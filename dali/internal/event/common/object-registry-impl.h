@@ -38,7 +38,7 @@ class UpdateManager;
 
 class ObjectRegistry;
 
-typedef IntrusivePtr<ObjectRegistry> ObjectRegistryPtr;
+using ObjectRegistryPtr = IntrusivePtr<ObjectRegistry>;
 
 /**
  * The ObjectRegistry notifies it's observers when an object is created.
@@ -111,7 +111,7 @@ private:
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  ~ObjectRegistry();
+  ~ObjectRegistry() override;
 
 private:
 

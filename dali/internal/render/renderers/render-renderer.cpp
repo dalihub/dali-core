@@ -134,7 +134,7 @@ Renderer::Renderer( SceneGraph::RenderDataProvider* dataProvider,
                     DepthFunction::Type depthFunction,
                     StencilParameters& stencilParameters )
 : mRenderDataProvider( dataProvider ),
-  mContext( NULL),
+  mContext( nullptr),
   mGeometry( geometry ),
   mUniformIndexMap(),
   mAttributesLocation(),
@@ -703,8 +703,7 @@ bool Renderer::Updated(BufferIndex bufferIndex, const SceneGraph::NodeDataProvid
     return true;
   }
 
-  std::vector<Render::Texture*> textures = mRenderDataProvider->GetTextures();
-  for (Render::Texture* texture : textures)
+  for( const auto& texture : mRenderDataProvider->GetTextures() )
   {
     if (texture && texture->IsNativeImage())
     {

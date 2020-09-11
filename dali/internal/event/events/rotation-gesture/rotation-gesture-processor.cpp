@@ -132,7 +132,7 @@ void RotationGestureProcessor::Process( Scene& scene, const RotationGestureEvent
         // Set mCurrentRotationEvent to use inside overridden methods called from ProcessAndEmit()
         mCurrentRotationEvent = &rotationEvent;
         ProcessAndEmit( hitTestResults );
-        mCurrentRotationEvent = NULL;
+        mCurrentRotationEvent = nullptr;
       }
       break;
     }

@@ -102,8 +102,8 @@ public:
   void Destroy( PropertyOwner& object );
 
 private:
-  typedef Dali::Vector<Observer*> Observers;
-  typedef Observers::Iterator ObserversIterator;
+  using Observers         = Dali::Vector<Observer*>;
+  using ObserversIterator = Observers::Iterator;
 
   Observers mObservers;
 };

@@ -2,7 +2,7 @@
 #define DALI_SIGNAL_SLOT_OBSERVERS_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,6 @@ class CallbackBase;
 class DALI_CORE_API SignalObserver
 {
 public:
-
   /**
    * @brief Constructor.
    * @SINCE_1_0.0
@@ -60,7 +59,7 @@ public:
    * @param[in] slotObserver The signal that has disconnected
    * @param[in] callback The callback attached to the signal disconnected
    */
-  virtual void SignalDisconnected( SlotObserver* slotObserver, CallbackBase* callback ) = 0;
+  virtual void SignalDisconnected(SlotObserver* slotObserver, CallbackBase* callback) = 0;
 };
 
 /**
@@ -72,7 +71,6 @@ public:
 class DALI_CORE_API SlotObserver
 {
 public:
-
   /**
    * @brief Constructor.
    * @SINCE_1_0.0
@@ -91,7 +89,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] callback The callback attached to the signal disconnected
    */
-  virtual void SlotDisconnected( CallbackBase* callback ) = 0;
+  virtual void SlotDisconnected(CallbackBase* callback) = 0;
 };
 
 /**

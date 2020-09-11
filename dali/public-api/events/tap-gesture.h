@@ -24,7 +24,6 @@
 
 namespace Dali
 {
-
 namespace Internal DALI_INTERNAL
 {
 class TapGesture;
@@ -45,7 +44,6 @@ class TapGesture;
 class DALI_CORE_API TapGesture : public Gesture
 {
 public:
-
   /**
    * @brief Creates an uninitialized TapGesture handle.
    *
@@ -59,14 +57,14 @@ public:
    * @SINCE_1_9.28
    * @param rhs A reference to the copied handle
    */
-  TapGesture( const TapGesture& rhs );
+  TapGesture(const TapGesture& rhs);
 
   /**
    * @brief Move constructor.
    * @SINCE_1_9.28
    * @param rhs The handle to move.
    */
-  TapGesture( TapGesture&& rhs );
+  TapGesture(TapGesture&& rhs);
 
   /**
    * @brief Assignment operator.
@@ -74,14 +72,14 @@ public:
    * @param rhs A reference to the copied handle
    * @return A reference to this
    */
-  TapGesture& operator=( const TapGesture& rhs );
+  TapGesture& operator=(const TapGesture& rhs);
 
   /**
    * @brief Move assignment operator.
    * @SINCE_1_9.28
    * @param rhs The handle to move.
    */
-  TapGesture& operator=( TapGesture&& rhs );
+  TapGesture& operator=(TapGesture&& rhs);
 
   /**
    * @brief Non virtual destructor.
@@ -123,7 +121,6 @@ public:
   const Vector2& GetLocalPoint() const;
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief This constructor is used internally to Create an initialized TapGesture handle.
@@ -131,7 +128,7 @@ public: // Not intended for application developers
    * @param[in] tapGesture A pointer to a newly allocated Dali resource
    * @SINCE_1_9.28
    */
-  explicit DALI_INTERNAL TapGesture( Internal::TapGesture* tapGesture );
+  explicit DALI_INTERNAL TapGesture(Internal::TapGesture* tapGesture);
   /// @endcond
 };
 

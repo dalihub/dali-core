@@ -16,9 +16,11 @@
  */
 
 #include "test-addon-manager.h"
+
 #include <dali-test-suite-utils.h>
-#include <cstring>
 #include <dlfcn.h>
+
+#include <cstring>
 
 #ifndef ADDON_LIBS_PATH
 #define ADDON_LIBS_PATH ""
@@ -28,7 +30,6 @@ namespace Dali
 {
 namespace Test
 {
-
 std::vector<std::string> AddOnManager::EnumerateAddOns()
 {
   std::string listFileName(ADDON_LIBS_PATH);
@@ -37,41 +38,41 @@ std::vector<std::string> AddOnManager::EnumerateAddOns()
   // Read list of available test addons
   tet_printf("Enumerating addons, file: %s\n", listFileName.c_str());
   std::vector<std::string> addons{};
-  auto* fin = fopen( listFileName.c_str(), "r" );
-  char* lineBuf = new char[256];
-  size_t n = 256;
-  while( getline( &lineBuf, &n, fin ) > 0 )
+  auto*                    fin     = fopen(listFileName.c_str(), "r");
+  char*                    lineBuf = new char[256];
+  size_t                   n       = 256;
+  while(getline(&lineBuf, &n, fin) > 0)
   {
     tet_printf("Adding %s\n", lineBuf);
-    addons.emplace_back( lineBuf );
+    addons.emplace_back(lineBuf);
   }
   fclose(fin);
-  delete [] lineBuf;
+  delete[] lineBuf;
   std::vector<std::string> retval{};
   // Open addons
-  for( auto& name : addons )
+  for(auto& name : addons)
   {
     std::string path(ADDON_LIBS_PATH);
     path += "/";
     path += name;
 
     mAddOnCache.emplace_back();
-    mAddOnCache.back().handle = dlopen( path.c_str(), RTLD_DEEPBIND|RTLD_LAZY );
-    if( !mAddOnCache.back().handle )
+    mAddOnCache.back().handle = dlopen(path.c_str(), RTLD_DEEPBIND | RTLD_LAZY);
+    if(!mAddOnCache.back().handle)
     {
       mAddOnCache.back().valid = false;
-      tet_printf( "Can't open addon lib: %s\n", path.c_str());
+      tet_printf("Can't open addon lib: %s\n", path.c_str());
       continue;
     }
     // Here addon must self register
-    if( !mAddOnCache.back().valid )
+    if(!mAddOnCache.back().valid)
     {
       puts("Addon invalid!");
     }
     else
     {
-      tet_printf( "Valid AddOn: %s\n", mAddOnCache.back().name.c_str() );
-      retval.emplace_back( mAddOnCache.back().name );
+      tet_printf("Valid AddOn: %s\n", mAddOnCache.back().name.c_str());
+      retval.emplace_back(mAddOnCache.back().name);
     }
   }
 
@@ -82,31 +83,29 @@ std::vector<std::string> AddOnManager::EnumerateAddOns()
    */
 }
 
-void AddOnManager::RegisterAddOnDispatchTable( const AddOnDispatchTable* dispatchTable )
+void AddOnManager::RegisterAddOnDispatchTable(const AddOnDispatchTable* dispatchTable)
 {
   // Register the dispatch table
   auto& entry = mAddOnCache.back();
-  entry.name = dispatchTable->name;
-  tet_printf( "Registering AddOn: %s\n", entry.name.c_str());
-  entry.GetGlobalProc = dispatchTable->GetGlobalProc;
+  entry.name  = dispatchTable->name;
+  tet_printf("Registering AddOn: %s\n", entry.name.c_str());
+  entry.GetGlobalProc   = dispatchTable->GetGlobalProc;
   entry.GetInstanceProc = dispatchTable->GetInstanceProc;
-  entry.GetAddOnInfo = dispatchTable->GetAddOnInfo;
-  entry.OnStart = dispatchTable->OnStart;
-  entry.OnStop = dispatchTable->OnStop;
-  entry.OnPause = dispatchTable->OnPause;
-  entry.OnResume = dispatchTable->OnResume;
-  entry.valid = true;
+  entry.GetAddOnInfo    = dispatchTable->GetAddOnInfo;
+  entry.OnStart         = dispatchTable->OnStart;
+  entry.OnStop          = dispatchTable->OnStop;
+  entry.OnPause         = dispatchTable->OnPause;
+  entry.OnResume        = dispatchTable->OnResume;
+  entry.valid           = true;
 }
 
-bool AddOnManager::GetAddOnInfo(const std::string& name, AddOnInfo& info )
+bool AddOnManager::GetAddOnInfo(const std::string& name, AddOnInfo& info)
 {
   auto retval = false;
-  std::find_if( mAddOnCache.begin(), mAddOnCache.end(),
-    [&retval, name, &info]( AddOnCacheEntry& entry )
-  {
+  std::find_if(mAddOnCache.begin(), mAddOnCache.end(), [&retval, name, &info](AddOnCacheEntry& entry) {
     if(entry.name == name)
     {
-      entry.GetAddOnInfo( info );
+      entry.GetAddOnInfo(info);
       retval = true;
       return true;
     }
@@ -115,7 +114,7 @@ bool AddOnManager::GetAddOnInfo(const std::string& name, AddOnInfo& info )
   return retval;
 }
 
-std::vector<AddOnLibrary> AddOnManager::LoadAddOns( const std::vector<std::string>& addonNames )
+std::vector<AddOnLibrary> AddOnManager::LoadAddOns(const std::vector<std::string>& addonNames)
 {
   if(mAddOnCache.empty())
   {
@@ -123,47 +122,45 @@ std::vector<AddOnLibrary> AddOnManager::LoadAddOns( const std::vector<std::strin
   }
 
   std::vector<AddOnLibrary> retval{};
-  for( auto& name : addonNames)
+  for(auto& name : addonNames)
   {
     size_t index = 0;
-    auto iter = std::find_if( mAddOnCache.begin(), mAddOnCache.end(),
-      [&retval, name, &index]( AddOnCacheEntry& entry )
+    auto   iter  = std::find_if(mAddOnCache.begin(), mAddOnCache.end(), [&retval, name, &index](AddOnCacheEntry& entry) {
+      index++;
+      if(entry.name == name)
       {
-        index++;
-        if(entry.name == name)
-        {
-          return true;
-        }
-        return false;
-      });
-    if( iter != mAddOnCache.end() )
+        return true;
+      }
+      return false;
+    });
+    if(iter != mAddOnCache.end())
     {
-      retval.emplace_back( *reinterpret_cast<void**>( &index ) );
+      retval.emplace_back(*reinterpret_cast<void**>(&index));
     }
     else
     {
-      retval.emplace_back( nullptr );
+      retval.emplace_back(nullptr);
     }
   }
 
   return retval;
 }
 
-void* AddOnManager::GetGlobalProc( const Dali::AddOnLibrary& addOnLibrary, const char* procName )
+void* AddOnManager::GetGlobalProc(const Dali::AddOnLibrary& addOnLibrary, const char* procName)
 {
-  auto index = *reinterpret_cast<const size_t*>( &addOnLibrary );
-  return mAddOnCache[index-1].GetGlobalProc( procName );
+  auto index = *reinterpret_cast<const size_t*>(&addOnLibrary);
+  return mAddOnCache[index - 1].GetGlobalProc(procName);
 }
 
-void* AddOnManager::GetInstanceProc( const Dali::AddOnLibrary& addOnLibrary, const char* procName )
+void* AddOnManager::GetInstanceProc(const Dali::AddOnLibrary& addOnLibrary, const char* procName)
 {
-  auto index = *reinterpret_cast<const size_t*>( &addOnLibrary );
-  return mAddOnCache[index-1].GetInstanceProc( procName );
+  auto index = *reinterpret_cast<const size_t*>(&addOnLibrary);
+  return mAddOnCache[index - 1].GetInstanceProc(procName);
 }
 
 void AddOnManager::Start()
 {
-  for( auto& entry : mAddOnCache )
+  for(auto& entry : mAddOnCache)
   {
     if(entry.OnStart)
     {
@@ -174,7 +171,7 @@ void AddOnManager::Start()
 
 void AddOnManager::Resume()
 {
-  for( auto& entry : mAddOnCache )
+  for(auto& entry : mAddOnCache)
   {
     if(entry.OnResume)
     {
@@ -185,7 +182,7 @@ void AddOnManager::Resume()
 
 void AddOnManager::Stop()
 {
-  for( auto& entry : mAddOnCache )
+  for(auto& entry : mAddOnCache)
   {
     if(entry.OnStop)
     {
@@ -196,7 +193,7 @@ void AddOnManager::Stop()
 
 void AddOnManager::Pause()
 {
-  for( auto& entry : mAddOnCache )
+  for(auto& entry : mAddOnCache)
   {
     if(entry.OnPause)
     {
@@ -205,6 +202,5 @@ void AddOnManager::Pause()
   }
 }
 
-}
-}
-
+} // namespace Test
+} // namespace Dali

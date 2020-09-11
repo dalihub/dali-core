@@ -20,7 +20,6 @@
 
 namespace Dali
 {
-
 TouchPoint::TouchPoint(int32_t id, PointState::Type state, float screenX, float screenY)
 : deviceId(id),
   state(state),

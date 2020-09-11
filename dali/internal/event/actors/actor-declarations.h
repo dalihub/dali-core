@@ -32,10 +32,10 @@ class CameraActor;
 class CustomActor;
 class Layer;
 
-typedef IntrusivePtr<Actor>       ActorPtr;
-typedef IntrusivePtr<CameraActor> CameraActorPtr;
-typedef IntrusivePtr<CustomActor> CustomActorPtr;
-typedef IntrusivePtr<Layer>       LayerPtr;
+using ActorPtr       = IntrusivePtr<Actor>;
+using CameraActorPtr = IntrusivePtr<CameraActor>;
+using CustomActorPtr = IntrusivePtr<CustomActor>;
+using LayerPtr       = IntrusivePtr<Layer>;
 
 } // namespace Internal
 

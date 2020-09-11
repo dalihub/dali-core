@@ -41,22 +41,22 @@ namespace Dali
  */
 namespace ParentOrigin
 {
-static constexpr float TOP = 0.0f;
-static constexpr float BOTTOM = 1.0f;
-static constexpr float LEFT = 0.0f;
-static constexpr float RIGHT = 1.0f;
-static constexpr float MIDDLE = 0.5f;
-static constexpr Vector3 TOP_LEFT     (0.0f, 0.0f, 0.5f);
-static constexpr Vector3 TOP_CENTER   (0.5f, 0.0f, 0.5f);
-static constexpr Vector3 TOP_RIGHT    (1.0f, 0.0f, 0.5f);
-static constexpr Vector3 CENTER_LEFT  (0.0f, 0.5f, 0.5f);
-static constexpr Vector3 CENTER       (0.5f, 0.5f, 0.5f);
-static constexpr Vector3 CENTER_RIGHT (1.0f, 0.5f, 0.5f);
-static constexpr Vector3 BOTTOM_LEFT  (0.0f, 1.0f, 0.5f);
+static constexpr float   TOP    = 0.0f;
+static constexpr float   BOTTOM = 1.0f;
+static constexpr float   LEFT   = 0.0f;
+static constexpr float   RIGHT  = 1.0f;
+static constexpr float   MIDDLE = 0.5f;
+static constexpr Vector3 TOP_LEFT(0.0f, 0.0f, 0.5f);
+static constexpr Vector3 TOP_CENTER(0.5f, 0.0f, 0.5f);
+static constexpr Vector3 TOP_RIGHT(1.0f, 0.0f, 0.5f);
+static constexpr Vector3 CENTER_LEFT(0.0f, 0.5f, 0.5f);
+static constexpr Vector3 CENTER(0.5f, 0.5f, 0.5f);
+static constexpr Vector3 CENTER_RIGHT(1.0f, 0.5f, 0.5f);
+static constexpr Vector3 BOTTOM_LEFT(0.0f, 1.0f, 0.5f);
 static constexpr Vector3 BOTTOM_CENTER(0.5f, 1.0f, 0.5f);
-static constexpr Vector3 BOTTOM_RIGHT (1.0f, 1.0f, 0.5f);
-static constexpr Vector3 DEFAULT( TOP_LEFT );
-}
+static constexpr Vector3 BOTTOM_RIGHT(1.0f, 1.0f, 0.5f);
+static constexpr Vector3 DEFAULT(TOP_LEFT);
+} // namespace ParentOrigin
 
 /**
  * @brief AnchorPoint constants.
@@ -66,23 +66,22 @@ static constexpr Vector3 DEFAULT( TOP_LEFT );
  */
 namespace AnchorPoint
 {
-static constexpr float TOP = 0.0f;
-static constexpr float BOTTOM = 1.0f;
-static constexpr float LEFT = 0.0f;
-static constexpr float RIGHT = 1.0f;
-static constexpr float MIDDLE = 0.5f;
-static constexpr Vector3 TOP_LEFT     (0.0f, 0.0f, 0.5f);
-static constexpr Vector3 TOP_CENTER   (0.5f, 0.0f, 0.5f);
-static constexpr Vector3 TOP_RIGHT    (1.0f, 0.0f, 0.5f);
-static constexpr Vector3 CENTER_LEFT  (0.0f, 0.5f, 0.5f);
-static constexpr Vector3 CENTER       (0.5f, 0.5f, 0.5f);
-static constexpr Vector3 CENTER_RIGHT (1.0f, 0.5f, 0.5f);
-static constexpr Vector3 BOTTOM_LEFT  (0.0f, 1.0f, 0.5f);
+static constexpr float   TOP    = 0.0f;
+static constexpr float   BOTTOM = 1.0f;
+static constexpr float   LEFT   = 0.0f;
+static constexpr float   RIGHT  = 1.0f;
+static constexpr float   MIDDLE = 0.5f;
+static constexpr Vector3 TOP_LEFT(0.0f, 0.0f, 0.5f);
+static constexpr Vector3 TOP_CENTER(0.5f, 0.0f, 0.5f);
+static constexpr Vector3 TOP_RIGHT(1.0f, 0.0f, 0.5f);
+static constexpr Vector3 CENTER_LEFT(0.0f, 0.5f, 0.5f);
+static constexpr Vector3 CENTER(0.5f, 0.5f, 0.5f);
+static constexpr Vector3 CENTER_RIGHT(1.0f, 0.5f, 0.5f);
+static constexpr Vector3 BOTTOM_LEFT(0.0f, 1.0f, 0.5f);
 static constexpr Vector3 BOTTOM_CENTER(0.5f, 1.0f, 0.5f);
-static constexpr Vector3 BOTTOM_RIGHT (1.0f, 1.0f, 0.5f);
-static constexpr Vector3 DEFAULT( CENTER );
-}
-
+static constexpr Vector3 BOTTOM_RIGHT(1.0f, 1.0f, 0.5f);
+static constexpr Vector3 DEFAULT(CENTER);
+} // namespace AnchorPoint
 
 /**
  * @brief Color Constants.
@@ -92,15 +91,15 @@ static constexpr Vector3 DEFAULT( CENTER );
  */
 namespace Color
 {
-static constexpr Vector4 BLACK( 0.0f, 0.0f, 0.0f, 1.0f );
-static constexpr Vector4 WHITE( 1.0f, 1.0f, 1.0f, 1.0f );
-static constexpr Vector4 RED(   1.0f, 0.0f, 0.0f, 1.0f );
-static constexpr Vector4 GREEN( 0.0f, 1.0f, 0.0f, 1.0f );
-static constexpr Vector4 BLUE(  0.0f, 0.0f, 1.0f, 1.0f );
-static constexpr Vector4 YELLOW(  1.0f, 1.0f, 0.0f, 1.0f );
-static constexpr Vector4 MAGENTA( 1.0f, 0.0f, 1.0f, 1.0f );
-static constexpr Vector4 CYAN(    0.0f, 1.0f, 1.0f, 1.0f );
-static constexpr Vector4 TRANSPARENT( 0.0f, 0.0f, 0.0f, 0.0f );
+static constexpr Vector4 BLACK(0.0f, 0.0f, 0.0f, 1.0f);
+static constexpr Vector4 WHITE(1.0f, 1.0f, 1.0f, 1.0f);
+static constexpr Vector4 RED(1.0f, 0.0f, 0.0f, 1.0f);
+static constexpr Vector4 GREEN(0.0f, 1.0f, 0.0f, 1.0f);
+static constexpr Vector4 BLUE(0.0f, 0.0f, 1.0f, 1.0f);
+static constexpr Vector4 YELLOW(1.0f, 1.0f, 0.0f, 1.0f);
+static constexpr Vector4 MAGENTA(1.0f, 0.0f, 1.0f, 1.0f);
+static constexpr Vector4 CYAN(0.0f, 1.0f, 1.0f, 1.0f);
+static constexpr Vector4 TRANSPARENT(0.0f, 0.0f, 0.0f, 0.0f);
 
 } // namespace Color
 
@@ -118,11 +117,11 @@ static constexpr float MACHINE_EPSILON_1000  = Epsilon<1000>::value;
 static constexpr float MACHINE_EPSILON_10000 = Epsilon<10000>::value;
 
 // float is preferred to double for performance on ARM targets
-static constexpr float PI   = static_cast<float>(M_PI);       ///< Pi
-static constexpr float PI_2 = static_cast<float>(M_PI_2);     ///< Pi/2
-static constexpr float PI_4 = static_cast<float>(M_PI_4);     ///< Pi/4
-static constexpr float PI_OVER_180 = Dali::Math::PI/180.0f;   ///< Constant used to convert degree to radian
-static constexpr float ONE80_OVER_PI = 180.0f/Dali::Math::PI; ///< Constant used to convert radian to degree
+static constexpr float PI            = static_cast<float>(M_PI);   ///< Pi
+static constexpr float PI_2          = static_cast<float>(M_PI_2); ///< Pi/2
+static constexpr float PI_4          = static_cast<float>(M_PI_4); ///< Pi/4
+static constexpr float PI_OVER_180   = Dali::Math::PI / 180.0f;    ///< Constant used to convert degree to radian
+static constexpr float ONE80_OVER_PI = 180.0f / Dali::Math::PI;    ///< Constant used to convert radian to degree
 
 } // namespace Math
 

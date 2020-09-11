@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,11 @@
  *
  */
 
-#include <string>
-#include <stdlib.h>
-#include <dali/devel-api/common/hash.h>
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/common/hash.h>
+#include <stdlib.h>
+
+#include <string>
 
 void utc_dali_hash_startup(void)
 {
@@ -30,7 +31,6 @@ void utc_dali_hash_cleanup(void)
   test_return_value = TET_PASS;
 }
 
-
 int UtcDaliHash(void)
 {
   // To fully test the Hash distribution we need to use a tool like http://code.google.com/p/smhasher/
@@ -40,11 +40,11 @@ int UtcDaliHash(void)
 
   tet_infoline("UtcDaliHash");
 
-  const std::string testString1( "highp vec4 glowColor = vec4( uGlowColor.rgb, uGlowColor.a * clampedColor.a );");
-  const std::string testString2( "lowp vec4 glowColor = vec4( uGlowColor.rgb, uGlowColor.a * clampedColor.a );");
+  const std::string testString1("highp vec4 glowColor = vec4( uGlowColor.rgb, uGlowColor.a * clampedColor.a );");
+  const std::string testString2("lowp vec4 glowColor = vec4( uGlowColor.rgb, uGlowColor.a * clampedColor.a );");
 
-  DALI_TEST_CHECK( Dali::CalculateHash( testString1 ) != Dali::CalculateHash( testString2 ) );
-  DALI_TEST_CHECK( Dali::CalculateHash( testString1, testString2 ) != Dali::CalculateHash( testString2, testString1 ) );
+  DALI_TEST_CHECK(Dali::CalculateHash(testString1) != Dali::CalculateHash(testString2));
+  DALI_TEST_CHECK(Dali::CalculateHash(testString1, testString2) != Dali::CalculateHash(testString2, testString1));
 
   END_TEST;
 }
@@ -54,8 +54,8 @@ int UtcDaliHashNegative(void)
   // negative test, check hash value == initial value
   const std::string emptyString;
 
-  DALI_TEST_CHECK( Dali::CalculateHash( emptyString ) != 0 );
-  DALI_TEST_CHECK( Dali::CalculateHash( emptyString, emptyString ) != 0 );
+  DALI_TEST_CHECK(Dali::CalculateHash(emptyString) != 0);
+  DALI_TEST_CHECK(Dali::CalculateHash(emptyString, emptyString) != 0);
 
   END_TEST;
 }

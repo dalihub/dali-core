@@ -71,7 +71,7 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~Constraint()
+  ~Constraint() override
   {
     // This is not responsible for removing constraints.
   }
@@ -81,7 +81,7 @@ private:
   /**
    * @copydoc ConstraintBase::DoClone()
    */
-  ConstraintBase* DoClone( Object& object ) override final
+  ConstraintBase* DoClone( Object& object ) final
   {
     ConstraintFunctionPtr funcPtr( mUserFunction->Clone() );
     return new Constraint( object,
@@ -111,7 +111,7 @@ private:
   /**
    * @copydoc ConstraintBase::ConnectConstraint()
    */
-  void ConnectConstraint() override final
+  void ConnectConstraint() final
   {
     // Should not come here if target object has been destroyed
     DALI_ASSERT_DEBUG( nullptr != mTargetObject );
@@ -226,7 +226,7 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~Constraint()
+  ~Constraint() override
   {
     // This is not responsible for removing constraints.
   }
@@ -236,7 +236,7 @@ private:
   /**
    * @copydoc ConstraintBase::DoClone()
    */
-  virtual ConstraintBase* DoClone( Object& object ) override final
+  ConstraintBase* DoClone( Object& object ) final
   {
     ConstraintFunctionPtr funcPtr( mUserFunction->Clone() );
     return new Constraint( object,
@@ -265,7 +265,7 @@ private:
   /**
    * @copydoc ConstraintBase::ConnectConstraint()
    */
-  void ConnectConstraint() override final
+  void ConnectConstraint() final
   {
     // Should not come here if target object has been destroyed
     DALI_ASSERT_DEBUG( nullptr != mTargetObject );

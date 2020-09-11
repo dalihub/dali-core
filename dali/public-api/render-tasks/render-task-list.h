@@ -47,7 +47,6 @@ class RenderTaskList;
 class DALI_CORE_API RenderTaskList : public BaseHandle
 {
 public:
-
   /**
    * @brief Creates an empty RenderTaskList handle.
    *
@@ -66,7 +65,7 @@ public:
    * @param[in] handle A handle to an object
    * @return A handle to a RenderTaskList or an uninitialized handle
    */
-  static RenderTaskList DownCast( BaseHandle handle );
+  static RenderTaskList DownCast(BaseHandle handle);
 
   /**
    * @brief Destructor.
@@ -99,7 +98,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  RenderTaskList( RenderTaskList&& rhs );
+  RenderTaskList(RenderTaskList&& rhs);
 
   /**
    * @brief Move assignment operator.
@@ -108,7 +107,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  RenderTaskList& operator=( RenderTaskList&& rhs );
+  RenderTaskList& operator=(RenderTaskList&& rhs);
 
   /**
    * @brief Creates a new RenderTask.
@@ -124,7 +123,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] task The render-task to remove.
    */
-  void RemoveTask( RenderTask task );
+  void RemoveTask(RenderTask task);
 
   /**
    * @brief Queries the number of render-tasks in the list.
@@ -143,10 +142,9 @@ public:
    * @return A handle to the render-task
    * @pre index should be in range i.e. less than GetTaskCount().
    */
-  RenderTask GetTask( uint32_t index ) const;
+  RenderTask GetTask(uint32_t index) const;
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief This constructor is used by Dali New() methods.
@@ -154,7 +152,7 @@ public: // Not intended for application developers
    * @SINCE_1_0.0
    * @param [in] renderTask A pointer to a newly allocated render-task
    */
-  explicit DALI_INTERNAL RenderTaskList( Internal::RenderTaskList* renderTask );
+  explicit DALI_INTERNAL RenderTaskList(Internal::RenderTaskList* renderTask);
   /// @endcond
 };
 

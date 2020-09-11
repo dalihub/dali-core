@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,19 +20,18 @@
 
 namespace Dali
 {
-
 // CallbackBaseFunctor methods:
 
-SignalDelegate::CallbackBaseFunctor::CallbackBaseFunctor( CallbackBase* callback )
-: mCallback( callback )
+SignalDelegate::CallbackBaseFunctor::CallbackBaseFunctor(CallbackBase* callback)
+: mCallback(callback)
 {
 }
 
 void SignalDelegate::CallbackBaseFunctor::operator()()
 {
-  if( mCallback )
+  if(mCallback)
   {
-    CallbackBase::Execute( *mCallback );
+    CallbackBase::Execute(*mCallback);
   }
 }
 
@@ -42,13 +41,12 @@ SignalDelegate::CallbackBaseFunctor::~CallbackBaseFunctor()
   delete mCallback;
 }
 
-
 // SignalDelegate methods:
 
-SignalDelegate::SignalDelegate( Dali::Actor connectActor, const std::string& signalName )
-: mIsConnected( false ),
-  mConnectActor( connectActor ),
-  mSignalName( signalName )
+SignalDelegate::SignalDelegate(Dali::Actor connectActor, const std::string& signalName)
+: mIsConnected(false),
+  mConnectActor(connectActor),
+  mSignalName(signalName)
 {
 }
 
@@ -56,6 +54,5 @@ bool SignalDelegate::IsConnected()
 {
   return mIsConnected;
 }
-
 
 } // namespace Dali

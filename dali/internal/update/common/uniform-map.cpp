@@ -148,7 +148,7 @@ const PropertyInputImpl* UniformMap::Find( const std::string& uniformName )
       }
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 UniformMap::SizeType UniformMap::Count() const

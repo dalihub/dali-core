@@ -16,18 +16,17 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/rendering/sampler.h>          // Dali::Sampler
+#include <dali/public-api/rendering/sampler.h> // Dali::Sampler
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/rendering/sampler-impl.h> // Dali::Internal::Sampler
 
 namespace Dali
 {
-
 Sampler Sampler::New()
 {
   Internal::SamplerPtr sampler = Internal::Sampler::New();
-  return Sampler( sampler.Get() );
+  return Sampler(sampler.Get());
 }
 
 Sampler::Sampler()
@@ -38,36 +37,36 @@ Sampler::~Sampler()
 {
 }
 
-Sampler::Sampler( const Sampler& handle ) = default;
+Sampler::Sampler(const Sampler& handle) = default;
 
-Sampler Sampler::DownCast( BaseHandle handle )
+Sampler Sampler::DownCast(BaseHandle handle)
 {
-  return Sampler( dynamic_cast<Dali::Internal::Sampler*>(handle.GetObjectPtr()));
+  return Sampler(dynamic_cast<Dali::Internal::Sampler*>(handle.GetObjectPtr()));
 }
 
-Sampler& Sampler::operator=( const Sampler& handle ) = default;
+Sampler& Sampler::operator=(const Sampler& handle) = default;
 
-Sampler::Sampler( Sampler&& rhs ) =  default;
+Sampler::Sampler(Sampler&& rhs) = default;
 
-Sampler& Sampler::operator=( Sampler&& rhs ) =  default;
+Sampler& Sampler::operator=(Sampler&& rhs) = default;
 
-void Sampler::SetFilterMode( FilterMode::Type minFilter, FilterMode::Type magFilter )
+void Sampler::SetFilterMode(FilterMode::Type minFilter, FilterMode::Type magFilter)
 {
-  GetImplementation(*this).SetFilterMode( minFilter, magFilter );
+  GetImplementation(*this).SetFilterMode(minFilter, magFilter);
 }
 
-void Sampler::SetWrapMode( WrapMode::Type uWrap, WrapMode::Type vWrap )
+void Sampler::SetWrapMode(WrapMode::Type uWrap, WrapMode::Type vWrap)
 {
-  GetImplementation(*this).SetWrapMode( uWrap, uWrap, vWrap );
+  GetImplementation(*this).SetWrapMode(uWrap, uWrap, vWrap);
 }
 
-void Sampler::SetWrapMode( WrapMode::Type rWrap, WrapMode::Type sWrap, WrapMode::Type tWrap )
+void Sampler::SetWrapMode(WrapMode::Type rWrap, WrapMode::Type sWrap, WrapMode::Type tWrap)
 {
-  GetImplementation(*this).SetWrapMode( rWrap, sWrap, tWrap );
+  GetImplementation(*this).SetWrapMode(rWrap, sWrap, tWrap);
 }
 
 Sampler::Sampler(Internal::Sampler* pointer)
-: BaseHandle( pointer )
+: BaseHandle(pointer)
 {
 }
 

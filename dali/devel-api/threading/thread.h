@@ -26,14 +26,12 @@
  */
 namespace Dali
 {
-
 /*
  * @brief Abstract class for thread functionality. Can be used for worker threads.
  */
 class DALI_CORE_API Thread
 {
 public:
-
   /**
    * @brief Creates a new thread and make it executable.
    */
@@ -45,7 +43,6 @@ public:
   void Join();
 
 protected:
-
   /**
    * @brief Constructor
    */
@@ -62,26 +59,23 @@ protected:
   virtual void Run() = 0;
 
 private:
-
   /**
    * Helper for the thread calling the entry function.
    * @param[in] This A pointer to the current thread object
    */
-  static void InternalThreadEntryFunc( Thread& This );
+  static void InternalThreadEntryFunc(Thread& This);
 
   // Not copyable or movable
-  Thread( const Thread& ) = delete; ///< Deleted copy constructor
-  Thread( Thread&& ) = delete; ///< Deleted move constructor
-  Thread& operator=( const Thread& ) = delete; ///< Deleted copy assignment operator
-  Thread& operator=( Thread&& ) = delete; ///< Deleted move assignment operator
+  Thread(const Thread&) = delete;            ///< Deleted copy constructor
+  Thread(Thread&&)      = delete;            ///< Deleted move constructor
+  Thread& operator=(const Thread&) = delete; ///< Deleted copy assignment operator
+  Thread& operator=(Thread&&) = delete;      ///< Deleted move assignment operator
 
 private:
-
   struct ThreadImpl;
   ThreadImpl* mImpl;
-
 };
 
-}
+} // namespace Dali
 
 #endif // DALI_THREAD_H

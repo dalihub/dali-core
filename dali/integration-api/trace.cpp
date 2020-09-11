@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,32 +19,29 @@
 #include <dali/integration-api/trace.h>
 
 // EXTERNAL INCLUDES
-#include <list>
 #include <cstdarg>
+#include <list>
 
 namespace Dali
 {
-
 namespace Integration
 {
-
 namespace Trace
 {
-
 thread_local LogContextFunction gThreadLocalLogContextFunction = nullptr;
 
-void InstallLogContextFunction( const LogContextFunction& logContextFunction )
+void InstallLogContextFunction(const LogContextFunction& logContextFunction)
 {
   gThreadLocalLogContextFunction = logContextFunction;
 }
 
-void LogContext( bool start, const char* tag )
+void LogContext(bool start, const char* tag)
 {
-  if ( !gThreadLocalLogContextFunction )
+  if(!gThreadLocalLogContextFunction)
   {
     return;
   }
-  gThreadLocalLogContextFunction( start, tag );
+  gThreadLocalLogContextFunction(start, tag);
 }
 
 #ifdef TRACE_ENABLED
@@ -54,34 +51,34 @@ typedef std::list<Filter*>::iterator FilterIter;
 
 namespace
 {
-  static FilterList* GetActiveFilters()
-  {
-    static FilterList* activeFilters = new FilterList;
-    return activeFilters;
-  }
-}
-
-Filter* Filter::New( bool trace, const char * environmentVariableName )
+static FilterList* GetActiveFilters()
 {
-  char * environmentVariableValue = getenv( environmentVariableName );
-  if ( environmentVariableValue )
+  static FilterList* activeFilters = new FilterList;
+  return activeFilters;
+}
+} // namespace
+
+Filter* Filter::New(bool trace, const char* environmentVariableName)
+{
+  char* environmentVariableValue = getenv(environmentVariableName);
+  if(environmentVariableValue)
   {
-    char envTraceString( 0 );
-    sscanf( environmentVariableValue, "%c", &envTraceString );
+    char envTraceString(0);
+    sscanf(environmentVariableValue, "%c", &envTraceString);
 
     // Just use 'f' and 't' as it's faster than doing full string comparisons
-    if ( envTraceString == 't' )
+    if(envTraceString == 't')
     {
       trace = true;
     }
-    else if ( envTraceString == 'f' )
+    else if(envTraceString == 'f')
     {
       trace = false;
     }
   }
 
-  Filter* filter = new Filter( trace );
-  GetActiveFilters()->push_back( filter );
+  Filter* filter = new Filter(trace);
+  GetActiveFilters()->push_back(filter);
   return filter;
 }
 
@@ -90,7 +87,7 @@ Filter* Filter::New( bool trace, const char * environmentVariableName )
  */
 void Filter::EnableGlobalTrace()
 {
-  for( FilterIter iter = GetActiveFilters()->begin(); iter != GetActiveFilters()->end(); iter++ )
+  for(FilterIter iter = GetActiveFilters()->begin(); iter != GetActiveFilters()->end(); iter++)
   {
     (*iter)->EnableTrace();
   }
@@ -101,7 +98,7 @@ void Filter::EnableGlobalTrace()
  */
 void Filter::DisableGlobalTrace()
 {
-  for( FilterIter iter = GetActiveFilters()->begin(); iter != GetActiveFilters()->end(); iter++ )
+  for(FilterIter iter = GetActiveFilters()->begin(); iter != GetActiveFilters()->end(); iter++)
   {
     (*iter)->DisableTrace();
   }
@@ -110,29 +107,29 @@ void Filter::DisableGlobalTrace()
 /**
  * Begin Trace
  */
-void Filter::BeginTrace( const char* tagName )
+void Filter::BeginTrace(const char* tagName)
 {
-  Dali::Integration::Trace::LogContext( true, tagName );
+  Dali::Integration::Trace::LogContext(true, tagName);
 }
 
 /**
  * End Trace
  */
-void Filter::EndTrace( const char* tagName )
+void Filter::EndTrace(const char* tagName)
 {
-  Dali::Integration::Trace::LogContext( false, tagName );
+  Dali::Integration::Trace::LogContext(false, tagName);
 }
 
 /**
  * Tracer Constructor
  */
-Tracer::Tracer( Filter* filter, const char* tag )
-: mTag( tag ),
-  mFilter( filter )
+Tracer::Tracer(Filter* filter, const char* tag)
+: mTag(tag),
+  mFilter(filter)
 {
-  if( mFilter && mFilter->IsTraceEnabled() )
+  if(mFilter && mFilter->IsTraceEnabled())
   {
-    mFilter->BeginTrace( mTag );
+    mFilter->BeginTrace(mTag);
   }
 }
 
@@ -141,16 +138,16 @@ Tracer::Tracer( Filter* filter, const char* tag )
  */
 Tracer::~Tracer()
 {
-  if( mFilter && mFilter->IsTraceEnabled() )
+  if(mFilter && mFilter->IsTraceEnabled())
   {
-    mFilter->EndTrace( mTag );
+    mFilter->EndTrace(mTag);
   }
 }
 
 #endif //TRACE_ENABLED
 
-} // Trace
+} // namespace Trace
 
-} // Integration
+} // namespace Integration
 
-} // Dali
+} // namespace Dali

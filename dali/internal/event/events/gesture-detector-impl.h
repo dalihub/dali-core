@@ -40,9 +40,9 @@ namespace Internal
 class GestureDetector;
 class GestureEventProcessor;
 
-typedef IntrusivePtr<GestureDetector> GestureDetectorPtr;
-typedef std::vector<GestureDetector*> GestureDetectorContainer;
-typedef std::vector<Actor*> GestureDetectorActorContainer;
+using GestureDetectorPtr            = IntrusivePtr<GestureDetector>;
+using GestureDetectorContainer      = std::vector<GestureDetector*>;
+using GestureDetectorActorContainer = std::vector<Actor*>;
 
 /**
  * This is a type trait that should be used by deriving gesture detectors for their container type.
@@ -50,7 +50,7 @@ typedef std::vector<Actor*> GestureDetectorActorContainer;
 template< typename Detector >
 struct DerivedGestureDetectorContainer
 {
-  typedef std::vector<Detector*> type;
+  using type = std::vector<Detector*>;
 };
 
 /**
@@ -123,7 +123,7 @@ protected: // Creation & Destruction
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~GestureDetector();
+  ~GestureDetector() override;
 
 private:
 
@@ -135,17 +135,17 @@ private:
   /**
    * @copydoc Dali::Internal::Object::Observer::SceneObjectAdded()
    */
-  virtual void SceneObjectAdded(Object& object);
+  void SceneObjectAdded(Object& object) override;
 
   /**
    * @copydoc Dali::Internal::Object::Observer::SceneObjectAdded()
    */
-  virtual void SceneObjectRemoved(Object& object) {}
+  void SceneObjectRemoved(Object& object) override {}
 
   /**
    * @copydoc Dali::Internal::Object::Observer::ObjectDestroyed()
    */
-  virtual void ObjectDestroyed(Object& object);
+  void ObjectDestroyed(Object& object) override;
 
   /**
    * For use in derived classes, called after an actor is attached.

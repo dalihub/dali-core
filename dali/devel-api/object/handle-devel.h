@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace DevelHandle
 {
-
 /**
  * @brief Set the type-info that the object is created by.
  *
@@ -35,7 +33,7 @@ namespace DevelHandle
  * @param[in] handle The handle created by this TypeInfo.
  * @param[in] typeInfo The TypeInfo that creates the handle.
  */
-DALI_CORE_API void SetTypeInfo( Handle& handle, const TypeInfo& typeInfo );
+DALI_CORE_API void SetTypeInfo(Handle& handle, const TypeInfo& typeInfo);
 
 } // namespace DevelHandle
 

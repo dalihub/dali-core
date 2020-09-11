@@ -21,8 +21,8 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/math/degree.h>
+#include <dali/public-api/math/math-utils.h>
 
 namespace Dali
 {
@@ -44,8 +44,9 @@ struct Radian
    * @SINCE_1_0.0
    */
   Radian()
-  : radian( 0.f )
-  { }
+  : radian(0.f)
+  {
+  }
 
   /**
    * @brief Creates an angle in radians.
@@ -53,9 +54,10 @@ struct Radian
    * @SINCE_1_0.0
    * @param[in] value The initial value in radians
    */
-  explicit constexpr Radian( float value )
-  : radian( value )
-  { }
+  explicit constexpr Radian(float value)
+  : radian(value)
+  {
+  }
 
   /**
    * @brief Creates an angle in radians from an angle in degrees.
@@ -63,9 +65,10 @@ struct Radian
    * @SINCE_1_0.0
    * @param[in] degree The initial value in degrees
    */
-  Radian( Degree degree )
-  : radian( degree.degree * Math::PI_OVER_180 )
-  { }
+  Radian(Degree degree)
+  : radian(degree.degree * Math::PI_OVER_180)
+  {
+  }
 
   /**
    * @brief Assigns an angle from a float value.
@@ -74,7 +77,7 @@ struct Radian
    * @param[in] value Float value in radians
    * @return A reference to this
    */
-  Radian& operator=( float value )
+  Radian& operator=(float value)
   {
     radian = value;
     return *this;
@@ -87,7 +90,7 @@ struct Radian
    * @param[in] degree The value in degrees
    * @return A reference to this
    */
-  Radian& operator=( Degree degree )
+  Radian& operator=(Degree degree)
   {
     radian = degree.degree * Math::PI_OVER_180;
     return *this;
@@ -104,17 +107,14 @@ struct Radian
   }
 
 public:
-
-  Radian( const Radian& ) = default; ///< Default copy constructor
-  Radian( Radian&& ) = default; ///< Default move constructor
-  Radian& operator=( const Radian& ) = default; ///< Default copy assignment operator
-  Radian& operator=( Radian&& ) = default; ///< Default move assignment operator
+  Radian(const Radian&) = default;            ///< Default copy constructor
+  Radian(Radian&&)      = default;            ///< Default move constructor
+  Radian& operator=(const Radian&) = default; ///< Default copy assignment operator
+  Radian& operator=(Radian&&) = default;      ///< Default move assignment operator
 
 public:
-
   // member data
   float radian; ///< The value in radians
-
 };
 
 // compiler generated destructor, copy constructor and assignment operators are ok as this class is POD
@@ -127,9 +127,9 @@ public:
  * @param[in] rhs Radian to compare to
  * @return True if the values are identical
  */
-inline bool operator==( Radian lhs, Radian rhs )
+inline bool operator==(Radian lhs, Radian rhs)
 {
-  return fabsf( lhs.radian - rhs.radian ) < Math::MACHINE_EPSILON_10; // expect Radian angles to be between 0 and 10 (multiplies of Math::PI)
+  return fabsf(lhs.radian - rhs.radian) < Math::MACHINE_EPSILON_10; // expect Radian angles to be between 0 and 10 (multiplies of Math::PI)
 }
 
 /**
@@ -140,9 +140,9 @@ inline bool operator==( Radian lhs, Radian rhs )
  * @param[in] rhs Radian to compare to
  * @return True if the values are not identical
  */
-inline bool operator!=( Radian lhs, Radian rhs )
+inline bool operator!=(Radian lhs, Radian rhs)
 {
-  return !( operator==( lhs, rhs ) );
+  return !(operator==(lhs, rhs));
 }
 
 /**
@@ -153,9 +153,9 @@ inline bool operator!=( Radian lhs, Radian rhs )
  * @param[in] rhs Degree to compare to
  * @return True if the values are identical
  */
-inline bool operator==( Radian lhs, Degree rhs )
+inline bool operator==(Radian lhs, Degree rhs)
 {
-  return fabsf( lhs.radian - Radian( rhs ).radian ) < Math::MACHINE_EPSILON_100; // expect Degree angles to be between 0 and 999
+  return fabsf(lhs.radian - Radian(rhs).radian) < Math::MACHINE_EPSILON_100; // expect Degree angles to be between 0 and 999
 }
 
 /**
@@ -166,9 +166,9 @@ inline bool operator==( Radian lhs, Degree rhs )
  * @param[in] rhs Degree to compare to
  * @return True if the values are not identical
  */
-inline bool operator!=( Radian lhs, Degree rhs )
+inline bool operator!=(Radian lhs, Degree rhs)
 {
-  return !( operator==( lhs, rhs ) );
+  return !(operator==(lhs, rhs));
 }
 
 /**
@@ -179,9 +179,9 @@ inline bool operator!=( Radian lhs, Degree rhs )
  * @param[in] rhs Radian to compare to
  * @return True if the values are identical
  */
-inline bool operator==( Degree lhs, Radian rhs )
+inline bool operator==(Degree lhs, Radian rhs)
 {
-  return fabsf( Radian( lhs ).radian - rhs.radian ) < Math::MACHINE_EPSILON_100; // expect Degree angles to be between 0 and 999
+  return fabsf(Radian(lhs).radian - rhs.radian) < Math::MACHINE_EPSILON_100; // expect Degree angles to be between 0 and 999
 }
 
 /**
@@ -192,9 +192,9 @@ inline bool operator==( Degree lhs, Radian rhs )
  * @param[in] rhs Radian to compare to
  * @return True if the values are not identical
  */
-inline bool operator!=( Degree lhs, Radian rhs )
+inline bool operator!=(Degree lhs, Radian rhs)
 {
-  return !( operator==( lhs, rhs ) );
+  return !(operator==(lhs, rhs));
 }
 
 /**
@@ -205,7 +205,7 @@ inline bool operator!=( Degree lhs, Radian rhs )
  * @param[in] rhs Radian to compare to
  * @return True if lhs is greater than rhs
  */
-inline bool operator>( Radian lhs, Radian rhs )
+inline bool operator>(Radian lhs, Radian rhs)
 {
   return lhs.radian > rhs.radian;
 }
@@ -218,7 +218,7 @@ inline bool operator>( Radian lhs, Radian rhs )
  * @param[in] rhs Degree to compare to
  * @return True if lhs is greater than rhs
  */
-inline bool operator>( Radian lhs, Degree rhs )
+inline bool operator>(Radian lhs, Degree rhs)
 {
   return lhs.radian > Radian(rhs).radian;
 }
@@ -231,7 +231,7 @@ inline bool operator>( Radian lhs, Degree rhs )
  * @param[in] rhs Degree to compare to
  * @return True if lhs is greater than rhs
  */
-inline bool operator>( Degree lhs, Radian rhs )
+inline bool operator>(Degree lhs, Radian rhs)
 {
   return Radian(lhs).radian > rhs.radian;
 }
@@ -244,7 +244,7 @@ inline bool operator>( Degree lhs, Radian rhs )
  * @param[in] rhs Radian to compare to
  * @return True if lhs is less than rhs
  */
-inline bool operator<( Radian lhs, Radian rhs )
+inline bool operator<(Radian lhs, Radian rhs)
 {
   return lhs.radian < rhs.radian;
 }
@@ -257,7 +257,7 @@ inline bool operator<( Radian lhs, Radian rhs )
  * @param[in] rhs Degree to compare to
  * @return True if lhs is less than rhs
  */
-inline bool operator<( Radian lhs, Degree rhs )
+inline bool operator<(Radian lhs, Degree rhs)
 {
   return lhs.radian < Radian(rhs).radian;
 }
@@ -270,7 +270,7 @@ inline bool operator<( Radian lhs, Degree rhs )
  * @param[in] rhs Radian to compare to
  * @return True if lhs is less than rhs
  */
-inline bool operator<( Degree lhs, Radian rhs )
+inline bool operator<(Degree lhs, Radian rhs)
 {
   return Radian(lhs).radian < rhs.radian;
 }
@@ -283,9 +283,9 @@ inline bool operator<( Degree lhs, Radian rhs )
  * @param[in] rhs float to multiply
  * @return Result of the multiplication
  */
-inline Radian operator*( Radian lhs, float rhs )
+inline Radian operator*(Radian lhs, float rhs)
 {
-  return Radian( lhs.radian * rhs );
+  return Radian(lhs.radian * rhs);
 }
 
 /**
@@ -294,9 +294,9 @@ inline Radian operator*( Radian lhs, float rhs )
  * @param[in] in Radian to negate
  * @return The negative angle
  */
-inline Radian operator-( Radian in )
+inline Radian operator-(Radian in)
 {
-   return Radian( -in.radian );
+  return Radian(-in.radian);
 }
 
 /**
@@ -307,24 +307,24 @@ inline Radian operator-( Radian in )
  * @param max value
  * @return The resulting radian
  */
-inline Radian Clamp( Radian angle, float min, float max )
+inline Radian Clamp(Radian angle, float min, float max)
 {
-  return Radian( Clamp<float>( angle.radian, min, max ) );
+  return Radian(Clamp<float>(angle.radian, min, max));
 }
 
 // useful constant angles
-inline constexpr Radian ANGLE_360( Math::PI * 2.f     );
-inline constexpr Radian ANGLE_315( Math::PI * 1.75f   );
-inline constexpr Radian ANGLE_270( Math::PI * 1.5f    );
-inline constexpr Radian ANGLE_225( Math::PI * 1.25f   );
-inline constexpr Radian ANGLE_180( Math::PI           );
-inline constexpr Radian ANGLE_135( Math::PI * 0.75f   );
-inline constexpr Radian ANGLE_120( Math::PI * 2.f/3.f );
-inline constexpr Radian ANGLE_90 ( Math::PI_2         );
-inline constexpr Radian ANGLE_60 ( Math::PI / 3.f     );
-inline constexpr Radian ANGLE_45 ( Math::PI_4         );
-inline constexpr Radian ANGLE_30 ( Math::PI / 6.f     );
-inline constexpr Radian ANGLE_0  ( 0.0f               );
+inline constexpr Radian ANGLE_360(Math::PI * 2.f);
+inline constexpr Radian ANGLE_315(Math::PI * 1.75f);
+inline constexpr Radian ANGLE_270(Math::PI * 1.5f);
+inline constexpr Radian ANGLE_225(Math::PI * 1.25f);
+inline constexpr Radian ANGLE_180(Math::PI);
+inline constexpr Radian ANGLE_135(Math::PI * 0.75f);
+inline constexpr Radian ANGLE_120(Math::PI * 2.f / 3.f);
+inline constexpr Radian ANGLE_90(Math::PI_2);
+inline constexpr Radian ANGLE_60(Math::PI / 3.f);
+inline constexpr Radian ANGLE_45(Math::PI_4);
+inline constexpr Radian ANGLE_30(Math::PI / 6.f);
+inline constexpr Radian ANGLE_0(0.0f);
 
 /**
  * @}

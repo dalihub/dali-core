@@ -25,7 +25,6 @@
 
 namespace Dali
 {
-
 namespace Internal DALI_INTERNAL
 {
 class RotationGesture;
@@ -44,10 +43,9 @@ class RotationGesture;
  * until the rotation ends.
  * @SINCE_1_9.28
  */
-class DALI_CORE_API RotationGesture: public Gesture
+class DALI_CORE_API RotationGesture : public Gesture
 {
 public:
-
   /**
    * @brief Creates an uninitialized RotationGesture handle.
    *
@@ -61,14 +59,14 @@ public:
    * @SINCE_1_9.28
    * @param[in] rhs A reference to the copied handle
    */
-  RotationGesture( const RotationGesture& rhs );
+  RotationGesture(const RotationGesture& rhs);
 
   /**
    * @brief Move constructor.
    * @SINCE_1_9.28
    * @param[in] rhs A reference to the moved handle
    */
-  RotationGesture( RotationGesture&& rhs );
+  RotationGesture(RotationGesture&& rhs);
 
   /**
    * @brief Assignment operator.
@@ -76,7 +74,7 @@ public:
    * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
-  RotationGesture& operator=( const RotationGesture& rhs );
+  RotationGesture& operator=(const RotationGesture& rhs);
 
   /**
    * @brief Move assignment operator.
@@ -84,7 +82,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  RotationGesture& operator=( RotationGesture&& rhs );
+  RotationGesture& operator=(RotationGesture&& rhs);
 
   /**
    * @brief Non virtual destructor.
@@ -114,7 +112,6 @@ public:
   const Vector2& GetLocalCenterPoint() const;
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief This constructor is used internally to Create an initialized RotationGesture handle.
@@ -122,7 +119,7 @@ public: // Not intended for application developers
    * @param[in] rotationGesture A pointer to a newly allocated Dali resource
    * @SINCE_1_9.28
    */
-  explicit DALI_INTERNAL RotationGesture( Internal::RotationGesture* rotationGesture );
+  explicit DALI_INTERNAL RotationGesture(Internal::RotationGesture* rotationGesture);
   /// @endcond
 };
 

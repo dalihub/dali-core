@@ -23,7 +23,6 @@
 
 namespace Dali
 {
-
 /**
  * @brief Enumeration for type of gesture.
  * @SINCE_1_9.28

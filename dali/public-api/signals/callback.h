@@ -2,7 +2,7 @@
 #define DALI_CALLBACK_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,6 @@ class CallbackBase;
 class DALI_CORE_API CallbackBase
 {
 public:
-
   /**
    * @brief Default constructor.
    * @SINCE_1_0.0
@@ -66,26 +65,26 @@ public:
    * @SINCE_1_0.0
    * @param[in] callback The callback to call
    */
-  static void Execute( CallbackBase& callback )
+  static void Execute(CallbackBase& callback)
   {
     // if we point to a function, we can call it directly
     // otherwise call the dispatcher function that knows the real type of the object
     // Note that this template dispatcher lives in client code so the library containing
     // the code has to be loaded, otherwise we crash boom bang
-    if( callback.mImpl && callback.mImpl->mObjectPointer )
+    if(callback.mImpl && callback.mImpl->mObjectPointer)
     {
       Dispatcher dispatcher = callback.mImpl->mMemberFunctionDispatcher;
-      (*dispatcher)( callback );
+      (*dispatcher)(callback);
     }
     // its also possible to have a member function pointer to a CallbackProvider
     // that has been deleted, so check if we have impl still
-    else if( !callback.mImpl && callback.mFunction )
+    else if(!callback.mImpl && callback.mFunction)
     {
       (*(callback.mFunction))();
     }
     else
     {
-      DALI_ASSERT_ALWAYS( 0 && "no function to execute" );
+      DALI_ASSERT_ALWAYS(0 && "no function to execute");
     }
   }
 
@@ -96,24 +95,24 @@ public:
    * @param[in] callback The callback to call
    * @return The value from the function
    */
-  template< typename R >
-  static R ExecuteReturn( CallbackBase& callback )
+  template<typename R>
+  static R ExecuteReturn(CallbackBase& callback)
   {
     R returnVal = R();
     // if we point to a function, we can call it directly
     // otherwise call the dispatcher function that knows the real type of the object
     // Note that this template dispatcher lives in client code so the library containing
     // the code has to be loaded, otherwise we crash boom bang
-    if( callback.mImpl && callback.mImpl->mObjectPointer )
+    if(callback.mImpl && callback.mImpl->mObjectPointer)
     {
-      typedef R(*Dispatcher)(CallbackBase& base);
-      Dispatcher dispatcher = reinterpret_cast< Dispatcher >( callback.mImpl->mMemberFunctionDispatcher );
-      returnVal = (*dispatcher)( callback );
+      using Dispatcher      = R (*)(CallbackBase&);
+      Dispatcher dispatcher = reinterpret_cast<Dispatcher>(callback.mImpl->mMemberFunctionDispatcher);
+      returnVal             = (*dispatcher)(callback);
     }
-    else if( !callback.mImpl && callback.mFunction )
+    else if(!callback.mImpl && callback.mFunction)
     {
-      typedef R(*Function1)();
-      returnVal = (*(reinterpret_cast< Function1 >( callback.mFunction )))();
+      using Function1 = R (*)();
+      returnVal       = (*(reinterpret_cast<Function1>(callback.mFunction)))();
     }
 
     return returnVal;
@@ -127,24 +126,24 @@ public:
    * @param[in] callback The callback to call
    * @param[in] param1 The first parameter to pass into the function
    */
-  template< typename P1 >
-  static void Execute( CallbackBase& callback, P1 param1 )
+  template<typename P1>
+  static void Execute(CallbackBase& callback, P1 param1)
   {
     // if we point to a function, we can call it directly
     // otherwise call the dispatcher function that knows the real type of the object
     // Note that this template dispatcher lives in client code (where the callback was created)
     // so the library containing the code has to be loaded, otherwise we crash boom bang
-    if( callback.mImpl && callback.mImpl->mObjectPointer )
+    if(callback.mImpl && callback.mImpl->mObjectPointer)
     {
-      typedef void(*Dispatcher)(CallbackBase& base,P1);
-      Dispatcher dispatcher = reinterpret_cast< Dispatcher >( callback.mImpl->mMemberFunctionDispatcher );
-      (*dispatcher)( callback, param1 );
+      using Dispatcher      = void (*)(CallbackBase&, P1);
+      Dispatcher dispatcher = reinterpret_cast<Dispatcher>(callback.mImpl->mMemberFunctionDispatcher);
+      (*dispatcher)(callback, param1);
     }
-    else if( !callback.mImpl && callback.mFunction )
+    else if(!callback.mImpl && callback.mFunction)
     {
       // convert function type
-      typedef void(*Function1)(P1);
-      (*(reinterpret_cast< Function1 >( callback.mFunction )))( param1 );
+      using Function1 = void (*)(P1);
+      (*(reinterpret_cast<Function1>(callback.mFunction)))(param1);
     }
   }
 
@@ -157,25 +156,25 @@ public:
    * @param[in] param1 The first parameter to pass into the function
    * @return The value from the function
    */
-  template< typename R, typename P1 >
-  static R ExecuteReturn( CallbackBase& callback, P1 param1 )
+  template<typename R, typename P1>
+  static R ExecuteReturn(CallbackBase& callback, P1 param1)
   {
-    R returnVal =  R();
+    R returnVal = R();
     // if we point to a function, we can call it directly
     // otherwise call the dispatcher function that knows the real type of the object
     // Note that this template dispatcher lives in client code (where the callback was created)
     // so the library containing the code has to be loaded, otherwise we crash boom bang
-    if( callback.mImpl && callback.mImpl->mObjectPointer )
+    if(callback.mImpl && callback.mImpl->mObjectPointer)
     {
-      typedef R(*Dispatcher)(CallbackBase& base,P1);
-      Dispatcher dispatcher = reinterpret_cast< Dispatcher >( callback.mImpl->mMemberFunctionDispatcher );
-      returnVal = (*dispatcher)( callback, param1 );
+      using Dispatcher      = R (*)(CallbackBase&, P1);
+      Dispatcher dispatcher = reinterpret_cast<Dispatcher>(callback.mImpl->mMemberFunctionDispatcher);
+      returnVal             = (*dispatcher)(callback, param1);
     }
-    else if( !callback.mImpl && callback.mFunction )
+    else if(!callback.mImpl && callback.mFunction)
     {
       // convert function type
-      typedef R(*Function1)(P1);
-      returnVal = (*(reinterpret_cast< Function1 >( callback.mFunction )))( param1 );
+      using Function1 = R (*)(P1);
+      returnVal       = (*(reinterpret_cast<Function1>(callback.mFunction)))(param1);
     }
 
     return returnVal;
@@ -190,24 +189,24 @@ public:
    * @param[in] param1 The first parameter to pass into the function
    * @param[in] param2 The second parameter to pass into the function
    */
-  template< typename P1, typename P2 >
-  static void Execute( CallbackBase& callback, P1 param1, P2 param2 )
+  template<typename P1, typename P2>
+  static void Execute(CallbackBase& callback, P1 param1, P2 param2)
   {
     // if we point to a function, we can call it directly
     // otherwise call the dispatcher function that knows the real type of the object
     // Note that this template dispatcher lives in client code (where the callback was created)
     // so the library containing the code has to be loaded, otherwise we crash boom bang
-    if( callback.mImpl && callback.mImpl->mObjectPointer )
+    if(callback.mImpl && callback.mImpl->mObjectPointer)
     {
-      typedef void(*Dispatcher)(CallbackBase& base,P1,P2);
-      Dispatcher dispatcher = reinterpret_cast< Dispatcher >( callback.mImpl->mMemberFunctionDispatcher );
-      (*dispatcher)( callback, param1, param2 );
+      using Dispatcher      = void (*)(CallbackBase&, P1, P2);
+      Dispatcher dispatcher = reinterpret_cast<Dispatcher>(callback.mImpl->mMemberFunctionDispatcher);
+      (*dispatcher)(callback, param1, param2);
     }
-    else if( !callback.mImpl && callback.mFunction )
+    else if(!callback.mImpl && callback.mFunction)
     {
       // convert function type
-      typedef void(*Function2)(P1,P2);
-      (*(reinterpret_cast< Function2 >( callback.mFunction )))( param1, param2 );
+      using Function2 = void (*)(P1, P2);
+      (*(reinterpret_cast<Function2>(callback.mFunction)))(param1, param2);
     }
   }
 
@@ -221,25 +220,25 @@ public:
    * @param[in] param2 The second parameter to pass into the function
    * @return The return value from the function
    */
-  template< typename R, typename P1, typename P2 >
-  static R ExecuteReturn( CallbackBase& callback, P1 param1, P2 param2 )
+  template<typename R, typename P1, typename P2>
+  static R ExecuteReturn(CallbackBase& callback, P1 param1, P2 param2)
   {
-    R returnVal= R();
+    R returnVal = R();
     // if we point to a function, we can call it directly
     // otherwise call the dispatcher function that knows the real type of the object
     // Note that this template dispatcher lives in client code (where the callback was created)
     // so the library containing the code has to be loaded, otherwise we crash boom bang
-    if( callback.mImpl && callback.mImpl->mObjectPointer )
+    if(callback.mImpl && callback.mImpl->mObjectPointer)
     {
-      typedef R(*Dispatcher)(CallbackBase& base,P1,P2);
-      Dispatcher dispatcher = reinterpret_cast< Dispatcher >( callback.mImpl->mMemberFunctionDispatcher );
-      returnVal = (*dispatcher)( callback, param1, param2 );
+      using Dispatcher      = R (*)(CallbackBase&, P1, P2);
+      Dispatcher dispatcher = reinterpret_cast<Dispatcher>(callback.mImpl->mMemberFunctionDispatcher);
+      returnVal             = (*dispatcher)(callback, param1, param2);
     }
-    else if( !callback.mImpl && callback.mFunction )
+    else if(!callback.mImpl && callback.mFunction)
     {
       // convert function type
-      typedef R(*Function2)(P1,P2);
-      returnVal = (*(reinterpret_cast< Function2 >( callback.mFunction )))( param1, param2 );
+      using Function2 = R (*)(P1, P2);
+      returnVal       = (*(reinterpret_cast<Function2>(callback.mFunction)))(param1, param2);
     }
 
     return returnVal;
@@ -255,24 +254,24 @@ public:
    * @param[in] param2 The second parameter to pass into the function
    * @param[in] param3 The third parameter to pass into the function
    */
-  template< typename P1, typename P2, typename P3 >
-  static void Execute( CallbackBase& callback, P1 param1, P2 param2, P3 param3 )
+  template<typename P1, typename P2, typename P3>
+  static void Execute(CallbackBase& callback, P1 param1, P2 param2, P3 param3)
   {
     // if we point to a function, we can call it directly
     // otherwise call the dispatcher function that knows the real type of the object
     // Note that this template dispatcher lives in client code (where the callback was created)
     // so the library containing the code has to be loaded, otherwise we crash boom bang
-    if( callback.mImpl && callback.mImpl->mObjectPointer )
+    if(callback.mImpl && callback.mImpl->mObjectPointer)
     {
-      typedef void(*Dispatcher)(CallbackBase& base,P1,P2,P3);
-      Dispatcher dispatcher = reinterpret_cast< Dispatcher >( callback.mImpl->mMemberFunctionDispatcher );
-      (*dispatcher)( callback, param1, param2, param3 );
+      using Dispatcher      = void (*)(CallbackBase&, P1, P2, P3);
+      Dispatcher dispatcher = reinterpret_cast<Dispatcher>(callback.mImpl->mMemberFunctionDispatcher);
+      (*dispatcher)(callback, param1, param2, param3);
     }
-    else if( !callback.mImpl && callback.mFunction )
+    else if(!callback.mImpl && callback.mFunction)
     {
       // convert function type
-      typedef void(*Function2)(P1,P2,P3);
-      (*(reinterpret_cast< Function2 >( callback.mFunction )))( param1, param2, param3 );
+      using Function2 = void (*)(P1, P2, P3);
+      (*(reinterpret_cast<Function2>(callback.mFunction)))(param1, param2, param3);
     }
   }
 
@@ -287,62 +286,61 @@ public:
    * @param[in] param3 The third parameter to pass into the function
    * @return The return value from the function
    */
-  template< typename R, typename P1, typename P2, typename P3 >
-  static R ExecuteReturn( CallbackBase& callback, P1 param1, P2 param2, P3 param3 )
+  template<typename R, typename P1, typename P2, typename P3>
+  static R ExecuteReturn(CallbackBase& callback, P1 param1, P2 param2, P3 param3)
   {
-    R returnVal= R();
+    R returnVal = R();
     // if we point to a function, we can call it directly
     // otherwise call the dispatcher function that knows the real type of the object
     // Note that this template dispatcher lives in client code (where the callback was created)
     // so the library containing the code has to be loaded, otherwise we crash boom bang
-    if( callback.mImpl && callback.mImpl->mObjectPointer )
+    if(callback.mImpl && callback.mImpl->mObjectPointer)
     {
-      typedef R(*Dispatcher)(CallbackBase& base,P1,P2,P3);
-      Dispatcher dispatcher = reinterpret_cast< Dispatcher >( callback.mImpl->mMemberFunctionDispatcher );
-      returnVal = (*dispatcher)( callback, param1, param2, param3 );
+      using Dispatcher      = R (*)(CallbackBase&, P1, P2, P3);
+      Dispatcher dispatcher = reinterpret_cast<Dispatcher>(callback.mImpl->mMemberFunctionDispatcher);
+      returnVal             = (*dispatcher)(callback, param1, param2, param3);
     }
-    else if( !callback.mImpl && callback.mFunction )
+    else if(!callback.mImpl && callback.mFunction)
     {
       // convert function type
-      typedef R(*Function2)(P1,P2,P3);
-      returnVal = (*(reinterpret_cast< Function2 >( callback.mFunction )))( param1, param2, param3 );
+      using Function2 = R (*)(P1, P2, P3);
+      returnVal       = (*(reinterpret_cast<Function2>(callback.mFunction)))(param1, param2, param3);
     }
 
     return returnVal;
   }
 
 protected: // Constructors for deriving classes
-
   /**
    * @brief Function with static linkage.
    * @SINCE_1_0.0
    */
-  typedef void(*Function)(void);
+  using Function = void (*)();
 
   /**
    * @brief Member function.
    * @SINCE_1_0.0
    */
-  typedef void (CallbackBase::*MemberFunction)( void );
+  using MemberFunction = void (CallbackBase::*)();
 
   /**
    * @brief Used to call the correct member function.
    * @SINCE_1_0.0
    */
-  typedef void (*Dispatcher)( CallbackBase& base );
+  using Dispatcher = void (*)(CallbackBase&);
 
   /**
    * @brief Used to destroy mObjectPointer (NULL if not mObjectPointer is not owned).
    * @SINCE_1_0.0
    */
-  typedef void(*Destructor)(void* object);
+  using Destructor = void (*)(void*);
 
   /**
    * @brief Copy constructor operator not declared.
    * @SINCE_1_0.0
    * @param[in] rhs Handle to an object
    */
-  CallbackBase( const CallbackBase& rhs );
+  CallbackBase(const CallbackBase& rhs);
 
   /**
    * @brief Assignment operator not declared.
@@ -350,7 +348,7 @@ protected: // Constructors for deriving classes
    * @param[in] rhs Handle to an object
    * @return A reference to this
    */
-  CallbackBase& operator=( const CallbackBase& rhs );
+  CallbackBase& operator=(const CallbackBase& rhs);
 
   /**
    * @brief Constructor for function with static linkage.
@@ -358,7 +356,7 @@ protected: // Constructors for deriving classes
    * @SINCE_1_0.0
    * @param[in] function The function to call
    */
-  CallbackBase( Function function );
+  CallbackBase(Function function);
 
   /**
    * @brief Constructor for member function.
@@ -368,7 +366,7 @@ protected: // Constructors for deriving classes
    * @param[in] function The member function of the object
    * @param[in] dispatcher Used to call the actual object
    */
-  CallbackBase( void* object, MemberFunction function, Dispatcher dispatcher );
+  CallbackBase(void* object, MemberFunction function, Dispatcher dispatcher);
 
   /**
    * @brief Constructor for member function.
@@ -379,28 +377,27 @@ protected: // Constructors for deriving classes
    * @param dispatcher Used to call the actual object
    * @param destructor Used to delete the owned object
    */
-  CallbackBase( void* object, MemberFunction function, Dispatcher dispatcher, Destructor destructor );
+  CallbackBase(void* object, MemberFunction function, Dispatcher dispatcher, Destructor destructor);
 
 public: // Data for deriving classes & Dispatchers
-
   /**
    * @brief Struct to hold the extra data needed for member functions.
    * @SINCE_1_0.0
    */
   struct Impl
   {
-    Impl();                               ///< Default constructor @SINCE_1_0.0
+    Impl(); ///< Default constructor @SINCE_1_0.0
 
-    void* mObjectPointer;                 ///< Object whose member function will be called. Not owned if mDestructorDispatcher is NULL.
+    void*      mObjectPointer;            ///< Object whose member function will be called. Not owned if mDestructorDispatcher is NULL.
     Dispatcher mMemberFunctionDispatcher; ///< Dispatcher for member functions
     Destructor mDestructorDispatcher;     ///< Destructor for owned objects. NULL if mDestructorDispatcher is not owned.
   };
-  Impl* mImpl;                            ///< Implementation pointer
+  Impl* mImpl; ///< Implementation pointer
 
   union
   {
-    MemberFunction mMemberFunction;       ///< Pointer to member function
-    Function mFunction;                   ///< Static function
+    MemberFunction mMemberFunction; ///< Pointer to member function
+    Function       mFunction;       ///< Static function
   };
 };
 
@@ -411,13 +408,13 @@ public: // Data for deriving classes & Dispatchers
  * @param[in] rhs A reference to compare to
  * @return True if lhs is same as rhs
  */
-bool operator==( const CallbackBase& lhs, const CallbackBase& rhs );
+bool operator==(const CallbackBase& lhs, const CallbackBase& rhs);
 
 /**
  * @brief Dispatcher to delete an object.
  * @SINCE_1_0.0
  */
-template< class T >
+template<class T>
 struct Destroyer
 {
   /**
@@ -425,11 +422,11 @@ struct Destroyer
    * @SINCE_1_0.0
    * @param[in] object An object to delete
    */
-  static void Delete( void* object )
+  static void Delete(void* object)
   {
     // CallbackBase owns the object but we're the only one who knows the real type so need
     // to delete by "downcasting" from void* to the correct type
-    delete reinterpret_cast< T* >( object );
+    delete reinterpret_cast<T*>(object);
   }
 };
 
@@ -437,7 +434,7 @@ struct Destroyer
  * @brief Dispatcher to call the actual member function.
  * @SINCE_1_0.0
  */
-template< class T >
+template<class T>
 struct Dispatcher0
 {
   /**
@@ -446,12 +443,12 @@ struct Dispatcher0
    * @SINCE_1_0.0
    * @param[in] callback The callback information
    */
-  static void Dispatch( CallbackBase& callback )
+  static void Dispatch(CallbackBase& callback)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    typedef void(T::*MemberFunction)(void);
-    MemberFunction function = reinterpret_cast< MemberFunction >( callback.mMemberFunction );
+    T* object               = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    using MemberFunction    = void (T::*)();
+    MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
     (object->*function)();
   }
 };
@@ -460,7 +457,7 @@ struct Dispatcher0
  * @brief Dispatcher to call the actual member function.
  * @SINCE_1_0.0
  */
-template< class T, typename P1 >
+template<class T, typename P1>
 struct Dispatcher1
 {
   /**
@@ -470,13 +467,13 @@ struct Dispatcher1
    * @param[in] callback The callback information
    * @param[in] param1 The first parameter to pass to the real member function
    */
-  static void Dispatch( CallbackBase& callback, P1 param1 )
+  static void Dispatch(CallbackBase& callback, P1 param1)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    typedef void(T::*MemberFunction)(P1);
-    MemberFunction function = reinterpret_cast< MemberFunction >( callback.mMemberFunction );
-    (object->*function)( param1 );
+    T* object               = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    using MemberFunction    = void (T::*)(P1);
+    MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
+    (object->*function)(param1);
   }
 };
 
@@ -484,7 +481,7 @@ struct Dispatcher1
  * @brief Dispatcher to call the actual member function.
  * @SINCE_1_0.0
  */
-template< class T, typename P1, typename P2 >
+template<class T, typename P1, typename P2>
 struct Dispatcher2
 {
   /**
@@ -495,13 +492,13 @@ struct Dispatcher2
    * @param[in] param1 The first parameter to pass to the real member function
    * @param[in] param2 The second parameter to pass to the real member function
    */
-  static void Dispatch( CallbackBase& callback, P1 param1, P2 param2 )
+  static void Dispatch(CallbackBase& callback, P1 param1, P2 param2)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    typedef void(T::*MemberFunction)(P1, P2);
-    MemberFunction function = reinterpret_cast< MemberFunction >( callback.mMemberFunction );
-    (object->*function)( param1, param2 );
+    T* object               = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    using MemberFunction    = void (T::*)(P1, P2);
+    MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
+    (object->*function)(param1, param2);
   }
 };
 
@@ -509,7 +506,7 @@ struct Dispatcher2
  * @brief Dispatcher to call the actual member function.
  * @SINCE_1_0.0
  */
-template< class T, typename P1, typename P2, typename P3 >
+template<class T, typename P1, typename P2, typename P3>
 struct Dispatcher3
 {
   /**
@@ -521,13 +518,13 @@ struct Dispatcher3
    * @param[in] param2 The second parameter to pass to the real member function
    * @param[in] param3 The third parameter to pass to the real member function
    */
-  static void Dispatch( CallbackBase& callback, P1 param1, P2 param2, P3 param3 )
+  static void Dispatch(CallbackBase& callback, P1 param1, P2 param2, P3 param3)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    typedef void(T::*MemberFunction)(P1, P2, P3);
-    MemberFunction function = reinterpret_cast< MemberFunction >( callback.mMemberFunction );
-    (object->*function)( param1, param2, param3 );
+    T* object               = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    using MemberFunction    = void (T::*)(P1, P2, P3);
+    MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
+    (object->*function)(param1, param2, param3);
   }
 };
 
@@ -535,7 +532,7 @@ struct Dispatcher3
  * @brief Dispatcher to call the actual member function.
  * @SINCE_1_0.0
  */
-template< class T, typename R >
+template<class T, typename R>
 struct DispatcherReturn0
 {
   /**
@@ -545,12 +542,12 @@ struct DispatcherReturn0
    * @param[in] callback The callback information
    * @return The value
    */
-  static R Dispatch( CallbackBase& callback )
+  static R Dispatch(CallbackBase& callback)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    typedef R(T::*MemberFunction)(void);
-    MemberFunction function = reinterpret_cast< MemberFunction >( callback.mMemberFunction );
+    T* object               = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    using MemberFunction    = R (T::*)();
+    MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
     return (object->*function)();
   }
 };
@@ -559,7 +556,7 @@ struct DispatcherReturn0
  * @brief Dispatcher to call the actual member function.
  * @SINCE_1_0.0
  */
-template< class T, typename R, typename P1 >
+template<class T, typename R, typename P1>
 struct DispatcherReturn1
 {
   /**
@@ -570,13 +567,13 @@ struct DispatcherReturn1
    * @param[in] param1 The first parameter to pass to the real member function
    * @return The return value from the function
    */
-  static R Dispatch( CallbackBase& callback, P1 param1 )
+  static R Dispatch(CallbackBase& callback, P1 param1)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    typedef R(T::*MemberFunction)(P1);
-    MemberFunction function = reinterpret_cast< MemberFunction >( callback.mMemberFunction );
-    return (object->*function)( param1 );
+    T* object               = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    using MemberFunction    = R (T::*)(P1);
+    MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
+    return (object->*function)(param1);
   }
 };
 
@@ -584,7 +581,7 @@ struct DispatcherReturn1
  * @brief Dispatcher to call the actual member function.
  * @SINCE_1_0.0
  */
-template< class T, typename R, typename P1, typename P2 >
+template<class T, typename R, typename P1, typename P2>
 struct DispatcherReturn2
 {
   /**
@@ -596,13 +593,13 @@ struct DispatcherReturn2
    * @param[in] param2 The second parameter to pass to the real member function
    * @return The return value from the function
    */
-  static R Dispatch( CallbackBase& callback, P1 param1, P2 param2 )
+  static R Dispatch(CallbackBase& callback, P1 param1, P2 param2)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    typedef R(T::*MemberFunction)(P1, P2);
-    MemberFunction function = reinterpret_cast< MemberFunction >( callback.mMemberFunction );
-    return (object->*function)( param1, param2 );
+    T* object               = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    using MemberFunction    = R (T::*)(P1, P2);
+    MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
+    return (object->*function)(param1, param2);
   }
 };
 
@@ -610,7 +607,7 @@ struct DispatcherReturn2
  * @brief Dispatcher to call the actual member function.
  * @SINCE_1_0.0
  */
-template< class T, typename R, typename P1, typename P2, typename P3 >
+template<class T, typename R, typename P1, typename P2, typename P3>
 struct DispatcherReturn3
 {
   /**
@@ -623,13 +620,13 @@ struct DispatcherReturn3
    * @param[in] param3 The third parameter to pass to the real member function
    * @return The return value from the function
    */
-  static R Dispatch( CallbackBase& callback, P1 param1, P2 param2, P3 param3 )
+  static R Dispatch(CallbackBase& callback, P1 param1, P2 param2, P3 param3)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    typedef R(T::*MemberFunction)(P1, P2, P3);
-    MemberFunction function = reinterpret_cast< MemberFunction >( callback.mMemberFunction );
-    return (object->*function)( param1, param2, param3 );
+    T* object               = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    using MemberFunction    = R (T::*)(P1, P2, P3);
+    MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
+    return (object->*function)(param1, param2, param3);
   }
 };
 
@@ -637,7 +634,7 @@ struct DispatcherReturn3
  * @brief Dispatcher to call a functor.
  * @SINCE_1_0.0
  */
-template< class T >
+template<class T>
 struct FunctorDispatcher0
 {
   /**
@@ -646,10 +643,10 @@ struct FunctorDispatcher0
    * @SINCE_1_0.0
    * @param[in] callback The callback information
    */
-  static void Dispatch( CallbackBase& callback )
+  static void Dispatch(CallbackBase& callback)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
+    T* object = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
     (*object)();
   }
 };
@@ -658,7 +655,7 @@ struct FunctorDispatcher0
  * @brief Dispatcher to call a functor.
  * @SINCE_1_0.0
  */
-template< class T, typename P1 >
+template<class T, typename P1>
 struct FunctorDispatcher1
 {
   /**
@@ -668,11 +665,11 @@ struct FunctorDispatcher1
    * @param[in] callback The callback information
    * @param[in] param1 The first parameter to pass to the real member function.
    */
-  static void Dispatch( CallbackBase& callback, P1 param1 )
+  static void Dispatch(CallbackBase& callback, P1 param1)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    (*object)( param1 );
+    T* object = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    (*object)(param1);
   }
 };
 
@@ -680,7 +677,7 @@ struct FunctorDispatcher1
  * @brief Dispatcher to call a functor.
  * @SINCE_1_0.0
  */
-template< class T, typename P1, typename P2 >
+template<class T, typename P1, typename P2>
 struct FunctorDispatcher2
 {
   /**
@@ -691,11 +688,11 @@ struct FunctorDispatcher2
    * @param[in] param1 The first parameter to pass to the real member function
    * @param[in] param2 The second parameter to pass to the real member function
    */
-  static void Dispatch( CallbackBase& callback, P1 param1, P2 param2 )
+  static void Dispatch(CallbackBase& callback, P1 param1, P2 param2)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    (*object)( param1, param2 );
+    T* object = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    (*object)(param1, param2);
   }
 };
 
@@ -703,7 +700,7 @@ struct FunctorDispatcher2
  * @brief Dispatcher to call a functor.
  * @SINCE_1_0.0
  */
-template< class T, typename P1, typename P2, typename P3 >
+template<class T, typename P1, typename P2, typename P3>
 struct FunctorDispatcher3
 {
   /**
@@ -715,11 +712,11 @@ struct FunctorDispatcher3
    * @param[in] param2 The second parameter to pass to the real member function
    * @param[in] param3 The third parameter to pass to the real member function
    */
-  static void Dispatch( CallbackBase& callback, P1 param1, P2 param2, P3 param3 )
+  static void Dispatch(CallbackBase& callback, P1 param1, P2 param2, P3 param3)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    (*object)( param1, param2, param3 );
+    T* object = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    (*object)(param1, param2, param3);
   }
 };
 
@@ -727,7 +724,7 @@ struct FunctorDispatcher3
  * @brief Dispatcher to call a functor.
  * @SINCE_1_0.0
  */
-template< class T, typename R >
+template<class T, typename R>
 struct FunctorDispatcherReturn0
 {
   /**
@@ -737,10 +734,10 @@ struct FunctorDispatcherReturn0
    * @param[in] callback The callback information
    * @return The value
    */
-  static R Dispatch( CallbackBase& callback )
+  static R Dispatch(CallbackBase& callback)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
+    T* object = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
     return (*object)();
   }
 };
@@ -749,7 +746,7 @@ struct FunctorDispatcherReturn0
  * @brief Dispatcher to call a functor.
  * @SINCE_1_0.0
  */
-template< class T, typename R, typename P1 >
+template<class T, typename R, typename P1>
 struct FunctorDispatcherReturn1
 {
   /**
@@ -760,11 +757,11 @@ struct FunctorDispatcherReturn1
    * @param[in] param1 The first parameter to pass to the real member function
    * @return The return value from the function
    */
-  static R Dispatch( CallbackBase& callback, P1 param1 )
+  static R Dispatch(CallbackBase& callback, P1 param1)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    return (*object)( param1 );
+    T* object = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    return (*object)(param1);
   }
 };
 
@@ -772,7 +769,7 @@ struct FunctorDispatcherReturn1
  * @brief Dispatcher to call a functor.
  * @SINCE_1_0.0
  */
-template< class T, typename R, typename P1, typename P2 >
+template<class T, typename R, typename P1, typename P2>
 struct FunctorDispatcherReturn2
 {
   /**
@@ -784,11 +781,11 @@ struct FunctorDispatcherReturn2
    * @param[in] param2 The second parameter to pass to the real member function
    * @return The return value from the function
    */
-  static R Dispatch( CallbackBase& callback, P1 param1, P2 param2 )
+  static R Dispatch(CallbackBase& callback, P1 param1, P2 param2)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    return (*object)( param1, param2 );
+    T* object = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    return (*object)(param1, param2);
   }
 };
 
@@ -796,7 +793,7 @@ struct FunctorDispatcherReturn2
  * @brief Dispatcher to call a functor.
  * @SINCE_1_0.0
  */
-template< class T, typename R, typename P1, typename P2, typename P3 >
+template<class T, typename R, typename P1, typename P2, typename P3>
 struct FunctorDispatcherReturn3
 {
   /**
@@ -809,11 +806,11 @@ struct FunctorDispatcherReturn3
    * @param[in] param3 The third parameter to pass to the real member function
    * @return The return value from the function
    */
-  static R Dispatch( CallbackBase& callback, P1 param1, P2 param2, P3 param3 )
+  static R Dispatch(CallbackBase& callback, P1 param1, P2 param2, P3 param3)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    return (*object)( param1, param2, param3 );
+    T* object = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    return (*object)(param1, param2, param3);
   }
 };
 
@@ -823,7 +820,7 @@ struct FunctorDispatcherReturn3
  * This variant calls a specific void() member function.
  * @SINCE_1_0.0
  */
-template< class T >
+template<class T>
 struct VoidFunctorDispatcher0
 {
   /**
@@ -832,12 +829,12 @@ struct VoidFunctorDispatcher0
    * @SINCE_1_0.0
    * @param[in] callback The callback information
    */
-  static void Dispatch( CallbackBase& callback )
+  static void Dispatch(CallbackBase& callback)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    typedef void(T::*MemberFunction)(void);
-    MemberFunction function = reinterpret_cast< MemberFunction >( callback.mMemberFunction );
+    T* object               = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    using MemberFunction    = void (T::*)();
+    MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
     (object->*function)();
   }
 };
@@ -848,7 +845,7 @@ struct VoidFunctorDispatcher0
  * This variant calls a void() member, ignoring any signal parameters.
  * @SINCE_1_0.0
  */
-template< class T, typename P1 >
+template<class T, typename P1>
 struct VoidFunctorDispatcher1
 {
   /**
@@ -858,12 +855,12 @@ struct VoidFunctorDispatcher1
    * @param[in] callback The callback information
    * @param[in] param1 The first parameter to pass to the real member function
    */
-  static void Dispatch( CallbackBase& callback, P1 param1 )
+  static void Dispatch(CallbackBase& callback, P1 param1)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    typedef void(T::*MemberFunction)(void);
-    MemberFunction function = reinterpret_cast< MemberFunction >( callback.mMemberFunction );
+    T* object               = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    using MemberFunction    = void (T::*)();
+    MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
     (object->*function)(/*ignore params*/);
   }
 };
@@ -874,7 +871,7 @@ struct VoidFunctorDispatcher1
  * This variant calls a void() member, ignoring any signal parameters.
  * @SINCE_1_0.0
  */
-template< class T, typename P1, typename P2 >
+template<class T, typename P1, typename P2>
 struct VoidFunctorDispatcher2
 {
   /**
@@ -885,12 +882,12 @@ struct VoidFunctorDispatcher2
    * @param[in] param1 The first parameter to pass to the real member function
    * @param[in] param2 The second parameter to pass to the real member function
    */
-  static void Dispatch( CallbackBase& callback, P1 param1, P2 param2 )
+  static void Dispatch(CallbackBase& callback, P1 param1, P2 param2)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    typedef void(T::*MemberFunction)(void);
-    MemberFunction function = reinterpret_cast< MemberFunction >( callback.mMemberFunction );
+    T* object               = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    using MemberFunction    = void (T::*)();
+    MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
     (object->*function)(/*ignore params*/);
   }
 };
@@ -901,7 +898,7 @@ struct VoidFunctorDispatcher2
  * This variant calls a void() member, ignoring any signal parameters.
  * @SINCE_1_0.0
  */
-template< class T, typename P1, typename P2, typename P3 >
+template<class T, typename P1, typename P2, typename P3>
 struct VoidFunctorDispatcher3
 {
   /**
@@ -913,12 +910,12 @@ struct VoidFunctorDispatcher3
    * @param[in] param2 The second parameter to pass to the real member function
    * @param[in] param3 The third parameter to pass to the real member function
    */
-  static void Dispatch( CallbackBase& callback, P1 param1, P2 param2, P3 param3 )
+  static void Dispatch(CallbackBase& callback, P1 param1, P2 param2, P3 param3)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    typedef void(T::*MemberFunction)(void);
-    MemberFunction function = reinterpret_cast< MemberFunction >( callback.mMemberFunction );
+    T* object               = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    using MemberFunction    = void (T::*)();
+    MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
     (object->*function)(/*ignore params*/);
   }
 };
@@ -929,7 +926,7 @@ struct VoidFunctorDispatcher3
  * This variant calls a void() member, and returns a default-constructed value.
  * @SINCE_1_0.0
  */
-template< class T, typename R >
+template<class T, typename R>
 struct VoidFunctorDispatcherReturn0
 {
   /**
@@ -939,12 +936,12 @@ struct VoidFunctorDispatcherReturn0
    * @param[in] callback The callback information
    * @return The value
    */
-  static R Dispatch( CallbackBase& callback )
+  static R Dispatch(CallbackBase& callback)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    typedef void(T::*MemberFunction)(void);
-    MemberFunction function = reinterpret_cast< MemberFunction >( callback.mMemberFunction );
+    T* object               = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    using MemberFunction    = void (T::*)();
+    MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
     (object->*function)(/*ignore params*/);
     return R();
   }
@@ -956,7 +953,7 @@ struct VoidFunctorDispatcherReturn0
  * This variant calls a void() member, and returns a default-constructed value.
  * @SINCE_1_0.0
  */
-template< class T, typename R, typename P1 >
+template<class T, typename R, typename P1>
 struct VoidFunctorDispatcherReturn1
 {
   /**
@@ -967,12 +964,12 @@ struct VoidFunctorDispatcherReturn1
    * @param[in] param1 The first parameter to pass to the real member function
    * @return The return value from the function
    */
-  static R Dispatch( CallbackBase& callback, P1 param1 )
+  static R Dispatch(CallbackBase& callback, P1 param1)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    typedef void(T::*MemberFunction)(void);
-    MemberFunction function = reinterpret_cast< MemberFunction >( callback.mMemberFunction );
+    T* object               = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    using MemberFunction    = void (T::*)();
+    MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
     (object->*function)(/*ignore params*/);
     return R();
   }
@@ -984,7 +981,7 @@ struct VoidFunctorDispatcherReturn1
  * This variant calls a void() member, and returns a default-constructed value.
  * @SINCE_1_0.0
  */
-template< class T, typename R, typename P1, typename P2 >
+template<class T, typename R, typename P1, typename P2>
 struct VoidFunctorDispatcherReturn2
 {
   /**
@@ -996,12 +993,12 @@ struct VoidFunctorDispatcherReturn2
    * @param[in] param2 The second parameter to pass to the real member function
    * @return The return value from the function
    */
-  static R Dispatch( CallbackBase& callback, P1 param1, P2 param2 )
+  static R Dispatch(CallbackBase& callback, P1 param1, P2 param2)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    typedef void(T::*MemberFunction)(void);
-    MemberFunction function = reinterpret_cast< MemberFunction >( callback.mMemberFunction );
+    T* object               = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    using MemberFunction    = void (T::*)();
+    MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
     (object->*function)(/*ignore params*/);
     return R();
   }
@@ -1013,7 +1010,7 @@ struct VoidFunctorDispatcherReturn2
  * This variant calls a void() member, and returns a default-constructed value.
  * @SINCE_1_0.0
  */
-template< class T, typename R, typename P1, typename P2, typename P3 >
+template<class T, typename R, typename P1, typename P2, typename P3>
 struct VoidFunctorDispatcherReturn3
 {
   /**
@@ -1026,12 +1023,12 @@ struct VoidFunctorDispatcherReturn3
    * @param[in] param3 The third parameter to pass to the real member function
    * @return The return value from the function
    */
-  static R Dispatch( CallbackBase& callback, P1 param1, P2 param2, P3 param3 )
+  static R Dispatch(CallbackBase& callback, P1 param1, P2 param2, P3 param3)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    typedef void(T::*MemberFunction)(void);
-    MemberFunction function = reinterpret_cast< MemberFunction >( callback.mMemberFunction );
+    T* object               = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    using MemberFunction    = void (T::*)();
+    MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
     (object->*function)(/*ignore params*/);
     return R();
   }
@@ -1043,11 +1040,10 @@ struct VoidFunctorDispatcherReturn3
  * Version with two parameters and return value.
  * @SINCE_1_0.0
  */
-template< class T >
+template<class T>
 class Callback : public CallbackBase
 {
 public:
-
   /**
    * @brief Default constructor.
    *
@@ -1066,46 +1062,61 @@ public:
    * @param[in] object The object to call
    * @param[in] memberFunction The member function of the object
    */
-  Callback( T* object, void(T::*memberFunction)(void) )
-  : CallbackBase( object,
-                  reinterpret_cast< CallbackBase::MemberFunction >( memberFunction ),
-                  reinterpret_cast< CallbackBase::Dispatcher >( &Dispatcher0<T>::Dispatch ) ) { }
-  template< typename P1 >
-  Callback( T* object, void(T::*memberFunction)(P1) )
-  : CallbackBase( object,
-                  reinterpret_cast< CallbackBase::MemberFunction >( memberFunction ),
-                  reinterpret_cast< CallbackBase::Dispatcher >( &Dispatcher1<T,P1>::Dispatch ) ) { }
-  template< typename P1, typename P2 >
-  Callback( T* object, void(T::*memberFunction)(P1, P2) )
-  : CallbackBase( object,
-                  reinterpret_cast< CallbackBase::MemberFunction >( memberFunction ),
-                  reinterpret_cast< CallbackBase::Dispatcher >( &Dispatcher2<T,P1,P2>::Dispatch ) ) { }
-  template< typename P1, typename P2, typename P3 >
-  Callback( T* object, void(T::*memberFunction)(P1, P2, P3) )
-  : CallbackBase( object,
-                  reinterpret_cast< CallbackBase::MemberFunction >( memberFunction ),
-                  reinterpret_cast< CallbackBase::Dispatcher >( &Dispatcher3<T,P1,P2,P3>::Dispatch ) ) { }
-  template< typename R >
-  Callback( T* object, R(T::*memberFunction)(void) )
-  : CallbackBase( object,
-                  reinterpret_cast< CallbackBase::MemberFunction >( memberFunction ),
-                  reinterpret_cast< CallbackBase::Dispatcher >( &DispatcherReturn0<T,R>::Dispatch ) ) { }
-  template< typename R, typename P1 >
-  Callback( T* object, R(T::*memberFunction)(P1) )
-  : CallbackBase( object,
-                  reinterpret_cast< CallbackBase::MemberFunction >( memberFunction ),
-                  reinterpret_cast< CallbackBase::Dispatcher >( &DispatcherReturn1<T,R,P1>::Dispatch ) ) { }
-  template< typename R, typename P1, typename P2 >
-  Callback( T* object, R(T::*memberFunction)(P1, P2) )
-  : CallbackBase( object,
-                  reinterpret_cast< CallbackBase::MemberFunction >( memberFunction ),
-                  reinterpret_cast< CallbackBase::Dispatcher >( &DispatcherReturn2<T,R,P1,P2>::Dispatch ) ) { }
-  template< typename R, typename P1, typename P2, typename P3 >
-  Callback( T* object, R(T::*memberFunction)(P1, P2, P3) )
-  : CallbackBase( object,
-                  reinterpret_cast< CallbackBase::MemberFunction >( memberFunction ),
-                  reinterpret_cast< CallbackBase::Dispatcher >( &DispatcherReturn3<T,R,P1,P2,P3>::Dispatch ) ) { }
-
+  Callback(T* object, void (T::*memberFunction)(void))
+  : CallbackBase(object,
+                 reinterpret_cast<CallbackBase::MemberFunction>(memberFunction),
+                 reinterpret_cast<CallbackBase::Dispatcher>(&Dispatcher0<T>::Dispatch))
+  {
+  }
+  template<typename P1>
+  Callback(T* object, void (T::*memberFunction)(P1))
+  : CallbackBase(object,
+                 reinterpret_cast<CallbackBase::MemberFunction>(memberFunction),
+                 reinterpret_cast<CallbackBase::Dispatcher>(&Dispatcher1<T, P1>::Dispatch))
+  {
+  }
+  template<typename P1, typename P2>
+  Callback(T* object, void (T::*memberFunction)(P1, P2))
+  : CallbackBase(object,
+                 reinterpret_cast<CallbackBase::MemberFunction>(memberFunction),
+                 reinterpret_cast<CallbackBase::Dispatcher>(&Dispatcher2<T, P1, P2>::Dispatch))
+  {
+  }
+  template<typename P1, typename P2, typename P3>
+  Callback(T* object, void (T::*memberFunction)(P1, P2, P3))
+  : CallbackBase(object,
+                 reinterpret_cast<CallbackBase::MemberFunction>(memberFunction),
+                 reinterpret_cast<CallbackBase::Dispatcher>(&Dispatcher3<T, P1, P2, P3>::Dispatch))
+  {
+  }
+  template<typename R>
+  Callback(T* object, R (T::*memberFunction)(void))
+  : CallbackBase(object,
+                 reinterpret_cast<CallbackBase::MemberFunction>(memberFunction),
+                 reinterpret_cast<CallbackBase::Dispatcher>(&DispatcherReturn0<T, R>::Dispatch))
+  {
+  }
+  template<typename R, typename P1>
+  Callback(T* object, R (T::*memberFunction)(P1))
+  : CallbackBase(object,
+                 reinterpret_cast<CallbackBase::MemberFunction>(memberFunction),
+                 reinterpret_cast<CallbackBase::Dispatcher>(&DispatcherReturn1<T, R, P1>::Dispatch))
+  {
+  }
+  template<typename R, typename P1, typename P2>
+  Callback(T* object, R (T::*memberFunction)(P1, P2))
+  : CallbackBase(object,
+                 reinterpret_cast<CallbackBase::MemberFunction>(memberFunction),
+                 reinterpret_cast<CallbackBase::Dispatcher>(&DispatcherReturn2<T, R, P1, P2>::Dispatch))
+  {
+  }
+  template<typename R, typename P1, typename P2, typename P3>
+  Callback(T* object, R (T::*memberFunction)(P1, P2, P3))
+  : CallbackBase(object,
+                 reinterpret_cast<CallbackBase::MemberFunction>(memberFunction),
+                 reinterpret_cast<CallbackBase::Dispatcher>(&DispatcherReturn3<T, R, P1, P2, P3>::Dispatch))
+  {
+  }
 };
 
 /**
@@ -1115,7 +1126,6 @@ public:
 class CallbackFunction : public CallbackBase
 {
 public:
-
   /**
    * @brief Default constructor.
    * @SINCE_1_0.0
@@ -1131,60 +1141,68 @@ public:
    * @SINCE_1_0.0
    * @param[in] function The function to call
    */
-  CallbackFunction( void(*function)() )
-  : CallbackBase( reinterpret_cast< CallbackBase::Function >( function ) )
-  { }
-  template< typename R >
-  CallbackFunction( R(*function)() )
-  : CallbackBase( reinterpret_cast< CallbackBase::Function >( function ) )
-  { }
-  template< typename P1 >
-  CallbackFunction( void(*function)(P1) )
-  : CallbackBase( reinterpret_cast< CallbackBase::Function >( function ) )
-  { }
-  template< typename P1, typename R >
-  CallbackFunction( R(*function)(P1)  )
-  : CallbackBase( reinterpret_cast< CallbackBase::Function >( function ) )
-  { }
-  template< typename P1, typename P2 >
-  CallbackFunction( void(*function)(P1,P2)  )
-  : CallbackBase( reinterpret_cast< CallbackBase::Function >( function ) )
-  { }
-  template< typename P1, typename P2, typename R >
-  CallbackFunction( R(*function)(P1,P2) )
-  : CallbackBase( reinterpret_cast< CallbackBase::Function >( function ) )
-  { }
-  template< typename P1, typename P2, typename P3 >
-  CallbackFunction( void(*function)(P1,P2,P3)  )
-  : CallbackBase( reinterpret_cast< CallbackBase::Function >( function ) )
-  { }
-  template< typename P1, typename P2, typename P3, typename R >
-  CallbackFunction( R(*function)(P1,P2,P3) )
-  : CallbackBase( reinterpret_cast< CallbackBase::Function >( function ) )
-  { }
-
+  CallbackFunction(void (*function)())
+  : CallbackBase(reinterpret_cast<CallbackBase::Function>(function))
+  {
+  }
+  template<typename R>
+  CallbackFunction(R (*function)())
+  : CallbackBase(reinterpret_cast<CallbackBase::Function>(function))
+  {
+  }
+  template<typename P1>
+  CallbackFunction(void (*function)(P1))
+  : CallbackBase(reinterpret_cast<CallbackBase::Function>(function))
+  {
+  }
+  template<typename P1, typename R>
+  CallbackFunction(R (*function)(P1))
+  : CallbackBase(reinterpret_cast<CallbackBase::Function>(function))
+  {
+  }
+  template<typename P1, typename P2>
+  CallbackFunction(void (*function)(P1, P2))
+  : CallbackBase(reinterpret_cast<CallbackBase::Function>(function))
+  {
+  }
+  template<typename P1, typename P2, typename R>
+  CallbackFunction(R (*function)(P1, P2))
+  : CallbackBase(reinterpret_cast<CallbackBase::Function>(function))
+  {
+  }
+  template<typename P1, typename P2, typename P3>
+  CallbackFunction(void (*function)(P1, P2, P3))
+  : CallbackBase(reinterpret_cast<CallbackBase::Function>(function))
+  {
+  }
+  template<typename P1, typename P2, typename P3, typename R>
+  CallbackFunction(R (*function)(P1, P2, P3))
+  : CallbackBase(reinterpret_cast<CallbackBase::Function>(function))
+  {
+  }
 };
 
 /**
  * @brief Specializations for function object callbacks.
  * @SINCE_1_0.0
  */
-template< class T >
+template<class T>
 class CallbackFunctor0 : public CallbackBase
 {
 public:
-
   /**
    * @brief Constructor which copies a function object.
    *
    * @SINCE_1_0.0
    * @param[in] object The object to copy
    */
-  CallbackFunctor0( const T& object )
-  : CallbackBase( reinterpret_cast< void* >( new T( object ) ), // copy the object
-                  NULL, // uses operator() instead of member function
-                  reinterpret_cast< CallbackBase::Dispatcher >( &FunctorDispatcher0<T>::Dispatch ),
-                  reinterpret_cast< CallbackBase::Destructor >( &Destroyer<T>::Delete ) ) { }
+  CallbackFunctor0(const T& object)
+  : CallbackBase(reinterpret_cast<void*>(new T(object)), // copy the object
+                 NULL,                                   // uses operator() instead of member function
+                 reinterpret_cast<CallbackBase::Dispatcher>(&FunctorDispatcher0<T>::Dispatch),
+                 reinterpret_cast<CallbackBase::Destructor>(&Destroyer<T>::Delete))
+  {
+  }
 };
 
 /**
@@ -1194,7 +1212,6 @@ public:
 class CallbackFunctorDelegate0 : public CallbackBase
 {
 public:
-
   /**
    * @brief Constructor which copies a function object.
    *
@@ -1202,44 +1219,46 @@ public:
    * @SINCE_1_0.0
    * @param[in] object A newly allocated object (ownership is transferred)
    */
-  CallbackFunctorDelegate0( FunctorDelegate* object )
-  : CallbackBase( reinterpret_cast< void* >( object ), // transfer ownership
-                  reinterpret_cast< CallbackBase::MemberFunction >( &FunctorDelegate::Execute ),
-                  reinterpret_cast< CallbackBase::Dispatcher >( &VoidFunctorDispatcher0<FunctorDelegate>::Dispatch ),
-                  reinterpret_cast< CallbackBase::Destructor >( &Destroyer<FunctorDelegate>::Delete ) ) { }
+  CallbackFunctorDelegate0(FunctorDelegate* object)
+  : CallbackBase(reinterpret_cast<void*>(object), // transfer ownership
+                 reinterpret_cast<CallbackBase::MemberFunction>(&FunctorDelegate::Execute),
+                 reinterpret_cast<CallbackBase::Dispatcher>(&VoidFunctorDispatcher0<FunctorDelegate>::Dispatch),
+                 reinterpret_cast<CallbackBase::Destructor>(&Destroyer<FunctorDelegate>::Delete))
+  {
+  }
 };
 
 /**
  * @brief Function object callback for matching callbacks to signal signature.
  * @SINCE_1_0.0
  */
-template< class T, typename P1 >
+template<class T, typename P1>
 class CallbackFunctor1 : public CallbackBase
 {
 public:
-
   /**
    * @brief Constructor which copies a function object.
    *
    * @SINCE_1_0.0
    * @param[in] object The object to copy
    */
-  CallbackFunctor1( const T& object )
-  : CallbackBase( reinterpret_cast< void* >( new T( object ) ), // copy the object
-                  NULL, // uses operator() instead of member function
-                  reinterpret_cast< CallbackBase::Dispatcher >( &FunctorDispatcher1<T,P1>::Dispatch ),
-                  reinterpret_cast< CallbackBase::Destructor >( &Destroyer<T>::Delete ) ) { }
+  CallbackFunctor1(const T& object)
+  : CallbackBase(reinterpret_cast<void*>(new T(object)), // copy the object
+                 NULL,                                   // uses operator() instead of member function
+                 reinterpret_cast<CallbackBase::Dispatcher>(&FunctorDispatcher1<T, P1>::Dispatch),
+                 reinterpret_cast<CallbackBase::Destructor>(&Destroyer<T>::Delete))
+  {
+  }
 };
 
 /**
  * @brief Function object callback for connecting void() methods.
  * @SINCE_1_0.0
  */
-template< typename P1 >
+template<typename P1>
 class CallbackFunctorDelegate1 : public CallbackBase
 {
 public:
-
   /**
    * @brief Constructor which copies a function object.
    *
@@ -1247,44 +1266,46 @@ public:
    * @SINCE_1_0.0
    * @param[in] object The object to copy
    */
-  CallbackFunctorDelegate1( FunctorDelegate* object )
-  : CallbackBase( reinterpret_cast< void* >( object ), // transfer ownership
-                  reinterpret_cast< CallbackBase::MemberFunction >( &FunctorDelegate::Execute ),
-                  reinterpret_cast< CallbackBase::Dispatcher >( &VoidFunctorDispatcher1<FunctorDelegate,P1>::Dispatch ),
-                  reinterpret_cast< CallbackBase::Destructor >( &Destroyer<FunctorDelegate>::Delete ) ) { }
+  CallbackFunctorDelegate1(FunctorDelegate* object)
+  : CallbackBase(reinterpret_cast<void*>(object), // transfer ownership
+                 reinterpret_cast<CallbackBase::MemberFunction>(&FunctorDelegate::Execute),
+                 reinterpret_cast<CallbackBase::Dispatcher>(&VoidFunctorDispatcher1<FunctorDelegate, P1>::Dispatch),
+                 reinterpret_cast<CallbackBase::Destructor>(&Destroyer<FunctorDelegate>::Delete))
+  {
+  }
 };
 
 /**
  * @brief Function object callback for matching callbacks to signal signature.
  * @SINCE_1_0.0
  */
-template< class T, typename P1, typename P2 >
+template<class T, typename P1, typename P2>
 class CallbackFunctor2 : public CallbackBase
 {
 public:
-
   /**
    * @brief Constructor which copies a function object.
    *
    * @SINCE_1_0.0
    * @param[in] object The object to copy
    */
-  CallbackFunctor2( const T& object )
-  : CallbackBase( reinterpret_cast< void* >( new T( object ) ), // copy the object
-                  NULL, // uses operator() instead of member function
-                  reinterpret_cast< CallbackBase::Dispatcher >( &FunctorDispatcher2<T,P1,P2>::Dispatch ),
-                  reinterpret_cast< CallbackBase::Destructor >( &Destroyer<T>::Delete ) ) { }
+  CallbackFunctor2(const T& object)
+  : CallbackBase(reinterpret_cast<void*>(new T(object)), // copy the object
+                 NULL,                                   // uses operator() instead of member function
+                 reinterpret_cast<CallbackBase::Dispatcher>(&FunctorDispatcher2<T, P1, P2>::Dispatch),
+                 reinterpret_cast<CallbackBase::Destructor>(&Destroyer<T>::Delete))
+  {
+  }
 };
 
 /**
  * @brief Function object callback for connecting void() methods.
  * @SINCE_1_0.0
  */
-template< typename P1, typename P2 >
+template<typename P1, typename P2>
 class CallbackFunctorDelegate2 : public CallbackBase
 {
 public:
-
   /**
    * @brief Constructor which copies a function object.
    *
@@ -1292,45 +1313,46 @@ public:
    * @SINCE_1_0.0
    * @param[in] object The object to copy
    */
-  CallbackFunctorDelegate2( FunctorDelegate* object )
-  : CallbackBase( reinterpret_cast< void* >( object ), // transfer ownership
-                  reinterpret_cast< CallbackBase::MemberFunction >( &FunctorDelegate::Execute ),
-                  reinterpret_cast< CallbackBase::Dispatcher >( &VoidFunctorDispatcher2<FunctorDelegate,P1,P2>::Dispatch ),
-                  reinterpret_cast< CallbackBase::Destructor >( &Destroyer<FunctorDelegate>::Delete ) ) { }
+  CallbackFunctorDelegate2(FunctorDelegate* object)
+  : CallbackBase(reinterpret_cast<void*>(object), // transfer ownership
+                 reinterpret_cast<CallbackBase::MemberFunction>(&FunctorDelegate::Execute),
+                 reinterpret_cast<CallbackBase::Dispatcher>(&VoidFunctorDispatcher2<FunctorDelegate, P1, P2>::Dispatch),
+                 reinterpret_cast<CallbackBase::Destructor>(&Destroyer<FunctorDelegate>::Delete))
+  {
+  }
 };
 
 /**
  * @brief Function object callback for matching callbacks to signal signature.
  * @SINCE_1_0.0
  */
-template< class T, typename P1, typename P2, typename P3 >
+template<class T, typename P1, typename P2, typename P3>
 class CallbackFunctor3 : public CallbackBase
 {
 public:
-
   /**
    * @brief Constructor which copies a function object.
    *
    * @SINCE_1_0.0
    * @param[in] object The object to copy
    */
-  CallbackFunctor3( const T& object )
-  : CallbackBase( reinterpret_cast< void* >( new T( object ) ), // copy the object
-                  NULL, // uses operator() instead of member function
-                  reinterpret_cast< CallbackBase::Dispatcher >( &FunctorDispatcher3<T,P1,P2,P3>::Dispatch ),
-                  reinterpret_cast< CallbackBase::Destructor >( &Destroyer<T>::Delete ) ) { }
+  CallbackFunctor3(const T& object)
+  : CallbackBase(reinterpret_cast<void*>(new T(object)), // copy the object
+                 NULL,                                   // uses operator() instead of member function
+                 reinterpret_cast<CallbackBase::Dispatcher>(&FunctorDispatcher3<T, P1, P2, P3>::Dispatch),
+                 reinterpret_cast<CallbackBase::Destructor>(&Destroyer<T>::Delete))
+  {
+  }
 };
 
 /**
  * @brief Function object callback for connecting void() methods.
  * @SINCE_1_0.0
  */
-template< typename P1, typename P2, typename P3 >
+template<typename P1, typename P2, typename P3>
 class CallbackFunctorDelegate3 : public CallbackBase
 {
 public:
-
-
   /**
    * @brief Constructor which copies a function object.
    *
@@ -1338,44 +1360,46 @@ public:
    * @SINCE_1_0.0
    * @param[in] object The object to copy
    */
-  CallbackFunctorDelegate3( FunctorDelegate* object )
-  : CallbackBase( reinterpret_cast< void* >( object ), // transfer ownership
-                  reinterpret_cast< CallbackBase::MemberFunction >( &FunctorDelegate::Execute ),
-                  reinterpret_cast< CallbackBase::Dispatcher >( &VoidFunctorDispatcher3<FunctorDelegate,P1,P2,P3>::Dispatch ),
-                  reinterpret_cast< CallbackBase::Destructor >( &Destroyer<FunctorDelegate>::Delete ) ) { }
+  CallbackFunctorDelegate3(FunctorDelegate* object)
+  : CallbackBase(reinterpret_cast<void*>(object), // transfer ownership
+                 reinterpret_cast<CallbackBase::MemberFunction>(&FunctorDelegate::Execute),
+                 reinterpret_cast<CallbackBase::Dispatcher>(&VoidFunctorDispatcher3<FunctorDelegate, P1, P2, P3>::Dispatch),
+                 reinterpret_cast<CallbackBase::Destructor>(&Destroyer<FunctorDelegate>::Delete))
+  {
+  }
 };
 
 /**
  * @brief Function object callback for matching callbacks to signal signature.
  * @SINCE_1_0.0
  */
-template< class T, typename R >
+template<class T, typename R>
 class CallbackFunctorReturn0 : public CallbackBase
 {
 public:
-
   /**
    * @brief Constructor which copies a function object.
    *
    * @SINCE_1_0.0
    * @param[in] object The object to copy
    */
-  CallbackFunctorReturn0( const T& object )
-  : CallbackBase( reinterpret_cast< void* >( new T( object ) ), // copy the object
-                  NULL, // uses operator() instead of member function
-                  reinterpret_cast< CallbackBase::Dispatcher >( &FunctorDispatcherReturn0<T,R>::Dispatch ),
-                  reinterpret_cast< CallbackBase::Destructor >( &Destroyer<T>::Delete ) ) { }
+  CallbackFunctorReturn0(const T& object)
+  : CallbackBase(reinterpret_cast<void*>(new T(object)), // copy the object
+                 NULL,                                   // uses operator() instead of member function
+                 reinterpret_cast<CallbackBase::Dispatcher>(&FunctorDispatcherReturn0<T, R>::Dispatch),
+                 reinterpret_cast<CallbackBase::Destructor>(&Destroyer<T>::Delete))
+  {
+  }
 };
 
 /**
  * @brief Function object callback for connecting void() methods.
  * @SINCE_1_0.0
  */
-template< typename R >
+template<typename R>
 class CallbackFunctorDelegateReturn0 : public CallbackBase
 {
 public:
-
   /**
    * @brief Constructor which copies a function object.
    *
@@ -1383,44 +1407,46 @@ public:
    * @SINCE_1_0.0
    * @param[in] object The object to copy
    */
-  CallbackFunctorDelegateReturn0( FunctorDelegate* object )
-  : CallbackBase( reinterpret_cast< void* >( object ), // transfer ownership
-                  reinterpret_cast< CallbackBase::MemberFunction >( &FunctorDelegate::Execute ),
-                  reinterpret_cast< CallbackBase::Dispatcher >( &VoidFunctorDispatcherReturn0<FunctorDelegate,R>::Dispatch ),
-                  reinterpret_cast< CallbackBase::Destructor >( &Destroyer<FunctorDelegate>::Delete ) ) { }
+  CallbackFunctorDelegateReturn0(FunctorDelegate* object)
+  : CallbackBase(reinterpret_cast<void*>(object), // transfer ownership
+                 reinterpret_cast<CallbackBase::MemberFunction>(&FunctorDelegate::Execute),
+                 reinterpret_cast<CallbackBase::Dispatcher>(&VoidFunctorDispatcherReturn0<FunctorDelegate, R>::Dispatch),
+                 reinterpret_cast<CallbackBase::Destructor>(&Destroyer<FunctorDelegate>::Delete))
+  {
+  }
 };
 
 /**
  * @brief Function object callback for matching callbacks to signal signature.
  * @SINCE_1_0.0
  */
-template< class T, typename P1, typename R >
+template<class T, typename P1, typename R>
 class CallbackFunctorReturn1 : public CallbackBase
 {
 public:
-
   /**
    * @brief Constructor which copies a function object.
    *
    * @SINCE_1_0.0
    * @param[in] object The object to copy
    */
-  CallbackFunctorReturn1( const T& object )
-  : CallbackBase( reinterpret_cast< void* >( new T( object ) ), // copy the object
-                  NULL, // uses operator() instead of member function
-                  reinterpret_cast< CallbackBase::Dispatcher >( &FunctorDispatcherReturn1<T,R,P1>::Dispatch ),
-                  reinterpret_cast< CallbackBase::Destructor >( &Destroyer<T>::Delete ) ) { }
+  CallbackFunctorReturn1(const T& object)
+  : CallbackBase(reinterpret_cast<void*>(new T(object)), // copy the object
+                 NULL,                                   // uses operator() instead of member function
+                 reinterpret_cast<CallbackBase::Dispatcher>(&FunctorDispatcherReturn1<T, R, P1>::Dispatch),
+                 reinterpret_cast<CallbackBase::Destructor>(&Destroyer<T>::Delete))
+  {
+  }
 };
 
 /**
  * @brief Function object callback for connecting void() methods.
  * @SINCE_1_0.0
  */
-template< typename P1, typename R >
+template<typename P1, typename R>
 class CallbackFunctorDelegateReturn1 : public CallbackBase
 {
 public:
-
   /**
    * @brief Constructor which copies a function object.
    *
@@ -1428,44 +1454,46 @@ public:
    * @SINCE_1_0.0
    * @param[in] object The object to copy
    */
-  CallbackFunctorDelegateReturn1( FunctorDelegate* object )
-  : CallbackBase( reinterpret_cast< void* >( object ), // transfer ownership
-                  reinterpret_cast< CallbackBase::MemberFunction >( &FunctorDelegate::Execute ),
-                  reinterpret_cast< CallbackBase::Dispatcher >( &VoidFunctorDispatcherReturn1<FunctorDelegate,R,P1>::Dispatch ),
-                  reinterpret_cast< CallbackBase::Destructor >( &Destroyer<FunctorDelegate>::Delete ) ) { }
+  CallbackFunctorDelegateReturn1(FunctorDelegate* object)
+  : CallbackBase(reinterpret_cast<void*>(object), // transfer ownership
+                 reinterpret_cast<CallbackBase::MemberFunction>(&FunctorDelegate::Execute),
+                 reinterpret_cast<CallbackBase::Dispatcher>(&VoidFunctorDispatcherReturn1<FunctorDelegate, R, P1>::Dispatch),
+                 reinterpret_cast<CallbackBase::Destructor>(&Destroyer<FunctorDelegate>::Delete))
+  {
+  }
 };
 
 /**
  * @brief Function object callback for matching callbacks to signal signature.
  * @SINCE_1_0.0
  */
-template< class T, typename P1, typename P2, typename R >
+template<class T, typename P1, typename P2, typename R>
 class CallbackFunctorReturn2 : public CallbackBase
 {
 public:
-
   /**
    * @brief Constructor which copies a function object.
    *
    * @SINCE_1_0.0
    * @param[in] object The object to copy
    */
-  CallbackFunctorReturn2( const T& object )
-  : CallbackBase( reinterpret_cast< void* >( new T( object ) ), // copy the object
-                  NULL, // uses operator() instead of member function
-                  reinterpret_cast< CallbackBase::Dispatcher >( &FunctorDispatcherReturn2<T,R,P1,P2>::Dispatch ),
-                  reinterpret_cast< CallbackBase::Destructor >( &Destroyer<T>::Delete ) ) { }
+  CallbackFunctorReturn2(const T& object)
+  : CallbackBase(reinterpret_cast<void*>(new T(object)), // copy the object
+                 NULL,                                   // uses operator() instead of member function
+                 reinterpret_cast<CallbackBase::Dispatcher>(&FunctorDispatcherReturn2<T, R, P1, P2>::Dispatch),
+                 reinterpret_cast<CallbackBase::Destructor>(&Destroyer<T>::Delete))
+  {
+  }
 };
 
 /**
  * @brief Function object callback for connecting void() methods.
  * @SINCE_1_0.0
  */
-template< typename P1, typename P2, typename R >
+template<typename P1, typename P2, typename R>
 class CallbackFunctorDelegateReturn2 : public CallbackBase
 {
 public:
-
   /**
    * @brief Constructor which copies a function object.
    *
@@ -1473,44 +1501,46 @@ public:
    * @SINCE_1_0.0
    * @param[in] object The object to copy
    */
-  CallbackFunctorDelegateReturn2( FunctorDelegate* object )
-  : CallbackBase( reinterpret_cast< void* >( object ), // transfer ownership
-                  reinterpret_cast< CallbackBase::MemberFunction >( &FunctorDelegate::Execute ),
-                  reinterpret_cast< CallbackBase::Dispatcher >( &VoidFunctorDispatcherReturn2<FunctorDelegate,R,P1,P2>::Dispatch ),
-                  reinterpret_cast< CallbackBase::Destructor >( &Destroyer<FunctorDelegate>::Delete ) ) { }
+  CallbackFunctorDelegateReturn2(FunctorDelegate* object)
+  : CallbackBase(reinterpret_cast<void*>(object), // transfer ownership
+                 reinterpret_cast<CallbackBase::MemberFunction>(&FunctorDelegate::Execute),
+                 reinterpret_cast<CallbackBase::Dispatcher>(&VoidFunctorDispatcherReturn2<FunctorDelegate, R, P1, P2>::Dispatch),
+                 reinterpret_cast<CallbackBase::Destructor>(&Destroyer<FunctorDelegate>::Delete))
+  {
+  }
 };
 
 /**
  * @brief Function object callback for matching callbacks to signal signature.
  * @SINCE_1_0.0
  */
-template< class T, typename P1, typename P2, typename P3, typename R >
+template<class T, typename P1, typename P2, typename P3, typename R>
 class CallbackFunctorReturn3 : public CallbackBase
 {
 public:
-
   /**
    * @brief Constructor which copies a function object.
    *
    * @SINCE_1_0.0
    * @param[in] object The object to copy
    */
-  CallbackFunctorReturn3( const T& object )
-  : CallbackBase( reinterpret_cast< void* >( new T( object ) ), // copy the object
-                  NULL, // uses operator() instead of member function
-                  reinterpret_cast< CallbackBase::Dispatcher >( &FunctorDispatcherReturn3<T,R,P1,P2,P3>::Dispatch ),
-                  reinterpret_cast< CallbackBase::Destructor >( &Destroyer<T>::Delete ) ) { }
+  CallbackFunctorReturn3(const T& object)
+  : CallbackBase(reinterpret_cast<void*>(new T(object)), // copy the object
+                 NULL,                                   // uses operator() instead of member function
+                 reinterpret_cast<CallbackBase::Dispatcher>(&FunctorDispatcherReturn3<T, R, P1, P2, P3>::Dispatch),
+                 reinterpret_cast<CallbackBase::Destructor>(&Destroyer<T>::Delete))
+  {
+  }
 };
 
 /**
  * @brief Function object callback for connecting void() methods.
  * @SINCE_1_0.0
  */
-template< typename P1, typename P2, typename P3, typename R >
+template<typename P1, typename P2, typename P3, typename R>
 class CallbackFunctorDelegateReturn3 : public CallbackBase
 {
 public:
-
   /**
    * @brief Constructor which copies a function object.
    *
@@ -1518,11 +1548,13 @@ public:
    * @SINCE_1_0.0
    * @param[in] object The object to copy
    */
-  CallbackFunctorDelegateReturn3( FunctorDelegate* object )
-  : CallbackBase( reinterpret_cast< void* >( object ), // transfer ownership
-                  reinterpret_cast< CallbackBase::MemberFunction >( &FunctorDelegate::Execute ),
-                  reinterpret_cast< CallbackBase::Dispatcher >( &VoidFunctorDispatcherReturn3<FunctorDelegate,R,P1,P2,P3>::Dispatch ),
-                  reinterpret_cast< CallbackBase::Destructor >( &Destroyer<FunctorDelegate>::Delete ) ) { }
+  CallbackFunctorDelegateReturn3(FunctorDelegate* object)
+  : CallbackBase(reinterpret_cast<void*>(object), // transfer ownership
+                 reinterpret_cast<CallbackBase::MemberFunction>(&FunctorDelegate::Execute),
+                 reinterpret_cast<CallbackBase::Dispatcher>(&VoidFunctorDispatcherReturn3<FunctorDelegate, R, P1, P2, P3>::Dispatch),
+                 reinterpret_cast<CallbackBase::Destructor>(&Destroyer<FunctorDelegate>::Delete))
+  {
+  }
 };
 
 // Callback creation thin templates
@@ -1534,9 +1566,9 @@ public:
  * @param[in] function The function to call
  * @return A newly allocated Callback object, ownership transferred to caller
  */
-inline CallbackBase* MakeCallback( void(*function)(void) )
+inline CallbackBase* MakeCallback(void (*function)(void))
 {
-  return new CallbackFunction( function );
+  return new CallbackFunction(function);
 }
 
 /**
@@ -1546,10 +1578,10 @@ inline CallbackBase* MakeCallback( void(*function)(void) )
  * @param[in] function The function to call
  * @return A newly allocated Callback object, ownership transferred to caller
  */
-template< typename P1 >
-inline CallbackBase* MakeCallback( void(*function)(P1) )
+template<typename P1>
+inline CallbackBase* MakeCallback(void (*function)(P1))
 {
-  return new CallbackFunction( function );
+  return new CallbackFunction(function);
 }
 
 /**
@@ -1559,10 +1591,10 @@ inline CallbackBase* MakeCallback( void(*function)(P1) )
  * @param[in] function The function to call
  * @return A newly allocated Callback object, ownership transferred to caller
  */
-template< typename R >
-inline CallbackBase* MakeCallback( R(*function)(void) )
+template<typename R>
+inline CallbackBase* MakeCallback(R (*function)(void))
 {
-  return new CallbackFunction( function );
+  return new CallbackFunction(function);
 }
 
 /**
@@ -1572,10 +1604,10 @@ inline CallbackBase* MakeCallback( R(*function)(void) )
  * @param[in] function The function to call
  * @return A newly allocated Callback object, ownership transferred to caller
  */
-template< typename R, typename P1 >
-inline CallbackBase* MakeCallback( R(*function)(P1) )
+template<typename R, typename P1>
+inline CallbackBase* MakeCallback(R (*function)(P1))
 {
-  return new CallbackFunction( function );
+  return new CallbackFunction(function);
 }
 
 /**
@@ -1585,10 +1617,10 @@ inline CallbackBase* MakeCallback( R(*function)(P1) )
  * @param[in] function The function to call
  * @return A newly allocated Callback object, ownership transferred to caller
  */
-template< typename P1, typename P2 >
-inline CallbackBase* MakeCallback( void(*function)(P1,P2) )
+template<typename P1, typename P2>
+inline CallbackBase* MakeCallback(void (*function)(P1, P2))
 {
-  return new CallbackFunction( function );
+  return new CallbackFunction(function);
 }
 
 /**
@@ -1598,10 +1630,10 @@ inline CallbackBase* MakeCallback( void(*function)(P1,P2) )
  * @param[in] function The function to call
  * @return A newly allocated Callback object, ownership transferred to caller
  */
-template< typename R, typename P1, typename P2 >
-inline CallbackBase* MakeCallback( R(*function)(P1,P2) )
+template<typename R, typename P1, typename P2>
+inline CallbackBase* MakeCallback(R (*function)(P1, P2))
 {
-  return new CallbackFunction( function );
+  return new CallbackFunction(function);
 }
 
 /**
@@ -1611,10 +1643,10 @@ inline CallbackBase* MakeCallback( R(*function)(P1,P2) )
  * @param[in] function The function to call
  * @return A newly allocated Callback object, ownership transferred to caller
  */
-template< typename P1, typename P2, typename P3 >
-inline CallbackBase* MakeCallback( void(*function)(P1,P2,P3) )
+template<typename P1, typename P2, typename P3>
+inline CallbackBase* MakeCallback(void (*function)(P1, P2, P3))
 {
-  return new CallbackFunction( function );
+  return new CallbackFunction(function);
 }
 
 /**
@@ -1624,10 +1656,10 @@ inline CallbackBase* MakeCallback( void(*function)(P1,P2,P3) )
  * @param[in] function The function to call
  * @return A newly allocated Callback object, ownership transferred to caller
  */
-template< typename R, typename P1, typename P2, typename P3 >
-inline CallbackBase* MakeCallback( R(*function)(P1,P2,P3) )
+template<typename R, typename P1, typename P2, typename P3>
+inline CallbackBase* MakeCallback(R (*function)(P1, P2, P3))
 {
-  return new CallbackFunction( function );
+  return new CallbackFunction(function);
 }
 
 /**
@@ -1639,10 +1671,10 @@ inline CallbackBase* MakeCallback( R(*function)(P1,P2,P3) )
  * @param[in] function The member function to call
  * @return A newly allocated Callback object, ownership transferred to caller
  */
-template< class T >
-inline CallbackBase* MakeCallback( T* object, void(T::*function)(void) )
+template<class T>
+inline CallbackBase* MakeCallback(T* object, void (T::*function)(void))
 {
-  return new Callback< T >( object, function );
+  return new Callback<T>(object, function);
 }
 
 /**
@@ -1654,10 +1686,10 @@ inline CallbackBase* MakeCallback( T* object, void(T::*function)(void) )
  * @param[in] function The member function to call
  * @return A newly allocated Callback object, ownership transferred to caller
  */
-template< class T, typename P1 >
-inline CallbackBase* MakeCallback( T* object, void(T::*function)(P1) )
+template<class T, typename P1>
+inline CallbackBase* MakeCallback(T* object, void (T::*function)(P1))
 {
-  return new Callback< T >( object, function );
+  return new Callback<T>(object, function);
 }
 
 /**
@@ -1669,10 +1701,10 @@ inline CallbackBase* MakeCallback( T* object, void(T::*function)(P1) )
  * @param[in] function The member function to call
  * @return A newly allocated Callback object, ownership transferred to caller
  */
-template< class T, typename P1, typename P2 >
-inline CallbackBase* MakeCallback( T* object, void(T::*function)(P1,P2) )
+template<class T, typename P1, typename P2>
+inline CallbackBase* MakeCallback(T* object, void (T::*function)(P1, P2))
 {
-  return new Callback< T >( object, function );
+  return new Callback<T>(object, function);
 }
 
 /**
@@ -1684,10 +1716,10 @@ inline CallbackBase* MakeCallback( T* object, void(T::*function)(P1,P2) )
  * @param[in] function The member function to call
  * @return A newly allocated Callback object, ownership transferred to caller
  */
-template< class T, typename P1, typename P2, typename P3 >
-inline CallbackBase* MakeCallback( T* object, void(T::*function)(P1,P2,P3) )
+template<class T, typename P1, typename P2, typename P3>
+inline CallbackBase* MakeCallback(T* object, void (T::*function)(P1, P2, P3))
 {
-  return new Callback< T >( object, function );
+  return new Callback<T>(object, function);
 }
 
 /**
@@ -1699,10 +1731,10 @@ inline CallbackBase* MakeCallback( T* object, void(T::*function)(P1,P2,P3) )
  * @param[in] function The member function to call
  * @return A newly allocated Callback object, ownership transferred to caller
  */
-template< class T, typename R >
-inline CallbackBase* MakeCallback( T* object, R(T::*function)() )
+template<class T, typename R>
+inline CallbackBase* MakeCallback(T* object, R (T::*function)())
 {
-  return new Callback< T >( object, function );
+  return new Callback<T>(object, function);
 }
 
 /**
@@ -1714,10 +1746,10 @@ inline CallbackBase* MakeCallback( T* object, R(T::*function)() )
  * @param[in] function The member function to call
  * @return A newly allocated Callback object, ownership transferred to caller
  */
-template< class T, typename P1, typename R >
-inline CallbackBase* MakeCallback( T* object, R(T::*function)(P1) )
+template<class T, typename P1, typename R>
+inline CallbackBase* MakeCallback(T* object, R (T::*function)(P1))
 {
-  return new Callback< T >( object, function );
+  return new Callback<T>(object, function);
 }
 
 /**
@@ -1729,10 +1761,10 @@ inline CallbackBase* MakeCallback( T* object, R(T::*function)(P1) )
  * @param[in] function The member function to call
  * @return A newly allocated Callback object, ownership transferred to caller
  */
-template< class T, typename P1, typename P2, typename R >
-inline CallbackBase* MakeCallback( T* object, R(T::*function)(P1,P2) )
+template<class T, typename P1, typename P2, typename R>
+inline CallbackBase* MakeCallback(T* object, R (T::*function)(P1, P2))
 {
-  return new Callback< T >( object, function );
+  return new Callback<T>(object, function);
 }
 
 /**
@@ -1744,10 +1776,10 @@ inline CallbackBase* MakeCallback( T* object, R(T::*function)(P1,P2) )
  * @param[in] function The member function to call
  * @return A newly allocated Callback object, ownership transferred to caller
  */
-template< class T, typename P1, typename P2, typename P3, typename R >
-inline CallbackBase* MakeCallback( T* object, R(T::*function)(P1,P2,P3) )
+template<class T, typename P1, typename P2, typename P3, typename R>
+inline CallbackBase* MakeCallback(T* object, R (T::*function)(P1, P2, P3))
 {
-  return new Callback< T >( object, function );
+  return new Callback<T>(object, function);
 }
 
 /**
@@ -1759,10 +1791,10 @@ inline CallbackBase* MakeCallback( T* object, R(T::*function)(P1,P2,P3) )
  * @param[in] function The member function to call
  * @return A newly allocated Callback object, ownership transferred to caller
  */
-template< class T, class Base >
-inline CallbackBase* MakeCallback( T* object, void(Base::*function)(void) )
+template<class T, class Base>
+inline CallbackBase* MakeCallback(T* object, void (Base::*function)(void))
 {
-  return new Callback< T >( object, function );
+  return new Callback<T>(object, function);
 }
 /**
  * @brief Creates a callback from a class's parent member function with no parameters.
@@ -1773,15 +1805,15 @@ inline CallbackBase* MakeCallback( T* object, void(Base::*function)(void) )
  * @param[in] function The member function to call
  * @return A newly allocated Callback object, ownership transferred to caller
  */
-template< class T, class Base >
-inline CallbackBase* MakeCallback( T& object, void(Base::*function)(void) )
+template<class T, class Base>
+inline CallbackBase* MakeCallback(T& object, void (Base::*function)(void))
 {
-  return new Callback< T >( object, function );
+  return new Callback<T>(object, function);
 }
 
 /**
  * @}
  */
-} // namespace DALI
+} // namespace Dali
 
 #endif // DALI_CALLBACK_H

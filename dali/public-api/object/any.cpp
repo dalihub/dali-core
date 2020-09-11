@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,8 @@
 
 namespace Dali
 {
-
 Any::Any()
-: mContainer( NULL )
+: mContainer(nullptr)
 {
 }
 
@@ -33,37 +32,37 @@ Any::~Any()
 {
   // Call the implementation deletion function, which will invalidate mContainer
 
-  if ( NULL != mContainer )
+  if(nullptr != mContainer)
   {
-    mContainer->mDeleteFunc( mContainer );
-    mContainer = NULL;
+    mContainer->mDeleteFunc(mContainer);
+    mContainer = nullptr;
   }
 }
 
-Any& Any::operator=( const Any& any )
+Any& Any::operator=(const Any& any)
 {
-  if( &any != this )
+  if(&any != this)
   {
-    if( NULL == any.mContainer )
+    if(nullptr == any.mContainer)
     {
       delete mContainer;
-      mContainer = NULL;
+      mContainer = nullptr;
     }
     else
     {
       AnyContainerBase* tmp = mContainer;
 
-      if( NULL != mContainer )
+      if(nullptr != mContainer)
       {
         // Check if two Any types have the same type. Avoids assignments of values with different types.
-        if( mContainer->GetType() != any.GetType() )
+        if(mContainer->GetType() != any.GetType())
         {
-          AssertAlways( "Any::operator=( const Any& Any ). Trying to assign two values with different types." );
+          AssertAlways("Any::operator=( const Any& Any ). Trying to assign two values with different types.");
         }
       }
 
       // Clone the correct templated object
-      mContainer = any.mContainer->mCloneFunc( *any.mContainer );
+      mContainer = any.mContainer->mCloneFunc(*any.mContainer);
 
       // Deletes previous container.
       delete tmp;
@@ -75,14 +74,13 @@ Any& Any::operator=( const Any& any )
 
 const std::type_info& Any::GetType() const
 {
-  return mContainer ? mContainer->GetType() : typeid( void );
+  return mContainer ? mContainer->GetType() : typeid(void);
 }
 
-void Any::AssertAlways( const char* assertMessage )
+void Any::AssertAlways(const char* assertMessage)
 {
-  DALI_LOG_ERROR_NOFN( assertMessage );
-  throw Dali::DaliException( assertMessage, "" );
+  DALI_LOG_ERROR_NOFN(assertMessage);
+  throw Dali::DaliException(assertMessage, "");
 }
-
 
 } //namespace Dali

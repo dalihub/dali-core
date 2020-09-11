@@ -43,7 +43,7 @@ class Quaternion;
  */
 struct DALI_CORE_API Vector3
 {
-// Construction
+  // Construction
 
   /**
    * @brief Constructor.
@@ -94,7 +94,7 @@ struct DALI_CORE_API Vector3
    * @SINCE_1_0.0
    * @param[in] vec2 Vector2 to create this vector from
    */
-  explicit Vector3( const Vector2& vec2 );
+  explicit Vector3(const Vector2& vec2);
 
   /**
    * @brief Constructor.
@@ -102,20 +102,20 @@ struct DALI_CORE_API Vector3
    * @SINCE_1_0.0
    * @param[in] vec4 Vector4 to create this vector from
    */
-  explicit Vector3( const Vector4& vec4 );
+  explicit Vector3(const Vector4& vec4);
 
-// Constants
+  // Constants
 
-  static const Vector3 ONE;               ///< (1.0f,1.0f,1.0f)
-  static const Vector3 XAXIS;             ///< Vector representing the X axis
-  static const Vector3 YAXIS;             ///< Vector representing the Y axis
-  static const Vector3 ZAXIS;             ///< Vector representing the Z axis
-  static const Vector3 NEGATIVE_XAXIS;    ///< Vector representing the negative X axis
-  static const Vector3 NEGATIVE_YAXIS;    ///< Vector representing the negative Y axis
-  static const Vector3 NEGATIVE_ZAXIS;    ///< Vector representing the negative Z axis
-  static const Vector3 ZERO;              ///< (0.0f, 0.0f, 0.0f)
+  static const Vector3 ONE;            ///< (1.0f,1.0f,1.0f)
+  static const Vector3 XAXIS;          ///< Vector representing the X axis
+  static const Vector3 YAXIS;          ///< Vector representing the Y axis
+  static const Vector3 ZAXIS;          ///< Vector representing the Z axis
+  static const Vector3 NEGATIVE_XAXIS; ///< Vector representing the negative X axis
+  static const Vector3 NEGATIVE_YAXIS; ///< Vector representing the negative Y axis
+  static const Vector3 NEGATIVE_ZAXIS; ///< Vector representing the negative Z axis
+  static const Vector3 ZERO;           ///< (0.0f, 0.0f, 0.0f)
 
-// API
+  // API
 
   /**
    * @brief Assignment operator.
@@ -385,7 +385,7 @@ struct DALI_CORE_API Vector3
    */
   const float& operator[](const uint32_t index) const
   {
-    DALI_ASSERT_ALWAYS( index < 3 && "Vector element index out of bounds" );
+    DALI_ASSERT_ALWAYS(index < 3 && "Vector element index out of bounds");
 
     return AsFloat()[index];
   }
@@ -400,7 +400,7 @@ struct DALI_CORE_API Vector3
    */
   float& operator[](const uint32_t index)
   {
-    DALI_ASSERT_ALWAYS( index < 3 && "Vector element index out of bounds" );
+    DALI_ASSERT_ALWAYS(index < 3 && "Vector element index out of bounds");
 
     return AsFloat()[index];
   }
@@ -461,7 +461,7 @@ struct DALI_CORE_API Vector3
    * @param[in] min The minimum vector
    * @param[in] max The maximum vector
    */
-  void Clamp( const Vector3& min, const Vector3& max );
+  void Clamp(const Vector3& min, const Vector3& max);
 
   /**
    * @brief Returns the contents of the vector as an array of 3 floats.
@@ -474,7 +474,10 @@ struct DALI_CORE_API Vector3
    * @return The vector contents as an array of 3 floats
    * @note inlined for performance reasons (generates less code than a function call)
    */
-  const float* AsFloat() const {return &x;}
+  const float* AsFloat() const
+  {
+    return &x;
+  }
 
   /**
    * @brief Returns the contents of the vector as an array of 3 floats.
@@ -487,7 +490,10 @@ struct DALI_CORE_API Vector3
    * @return The vector contents as an array of 3 floats
    * @note inlined for performance reasons (generates less code than a function call)
    */
-  float* AsFloat() {return &x;}
+  float* AsFloat()
+  {
+    return &x;
+  }
 
   /**
    * @brief Returns the x & y components (or width & height, or r & g) as a Vector2.
@@ -496,7 +502,10 @@ struct DALI_CORE_API Vector3
    * @return The partial vector contents as Vector2 (x,y)
    * @note inlined for performance reasons (generates less code than a function call)
    */
-  const Vector2& GetVectorXY() const {return reinterpret_cast<const Vector2&>(x);}
+  const Vector2& GetVectorXY() const
+  {
+    return reinterpret_cast<const Vector2&>(x);
+  }
 
   /**
    * @brief Returns the x & y components (or width & height, or r & g) as a Vector2.
@@ -505,7 +514,10 @@ struct DALI_CORE_API Vector3
    * @return The partial vector contents as Vector2 (x,y)
    * @note inlined for performance reasons (generates less code than a function call)
    */
-  Vector2& GetVectorXY() {return reinterpret_cast<Vector2&>(x);}
+  Vector2& GetVectorXY()
+  {
+    return reinterpret_cast<Vector2&>(x);
+  }
 
   /**
    * @brief Returns the y & z components (or height & depth, or g & b) as a Vector2.
@@ -514,7 +526,10 @@ struct DALI_CORE_API Vector3
    * @return The partial vector contents as Vector2 (y,z)
    * @note inlined for performance reasons (generates less code than a function call)
    */
-  const Vector2& GetVectorYZ() const {return reinterpret_cast<const Vector2&>(y);}
+  const Vector2& GetVectorYZ() const
+  {
+    return reinterpret_cast<const Vector2&>(y);
+  }
 
   /**
    * @brief Returns the y & z components (or height & depth, or g & b) as a Vector2.
@@ -523,9 +538,12 @@ struct DALI_CORE_API Vector3
    * @return The partial vector contents as Vector2 (y,z)
    * @note inlined for performance reasons (generates less code than a function call)
    */
-  Vector2& GetVectorYZ() {return reinterpret_cast<Vector2&>(y);}
+  Vector2& GetVectorYZ()
+  {
+    return reinterpret_cast<Vector2&>(y);
+  }
 
-// Data
+  // Data
 
   // NOTE
   // (x width r), (y height g), (z depth b) must be consecutive in memory.
@@ -533,9 +551,9 @@ struct DALI_CORE_API Vector3
   // No virtual methods must be added to this struct.
   union
   {
-    float x;      ///< x component
-    float width;  ///< width component
-    float r;      ///< red component
+    float x;     ///< x component
+    float width; ///< width component
+    float r;     ///< red component
   };
   union
   {
@@ -545,17 +563,16 @@ struct DALI_CORE_API Vector3
   };
   union
   {
-    float z;      ///< z component
-    float depth;  ///< depth component
-    float b;      ///< blue component
+    float z;     ///< z component
+    float depth; ///< depth component
+    float b;     ///< blue component
   };
 
 public:
-
-  Vector3( const Vector3& ) = default; ///< Default copy constructor
-  Vector3( Vector3&& ) = default; ///< Default move constructor
-  Vector3& operator=( const Vector3& ) = default; ///< Default copy assignment operator
-  Vector3& operator=( Vector3&& ) = default; ///< Default move assignment operator
+  Vector3(const Vector3&) = default;            ///< Default copy constructor
+  Vector3(Vector3&&)      = default;            ///< Default move constructor
+  Vector3& operator=(const Vector3&) = default; ///< Default copy assignment operator
+  Vector3& operator=(Vector3&&) = default;      ///< Default move assignment operator
 };
 
 /**
@@ -566,7 +583,7 @@ public:
  * @param[in] vector The vector to print
  * @return The output stream operator
  */
-DALI_CORE_API std::ostream& operator<< (std::ostream& o, const Vector3& vector);
+DALI_CORE_API std::ostream& operator<<(std::ostream& o, const Vector3& vector);
 
 /**
  * @brief Returns a vector with components set to the minimum of the corresponding component in a and b.
@@ -577,11 +594,11 @@ DALI_CORE_API std::ostream& operator<< (std::ostream& o, const Vector3& vector);
  * @param[in] b A vector
  * @return A vector containing the minimum of each component from a and b
  */
-inline Vector3 Min( const Vector3& a, const Vector3& b )
+inline Vector3 Min(const Vector3& a, const Vector3& b)
 {
-  return Vector3( a.x < b.x ? a.x : b.x ,
-                  a.y < b.y ? a.y : b.y,
-                  a.z < b.z ? a.z : b.z );
+  return Vector3(a.x < b.x ? a.x : b.x,
+                 a.y < b.y ? a.y : b.y,
+                 a.z < b.z ? a.z : b.z);
 }
 
 /**
@@ -593,11 +610,11 @@ inline Vector3 Min( const Vector3& a, const Vector3& b )
  * @param[in] b A vector
  * @return A vector containing the maximum of each component from a and b
  */
-inline Vector3 Max( const Vector3& a, const Vector3& b )
+inline Vector3 Max(const Vector3& a, const Vector3& b)
 {
-  return Vector3( a.x > b.x ? a.x : b.x,
-                  a.y > b.y ? a.y : b.y,
-                  a.z > b.z ? a.z : b.z );
+  return Vector3(a.x > b.x ? a.x : b.x,
+                 a.y > b.y ? a.y : b.y,
+                 a.z > b.z ? a.z : b.z);
 }
 
 /**
@@ -609,10 +626,17 @@ inline Vector3 Max( const Vector3& a, const Vector3& b )
  * @param[in] max The maximum value
  * @return A vector containing the clamped components of v
  */
-DALI_CORE_API Vector3 Clamp( const Vector3& v, const float& min, const float& max );
+DALI_CORE_API Vector3 Clamp(const Vector3& v, const float& min, const float& max);
 
 // Allow Vector3 to be treated as a POD type
-template <> struct TypeTraits< Vector3 > : public BasicTypes< Vector3 > { enum { IS_TRIVIAL_TYPE = true }; };
+template<>
+struct TypeTraits<Vector3> : public BasicTypes<Vector3>
+{
+  enum
+  {
+    IS_TRIVIAL_TYPE = true
+  };
+};
 
 /**
  * @}

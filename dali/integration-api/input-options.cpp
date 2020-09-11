@@ -8,148 +8,145 @@ using Dali::Internal::ThreadLocalStorage;
 
 namespace Dali
 {
-
 namespace Integration
 {
-
-void SetPanGesturePredictionMode( int mode )
+void SetPanGesturePredictionMode(int mode)
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
   eventProcessor.SetPanGesturePredictionMode(mode);
 }
 
-void SetPanGesturePredictionAmount( unsigned int amount )
+void SetPanGesturePredictionAmount(unsigned int amount)
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
   eventProcessor.SetPanGesturePredictionAmount(amount);
 }
 
-void SetPanGestureMaximumPredictionAmount( unsigned int amount )
+void SetPanGestureMaximumPredictionAmount(unsigned int amount)
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
   eventProcessor.SetPanGestureMaximumPredictionAmount(amount);
 }
 
-void SetPanGestureMinimumPredictionAmount( unsigned int amount )
+void SetPanGestureMinimumPredictionAmount(unsigned int amount)
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
   eventProcessor.SetPanGestureMinimumPredictionAmount(amount);
 }
 
-void SetPanGesturePredictionAmountAdjustment( unsigned int amount )
+void SetPanGesturePredictionAmountAdjustment(unsigned int amount)
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
   eventProcessor.SetPanGesturePredictionAmountAdjustment(amount);
 }
 
-void SetPanGestureSmoothingMode( int mode )
+void SetPanGestureSmoothingMode(int mode)
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
   eventProcessor.SetPanGestureSmoothingMode(mode);
 }
 
-void SetPanGestureSmoothingAmount( float amount )
+void SetPanGestureSmoothingAmount(float amount)
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
   eventProcessor.SetPanGestureSmoothingAmount(amount);
 }
 
-void SetPanGestureUseActualTimes( bool value )
+void SetPanGestureUseActualTimes(bool value)
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
-  eventProcessor.SetPanGestureUseActualTimes( value );
+  eventProcessor.SetPanGestureUseActualTimes(value);
 }
 
-void SetPanGestureInterpolationTimeRange( int value )
+void SetPanGestureInterpolationTimeRange(int value)
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
-  eventProcessor.SetPanGestureInterpolationTimeRange( value );
+  eventProcessor.SetPanGestureInterpolationTimeRange(value);
 }
 
-void SetPanGestureScalarOnlyPredictionEnabled( bool value )
+void SetPanGestureScalarOnlyPredictionEnabled(bool value)
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
-  eventProcessor.SetPanGestureScalarOnlyPredictionEnabled( value );
+  eventProcessor.SetPanGestureScalarOnlyPredictionEnabled(value);
 }
 
-void SetPanGestureTwoPointPredictionEnabled( bool value )
+void SetPanGestureTwoPointPredictionEnabled(bool value)
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
-  eventProcessor.SetPanGestureTwoPointPredictionEnabled( value );
+  eventProcessor.SetPanGestureTwoPointPredictionEnabled(value);
 }
 
-void SetPanGestureTwoPointInterpolatePastTime( int value )
+void SetPanGestureTwoPointInterpolatePastTime(int value)
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
-  eventProcessor.SetPanGestureTwoPointInterpolatePastTime( value );
+  eventProcessor.SetPanGestureTwoPointInterpolatePastTime(value);
 }
 
-void SetPanGestureTwoPointVelocityBias( float value )
+void SetPanGestureTwoPointVelocityBias(float value)
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
-  eventProcessor.SetPanGestureTwoPointVelocityBias( value );
+  eventProcessor.SetPanGestureTwoPointVelocityBias(value);
 }
 
-void SetPanGestureTwoPointAccelerationBias( float value )
+void SetPanGestureTwoPointAccelerationBias(float value)
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
-  eventProcessor.SetPanGestureTwoPointAccelerationBias( value );
+  eventProcessor.SetPanGestureTwoPointAccelerationBias(value);
 }
 
-void SetPanGestureMultitapSmoothingRange( int value )
+void SetPanGestureMultitapSmoothingRange(int value)
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
-  eventProcessor.SetPanGestureMultitapSmoothingRange( value );
+  eventProcessor.SetPanGestureMultitapSmoothingRange(value);
 }
 
-void SetPanGestureMinimumDistance( int value )
+void SetPanGestureMinimumDistance(int value)
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
-  eventProcessor.SetPanGestureMinimumDistance( value );
+  eventProcessor.SetPanGestureMinimumDistance(value);
 }
 
-void SetPanGestureMinimumPanEvents( int value )
+void SetPanGestureMinimumPanEvents(int value)
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
-  eventProcessor.SetPanGestureMinimumPanEvents( value );
+  eventProcessor.SetPanGestureMinimumPanEvents(value);
 }
 
-void SetPinchGestureMinimumDistance( float value )
+void SetPinchGestureMinimumDistance(float value)
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
-  eventProcessor.SetPinchGestureMinimumDistance( value );
+  eventProcessor.SetPinchGestureMinimumDistance(value);
 }
 
-void SetPinchGestureMinimumTouchEvents( uint32_t value )
+void SetPinchGestureMinimumTouchEvents(uint32_t value)
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
-  eventProcessor.SetPinchGestureMinimumTouchEvents( value );
+  eventProcessor.SetPinchGestureMinimumTouchEvents(value);
 }
 
-void SetPinchGestureMinimumTouchEventsAfterStart( uint32_t value )
+void SetPinchGestureMinimumTouchEventsAfterStart(uint32_t value)
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
-  eventProcessor.SetPinchGestureMinimumTouchEventsAfterStart( value );
+  eventProcessor.SetPinchGestureMinimumTouchEventsAfterStart(value);
 }
 
-void SetRotationGestureMinimumTouchEvents( uint32_t value )
+void SetRotationGestureMinimumTouchEvents(uint32_t value)
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
-  eventProcessor.SetRotationGestureMinimumTouchEvents( value );
+  eventProcessor.SetRotationGestureMinimumTouchEvents(value);
 }
 
-void SetRotationGestureMinimumTouchEventsAfterStart( uint32_t value )
+void SetRotationGestureMinimumTouchEventsAfterStart(uint32_t value)
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
-  eventProcessor.SetRotationGestureMinimumTouchEventsAfterStart( value );
+  eventProcessor.SetRotationGestureMinimumTouchEventsAfterStart(value);
 }
 
-void SetLongPressMinimumHoldingTime( unsigned int value )
+void SetLongPressMinimumHoldingTime(unsigned int value)
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
-  eventProcessor.SetLongPressMinimumHoldingTime( value );
+  eventProcessor.SetLongPressMinimumHoldingTime(value);
 }
-
 
 } // namespace Integration
 

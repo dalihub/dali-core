@@ -40,8 +40,8 @@ namespace Internal
 template <typename Type>
 struct BasicType
 {
-  typedef Type HolderType;
-  typedef Type PassingType;
+  using HolderType  = Type;
+  using PassingType = Type;
 };
 
 // For complex types that are copied into the message,
@@ -49,8 +49,8 @@ struct BasicType
 template <typename Type>
 struct ComplexType
 {
-  typedef Type HolderType;
-  typedef const Type& PassingType;
+  using HolderType  = Type;
+  using PassingType = const Type&;
 };
 
 // For complex types that are owned by the message,
@@ -58,8 +58,8 @@ struct ComplexType
 template <typename Type>
 struct OwnedType
 {
-  typedef OwnerPointer<Type> HolderType;
-  typedef OwnerPointer<Type>& PassingType;
+  using HolderType  = OwnerPointer<Type>;
+  using PassingType = OwnerPointer<Type>&;
 };
 
 

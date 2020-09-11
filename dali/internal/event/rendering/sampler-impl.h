@@ -37,7 +37,7 @@ struct Sampler;
 }
 
 class Sampler;
-typedef IntrusivePtr<Sampler> SamplerPtr;
+using SamplerPtr = IntrusivePtr<Sampler>;
 
 /**
  * Sampler is an object that contains an array of structures of values that
@@ -82,7 +82,7 @@ protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~Sampler();
+  ~Sampler() override;
 
 private: // data
   EventThreadServices& mEventThreadServices;    ///<Used to send messages to the render thread via the update thread

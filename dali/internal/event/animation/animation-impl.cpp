@@ -156,7 +156,7 @@ AnimationPtr Animation::New(float durationSeconds)
 }
 
 Animation::Animation( EventThreadServices& eventThreadServices, AnimationPlaylist& playlist, float durationSeconds, EndAction endAction, EndAction disconnectAction, AlphaFunction defaultAlpha )
-: mAnimation( NULL ),
+: mAnimation( nullptr ),
   mEventThreadServices( eventThreadServices ),
   mPlaylist( playlist ),
   mFinishedSignal(),
@@ -214,11 +214,11 @@ void Animation::CreateSceneObject()
 
 void Animation::DestroySceneObject()
 {
-  if ( mAnimation != NULL )
+  if ( mAnimation != nullptr )
   {
     // Remove animation using a message to the update manager
     RemoveAnimationMessage( mEventThreadServices.GetUpdateManager(), *mAnimation );
-    mAnimation = NULL;
+    mAnimation = nullptr;
   }
 }
 

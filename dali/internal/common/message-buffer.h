@@ -34,7 +34,7 @@ namespace Internal
 class MessageBuffer
 {
 public:
-  typedef std::ptrdiff_t WordType;
+  using WordType = std::ptrdiff_t;
 
   /**
    * Create a new MessageBuffer
@@ -82,7 +82,7 @@ public:
     // Inlined for performance
     WordType* Get()
     {
-      return ( 0 != mMessageSize ) ? mCurrent : NULL;
+      return ( 0 != mMessageSize ) ? mCurrent : nullptr;
     }
 
     // Inlined for performance

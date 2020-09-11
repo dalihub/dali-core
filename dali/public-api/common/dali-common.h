@@ -31,43 +31,43 @@
  * When building a library that uses DALI, HIDE_DALI_INTERNALS.
  */
 #if __GNUC__ >= 4
-#  ifndef HIDE_DALI_INTERNALS
-#    define DALI_EXPORT_API
-#    define DALI_NO_EXPORT_API
-#    define DALI_IMPORT_API
-#    define DALI_CORE_API
-#    define DALI_INTERNAL
-#  else
-#    define DALI_EXPORT_API __attribute__ ((visibility ("default")))
-#    define DALI_NO_EXPORT_API __attribute__ ((visibility ("hidden")))
-#    define DALI_IMPORT_API __attribute__ ((visibility ("default")))
-#    define DALI_CORE_API   __attribute__ ((visibility ("default")))
-#    define DALI_INTERNAL   __attribute__ ((visibility ("hidden")))
-#  endif
+#ifndef HIDE_DALI_INTERNALS
+#define DALI_EXPORT_API
+#define DALI_NO_EXPORT_API
+#define DALI_IMPORT_API
+#define DALI_CORE_API
+#define DALI_INTERNAL
+#else
+#define DALI_EXPORT_API __attribute__((visibility("default")))
+#define DALI_NO_EXPORT_API __attribute__((visibility("hidden")))
+#define DALI_IMPORT_API __attribute__((visibility("default")))
+#define DALI_CORE_API __attribute__((visibility("default")))
+#define DALI_INTERNAL __attribute__((visibility("hidden")))
+#endif
 #else
 #ifdef WIN32
- /** Visibility attribute to show declarations */
-#  define DALI_EXPORT_API __declspec(dllexport)
+/** Visibility attribute to show declarations */
+#define DALI_EXPORT_API __declspec(dllexport)
 
 #ifdef BUILDING_DALI_CORE
- /** Visibility attribute to hide declarations */
-#  define DALI_CORE_API __declspec(dllexport)
+/** Visibility attribute to hide declarations */
+#define DALI_CORE_API __declspec(dllexport)
 #else
 /** Visibility attribute to hide declarations */
-#  define DALI_CORE_API __declspec(dllimport)
+#define DALI_CORE_API __declspec(dllimport)
 #endif
 
 #else
- /** Visibility attribute to show declarations */
-#  define DALI_EXPORT_API
 /** Visibility attribute to show declarations */
-#  define DALI_IMPORT_API
+#define DALI_EXPORT_API
 /** Visibility attribute to show declarations */
-#  define DALI_CORE_API
+#define DALI_IMPORT_API
+/** Visibility attribute to show declarations */
+#define DALI_CORE_API
 #endif
 /** Visibility attribute to hide declarations */
-#  define DALI_INTERNAL
-#  define DALI_NO_EXPORT_API
+#define DALI_INTERNAL
+#define DALI_NO_EXPORT_API
 #endif
 
 #ifdef DEPRECATION_WARNING
@@ -76,7 +76,7 @@
 #define DALI_DEPRECATED_API
 #endif
 
-#if defined (__GXX_EXPERIMENTAL_CXX0X__) || (__cplusplus >= 201103L)
+#if defined(__GXX_EXPERIMENTAL_CXX0X__) || (__cplusplus >= 201103L)
 // C++0x support
 #define _CPP11
 #else
@@ -91,10 +91,10 @@
  * @SINCE_1_0.0
  */
 #ifdef __GNUC
-#define DALI_LIKELY(expression)   __builtin_expect( !!(expression), 1 )
-#define DALI_UNLIKELY(expression) __builtin_expect( !!(expression), 0 )
+#define DALI_LIKELY(expression) __builtin_expect(!!(expression), 1)
+#define DALI_UNLIKELY(expression) __builtin_expect(!!(expression), 0)
 #else
-#define DALI_LIKELY(expression)   !!(expression)
+#define DALI_LIKELY(expression) !!(expression)
 #define DALI_UNLIKELY(expression) !!(expression)
 #endif
 
@@ -116,7 +116,7 @@ namespace Dali
  * @param[in] location Where the assertion occurred
  * @param[in] condition The assertion condition
  */
-DALI_CORE_API void DaliAssertMessage( const char* location, const char* condition );
+DALI_CORE_API void DaliAssertMessage(const char* location, const char* condition);
 
 /**
  * @brief Exception class for Dali Core library - Raised by assertions in codebase.
@@ -134,7 +134,7 @@ public:
    * @param[in] location The location of the assertion
    * @param[in] condition The assertion condition
    */
-  DaliException( const char* location, const char* condition );
+  DaliException(const char* location, const char* condition);
 
   const char* location;
   const char* condition;
@@ -143,7 +143,7 @@ public:
 /**
  * @}
  */
-}// Dali
+} // namespace Dali
 
 /**
  * @brief An invariant concurrent assertion to ensure its argument always evaluates TRUE.
@@ -181,17 +181,17 @@ public:
 #define ASSERT_LOCATION NULL
 #endif
 
-#define DALI_ASSERT_ALWAYS(cond)                \
-  if(DALI_UNLIKELY(!(cond))) \
-  { \
-    Dali::DaliAssertMessage( ASSERT_LOCATION, #cond );   \
-    throw Dali::DaliException( ASSERT_LOCATION, #cond );  \
+#define DALI_ASSERT_ALWAYS(cond)                       \
+  if(DALI_UNLIKELY(!(cond)))                           \
+  {                                                    \
+    Dali::DaliAssertMessage(ASSERT_LOCATION, #cond);   \
+    throw Dali::DaliException(ASSERT_LOCATION, #cond); \
   }
 
-#define DALI_ABORT(message)                \
-  { \
-    Dali::DaliAssertMessage( ASSERT_LOCATION, message );   \
-    throw Dali::DaliException( ASSERT_LOCATION, message );  \
+#define DALI_ABORT(message)                              \
+  {                                                      \
+    Dali::DaliAssertMessage(ASSERT_LOCATION, message);   \
+    throw Dali::DaliException(ASSERT_LOCATION, message); \
   }
 
 /**

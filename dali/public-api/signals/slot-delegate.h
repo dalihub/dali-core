@@ -72,19 +72,18 @@ namespace Dali
  * @endcode
  * @SINCE_1_0.0
  */
-template <typename Slot>
+template<typename Slot>
 class SlotDelegate
 {
 public:
-
   /**
    * @brief Constructor.
    *
    * @SINCE_1_0.0
    * @param[in] slot The object with a callback
    */
-  SlotDelegate( Slot* slot )
-  : mSlot( slot )
+  SlotDelegate(Slot* slot)
+  : mSlot(slot)
   {
   }
 
@@ -138,14 +137,12 @@ public:
   }
 
 private:
-
-  SlotDelegate( const SlotDelegate& ) = delete; ///< Deleted copy constructor. @SINCE_1_0.0
-  SlotDelegate( SlotDelegate&& ) = delete; ///< Deleted move constructor. @SINCE_1_9.25
-  SlotDelegate& operator=( const SlotDelegate& ) = delete; ///< Deleted copy assignment operator. @SINCE_1_0.0
-  SlotDelegate& operator=( SlotDelegate&& ) = delete; ///< Deleted move assignment operator. @SINCE_1_9.25
+  SlotDelegate(const SlotDelegate&) = delete;            ///< Deleted copy constructor. @SINCE_1_0.0
+  SlotDelegate(SlotDelegate&&)      = delete;            ///< Deleted move constructor. @SINCE_1_9.25
+  SlotDelegate& operator=(const SlotDelegate&) = delete; ///< Deleted copy assignment operator. @SINCE_1_0.0
+  SlotDelegate& operator=(SlotDelegate&&) = delete;      ///< Deleted move assignment operator. @SINCE_1_9.25
 
 private:
-
   Slot* mSlot; ///< The slot object
 
   // Use composition instead of inheritance (virtual methods don't mix well with templates)

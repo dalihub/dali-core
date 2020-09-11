@@ -244,7 +244,7 @@ RenderManager* RenderManager::New( Integration::GlAbstraction& glAbstraction,
 }
 
 RenderManager::RenderManager()
-: mImpl(NULL)
+: mImpl(nullptr)
 {
 }
 
@@ -954,7 +954,7 @@ void RenderManager::RenderScene( Integration::RenderStatus& status, Integration:
       clearMask |= GL_STENCIL_BUFFER_BIT;
     }
 
-    if( !instruction.mIgnoreRenderToFbo && ( instruction.mFrameBuffer != 0 ) )
+    if( !instruction.mIgnoreRenderToFbo && ( instruction.mFrameBuffer != nullptr ) )
     {
       // Offscreen buffer rendering
       if ( instruction.mIsViewportSet )
@@ -984,7 +984,7 @@ void RenderManager::RenderScene( Integration::RenderStatus& status, Integration:
     }
 
     bool clearFullFrameRect = true;
-    if( instruction.mFrameBuffer != 0 )
+    if( instruction.mFrameBuffer != nullptr )
     {
       Viewport frameRect( 0, 0, instruction.mFrameBuffer->GetWidth(), instruction.mFrameBuffer->GetHeight() );
       clearFullFrameRect = ( frameRect == viewportRect );

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,49 +20,48 @@
 
 namespace Dali
 {
-
 Extents::Extents()
 : start(0),
   end(0),
   top(0),
   bottom(0)
-  {
-  }
-
-Extents::Extents( uint16_t start, uint16_t end, uint16_t top, uint16_t bottom )
-: start( start ),
-  end( end ),
-  top( top ),
-  bottom( bottom )
-  {
-  }
-
-Extents& Extents::operator=( const uint16_t* array )
 {
-  start = array[0];
-  end = array[1];
-  top = array[2];
+}
+
+Extents::Extents(uint16_t start, uint16_t end, uint16_t top, uint16_t bottom)
+: start(start),
+  end(end),
+  top(top),
+  bottom(bottom)
+{
+}
+
+Extents& Extents::operator=(const uint16_t* array)
+{
+  start  = array[0];
+  end    = array[1];
+  top    = array[2];
   bottom = array[3];
 
   return *this;
 }
 
-bool Extents::operator==( const Extents &rhs ) const
+bool Extents::operator==(const Extents& rhs) const
 {
-  return ( start == rhs.start )&&
-    ( end == rhs.end )&&
-    ( top == rhs.top )&&
-    ( bottom == rhs.bottom );
+  return (start == rhs.start) &&
+         (end == rhs.end) &&
+         (top == rhs.top) &&
+         (bottom == rhs.bottom);
 }
 
-bool Extents::operator!=( const Extents &rhs ) const
+bool Extents::operator!=(const Extents& rhs) const
 {
-  return !( *this == rhs );
+  return !(*this == rhs);
 }
 
-std::ostream& operator<<( std::ostream& stream, const Extents& extents )
+std::ostream& operator<<(std::ostream& stream, const Extents& extents)
 {
   return stream << "[" << extents.start << ", " << extents.end << ", " << extents.top << ", " << extents.bottom << "]";
 }
 
-} // Dali
+} // namespace Dali

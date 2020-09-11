@@ -20,8 +20,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/base-handle.h>
-#include <dali/public-api/object/property-notification-declarations.h>
 #include <dali/public-api/object/property-conditions.h>
+#include <dali/public-api/object/property-notification-declarations.h>
 #include <dali/public-api/object/property.h>
 
 namespace Dali
@@ -52,14 +52,13 @@ public:
    */
   enum NotifyMode
   {
-    DISABLED,                             ///< Don't notify, regardless of result of Condition @SINCE_1_9.28
-    NOTIFY_ON_TRUE,                       ///< Notify whenever condition changes from false to true. @SINCE_1_9.28
-    NOTIFY_ON_FALSE,                      ///< Notify whenever condition changes from true to false. @SINCE_1_9.28
-    NOTIFY_ON_CHANGED                     ///< Notify whenever condition changes (false to true, and true to false) @SINCE_1_9.28
+    DISABLED,         ///< Don't notify, regardless of result of Condition @SINCE_1_9.28
+    NOTIFY_ON_TRUE,   ///< Notify whenever condition changes from false to true. @SINCE_1_9.28
+    NOTIFY_ON_FALSE,  ///< Notify whenever condition changes from true to false. @SINCE_1_9.28
+    NOTIFY_ON_CHANGED ///< Notify whenever condition changes (false to true, and true to false) @SINCE_1_9.28
   };
 
 public:
-
   /**
    * @brief Creates an uninitialized PropertyNotification; this can be initialized with PropertyNotification::New().
    *
@@ -79,7 +78,7 @@ public:
    * @param[in] handle to An object
    * @return handle to a PropertyNotification object or an uninitialized handle
    */
-  static PropertyNotification DownCast( BaseHandle handle );
+  static PropertyNotification DownCast(BaseHandle handle);
 
   /**
    * @brief Destructor.
@@ -112,7 +111,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  PropertyNotification( PropertyNotification&& rhs );
+  PropertyNotification(PropertyNotification&& rhs);
 
   /**
    * @brief Move assignment operator.
@@ -121,7 +120,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  PropertyNotification& operator=( PropertyNotification&& rhs );
+  PropertyNotification& operator=(PropertyNotification&& rhs);
 
   /**
    * @brief Gets the condition of this notification.
@@ -164,7 +163,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] mode Notification mode (Default is PropertyNotification::NOTIFY_ON_TRUE)
    */
-  void SetNotifyMode( NotifyMode mode );
+  void SetNotifyMode(NotifyMode mode);
 
   /**
    * @brief Retrieves the current Notification mode.
@@ -192,7 +191,6 @@ public:
   PropertyNotifySignalType& NotifySignal();
 
 public: // Not intended for use by Application developers
-
   /// @cond internal
   /**
    * @brief This constructor is used by Dali New() methods.

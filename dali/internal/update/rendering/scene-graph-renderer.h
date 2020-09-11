@@ -47,9 +47,9 @@ namespace SceneGraph
 class SceneController;
 
 class Renderer;
-typedef Dali::Vector< Renderer* > RendererContainer;
-typedef RendererContainer::Iterator RendererIter;
-typedef RendererContainer::ConstIterator RendererConstIter;
+using RendererContainer = Dali::Vector<Renderer*>;
+using RendererIter      = RendererContainer::Iterator;
+using RendererConstIter = RendererContainer::ConstIterator;
 
 class TextureSet;
 class Geometry;
@@ -76,7 +76,7 @@ public:
   /**
    * Destructor
    */
-  virtual ~Renderer();
+  ~Renderer() override;
 
   /**
    * Overriden delete operator
@@ -395,24 +395,24 @@ public: // UniformMap::Observer
   /**
    * @copydoc UniformMap::Observer::UniformMappingsChanged
    */
-  virtual void UniformMappingsChanged( const UniformMap& mappings );
+  void UniformMappingsChanged( const UniformMap& mappings ) override;
 
 public: // ConnectionChangePropagator::Observer
 
   /**
    * @copydoc ConnectionChangePropagator::ConnectionsChanged
    */
-  virtual void ConnectionsChanged( PropertyOwner& owner );
+  void ConnectionsChanged( PropertyOwner& owner ) override;
 
   /**
    * @copydoc ConnectionChangePropagator::ConnectedUniformMapChanged
    */
-  virtual void ConnectedUniformMapChanged( );
+  void ConnectedUniformMapChanged( ) override;
 
   /**
    * @copydoc ConnectionChangePropagator::ConnectedUniformMapChanged
    */
-  virtual void ObservedObjectDestroyed(PropertyOwner& owner);
+  void ObservedObjectDestroyed(PropertyOwner& owner) override;
 
 public: // PropertyOwner implementation
   /**
@@ -425,12 +425,12 @@ public: // From UniformMapDataProvider
   /**
    * @copydoc UniformMapDataProvider::GetUniformMapChanged
    */
-  virtual bool GetUniformMapChanged( BufferIndex bufferIndex ) const{ return mUniformMapChanged[bufferIndex];}
+  bool GetUniformMapChanged( BufferIndex bufferIndex ) const override{ return mUniformMapChanged[bufferIndex];}
 
   /**
    * @copydoc UniformMapDataProvider::GetUniformMap
    */
-  virtual const CollectedUniformMap& GetUniformMap( BufferIndex bufferIndex ) const;
+  const CollectedUniformMap& GetUniformMap( BufferIndex bufferIndex ) const override;
 
   void SetDrawCommands( Dali::DevelRenderer::DrawCommand* pDrawCommands, uint32_t size );
 
@@ -488,7 +488,7 @@ public:
 /// Messages
 inline void SetTexturesMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, const TextureSet& textureSet )
 {
-  typedef MessageValue1< Renderer, TextureSet* > LocalType;
+  using LocalType = MessageValue1<Renderer, TextureSet*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -499,7 +499,7 @@ inline void SetTexturesMessage( EventThreadServices& eventThreadServices, const 
 
 inline void SetGeometryMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, const Render::Geometry& geometry )
 {
-  typedef MessageValue1< Renderer, Render::Geometry* > LocalType;
+  using LocalType = MessageValue1<Renderer, Render::Geometry*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -510,7 +510,7 @@ inline void SetGeometryMessage( EventThreadServices& eventThreadServices, const 
 
 inline void SetShaderMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, const Shader& shader )
 {
-  typedef MessageValue1< Renderer, Shader* > LocalType;
+  using LocalType = MessageValue1<Renderer, Shader*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -521,7 +521,7 @@ inline void SetShaderMessage( EventThreadServices& eventThreadServices, const Re
 
 inline void SetDepthIndexMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, int depthIndex )
 {
-  typedef MessageValue1< Renderer, int > LocalType;
+  using LocalType = MessageValue1<Renderer, int>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -532,7 +532,7 @@ inline void SetDepthIndexMessage( EventThreadServices& eventThreadServices, cons
 
 inline void SetFaceCullingModeMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, FaceCullingMode::Type faceCullingMode )
 {
-  typedef MessageValue1< Renderer, FaceCullingMode::Type > LocalType;
+  using LocalType = MessageValue1<Renderer, FaceCullingMode::Type>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -542,7 +542,7 @@ inline void SetFaceCullingModeMessage( EventThreadServices& eventThreadServices,
 
 inline void SetBlendModeMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, BlendMode::Type blendingMode )
 {
-  typedef MessageValue1< Renderer, BlendMode::Type > LocalType;
+  using LocalType = MessageValue1<Renderer, BlendMode::Type>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -552,7 +552,7 @@ inline void SetBlendModeMessage( EventThreadServices& eventThreadServices, const
 
 inline void SetBlendingOptionsMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, uint32_t options )
 {
-  typedef MessageValue1< Renderer, uint32_t > LocalType;
+  using LocalType = MessageValue1<Renderer, uint32_t>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -562,7 +562,7 @@ inline void SetBlendingOptionsMessage( EventThreadServices& eventThreadServices,
 
 inline void SetBlendColorMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, const Vector4& blendColor )
 {
-  typedef MessageValue1< Renderer, Vector4 > LocalType;
+  using LocalType = MessageValue1<Renderer, Vector4>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -572,7 +572,7 @@ inline void SetBlendColorMessage( EventThreadServices& eventThreadServices, cons
 
 inline void SetIndexedDrawFirstElementMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, uint32_t firstElement )
 {
-  typedef MessageValue1< Renderer, uint32_t > LocalType;
+  using LocalType = MessageValue1<Renderer, uint32_t>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -582,7 +582,7 @@ inline void SetIndexedDrawFirstElementMessage( EventThreadServices& eventThreadS
 
 inline void SetIndexedDrawElementsCountMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, uint32_t elementsCount )
 {
-  typedef MessageValue1< Renderer, uint32_t > LocalType;
+  using LocalType = MessageValue1<Renderer, uint32_t>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -592,7 +592,7 @@ inline void SetIndexedDrawElementsCountMessage( EventThreadServices& eventThread
 
 inline void SetEnablePreMultipliedAlphaMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, bool preMultiplied )
 {
-  typedef MessageValue1< Renderer, bool > LocalType;
+  using LocalType = MessageValue1<Renderer, bool>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -602,7 +602,7 @@ inline void SetEnablePreMultipliedAlphaMessage( EventThreadServices& eventThread
 
 inline void SetDepthWriteModeMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, DepthWriteMode::Type depthWriteMode )
 {
-  typedef MessageValue1< Renderer, DepthWriteMode::Type > LocalType;
+  using LocalType = MessageValue1<Renderer, DepthWriteMode::Type>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -612,7 +612,7 @@ inline void SetDepthWriteModeMessage( EventThreadServices& eventThreadServices, 
 
 inline void SetDepthTestModeMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, DepthTestMode::Type depthTestMode )
 {
-  typedef MessageValue1< Renderer, DepthTestMode::Type > LocalType;
+  using LocalType = MessageValue1<Renderer, DepthTestMode::Type>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -622,7 +622,7 @@ inline void SetDepthTestModeMessage( EventThreadServices& eventThreadServices, c
 
 inline void SetDepthFunctionMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, DepthFunction::Type depthFunction )
 {
-  typedef MessageValue1< Renderer, DepthFunction::Type > LocalType;
+  using LocalType = MessageValue1<Renderer, DepthFunction::Type>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -632,7 +632,7 @@ inline void SetDepthFunctionMessage( EventThreadServices& eventThreadServices, c
 
 inline void SetRenderModeMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, RenderMode::Type mode )
 {
-  typedef MessageValue1< Renderer, RenderMode::Type > LocalType;
+  using LocalType = MessageValue1<Renderer, RenderMode::Type>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -642,7 +642,7 @@ inline void SetRenderModeMessage( EventThreadServices& eventThreadServices, cons
 
 inline void SetStencilFunctionMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, StencilFunction::Type stencilFunction )
 {
-  typedef MessageValue1< Renderer, StencilFunction::Type > LocalType;
+  using LocalType = MessageValue1<Renderer, StencilFunction::Type>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -652,7 +652,7 @@ inline void SetStencilFunctionMessage( EventThreadServices& eventThreadServices,
 
 inline void SetStencilFunctionMaskMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, int mask )
 {
-  typedef MessageValue1< Renderer, int > LocalType;
+  using LocalType = MessageValue1<Renderer, int>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -662,7 +662,7 @@ inline void SetStencilFunctionMaskMessage( EventThreadServices& eventThreadServi
 
 inline void SetStencilFunctionReferenceMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, int stencilFunctionReference )
 {
-  typedef MessageValue1< Renderer, int > LocalType;
+  using LocalType = MessageValue1<Renderer, int>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -672,7 +672,7 @@ inline void SetStencilFunctionReferenceMessage( EventThreadServices& eventThread
 
 inline void SetStencilMaskMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, int stencilMask )
 {
-  typedef MessageValue1< Renderer, int > LocalType;
+  using LocalType = MessageValue1<Renderer, int>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -682,7 +682,7 @@ inline void SetStencilMaskMessage( EventThreadServices& eventThreadServices, con
 
 inline void SetStencilOperationOnFailMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, StencilOperation::Type stencilOperation )
 {
-  typedef MessageValue1< Renderer, StencilOperation::Type > LocalType;
+  using LocalType = MessageValue1<Renderer, StencilOperation::Type>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -692,7 +692,7 @@ inline void SetStencilOperationOnFailMessage( EventThreadServices& eventThreadSe
 
 inline void SetStencilOperationOnZFailMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, StencilOperation::Type stencilOperation )
 {
-  typedef MessageValue1< Renderer, StencilOperation::Type > LocalType;
+  using LocalType = MessageValue1<Renderer, StencilOperation::Type>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -702,7 +702,7 @@ inline void SetStencilOperationOnZFailMessage( EventThreadServices& eventThreadS
 
 inline void SetStencilOperationOnZPassMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, StencilOperation::Type stencilOperation )
 {
-  typedef MessageValue1< Renderer, StencilOperation::Type > LocalType;
+  using LocalType = MessageValue1<Renderer, StencilOperation::Type>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -712,7 +712,7 @@ inline void SetStencilOperationOnZPassMessage( EventThreadServices& eventThreadS
 
 inline void BakeOpacityMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, float opacity )
 {
-  typedef MessageDoubleBuffered1< Renderer, float > LocalType;
+  using LocalType = MessageDoubleBuffered1<Renderer, float>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -732,7 +732,7 @@ inline void SetRenderingBehaviorMessage( EventThreadServices& eventThreadService
 
 inline void SetDrawCommandsMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, Dali::DevelRenderer::DrawCommand* pDrawCommands, uint32_t size )
 {
-  typedef MessageValue2< Renderer, Dali::DevelRenderer::DrawCommand*, uint32_t > LocalType;
+  using LocalType = MessageValue2<Renderer, Dali::DevelRenderer::DrawCommand*, uint32_t>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );

@@ -15,8 +15,8 @@
  *
  */
 
-#include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
+#include <dali/public-api/dali-core.h>
 
 using namespace Dali;
 
@@ -37,20 +37,20 @@ int UtcDaliVertexBufferNew01(void)
   TestApplication application;
 
   Property::Map texturedQuadVertexFormat;
-  texturedQuadVertexFormat["aPosition"] = Property::VECTOR2;
+  texturedQuadVertexFormat["aPosition"]    = Property::VECTOR2;
   texturedQuadVertexFormat["aVertexCoord"] = Property::VECTOR2;
 
-  VertexBuffer vertexBuffer = VertexBuffer::New( texturedQuadVertexFormat );
+  VertexBuffer vertexBuffer = VertexBuffer::New(texturedQuadVertexFormat);
 
-  DALI_TEST_EQUALS( (bool)vertexBuffer, true, TEST_LOCATION );
+  DALI_TEST_EQUALS((bool)vertexBuffer, true, TEST_LOCATION);
   END_TEST;
 }
 
 int UtcDaliVertexBufferNew02(void)
 {
   TestApplication application;
-  VertexBuffer vertexBuffer;
-  DALI_TEST_EQUALS( (bool)vertexBuffer, false, TEST_LOCATION );
+  VertexBuffer    vertexBuffer;
+  DALI_TEST_EQUALS((bool)vertexBuffer, false, TEST_LOCATION);
   END_TEST;
 }
 
@@ -59,14 +59,14 @@ int UtcDaliVertexBufferDownCast01(void)
   TestApplication application;
 
   Property::Map texturedQuadVertexFormat;
-  texturedQuadVertexFormat["aPosition"] = Property::VECTOR2;
+  texturedQuadVertexFormat["aPosition"]    = Property::VECTOR2;
   texturedQuadVertexFormat["aVertexCoord"] = Property::VECTOR2;
 
-  VertexBuffer vertexBuffer = VertexBuffer::New( texturedQuadVertexFormat );
+  VertexBuffer vertexBuffer = VertexBuffer::New(texturedQuadVertexFormat);
 
-  BaseHandle handle(vertexBuffer);
+  BaseHandle   handle(vertexBuffer);
   VertexBuffer vertexBuffer2 = VertexBuffer::DownCast(handle);
-  DALI_TEST_EQUALS( (bool)vertexBuffer2, true, TEST_LOCATION );
+  DALI_TEST_EQUALS((bool)vertexBuffer2, true, TEST_LOCATION);
   END_TEST;
 }
 
@@ -74,9 +74,9 @@ int UtcDaliVertexBufferDownCast02(void)
 {
   TestApplication application;
 
-  Handle handle = Handle::New(); // Create a custom object
+  Handle       handle       = Handle::New(); // Create a custom object
   VertexBuffer vertexBuffer = VertexBuffer::DownCast(handle);
-  DALI_TEST_EQUALS( (bool)vertexBuffer, false, TEST_LOCATION );
+  DALI_TEST_EQUALS((bool)vertexBuffer, false, TEST_LOCATION);
   END_TEST;
 }
 
@@ -88,8 +88,8 @@ int UtcDaliVertexBufferCopyConstructor(void)
 
   VertexBuffer vertexBufferCopy(vertexBuffer);
 
-  DALI_TEST_EQUALS( (bool)vertexBufferCopy, true, TEST_LOCATION );
-  DALI_TEST_EQUALS( vertexBufferCopy.GetSize(), 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS((bool)vertexBufferCopy, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(vertexBufferCopy.GetSize(), 0u, TEST_LOCATION);
 
   END_TEST;
 }
@@ -101,11 +101,11 @@ int UtcDaliVertexBufferAssignmentOperator(void)
   VertexBuffer vertexBuffer = CreateVertexBuffer();
 
   VertexBuffer vertexBuffer2;
-  DALI_TEST_EQUALS( (bool)vertexBuffer2, false, TEST_LOCATION );
+  DALI_TEST_EQUALS((bool)vertexBuffer2, false, TEST_LOCATION);
 
   vertexBuffer2 = vertexBuffer;
-  DALI_TEST_EQUALS( (bool)vertexBuffer2, true, TEST_LOCATION );
-  DALI_TEST_EQUALS( vertexBuffer2.GetSize(), 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS((bool)vertexBuffer2, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(vertexBuffer2.GetSize(), 0u, TEST_LOCATION);
 
   END_TEST;
 }
@@ -115,15 +115,15 @@ int UtcDaliVertexBufferMoveConstructor(void)
   TestApplication application;
 
   VertexBuffer vertexBuffer = CreateVertexBuffer();
-  DALI_TEST_CHECK( vertexBuffer );
-  DALI_TEST_EQUALS( 1, vertexBuffer.GetBaseObject().ReferenceCount(), TEST_LOCATION );
-  DALI_TEST_EQUALS( 0u, vertexBuffer.GetSize(), TEST_LOCATION );
+  DALI_TEST_CHECK(vertexBuffer);
+  DALI_TEST_EQUALS(1, vertexBuffer.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, vertexBuffer.GetSize(), TEST_LOCATION);
 
-  VertexBuffer move = std::move( vertexBuffer );
-  DALI_TEST_CHECK( move );
-  DALI_TEST_EQUALS( 1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
-  DALI_TEST_EQUALS( 0u, move.GetSize(), TEST_LOCATION );
-  DALI_TEST_CHECK( !vertexBuffer );
+  VertexBuffer move = std::move(vertexBuffer);
+  DALI_TEST_CHECK(move);
+  DALI_TEST_EQUALS(1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, move.GetSize(), TEST_LOCATION);
+  DALI_TEST_CHECK(!vertexBuffer);
 
   END_TEST;
 }
@@ -133,16 +133,16 @@ int UtcDaliVertexBufferMoveAssignment(void)
   TestApplication application;
 
   VertexBuffer vertexBuffer = CreateVertexBuffer();
-  DALI_TEST_CHECK( vertexBuffer );
-  DALI_TEST_EQUALS( 1, vertexBuffer.GetBaseObject().ReferenceCount(), TEST_LOCATION );
-  DALI_TEST_EQUALS( 0u, vertexBuffer.GetSize(), TEST_LOCATION );
+  DALI_TEST_CHECK(vertexBuffer);
+  DALI_TEST_EQUALS(1, vertexBuffer.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, vertexBuffer.GetSize(), TEST_LOCATION);
 
   VertexBuffer move;
-  move = std::move( vertexBuffer );
-  DALI_TEST_CHECK( move );
-  DALI_TEST_EQUALS( 1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
-  DALI_TEST_EQUALS( 0u, move.GetSize(), TEST_LOCATION );
-  DALI_TEST_CHECK( !vertexBuffer );
+  move = std::move(vertexBuffer);
+  DALI_TEST_CHECK(move);
+  DALI_TEST_EQUALS(1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, move.GetSize(), TEST_LOCATION);
+  DALI_TEST_CHECK(!vertexBuffer);
 
   END_TEST;
 }
@@ -152,30 +152,34 @@ int UtcDaliVertexBufferSetData01(void)
   TestApplication application;
 
   Property::Map texturedQuadVertexFormat;
-  texturedQuadVertexFormat["aPosition"] = Property::VECTOR2;
+  texturedQuadVertexFormat["aPosition"]    = Property::VECTOR2;
   texturedQuadVertexFormat["aVertexCoord"] = Property::VECTOR2;
 
   {
-    VertexBuffer vertexBuffer = VertexBuffer::New( texturedQuadVertexFormat );
-    DALI_TEST_EQUALS( (bool)vertexBuffer, true, TEST_LOCATION );
+    VertexBuffer vertexBuffer = VertexBuffer::New(texturedQuadVertexFormat);
+    DALI_TEST_EQUALS((bool)vertexBuffer, true, TEST_LOCATION);
 
     const float halfQuadSize = .5f;
-    struct TexturedQuadVertex { Vector2 position; Vector2 textureCoordinates; };
+    struct TexturedQuadVertex
+    {
+      Vector2 position;
+      Vector2 textureCoordinates;
+    };
     TexturedQuadVertex texturedQuadVertexData[4] = {
-      { Vector2(-halfQuadSize, -halfQuadSize), Vector2(0.f, 0.f) },
-      { Vector2( halfQuadSize, -halfQuadSize), Vector2(1.f, 0.f) },
-      { Vector2(-halfQuadSize,  halfQuadSize), Vector2(0.f, 1.f) },
-      { Vector2( halfQuadSize,  halfQuadSize), Vector2(1.f, 1.f) } };
+      {Vector2(-halfQuadSize, -halfQuadSize), Vector2(0.f, 0.f)},
+      {Vector2(halfQuadSize, -halfQuadSize), Vector2(1.f, 0.f)},
+      {Vector2(-halfQuadSize, halfQuadSize), Vector2(0.f, 1.f)},
+      {Vector2(halfQuadSize, halfQuadSize), Vector2(1.f, 1.f)}};
 
-    vertexBuffer.SetData( texturedQuadVertexData, 4 );
+    vertexBuffer.SetData(texturedQuadVertexData, 4);
 
     Geometry geometry = Geometry::New();
-    geometry.AddVertexBuffer( vertexBuffer );
+    geometry.AddVertexBuffer(vertexBuffer);
 
-    Shader shader = CreateShader();
+    Shader   shader   = CreateShader();
     Renderer renderer = Renderer::New(geometry, shader);
-    Actor actor = Actor::New();
-    actor.SetProperty( Actor::Property::SIZE,Vector3::ONE * 100.f);
+    Actor    actor    = Actor::New();
+    actor.SetProperty(Actor::Property::SIZE, Vector3::ONE * 100.f);
     actor.AddRenderer(renderer);
     application.GetScene().Add(actor);
 
@@ -185,12 +189,11 @@ int UtcDaliVertexBufferSetData01(void)
     application.SendNotification();
 
     const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
-        application.GetGlAbstraction().GetBufferDataCalls();
+      application.GetGlAbstraction().GetBufferDataCalls();
 
-    DALI_TEST_EQUALS( bufferDataCalls.size(), 1u, TEST_LOCATION );
+    DALI_TEST_EQUALS(bufferDataCalls.size(), 1u, TEST_LOCATION);
 
-    DALI_TEST_EQUALS( bufferDataCalls[0], sizeof(texturedQuadVertexData), TEST_LOCATION );
-
+    DALI_TEST_EQUALS(bufferDataCalls[0], sizeof(texturedQuadVertexData), TEST_LOCATION);
   }
   // end of scope to let the buffer and geometry die; do another notification and render to get the deletion processed
   application.SendNotification();
@@ -204,29 +207,33 @@ int UtcDaliVertexBufferSetData02(void)
   TestApplication application;
 
   Property::Map texturedQuadVertexFormat;
-  texturedQuadVertexFormat["aPosition"] = Property::VECTOR2;
+  texturedQuadVertexFormat["aPosition"]    = Property::VECTOR2;
   texturedQuadVertexFormat["aVertexCoord"] = Property::VECTOR2;
 
-  VertexBuffer vertexBuffer = VertexBuffer::New( texturedQuadVertexFormat );
-  DALI_TEST_EQUALS( (bool)vertexBuffer, true, TEST_LOCATION );
+  VertexBuffer vertexBuffer = VertexBuffer::New(texturedQuadVertexFormat);
+  DALI_TEST_EQUALS((bool)vertexBuffer, true, TEST_LOCATION);
 
   const float halfQuadSize = .5f;
-  struct TexturedQuadVertex { Vector2 position; Vector2 textureCoordinates; };
+  struct TexturedQuadVertex
+  {
+    Vector2 position;
+    Vector2 textureCoordinates;
+  };
   TexturedQuadVertex texturedQuadVertexData[4] = {
-    { Vector2(-halfQuadSize, -halfQuadSize), Vector2(0.f, 0.f) },
-    { Vector2( halfQuadSize, -halfQuadSize), Vector2(1.f, 0.f) },
-    { Vector2(-halfQuadSize,  halfQuadSize), Vector2(0.f, 1.f) },
-    { Vector2( halfQuadSize,  halfQuadSize), Vector2(1.f, 1.f) } };
+    {Vector2(-halfQuadSize, -halfQuadSize), Vector2(0.f, 0.f)},
+    {Vector2(halfQuadSize, -halfQuadSize), Vector2(1.f, 0.f)},
+    {Vector2(-halfQuadSize, halfQuadSize), Vector2(0.f, 1.f)},
+    {Vector2(halfQuadSize, halfQuadSize), Vector2(1.f, 1.f)}};
 
-  vertexBuffer.SetData( texturedQuadVertexData, 4 );
+  vertexBuffer.SetData(texturedQuadVertexData, 4);
 
   Geometry geometry = Geometry::New();
-  geometry.AddVertexBuffer( vertexBuffer );
+  geometry.AddVertexBuffer(vertexBuffer);
 
-  Shader shader = CreateShader();
+  Shader   shader   = CreateShader();
   Renderer renderer = Renderer::New(geometry, shader);
-  Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE,Vector3::ONE * 100.f);
+  Actor    actor    = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector3::ONE * 100.f);
   actor.AddRenderer(renderer);
   application.GetScene().Add(actor);
 
@@ -239,13 +246,13 @@ int UtcDaliVertexBufferSetData02(void)
     const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
       application.GetGlAbstraction().GetBufferDataCalls();
 
-    DALI_TEST_EQUALS( bufferDataCalls.size(), 1u, TEST_LOCATION );
+    DALI_TEST_EQUALS(bufferDataCalls.size(), 1u, TEST_LOCATION);
 
-    DALI_TEST_EQUALS( bufferDataCalls[0], sizeof(texturedQuadVertexData), TEST_LOCATION );
+    DALI_TEST_EQUALS(bufferDataCalls[0], sizeof(texturedQuadVertexData), TEST_LOCATION);
   }
 
   // Re-upload the data on the vertexBuffer
-  vertexBuffer.SetData( texturedQuadVertexData, 4 );
+  vertexBuffer.SetData(texturedQuadVertexData, 4);
 
   application.SendNotification();
   application.Render(0);
@@ -257,14 +264,14 @@ int UtcDaliVertexBufferSetData02(void)
       application.GetGlAbstraction().GetBufferSubDataCalls();
 
     const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
-          application.GetGlAbstraction().GetBufferDataCalls();
+      application.GetGlAbstraction().GetBufferDataCalls();
 
-    DALI_TEST_EQUALS( bufferSubDataCalls.size(), 1u, TEST_LOCATION );
-    DALI_TEST_EQUALS( bufferDataCalls.size(), 1u, TEST_LOCATION );
+    DALI_TEST_EQUALS(bufferSubDataCalls.size(), 1u, TEST_LOCATION);
+    DALI_TEST_EQUALS(bufferDataCalls.size(), 1u, TEST_LOCATION);
 
-    if ( bufferSubDataCalls.size() )
+    if(bufferSubDataCalls.size())
     {
-      DALI_TEST_EQUALS( bufferSubDataCalls[0], sizeof(texturedQuadVertexData), TEST_LOCATION );
+      DALI_TEST_EQUALS(bufferSubDataCalls[0], sizeof(texturedQuadVertexData), TEST_LOCATION);
     }
   }
 
@@ -276,31 +283,30 @@ int UtcDaliVertexBufferInvalidTypeN(void)
   TestApplication application;
 
   Property::Map texturedQuadVertexFormat;
-  texturedQuadVertexFormat["aPosition"] = Property::MAP;
+  texturedQuadVertexFormat["aPosition"]    = Property::MAP;
   texturedQuadVertexFormat["aVertexCoord"] = Property::STRING;
 
   try
   {
-    VertexBuffer vertexBuffer = VertexBuffer::New( texturedQuadVertexFormat );
+    VertexBuffer vertexBuffer = VertexBuffer::New(texturedQuadVertexFormat);
     tet_result(TET_FAIL);
   }
-  catch ( Dali::DaliException& e )
+  catch(Dali::DaliException& e)
   {
-    DALI_TEST_ASSERT( e, "Property::Type not supported in VertexBuffer", TEST_LOCATION );
+    DALI_TEST_ASSERT(e, "Property::Type not supported in VertexBuffer", TEST_LOCATION);
   }
   END_TEST;
 }
 
-
 int UtcDaliVertexBufferSetDataNegative(void)
 {
-  TestApplication application;
+  TestApplication    application;
   Dali::VertexBuffer instance;
   try
   {
-    void* arg1(nullptr);
+    void*         arg1(nullptr);
     unsigned long arg2(0u);
-    instance.SetData(arg1,arg2);
+    instance.SetData(arg1, arg2);
     DALI_TEST_CHECK(false); // Should not get here
   }
   catch(...)
@@ -312,7 +318,7 @@ int UtcDaliVertexBufferSetDataNegative(void)
 
 int UtcDaliVertexBufferGetSizeNegative(void)
 {
-  TestApplication application;
+  TestApplication    application;
   Dali::VertexBuffer instance;
   try
   {

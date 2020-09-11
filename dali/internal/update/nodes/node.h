@@ -113,7 +113,7 @@ public:
    */
   virtual Layer* GetLayer()
   {
-    return NULL;
+    return nullptr;
   }
 
   /**
@@ -121,7 +121,7 @@ public:
    * @param[in] updated The updated flag
    * (used for partial rendering to mark an animating sub tree for example).
    */
-  virtual void SetUpdated(bool updated)
+  void SetUpdated(bool updated) override
   {
     mUpdated = updated;
 
@@ -798,12 +798,12 @@ public:
   /**
    * @copydoc UniformMap::Add
    */
-  void AddUniformMapping( OwnerPointer< UniformPropertyMapping >& map );
+  void AddUniformMapping( OwnerPointer< UniformPropertyMapping >& map ) override;
 
   /**
    * @copydoc UniformMap::Remove
    */
-  void RemoveUniformMapping( const std::string& uniformName );
+  void RemoveUniformMapping( const std::string& uniformName ) override;
 
   /**
    * Prepare the node for rendering.
@@ -844,14 +844,14 @@ protected:
    * Protected virtual destructor; See also Node::Delete( Node* )
    * Kept protected to allow destructor chaining from layer
    */
-  virtual ~Node();
+  ~Node() override;
 
 private: // from NodeDataProvider
 
   /**
    * @copydoc NodeDataProvider::GetModelMatrix
    */
-  virtual const Matrix& GetModelMatrix( BufferIndex bufferIndex ) const
+  const Matrix& GetModelMatrix( BufferIndex bufferIndex ) const override
   {
     return GetWorldMatrix( bufferIndex );
   }
@@ -859,7 +859,7 @@ private: // from NodeDataProvider
   /**
    * @copydoc NodeDataProvider::GetRenderColor
    */
-  virtual const Vector4& GetRenderColor( BufferIndex bufferIndex ) const
+  const Vector4& GetRenderColor( BufferIndex bufferIndex ) const override
   {
     return GetWorldColor( bufferIndex );
   }
@@ -868,7 +868,7 @@ public: // From UniformMapDataProvider
   /**
    * @copydoc UniformMapDataProvider::GetUniformMapChanged
    */
-  virtual bool GetUniformMapChanged( BufferIndex bufferIndex ) const
+  bool GetUniformMapChanged( BufferIndex bufferIndex ) const override
   {
     return mUniformMapChanged[bufferIndex];
   }
@@ -876,7 +876,7 @@ public: // From UniformMapDataProvider
   /**
    * @copydoc UniformMapDataProvider::GetUniformMap
    */
-  virtual const CollectedUniformMap& GetUniformMap( BufferIndex bufferIndex ) const
+  const CollectedUniformMap& GetUniformMap( BufferIndex bufferIndex ) const override
   {
     return mCollectedUniformMap[bufferIndex];
   }
@@ -960,7 +960,7 @@ protected:
 
 inline void SetInheritOrientationMessage( EventThreadServices& eventThreadServices, const Node& node, bool inherit )
 {
-  typedef MessageValue1< Node, bool > LocalType;
+  using LocalType = MessageValue1<Node, bool>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -971,7 +971,7 @@ inline void SetInheritOrientationMessage( EventThreadServices& eventThreadServic
 
 inline void SetParentOriginMessage( EventThreadServices& eventThreadServices, const Node& node, const Vector3& origin )
 {
-  typedef MessageValue1< Node, Vector3 > LocalType;
+  using LocalType = MessageValue1<Node, Vector3>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -982,7 +982,7 @@ inline void SetParentOriginMessage( EventThreadServices& eventThreadServices, co
 
 inline void SetAnchorPointMessage( EventThreadServices& eventThreadServices, const Node& node, const Vector3& anchor )
 {
-  typedef MessageValue1< Node, Vector3 > LocalType;
+  using LocalType = MessageValue1<Node, Vector3>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -993,7 +993,7 @@ inline void SetAnchorPointMessage( EventThreadServices& eventThreadServices, con
 
 inline void SetInheritPositionMessage( EventThreadServices& eventThreadServices, const Node& node, bool inherit )
 {
-  typedef MessageValue1< Node, bool > LocalType;
+  using LocalType = MessageValue1<Node, bool>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1004,7 +1004,7 @@ inline void SetInheritPositionMessage( EventThreadServices& eventThreadServices,
 
 inline void SetInheritScaleMessage( EventThreadServices& eventThreadServices, const Node& node, bool inherit )
 {
-  typedef MessageValue1< Node, bool > LocalType;
+  using LocalType = MessageValue1<Node, bool>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1015,7 +1015,7 @@ inline void SetInheritScaleMessage( EventThreadServices& eventThreadServices, co
 
 inline void SetColorModeMessage( EventThreadServices& eventThreadServices, const Node& node, ColorMode colorMode )
 {
-  typedef MessageValue1< Node, ColorMode > LocalType;
+  using LocalType = MessageValue1<Node, ColorMode>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1026,7 +1026,7 @@ inline void SetColorModeMessage( EventThreadServices& eventThreadServices, const
 
 inline void SetDrawModeMessage( EventThreadServices& eventThreadServices, const Node& node, DrawMode::Type drawMode )
 {
-  typedef MessageValue1< Node, DrawMode::Type > LocalType;
+  using LocalType = MessageValue1<Node, DrawMode::Type>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1037,7 +1037,7 @@ inline void SetDrawModeMessage( EventThreadServices& eventThreadServices, const 
 
 inline void AttachRendererMessage( EventThreadServices& eventThreadServices, const Node& node, const Renderer& renderer )
 {
-  typedef MessageValue1< Node, Renderer* > LocalType;
+  using LocalType = MessageValue1<Node, Renderer*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1048,7 +1048,7 @@ inline void AttachRendererMessage( EventThreadServices& eventThreadServices, con
 
 inline void DetachRendererMessage( EventThreadServices& eventThreadServices, const Node& node, const Renderer& renderer )
 {
-  typedef MessageValue1< Node, const Renderer* > LocalType;
+  using LocalType = MessageValue1<Node, const Renderer*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1059,7 +1059,7 @@ inline void DetachRendererMessage( EventThreadServices& eventThreadServices, con
 
 inline void SetDepthIndexMessage( EventThreadServices& eventThreadServices, const Node& node, uint32_t depthIndex )
 {
-  typedef MessageValue1< Node, uint32_t > LocalType;
+  using LocalType = MessageValue1<Node, uint32_t>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1070,7 +1070,7 @@ inline void SetDepthIndexMessage( EventThreadServices& eventThreadServices, cons
 
 inline void SetClippingModeMessage( EventThreadServices& eventThreadServices, const Node& node, ClippingMode::Type clippingMode )
 {
-  typedef MessageValue1< Node, ClippingMode::Type > LocalType;
+  using LocalType = MessageValue1<Node, ClippingMode::Type>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1081,7 +1081,7 @@ inline void SetClippingModeMessage( EventThreadServices& eventThreadServices, co
 
 inline void SetPositionUsesAnchorPointMessage( EventThreadServices& eventThreadServices, const Node& node, bool positionUsesAnchorPoint )
 {
-  typedef MessageValue1< Node, bool > LocalType;
+  using LocalType = MessageValue1<Node, bool>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1096,10 +1096,10 @@ inline void SetPositionUsesAnchorPointMessage( EventThreadServices& eventThreadS
 template <>
 inline void OwnerPointer<Dali::Internal::SceneGraph::Node>::Reset()
 {
-  if (mObject != NULL)
+  if (mObject != nullptr)
   {
     Dali::Internal::SceneGraph::Node::Delete(mObject);
-    mObject = NULL;
+    mObject = nullptr;
   }
 }
 } // namespace Internal

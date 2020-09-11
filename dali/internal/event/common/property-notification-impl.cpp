@@ -62,7 +62,7 @@ PropertyNotification::PropertyNotification( UpdateManager& updateManager,
                                             int componentIndex,
                                             const Dali::PropertyCondition& condition )
 : mUpdateManager( updateManager ),
-  mPropertyNotification( NULL ),
+  mPropertyNotification( nullptr ),
   mPropertyNotificationManager( propertyNotificationManager ),
   mObjectPropertyIndex( target.propertyIndex ),
   mPropertyType( Property::NONE ),
@@ -229,11 +229,11 @@ void PropertyNotification::CreateSceneObject()
 
 void PropertyNotification::DestroySceneObject()
 {
-  if ( mPropertyNotification != NULL )
+  if ( mPropertyNotification != nullptr )
   {
     // Remove PropertyNotification using a message to the update manager
     RemovePropertyNotificationMessage( mUpdateManager, *mPropertyNotification );
-    mPropertyNotification = NULL;
+    mPropertyNotification = nullptr;
   }
 }
 

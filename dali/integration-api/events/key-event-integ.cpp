@@ -23,41 +23,47 @@
 
 namespace Dali
 {
-
 namespace Integration
 {
-
 KeyEvent::KeyEvent()
-: Event( Key ),
+: Event(Key),
   keyName(),
   logicalKey(),
   keyString(),
-  keyCode( -1 ),
-  keyModifier( 0 ),
-  time( 0 ),
-  state( KeyEvent::DOWN ),
-  compose( "" ),
-  deviceName( "" ),
-  deviceClass( Device::Class::NONE ),
-  deviceSubclass( Device::Subclass::NONE )
+  keyCode(-1),
+  keyModifier(0),
+  time(0),
+  state(KeyEvent::DOWN),
+  compose(""),
+  deviceName(""),
+  deviceClass(Device::Class::NONE),
+  deviceSubclass(Device::Subclass::NONE)
 {
 }
 
-KeyEvent::KeyEvent( const std::string& keyName, const std::string& logicalKey, const std::string& keyString, int keyCode, int keyModifier,
-                    unsigned long timeStamp, const State& keyState, const std::string& compose, const std::string& deviceName,
-                    const Device::Class::Type deviceClass, const Device::Subclass::Type deviceSubclass )
-: Event( Key ),
-  keyName( keyName ),
-  logicalKey( logicalKey ),
-  keyString( keyString ),
-  keyCode( keyCode ),
-  keyModifier( keyModifier ),
-  time( timeStamp ),
-  state( keyState ),
-  compose( compose ),
-  deviceName( deviceName ),
-  deviceClass( deviceClass ),
-  deviceSubclass( deviceSubclass )
+KeyEvent::KeyEvent(const std::string&           keyName,
+                   const std::string&           logicalKey,
+                   const std::string&           keyString,
+                   int                          keyCode,
+                   int                          keyModifier,
+                   unsigned long                timeStamp,
+                   const State&                 keyState,
+                   const std::string&           compose,
+                   const std::string&           deviceName,
+                   const Device::Class::Type    deviceClass,
+                   const Device::Subclass::Type deviceSubclass)
+: Event(Key),
+  keyName(keyName),
+  logicalKey(logicalKey),
+  keyString(keyString),
+  keyCode(keyCode),
+  keyModifier(keyModifier),
+  time(timeStamp),
+  state(keyState),
+  compose(compose),
+  deviceName(deviceName),
+  deviceClass(deviceClass),
+  deviceSubclass(deviceSubclass)
 {
 }
 

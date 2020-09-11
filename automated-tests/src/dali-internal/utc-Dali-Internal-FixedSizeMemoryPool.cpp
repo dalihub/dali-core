@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
  */
 
-#include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
+#include <dali/public-api/dali-core.h>
 
 // Internal headers are allowed here
 
@@ -36,22 +36,19 @@ void utc_dali_internal_fixedsizememorypool_cleanup(void)
 
 namespace
 {
-
 unsigned int gTestObjectConstructed = 0;
-unsigned int gTestObjectDestructed = 0;
-unsigned int gTestObjectMethod = 0;
-unsigned int gTestObjectDataAccess = 0;
+unsigned int gTestObjectDestructed  = 0;
+unsigned int gTestObjectMethod      = 0;
+unsigned int gTestObjectDataAccess  = 0;
 
 } // namespace
-
 
 class TestObject
 {
 public:
-
   TestObject()
-  : mData1( 0 ),
-    mData2( false )
+  : mData1(0),
+    mData2(false)
   {
     gTestObjectConstructed++;
   }
@@ -75,34 +72,32 @@ public:
   }
 
 private:
-
   unsigned int mData1;
-  bool mData2;
-
+  bool         mData2;
 };
 
 int UtcDaliFixedSizeMemoryPoolCreate(void)
 {
   gTestObjectConstructed = 0;
-  gTestObjectDestructed = 0;
-  gTestObjectMethod = 0;
-  gTestObjectDataAccess = 0;
+  gTestObjectDestructed  = 0;
+  gTestObjectMethod      = 0;
+  gTestObjectDataAccess  = 0;
 
-  Internal::FixedSizeMemoryPool memoryPool( Internal::TypeSizeWithAlignment< TestObject >::size );
+  Internal::FixedSizeMemoryPool memoryPool(Internal::TypeSizeWithAlignment<TestObject>::size);
 
-  TestObject* testObject1 = new (memoryPool.Allocate()) TestObject();
-  DALI_TEST_CHECK( testObject1 );
-  DALI_TEST_EQUALS( gTestObjectConstructed, 1U, TEST_LOCATION );
+  TestObject* testObject1 = new(memoryPool.Allocate()) TestObject();
+  DALI_TEST_CHECK(testObject1);
+  DALI_TEST_EQUALS(gTestObjectConstructed, 1U, TEST_LOCATION);
 
   testObject1->Method();
-  DALI_TEST_EQUALS( gTestObjectMethod, 1U, TEST_LOCATION );
+  DALI_TEST_EQUALS(gTestObjectMethod, 1U, TEST_LOCATION);
 
   testObject1->DataAccess();
-  DALI_TEST_EQUALS( gTestObjectDataAccess, 1U, TEST_LOCATION );
+  DALI_TEST_EQUALS(gTestObjectDataAccess, 1U, TEST_LOCATION);
 
   testObject1->~TestObject();
-  memoryPool.Free( testObject1 );
-  DALI_TEST_EQUALS( gTestObjectDestructed, 1U, TEST_LOCATION );
+  memoryPool.Free(testObject1);
+  DALI_TEST_EQUALS(gTestObjectDestructed, 1U, TEST_LOCATION);
 
   END_TEST;
 }
@@ -110,37 +105,37 @@ int UtcDaliFixedSizeMemoryPoolCreate(void)
 int UtcDaliFixedSizeMemoryPoolStressTest(void)
 {
   gTestObjectConstructed = 0;
-  gTestObjectDestructed = 0;
-  gTestObjectMethod = 0;
-  gTestObjectDataAccess = 0;
+  gTestObjectDestructed  = 0;
+  gTestObjectMethod      = 0;
+  gTestObjectDataAccess  = 0;
 
   const size_t initialCapacity = 32;
   const size_t maximumCapacity = 1024;
 
   const unsigned int numObjects = 1024 * 1024;
 
-  Internal::FixedSizeMemoryPool memoryPool( Internal::TypeSizeWithAlignment< TestObject >::size, initialCapacity, maximumCapacity );
+  Internal::FixedSizeMemoryPool memoryPool(Internal::TypeSizeWithAlignment<TestObject>::size, initialCapacity, maximumCapacity);
 
   Dali::Vector<TestObject*> objects;
-  objects.Reserve( numObjects );
+  objects.Reserve(numObjects);
 
-  for( unsigned int i = 0; i < numObjects; ++i )
+  for(unsigned int i = 0; i < numObjects; ++i)
   {
-    TestObject* testObject = new ( memoryPool.Allocate() ) TestObject();
-    DALI_TEST_CHECK( testObject );
+    TestObject* testObject = new(memoryPool.Allocate()) TestObject();
+    DALI_TEST_CHECK(testObject);
 
-    objects.PushBack( testObject );
+    objects.PushBack(testObject);
   }
 
-  DALI_TEST_EQUALS( gTestObjectConstructed, numObjects, TEST_LOCATION );
+  DALI_TEST_EQUALS(gTestObjectConstructed, numObjects, TEST_LOCATION);
 
-  for( unsigned int i = 0; i < numObjects; ++i )
+  for(unsigned int i = 0; i < numObjects; ++i)
   {
     objects[i]->~TestObject();
-    memoryPool.Free( objects[i] );
+    memoryPool.Free(objects[i]);
   }
 
-  DALI_TEST_EQUALS( gTestObjectDestructed, numObjects, TEST_LOCATION );
+  DALI_TEST_EQUALS(gTestObjectDestructed, numObjects, TEST_LOCATION);
 
   END_TEST;
 }

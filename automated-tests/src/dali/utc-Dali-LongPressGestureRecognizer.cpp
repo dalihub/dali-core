@@ -15,33 +15,33 @@
  *
  */
 
-#include <iostream>
-#include <thread>
-#include <chrono>
-
-#include <stdlib.h>
-#include <dali/public-api/dali-core.h>
+#include <dali-test-suite-utils.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/render-task-list-integ.h>
-#include <dali-test-suite-utils.h>
+#include <dali/public-api/dali-core.h>
+#include <stdlib.h>
+
+#include <chrono>
+#include <iostream>
+#include <thread>
 
 using namespace Dali;
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace
 {
-
 struct SignalData
 {
   SignalData()
   : functorCalled(false),
     voidFunctorCalled(false),
     receivedGesture()
-  {}
+  {
+  }
 
   void Reset()
   {
-    functorCalled = false;
+    functorCalled     = false;
     voidFunctorCalled = false;
 
     receivedGesture.Reset();
@@ -49,22 +49,25 @@ struct SignalData
     pressedActor.Reset();
   }
 
-  bool functorCalled;
-  bool voidFunctorCalled;
+  bool             functorCalled;
+  bool             voidFunctorCalled;
   LongPressGesture receivedGesture;
-  Actor pressedActor;
+  Actor            pressedActor;
 };
 
 // Functor that sets the data when called
 struct GestureReceivedFunctor
 {
-  GestureReceivedFunctor(SignalData& data) : signalData(data) { }
+  GestureReceivedFunctor(SignalData& data)
+  : signalData(data)
+  {
+  }
 
   void operator()(Actor actor, const LongPressGesture& pan)
   {
-    signalData.functorCalled = true;
+    signalData.functorCalled   = true;
     signalData.receivedGesture = pan;
-    signalData.pressedActor = actor;
+    signalData.pressedActor    = actor;
   }
 
   void operator()()
@@ -75,44 +78,41 @@ struct GestureReceivedFunctor
   SignalData& signalData;
 };
 
-
-Integration::TouchEvent GenerateSingleTouch( PointState::Type state, const Vector2& screenPosition, uint32_t time )
+Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector2& screenPosition, uint32_t time)
 {
   Integration::TouchEvent touchEvent;
-  Integration::Point point;
-  point.SetState( state );
+  Integration::Point      point;
+  point.SetState(state);
   point.SetDeviceId(4);
-  point.SetScreenPosition( screenPosition );
-  point.SetDeviceClass( Device::Class::TOUCH );
-  point.SetDeviceSubclass( Device::Subclass::NONE );
-  touchEvent.points.push_back( point );
+  point.SetScreenPosition(screenPosition);
+  point.SetDeviceClass(Device::Class::TOUCH);
+  point.SetDeviceSubclass(Device::Subclass::NONE);
+  touchEvent.points.push_back(point);
   touchEvent.time = time;
   return touchEvent;
 }
 
-Integration::TouchEvent GenerateDoubleTouch( PointState::Type stateA, const Vector2& screenPositionA, PointState::Type stateB, const Vector2& screenPositionB, uint32_t time )
+Integration::TouchEvent GenerateDoubleTouch(PointState::Type stateA, const Vector2& screenPositionA, PointState::Type stateB, const Vector2& screenPositionB, uint32_t time)
 {
   Integration::TouchEvent touchEvent;
-  Integration::Point point;
-  point.SetState( stateA );
+  Integration::Point      point;
+  point.SetState(stateA);
   point.SetDeviceId(4);
-  point.SetScreenPosition( screenPositionA );
-  point.SetDeviceClass( Device::Class::TOUCH );
-  point.SetDeviceSubclass( Device::Subclass::NONE );
-  touchEvent.points.push_back( point );
-  point.SetScreenPosition( screenPositionB );
-  point.SetState( stateB);
+  point.SetScreenPosition(screenPositionA);
+  point.SetDeviceClass(Device::Class::TOUCH);
+  point.SetDeviceSubclass(Device::Subclass::NONE);
+  touchEvent.points.push_back(point);
+  point.SetScreenPosition(screenPositionB);
+  point.SetState(stateB);
   point.SetDeviceId(7);
-  touchEvent.points.push_back( point );
+  touchEvent.points.push_back(point);
   touchEvent.time = time;
   return touchEvent;
 }
 
-
-} // anon namespace
+} // namespace
 
 ///////////////////////////////////////////////////////////////////////////////
-
 
 int UtcDaliLongPressGestureRecognizerBasicNoAction(void)
 {
@@ -121,8 +121,8 @@ int UtcDaliLongPressGestureRecognizerBasicNoAction(void)
   LongPressGestureDetector detector = LongPressGestureDetector::New();
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -131,13 +131,13 @@ int UtcDaliLongPressGestureRecognizerBasicNoAction(void)
 
   detector.Attach(actor);
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), 150 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::UP, Vector2( 20.0f, 20.0f ), 200 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 200));
 
   application.SendNotification();
 
@@ -153,8 +153,8 @@ int UtcDaliLongPressGestureRecognizerBasic(void)
   LongPressGestureDetector detector = LongPressGestureDetector::New();
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -163,11 +163,11 @@ int UtcDaliLongPressGestureRecognizerBasic(void)
 
   detector.Attach(actor);
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), 150 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
 
   application.GetPlatform().TriggerTimer();
 
@@ -185,8 +185,8 @@ int UtcDaliLongPressGestureRecognizerTooShortWait(void)
   LongPressGestureDetector detector = LongPressGestureDetector::New();
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -195,11 +195,11 @@ int UtcDaliLongPressGestureRecognizerTooShortWait(void)
 
   detector.Attach(actor);
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), 150 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
 
   application.SendNotification();
 
@@ -214,11 +214,11 @@ int UtcDaliLongPressGestureRecognizerTooFewPoints(void)
 
   LongPressGestureDetector detector = LongPressGestureDetector::New();
 
-  detector.SetTouchesRequired(2,2);
+  detector.SetTouchesRequired(2, 2);
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -227,11 +227,11 @@ int UtcDaliLongPressGestureRecognizerTooFewPoints(void)
 
   detector.Attach(actor);
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), 150 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
 
   // There should be no function to call
   application.GetPlatform().TriggerTimer();
@@ -250,8 +250,8 @@ int UtcDaliLongPressGestureRecognizerTooManyPoints(void)
   LongPressGestureDetector detector = LongPressGestureDetector::New();
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -260,12 +260,12 @@ int UtcDaliLongPressGestureRecognizerTooManyPoints(void)
 
   detector.Attach(actor);
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), 150 ) );
-  application.ProcessEvent( GenerateDoubleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), PointState::DOWN, Vector2( 20.0f, 90.0f ), 151 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
+  application.ProcessEvent(GenerateDoubleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), PointState::DOWN, Vector2(20.0f, 90.0f), 151));
 
   // There should be no function to call as the double touch should have cancelled it
   application.GetPlatform().TriggerTimer();
@@ -283,11 +283,11 @@ int UtcDaliLongPressGestureRecognizerMultiplePointsMoving(void)
 
   LongPressGestureDetector detector = LongPressGestureDetector::New();
 
-  detector.SetTouchesRequired(2,2);
+  detector.SetTouchesRequired(2, 2);
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -296,17 +296,17 @@ int UtcDaliLongPressGestureRecognizerMultiplePointsMoving(void)
 
   detector.Attach(actor);
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  application.ProcessEvent( GenerateDoubleTouch( PointState::DOWN, Vector2( 20.0f, 0.0f ), PointState::DOWN, Vector2( 20.0f, 90.0f ), 151 ) );
-  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 20.0f, 10.0f ), PointState::MOTION, Vector2( 20.0f, 80.0f ), 153 ) );
-  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 20.0f, 20.0f ), PointState::MOTION, Vector2( 20.0f, 70.0f ), 155 ) );
-  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 20.0f, 30.0f ), PointState::MOTION, Vector2( 20.0f, 60.0f ), 157 ) );
-  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 20.0f, 40.0f ), PointState::MOTION, Vector2( 20.0f, 50.0f ), 159 ) );
-  application.ProcessEvent( GenerateDoubleTouch( PointState::STATIONARY, Vector2( 20.0f, 40.0f ), PointState::UP, Vector2( 20.0f, 50.0f ), 160 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::UP, Vector2( 20.0f, 40.0f ), 161 ) );
+  application.ProcessEvent(GenerateDoubleTouch(PointState::DOWN, Vector2(20.0f, 0.0f), PointState::DOWN, Vector2(20.0f, 90.0f), 151));
+  application.ProcessEvent(GenerateDoubleTouch(PointState::MOTION, Vector2(20.0f, 10.0f), PointState::MOTION, Vector2(20.0f, 80.0f), 153));
+  application.ProcessEvent(GenerateDoubleTouch(PointState::MOTION, Vector2(20.0f, 20.0f), PointState::MOTION, Vector2(20.0f, 70.0f), 155));
+  application.ProcessEvent(GenerateDoubleTouch(PointState::MOTION, Vector2(20.0f, 30.0f), PointState::MOTION, Vector2(20.0f, 60.0f), 157));
+  application.ProcessEvent(GenerateDoubleTouch(PointState::MOTION, Vector2(20.0f, 40.0f), PointState::MOTION, Vector2(20.0f, 50.0f), 159));
+  application.ProcessEvent(GenerateDoubleTouch(PointState::STATIONARY, Vector2(20.0f, 40.0f), PointState::UP, Vector2(20.0f, 50.0f), 160));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 40.0f), 161));
 
   application.GetPlatform().TriggerTimer();
 
@@ -324,8 +324,8 @@ int UtcDaliLongPressGestureRecognizerMultiplePointsLongPress(void)
   LongPressGestureDetector detector = LongPressGestureDetector::New();
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -333,19 +333,19 @@ int UtcDaliLongPressGestureRecognizerMultiplePointsLongPress(void)
   application.Render();
 
   detector.Attach(actor);
-  detector.SetTouchesRequired(2,2); // Set after we've attached forcing us to change things internally
+  detector.SetTouchesRequired(2, 2); // Set after we've attached forcing us to change things internally
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 20.0f, 40.0f ), 140 ) );
-  application.ProcessEvent( GenerateDoubleTouch( PointState::DOWN, Vector2( 20.0f, 40.0f ), PointState::DOWN, Vector2( 20.0f, 90.0f ), 150 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 40.0f), 140));
+  application.ProcessEvent(GenerateDoubleTouch(PointState::DOWN, Vector2(20.0f, 40.0f), PointState::DOWN, Vector2(20.0f, 90.0f), 150));
 
   application.GetPlatform().TriggerTimer();
 
-  application.ProcessEvent( GenerateDoubleTouch( PointState::STATIONARY, Vector2( 20.0f, 20.0f ), PointState::UP, Vector2( 20.0f, 90.0f ), 760 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::UP, Vector2( 20.0f, 20.0f ), 761 ) );
+  application.ProcessEvent(GenerateDoubleTouch(PointState::STATIONARY, Vector2(20.0f, 20.0f), PointState::UP, Vector2(20.0f, 90.0f), 760));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 761));
 
   application.SendNotification();
 
@@ -358,57 +358,57 @@ int UtcDaliLongPressGestureRecognizerMultipleDetectors(void)
 {
   TestApplication application;
 
-    Actor actor = Actor::New();
-    actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-    actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-    application.GetScene().Add(actor);
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
 
-    Actor actor2 = Actor::New();
-    actor2.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-    actor2.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-    actor2.SetProperty( Actor::Property::POSITION_X, 100.0f);
-    application.GetScene().Add(actor2);
+  Actor actor2 = Actor::New();
+  actor2.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor2.SetProperty(Actor::Property::POSITION_X, 100.0f);
+  application.GetScene().Add(actor2);
 
-    // Render and notify
-    application.SendNotification();
-    application.Render();
+  // Render and notify
+  application.SendNotification();
+  application.Render();
 
-    LongPressGestureDetector detector = LongPressGestureDetector::New();
-    detector.Attach(actor);
+  LongPressGestureDetector detector = LongPressGestureDetector::New();
+  detector.Attach(actor);
 
-    LongPressGestureDetector detector2 = LongPressGestureDetector::New(2);
-    detector2.Attach(actor2);
+  LongPressGestureDetector detector2 = LongPressGestureDetector::New(2);
+  detector2.Attach(actor2);
 
-    SignalData data;
-    GestureReceivedFunctor functor(data);
-    detector.DetectedSignal().Connect(&application, functor);
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+  detector.DetectedSignal().Connect(&application, functor);
 
-    SignalData data2;
-    GestureReceivedFunctor functor2(data2);
-    detector2.DetectedSignal().Connect(&application, functor2);
+  SignalData             data2;
+  GestureReceivedFunctor functor2(data2);
+  detector2.DetectedSignal().Connect(&application, functor2);
 
-    application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), 150 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
 
-    application.GetPlatform().TriggerTimer();
+  application.GetPlatform().TriggerTimer();
 
-    application.ProcessEvent( GenerateSingleTouch( PointState::UP, Vector2( 20.0f, 20.0f ), 700 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 700));
 
-    application.SendNotification();
+  application.SendNotification();
 
-    DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-    DALI_TEST_EQUALS(true, actor == data.pressedActor, TEST_LOCATION);
-    data.Reset();
-    DALI_TEST_EQUALS(false, data2.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, actor == data.pressedActor, TEST_LOCATION);
+  data.Reset();
+  DALI_TEST_EQUALS(false, data2.functorCalled, TEST_LOCATION);
 
-    application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 120.0f, 40.0f ), 800 ) );
-    application.ProcessEvent( GenerateDoubleTouch( PointState::DOWN, Vector2( 120.0f, 40.0f ), PointState::DOWN, Vector2( 120.0f, 90.0f ), 805 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(120.0f, 40.0f), 800));
+  application.ProcessEvent(GenerateDoubleTouch(PointState::DOWN, Vector2(120.0f, 40.0f), PointState::DOWN, Vector2(120.0f, 90.0f), 805));
 
-    application.GetPlatform().TriggerTimer();
+  application.GetPlatform().TriggerTimer();
 
-    application.SendNotification();
+  application.SendNotification();
 
-    DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
-    DALI_TEST_EQUALS(true, data2.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, data2.functorCalled, TEST_LOCATION);
 
-    END_TEST;
+  END_TEST;
 }

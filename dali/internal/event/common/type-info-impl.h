@@ -68,7 +68,7 @@ public:
   /**
    * Destructor
    */
-  virtual ~TypeInfo();
+  ~TypeInfo() override;
 
   /**
    * @copydoc Dali::TypeInfo::GetName
@@ -384,15 +384,15 @@ private:
     int32_t componentIndex = Property::INVALID_COMPONENT_INDEX;
   };
 
-  typedef std::pair<std::string, Dali::TypeInfo::SignalConnectorFunction > ConnectionPair;
-  typedef std::pair<std::string, Dali::TypeInfo::ActionFunction > ActionPair;
-  typedef std::pair<Property::Index, RegisteredProperty> RegisteredPropertyPair;
-  typedef std::pair<Property::Index, Property::Value> PropertyDefaultValuePair;
+  using ConnectionPair           = std::pair<std::string, Dali::TypeInfo::SignalConnectorFunction>;
+  using ActionPair               = std::pair<std::string, Dali::TypeInfo::ActionFunction>;
+  using RegisteredPropertyPair   = std::pair<Property::Index, RegisteredProperty>;
+  using PropertyDefaultValuePair = std::pair<Property::Index, Property::Value>;
 
-  typedef std::vector< ActionPair > ActionContainer;
-  typedef std::vector< ConnectionPair > ConnectorContainer;
-  typedef std::vector< RegisteredPropertyPair > RegisteredPropertyContainer;
-  typedef std::vector< PropertyDefaultValuePair > PropertyDefaultValueContainer;
+  using ActionContainer               = std::vector<ActionPair>;
+  using ConnectorContainer            = std::vector<ConnectionPair>;
+  using RegisteredPropertyContainer   = std::vector<RegisteredPropertyPair>;
+  using PropertyDefaultValueContainer = std::vector<PropertyDefaultValuePair>;
 
   /**
    * Append properties from registeredProperties onto indices.

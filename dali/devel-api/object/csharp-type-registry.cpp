@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,32 +23,29 @@
 
 namespace Dali
 {
-
 namespace CSharpTypeRegistry
 {
-
-bool RegisterType( const std::string& name, const std::type_info& baseType, CSharpTypeInfo::CreateFunction f )
+bool RegisterType(const std::string& name, const std::type_info& baseType, CSharpTypeInfo::CreateFunction f)
 {
-  Internal::TypeRegistry *impl = Internal::TypeRegistry::Get();
+  Internal::TypeRegistry* impl = Internal::TypeRegistry::Get();
 
-  impl->Register( name, baseType, f );
+  impl->Register(name, baseType, f);
 
   return true;
 }
 
-bool RegisterProperty( const std::string& objectName,
-                       const std::string& name,
-                       Property::Index index,
-                       Property::Type type,
-                       CSharpTypeInfo::SetPropertyFunction setFunc,
-                       CSharpTypeInfo::GetPropertyFunction getFunc )
+bool RegisterProperty(const std::string&                  objectName,
+                      const std::string&                  name,
+                      Property::Index                     index,
+                      Property::Type                      type,
+                      CSharpTypeInfo::SetPropertyFunction setFunc,
+                      CSharpTypeInfo::GetPropertyFunction getFunc)
 {
+  Internal::TypeRegistry* impl = Internal::TypeRegistry::Get();
 
-  Internal::TypeRegistry *impl = Internal::TypeRegistry::Get();
-
-  return impl->RegisterProperty( objectName, name, index, type, setFunc, getFunc );
+  return impl->RegisterProperty(objectName, name, index, type, setFunc, getFunc);
 }
 
-}
+} // namespace CSharpTypeRegistry
 
 } // namespace Dali

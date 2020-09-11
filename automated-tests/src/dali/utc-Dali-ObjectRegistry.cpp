@@ -15,17 +15,16 @@
  *
  */
 
-#include <iostream>
-
-#include <stdlib.h>
 #include <dali-test-suite-utils.h>
 #include <dali/public-api/dali-core.h>
+#include <stdlib.h>
+
+#include <iostream>
 
 using namespace Dali;
 
 namespace
 {
-
 // Functors to test whether Object created/destroyed signal is emitted for different types of Objects
 
 struct TestObjectDestroyedCallback
@@ -46,7 +45,7 @@ struct TestObjectDestroyedCallback
     }
   }
 
-  bool& mSignalVerified;
+  bool&             mSignalVerified;
   Dali::RefObject*& mObjectPointer;
 };
 
@@ -131,9 +130,9 @@ int UtcDaliObjectRegistryGet(void)
   TestApplication application;
 
   ObjectRegistry registry; //  like this for ctor code coverage
-  registry= application.GetCore().GetObjectRegistry();
+  registry = application.GetCore().GetObjectRegistry();
 
-  DALI_TEST_CHECK( registry );
+  DALI_TEST_CHECK(registry);
   END_TEST;
 }
 
@@ -142,9 +141,9 @@ int UtcDaliObjectRegistryCopyConstructor(void)
   TestApplication application;
 
   ObjectRegistry myRegistry;
-  ObjectRegistry anotherRegistry( myRegistry );
+  ObjectRegistry anotherRegistry(myRegistry);
 
-  DALI_TEST_EQUALS( myRegistry, anotherRegistry, TEST_LOCATION );
+  DALI_TEST_EQUALS(myRegistry, anotherRegistry, TEST_LOCATION);
   END_TEST;
 }
 
@@ -153,15 +152,15 @@ int UtcDaliObjectRegistryMoveConstructor(void)
   TestApplication application;
 
   ObjectRegistry registry = application.GetCore().GetObjectRegistry();
-  DALI_TEST_CHECK( registry );
-  DALI_TEST_EQUALS( 2, registry.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK(registry);
+  DALI_TEST_EQUALS(2, registry.GetBaseObject().ReferenceCount(), TEST_LOCATION);
 
-  ObjectRegistry move = std::move( registry );
-  DALI_TEST_CHECK( move );
+  ObjectRegistry move = std::move(registry);
+  DALI_TEST_CHECK(move);
 
   // Check that object is moved (not copied, so ref count keeps the same)
-  DALI_TEST_EQUALS( 2, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
-  DALI_TEST_CHECK( !registry );
+  DALI_TEST_EQUALS(2, move.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+  DALI_TEST_CHECK(!registry);
 
   END_TEST;
 }
@@ -171,16 +170,16 @@ int UtcDaliObjectRegistryMoveAssignment(void)
   TestApplication application;
 
   ObjectRegistry registry = application.GetCore().GetObjectRegistry();
-  DALI_TEST_CHECK( registry );
-  DALI_TEST_EQUALS( 2, registry.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK(registry);
+  DALI_TEST_EQUALS(2, registry.GetBaseObject().ReferenceCount(), TEST_LOCATION);
 
   ObjectRegistry move;
-  move = std::move( registry );
-  DALI_TEST_CHECK( move );
+  move = std::move(registry);
+  DALI_TEST_CHECK(move);
 
   // Check that object is moved (not copied, so ref count keeps the same)
-  DALI_TEST_EQUALS( 2, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
-  DALI_TEST_CHECK( !registry );
+  DALI_TEST_EQUALS(2, move.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+  DALI_TEST_CHECK(!registry);
 
   END_TEST;
 }
@@ -189,13 +188,13 @@ int UtcDaliObjectRegistrySignalActorCreated(void)
 {
   tet_infoline("Testing GetObjectRegistry()");
   TestApplication application;
-  ObjectRegistry registry = application.GetCore().GetObjectRegistry();
-  DALI_TEST_CHECK( registry );
+  ObjectRegistry  registry = application.GetCore().GetObjectRegistry();
+  DALI_TEST_CHECK(registry);
 
-  bool verified = false;
+  bool              verified = false;
   TestActorCallback test(verified);
 
-  Dali::RefObject* objectPointer = NULL;
+  Dali::RefObject*            objectPointer = NULL;
   TestObjectDestroyedCallback test2(verified, objectPointer);
 
   registry.ObjectCreatedSignal().Connect(&application, test);
@@ -203,12 +202,12 @@ int UtcDaliObjectRegistrySignalActorCreated(void)
 
   {
     Actor actor = Actor::New();
-    DALI_TEST_CHECK( test.mSignalVerified );
+    DALI_TEST_CHECK(test.mSignalVerified);
 
-    verified = false;
+    verified      = false;
     objectPointer = actor.GetObjectPtr();
   }
-  DALI_TEST_CHECK( test.mSignalVerified );
+  DALI_TEST_CHECK(test.mSignalVerified);
   END_TEST;
 }
 
@@ -218,10 +217,10 @@ int UtcDaliObjectRegistrySignalCameraCreated(void)
 
   ObjectRegistry registry = application.GetCore().GetObjectRegistry();
 
-  bool verified = false;
+  bool                    verified = false;
   TestCameraActorCallback test(verified);
 
-  Dali::RefObject* objectPointer = NULL;
+  Dali::RefObject*            objectPointer = NULL;
   TestObjectDestroyedCallback test2(verified, objectPointer);
 
   registry.ObjectCreatedSignal().Connect(&application, test);
@@ -229,24 +228,24 @@ int UtcDaliObjectRegistrySignalCameraCreated(void)
 
   {
     CameraActor actor = CameraActor::New();
-    DALI_TEST_CHECK( test.mSignalVerified );
+    DALI_TEST_CHECK(test.mSignalVerified);
 
-    verified = false;
+    verified      = false;
     objectPointer = actor.GetObjectPtr();
   }
-  DALI_TEST_CHECK( test.mSignalVerified );
+  DALI_TEST_CHECK(test.mSignalVerified);
   END_TEST;
 }
 
 int UtcDaliObjectRegistrySignalLayerCreated(void)
 {
   TestApplication application;
-  ObjectRegistry registry = application.GetCore().GetObjectRegistry();
+  ObjectRegistry  registry = application.GetCore().GetObjectRegistry();
 
-  bool verified = false;
+  bool              verified = false;
   TestLayerCallback test(verified);
 
-  Dali::RefObject* objectPointer = NULL;
+  Dali::RefObject*            objectPointer = NULL;
   TestObjectDestroyedCallback test2(verified, objectPointer);
 
   registry.ObjectCreatedSignal().Connect(&application, test);
@@ -254,24 +253,24 @@ int UtcDaliObjectRegistrySignalLayerCreated(void)
 
   {
     Layer actor = Layer::New();
-    DALI_TEST_CHECK( test.mSignalVerified );
+    DALI_TEST_CHECK(test.mSignalVerified);
 
-    verified = false;
+    verified      = false;
     objectPointer = actor.GetObjectPtr();
   }
-  DALI_TEST_CHECK( test.mSignalVerified );
+  DALI_TEST_CHECK(test.mSignalVerified);
   END_TEST;
 }
 
 int UtcDaliObjectRegistrySignalAnimationCreated(void)
 {
   TestApplication application;
-  ObjectRegistry registry = application.GetCore().GetObjectRegistry();
+  ObjectRegistry  registry = application.GetCore().GetObjectRegistry();
 
-  bool verified = false;
+  bool                  verified = false;
   TestAnimationCallback test(verified);
 
-  Dali::RefObject* objectPointer = NULL;
+  Dali::RefObject*            objectPointer = NULL;
   TestObjectDestroyedCallback test2(verified, objectPointer);
 
   registry.ObjectCreatedSignal().Connect(&application, test);
@@ -279,18 +278,18 @@ int UtcDaliObjectRegistrySignalAnimationCreated(void)
 
   {
     Animation animation = Animation::New(1.0f);
-    DALI_TEST_CHECK( test.mSignalVerified );
+    DALI_TEST_CHECK(test.mSignalVerified);
 
-    verified = false;
+    verified      = false;
     objectPointer = animation.GetObjectPtr();
   }
-  DALI_TEST_CHECK( test.mSignalVerified );
+  DALI_TEST_CHECK(test.mSignalVerified);
   END_TEST;
 }
 
 int UtcDaliObjectRegistryObjectCreatedSignalNegative(void)
 {
-  TestApplication application;
+  TestApplication      application;
   Dali::ObjectRegistry instance;
   try
   {
@@ -306,7 +305,7 @@ int UtcDaliObjectRegistryObjectCreatedSignalNegative(void)
 
 int UtcDaliObjectRegistryObjectDestroyedSignalNegative(void)
 {
-  TestApplication application;
+  TestApplication      application;
   Dali::ObjectRegistry instance;
   try
   {

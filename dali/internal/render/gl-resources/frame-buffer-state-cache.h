@@ -120,7 +120,7 @@ private:
     unsigned int mState;  ///< State, bitmask of FrameBufferStatus flags
   };
 
-  typedef Dali::Vector< FrameBufferState > FrameBufferStateVector;
+  using FrameBufferStateVector = Dali::Vector<FrameBufferState>;
 
   /**
    * @brief Set the clear state

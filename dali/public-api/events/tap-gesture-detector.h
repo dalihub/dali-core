@@ -70,15 +70,13 @@ class TapGesture;
 class DALI_CORE_API TapGestureDetector : public GestureDetector
 {
 public: // Typedefs
-
   /**
    * @brief Signal type for detected signal.
    * @SINCE_1_0.0
    */
-  typedef Signal< void ( Actor, const TapGesture& ) > DetectedSignalType;
+  using DetectedSignalType = Signal<void(Actor, const TapGesture&)>;
 
 public: // Creation & Destruction
-
   /**
    * @brief Creates an uninitialized TapGestureDetector; this can be initialized with TapGestureDetector::New().
    *
@@ -103,7 +101,7 @@ public: // Creation & Destruction
    * @param[in] tapsRequired The minimum & maximum number of taps required
    * @return A handle to a newly allocated Dali resource
    */
-  static TapGestureDetector New( uint32_t tapsRequired );
+  static TapGestureDetector New(uint32_t tapsRequired);
 
   /**
    * @brief Downcasts a handle to TapGestureDetector handle.
@@ -114,7 +112,7 @@ public: // Creation & Destruction
    * @param[in] handle Handle to an object
    * @return Handle to a TapGestureDetector object or an uninitialized handle
    */
-  static TapGestureDetector DownCast( BaseHandle handle );
+  static TapGestureDetector DownCast(BaseHandle handle);
 
   /**
    * @brief Destructor.
@@ -142,7 +140,6 @@ public: // Creation & Destruction
   TapGestureDetector& operator=(const TapGestureDetector& rhs);
 
 public: // Setters
-
   /**
    * @brief Sets the minimum number of taps required.
    *
@@ -152,7 +149,7 @@ public: // Setters
    * @pre The gesture detector has been initialized.
    * @note The default is '1', the maximum is 2.
    */
-  void SetMinimumTapsRequired( uint32_t minimumTaps );
+  void SetMinimumTapsRequired(uint32_t minimumTaps);
 
   /**
    * @brief Sets the maximum number of taps required.
@@ -163,10 +160,9 @@ public: // Setters
    * @pre The gesture detector has been initialized.
    * @note The default is '1', the maximum is 2.
    */
-  void SetMaximumTapsRequired( uint32_t maximumTaps );
+  void SetMaximumTapsRequired(uint32_t maximumTaps);
 
 public: // Getters
-
   /**
    * @brief Retrieves the minimum number of taps required.
    *
@@ -186,7 +182,6 @@ public: // Getters
   uint32_t GetMaximumTapsRequired() const;
 
 public: // Signals
-
   /**
    * @brief This signal is emitted when the specified tap is detected on the attached actor.
    *
@@ -201,7 +196,6 @@ public: // Signals
   DetectedSignalType& DetectedSignal();
 
 public: // Not intended for Application developers
-
   /// @cond internal
   /**
    * @brief This constructor is used by TapGestureDetector::New() methods.

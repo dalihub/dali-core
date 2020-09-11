@@ -54,7 +54,7 @@ struct RotationGestureEvent : public GestureEvent
   /**
    * Virtual destructor
    */
-  virtual ~RotationGestureEvent() = default;
+  ~RotationGestureEvent() override = default;
 
   // Data
 

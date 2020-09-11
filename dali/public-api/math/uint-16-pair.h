@@ -49,7 +49,10 @@ public:
    * @brief Default constructor for the (0, 0) tuple.
    * @SINCE_1_0.0
    */
-  Uint16Pair() : mData(0) {}
+  Uint16Pair()
+  : mData(0)
+  {
+  }
 
   /**
    * @brief Constructor taking separate x and y (width and height) parameters.
@@ -57,10 +60,10 @@ public:
    * @param[in] width The width or X dimension of the tuple. Make sure it is less than 65536
    * @param[in] height The height or Y dimension of the tuple. Make sure it is less than 65536
    */
-  Uint16Pair( uint32_t width, uint32_t height )
+  Uint16Pair(uint32_t width, uint32_t height)
   {
-    DALI_ASSERT_DEBUG( width < ( 1u << 16 ) && "Width parameter not representable." );
-    DALI_ASSERT_DEBUG( height < ( 1u << 16 ) && "Height parameter not representable." );
+    DALI_ASSERT_DEBUG(width < (1u << 16) && "Width parameter not representable.");
+    DALI_ASSERT_DEBUG(height < (1u << 16) && "Height parameter not representable.");
 
     /* Do equivalent of the code below with one aligned memory access:
      * mComponents[0] = width;
@@ -75,7 +78,7 @@ public:
    * @SINCE_1_1.13
    * @param[in] width The x dimension to be stored in this 2-tuple
    */
-  void SetWidth( uint16_t width )
+  void SetWidth(uint16_t width)
   {
     mComponents[0] = width;
   }
@@ -95,7 +98,7 @@ public:
    * @SINCE_1_1.13
    * @param[in] height The y dimension to be stored in this 2-tuple
    */
-  void SetHeight( uint16_t height )
+  void SetHeight(uint16_t height)
   {
     mComponents[1] = height;
   }
@@ -115,7 +118,7 @@ public:
    * @SINCE_1_1.14
    * @param[in] x The x dimension to be stored in this 2-tuple
    */
-  void SetX( uint16_t x )
+  void SetX(uint16_t x)
   {
     mComponents[0] = x;
   }
@@ -125,7 +128,7 @@ public:
    * @SINCE_1_0.0
    * @return X
    */
-  uint16_t GetX()  const
+  uint16_t GetX() const
   {
     return mComponents[0];
   }
@@ -135,7 +138,7 @@ public:
    * @SINCE_1_1.14
    * @param[in] y The y dimension to be stored in this 2-tuple
    */
-  void SetY( uint16_t y )
+  void SetY(uint16_t y)
   {
     mComponents[1] = y;
   }
@@ -156,7 +159,7 @@ public:
    * @param[in] rhs A reference for comparison
    * @return True if same
    */
-  bool operator==( const Uint16Pair& rhs ) const
+  bool operator==(const Uint16Pair& rhs) const
   {
     return mData == rhs.mData;
   }
@@ -167,7 +170,7 @@ public:
    * @param[in] rhs A reference for comparison
    * @return True if different
    */
-  bool operator!=( const Uint16Pair& rhs ) const
+  bool operator!=(const Uint16Pair& rhs) const
   {
     return mData != rhs.mData;
   }
@@ -179,7 +182,7 @@ public:
    * @param[in] rhs A reference for comparison
    * @return True if less
    */
-  bool operator<( const Uint16Pair& rhs ) const
+  bool operator<(const Uint16Pair& rhs) const
   {
     return mData < rhs.mData;
   }
@@ -191,7 +194,7 @@ public:
    * @param[in] rhs A reference for comparison
    * @return True if greater
    */
-  bool operator>( const Uint16Pair& rhs ) const
+  bool operator>(const Uint16Pair& rhs) const
   {
     return mData > rhs.mData;
   }
@@ -207,11 +210,11 @@ public:
    * @return Closest integer value
    */
   template<typename FLOAT_VECTOR_N_TYPE>
-  static Uint16Pair FromFloatVec2( const FLOAT_VECTOR_N_TYPE& from )
+  static Uint16Pair FromFloatVec2(const FLOAT_VECTOR_N_TYPE& from)
   {
-    DALI_ASSERT_DEBUG( from.x + 0.5f < 65536.0f );
-    DALI_ASSERT_DEBUG( from.y + 0.5f < 65536.0f );
-    return Uint16Pair( from.x + 0.5f, from.y + 0.5f );
+    DALI_ASSERT_DEBUG(from.x + 0.5f < 65536.0f);
+    DALI_ASSERT_DEBUG(from.y + 0.5f < 65536.0f);
+    return Uint16Pair(from.x + 0.5f, from.y + 0.5f);
   }
 
   /**
@@ -225,19 +228,18 @@ public:
    * @return Closest integer value
    */
   template<typename FLOAT_ARRAY>
-  static Uint16Pair FromFloatArray( const FLOAT_ARRAY& from )
+  static Uint16Pair FromFloatArray(const FLOAT_ARRAY& from)
   {
-    DALI_ASSERT_DEBUG( from[0] + 0.5f < 65536.0f );
-    DALI_ASSERT_DEBUG( from[1] + 0.5f < 65536.0f );
-    return Uint16Pair( from[0] + 0.5f, from[1] + 0.5f );
+    DALI_ASSERT_DEBUG(from[0] + 0.5f < 65536.0f);
+    DALI_ASSERT_DEBUG(from[1] + 0.5f < 65536.0f);
+    return Uint16Pair(from[0] + 0.5f, from[1] + 0.5f);
   }
 
 public:
-
-  Uint16Pair( const Uint16Pair& ) = default; ///< Default copy constructor
-  Uint16Pair( Uint16Pair&& ) = default; ///< Default move constructor
-  Uint16Pair& operator=( const Uint16Pair& ) = default; ///< Default copy assignment operator
-  Uint16Pair& operator=( Uint16Pair&& ) = default; ///< Default move assignment operator
+  Uint16Pair(const Uint16Pair&) = default;            ///< Default copy constructor
+  Uint16Pair(Uint16Pair&&)      = default;            ///< Default move constructor
+  Uint16Pair& operator=(const Uint16Pair&) = default; ///< Default copy assignment operator
+  Uint16Pair& operator=(Uint16Pair&&) = default;      ///< Default move assignment operator
 
 private:
   union
@@ -250,7 +252,14 @@ private:
 };
 
 // Allow Uint16Pair to be treated as a POD type
-template <> struct TypeTraits< Uint16Pair > : public BasicTypes< Uint16Pair > { enum { IS_TRIVIAL_TYPE = true }; };
+template<>
+struct TypeTraits<Uint16Pair> : public BasicTypes<Uint16Pair>
+{
+  enum
+  {
+    IS_TRIVIAL_TYPE = true
+  };
+};
 
 /**
  * @}

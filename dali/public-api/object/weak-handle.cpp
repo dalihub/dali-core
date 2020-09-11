@@ -23,40 +23,39 @@
 
 namespace Dali
 {
-
 struct WeakHandleBase::Impl : public BaseObject::Impl::Observer
 {
   // Construction
   Impl()
-  : mObject( nullptr )
+  : mObject(nullptr)
   {
   }
 
   // Construction
-  Impl( BaseHandle& handle )
-  : mObject( nullptr )
+  Impl(BaseHandle& handle)
+  : mObject(nullptr)
   {
-    if( handle )
+    if(handle)
     {
-      mObject = static_cast<Dali::BaseObject*>( handle.GetObjectPtr() );
-      if( mObject )
+      mObject = static_cast<Dali::BaseObject*>(handle.GetObjectPtr());
+      if(mObject)
       {
-        BaseObject::Impl::Get( *mObject ).AddObserver( *this );
+        BaseObject::Impl::Get(*mObject).AddObserver(*this);
       }
     }
   }
 
   // Destruction
-  ~Impl()
+  ~Impl() override
   {
     Reset();
   }
 
   void Reset()
   {
-    if( mObject )
+    if(mObject)
     {
-      BaseObject::Impl::Get( *mObject ).RemoveObserver( *this );
+      BaseObject::Impl::Get(*mObject).RemoveObserver(*this);
       mObject = nullptr;
     }
   }
@@ -64,7 +63,7 @@ struct WeakHandleBase::Impl : public BaseObject::Impl::Observer
   /**
    * From BaseObject::Impl::Observer
    */
-  virtual void ObjectDestroyed( BaseObject& object )
+  void ObjectDestroyed(BaseObject& object) override
   {
     mObject = nullptr;
   }
@@ -74,12 +73,12 @@ struct WeakHandleBase::Impl : public BaseObject::Impl::Observer
 };
 
 WeakHandleBase::WeakHandleBase()
-: mImpl( new Impl() )
+: mImpl(new Impl())
 {
 }
 
-WeakHandleBase::WeakHandleBase( BaseHandle& handle )
-: mImpl( new Impl( handle ) )
+WeakHandleBase::WeakHandleBase(BaseHandle& handle)
+: mImpl(new Impl(handle))
 {
 }
 
@@ -90,57 +89,57 @@ WeakHandleBase::~WeakHandleBase()
 }
 
 WeakHandleBase::WeakHandleBase(const WeakHandleBase& handle)
-: mImpl( nullptr )
+: mImpl(nullptr)
 {
   BaseHandle object = handle.GetBaseHandle();
-  mImpl = new Impl(object);
+  mImpl             = new Impl(object);
 }
 
-WeakHandleBase& WeakHandleBase::operator=( const WeakHandleBase& rhs )
+WeakHandleBase& WeakHandleBase::operator=(const WeakHandleBase& rhs)
 {
-  if( this != &rhs )
+  if(this != &rhs)
   {
     delete mImpl;
 
     BaseHandle handle = rhs.GetBaseHandle();
-    mImpl = new Impl(handle);
+    mImpl             = new Impl(handle);
   }
 
   return *this;
 }
 
-WeakHandleBase::WeakHandleBase( WeakHandleBase&& rhs )
-: mImpl( rhs.mImpl )
+WeakHandleBase::WeakHandleBase(WeakHandleBase&& rhs)
+: mImpl(rhs.mImpl)
 {
   rhs.mImpl = nullptr;
 }
 
-WeakHandleBase& WeakHandleBase::operator=( WeakHandleBase&& rhs )
+WeakHandleBase& WeakHandleBase::operator=(WeakHandleBase&& rhs)
 {
-  if (this != &rhs)
+  if(this != &rhs)
   {
     delete mImpl;
 
-    mImpl = rhs.mImpl;
+    mImpl     = rhs.mImpl;
     rhs.mImpl = nullptr;
   }
 
   return *this;
 }
 
-bool WeakHandleBase::operator==( const WeakHandleBase& rhs ) const
+bool WeakHandleBase::operator==(const WeakHandleBase& rhs) const
 {
   return this->mImpl->mObject == rhs.mImpl->mObject;
 }
 
-bool WeakHandleBase::operator!=( const WeakHandleBase& rhs ) const
+bool WeakHandleBase::operator!=(const WeakHandleBase& rhs) const
 {
-  return !( *this == rhs );
+  return !(*this == rhs);
 }
 
 BaseHandle WeakHandleBase::GetBaseHandle() const
 {
-  return mImpl ? BaseHandle( mImpl->mObject ) : BaseHandle();
+  return mImpl ? BaseHandle(mImpl->mObject) : BaseHandle();
 }
 
 void WeakHandleBase::Reset()
@@ -148,5 +147,4 @@ void WeakHandleBase::Reset()
   mImpl->Reset();
 }
 
-
-} // Dali
+} // namespace Dali

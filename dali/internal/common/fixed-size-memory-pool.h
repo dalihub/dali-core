@@ -52,8 +52,7 @@ struct TypeSizeWithAlignment
 class FixedSizeMemoryPool
 {
 public:
-
-  typedef uint32_t SizeType;
+  using SizeType = uint32_t;
 
 public:
 

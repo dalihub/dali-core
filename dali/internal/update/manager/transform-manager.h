@@ -92,7 +92,7 @@ enum TransformManagerProperty
   TRANSFORM_PROPERTY_COUNT,
 };
 
-typedef uint32_t TransformId; // 4,294,967,295 transforms supported
+using TransformId                             = uint32_t; // 4,294,967,295 transforms supported
 static const TransformId INVALID_TRANSFORM_ID = -1;
 
 } //SceneGraph

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@
 
 namespace Dali
 {
-
 LongPressGestureDetector::LongPressGestureDetector(Internal::LongPressGestureDetector* internal)
 : GestureDetector(internal)
 {
@@ -54,9 +53,9 @@ LongPressGestureDetector LongPressGestureDetector::New(uint32_t minTouches, uint
   return LongPressGestureDetector(internal.Get());
 }
 
-LongPressGestureDetector LongPressGestureDetector::DownCast( BaseHandle handle )
+LongPressGestureDetector LongPressGestureDetector::DownCast(BaseHandle handle)
 {
-  return LongPressGestureDetector( dynamic_cast<Dali::Internal::LongPressGestureDetector*>(handle.GetObjectPtr()) );
+  return LongPressGestureDetector(dynamic_cast<Dali::Internal::LongPressGestureDetector*>(handle.GetObjectPtr()));
 }
 
 LongPressGestureDetector::~LongPressGestureDetector()

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,13 @@
  *
  */
 
-#include <iostream>
-#include <stdlib.h>
-#include <unistd.h>
-#include <type_traits>
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/threading/thread.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+#include <iostream>
+#include <type_traits>
 
 using Dali::Thread;
 
@@ -35,7 +36,7 @@ class TestThread : public Thread
     gRunThreadEntryFunc = true;
   }
 };
-}
+} // namespace
 
 int UtcDaliThreadP(void)
 {
@@ -47,11 +48,11 @@ int UtcDaliThreadP(void)
 
   thread.Start();
   // wait till the thread is terminated
-  while( !gRunThreadEntryFunc )
+  while(!gRunThreadEntryFunc)
   {
-    usleep( 1 ); // 1 microsecond
+    usleep(1); // 1 microsecond
   }
-  DALI_TEST_EQUALS( true, gRunThreadEntryFunc, TEST_LOCATION );
+  DALI_TEST_EQUALS(true, gRunThreadEntryFunc, TEST_LOCATION);
 
   thread.Join();
 
@@ -60,11 +61,11 @@ int UtcDaliThreadP(void)
   thread.Start();
   thread.Join();
   // wait till the thread is terminated
-  while( !gRunThreadEntryFunc )
+  while(!gRunThreadEntryFunc)
   {
-    usleep( 1 ); // 1 microsecond
+    usleep(1); // 1 microsecond
   }
-  DALI_TEST_EQUALS( true, gRunThreadEntryFunc, TEST_LOCATION );
+  DALI_TEST_EQUALS(true, gRunThreadEntryFunc, TEST_LOCATION);
 
   END_TEST;
 }
@@ -73,8 +74,8 @@ int UtcDaliThreadNonCopyable(void)
 {
   // we want to make sure that mutex is not copyable (its copy constructor is not defined)
   // this test will stop compiling if Mutex has compiler generated copy constructor
-  static_assert( !__has_trivial_copy( Thread ), "Thread should NOT be copyable" );
+  static_assert(!__has_trivial_copy(Thread), "Thread should NOT be copyable");
 
-  DALI_TEST_CHECK( true );
+  DALI_TEST_CHECK(true);
   END_TEST;
 }

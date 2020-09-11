@@ -35,7 +35,7 @@ namespace Internal
 {
 
 class TouchEvent;
-typedef IntrusivePtr< TouchEvent > TouchEventPtr;
+using TouchEventPtr = IntrusivePtr<TouchEvent>;
 
 /**
  * @copydoc Dali::TouchEvent
@@ -195,7 +195,7 @@ private:
    *
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~TouchEvent() = default;
+  ~TouchEvent() override = default;
 
 private:
 

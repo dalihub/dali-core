@@ -15,13 +15,13 @@
  *
  */
 
+#include <dali-test-suite-utils.h>
+#include <dali/public-api/dali-core.h>
+#include <stdlib.h>
+
+#include <cmath> // isfinite
 #include <iostream>
 #include <sstream>
-#include <cmath> // isfinite
-
-#include <stdlib.h>
-#include <dali/public-api/dali-core.h>
-#include <dali-test-suite-utils.h>
 
 using namespace Dali;
 
@@ -38,7 +38,7 @@ void utc_dali_vector2_cleanup(void)
 int UtcDaliVector2Constructor01P(void)
 {
   TestApplication application;
-  Vector2 vec2;
+  Vector2         vec2;
   DALI_TEST_EQUALS(vec2.x, 0.0f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(vec2.y, 0.0f, 0.001, TEST_LOCATION);
   END_TEST;
@@ -47,7 +47,7 @@ int UtcDaliVector2Constructor01P(void)
 int UtcDaliVector2Constructor02P(void)
 {
   TestApplication application;
-  Vector2 vec2(1.f,1.f);
+  Vector2         vec2(1.f, 1.f);
   DALI_TEST_EQUALS(vec2.x, 1.0f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(vec2.y, 1.0f, 0.001, TEST_LOCATION);
   END_TEST;
@@ -56,8 +56,8 @@ int UtcDaliVector2Constructor02P(void)
 int UtcDaliVector2Constructor03P(void)
 {
   TestApplication application;
-  float array[] = {1.f,1.f};
-  Vector2 vec2(array);
+  float           array[] = {1.f, 1.f};
+  Vector2         vec2(array);
   DALI_TEST_EQUALS(vec2.x, 1.0f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(vec2.y, 1.0f, 0.001, TEST_LOCATION);
   END_TEST;
@@ -66,8 +66,8 @@ int UtcDaliVector2Constructor03P(void)
 int UtcDaliVector2Constructor04P(void)
 {
   TestApplication application;
-  Vector3 vec3(1.f,1.f,1.f);
-  Vector3 vec2(vec3);
+  Vector3         vec3(1.f, 1.f, 1.f);
+  Vector3         vec2(vec3);
   DALI_TEST_EQUALS(vec2.x, 1.0f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(vec2.y, 1.0f, 0.001, TEST_LOCATION);
   END_TEST;
@@ -76,8 +76,8 @@ int UtcDaliVector2Constructor04P(void)
 int UtcDaliVector2Constructor05P(void)
 {
   TestApplication application;
-  Vector4 vec4(1.f,1.f,1.f,1.f);
-  Vector2 vec2(vec4);
+  Vector4         vec4(1.f, 1.f, 1.f, 1.f);
+  Vector2         vec2(vec4);
   DALI_TEST_EQUALS(vec2.x, 1.0f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(vec2.y, 1.0f, 0.001, TEST_LOCATION);
   END_TEST;
@@ -86,8 +86,8 @@ int UtcDaliVector2Constructor05P(void)
 int UtcDaliVector2ConstructorUint16PairP(void)
 {
   TestApplication application;
-  Uint16Pair pair( 20, 30 );
-  Vector2 vec2(pair);
+  Uint16Pair      pair(20, 30);
+  Vector2         vec2(pair);
   DALI_TEST_EQUALS(vec2.x, 20.0f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(vec2.y, 30.0f, 0.001, TEST_LOCATION);
   END_TEST;
@@ -96,8 +96,8 @@ int UtcDaliVector2ConstructorUint16PairP(void)
 int UtcDaliVector2CopyConstructor01P(void)
 {
   TestApplication application;
-  float array[] = {1.f,1.f};
-  Vector2 vec2;
+  float           array[] = {1.f, 1.f};
+  Vector2         vec2;
   vec2 = array;
   DALI_TEST_EQUALS(vec2.x, 1.0f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(vec2.y, 1.0f, 0.001, TEST_LOCATION);
@@ -107,8 +107,8 @@ int UtcDaliVector2CopyConstructor01P(void)
 int UtcDaliVector2CopyConstructor02P(void)
 {
   TestApplication application;
-  Vector3 vec3(1.f,1.f,1.f);
-  Vector3 vec2;
+  Vector3         vec3(1.f, 1.f, 1.f);
+  Vector3         vec2;
   vec2 = vec3;
   DALI_TEST_EQUALS(vec2.x, 1.0f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(vec2.y, 1.0f, 0.001, TEST_LOCATION);
@@ -118,8 +118,8 @@ int UtcDaliVector2CopyConstructor02P(void)
 int UtcDaliVector2CopyConstructor03P(void)
 {
   TestApplication application;
-  Vector4 vec4(1.f,1.f,1.f,1.f);
-  Vector3 vec2;
+  Vector4         vec4(1.f, 1.f, 1.f, 1.f);
+  Vector3         vec2;
   vec2 = vec4;
   DALI_TEST_EQUALS(vec2.x, 1.0f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(vec2.y, 1.0f, 0.001, TEST_LOCATION);
@@ -129,8 +129,8 @@ int UtcDaliVector2CopyConstructor03P(void)
 int UtcDaliVector2CopyConstructor04P(void)
 {
   TestApplication application;
-  Vector2 vec0( 10.f, 20.f );
-  Vector2 vec1( vec0 );
+  Vector2         vec0(10.f, 20.f);
+  Vector2         vec1(vec0);
   DALI_TEST_EQUALS(vec1.x, 10.0f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(vec1.y, 20.0f, 0.001, TEST_LOCATION);
   END_TEST;
@@ -139,8 +139,8 @@ int UtcDaliVector2CopyConstructor04P(void)
 int UtcDaliVector2MoveConstructor(void)
 {
   TestApplication application;
-  Vector2 vec0( 10.f, 20.f );
-  Vector2 vec1 = std::move( vec0 );
+  Vector2         vec0(10.f, 20.f);
+  Vector2         vec1 = std::move(vec0);
   DALI_TEST_EQUALS(vec1.x, 10.0f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(vec1.y, 20.0f, 0.001, TEST_LOCATION);
 
@@ -150,8 +150,8 @@ int UtcDaliVector2MoveConstructor(void)
 int UtcDaliVector2CopyAssignment(void)
 {
   TestApplication application;
-  Vector2 vec0( 10.f, 20.f );
-  Vector2 vec1;
+  Vector2         vec0(10.f, 20.f);
+  Vector2         vec1;
   vec1 = vec0;
   DALI_TEST_EQUALS(vec1.x, 10.0f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(vec1.y, 20.0f, 0.001, TEST_LOCATION);
@@ -162,9 +162,9 @@ int UtcDaliVector2CopyAssignment(void)
 int UtcDaliVector2MoveAssignment(void)
 {
   TestApplication application;
-  Vector2 vec0( 10.f, 20.f );
-  Vector2 vec1;
-  vec1 = std::move( vec0 );
+  Vector2         vec0(10.f, 20.f);
+  Vector2         vec1;
+  vec1 = std::move(vec0);
   DALI_TEST_EQUALS(vec1.x, 10.0f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(vec1.y, 20.0f, 0.001, TEST_LOCATION);
 
@@ -174,8 +174,8 @@ int UtcDaliVector2MoveAssignment(void)
 int UtcDaliVector2AssignP(void)
 {
   TestApplication application;
-  Vector2 v1(10.0f, 20.0f);
-  Vector2 r0(11.0f, 22.0f);
+  Vector2         v1(10.0f, 20.0f);
+  Vector2         r0(11.0f, 22.0f);
 
   v1 = r0;
   DALI_TEST_EQUALS(v1, r0, TEST_LOCATION);
@@ -185,8 +185,8 @@ int UtcDaliVector2AssignP(void)
 int UtcDaliVector2AssignP02(void)
 {
   TestApplication application;
-  Vector2 v1(10.0f, 20.0f);
-  Vector4 r0(11.0f, 22.0f, 33.f, 44.f);
+  Vector2         v1(10.0f, 20.0f);
+  Vector4         r0(11.0f, 22.0f, 33.f, 44.f);
 
   v1 = r0;
   DALI_TEST_EQUALS(v1, Vector2(r0.x, r0.y), TEST_LOCATION);
@@ -196,8 +196,8 @@ int UtcDaliVector2AssignP02(void)
 int UtcDaliVector2AssignP03(void)
 {
   TestApplication application;
-  Vector2 v1(10.0f, 20.0f);
-  Vector3 r0(11.0f, 22.0f, 33.f);
+  Vector2         v1(10.0f, 20.0f);
+  Vector3         r0(11.0f, 22.0f, 33.f);
 
   v1 = r0;
   DALI_TEST_EQUALS(v1, Vector2(r0.x, r0.y), TEST_LOCATION);
@@ -207,11 +207,11 @@ int UtcDaliVector2AssignP03(void)
 int UtcDaliVector2AddP(void)
 {
   TestApplication application;
-  Vector2 v0(1.0f, 2.0f);
-  Vector2 v1(10.0f, 20.0f);
-  Vector2 r0(11.0f, 22.0f);
+  Vector2         v0(1.0f, 2.0f);
+  Vector2         v1(10.0f, 20.0f);
+  Vector2         r0(11.0f, 22.0f);
 
-  Vector2 v2 = v0+v1;
+  Vector2 v2 = v0 + v1;
   DALI_TEST_EQUALS(v2, r0, TEST_LOCATION);
   END_TEST;
 }
@@ -219,9 +219,9 @@ int UtcDaliVector2AddP(void)
 int UtcDaliVector2AddAssignP(void)
 {
   TestApplication application;
-  Vector2 v0(1.0f, 2.0f);
-  Vector2 v1(10.0f, 20.0f);
-  Vector2 r0(11.0f, 22.0f);
+  Vector2         v0(1.0f, 2.0f);
+  Vector2         v1(10.0f, 20.0f);
+  Vector2         r0(11.0f, 22.0f);
 
   v0 += v1;
   DALI_TEST_EQUALS(v0, r0, TEST_LOCATION);
@@ -231,11 +231,11 @@ int UtcDaliVector2AddAssignP(void)
 int UtcDaliVector2SubtractP(void)
 {
   TestApplication application;
-  Vector2 v0(11.0f, 22.0f);
-  Vector2 v1(10.0f, 20.0f);
-  Vector2 r0(1.0f, 2.0f);
+  Vector2         v0(11.0f, 22.0f);
+  Vector2         v1(10.0f, 20.0f);
+  Vector2         r0(1.0f, 2.0f);
 
-  Vector2 v2 = v0-v1;
+  Vector2 v2 = v0 - v1;
   DALI_TEST_EQUALS(v2, r0, TEST_LOCATION);
 
   END_TEST;
@@ -244,9 +244,9 @@ int UtcDaliVector2SubtractP(void)
 int UtcDaliVector2SubtractAssignP(void)
 {
   TestApplication application;
-  Vector2 v0(11.0f, 22.0f);
-  Vector2 v1(10.0f, 20.0f);
-  Vector2 r0(1.0f, 2.0f);
+  Vector2         v0(11.0f, 22.0f);
+  Vector2         v1(10.0f, 20.0f);
+  Vector2         r0(1.0f, 2.0f);
 
   v0 -= v1;
   DALI_TEST_EQUALS(v0, r0, TEST_LOCATION);
@@ -256,8 +256,8 @@ int UtcDaliVector2SubtractAssignP(void)
 int UtcDaliVector2NegateP(void)
 {
   TestApplication application;
-  Vector2 v1(10.0f, 20.0f);
-  Vector2 r0(-10.0f, -20.0f);
+  Vector2         v1(10.0f, 20.0f);
+  Vector2         r0(-10.0f, -20.0f);
 
   Vector2 v2 = -v1;
   DALI_TEST_EQUALS(v2, r0, TEST_LOCATION);
@@ -267,9 +267,9 @@ int UtcDaliVector2NegateP(void)
 int UtcDaliVector2Multiply01P(void)
 {
   TestApplication application;
-  Vector2 v0(2.0f, 3.0f);
-  Vector2 v1(10.0f, 20.0f);
-  Vector2 r0(20.0f, 60.0f);
+  Vector2         v0(2.0f, 3.0f);
+  Vector2         v1(10.0f, 20.0f);
+  Vector2         r0(20.0f, 60.0f);
 
   Vector2 v2 = v0 * v1;
   DALI_TEST_EQUALS(v2, r0, TEST_LOCATION);
@@ -280,8 +280,8 @@ int UtcDaliVector2Multiply01P(void)
 int UtcDaliVector2Multiply02P(void)
 {
   TestApplication application;
-  Vector2 v0(2.0f, 3.0f);
-  Vector2 r0(20.0f, 30.0f);
+  Vector2         v0(2.0f, 3.0f);
+  Vector2         r0(20.0f, 30.0f);
 
   Vector2 v2 = v0 * 10.f;
   DALI_TEST_EQUALS(v2, r0, TEST_LOCATION);
@@ -292,9 +292,9 @@ int UtcDaliVector2Multiply02P(void)
 int UtcDaliVector2MultiplyAssign01P(void)
 {
   TestApplication application;
-  Vector2 v0(2.0f, 3.0f);
-  Vector2 v1(10.0f, 20.0f);
-  Vector2 r0(20.0f, 60.0f);
+  Vector2         v0(2.0f, 3.0f);
+  Vector2         v1(10.0f, 20.0f);
+  Vector2         r0(20.0f, 60.0f);
 
   v0 *= v1;
   DALI_TEST_EQUALS(v0, r0, TEST_LOCATION);
@@ -304,8 +304,8 @@ int UtcDaliVector2MultiplyAssign01P(void)
 int UtcDaliVector2MultiplyAssign02P(void)
 {
   TestApplication application;
-  Vector2 v0(2.0f, 3.0f);
-  Vector2 r0(20.0f, 30.0f);
+  Vector2         v0(2.0f, 3.0f);
+  Vector2         r0(20.0f, 30.0f);
 
   v0 *= 10.f;
   DALI_TEST_EQUALS(v0, r0, TEST_LOCATION);
@@ -315,14 +315,14 @@ int UtcDaliVector2MultiplyAssign02P(void)
 int UtcDaliVector2Divide01P(void)
 {
   TestApplication application;
-  Vector2 v0(1.0f, 1.0f);
-  Vector2 v1(2.0f, 3.0f);
-  Vector2 v2(4.0f, 9.0f);
+  Vector2         v0(1.0f, 1.0f);
+  Vector2         v1(2.0f, 3.0f);
+  Vector2         v2(4.0f, 9.0f);
 
-  DALI_TEST_EQUALS( v0/v0, v0, TEST_LOCATION);
-  DALI_TEST_EQUALS( v1/v0, v1, TEST_LOCATION);
-  DALI_TEST_EQUALS( v1/v1, v0, TEST_LOCATION);
-  DALI_TEST_EQUALS( v2/v1, v1, TEST_LOCATION);
+  DALI_TEST_EQUALS(v0 / v0, v0, TEST_LOCATION);
+  DALI_TEST_EQUALS(v1 / v0, v1, TEST_LOCATION);
+  DALI_TEST_EQUALS(v1 / v1, v0, TEST_LOCATION);
+  DALI_TEST_EQUALS(v2 / v1, v1, TEST_LOCATION);
 
   END_TEST;
 }
@@ -330,13 +330,13 @@ int UtcDaliVector2Divide01P(void)
 int UtcDaliVector2Divide02P(void)
 {
   TestApplication application;
-  Vector2 v0(1.0f, 1.0f);
-  Vector2 v1(3.0f, 3.0f);
-  Vector2 v2(9.0f, 9.0f);
+  Vector2         v0(1.0f, 1.0f);
+  Vector2         v1(3.0f, 3.0f);
+  Vector2         v2(9.0f, 9.0f);
 
-  DALI_TEST_EQUALS( v0/1.f, v0, TEST_LOCATION);
-  DALI_TEST_EQUALS( v1/1.f, v1, TEST_LOCATION);
-  DALI_TEST_EQUALS( v1/3.f, v0, TEST_LOCATION);
+  DALI_TEST_EQUALS(v0 / 1.f, v0, TEST_LOCATION);
+  DALI_TEST_EQUALS(v1 / 1.f, v1, TEST_LOCATION);
+  DALI_TEST_EQUALS(v1 / 3.f, v0, TEST_LOCATION);
 
   END_TEST;
 }
@@ -344,9 +344,9 @@ int UtcDaliVector2Divide02P(void)
 int UtcDaliVector2DivideAssign01P(void)
 {
   TestApplication application;
-  Vector2 v0(1.0f, 1.0f);
-  Vector2 v1(2.0f, 3.0f);
-  Vector2 v2(4.0f, 9.0f);
+  Vector2         v0(1.0f, 1.0f);
+  Vector2         v1(2.0f, 3.0f);
+  Vector2         v2(4.0f, 9.0f);
 
   Vector2 v4(v0);
   v4 /= v0;
@@ -369,8 +369,8 @@ int UtcDaliVector2DivideAssign01P(void)
 int UtcDaliVector2DivideAssign02P(void)
 {
   TestApplication application;
-  Vector2 v0(1.0f, 1.0f);
-  Vector2 v1(3.0f, 3.0f);
+  Vector2         v0(1.0f, 1.0f);
+  Vector2         v1(3.0f, 3.0f);
 
   Vector2 v4(v0);
   v4 /= 1.f;
@@ -390,8 +390,8 @@ int UtcDaliVector2DivideAssign02P(void)
 int UtcDaliVector2EqualsP(void)
 {
   TestApplication application;
-  Vector2 v0(1.0f, 2.0f);
-  Vector2 v1(1.0f, 2.0f);
+  Vector2         v0(1.0f, 2.0f);
+  Vector2         v1(1.0f, 2.0f);
 
   DALI_TEST_CHECK(v0 == v1);
 
@@ -401,8 +401,8 @@ int UtcDaliVector2EqualsP(void)
 int UtcDaliVector2NotEqualsP(void)
 {
   TestApplication application;
-  Vector2 v0(1.0f, 2.0f);
-  Vector2 v1(1.0f, 2.0f);
+  Vector2         v0(1.0f, 2.0f);
+  Vector2         v1(1.0f, 2.0f);
 
   Vector2 v2 = Vector2(0.0f, 2.0f);
   DALI_TEST_CHECK(v0 != v2);
@@ -421,18 +421,18 @@ int UtcDaliVector2NotEqualsP(void)
 int UtcDaliVector2OperatorSubscriptP(void)
 {
   TestApplication application;
-  Vector2 testVector(1.0f, 2.0f);
+  Vector2         testVector(1.0f, 2.0f);
 
   // read array subscripts
-  DALI_TEST_EQUALS( testVector[0], 1.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( testVector[1], 2.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS(testVector[0], 1.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(testVector[1], 2.0f, TEST_LOCATION);
 
   // write array subscripts/read struct memebers
   testVector[0] = 3.0f;
   testVector[1] = 4.0f;
 
-  DALI_TEST_EQUALS( testVector.x, 3.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( testVector.y, 4.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS(testVector.x, 3.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(testVector.y, 4.0f, TEST_LOCATION);
 
   END_TEST;
 }
@@ -440,7 +440,7 @@ int UtcDaliVector2OperatorSubscriptP(void)
 int UtcDaliVector2OperatorSubscriptN(void)
 {
   TestApplication application;
-  Vector2 testVector(1.0f, 2.0f);
+  Vector2         testVector(1.0f, 2.0f);
 
   try
   {
@@ -448,10 +448,10 @@ int UtcDaliVector2OperatorSubscriptN(void)
     (void)w; // Suppress unused variable warning
     tet_result(TET_FAIL);
   }
-  catch (Dali::DaliException& e)
+  catch(Dali::DaliException& e)
   {
-    DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT( e, "Vector element index out of bounds", TEST_LOCATION);
+    DALI_TEST_PRINT_ASSERT(e);
+    DALI_TEST_ASSERT(e, "Vector element index out of bounds", TEST_LOCATION);
   }
 
   END_TEST;
@@ -460,18 +460,18 @@ int UtcDaliVector2OperatorSubscriptN(void)
 int UtcDaliVector2OperatorConstSubscriptP(void)
 {
   TestApplication application;
-  const Vector2 testVector2(3.0f, 4.0f);
-  const float& x = testVector2[0];
-  const float& y = testVector2[1];
-  DALI_TEST_EQUALS( x, 3.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( y, 4.0f, TEST_LOCATION );
+  const Vector2   testVector2(3.0f, 4.0f);
+  const float&    x = testVector2[0];
+  const float&    y = testVector2[1];
+  DALI_TEST_EQUALS(x, 3.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(y, 4.0f, TEST_LOCATION);
   END_TEST;
 }
 
 int UtcDaliVector2OperatorConstSubscriptN(void)
 {
   TestApplication application;
-  const Vector2 testVector2(3.0f, 4.0f);
+  const Vector2   testVector2(3.0f, 4.0f);
 
   try
   {
@@ -479,22 +479,20 @@ int UtcDaliVector2OperatorConstSubscriptN(void)
     (void)w; // Suppress unused variable warning
     tet_result(TET_FAIL);
   }
-  catch (Dali::DaliException& e)
+  catch(Dali::DaliException& e)
   {
-    DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT( e, "Vector element index out of bounds" , TEST_LOCATION);
+    DALI_TEST_PRINT_ASSERT(e);
+    DALI_TEST_ASSERT(e, "Vector element index out of bounds", TEST_LOCATION);
   }
-
 
   END_TEST;
 }
 
-
 int UtcDaliVector2LengthP(void)
 {
   TestApplication application;
-  Vector2 v(1.0f, 2.0f);
-  DALI_TEST_EQUALS(v.Length(), sqrtf(v.x*v.x + v.y*v.y), 0.001f, TEST_LOCATION);
+  Vector2         v(1.0f, 2.0f);
+  DALI_TEST_EQUALS(v.Length(), sqrtf(v.x * v.x + v.y * v.y), 0.001f, TEST_LOCATION);
 
   Vector2 v1(0.0f, 0.0f);
   DALI_TEST_EQUALS(v1.Length(), 0.0f, TEST_LOCATION);
@@ -504,8 +502,8 @@ int UtcDaliVector2LengthP(void)
 int UtcDaliVector2LengthSquaredP(void)
 {
   TestApplication application;
-  Vector2 v(1.0f, 2.0f);
-  DALI_TEST_EQUALS(v.LengthSquared(), v.x*v.x + v.y*v.y, 0.001f, TEST_LOCATION);
+  Vector2         v(1.0f, 2.0f);
+  DALI_TEST_EQUALS(v.LengthSquared(), v.x * v.x + v.y * v.y, 0.001f, TEST_LOCATION);
 
   Vector2 v1(0.0f, 0.0f);
   DALI_TEST_EQUALS(v1.LengthSquared(), 0.0f, TEST_LOCATION);
@@ -515,9 +513,9 @@ int UtcDaliVector2LengthSquaredP(void)
 int UtcDaliVector2NormalizeP(void)
 {
   TestApplication application;
-  for (float f=0.0f; f<6.0f; f+=1.0f)
+  for(float f = 0.0f; f < 6.0f; f += 1.0f)
   {
-    Vector2 v(cosf(f)*10.0f, cosf(f+1.0f)*10.0f);
+    Vector2 v(cosf(f) * 10.0f, cosf(f + 1.0f) * 10.0f);
     v.Normalize();
     DALI_TEST_EQUALS(v.LengthSquared(), 1.0f, 0.001f, TEST_LOCATION);
   }
@@ -527,7 +525,7 @@ int UtcDaliVector2NormalizeP(void)
 int UtcDaliVector2NormalizeN(void)
 {
   TestApplication application;
-  Vector2 v(0.0f, 0.0f);
+  Vector2         v(0.0f, 0.0f);
   v.Normalize();
   DALI_TEST_EQUALS(v.LengthSquared(), 0.0f, 0.00001f, TEST_LOCATION);
   END_TEST;
@@ -546,34 +544,34 @@ int UtcDaliVector2ClampVector2P(void)
   Vector2 min(1.0f, 4.0f);
   Vector2 max(9.0f, 6.0f);
 
-  v0.Clamp( min, max );
-  v1.Clamp( min, max );
-  v2.Clamp( min, max );
-  v3.Clamp( min, max );
-  v4.Clamp( min, max );
+  v0.Clamp(min, max);
+  v1.Clamp(min, max);
+  v2.Clamp(min, max);
+  v3.Clamp(min, max);
+  v4.Clamp(min, max);
 
-  DALI_TEST_EQUALS( v0, Vector2(2.0f, 4.0f), 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( v1, Vector2(1.0f, 4.0f), 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( v2, Vector2(9.0f, 5.0f), 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( v3, Vector2(8.0f, 6.0f), 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( v4, Vector2(4.9f, 5.1f), 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS(v0, Vector2(2.0f, 4.0f), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(v1, Vector2(1.0f, 4.0f), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(v2, Vector2(9.0f, 5.0f), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(v3, Vector2(8.0f, 6.0f), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(v4, Vector2(4.9f, 5.1f), 0.01f, TEST_LOCATION);
   END_TEST;
 }
 
 int UtcDaliVector2AsFloatP(void)
 {
   TestApplication application;
-  Vector2 vec2(1.f,1.f);
-  float* p = vec2.AsFloat();
+  Vector2         vec2(1.f, 1.f);
+  float*          p = vec2.AsFloat();
 
-  DALI_TEST_EQUALS( p[0], 1.f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( p[1], 1.f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS(p[0], 1.f, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(p[1], 1.f, 0.01f, TEST_LOCATION);
 
   p[0] = 2.f;
   p[1] = 2.f;
 
-  DALI_TEST_EQUALS( p[0], 2.f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( p[1], 2.f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS(p[0], 2.f, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(p[1], 2.f, 0.01f, TEST_LOCATION);
 
   END_TEST;
 }
@@ -581,11 +579,11 @@ int UtcDaliVector2AsFloatP(void)
 int UtcDaliVector2ConstAsFloatP(void)
 {
   TestApplication application;
-  Vector2 vec2(1.f,1.f);
-  const float* p = vec2.AsFloat();
+  Vector2         vec2(1.f, 1.f);
+  const float*    p = vec2.AsFloat();
 
-  DALI_TEST_EQUALS( p[0], 1.f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( p[1], 1.f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS(p[0], 1.f, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(p[1], 1.f, 0.01f, TEST_LOCATION);
 
   END_TEST;
 }
@@ -593,10 +591,10 @@ int UtcDaliVector2ConstAsFloatP(void)
 int UtcDaliVector2XWidthP(void)
 {
   TestApplication application;
-  Vector2 vec2(1.f,1.f);
+  Vector2         vec2(1.f, 1.f);
 
-  DALI_TEST_EQUALS( vec2.x, 1.f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( vec2.width, 1.f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS(vec2.x, 1.f, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec2.width, 1.f, 0.01f, TEST_LOCATION);
 
   END_TEST;
 }
@@ -604,17 +602,17 @@ int UtcDaliVector2XWidthP(void)
 int UtcDaliVector2YHeightP(void)
 {
   TestApplication application;
-  Vector2 vec2(1.f,1.f);
+  Vector2         vec2(1.f, 1.f);
 
-  DALI_TEST_EQUALS( vec2.y, 1.f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( vec2.height, 1.f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS(vec2.y, 1.f, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec2.height, 1.f, 0.01f, TEST_LOCATION);
 
   END_TEST;
 }
 
 int UtcDaliVector2OStreamOperatorP(void)
 {
-  TestApplication application;
+  TestApplication    application;
   std::ostringstream oss;
 
   Vector2 vector(1, 2);
@@ -623,16 +621,15 @@ int UtcDaliVector2OStreamOperatorP(void)
 
   std::string expectedOutput = "[1, 2]";
 
-  DALI_TEST_EQUALS( oss.str(), expectedOutput, TEST_LOCATION);
+  DALI_TEST_EQUALS(oss.str(), expectedOutput, TEST_LOCATION);
   END_TEST;
 }
-
 
 int UtcDaliVector2MaxP(void)
 {
   TestApplication application;
-  Vector2 v0(2.0f, 1.0f);
-  Vector2 v1(1.0f, 2.0f);
+  Vector2         v0(2.0f, 1.0f);
+  Vector2         v1(1.0f, 2.0f);
 
   DALI_TEST_EQUALS(Max(v0, v1), Vector2(2.0f, 2.0f), 0.01f, TEST_LOCATION);
   END_TEST;
@@ -641,8 +638,8 @@ int UtcDaliVector2MaxP(void)
 int UtcDaliVector2MinP(void)
 {
   TestApplication application;
-  Vector2 v0(2.0f, 1.0f);
-  Vector2 v1(1.0f, 2.0f);
+  Vector2         v0(2.0f, 1.0f);
+  Vector2         v1(1.0f, 2.0f);
 
   DALI_TEST_EQUALS(Min(v0, v1), Vector2(1.0f, 1.0f), 0.01f, TEST_LOCATION);
   END_TEST;
@@ -656,9 +653,8 @@ int UtcDaliVector2ClampP(void)
   Vector2 v0(2.0f, 0.8f);
   Vector2 v1(-1.0f, 2.0f);
 
-  DALI_TEST_EQUALS( Clamp( v0, 0.9f, 1.1f ), Vector2(1.1f, 0.9f), 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( Clamp( v1, 1.0f, 1.0f ), Vector2(1.0f, 1.0f), 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( Clamp( v1, 0.0f, 3.0f ), Vector2(0.0f, 2.0f), 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS(Clamp(v0, 0.9f, 1.1f), Vector2(1.1f, 0.9f), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Clamp(v1, 1.0f, 1.0f), Vector2(1.0f, 1.0f), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Clamp(v1, 0.0f, 3.0f), Vector2(0.0f, 2.0f), 0.01f, TEST_LOCATION);
   END_TEST;
 }
-

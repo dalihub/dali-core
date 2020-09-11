@@ -29,7 +29,7 @@ namespace Internal
 {
 
 typedef Dali::Vector<Object*>         ObjectContainer;
-typedef ObjectContainer::Iterator     ObjectIter;
+using ObjectIter = ObjectContainer::Iterator;
 
 /**
  * An abstract base class for constrainers.
@@ -48,24 +48,24 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~Constrainer();
+  ~Constrainer() override;
 
 public: // Object::Observer methods
 
   /**
    * @copydoc Object::Observer::SceneObjectAdded()
    */
-  virtual void SceneObjectAdded( Object& object ){}
+  void SceneObjectAdded( Object& object ) override{}
 
   /**
    * @copydoc Object::Observer::SceneObjectRemoved()
    */
-  virtual void SceneObjectRemoved( Object& object ){}
+  void SceneObjectRemoved( Object& object ) override{}
 
   /**
    * @copydoc Object::Observer::ObjectDestroyed()
    */
-  virtual void ObjectDestroyed( Object& object );
+  void ObjectDestroyed( Object& object ) override;
 
 public:
 

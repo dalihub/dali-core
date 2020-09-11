@@ -15,28 +15,29 @@
  */
 
 #include "test-harness.h"
+
+#include <fcntl.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <unistd.h>
-#include <vector>
-#include <map>
-#include <cstring>
 #include <testcase.h>
-#include <fcntl.h>
+#include <unistd.h>
+
+#include <cstring>
+#include <map>
+#include <vector>
 
 namespace TestHarness
 {
-
 typedef std::map<int32_t, TestCase> RunningTestCases;
 
 const char* basename(const char* path)
 {
-  const char* ptr=path;
-  const char* slash=NULL;
-  for( ; *ptr != '\0' ; ++ptr )
+  const char* ptr   = path;
+  const char* slash = NULL;
+  for(; *ptr != '\0'; ++ptr)
   {
-    if(*ptr == '/') slash=ptr;
+    if(*ptr == '/') slash = ptr;
   }
   if(slash != NULL) ++slash;
   return slash;
@@ -56,14 +57,14 @@ void SuppressLogOutput()
   open("/dev/null", O_RDWR); // Redirect file descriptor number 2 (i.e. stderr) to /dev/null
 }
 
-int32_t RunTestCase( struct ::testcase_s& testCase )
+int32_t RunTestCase(struct ::testcase_s& testCase)
 {
   int32_t result = EXIT_STATUS_TESTCASE_FAILED;
 
-// dont want to catch exception as we want to be able to get
-// gdb stack trace from the first error
-// by default tests should all always pass with no exceptions
-  if( testCase.startup )
+  // dont want to catch exception as we want to be able to get
+  // gdb stack trace from the first error
+  // by default tests should all always pass with no exceptions
+  if(testCase.startup)
   {
     testCase.startup();
   }
@@ -71,11 +72,11 @@ int32_t RunTestCase( struct ::testcase_s& testCase )
   {
     result = testCase.function();
   }
-  catch( const char* )
+  catch(const char*)
   {
     // just catch test fail exception, return is already set to EXIT_STATUS_TESTCASE_FAILED
   }
-  if( testCase.cleanup )
+  if(testCase.cleanup)
   {
     testCase.cleanup();
   }
@@ -83,36 +84,35 @@ int32_t RunTestCase( struct ::testcase_s& testCase )
   return result;
 }
 
-
-int32_t RunTestCaseInChildProcess( struct ::testcase_s& testCase, bool suppressOutput )
+int32_t RunTestCaseInChildProcess(struct ::testcase_s& testCase, bool suppressOutput)
 {
   int32_t testResult = EXIT_STATUS_TESTCASE_FAILED;
 
   int32_t pid = fork();
-  if( pid == 0 ) // Child process
+  if(pid == 0) // Child process
   {
-    if( suppressOutput )
+    if(suppressOutput)
     {
       SuppressLogOutput();
     }
     else
     {
       printf("\n");
-      for(int32_t i=0; i<80; ++i) printf("#");
+      for(int32_t i = 0; i < 80; ++i) printf("#");
       printf("\nTC: %s\n", testCase.name);
       fflush(stdout);
     }
 
-    int32_t status = RunTestCase( testCase );
+    int32_t status = RunTestCase(testCase);
 
-    if( ! suppressOutput )
+    if(!suppressOutput)
     {
       fflush(stdout);
       fflush(stderr);
       fclose(stdout);
       fclose(stderr);
     }
-    exit( status );
+    exit(status);
   }
   else if(pid == -1)
   {
@@ -121,31 +121,31 @@ int32_t RunTestCaseInChildProcess( struct ::testcase_s& testCase, bool suppressO
   }
   else // Parent process
   {
-    int32_t status = 0;
+    int32_t status   = 0;
     int32_t childPid = waitpid(pid, &status, 0);
-    if( childPid == -1 )
+    if(childPid == -1)
     {
       perror("waitpid");
       exit(EXIT_STATUS_WAITPID_FAILED);
     }
-    if( WIFEXITED(status) )
+    if(WIFEXITED(status))
     {
-      if( childPid > 0 )
+      if(childPid > 0)
       {
         testResult = WEXITSTATUS(status);
-        if( testResult )
+        if(testResult)
         {
           printf("Test case %s failed: %d\n", testCase.name, testResult);
         }
       }
     }
-    else if(WIFSIGNALED(status) )
+    else if(WIFSIGNALED(status))
     {
       int32_t signal = WTERMSIG(status);
-      testResult = EXIT_STATUS_TESTCASE_ABORTED;
-      if( signal == SIGABRT )
+      testResult     = EXIT_STATUS_TESTCASE_ABORTED;
+      if(signal == SIGABRT)
       {
-        printf("Test case %s failed: test case asserted\n", testCase.name );
+        printf("Test case %s failed: test case asserted\n", testCase.name);
       }
       else
       {
@@ -162,43 +162,43 @@ int32_t RunTestCaseInChildProcess( struct ::testcase_s& testCase, bool suppressO
   return testResult;
 }
 
-void OutputStatistics( const char* processName, int32_t numPasses, int32_t numFailures )
+void OutputStatistics(const char* processName, int32_t numPasses, int32_t numFailures)
 {
-  FILE* fp=fopen("summary.xml", "a");
-  if( fp != NULL )
+  FILE* fp = fopen("summary.xml", "a");
+  if(fp != NULL)
   {
-    fprintf( fp,
-             "  <suite name=\"%s\">\n"
-             "    <total_case>%d</total_case>\n"
-             "    <pass_case>%d</pass_case>\n"
-             "    <pass_rate>%5.2f</pass_rate>\n"
-             "    <fail_case>%d</fail_case>\n"
-             "    <fail_rate>%5.2f</fail_rate>\n"
-             "    <block_case>0</block_case>\n"
-             "    <block_rate>0.00</block_rate>\n"
-             "    <na_case>0</na_case>\n"
-             "    <na_rate>0.00</na_rate>\n"
-             "  </suite>\n",
-             basename(processName),
-             numPasses+numFailures,
-             numPasses,
-             (float)numPasses/(numPasses+numFailures),
-             numFailures,
-             (float)numFailures/(numPasses+numFailures) );
+    fprintf(fp,
+            "  <suite name=\"%s\">\n"
+            "    <total_case>%d</total_case>\n"
+            "    <pass_case>%d</pass_case>\n"
+            "    <pass_rate>%5.2f</pass_rate>\n"
+            "    <fail_case>%d</fail_case>\n"
+            "    <fail_rate>%5.2f</fail_rate>\n"
+            "    <block_case>0</block_case>\n"
+            "    <block_rate>0.00</block_rate>\n"
+            "    <na_case>0</na_case>\n"
+            "    <na_rate>0.00</na_rate>\n"
+            "  </suite>\n",
+            basename(processName),
+            numPasses + numFailures,
+            numPasses,
+            (float)numPasses / (numPasses + numFailures),
+            numFailures,
+            (float)numFailures / (numPasses + numFailures));
     fclose(fp);
   }
 }
 
-int32_t RunAll( const char* processName, ::testcase tc_array[] )
+int32_t RunAll(const char* processName, ::testcase tc_array[])
 {
   int32_t numFailures = 0;
-  int32_t numPasses = 0;
+  int32_t numPasses   = 0;
 
   // Run test cases in child process( to kill output/handle signals ), but run serially.
-  for( uint32_t i=0; tc_array[i].name; i++)
+  for(uint32_t i = 0; tc_array[i].name; i++)
   {
-    int32_t result = RunTestCaseInChildProcess( tc_array[i], false );
-    if( result == 0 )
+    int32_t result = RunTestCaseInChildProcess(tc_array[i], false);
+    if(result == 0)
     {
       numPasses++;
     }
@@ -208,36 +208,36 @@ int32_t RunAll( const char* processName, ::testcase tc_array[] )
     }
   }
 
-  OutputStatistics( processName, numPasses, numFailures);
+  OutputStatistics(processName, numPasses, numFailures);
 
   return numFailures;
 }
 
 // Constantly runs up to MAX_NUM_CHILDREN processes
-int32_t RunAllInParallel(  const char* processName, ::testcase tc_array[], bool reRunFailed)
+int32_t RunAllInParallel(const char* processName, ::testcase tc_array[], bool reRunFailed)
 {
   int32_t numFailures = 0;
-  int32_t numPasses = 0;
+  int32_t numPasses   = 0;
 
-  RunningTestCases children;
+  RunningTestCases     children;
   std::vector<int32_t> failedTestCases;
 
   // Fork up to MAX_NUM_CHILDREN processes, then
   // wait. As soon as a proc completes, fork the next.
 
-  int32_t nextTestCase = 0;
+  int32_t nextTestCase       = 0;
   int32_t numRunningChildren = 0;
 
-  while( tc_array[nextTestCase].name || numRunningChildren > 0)
+  while(tc_array[nextTestCase].name || numRunningChildren > 0)
   {
     // Create more children (up to the max number or til the end of the array)
-    while( numRunningChildren < MAX_NUM_CHILDREN && tc_array[nextTestCase].name )
+    while(numRunningChildren < MAX_NUM_CHILDREN && tc_array[nextTestCase].name)
     {
       int32_t pid = fork();
-      if( pid == 0 ) // Child process
+      if(pid == 0) // Child process
       {
         SuppressLogOutput();
-        exit( RunTestCase( tc_array[nextTestCase] ) );
+        exit(RunTestCase(tc_array[nextTestCase]));
       }
       else if(pid == -1)
       {
@@ -255,20 +255,20 @@ int32_t RunAllInParallel(  const char* processName, ::testcase tc_array[], bool 
 
     // Wait for the next child to finish
 
-    int32_t status=0;
+    int32_t status   = 0;
     int32_t childPid = waitpid(-1, &status, 0);
-    if( childPid == -1 )
+    if(childPid == -1)
     {
       perror("waitpid");
       exit(EXIT_STATUS_WAITPID_FAILED);
     }
 
-    if( WIFEXITED(status) )
+    if(WIFEXITED(status))
     {
-      if( childPid > 0 )
+      if(childPid > 0)
       {
         int32_t testResult = WEXITSTATUS(status);
-        if( testResult )
+        if(testResult)
         {
           printf("Test case %s failed: %d\n", children[childPid].testCaseName, testResult);
           failedTestCases.push_back(children[childPid].testCase);
@@ -282,14 +282,14 @@ int32_t RunAllInParallel(  const char* processName, ::testcase tc_array[], bool 
       }
     }
 
-    else if( WIFSIGNALED(status) || WIFSTOPPED(status))
+    else if(WIFSIGNALED(status) || WIFSTOPPED(status))
     {
-      status = WIFSIGNALED(status)?WTERMSIG(status):WSTOPSIG(status);
+      status = WIFSIGNALED(status) ? WTERMSIG(status) : WSTOPSIG(status);
 
-      if( childPid > 0 )
+      if(childPid > 0)
       {
         RunningTestCases::iterator iter = children.find(childPid);
-        if( iter != children.end() )
+        if(iter != children.end())
         {
           printf("Test case %s exited with signal %s\n", iter->second.testCaseName, strsignal(status));
           failedTestCases.push_back(iter->second.testCase);
@@ -305,38 +305,36 @@ int32_t RunAllInParallel(  const char* processName, ::testcase tc_array[], bool 
     }
   }
 
-  OutputStatistics( processName, numPasses, numFailures );
+  OutputStatistics(processName, numPasses, numFailures);
 
-  if( reRunFailed )
+  if(reRunFailed)
   {
-    for( uint32_t i=0; i<failedTestCases.size(); i++)
+    for(uint32_t i = 0; i < failedTestCases.size(); i++)
     {
-      char* testCaseStrapline;
-      int32_t numChars = asprintf(&testCaseStrapline, "Test case %s", tc_array[failedTestCases[i]].name );
+      char*   testCaseStrapline;
+      int32_t numChars = asprintf(&testCaseStrapline, "Test case %s", tc_array[failedTestCases[i]].name);
       printf("\n%s\n", testCaseStrapline);
-      for(int32_t j=0; j<numChars; j++)
+      for(int32_t j = 0; j < numChars; j++)
       {
         printf("=");
       }
       printf("\n");
-      RunTestCaseInChildProcess( tc_array[failedTestCases[i] ], false );
+      RunTestCaseInChildProcess(tc_array[failedTestCases[i]], false);
     }
   }
 
   return numFailures;
 }
 
-
-
 int32_t FindAndRunTestCase(::testcase tc_array[], const char* testCaseName)
 {
   int32_t result = EXIT_STATUS_TESTCASE_NOT_FOUND;
 
-  for( int32_t i = 0; tc_array[i].name; i++ )
+  for(int32_t i = 0; tc_array[i].name; i++)
   {
-    if( !strcmp(testCaseName, tc_array[i].name) )
+    if(!strcmp(testCaseName, tc_array[i].name))
     {
-      return RunTestCase( tc_array[i] );
+      return RunTestCase(tc_array[i]);
     }
   }
 
@@ -346,12 +344,16 @@ int32_t FindAndRunTestCase(::testcase tc_array[], const char* testCaseName)
 
 void Usage(const char* program)
 {
-  printf("Usage: \n"
-         "   %s <testcase name>\t\t Execute a test case\n"
-         "   %s \t\t Execute all test cases in parallel\n"
-         "   %s -r\t\t Execute all test cases in parallel, rerunning failed test cases\n"
-         "   %s -s\t\t Execute all test cases serially\n",
-         program, program, program, program);
+  printf(
+    "Usage: \n"
+    "   %s <testcase name>\t\t Execute a test case\n"
+    "   %s \t\t Execute all test cases in parallel\n"
+    "   %s -r\t\t Execute all test cases in parallel, rerunning failed test cases\n"
+    "   %s -s\t\t Execute all test cases serially\n",
+    program,
+    program,
+    program,
+    program);
 }
 
-} // namespace
+} // namespace TestHarness

@@ -24,7 +24,6 @@
 
 namespace Dali
 {
-
 /**
  * OwnerContainer is a vector which own heap-allocated objects.
  * Unlike vector this will call delete on the stored pointers during destruction.
@@ -38,20 +37,20 @@ namespace Dali
  *
  * @endcode
  */
-template< class T >
-class OwnerContainer : public Dali::Vector< T >
+template<class T>
+class OwnerContainer : public Dali::Vector<T>
 {
 public:
-
-  typedef typename Dali::Vector< T >::SizeType SizeType;
-  typedef typename Vector< T >::Iterator Iterator;
-  typedef typename Vector< T >::ConstIterator ConstIterator;
+  using SizeType      = typename Dali::Vector<T>::SizeType;
+  using Iterator      = typename Vector<T>::Iterator;
+  using ConstIterator = typename Vector<T>::ConstIterator;
 
   /**
    * Create a pointer-container.
    */
   OwnerContainer()
-  { }
+  {
+  }
 
   /**
    * Non-virtual destructor; OwnerContainer<T> is not suitable as base class.
@@ -63,10 +62,10 @@ public:
   }
 
   // Not copyable or movable
-  OwnerContainer( const OwnerContainer& ) = delete; ///< Deleted copy constructor
-  OwnerContainer( OwnerContainer&& ) = delete; ///< Deleted move constructor
-  OwnerContainer& operator=( const OwnerContainer& ) = delete; ///< Deleted copy assignment operator
-  OwnerContainer& operator=( OwnerContainer&& ) = delete; ///< Deleted move assignment operator
+  OwnerContainer(const OwnerContainer&) = delete;            ///< Deleted copy constructor
+  OwnerContainer(OwnerContainer&&)      = delete;            ///< Deleted move constructor
+  OwnerContainer& operator=(const OwnerContainer&) = delete; ///< Deleted copy assignment operator
+  OwnerContainer& operator=(OwnerContainer&&) = delete;      ///< Deleted move assignment operator
 
   /**
    * Test whether the container is empty.
@@ -82,27 +81,27 @@ public:
    * @param[in] position A dereferencable iterator to an element in mContainer.
    * @return iterator pointing to next element
    */
-  Iterator Erase( Iterator position )
+  Iterator Erase(Iterator position)
   {
-    Delete (*position);
-    return Vector< T >::Erase( position );
+    Delete(*position);
+    return Vector<T>::Erase(position);
   }
 
   /**
    * Erase an object from OwnerContainer
    * @param object to remove
    */
-  inline void EraseObject( T object )
+  inline void EraseObject(T object)
   {
-    DALI_ASSERT_DEBUG( object && "NULL object not allowed" );
+    DALI_ASSERT_DEBUG(object && "NULL object not allowed");
 
-    Iterator iter = Vector< T >::Begin();
-    const ConstIterator endIter = Vector< T >::End();
-    for ( ; iter != endIter; ++iter )
+    Iterator            iter    = Vector<T>::Begin();
+    const ConstIterator endIter = Vector<T>::End();
+    for(; iter != endIter; ++iter)
     {
-      if ( *iter == object )
+      if(*iter == object)
       {
-        Erase( iter );
+        Erase(iter);
         return;
       }
     }
@@ -114,10 +113,10 @@ public:
    * @post iterators are invalidated by this method.
    * @return pointer to the released item
    */
-  T Release( Iterator position )
+  T Release(Iterator position)
   {
     T pointer = *position;
-    Vector< T >::Erase( position );
+    Vector<T>::Erase(position);
     return pointer;
   }
 
@@ -126,30 +125,30 @@ public:
    */
   void Clear()
   {
-    ConstIterator end = Vector< T >::End();
-    for( Iterator iter = Vector< T >::Begin(); iter != end; ++iter )
+    ConstIterator end = Vector<T>::End();
+    for(Iterator iter = Vector<T>::Begin(); iter != end; ++iter)
     {
-      Delete (*iter);
+      Delete(*iter);
     }
-    Vector< T >::Clear();
+    Vector<T>::Clear();
   }
 
   /**
    * Resizes the container to hold specific amount of elements
    * @param size to resize to
    */
-  void Resize( SizeType size )
+  void Resize(SizeType size)
   {
-    if( size < VectorBase::Count() )
+    if(size < VectorBase::Count())
     {
       // OwnerContainer owns these heap-allocated objects
-      ConstIterator end = Vector< T >::End();
-      for( Iterator iter = Vector< T >::Begin() + size; iter != end; ++iter )
+      ConstIterator end = Vector<T>::End();
+      for(Iterator iter = Vector<T>::Begin() + size; iter != end; ++iter)
       {
-        Delete (*iter);
+        Delete(*iter);
       }
     }
-    Vector< T >::Resize( size );
+    Vector<T>::Resize(size);
   }
 
   /**
@@ -157,47 +156,44 @@ public:
    * without deleting them. It will keep the original items here as well.
    * @param[in] source where to move elements from to this OwnerContainer
    */
-  void MoveFrom( OwnerContainer& source )
+  void MoveFrom(OwnerContainer& source)
   {
-    typename Vector< T >::SizeType sourceCount = source.Count();
+    typename Vector<T>::SizeType sourceCount = source.Count();
     // if source is empty, nothing to move
-    if( sourceCount > 0u )
+    if(sourceCount > 0u)
     {
       // Optimisation for the case that this is empty
-      if( IsEmpty() )
+      if(IsEmpty())
       {
-        VectorBase::Swap( source );
+        VectorBase::Swap(source);
       }
       else
       {
         // make space for new items
-        Vector< T >::Reserve( VectorBase::Count() + sourceCount );
-        Iterator iter = source.Begin();
-        ConstIterator end = source.End();
-        for( ; iter != end; ++iter )
+        Vector<T>::Reserve(VectorBase::Count() + sourceCount);
+        Iterator      iter = source.Begin();
+        ConstIterator end  = source.End();
+        for(; iter != end; ++iter)
         {
           T pointer = *iter;
-          Vector< T >::PushBack( pointer );
+          Vector<T>::PushBack(pointer);
         }
         // cannot call Clear on OwnerContainer as that deletes the elements
-        source.Vector< T >::Clear();
+        source.Vector<T>::Clear();
       }
     }
   }
 
 private:
-
   /**
    * @brief delete the contents of the pointer
    * Function provided to allow classes to provide a custom destructor through template specialisation
    * @param pointer to the object
    */
-  void Delete( T pointer )
+  void Delete(T pointer)
   {
     delete pointer;
   }
-
-
 };
 
 } // namespace Dali

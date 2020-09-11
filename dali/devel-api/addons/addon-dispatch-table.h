@@ -18,11 +18,14 @@
  *
  */
 
+#include <string>
+#include <algorithm>
+#include <dali/public-api/common/vector-wrapper.h>
+
 namespace Dali
 {
 namespace AddOns
 {
-
 /**
  * DispatchTable contains essential function pointers
  * needed to register the AddOn with AddOnManager.
@@ -42,25 +45,25 @@ struct DispatchTable
      * @return Reference to self
      */
     template<class T>
-    Entry &operator=(T funcPtr)
+    Entry& operator=(T funcPtr)
     {
-      functionPtr = reinterpret_cast<void *>( funcPtr );
-      if (index < 0)
+      functionPtr = reinterpret_cast<void*>(funcPtr);
+      if(index < 0)
       {
         index = int32_t(table->entries.size());
         table->entries.emplace_back(*this);
       }
       else
       {
-        table->entries[index].functionPtr = reinterpret_cast<void *>( funcPtr );
+        table->entries[index].functionPtr = reinterpret_cast<void*>(funcPtr);
       }
       return *this;
     }
 
-    std::string    functionName{};        ///< Name of function
-    void*          functionPtr{nullptr};  ///< Function pointer
-    DispatchTable* table{nullptr};        ///< DispatchTable associated with entry
-    int32_t        index = -1;            ///< Index within the dispatch table
+    std::string    functionName{};       ///< Name of function
+    void*          functionPtr{nullptr}; ///< Function pointer
+    DispatchTable* table{nullptr};       ///< DispatchTable associated with entry
+    int32_t        index = -1;           ///< Index within the dispatch table
   };
 
   /**
@@ -68,17 +71,17 @@ struct DispatchTable
    * @param[in] functionName name of function
    * @return Returns Entry object
    */
-  Entry operator[](const char *functionName)
+  Entry operator[](const char* functionName)
   {
-    auto iter = std::find_if(entries.begin(), entries.end(), [functionName](Entry &entry)
-    {
-      if (entry.functionName == functionName)
+    auto iter = std::find_if(entries.begin(), entries.end(), [functionName](Entry& entry) {
+      if(entry.functionName == functionName)
       {
         return true;
       }
       return false;
     });
-    if (iter == entries.end())
+
+    if(iter == entries.end())
     {
       Entry retval;
       retval.table        = this;
@@ -111,25 +114,24 @@ struct DispatchTable
    * @param[in] funcName Name of function
    * @return valid pointer or nullptr if function not found
    */
-  FunctionPointer Find(const char *funcName)
+  FunctionPointer Find(const char* funcName)
   {
-    if (entries.empty())
+    if(entries.empty())
     {
       return nullptr;
     }
 
-    auto iter = std::find_if(entries.begin(), entries.end(), [funcName, entries = &this->entries](Entry &entry)
-    {
+    auto iter = std::find_if(entries.begin(), entries.end(), [funcName, entries = &this->entries](Entry& entry) {
       return (entry.functionName == funcName);
     });
-    if (iter != entries.end())
+    if(iter != entries.end())
     {
       return iter->functionPtr;
     }
     return nullptr;
   }
 
-  std::vector <Entry> entries;
+  std::vector<Entry> entries;
 };
 
 } // namespace AddOns

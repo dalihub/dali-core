@@ -51,7 +51,7 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~AnimationPlaylist();
+  ~AnimationPlaylist() override;
 
   /**
    * Called when an animation is constructed.
@@ -114,7 +114,7 @@ private: // from CompleteNotificationInterface
   /**
    * @copydoc CompleteNotificationInterface::NotifyCompleted()
    */
-  virtual void NotifyCompleted();
+  void NotifyCompleted() override;
 
 private:
 

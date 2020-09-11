@@ -2,7 +2,7 @@
 #define DALI_GESTURE_DETECTOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,6 @@ class Actor;
 class DALI_CORE_API GestureDetector : public Handle
 {
 public: // Creation & Destruction
-
   /**
    * @brief Creates an uninitialized GestureDetector.
    *
@@ -70,7 +69,7 @@ public: // Creation & Destruction
    * @param[in] handle Handle to an object
    * @return Handle to a GestureDetector object or an uninitialized handle
    */
-  static GestureDetector DownCast( BaseHandle handle );
+  static GestureDetector DownCast(BaseHandle handle);
 
   /**
    * @brief Dali::GestureDetector is intended as a base class.
@@ -98,7 +97,6 @@ public: // Creation & Destruction
   GestureDetector& operator=(const GestureDetector& rhs);
 
 public: // Actor related
-
   /**
    * @brief Attaches an actor to the gesture.
    *
@@ -150,7 +148,6 @@ public: // Actor related
   Actor GetAttachedActor(size_t index) const;
 
 protected:
-
   /// @cond internal
   /**
    * @brief This constructor is used by New() methods of derived classes (For example, PanGestureDetector::New()).

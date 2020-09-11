@@ -47,9 +47,9 @@ RenderItem::RenderItem()
   mModelViewMatrix( false ),
   mColor( Vector4::ZERO ),
   mSize(),
-  mRenderer( NULL ),
-  mNode( NULL ),
-  mTextureSet( NULL ),
+  mRenderer( nullptr ),
+  mNode( nullptr ),
+  mTextureSet( nullptr ),
   mDepthIndex( 0 ),
   mIsOpaque( true ),
   mIsUpdated( false )

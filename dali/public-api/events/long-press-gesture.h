@@ -24,7 +24,6 @@
 
 namespace Dali
 {
-
 namespace Internal DALI_INTERNAL
 {
 class LongPressGesture;
@@ -49,7 +48,6 @@ class LongPressGesture;
 class DALI_CORE_API LongPressGesture : public Gesture
 {
 public:
-
   /**
    * @brief Creates an uninitialized LongPressGesture handle.
    *
@@ -63,14 +61,14 @@ public:
    * @SINCE_1_9.28
    * @param[in] rhs A reference to the copied handle
    */
-  LongPressGesture( const LongPressGesture& rhs );
+  LongPressGesture(const LongPressGesture& rhs);
 
   /**
    * @brief Move constructor.
    * @SINCE_1_9.28
    * @param[in] rhs A reference to the handle to move
    */
-  LongPressGesture( LongPressGesture&& rhs );
+  LongPressGesture(LongPressGesture&& rhs);
 
   /**
    * @brief Assignment operator.
@@ -78,7 +76,7 @@ public:
    * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
-  LongPressGesture& operator=( const LongPressGesture& rhs );
+  LongPressGesture& operator=(const LongPressGesture& rhs);
 
   /**
    * @brief Move assignment operator.
@@ -86,7 +84,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  LongPressGesture& operator=( LongPressGesture&& rhs );
+  LongPressGesture& operator=(LongPressGesture&& rhs);
 
   /**
    * @brief Non virtual destructor.
@@ -122,7 +120,6 @@ public:
   const Vector2& GetLocalPoint() const;
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief This constructor is used internally to Create an initialized LongPressGesture handle.
@@ -130,9 +127,8 @@ public: // Not intended for application developers
    * @param[in] longPressGesture A pointer to a newly allocated Dali resource
    * @SINCE_1_9.28
    */
-  explicit DALI_INTERNAL LongPressGesture( Internal::LongPressGesture* longPressGesture );
+  explicit DALI_INTERNAL LongPressGesture(Internal::LongPressGesture* longPressGesture);
   /// @endcond
-
 };
 
 /**

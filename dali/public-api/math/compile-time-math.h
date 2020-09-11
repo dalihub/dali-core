@@ -2,7 +2,7 @@
 #define DALI_COMPILE_TIME_MATH_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,10 +41,13 @@ namespace Dali
  * @note Values need to be compile time constants.
  * Usage: <code>Power< 10, 2 >::value; // value=100</code>
  */
-template< size_t mantissa, size_t exponent >
+template<size_t mantissa, size_t exponent>
 struct Power
 {
-  enum { value = mantissa * Power< mantissa, exponent - 1 >::value };
+  enum
+  {
+    value = mantissa * Power<mantissa, exponent - 1>::value
+  };
 };
 
 /**
@@ -54,10 +57,13 @@ struct Power
  * @SINCE_1_0.0
  * @tparam mantissa to raise to exponent
  */
-template< size_t mantissa >
-struct Power< mantissa, 1 >
+template<size_t mantissa>
+struct Power<mantissa, 1>
 {
-  enum { value = mantissa };
+  enum
+  {
+    value = mantissa
+  };
 };
 
 /**
@@ -67,10 +73,13 @@ struct Power< mantissa, 1 >
  * @SINCE_1_0.0
  * @tparam mantissa to raise to exponent
  */
-template< size_t mantissa >
-struct Power< mantissa, 0 >
+template<size_t mantissa>
+struct Power<mantissa, 0>
 {
-  enum { value = 1 };
+  enum
+  {
+    value = 1
+  };
 };
 
 /**
@@ -82,10 +91,13 @@ struct Power< mantissa, 0 >
  * @note Values need to be compile time constants.
  * Usage: <code>Log< 100, 10 >::value; value equals 2</code>
  */
-template< size_t number, size_t base = 2 >
+template<size_t number, size_t base = 2>
 struct Log
 {
-  enum { value = 1 + Log< number / base, base >::value };
+  enum
+  {
+    value = 1 + Log<number / base, base>::value
+  };
 };
 
 /**
@@ -95,10 +107,13 @@ struct Log
  * @SINCE_1_0.0
  * @tparam base logarithm to calculate
  */
-template< size_t base >
-struct Log< 1, base >
+template<size_t base>
+struct Log<1, base>
 {
-  enum { value = 0 };
+  enum
+  {
+    value = 0
+  };
 };
 
 /**
@@ -108,12 +123,14 @@ struct Log< 1, base >
  * @SINCE_1_0.0
  * @tparam base logarithm to calculate
  */
-template< size_t base >
-struct Log< 0, base >
+template<size_t base>
+struct Log<0, base>
 {
-  enum { value = 0 };
+  enum
+  {
+    value = 0
+  };
 };
-
 
 /**
  * @brief Compiles time template to calculate the machine epsilon for a given floating point number.
@@ -123,15 +140,15 @@ struct Log< 0, base >
  * @note Value needs to be compile time constant.
  * Usage: <code>Epsilon<1000>::value; value equals 0.000119209</code>
  */
-template< size_t N >
+template<size_t N>
 struct Epsilon
 {
   // take log10 of the number to get to the nearest power of 10 number and divide that by 10
   // template recursion will take care of the rest
 #ifdef _CPP11
-  static constexpr float value = 10.0f * Epsilon< Power< 10, Log< N, 10 >::value >::value / 10 >::value;
+  static constexpr float value = 10.0f * Epsilon<Power<10, Log<N, 10>::value>::value / 10>::value;
 #else
-  static const float value = 10.0f * Epsilon< Power< 10, Log< N, 10 >::value >::value / 10 >::value;
+  static const float value = 10.0f * Epsilon<Power<10, Log<N, 10>::value>::value / 10>::value;
 #endif
 };
 
@@ -142,7 +159,7 @@ struct Epsilon
  * @SINCE_1_0.0
  */
 template<>
-struct Epsilon< 1 >
+struct Epsilon<1>
 {
 #ifdef _CPP11
   static constexpr float value = FLT_EPSILON;
@@ -158,7 +175,7 @@ struct Epsilon< 1 >
  * @SINCE_1_0.0
  */
 template<>
-struct Epsilon< 0 >
+struct Epsilon<0>
 {
 #ifdef _CPP11
   static constexpr float value = FLT_MIN;

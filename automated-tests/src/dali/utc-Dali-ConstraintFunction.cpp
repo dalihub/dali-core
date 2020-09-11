@@ -15,11 +15,11 @@
  *
  */
 
-#include <iostream>
-
-#include <stdlib.h>
-#include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
+#include <dali/public-api/dali-core.h>
+#include <stdlib.h>
+
+#include <iostream>
 
 using namespace Dali;
 
@@ -40,18 +40,21 @@ namespace
 {
 bool gFunctionCalled = false;
 
-template< typename T >
-void TestCallbackFunction( T& /* current*/ , const PropertyInputContainer& /* inputs */ )
+template<typename T>
+void TestCallbackFunction(T& /* current*/, const PropertyInputContainer& /* inputs */)
 {
   gFunctionCalled = true;
 }
 
-template< typename T >
+template<typename T>
 struct TestCallbackFunctor
 {
-  TestCallbackFunctor( bool& functorCalled ) : mFunctorCalled( functorCalled ) { }
+  TestCallbackFunctor(bool& functorCalled)
+  : mFunctorCalled(functorCalled)
+  {
+  }
 
-  void operator()( T& /* current*/ , const PropertyInputContainer& /* inputs */ )
+  void operator()(T& /* current*/, const PropertyInputContainer& /* inputs */)
   {
     mFunctorCalled = true;
   }
@@ -59,12 +62,15 @@ struct TestCallbackFunctor
   bool& mFunctorCalled;
 };
 
-template< typename T >
+template<typename T>
 struct TestFunctorMethod
 {
-  TestFunctorMethod( bool& functorCalled ) : mFunctorCalled( functorCalled ) { }
+  TestFunctorMethod(bool& functorCalled)
+  : mFunctorCalled(functorCalled)
+  {
+  }
 
-  void Method( T& /* current*/ , const PropertyInputContainer& /* inputs */ )
+  void Method(T& /* current*/, const PropertyInputContainer& /* inputs */)
   {
     mFunctorCalled = true;
   }
@@ -80,32 +86,32 @@ struct TestFunctorMethod
 ///////////////////////////////////////////////////////////////////////////////
 namespace
 {
-template< typename T >
+template<typename T>
 void TestFunctionConstructor()
 {
   gFunctionCalled = false;
-  Constraint::Function< T > function( &TestCallbackFunction< T > );
-  T current;
-  PropertyInputContainer inputs;
+  Constraint::Function<T> function(&TestCallbackFunction<T>);
+  T                       current;
+  PropertyInputContainer  inputs;
 
-  DALI_TEST_EQUALS( gFunctionCalled, false, TEST_LOCATION );
-  CallbackBase::Execute< T&, const PropertyInputContainer& >( function, current, inputs );
-  DALI_TEST_EQUALS( gFunctionCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS(gFunctionCalled, false, TEST_LOCATION);
+  CallbackBase::Execute<T&, const PropertyInputContainer&>(function, current, inputs);
+  DALI_TEST_EQUALS(gFunctionCalled, true, TEST_LOCATION);
 }
 } // unnamed namespace
 
 int UtcDaliConstraintFunctionWithFunction(void)
 {
-  TestFunctionConstructor< bool >();
-  TestFunctionConstructor< int >();
-  TestFunctionConstructor< unsigned int >();
-  TestFunctionConstructor< float >();
-  TestFunctionConstructor< Vector2 >();
-  TestFunctionConstructor< Vector3 >();
-  TestFunctionConstructor< Vector4 >();
-  TestFunctionConstructor< Quaternion >();
-  TestFunctionConstructor< Matrix >();
-  TestFunctionConstructor< Matrix3 >();
+  TestFunctionConstructor<bool>();
+  TestFunctionConstructor<int>();
+  TestFunctionConstructor<unsigned int>();
+  TestFunctionConstructor<float>();
+  TestFunctionConstructor<Vector2>();
+  TestFunctionConstructor<Vector3>();
+  TestFunctionConstructor<Vector4>();
+  TestFunctionConstructor<Quaternion>();
+  TestFunctionConstructor<Matrix>();
+  TestFunctionConstructor<Matrix3>();
   END_TEST;
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -115,33 +121,33 @@ int UtcDaliConstraintFunctionWithFunction(void)
 ///////////////////////////////////////////////////////////////////////////////
 namespace
 {
-template< typename T >
+template<typename T>
 void TestFunctorConstructor()
 {
-  bool called = false;
-  TestCallbackFunctor< T > functor( called );
-  Constraint::Function< T > callback( functor );
-  T current;
-  PropertyInputContainer inputs;
+  bool                    called = false;
+  TestCallbackFunctor<T>  functor(called);
+  Constraint::Function<T> callback(functor);
+  T                       current;
+  PropertyInputContainer  inputs;
 
-  DALI_TEST_EQUALS( called, false, TEST_LOCATION );
-  CallbackBase::Execute< T&, const PropertyInputContainer& >( callback, current, inputs );
-  DALI_TEST_EQUALS( called, true, TEST_LOCATION );
+  DALI_TEST_EQUALS(called, false, TEST_LOCATION);
+  CallbackBase::Execute<T&, const PropertyInputContainer&>(callback, current, inputs);
+  DALI_TEST_EQUALS(called, true, TEST_LOCATION);
 }
 } // unnamed namespace
 
 int UtcDaliConstraintFunctionWithFunctor(void)
 {
-  TestFunctorConstructor< bool >();
-  TestFunctorConstructor< int >();
-  TestFunctorConstructor< unsigned int >();
-  TestFunctorConstructor< float >();
-  TestFunctorConstructor< Vector2 >();
-  TestFunctorConstructor< Vector3 >();
-  TestFunctorConstructor< Vector4 >();
-  TestFunctorConstructor< Quaternion >();
-  TestFunctorConstructor< Matrix >();
-  TestFunctorConstructor< Matrix3 >();
+  TestFunctorConstructor<bool>();
+  TestFunctorConstructor<int>();
+  TestFunctorConstructor<unsigned int>();
+  TestFunctorConstructor<float>();
+  TestFunctorConstructor<Vector2>();
+  TestFunctorConstructor<Vector3>();
+  TestFunctorConstructor<Vector4>();
+  TestFunctorConstructor<Quaternion>();
+  TestFunctorConstructor<Matrix>();
+  TestFunctorConstructor<Matrix3>();
   END_TEST;
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -151,33 +157,33 @@ int UtcDaliConstraintFunctionWithFunctor(void)
 ///////////////////////////////////////////////////////////////////////////////
 namespace
 {
-template< typename T >
+template<typename T>
 void TestFunctorMethodConstructor()
 {
-  bool called = false;
-  TestFunctorMethod< T > functor( called );
-  Constraint::Function< T > callback( functor, &TestFunctorMethod< T >::Method );
-  T current;
-  PropertyInputContainer inputs;
+  bool                    called = false;
+  TestFunctorMethod<T>    functor(called);
+  Constraint::Function<T> callback(functor, &TestFunctorMethod<T>::Method);
+  T                       current;
+  PropertyInputContainer  inputs;
 
-  DALI_TEST_EQUALS( called, false, TEST_LOCATION );
-  CallbackBase::Execute< T&, const PropertyInputContainer& >( callback, current, inputs );
-  DALI_TEST_EQUALS( called, true, TEST_LOCATION );
+  DALI_TEST_EQUALS(called, false, TEST_LOCATION);
+  CallbackBase::Execute<T&, const PropertyInputContainer&>(callback, current, inputs);
+  DALI_TEST_EQUALS(called, true, TEST_LOCATION);
 }
 } // unnamed namespace
 
 int UtcDaliConstraintFunctionWithMethodFunctor(void)
 {
-  TestFunctorMethodConstructor< bool >();
-  TestFunctorMethodConstructor< int >();
-  TestFunctorMethodConstructor< unsigned int >();
-  TestFunctorMethodConstructor< float >();
-  TestFunctorMethodConstructor< Vector2 >();
-  TestFunctorMethodConstructor< Vector3 >();
-  TestFunctorMethodConstructor< Vector4 >();
-  TestFunctorMethodConstructor< Quaternion >();
-  TestFunctorMethodConstructor< Matrix >();
-  TestFunctorMethodConstructor< Matrix3 >();
+  TestFunctorMethodConstructor<bool>();
+  TestFunctorMethodConstructor<int>();
+  TestFunctorMethodConstructor<unsigned int>();
+  TestFunctorMethodConstructor<float>();
+  TestFunctorMethodConstructor<Vector2>();
+  TestFunctorMethodConstructor<Vector3>();
+  TestFunctorMethodConstructor<Vector4>();
+  TestFunctorMethodConstructor<Quaternion>();
+  TestFunctorMethodConstructor<Matrix>();
+  TestFunctorMethodConstructor<Matrix3>();
   END_TEST;
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -187,53 +193,53 @@ int UtcDaliConstraintFunctionWithMethodFunctor(void)
 ///////////////////////////////////////////////////////////////////////////////
 namespace
 {
-template< typename T >
+template<typename T>
 void TestFunctionClone()
 {
   gFunctionCalled = false;
-  Constraint::Function< T > callback( &TestCallbackFunction< T > );
-  CallbackBase* clone = callback.Clone();
+  Constraint::Function<T> callback(&TestCallbackFunction<T>);
+  CallbackBase*           clone = callback.Clone();
 
-  T current;
+  T                      current;
   PropertyInputContainer inputs;
 
-  DALI_TEST_EQUALS( gFunctionCalled, false, TEST_LOCATION );
-  CallbackBase::Execute< T&, const PropertyInputContainer& >( *clone, current, inputs );
-  DALI_TEST_EQUALS( gFunctionCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS(gFunctionCalled, false, TEST_LOCATION);
+  CallbackBase::Execute<T&, const PropertyInputContainer&>(*clone, current, inputs);
+  DALI_TEST_EQUALS(gFunctionCalled, true, TEST_LOCATION);
   delete clone;
 }
 
-template< typename T >
+template<typename T>
 void TestFunctorClone()
 {
-  bool called = false;
-  TestCallbackFunctor< T > functor( called );
-  Constraint::Function< T > callback( functor );
-  CallbackBase* clone = callback.Clone();
+  bool                    called = false;
+  TestCallbackFunctor<T>  functor(called);
+  Constraint::Function<T> callback(functor);
+  CallbackBase*           clone = callback.Clone();
 
-  T current;
+  T                      current;
   PropertyInputContainer inputs;
 
-  DALI_TEST_EQUALS( called, false, TEST_LOCATION );
-  CallbackBase::Execute< T&, const PropertyInputContainer& >( *clone, current, inputs );
-  DALI_TEST_EQUALS( called, true, TEST_LOCATION );
+  DALI_TEST_EQUALS(called, false, TEST_LOCATION);
+  CallbackBase::Execute<T&, const PropertyInputContainer&>(*clone, current, inputs);
+  DALI_TEST_EQUALS(called, true, TEST_LOCATION);
   delete clone;
 }
 
-template< typename T >
+template<typename T>
 void TestMethodFunctorClone()
 {
-  bool called = false;
-  TestFunctorMethod< T > functor( called );
-  Constraint::Function< T > callback( functor, &TestFunctorMethod< T >::Method );
-  CallbackBase* clone = callback.Clone();
+  bool                    called = false;
+  TestFunctorMethod<T>    functor(called);
+  Constraint::Function<T> callback(functor, &TestFunctorMethod<T>::Method);
+  CallbackBase*           clone = callback.Clone();
 
-  T current;
+  T                      current;
   PropertyInputContainer inputs;
 
-  DALI_TEST_EQUALS( called, false, TEST_LOCATION );
-  CallbackBase::Execute< T&, const PropertyInputContainer& >( *clone, current, inputs );
-  DALI_TEST_EQUALS( called, true, TEST_LOCATION );
+  DALI_TEST_EQUALS(called, false, TEST_LOCATION);
+  CallbackBase::Execute<T&, const PropertyInputContainer&>(*clone, current, inputs);
+  DALI_TEST_EQUALS(called, true, TEST_LOCATION);
   delete clone;
 }
 
@@ -241,46 +247,46 @@ void TestMethodFunctorClone()
 
 int UtcDaliConstraintFunctionFunctionClone(void)
 {
-  TestFunctionClone< bool >();
-  TestFunctionClone< int >();
-  TestFunctionClone< unsigned int >();
-  TestFunctionClone< float >();
-  TestFunctionClone< Vector2 >();
-  TestFunctionClone< Vector3 >();
-  TestFunctionClone< Vector4 >();
-  TestFunctionClone< Quaternion >();
-  TestFunctionClone< Matrix >();
-  TestFunctionClone< Matrix3 >();
+  TestFunctionClone<bool>();
+  TestFunctionClone<int>();
+  TestFunctionClone<unsigned int>();
+  TestFunctionClone<float>();
+  TestFunctionClone<Vector2>();
+  TestFunctionClone<Vector3>();
+  TestFunctionClone<Vector4>();
+  TestFunctionClone<Quaternion>();
+  TestFunctionClone<Matrix>();
+  TestFunctionClone<Matrix3>();
   END_TEST;
 }
 
 int UtcDaliConstraintFunctionFunctorClone(void)
 {
-  TestFunctorClone< bool >();
-  TestFunctorClone< int >();
-  TestFunctorClone< unsigned int >();
-  TestFunctorClone< float >();
-  TestFunctorClone< Vector2 >();
-  TestFunctorClone< Vector3 >();
-  TestFunctorClone< Vector4 >();
-  TestFunctorClone< Quaternion >();
-  TestFunctorClone< Matrix >();
-  TestFunctorClone< Matrix3 >();
+  TestFunctorClone<bool>();
+  TestFunctorClone<int>();
+  TestFunctorClone<unsigned int>();
+  TestFunctorClone<float>();
+  TestFunctorClone<Vector2>();
+  TestFunctorClone<Vector3>();
+  TestFunctorClone<Vector4>();
+  TestFunctorClone<Quaternion>();
+  TestFunctorClone<Matrix>();
+  TestFunctorClone<Matrix3>();
   END_TEST;
 }
 
 int UtcDaliConstraintFunctionMethodFunctorClone(void)
 {
-  TestMethodFunctorClone< bool >();
-  TestMethodFunctorClone< int >();
-  TestMethodFunctorClone< unsigned int >();
-  TestMethodFunctorClone< float >();
-  TestMethodFunctorClone< Vector2 >();
-  TestMethodFunctorClone< Vector3 >();
-  TestMethodFunctorClone< Vector4 >();
-  TestMethodFunctorClone< Quaternion >();
-  TestMethodFunctorClone< Matrix >();
-  TestMethodFunctorClone< Matrix3 >();
+  TestMethodFunctorClone<bool>();
+  TestMethodFunctorClone<int>();
+  TestMethodFunctorClone<unsigned int>();
+  TestMethodFunctorClone<float>();
+  TestMethodFunctorClone<Vector2>();
+  TestMethodFunctorClone<Vector3>();
+  TestMethodFunctorClone<Vector4>();
+  TestMethodFunctorClone<Quaternion>();
+  TestMethodFunctorClone<Matrix>();
+  TestMethodFunctorClone<Matrix3>();
   END_TEST;
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -290,19 +296,19 @@ namespace
 {
 struct CountFunctor
 {
-  CountFunctor( int& count )
-  : mCount( count )
+  CountFunctor(int& count)
+  : mCount(count)
   {
     ++mCount;
   }
 
-  CountFunctor( const CountFunctor& other )
-  : mCount( other.mCount )
+  CountFunctor(const CountFunctor& other)
+  : mCount(other.mCount)
   {
     ++mCount;
   }
 
-  CountFunctor& operator=( const CountFunctor& other )
+  CountFunctor& operator=(const CountFunctor& other)
   {
     this->mCount = other.mCount;
     ++mCount;
@@ -314,7 +320,7 @@ struct CountFunctor
     --mCount;
   }
 
-  void operator()( bool& /* current*/ , const PropertyInputContainer& /* inputs */ )
+  void operator()(bool& /* current*/, const PropertyInputContainer& /* inputs */)
   {
   }
 
@@ -329,20 +335,20 @@ int UtcDaliConstraintFunctionEnsureMemoryCleanup(void)
   int count = 0;
 
   {
-    CountFunctor functor( count );
-    Constraint::Function< bool > callback1( functor );
-    Constraint::Function< bool > callback2( functor );
-    Constraint::Function< bool > callback3( functor );
-    Constraint::Function< bool > callback4( functor );
-    Constraint::Function< bool > callback5( functor );
-    Constraint::Function< bool > callback6( functor );
-    Constraint::Function< bool > callback7( functor );
-    Constraint::Function< bool > callback8( functor );
-    Constraint::Function< bool > callback9( functor );
-    DALI_TEST_EQUALS( count, 10, TEST_LOCATION );
+    CountFunctor               functor(count);
+    Constraint::Function<bool> callback1(functor);
+    Constraint::Function<bool> callback2(functor);
+    Constraint::Function<bool> callback3(functor);
+    Constraint::Function<bool> callback4(functor);
+    Constraint::Function<bool> callback5(functor);
+    Constraint::Function<bool> callback6(functor);
+    Constraint::Function<bool> callback7(functor);
+    Constraint::Function<bool> callback8(functor);
+    Constraint::Function<bool> callback9(functor);
+    DALI_TEST_EQUALS(count, 10, TEST_LOCATION);
   }
 
-  DALI_TEST_EQUALS( count, 0, TEST_LOCATION );
+  DALI_TEST_EQUALS(count, 0, TEST_LOCATION);
 
   END_TEST;
 }

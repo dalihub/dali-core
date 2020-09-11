@@ -2,7 +2,7 @@
 #define DALI_PATH_CONSTRAINER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,10 +28,9 @@
 
 namespace Dali
 {
-
 namespace Internal DALI_INTERNAL
 {
-  class PathConstrainer;
+class PathConstrainer;
 }
 /**
  * @brief
@@ -44,7 +43,6 @@ namespace Internal DALI_INTERNAL
 class DALI_CORE_API PathConstrainer : public Handle
 {
 public:
-
   /**
    * @brief An enumeration of properties belonging to the PathConstrainer class.
    */
@@ -52,9 +50,9 @@ public:
   {
     enum
     {
-      FORWARD   =  DEFAULT_OBJECT_PROPERTY_START_INDEX, ///< name "forward" type Vector3
-      POINTS,                                           ///< name "points" type Array of Vector3
-      CONTROL_POINTS                                    ///< name "controlPoints" type Array of Vector3
+      FORWARD = DEFAULT_OBJECT_PROPERTY_START_INDEX, ///< name "forward" type Vector3
+      POINTS,                                        ///< name "points" type Array of Vector3
+      CONTROL_POINTS                                 ///< name "controlPoints" type Array of Vector3
     };
   };
 
@@ -73,7 +71,7 @@ public:
    * @param[in] handle to An object
    * @return handle to a PathConstrainer object or an uninitialized handle
    */
-  static PathConstrainer DownCast( BaseHandle handle );
+  static PathConstrainer DownCast(BaseHandle handle);
 
   /**
    * @brief Create an uninitialized PathConstrainer handle.
@@ -113,14 +111,14 @@ public:
    * @param[in] range The range of values in the source property which will be mapped to [0,1]
    * @param[in] wrap Wrapping domain. Source property will be wrapped in the domain [wrap.x,wrap.y] before mapping to [0,1]
    */
-  void Apply( Dali::Property target, Dali::Property source, const Vector2& range, const Vector2& wrap = Vector2(-FLT_MAX, FLT_MAX) );
+  void Apply(Dali::Property target, Dali::Property source, const Vector2& range, const Vector2& wrap = Vector2(-FLT_MAX, FLT_MAX));
 
   /**
    * @brief Removes the path constraint in the target object
    *
    * @param[in] target A handle to an object constrained by the PathConstrainer
    */
-  void Remove( Dali::Handle& target );
+  void Remove(Dali::Handle& target);
 
 public: // Not intended for application developers
   /**

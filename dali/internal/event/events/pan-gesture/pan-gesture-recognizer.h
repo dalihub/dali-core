@@ -60,19 +60,19 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~PanGestureRecognizer();
+  ~PanGestureRecognizer() override;
 
 public:
 
   /**
    * @copydoc Dali::Internal::GestureDetector::SendEvent(const Integration::TouchEvent&)
    */
-  virtual void SendEvent(const Integration::TouchEvent& event);
+  void SendEvent(const Integration::TouchEvent& event) override;
 
   /**
    * @copydoc Dali::Internal::GestureDetector::Update(const Integration::GestureRequest&)
    */
-  virtual void Update(const GestureRequest& request);
+  void Update(const GestureRequest& request) override;
 
 private:
 

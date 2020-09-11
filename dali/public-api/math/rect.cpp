@@ -23,4 +23,3 @@ namespace Dali
 // Ensure Rect is maintained as a trivially copyable type
 static_assert(std::is_trivially_copyable<Rect<float>>::value);
 } // namespace Dali
-

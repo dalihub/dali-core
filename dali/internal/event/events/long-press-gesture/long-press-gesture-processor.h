@@ -54,7 +54,7 @@ public:
   /**
    * Non-virtual destructor; LongPressGestureProcessor is not a base class
    */
-  ~LongPressGestureProcessor();
+  ~LongPressGestureProcessor() override;
 
 public: // To be called by GestureEventProcessor
 
@@ -63,7 +63,7 @@ public: // To be called by GestureEventProcessor
    * @param[in] scene The scene the long press gesture event occurs in.
    * @param[in] longPressEvent The event that has occurred.
    */
-  void Process( Scene& scene, const LongPressGestureEvent& longPressEvent );
+  void Process( Scene& scene, const LongPressGestureEvent& longPressEvent ) override;
 
   /**
    * Adds a gesture detector to this gesture processor.
@@ -119,17 +119,17 @@ private:
   /**
    * @copydoc GestureProcessor::OnGesturedActorStageDisconnection()
    */
-  void OnGesturedActorStageDisconnection();
+  void OnGesturedActorStageDisconnection() override;
 
   /**
    * @copydoc GestureProcessor::CheckGestureDetector()
    */
-  bool CheckGestureDetector( GestureDetector* detector, Actor* actor );
+  bool CheckGestureDetector( GestureDetector* detector, Actor* actor ) override;
 
   /**
    * @copydoc GestureProcessor::EmitGestureSignal()
    */
-  void EmitGestureSignal( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates );
+  void EmitGestureSignal( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates ) override;
 
 private:
 

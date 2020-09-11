@@ -18,7 +18,7 @@
  *
  */
 
-#include <dali/public-api/actors/actor.h>
+#include <dali/public-api/actors/camera-actor.h>
 
 namespace Dali
 {
@@ -37,7 +37,7 @@ enum
 };
 
 } // Namespace Property
-} // Namesapce DevelCameraActor
+} // namespace DevelCameraActor
 } // Namespace Dali
 
 #endif // DALI_CAMERA_ACTOR_DEVEL_H

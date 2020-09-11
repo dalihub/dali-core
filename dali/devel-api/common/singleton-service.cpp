@@ -23,7 +23,6 @@
 
 namespace Dali
 {
-
 SingletonService::SingletonService()
 {
 }
@@ -37,23 +36,23 @@ SingletonService::~SingletonService()
 {
 }
 
-void SingletonService::Register( const std::type_info& info, BaseHandle singleton )
+void SingletonService::Register(const std::type_info& info, BaseHandle singleton)
 {
-  GetImplementation( *this ).Register( info, singleton );
+  GetImplementation(*this).Register(info, singleton);
 }
 
 void SingletonService::UnregisterAll()
 {
-  GetImplementation( *this ).UnregisterAll();
+  GetImplementation(*this).UnregisterAll();
 }
 
-BaseHandle SingletonService::GetSingleton( const std::type_info& info ) const
+BaseHandle SingletonService::GetSingleton(const std::type_info& info) const
 {
-  return GetImplementation( *this ).GetSingleton( info );
+  return GetImplementation(*this).GetSingleton(info);
 }
 
-SingletonService::SingletonService( Internal::ThreadLocalStorage* tls )
-: BaseHandle( tls )
+SingletonService::SingletonService(Internal::ThreadLocalStorage* tls)
+: BaseHandle(tls)
 {
 }
 

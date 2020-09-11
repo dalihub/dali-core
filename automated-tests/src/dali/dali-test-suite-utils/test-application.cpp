@@ -19,24 +19,23 @@
 
 namespace Dali
 {
-
 bool TestApplication::mLoggingEnabled = true;
 
-TestApplication::TestApplication( uint32_t surfaceWidth,
-                                  uint32_t surfaceHeight,
-                                  uint32_t  horizontalDpi,
-                                  uint32_t  verticalDpi,
-                                  bool initialize,
-                                  bool enablePartialUpdate )
-: mCore( NULL ),
-  mSurfaceWidth( surfaceWidth ),
-  mSurfaceHeight( surfaceHeight ),
-  mFrame( 0u ),
-  mDpi{ horizontalDpi, verticalDpi },
+TestApplication::TestApplication(uint32_t surfaceWidth,
+                                 uint32_t surfaceHeight,
+                                 uint32_t horizontalDpi,
+                                 uint32_t verticalDpi,
+                                 bool     initialize,
+                                 bool     enablePartialUpdate)
+: mCore(NULL),
+  mSurfaceWidth(surfaceWidth),
+  mSurfaceHeight(surfaceHeight),
+  mFrame(0u),
+  mDpi{horizontalDpi, verticalDpi},
   mLastVSyncTime(0u),
   mPartialUpdateEnabled(enablePartialUpdate)
 {
-  if( initialize )
+  if(initialize)
   {
     Initialize();
   }
@@ -54,15 +53,15 @@ void TestApplication::CreateCore()
   // We always need the first update!
   mStatus.keepUpdating = Integration::KeepUpdating::STAGE_KEEP_RENDERING;
 
-  mCore = Dali::Integration::Core::New( mRenderController,
-                                        mPlatformAbstraction,
-                                        mGlAbstraction,
-                                        mGlSyncAbstraction,
-                                        mGlContextHelperAbstraction,
-                                        Integration::RenderToFrameBuffer::FALSE,
-                                        Integration::DepthBufferAvailable::TRUE,
-                                        Integration::StencilBufferAvailable::TRUE,
-                                        mPartialUpdateEnabled ? Integration::PartialUpdateAvailable::TRUE : Integration::PartialUpdateAvailable::FALSE );
+  mCore = Dali::Integration::Core::New(mRenderController,
+                                       mPlatformAbstraction,
+                                       mGlAbstraction,
+                                       mGlSyncAbstraction,
+                                       mGlContextHelperAbstraction,
+                                       Integration::RenderToFrameBuffer::FALSE,
+                                       Integration::DepthBufferAvailable::TRUE,
+                                       Integration::StencilBufferAvailable::TRUE,
+                                       mPartialUpdateEnabled ? Integration::PartialUpdateAvailable::TRUE : Integration::PartialUpdateAvailable::FALSE);
 
   mCore->ContextCreated();
 
@@ -70,15 +69,15 @@ void TestApplication::CreateCore()
   Dali::Integration::Log::InstallLogFunction(logFunction);
 
   Dali::Integration::Trace::LogContextFunction logContextFunction(&TestApplication::LogContext);
-  Dali::Integration::Trace::InstallLogContextFunction( logContextFunction );
+  Dali::Integration::Trace::InstallLogContextFunction(logContextFunction);
 
-  Dali::Integration::Trace::LogContext( true, "Test" );
+  Dali::Integration::Trace::LogContext(true, "Test");
 }
 
 void TestApplication::CreateScene()
 {
-  mScene = Dali::Integration::Scene::New( Size( static_cast<float>( mSurfaceWidth ), static_cast<float>( mSurfaceHeight ) ) );
-  mScene.SetDpi( Vector2( static_cast<float>( mDpi.x ), static_cast<float>( mDpi.y ) ) );
+  mScene = Dali::Integration::Scene::New(Size(static_cast<float>(mSurfaceWidth), static_cast<float>(mSurfaceHeight)));
+  mScene.SetDpi(Vector2(static_cast<float>(mDpi.x), static_cast<float>(mDpi.y)));
 }
 
 void TestApplication::InitializeCore()
@@ -93,9 +92,9 @@ TestApplication::~TestApplication()
   delete mCore;
 }
 
-void TestApplication::LogContext( bool start, const char* tag )
+void TestApplication::LogContext(bool start, const char* tag)
 {
-  if( start )
+  if(start)
   {
     fprintf(stderr, "INFO: Trace Start: %s\n", tag);
   }
@@ -107,7 +106,7 @@ void TestApplication::LogContext( bool start, const char* tag )
 
 void TestApplication::LogMessage(Dali::Integration::Log::DebugPriority level, std::string& message)
 {
-  if( mLoggingEnabled )
+  if(mLoggingEnabled)
   {
     switch(level)
     {
@@ -168,37 +167,37 @@ void TestApplication::SendNotification()
   mCore->ProcessEvents();
 }
 
-void TestApplication::DoUpdate( uint32_t intervalMilliseconds, const char* location )
+void TestApplication::DoUpdate(uint32_t intervalMilliseconds, const char* location)
 {
-  if( GetUpdateStatus() == 0 &&
-      mRenderStatus.NeedsUpdate() == false &&
-      ! GetRenderController().WasCalled(TestRenderController::RequestUpdateFunc) )
+  if(GetUpdateStatus() == 0 &&
+     mRenderStatus.NeedsUpdate() == false &&
+     !GetRenderController().WasCalled(TestRenderController::RequestUpdateFunc))
   {
-    fprintf(stderr, "WARNING - Update not required :%s\n", location==NULL?"NULL":location);
+    fprintf(stderr, "WARNING - Update not required :%s\n", location == NULL ? "NULL" : location);
   }
 
-  uint32_t nextVSyncTime = mLastVSyncTime + intervalMilliseconds;
-  float elapsedSeconds = static_cast<float>( intervalMilliseconds ) * 0.001f;
+  uint32_t nextVSyncTime  = mLastVSyncTime + intervalMilliseconds;
+  float    elapsedSeconds = static_cast<float>(intervalMilliseconds) * 0.001f;
 
-  mCore->Update( elapsedSeconds, mLastVSyncTime, nextVSyncTime, mStatus, false, false );
+  mCore->Update(elapsedSeconds, mLastVSyncTime, nextVSyncTime, mStatus, false, false);
 
   GetRenderController().Initialize();
 
   mLastVSyncTime = nextVSyncTime;
 }
 
-bool TestApplication::Render( uint32_t intervalMilliseconds, const char* location )
+bool TestApplication::Render(uint32_t intervalMilliseconds, const char* location)
 {
-  DoUpdate( intervalMilliseconds, location );
+  DoUpdate(intervalMilliseconds, location);
 
   // Reset the status
-  mRenderStatus.SetNeedsUpdate( false );
-  mRenderStatus.SetNeedsPostRender( false );
+  mRenderStatus.SetNeedsUpdate(false);
+  mRenderStatus.SetNeedsPostRender(false);
 
-  mCore->PreRender( mRenderStatus, false /*do not force clear*/, false /*do not skip rendering*/ );
-  mCore->RenderScene( mRenderStatus, mScene, true /*render the off-screen buffers*/ );
-  mCore->RenderScene( mRenderStatus, mScene, false /*render the surface*/ );
-  mCore->PostRender( false /*do not skip rendering*/ );
+  mCore->PreRender(mRenderStatus, false /*do not force clear*/, false /*do not skip rendering*/);
+  mCore->RenderScene(mRenderStatus, mScene, true /*render the off-screen buffers*/);
+  mCore->RenderScene(mRenderStatus, mScene, false /*render the surface*/);
+  mCore->PostRender(false /*do not skip rendering*/);
 
   mFrame++;
 
@@ -209,7 +208,7 @@ bool TestApplication::PreRenderWithPartialUpdate(uint32_t intervalMilliseconds, 
 {
   DoUpdate(intervalMilliseconds, location);
 
-  mCore->PreRender(mRenderStatus, false /*do not force clear*/, false /*do not skip rendering*/ );
+  mCore->PreRender(mRenderStatus, false /*do not force clear*/, false /*do not skip rendering*/);
   mCore->PreRender(mScene, damagedRects);
 
   return mStatus.KeepUpdating() || mRenderStatus.NeedsUpdate();
@@ -231,9 +230,9 @@ uint32_t TestApplication::GetUpdateStatus()
   return mStatus.KeepUpdating();
 }
 
-bool TestApplication::UpdateOnly( uint32_t intervalMilliseconds  )
+bool TestApplication::UpdateOnly(uint32_t intervalMilliseconds)
 {
-  DoUpdate( intervalMilliseconds );
+  DoUpdate(intervalMilliseconds);
   return mStatus.KeepUpdating();
 }
 
@@ -247,13 +246,13 @@ bool TestApplication::GetRenderNeedsPostRender()
   return mRenderStatus.NeedsPostRender();
 }
 
-bool TestApplication::RenderOnly( )
+bool TestApplication::RenderOnly()
 {
   // Update Time values
-  mCore->PreRender( mRenderStatus, false /*do not force clear*/, false /*do not skip rendering*/ );
-  mCore->RenderScene( mRenderStatus, mScene, true /*render the off-screen buffers*/ );
-  mCore->RenderScene( mRenderStatus, mScene, false /*render the surface*/ );
-  mCore->PostRender( false /*do not skip rendering*/ );
+  mCore->PreRender(mRenderStatus, false /*do not force clear*/, false /*do not skip rendering*/);
+  mCore->RenderScene(mRenderStatus, mScene, true /*render the off-screen buffers*/);
+  mCore->RenderScene(mRenderStatus, mScene, false /*render the surface*/);
+  mCore->PostRender(false /*do not skip rendering*/);
 
   mFrame++;
 
@@ -267,11 +266,11 @@ void TestApplication::ResetContext()
   mCore->ContextCreated();
 }
 
-uint32_t TestApplication::Wait( uint32_t durationToWait )
+uint32_t TestApplication::Wait(uint32_t durationToWait)
 {
   int time = 0;
 
-  for(uint32_t i = 0; i <= ( durationToWait / RENDER_FRAME_INTERVAL); i++)
+  for(uint32_t i = 0; i <= (durationToWait / RENDER_FRAME_INTERVAL); i++)
   {
     SendNotification();
     Render(RENDER_FRAME_INTERVAL);
@@ -280,4 +279,4 @@ uint32_t TestApplication::Wait( uint32_t durationToWait )
   return time;
 }
 
-} // Namespace dali
+} // namespace Dali

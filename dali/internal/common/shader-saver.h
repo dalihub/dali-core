@@ -30,7 +30,7 @@ namespace Dali
 namespace Internal
 {
 class ShaderData;
-typedef IntrusivePtr<ShaderData> ShaderDataPtr;
+using ShaderDataPtr = IntrusivePtr<ShaderData>;
 
 /**
  * Abstract interface for passing a ShaderData object towards being saved.

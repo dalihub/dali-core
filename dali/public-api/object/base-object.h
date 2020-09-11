@@ -22,9 +22,9 @@
 #include <memory>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/object/property.h>
+#include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/signals/functor-delegate.h>
 
 namespace Dali
@@ -43,7 +43,6 @@ class BaseHandle;
 class DALI_CORE_API BaseObject : public Dali::RefObject
 {
 public:
-
   /**
    * @brief Connects a void() functor to a specified signal.
    *
@@ -54,10 +53,10 @@ public:
    * @return True if the signal was available
    * @pre The signal must be available in this object.
    */
-  template <class T>
-  bool ConnectSignal( ConnectionTrackerInterface* connectionTracker, const std::string& signalName, const T& functor )
+  template<class T>
+  bool ConnectSignal(ConnectionTrackerInterface* connectionTracker, const std::string& signalName, const T& functor)
   {
-    return DoConnectSignal( connectionTracker, signalName, FunctorDelegate::New( functor ) );
+    return DoConnectSignal(connectionTracker, signalName, FunctorDelegate::New(functor));
   }
 
   /**
@@ -76,7 +75,6 @@ public:
   bool GetTypeInfo(Dali::TypeInfo& info) const;
 
 public: // Not intended for application developers
-
   /**
    * @brief Not intended for application developers.
    *
@@ -86,10 +84,9 @@ public: // Not intended for application developers
    * @param[in] functorDelegate A newly allocated functor delegate (takes ownership)
    * @return True if the signal was available
    */
-  bool DoConnectSignal( ConnectionTrackerInterface* connectionTracker, const std::string& signalName, FunctorDelegate* functorDelegate );
+  bool DoConnectSignal(ConnectionTrackerInterface* connectionTracker, const std::string& signalName, FunctorDelegate* functorDelegate);
 
 protected:
-
   /**
    * @brief Default constructor.
    * @SINCE_1_0.0
@@ -100,7 +97,7 @@ protected:
    * @brief A reference counted object may only be deleted by calling Unreference().
    * @SINCE_1_0.0
    */
-  virtual ~BaseObject();
+  ~BaseObject() override;
 
   /**
    * @brief Registers the object as created with the Object registry.
@@ -116,17 +113,15 @@ protected:
 
   // Not copyable or movable
 
-  BaseObject(const BaseObject& rhs) = delete; ///< Deleted copy constructor
-  BaseObject(BaseObject&& rhs) = delete; ///< Deleted move constructor
+  BaseObject(const BaseObject& rhs) = delete;            ///< Deleted copy constructor
+  BaseObject(BaseObject&& rhs)      = delete;            ///< Deleted move constructor
   BaseObject& operator=(const BaseObject& rhs) = delete; ///< Deleted copy assignment operator
-  BaseObject& operator=(BaseObject&& rhs) = delete; ///< Deleted move assignment operator
+  BaseObject& operator=(BaseObject&& rhs) = delete;      ///< Deleted move assignment operator
 
 public:
-
   class DALI_INTERNAL Impl;
 
 private:
-
   std::unique_ptr<Impl> mImpl;
 };
 
@@ -141,7 +136,7 @@ private:
  */
 inline BaseObject& GetImplementation(Dali::BaseHandle& handle)
 {
-  DALI_ASSERT_ALWAYS( handle && "BaseObject handle is empty" );
+  DALI_ASSERT_ALWAYS(handle && "BaseObject handle is empty");
 
   return handle.GetBaseObject();
 }
@@ -155,7 +150,7 @@ inline BaseObject& GetImplementation(Dali::BaseHandle& handle)
  */
 inline const BaseObject& GetImplementation(const Dali::BaseHandle& handle)
 {
-  DALI_ASSERT_ALWAYS( handle && "BaseObject handle is empty" );
+  DALI_ASSERT_ALWAYS(handle && "BaseObject handle is empty");
 
   return handle.GetBaseObject();
 }
@@ -165,4 +160,4 @@ inline const BaseObject& GetImplementation(const Dali::BaseHandle& handle)
  */
 } // namespace Dali
 
-# endif // __DALI_BASE_OBJECT_H__
+#endif // __DALI_BASE_OBJECT_H__

@@ -223,7 +223,7 @@ public:
   /**
    * Pointer-to-member type. Objects can be implicitly converted to this for validity checks.
    */
-  typedef void (OwnerPointer::*BooleanType)() const;
+  using BooleanType = void ( OwnerPointer<T>::* )() const;
 
   /**
    * Converts an object handle to a BooleanType.

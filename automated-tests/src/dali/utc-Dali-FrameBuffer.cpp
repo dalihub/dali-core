@@ -15,9 +15,9 @@
  *
  */
 
-#include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/rendering/frame-buffer-devel.h>
+#include <dali/public-api/dali-core.h>
 
 using namespace Dali;
 
@@ -39,9 +39,9 @@ int UtcDaliFrameBufferNew01(void)
 
   unsigned int width(64);
   unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::NONE );
+  FrameBuffer  frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::NONE);
 
-  DALI_TEST_CHECK( frameBuffer );
+  DALI_TEST_CHECK(frameBuffer);
 
   application.SendNotification();
   application.Render();
@@ -59,9 +59,9 @@ int UtcDaliFrameBufferNew02(void)
 
   unsigned int width(64);
   unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::DEPTH );
+  FrameBuffer  frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::DEPTH);
 
-  DALI_TEST_CHECK( frameBuffer );
+  DALI_TEST_CHECK(frameBuffer);
 
   application.SendNotification();
   application.Render();
@@ -79,9 +79,9 @@ int UtcDaliFrameBufferNew03(void)
 
   unsigned int width(64);
   unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::STENCIL );
+  FrameBuffer  frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::STENCIL);
 
-  DALI_TEST_CHECK( frameBuffer );
+  DALI_TEST_CHECK(frameBuffer);
 
   application.SendNotification();
   application.Render();
@@ -99,9 +99,9 @@ int UtcDaliFrameBufferNew04(void)
 
   unsigned int width(64);
   unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::DEPTH_STENCIL );
+  FrameBuffer  frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::DEPTH_STENCIL);
 
-  DALI_TEST_CHECK( frameBuffer );
+  DALI_TEST_CHECK(frameBuffer);
 
   application.SendNotification();
   application.Render();
@@ -116,8 +116,8 @@ int UtcDaliFrameBufferNew04(void)
 int UtcDaliFrameBufferNew05(void)
 {
   TestApplication application;
-  FrameBuffer frameBuffer;
-  DALI_TEST_CHECK( !frameBuffer );
+  FrameBuffer     frameBuffer;
+  DALI_TEST_CHECK(!frameBuffer);
   END_TEST;
 }
 
@@ -127,9 +127,9 @@ int UtcDaliFrameBufferNew06(void)
 
   unsigned int width(64);
   unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, static_cast<FrameBuffer::Attachment::Mask>( FrameBuffer::Attachment::DEPTH | FrameBuffer::Attachment::STENCIL ) );
+  FrameBuffer  frameBuffer = FrameBuffer::New(width, height, static_cast<FrameBuffer::Attachment::Mask>(FrameBuffer::Attachment::DEPTH | FrameBuffer::Attachment::STENCIL));
 
-  DALI_TEST_CHECK( frameBuffer );
+  DALI_TEST_CHECK(frameBuffer);
 
   application.SendNotification();
   application.Render();
@@ -144,80 +144,80 @@ int UtcDaliFrameBufferNew06(void)
 int UtcDaliFrameBufferNewWithColor01(void)
 {
   TestApplication application;
-  uint32_t width = 64;
-  uint32_t height = 64;
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height );
+  uint32_t        width       = 64;
+  uint32_t        height      = 64;
+  FrameBuffer     frameBuffer = FrameBuffer::New(width, height);
   application.SendNotification();
   application.Render();
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 1u, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   // check that texture is not empty handle
-  DALI_TEST_CHECK( frameBuffer.GetColorTexture() );
+  DALI_TEST_CHECK(frameBuffer.GetColorTexture());
   END_TEST;
 }
 
 int UtcDaliFrameBufferNewWithColor02(void)
 {
   TestApplication application;
-  uint32_t width = 64;
-  uint32_t height = 64;
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::COLOR );
+  uint32_t        width       = 64;
+  uint32_t        height      = 64;
+  FrameBuffer     frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::COLOR);
   application.SendNotification();
   application.Render();
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 1u, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   // check that texture is not empty handle
-  DALI_TEST_CHECK( frameBuffer.GetColorTexture() );
+  DALI_TEST_CHECK(frameBuffer.GetColorTexture());
   END_TEST;
 }
 
 int UtcDaliFrameBufferNewWithColor03(void)
 {
   TestApplication application;
-  uint32_t width = 64;
-  uint32_t height = 64;
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::COLOR_DEPTH );
+  uint32_t        width       = 64;
+  uint32_t        height      = 64;
+  FrameBuffer     frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::COLOR_DEPTH);
   application.SendNotification();
   application.Render();
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 1u, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   // check that texture is not empty handle
-  DALI_TEST_CHECK( frameBuffer.GetColorTexture() );
+  DALI_TEST_CHECK(frameBuffer.GetColorTexture());
   END_TEST;
 }
 
 int UtcDaliFrameBufferNewWithColor04(void)
 {
   TestApplication application;
-  uint32_t width = 64;
-  uint32_t height = 64;
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::COLOR_STENCIL );
+  uint32_t        width       = 64;
+  uint32_t        height      = 64;
+  FrameBuffer     frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::COLOR_STENCIL);
   application.SendNotification();
   application.Render();
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 1u, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   // check that texture is not empty handle
-  DALI_TEST_CHECK( frameBuffer.GetColorTexture() );
+  DALI_TEST_CHECK(frameBuffer.GetColorTexture());
   END_TEST;
 }
 
 int UtcDaliFrameBufferNewWithColor05(void)
 {
   TestApplication application;
-  uint32_t width = 64;
-  uint32_t height = 64;
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::COLOR_DEPTH_STENCIL );
+  uint32_t        width       = 64;
+  uint32_t        height      = 64;
+  FrameBuffer     frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::COLOR_DEPTH_STENCIL);
   application.SendNotification();
   application.Render();
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 1u, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   // check that texture is not empty handle
-  DALI_TEST_CHECK( frameBuffer.GetColorTexture() );
+  DALI_TEST_CHECK(frameBuffer.GetColorTexture());
   END_TEST;
 }
 
@@ -227,11 +227,11 @@ int UtcDaliFrameBufferCopyConstructor(void)
 
   unsigned int width(64);
   unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::NONE );
+  FrameBuffer  frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::NONE);
 
-  FrameBuffer frameBufferCopy( frameBuffer );
+  FrameBuffer frameBufferCopy(frameBuffer);
 
-  DALI_TEST_CHECK( frameBufferCopy );
+  DALI_TEST_CHECK(frameBufferCopy);
 
   END_TEST;
 }
@@ -242,13 +242,13 @@ int UtcDaliFrameBufferAssignmentOperator(void)
 
   unsigned int width(64);
   unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::NONE );
+  FrameBuffer  frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::NONE);
 
   FrameBuffer frameBuffer2;
-  DALI_TEST_CHECK( !frameBuffer2 );
+  DALI_TEST_CHECK(!frameBuffer2);
 
   frameBuffer2 = frameBuffer;
-  DALI_TEST_CHECK( frameBuffer2 );
+  DALI_TEST_CHECK(frameBuffer2);
 
   END_TEST;
 }
@@ -257,21 +257,21 @@ int UtcDaliFrameBufferMoveConstructor(void)
 {
   TestApplication application;
 
-  uint32_t width = 64;
-  uint32_t height = 64;
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::DEPTH_STENCIL );
-  DALI_TEST_CHECK( frameBuffer );
-  DALI_TEST_EQUALS( 1, frameBuffer.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  uint32_t    width       = 64;
+  uint32_t    height      = 64;
+  FrameBuffer frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::DEPTH_STENCIL);
+  DALI_TEST_CHECK(frameBuffer);
+  DALI_TEST_EQUALS(1, frameBuffer.GetBaseObject().ReferenceCount(), TEST_LOCATION);
 
-  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
-  frameBuffer.AttachColorTexture( texture );
-  DALI_TEST_EQUALS( frameBuffer.GetColorTexture(), texture, TEST_LOCATION );
+  Texture texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  frameBuffer.AttachColorTexture(texture);
+  DALI_TEST_EQUALS(frameBuffer.GetColorTexture(), texture, TEST_LOCATION);
 
-  FrameBuffer move = std::move( frameBuffer );
-  DALI_TEST_CHECK( move );
-  DALI_TEST_EQUALS( 1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
-  DALI_TEST_EQUALS( move.GetColorTexture(), texture, TEST_LOCATION );
-  DALI_TEST_CHECK( !frameBuffer );
+  FrameBuffer move = std::move(frameBuffer);
+  DALI_TEST_CHECK(move);
+  DALI_TEST_EQUALS(1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(move.GetColorTexture(), texture, TEST_LOCATION);
+  DALI_TEST_CHECK(!frameBuffer);
 
   END_TEST;
 }
@@ -280,22 +280,22 @@ int UtcDaliFrameBufferMoveAssignment(void)
 {
   TestApplication application;
 
-  uint32_t width = 64;
-  uint32_t height = 64;
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::DEPTH_STENCIL );
-  DALI_TEST_CHECK( frameBuffer );
-  DALI_TEST_EQUALS( 1, frameBuffer.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  uint32_t    width       = 64;
+  uint32_t    height      = 64;
+  FrameBuffer frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::DEPTH_STENCIL);
+  DALI_TEST_CHECK(frameBuffer);
+  DALI_TEST_EQUALS(1, frameBuffer.GetBaseObject().ReferenceCount(), TEST_LOCATION);
 
-  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
-  frameBuffer.AttachColorTexture( texture );
-  DALI_TEST_EQUALS( frameBuffer.GetColorTexture(), texture, TEST_LOCATION );
+  Texture texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  frameBuffer.AttachColorTexture(texture);
+  DALI_TEST_EQUALS(frameBuffer.GetColorTexture(), texture, TEST_LOCATION);
 
   FrameBuffer move;
-  move = std::move( frameBuffer );
-  DALI_TEST_CHECK( move );
-  DALI_TEST_EQUALS( 1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
-  DALI_TEST_EQUALS( move.GetColorTexture(), texture, TEST_LOCATION );
-  DALI_TEST_CHECK( !frameBuffer );
+  move = std::move(frameBuffer);
+  DALI_TEST_CHECK(move);
+  DALI_TEST_EQUALS(1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(move.GetColorTexture(), texture, TEST_LOCATION);
+  DALI_TEST_CHECK(!frameBuffer);
 
   END_TEST;
 }
@@ -303,13 +303,13 @@ int UtcDaliFrameBufferMoveAssignment(void)
 int UtcDaliFrameBufferDownCast01(void)
 {
   TestApplication application;
-  unsigned int width(64);
-  unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::NONE );
+  unsigned int    width(64);
+  unsigned int    height(64);
+  FrameBuffer     frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::NONE);
 
-  BaseHandle handle(frameBuffer);
+  BaseHandle  handle(frameBuffer);
   FrameBuffer frameBuffer2 = FrameBuffer::DownCast(handle);
-  DALI_TEST_CHECK( frameBuffer2 );
+  DALI_TEST_CHECK(frameBuffer2);
 
   END_TEST;
 }
@@ -318,9 +318,9 @@ int UtcDaliFrameBufferDownCast02(void)
 {
   TestApplication application;
 
-  Handle handle = Handle::New(); // Create a custom object
+  Handle      handle      = Handle::New(); // Create a custom object
   FrameBuffer frameBuffer = FrameBuffer::DownCast(handle);
-  DALI_TEST_CHECK( !frameBuffer );
+  DALI_TEST_CHECK(!frameBuffer);
   END_TEST;
 }
 
@@ -330,9 +330,9 @@ int UtcDaliFrameBufferAttachColorTexture01(void)
 
   unsigned int width(64);
   unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::DEPTH_STENCIL );
-  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
-  frameBuffer.AttachColorTexture( texture );
+  FrameBuffer  frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::DEPTH_STENCIL);
+  Texture      texture     = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  frameBuffer.AttachColorTexture(texture);
 
   application.SendNotification();
   application.Render();
@@ -350,12 +350,12 @@ int UtcDaliFrameBufferAttachColorTexture02(void)
 
   unsigned int width(64);
   unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::NONE );
-  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
+  FrameBuffer  frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::NONE);
+  Texture      texture     = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
   texture.GenerateMipmaps();
 
   //Attach mipmap 1
-  frameBuffer.AttachColorTexture( texture, 0u, 1u );
+  frameBuffer.AttachColorTexture(texture, 0u, 1u);
 
   application.SendNotification();
   application.Render();
@@ -373,12 +373,12 @@ int UtcDaliFrameBufferAttachColorTexture03(void)
 
   unsigned int width(64);
   unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::NONE );
-  Texture texture = Texture::New( TextureType::TEXTURE_CUBE, Pixel::RGBA8888, width, height );
+  FrameBuffer  frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::NONE);
+  Texture      texture     = Texture::New(TextureType::TEXTURE_CUBE, Pixel::RGBA8888, width, height);
   texture.GenerateMipmaps();
 
   //Attach NEGATIVE_Y face of the cubemap
-  frameBuffer.AttachColorTexture( texture, 0u, CubeMapLayer::NEGATIVE_Y );
+  frameBuffer.AttachColorTexture(texture, 0u, CubeMapLayer::NEGATIVE_Y);
 
   application.SendNotification();
   application.Render();
@@ -396,9 +396,9 @@ int UtcDaliFrameBufferAttachColorTexture04(void)
 
   unsigned int width(64);
   unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, static_cast<FrameBuffer::Attachment::Mask>( FrameBuffer::Attachment::DEPTH | FrameBuffer::Attachment::STENCIL ) );
-  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
-  frameBuffer.AttachColorTexture( texture );
+  FrameBuffer  frameBuffer = FrameBuffer::New(width, height, static_cast<FrameBuffer::Attachment::Mask>(FrameBuffer::Attachment::DEPTH | FrameBuffer::Attachment::STENCIL));
+  Texture      texture     = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  frameBuffer.AttachColorTexture(texture);
 
   application.SendNotification();
   application.Render();
@@ -416,13 +416,13 @@ int UtcDaliFrameBufferAttachColorTexture05(void)
 
   unsigned int width(64);
   unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::NONE );
-  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
+  FrameBuffer  frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::NONE);
+  Texture      texture     = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
 
   // N.B. it doesn't make sense per se, however the OGL standard doesn't seem to forbid attaching the same texture to different slots.
-  for (int i = 0; i < Dali::DevelFrameBuffer::MAX_COLOR_ATTACHMENTS + 1; ++i)
+  for(int i = 0; i < Dali::DevelFrameBuffer::MAX_COLOR_ATTACHMENTS + 1; ++i)
   {
-    frameBuffer.AttachColorTexture( texture );
+    frameBuffer.AttachColorTexture(texture);
   }
 
   application.SendNotification();
@@ -441,12 +441,12 @@ int UtcDaliFrameBufferAttachDepthTexture01(void)
 
   unsigned int width(64);
   unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::DEPTH_STENCIL );
-  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
-  frameBuffer.AttachColorTexture( texture );
+  FrameBuffer  frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::DEPTH_STENCIL);
+  Texture      texture     = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  frameBuffer.AttachColorTexture(texture);
 
-  Texture textureDepth = Texture::New( TextureType::TEXTURE_2D, Pixel::DEPTH_UNSIGNED_INT, width, height );
-  DevelFrameBuffer::AttachDepthTexture( frameBuffer, textureDepth );
+  Texture textureDepth = Texture::New(TextureType::TEXTURE_2D, Pixel::DEPTH_UNSIGNED_INT, width, height);
+  DevelFrameBuffer::AttachDepthTexture(frameBuffer, textureDepth);
 
   application.SendNotification();
   application.Render();
@@ -464,12 +464,12 @@ int UtcDaliFrameBufferAttachDepthStencilTexture01(void)
 
   unsigned int width(64);
   unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::DEPTH_STENCIL );
-  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
-  frameBuffer.AttachColorTexture( texture );
+  FrameBuffer  frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::DEPTH_STENCIL);
+  Texture      texture     = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  frameBuffer.AttachColorTexture(texture);
 
-  Texture textureStencil = Texture::New( TextureType::TEXTURE_2D, Pixel::DEPTH_STENCIL, width, height );
-  DevelFrameBuffer::AttachDepthStencilTexture( frameBuffer, textureStencil );
+  Texture textureStencil = Texture::New(TextureType::TEXTURE_2D, Pixel::DEPTH_STENCIL, width, height);
+  DevelFrameBuffer::AttachDepthStencilTexture(frameBuffer, textureStencil);
 
   application.SendNotification();
   application.Render();
@@ -487,9 +487,9 @@ int UtcDaliFrameBufferGetColorTexture01(void)
 
   unsigned int width(64);
   unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::NONE );
-  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
-  frameBuffer.AttachColorTexture( texture );
+  FrameBuffer  frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::NONE);
+  Texture      texture     = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  frameBuffer.AttachColorTexture(texture);
 
   DALI_TEST_EQUALS(frameBuffer.GetColorTexture(), texture, TEST_LOCATION);
 
@@ -502,9 +502,9 @@ int UtcDaliFrameBufferGetColorTexture02(void)
 
   unsigned int width(64);
   unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::NONE );
-  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
-  frameBuffer.AttachColorTexture( texture, 0u, 1u );
+  FrameBuffer  frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::NONE);
+  Texture      texture     = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  frameBuffer.AttachColorTexture(texture, 0u, 1u);
 
   DALI_TEST_EQUALS(frameBuffer.GetColorTexture(), texture, TEST_LOCATION);
 
@@ -517,9 +517,9 @@ int UtcDaliFrameBufferGetColorTexture03(void)
 
   unsigned int width(64);
   unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::NONE );
-  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
-  frameBuffer.AttachColorTexture( texture, 0u, 1u );
+  FrameBuffer  frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::NONE);
+  Texture      texture     = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  frameBuffer.AttachColorTexture(texture, 0u, 1u);
 
   DALI_TEST_EQUALS(frameBuffer.GetColorTexture(), texture, TEST_LOCATION);
   DALI_TEST_EQUALS(DevelFrameBuffer::GetColorTexture(frameBuffer, 0), texture, TEST_LOCATION);
@@ -533,24 +533,24 @@ int UtcDaliFrameBufferGetColorTexture04(void)
 
   unsigned int width(64);
   unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::NONE );
-  Texture textures[] = {
-      Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height ),
-      Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height ),
-      Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height ),
-      Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height ),
-      Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height ),
-      Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height ),
-      Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height ),
-      Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height ),
+  FrameBuffer  frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::NONE);
+  Texture      textures[]  = {
+    Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height),
+    Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height),
+    Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height),
+    Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height),
+    Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height),
+    Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height),
+    Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height),
+    Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height),
   };
 
-  for (auto& t: textures)
+  for(auto& t : textures)
   {
-    frameBuffer.AttachColorTexture( t, 0u, 1u );
+    frameBuffer.AttachColorTexture(t, 0u, 1u);
   }
 
-  for (unsigned int i = 0; i < std::extent<decltype(textures)>::value; ++i)
+  for(unsigned int i = 0; i < std::extent<decltype(textures)>::value; ++i)
   {
     DALI_TEST_EQUALS(DevelFrameBuffer::GetColorTexture(frameBuffer, i), textures[i], TEST_LOCATION);
   }
@@ -564,14 +564,14 @@ int UtcDaliFrameBufferGetDepthTexture01(void)
 
   unsigned int width(64);
   unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::NONE );
-  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
-  frameBuffer.AttachColorTexture( texture );
+  FrameBuffer  frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::NONE);
+  Texture      texture     = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  frameBuffer.AttachColorTexture(texture);
 
-  Texture textureDepth = Texture::New( TextureType::TEXTURE_2D, Pixel::DEPTH_FLOAT, width, height );
-  DevelFrameBuffer::AttachDepthTexture( frameBuffer, textureDepth );
+  Texture textureDepth = Texture::New(TextureType::TEXTURE_2D, Pixel::DEPTH_FLOAT, width, height);
+  DevelFrameBuffer::AttachDepthTexture(frameBuffer, textureDepth);
 
-  DALI_TEST_EQUALS(DevelFrameBuffer::GetDepthTexture( frameBuffer ), textureDepth, TEST_LOCATION);
+  DALI_TEST_EQUALS(DevelFrameBuffer::GetDepthTexture(frameBuffer), textureDepth, TEST_LOCATION);
 
   END_TEST;
 }
@@ -582,14 +582,14 @@ int UtcDaliFrameBufferGetDepthStencilTexture01(void)
 
   unsigned int width(64);
   unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::NONE );
-  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
-  frameBuffer.AttachColorTexture( texture );
+  FrameBuffer  frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::NONE);
+  Texture      texture     = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  frameBuffer.AttachColorTexture(texture);
 
-  Texture textureStencil = Texture::New( TextureType::TEXTURE_2D, Pixel::DEPTH_STENCIL, width, height );
-  DevelFrameBuffer::AttachDepthStencilTexture( frameBuffer, textureStencil );
+  Texture textureStencil = Texture::New(TextureType::TEXTURE_2D, Pixel::DEPTH_STENCIL, width, height);
+  DevelFrameBuffer::AttachDepthStencilTexture(frameBuffer, textureStencil);
 
-  DALI_TEST_EQUALS(DevelFrameBuffer::GetDepthStencilTexture( frameBuffer ), textureStencil, TEST_LOCATION);
+  DALI_TEST_EQUALS(DevelFrameBuffer::GetDepthStencilTexture(frameBuffer), textureStencil, TEST_LOCATION);
 
   END_TEST;
 }
@@ -602,14 +602,14 @@ int UtcDaliFramebufferContextLoss(void)
   //Create the texture
   unsigned int width(64);
   unsigned int height(64);
-  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
-  DALI_TEST_CHECK( texture );
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::NONE );
-  DALI_TEST_CHECK( frameBuffer );
-  frameBuffer.AttachColorTexture( texture, 0u, 1u );
+  Texture      texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  DALI_TEST_CHECK(texture);
+  FrameBuffer frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::NONE);
+  DALI_TEST_CHECK(frameBuffer);
+  frameBuffer.AttachColorTexture(texture, 0u, 1u);
 
   Geometry geometry = CreateQuadGeometry();
-  Shader shader = CreateShader();
+  Shader   shader   = CreateShader();
   Renderer renderer = Renderer::New(geometry, shader);
 
   application.SendNotification();
@@ -617,14 +617,14 @@ int UtcDaliFramebufferContextLoss(void)
 
   // Lose & regain context (in render 'thread')
   application.ResetContext();
-  DALI_TEST_CHECK( frameBuffer );
+  DALI_TEST_CHECK(frameBuffer);
 
   END_TEST;
 }
 
 int UtcDaliFrameBufferGetColorTextureNegative(void)
 {
-  TestApplication application;
+  TestApplication   application;
   Dali::FrameBuffer instance;
   try
   {
@@ -640,7 +640,7 @@ int UtcDaliFrameBufferGetColorTextureNegative(void)
 
 int UtcDaliFrameBufferAttachColorTextureNegative01(void)
 {
-  TestApplication application;
+  TestApplication   application;
   Dali::FrameBuffer instance;
   try
   {
@@ -657,14 +657,14 @@ int UtcDaliFrameBufferAttachColorTextureNegative01(void)
 
 int UtcDaliFrameBufferAttachColorTextureNegative02(void)
 {
-  TestApplication application;
+  TestApplication   application;
   Dali::FrameBuffer instance;
   try
   {
     Dali::Texture arg1 = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 400u, 400u);
-    unsigned int arg2(0u);
-    unsigned int arg3(0u);
-    instance.AttachColorTexture(arg1,arg2,arg3);
+    unsigned int  arg2(0u);
+    unsigned int  arg3(0u);
+    instance.AttachColorTexture(arg1, arg2, arg3);
     DALI_TEST_CHECK(false); // Should not get here
   }
   catch(...)

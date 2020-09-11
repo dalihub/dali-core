@@ -28,7 +28,7 @@ namespace SceneGraph
 class UniformMap;
 class UniformPropertyMapping;
 
-typedef Dali::Vector< const UniformPropertyMapping* > CollectedUniformMap;
+using CollectedUniformMap = Dali::Vector<const UniformPropertyMapping*>;
 
 /**
  * This class maps uniform names to property value pointers.

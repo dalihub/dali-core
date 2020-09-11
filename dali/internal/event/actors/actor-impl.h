@@ -56,15 +56,15 @@ class RenderTask;
 class Renderer;
 class Scene;
 
-typedef std::vector< ActorPtr > ActorContainer;
-typedef ActorContainer::iterator ActorIter;
-typedef ActorContainer::const_iterator ActorConstIter;
+using ActorContainer = std::vector<ActorPtr>;
+using ActorIter      = ActorContainer::iterator;
+using ActorConstIter = ActorContainer::const_iterator;
 
-typedef std::vector< RendererPtr > RendererContainer;
-typedef RendererContainer::iterator RendererIter;
+using RendererContainer = std::vector<RendererPtr>;
+using RendererIter      = RendererContainer::iterator;
 
 class ActorDepthTreeNode;
-typedef Dali::Internal::MemoryPoolObjectAllocator< ActorDepthTreeNode > DepthNodeMemoryPool;
+using DepthNodeMemoryPool = Dali::Internal::MemoryPoolObjectAllocator<ActorDepthTreeNode>;
 
 /**
  * Actor is the primary object which Dali applications interact with.
@@ -112,7 +112,7 @@ public:
     Dimension::Type dimension;    ///< The dimension to hold
   };
 
-  typedef std::vector< ActorDimensionPair > ActorDimensionStack;
+  using ActorDimensionStack = std::vector<ActorDimensionPair>;
 
 public:
 
@@ -1563,7 +1563,7 @@ protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~Actor();
+  ~Actor() override;
 
   /**
    * Called on a child during Add() when the parent actor is connected to the Scene.
@@ -1641,42 +1641,42 @@ public:
   /**
    * @copydoc Dali::Internal::Object::SetDefaultProperty()
    */
-  virtual void SetDefaultProperty( Property::Index index, const Property::Value& propertyValue );
+  void SetDefaultProperty( Property::Index index, const Property::Value& propertyValue ) override;
 
   /**
    * @copydoc Dali::Internal::Object::SetSceneGraphProperty()
    */
-  virtual void SetSceneGraphProperty( Property::Index index, const PropertyMetadata& entry, const Property::Value& value );
+  void SetSceneGraphProperty( Property::Index index, const PropertyMetadata& entry, const Property::Value& value ) override;
 
   /**
    * @copydoc Dali::Internal::Object::GetDefaultProperty()
    */
-  virtual Property::Value GetDefaultProperty( Property::Index index ) const;
+  Property::Value GetDefaultProperty( Property::Index index ) const override;
 
   /**
    * @copydoc Dali::Internal::Object::GetDefaultPropertyCurrentValue()
    */
-  virtual Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const;
+  Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const override;
 
   /**
    * @copydoc Dali::Internal::Object::OnNotifyDefaultPropertyAnimation()
    */
-  virtual void OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType );
+  void OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType ) override;
 
   /**
    * @copydoc Dali::Internal::Object::GetSceneObjectAnimatableProperty()
    */
-  virtual const SceneGraph::PropertyBase* GetSceneObjectAnimatableProperty( Property::Index index ) const;
+  const SceneGraph::PropertyBase* GetSceneObjectAnimatableProperty( Property::Index index ) const override;
 
   /**
    * @copydoc Dali::Internal::Object::GetSceneObjectInputProperty()
    */
-  virtual const PropertyInputImpl* GetSceneObjectInputProperty( Property::Index index ) const;
+  const PropertyInputImpl* GetSceneObjectInputProperty( Property::Index index ) const override;
 
   /**
    * @copydoc Dali::Internal::Object::GetPropertyComponentIndex()
    */
-  virtual int32_t GetPropertyComponentIndex( Property::Index index ) const;
+  int32_t GetPropertyComponentIndex( Property::Index index ) const override;
 
   /**
    * Retrieve the actor's node.
@@ -1862,7 +1862,7 @@ private:
    * Retrieve the parent object of an Actor.
    * @return The parent object, or NULL if the Actor does not have a parent.
    */
-  virtual Object* GetParentObject() const;
+  Object* GetParentObject() const override;
 
   /**
    * Set Sibling order

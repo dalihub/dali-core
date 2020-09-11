@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,24 +19,23 @@
 #include <dali/public-api/actors/custom-actor-impl.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
 #include <dali/internal/event/actors/custom-actor-internal.h>
+#include <dali/public-api/common/dali-common.h>
 
 namespace Dali
 {
-
 CustomActor CustomActorImpl::Self() const
 {
   return CustomActor(mOwner);
 }
 
-void CustomActorImpl::OnPropertySet( Property::Index index, const Property::Value& propertyValue )
+void CustomActorImpl::OnPropertySet(Property::Index index, const Property::Value& propertyValue)
 {
 }
 
-CustomActorImpl::CustomActorImpl( ActorFlags flags )
-: mOwner(NULL),
-  mFlags( flags )
+CustomActorImpl::CustomActorImpl(ActorFlags flags)
+: mOwner(nullptr),
+  mFlags(flags)
 {
 }
 
@@ -58,7 +57,7 @@ Internal::CustomActor* CustomActorImpl::GetOwner() const
 
 bool CustomActorImpl::IsRelayoutEnabled() const
 {
-  return ( mFlags & DISABLE_SIZE_NEGOTIATION ) == 0;
+  return (mFlags & DISABLE_SIZE_NEGOTIATION) == 0;
 }
 
 void CustomActorImpl::RelayoutRequest()
@@ -66,24 +65,24 @@ void CustomActorImpl::RelayoutRequest()
   mOwner->RelayoutRequest();
 }
 
-float CustomActorImpl::GetHeightForWidthBase( float width )
+float CustomActorImpl::GetHeightForWidthBase(float width)
 {
-  return mOwner->GetHeightForWidthBase( width );
+  return mOwner->GetHeightForWidthBase(width);
 }
 
-float CustomActorImpl::GetWidthForHeightBase( float height )
+float CustomActorImpl::GetWidthForHeightBase(float height)
 {
-  return mOwner->GetWidthForHeightBase( height );
+  return mOwner->GetWidthForHeightBase(height);
 }
 
-float CustomActorImpl::CalculateChildSizeBase( const Dali::Actor& child, Dimension::Type dimension )
+float CustomActorImpl::CalculateChildSizeBase(const Dali::Actor& child, Dimension::Type dimension)
 {
-  return mOwner->CalculateChildSizeBase( child, dimension );
+  return mOwner->CalculateChildSizeBase(child, dimension);
 }
 
-bool CustomActorImpl::RelayoutDependentOnChildrenBase( Dimension::Type dimension )
+bool CustomActorImpl::RelayoutDependentOnChildrenBase(Dimension::Type dimension)
 {
-  return mOwner->RelayoutDependentOnChildrenBase( dimension );
+  return mOwner->RelayoutDependentOnChildrenBase(dimension);
 }
 
 } // namespace Dali

@@ -26,8 +26,8 @@
  */
 struct TouchEventFunctorConsumeSetter
 {
-  TouchEventFunctorConsumeSetter( bool& consume )
-  : mConsume( consume )
+  TouchEventFunctorConsumeSetter(bool& consume)
+  : mConsume(consume)
   {
   }
 
@@ -41,4 +41,3 @@ private:
 };
 
 #endif // TEST_TOUCH_EVENT_UTILS_H
-

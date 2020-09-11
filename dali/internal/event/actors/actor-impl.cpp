@@ -462,7 +462,7 @@ Dali::Layer Actor::GetLayer()
   }
 
   // Find the immediate Layer parent
-  for( Actor* parent = mParent; !layer && parent != NULL; parent = parent->GetParent() )
+  for( Actor* parent = mParent; !layer && parent != nullptr; parent = parent->GetParent() )
   {
     if( parent->IsLayer() )
     {
@@ -549,7 +549,7 @@ void Actor::Remove( Actor& child )
       mChildren->erase( iter );
 
       DALI_ASSERT_DEBUG( actor->GetParent() == this );
-      actor->SetParent( NULL );
+      actor->SetParent( nullptr );
 
       break;
     }
@@ -582,7 +582,7 @@ void Actor::Unparent()
 
 uint32_t Actor::GetChildCount() const
 {
-  return ( NULL != mChildren ) ? static_cast<uint32_t>( mChildren->size() ) : 0; // only 4,294,967,295 children per actor
+  return ( nullptr != mChildren ) ? static_cast<uint32_t>( mChildren->size() ) : 0; // only 4,294,967,295 children per actor
 }
 
 ActorPtr Actor::GetChildAt( uint32_t index ) const
@@ -594,7 +594,7 @@ ActorPtr Actor::GetChildAt( uint32_t index ) const
 
 ActorPtr Actor::FindChildByName( const std::string& actorName )
 {
-  ActorPtr child = 0;
+  ActorPtr child = nullptr;
   if( actorName == mName )
   {
     child = this;
@@ -617,7 +617,7 @@ ActorPtr Actor::FindChildByName( const std::string& actorName )
 
 ActorPtr Actor::FindChildById( const uint32_t id )
 {
-  ActorPtr child = 0;
+  ActorPtr child = nullptr;
   if( id == GetId() )
   {
     child = this;
@@ -1810,7 +1810,7 @@ ActorGestureData& Actor::GetGestureData()
 {
   // Likely scenario is that once gesture-data is created for this actor, the actor will require
   // that gesture for its entire life-time so no need to destroy it until the actor is destroyed
-  if( NULL == mGestureData )
+  if( nullptr == mGestureData )
   {
     mGestureData = new ActorGestureData;
   }
@@ -2009,13 +2009,13 @@ bool Actor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
 Actor::Actor( DerivedType derivedType, const SceneGraph::Node& node )
 : Object( &node ),
   mScene( nullptr ),
-  mParent( NULL ),
-  mChildren( NULL ),
-  mRenderers( NULL ),
-  mParentOrigin( NULL ),
-  mAnchorPoint( NULL ),
-  mRelayoutData( NULL ),
-  mGestureData( NULL ),
+  mParent( nullptr ),
+  mChildren( nullptr ),
+  mRenderers( nullptr ),
+  mParentOrigin( nullptr ),
+  mAnchorPoint( nullptr ),
+  mRelayoutData( nullptr ),
+  mGestureData( nullptr ),
   mTouchedSignal(),
   mHoveredSignal(),
   mWheelEventSignal(),
@@ -2075,7 +2075,7 @@ Actor::~Actor()
     ActorConstIter endIter = mChildren->end();
     for( ActorIter iter = mChildren->begin(); iter != endIter; ++iter )
     {
-      (*iter)->SetParent( NULL );
+      (*iter)->SetParent( nullptr );
     }
   }
   delete mChildren;
@@ -3300,7 +3300,7 @@ void Actor::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::In
 
 const PropertyBase* Actor::GetSceneObjectAnimatableProperty( Property::Index index ) const
 {
-  const PropertyBase* property( NULL );
+  const PropertyBase* property( nullptr );
 
   switch( index )
   {
@@ -3364,7 +3364,7 @@ const PropertyBase* Actor::GetSceneObjectAnimatableProperty( Property::Index ind
 
 const PropertyInputImpl* Actor::GetSceneObjectInputProperty( Property::Index index ) const
 {
-  const PropertyInputImpl* property( NULL );
+  const PropertyInputImpl* property( nullptr );
 
   switch( index )
   {
@@ -3518,9 +3518,9 @@ void Actor::SetParent( Actor* parent )
   }
   else // parent being set to NULL
   {
-    DALI_ASSERT_ALWAYS( mParent != NULL && "Actor should have a parent" );
+    DALI_ASSERT_ALWAYS( mParent != nullptr && "Actor should have a parent" );
 
-    mParent = NULL;
+    mParent = nullptr;
 
     if ( EventThreadServices::IsCoreRunning() && // Don't emit signals or send messages during Core destruction
          OnScene() )

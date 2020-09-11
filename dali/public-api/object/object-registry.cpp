@@ -23,7 +23,6 @@
 
 namespace Dali
 {
-
 ObjectRegistry::ObjectRegistry()
 {
 }
@@ -36,9 +35,9 @@ ObjectRegistry::ObjectRegistry(const ObjectRegistry& copy) = default;
 
 ObjectRegistry& ObjectRegistry::operator=(const ObjectRegistry& rhs) = default;
 
-ObjectRegistry::ObjectRegistry( ObjectRegistry&& rhs ) = default;
+ObjectRegistry::ObjectRegistry(ObjectRegistry&& rhs) = default;
 
-ObjectRegistry& ObjectRegistry::operator=( ObjectRegistry&& rhs ) = default;
+ObjectRegistry& ObjectRegistry::operator=(ObjectRegistry&& rhs) = default;
 
 ObjectRegistry::ObjectCreatedSignalType& ObjectRegistry::ObjectCreatedSignal()
 {

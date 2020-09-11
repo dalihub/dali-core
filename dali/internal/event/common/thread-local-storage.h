@@ -196,7 +196,7 @@ private:
   /**
    * Virtual Destructor
    */
-  virtual ~ThreadLocalStorage();
+  ~ThreadLocalStorage() override;
 
   // Undefined
   ThreadLocalStorage( const ThreadLocalStorage& );
@@ -208,9 +208,9 @@ private:
 
   // using the address of the type name string as compiler will allocate these once per library
   // and we don't support un/re-loading of dali libraries while singleton service is alive
-  typedef std::pair< const char*, BaseHandle> SingletonPair;
-  typedef std::vector< SingletonPair >  SingletonContainer;
-  typedef SingletonContainer::const_iterator SingletonConstIter;
+  using SingletonPair      = std::pair<const char*, BaseHandle>;
+  using SingletonContainer = std::vector<SingletonPair>;
+  using SingletonConstIter = SingletonContainer::const_iterator;
 
   SingletonContainer mSingletonContainer; ///< The container to look up singleton by its type name
 

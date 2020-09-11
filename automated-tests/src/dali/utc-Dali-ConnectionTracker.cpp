@@ -16,14 +16,14 @@
  */
 
 // EXTERNAL INCLUDES
-#include <iostream>
 #include <stdlib.h>
 
-// INTERNAL INCLUDES
-#include <dali/public-api/dali-core.h>
-#include <dali-test-suite-utils.h>
-#include <signal-helper.h>
+#include <iostream>
 
+// INTERNAL INCLUDES
+#include <dali-test-suite-utils.h>
+#include <dali/public-api/dali-core.h>
+#include <signal-helper.h>
 
 using namespace Dali;
 
@@ -37,11 +37,9 @@ void utc_dali_conenction_tracker_cleanup(void)
   test_return_value = TET_PASS;
 }
 
-namespace {
-
-
-} // anon namespace
-
+namespace
+{
+} // namespace
 
 /*******************************************
  *
@@ -57,7 +55,7 @@ int UtcConnectionTrackerConstructorP(void)
 
   ConnectionTracker tracker;
 
-  DALI_TEST_CHECK( tracker.GetConnectionCount() == 0 );
+  DALI_TEST_CHECK(tracker.GetConnectionCount() == 0);
 
   END_TEST;
 }
@@ -70,12 +68,12 @@ int UtcConnectionTrackerDestructorP(void)
   TestButton* button = new TestButton(1);
   {
     TestApp testApp;
-    button->DownSignal().Connect(&testApp,&TestApp::OnButtonPress);
-    DALI_TEST_CHECK( testApp.GetConnectionCount() == 1 );
-    DALI_TEST_CHECK( button->DownSignal().GetConnectionCount( )== 1 );
+    button->DownSignal().Connect(&testApp, &TestApp::OnButtonPress);
+    DALI_TEST_CHECK(testApp.GetConnectionCount() == 1);
+    DALI_TEST_CHECK(button->DownSignal().GetConnectionCount() == 1);
   }
   // testApp out of scope it should have been disconnected
-  DALI_TEST_CHECK( button->DownSignal().GetConnectionCount( ) == 0 );
+  DALI_TEST_CHECK(button->DownSignal().GetConnectionCount() == 0);
 
   delete button;
 
@@ -87,14 +85,14 @@ int UtcConnectionTrackerDisconnectAllP(void)
   TestApplication application; // Create core for debug logging
 
   TestButton* button = new TestButton(1);
-  TestApp testApp;
-  button->DownSignal().Connect(&testApp,&TestApp::OnButtonPress);
+  TestApp     testApp;
+  button->DownSignal().Connect(&testApp, &TestApp::OnButtonPress);
 
-  DALI_TEST_CHECK( button->DownSignal().GetConnectionCount( ) == 1 );
+  DALI_TEST_CHECK(button->DownSignal().GetConnectionCount() == 1);
 
   testApp.DisconnectAll();
 
-  DALI_TEST_CHECK( button->DownSignal().GetConnectionCount( ) == 0 );
+  DALI_TEST_CHECK(button->DownSignal().GetConnectionCount() == 0);
 
   delete button;
 
@@ -104,12 +102,12 @@ int UtcConnectionTrackerDisconnectAllP(void)
 int UtcConnectionTrackerDisconnectAllN(void)
 {
   TestApplication application; // Create core for debug logging
-  TestApp testApp;
-  TestButton* button = new TestButton(1);
+  TestApp         testApp;
+  TestButton*     button = new TestButton(1);
 
-  DALI_TEST_CHECK( button->DownSignal().GetConnectionCount( ) == 0 );
+  DALI_TEST_CHECK(button->DownSignal().GetConnectionCount() == 0);
   testApp.DisconnectAll();
-  DALI_TEST_CHECK( button->DownSignal().GetConnectionCount( ) == 0 );
+  DALI_TEST_CHECK(button->DownSignal().GetConnectionCount() == 0);
 
   delete button;
 
@@ -121,32 +119,31 @@ int UtcConnectionTrackerSignalConnectedP(void)
   TestApplication application; // Create core for debug logging
 
   TestButton* button = new TestButton(1);
-  TestApp testApp;
-  button->DownSignal().Connect(&testApp,&TestApp::OnButtonPress);
+  TestApp     testApp;
+  button->DownSignal().Connect(&testApp, &TestApp::OnButtonPress);
 
-  DALI_TEST_CHECK( button->DownSignal().GetConnectionCount( ) == 1 );
+  DALI_TEST_CHECK(button->DownSignal().GetConnectionCount() == 1);
 
   delete button;
 
   END_TEST;
-
 }
 int UtcConnectionTrackerSignalConnectedN(void)
 {
   TestApplication application; // Create core for debug logging
 
   TestButton* button = new TestButton(1);
-  TestApp* testApp( NULL );
+  TestApp*    testApp(NULL);
 
   try
   {
     // connect to a null connection tracker
-    button->DownSignal().Connect( testApp, &TestApp::OnButtonPress);
+    button->DownSignal().Connect(testApp, &TestApp::OnButtonPress);
   }
-  catch (Dali::DaliException& e)
+  catch(Dali::DaliException& e)
   {
     // Tests that a negative test of an assertion succeeds
-    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_PRINT_ASSERT(e);
     tet_result(TET_PASS);
   }
 
@@ -155,44 +152,42 @@ int UtcConnectionTrackerSignalConnectedN(void)
   END_TEST;
 }
 
-
 int UtcConnectionTrackerSignalDisconnectP(void)
 {
   TestApplication application; // Create core for debug logging
 
   TestButton* button = new TestButton(1);
-  TestApp testApp;
-  button->DownSignal().Connect(&testApp,&TestApp::OnButtonPress);
+  TestApp     testApp;
+  button->DownSignal().Connect(&testApp, &TestApp::OnButtonPress);
 
-  DALI_TEST_CHECK( button->DownSignal().GetConnectionCount( ) == 1 );
+  DALI_TEST_CHECK(button->DownSignal().GetConnectionCount() == 1);
 
-  button->DownSignal().Disconnect(&testApp,&TestApp::OnButtonPress);
-  DALI_TEST_CHECK( button->DownSignal().GetConnectionCount( ) == 0 );
+  button->DownSignal().Disconnect(&testApp, &TestApp::OnButtonPress);
+  DALI_TEST_CHECK(button->DownSignal().GetConnectionCount() == 0);
 
   delete button;
 
   END_TEST;
 }
-
 
 int UtcConnectionTrackerSignalDisconnectN(void)
 {
   TestApplication application; // Create core for debug logging
 
   TestButton* button = new TestButton(1);
-  TestApp testApp;
-  button->DownSignal().Connect(&testApp,&TestApp::OnButtonPress);
+  TestApp     testApp;
+  button->DownSignal().Connect(&testApp, &TestApp::OnButtonPress);
 
-  DALI_TEST_CHECK( button->DownSignal().GetConnectionCount( ) == 1 );
+  DALI_TEST_CHECK(button->DownSignal().GetConnectionCount() == 1);
 
   try
   {
-    application.SignalDisconnected( NULL, NULL );
-    tet_result( TET_FAIL );
+    application.SignalDisconnected(NULL, NULL);
+    tet_result(TET_FAIL);
   }
-  catch (Dali::DaliException& e)
+  catch(Dali::DaliException& e)
   {
-    tet_result( TET_PASS );
+    tet_result(TET_PASS);
   }
 
   delete button;
@@ -200,15 +195,14 @@ int UtcConnectionTrackerSignalDisconnectN(void)
   END_TEST;
 }
 
-
 int UtcConnectionTrackerGetConnectionCountP(void)
 {
   TestApplication application; // Create core for debug logging
 
   TestButton* button = new TestButton(1);
-  TestApp testApp;
-  button->DownSignal().Connect(&testApp,&TestApp::OnButtonPress);
-  DALI_TEST_CHECK( button->DownSignal().GetConnectionCount( ) == 1 );
+  TestApp     testApp;
+  button->DownSignal().Connect(&testApp, &TestApp::OnButtonPress);
+  DALI_TEST_CHECK(button->DownSignal().GetConnectionCount() == 1);
 
   delete button;
 
@@ -220,7 +214,7 @@ int UtcConnectionTrackerGetConnectionCountN(void)
   TestApplication application; // Create core for debug logging
 
   TestButton* button = new TestButton(1);
-  DALI_TEST_CHECK( button->DownSignal().GetConnectionCount( ) == 0 );
+  DALI_TEST_CHECK(button->DownSignal().GetConnectionCount() == 0);
 
   delete button;
 

@@ -25,7 +25,6 @@
 
 namespace Dali
 {
-
 TypeInfo::TypeInfo()
 {
 }
@@ -38,9 +37,9 @@ TypeInfo::TypeInfo(const TypeInfo& copy) = default;
 
 TypeInfo& TypeInfo::operator=(const TypeInfo& rhs) = default;
 
-TypeInfo::TypeInfo( TypeInfo&& rhs ) = default;
+TypeInfo::TypeInfo(TypeInfo&& rhs) = default;
 
-TypeInfo& TypeInfo::operator=( TypeInfo&& rhs ) = default;
+TypeInfo& TypeInfo::operator=(TypeInfo&& rhs) = default;
 
 const std::string& TypeInfo::GetName() const
 {
@@ -69,7 +68,7 @@ size_t TypeInfo::GetActionCount() const
 
 std::string TypeInfo::GetActionName(size_t index)
 {
-  return GetImplementation(*this).GetActionName( static_cast<uint32_t>( index ) );
+  return GetImplementation(*this).GetActionName(static_cast<uint32_t>(index));
 }
 
 size_t TypeInfo::GetSignalCount() const
@@ -79,7 +78,7 @@ size_t TypeInfo::GetSignalCount() const
 
 std::string TypeInfo::GetSignalName(size_t index)
 {
-  return GetImplementation(*this).GetSignalName( static_cast<uint32_t>( index ) );
+  return GetImplementation(*this).GetSignalName(static_cast<uint32_t>(index));
 }
 
 size_t TypeInfo::GetPropertyCount() const
@@ -87,36 +86,36 @@ size_t TypeInfo::GetPropertyCount() const
   return GetImplementation(*this).GetPropertyCount();
 }
 
-void TypeInfo::GetPropertyIndices( Property::IndexContainer& indices ) const
+void TypeInfo::GetPropertyIndices(Property::IndexContainer& indices) const
 {
   indices.Clear(); // We do not want to clear the container if called internally, so only clear here
-  GetImplementation(*this).GetPropertyIndices( indices );
+  GetImplementation(*this).GetPropertyIndices(indices);
 }
 
-const std::string& TypeInfo::GetPropertyName( Property::Index index ) const
+const std::string& TypeInfo::GetPropertyName(Property::Index index) const
 {
-  return GetImplementation(*this).GetRegisteredPropertyName( index );
+  return GetImplementation(*this).GetRegisteredPropertyName(index);
 }
 
-Property::Index TypeInfo::GetChildPropertyIndex( const std::string& name ) const
+Property::Index TypeInfo::GetChildPropertyIndex(const std::string& name) const
 {
-  return GetImplementation(*this).GetChildPropertyIndex( name );
+  return GetImplementation(*this).GetChildPropertyIndex(name);
 }
 
-const std::string& TypeInfo::GetChildPropertyName( Property::Index index ) const
+const std::string& TypeInfo::GetChildPropertyName(Property::Index index) const
 {
-  return GetImplementation(*this).GetChildPropertyName( index );
+  return GetImplementation(*this).GetChildPropertyName(index);
 }
 
-Property::Type TypeInfo::GetChildPropertyType( Property::Index index ) const
+Property::Type TypeInfo::GetChildPropertyType(Property::Index index) const
 {
-  return GetImplementation(*this).GetChildPropertyType( index );
+  return GetImplementation(*this).GetChildPropertyType(index);
 }
 
-void TypeInfo::GetChildPropertyIndices( Property::IndexContainer& indices ) const
+void TypeInfo::GetChildPropertyIndices(Property::IndexContainer& indices) const
 {
   indices.Clear(); // We do not want to clear the container if called internally, so only clear here
-  GetImplementation(*this).GetChildPropertyIndices( indices );
+  GetImplementation(*this).GetChildPropertyIndices(indices);
 }
 
 TypeInfo::TypeInfo(Internal::TypeInfo* internal)

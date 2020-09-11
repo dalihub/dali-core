@@ -41,7 +41,7 @@ class Geometry;
 }
 
 class Geometry;
-typedef IntrusivePtr<Geometry> GeometryPtr;
+using GeometryPtr = IntrusivePtr<Geometry>;
 
 /**
  * Geometry is an object that contains an array of structures of values that
@@ -111,7 +111,7 @@ protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~Geometry();
+  ~Geometry() override;
 
 private: // unimplemented methods
   Geometry( const Geometry& );

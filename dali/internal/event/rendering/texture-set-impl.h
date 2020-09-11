@@ -42,7 +42,7 @@ class TextureSet;
 
 
 class TextureSet;
-typedef IntrusivePtr<TextureSet> TextureSetPtr;
+using TextureSetPtr = IntrusivePtr<TextureSet>;
 
 /**
  * TextureSet is an object that holds all the textures used by a renderer
@@ -101,7 +101,7 @@ protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~TextureSet();
+  ~TextureSet() override;
 
 private: // unimplemented methods
   TextureSet( const TextureSet& );

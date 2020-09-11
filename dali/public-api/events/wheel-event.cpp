@@ -23,71 +23,70 @@
 
 namespace Dali
 {
-
 WheelEvent::WheelEvent()
 : BaseHandle()
 {
 }
 
-WheelEvent::WheelEvent( const WheelEvent& rhs ) = default;
+WheelEvent::WheelEvent(const WheelEvent& rhs) = default;
 
-WheelEvent::WheelEvent( WheelEvent&& rhs ) = default;
+WheelEvent::WheelEvent(WheelEvent&& rhs) = default;
 
 WheelEvent::~WheelEvent()
 {
 }
 
-WheelEvent& WheelEvent::operator=( const WheelEvent& rhs ) = default;
+WheelEvent& WheelEvent::operator=(const WheelEvent& rhs) = default;
 
-WheelEvent& WheelEvent::operator=( WheelEvent&& rhs ) = default;
+WheelEvent& WheelEvent::operator=(WheelEvent&& rhs) = default;
 
 bool WheelEvent::IsShiftModifier() const
 {
-  return GetImplementation( *this ).IsShiftModifier();
+  return GetImplementation(*this).IsShiftModifier();
 }
 
 bool WheelEvent::IsCtrlModifier() const
 {
-  return GetImplementation( *this ).IsCtrlModifier();
+  return GetImplementation(*this).IsCtrlModifier();
 }
 
 bool WheelEvent::IsAltModifier() const
 {
-  return GetImplementation( *this ).IsAltModifier();
+  return GetImplementation(*this).IsAltModifier();
 }
 
 WheelEvent::Type WheelEvent::GetType() const
 {
-  return GetImplementation( *this ).GetType();
+  return GetImplementation(*this).GetType();
 }
 
 int32_t WheelEvent::GetDirection() const
 {
-  return GetImplementation( *this ).GetDirection();
+  return GetImplementation(*this).GetDirection();
 }
 
 uint32_t WheelEvent::GetModifiers() const
 {
-  return GetImplementation( *this ).GetModifiers();
+  return GetImplementation(*this).GetModifiers();
 }
 
 const Vector2& WheelEvent::GetPoint() const
 {
-  return GetImplementation( *this ).GetPoint();
+  return GetImplementation(*this).GetPoint();
 }
 
 int32_t WheelEvent::GetDelta() const
 {
-  return GetImplementation( *this ).GetDelta();
+  return GetImplementation(*this).GetDelta();
 }
 
 uint32_t WheelEvent::GetTime() const
 {
-  return GetImplementation( *this ).GetTime();
+  return GetImplementation(*this).GetTime();
 }
 
-WheelEvent::WheelEvent( Internal::WheelEvent* internal )
-: BaseHandle( internal )
+WheelEvent::WheelEvent(Internal::WheelEvent* internal)
+: BaseHandle(internal)
 {
 }
 

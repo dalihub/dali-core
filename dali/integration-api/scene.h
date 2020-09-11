@@ -22,14 +22,13 @@
 #include <memory>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/handle.h>
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
-#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/object/handle.h>
 
 namespace Dali
 {
-
 class Actor;
 class KeyEvent;
 class Layer;
@@ -39,12 +38,11 @@ class WheelEvent;
 
 namespace Internal DALI_INTERNAL
 {
-  class Scene;
+class Scene;
 }
 
 namespace Integration
 {
-
 struct Event;
 
 /**
@@ -56,13 +54,13 @@ struct Event;
 class DALI_CORE_API Scene : public BaseHandle
 {
 public:
-  typedef Signal< void () > EventProcessingFinishedSignalType; ///< Event Processing finished signal type
-  typedef Signal< void (const Dali::KeyEvent&) > KeyEventSignalType; ///< Key event signal type
-  typedef Signal< bool (const Dali::KeyEvent&) > KeyEventGeneratedSignalType; ///< key event generated signal type
-  typedef Signal< void (const Dali::TouchEvent&) > TouchEventSignalType; ///< Touch signal type
-  typedef Signal< void (const Dali::WheelEvent&) > WheelEventSignalType; ///< WheelEvent signal type
+  using EventProcessingFinishedSignalType = Signal<void()>;                        ///< Event Processing finished signal type
+  using KeyEventSignalType                = Signal<void(const Dali::KeyEvent&)>;   ///< Key event signal type
+  using KeyEventGeneratedSignalType       = Signal<bool(const Dali::KeyEvent&)>;   ///< key event generated signal type
+  using TouchEventSignalType              = Signal<void(const Dali::TouchEvent&)>; ///< Touch signal type
+  using WheelEventSignalType              = Signal<void(const Dali::WheelEvent&)>; ///< WheelEvent signal type
 
-  using FrameCallbackContainer = std::vector< std::pair< std::unique_ptr< CallbackBase >, int32_t > >;
+  using FrameCallbackContainer = std::vector<std::pair<std::unique_ptr<CallbackBase>, int32_t> >;
 
   /**
    * @brief Create an initialized Scene handle.
@@ -71,7 +69,7 @@ public:
    *
    * @return a handle to a newly allocated Dali resource.
    */
-  static Scene New( Size size );
+  static Scene New(Size size);
 
   /**
    * @brief Downcast an Object handle to Scene handle.
@@ -81,7 +79,7 @@ public:
    * @param[in] handle to An object
    * @return handle to a Scene object or an uninitialized handle
    */
-  static Scene DownCast( BaseHandle handle );
+  static Scene DownCast(BaseHandle handle);
 
   /**
    * @brief Create an uninitialized Scene handle.
@@ -146,7 +144,7 @@ public:
    * Sets horizontal and vertical pixels per inch value that is used by the display
    * @param[in] dpi Horizontal and vertical dpi value
    */
-  void SetDpi( Vector2 dpi );
+  void SetDpi(Vector2 dpi);
 
   /**
    * @brief Retrieves the DPI of the display device to which the scene is connected.
@@ -160,7 +158,7 @@ public:
    *
    * @param[in] color The new background color
    */
-  void SetBackgroundColor( const Vector4& color );
+  void SetBackgroundColor(const Vector4& color);
 
   /**
    * @brief Gets the background color of the render　surface.
@@ -198,7 +196,7 @@ public:
    * @return The layer found at the given depth
    * @pre Depth is less than layer count; see GetLayerCount().
    */
-  Layer GetLayer( uint32_t depth ) const;
+  Layer GetLayer(uint32_t depth) const;
 
   /**
    * @brief Informs the scene that the set surface has been resized.
@@ -206,7 +204,7 @@ public:
    * @param[in] width The new width of the set surface
    * @param[in] height The new height of the set surface
    */
-  void SurfaceResized( float width, float height );
+  void SurfaceResized(float width, float height);
 
   /**
    * @brief Informs the scene that the surface has been replaced.
@@ -222,13 +220,13 @@ public:
    * @brief Retrieve the Scene that the given actor belongs to.
    * @return The Scene.
    */
-  static Integration::Scene Get( Actor actor );
+  static Integration::Scene Get(Actor actor);
 
   /**
    * This function is called when an event is queued.
    * @param[in] event A event to queue.
    */
-  void QueueEvent( const Integration::Event& event );
+  void QueueEvent(const Integration::Event& event);
 
   /**
    * This function is called by Core when events are processed.
@@ -249,7 +247,7 @@ public:
    *
    * @note Ownership of the callback is passed onto this class.
    */
-  void AddFrameRenderedCallback( std::unique_ptr< CallbackBase > callback, int32_t frameId );
+  void AddFrameRenderedCallback(std::unique_ptr<CallbackBase> callback, int32_t frameId);
 
   /**
    * @brief Adds a callback that is called when the frame is displayed on the display.
@@ -265,7 +263,7 @@ public:
    *
    * @note Ownership of the callback is passed onto this class.
    */
-  void AddFramePresentedCallback( std::unique_ptr< CallbackBase > callback, int32_t frameId );
+  void AddFramePresentedCallback(std::unique_ptr<CallbackBase> callback, int32_t frameId);
 
   /**
    * @brief Gets the callback list that is called when the frame rendering is done by the graphics driver.
@@ -274,7 +272,7 @@ public:
    *
    * @note This is called in the update thread.
    */
-  void GetFrameRenderedCallback( FrameCallbackContainer& callbacks );
+  void GetFrameRenderedCallback(FrameCallbackContainer& callbacks);
 
   /**
    * @brief Gets the callback list that is called when the frame is displayed on the display.
@@ -283,7 +281,7 @@ public:
    *
    * @note This is called in the update thread.
    */
-  void GetFramePresentedCallback( FrameCallbackContainer& callbacks );
+  void GetFramePresentedCallback(FrameCallbackContainer& callbacks);
 
   /**
    * @brief This signal is emitted just after the event processing is finished.
@@ -348,7 +346,6 @@ public:
   WheelEventSignalType& WheelEventSignal();
 
 public: // Not intended for application developers
-
   /**
    * @brief This constructor is used by Dali::New() methods.
    *

@@ -21,19 +21,17 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/animation/linear-constrainer-impl.h>
 
-
 namespace Dali
 {
-
 LinearConstrainer LinearConstrainer::New()
 {
   Internal::LinearConstrainer* internal = Internal::LinearConstrainer::New();
   return LinearConstrainer(internal);
 }
 
-LinearConstrainer LinearConstrainer::DownCast( BaseHandle handle )
+LinearConstrainer LinearConstrainer::DownCast(BaseHandle handle)
 {
-  return LinearConstrainer( dynamic_cast<Dali::Internal::LinearConstrainer*>(handle.GetObjectPtr()) );
+  return LinearConstrainer(dynamic_cast<Dali::Internal::LinearConstrainer*>(handle.GetObjectPtr()));
 }
 
 LinearConstrainer::LinearConstrainer()
@@ -53,19 +51,18 @@ LinearConstrainer::LinearConstrainer(Internal::LinearConstrainer* internal)
 
 LinearConstrainer& LinearConstrainer::operator=(const LinearConstrainer& rhs) = default;
 
-LinearConstrainer::LinearConstrainer( LinearConstrainer&& rhs ) = default;
+LinearConstrainer::LinearConstrainer(LinearConstrainer&& rhs) = default;
 
-LinearConstrainer& LinearConstrainer::operator=( LinearConstrainer&& rhs ) = default;
+LinearConstrainer& LinearConstrainer::operator=(LinearConstrainer&& rhs) = default;
 
-void LinearConstrainer::Apply( Dali::Property target, Dali::Property source, const Vector2& range, const Vector2& wrap )
+void LinearConstrainer::Apply(Dali::Property target, Dali::Property source, const Vector2& range, const Vector2& wrap)
 {
-  GetImplementation(*this).Apply( target, source, range, wrap );
+  GetImplementation(*this).Apply(target, source, range, wrap);
 }
 
-void LinearConstrainer::Remove( Dali::Handle& target )
+void LinearConstrainer::Remove(Dali::Handle& target)
 {
-  GetImplementation(*this).Remove( target );
+  GetImplementation(*this).Remove(target);
 }
 
-
-} // Dali
+} // namespace Dali

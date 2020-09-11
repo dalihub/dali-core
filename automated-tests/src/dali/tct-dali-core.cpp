@@ -1,21 +1,22 @@
-#include <string.h>
 #include <getopt.h>
 #include <stdlib.h>
+#include <string.h>
 #include <test-harness.h>
+
 #include "tct-dali-core.h"
 
-int main(int argc, char * const argv[])
+int main(int argc, char* const argv[])
 {
   int result = TestHarness::EXIT_STATUS_BAD_ARGUMENT;
 
   const char* optString = "sf";
-  bool optRerunFailed(true);
-  bool optRunSerially(false);
+  bool        optRerunFailed(true);
+  bool        optRunSerially(false);
 
   int nextOpt = 0;
   do
   {
-    nextOpt = getopt( argc, argv, optString );
+    nextOpt = getopt(argc, argv, optString);
     switch(nextOpt)
     {
       case 'f':
@@ -29,17 +30,17 @@ int main(int argc, char * const argv[])
         exit(TestHarness::EXIT_STATUS_BAD_ARGUMENT);
         break;
     }
-  } while( nextOpt != -1 );
+  } while(nextOpt != -1);
 
-  if( optind == argc ) // no testcase name in argument list
+  if(optind == argc) // no testcase name in argument list
   {
-    if( optRunSerially )
+    if(optRunSerially)
     {
-      result = TestHarness::RunAll( argv[0], tc_array );
+      result = TestHarness::RunAll(argv[0], tc_array);
     }
     else
     {
-      result = TestHarness::RunAllInParallel( argv[0], tc_array, optRerunFailed );
+      result = TestHarness::RunAllInParallel(argv[0], tc_array, optRerunFailed);
     }
   }
   else

@@ -23,14 +23,13 @@
 
 namespace Dali
 {
-
-const Radian PanGestureDetector::DIRECTION_LEFT( -Math::PI );
-const Radian PanGestureDetector::DIRECTION_RIGHT( 0.0f );
-const Radian PanGestureDetector::DIRECTION_UP( -0.5f * Math::PI );
-const Radian PanGestureDetector::DIRECTION_DOWN( 0.5f * Math::PI );
-const Radian PanGestureDetector::DIRECTION_HORIZONTAL( Math::PI );
-const Radian PanGestureDetector::DIRECTION_VERTICAL( -0.5f * Math::PI );
-const Radian PanGestureDetector::DEFAULT_THRESHOLD( 0.25f * Math::PI );
+const Radian PanGestureDetector::DIRECTION_LEFT(-Math::PI);
+const Radian PanGestureDetector::DIRECTION_RIGHT(0.0f);
+const Radian PanGestureDetector::DIRECTION_UP(-0.5f * Math::PI);
+const Radian PanGestureDetector::DIRECTION_DOWN(0.5f * Math::PI);
+const Radian PanGestureDetector::DIRECTION_HORIZONTAL(Math::PI);
+const Radian PanGestureDetector::DIRECTION_VERTICAL(-0.5f * Math::PI);
+const Radian PanGestureDetector::DEFAULT_THRESHOLD(0.25f * Math::PI);
 
 PanGestureDetector::PanGestureDetector(Internal::PanGestureDetector* internal)
 : GestureDetector(internal)
@@ -48,9 +47,9 @@ PanGestureDetector PanGestureDetector::New()
   return PanGestureDetector(internal.Get());
 }
 
-PanGestureDetector PanGestureDetector::DownCast( BaseHandle handle )
+PanGestureDetector PanGestureDetector::DownCast(BaseHandle handle)
 {
-  return PanGestureDetector( dynamic_cast<Dali::Internal::PanGestureDetector*>(handle.GetObjectPtr()) );
+  return PanGestureDetector(dynamic_cast<Dali::Internal::PanGestureDetector*>(handle.GetObjectPtr()));
 }
 
 PanGestureDetector::~PanGestureDetector()
@@ -88,14 +87,14 @@ uint32_t PanGestureDetector::GetMaximumTouchesRequired() const
   return GetImplementation(*this).GetMaximumTouchesRequired();
 }
 
-void PanGestureDetector::AddAngle( Radian angle, Radian threshold )
+void PanGestureDetector::AddAngle(Radian angle, Radian threshold)
 {
-  GetImplementation(*this).AddAngle( angle, threshold );
+  GetImplementation(*this).AddAngle(angle, threshold);
 }
 
-void PanGestureDetector::AddDirection( Radian direction, Radian threshold )
+void PanGestureDetector::AddDirection(Radian direction, Radian threshold)
 {
-  GetImplementation(*this).AddDirection( direction, threshold );
+  GetImplementation(*this).AddDirection(direction, threshold);
 }
 
 size_t PanGestureDetector::GetAngleCount() const
@@ -105,7 +104,7 @@ size_t PanGestureDetector::GetAngleCount() const
 
 PanGestureDetector::AngleThresholdPair PanGestureDetector::GetAngle(size_t index) const
 {
-  return GetImplementation(*this).GetAngle( static_cast<uint32_t>( index ) );
+  return GetImplementation(*this).GetAngle(static_cast<uint32_t>(index));
 }
 
 void PanGestureDetector::ClearAngles()
@@ -113,14 +112,14 @@ void PanGestureDetector::ClearAngles()
   GetImplementation(*this).ClearAngles();
 }
 
-void PanGestureDetector::RemoveAngle( Radian angle )
+void PanGestureDetector::RemoveAngle(Radian angle)
 {
-  GetImplementation(*this).RemoveAngle( angle );
+  GetImplementation(*this).RemoveAngle(angle);
 }
 
-void PanGestureDetector::RemoveDirection( Radian direction )
+void PanGestureDetector::RemoveDirection(Radian direction)
 {
-  GetImplementation(*this).RemoveDirection( direction );
+  GetImplementation(*this).RemoveDirection(direction);
 }
 
 PanGestureDetector::DetectedSignalType& PanGestureDetector::DetectedSignal()
@@ -128,9 +127,9 @@ PanGestureDetector::DetectedSignalType& PanGestureDetector::DetectedSignal()
   return GetImplementation(*this).DetectedSignal();
 }
 
-void PanGestureDetector::SetPanGestureProperties( const Dali::PanGesture& pan )
+void PanGestureDetector::SetPanGestureProperties(const Dali::PanGesture& pan)
 {
-  Internal::PanGestureDetector::SetPanGestureProperties( pan );
+  Internal::PanGestureDetector::SetPanGestureProperties(pan);
 }
 
 } // namespace Dali

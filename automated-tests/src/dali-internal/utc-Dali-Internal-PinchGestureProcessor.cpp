@@ -15,14 +15,14 @@
  *
  */
 
-#include <iostream>
-
-#include <stdlib.h>
-#include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
-#include <dali/internal/event/events/pinch-gesture/pinch-gesture-processor.h>
-#include <dali/internal/event/events/pinch-gesture/pinch-gesture-event.h>
 #include <dali/internal/event/common/scene-impl.h>
+#include <dali/internal/event/events/pinch-gesture/pinch-gesture-event.h>
+#include <dali/internal/event/events/pinch-gesture/pinch-gesture-processor.h>
+#include <dali/public-api/dali-core.h>
+#include <stdlib.h>
+
+#include <iostream>
 
 using namespace Dali;
 
@@ -38,28 +38,27 @@ void utc_dali_internal_pinch_gesture_processor_cleanup(void)
 
 namespace
 {
-
 void TestAbortWithState(GestureState state)
 {
   TestApplication application;
 
   Internal::PinchGestureProcessor processor;
-  Integration::Scene scene( application.GetScene() );
-  Internal::Scene& sceneImpl = GetImplementation( scene );
-  Internal::PinchGestureEvent event(state);
+  Integration::Scene              scene(application.GetScene());
+  Internal::Scene&                sceneImpl = GetImplementation(scene);
+  Internal::PinchGestureEvent     event(state);
 
   try
   {
     processor.Process(sceneImpl, event);
-    DALI_TEST_CHECK( false ); // Should not get here as we expect an abort
+    DALI_TEST_CHECK(false); // Should not get here as we expect an abort
   }
   catch(...)
   {
-    DALI_TEST_CHECK( true ); // We aborted, so the test has passed
+    DALI_TEST_CHECK(true); // We aborted, so the test has passed
   }
 }
 
-} // anon namespace
+} // namespace
 
 int UtcDaliPinchGestureProcessorProcessClearStateN(void)
 {
@@ -72,4 +71,3 @@ int UtcDaliPinchGestureProcessorProcessPossibleStateN(void)
   TestAbortWithState(GestureState::POSSIBLE);
   END_TEST;
 }
-

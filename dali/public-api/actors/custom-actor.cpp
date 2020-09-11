@@ -24,10 +24,8 @@
 
 namespace Dali
 {
-
 namespace
 {
-
 using namespace Dali;
 
 BaseHandle Create()
@@ -36,17 +34,17 @@ BaseHandle Create()
   return BaseHandle();
 }
 
-TypeRegistration mType( typeid(Dali::CustomActor), typeid(Dali::Actor), Create );
+TypeRegistration mType(typeid(Dali::CustomActor), typeid(Dali::Actor), Create);
 
-}
+} // namespace
 
 CustomActor::CustomActor()
 {
 }
 
-CustomActor CustomActor::DownCast( BaseHandle handle )
+CustomActor CustomActor::DownCast(BaseHandle handle)
 {
-  return CustomActor( dynamic_cast<Dali::Internal::CustomActor*>(handle.GetObjectPtr()) );
+  return CustomActor(dynamic_cast<Dali::Internal::CustomActor*>(handle.GetObjectPtr()));
 }
 
 CustomActor::~CustomActor()
@@ -57,9 +55,9 @@ CustomActor::CustomActor(const CustomActor& copy) = default;
 
 CustomActor& CustomActor::operator=(const CustomActor& rhs) = default;
 
-CustomActor::CustomActor( CustomActor&& rhs ) = default;
+CustomActor::CustomActor(CustomActor&& rhs) = default;
 
-CustomActor& CustomActor::operator=( CustomActor&& rhs ) = default;
+CustomActor& CustomActor::operator=(CustomActor&& rhs) = default;
 
 CustomActorImpl& CustomActor::GetImplementation()
 {
@@ -91,7 +89,7 @@ CustomActor::CustomActor(Internal::CustomActor* internal)
   // Without this check, the actor will be deleted a second time, when the handle is disposed of
   // causing a crash.
 
-  if (internal)
+  if(internal)
   {
     DALI_ASSERT_ALWAYS(internal->ReferenceCount() != 1 && "Are you trying to use CustomActorImpl::Self() inside a CustomActorImpl destructor?");
   }

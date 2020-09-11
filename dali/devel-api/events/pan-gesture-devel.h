@@ -24,10 +24,8 @@
 
 namespace Dali
 {
-
 namespace DevelPanGesture
 {
-
 /**
  * @brief Create a PanGeture for internal.
  * @param[in] state The state of the PanGesture

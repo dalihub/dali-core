@@ -19,10 +19,10 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/images/native-image-interface.h>
-#include <dali/public-api/images/pixel.h>
 #include <dali/public-api/images/pixel-data.h>
+#include <dali/public-api/images/pixel.h>
+#include <dali/public-api/object/base-handle.h>
 
 namespace Dali
 {
@@ -38,36 +38,33 @@ class Texture;
 
 namespace TextureType
 {
-
 /**
  * @brief Enumeration for texture types.
  * @SINCE_1_1.43
  */
 enum Type
 {
-  TEXTURE_2D,   ///< One 2D image                            @SINCE_1_1.43
-  TEXTURE_CUBE  ///< Six 2D images arranged in a cube-shape  @SINCE_1_1.43
+  TEXTURE_2D,  ///< One 2D image                            @SINCE_1_1.43
+  TEXTURE_CUBE ///< Six 2D images arranged in a cube-shape  @SINCE_1_1.43
 };
 
 } // namespace TextureType
 
 namespace CubeMapLayer
 {
-
-  /**
+/**
    * @brief Faces of a cube map.
    * These constants should be used as the "layer" parameter when uploading a cube-map with Texture::Upload.
    * @SINCE_1_1.43
    */
-  const uint32_t POSITIVE_X = 0u; ///< CubeMap image for +x @SINCE_1_1.43
-  const uint32_t NEGATIVE_X = 1u; ///< CubeMap image for -x @SINCE_1_1.43
-  const uint32_t POSITIVE_Y = 2u; ///< CubeMap image for +y @SINCE_1_1.43
-  const uint32_t NEGATIVE_Y = 3u; ///< CubeMap image for -y @SINCE_1_1.43
-  const uint32_t POSITIVE_Z = 4u; ///< CubeMap image for +z @SINCE_1_1.43
-  const uint32_t NEGATIVE_Z = 5u; ///< CubeMap image for -z @SINCE_1_1.43
+const uint32_t POSITIVE_X = 0u; ///< CubeMap image for +x @SINCE_1_1.43
+const uint32_t NEGATIVE_X = 1u; ///< CubeMap image for -x @SINCE_1_1.43
+const uint32_t POSITIVE_Y = 2u; ///< CubeMap image for +y @SINCE_1_1.43
+const uint32_t NEGATIVE_Y = 3u; ///< CubeMap image for -y @SINCE_1_1.43
+const uint32_t POSITIVE_Z = 4u; ///< CubeMap image for +z @SINCE_1_1.43
+const uint32_t NEGATIVE_Z = 5u; ///< CubeMap image for -z @SINCE_1_1.43
 
 } // namespace CubeMapLayer
-
 
 /**
  * @brief Texture represents a texture object used as input or output by shaders.
@@ -76,7 +73,6 @@ namespace CubeMapLayer
 class DALI_CORE_API Texture : public BaseHandle
 {
 public:
-
   /**
    * @brief Creates a new Texture object.
    *
@@ -87,7 +83,7 @@ public:
    * @param[in] height The height of the texture
    * @return A handle to a newly allocated Texture
    */
-  static Texture New( TextureType::Type type, Pixel::Format format, uint32_t width, uint32_t height );
+  static Texture New(TextureType::Type type, Pixel::Format format, uint32_t width, uint32_t height);
 
   /**
    * @brief Creates a new Texture object from a native image.
@@ -98,7 +94,7 @@ public:
    * @note It is not possible to upload data to textures created from a native image using Upload methods
    * although there might be platform specific APIs to upload data to a native image.
    */
-  static Texture New( NativeImageInterface& nativeImageInterface );
+  static Texture New(NativeImageInterface& nativeImageInterface);
 
   /**
    * @brief Default constructor, creates an empty handle.
@@ -120,7 +116,7 @@ public:
    * @SINCE_1_1.43
    * @param[in] handle Handle to an object
    */
-  Texture( const Texture& handle );
+  Texture(const Texture& handle);
 
   /**
    * @brief Downcasts to a texture.
@@ -130,7 +126,7 @@ public:
    * @param[in] handle Handle to an object
    * @return Texture handle or an uninitialized handle
    */
-  static Texture DownCast( BaseHandle handle );
+  static Texture DownCast(BaseHandle handle);
 
   /**
    * @brief Assignment operator, changes this handle to point at the same object.
@@ -139,7 +135,7 @@ public:
    * @param[in] handle Handle to an object
    * @return Reference to the assigned object
    */
-  Texture& operator=( const Texture& handle );
+  Texture& operator=(const Texture& handle);
 
   /**
    * @brief Move constructor.
@@ -147,7 +143,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  Texture( Texture&& rhs );
+  Texture(Texture&& rhs);
 
   /**
    * @brief Move assignment operator.
@@ -156,7 +152,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  Texture& operator=( Texture&& rhs );
+  Texture& operator=(Texture&& rhs);
 
   /**
    * @brief Uploads data to the texture from a PixelData object.
@@ -165,7 +161,7 @@ public:
    * @param[in] pixelData The pixelData object
    * @return True if the PixelData object has compatible pixel format and fits within the texture, false otherwise
    */
-  bool Upload( PixelData pixelData );
+  bool Upload(PixelData pixelData);
 
   /**
    * @brief Uploads data to the texture from a PixelData object.
@@ -181,10 +177,13 @@ public:
    * @param[in] height Specifies the height of the rectangular area in the texture that will be updated
    * @return True if the PixelData object has compatible pixel format and fits in the rectangle specified, false otherwise
    */
-  bool Upload( PixelData pixelData,
-               uint32_t layer, uint32_t mipmap,
-               uint32_t xOffset, uint32_t yOffset,
-               uint32_t width, uint32_t height );
+  bool Upload(PixelData pixelData,
+              uint32_t  layer,
+              uint32_t  mipmap,
+              uint32_t  xOffset,
+              uint32_t  yOffset,
+              uint32_t  width,
+              uint32_t  height);
 
   /**
    * @brief Generates mipmaps for the texture.
@@ -211,14 +210,13 @@ public:
   uint32_t GetHeight() const;
 
 public:
-
   /**
    * @brief The constructor.
    * @note  Not intended for application developers.
    * @SINCE_1_1.43
    * @param[in] pointer A pointer to a newly allocated Texture
    */
-  explicit DALI_INTERNAL Texture( Internal::Texture* pointer );
+  explicit DALI_INTERNAL Texture(Internal::Texture* pointer);
 };
 
 /**

@@ -241,7 +241,7 @@ namespace Internal
 
 BlendingOptions::BlendingOptions()
 : mBitmask( 0u ),
-  mBlendColor( NULL )
+  mBlendColor( nullptr )
 {
   SetBlendFunc( BlendFactor::SRC_ALPHA, BlendFactor::ONE_MINUS_SRC_ALPHA,
                 BlendFactor::ONE,       BlendFactor::ONE_MINUS_SRC_ALPHA );
@@ -316,7 +316,7 @@ void BlendingOptions::SetBlendColor( const Vector4& color )
 {
   if( Color::TRANSPARENT == color )
   {
-    mBlendColor = NULL;
+    mBlendColor = nullptr;
   }
   else
   {

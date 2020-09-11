@@ -159,31 +159,31 @@ protected:
   /**
    * virtual destructor
    */
-  virtual ~LinearConstrainer();
+  ~LinearConstrainer() override;
 
 private:
 
   /**
    * @copydoc Dali::Internal::Object::SetDefaultProperty()
    */
-  virtual void SetDefaultProperty(Property::Index index, const Property::Value& propertyValue);
+  void SetDefaultProperty(Property::Index index, const Property::Value& propertyValue) override;
 
   /**
    * @copydoc Dali::Internal::Object::GetDefaultProperty()
    */
-  virtual Property::Value GetDefaultProperty( Property::Index index ) const;
+  Property::Value GetDefaultProperty( Property::Index index ) const override;
 
  /**
   * @copydoc Dali::Internal::Object::GetDefaultPropertyCurrentValue()
   */
- virtual Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const;
+ Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const override;
 
 public:
 
   /**
    * @copydoc Dali::PathConstrainer::Apply
    */
-  void Apply( Property target, Property source, const Vector2& range, const Vector2& wrap );
+  void Apply( Property target, Property source, const Vector2& range, const Vector2& wrap ) override;
 
 private:
 

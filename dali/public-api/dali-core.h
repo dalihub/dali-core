@@ -18,8 +18,8 @@
  *
  */
 
-#include <dali/public-api/actors/actor.h>
 #include <dali/public-api/actors/actor-enumerations.h>
+#include <dali/public-api/actors/actor.h>
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/actors/custom-actor-impl.h>
 #include <dali/public-api/actors/custom-actor.h>
@@ -51,7 +51,6 @@
 #include <dali/public-api/events/key-event.h>
 #include <dali/public-api/events/long-press-gesture-detector.h>
 #include <dali/public-api/events/long-press-gesture.h>
-#include <dali/public-api/events/wheel-event.h>
 #include <dali/public-api/events/pan-gesture-detector.h>
 #include <dali/public-api/events/pan-gesture.h>
 #include <dali/public-api/events/pinch-gesture-detector.h>
@@ -62,10 +61,11 @@
 #include <dali/public-api/events/tap-gesture-detector.h>
 #include <dali/public-api/events/tap-gesture.h>
 #include <dali/public-api/events/touch-event.h>
+#include <dali/public-api/events/wheel-event.h>
 
 #include <dali/public-api/images/native-image-interface.h>
-#include <dali/public-api/images/pixel.h>
 #include <dali/public-api/images/pixel-data.h>
+#include <dali/public-api/images/pixel.h>
 
 #include <dali/public-api/math/angle-axis.h>
 #include <dali/public-api/math/compile-time-math.h>
@@ -97,8 +97,8 @@
 #include <dali/public-api/object/property.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/object/type-info.h>
-#include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
+#include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/weak-handle.h>
 
 #include <dali/public-api/render-tasks/render-task-list.h>
@@ -109,8 +109,8 @@
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/sampler.h>
 #include <dali/public-api/rendering/shader.h>
-#include <dali/public-api/rendering/texture.h>
 #include <dali/public-api/rendering/texture-set.h>
+#include <dali/public-api/rendering/texture.h>
 #include <dali/public-api/rendering/vertex-buffer.h>
 
 #include <dali/public-api/signals/base-signal.h>

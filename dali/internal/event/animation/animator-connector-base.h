@@ -71,7 +71,7 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~AnimatorConnectorBase()
+  ~AnimatorConnectorBase() override
   {
     if( mObject )
     {
@@ -181,7 +181,7 @@ private:
   /**
    * From Object::Observer
    */
-  virtual void SceneObjectAdded( Object& object ) override final
+  void SceneObjectAdded( Object& object ) final
   {
     // If the animator has not been created yet, create it now.
     if( !mAnimator && mObject )
@@ -193,14 +193,14 @@ private:
   /**
    * From Object::Observer
    */
-  virtual void SceneObjectRemoved( Object& object ) override final
+  void SceneObjectRemoved( Object& object ) final
   {
   }
 
   /**
    * From Object::Observer
    */
-  virtual void ObjectDestroyed( Object& object )
+  void ObjectDestroyed( Object& object ) override
   {
     mObject = nullptr;
   }

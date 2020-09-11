@@ -26,8 +26,7 @@ namespace Dali
 
 namespace Internal
 {
-
-typedef uint32_t BufferIndex;
+using BufferIndex = uint32_t;
 
 } // namespace Internal
 

@@ -2,7 +2,7 @@
 #define DALI_TYPE_TRAITS_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ namespace Dali
  * This allows specializations to not have to repeat all flags.
  * @SINCE_1_0.0
  */
-template <typename Type>
+template<typename Type>
 struct BasicTypes
 {
   /**
@@ -41,7 +41,10 @@ struct BasicTypes
    * and cannot be copied by using memcpy etc.
    * @SINCE_1_0.0
    */
-  enum { IS_TRIVIAL_TYPE = __has_trivial_destructor(Type) && __has_trivial_copy(Type) };
+  enum
+  {
+    IS_TRIVIAL_TYPE = __has_trivial_destructor(Type) && __has_trivial_copy(Type)
+  };
 };
 
 /**
@@ -61,8 +64,8 @@ struct BasicTypes
  *
  * @SINCE_1_0.0
  */
-template <typename Type>
-struct TypeTraits : public BasicTypes< Type >
+template<typename Type>
+struct TypeTraits : public BasicTypes<Type>
 {
 };
 

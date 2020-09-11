@@ -2,7 +2,7 @@
 #define DALI_CIRCULAR_QUEUE_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,12 @@
 
 namespace Dali
 {
-
 /**
  * Class to provide a circular growable queue on top of Dali::Vector
  * It is designed to occupy a fixed block of memory. It does not allow
  * addition of elements past the start; i.e. it doesn't overwrite.
  */
-template <typename ElementType>
+template<typename ElementType>
 class CircularQueue
 {
 public:
@@ -36,7 +35,7 @@ public:
    * Constructor
    * @param[in] maximumSize The maximum number of elements that the queue can contain
    */
-  CircularQueue( int maximumSize )
+  CircularQueue(int maximumSize)
   : mMaximumSize(maximumSize),
     mStartMarker(0),
     mEndMarker(0),
@@ -56,14 +55,14 @@ public:
   ElementType& operator[](unsigned int index)
   {
     unsigned int actualIndex = (mStartMarker + index) % mMaximumSize;
-    DALI_ASSERT_ALWAYS( actualIndex<mQueue.Count() && "Reading outside queue boundary");
+    DALI_ASSERT_ALWAYS(actualIndex < mQueue.Count() && "Reading outside queue boundary");
     return mQueue[actualIndex];
   }
 
   const ElementType& operator[](unsigned int index) const
   {
     unsigned int actualIndex = (mStartMarker + index) % mMaximumSize;
-    DALI_ASSERT_ALWAYS( actualIndex<mQueue.Count() && "Reading outside queue boundary");
+    DALI_ASSERT_ALWAYS(actualIndex < mQueue.Count() && "Reading outside queue boundary");
     return mQueue[actualIndex];
   }
 
@@ -74,32 +73,32 @@ public:
    * @warning This method asserts if the user attempts to push more elements
    * than the maximum size specified in the constructor
    */
-  void PushBack( const ElementType& element )
+  void PushBack(const ElementType& element)
   {
-    DALI_ASSERT_ALWAYS( !IsFull() && "Adding to full queue");
+    DALI_ASSERT_ALWAYS(!IsFull() && "Adding to full queue");
 
     // Push back if we need to increase the vector count
-    if( mQueue.Count() == 0 || ( mQueue.Count() < mMaximumSize && ! IsEmpty() ) )
+    if(mQueue.Count() == 0 || (mQueue.Count() < mMaximumSize && !IsEmpty()))
     {
       mQueue.PushBack(element);
-      if( !IsEmpty() )
+      if(!IsEmpty())
       {
         ++mEndMarker;
       }
       ++mNumberOfElements;
     }
-    else if( IsEmpty() )
+    else if(IsEmpty())
     {
       // Don't advance the end marker or increase the vector count
       mQueue[mEndMarker] = element;
       ++mNumberOfElements;
     }
-    else if( !IsFull() )
+    else if(!IsFull())
     {
       // vector is at max and there is space: advance end marker
       ++mEndMarker;
       mEndMarker %= mMaximumSize;
-      mQueue[ mEndMarker ] = element;
+      mQueue[mEndMarker] = element;
       ++mNumberOfElements;
     }
   }
@@ -112,15 +111,15 @@ public:
    */
   ElementType PopFront()
   {
-    DALI_ASSERT_ALWAYS( !IsEmpty() && "Reading from empty queue" );
+    DALI_ASSERT_ALWAYS(!IsEmpty() && "Reading from empty queue");
     ElementType element;
 
-    if( mNumberOfElements == 1 )
+    if(mNumberOfElements == 1)
     {
-      element = mQueue[mStartMarker];
+      element           = mQueue[mStartMarker];
       mNumberOfElements = 0;
     }
-    else if( mNumberOfElements > 1 )
+    else if(mNumberOfElements > 1)
     {
       element = mQueue[mStartMarker];
       ++mStartMarker;
@@ -133,25 +132,25 @@ public:
 
   ElementType& Front()
   {
-    DALI_ASSERT_ALWAYS( !IsEmpty() && "Reading from empty queue" );
+    DALI_ASSERT_ALWAYS(!IsEmpty() && "Reading from empty queue");
     return mQueue[mStartMarker];
   }
 
   const ElementType& Front() const
   {
-    DALI_ASSERT_ALWAYS( !IsEmpty() && "Reading from empty queue" );
+    DALI_ASSERT_ALWAYS(!IsEmpty() && "Reading from empty queue");
     return mQueue[mStartMarker];
   }
 
   ElementType& Back()
   {
-    DALI_ASSERT_ALWAYS( !IsEmpty() && "Reading from empty queue" );
+    DALI_ASSERT_ALWAYS(!IsEmpty() && "Reading from empty queue");
     return mQueue[mEndMarker];
   }
 
   const ElementType& Back() const
   {
-    DALI_ASSERT_ALWAYS( !IsEmpty() && "Reading from empty queue" );
+    DALI_ASSERT_ALWAYS(!IsEmpty() && "Reading from empty queue");
     return mQueue[mEndMarker];
   }
 
@@ -172,9 +171,9 @@ public:
    */
   bool IsFull() const
   {
-    return ( mQueue.Count() == mMaximumSize &&
-             mNumberOfElements > 0 &&
-             (mEndMarker + 1) % mMaximumSize == mStartMarker );
+    return (mQueue.Count() == mMaximumSize &&
+            mNumberOfElements > 0 &&
+            (mEndMarker + 1) % mMaximumSize == mStartMarker);
   }
 
   /**
@@ -195,6 +194,6 @@ private:
   int         mNumberOfElements; ///< Number of valid elements in the queue
 };
 
-} // Dali
+} // namespace Dali
 
 #endif //  DALI_CIRCULAR_QUEUE_H

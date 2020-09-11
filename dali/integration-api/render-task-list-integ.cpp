@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,28 +19,25 @@
 #include <dali/integration-api/render-task-list-integ.h>
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/render-tasks/render-task-list-impl.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/camera-actor-impl.h>
+#include <dali/internal/event/render-tasks/render-task-list-impl.h>
 
 namespace Dali
 {
-
 namespace Integration
 {
-
 namespace RenderTaskList
 {
-
 Dali::RenderTaskList New()
 {
   Dali::Internal::RenderTaskListPtr renderTaskList = Dali::Internal::RenderTaskList::New();
-  return Dali::RenderTaskList( renderTaskList.Get() );
+  return Dali::RenderTaskList(renderTaskList.Get());
 }
 
-Dali::RenderTask CreateTask( Dali::RenderTaskList& taskList, Dali::Actor& sourceActor, Dali::CameraActor& cameraActor)
+Dali::RenderTask CreateTask(Dali::RenderTaskList& taskList, Dali::Actor& sourceActor, Dali::CameraActor& cameraActor)
 {
-  return RenderTask( GetImplementation(taskList).CreateTask( &GetImplementation( sourceActor), &GetImplementation(cameraActor) ).Get() );
+  return RenderTask(GetImplementation(taskList).CreateTask(&GetImplementation(sourceActor), &GetImplementation(cameraActor)).Get());
 }
 
 } // namespace RenderTaskList

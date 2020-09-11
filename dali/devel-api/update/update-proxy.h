@@ -2,7 +2,7 @@
 #define DALI_UPDATE_PROXY_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@
 
 namespace Dali
 {
-
 namespace Internal DALI_INTERNAL
 {
 class UpdateProxy;
@@ -46,14 +45,13 @@ class UpdateProxy;
 class DALI_CORE_API UpdateProxy
 {
 public:
-
   /**
    * @brief Given the Actor ID, this retrieves that Actor's local position.
    * @param[in]   id        The Actor ID
    * @param[out]  position  Set to the Actor's current position, if Actor ID is valid
    * @return Whether the method call was successful or not.
    */
-  bool GetPosition( uint32_t id, Vector3& position ) const;
+  bool GetPosition(uint32_t id, Vector3& position) const;
 
   /**
    * @brief Allows setting an Actor's local position from the Frame callback function for the current frame only.
@@ -62,7 +60,7 @@ public:
    * @return Whether the method call was successful or not.
    * @note This will get reset to the internally calculated or previously baked value in the next frame, so will have to be set again.
    */
-  bool SetPosition( uint32_t id, const Vector3& position );
+  bool SetPosition(uint32_t id, const Vector3& position);
 
   /**
    * @brief Allows baking an Actor's local position from the Frame callback function.
@@ -71,7 +69,7 @@ public:
    * @return Whether the method call was successful or not.
    * @note The value is saved so will cause undesired effects if this property is being animated.
    */
-  bool BakePosition( uint32_t id, const Vector3& position );
+  bool BakePosition(uint32_t id, const Vector3& position);
 
   /**
    * @brief Given the Actor ID, this retrieves that Actor's size.
@@ -79,7 +77,7 @@ public:
    * @param[out]  size  Set to the Actor's current size, if Actor ID is valid
    * @return Whether the method call was successful or not.
    */
-  bool GetSize( uint32_t id, Vector3& size ) const;
+  bool GetSize(uint32_t id, Vector3& size) const;
 
   /**
    * @brief Allows setting an Actor's size from the Frame callback function for the current frame only.
@@ -88,7 +86,7 @@ public:
    * @return Whether the method call was successful or not.
    * @note This will get reset to the internally calculated or previously baked value in the next frame, so will have to be set again.
    */
-  bool SetSize( uint32_t id, const Vector3& size );
+  bool SetSize(uint32_t id, const Vector3& size);
 
   /**
    * @brief Allows baking an Actor's size from the Frame callback function.
@@ -97,7 +95,7 @@ public:
    * @return Whether the method call was successful or not.
    * @note The value is saved so will cause undesired effects if this property is being animated.
    */
-  bool BakeSize( uint32_t id, const Vector3& size );
+  bool BakeSize(uint32_t id, const Vector3& size);
 
   /**
    * @brief Given the Actor ID, this retrieves that Actor's local position and size.
@@ -106,7 +104,7 @@ public:
    * @param[out]  size      Set to the Actor's current size, if Actor ID is valid
    * @return Whether the method call was successful or not.
    */
-  bool GetPositionAndSize( uint32_t id, Vector3& position, Vector3& size ) const;
+  bool GetPositionAndSize(uint32_t id, Vector3& position, Vector3& size) const;
 
   /**
    * @brief Given the Actor ID, this retrieves that Actor's local scale.
@@ -114,7 +112,7 @@ public:
    * @param[out]  scale  Set to the Actor's current scale, if Actor ID is valid
    * @return Whether the method call was successful or not.
    */
-  bool GetScale( uint32_t id, Vector3& scale ) const;
+  bool GetScale(uint32_t id, Vector3& scale) const;
 
   /**
    * @brief Allows setting an Actor's local scale from the Frame callback function for the current frame only.
@@ -123,7 +121,7 @@ public:
    * @return Whether the method call was successful or not.
    * @note This will get reset to the internally calculated or previously baked value in the next frame, so will have to be set again.
    */
-  bool SetScale( uint32_t id, const Vector3& scale );
+  bool SetScale(uint32_t id, const Vector3& scale);
 
   /**
    * @brief Allows baking an Actor's local scale from the Frame callback function.
@@ -132,7 +130,7 @@ public:
    * @return Whether the method call was successful or not.
    * @note The value is saved so will cause undesired effects if this property is being animated.
    */
-  bool BakeScale( uint32_t id, const Vector3& scale );
+  bool BakeScale(uint32_t id, const Vector3& scale);
 
   /**
    * @brief Given the Actor ID, this retrieves that Actor's local color.
@@ -140,7 +138,7 @@ public:
    * @param[out]  color  Set to the Actor's current color, if Actor ID is valid
    * @return Whether the method call was successful or not.
    */
-  bool GetColor( uint32_t id, Vector4& color ) const;
+  bool GetColor(uint32_t id, Vector4& color) const;
 
   /**
    * @brief Allows setting an Actor's local color from the Frame callback function for the current frame only.
@@ -149,7 +147,7 @@ public:
    * @return Whether the method call was successful or not.
    * @note This will get reset to the internally calculated or previously baked value in the next frame, so will have to be set again.
    */
-  bool SetColor( uint32_t id, const Vector4& color );
+  bool SetColor(uint32_t id, const Vector4& color);
 
   /**
    * @brief Allows baking an Actor's local color from the Frame callback function.
@@ -158,17 +156,16 @@ public:
    * @return Whether the method call was successful or not.
    * @note The value is saved so will cause undesired effects if this property is being animated.
    */
-  bool BakeColor( uint32_t id, const Vector4& color );
+  bool BakeColor(uint32_t id, const Vector4& color);
 
 public: // Not intended for application developers
-
   /// @cond internal
 
   /**
    * @brief Constructor.
    * @param[in]  impl  A reference to the internal object.
    */
-  DALI_INTERNAL UpdateProxy( Internal::UpdateProxy& impl );
+  DALI_INTERNAL UpdateProxy(Internal::UpdateProxy& impl);
 
   /**
    * @brief Destructor.
@@ -177,15 +174,14 @@ public: // Not intended for application developers
 
   // Not copyable or movable
 
-  UpdateProxy( const UpdateProxy& )            = delete; ///< Deleted copy constructor
-  UpdateProxy( UpdateProxy&& )                 = delete; ///< Deleted move constructor
-  UpdateProxy& operator=( const UpdateProxy& ) = delete; ///< Deleted copy assignment operator
-  UpdateProxy& operator=( UpdateProxy&& )      = delete; ///< Deleted move assignment operator
+  UpdateProxy(const UpdateProxy&) = delete;            ///< Deleted copy constructor
+  UpdateProxy(UpdateProxy&&)      = delete;            ///< Deleted move constructor
+  UpdateProxy& operator=(const UpdateProxy&) = delete; ///< Deleted copy assignment operator
+  UpdateProxy& operator=(UpdateProxy&&) = delete;      ///< Deleted move assignment operator
 
   /// @endcond
 
 private:
-
   /// @cond internal
   Internal::UpdateProxy& mImpl;
   /// @endcond

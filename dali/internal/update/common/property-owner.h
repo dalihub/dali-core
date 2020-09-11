@@ -39,8 +39,8 @@ namespace SceneGraph
 
 class PropertyOwner;
 
-typedef OwnerContainer< PropertyBase* > OwnedPropertyContainer;
-typedef OwnedPropertyContainer::Iterator  OwnedPropertyIter;
+using OwnedPropertyContainer = OwnerContainer<PropertyBase*>;
+using OwnedPropertyIter      = OwnedPropertyContainer::Iterator;
 
 /**
  * An update-thread object which own properties.
@@ -246,10 +246,9 @@ protected:
   bool mUpdated;
 
 private:
-
-  typedef Dali::Vector<PropertyOwner::Observer*> ObserverContainer;
-  typedef ObserverContainer::Iterator ObserverIter;
-  typedef ObserverContainer::ConstIterator ConstObserverIter;
+  using ObserverContainer = Dali::Vector<PropertyOwner::Observer*>;
+  using ObserverIter      = ObserverContainer::Iterator;
+  using ConstObserverIter = ObserverContainer::ConstIterator;
 
   ObserverContainer mObservers; ///< Container of observer raw-pointers (not owned)
 

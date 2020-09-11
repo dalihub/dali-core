@@ -29,7 +29,7 @@ namespace Internal
 
 class AnimationPlaylist;
 
-typedef OwnerPointer<AnimationPlaylist> AnimationPlaylistOwner;
+using AnimationPlaylistOwner = OwnerPointer<AnimationPlaylist>;
 
 } // namespace Internal
 

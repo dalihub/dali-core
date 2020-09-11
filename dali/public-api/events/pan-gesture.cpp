@@ -19,82 +19,81 @@
 #include <dali/public-api/events/pan-gesture.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
 #include <dali/internal/event/events/pan-gesture/pan-gesture-impl.h>
+#include <dali/public-api/common/dali-common.h>
 
 namespace Dali
 {
-
-PanGesture::PanGesture( Internal::PanGesture* internal )
-: Gesture( internal )
+PanGesture::PanGesture(Internal::PanGesture* internal)
+: Gesture(internal)
 {
 }
 
 PanGesture::PanGesture() = default;
 
-PanGesture::PanGesture( const PanGesture& rhs ) = default;
+PanGesture::PanGesture(const PanGesture& rhs) = default;
 
-PanGesture::PanGesture( PanGesture&& rhs ) = default;
+PanGesture::PanGesture(PanGesture&& rhs) = default;
 
-PanGesture& PanGesture::operator=( const PanGesture& rhs ) = default;
+PanGesture& PanGesture::operator=(const PanGesture& rhs) = default;
 
-PanGesture& PanGesture::operator=( PanGesture&& rhs ) = default;
+PanGesture& PanGesture::operator=(PanGesture&& rhs) = default;
 
 PanGesture::~PanGesture() = default;
 
 const Vector2& PanGesture::GetVelocity() const
 {
-  return GetImplementation( *this ).GetVelocity();
+  return GetImplementation(*this).GetVelocity();
 }
 
 const Vector2& PanGesture::GetDisplacement() const
 {
-  return GetImplementation( *this ).GetDisplacement();
+  return GetImplementation(*this).GetDisplacement();
 }
 
 const Vector2& PanGesture::GetPosition() const
 {
-  return GetImplementation( *this ).GetPosition();
+  return GetImplementation(*this).GetPosition();
 }
 
 const Vector2& PanGesture::GetScreenVelocity() const
 {
-  return GetImplementation( *this ).GetScreenVelocity();
+  return GetImplementation(*this).GetScreenVelocity();
 }
 
 const Vector2& PanGesture::GetScreenDisplacement() const
 {
-  return GetImplementation( *this ).GetScreenDisplacement();
+  return GetImplementation(*this).GetScreenDisplacement();
 }
 
 const Vector2& PanGesture::GetScreenPosition() const
 {
-  return GetImplementation( *this ).GetScreenPosition();
+  return GetImplementation(*this).GetScreenPosition();
 }
 
 uint32_t PanGesture::GetNumberOfTouches() const
 {
-  return GetImplementation( *this ).GetNumberOfTouches();
+  return GetImplementation(*this).GetNumberOfTouches();
 }
 
 float PanGesture::GetSpeed() const
 {
-  return GetImplementation( *this ).GetSpeed();
+  return GetImplementation(*this).GetSpeed();
 }
 
 float PanGesture::GetDistance() const
 {
-  return GetImplementation( *this ).GetDistance();
+  return GetImplementation(*this).GetDistance();
 }
 
 float PanGesture::GetScreenSpeed() const
 {
-  return GetImplementation( *this ).GetScreenSpeed();
+  return GetImplementation(*this).GetScreenSpeed();
 }
 
 float PanGesture::GetScreenDistance() const
 {
-  return GetImplementation( *this ).GetScreenDistance();
+  return GetImplementation(*this).GetScreenDistance();
 }
 
 } // namespace Dali

@@ -48,7 +48,7 @@ class Renderer;
 class RenderDataProvider
 {
 public:
-  typedef std::vector< Render::Sampler* > Samplers;
+  using Samplers = std::vector<Render::Sampler*>;
 
   /**
    * Constructor.

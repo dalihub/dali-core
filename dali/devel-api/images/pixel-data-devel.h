@@ -2,7 +2,7 @@
 #define DALI_PIXEL_DATA_DEVEL_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,10 +27,8 @@
 
 namespace Dali
 {
-
 namespace DevelPixelData
 {
-
 /**
  * Struct to keep the buffer pointer and the allocation method.
  *
@@ -40,13 +38,13 @@ namespace DevelPixelData
  */
 struct PixelDataBuffer
 {
-  uint8_t* buffer;
-  uint32_t bufferSize;
+  uint8_t*                   buffer;
+  uint32_t                   bufferSize;
   PixelData::ReleaseFunction releaseFunction;
 
-  PixelDataBuffer(  uint8_t* buffer,
-                    uint32_t bufferSize,
-                    PixelData::ReleaseFunction releaseFunction )
+  PixelDataBuffer(uint8_t*                   buffer,
+                  uint32_t                   bufferSize,
+                  PixelData::ReleaseFunction releaseFunction)
   : buffer(buffer),
     bufferSize(bufferSize),
     releaseFunction(releaseFunction)
@@ -60,10 +58,10 @@ struct PixelDataBuffer
  * @param[in,out] pixelData The pixel data object to take the buffer from
  * @return the buffer and the data release mechanism
  */
-DALI_CORE_API PixelDataBuffer ReleasePixelDataBuffer( PixelData& pixelData );
+DALI_CORE_API PixelDataBuffer ReleasePixelDataBuffer(PixelData& pixelData);
 
 } // namespace DevelPixelData
 
-} // Dali
+} // namespace Dali
 
 #endif // DALI_PIXEL_DATA_DEVEL_H

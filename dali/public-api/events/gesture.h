@@ -23,8 +23,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/events/gesture-enumerations.h>
+#include <dali/public-api/object/base-handle.h>
 
 namespace Dali
 {
@@ -56,7 +56,6 @@ class Gesture;
 class DALI_CORE_API Gesture : public BaseHandle
 {
 public:
-
   /**
    * @brief Creates an uninitialized Gesture handle.
    *
@@ -70,14 +69,14 @@ public:
    * @SINCE_1_9.28
    * @param[in] rhs A reference to the copied handle
    */
-  Gesture( const Gesture& rhs );
+  Gesture(const Gesture& rhs);
 
   /**
    * @brief Move constructor.
    * @SINCE_1_9.28
    * @param[in] rhs A reference to the handle to move
    */
-  Gesture( Gesture&& rhs );
+  Gesture(Gesture&& rhs);
 
   /**
    * @brief Assignment operator.
@@ -85,7 +84,7 @@ public:
    * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
-  Gesture& operator=( const Gesture& rhs );
+  Gesture& operator=(const Gesture& rhs);
 
   /**
    * @brief Move assignment operator.
@@ -93,7 +92,7 @@ public:
    * @param[in] rhs A reference to the handle to move
    * @return A reference to this
    */
-  Gesture& operator=( Gesture&& rhs );
+  Gesture& operator=(Gesture&& rhs);
 
   /**
    * @brief Non virtual destructor.
@@ -126,7 +125,6 @@ public:
   uint32_t GetTime() const;
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief Internal constructor.

@@ -15,16 +15,15 @@
  *
  */
 
-#include <iostream>
-
-#include <stdlib.h>
-#include <dali/public-api/dali-core.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/public-api/dali-core.h>
+#include <stdlib.h>
+
+#include <iostream>
 
 #include "dali-test-suite-utils/dali-test-suite-utils.h"
 
 using namespace Dali;
-
 
 void utc_base_handle_startup(void)
 {
@@ -39,7 +38,6 @@ void utc_base_handle_cleanup(void)
 
 namespace
 {
-
 // Functor to test whether an animation finish signal is emitted
 struct AnimationFinishCheck
 {
@@ -60,7 +58,7 @@ struct AnimationFinishCheck
 
   void CheckSignalReceived()
   {
-    if (!mSignalReceived)
+    if(!mSignalReceived)
     {
       tet_printf("Expected Finish signal was not received\n");
       tet_result(TET_FAIL);
@@ -78,7 +76,7 @@ BaseHandle ImplicitCopyConstructor(BaseHandle passedByValue)
 {
   // object + copy + passedByValue, ref count == 3
   DALI_TEST_CHECK(passedByValue);
-  if (passedByValue)
+  if(passedByValue)
   {
     DALI_TEST_EQUALS(3, passedByValue.GetBaseObject().ReferenceCount(), TEST_LOCATION);
   }
@@ -101,16 +99,15 @@ class FakeObject : public BaseObject
 {
 };
 // used for testing ThisIsSaferThanReturningVoidStar
-class FakeHandle :  public BaseHandle
+class FakeHandle : public BaseHandle
 {
 public:
-
   void RunTest()
   {
     return ThisIsSaferThanReturningVoidStar();
   }
 };
-} // anon namespace
+} // namespace
 
 int UtcDaliBaseHandleConstructorVoid(void)
 {
@@ -136,7 +133,7 @@ int UtcDaliBaseHandleCopyConstructor(void)
   // Copy the object, ref count == 2
   BaseHandle copy(object);
   DALI_TEST_CHECK(copy);
-  if (copy)
+  if(copy)
   {
     DALI_TEST_EQUALS(2, copy.GetBaseObject().ReferenceCount(), TEST_LOCATION);
   }
@@ -146,7 +143,7 @@ int UtcDaliBaseHandleCopyConstructor(void)
     BaseHandle anotherCopy = ImplicitCopyConstructor(copy);
 
     DALI_TEST_CHECK(anotherCopy);
-    if (anotherCopy)
+    if(anotherCopy)
     {
       DALI_TEST_EQUALS(3, anotherCopy.GetBaseObject().ReferenceCount(), TEST_LOCATION);
     }
@@ -154,7 +151,7 @@ int UtcDaliBaseHandleCopyConstructor(void)
 
   // anotherCopy out of scope, ref count == 2
   DALI_TEST_CHECK(copy);
-  if (copy)
+  if(copy)
   {
     DALI_TEST_EQUALS(2, copy.GetBaseObject().ReferenceCount(), TEST_LOCATION);
   }
@@ -169,7 +166,7 @@ int UtcDaliBaseHandleAssignmentOperator(void)
   BaseHandle object = Actor::New();
 
   DALI_TEST_CHECK(object);
-  if (object)
+  if(object)
   {
     DALI_TEST_EQUALS(1, object.GetBaseObject().ReferenceCount(), TEST_LOCATION);
   }
@@ -177,7 +174,7 @@ int UtcDaliBaseHandleAssignmentOperator(void)
   BaseHandle copy = object;
 
   DALI_TEST_CHECK(copy);
-  if (copy)
+  if(copy)
   {
     DALI_TEST_EQUALS(2, copy.GetBaseObject().ReferenceCount(), TEST_LOCATION);
   }
@@ -191,18 +188,18 @@ int UtcDaliBaseHandleMoveConstructor(void)
   // Initialize an object, ref count == 1
   BaseHandle object = Actor::New();
 
-  DALI_TEST_EQUALS( 1, object.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS(1, object.GetBaseObject().ReferenceCount(), TEST_LOCATION);
 
   // Move the object, ref count == 1
-  BaseHandle move = std::move( object );
-  DALI_TEST_CHECK( move );
+  BaseHandle move = std::move(object);
+  DALI_TEST_CHECK(move);
 
   // Check that object is moved (not copied, so ref count keeps the same)
-  if ( move )
+  if(move)
   {
-    DALI_TEST_EQUALS( 1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+    DALI_TEST_EQUALS(1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION);
   }
-  DALI_TEST_CHECK( !object );
+  DALI_TEST_CHECK(!object);
 
   END_TEST;
 }
@@ -214,19 +211,19 @@ int UtcDaliBaseHandleMoveAssignment(void)
   // Initialize an object, ref count == 1
   BaseHandle object = Actor::New();
 
-  DALI_TEST_EQUALS( 1, object.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS(1, object.GetBaseObject().ReferenceCount(), TEST_LOCATION);
 
   // Move the object, ref count == 1
   BaseHandle move;
-  move = std::move( object );
-  DALI_TEST_CHECK( move );
+  move = std::move(object);
+  DALI_TEST_CHECK(move);
 
   // Check that object is moved (not copied, so ref count keeps the same)
-  if ( move )
+  if(move)
   {
-    DALI_TEST_EQUALS( 1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+    DALI_TEST_EQUALS(1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION);
   }
-  DALI_TEST_CHECK( !object );
+  DALI_TEST_CHECK(!object);
 
   END_TEST;
 }
@@ -329,24 +326,24 @@ int UtcDaliBaseHandleStlVector(void)
 
   std::vector<Actor> myVector;
 
-  for (int i=0; i<TargetVectorSize; ++i)
+  for(int i = 0; i < TargetVectorSize; ++i)
   {
     Actor actor = Actor::New();
 
     std::stringstream stream;
-    stream << "Actor " << i+1;
-    actor.SetProperty( Actor::Property::NAME,stream.str());
+    stream << "Actor " << i + 1;
+    actor.SetProperty(Actor::Property::NAME, stream.str());
 
     myVector.push_back(actor);
   }
 
   DALI_TEST_EQUALS(TargetVectorSize, static_cast<int>(myVector.size()), TEST_LOCATION);
 
-  DALI_TEST_CHECK(myVector[0].GetProperty< std::string >( Actor::Property::NAME ) == "Actor 1");
-  DALI_TEST_CHECK(myVector[1].GetProperty< std::string >( Actor::Property::NAME ) == "Actor 2");
-  DALI_TEST_CHECK(myVector[2].GetProperty< std::string >( Actor::Property::NAME ) == "Actor 3");
-  DALI_TEST_CHECK(myVector[3].GetProperty< std::string >( Actor::Property::NAME ) == "Actor 4");
-  DALI_TEST_CHECK(myVector[4].GetProperty< std::string >( Actor::Property::NAME ) == "Actor 5");
+  DALI_TEST_CHECK(myVector[0].GetProperty<std::string>(Actor::Property::NAME) == "Actor 1");
+  DALI_TEST_CHECK(myVector[1].GetProperty<std::string>(Actor::Property::NAME) == "Actor 2");
+  DALI_TEST_CHECK(myVector[2].GetProperty<std::string>(Actor::Property::NAME) == "Actor 3");
+  DALI_TEST_CHECK(myVector[3].GetProperty<std::string>(Actor::Property::NAME) == "Actor 4");
+  DALI_TEST_CHECK(myVector[4].GetProperty<std::string>(Actor::Property::NAME) == "Actor 5");
   END_TEST;
 }
 
@@ -355,7 +352,7 @@ int UtcDaliBaseHandleDoAction(void)
   TestApplication application;
   tet_infoline("Positive Test Dali::BaseHandle::UtcDaliBaseHandleDoAction");
 
-  Actor actor = Actor::New();
+  Actor      actor       = Actor::New();
   BaseHandle actorObject = actor;
 
   DALI_TEST_CHECK(actorObject);
@@ -365,8 +362,8 @@ int UtcDaliBaseHandleDoAction(void)
   DALI_TEST_CHECK(actorObject.DoAction("invalidCommand", attributes) == false);
 
   // Check that the actor is visible
-  actor.SetProperty( Actor::Property::VISIBLE,true);
-  DALI_TEST_CHECK(actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE ) == true);
+  actor.SetProperty(Actor::Property::VISIBLE, true);
+  DALI_TEST_CHECK(actor.GetCurrentProperty<bool>(Actor::Property::VISIBLE) == true);
 
   // Check the actor performed an action to hide itself
   DALI_TEST_CHECK(actorObject.DoAction("hide", attributes) == true);
@@ -376,7 +373,7 @@ int UtcDaliBaseHandleDoAction(void)
   application.Render();
 
   // Check that the actor is now invisible
-  DALI_TEST_CHECK(actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE ) == false);
+  DALI_TEST_CHECK(actor.GetCurrentProperty<bool>(Actor::Property::VISIBLE) == false);
 
   // Check the actor performed an action to show itself
   DALI_TEST_CHECK(actorObject.DoAction("show", attributes) == true);
@@ -386,13 +383,13 @@ int UtcDaliBaseHandleDoAction(void)
   application.Render();
 
   // Check that the actor is now visible
-  DALI_TEST_CHECK(actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE ) == true);
+  DALI_TEST_CHECK(actor.GetCurrentProperty<bool>(Actor::Property::VISIBLE) == true);
 
   application.GetScene().Add(actor);
 
   // Build an animation with initial duration of 1 second
-  float durationSeconds(1.0f);
-  Animation animation = Animation::New(durationSeconds);
+  float      durationSeconds(1.0f);
+  Animation  animation       = Animation::New(durationSeconds);
   BaseHandle animationObject = animation;
 
   DALI_TEST_CHECK(animationObject);
@@ -404,40 +401,40 @@ int UtcDaliBaseHandleDoAction(void)
   animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
 
   // Set the new duration to be 2 seconds
-  float newDurationSeconds(2.0f);
-  Property::Value newDurationSecondsValue = Property::Value( newDurationSeconds );
-  attributes["duration"] = newDurationSecondsValue;
+  float           newDurationSeconds(2.0f);
+  Property::Value newDurationSecondsValue = Property::Value(newDurationSeconds);
+  attributes["duration"]                  = newDurationSecondsValue;
 
   // Check the animation performed an action to play itself with the specified duration of 2 seconds
   animationObject.DoAction("play", attributes);
 
-  bool signalReceived(false);
+  bool                 signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
   // use the handle API to connect the signal
-  animation.ConnectSignal( &application, "finished", finishCheck );
+  animation.ConnectSignal(&application, "finished", finishCheck);
   // just for coverage connect to non-existant signal as well
-  animation.ConnectSignal( &application, "foo", finishCheck );
-  DALI_TEST_EQUALS( signalReceived, false, TEST_LOCATION );
+  animation.ConnectSignal(&application, "foo", finishCheck);
+  DALI_TEST_EQUALS(signalReceived, false, TEST_LOCATION);
 
   application.SendNotification();
   application.Render(static_cast<uint32_t>(newDurationSeconds * 500.0f) /* half of time */);
-  DALI_TEST_EQUALS( signalReceived, false, TEST_LOCATION );
+  DALI_TEST_EQUALS(signalReceived, false, TEST_LOCATION);
 
   // pause
   animationObject.DoAction("pause", attributes);
   application.SendNotification();
-  application.Render(static_cast<uint32_t>(newDurationSeconds * 500.0f) + 1u/*just beyond the animation duration*/);
-  DALI_TEST_EQUALS( signalReceived, false, TEST_LOCATION );
+  application.Render(static_cast<uint32_t>(newDurationSeconds * 500.0f) + 1u /*just beyond the animation duration*/);
+  DALI_TEST_EQUALS(signalReceived, false, TEST_LOCATION);
 
   // continue
   animationObject.DoAction("play", attributes);
   application.SendNotification();
-  application.Render(static_cast<uint32_t>(newDurationSeconds * 500.0f) + 1u/*just beyond the animation duration*/);
+  application.Render(static_cast<uint32_t>(newDurationSeconds * 500.0f) + 1u /*just beyond the animation duration*/);
 
   // We expect the animation to finish
   application.SendNotification();
   finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), targetPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), targetPosition, TEST_LOCATION);
 
   // play again
   signalReceived = false;
@@ -448,13 +445,12 @@ int UtcDaliBaseHandleDoAction(void)
   animationObject.DoAction("stop", attributes);
   application.SendNotification();
   application.Render(static_cast<uint32_t>(newDurationSeconds * 1000.0f) /* full time */);
-  DALI_TEST_EQUALS( signalReceived, false, TEST_LOCATION );
+  DALI_TEST_EQUALS(signalReceived, false, TEST_LOCATION);
 
   // Check the new animation duration is 2 seconds
   DALI_TEST_EQUALS(animation.GetDuration(), newDurationSeconds, TEST_LOCATION);
   END_TEST;
 }
-
 
 int UtcDaliBaseHandleConnectSignal(void)
 {
@@ -465,17 +461,17 @@ int UtcDaliBaseHandleConnectSignal(void)
 
   // get the root layer
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
-  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
-  actor.SetProperty( Actor::Property::POSITION, Vector2( 240, 400 ));
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100, 100 ) );
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  actor.SetProperty(Actor::Property::POSITION, Vector2(240, 400));
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
 
-  application.GetScene().Add( actor );
+  application.GetScene().Add(actor);
 
-  DALI_TEST_CHECK( gTouchCallBackCalled == false );
+  DALI_TEST_CHECK(gTouchCallBackCalled == false);
 
   // connect to its touch signal
-  actor.ConnectSignal( &application, "touched", TestCallback() );
+  actor.ConnectSignal(&application, "touched", TestCallback());
 
   application.SendNotification();
   application.Render(1000);
@@ -484,27 +480,27 @@ int UtcDaliBaseHandleConnectSignal(void)
 
   // simulate a touch event
   Dali::Integration::Point point;
-  point.SetState( PointState::DOWN );
-  point.SetScreenPosition( Vector2( 240, 400 ) );
+  point.SetState(PointState::DOWN);
+  point.SetScreenPosition(Vector2(240, 400));
   Dali::Integration::TouchEvent event;
-  event.AddPoint( point );
-  application.ProcessEvent( event );
+  event.AddPoint(point);
+  application.ProcessEvent(event);
 
   application.SendNotification();
   application.Render(1000);
   application.SendNotification();
   application.Render(1000);
 
-  DALI_TEST_CHECK( application.GetConnectionCount() > 0 );
-  DALI_TEST_CHECK( gTouchCallBackCalled == true );
+  DALI_TEST_CHECK(application.GetConnectionCount() > 0);
+  DALI_TEST_CHECK(gTouchCallBackCalled == true);
 
   gTouchCallBackCalled = false;
   application.DisconnectAll();
 
   // simulate another touch event
-  application.ProcessEvent( event );
+  application.ProcessEvent(event);
 
-  DALI_TEST_CHECK( gTouchCallBackCalled == false );
+  DALI_TEST_CHECK(gTouchCallBackCalled == false);
   END_TEST;
 }
 
@@ -518,20 +514,19 @@ int UtcDaliBaseHandleGetTypeNameP(void)
 
   std::string typeName = actor.GetTypeName();
 
-  DALI_TEST_CHECK( typeName.size() );
-  DALI_TEST_CHECK( typeName == std::string("Actor") );
+  DALI_TEST_CHECK(typeName.size());
+  DALI_TEST_CHECK(typeName == std::string("Actor"));
   END_TEST;
 }
 
 int UtcDaliBaseHandleGetTypeNameN(void)
 {
-
   TestApplication application;
   tet_infoline("Testing Dali::BaseObject::GetTypeName");
-  FakeObject object;
+  FakeObject  object;
   std::string typeName = object.GetTypeName();
 
-  DALI_TEST_CHECK( typeName.empty() );
+  DALI_TEST_CHECK(typeName.empty());
   END_TEST;
 }
 
@@ -541,10 +536,10 @@ int UtcDaliBaseHandleGetTypeInfoP(void)
   tet_infoline("Testing Dali::BaseHandle::GetTypeInfo");
 
   Dali::TypeInfo info;
-  Actor actor = Actor::New();
+  Actor          actor = Actor::New();
 
-  bool ok = actor.GetTypeInfo( info );
-  DALI_TEST_CHECK( ok );
+  bool ok = actor.GetTypeInfo(info);
+  DALI_TEST_CHECK(ok);
   END_TEST;
 }
 
@@ -556,7 +551,6 @@ int UtcDaliBaseHandleThisIsSaferThanReturningVoidStar(void)
   handle.RunTest();
   tet_result(TET_PASS);
   END_TEST;
-
 }
 
 int UtcDaliBaseHandleGetTypeInfoN(void)
@@ -565,10 +559,10 @@ int UtcDaliBaseHandleGetTypeInfoN(void)
   tet_infoline("Testing Dali::BaseHandle::GetTypeInfo");
 
   Dali::TypeInfo info;
-  FakeObject object;
+  FakeObject     object;
 
-  bool ok = object.GetTypeInfo( info );
-  DALI_TEST_CHECK( !ok );
+  bool ok = object.GetTypeInfo(info);
+  DALI_TEST_CHECK(!ok);
   END_TEST;
 }
 
@@ -582,7 +576,7 @@ int UtcDaliBaseHandleGetObjectPtr(void)
 
   Dali::RefObject* p = actor.GetObjectPtr();
 
-  DALI_TEST_CHECK( p != NULL );
+  DALI_TEST_CHECK(p != NULL);
   END_TEST;
 }
 
@@ -594,30 +588,30 @@ int UtcDaliBaseHandleBooleanCast(void)
   // get the root layer
   BaseHandle handle = Actor::New();
 
-  DALI_TEST_CHECK( static_cast<BaseHandle::BooleanType>( handle ) );
+  DALI_TEST_CHECK(static_cast<BaseHandle::BooleanType>(handle));
   END_TEST;
 }
 
 int UtcDaliBaseHandleCompareOperatorN(void)
 {
   TestApplication application;
-  BaseHandle handle1 = Actor::New();
-  BaseHandle handle2 = handle1;
+  BaseHandle      handle1 = Actor::New();
+  BaseHandle      handle2 = handle1;
 
-  DALI_TEST_CHECK( (handle1 < handle2) == false );
+  DALI_TEST_CHECK((handle1 < handle2) == false);
 
   END_TEST;
 }
 
 int UtcDaliBaseHandleDoActionNegative(void)
 {
-  TestApplication application;
+  TestApplication  application;
   Dali::BaseHandle instance;
   try
   {
-    std::string arg1;
+    std::string         arg1;
     Dali::Property::Map arg2;
-    instance.DoAction(arg1,arg2);
+    instance.DoAction(arg1, arg2);
     DALI_TEST_CHECK(false); // Should not get here
   }
   catch(...)
@@ -629,7 +623,7 @@ int UtcDaliBaseHandleDoActionNegative(void)
 
 int UtcDaliBaseHandleGetTypeInfoNegative(void)
 {
-  TestApplication application;
+  TestApplication  application;
   Dali::BaseHandle instance;
   try
   {
@@ -646,7 +640,7 @@ int UtcDaliBaseHandleGetTypeInfoNegative(void)
 
 int UtcDaliBaseHandleGetTypeNameNegative(void)
 {
-  TestApplication application;
+  TestApplication  application;
   Dali::BaseHandle instance;
   try
   {

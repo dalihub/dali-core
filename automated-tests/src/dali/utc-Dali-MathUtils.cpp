@@ -15,11 +15,11 @@
  *
  */
 
-#include <iostream>
-
-#include <stdlib.h>
-#include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
+#include <dali/public-api/dali-core.h>
+#include <stdlib.h>
+
+#include <iostream>
 
 using namespace Dali;
 
@@ -92,17 +92,17 @@ int UtcDaliMathUtilsNextPowerOfTwoN(void)
 
   try
   {
-    NextPowerOfTwo( (1u << (sizeof(unsigned) * 8 - 1)) + 1);
+    NextPowerOfTwo((1u << (sizeof(unsigned) * 8 - 1)) + 1);
     tet_result(TET_FAIL);
   }
-  catch( Dali::DaliException& e )
+  catch(Dali::DaliException& e)
   {
-    DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT( e, "Return type cannot represent the next power of two greater than the argument.", TEST_LOCATION );
+    DALI_TEST_PRINT_ASSERT(e);
+    DALI_TEST_ASSERT(e, "Return type cannot represent the next power of two greater than the argument.", TEST_LOCATION);
   }
-  catch( ... )
+  catch(...)
   {
-    tet_printf("Assertion test failed - wrong Exception\n" );
+    tet_printf("Assertion test failed - wrong Exception\n");
     tet_result(TET_FAIL);
   }
 
@@ -124,7 +124,7 @@ int UtcDaliMathUtilsClampP(void)
   DALI_TEST_EQUALS(Clamp(0, -10, 10), 0, TEST_LOCATION);
   DALI_TEST_EQUALS(Clamp(20, 0, 10), 10, TEST_LOCATION);
 
-  float value=-10.0f, min=-2.0f, max=4.0f;
+  float value = -10.0f, min = -2.0f, max = 4.0f;
   ClampInPlace(value, min, max);
   DALI_TEST_EQUALS(value, min, 0.001, TEST_LOCATION);
 
@@ -142,7 +142,7 @@ int UtcDaliMathUtilsClampInPlaceP(void)
 {
   Dali::TestApplication testApp;
 
-  float value=-10.0f, min=-2.0f, max=4.0f;
+  float value = -10.0f, min = -2.0f, max = 4.0f;
   ClampInPlace(value, min, max);
   DALI_TEST_EQUALS(value, min, 0.001, TEST_LOCATION);
 
@@ -160,7 +160,7 @@ int UtcDaliMathUtilsLerpP(void)
 {
   Dali::TestApplication testApp;
 
-  float offset=0.0f, low=-2.0f, high=4.0f;
+  float offset = 0.0f, low = -2.0f, high = 4.0f;
   DALI_TEST_EQUALS(Lerp(offset, low, high), low, 0.001, TEST_LOCATION);
   offset = 1.0f;
   DALI_TEST_EQUALS(Lerp(offset, low, high), high, 0.001, TEST_LOCATION);
@@ -176,17 +176,17 @@ int UtcDaliMathUtilsGetRangedEpsilonP(void)
 
   DALI_TEST_EQUALS(GetRangedEpsilon(0.05f, 0.02f), Dali::Math::MACHINE_EPSILON_0, TEST_LOCATION);
   DALI_TEST_EQUALS(GetRangedEpsilon(0.05f, 0.02f), Dali::Math::MACHINE_EPSILON_0, TEST_LOCATION);
-  DALI_TEST_EQUALS(GetRangedEpsilon(0.05f, 0.099f),  Dali::Math::MACHINE_EPSILON_0, TEST_LOCATION);
-  DALI_TEST_EQUALS(GetRangedEpsilon(0.099f,  0.02f), Dali::Math::MACHINE_EPSILON_0, TEST_LOCATION);
-  DALI_TEST_EQUALS(GetRangedEpsilon(0.05f, 0.5f),  Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
-  DALI_TEST_EQUALS(GetRangedEpsilon(0.99f, 0.5f),  Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetRangedEpsilon(0.05f, 0.099f), Dali::Math::MACHINE_EPSILON_0, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetRangedEpsilon(0.099f, 0.02f), Dali::Math::MACHINE_EPSILON_0, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetRangedEpsilon(0.05f, 0.5f), Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetRangedEpsilon(0.99f, 0.5f), Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
   DALI_TEST_EQUALS(GetRangedEpsilon(0.99f, 0.98f), Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
   DALI_TEST_EQUALS(GetRangedEpsilon(1.05f, 0.99f), Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
   DALI_TEST_EQUALS(GetRangedEpsilon(1.99f, 1.05f), Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
 
-  DALI_TEST_EQUALS(GetRangedEpsilon(2.0f,  1.99f), Dali::Math::MACHINE_EPSILON_10, TEST_LOCATION);
-  DALI_TEST_EQUALS(GetRangedEpsilon(0.05f, 2.0f),  Dali::Math::MACHINE_EPSILON_10, TEST_LOCATION);
-  DALI_TEST_EQUALS(GetRangedEpsilon(1.0f,  3.0f),  Dali::Math::MACHINE_EPSILON_10, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetRangedEpsilon(2.0f, 1.99f), Dali::Math::MACHINE_EPSILON_10, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetRangedEpsilon(0.05f, 2.0f), Dali::Math::MACHINE_EPSILON_10, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetRangedEpsilon(1.0f, 3.0f), Dali::Math::MACHINE_EPSILON_10, TEST_LOCATION);
   DALI_TEST_EQUALS(GetRangedEpsilon(9.99f, 0.5f), Dali::Math::MACHINE_EPSILON_10, TEST_LOCATION);
   DALI_TEST_EQUALS(GetRangedEpsilon(9.99f, 1.5f), Dali::Math::MACHINE_EPSILON_10, TEST_LOCATION);
   DALI_TEST_EQUALS(GetRangedEpsilon(9.99f, 9.99f), Dali::Math::MACHINE_EPSILON_10, TEST_LOCATION);
@@ -207,20 +207,19 @@ int UtcDaliMathUtilsGetRangedEpsilonP(void)
 
   DALI_TEST_EQUALS(GetRangedEpsilon(1e07f, 0.99e09f), Dali::Math::MACHINE_EPSILON_10000, TEST_LOCATION);
 
-
   DALI_TEST_EQUALS(GetRangedEpsilon(-0.05f, -0.02f), Dali::Math::MACHINE_EPSILON_0, TEST_LOCATION);
   DALI_TEST_EQUALS(GetRangedEpsilon(-0.05f, -0.02f), Dali::Math::MACHINE_EPSILON_0, TEST_LOCATION);
-  DALI_TEST_EQUALS(GetRangedEpsilon(-0.05f, -0.099f),  Dali::Math::MACHINE_EPSILON_0, TEST_LOCATION);
-  DALI_TEST_EQUALS(GetRangedEpsilon(-0.099f, - 0.02f), Dali::Math::MACHINE_EPSILON_0, TEST_LOCATION);
-  DALI_TEST_EQUALS(GetRangedEpsilon(-0.05f, -0.5f),  Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
-  DALI_TEST_EQUALS(GetRangedEpsilon(-0.99f, -0.5f),  Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetRangedEpsilon(-0.05f, -0.099f), Dali::Math::MACHINE_EPSILON_0, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetRangedEpsilon(-0.099f, -0.02f), Dali::Math::MACHINE_EPSILON_0, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetRangedEpsilon(-0.05f, -0.5f), Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetRangedEpsilon(-0.99f, -0.5f), Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
   DALI_TEST_EQUALS(GetRangedEpsilon(-0.99f, -0.98f), Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
   DALI_TEST_EQUALS(GetRangedEpsilon(-1.05f, -0.99f), Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
   DALI_TEST_EQUALS(GetRangedEpsilon(-1.99f, -1.05f), Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
 
-  DALI_TEST_EQUALS(GetRangedEpsilon(-2.0f, - 1.99f), Dali::Math::MACHINE_EPSILON_10, TEST_LOCATION);
-  DALI_TEST_EQUALS(GetRangedEpsilon(-0.05f, -2.0f),  Dali::Math::MACHINE_EPSILON_10, TEST_LOCATION);
-  DALI_TEST_EQUALS(GetRangedEpsilon(-1.0f, - 3.0f),  Dali::Math::MACHINE_EPSILON_10, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetRangedEpsilon(-2.0f, -1.99f), Dali::Math::MACHINE_EPSILON_10, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetRangedEpsilon(-0.05f, -2.0f), Dali::Math::MACHINE_EPSILON_10, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetRangedEpsilon(-1.0f, -3.0f), Dali::Math::MACHINE_EPSILON_10, TEST_LOCATION);
   DALI_TEST_EQUALS(GetRangedEpsilon(-9.99f, -0.5f), Dali::Math::MACHINE_EPSILON_10, TEST_LOCATION);
   DALI_TEST_EQUALS(GetRangedEpsilon(-9.99f, -1.5f), Dali::Math::MACHINE_EPSILON_10, TEST_LOCATION);
   DALI_TEST_EQUALS(GetRangedEpsilon(-9.99f, -9.99f), Dali::Math::MACHINE_EPSILON_10, TEST_LOCATION);
@@ -240,7 +239,6 @@ int UtcDaliMathUtilsGetRangedEpsilonP(void)
   DALI_TEST_EQUALS(GetRangedEpsilon(-0.005f, -19999.0f), Dali::Math::MACHINE_EPSILON_10000, TEST_LOCATION);
 
   DALI_TEST_EQUALS(GetRangedEpsilon(-1e07f, -0.99e09f), Dali::Math::MACHINE_EPSILON_10000, TEST_LOCATION);
-
 
   END_TEST;
 }
@@ -280,11 +278,11 @@ int UtcDaliMathUtilsShortestDistanceInDomainP(void)
 
 int UtcDaliMathUtilsEqualsZeroP(void)
 {
-  float v=0.0f;
+  float v = 0.0f;
 
   DALI_TEST_CHECK(EqualsZero(v));
 
-  v  = Math::PI;
+  v = Math::PI;
   v -= (Math::PI_2 * 2.0f);
   DALI_TEST_CHECK(EqualsZero(v));
 
@@ -293,17 +291,17 @@ int UtcDaliMathUtilsEqualsZeroP(void)
 
 int UtcDaliMathUtilsEquals01P(void)
 {
-  float w=100.0f;
-  float x=w+1e-8f;
-  DALI_TEST_CHECK( Equals(w, x, GetRangedEpsilon( w, x )) );
+  float w = 100.0f;
+  float x = w + 1e-8f;
+  DALI_TEST_CHECK(Equals(w, x, GetRangedEpsilon(w, x)));
   END_TEST;
 }
 
 int UtcDaliMathUtilsEquals02P(void)
 {
-  float w=100.0f;
-  float x=w+1e-8f;
-  DALI_TEST_CHECK( Equals(w, x) );
+  float w = 100.0f;
+  float x = w + 1e-8f;
+  DALI_TEST_CHECK(Equals(w, x));
   END_TEST;
 }
 

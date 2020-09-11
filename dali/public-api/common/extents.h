@@ -2,7 +2,7 @@
 #define DALI_EXTENTS_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ struct DALI_CORE_API Extents
    * @SINCE_1_2.62
    * @param[in] copy A reference to the copied Extents
    */
-  Extents( const Extents& copy ) = default;
+  Extents(const Extents& copy) = default;
 
   /**
    * @brief Constructor.
@@ -60,7 +60,7 @@ struct DALI_CORE_API Extents
    * @param[in] top       Top extent
    * @param[in] bottom    Bottom extent
    */
-  Extents( uint16_t start, uint16_t end, uint16_t top, uint16_t bottom );
+  Extents(uint16_t start, uint16_t end, uint16_t top, uint16_t bottom);
 
   /**
    * @brief Copy Assignment operator.
@@ -68,7 +68,7 @@ struct DALI_CORE_API Extents
    * @param[in] copy A reference to the copied Extents
    * @return Itself
    */
-  Extents& operator=( const Extents& copy ) = default;
+  Extents& operator=(const Extents& copy) = default;
 
   /**
    * @brief Assignment operator.
@@ -77,7 +77,7 @@ struct DALI_CORE_API Extents
    * @param[in] array Array of uint16_t
    * @return Itself
    */
-  Extents& operator=( const uint16_t* array );
+  Extents& operator=(const uint16_t* array);
 
   /**
    * @brief Equality operator.
@@ -86,7 +86,7 @@ struct DALI_CORE_API Extents
    * @param[in] rhs The Extents to test against
    * @return True if the extents are equal
    */
-  bool operator==( const Extents &rhs ) const;
+  bool operator==(const Extents& rhs) const;
 
   /**
    * @brief Inequality operator.
@@ -95,14 +95,13 @@ struct DALI_CORE_API Extents
    * @param[in] rhs The Extents to test against
    * @return True if the extents are not equal
    */
-  bool operator!=( const Extents &rhs ) const;
+  bool operator!=(const Extents& rhs) const;
 
 public:
-  uint16_t start;   ///< The start extent.  @SINCE_1_2.62
-  uint16_t end;     ///< The end extent.    @SINCE_1_2.62
-  uint16_t top;     ///< The top extent.    @SINCE_1_2.62
-  uint16_t bottom;  ///< The bottom extent. @SINCE_1_2.62
-
+  uint16_t start;  ///< The start extent.  @SINCE_1_2.62
+  uint16_t end;    ///< The end extent.    @SINCE_1_2.62
+  uint16_t top;    ///< The top extent.    @SINCE_1_2.62
+  uint16_t bottom; ///< The bottom extent. @SINCE_1_2.62
 };
 
 /**
@@ -113,7 +112,7 @@ public:
  * @param[in] extents The Extents to output
  * @return The output stream operator
  */
-DALI_CORE_API std::ostream& operator<<( std::ostream& stream, const Extents& extents );
+DALI_CORE_API std::ostream& operator<<(std::ostream& stream, const Extents& extents);
 
 /**
  * @}

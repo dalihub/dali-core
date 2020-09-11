@@ -46,7 +46,6 @@ class CallbackBase;
 class DALI_CORE_API SlotConnection
 {
 public:
-
   /**
    * @brief Constructor.
    *
@@ -79,14 +78,12 @@ public:
   SlotObserver* GetSlotObserver();
 
 private:
-
-  SlotConnection( const SlotConnection& ) = delete; ///< Deleted copy constructor. @SINCE_1_0.0
-  SlotConnection( SlotConnection&& ) = delete; ///< Deleted move constructor. @SINCE_1_9.25
-  SlotConnection& operator=( const SlotConnection& ) = delete; ///< Deleted copy assignment operator. @SINCE_1_0.0
-  SlotConnection& operator=( SlotConnection&& ) = delete; ///< Deleted move assignment operator. @SINCE_1_9.25
+  SlotConnection(const SlotConnection&) = delete;            ///< Deleted copy constructor. @SINCE_1_0.0
+  SlotConnection(SlotConnection&&)      = delete;            ///< Deleted move constructor. @SINCE_1_9.25
+  SlotConnection& operator=(const SlotConnection&) = delete; ///< Deleted copy assignment operator. @SINCE_1_0.0
+  SlotConnection& operator=(SlotConnection&&) = delete;      ///< Deleted move assignment operator. @SINCE_1_9.25
 
 private:
-
   SlotObserver* mSlotObserver; ///< a pointer to the slot observer (not owned)
   CallbackBase* mCallback;     ///< The callback. This is not owned, the corresponding SignalConnection has ownership.
 };
@@ -108,14 +105,13 @@ private:
 class DALI_CORE_API SignalConnection
 {
 public:
-
   /**
    * @brief Constructor.
    *
    * @SINCE_1_0.0
    * @param[in] callback The callback which should be a C function
    */
-  SignalConnection( CallbackBase* callback );
+  SignalConnection(CallbackBase* callback);
 
   /**
    * @brief Constructor.
@@ -124,7 +120,7 @@ public:
    * @param[in] signalObserver The signal observer
    * @param[in] callback Ownership of this callback object is taken
    */
-  SignalConnection( SignalObserver* signalObserver, CallbackBase* callback );
+  SignalConnection(SignalObserver* signalObserver, CallbackBase* callback);
 
   /**
    * @brief Non-virtual destructor, not intended as a base class.
@@ -138,7 +134,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] slotObserver The signal disconnecting from the slot
    */
-  void Disconnect( SlotObserver* slotObserver );
+  void Disconnect(SlotObserver* slotObserver);
 
   /**
    * @brief Retrieves the callback.
@@ -149,16 +145,14 @@ public:
   CallbackBase* GetCallback();
 
 private:
-
-  SignalConnection( const SignalConnection& ) = delete; ///< Deleted copy constructor. @SINCE_1_0.0
-  SignalConnection( SignalConnection&& ) = delete; ///< Deleted move constructor. @SINCE_1_9.25
-  SignalConnection& operator=( const SignalConnection& ) = delete; ///< Deleted copy assignment operator. @SINCE_1_0.0
-  SignalConnection& operator=( SignalConnection&& ) = delete; ///< Deleted move assignment operator. @SINCE_1_9.25
+  SignalConnection(const SignalConnection&) = delete;            ///< Deleted copy constructor. @SINCE_1_0.0
+  SignalConnection(SignalConnection&&)      = delete;            ///< Deleted move constructor. @SINCE_1_9.25
+  SignalConnection& operator=(const SignalConnection&) = delete; ///< Deleted copy assignment operator. @SINCE_1_0.0
+  SignalConnection& operator=(SignalConnection&&) = delete;      ///< Deleted move assignment operator. @SINCE_1_9.25
 
 private:
-
   SignalObserver* mSignalObserver; ///< a pointer to the signal observer (not owned)
-  CallbackBase* mCallback;         ///< The callback, has ownership.
+  CallbackBase*   mCallback;       ///< The callback, has ownership.
 };
 
 /**

@@ -47,7 +47,6 @@ class TextureSet;
 class DALI_CORE_API TextureSet : public BaseHandle
 {
 public:
-
   /**
    * @brief Creates a new TextureSet object.
    *
@@ -76,7 +75,7 @@ public:
    * @SINCE_1_1.43
    * @param[in] handle Handle to an object
    */
-  TextureSet( const TextureSet& handle );
+  TextureSet(const TextureSet& handle);
 
   /**
    * @brief Downcasts to a TextureSet handle.
@@ -85,7 +84,7 @@ public:
    * @param[in] handle Handle to an object
    * @return TextureSet handle or an uninitialized handle
    */
-  static TextureSet DownCast( BaseHandle handle );
+  static TextureSet DownCast(BaseHandle handle);
 
   /**
    * @brief Assignment operator, changes this handle to point at the same object.
@@ -94,7 +93,7 @@ public:
    * @param[in] handle Handle to an object
    * @return A reference to this
    */
-  TextureSet& operator=( const TextureSet& handle );
+  TextureSet& operator=(const TextureSet& handle);
 
   /**
    * @brief Move constructor.
@@ -102,7 +101,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  TextureSet( TextureSet&& rhs );
+  TextureSet(TextureSet&& rhs);
 
   /**
    * @brief Move assignment operator.
@@ -111,7 +110,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  TextureSet& operator=( TextureSet&& rhs );
+  TextureSet& operator=(TextureSet&& rhs);
 
   /**
    * @brief Sets the texture at position "index".
@@ -120,7 +119,7 @@ public:
    * @param[in] index The position in the texture set of the texture
    * @param[in] texture The texture
    */
-  void SetTexture( size_t index, Texture texture );
+  void SetTexture(size_t index, Texture texture);
 
   /**
    * @brief Gets the image at position "index".
@@ -129,7 +128,7 @@ public:
    * @param[in] index The position in the texture set of the image
    * @return A handle to the image at the the specified position
    */
-  Texture GetTexture( size_t index ) const;
+  Texture GetTexture(size_t index) const;
 
   /**
    * @brief Sets the sampler to be used by the image at position "index".
@@ -138,7 +137,7 @@ public:
    * @param[in] index The position in the texture set of the sampler
    * @param[in] sampler The sampler to use
    */
-  void SetSampler( size_t index, Sampler sampler );
+  void SetSampler(size_t index, Sampler sampler);
 
   /**
    * @brief Sets the sampler to be used by the image at position "index".
@@ -147,7 +146,7 @@ public:
    * @param[in] index The position in the texture set of the image
    * @return A handle to the sampler at the specified position
    */
-  Sampler GetSampler( size_t index ) const;
+  Sampler GetSampler(size_t index) const;
 
   /**
    * @brief Gets the number of textures present in the TextureSet.
@@ -158,20 +157,18 @@ public:
   size_t GetTextureCount() const;
 
 public:
-
   /**
    * @brief The constructor.
    * @note  Not intended for application developers.
    * @SINCE_1_1.43
    * @param[in] pointer A pointer to a newly allocated TextureSet
    */
-  explicit DALI_INTERNAL TextureSet( Internal::TextureSet* pointer );
+  explicit DALI_INTERNAL TextureSet(Internal::TextureSet* pointer);
 };
 
 /**
  * @}
  */
 } //namespace Dali
-
 
 #endif // DALI_TEXTURE_SET_H

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,15 +27,14 @@
 
 namespace Dali
 {
-
 struct Mutex::MutexImpl
 {
   std::mutex mutex;
-  bool locked;
+  bool       locked;
 };
 
 Mutex::Mutex()
-: mImpl( new MutexImpl )
+: mImpl(new MutexImpl)
 {
   mImpl->locked = false;
 }
@@ -52,8 +51,8 @@ bool Mutex::IsLocked()
   return mImpl->locked;
 }
 
-Mutex::ScopedLock::ScopedLock( Mutex& mutex )
-: mMutex( mutex )
+Mutex::ScopedLock::ScopedLock(Mutex& mutex)
+: mMutex(mutex)
 {
   mMutex.mImpl->mutex.lock();
   Internal::MutexTrace::Lock(); // matching sequence in conditional-wait.cpp

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,21 +19,20 @@
 #include <dali/devel-api/threading/thread.h>
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
 #include <cstddef>
 #include <thread>
-#include <dali/integration-api/debug.h>
 
 namespace Dali
 {
-
 struct Thread::ThreadImpl
 {
-  ThreadImpl( Thread& aThis )
-  : thread( &Thread::InternalThreadEntryFunc, std::ref( aThis ) )
+  ThreadImpl(Thread& aThis)
+  : thread(&Thread::InternalThreadEntryFunc, std::ref(aThis))
   {
     // std::thread starts execution immediately
   }
-  ~ThreadImpl( )
+  ~ThreadImpl()
   {
     thread.join();
   }
@@ -41,7 +40,7 @@ struct Thread::ThreadImpl
 };
 
 Thread::Thread()
-: mImpl( nullptr )
+: mImpl(nullptr)
 {
 }
 
@@ -52,9 +51,9 @@ Thread::~Thread()
 
 void Thread::Start()
 {
-  if( !mImpl )
+  if(!mImpl)
   {
-    mImpl = new Thread::ThreadImpl( *this );
+    mImpl = new Thread::ThreadImpl(*this);
   }
 }
 
@@ -64,7 +63,7 @@ void Thread::Join()
   mImpl = nullptr;
 }
 
-void Thread::InternalThreadEntryFunc( Thread& aThis )
+void Thread::InternalThreadEntryFunc(Thread& aThis)
 {
   aThis.Run();
 }

@@ -25,7 +25,6 @@ namespace Dali
 {
 namespace Integration
 {
-
 /**
  * This abstraction defines the interface for accessing GL context.
  */
@@ -38,7 +37,6 @@ protected:
   virtual ~GlContextHelperAbstraction() = default;
 
 public:
-
   /**
    * @brief Switch to the surfaceless GL context
    */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,19 +23,17 @@
 
 namespace Dali
 {
-
 namespace Integration
 {
-
-MultiPointEvent::MultiPointEvent( Type eventType )
-: Event( eventType ),
-  time( 0 )
+MultiPointEvent::MultiPointEvent(Type eventType)
+: Event(eventType),
+  time(0)
 {
 }
 
-MultiPointEvent::MultiPointEvent( Type eventType, uint32_t time )
-: Event( eventType ),
-  time( time )
+MultiPointEvent::MultiPointEvent(Type eventType, uint32_t time)
+: Event(eventType),
+  time(time)
 {
 }
 
@@ -43,18 +41,18 @@ MultiPointEvent::~MultiPointEvent()
 {
 }
 
-void MultiPointEvent::AddPoint( const Point& point )
+void MultiPointEvent::AddPoint(const Point& point)
 {
   points.push_back(point);
 }
 
-Point& MultiPointEvent::GetPoint( uint32_t point )
+Point& MultiPointEvent::GetPoint(uint32_t point)
 {
   DALI_ASSERT_ALWAYS(point < points.size() && "MultiPointEvent: Point index out of bounds");
   return points[point];
 }
 
-const Point& MultiPointEvent::GetPoint( uint32_t point ) const
+const Point& MultiPointEvent::GetPoint(uint32_t point) const
 {
   DALI_ASSERT_ALWAYS(point < points.size() && "MultiPointEvent: Point index out of bounds");
   return points[point];
@@ -62,7 +60,7 @@ const Point& MultiPointEvent::GetPoint( uint32_t point ) const
 
 uint32_t MultiPointEvent::GetPointCount() const
 {
-  return static_cast<uint32_t>( points.size() ); // not going to overflow in practice
+  return static_cast<uint32_t>(points.size()); // not going to overflow in practice
 }
 
 } // namespace Integration

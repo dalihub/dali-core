@@ -21,8 +21,8 @@
 // EXTERNAL INCLUDES
 #include <cstdarg>
 #include <cstdio>
-#include <iostream>
 #include <cstring>
+#include <iostream>
 #include <string>
 
 // INTERNAL INCLUDES
@@ -31,12 +31,12 @@
 
 extern "C"
 {
-void tet_infoline(const char*str);
-void tet_printf(const char *format, ...);
+  void tet_infoline(const char* str);
+  void tet_printf(const char* format, ...);
 }
 
-#include "test-application.h"
 #include "test-actor-utils.h"
+#include "test-application.h"
 #include "test-gesture-generator.h"
 
 using namespace Dali;
@@ -48,21 +48,21 @@ using namespace Dali;
  * Inspired by https://stackoverflow.com/questions/1706346/file-macro-manipulation-handling-at-compile-time
  * answer by Chetan Reddy
  */
-constexpr int32_t basenameIndex( const char * const path, const int32_t index = 0, const int32_t slashIndex = -1 )
+constexpr int32_t basenameIndex(const char* const path, const int32_t index = 0, const int32_t slashIndex = -1)
 {
-   return path[ index ]
-       ? ( path[ index ] == '/'
-           ? basenameIndex( path, index + 1, index )
-           : basenameIndex( path, index + 1, slashIndex ) )
-       : ( slashIndex + 1 );
+  return path[index]
+           ? (path[index] == '/'
+                ? basenameIndex(path, index + 1, index)
+                : basenameIndex(path, index + 1, slashIndex))
+           : (slashIndex + 1);
 }
 
-#define __FILELINE__ ( { static const int32_t basenameIdx = basenameIndex( __FILE__ ); \
+#define __FILELINE__ ({ static const int32_t basenameIdx = basenameIndex( __FILE__ ); \
                          static_assert (basenameIdx >= 0, "compile-time basename" );   \
-                         __FILE__ ":" STRINGIZE(__LINE__) + basenameIdx ; } )
+                         __FILE__ ":" STRINGIZE(__LINE__) + basenameIdx ; })
 
 #define TEST_LOCATION __FILELINE__
-#define TEST_INNER_LOCATION(x) ( std::string(x) + " (" + STRINGIZE(__LINE__) + ")" ).c_str()
+#define TEST_INNER_LOCATION(x) (std::string(x) + " (" + STRINGIZE(__LINE__) + ")").c_str()
 
 #define TET_UNDEF 2
 #define TET_FAIL 1
@@ -73,33 +73,32 @@ extern int32_t test_return_value;
 void tet_result(int32_t value);
 
 #define END_TEST \
-  return ((test_return_value>0)?1:0)
+  return ((test_return_value > 0) ? 1 : 0)
 
 void tet_infoline(const char* str);
-void tet_printf(const char *format, ...);
+void tet_printf(const char* format, ...);
 
 /**
  * DALI_TEST_CHECK is a wrapper for tet_result.
  * If the condition evaluates to false, the test is stopped.
  * @param[in] The boolean expression to check
  */
-#define DALI_TEST_CHECK(condition)                                                        \
-if ( (condition) )                                                                        \
-{                                                                                         \
-  tet_result(TET_PASS);                                                                   \
-}                                                                                         \
-else                                                                                      \
-{                                                                                         \
-  fprintf(stderr, "Test failed in %s, condition: %s\n", __FILELINE__, #condition );       \
-  tet_result(TET_FAIL);                                                                   \
-  throw("TET_FAIL");                                                                      \
-}
+#define DALI_TEST_CHECK(condition)                                                   \
+  if((condition))                                                                    \
+  {                                                                                  \
+    tet_result(TET_PASS);                                                            \
+  }                                                                                  \
+  else                                                                               \
+  {                                                                                  \
+    fprintf(stderr, "Test failed in %s, condition: %s\n", __FILELINE__, #condition); \
+    tet_result(TET_FAIL);                                                            \
+    throw("TET_FAIL");                                                               \
+  }
 
-
-bool operator==(TimePeriod a, TimePeriod b);
-std::ostream& operator<<( std::ostream& ostream, TimePeriod value );
-std::ostream& operator<<( std::ostream& ostream, Radian angle );
-std::ostream& operator<<( std::ostream& ostream, Degree angle );
+bool          operator==(TimePeriod a, TimePeriod b);
+std::ostream& operator<<(std::ostream& ostream, TimePeriod value);
+std::ostream& operator<<(std::ostream& ostream, Radian angle);
+std::ostream& operator<<(std::ostream& ostream, Degree angle);
 
 /**
  * Test whether two values are equal.
@@ -110,13 +109,13 @@ std::ostream& operator<<( std::ostream& ostream, Degree angle );
 template<typename Type>
 inline void DALI_TEST_EQUALS(Type value1, Type value2, const char* location)
 {
-  if( !CompareType<Type>(value1, value2, 0.01f) )
+  if(!CompareType<Type>(value1, value2, 0.01f))
   {
     std::ostringstream o;
     o << value1 << " == " << value2 << std::endl;
     fprintf(stderr, "Test failed in %s, checking %s", location, o.str().c_str());
     tet_result(TET_FAIL);
-    throw("TET_FAIL");                                                                      \
+    throw("TET_FAIL");
   }
   else
   {
@@ -129,18 +128,18 @@ inline void DALI_TEST_EQUALS(Type value1, Type value2, const char* location)
  * @param[in] value1 The first value
  * @param[in] value2 The second value
  */
-#define DALI_TEST_EQUAL( v1, v2 ) DALI_TEST_EQUALS( v1, v2, __FILELINE__ )
+#define DALI_TEST_EQUAL(v1, v2) DALI_TEST_EQUALS(v1, v2, __FILELINE__)
 
 template<typename Type>
 inline void DALI_TEST_EQUALS(Type value1, Type value2, float epsilon, const char* location)
 {
-  if( !CompareType<Type>(value1, value2, epsilon) )
+  if(!CompareType<Type>(value1, value2, epsilon))
   {
     std::ostringstream o;
     o << value1 << " == " << value2 << std::endl;
     fprintf(stderr, "Test failed in %s, checking %s", location, o.str().c_str());
     tet_result(TET_FAIL);
-    throw("TET_FAIL");                                                                      \
+    throw("TET_FAIL");
   }
   else
   {
@@ -151,20 +150,19 @@ inline void DALI_TEST_EQUALS(Type value1, Type value2, float epsilon, const char
 template<typename Type>
 inline void DALI_TEST_NOT_EQUALS(Type value1, Type value2, float epsilon, const char* location)
 {
-  if( CompareType<Type>(value1, value2, epsilon) )
+  if(CompareType<Type>(value1, value2, epsilon))
   {
     std::ostringstream o;
     o << value1 << " !=  " << value2 << std::endl;
     fprintf(stderr, "Test failed in %s, checking %s", location, o.str().c_str());
     tet_result(TET_FAIL);
-    throw("TET_FAIL");                                                                      \
+    throw("TET_FAIL");
   }
   else
   {
     tet_result(TET_PASS);
   }
 }
-
 
 /**
  * Test whether two TimePeriods are within a certain distance of each other.
@@ -174,19 +172,19 @@ inline void DALI_TEST_NOT_EQUALS(Type value1, Type value2, float epsilon, const 
  * @param[in] location The TEST_LOCATION macro should be used here
  */
 template<>
-inline void DALI_TEST_EQUALS<TimePeriod>( TimePeriod value1, TimePeriod value2, float epsilon, const char* location)
+inline void DALI_TEST_EQUALS<TimePeriod>(TimePeriod value1, TimePeriod value2, float epsilon, const char* location)
 {
-  if ((fabs(value1.durationSeconds - value2.durationSeconds) > epsilon))
+  if((fabs(value1.durationSeconds - value2.durationSeconds) > epsilon))
   {
     fprintf(stderr, "Test failed in %s, checking durations %f == %f, epsilon %f\n", location, value1.durationSeconds, value2.durationSeconds, epsilon);
     tet_result(TET_FAIL);
-    throw("TET_FAIL");                                                                      \
+    throw("TET_FAIL");
   }
-  else if ((fabs(value1.delaySeconds - value2.delaySeconds) > epsilon))
+  else if((fabs(value1.delaySeconds - value2.delaySeconds) > epsilon))
   {
     fprintf(stderr, "Test failed in %s, checking delays %f == %f, epsilon %f\n", location, value1.delaySeconds, value2.delaySeconds, epsilon);
     tet_result(TET_FAIL);
-    throw("TET_FAIL");                                                                      \
+    throw("TET_FAIL");
   }
   else
   {
@@ -200,7 +198,7 @@ inline void DALI_TEST_EQUALS<TimePeriod>( TimePeriod value1, TimePeriod value2, 
  * @param[in] baseHandle2 The second value
  * @param[in] location The TEST_LOCATION macro should be used here
  */
-void DALI_TEST_EQUALS( const BaseHandle& baseHandle1, const BaseHandle& baseHandle2, const char* location );
+void DALI_TEST_EQUALS(const BaseHandle& baseHandle1, const BaseHandle& baseHandle2, const char* location);
 
 /**
  * Test whether a size_t value and an uint32_t are equal.
@@ -208,7 +206,7 @@ void DALI_TEST_EQUALS( const BaseHandle& baseHandle1, const BaseHandle& baseHand
  * @param[in] value2 The second value
  * @param[in] location The TEST_LOCATION macro should be used here
  */
-void DALI_TEST_EQUALS( const size_t value1, const uint32_t value2, const char* location );
+void DALI_TEST_EQUALS(const size_t value1, const uint32_t value2, const char* location);
 
 /**
  * Test whether an uint32_t and a size_t value and are equal.
@@ -216,7 +214,7 @@ void DALI_TEST_EQUALS( const size_t value1, const uint32_t value2, const char* l
  * @param[in] value2 The second value
  * @param[in] location The TEST_LOCATION macro should be used here
  */
-void DALI_TEST_EQUALS( const uint32_t value1, const size_t value2, const char* location );
+void DALI_TEST_EQUALS(const uint32_t value1, const size_t value2, const char* location);
 
 /**
  * Test whether two Matrix3 objects are equal.
@@ -224,7 +222,7 @@ void DALI_TEST_EQUALS( const uint32_t value1, const size_t value2, const char* l
  * @param[in] matrix2 The second object
  * @param[in] location The TEST_LOCATION macro should be used here
  */
-void DALI_TEST_EQUALS( const Matrix3& matrix1, const Matrix3& matrix2, const char* location);
+void DALI_TEST_EQUALS(const Matrix3& matrix1, const Matrix3& matrix2, const char* location);
 
 /** Test whether two Matrix3 objects are equal (fuzzy compare).
  * @param[in] matrix1 The first object
@@ -232,7 +230,7 @@ void DALI_TEST_EQUALS( const Matrix3& matrix1, const Matrix3& matrix2, const cha
  * @param[in] epsilon The epsilon to use for comparison
  * @param[in] location The TEST_LOCATION macro should be used here
  */
-void DALI_TEST_EQUALS( const Matrix3& matrix1, const Matrix3& matrix2, float epsilon, const char* location);
+void DALI_TEST_EQUALS(const Matrix3& matrix1, const Matrix3& matrix2, float epsilon, const char* location);
 
 /**
  * Test whether two Matrix objects are equal.
@@ -240,7 +238,7 @@ void DALI_TEST_EQUALS( const Matrix3& matrix1, const Matrix3& matrix2, float eps
  * @param[in] matrix2 The second object
  * @param[in] location The TEST_LOCATION macro should be used here
  */
-void DALI_TEST_EQUALS( const Matrix& matrix1, const Matrix& matrix2, const char* location);
+void DALI_TEST_EQUALS(const Matrix& matrix1, const Matrix& matrix2, const char* location);
 
 /**
  * Test whether two Matrix objects are equal (fuzzy-compare).
@@ -248,7 +246,7 @@ void DALI_TEST_EQUALS( const Matrix& matrix1, const Matrix& matrix2, const char*
  * @param[in] matrix2 The second object
  * @param[in] location The TEST_LOCATION macro should be used here
  */
-void DALI_TEST_EQUALS( const Matrix& matrix1, const Matrix& matrix2, float epsilon, const char* location);
+void DALI_TEST_EQUALS(const Matrix& matrix1, const Matrix& matrix2, float epsilon, const char* location);
 
 /**
  * Test whether two strings are equal.
@@ -257,13 +255,13 @@ void DALI_TEST_EQUALS( const Matrix& matrix1, const Matrix& matrix2, float epsil
  * @param[in] location The TEST_LOCATION macro should be used here
  */
 template<>
-inline void DALI_TEST_EQUALS<const char*>( const char* str1, const char* str2, const char* location)
+inline void DALI_TEST_EQUALS<const char*>(const char* str1, const char* str2, const char* location)
 {
-  if (strcmp(str1, str2))
+  if(strcmp(str1, str2))
   {
     fprintf(stderr, "Test failed in %s, checking '%s' == '%s'\n", location, str1, str2);
     tet_result(TET_FAIL);
-    throw("TET_FAIL");                                                                      \
+    throw("TET_FAIL");
   }
   else
   {
@@ -278,7 +276,7 @@ inline void DALI_TEST_EQUALS<const char*>( const char* str1, const char* str2, c
  * @param[in] location The TEST_LOCATION macro should be used here
  */
 template<>
-inline void DALI_TEST_EQUALS<const std::string&>( const std::string &str1, const std::string &str2, const char* location)
+inline void DALI_TEST_EQUALS<const std::string&>(const std::string& str1, const std::string& str2, const char* location)
 {
   DALI_TEST_EQUALS(str1.c_str(), str2.c_str(), location);
 }
@@ -289,7 +287,7 @@ inline void DALI_TEST_EQUALS<const std::string&>( const std::string &str1, const
  * @param[in] str2 The second string
  * @param[in] location The TEST_LOCATION macro should be used here
  */
-void DALI_TEST_EQUALS( Property::Value& str1, const char* str2, const char* location);
+void DALI_TEST_EQUALS(Property::Value& str1, const char* str2, const char* location);
 
 /**
  * Test whether two strings are equal.
@@ -297,7 +295,7 @@ void DALI_TEST_EQUALS( Property::Value& str1, const char* str2, const char* loca
  * @param[in] str2 The second string
  * @param[in] location The TEST_LOCATION macro should be used here
  */
-void DALI_TEST_EQUALS( const std::string &str1, const char* str2, const char* location);
+void DALI_TEST_EQUALS(const std::string& str1, const char* str2, const char* location);
 
 /**
  * Test whether two strings are equal.
@@ -305,18 +303,17 @@ void DALI_TEST_EQUALS( const std::string &str1, const char* str2, const char* lo
  * @param[in] str2 The second string
  * @param[in] location The TEST_LOCATION macro should be used here
  */
-void DALI_TEST_EQUALS( const char* str1, const std::string &str2, const char* location);
+void DALI_TEST_EQUALS(const char* str1, const std::string& str2, const char* location);
 
 /**
  * Test if a property value type is equal to a trivial type.
  */
 template<typename Type>
-inline void DALI_TEST_VALUE_EQUALS( Property::Value&& value1, Type value2, float epsilon, const char* location)
+inline void DALI_TEST_VALUE_EQUALS(Property::Value&& value1, Type value2, float epsilon, const char* location)
 {
   Property::Value value2b(value2);
   DALI_TEST_EQUALS(value1, value2b, epsilon, location);
 }
-
 
 /**
  * Test whether one unsigned integer value is greater than another.
@@ -325,14 +322,14 @@ inline void DALI_TEST_VALUE_EQUALS( Property::Value&& value1, Type value2, float
  * @param[in] value2 The second value
  * @param[in] location The TEST_LOCATION macro should be used here
  */
-template< typename T >
-void DALI_TEST_GREATER( T value1, T value2, const char* location)
+template<typename T>
+void DALI_TEST_GREATER(T value1, T value2, const char* location)
 {
-  if (!(value1 > value2))
+  if(!(value1 > value2))
   {
-    std::cerr << "Test failed in " << location << ", checking " << value1 <<" > " << value2 << "\n";
+    std::cerr << "Test failed in " << location << ", checking " << value1 << " > " << value2 << "\n";
     tet_result(TET_FAIL);
-    throw("TET_FAIL");                                                                      \
+    throw("TET_FAIL");
   }
   else
   {
@@ -348,15 +345,15 @@ void DALI_TEST_GREATER( T value1, T value2, const char* location)
  *                               assertion which triggered the exception.
  * @param[in] location The TEST_LOCATION macro should be used here.
  */
-void DALI_TEST_ASSERT( DaliException& e, std::string conditionSubString, const char* location );
+void DALI_TEST_ASSERT(DaliException& e, std::string conditionSubString, const char* location);
 
 /**
  * Print the assert
  * @param[in] e The exception that we expect was fired by a runtime assertion failure.
  */
-inline void DALI_TEST_PRINT_ASSERT( DaliException& e )
+inline void DALI_TEST_PRINT_ASSERT(DaliException& e)
 {
-  tet_printf("Assertion %s failed at %s\n", e.condition, e.location );
+  tet_printf("Assertion %s failed at %s\n", e.condition, e.location);
 }
 
 /**
@@ -366,41 +363,42 @@ inline void DALI_TEST_PRINT_ASSERT( DaliException& e )
  * @param expressions code to execute
  * @param assertstring the substring expected in the assert
  */
-#define DALI_TEST_ASSERTION( expressions, assertstring ) \
-try \
-{ \
-  TestApplication::EnableLogging( false ); \
-  expressions; \
-  TestApplication::EnableLogging( true ); \
-  fprintf(stderr, "Test failed in %s, expected assert: '%s' didn't occur\n", __FILELINE__, assertstring ); \
-  tet_result(TET_FAIL); \
-  throw("TET_FAIL"); } \
-catch( Dali::DaliException& e ) \
-{ \
-  DALI_TEST_ASSERT( e, assertstring, TEST_LOCATION ); \
-}
+#define DALI_TEST_ASSERTION(expressions, assertstring)                                                      \
+  try                                                                                                       \
+  {                                                                                                         \
+    TestApplication::EnableLogging(false);                                                                  \
+    expressions;                                                                                            \
+    TestApplication::EnableLogging(true);                                                                   \
+    fprintf(stderr, "Test failed in %s, expected assert: '%s' didn't occur\n", __FILELINE__, assertstring); \
+    tet_result(TET_FAIL);                                                                                   \
+    throw("TET_FAIL");                                                                                      \
+  }                                                                                                         \
+  catch(Dali::DaliException & e)                                                                            \
+  {                                                                                                         \
+    DALI_TEST_ASSERT(e, assertstring, TEST_LOCATION);                                                       \
+  }
 
 // Functor to test whether an Applied signal is emitted
 struct ConstraintAppliedCheck
 {
-  ConstraintAppliedCheck( bool& signalReceived );
-  void operator()( Constraint& constraint );
-  void Reset();
-  void CheckSignalReceived();
-  void CheckSignalNotReceived();
+  ConstraintAppliedCheck(bool& signalReceived);
+  void  operator()(Constraint& constraint);
+  void  Reset();
+  void  CheckSignalReceived();
+  void  CheckSignalNotReceived();
   bool& mSignalReceived; // owned by individual tests
 };
 
 /**
  * A Helper to test default functions
  */
-template <typename T>
+template<typename T>
 struct DefaultFunctionCoverage
 {
   DefaultFunctionCoverage()
   {
-    T a;
-    T *b = new T(a);
+    T  a;
+    T* b = new T(a);
     DALI_TEST_CHECK(b);
     a = *b;
     delete b;
@@ -422,19 +420,18 @@ namespace Test
 class ObjectDestructionTracker : public ConnectionTracker
 {
 public:
-
   /**
    * @brief Call in main part of code
    * @param[in] objectRegistry The object Registry being used
    */
-  ObjectDestructionTracker( ObjectRegistry objectRegistry );
+  ObjectDestructionTracker(ObjectRegistry objectRegistry);
 
   /**
    * @brief Call in sub bock of code where the Actor being checked is still alive.
    *
    * @param[in] actor Actor to be checked for destruction
    */
-  void Start( Actor actor );
+  void Start(Actor actor);
 
   /**
    * @brief Call to check if Actor alive or destroyed.
@@ -445,7 +442,7 @@ public:
 
 private:
   ObjectRegistry mObjectRegistry;
-  bool mRefObjectDestroyed;
+  bool           mRefObjectDestroyed;
 };
 
 } // namespace Test

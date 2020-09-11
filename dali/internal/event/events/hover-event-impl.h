@@ -32,7 +32,7 @@ namespace Internal
 {
 
 class HoverEvent;
-typedef IntrusivePtr< HoverEvent > HoverEventPtr;
+using HoverEventPtr = IntrusivePtr<HoverEvent>;
 
 /**
  * @copydoc Dali::HoverEvent
@@ -137,7 +137,7 @@ private:
    *
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~HoverEvent() = default;
+  ~HoverEvent() override = default;
 
   // Not copyable or movable
 

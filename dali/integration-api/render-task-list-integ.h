@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_RENDER_TASK_LIST_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,17 +23,14 @@
 
 namespace Dali
 {
-
 class Actor;
 class CameraActor;
 
 namespace Integration
 {
-
 namespace RenderTaskList
 {
-
-  /**
+/**
    * @brief Helper function to create a new RenderTaskList object.
    *
    * A RenderTaskList is an ordered list of render tasks that describes
@@ -41,9 +38,9 @@ namespace RenderTaskList
    *
    * @return A handle to a newly allocated RenderTaskList
    */
-  DALI_CORE_API Dali::RenderTaskList New();
+DALI_CORE_API Dali::RenderTaskList New();
 
-  /**
+/**
    * @brief Helper function to create a new RenderTask.
    *
    * The created task will be appended to the list of render-tasks.
@@ -53,7 +50,7 @@ namespace RenderTaskList
    * @param[in] cameraActor The actor from which the scene is viewed for this render task.
    * @return A valid handle to a new RenderTask
    */
-  DALI_CORE_API Dali::RenderTask CreateTask( Dali::RenderTaskList& taskList, Dali::Actor& sourceActor, Dali::CameraActor& cameraActor);
+DALI_CORE_API Dali::RenderTask CreateTask(Dali::RenderTaskList& taskList, Dali::Actor& sourceActor, Dali::CameraActor& cameraActor);
 
 } // namespace RenderTaskList
 

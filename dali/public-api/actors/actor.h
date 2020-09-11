@@ -19,8 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
-#include <string>
 #include <cstdint> // uint32_t
+#include <string>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor-enumerations.h>
@@ -56,7 +56,7 @@ struct Vector2;
 struct Vector3;
 struct Vector4;
 
-typedef Rect<float> Padding;      ///< Padding definition @SINCE_1_0.0
+using Padding = Rect<float>; ///< Padding definition @SINCE_1_0.0
 
 /**
  * @brief Actor is the primary object with which Dali applications interact.
@@ -238,7 +238,6 @@ typedef Rect<float> Padding;      ///< Padding definition @SINCE_1_0.0
 class DALI_CORE_API Actor : public Handle
 {
 public:
-
   /**
    * @brief Enumeration for the instance of properties belonging to the Actor class.
    * @SINCE_1_0.0
@@ -730,13 +729,13 @@ public:
 
   // Typedefs
 
-  typedef Signal< bool (Actor, const TouchEvent&) > TouchEventSignalType;   ///< Touch signal type @SINCE_1_1.37
-  typedef Signal< bool (Actor, const HoverEvent&) > HoverSignalType;        ///< Hover signal type @SINCE_1_0.0
-  typedef Signal< bool (Actor, const WheelEvent&) > WheelEventSignalType;   ///< Wheel signal type @SINCE_1_0.0
-  typedef Signal< void (Actor) > OnSceneSignalType;                         ///< Scene connection signal type @SINCE_1_9.24
-  typedef Signal< void (Actor) > OffSceneSignalType;                        ///< Scene disconnection signal type @SINCE_1_9.24
-  typedef Signal< void (Actor) > OnRelayoutSignalType;                      ///< Called when the actor is relaid out @SINCE_1_0.0
-  typedef Signal< void ( Actor, LayoutDirection::Type ) > LayoutDirectionChangedSignalType; ///< Layout direction changes signal type. @SINCE_1_2.60
+  using TouchEventSignalType             = Signal<bool(Actor, const TouchEvent&)>;     ///< Touch signal type @SINCE_1_1.37
+  using HoverSignalType                  = Signal<bool(Actor, const HoverEvent&)>;     ///< Hover signal type @SINCE_1_0.0
+  using WheelEventSignalType             = Signal<bool(Actor, const WheelEvent&)>;     ///< Wheel signal type @SINCE_1_0.0
+  using OnSceneSignalType                = Signal<void(Actor)>;                        ///< Scene connection signal type @SINCE_1_9.24
+  using OffSceneSignalType               = Signal<void(Actor)>;                        ///< Scene disconnection signal type @SINCE_1_9.24
+  using OnRelayoutSignalType             = Signal<void(Actor)>;                        ///< Called when the actor is relaid out @SINCE_1_0.0
+  using LayoutDirectionChangedSignalType = Signal<void(Actor, LayoutDirection::Type)>; ///< Layout direction changes signal type. @SINCE_1_2.60
 
   // Creation
 
@@ -766,7 +765,7 @@ public:
    * @param[in] handle to An object
    * @return handle to a Actor object or an uninitialized handle
    */
-  static Actor DownCast( BaseHandle handle );
+  static Actor DownCast(BaseHandle handle);
 
   /**
    * @brief Dali::Actor is intended as a base class.
@@ -799,7 +798,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the actor to move
    */
-  Actor( Actor&& rhs );
+  Actor(Actor&& rhs);
 
   /**
    * @brief Move assignment operator.
@@ -808,7 +807,7 @@ public:
    * @param[in] rhs A reference to the actor to move
    * @return A reference to this
    */
-  Actor& operator=( Actor&& rhs );
+  Actor& operator=(Actor&& rhs);
 
   // Containment
 
@@ -875,7 +874,7 @@ public:
    * @return The actor for the given index or empty handle if children not initialized
    * @pre The Actor has been initialized.
    */
-  Actor GetChildAt( uint32_t index ) const;
+  Actor GetChildAt(uint32_t index) const;
 
   /**
    * @brief Search through this actor's hierarchy for an actor with the given name.
@@ -897,7 +896,7 @@ public:
    * @return A handle to the actor if found, or an empty handle if not
    * @pre The Actor has been initialized.
    */
-  Actor FindChildById( const uint32_t id );
+  Actor FindChildById(const uint32_t id);
 
   /**
    * @brief Retrieves the actor's parent.
@@ -948,9 +947,9 @@ public:
    * @param[in] axis The axis of the rotation to combine with the existing orientation
    * @pre The actor has been initialized.
    */
-  void RotateBy( const Degree& angle, const Vector3& axis )
+  void RotateBy(const Degree& angle, const Vector3& axis)
   {
-    RotateBy( Radian( angle ), axis );
+    RotateBy(Radian(angle), axis);
   }
 
   /**
@@ -1042,7 +1041,7 @@ public:
    * @pre The Actor has been parented.
    * @pre The target actor is a sibling.
    */
-  void RaiseAbove( Actor target );
+  void RaiseAbove(Actor target);
 
   /**
    * @brief Lower the actor to below the target actor.
@@ -1053,7 +1052,7 @@ public:
    * @pre The Actor has been parented.
    * @pre The target actor is a sibling.
    */
-  void LowerBelow( Actor target );
+  void LowerBelow(Actor target);
 
   // SIZE NEGOTIATION
 
@@ -1064,7 +1063,7 @@ public:
    * @param[in] policy The resize policy to use
    * @param[in] dimension The dimension(s) to set policy for. Can be a bitfield of multiple dimensions
    */
-  void SetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension );
+  void SetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension);
 
   /**
    * @brief Returns the resize policy used for a single dimension.
@@ -1073,7 +1072,7 @@ public:
    * @param[in] dimension The dimension to get policy for
    * @return Return the dimension resize policy. If more than one dimension is requested, just return the first one found
    */
-  ResizePolicy::Type GetResizePolicy( Dimension::Type dimension ) const;
+  ResizePolicy::Type GetResizePolicy(Dimension::Type dimension) const;
 
   /**
    * @brief Calculates the height of the actor given a width.
@@ -1085,7 +1084,7 @@ public:
    * @param[in] width Width to use
    * @return Return the height based on the width
    */
-  float GetHeightForWidth( float width );
+  float GetHeightForWidth(float width);
 
   /**
    * @brief Calculates the width of the actor given a height.
@@ -1097,7 +1096,7 @@ public:
    * @param[in] height Height to use
    * @return Return the width based on the height
    */
-  float GetWidthForHeight( float height );
+  float GetWidthForHeight(float height);
 
   /**
    * @brief Returns the value of negotiated dimension for the given dimension.
@@ -1106,10 +1105,9 @@ public:
    * @param[in] dimension The dimension to retrieve
    * @return Return the value of the negotiated dimension. If more than one dimension is requested, just return the first one found
    */
-  float GetRelayoutSize( Dimension::Type dimension ) const;
+  float GetRelayoutSize(Dimension::Type dimension) const;
 
 public: // Renderer
-
   /**
    * @brief Adds a renderer to this actor.
    *
@@ -1119,7 +1117,7 @@ public: // Renderer
    * @pre The renderer must be initialized.
    *
    */
-  uint32_t AddRenderer( Renderer& renderer );
+  uint32_t AddRenderer(Renderer& renderer);
 
   /**
    * @brief Gets the number of renderers on this actor.
@@ -1138,7 +1136,7 @@ public: // Renderer
    * @pre The index must be between 0 and GetRendererCount()-1
    *
    */
-  Renderer GetRendererAt( uint32_t index );
+  Renderer GetRendererAt(uint32_t index);
 
   /**
    * @brief Removes a renderer from the actor.
@@ -1146,7 +1144,7 @@ public: // Renderer
    * @SINCE_1_0.0
    * @param[in] renderer Handle to the renderer that is to be removed
    */
-  void RemoveRenderer( Renderer& renderer );
+  void RemoveRenderer(Renderer& renderer);
 
   /**
    * @brief Removes a renderer from the actor by index.
@@ -1156,10 +1154,9 @@ public: // Renderer
    * @pre The index must be between 0 and GetRendererCount()-1
    *
    */
-  void RemoveRenderer( uint32_t index );
+  void RemoveRenderer(uint32_t index);
 
 public: // Signals
-
   /**
    * @brief This signal is emitted when touch input is received.
    *
@@ -1279,7 +1276,6 @@ public: // Signals
   LayoutDirectionChangedSignalType& LayoutDirectionChangedSignal();
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief This constructor is used by Actor::New() methods.
@@ -1299,9 +1295,9 @@ public: // Not intended for application developers
  * @SINCE_1_0.0
  * @param[in,out] actor A handle to an actor, or an empty handle
  */
-inline void UnparentAndReset( Actor& actor )
+inline void UnparentAndReset(Actor& actor)
 {
-  if( actor )
+  if(actor)
   {
     actor.Unparent();
     actor.Reset();

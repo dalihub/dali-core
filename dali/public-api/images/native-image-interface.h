@@ -23,8 +23,8 @@
 #include <cstdint> // uint32_t
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/object/any.h>
+#include <dali/public-api/object/ref-object.h>
 
 namespace Dali
 {
@@ -42,7 +42,6 @@ namespace Dali
 class NativeImageInterface : public Dali::RefObject
 {
 public:
-
   class Extension; ///< Forward declare future extension interface
 
   /**
@@ -98,7 +97,7 @@ public:
    */
   virtual uint32_t GetHeight() const = 0;
 
- /**
+  /**
   * @brief Queries whether blending is required.
   * @SINCE_1_0.0
   * @return True if blending is required
@@ -154,21 +153,19 @@ public:
    */
   virtual Extension* GetExtension()
   {
-    return NULL;
+    return nullptr;
   }
 
 protected:
-
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
    *
    * The implementation should destroy the NativeImage resources.
    * @SINCE_1_0.0
    */
-  virtual ~NativeImageInterface()
+  ~NativeImageInterface() override
   {
   }
-
 };
 
 /**

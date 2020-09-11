@@ -27,37 +27,36 @@
  * These internal macros exist as to perform the compile-time check on the enumeration order, the __COUNTER__ macro is used twice.
  * Using it twice within the same macro would result in two different values.
  */
-#define DALI_TOKEN_PASTE_EXPAND( x, y ) x ## y
-#define DALI_TOKEN_PASTE( x, y ) DALI_TOKEN_PASTE_EXPAND(x, y)
+#define DALI_TOKEN_PASTE_EXPAND(x, y) x##y
+#define DALI_TOKEN_PASTE(x, y) DALI_TOKEN_PASTE_EXPAND(x, y)
 
-#define DALI_PROPERTY_REGISTRATION_INTERNAL( count, typeRegistrationObject, objectNamespace, objectType, text, valueType, enumIndex ) \
-  Dali::PropertyRegistration DALI_TOKEN_PASTE( property, count ) ( typeRegistrationObject, text, objectNamespace::objectType::Property::enumIndex, Dali::Property::valueType, &objectType::SetProperty, &objectType::GetProperty ); \
-  static_assert( ( objectNamespace::objectType::Property::enumIndex - objectNamespace::objectType::PROPERTY_START_INDEX ) == count );
+#define DALI_PROPERTY_REGISTRATION_INTERNAL(count, typeRegistrationObject, objectNamespace, objectType, text, valueType, enumIndex)                                                                                            \
+  Dali::PropertyRegistration DALI_TOKEN_PASTE(property, count)(typeRegistrationObject, text, objectNamespace::objectType::Property::enumIndex, Dali::Property::valueType, &objectType::SetProperty, &objectType::GetProperty); \
+  static_assert((objectNamespace::objectType::Property::enumIndex - objectNamespace::objectType::PROPERTY_START_INDEX) == count);
 
-#define DALI_PROPERTY_REGISTRATION_INTERNAL_READ_ONLY( count, typeRegistrationObject, objectNamespace, objectType, text, valueType, enumIndex ) \
-  Dali::PropertyRegistration DALI_TOKEN_PASTE( property, count ) ( typeRegistrationObject, text, objectNamespace::objectType::Property::enumIndex, Dali::Property::valueType, NULL, &objectType::GetProperty ); \
-  static_assert( ( objectNamespace::objectType::Property::enumIndex - objectNamespace::objectType::PROPERTY_START_INDEX ) == count );
+#define DALI_PROPERTY_REGISTRATION_INTERNAL_READ_ONLY(count, typeRegistrationObject, objectNamespace, objectType, text, valueType, enumIndex)                                                              \
+  Dali::PropertyRegistration DALI_TOKEN_PASTE(property, count)(typeRegistrationObject, text, objectNamespace::objectType::Property::enumIndex, Dali::Property::valueType, NULL, &objectType::GetProperty); \
+  static_assert((objectNamespace::objectType::Property::enumIndex - objectNamespace::objectType::PROPERTY_START_INDEX) == count);
 
-#define DALI_ANIMATABLE_PROPERTY_REGISTRATION_INTERNAL( count, typeRegistrationObject, objectNamespace, objectType, text, valueType, enumIndex) \
-  Dali::AnimatablePropertyRegistration DALI_TOKEN_PASTE( property, count ) ( typeRegistrationObject, text, objectNamespace::objectType::Property::enumIndex, Dali::Property::valueType );
+#define DALI_ANIMATABLE_PROPERTY_REGISTRATION_INTERNAL(count, typeRegistrationObject, objectNamespace, objectType, text, valueType, enumIndex) \
+  Dali::AnimatablePropertyRegistration DALI_TOKEN_PASTE(property, count)(typeRegistrationObject, text, objectNamespace::objectType::Property::enumIndex, Dali::Property::valueType);
 
-#define DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT_INTERNAL( count, typeRegistrationObject, objectNamespace, objectType, text, value, enumIndex) \
-  Dali::AnimatablePropertyRegistration DALI_TOKEN_PASTE( property, count ) ( typeRegistrationObject, text, objectNamespace::objectType::Property::enumIndex, value );
+#define DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT_INTERNAL(count, typeRegistrationObject, objectNamespace, objectType, text, value, enumIndex) \
+  Dali::AnimatablePropertyRegistration DALI_TOKEN_PASTE(property, count)(typeRegistrationObject, text, objectNamespace::objectType::Property::enumIndex, value);
 
-#define DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION_INTERNAL( count, typeRegistrationObject, objectNamespace, objectType, text, enumIndex, baseEnumIndex, componentIndex) \
-  Dali::AnimatablePropertyComponentRegistration DALI_TOKEN_PASTE( property, count ) ( typeRegistrationObject, text, objectNamespace::objectType::Property::enumIndex, objectNamespace::objectType::Property::baseEnumIndex, componentIndex );
+#define DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION_INTERNAL(count, typeRegistrationObject, objectNamespace, objectType, text, enumIndex, baseEnumIndex, componentIndex) \
+  Dali::AnimatablePropertyComponentRegistration DALI_TOKEN_PASTE(property, count)(typeRegistrationObject, text, objectNamespace::objectType::Property::enumIndex, objectNamespace::objectType::Property::baseEnumIndex, componentIndex);
 
-#define DALI_CHILD_PROPERTY_REGISTRATION_INTERNAL( count, typeRegistrationObject, objectNamespace, objectType, text, valueType, enumIndex ) \
-  Dali::ChildPropertyRegistration DALI_TOKEN_PASTE( property, count ) ( typeRegistrationObject, text, objectNamespace::objectType::ChildProperty::enumIndex, Property::valueType );
+#define DALI_CHILD_PROPERTY_REGISTRATION_INTERNAL(count, typeRegistrationObject, objectNamespace, objectType, text, valueType, enumIndex) \
+  Dali::ChildPropertyRegistration DALI_TOKEN_PASTE(property, count)(typeRegistrationObject, text, objectNamespace::objectType::ChildProperty::enumIndex, Property::valueType);
 
-#define DALI_SIGNAL_REGISTRATION_INTERNAL( count, typeRegistrationObject, objectNamespace, objectType, text, textVariable ) \
-  const char* const textVariable = text; \
-  Dali::SignalConnectorType DALI_TOKEN_PASTE( signalConnector, count ) ( typeRegistrationObject, text, &objectNamespace::Internal::objectType::DoConnectSignal );
+#define DALI_SIGNAL_REGISTRATION_INTERNAL(count, typeRegistrationObject, objectNamespace, objectType, text, textVariable) \
+  const char* const         textVariable = text;                                                                          \
+  Dali::SignalConnectorType DALI_TOKEN_PASTE(signalConnector, count)(typeRegistrationObject, text, &objectNamespace::Internal::objectType::DoConnectSignal);
 
-#define DALI_ACTION_REGISTRATION_INTERNAL( count, typeRegistrationObject, objectNamespace, objectType, text, textVariable ) \
-  const char* const textVariable = text; \
-  Dali::TypeAction DALI_TOKEN_PASTE( signalConnector, count ) ( typeRegistrationObject, text, &objectNamespace::Internal::objectType::DoAction );
-
+#define DALI_ACTION_REGISTRATION_INTERNAL(count, typeRegistrationObject, objectNamespace, objectType, text, textVariable) \
+  const char* const textVariable = text;                                                                                  \
+  Dali::TypeAction  DALI_TOKEN_PASTE(signalConnector, count)(typeRegistrationObject, text, &objectNamespace::Internal::objectType::DoAction);
 
 /**
  * @brief These macros are used to define properties for implementations of CustomActor.
@@ -110,37 +109,36 @@
  * Using these macros have certain prerequisites on how the property enumeration is defined.
  * Please see the Programming Guide (within the generated Doxygen) for full details.
  */
-#define DALI_TYPE_REGISTRATION_BEGIN( thisType, baseType, createFunction ) \
-  Dali::TypeRegistration typeRegistration( typeid( thisType ), typeid( baseType ), createFunction );
+#define DALI_TYPE_REGISTRATION_BEGIN(thisType, baseType, createFunction) \
+  Dali::TypeRegistration typeRegistration(typeid(thisType), typeid(baseType), createFunction);
 
-#define DALI_TYPE_REGISTRATION_BEGIN_CREATE( thisType, baseType, createFunction, createAtStartup ) \
-  Dali::TypeRegistration typeRegistration( typeid( thisType ), typeid( baseType ), createFunction, createAtStartup );
+#define DALI_TYPE_REGISTRATION_BEGIN_CREATE(thisType, baseType, createFunction, createAtStartup) \
+  Dali::TypeRegistration typeRegistration(typeid(thisType), typeid(baseType), createFunction, createAtStartup);
 
-#define DALI_PROPERTY_REGISTRATION( objectNamespace, objectType, text, valueType, enumIndex ) \
-  DALI_PROPERTY_REGISTRATION_INTERNAL( __COUNTER__, typeRegistration, objectNamespace, objectType, text, valueType, enumIndex )
+#define DALI_PROPERTY_REGISTRATION(objectNamespace, objectType, text, valueType, enumIndex) \
+  DALI_PROPERTY_REGISTRATION_INTERNAL(__COUNTER__, typeRegistration, objectNamespace, objectType, text, valueType, enumIndex)
 
-#define DALI_PROPERTY_REGISTRATION_READ_ONLY( objectNamespace, objectType, text, valueType, enumIndex ) \
-  DALI_PROPERTY_REGISTRATION_INTERNAL_READ_ONLY( __COUNTER__, typeRegistration, objectNamespace, objectType, text, valueType, enumIndex )
+#define DALI_PROPERTY_REGISTRATION_READ_ONLY(objectNamespace, objectType, text, valueType, enumIndex) \
+  DALI_PROPERTY_REGISTRATION_INTERNAL_READ_ONLY(__COUNTER__, typeRegistration, objectNamespace, objectType, text, valueType, enumIndex)
 
-#define DALI_ANIMATABLE_PROPERTY_REGISTRATION( objectNamespace, objectType, text, valueType, enumIndex ) \
-  DALI_ANIMATABLE_PROPERTY_REGISTRATION_INTERNAL( __COUNTER__, typeRegistration, objectNamespace, objectType, text, valueType, enumIndex )
+#define DALI_ANIMATABLE_PROPERTY_REGISTRATION(objectNamespace, objectType, text, valueType, enumIndex) \
+  DALI_ANIMATABLE_PROPERTY_REGISTRATION_INTERNAL(__COUNTER__, typeRegistration, objectNamespace, objectType, text, valueType, enumIndex)
 
-#define DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT( objectNamespace, objectType, text, value, enumIndex ) \
-  DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT_INTERNAL( __COUNTER__, typeRegistration, objectNamespace, objectType, text, value, enumIndex )
+#define DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT(objectNamespace, objectType, text, value, enumIndex) \
+  DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT_INTERNAL(__COUNTER__, typeRegistration, objectNamespace, objectType, text, value, enumIndex)
 
-#define DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( objectNamespace, objectType, text, enumIndex, baseEnumIndex, componentIndex ) \
-  DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION_INTERNAL( __COUNTER__, typeRegistration, objectNamespace, objectType, text, enumIndex, baseEnumIndex, componentIndex )
+#define DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION(objectNamespace, objectType, text, enumIndex, baseEnumIndex, componentIndex) \
+  DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION_INTERNAL(__COUNTER__, typeRegistration, objectNamespace, objectType, text, enumIndex, baseEnumIndex, componentIndex)
 
-#define DALI_CHILD_PROPERTY_REGISTRATION( objectNamespace, objectType, text, valueType, enumIndex ) \
-  DALI_CHILD_PROPERTY_REGISTRATION_INTERNAL( __COUNTER__, typeRegistration, objectNamespace, objectType, text, valueType, enumIndex )
+#define DALI_CHILD_PROPERTY_REGISTRATION(objectNamespace, objectType, text, valueType, enumIndex) \
+  DALI_CHILD_PROPERTY_REGISTRATION_INTERNAL(__COUNTER__, typeRegistration, objectNamespace, objectType, text, valueType, enumIndex)
 
-#define DALI_SIGNAL_REGISTRATION( objectNamespace, objectType, text, textVariable ) \
-  DALI_SIGNAL_REGISTRATION_INTERNAL( __COUNTER__, typeRegistration, objectNamespace, objectType, text, textVariable )
+#define DALI_SIGNAL_REGISTRATION(objectNamespace, objectType, text, textVariable) \
+  DALI_SIGNAL_REGISTRATION_INTERNAL(__COUNTER__, typeRegistration, objectNamespace, objectType, text, textVariable)
 
-#define DALI_ACTION_REGISTRATION( objectNamespace, objectType, text, textVariable ) \
-  DALI_ACTION_REGISTRATION_INTERNAL( __COUNTER__, typeRegistration, objectNamespace, objectType, text, textVariable )
+#define DALI_ACTION_REGISTRATION(objectNamespace, objectType, text, textVariable) \
+  DALI_ACTION_REGISTRATION_INTERNAL(__COUNTER__, typeRegistration, objectNamespace, objectType, text, textVariable)
 
-#define DALI_TYPE_REGISTRATION_END( ) // This macro exists for consistency and readability.
-
+#define DALI_TYPE_REGISTRATION_END() // This macro exists for consistency and readability.
 
 #endif // DALI_TYPE_REGISTRY_HELPER_H

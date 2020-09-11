@@ -56,19 +56,19 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~RotationGestureRecognizer() = default;
+  ~RotationGestureRecognizer() override = default;
 
 public:
 
   /**
    * @copydoc Dali::Internal::GestureDetector::SendEvent(const Integration::TouchEvent&)
    */
-  virtual void SendEvent( const Integration::TouchEvent& event );
+  void SendEvent( const Integration::TouchEvent& event ) override;
 
   /**
    * @copydoc Dali::Internal::GestureDetector::Update(const Integration::GestureRequest&)
    */
-  virtual void Update( const GestureRequest& request ) { /* Nothing to do */ }
+  void Update( const GestureRequest& request ) override { /* Nothing to do */ }
 
   /**
    * Sets the minimum touch events required before a rotation can be started

@@ -55,7 +55,7 @@ struct TapGestureEvent : public GestureEvent
   /**
    * Virtual destructor
    */
-  virtual ~TapGestureEvent();
+  ~TapGestureEvent() override;
 
   // Data
 

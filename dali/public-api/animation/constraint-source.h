@@ -2,7 +2,7 @@
 #define DALI_CONSTRAINT_SOURCE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,6 @@ enum SourceType
   PARENT_PROPERTY  ///< The property comes from the parent of the object, which the constraint is applied to. @SINCE_1_0.0
 };
 
-
 /**
  * @brief Identifies a property from an object.
  * @SINCE_1_0.0
@@ -55,7 +54,7 @@ struct DALI_CORE_API LocalSource
    * @SINCE_1_0.0
    * @param[in] index The index of a property provided by the constrained object
    */
-  LocalSource( Property::Index index );
+  LocalSource(Property::Index index);
 
   Property::Index propertyIndex; ///< The index of a property provided by the constrained object.
 };
@@ -72,7 +71,7 @@ struct DALI_CORE_API ParentSource
    * @SINCE_1_0.0
    * @param[in] index The index of a property, provided by the parent of the constrained object
    */
-  ParentSource( Property::Index index );
+  ParentSource(Property::Index index);
 
   Property::Index propertyIndex; ///< The index of a property provided by the parent of the constrained object.
 };
@@ -90,7 +89,7 @@ struct DALI_CORE_API Source
    * @param[in] object The object providing the property
    * @param[in] index The index of a property provided by object
    */
-  Source( Handle& object, Property::Index index );
+  Source(Handle& object, Property::Index index);
 
   Property::Index propertyIndex; ///< The index of a property provided by object.
 
@@ -109,7 +108,7 @@ struct DALI_CORE_API ConstraintSource
    * @SINCE_1_0.0
    * @param[in] source A constraint source from an arbitrary object
    */
-  ConstraintSource( Source source );
+  ConstraintSource(Source source);
 
   /**
    * @brief Creates a constraint source.
@@ -117,7 +116,7 @@ struct DALI_CORE_API ConstraintSource
    * @SINCE_1_0.0
    * @param[in] local A local constraint source
    */
-  ConstraintSource( LocalSource local );
+  ConstraintSource(LocalSource local);
 
   /**
    * @brief Creates a constraint source.
@@ -125,7 +124,7 @@ struct DALI_CORE_API ConstraintSource
    * @SINCE_1_0.0
    * @param[in] parent A parent constraint source
    */
-  ConstraintSource( ParentSource parent );
+  ConstraintSource(ParentSource parent);
 
   SourceType sourceType; ///< The source type
 

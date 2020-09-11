@@ -86,8 +86,8 @@ bool UnprojectFull( const Vector4& windowPos,
 
 bool XyPlaneIntersect( const Vector4& pointA, const Vector4& pointB, Vector4& intersect )
 {
-  const Vector4* near = NULL;
-  const Vector4* far = NULL;
+  const Vector4* near = nullptr;
+  const Vector4* far = nullptr;
 
   if ( pointA.z > 0.0f && pointB.z < 0.0f )
   {

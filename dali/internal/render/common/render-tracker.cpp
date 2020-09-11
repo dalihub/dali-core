@@ -34,8 +34,8 @@ namespace Render
 {
 
 RenderTracker::RenderTracker()
-: mGlSyncAbstraction( NULL ),
-  mSyncObject( NULL ),
+: mGlSyncAbstraction( nullptr ),
+  mSyncObject( nullptr ),
   mSyncTrigger( 0 )
 {
   TRACKER_LOG(Debug::Verbose);
@@ -47,7 +47,7 @@ RenderTracker::~RenderTracker()
   if( mSyncObject )
   {
     mGlSyncAbstraction->DestroySyncObject( mSyncObject );
-    mSyncObject = NULL;
+    mSyncObject = nullptr;
   }
 }
 
@@ -60,7 +60,7 @@ void RenderTracker::CreateSyncObject( Integration::GlSyncAbstraction& glSyncAbst
   if( mSyncObject )
   {
      mGlSyncAbstraction->DestroySyncObject( mSyncObject );
-     mSyncObject = NULL;
+     mSyncObject = nullptr;
   }
   ResetSyncFlag();
   mSyncObject = mGlSyncAbstraction->CreateSyncObject();
@@ -72,7 +72,7 @@ void RenderTracker::PollSyncObject()
   {
     SetSyncFlag();
     mGlSyncAbstraction->DestroySyncObject( mSyncObject );
-    mSyncObject = NULL;
+    mSyncObject = nullptr;
 
     TRACKER_LOG_FMT(Debug::General, " Synced\n");
     return;

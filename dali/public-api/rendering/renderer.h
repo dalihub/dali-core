@@ -38,24 +38,22 @@ class Renderer;
 
 namespace FaceCullingMode
 {
-
 /**
  * @brief Enumeration for face culling mode.
  * @SINCE_1_1.43
  */
 enum Type
 {
-  NONE,                ///< None of the faces should be culled                 @SINCE_1_1.43
-  FRONT,               ///< Cull front face, front faces should never be shown @SINCE_1_1.43
-  BACK,                ///< Cull back face, back faces should never be shown   @SINCE_1_1.43
-  FRONT_AND_BACK,      ///< Cull front and back faces; if the geometry is composed of triangles none of the faces will be shown @SINCE_1_1.43
+  NONE,           ///< None of the faces should be culled                 @SINCE_1_1.43
+  FRONT,          ///< Cull front face, front faces should never be shown @SINCE_1_1.43
+  BACK,           ///< Cull back face, back faces should never be shown   @SINCE_1_1.43
+  FRONT_AND_BACK, ///< Cull front and back faces; if the geometry is composed of triangles none of the faces will be shown @SINCE_1_1.43
 };
 
 } // namespace FaceCullingMode
 
 namespace BlendMode
 {
-
 /**
  * @brief Enumeration for blend mode.
  * @SINCE_1_1.43
@@ -71,23 +69,21 @@ enum Type
 
 namespace BlendEquation
 {
-
 /**
  * @brief Enumeration for blend equation.
  * @SINCE_1_1.43
  */
 enum Type
 {
-  ADD              = 0x8006,  ///< The source and destination colors are added to each other. @SINCE_1_1.43
-  SUBTRACT         = 0x800A,  ///< Subtracts the destination from the source.                 @SINCE_1_1.43
-  REVERSE_SUBTRACT = 0x800B   ///< Subtracts the source from the destination.                 @SINCE_1_1.43
+  ADD              = 0x8006, ///< The source and destination colors are added to each other. @SINCE_1_1.43
+  SUBTRACT         = 0x800A, ///< Subtracts the destination from the source.                 @SINCE_1_1.43
+  REVERSE_SUBTRACT = 0x800B  ///< Subtracts the source from the destination.                 @SINCE_1_1.43
 };
 
 } // namespace BlendEquation
 
 namespace BlendFactor
 {
-
 /**
  * @brief Enumeration for blend factor.
  * @SINCE_1_1.43
@@ -115,7 +111,6 @@ enum Type
 
 namespace DepthWriteMode
 {
-
 /**
  * @brief Enumeration for depth buffer write modes.
  * @SINCE_1_1.43
@@ -131,7 +126,6 @@ enum Type
 
 namespace DepthTestMode
 {
-
 /**
  * @brief Enumeration for depth buffer test (read) modes.
  * @SINCE_1_1.43
@@ -147,7 +141,6 @@ enum Type
 
 namespace DepthFunction
 {
-
 /**
  * @brief Enumeration for depth functions.
  * @SINCE_1_1.43
@@ -168,7 +161,6 @@ enum Type
 
 namespace RenderMode
 {
-
 /**
  * @brief Enumeration for the controls of how this renderer uses its stencil properties and writes to the color buffer.
  * @SINCE_1_2_5
@@ -186,7 +178,6 @@ enum Type
 
 namespace StencilFunction
 {
-
 /**
  * @brief Enumeration for the comparison function used on the stencil buffer.
  * @SINCE_1_1.43
@@ -207,7 +198,6 @@ enum Type
 
 namespace StencilOperation
 {
-
 /**
  * @brief Enumeration for specifying the action to take when the stencil (or depth) test fails during stencil test.
  * @SINCE_1_1.43
@@ -226,7 +216,6 @@ enum Type
 
 } // namespace StencilOperation
 
-
 /**
  * @brief Renderer is a handle to an object used to show content by combining a Geometry, a TextureSet and a shader.
  *
@@ -235,7 +224,6 @@ enum Type
 class DALI_CORE_API Renderer : public Handle
 {
 public:
-
   /**
    * @brief Enumeration for instances of properties belonging to the Renderer class.
    * @SINCE_1_1.43
@@ -434,7 +422,7 @@ public:
    * @param[in] shader Shader to be used by this renderer
    * @return A handle to the Renderer
    */
-  static Renderer New( Geometry& geometry, Shader& shader );
+  static Renderer New(Geometry& geometry, Shader& shader);
 
   /**
    * @brief Default constructor, creates an empty handle
@@ -456,7 +444,7 @@ public:
    * @SINCE_1_1.43
    * @param[in] handle Handle to an object
    */
-  Renderer( const Renderer& handle );
+  Renderer(const Renderer& handle);
 
   /**
    * @brief Downcasts to a renderer handle.
@@ -466,7 +454,7 @@ public:
    * @param[in] handle Handle to an object
    * @return Renderer handle or an uninitialized handle
    */
-  static Renderer DownCast( BaseHandle handle );
+  static Renderer DownCast(BaseHandle handle);
 
   /**
    * @brief Assignment operator, changes this handle to point at the same object.
@@ -475,7 +463,7 @@ public:
    * @param[in] handle Handle to an object
    * @return Reference to the assigned object
    */
-  Renderer& operator=( const Renderer& handle );
+  Renderer& operator=(const Renderer& handle);
 
   /**
    * @brief Move constructor.
@@ -483,7 +471,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  Renderer( Renderer&& rhs );
+  Renderer(Renderer&& rhs);
 
   /**
    * @brief Move assignment operator.
@@ -492,7 +480,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  Renderer& operator=( Renderer&& rhs );
+  Renderer& operator=(Renderer&& rhs);
 
   /**
    * @brief Sets the geometry to be used by this renderer.
@@ -500,7 +488,7 @@ public:
    * @SINCE_1_1.43
    * @param[in] geometry The geometry to be used by this renderer
    */
-  void SetGeometry( Geometry& geometry );
+  void SetGeometry(Geometry& geometry);
 
   /**
    * @brief Gets the geometry used by this renderer.
@@ -517,10 +505,10 @@ public:
    * @param[in] firstElement The First element to draw
    * @param[in] elementsCount The number of elements to draw
    */
-  inline void SetIndexRange( int firstElement, int elementsCount )
+  inline void SetIndexRange(int firstElement, int elementsCount)
   {
-    SetProperty( Property::INDEX_RANGE_FIRST, firstElement );
-    SetProperty( Property::INDEX_RANGE_COUNT, elementsCount );
+    SetProperty(Property::INDEX_RANGE_FIRST, firstElement);
+    SetProperty(Property::INDEX_RANGE_COUNT, elementsCount);
   }
 
   /**
@@ -529,7 +517,7 @@ public:
    * @SINCE_1_1.43
    * @param[in] textureSet The texture set to be used by this renderer
    */
-  void SetTextures( TextureSet& textureSet );
+  void SetTextures(TextureSet& textureSet);
 
   /**
    * @brief Gets the texture set used by this renderer.
@@ -545,7 +533,7 @@ public:
    * @SINCE_1_1.43
    * @param[in] shader The shader to be used by this renderer
    */
-  void SetShader( Shader& shader );
+  void SetShader(Shader& shader);
 
   /**
    * @brief Gets the shader used by this renderer.
@@ -556,14 +544,13 @@ public:
   Shader GetShader() const;
 
 public:
-
   /**
    * @brief The constructor.
    * @note  Not intended for application developers.
    * @SINCE_1_1.43
    * @param[in] pointer A pointer to a newly allocated Renderer
    */
-  explicit DALI_INTERNAL Renderer( Internal::Renderer* pointer );
+  explicit DALI_INTERNAL Renderer(Internal::Renderer* pointer);
 };
 
 /**

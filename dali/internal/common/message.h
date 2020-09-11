@@ -70,8 +70,7 @@ template< typename T >
 class Message : public MessageBase
 {
 public:
-
-  typedef void(T::*MemberFunction)();
+  using MemberFunction = void ( T::* )();
 
   /**
    * Create a message.
@@ -91,14 +90,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~Message()
+  ~Message() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex /*bufferIndex*/ )
+  void Process( BufferIndex /*bufferIndex*/ ) override
   {
     (object->*memberFunction)();
   }
@@ -120,8 +119,7 @@ template< typename T, typename P >
 class MessageValue1 : public MessageBase
 {
 public:
-
-  typedef void(T::*MemberFunction)( typename ParameterType< P >::PassingType );
+  using MemberFunction = void ( T::* )( typename ParameterType<P>::PassingType );
 
   /**
    * Create a message.
@@ -145,14 +143,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~MessageValue1()
+  ~MessageValue1() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex /*bufferIndex*/ )
+  void Process( BufferIndex /*bufferIndex*/ ) override
   {
     (object->*memberFunction)( param1 );
   }
@@ -176,10 +174,7 @@ template< typename T, typename P1, typename P2 >
 class MessageValue2 : public MessageBase
 {
 public:
-
-  typedef void(T::*MemberFunction)(
-      typename ParameterType< P1 >::PassingType,
-      typename ParameterType< P2 >::PassingType );
+  using MemberFunction = void ( T::* )( typename ParameterType<P1>::PassingType, typename ParameterType<P2>::PassingType );
 
   /**
    * Create a message.
@@ -206,14 +201,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~MessageValue2()
+  ~MessageValue2() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex /*bufferIndex*/ )
+  void Process( BufferIndex /*bufferIndex*/ ) override
   {
     (object->*memberFunction)( param1, param2 );
   }
@@ -237,11 +232,7 @@ template< typename T, typename P1, typename P2, typename P3 >
 class MessageValue3 : public MessageBase
 {
 public:
-
-  typedef void(T::*MemberFunction)(
-      typename ParameterType< P1 >::PassingType,
-      typename ParameterType< P2 >::PassingType,
-      typename ParameterType< P3 >::PassingType );
+  using MemberFunction = void ( T::* )( typename ParameterType<P1>::PassingType, typename ParameterType<P2>::PassingType, typename ParameterType<P3>::PassingType );
 
   /**
    * Create a message.
@@ -271,14 +262,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~MessageValue3()
+  ~MessageValue3() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex /*bufferIndex*/ )
+  void Process( BufferIndex /*bufferIndex*/ ) override
   {
     (object->*memberFunction)( param1, param2, param3 );
   }
@@ -303,12 +294,7 @@ template< typename T, typename P1, typename P2, typename P3, typename P4 >
 class MessageValue4 : public MessageBase
 {
 public:
-
-  typedef void(T::*MemberFunction)(
-      typename ParameterType< P1 >::PassingType,
-      typename ParameterType< P2 >::PassingType,
-      typename ParameterType< P3 >::PassingType,
-      typename ParameterType< P4 >::PassingType );
+  using MemberFunction = void ( T::* )( typename ParameterType<P1>::PassingType, typename ParameterType<P2>::PassingType, typename ParameterType<P3>::PassingType, typename ParameterType<P4>::PassingType );
 
   /**
    * Create a message.
@@ -341,14 +327,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~MessageValue4()
+  ~MessageValue4() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex /*bufferIndex*/ )
+  void Process( BufferIndex /*bufferIndex*/ ) override
   {
     (object->*memberFunction)( param1, param2, param3, param4 );
   }
@@ -374,13 +360,7 @@ template< typename T, typename P1, typename P2, typename P3, typename P4, typena
 class MessageValue5 : public MessageBase
 {
 public:
-
-  typedef void(T::*MemberFunction)(
-      typename ParameterType< P1 >::PassingType,
-      typename ParameterType< P2 >::PassingType,
-      typename ParameterType< P3 >::PassingType,
-      typename ParameterType< P4 >::PassingType,
-      typename ParameterType< P5 >::PassingType );
+  using MemberFunction = void ( T::* )( typename ParameterType<P1>::PassingType, typename ParameterType<P2>::PassingType, typename ParameterType<P3>::PassingType, typename ParameterType<P4>::PassingType, typename ParameterType<P5>::PassingType );
 
   /**
    * Create a message.
@@ -416,14 +396,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~MessageValue5()
+  ~MessageValue5() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex /*bufferIndex*/ )
+  void Process( BufferIndex /*bufferIndex*/ ) override
   {
     (object->*memberFunction)( param1, param2, param3, param4, param5 );
   }
@@ -450,14 +430,7 @@ template< typename T, typename P1, typename P2, typename P3, typename P4, typena
 class MessageValue6 : public MessageBase
 {
 public:
-
-  typedef void(T::*MemberFunction)(
-      typename ParameterType< P1 >::PassingType,
-      typename ParameterType< P2 >::PassingType,
-      typename ParameterType< P3 >::PassingType,
-      typename ParameterType< P4 >::PassingType,
-      typename ParameterType< P5 >::PassingType,
-      typename ParameterType< P6 >::PassingType );
+  using MemberFunction = void ( T::* )( typename ParameterType<P1>::PassingType, typename ParameterType<P2>::PassingType, typename ParameterType<P3>::PassingType, typename ParameterType<P4>::PassingType, typename ParameterType<P5>::PassingType, typename ParameterType<P6>::PassingType );
 
   /**
    * Create a message.
@@ -496,14 +469,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~MessageValue6()
+  ~MessageValue6() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex /*bufferIndex*/ )
+  void Process( BufferIndex /*bufferIndex*/ ) override
   {
     (object->*memberFunction)( param1, param2, param3, param4, param5, param6 );
   }
@@ -529,8 +502,7 @@ template< typename T >
 class MessageDoubleBuffered0 : public MessageBase
 {
 public:
-
-  typedef void(T::*MemberFunction)( BufferIndex );
+  using MemberFunction = void ( T::* )( BufferIndex );
 
   /**
    * Create a message.
@@ -550,14 +522,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~MessageDoubleBuffered0()
+  ~MessageDoubleBuffered0() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex bufferIndex )
+  void Process( BufferIndex bufferIndex ) override
   {
     (object->*memberFunction)( bufferIndex );
   }
@@ -580,10 +552,7 @@ template< typename T, typename P >
 class MessageDoubleBuffered1 : public MessageBase
 {
 public:
-
-  typedef void(T::*MemberFunction)(
-      BufferIndex,
-      typename ParameterType< P >::PassingType );
+  using MemberFunction = void ( T::* )( BufferIndex, typename ParameterType<P>::PassingType );
 
   /**
    * Create a message.
@@ -607,14 +576,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~MessageDoubleBuffered1()
+  ~MessageDoubleBuffered1() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex bufferIndex )
+  void Process( BufferIndex bufferIndex ) override
   {
     (object->*memberFunction)( bufferIndex,  param );
   }
@@ -637,11 +606,7 @@ template< typename T, typename P2, typename P3 >
 class MessageDoubleBuffered2 : public MessageBase
 {
 public:
-
-  typedef void(T::*MemberFunction)(
-      BufferIndex,
-      typename ParameterType< P2 >::PassingType,
-      typename ParameterType< P3 >::PassingType );
+  using MemberFunction = void ( T::* )( BufferIndex, typename ParameterType<P2>::PassingType, typename ParameterType<P3>::PassingType );
 
   /**
    * Create a message.
@@ -668,14 +633,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~MessageDoubleBuffered2()
+  ~MessageDoubleBuffered2() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex bufferIndex )
+  void Process( BufferIndex bufferIndex ) override
   {
     (object->*memberFunction)( bufferIndex, param2, param3 );
   }
@@ -700,12 +665,7 @@ template< typename T, typename P2, typename P3, typename P4 >
 class MessageDoubleBuffered3 : public MessageBase
 {
 public:
-
-  typedef void(T::*MemberFunction)(
-      BufferIndex,
-      typename ParameterType< P2 >::PassingType,
-      typename ParameterType< P3 >::PassingType,
-      typename ParameterType< P4 >::PassingType );
+  using MemberFunction = void ( T::* )( BufferIndex, typename ParameterType<P2>::PassingType, typename ParameterType<P3>::PassingType, typename ParameterType<P4>::PassingType );
 
   /**
    * Create a message.
@@ -735,14 +695,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~MessageDoubleBuffered3()
+  ~MessageDoubleBuffered3() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex bufferIndex )
+  void Process( BufferIndex bufferIndex ) override
   {
     (object->*memberFunction)( bufferIndex, param2, param3, param4 );
   }
@@ -767,13 +727,7 @@ template< typename T, typename P2, typename P3, typename P4, typename P5 >
 class MessageDoubleBuffered4 : public MessageBase
 {
 public:
-
-  typedef void(T::*MemberFunction)(
-      BufferIndex,
-      typename ParameterType< P2 >::PassingType,
-      typename ParameterType< P3 >::PassingType,
-      typename ParameterType< P4 >::PassingType,
-      typename ParameterType< P5 >::PassingType );
+  using MemberFunction = void ( T::* )( BufferIndex, typename ParameterType<P2>::PassingType, typename ParameterType<P3>::PassingType, typename ParameterType<P4>::PassingType, typename ParameterType<P5>::PassingType );
 
   /**
    * Create a message.
@@ -806,14 +760,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~MessageDoubleBuffered4()
+  ~MessageDoubleBuffered4() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex bufferIndex )
+  void Process( BufferIndex bufferIndex ) override
   {
     (object->*memberFunction)( bufferIndex, param2, param3, param4, param5 );
   }

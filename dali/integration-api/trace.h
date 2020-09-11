@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_TRACE_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,24 +26,21 @@
 
 namespace Dali
 {
-
 namespace Integration
 {
-
 namespace Trace
 {
-
 /**
  * Used by tracing macros to log a context message
  * @param start a bool to indicate start (true) or end (false) of the tracing / logging
  * @param tag a unique event tag name
  */
-DALI_CORE_API void LogContext( bool start, const char* tag );
+DALI_CORE_API void LogContext(bool start, const char* tag);
 
 /**
  * typedef for the LogContextFunction function.
  */
-typedef void ( *LogContextFunction )( bool start, const char* tag );
+using LogContextFunction = void (*)(bool, const char*);
 
 /**
  * A LogContextFunction function has to be installed for every thread that wants to use tracing.
@@ -51,7 +48,7 @@ typedef void ( *LogContextFunction )( bool start, const char* tag );
  * The LogContextFunction function can be different for each thread.
  * @param LogContextFunction the Log Context function to install
  */
-DALI_CORE_API void InstallLogContextFunction( const LogContextFunction& logContextFunction );
+DALI_CORE_API void InstallLogContextFunction(const LogContextFunction& logContextFunction);
 
 /********************************************************************************
  *                                    Filter                                    *
@@ -69,22 +66,30 @@ DALI_CORE_API void InstallLogContextFunction( const LogContextFunction& logConte
 class DALI_CORE_API Filter
 {
 public:
-
   /**
    * Test if trace is enabled for this filter.
    * @return true if trace is enabled;
    */
-  inline bool IsTraceEnabled() { return mTraceEnabled; }
+  inline bool IsTraceEnabled()
+  {
+    return mTraceEnabled;
+  }
 
   /**
    * Enable tracing on this filter.
    */
-  inline void EnableTrace() { mTraceEnabled = true; }
+  inline void EnableTrace()
+  {
+    mTraceEnabled = true;
+  }
 
   /**
    * Disable tracing on this filter.
    */
-  inline void DisableTrace() { mTraceEnabled = false; }
+  inline void DisableTrace()
+  {
+    mTraceEnabled = false;
+  }
 
   /**
    * Create a new filter whose trace can be modified through the use of an environment variable.
@@ -104,19 +109,19 @@ public:
    * TRACE_ENV=0 dali-demo  // Trace OFF
    * @endcode
    */
-  static Filter* New( bool trace, const char * environmentVariableName );
+  static Filter* New(bool trace, const char* environmentVariableName);
 
   /**
    * Begin trace.
    * @param[in] tagName - a unique event tag name.
    */
-  void BeginTrace( const char* tagName );
+  void BeginTrace(const char* tagName);
 
   /**
    * End trace.
    * @param[in] tagName - a unique event tag name.
    */
-  void EndTrace( const char* tagName );
+  void EndTrace(const char* tagName);
 
   /**
    * Enable trace on all filters.
@@ -129,12 +134,14 @@ public:
   static void DisableGlobalTrace();
 
 private:
-
   /**
    * Constructor.
    * @param[in] trace - whether this filter allows tracing.
    */
-  Filter( bool trace ) : mTraceEnabled( trace ) {}
+  Filter(bool trace)
+  : mTraceEnabled(trace)
+  {
+  }
 
 private:
   bool mTraceEnabled;
@@ -156,12 +163,12 @@ private:
 class DALI_CORE_API Tracer final
 {
 public:
-  Tracer( Filter* filter, const char* tag );
+  Tracer(Filter* filter, const char* tag);
   ~Tracer();
 
 public:
   const char* mTag;
-  Filter* mFilter;
+  Filter*     mFilter;
 };
 
 /**
@@ -176,50 +183,56 @@ public:
  * Initialization of trace filter
  * @ref Filter::New
  */
-#define DALI_INIT_TRACE_FILTER( name, environmentVariableName, enable )                                               \
-namespace                                                                                                             \
-{                                                                                                                     \
-  Dali::Integration::Trace::Filter* name = Dali::Integration::Trace::Filter::New( enable, #environmentVariableName ); \
-}
+#define DALI_INIT_TRACE_FILTER(name, environmentVariableName, enable)                                               \
+  namespace                                                                                                         \
+  {                                                                                                                 \
+  Dali::Integration::Trace::Filter* name = Dali::Integration::Trace::Filter::New(enable, #environmentVariableName); \
+  }
 
 /**
  * Start of tracing
  */
-#define DALI_TRACE_BEGIN( filter, tag ) \
-  if( filter && filter->IsTraceEnabled() ) { filter->BeginTrace( tag ); }
+#define DALI_TRACE_BEGIN(filter, tag)    \
+  if(filter && filter->IsTraceEnabled()) \
+  {                                      \
+    filter->BeginTrace(tag);             \
+  }
 
 /**
  * End of tracing
  */
-#define DALI_TRACE_END( filter, tag ) \
-  if( filter && filter->IsTraceEnabled() ) { filter->EndTrace( tag ); }
+#define DALI_TRACE_END(filter, tag)      \
+  if(filter && filter->IsTraceEnabled()) \
+  {                                      \
+    filter->EndTrace(tag);               \
+  }
 
 /**
  * Used for function tracing. It logs tracing of the fuction from start to end.
  */
-#define DALI_TRACE_FUNCTION( filter ) \
-  Dali::Integration::Trace::Tracer logTraceFunction( filter, ASSERT_LOCATION );
+#define DALI_TRACE_FUNCTION(filter) \
+  Dali::Integration::Trace::Tracer logTraceFunction(filter, ASSERT_LOCATION);
 
 /**
  * Used for scope tracing. It logs tracing around a scope.
  */
-#define DALI_TRACE_SCOPE( filter, tag ) \
-  Dali::Integration::Trace::Tracer logTracerScope( filter, tag );
+#define DALI_TRACE_SCOPE(filter, tag) \
+  Dali::Integration::Trace::Tracer logTracerScope(filter, tag);
 
 #else // TRACE_ENABLED
 
-#define DALI_INIT_TRACE_FILTER( name, tag, enable )
-#define DALI_TRACE_BEGIN( filter, tag )
-#define DALI_TRACE_END( filter, tag )
-#define DALI_TRACE_FUNCTION( filter )
-#define DALI_TRACE_SCOPE( filter, tag )
+#define DALI_INIT_TRACE_FILTER(name, tag, enable)
+#define DALI_TRACE_BEGIN(filter, tag)
+#define DALI_TRACE_END(filter, tag)
+#define DALI_TRACE_FUNCTION(filter)
+#define DALI_TRACE_SCOPE(filter, tag)
 
 #endif
 
-} // Trace
+} // namespace Trace
 
-} // Integration
+} // namespace Integration
 
-} // Dali
+} // namespace Dali
 
 #endif // DALI_INTEGRATION_TRACE_H

@@ -33,7 +33,7 @@ namespace Render
 
 Geometry::Geometry()
 : mIndices(),
-  mIndexBuffer(NULL),
+  mIndexBuffer(nullptr),
   mGeometryType( Dali::Geometry::TRIANGLES ),
   mIndicesChanged(false),
   mHasBeenUpdated(false),
@@ -118,11 +118,11 @@ void Geometry::Upload( Context& context )
     {
       if( mIndices.Empty() )
       {
-        mIndexBuffer = NULL;
+        mIndexBuffer = nullptr;
       }
       else
       {
-        if ( mIndexBuffer == NULL )
+        if ( mIndexBuffer == nullptr )
         {
           mIndexBuffer = new GpuBuffer( context );
         }

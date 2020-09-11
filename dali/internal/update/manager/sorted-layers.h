@@ -35,10 +35,10 @@ class Layer;
 /**
  * A container of Layer pointers sorted by depth
  */
-typedef std::vector<Layer*> SortedLayerPointers;
+using SortedLayerPointers = std::vector<Layer *>;
 
-typedef SortedLayerPointers::iterator       SortedLayersIter;
-typedef SortedLayerPointers::const_iterator SortedLayersConstIter;
+using SortedLayersIter      = SortedLayerPointers::iterator;
+using SortedLayersConstIter = SortedLayerPointers::const_iterator;
 
 } // namespace SceneGraph
 

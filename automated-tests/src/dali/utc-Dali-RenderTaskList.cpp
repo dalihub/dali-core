@@ -15,11 +15,11 @@
  *
  */
 
-#include <iostream>
-
-#include <stdlib.h>
-#include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
+#include <dali/public-api/dali-core.h>
+#include <stdlib.h>
+
+#include <iostream>
 
 using namespace Dali;
 
@@ -41,7 +41,7 @@ int UtcDaliRenderTaskListDefaultConstructor(void)
 
   RenderTaskList taskList;
 
-  DALI_TEST_CHECK( ! taskList );
+  DALI_TEST_CHECK(!taskList);
   END_TEST;
 }
 
@@ -53,9 +53,9 @@ int UtcDaliRenderTaskListCopyConstructor(void)
 
   RenderTaskList taskList1;
 
-  RenderTaskList taskList2( taskList1 );
+  RenderTaskList taskList2(taskList1);
 
-  DALI_TEST_CHECK( ! taskList2 );
+  DALI_TEST_CHECK(!taskList2);
   END_TEST;
 }
 
@@ -71,7 +71,7 @@ int UtcDaliRenderTaskListAssignment(void)
 
   taskList1 = taskList2;
 
-  DALI_TEST_CHECK( ! taskList1 );
+  DALI_TEST_CHECK(!taskList1);
   END_TEST;
 }
 
@@ -80,15 +80,15 @@ int UtcDaliRenderTaskListMoveConstructor(void)
   TestApplication application;
 
   RenderTaskList taskList = application.GetScene().GetRenderTaskList();
-  DALI_TEST_CHECK( taskList );
-  DALI_TEST_EQUALS( 2, taskList.GetBaseObject().ReferenceCount(), TEST_LOCATION );
-  DALI_TEST_CHECK( 1u == taskList.GetTaskCount() );
+  DALI_TEST_CHECK(taskList);
+  DALI_TEST_EQUALS(2, taskList.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+  DALI_TEST_CHECK(1u == taskList.GetTaskCount());
 
-  RenderTaskList move = std::move( taskList );
-  DALI_TEST_CHECK( move );
-  DALI_TEST_EQUALS( 2, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
-  DALI_TEST_CHECK( 1u == move.GetTaskCount() );
-  DALI_TEST_CHECK( !taskList );
+  RenderTaskList move = std::move(taskList);
+  DALI_TEST_CHECK(move);
+  DALI_TEST_EQUALS(2, move.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+  DALI_TEST_CHECK(1u == move.GetTaskCount());
+  DALI_TEST_CHECK(!taskList);
 
   END_TEST;
 }
@@ -98,16 +98,16 @@ int UtcDaliRenderTaskListMoveAssignment(void)
   TestApplication application;
 
   RenderTaskList taskList = application.GetScene().GetRenderTaskList();
-  DALI_TEST_CHECK( taskList );
-  DALI_TEST_EQUALS( 2, taskList.GetBaseObject().ReferenceCount(), TEST_LOCATION );
-  DALI_TEST_CHECK( 1u == taskList.GetTaskCount() );
+  DALI_TEST_CHECK(taskList);
+  DALI_TEST_EQUALS(2, taskList.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+  DALI_TEST_CHECK(1u == taskList.GetTaskCount());
 
   RenderTaskList move;
-  move = std::move( taskList );
-  DALI_TEST_CHECK( move );
-  DALI_TEST_EQUALS( 2, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
-  DALI_TEST_CHECK( 1u == move.GetTaskCount() );
-  DALI_TEST_CHECK( !taskList );
+  move = std::move(taskList);
+  DALI_TEST_CHECK(move);
+  DALI_TEST_EQUALS(2, move.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+  DALI_TEST_CHECK(1u == move.GetTaskCount());
+  DALI_TEST_CHECK(!taskList);
 
   END_TEST;
 }
@@ -120,12 +120,12 @@ int UtcDaliRenderTaskListDownCast(void)
 
   BaseHandle base = application.GetScene().GetRenderTaskList();
 
-  RenderTaskList taskList = RenderTaskList::DownCast( base );
+  RenderTaskList taskList = RenderTaskList::DownCast(base);
 
-  DALI_TEST_CHECK( taskList );
+  DALI_TEST_CHECK(taskList);
 
   // Try calling a method
-  DALI_TEST_CHECK( 1u == taskList.GetTaskCount() );
+  DALI_TEST_CHECK(1u == taskList.GetTaskCount());
   END_TEST;
 }
 
@@ -136,10 +136,10 @@ int UtcDaliRenderTaskListCreateTask(void)
   tet_infoline("Testing RenderTaskList::CreateTask()");
 
   RenderTaskList taskList = application.GetScene().GetRenderTaskList();
-  DALI_TEST_CHECK( 1u == taskList.GetTaskCount() );
+  DALI_TEST_CHECK(1u == taskList.GetTaskCount());
 
   taskList.CreateTask();
-  DALI_TEST_CHECK( 2u == taskList.GetTaskCount() );
+  DALI_TEST_CHECK(2u == taskList.GetTaskCount());
   END_TEST;
 }
 
@@ -150,13 +150,13 @@ int UtcDaliRenderTaskListRemoveTask(void)
   tet_infoline("Testing RenderTaskList::RemoveTask()");
 
   RenderTaskList taskList = application.GetScene().GetRenderTaskList();
-  DALI_TEST_CHECK( 1u == taskList.GetTaskCount() );
+  DALI_TEST_CHECK(1u == taskList.GetTaskCount());
 
   RenderTask newTask = taskList.CreateTask();
-  DALI_TEST_CHECK( 2u == taskList.GetTaskCount() );
+  DALI_TEST_CHECK(2u == taskList.GetTaskCount());
 
-  taskList.RemoveTask( newTask );
-  DALI_TEST_CHECK( 1u == taskList.GetTaskCount() );
+  taskList.RemoveTask(newTask);
+  DALI_TEST_CHECK(1u == taskList.GetTaskCount());
   END_TEST;
 }
 
@@ -167,19 +167,19 @@ int UtcDaliRenderTaskListRemoveTaskWithExclusiveActor(void)
   tet_infoline("Testing RenderTaskList::RemoveTask() which has an exclusive actor set");
 
   RenderTaskList taskList = application.GetScene().GetRenderTaskList();
-  DALI_TEST_CHECK( 1u == taskList.GetTaskCount() );
+  DALI_TEST_CHECK(1u == taskList.GetTaskCount());
 
   RenderTask newTask = taskList.CreateTask();
-  DALI_TEST_CHECK( 2u == taskList.GetTaskCount() );
+  DALI_TEST_CHECK(2u == taskList.GetTaskCount());
 
   auto actor = CreateRenderableActor();
-  newTask.SetSourceActor( actor );
-  newTask.SetExclusive( true );
-  DALI_TEST_EQUALS( actor, newTask.GetSourceActor(), TEST_LOCATION );
-  DALI_TEST_EQUALS( true, newTask.IsExclusive(), TEST_LOCATION );
-  taskList.RemoveTask( newTask );
+  newTask.SetSourceActor(actor);
+  newTask.SetExclusive(true);
+  DALI_TEST_EQUALS(actor, newTask.GetSourceActor(), TEST_LOCATION);
+  DALI_TEST_EQUALS(true, newTask.IsExclusive(), TEST_LOCATION);
+  taskList.RemoveTask(newTask);
 
-  DALI_TEST_CHECK( 1u == taskList.GetTaskCount() );
+  DALI_TEST_CHECK(1u == taskList.GetTaskCount());
   END_TEST;
 }
 
@@ -190,10 +190,10 @@ int UtcDaliRenderTaskListGetTaskCount(void)
   tet_infoline("Testing RenderTaskList::GetTaskCount()");
 
   RenderTaskList taskList = application.GetScene().GetRenderTaskList();
-  DALI_TEST_CHECK( 1u == taskList.GetTaskCount() );
+  DALI_TEST_CHECK(1u == taskList.GetTaskCount());
 
-  taskList.RemoveTask( taskList.GetTask(0u) );
-  DALI_TEST_CHECK( 0u == taskList.GetTaskCount() );
+  taskList.RemoveTask(taskList.GetTask(0u));
+  DALI_TEST_CHECK(0u == taskList.GetTaskCount());
   END_TEST;
 }
 
@@ -203,34 +203,34 @@ int UtcDaliRenderTaskListGetTask(void)
 
   tet_infoline("Testing RenderTaskList::GetTask()");
 
-  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
-  RenderTask defaultTask = taskList.GetTask( 0u );
-  DALI_TEST_CHECK( 1u == taskList.GetTaskCount() );
-  DALI_TEST_CHECK( defaultTask );
-  DALI_TEST_CHECK( defaultTask == taskList.GetTask( 0u ) );
+  RenderTaskList taskList    = application.GetScene().GetRenderTaskList();
+  RenderTask     defaultTask = taskList.GetTask(0u);
+  DALI_TEST_CHECK(1u == taskList.GetTaskCount());
+  DALI_TEST_CHECK(defaultTask);
+  DALI_TEST_CHECK(defaultTask == taskList.GetTask(0u));
 
   RenderTask newTask = taskList.CreateTask();
-  DALI_TEST_CHECK( 2u == taskList.GetTaskCount() );
+  DALI_TEST_CHECK(2u == taskList.GetTaskCount());
 
-  RenderTask temp = taskList.GetTask( 0u );
-  RenderTask temp2 = taskList.GetTask( 1u );
+  RenderTask temp  = taskList.GetTask(0u);
+  RenderTask temp2 = taskList.GetTask(1u);
 
-  DALI_TEST_CHECK( newTask );
-  DALI_TEST_CHECK( defaultTask != newTask );
-  DALI_TEST_CHECK( taskList.GetTask( 0u ) == defaultTask );
-  DALI_TEST_CHECK( taskList.GetTask( 1u ) == newTask );
-  DALI_TEST_CHECK( taskList.GetTask( 1u ) != defaultTask );
+  DALI_TEST_CHECK(newTask);
+  DALI_TEST_CHECK(defaultTask != newTask);
+  DALI_TEST_CHECK(taskList.GetTask(0u) == defaultTask);
+  DALI_TEST_CHECK(taskList.GetTask(1u) == newTask);
+  DALI_TEST_CHECK(taskList.GetTask(1u) != defaultTask);
 
-  taskList.RemoveTask( taskList.GetTask(0u) );
-  DALI_TEST_CHECK( 1u == taskList.GetTaskCount() );
-  DALI_TEST_CHECK( taskList.GetTask( 0u ) != defaultTask  );
-  DALI_TEST_CHECK( taskList.GetTask( 0u ) == newTask );
+  taskList.RemoveTask(taskList.GetTask(0u));
+  DALI_TEST_CHECK(1u == taskList.GetTaskCount());
+  DALI_TEST_CHECK(taskList.GetTask(0u) != defaultTask);
+  DALI_TEST_CHECK(taskList.GetTask(0u) == newTask);
   END_TEST;
 }
 
 int UtcDaliRenderTaskListCreateTaskNegative(void)
 {
-  TestApplication application;
+  TestApplication      application;
   Dali::RenderTaskList instance;
   try
   {
@@ -246,7 +246,7 @@ int UtcDaliRenderTaskListCreateTaskNegative(void)
 
 int UtcDaliRenderTaskListRemoveTaskNegative(void)
 {
-  TestApplication application;
+  TestApplication      application;
   Dali::RenderTaskList instance;
   try
   {
@@ -263,7 +263,7 @@ int UtcDaliRenderTaskListRemoveTaskNegative(void)
 
 int UtcDaliRenderTaskListGetTaskCountNegative(void)
 {
-  TestApplication application;
+  TestApplication      application;
   Dali::RenderTaskList instance;
   try
   {
@@ -279,7 +279,7 @@ int UtcDaliRenderTaskListGetTaskCountNegative(void)
 
 int UtcDaliRenderTaskListGetTaskNegative(void)
 {
-  TestApplication application;
+  TestApplication      application;
   Dali::RenderTaskList instance;
   try
   {

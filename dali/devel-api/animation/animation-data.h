@@ -2,7 +2,7 @@
 #define DALI_ANIMATION_DATA_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@
 
 namespace Dali
 {
-
 /**
  * @brief This object stores description data that can be used to generate an Animation.
  * This data can be produced from passing JSON.
@@ -40,7 +39,6 @@ namespace Dali
 class DALI_CORE_API AnimationData
 {
 public:
-
   AnimationData();
 
   ~AnimationData();
@@ -50,36 +48,33 @@ public:
    */
   struct AnimationDataElement
   {
-    std::string actor;
-    std::string property;
-    Property::Value value;
+    std::string                    actor;
+    std::string                    property;
+    Property::Value                value;
     AlphaFunction::BuiltinFunction alphaFunction;
-    float timePeriodDelay;
-    float timePeriodDuration;
+    float                          timePeriodDelay;
+    float                          timePeriodDuration;
 
     AnimationDataElement()
-    : alphaFunction( AlphaFunction::DEFAULT ),
-      timePeriodDelay( 0.0f ),
-      timePeriodDuration( 1.0f )
+    : alphaFunction(AlphaFunction::DEFAULT),
+      timePeriodDelay(0.0f),
+      timePeriodDuration(1.0f)
     {
     }
   };
-
 
   /**
    * @brief AnimationData holds the required data required to define an
    * animation to be performed on an actor or actors.
    */
-  typedef Dali::Vector< AnimationDataElement* > AnimationDataList;
-
+  using AnimationDataList = Dali::Vector<AnimationDataElement*>;
 
   /**
    * @brief Adds one AnimationDataElement to the list to describe one animation.
    * @param[in] animationDataElement A pre-populated struct to add
    * @note This class takes ownership of animationDataElement
    */
-  void Add( AnimationDataElement* animationDataElement );
-
+  void Add(AnimationDataElement* animationDataElement);
 
   /**
    * @brief Creates a Dali::Animation from this AnimationData object.
@@ -91,8 +86,7 @@ public:
    * @param[in] duration The duration of the animation to create.
    * @return    A ready-to-go Dali::Animation, or an invalid handle if there was no data.
    */
-  Dali::Animation CreateAnimation( Dali::Actor targetActor, float duration );
-
+  Dali::Animation CreateAnimation(Dali::Actor targetActor, float duration);
 
   /**
    * @brief Empties this AnimationData object (and frees all memory).
@@ -100,13 +94,9 @@ public:
   void Clear();
 
 private:
-
   AnimationDataList mAnimationDataList; ///< A vector of individual property animations from which to generate a Dali::Animation.
-
 };
-
 
 } // namespace Dali
 
 #endif // DALI_ANIMATION_DATA_H
-

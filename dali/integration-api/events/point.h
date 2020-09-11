@@ -19,19 +19,17 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/events/point-state.h>
-#include <dali/public-api/math/degree.h>
-#include <dali/public-api/math/vector2.h>
 #include <dali/devel-api/events/touch-point.h>
 #include <dali/public-api/events/device.h>
 #include <dali/public-api/events/mouse-button.h>
+#include <dali/public-api/events/point-state.h>
+#include <dali/public-api/math/degree.h>
+#include <dali/public-api/math/vector2.h>
 
 namespace Dali
 {
-
 namespace Integration
 {
-
 /**
  * @brief A Point represents a point on the screen that is currently being touched or where touch has stopped.
  */
@@ -46,7 +44,7 @@ struct DALI_CORE_API Point
    * @brief Constructor which creates a Point instance from a TouchPoint.
    * @param[in]  touchPoint  The touch-point to copy from.
    */
-  explicit Point( const TouchPoint& touchPoint );
+  explicit Point(const TouchPoint& touchPoint);
 
   /**
    * @brief Destructor
@@ -60,19 +58,19 @@ struct DALI_CORE_API Point
    *
    * @param[in]  deviceId  The Unique Device ID.
    */
-  void SetDeviceId( int32_t deviceId );
+  void SetDeviceId(int32_t deviceId);
 
   /**
    * @brief Set the state of the point.
    * @param[in]  state  The state of the point.
    */
-  void SetState( PointState::Type state );
+  void SetState(PointState::Type state);
 
   /**
    * @brief Set the screen position of the point from the top-left of the screen.
    * @param[in]  screenPosition  The screen position of the point from the top-left of the screen.
    */
-  void SetScreenPosition( const Vector2& screenPosition );
+  void SetScreenPosition(const Vector2& screenPosition);
 
   /**
    * @brief Set the radius of the press point.
@@ -80,14 +78,14 @@ struct DALI_CORE_API Point
    * This is the average of both the horizontal and vertical radii of the press point.
    * @param[in]  radius  The average of both the horizontal and vertical radii.
    */
-  void SetRadius( float radius );
+  void SetRadius(float radius);
 
   /**
    * @brief Set the radius of the press point as an ellipse.
    * @param[in]  radius         The average of both the horizontal and vertical radii.
    * @param[in]  ellipseRadius  The horizontal and vertical radii of the press point (different if an ellipse).
    */
-  void SetRadius( float radius, Vector2 ellipseRadius );
+  void SetRadius(float radius, Vector2 ellipseRadius);
 
   /**
    * @brief Sets the touch pressure.
@@ -99,25 +97,25 @@ struct DALI_CORE_API Point
    *
    * @param[in]  pressure  The touch pressure.
    */
-  void SetPressure( float pressure );
+  void SetPressure(float pressure);
 
   /**
    * @brief Sets the angle of the press point relative to the Y-Axis.
    * @param[in]  angle  The angle of the press point relative to the Y-Axis.
    */
-  void SetAngle( Degree angle );
+  void SetAngle(Degree angle);
 
   /**
    * @brief Sets the class of the device for the event
    * @param[in] deviceClass The class of the device.
    */
-  void SetDeviceClass( Device::Class::Type deviceClass );
+  void SetDeviceClass(Device::Class::Type deviceClass);
 
   /**
    * @brief Sets the subclass of the device for the event
    * @param[in] deviceSubclass The subclass of the device.
    */
-  void SetDeviceSubclass( Device::Subclass::Type deviceSubclass );
+  void SetDeviceSubclass(Device::Subclass::Type deviceSubclass);
 
   /**
    * @brief Retrieve the Unique Device ID of the point.
@@ -190,21 +188,19 @@ struct DALI_CORE_API Point
    */
   void SetMouseButton(MouseButton::Type button);
 
-
 public: // Not intended for Integration API developers
-
   /**
    * @brief Sets the hit actor under this point.
    * @param[in]  hitActor  The hit actor.
    */
-  DALI_INTERNAL void SetHitActor( Actor hitActor );
+  DALI_INTERNAL void SetHitActor(Actor hitActor);
 
   /**
    * @brief Set the co-ordinates relative to the top-left of the hit-actor.
    * @param[in]  localPosition  The local position.
    * @note The top-left of an actor is (0.0, 0.0, 0.5).
    */
-  DALI_INTERNAL void SetLocalPosition( const Vector2& localPosition );
+  DALI_INTERNAL void SetLocalPosition(const Vector2& localPosition);
 
   /**
    * @brief Retrieve the Hit Actor.
@@ -226,15 +222,14 @@ public: // Not intended for Integration API developers
   DALI_INTERNAL const TouchPoint& GetTouchPoint() const;
 
 private:
-
-  TouchPoint mTouchPoint; ///< Stores screen position, device Id, local & screen positions and the hit-actor. @see TouchPoint
-  Vector2 mEllipseRadius; ///< Radius of both the horizontal and vertical radius (useful if an ellipse).
-  Degree mAngle; ///< The angle of the press point, relative to the Y-Axis.
-  Device::Class::Type mDeviceClass;
+  TouchPoint             mTouchPoint;    ///< Stores screen position, device Id, local & screen positions and the hit-actor. @see TouchPoint
+  Vector2                mEllipseRadius; ///< Radius of both the horizontal and vertical radius (useful if an ellipse).
+  Degree                 mAngle;         ///< The angle of the press point, relative to the Y-Axis.
+  Device::Class::Type    mDeviceClass;
   Device::Subclass::Type mDeviceSubclass;
-  float mPressure; ///< The touch pressure.
-  float mRadius; ///< Radius of the press point, an average of the ellipse radius.
-  MouseButton::Type mMouseButton; /// < mouse button value.
+  float                  mPressure;    ///< The touch pressure.
+  float                  mRadius;      ///< Radius of the press point, an average of the ellipse radius.
+  MouseButton::Type      mMouseButton; /// < mouse button value.
 };
 
 } // namespace Integration

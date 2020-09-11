@@ -31,7 +31,7 @@ namespace Internal
 {
 
 class PinchGesture;
-typedef IntrusivePtr< PinchGesture > PinchGesturePtr;
+using PinchGesturePtr = IntrusivePtr<PinchGesture>;
 
 /**
  * @copydoc Dali::PinchGesture
@@ -128,7 +128,7 @@ private:
    *
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~PinchGesture() = default;
+  ~PinchGesture() override = default;
 
 private:
   Vector2 mScreenCenterPoint;

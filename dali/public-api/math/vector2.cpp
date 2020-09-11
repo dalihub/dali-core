@@ -23,15 +23,14 @@
 #include <ostream>
 
 // INTERNAL INCLUDES
+#include <dali/internal/render/common/performance-monitor.h>
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/math/uint-16-pair.h>
-#include <dali/internal/render/common/performance-monitor.h>
+#include <dali/public-api/math/vector3.h>
 
 namespace Dali
 {
-
 const Vector2 Vector2::ONE(1.0f, 1.0f);
 const Vector2 Vector2::XAXIS(1.0f, 0.0f);
 const Vector2 Vector2::YAXIS(0.0f, 1.0f);
@@ -73,14 +72,13 @@ Vector2& Vector2::operator=(const Vector4& rhs)
   return *this;
 }
 
-
 bool Vector2::operator==(const Vector2& rhs) const
 {
-  if (fabsf(x - rhs.x) > GetRangedEpsilon(x, rhs.x))
+  if(fabsf(x - rhs.x) > GetRangedEpsilon(x, rhs.x))
   {
     return false;
   }
-  if (fabsf(y - rhs.y) > GetRangedEpsilon(y, rhs.y))
+  if(fabsf(y - rhs.y) > GetRangedEpsilon(y, rhs.y))
   {
     return false;
   }
@@ -95,15 +93,15 @@ float Vector2::Length() const
 
 float Vector2::LengthSquared() const
 {
-  return (x*x) + (y*y);
+  return (x * x) + (y * y);
 }
 
 void Vector2::Normalize()
 {
   float length = Length();
-  if( ! EqualsZero(length) )
+  if(!EqualsZero(length))
   {
-    MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY,2);
+    MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY, 2);
 
     const float inverseLength = 1.0f / length;
     x *= inverseLength;
@@ -111,21 +109,21 @@ void Vector2::Normalize()
   }
 }
 
-void Vector2::Clamp( const Vector2& min, const Vector2& max )
+void Vector2::Clamp(const Vector2& min, const Vector2& max)
 {
-  Dali::ClampInPlace<float>( x, min.x, max.x );
-  Dali::ClampInPlace<float>( y, min.y, max.y );
+  Dali::ClampInPlace<float>(x, min.x, max.x);
+  Dali::ClampInPlace<float>(y, min.y, max.y);
 }
 
-std::ostream& operator<< (std::ostream& o, const Vector2& vector)
+std::ostream& operator<<(std::ostream& o, const Vector2& vector)
 {
   return o << "[" << vector.x << ", " << vector.y << "]";
 }
 
-Vector2 Clamp( const Vector2& v, const float& min, const float& max )
+Vector2 Clamp(const Vector2& v, const float& min, const float& max)
 {
-  Vector2 result( v );
-  result.Clamp( Vector2( min, min ) , Vector2( max, max ) );
+  Vector2 result(v);
+  result.Clamp(Vector2(min, min), Vector2(max, max));
 
   return result;
 }

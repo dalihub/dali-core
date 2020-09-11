@@ -15,13 +15,13 @@
  *
  */
 
+#include <dali-test-suite-utils.h>
+#include <dali/integration-api/core.h>
+#include <stdlib.h>
+
+#include <cmath> // isfinite
 #include <iostream>
 #include <sstream>
-#include <cmath> // isfinite
-
-#include <stdlib.h>
-#include <dali/integration-api/core.h>
-#include <dali-test-suite-utils.h>
 
 using namespace Dali;
 
@@ -40,13 +40,13 @@ int UtcDaliCoreGetMaximumUpdateCount(void)
   TestApplication application;
   tet_infoline("Testing Dali::GetMaximumUpdateCount");
 
-  DALI_TEST_EQUALS( 2, application.GetCore().GetMaximumUpdateCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS(2, application.GetCore().GetMaximumUpdateCount(), TEST_LOCATION);
   END_TEST;
 }
 
 int UtcDaliCoreGetObjectRegistry(void)
 {
   TestApplication application;
-  DALI_TEST_CHECK( application.GetCore().GetObjectRegistry() );
+  DALI_TEST_CHECK(application.GetCore().GetObjectRegistry());
   END_TEST;
 }

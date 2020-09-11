@@ -35,8 +35,8 @@ namespace Internal
 {
 
 class PanGestureDetector;
-typedef IntrusivePtr<PanGestureDetector> PanGestureDetectorPtr;
-typedef DerivedGestureDetectorContainer<PanGestureDetector>::type PanGestureDetectorContainer;
+using PanGestureDetectorPtr       = IntrusivePtr<PanGestureDetector>;
+using PanGestureDetectorContainer = DerivedGestureDetectorContainer<PanGestureDetector>::type;
 
 namespace SceneGraph
 {
@@ -49,9 +49,8 @@ class PanGesture;
 class PanGestureDetector : public GestureDetector
 {
 public: // Typedefs
-
-  typedef Dali::PanGestureDetector::AngleThresholdPair AngleThresholdPair;
-  typedef std::vector<AngleThresholdPair> AngleContainer;
+  using AngleThresholdPair = Dali::PanGestureDetector::AngleThresholdPair;
+  using AngleContainer     = std::vector<AngleThresholdPair>;
 
 public: // Creation
 
@@ -179,7 +178,7 @@ protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~PanGestureDetector();
+  ~PanGestureDetector() override;
 
 private:
 
@@ -198,17 +197,17 @@ private:
   /**
    * @copydoc Dali::Internal::GestureDetector::OnActorAttach(Actor&)
    */
-  virtual void OnActorAttach(Actor& actor);
+  void OnActorAttach(Actor& actor) override;
 
   /**
    * @copydoc Dali::Internal::GestureDetector::OnActorDetach(Actor&)
    */
-  virtual void OnActorDetach(Actor& actor);
+  void OnActorDetach(Actor& actor) override;
 
   /**
    * @copydoc Dali::Internal::GestureDetector::OnActorDestroyed(Object&)
    */
-  virtual void OnActorDestroyed(Object& object);
+  void OnActorDestroyed(Object& object) override;
 
 
   // Default property extensions from Object
@@ -216,22 +215,22 @@ private:
   /**
    * @copydoc Dali::Internal::Object::SetDefaultProperty()
    */
-  virtual void SetDefaultProperty(Property::Index index, const Property::Value& propertyValue);
+  void SetDefaultProperty(Property::Index index, const Property::Value& propertyValue) override;
 
   /**
    * @copydoc Dali::Internal::Object::GetDefaultProperty()
    */
-  virtual Property::Value GetDefaultProperty( Property::Index index ) const;
+  Property::Value GetDefaultProperty( Property::Index index ) const override;
 
   /**
    * @copydoc Dali::Internal::Object::GetDefaultPropertyCurrentValue()
    */
-  virtual Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const;
+  Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const override;
 
   /**
    * @copydoc Dali::Internal::Object::GetSceneObjectInputProperty()
    */
-  virtual const PropertyInputImpl* GetSceneObjectInputProperty( Property::Index index ) const;
+  const PropertyInputImpl* GetSceneObjectInputProperty( Property::Index index ) const override;
 
 private:
 

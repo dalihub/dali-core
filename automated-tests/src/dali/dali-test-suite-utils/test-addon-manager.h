@@ -20,6 +20,7 @@
 
 #include <dali/integration-api/addon-manager.h>
 #include <dali/public-api/common/vector-wrapper.h>
+
 #include <string>
 
 namespace Dali
@@ -29,7 +30,6 @@ namespace Test
 class AddOnManager : public Dali::Integration::AddOnManager
 {
 public:
-
   /**
    * @brief Constructor, initialised by the Adaptor
    */
@@ -38,19 +38,19 @@ public:
   /**
    * @brief Destructor
    */
-  virtual ~AddOnManager() = default;
+  ~AddOnManager() override = default;
 
   std::vector<std::string> EnumerateAddOns() override;
 
-  bool GetAddOnInfo(const std::string& name, AddOnInfo& info ) override;
+  bool GetAddOnInfo(const std::string& name, AddOnInfo& info) override;
 
-  std::vector<AddOnLibrary> LoadAddOns( const std::vector<std::string>& addonNames ) override;
+  std::vector<AddOnLibrary> LoadAddOns(const std::vector<std::string>& addonNames) override;
 
-  void* GetGlobalProc( const Dali::AddOnLibrary& addOnLibrary, const char* procName ) override;
+  void* GetGlobalProc(const Dali::AddOnLibrary& addOnLibrary, const char* procName) override;
 
-  void* GetInstanceProc( const Dali::AddOnLibrary& addOnLibrary, const char* procName ) override;
+  void* GetInstanceProc(const Dali::AddOnLibrary& addOnLibrary, const char* procName) override;
 
-  void RegisterAddOnDispatchTable( const AddOnDispatchTable* dispatchTable ) override;
+  void RegisterAddOnDispatchTable(const AddOnDispatchTable* dispatchTable) override;
 
   void Start() override;
 
@@ -63,20 +63,20 @@ public:
   struct AddOnCacheEntry
   {
     std::string name{};
-    AddOnInfo info{};
+    AddOnInfo   info{};
 
     // library handle
-    void* handle {nullptr};
+    void* handle{nullptr};
 
     // main function pointers
-    void(*GetAddOnInfo)(AddOnInfo& ) = nullptr; ///< Returns AddOnInfo structure
-    void*(*GetInstanceProc)( const char* ) = nullptr; ///< Returns pointer of instance function (member funtion)
-    void*(*GetGlobalProc)( const char* ) = nullptr; ///< Returns pointer of global function (non-member function)
+    void (*GetAddOnInfo)(AddOnInfo&)      = nullptr; ///< Returns AddOnInfo structure
+    void* (*GetInstanceProc)(const char*) = nullptr; ///< Returns pointer of instance function (member funtion)
+    void* (*GetGlobalProc)(const char*)   = nullptr; ///< Returns pointer of global function (non-member function)
 
-    void(*OnStart)() = nullptr;
-    void(*OnResume)() = nullptr;
-    void(*OnPause)() = nullptr;
-    void(*OnStop)() = nullptr;
+    void (*OnStart)()  = nullptr;
+    void (*OnResume)() = nullptr;
+    void (*OnPause)()  = nullptr;
+    void (*OnStop)()   = nullptr;
 
     bool valid = false;
   };

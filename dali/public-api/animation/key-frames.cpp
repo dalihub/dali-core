@@ -19,23 +19,22 @@
 #include <dali/public-api/animation/key-frames.h>
 
 // INTERNAL INCLUDES
+#include <dali/internal/event/animation/key-frames-impl.h>
 #include <dali/public-api/animation/alpha-function.h>
 #include <dali/public-api/math/degree.h>
 #include <dali/public-api/math/radian.h>
-#include <dali/internal/event/animation/key-frames-impl.h>
 
 namespace Dali
 {
-
 KeyFrames KeyFrames::New()
 {
   Internal::KeyFrames* internal = Internal::KeyFrames::New();
   return KeyFrames(internal);
 }
 
-KeyFrames KeyFrames::DownCast( BaseHandle handle )
+KeyFrames KeyFrames::DownCast(BaseHandle handle)
 {
-  return KeyFrames( dynamic_cast<Dali::Internal::KeyFrames*>(handle.GetObjectPtr()) );
+  return KeyFrames(dynamic_cast<Dali::Internal::KeyFrames*>(handle.GetObjectPtr()));
 }
 
 KeyFrames::KeyFrames()
@@ -50,9 +49,9 @@ KeyFrames::KeyFrames(const KeyFrames& handle) = default;
 
 KeyFrames& KeyFrames::operator=(const KeyFrames& rhs) = default;
 
-KeyFrames::KeyFrames( KeyFrames&& rhs ) = default;
+KeyFrames::KeyFrames(KeyFrames&& rhs) = default;
 
-KeyFrames& KeyFrames::operator=( KeyFrames&& rhs ) = default;
+KeyFrames& KeyFrames::operator=(KeyFrames&& rhs) = default;
 
 Property::Type KeyFrames::GetType() const
 {
@@ -70,10 +69,8 @@ void KeyFrames::Add(float time, Property::Value value, AlphaFunction alpha)
 }
 
 KeyFrames::KeyFrames(Internal::KeyFrames* internal)
-  : BaseHandle(internal)
+: BaseHandle(internal)
 {
 }
 
-
-
-} // Dali
+} // namespace Dali

@@ -28,8 +28,7 @@
 
 namespace Dali
 {
-
-typedef Rect<int> ClippingBox;
+using ClippingBox = Rect<int>;
 
 namespace Internal
 {
@@ -44,10 +43,10 @@ namespace SceneGraph
 
 class Layer;
 
-typedef OwnerContainer< RenderItem* > RenderItemContainer;
+using RenderItemContainer = OwnerContainer<RenderItem*>;
 
 struct RenderList;
-typedef OwnerContainer< RenderList* > RenderListContainer;
+using RenderListContainer = OwnerContainer<RenderList*>;
 
 /**
  * The RenderList structure provides the renderer with a list of renderers.
@@ -61,8 +60,8 @@ public:
    */
   RenderList()
   : mNextFree( 0 ),
-    mClippingBox( NULL ),
-    mSourceLayer( NULL ),
+    mClippingBox( nullptr ),
+    mSourceLayer( nullptr ),
     mHasColorRenderItems( false )
   {
   }
@@ -85,7 +84,7 @@ public:
     mNextFree = 0;
 
     delete mClippingBox;
-    mClippingBox = NULL;
+    mClippingBox = nullptr;
   }
 
   /**
@@ -193,7 +192,7 @@ public:
    */
   bool IsClipping() const
   {
-    return ( NULL != mClippingBox );
+    return ( nullptr != mClippingBox );
   }
 
   /**

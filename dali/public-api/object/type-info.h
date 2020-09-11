@@ -22,8 +22,8 @@
 #include <cstdint> // uint32_t
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/object/base-handle.h>
 
 namespace Dali
 {
@@ -37,7 +37,7 @@ class FunctorDelegate;
 
 namespace Internal DALI_INTERNAL
 {
-  class TypeInfo;
+class TypeInfo;
 };
 
 /**
@@ -50,7 +50,6 @@ namespace Internal DALI_INTERNAL
 class DALI_CORE_API TypeInfo : public BaseHandle
 {
 public:
-
   using CreateFunction = BaseHandle (*)(); ///< Function signature for creating an instance of the associated object type. @SINCE_1_0.0
 
   using ActionFunction = bool (*)(BaseObject*, const std::string&, const Property::Map&); ///< Function signature for creating scriptable actions @SINCE_1_0.0
@@ -77,7 +76,7 @@ public:
    * @param[in] value The new value of the property for the object specified
    * @see PropertyRegistration.
    */
-  using SetPropertyFunction = void (*)( BaseObject* object, Property::Index index, const Property::Value& value );
+  using SetPropertyFunction = void (*)(BaseObject* object, Property::Index index, const Property::Value& value);
 
   /**
    * @brief Callback to get the value of an event-thread only property.
@@ -88,7 +87,7 @@ public:
    * @return The current value of the property for the object specified
    * @see PropertyRegistration.
    */
-  using GetPropertyFunction = Property::Value (*)( BaseObject* object, Property::Index index );
+  using GetPropertyFunction = Property::Value (*)(BaseObject* object, Property::Index index);
 
   /**
    * @brief Allows the creation of an empty TypeInfo handle.
@@ -127,7 +126,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  TypeInfo( TypeInfo&& rhs );
+  TypeInfo(TypeInfo&& rhs);
 
   /**
    * @brief Move assignment operator.
@@ -136,7 +135,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  TypeInfo& operator=( TypeInfo&& rhs );
+  TypeInfo& operator=(TypeInfo&& rhs);
 
   /**
    * @brief Retrieves the type name for this type.
@@ -221,7 +220,7 @@ public:
    * @param[out] indices Container of property indices
    * @note The container will be cleared
    */
-  void GetPropertyIndices( Property::IndexContainer& indices ) const;
+  void GetPropertyIndices(Property::IndexContainer& indices) const;
 
   /**
    * @brief Retrieves all the child property indices for this type.
@@ -230,7 +229,7 @@ public:
    * @param[out] indices Container of property indices
    * @note The container will be cleared
    */
-  void GetChildPropertyIndices( Property::IndexContainer& indices ) const;
+  void GetChildPropertyIndices(Property::IndexContainer& indices) const;
 
   /**
    * @brief Given a property index, retrieve the property name associated with it.
@@ -241,8 +240,7 @@ public:
    * @exception DaliException If index is not valid.
    * @note this method only works for custom registered properties
    */
-  const std::string& GetPropertyName( Property::Index index ) const;
-
+  const std::string& GetPropertyName(Property::Index index) const;
 
   /**
    * @brief Given a child property name, retrieve the property index associated with it,
@@ -251,7 +249,7 @@ public:
    * @param[in] name The name of the property at the given index,
    * @return The property index or Property::INVALID_INDEX
    */
-  Property::Index GetChildPropertyIndex( const std::string& name ) const;
+  Property::Index GetChildPropertyIndex(const std::string& name) const;
 
   /**
    * @brief Given a child property index, retrieve the property name associated with it.
@@ -260,7 +258,7 @@ public:
    * @param[in] index The property index
    * @return The name of the property at the given index, or empty string if it does not exist
    */
-  const std::string& GetChildPropertyName( Property::Index index ) const;
+  const std::string& GetChildPropertyName(Property::Index index) const;
 
   /**
    * @brief Given a child property index, retrieve the property name associated with it.
@@ -269,12 +267,9 @@ public:
    * @param[in] index The property index
    * @return The name of the property at the given index, or empty string if it does not exist
    */
-  Property::Type GetChildPropertyType( Property::Index index ) const;
-
-
+  Property::Type GetChildPropertyType(Property::Index index) const;
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief This constructor is used by Dali Get() method.
@@ -284,7 +279,6 @@ public: // Not intended for application developers
    */
   explicit DALI_INTERNAL TypeInfo(Internal::TypeInfo* typeInfo);
   /// @endcond
-
 };
 
 /**

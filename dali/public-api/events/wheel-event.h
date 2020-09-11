@@ -28,7 +28,6 @@
 
 namespace Dali
 {
-
 namespace Internal DALI_INTERNAL
 {
 class WheelEvent;
@@ -52,9 +51,7 @@ class WheelEvent;
  */
 class DALI_CORE_API WheelEvent : public BaseHandle
 {
-
 public:
-
   // Enumerations
 
   /**
@@ -63,8 +60,8 @@ public:
    */
   enum Type
   {
-    MOUSE_WHEEL,      ///< Mouse wheel event @SINCE_1_0.0
-    CUSTOM_WHEEL      ///< Custom wheel event @SINCE_1_0.0
+    MOUSE_WHEEL, ///< Mouse wheel event @SINCE_1_0.0
+    CUSTOM_WHEEL ///< Custom wheel event @SINCE_1_0.0
   };
 
   // Construction & Destruction
@@ -83,7 +80,7 @@ public:
    * @SINCE_1_9.26
    * @param[in] rhs The WheelEvent to copy from
    */
-  WheelEvent( const WheelEvent& rhs );
+  WheelEvent(const WheelEvent& rhs);
 
   /**
    * @brief Move constructor.
@@ -91,7 +88,7 @@ public:
    * @SINCE_1_9.26
    * @param[in] rhs A reference to the moved WheelEvent
    */
-  WheelEvent( WheelEvent&& rhs );
+  WheelEvent(WheelEvent&& rhs);
 
   /**
    * @brief Destructor.
@@ -106,7 +103,7 @@ public:
    * @param[in] rhs The WheelEvent to copy from
    * @return A reference to this
    */
-  WheelEvent& operator=( const WheelEvent& rhs );
+  WheelEvent& operator=(const WheelEvent& rhs);
 
   /**
    * @brief Move assignment operator.
@@ -115,7 +112,7 @@ public:
    * @param[in] rhs A reference to the moved WheelEvent
    * @return A reference to this
    */
-  WheelEvent& operator=( WheelEvent&& rhs );
+  WheelEvent& operator=(WheelEvent&& rhs);
 
   /**
    * @brief Checks to see if Shift key modifier has been supplied.
@@ -193,7 +190,6 @@ public:
   uint32_t GetTime() const;
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief This constructor is used internally to Create an initialized WheelEvent handle.
@@ -201,7 +197,7 @@ public: // Not intended for application developers
    * @SINCE_1_9.26
    * @param[in] wheelEvent A pointer to a newly allocated Dali resource
    */
-  explicit DALI_INTERNAL WheelEvent( Internal::WheelEvent* hoverEvent );
+  explicit DALI_INTERNAL WheelEvent(Internal::WheelEvent* hoverEvent);
   /// @endcond
 };
 

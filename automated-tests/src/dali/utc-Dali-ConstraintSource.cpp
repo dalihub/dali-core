@@ -15,11 +15,11 @@
  *
  */
 
-#include <iostream>
-
-#include <stdlib.h>
-#include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
+#include <dali/public-api/dali-core.h>
+#include <stdlib.h>
+
+#include <iostream>
 
 using namespace Dali;
 
@@ -40,9 +40,9 @@ void utc_dali_constraint_source_cleanup(void)
 ///////////////////////////////////////////////////////////////////////////////
 int UtcDaliLocalSource(void)
 {
-  LocalSource source( Actor::Property::POSITION );
+  LocalSource source(Actor::Property::POSITION);
 
-  DALI_TEST_EQUALS( source.propertyIndex, (Property::Index)Actor::Property::POSITION, TEST_LOCATION );
+  DALI_TEST_EQUALS(source.propertyIndex, (Property::Index)Actor::Property::POSITION, TEST_LOCATION);
 
   END_TEST;
 }
@@ -54,9 +54,9 @@ int UtcDaliLocalSource(void)
 ///////////////////////////////////////////////////////////////////////////////
 int UtcDaliParentSource(void)
 {
-  ParentSource source( Actor::Property::POSITION );
+  ParentSource source(Actor::Property::POSITION);
 
-  DALI_TEST_EQUALS( source.propertyIndex, (Property::Index)Actor::Property::POSITION, TEST_LOCATION );
+  DALI_TEST_EQUALS(source.propertyIndex, (Property::Index)Actor::Property::POSITION, TEST_LOCATION);
 
   END_TEST;
 }
@@ -68,11 +68,11 @@ int UtcDaliParentSource(void)
 ///////////////////////////////////////////////////////////////////////////////
 int UtcDaliSource1(void)
 {
-  Actor actor;
-  Source source( actor, Actor::Property::SIZE );
+  Actor  actor;
+  Source source(actor, Actor::Property::SIZE);
 
-  DALI_TEST_CHECK( ! source.object );
-  DALI_TEST_EQUALS( source.propertyIndex, (Property::Index)Actor::Property::SIZE, TEST_LOCATION );
+  DALI_TEST_CHECK(!source.object);
+  DALI_TEST_EQUALS(source.propertyIndex, (Property::Index)Actor::Property::SIZE, TEST_LOCATION);
 
   END_TEST;
 }
@@ -83,9 +83,9 @@ int UtcDaliSource2(void)
 
   Actor actor = Actor::New();
 
-  Source source( actor, Actor::Property::SIZE );
-  DALI_TEST_EQUALS( source.object, actor, TEST_LOCATION );
-  DALI_TEST_EQUALS( source.propertyIndex, (Property::Index)Actor::Property::SIZE, TEST_LOCATION );
+  Source source(actor, Actor::Property::SIZE);
+  DALI_TEST_EQUALS(source.object, actor, TEST_LOCATION);
+  DALI_TEST_EQUALS(source.propertyIndex, (Property::Index)Actor::Property::SIZE, TEST_LOCATION);
 
   END_TEST;
 }
@@ -98,10 +98,10 @@ int UtcDaliConstraintSourceWithSource1(void)
 {
   Actor actor;
 
-  ConstraintSource source( Source( actor, Actor::Property::PARENT_ORIGIN ) );
-  DALI_TEST_CHECK( ! source.object );
-  DALI_TEST_EQUALS( source.propertyIndex, (Property::Index)Actor::Property::PARENT_ORIGIN, TEST_LOCATION );
-  DALI_TEST_EQUALS( source.sourceType, OBJECT_PROPERTY, TEST_LOCATION );
+  ConstraintSource source(Source(actor, Actor::Property::PARENT_ORIGIN));
+  DALI_TEST_CHECK(!source.object);
+  DALI_TEST_EQUALS(source.propertyIndex, (Property::Index)Actor::Property::PARENT_ORIGIN, TEST_LOCATION);
+  DALI_TEST_EQUALS(source.sourceType, OBJECT_PROPERTY, TEST_LOCATION);
 
   END_TEST;
 }
@@ -112,10 +112,10 @@ int UtcDaliConstraintSourceWithSource2(void)
 
   Actor actor = Actor::New();
 
-  ConstraintSource source( Source( actor, Actor::Property::PARENT_ORIGIN ) );
-  DALI_TEST_EQUALS( source.object, actor, TEST_LOCATION );
-  DALI_TEST_EQUALS( source.propertyIndex, (Property::Index)Actor::Property::PARENT_ORIGIN, TEST_LOCATION );
-  DALI_TEST_EQUALS( source.sourceType, OBJECT_PROPERTY, TEST_LOCATION );
+  ConstraintSource source(Source(actor, Actor::Property::PARENT_ORIGIN));
+  DALI_TEST_EQUALS(source.object, actor, TEST_LOCATION);
+  DALI_TEST_EQUALS(source.propertyIndex, (Property::Index)Actor::Property::PARENT_ORIGIN, TEST_LOCATION);
+  DALI_TEST_EQUALS(source.sourceType, OBJECT_PROPERTY, TEST_LOCATION);
 
   END_TEST;
 }
@@ -124,10 +124,10 @@ int UtcDaliConstraintSourceWithLocalSource(void)
 {
   Actor actor;
 
-  ConstraintSource source( LocalSource( Actor::Property::PARENT_ORIGIN ) );
-  DALI_TEST_CHECK( ! source.object );
-  DALI_TEST_EQUALS( source.propertyIndex, (Property::Index)Actor::Property::PARENT_ORIGIN, TEST_LOCATION );
-  DALI_TEST_EQUALS( source.sourceType, LOCAL_PROPERTY, TEST_LOCATION );
+  ConstraintSource source(LocalSource(Actor::Property::PARENT_ORIGIN));
+  DALI_TEST_CHECK(!source.object);
+  DALI_TEST_EQUALS(source.propertyIndex, (Property::Index)Actor::Property::PARENT_ORIGIN, TEST_LOCATION);
+  DALI_TEST_EQUALS(source.sourceType, LOCAL_PROPERTY, TEST_LOCATION);
 
   END_TEST;
 }
@@ -136,10 +136,10 @@ int UtcDaliConstraintSourceWithParentSource(void)
 {
   Actor actor;
 
-  ConstraintSource source( ParentSource( Actor::Property::PARENT_ORIGIN ) );
-  DALI_TEST_CHECK( ! source.object );
-  DALI_TEST_EQUALS( source.propertyIndex, (Property::Index)Actor::Property::PARENT_ORIGIN, TEST_LOCATION );
-  DALI_TEST_EQUALS( source.sourceType, PARENT_PROPERTY, TEST_LOCATION );
+  ConstraintSource source(ParentSource(Actor::Property::PARENT_ORIGIN));
+  DALI_TEST_CHECK(!source.object);
+  DALI_TEST_EQUALS(source.propertyIndex, (Property::Index)Actor::Property::PARENT_ORIGIN, TEST_LOCATION);
+  DALI_TEST_EQUALS(source.sourceType, PARENT_PROPERTY, TEST_LOCATION);
 
   END_TEST;
 }

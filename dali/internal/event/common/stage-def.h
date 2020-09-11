@@ -29,7 +29,7 @@ namespace Internal
 
 class Stage;
 
-typedef Stage* StagePtr;
+using StagePtr = Stage *;
 
 } // Internal
 

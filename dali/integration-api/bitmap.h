@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_BITMAP_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,17 +22,15 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/resource-policies.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/images/pixel.h>
 #include <dali/public-api/object/ref-object.h>
-#include <dali/integration-api/resource-policies.h>
 
 namespace Dali
 {
-
 namespace Integration
 {
-
 /**
  * Returns GL data type and internal format for specified pixel format
  * @param[in]  pixelformat    pixel format (eg. Pixel::RGBA32)
@@ -42,8 +40,8 @@ namespace Integration
 DALI_CORE_API void ConvertToGlFormat(Pixel::Format pixelformat, unsigned& pixelDataType, unsigned& internalFormat);
 
 class Bitmap;
-typedef IntrusivePtr<Bitmap>    BitmapPtr;
-typedef uint8_t                 PixelBuffer;  ///< Pixel data buffers are composed of these
+using BitmapPtr   = IntrusivePtr<Bitmap>;
+using PixelBuffer = uint8_t; ///< Pixel data buffers are composed of these
 
 /**
  * Bitmap class.
@@ -52,14 +50,13 @@ typedef uint8_t                 PixelBuffer;  ///< Pixel data buffers are compos
 class DALI_CORE_API Bitmap : public Dali::RefObject
 {
 protected:
-
   /**
    * Constructor
    * Use the static function Bitmap::New() to create instances.
    * @param[in] discardable Flag to tell the bitmap if it can delete the buffer with the pixel data.
    * @param[in] pixBuf External buffer of pixel data or null.
    */
-  Bitmap( ResourcePolicy::Discardable discardable = ResourcePolicy::OWNED_RETAIN, Dali::Integration::PixelBuffer* pixBuf = 0 );
+  Bitmap(ResourcePolicy::Discardable discardable = ResourcePolicy::OWNED_RETAIN, Dali::Integration::PixelBuffer* pixBuf = nullptr);
 
   /**
    * Initializes internal class members
@@ -68,9 +65,8 @@ protected:
    * @param[in] height        Image height in pixels
    */
   void Initialize(Pixel::Format pixelFormat,
-                           uint32_t width,
-                           uint32_t height);
-
+                  uint32_t      width,
+                  uint32_t      height);
 
 public:
   /** Defines the characteristics of the Bitmap returned from the factory
@@ -88,8 +84,8 @@ public:
 
   enum ReleaseFunction
   {
-    FREE,          ///< Use free function to release the buffer
-    DELETE_ARRAY,  ///< Use delete[] operator to release the buffer
+    FREE,         ///< Use free function to release the buffer
+    DELETE_ARRAY, ///< Use delete[] operator to release the buffer
   };
 
   /**
@@ -103,7 +99,7 @@ public:
    * OWNED_RETAIN means that the data is owned and must be kept in CPU memory
    * e.g. for an image that cannot be reloaded from disk.
    */
-  static Bitmap* New( Profile profile, ResourcePolicy::Discardable discardable );
+  static Bitmap* New(Profile profile, ResourcePolicy::Discardable discardable);
 
   /** \name GeneralFeatures
    * Features that are generic between profiles. */
@@ -188,7 +184,6 @@ public:
 
   /**@}*/ ///< End of generic features
 
-
   /** \name PackedPixelsProfile
    * Features that are active only if the Bitmap was created with a
    * BITMAP_2D_PACKED_PIXELS profile. */
@@ -197,7 +192,6 @@ public:
   class PackedPixelsProfile
   {
   public:
-
     /**
      * (Re-)Allocate pixel buffer for the Bitmap. Any previously allocated pixel buffer is deleted.
      * Dali has ownership of the buffer, but its contents can be modified.
@@ -211,10 +205,10 @@ public:
      * @return pixel buffer pointer
      */
     virtual PixelBuffer* ReserveBuffer(Pixel::Format pixelFormat,
-                                       uint32_t width,
-                                       uint32_t height,
-                                       uint32_t bufferWidth = 0,
-                                       uint32_t bufferHeight = 0) = 0;
+                                       uint32_t      width,
+                                       uint32_t      height,
+                                       uint32_t      bufferWidth  = 0,
+                                       uint32_t      bufferHeight = 0) = 0;
 
     /**
      * Assign a pixel buffer. Any previously allocated pixel buffer is deleted.
@@ -237,12 +231,12 @@ public:
      * @param[in] bufferHeight  Buffer height in pixels
      */
     virtual void AssignBuffer(Pixel::Format pixelFormat,
-                              PixelBuffer* buffer,
-                              uint32_t bufferSize,
-                              uint32_t width,
-                              uint32_t height,
-                              uint32_t bufferWidth = 0,
-                              uint32_t bufferHeight = 0) = 0;
+                              PixelBuffer*  buffer,
+                              uint32_t      bufferSize,
+                              uint32_t      width,
+                              uint32_t      height,
+                              uint32_t      bufferWidth  = 0,
+                              uint32_t      bufferHeight = 0) = 0;
     /**
      * Get the width of the buffer (stride)
      * @return The width of the buffer in pixels
@@ -269,24 +263,30 @@ public:
     virtual void TestForTransparency() = 0;
 
   protected:
-
     /**
      * Virtual destructor, no deletion through this interface
      */
-    virtual ~PackedPixelsProfile() {}
+    virtual ~PackedPixelsProfile()
+    {
+    }
   };
 
   /**
    * Get interface to features that are active only if the Bitmap was created
    * with a BITMAP_2D_PACKED_PIXELS profile. */
-  virtual const PackedPixelsProfile* GetPackedPixelsProfile() const { return 0; }
+  virtual const PackedPixelsProfile* GetPackedPixelsProfile() const
+  {
+    return nullptr;
+  }
   /**
    * Get interface to features that are active only if the Bitmap was created
    * with a BITMAP_2D_PACKED_PIXELS profile. */
-  virtual PackedPixelsProfile* GetPackedPixelsProfile() { return 0; }
+  virtual PackedPixelsProfile* GetPackedPixelsProfile()
+  {
+    return nullptr;
+  }
 
   /**@}*/ ///< End of packed pixel features.
-
 
   /** \name CompressedProfile
    * Features that only apply to opaque/compressed formats. */
@@ -307,22 +307,29 @@ public:
      * @param[in] bufferSize    Buffer size in bytes
      * @return pixel buffer pointer
      */
-    virtual PixelBuffer* ReserveBufferOfSize( Pixel::Format pixelFormat,
-                                       const unsigned width,
-                                       const unsigned height,
-                                       const uint32_t numBytes ) = 0;
-  protected:
+    virtual PixelBuffer* ReserveBufferOfSize(Pixel::Format  pixelFormat,
+                                             const unsigned width,
+                                             const unsigned height,
+                                             const uint32_t numBytes) = 0;
 
+  protected:
     /**
      * Virtual destructor, no deletion through this interface
      */
-    virtual ~CompressedProfile() {}
+    virtual ~CompressedProfile()
+    {
+    }
   };
 
-  virtual const CompressedProfile* GetCompressedProfile() const { return 0; }
-  virtual CompressedProfile* GetCompressedProfile() { return 0; }
+  virtual const CompressedProfile* GetCompressedProfile() const
+  {
+    return nullptr;
+  }
+  virtual CompressedProfile* GetCompressedProfile()
+  {
+    return nullptr;
+  }
   /**@}*/
-
 
   /**
    * Inform the bitmap that its pixel buffer is no longer required and can be
@@ -345,27 +352,24 @@ public:
   void DeletePixelBuffer();
 
 protected:
-
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~Bitmap();
+  ~Bitmap() override;
 
 protected:
-
-  uint32_t  mImageWidth;          ///< Image width in pixels
-  uint32_t  mImageHeight;         ///< Image height in pixels
-  Pixel::Format mPixelFormat;         ///< Pixel format
-  bool          mHasAlphaChannel;   ///< Whether the image has an alpha channel
-  bool          mAlphaChannelUsed;  ///< Whether the alpha channel is used in case the image owns one.
-  PixelBuffer*  mData;            ///< Raw pixel data
+  uint32_t      mImageWidth;       ///< Image width in pixels
+  uint32_t      mImageHeight;      ///< Image height in pixels
+  Pixel::Format mPixelFormat;      ///< Pixel format
+  bool          mHasAlphaChannel;  ///< Whether the image has an alpha channel
+  bool          mAlphaChannelUsed; ///< Whether the alpha channel is used in case the image owns one.
+  PixelBuffer*  mData;             ///< Raw pixel data
 
 private:
-
   ResourcePolicy::Discardable mDiscardable; ///< Should delete the buffer when discard buffer is called.
 
-  Bitmap(const Bitmap& other);  ///< defined private to prevent use
-  Bitmap& operator = (const Bitmap& other); ///< defined private to prevent use
+  Bitmap(const Bitmap& other);            ///< defined private to prevent use
+  Bitmap& operator=(const Bitmap& other); ///< defined private to prevent use
 
   // Changes scope, should be at end of class
   DALI_LOG_OBJECT_STRING_DECLARATION;
