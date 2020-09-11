@@ -2216,9 +2216,91 @@ int UtcDaliAnimationPlayP(void)
   END_TEST;
 }
 
+int UtcDaliAnimationPlayOffSceneP(void)
+{
+  // Test that an animation cannot be played, when the actor is off-stage.
+  // And the property value and the current property value should not be changed in the case.
+
+  TestApplication application;
+
+  Actor   actor = Actor::New();
+  Vector3 basePosition(Vector3::ZERO);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), basePosition, TEST_LOCATION);
+  // Not added to the stage yet!
+
+  // Build the animation
+  float     durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  Vector3   targetPosition(100.0f, 100.0f, 100.0f);
+  animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
+
+  // Start the animation
+  animation.Play();
+
+  bool                 signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f) + 1u /*just beyond the animation duration*/);
+
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+
+  // An animation can't be played. The position shouldn't be changed.
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), basePosition, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty<Vector3>(Actor::Property::POSITION), basePosition, TEST_LOCATION);
+
+  // Add to the stage
+  application.GetScene().Add(actor);
+
+  // Start the animation again
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f) + 1u /*just beyond the animation duration*/);
+
+  // We did expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), targetPosition, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty<Vector3>(Actor::Property::POSITION), targetPosition, TEST_LOCATION);
+
+  // Reset the position
+  actor[Actor::Property::POSITION] = basePosition;
+
+  application.SendNotification();
+  application.Render();
+
+  // Create an animator again
+  animation.Clear();
+  animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
+
+  // Remove from the stage
+  application.GetScene().Remove(actor);
+
+  signalReceived = false;
+
+  // Start the animation again
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f) + 1u /*just beyond the animation duration*/);
+
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+
+  // An animation can't be played. The position shouldn't be changed.
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), basePosition, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty<Vector3>(Actor::Property::POSITION), basePosition, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliAnimationPlayOffSceneDiscardP(void)
 {
-  // Test that an animation can be played, when the actor is off-stage.
+  // Test that an animation cannot be played, when the actor is off-stage.
   // When the actor is added to the stage, it should appear at the current position
   // i.e. where it would have been anyway, if on-stage from the beginning.
 
@@ -2249,7 +2331,9 @@ int UtcDaliAnimationPlayOffSceneDiscardP(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), Vector3(20, 20, 20), TEST_LOCATION);
+
+  // An animation can't be played. The position shouldn't be changed.
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), basePosition, TEST_LOCATION);
 
   // Add to the stage
   application.GetScene().Add(actor);
@@ -2310,7 +2394,7 @@ int UtcDaliAnimationPlayOffSceneDiscardP(void)
 
 int UtcDaliAnimationPlayOffSceneBakeFinalP(void)
 {
-  // Test that an animation can be played, when the actor is off-stage.
+  // Test that an animation cannot be played, when the actor is off-stage.
   // When the actor is added to the stage, it should appear at the current position
   // i.e. where it would have been anyway, if on-stage from the beginning.
 
@@ -2340,7 +2424,9 @@ int UtcDaliAnimationPlayOffSceneBakeFinalP(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), Vector3(20, 20, 20), TEST_LOCATION);
+
+  // An animation can't be played. The position shouldn't be changed.
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), basePosition, TEST_LOCATION);
 
   // Add to the stage
   application.GetScene().Add(actor);
@@ -2394,7 +2480,7 @@ int UtcDaliAnimationPlayOffSceneBakeFinalP(void)
 
 int UtcDaliAnimationPlayOffSceneBakeP(void)
 {
-  // Test that an animation can be played, when the actor is off-stage.
+  // Test that an animation cannot be played, when the actor is off-stage.
   // When the actor is added to the stage, it should appear at the current position
   // i.e. where it would have been anyway, if on-stage from the beginning.
 
@@ -2425,7 +2511,9 @@ int UtcDaliAnimationPlayOffSceneBakeP(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), Vector3(20, 20, 20), TEST_LOCATION);
+
+  // An animation can't be played. The position shouldn't be changed.
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), basePosition, TEST_LOCATION);
 
   // Add to the stage
   application.GetScene().Add(actor);

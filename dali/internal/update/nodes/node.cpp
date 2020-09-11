@@ -188,6 +188,11 @@ void Node::RemoveUniformMapping( const std::string& uniformName )
   mRegenerateUniformMap = 2;
 }
 
+bool Node::IsAnimationPossible() const
+{
+  return mIsConnectedToSceneGraph;
+}
+
 void Node::PrepareRender( BufferIndex bufferIndex )
 {
   if( mRegenerateUniformMap != 0 )

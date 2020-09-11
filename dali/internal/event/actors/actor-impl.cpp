@@ -3496,6 +3496,11 @@ int32_t Actor::GetPropertyComponentIndex( Property::Index index ) const
   return componentIndex;
 }
 
+bool Actor::IsAnimationPossible() const
+{
+  return OnScene();
+}
+
 void Actor::SetParent( Actor* parent )
 {
   if( parent )
