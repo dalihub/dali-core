@@ -34,34 +34,16 @@ namespace Internal
 
 /**
  * These macros are used to define a table of property details per object.
- * The index property is only compiled in for DEBUG_ENABLED builds and allows checking the table index VS the property enum index.
- * DALI_PROPERTY_TABLE_END Forces a run-time check that will happen once.
+ * Checking of the table index VS the property enum index happens during compile time.
  * the macros define an instance of PropertyMetadata with the name that is passed to DALI_PROPERTY_TABLE_END
  */
-#define DALI_PROPERTY_TABLE_BEGIN const Dali::PropertyDetails DEFAULT_PROPERTY_DETAILS[] = {
-#ifdef DEBUG_ENABLED
-#define DALI_PROPERTY_TABLE_END( startIndex, constantName )   }; const Property::Index DEFAULT_PROPERTY_COUNT = static_cast<Property::Index>( sizeof( DEFAULT_PROPERTY_DETAILS ) / sizeof( Dali::PropertyDetails ) ); \
-  struct PROPERTY_CHECK \
-  { \
-    PROPERTY_CHECK() \
-    { \
-      for( int i = 0; i < DEFAULT_PROPERTY_COUNT; i++ ) \
-      { \
-        if ( DEFAULT_PROPERTY_DETAILS[i].enumIndex != ( startIndex + i ) ) \
-        { \
-          DALI_LOG_ERROR( "Checking property failed: index:%d, enumIndex:%d == index+start:%d, (name:%s)\n", i, \
-                          DEFAULT_PROPERTY_DETAILS[i].enumIndex, (startIndex + i), DEFAULT_PROPERTY_DETAILS[i].name ); \
-          DALI_ASSERT_DEBUG( false && "Property enumeration mismatch" ); \
-        } \
-      } \
-    } \
-  }; \
-  constexpr Dali::DefaultPropertyMetadata constantName{ DEFAULT_PROPERTY_DETAILS, DEFAULT_PROPERTY_COUNT }; \
-  static PROPERTY_CHECK PROPERTY_CHECK_INSTANCE;
-#else
-#define DALI_PROPERTY_TABLE_END( startIndex, constantName )   }; const Property::Index DEFAULT_PROPERTY_COUNT = static_cast<Property::Index>( sizeof( DEFAULT_PROPERTY_DETAILS ) / sizeof( Dali::PropertyDetails ) );\
-  constexpr Dali::DefaultPropertyMetadata constantName{ DEFAULT_PROPERTY_DETAILS, DEFAULT_PROPERTY_COUNT };
-#endif
+#define DALI_PROPERTY_TABLE_BEGIN static constexpr Dali::PropertyDetails DEFAULT_PROPERTY_DETAILS[] = {
+
+#define DALI_PROPERTY_TABLE_END(startIndex, tableName)                                  \
+  };                                                                                    \
+  static constexpr auto tableName = GeneratePropertyMetadata(DEFAULT_PROPERTY_DETAILS); \
+  static_assert(CheckPropertyMetadata(tableName, startIndex), "Property enumeration mismatch");
+
 #define DALI_PROPERTY( text, type, writable, animatable, constraint, index ) { text, index, Dali::Property::type, writable, animatable, constraint },
 
 /**

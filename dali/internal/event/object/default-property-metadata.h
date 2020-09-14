@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <string_view>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/object/property.h>
 
@@ -33,7 +36,7 @@ namespace Dali
  */
 struct PropertyDetails
 {
-  const char* name;           ///< The name of the property.
+  std::string_view name;       ///< The name of the property.
   Property::Index enumIndex;  ///< Used to check the index is correct within a debug build.
   Property::Type type;        ///< The property type.
   bool writable;              ///< Whether the property is writable
@@ -47,8 +50,24 @@ struct PropertyDetails
 struct DefaultPropertyMetadata
 {
   const PropertyDetails* propertyTable; ///< address of the table defining property meta-data.
-  Property::Index propertyCount;        ///< count of the default properties.
+  const Property::Index  propertyCount; ///< count of the default properties.
 };
+
+inline constexpr bool CheckPropertyMetadata(const DefaultPropertyMetadata& table, Property::Index startIndex) noexcept
+{
+  for(int i = 0; i < table.propertyCount; i++)
+  {
+    if(table.propertyTable[i].enumIndex != startIndex + i)
+      return false;
+  }
+  return true;
+}
+
+template<size_t N>
+inline constexpr DefaultPropertyMetadata GeneratePropertyMetadata(const PropertyDetails (&array)[N]) noexcept
+{
+  return {array, N};
+}
 
 } // namespace Dali
 
