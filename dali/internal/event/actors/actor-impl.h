@@ -1679,6 +1679,11 @@ public:
   int32_t GetPropertyComponentIndex( Property::Index index ) const override;
 
   /**
+   * @copydoc Dali::Internal::Object::IsAnimationPossible()
+   */
+  bool IsAnimationPossible() const override;
+
+  /**
    * Retrieve the actor's node.
    * @return The node used by this actor
    */

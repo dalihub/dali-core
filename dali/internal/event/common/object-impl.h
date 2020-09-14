@@ -349,6 +349,15 @@ public:
   virtual int32_t GetPropertyComponentIndex( Property::Index index ) const;
 
   /**
+   * Query whether playing an animation is possible or not.
+   * @return true if playing an animation is possible.
+   */
+  virtual bool IsAnimationPossible() const
+  {
+    return true;
+  }
+
+  /**
    * @copydoc Dali::Handle::PropertySetSignal()
    */
   Handle::PropertySetSignalType& PropertySetSignal();

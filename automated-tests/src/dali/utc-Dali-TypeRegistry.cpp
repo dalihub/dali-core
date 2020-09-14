@@ -1393,6 +1393,8 @@ int UtcDaliTypeRegistryAnimatablePropertyComponentRegistrationP(void)
   unsigned int customActorIndices = indices.Size();
   DALI_TEST_EQUALS(actorIndices + 3u, customActorIndices, TEST_LOCATION); // Custom property + registered property
 
+  application.GetScene().Add(customActor);
+
   // Attempt to animate component property, it should not crash
   Animation animation = Animation::New(1.0f);
   animation.AnimateTo(Property(customActor, animatablePropertyComponentIndex1), 200.0f);
@@ -1416,6 +1418,7 @@ int UtcDaliTypeRegistryAnimatablePropertyComponentRegistrationVector2AnimateByP(
   BaseHandle handle = typeInfo.CreateInstance();
   DALI_TEST_CHECK(handle);
   Actor customActor = Actor::DownCast(handle);
+  application.GetScene().Add(customActor);
   DALI_TEST_CHECK(customActor);
 
   const unsigned int index           = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX;
@@ -1469,6 +1472,7 @@ int UtcDaliTypeRegistryAnimatablePropertyComponentRegistrationVector3AnimateByP(
   BaseHandle handle = typeInfo.CreateInstance();
   DALI_TEST_CHECK(handle);
   Actor customActor = Actor::DownCast(handle);
+  application.GetScene().Add(customActor);
   DALI_TEST_CHECK(customActor);
 
   const unsigned int index           = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX;
@@ -1528,6 +1532,7 @@ int UtcDaliTypeRegistryAnimatablePropertyComponentRegistrationVector4AnimateByP(
   BaseHandle handle = typeInfo.CreateInstance();
   DALI_TEST_CHECK(handle);
   Actor customActor = Actor::DownCast(handle);
+  application.GetScene().Add(customActor);
   DALI_TEST_CHECK(customActor);
 
   const unsigned int index           = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX;

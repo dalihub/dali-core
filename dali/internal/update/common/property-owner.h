@@ -223,6 +223,14 @@ public:
    */
   void RemoveUniformMapObserver( UniformMap::Observer& observer );
 
+  /**
+   * Query whether playing an animation is possible or not.
+   * @return true if playing an animation is possible.
+   */
+  virtual bool IsAnimationPossible() const
+  {
+    return true;
+  }
 
 protected:
 
@@ -244,6 +252,7 @@ protected:
   OwnedPropertyContainer mCustomProperties; ///< Properties provided with InstallCustomProperty()
   UniformMap mUniformMaps; ///< Container of owned uniform maps
   bool mUpdated;
+  bool                   mIsConnectedToSceneGraph;
 
 private:
   using ObserverContainer = Dali::Vector<PropertyOwner::Observer*>;

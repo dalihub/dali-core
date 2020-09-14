@@ -1108,7 +1108,7 @@ void Animation::NotifyObjects( Animation::Notify notifyValueType )
       AnimatorConnectorBase* connector = mConnectors[ iter->connectorIndex ];
 
       Object* object = connector->GetObject();
-      if( object )
+      if(object && object->IsAnimationPossible())
       {
         const auto propertyIndex = connector->GetPropertyIndex();
         object->NotifyPropertyAnimation(

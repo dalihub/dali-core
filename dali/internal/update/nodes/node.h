@@ -806,6 +806,11 @@ public:
   void RemoveUniformMapping( const std::string& uniformName ) override;
 
   /**
+   * @copydoc Dali::Internal::SceneGraph::PropertyOwner::IsAnimationPossible
+   */
+  bool IsAnimationPossible() const override;
+
+  /**
    * Prepare the node for rendering.
    * This is called by the UpdateManager when an object is due to be rendered in the current frame.
    * @param[in] updateBufferIndex The current update buffer index.
