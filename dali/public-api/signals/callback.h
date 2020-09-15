@@ -71,14 +71,14 @@ public:
     // otherwise call the dispatcher function that knows the real type of the object
     // Note that this template dispatcher lives in client code so the library containing
     // the code has to be loaded, otherwise we crash boom bang
-    if(callback.mImpl && callback.mImpl->mObjectPointer)
+    if(callback.mImpl.mObjectPointer)
     {
-      Dispatcher dispatcher = callback.mImpl->mMemberFunctionDispatcher;
+      Dispatcher dispatcher = callback.mImpl.mMemberFunctionDispatcher;
       (*dispatcher)(callback);
     }
     // its also possible to have a member function pointer to a CallbackProvider
     // that has been deleted, so check if we have impl still
-    else if(!callback.mImpl && callback.mFunction)
+    else if(callback.mFunction)
     {
       (*(callback.mFunction))();
     }
@@ -103,13 +103,13 @@ public:
     // otherwise call the dispatcher function that knows the real type of the object
     // Note that this template dispatcher lives in client code so the library containing
     // the code has to be loaded, otherwise we crash boom bang
-    if(callback.mImpl && callback.mImpl->mObjectPointer)
+    if(callback.mImpl.mObjectPointer)
     {
       using Dispatcher      = R (*)(CallbackBase&);
-      Dispatcher dispatcher = reinterpret_cast<Dispatcher>(callback.mImpl->mMemberFunctionDispatcher);
+      Dispatcher dispatcher = reinterpret_cast<Dispatcher>(callback.mImpl.mMemberFunctionDispatcher);
       returnVal             = (*dispatcher)(callback);
     }
-    else if(!callback.mImpl && callback.mFunction)
+    else if(callback.mFunction)
     {
       using Function1 = R (*)();
       returnVal       = (*(reinterpret_cast<Function1>(callback.mFunction)))();
@@ -133,13 +133,13 @@ public:
     // otherwise call the dispatcher function that knows the real type of the object
     // Note that this template dispatcher lives in client code (where the callback was created)
     // so the library containing the code has to be loaded, otherwise we crash boom bang
-    if(callback.mImpl && callback.mImpl->mObjectPointer)
+    if(callback.mImpl.mObjectPointer)
     {
       using Dispatcher      = void (*)(CallbackBase&, P1);
-      Dispatcher dispatcher = reinterpret_cast<Dispatcher>(callback.mImpl->mMemberFunctionDispatcher);
+      Dispatcher dispatcher = reinterpret_cast<Dispatcher>(callback.mImpl.mMemberFunctionDispatcher);
       (*dispatcher)(callback, param1);
     }
-    else if(!callback.mImpl && callback.mFunction)
+    else if(callback.mFunction)
     {
       // convert function type
       using Function1 = void (*)(P1);
@@ -164,13 +164,13 @@ public:
     // otherwise call the dispatcher function that knows the real type of the object
     // Note that this template dispatcher lives in client code (where the callback was created)
     // so the library containing the code has to be loaded, otherwise we crash boom bang
-    if(callback.mImpl && callback.mImpl->mObjectPointer)
+    if(callback.mImpl.mObjectPointer)
     {
       using Dispatcher      = R (*)(CallbackBase&, P1);
-      Dispatcher dispatcher = reinterpret_cast<Dispatcher>(callback.mImpl->mMemberFunctionDispatcher);
+      Dispatcher dispatcher = reinterpret_cast<Dispatcher>(callback.mImpl.mMemberFunctionDispatcher);
       returnVal             = (*dispatcher)(callback, param1);
     }
-    else if(!callback.mImpl && callback.mFunction)
+    else if(callback.mFunction)
     {
       // convert function type
       using Function1 = R (*)(P1);
@@ -196,13 +196,13 @@ public:
     // otherwise call the dispatcher function that knows the real type of the object
     // Note that this template dispatcher lives in client code (where the callback was created)
     // so the library containing the code has to be loaded, otherwise we crash boom bang
-    if(callback.mImpl && callback.mImpl->mObjectPointer)
+    if(callback.mImpl.mObjectPointer)
     {
       using Dispatcher      = void (*)(CallbackBase&, P1, P2);
-      Dispatcher dispatcher = reinterpret_cast<Dispatcher>(callback.mImpl->mMemberFunctionDispatcher);
+      Dispatcher dispatcher = reinterpret_cast<Dispatcher>(callback.mImpl.mMemberFunctionDispatcher);
       (*dispatcher)(callback, param1, param2);
     }
-    else if(!callback.mImpl && callback.mFunction)
+    else if(callback.mFunction)
     {
       // convert function type
       using Function2 = void (*)(P1, P2);
@@ -228,13 +228,13 @@ public:
     // otherwise call the dispatcher function that knows the real type of the object
     // Note that this template dispatcher lives in client code (where the callback was created)
     // so the library containing the code has to be loaded, otherwise we crash boom bang
-    if(callback.mImpl && callback.mImpl->mObjectPointer)
+    if(callback.mImpl.mObjectPointer)
     {
       using Dispatcher      = R (*)(CallbackBase&, P1, P2);
-      Dispatcher dispatcher = reinterpret_cast<Dispatcher>(callback.mImpl->mMemberFunctionDispatcher);
+      Dispatcher dispatcher = reinterpret_cast<Dispatcher>(callback.mImpl.mMemberFunctionDispatcher);
       returnVal             = (*dispatcher)(callback, param1, param2);
     }
-    else if(!callback.mImpl && callback.mFunction)
+    else if(callback.mFunction)
     {
       // convert function type
       using Function2 = R (*)(P1, P2);
@@ -261,13 +261,13 @@ public:
     // otherwise call the dispatcher function that knows the real type of the object
     // Note that this template dispatcher lives in client code (where the callback was created)
     // so the library containing the code has to be loaded, otherwise we crash boom bang
-    if(callback.mImpl && callback.mImpl->mObjectPointer)
+    if(callback.mImpl.mObjectPointer)
     {
       using Dispatcher      = void (*)(CallbackBase&, P1, P2, P3);
-      Dispatcher dispatcher = reinterpret_cast<Dispatcher>(callback.mImpl->mMemberFunctionDispatcher);
+      Dispatcher dispatcher = reinterpret_cast<Dispatcher>(callback.mImpl.mMemberFunctionDispatcher);
       (*dispatcher)(callback, param1, param2, param3);
     }
-    else if(!callback.mImpl && callback.mFunction)
+    else if(callback.mFunction)
     {
       // convert function type
       using Function2 = void (*)(P1, P2, P3);
@@ -294,13 +294,13 @@ public:
     // otherwise call the dispatcher function that knows the real type of the object
     // Note that this template dispatcher lives in client code (where the callback was created)
     // so the library containing the code has to be loaded, otherwise we crash boom bang
-    if(callback.mImpl && callback.mImpl->mObjectPointer)
+    if(callback.mImpl.mObjectPointer)
     {
       using Dispatcher      = R (*)(CallbackBase&, P1, P2, P3);
-      Dispatcher dispatcher = reinterpret_cast<Dispatcher>(callback.mImpl->mMemberFunctionDispatcher);
+      Dispatcher dispatcher = reinterpret_cast<Dispatcher>(callback.mImpl.mMemberFunctionDispatcher);
       returnVal             = (*dispatcher)(callback, param1, param2, param3);
     }
-    else if(!callback.mImpl && callback.mFunction)
+    else if(callback.mFunction)
     {
       // convert function type
       using Function2 = R (*)(P1, P2, P3);
@@ -386,13 +386,11 @@ public: // Data for deriving classes & Dispatchers
    */
   struct Impl
   {
-    Impl(); ///< Default constructor @SINCE_1_0.0
-
-    void*      mObjectPointer;            ///< Object whose member function will be called. Not owned if mDestructorDispatcher is NULL.
-    Dispatcher mMemberFunctionDispatcher; ///< Dispatcher for member functions
-    Destructor mDestructorDispatcher;     ///< Destructor for owned objects. NULL if mDestructorDispatcher is not owned.
+    void*      mObjectPointer{nullptr};            ///< Object whose member function will be called. Not owned if mDestructorDispatcher is NULL.
+    Dispatcher mMemberFunctionDispatcher{nullptr}; ///< Dispatcher for member functions
+    Destructor mDestructorDispatcher{nullptr};     ///< Destructor for owned objects. NULL if mDestructorDispatcher is not owned.
   };
-  Impl* mImpl; ///< Implementation pointer
+  Impl mImpl;
 
   union
   {
@@ -408,7 +406,15 @@ public: // Data for deriving classes & Dispatchers
  * @param[in] rhs A reference to compare to
  * @return True if lhs is same as rhs
  */
-bool operator==(const CallbackBase& lhs, const CallbackBase& rhs);
+inline bool operator==(const CallbackBase& lhs, const CallbackBase& rhs)
+{
+  if (lhs.mFunction == rhs.mFunction &&
+      lhs.mImpl.mObjectPointer == rhs.mImpl.mObjectPointer)
+  {
+    return true;
+  }
+  return false;
+}
 
 /**
  * @brief Dispatcher to delete an object.
@@ -446,7 +452,7 @@ struct Dispatcher0
   static void Dispatch(CallbackBase& callback)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object               = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     using MemberFunction    = void (T::*)();
     MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
     (object->*function)();
@@ -470,7 +476,7 @@ struct Dispatcher1
   static void Dispatch(CallbackBase& callback, P1 param1)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object               = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     using MemberFunction    = void (T::*)(P1);
     MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
     (object->*function)(param1);
@@ -495,7 +501,7 @@ struct Dispatcher2
   static void Dispatch(CallbackBase& callback, P1 param1, P2 param2)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object               = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     using MemberFunction    = void (T::*)(P1, P2);
     MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
     (object->*function)(param1, param2);
@@ -521,7 +527,7 @@ struct Dispatcher3
   static void Dispatch(CallbackBase& callback, P1 param1, P2 param2, P3 param3)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object               = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     using MemberFunction    = void (T::*)(P1, P2, P3);
     MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
     (object->*function)(param1, param2, param3);
@@ -545,7 +551,7 @@ struct DispatcherReturn0
   static R Dispatch(CallbackBase& callback)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object               = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     using MemberFunction    = R (T::*)();
     MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
     return (object->*function)();
@@ -570,7 +576,7 @@ struct DispatcherReturn1
   static R Dispatch(CallbackBase& callback, P1 param1)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object               = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     using MemberFunction    = R (T::*)(P1);
     MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
     return (object->*function)(param1);
@@ -596,7 +602,7 @@ struct DispatcherReturn2
   static R Dispatch(CallbackBase& callback, P1 param1, P2 param2)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object               = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     using MemberFunction    = R (T::*)(P1, P2);
     MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
     return (object->*function)(param1, param2);
@@ -623,7 +629,7 @@ struct DispatcherReturn3
   static R Dispatch(CallbackBase& callback, P1 param1, P2 param2, P3 param3)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object               = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     using MemberFunction    = R (T::*)(P1, P2, P3);
     MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
     return (object->*function)(param1, param2, param3);
@@ -646,7 +652,7 @@ struct FunctorDispatcher0
   static void Dispatch(CallbackBase& callback)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    T* object = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     (*object)();
   }
 };
@@ -668,7 +674,7 @@ struct FunctorDispatcher1
   static void Dispatch(CallbackBase& callback, P1 param1)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    T* object = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     (*object)(param1);
   }
 };
@@ -691,7 +697,7 @@ struct FunctorDispatcher2
   static void Dispatch(CallbackBase& callback, P1 param1, P2 param2)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    T* object = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     (*object)(param1, param2);
   }
 };
@@ -715,7 +721,7 @@ struct FunctorDispatcher3
   static void Dispatch(CallbackBase& callback, P1 param1, P2 param2, P3 param3)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    T* object = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     (*object)(param1, param2, param3);
   }
 };
@@ -737,7 +743,7 @@ struct FunctorDispatcherReturn0
   static R Dispatch(CallbackBase& callback)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    T* object = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     return (*object)();
   }
 };
@@ -760,7 +766,7 @@ struct FunctorDispatcherReturn1
   static R Dispatch(CallbackBase& callback, P1 param1)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    T* object = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     return (*object)(param1);
   }
 };
@@ -784,7 +790,7 @@ struct FunctorDispatcherReturn2
   static R Dispatch(CallbackBase& callback, P1 param1, P2 param2)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    T* object = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     return (*object)(param1, param2);
   }
 };
@@ -809,7 +815,7 @@ struct FunctorDispatcherReturn3
   static R Dispatch(CallbackBase& callback, P1 param1, P2 param2, P3 param3)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    T* object = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     return (*object)(param1, param2, param3);
   }
 };
@@ -832,7 +838,7 @@ struct VoidFunctorDispatcher0
   static void Dispatch(CallbackBase& callback)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object               = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     using MemberFunction    = void (T::*)();
     MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
     (object->*function)();
@@ -858,7 +864,7 @@ struct VoidFunctorDispatcher1
   static void Dispatch(CallbackBase& callback, P1 param1)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object               = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     using MemberFunction    = void (T::*)();
     MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
     (object->*function)(/*ignore params*/);
@@ -885,7 +891,7 @@ struct VoidFunctorDispatcher2
   static void Dispatch(CallbackBase& callback, P1 param1, P2 param2)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object               = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     using MemberFunction    = void (T::*)();
     MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
     (object->*function)(/*ignore params*/);
@@ -913,7 +919,7 @@ struct VoidFunctorDispatcher3
   static void Dispatch(CallbackBase& callback, P1 param1, P2 param2, P3 param3)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object               = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     using MemberFunction    = void (T::*)();
     MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
     (object->*function)(/*ignore params*/);
@@ -939,7 +945,7 @@ struct VoidFunctorDispatcherReturn0
   static R Dispatch(CallbackBase& callback)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object               = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     using MemberFunction    = void (T::*)();
     MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
     (object->*function)(/*ignore params*/);
@@ -967,7 +973,7 @@ struct VoidFunctorDispatcherReturn1
   static R Dispatch(CallbackBase& callback, P1 param1)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object               = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     using MemberFunction    = void (T::*)();
     MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
     (object->*function)(/*ignore params*/);
@@ -996,7 +1002,7 @@ struct VoidFunctorDispatcherReturn2
   static R Dispatch(CallbackBase& callback, P1 param1, P2 param2)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object               = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     using MemberFunction    = void (T::*)();
     MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
     (object->*function)(/*ignore params*/);
@@ -1026,7 +1032,7 @@ struct VoidFunctorDispatcherReturn3
   static R Dispatch(CallbackBase& callback, P1 param1, P2 param2, P3 param3)
   {
     // "downcast" the object and function type back to the correct ones
-    T* object               = reinterpret_cast<T*>(callback.mImpl->mObjectPointer);
+    T* object               = reinterpret_cast<T*>(callback.mImpl.mObjectPointer);
     using MemberFunction    = void (T::*)();
     MemberFunction function = reinterpret_cast<MemberFunction>(callback.mMemberFunction);
     (object->*function)(/*ignore params*/);
