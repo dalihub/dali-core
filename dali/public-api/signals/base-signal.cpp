@@ -47,42 +47,17 @@ BaseSignal::~BaseSignal()
 
   // The signal is being destroyed. We have to inform any slots
   // that are connected, that the signal is dead.
-  const std::size_t count(mSignalConnections.Count());
+  const std::size_t count(mSignalConnections.size());
   for(std::size_t i = 0; i < count; i++)
   {
-    SignalConnection* connection = mSignalConnections[i];
+    auto& connection = mSignalConnections[i];
 
     // Note that values are set to NULL in DeleteConnection
     if(connection)
     {
-      connection->Disconnect(this);
-      delete connection;
+      connection.Disconnect(this);
     }
   }
-
-  mSignalConnections.Clear();
-}
-
-bool BaseSignal::Empty() const
-{
-  return (0 == GetConnectionCount());
-}
-
-std::size_t BaseSignal::GetConnectionCount() const
-{
-  std::size_t count(0);
-
-  const std::size_t size(mSignalConnections.Count());
-  for(std::size_t i = 0; i < size; ++i)
-  {
-    // Note that values are set to NULL in DeleteConnection
-    if(nullptr != mSignalConnections[i])
-    {
-      ++count;
-    }
-  }
-
-  return count;
 }
 
 void BaseSignal::Emit()
@@ -96,7 +71,7 @@ void BaseSignal::Emit()
 
   // If more connections are added by callbacks, these are ignore until the next Emit()
   // Note that mSignalConnections.Count() count cannot be reduced while iterating
-  const std::size_t initialCount(mSignalConnections.Count());
+  const std::size_t initialCount(mSignalConnections.size());
 
   for(std::size_t i = 0; i < initialCount; ++i)
   {
@@ -124,9 +99,9 @@ void BaseSignal::OnConnect(CallbackBase* callback)
   if(INVALID_CALLBACK_INDEX == index)
   {
     // create a new signal connection object, to allow the signal to track the connection.
-    SignalConnection* connection = new SignalConnection(callback);
+    //SignalConnection* connection = new SignalConnection(callback);
 
-    mSignalConnections.PushBack(connection);
+    mSignalConnections.push_back(SignalConnection(callback));
   }
   else
   {
@@ -161,9 +136,9 @@ void BaseSignal::OnConnect(ConnectionTrackerInterface* tracker, CallbackBase* ca
   if(INVALID_CALLBACK_INDEX == index)
   {
     // create a new signal connection object, to allow the signal to track the connection.
-    SignalConnection* connection = new SignalConnection(tracker, callback);
+    //SignalConnection* connection = new SignalConnection(tracker, callback);
 
-    mSignalConnections.PushBack(connection);
+    mSignalConnections.push_back({tracker, callback});
 
     // Let the connection tracker know that a connection between a signal and a slot has been made.
     tracker->SignalConnected(this, callback);
@@ -185,7 +160,7 @@ void BaseSignal::OnDisconnect(ConnectionTrackerInterface* tracker, CallbackBase*
   if(index > INVALID_CALLBACK_INDEX)
   {
     // temporary pointer to disconnected callback
-    CallbackBase* disconnectedCallback = mSignalConnections[index]->GetCallback();
+    CallbackBase* disconnectedCallback = mSignalConnections[index].GetCallback();
 
     // close the signal side connection first.
     DeleteConnection(index);
@@ -201,7 +176,7 @@ void BaseSignal::OnDisconnect(ConnectionTrackerInterface* tracker, CallbackBase*
 // for SlotObserver::SlotDisconnected
 void BaseSignal::SlotDisconnected(CallbackBase* callback)
 {
-  const std::size_t count(mSignalConnections.Count());
+  const std::size_t count(mSignalConnections.size());
   for(std::size_t i = 0; i < count; ++i)
   {
     const CallbackBase* connectionCallback = GetCallback(i);
@@ -220,32 +195,15 @@ void BaseSignal::SlotDisconnected(CallbackBase* callback)
   DALI_ABORT("Callback lost in SlotDisconnected()");
 }
 
-CallbackBase* BaseSignal::GetCallback(std::size_t connectionIndex) const
-{
-  DALI_ASSERT_ALWAYS(connectionIndex < mSignalConnections.Count() && "GetCallback called with invalid index");
 
-  CallbackBase* callback(nullptr);
-
-  SignalConnection* connection(mSignalConnections[connectionIndex]);
-
-  // Note that values are set to NULL in DeleteConnection
-  if(connection)
-  {
-    callback = connection->GetCallback();
-  }
-
-  return callback;
-}
-
-int32_t BaseSignal::FindCallback(CallbackBase* callback)
+int32_t BaseSignal::FindCallback(CallbackBase* callback) const noexcept
 {
   int32_t index(INVALID_CALLBACK_INDEX);
 
   // A signal can have multiple slots connected to it.
   // We need to search for the slot which has the same call back function (if it's static)
   // Or the same object / member function (for non-static)
-  const std::size_t count = mSignalConnections.Count();
-  for(std::size_t i = 0; i < count; ++i)
+  for(auto i = 0u; i < mSignalConnections.size(); ++i)
   {
     const CallbackBase* connectionCallback = GetCallback(i);
 
@@ -262,49 +220,34 @@ int32_t BaseSignal::FindCallback(CallbackBase* callback)
 
 void BaseSignal::DeleteConnection(std::size_t connectionIndex)
 {
-  DALI_ASSERT_ALWAYS(connectionIndex < mSignalConnections.Count() && "DeleteConnection called with invalid index");
-
-  // delete the object
-  SignalConnection* connection(mSignalConnections[connectionIndex]);
-  delete connection;
 
   if(mEmittingFlag)
   {
-    // IMPORTANT - do not remove from items from mSignalConnections, set to NULL instead.
+    // IMPORTANT - do not remove from items from mSignalConnections, reset instead.
     // Signal Emit() methods require that connection count is not reduced while iterating
     // i.e. DeleteConnection can be called from within callbacks, while iterating through mSignalConnections.
-    mSignalConnections[connectionIndex] = nullptr;
+    mSignalConnections[connectionIndex] = {nullptr};
+    ++mNullConnections;
   }
   else
   {
     // If application connects and disconnects without the signal never emitting,
     // the mSignalConnections vector keeps growing and growing as CleanupConnections() is done from Emit.
-    mSignalConnections.Erase(mSignalConnections.Begin() + connectionIndex);
+    mSignalConnections.erase(mSignalConnections.begin() + connectionIndex);
   }
 }
 
 void BaseSignal::CleanupConnections()
 {
-  const std::size_t total = mSignalConnections.Count();
-  // only do something if there are items
-  if(total > 0)
+  if(!mSignalConnections.empty())
   {
-    std::size_t index = 0;
-    // process the whole vector
-    for(std::size_t i = 0; i < total; ++i)
-    {
-      if(mSignalConnections[index] == nullptr)
-      {
-        // items will be moved so don't increase index (erase will decrease the count of vector)
-        mSignalConnections.Erase(mSignalConnections.Begin() + index);
-      }
-      else
-      {
-        // increase to next element
-        ++index;
-      }
-    }
+    //Remove Signals that are already markeed nullptr.
+    mSignalConnections.erase(std::remove_if(mSignalConnections.begin(),
+                                            mSignalConnections.end(),
+                                            [](auto& elm) { return (elm) ? false : true; }),
+                             mSignalConnections.end());
   }
+  mNullConnections = 0;
 }
 
 // BaseSignal::EmitGuard

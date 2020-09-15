@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <vector>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/dali-vector.h>
@@ -96,7 +99,10 @@ public:
    * @SINCE_1_0.0
    * @return True if there are any slots connected to the signal.
    */
-  bool Empty() const;
+  bool Empty() const
+  {
+    return (0 == GetConnectionCount());
+  }
 
   /**
    * @brief Queries the number of slots.
@@ -104,7 +110,10 @@ public:
    * @SINCE_1_0.0
    * @return The number of slots connected to this signal
    */
-  std::size_t GetConnectionCount() const;
+  std::size_t GetConnectionCount() const
+  {
+    return mSignalConnections.size() - mNullConnections;
+  }
 
   // Templated Emit functions for the Signal implementations
 
@@ -169,7 +178,7 @@ public:
 
     // If more connections are added by callbacks, these are ignore until the next Emit()
     // Note that count cannot be reduced while iterating
-    const std::size_t initialCount(mSignalConnections.Count());
+    const std::size_t initialCount(mSignalConnections.size());
 
     for(std::size_t i = 0; i < initialCount; ++i)
     {
@@ -208,7 +217,7 @@ public:
 
     // If more connections are added by callbacks, these are ignore until the next Emit()
     // Note that count cannot be reduced while iterating
-    const std::size_t initialCount(mSignalConnections.Count());
+    const std::size_t initialCount(mSignalConnections.size());
 
     for(std::size_t i = 0; i < initialCount; ++i)
     {
@@ -248,7 +257,7 @@ public:
 
     // If more connections are added by callbacks, these are ignore until the next Emit()
     // Note that count cannot be reduced while iterating
-    const std::size_t initialCount(mSignalConnections.Count());
+    const std::size_t initialCount(mSignalConnections.size());
 
     for(std::size_t i = 0; i < initialCount; ++i)
     {
@@ -288,7 +297,7 @@ public:
 
     // If more connections are added by callbacks, these are ignore until the next Emit()
     // Note that count cannot be reduced while iterating
-    const std::size_t initialCount(mSignalConnections.Count());
+    const std::size_t initialCount(mSignalConnections.size());
 
     for(std::size_t i = 0; i < initialCount; ++i)
     {
@@ -329,7 +338,7 @@ public:
 
     // If more connections are added by callbacks, these are ignore until the next Emit()
     // Note that count cannot be reduced while iterating
-    const std::size_t initialCount(mSignalConnections.Count());
+    const std::size_t initialCount(mSignalConnections.size());
 
     for(std::size_t i = 0; i < initialCount; ++i)
     {
@@ -370,7 +379,7 @@ public:
 
     // If more connections are added by callbacks, these are ignore until the next Emit()
     // Note that count cannot be reduced while iterating
-    const std::size_t initialCount(mSignalConnections.Count());
+    const std::size_t initialCount(mSignalConnections.size());
 
     for(std::size_t i = 0; i < initialCount; ++i)
     {
@@ -412,7 +421,7 @@ public:
 
     // If more connections are added by callbacks, these are ignore until the next Emit()
     // Note that count cannot be reduced while iterating
-    const std::size_t initialCount(mSignalConnections.Count());
+    const std::size_t initialCount(mSignalConnections.size());
 
     for(std::size_t i = 0; i < initialCount; ++i)
     {
@@ -482,7 +491,10 @@ private:
    * @param[in] connectionIndex The index of the callback
    * @return The callback, or NULL if the connection has been deleted
    */
-  CallbackBase* GetCallback(std::size_t connectionIndex) const;
+  CallbackBase* GetCallback(std::size_t connectionIndex) const noexcept
+  {
+    return mSignalConnections[connectionIndex].GetCallback();
+  }
 
   /**
    * @brief Helper to find whether a callback is connected.
@@ -491,7 +503,7 @@ private:
    * @param[in] callback The call back object
    * @return A valid index if the callback is connected
    */
-  int32_t FindCallback(CallbackBase* callback);
+  int32_t FindCallback(CallbackBase* callback) const noexcept;
 
   /**
    * @brief Deletes a connection object from the list of connections.
@@ -514,9 +526,9 @@ private:
   BaseSignal& operator=(BaseSignal&&) = delete;      ///< Deleted move assignment operator. @SINCE_1_9.25
 
 private:
-  Dali::Vector<SignalConnection*> mSignalConnections; ///< Array of connections
-
-  bool mEmittingFlag; ///< Used to guard against nested Emit() calls
+  std::vector<SignalConnection> mSignalConnections; ///< Array of connections
+  uint32_t                      mNullConnections{0}; ///< Empty Connections in the array.
+  bool                          mEmittingFlag{false}; ///< Used to guard against nested Emit() calls
 };
 
 /**
