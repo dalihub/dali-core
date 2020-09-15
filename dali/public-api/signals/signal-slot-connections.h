@@ -56,18 +56,15 @@ public:
   SlotConnection(SlotObserver* slotObserver, CallbackBase* callback);
 
   /**
-   * @brief Non-virtual destructor, not intended as a base class.
-   * @SINCE_1_0.0
-   */
-  ~SlotConnection();
-
-  /**
    * @brief Retrieves the callback.
    *
    * @SINCE_1_0.0
    * @return A pointer to the callback
    */
-  CallbackBase* GetCallback();
+  CallbackBase* GetCallback() const
+  {
+    return mCallback;
+  }
 
   /**
    * @brief Retrieves the slot observer.
@@ -75,17 +72,14 @@ public:
    * @SINCE_1_0.0
    * @return A pointer to the slot observer
    */
-  SlotObserver* GetSlotObserver();
+  SlotObserver* GetSlotObserver() const
+  {
+    return mSlotObserver;
+  }
 
 private:
-  SlotConnection(const SlotConnection&) = delete;            ///< Deleted copy constructor. @SINCE_1_0.0
-  SlotConnection(SlotConnection&&)      = delete;            ///< Deleted move constructor. @SINCE_1_9.25
-  SlotConnection& operator=(const SlotConnection&) = delete; ///< Deleted copy assignment operator. @SINCE_1_0.0
-  SlotConnection& operator=(SlotConnection&&) = delete;      ///< Deleted move assignment operator. @SINCE_1_9.25
-
-private:
-  SlotObserver* mSlotObserver; ///< a pointer to the slot observer (not owned)
-  CallbackBase* mCallback;     ///< The callback. This is not owned, the corresponding SignalConnection has ownership.
+  SlotObserver* mSlotObserver{nullptr}; ///< a pointer to the slot observer (not owned)
+  CallbackBase* mCallback{nullptr};     ///< The callback. This is not owned, the corresponding SignalConnection has ownership.
 };
 
 /**

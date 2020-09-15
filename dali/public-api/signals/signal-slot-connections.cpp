@@ -27,24 +27,11 @@
 
 namespace Dali
 {
+
 SlotConnection::SlotConnection(SlotObserver* slotObserver, CallbackBase* callback)
 : mSlotObserver(slotObserver),
   mCallback(callback)
 {
-}
-
-SlotConnection::~SlotConnection()
-{
-}
-
-CallbackBase* SlotConnection::GetCallback()
-{
-  return mCallback;
-}
-
-SlotObserver* SlotConnection::GetSlotObserver()
-{
-  return mSlotObserver;
 }
 
 void SignalConnection::Disconnect(SlotObserver* slotObserver) noexcept
