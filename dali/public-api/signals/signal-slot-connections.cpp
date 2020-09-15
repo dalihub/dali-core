@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <cstddef>
+#include <type_traits>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/signals/callback.h>
@@ -46,25 +47,7 @@ SlotObserver* SlotConnection::GetSlotObserver()
   return mSlotObserver;
 }
 
-SignalConnection::SignalConnection(CallbackBase* callback)
-: mSignalObserver(nullptr),
-  mCallback(callback)
-{
-}
-
-SignalConnection::SignalConnection(SignalObserver* signalObserver, CallbackBase* callback)
-: mSignalObserver(signalObserver),
-  mCallback(callback)
-{
-}
-
-SignalConnection::~SignalConnection()
-{
-  // signal connections have ownership of the callback.
-  delete mCallback;
-}
-
-void SignalConnection::Disconnect(SlotObserver* slotObserver)
+void SignalConnection::Disconnect(SlotObserver* slotObserver) noexcept
 {
   if(mSignalObserver)
   {
@@ -78,9 +61,10 @@ void SignalConnection::Disconnect(SlotObserver* slotObserver)
   mCallback = nullptr;
 }
 
-CallbackBase* SignalConnection::GetCallback()
-{
-  return mCallback;
-}
+static_assert(std::is_nothrow_move_constructible_v<SignalConnection>);
+static_assert(std::is_nothrow_move_assignable_v<SignalConnection>);
+
+static_assert(std::is_copy_constructible_v<SignalConnection> == false);
+static_assert(std::is_copy_assignable_v<SignalConnection> == false);
 
 } // namespace Dali
