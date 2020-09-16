@@ -889,11 +889,10 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
   const bool gestureUpdated = ProcessGestures( bufferIndex, lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds );
 
   bool updateScene = // The scene-graph requires an update if..
-      (mImpl->nodeDirtyFlags & RenderableUpdateFlags)                    ||    // ..nodes were dirty in previous frame OR
-      IsAnimationRunning()                                               ||    // ..at least one animation is running OR
-      mImpl->messageQueue.IsSceneUpdateRequired()                        ||    // ..a message that modifies the scene graph node tree is queued OR
-      (mImpl->renderingBehavior == DevelStage::Rendering::CONTINUOUSLY)  ||    // ..rendering behavior is DevelStage::Rendering::CONTINUOUSLY OR
-      gestureUpdated;                                                          // ..a gesture property was updated
+      (mImpl->nodeDirtyFlags & RenderableUpdateFlags) ||    // ..nodes were dirty in previous frame OR
+      IsAnimationRunning()                            ||    // ..at least one animation is running OR
+      mImpl->messageQueue.IsSceneUpdateRequired()     ||    // ..a message that modifies the scene graph node tree is queued OR
+      gestureUpdated;                                       // ..a gesture property was updated
 
   bool keepRendererRendering = false;
 
