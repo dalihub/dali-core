@@ -45,10 +45,10 @@ public:
   /**
    * Constructor
    */
-  UniformPropertyMapping( const std::string& theUniformName, const PropertyInputImpl* thePropertyPtr )
-  : propertyPtr( thePropertyPtr ),
-    uniformName( theUniformName ),
-    uniformNameHash( Dali::CalculateHash( theUniformName ) )
+  UniformPropertyMapping(std::string theUniformName, const PropertyInputImpl* thePropertyPtr)
+  : propertyPtr(thePropertyPtr),
+    uniformName(std::move(theUniformName)),
+    uniformNameHash(Dali::CalculateHash(theUniformName))
   {
   }
 

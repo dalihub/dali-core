@@ -761,7 +761,7 @@ void Object::NotifyPropertyAnimation( Animation& animation, Property::Index inde
   }
 }
 
-void Object::AddUniformMapping( Property::Index propertyIndex, const std::string& uniformName ) const
+void Object::AddUniformMapping(Property::Index propertyIndex, std::string uniformName) const
 {
   // Get the address of the property if it's a scene property
   const PropertyInputImpl* propertyPtr = GetSceneObjectInputProperty( propertyIndex );
@@ -789,7 +789,8 @@ void Object::AddUniformMapping( Property::Index propertyIndex, const std::string
   {
     const SceneGraph::PropertyOwner& sceneObject = GetSceneObject();
 
-    OwnerPointer< SceneGraph::UniformPropertyMapping > map = new SceneGraph::UniformPropertyMapping( uniformName, propertyPtr );
+    OwnerPointer<SceneGraph::UniformPropertyMapping> map =
+      new SceneGraph::UniformPropertyMapping(std::move(uniformName), propertyPtr);
     // Message takes ownership of Uniform map (and will delete it after copy)
     AddUniformMapMessage( const_cast<EventThreadServices&>(GetEventThreadServices()), sceneObject, map );
   }

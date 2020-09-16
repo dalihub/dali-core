@@ -270,7 +270,7 @@ public:
    * @param propertyIndex index of the property
    * @param uniformName name of the uniform (same as property name)
    */
-  void AddUniformMapping( Property::Index propertyIndex, const std::string& uniformName ) const;
+  void AddUniformMapping(Property::Index propertyIndex, std::string uniformName) const;
 
   /**
    * Removes uniform mapping for given property
