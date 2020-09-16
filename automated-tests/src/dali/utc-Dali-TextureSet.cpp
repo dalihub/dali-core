@@ -531,3 +531,58 @@ int UtcDaliTextureSetGetTextureCountNegative(void)
   }
   END_TEST;
 }
+
+int UtcDaliTextureSetMultipleTextures(void)
+{
+  TestApplication application;
+
+  Shader     shader     = CreateShader();
+  TextureSet textureSet = CreateTextureSet();
+
+  // Set 2 textures
+  Texture texture1 = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
+  textureSet.SetTexture(0u, texture1);
+
+  Texture texture2 = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
+  textureSet.SetTexture(1u, texture2);
+
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = Renderer::New(geometry, shader);
+  renderer.SetTextures(textureSet);
+
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  const std::vector<GLuint>& boundTextures0 = application.GetGlAbstraction().GetBoundTextures(GL_TEXTURE0);
+  DALI_TEST_CHECK(boundTextures0[boundTextures0.size() - 1] == 1u); // the latest one should be 0.
+
+  const std::vector<GLuint>& boundTextures1 = application.GetGlAbstraction().GetBoundTextures(GL_TEXTURE1);
+  size_t count = boundTextures1.size();
+  DALI_TEST_CHECK(boundTextures1[count - 1] == 2u); // the latest one should be 1.
+
+  // Create a new TextureSet
+  textureSet = CreateTextureSet();
+
+  // Set 1 texture
+  textureSet.SetTexture(0u, texture1);
+
+  renderer.SetTextures(textureSet);
+
+  application.SendNotification();
+  application.Render();
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  DALI_TEST_CHECK(gl.GetActiveTextureUnit() == GL_TEXTURE0);
+
+  DALI_TEST_CHECK(boundTextures0[boundTextures0.size() - 1] == 1u);
+  DALI_TEST_CHECK(boundTextures1.size() == count);  // The bound texture count of GL_TEXTURE1 should not be changed.
+
+  END_TEST;
+}
