@@ -117,11 +117,6 @@ public:
   static ScenePtr New( Size size );
 
   /**
-   * @copydoc Dali::Integration::Scene::New
-   */
-  static ScenePtr New( Size size, int orientation );
-
-  /**
    * virtual destructor
    */
   virtual ~Scene();
@@ -345,9 +340,8 @@ private:
    * Second-phase constructor.
    *
    * @param[in] size The size of the set surface
-   * @param[in] orientation The orientation of the set surface for this scene
    */
-  void Initialize( Size size, int orientation );
+  void Initialize( Size size );
 
   // Undefined
   Scene(const Scene&) = delete;

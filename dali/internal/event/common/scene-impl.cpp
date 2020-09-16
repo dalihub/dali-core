@@ -48,17 +48,7 @@ ScenePtr Scene::New( Size size )
   ScenePtr scene = new Scene;
 
   // Second-phase construction
-  scene->Initialize( size, 0 );
-
-  return scene;
-}
-
-ScenePtr Scene::New( Size size, int orientation )
-{
-  ScenePtr scene = new Scene;
-
-  // Second-phase construction
-  scene->Initialize( size, orientation );
+  scene->Initialize( size );
 
   return scene;
 }
@@ -105,7 +95,7 @@ Scene::~Scene()
   // When this destructor is called, the scene has either already been removed from Core or Core has already been destroyed
 }
 
-void Scene::Initialize( Size size, int orientation )
+void Scene::Initialize( Size size )
 {
   ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
 
@@ -141,7 +131,6 @@ void Scene::Initialize( Size size, int orientation )
   // Create the default render-task and ensure clear is enabled on it to show the background color
   RenderTaskPtr renderTask = mRenderTaskList->CreateTask( mRootLayer.Get(), mDefaultCamera.Get() );
   renderTask->SetClearEnabled(true);
-  mSurfaceOrientation = orientation;
 
   SurfaceResized( size.width, size.height, mSurfaceOrientation, false );
 

@@ -74,16 +74,6 @@ public:
   static Scene New( Size size );
 
   /**
-   * @brief Create an initialized Scene handle.
-   *
-   * @param[in] size The size of the set surface for this scene
-   * @param[in] orientation The orientation of the set surface for this scene
-   *
-   * @return a handle to a newly allocated Dali resource.
-   */
-  static Scene New( Size size, int orientation );
-
-  /**
    * @brief Downcast an Object handle to Scene handle.
    *
    * If handle points to a Scene object the downcast produces
