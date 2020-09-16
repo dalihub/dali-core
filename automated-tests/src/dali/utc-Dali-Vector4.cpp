@@ -15,12 +15,12 @@
  *
  */
 
+#include <dali-test-suite-utils.h>
+#include <dali/public-api/dali-core.h>
+#include <stdlib.h>
+
 #include <iostream>
 #include <sstream>
-
-#include <stdlib.h>
-#include <dali/public-api/dali-core.h>
-#include <dali-test-suite-utils.h>
 
 using namespace Dali;
 
@@ -56,7 +56,7 @@ int UtcDaliVector4Constructor02P(void)
 
 int UtcDaliVector4Constructor03P(void)
 {
-  float f [] = {1.0f, 2.0f, 3.0f, 4.f};
+  float   f[] = {1.0f, 2.0f, 3.0f, 4.f};
   Vector4 v(f);
   DALI_TEST_EQUALS(v.x, 1.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(v.y, 2.0f, TEST_LOCATION);
@@ -90,8 +90,8 @@ int UtcDaliVector4Constructor05P(void)
 int UtcDaliVector4CopyConstructor(void)
 {
   TestApplication application;
-  Vector4 vec0( 10.f, 20.f, 30.0f, 40.0f );
-  Vector4 vec1( vec0 );
+  Vector4         vec0(10.f, 20.f, 30.0f, 40.0f);
+  Vector4         vec1(vec0);
   DALI_TEST_EQUALS(vec1.x, 10.0f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(vec1.y, 20.0f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(vec1.z, 30.0f, 0.001, TEST_LOCATION);
@@ -102,8 +102,8 @@ int UtcDaliVector4CopyConstructor(void)
 int UtcDaliVector4MoveConstructor(void)
 {
   TestApplication application;
-  Vector4 vec0( 10.f, 20.f, 30.0f, 40.0f );
-  Vector4 vec1 = std::move( vec0 );
+  Vector4         vec0(10.f, 20.f, 30.0f, 40.0f);
+  Vector4         vec1 = std::move(vec0);
   DALI_TEST_EQUALS(vec1.x, 10.0f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(vec1.y, 20.0f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(vec1.z, 30.0f, 0.001, TEST_LOCATION);
@@ -115,8 +115,8 @@ int UtcDaliVector4MoveConstructor(void)
 int UtcDaliVector4CopyAssignment(void)
 {
   TestApplication application;
-  Vector4 vec0( 10.f, 20.f, 30.0f, 40.0f );
-  Vector4 vec1;
+  Vector4         vec0(10.f, 20.f, 30.0f, 40.0f);
+  Vector4         vec1;
   vec1 = vec0;
   DALI_TEST_EQUALS(vec1.x, 10.0f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(vec1.y, 20.0f, 0.001, TEST_LOCATION);
@@ -129,9 +129,9 @@ int UtcDaliVector4CopyAssignment(void)
 int UtcDaliVector4MoveAssignment(void)
 {
   TestApplication application;
-  Vector4 vec0( 10.f, 20.f, 30.0f, 40.0f );
-  Vector4 vec1;
-  vec1 = std::move( vec0 );
+  Vector4         vec0(10.f, 20.f, 30.0f, 40.0f);
+  Vector4         vec1;
+  vec1 = std::move(vec0);
   DALI_TEST_EQUALS(vec1.x, 10.0f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(vec1.y, 20.0f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(vec1.z, 30.0f, 0.001, TEST_LOCATION);
@@ -142,9 +142,9 @@ int UtcDaliVector4MoveAssignment(void)
 
 int UtcDaliVector4Assign01P(void)
 {
-  Vector4 v0;
-  const float array[] = { 1.0f, 2.0f, 3.0f, 4.f };
-  v0 = (const float*)array;
+  Vector4     v0;
+  const float array[] = {1.0f, 2.0f, 3.0f, 4.f};
+  v0                  = (const float*)array;
 
   DALI_TEST_EQUALS(v0.x, 1.0f, 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(v0.y, 2.0f, 0.001f, TEST_LOCATION);
@@ -163,7 +163,7 @@ int UtcDaliVector4Assign02P(void)
   DALI_TEST_EQUALS(v0.z, 0.0f, 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(v0.z, 0.0f, 0.001f, TEST_LOCATION);
   v0.w = v0.z = 99.f;
-  v0 = vec2;
+  v0          = vec2;
   DALI_TEST_EQUALS(v0.x, 1.0f, 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(v0.y, 2.0f, 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(v0.z, 0.0f, 0.001f, TEST_LOCATION);
@@ -190,7 +190,7 @@ int UtcDaliVector4Add01P(void)
   Vector4 v1(10.0f, 20.0f, 30.0f, 40.0f);
   Vector4 r0(11.0f, 22.0f, 33.0f, 44.0f);
 
-  Vector4 v2 = v0+v1;
+  Vector4 v2 = v0 + v1;
   DALI_TEST_EQUALS(v2, r0, TEST_LOCATION);
 
   END_TEST;
@@ -213,7 +213,7 @@ int UtcDaliVector4Subtract01P(void)
   Vector4 v1(10.0f, 20.0f, 30.0f, 40.0f);
   Vector4 r0(1.0f, 2.0f, 3.0f, 4.0f);
 
-  Vector4 v2 = v0-v1;
+  Vector4 v2 = v0 - v1;
   DALI_TEST_EQUALS(v2, r0, TEST_LOCATION);
   END_TEST;
 }
@@ -232,7 +232,7 @@ int UtcDaliVector4Subtract02P(void)
 int UtcDaliVector4Multiply01P(void)
 {
   Vector4 v0(2.0f, 3.0f, 4.0f, 5.0f);
-  Vector4 v1(10.0f, 20.0f,  30.0f,  40.0f);
+  Vector4 v1(10.0f, 20.0f, 30.0f, 40.0f);
   Vector4 r0(20.0f, 60.0f, 120.0f, 200.0f);
 
   Vector4 v2 = v0 * v1;
@@ -243,9 +243,9 @@ int UtcDaliVector4Multiply01P(void)
 
 int UtcDaliVector4Multiply02P(void)
 {
-  Vector4 v0(2.0f,   4.0f,  8.0f,  16.0f);
+  Vector4       v0(2.0f, 4.0f, 8.0f, 16.0f);
   const Vector4 r0(20.0f, 40.0f, 80.0f, 160.0f);
-  Vector4 v2 = v0 * 10.0f;
+  Vector4       v2 = v0 * 10.0f;
   DALI_TEST_EQUALS(v2, r0, TEST_LOCATION);
   END_TEST;
 }
@@ -253,7 +253,7 @@ int UtcDaliVector4Multiply02P(void)
 int UtcDaliVector4Multiply03P(void)
 {
   Vector4 v0(2.0f, 3.0f, 4.0f, 5.0f);
-  Vector4 v1(10.0f, 20.0f,  30.0f,  40.0f);
+  Vector4 v1(10.0f, 20.0f, 30.0f, 40.0f);
   Vector4 r0(20.0f, 60.0f, 120.0f, 200.0f);
 
   v0 *= v1;
@@ -263,9 +263,9 @@ int UtcDaliVector4Multiply03P(void)
 
 int UtcDaliVector4Multiply04P(void)
 {
-  Vector4 v0(2.0f,   4.0f,  8.0f,  16.0f);
+  Vector4       v0(2.0f, 4.0f, 8.0f, 16.0f);
   const Vector4 r0(20.0f, 40.0f, 80.0f, 160.0f);
-  Vector4 v2(r0);
+  Vector4       v2(r0);
   v0 *= 10.0f;
   DALI_TEST_EQUALS(v2, r0, TEST_LOCATION);
   END_TEST;
@@ -277,22 +277,21 @@ int UtcDaliVector4Divide01P(void)
   Vector4 v1(2.0f, 3.0f, 5.0f, 7.0f);
   Vector4 v2(4.0f, 9.0f, 25.0f, 49.0f);
 
-  DALI_TEST_EQUALS( v0/v0, v0, TEST_LOCATION);
-  DALI_TEST_EQUALS( v1/v0, v1, TEST_LOCATION);
-  DALI_TEST_EQUALS( v1/v1, v0, TEST_LOCATION);
-  DALI_TEST_EQUALS( v2/v1, v1, TEST_LOCATION);
-
+  DALI_TEST_EQUALS(v0 / v0, v0, TEST_LOCATION);
+  DALI_TEST_EQUALS(v1 / v0, v1, TEST_LOCATION);
+  DALI_TEST_EQUALS(v1 / v1, v0, TEST_LOCATION);
+  DALI_TEST_EQUALS(v2 / v1, v1, TEST_LOCATION);
 
   END_TEST;
 }
 
 int UtcDaliVector4Divide02P(void)
 {
-  Vector4 v0(2.0f,   4.0f,  8.0f,  16.0f);
+  Vector4       v0(2.0f, 4.0f, 8.0f, 16.0f);
   const Vector4 r0(20.0f, 40.0f, 80.0f, 160.0f);
-  const Vector4 r1(10.0f, 20.0f, 40.0f,  80.0f);
-  const Vector4 r2( 1.0f,  2.0f,  4.0f,   8.0f);
-  const Vector4 r3(2.0f,   4.0f,  8.0f,  16.0f);
+  const Vector4 r1(10.0f, 20.0f, 40.0f, 80.0f);
+  const Vector4 r2(1.0f, 2.0f, 4.0f, 8.0f);
+  const Vector4 r3(2.0f, 4.0f, 8.0f, 16.0f);
 
   Vector4 v2 = r0 / 10.0f;
   DALI_TEST_EQUALS(v2, r3, TEST_LOCATION);
@@ -326,11 +325,11 @@ int UtcDaliVector4Divide03P(void)
 
 int UtcDaliVector4Divide04P(void)
 {
-  Vector4 v0(2.0f,   4.0f,  8.0f,  16.0f);
+  Vector4       v0(2.0f, 4.0f, 8.0f, 16.0f);
   const Vector4 r0(20.0f, 40.0f, 80.0f, 160.0f);
-  const Vector4 r1(10.0f, 20.0f, 40.0f,  80.0f);
-  const Vector4 r2( 1.0f,  2.0f,  4.0f,   8.0f);
-  const Vector4 r3(2.0f,   4.0f,  8.0f,  16.0f);
+  const Vector4 r1(10.0f, 20.0f, 40.0f, 80.0f);
+  const Vector4 r2(1.0f, 2.0f, 4.0f, 8.0f);
+  const Vector4 r3(2.0f, 4.0f, 8.0f, 16.0f);
 
   Vector4 v2(r0);
   v2 /= 10.0f;
@@ -342,8 +341,8 @@ int UtcDaliVector4Divide04P(void)
 int UtcDaliVector4NegateP(void)
 {
   TestApplication application;
-  Vector4 v1(10.0f, 20.0f, 30.f, 40.f);
-  Vector4 r0(-10.0f, -20.0f, -30.f, -40.f);
+  Vector4         v1(10.0f, 20.0f, 30.f, 40.f);
+  Vector4         r0(-10.0f, -20.0f, -30.f, -40.f);
 
   Vector4 v2 = -v1;
   DALI_TEST_EQUALS(v2, r0, TEST_LOCATION);
@@ -352,8 +351,8 @@ int UtcDaliVector4NegateP(void)
 
 int UtcDaliVector4EqualsP(void)
 {
-  Vector4 v0(1.0f, 2.0f,  3.0f, 4.0f);
-  Vector4 v1(1.0f, 2.0f,  3.0f, 4.0f);
+  Vector4 v0(1.0f, 2.0f, 3.0f, 4.0f);
+  Vector4 v1(1.0f, 2.0f, 3.0f, 4.0f);
 
   DALI_TEST_CHECK(v0 == v1);
   END_TEST;
@@ -361,8 +360,8 @@ int UtcDaliVector4EqualsP(void)
 
 int UtcDaliVector4NotEqualsP(void)
 {
-  Vector4 v0(1.0f, 2.0f,  3.0f, 4.0f);
-  Vector4 v1(1.0f, 2.0f,  3.0f, 4.0f);
+  Vector4 v0(1.0f, 2.0f, 3.0f, 4.0f);
+  Vector4 v1(1.0f, 2.0f, 3.0f, 4.0f);
 
   Vector4 v2 = Vector4(0.0f, 2.0f, 3.0f, 4.0f);
   DALI_TEST_CHECK(v0 != v2);
@@ -383,10 +382,10 @@ int UtcDaliVector4OperatorSubscriptP(void)
   Vector4 testVector(1.0f, 2.0f, 3.0f, 4.0f);
 
   // read array subscripts
-  DALI_TEST_EQUALS( testVector[0], 1.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( testVector[1], 2.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( testVector[2], 3.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( testVector[3], 4.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS(testVector[0], 1.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(testVector[1], 2.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(testVector[2], 3.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(testVector[3], 4.0f, TEST_LOCATION);
 
   // write array subscripts/read struct memebers
   testVector[0] = 5.0f;
@@ -394,10 +393,10 @@ int UtcDaliVector4OperatorSubscriptP(void)
   testVector[2] = 7.0f;
   testVector[3] = 8.0f;
 
-  DALI_TEST_EQUALS( testVector.x, 5.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( testVector.y, 6.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( testVector.z, 7.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( testVector.w, 8.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS(testVector.x, 5.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(testVector.y, 6.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(testVector.z, 7.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(testVector.w, 8.0f, TEST_LOCATION);
 
   // write struct members/read array subscripts
   testVector.x = 9.0f;
@@ -405,14 +404,13 @@ int UtcDaliVector4OperatorSubscriptP(void)
   testVector.z = 11.0f;
   testVector.w = 12.0f;
 
-  DALI_TEST_EQUALS( testVector[0],  9.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( testVector[1], 10.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( testVector[2], 11.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( testVector[3], 12.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS(testVector[0], 9.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(testVector[1], 10.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(testVector[2], 11.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(testVector[3], 12.0f, TEST_LOCATION);
 
   END_TEST;
 }
-
 
 int UtcDaliVector4ConstOperatorSubscriptP(void)
 {
@@ -420,15 +418,15 @@ int UtcDaliVector4ConstOperatorSubscriptP(void)
 
   // write struct members/read array subscripts
   const Vector4 testVector2(1.0f, 2.0f, 3.0f, 4.0f);
-  const float& x = testVector2[0];
-  const float& y = testVector2[1];
-  const float& z ( testVector2[2] );
-  const float& w ( testVector2[3] );
+  const float&  x = testVector2[0];
+  const float&  y = testVector2[1];
+  const float&  z(testVector2[2]);
+  const float&  w(testVector2[3]);
 
-  DALI_TEST_EQUALS( x, 1.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( y, 2.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( z, 3.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( w, 4.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS(x, 1.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(y, 2.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(z, 3.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(w, 4.0f, TEST_LOCATION);
 
   try
   {
@@ -436,10 +434,10 @@ int UtcDaliVector4ConstOperatorSubscriptP(void)
     (void)w; // Suppress unused variable warning
     tet_result(TET_FAIL);
   }
-  catch (Dali::DaliException& e)
+  catch(Dali::DaliException& e)
   {
-    DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT( e, "index < 4", TEST_LOCATION );
+    DALI_TEST_PRINT_ASSERT(e);
+    DALI_TEST_ASSERT(e, "index < 4", TEST_LOCATION);
   }
 
   try
@@ -448,10 +446,10 @@ int UtcDaliVector4ConstOperatorSubscriptP(void)
     (void)w; // Suppress unused variable warning
     tet_result(TET_FAIL);
   }
-  catch (Dali::DaliException& e)
+  catch(Dali::DaliException& e)
   {
-    DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT( e, "index < 4", TEST_LOCATION );
+    DALI_TEST_PRINT_ASSERT(e);
+    DALI_TEST_ASSERT(e, "index < 4", TEST_LOCATION);
   }
   END_TEST;
 }
@@ -467,7 +465,7 @@ int UtcDaliVector4Dot01P(void)
   DALI_TEST_EQUALS(Vector4(1.0f, 0.0f, 0.0f, 1.0f).Dot(Vector4(1.0f, 0.0f, 0.0f, 1.0f)), 1.0f, TEST_LOCATION);
 
   // Test v0 . v0 and v0 . v1 (v1 is always 90 degrees out of phase with v0)
-  for (float x = 0; x<6.0f; x+=1.0f)
+  for(float x = 0; x < 6.0f; x += 1.0f)
   {
     // vectors rotating in the XY plane.
     Vector4 v0(cosf(x), sinf(x), 0.0f, 1.0f);
@@ -501,7 +499,7 @@ int UtcDaliVector4DotVector302P(void)
   DALI_TEST_EQUALS(Vector4(1.0f, 0.0f, 0.0f, 1.0f).Dot(Vector3(1.0f, 0.0f, 0.0f)), 1.0f, TEST_LOCATION);
 
   // Test v0 . v0b and v0 . v1 (v1 is always 90 degrees out of phase with v0)
-  for (float x = 0; x<6.0f; x+=1.0f)
+  for(float x = 0; x < 6.0f; x += 1.0f)
   {
     // vectors rotating in the XY plane.
     Vector4 v0(cosf(x), sinf(x), 0.0f, 1.0f);
@@ -511,9 +509,9 @@ int UtcDaliVector4DotVector302P(void)
     DALI_TEST_EQUALS(v0.Dot(v0b), 1.0f, 0.0001f, TEST_LOCATION);
 
     // vectors rotating in the XZ plane.
-    v0 = Vector4(cosf(x), 0.0f, sinf(x), 0.0f);
+    v0  = Vector4(cosf(x), 0.0f, sinf(x), 0.0f);
     v0b = Vector3(cosf(x), 0.0f, sinf(x));
-    v1 = Vector3(sinf(x), 0.0f, -cosf(x));
+    v1  = Vector3(sinf(x), 0.0f, -cosf(x));
     DALI_TEST_EQUALS(v0.Dot(v1), 0.0f, 0.0001f, TEST_LOCATION);
     DALI_TEST_EQUALS(v0.Dot(v0b), 1.0f, 0.0001f, TEST_LOCATION);
   }
@@ -538,7 +536,7 @@ int UtcDaliVector4Dot4P(void)
 
   DALI_TEST_EQUALS(Vector4(1.0f, 0.0f, 0.0f, 1.0f).Dot4(Vector4(1.0f, 0.0f, 0.0f, 1.0f)), 2.0f, TEST_LOCATION);
 
-  for (float x = 0; x<6.0f; x+=1.0f)
+  for(float x = 0; x < 6.0f; x += 1.0f)
   {
     Vector4 v0(cosf(x), sinf(x), 0.0f, 1.0f);
     Vector4 v1(sinf(x), -cosf(x), 0.0f, 1.0f);
@@ -555,7 +553,7 @@ int UtcDaliVector4Dot4P(void)
   v0.Normalize();
 
   Vector4 v1 = v0 * 2.0f;
-  DALI_TEST_EQUALS(v0.Dot4(v1), 2.0f + 3.0f*6.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(v0.Dot4(v1), 2.0f + 3.0f * 6.0f, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -571,10 +569,10 @@ int UtcDaliVector4CrossP(void)
 
   Vector4 v0(2.0f, 3.0f, 4.0f, 5.0f);
   Vector4 v1(10.0f, 20.0f, 30.0f, 40.0f);
-  Vector4 result(   (v0.y * v1.z) - (v0.z * v1.y),
-                    (v0.z * v1.x) - (v0.x * v1.z),
-                    (v0.x * v1.y) - (v0.y * v1.x),
-                    0.0f);
+  Vector4 result((v0.y * v1.z) - (v0.z * v1.y),
+                 (v0.z * v1.x) - (v0.x * v1.z),
+                 (v0.x * v1.y) - (v0.y * v1.x),
+                 0.0f);
 
   DALI_TEST_EQUALS(v0.Cross(v1), result, 0.001f, TEST_LOCATION);
   END_TEST;
@@ -583,7 +581,7 @@ int UtcDaliVector4CrossP(void)
 int UtcDaliVector4LengthP(void)
 {
   Vector4 v(1.0f, 2.0f, 3.0f, 4.0f);
-  DALI_TEST_EQUALS(v.Length(), sqrtf(v.x*v.x + v.y*v.y + v.z*v.z), 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(v.Length(), sqrtf(v.x * v.x + v.y * v.y + v.z * v.z), 0.001f, TEST_LOCATION);
 
   Vector4 v1(0.0f, 0.0f, 0.0f, 0.0f);
   DALI_TEST_EQUALS(v1.Length(), 0.0f, TEST_LOCATION);
@@ -593,7 +591,7 @@ int UtcDaliVector4LengthP(void)
 int UtcDaliVector4LengthSquaredP(void)
 {
   Vector4 v(1.0f, 2.0f, 3.0f, 4.0f);
-  DALI_TEST_EQUALS(v.LengthSquared(), v.x*v.x + v.y*v.y + v.z*v.z, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(v.LengthSquared(), v.x * v.x + v.y * v.y + v.z * v.z, 0.001f, TEST_LOCATION);
 
   Vector4 v1(0.0f, 0.0f, 0.0f, 0.0f);
   DALI_TEST_EQUALS(v1.LengthSquared(), 0.0f, TEST_LOCATION);
@@ -602,9 +600,9 @@ int UtcDaliVector4LengthSquaredP(void)
 
 int UtcDaliVector4NormalizeP(void)
 {
-  for (float f=0.0f; f<6.0f; f+=1.0f)
+  for(float f = 0.0f; f < 6.0f; f += 1.0f)
   {
-    Vector4 v(cosf(f)*10.0f, cosf(f+1.0f)*10.0f, cosf(f+2.0f)*10.0f, 1.0f);
+    Vector4 v(cosf(f) * 10.0f, cosf(f + 1.0f) * 10.0f, cosf(f + 2.0f) * 10.0f, 1.0f);
     v.Normalize();
     DALI_TEST_EQUALS(v.LengthSquared(), 1.0f, 0.001f, TEST_LOCATION);
   }
@@ -628,26 +626,26 @@ int UtcDaliVector4ClampVector4P(void)
   Vector4 min(1.0f, -2.0f, -8.0f, -16.0f);
   Vector4 max(2.0f, 4.0f, 4.0f, -8.0f);
 
-  v0.Clamp( min, max );
-  v1.Clamp( min, max );
-  v2.Clamp( min, max );
-  v3.Clamp( min, max );
-  v4.Clamp( min, max );
+  v0.Clamp(min, max);
+  v1.Clamp(min, max);
+  v2.Clamp(min, max);
+  v3.Clamp(min, max);
+  v4.Clamp(min, max);
 
-  DALI_TEST_EQUALS( v0, Vector4( 2.0f, 0.8f, 0.0f, -8.0f), 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( v1, Vector4( 1.0f, 2.0f, 4.0f, -10.0f), 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( v2, Vector4( 2.0f, 4.0f, 0.0f, -8.0f), 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( v3, Vector4( 2.0f, 4.0f, 4.0f, -16.0f), 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( v4, Vector4( 2.0f, 4.0f, 4.0f, -8.0f), 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS(v0, Vector4(2.0f, 0.8f, 0.0f, -8.0f), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(v1, Vector4(1.0f, 2.0f, 4.0f, -10.0f), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(v2, Vector4(2.0f, 4.0f, 0.0f, -8.0f), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(v3, Vector4(2.0f, 4.0f, 4.0f, -16.0f), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(v4, Vector4(2.0f, 4.0f, 4.0f, -8.0f), 0.01f, TEST_LOCATION);
   END_TEST;
 }
 
 int UtcDaliVector4AsFloatP(void)
 {
-  float values[] = {0.0f,  1.0f,  2.0f, 3.0f};
+  float   values[] = {0.0f, 1.0f, 2.0f, 3.0f};
   Vector4 v0(values);
 
-  for (int i=0;i<4;++i)
+  for(int i = 0; i < 4; ++i)
   {
     DALI_TEST_EQUALS(v0.AsFloat()[i], values[i], TEST_LOCATION);
   }
@@ -657,11 +655,11 @@ int UtcDaliVector4AsFloatP(void)
 
 int UtcDaliVector4ConstAsFloatP(void)
 {
-  float values[] = {0.0f,  1.0f,  2.0f, 3.0f};
+  float   values[] = {0.0f, 1.0f, 2.0f, 3.0f};
   Vector4 v0(values);
 
   const Vector4 v1(values);
-  for (int i=0;i<4;++i)
+  for(int i = 0; i < 4; ++i)
   {
     DALI_TEST_EQUALS(v1.AsFloat()[i], values[i], TEST_LOCATION);
   }
@@ -678,7 +676,7 @@ int UtcDaliVector4OStreamOperatorP(void)
 
   std::string expectedOutput = "[1, 2, 3, 4]";
 
-  DALI_TEST_EQUALS( oss.str(), expectedOutput, TEST_LOCATION);
+  DALI_TEST_EQUALS(oss.str(), expectedOutput, TEST_LOCATION);
   END_TEST;
 }
 
@@ -715,7 +713,7 @@ int UtcDaliVector4ClampP(void)
 
 int UtcDaliVector4ConstantsP(void)
 {
-  float f[] = {2.0f, 3.0f, 4.0f, 5.0f};
+  float   f[] = {2.0f, 3.0f, 4.0f, 5.0f};
   Vector4 v0(f);
   Vector4 v1(f[0], f[1], f[2], f[3]);
   Vector4 v2(v0);

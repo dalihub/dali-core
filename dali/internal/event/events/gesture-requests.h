@@ -73,7 +73,7 @@ struct PanGestureRequest : public GestureRequest
   /**
    * Virtual destructor
    */
-  virtual ~PanGestureRequest()
+  ~PanGestureRequest() override
   {
   }
 
@@ -105,7 +105,7 @@ struct TapGestureRequest : public GestureRequest
   /**
    * Virtual destructor
    */
-  virtual ~TapGestureRequest()
+  ~TapGestureRequest() override
   {
   }
 
@@ -137,7 +137,7 @@ struct LongPressGestureRequest : public GestureRequest
   /**
    * Virtual destructor
    */
-  virtual ~LongPressGestureRequest()
+  ~LongPressGestureRequest() override
   {
   }
 

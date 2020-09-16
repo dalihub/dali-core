@@ -18,24 +18,32 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/events/touch-point.h>
+#include <dali/integration-api/events/point.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/events/touch-event.h>
-#include <dali/devel-api/events/touch-point.h>
 
 namespace Dali
 {
-
 namespace Integration
 {
-
 /**
  * Create a new touch data handle from timestamp and touch point.
  *
- * @param[in] timestamp The timestamp of the touch event.
+ * @param[in] timeStamp The time stamp of the touch event.
  * @param[in] point The point on screen where the touch occurred.
  * @return A new touch data handle.
  */
-DALI_CORE_API Dali::TouchEvent NewTouchEvent(uint32_t timestamp, const TouchPoint& point);
+DALI_CORE_API Dali::TouchEvent NewTouchEvent(uint32_t timeStamp, const TouchPoint& point);
+
+/**
+ * Create a new touch data handle from timestamp and point.
+ *
+ * @param[in] timeStamp The time stamp of the touch event.
+ * @param[in] point The point on screen where the touch occurred.
+ * @return A new touch data handle.
+ */
+DALI_CORE_API Dali::TouchEvent NewTouchEvent(uint32_t timeStamp, const Dali::Integration::Point& point);
 
 } // namespace Integration
 

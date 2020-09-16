@@ -29,7 +29,7 @@ namespace Internal
 {
 
 class WheelEvent;
-typedef IntrusivePtr< WheelEvent > WheelEventPtr;
+using WheelEventPtr = IntrusivePtr<WheelEvent>;
 
 /**
  * @copydoc Dali::WheelEvent
@@ -124,7 +124,7 @@ private:
    *
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~WheelEvent() = default;
+  ~WheelEvent() override = default;
 
   // Not copyable or movable
 

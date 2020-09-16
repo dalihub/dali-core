@@ -2,7 +2,7 @@
 #define TEST_TRACE_CALL_STACK_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,13 @@
  *
  */
 
-#include <string>
-#include <vector>
 #include <map>
 #include <sstream>
+#include <string>
+#include <vector>
 
 namespace Dali
 {
-
 template<typename T>
 std::string ToString(const T& x)
 {
@@ -42,9 +41,8 @@ std::string ToString(float x);
 class TraceCallStack
 {
 public:
-
   /// Typedef for passing and storing named parameters
-  typedef std::map< std::string, std::string > NamedParams;
+  typedef std::map<std::string, std::string> NamedParams;
 
   /**
    * Constructor
@@ -91,7 +89,7 @@ public:
    * @param[out] params of the method
    * @return true if the method was in the stack
    */
-  bool FindMethodAndGetParameters(std::string method, std::string& params ) const;
+  bool FindMethodAndGetParameters(std::string method, std::string& params) const;
 
   /**
    * Count how many times a method was called
@@ -127,7 +125,7 @@ public:
    *                calls can search for methods occuring after this one.
    * @return True if the method was in the stack
    */
-  bool FindMethodAndParamsFromStartIndex( std::string method, std::string params, size_t& startIndex ) const;
+  bool FindMethodAndParamsFromStartIndex(std::string method, std::string params, size_t& startIndex) const;
 
   /**
    * Search for a method in the stack with the given parameter list
@@ -165,10 +163,10 @@ public:
   std::string GetTraceString()
   {
     std::stringstream traceStream;
-    std::size_t functionCount = mCallStack.size();
-    for( std::size_t i = 0; i < functionCount; ++i )
+    std::size_t       functionCount = mCallStack.size();
+    for(std::size_t i = 0; i < functionCount; ++i)
     {
-      Dali::TraceCallStack::FunctionCall functionCall = mCallStack[ i ];
+      Dali::TraceCallStack::FunctionCall functionCall = mCallStack[i];
       traceStream << "StackTrace: Index:" << i << ",  Function:" << functionCall.method << ",  ParamList:" << functionCall.paramList << std::endl;
     }
 
@@ -183,19 +181,22 @@ private:
     std::string method;
     std::string paramList;
     NamedParams namedParams;
-    FunctionCall( const std::string& aMethod, const std::string& aParamList )
-    : method( aMethod ), paramList( aParamList )
+    FunctionCall(const std::string& aMethod, const std::string& aParamList)
+    : method(aMethod),
+      paramList(aParamList)
     {
     }
-    FunctionCall( const std::string& aMethod, const std::string& aParamList, const NamedParams& altParams )
-    : method( aMethod ), paramList( aParamList ), namedParams( altParams )
+    FunctionCall(const std::string& aMethod, const std::string& aParamList, const NamedParams& altParams)
+    : method(aMethod),
+      paramList(aParamList),
+      namedParams(altParams)
     {
     }
   };
 
-  std::vector< FunctionCall > mCallStack; ///< The call stack
+  std::vector<FunctionCall> mCallStack; ///< The call stack
 };
 
-} // namespace dali
+} // namespace Dali
 
 #endif // TEST_TRACE_CALL_STACK_H

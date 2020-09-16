@@ -60,7 +60,7 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~MemoryPoolRelayoutContainer();
+  ~MemoryPoolRelayoutContainer() override;
 
   /**
    * @brief Add relayout information to the container if it does'nt already exist
@@ -68,7 +68,7 @@ public:
    * @param actor The actor to relayout
    * @param size The size to relayout
    */
-  virtual void Add( const Dali::Actor& actor, const Vector2& size );
+  void Add( const Dali::Actor& actor, const Vector2& size ) override;
 
   /**
    * @brief Remove information from the container
@@ -108,8 +108,7 @@ public:
   bool Contains( const Dali::Actor& actor );
 
 private:
-
-  typedef Vector< RelayoutInfo* > RelayoutInfoContainer;
+  using RelayoutInfoContainer = Vector<RelayoutInfo*>;
 
   RelayoutInfoContainer mRelayoutInfos;     ///< The list of relayout infos
 

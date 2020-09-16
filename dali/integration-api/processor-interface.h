@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_PROCESSOR_INTERFACE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Integration
 {
-
 /**
  * Interface to enable classes to be processed after the event loop. Classes are processed
  * in the order they are registered.
@@ -40,15 +38,16 @@ public:
   virtual void Process() = 0;
 
 protected:
-
   /**
    * Virtual protected destructor
    */
-  virtual ~Processor() { }
+  virtual ~Processor()
+  {
+  }
 };
 
-} // Dali
+} // namespace Integration
 
-} // Integration
+} // namespace Dali
 
 #endif // DALI_INTEGRATION_PROCESSOR_INTERFACE_H

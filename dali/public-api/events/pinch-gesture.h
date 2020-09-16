@@ -24,7 +24,6 @@
 
 namespace Dali
 {
-
 namespace Internal DALI_INTERNAL
 {
 class PinchGesture;
@@ -47,10 +46,9 @@ class PinchGesture;
  * until the pinch ends.
  * @SINCE_1_9.28
  */
-class DALI_CORE_API PinchGesture: public Gesture
+class DALI_CORE_API PinchGesture : public Gesture
 {
 public:
-
   /**
    * @brief Creates an uninitialized PinchGesture handle.
    *
@@ -64,14 +62,14 @@ public:
    * @SINCE_1_9.28
    * @param[in] rhs A reference to the copied handle
    */
-  PinchGesture( const PinchGesture& rhs );
+  PinchGesture(const PinchGesture& rhs);
 
   /**
    * @brief Move constructor.
    * @SINCE_1_9.28
    * @param[in] rhs A reference to the moved handle
    */
-  PinchGesture( PinchGesture&& rhs );
+  PinchGesture(PinchGesture&& rhs);
 
   /**
    * @brief Assignment operator.
@@ -79,7 +77,7 @@ public:
    * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
-  PinchGesture& operator=( const PinchGesture& rhs );
+  PinchGesture& operator=(const PinchGesture& rhs);
 
   /**
    * @brief Assignment operator.
@@ -87,7 +85,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  PinchGesture& operator=( PinchGesture&& rhs );
+  PinchGesture& operator=(PinchGesture&& rhs);
 
   /**
    * @brief Non virtual destructor.
@@ -130,7 +128,6 @@ public:
   const Vector2& GetLocalCenterPoint() const;
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief This constructor is used internally to Create an initialized PinchGesture handle.
@@ -138,9 +135,8 @@ public: // Not intended for application developers
    * @param[in] PinchGesture A pointer to a newly allocated Dali resource
    * @SINCE_1_9.28
    */
-  explicit DALI_INTERNAL PinchGesture( Internal::PinchGesture* pinchGesture );
+  explicit DALI_INTERNAL PinchGesture(Internal::PinchGesture* pinchGesture);
   /// @endcond
-
 };
 
 /**

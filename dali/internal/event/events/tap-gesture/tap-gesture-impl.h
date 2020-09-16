@@ -31,7 +31,7 @@ namespace Internal
 {
 
 class TapGesture;
-typedef IntrusivePtr< TapGesture > TapGesturePtr;
+using TapGesturePtr = IntrusivePtr<TapGesture>;
 
 /**
  * @copydoc Dali::TapGesture
@@ -128,7 +128,7 @@ private:
    *
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~TapGesture() = default;
+  ~TapGesture() override = default;
 
 private:
   Vector2 mScreenPoint;

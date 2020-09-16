@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,6 @@
 #include "thread-pool.h"
 #include <cmath>
 
-
-
 namespace Dali
 {
 namespace
@@ -29,7 +27,7 @@ std::unique_ptr<T> make_unique(Args&&... args)
 {
   return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
-}
+} // namespace
 
 /**
  * WorkerThread executes tasks submitted to the pool
@@ -37,26 +35,25 @@ std::unique_ptr<T> make_unique(Args&&... args)
 class WorkerThread
 {
 public:
-
   /**
    * @brief Constructor of worker thread
    * @param index Thread index assigned to the object during pool initialisation
    */
-  explicit WorkerThread( uint32_t index );
+  explicit WorkerThread(uint32_t index);
 
   /**
    * @brief Destructor of the worker thread
    */
   ~WorkerThread();
 
-  WorkerThread(const WorkerThread &other) = delete;
-  WorkerThread &operator=(const WorkerThread &other) = delete;
+  WorkerThread(const WorkerThread& other) = delete;
+  WorkerThread& operator=(const WorkerThread& other) = delete;
 
   /**
    * @brief Adds task to the task queue
    * @param task Task to be executed by the thread
    */
-  void AddTask( Task task );
+  void AddTask(Task task);
 
   /**
    * @brief Wakes up thread.
@@ -69,35 +66,34 @@ public:
   void Wait();
 
 private:
-
   /**
    * @brief Internal thread loop function
    */
   void WaitAndExecute();
 
-  std::thread   mWorker;
-  uint32_t      mIndex;
-  TaskQueue     mTaskQueue;
-  std::mutex    mTaskQueueMutex;
+  std::thread             mWorker;
+  uint32_t                mIndex;
+  TaskQueue               mTaskQueue;
+  std::mutex              mTaskQueueMutex;
   std::condition_variable mConditionVariable;
 
-  bool mTerminating {false} ;
+  bool mTerminating{false};
 };
 
 void WorkerThread::WaitAndExecute()
 {
-  while( true )
+  while(true)
   {
     Task task;
 
     {
-      std::unique_lock< std::mutex > lock{ mTaskQueueMutex };
+      std::unique_lock<std::mutex> lock{mTaskQueueMutex};
 
-      mConditionVariable.wait( lock, [ this ]() -> bool {
+      mConditionVariable.wait(lock, [this]() -> bool {
         return !mTaskQueue.empty() || mTerminating;
-      } );
+      });
 
-      if( mTerminating )
+      if(mTerminating)
       {
         break;
       }
@@ -105,10 +101,10 @@ void WorkerThread::WaitAndExecute()
       task = mTaskQueue.front();
     }
 
-    task( mIndex );
+    task(mIndex);
 
     {
-      std::lock_guard< std::mutex > lock{ mTaskQueueMutex };
+      std::lock_guard<std::mutex> lock{mTaskQueueMutex};
 
       mTaskQueue.pop();
 
@@ -117,21 +113,22 @@ void WorkerThread::WaitAndExecute()
   }
 }
 
-WorkerThread::WorkerThread(uint32_t index) : mIndex( index )
+WorkerThread::WorkerThread(uint32_t index)
+: mIndex(index)
 {
   // Have to pass "this" as an argument because WaitAndExecute is a member function.
-  mWorker = std::thread{ &WorkerThread::WaitAndExecute, this };
+  mWorker = std::thread{&WorkerThread::WaitAndExecute, this};
 }
 
 WorkerThread::~WorkerThread()
 {
-  if( mWorker.joinable() )
+  if(mWorker.joinable())
   {
     Notify();
     Wait();
 
     {
-      std::lock_guard< std::mutex > lock{ mTaskQueueMutex };
+      std::lock_guard<std::mutex> lock{mTaskQueueMutex};
       mTerminating = true;
       mConditionVariable.notify_one();
     }
@@ -140,25 +137,25 @@ WorkerThread::~WorkerThread()
   }
 }
 
-void WorkerThread::AddTask( Task task )
+void WorkerThread::AddTask(Task task)
 {
-  std::lock_guard< std::mutex > lock{ mTaskQueueMutex };
-  mTaskQueue.push( std::move( task ) );
+  std::lock_guard<std::mutex> lock{mTaskQueueMutex};
+  mTaskQueue.push(std::move(task));
   mConditionVariable.notify_one();
 }
 
 void WorkerThread::Notify()
 {
-  std::lock_guard< std::mutex > lock{ mTaskQueueMutex };
+  std::lock_guard<std::mutex> lock{mTaskQueueMutex};
   mConditionVariable.notify_one();
 }
 
 void WorkerThread::Wait()
 {
-  std::unique_lock< std::mutex > lock{ mTaskQueueMutex };
-  mConditionVariable.wait( lock, [ this ]() -> bool {
+  std::unique_lock<std::mutex> lock{mTaskQueueMutex};
+  mConditionVariable.wait(lock, [this]() -> bool {
     return mTaskQueue.empty();
-  } );
+  });
 }
 
 // ThreadPool -----------------------------------------------------------------------------------------------
@@ -166,7 +163,7 @@ void WorkerThread::Wait()
 struct ThreadPool::Impl
 {
   std::vector<std::unique_ptr<WorkerThread>> mWorkers;
-  uint32_t                                   mWorkerIndex{ 0u };
+  uint32_t                                   mWorkerIndex{0u};
 };
 
 ThreadPool::ThreadPool()
@@ -176,16 +173,16 @@ ThreadPool::ThreadPool()
 
 ThreadPool::~ThreadPool() = default;
 
-bool ThreadPool::Initialize( uint32_t threadCount )
+bool ThreadPool::Initialize(uint32_t threadCount)
 {
   /**
    * Get the system's supported thread count.
    */
   auto thread_count = threadCount + 1;
-  if( !threadCount )
+  if(!threadCount)
   {
     thread_count = std::thread::hardware_concurrency();
-    if( !thread_count )
+    if(!thread_count)
     {
       return false;
     }
@@ -194,60 +191,57 @@ bool ThreadPool::Initialize( uint32_t threadCount )
   /**
    * Spawn the worker threads.
    */
-  for( auto i = 0u; i < thread_count - 1; i++ )
+  for(auto i = 0u; i < thread_count - 1; i++)
   {
     /**
     * The workers will execute an infinite loop function
     * and will wait for a job to enter the job queue. Once a job is in the the queue
     * the threads will wake up to acquire and execute it.
     */
-    mImpl->mWorkers.push_back( make_unique< WorkerThread >( i ) );
+    mImpl->mWorkers.push_back(make_unique<WorkerThread>(i));
   }
 
   return true;
 }
 
-
 void ThreadPool::Wait()
 {
-  for( auto& worker : mImpl->mWorkers )
+  for(auto& worker : mImpl->mWorkers)
   {
     worker->Wait();
   }
 }
 
-SharedFuture ThreadPool::SubmitTask( uint32_t workerIndex, const Task& task )
+SharedFuture ThreadPool::SubmitTask(uint32_t workerIndex, const Task& task)
 {
-  auto future = std::shared_ptr< Future< void > >( new Future< void > );
-  mImpl->mWorkers[workerIndex]->AddTask( [task, future]( uint32_t index )
-                                  {
-                                    task( index );
+  auto future = std::shared_ptr<Future<void>>(new Future<void>);
+  mImpl->mWorkers[workerIndex]->AddTask([task, future](uint32_t index) {
+    task(index);
 
-                                    future->mPromise.set_value();
-                                  });
+    future->mPromise.set_value();
+  });
 
   return future;
 }
 
-SharedFuture ThreadPool::SubmitTasks( const std::vector< Task >& tasks )
+SharedFuture ThreadPool::SubmitTasks(const std::vector<Task>& tasks)
 {
-  auto future = std::shared_ptr< Future< void > >( new Future< void > );
+  auto future = std::shared_ptr<Future<void>>(new Future<void>);
 
-  mImpl->mWorkers[ mImpl->mWorkerIndex++ % static_cast< uint32_t >( mImpl->mWorkers.size() )]->AddTask(
-    [ future, tasks ]( uint32_t index ) {
-      for( auto& task : tasks )
+  mImpl->mWorkers[mImpl->mWorkerIndex++ % static_cast<uint32_t>(mImpl->mWorkers.size())]->AddTask(
+    [future, tasks](uint32_t index) {
+      for(auto& task : tasks)
       {
-        task( index );
+        task(index);
       }
 
       future->mPromise.set_value();
-
-    } );
+    });
 
   return future;
 }
 
-UniqueFutureGroup ThreadPool::SubmitTasks( const std::vector< Task >& tasks, uint32_t threadMask )
+UniqueFutureGroup ThreadPool::SubmitTasks(const std::vector<Task>& tasks, uint32_t threadMask)
 {
   auto retval = make_unique<FutureGroup<void>>();
 
@@ -257,40 +251,40 @@ UniqueFutureGroup ThreadPool::SubmitTasks( const std::vector< Task >& tasks, uin
    */
   auto threads = uint32_t(std::log2(float(tasks.size())));
 
-  if( threadMask != 0 )
+  if(threadMask != 0)
   {
     threads = threadMask;
   }
 
-  if( threads > mImpl->mWorkers.size() )
+  if(threads > mImpl->mWorkers.size())
   {
     threads = uint32_t(mImpl->mWorkers.size());
   }
-  else if( !threads )
+  else if(!threads)
   {
     threads = 1;
   }
 
   auto payloadPerThread = uint32_t(tasks.size() / threads);
-  auto remaining = uint32_t(tasks.size() % threads);
+  auto remaining        = uint32_t(tasks.size() % threads);
 
   uint32_t taskIndex = 0;
-  uint32_t taskSize = uint32_t(remaining + payloadPerThread); // add 'remaining' tasks to the very first job list
+  uint32_t taskSize  = uint32_t(remaining + payloadPerThread); // add 'remaining' tasks to the very first job list
 
-  for( auto wt = 0u; wt < threads; ++wt )
+  for(auto wt = 0u; wt < threads; ++wt)
   {
-    auto future = std::shared_ptr< Future< void > >( new Future< void > );
-    retval->mFutures.emplace_back( future );
-    mImpl->mWorkers[ mImpl->mWorkerIndex++ % static_cast< uint32_t >( mImpl->mWorkers.size() )]->AddTask(
-      [ future, tasks, taskIndex, taskSize ]( uint32_t index ) {
+    auto future = std::shared_ptr<Future<void>>(new Future<void>);
+    retval->mFutures.emplace_back(future);
+    mImpl->mWorkers[mImpl->mWorkerIndex++ % static_cast<uint32_t>(mImpl->mWorkers.size())]->AddTask(
+      [future, tasks, taskIndex, taskSize](uint32_t index) {
         auto begin = tasks.begin() + int(taskIndex);
-        auto end = begin + int(taskSize);
-        for( auto it = begin; it < end; ++it )
+        auto end   = begin + int(taskSize);
+        for(auto it = begin; it < end; ++it)
         {
-          (*it)( index );
+          (*it)(index);
         }
         future->mPromise.set_value();
-      } );
+      });
 
     taskIndex += taskSize;
     taskSize = payloadPerThread;

@@ -51,24 +51,24 @@ public:
   /**
    * Destructor
    */
-  virtual ~SceneControllerImpl();
+  ~SceneControllerImpl() override;
 
 public:  // from SceneController
 
   /**
    * @copydoc SceneController::GetRenderMessageDispatcher()
    */
-  virtual RenderMessageDispatcher& GetRenderMessageDispatcher() { return mRenderMessageDispatcher; }
+  RenderMessageDispatcher& GetRenderMessageDispatcher() override { return mRenderMessageDispatcher; }
 
   /**
    * @copydoc SceneController::GetRenderQueue()
    */
-  virtual RenderQueue& GetRenderQueue() { return mRenderQueue; }
+  RenderQueue& GetRenderQueue() override { return mRenderQueue; }
 
   /**
    * @copydoc SceneController::GetDiscardQueue()
    */
-  virtual DiscardQueue& GetDiscardQueue() { return mDiscardQueue; }
+  DiscardQueue& GetDiscardQueue() override { return mDiscardQueue; }
 
 private:
 

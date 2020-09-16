@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_RENDER_CONTROLLER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,8 @@
 
 namespace Dali
 {
-
 namespace Integration
 {
-
 /**
  * Abstract interface for an object which controls rendering.
  * This will be informed when Dali has new content to render.
@@ -31,29 +29,28 @@ namespace Integration
 class RenderController
 {
 protected:
-
   /**
    * Virtual protected destructor, no deletion through this interface
    */
-  virtual ~RenderController() {}
+  virtual ~RenderController()
+  {
+  }
 
 public:
-
   /**
    * Requests a future call to Dali::Integration::Core::Update().
    * This is called when Dali has new content, typically in response to Actors/Animations being added.
    * Multi-threading note: this method will be called from the main thread only.
    * @param[in] forceUpdate true to update forcely.
    */
-  virtual void RequestUpdate( bool forceUpdate ) = 0;
+  virtual void RequestUpdate(bool forceUpdate) = 0;
 
   /**
    * Requests a future call to Dali::Integration::Core::ProcessEvents(), when the application is idle.
    * Multi-threading note: this method will be called from the main thread only.
    * @param[in] forceProcess true to process events forcely.
    */
-  virtual void RequestProcessEventsOnIdle( bool forceProcess ) = 0;
-
+  virtual void RequestProcessEventsOnIdle(bool forceProcess) = 0;
 };
 
 } // namespace Integration

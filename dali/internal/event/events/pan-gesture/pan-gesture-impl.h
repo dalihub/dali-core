@@ -31,7 +31,7 @@ namespace Internal
 {
 
 class PanGesture;
-typedef IntrusivePtr< PanGesture > PanGesturePtr;
+using PanGesturePtr = IntrusivePtr<PanGesture>;
 
 /**
  * @copydoc Dali::PanGesture
@@ -213,7 +213,7 @@ private:
    *
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~PanGesture() = default;
+  ~PanGesture() override = default;
 
 private:
   Vector2 mVelocity;

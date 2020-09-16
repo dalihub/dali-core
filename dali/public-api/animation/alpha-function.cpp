@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,43 +22,48 @@
 
 namespace Dali
 {
-
 namespace
 {
-constexpr uint32_t BitMaskOfN( uint32_t bits )
+constexpr uint32_t BitMaskOfN(uint32_t bits)
 {
-  return ( 1 << bits ) - 1;
+  return (1 << bits) - 1;
 }
 
 } // unnamed namespace
 
 AlphaFunction::AlphaFunction()
-:mBezierControlPoints(Vector4::ZERO),
- mCustom(0),
- mBuiltin(DEFAULT),
- mMode(BUILTIN_FUNCTION)
-{}
+: mBezierControlPoints(Vector4::ZERO),
+  mCustom(nullptr),
+  mBuiltin(DEFAULT),
+  mMode(BUILTIN_FUNCTION)
+{
+}
 
-AlphaFunction::AlphaFunction( BuiltinFunction function)
-:mBezierControlPoints(Vector4::ZERO),
- mCustom(0),
- mBuiltin(function),
- mMode(BUILTIN_FUNCTION)
-{}
+AlphaFunction::AlphaFunction(BuiltinFunction function)
+: mBezierControlPoints(Vector4::ZERO),
+  mCustom(nullptr),
+  mBuiltin(function),
+  mMode(BUILTIN_FUNCTION)
+{
+}
 
-AlphaFunction::AlphaFunction( AlphaFunctionPrototype function)
-:mBezierControlPoints(Vector4::ZERO),
- mCustom(function),
- mBuiltin(DEFAULT),
- mMode(CUSTOM_FUNCTION)
-{}
+AlphaFunction::AlphaFunction(AlphaFunctionPrototype function)
+: mBezierControlPoints(Vector4::ZERO),
+  mCustom(function),
+  mBuiltin(DEFAULT),
+  mMode(CUSTOM_FUNCTION)
+{
+}
 
-AlphaFunction::AlphaFunction( const Vector2& controlPoint0, const Vector2& controlPoint1 )
-:mBezierControlPoints(Vector4(Clamp(controlPoint0.x,0.0f,1.0f),controlPoint0.y,
-                              Clamp(controlPoint1.x,0.0f,1.0f),controlPoint1.y)),
- mCustom(0),
- mBuiltin(DEFAULT),
- mMode(BEZIER)
+AlphaFunction::AlphaFunction(const Vector2& controlPoint0, const Vector2& controlPoint1)
+: mBezierControlPoints(
+    Vector4(Clamp(controlPoint0.x, 0.0f, 1.0f),
+            controlPoint0.y,
+            Clamp(controlPoint1.x, 0.0f, 1.0f),
+            controlPoint1.y)),
+  mCustom(nullptr),
+  mBuiltin(DEFAULT),
+  mMode(BEZIER)
 {
 }
 
@@ -74,12 +79,12 @@ AlphaFunctionPrototype AlphaFunction::GetCustomFunction() const
 
 AlphaFunction::BuiltinFunction AlphaFunction::GetBuiltinFunction() const
 {
-  return static_cast<AlphaFunction::BuiltinFunction>( mBuiltin & BitMaskOfN( Log<COUNT>::value + 1 ) );
+  return static_cast<AlphaFunction::BuiltinFunction>(mBuiltin & BitMaskOfN(Log<COUNT>::value + 1));
 }
 
 AlphaFunction::Mode AlphaFunction::GetMode() const
 {
-  return static_cast<AlphaFunction::Mode>( mMode & BitMaskOfN( 2 ) );
+  return static_cast<AlphaFunction::Mode>(mMode & BitMaskOfN(2));
 }
 
 } // namespace Dali

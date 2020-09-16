@@ -71,7 +71,7 @@ public:
   /**
    * virtual destructor
    */
-  virtual ~Scene();
+  ~Scene() override;
 
   /**
    * @copydoc Dali::Integration::Scene::Add
@@ -266,13 +266,13 @@ public:
    * From RenderTaskDefaults; retrieve the default root actor.
    * @return The default root actor.
    */
-  virtual Actor& GetDefaultRootActor();
+  Actor& GetDefaultRootActor() override;
 
   /**
    * From RenderTaskDefaults; retrieve the default camera actor.
    * @return The default camera actor.
    */
-  virtual CameraActor& GetDefaultCameraActor();
+  CameraActor& GetDefaultCameraActor() override;
 
 private:
 

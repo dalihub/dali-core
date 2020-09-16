@@ -762,11 +762,11 @@ void Texture::Initialize(Context& context)
     {
       if( !mIsCompressed )
       {
-        context.TexImage2D(GL_TEXTURE_2D, 0, mGlInternalFormat, mWidth, mHeight, 0, mGlFormat, mPixelDataType, 0 );
+        context.TexImage2D(GL_TEXTURE_2D, 0, mGlInternalFormat, mWidth, mHeight, 0, mGlFormat, mPixelDataType, nullptr );
       }
       else
       {
-        context.CompressedTexImage2D(GL_TEXTURE_2D, 0, mGlInternalFormat, mWidth, mHeight, 0, 0, 0 );
+        context.CompressedTexImage2D(GL_TEXTURE_2D, 0, mGlInternalFormat, mWidth, mHeight, 0, 0, nullptr );
       }
     }
     else if( mType == TextureType::TEXTURE_CUBE )
@@ -775,14 +775,14 @@ void Texture::Initialize(Context& context)
       {
         for( uint32_t i(0); i<6; ++i )
         {
-          context.TexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, mGlInternalFormat, mWidth, mHeight, 0, mGlFormat, mPixelDataType, 0 );
+          context.TexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, mGlInternalFormat, mWidth, mHeight, 0, mGlFormat, mPixelDataType, nullptr );
         }
       }
       else
       {
         for( uint32_t i(0); i<6; ++i )
         {
-          context.CompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, mGlInternalFormat, mWidth, mHeight, 0, 0, 0 );
+          context.CompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, mGlInternalFormat, mWidth, mHeight, 0, 0, nullptr );
         }
       }
       context.TexParameteri( mTarget, GL_TEXTURE_WRAP_R, GL_WRAP_DEFAULT );
@@ -792,7 +792,7 @@ void Texture::Initialize(Context& context)
 
 void Texture::Upload( Context& context, PixelDataPtr pixelData, const Internal::Texture::UploadParams& params  )
 {
-  DALI_ASSERT_ALWAYS( mNativeImage == NULL );
+  DALI_ASSERT_ALWAYS( mNativeImage == nullptr );
 
   //Get pointer to the data of the PixelData object
   uint8_t* buffer( pixelData->GetBuffer() );

@@ -23,12 +23,10 @@
 
 namespace Dali
 {
-
 namespace DevelKeyEvent
 {
-
 /**
- * @brief Creates an initialized WheelEvent.
+ * @brief Creates an initialized KeyEvent.
  *
  * @SINCE_1_9.27
  * @param[in]  keyName         The name of the key pressed or command from the IMF, if later then the some following parameters will be needed.
@@ -44,17 +42,17 @@ namespace DevelKeyEvent
  * @param[in]  deviceSubclass  The subclass of device the key event originated from
  * @return A handle to a newly allocated Dali resource
  */
-DALI_CORE_API KeyEvent New( const std::string& keyName,
-                            const std::string& logicalKey,
-                            const std::string& keyString,
-                            int keyCode,
-                            int keyModifier,
-                            unsigned long timeStamp,
-                            const Dali::KeyEvent::State& keyState,
-                            const std::string& compose,
-                            const std::string& deviceName,
-                            const Device::Class::Type deviceClass,
-                            const Device::Subclass::Type deviceSubclass );
+DALI_CORE_API KeyEvent New(const std::string&           keyName,
+                           const std::string&           logicalKey,
+                           const std::string&           keyString,
+                           int                          keyCode,
+                           int                          keyModifier,
+                           unsigned long                timeStamp,
+                           const Dali::KeyEvent::State& keyState,
+                           const std::string&           compose,
+                           const std::string&           deviceName,
+                           const Device::Class::Type    deviceClass,
+                           const Device::Subclass::Type deviceSubclass);
 
 /**
  * @brief Set the name given to the key pressed
@@ -63,7 +61,7 @@ DALI_CORE_API KeyEvent New( const std::string& keyName,
  * @param[in] keyEvent The instance of KeyEvent.
  * @param[in] keyName The name given to the key pressed.
  */
-void SetKeyName( KeyEvent keyEvent, const std::string& keyName );
+DALI_CORE_API void SetKeyName(KeyEvent keyEvent, const std::string& keyName);
 
 /**
  * @brief Set the actual string of input characters that should be used for input editors.
@@ -72,7 +70,7 @@ void SetKeyName( KeyEvent keyEvent, const std::string& keyName );
  * @param[in] keyEvent The instance of KeyEvent.
  * @param[in] keyString The actual string of input characters
  */
-void SetKeyString( KeyEvent keyEvent, const std::string& keyString );
+DALI_CORE_API void SetKeyString(KeyEvent keyEvent, const std::string& keyString);
 
 /**
  * @brief Set the unique key code for the key pressed.
@@ -81,7 +79,7 @@ void SetKeyString( KeyEvent keyEvent, const std::string& keyString );
  * @param[in] keyEvent The instance of KeyEvent.
  * @param[in] keyCode The unique key code for the key pressed
  */
-void SetKeyCode( KeyEvent keyEvent, int32_t keyCode );
+DALI_CORE_API void SetKeyCode(KeyEvent keyEvent, int32_t keyCode);
 
 /**
  * @brief Set the key modifier for special keys like Shift, Alt and Ctrl which modify the next key pressed.
@@ -90,7 +88,7 @@ void SetKeyCode( KeyEvent keyEvent, int32_t keyCode );
  * @param[in] keyEvent The instance of KeyEvent.
  * @param[in] keyModifier The key modifier
  */
-void SetKeyModifier( KeyEvent keyEvent, int32_t keyModifier );
+DALI_CORE_API void SetKeyModifier(KeyEvent keyEvent, int32_t keyModifier);
 
 /**
  * @brief Set the time (in ms) that the key event occurred.
@@ -99,7 +97,7 @@ void SetKeyModifier( KeyEvent keyEvent, int32_t keyModifier );
  * @param[in] keyEvent The instance of KeyEvent.
  * @param[in] time The time (in ms)
  */
-void SetTime( KeyEvent keyEvent, unsigned long time );
+DALI_CORE_API void SetTime(KeyEvent keyEvent, unsigned long time);
 
 /**
  * @brief Set the state of the key event.
@@ -108,7 +106,7 @@ void SetTime( KeyEvent keyEvent, unsigned long time );
  * @param[in] keyEvent The instance of KeyEvent.
  * @param[in] state The state of the key event
  */
-void SetState( KeyEvent keyEvent, const KeyEvent::State& state );
+DALI_CORE_API void SetState(KeyEvent keyEvent, const KeyEvent::State& state);
 
 } // namespace DevelKeyEvent
 

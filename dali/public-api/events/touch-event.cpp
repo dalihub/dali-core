@@ -19,98 +19,97 @@
 #include <dali/public-api/events/touch-event.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/actors/actor.h>
 #include <dali/internal/event/events/touch-event-impl.h>
+#include <dali/public-api/actors/actor.h>
 
 #include <cstdio>
 
 namespace Dali
 {
-
 TouchEvent::TouchEvent() = default;
 
-TouchEvent::TouchEvent( const TouchEvent& other ) = default;
+TouchEvent::TouchEvent(const TouchEvent& other) = default;
 
-TouchEvent::TouchEvent( TouchEvent&& other ) = default;
+TouchEvent::TouchEvent(TouchEvent&& other) = default;
 
 TouchEvent::~TouchEvent() = default;
 
-TouchEvent& TouchEvent::operator=( const TouchEvent& other ) = default;
+TouchEvent& TouchEvent::operator=(const TouchEvent& other) = default;
 
-TouchEvent& TouchEvent::operator=( TouchEvent&& other ) = default;
+TouchEvent& TouchEvent::operator=(TouchEvent&& other) = default;
 
 unsigned long TouchEvent::GetTime() const
 {
-  return GetImplementation( *this ).GetTime();
+  return GetImplementation(*this).GetTime();
 }
 
 std::size_t TouchEvent::GetPointCount() const
 {
-  return GetImplementation( *this ).GetPointCount();
+  return GetImplementation(*this).GetPointCount();
 }
 
-int32_t TouchEvent::GetDeviceId( std::size_t point ) const
+int32_t TouchEvent::GetDeviceId(std::size_t point) const
 {
-  return GetImplementation( *this ).GetDeviceId( point );
+  return GetImplementation(*this).GetDeviceId(point);
 }
 
-PointState::Type TouchEvent::GetState( std::size_t point ) const
+PointState::Type TouchEvent::GetState(std::size_t point) const
 {
-  return GetImplementation( *this ).GetState( point );
+  return GetImplementation(*this).GetState(point);
 }
 
-Actor TouchEvent::GetHitActor( std::size_t point ) const
+Actor TouchEvent::GetHitActor(std::size_t point) const
 {
-  return GetImplementation( *this ).GetHitActor( point );
+  return GetImplementation(*this).GetHitActor(point);
 }
 
-const Vector2& TouchEvent::GetLocalPosition( std::size_t point ) const
+const Vector2& TouchEvent::GetLocalPosition(std::size_t point) const
 {
-  return GetImplementation( *this ).GetLocalPosition( point );
+  return GetImplementation(*this).GetLocalPosition(point);
 }
 
-const Vector2& TouchEvent::GetScreenPosition( std::size_t point ) const
+const Vector2& TouchEvent::GetScreenPosition(std::size_t point) const
 {
-  return GetImplementation( *this ).GetScreenPosition( point );
+  return GetImplementation(*this).GetScreenPosition(point);
 }
 
-float TouchEvent::GetRadius( std::size_t point ) const
+float TouchEvent::GetRadius(std::size_t point) const
 {
-  return GetImplementation( *this ).GetRadius( point );
+  return GetImplementation(*this).GetRadius(point);
 }
 
-const Vector2& TouchEvent::GetEllipseRadius( std::size_t point ) const
+const Vector2& TouchEvent::GetEllipseRadius(std::size_t point) const
 {
-  return GetImplementation( *this ).GetEllipseRadius( point );
+  return GetImplementation(*this).GetEllipseRadius(point);
 }
 
-float TouchEvent::GetPressure( std::size_t point ) const
+float TouchEvent::GetPressure(std::size_t point) const
 {
-  return GetImplementation( *this ).GetPressure( point );
+  return GetImplementation(*this).GetPressure(point);
 }
 
-Degree TouchEvent::GetAngle( std::size_t point ) const
+Degree TouchEvent::GetAngle(std::size_t point) const
 {
-  return GetImplementation( *this ).GetAngle( point );
+  return GetImplementation(*this).GetAngle(point);
 }
 
-Device::Class::Type TouchEvent::GetDeviceClass( std::size_t point ) const
+Device::Class::Type TouchEvent::GetDeviceClass(std::size_t point) const
 {
-  return GetImplementation( *this ).GetDeviceClass( point );
+  return GetImplementation(*this).GetDeviceClass(point);
 }
 
-Device::Subclass::Type TouchEvent::GetDeviceSubclass( std::size_t point ) const
+Device::Subclass::Type TouchEvent::GetDeviceSubclass(std::size_t point) const
 {
-  return GetImplementation( *this ).GetDeviceSubclass( point );
+  return GetImplementation(*this).GetDeviceSubclass(point);
 }
 
-MouseButton::Type TouchEvent::GetMouseButton( std::size_t point ) const
+MouseButton::Type TouchEvent::GetMouseButton(std::size_t point) const
 {
-  return GetImplementation( *this ).GetMouseButton( point );
+  return GetImplementation(*this).GetMouseButton(point);
 }
 
-TouchEvent::TouchEvent( Internal::TouchEvent* internal )
-: BaseHandle( internal )
+TouchEvent::TouchEvent(Internal::TouchEvent* internal)
+: BaseHandle(internal)
 {
 }
 

@@ -2,7 +2,7 @@
 #define DALI_PROPERTY_KEY_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
-#include <string>
 #include <sstream>
+#include <string>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -47,10 +47,10 @@ struct DALI_CORE_API Property::Key
   {
     INDEX, ///< The key is a Property::Index
     STRING ///< The key is a string
-  } type; ///< The type of the key
+  } type;  ///< The type of the key
 
-  Property::Index indexKey; ///< The index key.
-  std::string stringKey; ///< The string key.
+  Property::Index indexKey;  ///< The index key.
+  std::string     stringKey; ///< The string key.
 
   /**
    * @brief Constructor
@@ -58,7 +58,7 @@ struct DALI_CORE_API Property::Key
    *
    * @param[in] key The string key
    */
-  Key( const std::string& key );
+  Key(const std::string& key);
 
   /**
    * @brief Constructor
@@ -66,7 +66,7 @@ struct DALI_CORE_API Property::Key
    *
    * @param[in] key The string key as a const char *
    */
-  Key( const char * key );
+  Key(const char* key);
 
   /**
    * @brief Constructor
@@ -74,7 +74,7 @@ struct DALI_CORE_API Property::Key
    *
    * @param[in] key The index key
    */
-  Key( Property::Index key );
+  Key(Property::Index key);
 
   /**
    * @brief The equality operator
@@ -83,7 +83,7 @@ struct DALI_CORE_API Property::Key
    * @param[in] rhs A string key to compare against.
    * @return true if the key compares, or false if it isn't equal or of the wrong type
    */
-  bool operator== (const std::string& rhs);
+  bool operator==(const std::string& rhs);
 
   /**
    * @brief Constructor
@@ -92,7 +92,7 @@ struct DALI_CORE_API Property::Key
    * @param[in] key The string key as a const char *
    * @return true if the key compares, or false if it isn't equal or of the wrong type
    */
-  bool operator== ( const char * key );
+  bool operator==(const char* key);
 
   /**
    * @brief The equality operator
@@ -101,7 +101,7 @@ struct DALI_CORE_API Property::Key
    * @param[in] rhs An index key to compare against.
    * @return true if the key compares, or false if it isn't equal or of the wrong type
    */
-  bool operator== (Property::Index rhs);
+  bool operator==(Property::Index rhs);
 
   /**
    * @brief The equality operator
@@ -110,7 +110,7 @@ struct DALI_CORE_API Property::Key
    * @param[in] rhs A key  to compare against.
    * @return true if the keys are of the same type and have the same value
    */
-  bool operator== (const Key& rhs);
+  bool operator==(const Key& rhs);
 
   /**
    * @brief The inequality operator
@@ -119,7 +119,7 @@ struct DALI_CORE_API Property::Key
    * @param[in] rhs A string key to compare against.
    * @return true if the key is not equal or not a string key
    */
-  bool operator!= (const std::string& rhs);
+  bool operator!=(const std::string& rhs);
 
   /**
    * @brief The inequality operator
@@ -128,7 +128,7 @@ struct DALI_CORE_API Property::Key
    * @param[in] rhs A const char* key to compare against.
    * @return true if the key is not equal or not a string key
    */
-  bool operator!= ( const char* rhs );
+  bool operator!=(const char* rhs);
 
   /**
    * @brief The inequality operator
@@ -137,7 +137,7 @@ struct DALI_CORE_API Property::Key
    * @param[in] rhs An index key to compare against.
    * @return true if the key is not equal, or not an index key
    */
-  bool operator!= (Property::Index rhs);
+  bool operator!=(Property::Index rhs);
 
   /**
    * @brief The inequality operator
@@ -146,7 +146,7 @@ struct DALI_CORE_API Property::Key
    * @param[in] rhs A key to compare against.
    * @return true if the keys are not of the same type or are not equal
    */
-  bool operator!= (const Key& rhs);
+  bool operator!=(const Key& rhs);
 };
 
 /**
@@ -157,8 +157,7 @@ struct DALI_CORE_API Property::Key
  * @param [in] key the key to convert
  * @return The output stream operator.
  */
-DALI_CORE_API std::ostream& operator<<( std::ostream& stream, const Property::Key& key );
-
+DALI_CORE_API std::ostream& operator<<(std::ostream& stream, const Property::Key& key);
 
 /**
  * @}

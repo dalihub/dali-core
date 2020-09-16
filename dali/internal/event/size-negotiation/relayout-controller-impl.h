@@ -58,7 +58,7 @@ public:
   /**
    * Destructor
    */
-  virtual ~RelayoutController();
+  ~RelayoutController() override;
 
   /**
    * @brief Get the singleton of RelayoutController object.

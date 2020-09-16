@@ -31,7 +31,7 @@ namespace Internal
 {
 
 class RotationGesture;
-typedef IntrusivePtr< RotationGesture > RotationGesturePtr;
+using RotationGesturePtr = IntrusivePtr<RotationGesture>;
 
 /**
  * @copydoc Dali::RotationGesture
@@ -111,7 +111,7 @@ private:
    *
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~RotationGesture() = default;
+  ~RotationGesture() override = default;
 
 private:
   Radian mRotation;

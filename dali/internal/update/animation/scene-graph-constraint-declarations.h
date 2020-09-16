@@ -33,8 +33,8 @@ namespace SceneGraph
 
 class ConstraintBase;
 
-typedef OwnerContainer< ConstraintBase* > ConstraintOwnerContainer;
-typedef ConstraintOwnerContainer::Iterator ConstraintIter;
+using ConstraintOwnerContainer = OwnerContainer<ConstraintBase *>;
+using ConstraintIter           = ConstraintOwnerContainer::Iterator;
 
 } // namespace SceneGraph
 

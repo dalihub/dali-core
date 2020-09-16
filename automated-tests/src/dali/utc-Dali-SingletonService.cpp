@@ -16,22 +16,27 @@
  */
 
 // EXTERNAL INCLUDES
-#include <stdlib.h>
-#include <iostream>
-#include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/common/singleton-service.h>
+#include <dali/public-api/dali-core.h>
+#include <stdlib.h>
+
+#include <iostream>
 
 using namespace Dali;
 
 namespace
 {
-
 class TestHandle : public BaseHandle
 {
 public:
-  TestHandle() {}
-  TestHandle( BaseObject* object ) : BaseHandle( object ) {}
+  TestHandle()
+  {
+  }
+  TestHandle(BaseObject* object)
+  : BaseHandle(object)
+  {
+  }
 };
 
 class TestObject : public BaseObject
@@ -55,30 +60,30 @@ int UtcDaliSingletonServiceGet(void)
   // Attempt to retrieve SingletonService before creating application
   SingletonService singletonService;
   singletonService = SingletonService::Get();
-  DALI_TEST_CHECK( !singletonService );
+  DALI_TEST_CHECK(!singletonService);
 
   // Create Application class, should be able to retrieve SingletonService now
   TestApplication application;
   singletonService = SingletonService::Get();
-  DALI_TEST_CHECK( singletonService );
+  DALI_TEST_CHECK(singletonService);
 
   END_TEST;
 }
 
 int UtcDaliSingletonServiceRegisterAndGetSingleton(void)
 {
-  TestApplication application;
-  SingletonService singletonService( SingletonService::Get() );
+  TestApplication  application;
+  SingletonService singletonService(SingletonService::Get());
 
   // Attempt to register an empty handle
   TestHandle handle;
-  singletonService.Register( typeid( handle ), handle );
-  DALI_TEST_CHECK( !singletonService.GetSingleton( typeid( handle ) ) );
+  singletonService.Register(typeid(handle), handle);
+  DALI_TEST_CHECK(!singletonService.GetSingleton(typeid(handle)));
 
   // Create an actor instance and retrieve, should be valid this time
-  handle = TestHandle( new TestObject );
-  singletonService.Register( typeid( handle ), handle );
-  DALI_TEST_CHECK( singletonService.GetSingleton( typeid( handle ) ) );
+  handle = TestHandle(new TestObject);
+  singletonService.Register(typeid(handle), handle);
+  DALI_TEST_CHECK(singletonService.GetSingleton(typeid(handle)));
 
   END_TEST;
 }

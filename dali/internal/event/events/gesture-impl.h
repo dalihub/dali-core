@@ -30,7 +30,7 @@ namespace Internal
 {
 
 class Gesture;
-typedef IntrusivePtr<Gesture> GesturePtr;
+using GesturePtr = IntrusivePtr<Gesture>;
 
 /**
  * This is the abstract base structure for any gestures that the adaptor detects and wishes to send
@@ -111,7 +111,7 @@ protected:
    *
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~Gesture() = default;
+  ~Gesture() override = default;
 
 private:
   GestureType::Value mGestureType;

@@ -24,7 +24,6 @@
 
 namespace Dali
 {
-
 namespace Internal DALI_INTERNAL
 {
 class PanGesture;
@@ -51,10 +50,9 @@ class PanGesture;
  * A pan gesture will continue to be sent to the actor under than initial pan until it ends.
  * @SINCE_1_9.28
  */
-class DALI_CORE_API PanGesture: public Gesture
+class DALI_CORE_API PanGesture : public Gesture
 {
 public:
-
   /**
    * @brief Creates an uninitialized PanGesture handle.
    *
@@ -68,14 +66,14 @@ public:
    * @SINCE_1_9.28
    * @param[in] rhs A reference to the copied handle
    */
-  PanGesture( const PanGesture& rhs );
+  PanGesture(const PanGesture& rhs);
 
   /**
    * @brief Move constructor.
    * @SINCE_1_9.28
    * @param[in] rhs A reference to the moved handle
    */
-  PanGesture( PanGesture&& rhs );
+  PanGesture(PanGesture&& rhs);
 
   /**
    * @brief Assignment operator.
@@ -83,7 +81,7 @@ public:
    * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
-  PanGesture& operator=( const PanGesture& rhs );
+  PanGesture& operator=(const PanGesture& rhs);
 
   /**
    * @brief Move assignment operator.
@@ -91,7 +89,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  PanGesture& operator=( PanGesture&& rhs );
+  PanGesture& operator=(PanGesture&& rhs);
 
   /**
    * @brief Non virtual destructor.
@@ -211,7 +209,6 @@ public:
   float GetScreenDistance() const;
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief This constructor is used internally to Create an initialized PanGesture handle.
@@ -219,9 +216,8 @@ public: // Not intended for application developers
    * @param[in] panGesture A pointer to a newly allocated Dali resource
    * @SINCE_1_9.28
    */
-  explicit DALI_INTERNAL PanGesture( Internal::PanGesture* panGesture );
+  explicit DALI_INTERNAL PanGesture(Internal::PanGesture* panGesture);
   /// @endcond
-
 };
 
 /**

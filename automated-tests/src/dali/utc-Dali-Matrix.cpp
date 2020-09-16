@@ -15,15 +15,14 @@
  *
  */
 
+#include <dali-test-suite-utils.h>
+#include <dali/public-api/dali-core.h>
+#include <stdlib.h>
+
 #include <iostream>
 #include <sstream>
 
-#include <stdlib.h>
-#include <dali/public-api/dali-core.h>
-#include <dali-test-suite-utils.h>
-
 using namespace Dali;
-
 
 void utc_dali_matrix_startup(void)
 {
@@ -35,7 +34,6 @@ void utc_dali_matrix_cleanup(void)
   test_return_value = TET_PASS;
 }
 
-
 int UtcDaliMatrixConstructor01P(void)
 {
   // State of memory cannot be guaranteed, so use
@@ -44,11 +42,11 @@ int UtcDaliMatrixConstructor01P(void)
 
   memset(buffer, 1, sizeof(Matrix));
 
-  Matrix* m2 = new(&buffer) Matrix(false);
-  bool initialisation_occured = false;
+  Matrix* m2                     = new(&buffer) Matrix(false);
+  bool    initialisation_occured = false;
   {
     float* els = m2->AsFloat();
-    for(size_t idx=0; idx<16; ++idx, ++els)
+    for(size_t idx = 0; idx < 16; ++idx, ++els)
     {
       if(*els == 0.0f)
         initialisation_occured = true;
@@ -62,13 +60,13 @@ int UtcDaliMatrixConstructor01P(void)
 
 int UtcDaliMatrixConstructor02P(void)
 {
-  float r[] = { 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f};
+  float  r[] = {1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f};
   Matrix m(r);
 
-  float* els = m.AsFloat();
-  float* init = r;
-  bool initialised = true;
-  for(size_t idx=0; idx<16; ++idx, ++els, ++init)
+  float* els         = m.AsFloat();
+  float* init        = r;
+  bool   initialised = true;
+  for(size_t idx = 0; idx < 16; ++idx, ++els, ++init)
   {
     if(*els != *init)
       initialised = false;
@@ -80,15 +78,15 @@ int UtcDaliMatrixConstructor02P(void)
 
 int UtcDaliMatrixConstructor03P(void)
 {
-  float r[] = { 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f};
+  float r[] = {1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f};
 
   Matrix ma(r);
   Matrix mb(ma);
 
-  float* els = ma.AsFloat();
-  float* init = mb.AsFloat();
-  bool initialised = true;
-  for(size_t idx=0; idx<16; ++idx, ++els, ++init)
+  float* els         = ma.AsFloat();
+  float* init        = mb.AsFloat();
+  bool   initialised = true;
+  for(size_t idx = 0; idx < 16; ++idx, ++els, ++init)
   {
     if(*els != *init)
       initialised = false;
@@ -101,15 +99,15 @@ int UtcDaliMatrixConstructor03P(void)
 int UtcDaliMatrixConstructor04P(void)
 {
   Quaternion q(Quaternion::IDENTITY);
-  Matrix m(q);
+  Matrix     m(q);
   DALI_TEST_EQUALS(Matrix(Matrix::IDENTITY), m, 0.001, TEST_LOCATION);
   END_TEST;
 }
 
 int UtcDaliMatrixCopyConstructor(void)
 {
-  Matrix m0( Matrix::IDENTITY );
-  Matrix m1( m0 );
+  Matrix m0(Matrix::IDENTITY);
+  Matrix m1(m0);
   DALI_TEST_EQUALS(m1, Matrix::IDENTITY, 0.001f, TEST_LOCATION);
 
   END_TEST;
@@ -117,8 +115,8 @@ int UtcDaliMatrixCopyConstructor(void)
 
 int UtcDaliMatrixMoveConstructor(void)
 {
-  Matrix m0( Matrix::IDENTITY );
-  Matrix m1 = std::move( m0 );
+  Matrix m0(Matrix::IDENTITY);
+  Matrix m1 = std::move(m0);
   DALI_TEST_EQUALS(m1, Matrix::IDENTITY, 0.001f, TEST_LOCATION);
 
   END_TEST;
@@ -126,7 +124,7 @@ int UtcDaliMatrixMoveConstructor(void)
 
 int UtcDaliMatrixCopyAssignment(void)
 {
-  Matrix m0( Matrix::IDENTITY );
+  Matrix m0(Matrix::IDENTITY);
   Matrix m1;
   m1 = m0;
   DALI_TEST_EQUALS(m1, Matrix::IDENTITY, 0.001f, TEST_LOCATION);
@@ -136,9 +134,9 @@ int UtcDaliMatrixCopyAssignment(void)
 
 int UtcDaliMatrixMoveAssignment(void)
 {
-  Matrix m0( Matrix::IDENTITY );
+  Matrix m0(Matrix::IDENTITY);
   Matrix m1;
-  m1 = std::move( m0 );
+  m1 = std::move(m0);
   DALI_TEST_EQUALS(m1, Matrix::IDENTITY, 0.001f, TEST_LOCATION);
 
   END_TEST;
@@ -162,10 +160,7 @@ int UtcDaliMatrixAssign02P(void)
 
 int UtcDaliMatrixSetIdentityP(void)
 {
-  float els[] = { 0.0f,  1.0f,  2.0f,  3.0f,
-                  4.0f,  5.0f,  6.0f,  7.0f,
-                  8.0f,  9.0f, 10.0f, 11.0f,
-                  12.0f, 13.0f, 14.0f, 15.0f };
+  float  els[] = {0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f};
   Matrix m(els);
   m.SetIdentity();
 
@@ -175,17 +170,11 @@ int UtcDaliMatrixSetIdentityP(void)
 
 int UtcDaliMatrixSetIdentityAndScaleP(void)
 {
-  float els[] = { 0.0f,  1.0f,  2.0f,  3.0f,
-                  4.0f,  5.0f,  6.0f,  7.0f,
-                  8.0f,  9.0f, 10.0f, 11.0f,
-                  12.0f, 13.0f, 14.0f, 15.0f };
+  float  els[] = {0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f};
   Matrix m(els);
   m.SetIdentityAndScale(Vector3(4.0f, 4.0f, 4.0f));
 
-  float els2[] = { 4.0f, 0.0f, 0.0f, 0.0f,
-                   0.0f, 4.0f, 0.0f, 0.0f,
-                   0.0f, 0.0f, 4.0f, 0.0f,
-                   0.0f, 0.0f, 0.0f, 1.0f };
+  float  els2[] = {4.0f, 0.0f, 0.0f, 0.0f, 0.0f, 4.0f, 0.0f, 0.0f, 0.0f, 0.0f, 4.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
   Matrix r(els2);
 
   DALI_TEST_EQUALS(m, r, 0.001f, TEST_LOCATION);
@@ -194,22 +183,22 @@ int UtcDaliMatrixSetIdentityAndScaleP(void)
 
 int UtcDaliMatrixInvertTransformP(void)
 {
-  for (int i=0;i<1000;++i)
+  for(int i = 0; i < 1000; ++i)
   {
-    float f = i;
-    Vector3 axis(cosf(f*0.001f), cosf(f*0.02f), cosf(f*0.03f));
+    float   f = i;
+    Vector3 axis(cosf(f * 0.001f), cosf(f * 0.02f), cosf(f * 0.03f));
     axis.Normalize();
-    Vector3 center(f, cosf(f) * 100.0f, cosf(f*0.5f) * 50.0f);
+    Vector3 center(f, cosf(f) * 100.0f, cosf(f * 0.5f) * 50.0f);
 
     Matrix m0;
     m0.SetIdentity();
-    m0.SetTransformComponents( Vector3::ONE, Quaternion(Radian(1.0f), axis), center );
+    m0.SetTransformComponents(Vector3::ONE, Quaternion(Radian(1.0f), axis), center);
 
     Matrix m1;
     m0.InvertTransform(m1);
 
-    Matrix m2( false );
-    Matrix::Multiply( m2, m0, m1 );
+    Matrix m2(false);
+    Matrix::Multiply(m2, m0, m1);
 
     DALI_TEST_EQUALS(m2, Matrix::IDENTITY, 0.001f, TEST_LOCATION);
   }
@@ -218,77 +207,65 @@ int UtcDaliMatrixInvertTransformP(void)
 
 int UtcDaliMatrixInvertTransformN(void)
 {
-  std::string exceptionString( "EqualsZero( mMatrix[3] ) && EqualsZero( mMatrix[7] ) && EqualsZero( mMatrix[11] ) && Equals( mMatrix[15], 1.0f" );
+  std::string exceptionString("EqualsZero(mMatrix[3]) && EqualsZero(mMatrix[7]) && EqualsZero(mMatrix[11]) && Equals(mMatrix[15], 1.0f");
   try
   {
-    float els[] = { 0.0f,  1.0f,  2.0f,  3.0f,
-                    4.0f,  5.0f,  6.0f,  7.0f,
-                    8.0f,  9.0f, 10.0f, 11.0f,
-                    12.0f, 13.0f, 14.0f, 15.0f };
+    float  els[] = {0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f};
     Matrix m(els);
 
     Matrix it;
     m.InvertTransform(it);
     tet_result(TET_FAIL);
   }
-  catch (Dali::DaliException& e)
+  catch(Dali::DaliException& e)
   {
-    DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT( e, exceptionString, TEST_LOCATION );
+    DALI_TEST_PRINT_ASSERT(e);
+    DALI_TEST_ASSERT(e, exceptionString, TEST_LOCATION);
   }
 
   try
   {
-    float els[] = { 0.0f,  1.0f,  2.0f,  0.0f,
-                    4.0f,  5.0f,  6.0f,  7.0f,
-                    8.0f,  9.0f, 10.0f, 11.0f,
-                    12.0f, 13.0f, 14.0f, 15.0f };
+    float  els[] = {0.0f, 1.0f, 2.0f, 0.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f};
     Matrix m(els);
 
     Matrix it;
     m.InvertTransform(it);
     tet_result(TET_FAIL);
   }
-  catch (Dali::DaliException& e)
+  catch(Dali::DaliException& e)
   {
-    DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT( e, exceptionString, TEST_LOCATION );
+    DALI_TEST_PRINT_ASSERT(e);
+    DALI_TEST_ASSERT(e, exceptionString, TEST_LOCATION);
   }
 
   try
   {
-    float els[] = { 0.0f,  1.0f,  2.0f,  0.0f,
-                    4.0f,  5.0f,  6.0f,  0.0f,
-                    8.0f,  9.0f, 10.0f, 11.0f,
-                    12.0f, 13.0f, 14.0f, 15.0f };
+    float  els[] = {0.0f, 1.0f, 2.0f, 0.0f, 4.0f, 5.0f, 6.0f, 0.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f};
     Matrix m(els);
 
     Matrix it;
     m.InvertTransform(it);
     tet_result(TET_FAIL);
   }
-  catch (Dali::DaliException& e)
+  catch(Dali::DaliException& e)
   {
-    DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT( e, exceptionString, TEST_LOCATION );
+    DALI_TEST_PRINT_ASSERT(e);
+    DALI_TEST_ASSERT(e, exceptionString, TEST_LOCATION);
   }
 
   try
   {
-    float els[] = { 0.0f,  1.0f,  2.0f,  0.0f,
-                    4.0f,  5.0f,  6.0f,  0.0f,
-                    8.0f,  9.0f, 10.0f,  0.0f,
-                    12.0f, 13.0f, 14.0f, 15.0f };
+    float  els[] = {0.0f, 1.0f, 2.0f, 0.0f, 4.0f, 5.0f, 6.0f, 0.0f, 8.0f, 9.0f, 10.0f, 0.0f, 12.0f, 13.0f, 14.0f, 15.0f};
     Matrix m(els);
 
     Matrix it;
     m.InvertTransform(it);
     tet_result(TET_FAIL);
   }
-  catch (Dali::DaliException& e)
+  catch(Dali::DaliException& e)
   {
-    DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT( e, exceptionString, TEST_LOCATION );
+    DALI_TEST_PRINT_ASSERT(e);
+    DALI_TEST_ASSERT(e, exceptionString, TEST_LOCATION);
   }
   END_TEST;
 }
@@ -297,26 +274,26 @@ int UtcDaliMatrixInvert01P(void)
 {
   // We're going to invert a whole load of different matrices to make sure we don't
   // fail on particular orientations.
-  for (int i=0;i<1000;++i)
+  for(int i = 0; i < 1000; ++i)
   {
-    float f = i;
-    Vector3 axis(cosf(f*0.001f), cosf(f*0.02f), cosf(f*0.03f));
+    float   f = i;
+    Vector3 axis(cosf(f * 0.001f), cosf(f * 0.02f), cosf(f * 0.03f));
     axis.Normalize();
-    Vector3 center(f, cosf(f) * 100.0f, cosf(f*0.5f) * 50.0f);
+    Vector3 center(f, cosf(f) * 100.0f, cosf(f * 0.5f) * 50.0f);
 
     Matrix m0;
     m0.SetIdentity();
-    m0.SetTransformComponents( Vector3::ONE, Quaternion(Radian(1.0f), axis), center );
+    m0.SetTransformComponents(Vector3::ONE, Quaternion(Radian(1.0f), axis), center);
 
     Matrix m1(m0);
     m1.Invert();
 
-    Matrix m2( false );
-    Matrix::Multiply( m2, m0, m1 );
+    Matrix m2(false);
+    Matrix::Multiply(m2, m0, m1);
 
     DALI_TEST_EQUALS(m2, Matrix::IDENTITY, 0.001f, TEST_LOCATION);
 
-    m1.Invert();    // doube invert - should be back to m0
+    m1.Invert(); // doube invert - should be back to m0
 
     DALI_TEST_EQUALS(m0, m1, 0.001f, TEST_LOCATION);
   }
@@ -334,22 +311,18 @@ int UtcDaliMatrixInvert02P(void)
 int UtcDaliMatrixTransposeP(void)
 {
   float floats[] =
-  {   0.0f,  1.0f,  2.0f,  3.0f,
-      4.0f,  5.0f,  6.0f,  7.0f,
-      8.0f,  9.0f, 10.0f,  11.0f,
-     12.0f, 13.0f, 14.0f,  15.0f
-  };
+    {0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f};
 
   Matrix m(floats);
   m.Transpose();
 
   bool success = true;
 
-  for (int x=0;x<4;++x)
+  for(int x = 0; x < 4; ++x)
   {
-    for (int y=0;y<4;++y)
+    for(int y = 0; y < 4; ++y)
     {
-      success &= (m.AsFloat()[x+y*4] == floats[x*4+y]);
+      success &= (m.AsFloat()[x + y * 4] == floats[x * 4 + y]);
     }
   }
 
@@ -359,43 +332,34 @@ int UtcDaliMatrixTransposeP(void)
 
 int UtcDaliMatrixGetXAxisP(void)
 {
-  float els[] = { 0.0f,  1.0f,  2.0f,  3.0f,
-                  4.0f,  5.0f,  6.0f,  7.0f,
-                  8.0f,  9.0f, 10.0f, 11.0f,
-                  12.0f, 13.0f, 14.0f, 15.0f };
+  float  els[] = {0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f};
   Matrix m(els);
 
-  DALI_TEST_CHECK(m.GetXAxis() == Vector3(0.0f,  1.0f,  2.0f));
+  DALI_TEST_CHECK(m.GetXAxis() == Vector3(0.0f, 1.0f, 2.0f));
   END_TEST;
 }
 
 int UtcDaliMatrixGetYAxisP(void)
 {
-  float els[] = { 0.0f,  1.0f,  2.0f,  3.0f,
-                  4.0f,  5.0f,  6.0f,  7.0f,
-                  8.0f,  9.0f, 10.0f, 11.0f,
-                  12.0f, 13.0f, 14.0f, 15.0f };
+  float  els[] = {0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f};
   Matrix m(els);
 
-  DALI_TEST_CHECK(m.GetYAxis() == Vector3(4.0f,  5.0f,  6.0f));
+  DALI_TEST_CHECK(m.GetYAxis() == Vector3(4.0f, 5.0f, 6.0f));
   END_TEST;
 }
 
 int UtcDaliMatrixGetZAxisP(void)
 {
-  float els[] = { 0.0f,  1.0f,  2.0f,  3.0f,
-                  4.0f,  5.0f,  6.0f,  7.0f,
-                  8.0f,  9.0f, 10.0f, 11.0f,
-                  12.0f, 13.0f, 14.0f, 15.0f };
+  float  els[] = {0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f};
   Matrix m(els);
 
-  DALI_TEST_CHECK(m.GetZAxis() == Vector3(8.0f,  9.0f, 10.0f));
+  DALI_TEST_CHECK(m.GetZAxis() == Vector3(8.0f, 9.0f, 10.0f));
   END_TEST;
 }
 
 int UtcDaliMatrixSetXAxisP(void)
 {
-  Matrix m;
+  Matrix  m;
   Vector3 v(2.0f, 3.0f, 4.0f);
   m.SetXAxis(v);
 
@@ -405,7 +369,7 @@ int UtcDaliMatrixSetXAxisP(void)
 
 int UtcDaliMatrixSetYAxisP(void)
 {
-  Matrix m;
+  Matrix  m;
   Vector3 v(2.0f, 3.0f, 4.0f);
   m.SetYAxis(v);
 
@@ -415,7 +379,7 @@ int UtcDaliMatrixSetYAxisP(void)
 
 int UtcDaliMatrixSetZAxisP(void)
 {
-  Matrix m;
+  Matrix  m;
   Vector3 v(2.0f, 3.0f, 4.0f);
   m.SetZAxis(v);
 
@@ -425,10 +389,7 @@ int UtcDaliMatrixSetZAxisP(void)
 
 int UtcDaliMatrixGetTranslationP(void)
 {
-  float els[] = { 0.0f,  1.0f,  2.0f,  3.0f,
-                  4.0f,  5.0f,  6.0f,  7.0f,
-                  8.0f,  9.0f, 10.0f, 11.0f,
-                  12.0f, 13.0f, 14.0f, 15.0f };
+  float  els[] = {0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f};
   Matrix m(els);
 
   DALI_TEST_EQUALS(m.GetTranslation(), Vector4(12.0f, 13.0f, 14.0f, 15.0f), TEST_LOCATION);
@@ -437,10 +398,7 @@ int UtcDaliMatrixGetTranslationP(void)
 
 int UtcDaliMatrixGetTranslation3P(void)
 {
-  float els[] = { 0.0f,  1.0f,  2.0f,  3.0f,
-                  4.0f,  5.0f,  6.0f,  7.0f,
-                  8.0f,  9.0f, 10.0f, 11.0f,
-                  12.0f, 13.0f, 14.0f, 15.0f };
+  float  els[] = {0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f};
   Matrix m(els);
 
   DALI_TEST_EQUALS(m.GetTranslation3(), Vector3(12.0f, 13.0f, 14.0f), TEST_LOCATION);
@@ -449,7 +407,7 @@ int UtcDaliMatrixGetTranslation3P(void)
 
 int UtcDaliMatrixSetTranslationP(void)
 {
-  Matrix m;
+  Matrix  m;
   Vector4 v(2.0f, 3.0f, 4.0f, 5.0f);
   m.SetTranslation(v);
 
@@ -459,7 +417,7 @@ int UtcDaliMatrixSetTranslationP(void)
 
 int UtcDaliMatrixSetTranslation3P(void)
 {
-  Matrix m;
+  Matrix  m;
   Vector3 v(2.0f, 3.0f, 4.0f);
   m.SetTranslation(v);
 
@@ -473,13 +431,13 @@ int UtcDaliMatrixOrthoNormalize0P(void)
   Matrix m;
   m.SetIdentity();
 
-  for (int i=0;i<1000;++i)
+  for(int i = 0; i < 1000; ++i)
   {
-    float f = i;
-    Vector3 axis(cosf(f*0.001f), cosf(f*0.02f), cosf(f*0.03f));
+    float   f = i;
+    Vector3 axis(cosf(f * 0.001f), cosf(f * 0.02f), cosf(f * 0.03f));
     axis.Normalize();
 
-    m.SetTransformComponents( Vector3::ONE, Quaternion(Radian(1.0f), axis), Vector3::ZERO );
+    m.SetTransformComponents(Vector3::ONE, Quaternion(Radian(1.0f), axis), Vector3::ZERO);
     m.OrthoNormalize();
   }
 
@@ -499,16 +457,16 @@ int UtcDaliMatrixOrthoNormalize0P(void)
 int UtcDaliMatrixOrthoNormalize1P(void)
 {
   // OrthoNormalize is not flipping the axes and is maintaining the translation
-  for (int i=0;i<1000;++i)
+  for(int i = 0; i < 1000; ++i)
   {
-    float f = i;
-    Vector3 axis(cosf(f*0.001f), cosf(f*0.02f), cosf(f*0.03f));
+    float   f = i;
+    Vector3 axis(cosf(f * 0.001f), cosf(f * 0.02f), cosf(f * 0.03f));
     axis.Normalize();
     Vector3 center(10.0f, 15.0f, 5.0f);
 
     Matrix m0;
     m0.SetIdentity();
-    m0.SetTransformComponents( Vector3::ONE, Quaternion(Radian(1.0f), axis), center );
+    m0.SetTransformComponents(Vector3::ONE, Quaternion(Radian(1.0f), axis), center);
 
     Matrix m1(m0);
     m1.OrthoNormalize();
@@ -523,38 +481,36 @@ int UtcDaliMatrixOrthoNormalize1P(void)
 
 int UtcDaliMatrixConstAsFloatP(void)
 {
-  float r[] = { 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f};
+  float        r[] = {1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f};
   const Matrix m(r);
 
-  const float* els = m.AsFloat();
-  const float* init = r;
-  bool initialised = true;
-  for(size_t idx=0; idx<16; ++idx, ++els, ++init)
+  const float* els         = m.AsFloat();
+  const float* init        = r;
+  bool         initialised = true;
+  for(size_t idx = 0; idx < 16; ++idx, ++els, ++init)
   {
     if(*els != *init)
       initialised = false;
   }
   DALI_TEST_EQUALS(initialised, true, TEST_LOCATION);
-
 
   END_TEST;
 }
 
 int UtcDaliMatrixAsFloatP(void)
 {
-  float r[] = { 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f};
+  float  r[] = {1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f};
   Matrix m(r);
 
-  float* els = m.AsFloat();
-  float* init = r;
-  bool initialised = true;
-  for(size_t idx=0; idx<16; ++idx, ++els, ++init)
+  float* els         = m.AsFloat();
+  float* init        = r;
+  bool   initialised = true;
+  for(size_t idx = 0; idx < 16; ++idx, ++els, ++init)
   {
     if(*els != *init)
       initialised = false;
   }
   DALI_TEST_EQUALS(initialised, true, TEST_LOCATION);
-
 
   END_TEST;
 }
@@ -563,14 +519,11 @@ int UtcDaliMatrixMultiplyP(void)
 {
   Matrix m1 = Matrix::IDENTITY;
 
-  float els[] = { 1.0f, 0.0f,    0.0f,   0.0f,
-                  0.0f, 0.707f, 0.707f, 0.0f,
-                  0.0f, -0.707f,  0.707f, 0.0f,
-                  0.0f, 0.0f,    0.0f,   1.0f };
+  float  els[] = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.707f, 0.707f, 0.0f, 0.0f, -0.707f, 0.707f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
   Matrix result(els);
 
   Quaternion q(Radian(Degree(45.0f)), Vector3::XAXIS);
-  Matrix m2(false);
+  Matrix     m2(false);
   Matrix::Multiply(m2, m1, q);
 
   DALI_TEST_EQUALS(m2, result, 0.01f, TEST_LOCATION);
@@ -581,10 +534,7 @@ int UtcDaliMatrixOperatorMultiply01P(void)
 {
   Vector4 v1(2.0f, 5.0f, 4.0f, 0.0f);
 
-  float els[] = {2.0f, 0.0f, 0.0f, 0.0f,
-                 0.0f, 3.0f, 0.0f, 0.0f,
-                 0.0f, 0.0f, 4.0f, 0.0f,
-                 0.0f, 0.0f, 0.0f, 1.0f };
+  float  els[] = {2.0f, 0.0f, 0.0f, 0.0f, 0.0f, 3.0f, 0.0f, 0.0f, 0.0f, 0.0f, 4.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
   Matrix m1(els);
 
   Vector4 v2 = m1 * v1;
@@ -597,14 +547,14 @@ int UtcDaliMatrixOperatorMultiply02P(void)
 {
   TestApplication application;
 
-  Vector3 position ( 30.f, 40.f, 50.f);
+  Vector3 position(30.f, 40.f, 50.f);
 
   Matrix m1(false);
   m1.SetIdentity();
   m1.SetTranslation(-position);
 
   Vector4 positionV4(position);
-  positionV4.w=1.0f;
+  positionV4.w   = 1.0f;
   Vector4 output = m1 * positionV4;
 
   output.w = 0.0f;
@@ -616,14 +566,14 @@ int UtcDaliMatrixOperatorEqualsP(void)
 {
   Matrix m1 = Matrix::IDENTITY;
 
-  float els[] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+  float  els[] = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
   Matrix r2(els);
   DALI_TEST_EQUALS(m1 == r2, true, TEST_LOCATION);
 
-  float *f = m1.AsFloat();
-  for(size_t i=0; i<16; i++)
+  float* f = m1.AsFloat();
+  for(size_t i = 0; i < 16; i++)
   {
-    f[15-i] = 1.2f;
+    f[15 - i] = 1.2f;
     DALI_TEST_EQUALS(m1 == r2, false, TEST_LOCATION);
   }
   END_TEST;
@@ -631,11 +581,8 @@ int UtcDaliMatrixOperatorEqualsP(void)
 
 int UtcDaliMatrixOperatorNotEqualsP(void)
 {
-  Matrix m1 = Matrix::IDENTITY;
-  float els[] = {2.0f, 0.0f, 0.0f, 0.0f,
-                 0.0f, 3.0f, 0.0f, 0.0f,
-                 0.0f, 0.0f, 4.0f, 0.0f,
-                 0.0f, 0.0f, 0.0f, 1.0f };
+  Matrix m1    = Matrix::IDENTITY;
+  float  els[] = {2.0f, 0.0f, 0.0f, 0.0f, 0.0f, 3.0f, 0.0f, 0.0f, 0.0f, 0.0f, 4.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
   Matrix r1(els);
 
   DALI_TEST_CHECK(m1 != r1);
@@ -646,23 +593,23 @@ int UtcDaliMatrixOperatorNotEqualsP(void)
 int UtcDaliMatrixSetTransformComponents01P(void)
 {
   // Create an arbitrary vector
-  for( float x=-1.0f; x<=1.0f; x+=0.1f )
+  for(float x = -1.0f; x <= 1.0f; x += 0.1f)
   {
-    for( float y=-1.0f; y<1.0f; y+=0.1f )
+    for(float y = -1.0f; y < 1.0f; y += 0.1f)
     {
-      for( float z=-1.0f; z<1.0f; z+=0.1f )
+      for(float z = -1.0f; z < 1.0f; z += 0.1f)
       {
         Vector3 vForward(x, y, z);
         vForward.Normalize();
 
-        for( float angle = 5.0f; angle <= 360.0f; angle += 15.0f)
+        for(float angle = 5.0f; angle <= 360.0f; angle += 15.0f)
         {
           Quaternion rotation1(Radian(Degree(angle)), vForward);
 
-          Matrix m1(rotation1);
-          Matrix result1(false);
+          Matrix  m1(rotation1);
+          Matrix  result1(false);
           Vector3 vForward3(vForward.x, vForward.y, vForward.z);
-          result1.SetTransformComponents( Vector3::ONE, Quaternion(Radian(Degree(angle)), vForward3), Vector3::ZERO );
+          result1.SetTransformComponents(Vector3::ONE, Quaternion(Radian(Degree(angle)), vForward3), Vector3::ZERO);
 
           DALI_TEST_EQUALS(m1, result1, 0.001, TEST_LOCATION);
 
@@ -696,19 +643,19 @@ int UtcDaliMatrixSetTransformComponents01P(void)
 int UtcDaliMatrixSetInverseTransformComponent01P(void)
 {
   // Create an arbitrary vector
-  for( float x=-1.0f; x<=1.0f; x+=0.1f )
+  for(float x = -1.0f; x <= 1.0f; x += 0.1f)
   {
-    for( float y=-1.0f; y<1.0f; y+=0.1f )
+    for(float y = -1.0f; y < 1.0f; y += 0.1f)
     {
-      for( float z=-1.0f; z<1.0f; z+=0.1f )
+      for(float z = -1.0f; z < 1.0f; z += 0.1f)
       {
         Vector3 vForward(x, y, z);
         vForward.Normalize();
 
         {
           Quaternion rotation1(Quaternion::IDENTITY); // test no rotation branch
-          Vector3 scale1(2.0f, 3.0f, 4.0f);
-          Vector3 position1(1.0f, 2.0f, 3.0f);
+          Vector3    scale1(2.0f, 3.0f, 4.0f);
+          Vector3    position1(1.0f, 2.0f, 3.0f);
 
           Matrix m1(false);
           m1.SetTransformComponents(scale1, rotation1, position1);
@@ -730,30 +677,30 @@ int UtcDaliMatrixSetInverseTransformComponent01P(void)
 int UtcDaliMatrixSetInverseTransformComponent02P(void)
 {
   // Create an arbitrary vector
-  for( float x=-1.0f; x<=1.0f; x+=0.1f )
+  for(float x = -1.0f; x <= 1.0f; x += 0.1f)
   {
-    for( float y=-1.0f; y<1.0f; y+=0.1f )
+    for(float y = -1.0f; y < 1.0f; y += 0.1f)
     {
-      for( float z=-1.0f; z<1.0f; z+=0.1f )
+      for(float z = -1.0f; z < 1.0f; z += 0.1f)
       {
         Vector3 vForward(x, y, z);
         vForward.Normalize();
 
-        for( float angle = 5.0f; angle <= 360.0f; angle += 15.0f)
+        for(float angle = 5.0f; angle <= 360.0f; angle += 15.0f)
         {
           Quaternion rotation1(Radian(Degree(angle)), vForward);
-          Matrix rotationMatrix(rotation1);   // TEST RELIES ON THIS METHOD WORKING!!!
+          Matrix     rotationMatrix(rotation1); // TEST RELIES ON THIS METHOD WORKING!!!
 
           Vector3 position1(5.0f, -6.0f, 7.0f);
 
           Matrix m1(false);
-          m1.SetTransformComponents( Vector3::ONE, rotation1, position1 );
+          m1.SetTransformComponents(Vector3::ONE, rotation1, position1);
 
           Matrix m2(false);
-          m2.SetInverseTransformComponents( rotationMatrix.GetXAxis(),
-                                            rotationMatrix.GetYAxis(),
-                                            rotationMatrix.GetZAxis(),
-                                            position1 );
+          m2.SetInverseTransformComponents(rotationMatrix.GetXAxis(),
+                                           rotationMatrix.GetYAxis(),
+                                           rotationMatrix.GetZAxis(),
+                                           position1);
 
           Matrix result;
           Matrix::Multiply(result, m1, m2);
@@ -768,9 +715,9 @@ int UtcDaliMatrixSetInverseTransformComponent02P(void)
 
 int UtcDaliMatrixGetTransformComponents01P(void)
 {
-  Matrix m2(Matrix::IDENTITY.AsFloat());
-  Vector3 pos2;
-  Vector3 scale2;
+  Matrix     m2(Matrix::IDENTITY.AsFloat());
+  Vector3    pos2;
+  Vector3    scale2;
   Quaternion q2;
   m2.GetTransformComponents(pos2, q2, scale2);
   DALI_TEST_EQUALS(Vector3(0.0f, 0.0f, 0.0f), pos2, 0.001, TEST_LOCATION);
@@ -779,31 +726,30 @@ int UtcDaliMatrixGetTransformComponents01P(void)
   END_TEST;
 }
 
-
 int UtcDaliMatrixGetTransformComponents02P(void)
 {
   // Create an arbitrary vector
-  for( float x=-1.0f; x<=1.0f; x+=0.1f )
+  for(float x = -1.0f; x <= 1.0f; x += 0.1f)
   {
-    for( float y=-1.0f; y<1.0f; y+=0.1f )
+    for(float y = -1.0f; y < 1.0f; y += 0.1f)
     {
-      for( float z=-1.0f; z<1.0f; z+=0.1f )
+      for(float z = -1.0f; z < 1.0f; z += 0.1f)
       {
         Vector3 vForward(x, y, z);
         vForward.Normalize();
 
-        for( float angle = 5.0f; angle <= 360.0f; angle += 15.0f)
+        for(float angle = 5.0f; angle <= 360.0f; angle += 15.0f)
         {
           Quaternion rotation1(Radian(Degree(angle)), vForward);
-          Vector3 scale1(2.0f, 3.0f, 4.0f);
-          Vector3 position1(1.0f, 2.0f, 3.0f);
+          Vector3    scale1(2.0f, 3.0f, 4.0f);
+          Vector3    position1(1.0f, 2.0f, 3.0f);
 
           Matrix m1(false);
           m1.SetTransformComponents(scale1, rotation1, position1);
 
-          Vector3 position2;
+          Vector3    position2;
           Quaternion rotation2;
-          Vector3 scale2;
+          Vector3    scale2;
           m1.GetTransformComponents(position2, rotation2, scale2);
 
           DALI_TEST_EQUALS(position1, position2, 0.001, TEST_LOCATION);
@@ -818,9 +764,9 @@ int UtcDaliMatrixGetTransformComponents02P(void)
 
 int UtcDaliMatrixGetTransformComponents03P(void)
 {
-  Matrix m2; // zero branch
-  Vector3 pos2;
-  Vector3 scale2;
+  Matrix     m2; // zero branch
+  Vector3    pos2;
+  Vector3    scale2;
   Quaternion q2;
   m2.GetTransformComponents(pos2, q2, scale2);
   DALI_TEST_EQUALS(Vector3(0.0f, 0.0f, 0.0f), pos2, 0.001, TEST_LOCATION);
@@ -840,6 +786,6 @@ int UtcDaliMatrixOStreamOperator(void)
 
   std::string expectedOutput = "[ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ]";
 
-  DALI_TEST_EQUALS( oss.str(), expectedOutput, TEST_LOCATION);
+  DALI_TEST_EQUALS(oss.str(), expectedOutput, TEST_LOCATION);
   END_TEST;
 }

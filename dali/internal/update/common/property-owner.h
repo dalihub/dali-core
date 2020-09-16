@@ -39,8 +39,8 @@ namespace SceneGraph
 
 class PropertyOwner;
 
-typedef OwnerContainer< PropertyBase* > OwnedPropertyContainer;
-typedef OwnedPropertyContainer::Iterator  OwnedPropertyIter;
+using OwnedPropertyContainer = OwnerContainer<PropertyBase*>;
+using OwnedPropertyIter      = OwnedPropertyContainer::Iterator;
 
 /**
  * An update-thread object which own properties.
@@ -223,6 +223,14 @@ public:
    */
   void RemoveUniformMapObserver( UniformMap::Observer& observer );
 
+  /**
+   * Query whether playing an animation is possible or not.
+   * @return true if playing an animation is possible.
+   */
+  virtual bool IsAnimationPossible() const
+  {
+    return true;
+  }
 
 protected:
 
@@ -244,12 +252,12 @@ protected:
   OwnedPropertyContainer mCustomProperties; ///< Properties provided with InstallCustomProperty()
   UniformMap mUniformMaps; ///< Container of owned uniform maps
   bool mUpdated;
+  bool                   mIsConnectedToSceneGraph;
 
 private:
-
-  typedef Dali::Vector<PropertyOwner::Observer*> ObserverContainer;
-  typedef ObserverContainer::Iterator ObserverIter;
-  typedef ObserverContainer::ConstIterator ConstObserverIter;
+  using ObserverContainer = Dali::Vector<PropertyOwner::Observer*>;
+  using ObserverIter      = ObserverContainer::Iterator;
+  using ConstObserverIter = ObserverContainer::ConstIterator;
 
   ObserverContainer mObservers; ///< Container of observer raw-pointers (not owned)
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,6 +55,7 @@ RefObject& RefObject::operator=(const RefObject&)
 
 void RefObject::Reference()
 {
+  // clang-format off
   // The inline assembly below was tested on an ARMv8 64 bit platform on
   // 2015-02-06 and found to run in 11.8 nanoseconds, whereas
   // __sync_add_and_fetch( address, 1 ) required 18.8 nanoseconds.
@@ -105,10 +106,13 @@ void RefObject::Reference()
   __sync_add_and_fetch( &mCount, 1 );
 
 #endif
+  // clang-format on
 }
 
 void RefObject::Unreference()
 {
+  // clang-format off
+
   // The output register:
   int32_t newValue;
 
@@ -159,6 +163,7 @@ void RefObject::Unreference()
   {
     delete this;
   }
+  // clang-format on
 }
 
 uint32_t RefObject::ReferenceCount()
@@ -167,5 +172,3 @@ uint32_t RefObject::ReferenceCount()
 }
 
 } // namespace Dali
-
-

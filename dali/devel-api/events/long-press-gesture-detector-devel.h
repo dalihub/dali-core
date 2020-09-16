@@ -23,19 +23,17 @@
 
 namespace Dali
 {
-
 class LongPressGestureDetector;
 
 namespace DevelLongPressGestureDetector
 {
-
 /**
  * @brief Get the minimum holding time required to be recognized as a long press gesture in milliseconds
  *
  * @param[in] longPressGestureDetector The target LongPressGestureDetector instance
  * @return The time value in milliseconds
  */
-DALI_CORE_API uint32_t GetMinimumHoldingTime( LongPressGestureDetector longPressGestureDetector );
+DALI_CORE_API uint32_t GetMinimumHoldingTime(LongPressGestureDetector longPressGestureDetector);
 
 } // namespace DevelLongPressGestureDetector
 

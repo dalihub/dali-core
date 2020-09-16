@@ -16,26 +16,24 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/rendering/texture.h>          // Dali::Texture
+#include <dali/public-api/rendering/texture.h> // Dali::Texture
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/rendering/texture-impl.h> // Dali::Internal::Texture
 #include <dali/internal/event/images/pixel-data-impl.h> // Dali::Internal::PixelData
-
+#include <dali/internal/event/rendering/texture-impl.h> // Dali::Internal::Texture
 
 namespace Dali
 {
-
-Texture Texture::New( TextureType::Type type, Pixel::Format format, uint32_t width, uint32_t height )
+Texture Texture::New(TextureType::Type type, Pixel::Format format, uint32_t width, uint32_t height)
 {
-  Internal::TexturePtr texture = Internal::Texture::New(type, format, width, height );
-  return Texture( texture.Get() );
+  Internal::TexturePtr texture = Internal::Texture::New(type, format, width, height);
+  return Texture(texture.Get());
 }
 
-Texture Texture::New( NativeImageInterface& nativeImageInterface )
+Texture Texture::New(NativeImageInterface& nativeImageInterface)
 {
-  Internal::TexturePtr texture = Internal::Texture::New( nativeImageInterface );
-  return Texture( texture.Get() );
+  Internal::TexturePtr texture = Internal::Texture::New(nativeImageInterface);
+  return Texture(texture.Get());
 }
 
 Texture::Texture()
@@ -46,32 +44,35 @@ Texture::~Texture()
 {
 }
 
-Texture::Texture( const Texture& handle ) = default;
+Texture::Texture(const Texture& handle) = default;
 
-Texture Texture::DownCast( BaseHandle handle )
+Texture Texture::DownCast(BaseHandle handle)
 {
-  return Texture( dynamic_cast<Dali::Internal::Texture*>(handle.GetObjectPtr()));
+  return Texture(dynamic_cast<Dali::Internal::Texture*>(handle.GetObjectPtr()));
 }
 
-Texture& Texture::operator=( const Texture& handle ) = default;
+Texture& Texture::operator=(const Texture& handle) = default;
 
-Texture::Texture( Texture&& rhs ) =  default;
+Texture::Texture(Texture&& rhs) = default;
 
-Texture& Texture::operator=( Texture&& rhs ) =  default;
+Texture& Texture::operator=(Texture&& rhs) = default;
 
-bool Texture::Upload( PixelData pixelData )
+bool Texture::Upload(PixelData pixelData)
 {
-  Internal::PixelData& internalPixelData = GetImplementation( pixelData );
-  return GetImplementation(*this).Upload( &internalPixelData );
+  Internal::PixelData& internalPixelData = GetImplementation(pixelData);
+  return GetImplementation(*this).Upload(&internalPixelData);
 }
 
-bool Texture::Upload( PixelData pixelData,
-               uint32_t layer, uint32_t mipmap,
-               uint32_t xOffset, uint32_t yOffset,
-               uint32_t width, uint32_t height )
+bool Texture::Upload(PixelData pixelData,
+                     uint32_t  layer,
+                     uint32_t  mipmap,
+                     uint32_t  xOffset,
+                     uint32_t  yOffset,
+                     uint32_t  width,
+                     uint32_t  height)
 {
-  Internal::PixelData& internalPixelData = GetImplementation( pixelData );
-  return GetImplementation(*this).Upload( &internalPixelData, layer, mipmap, xOffset, yOffset, width, height );
+  Internal::PixelData& internalPixelData = GetImplementation(pixelData);
+  return GetImplementation(*this).Upload(&internalPixelData, layer, mipmap, xOffset, yOffset, width, height);
 }
 
 void Texture::GenerateMipmaps()
@@ -89,8 +90,8 @@ uint32_t Texture::GetHeight() const
   return GetImplementation(*this).GetHeight();
 }
 
-Texture::Texture( Internal::Texture* pointer )
-: BaseHandle( pointer )
+Texture::Texture(Internal::Texture* pointer)
+: BaseHandle(pointer)
 {
 }
 

@@ -19,16 +19,15 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/animation/animation-data.h>
 #include <dali/public-api/actors/actor-enumerations.h>
 #include <dali/public-api/actors/draw-mode.h>
-#include <dali/devel-api/animation/animation-data.h>
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/object/property-value.h>
 
 namespace Dali
 {
-
 class Actor;
 
 /**
@@ -36,14 +35,13 @@ class Actor;
  */
 namespace Scripting
 {
-
 /**
  * @brief Structure which stores an enumeration and its string equivalent.
  */
 struct StringEnum
 {
-  const char* string;  ///< The string representation
-  const int32_t value; ///< The enumeration value wrapped in int
+  const char*   string; ///< The string representation
+  const int32_t value;  ///< The enumeration value wrapped in int
 };
 
 /**
@@ -54,7 +52,7 @@ struct StringEnum
  * @param[in]  tableCount  Number of items in the array.
  * @return     The index of the enumeration. If enumeration is not found, logs an error and returns tableCount.
  */
-DALI_CORE_API uint32_t FindEnumIndex( const char* value, const StringEnum* table, uint32_t tableCount );
+DALI_CORE_API uint32_t FindEnumIndex(const char* value, const StringEnum* table, uint32_t tableCount);
 
 /**
  * @brief Find the enum as an integer from the table
@@ -67,7 +65,7 @@ DALI_CORE_API uint32_t FindEnumIndex( const char* value, const StringEnum* table
  * @param[out] integerEnum The value of the enum.
  * @return     true if one or more enums in value.
  */
-DALI_CORE_API bool EnumStringToInteger( const char* const value, const StringEnum* const table, uint32_t tableCount, int& integerEnum );
+DALI_CORE_API bool EnumStringToInteger(const char* const value, const StringEnum* const table, uint32_t tableCount, int& integerEnum);
 
 /**
  * @brief Chooses the appropriate enumeration for the provided string from the given table.
@@ -79,17 +77,17 @@ DALI_CORE_API bool EnumStringToInteger( const char* const value, const StringEnu
  *
  * @return     True if the value was found from the table
  */
-template< typename T >
-bool GetEnumeration( const char* value, const StringEnum* table, uint32_t tableCount, T& result )
+template<typename T>
+bool GetEnumeration(const char* value, const StringEnum* table, uint32_t tableCount, T& result)
 {
-  bool retVal( false );
-  if( table )
+  bool retVal(false);
+  if(table)
   {
     int integerEnum = 0;
     // check to avoid crash, not asserting on purpose, error is logged instead
-    if( EnumStringToInteger( value, table, tableCount, integerEnum ) )
+    if(EnumStringToInteger(value, table, tableCount, integerEnum))
     {
-      result = static_cast<T>( integerEnum );
+      result = static_cast<T>(integerEnum);
       retVal = true;
     }
   }
@@ -106,27 +104,27 @@ bool GetEnumeration( const char* value, const StringEnum* table, uint32_t tableC
  * @param[out] result      The enum value. This is not modified if the enumeration could not be converted.
  * @return     True if the value was found successfully AND the value has changed. This is to allow the caller to do nothing if there is no change.
  */
-template< typename T >
-bool GetEnumerationProperty( const Property::Value& propertyValue, const StringEnum* table, uint32_t tableCount, T& result )
+template<typename T>
+bool GetEnumerationProperty(const Property::Value& propertyValue, const StringEnum* table, uint32_t tableCount, T& result)
 {
-  int newValue;
-  bool set = false;
+  int            newValue;
+  bool           set  = false;
   Property::Type type = propertyValue.GetType();
 
-  if( type == Property::INTEGER )
+  if(type == Property::INTEGER)
   {
     // Attempt to fetch the property as an INTEGER type.
-    if( propertyValue.Get( newValue ) )
+    if(propertyValue.Get(newValue))
     {
       // Success.
       set = true;
     }
   }
-  else if( type == Property::STRING )
+  else if(type == Property::STRING)
   {
     // Attempt to fetch the property as an STRING type, and convert it from string to enumeration value.
     std::string propertyString;
-    if( table && propertyValue.Get( propertyString ) && EnumStringToInteger( propertyString.c_str(), table, tableCount, newValue ) )
+    if(table && propertyValue.Get(propertyString) && EnumStringToInteger(propertyString.c_str(), table, tableCount, newValue))
     {
       // Success.
       set = true;
@@ -134,9 +132,9 @@ bool GetEnumerationProperty( const Property::Value& propertyValue, const StringE
   }
 
   // If the property was converted OK, AND the value has changed, update the result and return true.
-  if( set && ( result != static_cast<T>( newValue ) ) )
+  if(set && (result != static_cast<T>(newValue)))
   {
-    result = static_cast<T>( newValue );
+    result = static_cast<T>(newValue);
     return true;
   }
 
@@ -154,27 +152,27 @@ bool GetEnumerationProperty( const Property::Value& propertyValue, const StringE
  * @param[out] result      The enum value. This is not modified if the enumeration could not be converted.
  * @return     True if the value was found successfully AND the value has changed. This is to allow the caller to do nothing if there is no change.
  */
-template< typename T >
-bool GetBitmaskEnumerationProperty( const Property::Value& propertyValue, const Scripting::StringEnum* table, uint32_t tableCount, T& result )
+template<typename T>
+bool GetBitmaskEnumerationProperty(const Property::Value& propertyValue, const Scripting::StringEnum* table, uint32_t tableCount, T& result)
 {
   bool returnValue = true;
 
   // Evaluate as a single INTEGER or STRING first.
-  if( !GetEnumerationProperty( propertyValue, table, tableCount, result ) )
+  if(!GetEnumerationProperty(propertyValue, table, tableCount, result))
   {
     // If not, then check if it's an ARRAY
-    if ( propertyValue.GetType() == Property::ARRAY )
+    if(propertyValue.GetType() == Property::ARRAY)
     {
-      int newValue = 0;
+      int             newValue = 0;
       Property::Array array;
-      propertyValue.Get( array );
-      for( Property::Array::SizeType i = 0; i < array.Count(); ++i )
+      propertyValue.Get(array);
+      for(Property::Array::SizeType i = 0; i < array.Count(); ++i)
       {
-        Property::Value currentValue = array[ i ];
+        Property::Value currentValue = array[i];
         // Use an initial value of -1 so any successful property conversion
         // causes a change (and true to be returned).
-        T current = static_cast< T >( -1 );
-        if( GetEnumerationProperty( currentValue, table, tableCount, current ) )
+        T current = static_cast<T>(-1);
+        if(GetEnumerationProperty(currentValue, table, tableCount, current))
         {
           newValue |= current;
         }
@@ -187,9 +185,9 @@ bool GetBitmaskEnumerationProperty( const Property::Value& propertyValue, const 
       }
 
       // If we didn't hit an invalid type and the value has changed, update the result.
-      if( returnValue && ( result != static_cast<T>( newValue ) ) )
+      if(returnValue && (result != static_cast<T>(newValue)))
       {
-        result = static_cast<T>( newValue );
+        result = static_cast<T>(newValue);
       }
     }
     else
@@ -213,20 +211,20 @@ bool GetBitmaskEnumerationProperty( const Property::Value& propertyValue, const 
  *
  * @note The caller is NOT responsible for cleaning up the returned pointer as it is statically allocated.
  */
-template< typename T >
-const char* GetEnumerationName( T value, const StringEnum* table, uint32_t tableCount )
+template<typename T>
+const char* GetEnumerationName(T value, const StringEnum* table, uint32_t tableCount)
 {
-  if( table )
+  if(table)
   {
-    for ( uint32_t i = 0; i < tableCount; ++i )
+    for(uint32_t i = 0; i < tableCount; ++i)
     {
-      if ( value == T(table[ i ].value) )
+      if(value == T(table[i].value))
       {
-        return table[ i ].string;
+        return table[i].string;
       }
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 /**
@@ -241,14 +239,14 @@ const char* GetEnumerationName( T value, const StringEnum* table, uint32_t table
  *
  * @note The caller is NOT responsible for cleaning up the returned pointer as it is statically allocated.
  */
-template< typename T >
-const char * GetLinearEnumerationName( T value, const StringEnum* table, uint32_t tableCount )
+template<typename T>
+const char* GetLinearEnumerationName(T value, const StringEnum* table, uint32_t tableCount)
 {
-  if ( table && ( value > 0 || value <= static_cast<int>( tableCount ) ) )
+  if(table && (value > 0 || value <= static_cast<int>(tableCount)))
   {
     return table[value].string;
   }
-  return NULL;
+  return nullptr;
 }
 
 /**
@@ -272,7 +270,7 @@ const char * GetLinearEnumerationName( T value, const StringEnum* table, uint32_
  *
  * @return A handle to the newly created actor.
  */
-DALI_CORE_API Actor NewActor( const Property::Map& map );
+DALI_CORE_API Actor NewActor(const Property::Map& map);
 
 /**
  * @brief Creates a Property::Map from the actor provided.
@@ -280,7 +278,7 @@ DALI_CORE_API Actor NewActor( const Property::Map& map );
  * @param[in]  actor The base-actor from which a Property::Map should be created
  * @param[out] map This map is cleared and a property map of actor and its children is filled in
  */
-DALI_CORE_API void CreatePropertyMap( Actor actor, Property::Map& map );
+DALI_CORE_API void CreatePropertyMap(Actor actor, Property::Map& map);
 
 /**
  * @brief Creates description data required to create an Animation object from a property map.
@@ -288,7 +286,7 @@ DALI_CORE_API void CreatePropertyMap( Actor actor, Property::Map& map );
  * @param[in]  map The property value map containing the animation description
  * @param[out] outputAnimationData Resultant data retrieved from the property map is written here
  */
-DALI_CORE_API void NewAnimation( const Property::Map& map, Dali::AnimationData& outputAnimationData );
+DALI_CORE_API void NewAnimation(const Property::Map& map, Dali::AnimationData& outputAnimationData);
 
 } // namespace Scripting
 

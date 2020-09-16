@@ -31,7 +31,7 @@ namespace Internal
 {
 
 class ShaderData;
-typedef IntrusivePtr<ShaderData> ShaderDataPtr;
+using ShaderDataPtr = IntrusivePtr<ShaderData>;
 
 /**
  * @brief ShaderFactory loads and saves shader binaries synchronously.
@@ -50,7 +50,7 @@ public:
   /**
    * Destructor
    */
-  virtual ~ShaderFactory();
+  ~ShaderFactory() override;
 
   /**
    * @brief Looks for precompiled binary version of shader program in memory and file caches.
@@ -77,7 +77,7 @@ public:
    * @param[in] shader The data to be saved.
    * @sa Load
    */
-  virtual void SaveBinary( Internal::ShaderDataPtr shader );
+  void SaveBinary( Internal::ShaderDataPtr shader ) override;
 
 private:
 

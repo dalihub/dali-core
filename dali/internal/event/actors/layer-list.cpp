@@ -36,8 +36,8 @@ namespace // unnamed namespace
 {
 
 typedef std::vector<Layer*> LayerContainer;
-typedef LayerContainer::iterator LayerIter;
-typedef LayerContainer::reverse_iterator ReverseLayerIter;
+using LayerIter        = LayerContainer::iterator;
+using ReverseLayerIter = LayerContainer::reverse_iterator;
 
 /**
  * A private helper template to return an iterator to the layer passed in.
@@ -236,7 +236,7 @@ void LayerList::MoveLayerBelow( const Layer& layer, const Layer& target )
 
 LayerList::LayerList( SceneGraph::UpdateManager& updateManager )
 : mUpdateManager( updateManager ),
-  mRoot( NULL )
+  mRoot( nullptr )
 {
 }
 

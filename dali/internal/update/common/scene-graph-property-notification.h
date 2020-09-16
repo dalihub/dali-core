@@ -38,10 +38,10 @@ namespace SceneGraph
 
 class PropertyNotification;
 
-typedef OwnerContainer< PropertyNotification* > PropertyNotificationContainer;
-typedef PropertyNotificationContainer::Iterator PropertyNotificationIter;
-typedef PropertyNotificationContainer::ConstIterator PropertyNotificationConstIter;
-typedef bool(*ConditionFunction)(const Dali::PropertyInput& value, Dali::Internal::PropertyNotification::RawArgumentContainer& args);
+using PropertyNotificationContainer = OwnerContainer<PropertyNotification*>;
+using PropertyNotificationIter      = PropertyNotificationContainer::Iterator;
+using PropertyNotificationConstIter = PropertyNotificationContainer::ConstIterator;
+using ConditionFunction             = bool ( * )( const Dali::PropertyInput&, Dali::Internal::PropertyNotification::RawArgumentContainer& );
 
 /**
  * PropertyNotifications are used to inspect properties of scene graph objects, as part of a scene
@@ -50,11 +50,10 @@ typedef bool(*ConditionFunction)(const Dali::PropertyInput& value, Dali::Interna
 class PropertyNotification
 {
 public:
-
-  typedef Dali::PropertyNotification::NotifyMode NotifyMode;
-  typedef Dali::Internal::PropertyNotification::ConditionType ConditionType;
-  typedef Dali::Internal::PropertyNotification::RawArgumentContainer RawArgumentContainer;
-  typedef const void *(*GetPropertyFunction)( const SceneGraph::PropertyBase*, int );
+  using NotifyMode           = Dali::PropertyNotification::NotifyMode;
+  using ConditionType        = Dali::Internal::PropertyNotification::ConditionType;
+  using RawArgumentContainer = Dali::Internal::PropertyNotification::RawArgumentContainer;
+  using GetPropertyFunction  = const void* (*)( const SceneGraph::PropertyBase*, int );
 
   /**
    * Construct a new PropertyNotification

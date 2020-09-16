@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_GL_ABSTRACTION_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,13 +46,11 @@
 ** MATERIALS OR THE USE OR OTHER DEALINGS IN THE MATERIALS.
 */
 
-
 /* OpenGL ES 3.0 */
 struct __GLsync;
 
 namespace Dali
 {
-
 /**
  * These types are equivalent to those in the GLES2 API.
  * Dali objects should only access GL indirectly, through the Context API.
@@ -60,34 +58,33 @@ namespace Dali
 
 /* OpenGL ES 2.0 */
 
-typedef void             GLvoid;
-typedef char             GLchar;
-typedef unsigned int     GLenum;
-typedef unsigned char    GLboolean;
-typedef unsigned int     GLbitfield;
-typedef int8_t           GLbyte;
-typedef short            GLshort;
-typedef int              GLint;
-typedef int              GLsizei;
-typedef uint8_t          GLubyte;
-typedef unsigned short   GLushort;
-typedef unsigned int     GLuint;
-typedef float            GLfloat;
-typedef float            GLclampf;
-typedef int              GLfixed;
-typedef signed long int  GLintptr;
-typedef signed long int  GLsizeiptr;
+using GLvoid     = void;
+using GLchar     = char;
+using GLenum     = unsigned int;
+using GLboolean  = unsigned char;
+using GLbitfield = unsigned int;
+using GLbyte     = int8_t;
+using GLshort    = short;
+using GLint      = int;
+using GLsizei    = int;
+using GLubyte    = uint8_t;
+using GLushort   = unsigned short;
+using GLuint     = unsigned int;
+using GLfloat    = float;
+using GLclampf   = float;
+using GLfixed    = int;
+using GLintptr   = long;
+using GLsizeiptr = long;
 
 /* OpenGL ES 3.0 */
 
-typedef unsigned short     GLhalf;
-typedef int64_t            GLint64;
-typedef uint64_t           GLuint64;
-typedef __GLsync* GLsync;
+using GLhalf   = unsigned short;
+using GLint64  = int64_t;
+using GLuint64 = uint64_t;
+using GLsync   = __GLsync*;
 
 namespace Integration
 {
-
 /**
  * GlAbstraction is an abstract interface, used to access OpenGL services.
  * A concrete implementation must be created for each platform, and provided when creating the
@@ -96,11 +93,12 @@ namespace Integration
 class GlAbstraction
 {
 protected:
-
   /**
    * Virtual protected destructor, no deletion through this interface
    */
-  virtual ~GlAbstraction() {}
+  virtual ~GlAbstraction()
+  {
+  }
 
 public:
   /**
@@ -128,7 +126,7 @@ public:
    * @param[in] isSubImage Boolian value for the whether the image is subimage or not
    * @return Whether the texture will be convert or not.
    */
-  virtual bool TextureRequiresConverting( const GLenum imageGlFormat, const GLenum textureGlFormat, const bool isSubImage ) const = 0;
+  virtual bool TextureRequiresConverting(const GLenum imageGlFormat, const GLenum textureGlFormat, const bool isSubImage) const = 0;
 
   /**
    * The number of texture units an implementation supports is implementation dependent, but must be at least 8.
@@ -136,7 +134,7 @@ public:
   static const unsigned int MIN_TEXTURE_UNIT_LIMIT = 8;
 
   /* OpenGL ES 2.0 */
-
+  // clang-format off
   virtual void         ActiveTexture (GLenum texture) = 0;
   virtual void         AttachShader (GLuint program, GLuint shader) = 0;
   virtual void         BindAttribLocation (GLuint program, GLuint index, const char* name) = 0;
@@ -386,7 +384,7 @@ public:
   virtual void           TexStorage2D (GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height) = 0;
   virtual void           TexStorage3D (GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth) = 0;
   virtual void           GetInternalformativ (GLenum target, GLenum internalformat, GLenum pname, GLsizei bufSize, GLint* params) = 0;
-
+  // clang-format on
 };
 
 } // namespace Integration

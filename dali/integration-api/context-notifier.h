@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_CONTEXT_NOTIFIER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ namespace Dali
 {
 namespace Integration
 {
-
 /**
  * Interface to inform dali core of context loss and regain
  */
@@ -48,16 +47,15 @@ public:
   virtual void NotifyContextRegained() = 0;
 
 protected:
-
   /**
    * Virtual destructor, no deletion through this interface
    */
-  virtual ~ContextNotifierInterface() {}
-
+  virtual ~ContextNotifierInterface()
+  {
+  }
 };
 
 } // namespace Integration
 } // namespace Dali
-
 
 #endif // DALI_INTEGRATION_CONTEXT_NOTIFIER_H

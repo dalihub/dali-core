@@ -19,47 +19,46 @@
 #include <dali/public-api/events/tap-gesture.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
 #include <dali/internal/event/events/tap-gesture/tap-gesture-impl.h>
+#include <dali/public-api/common/dali-common.h>
 
 namespace Dali
 {
-
-TapGesture::TapGesture( Internal::TapGesture* internal )
-: Gesture( internal )
+TapGesture::TapGesture(Internal::TapGesture* internal)
+: Gesture(internal)
 {
 }
 
 TapGesture::TapGesture() = default;
 
-TapGesture::TapGesture( const TapGesture& rhs ) = default;
+TapGesture::TapGesture(const TapGesture& rhs) = default;
 
-TapGesture::TapGesture( TapGesture&& rhs ) = default;
+TapGesture::TapGesture(TapGesture&& rhs) = default;
 
-TapGesture& TapGesture::operator=( const TapGesture& rhs ) = default;
+TapGesture& TapGesture::operator=(const TapGesture& rhs) = default;
 
-TapGesture& TapGesture::operator=( TapGesture&& rhs ) = default;
+TapGesture& TapGesture::operator=(TapGesture&& rhs) = default;
 
 TapGesture::~TapGesture() = default;
 
 uint32_t TapGesture::GetNumberOfTaps() const
 {
-  return GetImplementation( *this ).GetNumberOfTaps();
+  return GetImplementation(*this).GetNumberOfTaps();
 }
 
 uint32_t TapGesture::GetNumberOfTouches() const
 {
-  return GetImplementation( *this ).GetNumberOfTouches();
+  return GetImplementation(*this).GetNumberOfTouches();
 }
 
 const Vector2& TapGesture::GetScreenPoint() const
 {
-  return GetImplementation( *this ).GetScreenPoint();
+  return GetImplementation(*this).GetScreenPoint();
 }
 
 const Vector2& TapGesture::GetLocalPoint() const
 {
-  return GetImplementation( *this ).GetLocalPoint();
+  return GetImplementation(*this).GetLocalPoint();
 }
 
 } // namespace Dali

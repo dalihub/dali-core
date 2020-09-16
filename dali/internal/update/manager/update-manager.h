@@ -146,7 +146,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~UpdateManager();
+  ~UpdateManager() override;
 
   // Node connection methods
 
@@ -337,7 +337,7 @@ public:
    * @brief Accept compiled shaders passed back on render thread for saving.
    * @param[in] shaderData Source code, hash over source, and corresponding compiled binary to be saved.
    */
-  virtual void SaveBinary( Internal::ShaderDataPtr shaderData );
+  void SaveBinary( Internal::ShaderDataPtr shaderData ) override;
 
   /**
    * @brief Set the destination for compiled shader binaries to be passed on to.
@@ -770,7 +770,7 @@ private:
 inline void InstallRootMessage( UpdateManager& manager, OwnerPointer<Layer>& root )
 {
   // Message has ownership of Layer while in transit from event -> update
-  typedef MessageValue1< UpdateManager, OwnerPointer<Layer> > LocalType;
+  using LocalType = MessageValue1<UpdateManager, OwnerPointer<Layer> >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -784,7 +784,7 @@ inline void UninstallRootMessage( UpdateManager& manager, const Layer* constRoot
   // Scene graph thread can destroy this object.
   Layer* root = const_cast< Layer* >( constRoot );
 
-  typedef MessageValue1< UpdateManager, Layer* > LocalType;
+  using LocalType = MessageValue1<UpdateManager, Layer*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -796,7 +796,7 @@ inline void UninstallRootMessage( UpdateManager& manager, const Layer* constRoot
 inline void AddNodeMessage( UpdateManager& manager, OwnerPointer<Node>& node )
 {
   // Message has ownership of Node while in transit from event -> update
-  typedef MessageValue1< UpdateManager, OwnerPointer<Node> > LocalType;
+  using LocalType = MessageValue1<UpdateManager, OwnerPointer<Node> >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -811,7 +811,7 @@ inline void ConnectNodeMessage( UpdateManager& manager, const Node& constParent,
   Node& parent = const_cast< Node& >( constParent );
   Node& child = const_cast< Node& >( constChild );
 
-  typedef MessageValue2< UpdateManager, Node*, Node* > LocalType;
+  using LocalType = MessageValue2<UpdateManager, Node*, Node*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -825,7 +825,7 @@ inline void DisconnectNodeMessage( UpdateManager& manager, const Node& constNode
   // Scene graph thread can modify this object.
   Node& node = const_cast< Node& >( constNode );
 
-  typedef MessageValue1< UpdateManager, Node* > LocalType;
+  using LocalType = MessageValue1<UpdateManager, Node*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -839,7 +839,7 @@ inline void DestroyNodeMessage( UpdateManager& manager, const Node& constNode )
   // Scene graph thread can destroy this object.
   Node& node = const_cast< Node& >( constNode );
 
-  typedef MessageValue1< UpdateManager, Node* > LocalType;
+  using LocalType = MessageValue1<UpdateManager, Node*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -851,7 +851,7 @@ inline void DestroyNodeMessage( UpdateManager& manager, const Node& constNode )
 inline void AddCameraMessage( UpdateManager& manager, OwnerPointer< Camera >& camera )
 {
   // Message has ownership of Camera while in transit from event -> update
-  typedef MessageValue1< UpdateManager, OwnerPointer< Camera > > LocalType;
+  using LocalType = MessageValue1<UpdateManager, OwnerPointer<Camera> >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -862,7 +862,7 @@ inline void AddCameraMessage( UpdateManager& manager, OwnerPointer< Camera >& ca
 
 inline void RemoveCameraMessage( UpdateManager& manager, const Camera* camera )
 {
-  typedef MessageValue1< UpdateManager, Camera* > LocalType;
+  using LocalType = MessageValue1<UpdateManager, Camera*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -874,7 +874,7 @@ inline void RemoveCameraMessage( UpdateManager& manager, const Camera* camera )
 inline void AddObjectMessage( UpdateManager& manager, OwnerPointer<PropertyOwner>& object )
 {
   // Message has ownership of object while in transit from event -> update
-  typedef MessageValue1< UpdateManager, OwnerPointer<PropertyOwner> > LocalType;
+  using LocalType = MessageValue1<UpdateManager, OwnerPointer<PropertyOwner> >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -885,7 +885,7 @@ inline void AddObjectMessage( UpdateManager& manager, OwnerPointer<PropertyOwner
 
 inline void RemoveObjectMessage( UpdateManager& manager, const PropertyOwner* object )
 {
-  typedef MessageValue1< UpdateManager, PropertyOwner* > LocalType;
+  using LocalType = MessageValue1<UpdateManager, PropertyOwner*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -896,7 +896,7 @@ inline void RemoveObjectMessage( UpdateManager& manager, const PropertyOwner* ob
 
 inline void AddAnimationMessage( UpdateManager& manager, OwnerPointer< SceneGraph::Animation >& animation )
 {
-  typedef MessageValue1< UpdateManager, OwnerPointer< SceneGraph::Animation > > LocalType;
+  using LocalType = MessageValue1<UpdateManager, OwnerPointer<SceneGraph::Animation> >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -910,7 +910,7 @@ inline void StopAnimationMessage( UpdateManager& manager, const Animation& const
   // The scene-graph thread owns this object so it can safely edit it.
   Animation& animation = const_cast< Animation& >( constAnimation );
 
-  typedef MessageValue1< UpdateManager, Animation* > LocalType;
+  using LocalType = MessageValue1<UpdateManager, Animation*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -924,7 +924,7 @@ inline void RemoveAnimationMessage( UpdateManager& manager, const Animation& con
   // The scene-graph thread owns this object so it can safely edit it.
   Animation& animation = const_cast< Animation& >( constAnimation );
 
-  typedef MessageValue1< UpdateManager, Animation* > LocalType;
+  using LocalType = MessageValue1<UpdateManager, Animation*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -935,7 +935,7 @@ inline void RemoveAnimationMessage( UpdateManager& manager, const Animation& con
 
 inline void AddRenderTaskListMessage( UpdateManager& manager, OwnerPointer< SceneGraph::RenderTaskList >& taskList )
 {
-  typedef MessageValue1< UpdateManager, OwnerPointer< SceneGraph::RenderTaskList > > LocalType;
+  using LocalType = MessageValue1<UpdateManager, OwnerPointer<SceneGraph::RenderTaskList> >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -949,7 +949,7 @@ inline void RemoveRenderTaskListMessage( UpdateManager& manager, const RenderTas
   // The scene-graph thread owns this object so it can safely edit it.
   RenderTaskList& taskList = const_cast< RenderTaskList& >( constTaskList );
 
-  typedef MessageValue1< UpdateManager, RenderTaskList* > LocalType;
+  using LocalType = MessageValue1<UpdateManager, RenderTaskList*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -960,7 +960,7 @@ inline void RemoveRenderTaskListMessage( UpdateManager& manager, const RenderTas
 
 inline void AddSceneMessage( UpdateManager& manager, OwnerPointer< SceneGraph::Scene >& scene )
 {
-  typedef MessageValue1< UpdateManager, OwnerPointer< SceneGraph::Scene > > LocalType;
+  using LocalType = MessageValue1<UpdateManager, OwnerPointer<SceneGraph::Scene> >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -974,7 +974,7 @@ inline void RemoveSceneMessage( UpdateManager& manager, const SceneGraph::Scene&
   // The scene-graph thread owns this object so it can safely edit it.
   Scene& scene = const_cast< Scene& >( constScene );
 
-  typedef MessageValue1< UpdateManager, Scene* > LocalType;
+  using LocalType = MessageValue1<UpdateManager, Scene*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -986,7 +986,7 @@ inline void RemoveSceneMessage( UpdateManager& manager, const SceneGraph::Scene&
 inline void AddPropertyNotificationMessage( UpdateManager& manager, OwnerPointer< PropertyNotification >& propertyNotification )
 {
   // Message has ownership of PropertyNotification while in transit from event -> update
-  typedef MessageValue1< UpdateManager, OwnerPointer< PropertyNotification > > LocalType;
+  using LocalType = MessageValue1<UpdateManager, OwnerPointer<PropertyNotification> >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1000,7 +1000,7 @@ inline void RemovePropertyNotificationMessage( UpdateManager& manager, const Pro
   // The scene-graph thread owns this object so it can safely edit it.
   PropertyNotification& propertyNotification = const_cast< PropertyNotification& >( constPropertyNotification );
 
-  typedef MessageValue1< UpdateManager, PropertyNotification* > LocalType;
+  using LocalType = MessageValue1<UpdateManager, PropertyNotification*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1016,7 +1016,7 @@ inline void PropertyNotificationSetNotifyModeMessage( UpdateManager& manager,
   // The scene-graph thread owns this object so it can safely edit it.
   PropertyNotification* propertyNotification = const_cast< PropertyNotification* >( constPropertyNotification );
 
-  typedef MessageValue2< UpdateManager, PropertyNotification*, PropertyNotification::NotifyMode > LocalType;
+  using LocalType = MessageValue2<UpdateManager, PropertyNotification*, PropertyNotification::NotifyMode>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1028,7 +1028,7 @@ inline void PropertyNotificationSetNotifyModeMessage( UpdateManager& manager,
 // The render thread can safely change the Shader
 inline void AddShaderMessage( UpdateManager& manager, OwnerPointer< Shader >& shader )
 {
-  typedef MessageValue1< UpdateManager, OwnerPointer< Shader > > LocalType;
+  using LocalType = MessageValue1<UpdateManager, OwnerPointer<Shader> >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1040,7 +1040,7 @@ inline void AddShaderMessage( UpdateManager& manager, OwnerPointer< Shader >& sh
 // The render thread can safely change the Shader
 inline void RemoveShaderMessage( UpdateManager& manager, const Shader* shader )
 {
-  typedef MessageValue1< UpdateManager, Shader* > LocalType;
+  using LocalType = MessageValue1<UpdateManager, Shader*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1054,7 +1054,7 @@ inline void SetShaderProgramMessage( UpdateManager& manager,
                                      Internal::ShaderDataPtr shaderData,
                                      bool modifiesGeometry )
 {
-  typedef MessageValue3< UpdateManager, Shader*, Internal::ShaderDataPtr, bool > LocalType;
+  using LocalType = MessageValue3<UpdateManager, Shader*, Internal::ShaderDataPtr, bool>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1065,7 +1065,7 @@ inline void SetShaderProgramMessage( UpdateManager& manager,
 
 inline void SetDefaultSurfaceRectMessage( UpdateManager& manager, const Rect<int32_t>& rect  )
 {
-  typedef MessageValue1< UpdateManager, Rect<int32_t> > LocalType;
+  using LocalType = MessageValue1<UpdateManager, Rect<int32_t> >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1079,7 +1079,7 @@ inline void SurfaceReplacedMessage( UpdateManager& manager, const SceneGraph::Sc
   // The scene-graph thread owns this object so it can safely edit it.
   Scene& scene = const_cast< Scene& >( constScene );
 
-  typedef MessageValue1< UpdateManager, Scene* > LocalType;
+  using LocalType = MessageValue1<UpdateManager, Scene*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1090,7 +1090,7 @@ inline void SurfaceReplacedMessage( UpdateManager& manager, const SceneGraph::Sc
 
 inline void KeepRenderingMessage( UpdateManager& manager, float durationSeconds )
 {
-  typedef MessageValue1< UpdateManager, float > LocalType;
+  using LocalType = MessageValue1<UpdateManager, float>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1101,7 +1101,7 @@ inline void KeepRenderingMessage( UpdateManager& manager, float durationSeconds 
 
 inline void SetRenderingBehaviorMessage( UpdateManager& manager, DevelStage::Rendering renderingBehavior )
 {
-  typedef MessageValue1< UpdateManager, DevelStage::Rendering > LocalType;
+  using LocalType = MessageValue1<UpdateManager, DevelStage::Rendering>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1118,7 +1118,7 @@ inline void SetRenderingBehaviorMessage( UpdateManager& manager, DevelStage::Ren
  */
 inline void SetLayerDepthsMessage( UpdateManager& manager, const std::vector< Layer* >& layers, const Layer* rootLayer )
 {
-  typedef MessageValue2< UpdateManager, std::vector< Layer* >, const Layer* > LocalType;
+  using LocalType = MessageValue2<UpdateManager, std::vector<Layer*>, const Layer*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1129,7 +1129,7 @@ inline void SetLayerDepthsMessage( UpdateManager& manager, const std::vector< La
 
 inline void AddRendererMessage( UpdateManager& manager, OwnerPointer< Renderer >& object )
 {
-  typedef MessageValue1< UpdateManager, OwnerPointer< Renderer > > LocalType;
+  using LocalType = MessageValue1<UpdateManager, OwnerPointer<Renderer> >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1139,7 +1139,7 @@ inline void AddRendererMessage( UpdateManager& manager, OwnerPointer< Renderer >
 
 inline void RemoveRendererMessage( UpdateManager& manager, const Renderer& object )
 {
-  typedef MessageValue1< UpdateManager, Renderer* > LocalType;
+  using LocalType = MessageValue1<UpdateManager, Renderer*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1150,7 +1150,7 @@ inline void RemoveRendererMessage( UpdateManager& manager, const Renderer& objec
 // The render thread can safely change the Shader
 inline void AddTextureSetMessage( UpdateManager& manager, OwnerPointer< TextureSet >& textureSet )
 {
-  typedef MessageValue1< UpdateManager, OwnerPointer< TextureSet > > LocalType;
+  using LocalType = MessageValue1<UpdateManager, OwnerPointer<TextureSet> >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1162,7 +1162,7 @@ inline void AddTextureSetMessage( UpdateManager& manager, OwnerPointer< TextureS
 // The render thread can safely change the Shader
 inline void RemoveTextureSetMessage( UpdateManager& manager, TextureSet& textureSet )
 {
-  typedef MessageValue1< UpdateManager, TextureSet* > LocalType;
+  using LocalType = MessageValue1<UpdateManager, TextureSet*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1174,7 +1174,7 @@ inline void RemoveTextureSetMessage( UpdateManager& manager, TextureSet& texture
 inline void AddSamplerMessage( UpdateManager& manager, OwnerPointer< Render::Sampler >& sampler )
 {
   // Message has ownership of Sampler while in transit from event -> update
-  typedef MessageValue1< UpdateManager, OwnerPointer< Render::Sampler > > LocalType;
+  using LocalType = MessageValue1<UpdateManager, OwnerPointer<Render::Sampler> >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1185,7 +1185,7 @@ inline void AddSamplerMessage( UpdateManager& manager, OwnerPointer< Render::Sam
 
 inline void RemoveSamplerMessage( UpdateManager& manager, Render::Sampler& sampler )
 {
-  typedef MessageValue1< UpdateManager, Render::Sampler* > LocalType;
+  using LocalType = MessageValue1<UpdateManager, Render::Sampler*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1196,7 +1196,7 @@ inline void RemoveSamplerMessage( UpdateManager& manager, Render::Sampler& sampl
 
 inline void SetFilterModeMessage( UpdateManager& manager, Render::Sampler& sampler, uint32_t minFilterMode, uint32_t magFilterMode )
 {
-  typedef MessageValue3< UpdateManager, Render::Sampler*, uint32_t, uint32_t > LocalType;
+  using LocalType = MessageValue3<UpdateManager, Render::Sampler*, uint32_t, uint32_t>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1207,7 +1207,7 @@ inline void SetFilterModeMessage( UpdateManager& manager, Render::Sampler& sampl
 
 inline void SetWrapModeMessage( UpdateManager& manager, Render::Sampler& sampler, uint32_t rWrapMode, uint32_t sWrapMode, uint32_t tWrapMode )
 {
-  typedef MessageValue4< UpdateManager, Render::Sampler*, uint32_t, uint32_t, uint32_t > LocalType;
+  using LocalType = MessageValue4<UpdateManager, Render::Sampler*, uint32_t, uint32_t, uint32_t>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1219,7 +1219,7 @@ inline void SetWrapModeMessage( UpdateManager& manager, Render::Sampler& sampler
 inline void AddVertexBuffer( UpdateManager& manager, OwnerPointer< Render::VertexBuffer >& vertexBuffer )
 {
   // Message has ownership of vertexBuffer while in transit from event -> update
-  typedef MessageValue1< UpdateManager, OwnerPointer< Render::VertexBuffer > > LocalType;
+  using LocalType = MessageValue1<UpdateManager, OwnerPointer<Render::VertexBuffer> >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1230,7 +1230,7 @@ inline void AddVertexBuffer( UpdateManager& manager, OwnerPointer< Render::Verte
 
 inline void RemoveVertexBuffer( UpdateManager& manager, Render::VertexBuffer& vertexBuffer )
 {
-  typedef MessageValue1< UpdateManager, Render::VertexBuffer*  > LocalType;
+  using LocalType = MessageValue1<UpdateManager, Render::VertexBuffer*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1242,7 +1242,7 @@ inline void RemoveVertexBuffer( UpdateManager& manager, Render::VertexBuffer& ve
 inline void SetVertexBufferFormat( UpdateManager& manager, Render::VertexBuffer& vertexBuffer, OwnerPointer< Render::VertexBuffer::Format>& format )
 {
   // Message has ownership of VertexBuffer::Format while in transit from event -> update
-  typedef MessageValue2< UpdateManager, Render::VertexBuffer*, OwnerPointer< Render::VertexBuffer::Format> > LocalType;
+  using LocalType = MessageValue2<UpdateManager, Render::VertexBuffer*, OwnerPointer<Render::VertexBuffer::Format> >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1254,7 +1254,7 @@ inline void SetVertexBufferFormat( UpdateManager& manager, Render::VertexBuffer&
 inline void SetVertexBufferData( UpdateManager& manager, Render::VertexBuffer& vertexBuffer, OwnerPointer< Vector<uint8_t> >& data, uint32_t size )
 {
   // Message has ownership of VertexBuffer data while in transit from event -> update
-  typedef MessageValue3< UpdateManager, Render::VertexBuffer*, OwnerPointer< Vector<uint8_t> >, uint32_t  > LocalType;
+  using LocalType = MessageValue3<UpdateManager, Render::VertexBuffer*, OwnerPointer<Vector<uint8_t> >, uint32_t>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1266,7 +1266,7 @@ inline void SetVertexBufferData( UpdateManager& manager, Render::VertexBuffer& v
 inline void AddGeometry( UpdateManager& manager, OwnerPointer< Render::Geometry >& geometry )
 {
   // Message has ownership of Geometry while in transit from event -> update
-  typedef MessageValue1< UpdateManager, OwnerPointer< Render::Geometry > > LocalType;
+  using LocalType = MessageValue1<UpdateManager, OwnerPointer<Render::Geometry> >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1277,7 +1277,7 @@ inline void AddGeometry( UpdateManager& manager, OwnerPointer< Render::Geometry 
 
 inline void RemoveGeometry( UpdateManager& manager, Render::Geometry& geometry )
 {
-  typedef MessageValue1< UpdateManager, Render::Geometry*  > LocalType;
+  using LocalType = MessageValue1<UpdateManager, Render::Geometry*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1288,7 +1288,7 @@ inline void RemoveGeometry( UpdateManager& manager, Render::Geometry& geometry )
 
 inline void AttachVertexBufferMessage( UpdateManager& manager, Render::Geometry& geometry, const Render::VertexBuffer& vertexBuffer )
 {
-  typedef MessageValue2< UpdateManager, Render::Geometry*, Render::VertexBuffer* > LocalType;
+  using LocalType = MessageValue2<UpdateManager, Render::Geometry*, Render::VertexBuffer*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1299,7 +1299,7 @@ inline void AttachVertexBufferMessage( UpdateManager& manager, Render::Geometry&
 
 inline void RemoveVertexBufferMessage( UpdateManager& manager, Render::Geometry& geometry, const Render::VertexBuffer& vertexBuffer )
 {
-  typedef MessageValue2< UpdateManager, Render::Geometry*, Render::VertexBuffer* > LocalType;
+  using LocalType = MessageValue2<UpdateManager, Render::Geometry*, Render::VertexBuffer*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1328,14 +1328,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~IndexBufferMessage()
+  ~IndexBufferMessage() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex /*bufferIndex*/ )
+  void Process( BufferIndex /*bufferIndex*/ ) override
   {
     DALI_ASSERT_DEBUG( mManager && "Message does not have an object" );
     mManager->SetIndexBuffer( mRenderGeometry, mIndices );
@@ -1350,7 +1350,7 @@ private:
 
 inline void SetIndexBufferMessage( UpdateManager& manager, Render::Geometry& geometry, Dali::Vector<uint16_t>& indices )
 {
-  typedef IndexBufferMessage< UpdateManager > LocalType;
+  using LocalType = IndexBufferMessage<UpdateManager>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1361,7 +1361,7 @@ inline void SetIndexBufferMessage( UpdateManager& manager, Render::Geometry& geo
 
 inline void SetGeometryTypeMessage( UpdateManager& manager, Render::Geometry& geometry, uint32_t geometryType )
 {
-  typedef MessageValue2< UpdateManager, Render::Geometry*, uint32_t > LocalType;
+  using LocalType = MessageValue2<UpdateManager, Render::Geometry*, uint32_t>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1373,7 +1373,7 @@ inline void SetGeometryTypeMessage( UpdateManager& manager, Render::Geometry& ge
 inline void AddTexture( UpdateManager& manager, OwnerPointer< Render::Texture >& texture )
 {
   // Message has ownership of Texture while in transit from event -> update
-  typedef MessageValue1< UpdateManager, OwnerPointer< Render::Texture > > LocalType;
+  using LocalType = MessageValue1<UpdateManager, OwnerPointer<Render::Texture> >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1384,7 +1384,7 @@ inline void AddTexture( UpdateManager& manager, OwnerPointer< Render::Texture >&
 
 inline void RemoveTexture( UpdateManager& manager, Render::Texture& texture )
 {
-  typedef MessageValue1< UpdateManager, Render::Texture*  > LocalType;
+  using LocalType = MessageValue1<UpdateManager, Render::Texture*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1395,7 +1395,7 @@ inline void RemoveTexture( UpdateManager& manager, Render::Texture& texture )
 
 inline void UploadTextureMessage( UpdateManager& manager, Render::Texture& texture, PixelDataPtr pixelData, const Texture::UploadParams& params )
 {
-  typedef MessageValue3< UpdateManager, Render::Texture*, PixelDataPtr, Texture::UploadParams > LocalType;
+  using LocalType = MessageValue3<UpdateManager, Render::Texture*, PixelDataPtr, Texture::UploadParams>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1406,7 +1406,7 @@ inline void UploadTextureMessage( UpdateManager& manager, Render::Texture& textu
 
 inline void GenerateMipmapsMessage( UpdateManager& manager, Render::Texture& texture )
 {
-  typedef MessageValue1< UpdateManager, Render::Texture*  > LocalType;
+  using LocalType = MessageValue1<UpdateManager, Render::Texture*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1418,7 +1418,7 @@ inline void GenerateMipmapsMessage( UpdateManager& manager, Render::Texture& tex
 
 inline void AddFrameBuffer( UpdateManager& manager, OwnerPointer< Render::FrameBuffer >& frameBuffer )
 {
-  typedef MessageValue1< UpdateManager, OwnerPointer< Render::FrameBuffer > > LocalType;
+  using LocalType = MessageValue1<UpdateManager, OwnerPointer<Render::FrameBuffer> >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1429,7 +1429,7 @@ inline void AddFrameBuffer( UpdateManager& manager, OwnerPointer< Render::FrameB
 
 inline void RemoveFrameBuffer( UpdateManager& manager, Render::FrameBuffer& frameBuffer )
 {
-  typedef MessageValue1< UpdateManager, Render::FrameBuffer*  > LocalType;
+  using LocalType = MessageValue1<UpdateManager, Render::FrameBuffer*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1440,7 +1440,7 @@ inline void RemoveFrameBuffer( UpdateManager& manager, Render::FrameBuffer& fram
 
 inline void AttachColorTextureToFrameBuffer( UpdateManager& manager, Render::FrameBuffer& frameBuffer, Render::Texture* texture, uint32_t mipmapLevel, uint32_t layer )
 {
-  typedef MessageValue4< UpdateManager, Render::FrameBuffer*, Render::Texture*, uint32_t, uint32_t  > LocalType;
+  using LocalType = MessageValue4<UpdateManager, Render::FrameBuffer*, Render::Texture*, uint32_t, uint32_t>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1451,7 +1451,7 @@ inline void AttachColorTextureToFrameBuffer( UpdateManager& manager, Render::Fra
 
 inline void AttachDepthTextureToFrameBuffer( UpdateManager& manager, Render::FrameBuffer& frameBuffer, Render::Texture* texture, uint32_t mipmapLevel )
 {
-  typedef MessageValue3< UpdateManager, Render::FrameBuffer*, Render::Texture*, uint32_t > LocalType;
+  using LocalType = MessageValue3<UpdateManager, Render::FrameBuffer*, Render::Texture*, uint32_t>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1462,7 +1462,7 @@ inline void AttachDepthTextureToFrameBuffer( UpdateManager& manager, Render::Fra
 
 inline void AttachDepthStencilTextureToFrameBuffer( UpdateManager& manager, Render::FrameBuffer& frameBuffer, Render::Texture* texture, uint32_t mipmapLevel )
 {
-  typedef MessageValue3< UpdateManager, Render::FrameBuffer*, Render::Texture*, uint32_t > LocalType;
+  using LocalType = MessageValue3<UpdateManager, Render::FrameBuffer*, Render::Texture*, uint32_t>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1473,7 +1473,7 @@ inline void AttachDepthStencilTextureToFrameBuffer( UpdateManager& manager, Rend
 
 inline void SetDepthIndicesMessage( UpdateManager& manager, OwnerPointer< NodeDepths >& nodeDepths )
 {
-  typedef MessageValue1< UpdateManager, OwnerPointer< NodeDepths > > LocalType;
+  using LocalType = MessageValue1<UpdateManager, OwnerPointer<NodeDepths> >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1484,7 +1484,7 @@ inline void SetDepthIndicesMessage( UpdateManager& manager, OwnerPointer< NodeDe
 
 inline void AddResetterMessage( UpdateManager& manager, OwnerPointer<PropertyResetterBase> resetter )
 {
-  typedef MessageValue1< UpdateManager, OwnerPointer<PropertyResetterBase> > LocalType;
+  using LocalType = MessageValue1<UpdateManager, OwnerPointer<PropertyResetterBase> >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1495,7 +1495,7 @@ inline void AddResetterMessage( UpdateManager& manager, OwnerPointer<PropertyRes
 
 inline void AddFrameCallbackMessage( UpdateManager& manager, OwnerPointer< FrameCallback >& frameCallback, const Node& rootNode )
 {
-  typedef MessageValue2< UpdateManager, OwnerPointer< FrameCallback >, const Node* > LocalType;
+  using LocalType = MessageValue2<UpdateManager, OwnerPointer<FrameCallback>, const Node*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1506,7 +1506,7 @@ inline void AddFrameCallbackMessage( UpdateManager& manager, OwnerPointer< Frame
 
 inline void RemoveFrameCallbackMessage( UpdateManager& manager, FrameCallbackInterface& frameCallback )
 {
-  typedef MessageValue1< UpdateManager, FrameCallbackInterface* > LocalType;
+  using LocalType = MessageValue1<UpdateManager, FrameCallbackInterface*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );

@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace DevelHoverEvent
 {
-
 /**
  * @brief Creates an initialized HoverEvent.
  *
@@ -34,8 +32,7 @@ namespace DevelHoverEvent
  * @param[in] time The time the event occurred.
  * @return A handle to a newly allocated Dali resource
  */
-DALI_CORE_API HoverEvent New( uint32_t time );
-
+DALI_CORE_API HoverEvent New(uint32_t time);
 
 } // namespace DevelHoverEvent
 

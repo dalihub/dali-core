@@ -98,7 +98,7 @@ ShaderDataPtr ShaderFactory::Load( const std::string& vertexSource, const std::s
   }
 
   // If memory cache failed check the file system for a binary or return a source-only ShaderData:
-  if( shaderData.Get() == NULL )
+  if( shaderData.Get() == nullptr )
   {
     // Allocate the structure that returns the loaded shader:
     shaderData = new ShaderData( vertexSource, fragmentSource, hints );

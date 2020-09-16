@@ -19,19 +19,18 @@
 #include <dali/public-api/object/base-object.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
+#include <dali/internal/event/common/base-object-impl.h>
 #include <dali/internal/event/common/object-registry-impl.h>
 #include <dali/internal/event/common/stage-impl.h>
-#include <dali/internal/event/common/type-registry-impl.h>
 #include <dali/internal/event/common/thread-local-storage.h>
-#include <dali/internal/event/common/base-object-impl.h>
+#include <dali/internal/event/common/type-registry-impl.h>
+#include <dali/public-api/object/type-registry.h>
 
 namespace Dali
 {
-
 BaseObject::BaseObject()
-: mImpl( new Impl( *this ) )
+: mImpl(new Impl(*this))
 {
 }
 
@@ -42,9 +41,9 @@ BaseObject::~BaseObject()
 void BaseObject::RegisterObject()
 {
   Internal::ThreadLocalStorage* tls = Internal::ThreadLocalStorage::GetInternal();
-  if ( tls )
+  if(tls)
   {
-    tls->GetEventThreadServices().RegisterObject( this );
+    tls->GetEventThreadServices().RegisterObject(this);
   }
 }
 
@@ -53,9 +52,9 @@ void BaseObject::UnregisterObject()
   Internal::ThreadLocalStorage* tls = Internal::ThreadLocalStorage::GetInternal();
 
   // Guard to allow handle destruction after Core has been destroyed
-  if( tls )
+  if(tls)
   {
-    tls->GetEventThreadServices().UnregisterObject( this );
+    tls->GetEventThreadServices().UnregisterObject(this);
   }
 }
 
@@ -63,7 +62,7 @@ bool BaseObject::DoAction(const std::string& actionName, const Property::Map& at
 {
   Dali::Internal::TypeRegistry* registry = Dali::Internal::TypeRegistry::Get();
 
-  if( registry )
+  if(registry)
   {
     return registry->DoActionTo(this, actionName, attributes);
   }
@@ -75,17 +74,17 @@ const std::string& BaseObject::GetTypeName() const
 {
   Dali::Internal::TypeRegistry* registry = Dali::Internal::TypeRegistry::Get();
 
-  if( registry )
+  if(registry)
   {
     Internal::TypeRegistry::TypeInfoPointer typeInfo = registry->GetTypeInfo(this);
-    if( typeInfo )
+    if(typeInfo)
     {
       return typeInfo->GetName();
     }
   }
 
   // Return an empty string if type-name not found.
-  DALI_LOG_WARNING( "TypeName Not Found\n" );
+  DALI_LOG_WARNING("TypeName Not Found\n");
   static std::string empty;
   return empty;
 }
@@ -97,7 +96,7 @@ bool BaseObject::GetTypeInfo(Dali::TypeInfo& typeInfo) const
   Internal::TypeRegistry::TypeInfoPointer info = registry->GetTypeInfo(this);
   if(info)
   {
-    typeInfo = Dali::TypeInfo( info.Get() );
+    typeInfo = Dali::TypeInfo(info.Get());
     return true;
   }
   else
@@ -106,17 +105,16 @@ bool BaseObject::GetTypeInfo(Dali::TypeInfo& typeInfo) const
   }
 }
 
-bool BaseObject::DoConnectSignal( ConnectionTrackerInterface* connectionTracker, const std::string& signalName, FunctorDelegate* functor )
+bool BaseObject::DoConnectSignal(ConnectionTrackerInterface* connectionTracker, const std::string& signalName, FunctorDelegate* functor)
 {
   Dali::Internal::TypeRegistry* registry = Dali::Internal::TypeRegistry::Get();
 
-  if( registry )
+  if(registry)
   {
-    return registry->ConnectSignal( this, connectionTracker, signalName, functor );
+    return registry->ConnectSignal(this, connectionTracker, signalName, functor);
   }
 
   return false;
 }
 
 } // namespace Dali
-

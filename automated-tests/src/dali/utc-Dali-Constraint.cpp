@@ -15,11 +15,11 @@
  *
  */
 
-#include <iostream>
-
-#include <stdlib.h>
-#include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
+#include <dali/public-api/dali-core.h>
+#include <stdlib.h>
+
+#include <iostream>
 
 using namespace Dali;
 
@@ -38,24 +38,26 @@ void utc_dali_constraint_cleanup(void)
 ///////////////////////////////////////////////////////////////////////////////
 namespace
 {
-
 /**
  * A function to use for a constraint, no data collected.
  */
-template< typename T >
-void BasicFunction( T& /* current */, const PropertyInputContainer& /* inputs */ )
+template<typename T>
+void BasicFunction(T& /* current */, const PropertyInputContainer& /* inputs */)
 {
 }
 
 /**
  * A functor which sets a given boolean when the functor is called.
  */
-template< typename T >
+template<typename T>
 struct BasicCalledFunctor
 {
-  BasicCalledFunctor( bool& functorCalled ) : mCalled( functorCalled ) { }
+  BasicCalledFunctor(bool& functorCalled)
+  : mCalled(functorCalled)
+  {
+  }
 
-  void operator()( T& /* current */, const PropertyInputContainer& /* inputs */ )
+  void operator()(T& /* current */, const PropertyInputContainer& /* inputs */)
   {
     mCalled = true;
   }
@@ -66,12 +68,15 @@ struct BasicCalledFunctor
 /**
  * A functor which increments a given integer when the functor is called.
  */
-template< typename T >
+template<typename T>
 struct CalledCountFunctor
 {
-  CalledCountFunctor( int& callCount ) : mCallCount( callCount ) { }
+  CalledCountFunctor(int& callCount)
+  : mCallCount(callCount)
+  {
+  }
 
-  void operator()( T& /* current */, const PropertyInputContainer& /* inputs */ )
+  void operator()(T& /* current */, const PropertyInputContainer& /* inputs */)
   {
     ++mCallCount;
   }
@@ -82,12 +87,15 @@ struct CalledCountFunctor
 /**
  * A functor which sets the given value as the value required when the functor is called.
  */
-template< typename T >
+template<typename T>
 struct SetValueFunctor
 {
-  SetValueFunctor( const T& value ) : mValue( value ) { }
+  SetValueFunctor(const T& value)
+  : mValue(value)
+  {
+  }
 
-  void operator()( T& current, const PropertyInputContainer& /* inputs */ )
+  void operator()(T& current, const PropertyInputContainer& /* inputs */)
   {
     current = mValue;
   }
@@ -107,7 +115,7 @@ struct SetValueFunctor
 namespace UtcDaliConstraintNewFunction
 {
 bool gConstraintFunctionCalled = false;
-void ConstraintFunction( Vector3& /* current */, const PropertyInputContainer& /* inputs */ )
+void ConstraintFunction(Vector3& /* current */, const PropertyInputContainer& /* inputs */)
 {
   gConstraintFunctionCalled = true;
 }
@@ -121,22 +129,22 @@ int UtcDaliConstraintNewFunctionP(void)
   UtcDaliConstraintNewFunction::gConstraintFunctionCalled = false;
 
   Actor actor = Actor::New();
-  application.GetScene().Add( actor );
+  application.GetScene().Add(actor);
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( UtcDaliConstraintNewFunction::gConstraintFunctionCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS(UtcDaliConstraintNewFunction::gConstraintFunctionCalled, false, TEST_LOCATION);
 
   // Add a constraint
-  Constraint constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, &UtcDaliConstraintNewFunction::ConstraintFunction );
-  DALI_TEST_CHECK( constraint );
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &UtcDaliConstraintNewFunction::ConstraintFunction);
+  DALI_TEST_CHECK(constraint);
   constraint.Apply();
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( UtcDaliConstraintNewFunction::gConstraintFunctionCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS(UtcDaliConstraintNewFunction::gConstraintFunctionCalled, true, TEST_LOCATION);
 
   END_TEST;
 }
@@ -150,19 +158,19 @@ int UtcDaliConstraintNewFunctionN(void)
   // Add a constraint with an uninitialised handle
   try
   {
-    Constraint constraint = Constraint::New< Vector3 >( Actor(), Actor::Property::POSITION, &UtcDaliConstraintNewFunction::ConstraintFunction );
-    DALI_TEST_CHECK( false ); // Should not reach here
+    Constraint constraint = Constraint::New<Vector3>(Actor(), Actor::Property::POSITION, &UtcDaliConstraintNewFunction::ConstraintFunction);
+    DALI_TEST_CHECK(false); // Should not reach here
   }
-  catch ( ... )
+  catch(...)
   {
-    DALI_TEST_CHECK( true ); // Should assert!
+    DALI_TEST_CHECK(true); // Should assert!
   }
 
   END_TEST;
 }
 
 // helper for next test
-void StringConstraintFunction( std::string& /* current */, const PropertyInputContainer& /* inputs */ )
+void StringConstraintFunction(std::string& /* current */, const PropertyInputContainer& /* inputs */)
 {
 }
 
@@ -174,7 +182,7 @@ int UtcDaliConstraintNewFunctionNonConstrainableTypeN(void)
   UtcDaliConstraintNewFunction::gConstraintFunctionCalled = false;
 
   Actor actor = Actor::New();
-  application.GetScene().Add( actor );
+  application.GetScene().Add(actor);
 
   application.SendNotification();
   application.Render();
@@ -182,14 +190,14 @@ int UtcDaliConstraintNewFunctionNonConstrainableTypeN(void)
   try
   {
     // Add a constraint
-    Constraint constraint = Constraint::New< std::string >( actor, Actor::Property::COLOR_MODE, &StringConstraintFunction );
-    DALI_TEST_CHECK( constraint );
+    Constraint constraint = Constraint::New<std::string>(actor, Actor::Property::COLOR_MODE, &StringConstraintFunction);
+    DALI_TEST_CHECK(constraint);
     constraint.Apply();
     tet_result(TET_FAIL);
   }
-  catch ( Dali::DaliException& e )
+  catch(Dali::DaliException& e)
   {
-    DALI_TEST_ASSERT( e, "Property not constrainable", TEST_LOCATION );
+    DALI_TEST_ASSERT(e, "Property not constrainable", TEST_LOCATION);
   }
 
   END_TEST;
@@ -208,25 +216,25 @@ int UtcDaliConstraintNewFunctorP(void)
   // Ensure that we can create a constraint using a functor and that it is called.
 
   TestApplication application;
-  bool functorCalled = false;
+  bool            functorCalled = false;
 
   Actor actor = Actor::New();
-  application.GetScene().Add( actor );
+  application.GetScene().Add(actor);
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( functorCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS(functorCalled, false, TEST_LOCATION);
 
   // Add a constraint
-  Constraint constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, BasicCalledFunctor< Vector3 >( functorCalled ) );
-  DALI_TEST_CHECK( constraint );
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, BasicCalledFunctor<Vector3>(functorCalled));
+  DALI_TEST_CHECK(constraint);
   constraint.Apply();
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( functorCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS(functorCalled, true, TEST_LOCATION);
 
   END_TEST;
 }
@@ -236,17 +244,17 @@ int UtcDaliConstraintNewFunctorN(void)
   // Create a constraint with an uninitialised handle
 
   TestApplication application;
-  bool functorCalled = false;
+  bool            functorCalled = false;
 
   // Add a constraint with an uninitialised handle
   try
   {
-    Constraint constraint = Constraint::New< Vector3 >( Actor(), Actor::Property::POSITION, BasicCalledFunctor< Vector3 >( functorCalled ) );
-    DALI_TEST_CHECK( false ); // Should not reach here
+    Constraint constraint = Constraint::New<Vector3>(Actor(), Actor::Property::POSITION, BasicCalledFunctor<Vector3>(functorCalled));
+    DALI_TEST_CHECK(false); // Should not reach here
   }
-  catch ( ... )
+  catch(...)
   {
-    DALI_TEST_CHECK( true ); // Should assert!
+    DALI_TEST_CHECK(true); // Should assert!
   }
 
   END_TEST;
@@ -264,18 +272,18 @@ namespace UtcDaliConstraintNewFunctorMember
 {
 struct Functor
 {
-  Functor( bool& positionCalled, bool& scaleCalled )
-  : mPositionCalled( positionCalled ),
-    mScaleCalled( scaleCalled )
+  Functor(bool& positionCalled, bool& scaleCalled)
+  : mPositionCalled(positionCalled),
+    mScaleCalled(scaleCalled)
   {
   }
 
-  void Position( Vector3& /* current */, const PropertyInputContainer& /* inputs */ )
+  void Position(Vector3& /* current */, const PropertyInputContainer& /* inputs */)
   {
     mPositionCalled = true;
   }
 
-  void Scale( Vector3& /* current */, const PropertyInputContainer& /* inputs */ )
+  void Scale(Vector3& /* current */, const PropertyInputContainer& /* inputs */)
   {
     mScaleCalled = true;
   }
@@ -290,47 +298,47 @@ int UtcDaliConstraintNewFunctorMemberP(void)
   // Ensure that we can create a constraint using a functor and that it is called.
 
   TestApplication application;
-  bool positionFunctorCalled = false;
-  bool sizeFunctorCalled = false;
+  bool            positionFunctorCalled = false;
+  bool            sizeFunctorCalled     = false;
 
   Actor actor = Actor::New();
-  application.GetScene().Add( actor );
+  application.GetScene().Add(actor);
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( positionFunctorCalled, false, TEST_LOCATION );
-  DALI_TEST_EQUALS( sizeFunctorCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS(positionFunctorCalled, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(sizeFunctorCalled, false, TEST_LOCATION);
 
   // Add a constraint that calls Functor::Position
-  Constraint constraint = Constraint::New< Vector3 >(
-      actor,
-      Actor::Property::POSITION,
-      UtcDaliConstraintNewFunctorMember::Functor( positionFunctorCalled, sizeFunctorCalled ),
-      &UtcDaliConstraintNewFunctorMember::Functor::Position );
-  DALI_TEST_CHECK( constraint );
+  Constraint constraint = Constraint::New<Vector3>(
+    actor,
+    Actor::Property::POSITION,
+    UtcDaliConstraintNewFunctorMember::Functor(positionFunctorCalled, sizeFunctorCalled),
+    &UtcDaliConstraintNewFunctorMember::Functor::Position);
+  DALI_TEST_CHECK(constraint);
   constraint.Apply();
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( positionFunctorCalled, true, TEST_LOCATION );
-  DALI_TEST_EQUALS( sizeFunctorCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS(positionFunctorCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(sizeFunctorCalled, false, TEST_LOCATION);
 
   // Add another constraint that calls Functor::Size
-  Constraint constraint2 = Constraint::New< Vector3 >(
-      actor,
-      Actor::Property::SCALE,
-      UtcDaliConstraintNewFunctorMember::Functor( positionFunctorCalled, sizeFunctorCalled ),
-      &UtcDaliConstraintNewFunctorMember::Functor::Scale );
-  DALI_TEST_CHECK( constraint2 );
+  Constraint constraint2 = Constraint::New<Vector3>(
+    actor,
+    Actor::Property::SCALE,
+    UtcDaliConstraintNewFunctorMember::Functor(positionFunctorCalled, sizeFunctorCalled),
+    &UtcDaliConstraintNewFunctorMember::Functor::Scale);
+  DALI_TEST_CHECK(constraint2);
   constraint2.Apply();
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( positionFunctorCalled, true, TEST_LOCATION );
-  DALI_TEST_EQUALS( sizeFunctorCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS(positionFunctorCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(sizeFunctorCalled, true, TEST_LOCATION);
 
   END_TEST;
 }
@@ -340,22 +348,22 @@ int UtcDaliConstraintNewFunctorMemberN(void)
   // Create a constraint with an uninitialised handle
 
   TestApplication application;
-  bool positionFunctorCalled = false;
-  bool sizeFunctorCalled = false;
+  bool            positionFunctorCalled = false;
+  bool            sizeFunctorCalled     = false;
 
   // Add a constraint with an uninitialised handle
   try
   {
-    Constraint constraint = Constraint::New< Vector3 >(
-        Actor(),
-        Actor::Property::POSITION,
-        UtcDaliConstraintNewFunctorMember::Functor( positionFunctorCalled, sizeFunctorCalled ),
-        &UtcDaliConstraintNewFunctorMember::Functor::Position );
-    DALI_TEST_CHECK( false ); // Should not reach here
+    Constraint constraint = Constraint::New<Vector3>(
+      Actor(),
+      Actor::Property::POSITION,
+      UtcDaliConstraintNewFunctorMember::Functor(positionFunctorCalled, sizeFunctorCalled),
+      &UtcDaliConstraintNewFunctorMember::Functor::Position);
+    DALI_TEST_CHECK(false); // Should not reach here
   }
-  catch ( Dali::DaliException& e )
+  catch(Dali::DaliException& e)
   {
-    DALI_TEST_CHECK( true ); // Should assert!
+    DALI_TEST_CHECK(true); // Should assert!
   }
 
   END_TEST;
@@ -370,32 +378,32 @@ int UtcDaliConstraintCloneP(void)
   // Ensure we can clone for another actor and it's called appropriately
 
   TestApplication application;
-  int calledCount = 0;
+  int             calledCount = 0;
 
   Actor actor = Actor::New();
   Actor clone = Actor::New();
 
   Integration::Scene stage = application.GetScene();
-  stage.Add( actor );
-  stage.Add( clone );
+  stage.Add(actor);
+  stage.Add(clone);
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( calledCount, 0, TEST_LOCATION );
+  DALI_TEST_EQUALS(calledCount, 0, TEST_LOCATION);
 
   // Add a constraint to actor
-  Constraint constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, CalledCountFunctor< Vector3 >( calledCount ) );
-  DALI_TEST_CHECK( constraint );
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, CalledCountFunctor<Vector3>(calledCount));
+  DALI_TEST_CHECK(constraint);
   constraint.Apply();
 
   // Create a clone but don't apply
-  Constraint constraintClone = constraint.Clone( clone );
+  Constraint constraintClone = constraint.Clone(clone);
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( calledCount, 1, TEST_LOCATION );
+  DALI_TEST_EQUALS(calledCount, 1, TEST_LOCATION);
 
   // Reset
   calledCount = 0;
@@ -403,7 +411,7 @@ int UtcDaliConstraintCloneP(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( calledCount, 1, TEST_LOCATION );
+  DALI_TEST_EQUALS(calledCount, 1, TEST_LOCATION);
 
   // Apply the clone constraint
   constraintClone.Apply();
@@ -412,20 +420,20 @@ int UtcDaliConstraintCloneP(void)
   application.Render();
 
   // Should be called once for the new constraint clone and once for the original constraint
-  DALI_TEST_EQUALS( calledCount, 3, TEST_LOCATION );
+  DALI_TEST_EQUALS(calledCount, 3, TEST_LOCATION);
 
   // Reset
   calledCount = 0;
 
   // Change the position of both actors
-  actor.SetProperty( Actor::Property::POSITION, Vector2( 100.0f, 100.0f ));
-  clone.SetProperty( Actor::Property::POSITION, Vector2( 100.0f, 100.0f ));
+  actor.SetProperty(Actor::Property::POSITION, Vector2(100.0f, 100.0f));
+  clone.SetProperty(Actor::Property::POSITION, Vector2(100.0f, 100.0f));
 
   application.SendNotification();
   application.Render();
 
   // Functor should have been called twice
-  DALI_TEST_EQUALS( calledCount, 2, TEST_LOCATION );
+  DALI_TEST_EQUALS(calledCount, 2, TEST_LOCATION);
 
   END_TEST;
 }
@@ -440,13 +448,13 @@ int UtcDaliConstraintCloneN(void)
 
   try
   {
-    Actor actor = Actor::New();
-    Constraint clone = constraint.Clone( actor );
-    DALI_TEST_CHECK( false );
+    Actor      actor = Actor::New();
+    Constraint clone = constraint.Clone(actor);
+    DALI_TEST_CHECK(false);
   }
-  catch ( ... )
+  catch(...)
   {
-    DALI_TEST_CHECK( true );
+    DALI_TEST_CHECK(true);
   }
 
   END_TEST;
@@ -454,12 +462,12 @@ int UtcDaliConstraintCloneN(void)
 
 namespace UtcDaliConstraintClone
 {
-void Function( Vector3& /* current */, const PropertyInputContainer& inputs )
+void Function(Vector3& /* current */, const PropertyInputContainer& inputs)
 {
-  DALI_TEST_EQUALS( inputs[0]->GetType(), Property::VECTOR3, TEST_LOCATION );
-  DALI_TEST_EQUALS( inputs[1]->GetType(), Property::ROTATION, TEST_LOCATION );
-  DALI_TEST_EQUALS( inputs[2]->GetType(), Property::VECTOR4, TEST_LOCATION );
-  DALI_TEST_EQUALS( inputs[3]->GetType(), Property::BOOLEAN, TEST_LOCATION );
+  DALI_TEST_EQUALS(inputs[0]->GetType(), Property::VECTOR3, TEST_LOCATION);
+  DALI_TEST_EQUALS(inputs[1]->GetType(), Property::ROTATION, TEST_LOCATION);
+  DALI_TEST_EQUALS(inputs[2]->GetType(), Property::VECTOR4, TEST_LOCATION);
+  DALI_TEST_EQUALS(inputs[3]->GetType(), Property::BOOLEAN, TEST_LOCATION);
 }
 } // namespace UtcDaliConstraintClone
 
@@ -473,30 +481,30 @@ int UtcDaliConstraintCloneCheckSourcesAndSetters(void)
   Actor clone = Actor::New();
 
   Integration::Scene stage = application.GetScene();
-  stage.Add( actor );
-  stage.Add( clone );
+  stage.Add(actor);
+  stage.Add(clone);
 
   application.SendNotification();
   application.Render();
 
   // Create a constraint, DON'T Apply it though
-  Constraint constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, &UtcDaliConstraintClone::Function );
-  constraint.AddSource( LocalSource( Actor::Property::SIZE ) );
-  constraint.AddSource( LocalSource( Actor::Property::ORIENTATION ) );
-  constraint.AddSource( LocalSource( Actor::Property::COLOR ) );
-  constraint.AddSource( LocalSource( Actor::Property::VISIBLE ) );
-  constraint.SetRemoveAction( Constraint::DISCARD );
-  constraint.SetTag( 123 );
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &UtcDaliConstraintClone::Function);
+  constraint.AddSource(LocalSource(Actor::Property::SIZE));
+  constraint.AddSource(LocalSource(Actor::Property::ORIENTATION));
+  constraint.AddSource(LocalSource(Actor::Property::COLOR));
+  constraint.AddSource(LocalSource(Actor::Property::VISIBLE));
+  constraint.SetRemoveAction(Constraint::DISCARD);
+  constraint.SetTag(123);
 
   // Clone the constraint & apply the clone
-  Constraint constraintClone = constraint.Clone( clone );
+  Constraint constraintClone = constraint.Clone(clone);
   constraintClone.Apply();
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( constraint.GetRemoveAction(), constraintClone.GetRemoveAction(), TEST_LOCATION );
-  DALI_TEST_EQUALS( constraint.GetTag(),          constraintClone.GetTag(),          TEST_LOCATION );
+  DALI_TEST_EQUALS(constraint.GetRemoveAction(), constraintClone.GetRemoveAction(), TEST_LOCATION);
+  DALI_TEST_EQUALS(constraint.GetTag(), constraintClone.GetTag(), TEST_LOCATION);
 
   END_TEST;
 }
@@ -513,16 +521,16 @@ int UtcDaliConstraintCopyAndAssignment(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  application.GetScene().Add( actor );
+  application.GetScene().Add(actor);
 
-  Constraint constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, &BasicFunction< Vector3 > );
-  Constraint copied( constraint );
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &BasicFunction<Vector3>);
+  Constraint copied(constraint);
   Constraint assigned;
-  DALI_TEST_CHECK( constraint == copied );
-  DALI_TEST_CHECK( copied != assigned );
+  DALI_TEST_CHECK(constraint == copied);
+  DALI_TEST_CHECK(copied != assigned);
 
   assigned = constraint;
-  DALI_TEST_CHECK( constraint == assigned );
+  DALI_TEST_CHECK(constraint == assigned);
 
   END_TEST;
 }
@@ -535,18 +543,18 @@ int UtcDaliConstraintMoveConstructor(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  application.GetScene().Add( actor );
+  application.GetScene().Add(actor);
 
-  Constraint constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, &BasicFunction< Vector3 > );
-  DALI_TEST_CHECK( constraint );
-  DALI_TEST_EQUALS( 1, constraint.GetBaseObject().ReferenceCount(), TEST_LOCATION );
-  DALI_TEST_CHECK( constraint.GetTargetObject() == actor );
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &BasicFunction<Vector3>);
+  DALI_TEST_CHECK(constraint);
+  DALI_TEST_EQUALS(1, constraint.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+  DALI_TEST_CHECK(constraint.GetTargetObject() == actor);
 
-  Constraint moved = std::move( constraint );
-  DALI_TEST_CHECK( moved );
-  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
-  DALI_TEST_CHECK( moved.GetTargetObject() == actor );
-  DALI_TEST_CHECK( !constraint );
+  Constraint moved = std::move(constraint);
+  DALI_TEST_CHECK(moved);
+  DALI_TEST_EQUALS(1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+  DALI_TEST_CHECK(moved.GetTargetObject() == actor);
+  DALI_TEST_CHECK(!constraint);
 
   END_TEST;
 }
@@ -558,19 +566,19 @@ int UtcDaliConstraintMoveAssignment(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  application.GetScene().Add( actor );
+  application.GetScene().Add(actor);
 
-  Constraint constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, &BasicFunction< Vector3 > );
-  DALI_TEST_CHECK( constraint );
-  DALI_TEST_EQUALS( 1, constraint.GetBaseObject().ReferenceCount(), TEST_LOCATION );
-  DALI_TEST_CHECK( constraint.GetTargetObject() == actor );
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &BasicFunction<Vector3>);
+  DALI_TEST_CHECK(constraint);
+  DALI_TEST_EQUALS(1, constraint.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+  DALI_TEST_CHECK(constraint.GetTargetObject() == actor);
 
   Constraint moved;
-  moved = std::move( constraint );
-  DALI_TEST_CHECK( moved );
-  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
-  DALI_TEST_CHECK( moved.GetTargetObject() == actor );
-  DALI_TEST_CHECK( !constraint );
+  moved = std::move(constraint);
+  DALI_TEST_CHECK(moved);
+  DALI_TEST_EQUALS(1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+  DALI_TEST_CHECK(moved.GetTargetObject() == actor);
+  DALI_TEST_CHECK(!constraint);
 
   END_TEST;
 }
@@ -584,20 +592,20 @@ int UtcDaliConstraintDownCast(void)
 
   TestApplication application;
 
-  Actor actor = Actor::New();
-  Constraint constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, &BasicFunction< Vector3 > );
+  Actor      actor      = Actor::New();
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &BasicFunction<Vector3>);
 
   // Another BaseHandle type
-  Constraint downCast = Constraint::DownCast( actor );
-  DALI_TEST_CHECK( ! downCast );
+  Constraint downCast = Constraint::DownCast(actor);
+  DALI_TEST_CHECK(!downCast);
 
   // A constraint
-  downCast = Constraint::DownCast( constraint );
-  DALI_TEST_CHECK( downCast );
+  downCast = Constraint::DownCast(constraint);
+  DALI_TEST_CHECK(downCast);
 
   // An empty constraint
-  downCast = Constraint::DownCast( Constraint() );
-  DALI_TEST_CHECK( ! downCast );
+  downCast = Constraint::DownCast(Constraint());
+  DALI_TEST_CHECK(!downCast);
 
   END_TEST;
 }
@@ -610,12 +618,12 @@ int UtcDaliConstraintGetTargetObjectP(void)
 {
   TestApplication application;
 
-  Actor actor = Actor::New();
-  Constraint constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, &BasicFunction< Vector3 > );
-  DALI_TEST_CHECK( constraint.GetTargetObject() == actor );
+  Actor      actor      = Actor::New();
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &BasicFunction<Vector3>);
+  DALI_TEST_CHECK(constraint.GetTargetObject() == actor);
 
   Actor actor2 = Actor::New();
-  DALI_TEST_CHECK( constraint.GetTargetObject() != actor2 );
+  DALI_TEST_CHECK(constraint.GetTargetObject() != actor2);
 
   END_TEST;
 }
@@ -630,11 +638,11 @@ int UtcDaliConstraintGetTargetObjectN(void)
   try
   {
     Handle handle = constraint.GetTargetObject();
-    DALI_TEST_CHECK( false ); // Should not reach here!
+    DALI_TEST_CHECK(false); // Should not reach here!
   }
-  catch( ... )
+  catch(...)
   {
-    DALI_TEST_CHECK( true );
+    DALI_TEST_CHECK(true);
   }
 
   END_TEST;
@@ -648,9 +656,9 @@ int UtcDaliConstraintGetTargetPropertyP(void)
 {
   TestApplication application;
 
-  Actor actor = Actor::New();
-  Constraint constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, &BasicFunction< Vector3 > );
-  DALI_TEST_EQUALS( constraint.GetTargetProperty(), (Property::Index)Actor::Property::POSITION, TEST_LOCATION );
+  Actor      actor      = Actor::New();
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &BasicFunction<Vector3>);
+  DALI_TEST_EQUALS(constraint.GetTargetProperty(), (Property::Index)Actor::Property::POSITION, TEST_LOCATION);
 
   END_TEST;
 }
@@ -665,12 +673,12 @@ int UtcDaliConstraintGetTargetPropertyN(void)
   try
   {
     Property::Index propertyIndex = constraint.GetTargetProperty();
-    ( void )propertyIndex;
-    DALI_TEST_CHECK( false ); // Should not reach here!
+    (void)propertyIndex;
+    DALI_TEST_CHECK(false); // Should not reach here!
   }
-  catch( ... )
+  catch(...)
   {
-    DALI_TEST_CHECK( true );
+    DALI_TEST_CHECK(true);
   }
 
   END_TEST;
@@ -685,13 +693,13 @@ int UtcDaliConstraintTagP(void)
 {
   TestApplication application;
 
-  Actor actor = Actor::New();
-  Constraint constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, &BasicFunction< Vector3 > );
-  DALI_TEST_EQUALS( constraint.GetTag(), 0u, TEST_LOCATION );
+  Actor      actor      = Actor::New();
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &BasicFunction<Vector3>);
+  DALI_TEST_EQUALS(constraint.GetTag(), 0u, TEST_LOCATION);
 
   const unsigned int tag = 123;
-  constraint.SetTag( tag );
-  DALI_TEST_EQUALS( constraint.GetTag(), tag, TEST_LOCATION );
+  constraint.SetTag(tag);
+  DALI_TEST_EQUALS(constraint.GetTag(), tag, TEST_LOCATION);
 
   END_TEST;
 }
@@ -705,12 +713,12 @@ int UtcDaliConstraintSetTagN(void)
   Constraint constraint;
   try
   {
-    constraint.SetTag( 123 );
-    DALI_TEST_CHECK( false ); // Should not reach here!
+    constraint.SetTag(123);
+    DALI_TEST_CHECK(false); // Should not reach here!
   }
-  catch( ... )
+  catch(...)
   {
-    DALI_TEST_CHECK( true );
+    DALI_TEST_CHECK(true);
   }
 
   END_TEST;
@@ -726,12 +734,12 @@ int UtcDaliConstraintGetTagN(void)
   try
   {
     int tag = constraint.GetTag();
-    ( void )tag;
-    DALI_TEST_CHECK( false ); // Should not reach here!
+    (void)tag;
+    DALI_TEST_CHECK(false); // Should not reach here!
   }
-  catch( ... )
+  catch(...)
   {
-    DALI_TEST_CHECK( true );
+    DALI_TEST_CHECK(true);
   }
 
   END_TEST;
@@ -747,15 +755,15 @@ int UtcDaliConstraintRemoveActionP(void)
 {
   TestApplication application;
 
-  Actor actor = Actor::New();
-  Constraint constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, &BasicFunction< Vector3 > );
-  DALI_TEST_EQUALS( constraint.GetRemoveAction(), Constraint::DEFAULT_REMOVE_ACTION, TEST_LOCATION );
+  Actor      actor      = Actor::New();
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &BasicFunction<Vector3>);
+  DALI_TEST_EQUALS(constraint.GetRemoveAction(), Constraint::DEFAULT_REMOVE_ACTION, TEST_LOCATION);
 
-  constraint.SetRemoveAction( Constraint::DISCARD );
-  DALI_TEST_EQUALS( constraint.GetRemoveAction(), Constraint::DISCARD, TEST_LOCATION );
+  constraint.SetRemoveAction(Constraint::DISCARD);
+  DALI_TEST_EQUALS(constraint.GetRemoveAction(), Constraint::DISCARD, TEST_LOCATION);
 
-  constraint.SetRemoveAction( Constraint::BAKE );
-  DALI_TEST_EQUALS( constraint.GetRemoveAction(), Constraint::BAKE, TEST_LOCATION );
+  constraint.SetRemoveAction(Constraint::BAKE);
+  DALI_TEST_EQUALS(constraint.GetRemoveAction(), Constraint::BAKE, TEST_LOCATION);
 
   END_TEST;
 }
@@ -769,12 +777,12 @@ int UtcDaliConstraintSetRemoveActionN(void)
   Constraint constraint;
   try
   {
-    constraint.SetRemoveAction( Constraint::DISCARD );
-    DALI_TEST_CHECK( false ); // Should not reach here!
+    constraint.SetRemoveAction(Constraint::DISCARD);
+    DALI_TEST_CHECK(false); // Should not reach here!
   }
-  catch( ... )
+  catch(...)
   {
-    DALI_TEST_CHECK( true );
+    DALI_TEST_CHECK(true);
   }
 
   END_TEST;
@@ -790,12 +798,12 @@ int UtcDaliConstraintGetRemoveActionN(void)
   try
   {
     Constraint::RemoveAction removeAction = constraint.GetRemoveAction();
-    ( void )removeAction;
-    DALI_TEST_CHECK( false ); // Should not reach here!
+    (void)removeAction;
+    DALI_TEST_CHECK(false); // Should not reach here!
   }
-  catch( ... )
+  catch(...)
   {
-    DALI_TEST_CHECK( true );
+    DALI_TEST_CHECK(true);
   }
 
   END_TEST;
@@ -808,24 +816,24 @@ int UtcDaliConstraintBakeRemoveAction(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  application.GetScene().Add( actor );
+  application.GetScene().Add(actor);
 
   application.SendNotification();
   application.Render();
 
   // Should not equal position by default
-  Vector3 position( 10.0f, 20.0f, 30.0f );
-  DALI_TEST_CHECK( actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ) != position );
+  Vector3 position(10.0f, 20.0f, 30.0f);
+  DALI_TEST_CHECK(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION) != position);
 
   // Create a constraint that constrains to position
-  Constraint constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, SetValueFunctor< Vector3 >( position ) );
-  constraint.SetRemoveAction( Constraint::BAKE );
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, SetValueFunctor<Vector3>(position));
+  constraint.SetRemoveAction(Constraint::BAKE);
   constraint.Apply();
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), position, TEST_LOCATION );
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), position, TEST_LOCATION);
 
   // Remove the constraint, it should still be at position
   constraint.Remove();
@@ -833,7 +841,7 @@ int UtcDaliConstraintBakeRemoveAction(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), position, TEST_LOCATION );
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), position, TEST_LOCATION);
 
   END_TEST;
 }
@@ -845,27 +853,27 @@ int UtcDaliConstraintDiscardRemoveAction(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  application.GetScene().Add( actor );
+  application.GetScene().Add(actor);
 
   application.SendNotification();
   application.Render();
 
   // Get and store current position
-  Vector3 originalPosition = actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION );
+  Vector3 originalPosition = actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION);
 
   // Should not equal position by default
-  Vector3 position( 10.0f, 20.0f, 30.0f );
-  DALI_TEST_CHECK( actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ) != position );
+  Vector3 position(10.0f, 20.0f, 30.0f);
+  DALI_TEST_CHECK(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION) != position);
 
   // Create a constraint that constrains to position
-  Constraint constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, SetValueFunctor< Vector3 >( position ) );
-  constraint.SetRemoveAction( Constraint::DISCARD );
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, SetValueFunctor<Vector3>(position));
+  constraint.SetRemoveAction(Constraint::DISCARD);
   constraint.Apply();
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), position, TEST_LOCATION );
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), position, TEST_LOCATION);
 
   // Remove the constraint, it should still be at position
   constraint.Remove();
@@ -873,8 +881,8 @@ int UtcDaliConstraintDiscardRemoveAction(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), originalPosition, TEST_LOCATION );
-  DALI_TEST_CHECK( actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ) != position );
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), originalPosition, TEST_LOCATION);
+  DALI_TEST_CHECK(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION) != position);
 
   END_TEST;
 }
@@ -890,24 +898,24 @@ int UtcDaliConstraintApplyRemove(void)
   // Ensure constraint functors are called appropriately
 
   TestApplication application;
-  bool functorCalled = false;
+  bool            functorCalled = false;
 
   Actor actor = Actor::New();
-  application.GetScene().Add( actor );
+  application.GetScene().Add(actor);
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( functorCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS(functorCalled, false, TEST_LOCATION);
 
   // Create a constraint and apply, functor should be called
-  Constraint constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, BasicCalledFunctor< Vector3 >( functorCalled ) );
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, BasicCalledFunctor<Vector3>(functorCalled));
   constraint.Apply();
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( functorCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS(functorCalled, true, TEST_LOCATION);
 
   // Reset
   functorCalled = false;
@@ -918,7 +926,7 @@ int UtcDaliConstraintApplyRemove(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( functorCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS(functorCalled, false, TEST_LOCATION);
 
   // Re-apply the constraint, functor should be called again
   constraint.Apply();
@@ -926,7 +934,7 @@ int UtcDaliConstraintApplyRemove(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( functorCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS(functorCalled, true, TEST_LOCATION);
 
   END_TEST;
 }
@@ -937,27 +945,27 @@ int UtcDaliConstraintApplyBeforeAddedToStage(void)
   // Constraint should be automatically applied when the actor is added to the stage and not before
 
   TestApplication application;
-  bool functorCalled = false;
+  bool            functorCalled = false;
 
   // Create an actor and a constraint and apply, DON'T add to stage just yet
-  Actor actor = Actor::New();
-  Constraint constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, BasicCalledFunctor< Vector3 >( functorCalled ) );
+  Actor      actor      = Actor::New();
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, BasicCalledFunctor<Vector3>(functorCalled));
   constraint.Apply();
 
   application.SendNotification();
   application.Render();
 
   // Should NOT be called
-  DALI_TEST_EQUALS( functorCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS(functorCalled, false, TEST_LOCATION);
 
   // Add actor to stage
-  application.GetScene().Add( actor );
+  application.GetScene().Add(actor);
 
   application.SendNotification();
   application.Render();
 
   // Should now be called
-  DALI_TEST_EQUALS( functorCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS(functorCalled, true, TEST_LOCATION);
 
   END_TEST;
 }
@@ -968,30 +976,30 @@ int UtcDaliConstraintApplyAndRemoveBeforeAddedToStage(void)
   // Constraint should NOT be called at all
 
   TestApplication application;
-  bool functorCalled = false;
+  bool            functorCalled = false;
 
   // Create an actor and a constraint and apply, DON'T add to stage just yet
-  Actor actor = Actor::New();
-  Constraint constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, BasicCalledFunctor< Vector3 >( functorCalled ) );
+  Actor      actor      = Actor::New();
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, BasicCalledFunctor<Vector3>(functorCalled));
   constraint.Apply();
 
   application.SendNotification();
   application.Render();
 
   // Should NOT be called
-  DALI_TEST_EQUALS( functorCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS(functorCalled, false, TEST_LOCATION);
 
   // Remove the constraint
   constraint.Remove();
 
   // Add actor to stage
-  application.GetScene().Add( actor );
+  application.GetScene().Add(actor);
 
   application.SendNotification();
   application.Render();
 
   // Still should NOT be called
-  DALI_TEST_EQUALS( functorCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS(functorCalled, false, TEST_LOCATION);
 
   END_TEST;
 }
@@ -1002,43 +1010,43 @@ int UtcDaliConstraintApplyActorStagedUnstaged(void)
   // Functor should only be called while the actor is staged.
 
   TestApplication application;
-  bool functorCalled = false;
+  bool            functorCalled = false;
 
   // Create an actor and add to stage
-  Actor actor = Actor::New();
+  Actor              actor = Actor::New();
   Integration::Scene stage = application.GetScene();
-  stage.Add( actor );
+  stage.Add(actor);
 
   // Create a constraint and apply
-  Constraint constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, BasicCalledFunctor< Vector3 >( functorCalled ) );
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, BasicCalledFunctor<Vector3>(functorCalled));
   constraint.Apply();
 
   application.SendNotification();
   application.Render();
 
   // Constraint should be called
-  DALI_TEST_EQUALS( functorCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS(functorCalled, true, TEST_LOCATION);
 
   // Reset
   functorCalled = false;
 
   // Remove actor from stage
-  stage.Remove( actor );
+  stage.Remove(actor);
 
   application.SendNotification();
   application.Render();
 
   // Constraint should NOT be called
-  DALI_TEST_EQUALS( functorCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS(functorCalled, false, TEST_LOCATION);
 
   // Re-add to stage
-  stage.Add( actor );
+  stage.Add(actor);
 
   application.SendNotification();
   application.Render();
 
   // Constraint should be called
-  DALI_TEST_EQUALS( functorCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS(functorCalled, true, TEST_LOCATION);
 
   END_TEST;
 }
@@ -1049,15 +1057,15 @@ int UtcDaliConstraintApplySeveralTimes(void)
   // Should not cause any problems (subsequent attempts should be no-ops)
 
   TestApplication application;
-  int count = 0;
+  int             count = 0;
 
   // Create an actor and add to stage
-  Actor actor = Actor::New();
+  Actor              actor = Actor::New();
   Integration::Scene stage = application.GetScene();
-  stage.Add( actor );
+  stage.Add(actor);
 
   // Create a constraint and apply
-  Constraint constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, CalledCountFunctor< Vector3 >( count ) );
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, CalledCountFunctor<Vector3>(count));
   constraint.Apply();
 
   // Apply again
@@ -1067,7 +1075,7 @@ int UtcDaliConstraintApplySeveralTimes(void)
   application.Render();
 
   // Should only have been called once
-  DALI_TEST_EQUALS( count, 1, TEST_LOCATION );
+  DALI_TEST_EQUALS(count, 1, TEST_LOCATION);
 
   // Reset
   count = 0;
@@ -1078,20 +1086,20 @@ int UtcDaliConstraintApplySeveralTimes(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( count, 1, TEST_LOCATION );
+  DALI_TEST_EQUALS(count, 1, TEST_LOCATION);
 
   // Reset
   count = 0;
 
   // Change the position property, apply again
-  actor.SetProperty( Actor::Property::POSITION, Vector2( 10.0f, 10.0f ));
+  actor.SetProperty(Actor::Property::POSITION, Vector2(10.0f, 10.0f));
   constraint.Apply();
 
   application.SendNotification();
   application.Render();
 
   // Constraint should have been called once
-  DALI_TEST_EQUALS( count, 1, TEST_LOCATION );
+  DALI_TEST_EQUALS(count, 1, TEST_LOCATION);
 
   END_TEST;
 }
@@ -1103,13 +1111,13 @@ int UtcDaliConstraintApplySeveralTimes(void)
 ///////////////////////////////////////////////////////////////////////////////
 namespace UtcDaliConstraintAddSource
 {
-void Function( Vector3& /* current */, const PropertyInputContainer& inputs )
+void Function(Vector3& /* current */, const PropertyInputContainer& inputs)
 {
-  DALI_TEST_EQUALS( inputs.Size(), 4u, TEST_LOCATION );
-  DALI_TEST_EQUALS( inputs[0]->GetType(), Property::VECTOR3, TEST_LOCATION );
-  DALI_TEST_EQUALS( inputs[1]->GetType(), Property::ROTATION, TEST_LOCATION );
-  DALI_TEST_EQUALS( inputs[2]->GetType(), Property::VECTOR4, TEST_LOCATION );
-  DALI_TEST_EQUALS( inputs[3]->GetType(), Property::BOOLEAN, TEST_LOCATION );
+  DALI_TEST_EQUALS(inputs.Size(), 4u, TEST_LOCATION);
+  DALI_TEST_EQUALS(inputs[0]->GetType(), Property::VECTOR3, TEST_LOCATION);
+  DALI_TEST_EQUALS(inputs[1]->GetType(), Property::ROTATION, TEST_LOCATION);
+  DALI_TEST_EQUALS(inputs[2]->GetType(), Property::VECTOR4, TEST_LOCATION);
+  DALI_TEST_EQUALS(inputs[3]->GetType(), Property::BOOLEAN, TEST_LOCATION);
 }
 } // namespace UtcDaliConstraintAddSource
 
@@ -1120,14 +1128,14 @@ int UtcDaliConstraintAddSourceP(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  application.GetScene().Add( actor );
+  application.GetScene().Add(actor);
 
   // Create a constraint, add sources
-  Constraint constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, &UtcDaliConstraintAddSource::Function );
-  constraint.AddSource( LocalSource( Actor::Property::SIZE ) );
-  constraint.AddSource( LocalSource( Actor::Property::ORIENTATION ) );
-  constraint.AddSource( LocalSource( Actor::Property::COLOR ) );
-  constraint.AddSource( LocalSource( Actor::Property::VISIBLE ) );
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &UtcDaliConstraintAddSource::Function);
+  constraint.AddSource(LocalSource(Actor::Property::SIZE));
+  constraint.AddSource(LocalSource(Actor::Property::ORIENTATION));
+  constraint.AddSource(LocalSource(Actor::Property::COLOR));
+  constraint.AddSource(LocalSource(Actor::Property::VISIBLE));
   constraint.Apply();
 
   application.SendNotification();
@@ -1145,12 +1153,12 @@ int UtcDaliConstraintAddSourceN(void)
   Constraint constraint;
   try
   {
-    constraint.AddSource( LocalSource( Actor::Property::POSITION ) );
-    DALI_TEST_CHECK( false ); // Should not reach here!
+    constraint.AddSource(LocalSource(Actor::Property::POSITION));
+    DALI_TEST_CHECK(false); // Should not reach here!
   }
-  catch( ... )
+  catch(...)
   {
-    DALI_TEST_CHECK( true );
+    DALI_TEST_CHECK(true);
   }
 
   END_TEST;
@@ -1160,46 +1168,45 @@ int UtcDaliConstraintAddSourceN(void)
 ///////////////////////////////////////////////////////////////////////////////
 namespace TestChaining
 {
-
-const Vector3 gFunction1Output( Vector3::ONE );
-void Function1( Vector3& current, const PropertyInputContainer& /* inputs */ )
+const Vector3 gFunction1Output(Vector3::ONE);
+void          Function1(Vector3& current, const PropertyInputContainer& /* inputs */)
 {
   // current is original position
-  DALI_TEST_EQUALS( current, Vector3::ZERO, TEST_LOCATION );
+  DALI_TEST_EQUALS(current, Vector3::ZERO, TEST_LOCATION);
   current = gFunction1Output;
 }
 
-const Vector3 gFunction2Output( 10.0f, 20.0f, 30.0f );
-void Function2( Vector3& current, const PropertyInputContainer& /* inputs */ )
+const Vector3 gFunction2Output(10.0f, 20.0f, 30.0f);
+void          Function2(Vector3& current, const PropertyInputContainer& /* inputs */)
 {
   // current is output from Function1
-  DALI_TEST_EQUALS( current, gFunction1Output, TEST_LOCATION );
+  DALI_TEST_EQUALS(current, gFunction1Output, TEST_LOCATION);
 
   current = gFunction2Output;
 }
 
-const Vector3 gFunction3Output( 10.0f, 20.0f, 30.0f );
-void Function3( Vector3& current, const PropertyInputContainer& /* inputs */ )
+const Vector3 gFunction3Output(10.0f, 20.0f, 30.0f);
+void          Function3(Vector3& current, const PropertyInputContainer& /* inputs */)
 {
   // current is output from Function2
-  DALI_TEST_EQUALS( current, gFunction2Output, TEST_LOCATION );
+  DALI_TEST_EQUALS(current, gFunction2Output, TEST_LOCATION);
 
   current = gFunction3Output;
 }
 
-const Vector3 gFunction4Output( 10.0f, 20.0f, 30.0f );
-void Function4( Vector3& current, const PropertyInputContainer& /* inputs */ )
+const Vector3 gFunction4Output(10.0f, 20.0f, 30.0f);
+void          Function4(Vector3& current, const PropertyInputContainer& /* inputs */)
 {
   // current is output from Function3
-  DALI_TEST_EQUALS( current, gFunction3Output, TEST_LOCATION );
+  DALI_TEST_EQUALS(current, gFunction3Output, TEST_LOCATION);
 
   current = gFunction4Output;
 }
 
-void Function5( Vector3& current, const PropertyInputContainer& /* inputs */ )
+void Function5(Vector3& current, const PropertyInputContainer& /* inputs */)
 {
   // current is output from Function4
-  DALI_TEST_EQUALS( current, gFunction4Output, TEST_LOCATION );
+  DALI_TEST_EQUALS(current, gFunction4Output, TEST_LOCATION);
 
   current = Vector3::ZERO;
 }
@@ -1213,13 +1220,13 @@ int UtcDaliConstraintChaining(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  application.GetScene().Add( actor );
+  application.GetScene().Add(actor);
 
-  Constraint constraint1 = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, &TestChaining::Function1 );
-  Constraint constraint2 = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, &TestChaining::Function2 );
-  Constraint constraint3 = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, &TestChaining::Function3 );
-  Constraint constraint4 = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, &TestChaining::Function4 );
-  Constraint constraint5 = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, &TestChaining::Function5 );
+  Constraint constraint1 = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &TestChaining::Function1);
+  Constraint constraint2 = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &TestChaining::Function2);
+  Constraint constraint3 = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &TestChaining::Function3);
+  Constraint constraint4 = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &TestChaining::Function4);
+  Constraint constraint5 = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &TestChaining::Function5);
 
   constraint1.Apply();
   constraint2.Apply();
@@ -1237,47 +1244,47 @@ int UtcDaliConstraintChaining(void)
 ///////////////////////////////////////////////////////////////////////////////
 namespace TestPropertyTypes
 {
-template< typename T >
-void Execute( T value )
+template<typename T>
+void Execute(T value)
 {
   TestApplication application;
-  bool functorCalled = false;
+  bool            functorCalled = false;
 
-  Actor actor = Actor::New();
-  Property::Index index = actor.RegisterProperty( "TEMP_PROPERTY_NAME", value );
+  Actor           actor = Actor::New();
+  Property::Index index = actor.RegisterProperty("TEMP_PROPERTY_NAME", value);
 
-  application.GetScene().Add( actor );
+  application.GetScene().Add(actor);
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( functorCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS(functorCalled, false, TEST_LOCATION);
 
   // Add a constraint
-  Constraint constraint = Constraint::New< T >( actor, index, BasicCalledFunctor< T >( functorCalled ) );
-  DALI_TEST_CHECK( constraint );
+  Constraint constraint = Constraint::New<T>(actor, index, BasicCalledFunctor<T>(functorCalled));
+  DALI_TEST_CHECK(constraint);
   constraint.Apply();
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( functorCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS(functorCalled, true, TEST_LOCATION);
 }
-} // namespace UtcDaliConstraintNewFunctor
+} // namespace TestPropertyTypes
 
 int UtcDaliConstraintTestPropertyTypesP(void)
 {
   // Ensure we can use a constraint functor with all supported property types
 
-  TestPropertyTypes::Execute< bool >( false );
-  TestPropertyTypes::Execute< int >( 0 );
-  TestPropertyTypes::Execute< float >( 0.0f );
-  TestPropertyTypes::Execute< Vector2 >( Vector2::ZERO );
-  TestPropertyTypes::Execute< Vector3 >( Vector3::ZERO );
-  TestPropertyTypes::Execute< Vector4 >( Vector4::ZERO );
-  TestPropertyTypes::Execute< Quaternion >( Quaternion::IDENTITY );
-  TestPropertyTypes::Execute< Matrix >( Matrix::IDENTITY );
-  TestPropertyTypes::Execute< Matrix3 >( Matrix3::IDENTITY );
+  TestPropertyTypes::Execute<bool>(false);
+  TestPropertyTypes::Execute<int>(0);
+  TestPropertyTypes::Execute<float>(0.0f);
+  TestPropertyTypes::Execute<Vector2>(Vector2::ZERO);
+  TestPropertyTypes::Execute<Vector3>(Vector3::ZERO);
+  TestPropertyTypes::Execute<Vector4>(Vector4::ZERO);
+  TestPropertyTypes::Execute<Quaternion>(Quaternion::IDENTITY);
+  TestPropertyTypes::Execute<Matrix>(Matrix::IDENTITY);
+  TestPropertyTypes::Execute<Matrix3>(Matrix3::IDENTITY);
 
   END_TEST;
 }
@@ -1287,7 +1294,7 @@ int UtcDaliConstraintTestPropertyTypesP(void)
 ///////////////////////////////////////////////////////////////////////////////
 namespace
 {
-void SetHalfOpacity( Vector4& current, const PropertyInputContainer& inputs )
+void SetHalfOpacity(Vector4& current, const PropertyInputContainer& inputs)
 {
   current.a = 0.5f;
 }
@@ -1300,27 +1307,27 @@ int UtcDaliConstraintEnsureResetterAppliedOnSceneRemoval(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  application.GetScene().Add( actor );
+  application.GetScene().Add(actor);
 
   // Check initial value is fully opaque
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).a, 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR).a, 1.0f, TEST_LOCATION);
 
   // Create a constraint whose value is discarded when it is removed
-  Constraint constraint = Constraint::New< Vector4 >( actor, Actor::Property::COLOR, SetHalfOpacity );
-  constraint.SetRemoveAction( Constraint::RemoveAction::DISCARD );
+  Constraint constraint = Constraint::New<Vector4>(actor, Actor::Property::COLOR, SetHalfOpacity);
+  constraint.SetRemoveAction(Constraint::RemoveAction::DISCARD);
   constraint.Apply();
 
   // Check value after one render, it should be constrained
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).a, 0.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR).a, 0.5f, TEST_LOCATION);
 
   // Render another frame, ensure the other value has also been updated
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).a, 0.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR).a, 0.5f, TEST_LOCATION);
 
   // Remove the actor from the stage and delete the constraint
   actor.Unparent();
@@ -1330,20 +1337,20 @@ int UtcDaliConstraintEnsureResetterAppliedOnSceneRemoval(void)
   // Check value while off-stage, it should be fully opaque
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).a, 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR).a, 1.0f, TEST_LOCATION);
 
   // Add the actor back to the stage and check the value, it should be fully opaque again
-  application.GetScene().Add( actor );
+  application.GetScene().Add(actor);
 
   // Check value when back on-stage, it should be fully opaque as the constraint is no longer applied to it.
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).a, 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR).a, 1.0f, TEST_LOCATION);
 
   // Render for another frame to ensure both buffers have the correct value
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).a, 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR).a, 1.0f, TEST_LOCATION);
 
   END_TEST;
 }
@@ -1355,27 +1362,27 @@ int UtcDaliConstraintOnActorAddedAndRemoved(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  application.GetScene().Add( actor );
+  application.GetScene().Add(actor);
 
   // Check initial value is fully opaque
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).a, 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR).a, 1.0f, TEST_LOCATION);
 
   // Create a constraint whose value is discarded when it is removed
-  Constraint constraint = Constraint::New< Vector4 >( actor, Actor::Property::COLOR, SetHalfOpacity );
-  constraint.SetRemoveAction( Constraint::RemoveAction::DISCARD );
+  Constraint constraint = Constraint::New<Vector4>(actor, Actor::Property::COLOR, SetHalfOpacity);
+  constraint.SetRemoveAction(Constraint::RemoveAction::DISCARD);
   constraint.Apply();
 
   // Check value after one render, it should be constrained
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).a, 0.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR).a, 0.5f, TEST_LOCATION);
 
   // Render another frame, ensure the other value has also been updated
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).a, 0.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR).a, 0.5f, TEST_LOCATION);
 
   // Remove the actor from the stage
   actor.Unparent();
@@ -1383,23 +1390,23 @@ int UtcDaliConstraintOnActorAddedAndRemoved(void)
   // Check value while off-stage, the constraint is no longer being applied as it's off-stage
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).a, 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR).a, 1.0f, TEST_LOCATION);
 
   // Check the other buffer, the constraint should not be applied to this either.
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).a, 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR).a, 1.0f, TEST_LOCATION);
 
   // Add the actor back to the stage and check the value, the constraint should have been re-applied
-  application.GetScene().Add( actor );
+  application.GetScene().Add(actor);
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).a, 0.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR).a, 0.5f, TEST_LOCATION);
 
   // Render for another frame to ensure both buffers have the correct value
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).a, 0.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR).a, 0.5f, TEST_LOCATION);
 
   END_TEST;
 }
@@ -1408,7 +1415,7 @@ int UtcDaliConstraintOnActorAddedAndRemoved(void)
 
 int UtcDaliConstraintGetTargetObjectNegative(void)
 {
-  TestApplication application;
+  TestApplication  application;
   Dali::Constraint instance;
   try
   {
@@ -1424,7 +1431,7 @@ int UtcDaliConstraintGetTargetObjectNegative(void)
 
 int UtcDaliConstraintSetRemoveActionNegative(void)
 {
-  TestApplication application;
+  TestApplication  application;
   Dali::Constraint instance;
   try
   {
@@ -1441,7 +1448,7 @@ int UtcDaliConstraintSetRemoveActionNegative(void)
 
 int UtcDaliConstraintGetTargetPropertyNegative(void)
 {
-  TestApplication application;
+  TestApplication  application;
   Dali::Constraint instance;
   try
   {
@@ -1457,7 +1464,7 @@ int UtcDaliConstraintGetTargetPropertyNegative(void)
 
 int UtcDaliConstraintApplyNegative(void)
 {
-  TestApplication application;
+  TestApplication  application;
   Dali::Constraint instance;
   try
   {
@@ -1473,7 +1480,7 @@ int UtcDaliConstraintApplyNegative(void)
 
 int UtcDaliConstraintCloneNegative(void)
 {
-  TestApplication application;
+  TestApplication  application;
   Dali::Constraint instance;
   try
   {
@@ -1490,7 +1497,7 @@ int UtcDaliConstraintCloneNegative(void)
 
 int UtcDaliConstraintRemoveNegative(void)
 {
-  TestApplication application;
+  TestApplication  application;
   Dali::Constraint instance;
   try
   {
@@ -1506,7 +1513,7 @@ int UtcDaliConstraintRemoveNegative(void)
 
 int UtcDaliConstraintSetTagNegative(void)
 {
-  TestApplication application;
+  TestApplication  application;
   Dali::Constraint instance;
   try
   {
@@ -1523,7 +1530,7 @@ int UtcDaliConstraintSetTagNegative(void)
 
 int UtcDaliConstraintGetRemoveActionNegative(void)
 {
-  TestApplication application;
+  TestApplication  application;
   Dali::Constraint instance;
   try
   {
@@ -1539,7 +1546,7 @@ int UtcDaliConstraintGetRemoveActionNegative(void)
 
 int UtcDaliConstraintGetTagNegative(void)
 {
-  TestApplication application;
+  TestApplication  application;
   Dali::Constraint instance;
   try
   {

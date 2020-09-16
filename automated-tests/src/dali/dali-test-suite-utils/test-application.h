@@ -19,25 +19,24 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/resource-policies.h>
+#include <dali/integration-api/scene.h>
+#include <dali/integration-api/trace.h>
+#include <dali/public-api/common/dali-common.h>
 #include <test-platform-abstraction.h>
-#include "test-gl-sync-abstraction.h"
+
 #include "test-gl-abstraction.h"
 #include "test-gl-context-helper-abstraction.h"
+#include "test-gl-sync-abstraction.h"
 #include "test-render-controller.h"
-#include <dali/public-api/common/dali-common.h>
-#include <dali/integration-api/resource-policies.h>
-#include <dali/integration-api/trace.h>
-#include <dali/integration-api/scene.h>
 
 namespace Dali
 {
-
 class DALI_CORE_API TestApplication : public ConnectionTracker
 {
 public:
-
   // Default values derived from H2 device.
-  static const uint32_t DEFAULT_SURFACE_WIDTH = 480;
+  static const uint32_t DEFAULT_SURFACE_WIDTH  = 480;
   static const uint32_t DEFAULT_SURFACE_HEIGHT = 800;
 
   static constexpr uint32_t DEFAULT_HORIZONTAL_DPI = 220;
@@ -47,39 +46,39 @@ public:
 
   static const uint32_t RENDER_FRAME_INTERVAL = 16;
 
-  TestApplication( uint32_t surfaceWidth  = DEFAULT_SURFACE_WIDTH,
-                   uint32_t surfaceHeight = DEFAULT_SURFACE_HEIGHT,
-                   uint32_t horizontalDpi = DEFAULT_HORIZONTAL_DPI,
-                   uint32_t verticalDpi   = DEFAULT_VERTICAL_DPI,
-                   bool initialize = true,
-                   bool enablePartialUpdate = false );
+  TestApplication(uint32_t surfaceWidth        = DEFAULT_SURFACE_WIDTH,
+                  uint32_t surfaceHeight       = DEFAULT_SURFACE_HEIGHT,
+                  uint32_t horizontalDpi       = DEFAULT_HORIZONTAL_DPI,
+                  uint32_t verticalDpi         = DEFAULT_VERTICAL_DPI,
+                  bool     initialize          = true,
+                  bool     enablePartialUpdate = false);
 
   void Initialize();
   void CreateCore();
   void CreateScene();
   void InitializeCore();
-  virtual ~TestApplication();
-  static void LogMessage( Dali::Integration::Log::DebugPriority level, std::string& message );
-  static void LogContext( bool start, const char* tag );
-  Dali::Integration::Core& GetCore();
-  TestPlatformAbstraction& GetPlatform();
-  TestRenderController& GetRenderController();
-  TestGlAbstraction& GetGlAbstraction();
-  TestGlSyncAbstraction& GetGlSyncAbstraction();
+  ~TestApplication() override;
+  static void                     LogMessage(Dali::Integration::Log::DebugPriority level, std::string& message);
+  static void                     LogContext(bool start, const char* tag);
+  Dali::Integration::Core&        GetCore();
+  TestPlatformAbstraction&        GetPlatform();
+  TestRenderController&           GetRenderController();
+  TestGlAbstraction&              GetGlAbstraction();
+  TestGlSyncAbstraction&          GetGlSyncAbstraction();
   TestGlContextHelperAbstraction& GetGlContextHelperAbstraction();
-  void ProcessEvent(const Integration::Event& event);
-  void SendNotification();
-  bool Render( uint32_t intervalMilliseconds = DEFAULT_RENDER_INTERVAL, const char* location=NULL );
-  bool PreRenderWithPartialUpdate(uint32_t intervalMilliseconds, const char* location, std::vector<Rect<int>>& damagedRects);
-  bool RenderWithPartialUpdate(std::vector<Rect<int>>& damagedRects, Rect<int>& clippingRect);
-  uint32_t GetUpdateStatus();
-  bool UpdateOnly( uint32_t intervalMilliseconds = DEFAULT_RENDER_INTERVAL );
-  bool RenderOnly( );
-  void ResetContext();
-  bool GetRenderNeedsUpdate();
-  bool GetRenderNeedsPostRender();
-  uint32_t Wait( uint32_t durationToWait );
-  static void EnableLogging( bool enabled )
+  void                            ProcessEvent(const Integration::Event& event);
+  void                            SendNotification();
+  bool                            Render(uint32_t intervalMilliseconds = DEFAULT_RENDER_INTERVAL, const char* location = NULL);
+  bool                            PreRenderWithPartialUpdate(uint32_t intervalMilliseconds, const char* location, std::vector<Rect<int>>& damagedRects);
+  bool                            RenderWithPartialUpdate(std::vector<Rect<int>>& damagedRects, Rect<int>& clippingRect);
+  uint32_t                        GetUpdateStatus();
+  bool                            UpdateOnly(uint32_t intervalMilliseconds = DEFAULT_RENDER_INTERVAL);
+  bool                            RenderOnly();
+  void                            ResetContext();
+  bool                            GetRenderNeedsUpdate();
+  bool                            GetRenderNeedsPostRender();
+  uint32_t                        Wait(uint32_t durationToWait);
+  static void                     EnableLogging(bool enabled)
   {
     mLoggingEnabled = enabled;
   }
@@ -90,31 +89,35 @@ public:
   }
 
 private:
-  void DoUpdate( uint32_t intervalMilliseconds, const char* location=NULL );
+  void DoUpdate(uint32_t intervalMilliseconds, const char* location = NULL);
 
 protected:
-  TestPlatformAbstraction   mPlatformAbstraction;
-  TestRenderController      mRenderController;
-  TestGlAbstraction         mGlAbstraction;
-  TestGlSyncAbstraction     mGlSyncAbstraction;
+  TestPlatformAbstraction        mPlatformAbstraction;
+  TestRenderController           mRenderController;
+  TestGlAbstraction              mGlAbstraction;
+  TestGlSyncAbstraction          mGlSyncAbstraction;
   TestGlContextHelperAbstraction mGlContextHelperAbstraction;
 
   Integration::UpdateStatus mStatus;
   Integration::RenderStatus mRenderStatus;
 
-  Integration::Core* mCore;
+  Integration::Core*       mCore;
   Dali::Integration::Scene mScene;
 
   uint32_t mSurfaceWidth;
   uint32_t mSurfaceHeight;
   uint32_t mFrame;
 
-  struct { uint32_t x; uint32_t y; } mDpi;
-  uint32_t mLastVSyncTime;
-  bool mPartialUpdateEnabled;
+  struct
+  {
+    uint32_t x;
+    uint32_t y;
+  } mDpi;
+  uint32_t    mLastVSyncTime;
+  bool        mPartialUpdateEnabled;
   static bool mLoggingEnabled;
 };
 
-} // Dali
+} // namespace Dali
 
 #endif // DALI_TEST_APPLICATION_H

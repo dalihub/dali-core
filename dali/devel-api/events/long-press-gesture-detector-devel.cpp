@@ -26,17 +26,13 @@
 
 namespace Dali
 {
-
 namespace DevelLongPressGestureDetector
 {
-
-uint32_t GetMinimumHoldingTime( LongPressGestureDetector longPressGestureDetector )
+uint32_t GetMinimumHoldingTime(LongPressGestureDetector longPressGestureDetector)
 {
-  return GetImplementation( longPressGestureDetector ).GetMinimumHoldingTime();
+  return GetImplementation(longPressGestureDetector).GetMinimumHoldingTime();
 }
-
 
 } // namespace DevelLongPressGestureDetector
 
 } // namespace Dali
-

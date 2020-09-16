@@ -140,19 +140,19 @@ Dali::Actor EmitHoverSignals( Actor* actor, RenderTask& renderTask, const HoverE
  */
 struct ActorHoverableCheck : public HitTestAlgorithm::HitTestInterface
 {
-  bool IsActorHittable( Actor* actor )
+  bool IsActorHittable( Actor* actor ) override
   {
     return actor->GetHoverRequired() && // Does the Application or derived actor type require a hover event?
            actor->IsHittable();         // Is actor sensitive, visible and on the scene?
   }
 
-  bool DescendActorHierarchy( Actor* actor )
+  bool DescendActorHierarchy( Actor* actor ) override
   {
     return actor->IsVisible() && // Actor is visible, if not visible then none of its children are visible.
            actor->IsSensitive(); // Actor is sensitive, if insensitive none of its children should be hittable either.
   }
 
-  bool DoesLayerConsumeHit( Layer* layer )
+  bool DoesLayerConsumeHit( Layer* layer ) override
   {
     return layer->IsHoverConsumed();
   }
@@ -222,9 +222,9 @@ void HoverEventProcessor::ProcessHoverEvent( const Integration::HoverEvent& even
       AllocAndEmitHoverSignals( event.time, hoverStartConsumedActorHandle, currentPoint );
     }
 
-    mLastPrimaryHitActor.SetActor( NULL );
-    mLastConsumedActor.SetActor( NULL );
-    mHoverStartConsumedActor.SetActor( NULL );
+    mLastPrimaryHitActor.SetActor( nullptr );
+    mLastConsumedActor.SetActor( nullptr );
+    mHoverStartConsumedActor.SetActor( nullptr );
     mLastRenderTask.Reset();
 
     return; // No need for hit testing
@@ -355,8 +355,8 @@ void HoverEventProcessor::ProcessHoverEvent( const Integration::HoverEvent& even
 
   if ( primaryPointState == PointState::FINISHED )
   {
-    mLastPrimaryHitActor.SetActor( NULL );
-    mLastConsumedActor.SetActor( NULL );
+    mLastPrimaryHitActor.SetActor( nullptr );
+    mLastConsumedActor.SetActor( nullptr );
     mLastRenderTask.Reset();
   }
   else
@@ -373,15 +373,15 @@ void HoverEventProcessor::ProcessHoverEvent( const Integration::HoverEvent& even
       }
       else
       {
-        mLastConsumedActor.SetActor( NULL );
+        mLastConsumedActor.SetActor( nullptr );
       }
 
       mLastRenderTask = currentRenderTask;
     }
     else
     {
-      mLastPrimaryHitActor.SetActor( NULL );
-      mLastConsumedActor.SetActor( NULL );
+      mLastPrimaryHitActor.SetActor( nullptr );
+      mLastConsumedActor.SetActor( nullptr );
       mLastRenderTask.Reset();
     }
   }
@@ -411,7 +411,7 @@ void HoverEventProcessor::ProcessHoverEvent( const Integration::HoverEvent& even
           primaryPoint.SetState( primaryPointState );
         }
 
-        mHoverStartConsumedActor.SetActor( NULL );
+        mHoverStartConsumedActor.SetActor( nullptr );
       }
       // No break, Fallthrough
 

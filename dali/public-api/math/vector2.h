@@ -28,7 +28,6 @@
 
 namespace Dali
 {
-
 class Uint16Pair;
 
 /**
@@ -45,12 +44,11 @@ struct Vector4;
  */
 struct DALI_CORE_API Vector2
 {
-// (x width) and (y height) must be consecutive in memory.
-// No other data must be added before (x width) member.
-// No virtual methods must be added to this struct.
+  // (x width) and (y height) must be consecutive in memory.
+  // No other data must be added before (x width) member.
+  // No virtual methods must be added to this struct.
 
 public:
-
   /**
    * @brief Constructor.
    * @SINCE_1_0.0
@@ -69,7 +67,8 @@ public:
    * @param[in] y y or height component
    */
   explicit constexpr Vector2(float x, float y)
-  : x(x), y(y)
+  : x(x),
+    y(y)
   {
   }
 
@@ -110,16 +109,16 @@ public:
    */
   Vector2(const Uint16Pair& pair);
 
-// Constants
+  // Constants
 
-  static const Vector2 ONE;               ///< (1.0f,1.0f)
-  static const Vector2 XAXIS;             ///< Vector representing the X axis
-  static const Vector2 YAXIS;             ///< Vector representing the Y axis
-  static const Vector2 NEGATIVE_XAXIS;    ///< Vector representing the negative X axis
-  static const Vector2 NEGATIVE_YAXIS;    ///< Vector representing the negative Y axis
-  static const Vector2 ZERO;              ///< (0.0f, 0.0f)
+  static const Vector2 ONE;            ///< (1.0f,1.0f)
+  static const Vector2 XAXIS;          ///< Vector representing the X axis
+  static const Vector2 YAXIS;          ///< Vector representing the Y axis
+  static const Vector2 NEGATIVE_XAXIS; ///< Vector representing the negative X axis
+  static const Vector2 NEGATIVE_YAXIS; ///< Vector representing the negative Y axis
+  static const Vector2 ZERO;           ///< (0.0f, 0.0f)
 
-// API
+  // API
 
   /**
    * @brief Assignment operator.
@@ -290,7 +289,6 @@ public:
     return Vector2(x / rhs, y / rhs);
   }
 
-
   /**
    * @brief Division assignment operator.
    *
@@ -369,7 +367,7 @@ public:
    */
   const float& operator[](const uint32_t index) const
   {
-    DALI_ASSERT_ALWAYS( index < 2 && "Vector element index out of bounds" );
+    DALI_ASSERT_ALWAYS(index < 2 && "Vector element index out of bounds");
 
     return AsFloat()[index];
   }
@@ -384,7 +382,7 @@ public:
    */
   float& operator[](const uint32_t index)
   {
-    DALI_ASSERT_ALWAYS( index < 2 && "Vector element index out of bounds" );
+    DALI_ASSERT_ALWAYS(index < 2 && "Vector element index out of bounds");
 
     return AsFloat()[index];
   }
@@ -421,7 +419,7 @@ public:
     * @param[in] min The minimum vector
     * @param[in] max The maximum vector
    */
-  void Clamp( const Vector2& min, const Vector2& max );
+  void Clamp(const Vector2& min, const Vector2& max);
 
   /**
    * @brief Returns the contents of the vector as an array of 2 floats.
@@ -433,7 +431,10 @@ public:
    * @return The vector contents as an array of 2 floats
    * @note inlined for performance reasons (generates less code than a function call)
    */
-  const float* AsFloat() const {return &x;}
+  const float* AsFloat() const
+  {
+    return &x;
+  }
 
   /**
    * @brief Returns the contents of the vector as an array of 2 floats.
@@ -445,17 +446,18 @@ public:
    * @return The vector contents as an array of 2 floats
    * @note inlined for performance reasons (generates less code than a function call)
    */
-  float* AsFloat() {return &x;}
+  float* AsFloat()
+  {
+    return &x;
+  }
 
 public:
-
-  Vector2( const Vector2& ) = default; ///< Default copy constructor
-  Vector2( Vector2&& ) = default; ///< Default move constructor
-  Vector2& operator=( const Vector2& ) = default; ///< Default copy assignment operator
-  Vector2& operator=( Vector2&& ) = default; ///< Default move assignment operator
+  Vector2(const Vector2&) = default;            ///< Default copy constructor
+  Vector2(Vector2&&)      = default;            ///< Default move constructor
+  Vector2& operator=(const Vector2&) = default; ///< Default copy assignment operator
+  Vector2& operator=(Vector2&&) = default;      ///< Default move assignment operator
 
 public: // Data
-
   // NOTE
   // (x width) and (y height) must be consecutive in memory.
   // No other data must be added before (x width) member.
@@ -471,14 +473,13 @@ public: // Data
     float y;      ///< y component
     float height; ///< height
   };
-
 };
 
 /**
  * @brief Size is an alias of Dali::Vector2.
  * @SINCE_1_0.0
  */
-typedef Vector2 Size;
+using Size = Vector2;
 
 /**
  * @brief Print a Vector2.
@@ -488,7 +489,7 @@ typedef Vector2 Size;
  * @param[in] vector The vector to print
  * @return The output stream operator
  */
-DALI_CORE_API std::ostream& operator<< (std::ostream& o, const Vector2& vector);
+DALI_CORE_API std::ostream& operator<<(std::ostream& o, const Vector2& vector);
 
 /**
  * @brief Returns a vector with components set to the minimum of the corresponding component in a and b.
@@ -499,9 +500,9 @@ DALI_CORE_API std::ostream& operator<< (std::ostream& o, const Vector2& vector);
  * @param[in] b A vector
  * @return A vector containing the minimum of each component from a and b
  */
-inline Vector2 Min( const Vector2& a, const Vector2& b )
+inline Vector2 Min(const Vector2& a, const Vector2& b)
 {
-  return Vector2( a.x < b.x ? a.x : b.x , a.y < b.y ? a.y : b.y );
+  return Vector2(a.x < b.x ? a.x : b.x, a.y < b.y ? a.y : b.y);
 }
 
 /**
@@ -513,9 +514,9 @@ inline Vector2 Min( const Vector2& a, const Vector2& b )
  * @param[in] b A vector
  * @return A vector containing the maximum of each component from a and b
  */
-inline Vector2 Max( const Vector2& a, const Vector2& b )
+inline Vector2 Max(const Vector2& a, const Vector2& b)
 {
-  return Vector2( a.x > b.x ? a.x : b.x , a.y > b.y ? a.y : b.y );
+  return Vector2(a.x > b.x ? a.x : b.x, a.y > b.y ? a.y : b.y);
 }
 
 /**
@@ -527,10 +528,17 @@ inline Vector2 Max( const Vector2& a, const Vector2& b )
  * @param[in] max The maximum value
  * @return A vector containing the clamped components of v
  */
-DALI_CORE_API Vector2 Clamp( const Vector2& v, const float& min, const float& max );
+DALI_CORE_API Vector2 Clamp(const Vector2& v, const float& min, const float& max);
 
 // Allow Vector2 to be treated as a POD type
-template <> struct TypeTraits< Vector2 > : public BasicTypes< Vector2 > { enum { IS_TRIVIAL_TYPE = true }; };
+template<>
+struct TypeTraits<Vector2> : public BasicTypes<Vector2>
+{
+  enum
+  {
+    IS_TRIVIAL_TYPE = true
+  };
+};
 
 /**
  * @}

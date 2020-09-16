@@ -15,12 +15,13 @@
  *
  */
 
-#include <iostream>
-
-#include <stdlib.h>
-#include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/events/rotation-gesture-devel.h>
 #include <dali/internal/event/events/rotation-gesture/rotation-gesture-impl.h>
+#include <dali/public-api/dali-core.h>
+#include <stdlib.h>
+
+#include <iostream>
 
 using namespace Dali;
 
@@ -39,23 +40,23 @@ int UtcDaliRotationGestureConstructor(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  RotationGesture gesture(new Internal::RotationGesture( GestureState::STARTED ));
+  RotationGesture gesture = DevelRotationGesture::New(GestureState::STARTED);
   DALI_TEST_EQUALS(GestureState::STARTED, gesture.GetState(), TEST_LOCATION);
   DALI_TEST_EQUALS(0.0f, gesture.GetRotation().radian, TEST_LOCATION);
   DALI_TEST_EQUALS(GestureType::ROTATION, gesture.GetType(), TEST_LOCATION);
 
-  RotationGesture gesture2(new Internal::RotationGesture( GestureState::CONTINUING ));
+  RotationGesture gesture2 = DevelRotationGesture::New(GestureState::CONTINUING);
   DALI_TEST_EQUALS(GestureState::CONTINUING, gesture2.GetState(), TEST_LOCATION);
   DALI_TEST_EQUALS(0.0f, gesture2.GetRotation().radian, TEST_LOCATION);
   DALI_TEST_EQUALS(GestureType::ROTATION, gesture2.GetType(), TEST_LOCATION);
 
-  RotationGesture gesture3(new Internal::RotationGesture( GestureState::FINISHED ));
+  RotationGesture gesture3 = DevelRotationGesture::New(GestureState::FINISHED);
   DALI_TEST_EQUALS(GestureState::FINISHED, gesture3.GetState(), TEST_LOCATION);
   DALI_TEST_EQUALS(0.0f, gesture3.GetRotation().radian, TEST_LOCATION);
   DALI_TEST_EQUALS(GestureType::ROTATION, gesture3.GetType(), TEST_LOCATION);
 
   // Test copy constructor
-  GetImplementation( gesture3 ).SetRotation( Radian( 3.0f ));
+  GetImplementation(gesture3).SetRotation(Radian(3.0f));
 
   RotationGesture rotation(gesture3);
   DALI_TEST_EQUALS(GestureState::FINISHED, rotation.GetState(), TEST_LOCATION);
@@ -63,8 +64,8 @@ int UtcDaliRotationGestureConstructor(void)
   DALI_TEST_EQUALS(GestureType::ROTATION, rotation.GetType(), TEST_LOCATION);
 
   // Test move constructor
-  const auto refCount = gesture.GetObjectPtr()->ReferenceCount();
-  RotationGesture gesture4( std::move( gesture ) );
+  const auto      refCount = gesture.GetObjectPtr()->ReferenceCount();
+  RotationGesture gesture4(std::move(gesture));
   DALI_TEST_CHECK(!gesture);
   DALI_TEST_EQUALS(GestureType::ROTATION, gesture4.GetType(), TEST_LOCATION);
   DALI_TEST_EQUALS(gesture4.GetBaseObject().ReferenceCount(), refCount, TEST_LOCATION);
@@ -75,17 +76,17 @@ int UtcDaliRotationGestureConstructor(void)
 int UtcDaliRotationGestureAssignment(void)
 {
   // Test Assignment operator
-  RotationGesture gesture(new Internal::RotationGesture( GestureState::STARTED ));
+  RotationGesture gesture = DevelRotationGesture::New(GestureState::STARTED);
   DALI_TEST_EQUALS(GestureState::STARTED, gesture.GetState(), TEST_LOCATION);
   DALI_TEST_EQUALS(0.0f, gesture.GetRotation().radian, TEST_LOCATION);
   DALI_TEST_EQUALS(GestureType::ROTATION, gesture.GetType(), TEST_LOCATION);
 
-  RotationGesture gesture2(new Internal::RotationGesture( GestureState::CONTINUING ));
+  RotationGesture gesture2 = DevelRotationGesture::New(GestureState::CONTINUING);
   DALI_TEST_EQUALS(GestureState::CONTINUING, gesture2.GetState(), TEST_LOCATION);
   DALI_TEST_EQUALS(0.0f, gesture2.GetRotation().radian, TEST_LOCATION);
   DALI_TEST_EQUALS(GestureType::ROTATION, gesture2.GetType(), TEST_LOCATION);
 
-  GetImplementation( gesture2 ).SetRotation( Radian( 3.0f ));
+  GetImplementation(gesture2).SetRotation(Radian(3.0f));
 
   gesture = gesture2;
   DALI_TEST_EQUALS(GestureState::CONTINUING, gesture.GetState(), TEST_LOCATION);
@@ -93,7 +94,7 @@ int UtcDaliRotationGestureAssignment(void)
   DALI_TEST_EQUALS(GestureType::ROTATION, gesture.GetType(), TEST_LOCATION);
 
   // Move assignment
-  const auto refCount = gesture.GetObjectPtr()->ReferenceCount();
+  const auto      refCount = gesture.GetObjectPtr()->ReferenceCount();
   RotationGesture gesture3;
   DALI_TEST_EQUALS(gesture3, Gesture(), TEST_LOCATION);
   gesture3 = std::move(gesture);
@@ -106,7 +107,7 @@ int UtcDaliRotationGestureAssignment(void)
 
 int UtcDaliRotationGestureSetGetRotationP(void)
 {
-  RotationGesture gesture(new Internal::RotationGesture(GestureState::STARTED));
+  RotationGesture gesture = DevelRotationGesture::New(GestureState::STARTED);
   DALI_TEST_EQUALS(gesture.GetRotation(), Radian(), TEST_LOCATION);
 
   GetImplementation(gesture).SetRotation(Dali::ANGLE_270);
@@ -117,22 +118,22 @@ int UtcDaliRotationGestureSetGetRotationP(void)
 
 int UtcDaliRotationGestureSetGetScreenCenterPointP(void)
 {
-  RotationGesture gesture(new Internal::RotationGesture(GestureState::STARTED));
+  RotationGesture gesture = DevelRotationGesture::New(GestureState::STARTED);
   DALI_TEST_EQUALS(gesture.GetScreenCenterPoint(), Vector2::ZERO, TEST_LOCATION);
 
-  GetImplementation(gesture).SetScreenCenterPoint(Vector2(123.0f,321.0f));
-  DALI_TEST_EQUALS(gesture.GetScreenCenterPoint(), Vector2(123.0f,321.0f), TEST_LOCATION);
+  GetImplementation(gesture).SetScreenCenterPoint(Vector2(123.0f, 321.0f));
+  DALI_TEST_EQUALS(gesture.GetScreenCenterPoint(), Vector2(123.0f, 321.0f), TEST_LOCATION);
 
   END_TEST;
 }
 
 int UtcDaliRotationGestureSetGetLocalCenterPointP(void)
 {
-  RotationGesture gesture(new Internal::RotationGesture(GestureState::STARTED));
+  RotationGesture gesture = DevelRotationGesture::New(GestureState::STARTED);
   DALI_TEST_EQUALS(gesture.GetLocalCenterPoint(), Vector2::ZERO, TEST_LOCATION);
 
-  GetImplementation(gesture).SetLocalCenterPoint(Vector2(123.0f,321.0f));
-  DALI_TEST_EQUALS(gesture.GetLocalCenterPoint(), Vector2(123.0f,321.0f), TEST_LOCATION);
+  GetImplementation(gesture).SetLocalCenterPoint(Vector2(123.0f, 321.0f));
+  DALI_TEST_EQUALS(gesture.GetLocalCenterPoint(), Vector2(123.0f, 321.0f), TEST_LOCATION);
 
   END_TEST;
 }

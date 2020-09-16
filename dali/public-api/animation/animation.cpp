@@ -19,15 +19,14 @@
 #include <dali/public-api/animation/animation.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/animation/alpha-function.h>
-#include <dali/public-api/animation/time-period.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/animation/animation-impl.h>
 #include <dali/internal/event/animation/path-impl.h>
+#include <dali/public-api/animation/alpha-function.h>
+#include <dali/public-api/animation/time-period.h>
 
 namespace Dali
 {
-
 Animation::Animation()
 {
 }
@@ -44,9 +43,9 @@ Animation Animation::New(float durationSeconds)
   return Animation(internal.Get());
 }
 
-Animation Animation::DownCast( BaseHandle handle )
+Animation Animation::DownCast(BaseHandle handle)
 {
-  return Animation( dynamic_cast<Dali::Internal::Animation*>(handle.GetObjectPtr()) );
+  return Animation(dynamic_cast<Dali::Internal::Animation*>(handle.GetObjectPtr()));
 }
 
 Animation::~Animation()
@@ -57,9 +56,9 @@ Animation::Animation(const Animation& handle) = default;
 
 Animation& Animation::operator=(const Animation& rhs) = default;
 
-Animation::Animation( Animation&& rhs ) = default;
+Animation::Animation(Animation&& rhs) = default;
 
-Animation& Animation::operator=( Animation&& rhs ) = default;
+Animation& Animation::operator=(Animation&& rhs) = default;
 
 void Animation::SetDuration(float durationSeconds)
 {
@@ -106,9 +105,9 @@ Dali::Animation::EndAction Animation::GetEndAction() const
   return GetImplementation(*this).GetEndAction();
 }
 
-void Animation::SetDisconnectAction( Animation::EndAction disconnectAction )
+void Animation::SetDisconnectAction(Animation::EndAction disconnectAction)
 {
-  GetImplementation(*this).SetDisconnectAction( disconnectAction );
+  GetImplementation(*this).SetDisconnectAction(disconnectAction);
 }
 
 Animation::EndAction Animation::GetDisconnectAction() const
@@ -136,9 +135,9 @@ void Animation::PlayFrom(float progress)
   GetImplementation(*this).PlayFrom(progress);
 }
 
-void Animation::PlayAfter( float delaySeconds )
+void Animation::PlayAfter(float delaySeconds)
 {
-  GetImplementation( *this ).PlayAfter( delaySeconds );
+  GetImplementation(*this).PlayAfter(delaySeconds);
 }
 
 void Animation::Pause()
@@ -161,14 +160,14 @@ void Animation::Clear()
   GetImplementation(*this).Clear();
 }
 
-void Animation::SetLoopingMode( LoopingMode loopingMode )
+void Animation::SetLoopingMode(LoopingMode loopingMode)
 {
-  GetImplementation( *this ).SetLoopingMode( loopingMode );
+  GetImplementation(*this).SetLoopingMode(loopingMode);
 }
 
 Animation::LoopingMode Animation::GetLoopingMode() const
 {
-  return GetImplementation( *this ).GetLoopingMode();
+  return GetImplementation(*this).GetLoopingMode();
 }
 
 Animation::AnimationSignalType& Animation::FinishedSignal()
@@ -216,14 +215,14 @@ void Animation::AnimateTo(Property target, Property::Value destinationValue, Alp
   GetImplementation(*this).AnimateTo(target, destinationValue, alpha, period);
 }
 
-void Animation::AnimateBetween(Property target, KeyFrames& keyFrames )
+void Animation::AnimateBetween(Property target, KeyFrames& keyFrames)
 {
-  GetImplementation(*this).AnimateBetween(target, GetImplementation(keyFrames) );
+  GetImplementation(*this).AnimateBetween(target, GetImplementation(keyFrames));
 }
 
 void Animation::AnimateBetween(Property target, KeyFrames& keyFrames, Interpolation interpolation)
 {
-  GetImplementation(*this).AnimateBetween(target, GetImplementation(keyFrames), interpolation );
+  GetImplementation(*this).AnimateBetween(target, GetImplementation(keyFrames), interpolation);
 }
 
 void Animation::AnimateBetween(Property target, KeyFrames& keyFrames, TimePeriod period)
@@ -233,7 +232,7 @@ void Animation::AnimateBetween(Property target, KeyFrames& keyFrames, TimePeriod
 
 void Animation::AnimateBetween(Property target, KeyFrames& keyFrames, TimePeriod period, Interpolation interpolation)
 {
-  GetImplementation(*this).AnimateBetween(target, GetImplementation(keyFrames), period, interpolation );
+  GetImplementation(*this).AnimateBetween(target, GetImplementation(keyFrames), period, interpolation);
 }
 
 void Animation::AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunction alpha)
@@ -246,7 +245,6 @@ void Animation::AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunct
   GetImplementation(*this).AnimateBetween(target, GetImplementation(keyFrames), alpha, interpolation);
 }
 
-
 void Animation::AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period)
 {
   GetImplementation(*this).AnimateBetween(target, GetImplementation(keyFrames), alpha, period);
@@ -257,27 +255,26 @@ void Animation::AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunct
   GetImplementation(*this).AnimateBetween(target, GetImplementation(keyFrames), alpha, period, interpolation);
 }
 
-
 // Actor specific animations
 
-void Animation::Animate( Actor actor, Path path, const Vector3& forward )
+void Animation::Animate(Actor actor, Path path, const Vector3& forward)
 {
-  GetImplementation(*this).Animate(GetImplementation(actor), GetImplementation( path ), forward );
+  GetImplementation(*this).Animate(GetImplementation(actor), GetImplementation(path), forward);
 }
 
-void Animation::Animate( Actor actor, Path path, const Vector3& forward, AlphaFunction alpha )
+void Animation::Animate(Actor actor, Path path, const Vector3& forward, AlphaFunction alpha)
 {
-  GetImplementation(*this).Animate(GetImplementation(actor), GetImplementation( path ), forward, alpha );
+  GetImplementation(*this).Animate(GetImplementation(actor), GetImplementation(path), forward, alpha);
 }
 
-void Animation::Animate( Actor actor, Path path, const Vector3& forward, TimePeriod period )
+void Animation::Animate(Actor actor, Path path, const Vector3& forward, TimePeriod period)
 {
-  GetImplementation(*this).Animate(GetImplementation(actor), GetImplementation( path ), forward, period);
+  GetImplementation(*this).Animate(GetImplementation(actor), GetImplementation(path), forward, period);
 }
 
-void Animation::Animate( Actor actor, Path path, const Vector3& forward, AlphaFunction alpha, TimePeriod period)
+void Animation::Animate(Actor actor, Path path, const Vector3& forward, AlphaFunction alpha, TimePeriod period)
 {
-  GetImplementation(*this).Animate(GetImplementation(actor), GetImplementation( path ), forward, alpha, period );
+  GetImplementation(*this).Animate(GetImplementation(actor), GetImplementation(path), forward, alpha, period);
 }
 
 void Animation::Show(Actor actor, float delaySeconds)
@@ -290,9 +287,9 @@ void Animation::Hide(Actor actor, float delaySeconds)
   GetImplementation(*this).Hide(GetImplementation(actor), delaySeconds);
 }
 
-void Animation::SetCurrentProgress( float progress )
+void Animation::SetCurrentProgress(float progress)
 {
-  return GetImplementation(*this).SetCurrentProgress( progress );
+  return GetImplementation(*this).SetCurrentProgress(progress);
 }
 
 float Animation::GetCurrentProgress()
@@ -300,9 +297,9 @@ float Animation::GetCurrentProgress()
   return GetImplementation(*this).GetCurrentProgress();
 }
 
-void Animation::SetSpeedFactor( float factor )
+void Animation::SetSpeedFactor(float factor)
 {
-  GetImplementation(*this).SetSpeedFactor( factor );
+  GetImplementation(*this).SetSpeedFactor(factor);
 }
 
 float Animation::GetSpeedFactor() const
@@ -310,7 +307,7 @@ float Animation::GetSpeedFactor() const
   return GetImplementation(*this).GetSpeedFactor();
 }
 
-void Animation::SetPlayRange( const Vector2& range )
+void Animation::SetPlayRange(const Vector2& range)
 {
   GetImplementation(*this).SetPlayRange(range);
 }

@@ -117,9 +117,9 @@ namespace Render
 {
 
 VertexBuffer::VertexBuffer()
-:mFormat(NULL),
- mData(NULL),
- mGpuBuffer(NULL),
+:mFormat(nullptr),
+ mData(nullptr),
+ mGpuBuffer(nullptr),
  mSize(0),
  mDataChanged(true)
 {

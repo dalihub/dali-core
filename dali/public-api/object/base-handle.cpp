@@ -23,12 +23,11 @@
 #include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/common/object-impl.h>
 #include <dali/integration-api/debug.h>
+#include <dali/internal/event/common/object-impl.h>
 
 namespace Dali
 {
-
 BaseHandle::BaseHandle(Dali::BaseObject* handle)
 : mObjectHandle(handle)
 {
@@ -46,13 +45,13 @@ BaseHandle::BaseHandle(const BaseHandle& handle) = default;
 
 BaseHandle& BaseHandle::operator=(const BaseHandle& rhs) = default;
 
-BaseHandle::BaseHandle( BaseHandle&& rhs ) = default;
+BaseHandle::BaseHandle(BaseHandle&& rhs) = default;
 
-BaseHandle& BaseHandle::operator=( BaseHandle&& rhs ) = default;
+BaseHandle& BaseHandle::operator=(BaseHandle&& rhs) = default;
 
 bool BaseHandle::DoAction(const std::string& command, const Property::Map& attributes)
 {
-  return GetImplementation(*this).DoAction( command, attributes );
+  return GetImplementation(*this).DoAction(command, attributes);
 }
 
 const std::string& BaseHandle::GetTypeName() const
@@ -77,12 +76,12 @@ const BaseObject& BaseHandle::GetBaseObject() const
 
 void BaseHandle::Reset()
 {
-  mObjectHandle = NULL;
+  mObjectHandle = nullptr;
 }
 
 BaseHandle::operator BaseHandle::BooleanType() const
 {
-  return mObjectHandle ? &BaseHandle::ThisIsSaferThanReturningVoidStar : NULL;
+  return mObjectHandle ? &BaseHandle::ThisIsSaferThanReturningVoidStar : nullptr;
 }
 
 bool BaseHandle::operator==(const BaseHandle& rhs) const
@@ -100,9 +99,9 @@ Dali::RefObject* BaseHandle::GetObjectPtr() const
   return mObjectHandle.Get();
 }
 
-bool BaseHandle::DoConnectSignal( ConnectionTrackerInterface* connectionTracker, const std::string& signalName, FunctorDelegate* functor )
+bool BaseHandle::DoConnectSignal(ConnectionTrackerInterface* connectionTracker, const std::string& signalName, FunctorDelegate* functor)
 {
-  return GetImplementation(*this).DoConnectSignal( connectionTracker, signalName, functor );
+  return GetImplementation(*this).DoConnectSignal(connectionTracker, signalName, functor);
 }
 
 } // namespace Dali

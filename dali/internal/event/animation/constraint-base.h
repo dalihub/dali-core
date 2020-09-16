@@ -34,8 +34,8 @@ namespace Internal
 
 class EventThreadServices;
 class Object;
-typedef Dali::Vector<Object*>     ObjectContainer;
-typedef ObjectContainer::Iterator ObjectIter;
+using ObjectContainer = Dali::Vector<Object*>;
+using ObjectIter      = ObjectContainer::Iterator;
 
 namespace SceneGraph
 {
@@ -51,8 +51,7 @@ class AnimatableProperty;
 class ConstraintBase : public BaseObject, public Object::Observer
 {
 public:
-
-  typedef Dali::Constraint::RemoveAction RemoveAction;
+  using RemoveAction = Dali::Constraint::RemoveAction;
 
   /**
    * Constructor.
@@ -73,7 +72,7 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~ConstraintBase();
+  ~ConstraintBase() override;
 
   /**
    * Adds a constraint source to the constraint
@@ -140,17 +139,17 @@ private: // Object::Observer methods
   /**
    * @copydoc Object::Observer::SceneObjectAdded()
    */
-  virtual void SceneObjectAdded( Object& object );
+  void SceneObjectAdded( Object& object ) override;
 
   /**
    * @copydoc Object::Observer::SceneObjectRemoved()
    */
-  virtual void SceneObjectRemoved( Object& object );
+  void SceneObjectRemoved( Object& object ) override;
 
   /**
    * @copydoc Object::Observer::ObjectDestroyed()
    */
-  virtual void ObjectDestroyed( Object& object );
+  void ObjectDestroyed( Object& object ) override;
 
 private:
 

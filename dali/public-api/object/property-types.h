@@ -2,7 +2,7 @@
 #define DALI_PROPERTY_TYPES_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,13 @@
 #include <dali/public-api/common/extents.h>
 #include <dali/public-api/math/angle-axis.h>
 #include <dali/public-api/math/degree.h>
+#include <dali/public-api/math/matrix.h>
+#include <dali/public-api/math/matrix3.h>
 #include <dali/public-api/math/quaternion.h>
+#include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector4.h>
-#include <dali/public-api/math/matrix3.h>
-#include <dali/public-api/math/matrix.h>
-#include <dali/public-api/math/rect.h>
 #include <dali/public-api/object/property.h>
 
 namespace Dali
@@ -45,7 +45,6 @@ namespace Dali
  */
 namespace PropertyTypes
 {
-
 /**
  * @brief Retrieves the name of a property type.
  *
@@ -62,39 +61,86 @@ DALI_CORE_API const char* GetName(Property::Type type);
  * @SINCE_1_0.0
  * @return The property type
  */
-template <typename T>
-inline Property::Type Get()                   { return Property::NONE;  }
-template <>
-inline Property::Type Get<bool>()             { return Property::BOOLEAN;  }
-template <>
-inline Property::Type Get<float>()            { return Property::FLOAT;    }
-template <>
-inline Property::Type Get<int>()              { return Property::INTEGER;  }
-template <>
-inline Property::Type Get<Vector2>()          { return Property::VECTOR2;  }
-template <>
-inline Property::Type Get<Vector3>()          { return Property::VECTOR3;  }
-template <>
-inline Property::Type Get<Vector4>()          { return Property::VECTOR4;  }
-template <>
-inline Property::Type Get<Matrix3>()          { return Property::MATRIX3;  }
-template <>
-inline Property::Type Get<Matrix>()           { return Property::MATRIX;  }
-template <>
-inline Property::Type Get<AngleAxis>()        { return Property::ROTATION; } // Rotation has two representations
-template <>
-inline Property::Type Get<Quaternion>()       { return Property::ROTATION; } // Rotation has two representations
-template <>
-inline Property::Type Get<std::string>()      { return Property::STRING; }
-template <>
-inline Property::Type Get<Dali::Rect<int> >() { return Property::RECTANGLE; }
-template <>
-inline Property::Type Get<Property::Map>()    { return Property::MAP; }
-template <>
-inline Property::Type Get<Property::Array>()  { return Property::ARRAY; }
-template <>
-inline Property::Type Get<Extents>()          { return Property::EXTENTS; }
-
+template<typename T>
+inline Property::Type Get()
+{
+  return Property::NONE;
+}
+template<>
+inline Property::Type Get<bool>()
+{
+  return Property::BOOLEAN;
+}
+template<>
+inline Property::Type Get<float>()
+{
+  return Property::FLOAT;
+}
+template<>
+inline Property::Type Get<int>()
+{
+  return Property::INTEGER;
+}
+template<>
+inline Property::Type Get<Vector2>()
+{
+  return Property::VECTOR2;
+}
+template<>
+inline Property::Type Get<Vector3>()
+{
+  return Property::VECTOR3;
+}
+template<>
+inline Property::Type Get<Vector4>()
+{
+  return Property::VECTOR4;
+}
+template<>
+inline Property::Type Get<Matrix3>()
+{
+  return Property::MATRIX3;
+}
+template<>
+inline Property::Type Get<Matrix>()
+{
+  return Property::MATRIX;
+}
+template<>
+inline Property::Type Get<AngleAxis>()
+{
+  return Property::ROTATION;
+} // Rotation has two representations
+template<>
+inline Property::Type Get<Quaternion>()
+{
+  return Property::ROTATION;
+} // Rotation has two representations
+template<>
+inline Property::Type Get<std::string>()
+{
+  return Property::STRING;
+}
+template<>
+inline Property::Type Get<Dali::Rect<int> >()
+{
+  return Property::RECTANGLE;
+}
+template<>
+inline Property::Type Get<Property::Map>()
+{
+  return Property::MAP;
+}
+template<>
+inline Property::Type Get<Property::Array>()
+{
+  return Property::ARRAY;
+}
+template<>
+inline Property::Type Get<Extents>()
+{
+  return Property::EXTENTS;
+}
 
 }; // namespace PropertyTypes
 

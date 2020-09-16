@@ -2,7 +2,7 @@
 #define DALI_RELAYOUT_CONTAINER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,7 @@ namespace Dali
  */
 
 class RelayoutContainer;
-typedef RelayoutContainer* RelayoutContainerPtr;
-
+using RelayoutContainerPtr = RelayoutContainer*;
 
 /**
  * @brief Interface to encapsulate information required for relayout.
@@ -40,19 +39,22 @@ typedef RelayoutContainer* RelayoutContainerPtr;
 class RelayoutContainer
 {
 public:
-
   /**
    * @brief Default constructor.
    *
    * @SINCE_1_0.0
    */
-  RelayoutContainer() {}
+  RelayoutContainer()
+  {
+  }
 
   /**
    * @brief Virtual destructor.
    * @SINCE_1_0.0
    */
-  virtual ~RelayoutContainer() {}
+  virtual ~RelayoutContainer()
+  {
+  }
 
   /**
    * @brief Adds relayout information to the container if it doesn't already exist.
@@ -61,8 +63,7 @@ public:
    * @param actor The actor to relayout
    * @param size The size to relayout
    */
-  virtual void Add( const Actor& actor, const Vector2& size ) = 0;
-
+  virtual void Add(const Actor& actor, const Vector2& size) = 0;
 };
 
 /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,14 @@
 #include <dali/public-api/images/pixel.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/common/dali-common.h>
 
 namespace Dali
 {
-
 bool Pixel::HasAlpha(Format pixelformat)
 {
-  switch (pixelformat)
+  switch(pixelformat)
   {
     case RGBA5551:
     case RGBA8888:
@@ -104,7 +103,7 @@ bool Pixel::HasAlpha(Format pixelformat)
 
 uint32_t Pixel::GetBytesPerPixel(Format pixelFormat)
 {
-  switch (pixelFormat)
+  switch(pixelFormat)
   {
     case L8:
     case A8:
@@ -200,7 +199,7 @@ uint32_t Pixel::GetBytesPerPixel(Format pixelFormat)
 
 void Pixel::GetAlphaOffsetAndMask(Format pixelFormat, int& byteOffset, int& bitMask)
 {
-  switch (pixelFormat)
+  switch(pixelFormat)
   {
     case A8:
     {
@@ -216,39 +215,39 @@ void Pixel::GetAlphaOffsetAndMask(Format pixelFormat, int& byteOffset, int& bitM
     case BGR8888:
     case BGR565:
     {
-      byteOffset=0;
-      bitMask=0;
+      byteOffset = 0;
+      bitMask    = 0;
       break;
     }
 
     case LA88:
     {
-      byteOffset=1;
-      bitMask=0xff;
+      byteOffset = 1;
+      bitMask    = 0xff;
       break;
     }
 
     case RGBA4444:
     case BGRA4444:
     {
-      byteOffset=1;
-      bitMask=0x0f;
+      byteOffset = 1;
+      bitMask    = 0x0f;
       break;
     }
 
     case RGBA5551:
     case BGRA5551:
     {
-      byteOffset=1;
-      bitMask=0x01;
+      byteOffset = 1;
+      bitMask    = 0x01;
       break;
     }
 
     case RGBA8888:
     case BGRA8888:
     {
-      byteOffset=3;
-      bitMask=0xff;
+      byteOffset = 3;
+      bitMask    = 0xff;
       break;
     }
 
@@ -300,8 +299,8 @@ void Pixel::GetAlphaOffsetAndMask(Format pixelFormat, int& byteOffset, int& bitM
     case INVALID:
     {
       DALI_LOG_ERROR("Pixel formats are not compatible with simple masking-out of per-pixel alpha.\n");
-      byteOffset=0;
-      bitMask=0;
+      byteOffset = 0;
+      bitMask    = 0;
       break;
     }
   }

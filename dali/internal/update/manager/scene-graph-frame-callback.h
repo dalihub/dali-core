@@ -58,7 +58,7 @@ public:
   /**
    * Non-virtual Destructor.
    */
-  ~FrameCallback();
+  ~FrameCallback() override;
 
   /**
    * Called from the update-thread when connecting to the scene-graph.
@@ -107,19 +107,19 @@ private:
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerConnected()
    */
-  virtual void PropertyOwnerConnected( PropertyOwner& owner ) { /* Nothing to do */ }
+  void PropertyOwnerConnected( PropertyOwner& owner ) override { /* Nothing to do */ }
 
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerDisconnected()
    */
-  virtual void PropertyOwnerDisconnected( BufferIndex updateBufferIndex, PropertyOwner& owner ) { /* Nothing to do */ }
+  void PropertyOwnerDisconnected( BufferIndex updateBufferIndex, PropertyOwner& owner ) override { /* Nothing to do */ }
 
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerDisconnected()
    *
    * Will use this to disconnect the frame-callback if the accompanying node is destroyed
    */
-  virtual void PropertyOwnerDestroyed( PropertyOwner& owner );
+  void PropertyOwnerDestroyed( PropertyOwner& owner ) override;
 
   // Construction
 

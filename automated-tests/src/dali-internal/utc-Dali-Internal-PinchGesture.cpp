@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,13 @@
  *
  */
 
-#include <iostream>
-
-#include <stdlib.h>
-#include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/events/pinch-gesture-devel.h>
 #include <dali/internal/event/events/pinch-gesture/pinch-gesture-impl.h>
+#include <dali/public-api/dali-core.h>
+#include <stdlib.h>
+
+#include <iostream>
 
 using namespace Dali;
 
@@ -39,27 +40,27 @@ int UtcDaliPinchGestureConstructor(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  PinchGesture gesture(new Internal::PinchGesture( GestureState::STARTED ));
+  PinchGesture gesture = DevelPinchGesture::New(GestureState::STARTED);
   DALI_TEST_EQUALS(GestureState::STARTED, gesture.GetState(), TEST_LOCATION);
   DALI_TEST_EQUALS(0.0f, gesture.GetScale(), TEST_LOCATION);
   DALI_TEST_EQUALS(0.0f, gesture.GetSpeed(), TEST_LOCATION);
   DALI_TEST_EQUALS(GestureType::PINCH, gesture.GetType(), TEST_LOCATION);
 
-  PinchGesture gesture2(new Internal::PinchGesture( GestureState::CONTINUING ));
+  PinchGesture gesture2 = DevelPinchGesture::New(GestureState::CONTINUING);
   DALI_TEST_EQUALS(GestureState::CONTINUING, gesture2.GetState(), TEST_LOCATION);
   DALI_TEST_EQUALS(0.0f, gesture2.GetScale(), TEST_LOCATION);
   DALI_TEST_EQUALS(0.0f, gesture2.GetSpeed(), TEST_LOCATION);
   DALI_TEST_EQUALS(GestureType::PINCH, gesture2.GetType(), TEST_LOCATION);
 
-  PinchGesture gesture3(new Internal::PinchGesture( GestureState::FINISHED ));
+  PinchGesture gesture3 = DevelPinchGesture::New(GestureState::FINISHED);
   DALI_TEST_EQUALS(GestureState::FINISHED, gesture3.GetState(), TEST_LOCATION);
   DALI_TEST_EQUALS(0.0f, gesture3.GetScale(), TEST_LOCATION);
   DALI_TEST_EQUALS(0.0f, gesture3.GetSpeed(), TEST_LOCATION);
   DALI_TEST_EQUALS(GestureType::PINCH, gesture3.GetType(), TEST_LOCATION);
 
   // Test copy constructor
-  GetImplementation( gesture3 ).SetScale( 3.0f );
-  GetImplementation( gesture3 ).SetSpeed( 5.0f );
+  GetImplementation(gesture3).SetScale(3.0f);
+  GetImplementation(gesture3).SetSpeed(5.0f);
 
   PinchGesture pinch(gesture3);
   DALI_TEST_EQUALS(GestureState::FINISHED, pinch.GetState(), TEST_LOCATION);
@@ -68,8 +69,8 @@ int UtcDaliPinchGestureConstructor(void)
   DALI_TEST_EQUALS(GestureType::PINCH, pinch.GetType(), TEST_LOCATION);
 
   // Test move constructor
-  const auto refCount = gesture.GetObjectPtr()->ReferenceCount();
-  PinchGesture gesture4( std::move( gesture ) );
+  const auto   refCount = gesture.GetObjectPtr()->ReferenceCount();
+  PinchGesture gesture4(std::move(gesture));
   DALI_TEST_CHECK(!gesture);
   DALI_TEST_EQUALS(GestureType::PINCH, gesture4.GetType(), TEST_LOCATION);
   DALI_TEST_EQUALS(gesture4.GetBaseObject().ReferenceCount(), refCount, TEST_LOCATION);
@@ -80,20 +81,20 @@ int UtcDaliPinchGestureConstructor(void)
 int UtcDaliPinchGestureAssignment(void)
 {
   // Test Assignment operator
-  PinchGesture gesture(new Internal::PinchGesture( GestureState::STARTED ));
+  PinchGesture gesture = DevelPinchGesture::New(GestureState::STARTED);
   DALI_TEST_EQUALS(GestureState::STARTED, gesture.GetState(), TEST_LOCATION);
   DALI_TEST_EQUALS(0.0f, gesture.GetScale(), TEST_LOCATION);
   DALI_TEST_EQUALS(0.0f, gesture.GetSpeed(), TEST_LOCATION);
   DALI_TEST_EQUALS(GestureType::PINCH, gesture.GetType(), TEST_LOCATION);
 
-  PinchGesture gesture2(new Internal::PinchGesture( GestureState::CONTINUING ));
+  PinchGesture gesture2 = DevelPinchGesture::New(GestureState::CONTINUING);
   DALI_TEST_EQUALS(GestureState::CONTINUING, gesture2.GetState(), TEST_LOCATION);
   DALI_TEST_EQUALS(0.0f, gesture2.GetScale(), TEST_LOCATION);
   DALI_TEST_EQUALS(0.0f, gesture2.GetSpeed(), TEST_LOCATION);
   DALI_TEST_EQUALS(GestureType::PINCH, gesture2.GetType(), TEST_LOCATION);
 
-  GetImplementation( gesture2 ).SetScale( 3.0f );
-  GetImplementation( gesture2 ).SetSpeed( 5.0f );
+  GetImplementation(gesture2).SetScale(3.0f);
+  GetImplementation(gesture2).SetSpeed(5.0f);
 
   gesture = gesture2;
   DALI_TEST_EQUALS(GestureState::CONTINUING, gesture.GetState(), TEST_LOCATION);
@@ -102,7 +103,7 @@ int UtcDaliPinchGestureAssignment(void)
   DALI_TEST_EQUALS(GestureType::PINCH, gesture.GetType(), TEST_LOCATION);
 
   // Move assignment
-  const auto refCount = gesture.GetObjectPtr()->ReferenceCount();
+  const auto   refCount = gesture.GetObjectPtr()->ReferenceCount();
   PinchGesture gesture3;
   DALI_TEST_EQUALS(gesture3, Gesture(), TEST_LOCATION);
   gesture3 = std::move(gesture);
@@ -115,7 +116,7 @@ int UtcDaliPinchGestureAssignment(void)
 
 int UtcDaliPinchGestureSetGetScaleP(void)
 {
-  PinchGesture gesture(new Internal::PinchGesture(GestureState::STARTED));
+  PinchGesture gesture = DevelPinchGesture::New(GestureState::STARTED);
   DALI_TEST_EQUALS(gesture.GetScale(), 0.0f, TEST_LOCATION);
 
   GetImplementation(gesture).SetScale(123.0f);
@@ -126,7 +127,7 @@ int UtcDaliPinchGestureSetGetScaleP(void)
 
 int UtcDaliPinchGestureSetGetSpeedP(void)
 {
-  PinchGesture gesture(new Internal::PinchGesture(GestureState::STARTED));
+  PinchGesture gesture = DevelPinchGesture::New(GestureState::STARTED);
   DALI_TEST_EQUALS(gesture.GetSpeed(), 0.0f, TEST_LOCATION);
 
   GetImplementation(gesture).SetSpeed(123.0f);
@@ -137,22 +138,22 @@ int UtcDaliPinchGestureSetGetSpeedP(void)
 
 int UtcDaliPinchGestureSetGetScreenCenterPointP(void)
 {
-  PinchGesture gesture(new Internal::PinchGesture(GestureState::STARTED));
+  PinchGesture gesture = DevelPinchGesture::New(GestureState::STARTED);
   DALI_TEST_EQUALS(gesture.GetScreenCenterPoint(), Vector2::ZERO, TEST_LOCATION);
 
   GetImplementation(gesture).SetScreenCenterPoint(Vector2(123.0f, 321.0f));
-  DALI_TEST_EQUALS(gesture.GetScreenCenterPoint(), Vector2(123.0f,321.0f), TEST_LOCATION);
+  DALI_TEST_EQUALS(gesture.GetScreenCenterPoint(), Vector2(123.0f, 321.0f), TEST_LOCATION);
 
   END_TEST;
 }
 
 int UtcDaliPinchGestureSetGetLocalCenterPointP(void)
 {
-  PinchGesture gesture(new Internal::PinchGesture(GestureState::STARTED));
+  PinchGesture gesture = DevelPinchGesture::New(GestureState::STARTED);
   DALI_TEST_EQUALS(gesture.GetLocalCenterPoint(), Vector2::ZERO, TEST_LOCATION);
 
-  GetImplementation(gesture).SetLocalCenterPoint(Vector2(123.0f,321.0f));
-  DALI_TEST_EQUALS(gesture.GetLocalCenterPoint(), Vector2(123.0f,321.0f), TEST_LOCATION);
+  GetImplementation(gesture).SetLocalCenterPoint(Vector2(123.0f, 321.0f));
+  DALI_TEST_EQUALS(gesture.GetLocalCenterPoint(), Vector2(123.0f, 321.0f), TEST_LOCATION);
 
   END_TEST;
 }

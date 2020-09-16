@@ -19,47 +19,46 @@
 #include <dali/public-api/events/pinch-gesture.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
 #include <dali/internal/event/events/pinch-gesture/pinch-gesture-impl.h>
+#include <dali/public-api/common/dali-common.h>
 
 namespace Dali
 {
-
-PinchGesture::PinchGesture( Internal::PinchGesture* internal )
-: Gesture( internal )
+PinchGesture::PinchGesture(Internal::PinchGesture* internal)
+: Gesture(internal)
 {
 }
 
 PinchGesture::PinchGesture() = default;
 
-PinchGesture::PinchGesture( const PinchGesture& rhs ) = default;
+PinchGesture::PinchGesture(const PinchGesture& rhs) = default;
 
-PinchGesture::PinchGesture( PinchGesture&& rhs ) = default;
+PinchGesture::PinchGesture(PinchGesture&& rhs) = default;
 
-PinchGesture& PinchGesture::operator=( const PinchGesture& rhs ) = default;
+PinchGesture& PinchGesture::operator=(const PinchGesture& rhs) = default;
 
-PinchGesture& PinchGesture::operator=( PinchGesture&& rhs ) = default;
+PinchGesture& PinchGesture::operator=(PinchGesture&& rhs) = default;
 
 PinchGesture::~PinchGesture() = default;
 
 float PinchGesture::GetScale() const
 {
-  return GetImplementation( *this ).GetScale();
+  return GetImplementation(*this).GetScale();
 }
 
 float PinchGesture::GetSpeed() const
 {
-  return GetImplementation( *this ).GetSpeed();
+  return GetImplementation(*this).GetSpeed();
 }
 
 const Vector2& PinchGesture::GetScreenCenterPoint() const
 {
-  return GetImplementation( *this ).GetScreenCenterPoint();
+  return GetImplementation(*this).GetScreenCenterPoint();
 }
 
 const Vector2& PinchGesture::GetLocalCenterPoint() const
 {
-  return GetImplementation( *this ).GetLocalCenterPoint();
+  return GetImplementation(*this).GetLocalCenterPoint();
 }
 
 } // namespace Dali

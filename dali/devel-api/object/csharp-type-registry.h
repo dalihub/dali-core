@@ -2,7 +2,7 @@
 #define DALI_CSHARP_TYPE_REGISTRY_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,26 +18,21 @@
  *
  */
 
-
 // EXTERNAL INCLUDES
 #include <typeinfo>
 
-
 // INTERNAL INCLUDES
-#include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/object/csharp-type-info.h>
+#include <dali/public-api/object/type-registry.h>
 
 namespace Dali
 {
-
-
 /**
  * Custom static functions for registering C# custom controls and properties
  *
  */
 namespace CSharpTypeRegistry
 {
-
 /**
  * @brief Constructor registers the type creation function for a named class or type.
  *
@@ -48,11 +43,11 @@ namespace CSharpTypeRegistry
  * @param [in] f registerType instance creation function
  * @return true if the name could be registered.
  */
-  DALI_CORE_API bool RegisterType( const std::string& name,
-                                     const std::type_info& baseType,
-                                     CSharpTypeInfo::CreateFunction f );
+DALI_CORE_API bool RegisterType(const std::string&             name,
+                                const std::type_info&          baseType,
+                                CSharpTypeInfo::CreateFunction f);
 
-  /**
+/**
    * Register an event-thread only property with a type (used by C# Custom controls)
    * @param [in] objectName name of the object used to register the type
    * @param [in] name Property name
@@ -62,13 +57,13 @@ namespace CSharpTypeRegistry
    * @param [in] getFunc The function to get the value of a property.
    * @return true if the property could be registered.
   */
-  DALI_CORE_API bool RegisterProperty( const std::string& objectName,
-                                         const std::string& name,
-                                         Property::Index index,
-                                         Property::Type type,
-                                         CSharpTypeInfo::SetPropertyFunction setFunc,
-                                         CSharpTypeInfo::GetPropertyFunction getFunc );
-}
+DALI_CORE_API bool RegisterProperty(const std::string&                  objectName,
+                                    const std::string&                  name,
+                                    Property::Index                     index,
+                                    Property::Type                      type,
+                                    CSharpTypeInfo::SetPropertyFunction setFunc,
+                                    CSharpTypeInfo::GetPropertyFunction getFunc);
+} // namespace CSharpTypeRegistry
 
 } // namespace Dali
 

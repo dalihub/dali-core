@@ -15,22 +15,21 @@
  *
  */
 
-#include <iostream>
-
-#include <stdlib.h>
-#include <dali/public-api/dali-core.h>
-#include <dali/integration-api/lockless-buffer.h>
 #include <dali-test-suite-utils.h>
+#include <dali/integration-api/lockless-buffer.h>
+#include <dali/public-api/dali-core.h>
+#include <stdlib.h>
+
+#include <iostream>
 
 using namespace Dali;
 
 namespace
 {
-
 static bool ReadTest(Integration::LocklessBuffer& buf, const unsigned char exp[], size_t size)
 {
-  const unsigned char *res = buf.Read();
-  for (size_t i=0; i<size; ++i, ++res)
+  const unsigned char* res = buf.Read();
+  for(size_t i = 0; i < size; ++i, ++res)
   {
     if(*res != exp[i])
     {
@@ -42,21 +41,20 @@ static bool ReadTest(Integration::LocklessBuffer& buf, const unsigned char exp[]
 }
 } // anonymous namespace
 
-
 // Simple write - read test
 int UtcDaliLocklessBufferWriteRead01(void)
 {
   Integration::LocklessBuffer buf(10);
-  unsigned char data[10];
+  unsigned char               data[10];
 
-  for( unsigned char i=0; i<10; ++i )
+  for(unsigned char i = 0; i < 10; ++i)
   {
-    data[i]=i;
+    data[i] = i;
   }
 
-  buf.Write( &data[0], 10 );
+  buf.Write(&data[0], 10);
 
-  if( ReadTest( buf, data, 10 ) )
+  if(ReadTest(buf, data, 10))
   {
     tet_result(TET_PASS);
   }
@@ -71,25 +69,25 @@ int UtcDaliLocklessBufferWriteRead01(void)
 int UtcDaliLocklessBufferMultipleWrites01(void)
 {
   Integration::LocklessBuffer buf(10);
-  unsigned char data[10];
+  unsigned char               data[10];
 
-  for( unsigned char i=0; i<10; ++i )
+  for(unsigned char i = 0; i < 10; ++i)
   {
-    data[i]=i;
+    data[i] = i;
   }
 
   // Write to a buffer
-  buf.Write( &data[0], 10 );
+  buf.Write(&data[0], 10);
 
-  for (unsigned char i=0; i<10; ++i)
+  for(unsigned char i = 0; i < 10; ++i)
   {
-      data[i]=i+4;
+    data[i] = i + 4;
   }
 
   // No reads from buffer, so will overwrite contents of same buffer
-  buf.Write( &data[0], 10 );
+  buf.Write(&data[0], 10);
 
-  if( ReadTest(buf, data, 10) )
+  if(ReadTest(buf, data, 10))
   {
     tet_result(TET_PASS);
   }
@@ -104,8 +102,8 @@ int UtcDaliLocklessBufferMultipleWrites01(void)
 int UtcDaliLocklessBufferGetSize01(void)
 {
   Integration::LocklessBuffer buf(10);
-  unsigned int size = buf.GetSize();
-  if( size == 10 )
+  unsigned int                size = buf.GetSize();
+  if(size == 10)
   {
     tet_result(TET_PASS);
   }

@@ -23,16 +23,15 @@
 
 namespace Dali
 {
-
-PixelData PixelData::New( uint8_t* buffer,
-                          uint32_t bufferSize,
-                          uint32_t width,
-                          uint32_t height,
-                          Pixel::Format pixelFormat,
-                          ReleaseFunction releaseFunction )
+PixelData PixelData::New(uint8_t*        buffer,
+                         uint32_t        bufferSize,
+                         uint32_t        width,
+                         uint32_t        height,
+                         Pixel::Format   pixelFormat,
+                         ReleaseFunction releaseFunction)
 {
-  IntrusivePtr<Internal::PixelData> internal = Internal::PixelData::New( buffer, bufferSize, width, height, pixelFormat, releaseFunction );
-  return PixelData( internal.Get() );
+  IntrusivePtr<Internal::PixelData> internal = Internal::PixelData::New(buffer, bufferSize, width, height, pixelFormat, releaseFunction);
+  return PixelData(internal.Get());
 }
 
 PixelData::PixelData()
@@ -43,8 +42,8 @@ PixelData::~PixelData()
 {
 }
 
-PixelData::PixelData( Internal::PixelData* internal )
-: BaseHandle( internal )
+PixelData::PixelData(Internal::PixelData* internal)
+: BaseHandle(internal)
 {
 }
 
@@ -52,9 +51,9 @@ PixelData::PixelData(const PixelData& handle) = default;
 
 PixelData& PixelData::operator=(const PixelData& rhs) = default;
 
-PixelData::PixelData( PixelData&& rhs ) = default;
+PixelData::PixelData(PixelData&& rhs) = default;
 
-PixelData& PixelData::operator=( PixelData&& rhs ) = default;
+PixelData& PixelData::operator=(PixelData&& rhs) = default;
 
 uint32_t PixelData::GetWidth() const
 {

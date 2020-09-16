@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-
-#include <dali/public-api/object/indirect-value.h>
-#include <dali/public-api/object/handle.h>
 #include <dali/internal/event/common/object-impl.h>
+#include <dali/public-api/object/handle.h>
+#include <dali/public-api/object/indirect-value.h>
 
 namespace Dali
 {
-
-IndirectValue::IndirectValue( Handle& handle, Property::Index index )
+IndirectValue::IndirectValue(Handle& handle, Property::Index index)
 : mHandle(handle.GetObjectPtr()),
   mIndex(index),
   mExtension(nullptr)
 {
 }
 
-void IndirectValue::operator= (Property::Value value)
+void IndirectValue::operator=(Property::Value value)
 {
   Handle(static_cast<Dali::Internal::Object*>(mHandle.Get())).SetProperty(mIndex, value);
 }
@@ -39,9 +37,8 @@ Property::Value IndirectValue::GetProperty()
   return Handle(static_cast<Dali::Internal::Object*>(mHandle.Get())).GetProperty(mIndex);
 }
 
-IndirectValue& IndirectValue::operator=( IndirectValue&& ) = default;
+IndirectValue& IndirectValue::operator=(IndirectValue&&) = default;
 
-IndirectValue::IndirectValue( IndirectValue&& ) = default;
-
+IndirectValue::IndirectValue(IndirectValue&&) = default;
 
 } // namespace Dali

@@ -209,22 +209,22 @@ public: // properties
   /**
    * copydoc Dali::Internal::Object::SetDefaultProperty()
    */
-  virtual void SetDefaultProperty( Property::Index index, const Property::Value& propertyValue );
+  void SetDefaultProperty( Property::Index index, const Property::Value& propertyValue ) override;
 
   /**
    * copydoc Dali::Internal::Object::GetDefaultProperty()
    */
-  virtual Property::Value GetDefaultProperty( Property::Index index ) const;
+  Property::Value GetDefaultProperty( Property::Index index ) const override;
 
   /**
    * copydoc Dali::Internal::Object::GetDefaultPropertyCurrentValue()
    */
-  virtual Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const;
+  Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const override;
 
   /**
    * @copydoc Dali::Internal::Object::GetSceneObjectInputProperty()
    */
-  virtual const PropertyInputImpl* GetSceneObjectInputProperty( Property::Index index ) const;
+  const PropertyInputImpl* GetSceneObjectInputProperty( Property::Index index ) const override;
 
 private:
 
@@ -237,7 +237,7 @@ private:
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~CameraActor();
+  ~CameraActor() override;
 
 
   /**

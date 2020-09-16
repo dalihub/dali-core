@@ -63,12 +63,10 @@ class LongPressGesture;
  */
 class DALI_CORE_API LongPressGestureDetector : public GestureDetector
 {
-public: // Typedefs
-
-  typedef Signal< void ( Actor, const LongPressGesture& ) > DetectedSignalType; ///< Gesture detected signal type @SINCE_1_0.0
+public:                                                                    // Typedefs
+  using DetectedSignalType = Signal<void(Actor, const LongPressGesture&)>; ///< Gesture detected signal type @SINCE_1_0.0
 
 public: // Creation & Destruction
-
   /**
    * @brief Creates an uninitialized LongPressGestureDetector; this can be initialized with LongPressGestureDetector::New().
    *
@@ -118,7 +116,7 @@ public: // Creation & Destruction
    * @param[in] handle Handle to an object
    * @return Handle to a LongPressGestureDetector object or an uninitialized handle
    */
-  static LongPressGestureDetector DownCast( BaseHandle handle );
+  static LongPressGestureDetector DownCast(BaseHandle handle);
 
   /**
    * @brief Destructor.
@@ -146,7 +144,6 @@ public: // Creation & Destruction
   LongPressGestureDetector& operator=(const LongPressGestureDetector& rhs);
 
 public: // Setters
-
   /**
    * @brief Sets the number of touches required.
    *
@@ -176,7 +173,6 @@ public: // Setters
   void SetTouchesRequired(uint32_t minTouches, uint32_t maxTouches);
 
 public: // Getters
-
   /**
    * @brief Retrieves the minimum number of touches required.
    *
@@ -196,7 +192,6 @@ public: // Getters
   uint32_t GetMaximumTouchesRequired() const;
 
 public: // Signals
-
   /**
    * @brief This signal is emitted when the specified long press is detected on the attached actor.
    *
@@ -211,7 +206,6 @@ public: // Signals
   DetectedSignalType& DetectedSignal();
 
 public: // Not intended for Application developers
-
   /// @cond internal
   /**
    * @brief This constructor is used by LongPressGestureDetector::New() methods.
@@ -221,7 +215,6 @@ public: // Not intended for Application developers
    */
   explicit DALI_INTERNAL LongPressGestureDetector(Internal::LongPressGestureDetector* internal);
   /// @endcond
-
 };
 
 /**

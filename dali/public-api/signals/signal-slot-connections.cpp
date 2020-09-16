@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,9 @@
 
 namespace Dali
 {
-
-SlotConnection::SlotConnection( SlotObserver* slotObserver, CallbackBase* callback )
-: mSlotObserver( slotObserver ),
-  mCallback( callback )
+SlotConnection::SlotConnection(SlotObserver* slotObserver, CallbackBase* callback)
+: mSlotObserver(slotObserver),
+  mCallback(callback)
 {
 }
 
@@ -47,15 +46,15 @@ SlotObserver* SlotConnection::GetSlotObserver()
   return mSlotObserver;
 }
 
-SignalConnection::SignalConnection( CallbackBase* callback )
-: mSignalObserver( NULL ),
-  mCallback( callback )
+SignalConnection::SignalConnection(CallbackBase* callback)
+: mSignalObserver(nullptr),
+  mCallback(callback)
 {
 }
 
-SignalConnection::SignalConnection( SignalObserver* signalObserver, CallbackBase* callback )
-: mSignalObserver( signalObserver ),
-  mCallback( callback )
+SignalConnection::SignalConnection(SignalObserver* signalObserver, CallbackBase* callback)
+: mSignalObserver(signalObserver),
+  mCallback(callback)
 {
 }
 
@@ -65,18 +64,18 @@ SignalConnection::~SignalConnection()
   delete mCallback;
 }
 
-void SignalConnection::Disconnect( SlotObserver* slotObserver )
+void SignalConnection::Disconnect(SlotObserver* slotObserver)
 {
-  if( mSignalObserver )
+  if(mSignalObserver)
   {
     // tell the slot the signal wants to disconnect
-    mSignalObserver->SignalDisconnected( slotObserver, mCallback );
-    mSignalObserver = NULL;
+    mSignalObserver->SignalDisconnected(slotObserver, mCallback);
+    mSignalObserver = nullptr;
   }
 
   // we own the callback, SignalObserver is expected to delete the SlotConnection on Disconnected so its pointer to our mCallback is no longer used
   delete mCallback;
-  mCallback = NULL;
+  mCallback = nullptr;
 }
 
 CallbackBase* SignalConnection::GetCallback()

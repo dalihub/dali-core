@@ -2,7 +2,7 @@
 #define DALI_FUNCTOR_DELEGATE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ namespace Dali
  * @brief Dispatcher to call a functor.
  * @SINCE_1_0.0
  */
-template< typename T >
+template<typename T>
 struct FunctorDispatcher
 {
   /**
@@ -41,10 +41,10 @@ struct FunctorDispatcher
    * @SINCE_1_0.0
    * @param[in] functorPtr The functor to call
    */
-  static void Dispatch( void* functorPtr )
+  static void Dispatch(void* functorPtr)
   {
     // "downcast" the functor type back to the correct one
-    T* functor = reinterpret_cast< T* >( functorPtr );
+    T* functor = reinterpret_cast<T*>(functorPtr);
     (*functor)();
   }
 };
@@ -53,7 +53,7 @@ struct FunctorDispatcher
  * @brief Dispatcher to delete a functor object.
  * @SINCE_1_0.0
  */
-template< typename T >
+template<typename T>
 struct FunctorDestroyer
 {
   /**
@@ -61,11 +61,11 @@ struct FunctorDestroyer
    * @SINCE_1_0.0
    * @param[in] functorPtr A functor object to delete
    */
-  static void Delete( void* functorPtr )
+  static void Delete(void* functorPtr)
   {
     // FunctorDelegate owns the object but we're the only one who knows the real type so need
     // to delete by "downcasting" from void* to the correct type
-    delete reinterpret_cast< T* >( functorPtr );
+    delete reinterpret_cast<T*>(functorPtr);
   }
 };
 
@@ -76,7 +76,6 @@ struct FunctorDestroyer
 class DALI_CORE_API FunctorDelegate
 {
 public:
-
   /**
    * @brief Constructor which copies a function object.
    *
@@ -84,12 +83,12 @@ public:
    * @param[in] functor The functor object to copy, either a class with operator() or a C function
    * @return A pointer to the new function object
    */
-  template< typename T >
-  static FunctorDelegate* New( const T& functor )
+  template<typename T>
+  static FunctorDelegate* New(const T& functor)
   {
-    return new FunctorDelegate( reinterpret_cast< void* >( new T( functor ) ), // heap allocate the functor
-                                reinterpret_cast< FunctorDelegate::Dispatcher >( &FunctorDispatcher<T>::Dispatch ),
-                                reinterpret_cast< FunctorDelegate::Destructor >( &FunctorDestroyer<T>::Delete ) );
+    return new FunctorDelegate(reinterpret_cast<void*>(new T(functor)), // heap allocate the functor
+                               reinterpret_cast<FunctorDelegate::Dispatcher>(&FunctorDispatcher<T>::Dispatch),
+                               reinterpret_cast<FunctorDelegate::Destructor>(&FunctorDestroyer<T>::Delete));
   }
 
   /**
@@ -105,30 +104,29 @@ public:
   void Execute();
 
 private:
-
   /**
    * @brief Used to call the correct function.
    * @SINCE_1_0.0
    */
-  typedef void (*Dispatcher)( void* objectPtr );
+  using Dispatcher = void (*)(void*);
 
   /**
    * @brief Used to destroy mObjectPointer.
    * @SINCE_1_0.0
    */
-  typedef void(*Destructor)( void* objectPtr );
+  using Destructor = void (*)(void*);
 
   /**
    * @brief Not defined.
    * @SINCE_1_0.0
    */
-  FunctorDelegate( const FunctorDelegate& rhs );
+  FunctorDelegate(const FunctorDelegate& rhs);
 
   /**
    * @brief Not defined.
    * @SINCE_1_0.0
    */
-  const FunctorDelegate& operator=( const FunctorDelegate& rhs );
+  const FunctorDelegate& operator=(const FunctorDelegate& rhs);
 
   /**
    * @brief Private constructor.
@@ -138,11 +136,12 @@ private:
    * @param dispatcher Used to call the actual function
    * @param destructor Used to delete the owned functor object
    */
-  FunctorDelegate( void* functorPtr, Dispatcher dispatcher, Destructor destructor );
+  FunctorDelegate(void* functorPtr, Dispatcher dispatcher, Destructor destructor);
 
-public: // Data for deriving classes & Dispatchers
+public:
+  // Data for deriving classes & Dispatchers
 
-  void* mFunctorPointer;                ///< Functor that will be called
+  void*      mFunctorPointer;           ///< Functor that will be called
   Dispatcher mMemberFunctionDispatcher; ///< Dispatcher for member functions
   Destructor mDestructorDispatcher;     ///< Destructor for owned objects
 };
@@ -150,6 +149,6 @@ public: // Data for deriving classes & Dispatchers
 /**
  * @}
  */
-} // namespace DALI
+} // namespace Dali
 
 #endif // DALI_FUNCTOR_DELEGATE_H

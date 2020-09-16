@@ -79,7 +79,7 @@ void Node::Delete( Node* node )
 }
 
 Node::Node()
-: mTransformManager( NULL ),
+: mTransformManager( nullptr ),
   mTransformId( INVALID_TRANSFORM_ID ),
   mParentOrigin( TRANSFORM_PROPERTY_PARENT_ORIGIN ),
   mAnchorPoint( TRANSFORM_PROPERTY_ANCHOR_POINT ),
@@ -98,8 +98,8 @@ Node::Node()
   mWorldColor( Color::WHITE ),
   mClippingSortModifier( 0u ),
   mId( ++mNodeCounter ),
-  mParent( NULL ),
-  mExclusiveRenderTask( NULL ),
+  mParent( nullptr ),
+  mExclusiveRenderTask( nullptr ),
   mChildren(),
   mClippingDepth( 0u ),
   mScissorDepth( 0u ),
@@ -188,6 +188,11 @@ void Node::RemoveUniformMapping( const std::string& uniformName )
   mRegenerateUniformMap = 2;
 }
 
+bool Node::IsAnimationPossible() const
+{
+  return mIsConnectedToSceneGraph;
+}
+
 void Node::PrepareRender( BufferIndex bufferIndex )
 {
   if( mRegenerateUniformMap != 0 )
@@ -223,8 +228,8 @@ void Node::PrepareRender( BufferIndex bufferIndex )
 void Node::ConnectChild( Node* childNode )
 {
   DALI_ASSERT_ALWAYS( this != childNode );
-  DALI_ASSERT_ALWAYS( IsRoot() || NULL != mParent ); // Parent should be connected first
-  DALI_ASSERT_ALWAYS( !childNode->IsRoot() && NULL == childNode->GetParent() ); // Child should be disconnected
+  DALI_ASSERT_ALWAYS( IsRoot() || nullptr != mParent ); // Parent should be connected first
+  DALI_ASSERT_ALWAYS( !childNode->IsRoot() && nullptr == childNode->GetParent() ); // Child should be disconnected
 
   childNode->SetParent( *this );
 
@@ -244,7 +249,7 @@ void Node::DisconnectChild( BufferIndex updateBufferIndex, Node& childNode )
   DALI_ASSERT_ALWAYS( childNode.GetParent() == this );
 
   // Find the childNode and remove it
-  Node* found( NULL );
+  Node* found( nullptr );
 
   const NodeIter endIter = mChildren.End();
   for ( NodeIter iter = mChildren.Begin(); iter != endIter; ++iter )
@@ -257,7 +262,7 @@ void Node::DisconnectChild( BufferIndex updateBufferIndex, Node& childNode )
       break; // iter is no longer valid
     }
   }
-  DALI_ASSERT_ALWAYS( NULL != found );
+  DALI_ASSERT_ALWAYS( nullptr != found );
 
   found->RecursiveDisconnectFromSceneGraph( updateBufferIndex );
 }
@@ -338,7 +343,7 @@ void Node::SetParent( Node& parentNode )
 {
   DALI_ASSERT_ALWAYS(this != &parentNode);
   DALI_ASSERT_ALWAYS(!mIsRoot);
-  DALI_ASSERT_ALWAYS(mParent == NULL);
+  DALI_ASSERT_ALWAYS(mParent == nullptr);
 
   mParent = &parentNode;
 
@@ -351,7 +356,7 @@ void Node::SetParent( Node& parentNode )
 void Node::RecursiveDisconnectFromSceneGraph( BufferIndex updateBufferIndex )
 {
   DALI_ASSERT_ALWAYS(!mIsRoot);
-  DALI_ASSERT_ALWAYS(mParent != NULL);
+  DALI_ASSERT_ALWAYS(mParent != nullptr);
 
   const NodeIter endIter = mChildren.End();
   for ( NodeIter iter = mChildren.Begin(); iter != endIter; ++iter )
@@ -363,7 +368,7 @@ void Node::RecursiveDisconnectFromSceneGraph( BufferIndex updateBufferIndex )
   PropertyOwner::DisconnectFromSceneGraph( updateBufferIndex );
 
   // Remove back-pointer to parent
-  mParent = NULL;
+  mParent = nullptr;
 
   // Remove all child pointers
   mChildren.Clear();

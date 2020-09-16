@@ -55,7 +55,7 @@ struct PanGestureEvent: public GestureEvent
   /**
    * Virtual destructor
    */
-  virtual ~PanGestureEvent();
+  ~PanGestureEvent() override;
 
   // Data
 

@@ -32,7 +32,7 @@ namespace
 
 SceneGraph::Node* FindNodeInSceneGraph( uint32_t id, SceneGraph::Node& node )
 {
-  SceneGraph::Node* matchingNode = NULL;
+  SceneGraph::Node* matchingNode = nullptr;
 
   if( node.mId == id )
   {
@@ -57,7 +57,7 @@ SceneGraph::Node* FindNodeInSceneGraph( uint32_t id, SceneGraph::Node& node )
 
 UpdateProxy::UpdateProxy( SceneGraph::UpdateManager& updateManager, SceneGraph::TransformManager& transformManager, SceneGraph::Node& rootNode )
 : mNodeContainer(),
-  mLastCachedIdNodePair( { 0u, NULL } ),
+  mLastCachedIdNodePair( { 0u, nullptr } ),
   mCurrentBufferIndex( 0u ),
   mUpdateManager( updateManager ),
   mTransformManager( transformManager ),
@@ -233,14 +233,14 @@ bool UpdateProxy::BakeColor( uint32_t id, const Vector4& color )
 
 void UpdateProxy::NodeHierarchyChanged()
 {
-  mLastCachedIdNodePair = { 0u, NULL };
+  mLastCachedIdNodePair = { 0u, nullptr };
   mNodeContainer.clear();
   mPropertyModifier.reset();
 }
 
 SceneGraph::Node* UpdateProxy::GetNodeWithId( uint32_t id ) const
 {
-  SceneGraph::Node* node = NULL;
+  SceneGraph::Node* node = nullptr;
 
   // Cache the last accessed node so we don't have to traverse
   if( mLastCachedIdNodePair.node && mLastCachedIdNodePair.id == id )

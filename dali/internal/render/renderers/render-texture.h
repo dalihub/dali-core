@@ -41,8 +41,7 @@ struct Sampler;
 class Texture
 {
 public:
-
-  typedef Dali::TextureType::Type Type;
+  using Type = Dali::TextureType::Type;
 
   /**
    * Constructor

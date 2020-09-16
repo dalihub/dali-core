@@ -47,7 +47,7 @@ class VertexBuffer;
 class Geometry
 {
 public:
-  typedef Dali::Geometry::Type Type;
+  using Type = Dali::Geometry::Type;
 
   Geometry();
 

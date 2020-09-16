@@ -44,12 +44,12 @@ struct Vector3;
  */
 struct DALI_CORE_API Vector4
 {
-// NOTE
-// xrs, ygt, zbp and waq must be consecutive in memory.
-// No other data must be added before xrs member.
-// No virtual methods must be added to this struct.
+  // NOTE
+  // xrs, ygt, zbp and waq must be consecutive in memory.
+  // No other data must be added before xrs member.
+  // No virtual methods must be added to this struct.
 
-// Construction
+  // Construction
 
   /**
    * @brief Default constructor, initializes the vector to 0.
@@ -80,7 +80,6 @@ struct DALI_CORE_API Vector4
   {
   }
 
-
   /**
    * @brief Conversion constructor from an array of four floats.
    *
@@ -101,7 +100,7 @@ struct DALI_CORE_API Vector4
    * @SINCE_1_0.0
    * @param[in] vec2 Vector2 to copy from, z and w are initialized to 0
    */
-  explicit Vector4( const Vector2& vec2 );
+  explicit Vector4(const Vector2& vec2);
 
   /**
    * @brief Conversion constructor from Vector3.
@@ -109,16 +108,16 @@ struct DALI_CORE_API Vector4
    * @SINCE_1_0.0
    * @param[in] vec3 Vector3 to copy from, w is initialized to 0
    */
-  explicit Vector4( const Vector3& vec3 );
+  explicit Vector4(const Vector3& vec3);
 
-// Constants
+  // Constants
   static const Vector4 ONE;   ///< (1.0f,1.0f,1.0f,1.0f)
   static const Vector4 XAXIS; ///< (1.0f,0.0f,0.0f,0.0f)
   static const Vector4 YAXIS; ///< (0.0f,1.0f,0.0f,0.0f)
   static const Vector4 ZAXIS; ///< (0.0f,0.0f,1.0f,0.0f)
   static const Vector4 ZERO;  ///< (0.0f, 0.0f, 0.0f, 0.0f)
 
-// API
+  // API
 
   /**
    * @brief Assignment operator.
@@ -145,7 +144,7 @@ struct DALI_CORE_API Vector4
    * @param[in] vec2 A reference to assign from
    * @return Itself
    */
-  Vector4& operator=(const Vector2& vec2 );
+  Vector4& operator=(const Vector2& vec2);
 
   /**
    * @brief Assignment operator.
@@ -155,7 +154,7 @@ struct DALI_CORE_API Vector4
    * @param[in] vec3 A reference to assign from
    * @return Itself
    */
-  Vector4& operator=(const Vector3& vec3 );
+  Vector4& operator=(const Vector3& vec3);
 
   /**
    * @brief Addition operator.
@@ -164,7 +163,7 @@ struct DALI_CORE_API Vector4
    * @param[in] rhs Vector to add
    * @return A vector containing the result of the addition
    */
-  Vector4 operator+(const Vector4 & rhs) const
+  Vector4 operator+(const Vector4& rhs) const
   {
     Vector4 temp(*this);
 
@@ -199,7 +198,7 @@ struct DALI_CORE_API Vector4
   {
     Vector4 temp(*this);
 
-    temp-=rhs;
+    temp -= rhs;
 
     return temp;
   }
@@ -288,7 +287,7 @@ struct DALI_CORE_API Vector4
    * @param[in] rhs The vector to divide
    * @return A vector containing the result of the division
    */
-  Vector4 operator/(const Vector4 & rhs) const
+  Vector4 operator/(const Vector4& rhs) const
   {
     Vector4 temp(*this);
 
@@ -365,7 +364,7 @@ struct DALI_CORE_API Vector4
    * @param[in] rhs The vector to test against
    * @return True if the vectors are equal
    */
-  bool operator==(const Vector4 &rhs) const;
+  bool operator==(const Vector4& rhs) const;
 
   /**
    * @brief Inequality operator.
@@ -376,7 +375,7 @@ struct DALI_CORE_API Vector4
    * @param[in] rhs The vector to test against
    * @return True if the vectors are not equal
    */
-  bool operator!=(const Vector4 &rhs) const
+  bool operator!=(const Vector4& rhs) const
   {
     return !(*this == rhs);
   }
@@ -391,7 +390,7 @@ struct DALI_CORE_API Vector4
    */
   const float& operator[](const uint32_t index) const
   {
-    DALI_ASSERT_ALWAYS( index < 4 && "Vector element index out of bounds" );
+    DALI_ASSERT_ALWAYS(index < 4 && "Vector element index out of bounds");
 
     return AsFloat()[index];
   }
@@ -406,7 +405,7 @@ struct DALI_CORE_API Vector4
    */
   float& operator[](const uint32_t index)
   {
-    DALI_ASSERT_ALWAYS( index < 4 && "Vector element index out of bounds" );
+    DALI_ASSERT_ALWAYS(index < 4 && "Vector element index out of bounds");
 
     return AsFloat()[index];
   }
@@ -489,7 +488,7 @@ struct DALI_CORE_API Vector4
    * @param[in] min The minimum vector
    * @param[in] max The maximum vector
    */
-  void Clamp( const Vector4& min, const Vector4& max );
+  void Clamp(const Vector4& min, const Vector4& max);
 
   /**
    * @brief Returns the contents of the vector as an array of 4 floats.
@@ -508,7 +507,10 @@ struct DALI_CORE_API Vector4
    * @return The vector contents as an array of 4 floats
    * @note inlined for performance reasons (generates less code than a function call)
    */
-  const float* AsFloat() const {return &x;}
+  const float* AsFloat() const
+  {
+    return &x;
+  }
 
   /**
    * @brief Returns the contents of the vector as an array of 4 floats.
@@ -527,9 +529,12 @@ struct DALI_CORE_API Vector4
    * @return The vector contents as an array of 4 floats
    * @note inlined for performance reasons (generates less code than a function call)
    */
-  float* AsFloat() {return &x;}
+  float* AsFloat()
+  {
+    return &x;
+  }
 
-// Data
+  // Data
 
   // NOTE
   // xrs, ygt, zbp and waq must be consecutive in memory.
@@ -562,11 +567,10 @@ struct DALI_CORE_API Vector4
   };
 
 public:
-
-  Vector4( const Vector4& ) = default; ///< Default copy constructor
-  Vector4( Vector4&& ) = default; ///< Default move constructor
-  Vector4& operator=( const Vector4& ) = default; ///< Default copy assignment operator
-  Vector4& operator=( Vector4&& ) = default; ///< Default move assignment operator
+  Vector4(const Vector4&) = default;            ///< Default copy constructor
+  Vector4(Vector4&&)      = default;            ///< Default move constructor
+  Vector4& operator=(const Vector4&) = default; ///< Default copy assignment operator
+  Vector4& operator=(Vector4&&) = default;      ///< Default move assignment operator
 };
 
 /**
@@ -588,12 +592,12 @@ DALI_CORE_API std::ostream& operator<<(std::ostream& o, const Vector4& vector);
  * @param[in] b A vector
  * @return A vector containing the minimum of each component from a and b
  */
-inline Vector4 Min( const Vector4& a, const Vector4& b )
+inline Vector4 Min(const Vector4& a, const Vector4& b)
 {
-  return Vector4( a.x < b.x ? a.x : b.x,
-                  a.y < b.y ? a.y : b.y,
-                  a.z < b.z ? a.z : b.z,
-                  a.w < b.w ? a.w : b.w );
+  return Vector4(a.x < b.x ? a.x : b.x,
+                 a.y < b.y ? a.y : b.y,
+                 a.z < b.z ? a.z : b.z,
+                 a.w < b.w ? a.w : b.w);
 }
 
 /**
@@ -605,12 +609,12 @@ inline Vector4 Min( const Vector4& a, const Vector4& b )
  * @param[in] b A vector
  * @return A vector containing the maximum of each component from a and b
  */
-inline Vector4 Max( const Vector4& a, const Vector4& b )
+inline Vector4 Max(const Vector4& a, const Vector4& b)
 {
-  return Vector4( a.x > b.x ? a.x : b.x,
-                  a.y > b.y ? a.y : b.y,
-                  a.z > b.z ? a.z : b.z,
-                  a.w > b.w ? a.w : b.w );
+  return Vector4(a.x > b.x ? a.x : b.x,
+                 a.y > b.y ? a.y : b.y,
+                 a.z > b.z ? a.z : b.z,
+                 a.w > b.w ? a.w : b.w);
 }
 
 /**
@@ -622,10 +626,17 @@ inline Vector4 Max( const Vector4& a, const Vector4& b )
  * @param[in] max The maximum value
  * @return A vector containing the clamped components of v
  */
-DALI_CORE_API Vector4 Clamp( const Vector4& v, const float& min, const float& max );
+DALI_CORE_API Vector4 Clamp(const Vector4& v, const float& min, const float& max);
 
 // Allow Vector4 to be treated as a POD type
-template <> struct TypeTraits< Vector4 > : public BasicTypes< Vector4 > { enum { IS_TRIVIAL_TYPE = true }; };
+template<>
+struct TypeTraits<Vector4> : public BasicTypes<Vector4>
+{
+  enum
+  {
+    IS_TRIVIAL_TYPE = true
+  };
+};
 
 /**
  * @}

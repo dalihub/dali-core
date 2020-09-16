@@ -16,20 +16,19 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/rendering/renderer.h>          // Dali::Renderer
+#include <dali/public-api/rendering/renderer.h> // Dali::Renderer
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/rendering/renderer-impl.h> // Dali::Internal::Renderer
 
 namespace Dali
 {
-
-Renderer Renderer::New( Geometry& geometry, Shader& shader )
+Renderer Renderer::New(Geometry& geometry, Shader& shader)
 {
-  Internal::RendererPtr renderer = Internal::Renderer::New(  );
-  renderer->SetGeometry( GetImplementation(geometry) );
-  renderer->SetShader( GetImplementation(shader) );
-  return Renderer( renderer.Get() );
+  Internal::RendererPtr renderer = Internal::Renderer::New();
+  renderer->SetGeometry(GetImplementation(geometry));
+  renderer->SetShader(GetImplementation(shader));
+  return Renderer(renderer.Get());
 }
 
 Renderer::Renderer()
@@ -40,54 +39,54 @@ Renderer::~Renderer()
 {
 }
 
-Renderer::Renderer( const Renderer& handle ) = default;
+Renderer::Renderer(const Renderer& handle) = default;
 
-Renderer Renderer::DownCast( BaseHandle handle )
+Renderer Renderer::DownCast(BaseHandle handle)
 {
-  return Renderer( dynamic_cast<Dali::Internal::Renderer*>(handle.GetObjectPtr()));
+  return Renderer(dynamic_cast<Dali::Internal::Renderer*>(handle.GetObjectPtr()));
 }
 
-Renderer& Renderer::operator=( const Renderer& handle ) = default;
+Renderer& Renderer::operator=(const Renderer& handle) = default;
 
-Renderer::Renderer( Renderer&& rhs ) =  default;
+Renderer::Renderer(Renderer&& rhs) = default;
 
-Renderer& Renderer::operator=( Renderer&& rhs ) =  default;
+Renderer& Renderer::operator=(Renderer&& rhs) = default;
 
-void Renderer::SetGeometry( Geometry& geometry )
+void Renderer::SetGeometry(Geometry& geometry)
 {
-  DALI_ASSERT_ALWAYS( geometry && "Geometry handle not initialized" );
-  GetImplementation(*this).SetGeometry( GetImplementation(geometry) );
+  DALI_ASSERT_ALWAYS(geometry && "Geometry handle not initialized");
+  GetImplementation(*this).SetGeometry(GetImplementation(geometry));
 }
 
 Geometry Renderer::GetGeometry() const
 {
-  return Dali::Geometry( GetImplementation(*this).GetGeometry().Get() );
+  return Dali::Geometry(GetImplementation(*this).GetGeometry().Get());
 }
 
-void Renderer::SetTextures( TextureSet& textureSet )
+void Renderer::SetTextures(TextureSet& textureSet)
 {
-  DALI_ASSERT_ALWAYS( textureSet && "TextureSet handle not initialized" );
-  GetImplementation(*this).SetTextures( GetImplementation(textureSet) );
+  DALI_ASSERT_ALWAYS(textureSet && "TextureSet handle not initialized");
+  GetImplementation(*this).SetTextures(GetImplementation(textureSet));
 }
 
 TextureSet Renderer::GetTextures() const
 {
-  return Dali::TextureSet( GetImplementation(*this).GetTextures().Get() );
+  return Dali::TextureSet(GetImplementation(*this).GetTextures().Get());
 }
 
-void Renderer::SetShader( Shader& shader )
+void Renderer::SetShader(Shader& shader)
 {
-  DALI_ASSERT_ALWAYS( shader && "Shader handle not initialized" );
-  GetImplementation(*this).SetShader( GetImplementation(shader) );
+  DALI_ASSERT_ALWAYS(shader && "Shader handle not initialized");
+  GetImplementation(*this).SetShader(GetImplementation(shader));
 }
 
 Shader Renderer::GetShader() const
 {
-  return Dali::Shader( GetImplementation(*this).GetShader().Get() );
+  return Dali::Shader(GetImplementation(*this).GetShader().Get());
 }
 
-Renderer::Renderer( Internal::Renderer* pointer )
-: Handle( pointer )
+Renderer::Renderer(Internal::Renderer* pointer)
+: Handle(pointer)
 {
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,9 +39,9 @@ PinchGestureDetector PinchGestureDetector::New()
   return PinchGestureDetector(internal.Get());
 }
 
-PinchGestureDetector PinchGestureDetector::DownCast( BaseHandle handle )
+PinchGestureDetector PinchGestureDetector::DownCast(BaseHandle handle)
 {
-  return PinchGestureDetector( dynamic_cast<Dali::Internal::PinchGestureDetector*>(handle.GetObjectPtr()) );
+  return PinchGestureDetector(dynamic_cast<Dali::Internal::PinchGestureDetector*>(handle.GetObjectPtr()));
 }
 
 PinchGestureDetector::~PinchGestureDetector()

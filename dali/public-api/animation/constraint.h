@@ -25,8 +25,8 @@
 #include <dali/public-api/animation/constraint-source.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/base-handle.h>
-#include <dali/public-api/object/property.h>
 #include <dali/public-api/object/property-input.h>
+#include <dali/public-api/object/property.h>
 #include <dali/public-api/signals/callback.h>
 
 namespace Dali
@@ -43,7 +43,7 @@ namespace Internal DALI_INTERNAL
 class ConstraintBase;
 }
 
-typedef Vector< PropertyInput* > PropertyInputContainer;
+using PropertyInputContainer = Vector<PropertyInput*>;
 
 /**
  * @brief An abstract base class for Constraints.
@@ -71,7 +71,6 @@ typedef Vector< PropertyInput* > PropertyInputContainer;
 class DALI_CORE_API Constraint : public BaseHandle
 {
 public:
-
   /**
    * @brief Template for the Function that is called by the Constraint system.
    *
@@ -94,11 +93,10 @@ public:
    * @SINCE_1_0.0
    * @tparam P The property type to constrain
    */
-  template< typename P >
+  template<typename P>
   class DALI_INTERNAL Function : public CallbackBase
   {
   public:
-
     /**
      * @brief Constructor which connects to the provided C function (or a static member function).
      *
@@ -110,9 +108,9 @@ public:
      * @SINCE_1_0.0
      * @param[in] function The function to call
      */
-    Function( void( *function )( P&, const PropertyInputContainer& ) )
-    : CallbackBase( reinterpret_cast< CallbackBase::Function >( function ) ),
-      mCopyConstructorDispatcher( NULL )
+    Function(void (*function)(P&, const PropertyInputContainer&))
+    : CallbackBase(reinterpret_cast<CallbackBase::Function>(function)),
+      mCopyConstructorDispatcher(NULL)
     {
     }
 
@@ -128,13 +126,13 @@ public:
      * @param[in] object The object to copy
      * @tparam T The type of the object
      */
-    template< class T >
-    Function( const T& object )
-    : CallbackBase( reinterpret_cast< void* >( new T( object ) ), // copy the object
-                    NULL, // uses operator() instead of member function
-                    reinterpret_cast< CallbackBase::Dispatcher >( &FunctorDispatcher2< T, P&, const PropertyInputContainer& >::Dispatch ),
-                    reinterpret_cast< CallbackBase::Destructor >( &Destroyer< T >::Delete ) ),
-      mCopyConstructorDispatcher( reinterpret_cast< CopyConstructorDispatcher >( &ObjectCopyConstructorDispatcher< T >::Copy ) )
+    template<class T>
+    Function(const T& object)
+    : CallbackBase(reinterpret_cast<void*>(new T(object)), // copy the object
+                   nullptr,                                // uses operator() instead of member function
+                   reinterpret_cast<CallbackBase::Dispatcher>(&FunctorDispatcher2<T, P&, const PropertyInputContainer&>::Dispatch),
+                   reinterpret_cast<CallbackBase::Destructor>(&Destroyer<T>::Delete)),
+      mCopyConstructorDispatcher(reinterpret_cast<CopyConstructorDispatcher>(&ObjectCopyConstructorDispatcher<T>::Copy))
     {
     }
 
@@ -151,13 +149,13 @@ public:
      * @param[in] memberFunction The member function to call. This has to be a member of the same class
      * @tparam T The type of the object
      */
-    template< class T >
-    Function( const T& object, void ( T::*memberFunction ) ( P&, const PropertyInputContainer& ) )
-    : CallbackBase( reinterpret_cast< void* >( new T( object ) ), // copy the object
-                    reinterpret_cast< CallbackBase::MemberFunction >( memberFunction ),
-                    reinterpret_cast< CallbackBase::Dispatcher >( &Dispatcher2< T, P&, const PropertyInputContainer& >::Dispatch ),
-                    reinterpret_cast< CallbackBase::Destructor >( &Destroyer< T >::Delete ) ),
-      mCopyConstructorDispatcher( reinterpret_cast< CopyConstructorDispatcher >( &ObjectCopyConstructorDispatcher< T >::Copy ) )
+    template<class T>
+    Function(const T& object, void (T::*memberFunction)(P&, const PropertyInputContainer&))
+    : CallbackBase(reinterpret_cast<void*>(new T(object)), // copy the object
+                   reinterpret_cast<CallbackBase::MemberFunction>(memberFunction),
+                   reinterpret_cast<CallbackBase::Dispatcher>(&Dispatcher2<T, P&, const PropertyInputContainer&>::Dispatch),
+                   reinterpret_cast<CallbackBase::Destructor>(&Destroyer<T>::Delete)),
+      mCopyConstructorDispatcher(reinterpret_cast<CopyConstructorDispatcher>(&ObjectCopyConstructorDispatcher<T>::Copy))
     {
     }
 
@@ -171,24 +169,23 @@ public:
      */
     CallbackBase* Clone()
     {
-      CallbackBase* callback = NULL;
-      if ( mImpl && mImpl->mObjectPointer && mCopyConstructorDispatcher )
+      CallbackBase* callback = nullptr;
+      if(mImpl && mImpl->mObjectPointer && mCopyConstructorDispatcher)
       {
-        callback = new Function( mCopyConstructorDispatcher( reinterpret_cast< UndefinedClass* >( mImpl->mObjectPointer ) ) /* Copy the object */,
-                                 mMemberFunction,
-                                 mImpl->mMemberFunctionDispatcher,
-                                 mImpl->mDestructorDispatcher,
-                                 mCopyConstructorDispatcher );
+        callback = new Function(mCopyConstructorDispatcher(reinterpret_cast<UndefinedClass*>(mImpl->mObjectPointer)) /* Copy the object */,
+                                mMemberFunction,
+                                mImpl->mMemberFunctionDispatcher,
+                                mImpl->mDestructorDispatcher,
+                                mCopyConstructorDispatcher);
       }
       else
       {
-        callback = new Function( mFunction );
+        callback = new Function(mFunction);
       }
       return callback;
     }
 
   private:
-
     /**
      * @brief Must not be declared.
      *
@@ -200,7 +197,7 @@ public:
      * @brief Used to call the function to copy the stored object.
      * @SINCE_1_0.0
      */
-    typedef UndefinedClass* (*CopyConstructorDispatcher) ( UndefinedClass* object );
+    using CopyConstructorDispatcher = UndefinedClass* (*)(UndefinedClass*);
 
     /**
      * @brief Copies the actual object in Constraint::Function.
@@ -208,7 +205,7 @@ public:
      * @SINCE_1_0.0
 	 * @tparam T The type of the object
      */
-    template< class T >
+    template<class T>
     struct ObjectCopyConstructorDispatcher
     {
       /**
@@ -218,17 +215,17 @@ public:
        * @param[in] object The object to copy
        * @return Newly allocated clone of the object
        */
-      static UndefinedClass* Copy( const UndefinedClass* object )
+      static UndefinedClass* Copy(const UndefinedClass* object)
       {
-        T* copy = new T( *( reinterpret_cast< const T* >( object ) ) );
-        return reinterpret_cast< UndefinedClass* >( copy );
+        T* copy = new T(*(reinterpret_cast<const T*>(object)));
+        return reinterpret_cast<UndefinedClass*>(copy);
       }
     };
 
-    Function( const Function& ) = delete; ///< Deleted copy constructor. @SINCE_1_0.0
-    Function( Function&& ) = delete; ///< Deleted move constructor. @SINCE_1_9.25
-    Function& operator=( const Function& ) = delete; ///< Deleted copy assignment operator. @SINCE_1_0.0
-    Function& operator=( Function&& ) = delete; ///< Deleted move assignment operator. @SINCE_1_9.25
+    Function(const Function&) = delete;            ///< Deleted copy constructor. @SINCE_1_0.0
+    Function(Function&&)      = delete;            ///< Deleted move constructor. @SINCE_1_9.25
+    Function& operator=(const Function&) = delete; ///< Deleted copy assignment operator. @SINCE_1_0.0
+    Function& operator=(Function&&) = delete;      ///< Deleted move assignment operator. @SINCE_1_9.25
 
     /**
      * @brief Constructor used when copying the stored object.
@@ -240,13 +237,13 @@ public:
      * @param[in]  destructor                 Used to delete the owned object
      * @param[in]  copyConstructorDispatcher  Used to create a copy of the owned object
      */
-    Function( void* object,
-              CallbackBase::MemberFunction memberFunction,
-              CallbackBase::Dispatcher dispatcher,
-              CallbackBase::Destructor destructor,
-              CopyConstructorDispatcher copyConstructorDispatcher )
-    : CallbackBase( object, memberFunction, dispatcher, destructor ),
-      mCopyConstructorDispatcher( copyConstructorDispatcher )
+    Function(void*                        object,
+             CallbackBase::MemberFunction memberFunction,
+             CallbackBase::Dispatcher     dispatcher,
+             CallbackBase::Destructor     destructor,
+             CopyConstructorDispatcher    copyConstructorDispatcher)
+    : CallbackBase(object, memberFunction, dispatcher, destructor),
+      mCopyConstructorDispatcher(copyConstructorDispatcher)
     {
     }
 
@@ -256,9 +253,9 @@ public:
      * @SINCE_1_0.0
      * @param[in] function The function to call
      */
-    Function( CallbackBase::Function function )
-    : CallbackBase( function ),
-      mCopyConstructorDispatcher( NULL )
+    Function(CallbackBase::Function function)
+    : CallbackBase(function),
+      mCopyConstructorDispatcher(nullptr)
     {
     }
 
@@ -280,7 +277,7 @@ public:
     DISCARD ///< When the constraint is removed, the constrained value is discarded. @SINCE_1_9.28
   };
 
-  static const RemoveAction  DEFAULT_REMOVE_ACTION;  ///< BAKE
+  static const RemoveAction DEFAULT_REMOVE_ACTION; ///< BAKE
 
   /**
    * @brief Creates an uninitialized Constraint; this can be initialized with Constraint::New().
@@ -312,11 +309,11 @@ public:
    * @tparam P The type of the property to constrain
    * @return The new constraint
    */
-  template< class P >
-  static Constraint New( Handle handle, Property::Index targetIndex, void( *function )( P&, const PropertyInputContainer& ) )
+  template<class P>
+  static Constraint New(Handle handle, Property::Index targetIndex, void (*function)(P&, const PropertyInputContainer&))
   {
-    CallbackBase* callback = new Constraint::Function< P >( function );
-    return New( handle, targetIndex, PropertyTypes::Get< P >(), callback );
+    CallbackBase* callback = new Constraint::Function<P>(function);
+    return New(handle, targetIndex, PropertyTypes::Get<P>(), callback);
   }
 
   /**
@@ -345,11 +342,11 @@ public:
    * @tparam T The type of the object
    * @return The new constraint
    */
-  template< class P, class T >
-  static Constraint New( Handle handle, Property::Index targetIndex, const T& object )
+  template<class P, class T>
+  static Constraint New(Handle handle, Property::Index targetIndex, const T& object)
   {
-    CallbackBase* function = new Constraint::Function< P >( object );
-    return New( handle, targetIndex, PropertyTypes::Get< P >(), function );
+    CallbackBase* function = new Constraint::Function<P>(object);
+    return New(handle, targetIndex, PropertyTypes::Get<P>(), function);
   }
 
   /**
@@ -379,11 +376,11 @@ public:
    * @tparam P The type of the property to constrain
    * @tparam T The type of the object
    */
-  template< class P, class T >
-  static Constraint New( Handle handle, Property::Index targetIndex, const T& object, void ( T::*memberFunction ) ( P&, const PropertyInputContainer& ) )
+  template<class P, class T>
+  static Constraint New(Handle handle, Property::Index targetIndex, const T& object, void (T::*memberFunction)(P&, const PropertyInputContainer&))
   {
-    CallbackBase* function = new Constraint::Function< P >( object, memberFunction );
-    return New( handle, targetIndex, PropertyTypes::Get< P >(), function );
+    CallbackBase* function = new Constraint::Function<P>(object, memberFunction);
+    return New(handle, targetIndex, PropertyTypes::Get<P>(), function);
   }
 
   /**
@@ -393,7 +390,7 @@ public:
    * @param[in] handle The handle to the property-owning object this constraint is to be cloned for
    * @return The new constraint
    */
-  Constraint Clone( Handle handle );
+  Constraint Clone(Handle handle);
 
   /**
    * @brief Destructor.
@@ -409,7 +406,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] constraint A reference to the copied handle
    */
-  Constraint( const Constraint& constraint );
+  Constraint(const Constraint& constraint);
 
   /**
    * @brief This assignment operator is required for (smart) pointer semantics.
@@ -418,7 +415,7 @@ public:
    * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
-  Constraint& operator=( const Constraint& rhs );
+  Constraint& operator=(const Constraint& rhs);
 
   /**
    * @brief Move constructor.
@@ -426,7 +423,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  Constraint( Constraint&& rhs );
+  Constraint(Constraint&& rhs);
 
   /**
    * @brief Move assignment operator.
@@ -435,7 +432,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  Constraint& operator=( Constraint&& rhs );
+  Constraint& operator=(Constraint&& rhs);
 
   /**
    * @brief Downcasts a handle to Constraint handle.
@@ -446,7 +443,7 @@ public:
    * @param[in] baseHandle BaseHandle to an object
    * @return Handle to a Constraint object or an uninitialized handle
    */
-  static Constraint DownCast( BaseHandle baseHandle );
+  static Constraint DownCast(BaseHandle baseHandle);
 
   /**
    * @brief Adds a constraint source to the constraint.
@@ -454,7 +451,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] source The constraint source input to add
    */
-  void AddSource( ConstraintSource source );
+  void AddSource(ConstraintSource source);
 
   /**
    * @brief Applies this constraint.
@@ -496,7 +493,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] action The remove-action
    */
-  void SetRemoveAction( RemoveAction action );
+  void SetRemoveAction(RemoveAction action);
 
   /**
    * @brief Retrieves the remove action that will happen when the constraint is removed.
@@ -512,7 +509,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] tag An integer to identify the constraint
    */
-  void SetTag( const uint32_t tag );
+  void SetTag(const uint32_t tag);
 
   /**
    * @brief Gets the tag.
@@ -523,18 +520,16 @@ public:
   uint32_t GetTag() const;
 
 public: // Not intended for use by Application developers
-
   /// @cond internal
   /**
    * @brief This constructor is used by Constraint::New() methods.
    * @SINCE_1_0.0
    * @param[in] constraint A pointer to a newly allocated Dali resource
    */
-  explicit DALI_INTERNAL Constraint( Internal::ConstraintBase* constraint );
+  explicit DALI_INTERNAL Constraint(Internal::ConstraintBase* constraint);
   /// @endcond
 
 private: // Not intended for use by Application developers
-
   /// @cond internal
   /**
    * @brief Constructs a new constraint which targets a property.
@@ -546,7 +541,7 @@ private: // Not intended for use by Application developers
    * @param[in]  function     The constraint function
    * @return The new constraint
    */
-  static Constraint New( Handle handle, Property::Index targetIndex, Property::Type targetType, CallbackBase* function );
+  static Constraint New(Handle handle, Property::Index targetIndex, Property::Type targetType, CallbackBase* function);
   /// @endcond
 };
 

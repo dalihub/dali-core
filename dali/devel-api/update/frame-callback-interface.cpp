@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,21 +25,20 @@
 
 namespace Dali
 {
-
 FrameCallbackInterface::FrameCallbackInterface()
-: mImpl( std::unique_ptr< Impl >( new Impl ) )
+: mImpl(std::unique_ptr<Impl>(new Impl))
 {
 }
 
 FrameCallbackInterface::~FrameCallbackInterface()
 {
-  if( Internal::Stage::IsInstalled() )
+  if(Internal::Stage::IsInstalled())
   {
     Internal::StagePtr stage = Internal::Stage::GetCurrent();
-    if( stage )
+    if(stage)
     {
       // This will be a no-op if the callback has already been removed
-      stage->RemoveFrameCallback( *this );
+      stage->RemoveFrameCallback(*this);
     }
   }
 }

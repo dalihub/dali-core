@@ -23,37 +23,36 @@
 
 namespace Dali
 {
-
-LongPressGesture::LongPressGesture( Internal::LongPressGesture* internal )
-: Gesture( internal )
+LongPressGesture::LongPressGesture(Internal::LongPressGesture* internal)
+: Gesture(internal)
 {
 }
 
 LongPressGesture::LongPressGesture() = default;
 
-LongPressGesture::LongPressGesture( const LongPressGesture& rhs ) = default;
+LongPressGesture::LongPressGesture(const LongPressGesture& rhs) = default;
 
-LongPressGesture::LongPressGesture( LongPressGesture&& rhs ) = default;
+LongPressGesture::LongPressGesture(LongPressGesture&& rhs) = default;
 
-LongPressGesture& LongPressGesture::operator=( const LongPressGesture& rhs ) = default;
+LongPressGesture& LongPressGesture::operator=(const LongPressGesture& rhs) = default;
 
-LongPressGesture& LongPressGesture::operator=( LongPressGesture&& rhs ) = default;
+LongPressGesture& LongPressGesture::operator=(LongPressGesture&& rhs) = default;
 
 LongPressGesture::~LongPressGesture() = default;
 
 uint32_t LongPressGesture::GetNumberOfTouches() const
 {
-  return GetImplementation( *this ).GetNumberOfTouches();
+  return GetImplementation(*this).GetNumberOfTouches();
 }
 
 const Vector2& LongPressGesture::GetScreenPoint() const
 {
-  return GetImplementation( *this ).GetScreenPoint();
+  return GetImplementation(*this).GetScreenPoint();
 }
 
 const Vector2& LongPressGesture::GetLocalPoint() const
 {
-  return GetImplementation( *this ).GetLocalPoint();
+  return GetImplementation(*this).GetLocalPoint();
 }
 
 } // namespace Dali

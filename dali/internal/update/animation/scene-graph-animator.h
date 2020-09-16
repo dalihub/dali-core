@@ -158,7 +158,7 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~AnimatorBase()
+  ~AnimatorBase() override
   {
     delete mAnimatorFunction;
     if (mPropertyOwner && mConnectedToSceneGraph)
@@ -186,7 +186,7 @@ private: // From PropertyOwner::Observer
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerConnected( PropertyOwner& owner )
    */
-  void PropertyOwnerConnected( PropertyOwner& owner ) override final
+  void PropertyOwnerConnected( PropertyOwner& owner ) final
   {
     mEnabled = true;
   }
@@ -194,7 +194,7 @@ private: // From PropertyOwner::Observer
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerDisconnected( BufferIndex bufferIndex, PropertyOwner& owner )
    */
-  void PropertyOwnerDisconnected( BufferIndex bufferIndex, PropertyOwner& owner ) override final
+  void PropertyOwnerDisconnected( BufferIndex bufferIndex, PropertyOwner& owner ) final
   {
     // If we are active, then bake the value if required
     if ( mAnimationPlaying && mDisconnectAction != Dali::Animation::DISCARD )
@@ -209,7 +209,7 @@ private: // From PropertyOwner::Observer
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerDestroyed( PropertyOwner& owner )
    */
-  void PropertyOwnerDestroyed( PropertyOwner& owner ) override final
+  void PropertyOwnerDestroyed( PropertyOwner& owner ) final
   {
     mPropertyOwner = nullptr;
   }
@@ -222,6 +222,9 @@ public:
   {
     mConnectedToSceneGraph = true;
     mPropertyOwner->AddObserver(*this);
+
+    // Enable if the target object is valid and connected to the scene graph.
+    mEnabled = mPropertyOwner->IsAnimationPossible();
   }
 
   /**
@@ -607,14 +610,14 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~Animator()
+  ~Animator() override
   {
   }
 
   /**
    * @copydoc AnimatorBase::DoUpdate( BufferIndex bufferIndex, bool bake, float alpha )
    */
-  virtual void DoUpdate( BufferIndex bufferIndex, bool bake, float alpha ) override final
+  void DoUpdate( BufferIndex bufferIndex, bool bake, float alpha ) final
   {
     const PropertyType& current = mPropertyAccessor.Get( bufferIndex );
 
@@ -696,14 +699,14 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~AnimatorTransformProperty()
+  ~AnimatorTransformProperty() override
   {
   }
 
   /**
    * @copydoc AnimatorBase::DoUpdate( BufferIndex bufferIndex, bool bake, float alpha )
    */
-  virtual void DoUpdate( BufferIndex bufferIndex, bool bake, float alpha ) override final
+  void DoUpdate( BufferIndex bufferIndex, bool bake, float alpha ) final
   {
     const PropertyType& current = mPropertyAccessor.Get( bufferIndex );
 
@@ -760,7 +763,7 @@ struct AnimateByInteger : public AnimatorFunctionBase
   }
 
   using AnimatorFunctionBase::operator();
-  float operator()(float alpha, const int32_t& property)
+  float operator()(float alpha, const int32_t& property) override
   {
     // integers need to be correctly rounded
     return roundf(static_cast<float>( property ) + static_cast<float>( mRelative ) * alpha );
@@ -777,7 +780,7 @@ struct AnimateToInteger : public AnimatorFunctionBase
   }
 
   using AnimatorFunctionBase::operator();
-  float operator()(float alpha, const int32_t& property)
+  float operator()(float alpha, const int32_t& property) override
   {
     // integers need to be correctly rounded
     return roundf(static_cast<float>( property ) + (static_cast<float>(mTarget - property) * alpha) );
@@ -794,7 +797,7 @@ struct AnimateByFloat : public AnimatorFunctionBase
   }
 
   using AnimatorFunctionBase::operator();
-  float operator()(float alpha, const float& property)
+  float operator()(float alpha, const float& property) override
   {
     return float(property + mRelative * alpha);
   }
@@ -810,7 +813,7 @@ struct AnimateToFloat : public AnimatorFunctionBase
   }
 
   using AnimatorFunctionBase::operator();
-  float operator()(float alpha, const float& property)
+  float operator()(float alpha, const float& property) override
   {
     return float(property + ((mTarget - property) * alpha));
   }
@@ -826,7 +829,7 @@ struct AnimateByVector2 : public AnimatorFunctionBase
   }
 
   using AnimatorFunctionBase::operator();
-  Vector2 operator()(float alpha, const Vector2& property)
+  Vector2 operator()(float alpha, const Vector2& property) override
   {
     return Vector2(property + mRelative * alpha);
   }
@@ -842,7 +845,7 @@ struct AnimateToVector2 : public AnimatorFunctionBase
   }
 
   using AnimatorFunctionBase::operator();
-  Vector2 operator()(float alpha, const Vector2& property)
+  Vector2 operator()(float alpha, const Vector2& property) override
   {
     return Vector2(property + ((mTarget - property) * alpha));
   }
@@ -858,7 +861,7 @@ struct AnimateByVector3 : public AnimatorFunctionBase
   }
 
   using AnimatorFunctionBase::operator();
-  Vector3 operator()(float alpha, const Vector3& property)
+  Vector3 operator()(float alpha, const Vector3& property) override
   {
     return Vector3(property + mRelative * alpha);
   }
@@ -874,7 +877,7 @@ struct AnimateToVector3 : public AnimatorFunctionBase
   }
 
   using AnimatorFunctionBase::operator();
-  Vector3 operator()(float alpha, const Vector3& property)
+  Vector3 operator()(float alpha, const Vector3& property) override
   {
     return Vector3(property + ((mTarget - property) * alpha));
   }
@@ -890,7 +893,7 @@ struct AnimateByVector4 : public AnimatorFunctionBase
   }
 
   using AnimatorFunctionBase::operator();
-  Vector4 operator()(float alpha, const Vector4& property)
+  Vector4 operator()(float alpha, const Vector4& property) override
   {
     return Vector4(property + mRelative * alpha);
   }
@@ -906,7 +909,7 @@ struct AnimateToVector4 : public AnimatorFunctionBase
   }
 
   using AnimatorFunctionBase::operator();
-  Vector4 operator()(float alpha, const Vector4& property)
+  Vector4 operator()(float alpha, const Vector4& property) override
   {
     return Vector4(property + ((mTarget - property) * alpha));
   }
@@ -922,7 +925,7 @@ struct AnimateByOpacity : public AnimatorFunctionBase
   }
 
   using AnimatorFunctionBase::operator();
-  Vector4 operator()(float alpha, const Vector4& property)
+  Vector4 operator()(float alpha, const Vector4& property) override
   {
     Vector4 result(property);
     result.a += mRelative * alpha;
@@ -941,7 +944,7 @@ struct AnimateToOpacity : public AnimatorFunctionBase
   }
 
   using AnimatorFunctionBase::operator();
-  Vector4 operator()(float alpha, const Vector4& property)
+  Vector4 operator()(float alpha, const Vector4& property) override
   {
     Vector4 result(property);
     result.a = property.a + ((mTarget - property.a) * alpha);
@@ -960,7 +963,7 @@ struct AnimateByBoolean : public AnimatorFunctionBase
   }
 
   using AnimatorFunctionBase::operator();
-  bool operator()(float alpha, const bool& property)
+  bool operator()(float alpha, const bool& property) override
   {
     // Alpha is not useful here, just keeping to the same template as other update functors
     return bool(alpha >= 1.0f ? (property || mRelative) : property);
@@ -977,7 +980,7 @@ struct AnimateToBoolean : public AnimatorFunctionBase
   }
 
   using AnimatorFunctionBase::operator();
-  bool operator()(float alpha, const bool& property)
+  bool operator()(float alpha, const bool& property) override
   {
     // Alpha is not useful here, just keeping to the same template as other update functors
     return bool(alpha >= 1.0f ? mTarget : property);
@@ -995,7 +998,7 @@ struct RotateByAngleAxis : public AnimatorFunctionBase
   }
 
   using AnimatorFunctionBase::operator();
-  Quaternion operator()(float alpha, const Quaternion& rotation)
+  Quaternion operator()(float alpha, const Quaternion& rotation) override
   {
     if (alpha > 0.0f)
     {
@@ -1017,7 +1020,7 @@ struct RotateToQuaternion : public AnimatorFunctionBase
   }
 
   using AnimatorFunctionBase::operator();
-  Quaternion operator()(float alpha, const Quaternion& rotation)
+  Quaternion operator()(float alpha, const Quaternion& rotation) override
   {
     return Quaternion::Slerp(rotation, mTarget, alpha);
   }
@@ -1034,7 +1037,7 @@ struct KeyFrameBooleanFunctor : public AnimatorFunctionBase
   }
 
   using AnimatorFunctionBase::operator();
-  bool operator()(float progress, const bool& property)
+  bool operator()(float progress, const bool& property) override
   {
     if(mKeyFrames->IsActive(progress))
     {
@@ -1054,7 +1057,7 @@ struct KeyFrameIntegerFunctor : public AnimatorFunctionBase
   }
 
   using AnimatorFunctionBase::operator();
-  float operator()(float progress, const int32_t& property)
+  float operator()(float progress, const int32_t& property) override
   {
     if(mKeyFrames->IsActive(progress))
     {
@@ -1075,7 +1078,7 @@ struct KeyFrameNumberFunctor : public AnimatorFunctionBase
   }
 
   using AnimatorFunctionBase::operator();
-  float operator()(float progress, const float& property)
+  float operator()(float progress, const float& property) override
   {
     if(mKeyFrames->IsActive(progress))
     {
@@ -1096,7 +1099,7 @@ struct KeyFrameVector2Functor : public AnimatorFunctionBase
   }
 
   using AnimatorFunctionBase::operator();
-  Vector2 operator()(float progress, const Vector2& property)
+  Vector2 operator()(float progress, const Vector2& property) override
   {
     if(mKeyFrames->IsActive(progress))
     {
@@ -1118,7 +1121,7 @@ struct KeyFrameVector3Functor : public AnimatorFunctionBase
   }
 
   using AnimatorFunctionBase::operator();
-  Vector3 operator()(float progress, const Vector3& property)
+  Vector3 operator()(float progress, const Vector3& property) override
   {
     if(mKeyFrames->IsActive(progress))
     {
@@ -1139,7 +1142,7 @@ struct KeyFrameVector4Functor : public AnimatorFunctionBase
   }
 
   using AnimatorFunctionBase::operator();
-  Vector4 operator()(float progress, const Vector4& property)
+  Vector4 operator()(float progress, const Vector4& property) override
   {
     if(mKeyFrames->IsActive(progress))
     {
@@ -1160,7 +1163,7 @@ struct KeyFrameQuaternionFunctor : public AnimatorFunctionBase
   }
 
   using AnimatorFunctionBase::operator();
-  Quaternion operator()(float progress, const Quaternion& property)
+  Quaternion operator()(float progress, const Quaternion& property) override
   {
     if(mKeyFrames->IsActive(progress))
     {
@@ -1180,7 +1183,7 @@ struct PathPositionFunctor : public AnimatorFunctionBase
   }
 
   using AnimatorFunctionBase::operator();
-  Vector3 operator()(float progress, const Vector3& property)
+  Vector3 operator()(float progress, const Vector3& property) override
   {
     Vector3 position(property);
     static_cast<void>( mPath->SamplePosition(progress, position) );
@@ -1200,7 +1203,7 @@ struct PathRotationFunctor : public AnimatorFunctionBase
   }
 
   using AnimatorFunctionBase::operator();
-  Quaternion operator()(float progress, const Quaternion& property)
+  Quaternion operator()(float progress, const Quaternion& property) override
   {
     Vector3 tangent;
     if( mPath->SampleTangent(progress, tangent) )

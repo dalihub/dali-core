@@ -19,15 +19,14 @@
  */
 
 // EXTERNAL INCLUDES
+#include <initializer_list>
 #include <iosfwd>
 #include <type_traits>
 #include <utility>
-#include <initializer_list>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/property.h>
 #include <dali/public-api/math/rect.h>
-
+#include <dali/public-api/object/property.h>
 
 namespace Dali
 {
@@ -45,7 +44,7 @@ class Matrix3;
 class Matrix;
 struct Extents;
 
-typedef std::pair< Property::Key, Property::Value > KeyValuePair;
+using KeyValuePair = std::pair<Property::Key, Property::Value>;
 
 /**
  * @brief A value-type representing a property value.
@@ -54,7 +53,6 @@ typedef std::pair< Property::Key, Property::Value > KeyValuePair;
 class DALI_CORE_API Property::Value
 {
 public:
-
   /**
    * @brief Default constructor.
    *
@@ -69,7 +67,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] boolValue A boolean value
    */
-  Value( bool boolValue );
+  Value(bool boolValue);
 
   /**
    * @brief Creates an integer property value.
@@ -77,7 +75,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] integerValue An integer value
    */
-  Value( int32_t integerValue );
+  Value(int32_t integerValue);
 
   /**
    * @brief Creates a float property value.
@@ -85,7 +83,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] floatValue A floating-point value
    */
-  Value( float floatValue );
+  Value(float floatValue);
 
   /**
    * @brief Creates a Vector2 property value.
@@ -93,7 +91,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] vectorValue A vector of 2 floating-point values
    */
-  Value( const Vector2& vectorValue );
+  Value(const Vector2& vectorValue);
 
   /**
    * @brief Creates a Vector3 property value.
@@ -101,7 +99,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] vectorValue A vector of 3 floating-point values
    */
-  Value( const Vector3& vectorValue );
+  Value(const Vector3& vectorValue);
 
   /**
    * @brief Creates a Vector4 property value.
@@ -109,7 +107,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] vectorValue A vector of 4 floating-point values
    */
-  Value( const Vector4& vectorValue );
+  Value(const Vector4& vectorValue);
 
   /**
    * @brief Creates a Matrix3 property value.
@@ -117,7 +115,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] matrixValue A matrix of 3x3 floating-point values
    */
-  Value( const Matrix3& matrixValue );
+  Value(const Matrix3& matrixValue);
 
   /**
    * @brief Creates a Matrix property value.
@@ -125,7 +123,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] matrixValue A matrix of 4x4 floating-point values
    */
-  Value( const Matrix& matrixValue );
+  Value(const Matrix& matrixValue);
 
   /**
    * @brief Creates a Vector4 property value.
@@ -133,7 +131,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] vectorValue A vector of 4 integer values
    */
-  Value( const Rect<int32_t>& vectorValue );
+  Value(const Rect<int32_t>& vectorValue);
 
   /**
    * @brief Creates a Vector4 property value.
@@ -141,7 +139,7 @@ public:
    * @SINCE_1_9.14
    * @param[in] vectorValue A vector of 4 float values
    */
-  Value( const Rect<float>& vectorValue );
+  Value(const Rect<float>& vectorValue);
 
   /**
    * @brief Creates an orientation property value.
@@ -149,7 +147,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] angleAxis An angle-axis representing the rotation
    */
-  Value( const AngleAxis& angleAxis );
+  Value(const AngleAxis& angleAxis);
 
   /**
    * @brief Creates an orientation property value.
@@ -157,7 +155,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] quaternion A quaternion representing the rotation
    */
-  Value( const Quaternion& quaternion );
+  Value(const Quaternion& quaternion);
 
   /**
    * @brief Creates an string property value.
@@ -165,7 +163,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] stringValue A string
    */
-  Value( const std::string& stringValue );
+  Value(const std::string& stringValue);
 
   /**
    * @brief Creates a string property value.
@@ -173,7 +171,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] stringValue A string
    */
-  Value( const char* stringValue );
+  Value(const char* stringValue);
 
   /**
    * @brief Creates an array property value.
@@ -181,7 +179,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] arrayValue An array
    */
-  Value( Property::Array& arrayValue );
+  Value(Property::Array& arrayValue);
 
   /**
    * @brief Creates an array property value.
@@ -189,7 +187,7 @@ public:
    * @SINCE_1_4.16
    * @param[in] arrayValue An r-value array
    */
-  Value( Property::Array&& arrayValue );
+  Value(Property::Array&& arrayValue);
 
   /**
    * @brief Creates a map property value.
@@ -197,7 +195,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] mapValue A map
    */
-  Value( Property::Map& mapValue );
+  Value(Property::Map& mapValue);
 
   /**
    * @brief Creates a map property value.
@@ -205,7 +203,7 @@ public:
    * @SINCE_1_4.16
    * @param[in] mapValue An r-value map
    */
-  Value( Property::Map&& mapValue );
+  Value(Property::Map&& mapValue);
 
   /**
    * @brief Create a map property value from an initializer_list.
@@ -213,7 +211,7 @@ public:
    * @SINCE_1_4.16
    * @param [in] values An initializer_list of pairs of index and value.
    */
-  Value( const std::initializer_list< KeyValuePair >& values );
+  Value(const std::initializer_list<KeyValuePair>& values);
 
   /**
    * @brief Creates an extents property value.
@@ -221,7 +219,7 @@ public:
    * @SINCE_1_2.62
    * @param[in] extentsValue A collection of 4 uint16_t values
    */
-  Value( const Extents& extentsValue );
+  Value(const Extents& extentsValue);
 
   /**
    * @brief Creates an enumeration property value.
@@ -229,8 +227,9 @@ public:
    * @SINCE_1_4.36
    * @param[in] enumValue An enumeration value
    */
-  template< typename T, typename std::enable_if< std::is_enum< T >::value >::type* = nullptr >
-  Value( T enumValue ) : Value( static_cast< int32_t >( enumValue ) )
+  template<typename T, typename std::enable_if<std::is_enum<T>::value>::type* = nullptr>
+  Value(T enumValue)
+  : Value(static_cast<int32_t>(enumValue))
   {
   }
 
@@ -240,7 +239,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] type The property value type
    */
-  explicit Value( Type type );
+  explicit Value(Type type);
 
   /**
    * @brief Copy constructor.
@@ -248,7 +247,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] value The property value to copy
    */
-  Value( const Value& value );
+  Value(const Value& value);
 
   /**
    * @brief Move constructor.
@@ -257,7 +256,7 @@ public:
    * @SINCE_1_4.16
    * @param[in] value The property value to move from
    */
-  Value( Value&& value );
+  Value(Value&& value);
 
   /**
    * @brief Assigns a property value.
@@ -266,7 +265,7 @@ public:
    * @param[in] value The property value to assign from
    * @return a reference to this
    */
-  Value& operator=( const Value& value );
+  Value& operator=(const Value& value);
 
   /**
    * @brief Move assignment operator.
@@ -275,7 +274,7 @@ public:
    * @param[in] value The property value to move from
    * @return a reference to this
    */
-  Value& operator=( Value&& value );
+  Value& operator=(Value&& value);
 
   /**
    * @brief Non-virtual destructor.
@@ -301,11 +300,11 @@ public:
    * @SINCE_1_4.36
    * @return A value of type T
    */
-  template< typename T, typename std::enable_if< ! std::is_enum< T >::value >::type* = nullptr >
+  template<typename T, typename std::enable_if<!std::is_enum<T>::value>::type* = nullptr>
   T DALI_INTERNAL Get() const
   {
     T temp = T(); // value (zero) initialize
-    Get( temp );
+    Get(temp);
     return temp;
   }
 
@@ -318,12 +317,12 @@ public:
    * @SINCE_1_4.36
    * @return A value of type T
    */
-  template< typename T, typename std::enable_if< std::is_enum< T >::value >::type* = nullptr >
+  template<typename T, typename std::enable_if<std::is_enum<T>::value>::type* = nullptr>
   T DALI_INTERNAL Get() const
   {
     int32_t temp = 0; // value (zero) initialize
-    Get( temp );
-    return static_cast< T >( temp );
+    Get(temp);
+    return static_cast<T>(temp);
   }
 
   /**
@@ -334,15 +333,15 @@ public:
    * @return @c true if the value is successfully retrieved, @c false if the type is different
    * @pre GetType() is any enumeration
    */
-  template< typename T, typename std::enable_if< std::is_enum< T >::value >::type* = nullptr >
-  bool DALI_INTERNAL Get( T& enumValue ) const
+  template<typename T, typename std::enable_if<std::is_enum<T>::value>::type* = nullptr>
+  bool DALI_INTERNAL Get(T& enumValue) const
   {
     int32_t temp = 0;
-    if( ! Get( temp ) )
+    if(!Get(temp))
     {
       return false;
     }
-    enumValue = static_cast< T >( temp );
+    enumValue = static_cast<T>(temp);
     return true;
   }
 
@@ -354,7 +353,7 @@ public:
    * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
    * @pre GetType() is a type convertible to bool.
    */
-  bool Get( bool& boolValue ) const;
+  bool Get(bool& boolValue) const;
 
   /**
    * @brief Retrieves a floating-point value.
@@ -364,7 +363,7 @@ public:
    * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
    * @pre GetType() is a type convertible to float.
    */
-  bool Get( float& floatValue ) const;
+  bool Get(float& floatValue) const;
 
   /**
    * @brief Retrieves an integer value.
@@ -374,7 +373,7 @@ public:
    * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
    * @pre GetType() is a type convertible to int.
    */
-  bool Get( int32_t& integerValue ) const;
+  bool Get(int32_t& integerValue) const;
 
   /**
    * @brief Retrieves an integer rectangle.
@@ -384,7 +383,7 @@ public:
    * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
    * @pre GetType() is a type convertible to Rect<int>.
    */
-  bool Get( Rect<int32_t>& rect ) const;
+  bool Get(Rect<int32_t>& rect) const;
 
   /**
    * @brief Retrieves a vector value.
@@ -394,7 +393,7 @@ public:
    * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
    * @pre GetType() is a type convertible to Vector2.
    */
-  bool Get( Vector2& vectorValue ) const;
+  bool Get(Vector2& vectorValue) const;
 
   /**
    * @brief Retrieves a vector value.
@@ -404,7 +403,7 @@ public:
    * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
    * @pre GetType() is a type convertible to Vector3.
    */
-  bool Get( Vector3& vectorValue ) const;
+  bool Get(Vector3& vectorValue) const;
 
   /**
    * @brief Retrieves a vector value.
@@ -414,7 +413,7 @@ public:
    * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
    * @pre GetType() is a type convertible to Vector4.
    */
-  bool Get( Vector4& vectorValue ) const;
+  bool Get(Vector4& vectorValue) const;
 
   /**
    * @brief Retrieves a matrix3 value.
@@ -424,7 +423,7 @@ public:
    * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
    * @pre GetType() is a type convertible to Matrix3.
    */
-  bool Get( Matrix3& matrixValue ) const;
+  bool Get(Matrix3& matrixValue) const;
 
   /**
    * @brief Retrieves a matrix value.
@@ -434,7 +433,7 @@ public:
    * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
    * @pre GetType() is a type convertible to Matrix.
    */
-  bool Get( Matrix& matrixValue ) const;
+  bool Get(Matrix& matrixValue) const;
 
   /**
    * @brief Retrieves an angle-axis value.
@@ -444,7 +443,7 @@ public:
    * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
    * @pre GetType() is a type convertible to AngleAxis.
    */
-  bool Get( AngleAxis& angleAxisValue ) const;
+  bool Get(AngleAxis& angleAxisValue) const;
 
   /**
    * @brief Retrieves a quaternion value.
@@ -454,7 +453,7 @@ public:
    * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
    * @pre GetType() is a type convertible to Quaternion.
    */
-  bool Get( Quaternion& quaternionValue ) const;
+  bool Get(Quaternion& quaternionValue) const;
 
   /**
    * @brief Retrieves an string property value.
@@ -464,7 +463,7 @@ public:
    * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
    * @pre GetType() is a type convertible to string.
    */
-  bool Get( std::string& stringValue ) const;
+  bool Get(std::string& stringValue) const;
 
   /**
    * @brief Retrieves an array property value.
@@ -474,7 +473,7 @@ public:
    * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
    * @pre GetType() returns Property::ARRAY.
    */
-  bool Get( Property::Array& arrayValue ) const;
+  bool Get(Property::Array& arrayValue) const;
 
   /**
    * @brief Retrieves an map property value.
@@ -484,7 +483,7 @@ public:
    * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
    * @pre GetType() returns Property::MAP.
    */
-  bool Get( Property::Map& mapValue ) const;
+  bool Get(Property::Map& mapValue) const;
 
   /**
    * @brief Retrieves the Array API of the Property::Value without copying the contents of the map.
@@ -510,19 +509,17 @@ public:
    * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
    * @pre GetType() is a type convertible to Extents.
    */
-  bool Get( Extents& extentsValue ) const;
+  bool Get(Extents& extentsValue) const;
 
   /**
    * @brief Output to stream.
    * @SINCE_1_0.0
    */
-  friend DALI_CORE_API std::ostream& operator<<( std::ostream& ouputStream, const Property::Value& value );
+  friend DALI_CORE_API std::ostream& operator<<(std::ostream& ouputStream, const Property::Value& value);
 
 private:
-
   struct DALI_INTERNAL Impl;
-  Impl* mImpl; ///< Pointer to the implementation
-
+  Impl*                mImpl; ///< Pointer to the implementation
 };
 
 /**
@@ -533,7 +530,7 @@ private:
  * @param[in] value The value to insert
  * @return The output stream operator
  */
-DALI_CORE_API std::ostream& operator<<( std::ostream& ouputStream, const Property::Value& value );
+DALI_CORE_API std::ostream& operator<<(std::ostream& ouputStream, const Property::Value& value);
 
 /**
  * @}

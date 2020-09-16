@@ -20,15 +20,13 @@
 
 namespace Dali
 {
-
 namespace DevelRenderer
 {
-
-void AddDrawCommand( Dali::Renderer renderer, const DrawCommand& drawCommand )
+void AddDrawCommand(Dali::Renderer renderer, const DrawCommand& drawCommand)
 {
-  auto& impl = GetImplementation( renderer );
-  impl.AddDrawCommand( drawCommand );
+  auto& impl = GetImplementation(renderer);
+  impl.AddDrawCommand(drawCommand);
 }
 
-} // DevelRenderer
-} // Dali
+} // namespace DevelRenderer
+} // namespace Dali

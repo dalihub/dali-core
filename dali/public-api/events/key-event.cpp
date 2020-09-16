@@ -23,96 +23,95 @@
 
 namespace Dali
 {
-
 KeyEvent::KeyEvent()
 : BaseHandle()
 {
 }
 
-KeyEvent::KeyEvent( const KeyEvent& rhs ) = default;
+KeyEvent::KeyEvent(const KeyEvent& rhs) = default;
 
-KeyEvent::KeyEvent( KeyEvent&& rhs ) = default;
+KeyEvent::KeyEvent(KeyEvent&& rhs) = default;
 
 KeyEvent::~KeyEvent()
 {
 }
 
-KeyEvent& KeyEvent::operator=( const KeyEvent& rhs ) = default;
+KeyEvent& KeyEvent::operator=(const KeyEvent& rhs) = default;
 
-KeyEvent& KeyEvent::operator=( KeyEvent&& rhs ) = default;
+KeyEvent& KeyEvent::operator=(KeyEvent&& rhs) = default;
 
 bool KeyEvent::IsShiftModifier() const
 {
-  return GetImplementation( *this ).IsShiftModifier();
+  return GetImplementation(*this).IsShiftModifier();
 }
 
 bool KeyEvent::IsCtrlModifier() const
 {
-  return GetImplementation( *this ).IsCtrlModifier();
+  return GetImplementation(*this).IsCtrlModifier();
 }
 
 bool KeyEvent::IsAltModifier() const
 {
-  return GetImplementation( *this ).IsAltModifier();
+  return GetImplementation(*this).IsAltModifier();
 }
 
 const std::string& KeyEvent::GetCompose() const
 {
-  return GetImplementation( *this ).GetCompose();
+  return GetImplementation(*this).GetCompose();
 }
 
 const std::string& KeyEvent::GetDeviceName() const
 {
-  return GetImplementation( *this ).GetDeviceName();
+  return GetImplementation(*this).GetDeviceName();
 }
 
 Device::Class::Type KeyEvent::GetDeviceClass() const
 {
-  return GetImplementation( *this ).GetDeviceClass();
+  return GetImplementation(*this).GetDeviceClass();
 }
 
 Device::Subclass::Type KeyEvent::GetDeviceSubclass() const
 {
-  return GetImplementation( *this ).GetDeviceSubclass();
+  return GetImplementation(*this).GetDeviceSubclass();
 }
 
 const std::string& KeyEvent::GetKeyName() const
 {
-  return GetImplementation( *this ).GetKeyName();
+  return GetImplementation(*this).GetKeyName();
 }
 
 const std::string& KeyEvent::GetKeyString() const
 {
-  return GetImplementation( *this ).GetKeyString();
+  return GetImplementation(*this).GetKeyString();
 }
 
 const std::string& KeyEvent::GetLogicalKey() const
 {
-  return GetImplementation( *this ).GetLogicalKey();
+  return GetImplementation(*this).GetLogicalKey();
 }
 
 int32_t KeyEvent::GetKeyCode() const
 {
-  return GetImplementation( *this ).GetKeyCode();
+  return GetImplementation(*this).GetKeyCode();
 }
 
 int32_t KeyEvent::GetKeyModifier() const
 {
-  return GetImplementation( *this ).GetKeyModifier();
+  return GetImplementation(*this).GetKeyModifier();
 }
 
 unsigned long KeyEvent::GetTime() const
 {
-  return GetImplementation( *this ).GetTime();
+  return GetImplementation(*this).GetTime();
 }
 
 KeyEvent::State KeyEvent::GetState() const
 {
-  return GetImplementation( *this ).GetState();
+  return GetImplementation(*this).GetState();
 }
 
-KeyEvent::KeyEvent( Internal::KeyEvent* internal )
-: BaseHandle( internal )
+KeyEvent::KeyEvent(Internal::KeyEvent* internal)
+: BaseHandle(internal)
 {
 }
 

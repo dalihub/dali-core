@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_MULTI_POINT_EVENT_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,19 +19,17 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/integration-api/events/event.h>
 #include <dali/integration-api/events/point.h>
+#include <dali/public-api/common/vector-wrapper.h>
 
 namespace Dali
 {
-
 namespace Integration
 {
-
-typedef std::vector< Point > PointContainer; ///< Container of points
-typedef PointContainer::iterator PointContainerIterator; ///< Iterator for Dali::Integration::PointContainer
-typedef PointContainer::const_iterator PointContainerConstIterator; ///< Const iterator for Dali::Integration::PointContainer
+using PointContainer              = std::vector<Point>;             ///< Container of points
+using PointContainerIterator      = PointContainer::iterator;       ///< Iterator for Dali::Integration::PointContainer
+using PointContainerConstIterator = PointContainer::const_iterator; ///< Const iterator for Dali::Integration::PointContainer
 
 /**
  * An instance of this structure should be used by the adaptor to send a multi-point event to Dali core.
@@ -47,7 +45,7 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~MultiPointEvent();
+  ~MultiPointEvent() override;
 
 protected:
   /**
@@ -62,7 +60,6 @@ protected:
   MultiPointEvent(Type eventType, uint32_t time);
 
 public:
-
   // Data
 
   /**
@@ -81,19 +78,19 @@ public:
    * @brief Adds a point to the MultiPointEvent.
    * @param[in]  point  The point to add.
    */
-  void AddPoint( const Point& point );
+  void AddPoint(const Point& point);
 
   /**
    * @brief Retrieves the Point at position point.
    * @return The Point at position point.
    */
-  Point& GetPoint( uint32_t point );
+  Point& GetPoint(uint32_t point);
 
   /**
    * @brief Retrieves a const ref of the Point at position point.
    * @return The const ref of the Point at position point.
    */
-  const Point& GetPoint( uint32_t point ) const;
+  const Point& GetPoint(uint32_t point) const;
 
   /**
    * @brief The total number of Points in this TouchEvent.

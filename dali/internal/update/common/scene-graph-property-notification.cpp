@@ -57,13 +57,13 @@ PropertyNotification::PropertyNotification(Object& object,
 : mObject(&object),
   mPropertyIndex(propertyIndex),
   mPropertyType(propertyType),
-  mProperty(NULL),
+  mProperty(nullptr),
   mComponentIndex(componentIndex),
   mConditionType(condition),
   mArguments(arguments),
   mValid(false),
   mNotifyMode( Dali::PropertyNotification::DISABLED ),
-  mConditionFunction(NULL)
+  mConditionFunction(nullptr)
 {
   SetNotifyMode(notifyMode);
 

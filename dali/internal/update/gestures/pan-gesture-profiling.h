@@ -45,7 +45,7 @@ struct PanGestureProfiling
     GestureState state;
   };
 
-  typedef std::vector< PanGestureProfiling::Position > PanPositionContainer;
+  using PanPositionContainer = std::vector<PanGestureProfiling::Position>;
 
   void PrintData() const;
 

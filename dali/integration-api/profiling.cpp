@@ -35,16 +35,15 @@
 #include <dali/internal/update/animation/scene-graph-animation.h>
 #include <dali/internal/update/animation/scene-graph-constraint.h>
 
-
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
 
 #include <dali/internal/render/renderers/render-geometry.h>
-#include <dali/internal/render/renderers/render-vertex-buffer.h>
 #include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/renderers/render-sampler.h>
+#include <dali/internal/render/renderers/render-vertex-buffer.h>
 #include <dali/internal/update/render-tasks/scene-graph-camera.h>
 
 using Dali::Internal::GestureEventProcessor;
@@ -52,15 +51,13 @@ using Dali::Internal::ThreadLocalStorage;
 
 namespace Dali
 {
-
 namespace Integration
 {
-
-void EnableProfiling( ProfilingType type )
+void EnableProfiling(ProfilingType type)
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
 
-  switch( type )
+  switch(type)
   {
     case PROFILING_TYPE_PAN_GESTURE:
     {
@@ -77,43 +74,42 @@ void EnableProfiling( ProfilingType type )
 
 namespace Profiling
 {
-
 const std::size_t ANIMATION_MEMORY_SIZE(
-  sizeof( Internal::Animation ) +
-  sizeof( Internal::AnimatorConnector<float> ) +
-  sizeof( Internal::SceneGraph::Animation ) );
+  sizeof(Internal::Animation) +
+  sizeof(Internal::AnimatorConnector<float>) +
+  sizeof(Internal::SceneGraph::Animation));
 const std::size_t CONSTRAINT_MEMORY_SIZE(
-  sizeof( Internal::Constraint<float> ) +
-  sizeof( Internal::SceneGraph::Constraint<float, Internal::PropertyAccessor<float> > ) );
+  sizeof(Internal::Constraint<float>) +
+  sizeof(Internal::SceneGraph::Constraint<float, Internal::PropertyAccessor<float> >));
 const std::size_t ACTOR_MEMORY_SIZE(
-  sizeof( Internal::Actor ) +
-  sizeof( Internal::SceneGraph::Node ) );
+  sizeof(Internal::Actor) +
+  sizeof(Internal::SceneGraph::Node));
 const std::size_t CAMERA_ACTOR_MEMORY_SIZE(
-  sizeof( Internal::CameraActor ) +
-  sizeof( Internal::SceneGraph::Node ) +
-  sizeof( Internal::SceneGraph::Camera ) );
+  sizeof(Internal::CameraActor) +
+  sizeof(Internal::SceneGraph::Node) +
+  sizeof(Internal::SceneGraph::Camera));
 const std::size_t LAYER_MEMORY_SIZE(
-  sizeof( Internal::Layer ) +
-  sizeof( Internal::SceneGraph::Layer ) );
+  sizeof(Internal::Layer) +
+  sizeof(Internal::SceneGraph::Layer));
 const std::size_t RENDERER_MEMORY_SIZE(
-  sizeof( Internal::Renderer ) +
-  sizeof( Internal::SceneGraph::Renderer ) +
-  sizeof( Internal::Render::Renderer ) );
+  sizeof(Internal::Renderer) +
+  sizeof(Internal::SceneGraph::Renderer) +
+  sizeof(Internal::Render::Renderer));
 const std::size_t GEOMETRY_MEMORY_SIZE(
-  sizeof( Internal::Geometry ) +
-  sizeof( Internal::Render::Geometry) );
+  sizeof(Internal::Geometry) +
+  sizeof(Internal::Render::Geometry));
 const std::size_t PROPERTY_BUFFER_MEMORY_SIZE(
-  sizeof( Internal::VertexBuffer ) +
-  sizeof( Internal::Render::VertexBuffer ) );
+  sizeof(Internal::VertexBuffer) +
+  sizeof(Internal::Render::VertexBuffer));
 const std::size_t TEXTURE_SET_MEMORY_SIZE(
-  sizeof( Internal::TextureSet ) +
-  sizeof( Internal::SceneGraph::TextureSet ) );
+  sizeof(Internal::TextureSet) +
+  sizeof(Internal::SceneGraph::TextureSet));
 const std::size_t SAMPLER_MEMORY_SIZE(
-  sizeof( Internal::Sampler ) +
-  sizeof( Internal::Render::Sampler ) );
+  sizeof(Internal::Sampler) +
+  sizeof(Internal::Render::Sampler));
 const std::size_t SHADER_MEMORY_SIZE(
-  sizeof( Internal::Shader ) +
-  sizeof( Internal::SceneGraph::Shader ) );
+  sizeof(Internal::Shader) +
+  sizeof(Internal::SceneGraph::Shader));
 
 } // namespace Profiling
 

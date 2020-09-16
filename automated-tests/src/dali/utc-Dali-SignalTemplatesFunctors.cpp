@@ -16,12 +16,13 @@
  */
 
 // EXTERNAL INCLUDES
-#include <iostream>
 #include <stdlib.h>
 
+#include <iostream>
+
 // INTERNAL INCLUDES
-#include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
+#include <dali/public-api/dali-core.h>
 
 using namespace Dali;
 
@@ -37,16 +38,14 @@ void utc_dali_signal_templates_functors_cleanup(void)
 
 namespace
 {
-
 class TestSignals
 {
 public:
+  typedef Signal<void()>      VoidSignalVoid;
+  typedef Signal<void(float)> VoidSignalFloat;
 
-  typedef Signal<void ()> VoidSignalVoid;
-  typedef Signal<void (float)> VoidSignalFloat;
-
-  typedef Signal<float ()> FloatSignalVoid;
-  typedef Signal<float (float)> FloatSignalFloat;
+  typedef Signal<float()>      FloatSignalVoid;
+  typedef Signal<float(float)> FloatSignalFloat;
 
   TestSignals()
   {
@@ -54,24 +53,23 @@ public:
 
   void CheckNoConnections()
   {
-    DALI_TEST_EQUALS( mVoidSignalVoid.GetConnectionCount(), 0u, TEST_LOCATION );
-    DALI_TEST_EQUALS( mVoidSignalFloat.GetConnectionCount(), 0u, TEST_LOCATION );
+    DALI_TEST_EQUALS(mVoidSignalVoid.GetConnectionCount(), 0u, TEST_LOCATION);
+    DALI_TEST_EQUALS(mVoidSignalFloat.GetConnectionCount(), 0u, TEST_LOCATION);
 
-    DALI_TEST_EQUALS( mFloatSignalVoid.GetConnectionCount(), 0u, TEST_LOCATION );
-    DALI_TEST_EQUALS( mFloatSignalFloat.GetConnectionCount(), 0u, TEST_LOCATION );
+    DALI_TEST_EQUALS(mFloatSignalVoid.GetConnectionCount(), 0u, TEST_LOCATION);
+    DALI_TEST_EQUALS(mFloatSignalFloat.GetConnectionCount(), 0u, TEST_LOCATION);
   }
 
-  VoidSignalVoid mVoidSignalVoid;
+  VoidSignalVoid  mVoidSignalVoid;
   VoidSignalFloat mVoidSignalFloat;
 
-  FloatSignalVoid mFloatSignalVoid;
+  FloatSignalVoid  mFloatSignalVoid;
   FloatSignalFloat mFloatSignalFloat;
 };
 
 class TestConnectionTracker : public ConnectionTracker
 {
 public:
-
   TestConnectionTracker()
   {
   }
@@ -85,7 +83,7 @@ struct VoidFunctorVoid
     ++mCurrentInstanceCount;
   }
 
-  VoidFunctorVoid( const VoidFunctorVoid& copyMe )
+  VoidFunctorVoid(const VoidFunctorVoid& copyMe)
   {
     ++mTotalInstanceCount;
     ++mCurrentInstanceCount;
@@ -108,15 +106,15 @@ struct VoidFunctorVoid
 
 struct VoidFunctorFloat
 {
-  VoidFunctorFloat( float* lastReceivedValue )
-  : mLastReceivedValue( lastReceivedValue )
+  VoidFunctorFloat(float* lastReceivedValue)
+  : mLastReceivedValue(lastReceivedValue)
   {
     ++mTotalInstanceCount;
     ++mCurrentInstanceCount;
   }
 
-  VoidFunctorFloat( const VoidFunctorFloat& copyMe )
-  : mLastReceivedValue( copyMe.mLastReceivedValue )
+  VoidFunctorFloat(const VoidFunctorFloat& copyMe)
+  : mLastReceivedValue(copyMe.mLastReceivedValue)
   {
     ++mTotalInstanceCount;
     ++mCurrentInstanceCount;
@@ -131,7 +129,7 @@ struct VoidFunctorFloat
   {
     ++mCallbackCount;
 
-    if( mLastReceivedValue )
+    if(mLastReceivedValue)
     {
       *mLastReceivedValue = value;
     }
@@ -154,7 +152,7 @@ struct FloatFunctorVoid
     ++mCurrentInstanceCount;
   }
 
-  FloatFunctorVoid( const FloatFunctorVoid& copyMe )
+  FloatFunctorVoid(const FloatFunctorVoid& copyMe)
   {
     ++mTotalInstanceCount;
     ++mCurrentInstanceCount;
@@ -188,8 +186,8 @@ struct FloatFunctorFloat
     ++mCurrentInstanceCount;
   }
 
-  FloatFunctorFloat( const FloatFunctorFloat& copyMe )
-  : mLastReceivedValue (copyMe.mLastReceivedValue )
+  FloatFunctorFloat(const FloatFunctorFloat& copyMe)
+  : mLastReceivedValue(copyMe.mLastReceivedValue)
   {
     ++mTotalInstanceCount;
     ++mCurrentInstanceCount;
@@ -249,8 +247,7 @@ int FloatFunctorFloat::mTotalInstanceCount   = 0;
 int FloatFunctorFloat::mCurrentInstanceCount = 0;
 int FloatFunctorFloat::mCallbackCount        = 0;
 
-} // anon namespace
-
+} // namespace
 
 int UtcDaliSignalFunctorsEmptyCheck(void)
 {
@@ -260,33 +257,33 @@ int UtcDaliSignalFunctorsEmptyCheck(void)
 
   {
     TestSignals::VoidSignalVoid signal;
-    DALI_TEST_CHECK( signal.Empty() );
-    DALI_TEST_EQUALS( VoidFunctorVoid::mTotalInstanceCount, 0, TEST_LOCATION );
-    DALI_TEST_EQUALS( VoidFunctorVoid::mCurrentInstanceCount, 0, TEST_LOCATION );
+    DALI_TEST_CHECK(signal.Empty());
+    DALI_TEST_EQUALS(VoidFunctorVoid::mTotalInstanceCount, 0, TEST_LOCATION);
+    DALI_TEST_EQUALS(VoidFunctorVoid::mCurrentInstanceCount, 0, TEST_LOCATION);
     TestConnectionTracker tracker;
-    signal.Connect( &tracker, VoidFunctorVoid() );
-    DALI_TEST_CHECK( ! signal.Empty() );
-    DALI_TEST_EQUALS( VoidFunctorVoid::mTotalInstanceCount, 2/*temporary copy + signal copy*/, TEST_LOCATION );
-    DALI_TEST_EQUALS( VoidFunctorVoid::mCurrentInstanceCount, 1, TEST_LOCATION );
+    signal.Connect(&tracker, VoidFunctorVoid());
+    DALI_TEST_CHECK(!signal.Empty());
+    DALI_TEST_EQUALS(VoidFunctorVoid::mTotalInstanceCount, 2 /*temporary copy + signal copy*/, TEST_LOCATION);
+    DALI_TEST_EQUALS(VoidFunctorVoid::mCurrentInstanceCount, 1, TEST_LOCATION);
   }
   // TestConnectionTracker should auto-disconnect
-  DALI_TEST_EQUALS( VoidFunctorVoid::mTotalInstanceCount, 2/*temporary copy + signal copy*/, TEST_LOCATION );
-  DALI_TEST_EQUALS( VoidFunctorVoid::mCurrentInstanceCount, 0, TEST_LOCATION );
+  DALI_TEST_EQUALS(VoidFunctorVoid::mTotalInstanceCount, 2 /*temporary copy + signal copy*/, TEST_LOCATION);
+  DALI_TEST_EQUALS(VoidFunctorVoid::mCurrentInstanceCount, 0, TEST_LOCATION);
 
   {
     TestSignals::VoidSignalFloat signal;
-    DALI_TEST_CHECK( signal.Empty() );
-    DALI_TEST_EQUALS( VoidFunctorFloat::mTotalInstanceCount, 0, TEST_LOCATION );
-    DALI_TEST_EQUALS( VoidFunctorFloat::mCurrentInstanceCount, 0, TEST_LOCATION );
+    DALI_TEST_CHECK(signal.Empty());
+    DALI_TEST_EQUALS(VoidFunctorFloat::mTotalInstanceCount, 0, TEST_LOCATION);
+    DALI_TEST_EQUALS(VoidFunctorFloat::mCurrentInstanceCount, 0, TEST_LOCATION);
     TestConnectionTracker tracker;
-    signal.Connect( &tracker, VoidFunctorFloat(NULL) );
-    DALI_TEST_CHECK( ! signal.Empty() );
-    DALI_TEST_EQUALS( VoidFunctorFloat::mTotalInstanceCount, 2/*temporary copy + signal copy*/, TEST_LOCATION );
-    DALI_TEST_EQUALS( VoidFunctorFloat::mCurrentInstanceCount, 1, TEST_LOCATION );
+    signal.Connect(&tracker, VoidFunctorFloat(NULL));
+    DALI_TEST_CHECK(!signal.Empty());
+    DALI_TEST_EQUALS(VoidFunctorFloat::mTotalInstanceCount, 2 /*temporary copy + signal copy*/, TEST_LOCATION);
+    DALI_TEST_EQUALS(VoidFunctorFloat::mCurrentInstanceCount, 1, TEST_LOCATION);
   }
   // TestConnectionTracker should auto-disconnect
-  DALI_TEST_EQUALS( VoidFunctorFloat::mTotalInstanceCount, 2/*temporary copy + signal copy*/, TEST_LOCATION );
-  DALI_TEST_EQUALS( VoidFunctorFloat::mCurrentInstanceCount, 0, TEST_LOCATION );
+  DALI_TEST_EQUALS(VoidFunctorFloat::mTotalInstanceCount, 2 /*temporary copy + signal copy*/, TEST_LOCATION);
+  DALI_TEST_EQUALS(VoidFunctorFloat::mCurrentInstanceCount, 0, TEST_LOCATION);
   END_TEST;
 }
 
@@ -301,52 +298,52 @@ int UtcDaliSignalFunctorsEmit(void)
   {
     TestConnectionTracker tracker;
 
-    DALI_TEST_EQUALS( VoidFunctorVoid::mTotalInstanceCount, 0, TEST_LOCATION );
-    DALI_TEST_EQUALS( VoidFunctorVoid::mCurrentInstanceCount, 0, TEST_LOCATION );
+    DALI_TEST_EQUALS(VoidFunctorVoid::mTotalInstanceCount, 0, TEST_LOCATION);
+    DALI_TEST_EQUALS(VoidFunctorVoid::mCurrentInstanceCount, 0, TEST_LOCATION);
 
-    signals.mVoidSignalVoid.Connect( &tracker, VoidFunctorVoid() );
-    DALI_TEST_EQUALS( VoidFunctorVoid::mTotalInstanceCount, 2/*temporary copy + signal copy*/, TEST_LOCATION );
-    DALI_TEST_EQUALS( VoidFunctorVoid::mCurrentInstanceCount, 1, TEST_LOCATION );
-    DALI_TEST_EQUALS( VoidFunctorVoid::mCallbackCount, 0, TEST_LOCATION );
+    signals.mVoidSignalVoid.Connect(&tracker, VoidFunctorVoid());
+    DALI_TEST_EQUALS(VoidFunctorVoid::mTotalInstanceCount, 2 /*temporary copy + signal copy*/, TEST_LOCATION);
+    DALI_TEST_EQUALS(VoidFunctorVoid::mCurrentInstanceCount, 1, TEST_LOCATION);
+    DALI_TEST_EQUALS(VoidFunctorVoid::mCallbackCount, 0, TEST_LOCATION);
 
     signals.mVoidSignalVoid.Emit();
-    DALI_TEST_EQUALS( VoidFunctorVoid::mCallbackCount, 1, TEST_LOCATION );
+    DALI_TEST_EQUALS(VoidFunctorVoid::mCallbackCount, 1, TEST_LOCATION);
 
     // Test double emission
     signals.mVoidSignalVoid.Emit();
-    DALI_TEST_EQUALS( VoidFunctorVoid::mCallbackCount, 2, TEST_LOCATION );
+    DALI_TEST_EQUALS(VoidFunctorVoid::mCallbackCount, 2, TEST_LOCATION);
   }
   // TestConnectionTracker should auto-disconnect
-  DALI_TEST_EQUALS( VoidFunctorVoid::mTotalInstanceCount, 2/*temporary copy + signal copy*/, TEST_LOCATION );
-  DALI_TEST_EQUALS( VoidFunctorVoid::mCurrentInstanceCount, 0, TEST_LOCATION );
-  DALI_TEST_EQUALS( VoidFunctorVoid::mCallbackCount, 2, TEST_LOCATION );
+  DALI_TEST_EQUALS(VoidFunctorVoid::mTotalInstanceCount, 2 /*temporary copy + signal copy*/, TEST_LOCATION);
+  DALI_TEST_EQUALS(VoidFunctorVoid::mCurrentInstanceCount, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(VoidFunctorVoid::mCallbackCount, 2, TEST_LOCATION);
   signals.CheckNoConnections();
 
   {
     TestConnectionTracker tracker;
-    float lastReceivedValue( 0.0f );
+    float                 lastReceivedValue(0.0f);
 
-    DALI_TEST_EQUALS( VoidFunctorFloat::mTotalInstanceCount, 0, TEST_LOCATION );
-    DALI_TEST_EQUALS( VoidFunctorFloat::mCurrentInstanceCount, 0, TEST_LOCATION );
+    DALI_TEST_EQUALS(VoidFunctorFloat::mTotalInstanceCount, 0, TEST_LOCATION);
+    DALI_TEST_EQUALS(VoidFunctorFloat::mCurrentInstanceCount, 0, TEST_LOCATION);
 
-    signals.mVoidSignalFloat.Connect( &tracker, VoidFunctorFloat(&lastReceivedValue) );
-    DALI_TEST_EQUALS( VoidFunctorFloat::mTotalInstanceCount, 2/*temporary copy + signal copy*/, TEST_LOCATION );
-    DALI_TEST_EQUALS( VoidFunctorFloat::mCurrentInstanceCount, 1, TEST_LOCATION );
-    DALI_TEST_EQUALS( VoidFunctorFloat::mCallbackCount, 0, TEST_LOCATION );
+    signals.mVoidSignalFloat.Connect(&tracker, VoidFunctorFloat(&lastReceivedValue));
+    DALI_TEST_EQUALS(VoidFunctorFloat::mTotalInstanceCount, 2 /*temporary copy + signal copy*/, TEST_LOCATION);
+    DALI_TEST_EQUALS(VoidFunctorFloat::mCurrentInstanceCount, 1, TEST_LOCATION);
+    DALI_TEST_EQUALS(VoidFunctorFloat::mCallbackCount, 0, TEST_LOCATION);
 
-    signals.mVoidSignalFloat.Emit( 3.5f );
-    DALI_TEST_EQUALS( VoidFunctorFloat::mCallbackCount, 1, TEST_LOCATION );
-    DALI_TEST_EQUALS( lastReceivedValue, 3.5f, TEST_LOCATION );
+    signals.mVoidSignalFloat.Emit(3.5f);
+    DALI_TEST_EQUALS(VoidFunctorFloat::mCallbackCount, 1, TEST_LOCATION);
+    DALI_TEST_EQUALS(lastReceivedValue, 3.5f, TEST_LOCATION);
 
     // Test double emission
-    signals.mVoidSignalFloat.Emit( 7.0f );
-    DALI_TEST_EQUALS( VoidFunctorFloat::mCallbackCount, 2, TEST_LOCATION );
-    DALI_TEST_EQUALS( lastReceivedValue, 7.0f, TEST_LOCATION );
+    signals.mVoidSignalFloat.Emit(7.0f);
+    DALI_TEST_EQUALS(VoidFunctorFloat::mCallbackCount, 2, TEST_LOCATION);
+    DALI_TEST_EQUALS(lastReceivedValue, 7.0f, TEST_LOCATION);
   }
   // TestConnectionTracker should auto-disconnect
-  DALI_TEST_EQUALS( VoidFunctorFloat::mTotalInstanceCount, 2/*temporary copy + signal copy*/, TEST_LOCATION );
-  DALI_TEST_EQUALS( VoidFunctorFloat::mCurrentInstanceCount, 0, TEST_LOCATION );
-  DALI_TEST_EQUALS( VoidFunctorFloat::mCallbackCount, 2, TEST_LOCATION );
+  DALI_TEST_EQUALS(VoidFunctorFloat::mTotalInstanceCount, 2 /*temporary copy + signal copy*/, TEST_LOCATION);
+  DALI_TEST_EQUALS(VoidFunctorFloat::mCurrentInstanceCount, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(VoidFunctorFloat::mCallbackCount, 2, TEST_LOCATION);
   signals.CheckNoConnections();
   END_TEST;
 }
@@ -362,53 +359,53 @@ int UtcDaliSignalFunctorsEmitReturn(void)
   {
     TestConnectionTracker tracker;
 
-    DALI_TEST_EQUALS( FloatFunctorVoid::mTotalInstanceCount, 0, TEST_LOCATION );
-    DALI_TEST_EQUALS( FloatFunctorVoid::mCurrentInstanceCount, 0, TEST_LOCATION );
+    DALI_TEST_EQUALS(FloatFunctorVoid::mTotalInstanceCount, 0, TEST_LOCATION);
+    DALI_TEST_EQUALS(FloatFunctorVoid::mCurrentInstanceCount, 0, TEST_LOCATION);
 
-    signals.mFloatSignalVoid.Connect( &tracker, FloatFunctorVoid() );
-    DALI_TEST_EQUALS( FloatFunctorVoid::mTotalInstanceCount, 2/*temporary copy + signal copy*/, TEST_LOCATION );
-    DALI_TEST_EQUALS( FloatFunctorVoid::mCurrentInstanceCount, 1, TEST_LOCATION );
-    DALI_TEST_EQUALS( FloatFunctorVoid::mCallbackCount, 0, TEST_LOCATION );
+    signals.mFloatSignalVoid.Connect(&tracker, FloatFunctorVoid());
+    DALI_TEST_EQUALS(FloatFunctorVoid::mTotalInstanceCount, 2 /*temporary copy + signal copy*/, TEST_LOCATION);
+    DALI_TEST_EQUALS(FloatFunctorVoid::mCurrentInstanceCount, 1, TEST_LOCATION);
+    DALI_TEST_EQUALS(FloatFunctorVoid::mCallbackCount, 0, TEST_LOCATION);
 
     float returnValue = signals.mFloatSignalVoid.Emit();
-    DALI_TEST_EQUALS( FloatFunctorVoid::mCallbackCount, 1, TEST_LOCATION );
-    DALI_TEST_EQUALS( returnValue, FloatFunctorVoid::DEFAULT_RETURN_VALUE, TEST_LOCATION );
+    DALI_TEST_EQUALS(FloatFunctorVoid::mCallbackCount, 1, TEST_LOCATION);
+    DALI_TEST_EQUALS(returnValue, FloatFunctorVoid::DEFAULT_RETURN_VALUE, TEST_LOCATION);
 
     // Test double emission
     returnValue = signals.mFloatSignalVoid.Emit();
-    DALI_TEST_EQUALS( FloatFunctorVoid::mCallbackCount, 2, TEST_LOCATION );
-    DALI_TEST_EQUALS( returnValue, FloatFunctorVoid::DEFAULT_RETURN_VALUE, TEST_LOCATION );
+    DALI_TEST_EQUALS(FloatFunctorVoid::mCallbackCount, 2, TEST_LOCATION);
+    DALI_TEST_EQUALS(returnValue, FloatFunctorVoid::DEFAULT_RETURN_VALUE, TEST_LOCATION);
   }
   // TestConnectionTracker should auto-disconnect
-  DALI_TEST_EQUALS( FloatFunctorVoid::mTotalInstanceCount, 2/*temporary copy + signal copy*/, TEST_LOCATION );
-  DALI_TEST_EQUALS( FloatFunctorVoid::mCurrentInstanceCount, 0, TEST_LOCATION );
-  DALI_TEST_EQUALS( FloatFunctorVoid::mCallbackCount, 2, TEST_LOCATION );
+  DALI_TEST_EQUALS(FloatFunctorVoid::mTotalInstanceCount, 2 /*temporary copy + signal copy*/, TEST_LOCATION);
+  DALI_TEST_EQUALS(FloatFunctorVoid::mCurrentInstanceCount, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(FloatFunctorVoid::mCallbackCount, 2, TEST_LOCATION);
   signals.CheckNoConnections();
 
   {
     TestConnectionTracker tracker;
 
-    DALI_TEST_EQUALS( FloatFunctorFloat::mTotalInstanceCount, 0, TEST_LOCATION );
-    DALI_TEST_EQUALS( FloatFunctorFloat::mCurrentInstanceCount, 0, TEST_LOCATION );
+    DALI_TEST_EQUALS(FloatFunctorFloat::mTotalInstanceCount, 0, TEST_LOCATION);
+    DALI_TEST_EQUALS(FloatFunctorFloat::mCurrentInstanceCount, 0, TEST_LOCATION);
 
-    signals.mFloatSignalFloat.Connect( &tracker, FloatFunctorFloat() );
-    DALI_TEST_EQUALS( FloatFunctorFloat::mTotalInstanceCount, 2/*temporary copy + signal copy*/, TEST_LOCATION );
-    DALI_TEST_EQUALS( FloatFunctorFloat::mCurrentInstanceCount, 1, TEST_LOCATION );
-    DALI_TEST_EQUALS( FloatFunctorFloat::mCallbackCount, 0, TEST_LOCATION );
+    signals.mFloatSignalFloat.Connect(&tracker, FloatFunctorFloat());
+    DALI_TEST_EQUALS(FloatFunctorFloat::mTotalInstanceCount, 2 /*temporary copy + signal copy*/, TEST_LOCATION);
+    DALI_TEST_EQUALS(FloatFunctorFloat::mCurrentInstanceCount, 1, TEST_LOCATION);
+    DALI_TEST_EQUALS(FloatFunctorFloat::mCallbackCount, 0, TEST_LOCATION);
 
-    float returnValue = signals.mFloatSignalFloat.Emit( 0.1f );
-    DALI_TEST_EQUALS( FloatFunctorFloat::mCallbackCount, 1, TEST_LOCATION );
-    DALI_TEST_EQUALS( returnValue, 1.0f + 0.1f, TEST_LOCATION );
+    float returnValue = signals.mFloatSignalFloat.Emit(0.1f);
+    DALI_TEST_EQUALS(FloatFunctorFloat::mCallbackCount, 1, TEST_LOCATION);
+    DALI_TEST_EQUALS(returnValue, 1.0f + 0.1f, TEST_LOCATION);
 
     // Test double emission
-    returnValue = signals.mFloatSignalFloat.Emit( 0.2f );
-    DALI_TEST_EQUALS( FloatFunctorFloat::mCallbackCount, 2, TEST_LOCATION );
-    DALI_TEST_EQUALS( returnValue, 1.0f + 0.2f, TEST_LOCATION );
+    returnValue = signals.mFloatSignalFloat.Emit(0.2f);
+    DALI_TEST_EQUALS(FloatFunctorFloat::mCallbackCount, 2, TEST_LOCATION);
+    DALI_TEST_EQUALS(returnValue, 1.0f + 0.2f, TEST_LOCATION);
   }
   // TestConnectionTracker should auto-disconnect
-  DALI_TEST_EQUALS( FloatFunctorFloat::mTotalInstanceCount, 2/*temporary copy + signal copy*/, TEST_LOCATION );
-  DALI_TEST_EQUALS( FloatFunctorFloat::mCurrentInstanceCount, 0, TEST_LOCATION );
-  DALI_TEST_EQUALS( FloatFunctorFloat::mCallbackCount, 2, TEST_LOCATION );
+  DALI_TEST_EQUALS(FloatFunctorFloat::mTotalInstanceCount, 2 /*temporary copy + signal copy*/, TEST_LOCATION);
+  DALI_TEST_EQUALS(FloatFunctorFloat::mCurrentInstanceCount, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(FloatFunctorFloat::mCallbackCount, 2, TEST_LOCATION);
   signals.CheckNoConnections();
   END_TEST;
 }
@@ -424,23 +421,23 @@ int UtcDaliSignalFunctorsDisconnectBeforeEmit(void)
   {
     TestConnectionTracker tracker;
 
-    DALI_TEST_EQUALS( VoidFunctorVoid::mTotalInstanceCount, 0, TEST_LOCATION );
-    DALI_TEST_EQUALS( VoidFunctorVoid::mCurrentInstanceCount, 0, TEST_LOCATION );
+    DALI_TEST_EQUALS(VoidFunctorVoid::mTotalInstanceCount, 0, TEST_LOCATION);
+    DALI_TEST_EQUALS(VoidFunctorVoid::mCurrentInstanceCount, 0, TEST_LOCATION);
 
-    signals.mVoidSignalVoid.Connect( &tracker, VoidFunctorVoid() );
-    DALI_TEST_EQUALS( VoidFunctorVoid::mTotalInstanceCount, 2/*temporary copy + signal copy*/, TEST_LOCATION );
-    DALI_TEST_EQUALS( VoidFunctorVoid::mCurrentInstanceCount, 1, TEST_LOCATION );
+    signals.mVoidSignalVoid.Connect(&tracker, VoidFunctorVoid());
+    DALI_TEST_EQUALS(VoidFunctorVoid::mTotalInstanceCount, 2 /*temporary copy + signal copy*/, TEST_LOCATION);
+    DALI_TEST_EQUALS(VoidFunctorVoid::mCurrentInstanceCount, 1, TEST_LOCATION);
 
     tracker.DisconnectAll();
-    DALI_TEST_EQUALS( VoidFunctorVoid::mTotalInstanceCount, 2/*temporary copy + signal copy*/, TEST_LOCATION );
-    DALI_TEST_EQUALS( VoidFunctorVoid::mCurrentInstanceCount, 0, TEST_LOCATION );
+    DALI_TEST_EQUALS(VoidFunctorVoid::mTotalInstanceCount, 2 /*temporary copy + signal copy*/, TEST_LOCATION);
+    DALI_TEST_EQUALS(VoidFunctorVoid::mCurrentInstanceCount, 0, TEST_LOCATION);
 
     signals.mVoidSignalVoid.Emit();
-    DALI_TEST_EQUALS( VoidFunctorVoid::mCallbackCount, 0, TEST_LOCATION );
+    DALI_TEST_EQUALS(VoidFunctorVoid::mCallbackCount, 0, TEST_LOCATION);
 
     // Test double emission
     signals.mVoidSignalVoid.Emit();
-    DALI_TEST_EQUALS( VoidFunctorVoid::mCallbackCount, 0, TEST_LOCATION );
+    DALI_TEST_EQUALS(VoidFunctorVoid::mCallbackCount, 0, TEST_LOCATION);
   }
   END_TEST;
 }
@@ -456,25 +453,25 @@ int UtcDaliSignalFunctorsDestroySignal(void)
   {
     TestSignals signals;
 
-    DALI_TEST_EQUALS( VoidFunctorVoid::mTotalInstanceCount, 0, TEST_LOCATION );
-    DALI_TEST_EQUALS( VoidFunctorVoid::mCurrentInstanceCount, 0, TEST_LOCATION );
+    DALI_TEST_EQUALS(VoidFunctorVoid::mTotalInstanceCount, 0, TEST_LOCATION);
+    DALI_TEST_EQUALS(VoidFunctorVoid::mCurrentInstanceCount, 0, TEST_LOCATION);
 
-    signals.mVoidSignalVoid.Connect( &tracker, VoidFunctorVoid() );
-    DALI_TEST_EQUALS( VoidFunctorVoid::mTotalInstanceCount, 2/*temporary copy + signal copy*/, TEST_LOCATION );
-    DALI_TEST_EQUALS( VoidFunctorVoid::mCurrentInstanceCount, 1, TEST_LOCATION );
+    signals.mVoidSignalVoid.Connect(&tracker, VoidFunctorVoid());
+    DALI_TEST_EQUALS(VoidFunctorVoid::mTotalInstanceCount, 2 /*temporary copy + signal copy*/, TEST_LOCATION);
+    DALI_TEST_EQUALS(VoidFunctorVoid::mCurrentInstanceCount, 1, TEST_LOCATION);
 
     signals.mVoidSignalVoid.Emit();
-    DALI_TEST_EQUALS( VoidFunctorVoid::mCallbackCount,1, TEST_LOCATION );
+    DALI_TEST_EQUALS(VoidFunctorVoid::mCallbackCount, 1, TEST_LOCATION);
 
-    DALI_TEST_EQUALS( tracker.GetConnectionCount(), 1u, TEST_LOCATION );
+    DALI_TEST_EQUALS(tracker.GetConnectionCount(), 1u, TEST_LOCATION);
   }
 
   // Functor should have been deleted with signal
-  DALI_TEST_EQUALS( VoidFunctorVoid::mTotalInstanceCount, 2/*temporary copy + signal copy*/, TEST_LOCATION );
-  DALI_TEST_EQUALS( VoidFunctorVoid::mCurrentInstanceCount, 0, TEST_LOCATION );
-  DALI_TEST_EQUALS( VoidFunctorVoid::mCallbackCount, 1, TEST_LOCATION );
+  DALI_TEST_EQUALS(VoidFunctorVoid::mTotalInstanceCount, 2 /*temporary copy + signal copy*/, TEST_LOCATION);
+  DALI_TEST_EQUALS(VoidFunctorVoid::mCurrentInstanceCount, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(VoidFunctorVoid::mCallbackCount, 1, TEST_LOCATION);
 
-  DALI_TEST_EQUALS( tracker.GetConnectionCount(), 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS(tracker.GetConnectionCount(), 0u, TEST_LOCATION);
   END_TEST;
 }
 
@@ -489,25 +486,25 @@ int UtcDaliSignalConnectVoidFunctor(void)
   {
     TestConnectionTracker tracker;
 
-    DALI_TEST_EQUALS( VoidFunctorVoid::mTotalInstanceCount, 0, TEST_LOCATION );
-    DALI_TEST_EQUALS( VoidFunctorVoid::mCurrentInstanceCount, 0, TEST_LOCATION );
+    DALI_TEST_EQUALS(VoidFunctorVoid::mTotalInstanceCount, 0, TEST_LOCATION);
+    DALI_TEST_EQUALS(VoidFunctorVoid::mCurrentInstanceCount, 0, TEST_LOCATION);
 
-    signals.mVoidSignalVoid.Connect( &tracker, FunctorDelegate::New( VoidFunctorVoid() ) );
-    DALI_TEST_EQUALS( VoidFunctorVoid::mTotalInstanceCount, 2/*temporary copy + signal copy*/, TEST_LOCATION );
-    DALI_TEST_EQUALS( VoidFunctorVoid::mCurrentInstanceCount, 1, TEST_LOCATION );
-    DALI_TEST_EQUALS( VoidFunctorVoid::mCallbackCount, 0, TEST_LOCATION );
+    signals.mVoidSignalVoid.Connect(&tracker, FunctorDelegate::New(VoidFunctorVoid()));
+    DALI_TEST_EQUALS(VoidFunctorVoid::mTotalInstanceCount, 2 /*temporary copy + signal copy*/, TEST_LOCATION);
+    DALI_TEST_EQUALS(VoidFunctorVoid::mCurrentInstanceCount, 1, TEST_LOCATION);
+    DALI_TEST_EQUALS(VoidFunctorVoid::mCallbackCount, 0, TEST_LOCATION);
 
     signals.mVoidSignalVoid.Emit();
-    DALI_TEST_EQUALS( VoidFunctorVoid::mCallbackCount, 1, TEST_LOCATION );
+    DALI_TEST_EQUALS(VoidFunctorVoid::mCallbackCount, 1, TEST_LOCATION);
 
     // Test double emission
     signals.mVoidSignalVoid.Emit();
-    DALI_TEST_EQUALS( VoidFunctorVoid::mCallbackCount, 2, TEST_LOCATION );
+    DALI_TEST_EQUALS(VoidFunctorVoid::mCallbackCount, 2, TEST_LOCATION);
   }
   // TestConnectionTracker should auto-disconnect
-  DALI_TEST_EQUALS( VoidFunctorVoid::mTotalInstanceCount, 2/*temporary copy + signal copy*/, TEST_LOCATION );
-  DALI_TEST_EQUALS( VoidFunctorVoid::mCurrentInstanceCount, 0, TEST_LOCATION );
-  DALI_TEST_EQUALS( VoidFunctorVoid::mCallbackCount, 2, TEST_LOCATION );
+  DALI_TEST_EQUALS(VoidFunctorVoid::mTotalInstanceCount, 2 /*temporary copy + signal copy*/, TEST_LOCATION);
+  DALI_TEST_EQUALS(VoidFunctorVoid::mCurrentInstanceCount, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(VoidFunctorVoid::mCallbackCount, 2, TEST_LOCATION);
   signals.CheckNoConnections();
   END_TEST;
 }

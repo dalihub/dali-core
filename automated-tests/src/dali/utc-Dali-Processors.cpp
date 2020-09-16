@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,17 @@
  *
  */
 
-#include <stdlib.h>
-#include <dali/public-api/dali-core.h>
-#include <dali/integration-api/core.h>
 #include <dali-test-suite-utils.h>
+#include <dali/integration-api/core.h>
 #include <dali/integration-api/processor-interface.h>
+#include <dali/public-api/dali-core.h>
+#include <stdlib.h>
 
 using namespace Dali;
-
 
 class TestProcessor : public Integration::Processor
 {
 public:
-
   TestProcessor()
   : processRun(false)
   {
@@ -41,30 +39,29 @@ public:
   bool processRun;
 };
 
-
 int UtcDaliCoreProcessorP(void)
 {
   TestApplication application;
 
-  TestProcessor testProcessor;
+  TestProcessor      testProcessor;
   Integration::Core& core = application.GetCore();
-  core.RegisterProcessor( testProcessor );
+  core.RegisterProcessor(testProcessor);
 
   tet_infoline("Test that the processor has not been executed yet:");
-  DALI_TEST_CHECK( testProcessor.processRun == false );
+  DALI_TEST_CHECK(testProcessor.processRun == false);
 
   application.SendNotification();
 
   tet_infoline("Test that the processor has been executed:");
-  DALI_TEST_CHECK( testProcessor.processRun );
+  DALI_TEST_CHECK(testProcessor.processRun);
 
   // Clear down for next part of test
   testProcessor.processRun = false;
 
-  core.UnregisterProcessor( testProcessor );
+  core.UnregisterProcessor(testProcessor);
   application.SendNotification();
   tet_infoline("Test that the processor has not been executed again:");
-  DALI_TEST_CHECK( testProcessor.processRun == false );
+  DALI_TEST_CHECK(testProcessor.processRun == false);
 
   END_TEST;
 }
@@ -78,43 +75,43 @@ int UtcDaliCoreProcessorMultipleP(void)
   TestProcessor testProcessor3;
 
   Integration::Core& core = application.GetCore();
-  core.RegisterProcessor( testProcessor1 );
+  core.RegisterProcessor(testProcessor1);
 
   tet_infoline("Test that the processor has not been executed yet:");
-  DALI_TEST_CHECK( testProcessor1.processRun == false );
+  DALI_TEST_CHECK(testProcessor1.processRun == false);
 
   application.SendNotification();
 
   tet_infoline("Test that the processor has been executed:");
-  DALI_TEST_CHECK( testProcessor1.processRun );
+  DALI_TEST_CHECK(testProcessor1.processRun);
 
   // Clear down for next part of test
   testProcessor1.processRun = false;
 
-  core.RegisterProcessor( testProcessor2 );
-  core.RegisterProcessor( testProcessor3 );
+  core.RegisterProcessor(testProcessor2);
+  core.RegisterProcessor(testProcessor3);
 
   tet_infoline("Test that the processors have not been executed yet:");
-  DALI_TEST_CHECK( testProcessor1.processRun == false );
-  DALI_TEST_CHECK( testProcessor2.processRun == false );
-  DALI_TEST_CHECK( testProcessor3.processRun == false );
+  DALI_TEST_CHECK(testProcessor1.processRun == false);
+  DALI_TEST_CHECK(testProcessor2.processRun == false);
+  DALI_TEST_CHECK(testProcessor3.processRun == false);
 
   application.SendNotification();
 
   tet_infoline("Test that the processors have been executed:");
-  DALI_TEST_CHECK( testProcessor1.processRun );
-  DALI_TEST_CHECK( testProcessor2.processRun );
-  DALI_TEST_CHECK( testProcessor3.processRun );
+  DALI_TEST_CHECK(testProcessor1.processRun);
+  DALI_TEST_CHECK(testProcessor2.processRun);
+  DALI_TEST_CHECK(testProcessor3.processRun);
 
   // Clear down for next part of test
   testProcessor2.processRun = false;
 
-  core.UnregisterProcessor( testProcessor2 );
+  core.UnregisterProcessor(testProcessor2);
   application.SendNotification();
   tet_infoline("Test that the unregistered processor has not been executed again but others have");
-  DALI_TEST_CHECK( testProcessor1.processRun );
-  DALI_TEST_CHECK( testProcessor2.processRun == false );
-  DALI_TEST_CHECK( testProcessor3.processRun );
+  DALI_TEST_CHECK(testProcessor1.processRun);
+  DALI_TEST_CHECK(testProcessor2.processRun == false);
+  DALI_TEST_CHECK(testProcessor3.processRun);
 
   END_TEST;
 }

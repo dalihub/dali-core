@@ -22,10 +22,10 @@
 #include <cstdint> // uint32_t
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/property.h>
-#include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/actors/actor-enumerations.h>
 #include <dali/public-api/math/compile-time-math.h>
+#include <dali/public-api/object/property.h>
+#include <dali/public-api/object/ref-object.h>
 
 namespace Dali
 {
@@ -54,7 +54,7 @@ struct Vector3;
  * @brief Pointer to Dali::CustomActorImpl object.
  * @SINCE_1_0.0
  */
-typedef IntrusivePtr<CustomActorImpl> CustomActorImplPtr;
+using CustomActorImplPtr = IntrusivePtr<CustomActorImpl>;
 
 /**
  * @brief CustomActorImpl is an abstract base class for custom control implementations.
@@ -66,7 +66,6 @@ typedef IntrusivePtr<CustomActorImpl> CustomActorImplPtr;
 class DALI_CORE_API CustomActorImpl : public Dali::RefObject
 {
 public:
-
   class Extension; ///< Forward declare future extension interface
 
 protected:
@@ -74,7 +73,7 @@ protected:
    * @brief Virtual destructor
    * @SINCE_1_0.0
    */
-  virtual ~CustomActorImpl();
+  ~CustomActorImpl() override;
 
 public:
   /**
@@ -108,7 +107,7 @@ public:
    * @endcode
    * @param[in] depth The depth in the hierarchy for the actor
    */
-  virtual void OnSceneConnection( int32_t depth ) = 0;
+  virtual void OnSceneConnection(int32_t depth) = 0;
 
   /**
    * @brief Called after the actor has been disconnected from the Scene.
@@ -155,7 +154,7 @@ public:
    * @param[in] index The Property index that was set
    * @param[in] propertyValue The value to set
    */
-  virtual void OnPropertySet( Property::Index index, const Property::Value& propertyValue );
+  virtual void OnPropertySet(Property::Index index, const Property::Value& propertyValue);
 
   /**
    * @brief Called when the owning actor's size is set e.g. using Actor::SetSize().
@@ -190,7 +189,7 @@ public:
    * @note  As this function is called from inside the size negotiation algorithm, you cannot
    * call RequestRelayout (the call would just be ignored).
    */
-  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container ) = 0;
+  virtual void OnRelayout(const Vector2& size, RelayoutContainer& container) = 0;
 
   /**
    * @brief Notification for deriving classes.
@@ -199,7 +198,7 @@ public:
    * @param[in] policy The policy being set
    * @param[in] dimension The dimension the policy is being set for
    */
-  virtual void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension ) = 0;
+  virtual void OnSetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension) = 0;
 
   /**
    * @brief Returns the natural size of the actor.
@@ -217,7 +216,7 @@ public:
    * @param[in] dimension The dimension to calculate the size for. E.g. width or height
    * @return Return the calculated size for the given dimension
    */
-  virtual float CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension ) = 0;
+  virtual float CalculateChildSize(const Dali::Actor& child, Dimension::Type dimension) = 0;
 
   /**
    * @brief This method is called during size negotiation when a height is required for a given width.
@@ -228,7 +227,7 @@ public:
    * @param[in] width Width to use
    * @return The height based on the width
    */
-  virtual float GetHeightForWidth( float width ) = 0;
+  virtual float GetHeightForWidth(float width) = 0;
 
   /**
    * @brief This method is called during size negotiation when a width is required for a given height.
@@ -239,7 +238,7 @@ public:
    * @param[in] height Height to use
    * @return The width based on the width
    */
-  virtual float GetWidthForHeight( float height ) = 0;
+  virtual float GetWidthForHeight(float height) = 0;
 
   /**
    * @brief Determines if this actor is dependent on its children for relayout.
@@ -248,7 +247,7 @@ public:
    * @param[in] dimension The dimension(s) to check for
    * @return Return if the actor is dependent on it's children
    */
-  virtual bool RelayoutDependentOnChildren( Dimension::Type dimension = Dimension::ALL_DIMENSIONS ) = 0;
+  virtual bool RelayoutDependentOnChildren(Dimension::Type dimension = Dimension::ALL_DIMENSIONS) = 0;
 
   /**
    * @brief Virtual method to notify deriving classes that relayout dependencies have been
@@ -257,7 +256,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] dimension The dimension that is about to be calculated
    */
-  virtual void OnCalculateRelayoutSize( Dimension::Type dimension ) = 0;
+  virtual void OnCalculateRelayoutSize(Dimension::Type dimension) = 0;
 
   /**
    * @brief Virtual method to notify deriving classes that the size for a dimension
@@ -267,7 +266,7 @@ public:
    * @param[in] size The new size for the given dimension
    * @param[in] dimension The dimension that was just negotiated
    */
-  virtual void OnLayoutNegotiated( float size, Dimension::Type dimension ) = 0;
+  virtual void OnLayoutNegotiated(float size, Dimension::Type dimension) = 0;
 
   /**
    * @brief Retrieves the extension for this control.
@@ -277,31 +276,30 @@ public:
    */
   virtual Extension* GetExtension()
   {
-    return NULL;
+    return nullptr;
   }
 
 protected: // For derived classes
-
   /**
    * @brief Enumeration for the constructor flags.
    * @SINCE_1_0.0
    */
   enum ActorFlags
   {
-    ACTOR_BEHAVIOUR_DEFAULT       = 0,          ///< Use to provide default behaviour (size negotiation is on, event callbacks are not called). @SINCE_1_2_10
-    DISABLE_SIZE_NEGOTIATION      = 1 << 0,     ///< True if control does not need size negotiation, i.e. it can be skipped in the algorithm @SINCE_1_0.0
+    ACTOR_BEHAVIOUR_DEFAULT  = 0,      ///< Use to provide default behaviour (size negotiation is on, event callbacks are not called). @SINCE_1_2_10
+    DISABLE_SIZE_NEGOTIATION = 1 << 0, ///< True if control does not need size negotiation, i.e. it can be skipped in the algorithm @SINCE_1_0.0
 
-    LAST_ACTOR_FLAG                             ///< Special marker for last actor flag @SINCE_1_0.0
+    LAST_ACTOR_FLAG ///< Special marker for last actor flag @SINCE_1_0.0
   };
 
-  static constexpr int32_t ACTOR_FLAG_COUNT = Log< LAST_ACTOR_FLAG - 1 >::value + 1;      ///< Value for deriving classes to continue on the flag enum
+  static constexpr int32_t ACTOR_FLAG_COUNT = Log<LAST_ACTOR_FLAG - 1>::value + 1; ///< Value for deriving classes to continue on the flag enum
 
   /**
    * @brief Creates a CustomActorImpl.
    * @SINCE_1_0.0
    * @param[in] flags Bitfield of ActorFlags to define behaviour
    */
-  CustomActorImpl( ActorFlags flags );
+  CustomActorImpl(ActorFlags flags);
 
   // Size negotiation helpers
 
@@ -324,7 +322,7 @@ protected: // For derived classes
    * @param[in] width Width to use
    * @return The height based on the width
    */
-  float GetHeightForWidthBase( float width );
+  float GetHeightForWidthBase(float width);
 
   /**
    * @brief Provides the Actor implementation of GetWidthForHeight.
@@ -332,7 +330,7 @@ protected: // For derived classes
    * @param[in] height Height to use
    * @return The width based on the height
    */
-  float GetWidthForHeightBase( float height );
+  float GetWidthForHeightBase(float height);
 
   /**
    * @brief Calculates the size for a child using the base actor object.
@@ -342,7 +340,7 @@ protected: // For derived classes
    * @param[in] dimension The dimension to calculate the size for. E.g. width or height
    * @return Return the calculated size for the given dimension. If more than one dimension is requested, just return the first one found
    */
-  float CalculateChildSizeBase( const Dali::Actor& child, Dimension::Type dimension );
+  float CalculateChildSizeBase(const Dali::Actor& child, Dimension::Type dimension);
 
   /**
    * @brief Determines if this actor is dependent on its children for relayout from the base class.
@@ -351,10 +349,9 @@ protected: // For derived classes
    * @param[in] dimension The dimension(s) to check for
    * @return Return if the actor is dependent on it's children
    */
-  bool RelayoutDependentOnChildrenBase( Dimension::Type dimension = Dimension::ALL_DIMENSIONS );
+  bool RelayoutDependentOnChildrenBase(Dimension::Type dimension = Dimension::ALL_DIMENSIONS);
 
 public: // Not intended for application developers
-
   /**
    * @brief Initializes a CustomActor.
    * @SINCE_1_0.0
@@ -384,9 +381,8 @@ public: // Not intended for application developers
   bool IsRelayoutEnabled() const;
 
 private:
-
-  Internal::CustomActor* mOwner;        ///< Internal owner of this custom actor implementation
-  ActorFlags mFlags;  ///< ActorFlags flags to determine behaviour
+  Internal::CustomActor* mOwner; ///< Internal owner of this custom actor implementation
+  ActorFlags             mFlags; ///< ActorFlags flags to determine behaviour
 };
 
 /**

@@ -59,20 +59,19 @@ class ObjectRegistry;
 class DALI_CORE_API ObjectRegistry : public BaseHandle
 {
 public:
-
   // Typedefs
 
   /**
    * @brief Object created signal.
    * @SINCE_1_0.0
    */
-  typedef Signal< void ( BaseHandle ) > ObjectCreatedSignalType;
+  using ObjectCreatedSignalType = Signal<void(BaseHandle)>;
 
   /**
    * @brief Object destroyed signal.
    * @SINCE_1_0.0
    */
-  typedef Signal< void ( const Dali::RefObject* ) > ObjectDestroyedSignalType;
+  using ObjectDestroyedSignalType = Signal<void(const Dali::RefObject*)>;
 
   /**
    * @brief Allows the creation of an empty objectRegistry handle.
@@ -114,7 +113,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  ObjectRegistry( ObjectRegistry&& rhs );
+  ObjectRegistry(ObjectRegistry&& rhs);
 
   /**
    * @brief Move assignment operator.
@@ -123,10 +122,9 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  ObjectRegistry& operator=( ObjectRegistry&& rhs );
+  ObjectRegistry& operator=(ObjectRegistry&& rhs);
 
 public: // Signals
-
   /**
    * @brief This signal is emitted when an object is created.
    *
@@ -165,7 +163,6 @@ public: // Signals
   ObjectDestroyedSignalType& ObjectDestroyedSignal();
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief This constructor is used by Dali Get() method.

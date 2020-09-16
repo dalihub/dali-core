@@ -55,7 +55,7 @@ Render::Texture* Texture::GetRenderObject() const
 
 Texture::Texture(TextureType::Type type, Pixel::Format format, ImageDimensions size )
 : mEventThreadServices( EventThreadServices::Get() ),
-  mRenderObject( NULL ),
+  mRenderObject( nullptr ),
   mNativeImage(),
   mSize( size ),
   mType( type ),
@@ -65,7 +65,7 @@ Texture::Texture(TextureType::Type type, Pixel::Format format, ImageDimensions s
 
 Texture::Texture( NativeImageInterfacePtr nativeImageInterface )
 : mEventThreadServices( EventThreadServices::Get() ),
-  mRenderObject( NULL ),
+  mRenderObject( nullptr ),
   mNativeImage( nativeImageInterface ),
   mSize( nativeImageInterface->GetWidth(), nativeImageInterface->GetHeight() ),
   mType( TextureType::TEXTURE_2D ),
@@ -128,7 +128,7 @@ bool Texture::Upload( PixelDataPtr pixelData,
     else
     {
       unsigned int pixelDataSize = pixelData->GetWidth()*pixelData->GetHeight();
-      if( pixelData->GetBuffer() == NULL || pixelDataSize == 0 )
+      if( pixelData->GetBuffer() == nullptr || pixelDataSize == 0 )
       {
         DALI_LOG_ERROR( "PixelData is empty\n");
       }

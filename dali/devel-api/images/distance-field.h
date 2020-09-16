@@ -2,7 +2,7 @@
 #define DALI_DISTANCE_FIELD_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@
 
 namespace Dali
 {
-
 struct Vector2;
 
 /**
@@ -41,11 +40,14 @@ struct Vector2;
  * @param[in]  maxSize         The image is scaled from this size to distanceMapSize
  * @param[in]  highQuality     Set true to generate high quality distance fields
  */
-DALI_CORE_API void GenerateDistanceFieldMap( const uint8_t* const imagePixels, const Vector2& imageSize,
-                                             uint8_t* const distanceMap, const Vector2& distanceMapSize,
-                                             const uint32_t fieldBorder,
-                                             const Vector2& maxSize,
-                                             bool highQuality = true );
+DALI_CORE_API void GenerateDistanceFieldMap(
+  const uint8_t* const imagePixels,
+  const Vector2&       imageSize,
+  uint8_t* const       distanceMap,
+  const Vector2&       distanceMapSize,
+  const uint32_t       fieldBorder,
+  const Vector2&       maxSize,
+  bool                 highQuality = true);
 
 } //namespace Dali
 

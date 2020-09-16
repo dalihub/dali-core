@@ -50,8 +50,8 @@ namespace Internal
 
 MessageBuffer::MessageBuffer( std::size_t initialCapacity )
 : mInitialCapacity( initialCapacity / WORD_SIZE ),
-  mData( NULL ),
-  mNextSlot( NULL ),
+  mData( nullptr ),
+  mNextSlot( nullptr ),
   mCapacity( 0 ),
   mSize( 0 )
 {
@@ -112,7 +112,7 @@ MessageBuffer::Iterator MessageBuffer::Begin() const
     return Iterator( mData );
   }
 
-  return Iterator( NULL );
+  return Iterator( nullptr );
 }
 
 void MessageBuffer::Reset()
@@ -145,7 +145,7 @@ void MessageBuffer::IncreaseCapacity( std::size_t newCapacity )
   {
     mData = reinterpret_cast<WordType*>( malloc( newCapacity * WORD_SIZE ) );
   }
-  DALI_ASSERT_ALWAYS( NULL != mData );
+  DALI_ASSERT_ALWAYS( nullptr != mData );
 
   mCapacity = newCapacity;
   mNextSlot = mData + mSize;
@@ -155,7 +155,7 @@ MessageBuffer::Iterator::Iterator(WordType* current)
 : mCurrent(current),
   mMessageSize(0)
 {
-  if( NULL != mCurrent )
+  if( nullptr != mCurrent )
   {
     // The first word is the size of the following object
     mMessageSize = *mCurrent++;

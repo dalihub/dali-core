@@ -16,18 +16,17 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/rendering/geometry.h>  // Dali::Geometry
+#include <dali/public-api/rendering/geometry.h> // Dali::Geometry
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/rendering/geometry-impl.h> // Dali::Internal::Geometry
 
 namespace Dali
 {
-
 Geometry Geometry::New()
 {
   Internal::GeometryPtr geometry = Internal::Geometry::New();
-  return Geometry( geometry.Get() );
+  return Geometry(geometry.Get());
 }
 
 Geometry::Geometry()
@@ -38,23 +37,23 @@ Geometry::~Geometry()
 {
 }
 
-Geometry::Geometry( const Geometry& handle ) = default;
+Geometry::Geometry(const Geometry& handle) = default;
 
-Geometry Geometry::DownCast( BaseHandle handle )
+Geometry Geometry::DownCast(BaseHandle handle)
 {
-  return Geometry( dynamic_cast<Dali::Internal::Geometry*>(handle.GetObjectPtr()));
+  return Geometry(dynamic_cast<Dali::Internal::Geometry*>(handle.GetObjectPtr()));
 }
 
-Geometry& Geometry::operator=( const Geometry& handle ) = default;
+Geometry& Geometry::operator=(const Geometry& handle) = default;
 
-Geometry::Geometry( Geometry&& rhs ) =  default;
+Geometry::Geometry(Geometry&& rhs) = default;
 
-Geometry& Geometry::operator=( Geometry&& rhs ) =  default;
+Geometry& Geometry::operator=(Geometry&& rhs) = default;
 
-std::size_t Geometry::AddVertexBuffer( VertexBuffer& vertexBuffer )
+std::size_t Geometry::AddVertexBuffer(VertexBuffer& vertexBuffer)
 {
-  DALI_ASSERT_ALWAYS( vertexBuffer && "VertexBuffer is not initialized ");
-  return GetImplementation(*this).AddVertexBuffer( GetImplementation( vertexBuffer ) );
+  DALI_ASSERT_ALWAYS(vertexBuffer && "VertexBuffer is not initialized ");
+  return GetImplementation(*this).AddVertexBuffer(GetImplementation(vertexBuffer));
 }
 
 std::size_t Geometry::GetNumberOfVertexBuffers() const
@@ -62,19 +61,19 @@ std::size_t Geometry::GetNumberOfVertexBuffers() const
   return GetImplementation(*this).GetNumberOfVertexBuffers();
 }
 
-void Geometry::RemoveVertexBuffer( std::size_t index )
+void Geometry::RemoveVertexBuffer(std::size_t index)
 {
-  GetImplementation(*this).RemoveVertexBuffer( static_cast<uint32_t>( index ) );
+  GetImplementation(*this).RemoveVertexBuffer(static_cast<uint32_t>(index));
 }
 
-void Geometry::SetIndexBuffer( const uint16_t* indices, size_t count )
+void Geometry::SetIndexBuffer(const uint16_t* indices, size_t count)
 {
-  GetImplementation(*this).SetIndexBuffer( indices, static_cast<uint32_t>( count ) );
+  GetImplementation(*this).SetIndexBuffer(indices, static_cast<uint32_t>(count));
 }
 
-void Geometry::SetType( Type geometryType )
+void Geometry::SetType(Type geometryType)
 {
-  GetImplementation(*this).SetType( geometryType );
+  GetImplementation(*this).SetType(geometryType);
 }
 
 Geometry::Type Geometry::GetType() const
@@ -82,8 +81,8 @@ Geometry::Type Geometry::GetType() const
   return GetImplementation(*this).GetType();
 }
 
-Geometry::Geometry( Internal::Geometry* pointer )
-: BaseHandle( pointer )
+Geometry::Geometry(Internal::Geometry* pointer)
+: BaseHandle(pointer)
 {
 }
 

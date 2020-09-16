@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,15 @@
  *
  */
 
-#include <iostream>
-
-#include <stdlib.h>
-#include <dali/public-api/dali-core.h>
+#include <dali-test-suite-utils.h>
 #include <dali/devel-api/common/map-wrapper.h>
 #include <dali/devel-api/common/stage-devel.h>
 #include <dali/devel-api/update/frame-callback-interface.h>
 #include <dali/devel-api/update/update-proxy.h>
-#include <dali-test-suite-utils.h>
+#include <dali/public-api/dali-core.h>
+#include <stdlib.h>
+
+#include <iostream>
 
 using namespace Dali;
 
@@ -40,14 +40,12 @@ void utc_dali_frame_callback_interface_cleanup(void)
 ///////////////////////////////////////////////////////////////////////////////
 namespace
 {
-
 class FrameCallbackBasic : public FrameCallbackInterface
 {
 public:
-
   FrameCallbackBasic() = default;
 
-  virtual void Update( Dali::UpdateProxy& updateProxy, float elapsedSeconds )
+  virtual void Update(Dali::UpdateProxy& updateProxy, float elapsedSeconds)
   {
     mCalled = true;
   }
@@ -57,26 +55,25 @@ public:
     mCalled = false;
   }
 
-  bool mCalled{ false };
+  bool mCalled{false};
 };
 
 class FrameCallbackOneActor : public FrameCallbackBasic
 {
 public:
-
-  FrameCallbackOneActor( unsigned int actorId )
-  : mActorId( actorId )
+  FrameCallbackOneActor(unsigned int actorId)
+  : mActorId(actorId)
   {
   }
 
-  virtual void Update( Dali::UpdateProxy& updateProxy, float elapsedSeconds ) override
+  virtual void Update(Dali::UpdateProxy& updateProxy, float elapsedSeconds) override
   {
-    FrameCallbackBasic::Update( updateProxy, elapsedSeconds );
-    updateProxy.GetSize( mActorId, mSizeGetSizeCall );
-    updateProxy.GetPosition( mActorId, mPositionGetPositionCall );
-    updateProxy.GetPositionAndSize( mActorId, mPositionGetPositionAndSizeCall, mSizeGetPositionAndSizeCall );
-    updateProxy.GetColor( mActorId, mColor );
-    updateProxy.GetScale( mActorId, mScale );
+    FrameCallbackBasic::Update(updateProxy, elapsedSeconds);
+    updateProxy.GetSize(mActorId, mSizeGetSizeCall);
+    updateProxy.GetPosition(mActorId, mPositionGetPositionCall);
+    updateProxy.GetPositionAndSize(mActorId, mPositionGetPositionAndSizeCall, mSizeGetPositionAndSizeCall);
+    updateProxy.GetColor(mActorId, mColor);
+    updateProxy.GetScale(mActorId, mScale);
   }
 
   const unsigned int mActorId;
@@ -92,39 +89,38 @@ public:
 class FrameCallbackSetter : public FrameCallbackBasic
 {
 public:
-
   FrameCallbackSetter(
-      unsigned int actorId,
-      const Vector3& sizeToSet,
-      const Vector3& positionToSet,
-      const Vector4& colorToSet,
-      const Vector3& scaleToSet )
-  : mActorId( actorId ),
-    mSizeToSet( sizeToSet ),
-    mPositionToSet( positionToSet ),
-    mColorToSet( colorToSet ),
-    mScaleToSet( scaleToSet )
+    unsigned int   actorId,
+    const Vector3& sizeToSet,
+    const Vector3& positionToSet,
+    const Vector4& colorToSet,
+    const Vector3& scaleToSet)
+  : mActorId(actorId),
+    mSizeToSet(sizeToSet),
+    mPositionToSet(positionToSet),
+    mColorToSet(colorToSet),
+    mScaleToSet(scaleToSet)
   {
   }
 
-  virtual void Update( Dali::UpdateProxy& updateProxy, float elapsedSeconds ) override
+  virtual void Update(Dali::UpdateProxy& updateProxy, float elapsedSeconds) override
   {
-    FrameCallbackBasic::Update( updateProxy, elapsedSeconds );
-    updateProxy.SetSize( mActorId, mSizeToSet );
-    updateProxy.SetPosition( mActorId, mPositionToSet );
-    updateProxy.SetColor( mActorId, mColorToSet );
-    updateProxy.SetScale( mActorId, mScaleToSet );
-    updateProxy.GetSize( mActorId, mSizeAfterSetting );
-    updateProxy.GetPosition( mActorId, mPositionAfterSetting );
-    updateProxy.GetColor( mActorId, mColorAfterSetting );
-    updateProxy.GetScale( mActorId, mScaleAfterSetting );
+    FrameCallbackBasic::Update(updateProxy, elapsedSeconds);
+    updateProxy.SetSize(mActorId, mSizeToSet);
+    updateProxy.SetPosition(mActorId, mPositionToSet);
+    updateProxy.SetColor(mActorId, mColorToSet);
+    updateProxy.SetScale(mActorId, mScaleToSet);
+    updateProxy.GetSize(mActorId, mSizeAfterSetting);
+    updateProxy.GetPosition(mActorId, mPositionAfterSetting);
+    updateProxy.GetColor(mActorId, mColorAfterSetting);
+    updateProxy.GetScale(mActorId, mScaleAfterSetting);
   }
 
   const unsigned int mActorId;
-  const Vector3& mSizeToSet;
-  const Vector3& mPositionToSet;
-  const Vector4& mColorToSet;
-  const Vector3& mScaleToSet;
+  const Vector3&     mSizeToSet;
+  const Vector3&     mPositionToSet;
+  const Vector4&     mColorToSet;
+  const Vector3&     mScaleToSet;
 
   Vector3 mSizeAfterSetting;
   Vector3 mPositionAfterSetting;
@@ -135,39 +131,38 @@ public:
 class FrameCallbackBaker : public FrameCallbackBasic
 {
 public:
-
   FrameCallbackBaker(
-      unsigned int actorId,
-      const Vector3& sizeToSet,
-      const Vector3& positionToSet,
-      const Vector4& colorToSet,
-      const Vector3& scaleToSet )
-  : mActorId( actorId ),
-    mSizeToSet( sizeToSet ),
-    mPositionToSet( positionToSet ),
-    mColorToSet( colorToSet ),
-    mScaleToSet( scaleToSet )
+    unsigned int   actorId,
+    const Vector3& sizeToSet,
+    const Vector3& positionToSet,
+    const Vector4& colorToSet,
+    const Vector3& scaleToSet)
+  : mActorId(actorId),
+    mSizeToSet(sizeToSet),
+    mPositionToSet(positionToSet),
+    mColorToSet(colorToSet),
+    mScaleToSet(scaleToSet)
   {
   }
 
-  virtual void Update( Dali::UpdateProxy& updateProxy, float elapsedSeconds ) override
+  virtual void Update(Dali::UpdateProxy& updateProxy, float elapsedSeconds) override
   {
-    FrameCallbackBasic::Update( updateProxy, elapsedSeconds );
-    updateProxy.BakeSize( mActorId, mSizeToSet );
-    updateProxy.BakePosition( mActorId, mPositionToSet );
-    updateProxy.BakeColor( mActorId, mColorToSet );
-    updateProxy.BakeScale( mActorId, mScaleToSet );
-    updateProxy.GetSize( mActorId, mSizeAfterSetting );
-    updateProxy.GetPosition( mActorId, mPositionAfterSetting );
-    updateProxy.GetColor( mActorId, mColorAfterSetting );
-    updateProxy.GetScale( mActorId, mScaleAfterSetting );
+    FrameCallbackBasic::Update(updateProxy, elapsedSeconds);
+    updateProxy.BakeSize(mActorId, mSizeToSet);
+    updateProxy.BakePosition(mActorId, mPositionToSet);
+    updateProxy.BakeColor(mActorId, mColorToSet);
+    updateProxy.BakeScale(mActorId, mScaleToSet);
+    updateProxy.GetSize(mActorId, mSizeAfterSetting);
+    updateProxy.GetPosition(mActorId, mPositionAfterSetting);
+    updateProxy.GetColor(mActorId, mColorAfterSetting);
+    updateProxy.GetScale(mActorId, mScaleAfterSetting);
   }
 
   const unsigned int mActorId;
-  const Vector3& mSizeToSet;
-  const Vector3& mPositionToSet;
-  const Vector4& mColorToSet;
-  const Vector3& mScaleToSet;
+  const Vector3&     mSizeToSet;
+  const Vector3&     mPositionToSet;
+  const Vector4&     mColorToSet;
+  const Vector3&     mScaleToSet;
 
   Vector3 mSizeAfterSetting;
   Vector3 mPositionAfterSetting;
@@ -178,58 +173,56 @@ public:
 class FrameCallbackMultipleActors : public FrameCallbackBasic
 {
 public:
-
   FrameCallbackMultipleActors()
   {
   }
 
-  virtual void Update( Dali::UpdateProxy& updateProxy, float elapsedSeconds ) override
+  virtual void Update(Dali::UpdateProxy& updateProxy, float elapsedSeconds) override
   {
-    FrameCallbackBasic::Update( updateProxy, elapsedSeconds );
-    for( auto&& i : mActorIds )
+    FrameCallbackBasic::Update(updateProxy, elapsedSeconds);
+    for(auto&& i : mActorIds)
     {
       Vector3 position;
       Vector3 size;
-      updateProxy.GetPositionAndSize( i, position, size );
-      mPositions[ i ] = position;
-      mSizes[ i ] = size;
+      updateProxy.GetPositionAndSize(i, position, size);
+      mPositions[i] = position;
+      mSizes[i]     = size;
     }
   }
 
-  Vector< unsigned int > mActorIds;
+  Vector<unsigned int> mActorIds;
 
-  std::map< unsigned int, Vector3 > mPositions;
-  std::map< unsigned int, Vector3 > mSizes;
+  std::map<unsigned int, Vector3> mPositions;
+  std::map<unsigned int, Vector3> mSizes;
 };
 
 class FrameCallbackActorIdCheck : public FrameCallbackBasic
 {
 public:
-
-  FrameCallbackActorIdCheck( unsigned int actorId )
-  : mActorId( actorId )
+  FrameCallbackActorIdCheck(unsigned int actorId)
+  : mActorId(actorId)
   {
   }
 
-  virtual void Update( Dali::UpdateProxy& updateProxy, float elapsedSeconds ) override
+  virtual void Update(Dali::UpdateProxy& updateProxy, float elapsedSeconds) override
   {
-    FrameCallbackBasic::Update( updateProxy, elapsedSeconds );
+    FrameCallbackBasic::Update(updateProxy, elapsedSeconds);
     Vector3 vec3;
     Vector4 vec4;
 
-    mGetSizeCallSuccess            = updateProxy.GetSize( mActorId, vec3 );
-    mGetPositionCallSuccess        = updateProxy.GetPosition( mActorId, vec3 );
-    mGetColorCallSuccess           = updateProxy.GetColor( mActorId, vec4 );
-    mGetScaleCallSuccess           = updateProxy.GetScale( mActorId, vec3 );
-    mGetPositionAndSizeCallSuccess = updateProxy.GetPositionAndSize( mActorId, vec3, vec3 );
-    mSetSizeCallSuccess            = updateProxy.SetSize( mActorId, vec3 );
-    mSetPositionCallSuccess        = updateProxy.SetPosition( mActorId, vec3 );
-    mSetColorCallSuccess           = updateProxy.SetColor( mActorId, vec4 );
-    mSetScaleCallSuccess           = updateProxy.SetScale( mActorId, vec3 );
-    mBakeSizeCallSuccess           = updateProxy.BakeSize( mActorId, vec3 );
-    mBakePositionCallSuccess       = updateProxy.BakePosition( mActorId, vec3 );
-    mBakeColorCallSuccess          = updateProxy.BakeColor( mActorId, vec4 );
-    mBakeScaleCallSuccess          = updateProxy.BakeScale( mActorId, vec3 );
+    mGetSizeCallSuccess            = updateProxy.GetSize(mActorId, vec3);
+    mGetPositionCallSuccess        = updateProxy.GetPosition(mActorId, vec3);
+    mGetColorCallSuccess           = updateProxy.GetColor(mActorId, vec4);
+    mGetScaleCallSuccess           = updateProxy.GetScale(mActorId, vec3);
+    mGetPositionAndSizeCallSuccess = updateProxy.GetPositionAndSize(mActorId, vec3, vec3);
+    mSetSizeCallSuccess            = updateProxy.SetSize(mActorId, vec3);
+    mSetPositionCallSuccess        = updateProxy.SetPosition(mActorId, vec3);
+    mSetColorCallSuccess           = updateProxy.SetColor(mActorId, vec4);
+    mSetScaleCallSuccess           = updateProxy.SetScale(mActorId, vec3);
+    mBakeSizeCallSuccess           = updateProxy.BakeSize(mActorId, vec3);
+    mBakePositionCallSuccess       = updateProxy.BakePosition(mActorId, vec3);
+    mBakeColorCallSuccess          = updateProxy.BakeColor(mActorId, vec4);
+    mBakeScaleCallSuccess          = updateProxy.BakeScale(mActorId, vec3);
   }
 
   virtual void Reset() override
@@ -237,38 +230,38 @@ public:
     // Up-call
     FrameCallbackBasic::Reset();
 
-    mGetSizeCallSuccess = false;
-    mGetPositionCallSuccess = false;
-    mGetColorCallSuccess = false;
-    mGetScaleCallSuccess = false;
+    mGetSizeCallSuccess            = false;
+    mGetPositionCallSuccess        = false;
+    mGetColorCallSuccess           = false;
+    mGetScaleCallSuccess           = false;
     mGetPositionAndSizeCallSuccess = false;
-    mSetSizeCallSuccess = false;
-    mSetPositionCallSuccess = false;
-    mSetColorCallSuccess = false;
-    mSetScaleCallSuccess = false;
-    mBakeSizeCallSuccess = false;
-    mBakePositionCallSuccess = false;
-    mBakeColorCallSuccess = false;
-    mBakeScaleCallSuccess = false;
+    mSetSizeCallSuccess            = false;
+    mSetPositionCallSuccess        = false;
+    mSetColorCallSuccess           = false;
+    mSetScaleCallSuccess           = false;
+    mBakeSizeCallSuccess           = false;
+    mBakePositionCallSuccess       = false;
+    mBakeColorCallSuccess          = false;
+    mBakeScaleCallSuccess          = false;
   }
 
   const uint32_t mActorId;
-  bool mGetSizeCallSuccess{ false };
-  bool mGetPositionCallSuccess{ false };
-  bool mGetColorCallSuccess{ false };
-  bool mGetScaleCallSuccess{ false };
-  bool mGetPositionAndSizeCallSuccess{ false };
-  bool mSetSizeCallSuccess{ false };
-  bool mSetPositionCallSuccess{ false };
-  bool mSetColorCallSuccess{ false };
-  bool mSetScaleCallSuccess{ false };
-  bool mBakeSizeCallSuccess{ false };
-  bool mBakePositionCallSuccess{ false };
-  bool mBakeColorCallSuccess{ false };
-  bool mBakeScaleCallSuccess{ false };
+  bool           mGetSizeCallSuccess{false};
+  bool           mGetPositionCallSuccess{false};
+  bool           mGetColorCallSuccess{false};
+  bool           mGetScaleCallSuccess{false};
+  bool           mGetPositionAndSizeCallSuccess{false};
+  bool           mSetSizeCallSuccess{false};
+  bool           mSetPositionCallSuccess{false};
+  bool           mSetColorCallSuccess{false};
+  bool           mSetScaleCallSuccess{false};
+  bool           mBakeSizeCallSuccess{false};
+  bool           mBakePositionCallSuccess{false};
+  bool           mBakeColorCallSuccess{false};
+  bool           mBakeScaleCallSuccess{false};
 };
 
-} // anon namespace
+} // namespace
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -281,21 +274,21 @@ int UtcDaliFrameCallbackCheckInstallationAndRemoval(void)
   FrameCallbackBasic frameCallback;
 
   Stage stage = Stage::GetCurrent();
-  DevelStage::AddFrameCallback( stage, frameCallback, stage.GetRootLayer() );
+  DevelStage::AddFrameCallback(stage, frameCallback, stage.GetRootLayer());
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( frameCallback.mCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS(frameCallback.mCalled, true, TEST_LOCATION);
 
   frameCallback.mCalled = false;
 
-  DevelStage::RemoveFrameCallback( stage, frameCallback );
+  DevelStage::RemoveFrameCallback(stage, frameCallback);
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( frameCallback.mCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS(frameCallback.mCalled, false, TEST_LOCATION);
 
   END_TEST;
 }
@@ -305,35 +298,35 @@ int UtcDaliFrameCallbackGetters(void)
   // Test to see that the Getters all return the expected values
 
   TestApplication application;
-  Vector2 actorSize( 200, 300 );
-  Vector4 color( 0.5f, 0.6f, 0.7f, 0.8f );
-  Vector3 position( 10.0f, 20.0f, 30.0f );
-  Vector3 scale( 2.0f, 4.0f, 6.0f );
+  Vector2         actorSize(200, 300);
+  Vector4         color(0.5f, 0.6f, 0.7f, 0.8f);
+  Vector3         position(10.0f, 20.0f, 30.0f);
+  Vector3         scale(2.0f, 4.0f, 6.0f);
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
-  actor.SetProperty( Actor::Property::SIZE, actorSize );
-  actor.SetProperty( Actor::Property::COLOR, color );
-  actor.SetProperty( Actor::Property::POSITION, position );
-  actor.SetProperty( Actor::Property::SCALE, scale );
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, actorSize);
+  actor.SetProperty(Actor::Property::COLOR, color);
+  actor.SetProperty(Actor::Property::POSITION, position);
+  actor.SetProperty(Actor::Property::SCALE, scale);
 
   Stage stage = Stage::GetCurrent();
-  stage.Add( actor );
+  stage.Add(actor);
 
-  FrameCallbackOneActor frameCallback( actor.GetProperty< int >( Actor::Property::ID ) );
-  DevelStage::AddFrameCallback( stage, frameCallback, stage.GetRootLayer() );
+  FrameCallbackOneActor frameCallback(actor.GetProperty<int>(Actor::Property::ID));
+  DevelStage::AddFrameCallback(stage, frameCallback, stage.GetRootLayer());
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( frameCallback.mCalled, true, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mSizeGetSizeCall, Vector3( actorSize.width, actorSize.height, 0.0f ), TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mPositionGetPositionCall, position, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mPositionGetPositionAndSizeCall, position, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mSizeGetPositionAndSizeCall, Vector3( actorSize.width, actorSize.height, 0.0f ), TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mColor, color, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mScale, scale, TEST_LOCATION );
+  DALI_TEST_EQUALS(frameCallback.mCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSizeGetSizeCall, Vector3(actorSize.width, actorSize.height, 0.0f), TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mPositionGetPositionCall, position, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mPositionGetPositionAndSizeCall, position, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSizeGetPositionAndSizeCall, Vector3(actorSize.width, actorSize.height, 0.0f), TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mColor, color, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mScale, scale, TEST_LOCATION);
 
   END_TEST;
 }
@@ -343,61 +336,61 @@ int UtcDaliFrameCallbackSetters(void)
   // Test to see that the setters set the values appropriately
 
   TestApplication application;
-  Vector2 actorSize( 200, 300 );
+  Vector2         actorSize(200, 300);
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
-  actor.SetProperty( Actor::Property::SIZE, actorSize );
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, actorSize);
 
   Stage stage = Stage::GetCurrent();
-  stage.Add( actor );
+  stage.Add(actor);
 
-  Vector3 sizeToSet( 1.0f, 2.0f, 3.0f );
-  Vector3 positionToSet( 10.0f, 20.0f, 30.0f );
-  Vector4 colorToSet( Color::MAGENTA );
-  Vector3 scaleToSet( 1.0f, 3.0f, 5.0f );
+  Vector3 sizeToSet(1.0f, 2.0f, 3.0f);
+  Vector3 positionToSet(10.0f, 20.0f, 30.0f);
+  Vector4 colorToSet(Color::MAGENTA);
+  Vector3 scaleToSet(1.0f, 3.0f, 5.0f);
 
-  FrameCallbackSetter frameCallback( actor.GetProperty< int >( Actor::Property::ID ), sizeToSet, positionToSet, colorToSet, scaleToSet );
-  DevelStage::AddFrameCallback( stage, frameCallback, stage.GetRootLayer() );
+  FrameCallbackSetter frameCallback(actor.GetProperty<int>(Actor::Property::ID), sizeToSet, positionToSet, colorToSet, scaleToSet);
+  DevelStage::AddFrameCallback(stage, frameCallback, stage.GetRootLayer());
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( frameCallback.mCalled, true, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mSizeAfterSetting, sizeToSet, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mPositionAfterSetting, positionToSet, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mColorAfterSetting, colorToSet, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mScaleAfterSetting, scaleToSet, TEST_LOCATION );
+  DALI_TEST_EQUALS(frameCallback.mCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSizeAfterSetting, sizeToSet, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mPositionAfterSetting, positionToSet, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mColorAfterSetting, colorToSet, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mScaleAfterSetting, scaleToSet, TEST_LOCATION);
 
   // Ensure the actual actor values haven't changed as we didn't bake the values after removing the callback
-  DevelStage::RemoveFrameCallback( stage, frameCallback );
+  DevelStage::RemoveFrameCallback(stage, frameCallback);
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( actor.GetCurrentProperty( Actor::Property::POSITION ).Get< Vector3 >(), Vector3::ZERO, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetCurrentProperty( Actor::Property::SIZE ).Get< Vector3 >(), Vector3( actorSize ), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetCurrentProperty( Actor::Property::COLOR ).Get< Vector4 >(), Color::WHITE, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetCurrentProperty( Actor::Property::SCALE ).Get< Vector3 >(), Vector3::ONE, TEST_LOCATION );
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::POSITION).Get<Vector3>(), Vector3::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::SIZE).Get<Vector3>(), Vector3(actorSize), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::COLOR).Get<Vector4>(), Color::WHITE, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::SCALE).Get<Vector3>(), Vector3::ONE, TEST_LOCATION);
 
   // Render for a couple more frames to ensure the values are reset properly (some values are double-buffered)
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( actor.GetCurrentProperty( Actor::Property::POSITION ).Get< Vector3 >(), Vector3::ZERO, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetCurrentProperty( Actor::Property::SIZE ).Get< Vector3 >(), Vector3( actorSize ), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetCurrentProperty( Actor::Property::COLOR ).Get< Vector4 >(), Color::WHITE, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetCurrentProperty( Actor::Property::SCALE ).Get< Vector3 >(), Vector3::ONE, TEST_LOCATION );
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::POSITION).Get<Vector3>(), Vector3::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::SIZE).Get<Vector3>(), Vector3(actorSize), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::COLOR).Get<Vector4>(), Color::WHITE, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::SCALE).Get<Vector3>(), Vector3::ONE, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( actor.GetCurrentProperty( Actor::Property::POSITION ).Get< Vector3 >(), Vector3::ZERO, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetCurrentProperty( Actor::Property::SIZE ).Get< Vector3 >(), Vector3( actorSize ), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetCurrentProperty( Actor::Property::COLOR ).Get< Vector4 >(), Color::WHITE, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetCurrentProperty( Actor::Property::SCALE ).Get< Vector3 >(), Vector3::ONE, TEST_LOCATION );
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::POSITION).Get<Vector3>(), Vector3::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::SIZE).Get<Vector3>(), Vector3(actorSize), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::COLOR).Get<Vector4>(), Color::WHITE, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::SCALE).Get<Vector3>(), Vector3::ONE, TEST_LOCATION);
 
   END_TEST;
 }
@@ -407,47 +400,46 @@ int UtcDaliFrameCallbackBake(void)
   // Test to see that the bake methods bake the values
 
   TestApplication application;
-  Vector2 actorSize( 200, 300 );
+  Vector2         actorSize(200, 300);
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
-  actor.SetProperty( Actor::Property::SIZE, actorSize );
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, actorSize);
 
   Stage stage = Stage::GetCurrent();
-  stage.Add( actor );
+  stage.Add(actor);
 
-  Vector3 sizeToSet( 1.0f, 2.0f, 3.0f );
-  Vector3 positionToSet( 10.0f, 20.0f, 30.0f );
-  Vector4 colorToSet( Color::MAGENTA );
-  Vector3 scaleToSet( 1.0f, 3.0f, 5.0f );
+  Vector3 sizeToSet(1.0f, 2.0f, 3.0f);
+  Vector3 positionToSet(10.0f, 20.0f, 30.0f);
+  Vector4 colorToSet(Color::MAGENTA);
+  Vector3 scaleToSet(1.0f, 3.0f, 5.0f);
 
-  FrameCallbackBaker frameCallback( actor.GetProperty< int >( Actor::Property::ID ), sizeToSet, positionToSet, colorToSet, scaleToSet );
-  DevelStage::AddFrameCallback( stage, frameCallback, stage.GetRootLayer() );
+  FrameCallbackBaker frameCallback(actor.GetProperty<int>(Actor::Property::ID), sizeToSet, positionToSet, colorToSet, scaleToSet);
+  DevelStage::AddFrameCallback(stage, frameCallback, stage.GetRootLayer());
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( frameCallback.mCalled, true, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mSizeAfterSetting, sizeToSet, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mPositionAfterSetting, positionToSet, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mColorAfterSetting, colorToSet, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mScaleAfterSetting, scaleToSet, TEST_LOCATION );
+  DALI_TEST_EQUALS(frameCallback.mCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSizeAfterSetting, sizeToSet, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mPositionAfterSetting, positionToSet, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mColorAfterSetting, colorToSet, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mScaleAfterSetting, scaleToSet, TEST_LOCATION);
 
   // Ensure the new values are saved after removing the callback
-  DevelStage::RemoveFrameCallback( stage, frameCallback );
+  DevelStage::RemoveFrameCallback(stage, frameCallback);
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( actor.GetCurrentProperty( Actor::Property::POSITION ).Get< Vector3 >(), positionToSet, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetCurrentProperty( Actor::Property::SIZE ).Get< Vector3 >(), sizeToSet, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetCurrentProperty( Actor::Property::COLOR ).Get< Vector4 >(), colorToSet, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetCurrentProperty( Actor::Property::SCALE ).Get< Vector3 >(), scaleToSet, TEST_LOCATION );
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::POSITION).Get<Vector3>(), positionToSet, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::SIZE).Get<Vector3>(), sizeToSet, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::COLOR).Get<Vector4>(), colorToSet, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::SCALE).Get<Vector3>(), scaleToSet, TEST_LOCATION);
 
   END_TEST;
 }
-
 
 int UtcDaliFrameCallbackMultipleActors(void)
 {
@@ -483,111 +475,111 @@ int UtcDaliFrameCallbackMultipleActors(void)
    */
 
   TestApplication application;
-  Stage stage = Stage::GetCurrent();
+  Stage           stage = Stage::GetCurrent();
 
-  std::map< char, Vector3 > sizes;
-  sizes['A'] = Vector3(  50.0f,  50.0f, 0.0f );
-  sizes['B'] = Vector3( 100.0f, 100.0f, 0.0f );
-  sizes['C'] = Vector3( 150.0f, 150.0f, 0.0f );
-  sizes['D'] = Vector3( 200.0f, 200.0f, 0.0f );
-  sizes['E'] = Vector3( 250.0f, 250.0f, 0.0f );
-  sizes['F'] = Vector3( 300.0f, 300.0f, 0.0f );
-  sizes['G'] = Vector3( 350.0f, 350.0f, 0.0f );
-  sizes['H'] = Vector3( 400.0f, 350.0f, 0.0f );
+  std::map<char, Vector3> sizes;
+  sizes['A'] = Vector3(50.0f, 50.0f, 0.0f);
+  sizes['B'] = Vector3(100.0f, 100.0f, 0.0f);
+  sizes['C'] = Vector3(150.0f, 150.0f, 0.0f);
+  sizes['D'] = Vector3(200.0f, 200.0f, 0.0f);
+  sizes['E'] = Vector3(250.0f, 250.0f, 0.0f);
+  sizes['F'] = Vector3(300.0f, 300.0f, 0.0f);
+  sizes['G'] = Vector3(350.0f, 350.0f, 0.0f);
+  sizes['H'] = Vector3(400.0f, 350.0f, 0.0f);
 
-  std::map< char, Vector3 > positions;
-  positions['A'] = Vector3(  0.0f,  1.0f,  2.0f );
-  positions['B'] = Vector3(  2.0f,  3.0f,  4.0f );
-  positions['C'] = Vector3(  5.0f,  6.0f,  7.0f );
-  positions['D'] = Vector3(  8.0f,  9.0f, 10.0f );
-  positions['E'] = Vector3( 11.0f, 12.0f, 13.0f );
-  positions['F'] = Vector3( 14.0f, 15.0f, 16.0f );
-  positions['G'] = Vector3( 17.0f, 18.0f, 19.0f );
-  positions['H'] = Vector3( 20.0f, 21.0f, 22.0f );
+  std::map<char, Vector3> positions;
+  positions['A'] = Vector3(0.0f, 1.0f, 2.0f);
+  positions['B'] = Vector3(2.0f, 3.0f, 4.0f);
+  positions['C'] = Vector3(5.0f, 6.0f, 7.0f);
+  positions['D'] = Vector3(8.0f, 9.0f, 10.0f);
+  positions['E'] = Vector3(11.0f, 12.0f, 13.0f);
+  positions['F'] = Vector3(14.0f, 15.0f, 16.0f);
+  positions['G'] = Vector3(17.0f, 18.0f, 19.0f);
+  positions['H'] = Vector3(20.0f, 21.0f, 22.0f);
 
   Actor actorA = Actor::New();
-  actorA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
-  actorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
-  actorA.SetProperty( Actor::Property::SIZE, sizes['A'] );
-  actorA.SetProperty( Actor::Property::POSITION, positions['A'] );
-  stage.Add( actorA );
+  actorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actorA.SetProperty(Actor::Property::SIZE, sizes['A']);
+  actorA.SetProperty(Actor::Property::POSITION, positions['A']);
+  stage.Add(actorA);
 
   Actor actorB = Actor::New();
-  actorB.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_RIGHT );
-  actorB.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
-  actorB.SetProperty( Actor::Property::SIZE, sizes['B'] );
-  actorB.SetProperty( Actor::Property::POSITION, positions['B'] );
-  actorA.Add( actorB );
+  actorB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_RIGHT);
+  actorB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actorB.SetProperty(Actor::Property::SIZE, sizes['B']);
+  actorB.SetProperty(Actor::Property::POSITION, positions['B']);
+  actorA.Add(actorB);
 
   Actor actorC = Actor::New();
-  actorC.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_CENTER );
-  actorC.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_CENTER );
-  actorC.SetProperty( Actor::Property::SIZE, sizes['C'] );
-  actorC.SetProperty( Actor::Property::POSITION, positions['C'] );
-  actorB.Add( actorC );
+  actorC.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_CENTER);
+  actorC.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_CENTER);
+  actorC.SetProperty(Actor::Property::SIZE, sizes['C']);
+  actorC.SetProperty(Actor::Property::POSITION, positions['C']);
+  actorB.Add(actorC);
 
   Actor actorD = Actor::New();
-  actorD.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_RIGHT );
-  actorD.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT );
-  actorD.SetProperty( Actor::Property::SIZE, sizes['D'] );
-  actorD.SetProperty( Actor::Property::POSITION, positions['D'] );
-  actorA.Add( actorD );
+  actorD.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_RIGHT);
+  actorD.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT);
+  actorD.SetProperty(Actor::Property::SIZE, sizes['D']);
+  actorD.SetProperty(Actor::Property::POSITION, positions['D']);
+  actorA.Add(actorD);
 
   Actor actorE = Actor::New();
-  actorE.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_LEFT );
-  actorE.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_LEFT );
-  actorE.SetProperty( Actor::Property::SIZE, sizes['E'] );
-  actorE.SetProperty( Actor::Property::POSITION, positions['E'] );
-  stage.Add( actorE );
+  actorE.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_LEFT);
+  actorE.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_LEFT);
+  actorE.SetProperty(Actor::Property::SIZE, sizes['E']);
+  actorE.SetProperty(Actor::Property::POSITION, positions['E']);
+  stage.Add(actorE);
 
   Actor actorF = Actor::New();
-  actorF.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_CENTER );
-  actorF.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_CENTER );
-  actorF.SetProperty( Actor::Property::SIZE, sizes['F'] );
-  actorF.SetProperty( Actor::Property::POSITION, positions['F'] );
-  actorE.Add( actorF );
+  actorF.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_CENTER);
+  actorF.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_CENTER);
+  actorF.SetProperty(Actor::Property::SIZE, sizes['F']);
+  actorF.SetProperty(Actor::Property::POSITION, positions['F']);
+  actorE.Add(actorF);
 
   Actor actorG = Actor::New();
-  actorG.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_RIGHT );
-  actorG.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT );
-  actorG.SetProperty( Actor::Property::SIZE, sizes['G'] );
-  actorG.SetProperty( Actor::Property::POSITION, positions['G'] );
-  actorE.Add( actorG );
+  actorG.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_RIGHT);
+  actorG.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT);
+  actorG.SetProperty(Actor::Property::SIZE, sizes['G']);
+  actorG.SetProperty(Actor::Property::POSITION, positions['G']);
+  actorE.Add(actorG);
 
   Actor actorH = Actor::New();
-  actorH.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_RIGHT );
-  actorH.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_LEFT );
-  actorH.SetProperty( Actor::Property::SIZE, sizes['H'] );
-  actorH.SetProperty( Actor::Property::POSITION, positions['H'] );
-  actorG.Add( actorH );
+  actorH.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_RIGHT);
+  actorH.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_LEFT);
+  actorH.SetProperty(Actor::Property::SIZE, sizes['H']);
+  actorH.SetProperty(Actor::Property::POSITION, positions['H']);
+  actorG.Add(actorH);
 
-  std::map< char, unsigned int > actorIds;
-  actorIds['A'] = actorA.GetProperty< int >( Actor::Property::ID );
-  actorIds['B'] = actorB.GetProperty< int >( Actor::Property::ID );
-  actorIds['C'] = actorC.GetProperty< int >( Actor::Property::ID );
-  actorIds['D'] = actorD.GetProperty< int >( Actor::Property::ID );
-  actorIds['E'] = actorE.GetProperty< int >( Actor::Property::ID );
-  actorIds['F'] = actorF.GetProperty< int >( Actor::Property::ID );
-  actorIds['G'] = actorG.GetProperty< int >( Actor::Property::ID );
-  actorIds['H'] = actorH.GetProperty< int >( Actor::Property::ID );
+  std::map<char, unsigned int> actorIds;
+  actorIds['A'] = actorA.GetProperty<int>(Actor::Property::ID);
+  actorIds['B'] = actorB.GetProperty<int>(Actor::Property::ID);
+  actorIds['C'] = actorC.GetProperty<int>(Actor::Property::ID);
+  actorIds['D'] = actorD.GetProperty<int>(Actor::Property::ID);
+  actorIds['E'] = actorE.GetProperty<int>(Actor::Property::ID);
+  actorIds['F'] = actorF.GetProperty<int>(Actor::Property::ID);
+  actorIds['G'] = actorG.GetProperty<int>(Actor::Property::ID);
+  actorIds['H'] = actorH.GetProperty<int>(Actor::Property::ID);
 
   FrameCallbackMultipleActors frameCallback;
-  for( auto&& i : actorIds )
+  for(auto&& i : actorIds)
   {
-    frameCallback.mActorIds.PushBack( i.second );
+    frameCallback.mActorIds.PushBack(i.second);
   }
 
-  DevelStage::AddFrameCallback( stage, frameCallback, stage.GetRootLayer() );
+  DevelStage::AddFrameCallback(stage, frameCallback, stage.GetRootLayer());
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( frameCallback.mCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS(frameCallback.mCalled, true, TEST_LOCATION);
 
-  for( char i = 'A'; i <= 'H'; ++i )
+  for(char i = 'A'; i <= 'H'; ++i)
   {
-    DALI_TEST_EQUALS( frameCallback.mPositions[ actorIds[ i ] ], positions[ i ], TEST_LOCATION );
-    DALI_TEST_EQUALS( frameCallback.mSizes[ actorIds[ i ] ], sizes[ i ], TEST_LOCATION );
+    DALI_TEST_EQUALS(frameCallback.mPositions[actorIds[i]], positions[i], TEST_LOCATION);
+    DALI_TEST_EQUALS(frameCallback.mSizes[actorIds[i]], sizes[i], TEST_LOCATION);
   }
 
   // Render again to make sure it still gets called and gives the correct values (in case any optimisations break this)
@@ -596,12 +588,12 @@ int UtcDaliFrameCallbackMultipleActors(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( frameCallback.mCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS(frameCallback.mCalled, true, TEST_LOCATION);
 
-  for( char i = 'A'; i <= 'H'; ++i )
+  for(char i = 'A'; i <= 'H'; ++i)
   {
-    DALI_TEST_EQUALS( frameCallback.mPositions[ actorIds[ i ] ], positions[ i ], TEST_LOCATION );
-    DALI_TEST_EQUALS( frameCallback.mSizes[ actorIds[ i ] ], sizes[ i ], TEST_LOCATION );
+    DALI_TEST_EQUALS(frameCallback.mPositions[actorIds[i]], positions[i], TEST_LOCATION);
+    DALI_TEST_EQUALS(frameCallback.mSizes[actorIds[i]], sizes[i], TEST_LOCATION);
   }
 
   END_TEST;
@@ -612,23 +604,23 @@ int UtcDaliFrameCallbackCheckActorNotAdded(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 200, 300 ) );
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200, 300));
 
-  Stage stage = Stage::GetCurrent();
-  FrameCallbackOneActor frameCallback( actor.GetProperty< int >( Actor::Property::ID ) );
-  DevelStage::AddFrameCallback( stage, frameCallback, stage.GetRootLayer() );
+  Stage                 stage = Stage::GetCurrent();
+  FrameCallbackOneActor frameCallback(actor.GetProperty<int>(Actor::Property::ID));
+  DevelStage::AddFrameCallback(stage, frameCallback, stage.GetRootLayer());
 
   application.SendNotification();
   application.Render();
 
   // All should be default constructed objects
-  DALI_TEST_EQUALS( frameCallback.mCalled, true, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mPositionGetPositionCall, Vector3::ZERO, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mSizeGetSizeCall, Vector3::ZERO, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mColor, Vector4::ZERO, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mScale, Vector3::ZERO, TEST_LOCATION );
+  DALI_TEST_EQUALS(frameCallback.mCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mPositionGetPositionCall, Vector3::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSizeGetSizeCall, Vector3::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mColor, Vector4::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mScale, Vector3::ZERO, TEST_LOCATION);
 
   END_TEST;
 }
@@ -638,30 +630,30 @@ int UtcDaliFrameCallbackInvalidActorId(void)
   // Test to ensure that there are no issues when trying to use the update-proxy methods with an invalid actor ID.
 
   TestApplication application;
-  Stage stage = Stage::GetCurrent();
+  Stage           stage = Stage::GetCurrent();
 
-  FrameCallbackActorIdCheck frameCallback( 10000 );
-  DevelStage::AddFrameCallback( stage, frameCallback, stage.GetRootLayer() );
+  FrameCallbackActorIdCheck frameCallback(10000);
+  DevelStage::AddFrameCallback(stage, frameCallback, stage.GetRootLayer());
 
   application.SendNotification();
   application.Render();
 
   // Invalid Actor ID so all the methods should not return successfully.
 
-  DALI_TEST_EQUALS( frameCallback.mCalled,                        true,  TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mGetSizeCallSuccess,            false, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mGetPositionCallSuccess,        false, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mGetColorCallSuccess,           false, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mGetScaleCallSuccess,           false, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mGetPositionAndSizeCallSuccess, false, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mSetSizeCallSuccess,            false, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mSetPositionCallSuccess,        false, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mSetColorCallSuccess,           false, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mSetScaleCallSuccess,           false, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mBakeSizeCallSuccess,           false, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mBakePositionCallSuccess,       false, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mBakeColorCallSuccess,          false, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mBakeScaleCallSuccess,          false, TEST_LOCATION );
+  DALI_TEST_EQUALS(frameCallback.mCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetSizeCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetPositionCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetColorCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetScaleCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetPositionAndSizeCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetSizeCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetPositionCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetColorCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetScaleCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakeSizeCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakePositionCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakeColorCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakeScaleCallSuccess, false, TEST_LOCATION);
 
   END_TEST;
 }
@@ -672,79 +664,79 @@ int UtcDaliFrameCallbackActorRemovedAndAdded(void)
   // and then re-start calling the required methods if that actor is re-added back to the stage
 
   TestApplication application;
-  Stage stage = Stage::GetCurrent();
+  Stage           stage = Stage::GetCurrent();
 
   Actor actor = Actor::New();
-  stage.Add( actor );
+  stage.Add(actor);
 
-  FrameCallbackActorIdCheck frameCallback( actor.GetProperty< int >( Actor::Property::ID ) );
-  DevelStage::AddFrameCallback( stage, frameCallback, stage.GetRootLayer() );
+  FrameCallbackActorIdCheck frameCallback(actor.GetProperty<int>(Actor::Property::ID));
+  DevelStage::AddFrameCallback(stage, frameCallback, stage.GetRootLayer());
 
   application.SendNotification();
   application.Render();
 
   // All methods should return successfully.
 
-  DALI_TEST_EQUALS( frameCallback.mCalled,                        true, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mGetSizeCallSuccess,            true, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mGetPositionCallSuccess,        true, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mGetColorCallSuccess,           true, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mGetScaleCallSuccess,           true, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mGetPositionAndSizeCallSuccess, true, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mSetSizeCallSuccess,            true, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mSetPositionCallSuccess,        true, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mSetColorCallSuccess,           true, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mSetScaleCallSuccess,           true, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mBakeSizeCallSuccess,           true, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mBakePositionCallSuccess,       true, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mBakeColorCallSuccess,          true, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mBakeScaleCallSuccess,          true, TEST_LOCATION );
+  DALI_TEST_EQUALS(frameCallback.mCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetSizeCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetPositionCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetColorCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetScaleCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetPositionAndSizeCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetSizeCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetPositionCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetColorCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetScaleCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakeSizeCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakePositionCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakeColorCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakeScaleCallSuccess, true, TEST_LOCATION);
   frameCallback.Reset();
 
   // Remove the actor from stage, the methods should not return successfully.
 
-  stage.Remove( actor );
+  stage.Remove(actor);
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( frameCallback.mCalled,                        true,  TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mGetSizeCallSuccess,            false, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mGetPositionCallSuccess,        false, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mGetColorCallSuccess,           false, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mGetScaleCallSuccess,           false, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mGetPositionAndSizeCallSuccess, false, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mSetSizeCallSuccess,            false, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mSetPositionCallSuccess,        false, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mSetColorCallSuccess,           false, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mSetScaleCallSuccess,           false, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mBakeSizeCallSuccess,           false, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mBakePositionCallSuccess,       false, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mBakeColorCallSuccess,          false, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mBakeScaleCallSuccess,          false, TEST_LOCATION );
+  DALI_TEST_EQUALS(frameCallback.mCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetSizeCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetPositionCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetColorCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetScaleCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetPositionAndSizeCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetSizeCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetPositionCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetColorCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetScaleCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakeSizeCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakePositionCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakeColorCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakeScaleCallSuccess, false, TEST_LOCATION);
   frameCallback.Reset();
 
   // Re-add the actor back to the stage, all the methods should once again, return successfully.
 
-  stage.Add( actor );
+  stage.Add(actor);
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( frameCallback.mCalled,                        true, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mGetSizeCallSuccess,            true, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mGetPositionCallSuccess,        true, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mGetColorCallSuccess,           true, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mGetScaleCallSuccess,           true, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mGetPositionAndSizeCallSuccess, true, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mSetSizeCallSuccess,            true, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mSetPositionCallSuccess,        true, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mSetColorCallSuccess,           true, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mSetScaleCallSuccess,           true, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mBakeSizeCallSuccess,           true, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mBakePositionCallSuccess,       true, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mBakeColorCallSuccess,          true, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback.mBakeScaleCallSuccess,          true, TEST_LOCATION );
+  DALI_TEST_EQUALS(frameCallback.mCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetSizeCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetPositionCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetColorCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetScaleCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetPositionAndSizeCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetSizeCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetPositionCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetColorCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetScaleCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakeSizeCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakePositionCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakeColorCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakeScaleCallSuccess, true, TEST_LOCATION);
 
   END_TEST;
 }
@@ -754,68 +746,68 @@ int UtcDaliFrameCallbackMultipleCallbacks(void)
   // Test to ensure multiple frame-callbacks work as expected
 
   TestApplication application;
-  Stage stage = Stage::GetCurrent();
+  Stage           stage = Stage::GetCurrent();
 
   Actor actor = Actor::New();
-  stage.Add( actor );
+  stage.Add(actor);
 
   FrameCallbackBasic frameCallback1;
   FrameCallbackBasic frameCallback2;
-  DevelStage::AddFrameCallback( stage, frameCallback1, stage.GetRootLayer() );
-  DevelStage::AddFrameCallback( stage, frameCallback2, stage.GetRootLayer() );
+  DevelStage::AddFrameCallback(stage, frameCallback1, stage.GetRootLayer());
+  DevelStage::AddFrameCallback(stage, frameCallback2, stage.GetRootLayer());
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( frameCallback1.mCalled, true,  TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback2.mCalled, true,  TEST_LOCATION );
+  DALI_TEST_EQUALS(frameCallback1.mCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback2.mCalled, true, TEST_LOCATION);
   frameCallback1.Reset();
   frameCallback2.Reset();
 
   // Remove the second frame-callback, only the first should be called
 
-  DevelStage::RemoveFrameCallback( stage, frameCallback2 );
+  DevelStage::RemoveFrameCallback(stage, frameCallback2);
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( frameCallback1.mCalled, true,  TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback2.mCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS(frameCallback1.mCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback2.mCalled, false, TEST_LOCATION);
   frameCallback1.Reset();
   frameCallback2.Reset();
 
   // Re-add the second frame-callback and remove the first, only the second should be called
 
-  DevelStage::AddFrameCallback( stage, frameCallback2, stage.GetRootLayer() );
-  DevelStage::RemoveFrameCallback( stage, frameCallback1 );
+  DevelStage::AddFrameCallback(stage, frameCallback2, stage.GetRootLayer());
+  DevelStage::RemoveFrameCallback(stage, frameCallback1);
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( frameCallback1.mCalled, false, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback2.mCalled, true,  TEST_LOCATION );
+  DALI_TEST_EQUALS(frameCallback1.mCalled, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback2.mCalled, true, TEST_LOCATION);
   frameCallback1.Reset();
   frameCallback2.Reset();
 
   // Attempt removal of the first frame-callback again, should be a no-op and yield the exact same results as the last run
-  DevelStage::RemoveFrameCallback( stage, frameCallback1 );
+  DevelStage::RemoveFrameCallback(stage, frameCallback1);
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( frameCallback1.mCalled, false, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback2.mCalled, true,  TEST_LOCATION );
+  DALI_TEST_EQUALS(frameCallback1.mCalled, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback2.mCalled, true, TEST_LOCATION);
   frameCallback1.Reset();
   frameCallback2.Reset();
 
   // Remove the second frame-callback as well, neither should be called
-  DevelStage::RemoveFrameCallback( stage, frameCallback2 );
+  DevelStage::RemoveFrameCallback(stage, frameCallback2);
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( frameCallback1.mCalled, false, TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback2.mCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS(frameCallback1.mCalled, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback2.mCalled, false, TEST_LOCATION);
 
   END_TEST;
 }
@@ -825,45 +817,45 @@ int UtcDaliFrameCallbackActorDestroyed(void)
   // Test to ensure that the frame-callback behaves gracefully if the connected root-actor is destroyed
 
   TestApplication application;
-  Stage stage = Stage::GetCurrent();
+  Stage           stage = Stage::GetCurrent();
 
   Actor actor = Actor::New();
-  stage.Add( actor );
+  stage.Add(actor);
 
   FrameCallbackBasic frameCallback1;
   FrameCallbackBasic frameCallback2;
-  DevelStage::AddFrameCallback( stage, frameCallback1, actor );
-  DevelStage::AddFrameCallback( stage, frameCallback2, actor );
+  DevelStage::AddFrameCallback(stage, frameCallback1, actor);
+  DevelStage::AddFrameCallback(stage, frameCallback2, actor);
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( frameCallback1.mCalled, true,  TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback2.mCalled, true,  TEST_LOCATION );
+  DALI_TEST_EQUALS(frameCallback1.mCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback2.mCalled, true, TEST_LOCATION);
   frameCallback1.Reset();
   frameCallback2.Reset();
 
   // Remove the second frame-callback, only the first should be called
 
-  DevelStage::RemoveFrameCallback( stage, frameCallback2 );
+  DevelStage::RemoveFrameCallback(stage, frameCallback2);
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( frameCallback1.mCalled, true,  TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback2.mCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS(frameCallback1.mCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback2.mCalled, false, TEST_LOCATION);
   frameCallback1.Reset();
   frameCallback2.Reset();
 
   // Remove and destroy the actor, the first one should not be called either
-  stage.Remove( actor );
+  stage.Remove(actor);
   actor.Reset();
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( frameCallback1.mCalled, false,  TEST_LOCATION );
-  DALI_TEST_EQUALS( frameCallback2.mCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS(frameCallback1.mCalled, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback2.mCalled, false, TEST_LOCATION);
 
   END_TEST;
 }
@@ -873,19 +865,19 @@ int UtcDaliFrameCallbackDestroyedBeforeRemoving(void)
   // Ensure there's no segmentation fault if the callback is deleted without being removed
 
   TestApplication application;
-  Stage stage = Stage::GetCurrent();
+  Stage           stage = Stage::GetCurrent();
 
   Actor actor = Actor::New();
-  stage.Add( actor );
+  stage.Add(actor);
 
   {
     FrameCallbackBasic frameCallback;
-    DevelStage::AddFrameCallback( stage, frameCallback, actor );
+    DevelStage::AddFrameCallback(stage, frameCallback, actor);
 
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_EQUALS( frameCallback.mCalled, true,  TEST_LOCATION );
+    DALI_TEST_EQUALS(frameCallback.mCalled, true, TEST_LOCATION);
     frameCallback.Reset();
   }
 
@@ -893,7 +885,7 @@ int UtcDaliFrameCallbackDestroyedBeforeRemoving(void)
 
   application.SendNotification();
   application.Render();
-  DALI_TEST_CHECK( true ); // If it runs to here then there's no segmentation fault
+  DALI_TEST_CHECK(true); // If it runs to here then there's no segmentation fault
 
   END_TEST;
 }
@@ -903,19 +895,19 @@ int UtcDaliFrameCallbackDoubleAddition(void)
   // Ensure we don't connect the same frame-callback twice
 
   TestApplication application;
-  Stage stage = Stage::GetCurrent();
-  Actor rootActor = stage.GetRootLayer();
+  Stage           stage     = Stage::GetCurrent();
+  Actor           rootActor = stage.GetRootLayer();
 
   FrameCallbackBasic frameCallback;
-  DevelStage::AddFrameCallback( stage, frameCallback, rootActor );
+  DevelStage::AddFrameCallback(stage, frameCallback, rootActor);
 
   try
   {
-    DevelStage::AddFrameCallback( stage, frameCallback, rootActor );
+    DevelStage::AddFrameCallback(stage, frameCallback, rootActor);
   }
-  catch( ... )
+  catch(...)
   {
-    DALI_TEST_CHECK( true );
+    DALI_TEST_CHECK(true);
   }
 
   END_TEST;

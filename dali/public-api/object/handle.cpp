@@ -19,18 +19,16 @@
 #include <dali/public-api/object/handle.h>
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
+#include <dali/internal/event/animation/constraint-impl.h>
+#include <dali/internal/event/common/object-impl.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/object/property-conditions.h>
 #include <dali/public-api/object/property-notification.h>
-#include <dali/internal/event/animation/constraint-impl.h>
-#include <dali/internal/event/common/object-impl.h>
-#include <dali/integration-api/debug.h>
 
 namespace Dali
 {
-
-
-Handle::Handle( Dali::Internal::Object* handle )
+Handle::Handle(Dali::Internal::Object* handle)
 : BaseHandle(handle)
 {
 }
@@ -41,29 +39,29 @@ Handle::Handle()
 
 Handle Handle::New()
 {
-  return Handle( Internal::Object::New().Get() );
+  return Handle(Internal::Object::New().Get());
 }
 
 Handle::~Handle()
 {
 }
 
-Handle::Handle( const Handle& handle ) = default;
+Handle::Handle(const Handle& handle) = default;
 
-Handle& Handle::operator=( const Handle& rhs ) = default;
+Handle& Handle::operator=(const Handle& rhs) = default;
 
-Handle::Handle( Handle&& rhs ) = default;
+Handle::Handle(Handle&& rhs) = default;
 
-Handle& Handle::operator=( Handle&& rhs ) = default;
+Handle& Handle::operator=(Handle&& rhs) = default;
 
-Handle Handle::DownCast( BaseHandle handle )
+Handle Handle::DownCast(BaseHandle handle)
 {
-  return Handle( dynamic_cast<Dali::Internal::Object*>(handle.GetObjectPtr()) );
+  return Handle(dynamic_cast<Dali::Internal::Object*>(handle.GetObjectPtr()));
 }
 
-bool Handle::Supports( Capability capability ) const
+bool Handle::Supports(Capability capability) const
 {
-  return GetImplementation(*this).Supports( capability );
+  return GetImplementation(*this).Supports(capability);
 }
 
 uint32_t Handle::GetPropertyCount() const
@@ -71,102 +69,102 @@ uint32_t Handle::GetPropertyCount() const
   return GetImplementation(*this).GetPropertyCount();
 }
 
-std::string Handle::GetPropertyName( Property::Index index ) const
+std::string Handle::GetPropertyName(Property::Index index) const
 {
-  return GetImplementation(*this).GetPropertyName( index );
+  return GetImplementation(*this).GetPropertyName(index);
 }
 
-Property::Index Handle::GetPropertyIndex( Property::Key key ) const
+Property::Index Handle::GetPropertyIndex(Property::Key key) const
 {
-  return GetImplementation( *this ).GetPropertyIndex( key );
+  return GetImplementation(*this).GetPropertyIndex(key);
 }
 
-bool Handle::IsPropertyWritable( Property::Index index ) const
+bool Handle::IsPropertyWritable(Property::Index index) const
 {
-  return GetImplementation(*this).IsPropertyWritable( index );
+  return GetImplementation(*this).IsPropertyWritable(index);
 }
 
-bool Handle::IsPropertyAnimatable( Property::Index index ) const
+bool Handle::IsPropertyAnimatable(Property::Index index) const
 {
-  return GetImplementation(*this).IsPropertyAnimatable( index );
+  return GetImplementation(*this).IsPropertyAnimatable(index);
 }
 
-bool Handle::IsPropertyAConstraintInput( Property::Index index ) const
+bool Handle::IsPropertyAConstraintInput(Property::Index index) const
 {
-  return GetImplementation(*this).IsPropertyAConstraintInput( index );
+  return GetImplementation(*this).IsPropertyAConstraintInput(index);
 }
 
-Property::Type Handle::GetPropertyType( Property::Index index ) const
+Property::Type Handle::GetPropertyType(Property::Index index) const
 {
-  return GetImplementation(*this).GetPropertyType( index );
+  return GetImplementation(*this).GetPropertyType(index);
 }
 
-void Handle::SetProperty( Property::Index index, const Property::Value& propertyValue )
+void Handle::SetProperty(Property::Index index, const Property::Value& propertyValue)
 {
-  GetImplementation(*this).SetProperty( index, propertyValue );
+  GetImplementation(*this).SetProperty(index, propertyValue);
 }
 
-Property::Index Handle::RegisterProperty( const std::string& name, const Property::Value& propertyValue )
+Property::Index Handle::RegisterProperty(const std::string& name, const Property::Value& propertyValue)
 {
-  return GetImplementation(*this).RegisterProperty( name, propertyValue );
+  return GetImplementation(*this).RegisterProperty(name, propertyValue);
 }
 
-Property::Index Handle::RegisterProperty( Property::Index key, const std::string& name, const Property::Value& propertyValue )
+Property::Index Handle::RegisterProperty(Property::Index key, const std::string& name, const Property::Value& propertyValue)
 {
-  return GetImplementation( *this ).RegisterProperty( name, key, propertyValue );
+  return GetImplementation(*this).RegisterProperty(name, key, propertyValue);
 }
 
-Property::Index Handle::RegisterProperty( const std::string& name, const Property::Value& propertyValue, Property::AccessMode accessMode )
+Property::Index Handle::RegisterProperty(const std::string& name, const Property::Value& propertyValue, Property::AccessMode accessMode)
 {
-  return GetImplementation(*this).RegisterProperty( name, propertyValue, accessMode );
+  return GetImplementation(*this).RegisterProperty(name, propertyValue, accessMode);
 }
 
-Property::Value Handle::GetProperty( Property::Index index ) const
+Property::Value Handle::GetProperty(Property::Index index) const
 {
-  return GetImplementation(*this).GetProperty( index );
+  return GetImplementation(*this).GetProperty(index);
 }
 
-Property::Value Handle::GetCurrentProperty( Property::Index index ) const
+Property::Value Handle::GetCurrentProperty(Property::Index index) const
 {
-  return GetImplementation(*this).GetCurrentProperty( index );
+  return GetImplementation(*this).GetCurrentProperty(index);
 }
 
-void Handle::SetProperties( const Property::Map& properties )
+void Handle::SetProperties(const Property::Map& properties)
 {
-  GetImplementation( *this ).SetProperties( properties );
+  GetImplementation(*this).SetProperties(properties);
 }
 
-void Handle::GetProperties( Property::Map& properties )
+void Handle::GetProperties(Property::Map& properties)
 {
-  GetImplementation( *this ).GetProperties( properties );
+  GetImplementation(*this).GetProperties(properties);
 }
 
-void Handle::GetPropertyIndices( Property::IndexContainer& indices ) const
+void Handle::GetPropertyIndices(Property::IndexContainer& indices) const
 {
-  GetImplementation(*this).GetPropertyIndices( indices );
+  GetImplementation(*this).GetPropertyIndices(indices);
 }
 
-bool Handle::DoesCustomPropertyExist( Property::Index index )
+bool Handle::DoesCustomPropertyExist(Property::Index index)
 {
-  return GetImplementation( *this ).DoesCustomPropertyExist( index );
+  return GetImplementation(*this).DoesCustomPropertyExist(index);
 }
 
-Dali::PropertyNotification Handle::AddPropertyNotification( Property::Index index,
-                                                            const PropertyCondition& condition )
+Dali::PropertyNotification Handle::AddPropertyNotification(Property::Index          index,
+                                                           const PropertyCondition& condition)
 {
-  return GetImplementation(*this).AddPropertyNotification( index, -1, condition );
+  return GetImplementation(*this).AddPropertyNotification(index, -1, condition);
 }
 
-Dali::PropertyNotification Handle::AddPropertyNotification( Property::Index index,
-                                                            int componentIndex,
-                                                            const PropertyCondition& condition )
+Dali::PropertyNotification Handle::AddPropertyNotification(Property::Index          index,
+                                                           int                      componentIndex,
+                                                           const PropertyCondition& condition)
 {
-  return GetImplementation(*this).AddPropertyNotification( index, componentIndex, condition );
+  return GetImplementation(*this).AddPropertyNotification(index, componentIndex, condition);
 }
 
-void Handle::RemovePropertyNotification( Dali::PropertyNotification propertyNotification )
+void Handle::RemovePropertyNotification(Dali::PropertyNotification propertyNotification)
 {
-  GetImplementation(*this).RemovePropertyNotification( propertyNotification );
+  GetImplementation(*this).RemovePropertyNotification(propertyNotification);
 }
 
 void Handle::RemovePropertyNotifications()
@@ -179,18 +177,18 @@ void Handle::RemoveConstraints()
   GetImplementation(*this).RemoveConstraints();
 }
 
-void Handle::RemoveConstraints( uint32_t tag )
+void Handle::RemoveConstraints(uint32_t tag)
 {
-  GetImplementation(*this).RemoveConstraints( tag );
+  GetImplementation(*this).RemoveConstraints(tag);
 }
 
-IndirectValue Handle::operator[]( Property::Index index )
+IndirectValue Handle::operator[](Property::Index index)
 {
   // Will assert on access if handle is empty
   return IndirectValue(*this, index);
 }
 
-IndirectValue Handle::operator[]( const std::string& name )
+IndirectValue Handle::operator[](const std::string& name)
 {
   // Will assert immediately when GetPropertyIndex is called if handle is empty
   return IndirectValue(*this, GetPropertyIndex(name));
@@ -198,20 +196,18 @@ IndirectValue Handle::operator[]( const std::string& name )
 
 Handle::PropertySetSignalType& Handle::PropertySetSignal()
 {
-  return GetImplementation( *this ).PropertySetSignal();
+  return GetImplementation(*this).PropertySetSignal();
 }
-
 
 namespace WeightObject
 {
-
 const Property::Index WEIGHT = PROPERTY_CUSTOM_START_INDEX;
 
 Handle New()
 {
   Handle handle = Handle::New();
 
-  handle.RegisterProperty( "weight", 0.0f );
+  handle.RegisterProperty("weight", 0.0f);
 
   return handle;
 }

@@ -330,7 +330,7 @@ public:  // PROPERTIES
 
 inline void SetTypeMessage( EventThreadServices& eventThreadServices, const Camera& camera, Dali::Camera::Type parameter )
 {
-  typedef MessageValue1< Camera, Dali::Camera::Type > LocalType;
+  using LocalType = MessageValue1<Camera, Dali::Camera::Type>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -341,7 +341,7 @@ inline void SetTypeMessage( EventThreadServices& eventThreadServices, const Came
 
 inline void SetProjectionModeMessage( EventThreadServices& eventThreadServices, const Camera& camera, Dali::Camera::ProjectionMode parameter )
 {
-  typedef MessageValue1< Camera, Dali::Camera::ProjectionMode > LocalProjectionMode;
+  using LocalProjectionMode = MessageValue1<Camera, Dali::Camera::ProjectionMode>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalProjectionMode ) );
@@ -352,7 +352,7 @@ inline void SetProjectionModeMessage( EventThreadServices& eventThreadServices, 
 
 inline void SetFieldOfViewMessage( EventThreadServices& eventThreadServices, const Camera& camera, float parameter )
 {
-  typedef MessageValue1< Camera, float > LocalType;
+  using LocalType = MessageValue1<Camera, float>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -363,7 +363,7 @@ inline void SetFieldOfViewMessage( EventThreadServices& eventThreadServices, con
 
 inline void SetAspectRatioMessage( EventThreadServices& eventThreadServices, const Camera& camera, float parameter )
 {
-  typedef MessageValue1< Camera, float > LocalType;
+  using LocalType = MessageValue1<Camera, float>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -374,7 +374,7 @@ inline void SetAspectRatioMessage( EventThreadServices& eventThreadServices, con
 
 inline void SetLeftClippingPlaneMessage( EventThreadServices& eventThreadServices, const Camera& camera, float parameter )
 {
-  typedef MessageValue1< Camera, float > LocalType;
+  using LocalType = MessageValue1<Camera, float>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -385,7 +385,7 @@ inline void SetLeftClippingPlaneMessage( EventThreadServices& eventThreadService
 
 inline void SetRightClippingPlaneMessage( EventThreadServices& eventThreadServices, const Camera& camera, float parameter )
 {
-  typedef MessageValue1< Camera, float > LocalType;
+  using LocalType = MessageValue1<Camera, float>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -396,7 +396,7 @@ inline void SetRightClippingPlaneMessage( EventThreadServices& eventThreadServic
 
 inline void SetTopClippingPlaneMessage( EventThreadServices& eventThreadServices, const Camera& camera, float parameter )
 {
-  typedef MessageValue1< Camera, float > LocalType;
+  using LocalType = MessageValue1<Camera, float>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -407,7 +407,7 @@ inline void SetTopClippingPlaneMessage( EventThreadServices& eventThreadServices
 
 inline void SetBottomClippingPlaneMessage( EventThreadServices& eventThreadServices, const Camera& camera, float parameter )
 {
-  typedef MessageValue1< Camera, float > LocalType;
+  using LocalType = MessageValue1<Camera, float>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -418,7 +418,7 @@ inline void SetBottomClippingPlaneMessage( EventThreadServices& eventThreadServi
 
 inline void SetNearClippingPlaneMessage( EventThreadServices& eventThreadServices, const Camera& camera, float parameter )
 {
-  typedef MessageValue1< Camera, float > LocalType;
+  using LocalType = MessageValue1<Camera, float>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -429,7 +429,7 @@ inline void SetNearClippingPlaneMessage( EventThreadServices& eventThreadService
 
 inline void SetFarClippingPlaneMessage( EventThreadServices& eventThreadServices, const Camera& camera, float parameter )
 {
-  typedef MessageValue1< Camera, float > LocalType;
+  using LocalType = MessageValue1<Camera, float>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -440,7 +440,7 @@ inline void SetFarClippingPlaneMessage( EventThreadServices& eventThreadServices
 
 inline void SetTargetPositionMessage( EventThreadServices& eventThreadServices, const Camera& camera, const Vector3& parameter )
 {
-  typedef MessageValue1< Camera, Vector3 > LocalType;
+  using LocalType = MessageValue1<Camera, Vector3>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -451,7 +451,7 @@ inline void SetTargetPositionMessage( EventThreadServices& eventThreadServices, 
 
 inline void SetInvertYAxisMessage( EventThreadServices& eventThreadServices, const Camera& camera, bool parameter )
 {
-  typedef MessageValue1< Camera, bool > LocalType;
+  using LocalType = MessageValue1<Camera, bool>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );

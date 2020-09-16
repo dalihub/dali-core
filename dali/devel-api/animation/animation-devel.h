@@ -23,17 +23,15 @@
 
 namespace Dali
 {
-
 namespace DevelAnimation
 {
-
 /**
  * @brief Set progress percentage marker to trigger ProgressHasBeenReachedSignal
  *
  * @param[in] animation the animation object to perform this operation on
  * @param[in] progress the progress percentage to trigger the signal at, e.g .3 for 30%.
  */
-DALI_CORE_API void SetProgressNotification( Animation animation, float progress );
+DALI_CORE_API void SetProgressNotification(Animation animation, float progress);
 
 /**
  * @brief Get progress percentage marker that has been set to trigger ProgressHasBeenReachedSignal
@@ -41,14 +39,14 @@ DALI_CORE_API void SetProgressNotification( Animation animation, float progress 
  * @param[in] animation the animation object to perform this operation on
  * @return the percentage to trigger at eg 0.3 for 30%
  */
-DALI_CORE_API float GetProgressNotification( Animation animation );
+DALI_CORE_API float GetProgressNotification(Animation animation);
 
 /**
  * @brief Connects to this signal to be notified when an Animation's animations have reached set progress.
  *
  * @return A signal object to connect with
  */
-DALI_CORE_API Animation::AnimationSignalType& ProgressReachedSignal( Animation animation );
+DALI_CORE_API Animation::AnimationSignalType& ProgressReachedSignal(Animation animation);
 
 /**
  * @brief Retrive the number of Animations.
@@ -63,7 +61,7 @@ DALI_CORE_API uint32_t GetAnimationCount();
  * @param[in] index The index of the Animation to retrieve
  * @return The animation for the given index or empty handle
  */
-DALI_CORE_API Animation GetAnimationAt( uint32_t index );
+DALI_CORE_API Animation GetAnimationAt(uint32_t index);
 
 } // namespace DevelAnimation
 

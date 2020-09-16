@@ -52,7 +52,7 @@ struct LongPressGestureEvent : public GestureEvent
   /**
    * Virtual destructor
    */
-  virtual ~LongPressGestureEvent();
+  ~LongPressGestureEvent() override;
 
   // Data
 

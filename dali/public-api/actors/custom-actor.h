@@ -43,7 +43,6 @@ class CustomActor;
 class DALI_CORE_API CustomActor : public Actor
 {
 public:
-
   /**
    * @brief Creates an uninitialized CustomActor handle.
    *
@@ -63,7 +62,7 @@ public:
    * @param[in] handle Handle to an object
    * @return Handle to a CustomActor or an uninitialized handle
    */
-  static CustomActor DownCast( BaseHandle handle );
+  static CustomActor DownCast(BaseHandle handle);
 
   /**
    * @brief Destructor.
@@ -121,7 +120,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs The actor to move
    */
-  CustomActor( CustomActor&& rhs );
+  CustomActor(CustomActor&& rhs);
 
   /**
    * @brief Move assignment operator.
@@ -130,10 +129,9 @@ public:
    * @param[in] rhs The actor to move
    * @return A reference to this
    */
-  CustomActor& operator=( CustomActor&& rhs );
+  CustomActor& operator=(CustomActor&& rhs);
 
 public: // Not intended for application developers
-
   /**
    * @brief This constructor is used internally to create additional CustomActor handles.
    *

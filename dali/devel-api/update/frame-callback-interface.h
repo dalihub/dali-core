@@ -2,7 +2,7 @@
 #define DALI_FRAME_CALLBACK_INTERFACE_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@
 
 namespace Dali
 {
-
 class UpdateProxy;
 
 /**
@@ -48,17 +47,15 @@ class UpdateProxy;
 class DALI_CORE_API FrameCallbackInterface
 {
 public:
-
   /**
    * @brief Called from the update-thread after the scene has been updated, and is ready to render.
    * @param[in]  updateProxy  Use this to get/set required values for the Actor.
    * @param[in]  elapsedSeconds  Time elapsed time since the last frame (in seconds)
    * @see FrameCallbackInterface
    */
-  virtual void Update( UpdateProxy& updateProxy, float elapsedSeconds ) = 0;
+  virtual void Update(UpdateProxy& updateProxy, float elapsedSeconds) = 0;
 
 protected:
-
   /**
    * @brief Protected constructor.
    */
@@ -74,7 +71,7 @@ public:
   class Impl;
 
 private:
-  std::unique_ptr< Impl > mImpl;
+  std::unique_ptr<Impl> mImpl;
   /// @endcond
 };
 

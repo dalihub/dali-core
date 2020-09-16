@@ -39,7 +39,7 @@
 #include <list>
 
 #undef _LIBCPP_INLINE_VISIBILITY
-#define _LIBCPP_INLINE_VISIBILITY __attribute__ ((__visibility__("hidden"), __always_inline__))
+#define _LIBCPP_INLINE_VISIBILITY __attribute__((__visibility__("hidden"), __always_inline__))
 #undef _LIBCPP_EXTERN_TEMPLATE
 #define _LIBCPP_EXTERN_TEMPLATE(...) extern template __VA_ARGS__;
 
@@ -49,13 +49,13 @@
 #include <bits/stl_list.h>
 #undef _GLIBCXX_VISIBILITY_ATTR
 #undef _GLIBCXX_VISIBILITY
-#define _GLIBCXX_VISIBILITY_ATTR(V) __attribute__ ((__visibility__ ("hidden")))
-#define _GLIBCXX_VISIBILITY(V) __attribute__ ((__visibility__ ("hidden")))
+#define _GLIBCXX_VISIBILITY_ATTR(V) __attribute__((__visibility__("hidden")))
+#define _GLIBCXX_VISIBILITY(V) __attribute__((__visibility__("hidden")))
 #include <list>
 #undef _GLIBCXX_VISIBILITY_ATTR
 #undef _GLIBCXX_VISIBILITY
-#define _GLIBCXX_VISIBILITY_ATTR(V) __attribute__ ((__visibility__ (#V))) // restore `_GLIBCXX_VISIBILITY_ATTR`
-#define _GLIBCXX_VISIBILITY(V) __attribute__ ((__visibility__ (#V))) // restore `_GLIBCXX_VISIBILITY`
+#define _GLIBCXX_VISIBILITY_ATTR(V) __attribute__((__visibility__(#V))) // restore `_GLIBCXX_VISIBILITY_ATTR`
+#define _GLIBCXX_VISIBILITY(V) __attribute__((__visibility__(#V)))      // restore `_GLIBCXX_VISIBILITY`
 
 #endif // #ifdef __clang__
 

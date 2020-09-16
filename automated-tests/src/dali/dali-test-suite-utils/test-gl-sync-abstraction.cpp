@@ -19,7 +19,6 @@
 
 namespace Dali
 {
-
 TestSyncObject::TestSyncObject(TraceCallStack& trace)
 : synced(false),
   mTrace(trace)
@@ -36,8 +35,6 @@ bool TestSyncObject::IsSynced()
   return synced;
 }
 
-
-
 TestGlSyncAbstraction::TestGlSyncAbstraction()
 {
   Initialize();
@@ -48,7 +45,7 @@ TestGlSyncAbstraction::TestGlSyncAbstraction()
  */
 TestGlSyncAbstraction::~TestGlSyncAbstraction()
 {
-  for( SyncIter iter=mSyncObjects.begin(), end=mSyncObjects.end(); iter != end; ++iter )
+  for(SyncIter iter = mSyncObjects.begin(), end = mSyncObjects.end(); iter != end; ++iter)
   {
     delete *iter;
   }
@@ -66,12 +63,12 @@ void TestGlSyncAbstraction::Initialize()
  * Create a sync object
  * @return the sync object
  */
-Integration::GlSyncAbstraction::SyncObject* TestGlSyncAbstraction::CreateSyncObject( )
+Integration::GlSyncAbstraction::SyncObject* TestGlSyncAbstraction::CreateSyncObject()
 {
   mTrace.PushCall("CreateSyncObject", ""); // Trace the method
 
   TestSyncObject* syncObject = new TestSyncObject(mTrace);
-  mSyncObjects.push_back( syncObject );
+  mSyncObjects.push_back(syncObject);
   return syncObject;
 }
 
@@ -79,15 +76,15 @@ Integration::GlSyncAbstraction::SyncObject* TestGlSyncAbstraction::CreateSyncObj
  * Destroy a sync object
  * @param[in] syncObject The object to destroy
  */
-void TestGlSyncAbstraction::DestroySyncObject( Integration::GlSyncAbstraction::SyncObject* syncObject )
+void TestGlSyncAbstraction::DestroySyncObject(Integration::GlSyncAbstraction::SyncObject* syncObject)
 {
   std::stringstream out;
   out << syncObject;
   mTrace.PushCall("DestroySyncObject", out.str()); // Trace the method
 
-  for( SyncIter iter=mSyncObjects.begin(), end=mSyncObjects.end(); iter != end; ++iter )
+  for(SyncIter iter = mSyncObjects.begin(), end = mSyncObjects.end(); iter != end; ++iter)
   {
-    if( *iter == syncObject )
+    if(*iter == syncObject)
     {
       delete *iter;
       mSyncObjects.erase(iter);
@@ -96,10 +93,9 @@ void TestGlSyncAbstraction::DestroySyncObject( Integration::GlSyncAbstraction::S
   }
 }
 
-
-Integration::GlSyncAbstraction::SyncObject* TestGlSyncAbstraction::GetLastSyncObject( )
+Integration::GlSyncAbstraction::SyncObject* TestGlSyncAbstraction::GetLastSyncObject()
 {
-  if( !mSyncObjects.empty() )
+  if(!mSyncObjects.empty())
   {
     return mSyncObjects.back();
   }
@@ -111,31 +107,39 @@ Integration::GlSyncAbstraction::SyncObject* TestGlSyncAbstraction::GetLastSyncOb
  * @param[in]
  * @param[in] sync The sync value to set
  */
-void TestGlSyncAbstraction::SetObjectSynced( Integration::GlSyncAbstraction::SyncObject* syncObject, bool sync )
+void TestGlSyncAbstraction::SetObjectSynced(Integration::GlSyncAbstraction::SyncObject* syncObject, bool sync)
 {
   TestSyncObject* testSyncObject = static_cast<TestSyncObject*>(syncObject);
-  testSyncObject->synced = sync;
+  testSyncObject->synced         = sync;
 }
 
 /**
  * Turn trace on
  */
-void TestGlSyncAbstraction::EnableTrace(bool enable) { mTrace.Enable(enable); }
+void TestGlSyncAbstraction::EnableTrace(bool enable)
+{
+  mTrace.Enable(enable);
+}
 
 /**
  * Reset the trace callstack
  */
-void TestGlSyncAbstraction::ResetTrace() { mTrace.Reset(); }
+void TestGlSyncAbstraction::ResetTrace()
+{
+  mTrace.Reset();
+}
 
 /**
  * Get the trace object (allows test case to find methods on it)
  */
-TraceCallStack& TestGlSyncAbstraction::GetTrace() { return mTrace; }
+TraceCallStack& TestGlSyncAbstraction::GetTrace()
+{
+  return mTrace;
+}
 
 int32_t TestGlSyncAbstraction::GetNumberOfSyncObjects()
 {
-  return static_cast<int32_t>( mSyncObjects.size() );
+  return static_cast<int32_t>(mSyncObjects.size());
 }
 
-
-} // Dali
+} // namespace Dali

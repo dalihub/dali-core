@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,13 @@
  *
  */
 
-#include <iostream>
-
-#include <stdlib.h>
-#include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/events/tap-gesture-devel.h>
 #include <dali/internal/event/events/tap-gesture/tap-gesture-impl.h>
+#include <dali/public-api/dali-core.h>
+#include <stdlib.h>
+
+#include <iostream>
 
 using namespace Dali;
 
@@ -34,20 +35,19 @@ void utc_dali_internal_tap_gesture_cleanup(void)
   test_return_value = TET_PASS;
 }
 
-
 // Positive test case for a method
 int UtcDaliTapGestureConstructor(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  TapGesture gesture(new Internal::TapGesture( GestureState::STARTED ));
+  TapGesture gesture = DevelTapGesture::New(GestureState::STARTED);
   DALI_TEST_EQUALS(1u, gesture.GetNumberOfTouches(), TEST_LOCATION);
   DALI_TEST_EQUALS(1u, gesture.GetNumberOfTaps(), TEST_LOCATION);
   DALI_TEST_EQUALS(GestureType::TAP, gesture.GetType(), TEST_LOCATION);
 
   // Test Copy constructor
-  GetImplementation( gesture ).SetNumberOfTouches( 5u );
-  GetImplementation( gesture ).SetNumberOfTaps( 2u );
+  GetImplementation(gesture).SetNumberOfTouches(5u);
+  GetImplementation(gesture).SetNumberOfTaps(2u);
 
   TapGesture gesture2(gesture);
   DALI_TEST_EQUALS(5u, gesture2.GetNumberOfTouches(), TEST_LOCATION);
@@ -56,7 +56,7 @@ int UtcDaliTapGestureConstructor(void)
 
   // Test move constructor
   const auto refCount = gesture.GetObjectPtr()->ReferenceCount();
-  TapGesture gesture3( std::move( gesture ) );
+  TapGesture gesture3(std::move(gesture));
   DALI_TEST_CHECK(!gesture);
   DALI_TEST_EQUALS(GestureType::TAP, gesture3.GetType(), TEST_LOCATION);
   DALI_TEST_EQUALS(gesture3.GetBaseObject().ReferenceCount(), refCount, TEST_LOCATION);
@@ -67,13 +67,13 @@ int UtcDaliTapGestureConstructor(void)
 int UtcDaliTapGestureAssignment(void)
 {
   // Test Assignment operator
-  TapGesture gesture(new Internal::TapGesture( GestureState::STARTED ));
+  TapGesture gesture = DevelTapGesture::New(GestureState::STARTED);
   DALI_TEST_EQUALS(1u, gesture.GetNumberOfTouches(), TEST_LOCATION);
   DALI_TEST_EQUALS(1u, gesture.GetNumberOfTaps(), TEST_LOCATION);
   DALI_TEST_EQUALS(GestureType::TAP, gesture.GetType(), TEST_LOCATION);
 
-  GetImplementation( gesture ).SetNumberOfTouches( 5u );
-  GetImplementation( gesture ).SetNumberOfTaps( 2u );
+  GetImplementation(gesture).SetNumberOfTouches(5u);
+  GetImplementation(gesture).SetNumberOfTaps(2u);
 
   TapGesture gesture2;
   gesture2 = gesture;
@@ -95,7 +95,7 @@ int UtcDaliTapGestureAssignment(void)
 
 int UtcDaliTapGestureSetGetNumberOfTapsP(void)
 {
-  TapGesture gesture(new Internal::TapGesture(GestureState::STARTED));
+  TapGesture gesture = DevelTapGesture::New(GestureState::STARTED);
   DALI_TEST_EQUALS(gesture.GetNumberOfTaps(), 1u, TEST_LOCATION);
 
   GetImplementation(gesture).SetNumberOfTaps(123u);
@@ -106,7 +106,7 @@ int UtcDaliTapGestureSetGetNumberOfTapsP(void)
 
 int UtcDaliTapGestureSetGetNumberOfTouchesP(void)
 {
-  TapGesture gesture(new Internal::TapGesture(GestureState::STARTED));
+  TapGesture gesture = DevelTapGesture::New(GestureState::STARTED);
   DALI_TEST_EQUALS(gesture.GetNumberOfTouches(), 1u, TEST_LOCATION);
 
   GetImplementation(gesture).SetNumberOfTouches(321u);
@@ -117,22 +117,22 @@ int UtcDaliTapGestureSetGetNumberOfTouchesP(void)
 
 int UtcDaliTapGestureSetGetScreenPointP(void)
 {
-  TapGesture gesture(new Internal::TapGesture(GestureState::STARTED));
+  TapGesture gesture = DevelTapGesture::New(GestureState::STARTED);
   DALI_TEST_EQUALS(gesture.GetScreenPoint(), Vector2::ZERO, TEST_LOCATION);
 
-  GetImplementation(gesture).SetScreenPoint(Vector2(123.0f,321.0f));
-  DALI_TEST_EQUALS(gesture.GetScreenPoint(), Vector2(123.0f,321.0f), TEST_LOCATION);
+  GetImplementation(gesture).SetScreenPoint(Vector2(123.0f, 321.0f));
+  DALI_TEST_EQUALS(gesture.GetScreenPoint(), Vector2(123.0f, 321.0f), TEST_LOCATION);
 
   END_TEST;
 }
 
 int UtcDaliTapGestureSetGetLocalPointP(void)
 {
-  TapGesture gesture(new Internal::TapGesture(GestureState::STARTED));
+  TapGesture gesture = DevelTapGesture::New(GestureState::STARTED);
   DALI_TEST_EQUALS(gesture.GetLocalPoint(), Vector2::ZERO, TEST_LOCATION);
 
-  GetImplementation(gesture).SetLocalPoint(Vector2(123.0f,321.0f));
-  DALI_TEST_EQUALS(gesture.GetLocalPoint(), Vector2(123.0f,321.0f), TEST_LOCATION);
+  GetImplementation(gesture).SetLocalPoint(Vector2(123.0f, 321.0f));
+  DALI_TEST_EQUALS(gesture.GetLocalPoint(), Vector2(123.0f, 321.0f), TEST_LOCATION);
 
   END_TEST;
 }

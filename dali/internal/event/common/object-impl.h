@@ -349,6 +349,15 @@ public:
   virtual int32_t GetPropertyComponentIndex( Property::Index index ) const;
 
   /**
+   * Query whether playing an animation is possible or not.
+   * @return true if playing an animation is possible.
+   */
+  virtual bool IsAnimationPossible() const
+  {
+    return true;
+  }
+
+  /**
    * @copydoc Dali::Handle::PropertySetSignal()
    */
   Handle::PropertySetSignalType& PropertySetSignal();
@@ -365,7 +374,7 @@ protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~Object();
+  ~Object() override;
 
   /**
    * Called immediately by derived classes, after the scene-object has been created & passed to the scene-graph.

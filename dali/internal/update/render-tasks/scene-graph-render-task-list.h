@@ -43,8 +43,7 @@ class RenderTask;
 class RenderTaskList
 {
 public:
-
-  typedef OwnerContainer< RenderTask* > RenderTaskContainer;
+  using RenderTaskContainer = OwnerContainer<RenderTask*>;
 
   /**
    * Construct a new RenderTaskList.
@@ -138,7 +137,7 @@ private:
 inline void AddTaskMessage( EventThreadServices& eventThreadServices, const RenderTaskList& list, OwnerPointer< RenderTask >& task )
 {
   // Message has ownership of the RenderTask while in transit from event -> update
-  typedef MessageValue1< RenderTaskList, OwnerPointer< RenderTask > > LocalType;
+  using LocalType = MessageValue1<RenderTaskList, OwnerPointer<RenderTask> >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -152,7 +151,7 @@ inline void RemoveTaskMessage( EventThreadServices& eventThreadServices, const R
   // Scene graph thread can destroy this object.
   RenderTask& task = const_cast< RenderTask& >( constTask );
 
-  typedef MessageValue1< RenderTaskList, RenderTask* > LocalType;
+  using LocalType = MessageValue1<RenderTaskList, RenderTask*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );

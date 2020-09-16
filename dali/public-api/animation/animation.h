@@ -123,10 +123,9 @@ class Animation;
 class DALI_CORE_API Animation : public BaseHandle
 {
 public:
+  using AnimationSignalType = Signal<void(Animation&)>; ///< Animation finished signal type @SINCE_1_0.0
 
-  typedef Signal< void (Animation&) > AnimationSignalType; ///< Animation finished signal type @SINCE_1_0.0
-
-  typedef Any AnyFunction; ///< Interpolation function @SINCE_1_0.0
+  using AnyFunction = Any; ///< Interpolation function @SINCE_1_0.0
 
   /**
    * @brief Enumeration for what to do when the animation ends, is stopped, or is destroyed.
@@ -134,8 +133,8 @@ public:
    */
   enum EndAction
   {
-    BAKE,     ///< When the animation ends, the animated property values are saved. @SINCE_1_0.0
-    DISCARD,  ///< When the animation ends, the animated property values are forgotten. @SINCE_1_0.0
+    BAKE,      ///< When the animation ends, the animated property values are saved. @SINCE_1_0.0
+    DISCARD,   ///< When the animation ends, the animated property values are forgotten. @SINCE_1_0.0
     BAKE_FINAL ///< If the animation is stopped, the animated property values are saved as if the animation had run to completion, otherwise behaves like Bake. @SINCE_1_0.0
   };
 
@@ -145,8 +144,8 @@ public:
    */
   enum Interpolation
   {
-    LINEAR,   ///< Values in between key frames are interpolated using a linear polynomial. (Default) @SINCE_1_0.0
-    CUBIC     ///< Values in between key frames are interpolated using a cubic polynomial. @SINCE_1_0.0
+    LINEAR, ///< Values in between key frames are interpolated using a linear polynomial. (Default) @SINCE_1_0.0
+    CUBIC   ///< Values in between key frames are interpolated using a cubic polynomial. @SINCE_1_0.0
   };
 
   /**
@@ -158,9 +157,9 @@ public:
    */
   enum State
   {
-    STOPPED,   ///< Animation has stopped @SINCE_1_1.21
-    PLAYING,   ///< The animation is playing @SINCE_1_1.21
-    PAUSED     ///< The animation is paused @SINCE_1_1.21
+    STOPPED, ///< Animation has stopped @SINCE_1_1.21
+    PLAYING, ///< The animation is playing @SINCE_1_1.21
+    PAUSED   ///< The animation is paused @SINCE_1_1.21
   };
 
   /**
@@ -170,8 +169,8 @@ public:
    */
   enum LoopingMode
   {
-    RESTART,      ///< When the animation arrives at the end in looping mode, the animation restarts from the beginning. @SINCE_1_2.60
-    AUTO_REVERSE  ///< When the animation arrives at the end in looping mode, the animation reverses direction and runs backwards again. @SINCE_1_2.60
+    RESTART,     ///< When the animation arrives at the end in looping mode, the animation restarts from the beginning. @SINCE_1_2.60
+    AUTO_REVERSE ///< When the animation arrives at the end in looping mode, the animation reverses direction and runs backwards again. @SINCE_1_2.60
   };
 
   /**
@@ -205,7 +204,7 @@ public:
    * @param[in] handle Handle to an object
    * @return Handle to an Animation object or an uninitialized handle
    */
-  static Animation DownCast( BaseHandle handle );
+  static Animation DownCast(BaseHandle handle);
 
   /**
    * @brief Destructor.
@@ -238,7 +237,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  Animation( Animation&& rhs );
+  Animation(Animation&& rhs);
 
   /**
    * @brief Move assignment operator.
@@ -247,7 +246,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  Animation& operator=( Animation&& rhs );
+  Animation& operator=(Animation&& rhs);
 
   /**
    * @brief Sets the duration of an animation.
@@ -287,7 +286,7 @@ public:
    * @SINCE_1_1.20
    * @param[in] count The number of times to loop
    */
-  void SetLoopCount(int32_t  count);
+  void SetLoopCount(int32_t count);
 
   /**
    * @brief Gets the loop count.
@@ -298,7 +297,7 @@ public:
    * @SINCE_1_1.20
    * @return The number of times to loop
    */
-  int32_t  GetLoopCount();
+  int32_t GetLoopCount();
 
   /**
    * @brief Gets the current loop count.
@@ -308,7 +307,7 @@ public:
    * @SINCE_1_1.20
    * @return The current number of loops that have occured
    */
-  int32_t  GetCurrentLoop();
+  int32_t GetCurrentLoop();
 
   /**
    * @brief Queries whether the animation will loop.
@@ -344,7 +343,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] disconnectAction The disconnect action
    */
-  void SetDisconnectAction( EndAction disconnectAction );
+  void SetDisconnectAction(EndAction disconnectAction);
 
   /**
    * @brief Returns the disconnect action.
@@ -382,7 +381,7 @@ public:
    * @param[in] progress The new progress as a normalized value between [0,1]
    * or between the play range if specified
    */
-  void SetCurrentProgress( float progress );
+  void SetCurrentProgress(float progress);
 
   /**
   * @brief Retrieves the current progress of the animation.
@@ -402,7 +401,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] factor A value which will multiply the velocity
    */
-  void SetSpeedFactor( float factor );
+  void SetSpeedFactor(float factor);
 
   /**
    * @brief Retrieves the speed factor of the animation.
@@ -422,7 +421,7 @@ public:
    * @param[in] range Two values between [0,1] to specify minimum and maximum progress. The
    * animation will play between those values
    */
-  void SetPlayRange( const Vector2& range );
+  void SetPlayRange(const Vector2& range);
 
   /**
    * @brief Gets the playing range.
@@ -447,7 +446,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] progress A value between [0,1], or between the play range if specified, from where the animation should start playing
    */
-  void PlayFrom( float progress );
+  void PlayFrom(float progress);
 
   /**
    * @brief Play the animation after a given delay time.
@@ -457,7 +456,7 @@ public:
    * @SINCE_1_2.60
    * @param[in] delaySeconds The delay time
    */
-  void PlayAfter( float delaySeconds );
+  void PlayAfter(float delaySeconds);
 
   /**
    * @brief Pauses the animation.
@@ -493,7 +492,7 @@ public:
    * @SINCE_1_2.60
    * @param[in] loopingMode The looping mode is one of RESTART and AUTO_REVERSE
    */
-  void SetLoopingMode( LoopingMode loopingMode );
+  void SetLoopingMode(LoopingMode loopingMode);
 
   /**
    * @brief Gets one of the current looping mode.
@@ -599,7 +598,7 @@ public:
    */
   void AnimateTo(Property target, Property::Value destinationValue, AlphaFunction alpha, TimePeriod period);
 
-   /**
+  /**
    * @brief Animates a property between keyframes.
    *
    * @SINCE_1_0.0
@@ -683,7 +682,6 @@ public:
    */
   void AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period, Interpolation interpolation);
 
-
   // Actor-specific convenience methods
 
   /**
@@ -697,7 +695,7 @@ public:
    * @param[in] path The path. It defines position and orientation
    * @param[in] forward The vector (in local space coordinate system) that will be oriented with the path's tangent direction
    */
-  void Animate( Actor actor, Path path, const Vector3& forward );
+  void Animate(Actor actor, Path path, const Vector3& forward);
 
   /**
    * @brief Animates an actor's position and orientation through a predefined path.
@@ -711,7 +709,7 @@ public:
    * @param[in] forward The vector (in local space coordinate system) that will be oriented with the path's tangent direction
    * @param[in] alpha The alpha function to apply
    */
-  void Animate( Actor actor, Path path, const Vector3& forward, AlphaFunction alpha );
+  void Animate(Actor actor, Path path, const Vector3& forward, AlphaFunction alpha);
 
   /**
    * @brief Animates an actor's position and orientation through a predefined path.
@@ -725,7 +723,7 @@ public:
    * @param[in] forward The vector (in local space coordinate system) that will be oriented with the path's tangent direction
    * @param[in] period The effect will occur during this time period
    */
-  void Animate( Actor actor, Path path, const Vector3& forward, TimePeriod period );
+  void Animate(Actor actor, Path path, const Vector3& forward, TimePeriod period);
 
   /**
    * @brief Animates an actor's position and orientation through a predefined path.
@@ -740,7 +738,7 @@ public:
    * @param[in] alpha The alpha function to apply
    * @param[in] period The effect will occur during this time period
    */
-  void Animate( Actor actor, Path path, const Vector3& forward, AlphaFunction alpha, TimePeriod period);
+  void Animate(Actor actor, Path path, const Vector3& forward, AlphaFunction alpha, TimePeriod period);
 
   /**
    * @brief Shows an actor during the animation.
@@ -761,7 +759,6 @@ public:
   void Hide(Actor actor, float delaySeconds);
 
 public: // Not intended for use by Application developers
-
   /// @cond internal
   /**
    * @brief This constructor is used by Animation::New() methods.
@@ -770,7 +767,6 @@ public: // Not intended for use by Application developers
    */
   explicit DALI_INTERNAL Animation(Internal::Animation* animation);
   /// @endcond
-
 };
 
 /**

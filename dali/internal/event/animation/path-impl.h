@@ -30,7 +30,7 @@ namespace Dali
 
 namespace Internal
 {
-typedef IntrusivePtr<Path> PathPtr;
+using PathPtr = IntrusivePtr<Path>;
 
 /**
  * A 3D path
@@ -54,19 +54,19 @@ protected:
   /**
    * virtual destructor
    */
-  virtual ~Path();
+  ~Path() override;
 
 private:
 
   /**
    * @copydoc Dali::Internal::Object::SetDefaultProperty()
    */
-  virtual void SetDefaultProperty(Property::Index index, const Property::Value& propertyValue);
+  void SetDefaultProperty(Property::Index index, const Property::Value& propertyValue) override;
 
    /**
    * @copydoc Dali::Internal::Object::GetDefaultProperty()
    */
-  virtual Property::Value GetDefaultProperty( Property::Index index ) const;
+  Property::Value GetDefaultProperty( Property::Index index ) const override;
 
 public:
 

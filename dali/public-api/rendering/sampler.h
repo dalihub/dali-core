@@ -19,8 +19,8 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/handle.h>   // Dali::Handle
 #include <dali/public-api/actors/sampling.h>
+#include <dali/public-api/object/handle.h> // Dali::Handle
 
 namespace Dali
 {
@@ -42,7 +42,6 @@ class Sampler;
 class DALI_CORE_API Sampler : public BaseHandle
 {
 public:
-
   /**
    * @brief Creates a new Sampler object.
    *
@@ -71,7 +70,7 @@ public:
    * @SINCE_1_1.43
    * @param[in] handle Handle to an object
    */
-  Sampler( const Sampler& handle );
+  Sampler(const Sampler& handle);
 
   /**
    * @brief Downcasts to a sampler handle.
@@ -81,7 +80,7 @@ public:
    * @param[in] handle Handle to an object
    * @return Handle or an uninitialized handle
    */
-  static Sampler DownCast( BaseHandle handle );
+  static Sampler DownCast(BaseHandle handle);
 
   /**
    * @brief Assignment operator, changes this handle to point at the same object.
@@ -90,8 +89,7 @@ public:
    * @param[in] handle Handle to an object
    * @return Reference to the assigned object
    */
-  Sampler& operator=( const Sampler& handle );
-
+  Sampler& operator=(const Sampler& handle);
 
   /**
    * @brief Move constructor.
@@ -99,7 +97,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  Sampler( Sampler&& rhs );
+  Sampler(Sampler&& rhs);
 
   /**
    * @brief Move assignment operator.
@@ -108,7 +106,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  Sampler& operator=( Sampler&& rhs );
+  Sampler& operator=(Sampler&& rhs);
 
   /**
    * @brief Sets the filter modes for this sampler.
@@ -118,7 +116,7 @@ public:
    * @param[in] minFilter The minification filter that will be used
    * @param[in] magFilter The magnification filter that will be used
    */
-  void SetFilterMode( FilterMode::Type minFilter, FilterMode::Type magFilter );
+  void SetFilterMode(FilterMode::Type minFilter, FilterMode::Type magFilter);
 
   /**
    * @brief Sets the wrap modes for this sampler.
@@ -127,7 +125,7 @@ public:
    * @param[in] uWrap Wrap mode for u coordinates
    * @param[in] vWrap Wrap mode for v coordinates
    */
-  void SetWrapMode( WrapMode::Type uWrap, WrapMode::Type vWrap );
+  void SetWrapMode(WrapMode::Type uWrap, WrapMode::Type vWrap);
 
   /**
    * @brief Sets the wrap modes for this sampler.
@@ -137,17 +135,16 @@ public:
    * @param[in] sWrap Wrap mode for the x direction
    * @param[in] tWrap Wrap mode for the y direction
    */
-  void SetWrapMode( WrapMode::Type rWrap, WrapMode::Type sWrap, WrapMode::Type tWrap );
+  void SetWrapMode(WrapMode::Type rWrap, WrapMode::Type sWrap, WrapMode::Type tWrap);
 
 public:
-
   /**
    * @brief The constructor.
    * @note  Not intended for application developers.
    * @SINCE_1_1.43
    * @param[in] pointer A pointer to a newly allocated Sampler
    */
-  explicit DALI_INTERNAL Sampler( Internal::Sampler* pointer );
+  explicit DALI_INTERNAL Sampler(Internal::Sampler* pointer);
 };
 
 /**

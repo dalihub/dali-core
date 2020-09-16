@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_CORE_ENUMERATIONS_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,19 +19,17 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
 #include <dali/integration-api/context-notifier.h>
 #include <dali/integration-api/resource-policies.h>
+#include <dali/public-api/common/dali-common.h>
 
 #undef FALSE
 #undef TRUE
 
 namespace Dali
 {
-
 namespace Integration
 {
-
 /**
  * @brief Enumerations to specify whether we should render to the frame-buffer.
  */

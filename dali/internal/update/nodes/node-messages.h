@@ -47,7 +47,7 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~NodePropertyMessageBase();
+  ~NodePropertyMessageBase() override;
 
 private:
 
@@ -67,8 +67,7 @@ template< typename P >
 class NodePropertyMessage : public NodePropertyMessageBase
 {
 public:
-
-  typedef void(AnimatableProperty<P>::*MemberFunction)( BufferIndex, typename ParameterType< P >::PassingType );
+  using MemberFunction = void ( AnimatableProperty<P>::* )( BufferIndex, typename ParameterType<P>::PassingType );
 
   /**
    * Create a message.
@@ -96,14 +95,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~NodePropertyMessage()
+  ~NodePropertyMessage() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex updateBufferIndex )
+  void Process( BufferIndex updateBufferIndex ) override
   {
     (mProperty->*mMemberFunction)( updateBufferIndex, mParam );
   }
@@ -148,8 +147,7 @@ template< typename P >
 class NodePropertyComponentMessage : public NodePropertyMessageBase
 {
 public:
-
-  typedef void(AnimatableProperty<P>::*MemberFunction)( BufferIndex, float );
+  using MemberFunction = void ( AnimatableProperty<P>::* )( BufferIndex, float );
 
   /**
    * Send a message.
@@ -177,14 +175,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~NodePropertyComponentMessage()
+  ~NodePropertyComponentMessage() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex updateBufferIndex )
+  void Process( BufferIndex updateBufferIndex ) override
   {
     (mProperty->*mMemberFunction)( updateBufferIndex, mParam );
   }
@@ -227,8 +225,7 @@ template <typename P>
 class NodeTransformPropertyMessage : public NodePropertyMessageBase
 {
 public:
-
-  typedef void(TransformManagerPropertyHandler<P>::*MemberFunction)( BufferIndex, const P& );
+  using MemberFunction = void ( TransformManagerPropertyHandler<P>::* )( BufferIndex, const P& );
 
   /**
    * Create a message.
@@ -256,14 +253,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~NodeTransformPropertyMessage()
+  ~NodeTransformPropertyMessage() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex updateBufferIndex )
+  void Process( BufferIndex updateBufferIndex ) override
   {
     (mProperty->*mMemberFunction)( updateBufferIndex, mParam );
   }
@@ -306,8 +303,7 @@ template <typename P>
 class NodeTransformComponentMessage : public NodePropertyMessageBase
 {
 public:
-
-  typedef void(TransformManagerPropertyHandler<P>::*MemberFunction)( BufferIndex, float );
+  using MemberFunction = void ( TransformManagerPropertyHandler<P>::* )( BufferIndex, float );
 
   /**
    * Send a message.
@@ -335,14 +331,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~NodeTransformComponentMessage()
+  ~NodeTransformComponentMessage() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex updateBufferIndex )
+  void Process( BufferIndex updateBufferIndex ) override
   {
     (mProperty->*mMemberFunction)( updateBufferIndex, mParam );
   }

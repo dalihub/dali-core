@@ -19,19 +19,17 @@
 #include <dali/devel-api/object/handle-devel.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/property-key.h>
 #include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/common/type-info-impl.h>
+#include <dali/public-api/object/property-key.h>
 
 namespace Dali
 {
-
 namespace DevelHandle
 {
-
-void SetTypeInfo( Handle& handle, const TypeInfo& typeInfo )
+void SetTypeInfo(Handle& handle, const TypeInfo& typeInfo)
 {
-  GetImplementation( handle ).SetTypeInfo( &GetImplementation( typeInfo ) );
+  GetImplementation(handle).SetTypeInfo(&GetImplementation(typeInfo));
 }
 
 } // namespace DevelHandle

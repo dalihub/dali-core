@@ -40,9 +40,8 @@ template <> struct ParameterType< Dali::Constraint::RemoveAction >
 
 namespace SceneGraph
 {
-
-typedef Dali::Vector<PropertyOwner*>     PropertyOwnerContainer;
-typedef PropertyOwnerContainer::Iterator PropertyOwnerIter;
+using PropertyOwnerContainer = Dali::Vector<PropertyOwner*>;
+using PropertyOwnerIter      = PropertyOwnerContainer::Iterator;
 
 /**
  * An abstract base class for Constraints.
@@ -70,8 +69,7 @@ public:
   };
 
 public:
-
-  typedef Dali::Constraint::RemoveAction RemoveAction;
+  using RemoveAction = Dali::Constraint::RemoveAction;
 
   /**
    * Constructor
@@ -83,7 +81,7 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~ConstraintBase();
+  ~ConstraintBase() override;
 
   /**
    * Property resetter observes the lifecycle of this object
@@ -177,14 +175,14 @@ private:
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerConnected()
    */
-  virtual void PropertyOwnerConnected( PropertyOwner& owner )
+  void PropertyOwnerConnected( PropertyOwner& owner ) override
   {
   }
 
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerDisconnected()
    */
-  virtual void PropertyOwnerDisconnected( BufferIndex bufferIndex, PropertyOwner& owner )
+  void PropertyOwnerDisconnected( BufferIndex bufferIndex, PropertyOwner& owner ) override
   {
     if ( !mDisconnected )
     {
@@ -201,7 +199,7 @@ private:
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerDestroyed()
    */
-  virtual void PropertyOwnerDestroyed( PropertyOwner& owner )
+  void PropertyOwnerDestroyed( PropertyOwner& owner ) override
   {
     if ( !mDisconnected )
     {
@@ -251,7 +249,7 @@ private:
 
 inline void  SetRemoveActionMessage( EventThreadServices& eventThreadServices, const ConstraintBase& constraint, Dali::Constraint::RemoveAction removeAction )
 {
-  typedef MessageValue1< ConstraintBase, Dali::Constraint::RemoveAction > LocalType;
+  using LocalType = MessageValue1<ConstraintBase, Dali::Constraint::RemoveAction>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );

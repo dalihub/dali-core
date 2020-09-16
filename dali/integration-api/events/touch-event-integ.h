@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Integration
 {
-
 /**
  * An instance of this structure should be used by the adaptor to send a touch event to Dali core.
  *
@@ -51,7 +49,7 @@ struct DALI_CORE_API TouchEvent : public MultiPointEvent
   /**
    * Virtual destructor
    */
-  virtual ~TouchEvent();
+  ~TouchEvent() override;
 };
 
 } // namespace Integration

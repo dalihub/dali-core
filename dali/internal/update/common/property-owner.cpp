@@ -89,6 +89,8 @@ void PropertyOwner::Destroy()
 
 void PropertyOwner::ConnectToSceneGraph()
 {
+  mIsConnectedToSceneGraph = true;
+
   // Notification for observers
   const ConstObserverIter endIter = mObservers.End();
   for( ConstObserverIter iter = mObservers.Begin(); iter != endIter; ++iter)
@@ -99,6 +101,8 @@ void PropertyOwner::ConnectToSceneGraph()
 
 void PropertyOwner::DisconnectFromSceneGraph( BufferIndex updateBufferIndex )
 {
+  mIsConnectedToSceneGraph = false;
+
   // Notification for observers
   const ConstObserverIter endIter = mObservers.End();
   for( ConstObserverIter iter = mObservers.Begin(); iter != endIter; ++iter)
@@ -143,7 +147,8 @@ void PropertyOwner::RemoveConstraint( ConstraintBase* constraint )
 }
 
 PropertyOwner::PropertyOwner()
-: mUpdated( false )
+: mUpdated(false),
+  mIsConnectedToSceneGraph(false)
 {
 }
 

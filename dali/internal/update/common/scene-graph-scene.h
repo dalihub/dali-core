@@ -131,7 +131,7 @@ private:
 /// Messages
 inline void AddFrameRenderedCallbackMessage( EventThreadServices& eventThreadServices, const Scene& scene, const CallbackBase* callback, int32_t frameId )
 {
-  typedef MessageValue2< Scene, CallbackBase*, int32_t > LocalType;
+  using LocalType = MessageValue2<Scene, CallbackBase*, int32_t>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -142,7 +142,7 @@ inline void AddFrameRenderedCallbackMessage( EventThreadServices& eventThreadSer
 
 inline void AddFramePresentedCallbackMessage( EventThreadServices& eventThreadServices, const Scene& scene, const CallbackBase* callback, int32_t frameId )
 {
-  typedef MessageValue2< Scene, CallbackBase*, int32_t > LocalType;
+  using LocalType = MessageValue2<Scene, CallbackBase*, int32_t>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );

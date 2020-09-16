@@ -17,18 +17,21 @@
 
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/common/addon-binder.h>
+
 #include "dali-test-suite-utils/test-addon-manager.h"
 
 struct DummyAddOn : public Dali::AddOn::AddOnBinder
 {
-  DummyAddOn() : Dali::AddOn::AddOnBinder( "SampleAddOn" )
-  {}
+  DummyAddOn()
+  : Dali::AddOn::AddOnBinder("SampleAddOn")
+  {
+  }
 
-  ~DummyAddOn() = default;
+  ~DummyAddOn() override = default;
 
-  ADDON_BIND_FUNCTION( DoSum, int(int, int) );
+  ADDON_BIND_FUNCTION(DoSum, int(int, int));
 
-  ADDON_BIND_FUNCTION( StringLen, int() );
+  ADDON_BIND_FUNCTION(StringLen, int());
 };
 
 int UtcDaliAddOnBinderP(void)
@@ -42,15 +45,15 @@ int UtcDaliAddOnBinderP(void)
   DummyAddOn addon;
 
   // Test whether library handle is non-null
-  DALI_TEST_EQUALS( addon.GetHandle(), (void*)1, TEST_LOCATION );
+  DALI_TEST_EQUALS(addon.GetHandle(), (void*)1, TEST_LOCATION);
 
   // Test whether addon is valid
   auto isValid = addon.IsValid();
-  DALI_TEST_EQUALS( isValid, true, TEST_LOCATION );
+  DALI_TEST_EQUALS(isValid, true, TEST_LOCATION);
 
   // Test AddOnInfo
   const auto& info = addon.GetAddOnInfo();
-  DALI_TEST_EQUALS( info.name, "SampleAddOn", TEST_LOCATION );
+  DALI_TEST_EQUALS(info.name, "SampleAddOn", TEST_LOCATION);
 
   delete addOnManager;
 
@@ -65,16 +68,16 @@ int UtcDaliAddOnManagerNotSupportedP(void)
 
   // Not supported
   using VoidPtr = void*;
-  DALI_TEST_EQUALS( VoidPtr(Dali::Integration::AddOnManager::Get()), VoidPtr(nullptr), TEST_LOCATION );
+  DALI_TEST_EQUALS(VoidPtr(Dali::Integration::AddOnManager::Get()), VoidPtr(nullptr), TEST_LOCATION);
 
   DummyAddOn addon{};
 
   // Test whether library handle is non-null
-  DALI_TEST_EQUALS( addon.GetHandle(), (void*)0, TEST_LOCATION );
+  DALI_TEST_EQUALS(addon.GetHandle(), (void*)0, TEST_LOCATION);
 
   // Test whether addon is valid
   auto isValid = addon.IsValid();
-  DALI_TEST_EQUALS( isValid, false, TEST_LOCATION );
+  DALI_TEST_EQUALS(isValid, false, TEST_LOCATION);
 
   END_TEST;
 }

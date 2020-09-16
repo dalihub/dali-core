@@ -47,15 +47,14 @@ class PixelData;
 class DALI_CORE_API PixelData : public BaseHandle
 {
 public:
-
   /**
    * @brief Enumeration for Function to release the pixel buffer.
    * @SINCE_1_1.43
    */
   enum ReleaseFunction
   {
-    FREE,          ///< Use free function to release the pixel buffer     @SINCE_1_1.43
-    DELETE_ARRAY,  ///< Use delete[] operator to release the pixel buffer @SINCE_1_1.43
+    FREE,         ///< Use free function to release the pixel buffer     @SINCE_1_1.43
+    DELETE_ARRAY, ///< Use delete[] operator to release the pixel buffer @SINCE_1_1.43
   };
 
   /**
@@ -70,12 +69,12 @@ public:
    * @param[in] releaseFunction The function used to release the memory
    * @return A handle to the PixelData
    */
-  static PixelData New( uint8_t* buffer,
-                        uint32_t bufferSize,
-                        uint32_t width,
-                        uint32_t height,
-                        Pixel::Format pixelFormat,
-                        ReleaseFunction releaseFunction);
+  static PixelData New(uint8_t*        buffer,
+                       uint32_t        bufferSize,
+                       uint32_t        width,
+                       uint32_t        height,
+                       Pixel::Format   pixelFormat,
+                       ReleaseFunction releaseFunction);
 
   /**
    * @brief Creates an empty handle.
@@ -115,7 +114,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  PixelData( PixelData&& rhs );
+  PixelData(PixelData&& rhs);
 
   /**
    * @brief Move assignment operator.
@@ -124,7 +123,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  PixelData& operator=( PixelData&& rhs );
+  PixelData& operator=(PixelData&& rhs);
 
   /**
    * @brief Gets the width of the buffer in pixels.
@@ -151,14 +150,13 @@ public:
   Pixel::Format GetPixelFormat() const;
 
 public:
-
   /**
    * @brief The constructor.
    * @note  Not intended for application developers.
    * @SINCE_1_1.43
    * @param[in] pointer A pointer to a newly allocated PixelData
    */
-  explicit DALI_INTERNAL PixelData( Internal::PixelData* pointer );
+  explicit DALI_INTERNAL PixelData(Internal::PixelData* pointer);
 };
 
 /**

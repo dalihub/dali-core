@@ -34,5 +34,5 @@ AddOnManager* AddOnManager::Get()
 {
   return mSingleton;
 }
-}
-}
+} // namespace Integration
+} // namespace Dali

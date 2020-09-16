@@ -15,14 +15,13 @@
  *
  */
 
+#include <dali-test-suite-utils.h>
+#include <dali/public-api/dali-core.h>
+#include <stdlib.h>
+
 #include <iostream>
 
-#include <stdlib.h>
-#include <dali/public-api/dali-core.h>
-#include <dali-test-suite-utils.h>
-
 using namespace Dali;
-
 
 namespace
 {
@@ -46,13 +45,12 @@ enum TestAttribType
 static Actor CreateBitmapActor()
 {
   Actor actor = CreateRenderableActor();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::NAME,"Test Image Rendering Actor");
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::NAME, "Test Image Rendering Actor");
   return actor;
 }
 
 } // anonymous namespace
-
 
 // Positive test case for a method
 int UtcDaliContextVertexAttribStartup(void)
@@ -67,9 +65,9 @@ int UtcDaliContextVertexAttribStartup(void)
   application.Render();
 
   // check the locations
-  for (unsigned int i = 0; i < TEST_MAX_ATTRIBUTE_CACHE_SIZE; i++)
+  for(unsigned int i = 0; i < TEST_MAX_ATTRIBUTE_CACHE_SIZE; i++)
   {
-    DALI_TEST_CHECK( application.GetGlAbstraction().GetVertexAttribArrayState(i) == false);
+    DALI_TEST_CHECK(application.GetGlAbstraction().GetVertexAttribArrayState(i) == false);
   }
 
   tet_result(TET_PASS);
@@ -92,11 +90,9 @@ int UtcDaliContextVertexAttribImageRendering(void)
   // clear the flag to say they've changed
   application.GetGlAbstraction().ClearVertexAttribArrayChanged();
 
-
   // create a test bitmap actor
   Actor actor(CreateBitmapActor());
   application.GetScene().Add(actor);
-
 
   application.SendNotification();
   application.Render();
@@ -115,7 +111,6 @@ int UtcDaliContextVertexAttribImageRendering(void)
 
   // if it has changed then the caching has failed
   DALI_TEST_CHECK(application.GetGlAbstraction().GetVertexAttribArrayChanged() == false);
-
 
   tet_result(TET_PASS);
   END_TEST;

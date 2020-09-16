@@ -33,7 +33,7 @@ namespace Internal
 {
 
 class ShaderData;
-typedef IntrusivePtr<ShaderData> ShaderDataPtr;
+using ShaderDataPtr = IntrusivePtr<ShaderData>;
 
 /**
  * ShaderData class.
@@ -60,7 +60,7 @@ protected:
    * Protected Destructor
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~ShaderData()
+  ~ShaderData() override
   {
     // vector releases its data
   }

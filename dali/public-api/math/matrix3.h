@@ -19,9 +19,9 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/math/vector3.h>
-#include <dali/public-api/math/matrix.h>
 #include <dali/public-api/common/type-traits.h>
+#include <dali/public-api/math/matrix.h>
+#include <dali/public-api/math/vector3.h>
 
 namespace Dali
 {
@@ -55,8 +55,7 @@ struct Vector2;
 class DALI_CORE_API Matrix3
 {
 public:
-
-  friend DALI_CORE_API std::ostream& operator<< (std::ostream& o, const Matrix3& matrix);
+  friend DALI_CORE_API std::ostream& operator<<(std::ostream& o, const Matrix3& matrix);
 
   /**
    * @brief The identity matrix.
@@ -107,7 +106,7 @@ public:
    * @SINCE_1_9.21
    * @param[in] matrix A reference to the moved matrix
    */
-  Matrix3( Matrix3&& matrix );
+  Matrix3(Matrix3&& matrix);
 
   /**
    * @brief Move assignment operator.
@@ -116,7 +115,7 @@ public:
    * @param[in] matrix A reference to the moved matrix
    * @return A reference to this
    */
-  Matrix3& operator=( Matrix3&& matrix );
+  Matrix3& operator=(Matrix3&& matrix);
 
   /**
    * @brief Assignment Operator.
@@ -124,7 +123,7 @@ public:
    * @param[in] matrix From which to copy values
    * @return Reference to this object
    */
-  Matrix3& operator=( const Matrix3& matrix );
+  Matrix3& operator=(const Matrix3& matrix);
 
   /**
    * @brief Assignment Operator.
@@ -132,7 +131,7 @@ public:
    * @param[in] matrix A reference to the copied matrix
    * @return A reference to this
    */
-  Matrix3& operator=( const Matrix& matrix );
+  Matrix3& operator=(const Matrix& matrix);
 
   /**
    * @brief The equality operator.
@@ -143,7 +142,7 @@ public:
    * @param[in] rhs The Matrix to compare this to
    * @return True if the matrices are equal
    */
-  bool operator==(const Matrix3 & rhs) const;
+  bool operator==(const Matrix3& rhs) const;
 
   /**
    * @brief The inequality operator.
@@ -154,7 +153,7 @@ public:
    * @param[in] rhs The Matrix to compare this to
    * @return true if the matrices are equal
    */
-  bool operator!=(const Matrix3 & rhs) const;
+  bool operator!=(const Matrix3& rhs) const;
 
   /**
    * @brief Destructor.
@@ -182,7 +181,10 @@ public:
    * @SINCE_1_0.0
    * @return The matrix contents as an array of 9 floats
    */
-  const float* AsFloat() const {return &mElements[0];}
+  const float* AsFloat() const
+  {
+    return &mElements[0];
+  }
 
   /**
    * @brief Returns the contents of the matrix as an array of 9 floats.
@@ -196,7 +198,10 @@ public:
    * @SINCE_1_0.0
    * @return The matrix contents as an array of 9 floats
    */
-  float* AsFloat() {return &mElements[0];}
+  float* AsFloat()
+  {
+    return &mElements[0];
+  }
 
   /**
    * @brief Inverts the matrix.
@@ -255,10 +260,9 @@ public:
    * @param[in] lhs Matrix, this can be same matrix as result
    * @param[in] rhs Matrix, this cannot be same matrix as result
    */
-  static void Multiply( Matrix3& result, const Matrix3& lhs, const Matrix3& rhs );
+  static void Multiply(Matrix3& result, const Matrix3& lhs, const Matrix3& rhs);
 
 private:
-
   float mElements[9]; ///< The elements of the matrix
 };
 
@@ -270,10 +274,17 @@ private:
  * @param[in] matrix The matrix to print
  * @return The output stream operator
  */
-DALI_CORE_API std::ostream& operator<< (std::ostream& o, const Matrix3& matrix);
+DALI_CORE_API std::ostream& operator<<(std::ostream& o, const Matrix3& matrix);
 
 // Allow Matrix3 to be treated as a POD type
-template <> struct TypeTraits< Matrix3 > : public BasicTypes< Matrix3 > { enum { IS_TRIVIAL_TYPE = true }; };
+template<>
+struct TypeTraits<Matrix3> : public BasicTypes<Matrix3>
+{
+  enum
+  {
+    IS_TRIVIAL_TYPE = true
+  };
+};
 
 /**
  * @}

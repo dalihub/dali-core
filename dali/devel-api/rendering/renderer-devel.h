@@ -2,7 +2,7 @@
 #define DALI_RENDERER_DEVEL_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,18 +23,16 @@
 
 namespace Dali
 {
-
 namespace DevelRenderer
 {
-
 /**
  * The index of render queue used by the DrawCommand
  */
 using RenderQueueIndex = uint32_t;
 
-constexpr RenderQueueIndex RENDER_QUEUE_OPAQUE = 0; ///< Queue for opaque elements
+constexpr RenderQueueIndex RENDER_QUEUE_OPAQUE      = 0; ///< Queue for opaque elements
 constexpr RenderQueueIndex RENDER_QUEUE_TRANSPARENT = 1; ///<Queue for transparent elements
-constexpr RenderQueueIndex RENDER_QUEUE_MAX = 2;
+constexpr RenderQueueIndex RENDER_QUEUE_MAX         = 2;
 
 /**
  * Enum describing way of rendering the primitives (indexed draw, array draw)
@@ -52,10 +50,10 @@ enum class DrawType
  */
 struct DrawCommand
 {
-  DrawType         drawType; ///< Type of drawing (indexed, array)
-  uint32_t         firstIndex ; ///< First index into the geometry array
+  DrawType         drawType;     ///< Type of drawing (indexed, array)
+  uint32_t         firstIndex;   ///< First index into the geometry array
   uint32_t         elementCount; ///< Number of elements to draw
-  RenderQueueIndex queue; ///< Queue index
+  RenderQueueIndex queue;        ///< Queue index
 };
 
 /**
@@ -64,64 +62,60 @@ struct DrawCommand
  * @param[in] renderer a valid Renderer object
  * @param[in] drawCommand Valid DrawCommand to add to the Renderer
  */
-DALI_CORE_API void AddDrawCommand( Dali::Renderer renderer, const DrawCommand& drawCommand );
+DALI_CORE_API void AddDrawCommand(Dali::Renderer renderer, const DrawCommand& drawCommand);
 
 namespace Property
 {
+enum Type
+{
+  DEPTH_INDEX                 = Dali::Renderer::Property::DEPTH_INDEX,
+  FACE_CULLING_MODE           = Dali::Renderer::Property::FACE_CULLING_MODE,
+  BLEND_MODE                  = Dali::Renderer::Property::BLEND_MODE,
+  BLEND_EQUATION_RGB          = Dali::Renderer::Property::BLEND_EQUATION_RGB,
+  BLEND_EQUATION_ALPHA        = Dali::Renderer::Property::BLEND_EQUATION_ALPHA,
+  BLEND_FACTOR_SRC_RGB        = Dali::Renderer::Property::BLEND_FACTOR_SRC_RGB,
+  BLEND_FACTOR_DEST_RGB       = Dali::Renderer::Property::BLEND_FACTOR_DEST_RGB,
+  BLEND_FACTOR_SRC_ALPHA      = Dali::Renderer::Property::BLEND_FACTOR_SRC_ALPHA,
+  BLEND_FACTOR_DEST_ALPHA     = Dali::Renderer::Property::BLEND_FACTOR_DEST_ALPHA,
+  BLEND_COLOR                 = Dali::Renderer::Property::BLEND_COLOR,
+  BLEND_PRE_MULTIPLIED_ALPHA  = Dali::Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA,
+  INDEX_RANGE_FIRST           = Dali::Renderer::Property::INDEX_RANGE_FIRST,
+  INDEX_RANGE_COUNT           = Dali::Renderer::Property::INDEX_RANGE_COUNT,
+  DEPTH_WRITE_MODE            = Dali::Renderer::Property::DEPTH_WRITE_MODE,
+  DEPTH_FUNCTION              = Dali::Renderer::Property::DEPTH_FUNCTION,
+  DEPTH_TEST_MODE             = Dali::Renderer::Property::DEPTH_TEST_MODE,
+  RENDER_MODE                 = Dali::Renderer::Property::RENDER_MODE,
+  STENCIL_FUNCTION            = Dali::Renderer::Property::STENCIL_FUNCTION,
+  STENCIL_FUNCTION_MASK       = Dali::Renderer::Property::STENCIL_FUNCTION_MASK,
+  STENCIL_FUNCTION_REFERENCE  = Dali::Renderer::Property::STENCIL_FUNCTION_REFERENCE,
+  STENCIL_MASK                = Dali::Renderer::Property::STENCIL_MASK,
+  STENCIL_OPERATION_ON_FAIL   = Dali::Renderer::Property::STENCIL_OPERATION_ON_FAIL,
+  STENCIL_OPERATION_ON_Z_FAIL = Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL,
+  STENCIL_OPERATION_ON_Z_PASS = Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_PASS,
 
-  enum Type
-  {
-    DEPTH_INDEX                 = Dali::Renderer::Property::DEPTH_INDEX,
-    FACE_CULLING_MODE           = Dali::Renderer::Property::FACE_CULLING_MODE,
-    BLEND_MODE                  = Dali::Renderer::Property::BLEND_MODE,
-    BLEND_EQUATION_RGB          = Dali::Renderer::Property::BLEND_EQUATION_RGB,
-    BLEND_EQUATION_ALPHA        = Dali::Renderer::Property::BLEND_EQUATION_ALPHA,
-    BLEND_FACTOR_SRC_RGB        = Dali::Renderer::Property::BLEND_FACTOR_SRC_RGB,
-    BLEND_FACTOR_DEST_RGB       = Dali::Renderer::Property::BLEND_FACTOR_DEST_RGB,
-    BLEND_FACTOR_SRC_ALPHA      = Dali::Renderer::Property::BLEND_FACTOR_SRC_ALPHA,
-    BLEND_FACTOR_DEST_ALPHA     = Dali::Renderer::Property::BLEND_FACTOR_DEST_ALPHA,
-    BLEND_COLOR                 = Dali::Renderer::Property::BLEND_COLOR,
-    BLEND_PRE_MULTIPLIED_ALPHA  = Dali::Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA,
-    INDEX_RANGE_FIRST           = Dali::Renderer::Property::INDEX_RANGE_FIRST,
-    INDEX_RANGE_COUNT           = Dali::Renderer::Property::INDEX_RANGE_COUNT,
-    DEPTH_WRITE_MODE            = Dali::Renderer::Property::DEPTH_WRITE_MODE,
-    DEPTH_FUNCTION              = Dali::Renderer::Property::DEPTH_FUNCTION,
-    DEPTH_TEST_MODE             = Dali::Renderer::Property::DEPTH_TEST_MODE,
-    RENDER_MODE                 = Dali::Renderer::Property::RENDER_MODE,
-    STENCIL_FUNCTION            = Dali::Renderer::Property::STENCIL_FUNCTION,
-    STENCIL_FUNCTION_MASK       = Dali::Renderer::Property::STENCIL_FUNCTION_MASK,
-    STENCIL_FUNCTION_REFERENCE  = Dali::Renderer::Property::STENCIL_FUNCTION_REFERENCE,
-    STENCIL_MASK                = Dali::Renderer::Property::STENCIL_MASK,
-    STENCIL_OPERATION_ON_FAIL   = Dali::Renderer::Property::STENCIL_OPERATION_ON_FAIL,
-    STENCIL_OPERATION_ON_Z_FAIL = Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL,
-    STENCIL_OPERATION_ON_Z_PASS = Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_PASS,
-
-    /**
+  /**
      * @brief The opacity of the renderer.
      * @details Name "opacity", type Property::FLOAT.
      */
-    OPACITY = STENCIL_OPERATION_ON_Z_PASS + 1,
+  OPACITY = STENCIL_OPERATION_ON_Z_PASS + 1,
 
-    /**
+  /**
      * @brief The rendering behavior of the renderer.
      * @details Name "renderingBehavior", type Property::INTEGER.
      */
-    RENDERING_BEHAVIOR = STENCIL_OPERATION_ON_Z_PASS + 2,
-  };
+  RENDERING_BEHAVIOR = STENCIL_OPERATION_ON_Z_PASS + 2,
+};
 } // namespace Property
 
 namespace Rendering
 {
-
-
-
 /**
  * @brief Enumeration for the rendering behavior
  */
 enum Type
 {
-  IF_REQUIRED,  ///< Default. Will only render if required to do so.
-  CONTINUOUSLY  ///< Will render continuously.
+  IF_REQUIRED, ///< Default. Will only render if required to do so.
+  CONTINUOUSLY ///< Will render continuously.
 };
 
 } // namespace Rendering

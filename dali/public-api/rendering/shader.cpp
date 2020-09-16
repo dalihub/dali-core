@@ -16,20 +16,19 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/rendering/shader.h>           // Dali::Shader
+#include <dali/public-api/rendering/shader.h> // Dali::Shader
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/rendering/shader-impl.h>  // Dali::Internal::Shader
+#include <dali/internal/event/rendering/shader-impl.h> // Dali::Internal::Shader
 
 namespace Dali
 {
-
-Shader Shader::New( const std::string& vertexShader,
-                    const std::string& fragmentShader,
-                    Hint::Value hints )
+Shader Shader::New(const std::string& vertexShader,
+                   const std::string& fragmentShader,
+                   Hint::Value        hints)
 {
-  Internal::ShaderPtr renderer = Internal::Shader::New( vertexShader, fragmentShader, hints );
-  return Shader( renderer.Get() );
+  Internal::ShaderPtr renderer = Internal::Shader::New(vertexShader, fragmentShader, hints);
+  return Shader(renderer.Get());
 }
 
 Shader::Shader()
@@ -40,21 +39,21 @@ Shader::~Shader()
 {
 }
 
-Shader::Shader( const Shader& handle ) = default;
+Shader::Shader(const Shader& handle) = default;
 
-Shader Shader::DownCast( BaseHandle handle )
+Shader Shader::DownCast(BaseHandle handle)
 {
-  return Shader( dynamic_cast<Dali::Internal::Shader*>(handle.GetObjectPtr()));
+  return Shader(dynamic_cast<Dali::Internal::Shader*>(handle.GetObjectPtr()));
 }
 
-Shader& Shader::operator=( const Shader& handle ) = default;
+Shader& Shader::operator=(const Shader& handle) = default;
 
-Shader::Shader( Shader&& rhs ) =  default;
+Shader::Shader(Shader&& rhs) = default;
 
-Shader& Shader::operator=( Shader&& rhs ) =  default;
+Shader& Shader::operator=(Shader&& rhs) = default;
 
-Shader::Shader( Internal::Shader* pointer )
-: Handle( pointer )
+Shader::Shader(Internal::Shader* pointer)
+: Handle(pointer)
 {
 }
 

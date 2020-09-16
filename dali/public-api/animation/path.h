@@ -44,7 +44,6 @@ class Path;
 class DALI_CORE_API Path : public Handle
 {
 public:
-
   /**
    * @brief Enumeration for the instance of properties belonging to the Path class.
    * @SINCE_1_0.0
@@ -57,8 +56,8 @@ public:
      */
     enum
     {
-      POINTS         = DEFAULT_OBJECT_PROPERTY_START_INDEX, ///< name "points",         type Vector3 @SINCE_1_0.0
-      CONTROL_POINTS,                                       ///< name "controlPoints",  type Vector3 @SINCE_1_0.0
+      POINTS = DEFAULT_OBJECT_PROPERTY_START_INDEX, ///< name "points",         type Vector3 @SINCE_1_0.0
+      CONTROL_POINTS,                               ///< name "controlPoints",  type Vector3 @SINCE_1_0.0
     };
   };
 
@@ -79,7 +78,7 @@ public:
    * @param[in] handle Handle to an object
    * @return Handle to a Path object or an uninitialized handle
    */
-  static Path DownCast( BaseHandle handle );
+  static Path DownCast(BaseHandle handle);
 
   /**
    * @brief Creates an uninitialized Path handle.
@@ -121,7 +120,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  Path( Path&& rhs );
+  Path(Path&& rhs);
 
   /**
    * @brief Move assignment operator.
@@ -130,7 +129,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  Path& operator=( Path&& rhs );
+  Path& operator=(Path&& rhs);
 
   /**
    * @brief Adds an interpolation point.
@@ -138,7 +137,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] point The new interpolation point to be added
    */
-  void AddPoint(const Vector3& point );
+  void AddPoint(const Vector3& point);
 
   /**
    * @brief Adds a control point.
@@ -146,7 +145,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] point The new control point to be added
    */
-  void AddControlPoint(const Vector3& point );
+  void AddControlPoint(const Vector3& point);
 
   /**
    * @brief Automatic generation of control points. Generated control points which result in a smooth join between the splines of each segment.
@@ -166,7 +165,7 @@ public:
    * @pre There are at least two points in the path ( one segment ).
    *
    */
-  void GenerateControlPoints( float curvature );
+  void GenerateControlPoints(float curvature);
 
   /**
    * @brief Sample path at a given progress. Calculates position and tangent at that point of the curve.
@@ -176,7 +175,7 @@ public:
    * @param[out] position The interpolated position at that progress
    * @param[out] tangent The interpolated tangent at that progress
    */
-  void Sample( float progress, Vector3& position, Vector3& tangent ) const;
+  void Sample(float progress, Vector3& position, Vector3& tangent) const;
 
   /**
    * @brief Accessor for the interpolation points.
@@ -185,7 +184,7 @@ public:
    * @param[in] index The index of the interpolation point
    * @return A reference to the interpolation point
    */
-  Vector3& GetPoint( size_t index );
+  Vector3& GetPoint(size_t index);
 
   /**
    * @brief Accessor for the control points.
@@ -194,7 +193,7 @@ public:
    * @param[in] index The index of the control point
    * @return A reference to the control point
    */
-  Vector3& GetControlPoint( size_t index );
+  Vector3& GetControlPoint(size_t index);
 
   /**
    * @brief Gets the number of interpolation points in the path.

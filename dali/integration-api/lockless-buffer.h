@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_LOCKLESS_BUFFER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,16 +22,14 @@
 #include <cstdint> // uint32_t, uint8_t
 
 // INTERNAL INCLUDES
-#include <cstring>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/vector-wrapper.h>
+#include <cstring>
 
 namespace Dali
 {
-
 namespace Integration
 {
-
 /**
  * The LocklessBuffer class implements double buffering eligible for multi-(two) threaded use,
  * where it's possible to read from one thread and write from another
@@ -47,13 +45,12 @@ namespace Integration
  */
 class DALI_CORE_API LocklessBuffer
 {
-
 public:
   /**
    * Constructor.
    * @param[in] size The size of buffers in bytes.
    */
-  LocklessBuffer( uint32_t size );
+  LocklessBuffer(uint32_t size);
 
   /**
    * Destructor.
@@ -65,7 +62,7 @@ public:
    * @param[in] src data source
    * @param[in] size size of data in bytes
    */
-  void Write( const uint8_t *src, uint32_t size );
+  void Write(const uint8_t* src, uint32_t size);
 
   /**
    * Try to swap buffers and read data.
@@ -87,19 +84,19 @@ private:
    */
   enum BufferState
   {
-    R0W1    = 0, ///< Read from buffer 0 write to buffer 1
-    R1W0    = 1, ///< Read from buffer 1 write to buffer 0
-    WRITING = 2, ///< Currently writing to buffer
-    UPDATED = 4, ///< Swapping buffer required; there is new data available
+    R0W1              = 0, ///< Read from buffer 0 write to buffer 1
+    R1W0              = 1, ///< Read from buffer 1 write to buffer 0
+    WRITING           = 2, ///< Currently writing to buffer
+    UPDATED           = 4, ///< Swapping buffer required; there is new data available
     WRITE_BUFFER_MASK = 1, ///< indicates which buffer to write to
     WRITING_MASK      = 2, ///< indicates whether currently writing
     UPDATED_MASK      = 4  ///< indicates whether new data is available
   };
 
 private:
-  LocklessBuffer(); ///< undefined default constructor, need to give size on construction
-  LocklessBuffer( const LocklessBuffer& );            ///< undefined copy constructor
-  LocklessBuffer& operator=( const LocklessBuffer& ); ///< undefined assignment operator
+  LocklessBuffer();                                 ///< undefined default constructor, need to give size on construction
+  LocklessBuffer(const LocklessBuffer&);            ///< undefined copy constructor
+  LocklessBuffer& operator=(const LocklessBuffer&); ///< undefined assignment operator
 
 private:
   uint8_t* mBuffer[2];         ///< bitmap buffers
@@ -107,8 +104,8 @@ private:
   uint32_t mSize;              ///< size of buffers
 };
 
-} // Internal
+} // namespace Integration
 
-} // Dali
+} // namespace Dali
 
 #endif // DALI_INTEGRATION_LOCKLESS_BUFFER_H

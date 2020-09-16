@@ -26,14 +26,12 @@
 
 namespace Dali
 {
-
 namespace // unnamed namespace
 {
-
-template < class P >
-Internal::PropertyConstraint< P >* CreatePropertyConstraint( CallbackBase* func )
+template<class P>
+Internal::PropertyConstraint<P>* CreatePropertyConstraint(CallbackBase* func)
 {
-  return new Internal::PropertyConstraint< P >( reinterpret_cast< Dali::Constraint::Function< P >* >( func ) );
+  return new Internal::PropertyConstraint<P>(reinterpret_cast<Dali::Constraint::Function<P>*>(func));
 }
 
 } // unnamed namespace
@@ -44,41 +42,41 @@ Constraint::Constraint()
 {
 }
 
-Constraint Constraint::Clone( Handle object )
+Constraint Constraint::Clone(Handle object)
 {
-  return Constraint( GetImplementation( *this ).Clone( GetImplementation( object ) ) );
+  return Constraint(GetImplementation(*this).Clone(GetImplementation(object)));
 }
 
 Constraint::~Constraint()
 {
 }
 
-Constraint::Constraint( const Constraint& constraint ) = default;
+Constraint::Constraint(const Constraint& constraint) = default;
 
-Constraint& Constraint::operator=( const Constraint& rhs ) = default;
+Constraint& Constraint::operator=(const Constraint& rhs) = default;
 
-Constraint::Constraint( Constraint&& rhs ) = default;
+Constraint::Constraint(Constraint&& rhs) = default;
 
-Constraint& Constraint::operator=( Constraint&& rhs ) = default;
+Constraint& Constraint::operator=(Constraint&& rhs) = default;
 
-Constraint Constraint::DownCast( BaseHandle baseHandle )
+Constraint Constraint::DownCast(BaseHandle baseHandle)
 {
-  return Constraint( dynamic_cast< Dali::Internal::ConstraintBase* >( baseHandle.GetObjectPtr() ) );
+  return Constraint(dynamic_cast<Dali::Internal::ConstraintBase*>(baseHandle.GetObjectPtr()));
 }
 
-void Constraint::AddSource( ConstraintSource source )
+void Constraint::AddSource(ConstraintSource source)
 {
-  GetImplementation( *this ).AddSource( Internal::Source( source ) );
+  GetImplementation(*this).AddSource(Internal::Source(source));
 }
 
 void Constraint::Apply()
 {
-  GetImplementation( *this ).Apply();
+  GetImplementation(*this).Apply();
 }
 
 void Constraint::Remove()
 {
-  GetImplementation( *this ).Remove();
+  GetImplementation(*this).Remove();
 }
 
 Handle Constraint::GetTargetObject()
@@ -101,9 +99,9 @@ Constraint::RemoveAction Constraint::GetRemoveAction() const
   return GetImplementation(*this).GetRemoveAction();
 }
 
-void Constraint::SetTag( const uint32_t tag )
+void Constraint::SetTag(const uint32_t tag)
 {
-  GetImplementation(*this).SetTag( tag );
+  GetImplementation(*this).SetTag(tag);
 }
 
 uint32_t Constraint::GetTag() const
@@ -111,121 +109,121 @@ uint32_t Constraint::GetTag() const
   return GetImplementation(*this).GetTag();
 }
 
-Constraint::Constraint( Internal::ConstraintBase* constraint )
-: BaseHandle( constraint )
+Constraint::Constraint(Internal::ConstraintBase* constraint)
+: BaseHandle(constraint)
 {
 }
 
-Constraint Constraint::New( Handle handle, Property::Index targetIndex, Property::Type targetType, CallbackBase* function )
+Constraint Constraint::New(Handle handle, Property::Index targetIndex, Property::Type targetType, CallbackBase* function)
 {
-  Constraint constraint;
+  Constraint                constraint;
   Internal::SourceContainer sources;
-  Internal::Object& object = GetImplementation( handle );
+  Internal::Object&         object = GetImplementation(handle);
 
-  switch ( targetType )
+  switch(targetType)
   {
     case Property::BOOLEAN:
     {
-      Internal::PropertyConstraintPtr< bool >::Type funcPtr( CreatePropertyConstraint< bool >( function ) );
+      Internal::PropertyConstraintPtr<bool>::Type funcPtr(CreatePropertyConstraint<bool>(function));
 
-      constraint = Dali::Constraint( Internal::Constraint< bool >::New( object,
-                                                                        targetIndex,
-                                                                        sources,
-                                                                        funcPtr ) );
+      constraint = Dali::Constraint(Internal::Constraint<bool>::New(object,
+                                                                    targetIndex,
+                                                                    sources,
+                                                                    funcPtr));
       break;
     }
 
     case Property::FLOAT:
     {
-      Internal::PropertyConstraintPtr< float >::Type funcPtr( CreatePropertyConstraint< float >( function ) );
+      Internal::PropertyConstraintPtr<float>::Type funcPtr(CreatePropertyConstraint<float>(function));
 
-      constraint = Dali::Constraint( Internal::Constraint< float >::New( object,
-                                                                         targetIndex,
-                                                                         sources,
-                                                                         funcPtr ) );
+      constraint = Dali::Constraint(Internal::Constraint<float>::New(object,
+                                                                     targetIndex,
+                                                                     sources,
+                                                                     funcPtr));
       break;
     }
 
     case Property::INTEGER:
     {
-      Internal::PropertyConstraintPtr< int >::Type funcPtr( CreatePropertyConstraint< int >( function ) );
+      Internal::PropertyConstraintPtr<int>::Type funcPtr(CreatePropertyConstraint<int>(function));
 
-      constraint = Dali::Constraint( Internal::Constraint< int >::New( object,
-                                                                       targetIndex,
-                                                                       sources,
-                                                                       funcPtr ) );
+      constraint = Dali::Constraint(Internal::Constraint<int>::New(object,
+                                                                   targetIndex,
+                                                                   sources,
+                                                                   funcPtr));
       break;
     }
 
     case Property::VECTOR2:
     {
-      Internal::PropertyConstraintPtr< Vector2 >::Type funcPtr( CreatePropertyConstraint< Vector2 >( function ) );
+      Internal::PropertyConstraintPtr<Vector2>::Type funcPtr(CreatePropertyConstraint<Vector2>(function));
 
-      constraint = Dali::Constraint( Internal::Constraint< Vector2 >::New( object,
-                                                                           targetIndex,
-                                                                           sources,
-                                                                           funcPtr ) );
+      constraint = Dali::Constraint(Internal::Constraint<Vector2>::New(object,
+                                                                       targetIndex,
+                                                                       sources,
+                                                                       funcPtr));
       break;
     }
 
     case Property::VECTOR3:
     {
-      Internal::PropertyConstraintPtr< Vector3 >::Type funcPtr( CreatePropertyConstraint< Vector3 >( function ) );
+      Internal::PropertyConstraintPtr<Vector3>::Type funcPtr(CreatePropertyConstraint<Vector3>(function));
 
-      constraint = Dali::Constraint( Internal::Constraint< Vector3 >::New( object,
-                                                                           targetIndex,
-                                                                           sources,
-                                                                           funcPtr ) );
+      constraint = Dali::Constraint(Internal::Constraint<Vector3>::New(object,
+                                                                       targetIndex,
+                                                                       sources,
+                                                                       funcPtr));
       break;
     }
 
     case Property::VECTOR4:
     {
-      Internal::PropertyConstraintPtr< Vector4 >::Type funcPtr( CreatePropertyConstraint< Vector4 >( function ) );
+      Internal::PropertyConstraintPtr<Vector4>::Type funcPtr(CreatePropertyConstraint<Vector4>(function));
 
-      constraint = Dali::Constraint( Internal::Constraint< Vector4 >::New( object,
-                                                                           targetIndex,
-                                                                           sources,
-                                                                           funcPtr ) );
+      constraint = Dali::Constraint(Internal::Constraint<Vector4>::New(object,
+                                                                       targetIndex,
+                                                                       sources,
+                                                                       funcPtr));
       break;
     }
 
     case Property::ROTATION:
     {
-      Internal::PropertyConstraintPtr< Quaternion >::Type funcPtr( CreatePropertyConstraint< Quaternion >( function ) );
+      Internal::PropertyConstraintPtr<Quaternion>::Type funcPtr(CreatePropertyConstraint<Quaternion>(function));
 
-      constraint = Dali::Constraint( Internal::Constraint< Quaternion >::New( object,
-                                                                              targetIndex,
-                                                                              sources,
-                                                                              funcPtr ) );
+      constraint = Dali::Constraint(Internal::Constraint<Quaternion>::New(object,
+                                                                          targetIndex,
+                                                                          sources,
+                                                                          funcPtr));
       break;
     }
 
     case Property::MATRIX:
     {
-      Internal::PropertyConstraintPtr< Matrix >::Type funcPtr( CreatePropertyConstraint< Matrix >( function ) );
+      Internal::PropertyConstraintPtr<Matrix>::Type funcPtr(CreatePropertyConstraint<Matrix>(function));
 
-      constraint = Dali::Constraint( Internal::Constraint< Matrix >::New( object,
-                                                                          targetIndex,
-                                                                          sources,
-                                                                          funcPtr ) );
+      constraint = Dali::Constraint(Internal::Constraint<Matrix>::New(object,
+                                                                      targetIndex,
+                                                                      sources,
+                                                                      funcPtr));
       break;
     }
 
     case Property::MATRIX3:
     {
-      Internal::PropertyConstraintPtr<Matrix3>::Type funcPtr( CreatePropertyConstraint<Matrix3>( function ) );
+      Internal::PropertyConstraintPtr<Matrix3>::Type funcPtr(CreatePropertyConstraint<Matrix3>(function));
 
-      constraint = Dali::Constraint( Internal::Constraint< Matrix3 >::New( object,
-                                                                           targetIndex,
-                                                                           sources,
-                                                                           funcPtr ) );
+      constraint = Dali::Constraint(Internal::Constraint<Matrix3>::New(object,
+                                                                       targetIndex,
+                                                                       sources,
+                                                                       funcPtr));
       break;
     }
 
     default:
     {
-      DALI_ABORT( "Property not constrainable" );
+      DALI_ABORT("Property not constrainable");
       break;
     }
   }

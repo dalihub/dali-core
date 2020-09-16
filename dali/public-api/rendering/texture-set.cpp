@@ -16,20 +16,19 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/rendering/texture-set.h>          // Dali::TextureSet
+#include <dali/public-api/rendering/texture-set.h> // Dali::TextureSet
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/rendering/texture-set-impl.h> // Dali::Internal::TextureSet
 #include <dali/internal/event/rendering/sampler-impl.h>     // Dali::Internal::Sampler
 #include <dali/internal/event/rendering/shader-impl.h>      // Dali::Internal::Shader
+#include <dali/internal/event/rendering/texture-set-impl.h> // Dali::Internal::TextureSet
 
 namespace Dali
 {
-
 TextureSet TextureSet::New()
 {
   Internal::TextureSetPtr textureSet = Internal::TextureSet::New();
-  return TextureSet( textureSet.Get() );
+  return TextureSet(textureSet.Get());
 }
 
 TextureSet::TextureSet()
@@ -40,55 +39,55 @@ TextureSet::~TextureSet()
 {
 }
 
-TextureSet::TextureSet( const TextureSet& handle ) = default;
+TextureSet::TextureSet(const TextureSet& handle) = default;
 
-TextureSet TextureSet::DownCast( BaseHandle handle )
+TextureSet TextureSet::DownCast(BaseHandle handle)
 {
-  return TextureSet( dynamic_cast<Dali::Internal::TextureSet*>(handle.GetObjectPtr()));
+  return TextureSet(dynamic_cast<Dali::Internal::TextureSet*>(handle.GetObjectPtr()));
 }
 
-TextureSet& TextureSet::operator=( const TextureSet& handle ) = default;
+TextureSet& TextureSet::operator=(const TextureSet& handle) = default;
 
-TextureSet::TextureSet( TextureSet&& rhs ) =  default;
+TextureSet::TextureSet(TextureSet&& rhs) = default;
 
-TextureSet& TextureSet::operator=( TextureSet&& rhs ) =  default;
+TextureSet& TextureSet::operator=(TextureSet&& rhs) = default;
 
-void TextureSet::SetTexture( size_t index, Texture texture )
+void TextureSet::SetTexture(size_t index, Texture texture)
 {
-  if( texture )
+  if(texture)
   {
-    Internal::TexturePtr texturePtr( &GetImplementation( texture ) );
-    GetImplementation(*this).SetTexture( static_cast<uint32_t>( index ), texturePtr ); // only support 4,294,967,295 textures
+    Internal::TexturePtr texturePtr(&GetImplementation(texture));
+    GetImplementation(*this).SetTexture(static_cast<uint32_t>(index), texturePtr); // only support 4,294,967,295 textures
   }
   else
   {
-    GetImplementation(*this).SetTexture( static_cast<uint32_t>( index ), NULL ); // only support 4,294,967,295 textures
+    GetImplementation(*this).SetTexture(static_cast<uint32_t>(index), nullptr); // only support 4,294,967,295 textures
   }
 }
 
-Texture TextureSet::GetTexture( size_t index ) const
+Texture TextureSet::GetTexture(size_t index) const
 {
-  Internal::Texture* texturePtr = GetImplementation(*this).GetTexture( static_cast<uint32_t>( index ) ); // only support 4,294,967,295 textures
-  return Dali::Texture( texturePtr );
+  Internal::Texture* texturePtr = GetImplementation(*this).GetTexture(static_cast<uint32_t>(index)); // only support 4,294,967,295 textures
+  return Dali::Texture(texturePtr);
 }
 
-void TextureSet::SetSampler( size_t index, Sampler sampler )
+void TextureSet::SetSampler(size_t index, Sampler sampler)
 {
-  if( sampler )
+  if(sampler)
   {
-    Internal::SamplerPtr samplerPtr( &GetImplementation( sampler ) );
-    GetImplementation(*this).SetSampler( static_cast<uint32_t>( index ), samplerPtr ); // only support 4,294,967,295 samplers
+    Internal::SamplerPtr samplerPtr(&GetImplementation(sampler));
+    GetImplementation(*this).SetSampler(static_cast<uint32_t>(index), samplerPtr); // only support 4,294,967,295 samplers
   }
   else
   {
-    GetImplementation(*this).SetSampler( static_cast<uint32_t>( index ), NULL ); // only support 4,294,967,295 samplers
+    GetImplementation(*this).SetSampler(static_cast<uint32_t>(index), nullptr); // only support 4,294,967,295 samplers
   }
 }
 
-Sampler TextureSet::GetSampler( size_t index ) const
+Sampler TextureSet::GetSampler(size_t index) const
 {
-  Internal::Sampler* samplerPtr = GetImplementation(*this).GetSampler( static_cast<uint32_t>( index ) ); // only support 4,294,967,295 samplers
-  return Dali::Sampler( samplerPtr );
+  Internal::Sampler* samplerPtr = GetImplementation(*this).GetSampler(static_cast<uint32_t>(index)); // only support 4,294,967,295 samplers
+  return Dali::Sampler(samplerPtr);
 }
 
 size_t TextureSet::GetTextureCount() const
@@ -96,8 +95,8 @@ size_t TextureSet::GetTextureCount() const
   return GetImplementation(*this).GetTextureCount();
 }
 
-TextureSet::TextureSet( Internal::TextureSet* pointer )
-: BaseHandle( pointer )
+TextureSet::TextureSet(Internal::TextureSet* pointer)
+: BaseHandle(pointer)
 {
 }
 

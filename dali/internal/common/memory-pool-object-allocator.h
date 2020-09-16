@@ -43,7 +43,7 @@ public:
    * @brief Constructor
    */
   MemoryPoolObjectAllocator()
-  : mPool( NULL )
+  : mPool( nullptr )
   {
     ResetMemoryPool();
   }

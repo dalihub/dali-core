@@ -2,7 +2,7 @@
 #define DALI_MATH_UTILS_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@
 #include <cstdint> // uint32_t
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/constants.h>
+#include <dali/public-api/common/dali-common.h>
 
 namespace Dali
 {
@@ -41,10 +41,10 @@ namespace Dali
  * @param[in] i Input number
  * @return The next power of two or i itself in case it's a power of two
  */
-inline uint32_t NextPowerOfTwo( uint32_t i )
+inline uint32_t NextPowerOfTwo(uint32_t i)
 {
   DALI_ASSERT_ALWAYS(i <= 1u << (sizeof(uint32_t) * 8 - 1) && "Return type cannot represent the next power of two greater than the argument.");
-  if(i==0u)
+  if(i == 0u)
   {
     return 1u;
   }
@@ -66,7 +66,7 @@ inline uint32_t NextPowerOfTwo( uint32_t i )
  * @param[in] i Input number
  * @return    True if i is power of two.
  */
-inline bool IsPowerOfTwo( uint32_t i )
+inline bool IsPowerOfTwo(uint32_t i)
 {
   return (i != 0u) && ((i & (i - 1u)) == 0u);
 }
@@ -80,12 +80,12 @@ inline bool IsPowerOfTwo( uint32_t i )
  * @param[in] max The maximum allowed value.
  * @return T the clamped value
  */
-template< typename T >
-inline const T& Clamp( const T& value, const T& min, const T& max )
+template<typename T>
+inline const T& Clamp(const T& value, const T& min, const T& max)
 {
-  const T& constrainedUpper = value < max ? value : max;
+  const T& constrainedUpper         = value < max ? value : max;
   const T& constrainedUpperAndLower = constrainedUpper > min ? constrainedUpper : min;
-  return  constrainedUpperAndLower;
+  return constrainedUpperAndLower;
 }
 
 /**
@@ -96,14 +96,13 @@ inline const T& Clamp( const T& value, const T& min, const T& max )
  * @param[in] min The minimum allowed value.
  * @param[in] max The maximum allowed value.
  */
-template< typename T >
-inline void ClampInPlace( T& value, const T& min, const T& max )
+template<typename T>
+inline void ClampInPlace(T& value, const T& min, const T& max)
 {
-  const T& constrainedUpper = value < max ? value : max;
+  const T& constrainedUpper         = value < max ? value : max;
   const T& constrainedUpperAndLower = constrainedUpper > min ? constrainedUpper : min;
-  value = constrainedUpperAndLower;
+  value                             = constrainedUpperAndLower;
 }
-
 
 /**
  * @brief Linear interpolation between two values.
@@ -115,8 +114,8 @@ inline void ClampInPlace( T& value, const T& min, const T& max )
  * @param[in] high   Highest value in range
  * @return A value between low and high.
  */
-template< typename T >
-inline const T Lerp( const float offset, const T& low, const T& high )
+template<typename T>
+inline const T Lerp(const float offset, const T& low, const T& high)
 {
   return low + ((high - low) * Clamp(offset, 0.0f, 1.0f));
 }
@@ -129,31 +128,31 @@ inline const T Lerp( const float offset, const T& low, const T& high )
  * @param[in] b the second value in the range.
  * @return a suitable epsilon
  */
-inline float GetRangedEpsilon( float a, float b )
+inline float GetRangedEpsilon(float a, float b)
 {
-  const float absA = fabsf( a );
-  const float absB = fabsf( b );
-  const float absF = absA > absB ? absA : absB;
-  const int32_t absI = static_cast<int32_t>( absF ); // truncated
+  const float   absA = fabsf(a);
+  const float   absB = fabsf(b);
+  const float   absF = absA > absB ? absA : absB;
+  const int32_t absI = static_cast<int32_t>(absF); // truncated
 
   float epsilon = Math::MACHINE_EPSILON_10000;
-  if (absF < 0.1f)
+  if(absF < 0.1f)
   {
     return Math::MACHINE_EPSILON_0;
   }
-  else if (absI < 2)
+  else if(absI < 2)
   {
     return Math::MACHINE_EPSILON_1;
   }
-  else if (absI < 20)
+  else if(absI < 20)
   {
     return Math::MACHINE_EPSILON_10;
   }
-  else if (absI < 200)
+  else if(absI < 200)
   {
     return Math::MACHINE_EPSILON_100;
   }
-  else if (absI < 2000)
+  else if(absI < 2000)
   {
     return Math::MACHINE_EPSILON_1000;
   }
@@ -171,7 +170,7 @@ inline float GetRangedEpsilon( float a, float b )
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wfloat-equal"
 #endif
-inline bool EqualsZero( float value )
+inline bool EqualsZero(float value)
 {
   return value == 0.0f;
 }
@@ -187,9 +186,9 @@ inline bool EqualsZero( float value )
  * @param[in] b the second value to compare
  * @return true if the values are equal within a minimal epsilon for their values
  */
-inline bool Equals( float a, float b )
+inline bool Equals(float a, float b)
 {
-  return ( fabsf( a - b ) <= GetRangedEpsilon( a, b ) );
+  return (fabsf(a - b) <= GetRangedEpsilon(a, b));
 }
 
 /**
@@ -201,9 +200,9 @@ inline bool Equals( float a, float b )
  * @param[in] epsilon the minimum epsilon value that will be used to consider the values different
  * @return true if the difference between the values is less than the epsilon
  */
-inline bool Equals( float a, float b, float epsilon )
+inline bool Equals(float a, float b, float epsilon)
 {
-  return ( fabsf( a - b ) <= epsilon );
+  return (fabsf(a - b) <= epsilon);
 }
 
 /**
@@ -214,12 +213,12 @@ inline bool Equals( float a, float b, float epsilon )
  * @param[in] pos decimal place
  * @return a rounded float
  */
-inline float Round( float value, int32_t pos )
+inline float Round(float value, int32_t pos)
 {
   float temp;
-  temp = value * powf( 10.f, static_cast<float>( pos ) );
-  temp = floorf( temp + 0.5f );
-  temp *= powf( 10.f, static_cast<float>( -pos ) );
+  temp = value * powf(10.f, static_cast<float>(pos));
+  temp = floorf(temp + 0.5f);
+  temp *= powf(10.f, static_cast<float>(-pos));
   return temp;
 }
 
@@ -271,7 +270,6 @@ inline float WrapInDomain(float x, float start, float end)
   return start;
 }
 
-
 /**
  * @brief Find the shortest distance (magnitude) and direction (sign)
  * from (a) to (b) in domain (start) to (end).
@@ -303,30 +301,30 @@ inline float WrapInDomain(float x, float start, float end)
  * (start) to (end).
  *
  */
-inline float ShortestDistanceInDomain( float a, float b, float start, float end )
+inline float ShortestDistanceInDomain(float a, float b, float start, float end)
 {
   //  (a-start + end-b)
-  float size = end-start;
-  float vect = b-a;
+  float size = end - start;
+  float vect = b - a;
 
   if(vect > 0)
   {
     // +ve vector, let's try perspective 1 domain to the right,
     // and see if closer.
-    float aRight = a+size;
-    if( aRight-b < vect )
+    float aRight = a + size;
+    if(aRight - b < vect)
     {
-      return b-aRight;
+      return b - aRight;
     }
   }
   else
   {
     // -ve vector, let's try perspective 1 domain to the left,
     // and see if closer.
-    float aLeft = a-size;
-    if( aLeft-b > vect )
+    float aLeft = a - size;
+    if(aLeft - b > vect)
     {
-      return b-aLeft;
+      return b - aLeft;
     }
   }
 
@@ -340,10 +338,10 @@ inline float ShortestDistanceInDomain( float a, float b, float start, float end 
  * @param[in] value The value we want to extract the sign
  * @return -1 for negative values, +1 for positive values and 0 if value is 0
  */
-template <typename T>
-int32_t Sign( T value )
+template<typename T>
+int32_t Sign(T value)
 {
-  return ( T(0) < value ) - ( value < T(0) );
+  return (T(0) < value) - (value < T(0));
 }
 
 /**

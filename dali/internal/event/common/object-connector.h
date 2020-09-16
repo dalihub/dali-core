@@ -36,7 +36,7 @@ template<typename Object>
 class ObjectConnector
 {
 public:
-  typedef IntrusivePtr<Object> ObjectPtr;
+  using ObjectPtr = IntrusivePtr<Object>;
 
   /**
    * @brief Default constructor.

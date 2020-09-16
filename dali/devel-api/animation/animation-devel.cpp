@@ -18,28 +18,26 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/animation/animation-devel.h>
 #include <dali/internal/event/animation/animation-impl.h>
-#include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/animation/animation-playlist.h>
+#include <dali/internal/event/common/thread-local-storage.h>
 
 namespace Dali
 {
-
 namespace DevelAnimation
 {
-
-void SetProgressNotification( Animation animation, float progress )
+void SetProgressNotification(Animation animation, float progress)
 {
-  GetImplementation(animation).SetProgressNotification( progress );
+  GetImplementation(animation).SetProgressNotification(progress);
 }
 
-float GetProgressNotification( Animation animation )
+float GetProgressNotification(Animation animation)
 {
   return GetImplementation(animation).GetProgressNotification();
 }
 
-Animation::AnimationSignalType& ProgressReachedSignal( Animation animation )
+Animation::AnimationSignalType& ProgressReachedSignal(Animation animation)
 {
-  return GetImplementation( animation ).ProgressReachedSignal();
+  return GetImplementation(animation).ProgressReachedSignal();
 }
 
 uint32_t GetAnimationCount()
@@ -48,10 +46,10 @@ uint32_t GetAnimationCount()
   return tls.GetAnimationPlaylist().GetAnimationCount();
 }
 
-Animation GetAnimationAt( uint32_t index )
+Animation GetAnimationAt(uint32_t index)
 {
   Dali::Internal::ThreadLocalStorage& tls = Dali::Internal::ThreadLocalStorage::Get();
-  return tls.GetAnimationPlaylist().GetAnimationAt( index );
+  return tls.GetAnimationPlaylist().GetAnimationAt(index);
 }
 
 } // namespace DevelAnimation

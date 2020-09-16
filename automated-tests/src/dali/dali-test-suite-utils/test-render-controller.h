@@ -2,7 +2,7 @@
 #define TEST_RENDER_CONTROLLER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,20 +19,19 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
 #include <dali/integration-api/render-controller.h>
+#include <dali/public-api/common/dali-common.h>
 
 namespace Dali
 {
-
 class DALI_CORE_API TestRenderController : public Dali::Integration::RenderController
 {
 public:
   TestRenderController();
-  ~TestRenderController();
+  ~TestRenderController() override;
 
-  virtual void RequestUpdate( bool forceUpdate );
-  virtual void RequestProcessEventsOnIdle( bool forceProcess );
+  void RequestUpdate(bool forceUpdate) override;
+  void RequestProcessEventsOnIdle(bool forceProcess) override;
 
   typedef enum
   {
@@ -43,12 +42,11 @@ public:
   bool WasCalled(TestRenderControllerFuncEnum func);
   void Initialize();
 
-
 private:
   bool mRequestUpdateCalled;
   bool mRequestProcessEventsOnIdleCalled;
 };
 
-} // Dali
+} // namespace Dali
 
 #endif // TEST_RENDER_CONTROLLER_H

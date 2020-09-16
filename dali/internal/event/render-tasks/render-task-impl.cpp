@@ -64,7 +64,7 @@ DALI_PROPERTY_TABLE_END( DEFAULT_OBJECT_PROPERTY_START_INDEX, RenderTaskDefaultP
 
 const char* const SIGNAL_FINISHED = "finished";
 
-TypeRegistration mType( typeid( Dali::RenderTask ), typeid( Dali::BaseHandle ), NULL, RenderTaskDefaultProperties );
+TypeRegistration mType( typeid( Dali::RenderTask ), typeid( Dali::BaseHandle ), nullptr, RenderTaskDefaultProperties );
 
 SignalConnectorType signalConnector1( mType, SIGNAL_FINISHED, &RenderTask::DoConnectSignal );
 
@@ -168,7 +168,7 @@ CameraActor* RenderTask::GetCameraActor() const
 void RenderTask::SetFrameBuffer( FrameBufferPtr frameBuffer )
 {
   mFrameBuffer = frameBuffer;
-  Render::FrameBuffer* renderFrameBufferPtr( NULL );
+  Render::FrameBuffer* renderFrameBufferPtr( nullptr );
   if( frameBuffer )
   {
     renderFrameBufferPtr = mFrameBuffer->GetRenderObject();
@@ -652,7 +652,7 @@ void RenderTask::OnNotifyDefaultPropertyAnimation( Animation& animation, Propert
 
 const SceneGraph::PropertyBase* RenderTask::GetSceneObjectAnimatableProperty( Property::Index index ) const
 {
-  const SceneGraph::PropertyBase* property( NULL );
+  const SceneGraph::PropertyBase* property( nullptr );
 
   switch ( index )
   {

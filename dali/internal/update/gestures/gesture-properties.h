@@ -62,14 +62,14 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~GestureProperty()
+  ~GestureProperty() override
   {
   }
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
    */
-  virtual Dali::Property::Type GetType() const
+  Dali::Property::Type GetType() const override
   {
     return Dali::PropertyTypes::Get< T >();
   }
@@ -85,7 +85,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::InputInitialized()
    */
-  virtual bool InputInitialized() const
+  bool InputInitialized() const override
   {
     // A constraint cannot use the property until it has been inherited (at least once).
     return true;
@@ -95,7 +95,7 @@ public:
    * @copydoc Dali::Internal::PropertyInputImpl::InputChanged()
    * @note A constraint can only receive the inherited property from the previous frame.
    */
-  virtual bool InputChanged() const
+  bool InputChanged() const override
   {
     return mInputChanged;
   }
@@ -151,14 +151,14 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~GesturePropertyVector2()
+  ~GesturePropertyVector2() override
   {
   }
 
   /**
    * @copydoc Dali::PropertyInput::GetVector2()
    */
-  virtual const Vector2& GetVector2( BufferIndex bufferIndex ) const
+  const Vector2& GetVector2( BufferIndex bufferIndex ) const override
   {
     return mValue;
   }
@@ -174,14 +174,14 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~GesturePropertyBool()
+  ~GesturePropertyBool() override
   {
   }
 
   /**
    * @copydoc Dali::PropertyInput::GetBoolean()
    */
-  virtual const bool& GetBoolean( BufferIndex bufferIndex ) const
+  const bool& GetBoolean( BufferIndex bufferIndex ) const override
   {
     return mValue;
   }

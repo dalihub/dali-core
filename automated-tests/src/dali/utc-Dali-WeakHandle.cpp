@@ -15,14 +15,13 @@
  *
  */
 
-#include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
+#include <dali/public-api/dali-core.h>
 
 using namespace Dali;
 
 namespace
 {
-
 /*******************************************************************************
  *
  * Custom Actor
@@ -32,21 +31,24 @@ namespace Impl
 {
 struct MyTestCustomActor : public CustomActorImpl
 {
-  typedef Signal< void ()> SignalType;
-  typedef Signal< void (float)> SignalTypeFloat;
+  typedef Signal<void()>      SignalType;
+  typedef Signal<void(float)> SignalTypeFloat;
 
-  MyTestCustomActor() : CustomActorImpl( ActorFlags() )
-  { }
+  MyTestCustomActor()
+  : CustomActorImpl(ActorFlags())
+  {
+  }
 
   virtual ~MyTestCustomActor()
-  { }
+  {
+  }
 
   void ResetCallStack()
   {
   }
 
   // From CustomActorImpl
-  virtual void OnSceneConnection( int depth )
+  virtual void OnSceneConnection(int depth)
   {
   }
   virtual void OnSceneDisconnection()
@@ -72,47 +74,46 @@ struct MyTestCustomActor : public CustomActorImpl
   }
   virtual Vector3 GetNaturalSize()
   {
-    return Vector3( 0.0f, 0.0f, 0.0f );
+    return Vector3(0.0f, 0.0f, 0.0f);
   }
 
-  virtual float GetHeightForWidth( float width )
+  virtual float GetHeightForWidth(float width)
   {
     return 0.0f;
   }
 
-  virtual float GetWidthForHeight( float height )
+  virtual float GetWidthForHeight(float height)
   {
     return 0.0f;
   }
 
-  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container )
+  virtual void OnRelayout(const Vector2& size, RelayoutContainer& container)
   {
   }
 
-  virtual void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension )
+  virtual void OnSetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension)
   {
   }
 
-  virtual void OnCalculateRelayoutSize( Dimension::Type dimension )
+  virtual void OnCalculateRelayoutSize(Dimension::Type dimension)
   {
   }
 
-  virtual float CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension )
+  virtual float CalculateChildSize(const Dali::Actor& child, Dimension::Type dimension)
   {
     return 0.0f;
   }
 
-  virtual void OnLayoutNegotiated( float size, Dimension::Type dimension )
+  virtual void OnLayoutNegotiated(float size, Dimension::Type dimension)
   {
   }
 
-  virtual bool RelayoutDependentOnChildren( Dimension::Type dimension = Dimension::ALL_DIMENSIONS )
+  virtual bool RelayoutDependentOnChildren(Dimension::Type dimension = Dimension::ALL_DIMENSIONS)
   {
     return false;
   }
 
 public:
-
   SignalType mSignal;
 };
 
@@ -121,9 +122,8 @@ public:
 class MyTestCustomActor : public CustomActor
 {
 public:
-
-  typedef Signal< void ()> SignalType;
-  typedef Signal< void (float)> SignalTypeFloat;
+  typedef Signal<void()>      SignalType;
+  typedef Signal<void(float)> SignalTypeFloat;
 
   MyTestCustomActor()
   {
@@ -132,25 +132,25 @@ public:
   static MyTestCustomActor New()
   {
     Impl::MyTestCustomActor* p = new Impl::MyTestCustomActor;
-    return MyTestCustomActor( *p ); // takes ownership
+    return MyTestCustomActor(*p); // takes ownership
   }
 
   virtual ~MyTestCustomActor()
   {
   }
 
-  static MyTestCustomActor DownCast( BaseHandle handle )
+  static MyTestCustomActor DownCast(BaseHandle handle)
   {
     MyTestCustomActor result;
 
-    CustomActor custom = Dali::CustomActor::DownCast( handle );
-    if ( custom )
+    CustomActor custom = Dali::CustomActor::DownCast(handle);
+    if(custom)
     {
       CustomActorImpl& customImpl = custom.GetImplementation();
 
       Impl::MyTestCustomActor* impl = dynamic_cast<Impl::MyTestCustomActor*>(&customImpl);
 
-      if (impl)
+      if(impl)
       {
         result = MyTestCustomActor(customImpl.GetOwner());
       }
@@ -162,7 +162,7 @@ public:
   SignalType& GetCustomSignal()
   {
     Dali::RefObject& obj = GetImplementation();
-    return static_cast<Impl::MyTestCustomActor&>( obj ).mSignal;
+    return static_cast<Impl::MyTestCustomActor&>(obj).mSignal;
   }
 
   MyTestCustomActor(Internal::CustomActor* internal)
@@ -170,13 +170,13 @@ public:
   {
   }
 
-  MyTestCustomActor( Impl::MyTestCustomActor& impl )
-  : CustomActor( impl )
+  MyTestCustomActor(Impl::MyTestCustomActor& impl)
+  : CustomActor(impl)
   {
   }
 };
 
-}
+} // namespace
 
 int UtcDaliWeakHandleBaseConstructorVoid(void)
 {
@@ -195,17 +195,17 @@ int UtcDaliWeakHandleBaseConstructorWithBaseHandle(void)
   TestApplication application;
   tet_infoline("Testing Dali::WeakHandleBase::WeakHandleBase(BaseHandle)");
 
-  BaseHandle emptyHandle;
+  BaseHandle     emptyHandle;
   WeakHandleBase emptyObject(emptyHandle);
   DALI_TEST_CHECK(!emptyObject.GetBaseHandle());
 
-  Actor actor = Actor::New();
+  Actor          actor = Actor::New();
   WeakHandleBase object(actor);
   DALI_TEST_CHECK(object.GetBaseHandle() == actor);
 
-  Animation animation = Animation::New( 1.0f );
-  WeakHandleBase animationObject( animation );
-  DALI_TEST_CHECK( animationObject.GetBaseHandle() == animation );
+  Animation      animation = Animation::New(1.0f);
+  WeakHandleBase animationObject(animation);
+  DALI_TEST_CHECK(animationObject.GetBaseHandle() == animation);
 
   END_TEST;
 }
@@ -253,16 +253,16 @@ int UtcDaliWeakHandleBaseMoveConstructor(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  DALI_TEST_EQUALS( 1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION ); // reference count of the actor is not increased
+  DALI_TEST_EQUALS(1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION); // reference count of the actor is not increased
 
-  WeakHandleBase object( actor );
-  DALI_TEST_CHECK( object.GetBaseHandle() == actor);
-  DALI_TEST_EQUALS( 1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION ); // reference count of the actor is not increased
+  WeakHandleBase object(actor);
+  DALI_TEST_CHECK(object.GetBaseHandle() == actor);
+  DALI_TEST_EQUALS(1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION); // reference count of the actor is not increased
 
-  WeakHandleBase move = std::move( object );
-  DALI_TEST_CHECK(move.GetBaseHandle() == actor );
-  DALI_TEST_EQUALS( 1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION ); // reference count of the actor is not increased
-  DALI_TEST_CHECK( !object.GetBaseHandle() ); // object moved
+  WeakHandleBase move = std::move(object);
+  DALI_TEST_CHECK(move.GetBaseHandle() == actor);
+  DALI_TEST_EQUALS(1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION); // reference count of the actor is not increased
+  DALI_TEST_CHECK(!object.GetBaseHandle());                                   // object moved
 
   END_TEST;
 }
@@ -272,17 +272,17 @@ int UtcDaliWeakHandleBaseMoveAssignment(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  DALI_TEST_EQUALS( 1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION ); // reference count of the actor is not increased
+  DALI_TEST_EQUALS(1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION); // reference count of the actor is not increased
 
-  WeakHandleBase object( actor );
-  DALI_TEST_CHECK( object.GetBaseHandle() == actor);
-  DALI_TEST_EQUALS( 1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION ); // reference count of the actor is not increased
+  WeakHandleBase object(actor);
+  DALI_TEST_CHECK(object.GetBaseHandle() == actor);
+  DALI_TEST_EQUALS(1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION); // reference count of the actor is not increased
 
   WeakHandleBase move;
-  move = std::move( object );
-  DALI_TEST_CHECK(move.GetBaseHandle() == actor );
-  DALI_TEST_EQUALS( 1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION ); // reference count of the actor is not increased
-  DALI_TEST_CHECK( !object.GetBaseHandle() ); // object moved
+  move = std::move(object);
+  DALI_TEST_CHECK(move.GetBaseHandle() == actor);
+  DALI_TEST_EQUALS(1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION); // reference count of the actor is not increased
+  DALI_TEST_CHECK(!object.GetBaseHandle());                                   // object moved
 
   END_TEST;
 }
@@ -318,7 +318,7 @@ int UtcDaliWeakHandleBaseEqualityOperatorN(void)
   WeakHandleBase object(actor);
   DALI_TEST_CHECK(object.GetBaseHandle() == actor);
 
-  Actor differentActor = Actor::New();
+  Actor          differentActor = Actor::New();
   WeakHandleBase aDifferentWeakHandleBase(differentActor);
 
   DALI_TEST_CHECK(!(object == aDifferentWeakHandleBase));
@@ -336,7 +336,7 @@ int UtcDaliWeakHandleBaseInequalityOperatorP(void)
   WeakHandleBase object(actor);
   DALI_TEST_CHECK(object.GetBaseHandle() == actor);
 
-  Actor differentActor = Actor::New();
+  Actor          differentActor = Actor::New();
   WeakHandleBase aDifferentWeakHandleBase(differentActor);
 
   DALI_TEST_CHECK(object != aDifferentWeakHandleBase);
@@ -364,31 +364,31 @@ int UtcDaliWeakHandleBaseGetBaseHandle(void)
   TestApplication application;
   tet_infoline("Testing Dali::WeakHandleBase::GetBaseHandle()");
 
-  Handle emptyHandle;
+  Handle         emptyHandle;
   WeakHandleBase emptyObject(emptyHandle);
   DALI_TEST_CHECK(!emptyObject.GetBaseHandle());
 
-  Actor actor = Actor::New();
+  Actor          actor = Actor::New();
   WeakHandleBase object(actor);
   DALI_TEST_CHECK(object.GetBaseHandle() == actor);
 
   WeakHandleBase theSameObject = WeakHandleBase(actor);
   DALI_TEST_CHECK(object.GetBaseHandle() == theSameObject.GetBaseHandle());
 
-  Actor differentActor = Actor::New();
+  Actor          differentActor = Actor::New();
   WeakHandleBase aDifferentWeakHandleBase(differentActor);
   DALI_TEST_CHECK(object.GetBaseHandle() != aDifferentWeakHandleBase.GetBaseHandle());
 
-  Animation animation = Animation::New( 1.0f );
-  WeakHandleBase animationObject( animation );
-  DALI_TEST_CHECK( animationObject.GetBaseHandle() == animation );
+  Animation      animation = Animation::New(1.0f);
+  WeakHandleBase animationObject(animation);
+  DALI_TEST_CHECK(animationObject.GetBaseHandle() == animation);
 
-  WeakHandleBase theSameAnimationObject = WeakHandleBase( animation );
-  DALI_TEST_CHECK( animationObject.GetBaseHandle() == theSameAnimationObject.GetBaseHandle() );
+  WeakHandleBase theSameAnimationObject = WeakHandleBase(animation);
+  DALI_TEST_CHECK(animationObject.GetBaseHandle() == theSameAnimationObject.GetBaseHandle());
 
-  Animation differentAnimation = Animation::New( 1.0f );
-  WeakHandleBase aDifferentAnimationObject( differentAnimation );
-  DALI_TEST_CHECK( animationObject.GetBaseHandle() != aDifferentAnimationObject.GetBaseHandle() );
+  Animation      differentAnimation = Animation::New(1.0f);
+  WeakHandleBase aDifferentAnimationObject(differentAnimation);
+  DALI_TEST_CHECK(animationObject.GetBaseHandle() != aDifferentAnimationObject.GetBaseHandle());
 
   END_TEST;
 }
@@ -396,9 +396,9 @@ int UtcDaliWeakHandleBaseGetBaseHandle(void)
 int UtcDaliWeakHandleBaseReset(void)
 {
   TestApplication application;
-  tet_infoline( "Testing Daku::WeakHandleBase::Reset()" );
+  tet_infoline("Testing Daku::WeakHandleBase::Reset()");
 
-  Actor actor = Actor::New();
+  Actor          actor = Actor::New();
   WeakHandleBase object(actor);
   DALI_TEST_CHECK(object.GetBaseHandle() == actor);
 
@@ -415,22 +415,22 @@ int UtcDaliWeakHandleGetHandle(void)
   TestApplication application;
   tet_infoline("Testing Dali::WeakHandle::GetHandle()");
 
-  Actor actor = Actor::New();
+  Actor             actor = Actor::New();
   WeakHandle<Actor> object(actor);
   DALI_TEST_CHECK(object.GetHandle() == actor);
 
-  MyTestCustomActor customActor = MyTestCustomActor::New();
+  MyTestCustomActor             customActor = MyTestCustomActor::New();
   WeakHandle<MyTestCustomActor> customObject(customActor);
   DALI_TEST_CHECK(customObject.GetHandle() == customActor);
 
   DALI_TEST_CHECK(object.GetHandle() != customObject.GetHandle());
 
-  Animation animation = Animation::New( 1.0f );
-  WeakHandle<Animation>  animationObject( animation );
-  DALI_TEST_CHECK( animationObject.GetHandle() == animation );
+  Animation             animation = Animation::New(1.0f);
+  WeakHandle<Animation> animationObject(animation);
+  DALI_TEST_CHECK(animationObject.GetHandle() == animation);
 
   animation.Reset();
-  DALI_TEST_CHECK( animationObject.GetHandle() == Animation() );
+  DALI_TEST_CHECK(animationObject.GetHandle() == Animation());
 
   END_TEST;
 }
@@ -440,16 +440,16 @@ int UtcDaliWeakHandleMoveConstructor(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  DALI_TEST_EQUALS( 1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION ); // reference count of the actor is not increased
+  DALI_TEST_EQUALS(1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION); // reference count of the actor is not increased
 
-  WeakHandle<Actor> object( actor );
-  DALI_TEST_CHECK( object.GetHandle() == actor );
-  DALI_TEST_EQUALS( 1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION ); // reference count of the actor is not increased
+  WeakHandle<Actor> object(actor);
+  DALI_TEST_CHECK(object.GetHandle() == actor);
+  DALI_TEST_EQUALS(1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION); // reference count of the actor is not increased
 
-  WeakHandle<Actor> move = std::move( object );
-  DALI_TEST_CHECK( move.GetHandle() == actor );
-  DALI_TEST_EQUALS( 1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION ); // reference count of the actor is not increased
-  DALI_TEST_CHECK( !object.GetHandle() ); // object moved
+  WeakHandle<Actor> move = std::move(object);
+  DALI_TEST_CHECK(move.GetHandle() == actor);
+  DALI_TEST_EQUALS(1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION); // reference count of the actor is not increased
+  DALI_TEST_CHECK(!object.GetHandle());                                       // object moved
 
   END_TEST;
 }
@@ -459,17 +459,17 @@ int UtcDaliWeakHandleMoveAssignment(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  DALI_TEST_EQUALS( 1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION ); // reference count of the actor is not increased
+  DALI_TEST_EQUALS(1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION); // reference count of the actor is not increased
 
-  WeakHandle<Actor> object( actor );
-  DALI_TEST_CHECK( object.GetHandle() == actor );
-  DALI_TEST_EQUALS( 1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION ); // reference count of the actor is not increased
+  WeakHandle<Actor> object(actor);
+  DALI_TEST_CHECK(object.GetHandle() == actor);
+  DALI_TEST_EQUALS(1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION); // reference count of the actor is not increased
 
   WeakHandle<Actor> move;
-  move = std::move( object );
-  DALI_TEST_CHECK( move.GetHandle() == actor );
-  DALI_TEST_EQUALS( 1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION ); // reference count of the actor is not increased
-  DALI_TEST_CHECK( !object.GetHandle() ); // object moved
+  move = std::move(object);
+  DALI_TEST_CHECK(move.GetHandle() == actor);
+  DALI_TEST_EQUALS(1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION); // reference count of the actor is not increased
+  DALI_TEST_CHECK(!object.GetHandle());                                       // object moved
 
   END_TEST;
 }

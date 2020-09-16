@@ -94,12 +94,12 @@ public:
   /**
    * @copydoc Dali::Internal::GlResourceOwner::GlContextDestroyed()
    */
-  void GlContextDestroyed();
+  void GlContextDestroyed() override;
 
   /**
    * @copydoc Dali::Internal::GlResourceOwner::GlCleanup()
    */
-  void GlCleanup();
+  void GlCleanup() override;
 
   /**
    * Create a new renderer instance
@@ -176,7 +176,7 @@ public:
   /**
    * Destructor
    */
-  ~Renderer();
+  ~Renderer() override;
 
   /**
    * Set the face-culling mode.
@@ -459,7 +459,7 @@ private:
     const PropertyInputImpl*   propertyValue;
   };
 
-  typedef Dali::Vector< UniformIndexMap > UniformIndexMappings;
+  using UniformIndexMappings = Dali::Vector<UniformIndexMap>;
 
   UniformIndexMappings         mUniformIndexMap;
   Vector<GLint>                mAttributesLocation;

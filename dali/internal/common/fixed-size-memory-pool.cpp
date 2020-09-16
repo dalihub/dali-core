@@ -51,7 +51,7 @@ struct FixedSizeMemoryPool::Impl
      * @param size The size of the memory block to allocate in bytes. Must be non-zero.
      */
     Block( SizeType size )
-    : nextBlock( NULL )
+    : nextBlock( nullptr )
 #ifdef DEBUG_ENABLED
       ,mBlockSize( size )
 #endif
@@ -87,7 +87,7 @@ struct FixedSizeMemoryPool::Impl
      mCurrentBlock( &mMemoryBlocks ),
      mCurrentBlockCapacity( initialCapacity ),
      mCurrentBlockSize( 0 ),
-     mDeletedObjects( NULL )
+     mDeletedObjects( nullptr )
   {
     // We need enough room to store the deleted list in the data
     DALI_ASSERT_DEBUG( mFixedSize >= sizeof( void* ) );

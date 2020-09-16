@@ -19,66 +19,65 @@
 #include <dali/public-api/events/hover-event.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/actors/actor.h>
 #include <dali/internal/event/events/hover-event-impl.h>
+#include <dali/public-api/actors/actor.h>
 
 namespace Dali
 {
-
 HoverEvent::HoverEvent()
 : BaseHandle()
 {
 }
 
-HoverEvent::HoverEvent( const HoverEvent& rhs ) = default;
+HoverEvent::HoverEvent(const HoverEvent& rhs) = default;
 
-HoverEvent::HoverEvent( HoverEvent&& rhs ) = default;
+HoverEvent::HoverEvent(HoverEvent&& rhs) = default;
 
 HoverEvent::~HoverEvent()
 {
 }
 
-HoverEvent& HoverEvent::operator=( const HoverEvent& rhs ) = default;
+HoverEvent& HoverEvent::operator=(const HoverEvent& rhs) = default;
 
-HoverEvent& HoverEvent::operator=( HoverEvent&& rhs ) = default;
+HoverEvent& HoverEvent::operator=(HoverEvent&& rhs) = default;
 
 unsigned long HoverEvent::GetTime() const
 {
-  return GetImplementation( *this ).GetTime();
+  return GetImplementation(*this).GetTime();
 }
 
 std::size_t HoverEvent::GetPointCount() const
 {
-  return GetImplementation( *this ).GetPointCount();
+  return GetImplementation(*this).GetPointCount();
 }
 
-int32_t HoverEvent::GetDeviceId( std::size_t point ) const
+int32_t HoverEvent::GetDeviceId(std::size_t point) const
 {
-  return GetImplementation( *this ).GetDeviceId( point );
+  return GetImplementation(*this).GetDeviceId(point);
 }
 
-PointState::Type HoverEvent::GetState( std::size_t point ) const
+PointState::Type HoverEvent::GetState(std::size_t point) const
 {
-  return GetImplementation( *this ).GetState( point );
+  return GetImplementation(*this).GetState(point);
 }
 
-Actor HoverEvent::GetHitActor( std::size_t point ) const
+Actor HoverEvent::GetHitActor(std::size_t point) const
 {
-  return GetImplementation( *this ).GetHitActor( point );
+  return GetImplementation(*this).GetHitActor(point);
 }
 
-const Vector2& HoverEvent::GetLocalPosition( std::size_t point ) const
+const Vector2& HoverEvent::GetLocalPosition(std::size_t point) const
 {
-  return GetImplementation( *this ).GetLocalPosition( point );
+  return GetImplementation(*this).GetLocalPosition(point);
 }
 
-const Vector2& HoverEvent::GetScreenPosition( std::size_t point ) const
+const Vector2& HoverEvent::GetScreenPosition(std::size_t point) const
 {
-  return GetImplementation( *this ).GetScreenPosition( point );
+  return GetImplementation(*this).GetScreenPosition(point);
 }
 
-HoverEvent::HoverEvent( Internal::HoverEvent* internal )
-: BaseHandle( internal )
+HoverEvent::HoverEvent(Internal::HoverEvent* internal)
+: BaseHandle(internal)
 {
 }
 

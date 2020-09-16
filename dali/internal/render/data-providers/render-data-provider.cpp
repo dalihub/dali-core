@@ -25,8 +25,8 @@ namespace SceneGraph
 {
 
 RenderDataProvider::RenderDataProvider( AnimatableProperty< float >& opacity )
-: mUniformMapDataProvider( NULL ),
-  mShader( NULL ),
+: mUniformMapDataProvider( nullptr ),
+  mShader( nullptr ),
   mOpacity( opacity )
 {
 }

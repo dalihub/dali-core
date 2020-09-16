@@ -70,7 +70,7 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~RenderTask();
+  ~RenderTask() override;
 
   /**
    * Initialize the render task. Called in update thread
@@ -342,17 +342,17 @@ private: // from PropertyOwner::Observer
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerConnected( PropertyOwner& owner )
    */
-  void PropertyOwnerConnected( PropertyOwner& owner );
+  void PropertyOwnerConnected( PropertyOwner& owner ) override;
 
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerDisconnected( BufferIndex updateBufferIndex, PropertyOwner& owner )
    */
-  void PropertyOwnerDisconnected( BufferIndex updateBufferIndex, PropertyOwner& owner );
+  void PropertyOwnerDisconnected( BufferIndex updateBufferIndex, PropertyOwner& owner ) override;
 
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerDestroyed( PropertyOwner& owner )
    */
-  void PropertyOwnerDestroyed( PropertyOwner& owner );
+  void PropertyOwnerDestroyed( PropertyOwner& owner ) override;
 
 private:
 
@@ -401,7 +401,7 @@ private:
 // Messages for RenderTask
 inline void SetFrameBufferMessage( EventThreadServices& eventThreadServices, const RenderTask& task, Render::FrameBuffer* frameBuffer )
 {
-  typedef MessageValue1< RenderTask, Render::FrameBuffer*> LocalType;
+  using LocalType = MessageValue1<RenderTask, Render::FrameBuffer*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -412,7 +412,7 @@ inline void SetFrameBufferMessage( EventThreadServices& eventThreadServices, con
 
 inline void SetClearColorMessage( EventThreadServices& eventThreadServices, const RenderTask& task, const Vector4& value )
 {
-  typedef MessageDoubleBuffered1< RenderTask, Vector4 > LocalType;
+  using LocalType = MessageDoubleBuffered1<RenderTask, Vector4>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -423,7 +423,7 @@ inline void SetClearColorMessage( EventThreadServices& eventThreadServices, cons
 
 inline void BakeClearColorMessage( EventThreadServices& eventThreadServices, const RenderTask& task, const Vector4& value )
 {
-  typedef MessageDoubleBuffered1< RenderTask, Vector4 > LocalType;
+  using LocalType = MessageDoubleBuffered1<RenderTask, Vector4>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -434,7 +434,7 @@ inline void BakeClearColorMessage( EventThreadServices& eventThreadServices, con
 
 inline void SetClearEnabledMessage( EventThreadServices& eventThreadServices, const RenderTask& task, bool enabled )
 {
-  typedef MessageValue1< RenderTask, bool > LocalType;
+  using LocalType = MessageValue1<RenderTask, bool>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -445,7 +445,7 @@ inline void SetClearEnabledMessage( EventThreadServices& eventThreadServices, co
 
 inline void SetCullModeMessage( EventThreadServices& eventThreadServices, const RenderTask& task, bool mode )
 {
-  typedef MessageValue1< RenderTask, bool > LocalType;
+  using LocalType = MessageValue1<RenderTask, bool>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -456,7 +456,7 @@ inline void SetCullModeMessage( EventThreadServices& eventThreadServices, const 
 
 inline void SetRefreshRateMessage( EventThreadServices& eventThreadServices, const RenderTask& task, uint32_t refreshRate )
 {
-  typedef MessageValue1< RenderTask, uint32_t > LocalType;
+  using LocalType = MessageValue1<RenderTask, uint32_t>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -470,7 +470,7 @@ inline void SetSourceNodeMessage( EventThreadServices& eventThreadServices, cons
   // Scene graph thread can destroy this object.
   Node* node = const_cast< Node* >( constNode );
 
-  typedef MessageValue1< RenderTask, Node* > LocalType;
+  using LocalType = MessageValue1<RenderTask, Node*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -481,7 +481,7 @@ inline void SetSourceNodeMessage( EventThreadServices& eventThreadServices, cons
 
 inline void SetCameraMessage( EventThreadServices& eventThreadServices, const RenderTask& task, const Node* constNode, const Camera* constCamera )
 {
-  typedef MessageValue2< RenderTask, Node*, Camera* > LocalType;
+  using LocalType = MessageValue2<RenderTask, Node*, Camera*>;
 
   Node* node = const_cast< Node* >( constNode );
   Camera* camera = const_cast< Camera* >( constCamera );
@@ -494,7 +494,7 @@ inline void SetCameraMessage( EventThreadServices& eventThreadServices, const Re
 
 inline void SetExclusiveMessage( EventThreadServices& eventThreadServices, const RenderTask& task, bool exclusive )
 {
-  typedef MessageValue1< RenderTask, bool > LocalType;
+  using LocalType = MessageValue1<RenderTask, bool>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -505,7 +505,7 @@ inline void SetExclusiveMessage( EventThreadServices& eventThreadServices, const
 
 inline void SetSyncRequiredMessage(EventThreadServices& eventThreadServices, const RenderTask& task, bool requiresSync )
 {
-  typedef MessageValue1< RenderTask, bool > LocalType;
+  using LocalType = MessageValue1<RenderTask, bool>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -516,7 +516,7 @@ inline void SetSyncRequiredMessage(EventThreadServices& eventThreadServices, con
 
 inline void BakeViewportPositionMessage( EventThreadServices& eventThreadServices, const RenderTask& task, const Vector2& value )
 {
-  typedef MessageDoubleBuffered1< RenderTask, Vector2 > LocalType;
+  using LocalType = MessageDoubleBuffered1<RenderTask, Vector2>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -527,7 +527,7 @@ inline void BakeViewportPositionMessage( EventThreadServices& eventThreadService
 
 inline void BakeViewportSizeMessage( EventThreadServices& eventThreadServices, const RenderTask& task, const Vector2& value )
 {
-  typedef MessageDoubleBuffered1< RenderTask, Vector2 > LocalType;
+  using LocalType = MessageDoubleBuffered1<RenderTask, Vector2>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );

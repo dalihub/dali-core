@@ -37,7 +37,7 @@ SamplerPtr Sampler::New( )
 
 void Sampler::SetFilterMode( Dali::FilterMode::Type minFilter, Dali::FilterMode::Type magFilter )
 {
-  if( NULL != mRenderObject )
+  if( nullptr != mRenderObject )
   {
     SetFilterModeMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, static_cast< unsigned int >( minFilter ), static_cast< unsigned int >( magFilter ) );
   }
@@ -45,7 +45,7 @@ void Sampler::SetFilterMode( Dali::FilterMode::Type minFilter, Dali::FilterMode:
 
 void Sampler::SetWrapMode( Dali::WrapMode::Type rWrap, Dali::WrapMode::Type sWrap, Dali::WrapMode::Type tWrap )
 {
-  if( NULL != mRenderObject )
+  if( nullptr != mRenderObject )
   {
     SetWrapModeMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, static_cast< unsigned int >( rWrap ), static_cast< unsigned int >( sWrap ), static_cast< unsigned int >( tWrap ) );
   }
@@ -59,7 +59,7 @@ Render::Sampler* Sampler::GetSamplerRenderObject()
 
 Sampler::Sampler()
 :mEventThreadServices( EventThreadServices::Get() ),
- mRenderObject( NULL )
+ mRenderObject( nullptr )
 {
 }
 

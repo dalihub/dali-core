@@ -55,7 +55,7 @@ public:
   /**
    * Non-virtual destructor; TapGestureProcessor is not a base class
    */
-  ~TapGestureProcessor();
+  ~TapGestureProcessor() override;
 
 public: // To be called by GestureEventProcessor
 
@@ -64,7 +64,7 @@ public: // To be called by GestureEventProcessor
    * @param[in] scene The scene the tap gesture event occurs in.
    * @param[in] tapEvent The event that has occurred.
    */
-  void Process( Scene& scene, const TapGestureEvent& event);
+  void Process( Scene& scene, const TapGestureEvent& event) override;
 
   /**
    * Adds a gesture detector to this gesture processor.
@@ -107,17 +107,17 @@ private:
   /**
    * @copydoc GestureProcessor::OnGesturedActorStageDisconnection()
    */
-  void OnGesturedActorStageDisconnection() { /* Nothing to do */ }
+  void OnGesturedActorStageDisconnection() override { /* Nothing to do */ }
 
   /**
    * @copydoc GestureProcessor::CheckGestureDetector()
    */
-  bool CheckGestureDetector( GestureDetector* detector, Actor* actor );
+  bool CheckGestureDetector( GestureDetector* detector, Actor* actor ) override;
 
   /**
    * @copydoc GestureProcessor::EmitGestureSignal()
    */
-  void EmitGestureSignal( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates );
+  void EmitGestureSignal( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates ) override;
 
 private:
 

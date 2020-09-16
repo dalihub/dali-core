@@ -19,17 +19,16 @@
 #include <dali/public-api/rendering/vertex-buffer.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/property-map.h>              // Dali::Property::Map
 #include <dali/internal/event/rendering/vertex-buffer-impl.h> // Dali::Internal::VertexBuffer
+#include <dali/public-api/object/property-map.h>              // Dali::Property::Map
 
 namespace Dali
 {
-
-VertexBuffer VertexBuffer::New( Dali::Property::Map& bufferFormat )
+VertexBuffer VertexBuffer::New(Dali::Property::Map& bufferFormat)
 {
-  Internal::VertexBufferPtr vertexBuffer = Internal::VertexBuffer::New( bufferFormat );
+  Internal::VertexBufferPtr vertexBuffer = Internal::VertexBuffer::New(bufferFormat);
 
-  return VertexBuffer( vertexBuffer.Get() );
+  return VertexBuffer(vertexBuffer.Get());
 }
 
 VertexBuffer::VertexBuffer()
@@ -40,32 +39,31 @@ VertexBuffer::~VertexBuffer()
 {
 }
 
-VertexBuffer::VertexBuffer( const VertexBuffer& handle ) = default;
+VertexBuffer::VertexBuffer(const VertexBuffer& handle) = default;
 
-VertexBuffer VertexBuffer::DownCast( BaseHandle handle )
+VertexBuffer VertexBuffer::DownCast(BaseHandle handle)
 {
-  return VertexBuffer( dynamic_cast<Dali::Internal::VertexBuffer*>(handle.GetObjectPtr()));
+  return VertexBuffer(dynamic_cast<Dali::Internal::VertexBuffer*>(handle.GetObjectPtr()));
 }
 
-VertexBuffer& VertexBuffer::operator=( const VertexBuffer& handle ) = default;
+VertexBuffer& VertexBuffer::operator=(const VertexBuffer& handle) = default;
 
-VertexBuffer::VertexBuffer( VertexBuffer&& rhs ) =  default;
+VertexBuffer::VertexBuffer(VertexBuffer&& rhs) = default;
 
-VertexBuffer& VertexBuffer::operator=( VertexBuffer&& rhs ) =  default;
+VertexBuffer& VertexBuffer::operator=(VertexBuffer&& rhs) = default;
 
-void VertexBuffer::SetData( const void* data, std::size_t size )
+void VertexBuffer::SetData(const void* data, std::size_t size)
 {
-  GetImplementation(*this).SetData( data, static_cast<uint32_t>( size ) ); // only support 4,294,967,295 bytes
+  GetImplementation(*this).SetData(data, static_cast<uint32_t>(size)); // only support 4,294,967,295 bytes
 }
 
 std::size_t VertexBuffer::GetSize() const
 {
-  return  GetImplementation(*this).GetSize();
+  return GetImplementation(*this).GetSize();
 }
 
-
-VertexBuffer::VertexBuffer( Internal::VertexBuffer* pointer )
-: BaseHandle( pointer )
+VertexBuffer::VertexBuffer(Internal::VertexBuffer* pointer)
+: BaseHandle(pointer)
 {
 }
 
