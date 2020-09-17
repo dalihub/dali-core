@@ -60,9 +60,10 @@ public:
    * Size of the VertexAttributeArray enables
    * GLES specification states that there's minimum of 8
    */
-  static const unsigned int MAX_ATTRIBUTE_CACHE_SIZE = 8;
+  static constexpr unsigned int MAX_ATTRIBUTE_CACHE_SIZE = 8;
 
-  static const unsigned int MAX_TEXTURE_UNITS = 8; // for GLES 2.0 8 is guaranteed, which is more than DALi uses anyways
+  static constexpr unsigned int MAX_TEXTURE_UNITS = 8; // for GLES 2.0 8 is guaranteed, which is more than DALi uses anyways
+  static constexpr unsigned int MAX_TEXTURE_TARGET = 3; // We support only GL_TEXTURE_2D, GL_TEXTURE_CUBE_MAP and GL_TEXTURE_EXTERNAL_OES now
 
   /**
    * Creates the Dali Context object for surface rendering only.
@@ -133,6 +134,9 @@ public:
     DALI_LOG_INFO(Debug::Filter::gRender, Debug::General, "GL %s = %s\n", stringName, reinterpret_cast< const char * >( GetString( stringId ) ) );
   }
 
+  /**
+   * Reset the cached buffer ids.
+   */
   void ResetBufferCache()
   {
     // reset the cached buffer id's
@@ -143,13 +147,47 @@ public:
     mBoundTransformFeedbackBufferId = 0;
   }
 
+  /**
+   * Reset the cached texture ids.
+   */
   void ResetTextureCache()
   {
     // reset the cached texture id's in case the driver re-uses them
     // when creating new textures
-    for( unsigned int i=0; i < MAX_TEXTURE_UNITS; ++i )
+    for(unsigned int i = 0; i < MAX_TEXTURE_UNITS; ++i)
     {
-       mBoundTextureId[ i ] = 0;
+      for(unsigned int j = 0; j < MAX_TEXTURE_TARGET; ++j)
+      {
+        mBoundTextureId[i][j] = 0;
+      }
+    }
+  }
+
+  /**
+   * Get an index of the cached texture list from the texture target.
+   * @param target The texture target
+   * @return The index of the cached texture list
+   */
+  static constexpr int16_t GetTextureIndexFromGlFormat(int target)
+  {
+    switch(target)
+    {
+      case GL_TEXTURE_2D:
+      {
+        return 0;
+      }
+      case GL_TEXTURE_CUBE_MAP:
+      {
+        return 1;
+      }
+      case GL_TEXTURE_EXTERNAL_OES:
+      {
+        return 2;
+      }
+      default:
+      {
+        return -1;
+      }
     }
   }
 
@@ -311,11 +349,8 @@ public:
    */
   void BindTextureForUnit( TextureUnit textureunit, int target, GLuint texture )
   {
-    if( mBoundTextureId[ textureunit ] != texture )
-    {
-      ActiveTexture( textureunit );
-      BindTexture( target, texture );
-    }
+    ActiveTexture(textureunit);
+    BindTexture(target, texture);
   }
 
   /**
@@ -323,12 +358,13 @@ public:
    */
   void BindTexture( int target, GLuint texture )
   {
-    if (mBoundTextureId[ mActiveTextureUnit ] != texture)
+    int16_t index = GetTextureIndexFromGlFormat(target);
+    if(index >= 0 && mBoundTextureId[ mActiveTextureUnit ][index] != texture)
     {
-      mBoundTextureId[ mActiveTextureUnit ] = texture;
+      mBoundTextureId[ mActiveTextureUnit ][index] = texture;
 
       LOG_GL("BindTexture target(%d) %d\n", target, texture);
-      CHECK_GL( mGlAbstraction, mGlAbstraction.BindTexture(target, texture) );
+      CHECK_GL(mGlAbstraction, mGlAbstraction.BindTexture(target, texture));
     }
   }
 
@@ -1789,7 +1825,7 @@ private: // Data
 
   // glBindTexture() state
   TextureUnit mActiveTextureUnit;
-  GLuint mBoundTextureId[ MAX_TEXTURE_UNITS ];  ///< The ID passed to glBindTexture()
+  GLuint mBoundTextureId[ MAX_TEXTURE_UNITS ][MAX_TEXTURE_TARGET];  ///< The ID passed to glBindTexture()
 
   // glBlendColor() state
   Vector4 mBlendColor; ///< Blend color
