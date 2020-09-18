@@ -222,6 +222,9 @@ public:
   {
     mConnectedToSceneGraph = true;
     mPropertyOwner->AddObserver(*this);
+
+    // Enable if the target object is valid and connected to the scene graph.
+    mEnabled = mPropertyOwner->IsAnimationPossible();
   }
 
   /**

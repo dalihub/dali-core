@@ -270,7 +270,7 @@ public:
    * @param propertyIndex index of the property
    * @param uniformName name of the uniform (same as property name)
    */
-  void AddUniformMapping( Property::Index propertyIndex, const std::string& uniformName ) const;
+  void AddUniformMapping(Property::Index propertyIndex, std::string uniformName) const;
 
   /**
    * Removes uniform mapping for given property
@@ -347,6 +347,15 @@ public:
    * @return The index or Property::INVALID_COMPONENT_INDEX.
    */
   virtual int32_t GetPropertyComponentIndex( Property::Index index ) const;
+
+  /**
+   * Query whether playing an animation is possible or not.
+   * @return true if playing an animation is possible.
+   */
+  virtual bool IsAnimationPossible() const
+  {
+    return true;
+  }
 
   /**
    * @copydoc Dali::Handle::PropertySetSignal()

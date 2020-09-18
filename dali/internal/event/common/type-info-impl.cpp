@@ -413,7 +413,7 @@ std::string TypeInfo::GetPropertyName( Property::Index index ) const
   // default or custom
   if ( mDefaultProperties && ( index < DEFAULT_PROPERTY_MAX_COUNT ) )
   {
-    const char* name = nullptr;
+    std::string_view name;
     if( GetDefaultPropertyField( mDefaultProperties, mDefaultPropertyCount,index, &Dali::PropertyDetails::name, name ) )
     {
       propertyName = name;
@@ -630,7 +630,7 @@ Property::Index TypeInfo::GetPropertyIndex( const std::string& name ) const
   {
     for( Property::Index tableIndex = 0; tableIndex < mDefaultPropertyCount; ++tableIndex )
     {
-      if( 0 == name.compare( mDefaultProperties[ tableIndex ].name ) )
+      if(mDefaultProperties[tableIndex].name == name)
       {
         index = mDefaultProperties[ tableIndex ].enumIndex;
         found = true;

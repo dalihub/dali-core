@@ -1296,6 +1296,8 @@ int UtcDaliActorGetCurrentSizeImmediate(void)
 
   DALI_TEST_CHECK(actor.GetTargetSize() == vector);
 
+  application.GetScene().Add(actor);
+
   // Start the animation
   animation.Play();
 
