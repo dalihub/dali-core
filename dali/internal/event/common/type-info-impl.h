@@ -138,14 +138,14 @@ public:
   /*
    * Add an action function
    */
-  void AddActionFunction( const std::string &actionName, Dali::TypeInfo::ActionFunction function );
+  void AddActionFunction(std::string actionName, Dali::TypeInfo::ActionFunction function);
 
   /*
    * Add a function for connecting a signal.
    * @param[in] signalName The name of the signal.
    * @param[in] function The function used for connecting to the signal.
    */
-  void AddConnectorFunction( const std::string& signalName, Dali::TypeInfo::SignalConnectorFunction function );
+  void AddConnectorFunction(std::string signalName, Dali::TypeInfo::SignalConnectorFunction function);
 
   /**
    * Adds an event-thread only property to the type.
@@ -155,7 +155,7 @@ public:
    * @param[in] setFunc The function to call to set the property (Can be nullptr).
    * @param[in] getFunc The function to call to retrieve the value of the property.
    */
-  void AddProperty( const std::string& name, Property::Index index, Property::Type type, Dali::TypeInfo::SetPropertyFunction setFunc, Dali::TypeInfo::GetPropertyFunction getFunc );
+  void AddProperty(std::string name, Property::Index index, Property::Type type, Dali::TypeInfo::SetPropertyFunction setFunc, Dali::TypeInfo::GetPropertyFunction getFunc);
 
   /**
    * Adds an event-thread only property to the type.
@@ -165,7 +165,7 @@ public:
    * @param[in] setFunc The function to call to set the property (Can be nullptr).
    * @param[in] getFunc The function to call to retrieve the value of the property.
    */
-  void AddProperty( const std::string& name, Property::Index index, Property::Type type, Dali::CSharpTypeInfo::SetPropertyFunction setFunc, Dali::CSharpTypeInfo::GetPropertyFunction getFunc);
+  void AddProperty(std::string name, Property::Index index, Property::Type type, Dali::CSharpTypeInfo::SetPropertyFunction setFunc, Dali::CSharpTypeInfo::GetPropertyFunction getFunc);
 
   /**
    * Adds an animatable property to the type.
@@ -173,7 +173,7 @@ public:
    * @param[in] index The index of the property
    * @param[in] type The Property::Type.
    */
-  void AddAnimatableProperty( const std::string& name, Property::Index index, Property::Type type );
+  void AddAnimatableProperty(std::string name, Property::Index index, Property::Type type);
 
   /**
    * Adds an animatable property with the given default value.
@@ -181,7 +181,7 @@ public:
    * @param[in] index The index of the property
    * @param[in] type The Property::Type.
    */
-  void AddAnimatableProperty( const std::string& name, Property::Index index, const Property::Value& defaultValue );
+  void AddAnimatableProperty(std::string name, Property::Index index, Property::Value defaultValue);
 
   /**
    * Adds a component of an animatable property to the type.
@@ -191,7 +191,7 @@ public:
    * @param[in] baseIndex The index of the base animatable property
    * @param[in] component The index The index of the component.
    */
-  void AddAnimatablePropertyComponent( const std::string& name, Property::Index index, Property::Index baseIndex, uint32_t componentIndex );
+  void AddAnimatablePropertyComponent(std::string name, Property::Index index, Property::Index baseIndex, uint32_t componentIndex);
 
   /**
    * Adds a child property to the type.
@@ -199,7 +199,7 @@ public:
    * @param[in] index The index of the property
    * @param[in] type The Property::Type.
    */
-  void AddChildProperty( const std::string& name, Property::Index index, Property::Type type );
+  void AddChildProperty(std::string name, Property::Index index, Property::Type type);
 
   /**
    * Do an action on base object
@@ -307,7 +307,7 @@ public:
    * @param[in] index The property index.
    * @param[in] value The value to set.
    */
-  void SetProperty( BaseObject *object, Property::Index index, const Property::Value& value ) const;
+  void SetProperty(BaseObject* object, Property::Index index, Property::Value value) const;
 
   /**
    * Sets the value of a property with the name specified for the given object.
@@ -315,7 +315,7 @@ public:
    * @param[in] name The property name.
    * @param[in] value The value to set.
    */
-  void SetProperty( BaseObject *object, const std::string& name, const Property::Value& value ) const;
+  void SetProperty(BaseObject* object, const std::string& name, Property::Value value) const;
 
   /**
    * Retrieves the value of a property at the index specified for the given object.
@@ -337,32 +337,31 @@ private:
 
   struct RegisteredProperty
   {
-    RegisteredProperty( Property::Type propType, const std::string& propName, Property::Index basePropertyIndex, int32_t componentIndex )
-        : type( propType ),
-          setFunc( nullptr ),
-          getFunc( nullptr ),
-          name( propName ),
-          basePropertyIndex(basePropertyIndex),
-          componentIndex(componentIndex)
-    {
-    }
-
-
-    RegisteredProperty( Property::Type propType, Dali::TypeInfo::SetPropertyFunction set, Dali::TypeInfo::GetPropertyFunction get, const std::string& propName, Property::Index basePropertyIndex, int componentIndex )
-    : type( propType ),
-      setFunc( set ),
-      getFunc( get ),
-      name( propName ),
+    RegisteredProperty(Property::Type propType, std::string propName, Property::Index basePropertyIndex, int32_t componentIndex)
+    : type(propType),
+      setFunc(nullptr),
+      getFunc(nullptr),
+      name(std::move(propName)),
       basePropertyIndex(basePropertyIndex),
       componentIndex(componentIndex)
     {
     }
 
-    RegisteredProperty( Property::Type propType, Dali::CSharpTypeInfo::SetPropertyFunction set, Dali::CSharpTypeInfo::GetPropertyFunction get, const std::string& propName, Property::Index basePropertyIndex, int componentIndex )
-    : type( propType ),
-      cSharpSetFunc( set ),
-      cSharpGetFunc( get ),
-      name( propName ),
+    RegisteredProperty(Property::Type propType, Dali::TypeInfo::SetPropertyFunction set, Dali::TypeInfo::GetPropertyFunction get, std::string propName, Property::Index basePropertyIndex, int componentIndex)
+    : type(propType),
+      setFunc(set),
+      getFunc(get),
+      name(std::move(propName)),
+      basePropertyIndex(basePropertyIndex),
+      componentIndex(componentIndex)
+    {
+    }
+
+    RegisteredProperty(Property::Type propType, Dali::CSharpTypeInfo::SetPropertyFunction set, Dali::CSharpTypeInfo::GetPropertyFunction get, std::string propName, Property::Index basePropertyIndex, int componentIndex)
+    : type(propType),
+      cSharpSetFunc(set),
+      cSharpGetFunc(get),
+      name(std::move(propName)),
       basePropertyIndex(basePropertyIndex),
       componentIndex(componentIndex)
     {

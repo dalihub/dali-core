@@ -282,7 +282,7 @@ Property::Type Object::GetPropertyType( Property::Index index ) const
   return Property::NONE;
 }
 
-void Object::SetProperty( Property::Index index, const Property::Value& propertyValue )
+void Object::SetProperty(Property::Index index, Property::Value propertyValue)
 {
   DALI_ASSERT_ALWAYS(index > Property::INVALID_INDEX && "Property index is out of bounds" );
 
@@ -385,8 +385,11 @@ void Object::SetProperty( Property::Index index, const Property::Value& property
   if ( propertySet )
   {
     OnPropertySet( index, propertyValue );
-    Dali::Handle handle( this );
-    mPropertySetSignal.Emit( handle, index, propertyValue );
+    if(!mPropertySetSignal.Empty())
+    {
+      Dali::Handle handle(this);
+      mPropertySetSignal.Emit(handle, index, propertyValue);
+    }
   }
 }
 
@@ -533,14 +536,14 @@ void Object::GetPropertyIndices( Property::IndexContainer& indices ) const
   }
 }
 
-Property::Index Object::RegisterProperty( const std::string& name, const Property::Value& propertyValue )
+Property::Index Object::RegisterProperty(std::string name, Property::Value propertyValue)
 {
-  return RegisterProperty( name, Property::INVALID_KEY, propertyValue, Property::ANIMATABLE );
+  return RegisterProperty(std::move(name), Property::INVALID_KEY, std::move(propertyValue), Property::ANIMATABLE);
 }
 
-Property::Index Object::RegisterProperty( const std::string& name, Property::Index key, const Property::Value& propertyValue )
+Property::Index Object::RegisterProperty(std::string name, Property::Index key, Property::Value propertyValue)
 {
-  return RegisterProperty( name, key, propertyValue, Property::ANIMATABLE );
+  return RegisterProperty(std::move(name), key, std::move(propertyValue), Property::ANIMATABLE);
 }
 
 void Object::SetProperties( const Property::Map& properties )
@@ -575,12 +578,17 @@ void Object::GetProperties( Property::Map& properties )
   }
 }
 
-Property::Index Object::RegisterProperty( const std::string& name, const Property::Value& propertyValue, Property::AccessMode accessMode )
+Property::Index Object::RegisterProperty(std::string          name,
+                                         Property::Value      propertyValue,
+                                         Property::AccessMode accessMode)
 {
-  return RegisterProperty( name, Property::INVALID_KEY, propertyValue, accessMode );
+  return RegisterProperty(std::move(name), Property::INVALID_KEY, std::move(propertyValue), accessMode);
 }
 
-Property::Index Object::RegisterProperty( const std::string& name, Property::Index key, const Property::Value& propertyValue, Property::AccessMode accessMode )
+Property::Index Object::RegisterProperty(std::string          name,
+                                         Property::Index      key,
+                                         Property::Value      propertyValue,
+                                         Property::AccessMode accessMode)
 {
   // If property with the required key already exists, then just set it.
   Property::Index index = Property::INVALID_INDEX;
@@ -595,22 +603,27 @@ Property::Index Object::RegisterProperty( const std::string& name, Property::Ind
 
   if( index != Property::INVALID_INDEX ) // If there was a valid index found by either key, set it.
   {
-    SetProperty( index, propertyValue );
+    SetProperty(index, std::move(propertyValue));
   }
   else
   {
     // Otherwise register the property
     if( Property::ANIMATABLE == accessMode )
     {
-      index = RegisterSceneGraphProperty( name, key, PROPERTY_CUSTOM_START_INDEX + static_cast<Property::Index>( mCustomProperties.Count() ), propertyValue );
-      AddUniformMapping( index, name );
+      index = RegisterSceneGraphProperty(
+        name,
+        key,
+        PROPERTY_CUSTOM_START_INDEX + static_cast<Property::Index>(mCustomProperties.Count()),
+        std::move(propertyValue));
+      AddUniformMapping(index, std::move(name));
     }
     else
     {
       // Add entry to the property lookup
       index = PROPERTY_CUSTOM_START_INDEX + static_cast<Property::Index>( mCustomProperties.Count() );
 
-      CustomPropertyMetadata* customProperty = new CustomPropertyMetadata( name, propertyValue, accessMode );
+      CustomPropertyMetadata* customProperty =
+        new CustomPropertyMetadata(name, std::move(propertyValue), accessMode);
 
       // Resolve index for the child property
       Object* parent = GetParentObject();

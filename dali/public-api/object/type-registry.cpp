@@ -96,69 +96,69 @@ TypeRegistration::TypeRegistration(const std::type_info& registerType, const std
   mName = impl->Register(registerType, baseType, f, false, defaultProperties.propertyTable, defaultProperties.propertyCount);
 }
 
-TypeRegistration::TypeRegistration(const std::string& name, const std::type_info& baseType, TypeInfo::CreateFunction f)
+TypeRegistration::TypeRegistration(std::string name, const std::type_info& baseType, TypeInfo::CreateFunction f)
 : mReference(Internal::TypeRegistry::Get())
 {
   Internal::TypeRegistry* impl = Internal::TypeRegistry::Get();
 
-  mName = impl->Register(name, baseType, f, false);
+  mName = impl->Register(std::move(name), baseType, f, false);
 }
 
-const std::string TypeRegistration::RegisteredName() const
+const std::string& TypeRegistration::RegisteredName() const
 {
   return mName;
 }
 
-SignalConnectorType::SignalConnectorType(TypeRegistration& typeRegistration, const std::string& name, TypeInfo::SignalConnectorFunction func)
+SignalConnectorType::SignalConnectorType(TypeRegistration& typeRegistration, std::string name, TypeInfo::SignalConnectorFunction func)
 {
-  Internal::TypeRegistry::Get()->RegisterSignal(typeRegistration, name, func);
+  Internal::TypeRegistry::Get()->RegisterSignal(typeRegistration, std::move(name), func);
 }
 
-TypeAction::TypeAction(TypeRegistration& registered, const std::string& name, TypeInfo::ActionFunction f)
+TypeAction::TypeAction(TypeRegistration& registered, std::string name, TypeInfo::ActionFunction f)
 {
-  Internal::TypeRegistry::Get()->RegisterAction(registered, name, f);
+  Internal::TypeRegistry::Get()->RegisterAction(registered, std::move(name), f);
 }
 
-PropertyRegistration::PropertyRegistration(TypeRegistration& registered, const std::string& name, Property::Index index, Property::Type type, TypeInfo::SetPropertyFunction setFunc, TypeInfo::GetPropertyFunction getFunc)
+PropertyRegistration::PropertyRegistration(TypeRegistration& registered, std::string name, Property::Index index, Property::Type type, TypeInfo::SetPropertyFunction setFunc, TypeInfo::GetPropertyFunction getFunc)
 {
   DALI_ASSERT_ALWAYS((index >= PROPERTY_REGISTRATION_START_INDEX) && (index <= PROPERTY_REGISTRATION_MAX_INDEX));
 
-  Internal::TypeRegistry::Get()->RegisterProperty(registered, name, index, type, setFunc, getFunc);
+  Internal::TypeRegistry::Get()->RegisterProperty(registered, std::move(name), index, type, setFunc, getFunc);
 }
 
-AnimatablePropertyRegistration::AnimatablePropertyRegistration(TypeRegistration& registered, const std::string& name, Property::Index index, Property::Type type)
+AnimatablePropertyRegistration::AnimatablePropertyRegistration(TypeRegistration& registered, std::string name, Property::Index index, Property::Type type)
 {
   DALI_ASSERT_ALWAYS((index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX) && (index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX));
 
-  Internal::TypeRegistry::Get()->RegisterAnimatableProperty(registered, name, index, type);
+  Internal::TypeRegistry::Get()->RegisterAnimatableProperty(registered, std::move(name), index, type);
 }
 
-AnimatablePropertyRegistration::AnimatablePropertyRegistration(TypeRegistration& registered, const std::string& name, Property::Index index, const Property::Value& value)
+AnimatablePropertyRegistration::AnimatablePropertyRegistration(TypeRegistration& registered, std::string name, Property::Index index, const Property::Value& value)
 {
   DALI_ASSERT_ALWAYS((index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX) && (index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX));
 
-  Internal::TypeRegistry::Get()->RegisterAnimatableProperty(registered, name, index, value);
+  Internal::TypeRegistry::Get()->RegisterAnimatableProperty(registered, std::move(name), index, value);
 }
 
-AnimatablePropertyComponentRegistration::AnimatablePropertyComponentRegistration(TypeRegistration& registered, const std::string& name, Property::Index index, Property::Index baseIndex, uint32_t componentIndex)
+AnimatablePropertyComponentRegistration::AnimatablePropertyComponentRegistration(TypeRegistration& registered, std::string name, Property::Index index, Property::Index baseIndex, uint32_t componentIndex)
 {
   DALI_ASSERT_ALWAYS((index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX) && (index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX));
 
-  Internal::TypeRegistry::Get()->RegisterAnimatablePropertyComponent(registered, name, index, baseIndex, componentIndex);
+  Internal::TypeRegistry::Get()->RegisterAnimatablePropertyComponent(registered, std::move(name), index, baseIndex, componentIndex);
 }
 
-ChildPropertyRegistration::ChildPropertyRegistration(TypeRegistration& registered, const std::string& name, Property::Index index, Property::Type type)
+ChildPropertyRegistration::ChildPropertyRegistration(TypeRegistration& registered, std::string name, Property::Index index, Property::Type type)
 {
   DALI_ASSERT_ALWAYS((index >= CHILD_PROPERTY_REGISTRATION_START_INDEX) && (index <= CHILD_PROPERTY_REGISTRATION_MAX_INDEX));
 
-  Internal::TypeRegistry::Get()->RegisterChildProperty(registered, name, index, type);
+  Internal::TypeRegistry::Get()->RegisterChildProperty(registered, std::move(name), index, type);
 }
 
-ChildPropertyRegistration::ChildPropertyRegistration(const std::string& registered, const std::string& name, Property::Index index, Property::Type type)
+ChildPropertyRegistration::ChildPropertyRegistration(std::string registered, std::string name, Property::Index index, Property::Type type)
 {
   DALI_ASSERT_ALWAYS((index >= CHILD_PROPERTY_REGISTRATION_START_INDEX) && (index <= CHILD_PROPERTY_REGISTRATION_MAX_INDEX));
 
-  Internal::TypeRegistry::Get()->RegisterChildProperty(registered, name, index, type);
+  Internal::TypeRegistry::Get()->RegisterChildProperty(std::move(registered), std::move(name), index, type);
 }
 
 } // namespace Dali

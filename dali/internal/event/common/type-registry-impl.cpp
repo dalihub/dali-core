@@ -87,16 +87,16 @@ uint32_t TypeRegistry::GetTypeNameCount() const
   return static_cast<uint32_t>( mRegistryLut.size() );
 }
 
-std::string TypeRegistry::GetTypeName( uint32_t index ) const
+const std::string& TypeRegistry::GetTypeName(uint32_t index) const
 {
-  std::string name;
+  static std::string EMPTY_STRING{};
 
   if( index < mRegistryLut.size() )
   {
-    name = mRegistryLut[ index ]->GetName();
+    return mRegistryLut[index]->GetName();
   }
 
-  return name;
+  return EMPTY_STRING;
 }
 
 std::string TypeRegistry::Register( const std::type_info& theTypeInfo,
@@ -121,12 +121,12 @@ std::string TypeRegistry::Register( const std::type_info& theTypeInfo,
   return Register( uniqueTypeName, baseTypeInfo, createInstance, callCreateOnInit, defaultProperties, defaultPropertyCount );
 }
 
-std::string TypeRegistry::Register( const std::string& uniqueTypeName,
-                                    const std::type_info& baseTypeInfo,
-                                    Dali::TypeInfo::CreateFunction createInstance,
-                                    bool callCreateOnInit,
-                                    const Dali::PropertyDetails* defaultProperties,
-                                    Property::Index defaultPropertyCount )
+std::string TypeRegistry::Register(std::string                    uniqueTypeName,
+                                   const std::type_info&          baseTypeInfo,
+                                   Dali::TypeInfo::CreateFunction createInstance,
+                                   bool                           callCreateOnInit,
+                                   const Dali::PropertyDetails*   defaultProperties,
+                                   Property::Index                defaultPropertyCount)
 {
   std::string baseTypeName = DemangleClassName( baseTypeInfo.name() );
 
@@ -153,8 +153,7 @@ std::string TypeRegistry::Register( const std::string& uniqueTypeName,
   return uniqueTypeName;
 }
 
-void TypeRegistry::Register( const std::string& uniqueTypeName, const std::type_info& baseTypeInfo,
-    Dali::CSharpTypeInfo::CreateFunction createInstance )
+void TypeRegistry::Register(std::string uniqueTypeName, const std::type_info& baseTypeInfo, Dali::CSharpTypeInfo::CreateFunction createInstance)
 {
   std::string baseTypeName = DemangleClassName( baseTypeInfo.name() );
 
@@ -186,38 +185,38 @@ std::string TypeRegistry::RegistrationName( const std::type_info& registerType )
   return DemangleClassName( registerType.name() );
 }
 
-void TypeRegistry::RegisterSignal( TypeRegistration& typeRegistration, const std::string& name, Dali::TypeInfo::SignalConnectorFunction func )
+void TypeRegistry::RegisterSignal(TypeRegistration& typeRegistration, std::string name, Dali::TypeInfo::SignalConnectorFunction func)
 {
   for( auto&& iter : mRegistryLut )
   {
     if( iter->GetName() == typeRegistration.RegisteredName() )
     {
-      iter->AddConnectorFunction( name, func );
+      iter->AddConnectorFunction(std::move(name), func);
       break;
     }
   }
 }
 
-bool TypeRegistry::RegisterAction( TypeRegistration& typeRegistration, const std::string &name, Dali::TypeInfo::ActionFunction f )
+bool TypeRegistry::RegisterAction(TypeRegistration& typeRegistration, std::string name, Dali::TypeInfo::ActionFunction f)
 {
   for( auto&& iter : mRegistryLut )
   {
     if( iter->GetName() == typeRegistration.RegisteredName() )
     {
-      iter->AddActionFunction( name, f );
+      iter->AddActionFunction(std::move(name), f);
       return true;
     }
   }
   return false;
 }
 
-bool TypeRegistry::RegisterProperty( TypeRegistration& typeRegistration, const std::string& name, Property::Index index, Property::Type type, Dali::TypeInfo::SetPropertyFunction setFunc, Dali::TypeInfo::GetPropertyFunction getFunc )
+bool TypeRegistry::RegisterProperty(TypeRegistration& typeRegistration, std::string name, Property::Index index, Property::Type type, Dali::TypeInfo::SetPropertyFunction setFunc, Dali::TypeInfo::GetPropertyFunction getFunc)
 {
   for( auto&& iter : mRegistryLut )
   {
     if( iter->GetName() == typeRegistration.RegisteredName() )
     {
-      iter->AddProperty( name, index, type, setFunc, getFunc );
+      iter->AddProperty(std::move(name), index, type, setFunc, getFunc);
       return true;
     }
   }
@@ -225,13 +224,13 @@ bool TypeRegistry::RegisterProperty( TypeRegistration& typeRegistration, const s
   return false;
 }
 
-bool TypeRegistry::RegisterProperty( const std::string& objectName, const std::string& name, Property::Index index, Property::Type type, Dali::CSharpTypeInfo::SetPropertyFunction setFunc, Dali::CSharpTypeInfo::GetPropertyFunction getFunc )
+bool TypeRegistry::RegisterProperty(const std::string& objectName, std::string name, Property::Index index, Property::Type type, Dali::CSharpTypeInfo::SetPropertyFunction setFunc, Dali::CSharpTypeInfo::GetPropertyFunction getFunc)
 {
   for( auto&& iter : mRegistryLut )
   {
     if( iter->GetName() == objectName )
     {
-      iter->AddProperty( name, index, type, setFunc, getFunc );
+      iter->AddProperty(std::move(name), index, type, setFunc, getFunc);
       return true;
     }
   }
@@ -239,14 +238,13 @@ bool TypeRegistry::RegisterProperty( const std::string& objectName, const std::s
   return false;
 }
 
-
-bool TypeRegistry::RegisterAnimatableProperty( TypeRegistration& typeRegistration, const std::string& name, Property::Index index, Property::Type type )
+bool TypeRegistry::RegisterAnimatableProperty(TypeRegistration& typeRegistration, std::string name, Property::Index index, Property::Type type)
 {
   for( auto&& iter : mRegistryLut )
   {
     if( iter->GetName() == typeRegistration.RegisteredName() )
     {
-      iter->AddAnimatableProperty( name, index, type );
+      iter->AddAnimatableProperty(std::move(name), index, type);
       return true;
     }
   }
@@ -254,13 +252,13 @@ bool TypeRegistry::RegisterAnimatableProperty( TypeRegistration& typeRegistratio
   return false;
 }
 
-bool TypeRegistry::RegisterAnimatableProperty( TypeRegistration& typeRegistration, const std::string& name, Property::Index index, const Property::Value& value )
+bool TypeRegistry::RegisterAnimatableProperty(TypeRegistration& typeRegistration, std::string name, Property::Index index, Property::Value value)
 {
   for( auto&& iter : mRegistryLut )
   {
     if( iter->GetName() == typeRegistration.RegisteredName() )
     {
-      iter->AddAnimatableProperty( name, index, value );
+      iter->AddAnimatableProperty(std::move(name), index, std::move(value));
       return true;
     }
   }
@@ -268,13 +266,13 @@ bool TypeRegistry::RegisterAnimatableProperty( TypeRegistration& typeRegistratio
   return false;
 }
 
-bool TypeRegistry::RegisterAnimatablePropertyComponent( TypeRegistration& typeRegistration, const std::string& name, Property::Index index, Property::Index baseIndex, unsigned int componentIndex )
+bool TypeRegistry::RegisterAnimatablePropertyComponent(TypeRegistration& typeRegistration, std::string name, Property::Index index, Property::Index baseIndex, unsigned int componentIndex)
 {
   for( auto&& iter : mRegistryLut )
   {
     if( iter->GetName() == typeRegistration.RegisteredName() )
     {
-      iter->AddAnimatablePropertyComponent( name, index, baseIndex, componentIndex );
+      iter->AddAnimatablePropertyComponent(std::move(name), index, baseIndex, componentIndex);
       return true;
     }
   }
@@ -282,13 +280,13 @@ bool TypeRegistry::RegisterAnimatablePropertyComponent( TypeRegistration& typeRe
   return false;
 }
 
-bool TypeRegistry::RegisterChildProperty( const std::string& registeredType, const std::string& name, Property::Index index, Property::Type type )
+bool TypeRegistry::RegisterChildProperty(const std::string& registeredType, std::string name, Property::Index index, Property::Type type)
 {
   for( auto&& iter : mRegistryLut )
   {
     if( iter->GetName() == registeredType )
     {
-      iter->AddChildProperty( name, index, type );
+      iter->AddChildProperty(std::move(name), index, type);
       return true;
     }
   }
@@ -296,9 +294,9 @@ bool TypeRegistry::RegisterChildProperty( const std::string& registeredType, con
   return false;
 }
 
-bool TypeRegistry::RegisterChildProperty( TypeRegistration& typeRegistration, const std::string& name, Property::Index index, Property::Type type )
+bool TypeRegistry::RegisterChildProperty(TypeRegistration& typeRegistration, std::string name, Property::Index index, Property::Type type)
 {
-  return RegisterChildProperty( typeRegistration.RegisteredName(), name, index, type );
+  return RegisterChildProperty(typeRegistration.RegisteredName(), std::move(name), index, type);
 }
 
 bool TypeRegistry::DoActionTo( BaseObject * const object, const std::string& actionName, const Property::Map& properties )

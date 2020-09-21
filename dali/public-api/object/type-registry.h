@@ -247,7 +247,7 @@ public:
    * @param[in] baseType the base type info of registerType
    * @param[in] f registerType instance creation function
    */
-  TypeRegistration(const std::string& name, const std::type_info& baseType, TypeInfo::CreateFunction f);
+  TypeRegistration(std::string name, const std::type_info& baseType, TypeInfo::CreateFunction f);
 
   /**
    * @brief The name the type is registered under (derived from type_info).
@@ -255,7 +255,7 @@ public:
    * @SINCE_1_0.0
    * @return The registered name or empty if unregistered
    */
-  const std::string RegisteredName() const;
+  const std::string& RegisteredName() const;
 
 private:
   TypeRegistry mReference; ///< Reference to the type registry
@@ -277,7 +277,7 @@ public:
    * @param[in] name The signal name
    * @param[in] func The signal connector function
    */
-  SignalConnectorType(TypeRegistration& typeRegistration, const std::string& name, TypeInfo::SignalConnectorFunction func);
+  SignalConnectorType(TypeRegistration& typeRegistration, std::string name, TypeInfo::SignalConnectorFunction func);
 };
 
 /**
@@ -295,7 +295,7 @@ public:
    * @param[in] name The action name
    * @param[in] f The action function
    */
-  TypeAction(TypeRegistration& registered, const std::string& name, TypeInfo::ActionFunction f);
+  TypeAction(TypeRegistration& registered, std::string name, TypeInfo::ActionFunction f);
 };
 
 /**
@@ -332,7 +332,7 @@ public:
    *
    */
   PropertyRegistration(TypeRegistration&             registered,
-                       const std::string&            name,
+                       std::string                   name,
                        Property::Index               index,
                        Property::Type                type,
                        TypeInfo::SetPropertyFunction setFunc,
@@ -360,7 +360,7 @@ public:
    * @param[in] type The property value type
    * @pre "registered" must be registered with the TypeRegistry.
    */
-  AnimatablePropertyRegistration(TypeRegistration& registered, const std::string& name, Property::Index index, Property::Type type);
+  AnimatablePropertyRegistration(TypeRegistration& registered, std::string name, Property::Index index, Property::Type type);
 
   /**
    * @brief This constructor registers the animatable property with the registered default value.
@@ -376,7 +376,7 @@ public:
    * @param[in] value The property default value
    * @pre "registered" must be registered with the TypeRegistry.
    */
-  AnimatablePropertyRegistration(TypeRegistration& registered, const std::string& name, Property::Index index, const Property::Value& value);
+  AnimatablePropertyRegistration(TypeRegistration& registered, std::string name, Property::Index index, const Property::Value& value);
 };
 
 /**
@@ -403,7 +403,7 @@ public:
    * @param[in] componentIndex The index of the component (e.g. 0 for the x component of a Vector2 property and 1 for the y component of a Vector2 property)
    * @pre "registered" must be registered with the TypeRegistry.
    */
-  AnimatablePropertyComponentRegistration(TypeRegistration& registered, const std::string& name, Property::Index index, Property::Index baseIndex, uint32_t componentIndex);
+  AnimatablePropertyComponentRegistration(TypeRegistration& registered, std::string name, Property::Index index, Property::Index baseIndex, uint32_t componentIndex);
 };
 
 /**
@@ -424,7 +424,7 @@ public:
    * @param[in] type The property value type
    * @pre "registered" must be registered with the TypeRegistry.
    */
-  ChildPropertyRegistration(TypeRegistration& registered, const std::string& name, Property::Index index, Property::Type type);
+  ChildPropertyRegistration(TypeRegistration& registered, std::string name, Property::Index index, Property::Type type);
 
   /**
    * @brief This constructor registers an event-thread only child property (i.e. a property
@@ -437,7 +437,7 @@ public:
    * @param[in] type The property value type
    * @pre "registered" must be registered with the TypeRegistry.
    */
-  ChildPropertyRegistration(const std::string& registered, const std::string& name, Property::Index index, Property::Type type);
+  ChildPropertyRegistration(std::string registered, std::string name, Property::Index index, Property::Type type);
 };
 
 /**
