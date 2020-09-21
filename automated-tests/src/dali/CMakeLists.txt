@@ -47,6 +47,7 @@ SET(TC_SOURCES
         utc-Dali-Matrix3.cpp
         utc-Dali-MeshMaterial.cpp
         utc-Dali-Mutex.cpp
+        utc-Dali-Semaphore.cpp
         utc-Dali-ObjectRegistry.cpp
         utc-Dali-PanGesture.cpp
         utc-Dali-PanGestureDetector.cpp

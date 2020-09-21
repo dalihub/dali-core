@@ -128,6 +128,7 @@ SET( devel_api_core_scripting_header_files
 SET( devel_api_core_threading_header_files
   ${devel_api_src_dir}/threading/conditional-wait.h
   ${devel_api_src_dir}/threading/mutex.h
+  ${devel_api_src_dir}/threading/semaphore.h
   ${devel_api_src_dir}/threading/thread.h
   ${devel_api_src_dir}/threading/thread-pool.h
 )
