@@ -28,6 +28,7 @@
 #include <dali/internal/event/actors/layer-impl.h>
 #include <dali/internal/event/actors/layer-list.h>
 #include <dali/internal/event/common/projection.h>
+#include <dali/internal/event/events/ray-test.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/internal/event/render-tasks/render-task-list-impl.h>
 
@@ -159,7 +160,8 @@ HitActor HitTestWithinLayer( Actor& actor,
                              bool& overlayHit,
                              bool layerIs3d,
                              uint32_t clippingDepth,
-                             uint32_t clippingBitPlaneMask )
+                             uint32_t clippingBitPlaneMask,
+                             const RayTest& rayTest )
 {
   HitActor hit;
 
@@ -186,13 +188,13 @@ HitActor HitTestWithinLayer( Actor& actor,
 
     // Ensure the actor has a valid size.
     // If so, perform a quick ray sphere test to see if our ray is close to the actor.
-    if( size.x > 0.0f && size.y > 0.0f && actor.RaySphereTest( rayOrigin, rayDir ) )
+    if( size.x > 0.0f && size.y > 0.0f && rayTest.SphereTest( actor, rayOrigin, rayDir ) )
     {
       Vector2 hitPointLocal;
       float distance;
 
       // Finally, perform a more accurate ray test to see if our ray actually hits the actor.
-      if( actor.RayActorTest( rayOrigin, rayDir, hitPointLocal, distance ) )
+      if( rayTest.ActorTest( actor, rayOrigin, rayDir, hitPointLocal, distance ) )
       {
         if( distance >= nearClippingPlane && distance <= farClippingPlane )
         {
@@ -296,7 +298,8 @@ HitActor HitTestWithinLayer( Actor& actor,
                                                  overlayHit,
                                                  layerIs3d,
                                                  newClippingDepth,
-                                                 clippingBitPlaneMask ) );
+                                                 clippingBitPlaneMask,
+                                                 rayTest ) );
 
         bool updateChildHit = false;
         if( currentHit.distance >= 0.0f )
@@ -406,7 +409,8 @@ bool HitTestRenderTask( const RenderTaskList::ExclusivesContainer& exclusives,
                         RenderTask& renderTask,
                         Vector2 screenCoordinates,
                         Results& results,
-                        HitTestInterface& hitCheck )
+                        HitTestInterface& hitCheck,
+                        const RayTest& rayTest )
 {
   if ( renderTask.IsHittable( screenCoordinates ) )
   {
@@ -472,7 +476,8 @@ bool HitTestRenderTask( const RenderTaskList::ExclusivesContainer& exclusives,
                                         overlayHit,
                                         layer->GetBehavior() == Dali::Layer::LAYER_3D,
                                         0u,
-                                        0u );
+                                        0u,
+                                        rayTest );
             }
             else if( IsWithinSourceActors( *sourceActor, *layer ) )
             {
@@ -488,7 +493,8 @@ bool HitTestRenderTask( const RenderTaskList::ExclusivesContainer& exclusives,
                                         overlayHit,
                                         layer->GetBehavior() == Dali::Layer::LAYER_3D,
                                         0u,
-                                        0u );
+                                        0u,
+                                        rayTest );
             }
 
             // If this layer is set to consume the hit, then do not check any layers behind it
@@ -541,6 +547,7 @@ bool HitTestRenderTaskList( const Vector2& sceneSize,
   RenderTaskList::RenderTaskContainer& tasks = taskList.GetTasks();
   RenderTaskList::RenderTaskContainer::reverse_iterator endIter = tasks.rend();
   const auto& exclusives = taskList.GetExclusivesList();
+  RayTest rayTest;
 
   for( RenderTaskList::RenderTaskContainer::reverse_iterator iter = tasks.rbegin(); endIter != iter; ++iter )
   {
@@ -552,7 +559,7 @@ bool HitTestRenderTaskList( const Vector2& sceneSize,
       continue;
     }
 
-    if( HitTestRenderTask( exclusives, sceneSize, layers, renderTask, screenCoordinates, results, hitCheck ) )
+    if( HitTestRenderTask( exclusives, sceneSize, layers, renderTask, screenCoordinates, results, hitCheck, rayTest ) )
     {
       // Return true when an actor is hit (or layer in our render-task consumes the hit)
       return true; // don't bother checking off screen tasks
