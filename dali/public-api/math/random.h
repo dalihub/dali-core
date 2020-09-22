@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/math/vector4.h>
+#include <algorithm>
 
 namespace Dali
 {
