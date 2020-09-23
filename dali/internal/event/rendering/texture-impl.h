@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_NEW_TEXTURE_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,14 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h> // DALI_ASSERT_ALWAYS
-#include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
-#include <dali/public-api/object/base-object.h>
-#include <dali/public-api/images/pixel.h>
-#include <dali/public-api/images/image-operations.h> // Dali::ImageDimensions
-#include <dali/public-api/rendering/texture.h> // Dali::Internal::Render::Texture
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/images/pixel-data-impl.h>
+#include <dali/public-api/common/dali-common.h>      // DALI_ASSERT_ALWAYS
+#include <dali/public-api/common/intrusive-ptr.h>    // Dali::IntrusivePtr
+#include <dali/public-api/images/image-operations.h> // Dali::ImageDimensions
+#include <dali/public-api/images/pixel.h>
+#include <dali/public-api/object/base-object.h>
+#include <dali/public-api/rendering/texture.h> // Dali::Internal::Render::Texture
 
 namespace Dali
 {
@@ -43,18 +43,17 @@ using TexturePtr = IntrusivePtr<Texture>;
 class Texture : public BaseObject
 {
 public:
-
   /**
    * @brief Structure used to pass parameters to the Upload method
    */
   struct UploadParams
   {
-    uint16_t layer;    ///< Specifies the layer of a cube map or array texture
-    uint16_t mipmap;   ///< Specifies the level-of-detail number. Level 0 is the base image level. Level n is the nth mipmap reduction image.
-    uint16_t xOffset;  ///< Specifies a texel offset in the x direction within the texture array.
-    uint16_t yOffset;  ///< Specifies a texel offset in the y direction within the texture array.
-    uint16_t width;    ///< Specifies the width of the texture subimage
-    uint16_t height;   ///< Specifies the height of the texture subimage.
+    uint16_t layer;   ///< Specifies the layer of a cube map or array texture
+    uint16_t mipmap;  ///< Specifies the level-of-detail number. Level 0 is the base image level. Level n is the nth mipmap reduction image.
+    uint16_t xOffset; ///< Specifies a texel offset in the x direction within the texture array.
+    uint16_t yOffset; ///< Specifies a texel offset in the y direction within the texture array.
+    uint16_t width;   ///< Specifies the width of the texture subimage
+    uint16_t height;  ///< Specifies the height of the texture subimage.
   };
 
   /**
@@ -73,7 +72,7 @@ public:
    * @param[in] nativeImageInterface The native image
    * @return A smart-pointer to the newly allocated Texture.
    */
-  static TexturePtr New( NativeImageInterface& nativeImageInterface );
+  static TexturePtr New(NativeImageInterface& nativeImageInterface);
 
   /**
    * @brief Get the texture render object
@@ -85,15 +84,18 @@ public:
   /**
    * @copydoc Dali::Texture::Upload()
    */
-  bool Upload( PixelDataPtr pixelData );
+  bool Upload(PixelDataPtr pixelData);
 
   /**
    * @copydoc Dali::Texture::Upload()
    */
-  bool Upload( PixelDataPtr pixelData,
-               unsigned int layer, unsigned int mipmap,
-               unsigned int xOffset, unsigned int yOffset,
-               unsigned int width, unsigned int height );
+  bool Upload(PixelDataPtr pixelData,
+              unsigned int layer,
+              unsigned int mipmap,
+              unsigned int xOffset,
+              unsigned int yOffset,
+              unsigned int width,
+              unsigned int height);
 
   /**
    * @copydoc Dali::Texture::GenerateMipmaps()
@@ -110,21 +112,35 @@ public:
    */
   unsigned int GetHeight() const;
 
-private: // implementation
+  /**
+   * @brief Determine if the texture is a native image
+   *
+   * @return true if the texture has been initialized with a native image
+   */
+  bool IsNative() const;
 
+  /**
+   * @brief Apply any native texture code to the given fragment shader
+   *
+   * @param[in,out] shader The fragment shader
+   * @return true if the shader has been modified.
+   */
+  bool ApplyNativeFragmentShader(std::string& shader);
+
+private: // implementation
   /**
    * Constructor
    * @param[in] type The type of the texture
    * @param[in] format The format of the pixel data
    * @param[in] size The size of the texture
    */
-  Texture(TextureType::Type type, Pixel::Format format, ImageDimensions size );
+  Texture(TextureType::Type type, Pixel::Format format, ImageDimensions size);
 
   /**
    * Constructor from native image
    * @param[in] nativeImageInterface The native image
    */
-  Texture( NativeImageInterfacePtr nativeImageInterface );
+  Texture(NativeImageInterfacePtr nativeImageInterface);
 
   /**
    * Second stage initialization of the Texture
@@ -132,26 +148,23 @@ private: // implementation
   void Initialize();
 
 protected:
-
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
   ~Texture() override;
 
 private: // unimplemented methods
-  Texture( const Texture& );
-  Texture& operator=( const Texture& );
+  Texture(const Texture&);
+  Texture& operator=(const Texture&);
 
-private: // data
-
-  Internal::EventThreadServices& mEventThreadServices;    ///<Used to send messages to the render thread via update thread
-  Internal::Render::Texture* mRenderObject;            ///<The Render::Texture associated to this texture
+private:                                               // data
+  Internal::EventThreadServices& mEventThreadServices; ///<Used to send messages to the render thread via update thread
+  Internal::Render::Texture*     mRenderObject;        ///<The Render::Texture associated to this texture
 
   NativeImageInterfacePtr mNativeImage; ///< Pointer to native image
-  ImageDimensions mSize;                ///< Size of the texture
+  ImageDimensions         mSize;        ///< Size of the texture
   Dali::TextureType::Type mType;        ///< Texture type (cached)
-  Pixel::Format mFormat;                ///< Pixel format
-
+  Pixel::Format           mFormat;      ///< Pixel format
 };
 
 } // namespace Internal

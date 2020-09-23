@@ -99,24 +99,24 @@ Property::Type Handle::GetPropertyType(Property::Index index) const
   return GetImplementation(*this).GetPropertyType(index);
 }
 
-void Handle::SetProperty(Property::Index index, const Property::Value& propertyValue)
+void Handle::SetProperty(Property::Index index, Property::Value propertyValue)
 {
-  GetImplementation(*this).SetProperty(index, propertyValue);
+  GetImplementation(*this).SetProperty(index, std::move(propertyValue));
 }
 
-Property::Index Handle::RegisterProperty(const std::string& name, const Property::Value& propertyValue)
+Property::Index Handle::RegisterProperty(std::string name, Property::Value propertyValue)
 {
-  return GetImplementation(*this).RegisterProperty(name, propertyValue);
+  return GetImplementation(*this).RegisterProperty(std::move(name), std::move(propertyValue));
 }
 
-Property::Index Handle::RegisterProperty(Property::Index key, const std::string& name, const Property::Value& propertyValue)
+Property::Index Handle::RegisterProperty(Property::Index key, std::string name, Property::Value propertyValue)
 {
-  return GetImplementation(*this).RegisterProperty(name, key, propertyValue);
+  return GetImplementation(*this).RegisterProperty(std::move(name), key, std::move(propertyValue));
 }
 
-Property::Index Handle::RegisterProperty(const std::string& name, const Property::Value& propertyValue, Property::AccessMode accessMode)
+Property::Index Handle::RegisterProperty(std::string name, Property::Value propertyValue, Property::AccessMode accessMode)
 {
-  return GetImplementation(*this).RegisterProperty(name, propertyValue, accessMode);
+  return GetImplementation(*this).RegisterProperty(std::move(name), std::move(propertyValue), accessMode);
 }
 
 Property::Value Handle::GetProperty(Property::Index index) const

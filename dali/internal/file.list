@@ -5,7 +5,6 @@ SET( internal_src_dir ${ROOT_SRC_DIR}/dali/internal )
 SET( internal_src_files
   ${internal_src_dir}/common/blending-options.cpp
   ${internal_src_dir}/common/core-impl.cpp
-  ${internal_src_dir}/common/internal-constants.cpp
   ${internal_src_dir}/common/math.cpp
   ${internal_src_dir}/common/message-buffer.cpp
   ${internal_src_dir}/common/mutex-trace.cpp
@@ -14,6 +13,8 @@ SET( internal_src_files
   ${internal_src_dir}/common/fixed-size-memory-pool.cpp
 
   ${internal_src_dir}/event/actors/actor-impl.cpp
+  ${internal_src_dir}/event/actors/actor-property-handler.cpp
+  ${internal_src_dir}/event/actors/actor-relayouter.cpp
   ${internal_src_dir}/event/actors/custom-actor-internal.cpp
   ${internal_src_dir}/event/actors/layer-impl.cpp
   ${internal_src_dir}/event/actors/layer-list.cpp
@@ -72,6 +73,7 @@ SET( internal_src_files
   ${internal_src_dir}/event/events/pinch-gesture/pinch-gesture-event.cpp
   ${internal_src_dir}/event/events/pinch-gesture/pinch-gesture-processor.cpp
   ${internal_src_dir}/event/events/pinch-gesture/pinch-gesture-recognizer.cpp
+  ${internal_src_dir}/event/events/ray-test.cpp
   ${internal_src_dir}/event/events/rotation-gesture/rotation-gesture-detector-impl.cpp
   ${internal_src_dir}/event/events/rotation-gesture/rotation-gesture-processor.cpp
   ${internal_src_dir}/event/events/rotation-gesture/rotation-gesture-recognizer.cpp

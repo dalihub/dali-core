@@ -175,7 +175,7 @@ public:
   /**
    * @copydoc Dali::Handle::SetProperty()
    */
-  void SetProperty( Property::Index index, const Property::Value& propertyValue );
+  void SetProperty(Property::Index index, Property::Value propertyValue);
 
   /**
    * @copydoc Dali::Handle::GetProperty()
@@ -197,12 +197,12 @@ public:
   /**
    * @copydoc Dali::Handle::RegisterProperty()
    */
-  Property::Index RegisterProperty( const std::string& name, const Property::Value& propertyValue );
+  Property::Index RegisterProperty(std::string name, Property::Value propertyValue);
 
   /**
    * @copydoc Dali::Handle::RegisterProperty()
    */
-  Property::Index RegisterProperty( const std::string& name, Property::Index key, const Property::Value& propertyValue );
+  Property::Index RegisterProperty(std::string name, Property::Index key, Property::Value propertyValue);
 
   /**
    * @copydoc Dali::DevelHandle::SetProperties()
@@ -217,12 +217,15 @@ public:
   /**
    * @copydoc Dali::Handle::RegisterProperty(std::string name, Property::Value propertyValue, Property::AccessMode accessMode)
    */
-  Property::Index RegisterProperty( const std::string& name, const Property::Value& propertyValue, Property::AccessMode accessMode );
+  Property::Index RegisterProperty(std::string name, Property::Value propertyValue, Property::AccessMode accessMode);
 
   /**
    * @brief Implementing method for this override
    */
-  Property::Index RegisterProperty( const std::string& name, Property::Index key, const Property::Value& propertyValue, Property::AccessMode accessMode );
+  Property::Index RegisterProperty(std::string          name,
+                                   Property::Index      key,
+                                   Property::Value      propertyValue,
+                                   Property::AccessMode accessMode);
 
   /**
    * @brief returns true if the custom property exists on this object.
@@ -270,7 +273,7 @@ public:
    * @param propertyIndex index of the property
    * @param uniformName name of the uniform (same as property name)
    */
-  void AddUniformMapping( Property::Index propertyIndex, const std::string& uniformName ) const;
+  void AddUniformMapping(Property::Index propertyIndex, std::string uniformName) const;
 
   /**
    * Removes uniform mapping for given property
