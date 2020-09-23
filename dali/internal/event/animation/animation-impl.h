@@ -245,42 +245,42 @@ public:
   /**
    * @copydoc Dali::Animation::AnimateBy(Property target, Property::Value relativeValue)
    */
-  void AnimateBy(Property& target, Property::Value& relativeValue);
+  void AnimateBy(Property& target, Property::Value relativeValue);
 
   /**
    * @copydoc Dali::Animation::AnimateBy(Property target, Property::Value relativeValue, AlphaFunction alpha)
    */
-  void AnimateBy(Property& target, Property::Value& relativeValue, AlphaFunction alpha);
+  void AnimateBy(Property& target, Property::Value relativeValue, AlphaFunction alpha);
 
   /**
    * @copydoc Dali::Animation::AnimateBy(Property target, Property::Value relativeValue, TimePeriod period)
    */
-  void AnimateBy(Property& target, Property::Value& relativeValue, TimePeriod period);
+  void AnimateBy(Property& target, Property::Value relativeValue, TimePeriod period);
 
   /**
    * @copydoc Dali::Animation::AnimateBy(Property target, Property::Value relativeValue, AlphaFunction alpha, TimePeriod period)
    */
-  void AnimateBy(Property& target, Property::Value& relativeValue, AlphaFunction alpha, TimePeriod period);
+  void AnimateBy(Property& target, Property::Value relativeValue, AlphaFunction alpha, TimePeriod period);
 
   /**
    * @copydoc Dali::Animation::AnimateTo(Property target, Property::Value destinationValue)
    */
-  void AnimateTo(Property& target, Property::Value& destinationValue);
+  void AnimateTo(Property& target, Property::Value destinationValue);
 
   /**
    * @copydoc Dali::Animation::AnimateTo(Property target, Property::Value destinationValue, AlphaFunction alpha)
    */
-  void AnimateTo(Property& target, Property::Value& destinationValue, AlphaFunction alpha);
+  void AnimateTo(Property& target, Property::Value destinationValue, AlphaFunction alpha);
 
   /**
    * @copydoc Dali::Animation::AnimateTo(Property target, Property::Value destinationValue, TimePeriod period)
    */
-  void AnimateTo(Property& target, Property::Value& destinationValue, TimePeriod period);
+  void AnimateTo(Property& target, Property::Value destinationValue, TimePeriod period);
 
   /**
    * @copydoc Dali::Animation::AnimateTo(Property target, Property::Value destinationValue, AlphaFunction alpha, TimePeriod period)
    */
-  void AnimateTo(Property& target, Property::Value& destinationValue, AlphaFunction alpha, TimePeriod period);
+  void AnimateTo(Property& target, Property::Value destinationValue, AlphaFunction alpha, TimePeriod period);
 
   /**
    * @copydoc Dali::Animation::AnimateBetween(Property target, KeyFrames& keyFrames)
@@ -476,18 +476,20 @@ private:
 
   struct ConnectorTargetValues
   {
-    ConnectorTargetValues()
-    : targetValue(),
-      timePeriod( 0.0f ),
-      connectorIndex( 0 ),
-      animatorType( TO )
+    ConnectorTargetValues() = default;
+
+    ConnectorTargetValues(Property::Value value, TimePeriod time, std::size_t index, Animation::Type type)
+    : targetValue(std::move(value)),
+      timePeriod(time),
+      connectorIndex(index),
+      animatorType(type)
     {
     }
 
     Property::Value targetValue;
-    TimePeriod timePeriod;
-    std::size_t connectorIndex;
-    Animation::Type animatorType;
+    TimePeriod      timePeriod{0.f};
+    std::size_t     connectorIndex{0};
+    Animation::Type animatorType{TO};
   };
 
   enum class Notify
