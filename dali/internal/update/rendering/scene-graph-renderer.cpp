@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -181,7 +181,7 @@ void Renderer::operator delete( void* ptr )
 }
 
 
-void Renderer::PrepareRender( BufferIndex updateBufferIndex )
+bool Renderer::PrepareRender( BufferIndex updateBufferIndex )
 {
   if( mRegenerateUniformMap == UNIFORM_MAP_READY )
   {
@@ -220,6 +220,8 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
     mUniformMapChanged[updateBufferIndex] = true;
     mRegenerateUniformMap--;
   }
+
+  bool rendererUpdated = mUniformMapChanged[updateBufferIndex] || mResendFlag;
 
   if( mResendFlag != 0 )
   {
@@ -365,6 +367,8 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
 
     mResendFlag = 0;
   }
+
+  return rendererUpdated;
 }
 
 void Renderer::SetTextures( TextureSet* textureSet )
