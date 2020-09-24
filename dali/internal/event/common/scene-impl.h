@@ -114,7 +114,7 @@ public:
   /**
    * @copydoc Dali::Integration::Scene::New
    */
-  static ScenePtr New( Size size );
+  static ScenePtr New(Size size, int orientation = 0);
 
   /**
    * virtual destructor
@@ -232,6 +232,24 @@ public:
   SceneGraph::Scene* GetSceneObject() const;
 
   /**
+   * Notify the surface has been rotated.
+   * When the device is rotated or the rotation event is received by display manager,
+   * this function will be called by window implementation.
+   *
+   * @param[in] width The width of rotated surface
+   * @param[in] height The height of rotated surface
+   * @param[in] orientation The orientation of rotated surface
+   */
+  void SurfaceRotated(float width, float height, int orientation);
+
+  /**
+   * @brief Get surface's current orientation
+   *
+   * @return surface orientation
+   */
+  int GetSurfaceOrientation();
+
+  /**
    * Used by the EventProcessor to emit key event signals.
    * @param[in] event The key event.
    */
@@ -338,14 +356,24 @@ private:
    * Second-phase constructor.
    *
    * @param[in] size The size of the set surface
+   * @param[in] orientation The orientation of the set surface for this scene
    */
-  void Initialize( Size size );
+  void Initialize(Size size, int orientation);
 
   // Undefined
   Scene(const Scene&) = delete;
 
   // Undefined
   Scene& operator=(const Scene& rhs) = delete;
+
+  /**
+   * Informs the scene that the set surface has been resized or rotated.
+   *
+   * @param[in] width The width of rotated surface
+   * @param[in] height The height of rotated surface
+   * @param[in] orientation The orientation of rotated surface
+   */
+  void ChangedSurface(float width, float height, int orientation);
 
 private:
   Internal::SceneGraph::Scene* mSceneObject;
@@ -369,6 +397,9 @@ private:
   bool mDepthTreeDirty:1;  ///< True if the depth tree needs recalculating
 
   EventProcessor mEventProcessor;
+
+  // The Surface's orientation
+  int mSurfaceOrientation;
 
   // The key event signal
   Integration::Scene::KeyEventSignalType mKeyEventSignal;

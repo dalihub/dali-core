@@ -77,7 +77,8 @@ struct RenderManager::Impl
     programController( glAbstraction ),
     depthBufferAvailable( depthBufferAvailableParam ),
     stencilBufferAvailable( stencilBufferAvailableParam ),
-    partialUpdateAvailable( partialUpdateAvailableParam )
+    partialUpdateAvailable( partialUpdateAvailableParam ),
+    defaultSurfaceOrientation(0)
   {
      // Create thread pool with just one thread ( there may be a need to create more threads in the future ).
     threadPool = std::unique_ptr<Dali::ThreadPool>( new Dali::ThreadPool() );
@@ -174,6 +175,9 @@ struct RenderManager::Impl
   std::unique_ptr<Dali::ThreadPool>         threadPool;               ///< The thread pool
   Vector<GLuint>                            boundTextures;            ///< The textures bound for rendering
   Vector<GLuint>                            textureDependencyList;    ///< The dependency list of binded textures
+
+  int                                       defaultSurfaceOrientation; ///< defaultSurfaceOrientation for the default surface we are rendering to
+
 };
 
 RenderManager* RenderManager::New( Integration::GlAbstraction& glAbstraction,
@@ -255,6 +259,11 @@ void RenderManager::SetShaderSaver( ShaderSaver& upstream )
 void RenderManager::SetDefaultSurfaceRect(const Rect<int32_t>& rect)
 {
   mImpl->defaultSurfaceRect = rect;
+}
+
+void RenderManager::SetDefaultSurfaceOrientation(int orientation)
+{
+  mImpl->defaultSurfaceOrientation = orientation;
 }
 
 void RenderManager::AddRenderer( OwnerPointer< Render::Renderer >& renderer )
@@ -822,6 +831,7 @@ void RenderManager::RenderScene( Integration::RenderStatus& status, Integration:
     Rect<int32_t> surfaceRect = mImpl->defaultSurfaceRect;
     Integration::DepthBufferAvailable depthBufferAvailable = mImpl->depthBufferAvailable;
     Integration::StencilBufferAvailable stencilBufferAvailable = mImpl->stencilBufferAvailable;
+    int surfaceOrientation = sceneInternal.GetSurfaceOrientation();
 
     if ( instruction.mFrameBuffer )
     {
@@ -921,6 +931,7 @@ void RenderManager::RenderScene( Integration::RenderStatus& status, Integration:
       {
         viewportRect.Set( 0, 0, instruction.mFrameBuffer->GetWidth(), instruction.mFrameBuffer->GetHeight() );
       }
+      surfaceOrientation = 0;
     }
     else // No Offscreen frame buffer rendering
     {
@@ -936,6 +947,9 @@ void RenderManager::RenderScene( Integration::RenderStatus& status, Integration:
         viewportRect = surfaceRect;
       }
     }
+
+    // Set surface orientation
+    mImpl->currentContext->SetSurfaceOrientation(surfaceOrientation);
 
     bool clearFullFrameRect = true;
     if( instruction.mFrameBuffer != nullptr )
@@ -1079,6 +1093,7 @@ void RenderManager::RenderScene( Integration::RenderStatus& status, Integration:
 
   GLenum attachments[] = { GL_DEPTH, GL_STENCIL };
   mImpl->currentContext->InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
+
 }
 
 void RenderManager::PostRender( bool uploadOnly )

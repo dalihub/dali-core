@@ -107,7 +107,8 @@ Context::Context( Integration::GlAbstraction& glAbstraction, OwnerContainer< Con
   mClearColor(Color::WHITE),    // initial color, never used until it's been set by the user
   mCullFaceMode( FaceCullingMode::NONE ),
   mViewPort( 0, 0, 0, 0 ),
-  mSceneContexts( contexts )
+  mSceneContexts( contexts ),
+  mSurfaceOrientation(0)
 {
 }
 
