@@ -288,6 +288,9 @@ protected: // For derived classes
   {
     ACTOR_BEHAVIOUR_DEFAULT  = 0,      ///< Use to provide default behaviour (size negotiation is on, event callbacks are not called). @SINCE_1_2_10
     DISABLE_SIZE_NEGOTIATION = 1 << 0, ///< True if control does not need size negotiation, i.e. it can be skipped in the algorithm @SINCE_1_0.0
+    NOT_IN_USE_1             = 1<<1,
+    NOT_IN_USE_2             = 1<<2,
+    NOT_IN_USE_3             = 1<<3,
 
     LAST_ACTOR_FLAG ///< Special marker for last actor flag @SINCE_1_0.0
   };
