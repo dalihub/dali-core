@@ -19,6 +19,8 @@
 #include <dali/public-api/object/property-value.h>
 
 // EXTERNAL INCLUDES
+#include <algorithm>
+#include <cstring>
 #include <ostream>
 
 // INTERNAL INCLUDES
@@ -37,11 +39,39 @@
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/object/property-types.h>
 
+/**
+ * As the Implementation is bit complex because of Small Buffer Optimization (SBO)
+ * In the Property::Value class and Tagged Union implementation in the Impl class.
+ * Here is the brief description of the motivation and internal of this implementation.
+ *
+ * The main motivation is to keep the value semantic without doing any heap allocation.
+ * 1. In the public class we keep a aligned buffer of 16byte instead of keeping the Pimpl pointer.
+ * 2. we create the Impl object inplace in that buffer to avoid the memory allocation.
+ * 3. we don't store the Impl* along with the SBO storage to save 8byte from the Property::Value object.
+ * 4. Every time we need to access  Impl object we access it through Read() and Write() which retrieves
+ *    the already constructed Impl object from the SBO storage.
+ * 5. with SBO , the move and assignment operator are tricky , so we use std::copy to move the object
+ *    and update the moved from object to NONE to keep it in a safe state.
+ * 6. In the Impl class, we keep a Uninitialized Union and manage lifecycle of objects by doing construct/destroy manually.
+ * 7. We keep the Type information along with the Object to keep the size as 16byte (using common initial sequence(CIS) ).
+ */
+
 namespace Dali
 {
 
 struct Property::Value::Impl
 {
+  template<typename... Args>
+  static Impl* New(Property::Value::Storage& buffer, Args... args)
+  {
+    return new(&buffer) Impl(std::forward<Args>(args)...);
+  }
+
+  static void Delete(Property::Value::Impl& impl)
+  {
+    impl.~Impl();
+  }
+
   ~Impl()
   {
     // Destroy the current object stored in Data union memory.
@@ -226,7 +256,17 @@ struct Property::Value::Impl
     return &(mData.mMap.member);
   }
 
+  const Property::Map* GetMapPtr() const
+  {
+    return &(mData.mMap.member);
+  }
+
   Property::Array* GetArrayPtr()
+  {
+    return &(mData.mArray.member);
+  }
+
+  const Property::Array* GetArrayPtr() const
   {
     return &(mData.mArray.member);
   }
@@ -368,12 +408,12 @@ struct Property::Value::Impl
     return *this;
   }
 
-private:
   void SetType(Type typeValue)
   {
     mData.mType.type = typeValue;
   }
 
+private:
   /**
    * This helper function takes a typed(Tp) memory location( member)
    * and a object of same type( val ) and move constructs a new object of
@@ -524,205 +564,223 @@ private:
   Data mData;
 };
 
-Property::Value::Value()
-: mImpl(nullptr)
+/*
+ * Safe way to read an already constructed Object from a buffer.
+ */
+const Property::Value::Impl& Property::Value::Read() const
 {
+  return *(std::launder(reinterpret_cast<const Property::Value::Impl*>(mStorage.buffer)));
+}
+
+Property::Value::Impl& Property::Value::Write()
+{
+  return *(std::launder(reinterpret_cast<Property::Value::Impl*>(mStorage.buffer)));
+}
+
+Property::Value::Value()
+{
+  Impl::New(mStorage);
+
+  static_assert(sizeof(Value) == 16);
+  static_assert(alignof(Value) == alignof(Value*));
 }
 
 Property::Value::Value(bool booleanValue)
-: mImpl(new Impl(booleanValue))
 {
+  Impl::New(mStorage, booleanValue);
 }
 
 Property::Value::Value(float floatValue)
-: mImpl(new Impl(floatValue))
 {
+  Impl::New(mStorage, floatValue);
 }
 
 Property::Value::Value(int32_t integerValue)
-: mImpl(new Impl(integerValue))
 {
+  Impl::New(mStorage, integerValue);
 }
 
 Property::Value::Value(const Vector2& vectorValue)
-: mImpl(new Impl(vectorValue))
 {
+  Impl::New(mStorage, vectorValue);
 }
 
 Property::Value::Value(const Vector3& vectorValue)
-: mImpl(new Impl(vectorValue))
 {
+  Impl::New(mStorage, vectorValue);
 }
 
 Property::Value::Value(const Vector4& vectorValue)
-: mImpl(new Impl(vectorValue))
 {
+  Impl::New(mStorage, vectorValue);
 }
 
 Property::Value::Value(const Matrix3& matrixValue)
-: mImpl(new Impl(matrixValue))
 {
+  Impl::New(mStorage, matrixValue);
 }
 
 Property::Value::Value(const Matrix& matrixValue)
-: mImpl(new Impl(matrixValue))
 {
+  Impl::New(mStorage, matrixValue);
 }
 
 Property::Value::Value(const Rect<int32_t>& rectValue)
-: mImpl(new Impl(rectValue))
 {
+  Impl::New(mStorage, rectValue);
 }
 
 Property::Value::Value(const Rect<float>& rectValue)
-: mImpl(new Impl(Vector4(rectValue.x, rectValue.y, rectValue.width, rectValue.height)))
 {
+  Impl::New(mStorage, Vector4(rectValue.x, rectValue.y, rectValue.width, rectValue.height));
 }
 
 Property::Value::Value(const AngleAxis& angleAxisValue)
-: mImpl(new Impl(angleAxisValue))
 {
+  Impl::New(mStorage, angleAxisValue);
 }
 
 Property::Value::Value(const Quaternion& quaternionValue)
 {
   AngleAxis angleAxisValue;
   quaternionValue.ToAxisAngle(angleAxisValue.axis, angleAxisValue.angle);
-  mImpl = new Impl(std::move(angleAxisValue));
+  Impl::New(mStorage, std::move(angleAxisValue));
 }
 
 Property::Value::Value(std::string stringValue)
-: mImpl(new Impl(std::move(stringValue)))
 {
+  Impl::New(mStorage, std::move(stringValue));
 }
 
 Property::Value::Value(const char* stringValue)
-: mImpl(nullptr)
 {
   if(stringValue) // string constructor is undefined with nullptr
   {
-    mImpl = new Impl(std::string(stringValue));
+    Impl::New(mStorage, std::string(stringValue));
   }
   else
   {
-    mImpl = new Impl(std::string());
+    Impl::New(mStorage, std::string());
   }
 }
 
 Property::Value::Value(Property::Array arrayValue)
-: mImpl(new Impl(std::move(arrayValue)))
 {
+  Impl::New(mStorage, std::move(arrayValue));
 }
 
 Property::Value::Value(Property::Map mapValue)
-: mImpl(new Impl(std::move(mapValue)))
 {
+  Impl::New(mStorage, std::move(mapValue));
 }
 
 Property::Value::Value(const Extents& extentsValue)
-: mImpl(new Impl(extentsValue))
 {
+  Impl::New(mStorage, extentsValue);
 }
 
 Property::Value::Value(const std::initializer_list<KeyValuePair>& values)
-: mImpl(new Impl(Property::Map(values)))
 {
+  Impl::New(mStorage, Property::Map(values));
 }
 
 Property::Value::Value(Type type)
-: mImpl(nullptr)
 {
   switch(type)
   {
     case Property::BOOLEAN:
     {
-      mImpl = new Impl(false);
+      Impl::New(mStorage, false);
       break;
     }
     case Property::FLOAT:
     {
-      mImpl = new Impl(0.f);
+      Impl::New(mStorage, 0.f);
       break;
     }
     case Property::INTEGER:
     {
-      mImpl = new Impl(0);
+      Impl::New(mStorage, 0);
       break;
     }
     case Property::VECTOR2:
     {
-      mImpl = new Impl(Vector2::ZERO);
+      Impl::New(mStorage, Vector2::ZERO);
       break;
     }
     case Property::VECTOR3:
     {
-      mImpl = new Impl(Vector3::ZERO);
+      Impl::New(mStorage, Vector3::ZERO);
       break;
     }
     case Property::VECTOR4:
     {
-      mImpl = new Impl(Vector4::ZERO);
+      Impl::New(mStorage, Vector4::ZERO);
       break;
     }
     case Property::RECTANGLE:
     {
-      mImpl = new Impl(Rect<int32_t>());
+      Impl::New(mStorage, Rect<int32_t>());
       break;
     }
     case Property::ROTATION:
     {
-      mImpl = new Impl(AngleAxis());
+      Impl::New(mStorage, AngleAxis());
       break;
     }
     case Property::STRING:
     {
-      mImpl = new Impl(std::string());
+      Impl::New(mStorage, std::string());
       break;
     }
     case Property::MATRIX:
     {
-      mImpl = new Impl(Matrix());
+      Impl::New(mStorage, Matrix());
       break;
     }
     case Property::MATRIX3:
     {
-      mImpl = new Impl(Matrix3());
+      Impl::New(mStorage, Matrix3());
       break;
     }
     case Property::ARRAY:
     {
-      mImpl = new Impl(Property::Array());
+      Impl::New(mStorage, Property::Array());
       break;
     }
     case Property::MAP:
     {
-      mImpl = new Impl(Property::Map());
+      Impl::New(mStorage, Property::Map());
       break;
     }
     case Property::EXTENTS:
     {
-      mImpl = new Impl(Extents());
+      Impl::New(mStorage, Extents());
       break;
     }
     case Property::NONE:
     {
-      // No need to create an Impl
+      Impl::New(mStorage);
       break;
     }
   }
 }
 
 Property::Value::Value(const Property::Value& value)
-: mImpl(nullptr)
 {
+  Impl::New(mStorage);
+
   // reuse assignment operator
   operator=(value);
 }
 
 Property::Value::Value(Property::Value&& value) noexcept
-: mImpl(value.mImpl)
 {
-  value.mImpl = nullptr;
+  // steal the Impl object by doing a copy.
+  std::copy(std::begin(value.mStorage.buffer), std::end(value.mStorage.buffer), std::begin(mStorage.buffer));
+
+  // update the moved from object to NONE state.
+  value.Write().SetType(Property::NONE);
 }
 
 Property::Value& Property::Value::operator=(const Property::Value& value)
@@ -733,20 +791,8 @@ Property::Value& Property::Value::operator=(const Property::Value& value)
     return *this;
   }
 
-  if(value.mImpl)
-  {
-    if(!mImpl)
-    {
-      mImpl = new Impl();
-    }
-
-    *mImpl = *(value.mImpl);
-  }
-  else
-  {
-    delete mImpl;
-    mImpl = nullptr;
-  }
+  // this will call the Impl operator=()
+  Write() = value.Read();
 
   return *this;
 }
@@ -755,9 +801,14 @@ Property::Value& Property::Value::operator=(Property::Value&& value) noexcept
 {
   if(this != &value)
   {
-    delete mImpl;
-    mImpl       = value.mImpl;
-    value.mImpl = nullptr;
+    // delete the existing Impl object
+    Impl::Delete(Write());
+
+    // steal the Impl object by doing a copy.
+    std::copy(std::begin(value.mStorage.buffer), std::end(value.mStorage.buffer), std::begin(mStorage.buffer));
+
+    // update the moved from object to NONE state.
+    value.Write().SetType(Property::NONE);
   }
 
   return *this;
@@ -765,159 +816,168 @@ Property::Value& Property::Value::operator=(Property::Value&& value) noexcept
 
 Property::Value::~Value()
 {
-  delete mImpl;
+  Impl::Delete(Write());
 }
 
 Property::Type Property::Value::GetType() const
 {
-  return mImpl ? mImpl->GetType() : Property::NONE;
+  return Read().GetType();
 }
 
 bool Property::Value::Get(bool& booleanValue) const
 {
   bool converted = false;
-  if(mImpl)
+
+  const auto& obj = Read();
+
+  if(obj.GetType() == BOOLEAN)
   {
-    if(mImpl->GetType() == BOOLEAN)
-    {
-      booleanValue = mImpl->GetBool();
-      converted    = true;
-    }
-    else if(mImpl->GetType() == INTEGER)
-    {
-      booleanValue = mImpl->GetInt();
-      converted    = true;
-    }
+    booleanValue = obj.GetBool();
+    converted    = true;
   }
+  else if(obj.GetType() == INTEGER)
+  {
+    booleanValue = obj.GetInt();
+    converted    = true;
+  }
+
   return converted;
 }
 
 bool Property::Value::Get(float& floatValue) const
 {
   bool converted = false;
-  if(mImpl)
+
+  const auto& obj = Read();
+
+  if(obj.GetType() == FLOAT)
   {
-    if(mImpl->GetType() == FLOAT)
-    {
-      floatValue = mImpl->GetFloat();
-      converted  = true;
-    }
-    else if(mImpl->GetType() == BOOLEAN)
-    {
-      floatValue = static_cast<float>(mImpl->GetBool());
-      converted  = true;
-    }
-    else if(mImpl->GetType() == INTEGER)
-    {
-      floatValue = static_cast<float>(mImpl->GetInt());
-      converted  = true;
-    }
+    floatValue = obj.GetFloat();
+    converted  = true;
   }
+  else if(obj.GetType() == BOOLEAN)
+  {
+    floatValue = static_cast<float>(obj.GetBool());
+    converted  = true;
+  }
+  else if(obj.GetType() == INTEGER)
+  {
+    floatValue = static_cast<float>(obj.GetInt());
+    converted  = true;
+  }
+
   return converted;
 }
 
 bool Property::Value::Get(int32_t& integerValue) const
 {
   bool converted = false;
-  if(mImpl)
+
+  const auto& obj = Read();
+
+  if(obj.GetType() == INTEGER)
   {
-    if(mImpl->GetType() == INTEGER)
-    {
-      integerValue = mImpl->GetInt();
-      converted    = true;
-    }
-    else if(mImpl->GetType() == BOOLEAN)
-    {
-      integerValue = mImpl->GetBool();
-      converted    = true;
-    }
-    else if(mImpl->GetType() == FLOAT)
-    {
-      integerValue = static_cast<int32_t>(mImpl->GetFloat());
-      converted    = true;
-    }
+    integerValue = obj.GetInt();
+    converted    = true;
   }
+  else if(obj.GetType() == BOOLEAN)
+  {
+    integerValue = obj.GetBool();
+    converted    = true;
+  }
+  else if(obj.GetType() == FLOAT)
+  {
+    integerValue = static_cast<int32_t>(obj.GetFloat());
+    converted    = true;
+  }
+
   return converted;
 }
 
 bool Property::Value::Get(Vector2& vectorValue) const
 {
   bool converted = false;
-  if(mImpl)
+
+  const auto& obj = Read();
+
+  if(obj.GetType() == VECTOR4)
   {
-    if(mImpl->GetType() == VECTOR4)
-    {
-      vectorValue = mImpl->GetVector4();
-      converted   = true;
-    }
-    else if(mImpl->GetType() == VECTOR2)
-    {
-      vectorValue = mImpl->GetVector2();
-      converted   = true;
-    }
-    else if(mImpl->GetType() == VECTOR3)
-    {
-      vectorValue = mImpl->GetVector3();
-      converted   = true;
-    }
+    vectorValue = obj.GetVector4();
+    converted   = true;
   }
+  else if(obj.GetType() == VECTOR2)
+  {
+    vectorValue = obj.GetVector2();
+    converted   = true;
+  }
+  else if(obj.GetType() == VECTOR3)
+  {
+    vectorValue = obj.GetVector3();
+    converted   = true;
+  }
+
   return converted;
 }
 
 bool Property::Value::Get(Vector3& vectorValue) const
 {
   bool converted = false;
-  if(mImpl)
+
+  const auto& obj = Read();
+
+  if(obj.GetType() == VECTOR4)
   {
-    if(mImpl->GetType() == VECTOR4)
-    {
-      vectorValue = mImpl->GetVector4();
-      converted   = true;
-    }
-    else if(mImpl->GetType() == VECTOR2)
-    {
-      vectorValue = mImpl->GetVector2();
-      converted   = true;
-    }
-    else if(mImpl->GetType() == VECTOR3)
-    {
-      vectorValue = mImpl->GetVector3();
-      converted   = true;
-    }
+    vectorValue = obj.GetVector4();
+    converted   = true;
   }
+  else if(obj.GetType() == VECTOR2)
+  {
+    vectorValue = obj.GetVector2();
+    converted   = true;
+  }
+  else if(obj.GetType() == VECTOR3)
+  {
+    vectorValue = obj.GetVector3();
+    converted   = true;
+  }
+
   return converted;
 }
 
 bool Property::Value::Get(Vector4& vectorValue) const
 {
   bool converted = false;
-  if(mImpl)
+
+  const auto& obj = Read();
+
+  if(obj.GetType() == VECTOR4)
   {
-    if(mImpl->GetType() == VECTOR4)
-    {
-      vectorValue = mImpl->GetVector4();
-      converted   = true;
-    }
-    else if(mImpl->GetType() == VECTOR2)
-    {
-      vectorValue = mImpl->GetVector2();
-      converted   = true;
-    }
-    else if(mImpl->GetType() == VECTOR3)
-    {
-      vectorValue = mImpl->GetVector3();
-      converted   = true;
-    }
+    vectorValue = obj.GetVector4();
+    converted   = true;
   }
+  else if(obj.GetType() == VECTOR2)
+  {
+    vectorValue = obj.GetVector2();
+    converted   = true;
+  }
+  else if(obj.GetType() == VECTOR3)
+  {
+    vectorValue = obj.GetVector3();
+    converted   = true;
+  }
+
   return converted;
 }
 
 bool Property::Value::Get(Matrix3& matrixValue) const
 {
   bool converted = false;
-  if(mImpl && (mImpl->GetType() == MATRIX3))
+
+  const auto& obj = Read();
+
+  if(obj.GetType() == MATRIX3)
   {
-    matrixValue = mImpl->GetMatrix3();
+    matrixValue = obj.GetMatrix3();
     converted   = true;
   }
   return converted;
@@ -926,9 +986,12 @@ bool Property::Value::Get(Matrix3& matrixValue) const
 bool Property::Value::Get(Matrix& matrixValue) const
 {
   bool converted = false;
-  if(mImpl && (mImpl->GetType() == MATRIX))
+
+  const auto& obj = Read();
+
+  if(obj.GetType() == MATRIX)
   {
-    matrixValue = mImpl->GetMatrix();
+    matrixValue = obj.GetMatrix();
     converted   = true;
   }
   return converted;
@@ -937,9 +1000,12 @@ bool Property::Value::Get(Matrix& matrixValue) const
 bool Property::Value::Get(Rect<int32_t>& rectValue) const
 {
   bool converted = false;
-  if(mImpl && (mImpl->GetType() == RECTANGLE))
+
+  const auto& obj = Read();
+
+  if(obj.GetType() == RECTANGLE)
   {
-    rectValue = mImpl->GetRect();
+    rectValue = obj.GetRect();
     converted = true;
   }
   return converted;
@@ -948,9 +1014,12 @@ bool Property::Value::Get(Rect<int32_t>& rectValue) const
 bool Property::Value::Get(AngleAxis& angleAxisValue) const
 {
   bool converted = false;
-  if(mImpl && (mImpl->GetType() == ROTATION))
+
+  const auto& obj = Read();
+
+  if(obj.GetType() == ROTATION)
   {
-    angleAxisValue = mImpl->GetAngleAxis();
+    angleAxisValue = obj.GetAngleAxis();
     converted      = true;
   }
   return converted;
@@ -959,10 +1028,13 @@ bool Property::Value::Get(AngleAxis& angleAxisValue) const
 bool Property::Value::Get(Quaternion& quaternionValue) const
 {
   bool converted = false;
-  if(mImpl && (mImpl->GetType() == ROTATION))
+
+  const auto& obj = Read();
+
+  if(obj.GetType() == ROTATION)
   {
-    auto& obj       = mImpl->GetAngleAxis();
-    quaternionValue = Quaternion(obj.angle, obj.axis);
+    auto& angleAxis = obj.GetAngleAxis();
+    quaternionValue = Quaternion(angleAxis.angle, angleAxis.axis);
     converted       = true;
   }
   return converted;
@@ -971,9 +1043,12 @@ bool Property::Value::Get(Quaternion& quaternionValue) const
 bool Property::Value::Get(std::string& stringValue) const
 {
   bool converted = false;
-  if(mImpl && (mImpl->GetType() == STRING))
+
+  const auto& obj = Read();
+
+  if(obj.GetType() == STRING)
   {
-    stringValue.assign(mImpl->GetString());
+    stringValue.assign(obj.GetString());
     converted = true;
   }
   return converted;
@@ -982,9 +1057,12 @@ bool Property::Value::Get(std::string& stringValue) const
 bool Property::Value::Get(Property::Array& arrayValue) const
 {
   bool converted = false;
-  if(mImpl && (mImpl->GetType() == ARRAY))
+
+  const auto& obj = Read();
+
+  if(obj.GetType() == ARRAY)
   {
-    arrayValue = mImpl->GetArray();
+    arrayValue = obj.GetArray();
     converted  = true;
   }
   return converted;
@@ -993,9 +1071,12 @@ bool Property::Value::Get(Property::Array& arrayValue) const
 bool Property::Value::Get(Property::Map& mapValue) const
 {
   bool converted = false;
-  if(mImpl && (mImpl->GetType() == MAP))
+
+  const auto& obj = Read();
+
+  if(obj.GetType() == MAP)
   {
-    mapValue  = mImpl->GetMap();
+    mapValue  = obj.GetMap();
     converted = true;
   }
   return converted;
@@ -1003,38 +1084,44 @@ bool Property::Value::Get(Property::Map& mapValue) const
 
 Property::Array const* Property::Value::GetArray() const
 {
-  if(mImpl && (mImpl->GetType() == ARRAY))
+  const auto& obj = Read();
+
+  if(obj.GetType() == ARRAY)
   {
-    return mImpl->GetArrayPtr();
+    return obj.GetArrayPtr();
   }
   return nullptr;
 }
 
 Property::Array* Property::Value::GetArray()
 {
-  Property::Array* array = nullptr;
-  if(mImpl && (mImpl->GetType() == ARRAY)) // type cannot change in mImpl so array is allocated
+  auto& obj = Write();
+
+  if(obj.GetType() == ARRAY)
   {
-    array = mImpl->GetArrayPtr();
+    return obj.GetArrayPtr();
   }
-  return array;
+  return nullptr;
 }
 
 Property::Map const* Property::Value::GetMap() const
 {
-  Property::Map* map = nullptr;
-  if(mImpl && (mImpl->GetType() == MAP)) // type cannot change in mImpl so map is allocated
+  const auto& obj = Read();
+
+  if(obj.GetType() == MAP)
   {
-    map = mImpl->GetMapPtr();
+    return obj.GetMapPtr();
   }
-  return map;
+  return nullptr;
 }
 
 Property::Map* Property::Value::GetMap()
 {
-  if(mImpl && (mImpl->GetType() == MAP))
+  auto& obj = Write();
+
+  if(obj.GetType() == MAP)
   {
-    return mImpl->GetMapPtr();
+    return obj.GetMapPtr();
   }
   return nullptr;
 }
@@ -1042,112 +1129,107 @@ Property::Map* Property::Value::GetMap()
 bool Property::Value::Get(Extents& extentsValue) const
 {
   bool converted = false;
-  if(mImpl)
+
+  const auto& obj = Read();
+
+  if(obj.GetType() == EXTENTS)
   {
-    if(mImpl->GetType() == EXTENTS)
-    {
-      extentsValue = mImpl->GetExtents();
-      converted    = true;
-    }
-    else if(mImpl->GetType() == VECTOR4)
-    {
-      auto& obj           = mImpl->GetVector4();
-      extentsValue.start  = static_cast<uint16_t>(obj.x);
-      extentsValue.end    = static_cast<uint16_t>(obj.y);
-      extentsValue.top    = static_cast<uint16_t>(obj.z);
-      extentsValue.bottom = static_cast<uint16_t>(obj.w);
-      converted           = true;
-    }
+    extentsValue = obj.GetExtents();
+    converted    = true;
   }
+  else if(obj.GetType() == VECTOR4)
+  {
+    auto& vec4          = obj.GetVector4();
+    extentsValue.start  = static_cast<uint16_t>(vec4.x);
+    extentsValue.end    = static_cast<uint16_t>(vec4.y);
+    extentsValue.top    = static_cast<uint16_t>(vec4.z);
+    extentsValue.bottom = static_cast<uint16_t>(vec4.w);
+    converted           = true;
+  }
+
   return converted;
 }
 
 std::ostream& operator<<(std::ostream& stream, const Property::Value& value)
 {
-  if(value.mImpl)
-  {
-    auto obj = value.mImpl;
+  const auto& obj = value.Read();
 
-    switch(obj->GetType())
-    {
-      case Dali::Property::BOOLEAN:
-      {
-        stream << obj->GetBool();
-        break;
-      }
-      case Dali::Property::FLOAT:
-      {
-        stream << obj->GetFloat();
-        break;
-      }
-      case Dali::Property::INTEGER:
-      {
-        stream << obj->GetInt();
-        break;
-      }
-      case Dali::Property::VECTOR2:
-      {
-        stream << obj->GetVector2();
-        break;
-      }
-      case Dali::Property::VECTOR3:
-      {
-        stream << obj->GetVector3();
-        break;
-      }
-      case Dali::Property::VECTOR4:
-      {
-        stream << obj->GetVector4();
-        break;
-      }
-      case Dali::Property::MATRIX3:
-      {
-        stream << obj->GetMatrix3();
-        break;
-      }
-      case Dali::Property::MATRIX:
-      {
-        stream << obj->GetMatrix();
-        break;
-      }
-      case Dali::Property::RECTANGLE:
-      {
-        stream << obj->GetRect();
-        break;
-      }
-      case Dali::Property::ROTATION:
-      {
-        stream << obj->GetAngleAxis();
-        break;
-      }
-      case Dali::Property::STRING:
-      {
-        stream << obj->GetString();
-        break;
-      }
-      case Dali::Property::ARRAY:
-      {
-        stream << obj->GetArray();
-        break;
-      }
-      case Dali::Property::MAP:
-      {
-        stream << obj->GetMap();
-        break;
-      }
-      case Dali::Property::EXTENTS:
-      {
-        stream << obj->GetExtents();
-        break;
-      }
-      case Dali::Property::NONE:
-      { // mImpl will be a nullptr, there's no way to get to this case
-      }
-    }
-  }
-  else
+  switch(obj.GetType())
   {
-    stream << "undefined type";
+    case Dali::Property::BOOLEAN:
+    {
+      stream << obj.GetBool();
+      break;
+    }
+    case Dali::Property::FLOAT:
+    {
+      stream << obj.GetFloat();
+      break;
+    }
+    case Dali::Property::INTEGER:
+    {
+      stream << obj.GetInt();
+      break;
+    }
+    case Dali::Property::VECTOR2:
+    {
+      stream << obj.GetVector2();
+      break;
+    }
+    case Dali::Property::VECTOR3:
+    {
+      stream << obj.GetVector3();
+      break;
+    }
+    case Dali::Property::VECTOR4:
+    {
+      stream << obj.GetVector4();
+      break;
+    }
+    case Dali::Property::MATRIX3:
+    {
+      stream << obj.GetMatrix3();
+      break;
+    }
+    case Dali::Property::MATRIX:
+    {
+      stream << obj.GetMatrix();
+      break;
+    }
+    case Dali::Property::RECTANGLE:
+    {
+      stream << obj.GetRect();
+      break;
+    }
+    case Dali::Property::ROTATION:
+    {
+      stream << obj.GetAngleAxis();
+      break;
+    }
+    case Dali::Property::STRING:
+    {
+      stream << obj.GetString();
+      break;
+    }
+    case Dali::Property::ARRAY:
+    {
+      stream << obj.GetArray();
+      break;
+    }
+    case Dali::Property::MAP:
+    {
+      stream << obj.GetMap();
+      break;
+    }
+    case Dali::Property::EXTENTS:
+    {
+      stream << obj.GetExtents();
+      break;
+    }
+    case Dali::Property::NONE:
+    {
+      stream << "undefined type";
+    }
   }
   return stream;
 }

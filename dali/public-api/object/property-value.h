@@ -518,8 +518,31 @@ public:
   friend DALI_CORE_API std::ostream& operator<<(std::ostream& ouputStream, const Property::Value& value);
 
 private:
+  /// @cond internal
   struct DALI_INTERNAL Impl;
-  Impl*                mImpl; ///< Pointer to the implementation
+
+  /**
+   * @brief Retrieves an already constructed Impl object from the storage buffer.
+   * @return A const reference to the Impl object
+   */
+  DALI_INTERNAL const Impl& Read() const;
+
+  /**
+   * @brief Retrieves an already constructed Impl object from the storage buffer.
+   * @return A non const reference to the Impl object
+   */
+  DALI_INTERNAL Impl& Write();
+
+  /**
+   * @brief An aligned storage buffer to create Impl object inplace.
+   */
+  struct DALI_INTERNAL Storage
+  {
+    alignas(sizeof(Impl*)) unsigned char buffer[16];
+  };
+
+  Storage mStorage;
+  /// @endcond
 };
 
 /**
