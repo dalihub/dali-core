@@ -175,7 +175,7 @@ public:
   /**
    * @copydoc Dali::Handle::SetProperty()
    */
-  void SetProperty( Property::Index index, const Property::Value& propertyValue );
+  void SetProperty(Property::Index index, Property::Value propertyValue);
 
   /**
    * @copydoc Dali::Handle::GetProperty()
@@ -197,12 +197,12 @@ public:
   /**
    * @copydoc Dali::Handle::RegisterProperty()
    */
-  Property::Index RegisterProperty( const std::string& name, const Property::Value& propertyValue );
+  Property::Index RegisterProperty(std::string name, Property::Value propertyValue);
 
   /**
    * @copydoc Dali::Handle::RegisterProperty()
    */
-  Property::Index RegisterProperty( const std::string& name, Property::Index key, const Property::Value& propertyValue );
+  Property::Index RegisterProperty(std::string name, Property::Index key, Property::Value propertyValue);
 
   /**
    * @copydoc Dali::DevelHandle::SetProperties()
@@ -217,12 +217,15 @@ public:
   /**
    * @copydoc Dali::Handle::RegisterProperty(std::string name, Property::Value propertyValue, Property::AccessMode accessMode)
    */
-  Property::Index RegisterProperty( const std::string& name, const Property::Value& propertyValue, Property::AccessMode accessMode );
+  Property::Index RegisterProperty(std::string name, Property::Value propertyValue, Property::AccessMode accessMode);
 
   /**
    * @brief Implementing method for this override
    */
-  Property::Index RegisterProperty( const std::string& name, Property::Index key, const Property::Value& propertyValue, Property::AccessMode accessMode );
+  Property::Index RegisterProperty(std::string          name,
+                                   Property::Index      key,
+                                   Property::Value      propertyValue,
+                                   Property::AccessMode accessMode);
 
   /**
    * @brief returns true if the custom property exists on this object.
@@ -432,7 +435,7 @@ protected:
    * @param [in] value The value of the property.
    * @return The index of the registered property or Property::INVALID_INDEX if registration failed.
    */
-  Property::Index RegisterSceneGraphProperty( const std::string& name, Property::Index key, Property::Index index, const Property::Value& propertyValue ) const;
+  Property::Index RegisterSceneGraphProperty( std::string name, Property::Index key, Property::Index index, Property::Value propertyValue ) const;
 
   /**
    * Registers animatable scene property

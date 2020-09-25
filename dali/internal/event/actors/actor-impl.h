@@ -30,6 +30,7 @@
 #include <dali/public-api/math/viewport.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
+#include <dali/internal/common/internal-constants.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/event/actors/actor-declarations.h>
 #include <dali/internal/event/common/object-impl.h>
@@ -132,7 +133,10 @@ public:
    * Retrieve the name of the actor.
    * @return The name.
    */
-  const std::string& GetName() const;
+  const std::string& GetName() const
+  {
+    return mName;
+  }
 
   /**
    * Set the name of the actor.
@@ -159,7 +163,10 @@ public:
   /**
    * Query whether the actor is connected to the Scene.
    */
-  bool OnScene() const;
+  bool OnScene() const
+  {
+    return mIsOnScene;
+  }
 
   /**
    * Query whether the actor has any renderers.
@@ -351,24 +358,6 @@ public:
   void SetParentOrigin( const Vector3& origin );
 
   /**
-   * Set the x component of the parent-origin
-   * @param [in] x The new x value.
-   */
-  void SetParentOriginX( float x );
-
-  /**
-   * Set the y component of the parent-origin
-   * @param [in] y The new y value.
-   */
-  void SetParentOriginY( float y );
-
-  /**
-   * Set the z component of the parent-origin
-   * @param [in] z The new z value.
-   */
-  void SetParentOriginZ( float z );
-
-  /**
    * Retrieve the parent-origin of an actor.
    * @return The parent-origin.
    */
@@ -383,24 +372,6 @@ public:
    * @param [in] anchorPoint The new anchor-point.
    */
   void SetAnchorPoint( const Vector3& anchorPoint );
-
-  /**
-   * Set the x component of the anchor-point.
-   * @param [in] x The new x value.
-   */
-  void SetAnchorPointX( float x );
-
-  /**
-   * Set the y component of the anchor-point.
-   * @param [in] y The new y value.
-   */
-  void SetAnchorPointY( float y );
-
-  /**
-   * Set the z component of the anchor-point.
-   * @param [in] z The new z value.
-   */
-  void SetAnchorPointZ( float z );
 
   /**
    * Retrieve the anchor-point of an actor.
@@ -469,7 +440,10 @@ public:
    * The coordinates are relative to the Actor's parent.
    * @return the Actor's position.
    */
-  const Vector3& GetTargetPosition() const;
+  const Vector3& GetTargetPosition() const
+  {
+    return mTargetPosition;
+  }
 
   /**
    * @copydoc Dali::Actor::GetCurrentWorldPosition()
@@ -484,7 +458,10 @@ public:
   /**
    * @copydoc Dali::Actor::IsPositionInherited()
    */
-  bool IsPositionInherited() const;
+  bool IsPositionInherited() const
+  {
+    return mInheritPosition;
+  }
 
   /**
    * Sets the orientation of the Actor.
@@ -529,7 +506,10 @@ public:
    * Returns whether the actor inherit's it's parent's orientation.
    * @return true if the actor inherit's it's parent orientation, false if it uses world orientation.
    */
-  bool IsOrientationInherited() const;
+  bool IsOrientationInherited() const
+  {
+    return mInheritOrientation;
+  }
 
   /**
    * Sets the factor of the parents size used for the child actor.
@@ -613,7 +593,10 @@ public:
   /**
    * @copydoc Dali::Actor::IsScaleInherited()
    */
-  bool IsScaleInherited() const;
+  bool IsScaleInherited() const
+  {
+    return mInheritScale;
+  }
 
   /**
    * @copydoc Dali::Actor::GetCurrentWorldMatrix()
@@ -650,7 +633,10 @@ public:
    * Retrieve the actor's clipping mode.
    * @return The actor's clipping mode (cached)
    */
-  ClippingMode::Type GetClippingMode() const;
+  ClippingMode::Type GetClippingMode() const
+  {
+    return mClippingMode;
+  }
 
   /**
    * Sets whether an actor should emit touch or hover signals; see SignalTouch() and SignalHover().
@@ -695,12 +681,18 @@ public:
   /**
    * @copydoc Dali::Actor::GetDrawMode
    */
-  DrawMode::Type GetDrawMode() const;
+  DrawMode::Type GetDrawMode() const
+  {
+    return mDrawMode;
+  }
 
   /**
    * @copydoc Dali::Actor::IsOverlay
    */
-  bool IsOverlay() const;
+  bool IsOverlay() const
+  {
+    return ( DrawMode::OVERLAY_2D == mDrawMode );
+  }
 
   /**
    * Sets the actor's color.  The final color of actor depends on its color mode.
@@ -744,7 +736,10 @@ public:
    * Returns the actor's color mode.
    * @return currently used colorMode.
    */
-  ColorMode GetColorMode() const;
+  ColorMode GetColorMode() const
+  {
+    return mColorMode;
+  }
 
   /**
    * @copydoc Dali::Actor::GetCurrentWorldColor()
@@ -769,7 +764,10 @@ public:
    *
    * @return The depth used for hit-testing and renderer sorting
    */
-  uint32_t GetSortingDepth();
+  uint32_t GetSortingDepth()
+  {
+    return mSortedDepth;
+  }
 
 public:
 
@@ -809,7 +807,7 @@ public:
    *
    * @param dimension The dimension that is about to be calculated
    */
-  virtual void OnCalculateRelayoutSize( Dimension::Type dimension );
+  virtual void OnCalculateRelayoutSize( Dimension::Type dimension ) {}
 
   /**
    * @brief Virtual method to notify deriving classes that the size for a dimension
@@ -818,7 +816,7 @@ public:
    * @param[in] size The new size for the given dimension
    * @param[in] dimension The dimension that was just negotiated
    */
-  virtual void OnLayoutNegotiated( float size, Dimension::Type dimension );
+  virtual void OnLayoutNegotiated( float size, Dimension::Type dimension ) {}
 
   /**
    * @brief Determine if this actor is dependent on it's children for relayout
@@ -1039,15 +1037,6 @@ public:
    * @return Return the calculated size for the dimension
    */
   float CalculateSize( Dimension::Type dimension, const Vector2& maximumSize );
-
-  /**
-   * @brief Clamp a dimension given the relayout constraints on this actor
-   *
-   * @param[in] size The size to constrain
-   * @param[in] dimension The dimension the size exists in
-   * @return Return the clamped size
-   */
-  float ClampDimension( float size, Dimension::Type dimension );
 
   /**
    * Negotiate a dimension based on the size of the parent
@@ -1298,29 +1287,6 @@ public:
                       float screenY ) const;
 
   /**
-   * Performs a ray-sphere test with the given pick-ray and the actor's bounding sphere.
-   * @note The actor coordinates are relative to the top-left (0.0, 0.0, 0.5)
-   * @param[in] rayOrigin The ray origin in the world's reference system.
-   * @param[in] rayDir The ray director vector in the world's reference system.
-   * @return True if the ray intersects the actor's bounding sphere.
-   */
-  bool RaySphereTest( const Vector4& rayOrigin, const Vector4& rayDir ) const;
-
-  /**
-   * Performs a ray-actor test with the given pick-ray and the actor's geometry.
-   * @note The actor coordinates are relative to the top-left (0.0, 0.0, 0.5)
-   * @param[in] rayOrigin The ray origin in the world's reference system.
-   * @param[in] rayDir The ray director vector in the world's reference system.
-   * @param[out] hitPointLocal The hit point in the Actor's local reference system.
-   * @param[out] distance The distance from the hit point to the camera.
-   * @return True if the ray intersects the actor's geometry.
-   */
-  bool RayActorTest( const Vector4& rayOrigin,
-                     const Vector4& rayDir,
-                     Vector2& hitPointLocal,
-                     float& distance ) const;
-
-  /**
    * Sets whether the actor should receive a notification when touch or hover motion events leave
    * the boundary of the actor.
    *
@@ -1329,49 +1295,73 @@ public:
    *
    * @param[in]  required  Should be set to true if a Leave event is required
    */
-  void SetLeaveRequired( bool required );
+  void SetLeaveRequired( bool required )
+  {
+    mLeaveRequired = required;
+  }
 
   /**
    * This returns whether the actor requires touch or hover events whenever touch or hover motion events leave
    * the boundary of the actor.
    * @return true if a Leave event is required, false otherwise.
    */
-  bool GetLeaveRequired() const;
+  bool GetLeaveRequired() const
+  {
+    return mLeaveRequired;
+  }
 
   /**
    * @copydoc Dali::Actor::SetKeyboardFocusable()
    */
-  void SetKeyboardFocusable( bool focusable );
+  void SetKeyboardFocusable( bool focusable )
+  {
+    mKeyboardFocusable = focusable;
+  }
 
   /**
    * @copydoc Dali::Actor::IsKeyboardFocusable()
    */
-  bool IsKeyboardFocusable() const;
+  bool IsKeyboardFocusable() const
+  {
+    return mKeyboardFocusable;
+  }
 
   /**
    * Query whether the application or derived actor type requires touch events.
    * @return True if touch events are required.
    */
-  bool GetTouchRequired() const;
+  bool GetTouchRequired() const
+  {
+    return !mTouchedSignal.Empty();
+  }
 
   /**
    * Query whether the application or derived actor type requires hover events.
    * @return True if hover events are required.
    */
-  bool GetHoverRequired() const;
+  bool GetHoverRequired() const
+  {
+    return !mHoveredSignal.Empty();
+  }
 
   /**
    * Query whether the application or derived actor type requires wheel events.
    * @return True if wheel events are required.
    */
-  bool GetWheelEventRequired() const;
+  bool GetWheelEventRequired() const
+  {
+    return !mWheelEventSignal.Empty();
+  }
 
   /**
    * Query whether the actor is actually hittable.  This method checks whether the actor is
    * sensitive, has the visibility flag set to true and is not fully transparent.
    * @return true, if it can be hit, false otherwise.
    */
-  bool IsHittable() const;
+  bool IsHittable() const
+  {
+    return IsSensitive() && IsVisible() && ( GetCurrentWorldColor().a > FULLY_TRANSPARENT ) && IsNodeConnected();
+  }
 
   /**
    * Query whether the actor captures all touch after it starts even if touch leaves its boundary.
@@ -1452,57 +1442,90 @@ public:
   /**
    * @copydoc Dali::Actor::TouchedSignal()
    */
-  Dali::Actor::TouchEventSignalType& TouchedSignal();
+  Dali::Actor::TouchEventSignalType& TouchedSignal()
+  {
+    return mTouchedSignal;
+  }
 
   /**
    * @copydoc Dali::Actor::HoveredSignal()
    */
-  Dali::Actor::HoverSignalType& HoveredSignal();
+  Dali::Actor::HoverSignalType& HoveredSignal()
+  {
+    return mHoveredSignal;
+  }
 
   /**
    * @copydoc Dali::Actor::WheelEventSignal()
    */
-  Dali::Actor::WheelEventSignalType& WheelEventSignal();
+  Dali::Actor::WheelEventSignalType& WheelEventSignal()
+  {
+    return mWheelEventSignal;
+  }
 
   /**
    * @copydoc Dali::Actor::OnSceneSignal()
    */
-  Dali::Actor::OnSceneSignalType& OnSceneSignal();
+  Dali::Actor::OnSceneSignalType& OnSceneSignal()
+  {
+    return mOnSceneSignal;
+  }
 
   /**
    * @copydoc Dali::Actor::OffSceneSignal()
    */
-  Dali::Actor::OffSceneSignalType& OffSceneSignal();
+  Dali::Actor::OffSceneSignalType& OffSceneSignal()
+  {
+    return mOffSceneSignal;
+  }
 
   /**
    * @copydoc Dali::Actor::OnRelayoutSignal()
    */
-  Dali::Actor::OnRelayoutSignalType& OnRelayoutSignal();
+  Dali::Actor::OnRelayoutSignalType& OnRelayoutSignal()
+  {
+    return mOnRelayoutSignal;
+  }
 
   /**
    * @copydoc DevelActor::VisibilityChangedSignal
    */
-  DevelActor::VisibilityChangedSignalType& VisibilityChangedSignal();
+  DevelActor::VisibilityChangedSignalType& VisibilityChangedSignal()
+  {
+    return mVisibilityChangedSignal;
+  }
 
   /**
    * @copydoc LayoutDirectionChangedSignal
    */
-  Dali::Actor::LayoutDirectionChangedSignalType& LayoutDirectionChangedSignal();
+  Dali::Actor::LayoutDirectionChangedSignalType& LayoutDirectionChangedSignal()
+  {
+    return mLayoutDirectionChangedSignal;
+  }
 
   /**
    * @copydoc DevelActor::ChildAddedSignal
    */
-  DevelActor::ChildChangedSignalType& ChildAddedSignal();
+  DevelActor::ChildChangedSignalType& ChildAddedSignal()
+  {
+    return mChildAddedSignal;
+  }
 
   /**
    * @copydoc DevelActor::ChildRemovedSignal
    */
-  DevelActor::ChildChangedSignalType& ChildRemovedSignal();
+  DevelActor::ChildChangedSignalType& ChildRemovedSignal()
+  {
+    return mChildRemovedSignal;
+  }
 
   /**
    * @copydoc DevelActor::ChildOrderChangedSignal
    */
-  DevelActor::ChildOrderChangedSignalType& ChildOrderChangedSignal();
+  DevelActor::ChildOrderChangedSignalType& ChildOrderChangedSignal()
+  {
+    return mChildOrderChangedSignal;
+  }
 
   /**
    * Connects a callback function with the object's signals.
@@ -1681,7 +1704,10 @@ public:
   /**
    * @copydoc Dali::Internal::Object::IsAnimationPossible()
    */
-  bool IsAnimationPossible() const override;
+  bool IsAnimationPossible() const override
+  {
+    return OnScene();
+  }
 
   /**
    * Retrieve the actor's node.
@@ -1728,13 +1754,19 @@ public:
    * Sets the scene which this actor is added to.
    * @param[in] scene The scene
    */
-  void SetScene( Scene& scene );
+  void SetScene( Scene& scene )
+  {
+    mScene = &scene;
+  }
 
   /**
    * Gets the scene which this actor is added to.
    * @return The scene
    */
-  Scene& GetScene() const;
+  Scene& GetScene() const
+  {
+    return *mScene;
+  }
 
 private:
 
@@ -1757,6 +1789,8 @@ private:
       DEPTH  = 4
     };
   };
+
+  struct Relayouter;
 
   // Remove default constructor and copy constructor
   Actor() = delete;
@@ -1851,9 +1885,9 @@ private:
   bool GetCurrentPropertyValue( Property::Index index, Property::Value& value  ) const;
 
   /**
-   * @brief Ensure the relayout data is allocated
+   * @brief Ensure the relayouter is allocated
    */
-  void EnsureRelayoutData();
+  Relayouter& EnsureRelayouter();
 
   /**
    * @brief Apply the size set policy to the input size
@@ -1867,7 +1901,10 @@ private:
    * Retrieve the parent object of an Actor.
    * @return The parent object, or NULL if the Actor does not have a parent.
    */
-  Object* GetParentObject() const override;
+  Object* GetParentObject() const override
+  {
+    return mParent;
+  }
 
   /**
    * Set Sibling order
@@ -1911,7 +1948,10 @@ private:
    * Returns whether the actor inherits it's parent's layout direction.
    * @return true if the actor inherits it's parent's layout direction, false otherwise.
    */
-  bool IsLayoutDirectionInherited() const;
+  bool IsLayoutDirectionInherited() const
+  {
+    return mInheritLayoutDirection;
+  }
 
   /**
    * @brief Propagates layout direction recursively.
@@ -1926,12 +1966,6 @@ private:
    */
   void SetUpdateSizeHint( const Vector2& updateSizeHint );
 
-  /**
-   * @brief Return the update size hint of actor
-   * @return Return the update size hint
-   */
-  Vector2 GetUpdateSizeHint() const;
-
 protected:
 
   Scene* mScene;                  ///< The scene the actor is added to
@@ -1943,8 +1977,7 @@ protected:
   Vector3* mParentOrigin;         ///< NULL means ParentOrigin::DEFAULT. ParentOrigin is non-animatable
   Vector3* mAnchorPoint;          ///< NULL means AnchorPoint::DEFAULT. AnchorPoint is non-animatable
 
-  struct RelayoutData;
-  RelayoutData* mRelayoutData; ///< Struct to hold optional collection of relayout variables
+  Relayouter* mRelayoutData; ///< Struct to hold optional collection of relayout variables
 
   ActorGestureData* mGestureData;   ///< Optional Gesture data. Only created when actor requires gestures
 
@@ -1997,6 +2030,7 @@ private:
 
   static ActorContainer mNullChildren;  ///< Empty container (shared by all actors, returned by GetChildren() const)
 
+  struct PropertyHandler;
 };
 
 } // namespace Internal

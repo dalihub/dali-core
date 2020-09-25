@@ -67,7 +67,7 @@ public:
   /**
    * @copydoc Dali::TypeRegistry::GetTypeName
    */
-  std::string GetTypeName( uint32_t index ) const;
+  const std::string& GetTypeName(uint32_t index) const;
 
   /**
    * Register a type
@@ -107,15 +107,12 @@ public:
    * @param [in] defaultPropertyCount count of default properties
    * @return the name of the registered type.
    */
-  std::string Register( const std::string& name, const std::type_info& baseTypeInfo,
-                        Dali::TypeInfo::CreateFunction createInstance, bool callCreateOnInit,
-                        const Dali::PropertyDetails* defaultProperties = nullptr, Property::Index defaultPropertyCount = 0 );
+  std::string Register(std::string name, const std::type_info& baseTypeInfo, Dali::TypeInfo::CreateFunction createInstance, bool callCreateOnInit, const Dali::PropertyDetails* defaultProperties = nullptr, Property::Index defaultPropertyCount = 0);
 
   /**
    * @copydoc CSharpTypeRegistry::TypeRegistration( const std::string&, const std::type_info&, TypeInfo::CreateFunction );
    */
-  void Register( const std::string& name, const std::type_info& baseTypeInfo,
-                 Dali::CSharpTypeInfo::CreateFunction createInstance );
+  void Register(std::string name, const std::type_info& baseTypeInfo, Dali::CSharpTypeInfo::CreateFunction createInstance);
 
   /**
    * Register a signal connector function to a type
@@ -123,7 +120,7 @@ public:
    * @param [in] name Signal name
    * @param [in] func Signal connector function
    */
-  void RegisterSignal( TypeRegistration& typeRegistration, const std::string& name, Dali::TypeInfo::SignalConnectorFunction func );
+  void RegisterSignal(TypeRegistration& typeRegistration, std::string name, Dali::TypeInfo::SignalConnectorFunction func);
 
   /**
    * Register an action function to a type
@@ -132,7 +129,7 @@ public:
    * @param [in] f Action function
    * @return true if registered
    */
-  bool RegisterAction( TypeRegistration& registered, const std::string& name, Dali::TypeInfo::ActionFunction f );
+  bool RegisterAction(TypeRegistration& registered, std::string name, Dali::TypeInfo::ActionFunction f);
 
   /**
    * Register an event-thread only property with a type
@@ -144,7 +141,7 @@ public:
    * @param [in] getFunc The function to get the value of a property.
    * @return true if registered
    */
-  bool RegisterProperty( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Type type, Dali::TypeInfo::SetPropertyFunction setFunc, Dali::TypeInfo::GetPropertyFunction getFunc );
+  bool RegisterProperty(TypeRegistration& registered, std::string name, Property::Index index, Property::Type type, Dali::TypeInfo::SetPropertyFunction setFunc, Dali::TypeInfo::GetPropertyFunction getFunc);
 
   /**
    * Register an event-thread only property with a type (used by C# Custom controls)
@@ -156,8 +153,7 @@ public:
    * @param [in] getFunc The function to get the value of a property.
    * @return true if registered
    */
-  bool RegisterProperty( const std::string& objectName, const std::string& name, Property::Index index, Property::Type type, Dali::CSharpTypeInfo::SetPropertyFunction setFunc, Dali::CSharpTypeInfo::GetPropertyFunction getFunc );
-
+  bool RegisterProperty(const std::string& objectName, std::string name, Property::Index index, Property::Type type, Dali::CSharpTypeInfo::SetPropertyFunction setFunc, Dali::CSharpTypeInfo::GetPropertyFunction getFunc);
 
   /**
    * Register a scene graph only property with a type
@@ -167,7 +163,7 @@ public:
    * @param [in] type Property type
    * @return true if registered
    */
-  bool RegisterAnimatableProperty( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Type type );
+  bool RegisterAnimatableProperty(TypeRegistration& registered, std::string name, Property::Index index, Property::Type type);
 
   /**
    * Register a scene graph only property with a default value
@@ -177,7 +173,7 @@ public:
    * @param [in] value Property default value
    * @return true if registered
    */
-  bool RegisterAnimatableProperty( TypeRegistration& registered, const std::string& name, Property::Index index, const Property::Value& defaultValue );
+  bool RegisterAnimatableProperty(TypeRegistration& registered, std::string name, Property::Index index, Property::Value defaultValue);
 
   /**
    * Register a component of a scene graph only property that supports components (i.e. Vector2, Vector3 and Vector4)
@@ -188,7 +184,7 @@ public:
    * @param [in] componentIndex Component index
    * @return true if registered
    */
-  bool RegisterAnimatablePropertyComponent( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Index baseIndex, unsigned int componentIndex );
+  bool RegisterAnimatablePropertyComponent(TypeRegistration& registered, std::string name, Property::Index index, Property::Index baseIndex, unsigned int componentIndex);
 
   /**
    * Register a event-thread only property with a type and a default value
@@ -198,7 +194,7 @@ public:
    * @param [in] type Property type
    * @return true if registered
    */
-  bool RegisterChildProperty( const std::string& registeredType, const std::string& name, Property::Index index, Property::Type type );
+  bool RegisterChildProperty(const std::string& registeredType, std::string name, Property::Index index, Property::Type type);
 
   /**
    * Register a event-thread only property with a type and a default value
@@ -208,7 +204,7 @@ public:
    * @param [in] type Property type
    * @return true if registered
    */
-  bool RegisterChildProperty( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Type type );
+  bool RegisterChildProperty(TypeRegistration& registered, std::string name, Property::Index index, Property::Type type);
 
   /**
    * @copydoc Dali::Internal::TypeInfo::DoActionTo

@@ -359,10 +359,19 @@ public:
   void BindTexture( int target, GLuint texture )
   {
     int16_t index = GetTextureIndexFromGlFormat(target);
-    if(index >= 0 && mBoundTextureId[ mActiveTextureUnit ][index] != texture)
+    if(index >= 0)
     {
-      mBoundTextureId[ mActiveTextureUnit ][index] = texture;
+      if(mBoundTextureId[ mActiveTextureUnit ][index] != texture)
+      {
+        mBoundTextureId[ mActiveTextureUnit ][index] = texture;
 
+        LOG_GL("BindTexture target(%d) %d\n", target, texture);
+        CHECK_GL(mGlAbstraction, mGlAbstraction.BindTexture(target, texture));
+      }
+    }
+    else
+    {
+      // Don't use cache
       LOG_GL("BindTexture target(%d) %d\n", target, texture);
       CHECK_GL(mGlAbstraction, mGlAbstraction.BindTexture(target, texture));
     }

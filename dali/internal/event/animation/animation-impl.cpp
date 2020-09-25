@@ -422,22 +422,22 @@ void Animation::Clear()
   mPlaylist.OnClear( *this );
 }
 
-void Animation::AnimateBy( Property& target, Property::Value& relativeValue )
+void Animation::AnimateBy(Property& target, Property::Value relativeValue)
 {
-  AnimateBy( target, relativeValue, mDefaultAlpha, TimePeriod(mDurationSeconds) );
+  AnimateBy(target, std::move(relativeValue), mDefaultAlpha, TimePeriod(mDurationSeconds));
 }
 
-void Animation::AnimateBy( Property& target, Property::Value& relativeValue, AlphaFunction alpha )
+void Animation::AnimateBy(Property& target, Property::Value relativeValue, AlphaFunction alpha)
 {
-  AnimateBy( target, relativeValue, alpha, TimePeriod(mDurationSeconds) );
+  AnimateBy(target, std::move(relativeValue), alpha, TimePeriod(mDurationSeconds));
 }
 
-void Animation::AnimateBy( Property& target, Property::Value& relativeValue, TimePeriod period )
+void Animation::AnimateBy(Property& target, Property::Value relativeValue, TimePeriod period)
 {
-  AnimateBy( target, relativeValue, mDefaultAlpha, period );
+  AnimateBy(target, std::move(relativeValue), mDefaultAlpha, period);
 }
 
-void Animation::AnimateBy( Property& target, Property::Value& relativeValue, AlphaFunction alpha, TimePeriod period )
+void Animation::AnimateBy(Property& target, Property::Value relativeValue, AlphaFunction alpha, TimePeriod period)
 {
   Object& object = GetImplementation(target.object);
   const Property::Type propertyType = object.GetPropertyType( target.propertyIndex );
@@ -449,13 +449,8 @@ void Animation::AnimateBy( Property& target, Property::Value& relativeValue, Alp
 
   ExtendDuration(period);
 
-  // Store data to later notify the object that its property is being animated
-  ConnectorTargetValues connectorPair;
-  connectorPair.targetValue = relativeValue;
-  connectorPair.connectorIndex = mConnectors.Count();
-  connectorPair.timePeriod = period;
-  connectorPair.animatorType = Animation::BY;
-  mConnectorTargetValues.push_back( connectorPair );
+  // keep the current count.
+  auto connectorIndex = mConnectors.Count();
 
   // using destination type so component animation gets correct type
   switch ( destinationType )
@@ -541,27 +536,29 @@ void Animation::AnimateBy( Property& target, Property::Value& relativeValue, Alp
 
     default:
     {
-      // non animatable types handled already
+      DALI_ASSERT_DEBUG(false && "Property  not supported");
     }
   }
+  // Store data to later notify the object that its property is being animated
+  mConnectorTargetValues.push_back({std::move(relativeValue), period, connectorIndex, Animation::BY});
 }
 
-void Animation::AnimateTo( Property& target, Property::Value& destinationValue )
+void Animation::AnimateTo(Property& target, Property::Value destinationValue)
 {
-  AnimateTo( target, destinationValue, mDefaultAlpha, TimePeriod(mDurationSeconds) );
+  AnimateTo(target, std::move(destinationValue), mDefaultAlpha, TimePeriod(mDurationSeconds));
 }
 
-void Animation::AnimateTo( Property& target, Property::Value& destinationValue, AlphaFunction alpha )
+void Animation::AnimateTo(Property& target, Property::Value destinationValue, AlphaFunction alpha)
 {
-  AnimateTo( target, destinationValue, alpha, TimePeriod(mDurationSeconds));
+  AnimateTo(target, std::move(destinationValue), alpha, TimePeriod(mDurationSeconds));
 }
 
-void Animation::AnimateTo( Property& target, Property::Value& destinationValue, TimePeriod period )
+void Animation::AnimateTo(Property& target, Property::Value destinationValue, TimePeriod period)
 {
-  AnimateTo( target, destinationValue, mDefaultAlpha, period );
+  AnimateTo(target, std::move(destinationValue), mDefaultAlpha, period);
 }
 
-void Animation::AnimateTo( Property& target, Property::Value& destinationValue, AlphaFunction alpha, TimePeriod period )
+void Animation::AnimateTo(Property& target, Property::Value destinationValue, AlphaFunction alpha, TimePeriod period)
 {
   Object& object = GetImplementation( target.object );
   const Property::Type propertyType = object.GetPropertyType( target.propertyIndex );
@@ -573,13 +570,8 @@ void Animation::AnimateTo( Property& target, Property::Value& destinationValue, 
 
   ExtendDuration( period );
 
-  // Store data to later notify the object that its property is being animated
-  ConnectorTargetValues connectorPair;
-  connectorPair.targetValue = destinationValue;
-  connectorPair.connectorIndex = mConnectors.Count();
-  connectorPair.timePeriod = period;
-  connectorPair.animatorType = Animation::TO;
-  mConnectorTargetValues.push_back( connectorPair );
+  // keep the current count.
+  auto connectorIndex = mConnectors.Count();
 
   // using destination type so component animation gets correct type
   switch ( destinationType )
@@ -663,9 +655,11 @@ void Animation::AnimateTo( Property& target, Property::Value& destinationValue, 
 
     default:
     {
-      // non animatable types handled already
+      DALI_ASSERT_DEBUG(false && "Property  not supported");
     }
   }
+  // Store data to later notify the object that its property is being animated
+  mConnectorTargetValues.push_back({std::move(destinationValue), period, connectorIndex, Animation::TO});
 }
 
 void Animation::AnimateBetween( Property target, const KeyFrames& keyFrames )
@@ -716,12 +710,7 @@ void Animation::AnimateBetween( Property target, const KeyFrames& keyFrames, Alp
   ExtendDuration( period );
 
   // Store data to later notify the object that its property is being animated
-  ConnectorTargetValues connectorPair;
-  connectorPair.targetValue = keyFrames.GetLastKeyFrameValue();
-  connectorPair.connectorIndex = mConnectors.Count();
-  connectorPair.timePeriod = period;
-  connectorPair.animatorType = BETWEEN;
-  mConnectorTargetValues.push_back( connectorPair );
+  mConnectorTargetValues.push_back({keyFrames.GetLastKeyFrameValue(), period, mConnectors.Count(), BETWEEN});
 
   // using destination type so component animation gets correct type
   switch( destinationType )
@@ -826,7 +815,7 @@ void Animation::AnimateBetween( Property target, const KeyFrames& keyFrames, Alp
 
     default:
     {
-      // non animatable types handled by keyframes
+      DALI_ASSERT_DEBUG(false && "Property  not supported");
     }
   }
 }

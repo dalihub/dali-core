@@ -130,12 +130,12 @@ protected:
    * @param[in] sceneGraphProperty  A pointer to the scene-graph owned property
    * @param[in] writable            Whether the property is writable
    */
-  PropertyMetadata( const Property::Value& propertyValue,
+  PropertyMetadata( Property::Value propertyValue,
                     const SceneGraph::PropertyBase* sceneGraphProperty,
                     bool writable )
   : value( mStoredValue ),
     componentIndex( Property::INVALID_COMPONENT_INDEX ),
-    mStoredValue( propertyValue ),
+    mStoredValue( std::move(propertyValue) ),
     mSceneGraphProperty( sceneGraphProperty ),
     mWritable( writable )
   {
@@ -262,12 +262,12 @@ public:
    *
    * @note A valid sceneGraphProperty is mandatory otherwise this will debug assert.
    */
-  CustomPropertyMetadata( const std::string& propertyName,
+  CustomPropertyMetadata( std::string propertyName,
                           Property::Index propertyKey,
-                          const Property::Value& propertyValue,
+                          Property::Value propertyValue,
                           const SceneGraph::PropertyBase* sceneGraphProperty )
-  : PropertyMetadata( propertyValue, sceneGraphProperty, true ),
-    name( propertyName ),
+  : PropertyMetadata( std::move(propertyValue), sceneGraphProperty, true ),
+    name( std::move(propertyName) ),
     key( propertyKey ),
     childPropertyIndex( Property::INVALID_INDEX )
   {
@@ -282,11 +282,11 @@ public:
    *
    * @note The access mode MUST NOT be animatable otherwise this will debug assert.
    */
-  CustomPropertyMetadata( const std::string& propertyName,
-                          const Property::Value& propertyValue,
+  CustomPropertyMetadata( std::string propertyName,
+                          Property::Value propertyValue,
                           Property::AccessMode accessMode )
-  : PropertyMetadata( propertyValue, nullptr, ( accessMode != Property::READ_ONLY ) ),
-    name( propertyName ),
+  : PropertyMetadata( std::move(propertyValue), nullptr, ( accessMode != Property::READ_ONLY ) ),
+    name( std::move(propertyName) ),
     key( Property::INVALID_KEY ),
     childPropertyIndex( Property::INVALID_INDEX )
   {

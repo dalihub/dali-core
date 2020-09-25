@@ -177,42 +177,42 @@ Animation::AnimationSignalType& Animation::FinishedSignal()
 
 void Animation::AnimateBy(Property target, Property::Value relativeValue)
 {
-  GetImplementation(*this).AnimateBy(target, relativeValue);
+  GetImplementation(*this).AnimateBy(target, std::move(relativeValue));
 }
 
 void Animation::AnimateBy(Property target, Property::Value relativeValue, AlphaFunction alpha)
 {
-  GetImplementation(*this).AnimateBy(target, relativeValue, alpha);
+  GetImplementation(*this).AnimateBy(target, std::move(relativeValue), alpha);
 }
 
 void Animation::AnimateBy(Property target, Property::Value relativeValue, TimePeriod period)
 {
-  GetImplementation(*this).AnimateBy(target, relativeValue, period);
+  GetImplementation(*this).AnimateBy(target, std::move(relativeValue), period);
 }
 
 void Animation::AnimateBy(Property target, Property::Value relativeValue, AlphaFunction alpha, TimePeriod period)
 {
-  GetImplementation(*this).AnimateBy(target, relativeValue, alpha, period);
+  GetImplementation(*this).AnimateBy(target, std::move(relativeValue), alpha, period);
 }
 
 void Animation::AnimateTo(Property target, Property::Value destinationValue)
 {
-  GetImplementation(*this).AnimateTo(target, destinationValue);
+  GetImplementation(*this).AnimateTo(target, std::move(destinationValue));
 }
 
 void Animation::AnimateTo(Property target, Property::Value destinationValue, AlphaFunction alpha)
 {
-  GetImplementation(*this).AnimateTo(target, destinationValue, alpha);
+  GetImplementation(*this).AnimateTo(target, std::move(destinationValue), alpha);
 }
 
 void Animation::AnimateTo(Property target, Property::Value destinationValue, TimePeriod period)
 {
-  GetImplementation(*this).AnimateTo(target, destinationValue, period);
+  GetImplementation(*this).AnimateTo(target, std::move(destinationValue), period);
 }
 
 void Animation::AnimateTo(Property target, Property::Value destinationValue, AlphaFunction alpha, TimePeriod period)
 {
-  GetImplementation(*this).AnimateTo(target, destinationValue, alpha, period);
+  GetImplementation(*this).AnimateTo(target, std::move(destinationValue), alpha, period);
 }
 
 void Animation::AnimateBetween(Property target, KeyFrames& keyFrames)
