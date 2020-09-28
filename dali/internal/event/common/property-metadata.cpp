@@ -86,7 +86,7 @@ void PropertyMetadata::SetPropertyValue( const Property::Value& propertyValue )
 
     case Property::ARRAY:
     {
-      Property::Array* array = propertyValue.GetArray();
+      const Property::Array* array = propertyValue.GetArray();
       if( array )
       {
         value = *array;
@@ -96,7 +96,7 @@ void PropertyMetadata::SetPropertyValue( const Property::Value& propertyValue )
 
     case Property::MAP:
     {
-      Property::Map* map = propertyValue.GetMap();
+      const Property::Map* map = propertyValue.GetMap();
       if( map )
       {
         value = *map;

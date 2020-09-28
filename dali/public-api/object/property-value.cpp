@@ -1001,7 +1001,7 @@ bool Property::Value::Get(Property::Map& mapValue) const
   return converted;
 }
 
-Property::Array* Property::Value::GetArray() const
+Property::Array const* Property::Value::GetArray() const
 {
   if(mImpl && (mImpl->GetType() == ARRAY))
   {
@@ -1010,7 +1010,27 @@ Property::Array* Property::Value::GetArray() const
   return nullptr;
 }
 
-Property::Map* Property::Value::GetMap() const
+Property::Array* Property::Value::GetArray()
+{
+  Property::Array* array = nullptr;
+  if(mImpl && (mImpl->GetType() == ARRAY)) // type cannot change in mImpl so array is allocated
+  {
+    array = mImpl->GetArrayPtr();
+  }
+  return array;
+}
+
+Property::Map const* Property::Value::GetMap() const
+{
+  Property::Map* map = nullptr;
+  if(mImpl && (mImpl->GetType() == MAP)) // type cannot change in mImpl so map is allocated
+  {
+    map = mImpl->GetMapPtr();
+  }
+  return map;
+}
+
+Property::Map* Property::Value::GetMap()
 {
   if(mImpl && (mImpl->GetType() == MAP))
   {

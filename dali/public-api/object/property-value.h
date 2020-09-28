@@ -470,20 +470,36 @@ public:
   bool Get(Property::Map& mapValue) const;
 
   /**
-   * @brief Retrieves the Array API of the Property::Value without copying the contents of the map.
+   * @brief Retrieves the Array API of the Property::Value without copying the contents of the array.
    *
-   * @SINCE_1_0.0
+   * @SINCE_1_9.32
    * @return The Array API of the Property::Value or NULL if not a Property::Array
    */
-  Property::Array* GetArray() const;
+  const Property::Array* GetArray() const;
+
+  /**
+   * @brief Retrieves the Array API of the Property::Value without copying the contents of the array.
+   *
+   * @SINCE_1_9.32
+   * @return The Array API of the Property::Value or NULL if not a Property::Array
+   */
+  Property::Array* GetArray();
 
   /**
    * @brief Retrieves the Map API of the Property::Value without copying the contents of the map.
    *
-   * @SINCE_1_0.0
+   * @SINCE_1_9.32
    * @return The Map API of the Property::Value or NULL if not a Property::Map
    */
-  Property::Map* GetMap() const;
+  const Property::Map* GetMap() const;
+
+  /**
+   * @brief Retrieves the Map API of the Property::Value without copying the contents of the map.
+   *
+   * @SINCE_1_9.32
+   * @return The Map API of the Property::Value or NULL if not a Property::Map
+   */
+  Property::Map* GetMap();
 
   /**
    * @brief Retrieves an extents.
