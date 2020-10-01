@@ -442,6 +442,22 @@ inline void RenderAlgorithms::ProcessRenderList( const RenderList& renderList,
   {
     const RenderItem& item = renderList.GetItem( index );
 
+    // Discard renderers outside the root clipping rect
+    bool skip = true;
+    if( !rootClippingRect.IsEmpty() )
+    {
+      auto rect = item.CalculateViewportSpaceAABB( item.mUpdateSize, mViewportRectangle.width, mViewportRectangle.height );
+
+      if(rect.Intersect( rootClippingRect ))
+      {
+        skip = false;
+      }
+    }
+    else
+    {
+      skip = false;
+    }
+
     DALI_PRINT_RENDER_ITEM( item );
 
     // Set up clipping based on both the Renderer and Actor APIs.
@@ -455,9 +471,9 @@ inline void RenderAlgorithms::ProcessRenderList( const RenderList& renderList,
       // draw-mode state, such as Overlays.
       // If the flags are set to "AUTO", the behavior then depends on the type of renderer. Overlay Renderers will always
       // disable depth testing and writing. Color Renderers will enable them if the Layer does.
-      if( depthBufferAvailable == Integration::DepthBufferAvailable::TRUE )
+      if (depthBufferAvailable == Integration::DepthBufferAvailable::TRUE)
       {
-        SetupDepthBuffer( item, context, autoDepthTestMode, firstDepthBufferUse );
+        SetupDepthBuffer(item, context, autoDepthTestMode, firstDepthBufferUse);
       }
 
       // Depending on whether the renderer has draw commands attached or not the rendering process will
@@ -465,12 +481,15 @@ inline void RenderAlgorithms::ProcessRenderList( const RenderList& renderList,
       // iteration must be done and the default behaviour of the renderer will be executed.
       // The queues allow to iterate over the same renderer multiple times changing the state of the renderer.
       // It is similar to the multi-pass rendering.
-      auto const MAX_QUEUE = item.mRenderer->GetDrawCommands().empty() ? 1 : DevelRenderer::RENDER_QUEUE_MAX;
-      for( auto queue = 0u; queue < MAX_QUEUE; ++queue )
+      if( !skip )
       {
-        // Render the item.
-        item.mRenderer->Render(context, bufferIndex, *item.mNode, item.mModelMatrix, item.mModelViewMatrix,
-                               viewMatrix, projectionMatrix, item.mSize, !item.mIsOpaque, boundTextures, instruction, queue);
+        auto const MAX_QUEUE = item.mRenderer->GetDrawCommands().empty() ? 1 : DevelRenderer::RENDER_QUEUE_MAX;
+        for (auto queue = 0u; queue < MAX_QUEUE; ++queue)
+        {
+          // Render the item.
+          item.mRenderer->Render(context, bufferIndex, *item.mNode, item.mModelMatrix, item.mModelViewMatrix,
+                                 viewMatrix, projectionMatrix, item.mSize, !item.mIsOpaque, boundTextures, instruction, queue);
+        }
       }
     }
   }
