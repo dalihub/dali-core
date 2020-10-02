@@ -124,7 +124,7 @@ void Shader::SetDefaultProperty( Property::Index index, const Property::Value& p
     {
       if( propertyValue.GetType() == Property::MAP )
       {
-        Dali::Property::Map* map = propertyValue.GetMap();
+        const Dali::Property::Map* map = propertyValue.GetMap();
         if( map )
         {
           std::string vertex;
