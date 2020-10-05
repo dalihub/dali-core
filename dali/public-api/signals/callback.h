@@ -62,57 +62,31 @@ public:
   /**
    * @brief Function to call the function or member function dispatcher.
    *
-   * @SINCE_1_0.0
+   * This function template gets instantiated at the call site.
+   * @SINCE_1_9.33
    * @param[in] callback The callback to call
-   */
-  static void Execute(CallbackBase& callback)
-  {
-    // if we point to a function, we can call it directly
-    // otherwise call the dispatcher function that knows the real type of the object
-    // Note that this template dispatcher lives in client code so the library containing
-    // the code has to be loaded, otherwise we crash boom bang
-    if(callback.mImpl.mObjectPointer)
-    {
-      Dispatcher dispatcher = callback.mImpl.mMemberFunctionDispatcher;
-      (*dispatcher)(callback);
-    }
-    // its also possible to have a member function pointer to a CallbackProvider
-    // that has been deleted, so check if we have impl still
-    else if(callback.mFunction)
-    {
-      (*(callback.mFunction))();
-    }
-    else
-    {
-      DALI_ASSERT_ALWAYS(0 && "no function to execute");
-    }
-  }
-
-  /**
-   * @brief Function to call the function or member function dispatcher.
-   *
-   * @SINCE_1_0.0
-   * @param[in] callback The callback to call
+   * @param[in] args parameter pack to pass into the function
    * @return The value from the function
    */
-  template<typename R>
-  static R ExecuteReturn(CallbackBase& callback)
+  template<typename R, typename... Args>
+  static R ExecuteReturn(CallbackBase& callback, Args... args)
   {
     R returnVal = R();
     // if we point to a function, we can call it directly
     // otherwise call the dispatcher function that knows the real type of the object
-    // Note that this template dispatcher lives in client code so the library containing
-    // the code has to be loaded, otherwise we crash boom bang
+    // Note that this template dispatcher lives in client code (where the callback was created)
+    // so the library containing the code has to be loaded, otherwise we crash boom bang
     if(callback.mImpl.mObjectPointer)
     {
-      using Dispatcher      = R (*)(CallbackBase&);
+      using Dispatcher      = R (*)(CallbackBase&, Args...);
       Dispatcher dispatcher = reinterpret_cast<Dispatcher>(callback.mImpl.mMemberFunctionDispatcher);
-      returnVal             = (*dispatcher)(callback);
+      returnVal             = (*dispatcher)(callback, args...);
     }
     else if(callback.mFunction)
     {
-      using Function1 = R (*)();
-      returnVal       = (*(reinterpret_cast<Function1>(callback.mFunction)))();
+      // convert function type
+      using Function = R (*)(Args...);
+      returnVal       = (*(reinterpret_cast<Function>(callback.mFunction)))(args...);
     }
 
     return returnVal;
@@ -122,12 +96,12 @@ public:
    * @brief Function to call the function or member function dispatcher.
    *
    * This function template gets instantiated at the call site.
-   * @SINCE_1_0.0
+   * @SINCE_1_9.33
    * @param[in] callback The callback to call
-   * @param[in] param1 The first parameter to pass into the function
+   * @param[in] args parameter pack to pass into the function
    */
-  template<typename P1>
-  static void Execute(CallbackBase& callback, P1 param1)
+  template<typename... Args>
+  static void Execute(CallbackBase& callback, Args... args)
   {
     // if we point to a function, we can call it directly
     // otherwise call the dispatcher function that knows the real type of the object
@@ -135,187 +109,35 @@ public:
     // so the library containing the code has to be loaded, otherwise we crash boom bang
     if(callback.mImpl.mObjectPointer)
     {
-      using Dispatcher      = void (*)(CallbackBase&, P1);
+      using Dispatcher      = void (*)(CallbackBase&, Args...);
       Dispatcher dispatcher = reinterpret_cast<Dispatcher>(callback.mImpl.mMemberFunctionDispatcher);
-      (*dispatcher)(callback, param1);
+      (*dispatcher)(callback, args...);
     }
     else if(callback.mFunction)
     {
       // convert function type
-      using Function1 = void (*)(P1);
-      (*(reinterpret_cast<Function1>(callback.mFunction)))(param1);
+      using Function = void (*)(Args...);
+      (*(reinterpret_cast<Function>(callback.mFunction)))(args...);
     }
   }
 
-  /**
-   * @brief Function to call the function or member function dispatcher.
-   *
-   * This function template gets instantiated at the call site.
-   * @SINCE_1_0.0
-   * @param[in] callback The callback to call
-   * @param[in] param1 The first parameter to pass into the function
-   * @return The value from the function
-   */
-  template<typename R, typename P1>
-  static R ExecuteReturn(CallbackBase& callback, P1 param1)
-  {
-    R returnVal = R();
-    // if we point to a function, we can call it directly
-    // otherwise call the dispatcher function that knows the real type of the object
-    // Note that this template dispatcher lives in client code (where the callback was created)
-    // so the library containing the code has to be loaded, otherwise we crash boom bang
-    if(callback.mImpl.mObjectPointer)
-    {
-      using Dispatcher      = R (*)(CallbackBase&, P1);
-      Dispatcher dispatcher = reinterpret_cast<Dispatcher>(callback.mImpl.mMemberFunctionDispatcher);
-      returnVal             = (*dispatcher)(callback, param1);
-    }
-    else if(callback.mFunction)
-    {
-      // convert function type
-      using Function1 = R (*)(P1);
-      returnVal       = (*(reinterpret_cast<Function1>(callback.mFunction)))(param1);
-    }
-
-    return returnVal;
-  }
-
-  /**
-   * @brief Function to call the function or member function dispatcher.
-   *
-   * This function template gets instantiated at the call site.
-   * @SINCE_1_0.0
-   * @param[in] callback The callback to call
-   * @param[in] param1 The first parameter to pass into the function
-   * @param[in] param2 The second parameter to pass into the function
-   */
-  template<typename P1, typename P2>
-  static void Execute(CallbackBase& callback, P1 param1, P2 param2)
-  {
-    // if we point to a function, we can call it directly
-    // otherwise call the dispatcher function that knows the real type of the object
-    // Note that this template dispatcher lives in client code (where the callback was created)
-    // so the library containing the code has to be loaded, otherwise we crash boom bang
-    if(callback.mImpl.mObjectPointer)
-    {
-      using Dispatcher      = void (*)(CallbackBase&, P1, P2);
-      Dispatcher dispatcher = reinterpret_cast<Dispatcher>(callback.mImpl.mMemberFunctionDispatcher);
-      (*dispatcher)(callback, param1, param2);
-    }
-    else if(callback.mFunction)
-    {
-      // convert function type
-      using Function2 = void (*)(P1, P2);
-      (*(reinterpret_cast<Function2>(callback.mFunction)))(param1, param2);
-    }
-  }
-
-  /**
-   * @brief Function to call the function or member function dispatcher.
-   *
-   * This function template gets instantiated at the call site.
-   * @SINCE_1_0.0
-   * @param[in] callback The callback to call
-   * @param[in] param1 The first parameter to pass into the function
-   * @param[in] param2 The second parameter to pass into the function
-   * @return The return value from the function
-   */
-  template<typename R, typename P1, typename P2>
-  static R ExecuteReturn(CallbackBase& callback, P1 param1, P2 param2)
-  {
-    R returnVal = R();
-    // if we point to a function, we can call it directly
-    // otherwise call the dispatcher function that knows the real type of the object
-    // Note that this template dispatcher lives in client code (where the callback was created)
-    // so the library containing the code has to be loaded, otherwise we crash boom bang
-    if(callback.mImpl.mObjectPointer)
-    {
-      using Dispatcher      = R (*)(CallbackBase&, P1, P2);
-      Dispatcher dispatcher = reinterpret_cast<Dispatcher>(callback.mImpl.mMemberFunctionDispatcher);
-      returnVal             = (*dispatcher)(callback, param1, param2);
-    }
-    else if(callback.mFunction)
-    {
-      // convert function type
-      using Function2 = R (*)(P1, P2);
-      returnVal       = (*(reinterpret_cast<Function2>(callback.mFunction)))(param1, param2);
-    }
-
-    return returnVal;
-  }
-
-  /**
-   * @brief Function to call the function or member function dispatcher.
-   *
-   * This function template gets instantiated at the call site.
-   * @SINCE_1_0.0
-   * @param[in] callback The callback to call
-   * @param[in] param1 The first parameter to pass into the function
-   * @param[in] param2 The second parameter to pass into the function
-   * @param[in] param3 The third parameter to pass into the function
-   */
-  template<typename P1, typename P2, typename P3>
-  static void Execute(CallbackBase& callback, P1 param1, P2 param2, P3 param3)
-  {
-    // if we point to a function, we can call it directly
-    // otherwise call the dispatcher function that knows the real type of the object
-    // Note that this template dispatcher lives in client code (where the callback was created)
-    // so the library containing the code has to be loaded, otherwise we crash boom bang
-    if(callback.mImpl.mObjectPointer)
-    {
-      using Dispatcher      = void (*)(CallbackBase&, P1, P2, P3);
-      Dispatcher dispatcher = reinterpret_cast<Dispatcher>(callback.mImpl.mMemberFunctionDispatcher);
-      (*dispatcher)(callback, param1, param2, param3);
-    }
-    else if(callback.mFunction)
-    {
-      // convert function type
-      using Function2 = void (*)(P1, P2, P3);
-      (*(reinterpret_cast<Function2>(callback.mFunction)))(param1, param2, param3);
-    }
-  }
-
-  /**
-   * @brief Function to call the function or member function dispatcher.
-   *
-   * This function template gets instantiated at the call site.
-   * @SINCE_1_0.0
-   * @param[in] callback The callback to call
-   * @param[in] param1 The first parameter to pass into the function
-   * @param[in] param2 The second parameter to pass into the function
-   * @param[in] param3 The third parameter to pass into the function
-   * @return The return value from the function
-   */
-  template<typename R, typename P1, typename P2, typename P3>
-  static R ExecuteReturn(CallbackBase& callback, P1 param1, P2 param2, P3 param3)
-  {
-    R returnVal = R();
-    // if we point to a function, we can call it directly
-    // otherwise call the dispatcher function that knows the real type of the object
-    // Note that this template dispatcher lives in client code (where the callback was created)
-    // so the library containing the code has to be loaded, otherwise we crash boom bang
-    if(callback.mImpl.mObjectPointer)
-    {
-      using Dispatcher      = R (*)(CallbackBase&, P1, P2, P3);
-      Dispatcher dispatcher = reinterpret_cast<Dispatcher>(callback.mImpl.mMemberFunctionDispatcher);
-      returnVal             = (*dispatcher)(callback, param1, param2, param3);
-    }
-    else if(callback.mFunction)
-    {
-      // convert function type
-      using Function2 = R (*)(P1, P2, P3);
-      returnVal       = (*(reinterpret_cast<Function2>(callback.mFunction)))(param1, param2, param3);
-    }
-
-    return returnVal;
-  }
-
-protected: // Constructors for deriving classes
+public:
   /**
    * @brief Function with static linkage.
    * @SINCE_1_0.0
    */
   using Function = void (*)();
+
+  /**
+   * @brief Constructor for function with static linkage.
+   *
+   * @SINCE_1_0.0
+   * @param[in] function The function to call
+   */
+  CallbackBase(Function function);
+
+protected: // Constructors for deriving classes
+
 
   /**
    * @brief Member function.
@@ -349,14 +171,6 @@ protected: // Constructors for deriving classes
    * @return A reference to this
    */
   CallbackBase& operator=(const CallbackBase& rhs);
-
-  /**
-   * @brief Constructor for function with static linkage.
-   *
-   * @SINCE_1_0.0
-   * @param[in] function The function to call
-   */
-  CallbackBase(Function function);
 
   /**
    * @brief Constructor for member function.
@@ -1126,69 +940,6 @@ public:
 };
 
 /**
- * @brief Specializations for static function callbacks.
- * @SINCE_1_0.0
- */
-class CallbackFunction : public CallbackBase
-{
-public:
-  /**
-   * @brief Default constructor.
-   * @SINCE_1_0.0
-   */
-  CallbackFunction()
-  : CallbackBase()
-  {
-  }
-
-  /**
-   * @brief Constructors for functions with static linkage.
-   *
-   * @SINCE_1_0.0
-   * @param[in] function The function to call
-   */
-  CallbackFunction(void (*function)())
-  : CallbackBase(reinterpret_cast<CallbackBase::Function>(function))
-  {
-  }
-  template<typename R>
-  CallbackFunction(R (*function)())
-  : CallbackBase(reinterpret_cast<CallbackBase::Function>(function))
-  {
-  }
-  template<typename P1>
-  CallbackFunction(void (*function)(P1))
-  : CallbackBase(reinterpret_cast<CallbackBase::Function>(function))
-  {
-  }
-  template<typename P1, typename R>
-  CallbackFunction(R (*function)(P1))
-  : CallbackBase(reinterpret_cast<CallbackBase::Function>(function))
-  {
-  }
-  template<typename P1, typename P2>
-  CallbackFunction(void (*function)(P1, P2))
-  : CallbackBase(reinterpret_cast<CallbackBase::Function>(function))
-  {
-  }
-  template<typename P1, typename P2, typename R>
-  CallbackFunction(R (*function)(P1, P2))
-  : CallbackBase(reinterpret_cast<CallbackBase::Function>(function))
-  {
-  }
-  template<typename P1, typename P2, typename P3>
-  CallbackFunction(void (*function)(P1, P2, P3))
-  : CallbackBase(reinterpret_cast<CallbackBase::Function>(function))
-  {
-  }
-  template<typename P1, typename P2, typename P3, typename R>
-  CallbackFunction(R (*function)(P1, P2, P3))
-  : CallbackBase(reinterpret_cast<CallbackBase::Function>(function))
-  {
-  }
-};
-
-/**
  * @brief Specializations for function object callbacks.
  * @SINCE_1_0.0
  */
@@ -1566,106 +1317,16 @@ public:
 // Callback creation thin templates
 
 /**
- * @brief Creates a callback from a C function or static member function with no parameters.
+ * @brief Creates a callback from a free function with parameter pack.
  *
- * @SINCE_1_0.0
+ * @SINCE_1_9.33
  * @param[in] function The function to call
  * @return A newly allocated Callback object, ownership transferred to caller
  */
-inline CallbackBase* MakeCallback(void (*function)(void))
+template<typename R, typename... Args>
+inline CallbackBase* MakeCallback(R (*function)(Args... args))
 {
-  return new CallbackFunction(function);
-}
-
-/**
- * @brief Creates a callback from a C function or static member function with one parameter.
- *
- * @SINCE_1_0.0
- * @param[in] function The function to call
- * @return A newly allocated Callback object, ownership transferred to caller
- */
-template<typename P1>
-inline CallbackBase* MakeCallback(void (*function)(P1))
-{
-  return new CallbackFunction(function);
-}
-
-/**
- * @brief Creates a callback from a C function or static member function with no parameters and a return type.
- *
- * @SINCE_1_0.0
- * @param[in] function The function to call
- * @return A newly allocated Callback object, ownership transferred to caller
- */
-template<typename R>
-inline CallbackBase* MakeCallback(R (*function)(void))
-{
-  return new CallbackFunction(function);
-}
-
-/**
- * @brief Creates a callback from a C function or static member function with one parameter and a return type.
- *
- * @SINCE_1_0.0
- * @param[in] function The function to call
- * @return A newly allocated Callback object, ownership transferred to caller
- */
-template<typename R, typename P1>
-inline CallbackBase* MakeCallback(R (*function)(P1))
-{
-  return new CallbackFunction(function);
-}
-
-/**
- * @brief Creates a callback from a C function or static member function with two parameters.
- *
- * @SINCE_1_0.0
- * @param[in] function The function to call
- * @return A newly allocated Callback object, ownership transferred to caller
- */
-template<typename P1, typename P2>
-inline CallbackBase* MakeCallback(void (*function)(P1, P2))
-{
-  return new CallbackFunction(function);
-}
-
-/**
- * @brief Creates a callback from a C function or static member function with two parameters and a return type.
- *
- * @SINCE_1_0.0
- * @param[in] function The function to call
- * @return A newly allocated Callback object, ownership transferred to caller
- */
-template<typename R, typename P1, typename P2>
-inline CallbackBase* MakeCallback(R (*function)(P1, P2))
-{
-  return new CallbackFunction(function);
-}
-
-/**
- * @brief Creates a callback from a C function or static member function with three parameters.
- *
- * @SINCE_1_0.0
- * @param[in] function The function to call
- * @return A newly allocated Callback object, ownership transferred to caller
- */
-template<typename P1, typename P2, typename P3>
-inline CallbackBase* MakeCallback(void (*function)(P1, P2, P3))
-{
-  return new CallbackFunction(function);
-}
-
-/**
- * @brief Creates a callback from a C function or static member function with three parameters and a return type.
- *
- * @SINCE_1_0.0
- * @param[in] function The function to call
- * @return A newly allocated Callback object, ownership transferred to caller
- */
-template<typename R, typename P1, typename P2, typename P3>
-inline CallbackBase* MakeCallback(R (*function)(P1, P2, P3))
-{
-  return new CallbackFunction(function);
+  return new CallbackBase(reinterpret_cast<CallbackBase::Function>(function));
 }
 
 /**

@@ -60,35 +60,6 @@ BaseSignal::~BaseSignal()
   }
 }
 
-void BaseSignal::Emit()
-{
-  // Guards against nested Emit() calls
-  EmitGuard guard(mEmittingFlag); // Guards against nested Emit() calls
-  if(guard.ErrorOccurred())
-  {
-    return;
-  }
-
-  // If more connections are added by callbacks, these are ignore until the next Emit()
-  // Note that mSignalConnections.Count() count cannot be reduced while iterating
-  const std::size_t initialCount(mSignalConnections.size());
-
-  for(std::size_t i = 0; i < initialCount; ++i)
-  {
-    CallbackBase* callback(GetCallback(i));
-
-    // Note that connections will be set to NULL when disconnected
-    // This is preferable to reducing the connection count while iterating
-    if(callback)
-    {
-      CallbackBase::Execute(*callback);
-    }
-  }
-
-  // Cleanup NULL values from Connection container
-  CleanupConnections();
-}
-
 void BaseSignal::OnConnect(CallbackBase* callback)
 {
   DALI_ASSERT_ALWAYS(nullptr != callback && "Invalid member function pointer passed to Connect()");

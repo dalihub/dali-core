@@ -150,22 +150,15 @@ public:
   };
 
   /**
-   * @brief Emits a signal with no parameters.
+   * @brief Emits a signal with parameter pack.
    *
-   * @SINCE_1_0.0
-   * @pre Cannot be called from inside the same Signal's Emit methods.
-   */
-  void Emit();
-
-  /**
-   * @brief Emits a signal with no parameters.
-   *
-   * @SINCE_1_0.0
+   * @SINCE_1_9.33
+   * @param[in] args The parameter pack
    * @return The value returned by the last callback
    * @pre Cannot be called from inside the same Signal's Emit methods.
    */
-  template<typename Ret>
-  Ret EmitReturn()
+  template<typename Ret, typename... Args>
+  Ret EmitReturn(Args... args)
   {
     Ret returnVal = Ret();
 
@@ -188,7 +181,7 @@ public:
       // This is preferable to reducing the connection count while iterating
       if(callback)
       {
-        returnVal = CallbackBase::ExecuteReturn<Ret>(*callback);
+        returnVal = CallbackBase::ExecuteReturn<Ret, Args...>(*callback, args...);
       }
     }
 
@@ -199,14 +192,14 @@ public:
   }
 
   /**
-   * @brief Emits a signal with 1 parameter.
+   * @brief Emits a signal with  parameter pack.
    *
-   * @SINCE_1_0.0
-   * @param[in] arg0 The first parameter
+   * @SINCE_1_9.33
+   * @param[in] args The parameter pack
    * @pre Cannot be called from inside the same Signal's Emit methods.
    */
-  template<typename Arg0>
-  void Emit(Arg0 arg0)
+  template<typename... Args>
+  void Emit(Args... args)
   {
     // Guards against nested Emit() calls
     EmitGuard guard(mEmittingFlag); // Guards against nested Emit() calls
@@ -227,218 +220,12 @@ public:
       // This is preferable to reducing the connection count while iterating
       if(callback)
       {
-        CallbackBase::Execute<Arg0>(*callback, arg0);
+        CallbackBase::Execute<Args...>(*callback, args...);
       }
     }
 
     // Cleanup NULL values from Connection container
     CleanupConnections();
-  }
-
-  /**
-   * @brief Emits a signal with 1 parameter.
-   *
-   * @SINCE_1_0.0
-   * @param[in] arg0 The first parameter
-   * @return The value returned by the last callback
-   * @pre Cannot be called from inside the same Signal's Emit methods.
-   */
-  template<typename Ret, typename Arg0>
-  Ret EmitReturn(Arg0 arg0)
-  {
-    Ret returnVal = Ret();
-
-    // Guards against nested Emit() calls
-    EmitGuard guard(mEmittingFlag); // Guards against nested Emit() calls
-    if(guard.ErrorOccurred())
-    {
-      return returnVal;
-    }
-
-    // If more connections are added by callbacks, these are ignore until the next Emit()
-    // Note that count cannot be reduced while iterating
-    const std::size_t initialCount(mSignalConnections.size());
-
-    for(std::size_t i = 0; i < initialCount; ++i)
-    {
-      CallbackBase* callback(GetCallback(i));
-
-      // Note that connections will be set to NULL when disconnected
-      // This is preferable to reducing the connection count while iterating
-      if(callback)
-      {
-        returnVal = CallbackBase::ExecuteReturn<Ret, Arg0>(*callback, arg0);
-      }
-    }
-
-    // Cleanup NULL values from Connection container
-    CleanupConnections();
-
-    return returnVal;
-  }
-
-  /**
-   * @brief Emits a signal with 2 parameters.
-   *
-   * @SINCE_1_0.0
-   * @param[in] arg0 The first parameter
-   * @param[in] arg1 The second parameter
-   * @pre Cannot be called from inside the same Signal's Emit methods.
-   */
-  template<typename Arg0, typename Arg1>
-  void Emit(Arg0 arg0, Arg1 arg1)
-  {
-    // Guards against nested Emit() calls
-    EmitGuard guard(mEmittingFlag); // Guards against nested Emit() calls
-    if(guard.ErrorOccurred())
-    {
-      return;
-    }
-
-    // If more connections are added by callbacks, these are ignore until the next Emit()
-    // Note that count cannot be reduced while iterating
-    const std::size_t initialCount(mSignalConnections.size());
-
-    for(std::size_t i = 0; i < initialCount; ++i)
-    {
-      CallbackBase* callback(GetCallback(i));
-
-      // Note that connections will be set to NULL when disconnected
-      // This is preferable to reducing the connection count while iterating
-      if(callback)
-      {
-        CallbackBase::Execute<Arg0, Arg1>(*callback, arg0, arg1);
-      }
-    }
-
-    // Cleanup NULL values from Connection container
-    CleanupConnections();
-  }
-
-  /**
-   * @brief Emits a signal with 2 parameters.
-   *
-   * @SINCE_1_0.0
-   * @param[in] arg0 The first parameter
-   * @param[in] arg1 The second parameter
-   * @return The value returned by the last callback
-   * @pre Cannot be called from inside the same Signal's Emit methods.
-   */
-  template<typename Ret, typename Arg0, typename Arg1>
-  Ret EmitReturn(Arg0 arg0, Arg1 arg1)
-  {
-    Ret returnVal = Ret();
-
-    // Guards against nested Emit() calls
-    EmitGuard guard(mEmittingFlag); // Guards against nested Emit() calls
-    if(guard.ErrorOccurred())
-    {
-      return returnVal;
-    }
-
-    // If more connections are added by callbacks, these are ignore until the next Emit()
-    // Note that count cannot be reduced while iterating
-    const std::size_t initialCount(mSignalConnections.size());
-
-    for(std::size_t i = 0; i < initialCount; ++i)
-    {
-      CallbackBase* callback(GetCallback(i));
-
-      // Note that connections will be set to NULL when disconnected
-      // This is preferable to reducing the connection count while iterating
-      if(callback)
-      {
-        returnVal = CallbackBase::ExecuteReturn<Ret, Arg0, Arg1>(*callback, arg0, arg1);
-      }
-    }
-
-    // Cleanup NULL values from Connection container
-    CleanupConnections();
-
-    return returnVal;
-  }
-
-  /**
-   * @brief Emits a signal with 3 parameters.
-   *
-   * @SINCE_1_0.0
-   * @param[in] arg0 The first parameter
-   * @param[in] arg1 The second parameter
-   * @param[in] arg2 The third parameter
-   * @pre Cannot be called from inside the same Signal's Emit methods.
-   */
-  template<typename Arg0, typename Arg1, typename Arg2>
-  void Emit(Arg0 arg0, Arg1 arg1, Arg2 arg2)
-  {
-    // Guards against nested Emit() calls
-    EmitGuard guard(mEmittingFlag); // Guards against nested Emit() calls
-    if(guard.ErrorOccurred())
-    {
-      return;
-    }
-
-    // If more connections are added by callbacks, these are ignore until the next Emit()
-    // Note that count cannot be reduced while iterating
-    const std::size_t initialCount(mSignalConnections.size());
-
-    for(std::size_t i = 0; i < initialCount; ++i)
-    {
-      CallbackBase* callback(GetCallback(i));
-
-      // Note that connections will be set to NULL when disconnected
-      // This is preferable to reducing the connection count while iterating
-      if(callback)
-      {
-        CallbackBase::Execute<Arg0, Arg1, Arg2>(*callback, arg0, arg1, arg2);
-      }
-    }
-
-    // Cleanup NULL values from Connection container
-    CleanupConnections();
-  }
-
-  /**
-   * @brief Emits a signal with 3 parameters.
-   *
-   * @SINCE_1_0.0
-   * @param[in] arg0 The first parameter
-   * @param[in] arg1 The second parameter
-   * @param[in] arg2 The third parameter
-   * @return The value returned by the last callback
-   * @pre Cannot be called from inside the same Signal's Emit methods.
-   */
-  template<typename Ret, typename Arg0, typename Arg1, typename Arg2>
-  Ret EmitReturn(Arg0 arg0, Arg1 arg1, Arg2 arg2)
-  {
-    Ret returnVal = Ret();
-
-    // Guards against nested Emit() calls
-    EmitGuard guard(mEmittingFlag); // Guards against nested Emit() calls
-    if(guard.ErrorOccurred())
-    {
-      return returnVal;
-    }
-
-    // If more connections are added by callbacks, these are ignore until the next Emit()
-    // Note that count cannot be reduced while iterating
-    const std::size_t initialCount(mSignalConnections.size());
-
-    for(std::size_t i = 0; i < initialCount; ++i)
-    {
-      CallbackBase* callback(GetCallback(i));
-
-      // Note that connections will be set to NULL when disconnected
-      // This is preferable to reducing the connection count while iterating
-      if(callback)
-      {
-        returnVal = CallbackBase::ExecuteReturn<Ret, Arg0, Arg1, Arg2>(*callback, arg0, arg1, arg2);
-      }
-    }
-
-    // Cleanup NULL values from Connection container
-    CleanupConnections();
-
-    return returnVal;
   }
 
   // Connect / Disconnect function for use by Signal implementations
