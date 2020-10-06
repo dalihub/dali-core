@@ -32,7 +32,7 @@ namespace Internal
  * @param[in] typeIdName The type id name string to demangle.
  * @returns the class name ie "Actor" or an empty string
  */
-const std::string DemangleClassName(const char *typeIdName);
+std::string DemangleClassName(const char* typeIdName);
 
 } // namespace Internal
 

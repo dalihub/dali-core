@@ -623,7 +623,7 @@ Property::Index Object::RegisterProperty(std::string          name,
       index = PROPERTY_CUSTOM_START_INDEX + static_cast<Property::Index>( mCustomProperties.Count() );
 
       CustomPropertyMetadata* customProperty =
-        new CustomPropertyMetadata(name, std::move(propertyValue), accessMode);
+        new CustomPropertyMetadata(std::move(name), std::move(propertyValue), accessMode);
 
       // Resolve index for the child property
       Object* parent = GetParentObject();
@@ -632,7 +632,7 @@ Property::Index Object::RegisterProperty(std::string          name,
         const TypeInfo* parentTypeInfo( parent->GetTypeInfo() );
         if( parentTypeInfo )
         {
-          Property::Index childPropertyIndex = parentTypeInfo->GetChildPropertyIndex( name );
+          Property::Index childPropertyIndex = parentTypeInfo->GetChildPropertyIndex( customProperty->name );
           if( childPropertyIndex != Property::INVALID_INDEX )
           {
             customProperty->childPropertyIndex = childPropertyIndex;
@@ -1066,7 +1066,7 @@ AnimatablePropertyMetadata* Object::FindAnimatableProperty( Property::Index inde
   return nullptr;
 }
 
-Property::Index Object::RegisterSceneGraphProperty( const std::string& name, Property::Index key, Property::Index index, const Property::Value& propertyValue ) const
+Property::Index Object::RegisterSceneGraphProperty( std::string name, Property::Index key, Property::Index index, Property::Value propertyValue ) const
 {
   // Create a new property
   Dali::Internal::OwnerPointer<PropertyBase> newProperty;
@@ -1147,11 +1147,11 @@ Property::Index Object::RegisterSceneGraphProperty( const std::string& name, Pro
   {
     DALI_ASSERT_ALWAYS( index <= PROPERTY_CUSTOM_MAX_INDEX && "Too many custom properties have been registered" );
 
-    mCustomProperties.PushBack( new CustomPropertyMetadata( name, key, propertyValue, property ) );
+    mCustomProperties.PushBack( new CustomPropertyMetadata( std::move(name), key, std::move(propertyValue), property ) );
   }
   else
   {
-    mAnimatableProperties.PushBack( new AnimatablePropertyMetadata( index, propertyValue, property ) );
+    mAnimatableProperties.PushBack( new AnimatablePropertyMetadata( index, std::move(propertyValue), property ) );
   }
 
   // queue a message to add the property

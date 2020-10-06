@@ -435,7 +435,7 @@ protected:
    * @param [in] value The value of the property.
    * @return The index of the registered property or Property::INVALID_INDEX if registration failed.
    */
-  Property::Index RegisterSceneGraphProperty( const std::string& name, Property::Index key, Property::Index index, const Property::Value& propertyValue ) const;
+  Property::Index RegisterSceneGraphProperty( std::string name, Property::Index key, Property::Index index, Property::Value propertyValue ) const;
 
   /**
    * Registers animatable scene property

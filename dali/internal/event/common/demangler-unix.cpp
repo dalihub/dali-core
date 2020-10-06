@@ -15,38 +15,27 @@
  *
  */
 
+// EXTERNAL HEADER
+#include <string_view>
+
 // FILE HEADER
 #include <dali/internal/event/common/demangler.h>
 
-// INTERNAL HEADERS
-#include <dali/public-api/common/vector-wrapper.h>
-
 namespace
 {
-
-// true if character represent a digit
-inline bool IsDigit(char c)
+// Extracts the number from the src view and update the view.
+size_t ExtractNumber(std::string_view& src)
 {
-  return (c >= '0' && c <= '9');
-}
+  auto   IsDigit = [](char c) { return (c >= '0' && c <= '9'); };
+  size_t number  = 0;
 
-// Gets the number of characters (number is in string)
-//   start The start position to look for a number
-//   result The number as an integer
-//   returns the number of characters used to define the number ie '12' is 2
-size_t GetNumberOfCharacters(const std::string& s, const size_t& start, int& result)
-{
-  size_t size = s.size();
-
-  size_t i = start;
-
-  int number = 0;
-
-  for( ; i < size; ++i )
+  for(auto i = 0u; i < src.size(); ++i)
   {
-    char c = s.at(i);
+    char c = src[i];
     if( !IsDigit( c ) )
     {
+      //update the src view.
+      src.remove_prefix(i);
       break;
     }
     else
@@ -55,53 +44,41 @@ size_t GetNumberOfCharacters(const std::string& s, const size_t& start, int& res
     }
   }
 
-  if( i - start )
-  {
-    result = number;
-  }
-
-  return i - start;
+  return number;
 }
 
 /**
- * @brief Demangle a nested typeid name into its component parts.
+ * @brief Demangle a nested typeid name into its component parts and return
+ * the last component.
  * A nested type name is one containing namespaces and class names only.
- *   eg DemangleNestedNames(typeid(Dali::Actor).name());
+ *   eg ExtractDemangleNestedName(typeid(Dali::Actor).name());
  * @param[in] typeIdName The type id name string to demangle.
- * @returns the demangled list of names ie ["Dali","Actor"] or an empty list
+ * @returns the last component "Actor" or an empty string_view
  */
-std::vector<std::string> DemangleNestedNames(const char *typeIdName)
+std::string_view ExtractDemangleNestedName(std::string_view mangledName)
 {
-  // Demangle class name mangled according to the Itanium C++ ABI
-  // Returns demangled names ie "N4Dali8Internal5ActorE" is ["Dali","Internal","Actor"]
-  std::vector<std::string> ret;
-
-  const std::string mangledName(typeIdName);
-
-
-  size_t size = mangledName.size();
-
-  if( size >= 2 )
+  if(mangledName.empty())
   {
-    int number = 0;
-    size_t start = 0;
-
-    // If the class isnt nested in a namespace then it just starts with the
-    // number of characters
-    if(mangledName[0] == 'N' && mangledName[size-1]  == 'E')
-    {
-      start = 1;
-    }
-
-    while( size_t chars = GetNumberOfCharacters(mangledName, start, number) )
-    {
-      ret.push_back( mangledName.substr( start + chars, number ) );
-
-      start += chars + number;
-    }
+    return {};
   }
 
-  return ret;
+  // classes nested inside a namespace starts with 'N' and ends with 'E'
+  // so trim those
+  if(mangledName.front() == 'N' && mangledName.back() == 'E')
+  {
+    mangledName.remove_prefix(1);
+    mangledName.remove_suffix(1);
+  }
+
+  std::string_view result;
+  while(!mangledName.empty())
+  {
+    auto length = ExtractNumber(mangledName);
+    result      = {mangledName.data(), length};
+    mangledName.remove_prefix(length);
+  }
+
+  return result;
 }
 
 } // anon namespace
@@ -111,18 +88,9 @@ namespace Dali
 
 namespace Internal
 {
-
-const std::string DemangleClassName(const char *typeIdName)
+std::string DemangleClassName(const char* typeIdName)
 {
-  std::string name;
-  std::vector<std::string> names = DemangleNestedNames(typeIdName);
-
-  if( names.size() )
-  {
-    name = names[ names.size() - 1 ];
-  }
-
-  return name;
+  return std::string(ExtractDemangleNestedName(typeIdName));
 }
 
 } // namespace Internal

@@ -478,6 +478,29 @@ int UtcDaliPropertyValueCopyConstructorStringP(void)
   END_TEST;
 }
 
+int UtcDaliPropertyValueCopyAssignStringDifferentTypeP(void)
+{
+  Property::Value value1{Vector4(3.f, 2.f, 1.f, 2.0f)};
+  Property::Value value2{"very very long string ..................."};
+  value2 = value1;
+
+  Vector4 vec1, vec2;
+  value1.Get(vec1);
+  value2.Get(vec2);
+  DALI_TEST_EQUALS(value1.GetType(), value2.GetType(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1, vec2, TEST_LOCATION);
+
+  Property::Value value3{Vector4(3.f, 2.f, 1.f, 2.0f)};
+  Property::Value value4{"very very long string ..................."};
+
+  value3 = value4;
+
+  DALI_TEST_EQUALS(value3.GetType(), value4.GetType(), TEST_LOCATION);
+  DALI_TEST_EQUALS(value3.Get<std::string>(), "very very long string ...................", TEST_LOCATION);
+  DALI_TEST_EQUALS(value3.Get<std::string>(), value4.Get<std::string>(), TEST_LOCATION);
+  END_TEST;
+}
+
 int UtcDaliPropertyValueCopyConstructorArrayP(void)
 {
   Property::Value  value1(Property::ARRAY);

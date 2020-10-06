@@ -39,230 +39,489 @@
 
 namespace Dali
 {
-namespace
-{
-/**
- * Helper to check if the property value can be read as int/bool
- */
-inline bool IsIntegerType(Property::Type type)
-{
-  return (Property::BOOLEAN == type) || (Property::INTEGER == type);
-}
-} // namespace
 
 struct Property::Value::Impl
 {
-  Impl(bool booleanValue)
-  : type(Property::BOOLEAN),
-    integerValue(booleanValue)
+  ~Impl()
   {
+    // Destroy the current object stored in Data union memory.
+    Destroy();
+  }
+
+  Impl(const Impl&) = delete;
+
+  Impl(Impl&&) = delete;
+
+  Impl& operator=(Impl&&) = delete;
+
+  Impl()
+  {
+    static_assert(sizeof(Impl) == 16);
+    static_assert(alignof(Impl) == alignof(Impl*));
+
+    SetType(Property::NONE);
+  }
+
+  Impl(bool booleanValue)
+  {
+    SetType(Property::BOOLEAN);
+    mData.mBool.member = booleanValue;
   }
 
   Impl(float floatValue)
-  : type(Property::FLOAT),
-    floatValue(floatValue)
   {
+    SetType(Property::FLOAT);
+    mData.mFloat.member = floatValue;
   }
 
   Impl(int32_t integerValue)
-  : type(Property::INTEGER),
-    integerValue(integerValue)
   {
+    SetType(Property::INTEGER);
+    mData.mInt.member = integerValue;
   }
 
-  Impl(const Vector2& vectorValue)
-  : type(Property::VECTOR2),
-    vector2Value(new Vector2(vectorValue))
+  Impl(Vector2 vectorValue)
   {
+    SetType(Property::VECTOR2);
+    ConstructInplace(mData.mVector2.member, std::move(vectorValue));
   }
 
-  Impl(const Vector3& vectorValue)
-  : type(Property::VECTOR3),
-    vector3Value(new Vector3(vectorValue))
+  Impl(Vector3 vectorValue)
   {
+    SetType(Property::VECTOR3);
+    ConstructInplace(mData.mVector3.member, std::move(vectorValue));
   }
 
-  Impl(const Vector4& vectorValue)
-  : type(Property::VECTOR4),
-    vector4Value(new Vector4(vectorValue))
+  Impl(Extents extentsValue)
   {
+    SetType(Property::EXTENTS);
+    ConstructInplace(mData.mExtents.member, std::move(extentsValue));
   }
 
-  Impl(const Matrix3& matrixValue)
-  : type(Property::MATRIX3),
-    matrix3Value(new Matrix3(matrixValue))
+  Impl(Property::Map mapValue)
   {
+    SetType(Property::MAP);
+    ConstructInplace(mData.mMap.member, std::move(mapValue));
   }
 
-  Impl(const Matrix& matrixValue)
-  : type(Property::MATRIX),
-    matrixValue(new Matrix(matrixValue))
+  Impl(Property::Array arrayValue)
   {
+    SetType(Property::ARRAY);
+    ConstructInplace(mData.mArray.member, std::move(arrayValue));
   }
 
-  Impl(const AngleAxis& angleAxisValue)
-  : type(Property::ROTATION),
-    angleAxisValue(new AngleAxis(angleAxisValue))
+  Impl(std::string stringValue)
   {
+    SetType(Property::STRING);
+    mData.mString.member = new std::string(std::move(stringValue));
   }
 
-  Impl(const Quaternion& quaternionValue)
-  : type(Property::ROTATION),
-    angleAxisValue(new AngleAxis())
+  Impl(Rect<int32_t> rectValue)
   {
-    quaternionValue.ToAxisAngle(angleAxisValue->axis, angleAxisValue->angle);
+    SetType(Property::RECTANGLE);
+    mData.mRect.member = new Rect<int32_t>(std::move(rectValue));
   }
 
-  Impl(const std::string& stringValue)
-  : type(Property::STRING),
-    stringValue(new std::string(stringValue))
+  Impl(Vector4 vectorValue)
   {
+    SetType(Property::VECTOR4);
+    mData.mVector4.member = new Vector4(std::move(vectorValue));
   }
 
-  Impl(const Rect<int32_t>& rectValue)
-  : type(Property::RECTANGLE),
-    rectValue(new Rect<int>(rectValue))
+  Impl(Matrix3 matrixValue)
   {
+    SetType(Property::MATRIX3);
+    mData.mMatrix3.member = new Matrix3(std::move(matrixValue));
   }
 
-  Impl(const Rect<float>& rectValue)
-  : type(Property::VECTOR4),
-    vector4Value(new Vector4(rectValue.x, rectValue.y, rectValue.width, rectValue.height))
+  Impl(Matrix matrixValue)
   {
+    SetType(Property::MATRIX);
+    mData.mMatrix.member = new Matrix(std::move(matrixValue));
   }
 
-  Impl(const Property::Array& arrayValue)
-  : type(Property::ARRAY),
-    arrayValue(new Property::Array(arrayValue))
+  Impl(AngleAxis angleAxisValue)
   {
+    SetType(Property::ROTATION);
+    mData.mAngleAxis.member = new AngleAxis(std::move(angleAxisValue));
   }
 
-  Impl(Property::Array&& arrayValue)
-  : type(Property::ARRAY),
-    arrayValue(new Property::Array(std::move(arrayValue)))
+  Type GetType() const
   {
+    return mData.mType.type;
   }
 
-  Impl(const Property::Map& mapValue)
-  : type(Property::MAP),
-    mapValue(new Property::Map(mapValue))
+  bool GetBool() const
   {
+    return mData.mBool.member;
   }
 
-  Impl(Property::Map&& mapValue)
-  : type(Property::MAP),
-    mapValue(new Property::Map(std::move(mapValue)))
+  int32_t GetInt() const
   {
+    return mData.mInt.member;
   }
 
-  Impl(const Extents& extentsValue)
-  : type(Property::EXTENTS),
-    extentsValue(new Extents(extentsValue))
+  float GetFloat() const
   {
+    return mData.mFloat.member;
   }
 
-  Impl(const std::initializer_list<KeyValuePair>& values)
-  : type(Property::MAP),
-    mapValue(new Property::Map(values))
+  const Extents& GetExtents() const
   {
+    return mData.mExtents.member;
   }
 
-  /**
-   * Destructor, takes care of releasing the dynamically allocated types
-   */
-  ~Impl()
+  const Vector2& GetVector2() const
   {
-    switch(type)
+    return mData.mVector2.member;
+  }
+
+  const Vector3& GetVector3() const
+  {
+    return mData.mVector3.member;
+  }
+
+  const Property::Map& GetMap() const
+  {
+    return mData.mMap.member;
+  }
+
+  const Property::Array& GetArray() const
+  {
+    return mData.mArray.member;
+  }
+
+  const Vector4& GetVector4() const
+  {
+    return *(mData.mVector4.member);
+  }
+
+  const Matrix3& GetMatrix3() const
+  {
+    return *(mData.mMatrix3.member);
+  }
+
+  const Matrix& GetMatrix() const
+  {
+    return *(mData.mMatrix.member);
+  }
+
+  const AngleAxis& GetAngleAxis() const
+  {
+    return *(mData.mAngleAxis.member);
+  }
+
+  const std::string& GetString() const
+  {
+    return *(mData.mString.member);
+  }
+
+  const Rect<int32_t>& GetRect() const
+  {
+    return *(mData.mRect.member);
+  }
+
+  Property::Map* GetMapPtr()
+  {
+    return &(mData.mMap.member);
+  }
+
+  Property::Array* GetArrayPtr()
+  {
+    return &(mData.mArray.member);
+  }
+
+  Impl& operator=(const Impl& other)
+  {
+    const bool isSameType = GetType() == other.GetType();
+
+    if(!isSameType)
     {
-      case Property::NONE:    // FALLTHROUGH
-      case Property::BOOLEAN: // FALLTHROUGH
-      case Property::FLOAT:   // FALLTHROUGH
+      Destroy();
+      SetType(other.GetType());
+    }
+
+    switch(GetType())
+    {
+      case Property::NONE:
+      {
+        break;
+      }
+      case Property::BOOLEAN:
+      {
+        mData.mBool.member = other.GetBool();
+        break;
+      }
+      case Property::FLOAT:
+      {
+        mData.mFloat.member = other.GetFloat();
+        break;
+      }
       case Property::INTEGER:
       {
-        break; // nothing to do
-      }
-      case Property::VECTOR2:
-      {
-        delete vector2Value;
-        break;
-      }
-      case Property::VECTOR3:
-      {
-        delete vector3Value;
-        break;
-      }
-      case Property::VECTOR4:
-      {
-        delete vector4Value;
-        break;
-      }
-      case Property::MATRIX3:
-      {
-        delete matrix3Value;
-        break;
-      }
-      case Property::MATRIX:
-      {
-        delete matrixValue;
-        break;
-      }
-      case Property::RECTANGLE:
-      {
-        delete rectValue;
-        break;
-      }
-      case Property::ROTATION:
-      {
-        delete angleAxisValue;
-        break;
-      }
-      case Property::STRING:
-      {
-        delete stringValue;
-        break;
-      }
-      case Property::ARRAY:
-      {
-        delete arrayValue;
-        break;
-      }
-      case Property::MAP:
-      {
-        delete mapValue;
+        mData.mInt.member = other.GetInt();
         break;
       }
       case Property::EXTENTS:
       {
-        delete extentsValue;
+        auto obj = other.GetExtents();
+        ConstructInplace(mData.mExtents.member, std::move(obj));
+        break;
+      }
+      case Property::VECTOR2:
+      {
+        auto obj = other.GetVector2();
+        ConstructInplace(mData.mVector2.member, std::move(obj));
+        break;
+      }
+      case Property::VECTOR3:
+      {
+        auto obj = other.GetVector3();
+        ConstructInplace(mData.mVector3.member, std::move(obj));
+        break;
+      }
+      case Property::ARRAY:
+      {
+        auto obj = other.GetArray();
+        ConstructInplace(mData.mArray.member, std::move(obj));
+        break;
+      }
+      case Property::MAP:
+      {
+        auto obj = other.GetMap();
+        ConstructInplace(mData.mMap.member, std::move(obj));
+        break;
+      }
+      case Property::VECTOR4:
+      {
+        if(isSameType)
+        {
+          *mData.mVector4.member = other.GetVector4();
+        }
+        else
+        {
+          mData.mVector4.member = new Vector4(other.GetVector4());
+        }
+        break;
+      }
+      case Property::MATRIX3:
+      {
+        if(isSameType)
+        {
+          *mData.mMatrix3.member = other.GetMatrix3();
+        }
+        else
+        {
+          mData.mMatrix3.member = new Matrix3(other.GetMatrix3());
+        }
+        break;
+      }
+      case Property::MATRIX:
+      {
+        if(isSameType)
+        {
+          *mData.mMatrix.member = other.GetMatrix();
+        }
+        else
+        {
+          mData.mMatrix.member = new Matrix(other.GetMatrix());
+        }
+        break;
+      }
+      case Property::RECTANGLE:
+      {
+        if(isSameType)
+        {
+          *mData.mRect.member = other.GetRect();
+        }
+        else
+        {
+          mData.mRect.member = new Rect<int32_t>(other.GetRect());
+        }
+        break;
+      }
+      case Property::ROTATION:
+      {
+        if(isSameType)
+        {
+          *mData.mAngleAxis.member = other.GetAngleAxis();
+        }
+        else
+        {
+          mData.mAngleAxis.member = new AngleAxis(other.GetAngleAxis());
+        }
+        break;
+      }
+      case Property::STRING:
+      {
+        if(isSameType)
+        {
+          *mData.mString.member = other.GetString();
+        }
+        else
+        {
+          mData.mString.member = new std::string(other.GetString());
+        }
+        break;
+      }
+    }
+    return *this;
+  }
+
+private:
+  void SetType(Type typeValue)
+  {
+    mData.mType.type = typeValue;
+  }
+
+  /**
+   * This helper function takes a typed(Tp) memory location( member)
+   * and a object of same type( val ) and move constructs a new object of
+   * same type(Tp) in the memory location( member) using placement new.
+   * after this function call member location will have a object of type Tp.
+   */
+  template<typename Tp>
+  void ConstructInplace(Tp& member, Tp&& val)
+  {
+    new(&member) Tp(std::forward<Tp>(val));
+  }
+
+  /**
+  * Destroy the object created in the Data union memory by probing the
+  * type and calling the appropriate destructor.
+  * and also reset the type and memory location to reflect that .
+  */
+  void Destroy()
+  {
+    switch(GetType())
+    {
+      case Property::NONE:
+      case Property::BOOLEAN:
+      case Property::FLOAT:
+      case Property::INTEGER:
+      {
+        break; // nothing to do
+      }
+      case Property::EXTENTS:
+      {
+        mData.mExtents.member.~Extents();
+        break;
+      }
+      case Property::VECTOR2:
+      {
+        mData.mVector2.member.~Vector2();
+        break;
+      }
+      case Property::VECTOR3:
+      {
+        mData.mVector3.member.~Vector3();
+        break;
+      }
+      case Property::ARRAY:
+      {
+        using array = Property::Array;
+        mData.mArray.member.~array();
+        break;
+      }
+      case Property::MAP:
+      {
+        using map = Property::Map;
+        mData.mMap.member.~map();
+        break;
+      }
+      case Property::VECTOR4:
+      {
+        delete mData.mVector4.member;
+        break;
+      }
+      case Property::MATRIX3:
+      {
+        delete mData.mMatrix3.member;
+        break;
+      }
+      case Property::MATRIX:
+      {
+        delete mData.mMatrix.member;
+        break;
+      }
+      case Property::RECTANGLE:
+      {
+        delete mData.mRect.member;
+        break;
+      }
+      case Property::ROTATION:
+      {
+        delete mData.mAngleAxis.member;
+        break;
+      }
+      case Property::STRING:
+      {
+        delete mData.mString.member;
         break;
       }
     }
   }
 
-public: // Data
-  Type type;
-  union
+  /*
+   * This wrapper struct is used for
+   * storing Type in every union member
+   * and can acess it from non active member
+   * of the uninon without invoking UB. this is
+   * possible because of CIS(common initial sequence)
+   * http://eel.is/c++draft/class.mem#general-25
+   */
+  template<typename T>
+  struct UnionMember
   {
-    int32_t integerValue;
-    float   floatValue;
-    // must use pointers for any class value pre c++ 11
-    Vector2*         vector2Value;
-    Vector3*         vector3Value;
-    Vector4*         vector4Value;
-    Matrix3*         matrix3Value;
-    Matrix*          matrixValue;
-    AngleAxis*       angleAxisValue;
-    std::string*     stringValue;
-    Rect<int32_t>*   rectValue;
-    Property::Array* arrayValue;
-    Property::Map*   mapValue;
-    Extents*         extentsValue;
+    Type type;
+    T    member;
   };
 
-private:
-  // non-copyable
-  Impl(const Impl&) = delete;
-  Impl& operator=(const Impl&) = delete;
+  /**
+   * Tagged union implementation.
+   *
+   * This Data union contains non trivial data
+   * types Map and Array, the default constructor
+   * and destructors are deleted by the compiler
+   * so we provided empty constructor and destructor
+   * just to pacify the compiler.
+   * The only job of this union to give a typed memory buffer to the
+   * Impl class which can construct the appropriate object
+   * using placement new.
+   * As Impl class explicitly construct the object and keeps track of the
+   * object it creates and then destroys them in the ~Impl() this will not leak
+   * any memory.
+   */
+  union Data
+  {
+    Data()
+    {
+    }
+    ~Data()
+    {
+    }
+
+    UnionMember<bool>            mBool;
+    UnionMember<int32_t>         mInt;
+    UnionMember<float>           mFloat;
+    UnionMember<Extents>         mExtents;
+    UnionMember<Vector2>         mVector2;
+    UnionMember<Vector3>         mVector3;
+    UnionMember<Property::Map>   mMap;
+    UnionMember<Property::Array> mArray;
+    UnionMember<Vector4*>        mVector4;
+    UnionMember<Matrix3*>        mMatrix3;
+    UnionMember<Matrix*>         mMatrix;
+    UnionMember<AngleAxis*>      mAngleAxis;
+    UnionMember<std::string*>    mString;
+    UnionMember<Rect<int32_t>*>  mRect;
+    struct
+    {
+      Type type;
+    } mType;
+  };
+
+  Data mData;
 };
 
 Property::Value::Value()
@@ -316,7 +575,7 @@ Property::Value::Value(const Rect<int32_t>& rectValue)
 }
 
 Property::Value::Value(const Rect<float>& rectValue)
-: mImpl(new Impl(rectValue))
+: mImpl(new Impl(Vector4(rectValue.x, rectValue.y, rectValue.width, rectValue.height)))
 {
 }
 
@@ -326,12 +585,14 @@ Property::Value::Value(const AngleAxis& angleAxisValue)
 }
 
 Property::Value::Value(const Quaternion& quaternionValue)
-: mImpl(new Impl(quaternionValue))
 {
+  AngleAxis angleAxisValue;
+  quaternionValue.ToAxisAngle(angleAxisValue.axis, angleAxisValue.angle);
+  mImpl = new Impl(std::move(angleAxisValue));
 }
 
-Property::Value::Value(const std::string& stringValue)
-: mImpl(new Impl(stringValue))
+Property::Value::Value(std::string stringValue)
+: mImpl(new Impl(std::move(stringValue)))
 {
 }
 
@@ -348,22 +609,12 @@ Property::Value::Value(const char* stringValue)
   }
 }
 
-Property::Value::Value(Property::Array& arrayValue)
-: mImpl(new Impl(arrayValue))
-{
-}
-
-Property::Value::Value(Property::Array&& arrayValue)
+Property::Value::Value(Property::Array arrayValue)
 : mImpl(new Impl(std::move(arrayValue)))
 {
 }
 
-Property::Value::Value(Property::Map& mapValue)
-: mImpl(new Impl(mapValue))
-{
-}
-
-Property::Value::Value(Property::Map&& mapValue)
+Property::Value::Value(Property::Map mapValue)
 : mImpl(new Impl(std::move(mapValue)))
 {
 }
@@ -374,7 +625,7 @@ Property::Value::Value(const Extents& extentsValue)
 }
 
 Property::Value::Value(const std::initializer_list<KeyValuePair>& values)
-: mImpl(new Impl(values))
+: mImpl(new Impl(Property::Map(values)))
 {
 }
 
@@ -415,7 +666,7 @@ Property::Value::Value(Type type)
     }
     case Property::RECTANGLE:
     {
-      mImpl = new Impl(Rect<int32_t>(0, 0, 0, 0));
+      mImpl = new Impl(Rect<int32_t>());
       break;
     }
     case Property::ROTATION:
@@ -468,7 +719,7 @@ Property::Value::Value(const Property::Value& value)
   operator=(value);
 }
 
-Property::Value::Value(Property::Value&& value)
+Property::Value::Value(Property::Value&& value) noexcept
 : mImpl(value.mImpl)
 {
   value.mImpl = nullptr;
@@ -481,181 +732,26 @@ Property::Value& Property::Value::operator=(const Property::Value& value)
     // skip self assignment
     return *this;
   }
-  // if we are assigned an empty value, just drop impl
-  if(!value.mImpl)
+
+  if(value.mImpl)
   {
-    delete mImpl;
-    mImpl = nullptr;
-    return *this;
-  }
-  // first check if the type is the same, no need to change impl, just assign
-  if(mImpl && (mImpl->type == value.mImpl->type))
-  {
-    switch(mImpl->type)
+    if(!mImpl)
     {
-      case Property::BOOLEAN:
-      {
-        mImpl->integerValue = value.mImpl->integerValue;
-        break;
-      }
-      case Property::FLOAT:
-      {
-        mImpl->floatValue = value.mImpl->floatValue;
-        break;
-      }
-      case Property::INTEGER:
-      {
-        mImpl->integerValue = value.mImpl->integerValue;
-        break;
-      }
-      case Property::VECTOR2:
-      {
-        *mImpl->vector2Value = *value.mImpl->vector2Value; // type cannot change in mImpl so vector is allocated
-        break;
-      }
-      case Property::VECTOR3:
-      {
-        *mImpl->vector3Value = *value.mImpl->vector3Value; // type cannot change in mImpl so vector is allocated
-        break;
-      }
-      case Property::VECTOR4:
-      {
-        *mImpl->vector4Value = *value.mImpl->vector4Value; // type cannot change in mImpl so vector is allocated
-        break;
-      }
-      case Property::RECTANGLE:
-      {
-        *mImpl->rectValue = *value.mImpl->rectValue; // type cannot change in mImpl so rect is allocated
-        break;
-      }
-      case Property::ROTATION:
-      {
-        *mImpl->angleAxisValue = *value.mImpl->angleAxisValue; // type cannot change in mImpl so quaternion is allocated
-        break;
-      }
-      case Property::STRING:
-      {
-        *mImpl->stringValue = *value.mImpl->stringValue; // type cannot change in mImpl so string is allocated
-        break;
-      }
-      case Property::MATRIX:
-      {
-        *mImpl->matrixValue = *value.mImpl->matrixValue; // type cannot change in mImpl so matrix is allocated
-        break;
-      }
-      case Property::MATRIX3:
-      {
-        *mImpl->matrix3Value = *value.mImpl->matrix3Value; // type cannot change in mImpl so matrix is allocated
-        break;
-      }
-      case Property::ARRAY:
-      {
-        *mImpl->arrayValue = *value.mImpl->arrayValue; // type cannot change in mImpl so array is allocated
-        break;
-      }
-      case Property::MAP:
-      {
-        *mImpl->mapValue = *value.mImpl->mapValue; // type cannot change in mImpl so map is allocated
-        break;
-      }
-      case Property::EXTENTS:
-      {
-        *mImpl->extentsValue = *value.mImpl->extentsValue; // type cannot change in mImpl so extents is allocated
-        break;
-      }
-      case Property::NONE:
-      { // mImpl will be a nullptr, there's no way to get to this case
-      }
+      mImpl = new Impl();
     }
+
+    *mImpl = *(value.mImpl);
   }
   else
   {
-    // different type, release old impl and create new
-    Impl* newImpl(nullptr);
-    switch(value.mImpl->type)
-    {
-      case Property::BOOLEAN:
-      {
-        newImpl = new Impl(bool(value.mImpl->integerValue));
-        break;
-      }
-      case Property::FLOAT:
-      {
-        newImpl = new Impl(value.mImpl->floatValue);
-        break;
-      }
-      case Property::INTEGER:
-      {
-        newImpl = new Impl(value.mImpl->integerValue);
-        break;
-      }
-      case Property::VECTOR2:
-      {
-        newImpl = new Impl(*value.mImpl->vector2Value); // type cannot change in mImpl so vector is allocated
-        break;
-      }
-      case Property::VECTOR3:
-      {
-        newImpl = new Impl(*value.mImpl->vector3Value); // type cannot change in mImpl so vector is allocated
-        break;
-      }
-      case Property::VECTOR4:
-      {
-        newImpl = new Impl(*value.mImpl->vector4Value); // type cannot change in mImpl so vector is allocated
-        break;
-      }
-      case Property::RECTANGLE:
-      {
-        newImpl = new Impl(*value.mImpl->rectValue); // type cannot change in mImpl so rect is allocated
-        break;
-      }
-      case Property::ROTATION:
-      {
-        newImpl = new Impl(*value.mImpl->angleAxisValue); // type cannot change in mImpl so quaternion is allocated
-        break;
-      }
-      case Property::MATRIX3:
-      {
-        newImpl = new Impl(*value.mImpl->matrix3Value); // type cannot change in mImpl so matrix is allocated
-        break;
-      }
-      case Property::MATRIX:
-      {
-        newImpl = new Impl(*value.mImpl->matrixValue); // type cannot change in mImpl so matrix is allocated
-        break;
-      }
-      case Property::STRING:
-      {
-        newImpl = new Impl(*value.mImpl->stringValue); // type cannot change in mImpl so string is allocated
-        break;
-      }
-      case Property::ARRAY:
-      {
-        newImpl = new Impl(*value.mImpl->arrayValue); // type cannot change in mImpl so array is allocated
-        break;
-      }
-      case Property::MAP:
-      {
-        newImpl = new Impl(*value.mImpl->mapValue); // type cannot change in mImpl so map is allocated
-        break;
-      }
-      case Property::EXTENTS:
-      {
-        newImpl = new Impl(*value.mImpl->extentsValue); // type cannot change in mImpl so extents is allocated
-        break;
-      }
-      case Property::NONE:
-      { // nullptr value will be used for "empty" value
-      }
-    }
     delete mImpl;
-    mImpl = newImpl;
+    mImpl = nullptr;
   }
 
   return *this;
 }
 
-Property::Value& Property::Value::operator=(Property::Value&& value)
+Property::Value& Property::Value::operator=(Property::Value&& value) noexcept
 {
   if(this != &value)
   {
@@ -674,21 +770,24 @@ Property::Value::~Value()
 
 Property::Type Property::Value::GetType() const
 {
-  Property::Type type(Property::NONE);
-  if(mImpl)
-  {
-    type = mImpl->type;
-  }
-  return type;
+  return mImpl ? mImpl->GetType() : Property::NONE;
 }
 
 bool Property::Value::Get(bool& booleanValue) const
 {
   bool converted = false;
-  if(mImpl && IsIntegerType(mImpl->type))
+  if(mImpl)
   {
-    booleanValue = mImpl->integerValue;
-    converted    = true;
+    if(mImpl->GetType() == BOOLEAN)
+    {
+      booleanValue = mImpl->GetBool();
+      converted    = true;
+    }
+    else if(mImpl->GetType() == INTEGER)
+    {
+      booleanValue = mImpl->GetInt();
+      converted    = true;
+    }
   }
   return converted;
 }
@@ -698,14 +797,19 @@ bool Property::Value::Get(float& floatValue) const
   bool converted = false;
   if(mImpl)
   {
-    if(mImpl->type == FLOAT)
+    if(mImpl->GetType() == FLOAT)
     {
-      floatValue = mImpl->floatValue;
+      floatValue = mImpl->GetFloat();
       converted  = true;
     }
-    else if(IsIntegerType(mImpl->type))
+    else if(mImpl->GetType() == BOOLEAN)
     {
-      floatValue = static_cast<float>(mImpl->integerValue);
+      floatValue = static_cast<float>(mImpl->GetBool());
+      converted  = true;
+    }
+    else if(mImpl->GetType() == INTEGER)
+    {
+      floatValue = static_cast<float>(mImpl->GetInt());
       converted  = true;
     }
   }
@@ -717,14 +821,19 @@ bool Property::Value::Get(int32_t& integerValue) const
   bool converted = false;
   if(mImpl)
   {
-    if(IsIntegerType(mImpl->type))
+    if(mImpl->GetType() == INTEGER)
     {
-      integerValue = mImpl->integerValue;
+      integerValue = mImpl->GetInt();
       converted    = true;
     }
-    else if(mImpl->type == FLOAT)
+    else if(mImpl->GetType() == BOOLEAN)
     {
-      integerValue = static_cast<int32_t>(mImpl->floatValue);
+      integerValue = mImpl->GetBool();
+      converted    = true;
+    }
+    else if(mImpl->GetType() == FLOAT)
+    {
+      integerValue = static_cast<int32_t>(mImpl->GetFloat());
       converted    = true;
     }
   }
@@ -736,10 +845,19 @@ bool Property::Value::Get(Vector2& vectorValue) const
   bool converted = false;
   if(mImpl)
   {
-    // type cannot change in mImpl so vector is allocated
-    if(mImpl->type == VECTOR2 || mImpl->type == VECTOR3 || mImpl->type == VECTOR4)
+    if(mImpl->GetType() == VECTOR4)
     {
-      vectorValue = *(mImpl->vector2Value); // if Vector3 or 4 only x and y are assigned
+      vectorValue = mImpl->GetVector4();
+      converted   = true;
+    }
+    else if(mImpl->GetType() == VECTOR2)
+    {
+      vectorValue = mImpl->GetVector2();
+      converted   = true;
+    }
+    else if(mImpl->GetType() == VECTOR3)
+    {
+      vectorValue = mImpl->GetVector3();
       converted   = true;
     }
   }
@@ -751,15 +869,19 @@ bool Property::Value::Get(Vector3& vectorValue) const
   bool converted = false;
   if(mImpl)
   {
-    // type cannot change in mImpl so vector is allocated
-    if(mImpl->type == VECTOR3 || mImpl->type == VECTOR4)
+    if(mImpl->GetType() == VECTOR4)
     {
-      vectorValue = *(mImpl->vector3Value); // if Vector4 only x,y,z are assigned
+      vectorValue = mImpl->GetVector4();
       converted   = true;
     }
-    else if(mImpl->type == VECTOR2)
+    else if(mImpl->GetType() == VECTOR2)
     {
-      vectorValue = *(mImpl->vector2Value);
+      vectorValue = mImpl->GetVector2();
+      converted   = true;
+    }
+    else if(mImpl->GetType() == VECTOR3)
+    {
+      vectorValue = mImpl->GetVector3();
       converted   = true;
     }
   }
@@ -771,19 +893,19 @@ bool Property::Value::Get(Vector4& vectorValue) const
   bool converted = false;
   if(mImpl)
   {
-    if(mImpl->type == VECTOR4) // type cannot change in mImpl so vector is allocated
+    if(mImpl->GetType() == VECTOR4)
     {
-      vectorValue = *(mImpl->vector4Value);
+      vectorValue = mImpl->GetVector4();
       converted   = true;
     }
-    else if(mImpl->type == VECTOR2)
+    else if(mImpl->GetType() == VECTOR2)
     {
-      vectorValue = *(mImpl->vector2Value);
+      vectorValue = mImpl->GetVector2();
       converted   = true;
     }
-    else if(mImpl->type == VECTOR3)
+    else if(mImpl->GetType() == VECTOR3)
     {
-      vectorValue = *(mImpl->vector3Value);
+      vectorValue = mImpl->GetVector3();
       converted   = true;
     }
   }
@@ -793,9 +915,9 @@ bool Property::Value::Get(Vector4& vectorValue) const
 bool Property::Value::Get(Matrix3& matrixValue) const
 {
   bool converted = false;
-  if(mImpl && (mImpl->type == MATRIX3)) // type cannot change in mImpl so matrix is allocated
+  if(mImpl && (mImpl->GetType() == MATRIX3))
   {
-    matrixValue = *(mImpl->matrix3Value);
+    matrixValue = mImpl->GetMatrix3();
     converted   = true;
   }
   return converted;
@@ -804,9 +926,9 @@ bool Property::Value::Get(Matrix3& matrixValue) const
 bool Property::Value::Get(Matrix& matrixValue) const
 {
   bool converted = false;
-  if(mImpl && (mImpl->type == MATRIX)) // type cannot change in mImpl so matrix is allocated
+  if(mImpl && (mImpl->GetType() == MATRIX))
   {
-    matrixValue = *(mImpl->matrixValue);
+    matrixValue = mImpl->GetMatrix();
     converted   = true;
   }
   return converted;
@@ -815,9 +937,9 @@ bool Property::Value::Get(Matrix& matrixValue) const
 bool Property::Value::Get(Rect<int32_t>& rectValue) const
 {
   bool converted = false;
-  if(mImpl && (mImpl->type == RECTANGLE)) // type cannot change in mImpl so rect is allocated
+  if(mImpl && (mImpl->GetType() == RECTANGLE))
   {
-    rectValue = *(mImpl->rectValue);
+    rectValue = mImpl->GetRect();
     converted = true;
   }
   return converted;
@@ -826,9 +948,9 @@ bool Property::Value::Get(Rect<int32_t>& rectValue) const
 bool Property::Value::Get(AngleAxis& angleAxisValue) const
 {
   bool converted = false;
-  if(mImpl && (mImpl->type == ROTATION)) // type cannot change in mImpl so angleAxis is allocated
+  if(mImpl && (mImpl->GetType() == ROTATION))
   {
-    angleAxisValue = *(mImpl->angleAxisValue);
+    angleAxisValue = mImpl->GetAngleAxis();
     converted      = true;
   }
   return converted;
@@ -837,9 +959,10 @@ bool Property::Value::Get(AngleAxis& angleAxisValue) const
 bool Property::Value::Get(Quaternion& quaternionValue) const
 {
   bool converted = false;
-  if(mImpl && (mImpl->type == ROTATION)) // type cannot change in mImpl so angleAxis is allocated
+  if(mImpl && (mImpl->GetType() == ROTATION))
   {
-    quaternionValue = Quaternion(mImpl->angleAxisValue->angle, mImpl->angleAxisValue->axis);
+    auto& obj       = mImpl->GetAngleAxis();
+    quaternionValue = Quaternion(obj.angle, obj.axis);
     converted       = true;
   }
   return converted;
@@ -848,9 +971,9 @@ bool Property::Value::Get(Quaternion& quaternionValue) const
 bool Property::Value::Get(std::string& stringValue) const
 {
   bool converted = false;
-  if(mImpl && (mImpl->type == STRING)) // type cannot change in mImpl so string is allocated
+  if(mImpl && (mImpl->GetType() == STRING))
   {
-    stringValue.assign(*(mImpl->stringValue));
+    stringValue.assign(mImpl->GetString());
     converted = true;
   }
   return converted;
@@ -859,9 +982,9 @@ bool Property::Value::Get(std::string& stringValue) const
 bool Property::Value::Get(Property::Array& arrayValue) const
 {
   bool converted = false;
-  if(mImpl && (mImpl->type == ARRAY)) // type cannot change in mImpl so array is allocated
+  if(mImpl && (mImpl->GetType() == ARRAY))
   {
-    arrayValue = *(mImpl->arrayValue);
+    arrayValue = mImpl->GetArray();
     converted  = true;
   }
   return converted;
@@ -870,32 +993,50 @@ bool Property::Value::Get(Property::Array& arrayValue) const
 bool Property::Value::Get(Property::Map& mapValue) const
 {
   bool converted = false;
-  if(mImpl && (mImpl->type == MAP)) // type cannot change in mImpl so map is allocated
+  if(mImpl && (mImpl->GetType() == MAP))
   {
-    mapValue  = *(mImpl->mapValue);
+    mapValue  = mImpl->GetMap();
     converted = true;
   }
   return converted;
 }
 
-Property::Array* Property::Value::GetArray() const
+Property::Array const* Property::Value::GetArray() const
+{
+  if(mImpl && (mImpl->GetType() == ARRAY))
+  {
+    return mImpl->GetArrayPtr();
+  }
+  return nullptr;
+}
+
+Property::Array* Property::Value::GetArray()
 {
   Property::Array* array = nullptr;
-  if(mImpl && (mImpl->type == ARRAY)) // type cannot change in mImpl so array is allocated
+  if(mImpl && (mImpl->GetType() == ARRAY)) // type cannot change in mImpl so array is allocated
   {
-    array = mImpl->arrayValue;
+    array = mImpl->GetArrayPtr();
   }
   return array;
 }
 
-Property::Map* Property::Value::GetMap() const
+Property::Map const* Property::Value::GetMap() const
 {
   Property::Map* map = nullptr;
-  if(mImpl && (mImpl->type == MAP)) // type cannot change in mImpl so map is allocated
+  if(mImpl && (mImpl->GetType() == MAP)) // type cannot change in mImpl so map is allocated
   {
-    map = mImpl->mapValue;
+    map = mImpl->GetMapPtr();
   }
   return map;
+}
+
+Property::Map* Property::Value::GetMap()
+{
+  if(mImpl && (mImpl->GetType() == MAP))
+  {
+    return mImpl->GetMapPtr();
+  }
+  return nullptr;
 }
 
 bool Property::Value::Get(Extents& extentsValue) const
@@ -903,17 +1044,18 @@ bool Property::Value::Get(Extents& extentsValue) const
   bool converted = false;
   if(mImpl)
   {
-    if(mImpl->type == EXTENTS)
+    if(mImpl->GetType() == EXTENTS)
     {
-      extentsValue = *(mImpl->extentsValue);
+      extentsValue = mImpl->GetExtents();
       converted    = true;
     }
-    else if(mImpl->type == VECTOR4)
+    else if(mImpl->GetType() == VECTOR4)
     {
-      extentsValue.start  = static_cast<uint16_t>(mImpl->vector4Value->x);
-      extentsValue.end    = static_cast<uint16_t>(mImpl->vector4Value->y);
-      extentsValue.top    = static_cast<uint16_t>(mImpl->vector4Value->z);
-      extentsValue.bottom = static_cast<uint16_t>(mImpl->vector4Value->w);
+      auto& obj           = mImpl->GetVector4();
+      extentsValue.start  = static_cast<uint16_t>(obj.x);
+      extentsValue.end    = static_cast<uint16_t>(obj.y);
+      extentsValue.top    = static_cast<uint16_t>(obj.z);
+      extentsValue.bottom = static_cast<uint16_t>(obj.w);
       converted           = true;
     }
   }
@@ -924,78 +1066,78 @@ std::ostream& operator<<(std::ostream& stream, const Property::Value& value)
 {
   if(value.mImpl)
   {
-    const Property::Value::Impl& impl(*value.mImpl);
+    auto obj = value.mImpl;
 
-    switch(impl.type)
+    switch(obj->GetType())
     {
       case Dali::Property::BOOLEAN:
       {
-        stream << impl.integerValue;
+        stream << obj->GetBool();
         break;
       }
       case Dali::Property::FLOAT:
       {
-        stream << impl.floatValue;
+        stream << obj->GetFloat();
         break;
       }
       case Dali::Property::INTEGER:
       {
-        stream << impl.integerValue;
+        stream << obj->GetInt();
         break;
       }
       case Dali::Property::VECTOR2:
       {
-        stream << *impl.vector2Value;
+        stream << obj->GetVector2();
         break;
       }
       case Dali::Property::VECTOR3:
       {
-        stream << *impl.vector3Value;
+        stream << obj->GetVector3();
         break;
       }
       case Dali::Property::VECTOR4:
       {
-        stream << *impl.vector4Value;
+        stream << obj->GetVector4();
         break;
       }
       case Dali::Property::MATRIX3:
       {
-        stream << *impl.matrix3Value;
+        stream << obj->GetMatrix3();
         break;
       }
       case Dali::Property::MATRIX:
       {
-        stream << *impl.matrixValue;
+        stream << obj->GetMatrix();
         break;
       }
       case Dali::Property::RECTANGLE:
       {
-        stream << *impl.rectValue;
+        stream << obj->GetRect();
         break;
       }
       case Dali::Property::ROTATION:
       {
-        stream << *impl.angleAxisValue;
+        stream << obj->GetAngleAxis();
         break;
       }
       case Dali::Property::STRING:
       {
-        stream << *impl.stringValue;
+        stream << obj->GetString();
         break;
       }
       case Dali::Property::ARRAY:
       {
-        stream << *(value.GetArray());
+        stream << obj->GetArray();
         break;
       }
       case Dali::Property::MAP:
       {
-        stream << *(value.GetMap());
+        stream << obj->GetMap();
         break;
       }
       case Dali::Property::EXTENTS:
       {
-        stream << *impl.extentsValue;
+        stream << obj->GetExtents();
         break;
       }
       case Dali::Property::NONE:

@@ -23,8 +23,7 @@ namespace Dali
 
 namespace Internal
 {
-
-const std::string DemangleClassName(const char *typeIdName)
+std::string DemangleClassName(const char* typeIdName)
 {
   std::string name = typeIdName;
   int index = name.find_last_of(' ');
