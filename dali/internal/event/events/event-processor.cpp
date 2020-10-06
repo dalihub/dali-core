@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -152,18 +152,8 @@ void EventProcessor::ProcessEvents()
     {
       case Event::Touch:
       {
-        Integration::TouchEvent& touchEvent = static_cast<Integration::TouchEvent&>(*event);
-        const bool consumed = mTouchEventProcessor.ProcessTouchEvent( touchEvent );
-
-        // If touch is consumed, then gestures should be cancelled
-        // Do this by sending an interrupted event to the GestureEventProcessor
-        if( consumed )
-        {
-          Integration::Point& point = touchEvent.GetPoint(0);
-          point.SetState( PointState::INTERRUPTED );
-        }
-
-        mGestureEventProcessor.ProcessTouchEvent(mScene, touchEvent);
+        mTouchEventProcessor.ProcessTouchEvent( static_cast<const Integration::TouchEvent&>(*event) );
+        mGestureEventProcessor.ProcessTouchEvent(mScene, static_cast<const Integration::TouchEvent&>(*event));
         break;
       }
 

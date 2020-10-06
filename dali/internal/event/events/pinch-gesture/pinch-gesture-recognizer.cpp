@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,7 +118,7 @@ void PinchGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
         const Integration::Point& currentPoint1 = event.points[0];
         const Integration::Point& currentPoint2 = event.points[1];
 
-        if (currentPoint1.GetState() == PointState::UP || currentPoint2.GetState() == PointState::UP || currentPoint1.GetState() == PointState::INTERRUPTED)
+        if (currentPoint1.GetState() == PointState::UP || currentPoint2.GetState() == PointState::UP)
         {
           // One of our touch points has an Up event so change our state back to CLEAR.
           mState = CLEAR;

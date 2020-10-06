@@ -67,9 +67,8 @@ public:
   /**
    * This function is called by the event processor whenever a touch event occurs.
    * @param[in] event The touch event that has occurred.
-   * @return true if consumed
    */
-  bool ProcessTouchEvent( const Integration::TouchEvent& event );
+  void ProcessTouchEvent( const Integration::TouchEvent& event );
 
 private:
 
