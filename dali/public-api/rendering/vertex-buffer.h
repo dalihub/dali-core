@@ -181,9 +181,6 @@ public:
   explicit DALI_INTERNAL VertexBuffer(Internal::VertexBuffer* pointer);
 };
 
-// This is a temporary using. It will be removed when the name change on another package is complete.
-using PropertyBuffer = VertexBuffer;
-
 /**
  * @}
  */
