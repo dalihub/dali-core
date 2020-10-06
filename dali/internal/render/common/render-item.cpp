@@ -110,8 +110,8 @@ ClippingBox RenderItem::CalculateViewportSpaceAABB( const Vector3& size, const i
                         static_cast<float>( viewportWidth )  * 0.5f - aabb.x,
                         static_cast<float>( viewportHeight ) * 0.5f - aabb.y );
 
-  int x = static_cast< int >( floor( aabbInScreen.x ) );
-  int y = static_cast< int >( floor( aabbInScreen.y ) );
+  int x = static_cast< int >( roundf( aabbInScreen.x ) );
+  int y = static_cast< int >( roundf( aabbInScreen.y ) );
   int z = static_cast< int >( roundf( aabbInScreen.z ) );
   int w = static_cast< int >( roundf( aabbInScreen.w ) );
 
