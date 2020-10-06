@@ -58,6 +58,7 @@ Scene::Scene()
   mSize(), // Don't set the proper value here, this will be set when the surface is set later
   mDpi(),
   mBackgroundColor( DEFAULT_BACKGROUND_COLOR ),
+  mSurfaceOrientation( 0 ),
   mDepthTreeDirty( false ),
   mEventProcessor( *this, ThreadLocalStorage::GetInternal()->GetGestureEventProcessor() )
 {
@@ -131,7 +132,7 @@ void Scene::Initialize( Size size )
   RenderTaskPtr renderTask = mRenderTaskList->CreateTask( mRootLayer.Get(), mDefaultCamera.Get() );
   renderTask->SetClearEnabled(true);
 
-  SurfaceResized( size.width, size.height );
+  SurfaceResized( size.width, size.height, mSurfaceOrientation, false );
 
   // Create scene graph object
   mSceneObject = new SceneGraph::Scene();
@@ -199,23 +200,27 @@ Actor& Scene::GetDefaultRootActor()
   return *mRootLayer;
 }
 
-void Scene::SurfaceResized( float width, float height )
+void Scene::SurfaceResized( float width, float height, int orientation, bool forceUpdate )
 {
-  if( ( fabsf( mSize.width - width ) > Math::MACHINE_EPSILON_1 ) || ( fabsf( mSize.height - height ) > Math::MACHINE_EPSILON_1 ) )
+  if( ( fabsf( mSize.width - width ) > Math::MACHINE_EPSILON_1 ) || ( fabsf( mSize.height - height ) > Math::MACHINE_EPSILON_1 )
+      || ( orientation != mSurfaceOrientation ) || ( forceUpdate ) )
   {
     Rect< int32_t > newSize( 0, 0, static_cast< int32_t >( width ), static_cast< int32_t >( height ) ); // truncated
 
     mSize.width = width;
     mSize.height = height;
+    mSurfaceOrientation = orientation;
 
     // Calculates the aspect ratio, near and far clipping planes, field of view and camera Z position.
     mDefaultCamera->SetPerspectiveProjection( mSize );
+    mDefaultCamera->RotateProjection( mSurfaceOrientation );
 
     mRootLayer->SetSize( mSize.width, mSize.height );
 
     ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
     SceneGraph::UpdateManager& updateManager = tls->GetUpdateManager();
     SetDefaultSurfaceRectMessage( updateManager, newSize );
+    SetDefaultSurfaceOrientationMessage( updateManager, mSurfaceOrientation );
 
     // set default render-task viewport parameters
     RenderTaskPtr defaultRenderTask = mRenderTaskList->GetTask( 0u );
