@@ -148,21 +148,21 @@ DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX, ActorDefaultPropert
 
 // Signals
 
-const char* const SIGNAL_HOVERED = "hovered";
-const char* const SIGNAL_WHEEL_EVENT = "wheelEvent";
-const char* const SIGNAL_ON_SCENE = "onScene";
-const char* const SIGNAL_OFF_SCENE = "offScene";
-const char* const SIGNAL_ON_RELAYOUT = "onRelayout";
-const char* const SIGNAL_TOUCHED = "touched";
-const char* const SIGNAL_VISIBILITY_CHANGED = "visibilityChanged";
-const char* const SIGNAL_LAYOUT_DIRECTION_CHANGED = "layoutDirectionChanged";
-const char* const SIGNAL_CHILD_ADDED = "childAdded";
-const char* const SIGNAL_CHILD_REMOVED = "childRemoved";
+static constexpr std::string_view SIGNAL_HOVERED                  = "hovered";
+static constexpr std::string_view SIGNAL_WHEEL_EVENT              = "wheelEvent";
+static constexpr std::string_view SIGNAL_ON_SCENE                 = "onScene";
+static constexpr std::string_view SIGNAL_OFF_SCENE                = "offScene";
+static constexpr std::string_view SIGNAL_ON_RELAYOUT              = "onRelayout";
+static constexpr std::string_view SIGNAL_TOUCHED                  = "touched";
+static constexpr std::string_view SIGNAL_VISIBILITY_CHANGED       = "visibilityChanged";
+static constexpr std::string_view SIGNAL_LAYOUT_DIRECTION_CHANGED = "layoutDirectionChanged";
+static constexpr std::string_view SIGNAL_CHILD_ADDED              = "childAdded";
+static constexpr std::string_view SIGNAL_CHILD_REMOVED            = "childRemoved";
 
 // Actions
 
-const char* const ACTION_SHOW = "show";
-const char* const ACTION_HIDE = "hide";
+static constexpr std::string_view ACTION_SHOW = "show";
+static constexpr std::string_view ACTION_HIDE = "hide";
 
 BaseHandle CreateActor()
 {
@@ -171,19 +171,19 @@ BaseHandle CreateActor()
 
 TypeRegistration mType( typeid(Dali::Actor), typeid(Dali::Handle), CreateActor, ActorDefaultProperties );
 
-SignalConnectorType signalConnector2( mType, SIGNAL_HOVERED, &Actor::DoConnectSignal );
-SignalConnectorType signalConnector3( mType, SIGNAL_WHEEL_EVENT, &Actor::DoConnectSignal );
-SignalConnectorType signalConnector4( mType, SIGNAL_ON_SCENE, &Actor::DoConnectSignal );
-SignalConnectorType signalConnector5( mType, SIGNAL_OFF_SCENE, &Actor::DoConnectSignal );
-SignalConnectorType signalConnector6( mType, SIGNAL_ON_RELAYOUT, &Actor::DoConnectSignal );
-SignalConnectorType signalConnector7( mType, SIGNAL_TOUCHED, &Actor::DoConnectSignal );
-SignalConnectorType signalConnector8( mType, SIGNAL_VISIBILITY_CHANGED, &Actor::DoConnectSignal );
-SignalConnectorType signalConnector9( mType, SIGNAL_LAYOUT_DIRECTION_CHANGED, &Actor::DoConnectSignal );
-SignalConnectorType signalConnector10( mType, SIGNAL_CHILD_ADDED, &Actor::DoConnectSignal );
-SignalConnectorType signalConnector11( mType, SIGNAL_CHILD_REMOVED, &Actor::DoConnectSignal );
+SignalConnectorType signalConnector2(mType, std::string(SIGNAL_HOVERED), &Actor::DoConnectSignal);
+SignalConnectorType signalConnector3(mType, std::string(SIGNAL_WHEEL_EVENT), &Actor::DoConnectSignal);
+SignalConnectorType signalConnector4(mType, std::string(SIGNAL_ON_SCENE), &Actor::DoConnectSignal);
+SignalConnectorType signalConnector5(mType, std::string(SIGNAL_OFF_SCENE), &Actor::DoConnectSignal);
+SignalConnectorType signalConnector6(mType, std::string(SIGNAL_ON_RELAYOUT), &Actor::DoConnectSignal);
+SignalConnectorType signalConnector7(mType, std::string(SIGNAL_TOUCHED), &Actor::DoConnectSignal);
+SignalConnectorType signalConnector8(mType, std::string(SIGNAL_VISIBILITY_CHANGED), &Actor::DoConnectSignal);
+SignalConnectorType signalConnector9(mType, std::string(SIGNAL_LAYOUT_DIRECTION_CHANGED), &Actor::DoConnectSignal);
+SignalConnectorType signalConnector10(mType, std::string(SIGNAL_CHILD_ADDED), &Actor::DoConnectSignal);
+SignalConnectorType signalConnector11(mType, std::string(SIGNAL_CHILD_REMOVED), &Actor::DoConnectSignal);
 
-TypeAction a1( mType, ACTION_SHOW, &Actor::DoAction );
-TypeAction a2( mType, ACTION_HIDE, &Actor::DoAction );
+TypeAction a1(mType, std::string(ACTION_SHOW), &Actor::DoAction);
+TypeAction a2(mType, std::string(ACTION_HIDE), &Actor::DoAction);
 
 /**
  * @brief Extract a given dimension from a Vector2
@@ -1373,43 +1373,45 @@ bool Actor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
   bool connected( true );
   Actor* actor = static_cast< Actor* >( object ); // TypeRegistry guarantees that this is the correct type.
 
-  if( 0 == signalName.compare( SIGNAL_HOVERED ) )
+  std::string_view name(signalName);
+
+  if(name == SIGNAL_HOVERED)
   {
     actor->HoveredSignal().Connect( tracker, functor );
   }
-  else if( 0 == signalName.compare( SIGNAL_WHEEL_EVENT ) )
+  else if(signalName == SIGNAL_WHEEL_EVENT)
   {
     actor->WheelEventSignal().Connect( tracker, functor );
   }
-  else if( 0 == signalName.compare( SIGNAL_ON_SCENE ) )
+  else if(name == SIGNAL_ON_SCENE)
   {
     actor->OnSceneSignal().Connect( tracker, functor );
   }
-  else if( 0 == signalName.compare( SIGNAL_OFF_SCENE ) )
+  else if(name == SIGNAL_OFF_SCENE)
   {
     actor->OffSceneSignal().Connect( tracker, functor );
   }
-  else if( 0 == signalName.compare( SIGNAL_ON_RELAYOUT ) )
+  else if(name == SIGNAL_ON_RELAYOUT)
   {
     actor->OnRelayoutSignal().Connect( tracker, functor );
   }
-  else if( 0 == signalName.compare( SIGNAL_TOUCHED ) )
+  else if(name == SIGNAL_TOUCHED)
   {
     actor->TouchedSignal().Connect( tracker, functor );
   }
-  else if( 0 == signalName.compare( SIGNAL_VISIBILITY_CHANGED ) )
+  else if(name == SIGNAL_VISIBILITY_CHANGED)
   {
     actor->VisibilityChangedSignal().Connect( tracker, functor );
   }
-  else if( 0 == signalName.compare( SIGNAL_LAYOUT_DIRECTION_CHANGED ) )
+  else if(name == SIGNAL_LAYOUT_DIRECTION_CHANGED)
   {
     actor->LayoutDirectionChangedSignal().Connect( tracker, functor );
   }
-  else if( 0 == signalName.compare( SIGNAL_CHILD_ADDED ) )
+  else if(name == SIGNAL_CHILD_ADDED)
   {
     actor->ChildAddedSignal().Connect( tracker, functor );
   }
-  else if( 0 == signalName.compare( SIGNAL_CHILD_REMOVED ) )
+  else if(name == SIGNAL_CHILD_REMOVED)
   {
     actor->ChildRemovedSignal().Connect( tracker, functor );
   }
@@ -1870,12 +1872,13 @@ bool Actor::DoAction( BaseObject* object, const std::string& actionName, const P
 
   if( actor )
   {
-    if( 0 == actionName.compare( ACTION_SHOW ) )
+    std::string_view name(actionName);
+    if(name == ACTION_SHOW)
     {
       actor->SetVisible( true );
       done = true;
     }
-    else if( 0 == actionName.compare( ACTION_HIDE ) )
+    else if(name == ACTION_HIDE)
     {
       actor->SetVisible( false );
       done = true;
