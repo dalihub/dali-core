@@ -411,7 +411,7 @@ public:
    */
   Ret Emit()
   {
-    return Impl().EmitReturn<Ret>();
+    return Impl().template EmitReturn<Ret>();
   }
 };
 
@@ -530,7 +530,7 @@ public:
    */
   void Emit(Arg0 arg0)
   {
-    Impl().Emit<Arg0>(arg0);
+    Impl().template Emit<Arg0>(arg0);
   }
 };
 
@@ -650,7 +650,7 @@ public:
    */
   Ret Emit(Arg0 arg0)
   {
-    return Impl().EmitReturn<Ret, Arg0>(arg0);
+    return Impl().template EmitReturn<Ret, Arg0>(arg0);
   }
 };
 
@@ -771,7 +771,7 @@ public:
    */
   void Emit(Arg0 arg0, Arg1 arg1)
   {
-    Impl().Emit<Arg0, Arg1>(arg0, arg1);
+    Impl().template Emit<Arg0, Arg1>(arg0, arg1);
   }
 };
 
@@ -891,7 +891,7 @@ public:
    */
   Ret Emit(Arg0 arg0, Arg1 arg1)
   {
-    return Impl().EmitReturn<Ret, Arg0, Arg1>(arg0, arg1);
+    return Impl().template EmitReturn<Ret, Arg0, Arg1>(arg0, arg1);
   }
 };
 
@@ -1012,7 +1012,7 @@ public:
    */
   void Emit(Arg0 arg0, Arg1 arg1, Arg2 arg2)
   {
-    Impl().Emit<Arg0, Arg1, Arg2>(arg0, arg1, arg2);
+    Impl().template Emit<Arg0, Arg1, Arg2>(arg0, arg1, arg2);
   }
 };
 
@@ -1134,7 +1134,7 @@ public:
    */
   Ret Emit(Arg0 arg0, Arg1 arg1, Arg2 arg2)
   {
-    return Impl().EmitReturn<Ret, Arg0, Arg1, Arg2>(arg0, arg1, arg2);
+    return Impl().template EmitReturn<Ret, Arg0, Arg1, Arg2>(arg0, arg1, arg2);
   }
 };
 
