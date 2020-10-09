@@ -167,23 +167,16 @@ int UtcDaliSignalConnectP01(void)
 
 int UtcDaliSignalConnectN01(void)
 {
-  // difficult to perform a negative test on Connect as no checks are performed
-  // when creating a callback for a null function ( during Connect).
-  // so we test an assert on Emit
   TestApplication application; // Create core for debug logging
 
   TestSignals::VoidRetNoParamSignal signal;
-  signal.Connect(NULL);
-  try
-  {
-    signal.Emit();
-  }
-  catch(Dali::DaliException& e)
-  {
-    // Tests that a negative test of an assertion succeeds
-    DALI_TEST_PRINT_ASSERT(e);
-    tet_result(TET_PASS);
-  }
+  signal.Connect(nullptr);
+  signal.Emit();
+
+  // No assert occurs any more - the callback is silently ignored.
+  // If we execute this code, then the test case didn't crash.
+  tet_result(TET_PASS);
+
   END_TEST;
 }
 
