@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <algorithm>
+
 // INTERNAL INCLUDES
 #include <dali/internal/event/animation/progress-value.h>
 #include <dali/public-api/animation/animation.h>
@@ -27,171 +30,76 @@ namespace Dali
 {
 namespace Internal
 {
-
-class KeyFrameChannelBase
+template<typename V>
+struct KeyFrameChannel
 {
-public:
-  enum KeyFrameChannelId
+  using ProgressValues = std::vector<ProgressValue<V>>;
+
+  bool IsActive(float progress) const
   {
-    Translate, Rotate, Scale,
-  };
-
-  KeyFrameChannelBase(KeyFrameChannelId channel_id)
-  : mChannelId(channel_id)
-  {
-  }
-
-  virtual ~KeyFrameChannelBase() = default;
-
-  KeyFrameChannelId GetId() const
-  {
-    return mChannelId;
-  }
-
-  virtual bool IsActive(float progress) = 0;
-
-protected:
-  KeyFrameChannelId       mChannelId;
-};
-
-
-template <typename V>
-class KeyFrameChannel : public KeyFrameChannelBase
-{
-public:
-  using ProgressValues = std::vector<ProgressValue<V> >;
-
-  KeyFrameChannel(KeyFrameChannelId channel_id, ProgressValues& values )
-  : KeyFrameChannelBase(channel_id),
-    mValues(values)
-  {
-  }
-
-  ~KeyFrameChannel() override = default;
-
-  bool IsActive (float progress) override;
-
-  V GetValue(float progress, Dali::Animation::Interpolation interpolation) const;
-
-  bool FindInterval(typename ProgressValues::iterator& start,
-                    typename ProgressValues::iterator& end,
-                    float progress) const;
-
-  ProgressValues& mValues;
-};
-
-template <class V>
-bool KeyFrameChannel<V>::IsActive (float progress)
-{
-  bool active = false;
-  if(!mValues.empty())
-  {
-    ProgressValue<V>& first = mValues.front();
-
-    if( progress >= first.GetProgress() )
+    if(!mValues.empty() && (progress >= mValues[0].GetProgress()))
     {
-      active = true;
+      return true;
     }
-  }
-  return active;
-}
-
-/**
- * Use a linear search to find the interval containing progress
- */
-template <class V>
-bool KeyFrameChannel<V>::FindInterval(
-  typename ProgressValues::iterator& start,
-  typename ProgressValues::iterator& end,
-  float progress) const
-{
-  bool found = false;
-  typename std::vector<ProgressValue<V> >::iterator iter = mValues.begin();
-  typename std::vector<ProgressValue<V> >::iterator prevIter = iter;
-
-  while(iter != mValues.end() && iter->GetProgress() <= progress)
-  {
-    prevIter = iter;
-    ++iter;
+    return false;
   }
 
-  if(iter == mValues.end())
+  V GetValue(float progress, Dali::Animation::Interpolation interpolation) const
   {
-    --prevIter;
-    --iter;
-  }
+    V interpolatedV{};
 
-  if(prevIter->GetProgress() <= progress
-     &&
-     iter->GetProgress() > progress)
-  {
-    found = true;
-    start = prevIter;
-    end   = iter;
-  }
-
-  return found;
-}
-
-template <class V>
-V KeyFrameChannel<V>::GetValue (float progress, Dali::Animation::Interpolation interpolation) const
-{
-  ProgressValue<V>&  firstPV =  mValues.front();
-
-  typename std::vector<ProgressValue<V> >::iterator start;
-  typename std::vector<ProgressValue<V> >::iterator end;
-
-  V interpolatedV = firstPV.GetValue();
-  if(progress >= mValues.back().GetProgress() )
-  {
-    interpolatedV = mValues.back().GetValue(); // This should probably be last value...
-  }
-  else if(FindInterval(start, end, progress))
-  {
-    float frameProgress = (progress - start->GetProgress()) / (end->GetProgress() - start->GetProgress());
-
-    if( interpolation == Dali::Animation::LINEAR )
+    if(progress >= mValues.back().GetProgress())
     {
-      Interpolate(interpolatedV, start->GetValue(), end->GetValue(), frameProgress);
+      interpolatedV = mValues.back().GetValue();
     }
     else
     {
-      //Calculate prev and next values
-      V prev;
-      if( start != mValues.begin() )
-      {
-        prev = (start-1)->GetValue();
-      }
-      else
-      {
-        //Project next value through start point
-        prev = start->GetValue() + (start->GetValue()-(start+1)->GetValue());
-      }
+      auto end   = std::find_if(mValues.begin(), mValues.end(), [=](const auto& element) { return element.GetProgress() > progress; });
+      auto start = end - 1;
 
-      V next;
-      if( end != mValues.end()-1)
-      {
-        next = (end+1)->GetValue();
-      }
-      else
-      {
-        //Project prev value through end point
-        next = end->GetValue() + (end->GetValue()-(end-1)->GetValue());
-      }
+      const bool validInterval = (end != mValues.end()) && (start->GetProgress() <= progress);
 
-      CubicInterpolate(interpolatedV, prev, start->GetValue(), end->GetValue(), next, frameProgress);
+      if(validInterval)
+      {
+        float frameProgress = (progress - start->GetProgress()) / (end->GetProgress() - start->GetProgress());
+        if(interpolation == Dali::Animation::LINEAR)
+        {
+          Interpolate(interpolatedV, start->GetValue(), end->GetValue(), frameProgress);
+        }
+        else
+        {
+          //Calculate prev and next values
+          V prev;
+          if(start != mValues.begin())
+          {
+            prev = (start - 1)->GetValue();
+          }
+          else
+          {
+            //Project next value through start point
+            prev = start->GetValue() + (start->GetValue() - (start + 1)->GetValue());
+          }
+
+          V next;
+          if(end != mValues.end() - 1)
+          {
+            next = (end + 1)->GetValue();
+          }
+          else
+          {
+            //Project prev value through end point
+            next = end->GetValue() + (end->GetValue() - (end - 1)->GetValue());
+          }
+
+          CubicInterpolate(interpolatedV, prev, start->GetValue(), end->GetValue(), next, frameProgress);
+        }
+      }
     }
+    return interpolatedV;
   }
 
-  return interpolatedV;
-}
-
-using KeyFrameChannelNumber     = KeyFrameChannel<float>;
-using KeyFrameChannelVector2    = KeyFrameChannel<Vector2>;
-using KeyFrameChannelVector3    = KeyFrameChannel<Vector3>;
-using KeyFrameChannelVector4    = KeyFrameChannel<Vector4>;
-using KeyFrameChannelQuaternion = KeyFrameChannel<Quaternion>;
-using KeyFrameChannelAngleAxis  = KeyFrameChannel<AngleAxis>;
+  ProgressValues mValues;
+};
 
 } // Internal
 } // namespace Dali

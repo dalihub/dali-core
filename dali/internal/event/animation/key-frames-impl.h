@@ -18,12 +18,14 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <memory>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/animation/key-frames.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/animation/alpha-function.h>
-#include <dali/internal/event/animation/progress-value.h>
 #include <dali/internal/event/animation/key-frame-channel.h>
 
 namespace Dali
@@ -32,7 +34,6 @@ namespace Internal
 {
 class KeyFrameSpec;
 class KeyFrames;
-using KeyFramesPtr = IntrusivePtr<KeyFrames>;
 
 /**
  * KeyFrames class is responsible for creating and building a specialized KeyFrame class
@@ -43,24 +44,7 @@ class KeyFrames : public BaseObject
 public:
   static KeyFrames* New();
 
-  /**
-   * Instantiate an empty KeyFrames object
-   */
-  KeyFrames();
-
-protected:
-  ~KeyFrames() override;
-
 private:
-  /**
-   * Don't allow copy constructor
-   */
-  KeyFrames(const KeyFrames& rhs);
-
-  /**
-   * Don't allow copy operator
-   */
-  KeyFrames& operator=(const KeyFrames& rhs);
 
   /**
    * Create a specialization from the given type, and store it to the mSpec
@@ -86,7 +70,7 @@ public:
    * @param[in] alpha An alpha function to blend between this key frame and the
    * next key frame.
    */
-  void Add(float time, Property::Value value, AlphaFunction alpha);
+  void Add(float time, const Property::Value& value, AlphaFunction alpha);
 
   /**
    * Return the key frames without specialization. The GetSpecialization methods
@@ -100,22 +84,18 @@ public:
   Dali::Property::Value GetLastKeyFrameValue() const;
 
 private:
-  Dali::Property::Type mType; // Type of the specialization
-  IntrusivePtr<KeyFrameSpec> mKeyFrames;   // Pointer to the specialized key frame object
+  Dali::Property::Type          mType{Property::NONE}; // Type of the specialization
+  std::unique_ptr<KeyFrameSpec> mKeyFrames;            // Pointer to the specialized key frame object
 };
-
 
 /**
  * This is the base class for the individual template specializations, allowing a ptr to be
- * stored in the handle object above. It inherits from RefObject to allow smart pointers
- * to be used for the specializations. Note that the derived template class below
- * allows for a copy constructor so that the specialization object can be cloned before
- * being passed to the scene-graph for animation.
+ * stored in the handle object above.
  */
-class KeyFrameSpec : public RefObject
+class KeyFrameSpec
 {
 public:
-  KeyFrameSpec() = default;
+  virtual ~KeyFrameSpec() = default;
 
   virtual std::size_t GetNumberOfKeyFrames() const = 0;
 
@@ -125,85 +105,19 @@ public:
    * @param[out] value The value of the given key frame
    */
   virtual void GetKeyFrameAsValue( std::size_t index, Property::Value& value ) = 0;
-
-protected:
-
-  /**
-   * A reference counted object may only be deleted by calling Unreference()
-   */
-  ~KeyFrameSpec() override = default;
 };
 
-
 /**
- * The base template class for each key frame specialization. It stores a vector of
- * ProgressValue pairs in mPVs, and uses the existing interface for KeyFrameChannel
- * to point at this vector.
+ * The base template class for each key frame specialization.
  */
 template<typename V>
 class KeyFrameBaseSpec : public KeyFrameSpec
 {
-private:
-  using PV          = ProgressValue<V>;
-  using PVContainer = std::vector<PV>;
-
-  PVContainer                    mPVs;       // The ProgressValue pairs
-  KeyFrameChannel<V>*            mKeyFrames; // The key frame interpolator
-
-public:
-  static KeyFrameBaseSpec<V>* New()
-  {
-    return new KeyFrameBaseSpec<V>();
-  }
-
-  static KeyFrameBaseSpec<V>* Clone(const KeyFrameBaseSpec<V>& keyFrames)
-  {
-    return new KeyFrameBaseSpec<V>(keyFrames);
-  }
-
-  /**
-   * Constructor
-   */
-  KeyFrameBaseSpec<V>()
-  {
-    mKeyFrames = new KeyFrameChannel<V>(KeyFrameChannelBase::Translate, mPVs);
-  }
-
-protected:
-  /**
-   * Copy Constructor
-   * Allow cloning of this object
-   */
-  KeyFrameBaseSpec<V>(const KeyFrameBaseSpec<V>& keyFrames)
-  : mPVs(keyFrames.mPVs)
-  {
-    mKeyFrames = new KeyFrameChannel<V>(KeyFrameChannelBase::Translate, mPVs);
-  }
-
-  KeyFrameBaseSpec<V>& operator=( const KeyFrameBaseSpec<V>& keyFrames )
-  {
-    if( this != &keyFrames )
-    {
-      mPVs.clear();
-      mPVs = keyFrames.mPVs;
-      delete mKeyFrames;
-      mKeyFrames = new KeyFrameChannel<V>(KeyFrameChannelBase::Translate, mPVs);
-    }
-    return *this;
-  }
-
-  /**
-   * Destructor. Ensure progress value pairs are cleared down
-   */
-  ~KeyFrameBaseSpec<V>() override
-  {
-    delete mKeyFrames;
-    mPVs.clear();
-  }
+  KeyFrameChannel<V> mChannel; // The key frame channel
 
 public:
   /**
-   * Add a key frame to the progress value vector. Key frames should be added
+   * Add a key frame to the channel. Key frames should be added
    * in time order (this method does not sort the vector by time)
    * @param[in] t - progress
    * @param[in] v - value
@@ -211,16 +125,16 @@ public:
    */
   void AddKeyFrame(float t, V v, AlphaFunction alpha)
   {
-    mPVs.push_back(PV(t, v));
+    mChannel.mValues.push_back({t, v});
   }
 
   /**
    * Get the number of key frames
-   * @return The size of the progress value vector
+   * @return Channel size
    */
   std::size_t GetNumberOfKeyFrames() const override
   {
-    return mPVs.size();
+    return mChannel.mValues.size();
   }
 
   /**
@@ -229,11 +143,12 @@ public:
    * @param[out] time The progress of the given key frame
    * @param[out] value The value of the given key frame
    */
-  virtual void GetKeyFrame(unsigned int index, float& time, V& value) const
+  void GetKeyFrame(unsigned int index, float& time, V& value) const
   {
-    DALI_ASSERT_ALWAYS( index < mPVs.size() && "KeyFrame index is out of bounds" );
-    time  = mPVs[index].mProgress;
-    value = mPVs[index].mValue;
+    DALI_ASSERT_ALWAYS(index < mChannel.mValues.size() && "KeyFrame index is out of bounds");
+    const auto& element = mChannel.mValues[index];
+    time                = element.mProgress;
+    value               = element.mValue;
   }
 
   /**
@@ -241,7 +156,7 @@ public:
    */
   void GetKeyFrameAsValue( std::size_t index, Property::Value& value ) override
   {
-    value = mPVs[index].mValue;
+    value = mChannel.mValues[index].mValue;
   }
 
   /**
@@ -252,7 +167,7 @@ public:
    */
   bool IsActive(float progress) const
   {
-    return mKeyFrames->IsActive(progress);
+    return mChannel.IsActive(progress);
   }
 
   /**
@@ -262,7 +177,7 @@ public:
    */
   V GetValue(float progress, Dali::Animation::Interpolation interpolation) const
   {
-    return mKeyFrames->GetValue(progress, interpolation);
+    return mChannel.GetValue(progress, interpolation);
   }
 };
 
@@ -274,82 +189,10 @@ using KeyFrameVector3    = KeyFrameBaseSpec<Vector3>;
 using KeyFrameVector4    = KeyFrameBaseSpec<Vector4>;
 using KeyFrameQuaternion = KeyFrameBaseSpec<Quaternion>;
 
-using KeyFrameBooleanPtr    = IntrusivePtr<KeyFrameBoolean>;
-using KeyFrameNumberPtr     = IntrusivePtr<KeyFrameNumber>;
-using KeyFrameIntegerPtr    = IntrusivePtr<KeyFrameInteger>;
-using KeyFrameVector2Ptr    = IntrusivePtr<KeyFrameVector2>;
-using KeyFrameVector3Ptr    = IntrusivePtr<KeyFrameVector3>;
-using KeyFrameVector4Ptr    = IntrusivePtr<KeyFrameVector4>;
-using KeyFrameQuaternionPtr = IntrusivePtr<KeyFrameQuaternion>;
-
-inline void GetSpecialization(Internal::KeyFrames& keyFrames, Internal::KeyFrameBoolean*& keyFrameSpec)
+template<typename DeriveClass>
+auto GetSpecialization(const Internal::KeyFrames& keyFrames)
 {
-  keyFrameSpec = static_cast<Internal::KeyFrameBoolean*>(keyFrames.GetKeyFramesBase());
-}
-
-inline void GetSpecialization(const Internal::KeyFrames& keyFrames, const Internal::KeyFrameBoolean*& keyFrameSpec)
-{
-  keyFrameSpec = static_cast<const Internal::KeyFrameBoolean*>(keyFrames.GetKeyFramesBase());
-}
-
-inline void GetSpecialization(Internal::KeyFrames& keyFrames, Internal::KeyFrameNumber*& keyFrameSpec)
-{
-  keyFrameSpec = static_cast<Internal::KeyFrameNumber*>(keyFrames.GetKeyFramesBase());
-}
-
-inline void GetSpecialization(const Internal::KeyFrames& keyFrames, const Internal::KeyFrameNumber*& keyFrameSpec)
-{
-  keyFrameSpec = static_cast<const Internal::KeyFrameNumber*>(keyFrames.GetKeyFramesBase());
-}
-
-inline void GetSpecialization(Internal::KeyFrames& keyFrames, Internal::KeyFrameInteger*& keyFrameSpec)
-{
-  keyFrameSpec = static_cast<Internal::KeyFrameInteger*>(keyFrames.GetKeyFramesBase());
-}
-
-inline void GetSpecialization(const Internal::KeyFrames& keyFrames, const Internal::KeyFrameInteger*& keyFrameSpec)
-{
-  keyFrameSpec = static_cast<const Internal::KeyFrameInteger*>(keyFrames.GetKeyFramesBase());
-}
-
-inline void GetSpecialization(Internal::KeyFrames& keyFrames, Internal::KeyFrameVector2*& keyFrameSpec)
-{
-  keyFrameSpec = static_cast<Internal::KeyFrameVector2*>(keyFrames.GetKeyFramesBase());
-}
-
-inline void GetSpecialization(const Internal::KeyFrames& keyFrames, const Internal::KeyFrameVector2*& keyFrameSpec)
-{
-  keyFrameSpec = static_cast<const Internal::KeyFrameVector2*>(keyFrames.GetKeyFramesBase());
-}
-
-inline void GetSpecialization(Internal::KeyFrames& keyFrames, Internal::KeyFrameVector3*& keyFrameSpec)
-{
-  keyFrameSpec = static_cast<Internal::KeyFrameVector3*>(keyFrames.GetKeyFramesBase());
-}
-
-inline void GetSpecialization(const Internal::KeyFrames& keyFrames, const Internal::KeyFrameVector3*& keyFrameSpec)
-{
-  keyFrameSpec = static_cast<const Internal::KeyFrameVector3*>(keyFrames.GetKeyFramesBase());
-}
-
-inline void GetSpecialization(Internal::KeyFrames& keyFrames, Internal::KeyFrameVector4*& keyFrameSpec)
-{
-  keyFrameSpec = static_cast<Internal::KeyFrameVector4*>(keyFrames.GetKeyFramesBase());
-}
-
-inline void GetSpecialization(const Internal::KeyFrames& keyFrames, const Internal::KeyFrameVector4*& keyFrameSpec)
-{
-  keyFrameSpec = static_cast<const Internal::KeyFrameVector4*>(keyFrames.GetKeyFramesBase());
-}
-
-inline void GetSpecialization(Internal::KeyFrames& keyFrames, Internal::KeyFrameQuaternion*& keyFrameSpec)
-{
-  keyFrameSpec = static_cast<Internal::KeyFrameQuaternion*>(keyFrames.GetKeyFramesBase());
-}
-
-inline void GetSpecialization(const Internal::KeyFrames& keyFrames, const Internal::KeyFrameQuaternion*& keyFrameSpec)
-{
-  keyFrameSpec = static_cast<const Internal::KeyFrameQuaternion*>(keyFrames.GetKeyFramesBase());
+  return static_cast<DeriveClass>(keyFrames.GetKeyFramesBase());
 }
 
 } // Internal
