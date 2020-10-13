@@ -19,33 +19,59 @@ use strict;
 use Git;
 use Getopt::Long;
 use Error qw(:try);
-use HTML::Element;
 use Pod::Usage;
 use File::Basename;
-#use Data::Dumper;
 use File::stat;
 use Scalar::Util qw /looks_like_number/;
 use Cwd qw /getcwd/;
 use Term::ANSIColor qw(:constants);
+use Data::Dumper;
 
-# Program to run gcov on files in patch (that are in source dirs - needs to be dali-aware).
+# Dali specific program to run lcov and parse output for files in patch
 
-# A) Get patch
-# B) Remove uninteresting files
-# C) Find matching gcno/gcda files
-# D) Copy and rename them to match source prefix (i.e. strip library name off front)
-# E) Generate patch output with covered/uncovered lines marked in green/red
-# F) Generate coverage data for changed lines
-# G) Exit status should be 0 for high coverage (90% line coverage for all new/changed lines)
+# A) Generate lcov output from lib & test cases
+# B) Get patch using git diff
+# C) Generate patch output with covered/uncovered lines marked in green/red
+# D) Generate coverage data for changed lines
+# E) Exit status should be 0 for high coverage (90% line coverage for all new/changed lines)
 #    or 1 for low coverage
 
 # Sources for conversion of gcno/gcda files:
-# ~/bin/lcov
+# /usr/bin/lcov & genhtml
 # Python git-coverage (From http://stef.thewalter.net/git-coverage-useful-code-coverage.html)
 
+# From genhtml:
+sub read_info_file($);
+sub get_info_entry($);
+sub set_info_entry($$$$$$$$$;$$$$$$);
+sub combine_info_entries($$$);
+sub combine_info_files($$);
+sub compress_brcount($);
+sub brcount_to_db($);
+sub db_to_brcount($;$);
+sub brcount_db_combine($$$);
+sub add_counts($$);
+sub info(@);
+
 our $repo = Git->repository();
-our $debug=0;
+our $debug=1;
 our $pd_debug=0;
+our $root;
+our %info_data; # Hash containing all data from .info files
+
+# Settings from genhtml:
+our $func_coverage;     # If set, generate function coverage statistics
+our $no_func_coverage;  # Disable func_coverage
+our $br_coverage;       # If set, generate branch coverage statistics
+our $no_br_coverage;    # Disable br_coverage
+our $sort = 1;          # If set, provide directory listings with sorted entries
+our $no_sort;           # Disable sort
+
+# Branch data combination types
+our $BR_SUB = 0;
+our $BR_ADD = 1;
+
+# Command line options
 our $opt_cached;
 our $opt_help;
 our $opt_output;
@@ -64,6 +90,793 @@ GetOptions( %longOptions ) or pod2usage(2);
 pod2usage(1) if $opt_help;
 
 
+# From genhtml:
+#
+# read_info_file(info_filename)
+#
+# Read in the contents of the .info file specified by INFO_FILENAME. Data will
+# be returned as a reference to a hash containing the following mappings:
+#
+# %result: for each filename found in file -> \%data
+#
+# %data: "test"    -> \%testdata
+#        "sum"     -> \%sumcount
+#        "func"    -> \%funcdata
+#        "found"   -> $lines_found (number of instrumented lines found in file)
+#        "hit"     -> $lines_hit (number of executed lines in file)
+#        "f_found" -> $fn_found (number of instrumented functions found in file)
+#        "f_hit"   -> $fn_hit (number of executed functions in file)
+#        "b_found" -> $br_found (number of instrumented branches found in file)
+#        "b_hit"   -> $br_hit (number of executed branches in file)
+#        "check"   -> \%checkdata
+#        "testfnc" -> \%testfncdata
+#        "sumfnc"  -> \%sumfnccount
+#        "testbr"  -> \%testbrdata
+#        "sumbr"   -> \%sumbrcount
+#
+# %testdata   : name of test affecting this file -> \%testcount
+# %testfncdata: name of test affecting this file -> \%testfnccount
+# %testbrdata:  name of test affecting this file -> \%testbrcount
+#
+# %testcount   : line number   -> execution count for a single test
+# %testfnccount: function name -> execution count for a single test
+# %testbrcount : line number   -> branch coverage data for a single test
+# %sumcount    : line number   -> execution count for all tests
+# %sumfnccount : function name -> execution count for all tests
+# %sumbrcount  : line number   -> branch coverage data for all tests
+# %funcdata    : function name -> line number
+# %checkdata   : line number   -> checksum of source code line
+# $brdata      : vector of items: block, branch, taken
+#
+# Note that .info file sections referring to the same file and test name
+# will automatically be combined by adding all execution counts.
+#
+# Note that if INFO_FILENAME ends with ".gz", it is assumed that the file
+# is compressed using GZIP. If available, GUNZIP will be used to decompress
+# this file.
+#
+# Die on error.
+#
+sub read_info_file($)
+{
+    my $tracefile = $_[0];      # Name of tracefile
+    my %result;             # Resulting hash: file -> data
+    my $data;           # Data handle for current entry
+    my $testdata;           #       "             "
+    my $testcount;          #       "             "
+    my $sumcount;           #       "             "
+    my $funcdata;           #       "             "
+    my $checkdata;          #       "             "
+    my $testfncdata;
+    my $testfnccount;
+    my $sumfnccount;
+    my $testbrdata;
+    my $testbrcount;
+    my $sumbrcount;
+    my $line;           # Current line read from .info file
+    my $testname;           # Current test name
+    my $filename;           # Current filename
+    my $hitcount;           # Count for lines hit
+    my $count;          # Execution count of current line
+    my $negative;           # If set, warn about negative counts
+    my $changed_testname;       # If set, warn about changed testname
+    my $line_checksum;      # Checksum of current line
+    my $notified_about_relative_paths;
+    local *INFO_HANDLE;         # Filehandle for .info file
+
+    info("Reading data file $tracefile\n");
+
+    # Check if file exists and is readable
+    stat($tracefile);
+    if (!(-r _))
+    {
+        die("ERROR: cannot read file $tracefile!\n");
+    }
+
+    # Check if this is really a plain file
+    if (!(-f _))
+    {
+        die("ERROR: not a plain file: $tracefile!\n");
+    }
+
+    # Check for .gz extension
+    if ($tracefile =~ /\.gz$/)
+    {
+        # Check for availability of GZIP tool
+        system_no_output(1, "gunzip" ,"-h")
+            and die("ERROR: gunzip command not available!\n");
+
+        # Check integrity of compressed file
+        system_no_output(1, "gunzip", "-t", $tracefile)
+            and die("ERROR: integrity check failed for ".
+                    "compressed file $tracefile!\n");
+
+        # Open compressed file
+        open(INFO_HANDLE, "-|", "gunzip -c '$tracefile'")
+            or die("ERROR: cannot start gunzip to decompress ".
+                   "file $tracefile!\n");
+    }
+    else
+    {
+        # Open decompressed file
+        open(INFO_HANDLE, "<", $tracefile)
+            or die("ERROR: cannot read file $tracefile!\n");
+    }
+
+    $testname = "";
+    while (<INFO_HANDLE>)
+    {
+        chomp($_);
+        $line = $_;
+
+        # Switch statement
+        foreach ($line)
+        {
+            /^TN:([^,]*)(,diff)?/ && do
+            {
+                # Test name information found
+                $testname = defined($1) ? $1 : "";
+                if ($testname =~ s/\W/_/g)
+                {
+                    $changed_testname = 1;
+                }
+                $testname .= $2 if (defined($2));
+                last;
+            };
+
+            /^[SK]F:(.*)/ && do
+            {
+                # Filename information found
+                # Retrieve data for new entry
+                $filename = File::Spec->rel2abs($1, $root);
+
+                if (!File::Spec->file_name_is_absolute($1) &&
+                    !$notified_about_relative_paths)
+                {
+                    info("Resolved relative source file ".
+                         "path \"$1\" with CWD to ".
+                         "\"$filename\".\n");
+                    $notified_about_relative_paths = 1;
+                }
+
+                $data = $result{$filename};
+                ($testdata, $sumcount, $funcdata, $checkdata,
+                 $testfncdata, $sumfnccount, $testbrdata,
+                 $sumbrcount) =
+                    get_info_entry($data);
+
+                if (defined($testname))
+                {
+                    $testcount = $testdata->{$testname};
+                    $testfnccount = $testfncdata->{$testname};
+                    $testbrcount = $testbrdata->{$testname};
+                }
+                else
+                {
+                    $testcount = {};
+                    $testfnccount = {};
+                    $testbrcount = {};
+                }
+                last;
+            };
+
+            /^DA:(\d+),(-?\d+)(,[^,\s]+)?/ && do
+            {
+                # Fix negative counts
+                $count = $2 < 0 ? 0 : $2;
+                if ($2 < 0)
+                {
+                    $negative = 1;
+                }
+                # Execution count found, add to structure
+                # Add summary counts
+                $sumcount->{$1} += $count;
+
+                # Add test-specific counts
+                if (defined($testname))
+                {
+                    $testcount->{$1} += $count;
+                }
+
+                # Store line checksum if available
+                if (defined($3))
+                {
+                    $line_checksum = substr($3, 1);
+
+                    # Does it match a previous definition
+                    if (defined($checkdata->{$1}) &&
+                        ($checkdata->{$1} ne
+                         $line_checksum))
+                    {
+                        die("ERROR: checksum mismatch ".
+                            "at $filename:$1\n");
+                    }
+
+                    $checkdata->{$1} = $line_checksum;
+                }
+                last;
+            };
+
+            /^FN:(\d+),([^,]+)/ && do
+            {
+                last if (!$func_coverage);
+
+                # Function data found, add to structure
+                $funcdata->{$2} = $1;
+
+                # Also initialize function call data
+                if (!defined($sumfnccount->{$2})) {
+                    $sumfnccount->{$2} = 0;
+                }
+                if (defined($testname))
+                {
+                    if (!defined($testfnccount->{$2})) {
+                        $testfnccount->{$2} = 0;
+                    }
+                }
+                last;
+            };
+
+            /^FNDA:(\d+),([^,]+)/ && do
+            {
+                last if (!$func_coverage);
+                # Function call count found, add to structure
+                # Add summary counts
+                $sumfnccount->{$2} += $1;
+
+                # Add test-specific counts
+                if (defined($testname))
+                {
+                    $testfnccount->{$2} += $1;
+                }
+                last;
+            };
+
+            /^BRDA:(\d+),(\d+),(\d+),(\d+|-)/ && do {
+                # Branch coverage data found
+                my ($line, $block, $branch, $taken) =
+                    ($1, $2, $3, $4);
+
+                last if (!$br_coverage);
+                $sumbrcount->{$line} .=
+                    "$block,$branch,$taken:";
+
+                # Add test-specific counts
+                if (defined($testname)) {
+                    $testbrcount->{$line} .=
+                        "$block,$branch,$taken:";
+                }
+                last;
+            };
+
+            /^end_of_record/ && do
+            {
+                # Found end of section marker
+                if ($filename)
+                {
+                    # Store current section data
+                    if (defined($testname))
+                    {
+                        $testdata->{$testname} =
+                            $testcount;
+                        $testfncdata->{$testname} =
+                            $testfnccount;
+                        $testbrdata->{$testname} =
+                            $testbrcount;
+                    }
+
+                    set_info_entry($data, $testdata,
+                                   $sumcount, $funcdata,
+                                   $checkdata, $testfncdata,
+                                   $sumfnccount,
+                                   $testbrdata,
+                                   $sumbrcount);
+                    $result{$filename} = $data;
+                    last;
+                }
+            };
+
+            # default
+            last;
+        }
+    }
+    close(INFO_HANDLE);
+
+    # Calculate lines_found and lines_hit for each file
+    foreach $filename (keys(%result))
+    {
+        $data = $result{$filename};
+
+        ($testdata, $sumcount, undef, undef, $testfncdata,
+         $sumfnccount, $testbrdata, $sumbrcount) =
+            get_info_entry($data);
+
+        # Filter out empty files
+        if (scalar(keys(%{$sumcount})) == 0)
+        {
+            delete($result{$filename});
+            next;
+        }
+        # Filter out empty test cases
+        foreach $testname (keys(%{$testdata}))
+        {
+            if (!defined($testdata->{$testname}) ||
+                scalar(keys(%{$testdata->{$testname}})) == 0)
+            {
+                delete($testdata->{$testname});
+                delete($testfncdata->{$testname});
+            }
+        }
+
+        $data->{"found"} = scalar(keys(%{$sumcount}));
+        $hitcount = 0;
+
+        foreach (keys(%{$sumcount}))
+        {
+            if ($sumcount->{$_} > 0) { $hitcount++; }
+        }
+
+        $data->{"hit"} = $hitcount;
+
+        # Get found/hit values for function call data
+        $data->{"f_found"} = scalar(keys(%{$sumfnccount}));
+        $hitcount = 0;
+
+        foreach (keys(%{$sumfnccount})) {
+            if ($sumfnccount->{$_} > 0) {
+                $hitcount++;
+            }
+        }
+        $data->{"f_hit"} = $hitcount;
+
+        # Combine branch data for the same branches
+        (undef, $data->{"b_found"}, $data->{"b_hit"}) = compress_brcount($sumbrcount);
+        foreach $testname (keys(%{$testbrdata})) {
+            compress_brcount($testbrdata->{$testname});
+        }
+    }
+
+    if (scalar(keys(%result)) == 0)
+    {
+        die("ERROR: no valid records found in tracefile $tracefile\n");
+    }
+    if ($negative)
+    {
+        warn("WARNING: negative counts found in tracefile ".
+             "$tracefile\n");
+    }
+    if ($changed_testname)
+    {
+        warn("WARNING: invalid characters removed from testname in ".
+             "tracefile $tracefile\n");
+    }
+
+    return(\%result);
+}
+
+sub print_simplified_info
+{
+    for my $key (keys(%info_data))
+    {
+        print "K $key: \n";
+        my $sumcountref = $info_data{$key}->{"sum"};
+        for my $line (sort{$a<=>$b}(keys(%$sumcountref)))
+        {
+            print "L  $line: $sumcountref->{$line}\n";
+        }
+    }
+}
+
+# From genhtml:
+#
+# get_info_entry(hash_ref)
+#
+# Retrieve data from an entry of the structure generated by read_info_file().
+# Return a list of references to hashes:
+# (test data hash ref, sum count hash ref, funcdata hash ref, checkdata hash
+#  ref, testfncdata hash ref, sumfnccount hash ref, lines found, lines hit,
+#  functions found, functions hit)
+#
+
+sub get_info_entry($)
+{
+    my $testdata_ref = $_[0]->{"test"};
+    my $sumcount_ref = $_[0]->{"sum"};
+    my $funcdata_ref = $_[0]->{"func"};
+    my $checkdata_ref = $_[0]->{"check"};
+    my $testfncdata = $_[0]->{"testfnc"};
+    my $sumfnccount = $_[0]->{"sumfnc"};
+    my $testbrdata = $_[0]->{"testbr"};
+    my $sumbrcount = $_[0]->{"sumbr"};
+    my $lines_found = $_[0]->{"found"};
+    my $lines_hit = $_[0]->{"hit"};
+    my $fn_found = $_[0]->{"f_found"};
+    my $fn_hit = $_[0]->{"f_hit"};
+    my $br_found = $_[0]->{"b_found"};
+    my $br_hit = $_[0]->{"b_hit"};
+
+    return ($testdata_ref, $sumcount_ref, $funcdata_ref, $checkdata_ref,
+            $testfncdata, $sumfnccount, $testbrdata, $sumbrcount,
+            $lines_found, $lines_hit, $fn_found, $fn_hit,
+            $br_found, $br_hit);
+}
+
+
+# From genhtml:
+#
+# set_info_entry(hash_ref, testdata_ref, sumcount_ref, funcdata_ref,
+#                checkdata_ref, testfncdata_ref, sumfcncount_ref,
+#                testbrdata_ref, sumbrcount_ref[,lines_found,
+#                lines_hit, f_found, f_hit, $b_found, $b_hit])
+#
+# Update the hash referenced by HASH_REF with the provided data references.
+#
+
+sub set_info_entry($$$$$$$$$;$$$$$$)
+{
+    my $data_ref = $_[0];
+
+    $data_ref->{"test"} = $_[1];
+    $data_ref->{"sum"} = $_[2];
+    $data_ref->{"func"} = $_[3];
+    $data_ref->{"check"} = $_[4];
+    $data_ref->{"testfnc"} = $_[5];
+    $data_ref->{"sumfnc"} = $_[6];
+    $data_ref->{"testbr"} = $_[7];
+    $data_ref->{"sumbr"} = $_[8];
+
+    if (defined($_[9])) { $data_ref->{"found"} = $_[9]; }
+    if (defined($_[10])) { $data_ref->{"hit"} = $_[10]; }
+    if (defined($_[11])) { $data_ref->{"f_found"} = $_[11]; }
+    if (defined($_[12])) { $data_ref->{"f_hit"} = $_[12]; }
+    if (defined($_[13])) { $data_ref->{"b_found"} = $_[13]; }
+    if (defined($_[14])) { $data_ref->{"b_hit"} = $_[14]; }
+}
+
+# From genhtml:
+#
+# combine_info_entries(entry_ref1, entry_ref2, filename)
+#
+# Combine .info data entry hashes referenced by ENTRY_REF1 and ENTRY_REF2.
+# Return reference to resulting hash.
+#
+sub combine_info_entries($$$)
+{
+    my $entry1 = $_[0];     # Reference to hash containing first entry
+    my $testdata1;
+    my $sumcount1;
+    my $funcdata1;
+    my $checkdata1;
+    my $testfncdata1;
+    my $sumfnccount1;
+    my $testbrdata1;
+    my $sumbrcount1;
+
+    my $entry2 = $_[1];     # Reference to hash containing second entry
+    my $testdata2;
+    my $sumcount2;
+    my $funcdata2;
+    my $checkdata2;
+    my $testfncdata2;
+    my $sumfnccount2;
+    my $testbrdata2;
+    my $sumbrcount2;
+
+    my %result;         # Hash containing combined entry
+    my %result_testdata;
+    my $result_sumcount = {};
+    my $result_funcdata;
+    my $result_testfncdata;
+    my $result_sumfnccount;
+    my $result_testbrdata;
+    my $result_sumbrcount;
+    my $lines_found;
+    my $lines_hit;
+    my $fn_found;
+    my $fn_hit;
+    my $br_found;
+    my $br_hit;
+
+    my $testname;
+    my $filename = $_[2];
+
+    # Retrieve data
+    ($testdata1, $sumcount1, $funcdata1, $checkdata1, $testfncdata1,
+     $sumfnccount1, $testbrdata1, $sumbrcount1) = get_info_entry($entry1);
+    ($testdata2, $sumcount2, $funcdata2, $checkdata2, $testfncdata2,
+     $sumfnccount2, $testbrdata2, $sumbrcount2) = get_info_entry($entry2);
+
+#    # Merge checksums
+#    $checkdata1 = merge_checksums($checkdata1, $checkdata2, $filename);
+#
+#    # Combine funcdata
+#    $result_funcdata = merge_func_data($funcdata1, $funcdata2, $filename);
+#
+#    # Combine function call count data
+#    $result_testfncdata = add_testfncdata($testfncdata1, $testfncdata2);
+#    ($result_sumfnccount, $fn_found, $fn_hit) =
+#        add_fnccount($sumfnccount1, $sumfnccount2);
+#
+#    # Combine branch coverage data
+#    $result_testbrdata = add_testbrdata($testbrdata1, $testbrdata2);
+#    ($result_sumbrcount, $br_found, $br_hit) =
+#        combine_brcount($sumbrcount1, $sumbrcount2, $BR_ADD);
+#
+    # Combine testdata
+    foreach $testname (keys(%{$testdata1}))
+    {
+        if (defined($testdata2->{$testname}))
+        {
+            # testname is present in both entries, requires
+            # combination
+            ($result_testdata{$testname}) =
+                add_counts($testdata1->{$testname},
+                           $testdata2->{$testname});
+        }
+        else
+        {
+            # testname only present in entry1, add to result
+            $result_testdata{$testname} = $testdata1->{$testname};
+        }
+
+        # update sum count hash
+        ($result_sumcount, $lines_found, $lines_hit) =
+            add_counts($result_sumcount,
+                       $result_testdata{$testname});
+    }
+
+    foreach $testname (keys(%{$testdata2}))
+    {
+        # Skip testnames already covered by previous iteration
+        if (defined($testdata1->{$testname})) { next; }
+
+        # testname only present in entry2, add to result hash
+        $result_testdata{$testname} = $testdata2->{$testname};
+
+        # update sum count hash
+        ($result_sumcount, $lines_found, $lines_hit) =
+            add_counts($result_sumcount,
+                       $result_testdata{$testname});
+    }
+
+    # Calculate resulting sumcount
+
+    # Store result
+    set_info_entry(\%result, \%result_testdata, $result_sumcount,
+                   $result_funcdata, $checkdata1, $result_testfncdata,
+                   $result_sumfnccount, $result_testbrdata,
+                   $result_sumbrcount, $lines_found, $lines_hit,
+                   $fn_found, $fn_hit, $br_found, $br_hit);
+
+    return(\%result);
+}
+
+# From genhtml:
+#
+# combine_info_files(info_ref1, info_ref2)
+#
+# Combine .info data in hashes referenced by INFO_REF1 and INFO_REF2. Return
+# reference to resulting hash.
+#
+sub combine_info_files($$)
+{
+    my %hash1 = %{$_[0]};
+    my %hash2 = %{$_[1]};
+    my $filename;
+
+    foreach $filename (keys(%hash2))
+    {
+        if ($hash1{$filename})
+        {
+            # Entry already exists in hash1, combine them
+            $hash1{$filename} =
+                combine_info_entries($hash1{$filename},
+                                     $hash2{$filename},
+                                     $filename);
+        }
+        else
+        {
+            # Entry is unique in both hashes, simply add to
+            # resulting hash
+            $hash1{$filename} = $hash2{$filename};
+        }
+    }
+
+    return(\%hash1);
+}
+
+# From genhtml:
+#
+# add_counts(data1_ref, data2_ref)
+#
+# DATA1_REF and DATA2_REF are references to hashes containing a mapping
+#
+#   line number -> execution count
+#
+# Return a list (RESULT_REF, LINES_FOUND, LINES_HIT) where RESULT_REF
+# is a reference to a hash containing the combined mapping in which
+# execution counts are added.
+#
+sub add_counts($$)
+{
+    my $data1_ref = $_[0];  # Hash 1
+    my $data2_ref = $_[1];  # Hash 2
+    my %result;             # Resulting hash
+    my $line;               # Current line iteration scalar
+    my $data1_count;        # Count of line in hash1
+    my $data2_count;        # Count of line in hash2
+    my $found = 0;          # Total number of lines found
+    my $hit = 0;            # Number of lines with a count > 0
+
+    foreach $line (keys(%$data1_ref))
+    {
+        $data1_count = $data1_ref->{$line};
+        $data2_count = $data2_ref->{$line};
+
+        # Add counts if present in both hashes
+        if (defined($data2_count)) { $data1_count += $data2_count; }
+
+        # Store sum in %result
+        $result{$line} = $data1_count;
+
+        $found++;
+        if ($data1_count > 0) { $hit++; }
+    }
+
+    # Add lines unique to data2_ref
+    foreach $line (keys(%$data2_ref))
+    {
+        # Skip lines already in data1_ref
+        if (defined($data1_ref->{$line})) { next; }
+
+        # Copy count from data2_ref
+        $result{$line} = $data2_ref->{$line};
+
+        $found++;
+        if ($result{$line} > 0) { $hit++; }
+    }
+
+    return (\%result, $found, $hit);
+}
+
+
+# From genhtml:
+sub compress_brcount($)
+{
+    my ($brcount) = @_;
+    my $db;
+
+    $db = brcount_to_db($brcount);
+    return db_to_brcount($db, $brcount);
+}
+
+#
+# brcount_to_db(brcount)
+#
+# Convert brcount data to the following format:
+#
+# db:          line number    -> block hash
+# block hash:  block number   -> branch hash
+# branch hash: branch number  -> taken value
+#
+
+sub brcount_to_db($)
+{
+    my ($brcount) = @_;
+    my $line;
+    my $db;
+
+    # Add branches to database
+    foreach $line (keys(%{$brcount})) {
+        my $brdata = $brcount->{$line};
+
+        foreach my $entry (split(/:/, $brdata)) {
+            my ($block, $branch, $taken) = split(/,/, $entry);
+            my $old = $db->{$line}->{$block}->{$branch};
+
+            if (!defined($old) || $old eq "-") {
+                $old = $taken;
+            } elsif ($taken ne "-") {
+                $old += $taken;
+            }
+
+            $db->{$line}->{$block}->{$branch} = $old;
+        }
+    }
+
+    return $db;
+}
+
+
+#
+# db_to_brcount(db[, brcount])
+#
+# Convert branch coverage data back to brcount format. If brcount is specified,
+# the converted data is directly inserted in brcount.
+#
+
+sub db_to_brcount($;$)
+{
+    my ($db, $brcount) = @_;
+    my $line;
+    my $br_found = 0;
+    my $br_hit = 0;
+
+    # Convert database back to brcount format
+    foreach $line (sort({$a <=> $b} keys(%{$db}))) {
+        my $ldata = $db->{$line};
+        my $brdata;
+        my $block;
+
+        foreach $block (sort({$a <=> $b} keys(%{$ldata}))) {
+            my $bdata = $ldata->{$block};
+            my $branch;
+
+            foreach $branch (sort({$a <=> $b} keys(%{$bdata}))) {
+                my $taken = $bdata->{$branch};
+
+                $br_found++;
+                $br_hit++ if ($taken ne "-" && $taken > 0);
+                $brdata .= "$block,$branch,$taken:";
+            }
+        }
+        $brcount->{$line} = $brdata;
+    }
+
+    return ($brcount, $br_found, $br_hit);
+}
+
+
+#
+# brcount_db_combine(db1, db2, op)
+#
+# db1 := db1 op db2, where
+#   db1, db2: brcount data as returned by brcount_to_db
+#   op:       one of $BR_ADD and BR_SUB
+#
+sub brcount_db_combine($$$)
+{
+    my ($db1, $db2, $op) = @_;
+
+    foreach my $line (keys(%{$db2})) {
+        my $ldata = $db2->{$line};
+
+        foreach my $block (keys(%{$ldata})) {
+            my $bdata = $ldata->{$block};
+
+            foreach my $branch (keys(%{$bdata})) {
+                my $taken = $bdata->{$branch};
+                my $new = $db1->{$line}->{$block}->{$branch};
+
+                if (!defined($new) || $new eq "-") {
+                    $new = $taken;
+                } elsif ($taken ne "-") {
+                    if ($op == $BR_ADD) {
+                        $new += $taken;
+                    } elsif ($op == $BR_SUB) {
+                        $new -= $taken;
+                        $new = 0 if ($new < 0);
+                    }
+                }
+
+                $db1->{$line}->{$block}->{$branch} = $new;
+            }
+        }
+    }
+}
+
+# From genhtml
+sub info(@)
+{
+    if($debug)
+    {
+        # Print info string
+        printf(@_);
+    }
+}
+
+# NEW STUFF
+
 ## Format per file, repeated, no linebreak
 # <diffcmd>
 # index c1..c2 c3
@@ -78,6 +891,12 @@ pod2usage(1) if $opt_help;
 # 3 lines of context
 #
 # output:
+# <dali-source-file>: source / header files in dali/dali-toolkit
+# \%filter: <dali-source-file> -> \%filedata
+# %filedata: "patch"   -> \@checklines
+#            "b_lines" -> \%b_lines
+# @checklines: vector of \[start, length] # line numbers of new/modified lines
+# %b_lines: <line-number> -> patch line in b-file.
 sub parse_diff
 {
     my $patchref = shift;
@@ -184,7 +1003,7 @@ sub parse_diff
         }
     }
 
-    return {%filter};
+    return {%filter};#copy? - test and fixme
 }
 
 sub show_patch_lines
@@ -203,133 +1022,11 @@ sub show_patch_lines
     }
 }
 
-sub get_gcno_file
-{
-    # Assumes test cases have been run, and "make rename_cov_data" has been executed
 
-    my $file = shift;
-    my ($name, $path, $suffix) = fileparse($file, (".c", ".cpp", ".h"));
-    my $gcno_file = $repo->wc_path() . "/build/tizen/.cov/$name.gcno";
-
-    # Note, will translate headers to their source's object, which
-    # may miss execution code in the headers (e.g. inlines are usually
-    # not all used in the implementation, and require getting coverage
-    # from test cases.
-
-    if( -f $gcno_file )
-    {
-        my $gcno_st = stat($gcno_file);
-        my $fq_file = $repo->wc_path() . $file;
-        my $src_st = stat($fq_file);
-        if($gcno_st->ctime < $src_st->mtime)
-        {
-            print "WARNING: GCNO $gcno_file older than SRC $fq_file\n";
-            $gcno_file="";
-        }
-
-    }
-    else
-    {
-        print("WARNING: No equivalent gcno file for $file\n");
-    }
-    return $gcno_file;
-}
-
-our %gcovfiles=();
-sub get_coverage
-{
-    my $file = shift;
-    my $filesref = shift;
-    print("get_coverage($file)\n") if $debug;
-
-    my $gcno_file = get_gcno_file($file);
-    my @gcov_files = ();
-    my $gcovfile;
-    if( $gcno_file )
-    {
-        print "Running gcov on $gcno_file:\n" if $debug;
-        open( my $fh,  "gcov --preserve-paths $gcno_file |") || die "Can't run gcov:$!\n";
-        while( <$fh> )
-        {
-            print $_ if $debug>=3;
-            chomp;
-            if( m!'(.*\.gcov)'$! )
-            {
-                my $coverage_file = $1; # File has / replaced with # and .. replaced with ^
-                my $source_file = $coverage_file;
-                $source_file =~ s!\^!..!g;  # Change ^ to ..
-                $source_file =~ s!\#!/!g;   # change #'s to /s
-                $source_file =~ s!.gcov$!!; # Strip off .gcov suffix
-
-                print "Matching $file against $source_file\n" if $debug >= 3;
-                # Only want the coverage files matching source file:
-                if(index( $source_file, $file ) > 0 )
-                {
-                    $gcovfile = $coverage_file;
-                    # Some header files do not produce an equivalent gcov file so we shouldn't parse them
-                    if(($source_file =~ /\.h$/) && (! -e $gcovfile))
-                    {
-                        print "Omitting Header: $source_file\n" if $debug;
-                        $gcovfile = ""
-                    }
-                    last;
-                }
-            }
-        }
-        close($fh);
-
-        if($gcovfile)
-        {
-            if($gcovfiles{$gcovfile} == undef)
-            {
-                # Only parse a gcov file once
-                $gcovfiles{$gcovfile}->{"seen"}=1;
-
-                print "Getting coverage data from $gcovfile\n" if $debug;
-
-                open( FH, "< $gcovfile" ) || die "Can't open $gcovfile for reading:$!\n";
-                while(<FH>)
-                {
-                    my ($cov, $line, @code ) = split( /:/, $_ );
-                    $cov =~ s/^\s+//; # Strip leading space
-                    $line =~ s/^\s+//;
-                    my $code=join(":", @code);
-                    if($cov =~ /\#/)
-                    {
-                        # There is no coverage data for these executable lines
-                        $gcovfiles{$gcovfile}->{"uncovered"}->{$line}++;
-                        $gcovfiles{$gcovfile}->{"src"}->{$line}=$code;
-                    }
-                    elsif( $cov ne "-" && looks_like_number($cov) && $cov > 0 )
-                    {
-                        $gcovfiles{$gcovfile}->{"covered"}->{$line}=$cov;
-                        $gcovfiles{$gcovfile}->{"src"}->{$line}=$code;
-                    }
-                    else
-                    {
-                        # All other lines are not executable.
-                        $gcovfiles{$gcovfile}->{"src"}->{$line}=$code;
-                    }
-                }
-                close( FH );
-            }
-            $filesref->{$file}->{"coverage"} = $gcovfiles{$gcovfile}; # store hashref
-        }
-        else
-        {
-            # No gcov output - the gcno file produced no coverage of the source/header
-            # Probably means that there is no coverage for the file (with the given
-            # test case - there may be some somewhere, but for the sake of speed, don't
-            # check (yet).
-        }
-    }
-}
-
-# Run the git diff command to get the patch, then check the coverage
-# output for the patch.
+# Run the git diff command to get the patch
+# Output - see parse_diff
 sub run_diff
 {
-    #print "run_diff(" . join(" ", @_) . ")\n";
     my ($fh, $c) = $repo->command_output_pipe(@_);
     our @patch=();
     while(<$fh>)
@@ -343,23 +1040,8 @@ sub run_diff
 
     # @patch has slurped diff for all files...
     my $filesref = parse_diff ( \@patch );
-    show_patch_lines($filesref) if $debug;
+    show_patch_lines($filesref) if $debug>1;
 
-    print "Checking coverage:\n" if $debug;
-
-    my $cwd=getcwd();
-    chdir ".cov" || die "Can't find $cwd/.cov:$!\n";
-
-    for my $file (keys(%$filesref))
-    {
-        my ($name, $path, $suffix) = fileparse($file, qr{\.[^.]*$});
-        next if($path !~ /^dali/);
-        if($suffix eq ".cpp" || $suffix eq ".c" || $suffix eq ".h")
-        {
-            get_coverage($file, $filesref);
-        }
-    }
-    chdir $cwd;
     return $filesref;
 }
 
@@ -378,35 +1060,45 @@ sub calc_patch_coverage_percentage
         my $uncovered_lines = 0;
 
         my $patchref = $filesref->{$file}->{"patch"};
-        my $coverage_ref = $filesref->{$file}->{"coverage"};
-        if( $coverage_ref )
+
+        my $abs_filename = File::Spec->rel2abs($file, $root);
+        my $sumcountref = $info_data{$abs_filename}->{"sum"};
+
+        if( $sumcountref )
         {
             for my $patch (@$patchref)
             {
                 for(my $i = 0; $i < $patch->[1]; $i++ )
                 {
                     my $line = $i + $patch->[0];
-                    if($coverage_ref->{"covered"}->{$line})
+                    if(exists($sumcountref->{$line}))
                     {
-                        $covered_lines++;
-                        $total_covered_lines++;
-                    }
-                    if($coverage_ref->{"uncovered"}->{$line})
-                    {
-                        $uncovered_lines++;
-                        $total_uncovered_lines++;
+                        if( $sumcountref->{$line} > 0 )
+                        {
+                            $covered_lines++;
+                            $total_covered_lines++;
+                        }
+                        else
+                        {
+                            $uncovered_lines++;
+                            $total_uncovered_lines++;
+                        }
                     }
                 }
             }
-            $coverage_ref->{"covered_lines"} = $covered_lines;
-            $coverage_ref->{"uncovered_lines"} = $uncovered_lines;
+            $filesref->{$file}->{"covered_lines"} = $covered_lines;
+            $filesref->{$file}->{"uncovered_lines"} = $uncovered_lines;
             my $total = $covered_lines + $uncovered_lines;
             my $percent = 0;
             if($total > 0)
             {
                 $percent = $covered_lines / $total;
             }
-            $coverage_ref->{"percent_covered"} = 100 * $percent;
+            $filesref->{$file}->{"percent_covered"} = 100 * $percent;
+        }
+        else
+        {
+            print "Can't find coverage data for $abs_filename\n";
         }
     }
     my $total_exec = $total_covered_lines + $total_uncovered_lines;
@@ -416,6 +1108,8 @@ sub calc_patch_coverage_percentage
     return [ $total_exec, $percent ];
 }
 
+#
+#
 sub patch_output
 {
     my $filesref = shift;
@@ -424,18 +1118,22 @@ sub patch_output
         my ($name, $path, $suffix) = fileparse($file, qr{\.[^.]*$});
         next if($path !~ /^dali/);
 
-        my $patchref = $filesref->{$file}->{"patch"};
-        my $b_lines_ref = $filesref->{$file}->{"b_lines"};
-        my $coverage_ref = $filesref->{$file}->{"coverage"};
+        my $fileref = $filesref->{$file};
+        my $patchref = $fileref->{"patch"};
+        my $b_lines_ref = $fileref->{"b_lines"};
+
+        my $abs_filename = File::Spec->rel2abs($file, $root);
+        my $sumcountref = $info_data{$abs_filename}->{"sum"};
+
         print BOLD, "$file  ";
 
-        if($coverage_ref)
+        if($fileref)
         {
-            if( $coverage_ref->{"covered_lines"} > 0
+            if( $fileref->{"covered_lines"} > 0
                 ||
-                $coverage_ref->{"uncovered_lines"} > 0 )
+                $fileref->{"uncovered_lines"} > 0 )
             {
-                print GREEN, "Covered: " . $coverage_ref->{"covered_lines"}, RED, " Uncovered: " . $coverage_ref->{"uncovered_lines"}, RESET;
+                print GREEN, "Covered: " . $fileref->{"covered_lines"}, RED, " Uncovered: " . $fileref->{"uncovered_lines"}, RESET;
             }
         }
         else
@@ -461,28 +1159,29 @@ sub patch_output
                 my $line = $i + $patch->[0];
                 printf "%-6s  ", $line;
 
-                if($coverage_ref)
+                if($sumcountref)
                 {
                     my $color;
-                    if($coverage_ref->{"covered"}->{$line})
+                    if(exists($sumcountref->{$line}))
                     {
-                        $color=GREEN;
-                    }
-                    elsif($coverage_ref->{"uncovered"}->{$line})
-                    {
-                        $color=BOLD . RED;
+                        if($sumcountref->{$line} > 0)
+                        {
+                            $color=GREEN;
+                        }
+                        else
+                        {
+                            $color=BOLD . RED;
+                        }
                     }
                     else
                     {
-                        $color=BLACK;
+                        $color=CYAN;
                     }
-                    my $src=$coverage_ref->{"src"}->{$line};
-                    chomp($src);
+                    my $src = $b_lines_ref->{$line};
                     print $color, "$src\n", RESET;
                 }
                 else
                 {
-                    # We don't have coverage data, so print it from the patch instead.
                     my $src = $b_lines_ref->{$line};
                     print "$src\n";
                 }
@@ -491,70 +1190,65 @@ sub patch_output
     }
 }
 
-
+#
+#
 sub patch_html_output
 {
     my $filesref = shift;
 
-    my $html = HTML::Element->new('html');
-    my $head = HTML::Element->new('head');
-    my $title = HTML::Element->new('title');
-    $title->push_content("Patch Coverage");
-    $head->push_content($title, "\n");
-    $html->push_content($head, "\n");
+    open( my $filehandle, ">", $opt_output ) || die "Can't open $opt_output for writing:$!\n";
 
-    my $body = HTML::Element->new('body');
-    $body->attr('bgcolor', "white");
+    my $OUTPUT_FH = select;
+    select $filehandle;
+    print <<EOH;
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+"http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>Patch Coverage</title>
+</head>
+<body bgcolor="white">
+EOH
 
-    foreach my $file (sort(keys(%$filesref)))
+    foreach my $file (keys(%$filesref))
     {
         my ($name, $path, $suffix) = fileparse($file, qr{\.[^.]*$});
         next if($path !~ /^dali/);
 
-        my $patchref = $filesref->{$file}->{"patch"};
-        my $b_lines_ref = $filesref->{$file}->{"b_lines"};
-        my $coverage_ref = $filesref->{$file}->{"coverage"};
+        my $fileref = $filesref->{$file};
+        my $patchref = $fileref->{"patch"};
+        my $b_lines_ref = $fileref->{"b_lines"};
 
-        my $header = HTML::Element->new('h2');
-        $header->push_content($file);
-        $body->push_content($header);
-        $body->push_content("\n");
-        if($coverage_ref)
+        my $abs_filename = File::Spec->rel2abs($file, $root);
+        my $sumcountref = $info_data{$abs_filename}->{"sum"};
+
+        print "<h2>$file</h2>\n";
+
+        if($fileref)
         {
-            if( $coverage_ref->{"covered_lines"} > 0
+            if( $fileref->{"covered_lines"} > 0
                 ||
-                $coverage_ref->{"uncovered_lines"} > 0 )
+                $fileref->{"uncovered_lines"} > 0 )
             {
-                my $para = HTML::Element->new('p');
-                my $covered = HTML::Element->new('span');
-                $covered->attr('style', "color:green;");
-                $covered->push_content("Covered: " . $coverage_ref->{"covered_lines"} );
-                $para->push_content($covered);
-
-                my $para2 = HTML::Element->new('p');
-                my $uncovered = HTML::Element->new('span');
-                $uncovered->attr('style', "color:red;");
-                $uncovered->push_content("Uncovered: " . $coverage_ref->{"uncovered_lines"} );
-                $para2->push_content($uncovered);
-                $body->push_content($para, $para2);
-            }
-            else
-            {
-                #print "coverage ref exists for $file:\n" . Data::Dumper::Dumper($coverage_ref) . "\n";
+                print "<p style=\"color:green;\">Covered: " .
+                    $fileref->{"covered_lines"} . "<p>" .
+                    "<p style=\"color:red;\">Uncovered: " .
+                    $fileref->{"uncovered_lines"} . "</span></p>";
             }
         }
         else
         {
-            my $para = HTML::Element->new('p');
-            my $span = HTML::Element->new('span');
+            print "<p>";
+            my $span=0;
             if($suffix eq ".cpp" || $suffix eq ".c" || $suffix eq ".h")
             {
-                $span->attr('style', "color:red;");
+                print "<span style=\"color:red;\">";
+                $span=1;
             }
-            $span->push_content("No coverage found");
-            $para->push_content($span);
-            $body->push_content($para);
+            print "No coverage found";
+            print "</span>" if $span;
         }
+        print "</p>";
 
         for my $patch (@$patchref)
         {
@@ -563,71 +1257,54 @@ sub patch_html_output
             {
                 $hunkstr .= " - " . ($patch->[0]+$patch->[1]-1);
             }
+            print "<p style=\"font-weight:bold;\">" . $hunkstr . "</p>";
 
-            my $para = HTML::Element->new('p');
-            my $span = HTML::Element->new('span');
-            $span->attr('style', "font-weight:bold;");
-            $span->push_content($hunkstr);
-            $para->push_content($span);
-            $body->push_content($para);
-
-            my $codeHunk = HTML::Element->new('pre');
+            print "<pre>";
             for(my $i = 0; $i < $patch->[1]; $i++ )
             {
                 my $line = $i + $patch->[0];
                 my $num_line_digits=log($line)/log(10);
                 for $i (0..(6-$num_line_digits-1))
                 {
-                    $codeHunk->push_content(" ");
+                    print " ";
                 }
+                print "$line  ";
 
-                $codeHunk->push_content("$line  ");
-
-                my $srcLine = HTML::Element->new('span');
-                if($coverage_ref)
+                if($sumcountref)
                 {
                     my $color;
-
-                    if($coverage_ref->{"covered"}->{$line})
+                    if(exists($sumcountref->{$line}))
                     {
-                        $srcLine->attr('style', "color:green;");
-                    }
-                    elsif($coverage_ref->{"uncovered"}->{$line})
-                    {
-                        $srcLine->attr('style', "color:red;font-weight:bold;");
+                        if($sumcountref->{$line} > 0)
+                        {
+                            print("<span style=\"color:green;\">");
+                        }
+                        else
+                        {
+                            print("<span style=\"color:red;font-weight:bold;\">");
+                        }
                     }
                     else
                     {
-                        $srcLine->attr('style', "color:black;font-weight:normal;");
+                        print("<span style=\"color:black;font-weight:normal;\">");
                     }
-                    my $src=$coverage_ref->{"src"}->{$line};
+                    my $src=$b_lines_ref->{$line};
                     chomp($src);
-                    $srcLine->push_content($src);
+                    print "$src</span>\n";
                 }
                 else
                 {
-                    # We don't have coverage data, so print it from the patch instead.
                     my $src = $b_lines_ref->{$line};
-                    $srcLine->attr('style', "color:black;font-weight:normal;");
-                    $srcLine->push_content($src);
+                    print "$src\n";
                 }
-                $codeHunk->push_content($srcLine, "\n");
             }
-            $body->push_content($codeHunk, "\n");
+            print "<\pre>\n";
         }
     }
-    $body->push_content(HTML::Element->new('hr'));
-    $html->push_content($body, "\n");
 
-    open( my $filehandle, ">", $opt_output ) || die "Can't open $opt_output for writing:$!\n";
-
-    print $filehandle <<EOH;
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
-"http://www.w3.org/TR/REC-html40/loose.dtd">
-EOH
-;
-    print $filehandle $html->as_HTML();
+    print $filehandle "<hr>\n</body>\n</html>\n";
     close $filehandle;
+    select $OUTPUT_FH;
 }
 
 
@@ -635,15 +1312,38 @@ EOH
 ##                                    MAIN                                    ##
 ################################################################################
 
-my $cwd = getcwd();
-chdir $repo->wc_path();
-chdir "build/tizen";
-`make rename_cov_data`;
+my $cwd = getcwd(); # expect this to be automated-tests folder
 
+# execute coverage.sh, generating build/tizen/dali.info from lib, and
+# *.dir/dali.info. Don't generate html
+`coverage.sh -n`;
+chdir "..";
+$root = getcwd();
+
+our %info_data; # Hash of all data from .info files
+my @info_files = split(/\n/, `find . -name dali.info`);
+my %new_info;
+
+# Read in all specified .info files
+foreach (@info_files)
+{
+    %new_info = %{read_info_file($_)};
+
+    # Combine %new_info with %info_data
+    %info_data = %{combine_info_files(\%info_data, \%new_info)};
+}
+
+
+# Generate git diff command
 my @cmd=('--no-pager','diff','--no-ext-diff','-U0','--no-color');
-
 my $status = $repo->command("status", "-s");
-if( $status eq "" && !scalar(@ARGV))
+
+if(scalar(@ARGV)) # REMOVE ME
+{
+    # REMOVE ME - temp to get past modifying this script in place.
+    push @cmd, @ARGV;
+}
+elsif( $status eq "" && !scalar(@ARGV))
 {
     # There are no changes in the index or working tree, and
     # no diff arguments to append. Use the last patch instead.
@@ -674,6 +1374,8 @@ else
 }
 
 push @cmd, @ARGV;
+
+# Execute diff & coverage from root directory
 my $filesref = run_diff(@cmd);
 
 chdir $cwd;
@@ -692,6 +1394,9 @@ if( $filecount == 0 )
     print "No source files found\n";
     exit 0;    # Exit with no error.
 }
+
+#print_simplified_info() if $debug;
+#exit 0;
 
 my $percentref = calc_patch_coverage_percentage($filesref);
 if($percentref->[0] == 0)
