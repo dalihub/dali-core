@@ -15,6 +15,10 @@
       * [3. Building for MS Windows](#3-building-for-ms-windows)
          * Build with the Visual Studio project.
          * Build with CMake.
+      * [4. Building for MacOS](#4-building-for-macos)
+         * [Get dependencies](#get-dependencies)
+         * [Set a DALi Environment](#set-a-dali-environment)
+         * [Build the repository](#build-the-repository)
 
 # Build Instructions
 
@@ -134,3 +138,109 @@ vcpkg-script folder in the windows-dependencies repository.
     - CMAKE_INSTALL_PREFIX  ---> Were DALi is installed.
     - INSTALL_CMAKE_MODULES ---> Whether to install the CMake modules (Used by the CMake command find_package() to find previously installed libraries).
     - ENABLE_DEBUG          ---> Whether to build with debug enabled.
+
+## 4. Building for MacOS
+
+### Get dependencies
+
+Dependencies are obtained through [vcpkg](https://github.com/Microsoft/vcpkg#quick-start-unix) and [homebrew](https://docs.brew.sh/Installation.html).
+Follow each installation guide, to then be able to install the dependencies.
+
+From `homebrew` install:
+ - `cairo`
+ - `cmake`
+ - `fontconfig`
+ - `pkg-config`
+```bash
+        $ brew install cairo cmake fontconfig pkg-config
+```
+And through `vcpkg` install:
+ - `angle`
+ - `bzip2`
+ - `curl`
+ - `dirent`
+ - `egl-registry`
+ - `expat`
+ - `fribidi`
+ - `getopt`
+ - `gettext`
+ - `giflib`
+ - `glib`_¹_
+ - `harfbuzz`
+ - `libexif`
+ - `libffi`
+ - `libiconv`
+ - `libjpeg-turbo`
+ - `libpng`
+ - `libwebp`
+ - `opengl`
+ - `pcre`
+ - `pixman`
+ - `pthreads`
+ - `ragel`
+ - `tool-meson`
+ - `zlib`
+
+From `vcpkg` folder, run:
+```bash
+        $ ./vcpkg install angle bzip2 curl dirent egl-registry expat fribidi getopt gettext giflib glib harfbuzz libexif libffi libiconv libjpeg-turbo libpng libwebp opengl pcre pixman pthreads ragel tool-meson zlib
+```
+
+_¹_:  At this time, there's a reported bug with the latest MacOS and `vcpkg`'s
+`glib`, if you got a problem compiling it try adding the following line to
+`CMakeLists.txt` in the `glib` ports folder:
+```
+        set(ENV{SDKROOT} ${CMAKE_OSX_SYSROOT})
+```
+
+### Set a DALi Environment
+Now you need to create a `dali-env` folder and then set some environment variables.
+First of all:
+- `VCPKG_FOLDER` should contain the absolute path to your `vcpkg` installation
+- `DESKTOP_PREFIX` should contain the absolute path to `dali-env`
+```bash
+        $ export VCPKG_FOLDER="${HOME}/path/to/vcpkg"
+        $ export DESKTOP_PREFIX="${HOME}/path/to/dail-env"
+```
+Acordingly to `VCPKG_FOLDER` and `DESKTOP_PREFIX` set:
+```bash
+        $ export DYLD_LIBRARY_PATH="${DYLD_LIBRARY_PATH}:${VCPKG_FOLDER}/installed/x64-osx/lib"
+        $ export DYLD_LIBRARY_PATH="${DYLD_LIBRARY_PATH}:${DESKTOP_PREFIX}/lib/"
+        $ export DALI_APPLICATION_PACKAGE="${DESKTOP_PREFIX}/share/com.samsung.dali-demo/res/"
+        $ export DALI_WINDOW_WIDTH="480"
+        $ export DALI_WINDOW_HEIGHT="800"
+```
+If you are going to build `dali` libs with debug option you should also set:
+```bash
+        $ export DYLD_LIBRARY_PATH="${DYLD_LIBRARY_PATH}:${VCPKG_FOLDER}/installed/x64-osx/debug/lib"
+        $ export DYLD_LIBRARY_PATH="${DYLD_LIBRARY_PATH}:${DESKTOP_PREFIX}/lib/debug"
+```
+Because we aren't installing at the default resource folder, if you install
+`dali-toolkit` or `dali-demo` we should first set:
+```bash
+        $ export DALI_IMAGE_DIR="${DESKTOP_PREFIX}/share/dali/toolkit/images/"
+        $ export DALI_SOUND_DIR="${DESKTOP_PREFIX}/share/dali/toolkit/sounds/"
+        $ export DALI_STYLE_DIR="${DESKTOP_PREFIX}/share/dali/toolkit/styles/"
+        $ export DALI_STYLE_IMAGE_DIR="${DESKTOP_PREFIX}/share/dali/toolkit/styles/images/"
+        $ export DALI_DATA_READ_ONLY_DIR="${DESKTOP_PREFIX}/share/dali/"
+```
+You will need these variables every time you open up a new terminal. So you may put the exports on a file, here `setenv`, to just source it:
+```bash
+        $ source setenv
+```
+### Build the repository
+
+To build the repository enter the 'build/tizen' folder:
+```bash
+         $ cd dali-core/build/tizen
+```
+Then run the following command to set up the build:
+```bash
+         $ cmake -DCMAKE_INSTALL_PREFIX=$DESKTOP_PREFIX -DCMAKE_TOOLCHAIN_FILE=$VCPKG_FOLDER/scripts/buildsystems/vcpkg.cmake -DINSTALL_CMAKE_MODULES=ON
+```
+If a Debug build is required, then add `-DCMAKE_BUILD_TYPE=Debug -DENABLE_DEBUG=ON`
+
+To build run:
+```bash
+         $ make install -j8
+```
