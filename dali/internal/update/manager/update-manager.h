@@ -646,6 +646,14 @@ public:
   void SetRenderingBehavior( DevelStage::Rendering renderingBehavior );
 
   /**
+   * Request to render the current frame
+   * @note This is a temporary workaround (to be removed in the future) to request the rendering of
+   *       the current frame if the color or visibility of any actor is updated. It MUST NOT be used
+   *       for any other purposes.
+   */
+  void RequestRendering();
+
+  /**
    * Sets the depths of all layers.
    * @param layers The layers in depth order.
    * @param[in] rootLayer The root layer of the sorted layers.
@@ -711,8 +719,9 @@ private:
    * Perform animation updates
    * @param[in] bufferIndex to use
    * @param[in] elapsedSeconds time since last frame
+   * @return true if at least one animations is currently active or false otherwise
    */
-  void Animate( BufferIndex bufferIndex, float elapsedSeconds );
+  bool Animate( BufferIndex bufferIndex, float elapsedSeconds );
 
   /**
    * Applies constraints to CustomObjects
@@ -1108,6 +1117,17 @@ inline void SetRenderingBehaviorMessage( UpdateManager& manager, DevelStage::Ren
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::SetRenderingBehavior, renderingBehavior );
+}
+
+inline void RequestRenderingMessage( UpdateManager& manager )
+{
+  using LocalType = Message<UpdateManager>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::RequestRendering );
 }
 
 /**
