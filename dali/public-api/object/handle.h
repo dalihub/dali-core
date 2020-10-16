@@ -74,7 +74,7 @@ public:
   /**
    * @brief PropertySetSignal function prototype for signal handler. Called when a property is set on this object.
    */
-  using PropertySetSignalType = Signal<void(Handle& handle, Property::Index index, Property::Value value)>;
+  using PropertySetSignalType = Signal<void(Handle& handle, Property::Index index, const Property::Value& value)>;
 
 public:
   /**

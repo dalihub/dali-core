@@ -22,6 +22,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/signals/connection-tracker-interface.h>
+#include <dali/public-api/signals/signal-slot-connections.h>
 
 namespace Dali
 {
@@ -83,7 +84,7 @@ private:
   ConnectionTracker& operator=(ConnectionTracker&&) = delete;      ///< Deleted move assignment operator. @SINCE_1_9.25
 
 private:
-  Dali::Vector<SlotConnection*> mConnections; ///< Vector of connection pointers
+  Dali::Vector<SlotConnection> mConnections; ///< Vector of connection
 };
 
 /**

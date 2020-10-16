@@ -1319,6 +1319,11 @@ bool Actor::IsGestureRequired( GestureType::Value type ) const
   return mGestureData && mGestureData->IsGestureRequired( type );
 }
 
+bool Actor::EmitInterceptTouchEventSignal( const Dali::TouchEvent& touch )
+{
+  return EmitConsumingSignal( *this, mInterceptTouchedSignal, touch );
+}
+
 bool Actor::EmitTouchEventSignal( const Dali::TouchEvent& touch )
 {
   return EmitConsumingSignal( *this, mTouchedSignal, touch );
@@ -1418,6 +1423,7 @@ Actor::Actor( DerivedType derivedType, const SceneGraph::Node& node )
   mAnchorPoint( nullptr ),
   mRelayoutData( nullptr ),
   mGestureData( nullptr ),
+  mInterceptTouchedSignal(),
   mTouchedSignal(),
   mHoveredSignal(),
   mWheelEventSignal(),

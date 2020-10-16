@@ -48,6 +48,11 @@ ChildOrderChangedSignalType& ChildOrderChangedSignal(Actor actor)
   return GetImplementation(actor).ChildOrderChangedSignal();
 }
 
+Actor::TouchEventSignalType& InterceptTouchedSignal(Actor actor)
+{
+  return GetImplementation(actor).InterceptTouchedSignal();
+}
+
 } // namespace DevelActor
 
 } // namespace Dali

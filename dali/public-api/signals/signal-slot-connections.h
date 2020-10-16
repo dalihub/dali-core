@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/public-api/signals/callback.h>
 #include <dali/public-api/signals/signal-slot-observers.h>
 
 namespace Dali
@@ -28,7 +29,6 @@ namespace Dali
  * @{
  */
 
-class CallbackBase;
 
 /**
  * @brief Slot connection is the connection information held by a connection tracker.
@@ -56,18 +56,15 @@ public:
   SlotConnection(SlotObserver* slotObserver, CallbackBase* callback);
 
   /**
-   * @brief Non-virtual destructor, not intended as a base class.
-   * @SINCE_1_0.0
-   */
-  ~SlotConnection();
-
-  /**
    * @brief Retrieves the callback.
    *
    * @SINCE_1_0.0
    * @return A pointer to the callback
    */
-  CallbackBase* GetCallback();
+  CallbackBase* GetCallback() const
+  {
+    return mCallback;
+  }
 
   /**
    * @brief Retrieves the slot observer.
@@ -75,17 +72,14 @@ public:
    * @SINCE_1_0.0
    * @return A pointer to the slot observer
    */
-  SlotObserver* GetSlotObserver();
+  SlotObserver* GetSlotObserver() const
+  {
+    return mSlotObserver;
+  }
 
 private:
-  SlotConnection(const SlotConnection&) = delete;            ///< Deleted copy constructor. @SINCE_1_0.0
-  SlotConnection(SlotConnection&&)      = delete;            ///< Deleted move constructor. @SINCE_1_9.25
-  SlotConnection& operator=(const SlotConnection&) = delete; ///< Deleted copy assignment operator. @SINCE_1_0.0
-  SlotConnection& operator=(SlotConnection&&) = delete;      ///< Deleted move assignment operator. @SINCE_1_9.25
-
-private:
-  SlotObserver* mSlotObserver; ///< a pointer to the slot observer (not owned)
-  CallbackBase* mCallback;     ///< The callback. This is not owned, the corresponding SignalConnection has ownership.
+  SlotObserver* mSlotObserver{nullptr}; ///< a pointer to the slot observer (not owned)
+  CallbackBase* mCallback{nullptr};     ///< The callback. This is not owned, the corresponding SignalConnection has ownership.
 };
 
 /**
@@ -111,7 +105,10 @@ public:
    * @SINCE_1_0.0
    * @param[in] callback The callback which should be a C function
    */
-  SignalConnection(CallbackBase* callback);
+  SignalConnection(CallbackBase* callback) noexcept
+  : mCallback(callback)
+  {
+  }
 
   /**
    * @brief Constructor.
@@ -120,13 +117,21 @@ public:
    * @param[in] signalObserver The signal observer
    * @param[in] callback Ownership of this callback object is taken
    */
-  SignalConnection(SignalObserver* signalObserver, CallbackBase* callback);
+  SignalConnection(SignalObserver* signalObserver, CallbackBase* callback) noexcept
+  : mSignalObserver(signalObserver),
+    mCallback(callback)
+  {
+  }
 
   /**
    * @brief Non-virtual destructor, not intended as a base class.
    * @SINCE_1_0.0
    */
-  ~SignalConnection();
+  ~SignalConnection() noexcept
+  {
+    // signal connections have ownership of the callback.
+    delete mCallback;
+  }
 
   /**
    * @brief Disconnects the signal from the slot.
@@ -134,7 +139,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] slotObserver The signal disconnecting from the slot
    */
-  void Disconnect(SlotObserver* slotObserver);
+  void Disconnect(SlotObserver* slotObserver) noexcept;
 
   /**
    * @brief Retrieves the callback.
@@ -142,17 +147,60 @@ public:
    * @SINCE_1_0.0
    * @return A pointer to the callback
    */
-  CallbackBase* GetCallback();
+  CallbackBase* GetCallback() const noexcept
+  {
+    return mCallback;
+  }
 
-private:
   SignalConnection(const SignalConnection&) = delete;            ///< Deleted copy constructor. @SINCE_1_0.0
-  SignalConnection(SignalConnection&&)      = delete;            ///< Deleted move constructor. @SINCE_1_9.25
   SignalConnection& operator=(const SignalConnection&) = delete; ///< Deleted copy assignment operator. @SINCE_1_0.0
-  SignalConnection& operator=(SignalConnection&&) = delete;      ///< Deleted move assignment operator. @SINCE_1_9.25
+
+  /**
+   * @brief Move constructor.
+   *
+   * A move constructor enables the resources owned by an rvalue object to be moved into an lvalue without copying.
+   * @SINCE_1_9.38
+   * @param[in] connection The property value to move from
+   */
+  SignalConnection(SignalConnection&& connection) noexcept
+  : mSignalObserver(connection.mSignalObserver),
+    mCallback(connection.mCallback)
+  {
+    connection.mSignalObserver = nullptr;
+    connection.mCallback       = nullptr;
+  }
+
+  /**
+   * @brief Move assignment operator.
+   *
+   * @SINCE_1_9.38
+   * @param[in] connection The connection to move from
+   * @return a reference to this
+   */
+  SignalConnection& operator=(SignalConnection&& connection) noexcept
+  {
+    if(this != &connection)
+    {
+      // release the callback
+      delete mCallback;
+
+      mSignalObserver = connection.mSignalObserver;
+      mCallback       = connection.mCallback;
+
+      connection.mSignalObserver = nullptr;
+      connection.mCallback       = nullptr;
+    }
+    return *this;
+  }
+
+  explicit operator bool() const noexcept
+  {
+    return mCallback ? true : false;
+  }
 
 private:
-  SignalObserver* mSignalObserver; ///< a pointer to the signal observer (not owned)
-  CallbackBase*   mCallback;       ///< The callback, has ownership.
+  SignalObserver* mSignalObserver{nullptr}; ///< a pointer to the signal observer (not owned)
+  CallbackBase*   mCallback{nullptr};       ///< The callback, has ownership.
 };
 
 /**

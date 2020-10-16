@@ -39,12 +39,11 @@ void ConnectionTracker::DisconnectAll()
 
   for(std::size_t i = 0; i < size; ++i)
   {
-    SlotConnection* connection = mConnections[i];
+    auto& connection = mConnections[i];
 
     // Tell the signal that the slot is disconnected
-    connection->GetSlotObserver()->SlotDisconnected(connection->GetCallback());
+    connection.GetSlotObserver()->SlotDisconnected(connection.GetCallback());
 
-    delete connection;
   }
 
   mConnections.Clear();
@@ -52,8 +51,7 @@ void ConnectionTracker::DisconnectAll()
 
 void ConnectionTracker::SignalConnected(SlotObserver* slotObserver, CallbackBase* callback)
 {
-  SlotConnection* connection = new SlotConnection(slotObserver, callback);
-  mConnections.PushBack(connection);
+  mConnections.PushBack(SlotConnection(slotObserver, callback));
 }
 
 void ConnectionTracker::SignalDisconnected(SlotObserver* signal, CallbackBase* callback)
@@ -62,16 +60,13 @@ void ConnectionTracker::SignalDisconnected(SlotObserver* signal, CallbackBase* c
 
   for(std::size_t i = 0; i < size; ++i)
   {
-    SlotConnection* connection = mConnections[i];
+    auto& connection = mConnections[i];
 
     // Pointer comparison i.e. SignalConnection contains pointer to same callback instance
-    if(connection->GetCallback() == callback)
+    if(connection.GetCallback() == callback)
     {
       // Remove from connection list
       mConnections.Erase(mConnections.Begin() + i);
-
-      // Delete connection
-      delete connection;
 
       // Disconnection complete
       return;
