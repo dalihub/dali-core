@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <cstdint> // uint32_t
+#include <cstdint> // uint32_t, uint8_t
 
 // INTERNAL INCLUDES
 #include <dali/public-api/animation/alpha-function.h>
@@ -131,7 +131,7 @@ public:
    * @brief Enumeration for what to do when the animation ends, is stopped, or is destroyed.
    * @SINCE_1_0.0
    */
-  enum EndAction
+  enum EndAction : uint8_t
   {
     BAKE,      ///< When the animation ends, the animated property values are saved. @SINCE_1_0.0
     DISCARD,   ///< When the animation ends, the animated property values are forgotten. @SINCE_1_0.0
@@ -142,7 +142,7 @@ public:
    * @brief Enumeration for what interpolation method to use on key-frame animations.
    * @SINCE_1_0.0
    */
-  enum Interpolation
+  enum Interpolation : uint8_t
   {
     LINEAR, ///< Values in between key frames are interpolated using a linear polynomial. (Default) @SINCE_1_0.0
     CUBIC   ///< Values in between key frames are interpolated using a cubic polynomial. @SINCE_1_0.0
@@ -155,7 +155,7 @@ public:
    *
    * @SINCE_1_1.21
    */
-  enum State
+  enum State : uint8_t
   {
     STOPPED, ///< Animation has stopped @SINCE_1_1.21
     PLAYING, ///< The animation is playing @SINCE_1_1.21
@@ -167,7 +167,7 @@ public:
    *
    * @SINCE_1_2.60
    */
-  enum LoopingMode
+  enum LoopingMode : uint8_t
   {
     RESTART,     ///< When the animation arrives at the end in looping mode, the animation restarts from the beginning. @SINCE_1_2.60
     AUTO_REVERSE ///< When the animation arrives at the end in looping mode, the animation reverses direction and runs backwards again. @SINCE_1_2.60

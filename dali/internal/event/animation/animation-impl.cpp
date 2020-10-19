@@ -137,7 +137,6 @@ void ValidateParameters( Property::Type propertyType, Property::Type destination
 
 } // anonymous namespace
 
-
 AnimationPtr Animation::New(float durationSeconds)
 {
   if( durationSeconds < 0.0f )
@@ -155,26 +154,13 @@ AnimationPtr Animation::New(float durationSeconds)
   return animation;
 }
 
-Animation::Animation( EventThreadServices& eventThreadServices, AnimationPlaylist& playlist, float durationSeconds, EndAction endAction, EndAction disconnectAction, AlphaFunction defaultAlpha )
-: mAnimation( nullptr ),
-  mEventThreadServices( eventThreadServices ),
-  mPlaylist( playlist ),
-  mFinishedSignal(),
-  mConnectors(),
-  mConnectorTargetValues(),
-  mPlayRange( Vector2(0.0f,1.0f)),
-  mDurationSeconds( durationSeconds ),
-  mSpeedFactor(1.0f),
-  mNotificationCount( 0 ),
-  mLoopCount(1),
-  mCurrentLoop(0),
-  mEndAction( endAction ),
-  mDisconnectAction( disconnectAction ),
-  mDefaultAlpha( defaultAlpha ),
-  mState(Dali::Animation::STOPPED),
-  mProgressReachedMarker( 0.0f ),
-  mDelaySeconds( 0.0f ),
-  mAutoReverseEnabled( false )
+Animation::Animation(EventThreadServices& eventThreadServices, AnimationPlaylist& playlist, float durationSeconds, EndAction endAction, EndAction disconnectAction, AlphaFunction defaultAlpha)
+: mEventThreadServices(eventThreadServices),
+  mPlaylist(playlist),
+  mDefaultAlpha(defaultAlpha),
+  mDurationSeconds(durationSeconds),
+  mEndAction(endAction),
+  mDisconnectAction(disconnectAction)
 {
 }
 

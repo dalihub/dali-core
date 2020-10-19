@@ -61,12 +61,11 @@ using AnimationConstIter = AnimationContainer::const_iterator;
 class Animation : public BaseObject
 {
 public:
-
-  enum Type
+  enum Type : uint8_t
   {
-    TO,      ///< Animating TO the given value
-    BY,      ///< Animating BY the given value
-    BETWEEN  ///< Animating BETWEEN key-frames
+    TO,     ///< Animating TO the given value
+    BY,     ///< Animating BY the given value
+    BETWEEN ///< Animating BETWEEN key-frames
   };
 
   using EndAction     = Dali::Animation::EndAction;
@@ -492,7 +491,7 @@ private:
     Animation::Type animatorType{TO};
   };
 
-  enum class Notify
+  enum class Notify : uint8_t
   {
     USE_CURRENT_VALUE,   ///< Set the current value for the property
     USE_TARGET_VALUE,    ///< Set the animator's target value for the property
@@ -521,36 +520,33 @@ private:
   void SendFinalProgressNotificationMessage();
 
 private:
+  using AnimatorConnectorContainer     = OwnerContainer<AnimatorConnectorBase*>;
+  using ConnectorTargetValuesContainer = std::vector<ConnectorTargetValues>;
 
-  const SceneGraph::Animation* mAnimation;
+  const SceneGraph::Animation* mAnimation{ nullptr };
 
   EventThreadServices& mEventThreadServices;
-  AnimationPlaylist& mPlaylist;
+  AnimationPlaylist&   mPlaylist;
 
-  Dali::Animation::AnimationSignalType mFinishedSignal;
+  Dali::Animation::AnimationSignalType mFinishedSignal{};
+  Dali::Animation::AnimationSignalType mProgressReachedSignal{};
 
-  Dali::Animation::AnimationSignalType mProgressReachedSignal;
+  AnimatorConnectorContainer     mConnectors{};            ///< Owned by the Animation
+  ConnectorTargetValuesContainer mConnectorTargetValues{}; //< Used to store animating property target value information
 
-  using AnimatorConnectorContainer = OwnerContainer<AnimatorConnectorBase*>;
-  AnimatorConnectorContainer mConnectors; ///< Owned by the Animation
-
-  using ConnectorTargetValuesContainer = std::vector<ConnectorTargetValues>;
-  ConnectorTargetValuesContainer mConnectorTargetValues; //< Used to store animating property target value information
-
-  Vector2 mPlayRange;
-
-  float mDurationSeconds;
-  float mSpeedFactor;
-  int32_t mNotificationCount; ///< Keep track of how many Finished signals have been emitted.
-  int32_t mLoopCount;
-  int32_t mCurrentLoop;
-  EndAction mEndAction;
-  EndAction mDisconnectAction;
-  AlphaFunction mDefaultAlpha;
-  Dali::Animation::State mState;
-  float mProgressReachedMarker;
-  float mDelaySeconds;
-  bool mAutoReverseEnabled;  ///< Flag to identify that the looping mode is auto reverse.
+  AlphaFunction          mDefaultAlpha;
+  Vector2                mPlayRange{0.0f, 1.0f};
+  float                  mDurationSeconds;
+  float                  mSpeedFactor{1.0f};
+  int32_t                mNotificationCount{0}; ///< Keep track of how many Finished signals have been emitted.
+  int32_t                mLoopCount{1};
+  int32_t                mCurrentLoop{0};
+  float                  mProgressReachedMarker{0.0f};
+  float                  mDelaySeconds{0.0f};
+  EndAction              mEndAction;
+  EndAction              mDisconnectAction;
+  Dali::Animation::State mState{Dali::Animation::STOPPED};
+  bool                   mAutoReverseEnabled{false}; ///< Flag to identify that the looping mode is auto reverse.
 };
 
 } // namespace Internal
