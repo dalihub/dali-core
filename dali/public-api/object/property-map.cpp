@@ -98,22 +98,16 @@ bool Property::Map::Empty() const
   return mImpl->mStringValueContainer.empty() && mImpl->mIndexValueContainer.empty();
 }
 
-void Property::Map::Insert(const char* key, const Value& value)
+void Property::Map::Insert(std::string key, Value value)
 {
   DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
-  mImpl->mStringValueContainer.push_back(std::make_pair(key, value));
+  mImpl->mStringValueContainer.push_back(std::make_pair(std::move(key), std::move(value)));
 }
 
-void Property::Map::Insert(const std::string& key, const Value& value)
+void Property::Map::Insert(Property::Index key, Value value)
 {
   DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
-  mImpl->mStringValueContainer.push_back(std::make_pair(key, value));
-}
-
-void Property::Map::Insert(Property::Index key, const Value& value)
-{
-  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
-  mImpl->mIndexValueContainer.push_back(std::make_pair(key, value));
+  mImpl->mIndexValueContainer.push_back(std::make_pair(key, std::move(value)));
 }
 
 Property::Value& Property::Map::GetValue(SizeType position) const
@@ -194,29 +188,22 @@ KeyValuePair Property::Map::GetKeyValue(SizeType position) const
   }
   else
   {
-    Key          key(mImpl->mIndexValueContainer[position - numStringKeys].first);
-    KeyValuePair keyValue(key, mImpl->mIndexValueContainer[position - numStringKeys].second);
-    return keyValue;
+    return mImpl->mIndexValueContainer[position - numStringKeys];
   }
 }
 
-Property::Value* Property::Map::Find(const char* key) const
+Property::Value* Property::Map::Find(std::string_view key) const
 {
   DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
 
   for(auto&& iter : mImpl->mStringValueContainer)
   {
-    if(iter.first == key)
+    if(key == iter.first)
     {
       return &iter.second;
     }
   }
   return nullptr; // Not found
-}
-
-Property::Value* Property::Map::Find(const std::string& key) const
-{
-  return Find(key.c_str());
 }
 
 Property::Value* Property::Map::Find(Property::Index key) const
@@ -233,7 +220,7 @@ Property::Value* Property::Map::Find(Property::Index key) const
   return nullptr; // Not found
 }
 
-Property::Value* Property::Map::Find(Property::Index indexKey, const std::string& stringKey) const
+Property::Value* Property::Map::Find(Property::Index indexKey, std::string_view stringKey) const
 {
   Property::Value* valuePtr = Find(indexKey);
   if(!valuePtr)
@@ -243,13 +230,13 @@ Property::Value* Property::Map::Find(Property::Index indexKey, const std::string
   return valuePtr;
 }
 
-Property::Value* Property::Map::Find(const std::string& key, Property::Type type) const
+Property::Value* Property::Map::Find(std::string_view key, Property::Type type) const
 {
   DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
 
   for(auto&& iter : mImpl->mStringValueContainer)
   {
-    if((iter.second.GetType() == type) && (iter.first == key))
+    if((iter.second.GetType() == type) && (key == iter.first))
     {
       return &iter.second;
     }
@@ -306,7 +293,7 @@ void Property::Map::Merge(const Property::Map& from)
   }
 }
 
-const Property::Value& Property::Map::operator[](const std::string& key) const
+const Property::Value& Property::Map::operator[](std::string_view key) const
 {
   DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
 
@@ -321,7 +308,7 @@ const Property::Value& Property::Map::operator[](const std::string& key) const
   DALI_ASSERT_ALWAYS(!"Invalid Key");
 }
 
-Property::Value& Property::Map::operator[](const std::string& key)
+Property::Value& Property::Map::operator[](std::string_view key)
 {
   DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
 
@@ -334,8 +321,8 @@ Property::Value& Property::Map::operator[](const std::string& key)
   }
 
   // Create and return reference to new value
-  mImpl->mStringValueContainer.push_back(std::make_pair(key, Property::Value()));
-  return (mImpl->mStringValueContainer.end() - 1)->second;
+  mImpl->mStringValueContainer.push_back(std::make_pair(std::string(key), Property::Value()));
+  return mImpl->mStringValueContainer.back().second;
 }
 
 const Property::Value& Property::Map::operator[](Property::Index key) const
@@ -367,7 +354,7 @@ Property::Value& Property::Map::operator[](Property::Index key)
 
   // Create and return reference to new value
   mImpl->mIndexValueContainer.push_back(std::make_pair(key, Property::Value()));
-  return (mImpl->mIndexValueContainer.end() - 1)->second;
+  return mImpl->mIndexValueContainer.back().second;
 }
 
 Property::Map& Property::Map::operator=(const Property::Map& other)

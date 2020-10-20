@@ -22,6 +22,7 @@
 #include <initializer_list>
 #include <sstream>
 #include <string>
+#include <string_view>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -109,17 +110,7 @@ public:
    * @param[in] key The key to insert
    * @param[in] value The value to insert
    */
-  void Insert(const char* key, const Value& value);
-
-  /**
-   * @brief Inserts the key-value pair in the Map, with the key type as string.
-   *
-   * Does not check for duplicates.
-   * @SINCE_1_0.0
-   * @param[in] key The key to insert
-   * @param[in] value The value to insert
-   */
-  void Insert(const std::string& key, const Value& value);
+  void Insert(std::string key, Value value);
 
   /**
    * @brief Inserts the key-value pair in the Map, with the key type as index.
@@ -129,7 +120,7 @@ public:
    * @param[in] key The key to insert
    * @param[in] value The value to insert
    */
-  void Insert(Property::Index key, const Value& value);
+  void Insert(Property::Index key, Value value);
 
   /**
    * @brief Inserts the key-value pair in the Map, with the key type as string.
@@ -140,24 +131,9 @@ public:
    * @param value to insert
    * @return a reference to this object
    */
-  inline Property::Map& Add(const char* key, const Value& value)
+  Property::Map& Add(std::string key, Value value)
   {
-    Insert(key, value);
-    return *this;
-  }
-
-  /**
-   * @brief Inserts the key-value pair in the Map, with the key type as string.
-   *
-   * Does not check for duplicates
-   * @SINCE_1_2.5
-   * @param key to insert
-   * @param value to insert
-   * @return a reference to this object
-   */
-  inline Property::Map& Add(const std::string& key, const Value& value)
-  {
-    Insert(key, value);
+    Insert(std::move(key), std::move(value));
     return *this;
   }
 
@@ -170,9 +146,9 @@ public:
    * @param value to insert
    * @return a reference to this object
    */
-  inline Property::Map& Add(Property::Index key, const Value& value)
+  Property::Map& Add(Property::Index key, Value value)
   {
-    Insert(key, value);
+    Insert(key, std::move(value));
     return *this;
   }
 
@@ -243,17 +219,7 @@ public:
    *
    * @return A const pointer to the value if it exists, NULL otherwise
    */
-  Value* Find(const char* key) const;
-
-  /**
-   * @brief Finds the value for the specified key if it exists.
-   *
-   * @SINCE_1_0.0
-   * @param[in] key The key to find
-   *
-   * @return A const pointer to the value if it exists, NULL otherwise
-   */
-  Value* Find(const std::string& key) const;
+  Value* Find(std::string_view key) const;
 
   /**
    * @brief Finds the value for the specified key if it exists.
@@ -276,7 +242,7 @@ public:
    *
    * @return A const pointer to the value if it exists, NULL otherwise
    */
-  Value* Find(Property::Index indexKey, const std::string& stringKey) const;
+  Value* Find(Property::Index indexKey, std::string_view stringKey) const;
 
   /**
    * @brief Finds the value for the specified key if it exists and its type is type.
@@ -287,7 +253,7 @@ public:
    *
    * @return A const pointer to the value if it exists, NULL otherwise
    */
-  Value* Find(const std::string& key, Property::Type type) const;
+  Value* Find(std::string_view key, Property::Type type) const;
 
   /**
    * @brief Finds the value for the specified key if it exists and its type is type.
@@ -326,7 +292,7 @@ public:
    *
    * @note Will assert if invalid-key is given.
    */
-  const Value& operator[](const std::string& key) const;
+  const Value& operator[](std::string_view key) const;
 
   /**
    * @brief Operator to access the element with the specified string key.
@@ -338,7 +304,7 @@ public:
    *
    * @note If an element with the key does not exist, then it is created.
    */
-  Value& operator[](const std::string& key);
+  Value& operator[](std::string_view key);
 
   /**
    * @brief Const operator to access element with the specified index key.
