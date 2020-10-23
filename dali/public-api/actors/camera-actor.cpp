@@ -47,18 +47,11 @@ CameraActor CameraActor::DownCast(BaseHandle handle)
   return CameraActor(dynamic_cast<Dali::Internal::CameraActor*>(handle.GetObjectPtr()));
 }
 
-CameraActor::CameraActor()
-{
-}
+CameraActor::CameraActor() = default;
 
-CameraActor::~CameraActor()
-{
-}
+CameraActor::~CameraActor() = default;
 
-CameraActor::CameraActor(const CameraActor& copy)
-: Actor(copy)
-{
-}
+CameraActor::CameraActor(const CameraActor& copy) = default;
 
 CameraActor& CameraActor::operator=(const CameraActor& rhs)
 {

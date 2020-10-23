@@ -351,9 +351,7 @@ RenderInstructionProcessor::RenderInstructionProcessor()
   mSortComparitors.PushBack( CompareItems3DWithClipping );
 }
 
-RenderInstructionProcessor::~RenderInstructionProcessor()
-{
-}
+RenderInstructionProcessor::~RenderInstructionProcessor() = default;
 
 inline void RenderInstructionProcessor::SortRenderItems( BufferIndex bufferIndex, RenderList& renderList, Layer& layer, bool respectClippingOrder )
 {

@@ -41,12 +41,12 @@ public:
   /**
    * @brief Default constructor.
    */
-  ObjectConnector() {}
+  ObjectConnector() = default;
 
   /**
    * @brief Destructor.
    */
-  ~ObjectConnector() {}
+  ~ObjectConnector() = default;
 
   /**
    * @brief Copy constructor

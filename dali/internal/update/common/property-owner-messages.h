@@ -98,9 +98,7 @@ public:
   /**
    * Virtual destructor
    */
-  ~AnimatablePropertyMessage() override
-  {
-  }
+  ~AnimatablePropertyMessage() override = default;
 
   /**
    * @copydoc MessageBase::Process
@@ -176,9 +174,7 @@ public:
   /**
    * Virtual destructor
    */
-  ~AnimatablePropertyComponentMessage() override
-  {
-  }
+  ~AnimatablePropertyComponentMessage() override = default;
 
   /**
    * @copydoc MessageBase::Process

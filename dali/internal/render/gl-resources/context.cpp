@@ -111,9 +111,7 @@ Context::Context( Integration::GlAbstraction& glAbstraction, OwnerContainer< Con
 {
 }
 
-Context::~Context()
-{
-}
+Context::~Context() = default;
 
 void Context::GlContextCreated()
 {

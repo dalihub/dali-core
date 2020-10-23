@@ -60,9 +60,7 @@ struct BitmapResourceType
   /**
    * Destructor.
    */
-  ~BitmapResourceType()
-  {
-  }
+  ~BitmapResourceType() = default;
 
   /**
    * Attributes are copied from the request.

@@ -41,9 +41,7 @@ public:
   {
   }
 
-  virtual ~KeyFrameChannelBase()
-  {
-  }
+  virtual ~KeyFrameChannelBase() = default;
 
   KeyFrameChannelId GetId() const
   {
@@ -69,10 +67,7 @@ public:
   {
   }
 
-
-  ~KeyFrameChannel() override
-  {
-  }
+  ~KeyFrameChannel() override = default;
 
   bool IsActive (float progress) override;
 

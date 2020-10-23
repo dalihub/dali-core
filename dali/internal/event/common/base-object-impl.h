@@ -70,7 +70,7 @@ public:
     /**
      * Virtual destructor
      */
-    virtual ~Observer() {}
+    virtual ~Observer() = default;
   };
 
   /**

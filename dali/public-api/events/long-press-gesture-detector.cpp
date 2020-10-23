@@ -28,9 +28,7 @@ LongPressGestureDetector::LongPressGestureDetector(Internal::LongPressGestureDet
 {
 }
 
-LongPressGestureDetector::LongPressGestureDetector()
-{
-}
+LongPressGestureDetector::LongPressGestureDetector() = default;
 
 LongPressGestureDetector LongPressGestureDetector::New()
 {
@@ -58,14 +56,9 @@ LongPressGestureDetector LongPressGestureDetector::DownCast(BaseHandle handle)
   return LongPressGestureDetector(dynamic_cast<Dali::Internal::LongPressGestureDetector*>(handle.GetObjectPtr()));
 }
 
-LongPressGestureDetector::~LongPressGestureDetector()
-{
-}
+LongPressGestureDetector::~LongPressGestureDetector() = default;
 
-LongPressGestureDetector::LongPressGestureDetector(const LongPressGestureDetector& handle)
-: GestureDetector(handle)
-{
-}
+LongPressGestureDetector::LongPressGestureDetector(const LongPressGestureDetector& handle) = default;
 
 LongPressGestureDetector& LongPressGestureDetector::operator=(const LongPressGestureDetector& rhs)
 {

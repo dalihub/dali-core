@@ -40,9 +40,7 @@ RenderMessageDispatcher::RenderMessageDispatcher( RenderManager& renderManager, 
 {
 }
 
-RenderMessageDispatcher::~RenderMessageDispatcher()
-{
-}
+RenderMessageDispatcher::~RenderMessageDispatcher() = default;
 
 void RenderMessageDispatcher::AddRenderer( OwnerPointer< Render::Renderer >& renderer )
 {

@@ -249,9 +249,7 @@ BlendingOptions::BlendingOptions()
   SetBlendEquation( BlendEquation::ADD, BlendEquation::ADD );
 }
 
-BlendingOptions::~BlendingOptions()
-{
-}
+BlendingOptions::~BlendingOptions() = default;
 
 void BlendingOptions::SetBitmask( unsigned int bitmask )
 {

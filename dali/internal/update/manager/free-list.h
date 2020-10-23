@@ -49,8 +49,7 @@ struct FreeList
   /**
    * Destructor
    */
-  ~FreeList()
-  {}
+  ~FreeList() = default;
 
   /**
    * Adds a new item to the list. If there is no more space in the vector it will

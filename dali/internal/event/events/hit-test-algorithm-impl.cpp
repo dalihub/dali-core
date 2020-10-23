@@ -603,9 +603,7 @@ bool HitTestForEachRenderTask( const Vector2& sceneSize,
 
 } // unnamed namespace
 
-HitTestInterface::~HitTestInterface()
-{
-}
+HitTestInterface::~HitTestInterface() = default;
 
 bool HitTest( const Vector2& sceneSize, RenderTaskList& taskList, LayerList& layerList, const Vector2& screenCoordinates, Dali::HitTestAlgorithm::Results& results, Dali::HitTestAlgorithm::HitTestFunction func )
 {

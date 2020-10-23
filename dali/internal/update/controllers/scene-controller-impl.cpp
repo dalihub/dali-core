@@ -38,9 +38,7 @@ SceneControllerImpl::SceneControllerImpl( RenderMessageDispatcher& renderMessage
 {
 }
 
-SceneControllerImpl::~SceneControllerImpl()
-{
-}
+SceneControllerImpl::~SceneControllerImpl() = default;
 
 } // namespace SceneGraph
 

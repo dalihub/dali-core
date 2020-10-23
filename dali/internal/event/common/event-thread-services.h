@@ -54,8 +54,7 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~EventThreadServices()
-  { }
+  virtual ~EventThreadServices() = default;
 
   /**
    * Get the EventThreadServices

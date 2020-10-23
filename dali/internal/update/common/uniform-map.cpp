@@ -23,10 +23,7 @@ namespace Internal
 {
 namespace SceneGraph
 {
-
-UniformMap::UniformMap()
-{
-}
+UniformMap::UniformMap() = default;
 
 UniformMap::~UniformMap()
 {

@@ -38,29 +38,18 @@ Scene Scene::DownCast(BaseHandle handle)
   return Scene(dynamic_cast<Dali::Internal::Scene*>(handle.GetObjectPtr()));
 }
 
-Scene::Scene()
-{
-}
+Scene::Scene() = default;
 
-Scene::~Scene()
-{
-}
+Scene::~Scene() = default;
 
-Scene::Scene(const Scene& handle)
-: BaseHandle(handle)
-{
-}
+Scene::Scene(const Scene& handle) = default;
 
 Scene::Scene(Internal::Scene* internal)
 : BaseHandle(internal)
 {
 }
 
-Scene& Scene::operator=(const Scene& rhs)
-{
-  BaseHandle::operator=(rhs);
-  return *this;
-}
+Scene& Scene::operator=(const Scene& rhs) = default;
 
 void Scene::Add(Actor actor)
 {

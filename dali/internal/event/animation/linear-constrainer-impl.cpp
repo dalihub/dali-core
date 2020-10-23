@@ -63,9 +63,7 @@ LinearConstrainer::LinearConstrainer()
 {
 }
 
-LinearConstrainer::~LinearConstrainer()
-{
-}
+LinearConstrainer::~LinearConstrainer() = default;
 
 Property::Value LinearConstrainer::GetDefaultProperty( Property::Index index ) const
 {

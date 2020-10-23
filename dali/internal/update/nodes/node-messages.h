@@ -95,9 +95,7 @@ public:
   /**
    * Virtual destructor
    */
-  ~NodePropertyMessage() override
-  {
-  }
+  ~NodePropertyMessage() override = default;
 
   /**
    * @copydoc MessageBase::Process
@@ -175,9 +173,7 @@ public:
   /**
    * Virtual destructor
    */
-  ~NodePropertyComponentMessage() override
-  {
-  }
+  ~NodePropertyComponentMessage() override = default;
 
   /**
    * @copydoc MessageBase::Process
@@ -253,9 +249,7 @@ public:
   /**
    * Virtual destructor
    */
-  ~NodeTransformPropertyMessage() override
-  {
-  }
+  ~NodeTransformPropertyMessage() override = default;
 
   /**
    * @copydoc MessageBase::Process
@@ -331,9 +325,7 @@ public:
   /**
    * Virtual destructor
    */
-  ~NodeTransformComponentMessage() override
-  {
-  }
+  ~NodeTransformComponentMessage() override = default;
 
   /**
    * @copydoc MessageBase::Process

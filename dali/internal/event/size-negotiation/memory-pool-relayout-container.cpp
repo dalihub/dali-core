@@ -29,9 +29,7 @@ MemoryPoolRelayoutContainer::MemoryPoolRelayoutContainer( MemoryPoolObjectAlloca
 {
 }
 
-MemoryPoolRelayoutContainer::~MemoryPoolRelayoutContainer()
-{
-}
+MemoryPoolRelayoutContainer::~MemoryPoolRelayoutContainer() = default;
 
 bool MemoryPoolRelayoutContainer::Contains( const Dali::Actor& actor )
 {

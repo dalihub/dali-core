@@ -77,8 +77,7 @@ public:
   /**
    * Virtual destructor.
    */
-  ~AnimatablePropertyBase() override
-  {}
+  ~AnimatablePropertyBase() override = default;
 
 protected: // for derived classes
 
@@ -144,9 +143,7 @@ public:
   /**
    * Virtual destructor.
    */
-  ~AnimatableProperty() override
-  {
-  }
+  ~AnimatableProperty() override = default;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
@@ -317,9 +314,7 @@ public:
   /**
    * Virtual destructor.
    */
-  ~AnimatableProperty() override
-  {
-  }
+  ~AnimatableProperty() override = default;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
@@ -498,9 +493,7 @@ public:
   /**
    * Virtual destructor.
    */
-  ~AnimatableProperty() override
-  {
-  }
+  ~AnimatableProperty() override = default;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
@@ -680,9 +673,7 @@ public:
   /**
    * Virtual destructor.
    */
-  ~AnimatableProperty() override
-  {
-  }
+  ~AnimatableProperty() override = default;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
@@ -952,9 +943,7 @@ public:
   /**
    * Virtual destructor.
    */
-  ~AnimatableProperty() override
-  {
-  }
+  ~AnimatableProperty() override = default;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
@@ -1278,9 +1267,7 @@ public:
   /**
    * Virtual destructor.
    */
-  ~AnimatableProperty() override
-  {
-  }
+  ~AnimatableProperty() override = default;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
@@ -1663,9 +1650,7 @@ public:
   /**
    * Virtual destructor.
    */
-  ~AnimatableProperty() override
-  {
-  }
+  ~AnimatableProperty() override = default;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
@@ -1822,9 +1807,7 @@ public:
   /**
    * Virtual destructor.
    */
-  ~AnimatableProperty() override
-  {
-  }
+  ~AnimatableProperty() override = default;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
@@ -1985,9 +1968,7 @@ public:
   /**
    * Virtual destructor.
    */
-  ~AnimatableProperty() override
-  {
-  }
+  ~AnimatableProperty() override = default;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()

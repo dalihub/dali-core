@@ -57,9 +57,7 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~PropertyInputImpl()
-  {
-  }
+  virtual ~PropertyInputImpl() = default;
 
   /**
    * Query the type of property input.

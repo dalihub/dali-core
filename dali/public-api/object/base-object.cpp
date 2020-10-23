@@ -34,9 +34,7 @@ BaseObject::BaseObject()
 {
 }
 
-BaseObject::~BaseObject()
-{
-}
+BaseObject::~BaseObject() = default;
 
 void BaseObject::RegisterObject()
 {

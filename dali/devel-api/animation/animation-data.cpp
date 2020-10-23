@@ -20,9 +20,7 @@
 
 namespace Dali
 {
-AnimationData::AnimationData()
-{
-}
+AnimationData::AnimationData() = default;
 
 AnimationData::~AnimationData()
 {

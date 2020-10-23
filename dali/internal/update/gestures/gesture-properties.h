@@ -62,9 +62,7 @@ public:
   /**
    * Virtual destructor.
    */
-  ~GestureProperty() override
-  {
-  }
+  ~GestureProperty() override = default;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
@@ -151,9 +149,7 @@ public:
   /**
    * Virtual destructor.
    */
-  ~GesturePropertyVector2() override
-  {
-  }
+  ~GesturePropertyVector2() override = default;
 
   /**
    * @copydoc Dali::PropertyInput::GetVector2()
@@ -174,9 +170,7 @@ public:
   /**
    * Virtual destructor.
    */
-  ~GesturePropertyBool() override
-  {
-  }
+  ~GesturePropertyBool() override = default;
 
   /**
    * @copydoc Dali::PropertyInput::GetBoolean()

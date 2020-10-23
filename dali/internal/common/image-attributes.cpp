@@ -39,18 +39,9 @@ struct ImageAttributes::ImageAttributesImpl
   {
   }
 
-  ~ImageAttributesImpl()
-  {
-  }
+  ~ImageAttributesImpl() = default;
 
-  ImageAttributesImpl(const ImageAttributesImpl& rhs)
-  : width( rhs.width ),
-    height( rhs.height ),
-    scaling( rhs.scaling ),
-    filtering( rhs.filtering ),
-    mOrientationCorrection( rhs.mOrientationCorrection )
-  {
-  }
+  ImageAttributesImpl(const ImageAttributesImpl& rhs) = default;
 
   ImageAttributesImpl& operator=(const ImageAttributesImpl& rhs)
   {

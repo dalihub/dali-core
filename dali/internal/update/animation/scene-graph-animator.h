@@ -55,12 +55,12 @@ struct AnimatorFunctionBase
   /**
    * Constructor
    */
-  AnimatorFunctionBase() {}
+  AnimatorFunctionBase() = default;
 
   /*
    * Virtual destructor (Intended as base class)
    */
-  virtual ~AnimatorFunctionBase() {}
+  virtual ~AnimatorFunctionBase() = default;
 
   ///Stub "()" operators.
   virtual bool operator()(float progress, const bool& property)
@@ -610,9 +610,7 @@ public:
   /**
    * Virtual destructor.
    */
-  ~Animator() override
-  {
-  }
+  ~Animator() override = default;
 
   /**
    * @copydoc AnimatorBase::DoUpdate( BufferIndex bufferIndex, bool bake, float alpha )
@@ -699,9 +697,7 @@ public:
   /**
    * Virtual destructor.
    */
-  ~AnimatorTransformProperty() override
-  {
-  }
+  ~AnimatorTransformProperty() override = default;
 
   /**
    * @copydoc AnimatorBase::DoUpdate( BufferIndex bufferIndex, bool bake, float alpha )

@@ -32,9 +32,7 @@ protected:
   /**
    * Virtual protected destructor, no deletion through this interface
    */
-  virtual ~RenderController()
-  {
-  }
+  virtual ~RenderController() = default;
 
 public:
   /**

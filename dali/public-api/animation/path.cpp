@@ -34,13 +34,9 @@ Path Path::DownCast(BaseHandle handle)
   return Path(dynamic_cast<Dali::Internal::Path*>(handle.GetObjectPtr()));
 }
 
-Path::Path()
-{
-}
+Path::Path() = default;
 
-Path::~Path()
-{
-}
+Path::~Path() = default;
 
 Path::Path(const Path& handle) = default;
 

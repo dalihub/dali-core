@@ -39,9 +39,7 @@ public:
   /**
    * Constructor
    */
-  UniformMapDataProvider()
-  {
-  }
+  UniformMapDataProvider() = default;
 
   /**
    * Return true if the uniform map has been changed this frame
@@ -66,9 +64,7 @@ protected:
   /**
    * No deletion through this interface
    */
-  virtual ~UniformMapDataProvider()
-  {
-  }
+  virtual ~UniformMapDataProvider() = default;
 };
 
 } // namespace SceneGraph

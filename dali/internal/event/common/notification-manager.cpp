@@ -86,9 +86,7 @@ struct NotificationManager::Impl
     eventInterfaceQueue.Reserve( 4 );
   }
 
-  ~Impl()
-  {
-  }
+  ~Impl() = default;
 
   // queueMutex must be locked whilst accessing queue
   MessageQueueMutex queueMutex;

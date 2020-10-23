@@ -44,9 +44,7 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~PropertyNotifier()
-  {
-  }
+  virtual ~PropertyNotifier() = default;
 
   /**
    * Provide notification signals for a changed property.

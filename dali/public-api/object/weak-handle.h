@@ -162,9 +162,7 @@ public:
   /**
    * @copydoc Dali::WeakHandleBase::~WeakHandleBase()
    */
-  ~WeakHandle()
-  {
-  }
+  ~WeakHandle() = default;
 
   /**
    * @copydoc Dali::WeakHandleBase::WeakHandleBase(const WeakHandleBase&)

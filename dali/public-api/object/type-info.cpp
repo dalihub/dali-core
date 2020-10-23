@@ -25,13 +25,9 @@
 
 namespace Dali
 {
-TypeInfo::TypeInfo()
-{
-}
+TypeInfo::TypeInfo() = default;
 
-TypeInfo::~TypeInfo()
-{
-}
+TypeInfo::~TypeInfo() = default;
 
 TypeInfo::TypeInfo(const TypeInfo& copy) = default;
 

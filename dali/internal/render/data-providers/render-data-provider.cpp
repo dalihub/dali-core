@@ -31,9 +31,7 @@ RenderDataProvider::RenderDataProvider( AnimatableProperty< float >& opacity )
 {
 }
 
-RenderDataProvider::~RenderDataProvider()
-{
-}
+RenderDataProvider::~RenderDataProvider() = default;
 
 void RenderDataProvider::SetUniformMap(const UniformMapDataProvider& uniformMapDataProvider)
 {

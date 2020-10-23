@@ -34,13 +34,9 @@ LinearConstrainer LinearConstrainer::DownCast(BaseHandle handle)
   return LinearConstrainer(dynamic_cast<Dali::Internal::LinearConstrainer*>(handle.GetObjectPtr()));
 }
 
-LinearConstrainer::LinearConstrainer()
-{
-}
+LinearConstrainer::LinearConstrainer() = default;
 
-LinearConstrainer::~LinearConstrainer()
-{
-}
+LinearConstrainer::~LinearConstrainer() = default;
 
 LinearConstrainer::LinearConstrainer(const LinearConstrainer& handle) = default;
 

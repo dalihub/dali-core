@@ -34,10 +34,7 @@ KeyFrames::KeyFrames()
 {
 }
 
-KeyFrames::~KeyFrames()
-{
-}
-
+KeyFrames::~KeyFrames() = default;
 
 void KeyFrames::CreateKeyFramesSpec(Property::Type type)
 {

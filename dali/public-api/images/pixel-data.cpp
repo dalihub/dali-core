@@ -34,13 +34,9 @@ PixelData PixelData::New(uint8_t*        buffer,
   return PixelData(internal.Get());
 }
 
-PixelData::PixelData()
-{
-}
+PixelData::PixelData() = default;
 
-PixelData::~PixelData()
-{
-}
+PixelData::~PixelData() = default;
 
 PixelData::PixelData(Internal::PixelData* internal)
 : BaseHandle(internal)

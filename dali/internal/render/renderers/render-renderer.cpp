@@ -165,9 +165,7 @@ void Renderer::Initialize( Context& context )
   mContext = &context;
 }
 
-Renderer::~Renderer()
-{
-}
+Renderer::~Renderer() = default;
 
 void Renderer::SetGeometry( Render::Geometry* geometry )
 {

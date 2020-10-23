@@ -400,9 +400,7 @@ Stage::Stage( SceneGraph::UpdateManager& updateManager )
 {
 }
 
-Stage::~Stage()
-{
-}
+Stage::~Stage() = default;
 
 } // namespace Internal
 

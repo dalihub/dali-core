@@ -50,9 +50,7 @@ protected:
   /**
    * Virtual destructor, no deletion through this interface
    */
-  virtual ~ContextNotifierInterface()
-  {
-  }
+  virtual ~ContextNotifierInterface() = default;
 };
 
 } // namespace Integration

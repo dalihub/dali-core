@@ -35,9 +35,7 @@ PinchGestureEvent::PinchGestureEvent(GestureState state)
 {
 }
 
-PinchGestureEvent::~PinchGestureEvent()
-{
-}
+PinchGestureEvent::~PinchGestureEvent() = default;
 
 } // namespace Internal
 

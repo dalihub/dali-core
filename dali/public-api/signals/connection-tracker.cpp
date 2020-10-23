@@ -24,9 +24,7 @@
 
 namespace Dali
 {
-ConnectionTracker::ConnectionTracker()
-{
-}
+ConnectionTracker::ConnectionTracker() = default;
 
 ConnectionTracker::~ConnectionTracker()
 {

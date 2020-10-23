@@ -61,9 +61,7 @@ public:
   /**
    * @brief Virtual Destructor.
    */
-  virtual ~PropertyMetadata()
-  {
-  }
+  virtual ~PropertyMetadata() = default;
 
   /**
    * @brief Returns whether the property is animatable (i.e. if its a scene graph property).
@@ -233,9 +231,7 @@ public:
   /**
    * @brief Destructor.
    */
-  ~AnimatablePropertyMetadata() override
-  {
-  }
+  ~AnimatablePropertyMetadata() override = default;
 
 private:
 
@@ -296,9 +292,7 @@ public:
   /**
    * @brief Destructor.
    */
-  ~CustomPropertyMetadata() override
-  {
-  }
+  ~CustomPropertyMetadata() override = default;
 
 private:
 

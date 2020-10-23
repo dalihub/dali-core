@@ -28,9 +28,7 @@ PinchGestureDetector::PinchGestureDetector(Internal::PinchGestureDetector* inter
 {
 }
 
-PinchGestureDetector::PinchGestureDetector()
-{
-}
+PinchGestureDetector::PinchGestureDetector() = default;
 
 PinchGestureDetector PinchGestureDetector::New()
 {
@@ -44,14 +42,9 @@ PinchGestureDetector PinchGestureDetector::DownCast(BaseHandle handle)
   return PinchGestureDetector(dynamic_cast<Dali::Internal::PinchGestureDetector*>(handle.GetObjectPtr()));
 }
 
-PinchGestureDetector::~PinchGestureDetector()
-{
-}
+PinchGestureDetector::~PinchGestureDetector() = default;
 
-PinchGestureDetector::PinchGestureDetector(const PinchGestureDetector& handle)
-: GestureDetector(handle)
-{
-}
+PinchGestureDetector::PinchGestureDetector(const PinchGestureDetector& handle) = default;
 
 PinchGestureDetector& PinchGestureDetector::operator=(const PinchGestureDetector& rhs)
 {

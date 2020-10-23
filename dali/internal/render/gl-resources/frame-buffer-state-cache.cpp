@@ -40,9 +40,7 @@ FrameBufferStateCache::FrameBufferStateCache()
 {
 }
 
-FrameBufferStateCache::~FrameBufferStateCache()
-{
-}
+FrameBufferStateCache::~FrameBufferStateCache() = default;
 
 GLbitfield FrameBufferStateCache::GetClearMask( GLbitfield mask, bool forceClear, bool scissorTestEnabled )
 {
