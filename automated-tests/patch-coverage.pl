@@ -54,7 +54,7 @@ sub add_counts($$);
 sub info(@);
 
 our $repo = Git->repository();
-our $debug=1;
+our $debug=0;
 our $pd_debug=0;
 our $root;
 our %info_data; # Hash containing all data from .info files
@@ -1316,7 +1316,7 @@ my $cwd = getcwd(); # expect this to be automated-tests folder
 
 # execute coverage.sh, generating build/tizen/dali.info from lib, and
 # *.dir/dali.info. Don't generate html
-`coverage.sh -n`;
+print `./coverage.sh -n`;
 chdir "..";
 $root = getcwd();
 
@@ -1338,12 +1338,7 @@ foreach (@info_files)
 my @cmd=('--no-pager','diff','--no-ext-diff','-U0','--no-color');
 my $status = $repo->command("status", "-s");
 
-if(scalar(@ARGV)) # REMOVE ME
-{
-    # REMOVE ME - temp to get past modifying this script in place.
-    push @cmd, @ARGV;
-}
-elsif( $status eq "" && !scalar(@ARGV))
+if( $status eq "" && !scalar(@ARGV))
 {
     # There are no changes in the index or working tree, and
     # no diff arguments to append. Use the last patch instead.
