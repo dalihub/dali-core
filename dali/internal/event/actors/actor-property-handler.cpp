@@ -574,6 +574,17 @@ void Actor::PropertyHandler::SetDefaultProperty( Internal::Actor& actor, Propert
       break;
     }
 
+    case Dali::DevelActor::Property::TOUCH_DELEGATE_AREA:
+    {
+      Vector2 vec2Value;
+      if( property.Get( vec2Value ) )
+      {
+        actor.SetTouchDelegateArea( vec2Value );
+      }
+      break;
+    }
+
+
     default:
     {
       // this can happen in the case of a non-animatable default property so just do nothing
@@ -1600,6 +1611,12 @@ bool Actor::PropertyHandler::GetCachedPropertyValue(const Internal::Actor& actor
     case Dali::DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START:
     {
       value = actor.mCaptureAllTouchAfterStart;
+      break;
+    }
+
+    case Dali::DevelActor::Property::TOUCH_DELEGATE_AREA:
+    {
+      value = actor.GetTouchDelegateArea();
       break;
     }
 

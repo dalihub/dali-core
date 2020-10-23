@@ -2121,3 +2121,66 @@ int UtcDaliTouchEventIntercept(void)
   END_TEST;
 }
 
+int UtcDaliTouchDelegateArea(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's touched signal
+  SignalData        data;
+  TouchEventFunctor functor(data, false /* Do not consume */);
+  actor.TouchedSignal().Connect(&application, functor);
+
+  // Emit a down signal
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(110.0f, 110.0f)));
+  // The actor touched signal is not called because the touch area is outside actor.
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // set a bigger touch delegate area
+  actor.SetProperty(DevelActor::Property::TOUCH_DELEGATE_AREA, Vector2(200.0f, 200.0f));
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Emit a down signal
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(110.0f, 110.0f)));
+  // The actor touched signal is called because the touch area is inside touchDelegateArea.
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::DOWN, data.receivedTouch.points[0].state, TEST_LOCATION);
+  DALI_TEST_CHECK(actor == data.receivedTouch.points[0].hitActor);
+  data.Reset();
+
+  // set a smaller touch delegate area
+  actor.SetProperty(DevelActor::Property::TOUCH_DELEGATE_AREA, Vector2(50.0f, 50.0f));
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Emit a down signal
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(80.0f, 80.0f)));
+  // The actor touched signal is not called because the touch area is outside touchDelegateArea.
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Emit a down signal
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(30.0f, 30.0f)));
+  // The actor touched signal is called because the touch area is inside touchDelegateArea.
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::DOWN, data.receivedTouch.points[0].state, TEST_LOCATION);
+  DALI_TEST_CHECK(actor == data.receivedTouch.points[0].hitActor);
+  data.Reset();
+
+  END_TEST;
+}
