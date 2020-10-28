@@ -44,9 +44,7 @@ public:
   {
   }
 
-  ~ProgressValue ()
-  {
-  }
+  ~ProgressValue() = default;
 
   float GetProgress () const
   {

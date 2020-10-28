@@ -29,13 +29,9 @@ namespace SceneGraph
 
 // Messages for a property owner
 
-PropertyOwnerMessageBase::PropertyOwnerMessageBase()
-{
-}
+PropertyOwnerMessageBase::PropertyOwnerMessageBase() = default;
 
-PropertyOwnerMessageBase::~PropertyOwnerMessageBase()
-{
-}
+PropertyOwnerMessageBase::~PropertyOwnerMessageBase() = default;
 
 } // namespace SceneGraph
 

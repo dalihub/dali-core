@@ -32,9 +32,7 @@ TouchEvent::TouchEvent(uint32_t time)
 {
 }
 
-TouchEvent::~TouchEvent()
-{
-}
+TouchEvent::~TouchEvent() = default;
 
 } // namespace Integration
 

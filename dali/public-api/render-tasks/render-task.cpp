@@ -48,18 +48,14 @@ const bool     RenderTask::DEFAULT_CLEAR_ENABLED = false;
 const bool     RenderTask::DEFAULT_CULL_MODE     = true;
 const uint32_t RenderTask::DEFAULT_REFRESH_RATE  = REFRESH_ALWAYS;
 
-RenderTask::RenderTask()
-{
-}
+RenderTask::RenderTask() = default;
 
 RenderTask RenderTask::DownCast(BaseHandle handle)
 {
   return RenderTask(dynamic_cast<Dali::Internal::RenderTask*>(handle.GetObjectPtr()));
 }
 
-RenderTask::~RenderTask()
-{
-}
+RenderTask::~RenderTask() = default;
 
 RenderTask::RenderTask(const RenderTask& handle) = default;
 

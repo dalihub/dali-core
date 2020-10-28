@@ -697,8 +697,7 @@ Texture::Texture( NativeImageInterfacePtr nativeImageInterface )
 {
 }
 
-Texture::~Texture()
-{}
+Texture::~Texture() = default;
 
 void Texture::Destroy( Context& context )
 {

@@ -113,9 +113,7 @@ Quaternion::Quaternion(const Vector3& v0, const Vector3& v1)
   }
 }
 
-Quaternion::~Quaternion()
-{
-}
+Quaternion::~Quaternion() = default;
 
 bool Quaternion::IsIdentity() const
 {

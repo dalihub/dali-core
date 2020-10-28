@@ -35,9 +35,7 @@ RenderInstructionContainer::RenderInstructionContainer()
 {
 }
 
-RenderInstructionContainer::~RenderInstructionContainer()
-{
-}
+RenderInstructionContainer::~RenderInstructionContainer() = default;
 
 void RenderInstructionContainer::ResetAndReserve( BufferIndex bufferIndex, uint32_t capacityRequired )
 {

@@ -30,10 +30,7 @@ PropertyCondition::PropertyCondition()
 
 }
 
-PropertyCondition::~PropertyCondition()
-{
-
-}
+PropertyCondition::~PropertyCondition() = default;
 
 } // namespace Internal
 

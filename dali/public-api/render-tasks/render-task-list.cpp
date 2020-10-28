@@ -23,18 +23,14 @@
 
 namespace Dali
 {
-RenderTaskList::RenderTaskList()
-{
-}
+RenderTaskList::RenderTaskList() = default;
 
 RenderTaskList RenderTaskList::DownCast(BaseHandle handle)
 {
   return RenderTaskList(dynamic_cast<Dali::Internal::RenderTaskList*>(handle.GetObjectPtr()));
 }
 
-RenderTaskList::~RenderTaskList()
-{
-}
+RenderTaskList::~RenderTaskList() = default;
 
 RenderTaskList::RenderTaskList(const RenderTaskList& handle) = default;
 

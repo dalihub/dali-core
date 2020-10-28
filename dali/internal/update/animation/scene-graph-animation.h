@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_ANIMATION_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -259,6 +259,16 @@ public:
   }
 
   /**
+   * Query whether the animation is currently active (i.e. at least one of the animators has been updated in either frame)
+   * @return True if the animation is currently active
+   */
+  bool IsActive() const
+  {
+    // As we have double buffering, if animator is updated in either frame, it needs to be rendered.
+    return mIsActive[0] || mIsActive[1];
+  }
+
+  /**
    * @brief Sets the looping mode.
    *
    * Animation plays forwards and then restarts from the beginning or runs backwards again.
@@ -349,6 +359,7 @@ protected:
 
   bool mProgressReachedSignalRequired;  // Flag to indicate the progress marker was hit
   bool mAutoReverseEnabled;             // Flag to identify that the looping mode is auto reverse.
+  bool mIsActive[2];                    // Flag to indicate whether the animation is active in the current frame (which is double buffered)
 };
 
 }; //namespace SceneGraph

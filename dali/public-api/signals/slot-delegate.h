@@ -92,9 +92,7 @@ public:
    *
    * @SINCE_1_0.0
    */
-  ~SlotDelegate()
-  {
-  }
+  ~SlotDelegate() = default;
 
   /**
    * @brief Disconnects all signals from this object.

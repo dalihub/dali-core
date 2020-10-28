@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,8 +49,14 @@ MemoryPoolObjectAllocator<Renderer> gRendererMemoryPool;
 void AddMappings( CollectedUniformMap& localMap, const UniformMap& uniformMap )
 {
   // Iterate thru uniformMap.
-  //   Any maps that aren't in localMap should be added in a single step
-  CollectedUniformMap newUniformMappings;
+  // Any maps that aren't in localMap should be added in a single step
+
+  // keep a static vector to avoid temporary heap allocation.
+  // As this function gets called only from update thread we don't have to
+  // make it thread safe (so no need to keep a thread_local variable).
+  static CollectedUniformMap newUniformMappings;
+
+  newUniformMappings.Clear();
 
   for( UniformMap::SizeType i = 0, count=uniformMap.Count(); i<count; ++i )
   {
@@ -175,7 +181,7 @@ void Renderer::operator delete( void* ptr )
 }
 
 
-void Renderer::PrepareRender( BufferIndex updateBufferIndex )
+bool Renderer::PrepareRender( BufferIndex updateBufferIndex )
 {
   if( mRegenerateUniformMap == UNIFORM_MAP_READY )
   {
@@ -214,6 +220,8 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
     mUniformMapChanged[updateBufferIndex] = true;
     mRegenerateUniformMap--;
   }
+
+  bool rendererUpdated = mUniformMapChanged[updateBufferIndex] || mResendFlag;
 
   if( mResendFlag != 0 )
   {
@@ -359,6 +367,8 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
 
     mResendFlag = 0;
   }
+
+  return rendererUpdated;
 }
 
 void Renderer::SetTextures( TextureSet* textureSet )

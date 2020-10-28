@@ -46,8 +46,7 @@ struct Sampler
   /**
    * Destructor
    */
-  ~Sampler()
-  {}
+  ~Sampler() = default;
 
   bool operator==(const Sampler& rhs) const
   {

@@ -42,9 +42,7 @@ FrameCallbackProcessor::FrameCallbackProcessor( UpdateManager& updateManager, Tr
 {
 }
 
-FrameCallbackProcessor::~FrameCallbackProcessor()
-{
-}
+FrameCallbackProcessor::~FrameCallbackProcessor() = default;
 
 void FrameCallbackProcessor::AddFrameCallback( OwnerPointer< FrameCallback >& frameCallback, const Node* rootNode )
 {

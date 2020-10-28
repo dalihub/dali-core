@@ -52,9 +52,7 @@ FrameBuffer::FrameBuffer( uint32_t width, uint32_t height, Mask attachments )
 {
 }
 
-FrameBuffer::~FrameBuffer()
-{
-}
+FrameBuffer::~FrameBuffer() = default;
 
 void FrameBuffer::Destroy( Context& context )
 {

@@ -1326,6 +1326,16 @@ public:
     return mKeyboardFocusable;
   }
 
+
+  /**
+   * Query whether the application or derived actor type requires intercept touch events.
+   * @return True if intercept touch events are required.
+   */
+  bool GetInterceptTouchRequired() const
+  {
+    return !mInterceptTouchedSignal.Empty();
+  }
+
   /**
    * Query whether the application or derived actor type requires touch events.
    * @return True if touch events are required.
@@ -1372,6 +1382,25 @@ public:
     return mCaptureAllTouchAfterStart;
   }
 
+  /**
+   * Sets the touch delegate area of an actor.
+   * @param [in] area The new area.
+   */
+  void SetTouchDelegateArea(Vector2 area)
+  {
+    mTouchDelegateArea = area;
+  }
+
+  /**
+   * Retrieve the Actor's touch delegate area.
+   * @return The Actor's touch delegate area.
+   */
+  const Vector2& GetTouchDelegateArea() const
+  {
+    return mTouchDelegateArea;
+  }
+
+
   // Gestures
 
   /**
@@ -1392,6 +1421,13 @@ public:
   bool IsGestureRequired( GestureType::Value type ) const;
 
   // Signals
+
+  /**
+   * Used by the EventProcessor to emit intercept touch event signals.
+   * @param[in] touch The touch data.
+   * @return True if the event was intercepted.
+   */
+  bool EmitInterceptTouchEventSignal( const Dali::TouchEvent& touch );
 
   /**
    * Used by the EventProcessor to emit touch event signals.
@@ -1438,6 +1474,14 @@ public:
    * @param[in] child The child actor that has been removed
    */
   void EmitChildRemovedSignal( Actor& child );
+
+  /**
+   * @copydoc DevelActor::InterceptTouchedSignal()
+   */
+  Dali::Actor::TouchEventSignalType& InterceptTouchedSignal()
+  {
+    return mInterceptTouchedSignal;
+  }
 
   /**
    * @copydoc Dali::Actor::TouchedSignal()
@@ -1982,6 +2026,7 @@ protected:
   ActorGestureData* mGestureData;   ///< Optional Gesture data. Only created when actor requires gestures
 
   // Signals
+  Dali::Actor::TouchEventSignalType         mInterceptTouchedSignal;
   Dali::Actor::TouchEventSignalType        mTouchedSignal;
   Dali::Actor::HoverSignalType             mHoveredSignal;
   Dali::Actor::WheelEventSignalType        mWheelEventSignal;
@@ -2000,6 +2045,7 @@ protected:
   Vector3         mTargetPosition;    ///< Event-side storage for position (not a pointer as most actors will have a position)
   Vector3         mTargetScale;       ///< Event-side storage for scale
   Vector3         mAnimatedSize;      ///< Event-side storage for size animation
+  Vector2         mTouchDelegateArea; ///< touch delegate area
 
   std::string     mName;              ///< Name of the actor
   uint32_t        mSortedDepth;       ///< The sorted depth index. A combination of tree traversal and sibling order.

@@ -41,9 +41,7 @@ ProgramController::ProgramController( Integration::GlAbstraction& glAbstraction 
   mProgramCache.Reserve( 32 );
 }
 
-ProgramController::~ProgramController()
-{
-}
+ProgramController::~ProgramController() = default;
 
 void ProgramController::ResetProgramMatrices()
 {

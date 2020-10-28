@@ -39,9 +39,7 @@ CustomActorImpl::CustomActorImpl(ActorFlags flags)
 {
 }
 
-CustomActorImpl::~CustomActorImpl()
-{
-}
+CustomActorImpl::~CustomActorImpl() = default;
 
 void CustomActorImpl::Initialize(Internal::CustomActor& owner)
 {

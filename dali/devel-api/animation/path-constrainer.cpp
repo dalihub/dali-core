@@ -35,18 +35,11 @@ PathConstrainer PathConstrainer::DownCast(BaseHandle handle)
   return PathConstrainer(dynamic_cast<Dali::Internal::PathConstrainer*>(handle.GetObjectPtr()));
 }
 
-PathConstrainer::PathConstrainer()
-{
-}
+PathConstrainer::PathConstrainer() = default;
 
-PathConstrainer::~PathConstrainer()
-{
-}
+PathConstrainer::~PathConstrainer() = default;
 
-PathConstrainer::PathConstrainer(const PathConstrainer& handle)
-: Handle(handle)
-{
-}
+PathConstrainer::PathConstrainer(const PathConstrainer& handle) = default;
 
 PathConstrainer::PathConstrainer(Internal::PathConstrainer* internal)
 : Handle(internal)

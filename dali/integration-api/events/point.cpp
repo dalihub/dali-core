@@ -47,9 +47,7 @@ Point::Point(const TouchPoint& touchPoint)
 {
 }
 
-Point::~Point()
-{
-}
+Point::~Point() = default;
 
 void Point::SetDeviceId(int32_t deviceId)
 {

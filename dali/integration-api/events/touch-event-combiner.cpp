@@ -78,9 +78,7 @@ TouchEventCombiner::TouchEventCombiner(uint32_t minMotionTime, Vector2 minMotion
   DALI_ASSERT_ALWAYS(minMotionDistance.x >= 0.0f && minMotionDistance.y >= 0.0f && "Negative values not allowed\n");
 }
 
-TouchEventCombiner::~TouchEventCombiner()
-{
-}
+TouchEventCombiner::~TouchEventCombiner() = default;
 
 TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent(const Point& point, uint32_t time, TouchEvent& touchEvent, HoverEvent& hoverEvent)
 {

@@ -159,9 +159,7 @@ public:
    * @brief Destructor.
    * @SINCE_1_0.0
    */
-  ~Matrix3()
-  {
-  }
+  ~Matrix3() = default;
 
   /**
    * @brief Sets the matrix to the identity matrix.

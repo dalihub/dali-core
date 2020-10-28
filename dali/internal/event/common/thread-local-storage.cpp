@@ -59,9 +59,7 @@ ThreadLocalStorage::ThreadLocalStorage(Core* core)
   threadLocal = this;
 }
 
-ThreadLocalStorage::~ThreadLocalStorage()
-{
-}
+ThreadLocalStorage::~ThreadLocalStorage() = default;
 
 void ThreadLocalStorage::Remove()
 {

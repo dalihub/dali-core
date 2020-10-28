@@ -7926,6 +7926,43 @@ int UtcDaliActorCaptureAllTouchAfterStartPropertyN(void)
   END_TEST;
 }
 
+int UtcDaliActorTouchDelegateAreaPropertyP(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Vector2 touchDelegateArea = actor.GetProperty(DevelActor::Property::TOUCH_DELEGATE_AREA).Get<Vector2>();
+  DALI_TEST_EQUALS(touchDelegateArea, Vector2::ZERO, TEST_LOCATION);
+  actor.SetProperty(DevelActor::Property::TOUCH_DELEGATE_AREA, Vector2(10.f, 10.f));
+  touchDelegateArea = actor.GetProperty(DevelActor::Property::TOUCH_DELEGATE_AREA).Get<Vector2>();
+  DALI_TEST_EQUALS(touchDelegateArea, Vector2(10.f, 10.f), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliActorTouchDelegateAreaPropertyN(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  // Make sure setting invalid types does not cause a crash
+  try
+  {
+    actor.SetProperty(DevelActor::Property::TOUCH_DELEGATE_AREA, 1.0f);
+    actor.SetProperty(DevelActor::Property::TOUCH_DELEGATE_AREA, Vector2::ONE);
+    actor.SetProperty(DevelActor::Property::TOUCH_DELEGATE_AREA, Vector3::ONE);
+    actor.SetProperty(DevelActor::Property::TOUCH_DELEGATE_AREA, Vector4::ONE);
+    actor.SetProperty(DevelActor::Property::TOUCH_DELEGATE_AREA, Property::Map());
+    actor.SetProperty(DevelActor::Property::TOUCH_DELEGATE_AREA, Property::Array());
+    tet_result(TET_PASS);
+  }
+  catch(...)
+  {
+    tet_result(TET_FAIL);
+  }
+  END_TEST;
+}
+
 int UtcDaliActorLowerBelowNegative(void)
 {
   TestApplication application;

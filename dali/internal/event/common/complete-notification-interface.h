@@ -37,14 +37,12 @@ protected:
   /**
    * Constructor, not to be directly instantiated.
    */
-  CompleteNotificationInterface()
-  {}
+  CompleteNotificationInterface() = default;
 
   /**
    * Virtual destructor as this is an interface, no deletion through this interface though.
    */
-  virtual ~CompleteNotificationInterface()
-  {}
+  virtual ~CompleteNotificationInterface() = default;
 
 public:
 

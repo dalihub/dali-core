@@ -48,9 +48,7 @@ GestureEventProcessor::GestureEventProcessor( SceneGraph::UpdateManager& updateM
 {
 }
 
-GestureEventProcessor::~GestureEventProcessor()
-{
-}
+GestureEventProcessor::~GestureEventProcessor() = default;
 
 void GestureEventProcessor::ProcessTouchEvent( Scene& scene, const Integration::TouchEvent& event)
 {

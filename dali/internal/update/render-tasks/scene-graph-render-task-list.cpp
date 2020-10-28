@@ -49,9 +49,7 @@ RenderTaskList::RenderTaskList()
 {
 }
 
-RenderTaskList::~RenderTaskList()
-{
-}
+RenderTaskList::~RenderTaskList() = default;
 
 void RenderTaskList::operator delete( void* ptr )
 {

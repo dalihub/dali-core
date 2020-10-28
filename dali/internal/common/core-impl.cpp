@@ -248,9 +248,9 @@ void Core::SceneCreated()
 
   mRelayoutController->OnApplicationSceneCreated();
 
-  for( auto iter = mScenes.begin(); iter != mScenes.end(); ++iter )
+  for( const auto& scene : mScenes )
   {
-    Dali::Actor sceneRootLayer = (*iter)->GetRootLayer();
+    Dali::Actor sceneRootLayer = scene->GetRootLayer();
     mRelayoutController->RequestRelayoutTree( sceneRootLayer );
   }
 }

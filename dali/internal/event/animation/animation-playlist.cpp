@@ -35,13 +35,9 @@ AnimationPlaylist* AnimationPlaylist::New()
   return new AnimationPlaylist();
 }
 
-AnimationPlaylist::AnimationPlaylist()
-{
-}
+AnimationPlaylist::AnimationPlaylist() = default;
 
-AnimationPlaylist::~AnimationPlaylist()
-{
-}
+AnimationPlaylist::~AnimationPlaylist() = default;
 
 void AnimationPlaylist::AnimationCreated( Animation& animation )
 {

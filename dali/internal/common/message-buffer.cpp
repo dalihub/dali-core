@@ -162,11 +162,7 @@ MessageBuffer::Iterator::Iterator(WordType* current)
   }
 }
 
-MessageBuffer::Iterator::Iterator(const Iterator& copy)
-: mCurrent( copy.mCurrent ),
-  mMessageSize( copy.mMessageSize )
-{
-}
+MessageBuffer::Iterator::Iterator(const Iterator& copy) = default;
 
 } // namespace Internal
 

@@ -68,9 +68,7 @@ public:
   /**
    * Virtual destructor.
    */
-  ~InheritedVector3() override
-  {
-  }
+  ~InheritedVector3() override = default;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
@@ -219,9 +217,7 @@ public:
   /**
    * Virtual destructor.
    */
-  ~InheritedColor() override
-  {
-  }
+  ~InheritedColor() override = default;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
@@ -388,9 +384,7 @@ public:
   /**
    * Virtual destructor.
    */
-  ~InheritedQuaternion() override
-  {
-  }
+  ~InheritedQuaternion() override = default;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
@@ -538,9 +532,7 @@ public:
   /**
    * Virtual destructor.
    */
-  ~InheritedMatrix() override
-  {
-  }
+  ~InheritedMatrix() override = default;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()

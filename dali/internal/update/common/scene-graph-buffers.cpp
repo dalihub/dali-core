@@ -36,9 +36,7 @@ SceneGraphBuffers::SceneGraphBuffers()
 {
 }
 
-SceneGraphBuffers::~SceneGraphBuffers()
-{
-}
+SceneGraphBuffers::~SceneGraphBuffers() = default;
 
 void SceneGraphBuffers::Swap()
 {

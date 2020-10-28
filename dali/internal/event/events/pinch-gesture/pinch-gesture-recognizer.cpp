@@ -78,9 +78,7 @@ PinchGestureRecognizer::PinchGestureRecognizer( Observer& observer, Vector2 scre
   SetMinimumPinchDistance( minimumPinchDistance );
 }
 
-PinchGestureRecognizer::~PinchGestureRecognizer()
-{
-}
+PinchGestureRecognizer::~PinchGestureRecognizer() = default;
 
 void PinchGestureRecognizer::SetMinimumPinchDistance(float value)
 {

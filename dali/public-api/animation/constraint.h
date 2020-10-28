@@ -170,12 +170,12 @@ public:
     CallbackBase* Clone()
     {
       CallbackBase* callback = nullptr;
-      if(mImpl && mImpl->mObjectPointer && mCopyConstructorDispatcher)
+      if(mImpl.mObjectPointer && mCopyConstructorDispatcher)
       {
-        callback = new Function(mCopyConstructorDispatcher(reinterpret_cast<UndefinedClass*>(mImpl->mObjectPointer)) /* Copy the object */,
+        callback = new Function(mCopyConstructorDispatcher(reinterpret_cast<UndefinedClass*>(mImpl.mObjectPointer)) /* Copy the object */,
                                 mMemberFunction,
-                                mImpl->mMemberFunctionDispatcher,
-                                mImpl->mDestructorDispatcher,
+                                mImpl.mMemberFunctionDispatcher,
+                                mImpl.mDestructorDispatcher,
                                 mCopyConstructorDispatcher);
       }
       else

@@ -117,7 +117,21 @@ enum Type
     * @details Name "captureAllTouchAfterStart", type Property::BOOLEAN
     * @note Default is false, i.e. actor under touch event will receive the touch even if touch started on this actor
     */
-  CAPTURE_ALL_TOUCH_AFTER_START
+  CAPTURE_ALL_TOUCH_AFTER_START,
+
+  /**
+    * @brief If you set the TOUCH_DELEGATE_AREA on an actor, when you touch the actor, the delegate area is used rather than the size of the actor
+    * @details Name "touchDelegateArea", type Property::Vector2
+    * @note Default is Vector2::ZERO.
+    * @note for example
+    *  Actor actor = Actor::New();
+    *  actor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+    *  actor.SetProperty(DevelActor::Property::TOUCH_DELEGATE_AREA, Vector2(200.0f, 200.0f));
+    *  actor.TouchedSignal().Connect(OnTouchCallback);
+    *
+    *  If you want to reset the touch area to an area different with the size of the actor, you can set this TOUCH_DELEGATE_AREA property.
+    */
+  TOUCH_DELEGATE_AREA
 };
 
 } // namespace Property
@@ -214,6 +228,40 @@ using ChildOrderChangedSignalType = Signal<void(Actor)>; ///< Used when the acto
  * @pre The Actor has been initialized
  */
 DALI_CORE_API ChildOrderChangedSignalType& ChildOrderChangedSignal(Actor actor);
+
+/**
+ * @brief This signal is emitted when intercepting the actor's touch event.
+ *
+ * A callback of the following type may be connected:
+ * @code
+ *   void MyCallbackName( Actor actor );
+ * @endcode
+ * actor The actor to intercept
+ *
+ * @note TouchEvent callbacks are called from the last child in the order of the parent's actor.
+ * The InterceptTouchEvent callback is to intercept the touch event in the parent.
+ * So, if the parent interepts the touch event, the child cannot receive the touch event.
+ *
+ * @note example
+ *   Actor parent = Actor::New();
+ *   Actor child = Actor::New();
+ *   parent.Add(child);
+ *   child.TouchedSignal().Connect(&application, childFunctor);
+ *   parent.TouchedSignal().Connect(&application, parentFunctor);
+ * The touch event callbacks are called in the order childFunctor -> parentFunctor.
+ *
+ * If you connect interceptTouchSignal to parentActor.
+ *   Dali::DevelActor::InterceptTouchedSignal(parent).Connect(&application, interceptFunctor);
+ *
+ * When interceptFunctor returns false, the touch event callbacks are called in the same order childFunctor -> parentFunctor.
+ * If interceptFunctor returns true, it means that the TouchEvent was intercepted.
+ * So the child actor will not be able to receive touch events.
+ * Only the parentFunctor is called.
+ *
+ * @return The signal to connect to
+ * @pre The Actor has been initialized
+ */
+DALI_CORE_API Actor::TouchEventSignalType& InterceptTouchedSignal(Actor actor);
 
 } // namespace DevelActor
 

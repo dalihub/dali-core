@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDERER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -339,8 +339,9 @@ public:
    * Prepare the object for rendering.
    * This is called by the UpdateManager when an object is due to be rendered in the current frame.
    * @param[in] updateBufferIndex The current update buffer index.
+   * @return Whether this renderer has been updated in the current frame
    */
-  void PrepareRender( BufferIndex updateBufferIndex );
+  bool PrepareRender( BufferIndex updateBufferIndex );
 
   /**
    * Retrieve the Render thread renderer

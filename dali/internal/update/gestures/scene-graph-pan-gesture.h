@@ -77,19 +77,12 @@ public:
      */
     struct Info
     {
-      Info()
-      {
-      }
+      Info() = default;
 
       /**
        * Copy constructor
        */
-      Info( const Info& rhs )
-      : velocity( rhs.velocity ),
-        displacement( rhs.displacement ),
-        position( rhs.position )
-      {
-      }
+      Info(const Info& rhs) = default;
 
       /**
        * Assignment operator

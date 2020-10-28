@@ -49,9 +49,7 @@ public:
   /**
    * Non-virtual destructor; PropertyComponentAccessorX is not suitable as a base class.
    */
-  ~PropertyComponentAccessorX()
-  {
-  }
+  ~PropertyComponentAccessorX() = default;
 
   /**
    * Query whether the accessor is set.
@@ -141,9 +139,7 @@ public:
   /**
    * Non-virtual destructor; PropertyComponentAccessorY is not suitable as a base class.
    */
-  ~PropertyComponentAccessorY()
-  {
-  }
+  ~PropertyComponentAccessorY() = default;
 
   /**
    * Query whether the accessor is set.
@@ -232,9 +228,7 @@ public:
   /**
    * Non-virtual destructor; PropertyComponentAccessorZ is not suitable as a base class.
    */
-  ~PropertyComponentAccessorZ()
-  {
-  }
+  ~PropertyComponentAccessorZ() = default;
 
   /**
    * Query whether the accessor is set.
@@ -323,9 +317,7 @@ public:
   /**
    * Non-virtual destructor; PropertyComponentAccessorW is not suitable as a base class.
    */
-  ~PropertyComponentAccessorW()
-  {
-  }
+  ~PropertyComponentAccessorW() = default;
 
   /**
    * Query whether the accessor is set.

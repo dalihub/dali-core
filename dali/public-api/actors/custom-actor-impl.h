@@ -105,7 +105,6 @@ public:
    *   D   E   F
    *
    * @endcode
-   * @param[in] depth The depth in the hierarchy for the actor
    */
   virtual void OnSceneConnection(int32_t depth) = 0;
 

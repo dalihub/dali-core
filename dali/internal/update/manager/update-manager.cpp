@@ -189,7 +189,8 @@ struct UpdateManager::Impl
     previousUpdateScene( false ),
     renderTaskWaiting( false ),
     renderersAdded( false ),
-    surfaceRectChanged( false )
+    surfaceRectChanged( false ),
+    renderingRequired( false )
   {
     sceneController = new SceneControllerImpl( renderMessageDispatcher, renderQueue, discardQueue );
 
@@ -298,6 +299,7 @@ struct UpdateManager::Impl
   bool                                 renderTaskWaiting;             ///< A REFRESH_ONCE render task is waiting to be rendered
   bool                                 renderersAdded;                ///< Flag to keep track when renderers have been added to avoid unnecessary processing
   bool                                 surfaceRectChanged;            ///< True if the default surface rect is changed
+  bool                                 renderingRequired;             ///< True if required to render the current frame
 
 private:
 
@@ -734,8 +736,10 @@ bool UpdateManager::ProcessGestures( BufferIndex bufferIndex, uint32_t lastVSync
   return gestureUpdated;
 }
 
-void UpdateManager::Animate( BufferIndex bufferIndex, float elapsedSeconds )
+bool UpdateManager::Animate( BufferIndex bufferIndex, float elapsedSeconds )
 {
+  bool animationActive = false;
+
   auto&& iter = mImpl->animations.Begin();
   bool animationLooped = false;
 
@@ -746,6 +750,8 @@ void UpdateManager::Animate( BufferIndex bufferIndex, float elapsedSeconds )
     bool looped = false;
     bool progressMarkerReached = false;
     animation->Update( bufferIndex, elapsedSeconds, looped, finished, progressMarkerReached );
+
+    animationActive = animationActive || animation->IsActive();
 
     if ( progressMarkerReached )
     {
@@ -772,6 +778,8 @@ void UpdateManager::Animate( BufferIndex bufferIndex, float elapsedSeconds )
     // The application should be notified by NotificationManager, in another thread
     mImpl->notificationManager.QueueCompleteNotification( &mImpl->animationPlaylist );
   }
+
+  return animationActive;
 }
 
 void UpdateManager::ConstrainCustomObjects( BufferIndex bufferIndex )
@@ -852,7 +860,7 @@ void UpdateManager::UpdateRenderers( BufferIndex bufferIndex )
     //Apply constraints
     ConstrainPropertyOwner( *renderer, bufferIndex );
 
-    renderer->PrepareRender( bufferIndex );
+    mImpl->renderingRequired = renderer->PrepareRender( bufferIndex ) || mImpl->renderingRequired;
   }
 }
 
@@ -884,17 +892,20 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
   //Clear nodes/resources which were previously discarded
   mImpl->discardQueue.Clear( bufferIndex );
 
+  bool isAnimationRunning = IsAnimationRunning();
+
   //Process Touches & Gestures
   const bool gestureUpdated = ProcessGestures( bufferIndex, lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds );
 
   bool updateScene = // The scene-graph requires an update if..
       (mImpl->nodeDirtyFlags & RenderableUpdateFlags) ||    // ..nodes were dirty in previous frame OR
-      IsAnimationRunning()                            ||    // ..at least one animation is running OR
+      isAnimationRunning                              ||    // ..at least one animation is running OR
       mImpl->messageQueue.IsSceneUpdateRequired()     ||    // ..a message that modifies the scene graph node tree is queued OR
       mImpl->frameCallbackProcessor                   ||    // ..a frame callback processor is existed OR
       gestureUpdated;                                       // ..a gesture property was updated
 
   bool keepRendererRendering = false;
+  mImpl->renderingRequired = false;
 
   // Although the scene-graph may not require an update, we still need to synchronize double-buffered
   // values if the scene was updated in the previous frame.
@@ -919,7 +930,7 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
   if( updateScene || mImpl->previousUpdateScene )
   {
     //Animate
-    Animate( bufferIndex, elapsedSeconds );
+    bool animationActive = Animate( bufferIndex, elapsedSeconds );
 
     //Constraint custom objects
     ConstrainCustomObjects( bufferIndex );
@@ -957,7 +968,10 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
     UpdateRenderers( bufferIndex );
 
     //Update the transformations of all the nodes
-    mImpl->transformManager.Update();
+    if ( mImpl->transformManager.Update() )
+    {
+      mImpl->nodeDirtyFlags |= NodePropertyFlags::TRANSFORM;
+    }
 
     //Process Property Notifications
     ProcessPropertyNotifications( bufferIndex );
@@ -982,7 +996,6 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
         }
       }
 
-
       std::size_t numberOfRenderInstructions = 0;
       for ( auto&& scene : mImpl->scenes )
       {
@@ -991,13 +1004,19 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
           scene->scene->GetRenderInstructions().ResetAndReserve( bufferIndex,
                                                      static_cast<uint32_t>( scene->taskList->GetTasks().Count() ) );
 
-          keepRendererRendering |= mImpl->renderTaskProcessor.Process( bufferIndex,
-                                              *scene->taskList,
-                                              *scene->root,
-                                              scene->sortedLayerList,
-                                              scene->scene->GetRenderInstructions(),
-                                              renderToFboEnabled,
-                                              isRenderingToFbo );
+          // If there are animations running, only add render instruction if at least one animation is currently active (i.e. not delayed)
+          // or the nodes are dirty
+          if ( !isAnimationRunning || animationActive || mImpl->renderingRequired || (mImpl->nodeDirtyFlags & RenderableUpdateFlags) )
+          {
+            keepRendererRendering |= mImpl->renderTaskProcessor.Process( bufferIndex,
+                                                *scene->taskList,
+                                                *scene->root,
+                                                scene->sortedLayerList,
+                                                scene->scene->GetRenderInstructions(),
+                                                renderToFboEnabled,
+                                                isRenderingToFbo );
+
+          }
 
           numberOfRenderInstructions += scene->scene->GetRenderInstructions().Count( bufferIndex );
         }
@@ -1137,6 +1156,11 @@ void UpdateManager::KeepRendering( float durationSeconds )
 void UpdateManager::SetRenderingBehavior( DevelStage::Rendering renderingBehavior )
 {
   mImpl->renderingBehavior = renderingBehavior;
+}
+
+void UpdateManager::RequestRendering()
+{
+  mImpl->renderingRequired = true;
 }
 
 void UpdateManager::SetLayerDepths( const SortedLayerPointers& layers, const Layer* rootLayer )

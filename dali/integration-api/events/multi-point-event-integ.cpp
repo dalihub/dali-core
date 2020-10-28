@@ -37,9 +37,7 @@ MultiPointEvent::MultiPointEvent(Type eventType, uint32_t time)
 {
 }
 
-MultiPointEvent::~MultiPointEvent()
-{
-}
+MultiPointEvent::~MultiPointEvent() = default;
 
 void MultiPointEvent::AddPoint(const Point& point)
 {

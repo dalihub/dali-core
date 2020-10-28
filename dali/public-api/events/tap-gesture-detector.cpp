@@ -28,9 +28,7 @@ TapGestureDetector::TapGestureDetector(Internal::TapGestureDetector* internal)
 {
 }
 
-TapGestureDetector::TapGestureDetector()
-{
-}
+TapGestureDetector::TapGestureDetector() = default;
 
 TapGestureDetector TapGestureDetector::New()
 {
@@ -51,14 +49,9 @@ TapGestureDetector TapGestureDetector::DownCast(BaseHandle handle)
   return TapGestureDetector(dynamic_cast<Dali::Internal::TapGestureDetector*>(handle.GetObjectPtr()));
 }
 
-TapGestureDetector::~TapGestureDetector()
-{
-}
+TapGestureDetector::~TapGestureDetector() = default;
 
-TapGestureDetector::TapGestureDetector(const TapGestureDetector& handle)
-: GestureDetector(handle)
-{
-}
+TapGestureDetector::TapGestureDetector(const TapGestureDetector& handle) = default;
 
 TapGestureDetector& TapGestureDetector::operator=(const TapGestureDetector& rhs)
 {

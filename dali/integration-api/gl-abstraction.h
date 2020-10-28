@@ -96,9 +96,7 @@ protected:
   /**
    * Virtual protected destructor, no deletion through this interface
    */
-  virtual ~GlAbstraction()
-  {
-  }
+  virtual ~GlAbstraction() = default;
 
 public:
   /**

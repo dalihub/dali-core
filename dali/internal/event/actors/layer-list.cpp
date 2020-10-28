@@ -65,9 +65,7 @@ LayerList* LayerList::New( SceneGraph::UpdateManager& updateManager )
   return new LayerList( updateManager );
 }
 
-LayerList::~LayerList()
-{
-}
+LayerList::~LayerList() = default;
 
 uint32_t LayerList::GetLayerCount() const
 {

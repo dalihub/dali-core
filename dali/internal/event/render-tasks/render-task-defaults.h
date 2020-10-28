@@ -51,7 +51,7 @@ protected:
   /**
    * Virtual destructor
    */
-  virtual ~RenderTaskDefaults(){}
+  virtual ~RenderTaskDefaults() = default;
 };
 
 } // namespace Internal

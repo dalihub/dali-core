@@ -53,8 +53,6 @@ Property::Property(Handle& obj, const std::string& propertyName, int32_t compInd
   propertyIndex = object.GetPropertyIndex(propertyName);
 }
 
-Property::~Property()
-{
-}
+Property::~Property() = default;
 
 } // namespace Dali

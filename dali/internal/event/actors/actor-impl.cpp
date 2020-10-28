@@ -143,6 +143,7 @@ DALI_PROPERTY( "keyboardFocusable",         BOOLEAN,  true,  false, false, Dali:
 DALI_PROPERTY( "siblingOrder",              INTEGER,  true,  false, false, Dali::DevelActor::Property::SIBLING_ORDER )
 DALI_PROPERTY( "updateSizeHint",            VECTOR2,  true,  false, false, Dali::DevelActor::Property::UPDATE_SIZE_HINT )
 DALI_PROPERTY( "captureAllTouchAfterStart", BOOLEAN,  true,  false, false, Dali::DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START )
+DALI_PROPERTY( "touchDelegateArea",         VECTOR2,  true,  false, false, Dali::DevelActor::Property::TOUCH_DELEGATE_AREA )
 DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX, ActorDefaultProperties )
 
 // Signals
@@ -237,7 +238,7 @@ void EmitVisibilityChangedSignalRecursively( ActorPtr actor, bool visible, Devel
 
     if( actor->GetChildCount() > 0 )
     {
-      for( ActorPtr& child : actor->GetChildrenInternal() )
+      for( auto& child : actor->GetChildrenInternal() )
       {
         EmitVisibilityChangedSignalRecursively( child, visible, DevelActor::VisibilityChange::PARENT );
       }
@@ -515,10 +516,9 @@ ActorPtr Actor::FindChildByName( const std::string& actorName )
   }
   else if( mChildren )
   {
-    ActorIter end = mChildren->end();
-    for( ActorIter iter = mChildren->begin(); iter != end; ++iter )
+    for( const auto& actor : *mChildren )
     {
-      child = (*iter)->FindChildByName( actorName );
+      child = actor->FindChildByName( actorName );
 
       if( child )
       {
@@ -538,10 +538,9 @@ ActorPtr Actor::FindChildById( const uint32_t id )
   }
   else if( mChildren )
   {
-    ActorIter end = mChildren->end();
-    for( ActorIter iter = mChildren->begin(); iter != end; ++iter )
+    for( const auto& actor : *mChildren )
     {
-      child = (*iter)->FindChildById( id );
+      child = actor->FindChildById( id );
 
       if( child )
       {
@@ -836,6 +835,8 @@ void Actor::SetOpacity( float opacity )
 
   // node is being used in a separate thread; queue a message to set the value & base value
   SceneGraph::NodePropertyComponentMessage<Vector4>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mColor, &AnimatableProperty<Vector4>::BakeW, opacity );
+
+  RequestRenderingMessage( GetEventThreadServices().GetUpdateManager() );
 }
 
 float Actor::GetCurrentOpacity() const
@@ -855,6 +856,8 @@ void Actor::SetColor( const Vector4& color )
 
   // node is being used in a separate thread; queue a message to set the value & base value
   SceneGraph::NodePropertyMessage<Vector4>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mColor, &AnimatableProperty<Vector4>::Bake, color );
+
+  RequestRenderingMessage( GetEventThreadServices().GetUpdateManager() );
 }
 
 void Actor::SetColorRed( float red )
@@ -863,6 +866,8 @@ void Actor::SetColorRed( float red )
 
   // node is being used in a separate thread; queue a message to set the value & base value
   SceneGraph::NodePropertyComponentMessage<Vector4>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mColor, &AnimatableProperty<Vector4>::BakeX, red );
+
+  RequestRenderingMessage( GetEventThreadServices().GetUpdateManager() );
 }
 
 void Actor::SetColorGreen( float green )
@@ -871,6 +876,8 @@ void Actor::SetColorGreen( float green )
 
   // node is being used in a separate thread; queue a message to set the value & base value
   SceneGraph::NodePropertyComponentMessage<Vector4>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mColor, &AnimatableProperty<Vector4>::BakeY, green );
+
+  RequestRenderingMessage( GetEventThreadServices().GetUpdateManager() );
 }
 
 void Actor::SetColorBlue( float blue )
@@ -879,6 +886,8 @@ void Actor::SetColorBlue( float blue )
 
   // node is being used in a separate thread; queue a message to set the value & base value
   SceneGraph::NodePropertyComponentMessage<Vector4>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mColor, &AnimatableProperty<Vector4>::BakeZ, blue );
+
+  RequestRenderingMessage( GetEventThreadServices().GetUpdateManager() );
 }
 
 const Vector4& Actor::GetCurrentColor() const
@@ -1319,6 +1328,11 @@ bool Actor::IsGestureRequired( GestureType::Value type ) const
   return mGestureData && mGestureData->IsGestureRequired( type );
 }
 
+bool Actor::EmitInterceptTouchEventSignal( const Dali::TouchEvent& touch )
+{
+  return EmitConsumingSignal( *this, mInterceptTouchedSignal, touch );
+}
+
 bool Actor::EmitTouchEventSignal( const Dali::TouchEvent& touch )
 {
   return EmitConsumingSignal( *this, mTouchedSignal, touch );
@@ -1418,6 +1432,7 @@ Actor::Actor( DerivedType derivedType, const SceneGraph::Node& node )
   mAnchorPoint( nullptr ),
   mRelayoutData( nullptr ),
   mGestureData( nullptr ),
+  mInterceptTouchedSignal(),
   mTouchedSignal(),
   mHoveredSignal(),
   mWheelEventSignal(),
@@ -1435,6 +1450,7 @@ Actor::Actor( DerivedType derivedType, const SceneGraph::Node& node )
   mTargetPosition( Vector3::ZERO ),
   mTargetScale( Vector3::ONE ),
   mAnimatedSize( Vector3::ZERO ),
+  mTouchDelegateArea( Vector2::ZERO ),
   mName(),
   mSortedDepth( 0u ),
   mDepth( 0u ),
@@ -1474,10 +1490,9 @@ Actor::~Actor()
   // to guard against GetParent() & Unparent() calls from CustomActor destructors.
   if( mChildren )
   {
-    ActorConstIter endIter = mChildren->end();
-    for( ActorIter iter = mChildren->begin(); iter != endIter; ++iter )
+    for( const auto& actor : *mChildren )
     {
-      (*iter)->SetParent( nullptr );
+      actor->SetParent( nullptr );
     }
   }
   delete mChildren;
@@ -1521,10 +1536,9 @@ void Actor::ConnectToScene( uint32_t parentDepth )
   RecursiveConnectToScene( connectionList, parentDepth + 1 );
 
   // Notify applications about the newly connected actors.
-  const ActorIter endIter = connectionList.end();
-  for( ActorIter iter = connectionList.begin(); iter != endIter; ++iter )
+  for( const auto& actor : connectionList )
   {
-    (*iter)->NotifyStageConnection();
+    actor->NotifyStageConnection();
   }
 
   RelayoutRequest();
@@ -1548,11 +1562,10 @@ void Actor::RecursiveConnectToScene( ActorContainer& connectionList, uint32_t de
   // Recursively connect children
   if( mChildren )
   {
-    ActorConstIter endIter = mChildren->end();
-    for( ActorIter iter = mChildren->begin(); iter != endIter; ++iter )
+    for( const auto& actor : *mChildren )
     {
-      (*iter)->SetScene( *mScene );
-      (*iter)->RecursiveConnectToScene( connectionList, depth + 1 );
+      actor->SetScene( *mScene );
+      actor->RecursiveConnectToScene( connectionList, depth + 1 );
     }
   }
 }
@@ -1615,10 +1628,9 @@ void Actor::DisconnectFromStage()
   RecursiveDisconnectFromStage( disconnectionList );
 
   // Notify applications about the newly disconnected actors.
-  const ActorIter endIter = disconnectionList.end();
-  for( ActorIter iter = disconnectionList.begin(); iter != endIter; ++iter )
+  for( const auto& actor : disconnectionList )
   {
-    (*iter)->NotifyStageDisconnection();
+    actor->NotifyStageDisconnection();
   }
 }
 
@@ -1630,10 +1642,9 @@ void Actor::RecursiveDisconnectFromStage( ActorContainer& disconnectionList )
   // Recursively disconnect children
   if( mChildren )
   {
-    ActorConstIter endIter = mChildren->end();
-    for( ActorIter iter = mChildren->begin(); iter != endIter; ++iter )
+    for( const auto& child : *mChildren )
     {
-      (*iter)->RecursiveDisconnectFromStage( disconnectionList );
+      child->RecursiveDisconnectFromStage( disconnectionList );
     }
   }
 
@@ -1724,9 +1735,9 @@ void Actor::DepthTraverseActorTree( OwnerPointer<SceneGraph::NodeDepths>& sceneG
   // Create/add to children of this node
   if( mChildren )
   {
-    for( ActorContainer::iterator it = mChildren->begin(); it != mChildren->end(); ++it )
+    for( const auto& child : *mChildren )
     {
-      Actor* childActor = (*it).Get();
+      Actor* childActor = child.Get();
       ++depthIndex;
       childActor->DepthTraverseActorTree( sceneGraphNodeDepths, depthIndex );
     }
@@ -2225,9 +2236,9 @@ void Actor::NegotiateDimension( Dimension::Type dimension, const Vector2& alloca
     // Check that we havn't gotten into an infinite loop
     ActorDimensionPair searchActor = ActorDimensionPair( this, dimension );
     bool recursionFound = false;
-    for( ActorDimensionStack::iterator it = recursionStack.begin(), itEnd = recursionStack.end(); it != itEnd; ++it )
+    for( auto& element : recursionStack )
     {
-      if( *it == searchActor )
+      if( element == searchActor )
       {
         recursionFound = true;
         break;
@@ -2492,6 +2503,8 @@ void Actor::SetVisibleInternal( bool visible, SendMessage::Type sendMessage )
     {
       // node is being used in a separate thread; queue a message to set the value & base value
       SceneGraph::NodePropertyMessage<bool>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mVisible, &AnimatableProperty<bool>::Bake, visible );
+
+      RequestRenderingMessage( GetEventThreadServices().GetUpdateManager() );
     }
 
     mVisible = visible;
@@ -2633,7 +2646,7 @@ void Actor::RaiseToTop()
     ActorContainer& siblings = *(mParent->mChildren);
     if( siblings.back() != this ) // If not already at end
     {
-      ActorContainer::iterator iter = std::find( siblings.begin(), siblings.end(), this );
+      auto iter = std::find( siblings.begin(), siblings.end(), this );
       if( iter != siblings.end() )
       {
         siblings.erase(iter);
@@ -2661,7 +2674,7 @@ void Actor::LowerToBottom()
     {
       ActorPtr thisPtr(this); // ensure this actor remains referenced.
 
-      ActorContainer::iterator iter = std::find( siblings.begin(), siblings.end(), this );
+      auto iter = std::find( siblings.begin(), siblings.end(), this );
       if( iter != siblings.end() )
       {
         siblings.erase(iter);
@@ -2689,8 +2702,8 @@ void Actor::RaiseAbove( Internal::Actor& target )
     {
       ActorPtr thisPtr(this); // ensure this actor remains referenced.
 
-      ActorContainer::iterator targetIter = std::find( siblings.begin(), siblings.end(), &target );
-      ActorContainer::iterator thisIter = std::find( siblings.begin(), siblings.end(), this );
+      auto targetIter = std::find( siblings.begin(), siblings.end(), &target );
+      auto thisIter   = std::find( siblings.begin(), siblings.end(), this );
       if( thisIter < targetIter )
       {
         siblings.erase(thisIter);
@@ -2722,8 +2735,8 @@ void Actor::LowerBelow( Internal::Actor& target )
     {
       ActorPtr thisPtr(this); // ensure this actor remains referenced.
 
-      ActorContainer::iterator targetIter = std::find( siblings.begin(), siblings.end(), &target );
-      ActorContainer::iterator thisIter = std::find( siblings.begin(), siblings.end(), this );
+      auto targetIter = std::find( siblings.begin(), siblings.end(), &target );
+      auto thisIter   = std::find( siblings.begin(), siblings.end(), this );
 
       if( thisIter > targetIter )
       {
@@ -2769,7 +2782,7 @@ void Actor::InheritLayoutDirectionRecursively( ActorPtr actor, Dali::LayoutDirec
 
     if( actor->GetChildCount() > 0 )
     {
-      for( ActorPtr& child : actor->GetChildrenInternal() )
+      for( const auto& child : actor->GetChildrenInternal() )
       {
         InheritLayoutDirectionRecursively( child, direction );
       }

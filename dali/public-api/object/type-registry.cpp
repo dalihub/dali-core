@@ -27,13 +27,9 @@
 
 namespace Dali
 {
-TypeRegistry::TypeRegistry()
-{
-}
+TypeRegistry::TypeRegistry() = default;
 
-TypeRegistry::~TypeRegistry()
-{
-}
+TypeRegistry::~TypeRegistry() = default;
 
 TypeRegistry::TypeRegistry(const TypeRegistry& copy) = default;
 

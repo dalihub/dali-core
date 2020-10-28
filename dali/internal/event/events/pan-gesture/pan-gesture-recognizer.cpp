@@ -74,9 +74,7 @@ PanGestureRecognizer::PanGestureRecognizer( Observer& observer, Vector2 screenSi
   }
 }
 
-PanGestureRecognizer::~PanGestureRecognizer()
-{
-}
+PanGestureRecognizer::~PanGestureRecognizer() = default;
 
 void PanGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
 {

@@ -41,9 +41,7 @@ Geometry::Geometry()
 {
 }
 
-Geometry::~Geometry()
-{
-}
+Geometry::~Geometry() = default;
 
 void Geometry::GlContextCreated( Context& context )
 {

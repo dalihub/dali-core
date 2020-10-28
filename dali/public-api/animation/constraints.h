@@ -47,9 +47,7 @@ struct EqualToConstraint
    * @brief Constructor.
    * @SINCE_1_0.0
    */
-  EqualToConstraint()
-  {
-  }
+  EqualToConstraint() = default;
 
   /**
    * @brief Overrides functor for float properties.

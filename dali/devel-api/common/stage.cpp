@@ -30,24 +30,13 @@ namespace Dali
 {
 using Internal::Core;
 
-Stage::Stage()
-{
-}
+Stage::Stage() = default;
 
-Stage::~Stage()
-{
-}
+Stage::~Stage() = default;
 
-Stage::Stage(const Stage& handle)
-: BaseHandle(handle)
-{
-}
+Stage::Stage(const Stage& handle) = default;
 
-Stage& Stage::operator=(const Stage& rhs)
-{
-  BaseHandle::operator=(rhs);
-  return *this;
-}
+Stage& Stage::operator=(const Stage& rhs) = default;
 
 Stage::Stage(Internal::Stage* internal)
 : BaseHandle(internal)

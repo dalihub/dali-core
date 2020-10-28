@@ -66,9 +66,7 @@ UpdateProxy::UpdateProxy( SceneGraph::UpdateManager& updateManager, SceneGraph::
 {
 }
 
-UpdateProxy::~UpdateProxy()
-{
-}
+UpdateProxy::~UpdateProxy() = default;
 
 bool UpdateProxy::GetPosition( uint32_t id, Vector3& position ) const
 {

@@ -115,9 +115,7 @@ PinchGestureProcessor::PinchGestureProcessor()
 {
 }
 
-PinchGestureProcessor::~PinchGestureProcessor()
-{
-}
+PinchGestureProcessor::~PinchGestureProcessor() = default;
 
 void PinchGestureProcessor::SetMinimumPinchDistance( float value )
 {

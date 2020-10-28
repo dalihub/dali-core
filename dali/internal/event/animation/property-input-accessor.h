@@ -53,11 +53,7 @@ public:
   /**
    * Copy from a PropertyInputAccessor
    */
-  PropertyInputAccessor( const PropertyInputAccessor& accessor )
-  : mInput( accessor.mInput ),
-    mComponentIndex( accessor.mComponentIndex )
-  {
-  }
+  PropertyInputAccessor(const PropertyInputAccessor& accessor) = default;
 
   /**
    * Copy from a PropertyInputAccessor

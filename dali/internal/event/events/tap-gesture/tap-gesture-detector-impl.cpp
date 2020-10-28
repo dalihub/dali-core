@@ -79,9 +79,7 @@ TapGestureDetector::TapGestureDetector( unsigned int tapsRequired )
 {
 }
 
-TapGestureDetector::~TapGestureDetector()
-{
-}
+TapGestureDetector::~TapGestureDetector() = default;
 
 void TapGestureDetector::SetMinimumTapsRequired(unsigned int taps)
 {

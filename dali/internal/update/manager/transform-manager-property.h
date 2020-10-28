@@ -311,9 +311,7 @@ public:
   /**
    * Virtual destructor.
    */
-  ~TransformManagerVector3Input() override
-  {
-  }
+  ~TransformManagerVector3Input() override = default;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
@@ -473,9 +471,7 @@ public:
   /**
    * Virtual destructor.
    */
-  ~TransformManagerQuaternionInput() override
-  {
-  }
+  ~TransformManagerQuaternionInput() override = default;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
@@ -624,9 +620,7 @@ public:
   /**
    * Virtual destructor.
    */
-  ~TransformManagerMatrixInput() override
-  {
-  }
+  ~TransformManagerMatrixInput() override = default;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()

@@ -72,9 +72,7 @@ public:
   /**
    * Virtual destructor.
    */
-  ~Constraint() override
-  {
-  }
+  ~Constraint() override = default;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::ConstraintBase::Apply()

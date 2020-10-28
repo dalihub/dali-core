@@ -23,18 +23,14 @@
 
 namespace Dali
 {
-SingletonService::SingletonService()
-{
-}
+SingletonService::SingletonService() = default;
 
 SingletonService SingletonService::Get()
 {
   return Internal::ThreadLocalStorage::GetSingletonService();
 }
 
-SingletonService::~SingletonService()
-{
-}
+SingletonService::~SingletonService() = default;
 
 void SingletonService::Register(const std::type_info& info, BaseHandle singleton)
 {

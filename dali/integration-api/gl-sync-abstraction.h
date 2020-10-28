@@ -35,9 +35,7 @@ protected:
   /**
    * Virtual protected destructor, no deletion through this interface
    */
-  virtual ~GlSyncAbstraction()
-  {
-  }
+  virtual ~GlSyncAbstraction() = default;
 
 public:
   class SyncObject
@@ -48,9 +46,7 @@ public:
      * Core from deleting SyncObjects - only Adaptor implementation is able to delete
      * them.
      */
-    virtual ~SyncObject()
-    {
-    }
+    virtual ~SyncObject() = default;
 
   public:
     /**

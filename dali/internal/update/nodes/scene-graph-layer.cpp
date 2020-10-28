@@ -56,9 +56,7 @@ Layer::Layer()
   mAllChildTransformsClean[ 1 ] = false;
 }
 
-Layer::~Layer()
-{
-}
+Layer::~Layer() = default;
 
 void Layer::SetSortFunction( Dali::Layer::SortFunctionType function )
 {

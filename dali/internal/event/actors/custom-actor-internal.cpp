@@ -43,9 +43,7 @@ CustomActor::CustomActor( const SceneGraph::Node& node, CustomActorImpl& extensi
   SetRelayoutEnabled( extension.IsRelayoutEnabled() );
 }
 
-CustomActor::~CustomActor()
-{
-}
+CustomActor::~CustomActor() = default;
 
 Dali::TypeInfo CustomActor::GetTypeInfo()
 {

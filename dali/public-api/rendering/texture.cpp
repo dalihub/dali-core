@@ -36,13 +36,9 @@ Texture Texture::New(NativeImageInterface& nativeImageInterface)
   return Texture(texture.Get());
 }
 
-Texture::Texture()
-{
-}
+Texture::Texture() = default;
 
-Texture::~Texture()
-{
-}
+Texture::~Texture() = default;
 
 Texture::Texture(const Texture& handle) = default;
 

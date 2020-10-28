@@ -60,6 +60,36 @@ const char * TOUCH_POINT_STATE[ 6 ] =
 
 #endif // defined(DEBUG_ENABLED)
 
+Dali::Actor EmitInterceptTouchSignals( Dali::Actor actor, const Dali::TouchEvent& touchEvent )
+{
+  Dali::Actor interceptedActor;
+
+  if( actor )
+  {
+     Dali::Actor parent = actor.GetParent();
+     if( parent )
+     {
+       // Recursively deliver events to the actor and its parents for intercept touch event.
+       interceptedActor = EmitInterceptTouchSignals( parent, touchEvent );
+     }
+
+     if( !interceptedActor )
+     {
+       bool intercepted = false;
+       Actor& actorImpl( GetImplementation(actor) );
+       if( actorImpl.GetInterceptTouchRequired() )
+       {
+          intercepted = actorImpl.EmitInterceptTouchEventSignal( touchEvent );
+          if( intercepted )
+          {
+            interceptedActor = Dali::Actor( &actorImpl );
+          }
+       }
+     }
+  }
+
+  return interceptedActor;
+}
 
 /**
  *  Recursively deliver events to the actor and its parents, until the event is consumed or the stage is reached.
@@ -315,7 +345,16 @@ bool TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
   Dali::Actor consumedActor;
   if ( currentRenderTask )
   {
-    consumedActor = EmitTouchSignals( touchEventImpl->GetPoint( 0 ).GetHitActor(), touchEventHandle );
+    // Emit the intercept touch signal
+    Dali::Actor interceptedActor = EmitInterceptTouchSignals( touchEventImpl->GetPoint( 0 ).GetHitActor(), touchEventHandle );
+    if( interceptedActor )
+    {
+      consumedActor = EmitTouchSignals( interceptedActor, touchEventHandle );
+    }
+    else
+    {
+      consumedActor = EmitTouchSignals( touchEventImpl->GetPoint( 0 ).GetHitActor(), touchEventHandle );
+    }
     consumed = consumedActor ? true : false;
   }
 
