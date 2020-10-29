@@ -156,7 +156,7 @@ bool RayTest::ActorTest(const Internal::Actor& actor, const Vector4& rayOrigin, 
       // Ray travels distance * rayDirLocal to intersect with plane.
       distance = a / b;
 
-      const Vector2& size = actor.GetTouchDelegateArea() == Vector2::ZERO ? Vector2(node.GetSize(EventThreadServices::Get().GetEventBufferIndex())) : actor.GetTouchDelegateArea();
+      const Vector2& size = actor.GetTouchArea() == Vector2::ZERO ? Vector2(node.GetSize(EventThreadServices::Get().GetEventBufferIndex())) : actor.GetTouchArea();
       hitPointLocal.x = rayOriginLocal.x + rayDirLocal.x * distance + size.x * 0.5f;
       hitPointLocal.y = rayOriginLocal.y + rayDirLocal.y * distance + size.y * 0.5f;
 

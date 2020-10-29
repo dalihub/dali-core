@@ -574,12 +574,12 @@ void Actor::PropertyHandler::SetDefaultProperty( Internal::Actor& actor, Propert
       break;
     }
 
-    case Dali::DevelActor::Property::TOUCH_DELEGATE_AREA:
+    case Dali::DevelActor::Property::TOUCH_AREA:
     {
       Vector2 vec2Value;
       if( property.Get( vec2Value ) )
       {
-        actor.SetTouchDelegateArea( vec2Value );
+        actor.SetTouchArea( vec2Value );
       }
       break;
     }
@@ -1614,9 +1614,9 @@ bool Actor::PropertyHandler::GetCachedPropertyValue(const Internal::Actor& actor
       break;
     }
 
-    case Dali::DevelActor::Property::TOUCH_DELEGATE_AREA:
+    case Dali::DevelActor::Property::TOUCH_AREA:
     {
-      value = actor.GetTouchDelegateArea();
+      value = actor.GetTouchArea();
       break;
     }
 
