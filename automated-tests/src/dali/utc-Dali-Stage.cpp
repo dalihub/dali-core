@@ -178,6 +178,8 @@ struct TouchFunctor
     signalData.receivedTouchEvent = handle;
   }
 
+  // Allows functor to be used for signal connection by string.
+  // No data stored, though, so quite useless.
   void operator()()
   {
     signalData.functorCalled = true;
@@ -221,6 +223,25 @@ struct WheelEventReceivedFunctor
 
   WheelEventSignalData& signalData;
 };
+
+// Functor that sets the data when wheel-event signal is received
+struct WheelEventReceivedVoidFunctor
+{
+  WheelEventReceivedVoidFunctor(WheelEventSignalData& data)
+  : signalData(data)
+  {
+  }
+
+  // Signals connected through BaseObject::DoConnectSignal can only take void() methods
+  bool operator()(void)
+  {
+    signalData.functorCalled = true;
+    return true;
+  }
+
+  WheelEventSignalData& signalData;
+};
+
 
 bool DummyTouchCallback(Actor actor, const TouchEvent& touch)
 {
@@ -844,6 +865,27 @@ int UtcDaliStageEventProcessingFinishedP(void)
   END_TEST;
 }
 
+int UtcDaliStageEventProcessingFinishedP2(void)
+{
+  TestApplication application;
+  Stage           stage = Stage::GetCurrent();
+  tet_printf("UtcDaliStageEventProcessingFinishedSignalP2 - check event processing finished signal connection by name\n");
+
+  bool                           eventProcessingFinished = false;
+  EventProcessingFinishedFunctor functor(eventProcessingFinished);
+  GetImplementation(stage).ConnectSignal(&application, "eventProcessingFinished", functor);
+
+  Actor actor(Actor::New());
+  stage.Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(eventProcessingFinished);
+
+  END_TEST;
+}
+
 int UtcDaliStageEventProcessingFinishedN(void)
 {
   TestApplication application;
@@ -1103,6 +1145,35 @@ int UtcDaliStageTouchedSignalP(void)
   END_TEST;
 }
 
+
+int UtcDaliStageTouchedSignalP2(void)
+{
+  TestApplication application;
+  Stage           stage = Stage::GetCurrent();
+  tet_printf("UtcDaliStageTouchedSignalP2 - check touched signal connection by name\n");
+
+  TouchedSignalData data;
+  TouchFunctor      functor(data);
+  GetImplementation(stage).ConnectSignal(&application, "touched", functor);
+
+  // Render and notify.
+  application.SendNotification();
+  application.Render();
+
+  // Basic test: No actors, single touch (down then up).
+  {
+    GenerateTouch(application, PointState::DOWN, Vector2(10.0f, 10.0f));
+
+    DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+    data.Reset();
+
+    GenerateTouch(application, PointState::UP, Vector2(10.0f, 10.0f));
+    DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+    data.Reset();
+  }
+  END_TEST;
+}
+
 int UtcDaliStageTouchedSignalN(void)
 {
   TestApplication application;
@@ -1226,6 +1297,32 @@ int UtcDaliStageSignalWheelEventP(void)
   END_TEST;
 }
 
+
+int UtcDaliStageSignalWheelEventP2(void)
+{
+  TestApplication application;
+  Stage           stage = Stage::GetCurrent();
+  tet_printf("UtcDaliStageSignalWheelEventP2 - check wheel signal connection by name\n");
+
+  WheelEventSignalData      data;
+  WheelEventReceivedVoidFunctor functor(data);
+  GetImplementation(stage).ConnectSignal(&application, "wheelEvent", functor);
+
+  Integration::WheelEvent event(Integration::WheelEvent::CUSTOM_WHEEL, 0, 0u, Vector2(0.0f, 0.0f), 1, 1000u);
+  application.ProcessEvent(event);
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  // It's meaningless, since there's no data passed to the functor :/
+
+  data.Reset();
+
+  Integration::WheelEvent event2(Integration::WheelEvent::CUSTOM_WHEEL, 0, 0u, Vector2(0.0f, 0.0f), -1, 1000u);
+  application.ProcessEvent(event2);
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  END_TEST;
+}
+
 int UtcDaliStageContextLostSignalP(void)
 {
   TestApplication application;
@@ -1234,6 +1331,23 @@ int UtcDaliStageContextLostSignalP(void)
   bool                 contextLost = false;
   ContextStatusFunctor contextLostFunctor(contextLost);
   stage.ContextLostSignal().Connect(&application, contextLostFunctor);
+
+  Integration::ContextNotifierInterface* notifier = application.GetCore().GetContextNotifier();
+  notifier->NotifyContextLost();
+  DALI_TEST_EQUALS(contextLost, true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliStageContextLostSignalP2(void)
+{
+  TestApplication application;
+  Stage           stage = Stage::GetCurrent();
+  tet_printf("UtcDaliStageContextLostSignalP2 - check context loss signal connection by name\n");
+
+  bool                 contextLost = false;
+  ContextStatusFunctor contextLostFunctor(contextLost);
+  GetImplementation(stage).ConnectSignal(&application, "contextLost", contextLostFunctor);
 
   Integration::ContextNotifierInterface* notifier = application.GetCore().GetContextNotifier();
   notifier->NotifyContextLost();
@@ -1283,6 +1397,27 @@ int UtcDaliStageContextRegainedSignalP(void)
   END_TEST;
 }
 
+int UtcDaliStageContextRegainedSignalP2(void)
+{
+  TestApplication application;
+  Stage           stage = Stage::GetCurrent();
+  tet_printf("UtcDaliStageContextRegainedSignalP2 - check context regained signal connection by name\n");
+
+  bool                 contextRegained = false;
+  ContextStatusFunctor contextRegainedFunctor(contextRegained);
+  GetImplementation(stage).ConnectSignal(&application, "contextRegained", contextRegainedFunctor);
+
+  Integration::ContextNotifierInterface* notifier = application.GetCore().GetContextNotifier();
+  notifier->NotifyContextLost();
+  notifier->NotifyContextRegained();
+  DALI_TEST_EQUALS(contextRegained, true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+
+
+
 int UtcDaliStageContextRegainedSignalN(void)
 {
   TestApplication application;
@@ -1315,6 +1450,22 @@ int UtcDaliStageSceneCreatedSignalP(void)
   bool                      signalCalled = false;
   SceneCreatedStatusFunctor sceneCreatedFunctor(signalCalled);
   stage.SceneCreatedSignal().Connect(&application, sceneCreatedFunctor);
+
+  Integration::Core& core = application.GetCore();
+  core.SceneCreated();
+  DALI_TEST_EQUALS(signalCalled, true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliStageSceneCreatedSignalP2(void)
+{
+  TestApplication application;
+  Stage           stage = Stage::GetCurrent();
+
+  bool                      signalCalled = false;
+  SceneCreatedStatusFunctor sceneCreatedFunctor(signalCalled);
+  GetImplementation(stage).ConnectSignal(&application, "sceneCreated", sceneCreatedFunctor);
 
   Integration::Core& core = application.GetCore();
   core.SceneCreated();

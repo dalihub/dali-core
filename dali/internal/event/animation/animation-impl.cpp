@@ -56,13 +56,13 @@ namespace
 
 // Signals
 
-const char* const SIGNAL_FINISHED = "finished";
+static constexpr std::string_view SIGNAL_FINISHED = "finished";
 
 // Actions
 
-const char* const ACTION_PLAY =     "play";
-const char* const ACTION_STOP =     "stop";
-const char* const ACTION_PAUSE =    "pause";
+static constexpr std::string_view ACTION_PLAY  = "play";
+static constexpr std::string_view ACTION_STOP  = "stop";
+static constexpr std::string_view ACTION_PAUSE = "pause";
 
 BaseHandle Create()
 {
@@ -71,11 +71,11 @@ BaseHandle Create()
 
 TypeRegistration mType( typeid( Dali::Animation ), typeid( Dali::BaseHandle ), Create );
 
-SignalConnectorType signalConnector1( mType, SIGNAL_FINISHED, &Animation::DoConnectSignal );
+SignalConnectorType signalConnector1(mType, std::string(SIGNAL_FINISHED), &Animation::DoConnectSignal);
 
-TypeAction action1( mType, ACTION_PLAY,  &Animation::DoAction );
-TypeAction action2( mType, ACTION_STOP,  &Animation::DoAction );
-TypeAction action3( mType, ACTION_PAUSE, &Animation::DoAction );
+TypeAction action1(mType, std::string(ACTION_PLAY), &Animation::DoAction);
+TypeAction action2(mType, std::string(ACTION_STOP), &Animation::DoAction);
+TypeAction action3(mType, std::string(ACTION_PAUSE), &Animation::DoAction);
 
 const Dali::Animation::EndAction DEFAULT_END_ACTION( Dali::Animation::BAKE );
 const Dali::Animation::EndAction DEFAULT_DISCONNECT_ACTION( Dali::Animation::BAKE_FINAL );
@@ -846,7 +846,7 @@ bool Animation::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface*
   bool connected( false );
   Animation* animation = static_cast< Animation* >(object); // TypeRegistry guarantees that this is the correct type.
 
-  if( 0 == signalName.compare( SIGNAL_FINISHED ) )
+  if(SIGNAL_FINISHED == signalName)
   {
     animation->FinishedSignal().Connect( tracker, functor );
     connected = true;
@@ -937,7 +937,9 @@ bool Animation::DoAction( BaseObject* object, const std::string& actionName, con
 
   if( animation )
   {
-    if( 0 == actionName.compare( ACTION_PLAY ) )
+    std::string_view name(actionName);
+
+    if(name == ACTION_PLAY)
     {
       if( Property::Value* value = attributes.Find("duration", Property::FLOAT) )
       {
@@ -947,12 +949,12 @@ bool Animation::DoAction( BaseObject* object, const std::string& actionName, con
       animation->Play();
       done = true;
     }
-    else if( 0 == actionName.compare( ACTION_STOP ) )
+    else if(name == ACTION_STOP)
     {
       animation->Stop();
       done = true;
     }
-    else if( 0 == actionName.compare( ACTION_PAUSE ) )
+    else if(name == ACTION_PAUSE)
     {
       animation->Pause();
       done = true;

@@ -62,25 +62,25 @@ namespace
 
 // Signals
 
-const char* const SIGNAL_KEY_EVENT =                 "keyEvent";
-const char* const SIGNAL_KEY_EVENT_GENERATED =       "keyEventGenerated";
-const char* const SIGNAL_EVENT_PROCESSING_FINISHED = "eventProcessingFinished";
-const char* const SIGNAL_TOUCHED =                   "touched";
-const char* const SIGNAL_WHEEL_EVENT =               "wheelEvent";
-const char* const SIGNAL_CONTEXT_LOST =              "contextLost";
-const char* const SIGNAL_CONTEXT_REGAINED =          "contextRegained";
-const char* const SIGNAL_SCENE_CREATED =             "sceneCreated";
+static constexpr std::string_view SIGNAL_KEY_EVENT                 = "keyEvent";
+static constexpr std::string_view SIGNAL_KEY_EVENT_GENERATED       = "keyEventGenerated";
+static constexpr std::string_view SIGNAL_EVENT_PROCESSING_FINISHED = "eventProcessingFinished";
+static constexpr std::string_view SIGNAL_TOUCHED                   = "touched";
+static constexpr std::string_view SIGNAL_WHEEL_EVENT               = "wheelEvent";
+static constexpr std::string_view SIGNAL_CONTEXT_LOST              = "contextLost";
+static constexpr std::string_view SIGNAL_CONTEXT_REGAINED          = "contextRegained";
+static constexpr std::string_view SIGNAL_SCENE_CREATED             = "sceneCreated";
 
 TypeRegistration mType( typeid(Dali::Stage), typeid(Dali::BaseHandle), nullptr );
 
-SignalConnectorType signalConnector1( mType, SIGNAL_KEY_EVENT,                 &Stage::DoConnectSignal );
-SignalConnectorType signalConnector2( mType, SIGNAL_EVENT_PROCESSING_FINISHED, &Stage::DoConnectSignal );
-SignalConnectorType signalConnector4( mType, SIGNAL_WHEEL_EVENT,               &Stage::DoConnectSignal );
-SignalConnectorType signalConnector5( mType, SIGNAL_CONTEXT_LOST,              &Stage::DoConnectSignal );
-SignalConnectorType signalConnector6( mType, SIGNAL_CONTEXT_REGAINED,          &Stage::DoConnectSignal );
-SignalConnectorType signalConnector7( mType, SIGNAL_SCENE_CREATED,             &Stage::DoConnectSignal );
-SignalConnectorType signalConnector8( mType, SIGNAL_KEY_EVENT_GENERATED,       &Stage::DoConnectSignal );
-SignalConnectorType signalConnector9( mType, SIGNAL_TOUCHED,                   &Stage::DoConnectSignal );
+SignalConnectorType signalConnector1(mType, std::string(SIGNAL_KEY_EVENT), &Stage::DoConnectSignal);
+SignalConnectorType signalConnector2(mType, std::string(SIGNAL_EVENT_PROCESSING_FINISHED), &Stage::DoConnectSignal);
+SignalConnectorType signalConnector4(mType, std::string(SIGNAL_WHEEL_EVENT), &Stage::DoConnectSignal);
+SignalConnectorType signalConnector5(mType, std::string(SIGNAL_CONTEXT_LOST), &Stage::DoConnectSignal);
+SignalConnectorType signalConnector6(mType, std::string(SIGNAL_CONTEXT_REGAINED), &Stage::DoConnectSignal);
+SignalConnectorType signalConnector7(mType, std::string(SIGNAL_SCENE_CREATED), &Stage::DoConnectSignal);
+SignalConnectorType signalConnector8(mType, std::string(SIGNAL_KEY_EVENT_GENERATED), &Stage::DoConnectSignal);
+SignalConnectorType signalConnector9(mType, std::string(SIGNAL_TOUCHED), &Stage::DoConnectSignal);
 
 } // unnamed namespace
 
@@ -218,36 +218,37 @@ bool Stage::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
 {
   bool connected( true );
   Stage* stage = static_cast< Stage* >(object); // TypeRegistry guarantees that this is the correct type.
+  std::string_view name(signalName);
 
-  if( 0 == strcmp( signalName.c_str(), SIGNAL_KEY_EVENT ) )
+  if(name == SIGNAL_KEY_EVENT)
   {
     stage->KeyEventSignal().Connect( tracker, functor );
   }
-  else if( 0 == strcmp( signalName.c_str(), SIGNAL_KEY_EVENT_GENERATED ) )
+  else if(name == SIGNAL_KEY_EVENT_GENERATED)
   {
     stage->KeyEventGeneratedSignal().Connect( tracker, functor );
   }
-  else if( 0 == strcmp( signalName.c_str(), SIGNAL_EVENT_PROCESSING_FINISHED ) )
+  else if(name == SIGNAL_EVENT_PROCESSING_FINISHED)
   {
     stage->EventProcessingFinishedSignal().Connect( tracker, functor );
   }
-  else if( 0 == strcmp( signalName.c_str(), SIGNAL_TOUCHED ) )
+  else if(name == SIGNAL_TOUCHED)
   {
     stage->TouchedSignal().Connect( tracker, functor );
   }
-  else if( 0 == strcmp( signalName.c_str(), SIGNAL_WHEEL_EVENT ) )
+  else if(name == SIGNAL_WHEEL_EVENT)
   {
     stage->WheelEventSignal().Connect( tracker, functor );
   }
-  else if( 0 == strcmp( signalName.c_str(), SIGNAL_CONTEXT_LOST ) )
+  else if(name == SIGNAL_CONTEXT_LOST)
   {
     stage->ContextLostSignal().Connect( tracker, functor );
   }
-  else if( 0 == strcmp( signalName.c_str(), SIGNAL_CONTEXT_REGAINED ) )
+  else if(name == SIGNAL_CONTEXT_REGAINED)
   {
     stage->ContextRegainedSignal().Connect( tracker, functor );
   }
-  else if( 0 == strcmp( signalName.c_str(), SIGNAL_SCENE_CREATED ) )
+  else if(name == SIGNAL_SCENE_CREATED)
   {
     stage->SceneCreatedSignal().Connect( tracker, functor );
   }

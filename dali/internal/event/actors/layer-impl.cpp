@@ -67,10 +67,10 @@ DALI_PROPERTY_TABLE_END( DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, LayerDefaul
 
 // Actions
 
-const char* const ACTION_RAISE =           "raise";
-const char* const ACTION_LOWER =           "lower";
-const char* const ACTION_RAISE_TO_TOP =    "raiseToTop";
-const char* const ACTION_LOWER_TO_BOTTOM = "lowerToBottom";
+static constexpr std::string_view ACTION_RAISE           = "raise";
+static constexpr std::string_view ACTION_LOWER           = "lower";
+static constexpr std::string_view ACTION_RAISE_TO_TOP    = "raiseToTop";
+static constexpr std::string_view ACTION_LOWER_TO_BOTTOM = "lowerToBottom";
 
 BaseHandle Create()
 {
@@ -79,10 +79,10 @@ BaseHandle Create()
 
 TypeRegistration mType( typeid( Dali::Layer ), typeid( Dali::Actor ), Create, LayerDefaultProperties );
 
-TypeAction a1( mType, ACTION_RAISE, &Layer::DoAction );
-TypeAction a2( mType, ACTION_LOWER, &Layer::DoAction );
-TypeAction a3( mType, ACTION_RAISE_TO_TOP, &Layer::DoAction );
-TypeAction a4( mType, ACTION_LOWER_TO_BOTTOM, &Layer::DoAction );
+TypeAction a1(mType, std::string(ACTION_RAISE), &Layer::DoAction);
+TypeAction a2(mType, std::string(ACTION_LOWER), &Layer::DoAction);
+TypeAction a3(mType, std::string(ACTION_RAISE_TO_TOP), &Layer::DoAction);
+TypeAction a4(mType, std::string(ACTION_LOWER_TO_BOTTOM), &Layer::DoAction);
 
 } // unnamed namespace
 
@@ -507,22 +507,24 @@ bool Layer::DoAction( BaseObject* object, const std::string& actionName, const P
 
   if( layer )
   {
-    if( 0 == actionName.compare( ACTION_RAISE ) )
+    std::string_view name(actionName);
+
+    if(name == ACTION_RAISE)
     {
       layer->Raise();
       done = true;
     }
-    else if( 0 == actionName.compare( ACTION_LOWER ) )
+    else if(name == ACTION_LOWER)
     {
       layer->Lower();
       done = true;
     }
-    else if( 0 == actionName.compare( ACTION_RAISE_TO_TOP ) )
+    else if(name == ACTION_RAISE_TO_TOP)
     {
       layer->RaiseToTop();
       done = true;
     }
-    else if( 0 == actionName.compare( ACTION_LOWER_TO_BOTTOM ) )
+    else if(name == ACTION_LOWER_TO_BOTTOM)
     {
       layer->LowerToBottom();
       done = true;
