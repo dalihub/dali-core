@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstdint> // uint8_t
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
@@ -49,7 +52,7 @@ public:
    * @brief Enumeration for built-in alpha functions.
    * @SINCE_1_0.0
    */
-  enum BuiltinFunction
+  enum BuiltinFunction : uint8_t
   {
     DEFAULT,          ///< Linear @SINCE_1_0.0
     LINEAR,           ///< No transformation @SINCE_1_0.0
@@ -72,7 +75,7 @@ public:
    * @brief Enumeration for all possible functioning modes for the alpha function.
    * @SINCE_1_0.0
    */
-  enum Mode
+  enum Mode : uint8_t
   {
     BUILTIN_FUNCTION, ///< The user has specified a built-in function @SINCE_1_0.0
     CUSTOM_FUNCTION,  ///< The user has provided a custom function @SINCE_1_0.0
@@ -148,10 +151,14 @@ public:
   Mode GetMode() const;
 
 private:
-  Vector4                mBezierControlPoints;             //< Control points for the bezier alpha function
-  AlphaFunctionPrototype mCustom;                          //< Pointer to an alpha function
-  BuiltinFunction        mBuiltin : Log<COUNT>::value + 1; //< Enum indicating the built-in alpha function
-  Mode                   mMode : 2;                        //< Enum indicating the functioning mode of the AlphaFunction
+  Mode            mMode;    //< Enum indicating the functioning mode of the AlphaFunction
+  BuiltinFunction mBuiltin; //< Enum indicating the built-in alpha function
+
+  union
+  {
+    Vector4                mBezierControlPoints; //< Control points for the bezier alpha function
+    AlphaFunctionPrototype mCustom;              //< Pointer to an alpha function
+  };
 };
 
 /**
