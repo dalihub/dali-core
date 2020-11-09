@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,8 +78,7 @@ Animation::Animation( float durationSeconds, float speedFactor, const Vector2& p
   mDisconnectAction(disconnectAction),
   mState(Stopped),
   mProgressReachedSignalRequired( false ),
-  mAutoReverseEnabled( false ),
-  mIsActive{ false }
+  mAutoReverseEnabled( false )
 {
 }
 
@@ -425,8 +424,6 @@ void Animation::Update( BufferIndex bufferIndex, float elapsedSeconds, bool& loo
 
 void Animation::UpdateAnimators( BufferIndex bufferIndex, bool bake, bool animationFinished )
 {
-  mIsActive[bufferIndex] = false;
-
   const Vector2 playRange( mPlayRange * mDurationSeconds );
   float elapsedSecondsClamped = Clamp( mElapsedSeconds, playRange.x, playRange.y );
 
@@ -457,11 +454,6 @@ void Animation::UpdateAnimators( BufferIndex bufferIndex, bool bake, bool animat
             progress = Clamp((elapsedSecondsClamped - intervalDelay) / animatorDuration, 0.0f , 1.0f );
           }
           animator->Update(bufferIndex, progress, bake);
-
-          if (animatorDuration > 0.0f && (elapsedSecondsClamped - intervalDelay) <= animatorDuration)
-          {
-            mIsActive[bufferIndex] = true;
-          }
         }
         applied = true;
       }

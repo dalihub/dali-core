@@ -835,8 +835,6 @@ void Actor::SetOpacity( float opacity )
 
   // node is being used in a separate thread; queue a message to set the value & base value
   SceneGraph::NodePropertyComponentMessage<Vector4>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mColor, &AnimatableProperty<Vector4>::BakeW, opacity );
-
-  RequestRenderingMessage( GetEventThreadServices().GetUpdateManager() );
 }
 
 float Actor::GetCurrentOpacity() const
@@ -856,8 +854,6 @@ void Actor::SetColor( const Vector4& color )
 
   // node is being used in a separate thread; queue a message to set the value & base value
   SceneGraph::NodePropertyMessage<Vector4>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mColor, &AnimatableProperty<Vector4>::Bake, color );
-
-  RequestRenderingMessage( GetEventThreadServices().GetUpdateManager() );
 }
 
 void Actor::SetColorRed( float red )
@@ -866,8 +862,6 @@ void Actor::SetColorRed( float red )
 
   // node is being used in a separate thread; queue a message to set the value & base value
   SceneGraph::NodePropertyComponentMessage<Vector4>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mColor, &AnimatableProperty<Vector4>::BakeX, red );
-
-  RequestRenderingMessage( GetEventThreadServices().GetUpdateManager() );
 }
 
 void Actor::SetColorGreen( float green )
@@ -876,8 +870,6 @@ void Actor::SetColorGreen( float green )
 
   // node is being used in a separate thread; queue a message to set the value & base value
   SceneGraph::NodePropertyComponentMessage<Vector4>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mColor, &AnimatableProperty<Vector4>::BakeY, green );
-
-  RequestRenderingMessage( GetEventThreadServices().GetUpdateManager() );
 }
 
 void Actor::SetColorBlue( float blue )
@@ -886,8 +878,6 @@ void Actor::SetColorBlue( float blue )
 
   // node is being used in a separate thread; queue a message to set the value & base value
   SceneGraph::NodePropertyComponentMessage<Vector4>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mColor, &AnimatableProperty<Vector4>::BakeZ, blue );
-
-  RequestRenderingMessage( GetEventThreadServices().GetUpdateManager() );
 }
 
 const Vector4& Actor::GetCurrentColor() const
@@ -2503,8 +2493,6 @@ void Actor::SetVisibleInternal( bool visible, SendMessage::Type sendMessage )
     {
       // node is being used in a separate thread; queue a message to set the value & base value
       SceneGraph::NodePropertyMessage<bool>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mVisible, &AnimatableProperty<bool>::Bake, visible );
-
-      RequestRenderingMessage( GetEventThreadServices().GetUpdateManager() );
     }
 
     mVisible = visible;
