@@ -112,9 +112,9 @@ Layer Scene::GetLayer(uint32_t depth) const
   return GetImplementation(*this).GetLayer(depth);
 }
 
-void Scene::SurfaceResized(float width, float height)
+void Scene::SurfaceResized(float width, float height, int orientation, bool forceUpdate)
 {
-  GetImplementation(*this).SurfaceResized(width, height);
+  GetImplementation(*this).SurfaceResized(width, height, orientation, forceUpdate);
 }
 
 void Scene::SurfaceReplaced()
