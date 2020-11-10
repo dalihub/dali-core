@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TRANSFORM_MANAGER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -192,9 +192,8 @@ public:
 
   /**
    * Recomputes all world transform matrices
-   * @return true if any component has been changed in this frame, false otherwise
    */
-  bool Update();
+  void Update();
 
   /**
    * Resets all the animatable properties to its base value

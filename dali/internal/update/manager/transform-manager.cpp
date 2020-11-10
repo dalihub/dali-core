@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -228,10 +228,8 @@ void TransformManager::ResetToBaseValue()
   }
 }
 
-bool TransformManager::Update()
+void TransformManager::Update()
 {
-  bool componentsChanged = false;
-
   if( mReorder )
   {
     //If some transform component has change its parent or has been removed since last update
@@ -323,11 +321,8 @@ bool TransformManager::Update()
     mBoundingSpheres[i] = mWorld[i].GetTranslation();
     mBoundingSpheres[i].w = Length( centerToEdgeWorldSpace );
 
-    componentsChanged = componentsChanged || mComponentDirty[i];
     mComponentDirty[i] = false;
   }
-
-  return componentsChanged;
 }
 
 void TransformManager::SwapComponents( unsigned int i, unsigned int j )
@@ -386,26 +381,31 @@ Vector3& TransformManager::GetVector3PropertyValue( TransformId id, TransformMan
     case TRANSFORM_PROPERTY_POSITION:
     {
       TransformId index( mIds[id] );
+      mComponentDirty[ index ] = true;
       return mTxComponentAnimatable[ index ].mPosition;
     }
     case TRANSFORM_PROPERTY_SCALE:
     {
       TransformId index( mIds[id] );
+      mComponentDirty[ index ] = true;
       return mTxComponentAnimatable[ index ].mScale;
     }
     case TRANSFORM_PROPERTY_PARENT_ORIGIN:
     {
       TransformId index( mIds[id] );
+      mComponentDirty[ index ] = true;
       return mTxComponentStatic[ index ].mParentOrigin;
     }
     case TRANSFORM_PROPERTY_ANCHOR_POINT:
     {
       TransformId index( mIds[id] );
+      mComponentDirty[ index ] = true;
       return mTxComponentStatic[ index ].mAnchorPoint;
     }
     case TRANSFORM_PROPERTY_SIZE:
     {
       TransformId index( mIds[id] );
+      mComponentDirty[ index ] = true;
       return mSize[ index ];
     }
     default:
@@ -834,6 +834,7 @@ void TransformManager::BakeZVector3PropertyValue( TransformId id, TransformManag
 Quaternion& TransformManager::GetQuaternionPropertyValue( TransformId id )
 {
   TransformId index( mIds[id] );
+  mComponentDirty[ index ] = true;
   return mTxComponentAnimatable[ index ].mOrientation;
 }
 
