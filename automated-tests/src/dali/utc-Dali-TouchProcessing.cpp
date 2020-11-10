@@ -2121,7 +2121,7 @@ int UtcDaliTouchEventIntercept(void)
   END_TEST;
 }
 
-int UtcDaliTouchDelegateArea(void)
+int UtcDaliTouchArea(void)
 {
   TestApplication application;
 
@@ -2146,8 +2146,8 @@ int UtcDaliTouchDelegateArea(void)
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   data.Reset();
 
-  // set a bigger touch delegate area
-  actor.SetProperty(DevelActor::Property::TOUCH_DELEGATE_AREA, Vector2(200.0f, 200.0f));
+  // set a bigger touch area
+  actor.SetProperty(DevelActor::Property::TOUCH_AREA, Vector2(200.0f, 200.0f));
 
   // Render and notify
   application.SendNotification();
@@ -2155,14 +2155,14 @@ int UtcDaliTouchDelegateArea(void)
 
   // Emit a down signal
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(110.0f, 110.0f)));
-  // The actor touched signal is called because the touch area is inside touchDelegateArea.
+  // The actor touched signal is called because the touch area is inside touchArea.
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(PointState::DOWN, data.receivedTouch.points[0].state, TEST_LOCATION);
   DALI_TEST_CHECK(actor == data.receivedTouch.points[0].hitActor);
   data.Reset();
 
-  // set a smaller touch delegate area
-  actor.SetProperty(DevelActor::Property::TOUCH_DELEGATE_AREA, Vector2(50.0f, 50.0f));
+  // set a smaller touch area
+  actor.SetProperty(DevelActor::Property::TOUCH_AREA, Vector2(50.0f, 50.0f));
 
   // Render and notify
   application.SendNotification();
@@ -2170,13 +2170,13 @@ int UtcDaliTouchDelegateArea(void)
 
   // Emit a down signal
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(80.0f, 80.0f)));
-  // The actor touched signal is not called because the touch area is outside touchDelegateArea.
+  // The actor touched signal is not called because the touch area is outside touchArea.
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   data.Reset();
 
   // Emit a down signal
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(30.0f, 30.0f)));
-  // The actor touched signal is called because the touch area is inside touchDelegateArea.
+  // The actor touched signal is called because the touch area is inside touchArea.
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(PointState::DOWN, data.receivedTouch.points[0].state, TEST_LOCATION);
   DALI_TEST_CHECK(actor == data.receivedTouch.points[0].hitActor);

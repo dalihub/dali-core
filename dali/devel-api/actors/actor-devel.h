@@ -120,18 +120,18 @@ enum Type
   CAPTURE_ALL_TOUCH_AFTER_START,
 
   /**
-    * @brief If you set the TOUCH_DELEGATE_AREA on an actor, when you touch the actor, the delegate area is used rather than the size of the actor
-    * @details Name "touchDelegateArea", type Property::Vector2
+    * @brief If you set the TOUCH_AREA on an actor, when you touch the actor, the touch area is used rather than the size of the actor
+    * @details Name "touchArea", type Property::Vector2
     * @note Default is Vector2::ZERO.
     * @note for example
     *  Actor actor = Actor::New();
     *  actor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
-    *  actor.SetProperty(DevelActor::Property::TOUCH_DELEGATE_AREA, Vector2(200.0f, 200.0f));
+    *  actor.SetProperty(DevelActor::Property::TOUCH_AREA, Vector2(200.0f, 200.0f));
     *  actor.TouchedSignal().Connect(OnTouchCallback);
     *
-    *  If you want to reset the touch area to an area different with the size of the actor, you can set this TOUCH_DELEGATE_AREA property.
+    *  If you want to reset the touch area to an area different with the size of the actor, you can set this TOUCH_AREA property.
     */
-  TOUCH_DELEGATE_AREA
+  TOUCH_AREA
 };
 
 } // namespace Property
