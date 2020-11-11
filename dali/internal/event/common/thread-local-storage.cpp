@@ -149,6 +149,26 @@ AnimationPlaylist& ThreadLocalStorage::GetAnimationPlaylist()
   return mCore->GetAnimationPlaylist();
 }
 
+bool ThreadLocalStorage::IsBlendEquationSupported( DevelBlendEquation::Type blendEquation )
+{
+  return mCore->GetGlAbstraction().IsBlendEquationSupported( blendEquation );
+}
+
+std::string ThreadLocalStorage::GetShaderVersionPrefix()
+{
+  return mCore->GetGlAbstraction().GetShaderVersionPrefix();
+}
+
+std::string ThreadLocalStorage::GetVertexShaderPrefix()
+{
+  return mCore->GetGlAbstraction().GetVertexShaderPrefix();
+}
+
+std::string ThreadLocalStorage::GetFragmentShaderPrefix()
+{
+  return mCore->GetGlAbstraction().GetFragmentShaderPrefix();
+}
+
 void ThreadLocalStorage::AddScene( Scene* scene )
 {
   mCore->AddScene( scene );

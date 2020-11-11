@@ -163,6 +163,28 @@ public:
   AnimationPlaylist& GetAnimationPlaylist();
 
   /**
+   * @brief Returns whether the blend equation is supported in the system or not.
+   * @param[in] blendEquation blend equation to be checked.
+   * @return True if the blend equation supported.
+   */
+  bool IsBlendEquationSupported( DevelBlendEquation::Type blendEquation );
+
+  /**
+   * @brief Returns shader prefix of shading language version.
+   */
+  std::string GetShaderVersionPrefix();
+
+  /**
+   * @brief Returns vertex shader prefix including shading language version.
+   */
+  std::string GetVertexShaderPrefix();
+
+  /**
+   * @brief Returns fragment shader prefix including shading language version and extension information.
+   */
+  std::string GetFragmentShaderPrefix();
+
+  /**
    * Add a Scene to the Core.
    * This is only used by the Scene to add itself to the core when the Scene is created.
    * @param[in] scene The Scene.

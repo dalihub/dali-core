@@ -2,7 +2,7 @@
 #define DALI_BLENDING_OPTIONS_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/rendering/renderer.h>
+#include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/internal/common/owner-pointer.h>
 
@@ -83,17 +84,17 @@ struct BlendingOptions
   /**
    * @copydoc Dali::RenderableActor::SetBlendEquation()
    */
-  void SetBlendEquation( BlendEquation::Type equationRgb, BlendEquation::Type equationAlpha );
+  void SetBlendEquation( DevelBlendEquation::Type equationRgb, DevelBlendEquation::Type equationAlpha );
 
   /**
    * @copydoc Dali::RenderableActor::GetBlendEquation()
    */
-  BlendEquation::Type GetBlendEquationRgb() const;
+  DevelBlendEquation::Type GetBlendEquationRgb() const;
 
   /**
    * @copydoc Dali::RenderableActor::GetBlendEquation()
    */
-  BlendEquation::Type GetBlendEquationAlpha() const;
+  DevelBlendEquation::Type GetBlendEquationAlpha() const;
 
   /**
    * Set the blend color.
@@ -107,6 +108,18 @@ struct BlendingOptions
    * The blend color, or NULL if no blend color was set.
    */
   const Vector4* GetBlendColor() const;
+
+  /**
+   * Query whether current blend equation is advanced option.
+   * @return True if current blend equation is advanced.
+   */
+  bool IsAdvancedBlendEquationApplied();
+
+  /**
+   * Query whether input blend equation is advanced option.
+   * @return True if input blend equation is advanced.
+   */
+  static bool IsAdvancedBlendEquation( DevelBlendEquation::Type equation );
 
 private:
 

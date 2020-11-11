@@ -23,6 +23,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/events/hover-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/devel-api/common/capabilities.h>
 #include <dali/public-api/dali-core.h>
 #include <mesh-builder.h>
 
@@ -8610,5 +8611,42 @@ int UtcDaliActorGetParentNegative(void)
   {
     DALI_TEST_CHECK(true); // We expect an assert
   }
+  END_TEST;
+}
+
+int UtcDaliActorPropertyBlendEquation(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test SetProperty AdvancedBlendEquation");
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader shader = CreateShader();
+  Renderer renderer1 = Renderer::New( geometry, shader );
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::OPACITY, 0.1f);
+
+  actor.AddRenderer(renderer1);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(400, 400));
+  application.GetScene().Add(actor);
+
+  if( !Dali::Capabilities::IsBlendEquationSupported( DevelBlendEquation::SCREEN ) )
+  {
+    actor.SetProperty( Dali::DevelActor::Property::BLEND_EQUATION, Dali::DevelBlendEquation::SCREEN );
+    int equation = actor.GetProperty<int>( Dali::DevelActor::Property::BLEND_EQUATION );
+    DALI_TEST_EQUALS( ( Dali::DevelBlendEquation::SCREEN == equation ), false, TEST_LOCATION );
+  }
+
+  if( Dali::Capabilities::IsBlendEquationSupported( DevelBlendEquation::SCREEN ) )
+  {
+    actor.SetProperty( Dali::DevelActor::Property::BLEND_EQUATION, Dali::DevelBlendEquation::SCREEN );
+    int equation = actor.GetProperty<int>( Dali::DevelActor::Property::BLEND_EQUATION );
+    DALI_TEST_EQUALS( ( Dali::DevelBlendEquation::SCREEN == equation ), true, TEST_LOCATION );
+  }
+
+  Renderer renderer2 = Renderer::New( geometry, shader );
+  actor.AddRenderer(renderer2);
+
   END_TEST;
 }

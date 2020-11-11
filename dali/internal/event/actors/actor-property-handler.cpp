@@ -584,6 +584,15 @@ void Actor::PropertyHandler::SetDefaultProperty( Internal::Actor& actor, Propert
       break;
     }
 
+    case Dali::DevelActor::Property::BLEND_EQUATION:
+    {
+      int value;
+      if( property.Get( value ) )
+      {
+        actor.SetBlendEquation( static_cast<DevelBlendEquation::Type>( value ) );
+      }
+      break;
+    }
 
     default:
     {
@@ -1617,6 +1626,12 @@ bool Actor::PropertyHandler::GetCachedPropertyValue(const Internal::Actor& actor
     case Dali::DevelActor::Property::TOUCH_AREA:
     {
       value = actor.GetTouchArea();
+      break;
+    }
+
+    case Dali::DevelActor::Property::BLEND_EQUATION:
+    {
+      value = actor.GetBlendEquation();
       break;
     }
 

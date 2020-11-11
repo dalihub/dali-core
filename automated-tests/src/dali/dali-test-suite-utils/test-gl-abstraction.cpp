@@ -112,6 +112,31 @@ bool TestGlAbstraction::IsSurfacelessContextSupported() const
   return true;
 }
 
+bool TestGlAbstraction::IsAdvancedBlendEquationSupported()
+{
+  return true;
+}
+
+bool TestGlAbstraction::IsBlendEquationSupported(DevelBlendEquation::Type blendEquation)
+{
+  return true;
+}
+
+std::string TestGlAbstraction::GetShaderVersionPrefix()
+{
+  return std::string("");
+}
+
+std::string TestGlAbstraction::GetVertexShaderPrefix()
+{
+  return std::string("");
+}
+
+std::string TestGlAbstraction::GetFragmentShaderPrefix()
+{
+  return std::string("");
+}
+
 bool TestGlAbstraction::TextureRequiresConverting(const GLenum imageGlFormat, const GLenum textureGlFormat, const bool isSubImage) const
 {
   return ((imageGlFormat == GL_RGB) && (textureGlFormat == GL_RGBA));

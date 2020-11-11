@@ -217,11 +217,20 @@ bool Texture::ApplyNativeFragmentShader(std::string& shader)
     const char* fragmentPrefix        = mNativeImage->GetCustomFragmentPrefix();
     const char* customSamplerTypename = mNativeImage->GetCustomSamplerTypename();
 
+    size_t prefixIndex = shader.find(Dali::Shader::GetShaderVersionPrefix());
     if(fragmentPrefix != nullptr)
     {
       modified       = true;
-      fragmentShader = fragmentPrefix;
-      fragmentShader += "\n";
+      if(prefixIndex == std::string::npos)
+      {
+        fragmentShader = fragmentPrefix;
+        fragmentShader += "\n";
+      }
+      else
+      {
+        fragmentShader.clear();
+        shader.insert(prefixIndex + Dali::Shader::GetShaderVersionPrefix().length(), std::string(fragmentPrefix) + "\n");
+      }
     }
     fragmentShader += shader;
 

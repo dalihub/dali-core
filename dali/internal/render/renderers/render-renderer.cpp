@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -201,8 +201,21 @@ void Renderer::SetBlending( Context& context, bool blend )
                                mBlendingOptions.GetBlendDestFactorAlpha() );
 
     // Set blend equations
-    context.BlendEquationSeparate( mBlendingOptions.GetBlendEquationRgb(),
-                                   mBlendingOptions.GetBlendEquationAlpha() );
+    Dali::DevelBlendEquation::Type rgbEquation   = mBlendingOptions.GetBlendEquationRgb();
+    Dali::DevelBlendEquation::Type alphaEquation = mBlendingOptions.GetBlendEquationAlpha();
+
+    if( mBlendingOptions.IsAdvancedBlendEquationApplied() && mPremultipledAlphaEnabled )
+    {
+      if( rgbEquation != alphaEquation )
+      {
+        DALI_LOG_ERROR( "Advanced Blend Equation have to be appried by using BlendEquation.\n" );
+      }
+      context.BlendEquation( rgbEquation );
+    }
+    else
+    {
+      context.BlendEquationSeparate( rgbEquation, alphaEquation );
+    }
   }
 
   mUpdated = true;
@@ -647,6 +660,11 @@ void Renderer::Render( Context& context,
     {
       mGeometry->GetAttributeLocationFromProgram( mAttributesLocation, *program, bufferIndex );
       mUpdateAttributesLocation = false;
+    }
+
+    if( mBlendingOptions.IsAdvancedBlendEquationApplied() && mPremultipledAlphaEnabled )
+    {
+      context.BlendBarrier();
     }
 
     if(mDrawCommands.empty())

@@ -31,6 +31,7 @@
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/devel-api/common/capabilities.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/internal/event/actors/actor-property-handler.h>
 #include <dali/internal/event/actors/actor-relayouter.h>
@@ -144,6 +145,7 @@ DALI_PROPERTY( "siblingOrder",              INTEGER,  true,  false, false, Dali:
 DALI_PROPERTY( "updateSizeHint",            VECTOR2,  true,  false, false, Dali::DevelActor::Property::UPDATE_SIZE_HINT )
 DALI_PROPERTY( "captureAllTouchAfterStart", BOOLEAN,  true,  false, false, Dali::DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START )
 DALI_PROPERTY( "touchArea",                 VECTOR2,  true,  false, false, Dali::DevelActor::Property::TOUCH_AREA )
+DALI_PROPERTY( "blendEquation",             INTEGER,  true,  false, false, Dali::DevelActor::Property::BLEND_EQUATION )
 DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX, ActorDefaultProperties )
 
 // Signals
@@ -1195,6 +1197,12 @@ uint32_t Actor::AddRenderer( Renderer& renderer )
     mRenderers = new RendererContainer;
   }
 
+  if(mIsBlendEquationSet)
+  {
+    renderer.SetBlendMode(Dali::BlendMode::ON);
+    renderer.SetBlendEquation(static_cast<DevelBlendEquation::Type>(mBlendEquation));
+  }
+
   uint32_t index = static_cast<uint32_t>( mRenderers->size() ); //  4,294,967,295 renderers per actor
   RendererPtr rendererPtr = RendererPtr( &renderer );
   mRenderers->push_back( rendererPtr );
@@ -1249,6 +1257,34 @@ void Actor::RemoveRenderer( uint32_t index )
     DetachRendererMessage( GetEventThreadServices(), GetNode(), renderer.Get()->GetRendererSceneObject() );
     mRenderers->erase( mRenderers->begin()+index );
   }
+}
+
+void Actor::SetBlendEquation(DevelBlendEquation::Type blendEquation)
+{
+  if(Dali::Capabilities::IsBlendEquationSupported(blendEquation))
+  {
+    if(mBlendEquation != blendEquation)
+    {
+      mBlendEquation         = blendEquation;
+      uint32_t rendererCount = GetRendererCount();
+      for(uint32_t i = 0; i < rendererCount; ++i)
+      {
+        RendererPtr renderer = GetRendererAt(i);
+        renderer->SetBlendMode(Dali::BlendMode::ON);
+        renderer->SetBlendEquation(static_cast<DevelBlendEquation::Type>(blendEquation));
+      }
+    }
+    mIsBlendEquationSet = true;
+  }
+  else
+  {
+    DALI_LOG_ERROR("Invalid blend equation is entered.\n");
+  }
+}
+
+DevelBlendEquation::Type Actor::GetBlendEquation() const
+{
+  return mBlendEquation;
 }
 
 void Actor::SetDrawMode( DrawMode::Type drawMode )
@@ -1475,7 +1511,9 @@ Actor::Actor( DerivedType derivedType, const SceneGraph::Node& node )
   mLayoutDirection( LayoutDirection::LEFT_TO_RIGHT ),
   mDrawMode( DrawMode::NORMAL ),
   mColorMode( Node::DEFAULT_COLOR_MODE ),
-  mClippingMode( ClippingMode::DISABLED )
+  mClippingMode( ClippingMode::DISABLED ),
+  mBlendEquation( DevelBlendEquation::ADD ),
+  mIsBlendEquationSet( false )
 {
 }
 

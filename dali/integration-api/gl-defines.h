@@ -805,6 +805,23 @@
 #define GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR        0x93DC
 #define GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR        0x93DD
 
+// GL_blend_equation_advanced / GLES 3.2
+#define GL_MULTIPLY                                      0x9294
+#define GL_SCREEN                                        0x9295
+#define GL_OVERLAY                                       0x9296
+#define GL_DARKEN                                        0x9297
+#define GL_LIGHTEN                                       0x9298
+#define GL_COLORDODGE                                    0x9299
+#define GL_COLORBURN                                     0x929A
+#define GL_HARDLIGHT                                     0x929B
+#define GL_SOFTLIGHT                                     0x929C
+#define GL_DIFFERENCE                                    0x929E
+#define GL_EXCLUSION                                     0x92A0
+#define GL_HSL_HUE                                       0x92AD
+#define GL_HSL_SATURATION                                0x92AE
+#define GL_HSL_COLOR                                     0x92AF
+#define GL_HSL_LUMINOSITY                                0x92B0
+
 /*------------------------------------------------------------------------*
  * EXT extension tokens
  *------------------------------------------------------------------------*/

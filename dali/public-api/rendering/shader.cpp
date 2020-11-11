@@ -53,4 +53,19 @@ Shader::Shader(Internal::Shader* pointer)
 {
 }
 
+std::string Shader::GetShaderVersionPrefix()
+{
+  return Dali::Internal::Shader::GetShaderVersionPrefix();
+}
+
+std::string Shader::GetVertexShaderPrefix()
+{
+  return Dali::Internal::Shader::GetVertexShaderPrefix();
+}
+
+std::string Shader::GetFragmentShaderPrefix()
+{
+  return Dali::Internal::Shader::GetFragmentShaderPrefix();
+}
+
 } // namespace Dali
