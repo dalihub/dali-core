@@ -46,3 +46,5 @@ libdali2-core.so*
 /packaging/home*
 compile_commands.json
 file-list.cmake
+compile_commands.json
+.clangd

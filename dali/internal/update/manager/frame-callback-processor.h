@@ -67,7 +67,7 @@ public:
   FrameCallbackProcessor( const FrameCallbackProcessor& )            = delete;  ///< Deleted copy constructor.
   FrameCallbackProcessor( FrameCallbackProcessor&& )                 = default; ///< Default move constructor.
   FrameCallbackProcessor& operator=( const FrameCallbackProcessor& ) = delete;  ///< Deleted copy assignment operator.
-  FrameCallbackProcessor& operator=( FrameCallbackProcessor&& )      = default; ///< Default move assignment operator.
+  FrameCallbackProcessor& operator=( FrameCallbackProcessor&& )      = delete;  ///< Deleted move assignment operator.
 
   /**
    * Adds an implementation of the FrameCallbackInterface.

@@ -28,7 +28,7 @@
 namespace Dali
 {
 
-struct TouchEvent;
+class TouchEvent;
 struct Radian;
 
 namespace Internal

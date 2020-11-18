@@ -22,7 +22,7 @@
 #include <dali/public-api/rendering/vertex-buffer.h>
 #include <dali/internal/update/manager/update-manager.h>
 
-#if defined (ANDROID) || defined(WIN32)
+#if defined (ANDROID) || defined(WIN32) || defined(__APPLE__)
 namespace std
 {
   uint64_t _Hash_bytes(const void* bytes, uint64_t size, uint64_t seed)
