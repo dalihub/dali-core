@@ -56,7 +56,7 @@ Property::Type KeyFrames::GetType() const
 
 void KeyFrames::Add(float time, Property::Value value)
 {
-  Add(time, value, AlphaFunction::DEFAULT);
+  Add(time, std::move(value), AlphaFunction::DEFAULT);
 }
 
 void KeyFrames::Add(float time, Property::Value value, AlphaFunction alpha)

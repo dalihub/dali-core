@@ -311,6 +311,13 @@ private:
    */
   AnimationPlaylist& GetAnimationPlaylist() const;
 
+  /**
+   * @brief Returns GlAbstraction.
+   * @note Use only for the capability. Do not use this for bypass context
+   * @return GlAbstraction
+   */
+  Integration::GlAbstraction& GetGlAbstraction() const;
+
 private:
 
   /**
@@ -348,6 +355,10 @@ private:
 
   // The object registry
   ObjectRegistryPtr                             mObjectRegistry;
+
+  // GlAbstraction for capabilities of GL
+  // Not to use this for bypass Context.
+  Integration::GlAbstraction&               mGlAbstraction;
 
   bool                                      mProcessingEvent  : 1;        ///< True during ProcessEvents()
   bool                                      mForceNextUpdate:1;           ///< True if the next rendering is really required.

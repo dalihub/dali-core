@@ -16,12 +16,18 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/internal/event/rendering/renderer-impl.h>
 
 namespace Dali
 {
 namespace DevelRenderer
 {
+bool IsAdvancedBlendEquationApplied(const Renderer& renderer)
+{
+  return GetImplementation(renderer).IsAdvancedBlendEquationApplied();
+}
+
 void AddDrawCommand(Dali::Renderer renderer, const DrawCommand& drawCommand)
 {
   auto& impl = GetImplementation(renderer);

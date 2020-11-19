@@ -91,6 +91,7 @@ Core::Core( RenderController& renderController,
             Integration::PartialUpdateAvailable partialUpdateAvailable )
 : mRenderController( renderController ),
   mPlatform(platform),
+  mGlAbstraction(glAbstraction),
   mProcessingEvent(false),
   mForceNextUpdate( false )
 {
@@ -420,6 +421,11 @@ PropertyNotificationManager& Core::GetPropertyNotificationManager() const
 AnimationPlaylist& Core::GetAnimationPlaylist() const
 {
   return *(mAnimationPlaylist);
+}
+
+Integration::GlAbstraction& Core::GetGlAbstraction() const
+{
+  return mGlAbstraction;
 }
 
 void Core::AddScene( Scene* scene )

@@ -18,6 +18,9 @@
  *
  */
 
+//EXTERNAL INCLUDES
+#include <functional>
+
 // INTERNAL INCLUDES
 #include <dali/internal/event/animation/animator-connector-base.h>
 #include <dali/internal/event/animation/animation-impl.h>
@@ -41,6 +44,10 @@ namespace Internal
 template < typename PropertyType >
 class AnimatorConnector : public AnimatorConnectorBase
 {
+  using AnimatorFunction = std::function<PropertyType(float, const PropertyType&)>;
+
+  AnimatorFunction mAnimatorFunction;
+
 public:
 
   using AnimatorType = SceneGraph::Animator< PropertyType, PropertyAccessor<PropertyType> >;
@@ -56,19 +63,19 @@ public:
    * @param[in] period The time period of the animator.
    * @return A pointer to a newly allocated animator connector.
    */
-  static AnimatorConnectorBase* New( Object& object,
-                                     Property::Index propertyIndex,
-                                     int32_t componentIndex,
-                                     AnimatorFunctionBase* animatorFunction,
-                                     AlphaFunction alpha,
-                                     const TimePeriod& period )
+  static AnimatorConnectorBase* New(Object&           object,
+                                    Property::Index   propertyIndex,
+                                    int32_t           componentIndex,
+                                    AnimatorFunction  animatorFunction,
+                                    AlphaFunction     alpha,
+                                    const TimePeriod& period)
   {
-    return new AnimatorConnector( object,
-                                  propertyIndex,
-                                  componentIndex,
-                                  animatorFunction,
-                                  alpha,
-                                  period );
+    return new AnimatorConnector(object,
+                                 propertyIndex,
+                                 componentIndex,
+                                 std::move(animatorFunction),
+                                 alpha,
+                                 period);
   }
 
   /**
@@ -81,13 +88,14 @@ private:
   /**
    * Private constructor; see also AnimatorConnector::New().
    */
-  AnimatorConnector( Object& object,
-                     Property::Index propertyIndex,
-                     int32_t componentIndex,
-                     Internal::AnimatorFunctionBase* animatorFunction,
-                     AlphaFunction alpha,
-                     const TimePeriod& period )
-  : AnimatorConnectorBase( object, propertyIndex, componentIndex, animatorFunction, alpha, period )
+  AnimatorConnector(Object&           object,
+                    Property::Index   propertyIndex,
+                    int32_t           componentIndex,
+                    AnimatorFunction  animatorFunction,
+                    AlphaFunction     alpha,
+                    const TimePeriod& period)
+  : AnimatorConnectorBase(object, propertyIndex, componentIndex, alpha, period),
+    mAnimatorFunction(std::move(animatorFunction))
   {
   }
 
@@ -113,7 +121,11 @@ private:
     {
       if( baseProperty.IsTransformManagerProperty() )
       {
-        mAnimator = SceneGraph::AnimatorTransformProperty< PropertyType,TransformManagerPropertyAccessor<PropertyType> >::New( propertyOwner, baseProperty, mAnimatorFunction, mAlphaFunction, mTimePeriod );
+        mAnimator = SceneGraph::AnimatorTransformProperty<PropertyType, TransformManagerPropertyAccessor<PropertyType> >::New(propertyOwner,
+                                                                                                                              baseProperty,
+                                                                                                                              std::move(mAnimatorFunction),
+                                                                                                                              mAlphaFunction,
+                                                                                                                              mTimePeriod);
         // Don't reset transform manager properties - TransformManager will do it more efficiently
       }
       else
@@ -124,8 +136,12 @@ private:
     else
     {
       // Create the animator and resetter
-      mAnimator = AnimatorType::New( propertyOwner, *animatableProperty, mAnimatorFunction,
-                                     mAlphaFunction, mTimePeriod );
+      mAnimator = AnimatorType::New(propertyOwner,
+                                    *animatableProperty,
+                                    std::move(mAnimatorFunction),
+                                    mAlphaFunction,
+                                    mTimePeriod);
+
       resetterRequired = true;
     }
     return resetterRequired;
@@ -138,6 +154,10 @@ private:
 template <>
 class AnimatorConnector< float > : public AnimatorConnectorBase
 {
+  using AnimatorFunction = std::function<float(float, const float&)>;
+
+  AnimatorFunction mAnimatorFunction;
+
 public:
 
   using AnimatorType = SceneGraph::Animator< float, PropertyAccessor<float> >;
@@ -153,19 +173,19 @@ public:
    * @param[in] period The time period of the animator.
    * @return A pointer to a newly allocated animator connector.
    */
-  static AnimatorConnectorBase* New( Object& object,
-                                     Property::Index propertyIndex,
-                                     int32_t componentIndex,
-                                     AnimatorFunctionBase* animatorFunction,
-                                     AlphaFunction alpha,
-                                     const TimePeriod& period )
+  static AnimatorConnectorBase* New(Object&           object,
+                                    Property::Index   propertyIndex,
+                                    int32_t           componentIndex,
+                                    AnimatorFunction  animatorFunction,
+                                    AlphaFunction     alpha,
+                                    const TimePeriod& period)
   {
-    return new AnimatorConnector( object,
-                                  propertyIndex,
-                                  componentIndex,
-                                  animatorFunction,
-                                  alpha,
-                                  period );
+    return new AnimatorConnector(object,
+                                 propertyIndex,
+                                 componentIndex,
+                                 std::move(animatorFunction),
+                                 alpha,
+                                 period);
   }
 
   /**
@@ -178,13 +198,14 @@ private:
   /**
    * Private constructor; see also AnimatorConnector::New().
    */
-  AnimatorConnector( Object& object,
-                     Property::Index propertyIndex,
-                     int32_t componentIndex,
-                     Internal::AnimatorFunctionBase* animatorFunction,
-                     AlphaFunction alpha,
-                     const TimePeriod& period )
-  : AnimatorConnectorBase( object, propertyIndex, componentIndex, animatorFunction, alpha, period )
+  AnimatorConnector(Object&           object,
+                    Property::Index   propertyIndex,
+                    int32_t           componentIndex,
+                    AnimatorFunction  animatorFunction,
+                    AlphaFunction     alpha,
+                    const TimePeriod& period)
+  : AnimatorConnectorBase(object, propertyIndex, componentIndex, alpha, period),
+    mAnimatorFunction(std::move(animatorFunction))
   {
   }
 
@@ -210,7 +231,11 @@ private:
       {
         if( baseProperty.IsTransformManagerProperty() )
         {
-          mAnimator = SceneGraph::AnimatorTransformProperty< float,TransformManagerPropertyAccessor<float> >::New( propertyOwner, baseProperty, mAnimatorFunction, mAlphaFunction, mTimePeriod );
+          mAnimator = SceneGraph::AnimatorTransformProperty<float, TransformManagerPropertyAccessor<float> >::New(propertyOwner,
+                                                                                                                  baseProperty,
+                                                                                                                  std::move(mAnimatorFunction),
+                                                                                                                  mAlphaFunction,
+                                                                                                                  mTimePeriod);
           // Don't reset transform manager properties - TransformManager will do it more efficiently
         }
         else
@@ -221,8 +246,12 @@ private:
       else
       {
         // Create the animator and resetter
-        mAnimator = AnimatorType::New( propertyOwner, *animatableProperty, mAnimatorFunction,
-                                       mAlphaFunction, mTimePeriod );
+        mAnimator = AnimatorType::New(propertyOwner,
+                                      *animatableProperty,
+                                      std::move(mAnimatorFunction),
+                                      mAlphaFunction,
+                                      mTimePeriod);
+
         resetterRequired = true;
       }
     }
@@ -242,20 +271,20 @@ private:
           {
             case 0:
             {
-              mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorX<Vector2> >::New( propertyOwner,
-                                                                                                   *animatableProperty,
-                                                                                                   mAnimatorFunction,
-                                                                                                   mAlphaFunction,
-                                                                                                   mTimePeriod );
+              mAnimator = SceneGraph::Animator<float, PropertyComponentAccessorX<Vector2> >::New(propertyOwner,
+                                                                                                 *animatableProperty,
+                                                                                                 std::move(mAnimatorFunction),
+                                                                                                 mAlphaFunction,
+                                                                                                 mTimePeriod);
               break;
             }
             case 1:
             {
-              mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorY<Vector2> >::New( propertyOwner,
-                                                                                                   *animatableProperty,
-                                                                                                   mAnimatorFunction,
-                                                                                                   mAlphaFunction,
-                                                                                                   mTimePeriod );
+              mAnimator = SceneGraph::Animator<float, PropertyComponentAccessorY<Vector2> >::New(propertyOwner,
+                                                                                                 *animatableProperty,
+                                                                                                 std::move(mAnimatorFunction),
+                                                                                                 mAlphaFunction,
+                                                                                                 mTimePeriod);
               break;
             }
             default:
@@ -279,15 +308,27 @@ private:
             {
               if( mComponentIndex == 0 )
               {
-                mAnimator = SceneGraph::AnimatorTransformProperty< float,TransformManagerPropertyComponentAccessor<Vector3,0> >::New( propertyOwner, baseProperty, mAnimatorFunction, mAlphaFunction, mTimePeriod );
+                mAnimator = SceneGraph::AnimatorTransformProperty<float, TransformManagerPropertyComponentAccessor<Vector3, 0> >::New(propertyOwner,
+                                                                                                                                      baseProperty,
+                                                                                                                                      std::move(mAnimatorFunction),
+                                                                                                                                      mAlphaFunction,
+                                                                                                                                      mTimePeriod);
               }
               else if( mComponentIndex == 1 )
               {
-                mAnimator = SceneGraph::AnimatorTransformProperty< float,TransformManagerPropertyComponentAccessor<Vector3,1> >::New( propertyOwner, baseProperty, mAnimatorFunction, mAlphaFunction, mTimePeriod );
+                mAnimator = SceneGraph::AnimatorTransformProperty<float, TransformManagerPropertyComponentAccessor<Vector3, 1> >::New(propertyOwner,
+                                                                                                                                      baseProperty,
+                                                                                                                                      std::move(mAnimatorFunction),
+                                                                                                                                      mAlphaFunction,
+                                                                                                                                      mTimePeriod);
               }
               else if( mComponentIndex == 2 )
               {
-                mAnimator = SceneGraph::AnimatorTransformProperty< float,TransformManagerPropertyComponentAccessor<Vector3,2> >::New( propertyOwner, baseProperty, mAnimatorFunction, mAlphaFunction, mTimePeriod );
+                mAnimator = SceneGraph::AnimatorTransformProperty<float, TransformManagerPropertyComponentAccessor<Vector3, 2> >::New(propertyOwner,
+                                                                                                                                      baseProperty,
+                                                                                                                                      std::move(mAnimatorFunction),
+                                                                                                                                      mAlphaFunction,
+                                                                                                                                      mTimePeriod);
               }
             }
             else
@@ -305,29 +346,29 @@ private:
             {
               case 0:
               {
-                mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorX<Vector3> >::New( propertyOwner,
-                                                                                                     *animatableProperty,
-                                                                                                     mAnimatorFunction,
-                                                                                                     mAlphaFunction,
-                                                                                                     mTimePeriod );
+                mAnimator = SceneGraph::Animator<float, PropertyComponentAccessorX<Vector3> >::New(propertyOwner,
+                                                                                                   *animatableProperty,
+                                                                                                   std::move(mAnimatorFunction),
+                                                                                                   mAlphaFunction,
+                                                                                                   mTimePeriod);
                 break;
               }
               case 1:
               {
-                mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorY<Vector3> >::New( propertyOwner,
-                                                                                                     *animatableProperty,
-                                                                                                     mAnimatorFunction,
-                                                                                                     mAlphaFunction,
-                                                                                                     mTimePeriod );
+                mAnimator = SceneGraph::Animator<float, PropertyComponentAccessorY<Vector3> >::New(propertyOwner,
+                                                                                                   *animatableProperty,
+                                                                                                   std::move(mAnimatorFunction),
+                                                                                                   mAlphaFunction,
+                                                                                                   mTimePeriod);
                 break;
               }
               case 2:
               {
-                mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorZ<Vector3> >::New( propertyOwner,
-                                                                                                     *animatableProperty,
-                                                                                                     mAnimatorFunction,
-                                                                                                     mAlphaFunction,
-                                                                                                     mTimePeriod );
+                mAnimator = SceneGraph::Animator<float, PropertyComponentAccessorZ<Vector3> >::New(propertyOwner,
+                                                                                                   *animatableProperty,
+                                                                                                   std::move(mAnimatorFunction),
+                                                                                                   mAlphaFunction,
+                                                                                                   mTimePeriod);
                 break;
               }
               default:
@@ -353,38 +394,38 @@ private:
           {
             case 0:
             {
-              mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorX<Vector4> >::New( propertyOwner,
-                                                                                                   *animatableProperty,
-                                                                                                   mAnimatorFunction,
-                                                                                                   mAlphaFunction,
-                                                                                                   mTimePeriod );
+              mAnimator = SceneGraph::Animator<float, PropertyComponentAccessorX<Vector4> >::New(propertyOwner,
+                                                                                                 *animatableProperty,
+                                                                                                 std::move(mAnimatorFunction),
+                                                                                                 mAlphaFunction,
+                                                                                                 mTimePeriod);
               break;
             }
             case 1:
             {
-              mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorY<Vector4> >::New( propertyOwner,
-                                                                                                   *animatableProperty,
-                                                                                                   mAnimatorFunction,
-                                                                                                   mAlphaFunction,
-                                                                                                   mTimePeriod );
+              mAnimator = SceneGraph::Animator<float, PropertyComponentAccessorY<Vector4> >::New(propertyOwner,
+                                                                                                 *animatableProperty,
+                                                                                                 std::move(mAnimatorFunction),
+                                                                                                 mAlphaFunction,
+                                                                                                 mTimePeriod);
               break;
             }
             case 2:
             {
-              mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorZ<Vector4> >::New( propertyOwner,
-                                                                                                   *animatableProperty,
-                                                                                                   mAnimatorFunction,
-                                                                                                   mAlphaFunction,
-                                                                                                   mTimePeriod );
+              mAnimator = SceneGraph::Animator<float, PropertyComponentAccessorZ<Vector4> >::New(propertyOwner,
+                                                                                                 *animatableProperty,
+                                                                                                 std::move(mAnimatorFunction),
+                                                                                                 mAlphaFunction,
+                                                                                                 mTimePeriod);
               break;
             }
             case 3:
             {
-              mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorW<Vector4> >::New( propertyOwner,
-                                                                                                   *animatableProperty,
-                                                                                                   mAnimatorFunction,
-                                                                                                   mAlphaFunction,
-                                                                                                   mTimePeriod );
+              mAnimator = SceneGraph::Animator<float, PropertyComponentAccessorW<Vector4> >::New(propertyOwner,
+                                                                                                 *animatableProperty,
+                                                                                                 std::move(mAnimatorFunction),
+                                                                                                 mAlphaFunction,
+                                                                                                 mTimePeriod);
               break;
             }
 

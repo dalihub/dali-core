@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,6 +65,7 @@ DALI_PROPERTY( "stencilOperationOnZFail",         INTEGER,   true, false,  false
 DALI_PROPERTY( "stencilOperationOnZPass",         INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_PASS )
 DALI_PROPERTY( "opacity",                         FLOAT,     true, true,   true,  Dali::DevelRenderer::Property::OPACITY )
 DALI_PROPERTY( "renderingBehavior",               INTEGER,   true, false,  false, Dali::DevelRenderer::Property::RENDERING_BEHAVIOR )
+DALI_PROPERTY( "blendEquation",                   INTEGER,   true, false,  false, Dali::DevelRenderer::Property::BLEND_EQUATION )
 DALI_PROPERTY_TABLE_END( DEFAULT_RENDERER_PROPERTY_START_INDEX, RendererDefaultProperties )
 
 // Property string to enumeration tables:
@@ -86,6 +87,23 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN( BLEND_EQUATION )
 DALI_ENUM_TO_STRING_WITH_SCOPE( BlendEquation, ADD )
 DALI_ENUM_TO_STRING_WITH_SCOPE( BlendEquation, SUBTRACT )
 DALI_ENUM_TO_STRING_WITH_SCOPE( BlendEquation, REVERSE_SUBTRACT )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DevelBlendEquation, MIN )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DevelBlendEquation, MAX )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DevelBlendEquation, MULTIPLY )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DevelBlendEquation, SCREEN )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DevelBlendEquation, OVERLAY )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DevelBlendEquation, DARKEN )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DevelBlendEquation, LIGHTEN )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DevelBlendEquation, COLOR_DODGE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DevelBlendEquation, COLOR_BURN )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DevelBlendEquation, HARD_LIGHT )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DevelBlendEquation, SOFT_LIGHT )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DevelBlendEquation, DIFFERENCE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DevelBlendEquation, EXCLUSION )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DevelBlendEquation, HUE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DevelBlendEquation, SATURATION )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DevelBlendEquation, COLOR )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DevelBlendEquation, LUMINOSITY )
 DALI_ENUM_TO_STRING_TABLE_END( BLEND_EQUATION )
 
 DALI_ENUM_TO_STRING_TABLE_BEGIN( BLEND_FACTOR )
@@ -281,21 +299,26 @@ void Renderer::GetBlendFunc( BlendFactor::Type& srcFactorRgb,
   destFactorAlpha = mBlendingOptions.GetBlendDestFactorAlpha();
 }
 
-void Renderer::SetBlendEquation( BlendEquation::Type equationRgba )
+void Renderer::SetBlendEquation( DevelBlendEquation::Type equationRgba )
 {
   mBlendingOptions.SetBlendEquation( equationRgba, equationRgba );
   SetBlendingOptionsMessage( GetEventThreadServices(), GetRendererSceneObject(), mBlendingOptions.GetBitmask() );
 }
 
-void Renderer::SetBlendEquation( BlendEquation::Type equationRgb,
-                                 BlendEquation::Type equationAlpha )
+void Renderer::SetBlendEquation( DevelBlendEquation::Type equationRgb,
+                                 DevelBlendEquation::Type equationAlpha )
 {
+  if( mBlendingOptions.IsAdvancedBlendEquation( equationRgb ) || mBlendingOptions.IsAdvancedBlendEquation( equationAlpha ) )
+  {
+    DALI_LOG_ERROR("Advanced blend equation requires to be set by using SetBlendEquation( DevelBlendEquation::Type equationRgba ).");
+    return;
+  }
   mBlendingOptions.SetBlendEquation( equationRgb, equationAlpha );
   SetBlendingOptionsMessage( GetEventThreadServices(), GetRendererSceneObject(), mBlendingOptions.GetBitmask() );
 }
 
-void Renderer::GetBlendEquation( BlendEquation::Type& equationRgb,
-                                 BlendEquation::Type& equationAlpha ) const
+void Renderer::GetBlendEquation( DevelBlendEquation::Type& equationRgb,
+                                 DevelBlendEquation::Type& equationAlpha ) const
 {
   // These are not animatable, the cached values are up-to-date.
   equationRgb   = mBlendingOptions.GetBlendEquationRgb();
@@ -343,6 +366,19 @@ bool Renderer::IsPreMultipliedAlphaEnabled() const
   return mPremultipledAlphaEnabled;
 }
 
+bool Renderer::IsAdvancedBlendEquationApplied() const
+{
+  DevelBlendEquation::Type equationRgb, equationAlpha;
+  GetBlendEquation( equationRgb, equationAlpha );
+
+  if( equationRgb != equationAlpha )
+  {
+    return false;
+  }
+
+  return mBlendingOptions.IsAdvancedBlendEquation( equationRgb );
+}
+
 const SceneGraph::Renderer& Renderer::GetRendererSceneObject() const
 {
   return static_cast<const SceneGraph::Renderer&>( GetSceneObject() );
@@ -377,13 +413,29 @@ void Renderer::SetDefaultProperty( Property::Index index,
       }
       break;
     }
+    case Dali::DevelRenderer::Property::BLEND_EQUATION:
+    {
+      DevelBlendEquation::Type convertedValue = mBlendingOptions.GetBlendEquationRgb();
+
+      if( Scripting::GetEnumerationProperty< DevelBlendEquation::Type >( propertyValue, BLEND_EQUATION_TABLE, BLEND_EQUATION_TABLE_COUNT, convertedValue ) )
+      {
+        mBlendingOptions.SetBlendEquation( convertedValue, convertedValue );
+        SetBlendingOptionsMessage( GetEventThreadServices(), GetRendererSceneObject(), mBlendingOptions.GetBitmask() );
+      }
+      break;
+    }
     case Dali::Renderer::Property::BLEND_EQUATION_RGB:
     {
-      BlendEquation::Type convertedValue = mBlendingOptions.GetBlendEquationRgb();
+      DevelBlendEquation::Type convertedValue = mBlendingOptions.GetBlendEquationRgb();
 
-      if( Scripting::GetEnumerationProperty< BlendEquation::Type >( propertyValue, BLEND_EQUATION_TABLE, BLEND_EQUATION_TABLE_COUNT, convertedValue ) )
+      if( Scripting::GetEnumerationProperty< DevelBlendEquation::Type >( propertyValue, BLEND_EQUATION_TABLE, BLEND_EQUATION_TABLE_COUNT, convertedValue ) )
       {
-        BlendEquation::Type alphaEquation = mBlendingOptions.GetBlendEquationAlpha();
+        if( mBlendingOptions.IsAdvancedBlendEquation( convertedValue ) )
+        {
+          DALI_LOG_ERROR("Advanced blend equation requires to be set by using DevelBlendEquation::BLEND_EQUATION.");
+          break;
+        }
+        DevelBlendEquation::Type alphaEquation = mBlendingOptions.GetBlendEquationAlpha();
         mBlendingOptions.SetBlendEquation( convertedValue, alphaEquation );
         SetBlendingOptionsMessage( GetEventThreadServices(), GetRendererSceneObject(), mBlendingOptions.GetBitmask() );
       }
@@ -391,11 +443,16 @@ void Renderer::SetDefaultProperty( Property::Index index,
     }
     case Dali::Renderer::Property::BLEND_EQUATION_ALPHA:
     {
-      BlendEquation::Type convertedValue = mBlendingOptions.GetBlendEquationAlpha();
+      DevelBlendEquation::Type convertedValue = mBlendingOptions.GetBlendEquationAlpha();
 
-      if( Scripting::GetEnumerationProperty< BlendEquation::Type >( propertyValue, BLEND_EQUATION_TABLE, BLEND_EQUATION_TABLE_COUNT, convertedValue ) )
+      if( Scripting::GetEnumerationProperty< DevelBlendEquation::Type >( propertyValue, BLEND_EQUATION_TABLE, BLEND_EQUATION_TABLE_COUNT, convertedValue ) )
       {
-        BlendEquation::Type rgbEquation = mBlendingOptions.GetBlendEquationRgb();
+        if( mBlendingOptions.IsAdvancedBlendEquation( convertedValue ) )
+        {
+          DALI_LOG_ERROR("Advanced blend equation requires to be set by using DevelBlendEquation::BLEND_EQUATION.");
+          break;
+        }
+        DevelBlendEquation::Type rgbEquation = mBlendingOptions.GetBlendEquationRgb();
         mBlendingOptions.SetBlendEquation( rgbEquation, convertedValue );
         SetBlendingOptionsMessage( GetEventThreadServices(), GetRendererSceneObject(), mBlendingOptions.GetBitmask() );
       }
@@ -775,6 +832,11 @@ bool Renderer::GetCachedPropertyValue( Property::Index index, Property::Value& v
       value = mBlendMode;
       break;
     }
+    case Dali::DevelRenderer::Property::BLEND_EQUATION:
+    {
+      value = static_cast<int32_t>( mBlendingOptions.GetBlendEquationRgb() );
+      break;
+    }
     case Dali::Renderer::Property::BLEND_EQUATION_RGB:
     {
       value = static_cast<int32_t>( mBlendingOptions.GetBlendEquationRgb() );
@@ -941,6 +1003,14 @@ bool Renderer::GetCurrentPropertyValue( Property::Index index, Property::Value& 
     case Dali::Renderer::Property::BLEND_MODE:
     {
       value = sceneObject.GetBlendMode();
+      break;
+    }
+    case Dali::DevelRenderer::Property::BLEND_EQUATION:
+    {
+      uint32_t bitMask = sceneObject.GetBlendingOptions();
+      BlendingOptions blendingOptions;
+      blendingOptions.SetBitmask( bitMask );
+      value = static_cast<int32_t>( blendingOptions.GetBlendEquationRgb() );
       break;
     }
     case Dali::Renderer::Property::BLEND_EQUATION_RGB:

@@ -144,7 +144,7 @@ int UtcDaliLayerGetDepth(void)
   END_TEST;
 }
 
-int UtcDaliLayerRaise(void)
+int UtcDaliLayerRaise1(void)
 {
   tet_infoline("Testing Dali::Layer::Raise()");
   TestApplication application;
@@ -168,7 +168,34 @@ int UtcDaliLayerRaise(void)
   END_TEST;
 }
 
-int UtcDaliLayerLower(void)
+int UtcDaliLayerRaise2(void)
+{
+  tet_infoline("Testing Dali::Layer raise Action");
+  TestApplication application;
+  Layer           layer1 = Layer::New();
+  Layer           layer2 = Layer::New();
+
+  application.GetScene().Add(layer1);
+  application.GetScene().Add(layer2);
+  DALI_TEST_EQUALS(layer1.GetProperty<int>(Layer::Property::DEPTH), 1u, TEST_LOCATION);
+
+  layer1.Raise();
+  DALI_TEST_EQUALS(layer1.GetProperty<int>(Layer::Property::DEPTH), 2u, TEST_LOCATION);
+
+  // get root
+  Layer root = application.GetScene().GetLayer(0);
+  DALI_TEST_EQUALS(root.GetProperty<int>(Layer::Property::DEPTH), 0u, TEST_LOCATION);
+
+  GetImplementation(root).DoAction("raise", Property::Map());
+
+  DALI_TEST_EQUALS(root.GetProperty<int>(Layer::Property::DEPTH), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(layer1.GetProperty<int>(Layer::Property::DEPTH), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(layer2.GetProperty<int>(Layer::Property::DEPTH), 0u, TEST_LOCATION);
+  END_TEST;
+}
+
+
+int UtcDaliLayerLower1(void)
 {
   tet_infoline("Testing Dali::Layer::Lower()");
   TestApplication application;
@@ -192,7 +219,33 @@ int UtcDaliLayerLower(void)
   END_TEST;
 }
 
-int UtcDaliLayerRaiseToTop(void)
+
+int UtcDaliLayerLower2(void)
+{
+  tet_infoline("Testing Dali::Layer lower Action");
+  TestApplication application;
+  Layer           layer1 = Layer::New();
+  Layer           layer2 = Layer::New();
+
+  application.GetScene().Add(layer1);
+  application.GetScene().Add(layer2);
+  DALI_TEST_EQUALS(layer2.GetProperty<int>(Layer::Property::DEPTH), 2u, TEST_LOCATION);
+
+  layer2.Lower();
+  DALI_TEST_EQUALS(layer2.GetProperty<int>(Layer::Property::DEPTH), 1u, TEST_LOCATION);
+
+  // get root
+  Layer root = application.GetScene().GetLayer(0);
+  GetImplementation(root).DoAction("lower", Property::Map());
+  DALI_TEST_EQUALS(root.GetProperty<int>(Layer::Property::DEPTH), 0u, TEST_LOCATION);
+
+  GetImplementation(layer2).DoAction("lower", Property::Map());
+  DALI_TEST_EQUALS(root.GetProperty<int>(Layer::Property::DEPTH), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(layer2.GetProperty<int>(Layer::Property::DEPTH), 0u, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliLayerRaiseToTop1(void)
 {
   tet_infoline("Testing Dali::Layer::RaiseToTop()");
   TestApplication application;
@@ -218,7 +271,33 @@ int UtcDaliLayerRaiseToTop(void)
   END_TEST;
 }
 
-int UtcDaliLayerLowerToBottom(void)
+int UtcDaliLayerRaiseToTop2(void)
+{
+  tet_infoline("Testing Dali::Layer raiseToTop Action");
+  TestApplication application;
+  Layer           layer1 = Layer::New();
+  Layer           layer2 = Layer::New();
+  Layer           layer3 = Layer::New();
+
+  application.GetScene().Add(layer1);
+  application.GetScene().Add(layer2);
+  application.GetScene().Add(layer3);
+  Layer root = application.GetScene().GetLayer(0);
+
+  DALI_TEST_EQUALS(root.GetProperty<int>(Layer::Property::DEPTH), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(layer1.GetProperty<int>(Layer::Property::DEPTH), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(layer2.GetProperty<int>(Layer::Property::DEPTH), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(layer3.GetProperty<int>(Layer::Property::DEPTH), 3u, TEST_LOCATION);
+
+  GetImplementation(layer1).DoAction("raiseToTop", Property::Map());
+  DALI_TEST_EQUALS(layer1.GetProperty<int>(Layer::Property::DEPTH), 3u, TEST_LOCATION);
+
+  GetImplementation(root).DoAction("raiseToTop", Property::Map());
+  DALI_TEST_EQUALS(root.GetProperty<int>(Layer::Property::DEPTH), 3u, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliLayerLowerToBottom1(void)
 {
   tet_infoline("Testing Dali::Layer::LowerToBottom()");
   TestApplication application;
@@ -238,6 +317,28 @@ int UtcDaliLayerLowerToBottom(void)
   DALI_TEST_EQUALS(layer3.GetProperty<int>(Layer::Property::DEPTH), 0u, TEST_LOCATION);
   END_TEST;
 }
+
+int UtcDaliLayerLowerToBottom2(void)
+{
+  tet_infoline("Testing Dali::Layer lowerToBottom Action");
+  TestApplication application;
+  Layer           layer1 = Layer::New();
+  Layer           layer2 = Layer::New();
+  Layer           layer3 = Layer::New();
+
+  application.GetScene().Add(layer1);
+  application.GetScene().Add(layer2);
+  application.GetScene().Add(layer3);
+
+  DALI_TEST_EQUALS(layer1.GetProperty<int>(Layer::Property::DEPTH), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(layer2.GetProperty<int>(Layer::Property::DEPTH), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(layer3.GetProperty<int>(Layer::Property::DEPTH), 3u, TEST_LOCATION);
+
+  GetImplementation(layer3).DoAction("lowerToBottom", Property::Map());
+  DALI_TEST_EQUALS(layer3.GetProperty<int>(Layer::Property::DEPTH), 0u, TEST_LOCATION);
+  END_TEST;
+}
+
 
 int UtcDaliLayerSetClipping(void)
 {

@@ -1105,7 +1105,7 @@ sub calc_patch_coverage_percentage
     my $percent = 0;
     if($total_exec > 0) { $percent = 100 * $total_covered_lines / $total_exec; }
 
-    return [ $total_exec, $percent ];
+    return [ $total_exec, $percent, $total_covered_lines ];
 }
 
 #
@@ -1417,6 +1417,7 @@ elsif( ! $opt_quiet )
     print RESET;
 }
 
+printf("Line Coverage: %d/%d\n", $percentref->[2], $percentref->[0]);
 printf("Percentage of change covered: %5.2f%\n", $percent);
 
 exit($percent<90);

@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <cmath>
+#include <functional>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/animation/alpha-function.h>
@@ -45,59 +46,6 @@ namespace Internal
 
 using Interpolation = Dali::Animation::Interpolation;
 
-/**
- * AnimatorFunction base class.
- * Needs to be declared first so AnimatorBase knows about it's destructor
- * All update functions must inherit from AnimatorFunctionBase and overload the appropiate "()" operator
- */
-struct AnimatorFunctionBase
-{
-  /**
-   * Constructor
-   */
-  AnimatorFunctionBase() = default;
-
-  /*
-   * Virtual destructor (Intended as base class)
-   */
-  virtual ~AnimatorFunctionBase() = default;
-
-  ///Stub "()" operators.
-  virtual bool operator()(float progress, const bool& property)
-  {
-    return property;
-  }
-
-  virtual float operator()(float progress, const int32_t& property)
-  {
-    return static_cast<float>( property );
-  }
-
-  virtual float operator()(float progress, const float& property)
-  {
-    return property;
-  }
-
-  virtual Vector2 operator()(float progress, const Vector2& property)
-  {
-    return property;
-  }
-
-  virtual Vector3 operator()(float progress, const Vector3& property)
-  {
-    return property;
-  }
-
-  virtual Vector4 operator()(float progress, const Vector4& property)
-  {
-    return property;
-  }
-
-  virtual Quaternion operator()(float progress, const Quaternion& property)
-  {
-    return property;
-  }
-};
 
 namespace SceneGraph
 {
@@ -135,17 +83,14 @@ public:
    * Constructor.
    */
   AnimatorBase( PropertyOwner* propertyOwner,
-                AnimatorFunctionBase* animatorFunction,
                 AlphaFunction alphaFunction,
                 const TimePeriod& timePeriod )
   : mLifecycleObserver( nullptr ),
     mPropertyOwner( propertyOwner ),
-    mAnimatorFunction( animatorFunction ),
     mDurationSeconds( timePeriod.durationSeconds ),
     mIntervalDelaySeconds( timePeriod.delaySeconds ),
     mSpeedFactor( 1.0f ),
     mCurrentProgress( 0.f ),
-    mLoopCount( 1 ),
     mAlphaFunction( alphaFunction ),
     mDisconnectAction( Dali::Animation::BAKE_FINAL ),
     mAnimationPlaying( false ),
@@ -160,7 +105,6 @@ public:
    */
   ~AnimatorBase() override
   {
-    delete mAnimatorFunction;
     if (mPropertyOwner && mConnectedToSceneGraph)
     {
       mPropertyOwner->RemoveObserver(*this);
@@ -560,16 +504,15 @@ protected:
 
   LifecycleObserver* mLifecycleObserver;
   PropertyOwner* mPropertyOwner;
-  AnimatorFunctionBase* mAnimatorFunction;
+
   float mDurationSeconds;
   float mIntervalDelaySeconds;
   float mSpeedFactor;
   float mCurrentProgress;
 
-  int32_t mLoopCount;
-
   AlphaFunction mAlphaFunction;
 
+  int32_t                    mLoopCount{1};
   Dali::Animation::EndAction mDisconnectAction;     ///< EndAction to apply when target object gets disconnected from the stage.
   bool mAnimationPlaying:1;                         ///< whether disconnect has been applied while it's running.
   bool mEnabled:1;                                  ///< Animator is "enabled" while its target object is valid and on the stage.
@@ -580,9 +523,13 @@ protected:
 /**
  * An animator for a specific property type PropertyType.
  */
-template < typename PropertyType, typename PropertyAccessorType >
-class Animator : public AnimatorBase
+template<typename PropertyType, typename PropertyAccessorType>
+class Animator final : public AnimatorBase
 {
+  using AnimatorFunction = std::function<PropertyType(float, const PropertyType&)>;
+
+  AnimatorFunction mAnimatorFunction;
+
 public:
 
   /**
@@ -593,24 +540,19 @@ public:
    * @param[in] timePeriod The time period of this animation.
    * @return A newly allocated animator.
    */
-  static AnimatorBase* New( const PropertyOwner& propertyOwner,
-                            const PropertyBase& property,
-                            AnimatorFunctionBase* animatorFunction,
-                            AlphaFunction alphaFunction,
-                            const TimePeriod& timePeriod )
+  static AnimatorBase* New(const PropertyOwner& propertyOwner,
+                           const PropertyBase&  property,
+                           AnimatorFunction     animatorFunction,
+                           AlphaFunction        alphaFunction,
+                           const TimePeriod&    timePeriod)
   {
     // The property was const in the actor-thread, but animators are used in the scene-graph thread.
-    return new Animator( const_cast<PropertyOwner*>( &propertyOwner ),
-                                  const_cast<PropertyBase*>( &property ),
-                                  animatorFunction,
-                                  alphaFunction,
-                                  timePeriod );
+    return new Animator(const_cast<PropertyOwner*>(&propertyOwner),
+                        const_cast<PropertyBase*>(&property),
+                        std::move(animatorFunction),
+                        alphaFunction,
+                        timePeriod);
   }
-
-  /**
-   * Virtual destructor.
-   */
-  ~Animator() override = default;
 
   /**
    * @copydoc AnimatorBase::DoUpdate( BufferIndex bufferIndex, bool bake, float alpha )
@@ -620,7 +562,7 @@ public:
     const PropertyType& current = mPropertyAccessor.Get( bufferIndex );
 
     // need to cast the return value in case property is integer
-    const PropertyType result = static_cast<PropertyType>( (*mAnimatorFunction)( alpha, current ) );
+    const PropertyType result = static_cast<PropertyType>(mAnimatorFunction(alpha, current));
 
     if ( bake )
     {
@@ -637,13 +579,14 @@ private:
   /**
    * Private constructor; see also Animator::New().
    */
-  Animator( PropertyOwner* propertyOwner,
-            PropertyBase* property,
-            AnimatorFunctionBase* animatorFunction,
-            AlphaFunction alphaFunction,
-            const TimePeriod& timePeriod )
-  : AnimatorBase( propertyOwner, animatorFunction, alphaFunction, timePeriod ),
-    mPropertyAccessor( property )
+  Animator(PropertyOwner*    propertyOwner,
+           PropertyBase*     property,
+           AnimatorFunction  animatorFunction,
+           AlphaFunction     alphaFunction,
+           const TimePeriod& timePeriod)
+  : AnimatorBase(propertyOwner, alphaFunction, timePeriod),
+    mAnimatorFunction(std::move(animatorFunction)),
+    mPropertyAccessor(property)
   {
     // WARNING - this object is created in the event-thread
     // The scene-graph mPropertyOwner object cannot be observed here
@@ -666,9 +609,13 @@ protected:
 /**
  * An animator for a specific property type PropertyType.
  */
-template <typename PropertyType, typename PropertyAccessorType>
-class AnimatorTransformProperty : public AnimatorBase
+template<typename PropertyType, typename PropertyAccessorType>
+class AnimatorTransformProperty final : public AnimatorBase
 {
+  using AnimatorFunction = std::function<PropertyType(float, const PropertyType&)>;
+
+  AnimatorFunction mAnimatorFunction;
+
 public:
 
   /**
@@ -679,25 +626,20 @@ public:
    * @param[in] timePeriod The time period of this animation.
    * @return A newly allocated animator.
    */
-  static AnimatorBase* New( const PropertyOwner& propertyOwner,
-                            const PropertyBase& property,
-                            AnimatorFunctionBase* animatorFunction,
-                            AlphaFunction alphaFunction,
-                            const TimePeriod& timePeriod )
+  static AnimatorBase* New(const PropertyOwner& propertyOwner,
+                           const PropertyBase&  property,
+                           AnimatorFunction     animatorFunction,
+                           AlphaFunction        alphaFunction,
+                           const TimePeriod&    timePeriod)
   {
 
     // The property was const in the actor-thread, but animators are used in the scene-graph thread.
-    return new AnimatorTransformProperty( const_cast<PropertyOwner*>( &propertyOwner ),
-                                                                         const_cast<PropertyBase*>( &property ),
-                                                                         animatorFunction,
-                                                                         alphaFunction,
-                                                                         timePeriod );
+    return new AnimatorTransformProperty(const_cast<PropertyOwner*>(&propertyOwner),
+                                         const_cast<PropertyBase*>(&property),
+                                         std::move(animatorFunction),
+                                         alphaFunction,
+                                         timePeriod);
   }
-
-  /**
-   * Virtual destructor.
-   */
-  ~AnimatorTransformProperty() override = default;
 
   /**
    * @copydoc AnimatorBase::DoUpdate( BufferIndex bufferIndex, bool bake, float alpha )
@@ -707,7 +649,7 @@ public:
     const PropertyType& current = mPropertyAccessor.Get( bufferIndex );
 
     // need to cast the return value in case property is integer
-    const PropertyType result = static_cast<PropertyType>( (*mAnimatorFunction)( alpha, current ) );
+    const PropertyType result = static_cast<PropertyType>(mAnimatorFunction(alpha, current));
 
     if ( bake )
     {
@@ -724,13 +666,14 @@ private:
   /**
    * Private constructor; see also Animator::New().
    */
-  AnimatorTransformProperty( PropertyOwner* propertyOwner,
-            PropertyBase* property,
-            AnimatorFunctionBase* animatorFunction,
-            AlphaFunction alphaFunction,
-            const TimePeriod& timePeriod )
-  : AnimatorBase( propertyOwner, animatorFunction, alphaFunction, timePeriod ),
-    mPropertyAccessor( property )
+  AnimatorTransformProperty(PropertyOwner*    propertyOwner,
+                            PropertyBase*     property,
+                            AnimatorFunction  animatorFunction,
+                            AlphaFunction     alphaFunction,
+                            const TimePeriod& timePeriod)
+  : AnimatorBase(propertyOwner, alphaFunction, timePeriod),
+    mAnimatorFunction(std::move(animatorFunction)),
+    mPropertyAccessor(property)
   {
     // WARNING - this object is created in the event-thread
     // The scene-graph mPropertyOwner object cannot be observed here
@@ -751,15 +694,14 @@ protected:
 
 // Update functions
 
-struct AnimateByInteger : public AnimatorFunctionBase
+struct AnimateByInteger
 {
   AnimateByInteger(const int& relativeValue)
   : mRelative(relativeValue)
   {
   }
 
-  using AnimatorFunctionBase::operator();
-  float operator()(float alpha, const int32_t& property) override
+  float operator()(float alpha, const int32_t& property)
   {
     // integers need to be correctly rounded
     return roundf(static_cast<float>( property ) + static_cast<float>( mRelative ) * alpha );
@@ -768,15 +710,14 @@ struct AnimateByInteger : public AnimatorFunctionBase
   int32_t mRelative;
 };
 
-struct AnimateToInteger : public AnimatorFunctionBase
+struct AnimateToInteger
 {
   AnimateToInteger(const int& targetValue)
   : mTarget(targetValue)
   {
   }
 
-  using AnimatorFunctionBase::operator();
-  float operator()(float alpha, const int32_t& property) override
+  float operator()(float alpha, const int32_t& property)
   {
     // integers need to be correctly rounded
     return roundf(static_cast<float>( property ) + (static_cast<float>(mTarget - property) * alpha) );
@@ -785,15 +726,14 @@ struct AnimateToInteger : public AnimatorFunctionBase
   int32_t mTarget;
 };
 
-struct AnimateByFloat : public AnimatorFunctionBase
+struct AnimateByFloat
 {
   AnimateByFloat(const float& relativeValue)
   : mRelative(relativeValue)
   {
   }
 
-  using AnimatorFunctionBase::operator();
-  float operator()(float alpha, const float& property) override
+  float operator()(float alpha, const float& property)
   {
     return float(property + mRelative * alpha);
   }
@@ -801,15 +741,14 @@ struct AnimateByFloat : public AnimatorFunctionBase
   float mRelative;
 };
 
-struct AnimateToFloat : public AnimatorFunctionBase
+struct AnimateToFloat
 {
   AnimateToFloat(const float& targetValue)
   : mTarget(targetValue)
   {
   }
 
-  using AnimatorFunctionBase::operator();
-  float operator()(float alpha, const float& property) override
+  float operator()(float alpha, const float& property)
   {
     return float(property + ((mTarget - property) * alpha));
   }
@@ -817,15 +756,14 @@ struct AnimateToFloat : public AnimatorFunctionBase
   float mTarget;
 };
 
-struct AnimateByVector2 : public AnimatorFunctionBase
+struct AnimateByVector2
 {
   AnimateByVector2(const Vector2& relativeValue)
   : mRelative(relativeValue)
   {
   }
 
-  using AnimatorFunctionBase::operator();
-  Vector2 operator()(float alpha, const Vector2& property) override
+  Vector2 operator()(float alpha, const Vector2& property)
   {
     return Vector2(property + mRelative * alpha);
   }
@@ -833,15 +771,14 @@ struct AnimateByVector2 : public AnimatorFunctionBase
   Vector2 mRelative;
 };
 
-struct AnimateToVector2 : public AnimatorFunctionBase
+struct AnimateToVector2
 {
   AnimateToVector2(const Vector2& targetValue)
   : mTarget(targetValue)
   {
   }
 
-  using AnimatorFunctionBase::operator();
-  Vector2 operator()(float alpha, const Vector2& property) override
+  Vector2 operator()(float alpha, const Vector2& property)
   {
     return Vector2(property + ((mTarget - property) * alpha));
   }
@@ -849,15 +786,14 @@ struct AnimateToVector2 : public AnimatorFunctionBase
   Vector2 mTarget;
 };
 
-struct AnimateByVector3 : public AnimatorFunctionBase
+struct AnimateByVector3
 {
   AnimateByVector3(const Vector3& relativeValue)
   : mRelative(relativeValue)
   {
   }
 
-  using AnimatorFunctionBase::operator();
-  Vector3 operator()(float alpha, const Vector3& property) override
+  Vector3 operator()(float alpha, const Vector3& property)
   {
     return Vector3(property + mRelative * alpha);
   }
@@ -865,15 +801,14 @@ struct AnimateByVector3 : public AnimatorFunctionBase
   Vector3 mRelative;
 };
 
-struct AnimateToVector3 : public AnimatorFunctionBase
+struct AnimateToVector3
 {
   AnimateToVector3(const Vector3& targetValue)
   : mTarget(targetValue)
   {
   }
 
-  using AnimatorFunctionBase::operator();
-  Vector3 operator()(float alpha, const Vector3& property) override
+  Vector3 operator()(float alpha, const Vector3& property)
   {
     return Vector3(property + ((mTarget - property) * alpha));
   }
@@ -881,15 +816,14 @@ struct AnimateToVector3 : public AnimatorFunctionBase
   Vector3 mTarget;
 };
 
-struct AnimateByVector4 : public AnimatorFunctionBase
+struct AnimateByVector4
 {
   AnimateByVector4(const Vector4& relativeValue)
   : mRelative(relativeValue)
   {
   }
 
-  using AnimatorFunctionBase::operator();
-  Vector4 operator()(float alpha, const Vector4& property) override
+  Vector4 operator()(float alpha, const Vector4& property)
   {
     return Vector4(property + mRelative * alpha);
   }
@@ -897,15 +831,14 @@ struct AnimateByVector4 : public AnimatorFunctionBase
   Vector4 mRelative;
 };
 
-struct AnimateToVector4 : public AnimatorFunctionBase
+struct AnimateToVector4
 {
   AnimateToVector4(const Vector4& targetValue)
   : mTarget(targetValue)
   {
   }
 
-  using AnimatorFunctionBase::operator();
-  Vector4 operator()(float alpha, const Vector4& property) override
+  Vector4 operator()(float alpha, const Vector4& property)
   {
     return Vector4(property + ((mTarget - property) * alpha));
   }
@@ -913,15 +846,14 @@ struct AnimateToVector4 : public AnimatorFunctionBase
   Vector4 mTarget;
 };
 
-struct AnimateByOpacity : public AnimatorFunctionBase
+struct AnimateByOpacity
 {
   AnimateByOpacity(const float& relativeValue)
   : mRelative(relativeValue)
   {
   }
 
-  using AnimatorFunctionBase::operator();
-  Vector4 operator()(float alpha, const Vector4& property) override
+  Vector4 operator()(float alpha, const Vector4& property)
   {
     Vector4 result(property);
     result.a += mRelative * alpha;
@@ -932,15 +864,14 @@ struct AnimateByOpacity : public AnimatorFunctionBase
   float mRelative;
 };
 
-struct AnimateToOpacity : public AnimatorFunctionBase
+struct AnimateToOpacity
 {
   AnimateToOpacity(const float& targetValue)
   : mTarget(targetValue)
   {
   }
 
-  using AnimatorFunctionBase::operator();
-  Vector4 operator()(float alpha, const Vector4& property) override
+  Vector4 operator()(float alpha, const Vector4& property)
   {
     Vector4 result(property);
     result.a = property.a + ((mTarget - property.a) * alpha);
@@ -951,15 +882,14 @@ struct AnimateToOpacity : public AnimatorFunctionBase
   float mTarget;
 };
 
-struct AnimateByBoolean : public AnimatorFunctionBase
+struct AnimateByBoolean
 {
   AnimateByBoolean(bool relativeValue)
   : mRelative(relativeValue)
   {
   }
 
-  using AnimatorFunctionBase::operator();
-  bool operator()(float alpha, const bool& property) override
+  bool operator()(float alpha, const bool& property)
   {
     // Alpha is not useful here, just keeping to the same template as other update functors
     return bool(alpha >= 1.0f ? (property || mRelative) : property);
@@ -968,15 +898,14 @@ struct AnimateByBoolean : public AnimatorFunctionBase
   bool mRelative;
 };
 
-struct AnimateToBoolean : public AnimatorFunctionBase
+struct AnimateToBoolean
 {
   AnimateToBoolean(bool targetValue)
   : mTarget(targetValue)
   {
   }
 
-  using AnimatorFunctionBase::operator();
-  bool operator()(float alpha, const bool& property) override
+  bool operator()(float alpha, const bool& property)
   {
     // Alpha is not useful here, just keeping to the same template as other update functors
     return bool(alpha >= 1.0f ? mTarget : property);
@@ -985,7 +914,7 @@ struct AnimateToBoolean : public AnimatorFunctionBase
   bool mTarget;
 };
 
-struct RotateByAngleAxis : public AnimatorFunctionBase
+struct RotateByAngleAxis
 {
   RotateByAngleAxis(const Radian& angleRadians, const Vector3& axis)
   : mAngleRadians( angleRadians ),
@@ -993,8 +922,7 @@ struct RotateByAngleAxis : public AnimatorFunctionBase
   {
   }
 
-  using AnimatorFunctionBase::operator();
-  Quaternion operator()(float alpha, const Quaternion& rotation) override
+  Quaternion operator()(float alpha, const Quaternion& rotation)
   {
     if (alpha > 0.0f)
     {
@@ -1008,15 +936,14 @@ struct RotateByAngleAxis : public AnimatorFunctionBase
   Vector3 mAxis;
 };
 
-struct RotateToQuaternion : public AnimatorFunctionBase
+struct RotateToQuaternion
 {
   RotateToQuaternion(const Quaternion& targetValue)
   : mTarget(targetValue)
   {
   }
 
-  using AnimatorFunctionBase::operator();
-  Quaternion operator()(float alpha, const Quaternion& rotation) override
+  Quaternion operator()(float alpha, const Quaternion& rotation)
   {
     return Quaternion::Slerp(rotation, mTarget, alpha);
   }
@@ -1024,162 +951,157 @@ struct RotateToQuaternion : public AnimatorFunctionBase
   Quaternion mTarget;
 };
 
-
-struct KeyFrameBooleanFunctor : public AnimatorFunctionBase
+struct KeyFrameBooleanFunctor
 {
-  KeyFrameBooleanFunctor(KeyFrameBooleanPtr keyFrames)
-  : mKeyFrames(keyFrames)
+  KeyFrameBooleanFunctor(KeyFrameBoolean keyFrames)
+  : mKeyFrames(std::move(keyFrames))
   {
   }
 
-  using AnimatorFunctionBase::operator();
-  bool operator()(float progress, const bool& property) override
+  bool operator()(float progress, const bool& property)
   {
-    if(mKeyFrames->IsActive(progress))
+    if(mKeyFrames.IsActive(progress))
     {
-      return mKeyFrames->GetValue(progress, Dali::Animation::LINEAR);
+      return mKeyFrames.GetValue(progress, Dali::Animation::LINEAR);
     }
     return property;
   }
 
-  KeyFrameBooleanPtr mKeyFrames;
+  KeyFrameBoolean mKeyFrames;
 };
 
-struct KeyFrameIntegerFunctor : public AnimatorFunctionBase
+struct KeyFrameIntegerFunctor
 {
-  KeyFrameIntegerFunctor(KeyFrameIntegerPtr keyFrames, Interpolation interpolation)
-  : mKeyFrames(keyFrames),mInterpolation(interpolation)
+  KeyFrameIntegerFunctor(KeyFrameInteger keyFrames, Interpolation interpolation)
+  : mKeyFrames(std::move(keyFrames)),
+    mInterpolation(interpolation)
   {
   }
 
-  using AnimatorFunctionBase::operator();
-  float operator()(float progress, const int32_t& property) override
+  float operator()(float progress, const int32_t& property)
   {
-    if(mKeyFrames->IsActive(progress))
+    if(mKeyFrames.IsActive(progress))
     {
-      return static_cast<float>( mKeyFrames->GetValue(progress, mInterpolation) );
+      return static_cast<float>(mKeyFrames.GetValue(progress, mInterpolation));
     }
     return static_cast<float>( property );
   }
 
-  KeyFrameIntegerPtr mKeyFrames;
+  KeyFrameInteger mKeyFrames;
   Interpolation mInterpolation;
 };
 
-struct KeyFrameNumberFunctor : public AnimatorFunctionBase
+struct KeyFrameNumberFunctor
 {
-  KeyFrameNumberFunctor(KeyFrameNumberPtr keyFrames, Interpolation interpolation)
-  : mKeyFrames(keyFrames),mInterpolation(interpolation)
+  KeyFrameNumberFunctor(KeyFrameNumber keyFrames, Interpolation interpolation)
+  : mKeyFrames(std::move(keyFrames)),
+    mInterpolation(interpolation)
   {
   }
 
-  using AnimatorFunctionBase::operator();
-  float operator()(float progress, const float& property) override
+  float operator()(float progress, const float& property)
   {
-    if(mKeyFrames->IsActive(progress))
+    if(mKeyFrames.IsActive(progress))
     {
-      return mKeyFrames->GetValue(progress, mInterpolation);
+      return mKeyFrames.GetValue(progress, mInterpolation);
     }
     return property;
   }
 
-  KeyFrameNumberPtr mKeyFrames;
+  KeyFrameNumber mKeyFrames;
   Interpolation mInterpolation;
 };
 
-struct KeyFrameVector2Functor : public AnimatorFunctionBase
+struct KeyFrameVector2Functor
 {
-  KeyFrameVector2Functor(KeyFrameVector2Ptr keyFrames, Interpolation interpolation)
-  : mKeyFrames(keyFrames),mInterpolation(interpolation)
+  KeyFrameVector2Functor(KeyFrameVector2 keyFrames, Interpolation interpolation)
+  : mKeyFrames(std::move(keyFrames)),
+    mInterpolation(interpolation)
   {
   }
 
-  using AnimatorFunctionBase::operator();
-  Vector2 operator()(float progress, const Vector2& property) override
+  Vector2 operator()(float progress, const Vector2& property)
   {
-    if(mKeyFrames->IsActive(progress))
+    if(mKeyFrames.IsActive(progress))
     {
-      return mKeyFrames->GetValue(progress, mInterpolation);
+      return mKeyFrames.GetValue(progress, mInterpolation);
     }
     return property;
   }
 
-  KeyFrameVector2Ptr mKeyFrames;
+  KeyFrameVector2 mKeyFrames;
   Interpolation mInterpolation;
 };
 
-
-struct KeyFrameVector3Functor : public AnimatorFunctionBase
+struct KeyFrameVector3Functor
 {
-  KeyFrameVector3Functor(KeyFrameVector3Ptr keyFrames, Interpolation interpolation)
-  : mKeyFrames(keyFrames),mInterpolation(interpolation)
+  KeyFrameVector3Functor(KeyFrameVector3 keyFrames, Interpolation interpolation)
+  : mKeyFrames(std::move(keyFrames)),
+    mInterpolation(interpolation)
   {
   }
 
-  using AnimatorFunctionBase::operator();
-  Vector3 operator()(float progress, const Vector3& property) override
+  Vector3 operator()(float progress, const Vector3& property)
   {
-    if(mKeyFrames->IsActive(progress))
+    if(mKeyFrames.IsActive(progress))
     {
-      return mKeyFrames->GetValue(progress, mInterpolation);
+      return mKeyFrames.GetValue(progress, mInterpolation);
     }
     return property;
   }
 
-  KeyFrameVector3Ptr mKeyFrames;
+  KeyFrameVector3 mKeyFrames;
   Interpolation mInterpolation;
 };
 
-struct KeyFrameVector4Functor : public AnimatorFunctionBase
+struct KeyFrameVector4Functor
 {
-  KeyFrameVector4Functor(KeyFrameVector4Ptr keyFrames, Interpolation interpolation)
-  : mKeyFrames(keyFrames),mInterpolation(interpolation)
+  KeyFrameVector4Functor(KeyFrameVector4 keyFrames, Interpolation interpolation)
+  : mKeyFrames(std::move(keyFrames)),
+    mInterpolation(interpolation)
   {
   }
 
-  using AnimatorFunctionBase::operator();
-  Vector4 operator()(float progress, const Vector4& property) override
+  Vector4 operator()(float progress, const Vector4& property)
   {
-    if(mKeyFrames->IsActive(progress))
+    if(mKeyFrames.IsActive(progress))
     {
-      return mKeyFrames->GetValue(progress, mInterpolation);
+      return mKeyFrames.GetValue(progress, mInterpolation);
     }
     return property;
   }
 
-  KeyFrameVector4Ptr mKeyFrames;
+  KeyFrameVector4 mKeyFrames;
   Interpolation mInterpolation;
 };
 
-struct KeyFrameQuaternionFunctor : public AnimatorFunctionBase
+struct KeyFrameQuaternionFunctor
 {
-  KeyFrameQuaternionFunctor(KeyFrameQuaternionPtr keyFrames)
-  : mKeyFrames(keyFrames)
+  KeyFrameQuaternionFunctor(KeyFrameQuaternion keyFrames)
+  : mKeyFrames(std::move(keyFrames))
   {
   }
 
-  using AnimatorFunctionBase::operator();
-  Quaternion operator()(float progress, const Quaternion& property) override
+  Quaternion operator()(float progress, const Quaternion& property)
   {
-    if(mKeyFrames->IsActive(progress))
+    if(mKeyFrames.IsActive(progress))
     {
-      return mKeyFrames->GetValue(progress, Dali::Animation::LINEAR);
+      return mKeyFrames.GetValue(progress, Dali::Animation::LINEAR);
     }
     return property;
   }
 
-  KeyFrameQuaternionPtr mKeyFrames;
+  KeyFrameQuaternion mKeyFrames;
 };
 
-struct PathPositionFunctor : public AnimatorFunctionBase
+struct PathPositionFunctor
 {
   PathPositionFunctor( PathPtr path )
   : mPath(path)
   {
   }
 
-  using AnimatorFunctionBase::operator();
-  Vector3 operator()(float progress, const Vector3& property) override
+  Vector3 operator()(float progress, const Vector3& property)
   {
     Vector3 position(property);
     static_cast<void>( mPath->SamplePosition(progress, position) );
@@ -1189,7 +1111,7 @@ struct PathPositionFunctor : public AnimatorFunctionBase
   PathPtr mPath;
 };
 
-struct PathRotationFunctor : public AnimatorFunctionBase
+struct PathRotationFunctor
 {
   PathRotationFunctor( PathPtr path, const Vector3& forward )
   : mPath(path),
@@ -1198,8 +1120,7 @@ struct PathRotationFunctor : public AnimatorFunctionBase
     mForward.Normalize();
   }
 
-  using AnimatorFunctionBase::operator();
-  Quaternion operator()(float progress, const Quaternion& property) override
+  Quaternion operator()(float progress, const Quaternion& property)
   {
     Vector3 tangent;
     if( mPath->SampleTangent(progress, tangent) )

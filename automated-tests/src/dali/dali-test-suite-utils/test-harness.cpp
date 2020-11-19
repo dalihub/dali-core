@@ -21,8 +21,11 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <testcase.h>
+
+#include <time.h>
 #include <unistd.h>
 
+#include <chrono>
 #include <cstring>
 #include <map>
 #include <vector>
@@ -30,6 +33,8 @@
 namespace TestHarness
 {
 typedef std::map<int32_t, TestCase> RunningTestCases;
+
+const double MAXIMUM_CHILD_LIFETIME(60.0f); // 1 minute
 
 const char* basename(const char* path)
 {
@@ -247,25 +252,42 @@ int32_t RunAllInParallel(const char* processName, ::testcase tc_array[], bool re
       else // Parent process
       {
         TestCase tc(nextTestCase, tc_array[nextTestCase].name);
+        tc.startTime = std::chrono::steady_clock::now();
+
         children[pid] = tc;
         nextTestCase++;
         numRunningChildren++;
       }
     }
 
-    // Wait for the next child to finish
-
+    // Check to see if any children have finished yet
     int32_t status   = 0;
-    int32_t childPid = waitpid(-1, &status, 0);
-    if(childPid == -1)
+    int32_t childPid = waitpid(-1, &status, WNOHANG);
+    if(childPid == 0)
+    {
+      // No children have finished.
+      // Check if any have exceeded execution time
+      auto endTime = std::chrono::steady_clock::now();
+
+      for(auto& tc : children)
+      {
+        std::chrono::steady_clock::duration timeSpan = endTime - tc.second.startTime;
+        std::chrono::duration<double>       seconds  = std::chrono::duration_cast<std::chrono::duration<double>>(timeSpan);
+        if(seconds.count() > MAXIMUM_CHILD_LIFETIME)
+        {
+          // Kill the child process. A subsequent call to waitpid will process signal result below.
+          kill(tc.first, SIGKILL);
+        }
+      }
+    }
+    else if(childPid == -1) // waitpid errored
     {
       perror("waitpid");
       exit(EXIT_STATUS_WAITPID_FAILED);
     }
-
-    if(WIFEXITED(status))
+    else // a child has finished
     {
-      if(childPid > 0)
+      if(WIFEXITED(status))
       {
         int32_t testResult = WEXITSTATUS(status);
         if(testResult)
@@ -280,14 +302,11 @@ int32_t RunAllInParallel(const char* processName, ::testcase tc_array[], bool re
         }
         numRunningChildren--;
       }
-    }
 
-    else if(WIFSIGNALED(status) || WIFSTOPPED(status))
-    {
-      status = WIFSIGNALED(status) ? WTERMSIG(status) : WSTOPSIG(status);
-
-      if(childPid > 0)
+      else if(WIFSIGNALED(status) || WIFSTOPPED(status))
       {
+        status = WIFSIGNALED(status) ? WTERMSIG(status) : WSTOPSIG(status);
+
         RunningTestCases::iterator iter = children.find(childPid);
         if(iter != children.end())
         {

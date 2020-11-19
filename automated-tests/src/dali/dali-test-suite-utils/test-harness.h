@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <testcase.h>
 
+#include <chrono>
 #include <cstdint>
 
 namespace TestHarness
@@ -39,29 +40,34 @@ const int32_t MAX_NUM_CHILDREN(16);
 
 struct TestCase
 {
-  int32_t     testCase;
-  const char* testCaseName;
+  int32_t                               testCase;
+  const char*                           testCaseName;
+  std::chrono::steady_clock::time_point startTime;
 
   TestCase()
   : testCase(0),
-    testCaseName(NULL)
+    testCaseName(NULL),
+    startTime()
   {
   }
 
   TestCase(int32_t tc, const char* name)
   : testCase(tc),
-    testCaseName(name)
+    testCaseName(name),
+    startTime()
   {
   }
   TestCase(const TestCase& rhs)
   : testCase(rhs.testCase),
-    testCaseName(rhs.testCaseName)
+    testCaseName(rhs.testCaseName),
+    startTime(rhs.startTime)
   {
   }
   TestCase& operator=(const TestCase& rhs)
   {
     testCase     = rhs.testCase;
     testCaseName = rhs.testCaseName;
+    startTime    = rhs.startTime;
     return *this;
   }
 };

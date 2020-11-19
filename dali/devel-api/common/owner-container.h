@@ -86,6 +86,21 @@ public:
   }
 
   /**
+   * Erases a range of elements.(delete from heap).
+   */
+  Iterator Erase(Iterator first, Iterator last)
+  {
+    auto itr = first;
+    while(itr < last)
+    {
+      Delete(*itr);
+      ++itr;
+    }
+
+    return Vector<T>::Erase(first, last);
+  }
+
+  /**
    * Erase an object from OwnerContainer
    * @param object to remove
    */

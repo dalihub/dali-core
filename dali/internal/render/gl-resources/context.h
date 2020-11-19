@@ -408,8 +408,16 @@ public:
    */
   void BlendEquation(GLenum mode)
   {
-    // use BlendEquationSeparate to set the rgb and alpha modes the same
-    BlendEquationSeparate( mode, mode );
+    // DO NOT USE BlendEquationSeparate to set the same rgb and alpha modes
+    // KHR blending extensions require use of glBlendEquation
+
+    if( mBlendEquationSeparateModeRGB != mode || mBlendEquationSeparateModeAlpha != mode )
+    {
+      mBlendEquationSeparateModeRGB = mode;
+      mBlendEquationSeparateModeAlpha = mode;
+      LOG_GL("BlendEquation %d\n", mode);
+      CHECK_GL( mGlAbstraction, mGlAbstraction.BlendEquation( mode ) );
+    }
   }
 
   /**
@@ -1727,7 +1735,7 @@ public:
   }
 
   /**
-   * Wrapper for OpenGL ES 3.0 glUnmapBubffer()
+   * Wrapper for OpenGL ES 3.0 glUnmapBuffer()
    */
   GLboolean UnmapBuffer(GLenum target)
   {
@@ -1735,6 +1743,7 @@ public:
     GLboolean val = CHECK_GL( mGlAbstraction, mGlAbstraction.UnmapBuffer(target) );
     return val;
   }
+
   /**
    * Wrapper for OpenGL ES 2.0 glViewport()
    */
@@ -1753,6 +1762,15 @@ public:
       CHECK_GL( mGlAbstraction, mGlAbstraction.Viewport(x, y, width, height) );
       mViewPort = newViewport; // remember new one
     }
+  }
+
+  /**
+   * Wrapper for OpenGL ES 3.2 and GL_KHR_blend_equation_advanced extention glBlendBarrier()
+   */
+  void BlendBarrier()
+  {
+    LOG_GL( "BlendBarrier\n" );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.BlendBarrier() );
   }
 
   /**

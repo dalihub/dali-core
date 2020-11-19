@@ -19,22 +19,8 @@
 #include <dali/integration-api/debug.h>
 
 // EXTERNAL INCLUDES
+#include <chrono>
 #include <cstdarg>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <ctime>
-#include <iomanip>
-#include <sstream>
-
-// INTERNAL INCLUDES
-#include <dali/internal/event/common/thread-local-storage.h>
-#include <dali/public-api/common/constants.h>
-#include <dali/public-api/math/matrix.h>
-#include <dali/public-api/math/matrix3.h>
-#include <dali/public-api/math/quaternion.h>
-#include <dali/public-api/math/vector3.h>
-#include <dali/public-api/math/vector4.h>
 
 namespace Dali
 {
@@ -45,12 +31,6 @@ Dali::DebugPropertyValueArray gValueArray;
 Dali::DebugPropertyValueMap   gValueMap;
 
 #endif
-
-namespace // unnamed namespace
-{
-const uint64_t NANOSECONDS_PER_SECOND = 1e+9;
-
-}
 
 namespace Integration
 {
@@ -253,14 +233,19 @@ std::string FormatToString(const char* format, ...)
   return s;
 }
 
+#ifdef DEBUG_ENABLED
+
 void GetNanoseconds(uint64_t& timeInNanoseconds)
 {
-  timespec timeSpec;
-  clock_gettime(CLOCK_MONOTONIC, &timeSpec);
+  // Get the time of a monotonic clock since its epoch.
+  auto epoch = std::chrono::steady_clock::now().time_since_epoch();
 
-  // Convert all values to uint64_t to match our return type
-  timeInNanoseconds = (static_cast<uint64_t>(timeSpec.tv_sec) * NANOSECONDS_PER_SECOND) + static_cast<uint64_t>(timeSpec.tv_nsec);
+  auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(epoch);
+
+  timeInNanoseconds = static_cast<uint64_t>(duration.count());
 }
+
+#endif // DEBUG_ENABLED
 
 } // namespace Log
 

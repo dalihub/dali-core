@@ -56,13 +56,13 @@ namespace
 
 // Signals
 
-const char* const SIGNAL_FINISHED = "finished";
+static constexpr std::string_view SIGNAL_FINISHED = "finished";
 
 // Actions
 
-const char* const ACTION_PLAY =     "play";
-const char* const ACTION_STOP =     "stop";
-const char* const ACTION_PAUSE =    "pause";
+static constexpr std::string_view ACTION_PLAY  = "play";
+static constexpr std::string_view ACTION_STOP  = "stop";
+static constexpr std::string_view ACTION_PAUSE = "pause";
 
 BaseHandle Create()
 {
@@ -71,11 +71,11 @@ BaseHandle Create()
 
 TypeRegistration mType( typeid( Dali::Animation ), typeid( Dali::BaseHandle ), Create );
 
-SignalConnectorType signalConnector1( mType, SIGNAL_FINISHED, &Animation::DoConnectSignal );
+SignalConnectorType signalConnector1(mType, std::string(SIGNAL_FINISHED), &Animation::DoConnectSignal);
 
-TypeAction action1( mType, ACTION_PLAY,  &Animation::DoAction );
-TypeAction action2( mType, ACTION_STOP,  &Animation::DoAction );
-TypeAction action3( mType, ACTION_PAUSE, &Animation::DoAction );
+TypeAction action1(mType, std::string(ACTION_PLAY), &Animation::DoAction);
+TypeAction action2(mType, std::string(ACTION_STOP), &Animation::DoAction);
+TypeAction action3(mType, std::string(ACTION_PAUSE), &Animation::DoAction);
 
 const Dali::Animation::EndAction DEFAULT_END_ACTION( Dali::Animation::BAKE );
 const Dali::Animation::EndAction DEFAULT_DISCONNECT_ACTION( Dali::Animation::BAKE_FINAL );
@@ -443,67 +443,67 @@ void Animation::AnimateBy(Property& target, Property::Value relativeValue, Alpha
   {
     case Property::BOOLEAN:
     {
-      AddAnimatorConnector( AnimatorConnector<bool>::New( object,
-                                                          target.propertyIndex,
-                                                          target.componentIndex,
-                                                          new AnimateByBoolean(relativeValue.Get<bool>()),
-                                                          alpha,
-                                                          period ) );
+      AddAnimatorConnector(AnimatorConnector<bool>::New(object,
+                                                        target.propertyIndex,
+                                                        target.componentIndex,
+                                                        AnimateByBoolean(relativeValue.Get<bool>()),
+                                                        alpha,
+                                                        period));
       break;
     }
 
     case Property::INTEGER:
     {
-      AddAnimatorConnector( AnimatorConnector<int32_t>::New( object,
-                                                             target.propertyIndex,
-                                                             target.componentIndex,
-                                                             new AnimateByInteger(relativeValue.Get<int32_t>()),
-                                                             alpha,
-                                                             period ) );
+      AddAnimatorConnector(AnimatorConnector<int32_t>::New(object,
+                                                           target.propertyIndex,
+                                                           target.componentIndex,
+                                                           AnimateByInteger(relativeValue.Get<int32_t>()),
+                                                           alpha,
+                                                           period));
       break;
     }
 
     case Property::FLOAT:
     {
-      AddAnimatorConnector( AnimatorConnector<float>::New( object,
-                                                           target.propertyIndex,
-                                                           target.componentIndex,
-                                                           new AnimateByFloat(relativeValue.Get<float>()),
-                                                           alpha,
-                                                           period ) );
+      AddAnimatorConnector(AnimatorConnector<float>::New(object,
+                                                         target.propertyIndex,
+                                                         target.componentIndex,
+                                                         AnimateByFloat(relativeValue.Get<float>()),
+                                                         alpha,
+                                                         period));
       break;
     }
 
     case Property::VECTOR2:
     {
-      AddAnimatorConnector( AnimatorConnector<Vector2>::New( object,
-                                                             target.propertyIndex,
-                                                             target.componentIndex,
-                                                             new AnimateByVector2(relativeValue.Get<Vector2>()),
-                                                             alpha,
-                                                             period ) );
+      AddAnimatorConnector(AnimatorConnector<Vector2>::New(object,
+                                                           target.propertyIndex,
+                                                           target.componentIndex,
+                                                           AnimateByVector2(relativeValue.Get<Vector2>()),
+                                                           alpha,
+                                                           period));
       break;
     }
 
     case Property::VECTOR3:
     {
-      AddAnimatorConnector( AnimatorConnector<Vector3>::New( object,
-                                                             target.propertyIndex,
-                                                             target.componentIndex,
-                                                             new AnimateByVector3(relativeValue.Get<Vector3>()),
-                                                             alpha,
-                                                             period ) );
+      AddAnimatorConnector(AnimatorConnector<Vector3>::New(object,
+                                                           target.propertyIndex,
+                                                           target.componentIndex,
+                                                           AnimateByVector3(relativeValue.Get<Vector3>()),
+                                                           alpha,
+                                                           period));
       break;
     }
 
     case Property::VECTOR4:
     {
-      AddAnimatorConnector( AnimatorConnector<Vector4>::New( object,
-                                                             target.propertyIndex,
-                                                             target.componentIndex,
-                                                             new AnimateByVector4(relativeValue.Get<Vector4>()),
-                                                             alpha,
-                                                             period ) );
+      AddAnimatorConnector(AnimatorConnector<Vector4>::New(object,
+                                                           target.propertyIndex,
+                                                           target.componentIndex,
+                                                           AnimateByVector4(relativeValue.Get<Vector4>()),
+                                                           alpha,
+                                                           period));
       break;
     }
 
@@ -511,12 +511,12 @@ void Animation::AnimateBy(Property& target, Property::Value relativeValue, Alpha
     {
       AngleAxis angleAxis = relativeValue.Get<AngleAxis>();
 
-      AddAnimatorConnector( AnimatorConnector<Quaternion>::New( object,
-                                                                target.propertyIndex,
-                                                                target.componentIndex,
-                                                                new RotateByAngleAxis(angleAxis.angle, angleAxis.axis),
-                                                                alpha,
-                                                                period ) );
+      AddAnimatorConnector(AnimatorConnector<Quaternion>::New(object,
+                                                              target.propertyIndex,
+                                                              target.componentIndex,
+                                                              RotateByAngleAxis(angleAxis.angle, angleAxis.axis),
+                                                              alpha,
+                                                              period));
       break;
     }
 
@@ -564,78 +564,78 @@ void Animation::AnimateTo(Property& target, Property::Value destinationValue, Al
   {
     case Property::BOOLEAN:
     {
-      AddAnimatorConnector( AnimatorConnector<bool>::New( object,
-                                                          target.propertyIndex,
-                                                          target.componentIndex,
-                                                          new AnimateToBoolean( destinationValue.Get<bool>() ),
-                                                          alpha,
-                                                          period ) );
+      AddAnimatorConnector(AnimatorConnector<bool>::New(object,
+                                                        target.propertyIndex,
+                                                        target.componentIndex,
+                                                        AnimateToBoolean(destinationValue.Get<bool>()),
+                                                        alpha,
+                                                        period));
       break;
     }
 
     case Property::INTEGER:
     {
-      AddAnimatorConnector( AnimatorConnector<int32_t>::New( object,
-                                                             target.propertyIndex,
-                                                             target.componentIndex,
-                                                             new AnimateToInteger( destinationValue.Get<int32_t>() ),
-                                                             alpha,
-                                                             period ) );
+      AddAnimatorConnector(AnimatorConnector<int32_t>::New(object,
+                                                           target.propertyIndex,
+                                                           target.componentIndex,
+                                                           AnimateToInteger(destinationValue.Get<int32_t>()),
+                                                           alpha,
+                                                           period));
       break;
     }
 
     case Property::FLOAT:
     {
-      AddAnimatorConnector( AnimatorConnector<float>::New( object,
-                                                           target.propertyIndex,
-                                                           target.componentIndex,
-                                                           new AnimateToFloat( destinationValue.Get<float>() ),
-                                                           alpha,
-                                                           period ) );
+      AddAnimatorConnector(AnimatorConnector<float>::New(object,
+                                                         target.propertyIndex,
+                                                         target.componentIndex,
+                                                         AnimateToFloat(destinationValue.Get<float>()),
+                                                         alpha,
+                                                         period));
       break;
     }
 
     case Property::VECTOR2:
     {
-      AddAnimatorConnector( AnimatorConnector<Vector2>::New( object,
-                                                             target.propertyIndex,
-                                                             target.componentIndex,
-                                                             new AnimateToVector2( destinationValue.Get<Vector2>() ),
-                                                             alpha,
-                                                             period ) );
+      AddAnimatorConnector(AnimatorConnector<Vector2>::New(object,
+                                                           target.propertyIndex,
+                                                           target.componentIndex,
+                                                           AnimateToVector2(destinationValue.Get<Vector2>()),
+                                                           alpha,
+                                                           period));
       break;
     }
 
     case Property::VECTOR3:
     {
-      AddAnimatorConnector( AnimatorConnector<Vector3>::New( object,
-                                                             target.propertyIndex,
-                                                             target.componentIndex,
-                                                             new AnimateToVector3( destinationValue.Get<Vector3>() ),
-                                                             alpha,
-                                                             period ) );
+      AddAnimatorConnector(AnimatorConnector<Vector3>::New(object,
+                                                           target.propertyIndex,
+                                                           target.componentIndex,
+                                                           AnimateToVector3(destinationValue.Get<Vector3>()),
+                                                           alpha,
+                                                           period));
       break;
     }
 
     case Property::VECTOR4:
     {
-      AddAnimatorConnector( AnimatorConnector<Vector4>::New( object,
-                                                             target.propertyIndex,
-                                                             target.componentIndex,
-                                                             new AnimateToVector4( destinationValue.Get<Vector4>() ),
-                                                             alpha,
-                                                             period ) );
+      AddAnimatorConnector(AnimatorConnector<Vector4>::New(object,
+                                                           target.propertyIndex,
+                                                           target.componentIndex,
+                                                           AnimateToVector4(destinationValue.Get<Vector4>()),
+                                                           alpha,
+                                                           period));
       break;
     }
 
     case Property::ROTATION:
     {
-      AddAnimatorConnector( AnimatorConnector<Quaternion>::New( object,
-                                                                target.propertyIndex,
-                                                                target.componentIndex,
-                                                                new RotateToQuaternion( destinationValue.Get<Quaternion>() ),
-                                                                alpha,
-                                                                period ) );
+      AddAnimatorConnector(AnimatorConnector<Quaternion>::New(object,
+                                                              target.propertyIndex,
+                                                              target.componentIndex,
+                                                              RotateToQuaternion(destinationValue.Get<Quaternion>()),
+                                                              alpha,
+                                                              period));
       break;
     }
 
@@ -703,99 +703,85 @@ void Animation::AnimateBetween( Property target, const KeyFrames& keyFrames, Alp
   {
     case Dali::Property::BOOLEAN:
     {
-      const KeyFrameBoolean* kf;
-      GetSpecialization(keyFrames, kf);
-      KeyFrameBooleanPtr kfCopy = KeyFrameBoolean::Clone(*kf);
-      AddAnimatorConnector( AnimatorConnector<bool>::New( object,
-                                                          target.propertyIndex,
-                                                          target.componentIndex,
-                                                          new KeyFrameBooleanFunctor(kfCopy),
-                                                          alpha,
-                                                          period ) );
+      auto kf = GetSpecialization<const KeyFrameBoolean*>(keyFrames);
+      AddAnimatorConnector(AnimatorConnector<bool>::New(object,
+                                                        target.propertyIndex,
+                                                        target.componentIndex,
+                                                        KeyFrameBooleanFunctor(*kf), // takes a copy of the keyframe
+                                                        alpha,
+                                                        period));
       break;
     }
 
     case Dali::Property::INTEGER:
     {
-      const KeyFrameInteger* kf;
-      GetSpecialization(keyFrames, kf);
-      KeyFrameIntegerPtr kfCopy = KeyFrameInteger::Clone(*kf);
-      AddAnimatorConnector( AnimatorConnector<int32_t>::New( object,
-                                                         target.propertyIndex,
-                                                         target.componentIndex,
-                                                         new KeyFrameIntegerFunctor(kfCopy,interpolation),
-                                                         alpha,
-                                                         period ) );
+      auto kf = GetSpecialization<const KeyFrameInteger*>(keyFrames);
+      AddAnimatorConnector(AnimatorConnector<int32_t>::New(object,
+                                                           target.propertyIndex,
+                                                           target.componentIndex,
+                                                           KeyFrameIntegerFunctor(*kf, interpolation), // takes a copy of the keyframe
+                                                           alpha,
+                                                           period));
       break;
     }
 
     case Dali::Property::FLOAT:
     {
-      const KeyFrameNumber* kf;
-      GetSpecialization(keyFrames, kf);
-      KeyFrameNumberPtr kfCopy = KeyFrameNumber::Clone(*kf);
-      AddAnimatorConnector( AnimatorConnector<float>::New( object,
-                                                           target.propertyIndex,
-                                                           target.componentIndex,
-                                                           new KeyFrameNumberFunctor(kfCopy,interpolation),
-                                                           alpha,
-                                                           period ) );
+      auto kf = GetSpecialization<const KeyFrameNumber*>(keyFrames);
+      AddAnimatorConnector(AnimatorConnector<float>::New(object,
+                                                         target.propertyIndex,
+                                                         target.componentIndex,
+                                                         KeyFrameNumberFunctor(*kf, interpolation), // takes a copy of the keyframe
+                                                         alpha,
+                                                         period));
       break;
     }
 
     case Dali::Property::VECTOR2:
     {
-      const KeyFrameVector2* kf;
-      GetSpecialization(keyFrames, kf);
-      KeyFrameVector2Ptr kfCopy = KeyFrameVector2::Clone(*kf);
-      AddAnimatorConnector( AnimatorConnector<Vector2>::New( object,
-                                                             target.propertyIndex,
-                                                             target.componentIndex,
-                                                             new KeyFrameVector2Functor(kfCopy,interpolation),
-                                                             alpha,
-                                                             period ) );
+      auto kf = GetSpecialization<const KeyFrameVector2*>(keyFrames);
+      AddAnimatorConnector(AnimatorConnector<Vector2>::New(object,
+                                                           target.propertyIndex,
+                                                           target.componentIndex,
+                                                           KeyFrameVector2Functor(*kf, interpolation), // takes a copy of the keyframe
+                                                           alpha,
+                                                           period));
       break;
     }
 
     case Dali::Property::VECTOR3:
     {
-      const KeyFrameVector3* kf;
-      GetSpecialization(keyFrames, kf);
-      KeyFrameVector3Ptr kfCopy = KeyFrameVector3::Clone(*kf);
-      AddAnimatorConnector( AnimatorConnector<Vector3>::New( object,
-                                                             target.propertyIndex,
-                                                             target.componentIndex,
-                                                             new KeyFrameVector3Functor(kfCopy,interpolation),
-                                                             alpha,
-                                                             period ) );
+      auto kf = GetSpecialization<const KeyFrameVector3*>(keyFrames);
+      AddAnimatorConnector(AnimatorConnector<Vector3>::New(object,
+                                                           target.propertyIndex,
+                                                           target.componentIndex,
+                                                           KeyFrameVector3Functor(*kf, interpolation), // takes a copy of the keyframe
+                                                           alpha,
+                                                           period));
       break;
     }
 
     case Dali::Property::VECTOR4:
     {
-      const KeyFrameVector4* kf;
-      GetSpecialization(keyFrames, kf);
-      KeyFrameVector4Ptr kfCopy = KeyFrameVector4::Clone(*kf);
-      AddAnimatorConnector( AnimatorConnector<Vector4>::New( object,
-                                                             target.propertyIndex,
-                                                             target.componentIndex,
-                                                             new KeyFrameVector4Functor(kfCopy,interpolation),
-                                                             alpha,
-                                                             period ) );
+      auto kf = GetSpecialization<const KeyFrameVector4*>(keyFrames);
+      AddAnimatorConnector(AnimatorConnector<Vector4>::New(object,
+                                                           target.propertyIndex,
+                                                           target.componentIndex,
+                                                           KeyFrameVector4Functor(*kf, interpolation), // takes a copy of the keyframe
+                                                           alpha,
+                                                           period));
       break;
     }
 
     case Dali::Property::ROTATION:
     {
-      const KeyFrameQuaternion* kf;
-      GetSpecialization(keyFrames, kf);
-      KeyFrameQuaternionPtr kfCopy = KeyFrameQuaternion::Clone(*kf);
-      AddAnimatorConnector( AnimatorConnector<Quaternion>::New( object,
-                                                                target.propertyIndex,
-                                                                target.componentIndex,
-                                                                new KeyFrameQuaternionFunctor(kfCopy),
-                                                                alpha,
-                                                                period ) );
+      auto kf = GetSpecialization<const KeyFrameQuaternion*>(keyFrames);
+      AddAnimatorConnector(AnimatorConnector<Quaternion>::New(object,
+                                                              target.propertyIndex,
+                                                              target.componentIndex,
+                                                              KeyFrameQuaternionFunctor(*kf), // takes a copy of the keyframe
+                                                              alpha,
+                                                              period));
       break;
     }
 
@@ -860,7 +846,7 @@ bool Animation::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface*
   bool connected( false );
   Animation* animation = static_cast< Animation* >(object); // TypeRegistry guarantees that this is the correct type.
 
-  if( 0 == signalName.compare( SIGNAL_FINISHED ) )
+  if(SIGNAL_FINISHED == signalName)
   {
     animation->FinishedSignal().Connect( tracker, functor );
     connected = true;
@@ -900,23 +886,23 @@ void Animation::Animate( Actor& actor, const Path& path, const Vector3& forward,
   PathPtr pathCopy = Path::Clone(path);
 
   //Position animation
-  AddAnimatorConnector( AnimatorConnector<Vector3>::New( actor,
-                                                         Dali::Actor::Property::POSITION,
-                                                         Property::INVALID_COMPONENT_INDEX,
-                                                         new PathPositionFunctor( pathCopy ),
-                                                         alpha,
-                                                         period ) );
+  AddAnimatorConnector(AnimatorConnector<Vector3>::New(actor,
+                                                       Dali::Actor::Property::POSITION,
+                                                       Property::INVALID_COMPONENT_INDEX,
+                                                       PathPositionFunctor(pathCopy),
+                                                       alpha,
+                                                       period));
 
   //If forward is zero, PathRotationFunctor will always return the unit quaternion
   if( forward != Vector3::ZERO )
   {
     //Rotation animation
-    AddAnimatorConnector( AnimatorConnector<Quaternion>::New( actor,
-                                                              Dali::Actor::Property::ORIENTATION,
-                                                              Property::INVALID_COMPONENT_INDEX,
-                                                              new PathRotationFunctor( pathCopy, forward ),
-                                                              alpha,
-                                                              period ) );
+    AddAnimatorConnector(AnimatorConnector<Quaternion>::New(actor,
+                                                            Dali::Actor::Property::ORIENTATION,
+                                                            Property::INVALID_COMPONENT_INDEX,
+                                                            PathRotationFunctor(pathCopy, forward),
+                                                            alpha,
+                                                            period));
   }
 }
 
@@ -924,24 +910,24 @@ void Animation::Show(Actor& actor, float delaySeconds)
 {
   ExtendDuration( TimePeriod(delaySeconds, 0) );
 
-  AddAnimatorConnector( AnimatorConnector<bool>::New( actor,
-                                                      Dali::Actor::Property::VISIBLE,
-                                                      Property::INVALID_COMPONENT_INDEX,
-                                                      new AnimateToBoolean(SHOW_VALUE),
-                                                      mDefaultAlpha,
-                                                      TimePeriod(delaySeconds, 0.0f/*immediate*/) ) );
+  AddAnimatorConnector(AnimatorConnector<bool>::New(actor,
+                                                    Dali::Actor::Property::VISIBLE,
+                                                    Property::INVALID_COMPONENT_INDEX,
+                                                    AnimateToBoolean(SHOW_VALUE),
+                                                    mDefaultAlpha,
+                                                    TimePeriod(delaySeconds, 0.0f /*immediate*/)));
 }
 
 void Animation::Hide(Actor& actor, float delaySeconds)
 {
   ExtendDuration( TimePeriod(delaySeconds, 0) );
 
-  AddAnimatorConnector( AnimatorConnector<bool>::New( actor,
-                                                      Dali::Actor::Property::VISIBLE,
-                                                      Property::INVALID_COMPONENT_INDEX,
-                                                      new AnimateToBoolean(HIDE_VALUE),
-                                                      mDefaultAlpha,
-                                                      TimePeriod(delaySeconds, 0.0f/*immediate*/) ) );
+  AddAnimatorConnector(AnimatorConnector<bool>::New(actor,
+                                                    Dali::Actor::Property::VISIBLE,
+                                                    Property::INVALID_COMPONENT_INDEX,
+                                                    AnimateToBoolean(HIDE_VALUE),
+                                                    mDefaultAlpha,
+                                                    TimePeriod(delaySeconds, 0.0f /*immediate*/)));
 }
 
 bool Animation::DoAction( BaseObject* object, const std::string& actionName, const Property::Map& attributes )
@@ -951,7 +937,9 @@ bool Animation::DoAction( BaseObject* object, const std::string& actionName, con
 
   if( animation )
   {
-    if( 0 == actionName.compare( ACTION_PLAY ) )
+    std::string_view name(actionName);
+
+    if(name == ACTION_PLAY)
     {
       if( Property::Value* value = attributes.Find("duration", Property::FLOAT) )
       {
@@ -961,12 +949,12 @@ bool Animation::DoAction( BaseObject* object, const std::string& actionName, con
       animation->Play();
       done = true;
     }
-    else if( 0 == actionName.compare( ACTION_STOP ) )
+    else if(name == ACTION_STOP)
     {
       animation->Stop();
       done = true;
     }
-    else if( 0 == actionName.compare( ACTION_PAUSE ) )
+    else if(name == ACTION_PAUSE)
     {
       animation->Pause();
       done = true;

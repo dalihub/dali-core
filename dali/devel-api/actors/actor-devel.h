@@ -131,7 +131,16 @@ enum Type
     *
     *  If you want to reset the touch area to an area different with the size of the actor, you can set this TOUCH_AREA property.
     */
-  TOUCH_AREA
+  TOUCH_AREA,
+
+  /**
+   * @brief Determines which blend equation will be used to render renderers of this actor.
+   * @pre To use Advanced Blend Equation(DevelBlendEquation::MULTIPLY ~ DevelBlendEquation::LUMINOSITY), the color to be rendered should be pre-multipled alpha.
+   * @details Name "blendEquation", type Property::INTEGER.
+   * @note Color of each renderer will be blended with rendering framebuffer.
+   * @note To check the blend equation is supported in the system, use Dali::Capabilities::IsBlendEquationSupported
+   */
+  BLEND_EQUATION
 };
 
 } // namespace Property

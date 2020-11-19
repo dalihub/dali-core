@@ -49,21 +49,16 @@ public:
   /**
    * Constructor.
    */
-  AnimatorConnectorBase(
-      Object& object,
-      Property::Index propertyIndex,
-      int32_t componentIndex,
-      Internal::AnimatorFunctionBase* animatorFunction,
-      AlphaFunction alpha,
-      const TimePeriod& period)
-  : mParent( nullptr ),
-    mObject( &object ),
-    mAnimator( nullptr ),
-    mAnimatorFunction( animatorFunction ),
+  AnimatorConnectorBase(Object&           object,
+                        Property::Index   propertyIndex,
+                        int32_t           componentIndex,
+                        AlphaFunction     alpha,
+                        const TimePeriod& period)
+  : mObject(&object),
     mAlphaFunction(alpha),
     mTimePeriod(period),
-    mPropertyIndex( propertyIndex ),
-    mComponentIndex( componentIndex )
+    mPropertyIndex(propertyIndex),
+    mComponentIndex(componentIndex)
   {
     object.AddObserver( *this );
   }
@@ -77,13 +72,6 @@ public:
     {
       mObject->RemoveObserver( *this );
     }
-
-    // If there is not a SceneGraph::Animator, the AnimatorConnector is responsible for deleting the mAnimatorFunction
-    // otherwise, the animator function ownership is transferred to the SceneGraph::Animator
-    if( !mAnimator )
-    {
-      delete mAnimatorFunction;
-    }
   }
 
   /**
@@ -96,7 +84,6 @@ public:
   void CreateAnimator()
   {
     DALI_ASSERT_DEBUG( mAnimator == nullptr );
-    DALI_ASSERT_DEBUG( mAnimatorFunction != nullptr );
     DALI_ASSERT_DEBUG( mParent != nullptr );
 
     //Get the PropertyOwner the animator is going to animate
@@ -206,18 +193,15 @@ private:
   }
 
 protected:
-
-  Animation* mParent; ///< The parent owns the connector.
-  Object* mObject; ///< Not owned by the animator connector. Valid until ObjectDestroyed() is called.
-  SceneGraph::AnimatorBase* mAnimator;
-  Internal::AnimatorFunctionBase* mAnimatorFunction;  ///< Owned by the animator connector until an Scenegraph::Animator is created
+  Animation*                mParent{nullptr}; ///< The parent owns the connector.
+  Object*                   mObject;          ///< Not owned by the animator connector. Valid until ObjectDestroyed() is called.
+  SceneGraph::AnimatorBase* mAnimator{nullptr};
 
   AlphaFunction mAlphaFunction;
-  TimePeriod mTimePeriod;
+  TimePeriod    mTimePeriod;
 
   Property::Index mPropertyIndex;
-  int32_t mComponentIndex;
-
+  int32_t         mComponentIndex;
 };
 
 } // namespace Internal
