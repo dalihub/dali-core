@@ -66,10 +66,11 @@ public:
    * @brief Create an initialized Scene handle.
    *
    * @param[in] size The size of the set surface for this scene
+   * @param[in] orientation The rotated angle of the set surface for this scene
    *
    * @return a handle to a newly allocated Dali resource.
    */
-  static Scene New(Size size);
+  static Scene New(Size size, int orientation = 0);
 
   /**
    * @brief Downcast an Object handle to Scene handle.
@@ -282,6 +283,15 @@ public:
    * @note This is called in the update thread.
    */
   void GetFramePresentedCallback(FrameCallbackContainer& callbacks);
+
+  /**
+   * @brief Informs the scene that the set surface has been rotated.
+   *
+   * @param[in] width The width of rotated surface
+   * @param[in] height The height of rotated surface
+   * @param[in] orientation The orientation of rotated surface
+   */
+  void SurfaceRotated(float width, float height, int orientation);
 
   /**
    * @brief This signal is emitted just after the event processing is finished.

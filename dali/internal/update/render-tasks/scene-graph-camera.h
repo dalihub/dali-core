@@ -161,6 +161,11 @@ public:
   void SetFarClippingPlane( float farClippingPlane );
 
   /**
+   * @copydoc Dali::Internal::CameraActor::RotateProjection
+   */
+  void RotateProjection(int rotationAngle);
+
+  /**
    * @copydoc Dali::Internal::CameraActor::SetTarget
    */
   void SetTargetPosition( const Vector3& targetPosition );
@@ -222,6 +227,13 @@ public:
    * @return The inverse view-projection-matrix.
    */
   const Matrix& GetInverseViewProjectionMatrix( BufferIndex bufferIndex ) const;
+
+  /**
+   * Retrieve the final projection-matrix; this is double buffered for input handling.
+   * @param[in] bufferIndex The buffer to read from.
+   * @return The projection-matrix that should be used to render.
+   */
+  const Matrix& GetFinalProjectionMatrix(BufferIndex bufferIndex) const;
 
   /**
    * Retrieve the projection-matrix property querying interface.
@@ -295,6 +307,7 @@ private:
 
   uint32_t                  mUpdateViewFlag;       ///< This is non-zero if the view matrix requires an update
   uint32_t                  mUpdateProjectionFlag; ///< This is non-zero if the projection matrix requires an update
+  int                       mProjectionRotation;   ///< The rotaion angle of the projection
   const Node*                   mNode;                 ///< The node this scene graph camera belongs to
 
 public:  // PROPERTIES
@@ -323,6 +336,7 @@ public:  // PROPERTIES
 
   DoubleBuffered< FrustumPlanes > mFrustum;               ///< Clipping frustum; double buffered for input handling
   DoubleBuffered< Matrix >        mInverseViewProjection; ///< Inverted viewprojection; double buffered for input handling
+  DoubleBuffered< Matrix >        mFinalProjection;       ///< Final projection matrix; double buffered for input handling
 
 };
 
@@ -458,6 +472,17 @@ inline void SetInvertYAxisMessage( EventThreadServices& eventThreadServices, con
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &camera, &Camera::SetInvertYAxis, parameter );
+}
+
+inline void RotateProjectionMessage( EventThreadServices& eventThreadServices, const Camera& camera, int parameter )
+{
+  typedef MessageValue1< Camera, int > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &camera, &Camera::RotateProjection, parameter );
 }
 
 } // namespace SceneGraph

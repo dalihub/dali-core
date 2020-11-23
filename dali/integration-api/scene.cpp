@@ -27,9 +27,9 @@ namespace Dali
 {
 namespace Integration
 {
-Scene Scene::New(Size size)
+Scene Scene::New(Size size, int orientation)
 {
-  Internal::ScenePtr internal = Internal::Scene::New(size);
+  Internal::ScenePtr internal = Internal::Scene::New(size, orientation);
   return Scene(internal.Get());
 }
 
@@ -154,6 +154,11 @@ void Scene::GetFrameRenderedCallback(FrameCallbackContainer& callbacks)
 void Scene::GetFramePresentedCallback(FrameCallbackContainer& callbacks)
 {
   GetImplementation(*this).GetFramePresentedCallback(callbacks);
+}
+
+void Scene::SurfaceRotated(float width, float height, int orientation)
+{
+  GetImplementation(*this).SurfaceRotated(width, height, orientation);
 }
 
 Scene::EventProcessingFinishedSignalType& Scene::EventProcessingFinishedSignal()
