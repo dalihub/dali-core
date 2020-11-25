@@ -116,6 +116,12 @@ struct BlendingOptions
   bool IsAdvancedBlendEquationApplied();
 
   /**
+   * Query whether input bit mask include advanced blend equation.
+   * @return True if the bit mask include advanced blend equation.
+   */
+  static bool IsAdvancedBlendEquationIncluded( unsigned int bitmask );
+
+  /**
    * Query whether input blend equation is advanced option.
    * @return True if input blend equation is advanced.
    */

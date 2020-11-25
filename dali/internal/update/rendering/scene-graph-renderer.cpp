@@ -29,6 +29,7 @@
 #include <dali/internal/render/renderers/render-geometry.h>
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
+#include <dali/internal/common/blending-options.h>
 
 namespace Dali
 {
@@ -710,6 +711,12 @@ Renderer::OpacityType Renderer::GetOpacityType( BufferIndex updateBufferIndex, c
     }
     case BlendMode::AUTO:
     {
+      if(BlendingOptions::IsAdvancedBlendEquationIncluded(mBlendBitmask))
+      {
+        opacityType = Renderer::TRANSLUCENT;
+        break;
+      }
+
       bool shaderRequiresBlending( mShader->HintEnabled( Dali::Shader::Hint::OUTPUT_IS_TRANSPARENT ) );
       if( shaderRequiresBlending || ( mTextureSet && mTextureSet->HasAlpha() ) )
       {
@@ -726,6 +733,7 @@ Renderer::OpacityType Renderer::GetOpacityType( BufferIndex updateBufferIndex, c
       {
         opacityType = Renderer::TRANSLUCENT;
       }
+
       break;
     }
     case BlendMode::OFF: // the renderer should never use blending

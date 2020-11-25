@@ -1101,6 +1101,80 @@ int UtcDaliRendererSetBlendMode07(void)
   END_TEST;
 }
 
+int UtcDaliRendererSetBlendMode08(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test setting the blend mode to auto with opaque color and Advanced Blend Equation.");
+
+  if( Dali::Capabilities::IsBlendEquationSupported( DevelBlendEquation::SCREEN ) )
+  {
+    Geometry geometry = CreateQuadGeometry();
+    Shader   shader   = CreateShader();
+    Renderer renderer = Renderer::New(geometry, shader);
+
+    Actor actor = Actor::New();
+    actor.SetProperty(Actor::Property::OPACITY, 1.0f);
+    actor.AddRenderer(renderer);
+    actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+    application.GetScene().Add(actor);
+
+    renderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::AUTO);
+    renderer.SetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true );
+    renderer.SetProperty( DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::SCREEN );
+
+    TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+    glAbstraction.EnableEnableDisableCallTrace(true);
+
+    application.SendNotification();
+    application.Render();
+
+    TraceCallStack&    glEnableStack = glAbstraction.GetEnableDisableTrace();
+    std::ostringstream blendStr;
+    blendStr << GL_BLEND;
+    DALI_TEST_CHECK(glEnableStack.FindMethodAndParams("Enable", blendStr.str().c_str()));
+  }
+
+  END_TEST;
+}
+
+int UtcDaliRendererSetBlendMode08b(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test setting the blend mode to off with opaque color and Advanced Blend Equation.");
+
+  if( Dali::Capabilities::IsBlendEquationSupported( DevelBlendEquation::SCREEN ) )
+  {
+    Geometry geometry = CreateQuadGeometry();
+    Shader   shader   = CreateShader();
+    Renderer renderer = Renderer::New(geometry, shader);
+
+    Actor actor = Actor::New();
+    actor.SetProperty(Actor::Property::OPACITY, 1.0f);
+    actor.AddRenderer(renderer);
+    actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+    application.GetScene().Add(actor);
+
+    renderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::OFF);
+    renderer.SetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true );
+    renderer.SetProperty( DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::SCREEN );
+
+    TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+    glAbstraction.EnableEnableDisableCallTrace(true);
+
+    application.SendNotification();
+    application.Render();
+
+    TraceCallStack&    glEnableStack = glAbstraction.GetEnableDisableTrace();
+    std::ostringstream blendStr;
+    blendStr << GL_BLEND;
+    DALI_TEST_CHECK(!glEnableStack.FindMethodAndParams("Enable", blendStr.str().c_str()));
+  }
+
+  END_TEST;
+}
+
 int UtcDaliRendererGetBlendMode(void)
 {
   TestApplication application;

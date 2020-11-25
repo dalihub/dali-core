@@ -495,6 +495,17 @@ bool BlendingOptions::IsAdvancedBlendEquationApplied()
            ( ( indexA   >= BLENDING_EQUATION_ADVANCED_INDEX_START ) && ( indexA   <= BLENDING_EQUATION_ADVANCED_INDEX_END ) ) );
 }
 
+bool BlendingOptions::IsAdvancedBlendEquationIncluded( unsigned int bitmask )
+{
+  unsigned int indexRgb = bitmask & MASK_EQUATION_RGB;
+  indexRgb = indexRgb >> SHIFT_TO_EQUATION_RGB;
+  unsigned int indexA = bitmask & MASK_EQUATION_ALPHA;
+  indexA = indexA >> SHIFT_TO_EQUATION_ALPHA;
+
+  return ( ( ( indexRgb >= BLENDING_EQUATION_ADVANCED_INDEX_START ) && ( indexRgb <= BLENDING_EQUATION_ADVANCED_INDEX_END ) ) ||
+           ( ( indexA   >= BLENDING_EQUATION_ADVANCED_INDEX_START ) && ( indexA   <= BLENDING_EQUATION_ADVANCED_INDEX_END ) ) );
+}
+
 bool BlendingOptions::IsAdvancedBlendEquation( DevelBlendEquation::Type equation )
 {
   switch ( equation )

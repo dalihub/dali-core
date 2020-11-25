@@ -1199,7 +1199,6 @@ uint32_t Actor::AddRenderer( Renderer& renderer )
 
   if(mIsBlendEquationSet)
   {
-    renderer.SetBlendMode(Dali::BlendMode::ON);
     renderer.SetBlendEquation(static_cast<DevelBlendEquation::Type>(mBlendEquation));
   }
 
@@ -1270,7 +1269,6 @@ void Actor::SetBlendEquation(DevelBlendEquation::Type blendEquation)
       for(uint32_t i = 0; i < rendererCount; ++i)
       {
         RendererPtr renderer = GetRendererAt(i);
-        renderer->SetBlendMode(Dali::BlendMode::ON);
         renderer->SetBlendEquation(static_cast<DevelBlendEquation::Type>(blendEquation));
       }
     }
