@@ -11,6 +11,8 @@ SET( internal_src_files
   ${internal_src_dir}/common/image-sampler.cpp
   ${internal_src_dir}/common/image-attributes.cpp
   ${internal_src_dir}/common/fixed-size-memory-pool.cpp
+  ${internal_src_dir}/common/const-string.cpp
+
 
   ${internal_src_dir}/event/actors/actor-impl.cpp
   ${internal_src_dir}/event/actors/actor-property-handler.cpp
