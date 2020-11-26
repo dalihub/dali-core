@@ -102,6 +102,7 @@ public:
    */
   void Process( BufferIndex updateBufferIndex ) override
   {
+    mNode->SetUpdated( true );
     (mProperty->*mMemberFunction)( updateBufferIndex, mParam );
   }
 
@@ -180,6 +181,7 @@ public:
    */
   void Process( BufferIndex updateBufferIndex ) override
   {
+    mNode->SetUpdated( true );
     (mProperty->*mMemberFunction)( updateBufferIndex, mParam );
   }
 
@@ -256,6 +258,7 @@ public:
    */
   void Process( BufferIndex updateBufferIndex ) override
   {
+    mNode->SetUpdated( true );
     (mProperty->*mMemberFunction)( updateBufferIndex, mParam );
   }
 
@@ -332,6 +335,7 @@ public:
    */
   void Process( BufferIndex updateBufferIndex ) override
   {
+    mNode->SetUpdated( true );
     (mProperty->*mMemberFunction)( updateBufferIndex, mParam );
   }
 
