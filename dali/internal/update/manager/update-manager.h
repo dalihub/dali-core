@@ -603,18 +603,6 @@ public:
                   bool     isRenderingToFbo);
 
   /**
-   * Set the default surface rect.
-   * @param[in] rect The rect value representing the surface.
-   */
-  void SetDefaultSurfaceRect(const Rect<int>& rect);
-
-  /**
-   * Set the default surface orientation.
-   * @param[in] orientation The orientation value representing the surface.
-   */
-  void SetDefaultSurfaceOrientation(int orientation);
-
-  /**
    * @copydoc Dali::Stage::KeepRendering()
    */
   void KeepRendering(float durationSeconds);
@@ -644,12 +632,6 @@ public:
    * @param[in] nodeDepths A vector of nodes and associated depth indices
    */
   void SetDepthIndices(OwnerPointer<NodeDepths>& nodeDepths);
-
-  /**
-   * Query wheter the default surface rect is changed or not.
-   * @return true if the default surface rect is changed.
-   */
-  bool IsDefaultSurfaceRectChanged();
 
   /**
    * Adds an implementation of the FrameCallbackInterface.
@@ -1048,18 +1030,7 @@ inline void SetShaderProgramMessage(UpdateManager&          manager,
   new(slot) LocalType(&manager, &UpdateManager::SetShaderProgram, const_cast<Shader*>(&shader), shaderData, modifiesGeometry);
 }
 
-inline void SetDefaultSurfaceRectMessage(UpdateManager& manager, const Rect<int32_t>& rect)
-{
-  using LocalType = MessageValue1<UpdateManager, Rect<int32_t> >;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &UpdateManager::SetDefaultSurfaceRect, rect);
-}
-
-inline void SurfaceReplacedMessage(UpdateManager& manager, const SceneGraph::Scene& constScene)
+inline void SurfaceReplacedMessage( UpdateManager& manager, const SceneGraph::Scene& constScene )
 {
   // The scene-graph thread owns this object so it can safely edit it.
   Scene& scene = const_cast<Scene&>(constScene);
@@ -1073,18 +1044,7 @@ inline void SurfaceReplacedMessage(UpdateManager& manager, const SceneGraph::Sce
   new(slot) LocalType(&manager, &UpdateManager::SurfaceReplaced, &scene);
 }
 
-inline void SetDefaultSurfaceOrientationMessage(UpdateManager& manager, int orientation)
-{
-  using LocalType = MessageValue1<UpdateManager, int>;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &UpdateManager::SetDefaultSurfaceOrientation, orientation);
-}
-
-inline void KeepRenderingMessage(UpdateManager& manager, float durationSeconds)
+inline void KeepRenderingMessage( UpdateManager& manager, float durationSeconds )
 {
   using LocalType = MessageValue1<UpdateManager, float>;
 

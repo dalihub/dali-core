@@ -127,6 +127,42 @@ public:
    */
   bool IsRenderingSkipped() const;
 
+  /**
+   * Set the surface rectangle when surface is resized.
+   *
+   * @param[in] scene The resized scene.
+   * @param[in] rect The retangle representing the surface.
+   */
+  void SetSurfaceRect( const Rect<int32_t>& rect );
+
+  /**
+   * Get the surface rectangle.
+   *
+   * @return the current surface rectangle
+   */
+  const Rect<int32_t>& GetSurfaceRect() const;
+
+  /**
+   * Set the surface orientation when surface is rotated.
+   *
+   * @param[in] scene The rotated scene.
+   * @param[in] orientation The orientation value representing the surface.
+   */
+  void SetSurfaceOrientation( int32_t orientation );
+
+  /**
+   * Get the surface orientation.
+   *
+   * @return the current surface orientation
+   */
+  int32_t GetSurfaceOrientation() const;
+
+  /**
+   * Query wheter the surface rect is changed or not.
+   * @return true if the surface rect is changed.
+   */
+  bool IsSurfaceRectChanged();
+
 private:
 
   Context*                    mContext;   ///< The context holding the GL state of rendering for the scene, not owned
@@ -140,6 +176,10 @@ private:
   Dali::Integration::Scene::FrameCallbackContainer mFramePresentedCallbacks;  ///< Frame presented callbacks
 
   bool                        mSkipRendering;  ///< A flag to skip rendering
+
+  Rect<int32_t>               mSurfaceRect;           ///< The rectangle of surface which is related ot this scene.
+  int32_t                     mSurfaceOrientation;    ///< The orientation of surface which is related of this scene
+  bool                        mSurfaceRectChanged;    ///< The flag of surface's rectangle is changed when is resized, moved or rotated.
 };
 
 /// Messages
@@ -163,6 +203,28 @@ inline void AddFramePresentedCallbackMessage( EventThreadServices& eventThreadSe
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &scene, &Scene::AddFramePresentedCallback, const_cast< CallbackBase* >( callback ), frameId );
+}
+
+inline void SetSurfaceRectMessage( EventThreadServices& eventThreadServices, const Scene& scene, const Rect<int32_t>& rect )
+{
+  using LocalType = MessageValue1<Scene, Rect<int32_t> >;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &scene, &Scene::SetSurfaceRect, rect );
+}
+
+inline void SetSurfaceOrientationMessage( EventThreadServices& eventThreadServices, const Scene& scene, int32_t orientation )
+{
+  using LocalType = MessageValue1<Scene, int32_t>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &scene, &Scene::SetSurfaceOrientation, orientation );
 }
 
 } // namespace SceneGraph

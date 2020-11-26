@@ -189,7 +189,6 @@ struct UpdateManager::Impl
     previousUpdateScene( false ),
     renderTaskWaiting( false ),
     renderersAdded( false ),
-    surfaceRectChanged( false ),
     renderingRequired( false )
   {
     sceneController = new SceneControllerImpl( renderMessageDispatcher, renderQueue, discardQueue );
@@ -298,7 +297,6 @@ struct UpdateManager::Impl
   bool                                 previousUpdateScene;           ///< True if the scene was updated in the previous frame (otherwise it was optimized out)
   bool                                 renderTaskWaiting;             ///< A REFRESH_ONCE render task is waiting to be rendered
   bool                                 renderersAdded;                ///< Flag to keep track when renderers have been added to avoid unnecessary processing
-  bool                                 surfaceRectChanged;            ///< True if the default surface rect is changed
   bool                                 renderingRequired;             ///< True if required to render the current frame
 
 private:
@@ -1129,19 +1127,6 @@ uint32_t UpdateManager::KeepUpdatingCheck( float elapsedSeconds ) const
   return keepUpdatingRequest;
 }
 
-void UpdateManager::SetDefaultSurfaceRect( const Rect<int32_t>& rect )
-{
-  mImpl->surfaceRectChanged = true;
-
-  using DerivedType = MessageValue1<RenderManager, Rect<int32_t> >;
-
-  // Reserve some memory inside the render queue
-  uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::SetDefaultSurfaceRect, rect );
-}
-
 void UpdateManager::SurfaceReplaced( Scene* scene )
 {
   using DerivedType = MessageValue1<RenderManager, Scene*>;
@@ -1151,17 +1136,6 @@ void UpdateManager::SurfaceReplaced( Scene* scene )
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
   new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::SurfaceReplaced, scene );
-}
-
-void UpdateManager::SetDefaultSurfaceOrientation(int orientation)
-{
-  using DerivedType = MessageValue1<RenderManager, int>;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot(mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof(DerivedType));
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new(slot) DerivedType(&mImpl->renderManager, &RenderManager::SetDefaultSurfaceOrientation, orientation);
 }
 
 void UpdateManager::KeepRendering( float durationSeconds )
@@ -1208,16 +1182,6 @@ void UpdateManager::SetDepthIndices( OwnerPointer< NodeDepths >& nodeDepths )
       SortSiblingNodesRecursively( *scene->root );
     }
   }
-}
-
-bool UpdateManager::IsDefaultSurfaceRectChanged()
-{
-  bool surfaceRectChanged = mImpl->surfaceRectChanged;
-
-  // Reset the flag
-  mImpl->surfaceRectChanged = false;
-
-  return surfaceRectChanged;
 }
 
 void UpdateManager::AddFrameCallback( OwnerPointer< FrameCallback >& frameCallback, const Node* rootNode )

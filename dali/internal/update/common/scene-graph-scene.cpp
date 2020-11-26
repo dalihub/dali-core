@@ -32,7 +32,10 @@ Scene::Scene()
 : mContext( nullptr ),
   mFrameRenderedCallbacks(),
   mFramePresentedCallbacks(),
-  mSkipRendering( false )
+  mSkipRendering( false ),
+  mSurfaceRect(),
+  mSurfaceOrientation( 0 ),
+  mSurfaceRectChanged( false )
 {
 }
 
@@ -97,6 +100,35 @@ void Scene::SetSkipRendering( bool skip )
 bool Scene::IsRenderingSkipped() const
 {
   return mSkipRendering;
+}
+
+void Scene::SetSurfaceRect( const Rect<int32_t>& rect )
+{
+  mSurfaceRect = rect;
+  mSurfaceRectChanged = true;
+}
+
+const Rect<int32_t>& Scene::GetSurfaceRect() const
+{
+  return mSurfaceRect;
+}
+
+void Scene::SetSurfaceOrientation( int32_t orientation )
+{
+  mSurfaceOrientation = orientation;
+}
+
+int32_t Scene::GetSurfaceOrientation() const
+{
+  return mSurfaceOrientation;
+}
+
+bool Scene::IsSurfaceRectChanged()
+{
+  bool surfaceRectChanged = mSurfaceRectChanged;
+  mSurfaceRectChanged = false;
+
+  return surfaceRectChanged;
 }
 
 } //SceneGraph
