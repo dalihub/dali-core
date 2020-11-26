@@ -1580,8 +1580,42 @@ public:
    */
   void Scissor(GLint x, GLint y, GLsizei width, GLsizei height)
   {
-    LOG_GL("Scissor %d %d %d %d\n", x, y, width, height);
-    CHECK_GL( mGlAbstraction, mGlAbstraction.Scissor(x, y, width, height) );
+    GLint cx, cy, cw, ch;
+
+    // scissor's value should be set based on the default system coordinates.
+    // when the surface is rotated, the input valus already were set with the rotated angle.
+    // So, re-calculation is needed.
+    if(mSurfaceOrientation == 90)
+    {
+      cx = mViewPort.height - (y + height);
+      cy = x;
+      cw = height;
+      ch = width;
+    }
+    else if(mSurfaceOrientation == 180)
+    {
+      cx = mViewPort.width - (x + width);
+      cy = mViewPort.height - (y + height);
+      cw = width;
+      ch = height;
+    }
+    else if(mSurfaceOrientation == 270)
+    {
+      cx = y;
+      cy = mViewPort.width - (x + width);
+      cw = height;
+      ch = width;
+    }
+    else
+    {
+      cx = x;
+      cy = y;
+      cw = width;
+      ch = height;
+    }
+
+    LOG_GL("Scissor %d %d %d %d\n", cx, cy, cw, ch);
+    CHECK_GL(mGlAbstraction, mGlAbstraction.Scissor(cx, cy, cw, ch));
   }
 
   /**
@@ -1750,16 +1784,33 @@ public:
   void Viewport(GLint x, GLint y, GLsizei width, GLsizei height)
   {
     // check if its same as already set
-    Rect<int> newViewport( x, y, width, height );
+    GLsizei cw, ch;
+
+    // viewport's value shoud be set based on the default system size.
+    // when the surface is rotated, the input width and height already were swapped.
+    // So, re-swapping is needed.
+    if(mSurfaceOrientation == 90 || mSurfaceOrientation == 270)
+    {
+      cw = height;
+      ch = width;
+    }
+    else
+    {
+      cw = width;
+      ch = height;
+    }
+
+    // User uses the rotated viewport size.
+    Rect<int> newViewport(x, y, width, height);
 
     // Temporarily disable the viewport caching, as the implementation of GLES driver in Tizen platform
     // share a global viewport between multiple contexts, therefore glViewport has to be called every
     // time after glBindFramebuffer regardless of the same vewport size in the same context.
-//    if( mViewPort != newViewport )
+    //    if( mViewPort != newViewport )
     {
       // set new one
-      LOG_GL("Viewport %d %d %d %d\n", x, y, width, height);
-      CHECK_GL( mGlAbstraction, mGlAbstraction.Viewport(x, y, width, height) );
+      LOG_GL("Viewport %d %d %d %d\n", x, y, cw, ch);
+      CHECK_GL(mGlAbstraction, mGlAbstraction.Viewport(x, y, cw, ch));
       mViewPort = newViewport; // remember new one
     }
   }
@@ -1780,6 +1831,12 @@ public:
   GLint CachedMaxTextureSize() const
   {
     return mMaxTextureSize;
+  }
+
+  void SetSurfaceOrientation(int orientation)
+  {
+    LOG_GL( "SetSurfaceOrientation: orientation: %d\n", orientation );
+    mSurfaceOrientation = orientation;
   }
 
   /**
@@ -1893,6 +1950,8 @@ private: // Data
   FrameBufferStateCache mFrameBufferStateCache;   ///< frame buffer state cache
 
   OwnerContainer< Context* >* mSceneContexts;      ///< The pointer of the container of contexts for surface rendering
+
+  int mSurfaceOrientation;
 };
 
 } // namespace Internal

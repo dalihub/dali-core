@@ -43,33 +43,24 @@ namespace Dali
 namespace Internal
 {
 
-ScenePtr Scene::New( Size size )
+ScenePtr Scene::New(Size size, int orientation)
 {
   ScenePtr scene = new Scene;
 
   // Second-phase construction
-  scene->Initialize( size, 0 );
-
-  return scene;
-}
-
-ScenePtr Scene::New( Size size, int orientation )
-{
-  ScenePtr scene = new Scene;
-
-  // Second-phase construction
-  scene->Initialize( size, orientation );
+  scene->Initialize(size, orientation);
 
   return scene;
 }
 
 Scene::Scene()
-: mSceneObject( nullptr ),
+: mSceneObject(nullptr),
   mSize(), // Don't set the proper value here, this will be set when the surface is set later
   mDpi(),
-  mBackgroundColor( DEFAULT_BACKGROUND_COLOR ),
-  mDepthTreeDirty( false ),
-  mEventProcessor( *this, ThreadLocalStorage::GetInternal()->GetGestureEventProcessor() )
+  mBackgroundColor(DEFAULT_BACKGROUND_COLOR),
+  mDepthTreeDirty(false),
+  mEventProcessor(*this, ThreadLocalStorage::GetInternal()->GetGestureEventProcessor()),
+  mSurfaceOrientation(0)
 {
 }
 
@@ -104,7 +95,7 @@ Scene::~Scene()
   // When this destructor is called, the scene has either already been removed from Core or Core has already been destroyed
 }
 
-void Scene::Initialize( Size size, int orientation )
+void Scene::Initialize(Size size, int orientation)
 {
   ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
 
@@ -142,7 +133,7 @@ void Scene::Initialize( Size size, int orientation )
   renderTask->SetClearEnabled(true);
   mSurfaceOrientation = orientation;
 
-  SurfaceResized( size.width, size.height );
+  SurfaceRotated( size.width, size.height, mSurfaceOrientation );
 
   // Create scene graph object
   mSceneObject = new SceneGraph::Scene();
@@ -210,27 +201,11 @@ Actor& Scene::GetDefaultRootActor()
   return *mRootLayer;
 }
 
-void Scene::SurfaceResized( float width, float height )
+void Scene::SurfaceResized(float width, float height)
 {
-  if( ( fabsf( mSize.width - width ) > Math::MACHINE_EPSILON_1 ) || ( fabsf( mSize.height - height ) > Math::MACHINE_EPSILON_1 ) )
+  if((fabsf(mSize.width - width) > Math::MACHINE_EPSILON_1) || (fabsf(mSize.height - height) > Math::MACHINE_EPSILON_1))
   {
-    Rect< int32_t > newSize( 0, 0, static_cast< int32_t >( width ), static_cast< int32_t >( height ) ); // truncated
-
-    mSize.width = width;
-    mSize.height = height;
-
-    // Calculates the aspect ratio, near and far clipping planes, field of view and camera Z position.
-    mDefaultCamera->SetPerspectiveProjection( mSize );
-
-    mRootLayer->SetSize( mSize.width, mSize.height );
-
-    ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
-    SceneGraph::UpdateManager& updateManager = tls->GetUpdateManager();
-    SetDefaultSurfaceRectMessage( updateManager, newSize );
-
-    // set default render-task viewport parameters
-    RenderTaskPtr defaultRenderTask = mRenderTaskList->GetTask( 0u );
-    defaultRenderTask->SetViewport( newSize );
+    ChangedSurface(width, height, mSurfaceOrientation);
   }
 }
 
@@ -303,6 +278,43 @@ void Scene::EmitKeyEventSignal(const Dali::KeyEvent& event)
     Dali::Integration::Scene handle( this );
     mKeyEventSignal.Emit( event );
   }
+}
+
+void Scene::SurfaceRotated(float width, float height, int orientation)
+{
+  mSurfaceOrientation = orientation;
+  ChangedSurface(width, height, orientation);
+}
+
+int Scene::GetSurfaceOrientation()
+{
+  return mSurfaceOrientation;
+}
+
+void Scene::ChangedSurface(float width, float height, int orientation)
+{
+  Rect<int32_t> newSize(0, 0, static_cast<int32_t>(width), static_cast<int32_t>(height)); // truncated
+
+  mSize.width  = width;
+  mSize.height = height;
+
+  // Calculates the aspect ratio, near and far clipping planes, field of view and camera Z position.
+  mDefaultCamera->SetPerspectiveProjection(mSize);
+  // Set the surface orientation to Default camera for window/screen rotation
+  mDefaultCamera->RotateProjection(orientation);
+
+  mRootLayer->SetSize(width, height);
+
+  ThreadLocalStorage*        tls           = ThreadLocalStorage::GetInternal();
+  SceneGraph::UpdateManager& updateManager = tls->GetUpdateManager();
+  SetDefaultSurfaceRectMessage(updateManager, newSize);
+
+  // Send the surface orientation to render manager for calculating glViewport/Scissor
+  SetDefaultSurfaceOrientationMessage(updateManager, orientation);
+
+  // set default render-task viewport parameters
+  RenderTaskPtr defaultRenderTask = mRenderTaskList->GetTask(0u);
+  defaultRenderTask->SetViewport(newSize);
 }
 
 bool Scene::EmitKeyEventGeneratedSignal(const Dali::KeyEvent& event)

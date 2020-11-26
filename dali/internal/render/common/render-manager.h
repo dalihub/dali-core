@@ -131,6 +131,12 @@ public:
   void SetDefaultSurfaceRect( const Rect<int>& rect );
 
   /**
+   * Returns the orintation for the default surface (probably the application window).
+   * @param[in] orientation the surface's orientation.
+   */
+  void SetDefaultSurfaceOrientation(int orientation);
+
+  /**
    * Add a Renderer to the render manager.
    * @param[in] renderer The renderer to add.
    * @post renderer is owned by RenderManager

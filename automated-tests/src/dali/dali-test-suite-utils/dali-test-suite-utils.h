@@ -378,6 +378,34 @@ inline void DALI_TEST_PRINT_ASSERT(DaliException& e)
     DALI_TEST_ASSERT(e, assertstring, TEST_LOCATION);                                                       \
   }
 
+/**
+ * Test that given piece of code triggers an exception
+ * Fails the test if the exception didn't occur.
+ * Turns off logging during the execution of the code to avoid excessive false positive log output from the assertions
+ * @param expressions code to execute
+ * @param except the exception expected in the assert
+ */
+#define DALI_TEST_THROWS(expressions, except)                                                               \
+  try                                                                                                       \
+  {                                                                                                         \
+    TestApplication::EnableLogging(false);                                                                  \
+    expressions;                                                                                            \
+    TestApplication::EnableLogging(true);                                                                   \
+    fprintf(stderr, "Test failed in %s, expected exception: '%s' didn't occur\n", __FILELINE__, #except);   \
+    tet_result(TET_FAIL);                                                                                   \
+    throw("TET_FAIL");                                                                                      \
+  }                                                                                                         \
+  catch(except &)                                                                                           \
+  {                                                                                                         \
+    tet_result(TET_PASS);                                                                                   \
+  }                                                                                                         \
+  catch(...)                                                                                                \
+  {                                                                                                         \
+    fprintf(stderr, "Test failed in %s, unexpected exception\n", __FILELINE__);                             \
+    tet_result(TET_FAIL);                                                                                   \
+    throw;                                                                                                  \
+  }
+
 // Functor to test whether an Applied signal is emitted
 struct ConstraintAppliedCheck
 {

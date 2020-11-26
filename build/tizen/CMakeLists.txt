@@ -140,6 +140,8 @@ IF( WIN32 ) # WIN32 includes x64 as well according to the cmake doc.
 
 ELSEIF( UNIX )
 
+  INCLUDE(CheckCXXCompilerFlag)
+
   # Set up compiler flags and warnings
   ADD_COMPILE_OPTIONS( -Wnon-virtual-dtor -Woverloaded-virtual -Wold-style-cast )
 
@@ -149,8 +151,21 @@ ELSEIF( UNIX )
     ADD_COMPILE_OPTIONS( -Werror )
   ENDIF()
 
-  ADD_COMPILE_OPTIONS( -Wall -Wextra -Wno-unused-parameter -Wfloat-equal -Wno-class-memaccess -Wno-cast-function-type )
+  ADD_COMPILE_OPTIONS( -Wall -Wextra -Wno-unused-parameter -Wfloat-equal )
+  CHECK_CXX_COMPILER_FLAG(-Wno-class-memaccess HAVE_NO_CLASS_MEMACCESS)
+  IF (HAVE_NO_CLASS_MEMACCESS)
+    ADD_COMPILE_OPTIONS( -Wno-class-memaccess )
+  ENDIF()
 
+  CHECK_CXX_COMPILER_FLAG(-Wno-cast-function-type HAVE_NO_CAST_FUNCTION_TYPE)
+  IF (HAVE_NO_CAST_FUNCTION_TYPE)
+    ADD_COMPILE_OPTIONS( -Wno-cast-function-type )
+  ENDIF()
+
+  CHECK_CXX_COMPILER_FLAG(-Wno-string-plus-int HAVE_NO_STRING_PLUS_INT)
+  IF (HAVE_NO_STRING_PLUS_INT)
+    ADD_COMPILE_OPTIONS( -Wno-string-plus-int )
+  ENDIF()
   IF( ENABLE_COVERAGE OR "$ENV{CXXFLAGS}" MATCHES --coverage )
     ADD_COMPILE_OPTIONS( --coverage )
     SET(ENABLE_COVERAGE ON)
@@ -245,7 +260,7 @@ IF( INSTALL_CMAKE_MODULES )
   INSTALL( FILES ${CMAKE_CURRENT_BINARY_DIR}/${name}-config.cmake DESTINATION share/${name} )
 
   # Install the pdb file.
-  IF( ENABLE_DEBUG )
+  IF( ENABLE_DEBUG AND WIN32 )
     install( FILES ${CMAKE_CURRENT_BINARY_DIR}/Debug/${name}.pdb DESTINATION ${BIN_DIR} )
   ENDIF()
 ELSE()
