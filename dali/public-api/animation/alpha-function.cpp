@@ -22,69 +22,53 @@
 
 namespace Dali
 {
-namespace
-{
-constexpr uint32_t BitMaskOfN(uint32_t bits)
-{
-  return (1 << bits) - 1;
-}
-
-} // unnamed namespace
-
 AlphaFunction::AlphaFunction()
-: mBezierControlPoints(Vector4::ZERO),
-  mCustom(nullptr),
-  mBuiltin(DEFAULT),
-  mMode(BUILTIN_FUNCTION)
+: mMode(BUILTIN_FUNCTION),
+  mBuiltin(DEFAULT)
 {
 }
 
 AlphaFunction::AlphaFunction(BuiltinFunction function)
-: mBezierControlPoints(Vector4::ZERO),
-  mCustom(nullptr),
-  mBuiltin(function),
-  mMode(BUILTIN_FUNCTION)
+: mMode(BUILTIN_FUNCTION),
+  mBuiltin(function)
 {
 }
 
 AlphaFunction::AlphaFunction(AlphaFunctionPrototype function)
-: mBezierControlPoints(Vector4::ZERO),
-  mCustom(function),
-  mBuiltin(DEFAULT),
-  mMode(CUSTOM_FUNCTION)
+: mMode(CUSTOM_FUNCTION),
+  mCustom(function)
 {
 }
 
 AlphaFunction::AlphaFunction(const Vector2& controlPoint0, const Vector2& controlPoint1)
-: mBezierControlPoints(
+: mMode(BEZIER),
+  mBuiltin(DEFAULT),
+  mBezierControlPoints(
     Vector4(Clamp(controlPoint0.x, 0.0f, 1.0f),
             controlPoint0.y,
             Clamp(controlPoint1.x, 0.0f, 1.0f),
-            controlPoint1.y)),
-  mCustom(nullptr),
-  mBuiltin(DEFAULT),
-  mMode(BEZIER)
+            controlPoint1.y))
 {
 }
 
 Vector4 AlphaFunction::GetBezierControlPoints() const
 {
-  return mBezierControlPoints;
+  return (mMode == BEZIER) ? mBezierControlPoints : Vector4::ZERO;
 }
 
 AlphaFunctionPrototype AlphaFunction::GetCustomFunction() const
 {
-  return mCustom;
+  return (mMode == CUSTOM_FUNCTION) ? mCustom : nullptr;
 }
 
 AlphaFunction::BuiltinFunction AlphaFunction::GetBuiltinFunction() const
 {
-  return static_cast<AlphaFunction::BuiltinFunction>(mBuiltin & BitMaskOfN(Log<COUNT>::value + 1));
+  return mBuiltin;
 }
 
 AlphaFunction::Mode AlphaFunction::GetMode() const
 {
-  return static_cast<AlphaFunction::Mode>(mMode & BitMaskOfN(2));
+  return mMode;
 }
 
 } // namespace Dali
