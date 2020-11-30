@@ -60,19 +60,15 @@ void AddMappings( CollectedUniformMap& localMap, const UniformMap& uniformMap )
 
   for( UniformMap::SizeType i = 0, count=uniformMap.Count(); i<count; ++i )
   {
-    UniformPropertyMapping::Hash nameHash = uniformMap[i].uniformNameHash;
     bool found = false;
 
     for( CollectedUniformMap::Iterator iter = localMap.Begin() ; iter != localMap.End() ; ++iter )
     {
       const UniformPropertyMapping* map = (*iter);
-      if( map->uniformNameHash == nameHash )
+      if( map->uniformName == uniformMap[i].uniformName )
       {
-        if( map->uniformName == uniformMap[i].uniformName )
-        {
-          found = true;
-          break;
-        }
+        found = true;
+        break;
       }
     }
     if( !found )

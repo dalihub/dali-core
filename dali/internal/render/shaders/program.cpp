@@ -144,7 +144,7 @@ GLint Program::GetAttribLocation( AttribType type )
   return GetCustomAttributeLocation( type );
 }
 
-uint32_t Program::RegisterCustomAttribute( const std::string& name )
+uint32_t Program::RegisterCustomAttribute( ConstString name )
 {
   uint32_t index = 0;
   // find the value from cache
@@ -171,17 +171,17 @@ GLint Program::GetCustomAttributeLocation( uint32_t attributeIndex )
 
   if( location == ATTRIB_UNKNOWN )
   {
-    location = CHECK_GL( mGlAbstraction, mGlAbstraction.GetAttribLocation( mProgramId, mAttributeLocations[ attributeIndex ].first.c_str() ) );
+    location = CHECK_GL( mGlAbstraction, mGlAbstraction.GetAttribLocation( mProgramId, mAttributeLocations[ attributeIndex ].first.GetCString() ) );
 
     mAttributeLocations[ attributeIndex ].second = location;
-    LOG_GL( "GetAttributeLocation(program=%d,%s) = %d\n", mProgramId, mAttributeLocations[ attributeIndex ].first.c_str(), mAttributeLocations[ attributeIndex ].second );
+    LOG_GL( "GetAttributeLocation(program=%d,%s) = %d\n", mProgramId, mAttributeLocations[ attributeIndex ].first.GetCString(), mAttributeLocations[ attributeIndex ].second );
   }
 
   return location;
 }
 
 
-uint32_t Program::RegisterUniform( const std::string& name )
+uint32_t Program::RegisterUniform( ConstString name )
 {
   uint32_t index = 0;
   // find the value from cache
@@ -208,10 +208,10 @@ GLint Program::GetUniformLocation( uint32_t uniformIndex )
 
   if( location == UNIFORM_NOT_QUERIED )
   {
-    location = CHECK_GL( mGlAbstraction, mGlAbstraction.GetUniformLocation( mProgramId, mUniformLocations[ uniformIndex ].first.c_str() ) );
+    location = CHECK_GL( mGlAbstraction, mGlAbstraction.GetUniformLocation( mProgramId, mUniformLocations[ uniformIndex ].first.GetCString() ) );
 
     mUniformLocations[ uniformIndex ].second = location;
-    LOG_GL( "GetUniformLocation(program=%d,%s) = %d\n", mProgramId, mUniformLocations[ uniformIndex ].first.c_str(), mUniformLocations[ uniformIndex ].second );
+    LOG_GL( "GetUniformLocation(program=%d,%s) = %d\n", mProgramId, mUniformLocations[ uniformIndex ].first.GetCString(), mUniformLocations[ uniformIndex ].second );
   }
 
   return location;
@@ -645,7 +645,7 @@ Program::Program( ProgramCache& cache, Internal::ShaderDataPtr shaderData, bool 
   mAttributeLocations.reserve( ATTRIB_TYPE_LAST );
   for( uint32_t i = 0; i < ATTRIB_TYPE_LAST; ++i )
   {
-    RegisterCustomAttribute( gStdAttribs[i] );
+    RegisterCustomAttribute( ConstString(gStdAttribs[i]) );
   }
 
   // reserve space for standard uniforms
@@ -653,7 +653,7 @@ Program::Program( ProgramCache& cache, Internal::ShaderDataPtr shaderData, bool 
   // reset built in uniform names in cache
   for( uint32_t i = 0; i < UNIFORM_TYPE_LAST; ++i )
   {
-    RegisterUniform( gStdUniforms[ i ] );
+    RegisterUniform( ConstString(gStdUniforms[ i ]) );
   }
 
   // reset values

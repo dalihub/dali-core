@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/hash.h>
 #include <dali/devel-api/common/owner-container.h>
+#include <dali/internal/common/const-string.h>
 
 namespace Dali
 {
@@ -40,29 +41,19 @@ namespace SceneGraph
 class UniformPropertyMapping
 {
 public:
-  using Hash = unsigned long;
-
   /**
    * Constructor
    */
-  UniformPropertyMapping(std::string theUniformName, const PropertyInputImpl* thePropertyPtr)
+  UniformPropertyMapping(ConstString theUniformName, const PropertyInputImpl* thePropertyPtr)
   : propertyPtr(thePropertyPtr),
-    uniformName(std::move(theUniformName)),
-    uniformNameHash(Dali::CalculateHash(theUniformName))
+    uniformName(theUniformName)
   {
   }
 
-  UniformPropertyMapping()
-  : propertyPtr( nullptr ),
-    uniformName( "" ),
-    uniformNameHash( 0 )
-  {
-  }
+  UniformPropertyMapping() = default;
 
-
-  const PropertyInputImpl* propertyPtr;
-  std::string uniformName;
-  Hash uniformNameHash;
+  const PropertyInputImpl* propertyPtr{nullptr};
+  ConstString uniformName;
 };
 
 /**
@@ -96,16 +87,6 @@ public:
   };
 
   /**
-   * Constructor
-   */
-  UniformMap();
-
-  /**
-   * Destructor
-   */
-  ~UniformMap();
-
-  /**
    * Add an observer that watches for changes in the mappings
    */
   void AddObserver( Observer& observer );
@@ -123,13 +104,13 @@ public:
   /**
    * Remove a map from the mappings table
    */
-  void Remove( const std::string& uniformName );
+  void Remove( ConstString uniformName );
 
   /**
    * Find a property given the uniform name.
    * @return The address of the property if it's in the map, or NULL otherwise.
    */
-  const PropertyInputImpl* Find( const std::string& uniformName );
+  const PropertyInputImpl* Find( ConstString uniformName );
 
   /**
    * Get the count of uniforms in the map

@@ -23,12 +23,6 @@ namespace Internal
 {
 namespace SceneGraph
 {
-UniformMap::UniformMap() = default;
-
-UniformMap::~UniformMap()
-{
-  // Nothing to do - let the owner container delete the maps
-}
 
 void UniformMap::AddObserver( Observer& observer )
 {
@@ -70,8 +64,6 @@ void UniformMap::MappingChanged()
 
 void UniformMap::Add( UniformPropertyMapping* newMap )
 {
-  UniformPropertyMapping::Hash nameHash = CalculateHash( newMap->uniformName );
-
   bool found = false;
 
   for( UniformMapIter iter = mUniformMaps.Begin() ;
@@ -79,15 +71,12 @@ void UniformMap::Add( UniformPropertyMapping* newMap )
        ++iter )
   {
     UniformPropertyMapping* map = *iter;
-    if( map->uniformNameHash == nameHash )
+    if( map->uniformName == newMap->uniformName )
     {
-      if( map->uniformName == newMap->uniformName )
-      {
-        found = true;
-        // Mapping already exists - update it.
-        map->propertyPtr = newMap->propertyPtr;
-        break;
-      }
+      found = true;
+      // Mapping already exists - update it.
+      map->propertyPtr = newMap->propertyPtr;
+      break;
     }
   }
 
@@ -100,10 +89,8 @@ void UniformMap::Add( UniformPropertyMapping* newMap )
   MappingChanged();
 }
 
-void UniformMap::Remove( const std::string& uniformName )
+void UniformMap::Remove( ConstString uniformName )
 {
-  UniformPropertyMapping::Hash nameHash = CalculateHash( uniformName );
-
   bool found=false;
 
   for( UniformMapIter iter = mUniformMaps.Begin() ;
@@ -111,14 +98,11 @@ void UniformMap::Remove( const std::string& uniformName )
        ++iter )
   {
     UniformPropertyMapping* map = *iter;
-    if( map->uniformNameHash == nameHash )
+    if( map->uniformName == uniformName )
     {
-      if( map->uniformName == uniformName )
-      {
-        mUniformMaps.Erase( iter );
-        found = true;
-        break;
-      }
+      mUniformMaps.Erase( iter );
+      found = true;
+      break;
     }
   }
 
@@ -128,21 +112,16 @@ void UniformMap::Remove( const std::string& uniformName )
   }
 }
 
-const PropertyInputImpl* UniformMap::Find( const std::string& uniformName )
+const PropertyInputImpl* UniformMap::Find( ConstString uniformName )
 {
-  UniformPropertyMapping::Hash nameHash = CalculateHash( uniformName );
-
   for( UniformMapIter iter = mUniformMaps.Begin() ;
        iter != mUniformMaps.End() ;
        ++iter )
   {
     UniformPropertyMapping* map = *iter;
-    if( map->uniformNameHash == nameHash )
+    if( map->uniformName == uniformName )
     {
-      if( map->uniformName == uniformName )
-      {
-        return map->propertyPtr;
-      }
+      return map->propertyPtr;
     }
   }
   return nullptr;

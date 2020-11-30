@@ -215,7 +215,7 @@ void VertexBuffer::Initialize( Dali::Property::Map& formatMap )
     {
       continue;
     }
-    format->components[i].name = component.first.stringKey;
+    format->components[i].name = ConstString(component.first.stringKey);
 
     // enums are stored in the map as int
     Property::Type type = Property::Type( component.second.Get<int>() );

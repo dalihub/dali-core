@@ -24,6 +24,7 @@
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/render/renderers/render-sampler.h>
 #include <dali/internal/render/gl-resources/gpu-buffer.h>
+#include <dali/internal/common/const-string.h>
 
 namespace Dali
 {
@@ -38,7 +39,7 @@ public:
 
   struct Component
   {
-    std::string    name;
+    ConstString    name;
     uint32_t       offset;
     uint32_t       size;
     Property::Type type;
@@ -124,7 +125,7 @@ public:
    * @param[in] index The index of the attribute
    * @return The name of the attribute
    */
-  inline const std::string& GetAttributeName( uint32_t index ) const
+  inline ConstString GetAttributeName( uint32_t index ) const
   {
     DALI_ASSERT_DEBUG( mFormat && "Format should be set ");
     return mFormat->components[index].name;

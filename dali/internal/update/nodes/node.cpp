@@ -182,7 +182,7 @@ void Node::AddUniformMapping( OwnerPointer< UniformPropertyMapping >& map )
   mRegenerateUniformMap = 2;
 }
 
-void Node::RemoveUniformMapping( const std::string& uniformName )
+void Node::RemoveUniformMapping( const ConstString& uniformName )
 {
   PropertyOwner::RemoveUniformMapping( uniformName );
   mRegenerateUniformMap = 2;
