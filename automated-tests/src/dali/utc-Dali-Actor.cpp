@@ -8987,3 +8987,64 @@ int UtcDaliActorPropertyBlendEquation(void)
 
   END_TEST;
 }
+
+int UtcDaliActorRegisterProperty(void)
+{
+  tet_infoline("Test property registration and uniform map update\n");
+
+  TestApplication application;
+
+  Geometry geometry  = CreateQuadGeometry();
+  Shader   shader    = CreateShader();
+  Renderer renderer1 = Renderer::New(geometry, shader);
+  Renderer renderer2 = Renderer::New(geometry, shader);
+
+  Actor actor1 = Actor::New();
+  actor1.AddRenderer(renderer1);
+  actor1.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
+  actor1.RegisterProperty("uCustom", 1);
+  application.GetScene().Add(actor1);
+
+  Actor actor2 = Actor::New();
+  actor2.AddRenderer(renderer2);
+  actor2.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
+  application.GetScene().Add(actor2);
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  TraceCallStack&    callStack     = glAbstraction.GetSetUniformTrace();
+  glAbstraction.EnableSetUniformCallTrace(true);
+
+  application.SendNotification();
+  application.Render();
+
+  std::stringstream out;
+  out.str("1");
+  std::string params;
+
+  // Test uniform value of the custom property
+  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters("uCustom", params));
+  DALI_TEST_EQUALS(out.str(), params, TEST_LOCATION);
+
+  // Make invisible
+  actor1[Actor::Property::VISIBLE] = false;
+
+  application.SendNotification();
+  application.Render();
+
+  // Make visible again
+  actor1[Actor::Property::VISIBLE] = true;
+  actor1["uCustom"]                = 2;
+
+  glAbstraction.ResetSetUniformCallStack();
+
+  application.SendNotification();
+  application.Render();
+
+  out.str("2");
+
+  // The uniform value should not be changed
+  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters("uCustom", params));
+  DALI_TEST_EQUALS(out.str(), params, TEST_LOCATION);
+
+  END_TEST;
+}
