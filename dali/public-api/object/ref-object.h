@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <cstdint> // uint32_t
+#include <atomic>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -101,7 +102,7 @@ protected:
   RefObject& operator=(const RefObject& rhs);
 
 private:
-  volatile uint32_t mCount; ///< Reference count
+  std::atomic_uint32_t mCount {0u}; ///< Reference count
 };
 
 /**
