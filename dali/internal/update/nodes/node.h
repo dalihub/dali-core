@@ -798,7 +798,7 @@ public:
   /**
    * @copydoc UniformMap::Add
    */
-  void AddUniformMapping( OwnerPointer< UniformPropertyMapping >& map ) override;
+  void AddUniformMapping(const UniformPropertyMapping& map) override;
 
   /**
    * @copydoc UniformMap::Remove

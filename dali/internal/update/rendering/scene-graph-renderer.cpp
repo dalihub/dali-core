@@ -64,8 +64,8 @@ void AddMappings( CollectedUniformMap& localMap, const UniformMap& uniformMap )
 
     for( CollectedUniformMap::Iterator iter = localMap.Begin() ; iter != localMap.End() ; ++iter )
     {
-      const UniformPropertyMapping* map = (*iter);
-      if( map->uniformName == uniformMap[i].uniformName )
+      const UniformPropertyMapping& map = (*iter);
+      if(map.uniformName == uniformMap[i].uniformName)
       {
         found = true;
         break;
@@ -73,8 +73,7 @@ void AddMappings( CollectedUniformMap& localMap, const UniformMap& uniformMap )
     }
     if( !found )
     {
-      // it's a new mapping. Add raw ptr to temporary list
-      newUniformMappings.PushBack( &uniformMap[i] );
+      newUniformMappings.PushBack(uniformMap[i]);
     }
   }
 
@@ -87,7 +86,7 @@ void AddMappings( CollectedUniformMap& localMap, const UniformMap& uniformMap )
          iter != end ;
          ++iter )
     {
-      const UniformPropertyMapping* map = (*iter);
+      const UniformPropertyMapping& map = (*iter);
       localMap.PushBack( map );
     }
   }
@@ -188,9 +187,19 @@ bool Renderer::PrepareRender( BufferIndex updateBufferIndex )
     if( mRegenerateUniformMap == REGENERATE_UNIFORM_MAP)
     {
       CollectedUniformMap& localMap = mCollectedUniformMap[ updateBufferIndex ];
-      localMap.Resize(0);
+      localMap.Clear();
 
       const UniformMap& rendererUniformMap = PropertyOwner::GetUniformMap();
+
+      auto size = rendererUniformMap.Count();
+
+      if(mShader)
+      {
+        size += mShader->GetUniformMap().Count();
+      }
+
+      localMap.Reserve(size);
+
       AddMappings( localMap, rendererUniformMap );
 
       if( mShader )

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+#include <algorithm>
+
 // CLASS HEADER
 #include <dali/internal/update/common/uniform-map.h>
 
@@ -62,27 +64,20 @@ void UniformMap::MappingChanged()
   }
 }
 
-void UniformMap::Add( UniformPropertyMapping* newMap )
+void UniformMap::Add(UniformPropertyMapping newMap)
 {
-  bool found = false;
+  auto iter = std::find_if(mUniformMaps.Begin(),
+                           mUniformMaps.End(),
+                           [&](auto& element) { return element.uniformName == newMap.uniformName; });
 
-  for( UniformMapIter iter = mUniformMaps.Begin() ;
-       iter != mUniformMaps.End() ;
-       ++iter )
+  if(iter != mUniformMaps.End())
   {
-    UniformPropertyMapping* map = *iter;
-    if( map->uniformName == newMap->uniformName )
-    {
-      found = true;
-      // Mapping already exists - update it.
-      map->propertyPtr = newMap->propertyPtr;
-      break;
-    }
+    // Mapping already exists - update it.
+    (*iter).propertyPtr = newMap.propertyPtr;
   }
-
-  if( found == false )
+  else
   {
-    // Take ownership of the new map
+    // add the new map.
     mUniformMaps.PushBack(newMap);
   }
 
@@ -91,40 +86,24 @@ void UniformMap::Add( UniformPropertyMapping* newMap )
 
 void UniformMap::Remove( ConstString uniformName )
 {
-  bool found=false;
+  auto iter = std::find_if(mUniformMaps.Begin(),
+                           mUniformMaps.End(),
+                           [&](auto& element) { return element.uniformName == uniformName; });
 
-  for( UniformMapIter iter = mUniformMaps.Begin() ;
-       iter != mUniformMaps.End() ;
-       ++iter )
+  if(iter != mUniformMaps.End())
   {
-    UniformPropertyMapping* map = *iter;
-    if( map->uniformName == uniformName )
-    {
-      mUniformMaps.Erase( iter );
-      found = true;
-      break;
-    }
-  }
-
-  if( found )
-  {
+    mUniformMaps.Erase(iter);
     MappingChanged();
   }
 }
 
-const PropertyInputImpl* UniformMap::Find( ConstString uniformName )
+const PropertyInputImpl* UniformMap::Find(ConstString uniformName)
 {
-  for( UniformMapIter iter = mUniformMaps.Begin() ;
-       iter != mUniformMaps.End() ;
-       ++iter )
-  {
-    UniformPropertyMapping* map = *iter;
-    if( map->uniformName == uniformName )
-    {
-      return map->propertyPtr;
-    }
-  }
-  return nullptr;
+  auto iter = std::find_if(mUniformMaps.Begin(),
+                           mUniformMaps.End(),
+                           [&](auto& element) { return element.uniformName == uniformName; });
+
+  return (iter != mUniformMaps.End()) ? (*iter).propertyPtr : nullptr;
 }
 
 UniformMap::SizeType UniformMap::Count() const
@@ -134,7 +113,7 @@ UniformMap::SizeType UniformMap::Count() const
 
 const UniformPropertyMapping& UniformMap::operator[]( UniformMap::SizeType index ) const
 {
-  return *mUniformMaps[index];
+  return mUniformMaps[index];
 }
 
 } // SceneGraph

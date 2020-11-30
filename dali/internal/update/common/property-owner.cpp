@@ -153,9 +153,9 @@ PropertyOwner::PropertyOwner()
 {
 }
 
-void PropertyOwner::AddUniformMapping( OwnerPointer< UniformPropertyMapping >& map )
+void PropertyOwner::AddUniformMapping(const UniformPropertyMapping& map)
 {
-  mUniformMaps.Add( map.Release() );
+  mUniformMaps.Add(map);
 }
 
 void PropertyOwner::RemoveUniformMapping( const ConstString& uniformName )

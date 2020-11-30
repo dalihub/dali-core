@@ -201,7 +201,7 @@ public:
   /**
    * @copydoc UniformMap::Add
    */
-  virtual void AddUniformMapping( OwnerPointer< UniformPropertyMapping >& map );
+  virtual void AddUniformMapping(const UniformPropertyMapping& map);
 
   /**
    * @copydoc UniformMap::Remove

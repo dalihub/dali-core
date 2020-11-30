@@ -99,7 +99,7 @@ public:
   /**
    * Add a map to the mappings table.
    */
-  void Add( UniformPropertyMapping* map );
+  void Add(UniformPropertyMapping map);
 
   /**
    * Remove a map from the mappings table
@@ -132,7 +132,7 @@ private:
   void MappingChanged();
 
 private:
-  using UniformMapContainer = OwnerContainer<UniformPropertyMapping*>;
+  using UniformMapContainer = Dali::Vector<UniformPropertyMapping>;
   using UniformMapIter      = UniformMapContainer::Iterator;
   using Observers           = Dali::Vector<Observer*>;
   using ObserversIter       = Observers::Iterator;

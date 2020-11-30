@@ -254,9 +254,9 @@ inline void RemoveConstraintMessage( EventThreadServices& eventThreadServices, c
   new (slot) LocalType( &owner, &PropertyOwner::RemoveConstraint, &constraint );
 }
 
-inline void AddUniformMapMessage( EventThreadServices& eventThreadServices, const PropertyOwner& owner, OwnerPointer< UniformPropertyMapping >& map )
+inline void AddUniformMapMessage(EventThreadServices& eventThreadServices, const PropertyOwner& owner, UniformPropertyMapping map)
 {
-  using LocalType = MessageValue1<PropertyOwner, OwnerPointer<UniformPropertyMapping> >;
+  using LocalType = MessageValue1<PropertyOwner, UniformPropertyMapping>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );

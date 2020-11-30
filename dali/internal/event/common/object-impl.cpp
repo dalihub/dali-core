@@ -803,8 +803,7 @@ void Object::AddUniformMapping(Property::Index propertyIndex, std::string unifor
   {
     const SceneGraph::PropertyOwner& sceneObject = GetSceneObject();
 
-    OwnerPointer<SceneGraph::UniformPropertyMapping> map =
-      new SceneGraph::UniformPropertyMapping(ConstString(uniformName), propertyPtr);
+    SceneGraph::UniformPropertyMapping map(ConstString(uniformName), propertyPtr);
     // Message takes ownership of Uniform map (and will delete it after copy)
     AddUniformMapMessage( const_cast<EventThreadServices&>(GetEventThreadServices()), sceneObject, map );
   }
