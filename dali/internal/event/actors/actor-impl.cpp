@@ -57,7 +57,6 @@ using Dali::Internal::SceneGraph::PropertyBase;
 
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_DEPTH_TIMER" );
-Debug::Filter* gLogRelayoutFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_RELAYOUT_TIMER" );
 #endif
 
 namespace Dali
@@ -2268,98 +2267,6 @@ float Actor::CalculateSize( Dimension::Type dimension, const Vector2& maximumSiz
   return 0.0f;  // Default
 }
 
-void Actor::NegotiateDimension( Dimension::Type dimension, const Vector2& allocatedSize, ActorDimensionStack& recursionStack )
-{
-  // Check if it needs to be negotiated
-  if( IsLayoutDirty( dimension ) && !IsLayoutNegotiated( dimension ) )
-  {
-    // Check that we havn't gotten into an infinite loop
-    ActorDimensionPair searchActor = ActorDimensionPair( this, dimension );
-    bool recursionFound = false;
-    for( auto& element : recursionStack )
-    {
-      if( element == searchActor )
-      {
-        recursionFound = true;
-        break;
-      }
-    }
-
-    if( !recursionFound )
-    {
-      // Record the path that we have taken
-      recursionStack.push_back( ActorDimensionPair( this, dimension ) );
-
-      // Dimension dependency check
-      for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
-      {
-        Dimension::Type dimensionToCheck = static_cast< Dimension::Type >( 1 << i );
-
-        if( RelayoutDependentOnDimension( dimension, dimensionToCheck ) )
-        {
-          NegotiateDimension( dimensionToCheck, allocatedSize, recursionStack );
-        }
-      }
-
-      // Parent dependency check
-      Actor* parent = GetParent();
-      if( parent && RelayoutDependentOnParent( dimension ) )
-      {
-        parent->NegotiateDimension( dimension, allocatedSize, recursionStack );
-      }
-
-      // Children dependency check
-      if( RelayoutDependentOnChildren( dimension ) )
-      {
-        for( uint32_t i = 0, count = GetChildCount(); i < count; ++i )
-        {
-          ActorPtr child = GetChildAt( i );
-
-          // Only relayout child first if it is not dependent on this actor
-          if( !child->RelayoutDependentOnParent( dimension ) )
-          {
-            child->NegotiateDimension( dimension, allocatedSize, recursionStack );
-          }
-        }
-      }
-
-      // For deriving classes
-      OnCalculateRelayoutSize( dimension );
-
-      // All dependencies checked, calculate the size and set negotiated flag
-      const float newSize = Relayouter::ClampDimension( *this, CalculateSize( dimension, allocatedSize ), dimension );
-
-      SetNegotiatedDimension( newSize, dimension );
-      SetLayoutNegotiated( true, dimension );
-
-      // For deriving classes
-      OnLayoutNegotiated( newSize, dimension );
-
-      // This actor has been successfully processed, pop it off the recursion stack
-      recursionStack.pop_back();
-    }
-    else
-    {
-      // TODO: Break infinite loop
-      SetLayoutNegotiated( true, dimension );
-    }
-  }
-}
-
-void Actor::NegotiateDimensions( const Vector2& allocatedSize )
-{
-  // Negotiate all dimensions that require it
-  ActorDimensionStack recursionStack;
-
-  for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
-  {
-    const Dimension::Type dimension = static_cast< Dimension::Type >( 1 << i );
-
-    // Negotiate
-    NegotiateDimension( dimension, allocatedSize, recursionStack );
-  }
-}
-
 Vector2 Actor::ApplySizeSetPolicy( const Vector2& size )
 {
   return mRelayoutData->ApplySizeSetPolicy(*this, size);
@@ -2393,56 +2300,7 @@ void Actor::SetNegotiatedSize( RelayoutContainer& container )
 
 void Actor::NegotiateSize( const Vector2& allocatedSize, RelayoutContainer& container )
 {
-  // Force a size negotiation for actors that has assigned size during relayout
-  // This is required as otherwise the flags that force a relayout will not
-  // necessarilly be set. This will occur if the actor has already been laid out.
-  // The dirty flags are then cleared. Then if the actor is added back into the
-  // relayout container afterwards, the dirty flags would still be clear...
-  // causing a relayout to be skipped. Here we force any actors added to the
-  // container to be relayed out.
-  DALI_LOG_TIMER_START( NegSizeTimer1 );
-
-  if( GetUseAssignedSize(Dimension::WIDTH ) )
-  {
-    SetLayoutNegotiated( false, Dimension::WIDTH );
-  }
-  if( GetUseAssignedSize( Dimension::HEIGHT ) )
-  {
-    SetLayoutNegotiated( false, Dimension::HEIGHT );
-  }
-
-  // Do the negotiation
-  NegotiateDimensions( allocatedSize );
-
-  // Set the actor size
-  SetNegotiatedSize( container );
-
-  // Negotiate down to children
-  for( uint32_t i = 0, count = GetChildCount(); i < count; ++i )
-  {
-    ActorPtr child = GetChildAt( i );
-
-    // Forces children that have already been laid out to be relayed out
-    // if they have assigned size during relayout.
-    if( child->GetUseAssignedSize(Dimension::WIDTH) )
-    {
-      child->SetLayoutNegotiated(false, Dimension::WIDTH);
-      child->SetLayoutDirty(true, Dimension::WIDTH);
-    }
-
-    if( child->GetUseAssignedSize(Dimension::HEIGHT) )
-    {
-      child->SetLayoutNegotiated(false, Dimension::HEIGHT);
-      child->SetLayoutDirty(true, Dimension::HEIGHT);
-    }
-
-    // Only relayout if required
-    if( child->RelayoutRequired() )
-    {
-      container.Add( Dali::Actor( child.Get() ), mTargetSize.GetVectorXY() );
-    }
-  }
-  DALI_LOG_TIMER_END( NegSizeTimer1, gLogRelayoutFilter, Debug::Concise, "NegotiateSize() took: ");
+  Relayouter::NegotiateSize(*this, allocatedSize, container);
 }
 
 void Actor::SetUseAssignedSize( bool use, Dimension::Type dimension )
@@ -2470,27 +2328,7 @@ void Actor::RelayoutRequest( Dimension::Type dimension )
 
 void Actor::SetPreferredSize( const Vector2& size )
 {
-  EnsureRelayouter();
-
-  // If valid width or height, then set the resize policy to FIXED
-  // A 0 width or height may also be required so if the resize policy has not been changed, i.e. is still set to DEFAULT,
-  // then change to FIXED as well
-
-  if( size.width > 0.0f || GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::DEFAULT )
-  {
-    SetResizePolicy( ResizePolicy::FIXED, Dimension::WIDTH );
-  }
-
-  if( size.height > 0.0f || GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::DEFAULT )
-  {
-    SetResizePolicy( ResizePolicy::FIXED, Dimension::HEIGHT );
-  }
-
-  mRelayoutData->preferredSize = size;
-
-  mUseAnimatedSize = AnimatedSizeFlag::CLEAR;
-
-  RelayoutRequest();
+  EnsureRelayouter().SetPreferredSize(*this, size);
 }
 
 Vector2 Actor::GetPreferredSize() const

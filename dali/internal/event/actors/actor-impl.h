@@ -1004,28 +1004,6 @@ public:
   bool RelayoutDependentOnDimension( Dimension::Type dimension, Dimension::Type dependentDimension );
 
   /**
-   * Negotiate sizes for a control in all dimensions
-   *
-   * @param[in] allocatedSize The size constraint that the control must respect
-   */
-  void NegotiateDimensions( const Vector2& allocatedSize );
-
-  /**
-   * Negotiate size for a specific dimension
-   *
-   * The algorithm adopts a recursive dependency checking approach. Meaning, that wherever dependencies
-   * are found, e.g. an actor dependent on its parent, the dependency will be calculated first with NegotiatedDimension and
-   * LayoutDimensionNegotiated flags being filled in on the actor.
-   *
-   * @post All actors that exist in the dependency chain connected to the given actor will have had their NegotiatedDimensions
-   * calculated and set as well as the LayoutDimensionNegotiated flags.
-   *
-   * @param[in] dimension The dimension to negotiate on
-   * @param[in] allocatedSize The size constraint that the actor must respect
-   */
-  void NegotiateDimension( Dimension::Type dimension, const Vector2& allocatedSize, ActorDimensionStack& recursionStack );
-
-  /**
    * @brief Calculate the size of a dimension
    *
    * @param[in] dimension The dimension to calculate the size for
