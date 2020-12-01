@@ -87,13 +87,13 @@ void Geometry::GetAttributeLocationFromProgram( Vector<GLint>& attributeLocation
     const uint32_t attributeCount = vertexBuffer->GetAttributeCount();
     for( uint32_t j = 0; j < attributeCount; ++j )
     {
-      const std::string& attributeName = vertexBuffer->GetAttributeName( j );
+      auto attributeName = vertexBuffer->GetAttributeName( j );
       uint32_t index = program.RegisterCustomAttribute( attributeName );
       GLint location = program.GetCustomAttributeLocation( index );
 
       if( -1 == location )
       {
-        DALI_LOG_WARNING( "Attribute not found in the shader: %s\n", attributeName.c_str() );
+        DALI_LOG_WARNING( "Attribute not found in the shader: %s\n", attributeName.GetCString() );
       }
 
       attributeLocation.PushBack( location );

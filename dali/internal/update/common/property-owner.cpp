@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
+#include <dali/internal/common/const-string.h>
 
 namespace Dali
 {
@@ -152,12 +153,12 @@ PropertyOwner::PropertyOwner()
 {
 }
 
-void PropertyOwner::AddUniformMapping( OwnerPointer< UniformPropertyMapping >& map )
+void PropertyOwner::AddUniformMapping(const UniformPropertyMapping& map)
 {
-  mUniformMaps.Add( map.Release() );
+  mUniformMaps.Add(map);
 }
 
-void PropertyOwner::RemoveUniformMapping( const std::string& uniformName )
+void PropertyOwner::RemoveUniformMapping( const ConstString& uniformName )
 {
   mUniformMaps.Remove( uniformName );
 }

@@ -34,6 +34,7 @@
 #include <dali/internal/event/common/property-notification-impl.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/type-registry-impl.h>
+#include <dali/internal/common/const-string.h>
 
 using Dali::Internal::SceneGraph::AnimatableProperty;
 using Dali::Internal::SceneGraph::PropertyBase;
@@ -802,8 +803,7 @@ void Object::AddUniformMapping(Property::Index propertyIndex, std::string unifor
   {
     const SceneGraph::PropertyOwner& sceneObject = GetSceneObject();
 
-    OwnerPointer<SceneGraph::UniformPropertyMapping> map =
-      new SceneGraph::UniformPropertyMapping(std::move(uniformName), propertyPtr);
+    SceneGraph::UniformPropertyMapping map(ConstString(uniformName), propertyPtr);
     // Message takes ownership of Uniform map (and will delete it after copy)
     AddUniformMapMessage( const_cast<EventThreadServices&>(GetEventThreadServices()), sceneObject, map );
   }
@@ -812,7 +812,7 @@ void Object::AddUniformMapping(Property::Index propertyIndex, std::string unifor
 void Object::RemoveUniformMapping( const std::string& uniformName ) const
 {
   const SceneGraph::PropertyOwner& sceneObject = GetSceneObject();
-  RemoveUniformMapMessage( const_cast<EventThreadServices&>(GetEventThreadServices()), sceneObject, uniformName);
+  RemoveUniformMapMessage( const_cast<EventThreadServices&>(GetEventThreadServices()), sceneObject, ConstString(uniformName));
 }
 
 void Object::ApplyConstraint( ConstraintBase& constraint )

@@ -27,6 +27,7 @@
 #include <dali/public-api/object/ref-object.h>
 #include <dali/integration-api/gl-abstraction.h>
 #include <dali/internal/common/shader-data.h>
+#include <dali/internal/common/const-string.h>
 
 namespace Dali
 {
@@ -130,7 +131,7 @@ public:
    * @param [in] name attribute name
    * @return the index of the attribute name in local cache
    */
-  uint32_t RegisterCustomAttribute( const std::string& name );
+  uint32_t RegisterCustomAttribute( ConstString name );
 
   /**
    * Gets the location of a pre-registered attribute.
@@ -144,7 +145,7 @@ public:
    * @param [in] name uniform name
    * @return the index of the uniform name in local cache
    */
-  uint32_t RegisterUniform( const std::string& name );
+  uint32_t RegisterUniform( ConstString name );
 
   /**
    * Gets the location of a pre-registered uniform.
@@ -373,7 +374,7 @@ private:  // Data
   Internal::ShaderDataPtr mProgramData;       ///< Shader program source and binary (when compiled & linked or loaded)
 
   // location caches
-  using NameLocationPair = std::pair<std::string, GLint>;
+  using NameLocationPair = std::pair<ConstString, GLint>;
   using Locations        = std::vector<NameLocationPair>;
 
   Locations mAttributeLocations;      ///< attribute location cache
