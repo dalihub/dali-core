@@ -57,10 +57,6 @@ class RenderTask;
 class Renderer;
 class Scene;
 
-using ActorContainer = std::vector<ActorPtr>;
-using ActorIter      = ActorContainer::iterator;
-using ActorConstIter = ActorContainer::const_iterator;
-
 using RendererContainer = std::vector<RendererPtr>;
 using RendererIter      = RendererContainer::iterator;
 
@@ -1974,9 +1970,10 @@ private:
   uint32_t GetSiblingOrder() const;
 
   /**
-   * Request that the stage rebuilds the actor depth indices.
+   * Emit ChildOrderChanged signal, and request that the scene
+   * rebuilds the actor depth indices.
    */
-  void RequestRebuildDepthTree();
+  void EmitOrderChangedAndRebuild();
 
   /**
    * @brief Get the current position of the actor in screen coordinates.
@@ -2089,6 +2086,7 @@ private:
   static ActorContainer mNullChildren;  ///< Empty container (shared by all actors, returned by GetChildren() const)
 
   struct PropertyHandler;
+  struct SiblingHandler;
 };
 
 } // namespace Internal
