@@ -19,9 +19,7 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/internal/event/actors/actor-declarations.h>
-
-// EXTERNAL INCLUDES
-#include <string>
+#include <dali/internal/common/const-string.h>
 
 namespace Dali
 {
@@ -74,7 +72,7 @@ public:
   /**
    * @copydoc Dali::Actor::FindChildByName
    */
-  virtual ActorPtr FindChildByName(const std::string& actorName) = 0;
+  virtual ActorPtr FindChildByName(ConstString actorName) = 0;
 
   /**
    * @copydoc Dali::Actor::FindChildById

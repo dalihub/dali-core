@@ -40,6 +40,7 @@
 #include <dali/public-api/math/viewport.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
+#include <dali/internal/common/const-string.h>
 
 namespace Dali
 {
@@ -127,16 +128,16 @@ public:
    * Retrieve the name of the actor.
    * @return The name.
    */
-  const std::string& GetName() const
+  std::string_view GetName() const
   {
-    return mName;
+    return mName.GetStringView();
   }
 
   /**
    * Set the name of the actor.
    * @param[in] name The new name.
    */
-  void SetName(const std::string& name);
+  void SetName( std::string_view name );
 
   /**
    * @copydoc Dali::Actor::GetId
@@ -224,7 +225,7 @@ public:
   /**
    * @copydoc Dali::Internal::ActorParent::FindChildByName
    */
-  ActorPtr FindChildByName(const std::string& actorName) override;
+  ActorPtr FindChildByName( ConstString actorName ) override;
 
   /**
    * @copydoc Dali::Internal::ActorParent::FindChildById
@@ -2028,7 +2029,7 @@ protected:
   Vector3    mAnimatedSize;      ///< Event-side storage for size animation
   Vector2    mTouchArea;         ///< touch area
 
-  std::string mName;            ///< Name of the actor
+  ConstString mName;            ///< Name of the actor
   uint32_t    mSortedDepth;     ///< The sorted depth index. A combination of tree traversal and sibling order.
   int16_t     mDepth;           ///< The depth in the hierarchy of the actor. Only 32,767 levels of depth are supported
   uint16_t    mUseAnimatedSize; ///< Whether the size is animated.
