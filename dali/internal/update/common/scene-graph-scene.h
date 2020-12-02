@@ -115,6 +115,22 @@ public:
    */
   void GetFramePresentedCallback( Dali::Integration::Scene::FrameCallbackContainer& callbacks );
 
+  /**
+   * Set the surface orientation when surface is rotated.
+   *
+   * @param[in] scene The rotated scene.
+   * @param[in] orientation The orientation value representing the surface.
+   */
+  void SetSurfaceOrientation( int orientation );
+
+  /**
+   * Get the surface orientation.
+   *
+   * @param[in] scene The rotated scene.
+   * @return the current surface orientation
+   */
+  int GetSurfaceOrientation() const;
+
 private:
 
   Context*                    mContext;   ///< The context holding the GL state of rendering for the scene, not owned
@@ -126,6 +142,8 @@ private:
 
   Dali::Integration::Scene::FrameCallbackContainer mFrameRenderedCallbacks;   ///< Frame rendered callbacks
   Dali::Integration::Scene::FrameCallbackContainer mFramePresentedCallbacks;  ///< Frame presented callbacks
+
+  int                         mSurfaceOrientation;
 };
 
 /// Messages
@@ -149,6 +167,17 @@ inline void AddFramePresentedCallbackMessage( EventThreadServices& eventThreadSe
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &scene, &Scene::AddFramePresentedCallback, const_cast< CallbackBase* >( callback ), frameId );
+}
+
+inline void SetSurfaceOrientationMessage( EventThreadServices& eventThreadServices, const Scene& scene, int orientation )
+{
+  using LocalType = MessageValue1<Scene, int>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &scene, &Scene::SetSurfaceOrientation, orientation );
 }
 
 } // namespace SceneGraph

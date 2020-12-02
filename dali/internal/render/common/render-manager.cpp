@@ -77,8 +77,7 @@ struct RenderManager::Impl
     programController( glAbstraction ),
     depthBufferAvailable( depthBufferAvailableParam ),
     stencilBufferAvailable( stencilBufferAvailableParam ),
-    partialUpdateAvailable( partialUpdateAvailableParam ),
-    defaultSurfaceOrientation( 0 )
+    partialUpdateAvailable( partialUpdateAvailableParam )
   {
      // Create thread pool with just one thread ( there may be a need to create more threads in the future ).
     threadPool = std::unique_ptr<Dali::ThreadPool>( new Dali::ThreadPool() );
@@ -175,7 +174,6 @@ struct RenderManager::Impl
   std::unique_ptr<Dali::ThreadPool>         threadPool;               ///< The thread pool
   Vector<GLuint>                            boundTextures;            ///< The textures bound for rendering
   Vector<GLuint>                            textureDependencyList;    ///< The dependency list of binded textures
-  int                                       defaultSurfaceOrientation; ///< defaultSurfaceOrientation for the default surface we are rendering to
 };
 
 RenderManager* RenderManager::New( Integration::GlAbstraction& glAbstraction,
@@ -257,11 +255,6 @@ void RenderManager::SetShaderSaver( ShaderSaver& upstream )
 void RenderManager::SetDefaultSurfaceRect(const Rect<int32_t>& rect)
 {
   mImpl->defaultSurfaceRect = rect;
-}
-
-void RenderManager::SetDefaultSurfaceOrientation( int orientation )
-{
-  mImpl->defaultSurfaceOrientation = orientation;
 }
 
 void RenderManager::AddRenderer( OwnerPointer< Render::Renderer >& renderer )
@@ -573,12 +566,6 @@ void RenderManager::PreRender( Integration::Scene& scene, std::vector<Rect<int>>
     return;
   }
 
-  // @TODO We need to do partial rendering rotation.
-  if( mImpl->defaultSurfaceOrientation != 0 )
-  {
-    return;
-  }
-
   class DamagedRectsCleaner
   {
   public:
@@ -610,7 +597,6 @@ void RenderManager::PreRender( Integration::Scene& scene, std::vector<Rect<int>>
 
   // Clean collected dirty/damaged rects on exit if 3d layer or 3d node or other conditions.
   DamagedRectsCleaner damagedRectCleaner(damagedRects);
-
 
 
   Internal::Scene& sceneInternal = GetImplementation(scene);
@@ -835,7 +821,7 @@ void RenderManager::RenderScene( Integration::RenderStatus& status, Integration:
     Rect<int32_t> surfaceRect = mImpl->defaultSurfaceRect;
     Integration::DepthBufferAvailable depthBufferAvailable = mImpl->depthBufferAvailable;
     Integration::StencilBufferAvailable stencilBufferAvailable = mImpl->stencilBufferAvailable;
-    int surfaceOrientation = mImpl->defaultSurfaceOrientation;
+    int surfaceOrientation = sceneObject->GetSurfaceOrientation();
 
     if ( instruction.mFrameBuffer )
     {

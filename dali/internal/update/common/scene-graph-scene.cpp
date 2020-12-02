@@ -31,7 +31,8 @@ namespace SceneGraph
 Scene::Scene()
 : mContext( nullptr ),
   mFrameRenderedCallbacks(),
-  mFramePresentedCallbacks()
+  mFramePresentedCallbacks(),
+  mSurfaceOrientation( 0 )
 {
 }
 
@@ -86,6 +87,16 @@ void Scene::GetFramePresentedCallback( Dali::Integration::Scene::FrameCallbackCo
   }
 
   mFramePresentedCallbacks.clear();
+}
+
+void Scene::SetSurfaceOrientation( int orientation )
+{
+  mSurfaceOrientation = orientation;
+}
+
+int Scene::GetSurfaceOrientation() const
+{
+  return mSurfaceOrientation;
 }
 
 } //SceneGraph
