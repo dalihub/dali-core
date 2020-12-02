@@ -25,6 +25,9 @@
 #include <vector>
 #include <mutex>
 
+// INTERNAL INCLUDES
+#include <dali/public-api/common/dali-common.h>
+
 // local namespace
 namespace
 {
@@ -188,8 +191,10 @@ private:
      * So we allocate one memory and treat 1st segment as a array of StringEntry* and the second segment as array of
      * unsigned*.
      */
-    mTable              = static_cast<StringEntry**>(calloc(newBuckets + 1, sizeof(StringEntry**) + sizeof(unsigned)));
-    mBuckets            = newBuckets;
+    mTable = static_cast<StringEntry**>(calloc(newBuckets + 1, sizeof(StringEntry**) + sizeof(unsigned)));
+    DALI_ASSERT_ALWAYS(mTable && "calloc returned nullptr");
+
+    mBuckets = newBuckets;
   }
 
   unsigned FindBucket(std::string_view name)
@@ -244,8 +249,11 @@ private:
       return bucketNumber;
     }
     unsigned newBucketNumber = bucketNumber;
+
     // Allocate one extra bucket which will always be non-empty.
     auto newTable = static_cast<StringEntry**>(calloc(newSize + 1, sizeof(StringEntry*) + sizeof(unsigned)));
+    DALI_ASSERT_ALWAYS(newTable && "calloc returned nullptr");
+
     // point to the start of the hashvalue segment. as the pointer is of type StringEntry* , but the
     // second segment keeps only unsigned data hence the reinterpret_cast.
     unsigned* newHashTable = reinterpret_cast<unsigned*>(newTable + newSize + 1);

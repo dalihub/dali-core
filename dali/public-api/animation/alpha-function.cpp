@@ -36,6 +36,7 @@ AlphaFunction::AlphaFunction(BuiltinFunction function)
 
 AlphaFunction::AlphaFunction(AlphaFunctionPrototype function)
 : mMode(CUSTOM_FUNCTION),
+  mBuiltin(DEFAULT),
   mCustom(function)
 {
 }
