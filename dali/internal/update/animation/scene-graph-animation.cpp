@@ -430,15 +430,17 @@ void Animation::UpdateAnimators( BufferIndex bufferIndex, bool bake, bool animat
   const Vector2 playRange( mPlayRange * mDurationSeconds );
   float elapsedSecondsClamped = Clamp( mElapsedSeconds, playRange.x, playRange.y );
 
-  //Remove animators whose PropertyOwner has been destroyed
-  mAnimators.Erase(std::remove_if(mAnimators.begin(),
-                                  mAnimators.end(),
-                                  [](auto animator) { return animator->Orphan(); }),
-                   mAnimators.end());
+  bool cleanup = false;
 
   //Loop through all animators
   for(auto& animator : mAnimators)
   {
+    if(animator->Orphan())
+    {
+      cleanup = true;
+      continue;
+    }
+
     bool applied(true);
     if(animator->IsEnabled())
     {
@@ -476,6 +478,15 @@ void Animation::UpdateAnimators( BufferIndex bufferIndex, bool bake, bool animat
     {
       INCREASE_COUNTER(PerformanceMonitor::ANIMATORS_APPLIED);
     }
+  }
+
+  if(cleanup)
+  {
+    //Remove animators whose PropertyOwner has been destroyed
+    mAnimators.Erase(std::remove_if(mAnimators.begin(),
+                                    mAnimators.end(),
+                                    [](auto& animator) { return animator->Orphan(); }),
+                     mAnimators.end());
   }
 }
 
