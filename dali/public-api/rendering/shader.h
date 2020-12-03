@@ -124,8 +124,8 @@ public:
    * @param[in] hints Hints to define the geometry of the rendered object
    * @return A handle to a shader effect
    */
-  static Shader New(const std::string& vertexShader,
-                    const std::string& fragmentShader,
+  static Shader New(std::string_view vertexShader,
+                    std::string_view fragmentShader,
                     Hint::Value        hints = Hint::NONE);
 
   /**

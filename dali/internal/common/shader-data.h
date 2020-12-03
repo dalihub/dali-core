@@ -48,10 +48,10 @@ public:
    * @param[in] vertexSource   Source code for vertex program
    * @param[in] fragmentSource Source code for fragment program
    */
-  ShaderData(const std::string& vertexSource, const std::string& fragmentSource, const Dali::Shader::Hint::Value hints)
+  ShaderData(std::string vertexSource, std::string fragmentSource, const Dali::Shader::Hint::Value hints)
   : mShaderHash( -1 ),
-    mVertexShader(vertexSource),
-    mFragmentShader(fragmentSource),
+    mVertexShader(std::move(vertexSource)),
+    mFragmentShader(std::move(fragmentSource)),
     mHints(hints)
   { }
 
