@@ -65,8 +65,8 @@ private:
 template <typename T>
 struct PropertyNameFinder
 {
-  PropertyNameFinder( const std::string& find )
-  : mFind( find )
+  PropertyNameFinder(ConstString find)
+  : mFind(find)
   {
   }
 
@@ -76,8 +76,7 @@ struct PropertyNameFinder
   }
 
 private:
-
-  const std::string& mFind;
+  ConstString mFind;
 };
 
 /**
@@ -388,13 +387,13 @@ void TypeInfo::AppendProperties( Dali::Property::IndexContainer& indices,
   }
 }
 
-const std::string& TypeInfo::GetRegisteredPropertyName( Property::Index index ) const
+std::string_view TypeInfo::GetRegisteredPropertyName(Property::Index index) const
 {
   RegisteredPropertyContainer::const_iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
                                                           PairFinder< Property::Index, RegisteredPropertyPair >( index ) );
   if ( iter != mRegisteredProperties.end() )
   {
-    return iter->second.name;
+    return iter->second.name.GetStringView();
   }
   if( GetBaseType( mBaseType, mTypeRegistry, mBaseTypeName ) )
   {
@@ -405,9 +404,9 @@ const std::string& TypeInfo::GetRegisteredPropertyName( Property::Index index ) 
   return empty;
 }
 
-std::string TypeInfo::GetPropertyName( Property::Index index ) const
+std::string_view TypeInfo::GetPropertyName(Property::Index index) const
 {
-  std::string propertyName;
+  std::string_view propertyName;
   // default or custom
   if ( mDefaultProperties && ( index < DEFAULT_PROPERTY_MAX_COUNT ) )
   {
@@ -423,7 +422,7 @@ std::string TypeInfo::GetPropertyName( Property::Index index ) const
                                                             PairFinder< Property::Index, RegisteredPropertyPair >( index ) );
     if ( iter != mRegisteredProperties.end() )
     {
-      return iter->second.name;
+      return iter->second.name.GetStringView();
     }
   }
   // if not our property, go to parent
@@ -498,7 +497,7 @@ void TypeInfo::AddProperty(std::string name, Property::Index index, Property::Ty
 
     if ( iter == mRegisteredProperties.end() )
     {
-      mRegisteredProperties.push_back(RegisteredPropertyPair(index, RegisteredProperty(type, setFunc, getFunc, std::move(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX)));
+      mRegisteredProperties.push_back(RegisteredPropertyPair(index, RegisteredProperty(type, setFunc, getFunc, ConstString(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX)));
     }
     else
     {
@@ -523,7 +522,7 @@ void TypeInfo::AddProperty(std::string name, Property::Index index, Property::Ty
 
     if ( iter == mRegisteredProperties.end() )
     {
-      mRegisteredProperties.push_back(RegisteredPropertyPair(index, RegisteredProperty(type, setFunc, getFunc, std::move(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX)));
+      mRegisteredProperties.push_back(RegisteredPropertyPair(index, RegisteredProperty(type, setFunc, getFunc, ConstString(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX)));
     }
     else
     {
@@ -540,7 +539,7 @@ void TypeInfo::AddAnimatableProperty(std::string name, Property::Index index, Pr
 
   if ( iter == mRegisteredProperties.end() )
   {
-    mRegisteredProperties.push_back(RegisteredPropertyPair(index, RegisteredProperty(type, std::move(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX)));
+    mRegisteredProperties.push_back(RegisteredPropertyPair(index, RegisteredProperty(type, ConstString(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX)));
   }
   else
   {
@@ -555,7 +554,7 @@ void TypeInfo::AddAnimatableProperty(std::string name, Property::Index index, Pr
 
   if ( iter == mRegisteredProperties.end() )
   {
-    mRegisteredProperties.push_back(RegisteredPropertyPair(index, RegisteredProperty(defaultValue.GetType(), std::move(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX)));
+    mRegisteredProperties.push_back(RegisteredPropertyPair(index, RegisteredProperty(defaultValue.GetType(), ConstString(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX)));
     mPropertyDefaultValues.push_back(PropertyDefaultValuePair(index, std::move(defaultValue)));
   }
   else
@@ -581,7 +580,7 @@ void TypeInfo::AddAnimatablePropertyComponent(std::string name, Property::Index 
 
     if ( iter == mRegisteredProperties.end() )
     {
-      mRegisteredProperties.push_back(RegisteredPropertyPair(index, RegisteredProperty(type, std::move(name), baseIndex, componentIndex)));
+      mRegisteredProperties.push_back(RegisteredPropertyPair(index, RegisteredProperty(type, ConstString(name), baseIndex, componentIndex)));
       success = true;
     }
   }
@@ -596,7 +595,7 @@ void TypeInfo::AddChildProperty(std::string name, Property::Index index, Propert
 
   if ( iter == mRegisteredChildProperties.end() )
   {
-    mRegisteredChildProperties.push_back(RegisteredPropertyPair(index, RegisteredProperty(type, std::move(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX)));
+    mRegisteredChildProperties.push_back(RegisteredPropertyPair(index, RegisteredProperty(type, ConstString(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX)));
   }
   else
   {
@@ -617,7 +616,7 @@ uint32_t TypeInfo::GetPropertyCount() const
   return count;
 }
 
-Property::Index TypeInfo::GetPropertyIndex( const std::string& name ) const
+Property::Index TypeInfo::GetPropertyIndex(ConstString name) const
 {
   Property::Index index = Property::INVALID_INDEX;
   bool found = false;
@@ -625,9 +624,10 @@ Property::Index TypeInfo::GetPropertyIndex( const std::string& name ) const
   // check default properties
   if( mDefaultProperties )
   {
+    auto stringView = name.GetStringView();
     for( Property::Index tableIndex = 0; tableIndex < mDefaultPropertyCount; ++tableIndex )
     {
-      if(mDefaultProperties[tableIndex].name == name)
+      if(mDefaultProperties[tableIndex].name == stringView)
       {
         index = mDefaultProperties[ tableIndex ].enumIndex;
         found = true;
@@ -694,7 +694,7 @@ int32_t TypeInfo::GetComponentIndex( Property::Index index ) const
   return componentIndex;
 }
 
-Property::Index TypeInfo::GetChildPropertyIndex( const std::string& name ) const
+Property::Index TypeInfo::GetChildPropertyIndex(ConstString name) const
 {
   Property::Index index = Property::INVALID_INDEX;
 
@@ -715,14 +715,14 @@ Property::Index TypeInfo::GetChildPropertyIndex( const std::string& name ) const
   return index;
 }
 
-const std::string& TypeInfo::GetChildPropertyName( Property::Index index ) const
+std::string_view TypeInfo::GetChildPropertyName(Property::Index index) const
 {
   RegisteredPropertyContainer::const_iterator iter = find_if( mRegisteredChildProperties.begin(), mRegisteredChildProperties.end(),
                                                           PairFinder< Property::Index, RegisteredPropertyPair >( index ) );
 
   if ( iter != mRegisteredChildProperties.end() )
   {
-    return iter->second.name;
+    return iter->second.name.GetStringView();
   }
 
   if( GetBaseType( mBaseType, mTypeRegistry, mBaseTypeName ) )
@@ -733,8 +733,7 @@ const std::string& TypeInfo::GetChildPropertyName( Property::Index index ) const
 
   DALI_LOG_ERROR( "Property index %d not found\n", index );
 
-  static std::string empty;
-  return empty;
+  return {};
 }
 
 Property::Type TypeInfo::GetChildPropertyType( Property::Index index ) const
@@ -958,9 +957,9 @@ void TypeInfo::SetProperty(BaseObject* object, Property::Index index, Property::
       if( mCSharpType )
       {
         // CSharp wants a property name not an index
-        const std::string& name = (iter->second).name;
+        auto name = (iter->second).name;
 
-        iter->second.cSharpSetFunc( object,name.c_str(), const_cast< Property::Value* >(&value) );
+        iter->second.cSharpSetFunc(object, name.GetCString(), const_cast<Property::Value*>(&value));
       }
       else
       {
@@ -981,8 +980,7 @@ void TypeInfo::SetProperty(BaseObject* object, Property::Index index, Property::
 
 void TypeInfo::SetProperty(BaseObject* object, const std::string& name, Property::Value value) const
 {
-  RegisteredPropertyContainer::const_iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
-                                                              PropertyNameFinder< RegisteredPropertyPair >( name ) );
+  RegisteredPropertyContainer::const_iterator iter = find_if(mRegisteredProperties.begin(), mRegisteredProperties.end(), PropertyNameFinder<RegisteredPropertyPair>(ConstString(name)));
   if ( iter != mRegisteredProperties.end() )
   {
     DALI_ASSERT_ALWAYS( iter->second.setFunc && "Trying to write to a read-only property" );
@@ -1019,10 +1017,9 @@ Property::Value TypeInfo::GetProperty( const BaseObject *object, Property::Index
       // CSharp wants a property name not an index
       // CSharp callback can't return an object by value, it can only return a pointer
       // CSharp has ownership of the pointer contents, which is fine because we are returning by from this function by value
-      const std::string& name = (iter->second).name;
+      auto name = (iter->second).name;
 
-      return *( iter->second.cSharpGetFunc( const_cast< BaseObject* >( object ), name.c_str()) );
-
+      return *(iter->second.cSharpGetFunc(const_cast<BaseObject*>(object), name.GetCString()));
     }
     else
     {
@@ -1043,10 +1040,7 @@ Property::Value TypeInfo::GetProperty( const BaseObject *object, Property::Index
 
 Property::Value TypeInfo::GetProperty( const BaseObject *object, const std::string& name ) const
 {
-  RegisteredPropertyContainer::const_iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
-                                                            PropertyNameFinder< RegisteredPropertyPair >( name ) );
-
-
+  RegisteredPropertyContainer::const_iterator iter = find_if(mRegisteredProperties.begin(), mRegisteredProperties.end(), PropertyNameFinder<RegisteredPropertyPair>(ConstString(name)));
 
   if( iter != mRegisteredProperties.end() )
   {

@@ -111,7 +111,7 @@ uint32_t Object::GetPropertyCount() const
   return count;
 }
 
-std::string Object::GetPropertyName( Property::Index index ) const
+std::string_view Object::GetPropertyName(Property::Index index) const
 {
   DALI_ASSERT_ALWAYS( index > Property::INVALID_INDEX && "Property index out of bounds" );
 
@@ -129,24 +129,24 @@ std::string Object::GetPropertyName( Property::Index index ) const
     CustomPropertyMetadata* custom = FindCustomProperty( index );
     if( custom )
     {
-      return custom->name;
+      return custom->name.GetStringView();
     }
   }
 
   DALI_LOG_ERROR( "Property index %d not found\n", index );
-  return std::string();
+  return {};
 }
 
-Property::Index Object::GetPropertyIndex( Property::Key key ) const
+Property::Index Object::GetPropertyIndex(KeyRef key) const
 {
   Property::Index index = Property::INVALID_INDEX;
 
-  if( key.type == Property::Key::STRING )
+  if(key.mType == Property::Key::STRING)
   {
     const TypeInfo* typeInfo( GetTypeInfo() );
     if ( typeInfo )
     {
-      index = typeInfo->GetPropertyIndex( key.stringKey );
+      index = typeInfo->GetPropertyIndex(key.mString);
     }
   }
 
@@ -158,8 +158,8 @@ Property::Index Object::GetPropertyIndex( Property::Key key ) const
     {
       CustomPropertyMetadata* custom = static_cast<CustomPropertyMetadata*>(*iter);
 
-      if( ( key.type == Property::Key::STRING && custom->name == key.stringKey) ||
-          ( key.type == Property::Key::INDEX && custom->key == key.indexKey ) )
+      if((key.mType == Property::Key::STRING && custom->name == key.mString) ||
+         (key.mType == Property::Key::INDEX && custom->key == key.mIndex))
       {
         if ( custom->childPropertyIndex != Property::INVALID_INDEX )
         {
@@ -335,7 +335,7 @@ void Object::SetProperty(Property::Index index, Property::Value propertyValue)
       if( !custom )
       {
         // If the child property is not registered yet, register it.
-        custom = new CustomPropertyMetadata( "", propertyValue, Property::READ_WRITE );
+        custom = new CustomPropertyMetadata({}, propertyValue, Property::READ_WRITE);
         mCustomProperties.PushBack( custom );
       }
 
@@ -348,7 +348,7 @@ void Object::SetProperty(Property::Index index, Property::Value propertyValue)
         const TypeInfo* parentTypeInfo( parent->GetTypeInfo() );
         if( parentTypeInfo )
         {
-          custom->name = parentTypeInfo->GetChildPropertyName( index );
+          custom->name = ConstString(parentTypeInfo->GetChildPropertyName(index));
         }
       }
     }
@@ -537,14 +537,14 @@ void Object::GetPropertyIndices( Property::IndexContainer& indices ) const
   }
 }
 
-Property::Index Object::RegisterProperty(std::string name, Property::Value propertyValue)
+Property::Index Object::RegisterProperty(std::string_view name, Property::Value propertyValue)
 {
-  return RegisterProperty(std::move(name), Property::INVALID_KEY, std::move(propertyValue), Property::ANIMATABLE);
+  return RegisterProperty(name, Property::INVALID_KEY, std::move(propertyValue), Property::ANIMATABLE);
 }
 
-Property::Index Object::RegisterProperty(std::string name, Property::Index key, Property::Value propertyValue)
+Property::Index Object::RegisterProperty(std::string_view name, Property::Index key, Property::Value propertyValue)
 {
-  return RegisterProperty(std::move(name), key, std::move(propertyValue), Property::ANIMATABLE);
+  return RegisterProperty(name, key, std::move(propertyValue), Property::ANIMATABLE);
 }
 
 void Object::SetProperties( const Property::Map& properties )
@@ -579,18 +579,19 @@ void Object::GetProperties( Property::Map& properties )
   }
 }
 
-Property::Index Object::RegisterProperty(std::string          name,
+Property::Index Object::RegisterProperty(std::string_view     name,
                                          Property::Value      propertyValue,
                                          Property::AccessMode accessMode)
 {
-  return RegisterProperty(std::move(name), Property::INVALID_KEY, std::move(propertyValue), accessMode);
+  return RegisterProperty(name, Property::INVALID_KEY, std::move(propertyValue), accessMode);
 }
 
-Property::Index Object::RegisterProperty(std::string          name,
+Property::Index Object::RegisterProperty(std::string_view     name,
                                          Property::Index      key,
                                          Property::Value      propertyValue,
                                          Property::AccessMode accessMode)
 {
+  auto constString = ConstString(name);
   // If property with the required key already exists, then just set it.
   Property::Index index = Property::INVALID_INDEX;
   if( key != Property::INVALID_KEY ) // Try integer key first if it's valid
@@ -599,7 +600,7 @@ Property::Index Object::RegisterProperty(std::string          name,
   }
   if( index == Property::INVALID_INDEX ) // If it wasn't valid, or doesn't exist, try name
   {
-    index = GetPropertyIndex( name );
+    index = GetPropertyIndex(constString);
   }
 
   if( index != Property::INVALID_INDEX ) // If there was a valid index found by either key, set it.
@@ -612,11 +613,11 @@ Property::Index Object::RegisterProperty(std::string          name,
     if( Property::ANIMATABLE == accessMode )
     {
       index = RegisterSceneGraphProperty(
-        name,
+        constString,
         key,
         PROPERTY_CUSTOM_START_INDEX + static_cast<Property::Index>(mCustomProperties.Count()),
         std::move(propertyValue));
-      AddUniformMapping(index, std::move(name));
+      AddUniformMapping(index, constString);
     }
     else
     {
@@ -624,7 +625,7 @@ Property::Index Object::RegisterProperty(std::string          name,
       index = PROPERTY_CUSTOM_START_INDEX + static_cast<Property::Index>( mCustomProperties.Count() );
 
       CustomPropertyMetadata* customProperty =
-        new CustomPropertyMetadata(std::move(name), std::move(propertyValue), accessMode);
+        new CustomPropertyMetadata(constString, std::move(propertyValue), accessMode);
 
       // Resolve index for the child property
       Object* parent = GetParentObject();
@@ -633,7 +634,7 @@ Property::Index Object::RegisterProperty(std::string          name,
         const TypeInfo* parentTypeInfo( parent->GetTypeInfo() );
         if( parentTypeInfo )
         {
-          Property::Index childPropertyIndex = parentTypeInfo->GetChildPropertyIndex( customProperty->name );
+          Property::Index childPropertyIndex = parentTypeInfo->GetChildPropertyIndex(customProperty->name);
           if( childPropertyIndex != Property::INVALID_INDEX )
           {
             customProperty->childPropertyIndex = childPropertyIndex;
@@ -775,7 +776,7 @@ void Object::NotifyPropertyAnimation( Animation& animation, Property::Index inde
   }
 }
 
-void Object::AddUniformMapping(Property::Index propertyIndex, std::string uniformName) const
+void Object::AddUniformMapping(Property::Index propertyIndex, ConstString uniformName) const
 {
   // Get the address of the property if it's a scene property
   const PropertyInputImpl* propertyPtr = GetSceneObjectInputProperty( propertyIndex );
@@ -803,7 +804,7 @@ void Object::AddUniformMapping(Property::Index propertyIndex, std::string unifor
   {
     const SceneGraph::PropertyOwner& sceneObject = GetSceneObject();
 
-    SceneGraph::UniformPropertyMapping map(ConstString(uniformName), propertyPtr);
+    SceneGraph::UniformPropertyMapping map(uniformName, propertyPtr);
     // Message takes ownership of Uniform map (and will delete it after copy)
     AddUniformMapMessage( const_cast<EventThreadServices&>(GetEventThreadServices()), sceneObject, map );
   }
@@ -1066,7 +1067,7 @@ AnimatablePropertyMetadata* Object::FindAnimatableProperty( Property::Index inde
   return nullptr;
 }
 
-Property::Index Object::RegisterSceneGraphProperty( std::string name, Property::Index key, Property::Index index, Property::Value propertyValue ) const
+Property::Index Object::RegisterSceneGraphProperty(ConstString name, Property::Index key, Property::Index index, Property::Value propertyValue) const
 {
   // Create a new property
   Dali::Internal::OwnerPointer<PropertyBase> newProperty;
@@ -1147,7 +1148,7 @@ Property::Index Object::RegisterSceneGraphProperty( std::string name, Property::
   {
     DALI_ASSERT_ALWAYS( index <= PROPERTY_CUSTOM_MAX_INDEX && "Too many custom properties have been registered" );
 
-    mCustomProperties.PushBack( new CustomPropertyMetadata( std::move(name), key, std::move(propertyValue), property ) );
+    mCustomProperties.PushBack(new CustomPropertyMetadata(name, key, std::move(propertyValue), property));
   }
   else
   {
@@ -1165,7 +1166,7 @@ void Object::RegisterAnimatableProperty( const TypeInfo& typeInfo,
                                           const Property::Value* value ) const
 {
   // If the property is not a component of a base property, register the whole property itself.
-  const std::string& propertyName = typeInfo.GetPropertyName( index );
+  auto            propertyName = ConstString(typeInfo.GetPropertyName(index));
   Property::Value initialValue;
   if( value )
   {
@@ -1236,17 +1237,17 @@ void Object::ResolveChildProperties()
       {
         CustomPropertyMetadata* customProperty = static_cast<CustomPropertyMetadata*>( entry );
 
-        if( customProperty->name.empty() )
+        if(customProperty->name.IsEmpty())
         {
           if( customProperty->childPropertyIndex != Property::INVALID_INDEX )
           {
             // Resolve name for any child property with no name
-            customProperty->name = parentTypeInfo->GetChildPropertyName( customProperty->childPropertyIndex );
+            customProperty->name = ConstString(parentTypeInfo->GetChildPropertyName(customProperty->childPropertyIndex));
           }
         }
         else
         {
-          Property::Index childPropertyIndex = parentTypeInfo->GetChildPropertyIndex( customProperty->name );
+          Property::Index childPropertyIndex = parentTypeInfo->GetChildPropertyIndex(customProperty->name);
           if( childPropertyIndex != Property::INVALID_INDEX )
           {
             // Resolve index for any property with a name that matches the parent's child property name

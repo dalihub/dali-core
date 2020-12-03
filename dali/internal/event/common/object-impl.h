@@ -22,23 +22,24 @@
 #include <cstdint> // uint32_t
 
 // INTERNAL INCLUDES
-#include <dali/public-api/animation/constraint.h>
-#include <dali/public-api/common/dali-vector.h>
-#include <dali/public-api/common/vector-wrapper.h>
-#include <dali/public-api/object/base-object.h>
-#include <dali/public-api/object/handle.h>
-#include <dali/public-api/object/property.h>
-#include <dali/public-api/object/property-index-ranges.h>
-#include <dali/public-api/object/property-input.h>
-#include <dali/public-api/object/property-map.h>
-#include <dali/public-api/object/property-notification.h>
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/devel-api/object/handle-devel.h>
+#include <dali/internal/common/const-string.h>
 #include <dali/internal/event/animation/animation-impl.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/event/common/property-metadata.h>
 #include <dali/internal/update/common/property-base.h>
+#include <dali/public-api/animation/constraint.h>
+#include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/object/base-object.h>
+#include <dali/public-api/object/handle.h>
+#include <dali/public-api/object/property-index-ranges.h>
+#include <dali/public-api/object/property-input.h>
+#include <dali/public-api/object/property-map.h>
+#include <dali/public-api/object/property-notification.h>
+#include <dali/public-api/object/property.h>
 
 namespace Dali
 {
@@ -63,6 +64,36 @@ class PropertyOwner;
 using ConstraintContainer = std::vector< Dali::Constraint >;
 using ConstraintIter = ConstraintContainer::iterator;
 using ConstraintConstIter = ConstraintContainer::const_iterator;
+
+class KeyRef
+{
+public:
+  KeyRef(const Property::Key& key)
+  : mType(key.type)
+  {
+    if(mType == Property::Key::STRING)
+    {
+      mString = ConstString(key.stringKey);
+    }
+    else
+    {
+      mIndex = key.indexKey;
+    }
+  }
+  KeyRef(ConstString str)
+  : mType(Property::Key::STRING)
+  {
+    mString = str;
+  }
+  KeyRef(Property::Index index)
+  : mType(Property::Key::INDEX)
+  {
+    mIndex = index;
+  }
+  Property::Key::Type mType;
+  Property::Index     mIndex{Property::INVALID_INDEX};
+  ConstString         mString;
+};
 
 /**
  * A base class for objects which optionally provide properties.
@@ -145,12 +176,12 @@ public:
   /**
    * @copydoc Dali::Handle::GetPropertyName()
    */
-  std::string GetPropertyName( Property::Index index ) const;
+  std::string_view GetPropertyName(Property::Index index) const;
 
   /**
    * @copydoc Dali::Handle::GetPropertyIndex()
    */
-  Property::Index GetPropertyIndex( Property::Key key ) const;
+  Property::Index GetPropertyIndex(KeyRef key) const;
 
   /**
    * @copydoc Dali::Handle::IsPropertyWritable()
@@ -197,12 +228,12 @@ public:
   /**
    * @copydoc Dali::Handle::RegisterProperty()
    */
-  Property::Index RegisterProperty(std::string name, Property::Value propertyValue);
+  Property::Index RegisterProperty(std::string_view name, Property::Value propertyValue);
 
   /**
    * @copydoc Dali::Handle::RegisterProperty()
    */
-  Property::Index RegisterProperty(std::string name, Property::Index key, Property::Value propertyValue);
+  Property::Index RegisterProperty(std::string_view name, Property::Index key, Property::Value propertyValue);
 
   /**
    * @copydoc Dali::DevelHandle::SetProperties()
@@ -217,12 +248,12 @@ public:
   /**
    * @copydoc Dali::Handle::RegisterProperty(std::string name, Property::Value propertyValue, Property::AccessMode accessMode)
    */
-  Property::Index RegisterProperty(std::string name, Property::Value propertyValue, Property::AccessMode accessMode);
+  Property::Index RegisterProperty(std::string_view name, Property::Value propertyValue, Property::AccessMode accessMode);
 
   /**
    * @brief Implementing method for this override
    */
-  Property::Index RegisterProperty(std::string          name,
+  Property::Index RegisterProperty(std::string_view     name,
                                    Property::Index      key,
                                    Property::Value      propertyValue,
                                    Property::AccessMode accessMode);
@@ -273,7 +304,7 @@ public:
    * @param propertyIndex index of the property
    * @param uniformName name of the uniform (same as property name)
    */
-  void AddUniformMapping(Property::Index propertyIndex, std::string uniformName) const;
+  void AddUniformMapping(Property::Index propertyIndex, ConstString uniformName) const;
 
   /**
    * Removes uniform mapping for given property
@@ -435,7 +466,7 @@ protected:
    * @param [in] value The value of the property.
    * @return The index of the registered property or Property::INVALID_INDEX if registration failed.
    */
-  Property::Index RegisterSceneGraphProperty( std::string name, Property::Index key, Property::Index index, Property::Value propertyValue ) const;
+  Property::Index RegisterSceneGraphProperty(ConstString name, Property::Index key, Property::Index index, Property::Value propertyValue) const;
 
   /**
    * Registers animatable scene property

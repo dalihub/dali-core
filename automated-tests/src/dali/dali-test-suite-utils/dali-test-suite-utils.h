@@ -306,6 +306,38 @@ void DALI_TEST_EQUALS(const std::string& str1, const char* str2, const char* loc
 void DALI_TEST_EQUALS(const char* str1, const std::string& str2, const char* location);
 
 /**
+ * Test whether two strings are equal.
+ * @param[in] str1 The first string
+ * @param[in] str2 The second string
+ * @param[in] location The TEST_LOCATION macro should be used here
+ */
+template<>
+inline void DALI_TEST_EQUALS<const std::string_view>(std::string_view str1, std::string_view str2, const char* location)
+{
+  DALI_TEST_EQUALS(str1.data(), str2.data(), location);
+}
+
+inline void DALI_TEST_EQUALS(std::string_view str1, const char* str2, const char* location)
+{
+  DALI_TEST_EQUALS(str1.data(), str2, location);
+}
+
+inline void DALI_TEST_EQUALS(std::string_view str1, const std::string& str2, const char* location)
+{
+  DALI_TEST_EQUALS(str1.data(), str2.c_str(), location);
+}
+
+inline void DALI_TEST_EQUALS(const std::string& str2, std::string_view str1, const char* location)
+{
+  DALI_TEST_EQUALS(str2.c_str(), str1.data(), location);
+}
+
+inline void DALI_TEST_EQUALS(const char* str1, std::string_view str2, const char* location)
+{
+  DALI_TEST_EQUALS(str1, str2.data(), location);
+}
+
+/**
  * Test if a property value type is equal to a trivial type.
  */
 template<typename Type>
