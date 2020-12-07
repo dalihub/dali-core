@@ -20,10 +20,10 @@
 
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/common/capabilities.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/events/hover-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
-#include <dali/devel-api/common/capabilities.h>
 #include <dali/public-api/dali-core.h>
 #include <mesh-builder.h>
 
@@ -511,7 +511,7 @@ int UtcDaliActorAddN(void)
   catch(Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT(e);
-    DALI_TEST_ASSERT(e, "this != &child", TEST_LOCATION);
+    DALI_TEST_ASSERT(e, "&mOwner != &child", TEST_LOCATION);
     DALI_TEST_EQUALS(parent2.GetChildCount(), 1u, TEST_LOCATION);
   }
   catch(...)
@@ -5361,7 +5361,7 @@ int UtcDaliActorRaiseAbove2(void)
   tet_printf("Raise actor B Above Actor C\n");
 
   DALI_TEST_EQUALS(orderChangedSignal, false, TEST_LOCATION);
-  int newOrder = actorC[DevelActor::Property::SIBLING_ORDER];
+  int newOrder                                = actorC[DevelActor::Property::SIBLING_ORDER];
   actorB[DevelActor::Property::SIBLING_ORDER] = newOrder;
   DALI_TEST_EQUALS(orderChangedSignal, true, TEST_LOCATION);
   DALI_TEST_EQUALS(orderChangedActor, actorB, TEST_LOCATION);
@@ -5381,7 +5381,7 @@ int UtcDaliActorRaiseAbove2(void)
   orderChangedSignal = false;
 
   DALI_TEST_EQUALS(orderChangedSignal, false, TEST_LOCATION);
-  newOrder = actorB[DevelActor::Property::SIBLING_ORDER];
+  newOrder                                    = actorB[DevelActor::Property::SIBLING_ORDER];
   actorA[DevelActor::Property::SIBLING_ORDER] = newOrder;
   DALI_TEST_EQUALS(orderChangedSignal, true, TEST_LOCATION);
   DALI_TEST_EQUALS(orderChangedActor, actorA, TEST_LOCATION);
@@ -5624,7 +5624,6 @@ int UtcDaliActorLowerBelow(void)
 
   END_TEST;
 }
-
 
 int UtcDaliActorLowerBelow2(void)
 {
@@ -8268,7 +8267,7 @@ int UtcDaliActorTouchAreaPropertyP(void)
 {
   TestApplication application;
 
-  Actor actor = Actor::New();
+  Actor   actor     = Actor::New();
   Vector2 touchArea = actor.GetProperty(DevelActor::Property::TOUCH_AREA).Get<Vector2>();
   DALI_TEST_EQUALS(touchArea, Vector2::ZERO, TEST_LOCATION);
   actor.SetProperty(DevelActor::Property::TOUCH_AREA, Vector2(10.f, 10.f));
@@ -8957,9 +8956,9 @@ int UtcDaliActorPropertyBlendEquation(void)
 
   tet_infoline("Test SetProperty AdvancedBlendEquation");
 
-  Geometry geometry = CreateQuadGeometry();
-  Shader shader = CreateShader();
-  Renderer renderer1 = Renderer::New( geometry, shader );
+  Geometry geometry  = CreateQuadGeometry();
+  Shader   shader    = CreateShader();
+  Renderer renderer1 = Renderer::New(geometry, shader);
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::OPACITY, 0.1f);
@@ -8968,21 +8967,21 @@ int UtcDaliActorPropertyBlendEquation(void)
   actor.SetProperty(Actor::Property::SIZE, Vector2(400, 400));
   application.GetScene().Add(actor);
 
-  if( !Dali::Capabilities::IsBlendEquationSupported( DevelBlendEquation::SCREEN ) )
+  if(!Dali::Capabilities::IsBlendEquationSupported(DevelBlendEquation::SCREEN))
   {
-    actor.SetProperty( Dali::DevelActor::Property::BLEND_EQUATION, Dali::DevelBlendEquation::SCREEN );
-    int equation = actor.GetProperty<int>( Dali::DevelActor::Property::BLEND_EQUATION );
-    DALI_TEST_EQUALS( ( Dali::DevelBlendEquation::SCREEN == equation ), false, TEST_LOCATION );
+    actor.SetProperty(Dali::DevelActor::Property::BLEND_EQUATION, Dali::DevelBlendEquation::SCREEN);
+    int equation = actor.GetProperty<int>(Dali::DevelActor::Property::BLEND_EQUATION);
+    DALI_TEST_EQUALS((Dali::DevelBlendEquation::SCREEN == equation), false, TEST_LOCATION);
   }
 
-  if( Dali::Capabilities::IsBlendEquationSupported( DevelBlendEquation::SCREEN ) )
+  if(Dali::Capabilities::IsBlendEquationSupported(DevelBlendEquation::SCREEN))
   {
-    actor.SetProperty( Dali::DevelActor::Property::BLEND_EQUATION, Dali::DevelBlendEquation::SCREEN );
-    int equation = actor.GetProperty<int>( Dali::DevelActor::Property::BLEND_EQUATION );
-    DALI_TEST_EQUALS( ( Dali::DevelBlendEquation::SCREEN == equation ), true, TEST_LOCATION );
+    actor.SetProperty(Dali::DevelActor::Property::BLEND_EQUATION, Dali::DevelBlendEquation::SCREEN);
+    int equation = actor.GetProperty<int>(Dali::DevelActor::Property::BLEND_EQUATION);
+    DALI_TEST_EQUALS((Dali::DevelBlendEquation::SCREEN == equation), true, TEST_LOCATION);
   }
 
-  Renderer renderer2 = Renderer::New( geometry, shader );
+  Renderer renderer2 = Renderer::New(geometry, shader);
   actor.AddRenderer(renderer2);
 
   END_TEST;
