@@ -147,7 +147,7 @@ ELSEIF( UNIX )
 
   # TODO: Clang is a lot more strict with warnings, we should address
   # those issues at some point.
-  IF( NOT ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" )
+  IF( NOT ${CMAKE_CXX_COMPILER_ID} MATCHES "Clang" )
     ADD_COMPILE_OPTIONS( -Werror )
   ENDIF()
 
