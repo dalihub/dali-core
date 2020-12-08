@@ -7929,7 +7929,7 @@ int utcDaliActorPartialUpdate(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int>(16, 736, 64, 64); // in screen coordinates, includes 3 last frames updates
+  clippingRect = Rect<int>(16, 736, 48, 64); // in screen coordinates, includes 3 last frames updates
   DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
@@ -7951,7 +7951,7 @@ int utcDaliActorPartialUpdate(void)
 
   DALI_TEST_EQUALS(clippingRect.IsEmpty(), false, TEST_LOCATION);
   DALI_TEST_EQUALS(clippingRect.IsValid(), true, TEST_LOCATION);
-  DALI_TEST_EQUALS<Rect<int>>(clippingRect, Rect<int>(16, 736, 64, 64), TEST_LOCATION);
+  DALI_TEST_EQUALS<Rect<int>>(clippingRect, Rect<int>(16, 736, 48, 64), TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
@@ -8119,10 +8119,20 @@ int utcDaliActorPartialUpdateSetProperty(void)
   DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
   DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
 
+  // Should be no damage rects, nothing changed
   damagedRects.clear();
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+
+  // Should be 1 damage rect due to change in size
+  damagedRects.clear();
+  actor.SetProperty(Actor::Property::SIZE, Vector3(26.0f, 26.0f, 0.0f));
+  application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
+  clippingRect = Rect<int>(16, 752, 32, 48); // new clipping rect size increased due to change in actor size
   DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
@@ -8210,7 +8220,7 @@ int utcDaliActorPartialUpdateActorsWithSizeHint(void)
 
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
-  Rect<int> clippingRect = Rect<int>(0, 496, 160, 320);
+  Rect<int> clippingRect = Rect<int>(32, 560, 96, 176);
   DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);

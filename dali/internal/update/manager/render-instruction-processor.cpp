@@ -176,31 +176,36 @@ inline void AddRendererToRenderList(BufferIndex updateBufferIndex,
       // Get the next free RenderItem.
       RenderItem& item = renderList.GetNextFreeItem();
 
-      item.mIsUpdated = (item.mNode != renderable.mNode);
+      // Get cached values
+      auto& partialRenderingData = node->GetPartialRenderingData();
+
+      auto& partialRenderingCacheInfo = node->GetPartialRenderingData().GetCurrentCacheInfo();
+
+      partialRenderingCacheInfo.node = node;
+      partialRenderingCacheInfo.isOpaque = (opacityType == Renderer::OPAQUE);
+      partialRenderingCacheInfo.renderer = renderable.mRenderer;
+      partialRenderingCacheInfo.color = renderable.mNode->GetColor(updateBufferIndex);
+      partialRenderingCacheInfo.depthIndex = renderable.mNode->GetDepthIndex();
+
+      if( renderable.mRenderer )
+      {
+        partialRenderingCacheInfo.textureSet = renderable.mRenderer->GetTextures();
+      }
+
       item.mNode = renderable.mNode;
-
-      bool prevIsOpaque = item.mIsOpaque;
       item.mIsOpaque = (opacityType == Renderer::OPAQUE);
-      item.mIsUpdated |= (prevIsOpaque != item.mIsOpaque);
-
-      Vector4 prevColor = item.mColor;
       item.mColor = renderable.mNode->GetColor(updateBufferIndex);
-      item.mIsUpdated |= (prevColor != item.mColor);
 
-      int prevDepthIndex = item.mDepthIndex;
       item.mDepthIndex = 0;
       if (!isLayer3d)
       {
         item.mDepthIndex = renderable.mNode->GetDepthIndex();
       }
 
-      Render::Renderer* prevRenderer = item.mRenderer;
       if (DALI_LIKELY(renderable.mRenderer))
       {
         item.mRenderer = &renderable.mRenderer->GetRenderer();
-        const void* prevTextureSet = item.mTextureSet;
         item.mTextureSet = renderable.mRenderer->GetTextures();
-        item.mIsUpdated |= (prevTextureSet != item.mTextureSet);
         item.mDepthIndex += renderable.mRenderer->GetDepthIndex();
       }
       else
@@ -208,29 +213,15 @@ inline void AddRendererToRenderList(BufferIndex updateBufferIndex,
         item.mRenderer = nullptr;
       }
 
-      item.mIsUpdated |= (prevDepthIndex != item.mDepthIndex);
-      item.mIsUpdated |= (prevRenderer != item.mRenderer);
       item.mIsUpdated |= isLayer3d;
 
-      if (!item.mIsUpdated)
-      {
-        Matrix prevModelViewMatrix = item.mModelViewMatrix;
-        Vector3 prevSize = item.mSize;
+      // Save ModelView matrix onto the item.
+      node->GetWorldMatrixAndSize( item.mModelMatrix, item.mSize );
+      Matrix::Multiply( item.mModelViewMatrix, item.mModelMatrix, viewMatrix );
 
-        // Save ModelView matrix onto the item.
-        node->GetWorldMatrixAndSize( item.mModelMatrix, item.mSize );
-        Matrix::Multiply( item.mModelViewMatrix, item.mModelMatrix, viewMatrix );
+      partialRenderingCacheInfo.matrix = item.mModelViewMatrix;
+      partialRenderingCacheInfo.size = item.mSize;
 
-        item.mIsUpdated = ((prevSize != item.mSize) || (item.mModelViewMatrix != prevModelViewMatrix));
-      }
-      else
-      {
-        // Save ModelView matrix onto the item.
-        node->GetWorldMatrixAndSize( item.mModelMatrix, item.mSize );
-        Matrix::Multiply( item.mModelViewMatrix, item.mModelMatrix, viewMatrix );
-      }
-
-      item.mUpdateSize = node->GetUpdateSizeHint();
       if (item.mUpdateSize == Vector3::ZERO)
       {
         // RenderItem::CalculateViewportSpaceAABB cannot cope with z transform
@@ -240,8 +231,11 @@ inline void AddRendererToRenderList(BufferIndex updateBufferIndex,
           item.mUpdateSize = item.mSize;
         }
       }
-    }
+      partialRenderingCacheInfo.updatedSize = item.mUpdateSize;
 
+      item.mIsUpdated = partialRenderingData.IsUpdated() || item.mIsUpdated;
+      partialRenderingData.SwapBuffers();
+    }
     node->SetCulled( updateBufferIndex, false );
   }
   else
