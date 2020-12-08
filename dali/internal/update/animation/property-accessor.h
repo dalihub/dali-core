@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_PROPERTY_ACCESSOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,7 +85,8 @@ public:
   const PropertyType& Get( BufferIndex bufferIndex ) const
   {
     DALI_ASSERT_DEBUG( nullptr != mProperty && "PropertyAccessor::Get() mProperty was nullptr" );
-    return mProperty->Get( bufferIndex );
+    const SceneGraph::AnimatableProperty<PropertyType>* property = mProperty;
+    return property->Get( bufferIndex );
   }
 
   /**
@@ -176,7 +177,8 @@ public:
   const T& Get( BufferIndex bufferIndex ) const
   {
     DALI_ASSERT_DEBUG( nullptr != mProperty && "PropertyAccessor::Get() mProperty was nullptr" );
-    return mProperty->Get( bufferIndex );
+    const SceneGraph::TransformManagerPropertyHandler<T>* property = mProperty;
+    return property->Get( bufferIndex );
   }
 
   /**
@@ -267,7 +269,8 @@ public:
   float Get( BufferIndex bufferIndex ) const
   {
     DALI_ASSERT_DEBUG( nullptr != mProperty && "PropertyAccessor::Get() mProperty was nullptr" );
-    return mProperty->GetFloatComponent( COMPONENT );
+    const SceneGraph::TransformManagerPropertyHandler<T>* property = mProperty;
+    return property->GetFloatComponent( COMPONENT );
   }
 
   /**

@@ -21,6 +21,7 @@ SET(TC_SOURCES
         utc-Dali-Internal-TapGesture.cpp
         utc-Dali-Internal-TapGestureProcessor.cpp
         utc-Dali-Internal-ConstString.cpp
+        utc-Dali-Internal-TransformManagerProperty.cpp
 )
 
 LIST(APPEND TC_SOURCES
