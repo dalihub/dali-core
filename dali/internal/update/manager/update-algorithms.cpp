@@ -111,20 +111,6 @@ inline NodePropertyFlags UpdateNodes( Node& node,
   // Apply constraints to the node
   ConstrainPropertyOwner( node, updateBufferIndex );
 
-  // Short-circuit for invisible nodes
-  if ( !node.IsVisible( updateBufferIndex ) )
-  {
-    return NodePropertyFlags::NOTHING;
-  }
-
-  // If the node was not previously visible
-  BufferIndex previousBuffer = updateBufferIndex ? 0u : 1u;
-  if ( !node.IsVisible( previousBuffer ) )
-  {
-    // The node was skipped in the previous update; it must recalculate everything
-    node.SetAllDirtyFlags();
-  }
-
   // Some dirty flags are inherited from parent
   NodePropertyFlags nodeDirtyFlags = node.GetInheritedDirtyFlags( parentFlags );
 
