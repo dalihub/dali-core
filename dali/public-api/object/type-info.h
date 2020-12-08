@@ -240,7 +240,7 @@ public:
    * @exception DaliException If index is not valid.
    * @note this method only works for custom registered properties
    */
-  const std::string& GetPropertyName(Property::Index index) const;
+  std::string_view GetPropertyName(Property::Index index) const;
 
   /**
    * @brief Given a child property name, retrieve the property index associated with it,
@@ -258,7 +258,7 @@ public:
    * @param[in] index The property index
    * @return The name of the property at the given index, or empty string if it does not exist
    */
-  const std::string& GetChildPropertyName(Property::Index index) const;
+  std::string_view GetChildPropertyName(Property::Index index) const;
 
   /**
    * @brief Given a child property index, retrieve the property name associated with it.

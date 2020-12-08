@@ -176,13 +176,13 @@ void Node::SetRoot(bool isRoot)
   mIsRoot = isRoot;
 }
 
-void Node::AddUniformMapping( OwnerPointer< UniformPropertyMapping >& map )
+void Node::AddUniformMapping(const UniformPropertyMapping& map)
 {
   PropertyOwner::AddUniformMapping( map );
   mRegenerateUniformMap = 2;
 }
 
-void Node::RemoveUniformMapping( const std::string& uniformName )
+void Node::RemoveUniformMapping( const ConstString& uniformName )
 {
   PropertyOwner::RemoveUniformMapping( uniformName );
   mRegenerateUniformMap = 2;
@@ -204,7 +204,7 @@ void Node::PrepareRender( BufferIndex bufferIndex )
 
       for( UniformMap::SizeType i = 0, count=mUniformMaps.Count(); i<count; ++i )
       {
-        localMap.PushBack( &mUniformMaps[i] );
+        localMap.PushBack(mUniformMaps[i]);
       }
     }
     else if( mRegenerateUniformMap == 1 )

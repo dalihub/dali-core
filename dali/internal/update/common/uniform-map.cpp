@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+#include <algorithm>
+
 // CLASS HEADER
 #include <dali/internal/update/common/uniform-map.h>
 
@@ -23,12 +25,6 @@ namespace Internal
 {
 namespace SceneGraph
 {
-UniformMap::UniformMap() = default;
-
-UniformMap::~UniformMap()
-{
-  // Nothing to do - let the owner container delete the maps
-}
 
 void UniformMap::AddObserver( Observer& observer )
 {
@@ -68,84 +64,46 @@ void UniformMap::MappingChanged()
   }
 }
 
-void UniformMap::Add( UniformPropertyMapping* newMap )
+void UniformMap::Add(UniformPropertyMapping newMap)
 {
-  UniformPropertyMapping::Hash nameHash = CalculateHash( newMap->uniformName );
+  auto iter = std::find_if(mUniformMaps.Begin(),
+                           mUniformMaps.End(),
+                           [&](auto& element) { return element.uniformName == newMap.uniformName; });
 
-  bool found = false;
-
-  for( UniformMapIter iter = mUniformMaps.Begin() ;
-       iter != mUniformMaps.End() ;
-       ++iter )
+  if(iter != mUniformMaps.End())
   {
-    UniformPropertyMapping* map = *iter;
-    if( map->uniformNameHash == nameHash )
-    {
-      if( map->uniformName == newMap->uniformName )
-      {
-        found = true;
-        // Mapping already exists - update it.
-        map->propertyPtr = newMap->propertyPtr;
-        break;
-      }
-    }
+    // Mapping already exists - update it.
+    (*iter).propertyPtr = newMap.propertyPtr;
   }
-
-  if( found == false )
+  else
   {
-    // Take ownership of the new map
+    // add the new map.
     mUniformMaps.PushBack(newMap);
   }
 
   MappingChanged();
 }
 
-void UniformMap::Remove( const std::string& uniformName )
+void UniformMap::Remove( ConstString uniformName )
 {
-  UniformPropertyMapping::Hash nameHash = CalculateHash( uniformName );
+  auto iter = std::find_if(mUniformMaps.Begin(),
+                           mUniformMaps.End(),
+                           [&](auto& element) { return element.uniformName == uniformName; });
 
-  bool found=false;
-
-  for( UniformMapIter iter = mUniformMaps.Begin() ;
-       iter != mUniformMaps.End() ;
-       ++iter )
+  if(iter != mUniformMaps.End())
   {
-    UniformPropertyMapping* map = *iter;
-    if( map->uniformNameHash == nameHash )
-    {
-      if( map->uniformName == uniformName )
-      {
-        mUniformMaps.Erase( iter );
-        found = true;
-        break;
-      }
-    }
-  }
-
-  if( found )
-  {
+    mUniformMaps.Erase(iter);
     MappingChanged();
   }
 }
 
-const PropertyInputImpl* UniformMap::Find( const std::string& uniformName )
+const PropertyInputImpl* UniformMap::Find(ConstString uniformName)
 {
-  UniformPropertyMapping::Hash nameHash = CalculateHash( uniformName );
+  auto iter = std::find_if(mUniformMaps.Begin(),
+                           mUniformMaps.End(),
+                           [&](auto& element) { return element.uniformName == uniformName; });
 
-  for( UniformMapIter iter = mUniformMaps.Begin() ;
-       iter != mUniformMaps.End() ;
-       ++iter )
-  {
-    UniformPropertyMapping* map = *iter;
-    if( map->uniformNameHash == nameHash )
-    {
-      if( map->uniformName == uniformName )
-      {
-        return map->propertyPtr;
-      }
-    }
-  }
-  return nullptr;
+  return (iter != mUniformMaps.End()) ? (*iter).propertyPtr : nullptr;
 }
 
 UniformMap::SizeType UniformMap::Count() const
@@ -155,7 +113,7 @@ UniformMap::SizeType UniformMap::Count() const
 
 const UniformPropertyMapping& UniformMap::operator[]( UniformMap::SizeType index ) const
 {
-  return *mUniformMaps[index];
+  return mUniformMaps[index];
 }
 
 } // SceneGraph

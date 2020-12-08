@@ -23,9 +23,10 @@
 #include <utility>
 
 // INTERNAL INCLUDES
+#include <dali/internal/common/const-string.h>
 #include <dali/public-api/common/constants.h>
-#include <dali/public-api/object/property.h>
 #include <dali/public-api/object/property-value.h>
+#include <dali/public-api/object/property.h>
 
 namespace Dali
 {
@@ -258,14 +259,14 @@ public:
    *
    * @note A valid sceneGraphProperty is mandatory otherwise this will debug assert.
    */
-  CustomPropertyMetadata( std::string propertyName,
-                          Property::Index propertyKey,
-                          Property::Value propertyValue,
-                          const SceneGraph::PropertyBase* sceneGraphProperty )
-  : PropertyMetadata( std::move(propertyValue), sceneGraphProperty, true ),
-    name( std::move(propertyName) ),
-    key( propertyKey ),
-    childPropertyIndex( Property::INVALID_INDEX )
+  CustomPropertyMetadata(ConstString                     propertyName,
+                         Property::Index                 propertyKey,
+                         Property::Value                 propertyValue,
+                         const SceneGraph::PropertyBase* sceneGraphProperty)
+  : PropertyMetadata(std::move(propertyValue), sceneGraphProperty, true),
+    name(propertyName),
+    key(propertyKey),
+    childPropertyIndex(Property::INVALID_INDEX)
   {
     DALI_ASSERT_DEBUG( sceneGraphProperty && "Uninitialized scene-graph property" );
   }
@@ -278,13 +279,13 @@ public:
    *
    * @note The access mode MUST NOT be animatable otherwise this will debug assert.
    */
-  CustomPropertyMetadata( std::string propertyName,
-                          Property::Value propertyValue,
-                          Property::AccessMode accessMode )
-  : PropertyMetadata( std::move(propertyValue), nullptr, ( accessMode != Property::READ_ONLY ) ),
-    name( std::move(propertyName) ),
-    key( Property::INVALID_KEY ),
-    childPropertyIndex( Property::INVALID_INDEX )
+  CustomPropertyMetadata(ConstString          propertyName,
+                         Property::Value      propertyValue,
+                         Property::AccessMode accessMode)
+  : PropertyMetadata(std::move(propertyValue), nullptr, (accessMode != Property::READ_ONLY)),
+    name(propertyName),
+    key(Property::INVALID_KEY),
+    childPropertyIndex(Property::INVALID_INDEX)
   {
     DALI_ASSERT_DEBUG( accessMode != Property::ANIMATABLE && "Event side only properties should not be animatable" );
   }
@@ -302,8 +303,7 @@ private:
   CustomPropertyMetadata& operator=( const CustomPropertyMetadata& );
 
 public: // Data
-
-  std::string       name;                 ///< The name of the property.
+  ConstString       name;                 ///< The name of the property.
   Property::Index   key;                  ///< The key of the property.
   Property::Index   childPropertyIndex;   ///< The index as a child property.
 };

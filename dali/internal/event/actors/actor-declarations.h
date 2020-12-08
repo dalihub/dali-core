@@ -37,6 +37,10 @@ using CameraActorPtr = IntrusivePtr<CameraActor>;
 using CustomActorPtr = IntrusivePtr<CustomActor>;
 using LayerPtr       = IntrusivePtr<Layer>;
 
+using ActorContainer = std::vector<ActorPtr>;
+using ActorIter      = ActorContainer::iterator;
+using ActorConstIter = ActorContainer::const_iterator;
+
 } // namespace Internal
 
 } // namespace Dali

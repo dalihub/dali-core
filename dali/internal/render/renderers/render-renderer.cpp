@@ -255,19 +255,19 @@ void Renderer::SetUniforms( BufferIndex bufferIndex, const SceneGraph::NodeDataP
     uint32_t mapIndex = 0;
     for(; mapIndex < uniformMap.Count() ; ++mapIndex )
     {
-      mUniformIndexMap[mapIndex].propertyValue = uniformMap[mapIndex]->propertyPtr;
-      mUniformIndexMap[mapIndex].uniformIndex = program.RegisterUniform( uniformMap[mapIndex]->uniformName );
+      mUniformIndexMap[mapIndex].propertyValue = uniformMap[mapIndex].propertyPtr;
+      mUniformIndexMap[mapIndex].uniformIndex  = program.RegisterUniform(uniformMap[mapIndex].uniformName);
     }
 
     for( uint32_t nodeMapIndex = 0; nodeMapIndex < uniformMapNode.Count() ; ++nodeMapIndex )
     {
-      uint32_t uniformIndex = program.RegisterUniform( uniformMapNode[nodeMapIndex]->uniformName );
+      uint32_t uniformIndex = program.RegisterUniform(uniformMapNode[nodeMapIndex].uniformName);
       bool found(false);
       for( uint32_t i = 0; i<uniformMap.Count(); ++i )
       {
         if( mUniformIndexMap[i].uniformIndex == uniformIndex )
         {
-          mUniformIndexMap[i].propertyValue = uniformMapNode[nodeMapIndex]->propertyPtr;
+          mUniformIndexMap[i].propertyValue = uniformMapNode[nodeMapIndex].propertyPtr;
           found = true;
           break;
         }
@@ -275,7 +275,7 @@ void Renderer::SetUniforms( BufferIndex bufferIndex, const SceneGraph::NodeDataP
 
       if( !found )
       {
-        mUniformIndexMap[mapIndex].propertyValue = uniformMapNode[nodeMapIndex]->propertyPtr;
+        mUniformIndexMap[mapIndex].propertyValue = uniformMapNode[nodeMapIndex].propertyPtr;
         mUniformIndexMap[mapIndex].uniformIndex = uniformIndex;
         ++mapIndex;
       }
@@ -729,16 +729,16 @@ bool Renderer::Updated(BufferIndex bufferIndex, const SceneGraph::NodeDataProvid
 
   uint64_t hash = 0xc70f6907UL;
   const SceneGraph::CollectedUniformMap& uniformMapNode = node->GetUniformMap( bufferIndex );
-  for (const auto* uniformProperty : uniformMapNode)
+  for(const auto& uniformProperty : uniformMapNode)
   {
-    hash = uniformProperty->propertyPtr->Hash(bufferIndex, hash);
+    hash = uniformProperty.propertyPtr->Hash(bufferIndex, hash);
   }
 
   const SceneGraph::UniformMapDataProvider& uniformMapDataProvider = mRenderDataProvider->GetUniformMap();
   const SceneGraph::CollectedUniformMap& uniformMap = uniformMapDataProvider.GetUniformMap( bufferIndex );
-  for (const auto* uniformProperty : uniformMap)
+  for(const auto& uniformProperty : uniformMap)
   {
-    hash = uniformProperty->propertyPtr->Hash(bufferIndex, hash);
+    hash = uniformProperty.propertyPtr->Hash(bufferIndex, hash);
   }
 
   if (mUniformsHash != hash)

@@ -29,6 +29,7 @@
 #include <dali/internal/render/renderers/render-geometry.h>
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
+#include <dali/internal/common/blending-options.h>
 
 namespace Dali
 {
@@ -60,25 +61,20 @@ void AddMappings( CollectedUniformMap& localMap, const UniformMap& uniformMap )
 
   for( UniformMap::SizeType i = 0, count=uniformMap.Count(); i<count; ++i )
   {
-    UniformPropertyMapping::Hash nameHash = uniformMap[i].uniformNameHash;
     bool found = false;
 
     for( CollectedUniformMap::Iterator iter = localMap.Begin() ; iter != localMap.End() ; ++iter )
     {
-      const UniformPropertyMapping* map = (*iter);
-      if( map->uniformNameHash == nameHash )
+      const UniformPropertyMapping& map = (*iter);
+      if(map.uniformName == uniformMap[i].uniformName)
       {
-        if( map->uniformName == uniformMap[i].uniformName )
-        {
-          found = true;
-          break;
-        }
+        found = true;
+        break;
       }
     }
     if( !found )
     {
-      // it's a new mapping. Add raw ptr to temporary list
-      newUniformMappings.PushBack( &uniformMap[i] );
+      newUniformMappings.PushBack(uniformMap[i]);
     }
   }
 
@@ -91,7 +87,7 @@ void AddMappings( CollectedUniformMap& localMap, const UniformMap& uniformMap )
          iter != end ;
          ++iter )
     {
-      const UniformPropertyMapping* map = (*iter);
+      const UniformPropertyMapping& map = (*iter);
       localMap.PushBack( map );
     }
   }
@@ -192,9 +188,19 @@ bool Renderer::PrepareRender( BufferIndex updateBufferIndex )
     if( mRegenerateUniformMap == REGENERATE_UNIFORM_MAP)
     {
       CollectedUniformMap& localMap = mCollectedUniformMap[ updateBufferIndex ];
-      localMap.Resize(0);
+      localMap.Clear();
 
       const UniformMap& rendererUniformMap = PropertyOwner::GetUniformMap();
+
+      auto size = rendererUniformMap.Count();
+
+      if(mShader)
+      {
+        size += mShader->GetUniformMap().Count();
+      }
+
+      localMap.Reserve(size);
+
       AddMappings( localMap, rendererUniformMap );
 
       if( mShader )
@@ -710,6 +716,12 @@ Renderer::OpacityType Renderer::GetOpacityType( BufferIndex updateBufferIndex, c
     }
     case BlendMode::AUTO:
     {
+      if(BlendingOptions::IsAdvancedBlendEquationIncluded(mBlendBitmask))
+      {
+        opacityType = Renderer::TRANSLUCENT;
+        break;
+      }
+
       bool shaderRequiresBlending( mShader->HintEnabled( Dali::Shader::Hint::OUTPUT_IS_TRANSPARENT ) );
       if( shaderRequiresBlending || ( mTextureSet && mTextureSet->HasAlpha() ) )
       {
@@ -726,6 +738,7 @@ Renderer::OpacityType Renderer::GetOpacityType( BufferIndex updateBufferIndex, c
       {
         opacityType = Renderer::TRANSLUCENT;
       }
+
       break;
     }
     case BlendMode::OFF: // the renderer should never use blending

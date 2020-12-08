@@ -88,17 +88,17 @@ void TypeInfo::GetPropertyIndices(Property::IndexContainer& indices) const
   GetImplementation(*this).GetPropertyIndices(indices);
 }
 
-const std::string& TypeInfo::GetPropertyName(Property::Index index) const
+std::string_view TypeInfo::GetPropertyName(Property::Index index) const
 {
   return GetImplementation(*this).GetRegisteredPropertyName(index);
 }
 
 Property::Index TypeInfo::GetChildPropertyIndex(const std::string& name) const
 {
-  return GetImplementation(*this).GetChildPropertyIndex(name);
+  return GetImplementation(*this).GetChildPropertyIndex(Internal::ConstString(name));
 }
 
-const std::string& TypeInfo::GetChildPropertyName(Property::Index index) const
+std::string_view TypeInfo::GetChildPropertyName(Property::Index index) const
 {
   return GetImplementation(*this).GetChildPropertyName(index);
 }

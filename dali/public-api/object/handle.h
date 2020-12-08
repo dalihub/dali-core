@@ -289,7 +289,7 @@ public:
    *       - Property::ROTATION
    * @note If a property with the desired name already exists, then the value given is just set.
    */
-  Property::Index RegisterProperty(std::string name, Property::Value propertyValue);
+  Property::Index RegisterProperty(std::string_view name, Property::Value propertyValue);
 
   /**
    * @brief Register a new animatable property with an integer key.
@@ -329,9 +329,9 @@ public:
    *       - Property::ROTATION
    * @note If a property with the desired name already exists, then the value given is just set.
    */
-  Property::Index RegisterProperty(Property::Index key,
-                                   std::string     name,
-                                   Property::Value propertyValue);
+  Property::Index RegisterProperty(Property::Index  key,
+                                   std::string_view name,
+                                   Property::Value  propertyValue);
 
   /**
    * @brief Registers a new property.
@@ -356,7 +356,7 @@ public:
    *       - Property::ROTATION
    * @note If a property with the desired name already exists, then the value given is just set.
    */
-  Property::Index RegisterProperty(std::string name, Property::Value propertyValue, Property::AccessMode accessMode);
+  Property::Index RegisterProperty(std::string_view name, Property::Value propertyValue, Property::AccessMode accessMode);
 
   /**
    * @brief Retrieves a property value.

@@ -22,12 +22,13 @@
 #include <string>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/object/csharp-type-info.h>
+#include <dali/internal/common/const-string.h>
+#include <dali/internal/event/object/default-property-metadata.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/object/base-object.h>
-#include <dali/public-api/object/type-info.h>
 #include <dali/public-api/object/property.h>
-#include <dali/devel-api/object/csharp-type-info.h>
-#include <dali/internal/event/object/default-property-metadata.h>
+#include <dali/public-api/object/type-info.h>
 
 namespace Dali
 {
@@ -125,7 +126,7 @@ public:
    * @copydoc Dali::TypeInfo::GetPropertyName() const
    * this API exists to keep the old public API, which cannot be changed
    */
-  const std::string& GetRegisteredPropertyName( Property::Index index ) const;
+  std::string_view GetRegisteredPropertyName(Property::Index index) const;
 
   /**
    * Returns the property name for given index
@@ -133,7 +134,7 @@ public:
    * @param index of the property
    * @return name or empty string
    */
-  std::string GetPropertyName( Property::Index index ) const;
+  std::string_view GetPropertyName(Property::Index index) const;
 
   /*
    * Add an action function
@@ -226,7 +227,7 @@ public:
    * @param[in] name The name of the property.
    * @return The index associated with that name.
    */
-  Property::Index GetPropertyIndex( const std::string& name ) const;
+  Property::Index GetPropertyIndex(ConstString name) const;
 
   /**
    * Given a property index, retrieve the index of its base property.
@@ -272,14 +273,14 @@ public:
    * @param[in] name The name of the child property.
    * @return The index associated with that name.
    */
-  Property::Index GetChildPropertyIndex( const std::string& name ) const;
+  Property::Index GetChildPropertyIndex(ConstString name) const;
 
   /**
    * Retrieve the name of the child property at the given index.
    * @param[in] index The property index.
    * @return The name of the child property.
    */
-  const std::string& GetChildPropertyName( Property::Index index ) const;
+  std::string_view GetChildPropertyName(Property::Index index) const;
 
   /**
    * Retrieve the Property::Type of the child property at the given index.
@@ -337,31 +338,31 @@ private:
 
   struct RegisteredProperty
   {
-    RegisteredProperty(Property::Type propType, std::string propName, Property::Index basePropertyIndex, int32_t componentIndex)
+    RegisteredProperty(Property::Type propType, ConstString propName, Property::Index basePropertyIndex, int32_t componentIndex)
     : type(propType),
       setFunc(nullptr),
       getFunc(nullptr),
-      name(std::move(propName)),
+      name(propName),
       basePropertyIndex(basePropertyIndex),
       componentIndex(componentIndex)
     {
     }
 
-    RegisteredProperty(Property::Type propType, Dali::TypeInfo::SetPropertyFunction set, Dali::TypeInfo::GetPropertyFunction get, std::string propName, Property::Index basePropertyIndex, int componentIndex)
+    RegisteredProperty(Property::Type propType, Dali::TypeInfo::SetPropertyFunction set, Dali::TypeInfo::GetPropertyFunction get, ConstString propName, Property::Index basePropertyIndex, int componentIndex)
     : type(propType),
       setFunc(set),
       getFunc(get),
-      name(std::move(propName)),
+      name(propName),
       basePropertyIndex(basePropertyIndex),
       componentIndex(componentIndex)
     {
     }
 
-    RegisteredProperty(Property::Type propType, Dali::CSharpTypeInfo::SetPropertyFunction set, Dali::CSharpTypeInfo::GetPropertyFunction get, std::string propName, Property::Index basePropertyIndex, int componentIndex)
+    RegisteredProperty(Property::Type propType, Dali::CSharpTypeInfo::SetPropertyFunction set, Dali::CSharpTypeInfo::GetPropertyFunction get, ConstString propName, Property::Index basePropertyIndex, int componentIndex)
     : type(propType),
       cSharpSetFunc(set),
       cSharpGetFunc(get),
-      name(std::move(propName)),
+      name(propName),
       basePropertyIndex(basePropertyIndex),
       componentIndex(componentIndex)
     {
@@ -378,7 +379,7 @@ private:
       Dali::TypeInfo::GetPropertyFunction getFunc = nullptr;
       Dali::CSharpTypeInfo::GetPropertyFunction cSharpGetFunc; // only one field can be initialized but this will have same value anyways
     };
-    std::string name;
+    ConstString     name;
     Property::Index basePropertyIndex = Property::INVALID_INDEX;
     int32_t componentIndex = Property::INVALID_COMPONENT_INDEX;
   };

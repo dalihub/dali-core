@@ -798,12 +798,12 @@ public:
   /**
    * @copydoc UniformMap::Add
    */
-  void AddUniformMapping( OwnerPointer< UniformPropertyMapping >& map ) override;
+  void AddUniformMapping(const UniformPropertyMapping& map) override;
 
   /**
    * @copydoc UniformMap::Remove
    */
-  void RemoveUniformMapping( const std::string& uniformName ) override;
+  void RemoveUniformMapping( const ConstString& uniformName ) override;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyOwner::IsAnimationPossible

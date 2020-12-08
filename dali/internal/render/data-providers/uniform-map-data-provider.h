@@ -16,8 +16,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <dali/public-api/common/dali-vector.h>
 #include <dali/internal/common/buffer-index.h>
+#include <dali/internal/update/common/uniform-map.h>
+#include <dali/public-api/common/dali-vector.h>
 
 namespace Dali
 {
@@ -28,7 +29,7 @@ namespace SceneGraph
 class UniformMap;
 class UniformPropertyMapping;
 
-using CollectedUniformMap = Dali::Vector<const UniformPropertyMapping*>;
+using CollectedUniformMap = Dali::Vector<UniformPropertyMapping>;
 
 /**
  * This class maps uniform names to property value pointers.

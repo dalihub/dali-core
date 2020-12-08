@@ -19,6 +19,7 @@
 #include <dali/integration-api/events/hover-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/internal/event/common/type-info-impl.h>
+#include <dali/internal/common/const-string.h>
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
 
@@ -1691,7 +1692,7 @@ int UtcDaliTypeRegistryChildPropertyRegistrationP(void)
 
   // check the child property type
   Internal::TypeInfo& typeInfoImpl = GetImplementation(typeInfo);
-  Property::Type      type         = typeInfoImpl.GetChildPropertyType(typeInfoImpl.GetChildPropertyIndex("childProp4"));
+  Property::Type      type         = typeInfoImpl.GetChildPropertyType(typeInfoImpl.GetChildPropertyIndex(Dali::Internal::ConstString("childProp4")));
   DALI_TEST_EQUALS(type, Property::INTEGER, TEST_LOCATION);
 
   std::string unRegisteredChildName(typeInfoImpl.GetChildPropertyName(CHILD_PROPERTY_REGISTRATION_START_INDEX + 4));

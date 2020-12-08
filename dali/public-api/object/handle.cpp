@@ -67,7 +67,7 @@ uint32_t Handle::GetPropertyCount() const
 
 std::string Handle::GetPropertyName(Property::Index index) const
 {
-  return GetImplementation(*this).GetPropertyName(index);
+  return std::string(GetImplementation(*this).GetPropertyName(index));
 }
 
 Property::Index Handle::GetPropertyIndex(Property::Key key) const
@@ -100,19 +100,19 @@ void Handle::SetProperty(Property::Index index, Property::Value propertyValue)
   GetImplementation(*this).SetProperty(index, std::move(propertyValue));
 }
 
-Property::Index Handle::RegisterProperty(std::string name, Property::Value propertyValue)
+Property::Index Handle::RegisterProperty(std::string_view name, Property::Value propertyValue)
 {
-  return GetImplementation(*this).RegisterProperty(std::move(name), std::move(propertyValue));
+  return GetImplementation(*this).RegisterProperty(name, std::move(propertyValue));
 }
 
-Property::Index Handle::RegisterProperty(Property::Index key, std::string name, Property::Value propertyValue)
+Property::Index Handle::RegisterProperty(Property::Index key, std::string_view name, Property::Value propertyValue)
 {
-  return GetImplementation(*this).RegisterProperty(std::move(name), key, std::move(propertyValue));
+  return GetImplementation(*this).RegisterProperty(name, key, std::move(propertyValue));
 }
 
-Property::Index Handle::RegisterProperty(std::string name, Property::Value propertyValue, Property::AccessMode accessMode)
+Property::Index Handle::RegisterProperty(std::string_view name, Property::Value propertyValue, Property::AccessMode accessMode)
 {
-  return GetImplementation(*this).RegisterProperty(std::move(name), std::move(propertyValue), accessMode);
+  return GetImplementation(*this).RegisterProperty(name, std::move(propertyValue), accessMode);
 }
 
 Property::Value Handle::GetProperty(Property::Index index) const

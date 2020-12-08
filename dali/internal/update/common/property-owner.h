@@ -26,6 +26,7 @@
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/update/common/uniform-map.h>
 #include <dali/internal/update/animation/scene-graph-constraint-declarations.h>
+#include <dali/internal/common/const-string.h>
 
 
 namespace Dali
@@ -200,12 +201,12 @@ public:
   /**
    * @copydoc UniformMap::Add
    */
-  virtual void AddUniformMapping( OwnerPointer< UniformPropertyMapping >& map );
+  virtual void AddUniformMapping(const UniformPropertyMapping& map);
 
   /**
    * @copydoc UniformMap::Remove
    */
-  virtual void RemoveUniformMapping( const std::string& uniformName );
+  virtual void RemoveUniformMapping( const ConstString& uniformName );
 
   /**
    * Get the mappings table

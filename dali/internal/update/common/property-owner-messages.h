@@ -26,6 +26,7 @@
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
+#include <dali/internal/common/const-string.h>
 
 namespace Dali
 {
@@ -253,9 +254,9 @@ inline void RemoveConstraintMessage( EventThreadServices& eventThreadServices, c
   new (slot) LocalType( &owner, &PropertyOwner::RemoveConstraint, &constraint );
 }
 
-inline void AddUniformMapMessage( EventThreadServices& eventThreadServices, const PropertyOwner& owner, OwnerPointer< UniformPropertyMapping >& map )
+inline void AddUniformMapMessage(EventThreadServices& eventThreadServices, const PropertyOwner& owner, UniformPropertyMapping map)
 {
-  using LocalType = MessageValue1<PropertyOwner, OwnerPointer<UniformPropertyMapping> >;
+  using LocalType = MessageValue1<PropertyOwner, UniformPropertyMapping>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -263,9 +264,9 @@ inline void AddUniformMapMessage( EventThreadServices& eventThreadServices, cons
   new (slot) LocalType( &owner, &PropertyOwner::AddUniformMapping, map );
 }
 
-inline void RemoveUniformMapMessage( EventThreadServices& eventThreadServices, const PropertyOwner& owner, const std::string& uniformName )
+inline void RemoveUniformMapMessage( EventThreadServices& eventThreadServices, const PropertyOwner& owner, ConstString uniformName )
 {
-  using LocalType = MessageValue1<PropertyOwner, std::string>;
+  using LocalType = MessageValue1<PropertyOwner, ConstString>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );

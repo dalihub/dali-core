@@ -33,21 +33,22 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/common/capabilities.h>
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/internal/event/events/actor-gesture-data.h>
 #include <dali/internal/event/actors/actor-property-handler.h>
 #include <dali/internal/event/actors/actor-relayouter.h>
-#include <dali/internal/event/common/event-thread-services.h>
-#include <dali/internal/event/render-tasks/render-task-impl.h>
+#include <dali/internal/event/actors/actor-siblings.h>
 #include <dali/internal/event/actors/camera-actor-impl.h>
-#include <dali/internal/event/render-tasks/render-task-list-impl.h>
-#include <dali/internal/event/common/property-helper.h>
-#include <dali/internal/event/common/stage-impl.h>
-#include <dali/internal/event/common/type-info-impl.h>
-#include <dali/internal/event/common/scene-impl.h>
-#include <dali/internal/event/common/thread-local-storage.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/projection.h>
+#include <dali/internal/event/common/property-helper.h>
+#include <dali/internal/event/common/scene-impl.h>
+#include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/event/common/thread-local-storage.h>
+#include <dali/internal/event/common/type-info-impl.h>
+#include <dali/internal/event/render-tasks/render-task-impl.h>
+#include <dali/internal/event/render-tasks/render-task-list-impl.h>
 #include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
 #include <dali/internal/update/nodes/node-messages.h>
-#include <dali/internal/event/events/actor-gesture-data.h>
 #include <dali/integration-api/debug.h>
 
 using Dali::Internal::SceneGraph::Node;
@@ -56,7 +57,6 @@ using Dali::Internal::SceneGraph::PropertyBase;
 
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_DEPTH_TIMER" );
-Debug::Filter* gLogRelayoutFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_RELAYOUT_TIMER" );
 #endif
 
 namespace Dali
@@ -1199,7 +1199,6 @@ uint32_t Actor::AddRenderer( Renderer& renderer )
 
   if(mIsBlendEquationSet)
   {
-    renderer.SetBlendMode(Dali::BlendMode::ON);
     renderer.SetBlendEquation(static_cast<DevelBlendEquation::Type>(mBlendEquation));
   }
 
@@ -1270,7 +1269,6 @@ void Actor::SetBlendEquation(DevelBlendEquation::Type blendEquation)
       for(uint32_t i = 0; i < rendererCount; ++i)
       {
         RendererPtr renderer = GetRendererAt(i);
-        renderer->SetBlendMode(Dali::BlendMode::ON);
         renderer->SetBlendEquation(static_cast<DevelBlendEquation::Type>(blendEquation));
       }
     }
@@ -2269,98 +2267,6 @@ float Actor::CalculateSize( Dimension::Type dimension, const Vector2& maximumSiz
   return 0.0f;  // Default
 }
 
-void Actor::NegotiateDimension( Dimension::Type dimension, const Vector2& allocatedSize, ActorDimensionStack& recursionStack )
-{
-  // Check if it needs to be negotiated
-  if( IsLayoutDirty( dimension ) && !IsLayoutNegotiated( dimension ) )
-  {
-    // Check that we havn't gotten into an infinite loop
-    ActorDimensionPair searchActor = ActorDimensionPair( this, dimension );
-    bool recursionFound = false;
-    for( auto& element : recursionStack )
-    {
-      if( element == searchActor )
-      {
-        recursionFound = true;
-        break;
-      }
-    }
-
-    if( !recursionFound )
-    {
-      // Record the path that we have taken
-      recursionStack.push_back( ActorDimensionPair( this, dimension ) );
-
-      // Dimension dependency check
-      for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
-      {
-        Dimension::Type dimensionToCheck = static_cast< Dimension::Type >( 1 << i );
-
-        if( RelayoutDependentOnDimension( dimension, dimensionToCheck ) )
-        {
-          NegotiateDimension( dimensionToCheck, allocatedSize, recursionStack );
-        }
-      }
-
-      // Parent dependency check
-      Actor* parent = GetParent();
-      if( parent && RelayoutDependentOnParent( dimension ) )
-      {
-        parent->NegotiateDimension( dimension, allocatedSize, recursionStack );
-      }
-
-      // Children dependency check
-      if( RelayoutDependentOnChildren( dimension ) )
-      {
-        for( uint32_t i = 0, count = GetChildCount(); i < count; ++i )
-        {
-          ActorPtr child = GetChildAt( i );
-
-          // Only relayout child first if it is not dependent on this actor
-          if( !child->RelayoutDependentOnParent( dimension ) )
-          {
-            child->NegotiateDimension( dimension, allocatedSize, recursionStack );
-          }
-        }
-      }
-
-      // For deriving classes
-      OnCalculateRelayoutSize( dimension );
-
-      // All dependencies checked, calculate the size and set negotiated flag
-      const float newSize = Relayouter::ClampDimension( *this, CalculateSize( dimension, allocatedSize ), dimension );
-
-      SetNegotiatedDimension( newSize, dimension );
-      SetLayoutNegotiated( true, dimension );
-
-      // For deriving classes
-      OnLayoutNegotiated( newSize, dimension );
-
-      // This actor has been successfully processed, pop it off the recursion stack
-      recursionStack.pop_back();
-    }
-    else
-    {
-      // TODO: Break infinite loop
-      SetLayoutNegotiated( true, dimension );
-    }
-  }
-}
-
-void Actor::NegotiateDimensions( const Vector2& allocatedSize )
-{
-  // Negotiate all dimensions that require it
-  ActorDimensionStack recursionStack;
-
-  for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
-  {
-    const Dimension::Type dimension = static_cast< Dimension::Type >( 1 << i );
-
-    // Negotiate
-    NegotiateDimension( dimension, allocatedSize, recursionStack );
-  }
-}
-
 Vector2 Actor::ApplySizeSetPolicy( const Vector2& size )
 {
   return mRelayoutData->ApplySizeSetPolicy(*this, size);
@@ -2394,56 +2300,7 @@ void Actor::SetNegotiatedSize( RelayoutContainer& container )
 
 void Actor::NegotiateSize( const Vector2& allocatedSize, RelayoutContainer& container )
 {
-  // Force a size negotiation for actors that has assigned size during relayout
-  // This is required as otherwise the flags that force a relayout will not
-  // necessarilly be set. This will occur if the actor has already been laid out.
-  // The dirty flags are then cleared. Then if the actor is added back into the
-  // relayout container afterwards, the dirty flags would still be clear...
-  // causing a relayout to be skipped. Here we force any actors added to the
-  // container to be relayed out.
-  DALI_LOG_TIMER_START( NegSizeTimer1 );
-
-  if( GetUseAssignedSize(Dimension::WIDTH ) )
-  {
-    SetLayoutNegotiated( false, Dimension::WIDTH );
-  }
-  if( GetUseAssignedSize( Dimension::HEIGHT ) )
-  {
-    SetLayoutNegotiated( false, Dimension::HEIGHT );
-  }
-
-  // Do the negotiation
-  NegotiateDimensions( allocatedSize );
-
-  // Set the actor size
-  SetNegotiatedSize( container );
-
-  // Negotiate down to children
-  for( uint32_t i = 0, count = GetChildCount(); i < count; ++i )
-  {
-    ActorPtr child = GetChildAt( i );
-
-    // Forces children that have already been laid out to be relayed out
-    // if they have assigned size during relayout.
-    if( child->GetUseAssignedSize(Dimension::WIDTH) )
-    {
-      child->SetLayoutNegotiated(false, Dimension::WIDTH);
-      child->SetLayoutDirty(true, Dimension::WIDTH);
-    }
-
-    if( child->GetUseAssignedSize(Dimension::HEIGHT) )
-    {
-      child->SetLayoutNegotiated(false, Dimension::HEIGHT);
-      child->SetLayoutDirty(true, Dimension::HEIGHT);
-    }
-
-    // Only relayout if required
-    if( child->RelayoutRequired() )
-    {
-      container.Add( Dali::Actor( child.Get() ), mTargetSize.GetVectorXY() );
-    }
-  }
-  DALI_LOG_TIMER_END( NegSizeTimer1, gLogRelayoutFilter, Debug::Concise, "NegotiateSize() took: ");
+  Relayouter::NegotiateSize(*this, allocatedSize, container);
 }
 
 void Actor::SetUseAssignedSize( bool use, Dimension::Type dimension )
@@ -2471,27 +2328,7 @@ void Actor::RelayoutRequest( Dimension::Type dimension )
 
 void Actor::SetPreferredSize( const Vector2& size )
 {
-  EnsureRelayouter();
-
-  // If valid width or height, then set the resize policy to FIXED
-  // A 0 width or height may also be required so if the resize policy has not been changed, i.e. is still set to DEFAULT,
-  // then change to FIXED as well
-
-  if( size.width > 0.0f || GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::DEFAULT )
-  {
-    SetResizePolicy( ResizePolicy::FIXED, Dimension::WIDTH );
-  }
-
-  if( size.height > 0.0f || GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::DEFAULT )
-  {
-    SetResizePolicy( ResizePolicy::FIXED, Dimension::HEIGHT );
-  }
-
-  mRelayoutData->preferredSize = size;
-
-  mUseAnimatedSize = AnimatedSizeFlag::CLEAR;
-
-  RelayoutRequest();
+  EnsureRelayouter().SetPreferredSize(*this, size);
 }
 
 Vector2 Actor::GetPreferredSize() const
@@ -2555,93 +2392,39 @@ void Actor::SetVisibleInternal( bool visible, SendMessage::Type sendMessage )
   }
 }
 
+void Actor::EmitOrderChangedAndRebuild()
+{
+  Dali::Actor handle( this );
+  mParent->mChildOrderChangedSignal.Emit( handle );
+  if( mIsOnScene && mScene )
+  {
+    mScene->RequestRebuildDepthTree();
+  }
+}
+
 void Actor::SetSiblingOrder( uint32_t order )
 {
-  if ( mParent )
+  if( mParent && SiblingHandler::SetSiblingOrder(*(mParent->mChildren), *this, order))
   {
-    ActorContainer& siblings = *(mParent->mChildren);
-    uint32_t currentOrder = GetSiblingOrder();
-
-    if( order != currentOrder )
-    {
-      if( order == 0 )
-      {
-        LowerToBottom();
-      }
-      else if( order < siblings.size() -1 )
-      {
-        if( order > currentOrder )
-        {
-          RaiseAbove( *siblings[order] );
-        }
-        else
-        {
-          LowerBelow( *siblings[order] );
-        }
-      }
-      else
-      {
-        RaiseToTop();
-      }
-    }
+    EmitOrderChangedAndRebuild();
   }
 }
 
 uint32_t Actor::GetSiblingOrder() const
 {
   uint32_t order = 0;
-
-  if ( mParent )
+  if( mParent )
   {
-    ActorContainer& siblings = *(mParent->mChildren);
-    for( std::size_t i = 0; i < siblings.size(); ++i )
-    {
-      if( siblings[i] == this )
-      {
-        order = static_cast<uint32_t>( i );
-        break;
-      }
-    }
+    order = SiblingHandler::GetSiblingOrder(*(mParent->mChildren), *this);
   }
-
   return order;
-}
-
-void Actor::RequestRebuildDepthTree()
-{
-  if( mIsOnScene )
-  {
-    if( mScene )
-    {
-      mScene->RequestRebuildDepthTree();
-    }
-  }
 }
 
 void Actor::Raise()
 {
-  if ( mParent )
+  if( mParent && SiblingHandler::Raise(*(mParent->mChildren), *this) )
   {
-    ActorContainer& siblings = *(mParent->mChildren);
-    if( siblings.back() != this ) // If not already at end
-    {
-      for( std::size_t i=0; i<siblings.size(); ++i )
-      {
-        if( siblings[i] == this )
-        {
-          // Swap with next
-          ActorPtr next = siblings[i+1];
-          siblings[i+1] = this;
-          siblings[i] = next;
-          break;
-        }
-      }
-    }
-
-    Dali::Actor handle( this );
-    mParent->mChildOrderChangedSignal.Emit( handle );
-
-    RequestRebuildDepthTree();
+    EmitOrderChangedAndRebuild();
   }
   else
   {
@@ -2651,28 +2434,9 @@ void Actor::Raise()
 
 void Actor::Lower()
 {
-  if ( mParent )
+  if( mParent && SiblingHandler::Lower(*(mParent->mChildren), *this) )
   {
-    ActorContainer& siblings = *(mParent->mChildren);
-    if( siblings.front() != this ) // If not already at beginning
-    {
-      for( std::size_t i=1; i<siblings.size(); ++i )
-      {
-        if( siblings[i] == this )
-        {
-          // Swap with previous
-          ActorPtr previous = siblings[i-1];
-          siblings[i-1] = this;
-          siblings[i] = previous;
-          break;
-        }
-      }
-    }
-
-    Dali::Actor handle( this );
-    mParent->mChildOrderChangedSignal.Emit( handle );
-
-    RequestRebuildDepthTree();
+    EmitOrderChangedAndRebuild();
   }
   else
   {
@@ -2682,23 +2446,9 @@ void Actor::Lower()
 
 void Actor::RaiseToTop()
 {
-  if ( mParent )
+  if( mParent && SiblingHandler::RaiseToTop(*(mParent->mChildren), *this) )
   {
-    ActorContainer& siblings = *(mParent->mChildren);
-    if( siblings.back() != this ) // If not already at end
-    {
-      auto iter = std::find( siblings.begin(), siblings.end(), this );
-      if( iter != siblings.end() )
-      {
-        siblings.erase(iter);
-        siblings.push_back(ActorPtr(this));
-      }
-    }
-
-    Dali::Actor handle( this );
-    mParent->mChildOrderChangedSignal.Emit( handle );
-
-    RequestRebuildDepthTree();
+    EmitOrderChangedAndRebuild();
   }
   else
   {
@@ -2708,25 +2458,9 @@ void Actor::RaiseToTop()
 
 void Actor::LowerToBottom()
 {
-  if ( mParent )
+  if( mParent && SiblingHandler::LowerToBottom(*(mParent->mChildren), *this) )
   {
-    ActorContainer& siblings = *(mParent->mChildren);
-    if( siblings.front() != this ) // If not already at bottom,
-    {
-      ActorPtr thisPtr(this); // ensure this actor remains referenced.
-
-      auto iter = std::find( siblings.begin(), siblings.end(), this );
-      if( iter != siblings.end() )
-      {
-        siblings.erase(iter);
-        siblings.insert(siblings.begin(), thisPtr);
-      }
-    }
-
-    Dali::Actor handle( this );
-    mParent->mChildOrderChangedSignal.Emit( handle );
-
-    RequestRebuildDepthTree();
+    EmitOrderChangedAndRebuild();
   }
   else
   {
@@ -2736,30 +2470,9 @@ void Actor::LowerToBottom()
 
 void Actor::RaiseAbove( Internal::Actor& target )
 {
-  if ( mParent )
+  if( mParent && SiblingHandler::RaiseAbove( *(mParent->mChildren), *this, target ))
   {
-    ActorContainer& siblings = *(mParent->mChildren);
-    if( siblings.back() != this && target.mParent == mParent ) // If not already at top
-    {
-      ActorPtr thisPtr(this); // ensure this actor remains referenced.
-
-      auto targetIter = std::find( siblings.begin(), siblings.end(), &target );
-      auto thisIter   = std::find( siblings.begin(), siblings.end(), this );
-      if( thisIter < targetIter )
-      {
-        siblings.erase(thisIter);
-        // Erasing early invalidates the targetIter. (Conversely, inserting first may also
-        // invalidate thisIter)
-        targetIter = std::find( siblings.begin(), siblings.end(), &target );
-        ++targetIter;
-        siblings.insert(targetIter, thisPtr);
-      }
-
-      Dali::Actor handle( this );
-      mParent->mChildOrderChangedSignal.Emit( handle );
-
-      RequestRebuildDepthTree();
-    }
+    EmitOrderChangedAndRebuild();
   }
   else
   {
@@ -2769,27 +2482,9 @@ void Actor::RaiseAbove( Internal::Actor& target )
 
 void Actor::LowerBelow( Internal::Actor& target )
 {
-  if ( mParent )
+  if( mParent && SiblingHandler::LowerBelow(*(mParent->mChildren), *this, target ) )
   {
-    ActorContainer& siblings = *(mParent->mChildren);
-    if( siblings.front() != this && target.mParent == mParent ) // If not already at bottom
-    {
-      ActorPtr thisPtr(this); // ensure this actor remains referenced.
-
-      auto targetIter = std::find( siblings.begin(), siblings.end(), &target );
-      auto thisIter   = std::find( siblings.begin(), siblings.end(), this );
-
-      if( thisIter > targetIter )
-      {
-        siblings.erase(thisIter); // this only invalidates iterators at or after this point.
-        siblings.insert(targetIter, thisPtr);
-      }
-
-      Dali::Actor handle( this );
-      mParent->mChildOrderChangedSignal.Emit( handle );
-
-      RequestRebuildDepthTree();
-    }
+    EmitOrderChangedAndRebuild();
   }
   else
   {
