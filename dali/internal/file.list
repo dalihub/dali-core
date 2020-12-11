@@ -16,7 +16,7 @@ SET( internal_src_files
   ${internal_src_dir}/event/actors/actor-impl.cpp
   ${internal_src_dir}/event/actors/actor-property-handler.cpp
   ${internal_src_dir}/event/actors/actor-relayouter.cpp
-  ${internal_src_dir}/event/actors/actor-siblings.cpp
+  ${internal_src_dir}/event/actors/actor-parent-impl.cpp
   ${internal_src_dir}/event/actors/custom-actor-internal.cpp
   ${internal_src_dir}/event/actors/layer-impl.cpp
   ${internal_src_dir}/event/actors/layer-list.cpp
