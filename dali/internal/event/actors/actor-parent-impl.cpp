@@ -272,7 +272,7 @@ uint32_t ActorParentImpl::GetSiblingOrderOfChild(const Actor& child) const
 void ActorParentImpl::RaiseChild(Actor& child)
 {
   bool changed = false;
-  if(mChildren && mChildren && mChildren->back() != &child) // If not already at end
+  if(mChildren && mChildren->back() != &child) // If not already at end
   {
     for(std::size_t i = 0; i < mChildren->size(); ++i)
     {
