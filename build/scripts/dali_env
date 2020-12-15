@@ -46,6 +46,7 @@ my @system_packages = (
     "libturbojpeg0-dev",
     "libfribidi-dev",
     "libharfbuzz-dev",
+    "libhyphen-dev",
     "doxygen",
     "lcov",
     "libcurl4-gnutls-dev",

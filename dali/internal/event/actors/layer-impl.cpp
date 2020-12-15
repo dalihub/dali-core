@@ -24,46 +24,43 @@
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/type-registry.h>
+
 #include <dali/internal/event/actors/layer-list.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/common/scene-impl.h>
-#include <dali/internal/event/common/event-thread-services.h>
 
 using Dali::Internal::SceneGraph::UpdateManager;
 
 namespace Dali
 {
-
 namespace
 {
-
 typedef Layer::Behavior Behavior;
 
-DALI_ENUM_TO_STRING_TABLE_BEGIN( BEHAVIOR )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Layer, LAYER_UI )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Layer, LAYER_3D )
-DALI_ENUM_TO_STRING_TABLE_END( BEHAVIOR )
+DALI_ENUM_TO_STRING_TABLE_BEGIN(BEHAVIOR)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Layer, LAYER_UI)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Layer, LAYER_3D)
+DALI_ENUM_TO_STRING_TABLE_END(BEHAVIOR)
 
 } // namespace
 
 namespace Internal
 {
-
 namespace
 {
-
 // Properties
 
 //              Name                Type      writable animatable constraint-input  enum for index-checking
 DALI_PROPERTY_TABLE_BEGIN
-DALI_PROPERTY( "clippingEnable",    BOOLEAN,    true,    false,   true,   Dali::Layer::Property::CLIPPING_ENABLE )
-DALI_PROPERTY( "clippingBox",       RECTANGLE,  true,    false,   true,   Dali::Layer::Property::CLIPPING_BOX    )
-DALI_PROPERTY( "behavior",          INTEGER,    true,    false,   false,  Dali::Layer::Property::BEHAVIOR        )
-DALI_PROPERTY( "depth",             INTEGER,    false,   false,   false,  Dali::Layer::Property::DEPTH           )
-DALI_PROPERTY( "depthTest",         BOOLEAN,    true,    false,   false,  Dali::Layer::Property::DEPTH_TEST      )
-DALI_PROPERTY( "consumesTouch",     BOOLEAN,    true,    false,   false,  Dali::Layer::Property::CONSUMES_TOUCH  )
-DALI_PROPERTY( "consumesHover",     BOOLEAN,    true,    false,   false,  Dali::Layer::Property::CONSUMES_HOVER  )
-DALI_PROPERTY_TABLE_END( DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, LayerDefaultProperties )
+DALI_PROPERTY("clippingEnable", BOOLEAN, true, false, true, Dali::Layer::Property::CLIPPING_ENABLE)
+DALI_PROPERTY("clippingBox", RECTANGLE, true, false, true, Dali::Layer::Property::CLIPPING_BOX)
+DALI_PROPERTY("behavior", INTEGER, true, false, false, Dali::Layer::Property::BEHAVIOR)
+DALI_PROPERTY("depth", INTEGER, false, false, false, Dali::Layer::Property::DEPTH)
+DALI_PROPERTY("depthTest", BOOLEAN, true, false, false, Dali::Layer::Property::DEPTH_TEST)
+DALI_PROPERTY("consumesTouch", BOOLEAN, true, false, false, Dali::Layer::Property::CONSUMES_TOUCH)
+DALI_PROPERTY("consumesHover", BOOLEAN, true, false, false, Dali::Layer::Property::CONSUMES_HOVER)
+DALI_PROPERTY_TABLE_END(DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, LayerDefaultProperties)
 
 // Actions
 
@@ -77,7 +74,7 @@ BaseHandle Create()
   return Dali::Layer::New();
 }
 
-TypeRegistration mType( typeid( Dali::Layer ), typeid( Dali::Actor ), Create, LayerDefaultProperties );
+TypeRegistration mType(typeid(Dali::Layer), typeid(Dali::Actor), Create, LayerDefaultProperties);
 
 TypeAction a1(mType, std::string(ACTION_RAISE), &Layer::DoAction);
 TypeAction a2(mType, std::string(ACTION_LOWER), &Layer::DoAction);
@@ -86,14 +83,13 @@ TypeAction a4(mType, std::string(ACTION_LOWER_TO_BOTTOM), &Layer::DoAction);
 
 } // unnamed namespace
 
-
 LayerPtr Layer::New()
 {
   // create node, nodes are owned by UpdateManager
-  SceneGraph::Layer* layerNode = SceneGraph::Layer::New();
-  OwnerPointer< SceneGraph::Node > transferOwnership( layerNode );
-  AddNodeMessage( EventThreadServices::Get().GetUpdateManager(), transferOwnership );
-  LayerPtr layer( new Layer( Actor::LAYER, *layerNode ) );
+  SceneGraph::Layer*             layerNode = SceneGraph::Layer::New();
+  OwnerPointer<SceneGraph::Node> transferOwnership(layerNode);
+  AddNodeMessage(EventThreadServices::Get().GetUpdateManager(), transferOwnership);
+  LayerPtr layer(new Layer(Actor::LAYER, *layerNode));
 
   // Second-phase construction
   layer->Initialize();
@@ -101,14 +97,14 @@ LayerPtr Layer::New()
   return layer;
 }
 
-LayerPtr Layer::NewRoot( LayerList& layerList )
+LayerPtr Layer::NewRoot(LayerList& layerList)
 {
   // create node, nodes are owned by UpdateManager
-  SceneGraph::Layer* rootLayer = SceneGraph::Layer::New();
-  OwnerPointer< SceneGraph::Layer > transferOwnership( rootLayer );
-  InstallRootMessage( EventThreadServices::Get().GetUpdateManager(), transferOwnership );
+  SceneGraph::Layer*              rootLayer = SceneGraph::Layer::New();
+  OwnerPointer<SceneGraph::Layer> transferOwnership(rootLayer);
+  InstallRootMessage(EventThreadServices::Get().GetUpdateManager(), transferOwnership);
 
-  LayerPtr root( new Layer( Actor::ROOT_LAYER, *rootLayer ) );
+  LayerPtr root(new Layer(Actor::ROOT_LAYER, *rootLayer));
 
   // root actor is immediately considered to be on-stage
   root->mIsOnScene = true;
@@ -118,22 +114,22 @@ LayerPtr Layer::NewRoot( LayerList& layerList )
 
   // layer-list must be set for the root layer
   root->mLayerList = &layerList;
-  layerList.SetRootLayer( &(*root) );
-  layerList.RegisterLayer( *root );
+  layerList.SetRootLayer(&(*root));
+  layerList.RegisterLayer(*root);
 
   return root;
 }
 
-Layer::Layer( Actor::DerivedType type, const SceneGraph::Layer& layer )
-: Actor( type, layer ),
-  mLayerList( nullptr ),
-  mClippingBox( 0, 0, 0, 0 ),
-  mSortFunction( Layer::ZValue ),
-  mBehavior( Dali::Layer::LAYER_UI ),
-  mIsClipping( false ),
-  mDepthTestDisabled( true ),
-  mTouchConsumed( false ),
-  mHoverConsumed( false )
+Layer::Layer(Actor::DerivedType type, const SceneGraph::Layer& layer)
+: Actor(type, layer),
+  mLayerList(nullptr),
+  mClippingBox(0, 0, 0, 0),
+  mSortFunction(Layer::ZValue),
+  mBehavior(Dali::Layer::LAYER_UI),
+  mIsClipping(false),
+  mDepthTestDisabled(true),
+  mTouchConsumed(false),
+  mHoverConsumed(false)
 {
 }
 
@@ -143,26 +139,26 @@ void Layer::OnInitialize()
 
 Layer::~Layer()
 {
-  if ( mIsRoot )
+  if(mIsRoot)
   {
     // Guard to allow handle destruction after Core has been destroyed
-    if( EventThreadServices::IsCoreRunning() )
+    if(EventThreadServices::IsCoreRunning())
     {
-      UninstallRootMessage( GetEventThreadServices().GetUpdateManager(), &GetSceneGraphLayer() );
+      UninstallRootMessage(GetEventThreadServices().GetUpdateManager(), &GetSceneGraphLayer());
 
-      GetEventThreadServices().UnregisterObject( this );
+      GetEventThreadServices().UnregisterObject(this);
     }
   }
 }
 
 unsigned int Layer::GetDepth() const
 {
-  return mLayerList ? mLayerList->GetDepth( this ) : 0u;
+  return mLayerList ? mLayerList->GetDepth(this) : 0u;
 }
 
 void Layer::Raise()
 {
-  if ( mLayerList )
+  if(mLayerList)
   {
     mLayerList->RaiseLayer(*this);
   }
@@ -170,43 +166,43 @@ void Layer::Raise()
 
 void Layer::Lower()
 {
-  if ( mLayerList )
+  if(mLayerList)
   {
     mLayerList->LowerLayer(*this);
   }
 }
 
-void Layer::RaiseAbove( const Internal::Layer& target )
+void Layer::RaiseAbove(const Internal::Layer& target)
 {
   // cannot raise above ourself, both have to be on the scene
-  if( ( this != &target ) && OnScene() && target.OnScene() )
+  if((this != &target) && OnScene() && target.OnScene())
   {
     // get parameters depth
     const uint32_t targetDepth = target.GetDepth();
-    if( GetDepth() < targetDepth )
+    if(GetDepth() < targetDepth)
     {
-      MoveAbove( target );
+      MoveAbove(target);
     }
   }
 }
 
-void Layer::LowerBelow( const Internal::Layer& target )
+void Layer::LowerBelow(const Internal::Layer& target)
 {
   // cannot lower below ourself, both have to be on the scene
-  if( ( this != &target ) && OnScene() && target.OnScene() )
+  if((this != &target) && OnScene() && target.OnScene())
   {
     // get parameters depth
     const uint32_t targetDepth = target.GetDepth();
-    if( GetDepth() > targetDepth )
+    if(GetDepth() > targetDepth)
     {
-      MoveBelow( target );
+      MoveBelow(target);
     }
   }
 }
 
 void Layer::RaiseToTop()
 {
-  if ( mLayerList )
+  if(mLayerList)
   {
     mLayerList->RaiseLayerToTop(*this);
   }
@@ -214,83 +210,83 @@ void Layer::RaiseToTop()
 
 void Layer::LowerToBottom()
 {
-  if ( mLayerList )
+  if(mLayerList)
   {
     mLayerList->LowerLayerToBottom(*this);
   }
 }
 
-void Layer::MoveAbove( const Internal::Layer& target )
+void Layer::MoveAbove(const Internal::Layer& target)
 {
   // cannot raise above ourself, both have to be on the scene
-  if( ( this != &target ) && mLayerList && target.OnScene() )
+  if((this != &target) && mLayerList && target.OnScene())
   {
-    mLayerList->MoveLayerAbove(*this, target );
+    mLayerList->MoveLayerAbove(*this, target);
   }
 }
 
-void Layer::MoveBelow( const Internal::Layer& target )
+void Layer::MoveBelow(const Internal::Layer& target)
 {
   // cannot lower below ourself, both have to be on the scene
-  if( ( this != &target ) && mLayerList && target.OnScene() )
+  if((this != &target) && mLayerList && target.OnScene())
   {
-    mLayerList->MoveLayerBelow(*this, target );
+    mLayerList->MoveLayerBelow(*this, target);
   }
 }
 
-void Layer::SetBehavior( Dali::Layer::Behavior behavior )
+void Layer::SetBehavior(Dali::Layer::Behavior behavior)
 {
   mBehavior = behavior;
 
   // Notify update side object.
-  SetBehaviorMessage( GetEventThreadServices(), GetSceneGraphLayer(), behavior );
+  SetBehaviorMessage(GetEventThreadServices(), GetSceneGraphLayer(), behavior);
   // By default, disable depth test for LAYER_UI, and enable for LAYER_3D.
-  SetDepthTestDisabled( mBehavior == Dali::Layer::LAYER_UI );
+  SetDepthTestDisabled(mBehavior == Dali::Layer::LAYER_UI);
 }
 
 void Layer::SetClipping(bool enabled)
 {
-  if (enabled != mIsClipping)
+  if(enabled != mIsClipping)
   {
     mIsClipping = enabled;
 
     // layerNode is being used in a separate thread; queue a message to set the value
-    SetClippingMessage( GetEventThreadServices(), GetSceneGraphLayer(), mIsClipping );
+    SetClippingMessage(GetEventThreadServices(), GetSceneGraphLayer(), mIsClipping);
   }
 }
 
 void Layer::SetClippingBox(int x, int y, int width, int height)
 {
-  if( ( x != mClippingBox.x ) ||
-      ( y != mClippingBox.y ) ||
-      ( width != mClippingBox.width ) ||
-      ( height != mClippingBox.height ) )
+  if((x != mClippingBox.x) ||
+     (y != mClippingBox.y) ||
+     (width != mClippingBox.width) ||
+     (height != mClippingBox.height))
   {
     // Clipping box is not animatable; this is the most up-to-date value
     mClippingBox.Set(x, y, width, height);
 
     // Convert mClippingBox to GL based coordinates (from bottom-left)
-    ClippingBox clippingBox( mClippingBox );
+    ClippingBox clippingBox(mClippingBox);
 
-    if( mScene )
+    if(mScene)
     {
-      clippingBox.y = static_cast<int32_t>( mScene->GetSize().height ) - clippingBox.y - clippingBox.height;
+      clippingBox.y = static_cast<int32_t>(mScene->GetSize().height) - clippingBox.y - clippingBox.height;
 
       // layerNode is being used in a separate thread; queue a message to set the value
-      SetClippingBoxMessage( GetEventThreadServices(), GetSceneGraphLayer(), clippingBox );
+      SetClippingBoxMessage(GetEventThreadServices(), GetSceneGraphLayer(), clippingBox);
     }
   }
 }
 
-void Layer::SetDepthTestDisabled( bool disable )
+void Layer::SetDepthTestDisabled(bool disable)
 {
-  if( disable != mDepthTestDisabled )
+  if(disable != mDepthTestDisabled)
   {
     mDepthTestDisabled = disable;
 
     // Send message.
     // layerNode is being used in a separate thread; queue a message to set the value
-    SetDepthTestDisabledMessage( GetEventThreadServices(), GetSceneGraphLayer(), mDepthTestDisabled );
+    SetDepthTestDisabledMessage(GetEventThreadServices(), GetSceneGraphLayer(), mDepthTestDisabled);
   }
 }
 
@@ -301,16 +297,16 @@ bool Layer::IsDepthTestDisabled() const
 
 void Layer::SetSortFunction(Dali::Layer::SortFunctionType function)
 {
-  if( function != mSortFunction )
+  if(function != mSortFunction)
   {
     mSortFunction = function;
 
     // layerNode is being used in a separate thread; queue a message to set the value
-    SetSortFunctionMessage( GetEventThreadServices(), GetSceneGraphLayer(), mSortFunction );
+    SetSortFunctionMessage(GetEventThreadServices(), GetSceneGraphLayer(), mSortFunction);
   }
 }
 
-void Layer::SetTouchConsumed( bool consume )
+void Layer::SetTouchConsumed(bool consume)
 {
   mTouchConsumed = consume;
 }
@@ -320,7 +316,7 @@ bool Layer::IsTouchConsumed() const
   return mTouchConsumed;
 }
 
-void Layer::SetHoverConsumed( bool consume )
+void Layer::SetHoverConsumed(bool consume)
 {
   mHoverConsumed = consume;
 }
@@ -332,23 +328,23 @@ bool Layer::IsHoverConsumed() const
 
 void Layer::OnSceneConnectionInternal()
 {
-  if ( !mIsRoot )
+  if(!mIsRoot)
   {
-    DALI_ASSERT_DEBUG( NULL == mLayerList );
+    DALI_ASSERT_DEBUG(NULL == mLayerList);
 
     // Find the ordered layer-list
-    for ( Actor* parent = mParent; parent != nullptr; parent = parent->GetParent() )
+    for(Actor* parent = GetParent(); parent != nullptr; parent = parent->GetParent())
     {
-      if( parent->IsLayer() )
+      if(parent->IsLayer())
       {
-        Layer* parentLayer = static_cast< Layer* >( parent ); // cheaper than dynamic_cast
-        mLayerList = parentLayer->mLayerList;
+        Layer* parentLayer = static_cast<Layer*>(parent); // cheaper than dynamic_cast
+        mLayerList         = parentLayer->mLayerList;
       }
     }
   }
 
-  DALI_ASSERT_DEBUG( NULL != mLayerList );
-  mLayerList->RegisterLayer( *this );
+  DALI_ASSERT_DEBUG(NULL != mLayerList);
+  mLayerList->RegisterLayer(*this);
 }
 
 void Layer::OnSceneDisconnectionInternal()
@@ -361,28 +357,28 @@ void Layer::OnSceneDisconnectionInternal()
 
 const SceneGraph::Layer& Layer::GetSceneGraphLayer() const
 {
-  return static_cast< const SceneGraph::Layer& >( GetNode() ); // we know our node is a layer node
+  return static_cast<const SceneGraph::Layer&>(GetNode()); // we know our node is a layer node
 }
 
-void Layer::SetDefaultProperty( Property::Index index, const Property::Value& propertyValue )
+void Layer::SetDefaultProperty(Property::Index index, const Property::Value& propertyValue)
 {
-  if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
+  if(index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT)
   {
-    Actor::SetDefaultProperty( index, propertyValue );
+    Actor::SetDefaultProperty(index, propertyValue);
   }
   else
   {
-    switch( index )
+    switch(index)
     {
       case Dali::Layer::Property::CLIPPING_ENABLE:
       {
-        SetClipping( propertyValue.Get<bool>() );
+        SetClipping(propertyValue.Get<bool>());
         break;
       }
       case Dali::Layer::Property::CLIPPING_BOX:
       {
-        Rect<int32_t> clippingBox( propertyValue.Get<Rect<int32_t> >() );
-        SetClippingBox( clippingBox.x, clippingBox.y, clippingBox.width, clippingBox.height );
+        Rect<int32_t> clippingBox(propertyValue.Get<Rect<int32_t> >());
+        SetClippingBox(clippingBox.x, clippingBox.y, clippingBox.width, clippingBox.height);
         break;
       }
       case Dali::Layer::Property::BEHAVIOR:
@@ -390,37 +386,37 @@ void Layer::SetDefaultProperty( Property::Index index, const Property::Value& pr
         Behavior behavior = mBehavior;
 
         Property::Type type = propertyValue.GetType();
-        if( type == Property::STRING )
+        if(type == Property::STRING)
         {
-          if( Scripting::GetEnumeration< Behavior >( propertyValue.Get< std::string >().c_str(), BEHAVIOR_TABLE, BEHAVIOR_TABLE_COUNT, behavior ) )
+          if(Scripting::GetEnumeration<Behavior>(propertyValue.Get<std::string>().c_str(), BEHAVIOR_TABLE, BEHAVIOR_TABLE_COUNT, behavior))
           {
-            SetBehavior( behavior );
+            SetBehavior(behavior);
           }
         }
-        else if ( type == Property::INTEGER )
+        else if(type == Property::INTEGER)
         {
-          SetBehavior( propertyValue.Get< Dali::Layer::Behavior >() );
+          SetBehavior(propertyValue.Get<Dali::Layer::Behavior>());
         }
         break;
       }
       case Dali::Layer::Property::DEPTH_TEST:
       {
-        SetDepthTestDisabled( !propertyValue.Get<bool>() );
+        SetDepthTestDisabled(!propertyValue.Get<bool>());
         break;
       }
       case Dali::Layer::Property::CONSUMES_TOUCH:
       {
-        SetTouchConsumed( propertyValue.Get<bool>() );
+        SetTouchConsumed(propertyValue.Get<bool>());
         break;
       }
       case Dali::Layer::Property::CONSUMES_HOVER:
       {
-        SetHoverConsumed( propertyValue.Get<bool>() );
+        SetHoverConsumed(propertyValue.Get<bool>());
         break;
       }
       default:
       {
-        DALI_LOG_WARNING( "Unknown property (%d)\n", index );
+        DALI_LOG_WARNING("Unknown property (%d)\n", index);
         break;
       }
     } // switch(index)
@@ -428,16 +424,16 @@ void Layer::SetDefaultProperty( Property::Index index, const Property::Value& pr
   } // else
 }
 
-Property::Value Layer::GetDefaultProperty( Property::Index index ) const
+Property::Value Layer::GetDefaultProperty(Property::Index index) const
 {
   Property::Value ret;
-  if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
+  if(index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT)
   {
-    ret = Actor::GetDefaultProperty( index );
+    ret = Actor::GetDefaultProperty(index);
   }
   else
   {
-    switch( index )
+    switch(index)
     {
       case Dali::Layer::Property::CLIPPING_ENABLE:
       {
@@ -456,7 +452,7 @@ Property::Value Layer::GetDefaultProperty( Property::Index index ) const
       }
       case Dali::Layer::Property::DEPTH:
       {
-        ret = static_cast<int>( GetDepth() );
+        ret = static_cast<int>(GetDepth());
         break;
       }
       case Dali::Layer::Property::DEPTH_TEST:
@@ -476,7 +472,7 @@ Property::Value Layer::GetDefaultProperty( Property::Index index ) const
       }
       default:
       {
-        DALI_LOG_WARNING( "Unknown property (%d)\n", index );
+        DALI_LOG_WARNING("Unknown property (%d)\n", index);
         break;
       }
     } // switch(index)
@@ -485,27 +481,27 @@ Property::Value Layer::GetDefaultProperty( Property::Index index ) const
   return ret;
 }
 
-Property::Value Layer::GetDefaultPropertyCurrentValue( Property::Index index ) const
+Property::Value Layer::GetDefaultPropertyCurrentValue(Property::Index index) const
 {
   Property::Value ret;
-  if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
+  if(index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT)
   {
-    ret = Actor::GetDefaultPropertyCurrentValue( index );
+    ret = Actor::GetDefaultPropertyCurrentValue(index);
   }
   else
   {
-    ret = GetDefaultProperty( index ); // Layer only has event-side properties
+    ret = GetDefaultProperty(index); // Layer only has event-side properties
   }
 
   return ret;
 }
 
-bool Layer::DoAction( BaseObject* object, const std::string& actionName, const Property::Map& /*attributes*/ )
+bool Layer::DoAction(BaseObject* object, const std::string& actionName, const Property::Map& /*attributes*/)
 {
-  bool done = false;
-  Layer* layer = dynamic_cast<Layer*>( object );
+  bool   done  = false;
+  Layer* layer = dynamic_cast<Layer*>(object);
 
-  if( layer )
+  if(layer)
   {
     std::string_view name(actionName);
 

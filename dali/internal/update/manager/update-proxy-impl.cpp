@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,7 +74,8 @@ bool UpdateProxy::GetPosition( uint32_t id, Vector3& position ) const
   const SceneGraph::Node* node = GetNodeWithId( id );
   if( node )
   {
-    position = mTransformManager.GetVector3PropertyValue( node->mTransformId, SceneGraph::TRANSFORM_PROPERTY_POSITION );
+    const SceneGraph::TransformManager& transformManager = mTransformManager; // To ensure we call the const getter
+    position = transformManager.GetVector3PropertyValue( node->mTransformId, SceneGraph::TRANSFORM_PROPERTY_POSITION );
     success = true;
   }
   return success;
@@ -110,7 +111,8 @@ bool UpdateProxy::GetSize( uint32_t id, Vector3& size ) const
   const SceneGraph::Node* node = GetNodeWithId( id );
   if( node )
   {
-    size = mTransformManager.GetVector3PropertyValue( node->mTransformId, SceneGraph::TRANSFORM_PROPERTY_SIZE );
+    const SceneGraph::TransformManager& transformManager = mTransformManager; // To ensure we call the const getter
+    size = transformManager.GetVector3PropertyValue( node->mTransformId, SceneGraph::TRANSFORM_PROPERTY_SIZE );
     success = true;
   }
   return success;
@@ -146,8 +148,9 @@ bool UpdateProxy::GetPositionAndSize( uint32_t id, Vector3& position, Vector3& s
   const SceneGraph::Node* node = GetNodeWithId( id );
   if( node )
   {
-    position = mTransformManager.GetVector3PropertyValue( node->mTransformId, SceneGraph::TRANSFORM_PROPERTY_POSITION );
-    size = mTransformManager.GetVector3PropertyValue( node->mTransformId, SceneGraph::TRANSFORM_PROPERTY_SIZE );
+    const SceneGraph::TransformManager& transformManager = mTransformManager; // To ensure we call the const getter
+    position = transformManager.GetVector3PropertyValue( node->mTransformId, SceneGraph::TRANSFORM_PROPERTY_POSITION );
+    size = transformManager.GetVector3PropertyValue( node->mTransformId, SceneGraph::TRANSFORM_PROPERTY_SIZE );
     success = true;
   }
   return success;
@@ -159,7 +162,8 @@ bool UpdateProxy::GetScale( uint32_t id, Vector3& scale ) const
   const SceneGraph::Node* node = GetNodeWithId( id );
   if( node )
   {
-    scale = mTransformManager.GetVector3PropertyValue( node->mTransformId, SceneGraph::TRANSFORM_PROPERTY_SCALE );
+    const SceneGraph::TransformManager& transformManager = mTransformManager; // To ensure we call the const getter
+    scale = transformManager.GetVector3PropertyValue( node->mTransformId, SceneGraph::TRANSFORM_PROPERTY_SCALE );
     success = true;
   }
 
@@ -193,7 +197,7 @@ bool UpdateProxy::BakeScale( uint32_t id, const Vector3& scale )
 bool UpdateProxy::GetColor( uint32_t id, Vector4& color ) const
 {
   bool success = false;
-  SceneGraph::Node* node = GetNodeWithId( id );
+  const SceneGraph::Node* node = GetNodeWithId( id );
   if( node )
   {
     color = node->mColor.Get( mCurrentBufferIndex );

@@ -2,7 +2,7 @@
 #define TRANSFORM_MANAGER_PROPERTY_H_
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,7 +63,13 @@ struct TransformManagerPropertyHandler : public AnimatablePropertyBase
    * Retrieve a component of property
    * @param[in] component The component of the property
    */
-  virtual const float& GetFloatComponent(uint32_t component)=0;
+  virtual const float& GetFloatComponent(uint32_t component) const
+  {
+    DALI_ASSERT_DEBUG( 0 && "Invalid call");
+
+    static const float value = 0.0f;
+    return value;
+  }
 
   /**
    * Set the property value. This will only persist for the current frame; the property
@@ -170,7 +176,8 @@ struct TransformManagerPropertyVector3 : public TransformManagerPropertyHandler<
 
   const Vector3& Get( BufferIndex bufferIndex ) const override
   {
-    return mTxManager->GetVector3PropertyValue( mId, mProperty );
+    const TransformManager* txManager = mTxManager;
+    return txManager->GetVector3PropertyValue( mId, mProperty );
   }
 
   const Vector3& GetVector3( BufferIndex bufferIndex ) const override
@@ -178,9 +185,10 @@ struct TransformManagerPropertyVector3 : public TransformManagerPropertyHandler<
     return Get(bufferIndex);
   }
 
-  const float& GetFloatComponent( uint32_t component ) override
+  const float& GetFloatComponent( uint32_t component ) const override
   {
-    return mTxManager->GetVector3PropertyComponentValue( mId, mProperty, component );
+    const TransformManager* txManager = mTxManager;
+    return txManager->GetVector3PropertyComponentValue( mId, mProperty, component );
   }
 
   void Set(BufferIndex bufferIndex, const Vector3& value) override
@@ -261,12 +269,8 @@ public:
 
   const Quaternion& Get( BufferIndex bufferIndex ) const override
   {
-    return mTxManager->GetQuaternionPropertyValue( mId );
-  }
-
-  const float& GetFloatComponent( uint32_t component) override
-  {
-    return mTxManager->GetQuaternionPropertyValue( mId ).mVector[component];
+    const TransformManager* txManager = mTxManager;
+    return txManager->GetQuaternionPropertyValue( mId );
   }
 
   void Set(BufferIndex bufferIndex, const Quaternion& value) override
@@ -352,9 +356,10 @@ public:
    */
   void ComputeTransformComponent() const
   {
-    if( mTxManager )
+    const TransformManager* txManager = mTxManager;
+    if( txManager )
     {
-      const Matrix& worldMatrix = mTxManager->GetWorldMatrix(mId);
+      const Matrix& worldMatrix = txManager->GetWorldMatrix(mId);
 
       if( mProperty == TRANSFORM_PROPERTY_WORLD_POSITION )
       {
@@ -512,9 +517,10 @@ public:
    */
   void ComputeTransformComponent() const
   {
-    if( mTxManager )
+    const TransformManager* txManager = mTxManager;
+    if( txManager )
     {
-      const Matrix& worldMatrix = mTxManager->GetWorldMatrix(mId);
+      const Matrix& worldMatrix = txManager->GetWorldMatrix(mId);
       Vector3 position, scale;
       worldMatrix.GetTransformComponents(position, mValue, scale);
     }
@@ -660,9 +666,10 @@ public:
    */
   const Matrix& GetMatrix( BufferIndex bufferIndex ) const override
   {
-    if( mTxManager )
+    const TransformManager* txManager = mTxManager;
+    if( txManager )
     {
-      return mTxManager->GetWorldMatrix(mId);
+      return txManager->GetWorldMatrix(mId);
     }
 
     return Matrix::IDENTITY;
@@ -673,9 +680,10 @@ public:
    */
   const Matrix& GetConstraintInputMatrix( BufferIndex bufferIndex ) const override
   {
-    if( mTxManager )
+    const TransformManager* txManager = mTxManager;
+    if( txManager )
     {
-      return mTxManager->GetWorldMatrix(mId);
+      return txManager->GetWorldMatrix(mId);
     }
 
     return Matrix::IDENTITY;
