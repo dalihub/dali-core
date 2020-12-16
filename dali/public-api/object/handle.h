@@ -364,6 +364,8 @@ public:
    * @SINCE_1_0.0
    * @param[in] index The index of the property
    * @return The property value
+   * @note This returns the value set by SetProperty() or the animation target value if it is being animated.
+   * @note To get the current value on the scene-graph, use GetCurrentProperty().
    */
   Property::Value GetProperty(Property::Index index) const;
 
@@ -374,6 +376,7 @@ public:
    * @param[in] index The index of the property
    * @return The property value
    * @pre The property types match i.e. PropertyTypes::Get<T>() is equal to GetPropertyType(index).
+   * @see GetProperty()
    */
   template<typename T>
   T GetProperty(Property::Index index) const
@@ -389,6 +392,9 @@ public:
    * @SINCE_1_2.41
    * @param[in] index The index of the property
    * @return The property value
+   * @note This returns the value of the property in the last rendered frame so can be different to that
+   *       set by SetProperty() if the set-message has not been processed by the scene-graph yet.
+   * @note To retrieve the value set by SetProperty(), use GetProperty().
    */
   Property::Value GetCurrentProperty(Property::Index index) const;
 
@@ -399,6 +405,7 @@ public:
    * @param[in] index The index of the property
    * @return The property value
    * @pre The property types match i.e. PropertyTypes::Get<T>() is equal to GetPropertyType(index).
+   * @see GetCurrentProperty()
    */
   template<typename T>
   T GetCurrentProperty(Property::Index index) const
