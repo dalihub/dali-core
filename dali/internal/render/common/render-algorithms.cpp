@@ -159,7 +159,7 @@ inline void SetupStencilClipping( const RenderItem& item, Context& context, uint
     // We are reading from the stencil buffer. Set up the stencil accordingly
     // This calculation sets all the bits up to the current depth bit.
     // This has the effect of testing that the pixel being written to exists in every bit-plane up to the current depth.
-    context.StencilFunc( GL_EQUAL, currentDepthMask, 0xff );
+    context.StencilFunc( GL_EQUAL, currentDepthMask, currentDepthMask );
     context.StencilOp( GL_KEEP, GL_KEEP, GL_KEEP );
   }
 }
