@@ -67,7 +67,7 @@ public:
    *                            a compiled shader program binary if one could be found, else an
    *                            empty binary buffer cleared to size zero.
    */
-  Internal::ShaderDataPtr Load( const std::string& vertexSource, const std::string& fragmentSource, const Dali::Shader::Hint::Value hints, size_t& shaderHash );
+  Internal::ShaderDataPtr Load( std::string_view vertexSource, std::string_view fragmentSource, const Dali::Shader::Hint::Value hints, size_t& shaderHash );
 
   /**
    * @brief Saves shader to memory cache and filesystem.

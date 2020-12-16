@@ -23,8 +23,8 @@
 
 namespace Dali
 {
-Shader Shader::New(const std::string& vertexShader,
-                   const std::string& fragmentShader,
+Shader Shader::New(std::string_view vertexShader,
+                   std::string_view fragmentShader,
                    Hint::Value        hints)
 {
   Internal::ShaderPtr renderer = Internal::Shader::New(vertexShader, fragmentShader, hints);

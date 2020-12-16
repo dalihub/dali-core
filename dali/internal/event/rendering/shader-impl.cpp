@@ -91,8 +91,8 @@ Property::Value HintString(const Dali::Shader::Hint::Value& hints)
 
 } // unnamed namespace
 
-ShaderPtr Shader::New( const std::string& vertexShader,
-                       const std::string& fragmentShader,
+ShaderPtr Shader::New( std::string_view vertexShader,
+                       std::string_view fragmentShader,
                        Dali::Shader::Hint::Value hints )
 {
   // create scene object first so it's guaranteed to exist for the event side
@@ -195,8 +195,8 @@ Shader::Shader( const SceneGraph::Shader* sceneObject )
 {
 }
 
-void Shader::SetShader( const std::string& vertexSource,
-                        const std::string& fragmentSource,
+void Shader::SetShader( std::string_view vertexSource,
+                        std::string_view fragmentSource,
                         Dali::Shader::Hint::Value hints )
 {
   // Try to load a pre-compiled shader binary for the source pair:

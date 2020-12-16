@@ -49,8 +49,8 @@ public:
   /**
    * @copydoc Dali::Shader::New()
    */
-  static ShaderPtr New( const std::string& vertexShader,
-                        const std::string& fragmentShader,
+  static ShaderPtr New( std::string_view vertexShader,
+                        std::string_view fragmentShader,
                         Dali::Shader::Hint::Value hints );
 
   /**
@@ -88,7 +88,7 @@ private: // implementation
   /**
    * Second stage initialization
    */
-  void SetShader( const std::string& vertexShader, const std::string& fragmentShader, Dali::Shader::Hint::Value hints );
+  void SetShader( std::string_view vertexShader, std::string_view fragmentShader, Dali::Shader::Hint::Value hints );
 
 protected:
   /**
