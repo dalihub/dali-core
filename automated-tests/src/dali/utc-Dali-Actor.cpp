@@ -4367,7 +4367,7 @@ int UtcDaliActorPropertyClippingNestedChildren(void)
     DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("StencilOp", "7680, 7681, 7681", startIndex)); // GL_KEEP, GL_REPLACE, GL_REPLACE
 
     // Check the correct setup was done to test against first bit-plane (only) of the stencil buffer.
-    DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("StencilFunc", "514, 1, 255", startIndex));    // 514 is GL_EQUAL
+    DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("StencilFunc", "514, 1, 1", startIndex));    // 514 is GL_EQUAL
     DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("StencilOp", "7680, 7680, 7680", startIndex)); // GL_KEEP, GL_KEEP, GL_KEEP
 
     // Check we are set up to write to the second bitplane of the stencil buffer (only).
@@ -4377,7 +4377,7 @@ int UtcDaliActorPropertyClippingNestedChildren(void)
 
     // Check we are set up to test against both the first and second bit-planes of the stencil buffer.
     // (Both must be set to pass the check).
-    DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("StencilFunc", "514, 3, 255", startIndex));    // 514 is GL_EQUAL, Test both bit-planes 1 & 2
+    DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("StencilFunc", "514, 3, 3", startIndex));    // 514 is GL_EQUAL, Test both bit-planes 1 & 2
     DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("StencilOp", "7680, 7680, 7680", startIndex)); // GL_KEEP, GL_KEEP, GL_KEEP
 
     // If we are on the first loop, set the layer to 3D and loop to perform the test again.
