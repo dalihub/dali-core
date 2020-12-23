@@ -83,7 +83,7 @@ my %options = (
     "output:s"     => { "optvar"=>\$opt_output, "desc"=>"Generate html output"},
     "help"         => { "optvar"=>\$opt_help, "desc"=>""},
     "quiet"        => { "optvar"=>\$opt_quiet, "desc"=>""},
-    "verbose"      => { "optvar"=>\$opt_verbose, "desc"=>"" });
+    "verbose"      => { "optvar"=>\$opt_verbose, "desc"=>"Also output coverage" });
 
 my %longOptions = map { $_ => $options{$_}->{"optvar"} } keys(%options);
 GetOptions( %longOptions ) or pod2usage(2);
@@ -875,15 +875,14 @@ sub info(@)
     }
 }
 
-# NEW STUFF
 
-## Format per file, repeated, no linebreak
+# Format per file, repeated, no linebreak
 # <diffcmd>
 # index c1..c2 c3
 # --- a/<left-hand-side-file>
 # +++ b/<right-hand-side-file>
 # <diff hunks>
-
+#
 # Format of each diff hunk, repeated, no linebreak
 # @@ <ranges> @@ line
 # 3 lines of context
@@ -986,7 +985,7 @@ sub parse_diff
     $files{$file}->{"patch"} = [@checklines];
     $files{$file}->{"b_lines"} = {%b_lines};
 
-    my %filter = map { $_ => $files{$_} } grep {m!^dali(-toolkit)?/!} (keys(%files));;
+    my %filter = map { $_ => $files{$_} } grep {m!^dali(-toolkit|-scene-loader)?/!} (keys(%files));
 
     if($pd_debug)
     {
@@ -1063,6 +1062,13 @@ sub calc_patch_coverage_percentage
 
         my $abs_filename = File::Spec->rel2abs($file, $root);
         my $sumcountref = $info_data{$abs_filename}->{"sum"};
+
+        if($debug>1)
+        {
+            print("File:  $abs_filename\n");
+            print Dumper($info_data{$abs_filename});
+            print "\n";
+        }
 
         if( $sumcountref )
         {
@@ -1312,27 +1318,6 @@ EOH
 ##                                    MAIN                                    ##
 ################################################################################
 
-my $cwd = getcwd(); # expect this to be automated-tests folder
-
-# execute coverage.sh, generating build/tizen/dali.info from lib, and
-# *.dir/dali.info. Don't generate html
-print `./coverage.sh -n`;
-chdir "..";
-$root = getcwd();
-
-our %info_data; # Hash of all data from .info files
-my @info_files = split(/\n/, `find . -name dali.info`);
-my %new_info;
-
-# Read in all specified .info files
-foreach (@info_files)
-{
-    %new_info = %{read_info_file($_)};
-
-    # Combine %new_info with %info_data
-    %info_data = %{combine_info_files(\%info_data, \%new_info)};
-}
-
 
 # Generate git diff command
 my @cmd=('--no-pager','diff','--no-ext-diff','-U0','--no-color');
@@ -1362,13 +1347,38 @@ else
         }
         else
         {
-            die "Both cached & working files - cannot get correct patch from git\n";
+            die "Error: Both cached & working files - cannot get correct patch from git\nRun git add first.";
             # Would have to diff from separate clone.
         }
     }
 }
 
 push @cmd, @ARGV;
+
+# Before executing the diff, run the coverage.sh script. This is done here so that the
+# error condition above happens straight away, rather than after spewing out lots of information.
+
+my $cwd = getcwd(); # expect this to be automated-tests folder
+# execute coverage.sh, generating build/tizen/dali.info from lib, and
+# *.dir/dali.info. Don't generate html
+printf("Running coverage.sh\n");
+my $coverage_output=`./coverage.sh -n`;
+chdir "..";
+$root = getcwd();
+
+our %info_data; # Hash of all data from .info files
+my @info_files = split(/\n/, `find . -name dali.info`);
+my %new_info;
+
+# Read in all specified .info files
+foreach (@info_files)
+{
+    %new_info = %{read_info_file($_)};
+
+    # Combine %new_info with %info_data
+    %info_data = %{combine_info_files(\%info_data, \%new_info)};
+}
+
 
 # Execute diff & coverage from root directory
 my $filesref = run_diff(@cmd);
@@ -1386,20 +1396,32 @@ foreach my $file (keys(%$filesref))
 }
 if( $filecount == 0 )
 {
-    print "No source files found\n";
+    print "Warning: No source files found\n";
     exit 0;    # Exit with no error.
 }
 
 #print_simplified_info() if $debug;
 #exit 0;
+if($debug > 1)
+{
+    print "Info keys:\n";
+    for my $key (keys(%info_data))
+    {
+        print "$key\n";
+    }
+    print "\n\n";
+}
 
 my $percentref = calc_patch_coverage_percentage($filesref);
 if($percentref->[0] == 0)
 {
-    print "No coverable lines found\n";
+    print "Warning: No coverable lines found\n";
     exit 0;
 }
 my $percent = $percentref->[1];
+
+printf(join("\n", grep { $_ !~ /^Remov/ } split(/\n/,$coverage_output))) if $opt_verbose;
+#printf($coverage_output) if $opt_verbose;
 
 my $color=BOLD RED;
 if($opt_output)
@@ -1417,6 +1439,7 @@ elsif( ! $opt_quiet )
     print RESET;
 }
 
+printf("\n\n=========================\nPatch coverage output:\n=========================\n");
 printf("Line Coverage: %d/%d\n", $percentref->[2], $percentref->[0]);
 printf("Percentage of change covered: %5.2f%\n", $percent);
 
