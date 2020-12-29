@@ -130,14 +130,14 @@ void Core::PostRender(bool uploadOnly)
   mImpl->PostRender(uploadOnly);
 }
 
-void Core::RegisterProcessor(Processor& processor)
+void Core::RegisterProcessor(Processor& processor, bool postProcessor)
 {
-  mImpl->RegisterProcessor(processor);
+  mImpl->RegisterProcessor(processor, postProcessor);
 }
 
-void Core::UnregisterProcessor(Processor& processor)
+void Core::UnregisterProcessor(Processor& processor, bool postProcessor)
 {
-  mImpl->UnregisterProcessor(processor);
+  mImpl->UnregisterProcessor(processor, postProcessor);
 }
 
 ObjectRegistry Core::GetObjectRegistry() const

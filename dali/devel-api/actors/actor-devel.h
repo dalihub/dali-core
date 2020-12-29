@@ -2,7 +2,7 @@
 #define DALI_ACTOR_DEVEL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -271,6 +271,14 @@ DALI_CORE_API ChildOrderChangedSignalType& ChildOrderChangedSignal(Actor actor);
  * @pre The Actor has been initialized
  */
 DALI_CORE_API Actor::TouchEventSignalType& InterceptTouchedSignal(Actor actor);
+
+/**
+ * Switch parent in the same tree.
+ * Both of current parent Actor and new parent Actor must be added on Scene.
+ * If not, use Add() instead.
+ * This method don't emit any notification such as off scene, on scene, added or removed.
+ */
+DALI_CORE_API void SwitchParent(Actor actor, Actor newParent);
 
 } // namespace DevelActor
 
