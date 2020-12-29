@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1078,6 +1078,29 @@ int UtcDaliCustomActorCustomActor(void)
 
   DALI_TEST_CHECK(customA == customB);
 
+  END_TEST;
+}
+
+int UtcDaliCustomActorImplSetTransparent(void)
+{
+  TestApplication application; // Need the type registry
+
+  Test::TestCustomActor actor = Test::TestCustomActor::New();
+  application.GetScene().Add(actor);
+  actor.SetProperty(Actor::Property::OPACITY, 0.1f);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(400, 400));
+
+  DALI_TEST_EQUALS(false, actor.IsTransparent(), TEST_LOCATION);
+
+  actor.SetTransparent(true);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(true, actor.IsTransparent(), TEST_LOCATION);
+
+  application.GetScene().Remove(actor);
   END_TEST;
 }
 

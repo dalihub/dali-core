@@ -320,6 +320,16 @@ DALI_CORE_API Actor::TouchEventSignalType& InterceptTouchedSignal(Actor actor);
  */
 DALI_CORE_API void SetNeedGesturePropagation(Actor actor, bool propagation);
 
+/**
+ * Switch parent in the same tree.
+ * This method changes the actor's parent with keeping on scene state.
+ * Both of current parent Actor and new parent Actor must already be added on Scene.
+ * This method don't emit notification about add/remove and on/off scene.
+ * @param [in] actor This actor
+ * @param [in] newParent An actor to be a new parent of this actor.
+ */
+DALI_CORE_API void SwitchParent(Actor actor, Actor newParent);
+
 } // namespace DevelActor
 
 } // namespace Dali

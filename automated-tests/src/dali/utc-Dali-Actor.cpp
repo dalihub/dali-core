@@ -637,6 +637,32 @@ int UtcDaliActorRemoveP(void)
   END_TEST;
 }
 
+int UtcDaliActorSwitchParentN(void)
+{
+  tet_infoline("Testing Actor::UtcDaliActorSwitchParentN");
+  TestApplication application;
+
+  Actor parent1 = Actor::New();
+  Actor child   = Actor::New();
+
+  DALI_TEST_EQUALS(parent1.GetChildCount(), 0u, TEST_LOCATION);
+
+  parent1.Add(child);
+
+  DALI_TEST_EQUALS(parent1.GetChildCount(), 1u, TEST_LOCATION);
+
+  Actor parent2 = Actor::New();
+
+  DALI_TEST_EQUALS(parent2.GetChildCount(), 0u, TEST_LOCATION);
+
+  // Try switch parent with that both of parent1 and parent2 are off scene.
+  DevelActor::SwitchParent(child, parent2);
+
+  DALI_TEST_EQUALS(parent1.GetChildCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent2.GetChildCount(), 0u, TEST_LOCATION);
+  END_TEST;
+}
+
 int UtcDaliActorGetChildCount(void)
 {
   TestApplication application;
@@ -7633,6 +7659,61 @@ int UtcDaliChildMovedSignalP(void)
   DALI_TEST_EQUALS(removedASignalReceived, false, TEST_LOCATION);
   DALI_TEST_EQUALS(addedBSignalReceived, false, TEST_LOCATION);
   DALI_TEST_EQUALS(removedBSignalReceived, true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorSwitchParentP(void)
+{
+  tet_infoline("Testing Actor::UtcDaliActorSwitchParentP");
+  TestApplication application;
+
+  Actor parent1 = Actor::New();
+  Actor child   = Actor::New();
+
+  application.GetScene().Add(parent1);
+
+  DALI_TEST_EQUALS(parent1.GetChildCount(), 0u, TEST_LOCATION);
+
+  child.OnSceneSignal().Connect(OnSceneCallback);
+  child.OffSceneSignal().Connect(OffSceneCallback);
+
+  // sanity check
+  DALI_TEST_CHECK(gOnSceneCallBackCalled == 0);
+  DALI_TEST_CHECK(gOffSceneCallBackCalled == 0);
+
+  parent1.Add(child);
+
+  DALI_TEST_EQUALS(parent1.GetChildCount(), 1u, TEST_LOCATION);
+
+  DALI_TEST_CHECK(gOnSceneCallBackCalled == 1);
+  DALI_TEST_CHECK(gOffSceneCallBackCalled == 0);
+
+  Actor parent2 = Actor::New();
+  application.GetScene().Add(parent2);
+
+  bool  addSignalReceived = false;
+  ChildAddedSignalCheck addedSignal(addSignalReceived, child);
+  DevelActor::ChildAddedSignal(application.GetScene().GetRootLayer()).Connect(&application, addedSignal);
+  DALI_TEST_EQUALS(addSignalReceived, false, TEST_LOCATION);
+
+  bool  removedSignalReceived = false;
+  ChildRemovedSignalCheck removedSignal(removedSignalReceived, child);
+  DevelActor::ChildRemovedSignal(application.GetScene().GetRootLayer()).Connect(&application, removedSignal);
+  DALI_TEST_EQUALS(removedSignalReceived, false, TEST_LOCATION);
+
+  DevelActor::SwitchParent(child, parent2);
+
+  DALI_TEST_EQUALS(addSignalReceived, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(removedSignalReceived, false, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(parent1.GetChildCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent2.GetChildCount(), 1u, TEST_LOCATION);
+
+  DALI_TEST_CHECK(gOnSceneCallBackCalled == 1);
+  DALI_TEST_CHECK(gOffSceneCallBackCalled == 0);
+  DALI_TEST_CHECK(child.GetProperty<bool>(Dali::Actor::Property::CONNECTED_TO_SCENE));
+  DALI_TEST_CHECK(child.GetParent() == parent2);
 
   END_TEST;
 }

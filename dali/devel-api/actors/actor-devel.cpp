@@ -58,6 +58,11 @@ void SetNeedGesturePropagation(Actor actor, bool propagation)
   return GetImplementation(actor).SetNeedGesturePropagation(propagation);
 }
 
+void SwitchParent(Actor actor, Actor newParent)
+{
+  return GetImplementation(actor).SwitchParent(GetImplementation(newParent));
+}
+
 } // namespace DevelActor
 
 } // namespace Dali

@@ -50,16 +50,19 @@ public:
    * @pre The child actor is not the same as the parent actor.
    * @pre The child actor does not already have a parent.
    * @param [in] child The child.
+   * @param [in] notify Emits notification if set to true. Default is true.
    * @post The child will be referenced by its parent.
    */
-  void Add(Actor& child);
+  void Add(Actor& child, bool notify = true);
 
   /**
    * Removes a child Actor from this ActorParent.
    * @param [in] child The child.
+   * @param [in] notify Emits notification if set to true. Default is true.
    * @post The child will be unreferenced.
+   * @note If notify is false, Add() method must be called after this method.
    */
-  void Remove(Actor& child);
+  void Remove(Actor& child, bool notify = true);
 
   /**
    * Retrieve the number of children held by the actor.
