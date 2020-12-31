@@ -3243,6 +3243,11 @@ int UtcDaliRendererRenderingBehavior(void)
 
   DALI_TEST_CHECK(!(updateStatus & Integration::KeepUpdating::STAGE_KEEP_RENDERING));
 
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
+  drawTrace.Enable(true);
+  drawTrace.Reset();
+
   renderer.SetProperty(DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::CONTINUOUSLY);
 
   value = renderer.GetProperty(DevelRenderer::Property::RENDERING_BEHAVIOR);
@@ -3261,6 +3266,10 @@ int UtcDaliRendererRenderingBehavior(void)
   DALI_TEST_CHECK(value.Get(renderingBehavior));
   DALI_TEST_EQUALS(static_cast<DevelRenderer::Rendering::Type>(renderingBehavior), DevelRenderer::Rendering::CONTINUOUSLY, TEST_LOCATION);
 
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION);
+
+  drawTrace.Reset();
+
   // Render again and check the update status
   application.SendNotification();
   application.Render();
@@ -3268,6 +3277,33 @@ int UtcDaliRendererRenderingBehavior(void)
   updateStatus = application.GetUpdateStatus();
 
   DALI_TEST_CHECK(updateStatus & Integration::KeepUpdating::STAGE_KEEP_RENDERING);
+
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION);
+
+  {
+    // Render again and check the update status
+    Animation animation = Animation::New(1.0f);
+    animation.AnimateTo(Property(renderer, DevelRenderer::Property::OPACITY), 0.0f, TimePeriod(0.5f, 0.5f));
+    animation.Play();
+
+    drawTrace.Reset();
+
+    application.SendNotification();
+    application.Render(0);
+
+    DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION);
+
+    drawTrace.Reset();
+
+    application.SendNotification();
+    application.Render(100);
+
+    updateStatus = application.GetUpdateStatus();
+
+    DALI_TEST_CHECK(updateStatus & Integration::KeepUpdating::STAGE_KEEP_RENDERING);
+
+    DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION);
+  }
 
   // Change rendering behavior
   renderer.SetProperty(DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::IF_REQUIRED);
