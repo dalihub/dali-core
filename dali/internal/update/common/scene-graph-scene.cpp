@@ -31,7 +31,8 @@ namespace SceneGraph
 Scene::Scene()
 : mContext( nullptr ),
   mFrameRenderedCallbacks(),
-  mFramePresentedCallbacks()
+  mFramePresentedCallbacks(),
+  mSkipRendering( false )
 {
 }
 
@@ -86,6 +87,16 @@ void Scene::GetFramePresentedCallback( Dali::Integration::Scene::FrameCallbackCo
   }
 
   mFramePresentedCallbacks.clear();
+}
+
+void Scene::SetSkipRendering( bool skip )
+{
+  mSkipRendering = skip;
+}
+
+bool Scene::IsRenderingSkipped() const
+{
+  return mSkipRendering;
 }
 
 } //SceneGraph
