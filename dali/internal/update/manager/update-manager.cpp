@@ -378,20 +378,11 @@ void UpdateManager::AddNode( OwnerPointer<Node>& node )
 {
   DALI_ASSERT_ALWAYS( nullptr == node->GetParent() ); // Should not have a parent yet
 
-  // Nodes must be sorted by pointer
   Node* rawNode = node.Release();
   DALI_LOG_INFO( gLogFilter, Debug::General, "[%x] AddNode\n", rawNode );
 
-  Vector<Node*>::Iterator begin = mImpl->nodes.Begin();
-  for( Vector<Node*>::Iterator iter = mImpl->nodes.End()-1; iter >= begin; --iter )
-  {
-    if( rawNode > (*iter) )
-    {
-      mImpl->nodes.Insert((iter+1), rawNode );
-      rawNode->CreateTransform( &mImpl->transformManager );
-      return;
-    }
-  }
+  mImpl->nodes.PushBack(rawNode);
+  rawNode->CreateTransform(&mImpl->transformManager);
 }
 
 void UpdateManager::ConnectNode( Node* parent, Node* node )
