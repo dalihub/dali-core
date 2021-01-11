@@ -223,15 +223,15 @@ inline void SetupDepthBuffer( const RenderItem& item, Context& context, bool dep
 
 } // Unnamed namespace
 
-
 /**
  * @brief This method is responsible for making decisions on when to apply and unapply scissor clipping, and what rectangular dimensions should be used.
  * A stack of scissor clips at each depth of clipping is maintained, so it can be applied and unapplied.
  * As the clips are hierarchical, this RenderItems AABB is clipped against the current "active" scissor bounds via an intersection operation.
  * @param[in]     item                     The current RenderItem about to be rendered
  * @param[in]     context                  The context
+ * @param[in]     instruction              The render-instruction to process.
  */
-inline void RenderAlgorithms::SetupScissorClipping( const RenderItem& item, Context& context )
+inline void RenderAlgorithms::SetupScissorClipping(const RenderItem& item, Context& context, const RenderInstruction& instruction)
 {
   // Get the number of child scissors in the stack (do not include layer or root box).
   size_t childStackDepth = mScissorStack.size() - 1u;
@@ -292,17 +292,23 @@ inline void RenderAlgorithms::SetupScissorClipping( const RenderItem& item, Cont
     if( scissorEnabled )
     {
       ClippingBox useScissorBox( mScissorStack.back() );
+
+      if(instruction.mFrameBuffer && instruction.GetCamera()->IsYAxisInverted())
+      {
+        useScissorBox.y = (instruction.mFrameBuffer->GetHeight() - useScissorBox.height) - useScissorBox.y;
+      }
       context.Scissor( useScissorBox.x, useScissorBox.y, useScissorBox.width, useScissorBox.height );
     }
   }
 }
 
-inline void RenderAlgorithms::SetupClipping( const RenderItem& item,
-                                             Context& context,
-                                             bool& usedStencilBuffer,
-                                             uint32_t& lastClippingDepth,
-                                             uint32_t& lastClippingId,
-                                             Integration::StencilBufferAvailable stencilBufferAvailable )
+inline void RenderAlgorithms::SetupClipping(const RenderItem&                   item,
+                                            Context&                            context,
+                                            bool&                               usedStencilBuffer,
+                                            uint32_t&                           lastClippingDepth,
+                                            uint32_t&                           lastClippingId,
+                                            Integration::StencilBufferAvailable stencilBufferAvailable,
+                                            const RenderInstruction&            instruction)
 {
   RenderMode::Type renderMode = RenderMode::AUTO;
   const Renderer *renderer = item.mRenderer;
@@ -324,7 +330,7 @@ inline void RenderAlgorithms::SetupClipping( const RenderItem& item,
       // As both scissor and stencil clips can be nested, we may be simultaneously traversing up the scissor tree, requiring a scissor to be un-done. Whilst simultaneously adding a new stencil clip.
       // We process both based on our current and old clipping depths for each mode.
       // Both methods with return rapidly if there is nothing to be done for that type of clipping.
-      SetupScissorClipping( item, context );
+      SetupScissorClipping(item, context, instruction);
 
       if( stencilBufferAvailable == Integration::StencilBufferAvailable::TRUE )
       {
@@ -462,7 +468,7 @@ inline void RenderAlgorithms::ProcessRenderList( const RenderList& renderList,
 
     // Set up clipping based on both the Renderer and Actor APIs.
     // The Renderer API will be used if specified. If AUTO, the Actors automatic clipping feature will be used.
-    SetupClipping( item, context, usedStencilBuffer, lastClippingDepth, lastClippingId, stencilBufferAvailable );
+    SetupClipping(item, context, usedStencilBuffer, lastClippingDepth, lastClippingId, stencilBufferAvailable, instruction);
 
     if( DALI_LIKELY( item.mRenderer ) )
     {

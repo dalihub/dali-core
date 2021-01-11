@@ -575,6 +575,15 @@ void RenderManager::PreRender( Integration::Scene& scene, std::vector<Rect<int>>
     return;
   }
 
+  Internal::Scene& sceneInternal = GetImplementation(scene);
+  SceneGraph::Scene* sceneObject = sceneInternal.GetSceneObject();
+
+  if( sceneObject->IsRenderingSkipped() )
+  {
+    // We don't need to calculate dirty rects
+    return;
+  }
+
   class DamagedRectsCleaner
   {
   public:
@@ -606,11 +615,6 @@ void RenderManager::PreRender( Integration::Scene& scene, std::vector<Rect<int>>
 
   // Clean collected dirty/damaged rects on exit if 3d layer or 3d node or other conditions.
   DamagedRectsCleaner damagedRectCleaner(damagedRects);
-
-
-
-  Internal::Scene& sceneInternal = GetImplementation(scene);
-  SceneGraph::Scene* sceneObject = sceneInternal.GetSceneObject();
 
   // Mark previous dirty rects in the sorted array. The array is already sorted by node and renderer, frame number.
   // so you don't need to sort: std::stable_sort(itemsDirtyRects.begin(), itemsDirtyRects.end());

@@ -184,16 +184,18 @@ RenderTask CreateRenderTask(TestApplication& application,
                             Actor            rootActor,       // Reset default render task to point at this actor
                             Actor            secondRootActor, // Source actor
                             unsigned int     refreshRate,
-                            bool             glSync)
+                            bool             glSync,
+                            uint32_t         frameBufferWidth  = 10,
+                            uint32_t         frameBufferHeight = 10)
 {
   // Change main render task to use a different root
   RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   taskList.GetTask(0u).SetSourceActor(rootActor);
 
-  FrameBuffer frameBuffer = FrameBuffer::New(10, 10);
+  FrameBuffer frameBuffer = FrameBuffer::New(frameBufferWidth, frameBufferHeight);
   if(glSync)
   {
-    NativeImageInterfacePtr testNativeImagePtr = TestNativeImage::New(10, 10);
+    NativeImageInterfacePtr testNativeImagePtr = TestNativeImage::New(frameBufferWidth, frameBufferHeight);
     Texture                 texture            = Texture::New(*testNativeImagePtr);
     frameBuffer.AttachColorTexture(texture);
   }
@@ -3355,5 +3357,120 @@ int UtcDaliRenderTaskGetScreenToFrameBufferMappingActorNegative(void)
   {
     DALI_TEST_CHECK(true); // We expect an assert
   }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskClippingMode01(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing clipping mode: CLIP_TO_BOUNDING_BOX.\n");
+
+  TestGlAbstraction& glAbstraction       = application.GetGlAbstraction();
+  TraceCallStack&    enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
+  TraceCallStack&    scissorTrace        = glAbstraction.GetScissorTrace();
+
+  enabledDisableTrace.Enable(true);
+  scissorTrace.Enable(true);
+
+  // SETUP AN OFFSCREEN RENDER TASK
+  Actor rootActor = Actor::New();
+  application.GetScene().Add(rootActor);
+
+  CameraActor offscreenCameraActor = CameraActor::New(Size(TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT));
+  offscreenCameraActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  offscreenCameraActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  application.GetScene().Add(offscreenCameraActor);
+
+  Shader     shader     = CreateShader();
+  Texture    image      = CreateTexture();
+  TextureSet textureSet = CreateTextureSet(image);
+
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = Renderer::New(geometry, shader);
+  renderer.SetTextures(textureSet);
+
+  Vector2 position(100.0f, 100.0f);
+  Vector2 size(200.0f, 200.0f);
+  Actor   secondRootActor = Actor::New();
+  secondRootActor.AddRenderer(renderer);
+  secondRootActor.SetProperty(Actor::Property::POSITION, position);
+  secondRootActor.SetProperty(Actor::Property::SIZE, size);
+  secondRootActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  secondRootActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  secondRootActor.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
+  application.GetScene().Add(secondRootActor);
+
+  RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ONCE, true, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Enable", "3089")); // 3089 = 0xC11 (GL_SCISSOR_TEST)
+
+  // Check the scissor was set, and the coordinates are correct.
+  Vector4           expectResults(position.x, TestApplication::DEFAULT_SURFACE_HEIGHT - size.height - position.y, size.width, size.height); // (100, 500, 200, 200)
+  std::stringstream compareParametersString;
+  compareParametersString << expectResults.x << ", " << expectResults.y << ", " << expectResults.z << ", " << expectResults.w;
+  DALI_TEST_CHECK(scissorTrace.FindMethodAndParams("Scissor", compareParametersString.str())); // Compare with the expected result
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskClippingMode02(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing clipping mode with the inverted camera: CLIP_TO_BOUNDING_BOX.\n");
+
+  TestGlAbstraction& glAbstraction       = application.GetGlAbstraction();
+  TraceCallStack&    enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
+  TraceCallStack&    scissorTrace        = glAbstraction.GetScissorTrace();
+
+  enabledDisableTrace.Enable(true);
+  scissorTrace.Enable(true);
+
+  // SETUP AN OFFSCREEN RENDER TASK
+  Actor rootActor = Actor::New();
+  application.GetScene().Add(rootActor);
+
+  CameraActor offscreenCameraActor = CameraActor::New(Size(TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT));
+  offscreenCameraActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  offscreenCameraActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  offscreenCameraActor.SetInvertYAxis(true);
+  application.GetScene().Add(offscreenCameraActor);
+
+  Shader     shader     = CreateShader();
+  Texture    image      = CreateTexture();
+  TextureSet textureSet = CreateTextureSet(image);
+
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = Renderer::New(geometry, shader);
+  renderer.SetTextures(textureSet);
+
+  Vector2 position(100.0f, 100.0f);
+  Vector2 size(200.0f, 200.0f);
+  Actor   secondRootActor = Actor::New();
+  secondRootActor.AddRenderer(renderer);
+  secondRootActor.SetProperty(Actor::Property::POSITION, position);
+  secondRootActor.SetProperty(Actor::Property::SIZE, size);
+  secondRootActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  secondRootActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  secondRootActor.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
+  application.GetScene().Add(secondRootActor);
+
+  RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ONCE, true, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Enable", "3089")); // 3089 = 0xC11 (GL_SCISSOR_TEST)
+
+  // Check the scissor was set, and the coordinates are correct.
+  Vector4           expectResults(position.x, position.y, size.width, size.height); // (100, 100, 200, 200)
+  std::stringstream compareParametersString;
+  compareParametersString << expectResults.x << ", " << expectResults.y << ", " << expectResults.z << ", " << expectResults.w;
+  DALI_TEST_CHECK(scissorTrace.FindMethodAndParams("Scissor", compareParametersString.str())); // Compare with the expected result
+
   END_TEST;
 }

@@ -1016,6 +1016,11 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
                                                 renderToFboEnabled,
                                                 isRenderingToFbo );
 
+            scene->scene->SetSkipRendering( false );
+          }
+          else
+          {
+            scene->scene->SetSkipRendering( true );
           }
 
           numberOfRenderInstructions += scene->scene->GetRenderInstructions().Count( bufferIndex );

@@ -115,6 +115,18 @@ public:
    */
   void GetFramePresentedCallback( Dali::Integration::Scene::FrameCallbackContainer& callbacks );
 
+  /**
+   * @brief Sets whether rendering should be skipped or not.
+   * @param[in] skip true if rendering should be skipped.
+   */
+  void SetSkipRendering( bool skip );
+
+  /**
+   * @brief Query whether rendering should be skipped or not.
+   * @return true if rendering should be skipped, false otherwise.
+   */
+  bool IsRenderingSkipped() const;
+
 private:
 
   Context*                    mContext;   ///< The context holding the GL state of rendering for the scene, not owned
@@ -126,6 +138,8 @@ private:
 
   Dali::Integration::Scene::FrameCallbackContainer mFrameRenderedCallbacks;   ///< Frame rendered callbacks
   Dali::Integration::Scene::FrameCallbackContainer mFramePresentedCallbacks;  ///< Frame presented callbacks
+
+  bool                        mSkipRendering;  ///< A flag to skip rendering
 };
 
 /// Messages

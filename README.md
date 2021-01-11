@@ -13,8 +13,11 @@
          * [SMACK enabled Targets](#smack-enabled-targets)
          * [DEBUG Builds](#debug-builds)
       * [3. Building for MS Windows](#3-building-for-ms-windows)
-         * Build with the Visual Studio project.
-         * Build with CMake.
+         * Build with the Visual Studio project
+         * Build with CMake
+      * [4. Building for macOS](#4-building-for-macos)
+         * [macOS Dependencies](#macos-dependencies)
+         * [Build the repository](#build-the-repository)
 
 # Build Instructions
 
@@ -134,3 +137,31 @@ vcpkg-script folder in the windows-dependencies repository.
     - CMAKE_INSTALL_PREFIX  ---> Were DALi is installed.
     - INSTALL_CMAKE_MODULES ---> Whether to install the CMake modules (Used by the CMake command find_package() to find previously installed libraries).
     - ENABLE_DEBUG          ---> Whether to build with debug enabled.
+
+## 4. Building for macOS
+
+### macOS Dependencies
+
+Ensure you have followed the instructions in the macos-dependencies repo [here](https://github.com/dalihub/macos-dependencies)
+to create the DALi environment on the macOS.
+You can clone it using:
+```zsh
+% git clone https://github.com/dalihub/macos-dependencies.git
+```
+
+### Build the repository
+
+To build the repository enter the 'build/tizen' folder:
+```zsh
+% cd dali-core/build/tizen
+```
+Then run the following command to set up the build:
+```zsh
+% cmake -DCMAKE_INSTALL_PREFIX=$DESKTOP_PREFIX -DCMAKE_TOOLCHAIN_FILE=$VCPKG_FOLDER/scripts/buildsystems/vcpkg.cmake -DINSTALL_CMAKE_MODULES=ON
+```
+If a Debug build is required, then add `-DCMAKE_BUILD_TYPE=Debug -DENABLE_DEBUG=ON`
+
+To build run:
+```zsh
+% make install -j8
+```

@@ -227,7 +227,7 @@ bool Renderer::PrepareRender( BufferIndex updateBufferIndex )
     mRegenerateUniformMap--;
   }
 
-  bool rendererUpdated = mUniformMapChanged[updateBufferIndex] || mResendFlag;
+  bool rendererUpdated = mUniformMapChanged[updateBufferIndex] || mResendFlag || mRenderingBehavior == DevelRenderer::Rendering::CONTINUOUSLY;
 
   if( mResendFlag != 0 )
   {

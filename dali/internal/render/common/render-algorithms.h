@@ -86,10 +86,11 @@ class RenderAlgorithms
      *  - If the node is a clipping node, apply the nodes clip intersected with the current/parent scissor clip.
      *  - If we have gone up the scissor hierarchy, and need to un-apply a scissor clip.
      *  - Disable scissor clipping completely if it is not needed
-     * @param[in] item     The current RenderItem (about to be rendered)
-     * @param[in] context  The current Context
+     * @param[in] item        The current RenderItem (about to be rendered)
+     * @param[in] context     The current Context
+     * @param[in] instruction The render-instruction to process.
      */
-    inline void SetupScissorClipping( const Dali::Internal::SceneGraph::RenderItem& item, Context& context );
+    inline void SetupScissorClipping(const Dali::Internal::SceneGraph::RenderItem& item, Context& context, const Dali::Internal::SceneGraph::RenderInstruction& instruction);
 
     /**
      * @brief Set up the clipping based on the specified clipping settings.
@@ -99,13 +100,15 @@ class RenderAlgorithms
      * @param[in/out] lastClippingDepth        The stencil depth of the last renderer drawn. Used by the clipping feature.
      * @param[in/out] lastClippingId           The clipping ID of the last renderer drawn.   Used by the clipping feature.
      * @param[in]     stencilBufferAvailable   Whether the stencil buffer is available
+     * @param[in]     instruction              The render-instruction to process.
      */
-    inline void SetupClipping( const Dali::Internal::SceneGraph::RenderItem& item,
-                               Context& context,
-                               bool& usedStencilBuffer,
-                               uint32_t& lastClippingDepth,
-                               uint32_t& lastClippingId,
-                               Integration::StencilBufferAvailable stencilBufferAvailable );
+    inline void SetupClipping(const Dali::Internal::SceneGraph::RenderItem&        item,
+                              Context&                                             context,
+                              bool&                                                usedStencilBuffer,
+                              uint32_t&                                            lastClippingDepth,
+                              uint32_t&                                            lastClippingId,
+                              Integration::StencilBufferAvailable                  stencilBufferAvailable,
+                              const Dali::Internal::SceneGraph::RenderInstruction& instruction);
 
     /**
      * @brief Process a render-list.

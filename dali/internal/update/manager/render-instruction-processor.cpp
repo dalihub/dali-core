@@ -222,7 +222,7 @@ inline void AddRendererToRenderList(BufferIndex updateBufferIndex,
       partialRenderingCacheInfo.matrix = item.mModelViewMatrix;
       partialRenderingCacheInfo.size = item.mSize;
 
-      if (item.mUpdateSize == Vector3::ZERO)
+      if (renderable.mNode->GetUpdateSizeHint() == Vector3::ZERO)
       {
         // RenderItem::CalculateViewportSpaceAABB cannot cope with z transform
         // I don't use item.mModelMatrix.GetTransformComponents() for z transform, would be to slow
@@ -231,6 +231,11 @@ inline void AddRendererToRenderList(BufferIndex updateBufferIndex,
           item.mUpdateSize = item.mSize;
         }
       }
+      else
+      {
+        item.mUpdateSize = renderable.mNode->GetUpdateSizeHint();
+      }
+
       partialRenderingCacheInfo.updatedSize = item.mUpdateSize;
 
       item.mIsUpdated = partialRenderingData.IsUpdated() || item.mIsUpdated;
