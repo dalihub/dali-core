@@ -79,14 +79,7 @@ void Node::Delete( Node* node )
 }
 
 Node::Node()
-: mTransformManager( nullptr ),
-  mTransformId( INVALID_TRANSFORM_ID ),
-  mParentOrigin( TRANSFORM_PROPERTY_PARENT_ORIGIN ),
-  mAnchorPoint( TRANSFORM_PROPERTY_ANCHOR_POINT ),
-  mSize( TRANSFORM_PROPERTY_SIZE ),                                               // Zero initialized by default
-  mPosition( TRANSFORM_PROPERTY_POSITION ),                                       // Zero initialized by default
-  mOrientation(),                                                                 // Initialized to identity by default
-  mScale( TRANSFORM_PROPERTY_SCALE ),
+: mOrientation(),                                                                 // Initialized to identity by default
   mVisible( true ),
   mCulled( false ),
   mColor( Color::WHITE ),
@@ -119,14 +112,13 @@ Node::Node()
 #ifdef DEBUG_ENABLED
   gNodeCount++;
 #endif
-
 }
 
 Node::~Node()
 {
-  if( mTransformId != INVALID_TRANSFORM_ID )
+  if( mTransformManagerData.Id() != INVALID_TRANSFORM_ID )
   {
-    mTransformManager->RemoveTransform(mTransformId);
+    mTransformManagerData.Manager()->RemoveTransform(mTransformManagerData.Id());
   }
 
 #ifdef DEBUG_ENABLED
@@ -148,25 +140,25 @@ uint32_t Node::GetId() const
 void Node::CreateTransform( SceneGraph::TransformManager* transformManager )
 {
   //Create a new transform
-  mTransformManager = transformManager;
-  mTransformId = transformManager->CreateTransform();
+  mTransformManagerData.mManager = transformManager;
+  mTransformManagerData.mId = transformManager->CreateTransform();
 
   //Initialize all the animatable properties
-  mPosition.Initialize( transformManager, mTransformId );
-  mScale.Initialize( transformManager, mTransformId );
-  mOrientation.Initialize( transformManager, mTransformId );
-  mSize.Initialize( transformManager, mTransformId );
-  mParentOrigin.Initialize( transformManager, mTransformId );
-  mAnchorPoint.Initialize( transformManager, mTransformId );
+  mPosition.Initialize( &mTransformManagerData );
+  mScale.Initialize( &mTransformManagerData );
+  mOrientation.Initialize( &mTransformManagerData );
+  mSize.Initialize( &mTransformManagerData );
+  mParentOrigin.Initialize( &mTransformManagerData );
+  mAnchorPoint.Initialize( &mTransformManagerData );
 
   //Initialize all the input properties
-  mWorldPosition.Initialize( transformManager, mTransformId );
-  mWorldScale.Initialize( transformManager, mTransformId );
-  mWorldOrientation.Initialize( transformManager, mTransformId );
-  mWorldMatrix.Initialize( transformManager, mTransformId );
+  mWorldPosition.Initialize( &mTransformManagerData );
+  mWorldScale.Initialize( &mTransformManagerData );
+  mWorldOrientation.Initialize( &mTransformManagerData );
+  mWorldMatrix.Initialize( &mTransformManagerData);
 
   //Set whether the position should use the anchor point
-  transformManager->SetPositionUsesAnchorPoint( mTransformId, mPositionUsesAnchorPoint );
+  transformManager->SetPositionUsesAnchorPoint( mTransformManagerData.Id(), mPositionUsesAnchorPoint );
 }
 
 void Node::SetRoot(bool isRoot)
@@ -347,9 +339,9 @@ void Node::SetParent( Node& parentNode )
 
   mParent = &parentNode;
 
-  if( mTransformId != INVALID_TRANSFORM_ID )
+  if( mTransformManagerData.Id() != INVALID_TRANSFORM_ID )
   {
-    mTransformManager->SetParent( mTransformId, parentNode.GetTransformId() );
+    mTransformManagerData.Manager()->SetParent( mTransformManagerData.Id(), parentNode.GetTransformId() );
   }
 }
 
@@ -373,9 +365,9 @@ void Node::RecursiveDisconnectFromSceneGraph( BufferIndex updateBufferIndex )
   // Remove all child pointers
   mChildren.Clear();
 
-  if( mTransformId != INVALID_TRANSFORM_ID )
+  if( mTransformManagerData.Id() != INVALID_TRANSFORM_ID )
   {
-    mTransformManager->SetParent( mTransformId, INVALID_TRANSFORM_ID );
+    mTransformManagerData.Manager()->SetParent( mTransformManagerData.Id(), INVALID_TRANSFORM_ID );
   }
 }
 
