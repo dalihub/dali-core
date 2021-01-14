@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_CORE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,11 @@ class Layer;
 class ObjectRegistry;
 class RenderTaskList;
 
+namespace Graphics
+{
+class Controller;
+}
+
 namespace Internal
 {
 class Core;
@@ -42,9 +47,6 @@ class Core;
 namespace Integration
 {
 class Core;
-class GlAbstraction;
-class GlSyncAbstraction;
-class GlContextHelperAbstraction;
 class PlatformAbstraction;
 class Processor;
 class RenderController;
@@ -228,24 +230,20 @@ public:
    * This object is used for integration with the native windowing system.
    * @param[in] renderController The interface to an object which controls rendering.
    * @param[in] platformAbstraction The interface providing platform specific services.
-   * @param[in] glAbstraction The interface providing OpenGL services.
-   * @param[in] glSyncAbstraction The interface providing OpenGL sync objects.
-   * @param[in] glContextHelperAbstraction The interface providing OpenGL context helper objects.
+   * @param[in] graphicsController The interface providing graphics services
    * @param[in] renderToFboEnabled Whether rendering into the Frame Buffer Object is enabled.
    * @param[in] depthBufferAvailable Whether the depth buffer is available
    * @param[in] stencilBufferAvailable Whether the stencil buffer is available
    * @param[in] partialUpdateAvailable Whether the partial update is available
    * @return A newly allocated Core.
    */
-  static Core* New(RenderController&           renderController,
-                   PlatformAbstraction&        platformAbstraction,
-                   GlAbstraction&              glAbstraction,
-                   GlSyncAbstraction&          glSyncAbstraction,
-                   GlContextHelperAbstraction& glContextHelperAbstraction,
-                   RenderToFrameBuffer         renderToFboEnabled,
-                   DepthBufferAvailable        depthBufferAvailable,
-                   StencilBufferAvailable      stencilBufferAvailable,
-                   PartialUpdateAvailable      partialUpdateAvailable);
+  static Core* New(RenderController&      renderController,
+                   PlatformAbstraction&   platformAbstraction,
+                   Graphics::Controller&  graphicsController,
+                   RenderToFrameBuffer    renderToFboEnabled,
+                   DepthBufferAvailable   depthBufferAvailable,
+                   StencilBufferAvailable stencilBufferAvailable,
+                   PartialUpdateAvailable partialUpdateAvailable);
 
   /**
    * Non-virtual destructor. Core is not intended as a base class.

@@ -1,0 +1,7 @@
+# Set the header directory
+
+SET( graphics_src_dir ${ROOT_SRC_DIR}/dali/graphics-api )
+
+SET( GRAPHICS_API_HEADERS ${GRAPHICS_API_HEADERS}
+   ${graphics_src_dir}/graphics-controller.h
+)

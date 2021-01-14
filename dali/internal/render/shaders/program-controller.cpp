@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,19 +26,17 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
-ProgramController::ProgramController( Integration::GlAbstraction& glAbstraction )
-: mShaderSaver( nullptr ),
-  mGlAbstraction( glAbstraction ),
-  mCurrentProgram( nullptr ),
-  mProgramBinaryFormat( 0 ),
-  mNumberOfProgramBinaryFormats( 0 )
+ProgramController::ProgramController(Graphics::Controller& graphicsController)
+: mShaderSaver(nullptr),
+  mGraphicsController(graphicsController),
+  mCurrentProgram(nullptr),
+  mProgramBinaryFormat(0),
+  mNumberOfProgramBinaryFormats(0)
 {
   // we have 17 default programs so make room for those and a few custom ones as well
-  mProgramCache.Reserve( 32 );
+  mProgramCache.Reserve(32);
 }
 
 ProgramController::~ProgramController() = default;
@@ -46,31 +44,32 @@ ProgramController::~ProgramController() = default;
 void ProgramController::ResetProgramMatrices()
 {
   const ProgramIterator end = mProgramCache.End();
-  for ( ProgramIterator iter = mProgramCache.Begin(); iter != end; ++iter )
+  for(ProgramIterator iter = mProgramCache.Begin(); iter != end; ++iter)
   {
     Program* program = (*iter)->GetProgram();
-    program->SetProjectionMatrix( nullptr );
-    program->SetViewMatrix( nullptr );
+    program->SetProjectionMatrix(nullptr);
+    program->SetViewMatrix(nullptr);
   }
 }
 
 void ProgramController::GlContextCreated()
 {
   // reset any potential previous errors
-  LOG_GL( "GetError()\n" );
-  CHECK_GL( mGlAbstraction, mGlAbstraction.GetError() );
+  LOG_GL("GetError()\n");
+  Integration::GlAbstraction& glAbstraction = GetGlAbstraction();
+  CHECK_GL(glAbstraction, glAbstraction.GetError());
 
   // find out if program binaries are supported and the format enum as well
   Dali::Vector<GLint> programBinaryFormats;
 
-  CHECK_GL( mGlAbstraction, mGlAbstraction.GetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS_OES, &mNumberOfProgramBinaryFormats ) );
-  LOG_GL("GetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS_OES) = %d\n", mNumberOfProgramBinaryFormats );
+  CHECK_GL(glAbstraction(), glAbstraction.GetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS_OES, &mNumberOfProgramBinaryFormats));
+  LOG_GL("GetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS_OES) = %d\n", mNumberOfProgramBinaryFormats);
 
-  if( GL_NO_ERROR == mGlAbstraction.GetError() && 0 < mNumberOfProgramBinaryFormats )
+  if(GL_NO_ERROR == glAbstraction.GetError() && 0 < mNumberOfProgramBinaryFormats)
   {
-    programBinaryFormats.Resize( mNumberOfProgramBinaryFormats );
-    CHECK_GL( mGlAbstraction, mGlAbstraction.GetIntegerv(GL_PROGRAM_BINARY_FORMATS_OES, &programBinaryFormats[0] ) );
-    LOG_GL("GetIntegerv(GL_PROGRAM_BINARY_FORMATS_OES) = %d\n", programBinaryFormats[0] );
+    programBinaryFormats.Resize(mNumberOfProgramBinaryFormats);
+    CHECK_GL(glAbstraction, glAbstraction.GetIntegerv(GL_PROGRAM_BINARY_FORMATS_OES, &programBinaryFormats[0]));
+    LOG_GL("GetIntegerv(GL_PROGRAM_BINARY_FORMATS_OES) = %d\n", programBinaryFormats[0]);
     mProgramBinaryFormat = programBinaryFormats[0];
   }
 }
@@ -78,12 +77,12 @@ void ProgramController::GlContextCreated()
 void ProgramController::GlContextDestroyed()
 {
   mNumberOfProgramBinaryFormats = 0;
-  mProgramBinaryFormat = 0;
+  mProgramBinaryFormat          = 0;
 
-  SetCurrentProgram( nullptr );
+  SetCurrentProgram(nullptr);
   // Inform programs they are no longer valid
   const ProgramIterator end = mProgramCache.End();
-  for ( ProgramIterator iter = mProgramCache.Begin(); iter != end; ++iter )
+  for(ProgramIterator iter = mProgramCache.Begin(); iter != end; ++iter)
   {
     (*iter)->GetProgram()->GlContextDestroyed();
   }
@@ -91,17 +90,17 @@ void ProgramController::GlContextDestroyed()
 
 Integration::GlAbstraction& ProgramController::GetGlAbstraction()
 {
-  return mGlAbstraction;
+  return mGraphicsController.GetGlAbstraction();
 }
 
-Program* ProgramController::GetProgram( size_t shaderHash )
+Program* ProgramController::GetProgram(size_t shaderHash)
 {
-  Program* program = nullptr;
-  const ProgramIterator end = mProgramCache.End();
-  for ( ProgramIterator iter = mProgramCache.Begin(); iter != end; ++iter )
+  Program*              program = nullptr;
+  const ProgramIterator end     = mProgramCache.End();
+  for(ProgramIterator iter = mProgramCache.Begin(); iter != end; ++iter)
   {
     size_t hash = (*iter)->GetHash();
-    if( shaderHash == hash )
+    if(shaderHash == hash)
     {
       program = (*iter)->GetProgram();
       break;
@@ -110,11 +109,11 @@ Program* ProgramController::GetProgram( size_t shaderHash )
   return program;
 }
 
-void ProgramController::AddProgram( size_t shaderHash, Program* program )
+void ProgramController::AddProgram(size_t shaderHash, Program* program)
 {
   // we expect unique hash values so its event thread sides job to guarantee that
   // AddProgram is only called after program checks that GetProgram returns NULL
-  mProgramCache.PushBack( new ProgramPair( program, shaderHash ) );
+  mProgramCache.PushBack(new ProgramPair(program, shaderHash));
 }
 
 Program* ProgramController::GetCurrentProgram()
@@ -122,7 +121,7 @@ Program* ProgramController::GetCurrentProgram()
   return mCurrentProgram;
 }
 
-void ProgramController::SetCurrentProgram( Program* program )
+void ProgramController::SetCurrentProgram(Program* program)
 {
   mCurrentProgram = program;
 }
@@ -137,25 +136,25 @@ GLenum ProgramController::ProgramBinaryFormat()
   return mProgramBinaryFormat;
 }
 
-void ProgramController::StoreBinary( Internal::ShaderDataPtr programData )
+void ProgramController::StoreBinary(Internal::ShaderDataPtr programData)
 {
-  DALI_ASSERT_DEBUG( programData->GetBufferSize() > 0 );
-  DALI_ASSERT_DEBUG( mShaderSaver && "SetShaderSaver() should have been called during startup." );
+  DALI_ASSERT_DEBUG(programData->GetBufferSize() > 0);
+  DALI_ASSERT_DEBUG(mShaderSaver && "SetShaderSaver() should have been called during startup.");
 
-  if( mShaderSaver != nullptr )
+  if(mShaderSaver != nullptr)
   {
-    mShaderSaver->SaveBinary( programData );
+    mShaderSaver->SaveBinary(programData);
   }
 }
 
-void ProgramController::SetShaderSaver( ShaderSaver& shaderSaver )
+void ProgramController::SetShaderSaver(ShaderSaver& shaderSaver)
 {
   mShaderSaver = &shaderSaver;
 }
 
 void ProgramController::ClearCurrentProgram()
 {
-  SetCurrentProgram( nullptr );
+  SetCurrentProgram(nullptr);
 }
 
 } // namespace Internal

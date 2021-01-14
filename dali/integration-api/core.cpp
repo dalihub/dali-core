@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/events/event.h>
-#include <dali/integration-api/gl-context-helper-abstraction.h>
-#include <dali/integration-api/gl-sync-abstraction.h>
 #include <dali/integration-api/processor-interface.h>
 #include <dali/internal/common/core-impl.h>
 #include <dali/public-api/actors/layer.h>
@@ -32,22 +30,18 @@ namespace Dali
 {
 namespace Integration
 {
-Core* Core::New(RenderController&           renderController,
-                PlatformAbstraction&        platformAbstraction,
-                GlAbstraction&              glAbstraction,
-                GlSyncAbstraction&          glSyncAbstraction,
-                GlContextHelperAbstraction& glContextHelperAbstraction,
-                RenderToFrameBuffer         renderToFboEnabled,
-                DepthBufferAvailable        depthBufferAvailable,
-                StencilBufferAvailable      stencilBufferAvailable,
-                PartialUpdateAvailable      partialUpdateAvailable)
+Core* Core::New(RenderController&      renderController,
+                PlatformAbstraction&   platformAbstraction,
+                Graphics::Controller&  graphicsController,
+                RenderToFrameBuffer    renderToFboEnabled,
+                DepthBufferAvailable   depthBufferAvailable,
+                StencilBufferAvailable stencilBufferAvailable,
+                PartialUpdateAvailable partialUpdateAvailable)
 {
   Core* instance  = new Core;
   instance->mImpl = new Internal::Core(renderController,
                                        platformAbstraction,
-                                       glAbstraction,
-                                       glSyncAbstraction,
-                                       glContextHelperAbstraction,
+                                       graphicsController,
                                        renderToFboEnabled,
                                        depthBufferAvailable,
                                        stencilBufferAvailable,

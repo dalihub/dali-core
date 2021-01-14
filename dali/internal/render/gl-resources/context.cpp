@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,22 +24,19 @@
 #include <type_traits>
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
+#include <dali/integration-api/platform-abstraction.h>
+#include <dali/internal/render/common/render-manager.h>
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/rendering/texture-set.h>
-#include <dali/integration-api/platform-abstraction.h>
-#include <dali/integration-api/debug.h>
-#include <dali/internal/render/common/render-manager.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace // unnamed namespace
 {
-
-static_assert( TEXTURE_UNIT_LAST <= Context::MAX_TEXTURE_UNITS, "TEXTURE_UNIT_LAST is greater than Context::MAX_TEXTURE_UNITS" );
+static_assert(TEXTURE_UNIT_LAST <= Context::MAX_TEXTURE_UNITS, "TEXTURE_UNIT_LAST is greater than Context::MAX_TEXTURE_UNITS");
 
 /**
  * GL error strings
@@ -47,16 +44,15 @@ static_assert( TEXTURE_UNIT_LAST <= Context::MAX_TEXTURE_UNITS, "TEXTURE_UNIT_LA
 struct errorStrings
 {
   const GLenum errorCode;
-  const char* errorString;
+  const char*  errorString;
 };
 errorStrings errors[] =
-{
-   { GL_NO_ERROR,           "GL_NO_ERROR" },
-   { GL_INVALID_ENUM,       "GL_INVALID_ENUM" },
-   { GL_INVALID_VALUE,      "GL_INVALID_VALUE" },
-   { GL_INVALID_OPERATION,  "GL_INVALID_OPERATION" },
-   { GL_OUT_OF_MEMORY,      "GL_OUT_OF_MEMORY" }
-};
+  {
+    {GL_NO_ERROR, "GL_NO_ERROR"},
+    {GL_INVALID_ENUM, "GL_INVALID_ENUM"},
+    {GL_INVALID_VALUE, "GL_INVALID_VALUE"},
+    {GL_INVALID_OPERATION, "GL_INVALID_OPERATION"},
+    {GL_OUT_OF_MEMORY, "GL_OUT_OF_MEMORY"}};
 
 } // unnamed namespace
 
@@ -64,12 +60,12 @@ errorStrings errors[] =
 Debug::Filter* gContextLogFilter = Debug::Filter::New(Debug::Concise, false, "LOG_CONTEXT_STATE");
 #endif
 
-Context::Context( Integration::GlAbstraction& glAbstraction )
-: Context( glAbstraction, nullptr )
+Context::Context(Integration::GlAbstraction& glAbstraction)
+: Context(glAbstraction, nullptr)
 {
 }
 
-Context::Context( Integration::GlAbstraction& glAbstraction, OwnerContainer< Context* >* contexts )
+Context::Context(Integration::GlAbstraction& glAbstraction, OwnerContainer<Context*>* contexts)
 : mGlAbstraction(glAbstraction),
   mGlContextCreated(false),
   mColorMask(true),
@@ -88,26 +84,26 @@ Context::Context( Integration::GlAbstraction& glAbstraction, OwnerContainer< Con
   mBoundArrayBufferId(0),
   mBoundElementArrayBufferId(0),
   mBoundTransformFeedbackBufferId(0),
-  mActiveTextureUnit( TEXTURE_UNIT_LAST ),
+  mActiveTextureUnit(TEXTURE_UNIT_LAST),
   mBlendColor(Color::TRANSPARENT),
   mBlendFuncSeparateSrcRGB(GL_ONE),
   mBlendFuncSeparateDstRGB(GL_ZERO),
   mBlendFuncSeparateSrcAlpha(GL_ONE),
   mBlendFuncSeparateDstAlpha(GL_ZERO),
-  mBlendEquationSeparateModeRGB( GL_FUNC_ADD ),
-  mBlendEquationSeparateModeAlpha( GL_FUNC_ADD ),
-  mStencilFunc( GL_ALWAYS ),
-  mStencilFuncRef( 0 ),
-  mStencilFuncMask( 0xFFFFFFFF ),
-  mStencilOpFail( GL_KEEP ),
-  mStencilOpDepthFail( GL_KEEP ),
-  mStencilOpDepthPass( GL_KEEP ),
-  mDepthFunction( GL_LESS ),
+  mBlendEquationSeparateModeRGB(GL_FUNC_ADD),
+  mBlendEquationSeparateModeAlpha(GL_FUNC_ADD),
+  mStencilFunc(GL_ALWAYS),
+  mStencilFuncRef(0),
+  mStencilFuncMask(0xFFFFFFFF),
+  mStencilOpFail(GL_KEEP),
+  mStencilOpDepthFail(GL_KEEP),
+  mStencilOpDepthPass(GL_KEEP),
+  mDepthFunction(GL_LESS),
   mMaxTextureSize(0),
-  mClearColor(Color::WHITE),    // initial color, never used until it's been set by the user
-  mCullFaceMode( FaceCullingMode::NONE ),
-  mViewPort( 0, 0, 0, 0 ),
-  mSceneContexts( contexts ),
+  mClearColor(Color::WHITE), // initial color, never used until it's been set by the user
+  mCullFaceMode(FaceCullingMode::NONE),
+  mViewPort(0, 0, 0, 0),
+  mSceneContexts(contexts),
   mSurfaceOrientation(0)
 {
 }
@@ -118,7 +114,7 @@ void Context::GlContextCreated()
 {
   DALI_LOG_INFO(gContextLogFilter, Debug::Verbose, "Context::GlContextCreated()\n");
 
-  if( !mGlContextCreated )
+  if(!mGlContextCreated)
   {
     mGlContextCreated = true;
 
@@ -137,11 +133,11 @@ void Context::GlContextDestroyed()
   mGlContextCreated = false;
 }
 
-const char* Context::ErrorToString( GLenum errorCode )
+const char* Context::ErrorToString(GLenum errorCode)
 {
-  for( unsigned int i = 0; i < sizeof(errors) / sizeof(errors[0]); ++i)
+  for(unsigned int i = 0; i < sizeof(errors) / sizeof(errors[0]); ++i)
   {
-    if (errorCode == errors[i].errorCode)
+    if(errorCode == errors[i].errorCode)
     {
       return errors[i].errorString;
     }
@@ -149,59 +145,57 @@ const char* Context::ErrorToString( GLenum errorCode )
   return "Unknown Open GLES error";
 }
 
-const Rect< int >& Context::GetViewport()
+const Rect<int>& Context::GetViewport()
 {
   return mViewPort;
 }
 
 void Context::FlushVertexAttributeLocations()
 {
-  for( unsigned int i = 0; i < MAX_ATTRIBUTE_CACHE_SIZE; ++i )
+  for(unsigned int i = 0; i < MAX_ATTRIBUTE_CACHE_SIZE; ++i)
   {
     // see if our cached state is different to the actual state
-    if (mVertexAttributeCurrentState[ i ] != mVertexAttributeCachedState[ i ] )
+    if(mVertexAttributeCurrentState[i] != mVertexAttributeCachedState[i])
     {
       // it's different so make the change to the driver
       // and update the cached state
-      mVertexAttributeCurrentState[ i ] = mVertexAttributeCachedState[ i ];
+      mVertexAttributeCurrentState[i] = mVertexAttributeCachedState[i];
 
-      if (mVertexAttributeCurrentState[ i ] )
+      if(mVertexAttributeCurrentState[i])
       {
         LOG_GL("EnableVertexAttribArray %d\n", i);
-        CHECK_GL( mGlAbstraction, mGlAbstraction.EnableVertexAttribArray( i ) );
+        CHECK_GL(mGlAbstraction, mGlAbstraction.EnableVertexAttribArray(i));
       }
       else
       {
         LOG_GL("DisableVertexAttribArray %d\n", i);
-        CHECK_GL( mGlAbstraction, mGlAbstraction.DisableVertexAttribArray( i ) );
+        CHECK_GL(mGlAbstraction, mGlAbstraction.DisableVertexAttribArray(i));
       }
     }
   }
-
 }
 
 void Context::SetVertexAttributeLocation(unsigned int location, bool state)
 {
-
-  if( location >= MAX_ATTRIBUTE_CACHE_SIZE )
+  if(location >= MAX_ATTRIBUTE_CACHE_SIZE)
   {
     // not cached, make the gl call through context
-    if ( state )
+    if(state)
     {
-       LOG_GL("EnableVertexAttribArray %d\n", location);
-       CHECK_GL( mGlAbstraction, mGlAbstraction.EnableVertexAttribArray( location ) );
+      LOG_GL("EnableVertexAttribArray %d\n", location);
+      CHECK_GL(mGlAbstraction, mGlAbstraction.EnableVertexAttribArray(location));
     }
     else
     {
       LOG_GL("DisableVertexAttribArray %d\n", location);
-      CHECK_GL( mGlAbstraction, mGlAbstraction.DisableVertexAttribArray( location ) );
+      CHECK_GL(mGlAbstraction, mGlAbstraction.DisableVertexAttribArray(location));
     }
   }
   else
   {
     // set the cached state, it will be set at the next draw call
     // if it's different from the current driver state
-    mVertexAttributeCachedState[ location ] = state;
+    mVertexAttributeCachedState[location] = state;
   }
 }
 
@@ -210,34 +204,34 @@ void Context::InitializeGlState()
   DALI_LOG_INFO(gContextLogFilter, Debug::Verbose, "Context::InitializeGlState()\n");
   DALI_ASSERT_DEBUG(mGlContextCreated);
 
-  mClearColorSet = false;
-  mColorMask = true;
-  mStencilMask = 0xFF;
-  mBlendEnabled = false;
-  mDepthBufferEnabled = false;
-  mDepthMaskEnabled = false;
-  mPolygonOffsetFillEnabled = false;
+  mClearColorSet                = false;
+  mColorMask                    = true;
+  mStencilMask                  = 0xFF;
+  mBlendEnabled                 = false;
+  mDepthBufferEnabled           = false;
+  mDepthMaskEnabled             = false;
+  mPolygonOffsetFillEnabled     = false;
   mSampleAlphaToCoverageEnabled = false;
-  mSampleCoverageEnabled = false;
-  mScissorTestEnabled = false;
-  mStencilBufferEnabled = false;
-  mDitherEnabled = false; // This and GL_MULTISAMPLE are the only GL capability which defaults to true
+  mSampleCoverageEnabled        = false;
+  mScissorTestEnabled           = false;
+  mStencilBufferEnabled         = false;
+  mDitherEnabled                = false; // This and GL_MULTISAMPLE are the only GL capability which defaults to true
   mGlAbstraction.Disable(GL_DITHER);
 
-  mBoundArrayBufferId = 0;
-  mBoundElementArrayBufferId = 0;
+  mBoundArrayBufferId             = 0;
+  mBoundElementArrayBufferId      = 0;
   mBoundTransformFeedbackBufferId = 0;
-  mActiveTextureUnit = TEXTURE_UNIT_IMAGE;
+  mActiveTextureUnit              = TEXTURE_UNIT_IMAGE;
 
   mUsingDefaultBlendColor = true; //Default blend color is (0,0,0,0)
 
-  mBlendFuncSeparateSrcRGB = GL_ONE;
-  mBlendFuncSeparateDstRGB = GL_ZERO;
+  mBlendFuncSeparateSrcRGB   = GL_ONE;
+  mBlendFuncSeparateDstRGB   = GL_ZERO;
   mBlendFuncSeparateSrcAlpha = GL_ONE;
   mBlendFuncSeparateDstAlpha = GL_ZERO;
 
   // initial state is GL_FUNC_ADD for both RGB and Alpha blend modes
-  mBlendEquationSeparateModeRGB = GL_FUNC_ADD;
+  mBlendEquationSeparateModeRGB   = GL_FUNC_ADD;
   mBlendEquationSeparateModeAlpha = GL_FUNC_ADD;
 
   mCullFaceMode = FaceCullingMode::NONE; //By default cullface is disabled, front face is set to CCW and cull face is set to back
@@ -249,11 +243,11 @@ void Context::InitializeGlState()
   mViewPort.x = mViewPort.y = mViewPort.width = mViewPort.height = 0;
 
   //Initialze vertex attribute cache
-  memset( &mVertexAttributeCachedState, 0, sizeof(mVertexAttributeCachedState) );
-  memset( &mVertexAttributeCurrentState, 0, sizeof(mVertexAttributeCurrentState) );
+  memset(&mVertexAttributeCachedState, 0, sizeof(mVertexAttributeCachedState));
+  memset(&mVertexAttributeCurrentState, 0, sizeof(mVertexAttributeCurrentState));
 
   //Initialize bound 2d texture cache
-  memset( &mBoundTextureId, 0, sizeof(mBoundTextureId) );
+  memset(&mBoundTextureId, 0, sizeof(mBoundTextureId));
 
   mFrameBufferStateCache.Reset();
 }
@@ -262,8 +256,8 @@ void Context::InitializeGlState()
 
 void Context::PrintCurrentState()
 {
-  const char* cullFaceModes[] = { "CullNone", "CullFront", "CullBack", "CullFrontAndBack" };
-  DALI_LOG_INFO( gContextLogFilter, Debug::General,
+  const char* cullFaceModes[] = {"CullNone", "CullFront", "CullBack", "CullFrontAndBack"};
+  DALI_LOG_INFO(gContextLogFilter, Debug::General,
                 "\n----------------- Context State BEGIN -----------------\n"
                 "Blend = %s\n"
                 "Cull Face = %s\n"
@@ -277,7 +271,7 @@ void Context::PrintCurrentState()
                 "Stencil Test = %s\n"
                 "----------------- Context State END -----------------\n",
                 mBlendEnabled ? "Enabled" : "Disabled",
-                cullFaceModes[ mCullFaceMode ],
+                cullFaceModes[mCullFaceMode],
                 mDepthBufferEnabled ? "Enabled" : "Disabled",
                 mDepthMaskEnabled ? "Enabled" : "Disabled",
                 mDitherEnabled ? "Enabled" : "Disabled",

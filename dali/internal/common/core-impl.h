@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_CORE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,38 +19,38 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-vector.h>
-#include <dali/public-api/object/ref-object.h>
+#include <dali/devel-api/common/owner-container.h>
 #include <dali/integration-api/context-notifier.h>
 #include <dali/integration-api/core-enumerations.h>
-#include <dali/internal/common/owner-pointer.h>
-#include <dali/devel-api/common/owner-container.h>
-#include <dali/internal/event/animation/animation-playlist-declarations.h>
-#include <dali/internal/event/common/stage-def.h>
 #include <dali/integration-api/resource-policies.h>
-#include <dali/internal/event/common/scene-impl.h>
+#include <dali/internal/common/owner-pointer.h>
+#include <dali/internal/event/animation/animation-playlist-declarations.h>
 #include <dali/internal/event/common/object-registry-impl.h>
+#include <dali/internal/event/common/scene-impl.h>
+#include <dali/internal/event/common/stage-def.h>
+#include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/object/ref-object.h>
 
 namespace Dali
 {
+namespace Graphics
+{
+class Controller;
+}
 
 namespace Integration
 {
 class Processor;
 class RenderController;
 class PlatformAbstraction;
-class GlAbstraction;
-class GlSyncAbstraction;
-class GlContextHelperAbstraction;
 class UpdateStatus;
 class RenderStatus;
 struct Event;
 struct TouchEvent;
-}
+} // namespace Integration
 
 namespace Internal
 {
-
 class NotificationManager;
 class AnimationPlaylist;
 class PropertyNotificationManager;
@@ -67,7 +67,7 @@ class UpdateManager;
 class RenderManager;
 class DiscardQueue;
 class RenderTaskProcessor;
-}
+} // namespace SceneGraph
 
 /**
  * Internal class for Dali::Integration::Core
@@ -75,19 +75,16 @@ class RenderTaskProcessor;
 class Core : public EventThreadServices
 {
 public:
-
   /**
    * Create and initialise a new Core instance
    */
-  Core( Integration::RenderController& renderController,
-        Integration::PlatformAbstraction& platform,
-        Integration::GlAbstraction& glAbstraction,
-        Integration::GlSyncAbstraction& glSyncAbstraction,
-        Integration::GlContextHelperAbstraction& glContextHelperAbstraction,
-        Integration::RenderToFrameBuffer renderToFboEnabled,
-        Integration::DepthBufferAvailable depthBufferAvailable,
-        Integration::StencilBufferAvailable stencilBufferAvailable,
-        Integration::PartialUpdateAvailable partialUpdateAvailable );
+  Core(Integration::RenderController&      renderController,
+       Integration::PlatformAbstraction&   platform,
+       Graphics::Controller&               graphicsController,
+       Integration::RenderToFrameBuffer    renderToFboEnabled,
+       Integration::DepthBufferAvailable   depthBufferAvailable,
+       Integration::StencilBufferAvailable stencilBufferAvailable,
+       Integration::PartialUpdateAvailable partialUpdateAvailable);
 
   /**
    * Destructor
@@ -127,32 +124,32 @@ public:
   /**
    * @copydoc Dali::Integration::Core::Update()
    */
-  void Update( float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uint32_t nextVSyncTimeMilliseconds, Integration::UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo );
+  void Update(float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uint32_t nextVSyncTimeMilliseconds, Integration::UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo);
 
   /**
    * @copydoc Dali::Integration::Core::PreRender()
    */
-  void PreRender( Integration::RenderStatus& status, bool forceClear, bool uploadOnly );
+  void PreRender(Integration::RenderStatus& status, bool forceClear, bool uploadOnly);
 
   /**
    * @copydoc Dali::Integration::Core::PreRender()
    */
-  void PreRender( Integration::Scene& scene, std::vector<Rect<int>>& damagedRects );
+  void PreRender(Integration::Scene& scene, std::vector<Rect<int>>& damagedRects);
 
   /**
    * @copydoc Dali::Integration::Core::RenderScene()
    */
-  void RenderScene( Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo );
+  void RenderScene(Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo);
 
   /**
    * @copydoc Dali::Integration::Core::RenderScene()
    */
-  void RenderScene( Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo, Rect<int>& clippingRect );
+  void RenderScene(Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo, Rect<int>& clippingRect);
 
   /**
    * @copydoc Dali::Integration::Core::Render()
    */
-  void PostRender( bool uploadOnly );
+  void PostRender(bool uploadOnly);
 
   /**
    * @copydoc Dali::Integration::Core::SceneCreated()
@@ -162,7 +159,7 @@ public:
   /**
    * @copydoc Dali::Integration::Core::QueueEvent(const Integration::Event&)
    */
-  void QueueEvent( const Integration::Event& event );
+  void QueueEvent(const Integration::Event& event);
 
   /**
    * @copydoc Dali::Integration::Core::ProcessEvents()
@@ -177,22 +174,22 @@ public:
   /**
    * @copydoc Dali::Integration::Core::RegisterProcessor
    */
-  void RegisterProcessor( Dali::Integration::Processor& processor );
+  void RegisterProcessor(Dali::Integration::Processor& processor);
 
   /**
    * @copydoc Dali::Integration::Core::UnregisterProcessor
    */
-  void UnregisterProcessor( Dali::Integration::Processor& processor );
+  void UnregisterProcessor(Dali::Integration::Processor& processor);
 
   /**
    * @copydoc Dali::Internal::ThreadLocalStorage::AddScene()
    */
-  void AddScene( Scene* scene );
+  void AddScene(Scene* scene);
 
   /**
    * @copydoc Dali::Internal::ThreadLocalStorage::RemoveScene()
    */
-  void RemoveScene( Scene* scene );
+  void RemoveScene(Scene* scene);
 
   /**
    * @brief Gets the Object registry.
@@ -201,16 +198,15 @@ public:
   ObjectRegistry& GetObjectRegistry() const;
 
 public: // Implementation of EventThreadServices
-
   /**
    * @copydoc EventThreadServices::RegisterObject
    */
-  void RegisterObject( BaseObject* object) override;
+  void RegisterObject(BaseObject* object) override;
 
   /**
    * @copydoc EventThreadServices::UnregisterObject
    */
-  void UnregisterObject( BaseObject* object) override;
+  void UnregisterObject(BaseObject* object) override;
 
   /**
    * @copydoc EventThreadServices::GetUpdateManager
@@ -225,7 +221,7 @@ public: // Implementation of EventThreadServices
   /**
    * @copydoc EventThreadServices::ReserveMessageSlot
    */
-  uint32_t* ReserveMessageSlot( uint32_t size, bool updateScene ) override;
+  uint32_t* ReserveMessageSlot(uint32_t size, bool updateScene) override;
 
   /**
    * @copydoc EventThreadServices::GetEventBufferIndex
@@ -243,7 +239,6 @@ public: // Implementation of EventThreadServices
   bool IsNextUpdateForced() override;
 
 private:
-
   /**
    * Run each registered processor
    */
@@ -319,12 +314,11 @@ private:
   Integration::GlAbstraction& GetGlAbstraction() const;
 
 private:
-
   /**
    * Undefined copy and assignment operators
    */
-  Core(const Core& core) = delete;  // No definition
-  Core& operator=(const Core& core) = delete;  // No definition
+  Core(const Core& core) = delete;            // No definition
+  Core& operator=(const Core& core) = delete; // No definition
 
   /**
    * Create Thread local storage
@@ -332,39 +326,35 @@ private:
   void CreateThreadLocalStorage();
 
 private:
-
-  Integration::RenderController&            mRenderController;            ///< Reference to Render controller to tell it to keep rendering
-  Integration::PlatformAbstraction&         mPlatform;                    ///< The interface providing platform specific services.
+  Integration::RenderController&    mRenderController; ///< Reference to Render controller to tell it to keep rendering
+  Integration::PlatformAbstraction& mPlatform;         ///< The interface providing platform specific services.
 
   IntrusivePtr<Stage>                       mStage;                       ///< The current stage
   AnimationPlaylistOwner                    mAnimationPlaylist;           ///< For 'Fire and forget' animation support
   OwnerPointer<PropertyNotificationManager> mPropertyNotificationManager; ///< For safe signal emmision of property changed notifications
-  IntrusivePtr< RelayoutController >        mRelayoutController;          ///< Size negotiation relayout controller
+  IntrusivePtr<RelayoutController>          mRelayoutController;          ///< Size negotiation relayout controller
 
-  OwnerPointer<SceneGraph::RenderTaskProcessor> mRenderTaskProcessor;         ///< Handles the processing of render tasks
-  OwnerPointer<SceneGraph::RenderManager>       mRenderManager;               ///< Render manager
-  OwnerPointer<SceneGraph::UpdateManager>       mUpdateManager;               ///< Update manager
-  OwnerPointer<SceneGraph::DiscardQueue>        mDiscardQueue;                ///< Used to cleanup nodes & resources when no longer in use.
-  OwnerPointer<ShaderFactory>                   mShaderFactory;               ///< Shader resource factory
-  OwnerPointer<NotificationManager>             mNotificationManager;         ///< Notification manager
-  OwnerPointer<GestureEventProcessor>           mGestureEventProcessor;       ///< The gesture event processor
-  Dali::Vector<Integration::Processor*>         mProcessors;                  ///< Registered processors (not owned)
+  OwnerPointer<SceneGraph::RenderTaskProcessor> mRenderTaskProcessor;   ///< Handles the processing of render tasks
+  OwnerPointer<SceneGraph::RenderManager>       mRenderManager;         ///< Render manager
+  OwnerPointer<SceneGraph::UpdateManager>       mUpdateManager;         ///< Update manager
+  OwnerPointer<SceneGraph::DiscardQueue>        mDiscardQueue;          ///< Used to cleanup nodes & resources when no longer in use.
+  OwnerPointer<ShaderFactory>                   mShaderFactory;         ///< Shader resource factory
+  OwnerPointer<NotificationManager>             mNotificationManager;   ///< Notification manager
+  OwnerPointer<GestureEventProcessor>           mGestureEventProcessor; ///< The gesture event processor
+  Dali::Vector<Integration::Processor*>         mProcessors;            ///< Registered processors (not owned)
 
   using SceneContainer = std::vector<ScenePtr>;
-  SceneContainer                                mScenes;                      ///< A container of scenes that bound to a surface for rendering, owned by Core
+  SceneContainer mScenes; ///< A container of scenes that bound to a surface for rendering, owned by Core
 
   // The object registry
-  ObjectRegistryPtr                             mObjectRegistry;
+  ObjectRegistryPtr mObjectRegistry;
 
-  // GlAbstraction for capabilities of GL
-  // Not to use this for bypass Context.
-  Integration::GlAbstraction&               mGlAbstraction;
+  Graphics::Controller& mGraphicsController;
 
-  bool                                      mProcessingEvent  : 1;        ///< True during ProcessEvents()
-  bool                                      mForceNextUpdate:1;           ///< True if the next rendering is really required.
+  bool mProcessingEvent : 1; ///< True during ProcessEvents()
+  bool mForceNextUpdate : 1; ///< True if the next rendering is really required.
 
   friend class ThreadLocalStorage;
-
 };
 
 } // namespace Internal

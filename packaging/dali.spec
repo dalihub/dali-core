@@ -136,3 +136,4 @@ exit 0
 %files integration-devel
 %defattr(-,root,root,-)
 %{_includedir}/dali/integration-api/*
+%{_includedir}/dali/graphics-api/*

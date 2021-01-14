@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,22 +19,23 @@
 #include <dali/internal/common/core-impl.h>
 
 // INTERNAL INCLUDES
+#include <dali/graphics-api/graphics-controller.h>
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/events/event.h>
-#include <dali/integration-api/gl-sync-abstraction.h>
 #include <dali/integration-api/gl-context-helper-abstraction.h>
+#include <dali/integration-api/gl-sync-abstraction.h>
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/integration-api/processor-interface.h>
 #include <dali/integration-api/render-controller.h>
 
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/animation/animation-playlist.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/notification-manager.h>
 #include <dali/internal/event/common/property-notification-manager.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/thread-local-storage.h>
-#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/type-registry-impl.h>
 #include <dali/internal/event/effects/shader-factory.h>
 #include <dali/internal/event/events/event-processor.h>
@@ -43,17 +44,17 @@
 #include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
 
 #include <dali/internal/update/common/discard-queue.h>
-#include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/manager/render-task-processor.h>
+#include <dali/internal/update/manager/update-manager.h>
 
 #include <dali/internal/render/common/performance-monitor.h>
 #include <dali/internal/render/common/render-manager.h>
 #include <dali/internal/render/gl-resources/context.h>
 
-using Dali::Internal::SceneGraph::UpdateManager;
-using Dali::Internal::SceneGraph::RenderManager;
 using Dali::Internal::SceneGraph::DiscardQueue;
+using Dali::Internal::SceneGraph::RenderManager;
 using Dali::Internal::SceneGraph::RenderQueue;
+using Dali::Internal::SceneGraph::UpdateManager;
 
 namespace
 {
@@ -63,43 +64,39 @@ const uint32_t MAXIMUM_UPDATE_COUNT = 2u;
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gCoreFilter = Debug::Filter::New(Debug::Concise, false, "LOG_CORE");
 #endif
-}
+} // namespace
 
 namespace Dali
 {
-
 namespace Internal
 {
-
-using Integration::RenderController;
-using Integration::PlatformAbstraction;
-using Integration::GlSyncAbstraction;
+using Integration::Event;
 using Integration::GlAbstraction;
 using Integration::GlContextHelperAbstraction;
-using Integration::Event;
-using Integration::UpdateStatus;
+using Integration::GlSyncAbstraction;
+using Integration::PlatformAbstraction;
+using Integration::RenderController;
 using Integration::RenderStatus;
+using Integration::UpdateStatus;
 
-Core::Core( RenderController& renderController,
-            PlatformAbstraction& platform,
-            GlAbstraction& glAbstraction,
-            GlSyncAbstraction& glSyncAbstraction,
-            GlContextHelperAbstraction& glContextHelperAbstraction,
-            Integration::RenderToFrameBuffer renderToFboEnabled,
-            Integration::DepthBufferAvailable depthBufferAvailable,
-            Integration::StencilBufferAvailable stencilBufferAvailable,
-            Integration::PartialUpdateAvailable partialUpdateAvailable )
-: mRenderController( renderController ),
+Core::Core(RenderController&                   renderController,
+           PlatformAbstraction&                platform,
+           Graphics::Controller&               graphicsController,
+           Integration::RenderToFrameBuffer    renderToFboEnabled,
+           Integration::DepthBufferAvailable   depthBufferAvailable,
+           Integration::StencilBufferAvailable stencilBufferAvailable,
+           Integration::PartialUpdateAvailable partialUpdateAvailable)
+: mRenderController(renderController),
   mPlatform(platform),
-  mGlAbstraction(glAbstraction),
+  mGraphicsController(graphicsController),
   mProcessingEvent(false),
-  mForceNextUpdate( false )
+  mForceNextUpdate(false)
 {
   // Create the thread local storage
   CreateThreadLocalStorage();
 
   // This does nothing until Core is built with --enable-performance-monitor
-  PERFORMANCE_MONITOR_INIT( platform );
+  PERFORMANCE_MONITOR_INIT(platform);
 
   mNotificationManager = new NotificationManager();
 
@@ -109,34 +106,34 @@ Core::Core( RenderController& renderController,
 
   mRenderTaskProcessor = new SceneGraph::RenderTaskProcessor();
 
-  mRenderManager = RenderManager::New( glAbstraction, glSyncAbstraction, glContextHelperAbstraction, depthBufferAvailable, stencilBufferAvailable, partialUpdateAvailable );
+  mRenderManager = RenderManager::New(graphicsController, depthBufferAvailable, stencilBufferAvailable, partialUpdateAvailable);
 
   RenderQueue& renderQueue = mRenderManager->GetRenderQueue();
 
-  mDiscardQueue = new DiscardQueue( renderQueue );
+  mDiscardQueue = new DiscardQueue(renderQueue);
 
-  mUpdateManager = new UpdateManager( *mNotificationManager,
-                                      *mAnimationPlaylist,
-                                      *mPropertyNotificationManager,
-                                      *mDiscardQueue,
-                                       renderController,
-                                      *mRenderManager,
-                                       renderQueue,
-                                      *mRenderTaskProcessor );
+  mUpdateManager = new UpdateManager(*mNotificationManager,
+                                     *mAnimationPlaylist,
+                                     *mPropertyNotificationManager,
+                                     *mDiscardQueue,
+                                     renderController,
+                                     *mRenderManager,
+                                     renderQueue,
+                                     *mRenderTaskProcessor);
 
-  mRenderManager->SetShaderSaver( *mUpdateManager );
+  mRenderManager->SetShaderSaver(*mUpdateManager);
 
   mObjectRegistry = ObjectRegistry::New();
 
-  mStage = IntrusivePtr<Stage>( Stage::New( *mUpdateManager ) );
+  mStage = IntrusivePtr<Stage>(Stage::New(*mUpdateManager));
 
   // This must be called after stage is created but before stage initialization
-  mRelayoutController = IntrusivePtr< RelayoutController >( new RelayoutController( mRenderController ) );
+  mRelayoutController = IntrusivePtr<RelayoutController>(new RelayoutController(mRenderController));
 
-  mGestureEventProcessor = new GestureEventProcessor( *mUpdateManager, mRenderController );
+  mGestureEventProcessor = new GestureEventProcessor(*mUpdateManager, mRenderController);
 
   mShaderFactory = new ShaderFactory();
-  mUpdateManager->SetShaderSaver( *mShaderFactory );
+  mUpdateManager->SetShaderSaver(*mShaderFactory);
 
   GetImplementation(Dali::TypeRegistry::Get()).CallInitFunctions();
 }
@@ -151,7 +148,7 @@ Core::~Core()
   // allows core to be created / deleted many times in the same thread (how TET cases work).
   // Do this before mStage.Reset() so Stage::IsInstalled() returns false
   ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
-  if( tls )
+  if(tls)
   {
     tls->Remove();
     tls->Unreference();
@@ -164,12 +161,11 @@ Core::~Core()
 
   // remove (last?) reference to stage
   mStage.Reset();
-
 }
 
 void Core::Initialize()
 {
-  mStage->Initialize( *mScenes[0] );
+  mStage->Initialize(*mScenes[0]);
 }
 
 Integration::ContextNotifierInterface* Core::GetContextNotifier()
@@ -194,7 +190,7 @@ void Core::ContextDestroyed()
   mRenderManager->ContextDestroyed();
 }
 
-void Core::Update( float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uint32_t nextVSyncTimeMilliseconds, Integration::UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo )
+void Core::Update(float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uint32_t nextVSyncTimeMilliseconds, Integration::UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo)
 {
   // set the time delta so adaptor can easily print FPS with a release build with 0 as
   // it is cached by frametime
@@ -202,11 +198,11 @@ void Core::Update( float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uin
 
   // Render returns true when there are updates on the stage or one or more animations are completed.
   // Use the estimated time diff till we render as the elapsed time.
-  status.keepUpdating = mUpdateManager->Update( elapsedSeconds,
-                                                lastVSyncTimeMilliseconds,
-                                                nextVSyncTimeMilliseconds,
-                                                renderToFboEnabled,
-                                                isRenderingToFbo );
+  status.keepUpdating = mUpdateManager->Update(elapsedSeconds,
+                                               lastVSyncTimeMilliseconds,
+                                               nextVSyncTimeMilliseconds,
+                                               renderToFboEnabled,
+                                               isRenderingToFbo);
 
   // Check the Notification Manager message queue to set needsNotification
   status.needsNotification = mNotificationManager->MessagesToProcess();
@@ -218,29 +214,29 @@ void Core::Update( float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uin
   // Any message to update will wake it up anyways
 }
 
-void Core::PreRender( RenderStatus& status, bool forceClear, bool uploadOnly )
+void Core::PreRender(RenderStatus& status, bool forceClear, bool uploadOnly)
 {
-  mRenderManager->PreRender( status, forceClear, uploadOnly );
+  mRenderManager->PreRender(status, forceClear, uploadOnly);
 }
 
-void Core::PreRender( Integration::Scene& scene, std::vector<Rect<int>>& damagedRects )
+void Core::PreRender(Integration::Scene& scene, std::vector<Rect<int>>& damagedRects)
 {
-  mRenderManager->PreRender( scene, damagedRects );
+  mRenderManager->PreRender(scene, damagedRects);
 }
 
-void Core::RenderScene( RenderStatus& status, Integration::Scene& scene, bool renderToFbo )
+void Core::RenderScene(RenderStatus& status, Integration::Scene& scene, bool renderToFbo)
 {
-  mRenderManager->RenderScene( status, scene, renderToFbo );
+  mRenderManager->RenderScene(status, scene, renderToFbo);
 }
 
-void Core::RenderScene( RenderStatus& status, Integration::Scene& scene, bool renderToFbo, Rect<int>& clippingRect )
+void Core::RenderScene(RenderStatus& status, Integration::Scene& scene, bool renderToFbo, Rect<int>& clippingRect)
 {
-  mRenderManager->RenderScene( status, scene, renderToFbo, clippingRect );
+  mRenderManager->RenderScene(status, scene, renderToFbo, clippingRect);
 }
 
-void Core::PostRender( bool uploadOnly )
+void Core::PostRender(bool uploadOnly)
 {
-  mRenderManager->PostRender( uploadOnly );
+  mRenderManager->PostRender(uploadOnly);
 }
 
 void Core::SceneCreated()
@@ -249,33 +245,33 @@ void Core::SceneCreated()
 
   mRelayoutController->OnApplicationSceneCreated();
 
-  for( const auto& scene : mScenes )
+  for(const auto& scene : mScenes)
   {
     Dali::Actor sceneRootLayer = scene->GetRootLayer();
-    mRelayoutController->RequestRelayoutTree( sceneRootLayer );
+    mRelayoutController->RequestRelayoutTree(sceneRootLayer);
   }
 }
 
-void Core::QueueEvent( const Integration::Event& event )
+void Core::QueueEvent(const Integration::Event& event)
 {
-  if (mScenes.size() != 0)
+  if(mScenes.size() != 0)
   {
-    mScenes.front()->QueueEvent( event );
+    mScenes.front()->QueueEvent(event);
   }
 }
 
 void Core::ProcessEvents()
 {
   // Guard against calls to ProcessEvents() during ProcessEvents()
-  if( mProcessingEvent )
+  if(mProcessingEvent)
   {
-    DALI_LOG_ERROR( "ProcessEvents should not be called from within ProcessEvents!\n" );
-    mRenderController.RequestProcessEventsOnIdle( false );
+    DALI_LOG_ERROR("ProcessEvents should not be called from within ProcessEvents!\n");
+    mRenderController.RequestProcessEventsOnIdle(false);
     return;
   }
 
   mProcessingEvent = true;
-  mRelayoutController->SetProcessingCoreEvents( true );
+  mRelayoutController->SetProcessingCoreEvents(true);
 
   // Signal that any messages received will be flushed soon
   mUpdateManager->EventProcessingStarted();
@@ -285,7 +281,7 @@ void Core::ProcessEvents()
   SceneContainer scenes = mScenes;
 
   // process events in all scenes
-  for( auto scene : scenes )
+  for(auto scene : scenes)
   {
     scene->ProcessEvents();
   }
@@ -293,7 +289,7 @@ void Core::ProcessEvents()
   mNotificationManager->ProcessMessages();
 
   // Emit signal here to inform listeners that event processing has finished.
-  for( auto scene : scenes )
+  for(auto scene : scenes)
   {
     scene->EmitEventProcessingFinishedSignal();
   }
@@ -305,7 +301,7 @@ void Core::ProcessEvents()
   mRelayoutController->Relayout();
 
   // Rebuild depth tree after event processing has finished
-  for( auto scene : scenes )
+  for(auto scene : scenes)
   {
     scene->RebuildDepthTree();
   }
@@ -318,13 +314,13 @@ void Core::ProcessEvents()
   // Check if the next update is forced.
   const bool forceUpdate = IsNextUpdateForced();
 
-  if( messagesToProcess || gestureNeedsUpdate || forceUpdate )
+  if(messagesToProcess || gestureNeedsUpdate || forceUpdate)
   {
     // tell the render controller to keep update thread running
-    mRenderController.RequestUpdate( forceUpdate );
+    mRenderController.RequestUpdate(forceUpdate);
   }
 
-  mRelayoutController->SetProcessingCoreEvents( false );
+  mRelayoutController->SetProcessingCoreEvents(false);
 
   // ProcessEvents() may now be called again
   mProcessingEvent = false;
@@ -335,28 +331,28 @@ uint32_t Core::GetMaximumUpdateCount() const
   return MAXIMUM_UPDATE_COUNT;
 }
 
-void Core::RegisterProcessor( Integration::Processor& processor )
+void Core::RegisterProcessor(Integration::Processor& processor)
 {
   mProcessors.PushBack(&processor);
 }
 
-void Core::UnregisterProcessor( Integration::Processor& processor )
+void Core::UnregisterProcessor(Integration::Processor& processor)
 {
-  auto iter = std::find( mProcessors.Begin(), mProcessors.End(), &processor );
-  if( iter != mProcessors.End() )
+  auto iter = std::find(mProcessors.Begin(), mProcessors.End(), &processor);
+  if(iter != mProcessors.End())
   {
-    mProcessors.Erase( iter );
+    mProcessors.Erase(iter);
   }
 }
 
 void Core::RunProcessors()
 {
   // Copy processor pointers to prevent changes to vector affecting loop iterator.
-  Dali::Vector<Integration::Processor*> processors( mProcessors );
+  Dali::Vector<Integration::Processor*> processors(mProcessors);
 
-  for( auto processor : processors )
+  for(auto processor : processors)
   {
-    if( processor )
+    if(processor)
     {
       processor->Process();
     }
@@ -425,20 +421,20 @@ AnimationPlaylist& Core::GetAnimationPlaylist() const
 
 Integration::GlAbstraction& Core::GetGlAbstraction() const
 {
-  return mGlAbstraction;
+  return mGraphicsController.GetGlAbstraction();
 }
 
-void Core::AddScene( Scene* scene )
+void Core::AddScene(Scene* scene)
 {
-  mScenes.push_back( scene );
+  mScenes.push_back(scene);
 }
 
-void Core::RemoveScene( Scene* scene )
+void Core::RemoveScene(Scene* scene)
 {
-  auto iter = std::find( mScenes.begin(), mScenes.end(), scene );
-  if( iter != mScenes.end() )
+  auto iter = std::find(mScenes.begin(), mScenes.end(), scene);
+  if(iter != mScenes.end())
   {
-    mScenes.erase( iter );
+    mScenes.erase(iter);
   }
 }
 
@@ -450,16 +446,16 @@ void Core::CreateThreadLocalStorage()
   tls->Reference();
 }
 
-void Core::RegisterObject( Dali::BaseObject* object )
+void Core::RegisterObject(Dali::BaseObject* object)
 {
   mObjectRegistry = &ThreadLocalStorage::Get().GetObjectRegistry();
-  mObjectRegistry->RegisterObject( object );
+  mObjectRegistry->RegisterObject(object);
 }
 
-void Core::UnregisterObject( Dali::BaseObject* object )
+void Core::UnregisterObject(Dali::BaseObject* object)
 {
   mObjectRegistry = &ThreadLocalStorage::Get().GetObjectRegistry();
-  mObjectRegistry->UnregisterObject( object );
+  mObjectRegistry->UnregisterObject(object);
 }
 
 Integration::RenderController& Core::GetRenderController()
@@ -467,9 +463,9 @@ Integration::RenderController& Core::GetRenderController()
   return mRenderController;
 }
 
-uint32_t* Core::ReserveMessageSlot( uint32_t size, bool updateScene )
+uint32_t* Core::ReserveMessageSlot(uint32_t size, bool updateScene)
 {
-  return mUpdateManager->ReserveMessageSlot( size, updateScene );
+  return mUpdateManager->ReserveMessageSlot(size, updateScene);
 }
 
 BufferIndex Core::GetEventBufferIndex() const
@@ -485,7 +481,7 @@ void Core::ForceNextUpdate()
 bool Core::IsNextUpdateForced()
 {
   bool nextUpdateForced = mForceNextUpdate;
-  mForceNextUpdate = false;
+  mForceNextUpdate      = false;
   return nextUpdateForced;
 }
 

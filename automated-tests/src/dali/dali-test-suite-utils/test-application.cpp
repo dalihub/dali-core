@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,9 +55,7 @@ void TestApplication::CreateCore()
 
   mCore = Dali::Integration::Core::New(mRenderController,
                                        mPlatformAbstraction,
-                                       mGlAbstraction,
-                                       mGlSyncAbstraction,
-                                       mGlContextHelperAbstraction,
+                                       mGraphicsController,
                                        Integration::RenderToFrameBuffer::FALSE,
                                        Integration::DepthBufferAvailable::TRUE,
                                        Integration::StencilBufferAvailable::TRUE,
@@ -141,19 +139,24 @@ TestRenderController& TestApplication::GetRenderController()
   return mRenderController;
 }
 
+TestGraphicsController& TestApplication::GetGraphicsController()
+{
+  return mGraphicsController;
+}
+
 TestGlAbstraction& TestApplication::GetGlAbstraction()
 {
-  return mGlAbstraction;
+  return static_cast<TestGlAbstraction&>(mGraphicsController.GetGlAbstraction());
 }
 
 TestGlSyncAbstraction& TestApplication::GetGlSyncAbstraction()
 {
-  return mGlSyncAbstraction;
+  return static_cast<TestGlSyncAbstraction&>(mGraphicsController.GetGlSyncAbstraction());
 }
 
 TestGlContextHelperAbstraction& TestApplication::GetGlContextHelperAbstraction()
 {
-  return mGlContextHelperAbstraction;
+  return static_cast<TestGlContextHelperAbstraction&>(mGraphicsController.GetGlContextHelperAbstraction());
 }
 
 void TestApplication::ProcessEvent(const Integration::Event& event)
@@ -262,7 +265,7 @@ bool TestApplication::RenderOnly()
 void TestApplication::ResetContext()
 {
   mCore->ContextDestroyed();
-  mGlAbstraction.Initialize();
+  mGraphicsController.Initialize();
   mCore->ContextCreated();
 }
 
