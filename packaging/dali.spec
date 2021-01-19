@@ -1,6 +1,6 @@
 Name:       dali2
 Summary:    DALi 3D Engine
-Version:    2.0.8
+Version:    2.0.9
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT
@@ -136,3 +136,4 @@ exit 0
 %files integration-devel
 %defattr(-,root,root,-)
 %{_includedir}/dali/integration-api/*
+%{_includedir}/dali/graphics-api/*

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PROGRAM_CONTROLLER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,16 +20,15 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/owner-container.h>
+#include <dali/graphics-api/graphics-controller.h>
 #include <dali/internal/common/shader-data.h>
-#include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/shaders/program-cache.h>
+#include <dali/internal/render/shaders/program.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 class ShaderSaver;
 
 /**
@@ -38,22 +37,22 @@ class ShaderSaver;
 class ProgramController : public ProgramCache
 {
 public:
-
   /**
    * Wrapper for a program and its hash code
    */
   class ProgramPair
   {
   public: // API
-
     /**
      * Constructor
      * @param program
      * @param shaderHash
      */
-    ProgramPair( Program* program, size_t shaderHash )
-    : mProgram( program ), mShaderHash( shaderHash )
-    { }
+    ProgramPair(Program* program, size_t shaderHash)
+    : mProgram(program),
+      mShaderHash(shaderHash)
+    {
+    }
 
     /**
      * Destructor, non-virtual as not a base
@@ -82,19 +81,19 @@ public:
     }
 
   private: // Not implemented
-    ProgramPair( const ProgramPair& );
-    ProgramPair& operator=( const ProgramPair& );
+    ProgramPair(const ProgramPair&);
+    ProgramPair& operator=(const ProgramPair&);
 
   private: // Data
     Program* mProgram;
-    size_t mShaderHash;
+    size_t   mShaderHash;
   };
 
   /**
    * Constructor
-   * @param postProcessDispatcher to send save binary message back to update
+   * graphicsController The graphics backend controller
    */
-  ProgramController( Integration::GlAbstraction& glAbstraction );
+  ProgramController(Graphics::Controller& graphicsController);
 
   /**
    * Destructor, non virtual as not a base class
@@ -102,7 +101,6 @@ public:
   ~ProgramController() override;
 
 public: // API
-
   /**
    * Resets the program matrices. Must be called at the beginning of every frame
    */
@@ -122,7 +120,7 @@ public: // API
    * Set the destination for compiler shader binaries so they can be saved.
    * @note Must be called during initialisation.
    */
-  void SetShaderSaver( ShaderSaver& shaderSaver );
+  void SetShaderSaver(ShaderSaver& shaderSaver);
 
   /**
    * Clear current cached program
@@ -130,7 +128,6 @@ public: // API
   void ClearCurrentProgram();
 
 private: // From ProgramCache
-
   /**
    * @copydoc ProgramCache::GetGlAbstraction
    */
@@ -139,12 +136,12 @@ private: // From ProgramCache
   /**
    * @copydoc ProgramCache::GetProgram
    */
-  Program* GetProgram( size_t shaderHash ) override;
+  Program* GetProgram(size_t shaderHash) override;
 
   /**
    * @copydoc ProgramCache::AddProgram
    */
-  void AddProgram( size_t shaderHash, Program* program ) override;
+  void AddProgram(size_t shaderHash, Program* program) override;
 
   /**
    * @copydoc ProgramCache::GetCurrentProgram
@@ -154,7 +151,7 @@ private: // From ProgramCache
   /**
    * @copydoc ProgramCache::SetCurrentProgram
    */
-  void SetCurrentProgram( Program* program ) override;
+  void SetCurrentProgram(Program* program) override;
 
   /**
    * @copydoc ProgramCache::IsBinarySupported
@@ -169,18 +166,16 @@ private: // From ProgramCache
   /**
    * @copydoc ProgramCache::StoreBinary
    */
-  void StoreBinary( Internal::ShaderDataPtr programData ) override;
+  void StoreBinary(Internal::ShaderDataPtr programData) override;
 
 private: // not implemented as non-copyable
-
-  ProgramController( const ProgramController& rhs );
-  ProgramController& operator=( const ProgramController& rhs );
+  ProgramController(const ProgramController& rhs);
+  ProgramController& operator=(const ProgramController& rhs);
 
 private: // Data
-
-  ShaderSaver* mShaderSaver;
-  Integration::GlAbstraction& mGlAbstraction;
-  Program* mCurrentProgram;
+  ShaderSaver*          mShaderSaver;
+  Graphics::Controller& mGraphicsController;
+  Program*              mCurrentProgram;
 
   using ProgramContainer = OwnerContainer<ProgramPair*>;
   using ProgramIterator  = ProgramContainer::Iterator;
@@ -188,7 +183,6 @@ private: // Data
 
   GLint mProgramBinaryFormat;
   GLint mNumberOfProgramBinaryFormats;
-
 };
 
 } // namespace Internal
@@ -196,4 +190,3 @@ private: // Data
 } // namespace Dali
 
 #endif // DALI_INTERNAL_PROGRAM_CONTROLLER_H
-

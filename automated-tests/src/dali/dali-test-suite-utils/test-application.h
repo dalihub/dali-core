@@ -2,7 +2,7 @@
 #define DALI_TEST_APPLICATION_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +22,11 @@
 #include <dali/integration-api/resource-policies.h>
 #include <dali/integration-api/scene.h>
 #include <dali/integration-api/trace.h>
+
 #include <dali/public-api/common/dali-common.h>
 #include <test-platform-abstraction.h>
 
-#include "test-gl-abstraction.h"
-#include "test-gl-context-helper-abstraction.h"
-#include "test-gl-sync-abstraction.h"
+#include "test-graphics-controller.h"
 #include "test-render-controller.h"
 
 namespace Dali
@@ -58,27 +57,30 @@ public:
   void CreateScene();
   void InitializeCore();
   ~TestApplication() override;
-  static void                     LogMessage(Dali::Integration::Log::DebugPriority level, std::string& message);
-  static void                     LogContext(bool start, const char* tag);
-  Dali::Integration::Core&        GetCore();
-  TestPlatformAbstraction&        GetPlatform();
-  TestRenderController&           GetRenderController();
+  static void              LogMessage(Dali::Integration::Log::DebugPriority level, std::string& message);
+  static void              LogContext(bool start, const char* tag);
+  Dali::Integration::Core& GetCore();
+  TestPlatformAbstraction& GetPlatform();
+  TestRenderController&    GetRenderController();
+  TestGraphicsController&  GetGraphicsController();
+
   TestGlAbstraction&              GetGlAbstraction();
   TestGlSyncAbstraction&          GetGlSyncAbstraction();
   TestGlContextHelperAbstraction& GetGlContextHelperAbstraction();
-  void                            ProcessEvent(const Integration::Event& event);
-  void                            SendNotification();
-  bool                            Render(uint32_t intervalMilliseconds = DEFAULT_RENDER_INTERVAL, const char* location = NULL);
-  bool                            PreRenderWithPartialUpdate(uint32_t intervalMilliseconds, const char* location, std::vector<Rect<int>>& damagedRects);
-  bool                            RenderWithPartialUpdate(std::vector<Rect<int>>& damagedRects, Rect<int>& clippingRect);
-  uint32_t                        GetUpdateStatus();
-  bool                            UpdateOnly(uint32_t intervalMilliseconds = DEFAULT_RENDER_INTERVAL);
-  bool                            RenderOnly();
-  void                            ResetContext();
-  bool                            GetRenderNeedsUpdate();
-  bool                            GetRenderNeedsPostRender();
-  uint32_t                        Wait(uint32_t durationToWait);
-  static void                     EnableLogging(bool enabled)
+
+  void        ProcessEvent(const Integration::Event& event);
+  void        SendNotification();
+  bool        Render(uint32_t intervalMilliseconds = DEFAULT_RENDER_INTERVAL, const char* location = NULL);
+  bool        PreRenderWithPartialUpdate(uint32_t intervalMilliseconds, const char* location, std::vector<Rect<int>>& damagedRects);
+  bool        RenderWithPartialUpdate(std::vector<Rect<int>>& damagedRects, Rect<int>& clippingRect);
+  uint32_t    GetUpdateStatus();
+  bool        UpdateOnly(uint32_t intervalMilliseconds = DEFAULT_RENDER_INTERVAL);
+  bool        RenderOnly();
+  void        ResetContext();
+  bool        GetRenderNeedsUpdate();
+  bool        GetRenderNeedsPostRender();
+  uint32_t    Wait(uint32_t durationToWait);
+  static void EnableLogging(bool enabled)
   {
     mLoggingEnabled = enabled;
   }
@@ -92,11 +94,9 @@ private:
   void DoUpdate(uint32_t intervalMilliseconds, const char* location = NULL);
 
 protected:
-  TestPlatformAbstraction        mPlatformAbstraction;
-  TestRenderController           mRenderController;
-  TestGlAbstraction              mGlAbstraction;
-  TestGlSyncAbstraction          mGlSyncAbstraction;
-  TestGlContextHelperAbstraction mGlContextHelperAbstraction;
+  TestPlatformAbstraction mPlatformAbstraction;
+  TestRenderController    mRenderController;
+  TestGraphicsController  mGraphicsController;
 
   Integration::UpdateStatus mStatus;
   Integration::RenderStatus mRenderStatus;
