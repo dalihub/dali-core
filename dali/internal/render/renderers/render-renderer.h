@@ -19,6 +19,11 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/public-api/math/matrix.h>
+#include <dali/public-api/math/vector4.h>
+#include <dali/public-api/rendering/texture-set.h>
+
+#include <dali/graphics-api/graphics-controller.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/common/message.h>
@@ -28,9 +33,6 @@
 #include <dali/internal/render/gl-resources/gl-resource-owner.h>
 #include <dali/internal/render/renderers/render-geometry.h>
 #include <dali/internal/update/manager/render-instruction-processor.h>
-#include <dali/public-api/math/matrix.h>
-#include <dali/public-api/math/vector4.h>
-#include <dali/public-api/rendering/texture-set.h>
 
 namespace Dali
 {
@@ -164,9 +166,10 @@ public:
   /**
    * Second-phase construction.
    * This is called when the renderer is inside render thread
-   * @param[in] context Context used by the renderer
+   * @param[in] context Context used by the renderer (To be removed)
+   * @param[in] graphicsController The graphics controller to use
    */
-  void Initialize(Context& context);
+  void Initialize(Context& context, Graphics::Controller& graphicsController);
 
   /**
    * Destructor
@@ -371,7 +374,7 @@ public:
               const Matrix&                                        projectionMatrix,
               const Vector3&                                       size,
               bool                                                 blend,
-              Vector<GLuint>&                                      boundTextures,
+              Vector<Graphics::Texture*>&                          boundTextures,
               const Dali::Internal::SceneGraph::RenderInstruction& instruction,
               uint32_t                                             queueIndex);
 
@@ -438,9 +441,10 @@ private:
    * @param[in] boundTextures The textures bound for rendering
    * @return False if create or bind failed, true if success.
    */
-  bool BindTextures(Context& context, Program& program, Vector<GLuint>& boundTextures);
+  bool BindTextures(Context& context, Program& program, Graphics::CommandBuffer& commandBuffer, Vector<Graphics::Texture*>& boundTextures);
 
 private:
+  Graphics::Controller*                        mGraphicsController;
   OwnerPointer<SceneGraph::RenderDataProvider> mRenderDataProvider;
 
   Context*          mContext;

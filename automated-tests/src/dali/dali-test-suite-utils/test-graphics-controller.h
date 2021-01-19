@@ -37,9 +37,7 @@ std::ostream& operator<<(std::ostream& o, const Graphics::SamplerCreateInfo& cre
 class TestGraphicsController : public Dali::Graphics::Controller
 {
 public:
-  TestGraphicsController()
-  {
-  }
+  TestGraphicsController();
 
   virtual ~TestGraphicsController() = default;
 
@@ -63,38 +61,28 @@ public:
     return mGlContextHelperAbstraction;
   }
 
-  void SubmitCommandBuffers(const Graphics::SubmitInfo& submitInfo) override
-  {
-  }
+  void SubmitCommandBuffers(const Graphics::SubmitInfo& submitInfo) override;
 
   /**
    * @brief Presents render target
    * @param renderTarget render target to present
    */
-  void PresentRenderTarget(Graphics::RenderTarget* renderTarget) override
-  {
-  }
+  void PresentRenderTarget(Graphics::RenderTarget* renderTarget) override;
 
   /**
    * @brief Waits until the GPU is idle
    */
-  void WaitIdle() override
-  {
-  }
+  void WaitIdle() override;
 
   /**
    * @brief Lifecycle pause event
    */
-  void Pause() override
-  {
-  }
+  void Pause() override;
 
   /**
    * @brief Lifecycle resume event
    */
-  void Resume() override
-  {
-  }
+  void Resume() override;
 
   /**
    * @brief Executes batch update of textures
@@ -110,40 +98,25 @@ public:
    *
    */
   void UpdateTextures(const std::vector<Graphics::TextureUpdateInfo>&       updateInfoList,
-                      const std::vector<Graphics::TextureUpdateSourceInfo>& sourceList) override
-  {
-  }
+                      const std::vector<Graphics::TextureUpdateSourceInfo>& sourceList) override;
 
   /**
    * TBD: do we need those functions in the new implementation?
    */
-  bool EnableDepthStencilBuffer(bool enableDepth, bool enableStencil) override
-  {
-    return {};
-  }
+  bool EnableDepthStencilBuffer(bool enableDepth, bool enableStencil) override;
 
-  void RunGarbageCollector(size_t numberOfDiscardedRenderers) override
-  {
-  }
+  void RunGarbageCollector(size_t numberOfDiscardedRenderers) override;
 
-  void DiscardUnusedResources() override
-  {
-  }
+  void DiscardUnusedResources() override;
 
-  bool IsDiscardQueueEmpty() override
-  {
-    return {};
-  }
+  bool IsDiscardQueueEmpty() override;
 
   /**
    * @brief Test if the graphics subsystem has resumed & should force a draw
    *
    * @return true if the graphics subsystem requires a re-draw
    */
-  bool IsDrawOnResumeRequired() override
-  {
-    return {};
-  }
+  bool IsDrawOnResumeRequired() override;
 
   /**
    * @brief Creates new Buffer object
@@ -159,10 +132,7 @@ public:
    * @param[in] bufferCreateInfo The valid BufferCreateInfo structure
    * @return pointer to the Buffer object
    */
-  Graphics::UniquePtr<Graphics::Buffer> CreateBuffer(const Graphics::BufferCreateInfo& bufferCreateInfo, Graphics::UniquePtr<Graphics::Buffer>&& oldBuffer) override
-  {
-    return {};
-  }
+  Graphics::UniquePtr<Graphics::Buffer> CreateBuffer(const Graphics::BufferCreateInfo& bufferCreateInfo, Graphics::UniquePtr<Graphics::Buffer>&& oldBuffer) override;
 
   /**
    * @brief Creates new CommandBuffer object
@@ -170,10 +140,7 @@ public:
    * @param[in] bufferCreateInfo The valid BufferCreateInfo structure
    * @return pointer to the CommandBuffer object
    */
-  Graphics::UniquePtr<Graphics::CommandBuffer> CreateCommandBuffer(const Graphics::CommandBufferCreateInfo& commandBufferCreateInfo, Graphics::UniquePtr<Graphics::CommandBuffer>&& oldCommandBuffer) override
-  {
-    return {};
-  }
+  Graphics::UniquePtr<Graphics::CommandBuffer> CreateCommandBuffer(const Graphics::CommandBufferCreateInfo& commandBufferCreateInfo, Graphics::UniquePtr<Graphics::CommandBuffer>&& oldCommandBuffer) override;
 
   /**
    * @brief Creates new RenderPass object
@@ -181,10 +148,7 @@ public:
    * @param[in] renderPassCreateInfo The valid RenderPassCreateInfo structure
    * @return pointer to the RenderPass object
    */
-  Graphics::UniquePtr<Graphics::RenderPass> CreateRenderPass(const Graphics::RenderPassCreateInfo& renderPassCreateInfo, Graphics::UniquePtr<Graphics::RenderPass>&& oldRenderPass) override
-  {
-    return {};
-  }
+  Graphics::UniquePtr<Graphics::RenderPass> CreateRenderPass(const Graphics::RenderPassCreateInfo& renderPassCreateInfo, Graphics::UniquePtr<Graphics::RenderPass>&& oldRenderPass) override;
 
   /**
    * @brief Creates new Texture object
@@ -192,10 +156,7 @@ public:
    * @param[in] textureCreateInfo The valid TextureCreateInfo structure
    * @return pointer to the TextureCreateInfo object
    */
-  Graphics::UniquePtr<Graphics::Texture> CreateTexture(const Graphics::TextureCreateInfo& textureCreateInfo, Graphics::UniquePtr<Graphics::Texture>&& oldTexture) override
-  {
-    return {};
-  }
+  Graphics::UniquePtr<Graphics::Texture> CreateTexture(const Graphics::TextureCreateInfo& textureCreateInfo, Graphics::UniquePtr<Graphics::Texture>&& oldTexture) override;
 
   /**
    * @brief Creates new Framebuffer object
@@ -203,10 +164,7 @@ public:
    * @param[in] framebufferCreateInfo The valid FramebufferCreateInfo structure
    * @return pointer to the Framebuffer object
    */
-  Graphics::UniquePtr<Graphics::Framebuffer> CreateFramebuffer(const Graphics::FramebufferCreateInfo& framebufferCreateInfo, Graphics::UniquePtr<Graphics::Framebuffer>&& oldFramebuffer) override
-  {
-    return {};
-  }
+  Graphics::UniquePtr<Graphics::Framebuffer> CreateFramebuffer(const Graphics::FramebufferCreateInfo& framebufferCreateInfo, Graphics::UniquePtr<Graphics::Framebuffer>&& oldFramebuffer) override;
 
   /**
    * @brief Creates new Pipeline object
@@ -214,10 +172,7 @@ public:
    * @param[in] pipelineCreateInfo The valid PipelineCreateInfo structure
    * @return pointer to the Pipeline object
    */
-  Graphics::UniquePtr<Graphics::Pipeline> CreatePipeline(const Graphics::PipelineCreateInfo& pipelineCreateInfo, Graphics::UniquePtr<Graphics::Pipeline>&& oldPipeline) override
-  {
-    return {};
-  }
+  Graphics::UniquePtr<Graphics::Pipeline> CreatePipeline(const Graphics::PipelineCreateInfo& pipelineCreateInfo, Graphics::UniquePtr<Graphics::Pipeline>&& oldPipeline) override;
 
   /**
    * @brief Creates new Shader object
@@ -225,10 +180,7 @@ public:
    * @param[in] shaderCreateInfo The valid ShaderCreateInfo structure
    * @return pointer to the Shader object
    */
-  Graphics::UniquePtr<Graphics::Shader> CreateShader(const Graphics::ShaderCreateInfo& shaderCreateInfo, Graphics::UniquePtr<Graphics::Shader>&& oldShader) override
-  {
-    return {};
-  }
+  Graphics::UniquePtr<Graphics::Shader> CreateShader(const Graphics::ShaderCreateInfo& shaderCreateInfo, Graphics::UniquePtr<Graphics::Shader>&& oldShader) override;
 
   /**
    * @brief Creates new Sampler object
@@ -236,10 +188,7 @@ public:
    * @param[in] samplerCreateInfo The valid SamplerCreateInfo structure
    * @return pointer to the Sampler object
    */
-  Graphics::UniquePtr<Graphics::Sampler> CreateSampler(const Graphics::SamplerCreateInfo& samplerCreateInfo, Graphics::UniquePtr<Graphics::Sampler>&& oldSampler) override
-  {
-    return {};
-  }
+  Graphics::UniquePtr<Graphics::Sampler> CreateSampler(const Graphics::SamplerCreateInfo& samplerCreateInfo, Graphics::UniquePtr<Graphics::Sampler>&& oldSampler) override;
 
   /**
    * @brief Creates new RenderTarget object
@@ -247,10 +196,7 @@ public:
    * @param[in] renderTargetCreateInfo The valid RenderTargetCreateInfo structure
    * @return pointer to the RenderTarget object
    */
-  Graphics::UniquePtr<Graphics::RenderTarget> CreateRenderTarget(const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo, Graphics::UniquePtr<Graphics::RenderTarget>&& oldRenderTarget) override
-  {
-    return {};
-  }
+  Graphics::UniquePtr<Graphics::RenderTarget> CreateRenderTarget(const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo, Graphics::UniquePtr<Graphics::RenderTarget>&& oldRenderTarget) override;
 
   /**
    * @brief Maps memory associated with Buffer object
@@ -259,10 +205,7 @@ public:
    *
    * @return Returns pointer to Memory object or Graphicsnullptr on error
    */
-  Graphics::UniquePtr<Graphics::Memory> MapBufferRange(const Graphics::MapBufferInfo& mapInfo) override
-  {
-    return {};
-  }
+  Graphics::UniquePtr<Graphics::Memory> MapBufferRange(const Graphics::MapBufferInfo& mapInfo) override;
 
   /**
    * @brief Maps memory associated with the texture.
@@ -278,10 +221,7 @@ public:
    *
    * @return Valid Memory object or nullptr on error
    */
-  Graphics::UniquePtr<Graphics::Memory> MapTextureRange(const Graphics::MapTextureInfo& mapInfo) override
-  {
-    return {};
-  }
+  Graphics::UniquePtr<Graphics::Memory> MapTextureRange(const Graphics::MapTextureInfo& mapInfo) override;
 
   /**
    * @brief Unmaps memory and discards Memory object
@@ -291,9 +231,7 @@ public:
    *
    * @param[in] memory Valid and previously mapped Memory object
    */
-  void UnmapMemory(Graphics::UniquePtr<Graphics::Memory> memory) override
-  {
-  }
+  void UnmapMemory(Graphics::UniquePtr<Graphics::Memory> memory) override;
 
   /**
    * @brief Returns memory requirements of the Texture object.
@@ -304,10 +242,7 @@ public:
    *
    * @return Returns memory requirements of Texture
    */
-  Graphics::MemoryRequirements GetTextureMemoryRequirements(Graphics::Texture& texture) const override
-  {
-    return {};
-  }
+  Graphics::MemoryRequirements GetTextureMemoryRequirements(Graphics::Texture& texture) const override;
 
   /**
    * @brief Returns memory requirements of the Buffer object.
@@ -318,10 +253,7 @@ public:
    *
    * @return Returns memory requirements of Buffer
    */
-  Graphics::MemoryRequirements GetBufferMemoryRequirements(Graphics::Buffer& buffer) const override
-  {
-    return {};
-  }
+  Graphics::MemoryRequirements GetBufferMemoryRequirements(Graphics::Buffer& buffer) const override;
 
   /**
    * @brief Returns specification of the Texture object
@@ -332,11 +264,7 @@ public:
    *
    * @return Returns the TextureProperties object
    */
-  const Graphics::TextureProperties& GetTextureProperties(const Graphics::Texture& texture) override
-  {
-    static Graphics::TextureProperties properties{};
-    return properties;
-  }
+  const Graphics::TextureProperties& GetTextureProperties(const Graphics::Texture& texture) override;
 
   /**
    * @brief Tests whether two Pipelines are the same.
@@ -345,12 +273,11 @@ public:
    *
    * @return true if pipeline objects match
    */
-  bool PipelineEquals(const Graphics::Pipeline& pipeline0, const Graphics::Pipeline& pipeline1) const override
-  {
-    return {};
-  }
+  bool PipelineEquals(const Graphics::Pipeline& pipeline0, const Graphics::Pipeline& pipeline1) const override;
 
 public:
+  mutable TraceCallStack mCallStack{"TestGraphics:"};
+  mutable TraceCallStack mCommandBufferCallStack{"TestCommandBuffer:"};
 
   TestGlAbstraction              mGlAbstraction;
   TestGlSyncAbstraction          mGlSyncAbstraction;

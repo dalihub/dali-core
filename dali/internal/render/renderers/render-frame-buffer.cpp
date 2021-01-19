@@ -43,7 +43,7 @@ const GLenum COLOR_ATTACHMENTS[] =
 
 FrameBuffer::FrameBuffer(uint32_t width, uint32_t height, Mask attachments)
 : mId(0u),
-  mTextureId{0u},
+  mTextures{0u},
   mDepthBuffer(attachments & Dali::FrameBuffer::Attachment::DEPTH),
   mStencilBuffer(attachments & Dali::FrameBuffer::Attachment::STENCIL),
   mWidth(width),
@@ -97,14 +97,14 @@ void FrameBuffer::AttachColorTexture(Context& context, Render::Texture* texture,
 {
   context.BindFramebuffer(GL_FRAMEBUFFER, mId);
 
-  const GLuint textureId            = texture->GetId();
-  mTextureId[mColorAttachmentCount] = textureId;
+  mTextures[mColorAttachmentCount] = texture->GetGraphicsObject();
+  GLuint textureId                 = 0; //@todo Temp
 
   // Create a color attachment.
   const GLenum iAttachment = COLOR_ATTACHMENTS[mColorAttachmentCount];
   if(texture->GetType() == TextureType::TEXTURE_2D)
   {
-    context.FramebufferTexture2D(GL_FRAMEBUFFER, iAttachment, texture->GetTarget(), textureId, mipmapLevel);
+    context.FramebufferTexture2D(GL_FRAMEBUFFER, iAttachment, GL_TEXTURE_2D, textureId, mipmapLevel);
   }
   else
   {
@@ -122,10 +122,13 @@ void FrameBuffer::AttachDepthTexture(Context& context, Render::Texture* texture,
 {
   context.BindFramebuffer(GL_FRAMEBUFFER, mId);
 
+  //@todo Temp
+  GLuint textureId = 0;
+
   // Create a depth attachment.
   if(texture->GetType() == TextureType::TEXTURE_2D)
   {
-    context.FramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texture->GetId(), mipmapLevel);
+    context.FramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, textureId, mipmapLevel);
   }
 
   context.BindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -135,10 +138,13 @@ void FrameBuffer::AttachDepthStencilTexture(Context& context, Render::Texture* t
 {
   context.BindFramebuffer(GL_FRAMEBUFFER, mId);
 
+  //@todo temp
+  GLuint textureId = 0;
+
   // Create a depth/stencil attachment.
   if(texture->GetType() == TextureType::TEXTURE_2D)
   {
-    context.FramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, texture->GetId(), mipmapLevel);
+    context.FramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, textureId, mipmapLevel);
   }
 
   context.BindFramebuffer(GL_FRAMEBUFFER, 0);

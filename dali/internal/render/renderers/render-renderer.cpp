@@ -154,9 +154,10 @@ Renderer::Renderer(SceneGraph::RenderDataProvider* dataProvider,
   mBlendingOptions.SetBlendColor(blendColor);
 }
 
-void Renderer::Initialize(Context& context)
+void Renderer::Initialize(Context& context, Graphics::Controller& graphicsController)
 {
-  mContext = &context;
+  mContext            = &context;
+  mGraphicsController = &graphicsController;
 }
 
 Renderer::~Renderer() = default;
@@ -363,7 +364,7 @@ void Renderer::SetUniformFromProperty(BufferIndex bufferIndex, Program& program,
   }
 }
 
-bool Renderer::BindTextures(Context& context, Program& program, Vector<GLuint>& boundTextures)
+bool Renderer::BindTextures(Context& context, Program& program, Graphics::CommandBuffer& commandBuffer, Vector<Graphics::Texture*>& boundTextures)
 {
   uint32_t textureUnit = 0;
   bool     result      = true;
@@ -371,19 +372,32 @@ bool Renderer::BindTextures(Context& context, Program& program, Vector<GLuint>& 
   GLint                          uniformLocation(-1);
   std::vector<Render::Sampler*>& samplers(mRenderDataProvider->GetSamplers());
   std::vector<Render::Texture*>& textures(mRenderDataProvider->GetTextures());
+
+  std::vector<Graphics::TextureBinding> textureBindings;
   for(uint32_t i = 0; i < static_cast<uint32_t>(textures.size()) && result; ++i) // not expecting more than uint32_t of textures
   {
     if(textures[i])
     {
-      result = textures[i]->Bind(context, textureUnit, samplers[i]);
-      boundTextures.PushBack(textures[i]->GetId());
-      if(result && program.GetSamplerUniformLocation(i, uniformLocation))
+      if(program.GetSamplerUniformLocation(i, uniformLocation))
       {
-        program.SetUniform1i(uniformLocation, textureUnit);
+        // if the sampler exists,
+        //   if it's default, delete the graphics object
+        //   otherwise re-initialize it if dirty
+
+        const Graphics::Sampler* graphicsSampler = (samplers[i] ? samplers[i]->GetGraphicsObject()
+                                                                : nullptr);
+
+        boundTextures.PushBack(textures[i]->GetGraphicsObject());
+        const Graphics::TextureBinding textureBinding{textures[i]->GetGraphicsObject(), graphicsSampler, textureUnit};
+        textureBindings.push_back(textureBinding);
+
+        program.SetUniform1i(uniformLocation, textureUnit); // Get through shader reflection
         ++textureUnit;
       }
     }
   }
+
+  commandBuffer.BindTextures(textureBindings);
 
   return result;
 }
@@ -559,7 +573,7 @@ void Renderer::Render(Context&                                             conte
                       const Matrix&                                        projectionMatrix,
                       const Vector3&                                       size,
                       bool                                                 blend,
-                      Vector<GLuint>&                                      boundTextures,
+                      Vector<Graphics::Texture*>&                          boundTextures,
                       const Dali::Internal::SceneGraph::RenderInstruction& instruction,
                       uint32_t                                             queueIndex)
 {
@@ -593,6 +607,14 @@ void Renderer::Render(Context&                                             conte
     return;
   }
 
+  // For now, create command buffer to perform only the texture / sample binding
+  // and submit it.
+  // Expect this call to glBindTextureForUnit, and glTexParameteri() for the sampler
+  Graphics::UniquePtr<Graphics::CommandBuffer> commandBuffer = mGraphicsController->CreateCommandBuffer(
+    Graphics::CommandBufferCreateInfo()
+      .SetLevel(Graphics::CommandBufferLevel::SECONDARY),
+    nullptr);
+
   //Set cull face  mode
   const Dali::Internal::SceneGraph::Camera* cam = instruction.GetCamera();
   if(cam->GetReflectionUsed())
@@ -625,9 +647,14 @@ void Renderer::Render(Context&                                             conte
   // Take the program into use so we can send uniforms to it
   program->Use();
 
-  if(DALI_LIKELY(BindTextures(context, *program, boundTextures)))
+  if(DALI_LIKELY(BindTextures(context, *program, *commandBuffer.get(), boundTextures)))
   {
     // Only set up and draw if we have textures and they are all valid
+
+    // @todo Move to render manager. For now, ensure textures are bound before drawing
+    Graphics::SubmitInfo submitInfo{{}, 0 | Graphics::SubmitFlagBits::FLUSH};
+    submitInfo.cmdBuffer.push_back(commandBuffer.get());
+    mGraphicsController->SubmitCommandBuffers(submitInfo);
 
     // set projection and view matrix if program has not yet received them yet this frame
     SetMatrices(*program, modelMatrix, viewMatrix, projectionMatrix, modelViewMatrix);

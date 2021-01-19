@@ -118,12 +118,12 @@ public:
   }
 
   /**
-   * @brief Get the id (OpenGL handle) of the texture bound to this frame buffer as color attachment @a index.
-   * @return The texture id.
+   * @brief Get the texture bound to this frame buffer as color attachment @a index.
+   * @return The texture.
    */
-  GLuint GetTextureId(uint8_t index)
+  Graphics::Texture* GetTexture(uint8_t index)
   {
-    return mTextureId[index];
+    return mTextures[index];
   };
 
 private:
@@ -138,13 +138,13 @@ private:
   FrameBuffer& operator=(const FrameBuffer& rhs) = delete;
 
 private:
-  GLuint   mId;
-  GLuint   mTextureId[Dali::DevelFrameBuffer::MAX_COLOR_ATTACHMENTS];
-  GLuint   mDepthBuffer;
-  GLuint   mStencilBuffer;
-  uint32_t mWidth;
-  uint32_t mHeight;
-  uint8_t  mColorAttachmentCount;
+  GLuint             mId;
+  Graphics::Texture* mTextures[Dali::DevelFrameBuffer::MAX_COLOR_ATTACHMENTS];
+  GLuint             mDepthBuffer;
+  GLuint             mStencilBuffer;
+  uint32_t           mWidth;
+  uint32_t           mHeight;
+  uint8_t            mColorAttachmentCount;
 };
 
 } // namespace Render

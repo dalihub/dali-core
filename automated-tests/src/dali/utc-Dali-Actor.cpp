@@ -59,6 +59,17 @@ static bool gTestConstraintCalled;
 
 LayoutDirection::Type gLayoutDirectionType;
 
+Texture CreateTexture(TextureType::Type type, Pixel::Format format, int width, int height)
+{
+  Texture texture = Texture::New(type, format, width, height);
+
+  int       bufferSize = width * height * 2;
+  uint8_t*  buffer     = reinterpret_cast<uint8_t*>(malloc(bufferSize));
+  PixelData pixelData  = PixelData::New(buffer, bufferSize, width, height, format, PixelData::FREE);
+  texture.Upload(pixelData, 0u, 0u, 0u, 0u, width, height);
+  return texture;
+}
+
 struct TestConstraint
 {
   void operator()(Vector4& color, const PropertyInputContainer& /* inputs */)
@@ -2963,9 +2974,9 @@ int UtcDaliActorSetDrawModeOverlayRender(void)
   ids.push_back(10); // third rendered actor
   application.GetGlAbstraction().SetNextTextureIds(ids);
 
-  Texture imageA = Texture::New(TextureType::TEXTURE_2D, Pixel::Format::RGBA8888, 16, 16);
-  Texture imageB = Texture::New(TextureType::TEXTURE_2D, Pixel::Format::RGBA8888, 16, 16);
-  Texture imageC = Texture::New(TextureType::TEXTURE_2D, Pixel::Format::RGBA8888, 16, 16);
+  Texture imageA = CreateTexture(TextureType::TEXTURE_2D, Pixel::Format::RGBA8888, 16, 16);
+  Texture imageB = CreateTexture(TextureType::TEXTURE_2D, Pixel::Format::RGBA8888, 16, 16);
+  Texture imageC = CreateTexture(TextureType::TEXTURE_2D, Pixel::Format::RGBA8888, 16, 16);
   Actor   a      = CreateRenderableActor(imageA);
   Actor   b      = CreateRenderableActor(imageB);
   Actor   c      = CreateRenderableActor(imageC);
@@ -4104,7 +4115,7 @@ int UtcDaliActorRemoveRendererN(void)
 // Clipping test helper functions:
 Actor CreateActorWithContent(uint32_t width, uint32_t height)
 {
-  Texture image = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  Texture image = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
   Actor   actor = CreateRenderableActor(image);
 
   // Setup dimensions and position so actor is not skipped by culling.
@@ -4412,7 +4423,7 @@ int UtcDaliActorPropertyClippingActorDrawOrder(void)
   Actor actors[5];
   for(int i = 0; i < 5; ++i)
   {
-    Texture image = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 16u, 16u);
+    Texture image = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 16u, 16u);
     Actor   actor = CreateRenderableActor(image);
 
     // Setup dimensions and position so actor is not skipped by culling.
@@ -4783,7 +4794,7 @@ int UtcDaliActorPropertyClippingActorWithRendererOverride(void)
   // Check stencil functions are not called.
   DALI_TEST_CHECK(!stencilTrace.FindMethod("StencilFunc"));
   // TODO: Temporarily commented out the line below when caching is disabled. Will need to add it back.
-//  DALI_TEST_CHECK(!stencilTrace.FindMethod("StencilMask"));
+  //  DALI_TEST_CHECK(!stencilTrace.FindMethod("StencilMask"));
   DALI_TEST_CHECK(!stencilTrace.FindMethod("StencilOp"));
 
   // Check that scissor clipping is overriden by the renderer properties.
@@ -8081,7 +8092,7 @@ int utcDaliActorPartialUpdateSetProperty(void)
   DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
-  Texture image = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 4u, 4u);
+  Texture image = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 4u, 4u);
   Actor   actor = CreateRenderableActor(image, RENDER_SHADOW_VERTEX_SOURCE, RENDER_SHADOW_FRAGMENT_SOURCE);
   actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));

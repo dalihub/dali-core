@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 
 #include "test-trace-call-stack.h"
 
+#include <iostream>
 #include <sstream>
 
 namespace Dali
@@ -45,8 +46,9 @@ std::string ToString(float x)
 /**
  * Constructor
  */
-TraceCallStack::TraceCallStack()
-: mTraceActive(false)
+TraceCallStack::TraceCallStack(std::string prefix)
+: mTraceActive(false),
+  mPrefix(prefix)
 {
 }
 
@@ -70,6 +72,11 @@ bool TraceCallStack::IsEnabled()
   return mTraceActive;
 }
 
+void TraceCallStack::EnableLogging(bool enablelogging)
+{
+  mLogging = enablelogging;
+}
+
 /**
  * Push a call onto the stack if the trace is active
  * @param[in] method The name of the method
@@ -82,6 +89,10 @@ void TraceCallStack::PushCall(std::string method, std::string params)
     FunctionCall stackFrame(method, params);
     mCallStack.push_back(stackFrame);
   }
+  if(mLogging)
+  {
+    fprintf(stderr, "%s%s(%s)\n", mPrefix.c_str(), method.c_str(), params.c_str());
+  }
 }
 
 void TraceCallStack::PushCall(std::string method, std::string params, const TraceCallStack::NamedParams& altParams)
@@ -90,6 +101,10 @@ void TraceCallStack::PushCall(std::string method, std::string params, const Trac
   {
     FunctionCall stackFrame(method, params, altParams);
     mCallStack.push_back(stackFrame);
+  }
+  if(mLogging)
+  {
+    fprintf(stderr, "%s%s(%s)\n", mPrefix.c_str(), method.c_str(), params.c_str());
   }
 }
 
@@ -109,6 +124,10 @@ bool TraceCallStack::FindMethod(std::string method) const
       break;
     }
   }
+  if(!found)
+  {
+    fprintf(stderr, "Search for %s failed\n", method.c_str());
+  }
   return found;
 }
 
@@ -123,6 +142,10 @@ bool TraceCallStack::FindMethodAndGetParameters(std::string method, std::string&
       params = mCallStack[i].paramList;
       break;
     }
+  }
+  if(!found)
+  {
+    fprintf(stderr, "Search for %s(%s) failed\n", method.c_str(), params.c_str());
   }
   return found;
 }

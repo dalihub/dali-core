@@ -2,7 +2,7 @@
 #define TEST_GL_ABSTRACTION_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -438,13 +438,13 @@ public:
   inline void DeleteTextures(GLsizei n, const GLuint* textures) override
   {
     std::stringstream out;
-    out << n << ", " << textures << " = [";
+    out << "n:" << n << " textures[";
 
     TraceCallStack::NamedParams namedParams;
 
     for(GLsizei i = 0; i < n; i++)
     {
-      out << textures[i] << ", ";
+      out << (i > 0 ? ", " : "") << textures[i];
       std::stringstream paramName;
       paramName << "texture[" << i << "]";
       namedParams[paramName.str()] = ToString(textures[i]);
@@ -1151,12 +1151,20 @@ public:
   inline void TexParameteri(GLenum target, GLenum pname, GLint param) override
   {
     std::stringstream out;
-    out << target << ", " << pname << ", " << param;
+    out << std::hex << target << ", " << pname << ", " << param;
+    std::string params = out.str();
+
+    out.str("");
+    out << std::hex << target;
     TraceCallStack::NamedParams namedParams;
-    namedParams["target"] = ToString(target);
-    namedParams["pname"]  = ToString(pname);
-    namedParams["param"]  = ToString(param);
-    mTexParamaterTrace.PushCall("TexParameteri", out.str(), namedParams);
+    namedParams["target"] = out.str();
+    out.str("");
+    out << std::hex << pname;
+    namedParams["pname"] = out.str();
+    out.str("");
+    out << std::hex << param;
+    namedParams["param"] = out.str();
+    mTexParamaterTrace.PushCall("TexParameteri", params, namedParams);
   }
 
   inline void TexParameteriv(GLenum target, GLenum pname, const GLint* params) override
@@ -2429,7 +2437,7 @@ private:
   TraceCallStack mCullFaceTrace;
   TraceCallStack mEnableDisableTrace;
   TraceCallStack mShaderTrace;
-  TraceCallStack mTextureTrace;
+  TraceCallStack mTextureTrace{"GlA Texture:"};
   TraceCallStack mTexParamaterTrace;
   TraceCallStack mDrawTrace;
   TraceCallStack mDepthFunctionTrace;

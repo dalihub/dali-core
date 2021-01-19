@@ -1,3 +1,6 @@
+#ifndef DALI_TEST_GRAPHICS_BUFFER_H
+#define DALI_TEST_GRAPHICS_BUFFER_H
+
 /*
  * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
@@ -12,33 +15,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 
-#include "test-application.h"
-
-#include "test-native-image.h"
+#include <dali/graphics-api/graphics-buffer.h>
 
 namespace Dali
 {
-TestNativeImagePointer TestNativeImage::New(uint32_t width, uint32_t height)
+class TestGraphicsBuffer : public Graphics::Buffer
 {
-  return new TestNativeImage(width, height);
-}
-
-TestNativeImage::TestNativeImage(uint32_t width, uint32_t height)
-: mWidth(width),
-  mHeight(height),
-  mExtensionCreateCalls(0),
-  mExtensionDestroyCalls(0),
-  mTargetTextureCalls(0),
-  createResult(true)
-{
-  mCallStack.EnableLogging(true);
-}
-
-TestNativeImage::~TestNativeImage()
-{
-}
+public:
+  TestGraphicsBuffer() = default;
+};
 
 } // namespace Dali
+
+#endif //DALI_TEST_GRAPHICS_BUFFER_H

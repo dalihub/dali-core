@@ -114,9 +114,10 @@ SET( internal_src_files
   ${internal_src_dir}/render/queue/render-queue.cpp
   ${internal_src_dir}/render/renderers/render-frame-buffer.cpp
   ${internal_src_dir}/render/renderers/render-geometry.cpp
-  ${internal_src_dir}/render/renderers/render-vertex-buffer.cpp
   ${internal_src_dir}/render/renderers/render-renderer.cpp
+  ${internal_src_dir}/render/renderers/render-sampler.cpp
   ${internal_src_dir}/render/renderers/render-texture.cpp
+  ${internal_src_dir}/render/renderers/render-vertex-buffer.cpp
   ${internal_src_dir}/render/shaders/program.cpp
   ${internal_src_dir}/render/shaders/program-controller.cpp
   ${internal_src_dir}/render/shaders/scene-graph-shader.cpp

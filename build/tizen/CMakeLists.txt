@@ -352,7 +352,7 @@ IF( ENABLE_COVERAGE )
           -name libdali*.so* \)
           | grep -v TC | xargs rm -rf
           TARGET  ${DALI_CORE_PREFIX}distclean
-          VERBATIM
+VERBATIM
           )
 
   ENDIF( LCOV_BIN )
@@ -365,6 +365,10 @@ IF( ENABLE_LINK_TEST )
   SET( LINKER_TEST_SOURCES
     linker-test.cpp
     ${DALI_TEST_SUITE_DIR}/test-application.cpp
+    ${DALI_TEST_SUITE_DIR}/test-graphics-controller.cpp
+    ${DALI_TEST_SUITE_DIR}/test-graphics-sampler.cpp
+    ${DALI_TEST_SUITE_DIR}/test-graphics-texture.cpp
+    ${DALI_TEST_SUITE_DIR}/test-graphics-command-buffer.cpp
     ${DALI_TEST_SUITE_DIR}/test-platform-abstraction.cpp
     ${DALI_TEST_SUITE_DIR}/test-render-controller.cpp
     ${DALI_TEST_SUITE_DIR}/test-gl-abstraction.cpp

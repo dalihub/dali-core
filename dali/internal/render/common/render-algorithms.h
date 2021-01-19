@@ -62,7 +62,7 @@ public:
                                 BufferIndex                          bufferIndex,
                                 Integration::DepthBufferAvailable    depthBufferAvailable,
                                 Integration::StencilBufferAvailable  stencilBufferAvailable,
-                                Vector<GLuint>&                      boundTextures,
+                                Vector<Graphics::Texture*>&          boundTextures,
                                 const Rect<int>&                     rootClippingRect);
 
 private:
@@ -124,7 +124,7 @@ private:
                                 const Matrix&                                        projectionMatrix,
                                 Integration::DepthBufferAvailable                    depthBufferAvailable,
                                 Integration::StencilBufferAvailable                  stencilBufferAvailable,
-                                Vector<GLuint>&                                      boundTextures,
+                                Vector<Graphics::Texture*>&                          boundTextures,
                                 const Dali::Internal::SceneGraph::RenderInstruction& instruction, // in the case of reflection, things like CullFace need to be adjusted for reflection world
                                 const Rect<int>&                                     rootClippingRect);
 

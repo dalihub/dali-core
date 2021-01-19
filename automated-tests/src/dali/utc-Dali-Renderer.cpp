@@ -77,6 +77,42 @@ void TestConstraintNoBlue(Vector4& current, const PropertyInputContainer& inputs
   current.b = 0.0f;
 }
 
+Texture CreateTexture(TextureType::Type type, Pixel::Format format, int width, int height)
+{
+  Texture texture = Texture::New(type, format, width, height);
+
+  int       bufferSize = width * height * Pixel::GetBytesPerPixel(format);
+  uint8_t*  buffer     = reinterpret_cast<uint8_t*>(malloc(bufferSize));
+  PixelData pixelData  = PixelData::New(buffer, bufferSize, width, height, format, PixelData::FREE);
+  texture.Upload(pixelData, 0u, 0u, 0u, 0u, width, height);
+  return texture;
+}
+
+Renderer CreateRenderer(Actor actor, Geometry geometry, Shader shader, int depthIndex)
+{
+  Texture    image0      = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGB888, 64, 64);
+  TextureSet textureSet0 = CreateTextureSet(image0);
+  Renderer   renderer0   = Renderer::New(geometry, shader);
+  renderer0.SetTextures(textureSet0);
+  renderer0.SetProperty(Renderer::Property::DEPTH_INDEX, depthIndex);
+  actor.AddRenderer(renderer0);
+  return renderer0;
+}
+
+Actor CreateActor(Actor parent, int siblingOrder, const char* location)
+{
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, AnchorPoint::CENTER);
+  actor.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  parent.Add(actor);
+  actor.SetProperty(Dali::DevelActor::Property::SIBLING_ORDER, siblingOrder);
+  DALI_TEST_EQUALS(actor.GetProperty<int>(Dali::DevelActor::Property::SIBLING_ORDER), siblingOrder, TEST_INNER_LOCATION(location));
+
+  return actor;
+}
+
 } // unnamed namespace
 
 void renderer_test_startup(void)
@@ -1811,31 +1847,6 @@ int UtcDaliRendererUniformMapMultipleUniforms02(void)
   END_TEST;
 }
 
-Renderer CreateRenderer(Actor actor, Geometry geometry, Shader shader, int depthIndex)
-{
-  Texture    image0      = Texture::New(TextureType::TEXTURE_2D, Pixel::RGB888, 64, 64);
-  TextureSet textureSet0 = CreateTextureSet(image0);
-  Renderer   renderer0   = Renderer::New(geometry, shader);
-  renderer0.SetTextures(textureSet0);
-  renderer0.SetProperty(Renderer::Property::DEPTH_INDEX, depthIndex);
-  actor.AddRenderer(renderer0);
-  return renderer0;
-}
-
-Actor CreateActor(Actor parent, int siblingOrder, const char* location)
-{
-  Actor actor = Actor::New();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
-  actor.SetProperty(Actor::Property::PARENT_ORIGIN, AnchorPoint::CENTER);
-  actor.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
-  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  parent.Add(actor);
-  actor.SetProperty(Dali::DevelActor::Property::SIBLING_ORDER, siblingOrder);
-  DALI_TEST_EQUALS(actor.GetProperty<int>(Dali::DevelActor::Property::SIBLING_ORDER), siblingOrder, TEST_INNER_LOCATION(location));
-
-  return actor;
-}
-
 int UtcDaliRendererRenderOrder2DLayer(void)
 {
   TestApplication application;
@@ -1884,6 +1895,7 @@ int UtcDaliRendererRenderOrder2DLayer(void)
   application.Render(0);
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
+  gl.GetTextureTrace().Reset();
   gl.EnableTextureCallTrace(true);
   application.SendNotification();
   application.Render(0);
@@ -1951,6 +1963,7 @@ int UtcDaliRendererRenderOrder2DLayerMultipleRenderers(void)
   application.Render(0);
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
+  gl.GetTextureTrace().Reset();
   gl.EnableTextureCallTrace(true);
   application.SendNotification();
   application.Render(0);
@@ -2039,6 +2052,7 @@ int UtcDaliRendererRenderOrder2DLayerSiblingOrder(void)
   application.Render();
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
+  gl.GetTextureTrace().Reset();
   gl.EnableTextureCallTrace(true);
   application.SendNotification();
   application.Render(0);
@@ -2140,6 +2154,7 @@ int UtcDaliRendererRenderOrder2DLayerOverlay(void)
   actor0.Add(actor3);
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
+  gl.GetTextureTrace().Reset();
   gl.EnableTextureCallTrace(true);
   application.SendNotification();
   application.Render(0);

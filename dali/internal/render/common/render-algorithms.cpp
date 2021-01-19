@@ -392,7 +392,7 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
                                                 const Matrix&                       projectionMatrix,
                                                 Integration::DepthBufferAvailable   depthBufferAvailable,
                                                 Integration::StencilBufferAvailable stencilBufferAvailable,
-                                                Vector<GLuint>&                     boundTextures,
+                                                Vector<Graphics::Texture*>&         boundTextures,
                                                 const RenderInstruction&            instruction,
                                                 const Rect<int>&                    rootClippingRect)
 {
@@ -506,7 +506,7 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
                                                 BufferIndex                         bufferIndex,
                                                 Integration::DepthBufferAvailable   depthBufferAvailable,
                                                 Integration::StencilBufferAvailable stencilBufferAvailable,
-                                                Vector<GLuint>&                     boundTextures,
+                                                Vector<Graphics::Texture*>&         boundTextures,
                                                 const Rect<int>&                    rootClippingRect)
 {
   DALI_PRINT_RENDER_INSTRUCTION(instruction, bufferIndex);

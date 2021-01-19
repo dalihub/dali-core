@@ -2,7 +2,7 @@
 #define TEST_TRACE_CALL_STACK_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ public:
   /**
    * Constructor
    */
-  TraceCallStack();
+  TraceCallStack(std::string prefix = "");
 
   /**
    * Destructor
@@ -60,6 +60,8 @@ public:
   void Enable(bool enable);
 
   bool IsEnabled();
+
+  void EnableLogging(bool enable);
 
   /**
    * Push a call onto the stack if the trace is active
@@ -174,7 +176,9 @@ public:
   }
 
 private:
-  bool mTraceActive; ///< True if the trace is active
+  bool        mTraceActive{false}; ///< True if the trace is active
+  bool        mLogging{false};     ///< True if the trace is logged to stdout
+  std::string mPrefix;
 
   struct FunctionCall
   {

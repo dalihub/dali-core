@@ -22,13 +22,18 @@
 #include <string>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/images/image-operations.h> // Dali::ImageDimensions
+#include <dali/public-api/rendering/sampler.h>
+#include <dali/public-api/rendering/texture.h>
+
+#include <dali/graphics-api/graphics-controller.h>
+#include <dali/graphics-api/graphics-texture-create-info.h>
+#include <dali/graphics-api/graphics-texture.h>
+#include <dali/graphics-api/graphics-types.h>
 #include <dali/integration-api/gl-defines.h>
 #include <dali/internal/event/rendering/texture-impl.h>
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/renderers/render-sampler.h>
-#include <dali/public-api/images/image-operations.h> // Dali::ImageDimensions
-#include <dali/public-api/rendering/sampler.h>
-#include <dali/public-api/rendering/texture.h>
 
 namespace Dali
 {
@@ -63,69 +68,58 @@ public:
   ~Texture();
 
   /**
-   * Creates the texture in the GPU.
-   * Creates the texture and reserves memory for the first mipmap level
-   * @param[in] context The GL context
+   * Stores the graphics controller for use when required.
+   *
+   * @param[in] graphicsController The graphics controller to use
    */
-  void Initialize(Context& context);
+  void Initialize(Graphics::Controller& graphicsController);
+
+  /**
+   * Create the texture without a buffer
+   * @param[in] usage How texture will be used
+   */
+  void Create(Graphics::TextureUsageFlags usage);
+
+  /**
+   * Create a texture with a buffer if non-null
+   * @param[in] usage How texture will be used
+   * @param[in] buffer Buffer to copy
+   */
+  void CreateWithData(Graphics::TextureUsageFlags usage, uint8_t* buffer, uint32_t bufferSize);
 
   /**
    * Deletes the texture from the GPU
-   * @param[in] context The GL context
    */
-  void Destroy(Context& context);
-
-  /**
-   * Called by RenderManager to inform the texture that the context has been destroyed
-   */
-  void GlContextDestroyed();
+  void Destroy();
 
   /**
    * Uploads data to the texture.
-   * @param[in] context The GL context
    * @param[in] pixelData A pixel data object
    * @param[in] params Upload parameters. See UploadParams
    */
-  void Upload(Context& context, PixelDataPtr pixelData, const Internal::Texture::UploadParams& params);
+  void Upload(PixelDataPtr pixelData, const Internal::Texture::UploadParams& params);
 
   /**
-   * Bind the texture to the given texture unit and applies the given sampler
-   * @param[in] context The GL context
-   * @param[in] textureUnit the texture unit
-   * @param[in] sampler The sampler to be used with the texture
-   * @return true if the bind succeeded, false otherwise
+   * Called when the texture is about to be used for drawing.
+   * Allows native textures to be set up appropriately.
    */
-  bool Bind(Context& context, uint32_t textureUnit, Render::Sampler* sampler);
+  void Prepare();
 
   /**
    * Auto generates mipmaps for the texture
-   * @param[in] context The GL context
    */
-  void GenerateMipmaps(Context& context);
+  void GenerateMipmaps();
 
   /**
-   * Retrieve wheter the texture has an alpha channel
+   * Retrieve whether the texture has an alpha channel
    * @return True if the texture has alpha channel, false otherwise
    */
   bool HasAlphaChannel() const;
 
   /**
-   * Get the id of the texture
-   * @return Id of the texture
+   * Get the graphics object associated with this texture
    */
-  GLuint GetId() const
-  {
-    return mId;
-  }
-
-  /**
-   * Get the target to which the texture is bound
-   * @return target to which the texture is bound
-   */
-  GLuint GetTarget() const
-  {
-    return mTarget;
-  }
+  Graphics::Texture* GetGraphicsObject() const;
 
   /**
    * Get the type of the texture
@@ -151,21 +145,21 @@ private:
    * @param[in] context The GL context
    * @param[in] sampler The sampler
    */
-  void ApplySampler(Context& context, Render::Sampler* sampler);
+  void ApplySampler(Render::Sampler* sampler);
 
-  NativeImageInterfacePtr mNativeImage;      ///< Pointer to native image
-  Render::Sampler         mSampler;          ///< The current sampler state
-  GLuint                  mId;               ///< Id of the texture
-  GLuint                  mTarget;           ///< Specifies the target to which the texture is bound.
-  GLint                   mGlInternalFormat; ///< The gl internal format of the pixel data
-  GLenum                  mGlFormat;         ///< The gl format of the pixel data
-  GLenum                  mPixelDataType;    ///< The data type of the pixel data
-  uint16_t                mWidth;            ///< Width of the texture
-  uint16_t                mHeight;           ///< Height of the texture
-  uint16_t                mMaxMipMapLevel;   ///< Maximum mipmap level
-  Type                    mType : 3;         ///< Type of the texture
-  bool                    mHasAlpha : 1;     ///< Whether the format has an alpha channel
-  bool                    mIsCompressed : 1; ///< Whether the format is compressed
+private:
+  Graphics::Controller*                  mGraphicsController;
+  Graphics::UniquePtr<Graphics::Texture> mGraphicsTexture;
+
+  NativeImageInterfacePtr mNativeImage; ///< Pointer to native image
+  Render::Sampler         mSampler;     ///< The current sampler state
+
+  Pixel::Format mPixelFormat;    ///< Pixel format of the texture
+  uint16_t      mWidth;          ///< Width of the texture
+  uint16_t      mHeight;         ///< Height of the texture
+  uint16_t      mMaxMipMapLevel; ///< Maximum mipmap level
+  Type          mType : 3;       ///< Type of the texture
+  bool          mHasAlpha : 1;   ///< Whether the format has an alpha channel
 };
 
 } // namespace Render
