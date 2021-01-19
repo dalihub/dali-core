@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ACTOR_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/internal/common/internal-constants.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/event/actors/actor-declarations.h>
@@ -30,8 +31,6 @@
 #include <dali/internal/event/actors/actor-parent.h>
 #include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/common/stage-def.h>
-#include <dali/internal/event/rendering/renderer-impl.h>
-#include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/nodes/node-declarations.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/common/dali-common.h>
@@ -57,6 +56,7 @@ class RenderTask;
 class Renderer;
 class Scene;
 
+using RendererPtr       = IntrusivePtr<Renderer>;
 using RendererContainer = std::vector<RendererPtr>;
 using RendererIter      = RendererContainer::iterator;
 
@@ -1713,10 +1713,7 @@ public:
    * Retrieve the actor's node.
    * @return The node used by this actor
    */
-  const SceneGraph::Node& GetNode() const
-  {
-    return *static_cast<const SceneGraph::Node*>(mUpdateObject);
-  }
+  const SceneGraph::Node& GetNode() const;
 
   /**
    * @copydoc Dali::DevelActor::Raise()

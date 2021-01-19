@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_DATA_PROVIDER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,20 +18,23 @@
  *
  */
 
-#include <dali/public-api/common/vector-wrapper.h>
-#include <dali/public-api/rendering/renderer.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>
 #include <dali/internal/render/data-providers/uniform-map-data-provider.h>
-#include <dali/internal/render/renderers/render-sampler.h>
-#include <dali/internal/render/renderers/render-texture.h>
 #include <dali/internal/update/common/animatable-property.h>
+#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/rendering/renderer.h>
 
 namespace Dali
 {
 namespace Internal
 {
-
 struct BlendingOptions;
+
+namespace Render
+{
+class Texture;
+class Sampler;
+} // namespace Render
 
 namespace SceneGraph
 {
@@ -55,7 +58,7 @@ public:
    * The RendererAttachment that creates this object will initialize the members
    * directly.
    */
-  RenderDataProvider( AnimatableProperty< float >& opacity );
+  RenderDataProvider(AnimatableProperty<float>& opacity);
 
   /**
    * Destructor
@@ -63,7 +66,6 @@ public:
   ~RenderDataProvider();
 
 public:
-
   /**
    * Set the uniform map data provider
    * @param[in] uniformMapDataProvider The uniform map data provider
@@ -79,7 +81,7 @@ public:
    * Set the shader data provider
    * @param[in] shader The shader data provider
    */
-  void SetShader( Shader& shader );
+  void SetShader(Shader& shader);
 
   /**
    * Returns the shader
@@ -103,22 +105,21 @@ public:
    * Get the opacity
    * @return The opacity
    */
-  float GetOpacity( BufferIndex bufferIndex );
+  float GetOpacity(BufferIndex bufferIndex);
 
 private:
-
-  const UniformMapDataProvider*    mUniformMapDataProvider;
-  Shader*                          mShader;
-  std::vector<Render::Texture*>    mTextures;
-  Samplers                         mSamplers;
-  AnimatableProperty< float >&     mOpacity;
+  const UniformMapDataProvider* mUniformMapDataProvider;
+  Shader*                       mShader;
+  std::vector<Render::Texture*> mTextures;
+  Samplers                      mSamplers;
+  AnimatableProperty<float>&    mOpacity;
 
   // Give Renderer access to our private data to reduce copying vectors on construction.
   friend class Renderer;
 };
 
-} // SceneGraph
-} // Internal
-} // Dali
+} // namespace SceneGraph
+} // namespace Internal
+} // namespace Dali
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_RENDER_DATA_PROVIDER_H

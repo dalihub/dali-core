@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,20 +19,25 @@
 #include <dali/internal/event/common/thread-local-storage.h>
 
 // INTERNAL INCLUDES
-#include <dali/internal/common/core-impl.h>
-#include <dali/public-api/common/dali-common.h>
-#include <dali/internal/event/common/event-thread-services.h>
+#include <dali/integration-api/gl-abstraction.h>
 #include <dali/integration-api/processor-interface.h>
+#include <dali/internal/common/core-impl.h>
+#include <dali/internal/event/common/event-thread-services.h>
+#include <dali/public-api/common/dali-common.h>
 
 #if defined(DEBUG_ENABLED)
 #include <dali/integration-api/debug.h>
-Debug::Filter* gSingletonServiceLogFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_SINGLETON_SERVICE" );
+Debug::Filter* gSingletonServiceLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_SINGLETON_SERVICE");
 
 // Need to define own macro as the log function is not installed when this object is created so no logging is shown with DALI_LOG_INFO at construction and destruction
-#define DALI_LOG_SINGLETON_SERVICE_DIRECT(level, message)                        \
-    if(gSingletonServiceLogFilter && gSingletonServiceLogFilter->IsEnabledFor(level)) { std::string string(message); Dali::TizenPlatform::LogMessage( Debug::DebugInfo, string );  }
+#define DALI_LOG_SINGLETON_SERVICE_DIRECT(level, message)                           \
+  if(gSingletonServiceLogFilter && gSingletonServiceLogFilter->IsEnabledFor(level)) \
+  {                                                                                 \
+    std::string string(message);                                                    \
+    Dali::TizenPlatform::LogMessage(Debug::DebugInfo, string);                      \
+  }
 
-#define DALI_LOG_SINGLETON_SERVICE(level, format, ...) DALI_LOG_INFO(gSingletonServiceLogFilter, level, format, ## __VA_ARGS__ )
+#define DALI_LOG_SINGLETON_SERVICE(level, format, ...) DALI_LOG_INFO(gSingletonServiceLogFilter, level, format, ##__VA_ARGS__)
 #else
 
 #define DALI_LOG_SINGLETON_SERVICE_DIRECT(level, message)
@@ -42,19 +47,17 @@ Debug::Filter* gSingletonServiceLogFilter = Debug::Filter::New( Debug::NoLogging
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace
 {
 thread_local ThreadLocalStorage* threadLocal = nullptr;
 }
 
 ThreadLocalStorage::ThreadLocalStorage(Core* core)
-: mCore( core )
+: mCore(core)
 {
-  DALI_ASSERT_ALWAYS( threadLocal == nullptr && "Cannot create more than one ThreadLocalStorage object" );
+  DALI_ASSERT_ALWAYS(threadLocal == nullptr && "Cannot create more than one ThreadLocalStorage object");
 
   threadLocal = this;
 }
@@ -76,9 +79,9 @@ ThreadLocalStorage& ThreadLocalStorage::Get()
 Dali::SingletonService ThreadLocalStorage::GetSingletonService()
 {
   Dali::SingletonService singletonService;
-  if ( threadLocal )
+  if(threadLocal)
   {
-    singletonService = Dali::SingletonService( threadLocal );
+    singletonService = Dali::SingletonService(threadLocal);
   }
   return singletonService;
 }
@@ -149,9 +152,9 @@ AnimationPlaylist& ThreadLocalStorage::GetAnimationPlaylist()
   return mCore->GetAnimationPlaylist();
 }
 
-bool ThreadLocalStorage::IsBlendEquationSupported( DevelBlendEquation::Type blendEquation )
+bool ThreadLocalStorage::IsBlendEquationSupported(DevelBlendEquation::Type blendEquation)
 {
-  return mCore->GetGlAbstraction().IsBlendEquationSupported( blendEquation );
+  return mCore->GetGlAbstraction().IsBlendEquationSupported(blendEquation);
 }
 
 std::string ThreadLocalStorage::GetShaderVersionPrefix()
@@ -169,47 +172,47 @@ std::string ThreadLocalStorage::GetFragmentShaderPrefix()
   return mCore->GetGlAbstraction().GetFragmentShaderPrefix();
 }
 
-void ThreadLocalStorage::AddScene( Scene* scene )
+void ThreadLocalStorage::AddScene(Scene* scene)
 {
-  mCore->AddScene( scene );
+  mCore->AddScene(scene);
 }
 
-void ThreadLocalStorage::RemoveScene( Scene* scene )
+void ThreadLocalStorage::RemoveScene(Scene* scene)
 {
-  mCore->RemoveScene( scene );
+  mCore->RemoveScene(scene);
 }
 
-void ThreadLocalStorage::Register( const std::type_info& info, BaseHandle singleton )
+void ThreadLocalStorage::Register(const std::type_info& info, BaseHandle singleton)
 {
-  if( singleton )
+  if(singleton)
   {
-    DALI_LOG_SINGLETON_SERVICE( Debug::General, "Singleton Added: %s\n", info.name() );
-    mSingletonContainer.push_back( SingletonPair( info.name(), singleton ) );
+    DALI_LOG_SINGLETON_SERVICE(Debug::General, "Singleton Added: %s\n", info.name());
+    mSingletonContainer.push_back(SingletonPair(info.name(), singleton));
 
-    Integration::Processor* processor = dynamic_cast<Integration::Processor*>( &singleton.GetBaseObject() );
-    if( processor )
+    Integration::Processor* processor = dynamic_cast<Integration::Processor*>(&singleton.GetBaseObject());
+    if(processor)
     {
-      mCore->RegisterProcessor( *processor );
+      mCore->RegisterProcessor(*processor);
     }
   }
 }
 
-void ThreadLocalStorage::UnregisterAll( )
+void ThreadLocalStorage::UnregisterAll()
 {
   mSingletonContainer.clear();
 }
 
-BaseHandle ThreadLocalStorage::GetSingleton( const std::type_info& info ) const
+BaseHandle ThreadLocalStorage::GetSingleton(const std::type_info& info) const
 {
   BaseHandle object;
 
   const SingletonContainer::const_iterator end = mSingletonContainer.end();
-  for( SingletonContainer::const_iterator iter = mSingletonContainer.begin(); iter != end; ++iter )
+  for(SingletonContainer::const_iterator iter = mSingletonContainer.begin(); iter != end; ++iter)
   {
     // comparing the addresses as these are allocated statically per library
-    if( ( *iter ).first == info.name() )
+    if((*iter).first == info.name())
     {
-      object = ( *iter ).second;
+      object = (*iter).second;
     }
   }
 

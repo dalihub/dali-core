@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,13 @@
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/camera-actor-impl.h>
 #include <dali/internal/event/actors/layer-impl.h>
+
+#include <dali/internal/event/rendering/geometry-impl.h>
+#include <dali/internal/event/rendering/renderer-impl.h>
+#include <dali/internal/event/rendering/sampler-impl.h>
+#include <dali/internal/event/rendering/shader-impl.h>
+#include <dali/internal/event/rendering/texture-set-impl.h>
+#include <dali/internal/event/rendering/vertex-buffer-impl.h>
 
 #include <dali/internal/event/animation/animation-impl.h>
 #include <dali/internal/event/animation/animator-connector.h>

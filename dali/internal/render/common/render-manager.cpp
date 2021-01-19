@@ -25,11 +25,19 @@
 #include <dali/devel-api/threading/thread-pool.h>
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/gl-context-helper-abstraction.h>
+
 #include <dali/internal/event/common/scene-impl.h>
+
+#include <dali/internal/update/common/scene-graph-scene.h>
+#include <dali/internal/update/render-tasks/scene-graph-camera.h>
+
 #include <dali/internal/render/common/render-algorithms.h>
 #include <dali/internal/render/common/render-debug.h>
+#include <dali/internal/render/common/render-instruction.h>
 #include <dali/internal/render/common/render-tracker.h>
 #include <dali/internal/render/queue/render-queue.h>
+#include <dali/internal/render/renderers/render-frame-buffer.h>
+#include <dali/internal/render/renderers/render-texture.h>
 #include <dali/internal/render/shaders/program-controller.h>
 
 namespace Dali

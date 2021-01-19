@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,9 @@
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/common/scene-impl.h>
+
+#include <dali/internal/update/manager/update-manager.h>
+#include <dali/internal/update/nodes/scene-graph-layer.h>
 
 using Dali::Internal::SceneGraph::UpdateManager;
 
