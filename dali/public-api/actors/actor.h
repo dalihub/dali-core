@@ -880,12 +880,12 @@ public:
    * @brief Search through this actor's hierarchy for an actor with the given name.
    *
    * The actor itself is also considered in the search.
-   * @SINCE_1_0.0
+   * @SINCE_2_0.9
    * @param[in] actorName The name of the actor to find
    * @return A handle to the actor if found, or an empty handle if not
    * @pre The Actor has been initialized.
    */
-  Actor FindChildByName(const std::string& actorName);
+  Actor FindChildByName(std::string_view actorName);
 
   /**
    * @brief Search through this actor's hierarchy for an actor with the given unique ID.

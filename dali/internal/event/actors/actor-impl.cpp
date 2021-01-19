@@ -333,12 +333,13 @@ const SceneGraph::Node* Actor::CreateNode()
   return node;
 }
 
-void Actor::SetName(const std::string& name)
+
+void Actor::SetName( std::string_view name )
 {
-  mName = name;
+  mName = ConstString(name);
 
   // ATTENTION: string for debug purposes is not thread safe.
-  DALI_LOG_SET_OBJECT_STRING(const_cast<SceneGraph::Node*>(&GetNode()), name);
+  DALI_LOG_SET_OBJECT_STRING( const_cast< SceneGraph::Node* >( &GetNode() ), mName.GetCString() );
 }
 
 uint32_t Actor::GetId() const
@@ -1410,7 +1411,7 @@ ActorContainer& Actor::GetChildrenInternal()
   return mParentImpl.GetChildrenInternal();
 }
 
-ActorPtr Actor::FindChildByName(const std::string& actorName)
+ActorPtr Actor::FindChildByName(ConstString actorName)
 {
   return mParentImpl.FindChildByName(actorName);
 }

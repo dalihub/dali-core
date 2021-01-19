@@ -1446,7 +1446,7 @@ bool Actor::PropertyHandler::GetCachedPropertyValue(const Internal::Actor& actor
 
     case Dali::Actor::Property::NAME:
     {
-      value = actor.GetName();
+      value = std::string(actor.GetName());
       break;
     }
 
