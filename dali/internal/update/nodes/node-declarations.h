@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_NODE_DECLARATIONS_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,23 +19,21 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-vector.h>
 #include <dali/devel-api/common/bitwise-enum.h>
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/internal/common/owner-pointer.h>
+#include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/common/vector-wrapper.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace SceneGraph
 {
-
 class Node;
 
-using NodeContainer = Dali::Vector<Node *>;
+using NodeContainer = Dali::Vector<Node*>;
 using NodeIter      = NodeContainer::Iterator;
 using NodeConstIter = NodeContainer::ConstIterator;
 
@@ -45,12 +43,35 @@ using NodeConstIter = NodeContainer::ConstIterator;
 enum class NodePropertyFlags : uint8_t
 // 8 bits is enough for 4 flags (compiler will check it)
 {
-  NOTHING          = 0x000,
-  TRANSFORM        = 0x001,
-  VISIBLE          = 0x002,
-  COLOR            = 0x004,
-  CHILD_DELETED    = 0x008,
-  ALL = ( CHILD_DELETED << 1 ) - 1 // all the flags
+  NOTHING       = 0x000,
+  TRANSFORM     = 0x001,
+  VISIBLE       = 0x002,
+  COLOR         = 0x004,
+  CHILD_DELETED = 0x008,
+  ALL           = (CHILD_DELETED << 1) - 1 // all the flags
+};
+
+struct NodeDepthPair
+{
+  Node*    node;
+  uint32_t sortedDepth;
+  NodeDepthPair(Node* node, uint32_t sortedDepth)
+  : node(node),
+    sortedDepth(sortedDepth)
+  {
+  }
+};
+
+struct NodeDepths
+{
+  NodeDepths() = default;
+
+  void Add(Node* node, uint32_t sortedDepth)
+  {
+    nodeDepths.push_back(NodeDepthPair(node, sortedDepth));
+  }
+
+  std::vector<NodeDepthPair> nodeDepths;
 };
 
 } // namespace SceneGraph
@@ -58,7 +79,11 @@ enum class NodePropertyFlags : uint8_t
 } // namespace Internal
 
 // specialization has to be done in the same namespace
-template<> struct EnableBitMaskOperators< Internal::SceneGraph::NodePropertyFlags > { static const bool ENABLE = true; };
+template<>
+struct EnableBitMaskOperators<Internal::SceneGraph::NodePropertyFlags>
+{
+  static const bool ENABLE = true;
+};
 
 } // namespace Dali
 

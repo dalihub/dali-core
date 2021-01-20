@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_THREAD_LOCAL_STORAGE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,12 +23,11 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/singleton-service.h>
-#include <dali/internal/event/common/stage-def.h>
 #include <dali/internal/event/common/scene-impl.h>
+#include <dali/internal/event/common/stage-def.h>
 
 namespace Dali
 {
-
 struct Vector2;
 
 namespace Integration
@@ -38,7 +37,6 @@ class PlatformAbstraction;
 
 namespace Internal
 {
-
 class Core;
 class NotificationManager;
 class ShaderFactory;
@@ -46,6 +44,8 @@ class GestureEventProcessor;
 class RelayoutController;
 class ObjectRegistry;
 class EventThreadServices;
+class PropertyNotificationManager;
+class AnimationPlaylist;
 
 namespace SceneGraph
 {
@@ -59,7 +59,6 @@ class UpdateManager;
 class ThreadLocalStorage : public Dali::BaseObject
 {
 public:
-
   /**
    * Constructor
    * Creates the TLS and adds a pointer to core
@@ -167,7 +166,7 @@ public:
    * @param[in] blendEquation blend equation to be checked.
    * @return True if the blend equation supported.
    */
-  bool IsBlendEquationSupported( DevelBlendEquation::Type blendEquation );
+  bool IsBlendEquationSupported(DevelBlendEquation::Type blendEquation);
 
   /**
    * @brief Returns shader prefix of shading language version.
@@ -189,19 +188,19 @@ public:
    * This is only used by the Scene to add itself to the core when the Scene is created.
    * @param[in] scene The Scene.
    */
-  void AddScene( Scene* scene );
+  void AddScene(Scene* scene);
 
   /**
    * Remove a Scene from the Core.
    * This is only used by the Scene to remove itself from the core when the Scene is destroyed.
    * @param[in] scene The Scene.
    */
-  void RemoveScene( Scene* scene );
+  void RemoveScene(Scene* scene);
 
   /**
    * @copydoc Dali::SingletonService::Register()
    */
-  void Register( const std::type_info& info, BaseHandle singleton );
+  void Register(const std::type_info& info, BaseHandle singleton);
 
   /**
    * @copydoc Dali::SingletonService::UnregisterAll()
@@ -211,22 +210,20 @@ public:
   /**
    * @copydoc Dali::SingletonService::GetSingleton()
    */
-  BaseHandle GetSingleton( const std::type_info& info ) const;
+  BaseHandle GetSingleton(const std::type_info& info) const;
 
 private:
-
   /**
    * Virtual Destructor
    */
   ~ThreadLocalStorage() override;
 
   // Undefined
-  ThreadLocalStorage( const ThreadLocalStorage& );
-  ThreadLocalStorage& operator=( ThreadLocalStorage& );
+  ThreadLocalStorage(const ThreadLocalStorage&);
+  ThreadLocalStorage& operator=(ThreadLocalStorage&);
 
 private:
-
-  Core* mCore;                                              ///< reference to core
+  Core* mCore; ///< reference to core
 
   // using the address of the type name string as compiler will allocate these once per library
   // and we don't support un/re-loading of dali libraries while singleton service is alive
@@ -235,7 +232,6 @@ private:
   using SingletonConstIter = SingletonContainer::const_iterator;
 
   SingletonContainer mSingletonContainer; ///< The container to look up singleton by its type name
-
 };
 
 } // namespace Internal
@@ -244,7 +240,7 @@ private:
 
 inline Internal::ThreadLocalStorage& GetImplementation(Dali::SingletonService& service)
 {
-  DALI_ASSERT_ALWAYS( service && "SingletonService handle is empty" );
+  DALI_ASSERT_ALWAYS(service && "SingletonService handle is empty");
 
   BaseObject& handle = service.GetBaseObject();
 
@@ -253,7 +249,7 @@ inline Internal::ThreadLocalStorage& GetImplementation(Dali::SingletonService& s
 
 inline const Internal::ThreadLocalStorage& GetImplementation(const Dali::SingletonService& service)
 {
-  DALI_ASSERT_ALWAYS( service && "SingletonService handle is empty" );
+  DALI_ASSERT_ALWAYS(service && "SingletonService handle is empty");
 
   const BaseObject& handle = service.GetBaseObject();
 
