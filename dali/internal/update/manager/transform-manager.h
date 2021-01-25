@@ -95,6 +95,19 @@ enum TransformManagerProperty
 using TransformId                             = uint32_t; // 4,294,967,295 transforms supported
 static const TransformId INVALID_TRANSFORM_ID = -1;
 
+class TransformManager;
+
+struct TransformManagerData
+{
+
+  TransformManager* Manager() const { return mManager; }
+
+  TransformId Id() const { return mId; }
+
+  TransformManager* mManager{nullptr};
+  TransformId       mId{INVALID_TRANSFORM_ID};
+};
+
 } //SceneGraph
 } //Internal
 

@@ -396,7 +396,7 @@ public:
    */
   const Vector3& GetPosition(BufferIndex bufferIndex) const
   {
-    if( mTransformId != INVALID_TRANSFORM_ID )
+    if( mTransformManagerData.Id() != INVALID_TRANSFORM_ID )
     {
       return mPosition.Get(bufferIndex);
     }
@@ -419,9 +419,9 @@ public:
    */
   void SetInheritPosition(bool inherit)
   {
-    if( mTransformId != INVALID_TRANSFORM_ID )
+    if( mTransformManagerData.Id() != INVALID_TRANSFORM_ID )
     {
-      mTransformManager->SetInheritPosition( mTransformId, inherit );
+      mTransformManagerData.Manager()->SetInheritPosition( mTransformManagerData.Id(), inherit );
     }
   }
 
@@ -432,7 +432,7 @@ public:
    */
   const Quaternion& GetOrientation(BufferIndex bufferIndex) const
   {
-    if( mTransformId != INVALID_TRANSFORM_ID )
+    if( mTransformManagerData.Id() != INVALID_TRANSFORM_ID )
     {
       return mOrientation.Get(0);
     }
@@ -456,9 +456,9 @@ public:
    */
   void SetInheritOrientation(bool inherit)
   {
-    if( mTransformId != INVALID_TRANSFORM_ID )
+    if( mTransformManagerData.Id() != INVALID_TRANSFORM_ID )
     {
-      mTransformManager->SetInheritOrientation(mTransformId, inherit );
+      mTransformManagerData.Manager()->SetInheritOrientation(mTransformManagerData.Id(), inherit );
     }
   }
 
@@ -469,7 +469,7 @@ public:
    */
   const Vector3& GetScale(BufferIndex bufferIndex) const
   {
-    if( mTransformId != INVALID_TRANSFORM_ID )
+    if( mTransformManagerData.Id() != INVALID_TRANSFORM_ID )
     {
       return mScale.Get(0);
     }
@@ -494,9 +494,9 @@ public:
    */
   void SetInheritScale( bool inherit )
   {
-    if( mTransformId != INVALID_TRANSFORM_ID )
+    if( mTransformManagerData.Id() != INVALID_TRANSFORM_ID )
     {
-      mTransformManager->SetInheritScale(mTransformId, inherit );
+      mTransformManagerData.Manager()->SetInheritScale(mTransformManagerData.Id(), inherit );
     }
   }
 
@@ -620,7 +620,7 @@ public:
    */
   const Vector3& GetSize(BufferIndex bufferIndex) const
   {
-    if( mTransformId != INVALID_TRANSFORM_ID )
+    if( mTransformManagerData.Id() != INVALID_TRANSFORM_ID )
     {
       return mSize.Get(0);
     }
@@ -634,7 +634,7 @@ public:
    */
   const Vector3& GetUpdateSizeHint() const
   {
-    if( mTransformId != INVALID_TRANSFORM_ID )
+    if( mTransformManagerData.Id() != INVALID_TRANSFORM_ID )
     {
       return mUpdateSizeHint.Get(0);
     }
@@ -648,9 +648,9 @@ public:
    */
   const Vector4& GetBoundingSphere() const
   {
-    if( mTransformId != INVALID_TRANSFORM_ID )
+    if( mTransformManagerData.Id() != INVALID_TRANSFORM_ID )
     {
-      return mTransformManager->GetBoundingSphere( mTransformId );
+      return mTransformManagerData.Manager()->GetBoundingSphere( mTransformManagerData.Id() );
     }
 
     return Vector4::ZERO;
@@ -663,9 +663,9 @@ public:
    */
   void GetWorldMatrixAndSize( Matrix& worldMatrix, Vector3& size ) const
   {
-    if( mTransformId != INVALID_TRANSFORM_ID )
+    if( mTransformManagerData.Id() != INVALID_TRANSFORM_ID )
     {
-      mTransformManager->GetWorldMatrixAndSize( mTransformId, worldMatrix, size );
+      mTransformManagerData.Manager()->GetWorldMatrixAndSize( mTransformManagerData.Id(), worldMatrix, size );
     }
   }
 
@@ -675,8 +675,8 @@ public:
    */
   bool IsLocalMatrixDirty() const
   {
-    return (mTransformId != INVALID_TRANSFORM_ID) &&
-           (mTransformManager->IsLocalMatrixDirty( mTransformId ));
+    return (mTransformManagerData.Id() != INVALID_TRANSFORM_ID) &&
+           (mTransformManagerData.Manager()->IsLocalMatrixDirty( mTransformManagerData.Id() ));
   }
 
   /**
@@ -731,7 +731,7 @@ public:
    */
   TransformId GetTransformId() const
   {
-    return mTransformId;
+    return mTransformManagerData.Id();
   }
 
   /**
@@ -767,10 +767,10 @@ public:
    */
   void SetPositionUsesAnchorPoint( bool positionUsesAnchorPoint )
   {
-    if( mTransformId != INVALID_TRANSFORM_ID && mPositionUsesAnchorPoint != positionUsesAnchorPoint )
+    if( mTransformManagerData.Id() != INVALID_TRANSFORM_ID && mPositionUsesAnchorPoint != positionUsesAnchorPoint )
     {
       mPositionUsesAnchorPoint = positionUsesAnchorPoint;
-      mTransformManager->SetPositionUsesAnchorPoint( mTransformId, mPositionUsesAnchorPoint );
+      mTransformManagerData.Manager()->SetPositionUsesAnchorPoint( mTransformManagerData.Id(), mPositionUsesAnchorPoint );
     }
   }
 
@@ -902,15 +902,20 @@ private:
   void RecursiveDisconnectFromSceneGraph( BufferIndex updateBufferIndex );
 
 public: // Default properties
+  using TransformManagerParentsOrigin = TransformManagerPropertyVector3<TRANSFORM_PROPERTY_PARENT_ORIGIN>;
+  using TransformManagerAnchorPoint = TransformManagerPropertyVector3<TRANSFORM_PROPERTY_ANCHOR_POINT>;
+  using TransformManagerSize = TransformManagerPropertyVector3<TRANSFORM_PROPERTY_SIZE>;
+  using TransformManagerPosition = TransformManagerPropertyVector3<TRANSFORM_PROPERTY_POSITION>;
+  using TransformManagerScale = TransformManagerPropertyVector3<TRANSFORM_PROPERTY_SCALE>;
 
-  TransformManager*                  mTransformManager;
-  TransformId                        mTransformId;
-  TransformManagerPropertyVector3    mParentOrigin;           ///< Local transform; the position is relative to this. Sets the Transform flag dirty when changed
-  TransformManagerPropertyVector3    mAnchorPoint;            ///< Local transform; local center of rotation. Sets the Transform flag dirty when changed
-  TransformManagerPropertyVector3    mSize;                   ///< Size is provided for layouting
-  TransformManagerPropertyVector3    mPosition;               ///< Local transform; distance between parent-origin & anchor-point
+
+  TransformManagerData               mTransformManagerData;
+  TransformManagerParentsOrigin      mParentOrigin;           ///< Local transform; the position is relative to this. Sets the Transform flag dirty when changed
+  TransformManagerAnchorPoint        mAnchorPoint;            ///< Local transform; local center of rotation. Sets the Transform flag dirty when changed
+  TransformManagerSize               mSize;                   ///< Size is provided for layouting
+  TransformManagerPosition           mPosition;               ///< Local transform; distance between parent-origin & anchor-point
+  TransformManagerScale              mScale;                  ///< Local transform; scale relative to parent node
   TransformManagerPropertyQuaternion mOrientation;            ///< Local transform; rotation relative to parent node
-  TransformManagerPropertyVector3    mScale;                  ///< Local transform; scale relative to parent node
 
   AnimatableProperty<bool>           mVisible;                ///< Visibility can be inherited from the Node hierachy
   AnimatableProperty<bool>           mCulled;                 ///< True if the node is culled. This is not animatable. It is just double-buffered.

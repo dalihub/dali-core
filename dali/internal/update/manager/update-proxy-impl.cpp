@@ -75,7 +75,7 @@ bool UpdateProxy::GetPosition( uint32_t id, Vector3& position ) const
   if( node )
   {
     const SceneGraph::TransformManager& transformManager = mTransformManager; // To ensure we call the const getter
-    position = transformManager.GetVector3PropertyValue( node->mTransformId, SceneGraph::TRANSFORM_PROPERTY_POSITION );
+    position = transformManager.GetVector3PropertyValue( node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_POSITION );
     success = true;
   }
   return success;
@@ -87,7 +87,7 @@ bool UpdateProxy::SetPosition( uint32_t id, const Vector3& position )
   SceneGraph::Node* node = GetNodeWithId( id );
   if( node )
   {
-    mTransformManager.SetVector3PropertyValue( node->mTransformId, SceneGraph::TRANSFORM_PROPERTY_POSITION, position );
+    mTransformManager.SetVector3PropertyValue( node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_POSITION, position );
     success = true;
   }
   return success;
@@ -99,7 +99,7 @@ bool UpdateProxy::BakePosition( uint32_t id, const Vector3& position )
   SceneGraph::Node* node = GetNodeWithId( id );
   if( node )
   {
-    mTransformManager.BakeVector3PropertyValue( node->mTransformId, SceneGraph::TRANSFORM_PROPERTY_POSITION, position );
+    mTransformManager.BakeVector3PropertyValue( node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_POSITION, position );
     success = true;
   }
   return success;
@@ -112,7 +112,7 @@ bool UpdateProxy::GetSize( uint32_t id, Vector3& size ) const
   if( node )
   {
     const SceneGraph::TransformManager& transformManager = mTransformManager; // To ensure we call the const getter
-    size = transformManager.GetVector3PropertyValue( node->mTransformId, SceneGraph::TRANSFORM_PROPERTY_SIZE );
+    size = transformManager.GetVector3PropertyValue( node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_SIZE );
     success = true;
   }
   return success;
@@ -124,7 +124,7 @@ bool UpdateProxy::SetSize( uint32_t id, const Vector3& size )
   SceneGraph::Node* node = GetNodeWithId( id );
   if( node )
   {
-    mTransformManager.SetVector3PropertyValue( node->mTransformId, SceneGraph::TRANSFORM_PROPERTY_SIZE, size );
+    mTransformManager.SetVector3PropertyValue( node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_SIZE, size );
     success = true;
   }
   return success;
@@ -136,7 +136,7 @@ bool UpdateProxy::BakeSize( uint32_t id, const Vector3& size )
   SceneGraph::Node* node = GetNodeWithId( id );
   if( node )
   {
-    mTransformManager.BakeVector3PropertyValue( node->mTransformId, SceneGraph::TRANSFORM_PROPERTY_SIZE, size );
+    mTransformManager.BakeVector3PropertyValue( node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_SIZE, size );
     success = true;
   }
   return success;
@@ -149,8 +149,8 @@ bool UpdateProxy::GetPositionAndSize( uint32_t id, Vector3& position, Vector3& s
   if( node )
   {
     const SceneGraph::TransformManager& transformManager = mTransformManager; // To ensure we call the const getter
-    position = transformManager.GetVector3PropertyValue( node->mTransformId, SceneGraph::TRANSFORM_PROPERTY_POSITION );
-    size = transformManager.GetVector3PropertyValue( node->mTransformId, SceneGraph::TRANSFORM_PROPERTY_SIZE );
+    position = transformManager.GetVector3PropertyValue( node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_POSITION );
+    size = transformManager.GetVector3PropertyValue( node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_SIZE );
     success = true;
   }
   return success;
@@ -163,7 +163,7 @@ bool UpdateProxy::GetScale( uint32_t id, Vector3& scale ) const
   if( node )
   {
     const SceneGraph::TransformManager& transformManager = mTransformManager; // To ensure we call the const getter
-    scale = transformManager.GetVector3PropertyValue( node->mTransformId, SceneGraph::TRANSFORM_PROPERTY_SCALE );
+    scale = transformManager.GetVector3PropertyValue( node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_SCALE );
     success = true;
   }
 
@@ -176,7 +176,7 @@ bool UpdateProxy::SetScale( uint32_t id, const Vector3& scale )
   SceneGraph::Node* node = GetNodeWithId( id );
   if( node )
   {
-    mTransformManager.SetVector3PropertyValue( node->mTransformId, SceneGraph::TRANSFORM_PROPERTY_SCALE, scale );
+    mTransformManager.SetVector3PropertyValue( node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_SCALE, scale );
     success = true;
   }
   return success;
@@ -188,7 +188,7 @@ bool UpdateProxy::BakeScale( uint32_t id, const Vector3& scale )
   SceneGraph::Node* node = GetNodeWithId( id );
   if( node )
   {
-    mTransformManager.BakeVector3PropertyValue( node->mTransformId, SceneGraph::TRANSFORM_PROPERTY_SCALE, scale );
+    mTransformManager.BakeVector3PropertyValue( node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_SCALE, scale );
     success = true;
   }
   return success;
