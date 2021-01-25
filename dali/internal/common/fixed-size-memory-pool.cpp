@@ -205,13 +205,16 @@ void* FixedSizeMemoryPool::Allocate()
 
 void FixedSizeMemoryPool::Free( void* memory )
 {
+  if( memory )
+  {
 #ifdef DEBUG_ENABLED
-  mImpl->CheckMemoryIsInsidePool( memory );
+    mImpl->CheckMemoryIsInsidePool( memory );
 #endif
 
-  // Add memory to head of deleted objects list. Store next address in the same memory space as the old object.
-  *( reinterpret_cast< void** >( memory ) ) = mImpl->mDeletedObjects;
-  mImpl->mDeletedObjects = memory;
+    // Add memory to head of deleted objects list. Store next address in the same memory space as the old object.
+    *( reinterpret_cast< void** >( memory ) ) = mImpl->mDeletedObjects;
+    mImpl->mDeletedObjects = memory;
+  }
 }
 
 void* FixedSizeMemoryPool::AllocateThreadSafe()
@@ -222,8 +225,11 @@ void* FixedSizeMemoryPool::AllocateThreadSafe()
 
 void FixedSizeMemoryPool::FreeThreadSafe( void* memory )
 {
-  Mutex::ScopedLock lock( mImpl->mMutex );
-  Free( memory );
+  if( memory )
+  {
+    Mutex::ScopedLock lock( mImpl->mMutex );
+    Free( memory );
+  }
 }
 
 
