@@ -41,33 +41,63 @@ const int32_t MAX_NUM_CHILDREN(16);
 struct TestCase
 {
   int32_t                               testCase;
-  const char*                           testCaseName;
+  const char*                           name;
   std::chrono::steady_clock::time_point startTime;
+  std::chrono::system_clock::time_point startSystemTime;
+  int32_t                               result;
+  pid_t                                 childPid{0};
+  testcase*                             tctPtr;
 
+  TestCase(int32_t index, testcase* testCase)
+  : testCase(index),
+    name(testCase->name),
+    startTime(),
+    startSystemTime(),
+    result(0),
+    childPid(0),
+    tctPtr(testCase)
+  {
+  }
   TestCase()
   : testCase(0),
-    testCaseName(NULL),
-    startTime()
+    name(NULL),
+    startTime(),
+    startSystemTime(),
+    result(0),
+    childPid(0),
+    tctPtr(nullptr)
   {
   }
 
   TestCase(int32_t tc, const char* name)
   : testCase(tc),
-    testCaseName(name),
-    startTime()
+    name(name),
+    startTime(),
+    startSystemTime(),
+    result(0),
+    childPid(0),
+    tctPtr(nullptr)
   {
   }
   TestCase(const TestCase& rhs)
   : testCase(rhs.testCase),
-    testCaseName(rhs.testCaseName),
-    startTime(rhs.startTime)
+    name(rhs.name),
+    startTime(rhs.startTime),
+    startSystemTime(rhs.startSystemTime),
+    result(rhs.result),
+    childPid(rhs.childPid),
+    tctPtr(rhs.tctPtr)
   {
   }
   TestCase& operator=(const TestCase& rhs)
   {
-    testCase     = rhs.testCase;
-    testCaseName = rhs.testCaseName;
-    startTime    = rhs.startTime;
+    testCase        = rhs.testCase;
+    name            = rhs.name;
+    startTime       = rhs.startTime;
+    startSystemTime = rhs.startSystemTime;
+    result          = rhs.result;
+    childPid        = rhs.childPid;
+    tctPtr          = rhs.tctPtr;
     return *this;
   }
 };
@@ -108,6 +138,14 @@ int32_t FindAndRunTestCase(::testcase tc_array[], const char* testCaseName);
  * @param[in] program The name of this program
  */
 void Usage(const char* program);
+
+/**
+ * Main function.
+ * @param[in] argc Argument count
+ * @param[in] argv Argument vector
+ * @param[in] tc_array Array of test cases
+ */
+int RunTests(int argc, char* const argv[], ::testcase tc_array[]);
 
 } // namespace TestHarness
 

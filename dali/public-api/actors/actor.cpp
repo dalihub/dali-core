@@ -30,6 +30,7 @@
 #include <dali/internal/event/animation/constraint-impl.h>
 #include <dali/internal/event/rendering/renderer-impl.h>
 #include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
+#include <dali/internal/common/const-string.h>
 
 namespace Dali
 {
@@ -88,9 +89,9 @@ Actor Actor::GetChildAt(uint32_t index) const
   return Actor(child.Get());
 }
 
-Actor Actor::FindChildByName(const std::string& actorName)
+Actor Actor::FindChildByName(std::string_view actorName)
 {
-  Internal::ActorPtr child = GetImplementation(*this).FindChildByName(actorName);
+  Internal::ActorPtr child = GetImplementation(*this).FindChildByName(Internal::ConstString(actorName));
   return Actor(child.Get());
 }
 

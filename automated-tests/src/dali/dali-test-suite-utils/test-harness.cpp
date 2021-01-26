@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,20 @@
 #include <sys/wait.h>
 #include <testcase.h>
 
-#include <time.h>
+#include <getopt.h>
 #include <unistd.h>
-
+#include <algorithm>
 #include <chrono>
+#include <cstdlib>
 #include <cstring>
+#include <ctime>
+#include <fstream>
 #include <map>
+#include <sstream>
 #include <vector>
+
+using std::chrono::steady_clock;
+using std::chrono::system_clock;
 
 namespace TestHarness
 {
@@ -48,18 +55,185 @@ const char* basename(const char* path)
   return slash;
 }
 
-void SuppressLogOutput()
+std::vector<std::string> Split(const std::string& aString, char delimiter)
 {
-  // Close stdout and stderr to suppress the log output
-  close(STDOUT_FILENO); // File descriptor number for stdout is 1
-  close(STDERR_FILENO); // File descriptor number for stderr is 2
+  std::vector<std::string> tokens;
+  std::string              token;
+  std::istringstream       tokenStream(aString);
+  while(std::getline(tokenStream, token, delimiter))
+  {
+    tokens.push_back(token);
+  }
+  return tokens;
+}
 
-  // The POSIX specification requires that /dev/null must be provided,
-  // The open function always chooses the lowest unused file descriptor
-  // It is sufficient for stdout to be writable.
-  open("/dev/null", O_WRONLY); // Redirect file descriptor number 1 (i.e. stdout) to /dev/null
-  // When stderr is opened it must be both readable and writable.
-  open("/dev/null", O_RDWR); // Redirect file descriptor number 2 (i.e. stderr) to /dev/null
+std::string Join(const std::vector<std::string>& tokens, char delimiter)
+{
+  std::ostringstream oss;
+
+  unsigned int delimiterCount = 0;
+  for(auto& token : tokens)
+  {
+    oss << token;
+    if(delimiterCount < tokens.size() - 1)
+    {
+      oss << delimiter;
+    }
+    ++delimiterCount;
+  }
+  return oss.str();
+}
+
+std::string ChildOutputFilename(int pid)
+{
+  std::ostringstream os;
+  os << "/tmp/tct-child." << pid;
+  return os.str();
+}
+
+std::string TestModuleFilename(const char* processName)
+{
+  auto pathComponents = Split(processName, '/');
+  auto aModule        = pathComponents.back();
+  aModule += "-tests.xml";
+  return aModule;
+}
+
+std::string TestModuleName(const char* processName)
+{
+  auto pathComponents   = Split(processName, '/');
+  auto aModule          = pathComponents.back();
+  auto moduleComponents = Split(aModule, '-');
+
+  moduleComponents[1][0] = std::toupper(moduleComponents[1][0]);
+  moduleComponents[2][0] = std::toupper(moduleComponents[2][0]);
+
+  std::ostringstream oss;
+  for(unsigned int i = 1; i < moduleComponents.size() - 1; ++i) // [0]=tct, [n-1]=core
+  {
+    oss << moduleComponents[i];
+
+    if(i > 1 && i < moduleComponents.size() - 2) // skip first and last delimiter
+    {
+      oss << '-';
+    }
+  }
+
+  return oss.str();
+}
+
+std::string ReadAndEscape(std::string filename)
+{
+  std::ostringstream os;
+  std::ifstream      ifs;
+  ifs.open(filename, std::ifstream::in);
+  while(ifs.good())
+  {
+    std::string line;
+    std::getline(ifs, line);
+    for(auto c : line)
+    {
+      switch(c)
+      {
+        case '<':
+          os << "&lt;";
+          break;
+        case '>':
+          os << "&gt;";
+          break;
+        case '&':
+          os << "&amp;";
+          break;
+        default:
+          os << c;
+          break;
+      }
+    }
+    os << "\\"
+       << "n";
+  }
+  ifs.close();
+  return os.str();
+}
+
+void OutputTestResult(
+  std::ofstream& ofs,
+  const char*    pathToExecutable,
+  std::string    testSuiteName,
+  TestCase&      testCase,
+  std::string    startTime,
+  std::string    endTime)
+{
+  std::string outputFilename = ChildOutputFilename(testCase.childPid);
+  std::string testOutput     = ReadAndEscape(outputFilename);
+
+  ofs << "<testcase component=\"CoreAPI/" << testSuiteName << "/default\" execution_type=\"auto\" id=\""
+      << testCase.name << "\" purpose=\"\" result=\"" << (testCase.result == 0 ? "PASS" : "FAIL") << "\">" << std::endl
+      << "<description><test_script_entry test_script_expected_result=\"0\">"
+      << pathToExecutable << testCase.name << "</test_script_entry>" << std::endl
+      << "</description>"
+      << "<result_info><actual_result>" << (testCase.result == 0 ? "PASS" : "FAIL") << "</actual_result>" << std::endl
+      << "<start>" << startTime << "</start>"
+      << "<end>" << endTime << "</end>"
+      << "<stdout><![CDATA[]]></stdout>"
+      << "<stderr><![CDATA[" << testOutput << "]]></stderr></result_info></testcase>" << std::endl;
+
+  unlink(outputFilename.c_str());
+}
+
+void OutputTestResults(const char* processName, RunningTestCases& children)
+{
+  std::ofstream ofs;
+  std::string   filename   = TestModuleFilename(processName);
+  std::string   moduleName = TestModuleName(processName);
+  ofs.open(filename, std::ofstream::out | std::ofstream::app);
+
+  // Sort completed cases by original test case id
+  std::vector<TestCase> childTestCases;
+  childTestCases.reserve(children.size());
+  for(auto& element : children) childTestCases.push_back(element.second);
+  std::sort(childTestCases.begin(), childTestCases.end(), [](const TestCase& a, const TestCase& b) {
+    return a.testCase < b.testCase;
+  });
+
+  const int BUFSIZE = 256;
+  char      buffer[BUFSIZE];
+  for(auto& testCase : childTestCases)
+  {
+    auto tt = system_clock::to_time_t(testCase.startSystemTime);
+    strftime(buffer, BUFSIZE, "%c", localtime(&tt));
+    std::string startTime(buffer);
+    OutputTestResult(ofs, processName, moduleName, testCase, startTime, startTime);
+  }
+
+  ofs.close();
+}
+
+void OutputStatistics(const char* processName, int32_t numPasses, int32_t numFailures)
+{
+  FILE* fp = fopen("summary.xml", "a");
+  if(fp != NULL)
+  {
+    fprintf(fp,
+            "  <suite name=\"%s-tests\">\n"
+            "    <total_case>%d</total_case>\n"
+            "    <pass_case>%d</pass_case>\n"
+            "    <pass_rate>%5.2f</pass_rate>\n"
+            "    <fail_case>%d</fail_case>\n"
+            "    <fail_rate>%5.2f</fail_rate>\n"
+            "    <block_case>0</block_case>\n"
+            "    <block_rate>0.00</block_rate>\n"
+            "    <na_case>0</na_case>\n"
+            "    <na_rate>0.00</na_rate>\n"
+            "  </suite>\n",
+            basename(processName),
+            numPasses + numFailures,
+            numPasses,
+            (float)numPasses * 100.0f / (numPasses + numFailures),
+            numFailures,
+            (float)numFailures * 100.0f / (numPasses + numFailures));
+    fclose(fp);
+  }
 }
 
 int32_t RunTestCase(struct ::testcase_s& testCase)
@@ -89,35 +263,55 @@ int32_t RunTestCase(struct ::testcase_s& testCase)
   return result;
 }
 
-int32_t RunTestCaseInChildProcess(struct ::testcase_s& testCase, bool suppressOutput)
+int32_t RunTestCaseRedirectOutput(TestCase& testCase, bool suppressOutput)
+{
+  // Executing in child process
+  // Close stdout and stderr to suppress the log output
+  close(STDOUT_FILENO); // File descriptor number for stdout is 1
+
+  // The POSIX specification requires that /dev/null must be provided,
+  // The open function always chooses the lowest unused file descriptor
+  // It is sufficient for stdout to be writable.
+  open("/dev/null", O_WRONLY); // Redirect file descriptor number 1 (i.e. stdout) to /dev/null
+
+  fflush(stderr);
+  close(STDERR_FILENO);
+  if(suppressOutput)
+  {
+    stderr = fopen("/dev/null", "w+"); // Redirect fd 2 to /dev/null
+  }
+  else
+  {
+    // When stderr is opened it must be both readable and writable.
+    std::string childOutputFilename = ChildOutputFilename(getpid());
+    stderr                          = fopen(childOutputFilename.c_str(), "w+");
+  }
+
+  int32_t status = RunTestCase(*testCase.tctPtr);
+
+  fflush(stderr);
+  fclose(stderr);
+
+  return status;
+}
+
+int32_t RunTestCaseInChildProcess(TestCase& testCase, bool redirect)
 {
   int32_t testResult = EXIT_STATUS_TESTCASE_FAILED;
 
   int32_t pid = fork();
   if(pid == 0) // Child process
   {
-    if(suppressOutput)
+    if(redirect)
     {
-      SuppressLogOutput();
+      int status = RunTestCaseRedirectOutput(testCase, false);
+      exit(status);
     }
     else
     {
-      printf("\n");
-      for(int32_t i = 0; i < 80; ++i) printf("#");
-      printf("\nTC: %s\n", testCase.name);
-      fflush(stdout);
+      int status = RunTestCase(*testCase.tctPtr);
+      exit(status);
     }
-
-    int32_t status = RunTestCase(testCase);
-
-    if(!suppressOutput)
-    {
-      fflush(stdout);
-      fflush(stderr);
-      fclose(stdout);
-      fclose(stderr);
-    }
-    exit(status);
   }
   else if(pid == -1)
   {
@@ -126,8 +320,9 @@ int32_t RunTestCaseInChildProcess(struct ::testcase_s& testCase, bool suppressOu
   }
   else // Parent process
   {
-    int32_t status   = 0;
-    int32_t childPid = waitpid(pid, &status, 0);
+    int32_t status    = 0;
+    int32_t childPid  = waitpid(pid, &status, 0);
+    testCase.childPid = childPid;
     if(childPid == -1)
     {
       perror("waitpid");
@@ -167,43 +362,32 @@ int32_t RunTestCaseInChildProcess(struct ::testcase_s& testCase, bool suppressOu
   return testResult;
 }
 
-void OutputStatistics(const char* processName, int32_t numPasses, int32_t numFailures)
+int32_t RunAll(const char* processName, ::testcase tc_array[], bool quiet)
 {
-  FILE* fp = fopen("summary.xml", "a");
-  if(fp != NULL)
-  {
-    fprintf(fp,
-            "  <suite name=\"%s\">\n"
-            "    <total_case>%d</total_case>\n"
-            "    <pass_case>%d</pass_case>\n"
-            "    <pass_rate>%5.2f</pass_rate>\n"
-            "    <fail_case>%d</fail_case>\n"
-            "    <fail_rate>%5.2f</fail_rate>\n"
-            "    <block_case>0</block_case>\n"
-            "    <block_rate>0.00</block_rate>\n"
-            "    <na_case>0</na_case>\n"
-            "    <na_rate>0.00</na_rate>\n"
-            "  </suite>\n",
-            basename(processName),
-            numPasses + numFailures,
-            numPasses,
-            (float)numPasses / (numPasses + numFailures),
-            numFailures,
-            (float)numFailures / (numPasses + numFailures));
-    fclose(fp);
-  }
-}
+  int32_t       numFailures = 0;
+  int32_t       numPasses   = 0;
+  std::ofstream ofs;
+  std::string   filename   = TestModuleFilename(processName);
+  std::string   moduleName = TestModuleName(processName);
+  ofs.open(filename, std::ofstream::out | std::ofstream::app);
+  const int BUFSIZE = 256;
+  char      buffer[BUFSIZE];
 
-int32_t RunAll(const char* processName, ::testcase tc_array[])
-{
-  int32_t numFailures = 0;
-  int32_t numPasses   = 0;
-
-  // Run test cases in child process( to kill output/handle signals ), but run serially.
+  // Run test cases in child process( to handle signals ), but run serially.
   for(uint32_t i = 0; tc_array[i].name; i++)
   {
-    int32_t result = RunTestCaseInChildProcess(tc_array[i], false);
-    if(result == 0)
+    auto tt = system_clock::to_time_t(system_clock::now());
+    strftime(buffer, BUFSIZE, "%c", localtime(&tt));
+    std::string startTime(buffer);
+
+    TestCase testCase(i, &tc_array[i]);
+    testCase.result = RunTestCaseInChildProcess(testCase, quiet);
+
+    tt = system_clock::to_time_t(system_clock::now());
+    strftime(buffer, BUFSIZE, "%c", localtime(&tt));
+    std::string endTime(buffer);
+
+    if(testCase.result == 0)
     {
       numPasses++;
     }
@@ -211,7 +395,12 @@ int32_t RunAll(const char* processName, ::testcase tc_array[])
     {
       numFailures++;
     }
+    if(!quiet)
+    {
+      OutputTestResult(ofs, processName, moduleName, testCase, startTime, endTime);
+    }
   }
+  ofs.close();
 
   OutputStatistics(processName, numPasses, numFailures);
 
@@ -219,7 +408,7 @@ int32_t RunAll(const char* processName, ::testcase tc_array[])
 }
 
 // Constantly runs up to MAX_NUM_CHILDREN processes
-int32_t RunAllInParallel(const char* processName, ::testcase tc_array[], bool reRunFailed)
+int32_t RunAllInParallel(const char* processName, ::testcase tc_array[], bool reRunFailed, bool quiet)
 {
   int32_t numFailures = 0;
   int32_t numPasses   = 0;
@@ -241,8 +430,9 @@ int32_t RunAllInParallel(const char* processName, ::testcase tc_array[], bool re
       int32_t pid = fork();
       if(pid == 0) // Child process
       {
-        SuppressLogOutput();
-        exit(RunTestCase(tc_array[nextTestCase]));
+        TestCase testCase(nextTestCase, &tc_array[nextTestCase]);
+        int      status = RunTestCaseRedirectOutput(testCase, quiet);
+        exit(status);
       }
       else if(pid == -1)
       {
@@ -252,7 +442,9 @@ int32_t RunAllInParallel(const char* processName, ::testcase tc_array[], bool re
       else // Parent process
       {
         TestCase tc(nextTestCase, tc_array[nextTestCase].name);
-        tc.startTime = std::chrono::steady_clock::now();
+        tc.startTime       = steady_clock::now();
+        tc.startSystemTime = system_clock::now();
+        tc.childPid        = pid;
 
         children[pid] = tc;
         nextTestCase++;
@@ -289,11 +481,12 @@ int32_t RunAllInParallel(const char* processName, ::testcase tc_array[], bool re
     {
       if(WIFEXITED(status))
       {
-        int32_t testResult = WEXITSTATUS(status);
-        if(testResult)
+        auto& testCase  = children[childPid];
+        testCase.result = WEXITSTATUS(status);
+        if(testCase.result)
         {
-          printf("Test case %s failed: %d\n", children[childPid].testCaseName, testResult);
-          failedTestCases.push_back(children[childPid].testCase);
+          printf("Test case %s failed: %d\n", testCase.name, testCase.result);
+          failedTestCases.push_back(testCase.testCase);
           numFailures++;
         }
         else
@@ -310,7 +503,8 @@ int32_t RunAllInParallel(const char* processName, ::testcase tc_array[], bool re
         RunningTestCases::iterator iter = children.find(childPid);
         if(iter != children.end())
         {
-          printf("Test case %s exited with signal %s\n", iter->second.testCaseName, strsignal(status));
+          printf("Test case %s exited with signal %s\n", iter->second.name, strsignal(status));
+          iter->second.result = 1;
           failedTestCases.push_back(iter->second.testCase);
         }
         else
@@ -322,6 +516,11 @@ int32_t RunAllInParallel(const char* processName, ::testcase tc_array[], bool re
         numRunningChildren--;
       }
     }
+  }
+
+  if(!quiet)
+  {
+    OutputTestResults(processName, children);
   }
 
   OutputStatistics(processName, numPasses, numFailures);
@@ -338,7 +537,9 @@ int32_t RunAllInParallel(const char* processName, ::testcase tc_array[], bool re
         printf("=");
       }
       printf("\n");
-      RunTestCaseInChildProcess(tc_array[failedTestCases[i]], false);
+      int      index = failedTestCases[i];
+      TestCase testCase(index, &tc_array[index]);
+      RunTestCaseInChildProcess(testCase, false);
     }
   }
 
@@ -368,11 +569,62 @@ void Usage(const char* program)
     "   %s <testcase name>\t\t Execute a test case\n"
     "   %s \t\t Execute all test cases in parallel\n"
     "   %s -r\t\t Execute all test cases in parallel, rerunning failed test cases\n"
-    "   %s -s\t\t Execute all test cases serially\n",
+    "   %s -s\t\t Execute all test cases serially\n"
+    "   %s -q\t\t Run without output\n",
+    program,
     program,
     program,
     program,
     program);
+}
+
+int RunTests(int argc, char* const argv[], ::testcase tc_array[])
+{
+  int         result    = TestHarness::EXIT_STATUS_BAD_ARGUMENT;
+  const char* optString = "sfq";
+  bool        optRerunFailed(true);
+  bool        optRunSerially(false);
+  bool        optQuiet(false);
+
+  int nextOpt = 0;
+  do
+  {
+    nextOpt = getopt(argc, argv, optString);
+    switch(nextOpt)
+    {
+      case 'f':
+        optRerunFailed = false;
+        break;
+      case 's':
+        optRunSerially = true;
+        break;
+      case 'q':
+        optQuiet = true;
+        break;
+      case '?':
+        TestHarness::Usage(argv[0]);
+        exit(TestHarness::EXIT_STATUS_BAD_ARGUMENT);
+        break;
+    }
+  } while(nextOpt != -1);
+
+  if(optind == argc) // no testcase name in argument list
+  {
+    if(optRunSerially)
+    {
+      result = TestHarness::RunAll(argv[0], tc_array, optQuiet);
+    }
+    else
+    {
+      result = TestHarness::RunAllInParallel(argv[0], tc_array, optRerunFailed, optQuiet);
+    }
+  }
+  else
+  {
+    // optind is index of next argument - interpret as testcase name
+    result = TestHarness::FindAndRunTestCase(tc_array, argv[optind]);
+  }
+  return result;
 }
 
 } // namespace TestHarness

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TEMP=`getopt -o dhsSmf --long debug,help,failnorerun,serial,tct,modules -n 'execute.sh' -- "$@"`
+TEMP=`getopt -o dhsSmfq --long debug,help,failnorerun,quiet,serial,tct,modules -n 'execute.sh' -- "$@"`
 
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 
@@ -9,13 +9,14 @@ eval set -- "$TEMP"
 
 function usage
 {
-    echo -e "Usage: execute.sh [-d][-s|-S|-r] [module|testcase]"
+    echo -e "Usage: execute.sh [-d][-s|-S|-r][-q] [module|testcase]"
     echo -e "       execute.sh\t\tExecute test cases from all modules in parallel"
     echo -e "       execute.sh -f \tExecute test cases from all modules in parallel without rerunning failed test cases"
     echo -e "       execute.sh -d <testcase>\tDebug testcase"
     echo -e "       execute.sh [module]\tExecute test cases from the given module in parallel"
     echo -e "       execute.sh -s [module]\t\tExecute test cases in serial using Testkit-Lite"
     echo -e "       execute.sh -S [module]\t\tExecute test cases in serial"
+    echo -e "       execute.sh -q|--quiet ...\tExecute test cases, but don't write output"
     echo -e "       execute.sh <testcase>\tFind and execute the given test case"
     exit 2
 }
@@ -25,6 +26,7 @@ opt_serial=""
 opt_modules=0
 opt_debug=0
 opt_noFailedRerun="";
+opt_quiet="";
 while true ; do
     case "$1" in
         -h|--help)     usage ;;
@@ -32,6 +34,7 @@ while true ; do
         -s|--tct)      opt_tct=1 ; shift ;;
         -f|--nofailedrerun) opt_noFailedRerun="-f" ; shift ;;
         -S|--serial)   opt_serial="-s" ; shift ;;
+        -q|--quiet)    opt_quiet="-q" ; shift ;;
         -m|--modules)  opt_modules=1 ; shift ;;
         --) shift; break;;
         *) echo "Internal error $1!" ; exit 1 ;;
@@ -66,6 +69,31 @@ function summary_end
 </result_summary>
 EOF
 }
+
+function output_start
+{
+    start=`date +"%Y-%m-%d_%H_%M_%S"`
+    cat > tct-${1}-core-tests.xml <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="./style/testresult.xsl"?>
+<test_definition>
+<environment build_id="" device_id="localhost" device_model="" device_name="N/A" host="Ubuntu" manufacturer="" resolution="N/A" screen_size="N/A"><other /></environment>
+<summary test_plan_name="Empty test_plan_name"><start_at>$start</start_at><end_at>$start</end_at></summary>
+  <suite category="Core APIs" name="tct-$1-core-tests">
+    <set name="default" set_debug_msg="automated-tests.auto.suite_1_set_1.dlog">
+EOF
+}
+
+
+function output_end
+{
+    cat >> tct-${1}-core-tests.xml <<EOF
+    </set>
+  </suite>
+</test_definition>
+EOF
+}
+
 
 if [ $opt_modules == 1 ] ; then
     modules= get_modules
@@ -118,7 +146,9 @@ else
         do
             echo -e "$ASCII_BOLD"
             echo -e "Executing $mod$ASCII_RESET"
-            build/src/$mod/tct-$mod-core $opt_serial $opt_noFailedRerun
+            output_start $mod
+            dbus-launch build/src/$mod/tct-$mod-core $opt_serial $opt_noFailedRerun $opt_quiet
+            output_end $mod
         done
         summary_end
 
@@ -128,7 +158,9 @@ else
         summary_start
         module=$1
         shift;
-        build/src/$module/tct-$module-core $opt_serial $opt_noFailedRerun $*
+        output_start ${module}
+        dbus-launch build/src/$module/tct-$module-core $opt_serial $opt_noFailedRerun $opt_quiet $*
+        output_end ${module}
         summary_end
 
     else
@@ -141,7 +173,7 @@ else
             if [ $ret -ne 6 ] ; then
                 if [ $opt_debug -ne 0 ] ; then
                     echo DEBUGGING:
-                    gdb --args build/src/$mod/tct-$mod-core $1
+                    dbus-launch gdb --args build/src/$mod/tct-$mod-core $1
 
                 else
                     echo $output

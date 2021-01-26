@@ -131,14 +131,13 @@ void Scene::Initialize(Size size, int orientation)
   // Create the default render-task and ensure clear is enabled on it to show the background color
   RenderTaskPtr renderTask = mRenderTaskList->CreateTask( mRootLayer.Get(), mDefaultCamera.Get() );
   renderTask->SetClearEnabled(true);
-  mSurfaceOrientation = orientation;
-
-  SurfaceRotated( size.width, size.height, mSurfaceOrientation );
 
   // Create scene graph object
   mSceneObject = new SceneGraph::Scene();
   OwnerPointer< SceneGraph::Scene > transferOwnership( const_cast< SceneGraph::Scene* >( mSceneObject ) );
   AddSceneMessage( updateManager, transferOwnership );
+
+  SurfaceRotated( size.width, size.height, orientation );
 }
 
 void Scene::Add(Actor& actor)
@@ -294,7 +293,6 @@ int Scene::GetSurfaceOrientation()
 void Scene::ChangedSurface(float width, float height, int orientation)
 {
   Rect<int32_t> newSize(0, 0, static_cast<int32_t>(width), static_cast<int32_t>(height)); // truncated
-
   mSize.width  = width;
   mSize.height = height;
 
@@ -305,16 +303,19 @@ void Scene::ChangedSurface(float width, float height, int orientation)
 
   mRootLayer->SetSize(width, height);
 
+  // Send the surface rectangle/orientation to SceneGraph::Scene for calculating glViewport/Scissor
   ThreadLocalStorage*        tls           = ThreadLocalStorage::GetInternal();
-  SceneGraph::UpdateManager& updateManager = tls->GetUpdateManager();
-  SetDefaultSurfaceRectMessage(updateManager, newSize);
-
-  // Send the surface orientation to render manager for calculating glViewport/Scissor
-  SetDefaultSurfaceOrientationMessage(updateManager, orientation);
+  SetSurfaceRectMessage(tls->GetEventThreadServices(), *mSceneObject, newSize);
+  SetSurfaceOrientationMessage(tls->GetEventThreadServices(), *mSceneObject, static_cast<int32_t>(orientation));
 
   // set default render-task viewport parameters
   RenderTaskPtr defaultRenderTask = mRenderTaskList->GetTask(0u);
   defaultRenderTask->SetViewport(newSize);
+}
+
+bool Scene::IsSurfaceRectChanged() const
+{
+  return mSceneObject->IsSurfaceRectChanged();
 }
 
 bool Scene::EmitKeyEventGeneratedSignal(const Dali::KeyEvent& event)

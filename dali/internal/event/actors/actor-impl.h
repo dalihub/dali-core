@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ACTOR_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/internal/common/internal-constants.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/event/actors/actor-declarations.h>
@@ -30,8 +31,6 @@
 #include <dali/internal/event/actors/actor-parent.h>
 #include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/common/stage-def.h>
-#include <dali/internal/event/rendering/renderer-impl.h>
-#include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/nodes/node-declarations.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/common/dali-common.h>
@@ -40,6 +39,7 @@
 #include <dali/public-api/math/viewport.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
+#include <dali/internal/common/const-string.h>
 
 namespace Dali
 {
@@ -57,6 +57,7 @@ class RenderTask;
 class Renderer;
 class Scene;
 
+using RendererPtr       = IntrusivePtr<Renderer>;
 using RendererContainer = std::vector<RendererPtr>;
 using RendererIter      = RendererContainer::iterator;
 
@@ -127,16 +128,16 @@ public:
    * Retrieve the name of the actor.
    * @return The name.
    */
-  const std::string& GetName() const
+  std::string_view GetName() const
   {
-    return mName;
+    return mName.GetStringView();
   }
 
   /**
    * Set the name of the actor.
    * @param[in] name The new name.
    */
-  void SetName(const std::string& name);
+  void SetName( std::string_view name );
 
   /**
    * @copydoc Dali::Actor::GetId
@@ -224,7 +225,7 @@ public:
   /**
    * @copydoc Dali::Internal::ActorParent::FindChildByName
    */
-  ActorPtr FindChildByName(const std::string& actorName) override;
+  ActorPtr FindChildByName( ConstString actorName ) override;
 
   /**
    * @copydoc Dali::Internal::ActorParent::FindChildById
@@ -1713,10 +1714,7 @@ public:
    * Retrieve the actor's node.
    * @return The node used by this actor
    */
-  const SceneGraph::Node& GetNode() const
-  {
-    return *static_cast<const SceneGraph::Node*>(mUpdateObject);
-  }
+  const SceneGraph::Node& GetNode() const;
 
   /**
    * @copydoc Dali::DevelActor::Raise()
@@ -2028,7 +2026,7 @@ protected:
   Vector3    mAnimatedSize;      ///< Event-side storage for size animation
   Vector2    mTouchArea;         ///< touch area
 
-  std::string mName;            ///< Name of the actor
+  ConstString mName;            ///< Name of the actor
   uint32_t    mSortedDepth;     ///< The sorted depth index. A combination of tree traversal and sibling order.
   int16_t     mDepth;           ///< The depth in the hierarchy of the actor. Only 32,767 levels of depth are supported
   uint16_t    mUseAnimatedSize; ///< Whether the size is animated.

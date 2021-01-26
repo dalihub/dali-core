@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,26 +20,29 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/scene.h>
-#include <dali/public-api/math/vector2.h>
-#include <dali/public-api/actors/layer.h>
-#include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/event/actors/layer-impl.h>
 #include <dali/internal/event/events/event-processor.h>
 #include <dali/internal/event/render-tasks/render-task-defaults.h>
+#include <dali/public-api/actors/layer.h>
+#include <dali/public-api/math/vector2.h>
+#include <dali/public-api/render-tasks/render-task-list.h>
 
 namespace Dali
 {
-
 namespace Integration
 {
-
 struct Event;
 
 }
 
 namespace Internal
 {
+//@todo Break this dependence somehow.
+namespace Render
+{
+class Renderer;
+}
 
 namespace SceneGraph
 {
@@ -67,9 +70,9 @@ struct DirtyRect
 
   bool operator<(const DirtyRect& rhs) const
   {
-    if (node == rhs.node)
+    if(node == rhs.node)
     {
-      if (renderer == rhs.renderer)
+      if(renderer == rhs.renderer)
       {
         return frame > rhs.frame; // Most recent rects come first
       }
@@ -84,15 +87,15 @@ struct DirtyRect
     }
   }
 
-  Node* node;
+  Node*             node;
   Render::Renderer* renderer;
-  int frame;
+  int               frame;
 
   Rect<int> rect;
-  bool visited;
+  bool      visited;
 };
 
-}
+} // namespace SceneGraph
 
 class EventProcessor;
 class Layer;
@@ -102,14 +105,13 @@ class RenderTaskList;
 class FrameBuffer;
 
 using FrameBufferPtr = IntrusivePtr<FrameBuffer>;
-using ScenePtr = IntrusivePtr<Scene>;
+using ScenePtr       = IntrusivePtr<Scene>;
 
 /**
  * @brief Scene creates a "world" that can be bound to a surface for rendering.
  */
 class Scene : public BaseObject, public RenderTaskDefaults
 {
-
 public:
   /**
    * @copydoc Dali::Integration::Scene::New
@@ -139,7 +141,7 @@ public:
   /**
    * @copydoc Dali::Integration::Scene::SetDpi
    */
-  void SetDpi( Vector2 dpi );
+  void SetDpi(Vector2 dpi);
 
   /**
    * @copydoc Dali::Integration::Scene::GetDpi
@@ -172,7 +174,7 @@ public:
    * @param[in] width The new width of the set surface
    * @param[in] height The new height of the set surface
    */
-  void SurfaceResized( float width, float height );
+  void SurfaceResized(float width, float height);
 
   /**
    * @copydoc Dali::Integration::Scene::SurfaceReplaced
@@ -199,7 +201,7 @@ public:
    * This function is called when an event is queued.
    * @param[in] event A event to queue.
    */
-  void QueueEvent( const Integration::Event& event );
+  void QueueEvent(const Integration::Event& event);
 
   /**
    * This function is called by Core when events are processed.
@@ -216,7 +218,7 @@ public:
    * @brief Sets the background color of the render surface.
    * @param[in] color The new background color
    */
-  void SetBackgroundColor( const Vector4& color );
+  void SetBackgroundColor(const Vector4& color);
 
   /**
    * @brief Gets the background color of the render　surface.
@@ -250,6 +252,11 @@ public:
   int GetSurfaceOrientation();
 
   /**
+   * @copydoc Dali::Integration::Scene::IsSurfaceRectChanged
+   */
+  bool IsSurfaceRectChanged() const;
+
+  /**
    * Used by the EventProcessor to emit key event signals.
    * @param[in] event The key event.
    */
@@ -273,40 +280,40 @@ public:
    * Emits the touched signal.
    * @param[in] touch The touch event details.
    */
-  void EmitTouchedSignal( const Dali::TouchEvent& touch );
+  void EmitTouchedSignal(const Dali::TouchEvent& touch);
 
   /**
    * Used by the EventProcessor to emit wheel event signals.
    * @param[in] event The wheel event.
    */
-  void EmitWheelEventSignal( const Dali::WheelEvent& event );
+  void EmitWheelEventSignal(const Dali::WheelEvent& event);
 
   /**
    * @copydoc Dali::Integration::Scene::AddFrameRenderedCallback
    */
-  void AddFrameRenderedCallback( std::unique_ptr< CallbackBase > callback, int32_t frameId );
+  void AddFrameRenderedCallback(std::unique_ptr<CallbackBase> callback, int32_t frameId);
 
   /**
    * @copydoc Dali::Integration::Scene::AddFramePresentedCallback
    */
-  void AddFramePresentedCallback( std::unique_ptr< CallbackBase > callback, int32_t frameId );
+  void AddFramePresentedCallback(std::unique_ptr<CallbackBase> callback, int32_t frameId);
 
   /**
    * @copydoc Dali::Integration::Scene::GetFrameRenderedCallback
    */
-  void GetFrameRenderedCallback( Dali::Integration::Scene::FrameCallbackContainer& callbacks );
+  void GetFrameRenderedCallback(Dali::Integration::Scene::FrameCallbackContainer& callbacks);
 
   /**
    * @copydoc Dali::Integration::Scene::GetFramePresentedCallback
    */
-  void GetFramePresentedCallback( Dali::Integration::Scene::FrameCallbackContainer& callbacks );
+  void GetFramePresentedCallback(Dali::Integration::Scene::FrameCallbackContainer& callbacks);
 
   /**
    * @copydoc Integration::Scene::KeyEventSignal()
    */
   Integration::Scene::KeyEventSignalType& KeyEventSignal();
 
-    /**
+  /**
    * @copydoc Integration::Scene::KeyEventGeneratedSignal()
    */
   Integration::Scene::KeyEventGeneratedSignalType& KeyEventGeneratedSignal();
@@ -334,7 +341,6 @@ public:
   std::vector<Dali::Internal::SceneGraph::DirtyRect>& GetItemsDirtyRects();
 
 public:
-
   /**
    * From RenderTaskDefaults; retrieve the default root actor.
    * @return The default root actor.
@@ -348,7 +354,6 @@ public:
   CameraActor& GetDefaultCameraActor() override;
 
 private:
-
   // Constructor
   Scene();
 
@@ -394,7 +399,7 @@ private:
   // The list of render-tasks
   IntrusivePtr<RenderTaskList> mRenderTaskList;
 
-  bool mDepthTreeDirty:1;  ///< True if the depth tree needs recalculating
+  bool mDepthTreeDirty : 1; ///< True if the depth tree needs recalculating
 
   EventProcessor mEventProcessor;
 
@@ -402,8 +407,8 @@ private:
   int mSurfaceOrientation;
 
   // The key event signal
-  Integration::Scene::KeyEventSignalType mKeyEventSignal;
-  Integration::Scene::KeyEventGeneratedSignalType   mKeyEventGeneratedSignal;
+  Integration::Scene::KeyEventSignalType          mKeyEventSignal;
+  Integration::Scene::KeyEventGeneratedSignalType mKeyEventGeneratedSignal;
 
   // The event processing finished signal
   Integration::Scene::EventProcessingFinishedSignalType mEventProcessingFinishedSignal;
@@ -414,26 +419,26 @@ private:
   // The wheel event signal
   Integration::Scene::WheelEventSignalType mWheelEventSignal;
 
-  std::vector<Dali::Internal::SceneGraph::DirtyRect>                    mItemsDirtyRects;
+  std::vector<Dali::Internal::SceneGraph::DirtyRect> mItemsDirtyRects;
 };
 
-} // Internal
+} // namespace Internal
 
 // Get impl of handle
 inline Internal::Scene& GetImplementation(Dali::Integration::Scene& scene)
 {
-  DALI_ASSERT_ALWAYS( scene && "Scene handle is empty" );
+  DALI_ASSERT_ALWAYS(scene && "Scene handle is empty");
   Dali::RefObject& object = scene.GetBaseObject();
   return static_cast<Internal::Scene&>(object);
 }
 
 inline const Internal::Scene& GetImplementation(const Dali::Integration::Scene& scene)
 {
-  DALI_ASSERT_ALWAYS( scene && "Scene handle is empty" );
+  DALI_ASSERT_ALWAYS(scene && "Scene handle is empty");
   const Dali::RefObject& object = scene.GetBaseObject();
   return static_cast<const Internal::Scene&>(object);
 }
 
-} // Dali
+} // namespace Dali
 
 #endif // DALI_INTERNAL_SCENE_H

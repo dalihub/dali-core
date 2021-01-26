@@ -42,6 +42,7 @@ namespace Integration
 {
 class Processor;
 class RenderController;
+class GlAbstraction;
 class PlatformAbstraction;
 class UpdateStatus;
 class RenderStatus;

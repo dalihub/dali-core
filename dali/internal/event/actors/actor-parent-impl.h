@@ -20,6 +20,8 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/internal/event/actors/actor-declarations.h>
 #include <dali/internal/event/actors/actor-parent.h>
+#include <dali/internal/common/const-string.h>
+
 
 // EXTERNAL INCLUDES
 #include <string>
@@ -74,7 +76,7 @@ public:
   /**
    * @copydoc Dali::Actor::FindChildByName
    */
-  ActorPtr FindChildByName(const std::string& actorName);
+  ActorPtr FindChildByName(ConstString actorName) override;
 
   /**
    * @copydoc Dali::Actor::FindChildById

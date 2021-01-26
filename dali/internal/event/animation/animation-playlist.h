@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ANIMATION_PLAYLIST_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,18 +19,20 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/internal/common/message.h>
+#include <dali/internal/event/common/complete-notification-interface.h>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/vector-wrapper.h>
-#include <dali/internal/common/message.h>
-#include <dali/internal/event/common/complete-notification-interface.h>
-#include <dali/internal/update/animation/scene-graph-animation.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
+namespace SceneGraph
+{
+class Animation;
+}
 
 class Animation;
 
@@ -41,7 +43,6 @@ class Animation;
 class AnimationPlaylist : public CompleteNotificationInterface
 {
 public:
-
   /**
    * Create an AnimationPlaylist.
    * @return A newly allocated animation playlist.
@@ -56,30 +57,30 @@ public:
   /**
    * Called when an animation is constructed.
    */
-  void AnimationCreated( Animation& animation );
+  void AnimationCreated(Animation& animation);
 
   /**
    * Called when an animation is destroyed.
    */
-  void AnimationDestroyed( Animation& animation );
+  void AnimationDestroyed(Animation& animation);
 
   /**
    * Called when an animation is playing.
    * @post The animation will be referenced by AnimationPlaylist, until the "Finished" signal is emitted.
    */
-  void OnPlay( Animation& animation );
+  void OnPlay(Animation& animation);
 
   /**
    * Called when an animation is cleared.
    * @post The animation will no longer be referenced by AnimationPlaylist.
    */
-  void OnClear( Animation& animation );
+  void OnClear(Animation& animation);
 
   /**
    * @brief Notify that an animation has reached a progress marker
    * @param[in] sceneGraphAnimation scene graph animation that has reached progress
    */
-  void NotifyProgressReached( const SceneGraph::Animation* sceneGraphAnimation );
+  void NotifyProgressReached(const SceneGraph::Animation* sceneGraphAnimation);
 
   /**
    * @brief Retrive the number of Animations.
@@ -94,10 +95,9 @@ public:
    * @param[in] index The index of the Animation to retrieve
    * @return The Dali::Animation for the given index or empty handle
    */
-  Dali::Animation GetAnimationAt( uint32_t index );
+  Dali::Animation GetAnimationAt(uint32_t index);
 
 private:
-
   /**
    * Create an AnimationPlaylist.
    */
@@ -110,17 +110,14 @@ private:
   AnimationPlaylist& operator=(const AnimationPlaylist& rhs);
 
 private: // from CompleteNotificationInterface
-
   /**
    * @copydoc CompleteNotificationInterface::NotifyCompleted()
    */
   void NotifyCompleted() override;
 
 private:
-
-  Dali::Vector< Animation* > mAnimations; ///< All existing animations (not owned)
-  std::vector< Dali::Animation > mPlaylist; ///< The currently playing animations (owned through handle)
-
+  Dali::Vector<Animation*>     mAnimations; ///< All existing animations (not owned)
+  std::vector<Dali::Animation> mPlaylist;   ///< The currently playing animations (owned through handle)
 };
 
 /**
@@ -128,9 +125,9 @@ private:
  *
  * Note animationPlaylist is of type CompleteNotificationInterface because of updateManager only knowing about the interface not actual playlist
  */
-inline MessageBase* NotifyProgressReachedMessage( CompleteNotificationInterface& animationPlaylist, const SceneGraph::Animation* animation )
+inline MessageBase* NotifyProgressReachedMessage(CompleteNotificationInterface& animationPlaylist, const SceneGraph::Animation* animation)
 {
-  return new MessageValue1< AnimationPlaylist, const SceneGraph::Animation* >( static_cast<AnimationPlaylist*>(&animationPlaylist), &AnimationPlaylist::NotifyProgressReached, animation );
+  return new MessageValue1<AnimationPlaylist, const SceneGraph::Animation*>(static_cast<AnimationPlaylist*>(&animationPlaylist), &AnimationPlaylist::NotifyProgressReached, animation);
 }
 
 } // namespace Internal
@@ -138,4 +135,3 @@ inline MessageBase* NotifyProgressReachedMessage( CompleteNotificationInterface&
 } // namespace Dali
 
 #endif // DALI_INTERNAL_ANIMATION_PLAYLIST_H
-

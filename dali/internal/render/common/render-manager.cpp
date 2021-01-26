@@ -25,11 +25,19 @@
 #include <dali/devel-api/threading/thread-pool.h>
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/gl-context-helper-abstraction.h>
+
 #include <dali/internal/event/common/scene-impl.h>
+
+#include <dali/internal/update/common/scene-graph-scene.h>
+#include <dali/internal/update/render-tasks/scene-graph-camera.h>
+
 #include <dali/internal/render/common/render-algorithms.h>
 #include <dali/internal/render/common/render-debug.h>
+#include <dali/internal/render/common/render-instruction.h>
 #include <dali/internal/render/common/render-tracker.h>
 #include <dali/internal/render/queue/render-queue.h>
+#include <dali/internal/render/renderers/render-frame-buffer.h>
+#include <dali/internal/render/renderers/render-texture.h>
 #include <dali/internal/render/shaders/program-controller.h>
 
 namespace Dali
@@ -61,7 +69,6 @@ struct RenderManager::Impl
     renderAlgorithms(),
     frameCount(0u),
     renderBufferIndex(SceneGraphBuffers::INITIAL_UPDATE_BUFFER_INDEX),
-    defaultSurfaceRect(),
     rendererContainer(),
     samplerContainer(),
     textureContainer(),
@@ -70,8 +77,7 @@ struct RenderManager::Impl
     programController(graphicsController),
     depthBufferAvailable(depthBufferAvailableParam),
     stencilBufferAvailable(stencilBufferAvailableParam),
-    partialUpdateAvailable(partialUpdateAvailableParam),
-    defaultSurfaceOrientation(0)
+    partialUpdateAvailable(partialUpdateAvailableParam)
   {
     // Create thread pool with just one thread ( there may be a need to create more threads in the future ).
     threadPool = std::unique_ptr<Dali::ThreadPool>(new Dali::ThreadPool());
@@ -144,8 +150,6 @@ struct RenderManager::Impl
   uint32_t    frameCount;        ///< The current frame count
   BufferIndex renderBufferIndex; ///< The index of the buffer to read from; this is opposite of the "update" buffer
 
-  Rect<int32_t> defaultSurfaceRect; ///< Rectangle for the default surface we are rendering to
-
   OwnerContainer<Render::Renderer*>     rendererContainer;     ///< List of owned renderers
   OwnerContainer<Render::Sampler*>      samplerContainer;      ///< List of owned samplers
   OwnerContainer<Render::Texture*>      textureContainer;      ///< List of owned textures
@@ -166,8 +170,6 @@ struct RenderManager::Impl
   std::unique_ptr<Dali::ThreadPool> threadPool;            ///< The thread pool
   Vector<GLuint>                    boundTextures;         ///< The textures bound for rendering
   Vector<GLuint>                    textureDependencyList; ///< The dependency list of binded textures
-
-  int defaultSurfaceOrientation; ///< defaultSurfaceOrientation for the default surface we are rendering to
 };
 
 RenderManager* RenderManager::New(Graphics::Controller&               graphicsController,
@@ -240,16 +242,6 @@ void RenderManager::ContextDestroyed()
 void RenderManager::SetShaderSaver(ShaderSaver& upstream)
 {
   mImpl->programController.SetShaderSaver(upstream);
-}
-
-void RenderManager::SetDefaultSurfaceRect(const Rect<int32_t>& rect)
-{
-  mImpl->defaultSurfaceRect = rect;
-}
-
-void RenderManager::SetDefaultSurfaceOrientation(int orientation)
-{
-  mImpl->defaultSurfaceOrientation = orientation;
 }
 
 void RenderManager::AddRenderer(OwnerPointer<Render::Renderer>& renderer)
@@ -593,7 +585,7 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
     bool                    mCleanOnReturn;
   };
 
-  Rect<int32_t> surfaceRect = Rect<int32_t>(0, 0, static_cast<int32_t>(scene.GetSize().width), static_cast<int32_t>(scene.GetSize().height));
+  Rect<int32_t> surfaceRect = sceneObject->GetSurfaceRect();
 
   // Clean collected dirty/damaged rects on exit if 3d layer or 3d node or other conditions.
   DamagedRectsCleaner damagedRectCleaner(damagedRects);
@@ -814,10 +806,11 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       clearColor = Dali::RenderTask::DEFAULT_CLEAR_COLOR;
     }
 
-    Rect<int32_t>                       surfaceRect            = mImpl->defaultSurfaceRect;
+    Rect<int32_t> surfaceRect = sceneObject->GetSurfaceRect();
+    int32_t surfaceOrientation = sceneObject->GetSurfaceOrientation();
+
     Integration::DepthBufferAvailable   depthBufferAvailable   = mImpl->depthBufferAvailable;
     Integration::StencilBufferAvailable stencilBufferAvailable = mImpl->stencilBufferAvailable;
-    int                                 surfaceOrientation     = sceneInternal.GetSurfaceOrientation();
 
     if(instruction.mFrameBuffer)
     {
@@ -849,8 +842,6 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
           mImpl->programController.ClearCurrentProgram();
         }
       }
-
-      surfaceRect = Rect<int32_t>(0, 0, static_cast<int32_t>(scene.GetSize().width), static_cast<int32_t>(scene.GetSize().height));
     }
 
     // Make sure that GL context must be created

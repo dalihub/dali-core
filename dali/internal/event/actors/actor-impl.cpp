@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,9 @@
 #include <dali/internal/event/events/actor-gesture-data.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/internal/event/render-tasks/render-task-list-impl.h>
+#include <dali/internal/event/rendering/renderer-impl.h>
 #include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
+#include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/nodes/node-messages.h>
 
 using Dali::Internal::SceneGraph::AnimatableProperty;
@@ -333,12 +335,13 @@ const SceneGraph::Node* Actor::CreateNode()
   return node;
 }
 
-void Actor::SetName(const std::string& name)
+
+void Actor::SetName( std::string_view name )
 {
-  mName = name;
+  mName = ConstString(name);
 
   // ATTENTION: string for debug purposes is not thread safe.
-  DALI_LOG_SET_OBJECT_STRING(const_cast<SceneGraph::Node*>(&GetNode()), name);
+  DALI_LOG_SET_OBJECT_STRING( const_cast< SceneGraph::Node* >( &GetNode() ), mName.GetCString() );
 }
 
 uint32_t Actor::GetId() const
@@ -800,12 +803,12 @@ void Actor::SetSizeInternal(const Vector3& size)
   // check that we have a node AND the new size width, height or depth is at least a little bit different from the old one
   Vector3 currentSize = GetCurrentSize();
 
-  if( ( fabsf( mTargetSize.width - size.width  ) > Math::MACHINE_EPSILON_1 )||
-      ( fabsf( mTargetSize.height- size.height ) > Math::MACHINE_EPSILON_1 )||
-      ( fabsf( mTargetSize.depth - size.depth  ) > Math::MACHINE_EPSILON_1 )||
-      ( fabsf( mTargetSize.width - currentSize.width  ) > Math::MACHINE_EPSILON_1 )||
-      ( fabsf( mTargetSize.height- currentSize.height ) > Math::MACHINE_EPSILON_1 )||
-      ( fabsf( mTargetSize.depth - currentSize.depth  ) > Math::MACHINE_EPSILON_1 ) )
+  if((fabsf(mTargetSize.width - size.width) > Math::MACHINE_EPSILON_1) ||
+     (fabsf(mTargetSize.height - size.height) > Math::MACHINE_EPSILON_1) ||
+     (fabsf(mTargetSize.depth - size.depth) > Math::MACHINE_EPSILON_1) ||
+     (fabsf(mTargetSize.width - currentSize.width) > Math::MACHINE_EPSILON_1) ||
+     (fabsf(mTargetSize.height - currentSize.height) > Math::MACHINE_EPSILON_1) ||
+     (fabsf(mTargetSize.depth - currentSize.depth) > Math::MACHINE_EPSILON_1))
   {
     mTargetSize = size;
 
@@ -1410,7 +1413,7 @@ ActorContainer& Actor::GetChildrenInternal()
   return mParentImpl.GetChildrenInternal();
 }
 
-ActorPtr Actor::FindChildByName(const std::string& actorName)
+ActorPtr Actor::FindChildByName(ConstString actorName)
 {
   return mParentImpl.FindChildByName(actorName);
 }
@@ -1725,6 +1728,11 @@ int32_t Actor::GetPropertyComponentIndex(Property::Index index) const
   }
 
   return componentIndex;
+}
+
+const SceneGraph::Node& Actor::GetNode() const
+{
+  return *static_cast<const SceneGraph::Node*>(mUpdateObject);
 }
 
 void Actor::Raise()

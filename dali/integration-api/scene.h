@@ -294,6 +294,12 @@ public:
   void SurfaceRotated(float width, float height, int orientation);
 
   /**
+   * Query wheter the surface rect is changed or not.
+   * @return true if the surface rect is changed.
+   */
+  bool IsSurfaceRectChanged() const;
+
+  /**
    * @brief This signal is emitted just after the event processing is finished.
    *
    * @return The signal to connect to
