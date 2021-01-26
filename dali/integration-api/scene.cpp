@@ -161,6 +161,11 @@ void Scene::SurfaceRotated(float width, float height, int orientation)
   GetImplementation(*this).SurfaceRotated(width, height, orientation);
 }
 
+bool Scene::IsSurfaceRectChanged() const
+{
+  return GetImplementation(*this).IsSurfaceRectChanged();
+}
+
 Scene::EventProcessingFinishedSignalType& Scene::EventProcessingFinishedSignal()
 {
   return GetImplementation(*this).EventProcessingFinishedSignal();

@@ -120,18 +120,6 @@ public:
   void SetFrameDeltaTime(float deltaTime);
 
   /**
-   * Returns the rectangle for the default surface (probably the application window).
-   * @return Rectangle for the surface.
-   */
-  void SetDefaultSurfaceRect(const Rect<int>& rect);
-
-  /**
-   * Returns the orintation for the default surface (probably the application window).
-   * @param[in] orientation the surface's orientation.
-   */
-  void SetDefaultSurfaceOrientation(int orientation);
-
-  /**
    * Add a Renderer to the render manager.
    * @param[in] renderer The renderer to add.
    * @post renderer is owned by RenderManager
@@ -410,7 +398,6 @@ public:
    */
   void PostRender(bool uploadOnly);
 
-private:
 private:
   /**
    * Construct a new RenderManager.

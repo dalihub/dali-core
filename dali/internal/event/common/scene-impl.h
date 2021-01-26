@@ -252,6 +252,11 @@ public:
   int GetSurfaceOrientation();
 
   /**
+   * @copydoc Dali::Integration::Scene::IsSurfaceRectChanged
+   */
+  bool IsSurfaceRectChanged() const;
+
+  /**
    * Used by the EventProcessor to emit key event signals.
    * @param[in] event The key event.
    */

@@ -921,9 +921,17 @@ int UtcDaliSceneSurfaceResizedDefaultSceneViewport(void)
   auto defaultScene = application.GetScene();
   DALI_TEST_CHECK(defaultScene);
 
+  // consume the resize flag by first rendering
+  defaultScene.IsSurfaceRectChanged();
+
   // Ensure stage size matches the scene size
   auto stage = Stage::GetCurrent();
   DALI_TEST_EQUALS(stage.GetSize(), defaultScene.GetSize(), TEST_LOCATION);
+
+  bool surfaceResized;
+  // check resized flag before surface is resized.
+  surfaceResized = defaultScene.IsSurfaceRectChanged();
+  DALI_TEST_EQUALS(surfaceResized, false, TEST_LOCATION);
 
   // Resize the scene
   Vector2     newSize(1000.0f, 2000.0f);
@@ -937,6 +945,9 @@ int UtcDaliSceneSurfaceResizedDefaultSceneViewport(void)
   // Render after resizing surface
   application.SendNotification();
   application.Render(0);
+
+  surfaceResized = defaultScene.IsSurfaceRectChanged();
+  DALI_TEST_EQUALS(surfaceResized, true, TEST_LOCATION);
 
   // Check that the viewport is handled properly
   DALI_TEST_CHECK(callStack.FindMethodAndGetParameters("Viewport", viewportParams));
