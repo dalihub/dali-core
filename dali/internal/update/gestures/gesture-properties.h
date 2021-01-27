@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_GESTURE_PROPERTIES_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,34 +19,30 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/property-types.h>
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/event/common/property-input-impl.h>
+#include <dali/public-api/object/property-types.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace SceneGraph
 {
-
 /**
  * A template for a read only properties used by Gestures.
  */
-template < class T >
+template<class T>
 class GestureProperty : public PropertyInputImpl
 {
 public:
-
   /**
    * Create a read-only gesture property.
    * @param [in] initialValue The initial value of the property.
    */
-  GestureProperty( const T& initialValue )
-  : mValue( initialValue ),
-    mInputChanged( false )
+  GestureProperty(const T& initialValue)
+  : mValue(initialValue),
+    mInputChanged(false)
   {
   }
 
@@ -55,7 +51,7 @@ public:
    */
   GestureProperty()
   : mValue(),
-    mInputChanged( false )
+    mInputChanged(false)
   {
   }
 
@@ -69,7 +65,7 @@ public:
    */
   Dali::Property::Type GetType() const override
   {
-    return Dali::PropertyTypes::Get< T >();
+    return Dali::PropertyTypes::Get<T>();
   }
 
   /**
@@ -112,7 +108,7 @@ public:
    */
   void Set(const T& value)
   {
-    mValue = value;
+    mValue        = value;
     mInputChanged = true;
   }
 
@@ -126,7 +122,6 @@ public:
   }
 
 private:
-
   // Undefined
   GestureProperty(const GestureProperty& property);
 
@@ -134,18 +129,16 @@ private:
   GestureProperty& operator=(const GestureProperty& rhs);
 
 protected:
-
-  T mValue;             ///< The property value
-  bool mInputChanged:1; ///< Whether the property has been modified
+  T    mValue;            ///< The property value
+  bool mInputChanged : 1; ///< Whether the property has been modified
 };
 
 /**
  * A read only Vector2 property used by Gestures.
  */
-class GesturePropertyVector2 : public GestureProperty< Vector2 >
+class GesturePropertyVector2 : public GestureProperty<Vector2>
 {
 public:
-
   /**
    * Virtual destructor.
    */
@@ -154,7 +147,7 @@ public:
   /**
    * @copydoc Dali::PropertyInput::GetVector2()
    */
-  const Vector2& GetVector2( BufferIndex bufferIndex ) const override
+  const Vector2& GetVector2(BufferIndex bufferIndex) const override
   {
     return mValue;
   }
@@ -163,10 +156,9 @@ public:
 /**
  * A read only bool property used by Gestures.
  */
-class GesturePropertyBool : public GestureProperty< bool >
+class GesturePropertyBool : public GestureProperty<bool>
 {
 public:
-
   /**
    * Virtual destructor.
    */
@@ -175,7 +167,7 @@ public:
   /**
    * @copydoc Dali::PropertyInput::GetBoolean()
    */
-  const bool& GetBoolean( BufferIndex bufferIndex ) const override
+  const bool& GetBoolean(BufferIndex bufferIndex) const override
   {
     return mValue;
   }

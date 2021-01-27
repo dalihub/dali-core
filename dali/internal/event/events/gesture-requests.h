@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_GESTURE_REQUESTS_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 /**
  * This structure specifies the gesture type required (or no longer required) by Core.
  */
@@ -38,8 +36,8 @@ struct GestureRequest
    * Default Constructor
    * @param[in]  typeRequired  The gesture type required
    */
-  GestureRequest( GestureType::Value typeRequired )
-  : type( typeRequired )
+  GestureRequest(GestureType::Value typeRequired)
+  : type(typeRequired)
   {
   }
 

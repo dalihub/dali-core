@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PROPERTY_NOTIFICATION_MANAGER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,13 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-vector.h>
 #include <dali/internal/event/common/property-notifier.h>
+#include <dali/public-api/common/dali-vector.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 class PropertyNotification;
 
 /**
@@ -39,7 +37,6 @@ class PropertyNotification;
 class PropertyNotificationManager : public PropertyNotifier
 {
 public:
-
   /**
    * Create an PropertyNotificationManager.
    * @return A newly allocated object.
@@ -54,22 +51,20 @@ public:
   /**
    * Called when a PropertyNotification is constructed.
    */
-  void PropertyNotificationCreated( PropertyNotification& propertyNotification );
+  void PropertyNotificationCreated(PropertyNotification& propertyNotification);
 
   /**
    * Called when a PropertyNotification is destroyed.
    */
-  void PropertyNotificationDestroyed( PropertyNotification& propertyNotification );
+  void PropertyNotificationDestroyed(PropertyNotification& propertyNotification);
 
 private: // private virtual overrides
-
   /**
    * @copydoc PropertyNotifier::NotifyProperty
    */
-  void NotifyProperty( SceneGraph::PropertyNotification* propertyNotification, bool validity ) override;
+  void NotifyProperty(SceneGraph::PropertyNotification* propertyNotification, bool validity) override;
 
 private:
-
   /**
    * Default constructor.
    */
@@ -82,9 +77,7 @@ private:
   PropertyNotificationManager& operator=(const PropertyNotificationManager& rhs);
 
 private:
-
-  Dali::Vector< PropertyNotification* > mPropertyNotifications; ///< All existing PropertyNotifications (not owned)
-
+  Dali::Vector<PropertyNotification*> mPropertyNotifications; ///< All existing PropertyNotifications (not owned)
 };
 
 } // namespace Internal
@@ -92,4 +85,3 @@ private:
 } // namespace Dali
 
 #endif // DALI_INTERNAL_PROPERTY_NOTIFICATION_MANAGER_H
-

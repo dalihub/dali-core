@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_GESTURE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,16 +19,14 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/events/gesture.h>
 #include <dali/integration-api/events/event.h>
+#include <dali/public-api/events/gesture.h>
 #include <dali/public-api/object/base-object.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 class Gesture;
 using GesturePtr = IntrusivePtr<Gesture>;
 
@@ -39,7 +37,6 @@ using GesturePtr = IntrusivePtr<Gesture>;
 class Gesture : public BaseObject
 {
 public:
-
   /**
    * @brief Get the gesture type.
    *
@@ -54,12 +51,12 @@ public:
    * @brief Set the state of the gesture.
    * @param[in] state The state of the gesture to set
    */
-  inline void SetState( GestureState state )
+  inline void SetState(GestureState state)
   {
     mState = state;
   }
 
-   /**
+  /**
    * @brief Get the state of the gesture.
    *
    * @return The state of the gesture.
@@ -73,7 +70,7 @@ public:
    * @brief Set The time the gesture took place.
    * @param[in] time The time the gesture took place. to set
    */
-  inline void SetTime( uint32_t time )
+  inline void SetTime(uint32_t time)
   {
     mTime = time;
   }
@@ -88,21 +85,20 @@ public:
     return mTime;
   }
 
-  Gesture(const Gesture&) = delete; ///< Deleted copy constructor
-  Gesture(Gesture&&) = delete; ///< Deleted move constructor
+  Gesture(const Gesture&) = delete;            ///< Deleted copy constructor
+  Gesture(Gesture&&)      = delete;            ///< Deleted move constructor
   Gesture& operator=(const Gesture&) = delete; ///< Deleted copy assignment operator
-  Gesture& operator=(Gesture&&) = delete; ///< Deleted move assignment operator
+  Gesture& operator=(Gesture&&) = delete;      ///< Deleted move assignment operator
 
 protected:
-
   /**
    * This constructor is only used by derived classes.
    * @param[in] gestureType   The type of gesture event.
    * @param[in] gestureState  The state of the gesture event.
    */
   Gesture(GestureType::Value gestureType, GestureState gestureState)
-  : mGestureType( gestureType ),
-    mState( gestureState )
+  : mGestureType(gestureType),
+    mState(gestureState)
   {
   }
 
@@ -115,8 +111,8 @@ protected:
 
 private:
   GestureType::Value mGestureType;
-  GestureState mState;
-  uint32_t mTime{0u};
+  GestureState       mState;
+  uint32_t           mTime{0u};
 };
 
 } // namespace Internal
@@ -126,7 +122,7 @@ private:
  */
 inline Internal::Gesture& GetImplementation(Dali::Gesture& gesture)
 {
-  DALI_ASSERT_ALWAYS( gesture && "gesture handle is empty" );
+  DALI_ASSERT_ALWAYS(gesture && "gesture handle is empty");
 
   BaseObject& handle = gesture.GetBaseObject();
 
@@ -135,7 +131,7 @@ inline Internal::Gesture& GetImplementation(Dali::Gesture& gesture)
 
 inline const Internal::Gesture& GetImplementation(const Dali::Gesture& gesture)
 {
-  DALI_ASSERT_ALWAYS( gesture && "gesture handle is empty" );
+  DALI_ASSERT_ALWAYS(gesture && "gesture handle is empty");
 
   const BaseObject& handle = gesture.GetBaseObject();
 

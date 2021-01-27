@@ -1,7 +1,7 @@
 #pragma once
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,11 @@
 #include <dali/public-api/common/dali-common.h>
 
 // EXTERNAL INCLUDES
-#include <mutex>
 #include <condition_variable>
-#include <stdexcept>
-#include <sstream>
 #include <limits>
+#include <mutex>
+#include <sstream>
+#include <stdexcept>
 
 namespace Dali
 {
@@ -53,9 +53,9 @@ public:
    * @param[in] desired the desired initial value of the semaphore
    */
   explicit Semaphore(std::ptrdiff_t desired)
-    : mCount(desired)
+  : mCount(desired)
   {
-    if (mCount < 0 || mCount > Max())
+    if(mCount < 0 || mCount > Max())
     {
       ThrowInvalidParamException(desired);
     }
@@ -72,13 +72,13 @@ public:
   void Release(std::ptrdiff_t update = 1)
   {
     std::lock_guard<std::mutex> lock(mLock);
-    if (update < 0 || update > Max() - mCount)
+    if(update < 0 || update > Max() - mCount)
     {
       ThrowInvalidParamException(update);
     }
 
     mCount += update;
-    while (update--)
+    while(update--)
     {
       mCondVar.notify_one();
     }
@@ -92,7 +92,7 @@ public:
   void Acquire()
   {
     std::unique_lock<std::mutex> lock(mLock);
-    while (mCount == 0)
+    while(mCount == 0)
     {
       mCondVar.wait(lock);
     }
@@ -108,7 +108,7 @@ public:
   bool TryAcquire()
   {
     std::lock_guard<std::mutex> lock(mLock);
-    if (mCount)
+    if(mCount)
     {
       --mCount;
       return true;
@@ -127,12 +127,12 @@ public:
    * @return true if it decremented the internal counter, otherwise false
    */
   template<typename Rep, typename Period>
-  bool TryAcquireFor(const std::chrono::duration<Rep, Period> &relTime)
+  bool TryAcquireFor(const std::chrono::duration<Rep, Period>& relTime)
   {
     std::unique_lock<std::mutex> lock(mLock);
-    while (mCount == 0)
+    while(mCount == 0)
     {
-      if (mCondVar.wait_for(lock, relTime) == std::cv_status::timeout)
+      if(mCondVar.wait_for(lock, relTime) == std::cv_status::timeout)
       {
         return false;
       }
@@ -151,12 +151,12 @@ public:
    * @return true if it decremented the internal counter, otherwise false
    */
   template<typename Clock, typename Duration>
-  bool TryAcquireUntil(const std::chrono::time_point<Clock, Duration> &absTime)
+  bool TryAcquireUntil(const std::chrono::time_point<Clock, Duration>& absTime)
   {
     std::unique_lock<std::mutex> lock(mLock);
-    while (mCount == 0)
+    while(mCount == 0)
     {
-      if (mCondVar.wait_until(lock, absTime) == std::cv_status::timeout)
+      if(mCondVar.wait_until(lock, absTime) == std::cv_status::timeout)
       {
         return false;
       }
@@ -174,7 +174,7 @@ private:
   }
 
   std::condition_variable mCondVar;
-  std::mutex mLock;
-  std::ptrdiff_t mCount;
+  std::mutex              mLock;
+  std::ptrdiff_t          mCount;
 };
-}
+} // namespace Dali

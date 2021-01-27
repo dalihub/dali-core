@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,11 +30,10 @@ namespace Internal
 {
 namespace Render
 {
-
 Geometry::Geometry()
 : mIndices(),
   mIndexBuffer(nullptr),
-  mGeometryType( Dali::Geometry::TRIANGLES ),
+  mGeometryType(Dali::Geometry::TRIANGLES),
   mIndicesChanged(false),
   mHasBeenUpdated(false),
   mAttributesChanged(true)
@@ -43,7 +42,7 @@ Geometry::Geometry()
 
 Geometry::~Geometry() = default;
 
-void Geometry::GlContextCreated( Context& context )
+void Geometry::GlContextCreated(Context& context)
 {
 }
 
@@ -51,90 +50,90 @@ void Geometry::GlContextDestroyed()
 {
 }
 
-void Geometry::AddVertexBuffer( Render::VertexBuffer* vertexBuffer )
+void Geometry::AddVertexBuffer(Render::VertexBuffer* vertexBuffer)
 {
-  mVertexBuffers.PushBack( vertexBuffer );
+  mVertexBuffers.PushBack(vertexBuffer);
   mAttributesChanged = true;
 }
 
-void Geometry::SetIndexBuffer( Dali::Vector<uint16_t>& indices )
+void Geometry::SetIndexBuffer(Dali::Vector<uint16_t>& indices)
 {
-  mIndices.Swap( indices );
+  mIndices.Swap(indices);
   mIndicesChanged = true;
 }
 
-void Geometry::RemoveVertexBuffer( const Render::VertexBuffer* vertexBuffer )
+void Geometry::RemoveVertexBuffer(const Render::VertexBuffer* vertexBuffer)
 {
   const auto&& end = mVertexBuffers.End();
-  for( auto&& iter = mVertexBuffers.Begin(); iter != end; ++iter )
+  for(auto&& iter = mVertexBuffers.Begin(); iter != end; ++iter)
   {
-    if( *iter == vertexBuffer )
+    if(*iter == vertexBuffer)
     {
       //This will delete the gpu buffer associated to the RenderVertexBuffer if there is one
-      mVertexBuffers.Remove( iter );
+      mVertexBuffers.Remove(iter);
       mAttributesChanged = true;
       break;
     }
   }
 }
 
-void Geometry::GetAttributeLocationFromProgram( Vector<GLint>& attributeLocation, Program& program, BufferIndex bufferIndex ) const
+void Geometry::GetAttributeLocationFromProgram(Vector<GLint>& attributeLocation, Program& program, BufferIndex bufferIndex) const
 {
   attributeLocation.Clear();
 
-  for( auto&& vertexBuffer : mVertexBuffers )
+  for(auto&& vertexBuffer : mVertexBuffers)
   {
     const uint32_t attributeCount = vertexBuffer->GetAttributeCount();
-    for( uint32_t j = 0; j < attributeCount; ++j )
+    for(uint32_t j = 0; j < attributeCount; ++j)
     {
-      auto attributeName = vertexBuffer->GetAttributeName( j );
-      uint32_t index = program.RegisterCustomAttribute( attributeName );
-      GLint location = program.GetCustomAttributeLocation( index );
+      auto     attributeName = vertexBuffer->GetAttributeName(j);
+      uint32_t index         = program.RegisterCustomAttribute(attributeName);
+      GLint    location      = program.GetCustomAttributeLocation(index);
 
-      if( -1 == location )
+      if(-1 == location)
       {
-        DALI_LOG_WARNING( "Attribute not found in the shader: %s\n", attributeName.GetCString() );
+        DALI_LOG_WARNING("Attribute not found in the shader: %s\n", attributeName.GetCString());
       }
 
-      attributeLocation.PushBack( location );
+      attributeLocation.PushBack(location);
     }
   }
 }
 
 void Geometry::OnRenderFinished()
 {
-  mHasBeenUpdated = false;
+  mHasBeenUpdated    = false;
   mAttributesChanged = false;
 }
 
-void Geometry::Upload( Context& context )
+void Geometry::Upload(Context& context)
 {
-  if( !mHasBeenUpdated )
+  if(!mHasBeenUpdated)
   {
     // Update buffers
-    if( mIndicesChanged )
+    if(mIndicesChanged)
     {
-      if( mIndices.Empty() )
+      if(mIndices.Empty())
       {
         mIndexBuffer = nullptr;
       }
       else
       {
-        if ( mIndexBuffer == nullptr )
+        if(mIndexBuffer == nullptr)
         {
-          mIndexBuffer = new GpuBuffer( context );
+          mIndexBuffer = new GpuBuffer(context);
         }
 
-        uint32_t bufferSize = static_cast<uint32_t>( sizeof( uint16_t ) * mIndices.Size() );
-        mIndexBuffer->UpdateDataBuffer( context, bufferSize, &mIndices[0], GpuBuffer::STATIC_DRAW, GpuBuffer::ELEMENT_ARRAY_BUFFER );
+        uint32_t bufferSize = static_cast<uint32_t>(sizeof(uint16_t) * mIndices.Size());
+        mIndexBuffer->UpdateDataBuffer(context, bufferSize, &mIndices[0], GpuBuffer::STATIC_DRAW, GpuBuffer::ELEMENT_ARRAY_BUFFER);
       }
 
       mIndicesChanged = false;
     }
 
-    for( auto&& buffer : mVertexBuffers )
+    for(auto&& buffer : mVertexBuffers)
     {
-      if( !buffer->Update( context ) )
+      if(!buffer->Update(context))
       {
         //Vertex buffer is not ready ( Size, data or format has not been specified yet )
         return;
@@ -146,37 +145,37 @@ void Geometry::Upload( Context& context )
 }
 
 void Geometry::Draw(
-    Context& context,
-    BufferIndex bufferIndex,
-    Vector<GLint>& attributeLocation,
-    uint32_t elementBufferOffset,
-    uint32_t elementBufferCount )
+  Context&       context,
+  BufferIndex    bufferIndex,
+  Vector<GLint>& attributeLocation,
+  uint32_t       elementBufferOffset,
+  uint32_t       elementBufferCount)
 {
   //Bind buffers to attribute locations
-  uint32_t base = 0u;
-  const uint32_t vertexBufferCount = static_cast<uint32_t>( mVertexBuffers.Count() );
-  for( uint32_t i = 0; i < vertexBufferCount; ++i )
+  uint32_t       base              = 0u;
+  const uint32_t vertexBufferCount = static_cast<uint32_t>(mVertexBuffers.Count());
+  for(uint32_t i = 0; i < vertexBufferCount; ++i)
   {
-    mVertexBuffers[i]->BindBuffer( context, GpuBuffer::ARRAY_BUFFER );
-    base += mVertexBuffers[i]->EnableVertexAttributes( context, attributeLocation, base );
+    mVertexBuffers[i]->BindBuffer(context, GpuBuffer::ARRAY_BUFFER);
+    base += mVertexBuffers[i]->EnableVertexAttributes(context, attributeLocation, base);
   }
 
   uint32_t numIndices(0u);
   intptr_t firstIndexOffset(0u);
-  if( mIndexBuffer )
+  if(mIndexBuffer)
   {
-    numIndices = static_cast<uint32_t>( mIndices.Size() );
+    numIndices = static_cast<uint32_t>(mIndices.Size());
 
-    if( elementBufferOffset != 0u )
+    if(elementBufferOffset != 0u)
     {
-      elementBufferOffset = (elementBufferOffset >= numIndices ) ? numIndices - 1 : elementBufferOffset;
-      firstIndexOffset = elementBufferOffset * sizeof(GLushort);
+      elementBufferOffset = (elementBufferOffset >= numIndices) ? numIndices - 1 : elementBufferOffset;
+      firstIndexOffset    = elementBufferOffset * sizeof(GLushort);
       numIndices -= elementBufferOffset;
     }
 
-    if( elementBufferCount != 0u )
+    if(elementBufferCount != 0u)
     {
-      numIndices = std::min( elementBufferCount, numIndices );
+      numIndices = std::min(elementBufferCount, numIndices);
     }
   }
 
@@ -221,36 +220,36 @@ void Geometry::Draw(
   }
 
   //Draw call
-  if( mIndexBuffer && geometryGLType != GL_POINTS )
+  if(mIndexBuffer && geometryGLType != GL_POINTS)
   {
     //Indexed draw call
-    mIndexBuffer->Bind( context, GpuBuffer::ELEMENT_ARRAY_BUFFER );
+    mIndexBuffer->Bind(context, GpuBuffer::ELEMENT_ARRAY_BUFFER);
     // numIndices truncated, no value loss happening in practice
-    context.DrawElements( geometryGLType, static_cast<GLsizei>( numIndices ), GL_UNSIGNED_SHORT, reinterpret_cast<void*>( firstIndexOffset ) );
+    context.DrawElements(geometryGLType, static_cast<GLsizei>(numIndices), GL_UNSIGNED_SHORT, reinterpret_cast<void*>(firstIndexOffset));
   }
   else
   {
     //Unindex draw call
     GLsizei numVertices(0u);
-    if( vertexBufferCount > 0 )
+    if(vertexBufferCount > 0)
     {
       // truncated, no value loss happening in practice
-      numVertices = static_cast<GLsizei>( mVertexBuffers[0]->GetElementCount() );
+      numVertices = static_cast<GLsizei>(mVertexBuffers[0]->GetElementCount());
     }
 
-    context.DrawArrays( geometryGLType, 0, numVertices );
+    context.DrawArrays(geometryGLType, 0, numVertices);
   }
 
   //Disable attributes
-  for( auto&& attribute : attributeLocation )
+  for(auto&& attribute : attributeLocation)
   {
-    if( attribute != -1 )
+    if(attribute != -1)
     {
-      context.DisableVertexAttributeArray( static_cast<GLuint>( attribute ) );
+      context.DisableVertexAttributeArray(static_cast<GLuint>(attribute));
     }
   }
 }
 
-} // namespace SceneGraph
+} // namespace Render
 } // namespace Internal
 } // namespace Dali

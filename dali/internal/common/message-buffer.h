@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_MESSAGE_BUFFER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,8 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 /**
  * Utility class to reserve a buffer for storing messages.
  */
@@ -41,7 +39,7 @@ public:
    * @param[in] The smallest capacity which the buffer will allocate, with respect to the size of type "char".
    * @note The buffer will not allocate memory until the first call to ReserveMessageSlot().
    */
-  MessageBuffer( std::size_t initialCapacity );
+  MessageBuffer(std::size_t initialCapacity);
 
   /**
    * Non-virtual destructor; not suitable as a base class
@@ -54,7 +52,7 @@ public:
    * @param[in] size The message size with respect to the size of type "char".
    * @return A pointer to the address allocated for the message, aligned to a word boundary
    */
-  uint32_t* ReserveMessageSlot( std::size_t size );
+  uint32_t* ReserveMessageSlot(std::size_t size);
 
   /**
    * Query the capacity of the message buffer.
@@ -68,7 +66,6 @@ public:
   class Iterator
   {
   public:
-
     // Constructor
     Iterator(WordType* current);
 
@@ -82,7 +79,7 @@ public:
     // Inlined for performance
     WordType* Get()
     {
-      return ( 0 != mMessageSize ) ? mCurrent : nullptr;
+      return (0 != mMessageSize) ? mCurrent : nullptr;
     }
 
     // Inlined for performance
@@ -97,13 +94,11 @@ public:
     Iterator(const Iterator& copy);
 
   private:
-
     // Undefined
     Iterator& operator=(const Iterator& rhs);
 
   private:
-
-    WordType* mCurrent;
+    WordType*   mCurrent;
     std::size_t mMessageSize;
   };
 
@@ -121,7 +116,6 @@ public:
   void Reset();
 
 private:
-
   // Undefined
   MessageBuffer(const MessageBuffer&);
 
@@ -133,10 +127,9 @@ private:
    * @pre The newCapacity is greater than mCapacity.
    * @param[in] The newCapacity
    */
-  void IncreaseCapacity( std::size_t newCapacity );
+  void IncreaseCapacity(std::size_t newCapacity);
 
 private:
-
   std::size_t mInitialCapacity; ///< The capacity to allocate during first call to ReserveMessageSlot
 
   WordType* mData;     ///< The data allocated for the message buffer

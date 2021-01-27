@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,42 +24,38 @@
 #include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/platform-abstraction.h>
+#include <dali/internal/event/actors/camera-actor-impl.h>
 #include <dali/internal/event/actors/layer-impl.h>
 #include <dali/internal/event/actors/layer-list.h>
-#include <dali/internal/event/actors/camera-actor-impl.h>
-#include <dali/internal/event/common/thread-local-storage.h>
+#include <dali/internal/event/common/object-registry-impl.h>
 #include <dali/internal/event/common/property-notification-manager.h>
+#include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/render-tasks/render-task-list-impl.h>
 #include <dali/internal/event/update/frame-callback-interface-impl.h>
-#include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/manager/scene-graph-frame-callback.h>
-#include <dali/internal/event/common/object-registry-impl.h>
-#include <dali/integration-api/platform-abstraction.h>
+#include <dali/internal/update/nodes/node.h>
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/rendering/frame-buffer.h>
-#include <dali/public-api/common/constants.h>
 
 using Dali::Internal::SceneGraph::Node;
 
 namespace
 {
 #if defined(DEBUG_ENABLED)
-Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_DEPTH_TIMER" );
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_DEPTH_TIMER");
 #endif
-}
+} // namespace
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace
 {
-
 // Signals
 
 static constexpr std::string_view SIGNAL_KEY_EVENT                 = "keyEvent";
@@ -71,7 +67,7 @@ static constexpr std::string_view SIGNAL_CONTEXT_LOST              = "contextLos
 static constexpr std::string_view SIGNAL_CONTEXT_REGAINED          = "contextRegained";
 static constexpr std::string_view SIGNAL_SCENE_CREATED             = "sceneCreated";
 
-TypeRegistration mType( typeid(Dali::Stage), typeid(Dali::BaseHandle), nullptr );
+TypeRegistration mType(typeid(Dali::Stage), typeid(Dali::BaseHandle), nullptr);
 
 SignalConnectorType signalConnector1(mType, std::string(SIGNAL_KEY_EVENT), &Stage::DoConnectSignal);
 SignalConnectorType signalConnector2(mType, std::string(SIGNAL_EVENT_PROCESSING_FINISHED), &Stage::DoConnectSignal);
@@ -84,27 +80,27 @@ SignalConnectorType signalConnector9(mType, std::string(SIGNAL_TOUCHED), &Stage:
 
 } // unnamed namespace
 
-StagePtr Stage::New( SceneGraph::UpdateManager& updateManager )
+StagePtr Stage::New(SceneGraph::UpdateManager& updateManager)
 {
-  return StagePtr( new Stage( updateManager ) );
+  return StagePtr(new Stage(updateManager));
 }
 
-void Stage::Initialize( Scene& scene )
+void Stage::Initialize(Scene& scene)
 {
   mScene = &scene;
-  mScene->SetBackgroundColor( Dali::DEFAULT_BACKGROUND_COLOR );
-  mScene->EventProcessingFinishedSignal().Connect( this, &Stage::OnEventProcessingFinished );
-  mScene->KeyEventSignal().Connect( this, &Stage::OnKeyEvent );
-  mScene->TouchedSignal().Connect( this, &Stage::OnTouchEvent );
-  mScene->WheelEventSignal().Connect( this, &Stage::OnWheelEvent );
+  mScene->SetBackgroundColor(Dali::DEFAULT_BACKGROUND_COLOR);
+  mScene->EventProcessingFinishedSignal().Connect(this, &Stage::OnEventProcessingFinished);
+  mScene->KeyEventSignal().Connect(this, &Stage::OnKeyEvent);
+  mScene->TouchedSignal().Connect(this, &Stage::OnTouchEvent);
+  mScene->WheelEventSignal().Connect(this, &Stage::OnWheelEvent);
 }
 
 StagePtr Stage::GetCurrent()
 {
-  StagePtr stage( nullptr );
+  StagePtr stage(nullptr);
   // no checking in this version
   ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
-  if( tls )
+  if(tls)
   {
     stage = tls->GetCurrentStage();
   }
@@ -124,17 +120,17 @@ ObjectRegistry& Stage::GetObjectRegistry()
 Layer& Stage::GetRootActor()
 {
   Dali::Layer rootLayer = GetRootLayer();
-  return GetImplementation( rootLayer );
+  return GetImplementation(rootLayer);
 }
 
-void Stage::Add( Actor& actor )
+void Stage::Add(Actor& actor)
 {
-  mScene->Add( actor );
+  mScene->Add(actor);
 }
 
-void Stage::Remove( Actor& actor )
+void Stage::Remove(Actor& actor)
 {
-  mScene->Remove( actor );
+  mScene->Remove(actor);
 }
 
 Vector2 Stage::GetSize() const
@@ -162,9 +158,9 @@ uint32_t Stage::GetLayerCount() const
   return mScene->GetLayerCount();
 }
 
-Dali::Layer Stage::GetLayer( uint32_t depth ) const
+Dali::Layer Stage::GetLayer(uint32_t depth) const
 {
-  return mScene->GetLayer( depth );
+  return mScene->GetLayer(depth);
 }
 
 Dali::Layer Stage::GetRootLayer() const
@@ -179,7 +175,7 @@ LayerList& Stage::GetLayerList()
 
 void Stage::SetBackgroundColor(Vector4 color)
 {
-  mScene->SetBackgroundColor( color );
+  mScene->SetBackgroundColor(color);
 }
 
 Vector4 Stage::GetBackgroundColor() const
@@ -192,18 +188,18 @@ Vector2 Stage::GetDpi() const
   return mScene->GetDpi();
 }
 
-void Stage::KeepRendering( float durationSeconds )
+void Stage::KeepRendering(float durationSeconds)
 {
   // Send message to keep rendering
-  KeepRenderingMessage( mUpdateManager, durationSeconds );
+  KeepRenderingMessage(mUpdateManager, durationSeconds);
 }
 
-void Stage::SetRenderingBehavior( DevelStage::Rendering renderingBehavior )
+void Stage::SetRenderingBehavior(DevelStage::Rendering renderingBehavior)
 {
-  if( mRenderingBehavior != renderingBehavior )
+  if(mRenderingBehavior != renderingBehavior)
   {
     // Send message to change the rendering behavior
-    SetRenderingBehaviorMessage( mUpdateManager, renderingBehavior );
+    SetRenderingBehaviorMessage(mUpdateManager, renderingBehavior);
 
     mRenderingBehavior = renderingBehavior;
   }
@@ -214,43 +210,43 @@ DevelStage::Rendering Stage::GetRenderingBehavior() const
   return mRenderingBehavior;
 }
 
-bool Stage::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
+bool Stage::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
 {
-  bool connected( true );
-  Stage* stage = static_cast< Stage* >(object); // TypeRegistry guarantees that this is the correct type.
+  bool             connected(true);
+  Stage*           stage = static_cast<Stage*>(object); // TypeRegistry guarantees that this is the correct type.
   std::string_view name(signalName);
 
   if(name == SIGNAL_KEY_EVENT)
   {
-    stage->KeyEventSignal().Connect( tracker, functor );
+    stage->KeyEventSignal().Connect(tracker, functor);
   }
   else if(name == SIGNAL_KEY_EVENT_GENERATED)
   {
-    stage->KeyEventGeneratedSignal().Connect( tracker, functor );
+    stage->KeyEventGeneratedSignal().Connect(tracker, functor);
   }
   else if(name == SIGNAL_EVENT_PROCESSING_FINISHED)
   {
-    stage->EventProcessingFinishedSignal().Connect( tracker, functor );
+    stage->EventProcessingFinishedSignal().Connect(tracker, functor);
   }
   else if(name == SIGNAL_TOUCHED)
   {
-    stage->TouchedSignal().Connect( tracker, functor );
+    stage->TouchedSignal().Connect(tracker, functor);
   }
   else if(name == SIGNAL_WHEEL_EVENT)
   {
-    stage->WheelEventSignal().Connect( tracker, functor );
+    stage->WheelEventSignal().Connect(tracker, functor);
   }
   else if(name == SIGNAL_CONTEXT_LOST)
   {
-    stage->ContextLostSignal().Connect( tracker, functor );
+    stage->ContextLostSignal().Connect(tracker, functor);
   }
   else if(name == SIGNAL_CONTEXT_REGAINED)
   {
-    stage->ContextRegainedSignal().Connect( tracker, functor );
+    stage->ContextRegainedSignal().Connect(tracker, functor);
   }
   else if(name == SIGNAL_SCENE_CREATED)
   {
-    stage->SceneCreatedSignal().Connect( tracker, functor );
+    stage->SceneCreatedSignal().Connect(tracker, functor);
   }
   else
   {
@@ -266,37 +262,37 @@ void Stage::OnEventProcessingFinished()
   EmitEventProcessingFinishedSignal();
 }
 
-void Stage::OnKeyEvent( const Dali::KeyEvent& event )
+void Stage::OnKeyEvent(const Dali::KeyEvent& event)
 {
-  bool consumed = EmitKeyEventGeneratedSignal( event );
-  if( !consumed )
+  bool consumed = EmitKeyEventGeneratedSignal(event);
+  if(!consumed)
   {
-    EmitKeyEventSignal( event );
+    EmitKeyEventSignal(event);
   }
 }
 
-void Stage::OnTouchEvent( const Dali::TouchEvent& touch )
+void Stage::OnTouchEvent(const Dali::TouchEvent& touch)
 {
-  EmitTouchedSignal( touch );
+  EmitTouchedSignal(touch);
 }
 
-void Stage::OnWheelEvent( const Dali::WheelEvent& event )
+void Stage::OnWheelEvent(const Dali::WheelEvent& event)
 {
-  EmitWheelEventSignal( event );
+  EmitWheelEventSignal(event);
 }
 
 void Stage::EmitKeyEventSignal(const KeyEvent& event)
 {
   // Emit the key event signal when no actor in the stage has gained the key input focus
 
-  mKeyEventSignal.Emit( event );
+  mKeyEventSignal.Emit(event);
 }
 
 bool Stage::EmitKeyEventGeneratedSignal(const KeyEvent& event)
 {
   // Emit the KeyEventGenerated signal when KeyEvent is generated
 
-  return mKeyEventGeneratedSignal.Emit( event );
+  return mKeyEventGeneratedSignal.Emit(event);
 }
 
 void Stage::EmitEventProcessingFinishedSignal()
@@ -304,16 +300,16 @@ void Stage::EmitEventProcessingFinishedSignal()
   mEventProcessingFinishedSignal.Emit();
 }
 
-void Stage::EmitTouchedSignal( const Dali::TouchEvent& touch )
+void Stage::EmitTouchedSignal(const Dali::TouchEvent& touch)
 {
-  mTouchedSignal.Emit( touch );
+  mTouchedSignal.Emit(touch);
 }
 
-void Stage::EmitWheelEventSignal( const WheelEvent& event )
+void Stage::EmitWheelEventSignal(const WheelEvent& event)
 {
   // Emit the wheel event signal when no actor in the stage has gained the wheel input focus
 
-  mWheelEventSignal.Emit( event );
+  mWheelEventSignal.Emit(event);
 }
 
 void Stage::EmitSceneCreatedSignal()
@@ -331,20 +327,19 @@ Dali::DevelStage::KeyEventGeneratedSignalType& Stage::KeyEventGeneratedSignal()
   return mKeyEventGeneratedSignal;
 }
 
-void Stage::AddFrameCallback( FrameCallbackInterface& frameCallback, Actor& rootActor )
+void Stage::AddFrameCallback(FrameCallbackInterface& frameCallback, Actor& rootActor)
 {
-  DALI_ASSERT_ALWAYS( ( ! FrameCallbackInterface::Impl::Get( frameCallback ).IsConnectedToSceneGraph() )
-                      && "FrameCallbackInterface implementation already added" );
+  DALI_ASSERT_ALWAYS((!FrameCallbackInterface::Impl::Get(frameCallback).IsConnectedToSceneGraph()) && "FrameCallbackInterface implementation already added");
 
   // Create scene-graph object and transfer to UpdateManager
-  OwnerPointer< SceneGraph::FrameCallback > transferOwnership( SceneGraph::FrameCallback::New( frameCallback ) );
-  AddFrameCallbackMessage( mUpdateManager, transferOwnership, rootActor.GetNode() );
+  OwnerPointer<SceneGraph::FrameCallback> transferOwnership(SceneGraph::FrameCallback::New(frameCallback));
+  AddFrameCallbackMessage(mUpdateManager, transferOwnership, rootActor.GetNode());
 }
 
-void Stage::RemoveFrameCallback( FrameCallbackInterface& frameCallback )
+void Stage::RemoveFrameCallback(FrameCallbackInterface& frameCallback)
 {
-  FrameCallbackInterface::Impl::Get( frameCallback ).Invalidate();
-  RemoveFrameCallbackMessage( mUpdateManager, frameCallback );
+  FrameCallbackInterface::Impl::Get(frameCallback).Invalidate();
+  RemoveFrameCallbackMessage(mUpdateManager, frameCallback);
 }
 
 Dali::Stage::EventProcessingFinishedSignalType& Stage::EventProcessingFinishedSignal()
@@ -387,8 +382,8 @@ void Stage::NotifyContextRegained()
   mContextRegainedSignal.Emit();
 }
 
-Stage::Stage( SceneGraph::UpdateManager& updateManager )
-: mUpdateManager( updateManager ),
+Stage::Stage(SceneGraph::UpdateManager& updateManager)
+: mUpdateManager(updateManager),
   mKeyEventSignal(),
   mKeyEventGeneratedSignal(),
   mEventProcessingFinishedSignal(),
@@ -397,7 +392,7 @@ Stage::Stage( SceneGraph::UpdateManager& updateManager )
   mContextLostSignal(),
   mContextRegainedSignal(),
   mSceneCreatedSignal(),
-  mRenderingBehavior( DevelStage::Rendering::IF_REQUIRED )
+  mRenderingBehavior(DevelStage::Rendering::IF_REQUIRED)
 {
 }
 

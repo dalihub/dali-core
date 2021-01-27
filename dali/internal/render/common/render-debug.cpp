@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,9 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/internal/render/common/render-instruction.h>
 #include <dali/internal/render/common/render-item.h>
 #include <dali/internal/render/common/render-list.h>
-#include <dali/internal/render/common/render-instruction.h>
 #include <dali/internal/update/nodes/node.h>
 
 using Dali::Internal::SceneGraph::Node;
@@ -33,83 +33,80 @@ using Dali::Internal::SceneGraph::RenderList;
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace Render
 {
-
 // These functions should only be defined if they are being used by the #define in the header.
 // Otherwise they will contribute negatively to code coverage.
 #ifdef DALI_PRINT_RENDER_INFO
 
-void PrintFrameStart( BufferIndex bufferIndex )
+void PrintFrameStart(BufferIndex bufferIndex)
 {
-  DALI_LOG_RENDER_INFO( "RENDER START - bufferIndex: %d\n", bufferIndex );
+  DALI_LOG_RENDER_INFO("RENDER START - bufferIndex: %d\n", bufferIndex);
 }
 
 void PrintFrameEnd()
 {
-  DALI_LOG_RENDER_INFO( "RENDER END\n\n" );
+  DALI_LOG_RENDER_INFO("RENDER END\n\n");
 }
 
-void PrintRenderInstruction( const SceneGraph::RenderInstruction& instruction, BufferIndex index )
+void PrintRenderInstruction(const SceneGraph::RenderInstruction& instruction, BufferIndex index)
 {
   const char* target = (nullptr != instruction.mFrameBuffer) ? "FrameBuffer" : "Screen";
 
   std::stringstream debugStream;
   debugStream << "Rendering to " << target << ", View: " << *(instruction.GetViewMatrix(index)) << " Projection: " << *(instruction.GetProjectionMatrix(index));
 
-  if( instruction.mIsViewportSet )
+  if(instruction.mIsViewportSet)
   {
     debugStream << " Viewport: " << instruction.mViewport.x << "," << instruction.mViewport.y << " " << instruction.mViewport.width << "x" << instruction.mViewport.height;
   }
 
-  if( instruction.mIsClearColorSet )
+  if(instruction.mIsClearColorSet)
   {
     debugStream << " ClearColor: " << instruction.mClearColor;
   }
 
-  std::string debugString( debugStream.str() );
-  DALI_LOG_RENDER_INFO( "   %s\n", debugString.c_str() );
+  std::string debugString(debugStream.str());
+  DALI_LOG_RENDER_INFO("   %s\n", debugString.c_str());
 }
 
-void PrintRenderList( const RenderList& list )
+void PrintRenderList(const RenderList& list)
 {
   std::stringstream debugStream;
   debugStream << "Rendering items";
 
-  if( list.IsClipping() )
+  if(list.IsClipping())
   {
     debugStream << ", ClippingBox: " << list.GetClippingBox().x << "," << list.GetClippingBox().y << " " << list.GetClippingBox().width << "x" << list.GetClippingBox().height;
   }
 
-  std::string debugString( debugStream.str() );
-  DALI_LOG_RENDER_INFO( "      %s\n", debugString.c_str() );
+  std::string debugString(debugStream.str());
+  DALI_LOG_RENDER_INFO("      %s\n", debugString.c_str());
 }
 
-void PrintRenderItem( const SceneGraph::RenderItem& item )
+void PrintRenderItem(const SceneGraph::RenderItem& item)
 {
   std::stringstream debugStream;
   debugStream << "Rendering item, ModelView: " << item.mModelViewMatrix;
 
-  std::string debugString( debugStream.str() );
-  DALI_LOG_RENDER_INFO( "         %s\n", debugString.c_str() );
+  std::string debugString(debugStream.str());
+  DALI_LOG_RENDER_INFO("         %s\n", debugString.c_str());
 }
 
-void PrintRendererCount( unsigned int frameCount, unsigned int rendererCount )
+void PrintRendererCount(unsigned int frameCount, unsigned int rendererCount)
 {
-  if( frameCount % 120 == 30 ) // Print every 2 seconds reg
+  if(frameCount % 120 == 30) // Print every 2 seconds reg
   {
-    Debug::LogMessage( Debug::DebugInfo, "Renderer Total # renderers: %u\n", rendererCount );
+    Debug::LogMessage(Debug::DebugInfo, "Renderer Total # renderers: %u\n", rendererCount);
   }
 }
 
 #endif
 
-} // Render
+} // namespace Render
 
-} // Internal
+} // namespace Internal
 
-} // Dali
+} // namespace Dali

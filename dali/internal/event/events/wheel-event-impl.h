@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_WHEEL_EVENT_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,8 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 class WheelEvent;
 using WheelEventPtr = IntrusivePtr<WheelEvent>;
 
@@ -37,7 +35,6 @@ using WheelEventPtr = IntrusivePtr<WheelEvent>;
 class WheelEvent : public BaseObject
 {
 public:
-
   // Construction & Destruction
 
   /**
@@ -55,7 +52,7 @@ public:
    * @param[in] delta     The offset of rolling (positive value means roll down or clockwise, and negative value means roll up or counter-clockwise)
    * @param[in] timeStamp The time the wheel is being rolled
    */
-  WheelEvent( Dali::WheelEvent::Type type, int32_t direction, uint32_t modifiers, Vector2 point, int32_t delta, uint32_t timeStamp );
+  WheelEvent(Dali::WheelEvent::Type type, int32_t direction, uint32_t modifiers, Vector2 point, int32_t delta, uint32_t timeStamp);
 
   /**
    * Create a new WheelEvent.
@@ -68,7 +65,7 @@ public:
    * @param[in] timeStamp The time the wheel is being rolled
    * @return A smart-pointer to the newly allocated WheelEvent.
    */
-  static WheelEventPtr New( Dali::WheelEvent::Type type, int32_t direction, uint32_t modifiers, Vector2 point, int32_t delta, uint32_t timeStamp );
+  static WheelEventPtr New(Dali::WheelEvent::Type type, int32_t direction, uint32_t modifiers, Vector2 point, int32_t delta, uint32_t timeStamp);
 
   /**
    * @copydoc Dali::WheelEvent::IsShiftModifier()
@@ -118,7 +115,6 @@ public:
   uint32_t GetTime() const;
 
 private:
-
   /**
    * @brief Destructor
    *
@@ -128,41 +124,40 @@ private:
 
   // Not copyable or movable
 
-  WheelEvent( const WheelEvent& rhs ) = delete;             ///< Deleted copy constructor
-  WheelEvent( WheelEvent&& rhs ) = delete;                  ///< Deleted move constructor
-  WheelEvent& operator=( const WheelEvent& rhs ) = delete;  ///< Deleted copy assignment operator
-  WheelEvent& operator=( WheelEvent&& rhs ) = delete;       ///< Deleted move assignment operator
+  WheelEvent(const WheelEvent& rhs) = delete;            ///< Deleted copy constructor
+  WheelEvent(WheelEvent&& rhs)      = delete;            ///< Deleted move constructor
+  WheelEvent& operator=(const WheelEvent& rhs) = delete; ///< Deleted copy assignment operator
+  WheelEvent& operator=(WheelEvent&& rhs) = delete;      ///< Deleted move assignment operator
 
 private:
-
-  Dali::WheelEvent::Type mType; ///< The type of the event
-  int32_t mDirection;           ///< The direction in which the wheel is being rolled
-  uint32_t mModifiers;          ///< Modifier keys pressed during the event
-  Vector2 mPoint;               ///< The co-ordinates of the cursor relative to the top-left of the screen when the wheel is being rolled.
-  int32_t mDelta;               ///< The offset of the wheel rolling
-  uint32_t mTimeStamp;          ///< The time when the wheel is being rolled
+  Dali::WheelEvent::Type mType;      ///< The type of the event
+  int32_t                mDirection; ///< The direction in which the wheel is being rolled
+  uint32_t               mModifiers; ///< Modifier keys pressed during the event
+  Vector2                mPoint;     ///< The co-ordinates of the cursor relative to the top-left of the screen when the wheel is being rolled.
+  int32_t                mDelta;     ///< The offset of the wheel rolling
+  uint32_t               mTimeStamp; ///< The time when the wheel is being rolled
 };
 
 } // namespace Internal
 
 // Helpers for public-api forwarding methods
 
-inline Internal::WheelEvent& GetImplementation( Dali::WheelEvent& wheelEvent )
+inline Internal::WheelEvent& GetImplementation(Dali::WheelEvent& wheelEvent)
 {
-  DALI_ASSERT_ALWAYS( wheelEvent && "Wheel Event handle is empty" );
+  DALI_ASSERT_ALWAYS(wheelEvent && "Wheel Event handle is empty");
 
   BaseObject& object = wheelEvent.GetBaseObject();
 
-  return static_cast< Internal::WheelEvent& >( object );
+  return static_cast<Internal::WheelEvent&>(object);
 }
 
-inline const Internal::WheelEvent& GetImplementation( const Dali::WheelEvent& wheelEvent )
+inline const Internal::WheelEvent& GetImplementation(const Dali::WheelEvent& wheelEvent)
 {
-  DALI_ASSERT_ALWAYS( wheelEvent && "Wheel Event handle is empty" );
+  DALI_ASSERT_ALWAYS(wheelEvent && "Wheel Event handle is empty");
 
   const BaseObject& object = wheelEvent.GetBaseObject();
 
-  return static_cast< const Internal::WheelEvent& >( object );
+  return static_cast<const Internal::WheelEvent&>(object);
 }
 
 } // namespace Dali

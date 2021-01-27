@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_RENDER_TRACKER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ namespace Internal
 {
 namespace Render
 {
-
 /**
  * This class is used to communicate with Fence Sync objects, keeping access solely in
  * the RenderThread to avoid having mutual exclusion locks or messages back to the UpdateThread.
@@ -48,7 +47,7 @@ public:
   /**
    * Creates a sync object for this tracker. Will delete any existing sync object.
    */
-  void CreateSyncObject( Integration::GlSyncAbstraction& glSyncAbstraction );
+  void CreateSyncObject(Integration::GlSyncAbstraction& glSyncAbstraction);
 
   /**
    * Check the GL Sync objects. This is called from Render Thread.
@@ -74,18 +73,15 @@ public:
   void SetSyncFlag();
 
 private:
-
-  Integration::GlSyncAbstraction* mGlSyncAbstraction;      // The sync abstraction
-  Integration::GlSyncAbstraction::SyncObject* mSyncObject; // Associated sync object
-  volatile int mSyncTrigger;                               // Trigger that update thread can read
-
+  Integration::GlSyncAbstraction*             mGlSyncAbstraction; // The sync abstraction
+  Integration::GlSyncAbstraction::SyncObject* mSyncObject;        // Associated sync object
+  volatile int                                mSyncTrigger;       // Trigger that update thread can read
 };
 
-} // Render
+} // namespace Render
 
-} // Internal
+} // namespace Internal
 
-} // Dali
-
+} // namespace Dali
 
 #endif // DALI_INTERNAL_RENDER_RENDER_TRACKER_H

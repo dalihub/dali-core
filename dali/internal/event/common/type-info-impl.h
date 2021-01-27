@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TYPE_INFO_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,6 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
 class PropertyDetails;
@@ -48,15 +47,13 @@ class TypeRegistry;
 class TypeInfo : public BaseObject
 {
 public:
-
   /**
    * Create TypeInfo
    * @param [name] the registered name
    * @param [baseName] the base type registered name
    * @param [creator] the creator function for this type
    */
-  TypeInfo( const std::string& name, const std::string& baseName, Dali::TypeInfo::CreateFunction creator,
-            const Dali::PropertyDetails* defaultProperties, Property::Index defaultPropertyCount );
+  TypeInfo(const std::string& name, const std::string& baseName, Dali::TypeInfo::CreateFunction creator, const Dali::PropertyDetails* defaultProperties, Property::Index defaultPropertyCount);
 
   /**
    * Create TypeInfo for a csharp object
@@ -64,7 +61,7 @@ public:
    * @param [baseName] the base type registered name
    * @param [creator] the creator function for this type
    */
-  TypeInfo( const std::string& name, const std::string& baseName, Dali::CSharpTypeInfo::CreateFunction creator );
+  TypeInfo(const std::string& name, const std::string& baseName, Dali::CSharpTypeInfo::CreateFunction creator);
 
   /**
    * Destructor
@@ -99,7 +96,7 @@ public:
   /**
    * @copydoc Dali::TypeInfo::GetActionName
    */
-  std::string GetActionName( uint32_t index ) const;
+  std::string GetActionName(uint32_t index) const;
 
   /**
    * @copydoc Dali::TypeInfo::GetSignalCount
@@ -109,7 +106,7 @@ public:
   /**
    * @copydoc Dali::TypeInfo::GetSignalName
    */
-  std::string GetSignalName( uint32_t index ) const;
+  std::string GetSignalName(uint32_t index) const;
 
   /**
    * @copydoc Dali::TypeInfo::GetPropertyCount
@@ -120,7 +117,7 @@ public:
    * Adds the property indices to the container specified.
    * @param[in/out] indices The container where the property indices are added.
    */
-  void GetPropertyIndices( Property::IndexContainer& indices ) const;
+  void GetPropertyIndices(Property::IndexContainer& indices) const;
 
   /**
    * @copydoc Dali::TypeInfo::GetPropertyName() const
@@ -209,7 +206,7 @@ public:
    * @param [in] properties The arguments of the action
    * @return bool If the action could be executed
    */
-  bool DoActionTo(BaseObject *object, const std::string &actionName, const Property::Map &properties);
+  bool DoActionTo(BaseObject* object, const std::string& actionName, const Property::Map& properties);
 
   /**
    * Connects a callback function with the object's signals.
@@ -220,7 +217,7 @@ public:
    * @return True if the signal was connected.
    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
    */
-  bool ConnectSignal( BaseObject* object, ConnectionTrackerInterface* connectionTracker, const std::string& signalName, FunctorDelegate* functor );
+  bool ConnectSignal(BaseObject* object, ConnectionTrackerInterface* connectionTracker, const std::string& signalName, FunctorDelegate* functor);
 
   /**
    * Given a property name, retrieve the index.
@@ -234,39 +231,39 @@ public:
    * @param[in] index The index of the property.
    * @return The index of the base property associated with the given property index.
    */
-  Property::Index GetBasePropertyIndex( Property::Index index ) const;
+  Property::Index GetBasePropertyIndex(Property::Index index) const;
 
   /**
    * Given a property index, retrieve its component index.
    * @param[in] index The index of the property.
    * @return The component index associated with that property index.
    */
-  int32_t GetComponentIndex( Property::Index index ) const;
+  int32_t GetComponentIndex(Property::Index index) const;
 
   /**
    * @param[in] index The property index.
    * @return True, if writable, false otherwise.
    */
-  bool IsPropertyWritable( Property::Index index ) const;
+  bool IsPropertyWritable(Property::Index index) const;
 
   /**
    * @param[in] index The property index.
    * @return True, if animatable, false otherwise.
    */
-  bool IsPropertyAnimatable( Property::Index index ) const;
+  bool IsPropertyAnimatable(Property::Index index) const;
 
   /**
    * @param[in] index The property index.
    * @return True, if a constraint input, false otherwise.
    */
-  bool IsPropertyAConstraintInput( Property::Index index ) const;
+  bool IsPropertyAConstraintInput(Property::Index index) const;
 
   /**
    * Retrieve the Property::Type of the property at the given index.
    * @param[in] index The property index.
    * @return The Property::Type at that index.
    */
-  Property::Type GetPropertyType( Property::Index index ) const;
+  Property::Type GetPropertyType(Property::Index index) const;
 
   /**
    * Given a child property name, retrieve the index.
@@ -287,20 +284,20 @@ public:
    * @param[in] index The property index.
    * @return The Property::Type at that index.
    */
-  Property::Type GetChildPropertyType( Property::Index index ) const;
+  Property::Type GetChildPropertyType(Property::Index index) const;
 
   /**
    * Retrive the child indices into the given container.
    * @param[in,out] indices The container to put the child indices into
    */
-  void GetChildPropertyIndices( Property::IndexContainer& indices ) const;
+  void GetChildPropertyIndices(Property::IndexContainer& indices) const;
 
   /**
    * Retrieve the default value of the property at the given index.
    * @param[in] index The property index.
    * @return The default property value at that index.
    */
-  Property::Value GetPropertyDefaultValue( Property::Index index ) const;
+  Property::Value GetPropertyDefaultValue(Property::Index index) const;
 
   /**
    * Sets the value of a property at the index specified for the given object.
@@ -324,7 +321,7 @@ public:
    * @param[in] index The property index.
    * @return The current value of the property.
    */
-  Property::Value GetProperty( const BaseObject *object, Property::Index index ) const;
+  Property::Value GetProperty(const BaseObject* object, Property::Index index) const;
 
   /**
    * Retrieves the value of a property with the name specified for the given object.
@@ -332,10 +329,9 @@ public:
    * @param[in] name The property name.
    * @return The current value of the property.
    */
-  Property::Value GetProperty( const BaseObject *object, const std::string& name ) const;
+  Property::Value GetProperty(const BaseObject* object, const std::string& name) const;
 
 private:
-
   struct RegisteredProperty
   {
     RegisteredProperty(Property::Type propType, ConstString propName, Property::Index basePropertyIndex, int32_t componentIndex)
@@ -371,17 +367,17 @@ private:
     Property::Type type = Property::NONE;
     union
     {
-      Dali::TypeInfo::SetPropertyFunction setFunc = nullptr;
+      Dali::TypeInfo::SetPropertyFunction       setFunc = nullptr;
       Dali::CSharpTypeInfo::SetPropertyFunction cSharpSetFunc; // only one field can be initialized but this will have same value anyways
     };
     union
     {
-      Dali::TypeInfo::GetPropertyFunction getFunc = nullptr;
+      Dali::TypeInfo::GetPropertyFunction       getFunc = nullptr;
       Dali::CSharpTypeInfo::GetPropertyFunction cSharpGetFunc; // only one field can be initialized but this will have same value anyways
     };
     ConstString     name;
     Property::Index basePropertyIndex = Property::INVALID_INDEX;
-    int32_t componentIndex = Property::INVALID_COMPONENT_INDEX;
+    int32_t         componentIndex    = Property::INVALID_COMPONENT_INDEX;
   };
 
   using ConnectionPair           = std::pair<std::string, Dali::TypeInfo::SignalConnectorFunction>;
@@ -399,28 +395,27 @@ private:
    * @param[in,out] indices The vector to append indices onto
    * @param[in] registeredProperties The container to retrive indices from
    */
-  void AppendProperties( Dali::Property::IndexContainer& indices,
-                         const TypeInfo::RegisteredPropertyContainer& registeredProperties ) const;
+  void AppendProperties(Dali::Property::IndexContainer&              indices,
+                        const TypeInfo::RegisteredPropertyContainer& registeredProperties) const;
 
 private:
-
-  TypeRegistry& mTypeRegistry;
+  TypeRegistry&               mTypeRegistry;
   mutable Internal::TypeInfo* mBaseType; // allow changing from const methods, initialised inside constructor
-  std::string mTypeName;
-  std::string mBaseTypeName;
+  std::string                 mTypeName;
+  std::string                 mBaseTypeName;
   union
   {
-    Dali::TypeInfo::CreateFunction mCreate = nullptr;
+    Dali::TypeInfo::CreateFunction       mCreate = nullptr;
     Dali::CSharpTypeInfo::CreateFunction mCSharpCreate; // only one field can be initialized but this will have same value anyways
   };
-  ActionContainer mActions;
-  ConnectorContainer mSignalConnectors;
-  RegisteredPropertyContainer mRegisteredProperties;
-  RegisteredPropertyContainer mRegisteredChildProperties;
+  ActionContainer               mActions;
+  ConnectorContainer            mSignalConnectors;
+  RegisteredPropertyContainer   mRegisteredProperties;
+  RegisteredPropertyContainer   mRegisteredChildProperties;
   PropertyDefaultValueContainer mPropertyDefaultValues;
-  const Dali::PropertyDetails* mDefaultProperties = nullptr;
-  Property::Index mDefaultPropertyCount = 0;
-  bool mCSharpType = false;    ///< Whether this type info is for a CSharp control (instead of C++)
+  const Dali::PropertyDetails*  mDefaultProperties    = nullptr;
+  Property::Index               mDefaultPropertyCount = 0;
+  bool                          mCSharpType           = false; ///< Whether this type info is for a CSharp control (instead of C++)
 };
 
 } // namespace Internal

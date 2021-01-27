@@ -26,21 +26,18 @@
 
 namespace // unnamed namespace start
 {
-
 const int gExampleConstant = 0;
 
 void ExampleNonMemberFunction()
 {
 }
 
-} // unnamed namespace end
+} // namespace
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 ExampleClass::ExampleClass()
 {
 }

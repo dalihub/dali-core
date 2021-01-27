@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_GL_ABSTRACTION_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
  *
  */
 
-#include <stdint.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
+#include <stdint.h>
 
 /*
  * This file is based on gl3.h, the following licence is included for conformance.
@@ -128,7 +128,7 @@ public:
    * Returns current gles can support the blend equation
    * @Return true current gles support the blend equation
    */
-  virtual bool IsBlendEquationSupported( DevelBlendEquation::Type blendEquation ) = 0;
+  virtual bool IsBlendEquationSupported(DevelBlendEquation::Type blendEquation) = 0;
 
   /**
    * Returns shader prefix of shading language version.

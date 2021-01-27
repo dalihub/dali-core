@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_MULTI_POINT_EVENT_UTIL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,8 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 #if defined(DEBUG_ENABLED)
 
 /**
@@ -36,12 +34,12 @@ namespace Internal
  * @param[in]  actor  The actor whose children to print.
  * @param[in]  level  The number of " | " to put in front of the children.
  */
-void PrintChildren( Debug::Filter* logFilter, Dali::Actor actor, int level );
+void PrintChildren(Debug::Filter* logFilter, Dali::Actor actor, int level);
 
 /**
  * Prints the entire hierarchy of the scene.
  */
-void PrintHierarchy( Debug::Filter* logFilter );
+void PrintHierarchy(Debug::Filter* logFilter);
 
 #define PRINT_HIERARCHY(f) PrintHierarchy(f)
 
@@ -56,11 +54,10 @@ void PrintHierarchy( Debug::Filter* logFilter );
  * should also check if any of the actor's parents has become insensitive since we last processed
  * it.
  */
-bool IsActuallySensitive( Actor* actor );
+bool IsActuallySensitive(Actor* actor);
 
 } // namespace Internal
 
 } // namespace Dali
 
 #endif // DALI_INTERNAL_MULTI_POINT_EVENT_UTIL_H
-

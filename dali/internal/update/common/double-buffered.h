@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_DOUBLE_BUFFERED_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,24 +23,20 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 // The number of buffers per scene-graph property
 static const unsigned int NUM_SCENE_GRAPH_BUFFERS = 2;
 
 namespace SceneGraph
 {
-
 /**
  * Templated class for a double-buffered value.
  */
-template <typename T>
+template<typename T>
 class DoubleBuffered
 {
 public:
-
   DoubleBuffered()
   : mValue1(),
     mValue2()
@@ -57,18 +53,17 @@ public:
   {
     DALI_ASSERT_DEBUG(i < NUM_SCENE_GRAPH_BUFFERS);
 
-    return *(&mValue1+i);
+    return *(&mValue1 + i);
   }
 
   inline const T& operator[](const BufferIndex i) const
   {
     DALI_ASSERT_DEBUG(i < NUM_SCENE_GRAPH_BUFFERS);
 
-    return *(&mValue1+i);
+    return *(&mValue1 + i);
   }
 
 private:
-
   // Undefined
   DoubleBuffered<T>(const DoubleBuffered<T>&);
 
@@ -76,7 +71,6 @@ private:
   DoubleBuffered<T>& operator=(const DoubleBuffered<T>& rhs);
 
 private:
-
   T mValue1;
   T mValue2;
 };
@@ -87,11 +81,10 @@ private:
  * This class takes ownership of the pointers and releases the memory when the pointer
  * is no longer used by either buffer
  */
-template <typename T>
-class DoubleBuffered< OwnerPointer< T > >
+template<typename T>
+class DoubleBuffered<OwnerPointer<T> >
 {
 public:
-
   /**
    * Class that deals with setting a value
    */
@@ -102,7 +95,7 @@ public:
      * @brief Assignment operator to that a value that will later
      * be set in the correct buffer index of the object referenced by the setter.
      */
-    Setter& operator=( T* value )
+    Setter& operator=(T* value)
     {
       mValue = value;
       return *this;
@@ -110,90 +103,90 @@ public:
 
     ~Setter()
     {
-      mObject.Set( mIndex, mValue );
+      mObject.Set(mIndex, mValue);
     }
 
   private:
-    Setter( DoubleBuffered& object,
-            BufferIndex i,
-            T* value )
-    : mObject( object ),
-      mIndex( i ),
-      mValue( value )
+    Setter(DoubleBuffered& object,
+           BufferIndex     i,
+           T*              value)
+    : mObject(object),
+      mIndex(i),
+      mValue(value)
     {
     }
 
-    Setter( const Setter& rhs )
-    : mObject( rhs.mObject ),
-      mIndex( rhs.mIndex ),
-      mValue( rhs.mValue )
+    Setter(const Setter& rhs)
+    : mObject(rhs.mObject),
+      mIndex(rhs.mIndex),
+      mValue(rhs.mValue)
     {
     }
 
-    DoubleBuffered& mObject;  ///< Double-buffered object that will be changed
-    const BufferIndex mIndex; ///< Buffer index that will be changed
-    T* mValue;                ///< Value of the pointer
+    DoubleBuffered&   mObject; ///< Double-buffered object that will be changed
+    const BufferIndex mIndex;  ///< Buffer index that will be changed
+    T*                mValue;  ///< Value of the pointer
 
     friend class DoubleBuffered;
   };
 
   DoubleBuffered()
-  : mValue1( NULL ),
-    mValue2( NULL )
+  : mValue1(NULL),
+    mValue2(NULL)
   {
   }
 
   DoubleBuffered(T* val)
-  : mValue1( val ),
-    mValue2( val )
+  : mValue1(val),
+    mValue2(val)
   {
   }
 
   ~DoubleBuffered()
   {
-    if( mValue2 != mValue1 )
+    if(mValue2 != mValue1)
     {
       delete mValue2;
     }
     delete mValue1;
   }
 
-  void Set( BufferIndex i, T* value )
+  void Set(BufferIndex i, T* value)
   {
-    T*& current = *(&mValue1 + i);
-    T*& previous = *(&mValue1 + 1u-i);
+    T*& current  = *(&mValue1 + i);
+    T*& previous = *(&mValue1 + 1u - i);
 
-    if( current != value && current != previous )
+    if(current != value && current != previous)
     {
       delete current;
     }
     current = value;
   }
 
-  Setter operator[]( BufferIndex i )
+  Setter operator[](BufferIndex i)
   {
-    return Setter( *this, i, *(&mValue1+i) );
+    return Setter(*this, i, *(&mValue1 + i));
   }
 
-  const T* operator[]( BufferIndex i ) const
+  const T* operator[](BufferIndex i) const
   {
     DALI_ASSERT_DEBUG(i < NUM_SCENE_GRAPH_BUFFERS);
 
-    return *(&mValue1+i);
+    return *(&mValue1 + i);
   }
 
   /**
    * Auto-age the property: if it was set the previous frame,
    * then copy the value into the current frame's buffer.
    */
-  void CopyPrevious( BufferIndex i )
+  void CopyPrevious(BufferIndex i)
   {
     DALI_ASSERT_DEBUG(i < NUM_SCENE_GRAPH_BUFFERS);
 
-    T*& current = *(&mValue1 + i);
-    T*& previous = *(&mValue1 + 1u-i);
+    T*& current  = *(&mValue1 + i);
+    T*& previous = *(&mValue1 + 1u - i);
 
-    if( current != previous )
+    if(current != previous)
     {
       delete current;
     }
@@ -202,7 +195,6 @@ public:
   }
 
 private:
-
   // Undefined
   DoubleBuffered(const DoubleBuffered&);
 
@@ -210,12 +202,9 @@ private:
   DoubleBuffered& operator=(const DoubleBuffered& rhs);
 
 private:
-
   T* mValue1;
   T* mValue2;
-
 };
-
 
 } // namespace SceneGraph
 

@@ -20,13 +20,10 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace SceneGraph
 {
-
 BufferIndex SceneGraphBuffers::INITIAL_EVENT_BUFFER_INDEX  = 0u;
 BufferIndex SceneGraphBuffers::INITIAL_UPDATE_BUFFER_INDEX = 1u;
 
@@ -40,7 +37,7 @@ SceneGraphBuffers::~SceneGraphBuffers() = default;
 
 void SceneGraphBuffers::Swap()
 {
-  mUpdateBufferIndex = __sync_fetch_and_xor( &mEventBufferIndex, 1 );
+  mUpdateBufferIndex = __sync_fetch_and_xor(&mEventBufferIndex, 1);
 }
 
 } // namespace SceneGraph

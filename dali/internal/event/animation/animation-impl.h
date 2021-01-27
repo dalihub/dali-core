@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ANIMATION_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,26 +19,24 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h>
-#include <dali/public-api/object/ref-object.h>
-#include <dali/public-api/animation/animation.h>
-#include <dali/public-api/object/base-object.h>
 #include <dali/devel-api/animation/animation-devel.h>
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/internal/event/animation/key-frames-impl.h>
 #include <dali/internal/event/common/event-thread-services.h>
+#include <dali/public-api/animation/animation.h>
+#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/object/base-object.h>
+#include <dali/public-api/object/ref-object.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace SceneGraph
 {
 class Animation;
 class UpdateManager;
-}
+} // namespace SceneGraph
 
 class Actor;
 class Animation;
@@ -86,7 +84,7 @@ public:
   /**
    * @copydoc Dali::DevelAnimation::SetProgressNotification()
    */
-  void SetProgressNotification( float progress );
+  void SetProgressNotification(float progress);
 
   /**
    * @copydoc Dali::DevelAnimation::GetProgressNotification()
@@ -167,12 +165,12 @@ public:
   /**
    * @copydoc Dali::Animation::PlayFrom()
    */
-  void PlayFrom( float progress );
+  void PlayFrom(float progress);
 
   /**
    * @copydoc Dali::Animation::PlayAfter()
    */
-  void PlayAfter( float delaySeconds );
+  void PlayAfter(float delaySeconds);
 
   /**
    * @copydoc Dali::Animation::Pause()
@@ -230,7 +228,7 @@ public:
    * @return True if the signal was connected.
    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
    */
-  static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
+  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor);
 
   /**
    * Performs actions as requested using the action name.
@@ -289,7 +287,7 @@ public:
   /**
    * @copydoc Dali::Animation::AnimateBetween(Property target, KeyFrames& keyFrames, Interpolation interpolation)
    */
-  void AnimateBetween(Property target, const KeyFrames& keyFrames, Interpolation interpolation );
+  void AnimateBetween(Property target, const KeyFrames& keyFrames, Interpolation interpolation);
 
   /**
    * @copydoc Dali::Animation::AnimateBetween(Property target, KeyFrames& keyFrames, TimePeriod period)
@@ -319,29 +317,29 @@ public:
   /**
    * @copydoc Dali::Animation::AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period, Interpolation interpolation )
    */
-  void AnimateBetween(Property target, const KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period, Interpolation interpolation );
+  void AnimateBetween(Property target, const KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period, Interpolation interpolation);
 
   // Actor-specific convenience functions
 
   /**
    * @copydoc Dali::Animation::Animate( Actor actor, Path path, const Vector3& forward )
    */
-  void Animate( Actor& actor, const Path& path, const Vector3& forward );
+  void Animate(Actor& actor, const Path& path, const Vector3& forward);
 
   /**
    * @copydoc Dali::Animation::Animate( Actor actor, Path path, const Vector3& forward, AlphaFunction alpha )
    */
-  void Animate( Actor& actor, const Path& path, const Vector3& forward, AlphaFunction alpha );
+  void Animate(Actor& actor, const Path& path, const Vector3& forward, AlphaFunction alpha);
 
   /**
    * @copydoc Dali::Animation::Animate( Actor actor, Path path, const Vector3& forward, TimePeriod period )
    */
-  void Animate( Actor& actor, const Path& path, const Vector3& forward, TimePeriod period );
+  void Animate(Actor& actor, const Path& path, const Vector3& forward, TimePeriod period);
 
   /**
    * @copydoc Dali::Animation::Animate( Actor actor, Path path, const Vector3& forward, AlphaFunction alpha, TimePeriod period)
    */
-  void Animate( Actor& actor, const Path& path, const Vector3& forward, AlphaFunction alpha, TimePeriod period);
+  void Animate(Actor& actor, const Path& path, const Vector3& forward, AlphaFunction alpha, TimePeriod period);
 
   /**
    * @copydoc Dali::Animation::Show()
@@ -366,7 +364,7 @@ public:
   /**
    * @copydoc Dali::Animation::SetSpeedFactor()
    */
-  void SetSpeedFactor( float factor );
+  void SetSpeedFactor(float factor);
 
   /**
    * @copydoc Dali::Animation::GetSpeedFactor()
@@ -376,7 +374,7 @@ public:
   /**
    * @copydoc Dali::Animation::SetPlayRange()
    */
-  void SetPlayRange( const Vector2& range );
+  void SetPlayRange(const Vector2& range);
 
   /**
    * @copydoc Dali::Animation::GetPlayRange()
@@ -386,7 +384,7 @@ public:
   /**
    * @copydoc Dali::Animation::SetLoopingMode()
    */
-  void SetLoopingMode( Dali::Animation::LoopingMode loopingMode );
+  void SetLoopingMode(Dali::Animation::LoopingMode loopingMode);
 
   /**
    * @copydoc Dali::Animation::GetLoopingMode()
@@ -394,12 +392,11 @@ public:
   Dali::Animation::LoopingMode GetLoopingMode() const;
 
 public: // For connecting animators to animations
-
   /**
    * Add an animator connector.
    * @param[in] connector The animator connector.
    */
-  void AddAnimatorConnector( AnimatorConnectorBase* connector );
+  void AddAnimatorConnector(AnimatorConnectorBase* connector);
 
   /**
    * Retrieve the SceneGraph::Animation object.
@@ -420,7 +417,6 @@ public: // For connecting animators to animations
   }
 
 protected:
-
   /**
    * Construct a new Animation.
    * @param[in] eventThreadServices The interface for sending messages to the scene graph
@@ -430,12 +426,12 @@ protected:
    * @param[in] disconnectAction The action to perform when the property owner of an animator is disconnected.
    * @param[in] defaultAlpha The default alpha function to apply to animators.
    */
-  Animation( EventThreadServices& eventThreadServices,
-             AnimationPlaylist& playlist,
-             float durationSeconds,
-             EndAction endAction,
-             EndAction disconnectAction,
-             AlphaFunction defaultAlpha);
+  Animation(EventThreadServices& eventThreadServices,
+            AnimationPlaylist&   playlist,
+            float                durationSeconds,
+            EndAction            endAction,
+            EndAction            disconnectAction,
+            AlphaFunction        defaultAlpha);
 
   /**
    * Second-phase constructor.
@@ -458,12 +454,11 @@ protected:
   ~Animation() override;
 
 private:
-
   /**
    * Extends the duration when an animator is added with TimePeriod that exceeds current duration.
    * @param[in] timePeriod The time period for an animator.
    */
-  void ExtendDuration( const TimePeriod& timePeriod );
+  void ExtendDuration(const TimePeriod& timePeriod);
 
   // Undefined
   Animation(const Animation&);
@@ -472,7 +467,6 @@ private:
   Animation& operator=(const Animation& rhs);
 
 private:
-
   struct ConnectorTargetValues
   {
     ConnectorTargetValues() = default;
@@ -499,20 +493,19 @@ private:
   };
 
 private:
-
   /**
    * Compares the end times of the animators returning true if lhs end time is less than rhs end time.
    * @param[in] lhs The first comparator
    * @param[in] rhs The second comparator
    * @return True if end time of lhs is less, false otherwise.
    */
-  static bool CompareConnectorEndTimes( const ConnectorTargetValues& lhs, const ConnectorTargetValues& rhs );
+  static bool CompareConnectorEndTimes(const ConnectorTargetValues& lhs, const ConnectorTargetValues& rhs);
 
   /**
    * Notifies all the objects whose properties are being animated.
    * @param[in] notifyValueType Whether we should set the current or target value
    */
-  void NotifyObjects( Notify notifyValueType );
+  void NotifyObjects(Notify notifyValueType);
 
   /**
    * Sends message to SceneGraph with final progress value
@@ -523,7 +516,7 @@ private:
   using AnimatorConnectorContainer     = OwnerContainer<AnimatorConnectorBase*>;
   using ConnectorTargetValuesContainer = std::vector<ConnectorTargetValues>;
 
-  const SceneGraph::Animation* mAnimation{ nullptr };
+  const SceneGraph::Animation* mAnimation{nullptr};
 
   EventThreadServices& mEventThreadServices;
   AnimationPlaylist&   mPlaylist;
@@ -555,7 +548,7 @@ private:
 
 inline Internal::Animation& GetImplementation(Dali::Animation& animation)
 {
-  DALI_ASSERT_ALWAYS( animation && "Animation handle is empty" );
+  DALI_ASSERT_ALWAYS(animation && "Animation handle is empty");
 
   BaseObject& handle = animation.GetBaseObject();
 
@@ -564,7 +557,7 @@ inline Internal::Animation& GetImplementation(Dali::Animation& animation)
 
 inline const Internal::Animation& GetImplementation(const Dali::Animation& animation)
 {
-  DALI_ASSERT_ALWAYS( animation && "Animation handle is empty" );
+  DALI_ASSERT_ALWAYS(animation && "Animation handle is empty");
 
   const BaseObject& handle = animation.GetBaseObject();
 

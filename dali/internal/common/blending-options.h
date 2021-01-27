@@ -2,7 +2,7 @@
 #define DALI_BLENDING_OPTIONS_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,17 +19,15 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/rendering/renderer.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
-#include <dali/public-api/math/vector4.h>
 #include <dali/internal/common/owner-pointer.h>
+#include <dali/public-api/math/vector4.h>
+#include <dali/public-api/rendering/renderer.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 // This is an optimization to avoid storing 6 separate blending values
 struct BlendingOptions
 {
@@ -47,7 +45,7 @@ struct BlendingOptions
    * Set the blending options.
    * @param[in] A bitmask of blending options.
    */
-  void SetBitmask( unsigned int bitmask );
+  void SetBitmask(unsigned int bitmask);
 
   /**
    * Retrieve the blending options as a bitmask.
@@ -58,8 +56,7 @@ struct BlendingOptions
   /**
    * @copydoc Dali::RenderableActor::SetBlendFunc()
    */
-  void SetBlendFunc( BlendFactor::Type srcFactorRgb,   BlendFactor::Type destFactorRgb,
-                     BlendFactor::Type srcFactorAlpha, BlendFactor::Type destFactorAlpha );
+  void SetBlendFunc(BlendFactor::Type srcFactorRgb, BlendFactor::Type destFactorRgb, BlendFactor::Type srcFactorAlpha, BlendFactor::Type destFactorAlpha);
 
   /**
    * @copydoc Dali::RenderableActor::GetBlendFunc()
@@ -84,7 +81,7 @@ struct BlendingOptions
   /**
    * @copydoc Dali::RenderableActor::SetBlendEquation()
    */
-  void SetBlendEquation( DevelBlendEquation::Type equationRgb, DevelBlendEquation::Type equationAlpha );
+  void SetBlendEquation(DevelBlendEquation::Type equationRgb, DevelBlendEquation::Type equationAlpha);
 
   /**
    * @copydoc Dali::RenderableActor::GetBlendEquation()
@@ -101,7 +98,7 @@ struct BlendingOptions
    * @param[in] color The blend color.
    * @return True if the blend color changed, otherwise it was already the same color.
    */
-  void SetBlendColor( const Vector4& color );
+  void SetBlendColor(const Vector4& color);
 
   /**
    * Query the blend color.
@@ -119,16 +116,15 @@ struct BlendingOptions
    * Query whether input bit mask include advanced blend equation.
    * @return True if the bit mask include advanced blend equation.
    */
-  static bool IsAdvancedBlendEquationIncluded( unsigned int bitmask );
+  static bool IsAdvancedBlendEquationIncluded(unsigned int bitmask);
 
   /**
    * Query whether input blend equation is advanced option.
    * @return True if input blend equation is advanced.
    */
-  static bool IsAdvancedBlendEquation( DevelBlendEquation::Type equation );
+  static bool IsAdvancedBlendEquation(DevelBlendEquation::Type equation);
 
 private:
-
   // Undefined copy constructor.
   BlendingOptions(const BlendingOptions& typePath);
 
@@ -136,11 +132,9 @@ private:
   BlendingOptions& operator=(const BlendingOptions& rhs);
 
 private:
-
   unsigned int mBitmask; ///< A bitmask of blending options
 
-  OwnerPointer< Vector4> mBlendColor; ///< A heap-allocated color (owned)
-
+  OwnerPointer<Vector4> mBlendColor; ///< A heap-allocated color (owned)
 };
 
 } // namespace Internal

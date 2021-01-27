@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_STAGE_DEF_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,16 +23,14 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 class Stage;
 
-using StagePtr = Stage *;
+using StagePtr = Stage*;
 
-} // Internal
+} // namespace Internal
 
-} // Dali
+} // namespace Dali
 
 #endif // DALI_INTERNAL_STAGE_DEF_H

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_HIT_TEST_ALGORITHM_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,16 +19,14 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/actors/actor.h>
 #include <dali/devel-api/events/hit-test-algorithm.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
+#include <dali/public-api/actors/actor.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 class Layer;
 class LayerList;
 
@@ -37,7 +35,6 @@ class LayerList;
  */
 namespace HitTestAlgorithm
 {
-
 struct Results
 {
   RenderTaskPtr renderTask;       ///< The render-task displaying the actor.
@@ -60,7 +57,7 @@ struct HitTestInterface
    *
    * @return true if actor is hittable, false otherwise.
    */
-  virtual bool IsActorHittable( Actor* actor ) = 0;
+  virtual bool IsActorHittable(Actor* actor) = 0;
 
   /**
    * Called by the hit-test algorithm to determine whether the algorithm should descend the actor's
@@ -70,7 +67,7 @@ struct HitTestInterface
    *
    * @return true if we should descend the actor's hierarchy, false otherwise.
    */
-  virtual bool DescendActorHierarchy( Actor* actor ) = 0;
+  virtual bool DescendActorHierarchy(Actor* actor) = 0;
 
   /**
    * Called by the hit-test algorithm to determine whether the layer specified consumes the hit
@@ -82,15 +79,13 @@ struct HitTestInterface
    *
    * @return true if the layer should consume the hit, false otherwise.
    */
-  virtual bool DoesLayerConsumeHit( Layer* layer ) = 0;
+  virtual bool DoesLayerConsumeHit(Layer* layer) = 0;
 
 protected:
-
   /**
    * Virtual destructor, no deletion through this interface
    */
   virtual ~HitTestInterface();
-
 };
 
 /**
@@ -106,8 +101,7 @@ protected:
  *
  * @see HitTest(Stage&, const Vector2&, Results&, HitTestInterface&)
  */
-bool HitTest( const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList& layerList, const Vector2& screenCoordinates,
-              Dali::HitTestAlgorithm::Results& results, Dali::HitTestAlgorithm::HitTestFunction func );
+bool HitTest(const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList& layerList, const Vector2& screenCoordinates, Dali::HitTestAlgorithm::Results& results, Dali::HitTestAlgorithm::HitTestFunction func);
 
 /**
  * Given screen coordinates, this method returns the hit actor & the local coordinates relative to the actor etc.
@@ -133,8 +127,7 @@ bool HitTest( const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerLis
  * @note Currently, we prefer a child hit over a parent (regardless of the distance from the
  *       camera) unless the parent is a RenderableActor but this is subject to change.
  */
-bool HitTest( const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList& layerList, const Vector2& screenCoordinates,
-              Results& results, HitTestInterface& hitTestInterface );
+bool HitTest(const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList& layerList, const Vector2& screenCoordinates, Results& results, HitTestInterface& hitTestInterface);
 
 /**
  * Default HitTest where we check if a touch is required.
@@ -148,7 +141,7 @@ bool HitTest( const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerLis
  *
  * @see HitTest(Stage&, const Vector2&, Results&, HitTestInterface&)
  */
-bool HitTest( const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList& layerList, const Vector2& screenCoordinates, Results& results );
+bool HitTest(const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList& layerList, const Vector2& screenCoordinates, Results& results);
 
 } // namespace HitTestAlgorithm
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
 #include <dali-test-suite-utils.h>
 #include <dali/integration-api/events/hover-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
-#include <dali/internal/event/common/type-info-impl.h>
 #include <dali/internal/common/const-string.h>
+#include <dali/internal/event/common/type-info-impl.h>
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
 
@@ -1952,7 +1952,7 @@ int UtcDaliPropertyRegistrationFunctions(void)
   }
   catch(DaliException& e)
   {
-    DALI_TEST_ASSERT(e, "! \"GetProperty", TEST_LOCATION);
+    DALI_TEST_ASSERT(e, "!\"GetProperty", TEST_LOCATION);
   }
   END_TEST;
 }
@@ -1972,7 +1972,7 @@ int UtcDaliPropertyRegistrationAddSameIndex(void)
   }
   catch(DaliException& e)
   {
-    DALI_TEST_ASSERT(e, "! \"Property index already added", TEST_LOCATION);
+    DALI_TEST_ASSERT(e, "!\"Property index already added", TEST_LOCATION);
   }
 
   int animatablePropertyIndex = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 100;
@@ -1987,7 +1987,7 @@ int UtcDaliPropertyRegistrationAddSameIndex(void)
   }
   catch(DaliException& e)
   {
-    DALI_TEST_ASSERT(e, "! \"Property index already added", TEST_LOCATION);
+    DALI_TEST_ASSERT(e, "!\"Property index already added", TEST_LOCATION);
   }
   END_TEST;
 }

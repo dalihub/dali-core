@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_LAYER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,21 +19,25 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/actors/layer.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/nodes/node.h>
+#include <dali/public-api/actors/layer.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 // value types used by messages
-template <> struct ParameterType< Dali::Layer::SortFunctionType >
-: public BasicType< Dali::Layer::SortFunctionType > {};
-template <> struct ParameterType< Dali::Layer::Behavior >
-: public BasicType< Dali::Layer::Behavior > {};
+template<>
+struct ParameterType<Dali::Layer::SortFunctionType>
+: public BasicType<Dali::Layer::SortFunctionType>
+{
+};
+template<>
+struct ParameterType<Dali::Layer::Behavior>
+: public BasicType<Dali::Layer::Behavior>
+{
+};
 
 namespace SceneGraph
 {
@@ -45,16 +49,18 @@ class Camera;
 struct Renderable
 {
   Renderable()
-  : mNode( nullptr ),
-    mRenderer( nullptr )
-  {}
+  : mNode(nullptr),
+    mRenderer(nullptr)
+  {
+  }
 
-  Renderable( Node* node, Renderer* renderer )
-  : mNode( node ),
-    mRenderer( renderer )
-  {}
+  Renderable(Node* node, Renderer* renderer)
+  : mNode(node),
+    mRenderer(renderer)
+  {
+  }
 
-  Node* mNode;
+  Node*     mNode;
   Renderer* mRenderer;
 };
 
@@ -98,7 +104,7 @@ public:
    * Sets the sort-function of a layer.
    * @param [in] function The new sort-function.
    */
-  void SetSortFunction( Dali::Layer::SortFunctionType function );
+  void SetSortFunction(Dali::Layer::SortFunctionType function);
 
   /**
    * Retrieve the function used to sort semi-transparent geometry in this layer.
@@ -113,7 +119,7 @@ public:
    * Sets whether clipping is enabled for a layer.
    * @param [in] enabled True if clipping is enabled.
    */
-  void SetClipping( bool enabled );
+  void SetClipping(bool enabled);
 
   /**
    * Query whether clipping is enabled for a layer.
@@ -130,7 +136,7 @@ public:
    * enabled. The default clipping box is empty (0,0,0,0).
    * @param [in] box The clipping box
    */
-  void SetClippingBox( const ClippingBox& box );
+  void SetClippingBox(const ClippingBox& box);
 
   /**
    * Retrieves the clipping box of a layer, in window coordinates.
@@ -145,7 +151,7 @@ public:
    * Sets the behavior of the layer
    * @param [in] behavior The behavior of the layer
    */
-  void SetBehavior( Dali::Layer::Behavior behavior );
+  void SetBehavior(Dali::Layer::Behavior behavior);
 
   /**
    * Retrieves the behavior of the layer.
@@ -159,7 +165,7 @@ public:
   /**
    * @copydoc Dali::Layer::SetDepthTestDisabled()
    */
-  void SetDepthTestDisabled( bool disable );
+  void SetDepthTestDisabled(bool disable);
 
   /**
    * @copydoc Dali::Layer::IsDepthTestDisabled()
@@ -171,9 +177,9 @@ public:
    * @param[in] updateBufferIndex The current update buffer index.
    * @param value to set
    */
-  void SetReuseRenderers( BufferIndex updateBufferIndex, bool value )
+  void SetReuseRenderers(BufferIndex updateBufferIndex, bool value)
   {
-    mAllChildTransformsClean[ updateBufferIndex ] = value;
+    mAllChildTransformsClean[updateBufferIndex] = value;
   }
 
   /**
@@ -184,9 +190,9 @@ public:
    * to use is the same than the one used before ( Otherwise View transform will be different )
    *
    */
-  bool CanReuseRenderers( Camera* camera )
+  bool CanReuseRenderers(Camera* camera)
   {
-    bool bReturn( mAllChildTransformsClean[ 0 ] && mAllChildTransformsClean[ 1 ] && camera == mLastCamera );
+    bool bReturn(mAllChildTransformsClean[0] && mAllChildTransformsClean[1] && camera == mLastCamera);
     mLastCamera = camera;
 
     return bReturn;
@@ -206,7 +212,6 @@ public:
   void ClearRenderables();
 
 private:
-
   /**
    * Private constructor.
    * See also Layer::New()
@@ -220,26 +225,23 @@ private:
   Layer& operator=(const Layer& rhs);
 
 public: // For update-algorithms
-
   RenderableContainer colorRenderables;
   RenderableContainer overlayRenderables;
 
 private:
+  SortFunctionType mSortFunction; ///< Used to sort semi-transparent geometry
 
-  SortFunctionType mSortFunction;     ///< Used to sort semi-transparent geometry
+  ClippingBox mClippingBox; ///< The clipping box, in window coordinates
+  Camera*     mLastCamera;  ///< Pointer to the last camera that has rendered the layer
 
-  ClippingBox mClippingBox;           ///< The clipping box, in window coordinates
-  Camera* mLastCamera;                ///< Pointer to the last camera that has rendered the layer
+  Dali::Layer::Behavior mBehavior; ///< The behavior of the layer
 
-  Dali::Layer::Behavior mBehavior;    ///< The behavior of the layer
-
-  bool mAllChildTransformsClean[ 2 ]; ///< True if all child nodes transforms are clean,
-                                      ///  double buffered as we need two clean frames before we can reuse N-1 for N+1
-                                      ///  this allows us to cache render items when layer is "static"
-  bool mIsClipping:1;                 ///< True when clipping is enabled
-  bool mDepthTestDisabled:1;          ///< Whether depth test is disabled.
-  bool mIsDefaultSortFunction:1;      ///< whether the default depth sort function is used
-
+  bool mAllChildTransformsClean[2]; ///< True if all child nodes transforms are clean,
+                                    ///  double buffered as we need two clean frames before we can reuse N-1 for N+1
+                                    ///  this allows us to cache render items when layer is "static"
+  bool mIsClipping : 1;             ///< True when clipping is enabled
+  bool mDepthTestDisabled : 1;      ///< Whether depth test is disabled.
+  bool mIsDefaultSortFunction : 1;  ///< whether the default depth sort function is used
 };
 
 // Messages for Layer
@@ -249,15 +251,15 @@ private:
  * @param[in] layer The layer
  * @param[in] function The new sort-function.
  */
-inline void SetSortFunctionMessage( EventThreadServices& eventThreadServices, const Layer& layer, Dali::Layer::SortFunctionType function )
+inline void SetSortFunctionMessage(EventThreadServices& eventThreadServices, const Layer& layer, Dali::Layer::SortFunctionType function)
 {
   using LocalType = MessageValue1<Layer, Dali::Layer::SortFunctionType>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &layer, &Layer::SetSortFunction, function );
+  new(slot) LocalType(&layer, &Layer::SetSortFunction, function);
 }
 
 /**
@@ -265,15 +267,15 @@ inline void SetSortFunctionMessage( EventThreadServices& eventThreadServices, co
  * @param[in] layer The layer
  * @param[in] enabled True if clipping is enabled
  */
-inline void SetClippingMessage( EventThreadServices& eventThreadServices, const Layer& layer, bool enabled )
+inline void SetClippingMessage(EventThreadServices& eventThreadServices, const Layer& layer, bool enabled)
 {
   using LocalType = MessageValue1<Layer, bool>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &layer, &Layer::SetClipping, enabled );
+  new(slot) LocalType(&layer, &Layer::SetClipping, enabled);
 }
 
 /**
@@ -281,15 +283,15 @@ inline void SetClippingMessage( EventThreadServices& eventThreadServices, const 
  * @param[in] layer The layer
  * @param[in] clippingbox The clipping box
  */
-inline void SetClippingBoxMessage( EventThreadServices& eventThreadServices, const Layer& layer, const Dali::ClippingBox& clippingbox )
+inline void SetClippingBoxMessage(EventThreadServices& eventThreadServices, const Layer& layer, const Dali::ClippingBox& clippingbox)
 {
   using LocalType = MessageValue1<Layer, Dali::ClippingBox>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &layer, &Layer::SetClippingBox, clippingbox );
+  new(slot) LocalType(&layer, &Layer::SetClippingBox, clippingbox);
 }
 
 /**
@@ -297,17 +299,17 @@ inline void SetClippingBoxMessage( EventThreadServices& eventThreadServices, con
  * @param[in] layer The layer
  * @param[in] behavior The behavior
  */
-inline void SetBehaviorMessage( EventThreadServices& eventThreadServices,
-                                const Layer& layer,
-                                Dali::Layer::Behavior behavior )
+inline void SetBehaviorMessage(EventThreadServices&  eventThreadServices,
+                               const Layer&          layer,
+                               Dali::Layer::Behavior behavior)
 {
   using LocalType = MessageValue1<Layer, Dali::Layer::Behavior>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &layer, &Layer::SetBehavior, behavior );
+  new(slot) LocalType(&layer, &Layer::SetBehavior, behavior);
 }
 
 /**
@@ -318,24 +320,24 @@ inline void SetBehaviorMessage( EventThreadServices& eventThreadServices,
  * @param[in] layer The layer
  * @param[in] disable \e true disables depth test. \e false sets the default behavior.
  */
-inline void SetDepthTestDisabledMessage( EventThreadServices& eventThreadServices, const Layer& layer, bool disable )
+inline void SetDepthTestDisabledMessage(EventThreadServices& eventThreadServices, const Layer& layer, bool disable)
 {
   using LocalType = MessageValue1<Layer, bool>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &layer, &Layer::SetDepthTestDisabled, disable );
+  new(slot) LocalType(&layer, &Layer::SetDepthTestDisabled, disable);
 }
 
 } // namespace SceneGraph
 
 // Template specialisation for OwnerPointer<Layer>, because delete is protected
-template <>
+template<>
 inline void OwnerPointer<Dali::Internal::SceneGraph::Layer>::Reset()
 {
-  if (mObject != nullptr)
+  if(mObject != nullptr)
   {
     Dali::Internal::SceneGraph::Node::Delete(mObject);
     mObject = nullptr;

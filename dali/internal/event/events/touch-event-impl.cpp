@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,143 +23,141 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
-TouchEventPtr TouchEvent::Clone( const TouchEvent& other )
+TouchEventPtr TouchEvent::Clone(const TouchEvent& other)
 {
-  TouchEventPtr touchEvent( new TouchEvent );
+  TouchEventPtr touchEvent(new TouchEvent);
   touchEvent->mPoints = other.mPoints;
-  touchEvent->mTime = other.mTime;
+  touchEvent->mTime   = other.mTime;
   return touchEvent;
 }
 
-int32_t TouchEvent::GetDeviceId( std::size_t point ) const
+int32_t TouchEvent::GetDeviceId(std::size_t point) const
 {
-  if( point < mPoints.size() )
+  if(point < mPoints.size())
   {
-    return mPoints[ point ].GetDeviceId();
+    return mPoints[point].GetDeviceId();
   }
   return -1;
 }
 
-PointState::Type TouchEvent::GetState( std::size_t point ) const
+PointState::Type TouchEvent::GetState(std::size_t point) const
 {
-  if( point < mPoints.size() )
+  if(point < mPoints.size())
   {
-    return mPoints[ point ].GetState();
+    return mPoints[point].GetState();
   }
   return PointState::FINISHED;
 }
 
-Dali::Actor TouchEvent::GetHitActor( std::size_t point ) const
+Dali::Actor TouchEvent::GetHitActor(std::size_t point) const
 {
-  if( point < mPoints.size() )
+  if(point < mPoints.size())
   {
-    return mPoints[ point ].GetHitActor();
+    return mPoints[point].GetHitActor();
   }
   return Dali::Actor();
 }
 
-const Vector2& TouchEvent::GetLocalPosition( std::size_t point ) const
+const Vector2& TouchEvent::GetLocalPosition(std::size_t point) const
 {
-  if( point < mPoints.size() )
+  if(point < mPoints.size())
   {
-    return mPoints[ point ].GetLocalPosition();
+    return mPoints[point].GetLocalPosition();
   }
   return Vector2::ZERO;
 }
 
-const Vector2& TouchEvent::GetScreenPosition( std::size_t point ) const
+const Vector2& TouchEvent::GetScreenPosition(std::size_t point) const
 {
-  if( point < mPoints.size() )
+  if(point < mPoints.size())
   {
-    return mPoints[ point ].GetScreenPosition();
+    return mPoints[point].GetScreenPosition();
   }
   return Vector2::ZERO;
 }
 
-float TouchEvent::GetRadius( std::size_t point ) const
+float TouchEvent::GetRadius(std::size_t point) const
 {
-  if( point < mPoints.size() )
+  if(point < mPoints.size())
   {
-    return mPoints[ point ].GetRadius();
+    return mPoints[point].GetRadius();
   }
   return 0.0f;
 }
 
-const Vector2& TouchEvent::GetEllipseRadius( std::size_t point ) const
+const Vector2& TouchEvent::GetEllipseRadius(std::size_t point) const
 {
-  if( point < mPoints.size() )
+  if(point < mPoints.size())
   {
-    return mPoints[ point ].GetEllipseRadius();
+    return mPoints[point].GetEllipseRadius();
   }
   return Vector2::ZERO;
 }
 
-float TouchEvent::GetPressure( std::size_t point ) const
+float TouchEvent::GetPressure(std::size_t point) const
 {
-  if( point < mPoints.size() )
+  if(point < mPoints.size())
   {
-    return mPoints[ point ].GetPressure();
+    return mPoints[point].GetPressure();
   }
   return 1.0f;
 }
 
-Degree TouchEvent::GetAngle( std::size_t point ) const
+Degree TouchEvent::GetAngle(std::size_t point) const
 {
-  if( point < mPoints.size() )
+  if(point < mPoints.size())
   {
-    return mPoints[ point ].GetAngle();
+    return mPoints[point].GetAngle();
   }
   return Degree();
 }
 
-const Integration::Point& TouchEvent::GetPoint( std::size_t point ) const
+const Integration::Point& TouchEvent::GetPoint(std::size_t point) const
 {
-  DALI_ASSERT_DEBUG( point < mPoints.size() && "No point at index" );
-  return mPoints[ point ];
+  DALI_ASSERT_DEBUG(point < mPoints.size() && "No point at index");
+  return mPoints[point];
 }
 
-Integration::Point& TouchEvent::GetPoint( std::size_t point )
+Integration::Point& TouchEvent::GetPoint(std::size_t point)
 {
-  DALI_ASSERT_DEBUG( point < mPoints.size() && "No point at index" );
-  return mPoints[ point ];
+  DALI_ASSERT_DEBUG(point < mPoints.size() && "No point at index");
+  return mPoints[point];
 }
 
-Device::Class::Type TouchEvent::GetDeviceClass( std::size_t point ) const
+Device::Class::Type TouchEvent::GetDeviceClass(std::size_t point) const
 {
-  if( point < mPoints.size() )
+  if(point < mPoints.size())
   {
-    return mPoints[ point ].GetDeviceClass();
+    return mPoints[point].GetDeviceClass();
   }
   return Device::Class::NONE;
 }
 
-Device::Subclass::Type TouchEvent::GetDeviceSubclass( std::size_t point ) const
+Device::Subclass::Type TouchEvent::GetDeviceSubclass(std::size_t point) const
 {
-  if( point < mPoints.size() )
+  if(point < mPoints.size())
   {
-    return mPoints[ point ].GetDeviceSubclass();
+    return mPoints[point].GetDeviceSubclass();
   }
   return Device::Subclass::NONE;
 }
 
-MouseButton::Type TouchEvent::GetMouseButton( std::size_t point ) const
+MouseButton::Type TouchEvent::GetMouseButton(std::size_t point) const
 {
-  if( point < mPoints.size() )
+  if(point < mPoints.size())
   {
-    return mPoints[ point ].GetMouseButton();
+    return mPoints[point].GetMouseButton();
   }
   return MouseButton::INVALID;
 }
 
-void TouchEvent::AddPoint( const Integration::Point& point )
+void TouchEvent::AddPoint(const Integration::Point& point)
 {
-  mPoints.push_back( point );
+  mPoints.push_back(point);
 }
 
-} // namsespace Internal
+} // namespace Internal
 
 } // namespace Dali

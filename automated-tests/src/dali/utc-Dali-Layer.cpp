@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -194,7 +194,6 @@ int UtcDaliLayerRaise2(void)
   END_TEST;
 }
 
-
 int UtcDaliLayerLower1(void)
 {
   tet_infoline("Testing Dali::Layer::Lower()");
@@ -218,7 +217,6 @@ int UtcDaliLayerLower1(void)
   DALI_TEST_EQUALS(layer2.GetProperty<int>(Layer::Property::DEPTH), 0u, TEST_LOCATION);
   END_TEST;
 }
-
 
 int UtcDaliLayerLower2(void)
 {
@@ -338,7 +336,6 @@ int UtcDaliLayerLowerToBottom2(void)
   DALI_TEST_EQUALS(layer3.GetProperty<int>(Layer::Property::DEPTH), 0u, TEST_LOCATION);
   END_TEST;
 }
-
 
 int UtcDaliLayerSetClipping(void)
 {

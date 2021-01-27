@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PROPERTY_CONDITIONS_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,35 +23,30 @@
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/property-conditions.h>
 #include <dali/public-api/object/property-value.h>
-#include <dali/public-api/object/property-value.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 /**
  * Structure to contain PropertyCondition internal data
  */
 
 class PropertyCondition : public Dali::BaseObject
 {
-
 public:
-
   /**
    * Condition types.
    */
   enum Type
   {
-    False,                ///< Result Always False
-    LessThan,             ///< Magnitude of type is less than float value (arg0).
-    GreaterThan,          ///< Magnitude of type is greater than float value (arg0).
-    Inside,               ///< Magnitude of type is within float values (arg0 & arg1).
-    Outside,              ///< Magnitude of type is outside float values (arg0 & arg1).
-    Step,                 ///< Value of type has crossed a step amount
-    VariableStep          ///< Similar to step, except user can define a list of steps from reference value
+    False,       ///< Result Always False
+    LessThan,    ///< Magnitude of type is less than float value (arg0).
+    GreaterThan, ///< Magnitude of type is greater than float value (arg0).
+    Inside,      ///< Magnitude of type is within float values (arg0 & arg1).
+    Outside,     ///< Magnitude of type is outside float values (arg0 & arg1).
+    Step,        ///< Value of type has crossed a step amount
+    VariableStep ///< Similar to step, except user can define a list of steps from reference value
   };
 
   /**
@@ -65,7 +60,6 @@ public:
   ~PropertyCondition() override;
 
 private:
-
   // Not implemented
   PropertyCondition(const PropertyCondition& rhs);
 
@@ -73,10 +67,8 @@ private:
   PropertyCondition& operator=(const PropertyCondition& rhs);
 
 public:
-
-  Type type;                     ///< The condition Type.
+  Type                type;      ///< The condition Type.
   Dali::Vector<float> arguments; ///< The condition Arguments.
-
 };
 
 } // namespace Internal
@@ -85,7 +77,7 @@ public:
 
 inline Internal::PropertyCondition& GetImplementation(Dali::PropertyCondition& pub)
 {
-  DALI_ASSERT_ALWAYS( pub && "PropertyCondition handle is empty" );
+  DALI_ASSERT_ALWAYS(pub && "PropertyCondition handle is empty");
 
   BaseObject& handle = pub.GetBaseObject();
 
@@ -94,7 +86,7 @@ inline Internal::PropertyCondition& GetImplementation(Dali::PropertyCondition& p
 
 inline const Internal::PropertyCondition& GetImplementation(const Dali::PropertyCondition& pub)
 {
-  DALI_ASSERT_ALWAYS( pub && "PropertyCondition handle is empty" );
+  DALI_ASSERT_ALWAYS(pub && "PropertyCondition handle is empty");
 
   const BaseObject& handle = pub.GetBaseObject();
 

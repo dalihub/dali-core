@@ -2,7 +2,7 @@
 #define DALI_PROPERTY_HELPER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,29 +22,27 @@
 #include <cstdint>
 
 // INTERNAL INCLUDES
-#include <dali/integration-api/bitmap.h>
 #include <dali/devel-api/scripting/enum-helper.h>
+#include <dali/integration-api/bitmap.h>
 #include <dali/internal/event/object/default-property-metadata.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 /**
  * These macros are used to define a table of property details per object.
  * Checking of the table index VS the property enum index happens during compile time.
  * the macros define an instance of PropertyMetadata with the name that is passed to DALI_PROPERTY_TABLE_END
  */
 #define DALI_PROPERTY_TABLE_BEGIN static constexpr Dali::PropertyDetails DEFAULT_PROPERTY_DETAILS[] = {
-
 #define DALI_PROPERTY_TABLE_END(startIndex, tableName)                                  \
-  };                                                                                    \
+  }                                                                                     \
+  ;                                                                                     \
   static constexpr auto tableName = GeneratePropertyMetadata(DEFAULT_PROPERTY_DETAILS); \
   static_assert(CheckPropertyMetadata(tableName, startIndex), "Property enumeration mismatch");
 
-#define DALI_PROPERTY( text, type, writable, animatable, constraint, index ) { text, index, Dali::Property::type, writable, animatable, constraint },
+#define DALI_PROPERTY(text, type, writable, animatable, constraint, index) {text, index, Dali::Property::type, writable, animatable, constraint},
 
 /**
  * @brief Case insensitive string comparison.
@@ -58,8 +56,7 @@ namespace Internal
  *
  * @return true if strings are the same
  */
-bool CompareTokens( const char * first, const char * second, uint32_t& size );
-
+bool CompareTokens(const char* first, const char* second, uint32_t& size);
 
 /**
  * @brief Helper to adjust the current value of a variable from the given property-value
@@ -67,11 +64,11 @@ bool CompareTokens( const char * first, const char * second, uint32_t& size );
  * @param[in] value The relative value as a Property::Value
  * @return true if value adjusted, false otherwise
  */
-template< typename PropertyType >
-bool AdjustValue( PropertyType& currentValue, const Property::Value& value )
+template<typename PropertyType>
+bool AdjustValue(PropertyType& currentValue, const Property::Value& value)
 {
   PropertyType relativeValue;
-  if( value.Get( relativeValue ) )
+  if(value.Get(relativeValue))
   {
     currentValue += relativeValue;
     return true;

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_SCENE_CONTROLLER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,10 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace SceneGraph
 {
-
 class RenderMessageDispatcher;
 class RenderQueue;
 class DiscardQueue;
@@ -37,7 +34,6 @@ class DiscardQueue;
 class SceneController
 {
 public:
-
   /**
    * Constructor
    */
@@ -67,12 +63,11 @@ public:
   virtual DiscardQueue& GetDiscardQueue() = 0;
 
 private:
-
   // Undefined copy constructor.
-  SceneController( const SceneController& );
+  SceneController(const SceneController&);
 
   // Undefined assignment operator.
-  SceneController& operator=( const SceneController& );
+  SceneController& operator=(const SceneController&);
 };
 
 } // namespace SceneGraph

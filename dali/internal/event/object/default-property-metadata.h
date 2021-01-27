@@ -2,7 +2,7 @@
 #define DALI_DEFAULT_PROPERTY_METADATA_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,12 +36,12 @@ namespace Dali
  */
 struct PropertyDetails
 {
-  std::string_view name;       ///< The name of the property.
-  Property::Index enumIndex;  ///< Used to check the index is correct within a debug build.
-  Property::Type type;        ///< The property type.
-  bool writable;              ///< Whether the property is writable
-  bool animatable;            ///< Whether the property is animatable.
-  bool constraintInput;       ///< Whether the property can be used as an input to a constraint.
+  std::string_view name;            ///< The name of the property.
+  Property::Index  enumIndex;       ///< Used to check the index is correct within a debug build.
+  Property::Type   type;            ///< The property type.
+  bool             writable;        ///< Whether the property is writable
+  bool             animatable;      ///< Whether the property is animatable.
+  bool             constraintInput; ///< Whether the property can be used as an input to a constraint.
 };
 
 /**

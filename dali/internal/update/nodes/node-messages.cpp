@@ -16,18 +16,15 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/update/nodes/node-messages.h>
 #include <dali/internal/update/manager/update-manager.h>
+#include <dali/internal/update/nodes/node-messages.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace SceneGraph
 {
-
 // Messages for Node
 
 NodePropertyMessageBase::NodePropertyMessageBase(UpdateManager& updateManager)

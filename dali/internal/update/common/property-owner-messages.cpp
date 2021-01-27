@@ -20,13 +20,10 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace SceneGraph
 {
-
 // Messages for a property owner
 
 PropertyOwnerMessageBase::PropertyOwnerMessageBase() = default;

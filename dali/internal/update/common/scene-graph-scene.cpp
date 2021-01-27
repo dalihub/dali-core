@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
 #include <dali/internal/update/common/scene-graph-scene.h>
 
 // INTERNAL INCLUDES
-#include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
 #include <dali/internal/render/gl-resources/context.h>
+#include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
 
 namespace Dali
 {
@@ -27,15 +27,14 @@ namespace Internal
 {
 namespace SceneGraph
 {
-
 Scene::Scene()
-: mContext( nullptr ),
+: mContext(nullptr),
   mFrameRenderedCallbacks(),
   mFramePresentedCallbacks(),
-  mSkipRendering( false ),
+  mSkipRendering(false),
   mSurfaceRect(),
-  mSurfaceOrientation( 0 ),
-  mSurfaceRectChanged( false )
+  mSurfaceOrientation(0),
+  mSurfaceRectChanged(false)
 {
 }
 
@@ -45,7 +44,7 @@ Scene::~Scene()
   mFramePresentedCallbacks.clear();
 }
 
-void Scene::Initialize( Context& context )
+void Scene::Initialize(Context& context)
 {
   mContext = &context;
 }
@@ -60,39 +59,39 @@ RenderInstructionContainer& Scene::GetRenderInstructions()
   return mInstructions;
 }
 
-void Scene::AddFrameRenderedCallback( CallbackBase* callback, int32_t frameId )
+void Scene::AddFrameRenderedCallback(CallbackBase* callback, int32_t frameId)
 {
-  mFrameRenderedCallbacks.push_back( std::make_pair( std::unique_ptr< CallbackBase >( callback ), frameId ) );
+  mFrameRenderedCallbacks.push_back(std::make_pair(std::unique_ptr<CallbackBase>(callback), frameId));
 }
 
-void Scene::AddFramePresentedCallback( CallbackBase* callback, int32_t frameId )
+void Scene::AddFramePresentedCallback(CallbackBase* callback, int32_t frameId)
 {
-  mFramePresentedCallbacks.push_back( std::make_pair( std::unique_ptr< CallbackBase >( callback ), frameId ) );
+  mFramePresentedCallbacks.push_back(std::make_pair(std::unique_ptr<CallbackBase>(callback), frameId));
 }
 
-void Scene::GetFrameRenderedCallback( Dali::Integration::Scene::FrameCallbackContainer& callbacks )
+void Scene::GetFrameRenderedCallback(Dali::Integration::Scene::FrameCallbackContainer& callbacks)
 {
   // Transfer owership of the callbacks
-  for( auto&& iter : mFrameRenderedCallbacks )
+  for(auto&& iter : mFrameRenderedCallbacks)
   {
-    callbacks.push_back( std::make_pair( std::move( iter.first ), iter.second ) );
+    callbacks.push_back(std::make_pair(std::move(iter.first), iter.second));
   }
 
   mFrameRenderedCallbacks.clear();
 }
 
-void Scene::GetFramePresentedCallback( Dali::Integration::Scene::FrameCallbackContainer& callbacks )
+void Scene::GetFramePresentedCallback(Dali::Integration::Scene::FrameCallbackContainer& callbacks)
 {
   // Transfer owership of the callbacks
-  for( auto&& iter : mFramePresentedCallbacks )
+  for(auto&& iter : mFramePresentedCallbacks)
   {
-    callbacks.push_back( std::make_pair( std::move( iter.first ), iter.second ) );
+    callbacks.push_back(std::make_pair(std::move(iter.first), iter.second));
   }
 
   mFramePresentedCallbacks.clear();
 }
 
-void Scene::SetSkipRendering( bool skip )
+void Scene::SetSkipRendering(bool skip)
 {
   mSkipRendering = skip;
 }
@@ -102,9 +101,9 @@ bool Scene::IsRenderingSkipped() const
   return mSkipRendering;
 }
 
-void Scene::SetSurfaceRect( const Rect<int32_t>& rect )
+void Scene::SetSurfaceRect(const Rect<int32_t>& rect)
 {
-  mSurfaceRect = rect;
+  mSurfaceRect        = rect;
   mSurfaceRectChanged = true;
 }
 
@@ -113,7 +112,7 @@ const Rect<int32_t>& Scene::GetSurfaceRect() const
   return mSurfaceRect;
 }
 
-void Scene::SetSurfaceOrientation( int32_t orientation )
+void Scene::SetSurfaceOrientation(int32_t orientation)
 {
   mSurfaceOrientation = orientation;
 }
@@ -126,13 +125,13 @@ int32_t Scene::GetSurfaceOrientation() const
 bool Scene::IsSurfaceRectChanged()
 {
   bool surfaceRectChanged = mSurfaceRectChanged;
-  mSurfaceRectChanged = false;
+  mSurfaceRectChanged     = false;
 
   return surfaceRectChanged;
 }
 
-} //SceneGraph
+} // namespace SceneGraph
 
-} //Internal
+} // namespace Internal
 
-} //Dali
+} // namespace Dali

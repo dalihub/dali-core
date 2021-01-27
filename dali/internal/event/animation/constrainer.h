@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_CONSTRAINER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +24,9 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
-typedef Dali::Vector<Object*>         ObjectContainer;
+typedef Dali::Vector<Object*> ObjectContainer;
 using ObjectIter = ObjectContainer::Iterator;
 
 /**
@@ -39,7 +37,6 @@ using ObjectIter = ObjectContainer::Iterator;
 class Constrainer : public Object, public Object::Observer
 {
 public:
-
   /**
    * Constructor.
    */
@@ -51,24 +48,26 @@ public:
   ~Constrainer() override;
 
 public: // Object::Observer methods
-
   /**
    * @copydoc Object::Observer::SceneObjectAdded()
    */
-  void SceneObjectAdded( Object& object ) override{}
+  void SceneObjectAdded(Object& object) override
+  {
+  }
 
   /**
    * @copydoc Object::Observer::SceneObjectRemoved()
    */
-  void SceneObjectRemoved( Object& object ) override{}
+  void SceneObjectRemoved(Object& object) override
+  {
+  }
 
   /**
    * @copydoc Object::Observer::ObjectDestroyed()
    */
-  void ObjectDestroyed( Object& object ) override;
+  void ObjectDestroyed(Object& object) override;
 
 public:
-
   /**
    * @brief Applies the constraint to the target property
 
@@ -77,27 +76,25 @@ public:
    * @param[in] range The range of values in the source property which will be mapped to [0,1]
    * @param[in] wrap Wrapping domain. Source property will be wrapped in the domain [wrap.x,wrap.y] before mapping to [0,1]
    */
-  virtual void Apply( Property target, Property source, const Vector2& range, const Vector2& wrap) = 0;
+  virtual void Apply(Property target, Property source, const Vector2& range, const Vector2& wrap) = 0;
 
   /**
    * @brief Removes the constraint in the target object
    *
    * @param[in] target A handle to an object constrained by the Constrainer
    */
-  void Remove( Dali::Handle& target );
+  void Remove(Dali::Handle& target);
 
 protected:
-
   /**
    * @brief Adds an object to the list of observed objects
    *
    * @param[in] handle A handle to the object to be observed
    */
-  void Observe( Dali::Handle& handle );
+  void Observe(Dali::Handle& handle);
 
 private:
-
-  ObjectContainer   mObservedObjects;   ///< The list of object which have been constrained by the Constrainer
+  ObjectContainer mObservedObjects; ///< The list of object which have been constrained by the Constrainer
 };
 
 } // namespace Internal

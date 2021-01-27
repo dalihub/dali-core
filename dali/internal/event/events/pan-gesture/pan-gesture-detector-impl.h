@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PAN_GESTURE_DETECTOR_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,21 +19,19 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/internal/event/events/gesture-detector-impl.h>
 #include <dali/public-api/events/gesture.h>
 #include <dali/public-api/events/pan-gesture-detector.h>
-#include <dali/public-api/math/vector2.h>
-#include <dali/internal/event/events/gesture-detector-impl.h>
 #include <dali/public-api/events/pan-gesture.h>
+#include <dali/public-api/math/vector2.h>
 
 namespace Dali
 {
-
 class TouchEvent;
 struct Radian;
 
 namespace Internal
 {
-
 class PanGestureDetector;
 using PanGestureDetectorPtr       = IntrusivePtr<PanGestureDetector>;
 using PanGestureDetectorContainer = DerivedGestureDetectorContainer<PanGestureDetector>::type;
@@ -53,7 +51,6 @@ public: // Typedefs
   using AngleContainer     = std::vector<AngleThresholdPair>;
 
 public: // Creation
-
   /**
    * Create a new gesture detector.
    * @return A smart-pointer to the newly allocated detector.
@@ -61,7 +58,6 @@ public: // Creation
   static PanGestureDetectorPtr New();
 
 public:
-
   /**
    * @copydoc Dali::PanGestureDetector::SetMinimumTouchesRequired(unsigned int)
    */
@@ -85,12 +81,12 @@ public:
   /**
    * @copydoc Dali::PanGestureDetector::AddAngle()
    */
-  void AddAngle( Radian angle, Radian threshold );
+  void AddAngle(Radian angle, Radian threshold);
 
   /**
    * @copydoc Dali::PanGestureDetector::AddDirection()
    */
-  void AddDirection( Radian direction, Radian threshold );
+  void AddDirection(Radian direction, Radian threshold);
 
   /**
    * @copydoc Dali::PanGestureDetector::GetAngleCount()
@@ -110,12 +106,12 @@ public:
   /**
    * @copydoc Dali::PanGestureDetector::RemoveAngle()
    */
-  void RemoveAngle( Radian angle );
+  void RemoveAngle(Radian angle);
 
   /**
    * @copydoc Dali::PanGestureDetector::RemoveDirection()
    */
-  void RemoveDirection( Radian direction );
+  void RemoveDirection(Radian direction);
 
   /**
    * Checks whether the pan gesture detector requires a directional pan for emission.
@@ -127,10 +123,9 @@ public:
    * Checks whether the given pan angle is allowed for this gesture detector.
    * @param[in]  angle  The angle to check.
    */
-  bool CheckAngleAllowed( Radian angle ) const;
+  bool CheckAngleAllowed(Radian angle) const;
 
 public:
-
   /**
    * Called by the PanGestureProcessor when a pan gesture event occurs within the bounds of our
    * attached actor.
@@ -140,7 +135,6 @@ public:
   void EmitPanGestureSignal(Dali::Actor actor, const Dali::PanGesture& pan);
 
 public: // Signals
-
   /**
    * @copydoc Dali::PanGestureDetector::DetectedSignal()
    */
@@ -158,22 +152,20 @@ public: // Signals
    * @return True if the signal was connected.
    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
    */
-  static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
+  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor);
 
 public: // Override Pan Gesture
-
   /**
    * @copydoc Dali::PanGestureDetector::SetPanGestureProperties()
    */
-  static void SetPanGestureProperties( const Dali::PanGesture& pan );
+  static void SetPanGestureProperties(const Dali::PanGesture& pan);
 
 protected:
-
   /**
    * Construct a new PanGestureDetector.
    * @param sceneObject the scene object
    */
-  PanGestureDetector( const SceneGraph::PanGesture& sceneObject );
+  PanGestureDetector(const SceneGraph::PanGesture& sceneObject);
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -181,9 +173,8 @@ protected:
   ~PanGestureDetector() override;
 
 private:
-
   // Undefined
-  PanGestureDetector() = delete;
+  PanGestureDetector()                          = delete;
   PanGestureDetector(const PanGestureDetector&) = delete;
   PanGestureDetector& operator=(const PanGestureDetector& rhs) = delete;
 
@@ -209,7 +200,6 @@ private:
    */
   void OnActorDestroyed(Object& object) override;
 
-
   // Default property extensions from Object
 
   /**
@@ -220,27 +210,25 @@ private:
   /**
    * @copydoc Dali::Internal::Object::GetDefaultProperty()
    */
-  Property::Value GetDefaultProperty( Property::Index index ) const override;
+  Property::Value GetDefaultProperty(Property::Index index) const override;
 
   /**
    * @copydoc Dali::Internal::Object::GetDefaultPropertyCurrentValue()
    */
-  Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const override;
+  Property::Value GetDefaultPropertyCurrentValue(Property::Index index) const override;
 
   /**
    * @copydoc Dali::Internal::Object::GetSceneObjectInputProperty()
    */
-  const PropertyInputImpl* GetSceneObjectInputProperty( Property::Index index ) const override;
+  const PropertyInputImpl* GetSceneObjectInputProperty(Property::Index index) const override;
 
 private:
-
   Dali::PanGestureDetector::DetectedSignalType mDetectedSignal;
 
   unsigned int mMinimumTouches; ///< The minimum number of fingers required to be touching for pan.
   unsigned int mMaximumTouches; ///< The maximum number of fingers required to be touching for pan.
 
   AngleContainer mAngleContainer; ///< A container of all angles allowed for pan to occur.
-
 };
 
 } // namespace Internal
@@ -249,7 +237,7 @@ private:
 
 inline Internal::PanGestureDetector& GetImplementation(Dali::PanGestureDetector& detector)
 {
-  DALI_ASSERT_ALWAYS( detector && "PanGestureDetector handle is empty" );
+  DALI_ASSERT_ALWAYS(detector && "PanGestureDetector handle is empty");
 
   BaseObject& handle = detector.GetBaseObject();
 
@@ -258,7 +246,7 @@ inline Internal::PanGestureDetector& GetImplementation(Dali::PanGestureDetector&
 
 inline const Internal::PanGestureDetector& GetImplementation(const Dali::PanGestureDetector& detector)
 {
-  DALI_ASSERT_ALWAYS( detector && "PanGestureDetector handle is empty" );
+  DALI_ASSERT_ALWAYS(detector && "PanGestureDetector handle is empty");
 
   const BaseObject& handle = detector.GetBaseObject();
 

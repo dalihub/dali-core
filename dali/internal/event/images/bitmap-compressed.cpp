@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,18 +22,17 @@
 #include <cstdlib>
 
 // INTERNAL INCLUDES
-#include <dali/internal/common/core-impl.h>
 #include <dali/integration-api/debug.h>
+#include <dali/internal/common/core-impl.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
 using namespace Dali::Pixel;
 
-BitmapCompressed::BitmapCompressed( const ResourcePolicy::Discardable discardable )
-: Bitmap( discardable ),
+BitmapCompressed::BitmapCompressed(const ResourcePolicy::Discardable discardable)
+: Bitmap(discardable),
   mBufferSize(0)
 {
 }
@@ -43,20 +42,20 @@ BitmapCompressed::~BitmapCompressed()
   DALI_LOG_TRACE_METHOD(Debug::Filter::gImage);
 }
 
-void BitmapCompressed::Initialize( Pixel::Format pixelFormat,
-                                   const uint32_t width,
-                                   const uint32_t height,
-                                   const uint32_t bufferSize )
+void BitmapCompressed::Initialize(Pixel::Format  pixelFormat,
+                                  const uint32_t width,
+                                  const uint32_t height,
+                                  const uint32_t bufferSize)
 {
-  Dali::Integration::Bitmap::Initialize( pixelFormat, width, height );
-  mBufferSize  = bufferSize;
+  Dali::Integration::Bitmap::Initialize(pixelFormat, width, height);
+  mBufferSize       = bufferSize;
   mAlphaChannelUsed = false; // Default to not using Alpha as we cannot scan the pixels to look for transparent pixels. A follow-up work-item and patch will add an "assume alpha present" flag to ImageAttributes.
 }
 
-Dali::Integration::PixelBuffer* BitmapCompressed::ReserveBufferOfSize( Pixel::Format pixelFormat,
-                                                                       const uint32_t  width,
-                                                                       const uint32_t  height,
-                                                                       const uint32_t  bufferSize )
+Dali::Integration::PixelBuffer* BitmapCompressed::ReserveBufferOfSize(Pixel::Format  pixelFormat,
+                                                                      const uint32_t width,
+                                                                      const uint32_t height,
+                                                                      const uint32_t bufferSize)
 {
   // Sanity check that a not-outrageous amount of data is being passed in (indicating a client error):
   DALI_ASSERT_DEBUG(bufferSize < (1U << 27U) && "That is far too much compressed data."); // 128MB of compressed data == unreasonable.
@@ -65,11 +64,11 @@ Dali::Integration::PixelBuffer* BitmapCompressed::ReserveBufferOfSize( Pixel::Fo
 
   Initialize(pixelFormat, width, height, bufferSize);
 
-  mData = reinterpret_cast< Dali::Integration::PixelBuffer* >( malloc( bufferSize ) );
+  mData = reinterpret_cast<Dali::Integration::PixelBuffer*>(malloc(bufferSize));
 
   return mData;
 }
 
-} //namespace Integration
+} // namespace Internal
 
 } //namespace Dali

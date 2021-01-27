@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ACTOR_OBSERVER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,13 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/signals/callback.h>
 #include <dali/internal/event/common/object-impl.h>
+#include <dali/public-api/signals/callback.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 class Actor;
 
 /**
@@ -36,7 +34,6 @@ class Actor;
 struct ActorObserver : public Object::Observer
 {
 public:
-
   // Construction & Destruction
 
   /**
@@ -57,7 +54,7 @@ public:
    *
    * @note Ownership of callback is passed onto this class.
    */
-  ActorObserver( CallbackBase* callback );
+  ActorObserver(CallbackBase* callback);
 
   /**
    * Non virtual destructor
@@ -74,7 +71,7 @@ public:
    * @note The other's actor is appropriately disconnected.
    * @note Ownership of callback is passed onto this class.
    */
-  ActorObserver( ActorObserver&& other );
+  ActorObserver(ActorObserver&& other);
 
   /**
    * Move assignment operator.
@@ -84,12 +81,12 @@ public:
    * @note The other's actor is appropriately disconnected.
    * @note Ownership of callback is passed onto this class.
    */
-  ActorObserver& operator=( ActorObserver&& other );
+  ActorObserver& operator=(ActorObserver&& other);
 
   // Not copyable
 
-  ActorObserver( const ActorObserver& ) = delete;   ///< Deleted copy constructor.
-  ActorObserver& operator=( const ActorObserver& ) = delete;   ///< Deleted copy assignment operator.
+  ActorObserver(const ActorObserver&) = delete;            ///< Deleted copy constructor.
+  ActorObserver& operator=(const ActorObserver&) = delete; ///< Deleted copy assignment operator.
 
   // Methods
 
@@ -105,7 +102,7 @@ public:
    * This disconnects the required signals from the currently set actor and connects to the required
    * signals for the the actor specified (if set).
    */
-  void SetActor( Actor* actor );
+  void SetActor(Actor* actor);
 
   /**
    * Resets the set actor and disconnects any connected signals.
@@ -113,32 +110,31 @@ public:
   void ResetActor();
 
 private:
-
   /**
    * This will be called if an actor is added to the scene.
    * @param[in] object The object object.
    * @see Object::Observer::SceneObjectAdded()
    */
-  void SceneObjectAdded( Object& object ) override;
+  void SceneObjectAdded(Object& object) override;
 
   /**
    * This will be called when the actor is removed from the scene.
    * @param[in] object The object object.
    * @see Object::Observer::SceneObjectRemoved()
    */
-  void SceneObjectRemoved( Object& object ) override;
+  void SceneObjectRemoved(Object& object) override;
 
   /**
    * This will be called when the actor is destroyed. We should clear the actor.
    * No need to stop observing as the object is being destroyed anyway.
    * @see Object::Observer::ObjectDestroyed()
    */
-  void ObjectDestroyed( Object& object ) override;
+  void ObjectDestroyed(Object& object) override;
 
 private:
-  Actor* mActor;                 ///< Raw pointer to an Actor.
-  bool  mActorDisconnected;      ///< Indicates whether the actor has been disconnected from the scene
-  CallbackBase* mRemoveCallback; ///< Callback to call when the observed actor is removed from the scene
+  Actor*        mActor;             ///< Raw pointer to an Actor.
+  bool          mActorDisconnected; ///< Indicates whether the actor has been disconnected from the scene
+  CallbackBase* mRemoveCallback;    ///< Callback to call when the observed actor is removed from the scene
 };
 
 } // namespace Internal
@@ -146,4 +142,3 @@ private:
 } // namespace Dali
 
 #endif // DALI_INTERNAL_ACTOR_OBSERVER_H
-

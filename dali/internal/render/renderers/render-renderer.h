@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_RENDERER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/math/matrix.h>
-#include <dali/public-api/math/vector4.h>
-#include <dali/public-api/rendering/texture-set.h>
+#include <dali/integration-api/debug.h>
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/type-abstraction-enums.h>
@@ -30,11 +28,12 @@
 #include <dali/internal/render/gl-resources/gl-resource-owner.h>
 #include <dali/internal/render/renderers/render-geometry.h>
 #include <dali/internal/update/manager/render-instruction-processor.h>
-#include <dali/integration-api/debug.h>
+#include <dali/public-api/math/matrix.h>
+#include <dali/public-api/math/vector4.h>
+#include <dali/public-api/rendering/texture-set.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
 class Context;
@@ -48,11 +47,10 @@ class Shader;
 class NodeDataProvider;
 
 class RenderInstruction; //for relfection effect
-}
+} // namespace SceneGraph
 
 namespace Render
 {
-
 /**
  * Renderers are used to render meshes
  * These objects are used during RenderManager::Render(), so properties modified during
@@ -61,34 +59,31 @@ namespace Render
 class Renderer : public GlResourceOwner
 {
 public:
-
   /**
    * @brief Struct to encapsulate stencil parameters required for control of the stencil buffer.
    */
   struct StencilParameters
   {
-    StencilParameters( RenderMode::Type renderMode, StencilFunction::Type stencilFunction, int stencilFunctionMask,
-                       int stencilFunctionReference, int stencilMask, StencilOperation::Type stencilOperationOnFail,
-                       StencilOperation::Type stencilOperationOnZFail, StencilOperation::Type stencilOperationOnZPass )
-    : stencilFunctionMask      ( stencilFunctionMask      ),
-      stencilFunctionReference ( stencilFunctionReference ),
-      stencilMask              ( stencilMask              ),
-      renderMode               ( renderMode               ),
-      stencilFunction          ( stencilFunction          ),
-      stencilOperationOnFail   ( stencilOperationOnFail   ),
-      stencilOperationOnZFail  ( stencilOperationOnZFail  ),
-      stencilOperationOnZPass  ( stencilOperationOnZPass  )
+    StencilParameters(RenderMode::Type renderMode, StencilFunction::Type stencilFunction, int stencilFunctionMask, int stencilFunctionReference, int stencilMask, StencilOperation::Type stencilOperationOnFail, StencilOperation::Type stencilOperationOnZFail, StencilOperation::Type stencilOperationOnZPass)
+    : stencilFunctionMask(stencilFunctionMask),
+      stencilFunctionReference(stencilFunctionReference),
+      stencilMask(stencilMask),
+      renderMode(renderMode),
+      stencilFunction(stencilFunction),
+      stencilOperationOnFail(stencilOperationOnFail),
+      stencilOperationOnZFail(stencilOperationOnZFail),
+      stencilOperationOnZPass(stencilOperationOnZPass)
     {
     }
 
-    int stencilFunctionMask;                          ///< The stencil function mask
-    int stencilFunctionReference;                     ///< The stencil function reference
-    int stencilMask;                                  ///< The stencil mask
-    RenderMode::Type       renderMode:4;              ///< The render mode
-    StencilFunction::Type  stencilFunction:4;         ///< The stencil function
-    StencilOperation::Type stencilOperationOnFail:4;  ///< The stencil operation for stencil test fail
-    StencilOperation::Type stencilOperationOnZFail:4; ///< The stencil operation for depth test fail
-    StencilOperation::Type stencilOperationOnZPass:4; ///< The stencil operation for depth test pass
+    int                    stencilFunctionMask;         ///< The stencil function mask
+    int                    stencilFunctionReference;    ///< The stencil function reference
+    int                    stencilMask;                 ///< The stencil mask
+    RenderMode::Type       renderMode : 4;              ///< The render mode
+    StencilFunction::Type  stencilFunction : 4;         ///< The stencil function
+    StencilOperation::Type stencilOperationOnFail : 4;  ///< The stencil operation for stencil test fail
+    StencilOperation::Type stencilOperationOnZFail : 4; ///< The stencil operation for depth test fail
+    StencilOperation::Type stencilOperationOnZPass : 4; ///< The stencil operation for depth test pass
   };
 
   /**
@@ -114,16 +109,16 @@ public:
    * @param[in] depthFunction Depth function
    * @param[in] stencilParameters Struct containing all stencil related options
    */
-  static Renderer* New( SceneGraph::RenderDataProvider* dataProviders,
-                        Render::Geometry* geometry,
-                        uint32_t blendingBitmask,
-                        const Vector4& blendColor,
-                        FaceCullingMode::Type faceCullingMode,
-                        bool preMultipliedAlphaEnabled,
-                        DepthWriteMode::Type depthWriteMode,
-                        DepthTestMode::Type depthTestMode,
-                        DepthFunction::Type depthFunction,
-                        StencilParameters& stencilParameters );
+  static Renderer* New(SceneGraph::RenderDataProvider* dataProviders,
+                       Render::Geometry*               geometry,
+                       uint32_t                        blendingBitmask,
+                       const Vector4&                  blendColor,
+                       FaceCullingMode::Type           faceCullingMode,
+                       bool                            preMultipliedAlphaEnabled,
+                       DepthWriteMode::Type            depthWriteMode,
+                       DepthTestMode::Type             depthTestMode,
+                       DepthFunction::Type             depthFunction,
+                       StencilParameters&              stencilParameters);
 
   /**
    * Constructor.
@@ -138,24 +133,24 @@ public:
    * @param[in] depthFunction Depth function
    * @param[in] stencilParameters Struct containing all stencil related options
    */
-  Renderer( SceneGraph::RenderDataProvider* dataProviders,
-            Render::Geometry* geometry,
-            uint32_t blendingBitmask,
-            const Vector4& blendColor,
-            FaceCullingMode::Type faceCullingMode,
-            bool preMultipliedAlphaEnabled,
-            DepthWriteMode::Type depthWriteMode,
-            DepthTestMode::Type depthTestMode,
-            DepthFunction::Type depthFunction,
-            StencilParameters& stencilParameters );
+  Renderer(SceneGraph::RenderDataProvider* dataProviders,
+           Render::Geometry*               geometry,
+           uint32_t                        blendingBitmask,
+           const Vector4&                  blendColor,
+           FaceCullingMode::Type           faceCullingMode,
+           bool                            preMultipliedAlphaEnabled,
+           DepthWriteMode::Type            depthWriteMode,
+           DepthTestMode::Type             depthTestMode,
+           DepthFunction::Type             depthFunction,
+           StencilParameters&              stencilParameters);
 
   /**
    * Change the geometry used by the renderer
    * @param[in] geometry The new geometry
    */
-  void SetGeometry( Render::Geometry* geometry );
+  void SetGeometry(Render::Geometry* geometry);
 
-  void SetDrawCommands( Dali::DevelRenderer::DrawCommand* pDrawCommands, uint32_t size );
+  void SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, uint32_t size);
 
   /**
    * @brief Returns a reference to an array of draw commands
@@ -171,7 +166,7 @@ public:
    * This is called when the renderer is inside render thread
    * @param[in] context Context used by the renderer
    */
-  void Initialize( Context& context );
+  void Initialize(Context& context);
 
   /**
    * Destructor
@@ -182,44 +177,44 @@ public:
    * Set the face-culling mode.
    * @param[in] mode The face-culling mode.
    */
-  void SetFaceCullingMode( FaceCullingMode::Type mode );
+  void SetFaceCullingMode(FaceCullingMode::Type mode);
 
   /**
    * Set the bitmask for blending options
    * @param[in] bitmask A bitmask of blending options.
    */
-  void SetBlendingBitMask( uint32_t bitmask );
+  void SetBlendingBitMask(uint32_t bitmask);
 
   /**
    * Set the blend color for blending options
    * @param[in] blendColor The blend color to pass to GL
    */
-  void SetBlendColor( const Vector4& color );
+  void SetBlendColor(const Vector4& color);
 
   /**
    * Set the first element index to draw by the indexed draw
    * @param[in] firstElement index of first element to draw
    */
-  void SetIndexedDrawFirstElement( uint32_t firstElement );
+  void SetIndexedDrawFirstElement(uint32_t firstElement);
 
   /**
    * Set the number of elements to draw by the indexed draw
    * @param[in] elementsCount number of elements to draw
    */
-  void SetIndexedDrawElementsCount( uint32_t elementsCount );
+  void SetIndexedDrawElementsCount(uint32_t elementsCount);
 
   /**
    * @brief Set whether the Pre-multiplied Alpha Blending is required
    *
    * @param[in] preMultipled whether alpha is pre-multiplied.
    */
-  void EnablePreMultipliedAlpha( bool preMultipled );
+  void EnablePreMultipliedAlpha(bool preMultipled);
 
   /**
    * Sets the depth write mode
    * @param[in] depthWriteMode The depth write mode
    */
-  void SetDepthWriteMode( DepthWriteMode::Type depthWriteMode );
+  void SetDepthWriteMode(DepthWriteMode::Type depthWriteMode);
 
   /**
    * Query the Renderer's depth write mode
@@ -231,7 +226,7 @@ public:
    * Sets the depth test mode
    * @param[in] depthTestMode The depth test mode
    */
-  void SetDepthTestMode( DepthTestMode::Type depthTestMode );
+  void SetDepthTestMode(DepthTestMode::Type depthTestMode);
 
   /**
    * Query the Renderer's depth test mode
@@ -243,7 +238,7 @@ public:
    * Sets the depth function
    * @param[in] depthFunction The depth function
    */
-  void SetDepthFunction( DepthFunction::Type depthFunction );
+  void SetDepthFunction(DepthFunction::Type depthFunction);
 
   /**
    * Query the Renderer's depth function
@@ -255,7 +250,7 @@ public:
    * Sets the render mode
    * @param[in] renderMode The render mode
    */
-  void SetRenderMode( RenderMode::Type mode );
+  void SetRenderMode(RenderMode::Type mode);
 
   /**
    * Gets the render mode
@@ -267,7 +262,7 @@ public:
    * Sets the stencil function
    * @param[in] stencilFunction The stencil function
    */
-  void SetStencilFunction( StencilFunction::Type stencilFunction );
+  void SetStencilFunction(StencilFunction::Type stencilFunction);
 
   /**
    * Gets the stencil function
@@ -279,7 +274,7 @@ public:
    * Sets the stencil function mask
    * @param[in] stencilFunctionMask The stencil function mask
    */
-  void SetStencilFunctionMask( int stencilFunctionMask );
+  void SetStencilFunctionMask(int stencilFunctionMask);
 
   /**
    * Gets the stencil function mask
@@ -291,7 +286,7 @@ public:
    * Sets the stencil function reference
    * @param[in] stencilFunctionReference The stencil function reference
    */
-  void SetStencilFunctionReference( int stencilFunctionReference );
+  void SetStencilFunctionReference(int stencilFunctionReference);
 
   /**
    * Gets the stencil function reference
@@ -303,7 +298,7 @@ public:
    * Sets the stencil mask
    * @param[in] stencilMask The stencil mask
    */
-  void SetStencilMask( int stencilMask );
+  void SetStencilMask(int stencilMask);
 
   /**
    * Gets the stencil mask
@@ -315,7 +310,7 @@ public:
    * Sets the stencil operation for when the stencil test fails
    * @param[in] stencilOperationOnFail The stencil operation
    */
-  void SetStencilOperationOnFail( StencilOperation::Type stencilOperationOnFail );
+  void SetStencilOperationOnFail(StencilOperation::Type stencilOperationOnFail);
 
   /**
    * Gets the stencil operation for when the stencil test fails
@@ -327,7 +322,7 @@ public:
    * Sets the stencil operation for when the depth test fails
    * @param[in] stencilOperationOnZFail The stencil operation
    */
-  void SetStencilOperationOnZFail( StencilOperation::Type stencilOperationOnZFail );
+  void SetStencilOperationOnZFail(StencilOperation::Type stencilOperationOnZFail);
 
   /**
    * Gets the stencil operation for when the depth test fails
@@ -339,7 +334,7 @@ public:
    * Sets the stencil operation for when the depth test passes
    * @param[in] stencilOperationOnZPass The stencil operation
    */
-  void SetStencilOperationOnZPass( StencilOperation::Type stencilOperationOnZPass );
+  void SetStencilOperationOnZPass(StencilOperation::Type stencilOperationOnZPass);
 
   /**
    * Gets the stencil operation for when the depth test passes
@@ -351,7 +346,7 @@ public:
    * Called to upload during RenderManager::Render().
    * @param[in] context The context used for uploading
    */
-  void Upload( Context& context );
+  void Upload(Context& context);
 
   /**
    * Called to render during RenderManager::Render().
@@ -367,18 +362,18 @@ public:
    * @param[in] instruction. for use case like reflection where CullFace needs to be adjusted
 
    */
-  void Render( Context& context,
-               BufferIndex bufferIndex,
-               const SceneGraph::NodeDataProvider& node,
-               const Matrix& modelMatrix,
-               const Matrix& modelViewMatrix,
-               const Matrix& viewMatrix,
-               const Matrix& projectionMatrix,
-               const Vector3& size,
-               bool blend,
-               Vector<GLuint>& boundTextures,
-               const Dali::Internal::SceneGraph::RenderInstruction& instruction,
-               uint32_t queueIndex );
+  void Render(Context&                                             context,
+              BufferIndex                                          bufferIndex,
+              const SceneGraph::NodeDataProvider&                  node,
+              const Matrix&                                        modelMatrix,
+              const Matrix&                                        modelViewMatrix,
+              const Matrix&                                        viewMatrix,
+              const Matrix&                                        projectionMatrix,
+              const Vector3&                                       size,
+              bool                                                 blend,
+              Vector<GLuint>&                                      boundTextures,
+              const Dali::Internal::SceneGraph::RenderInstruction& instruction,
+              uint32_t                                             queueIndex);
 
   /**
    * Write the renderer's sort attributes to the passed in reference
@@ -386,14 +381,14 @@ public:
    * @param[in] bufferIndex The current update buffer index.
    * @param[out] sortAttributes
    */
-  void SetSortAttributes( BufferIndex bufferIndex, SceneGraph::RenderInstructionProcessor::SortAttributes& sortAttributes ) const;
+  void SetSortAttributes(BufferIndex bufferIndex, SceneGraph::RenderInstructionProcessor::SortAttributes& sortAttributes) const;
 
   /**
    * Sets the flag indicating whether shader changed.
    *
    * @param[in] value True if shader changed
    */
-  void SetShaderChanged( bool value );
+  void SetShaderChanged(bool value);
 
   /**
    * Check if the renderer attributes/uniforms are updated and returns the flag
@@ -404,21 +399,20 @@ public:
   bool Updated(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider* node);
 
 private:
-
   struct UniformIndexMap;
 
   // Undefined
-  Renderer( const Renderer& );
+  Renderer(const Renderer&);
 
   // Undefined
-  Renderer& operator=( const Renderer& rhs );
+  Renderer& operator=(const Renderer& rhs);
 
   /**
    * Sets blending options
    * @param context to use
    * @param blend Wheter blending should be enabled or not
    */
-  void SetBlending( Context& context, bool blend );
+  void SetBlending(Context& context, bool blend);
 
   /**
    * Set the uniforms from properties according to the uniform map
@@ -427,7 +421,7 @@ private:
    * @param[in] size The size of the renderer
    * @param[in] program The shader program on which to set the uniforms.
    */
-  void SetUniforms( BufferIndex bufferIndex, const SceneGraph::NodeDataProvider& node, const Vector3& size, Program& program );
+  void SetUniforms(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider& node, const Vector3& size, Program& program);
 
   /**
    * Set the program uniform in the map from the mapped property
@@ -435,7 +429,7 @@ private:
    * @param[in] program The shader program
    * @param[in] map The uniform
    */
-  void SetUniformFromProperty( BufferIndex bufferIndex, Program& program, UniformIndexMap& map );
+  void SetUniformFromProperty(BufferIndex bufferIndex, Program& program, UniformIndexMap& map);
 
   /**
    * Bind the textures and setup the samplers
@@ -444,48 +438,46 @@ private:
    * @param[in] boundTextures The textures bound for rendering
    * @return False if create or bind failed, true if success.
    */
-  bool BindTextures( Context& context, Program& program, Vector<GLuint>& boundTextures );
+  bool BindTextures(Context& context, Program& program, Vector<GLuint>& boundTextures);
 
 private:
+  OwnerPointer<SceneGraph::RenderDataProvider> mRenderDataProvider;
 
-  OwnerPointer< SceneGraph::RenderDataProvider > mRenderDataProvider;
-
-  Context*                     mContext;
-  Render::Geometry*            mGeometry;
+  Context*          mContext;
+  Render::Geometry* mGeometry;
 
   struct UniformIndexMap
   {
-    uint32_t                   uniformIndex;                ///< The index of the cached location in the Program
-    const PropertyInputImpl*   propertyValue;
+    uint32_t                 uniformIndex; ///< The index of the cached location in the Program
+    const PropertyInputImpl* propertyValue;
   };
 
   using UniformIndexMappings = Dali::Vector<UniformIndexMap>;
 
-  UniformIndexMappings         mUniformIndexMap;
-  Vector<GLint>                mAttributesLocation;
+  UniformIndexMappings mUniformIndexMap;
+  Vector<GLint>        mAttributesLocation;
 
-  uint64_t                     mUniformsHash;
+  uint64_t mUniformsHash;
 
-  StencilParameters            mStencilParameters;          ///< Struct containing all stencil related options
-  BlendingOptions              mBlendingOptions;            ///< Blending options including blend color, blend func and blend equation
+  StencilParameters mStencilParameters; ///< Struct containing all stencil related options
+  BlendingOptions   mBlendingOptions;   ///< Blending options including blend color, blend func and blend equation
 
-  uint32_t                     mIndexedDrawFirstElement;    ///< Offset of first element to draw
-  uint32_t                     mIndexedDrawElementsCount;   ///< Number of elements to draw
+  uint32_t mIndexedDrawFirstElement;  ///< Offset of first element to draw
+  uint32_t mIndexedDrawElementsCount; ///< Number of elements to draw
 
-  DepthFunction::Type          mDepthFunction:4;            ///< The depth function
-  FaceCullingMode::Type        mFaceCullingMode:3;          ///< The mode of face culling
-  DepthWriteMode::Type         mDepthWriteMode:3;           ///< The depth write mode
-  DepthTestMode::Type          mDepthTestMode:3;            ///< The depth test mode
-  bool                         mUpdateAttributesLocation:1; ///< Indicates attribute locations have changed
-  bool                         mPremultipledAlphaEnabled:1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
-  bool                         mShaderChanged:1;            ///< Flag indicating the shader changed and uniform maps have to be updated
-  bool                         mUpdated:1;
-
+  DepthFunction::Type   mDepthFunction : 4;            ///< The depth function
+  FaceCullingMode::Type mFaceCullingMode : 3;          ///< The mode of face culling
+  DepthWriteMode::Type  mDepthWriteMode : 3;           ///< The depth write mode
+  DepthTestMode::Type   mDepthTestMode : 3;            ///< The depth test mode
+  bool                  mUpdateAttributesLocation : 1; ///< Indicates attribute locations have changed
+  bool                  mPremultipledAlphaEnabled : 1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
+  bool                  mShaderChanged : 1;            ///< Flag indicating the shader changed and uniform maps have to be updated
+  bool                  mUpdated : 1;
 
   std::vector<Dali::DevelRenderer::DrawCommand> mDrawCommands; // Devel stuff
 };
 
-} // namespace SceneGraph
+} // namespace Render
 
 } // namespace Internal
 

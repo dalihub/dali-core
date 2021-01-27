@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,53 +20,52 @@
 
 namespace Dali
 {
-
-BaseObject::Impl::Impl( BaseObject& baseObject )
-: mBaseObject( baseObject )
+BaseObject::Impl::Impl(BaseObject& baseObject)
+: mBaseObject(baseObject)
 {
 }
 
 BaseObject::Impl::~Impl()
 {
   // Notification for observers
-  for( auto&& item : mObservers )
+  for(auto&& item : mObservers)
   {
-    item->ObjectDestroyed( mBaseObject );
+    item->ObjectDestroyed(mBaseObject);
   }
 }
 
-BaseObject::Impl& BaseObject::Impl::Get( BaseObject& baseObject )
+BaseObject::Impl& BaseObject::Impl::Get(BaseObject& baseObject)
 {
   return *baseObject.mImpl;
 }
 
-const BaseObject::Impl& BaseObject::Impl::Get( const BaseObject& baseObject )
+const BaseObject::Impl& BaseObject::Impl::Get(const BaseObject& baseObject)
 {
   return *baseObject.mImpl;
 }
 
-void BaseObject::Impl::AddObserver( Observer& observer )
+void BaseObject::Impl::AddObserver(Observer& observer)
 {
   // make sure an observer doesn't observe the same object twice
   // otherwise it will get multiple calls to ObjectDestroyed()
-  DALI_ASSERT_DEBUG( mObservers.End() == std::find( mObservers.Begin(), mObservers.End(), &observer) );
+  DALI_ASSERT_DEBUG(mObservers.End() == std::find(mObservers.Begin(), mObservers.End(), &observer));
 
-  mObservers.PushBack( &observer );
+  mObservers.PushBack(&observer);
 }
 
-void BaseObject::Impl::RemoveObserver( Observer& observer )
+void BaseObject::Impl::RemoveObserver(Observer& observer)
 {
   // Find the observer...
-  const auto endIter =  mObservers.End();
-  for( auto iter = mObservers.Begin(); iter != endIter; ++iter )
+  const auto endIter = mObservers.End();
+  for(auto iter = mObservers.Begin(); iter != endIter; ++iter)
   {
-    if( ( *iter ) == &observer)
+    if((*iter) == &observer)
     {
-      mObservers.Erase( iter );
+      mObservers.Erase(iter);
       break;
     }
   }
-  DALI_ASSERT_DEBUG( endIter != mObservers.End() );
+  DALI_ASSERT_DEBUG(endIter != mObservers.End());
 }
 
 } // namespace Dali

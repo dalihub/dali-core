@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PATH_CONSTRAINER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,17 +19,15 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/animation/constrainer.h>
 #include <dali/devel-api/animation/path-constrainer.h>
-#include <dali/public-api/math/math-utils.h>
+#include <dali/internal/event/animation/constrainer.h>
 #include <dali/internal/event/animation/path-impl.h>
+#include <dali/public-api/math/math-utils.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 typedef IntrusivePtr<PathConstrainer> PathConstrainerPtr;
 
 /**
@@ -48,7 +46,12 @@ struct PathConstraintFunctor
    * @param[in] range The range of values in the input property which will be mapped to [0,1]
    * @param[in] wrap Wrapping domain. Input property value will be wrapped in the domain [wrap.x,wrap.y] before mapping to [0,1]
    */
-  PathConstraintFunctor(PathPtr path, const Vector2& range, const Vector2& wrap ):mPath(path),mRange(range),mWrap(wrap){}
+  PathConstraintFunctor(PathPtr path, const Vector2& range, const Vector2& wrap)
+  : mPath(path),
+    mRange(range),
+    mWrap(wrap)
+  {
+  }
 
   /**
    * @brief Constructor.
@@ -58,7 +61,13 @@ struct PathConstraintFunctor
    * @param[in] forward Vector in object space which will be aligned with the tangent of the path
    * @param[in] wrap Wrapping domain. Input property value will be wrapped in the domain [wrap.x,wrap.y] before mapping to [0,1]
    */
-  PathConstraintFunctor(PathPtr path, const Vector2& range,const Vector3& forward, const Vector2& wrap ):mPath(path),mForward(forward),mRange(range),mWrap(wrap){}
+  PathConstraintFunctor(PathPtr path, const Vector2& range, const Vector3& forward, const Vector2& wrap)
+  : mPath(path),
+    mForward(forward),
+    mRange(range),
+    mWrap(wrap)
+  {
+  }
 
   /**
    * @brief Functor operator for Vector3 properties
@@ -68,19 +77,19 @@ struct PathConstraintFunctor
    *
    * @return The position of the path at the given parameter.
    */
-  void operator()( Vector3& position,
-                   const PropertyInputContainer& inputs)
+  void operator()(Vector3&                      position,
+                  const PropertyInputContainer& inputs)
   {
     float inputWrapped = inputs[0]->GetFloat();
-    if( inputWrapped < mWrap.x || inputWrapped > mWrap.y )
+    if(inputWrapped < mWrap.x || inputWrapped > mWrap.y)
     {
       inputWrapped = WrapInDomain(inputWrapped, mWrap.x, mWrap.y);
     }
 
-    float t = ( inputWrapped - mRange.x ) / ( mRange.y-mRange.x );
+    float t = (inputWrapped - mRange.x) / (mRange.y - mRange.x);
 
     Vector3 tangent;
-    mPath->Sample( t, position, tangent );
+    mPath->Sample(t, position, tangent);
   }
 
   /**
@@ -91,26 +100,26 @@ struct PathConstraintFunctor
    *
    * @return The rotation which will align the forward vector and the tangent of the path at the given parameter.
    */
-  void operator()( Quaternion& current,
-                   const PropertyInputContainer& inputs)
+  void operator()(Quaternion&                   current,
+                  const PropertyInputContainer& inputs)
   {
     float inputWrapped = inputs[0]->GetFloat();
-    if( inputWrapped < mWrap.x || inputWrapped > mWrap.y )
+    if(inputWrapped < mWrap.x || inputWrapped > mWrap.y)
     {
       inputWrapped = WrapInDomain(inputWrapped, mWrap.x, mWrap.y);
     }
 
-    float t = ( inputWrapped - mRange.x ) / ( mRange.y-mRange.x );
+    float t = (inputWrapped - mRange.x) / (mRange.y - mRange.x);
 
     Vector3 position, tangent;
-    mPath->Sample( t, position, tangent );
-    current = Quaternion( mForward, tangent );
+    mPath->Sample(t, position, tangent);
+    current = Quaternion(mForward, tangent);
   }
 
-  PathPtr     mPath;      ///< The path used
-  Vector3     mForward;   ///< Vector in object space which will be aligned with the tangent of the path
-  Vector2     mRange;     ///< The range of values in the input property which will be mapped to 0..1
-  Vector2     mWrap;      ///< Wrapping domain. Input property will be wrapped in this domain before being mapped to [0,1]
+  PathPtr mPath;    ///< The path used
+  Vector3 mForward; ///< Vector in object space which will be aligned with the tangent of the path
+  Vector2 mRange;   ///< The range of values in the input property which will be mapped to 0..1
+  Vector2 mWrap;    ///< Wrapping domain. Input property will be wrapped in this domain before being mapped to [0,1]
 };
 
 /**
@@ -119,7 +128,6 @@ struct PathConstraintFunctor
 class PathConstrainer : public Constrainer
 {
 public:
-
   /**
    * Create a new PathConstrainer
    * @return A smart-pointer to the newly allocated PathConstrainer.
@@ -127,14 +135,12 @@ public:
   static PathConstrainer* New();
 
 protected:
-
   /**
    * virtual destructor
    */
   ~PathConstrainer() override;
 
 private:
-
   /**
    * @copydoc Dali::Internal::Object::SetDefaultProperty()
    */
@@ -143,22 +149,20 @@ private:
   /**
    * @copydoc Dali::Internal::Object::GetDefaultProperty()
    */
-  Property::Value GetDefaultProperty( Property::Index index ) const override;
+  Property::Value GetDefaultProperty(Property::Index index) const override;
 
- /**
+  /**
   * @copydoc Dali::Internal::Object::GetDefaultPropertyCurrentValue()
   */
- Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const override;
+  Property::Value GetDefaultPropertyCurrentValue(Property::Index index) const override;
 
 public:
-
   /**
    * @copydoc Dali::PathConstrainer::Apply
    */
-  void Apply( Property target, Property source, const Vector2& range, const Vector2& wrap ) override;
+  void Apply(Property target, Property source, const Vector2& range, const Vector2& wrap) override;
 
 private:
-
   //Constructor
   PathConstrainer();
 
@@ -172,23 +176,23 @@ private:
   Vector3 mForward; ///< Vector in object space which will be aligned with the tangent of the path
 };
 
-} // Internal
+} // namespace Internal
 
 // Get impl of handle
 inline Internal::PathConstrainer& GetImplementation(Dali::PathConstrainer& pathConstrainer)
 {
-  DALI_ASSERT_ALWAYS( pathConstrainer && "PathConstrainer handle is empty" );
+  DALI_ASSERT_ALWAYS(pathConstrainer && "PathConstrainer handle is empty");
   Dali::RefObject& object = pathConstrainer.GetBaseObject();
   return static_cast<Internal::PathConstrainer&>(object);
 }
 
 inline const Internal::PathConstrainer& GetImplementation(const Dali::PathConstrainer& pathConstrainer)
 {
-  DALI_ASSERT_ALWAYS( pathConstrainer && "PathConstrainer handle is empty" );
+  DALI_ASSERT_ALWAYS(pathConstrainer && "PathConstrainer handle is empty");
   const Dali::RefObject& object = pathConstrainer.GetBaseObject();
   return static_cast<const Internal::PathConstrainer&>(object);
 }
 
-} // Dali
+} // namespace Dali
 
 #endif // DALI_INTERNAL_PATH_CONSTRAINER_H

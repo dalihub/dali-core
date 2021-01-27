@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_TASK_DEFAULTS_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,8 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 class Actor;
 class CameraActor;
 
@@ -33,7 +31,6 @@ class CameraActor;
 class RenderTaskDefaults
 {
 public:
-
   /**
    * Retrieve the default root actor.
    * @return The default root actor.
@@ -47,7 +44,6 @@ public:
   virtual CameraActor& GetDefaultCameraActor() = 0;
 
 protected:
-
   /**
    * Virtual destructor
    */

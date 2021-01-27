@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_COMPRESSED_BITMAP_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ namespace Dali
 {
 namespace Internal
 {
-
 class BitmapCompressed;
 using BitmapCompressedPtr = IntrusivePtr<BitmapCompressed>;
 
@@ -44,10 +43,16 @@ public:
    * Constructor
    * @param[in] discardable Flag to tell the bitmap if it can delete the buffer with the pixel data.
    */
-  BitmapCompressed( ResourcePolicy::Discardable discardable = ResourcePolicy::OWNED_RETAIN );
+  BitmapCompressed(ResourcePolicy::Discardable discardable = ResourcePolicy::OWNED_RETAIN);
 
-  const Bitmap::CompressedProfile* GetCompressedProfile() const override { return this; }
-  Bitmap::CompressedProfile* GetCompressedProfile() override { return this; }
+  const Bitmap::CompressedProfile* GetCompressedProfile() const override
+  {
+    return this;
+  }
+  Bitmap::CompressedProfile* GetCompressedProfile() override
+  {
+    return this;
+  }
 
 private:
   /**
@@ -58,9 +63,10 @@ private:
    * @param[in] bufferSize    Buffer cpacity in pixels
    */
   void Initialize(Pixel::Format pixelFormat,
-                           uint32_t width,
-                           uint32_t height,
-                           uint32_t bufferSize);
+                  uint32_t      width,
+                  uint32_t      height,
+                  uint32_t      bufferSize);
+
 public:
   /**
    * (Re-)Allocate pixel buffer for the Bitmap. Any previously allocated pixel buffer
@@ -74,10 +80,10 @@ public:
    * @param[in] bufferSize    Buffer size in bytes
    * @return pixel buffer pointer
    */
-  Dali::Integration::PixelBuffer* ReserveBufferOfSize( Pixel::Format pixelFormat,
-                                     const uint32_t width,
-                                     const uint32_t height,
-                                     const uint32_t numBytes ) override;
+  Dali::Integration::PixelBuffer* ReserveBufferOfSize(Pixel::Format  pixelFormat,
+                                                      const uint32_t width,
+                                                      const uint32_t height,
+                                                      const uint32_t numBytes) override;
 
   /**
    * Get the pixel buffer size in bytes
@@ -91,27 +97,28 @@ public:
   /**
    * See Dali::Integration::Bitmap::GetReleaseFunction()
    */
-  ReleaseFunction GetReleaseFunction() override{ return FREE; }
+  ReleaseFunction GetReleaseFunction() override
+  {
+    return FREE;
+  }
 
 protected:
-
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
   ~BitmapCompressed() override;
 
 private:
-
   uint32_t mBufferSize;
 
-  BitmapCompressed(const BitmapCompressed& other);  ///< defined private to prevent use
-  BitmapCompressed& operator = (const BitmapCompressed& other); ///< defined private to prevent use
+  BitmapCompressed(const BitmapCompressed& other);            ///< defined private to prevent use
+  BitmapCompressed& operator=(const BitmapCompressed& other); ///< defined private to prevent use
 
   // Changes scope, should be at end of class
   DALI_LOG_OBJECT_STRING_DECLARATION;
 };
 
-} // namespace Integration
+} // namespace Internal
 
 } // namespace Dali
 

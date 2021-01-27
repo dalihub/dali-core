@@ -29,25 +29,25 @@ ConnectionChangePropagator::~ConnectionChangePropagator() = default;
 void ConnectionChangePropagator::Add(Observer& observer)
 {
   bool foundObserver = false;
-  for( ObserversIterator iter = mObservers.Begin(); iter != mObservers.End(); ++iter )
+  for(ObserversIterator iter = mObservers.Begin(); iter != mObservers.End(); ++iter)
   {
-    if( *iter == &observer )
+    if(*iter == &observer)
     {
       foundObserver = true;
       break;
     }
   }
-  if( !foundObserver )
+  if(!foundObserver)
   {
-    mObservers.PushBack( &observer );
+    mObservers.PushBack(&observer);
   }
 }
 
 void ConnectionChangePropagator::Remove(Observer& observer)
 {
-  for( ObserversIterator iter = mObservers.Begin(); iter != mObservers.End(); ++iter )
+  for(ObserversIterator iter = mObservers.Begin(); iter != mObservers.End(); ++iter)
   {
-    if( *iter == &observer )
+    if(*iter == &observer)
     {
       mObservers.Erase(iter);
       return;
@@ -58,33 +58,33 @@ void ConnectionChangePropagator::Remove(Observer& observer)
 void ConnectionChangePropagator::ConnectionsChanged(PropertyOwner& object)
 {
   // Inform observers that the object's children have changed
-  for( ObserversIterator iter = mObservers.Begin(); iter != mObservers.End(); ++iter )
+  for(ObserversIterator iter = mObservers.Begin(); iter != mObservers.End(); ++iter)
   {
     Observer* observer = (*iter);
-    observer->ConnectionsChanged( object );
+    observer->ConnectionsChanged(object);
   }
 }
 
 void ConnectionChangePropagator::ConnectedUniformMapChanged()
 {
   // Inform observers that the object's uniform map has changed
-  for( ObserversIterator iter = mObservers.Begin(); iter != mObservers.End(); ++iter )
+  for(ObserversIterator iter = mObservers.Begin(); iter != mObservers.End(); ++iter)
   {
     Observer* observer = (*iter);
     observer->ConnectedUniformMapChanged();
   }
 }
 
-void ConnectionChangePropagator::Destroy( PropertyOwner& object )
+void ConnectionChangePropagator::Destroy(PropertyOwner& object)
 {
   // Inform observers that the object's children have changed
-  for( ObserversIterator iter = mObservers.Begin(); iter != mObservers.End(); ++iter )
+  for(ObserversIterator iter = mObservers.Begin(); iter != mObservers.End(); ++iter)
   {
     Observer* observer = (*iter);
-    observer->ObservedObjectDestroyed( object );
+    observer->ObservedObjectDestroyed(object);
   }
 }
 
-} // SceneGraph
-} // Internal
-} // Dali
+} // namespace SceneGraph
+} // namespace Internal
+} // namespace Dali

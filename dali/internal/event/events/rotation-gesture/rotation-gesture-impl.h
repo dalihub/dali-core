@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ROTATION_GESTURE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,17 +19,15 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/internal/event/events/gesture-impl.h>
+#include <dali/public-api/events/rotation-gesture.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/object/base-object.h>
-#include <dali/public-api/events/rotation-gesture.h>
-#include <dali/internal/event/events/gesture-impl.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 class RotationGesture;
 using RotationGesturePtr = IntrusivePtr<RotationGesture>;
 
@@ -39,25 +37,24 @@ using RotationGesturePtr = IntrusivePtr<RotationGesture>;
 class RotationGesture final : public Gesture
 {
 public:
-
   /**
    * @brief Default constructor
    */
-  RotationGesture( GestureState state )
-  : Gesture( GestureType::ROTATION, state )
+  RotationGesture(GestureState state)
+  : Gesture(GestureType::ROTATION, state)
   {
   }
 
-  RotationGesture(const RotationGesture&) = delete; ///< Deleted copy constructor
-  RotationGesture(RotationGesture&&) = delete; ///< Deleted move constructor
+  RotationGesture(const RotationGesture&) = delete;            ///< Deleted copy constructor
+  RotationGesture(RotationGesture&&)      = delete;            ///< Deleted move constructor
   RotationGesture& operator=(const RotationGesture&) = delete; ///< Deleted copy assignment operator
-  RotationGesture& operator=(RotationGesture&&) = delete; ///< Deleted move assignment operator
+  RotationGesture& operator=(RotationGesture&&) = delete;      ///< Deleted move assignment operator
 
   /**
    * @brief The overall rotation from the start of the rotation gesture till the latest rotation gesture.
    * @param[in] rotation The rotation to set.
    */
-  inline void SetRotation( const Radian& rotation )
+  inline void SetRotation(const Radian& rotation)
   {
     mRotation = rotation;
   }
@@ -74,7 +71,7 @@ public:
    * @brief The center point of the two points that caused the rotation gesture in screen coordinates.
    * @param[in] screenCenterPoint The point in screen coordinates to set.
    */
-  inline void SetScreenCenterPoint( const Vector2& screenCenterPoint )
+  inline void SetScreenCenterPoint(const Vector2& screenCenterPoint)
   {
     mScreenCenterPoint = screenCenterPoint;
   }
@@ -91,7 +88,7 @@ public:
    * @brief The center point of the two points that caused the rotation gesture in local actor coordinates.
    * @param[in] localCenterPoint The point in local actor coordinates to set.
    */
-  inline void SetLocalCenterPoint( const Vector2& localCenterPoint )
+  inline void SetLocalCenterPoint(const Vector2& localCenterPoint)
   {
     mLocalCenterPoint = localCenterPoint;
   }
@@ -105,7 +102,6 @@ public:
   }
 
 private:
-
   /**
    * @brief Virtual destructor
    *
@@ -114,7 +110,7 @@ private:
   ~RotationGesture() override = default;
 
 private:
-  Radian mRotation;
+  Radian  mRotation;
   Vector2 mScreenCenterPoint;
   Vector2 mLocalCenterPoint;
 };
@@ -123,22 +119,22 @@ private:
 
 // Helpers for public-api forwarding methods
 
-inline Internal::RotationGesture& GetImplementation( Dali::RotationGesture& rotationGesture )
+inline Internal::RotationGesture& GetImplementation(Dali::RotationGesture& rotationGesture)
 {
-  DALI_ASSERT_ALWAYS( rotationGesture && "rotationGesture handle is empty" );
+  DALI_ASSERT_ALWAYS(rotationGesture && "rotationGesture handle is empty");
 
   BaseObject& object = rotationGesture.GetBaseObject();
 
-  return static_cast< Internal::RotationGesture& >( object );
+  return static_cast<Internal::RotationGesture&>(object);
 }
 
-inline const Internal::RotationGesture& GetImplementation( const Dali::RotationGesture& rotationGesture )
+inline const Internal::RotationGesture& GetImplementation(const Dali::RotationGesture& rotationGesture)
 {
-  DALI_ASSERT_ALWAYS( rotationGesture && "rotationGesture handle is empty" );
+  DALI_ASSERT_ALWAYS(rotationGesture && "rotationGesture handle is empty");
 
   const BaseObject& object = rotationGesture.GetBaseObject();
 
-  return static_cast< const Internal::RotationGesture& >( object );
+  return static_cast<const Internal::RotationGesture&>(object);
 }
 
 } // namespace Dali

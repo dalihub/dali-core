@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,60 +29,57 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace
 {
-
 // Signals
 
-const char* const SIGNAL_OBJECT_CREATED =   "objectCreated";
+const char* const SIGNAL_OBJECT_CREATED   = "objectCreated";
 const char* const SIGNAL_OBJECT_DESTROYED = "objectDestroyed";
 
-TypeRegistration mType( typeid( Dali::ObjectRegistry ), typeid( Dali::BaseHandle ), nullptr );
+TypeRegistration mType(typeid(Dali::ObjectRegistry), typeid(Dali::BaseHandle), nullptr);
 
-SignalConnectorType signalConnector1( mType, SIGNAL_OBJECT_CREATED,   &ObjectRegistry::DoConnectSignal );
-SignalConnectorType signalConnector2( mType, SIGNAL_OBJECT_DESTROYED, &ObjectRegistry::DoConnectSignal );
+SignalConnectorType signalConnector1(mType, SIGNAL_OBJECT_CREATED, &ObjectRegistry::DoConnectSignal);
+SignalConnectorType signalConnector2(mType, SIGNAL_OBJECT_DESTROYED, &ObjectRegistry::DoConnectSignal);
 
-}
+} // namespace
 
 ObjectRegistryPtr ObjectRegistry::New()
 {
-  return ObjectRegistryPtr( new ObjectRegistry() );
+  return ObjectRegistryPtr(new ObjectRegistry());
 }
 
 ObjectRegistry::ObjectRegistry() = default;
 
 ObjectRegistry::~ObjectRegistry() = default;
 
-void ObjectRegistry::RegisterObject( Dali::BaseObject* object )
+void ObjectRegistry::RegisterObject(Dali::BaseObject* object)
 {
-  if ( !mObjectCreatedSignal.Empty() )
+  if(!mObjectCreatedSignal.Empty())
   {
-    Dali::BaseHandle handle( object );
-    mObjectCreatedSignal.Emit( handle );
+    Dali::BaseHandle handle(object);
+    mObjectCreatedSignal.Emit(handle);
   }
 }
 
-void ObjectRegistry::UnregisterObject( Dali::BaseObject* object )
+void ObjectRegistry::UnregisterObject(Dali::BaseObject* object)
 {
-  mObjectDestroyedSignal.Emit( object );
+  mObjectDestroyedSignal.Emit(object);
 }
 
-bool ObjectRegistry::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
+bool ObjectRegistry::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
 {
-  bool connected( true );
-  ObjectRegistry* objectRegistry = static_cast< ObjectRegistry* >( object ); // TypeRegistry guarantees that this is the correct type.
+  bool            connected(true);
+  ObjectRegistry* objectRegistry = static_cast<ObjectRegistry*>(object); // TypeRegistry guarantees that this is the correct type.
 
-  if( 0 == strcmp( signalName.c_str(), SIGNAL_OBJECT_CREATED ) )
+  if(0 == strcmp(signalName.c_str(), SIGNAL_OBJECT_CREATED))
   {
-    objectRegistry->ObjectCreatedSignal().Connect( tracker, functor );
+    objectRegistry->ObjectCreatedSignal().Connect(tracker, functor);
   }
-  else if( 0 == strcmp( signalName.c_str(), SIGNAL_OBJECT_DESTROYED ) )
+  else if(0 == strcmp(signalName.c_str(), SIGNAL_OBJECT_DESTROYED))
   {
-    objectRegistry->ObjectDestroyedSignal().Connect( tracker, functor );
+    objectRegistry->ObjectDestroyedSignal().Connect(tracker, functor);
   }
   else
   {

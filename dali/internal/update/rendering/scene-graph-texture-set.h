@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_TEXTURE_SET_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,21 +18,20 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/rendering/texture-set.h>
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/event-thread-services.h>
+#include <dali/public-api/rendering/texture-set.h>
 
 namespace Dali
 {
 namespace Internal
 {
-
 namespace Render
 {
 struct Sampler;
 class Texture;
-}
+} // namespace Render
 namespace SceneGraph
 {
 class Renderer;
@@ -40,7 +39,6 @@ class Renderer;
 class TextureSet
 {
 public:
-
   /**
    * Construct a new TextureSet.
    */
@@ -55,21 +53,21 @@ public:
    * Overriden delete operator
    * Deletes the texture set from its global memory pool
    */
-  void operator delete( void* ptr );
+  void operator delete(void* ptr);
 
   /**
    * Set the sampler to be used by the texture at position "index"
    * @param[in] index The index of the texture
    * @param[in] sampler The sampler to be used by the texture
    */
-  void SetSampler( uint32_t index, Render::Sampler* sampler );
+  void SetSampler(uint32_t index, Render::Sampler* sampler);
 
   /**
    * Set the texture at position "index"
    * @param[in] index The index of the texture
    * @param[in] texture The texture
    */
-  void SetTexture( uint32_t index, Render::Texture* texture );
+  void SetTexture(uint32_t index, Render::Texture* texture);
 
   /**
    * Return whether any texture in the texture set has an alpha channel
@@ -83,21 +81,21 @@ public:
    *
    * @param[in] renderer The renderer using the TextureSet
    */
-  void AddObserver( Renderer* renderer );
+  void AddObserver(Renderer* renderer);
 
   /**
    * Removes a renderer from the TextureSet renderers list
    *
    * @param[in] renderer The renderer no longer using the TextureSet
    */
-  void RemoveObserver( Renderer* renderer );
+  void RemoveObserver(Renderer* renderer);
 
   /**
    * Get the sampler of a texture in the TextureSet
    * @param[in] index The index of the texture in the textures array
    * @return the sampler used by the texture
    */
-  Render::Sampler* GetTextureSampler( uint32_t index )
+  Render::Sampler* GetTextureSampler(uint32_t index)
   {
     return mSamplers[index];
   }
@@ -108,7 +106,7 @@ public:
    */
   uint32_t GetTextureCount()
   {
-    return static_cast<uint32_t>( mTextures.Size() );
+    return static_cast<uint32_t>(mTextures.Size());
   }
 
   /**
@@ -116,13 +114,12 @@ public:
    * @param[in] index The index of the texture in the textures array
    * @return the pointer to the Texture in that position
    */
-  Render::Texture* GetTexture( uint32_t index )
+  Render::Texture* GetTexture(uint32_t index)
   {
     return mTextures[index];
   }
 
 private:
-
   /**
    * Protected constructor; See also TextureSet::New()
    */
@@ -134,34 +131,33 @@ private:
    */
   void NotifyChangeToRenderers();
 
-private: // Data
-
-  Vector< Render::Sampler* > mSamplers;                    ///< List of samplers used by each texture. Not owned
-  Vector< Render::Texture* > mTextures;                    ///< List of Textures. Not owned
-  Vector<Renderer*>          mRenderers;                   ///< List of renderers using the TextureSet
-  bool                       mHasAlpha;                    ///< if any of the textures has an alpha channel
+private:                               // Data
+  Vector<Render::Sampler*> mSamplers;  ///< List of samplers used by each texture. Not owned
+  Vector<Render::Texture*> mTextures;  ///< List of Textures. Not owned
+  Vector<Renderer*>        mRenderers; ///< List of renderers using the TextureSet
+  bool                     mHasAlpha;  ///< if any of the textures has an alpha channel
 };
 
-inline void SetTextureMessage( EventThreadServices& eventThreadServices, const TextureSet& textureSet, uint32_t index, Render::Texture* texture )
+inline void SetTextureMessage(EventThreadServices& eventThreadServices, const TextureSet& textureSet, uint32_t index, Render::Texture* texture)
 {
   using LocalType = MessageValue2<TextureSet, uint32_t, Render::Texture*>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &textureSet, &TextureSet::SetTexture, index, texture );
+  new(slot) LocalType(&textureSet, &TextureSet::SetTexture, index, texture);
 }
 
-inline void SetSamplerMessage( EventThreadServices& eventThreadServices, const TextureSet& textureSet, uint32_t index, Render::Sampler* sampler )
+inline void SetSamplerMessage(EventThreadServices& eventThreadServices, const TextureSet& textureSet, uint32_t index, Render::Sampler* sampler)
 {
   using LocalType = MessageValue2<TextureSet, uint32_t, Render::Sampler*>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &textureSet, &TextureSet::SetSampler, index, sampler );
+  new(slot) LocalType(&textureSet, &TextureSet::SetSampler, index, sampler);
 }
 
 } // namespace SceneGraph

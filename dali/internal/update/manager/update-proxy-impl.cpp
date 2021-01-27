@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,27 +23,24 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace
 {
-
-SceneGraph::Node* FindNodeInSceneGraph( uint32_t id, SceneGraph::Node& node )
+SceneGraph::Node* FindNodeInSceneGraph(uint32_t id, SceneGraph::Node& node)
 {
   SceneGraph::Node* matchingNode = nullptr;
 
-  if( node.mId == id )
+  if(node.mId == id)
   {
     matchingNode = &node;
   }
   else
   {
-    for( auto&& i : node.GetChildren() )
+    for(auto&& i : node.GetChildren())
     {
-      matchingNode = FindNodeInSceneGraph( id, *i );
-      if( matchingNode )
+      matchingNode = FindNodeInSceneGraph(id, *i);
+      if(matchingNode)
       {
         break;
       }
@@ -55,179 +52,179 @@ SceneGraph::Node* FindNodeInSceneGraph( uint32_t id, SceneGraph::Node& node )
 
 } // unnamed namespace
 
-UpdateProxy::UpdateProxy( SceneGraph::UpdateManager& updateManager, SceneGraph::TransformManager& transformManager, SceneGraph::Node& rootNode )
+UpdateProxy::UpdateProxy(SceneGraph::UpdateManager& updateManager, SceneGraph::TransformManager& transformManager, SceneGraph::Node& rootNode)
 : mNodeContainer(),
-  mLastCachedIdNodePair( { 0u, nullptr } ),
-  mCurrentBufferIndex( 0u ),
-  mUpdateManager( updateManager ),
-  mTransformManager( transformManager ),
-  mRootNode( rootNode ),
-  mPropertyModifier( nullptr )
+  mLastCachedIdNodePair({0u, nullptr}),
+  mCurrentBufferIndex(0u),
+  mUpdateManager(updateManager),
+  mTransformManager(transformManager),
+  mRootNode(rootNode),
+  mPropertyModifier(nullptr)
 {
 }
 
 UpdateProxy::~UpdateProxy() = default;
 
-bool UpdateProxy::GetPosition( uint32_t id, Vector3& position ) const
+bool UpdateProxy::GetPosition(uint32_t id, Vector3& position) const
 {
-  bool success = false;
-  const SceneGraph::Node* node = GetNodeWithId( id );
-  if( node )
+  bool                    success = false;
+  const SceneGraph::Node* node    = GetNodeWithId(id);
+  if(node)
   {
     const SceneGraph::TransformManager& transformManager = mTransformManager; // To ensure we call the const getter
-    position = transformManager.GetVector3PropertyValue( node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_POSITION );
-    success = true;
+    position                                             = transformManager.GetVector3PropertyValue(node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_POSITION);
+    success                                              = true;
   }
   return success;
 }
 
-bool UpdateProxy::SetPosition( uint32_t id, const Vector3& position )
+bool UpdateProxy::SetPosition(uint32_t id, const Vector3& position)
 {
-  bool success = false;
-  SceneGraph::Node* node = GetNodeWithId( id );
-  if( node )
+  bool              success = false;
+  SceneGraph::Node* node    = GetNodeWithId(id);
+  if(node)
   {
-    mTransformManager.SetVector3PropertyValue( node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_POSITION, position );
+    mTransformManager.SetVector3PropertyValue(node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_POSITION, position);
     success = true;
   }
   return success;
 }
 
-bool UpdateProxy::BakePosition( uint32_t id, const Vector3& position )
+bool UpdateProxy::BakePosition(uint32_t id, const Vector3& position)
 {
-  bool success = false;
-  SceneGraph::Node* node = GetNodeWithId( id );
-  if( node )
+  bool              success = false;
+  SceneGraph::Node* node    = GetNodeWithId(id);
+  if(node)
   {
-    mTransformManager.BakeVector3PropertyValue( node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_POSITION, position );
+    mTransformManager.BakeVector3PropertyValue(node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_POSITION, position);
     success = true;
   }
   return success;
 }
 
-bool UpdateProxy::GetSize( uint32_t id, Vector3& size ) const
+bool UpdateProxy::GetSize(uint32_t id, Vector3& size) const
 {
-  bool success = false;
-  const SceneGraph::Node* node = GetNodeWithId( id );
-  if( node )
-  {
-    const SceneGraph::TransformManager& transformManager = mTransformManager; // To ensure we call the const getter
-    size = transformManager.GetVector3PropertyValue( node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_SIZE );
-    success = true;
-  }
-  return success;
-}
-
-bool UpdateProxy::SetSize( uint32_t id, const Vector3& size )
-{
-  bool success = false;
-  SceneGraph::Node* node = GetNodeWithId( id );
-  if( node )
-  {
-    mTransformManager.SetVector3PropertyValue( node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_SIZE, size );
-    success = true;
-  }
-  return success;
-}
-
-bool UpdateProxy::BakeSize( uint32_t id, const Vector3& size )
-{
-  bool success = false;
-  SceneGraph::Node* node = GetNodeWithId( id );
-  if( node )
-  {
-    mTransformManager.BakeVector3PropertyValue( node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_SIZE, size );
-    success = true;
-  }
-  return success;
-}
-
-bool UpdateProxy::GetPositionAndSize( uint32_t id, Vector3& position, Vector3& size ) const
-{
-  bool success = false;
-  const SceneGraph::Node* node = GetNodeWithId( id );
-  if( node )
+  bool                    success = false;
+  const SceneGraph::Node* node    = GetNodeWithId(id);
+  if(node)
   {
     const SceneGraph::TransformManager& transformManager = mTransformManager; // To ensure we call the const getter
-    position = transformManager.GetVector3PropertyValue( node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_POSITION );
-    size = transformManager.GetVector3PropertyValue( node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_SIZE );
+    size                                                 = transformManager.GetVector3PropertyValue(node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_SIZE);
+    success                                              = true;
+  }
+  return success;
+}
+
+bool UpdateProxy::SetSize(uint32_t id, const Vector3& size)
+{
+  bool              success = false;
+  SceneGraph::Node* node    = GetNodeWithId(id);
+  if(node)
+  {
+    mTransformManager.SetVector3PropertyValue(node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_SIZE, size);
     success = true;
   }
   return success;
 }
 
-bool UpdateProxy::GetScale( uint32_t id, Vector3& scale ) const
+bool UpdateProxy::BakeSize(uint32_t id, const Vector3& size)
 {
-  bool success = false;
-  const SceneGraph::Node* node = GetNodeWithId( id );
-  if( node )
+  bool              success = false;
+  SceneGraph::Node* node    = GetNodeWithId(id);
+  if(node)
+  {
+    mTransformManager.BakeVector3PropertyValue(node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_SIZE, size);
+    success = true;
+  }
+  return success;
+}
+
+bool UpdateProxy::GetPositionAndSize(uint32_t id, Vector3& position, Vector3& size) const
+{
+  bool                    success = false;
+  const SceneGraph::Node* node    = GetNodeWithId(id);
+  if(node)
   {
     const SceneGraph::TransformManager& transformManager = mTransformManager; // To ensure we call the const getter
-    scale = transformManager.GetVector3PropertyValue( node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_SCALE );
+    position                                             = transformManager.GetVector3PropertyValue(node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_POSITION);
+    size                                                 = transformManager.GetVector3PropertyValue(node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_SIZE);
+    success                                              = true;
+  }
+  return success;
+}
+
+bool UpdateProxy::GetScale(uint32_t id, Vector3& scale) const
+{
+  bool                    success = false;
+  const SceneGraph::Node* node    = GetNodeWithId(id);
+  if(node)
+  {
+    const SceneGraph::TransformManager& transformManager = mTransformManager; // To ensure we call the const getter
+    scale                                                = transformManager.GetVector3PropertyValue(node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_SCALE);
+    success                                              = true;
+  }
+
+  return success;
+}
+
+bool UpdateProxy::SetScale(uint32_t id, const Vector3& scale)
+{
+  bool              success = false;
+  SceneGraph::Node* node    = GetNodeWithId(id);
+  if(node)
+  {
+    mTransformManager.SetVector3PropertyValue(node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_SCALE, scale);
+    success = true;
+  }
+  return success;
+}
+
+bool UpdateProxy::BakeScale(uint32_t id, const Vector3& scale)
+{
+  bool              success = false;
+  SceneGraph::Node* node    = GetNodeWithId(id);
+  if(node)
+  {
+    mTransformManager.BakeVector3PropertyValue(node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_SCALE, scale);
+    success = true;
+  }
+  return success;
+}
+
+bool UpdateProxy::GetColor(uint32_t id, Vector4& color) const
+{
+  bool                    success = false;
+  const SceneGraph::Node* node    = GetNodeWithId(id);
+  if(node)
+  {
+    color   = node->mColor.Get(mCurrentBufferIndex);
     success = true;
   }
 
   return success;
 }
 
-bool UpdateProxy::SetScale( uint32_t id, const Vector3& scale )
+bool UpdateProxy::SetColor(uint32_t id, const Vector4& color)
 {
-  bool success = false;
-  SceneGraph::Node* node = GetNodeWithId( id );
-  if( node )
+  bool              success = false;
+  SceneGraph::Node* node    = GetNodeWithId(id);
+  if(node)
   {
-    mTransformManager.SetVector3PropertyValue( node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_SCALE, scale );
+    node->mColor.Set(mCurrentBufferIndex, color);
+    node->SetDirtyFlag(SceneGraph::NodePropertyFlags::COLOR);
+    AddResetter(*node, node->mColor);
     success = true;
   }
   return success;
 }
 
-bool UpdateProxy::BakeScale( uint32_t id, const Vector3& scale )
+bool UpdateProxy::BakeColor(uint32_t id, const Vector4& color)
 {
-  bool success = false;
-  SceneGraph::Node* node = GetNodeWithId( id );
-  if( node )
+  bool              success = false;
+  SceneGraph::Node* node    = GetNodeWithId(id);
+  if(node)
   {
-    mTransformManager.BakeVector3PropertyValue( node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_SCALE, scale );
-    success = true;
-  }
-  return success;
-}
-
-bool UpdateProxy::GetColor( uint32_t id, Vector4& color ) const
-{
-  bool success = false;
-  const SceneGraph::Node* node = GetNodeWithId( id );
-  if( node )
-  {
-    color = node->mColor.Get( mCurrentBufferIndex );
-    success = true;
-  }
-
-  return success;
-}
-
-bool UpdateProxy::SetColor( uint32_t id, const Vector4& color )
-{
-  bool success = false;
-  SceneGraph::Node* node = GetNodeWithId( id );
-  if( node )
-  {
-    node->mColor.Set( mCurrentBufferIndex, color );
-    node->SetDirtyFlag( SceneGraph::NodePropertyFlags::COLOR );
-    AddResetter( *node, node->mColor );
-    success = true;
-  }
-  return success;
-}
-
-bool UpdateProxy::BakeColor( uint32_t id, const Vector4& color )
-{
-  bool success = false;
-  SceneGraph::Node* node = GetNodeWithId( id );
-  if( node )
-  {
-    node->mColor.Bake( mCurrentBufferIndex, color );
+    node->mColor.Bake(mCurrentBufferIndex, color);
     success = true;
   }
   return success;
@@ -235,40 +232,40 @@ bool UpdateProxy::BakeColor( uint32_t id, const Vector4& color )
 
 void UpdateProxy::NodeHierarchyChanged()
 {
-  mLastCachedIdNodePair = { 0u, nullptr };
+  mLastCachedIdNodePair = {0u, nullptr};
   mNodeContainer.clear();
   mPropertyModifier.reset();
 }
 
-SceneGraph::Node* UpdateProxy::GetNodeWithId( uint32_t id ) const
+SceneGraph::Node* UpdateProxy::GetNodeWithId(uint32_t id) const
 {
   SceneGraph::Node* node = nullptr;
 
   // Cache the last accessed node so we don't have to traverse
-  if( mLastCachedIdNodePair.node && mLastCachedIdNodePair.id == id )
+  if(mLastCachedIdNodePair.node && mLastCachedIdNodePair.id == id)
   {
     node = mLastCachedIdNodePair.node;
   }
   else
   {
     // Find node in vector
-    for( auto&& pair : mNodeContainer )
+    for(auto&& pair : mNodeContainer)
     {
-      if( pair.id == id )
+      if(pair.id == id)
       {
-        node = pair.node;
+        node                  = pair.node;
         mLastCachedIdNodePair = pair;
         break;
       }
     }
 
-    if( ! node )
+    if(!node)
     {
       // Node not in vector, find in scene-graph
-      node = FindNodeInSceneGraph( id, mRootNode );
-      if( node )
+      node = FindNodeInSceneGraph(id, mRootNode);
+      if(node)
       {
-        mNodeContainer.push_back( { id, node } );
+        mNodeContainer.push_back({id, node});
         mLastCachedIdNodePair = *mNodeContainer.rbegin();
       }
     }
@@ -277,13 +274,13 @@ SceneGraph::Node* UpdateProxy::GetNodeWithId( uint32_t id ) const
   return node;
 }
 
-void UpdateProxy::AddResetter( SceneGraph::Node& node, SceneGraph::PropertyBase& propertyBase )
+void UpdateProxy::AddResetter(SceneGraph::Node& node, SceneGraph::PropertyBase& propertyBase)
 {
-  if( ! mPropertyModifier )
+  if(!mPropertyModifier)
   {
-    mPropertyModifier = PropertyModifierPtr( new PropertyModifier( mUpdateManager ) );
+    mPropertyModifier = PropertyModifierPtr(new PropertyModifier(mUpdateManager));
   }
-  mPropertyModifier->AddResetter( node, propertyBase );
+  mPropertyModifier->AddResetter(node, propertyBase);
 }
 
 } // namespace Internal

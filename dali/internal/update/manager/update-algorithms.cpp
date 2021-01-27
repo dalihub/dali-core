@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,25 +22,22 @@
 #include <algorithm>
 
 // INTERNAL INCLUDES
+#include <dali/internal/render/renderers/render-renderer.h>
+#include <dali/internal/update/animation/scene-graph-constraint-base.h>
+#include <dali/internal/update/nodes/node.h>
+#include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/public-api/actors/draw-mode.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/vector3.h>
-#include <dali/internal/update/nodes/node.h>
-#include <dali/internal/update/animation/scene-graph-constraint-base.h>
-#include <dali/internal/update/nodes/scene-graph-layer.h>
-#include <dali/internal/render/renderers/render-renderer.h>
 
 #include <dali/integration-api/debug.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace SceneGraph
 {
-
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gUpdateFilter = Debug::Filter::New(Debug::Concise, false, "LOG_UPDATE_ALGORITHMS");
 #endif
@@ -49,21 +46,20 @@ Debug::Filter* gUpdateFilter = Debug::Filter::New(Debug::Concise, false, "LOG_UP
  *********************** Apply Constraints ************************************
  ******************************************************************************/
 
-
 /**
  * Constrain the local properties of the PropertyOwner.
  * @param propertyOwner to constrain
  * @param updateBufferIndex buffer index to use
  */
-void ConstrainPropertyOwner( PropertyOwner& propertyOwner, BufferIndex updateBufferIndex )
+void ConstrainPropertyOwner(PropertyOwner& propertyOwner, BufferIndex updateBufferIndex)
 {
   ConstraintOwnerContainer& constraints = propertyOwner.GetConstraints();
 
   const ConstraintIter endIter = constraints.End();
-  for( ConstraintIter iter = constraints.Begin(); iter != endIter; ++iter )
+  for(ConstraintIter iter = constraints.Begin(); iter != endIter; ++iter)
   {
     ConstraintBase& constraint = **iter;
-    constraint.Apply( updateBufferIndex );
+    constraint.Apply(updateBufferIndex);
   }
 }
 
@@ -71,92 +67,92 @@ void ConstrainPropertyOwner( PropertyOwner& propertyOwner, BufferIndex updateBuf
  ************************** Update node hierarchy *****************************
  ******************************************************************************/
 
-inline void UpdateRootNodeOpacity( Layer& rootNode, NodePropertyFlags nodeDirtyFlags, BufferIndex updateBufferIndex )
+inline void UpdateRootNodeOpacity(Layer& rootNode, NodePropertyFlags nodeDirtyFlags, BufferIndex updateBufferIndex)
 {
-  if ( nodeDirtyFlags & NodePropertyFlags::COLOR )
+  if(nodeDirtyFlags & NodePropertyFlags::COLOR)
   {
-    rootNode.SetWorldColor( rootNode.GetColor( updateBufferIndex ), updateBufferIndex );
+    rootNode.SetWorldColor(rootNode.GetColor(updateBufferIndex), updateBufferIndex);
   }
   else
   {
     // Copy previous value, in case it changed in the previous frame
-    rootNode.CopyPreviousWorldColor( updateBufferIndex );
+    rootNode.CopyPreviousWorldColor(updateBufferIndex);
   }
 }
 
-inline void UpdateNodeOpacity( Node& node, NodePropertyFlags nodeDirtyFlags, BufferIndex updateBufferIndex )
+inline void UpdateNodeOpacity(Node& node, NodePropertyFlags nodeDirtyFlags, BufferIndex updateBufferIndex)
 {
   // If opacity needs to be recalculated
-  if ( nodeDirtyFlags & NodePropertyFlags::COLOR )
+  if(nodeDirtyFlags & NodePropertyFlags::COLOR)
   {
-    node.InheritWorldColor( updateBufferIndex );
+    node.InheritWorldColor(updateBufferIndex);
   }
   else
   {
     // Copy inherited value, if changed in the previous frame
-    node.CopyPreviousWorldColor( updateBufferIndex );
+    node.CopyPreviousWorldColor(updateBufferIndex);
   }
 }
 
 /**
  * This is called recursively for all children of the root Node
  */
-inline NodePropertyFlags UpdateNodes( Node& node,
-                                      NodePropertyFlags parentFlags,
-                                      BufferIndex updateBufferIndex,
-                                      RenderQueue& renderQueue,
-                                      Layer& currentLayer,
-                                      uint32_t inheritedDrawMode )
+inline NodePropertyFlags UpdateNodes(Node&             node,
+                                     NodePropertyFlags parentFlags,
+                                     BufferIndex       updateBufferIndex,
+                                     RenderQueue&      renderQueue,
+                                     Layer&            currentLayer,
+                                     uint32_t          inheritedDrawMode)
 {
   // Apply constraints to the node
-  ConstrainPropertyOwner( node, updateBufferIndex );
+  ConstrainPropertyOwner(node, updateBufferIndex);
 
   // Some dirty flags are inherited from parent
-  NodePropertyFlags nodeDirtyFlags = node.GetInheritedDirtyFlags( parentFlags );
+  NodePropertyFlags nodeDirtyFlags = node.GetInheritedDirtyFlags(parentFlags);
 
   NodePropertyFlags cumulativeDirtyFlags = nodeDirtyFlags;
 
   Layer* layer = &currentLayer;
-  Layer* nodeIsLayer( node.GetLayer() );
-  if( nodeIsLayer )
+  Layer* nodeIsLayer(node.GetLayer());
+  if(nodeIsLayer)
   {
     // all childs go to this layer
     layer = nodeIsLayer;
 
     // assume layer is clean to begin with
-    layer->SetReuseRenderers( updateBufferIndex, true );
+    layer->SetReuseRenderers(updateBufferIndex, true);
 
     // Layers do not inherit the DrawMode from their parents
     inheritedDrawMode = DrawMode::NORMAL;
   }
-  DALI_ASSERT_DEBUG( NULL != layer );
+  DALI_ASSERT_DEBUG(NULL != layer);
 
-  UpdateNodeOpacity( node, nodeDirtyFlags, updateBufferIndex );
+  UpdateNodeOpacity(node, nodeDirtyFlags, updateBufferIndex);
 
   // Draw mode inheritance is treated as or-ing the modes together (as they are a bit-mask).
   inheritedDrawMode |= node.GetDrawMode();
 
-  node.PrepareRender( updateBufferIndex );
+  node.PrepareRender(updateBufferIndex);
 
   // if any child node has moved or had its sort modifier changed, layer is not clean and old frame cannot be reused
   // also if node has been deleted, dont reuse old render items
-  if( nodeDirtyFlags & RenderableUpdateFlags )
+  if(nodeDirtyFlags & RenderableUpdateFlags)
   {
-    layer->SetReuseRenderers( updateBufferIndex, false );
+    layer->SetReuseRenderers(updateBufferIndex, false);
   }
 
   // recurse children
   NodeContainer& children = node.GetChildren();
-  const NodeIter endIter = children.End();
-  for ( NodeIter iter = children.Begin(); iter != endIter; ++iter )
+  const NodeIter endIter  = children.End();
+  for(NodeIter iter = children.Begin(); iter != endIter; ++iter)
   {
     Node& child = **iter;
-    cumulativeDirtyFlags |=UpdateNodes( child,
+    cumulativeDirtyFlags |= UpdateNodes(child,
                                         nodeDirtyFlags,
                                         updateBufferIndex,
                                         renderQueue,
                                         *layer,
-                                        inheritedDrawMode );
+                                        inheritedDrawMode);
   }
 
   return cumulativeDirtyFlags;
@@ -165,46 +161,46 @@ inline NodePropertyFlags UpdateNodes( Node& node,
 /**
  * The root node is treated separately; it cannot inherit values since it has no parent
  */
-NodePropertyFlags UpdateNodeTree( Layer& rootNode,
-                                  BufferIndex updateBufferIndex,
-                                  RenderQueue& renderQueue )
+NodePropertyFlags UpdateNodeTree(Layer&       rootNode,
+                                 BufferIndex  updateBufferIndex,
+                                 RenderQueue& renderQueue)
 {
-  DALI_ASSERT_DEBUG( rootNode.IsRoot() );
+  DALI_ASSERT_DEBUG(rootNode.IsRoot());
 
   // Short-circuit for invisible nodes
-  if ( DALI_UNLIKELY( !rootNode.IsVisible( updateBufferIndex ) ) ) // almost never ever true
+  if(DALI_UNLIKELY(!rootNode.IsVisible(updateBufferIndex))) // almost never ever true
   {
     return NodePropertyFlags::NOTHING;
   }
 
   // If the root node was not previously visible
   BufferIndex previousBuffer = updateBufferIndex ? 0u : 1u;
-  if ( DALI_UNLIKELY( !rootNode.IsVisible( previousBuffer ) ) ) // almost never ever true
+  if(DALI_UNLIKELY(!rootNode.IsVisible(previousBuffer))) // almost never ever true
   {
     // The node was skipped in the previous update; it must recalculate everything
     rootNode.SetAllDirtyFlags();
   }
 
-  NodePropertyFlags nodeDirtyFlags( rootNode.GetDirtyFlags() );
+  NodePropertyFlags nodeDirtyFlags(rootNode.GetDirtyFlags());
 
   NodePropertyFlags cumulativeDirtyFlags = nodeDirtyFlags;
 
-  UpdateRootNodeOpacity( rootNode, nodeDirtyFlags, updateBufferIndex );
+  UpdateRootNodeOpacity(rootNode, nodeDirtyFlags, updateBufferIndex);
 
-  DrawMode::Type drawMode( rootNode.GetDrawMode() );
+  DrawMode::Type drawMode(rootNode.GetDrawMode());
 
   // recurse children
   NodeContainer& children = rootNode.GetChildren();
-  const NodeIter endIter = children.End();
-  for ( NodeIter iter = children.Begin(); iter != endIter; ++iter )
+  const NodeIter endIter  = children.End();
+  for(NodeIter iter = children.Begin(); iter != endIter; ++iter)
   {
     Node& child = **iter;
-    cumulativeDirtyFlags |= UpdateNodes( child,
-                                         nodeDirtyFlags,
-                                         updateBufferIndex,
-                                         renderQueue,
-                                         rootNode,
-                                         drawMode );
+    cumulativeDirtyFlags |= UpdateNodes(child,
+                                        nodeDirtyFlags,
+                                        updateBufferIndex,
+                                        renderQueue,
+                                        rootNode,
+                                        drawMode);
   }
 
   return cumulativeDirtyFlags;

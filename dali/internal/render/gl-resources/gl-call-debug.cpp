@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@
 #include <dali/internal/render/gl-resources/gl-call-debug.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/gl-abstraction.h>
 #include <dali/integration-api/gl-defines.h>
+#include <dali/public-api/common/dali-common.h>
 
 namespace
 {
@@ -32,22 +32,21 @@ namespace
 struct errorStrings
 {
   const Dali::GLenum errorCode;
-  const char* errorString;
+  const char*        errorString;
 };
 errorStrings errors[] =
-{
-   { GL_NO_ERROR,           "GL_NO_ERROR" },
-   { GL_INVALID_ENUM,       "GL_INVALID_ENUM" },
-   { GL_INVALID_VALUE,      "GL_INVALID_VALUE" },
-   { GL_INVALID_OPERATION,  "GL_INVALID_OPERATION" },
-   { GL_OUT_OF_MEMORY,      "GL_OUT_OF_MEMORY" }
-};
-
-const char* ErrorToString( Dali::GLenum errorCode )
-{
-  for( unsigned int i = 0; i < sizeof(errors) / sizeof(errors[0]); ++i)
   {
-    if (errorCode == errors[i].errorCode)
+    {GL_NO_ERROR, "GL_NO_ERROR"},
+    {GL_INVALID_ENUM, "GL_INVALID_ENUM"},
+    {GL_INVALID_VALUE, "GL_INVALID_VALUE"},
+    {GL_INVALID_OPERATION, "GL_INVALID_OPERATION"},
+    {GL_OUT_OF_MEMORY, "GL_OUT_OF_MEMORY"}};
+
+const char* ErrorToString(Dali::GLenum errorCode)
+{
+  for(unsigned int i = 0; i < sizeof(errors) / sizeof(errors[0]); ++i)
+  {
+    if(errorCode == errors[i].errorCode)
     {
       return errors[i].errorString;
     }
@@ -55,30 +54,28 @@ const char* ErrorToString( Dali::GLenum errorCode )
   return "Unknown Open GLES error";
 }
 
-}
+} // namespace
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 #ifdef DEBUG_ENABLED
 /// Switch debug level to Concise to disable, General to enable. Note, enabling snapshot logging will do this on the fly.
 Debug::Filter* gGlLogFilter = Debug::Filter::New(Debug::Concise, false, "LOG_CONTEXT");
 #endif // DEBUG_ENABLED
 
-void CheckGlError( Integration::GlAbstraction& glAbstraction, const char* operation )
+void CheckGlError(Integration::GlAbstraction& glAbstraction, const char* operation)
 {
   bool foundError = false;
-  while( GLint error = glAbstraction.GetError() )
+  while(GLint error = glAbstraction.GetError())
   {
-    DALI_LOG_ERROR( "glError (0x%x) %s - after %s\n",  error, ErrorToString( error ), operation );
+    DALI_LOG_ERROR("glError (0x%x) %s - after %s\n", error, ErrorToString(error), operation);
     foundError = true;
   }
-  DALI_ASSERT_ALWAYS( !foundError && "GL ERROR" ); // if errors are being checked we should assert
+  DALI_ASSERT_ALWAYS(!foundError && "GL ERROR"); // if errors are being checked we should assert
 }
 
-}
+} // namespace Internal
 
-}
+} // namespace Dali

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,22 +19,20 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/math/viewport.h>
-#include <dali/public-api/render-tasks/render-task.h>
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/event-thread-services.h>
-#include <dali/internal/update/common/property-owner.h>
-#include <dali/internal/update/common/animatable-property.h>
-#include <dali/internal/render/renderers/render-frame-buffer.h>
 #include <dali/internal/render/common/render-instruction.h>
+#include <dali/internal/render/renderers/render-frame-buffer.h>
+#include <dali/internal/update/common/animatable-property.h>
+#include <dali/internal/update/common/property-owner.h>
+#include <dali/public-api/math/viewport.h>
+#include <dali/public-api/render-tasks/render-task.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace Render
 {
 class RenderTracker;
@@ -53,7 +51,6 @@ class RenderMessageDispatcher;
 class RenderTask : public PropertyOwner, public PropertyOwner::Observer
 {
 public:
-
   enum State : uint8_t
   {
     RENDER_CONTINUOUSLY,               ///< mRefreshRate > 0
@@ -76,13 +73,13 @@ public:
    * Initialize the render task. Called in update thread
    * @param[in] renderMessageDispatcher to send messages to render thread
    */
-  void Initialize( RenderMessageDispatcher& renderMessageDispatcher );
+  void Initialize(RenderMessageDispatcher& renderMessageDispatcher);
 
   /**
    * Set the nodes to be rendered.
    * @param[in] node This node and its children will be rendered.
    */
-  void SetSourceNode( Node* node );
+  void SetSourceNode(Node* node);
 
   /**
    * Retrieve the source node.
@@ -94,7 +91,7 @@ public:
    * Set whether the RenderTask has exclusive access to the source nodes.
    * @param[in] exclusive True if the source nodes will only be rendered by this render-task.
    */
-  void SetExclusive( bool exclusive );
+  void SetExclusive(bool exclusive);
 
   /**
    * Query whether the RenderTask has exclusive access to the source actors.
@@ -107,13 +104,13 @@ public:
    * @param[in] cameraNode that camera is connected with
    * @param[in] camera to use.
    */
-  void SetCamera( Node* cameraNode, Camera* camera );
+  void SetCamera(Node* cameraNode, Camera* camera);
 
   /**
    * Set the frame-buffer used as a render target.
    * @param[in] frameBuffer The framebuffer
    */
-  void SetFrameBuffer( Render::FrameBuffer* frameBuffer );
+  void SetFrameBuffer(Render::FrameBuffer* frameBuffer);
 
   /**
    * Retrieve the resource ID of the frame-buffer.
@@ -127,7 +124,7 @@ public:
    * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] value The value of the property
    */
-  void SetViewportPosition( BufferIndex updateBufferIndex, const Vector2& value );
+  void SetViewportPosition(BufferIndex updateBufferIndex, const Vector2& value);
 
   /**
    * Get the value of property viewportPosition
@@ -135,7 +132,7 @@ public:
    * @param[in] bufferIndex The buffer to read from.
    * @return the value of the property.
    */
-  const Vector2& GetViewportPosition( BufferIndex bufferIndex ) const;
+  const Vector2& GetViewportPosition(BufferIndex bufferIndex) const;
 
   /**
    * Bake the value of the property viewportPosition
@@ -143,7 +140,7 @@ public:
    * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] value The new value for property.
    */
-  void BakeViewportPosition( BufferIndex updateBufferIndex, const Vector2& value );
+  void BakeViewportPosition(BufferIndex updateBufferIndex, const Vector2& value);
 
   /**
    * Set the value of property viewportSize
@@ -151,7 +148,7 @@ public:
    * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] value The value of the property
    */
-  void SetViewportSize( BufferIndex updateBufferIndex, const Vector2& value );
+  void SetViewportSize(BufferIndex updateBufferIndex, const Vector2& value);
 
   /**
    * Get the value of property viewportSize
@@ -159,7 +156,7 @@ public:
    * @param[in] bufferIndex The buffer to read from.
    * @return the value of the property.
    */
-  const Vector2& GetViewportSize( BufferIndex bufferIndex ) const;
+  const Vector2& GetViewportSize(BufferIndex bufferIndex) const;
 
   /**
    * Bake the value of the property viewportSize
@@ -167,7 +164,7 @@ public:
    * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] value The new value for property.
    */
-  void BakeViewportSize( BufferIndex updateBufferIndex, const Vector2& value );
+  void BakeViewportSize(BufferIndex updateBufferIndex, const Vector2& value);
 
   /**
    * Get the value of property viewportEnabled
@@ -175,7 +172,7 @@ public:
    * @param[in] bufferIndex The buffer to read from.
    * @return the value of the property.
    */
-  bool GetViewportEnabled( BufferIndex bufferIndex ) const;
+  bool GetViewportEnabled(BufferIndex bufferIndex) const;
 
   /**
    * Query whether the optional viewport is set.
@@ -183,7 +180,7 @@ public:
    * @param[out] viewport The viewport position and size is populated.
    * @return true if the viewport has been set
    */
-  bool QueryViewport( BufferIndex bufferIndex, Viewport& viewport ) const;
+  bool QueryViewport(BufferIndex bufferIndex, Viewport& viewport) const;
 
   /**
    * Set the value of property clearColor
@@ -191,7 +188,7 @@ public:
    * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] value The value of the property
    */
-  void SetClearColor( BufferIndex updateBufferIndex, const Vector4& value );
+  void SetClearColor(BufferIndex updateBufferIndex, const Vector4& value);
 
   /**
    * Get the value of property clearColor
@@ -199,7 +196,7 @@ public:
    * @param[in] bufferIndex The buffer to read from.
    * @return the value of the property.
    */
-  const Vector4& GetClearColor( BufferIndex bufferIndex ) const;
+  const Vector4& GetClearColor(BufferIndex bufferIndex) const;
 
   /**
    * Bake the value of the property clearColor
@@ -207,12 +204,12 @@ public:
    * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] value The new value for property.
    */
-  void BakeClearColor( BufferIndex updateBufferIndex, const Vector4& value );
+  void BakeClearColor(BufferIndex updateBufferIndex, const Vector4& value);
 
   /**
    * @copydoc Dali::RenderTask::SetClearEnabled()
    */
-  void SetClearEnabled( bool enabled );
+  void SetClearEnabled(bool enabled);
 
   /**
    * @copydoc Dali::RenderTask::GetClearEnabled()
@@ -222,7 +219,7 @@ public:
   /**
    * @copydoc Dali::RenderTask::SetCullMode()
    */
-  void SetCullMode( bool mode );
+  void SetCullMode(bool mode);
 
   /**
    * @copydoc Dali::RenderTask::GetCullMode()
@@ -233,7 +230,7 @@ public:
    * Set the refresh-rate of the RenderTask.
    * @param[in] refreshRate The new refresh rate.
    */
-  void SetRefreshRate( uint32_t refreshRate );
+  void SetRefreshRate(uint32_t refreshRate);
 
   /**
    * Retrieve the refresh-rate of the RenderTask.
@@ -246,7 +243,7 @@ public:
    * @param[in] updateBufferIndex The current update buffer index.
    * @return True if the render-task is ready for rendering.
    */
-  bool ReadyToRender( BufferIndex updateBufferIndex );
+  bool ReadyToRender(BufferIndex updateBufferIndex);
 
   /**
    * True if a render is required. If the current state is RENDER_CONTINUOUSLY, then
@@ -286,7 +283,7 @@ public:
    * @param[in] bufferIndex The buffer to read from.
    * @return The view-matrix.
    */
-  const Matrix& GetViewMatrix( BufferIndex bufferIndex ) const;
+  const Matrix& GetViewMatrix(BufferIndex bufferIndex) const;
 
   /**
    * @brief Retrieve the camera.
@@ -302,7 +299,7 @@ public:
    * @param[in] bufferIndex The buffer to read from.
    * @return The projection-matrix.
    */
-  const Matrix& GetProjectionMatrix( BufferIndex bufferIndex ) const;
+  const Matrix& GetProjectionMatrix(BufferIndex bufferIndex) const;
 
   /**
    * Prepares the render-instruction buffer to be populated with instructions.
@@ -314,7 +311,7 @@ public:
    * @param[in] updateBufferIndex The current update buffer index.
    * @return instruction to prepare
    */
-  RenderInstruction& PrepareRenderInstruction( BufferIndex updateBufferIndex );
+  RenderInstruction& PrepareRenderInstruction(BufferIndex updateBufferIndex);
 
   /**
    * @return true if the view matrix has been updated during this or last frame
@@ -325,37 +322,35 @@ public:
    * Indicate whether GL sync is required for native render target.
    * @param[in] requiresSync whether GL sync is required for native render target
    */
-  void SetSyncRequired( bool requiresSync );
+  void SetSyncRequired(bool requiresSync);
 
   /**
    * Retrieve the render instruction.
    * @param[in] updateBufferIndex The current update buffer index.
    * @return The render instruction
    */
-  RenderInstruction& GetRenderInstruction( BufferIndex updateBufferIndex )
+  RenderInstruction& GetRenderInstruction(BufferIndex updateBufferIndex)
   {
     return mRenderInstruction[updateBufferIndex];
   }
 
 private: // from PropertyOwner::Observer
-
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerConnected( PropertyOwner& owner )
    */
-  void PropertyOwnerConnected( PropertyOwner& owner ) override;
+  void PropertyOwnerConnected(PropertyOwner& owner) override;
 
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerDisconnected( BufferIndex updateBufferIndex, PropertyOwner& owner )
    */
-  void PropertyOwnerDisconnected( BufferIndex updateBufferIndex, PropertyOwner& owner ) override;
+  void PropertyOwnerDisconnected(BufferIndex updateBufferIndex, PropertyOwner& owner) override;
 
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerDestroyed( PropertyOwner& owner )
    */
-  void PropertyOwnerDestroyed( PropertyOwner& owner ) override;
+  void PropertyOwnerDestroyed(PropertyOwner& owner) override;
 
 private:
-
   void SetActiveStatus();
 
   /**
@@ -367,173 +362,172 @@ private:
   RenderTask(const RenderTask&) = delete;
   RenderTask& operator=(const RenderTask&) = delete;
 
-public: // Animatable Properties
-  AnimatableProperty< Vector2 >   mViewportPosition;    ///< viewportPosition
-  AnimatableProperty< Vector2 >   mViewportSize;        ///< viewportSize
-  AnimatableProperty< Vector4 >   mClearColor;          ///< clearColor
+public:                                          // Animatable Properties
+  AnimatableProperty<Vector2> mViewportPosition; ///< viewportPosition
+  AnimatableProperty<Vector2> mViewportSize;     ///< viewportSize
+  AnimatableProperty<Vector4> mClearColor;       ///< clearColor
 
 private:
   RenderMessageDispatcher* mRenderMessageDispatcher;
-  Render::RenderTracker* mRenderSyncTracker;
-  Node* mSourceNode;
-  Node* mCameraNode;
-  SceneGraph::Camera* mCamera;
-  Render::FrameBuffer* mFrameBuffer;
+  Render::RenderTracker*   mRenderSyncTracker;
+  Node*                    mSourceNode;
+  Node*                    mCameraNode;
+  SceneGraph::Camera*      mCamera;
+  Render::FrameBuffer*     mFrameBuffer;
 
   RenderInstruction mRenderInstruction[2]; ///< Owned double buffered render instruction. (Double buffered because this owns render commands for the currently drawn frame)
 
-  uint32_t mRefreshRate;   ///< REFRESH_ONCE, REFRESH_ALWAYS or render every N frames
-  uint32_t mFrameCounter;  ///< counter for rendering every N frames
-  uint32_t mRenderedOnceCounter;///< Incremented whenever state changes to RENDERED_ONCE_AND_NOTIFIED
+  uint32_t mRefreshRate;         ///< REFRESH_ONCE, REFRESH_ALWAYS or render every N frames
+  uint32_t mFrameCounter;        ///< counter for rendering every N frames
+  uint32_t mRenderedOnceCounter; ///< Incremented whenever state changes to RENDERED_ONCE_AND_NOTIFIED
 
-  State mState;           ///< Render state.
+  State mState; ///< Render state.
 
-  bool mRequiresSync:1;   ///< Whether sync is needed to track the render
-  bool mActive:1;         ///< True when the task is active, i.e. has valid source and camera
-  bool mWaitingToRender:1;///< True when an render once to FBO is waiting
-  bool mNotifyTrigger:1;  ///< True if a render once render task has finished renderering
-  bool mExclusive:1;      ///< Whether the render task has exclusive access to the source actor (node in the scene graph).
-  bool mClearEnabled:1;   ///< Whether previous results are cleared.
-  bool mCullMode:1;       ///< Whether renderers should be frustum culled
-
+  bool mRequiresSync : 1;    ///< Whether sync is needed to track the render
+  bool mActive : 1;          ///< True when the task is active, i.e. has valid source and camera
+  bool mWaitingToRender : 1; ///< True when an render once to FBO is waiting
+  bool mNotifyTrigger : 1;   ///< True if a render once render task has finished renderering
+  bool mExclusive : 1;       ///< Whether the render task has exclusive access to the source actor (node in the scene graph).
+  bool mClearEnabled : 1;    ///< Whether previous results are cleared.
+  bool mCullMode : 1;        ///< Whether renderers should be frustum culled
 };
 
 // Messages for RenderTask
-inline void SetFrameBufferMessage( EventThreadServices& eventThreadServices, const RenderTask& task, Render::FrameBuffer* frameBuffer )
+inline void SetFrameBufferMessage(EventThreadServices& eventThreadServices, const RenderTask& task, Render::FrameBuffer* frameBuffer)
 {
   using LocalType = MessageValue1<RenderTask, Render::FrameBuffer*>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &task, &RenderTask::SetFrameBuffer, frameBuffer );
+  new(slot) LocalType(&task, &RenderTask::SetFrameBuffer, frameBuffer);
 }
 
-inline void SetClearColorMessage( EventThreadServices& eventThreadServices, const RenderTask& task, const Vector4& value )
+inline void SetClearColorMessage(EventThreadServices& eventThreadServices, const RenderTask& task, const Vector4& value)
 {
   using LocalType = MessageDoubleBuffered1<RenderTask, Vector4>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &task, &RenderTask::SetClearColor, value );
+  new(slot) LocalType(&task, &RenderTask::SetClearColor, value);
 }
 
-inline void BakeClearColorMessage( EventThreadServices& eventThreadServices, const RenderTask& task, const Vector4& value )
+inline void BakeClearColorMessage(EventThreadServices& eventThreadServices, const RenderTask& task, const Vector4& value)
 {
   using LocalType = MessageDoubleBuffered1<RenderTask, Vector4>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &task, &RenderTask::BakeClearColor, value );
+  new(slot) LocalType(&task, &RenderTask::BakeClearColor, value);
 }
 
-inline void SetClearEnabledMessage( EventThreadServices& eventThreadServices, const RenderTask& task, bool enabled )
+inline void SetClearEnabledMessage(EventThreadServices& eventThreadServices, const RenderTask& task, bool enabled)
 {
   using LocalType = MessageValue1<RenderTask, bool>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &task, &RenderTask::SetClearEnabled, enabled );
+  new(slot) LocalType(&task, &RenderTask::SetClearEnabled, enabled);
 }
 
-inline void SetCullModeMessage( EventThreadServices& eventThreadServices, const RenderTask& task, bool mode )
+inline void SetCullModeMessage(EventThreadServices& eventThreadServices, const RenderTask& task, bool mode)
 {
   using LocalType = MessageValue1<RenderTask, bool>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &task, &RenderTask::SetCullMode, mode );
+  new(slot) LocalType(&task, &RenderTask::SetCullMode, mode);
 }
 
-inline void SetRefreshRateMessage( EventThreadServices& eventThreadServices, const RenderTask& task, uint32_t refreshRate )
+inline void SetRefreshRateMessage(EventThreadServices& eventThreadServices, const RenderTask& task, uint32_t refreshRate)
 {
   using LocalType = MessageValue1<RenderTask, uint32_t>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &task, &RenderTask::SetRefreshRate, refreshRate );
+  new(slot) LocalType(&task, &RenderTask::SetRefreshRate, refreshRate);
 }
 
-inline void SetSourceNodeMessage( EventThreadServices& eventThreadServices, const RenderTask& task, const Node* constNode )
+inline void SetSourceNodeMessage(EventThreadServices& eventThreadServices, const RenderTask& task, const Node* constNode)
 {
   // Scene graph thread can destroy this object.
-  Node* node = const_cast< Node* >( constNode );
+  Node* node = const_cast<Node*>(constNode);
 
   using LocalType = MessageValue1<RenderTask, Node*>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &task, &RenderTask::SetSourceNode, node );
+  new(slot) LocalType(&task, &RenderTask::SetSourceNode, node);
 }
 
-inline void SetCameraMessage( EventThreadServices& eventThreadServices, const RenderTask& task, const Node* constNode, const Camera* constCamera )
+inline void SetCameraMessage(EventThreadServices& eventThreadServices, const RenderTask& task, const Node* constNode, const Camera* constCamera)
 {
   using LocalType = MessageValue2<RenderTask, Node*, Camera*>;
 
-  Node* node = const_cast< Node* >( constNode );
-  Camera* camera = const_cast< Camera* >( constCamera );
+  Node*   node   = const_cast<Node*>(constNode);
+  Camera* camera = const_cast<Camera*>(constCamera);
   // Reserve memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &task, &RenderTask::SetCamera, node, camera );
+  new(slot) LocalType(&task, &RenderTask::SetCamera, node, camera);
 }
 
-inline void SetExclusiveMessage( EventThreadServices& eventThreadServices, const RenderTask& task, bool exclusive )
+inline void SetExclusiveMessage(EventThreadServices& eventThreadServices, const RenderTask& task, bool exclusive)
 {
   using LocalType = MessageValue1<RenderTask, bool>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &task, &RenderTask::SetExclusive, exclusive );
+  new(slot) LocalType(&task, &RenderTask::SetExclusive, exclusive);
 }
 
-inline void SetSyncRequiredMessage(EventThreadServices& eventThreadServices, const RenderTask& task, bool requiresSync )
+inline void SetSyncRequiredMessage(EventThreadServices& eventThreadServices, const RenderTask& task, bool requiresSync)
 {
   using LocalType = MessageValue1<RenderTask, bool>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &task, &RenderTask::SetSyncRequired, requiresSync );
+  new(slot) LocalType(&task, &RenderTask::SetSyncRequired, requiresSync);
 }
 
-inline void BakeViewportPositionMessage( EventThreadServices& eventThreadServices, const RenderTask& task, const Vector2& value )
+inline void BakeViewportPositionMessage(EventThreadServices& eventThreadServices, const RenderTask& task, const Vector2& value)
 {
   using LocalType = MessageDoubleBuffered1<RenderTask, Vector2>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &task, &RenderTask::BakeViewportPosition, value );
+  new(slot) LocalType(&task, &RenderTask::BakeViewportPosition, value);
 }
 
-inline void BakeViewportSizeMessage( EventThreadServices& eventThreadServices, const RenderTask& task, const Vector2& value )
+inline void BakeViewportSizeMessage(EventThreadServices& eventThreadServices, const RenderTask& task, const Vector2& value)
 {
   using LocalType = MessageDoubleBuffered1<RenderTask, Vector2>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &task, &RenderTask::BakeViewportSize, value );
+  new(slot) LocalType(&task, &RenderTask::BakeViewportSize, value);
 }
 
 } // namespace SceneGraph

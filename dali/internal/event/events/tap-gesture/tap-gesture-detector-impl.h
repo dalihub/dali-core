@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TAP_GESTURE_DETECTOR_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,16 +19,14 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/internal/event/events/gesture-detector-impl.h>
 #include <dali/public-api/events/tap-gesture-detector.h>
 #include <dali/public-api/events/tap-gesture.h>
-#include <dali/internal/event/events/gesture-detector-impl.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 class TapGestureDetector;
 
 using TapGestureDetectorPtr       = IntrusivePtr<TapGestureDetector>;
@@ -40,7 +38,6 @@ using TapGestureDetectorContainer = DerivedGestureDetectorContainer<TapGestureDe
 class TapGestureDetector : public GestureDetector
 {
 public: // Creation
-
   /**
    * Create a new gesture detector.
    * @return A smart-pointer to the newly allocated detector.
@@ -52,7 +49,7 @@ public: // Creation
    * @param[in]  tapsRequired     The number of taps required.
    * @return A smart-pointer to the newly allocated detector.
    */
-  static TapGestureDetectorPtr New( unsigned int tapsRequired );
+  static TapGestureDetectorPtr New(unsigned int tapsRequired);
 
   /**
    * Construct a new GestureDetector.
@@ -63,10 +60,9 @@ public: // Creation
    * Construct a new GestureDetector with the specified parameters.
    * @param[in]  tapsRequired     The number of taps required.
    */
-  TapGestureDetector( unsigned int tapsRequired );
+  TapGestureDetector(unsigned int tapsRequired);
 
 public:
-
   /**
    * @copydoc Dali::TapGestureDetector::SetTouchesRequired(unsigned int)
    */
@@ -75,12 +71,12 @@ public:
   /**
    * @copydoc Dali::TapGestureDetector::SetMinimumTapsRequired()
    */
-  void SetMinimumTapsRequired( unsigned int minTaps );
+  void SetMinimumTapsRequired(unsigned int minTaps);
 
   /**
    * @copydoc Dali::TapGestureDetector::SetMaximumTapsRequired()
    */
-  void SetMaximumTapsRequired( unsigned int maxTaps );
+  void SetMaximumTapsRequired(unsigned int maxTaps);
 
   /**
    * @copydoc Dali::TapGestureDetector::GetMinimumTapsRequired()
@@ -98,7 +94,6 @@ public:
   unsigned int GetTouchesRequired() const;
 
 public:
-
   /**
    * Called by the TapGestureProcessor when a tap gesture event occurs within the bounds of our
    * attached actor.
@@ -108,7 +103,6 @@ public:
   void EmitTapGestureSignal(Dali::Actor tappedActor, const Dali::TapGesture& tap);
 
 public: // Signals
-
   /**
    * @copydoc Dali::TapGestureDetector::DetectedSignal()
    */
@@ -126,23 +120,20 @@ public: // Signals
    * @return True if the signal was connected.
    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
    */
-  static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
+  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor);
 
 protected:
-
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
   ~TapGestureDetector() override;
 
 private:
-
   // Undefined
   TapGestureDetector(const TapGestureDetector&);
   TapGestureDetector& operator=(const TapGestureDetector& rhs);
 
 private: // GestureDetector overrides
-
   /**
    * @copydoc Dali::Internal::GestureDetector::OnActorAttach(Actor&)
    */
@@ -159,7 +150,6 @@ private: // GestureDetector overrides
   void OnActorDestroyed(Object& object) override;
 
 private:
-
   Dali::TapGestureDetector::DetectedSignalType mDetectedSignal;
 
   unsigned int mMinimumTapsRequired;
@@ -173,7 +163,7 @@ private:
 
 inline Internal::TapGestureDetector& GetImplementation(Dali::TapGestureDetector& detector)
 {
-  DALI_ASSERT_ALWAYS( detector && "TapGestureDetector handle is empty" );
+  DALI_ASSERT_ALWAYS(detector && "TapGestureDetector handle is empty");
 
   BaseObject& handle = detector.GetBaseObject();
 
@@ -182,7 +172,7 @@ inline Internal::TapGestureDetector& GetImplementation(Dali::TapGestureDetector&
 
 inline const Internal::TapGestureDetector& GetImplementation(const Dali::TapGestureDetector& detector)
 {
-  DALI_ASSERT_ALWAYS( detector && "TapGestureDetector handle is empty" );
+  DALI_ASSERT_ALWAYS(detector && "TapGestureDetector handle is empty");
 
   const BaseObject& handle = detector.GetBaseObject();
 

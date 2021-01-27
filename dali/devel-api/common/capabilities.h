@@ -2,7 +2,7 @@
 #define DALI_CAPABILITIES_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,23 +23,21 @@
 
 namespace Dali
 {
-
 namespace Capabilities
 {
+/**
+ * @brief Returns whether the blend equation is supported in the system or not.
+ * @param[in] blendEquation blend equation to be checked.
+ * @return True if the blend equation supported.
+ */
+DALI_CORE_API bool IsBlendEquationSupported(BlendEquation::Type blendEquation);
 
 /**
  * @brief Returns whether the blend equation is supported in the system or not.
  * @param[in] blendEquation blend equation to be checked.
  * @return True if the blend equation supported.
  */
-DALI_CORE_API bool IsBlendEquationSupported( BlendEquation::Type blendEquation );
-
-/**
- * @brief Returns whether the blend equation is supported in the system or not.
- * @param[in] blendEquation blend equation to be checked.
- * @return True if the blend equation supported.
- */
-DALI_CORE_API bool IsBlendEquationSupported( DevelBlendEquation::Type blendEquation );
+DALI_CORE_API bool IsBlendEquationSupported(DevelBlendEquation::Type blendEquation);
 
 } // namespace Capabilities
 

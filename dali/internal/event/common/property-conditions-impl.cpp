@@ -20,14 +20,11 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 PropertyCondition::PropertyCondition()
 : type(False)
 {
-
 }
 
 PropertyCondition::~PropertyCondition() = default;

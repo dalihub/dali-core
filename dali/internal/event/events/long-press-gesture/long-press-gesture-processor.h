@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_LONG_PRESS_GESTURE_EVENT_PROCESSOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,16 +19,14 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/events/long-press-gesture/long-press-gesture-detector-impl.h>
 #include <dali/internal/event/events/gesture-processor.h>
+#include <dali/internal/event/events/long-press-gesture/long-press-gesture-detector-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 class Stage;
 class Scene;
 
@@ -45,7 +43,6 @@ struct LongPressGestureEvent;
 class LongPressGestureProcessor : public GestureProcessor, public RecognizerObserver<LongPressGestureEvent>
 {
 public:
-
   /**
    * Create a long press gesture processor.
    */
@@ -57,13 +54,12 @@ public:
   ~LongPressGestureProcessor() override;
 
 public: // To be called by GestureEventProcessor
-
   /**
    * This method is called whenever a long press gesture event occurs.
    * @param[in] scene The scene the long press gesture event occurs in.
    * @param[in] longPressEvent The event that has occurred.
    */
-  void Process( Scene& scene, const LongPressGestureEvent& longPressEvent ) override;
+  void Process(Scene& scene, const LongPressGestureEvent& longPressEvent) override;
 
   /**
    * Adds a gesture detector to this gesture processor.
@@ -72,7 +68,7 @@ public: // To be called by GestureEventProcessor
    * @param[in]  gestureDetector  The gesture detector being added.
    * @param[in] scene The scene the long press gesture event occurs in.
    */
-  void AddGestureDetector( LongPressGestureDetector* gestureDetector, Scene& scene );
+  void AddGestureDetector(LongPressGestureDetector* gestureDetector, Scene& scene);
 
   /**
    * Removes the specified gesture detector from this gesture processor.  If, after removing this
@@ -80,7 +76,7 @@ public: // To be called by GestureEventProcessor
    * the gesture from the adaptor.
    * @param[in]  gestureDetector  The gesture detector being removed.
    */
-  void RemoveGestureDetector( LongPressGestureDetector* gestureDetector );
+  void RemoveGestureDetector(LongPressGestureDetector* gestureDetector);
 
   /**
    * This method updates the gesture detection parameters.
@@ -93,7 +89,7 @@ public: // To be called by GestureEventProcessor
    *
    * @param[in] value The time value in milliseconds
    */
-  void SetMinimumHoldingTime( uint32_t time );
+  void SetMinimumHoldingTime(uint32_t time);
 
   /**
    * @return The minimum holding time required to be recognized as a long press gesture in milliseconds
@@ -101,13 +97,11 @@ public: // To be called by GestureEventProcessor
   uint32_t GetMinimumHoldingTime() const;
 
 private:
-
   // Undefined
-  LongPressGestureProcessor( const LongPressGestureProcessor& );
-  LongPressGestureProcessor& operator=( const LongPressGestureProcessor& rhs );
+  LongPressGestureProcessor(const LongPressGestureProcessor&);
+  LongPressGestureProcessor& operator=(const LongPressGestureProcessor& rhs);
 
 private:
-
   /**
    * Iterates through our GestureDetectors and determines if we need to ask the adaptor to update
    * its detection policy.  If it does, it sends the appropriate gesture update request to adaptor.
@@ -124,19 +118,18 @@ private:
   /**
    * @copydoc GestureProcessor::CheckGestureDetector()
    */
-  bool CheckGestureDetector( GestureDetector* detector, Actor* actor ) override;
+  bool CheckGestureDetector(GestureDetector* detector, Actor* actor) override;
 
   /**
    * @copydoc GestureProcessor::EmitGestureSignal()
    */
-  void EmitGestureSignal( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates ) override;
+  void EmitGestureSignal(Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates) override;
 
 private:
-
   LongPressGestureDetectorContainer mLongPressGestureDetectors;
 
   GestureDetectorContainer mCurrentEmitters;
-  RenderTaskPtr mCurrentRenderTask;
+  RenderTaskPtr            mCurrentRenderTask;
 
   uint32_t mMinTouchesRequired;
   uint32_t mMaxTouchesRequired;

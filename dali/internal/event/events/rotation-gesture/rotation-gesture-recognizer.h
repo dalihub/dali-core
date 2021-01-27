@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_EVENT_ROTATION_GESTURE_RECOGNIZER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@
 
 namespace Dali
 {
-
 namespace Integration
 {
 struct TouchEvent;
@@ -35,15 +34,13 @@ struct TouchEvent;
 
 namespace Internal
 {
-
 /**
  * When given a set of touch events, this detector attempts to determine if a rotation gesture has taken place.
  */
 class RotationGestureRecognizer : public GestureRecognizer
 {
 public:
-
-  using Observer = RecognizerObserver< RotationGestureEvent >;
+  using Observer = RecognizerObserver<RotationGestureEvent>;
 
   /**
    * Constructor
@@ -51,7 +48,7 @@ public:
    * @param[in] minimumTouchEvents The number of touch events required
    * @param[in] minimumTouchEventsAfterStart The number of touch events required after a gesture started
    */
-  RotationGestureRecognizer( Observer& observer, uint32_t minimumTouchEvents, uint32_t minimumTouchEventsAfterStart );
+  RotationGestureRecognizer(Observer& observer, uint32_t minimumTouchEvents, uint32_t minimumTouchEventsAfterStart);
 
   /**
    * Virtual destructor.
@@ -59,40 +56,39 @@ public:
   ~RotationGestureRecognizer() override = default;
 
 public:
-
   /**
    * @copydoc Dali::Internal::GestureDetector::SendEvent(const Integration::TouchEvent&)
    */
-  void SendEvent( const Integration::TouchEvent& event ) override;
+  void SendEvent(const Integration::TouchEvent& event) override;
 
   /**
    * @copydoc Dali::Internal::GestureDetector::Update(const Integration::GestureRequest&)
    */
-  void Update( const GestureRequest& request ) override { /* Nothing to do */ }
+  void Update(const GestureRequest& request) override
+  { /* Nothing to do */
+  }
 
   /**
    * Sets the minimum touch events required before a rotation can be started
    * @param[in] value The number of touch events
    */
-  void SetMinimumTouchEvents( uint32_t value );
+  void SetMinimumTouchEvents(uint32_t value);
 
   /**
    * Sets the minimum touch events required after a rotation started
    * @param[in] value The number of touch events
    */
-  void SetMinimumTouchEventsAfterStart( uint32_t value );
+  void SetMinimumTouchEventsAfterStart(uint32_t value);
 
 private:
-
   /**
    * Emits the rotation gesture event to the core.
    * @param[in]  state         The state of the rotation (whether it's starting, continuing or finished).
    * @param[in]  currentEvent  The latest touch event.
    */
-  void SendRotation( GestureState state, const Integration::TouchEvent& currentEvent );
+  void SendRotation(GestureState state, const Integration::TouchEvent& currentEvent);
 
 private:
-
   // Reference to the gesture processor for this recognizer
   Observer& mObserver;
 
@@ -106,8 +102,8 @@ private:
     STARTED,  ///< A gesture has been detected.
   };
 
-  State mState; ///< The current state of the detector.
-  std::vector< Integration::TouchEvent > mTouchEvents; ///< The touch events since initial touch down.
+  State                                mState;       ///< The current state of the detector.
+  std::vector<Integration::TouchEvent> mTouchEvents; ///< The touch events since initial touch down.
 
   float mStartingAngle; ///< The angle between the two touch points when the rotation is first detected.
 

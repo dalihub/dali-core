@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_TASK_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,17 +22,16 @@
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/weak-handle.h>
 #include <dali/public-api/render-tasks/render-task.h>
+
 #include <dali/internal/event/common/object-impl.h>
-#include <dali/internal/event/rendering/frame-buffer-impl.h>
-#include <dali/internal/event/render-tasks/render-task-list-impl.h>
 #include <dali/internal/event/events/actor-observer.h>
+#include <dali/internal/event/render-tasks/render-task-list-impl.h>
+#include <dali/internal/event/rendering/frame-buffer-impl.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 class Actor;
 class CameraActor;
 class EventThreadServices;
@@ -43,14 +42,13 @@ namespace SceneGraph
 class RenderTaskList;
 class RenderTask;
 class Camera;
-}
+} // namespace SceneGraph
 
 using RenderTaskPtr = IntrusivePtr<RenderTask>;
 
 class RenderTask : public Object
 {
 public:
-
   using ScreenToFrameBufferFunction = Dali::RenderTask::ScreenToFrameBufferFunction;
 
   /**
@@ -61,12 +59,12 @@ public:
    * @param[in] renderTaskList The render task list.
    * @return The created render task
    */
-  static RenderTaskPtr New( Actor* sourceActor, CameraActor* cameraActor, RenderTaskList& renderTaskList );
+  static RenderTaskPtr New(Actor* sourceActor, CameraActor* cameraActor, RenderTaskList& renderTaskList);
 
   /**
    * @copydoc Dali::RenderTask::SetSourceActor()
    */
-  void SetSourceActor( Actor* actor );
+  void SetSourceActor(Actor* actor);
 
   /**
    * @copydoc Dali::RenderTask::GetSourceActor()
@@ -76,7 +74,7 @@ public:
   /**
    * @copydoc Dali::RenderTask::SetExclusive()
    */
-  void SetExclusive( bool exclusive );
+  void SetExclusive(bool exclusive);
 
   /**
    * @copydoc Dali::RenderTask::IsExclusive()
@@ -86,7 +84,7 @@ public:
   /**
    * @copydoc Dali::RenderTask::SetInputEnabled()
    */
-  void SetInputEnabled( bool enabled );
+  void SetInputEnabled(bool enabled);
 
   /**
    * @copydoc Dali::RenderTask::GetInputEnabled()
@@ -96,7 +94,7 @@ public:
   /**
    * @copydoc Dali::RenderTask::SetCameraActor()
    */
-  void SetCameraActor( CameraActor* cameraActor );
+  void SetCameraActor(CameraActor* cameraActor);
 
   /**
    * @copydoc Dali::RenderTask::GetCameraActor()
@@ -106,17 +104,17 @@ public:
   /**
     * @copydoc Dali::RenderTask::SetFrameBuffer()
     */
-   void SetFrameBuffer( FrameBufferPtr frameBuffer );
+  void SetFrameBuffer(FrameBufferPtr frameBuffer);
 
-   /**
+  /**
     * @copydoc Dali::RenderTask::GetFrameBuffer
     */
-   FrameBuffer* GetFrameBuffer() const;
+  FrameBuffer* GetFrameBuffer() const;
 
   /**
    * @copydoc Dali::RenderTask::SetScreenToFrameBufferFunction
    */
-  void SetScreenToFrameBufferFunction( ScreenToFrameBufferFunction conversionFunction );
+  void SetScreenToFrameBufferFunction(ScreenToFrameBufferFunction conversionFunction);
 
   /**
    * @copydoc Dali::RenderTask::GetScreenToFrameBufferFunction
@@ -126,7 +124,7 @@ public:
   /**
    * copydoc Dali::RenderTask::SetScreenToFrameBufferMappingActor
    */
-  void SetScreenToFrameBufferMappingActor( Dali::Actor& mappingActor );
+  void SetScreenToFrameBufferMappingActor(Dali::Actor& mappingActor);
 
   /**
    * copydoc Dali::RenderTask::GetScreenToFrameBufferMAppingActor
@@ -156,17 +154,17 @@ public:
   /**
    * @copydoc Dali::RenderTask::SetViewport()
    */
-  void SetViewport( const Viewport& viewport );
+  void SetViewport(const Viewport& viewport);
 
   /**
    * @param[out] viewPort instance to copy the values into
    */
-  void GetViewport( Viewport& viewPort ) const;
+  void GetViewport(Viewport& viewPort) const;
 
   /**
    * @copydoc Dali::RenderTask::SetClearColor()
    */
-  void SetClearColor( const Vector4& color );
+  void SetClearColor(const Vector4& color);
 
   /**
    * @copydoc Dali::RenderTask::GetClearColor()
@@ -177,18 +175,18 @@ public:
    * Indicate whether GL sync is required for native render target.
    * @param[in] requiresSync whether GL sync is required.
    */
-  void SetSyncRequired( bool requiresSync );
+  void SetSyncRequired(bool requiresSync);
 
   /**
    * Query whether the sync object is required for native render target.
    * @return True if the sync object is required, false otherwise.
    */
- bool IsSyncRequired() const;
+  bool IsSyncRequired() const;
 
   /**
    * @copydoc Dali::RenderTask::SetClearEnabled()
    */
-  void SetClearEnabled( bool enabled );
+  void SetClearEnabled(bool enabled);
 
   /**
    * @copydoc Dali::RenderTask::GetClearEnabled()
@@ -198,7 +196,7 @@ public:
   /**
    * @copydoc Dali::RenderTask::SetCullMode()
    */
-  void SetCullMode( bool mode );
+  void SetCullMode(bool mode);
 
   /**
    * @copydoc Dali::RenderTask::GetCullMode()
@@ -208,7 +206,7 @@ public:
   /**
    * @copydoc Dali::RenderTask::SetRefreshRate()
    */
-  void SetRefreshRate( uint32_t refreshRate );
+  void SetRefreshRate(uint32_t refreshRate);
 
   /**
    * @copydoc Dali::RenderTask::GetRefreshRate()
@@ -220,27 +218,26 @@ public:
    * @param[in,out] screenCoords The screen coordinate, which may be converted (for hit-testing actors which are rendered off-screen).
    * @return True the render-task can be used for input-handling; otherwise the output parameters are not valid.
    */
-  bool IsHittable( Vector2& screenCoords ) const;
+  bool IsHittable(Vector2& screenCoords) const;
 
   /**
    * Translates screen coordinates to render task coordinates for offscreen render tasks
    * @param[in,out] screenCoords The screen coordinates, which may be converted (for off-screen).
    * @return false if the conversion function decides the coordinates are not inside. returns true if there is no conversion function
    */
-  bool TranslateCoordinates( Vector2& screenCoords ) const;
+  bool TranslateCoordinates(Vector2& screenCoords) const;
 
   /**
    * @copydoc Dali::RenderTask::WorldToViewport()
    */
-  bool WorldToViewport(const Vector3 &position, float& viewportX, float& viewportY) const;
+  bool WorldToViewport(const Vector3& position, float& viewportX, float& viewportY) const;
 
   /**
    * @copydoc Dali::RenderTask::ViewportToLocal()
    */
-  bool ViewportToLocal(Actor* actor, float viewportX, float viewportY, float &localX, float &localY) const;
+  bool ViewportToLocal(Actor* actor, float viewportX, float viewportY, float& localX, float& localY) const;
 
 public: // Used by RenderTaskList, which owns the SceneGraph::RenderTasks
-
   /**
    * Retrieve the scene-graph RenderTask object.
    * @return The scene-graph object
@@ -254,7 +251,6 @@ public: // Used by RenderTaskList, which owns the SceneGraph::RenderTasks
   RenderTaskList& GetRenderTaskList() const;
 
 public: // Implementation of Object
-
   /**
    * @copydoc Dali::Internal::Object::SetDefaultProperty()
    */
@@ -263,30 +259,29 @@ public: // Implementation of Object
   /**
    * @copydoc Dali::Internal::Object::GetDefaultProperty()
    */
-  Property::Value GetDefaultProperty( Property::Index index ) const override;
+  Property::Value GetDefaultProperty(Property::Index index) const override;
 
   /**
    * @copydoc Dali::Internal::Object::GetDefaultPropertyCurrentValue()
    */
-  Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const override;
+  Property::Value GetDefaultPropertyCurrentValue(Property::Index index) const override;
 
   /**
    * @copydoc Dali::Internal::Object::OnNotifyDefaultPropertyAnimation()
    */
-  void OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType ) override;
+  void OnNotifyDefaultPropertyAnimation(Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType) override;
 
   /**
    * @copydoc Dali::Internal::Object::GetSceneObjectAnimatableProperty()
    */
-  const SceneGraph::PropertyBase* GetSceneObjectAnimatableProperty( Property::Index index ) const override;
+  const SceneGraph::PropertyBase* GetSceneObjectAnimatableProperty(Property::Index index) const override;
 
   /**
    * @copydoc Dali::Internal::Object::GetSceneObjectInputProperty()
    */
-  const PropertyInputImpl* GetSceneObjectInputProperty( Property::Index index ) const override;
+  const PropertyInputImpl* GetSceneObjectInputProperty(Property::Index index) const override;
 
 public: //signals
-
   /**
    * Query whether a Finished signal should be emitted for this render-task.
    * This should only be called by NotificationManager, before signals are emitted.
@@ -315,17 +310,16 @@ public: //signals
    * @return True if the signal was connected.
    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
    */
-  static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
+  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor);
 
 protected:
-
   /**
    * Constructor.
    *
    * @param[in] sceneObject The scene graph object
    * @param[in] renderTaskList The render task list
    */
-  RenderTask( const SceneGraph::RenderTask* sceneObject, RenderTaskList& renderTaskList );
+  RenderTask(const SceneGraph::RenderTask* sceneObject, RenderTaskList& renderTaskList);
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -333,19 +327,17 @@ protected:
   ~RenderTask() override;
 
 private: // not copyable
-
-  RenderTask() = delete;
-  RenderTask( const RenderTask& ) = delete;
-  RenderTask& operator=( const RenderTask& ) = delete;
+  RenderTask()                  = delete;
+  RenderTask(const RenderTask&) = delete;
+  RenderTask& operator=(const RenderTask&) = delete;
 
 private:
-
-  ActorObserver mSourceActor; ///< Source actor
-  ActorObserver mCameraActor; ///< Camera actor
+  ActorObserver           mSourceActor;       ///< Source actor
+  ActorObserver           mCameraActor;       ///< Camera actor
   WeakHandle<Dali::Actor> mInputMappingActor; /// used to mapping screen to frame buffer coordinate, not kept alive by rendertask
-  RenderTaskList& mRenderTaskList; ///< The render task list
+  RenderTaskList&         mRenderTaskList;    ///< The render task list
 
-  Vector4 mClearColor;       ///< Optional clear color
+  Vector4 mClearColor; ///< Optional clear color
 
   Vector2 mViewportPosition; ///< The cached viewport position
   Vector2 mViewportSize;     ///< The cached viewport size
@@ -354,19 +346,18 @@ private:
 
   uint32_t mRefreshOnceCounter;
 
-  FrameBufferPtr  mFrameBuffer;
-
+  FrameBufferPtr mFrameBuffer;
 
   Dali::RenderTask::ScreenToFrameBufferFunction mScreenToFrameBufferFunction; ///< Used to convert screen to frame-buffer coordinates
 
-  bool mExclusive     : 1; ///< True if the render-task has exclusive access to the source Nodes.
-  bool mInputEnabled  : 1; ///< True if the render-task should be considered for input handling.
-  bool mClearEnabled  : 1; ///< True if the render-task should be clear the color buffer.
-  bool mCullMode      : 1; ///< True if the render-task's actors should be culled
-  bool mRequiresSync  : 1; ///< True if the GL sync is required to track the render of.
+  bool mExclusive : 1;    ///< True if the render-task has exclusive access to the source Nodes.
+  bool mInputEnabled : 1; ///< True if the render-task should be considered for input handling.
+  bool mClearEnabled : 1; ///< True if the render-task should be clear the color buffer.
+  bool mCullMode : 1;     ///< True if the render-task's actors should be culled
+  bool mRequiresSync : 1; ///< True if the GL sync is required to track the render of.
 
   //Signals
-  Dali::RenderTask::RenderTaskSignalType  mSignalFinished; ///< Signal emmited when the render task has been processed.
+  Dali::RenderTask::RenderTaskSignalType mSignalFinished; ///< Signal emmited when the render task has been processed.
 };
 
 } // namespace Internal

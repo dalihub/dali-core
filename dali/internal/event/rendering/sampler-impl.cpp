@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,34 +20,33 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/stage-impl.h>
-#include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/render/renderers/render-sampler.h>
+#include <dali/internal/update/manager/update-manager.h>
 
 namespace Dali
 {
 namespace Internal
 {
-
-SamplerPtr Sampler::New( )
+SamplerPtr Sampler::New()
 {
-  SamplerPtr sampler( new Sampler() );
+  SamplerPtr sampler(new Sampler());
   sampler->Initialize();
   return sampler;
 }
 
-void Sampler::SetFilterMode( Dali::FilterMode::Type minFilter, Dali::FilterMode::Type magFilter )
+void Sampler::SetFilterMode(Dali::FilterMode::Type minFilter, Dali::FilterMode::Type magFilter)
 {
-  if( nullptr != mRenderObject )
+  if(nullptr != mRenderObject)
   {
-    SetFilterModeMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, static_cast< unsigned int >( minFilter ), static_cast< unsigned int >( magFilter ) );
+    SetFilterModeMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject, static_cast<unsigned int>(minFilter), static_cast<unsigned int>(magFilter));
   }
 }
 
-void Sampler::SetWrapMode( Dali::WrapMode::Type rWrap, Dali::WrapMode::Type sWrap, Dali::WrapMode::Type tWrap )
+void Sampler::SetWrapMode(Dali::WrapMode::Type rWrap, Dali::WrapMode::Type sWrap, Dali::WrapMode::Type tWrap)
 {
-  if( nullptr != mRenderObject )
+  if(nullptr != mRenderObject)
   {
-    SetWrapModeMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, static_cast< unsigned int >( rWrap ), static_cast< unsigned int >( sWrap ), static_cast< unsigned int >( tWrap ) );
+    SetWrapModeMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject, static_cast<unsigned int>(rWrap), static_cast<unsigned int>(sWrap), static_cast<unsigned int>(tWrap));
   }
 }
 
@@ -56,10 +55,9 @@ Render::Sampler* Sampler::GetSamplerRenderObject()
   return mRenderObject;
 }
 
-
 Sampler::Sampler()
-:mEventThreadServices( EventThreadServices::Get() ),
- mRenderObject( nullptr )
+: mEventThreadServices(EventThreadServices::Get()),
+  mRenderObject(nullptr)
 {
 }
 
@@ -68,16 +66,16 @@ void Sampler::Initialize()
   SceneGraph::UpdateManager& updateManager = mEventThreadServices.GetUpdateManager();
 
   mRenderObject = new Render::Sampler();
-  OwnerPointer< Render::Sampler > transferOwnership( mRenderObject );
-  AddSamplerMessage( updateManager, transferOwnership );
+  OwnerPointer<Render::Sampler> transferOwnership(mRenderObject);
+  AddSamplerMessage(updateManager, transferOwnership);
 }
 
 Sampler::~Sampler()
 {
-  if( EventThreadServices::IsCoreRunning() && mRenderObject )
+  if(EventThreadServices::IsCoreRunning() && mRenderObject)
   {
     SceneGraph::UpdateManager& updateManager = mEventThreadServices.GetUpdateManager();
-    RemoveSamplerMessage( updateManager, *mRenderObject );
+    RemoveSamplerMessage(updateManager, *mRenderObject);
   }
 }
 

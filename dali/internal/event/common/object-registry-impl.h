@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_OBJECT_REGISTRY_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,18 +19,16 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/ref-object.h>
-#include <dali/public-api/object/object-registry.h>
 #include <dali/public-api/object/base-object.h>
+#include <dali/public-api/object/object-registry.h>
+#include <dali/public-api/object/ref-object.h>
 
 namespace Dali
 {
-
 struct Vector2;
 
 namespace Internal
 {
-
 namespace SceneGraph
 {
 class UpdateManager;
@@ -49,7 +47,6 @@ using ObjectRegistryPtr = IntrusivePtr<ObjectRegistry>;
 class ObjectRegistry : public BaseObject
 {
 public:
-
   /**
    * Create the objectRegistry
    */
@@ -64,7 +61,7 @@ public:
    * @pre the object is ref counted (held in an intrusive pointer)
    * @param[in] object Pointer to the object.
    */
-  void RegisterObject( Dali::BaseObject* object );
+  void RegisterObject(Dali::BaseObject* object);
 
   /**
    * Unregisters the Object from the Object Registry, Which notifies
@@ -72,7 +69,7 @@ public:
    * @pre The object is already registered.
    * @param[in] object Pointer to the object.
    */
-  void UnregisterObject( Dali::BaseObject* object );
+  void UnregisterObject(Dali::BaseObject* object);
 
   /**
    * @copydoc Dali::ObjectRegistry::ObjectCreatedSignal()
@@ -99,10 +96,9 @@ public:
    * @return True if the signal was connected.
    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
    */
-  static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
+  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor);
 
 private:
-
   /**
    * Protected constructor; see also ObjectRegistry::New()
    */
@@ -114,10 +110,8 @@ private:
   ~ObjectRegistry() override;
 
 private:
-
-  Dali::ObjectRegistry::ObjectCreatedSignalType mObjectCreatedSignal;
+  Dali::ObjectRegistry::ObjectCreatedSignalType   mObjectCreatedSignal;
   Dali::ObjectRegistry::ObjectDestroyedSignalType mObjectDestroyedSignal;
-
 };
 
 } // namespace Internal
@@ -126,7 +120,7 @@ private:
 
 inline Internal::ObjectRegistry& GetImplementation(Dali::ObjectRegistry& objectRegistry)
 {
-  DALI_ASSERT_ALWAYS( objectRegistry && "ObjectRegistry handle is empty" );
+  DALI_ASSERT_ALWAYS(objectRegistry && "ObjectRegistry handle is empty");
 
   BaseObject& handle = objectRegistry.GetBaseObject();
 
@@ -135,7 +129,7 @@ inline Internal::ObjectRegistry& GetImplementation(Dali::ObjectRegistry& objectR
 
 inline const Internal::ObjectRegistry& GetImplementation(const Dali::ObjectRegistry& objectRegistry)
 {
-  DALI_ASSERT_ALWAYS( objectRegistry && "ObjectRegistry handle is empty" );
+  DALI_ASSERT_ALWAYS(objectRegistry && "ObjectRegistry handle is empty");
 
   const BaseObject& handle = objectRegistry.GetBaseObject();
 

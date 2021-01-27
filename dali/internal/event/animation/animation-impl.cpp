@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +22,6 @@
 // EXTERNAL INCLUDES
 
 // INTERNAL INCLUDES
-#include <dali/public-api/animation/alpha-function.h>
-#include <dali/public-api/animation/time-period.h>
-#include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/object/type-registry.h>
-#include <dali/public-api/math/vector2.h>
-#include <dali/public-api/math/radian.h>
 #include <dali/internal/event/animation/animation-playlist.h>
 #include <dali/internal/event/animation/animator-connector.h>
 #include <dali/internal/event/animation/path-impl.h>
@@ -37,23 +31,26 @@
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/update/animation/scene-graph-animator.h>
 #include <dali/internal/update/manager/update-manager.h>
+#include <dali/public-api/animation/alpha-function.h>
+#include <dali/public-api/animation/time-period.h>
+#include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/math/radian.h>
+#include <dali/public-api/math/vector2.h>
+#include <dali/public-api/object/type-registry.h>
 
-using Dali::Internal::SceneGraph::UpdateManager;
 using Dali::Internal::SceneGraph::AnimatorBase;
 using Dali::Internal::SceneGraph::Shader;
+using Dali::Internal::SceneGraph::UpdateManager;
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 static bool SHOW_VALUE = true;
 static bool HIDE_VALUE = false;
 
 namespace
 {
-
 // Signals
 
 static constexpr std::string_view SIGNAL_FINISHED = "finished";
@@ -69,7 +66,7 @@ BaseHandle Create()
   return Dali::Animation::New(0.f);
 }
 
-TypeRegistration mType( typeid( Dali::Animation ), typeid( Dali::BaseHandle ), Create );
+TypeRegistration mType(typeid(Dali::Animation), typeid(Dali::BaseHandle), Create);
 
 SignalConnectorType signalConnector1(mType, std::string(SIGNAL_FINISHED), &Animation::DoConnectSignal);
 
@@ -77,10 +74,10 @@ TypeAction action1(mType, std::string(ACTION_PLAY), &Animation::DoAction);
 TypeAction action2(mType, std::string(ACTION_STOP), &Animation::DoAction);
 TypeAction action3(mType, std::string(ACTION_PAUSE), &Animation::DoAction);
 
-const Dali::Animation::EndAction DEFAULT_END_ACTION( Dali::Animation::BAKE );
-const Dali::Animation::EndAction DEFAULT_DISCONNECT_ACTION( Dali::Animation::BAKE_FINAL );
-const Dali::Animation::Interpolation DEFAULT_INTERPOLATION( Dali::Animation::LINEAR );
-const Dali::AlphaFunction DEFAULT_ALPHA_FUNCTION( Dali::AlphaFunction::DEFAULT );
+const Dali::Animation::EndAction     DEFAULT_END_ACTION(Dali::Animation::BAKE);
+const Dali::Animation::EndAction     DEFAULT_DISCONNECT_ACTION(Dali::Animation::BAKE_FINAL);
+const Dali::Animation::Interpolation DEFAULT_INTERPOLATION(Dali::Animation::LINEAR);
+const Dali::AlphaFunction            DEFAULT_ALPHA_FUNCTION(Dali::AlphaFunction::DEFAULT);
 
 /**
  * Helper to tell if a property is animatable (if we have animators for it)
@@ -88,30 +85,30 @@ const Dali::AlphaFunction DEFAULT_ALPHA_FUNCTION( Dali::AlphaFunction::DEFAULT )
  * @param type type to check
  * @return true if animatable
  */
-inline bool IsAnimatable( Property::Type type )
+inline bool IsAnimatable(Property::Type type)
 {
   bool animatable = false;
-  switch( type )
+  switch(type)
   {
-    case Property::BOOLEAN :
-    case Property::FLOAT :
-    case Property::INTEGER :
-    case Property::VECTOR2 :
-    case Property::VECTOR3 :
-    case Property::VECTOR4 :
-    case Property::ROTATION :
+    case Property::BOOLEAN:
+    case Property::FLOAT:
+    case Property::INTEGER:
+    case Property::VECTOR2:
+    case Property::VECTOR3:
+    case Property::VECTOR4:
+    case Property::ROTATION:
     {
       animatable = true;
       break;
     }
-    case Property::MATRIX : // matrix is allowed as a scene graph property but there's no animators for it
-    case Property::MATRIX3 : // matrix3 is allowed as a scene graph property but there's no animators for it
-    case Property::NONE :
-    case Property::RECTANGLE :
-    case Property::STRING :
-    case Property::ARRAY :
-    case Property::MAP :
-    case Property::EXTENTS :
+    case Property::MATRIX:  // matrix is allowed as a scene graph property but there's no animators for it
+    case Property::MATRIX3: // matrix3 is allowed as a scene graph property but there's no animators for it
+    case Property::NONE:
+    case Property::RECTANGLE:
+    case Property::STRING:
+    case Property::ARRAY:
+    case Property::MAP:
+    case Property::EXTENTS:
     {
       break;
     }
@@ -126,27 +123,27 @@ inline bool IsAnimatable( Property::Type type )
  * @param destinationType type of the target
  * @param period time period of the animation
  */
-void ValidateParameters( Property::Type propertyType, Property::Type destinationType, const TimePeriod& period )
+void ValidateParameters(Property::Type propertyType, Property::Type destinationType, const TimePeriod& period)
 {
   // destination value has to be animatable
-  DALI_ASSERT_ALWAYS( IsAnimatable( propertyType ) && "Property type is not animatable" );
-  DALI_ASSERT_ALWAYS( IsAnimatable( destinationType ) && "Target value is not animatable" );
-  DALI_ASSERT_ALWAYS( propertyType == destinationType && "Property and target types don't match" );
-  DALI_ASSERT_ALWAYS( period.durationSeconds >= 0 && "Duration must be >=0" );
+  DALI_ASSERT_ALWAYS(IsAnimatable(propertyType) && "Property type is not animatable");
+  DALI_ASSERT_ALWAYS(IsAnimatable(destinationType) && "Target value is not animatable");
+  DALI_ASSERT_ALWAYS(propertyType == destinationType && "Property and target types don't match");
+  DALI_ASSERT_ALWAYS(period.durationSeconds >= 0 && "Duration must be >=0");
 }
 
 } // anonymous namespace
 
 AnimationPtr Animation::New(float durationSeconds)
 {
-  if( durationSeconds < 0.0f )
+  if(durationSeconds < 0.0f)
   {
     DALI_LOG_WARNING("duration should be greater than 0.0f.\n");
     durationSeconds = 0.0f;
   }
 
-  ThreadLocalStorage& tls = ThreadLocalStorage::Get();
-  AnimationPtr animation = new Animation( tls.GetEventThreadServices(), tls.GetAnimationPlaylist(), durationSeconds, DEFAULT_END_ACTION, DEFAULT_DISCONNECT_ACTION, DEFAULT_ALPHA_FUNCTION );
+  ThreadLocalStorage& tls       = ThreadLocalStorage::Get();
+  AnimationPtr        animation = new Animation(tls.GetEventThreadServices(), tls.GetAnimationPlaylist(), durationSeconds, DEFAULT_END_ACTION, DEFAULT_DISCONNECT_ACTION, DEFAULT_ALPHA_FUNCTION);
 
   // Second-phase construction
   animation->Initialize();
@@ -167,7 +164,7 @@ Animation::Animation(EventThreadServices& eventThreadServices, AnimationPlaylist
 void Animation::Initialize()
 {
   // Connect to the animation playlist
-  mPlaylist.AnimationCreated( *this );
+  mPlaylist.AnimationCreated(*this);
 
   CreateSceneObject();
 
@@ -177,10 +174,10 @@ void Animation::Initialize()
 Animation::~Animation()
 {
   // Guard to allow handle destruction after Core has been destroyed
-  if ( Stage::IsInstalled() )
+  if(Stage::IsInstalled())
   {
     // Disconnect from the animation playlist
-    mPlaylist.AnimationDestroyed( *this );
+    mPlaylist.AnimationDestroyed(*this);
 
     DestroySceneObject();
 
@@ -190,27 +187,27 @@ Animation::~Animation()
 
 void Animation::CreateSceneObject()
 {
-  DALI_ASSERT_DEBUG( mAnimation == NULL );
+  DALI_ASSERT_DEBUG(mAnimation == NULL);
 
   // Create a new animation, Keep a const pointer to the animation.
-  mAnimation = SceneGraph::Animation::New( mDurationSeconds, mSpeedFactor, mPlayRange, mLoopCount, mEndAction, mDisconnectAction );
-  OwnerPointer< SceneGraph::Animation > transferOwnership( const_cast< SceneGraph::Animation* >( mAnimation ) );
-  AddAnimationMessage( mEventThreadServices.GetUpdateManager(), transferOwnership );
+  mAnimation = SceneGraph::Animation::New(mDurationSeconds, mSpeedFactor, mPlayRange, mLoopCount, mEndAction, mDisconnectAction);
+  OwnerPointer<SceneGraph::Animation> transferOwnership(const_cast<SceneGraph::Animation*>(mAnimation));
+  AddAnimationMessage(mEventThreadServices.GetUpdateManager(), transferOwnership);
 }
 
 void Animation::DestroySceneObject()
 {
-  if ( mAnimation != nullptr )
+  if(mAnimation != nullptr)
   {
     // Remove animation using a message to the update manager
-    RemoveAnimationMessage( mEventThreadServices.GetUpdateManager(), *mAnimation );
+    RemoveAnimationMessage(mEventThreadServices.GetUpdateManager(), *mAnimation);
     mAnimation = nullptr;
   }
 }
 
 void Animation::SetDuration(float seconds)
 {
-  if( seconds < 0.0f )
+  if(seconds < 0.0f)
   {
     DALI_LOG_WARNING("duration should be greater than 0.0f.\n");
     seconds = 0.0f;
@@ -219,10 +216,10 @@ void Animation::SetDuration(float seconds)
   mDurationSeconds = seconds;
 
   // mAnimation is being used in a separate thread; queue a message to set the value
-  SetDurationMessage( mEventThreadServices, *mAnimation, seconds );
+  SetDurationMessage(mEventThreadServices, *mAnimation, seconds);
 }
 
-void Animation::SetProgressNotification( float progress )
+void Animation::SetProgressNotification(float progress)
 {
   // mAnimation is being used in a separate thread; queue a message to set the value
   mProgressReachedMarker = progress;
@@ -241,7 +238,7 @@ float Animation::GetDuration() const
 
 void Animation::SetLooping(bool on)
 {
-  SetLoopCount( on ? 0 : 1 );
+  SetLoopCount(on ? 0 : 1);
 }
 
 void Animation::SetLoopCount(int32_t count)
@@ -250,7 +247,7 @@ void Animation::SetLoopCount(int32_t count)
   mLoopCount = count;
 
   // mAnimation is being used in a separate thread; queue a message to set the value
-  SetLoopingMessage( mEventThreadServices, *mAnimation, mLoopCount );
+  SetLoopingMessage(mEventThreadServices, *mAnimation, mLoopCount);
 }
 
 int32_t Animation::GetLoopCount()
@@ -274,7 +271,7 @@ void Animation::SetEndAction(EndAction action)
   mEndAction = action;
 
   // mAnimation is being used in a separate thread; queue a message to set the value
-  SetEndActionMessage( mEventThreadServices, *mAnimation, action );
+  SetEndActionMessage(mEventThreadServices, *mAnimation, action);
 }
 
 Dali::Animation::EndAction Animation::GetEndAction() const
@@ -289,7 +286,7 @@ void Animation::SetDisconnectAction(EndAction action)
   mDisconnectAction = action;
 
   // mAnimation is being used in a separate thread; queue a message to set the value
-  SetDisconnectActionMessage( mEventThreadServices, *mAnimation, action );
+  SetDisconnectActionMessage(mEventThreadServices, *mAnimation, action);
 }
 
 Dali::Animation::EndAction Animation::GetDisconnectAction() const
@@ -301,54 +298,54 @@ Dali::Animation::EndAction Animation::GetDisconnectAction() const
 void Animation::Play()
 {
   // Update the current playlist
-  mPlaylist.OnPlay( *this );
+  mPlaylist.OnPlay(*this);
 
   mState = Dali::Animation::PLAYING;
 
-  NotifyObjects( Notify::USE_TARGET_VALUE );
+  NotifyObjects(Notify::USE_TARGET_VALUE);
 
   SendFinalProgressNotificationMessage();
 
   // mAnimation is being used in a separate thread; queue a Play message
-  PlayAnimationMessage( mEventThreadServices, *mAnimation );
+  PlayAnimationMessage(mEventThreadServices, *mAnimation);
 }
 
-void Animation::PlayFrom( float progress )
+void Animation::PlayFrom(float progress)
 {
-  if( progress >= mPlayRange.x && progress <= mPlayRange.y )
+  if(progress >= mPlayRange.x && progress <= mPlayRange.y)
   {
     // Update the current playlist
-    mPlaylist.OnPlay( *this );
+    mPlaylist.OnPlay(*this);
 
     mState = Dali::Animation::PLAYING;
 
-    NotifyObjects( Notify::USE_TARGET_VALUE );
+    NotifyObjects(Notify::USE_TARGET_VALUE);
 
     SendFinalProgressNotificationMessage();
 
     // mAnimation is being used in a separate thread; queue a Play message
-    PlayAnimationFromMessage( mEventThreadServices, *mAnimation, progress );
+    PlayAnimationFromMessage(mEventThreadServices, *mAnimation, progress);
   }
 }
 
-void Animation::PlayAfter( float delaySeconds )
+void Animation::PlayAfter(float delaySeconds)
 {
   // The negative delay means play immediately.
-  delaySeconds = std::max( 0.f, delaySeconds );
+  delaySeconds = std::max(0.f, delaySeconds);
 
   mDelaySeconds = delaySeconds;
 
   // Update the current playlist
-  mPlaylist.OnPlay( *this );
+  mPlaylist.OnPlay(*this);
 
   mState = Dali::Animation::PLAYING;
 
-  NotifyObjects( Notify::USE_TARGET_VALUE );
+  NotifyObjects(Notify::USE_TARGET_VALUE);
 
   SendFinalProgressNotificationMessage();
 
   // mAnimation is being used in a separate thread; queue a message to set the value
-  PlayAfterMessage( mEventThreadServices, *mAnimation, delaySeconds );
+  PlayAfterMessage(mEventThreadServices, *mAnimation, delaySeconds);
 }
 
 void Animation::Pause()
@@ -356,10 +353,10 @@ void Animation::Pause()
   mState = Dali::Animation::PAUSED;
 
   // mAnimation is being used in a separate thread; queue a Pause message
-  PauseAnimationMessage( mEventThreadServices, *mAnimation );
+  PauseAnimationMessage(mEventThreadServices, *mAnimation);
 
   // Notify the objects with the _paused_, i.e. current values
-  NotifyObjects( Notify::FORCE_CURRENT_VALUE );
+  NotifyObjects(Notify::FORCE_CURRENT_VALUE);
 }
 
 Dali::Animation::State Animation::GetState() const
@@ -372,12 +369,12 @@ void Animation::Stop()
   mState = Dali::Animation::STOPPED;
 
   // mAnimation is being used in a separate thread; queue a Stop message
-  StopAnimationMessage( mEventThreadServices.GetUpdateManager(), *mAnimation );
+  StopAnimationMessage(mEventThreadServices.GetUpdateManager(), *mAnimation);
 
   // Only notify the objects with the _stopped_, i.e. current values if the end action is set to BAKE
-  if( mEndAction == EndAction::BAKE )
+  if(mEndAction == EndAction::BAKE)
   {
-    NotifyObjects( Notify::USE_CURRENT_VALUE );
+    NotifyObjects(Notify::USE_CURRENT_VALUE);
   }
 }
 
@@ -386,9 +383,9 @@ void Animation::Clear()
   DALI_ASSERT_DEBUG(mAnimation);
 
   // Only notify the objects with the current values if the end action is set to BAKE
-  if( mEndAction == EndAction::BAKE )
+  if(mEndAction == EndAction::BAKE)
   {
-    NotifyObjects( Notify::USE_CURRENT_VALUE );
+    NotifyObjects(Notify::USE_CURRENT_VALUE);
   }
 
   // Remove all the connectors
@@ -405,7 +402,7 @@ void Animation::Clear()
   mNotificationCount = 0;
 
   // Update the current playlist
-  mPlaylist.OnClear( *this );
+  mPlaylist.OnClear(*this);
 }
 
 void Animation::AnimateBy(Property& target, Property::Value relativeValue)
@@ -425,13 +422,14 @@ void Animation::AnimateBy(Property& target, Property::Value relativeValue, TimeP
 
 void Animation::AnimateBy(Property& target, Property::Value relativeValue, AlphaFunction alpha, TimePeriod period)
 {
-  Object& object = GetImplementation(target.object);
-  const Property::Type propertyType = object.GetPropertyType( target.propertyIndex );
+  Object&              object          = GetImplementation(target.object);
+  const Property::Type propertyType    = object.GetPropertyType(target.propertyIndex);
   const Property::Type destinationType = relativeValue.GetType();
 
   // validate animation parameters, if component index is set then use float as checked type
-  ValidateParameters( (target.componentIndex == Property::INVALID_COMPONENT_INDEX) ? propertyType : Property::FLOAT,
-                      destinationType, period );
+  ValidateParameters((target.componentIndex == Property::INVALID_COMPONENT_INDEX) ? propertyType : Property::FLOAT,
+                     destinationType,
+                     period);
 
   ExtendDuration(period);
 
@@ -439,7 +437,7 @@ void Animation::AnimateBy(Property& target, Property::Value relativeValue, Alpha
   auto connectorIndex = mConnectors.Count();
 
   // using destination type so component animation gets correct type
-  switch ( destinationType )
+  switch(destinationType)
   {
     case Property::BOOLEAN:
     {
@@ -546,21 +544,22 @@ void Animation::AnimateTo(Property& target, Property::Value destinationValue, Ti
 
 void Animation::AnimateTo(Property& target, Property::Value destinationValue, AlphaFunction alpha, TimePeriod period)
 {
-  Object& object = GetImplementation( target.object );
-  const Property::Type propertyType = object.GetPropertyType( target.propertyIndex );
+  Object&              object          = GetImplementation(target.object);
+  const Property::Type propertyType    = object.GetPropertyType(target.propertyIndex);
   const Property::Type destinationType = destinationValue.GetType();
 
   // validate animation parameters, if component index is set then use float as checked type
-  ValidateParameters( (target.componentIndex == Property::INVALID_COMPONENT_INDEX) ? propertyType : Property::FLOAT,
-                      destinationType, period );
+  ValidateParameters((target.componentIndex == Property::INVALID_COMPONENT_INDEX) ? propertyType : Property::FLOAT,
+                     destinationType,
+                     period);
 
-  ExtendDuration( period );
+  ExtendDuration(period);
 
   // keep the current count.
   auto connectorIndex = mConnectors.Count();
 
   // using destination type so component animation gets correct type
-  switch ( destinationType )
+  switch(destinationType)
   {
     case Property::BOOLEAN:
     {
@@ -648,58 +647,59 @@ void Animation::AnimateTo(Property& target, Property::Value destinationValue, Al
   mConnectorTargetValues.push_back({std::move(destinationValue), period, connectorIndex, Animation::TO});
 }
 
-void Animation::AnimateBetween( Property target, const KeyFrames& keyFrames )
+void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames)
 {
-  AnimateBetween( target, keyFrames, mDefaultAlpha, TimePeriod(mDurationSeconds), DEFAULT_INTERPOLATION );
+  AnimateBetween(target, keyFrames, mDefaultAlpha, TimePeriod(mDurationSeconds), DEFAULT_INTERPOLATION);
 }
 
-void Animation::AnimateBetween( Property target, const KeyFrames& keyFrames, Interpolation interpolation )
+void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Interpolation interpolation)
 {
-  AnimateBetween( target, keyFrames, mDefaultAlpha, TimePeriod(mDurationSeconds), interpolation );
+  AnimateBetween(target, keyFrames, mDefaultAlpha, TimePeriod(mDurationSeconds), interpolation);
 }
 
-void Animation::AnimateBetween( Property target, const KeyFrames& keyFrames, TimePeriod period )
+void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, TimePeriod period)
 {
-  AnimateBetween( target, keyFrames, mDefaultAlpha, period, DEFAULT_INTERPOLATION );
+  AnimateBetween(target, keyFrames, mDefaultAlpha, period, DEFAULT_INTERPOLATION);
 }
 
-void Animation::AnimateBetween( Property target, const KeyFrames& keyFrames, TimePeriod period, Interpolation interpolation )
+void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, TimePeriod period, Interpolation interpolation)
 {
-  AnimateBetween( target, keyFrames, mDefaultAlpha, period, interpolation );
+  AnimateBetween(target, keyFrames, mDefaultAlpha, period, interpolation);
 }
 
-void Animation::AnimateBetween( Property target, const KeyFrames& keyFrames, AlphaFunction alpha )
+void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, AlphaFunction alpha)
 {
-  AnimateBetween( target, keyFrames, alpha, TimePeriod(mDurationSeconds), DEFAULT_INTERPOLATION );
+  AnimateBetween(target, keyFrames, alpha, TimePeriod(mDurationSeconds), DEFAULT_INTERPOLATION);
 }
 
-void Animation::AnimateBetween( Property target, const KeyFrames& keyFrames, AlphaFunction alpha, Interpolation interpolation )
+void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, AlphaFunction alpha, Interpolation interpolation)
 {
-  AnimateBetween( target, keyFrames, alpha, TimePeriod(mDurationSeconds), interpolation );
+  AnimateBetween(target, keyFrames, alpha, TimePeriod(mDurationSeconds), interpolation);
 }
 
-void Animation::AnimateBetween( Property target, const KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period )
+void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period)
 {
-  AnimateBetween( target, keyFrames, alpha, period, DEFAULT_INTERPOLATION );
+  AnimateBetween(target, keyFrames, alpha, period, DEFAULT_INTERPOLATION);
 }
 
-void Animation::AnimateBetween( Property target, const KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period, Interpolation interpolation )
+void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period, Interpolation interpolation)
 {
-  Object& object = GetImplementation( target.object );
-  const Property::Type propertyType = object.GetPropertyType( target.propertyIndex );
+  Object&              object          = GetImplementation(target.object);
+  const Property::Type propertyType    = object.GetPropertyType(target.propertyIndex);
   const Property::Type destinationType = keyFrames.GetType();
 
   // validate animation parameters, if component index is set then use float as checked type
-  ValidateParameters( (target.componentIndex == Property::INVALID_COMPONENT_INDEX) ? propertyType : Property::FLOAT,
-                      destinationType, period );
+  ValidateParameters((target.componentIndex == Property::INVALID_COMPONENT_INDEX) ? propertyType : Property::FLOAT,
+                     destinationType,
+                     period);
 
-  ExtendDuration( period );
+  ExtendDuration(period);
 
   // Store data to later notify the object that its property is being animated
   mConnectorTargetValues.push_back({keyFrames.GetLastKeyFrameValue(), period, mConnectors.Count(), BETWEEN});
 
   // using destination type so component animation gets correct type
-  switch( destinationType )
+  switch(destinationType)
   {
     case Dali::Property::BOOLEAN:
     {
@@ -794,13 +794,13 @@ void Animation::AnimateBetween( Property target, const KeyFrames& keyFrames, Alp
 
 bool Animation::HasFinished()
 {
-  bool hasFinished(false);
+  bool          hasFinished(false);
   const int32_t playedCount(mAnimation->GetPlayedCount());
 
   // If the play count has been incremented, then another notification is required
   mCurrentLoop = mAnimation->GetCurrentLoop();
 
-  if (playedCount > mNotificationCount)
+  if(playedCount > mNotificationCount)
   {
     // Note that only one signal is emitted, if the animation has been played repeatedly
     mNotificationCount = playedCount;
@@ -825,63 +825,63 @@ Dali::Animation::AnimationSignalType& Animation::ProgressReachedSignal()
 
 void Animation::EmitSignalFinish()
 {
-  if ( !mFinishedSignal.Empty() )
+  if(!mFinishedSignal.Empty())
   {
-    Dali::Animation handle( this );
-    mFinishedSignal.Emit( handle );
+    Dali::Animation handle(this);
+    mFinishedSignal.Emit(handle);
   }
 }
 
 void Animation::EmitSignalProgressReached()
 {
-  if ( !mProgressReachedSignal.Empty() )
+  if(!mProgressReachedSignal.Empty())
   {
-    Dali::Animation handle( this );
-    mProgressReachedSignal.Emit( handle );
+    Dali::Animation handle(this);
+    mProgressReachedSignal.Emit(handle);
   }
 }
 
-bool Animation::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
+bool Animation::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
 {
-  bool connected( false );
-  Animation* animation = static_cast< Animation* >(object); // TypeRegistry guarantees that this is the correct type.
+  bool       connected(false);
+  Animation* animation = static_cast<Animation*>(object); // TypeRegistry guarantees that this is the correct type.
 
   if(SIGNAL_FINISHED == signalName)
   {
-    animation->FinishedSignal().Connect( tracker, functor );
+    animation->FinishedSignal().Connect(tracker, functor);
     connected = true;
   }
 
   return connected;
 }
 
-void Animation::AddAnimatorConnector( AnimatorConnectorBase* connector )
+void Animation::AddAnimatorConnector(AnimatorConnectorBase* connector)
 {
-  DALI_ASSERT_DEBUG( NULL != connector );
+  DALI_ASSERT_DEBUG(NULL != connector);
 
   connector->SetParent(*this);
 
-  mConnectors.PushBack( connector );
+  mConnectors.PushBack(connector);
 }
 
-void Animation::Animate( Actor& actor, const Path& path, const Vector3& forward )
+void Animation::Animate(Actor& actor, const Path& path, const Vector3& forward)
 {
-  Animate( actor, path, forward, mDefaultAlpha, TimePeriod(mDurationSeconds) );
+  Animate(actor, path, forward, mDefaultAlpha, TimePeriod(mDurationSeconds));
 }
 
-void Animation::Animate( Actor& actor, const Path& path, const Vector3& forward, AlphaFunction alpha )
+void Animation::Animate(Actor& actor, const Path& path, const Vector3& forward, AlphaFunction alpha)
 {
-  Animate( actor, path, forward, alpha, TimePeriod(mDurationSeconds) );
+  Animate(actor, path, forward, alpha, TimePeriod(mDurationSeconds));
 }
 
-void Animation::Animate( Actor& actor, const Path& path, const Vector3& forward, TimePeriod period )
+void Animation::Animate(Actor& actor, const Path& path, const Vector3& forward, TimePeriod period)
 {
-  Animate( actor, path, forward, mDefaultAlpha, period );
+  Animate(actor, path, forward, mDefaultAlpha, period);
 }
 
-void Animation::Animate( Actor& actor, const Path& path, const Vector3& forward, AlphaFunction alpha, TimePeriod period)
+void Animation::Animate(Actor& actor, const Path& path, const Vector3& forward, AlphaFunction alpha, TimePeriod period)
 {
-  ExtendDuration( period );
+  ExtendDuration(period);
 
   PathPtr pathCopy = Path::Clone(path);
 
@@ -894,7 +894,7 @@ void Animation::Animate( Actor& actor, const Path& path, const Vector3& forward,
                                                        period));
 
   //If forward is zero, PathRotationFunctor will always return the unit quaternion
-  if( forward != Vector3::ZERO )
+  if(forward != Vector3::ZERO)
   {
     //Rotation animation
     AddAnimatorConnector(AnimatorConnector<Quaternion>::New(actor,
@@ -908,7 +908,7 @@ void Animation::Animate( Actor& actor, const Path& path, const Vector3& forward,
 
 void Animation::Show(Actor& actor, float delaySeconds)
 {
-  ExtendDuration( TimePeriod(delaySeconds, 0) );
+  ExtendDuration(TimePeriod(delaySeconds, 0));
 
   AddAnimatorConnector(AnimatorConnector<bool>::New(actor,
                                                     Dali::Actor::Property::VISIBLE,
@@ -920,7 +920,7 @@ void Animation::Show(Actor& actor, float delaySeconds)
 
 void Animation::Hide(Actor& actor, float delaySeconds)
 {
-  ExtendDuration( TimePeriod(delaySeconds, 0) );
+  ExtendDuration(TimePeriod(delaySeconds, 0));
 
   AddAnimatorConnector(AnimatorConnector<bool>::New(actor,
                                                     Dali::Actor::Property::VISIBLE,
@@ -930,20 +930,20 @@ void Animation::Hide(Actor& actor, float delaySeconds)
                                                     TimePeriod(delaySeconds, 0.0f /*immediate*/)));
 }
 
-bool Animation::DoAction( BaseObject* object, const std::string& actionName, const Property::Map& attributes )
+bool Animation::DoAction(BaseObject* object, const std::string& actionName, const Property::Map& attributes)
 {
-  bool done = false;
-  Animation* animation = dynamic_cast<Animation*>( object );
+  bool       done      = false;
+  Animation* animation = dynamic_cast<Animation*>(object);
 
-  if( animation )
+  if(animation)
   {
     std::string_view name(actionName);
 
     if(name == ACTION_PLAY)
     {
-      if( Property::Value* value = attributes.Find("duration", Property::FLOAT) )
+      if(Property::Value* value = attributes.Find("duration", Property::FLOAT))
       {
-        animation->SetDuration( value->Get<float>() );
+        animation->SetDuration(value->Get<float>());
       }
 
       animation->Play();
@@ -966,17 +966,17 @@ bool Animation::DoAction( BaseObject* object, const std::string& actionName, con
 
 void Animation::SetCurrentProgress(float progress)
 {
-  if( mAnimation && progress >= mPlayRange.x && progress <= mPlayRange.y )
+  if(mAnimation && progress >= mPlayRange.x && progress <= mPlayRange.y)
   {
     // mAnimation is being used in a separate thread; queue a message to set the current progress
-    SetCurrentProgressMessage( mEventThreadServices, *mAnimation, progress );
+    SetCurrentProgressMessage(mEventThreadServices, *mAnimation, progress);
   }
 }
 
 float Animation::GetCurrentProgress()
 {
   float progress = 0.f;
-  if( mAnimation ) // always exists in practice
+  if(mAnimation) // always exists in practice
   {
     progress = mAnimation->GetCurrentProgress();
   }
@@ -984,22 +984,22 @@ float Animation::GetCurrentProgress()
   return progress;
 }
 
-void Animation::ExtendDuration( const TimePeriod& timePeriod )
+void Animation::ExtendDuration(const TimePeriod& timePeriod)
 {
   float duration = timePeriod.delaySeconds + timePeriod.durationSeconds;
 
-  if( duration > mDurationSeconds )
+  if(duration > mDurationSeconds)
   {
-    SetDuration( duration );
+    SetDuration(duration);
   }
 }
 
-void Animation::SetSpeedFactor( float factor )
+void Animation::SetSpeedFactor(float factor)
 {
-  if( mAnimation )
+  if(mAnimation)
   {
     mSpeedFactor = factor;
-    SetSpeedFactorMessage( mEventThreadServices, *mAnimation, factor );
+    SetSpeedFactorMessage(mEventThreadServices, *mAnimation, factor);
   }
 }
 
@@ -1008,14 +1008,14 @@ float Animation::GetSpeedFactor() const
   return mSpeedFactor;
 }
 
-void Animation::SetPlayRange( const Vector2& range)
+void Animation::SetPlayRange(const Vector2& range)
 {
   //Make sure the range specified is between 0.0 and 1.0
-  if( range.x >= 0.0f && range.x <= 1.0f && range.y >= 0.0f && range.y <= 1.0f )
+  if(range.x >= 0.0f && range.x <= 1.0f && range.y >= 0.0f && range.y <= 1.0f)
   {
-    Vector2 orderedRange( range );
+    Vector2 orderedRange(range);
     //If the range is not in order swap values
-    if( range.x > range.y )
+    if(range.x > range.y)
     {
       orderedRange = Vector2(range.y, range.x);
     }
@@ -1024,7 +1024,7 @@ void Animation::SetPlayRange( const Vector2& range)
     mPlayRange = orderedRange;
 
     // mAnimation is being used in a separate thread; queue a message to set play range
-    SetPlayRangeMessage( mEventThreadServices, *mAnimation, orderedRange );
+    SetPlayRangeMessage(mEventThreadServices, *mAnimation, orderedRange);
   }
 }
 
@@ -1033,12 +1033,12 @@ Vector2 Animation::GetPlayRange() const
   return mPlayRange;
 }
 
-void Animation::SetLoopingMode( Dali::Animation::LoopingMode loopingMode )
+void Animation::SetLoopingMode(Dali::Animation::LoopingMode loopingMode)
 {
-  mAutoReverseEnabled = ( loopingMode == Dali::Animation::LoopingMode::AUTO_REVERSE );
+  mAutoReverseEnabled = (loopingMode == Dali::Animation::LoopingMode::AUTO_REVERSE);
 
   // mAnimation is being used in a separate thread; queue a message to set play range
-  SetLoopingModeMessage( mEventThreadServices, *mAnimation, mAutoReverseEnabled );
+  SetLoopingModeMessage(mEventThreadServices, *mAnimation, mAutoReverseEnabled);
 }
 
 Dali::Animation::LoopingMode Animation::GetLoopingMode() const
@@ -1046,29 +1046,29 @@ Dali::Animation::LoopingMode Animation::GetLoopingMode() const
   return mAutoReverseEnabled ? Dali::Animation::AUTO_REVERSE : Dali::Animation::RESTART;
 }
 
-bool Animation::CompareConnectorEndTimes( const Animation::ConnectorTargetValues& lhs, const Animation::ConnectorTargetValues& rhs )
+bool Animation::CompareConnectorEndTimes(const Animation::ConnectorTargetValues& lhs, const Animation::ConnectorTargetValues& rhs)
 {
-  return ( ( lhs.timePeriod.delaySeconds + lhs.timePeriod.durationSeconds ) < ( rhs.timePeriod.delaySeconds + rhs.timePeriod.durationSeconds ) );
+  return ((lhs.timePeriod.delaySeconds + lhs.timePeriod.durationSeconds) < (rhs.timePeriod.delaySeconds + rhs.timePeriod.durationSeconds));
 }
 
-void Animation::NotifyObjects( Animation::Notify notifyValueType )
+void Animation::NotifyObjects(Animation::Notify notifyValueType)
 {
   // If the animation is discarded, then we do not want to change the target values unless we want to force the current values
-  if( mEndAction != EndAction::DISCARD || notifyValueType == Notify::FORCE_CURRENT_VALUE )
+  if(mEndAction != EndAction::DISCARD || notifyValueType == Notify::FORCE_CURRENT_VALUE)
   {
     // Sort according to end time with earlier end times coming first, if the end time is the same, then the connectors are not moved
     // Only do this if we're using the target value
-    if( notifyValueType == Notify::USE_TARGET_VALUE )
+    if(notifyValueType == Notify::USE_TARGET_VALUE)
     {
-      std::stable_sort( mConnectorTargetValues.begin(), mConnectorTargetValues.end(), CompareConnectorEndTimes );
+      std::stable_sort(mConnectorTargetValues.begin(), mConnectorTargetValues.end(), CompareConnectorEndTimes);
     }
 
     // Loop through all connector target values sorted by increasing end time
-    ConnectorTargetValuesContainer::const_iterator iter = mConnectorTargetValues.begin();
+    ConnectorTargetValuesContainer::const_iterator       iter    = mConnectorTargetValues.begin();
     const ConnectorTargetValuesContainer::const_iterator endIter = mConnectorTargetValues.end();
-    for( ; iter != endIter; ++iter )
+    for(; iter != endIter; ++iter)
     {
-      AnimatorConnectorBase* connector = mConnectors[ iter->connectorIndex ];
+      AnimatorConnectorBase* connector = mConnectors[iter->connectorIndex];
 
       Object* object = connector->GetObject();
       if(object && object->IsAnimationPossible())
@@ -1077,20 +1077,19 @@ void Animation::NotifyObjects( Animation::Notify notifyValueType )
         object->NotifyPropertyAnimation(
           *this,
           propertyIndex,
-          ( notifyValueType == Notify::USE_TARGET_VALUE ) ? iter->targetValue  : object->GetCurrentProperty( propertyIndex ),
-          ( notifyValueType == Notify::USE_TARGET_VALUE ) ? iter->animatorType : Animation::TO ); // If we're setting the current value, then use TO as we want to set, not adjust, the current value
+          (notifyValueType == Notify::USE_TARGET_VALUE) ? iter->targetValue : object->GetCurrentProperty(propertyIndex),
+          (notifyValueType == Notify::USE_TARGET_VALUE) ? iter->animatorType : Animation::TO); // If we're setting the current value, then use TO as we want to set, not adjust, the current value
       }
     }
   }
 }
 
-
 void Animation::SendFinalProgressNotificationMessage()
 {
-  if ( mProgressReachedMarker > 0.0f )
+  if(mProgressReachedMarker > 0.0f)
   {
     float progressMarkerSeconds = mDurationSeconds * mProgressReachedMarker;
-    SetProgressNotificationMessage( mEventThreadServices, *mAnimation, progressMarkerSeconds );
+    SetProgressNotificationMessage(mEventThreadServices, *mAnimation, progressMarkerSeconds);
   }
 }
 

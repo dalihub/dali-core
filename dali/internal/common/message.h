@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_MESSAGE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,8 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 /**
  * An abstract base class for messages queued across threads.
  * Messages are only allowed to contain value objects, either copies of the parameters or pointers
@@ -37,7 +35,6 @@ namespace Internal
 class MessageBase
 {
 public:
-
   /**
    * Construct the message base.
    */
@@ -52,7 +49,7 @@ public:
    * Called to process the message.
    * @param [in] bufferIndex The current update/render buffer index (depending on which thread processes the message).
    */
-  virtual void Process( BufferIndex bufferIndex ) = 0;
+  virtual void Process(BufferIndex bufferIndex) = 0;
 
 private:
 };
@@ -62,11 +59,11 @@ private:
  * This allows nodes etc. to be modified in a thread-safe manner, when the update occurs in a separate thread.
  * The object lifetime must controlled i.e. not destroyed before the message is processed.
  */
-template< typename T >
+template<typename T>
 class Message : public MessageBase
 {
 public:
-  using MemberFunction = void ( T::* )();
+  using MemberFunction = void (T::*)();
 
   /**
    * Create a message.
@@ -75,12 +72,12 @@ public:
    * @param[in] obj The object to be updated in a separate thread.
    * @param[in] member The member function of the object.
    */
-  Message( const T* obj, MemberFunction member )
+  Message(const T* obj, MemberFunction member)
   : MessageBase(),
-    object( const_cast< T* >( obj ) ),
-    memberFunction( member )
+    object(const_cast<T*>(obj)),
+    memberFunction(member)
   {
-    DALI_ASSERT_DEBUG( object && "nullptr passed into message as object" );
+    DALI_ASSERT_DEBUG(object && "nullptr passed into message as object");
   }
 
   /**
@@ -91,16 +88,14 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process( BufferIndex /*bufferIndex*/ ) override
+  void Process(BufferIndex /*bufferIndex*/) override
   {
     (object->*memberFunction)();
   }
 
 private:
-
-  T* object;
+  T*             object;
   MemberFunction memberFunction;
-
 };
 
 /**
@@ -109,11 +104,11 @@ private:
  * Template parameters need to match the MemberFunction!
  * The message will contain copy of the value (in case of & or const&)
  */
-template< typename T, typename P >
+template<typename T, typename P>
 class MessageValue1 : public MessageBase
 {
 public:
-  using MemberFunction = void ( T::* )( typename ParameterType<P>::PassingType );
+  using MemberFunction = void (T::*)(typename ParameterType<P>::PassingType);
 
   /**
    * Create a message.
@@ -123,15 +118,15 @@ public:
    * @param[in] member The member function of the object.
    * @param[in] p1 The first value-type parameter to pass to the member function.
    */
-  MessageValue1( const T* obj,
-                 MemberFunction member,
-                 typename ParameterType< P >::PassingType p1 )
+  MessageValue1(const T*                               obj,
+                MemberFunction                         member,
+                typename ParameterType<P>::PassingType p1)
   : MessageBase(),
-    object( const_cast< T* >( obj ) ),
-    memberFunction( member ),
-    param1( p1 )
+    object(const_cast<T*>(obj)),
+    memberFunction(member),
+    param1(p1)
   {
-    DALI_ASSERT_DEBUG( object && "nullptr passed into message as object" );
+    DALI_ASSERT_DEBUG(object && "nullptr passed into message as object");
   }
 
   /**
@@ -142,17 +137,15 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process( BufferIndex /*bufferIndex*/ ) override
+  void Process(BufferIndex /*bufferIndex*/) override
   {
-    (object->*memberFunction)( param1 );
+    (object->*memberFunction)(param1);
   }
 
 private:
-
-  T* object;
-  MemberFunction memberFunction;
-  typename ParameterType< P >::HolderType param1;
-
+  T*                                    object;
+  MemberFunction                        memberFunction;
+  typename ParameterType<P>::HolderType param1;
 };
 
 /**
@@ -162,11 +155,11 @@ private:
  * The message will contain copy of the value (in case of & or const&)
  */
 
-template< typename T, typename P1, typename P2 >
+template<typename T, typename P1, typename P2>
 class MessageValue2 : public MessageBase
 {
 public:
-  using MemberFunction = void ( T::* )( typename ParameterType<P1>::PassingType, typename ParameterType<P2>::PassingType );
+  using MemberFunction = void (T::*)(typename ParameterType<P1>::PassingType, typename ParameterType<P2>::PassingType);
 
   /**
    * Create a message.
@@ -177,17 +170,17 @@ public:
    * @param[in] p1 The first parameter to pass to the member function.
    * @param[in] p2 The second parameter to pass to the member function.
    */
-  MessageValue2( const T* obj,
-                 MemberFunction member,
-                 typename ParameterType< P1 >::PassingType p1,
-                 typename ParameterType< P2 >::PassingType p2 )
+  MessageValue2(const T*                                obj,
+                MemberFunction                          member,
+                typename ParameterType<P1>::PassingType p1,
+                typename ParameterType<P2>::PassingType p2)
   : MessageBase(),
-    object( const_cast< T* >( obj ) ),
-    memberFunction( member ),
-    param1( p1 ),
-    param2( p2 )
+    object(const_cast<T*>(obj)),
+    memberFunction(member),
+    param1(p1),
+    param2(p2)
   {
-    DALI_ASSERT_DEBUG( object && "nullptr passed into message as object" );
+    DALI_ASSERT_DEBUG(object && "nullptr passed into message as object");
   }
 
   /**
@@ -198,18 +191,16 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process( BufferIndex /*bufferIndex*/ ) override
+  void Process(BufferIndex /*bufferIndex*/) override
   {
-    (object->*memberFunction)( param1, param2 );
+    (object->*memberFunction)(param1, param2);
   }
 
 private:
-
-  T* object;
-  MemberFunction memberFunction;
-  typename ParameterType< P1 >::HolderType param1;
-  typename ParameterType< P2 >::HolderType param2;
-
+  T*                                     object;
+  MemberFunction                         memberFunction;
+  typename ParameterType<P1>::HolderType param1;
+  typename ParameterType<P2>::HolderType param2;
 };
 
 /**
@@ -218,11 +209,11 @@ private:
  * Template parameters need to match the MemberFunction!
  * The message will contain copy of the value (in case of & or const&)
  */
-template< typename T, typename P1, typename P2, typename P3 >
+template<typename T, typename P1, typename P2, typename P3>
 class MessageValue3 : public MessageBase
 {
 public:
-  using MemberFunction = void ( T::* )( typename ParameterType<P1>::PassingType, typename ParameterType<P2>::PassingType, typename ParameterType<P3>::PassingType );
+  using MemberFunction = void (T::*)(typename ParameterType<P1>::PassingType, typename ParameterType<P2>::PassingType, typename ParameterType<P3>::PassingType);
 
   /**
    * Create a message.
@@ -234,19 +225,19 @@ public:
    * @param[in] p2 The second parameter to pass to the member function.
    * @param[in] p3 The third parameter to pass to the member function.
    */
-  MessageValue3( const T* obj,
-                 MemberFunction member,
-                 typename ParameterType< P1 >::PassingType p1,
-                 typename ParameterType< P2 >::PassingType p2,
-                 typename ParameterType< P3 >::PassingType p3 )
+  MessageValue3(const T*                                obj,
+                MemberFunction                          member,
+                typename ParameterType<P1>::PassingType p1,
+                typename ParameterType<P2>::PassingType p2,
+                typename ParameterType<P3>::PassingType p3)
   : MessageBase(),
-    object( const_cast< T* >( obj ) ),
-    memberFunction( member ),
-    param1( p1 ),
-    param2( p2 ),
-    param3( p3 )
+    object(const_cast<T*>(obj)),
+    memberFunction(member),
+    param1(p1),
+    param2(p2),
+    param3(p3)
   {
-    DALI_ASSERT_DEBUG( object && "nullptr passed into message as object" );
+    DALI_ASSERT_DEBUG(object && "nullptr passed into message as object");
   }
 
   /**
@@ -257,19 +248,17 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process( BufferIndex /*bufferIndex*/ ) override
+  void Process(BufferIndex /*bufferIndex*/) override
   {
-    (object->*memberFunction)( param1, param2, param3 );
+    (object->*memberFunction)(param1, param2, param3);
   }
 
 private:
-
-  T* object;
-  MemberFunction memberFunction;
-  typename ParameterType< P1 >::HolderType param1;
-  typename ParameterType< P2 >::HolderType param2;
-  typename ParameterType< P3 >::HolderType param3;
-
+  T*                                     object;
+  MemberFunction                         memberFunction;
+  typename ParameterType<P1>::HolderType param1;
+  typename ParameterType<P2>::HolderType param2;
+  typename ParameterType<P3>::HolderType param3;
 };
 
 /**
@@ -278,11 +267,11 @@ private:
  * Template parameters need to match the MemberFunction!
  * The message will contain copy of the value (in case of & or const&)
  */
-template< typename T, typename P1, typename P2, typename P3, typename P4 >
+template<typename T, typename P1, typename P2, typename P3, typename P4>
 class MessageValue4 : public MessageBase
 {
 public:
-  using MemberFunction = void ( T::* )( typename ParameterType<P1>::PassingType, typename ParameterType<P2>::PassingType, typename ParameterType<P3>::PassingType, typename ParameterType<P4>::PassingType );
+  using MemberFunction = void (T::*)(typename ParameterType<P1>::PassingType, typename ParameterType<P2>::PassingType, typename ParameterType<P3>::PassingType, typename ParameterType<P4>::PassingType);
 
   /**
    * Create a message.
@@ -295,21 +284,21 @@ public:
    * @param[in] p3 The third parameter to pass to the member function.
    * @param[in] p4 The fourth parameter to pass to the member function.
    */
-  MessageValue4( const T* obj,
-                 MemberFunction member,
-                 typename ParameterType< P1 >::PassingType p1,
-                 typename ParameterType< P2 >::PassingType p2,
-                 typename ParameterType< P3 >::PassingType p3,
-                 typename ParameterType< P4 >::PassingType p4 )
+  MessageValue4(const T*                                obj,
+                MemberFunction                          member,
+                typename ParameterType<P1>::PassingType p1,
+                typename ParameterType<P2>::PassingType p2,
+                typename ParameterType<P3>::PassingType p3,
+                typename ParameterType<P4>::PassingType p4)
   : MessageBase(),
-    object( const_cast< T* >( obj ) ),
-    memberFunction( member ),
-    param1( p1 ),
-    param2( p2 ),
-    param3( p3 ),
-    param4( p4 )
+    object(const_cast<T*>(obj)),
+    memberFunction(member),
+    param1(p1),
+    param2(p2),
+    param3(p3),
+    param4(p4)
   {
-    DALI_ASSERT_DEBUG( object && "nullptr passed into message as object" );
+    DALI_ASSERT_DEBUG(object && "nullptr passed into message as object");
   }
 
   /**
@@ -320,20 +309,18 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process( BufferIndex /*bufferIndex*/ ) override
+  void Process(BufferIndex /*bufferIndex*/) override
   {
-    (object->*memberFunction)( param1, param2, param3, param4 );
+    (object->*memberFunction)(param1, param2, param3, param4);
   }
 
 private:
-
-  T* object;
-  MemberFunction memberFunction;
-  typename ParameterType< P1 >::HolderType param1;
-  typename ParameterType< P2 >::HolderType param2;
-  typename ParameterType< P3 >::HolderType param3;
-  typename ParameterType< P4 >::HolderType param4;
-
+  T*                                     object;
+  MemberFunction                         memberFunction;
+  typename ParameterType<P1>::HolderType param1;
+  typename ParameterType<P2>::HolderType param2;
+  typename ParameterType<P3>::HolderType param3;
+  typename ParameterType<P4>::HolderType param4;
 };
 
 /**
@@ -342,11 +329,11 @@ private:
  * Template parameters need to match the MemberFunction!
  * The message will contain copy of the value (in case of & or const&)
  */
-template< typename T, typename P1, typename P2, typename P3, typename P4, typename P5 >
+template<typename T, typename P1, typename P2, typename P3, typename P4, typename P5>
 class MessageValue5 : public MessageBase
 {
 public:
-  using MemberFunction = void ( T::* )( typename ParameterType<P1>::PassingType, typename ParameterType<P2>::PassingType, typename ParameterType<P3>::PassingType, typename ParameterType<P4>::PassingType, typename ParameterType<P5>::PassingType );
+  using MemberFunction = void (T::*)(typename ParameterType<P1>::PassingType, typename ParameterType<P2>::PassingType, typename ParameterType<P3>::PassingType, typename ParameterType<P4>::PassingType, typename ParameterType<P5>::PassingType);
 
   /**
    * Create a message.
@@ -360,23 +347,23 @@ public:
    * @param[in] p4 The fourth parameter to pass to the member function.
    * @param[in] p5 The fifth parameter to pass to the member function.
    */
-  MessageValue5( const T* obj,
-                 MemberFunction member,
-                 typename ParameterType< P1 >::PassingType p1,
-                 typename ParameterType< P2 >::PassingType p2,
-                 typename ParameterType< P3 >::PassingType p3,
-                 typename ParameterType< P4 >::PassingType p4,
-                 typename ParameterType< P5 >::PassingType p5 )
+  MessageValue5(const T*                                obj,
+                MemberFunction                          member,
+                typename ParameterType<P1>::PassingType p1,
+                typename ParameterType<P2>::PassingType p2,
+                typename ParameterType<P3>::PassingType p3,
+                typename ParameterType<P4>::PassingType p4,
+                typename ParameterType<P5>::PassingType p5)
   : MessageBase(),
-    object( const_cast< T* >( obj ) ),
-    memberFunction( member ),
-    param1( p1 ),
-    param2( p2 ),
-    param3( p3 ),
-    param4( p4 ),
-    param5( p5 )
+    object(const_cast<T*>(obj)),
+    memberFunction(member),
+    param1(p1),
+    param2(p2),
+    param3(p3),
+    param4(p4),
+    param5(p5)
   {
-    DALI_ASSERT_DEBUG( object && "nullptr passed into message as object" );
+    DALI_ASSERT_DEBUG(object && "nullptr passed into message as object");
   }
 
   /**
@@ -387,21 +374,19 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process( BufferIndex /*bufferIndex*/ ) override
+  void Process(BufferIndex /*bufferIndex*/) override
   {
-    (object->*memberFunction)( param1, param2, param3, param4, param5 );
+    (object->*memberFunction)(param1, param2, param3, param4, param5);
   }
 
 private:
-
-  T* object;
-  MemberFunction memberFunction;
-  typename ParameterType< P1 >::HolderType param1;
-  typename ParameterType< P2 >::HolderType param2;
-  typename ParameterType< P3 >::HolderType param3;
-  typename ParameterType< P4 >::HolderType param4;
-  typename ParameterType< P5 >::HolderType param5;
-
+  T*                                     object;
+  MemberFunction                         memberFunction;
+  typename ParameterType<P1>::HolderType param1;
+  typename ParameterType<P2>::HolderType param2;
+  typename ParameterType<P3>::HolderType param3;
+  typename ParameterType<P4>::HolderType param4;
+  typename ParameterType<P5>::HolderType param5;
 };
 
 /**
@@ -410,11 +395,11 @@ private:
  * Template parameters need to match the MemberFunction!
  * The message will contain copy of the value (in case of & or const&)
  */
-template< typename T, typename P1, typename P2, typename P3, typename P4, typename P5, typename P6 >
+template<typename T, typename P1, typename P2, typename P3, typename P4, typename P5, typename P6>
 class MessageValue6 : public MessageBase
 {
 public:
-  using MemberFunction = void ( T::* )( typename ParameterType<P1>::PassingType, typename ParameterType<P2>::PassingType, typename ParameterType<P3>::PassingType, typename ParameterType<P4>::PassingType, typename ParameterType<P5>::PassingType, typename ParameterType<P6>::PassingType );
+  using MemberFunction = void (T::*)(typename ParameterType<P1>::PassingType, typename ParameterType<P2>::PassingType, typename ParameterType<P3>::PassingType, typename ParameterType<P4>::PassingType, typename ParameterType<P5>::PassingType, typename ParameterType<P6>::PassingType);
 
   /**
    * Create a message.
@@ -429,25 +414,25 @@ public:
    * @param[in] p5 The fifth parameter to pass to the member function.
    * @param[in] p6 The sixth parameter to pass to the member function.
    */
-  MessageValue6( const T* obj,
-                 MemberFunction member,
-                 typename ParameterType< P1 >::PassingType p1,
-                 typename ParameterType< P2 >::PassingType p2,
-                 typename ParameterType< P3 >::PassingType p3,
-                 typename ParameterType< P4 >::PassingType p4,
-                 typename ParameterType< P5 >::PassingType p5,
-                 typename ParameterType< P6 >::PassingType p6 )
+  MessageValue6(const T*                                obj,
+                MemberFunction                          member,
+                typename ParameterType<P1>::PassingType p1,
+                typename ParameterType<P2>::PassingType p2,
+                typename ParameterType<P3>::PassingType p3,
+                typename ParameterType<P4>::PassingType p4,
+                typename ParameterType<P5>::PassingType p5,
+                typename ParameterType<P6>::PassingType p6)
   : MessageBase(),
-    object( const_cast< T* >( obj ) ),
-    memberFunction( member ),
-    param1( p1 ),
-    param2( p2 ),
-    param3( p3 ),
-    param4( p4 ),
-    param5( p5 ),
-    param6( p6 )
+    object(const_cast<T*>(obj)),
+    memberFunction(member),
+    param1(p1),
+    param2(p2),
+    param3(p3),
+    param4(p4),
+    param5(p5),
+    param6(p6)
   {
-    DALI_ASSERT_DEBUG( object && "nullptr passed into message as object" );
+    DALI_ASSERT_DEBUG(object && "nullptr passed into message as object");
   }
 
   /**
@@ -458,33 +443,31 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process( BufferIndex /*bufferIndex*/ ) override
+  void Process(BufferIndex /*bufferIndex*/) override
   {
-    (object->*memberFunction)( param1, param2, param3, param4, param5, param6 );
+    (object->*memberFunction)(param1, param2, param3, param4, param5, param6);
   }
 
 private:
-
-  T* object;
-  MemberFunction memberFunction;
-  typename ParameterType< P1 >::HolderType param1;
-  typename ParameterType< P2 >::HolderType param2;
-  typename ParameterType< P3 >::HolderType param3;
-  typename ParameterType< P4 >::HolderType param4;
-  typename ParameterType< P5 >::HolderType param5;
-  typename ParameterType< P6 >::HolderType param6;
-
+  T*                                     object;
+  MemberFunction                         memberFunction;
+  typename ParameterType<P1>::HolderType param1;
+  typename ParameterType<P2>::HolderType param2;
+  typename ParameterType<P3>::HolderType param3;
+  typename ParameterType<P4>::HolderType param4;
+  typename ParameterType<P5>::HolderType param5;
+  typename ParameterType<P6>::HolderType param6;
 };
 
 /**
  * Templated message which calls a member function of an object.
  * This overload passes just the buffer index to the method, no parameters.
  */
-template< typename T >
+template<typename T>
 class MessageDoubleBuffered0 : public MessageBase
 {
 public:
-  using MemberFunction = void ( T::* )( BufferIndex );
+  using MemberFunction = void (T::*)(BufferIndex);
 
   /**
    * Create a message.
@@ -493,12 +476,12 @@ public:
    * @param[in] obj The object.
    * @param[in] member The member function of the object.
    */
-  MessageDoubleBuffered0( const T* obj, MemberFunction member )
+  MessageDoubleBuffered0(const T* obj, MemberFunction member)
   : MessageBase(),
-    object( const_cast< T* >( obj ) ),
-    memberFunction( member )
+    object(const_cast<T*>(obj)),
+    memberFunction(member)
   {
-    DALI_ASSERT_DEBUG( object && "nullptr passed into message as object" );
+    DALI_ASSERT_DEBUG(object && "nullptr passed into message as object");
   }
 
   /**
@@ -509,18 +492,15 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process( BufferIndex bufferIndex ) override
+  void Process(BufferIndex bufferIndex) override
   {
-    (object->*memberFunction)( bufferIndex );
+    (object->*memberFunction)(bufferIndex);
   }
 
 private:
-
-  T* object;
+  T*             object;
   MemberFunction memberFunction;
-
 };
-
 
 /**
  * Templated message which calls a member function of an object.
@@ -528,11 +508,11 @@ private:
  * Template parameters need to match the MemberFunction!
  * The message will contain copy of the value (in case of & or const&)
  */
-template< typename T, typename P >
+template<typename T, typename P>
 class MessageDoubleBuffered1 : public MessageBase
 {
 public:
-  using MemberFunction = void ( T::* )( BufferIndex, typename ParameterType<P>::PassingType );
+  using MemberFunction = void (T::*)(BufferIndex, typename ParameterType<P>::PassingType);
 
   /**
    * Create a message.
@@ -542,15 +522,15 @@ public:
    * @param[in] member The member function of the object.
    * @param[in] p The second parameter to pass.
    */
-  MessageDoubleBuffered1( const T* obj,
-                          MemberFunction member,
-                          typename ParameterType< P >::PassingType p )
+  MessageDoubleBuffered1(const T*                               obj,
+                         MemberFunction                         member,
+                         typename ParameterType<P>::PassingType p)
   : MessageBase(),
-    object( const_cast< T* >( obj ) ),
-    memberFunction( member ),
-    param( p )
+    object(const_cast<T*>(obj)),
+    memberFunction(member),
+    param(p)
   {
-    DALI_ASSERT_DEBUG( object && "nullptr passed into message as object" );
+    DALI_ASSERT_DEBUG(object && "nullptr passed into message as object");
   }
 
   /**
@@ -561,17 +541,15 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process( BufferIndex bufferIndex ) override
+  void Process(BufferIndex bufferIndex) override
   {
-    (object->*memberFunction)( bufferIndex,  param );
+    (object->*memberFunction)(bufferIndex, param);
   }
 
 private:
-
-  T* object;
-  MemberFunction memberFunction;
-  typename ParameterType< P >::HolderType param;
-
+  T*                                    object;
+  MemberFunction                        memberFunction;
+  typename ParameterType<P>::HolderType param;
 };
 
 /**
@@ -580,11 +558,11 @@ private:
  * Template parameters need to match the MemberFunction!
  * The message will contain copy of the value (in case of & or const&)
  */
-template< typename T, typename P2, typename P3 >
+template<typename T, typename P2, typename P3>
 class MessageDoubleBuffered2 : public MessageBase
 {
 public:
-  using MemberFunction = void ( T::* )( BufferIndex, typename ParameterType<P2>::PassingType, typename ParameterType<P3>::PassingType );
+  using MemberFunction = void (T::*)(BufferIndex, typename ParameterType<P2>::PassingType, typename ParameterType<P3>::PassingType);
 
   /**
    * Create a message.
@@ -595,17 +573,17 @@ public:
    * @param[in] p2 The second parameter to pass to the function.
    * @param[in] p3 The third parameter to pass to the function.
    */
-  MessageDoubleBuffered2( const T* obj,
-                          MemberFunction member,
-                          typename ParameterType< P2 >::PassingType p2,
-                          typename ParameterType< P3 >::PassingType p3 )
+  MessageDoubleBuffered2(const T*                                obj,
+                         MemberFunction                          member,
+                         typename ParameterType<P2>::PassingType p2,
+                         typename ParameterType<P3>::PassingType p3)
   : MessageBase(),
-    object( const_cast< T* >( obj ) ),
-    memberFunction( member ),
-    param2( p2 ),
-    param3( p3 )
+    object(const_cast<T*>(obj)),
+    memberFunction(member),
+    param2(p2),
+    param3(p3)
   {
-    DALI_ASSERT_DEBUG( object && "nullptr passed into message as object" );
+    DALI_ASSERT_DEBUG(object && "nullptr passed into message as object");
   }
 
   /**
@@ -616,20 +594,17 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process( BufferIndex bufferIndex ) override
+  void Process(BufferIndex bufferIndex) override
   {
-    (object->*memberFunction)( bufferIndex, param2, param3 );
+    (object->*memberFunction)(bufferIndex, param2, param3);
   }
 
 private:
-
-  T* object;
-  MemberFunction memberFunction;
-  typename ParameterType< P2 >::HolderType param2;
-  typename ParameterType< P3 >::HolderType param3;
-
+  T*                                     object;
+  MemberFunction                         memberFunction;
+  typename ParameterType<P2>::HolderType param2;
+  typename ParameterType<P3>::HolderType param3;
 };
-
 
 /**
  * Templated message which calls a member function of an object.
@@ -637,11 +612,11 @@ private:
  * Template parameters need to match the MemberFunction!
  * The message will contain copy of the value (in case of & or const&)
  */
-template< typename T, typename P2, typename P3, typename P4 >
+template<typename T, typename P2, typename P3, typename P4>
 class MessageDoubleBuffered3 : public MessageBase
 {
 public:
-  using MemberFunction = void ( T::* )( BufferIndex, typename ParameterType<P2>::PassingType, typename ParameterType<P3>::PassingType, typename ParameterType<P4>::PassingType );
+  using MemberFunction = void (T::*)(BufferIndex, typename ParameterType<P2>::PassingType, typename ParameterType<P3>::PassingType, typename ParameterType<P4>::PassingType);
 
   /**
    * Create a message.
@@ -653,19 +628,19 @@ public:
    * @param[in] p3 The third parameter to pass.
    * @param[in] p4 The forth parameter to pass.
    */
-  MessageDoubleBuffered3( const T* obj,
-                          MemberFunction member,
-                          typename ParameterType< P2 >::PassingType p2,
-                          typename ParameterType< P3 >::PassingType p3,
-                          typename ParameterType< P4 >::PassingType p4 )
+  MessageDoubleBuffered3(const T*                                obj,
+                         MemberFunction                          member,
+                         typename ParameterType<P2>::PassingType p2,
+                         typename ParameterType<P3>::PassingType p3,
+                         typename ParameterType<P4>::PassingType p4)
   : MessageBase(),
-    object( const_cast< T* >( obj ) ),
-    memberFunction( member ),
-    param2( p2 ),
-    param3( p3 ),
-    param4( p4 )
+    object(const_cast<T*>(obj)),
+    memberFunction(member),
+    param2(p2),
+    param3(p3),
+    param4(p4)
   {
-    DALI_ASSERT_DEBUG( object && "nullptr passed into message as object" );
+    DALI_ASSERT_DEBUG(object && "nullptr passed into message as object");
   }
 
   /**
@@ -676,19 +651,17 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process( BufferIndex bufferIndex ) override
+  void Process(BufferIndex bufferIndex) override
   {
-    (object->*memberFunction)( bufferIndex, param2, param3, param4 );
+    (object->*memberFunction)(bufferIndex, param2, param3, param4);
   }
 
 private:
-
-  T* object;
-  MemberFunction memberFunction;
-  typename ParameterType< P2 >::HolderType param2;
-  typename ParameterType< P3 >::HolderType param3;
-  typename ParameterType< P4 >::HolderType param4;
-
+  T*                                     object;
+  MemberFunction                         memberFunction;
+  typename ParameterType<P2>::HolderType param2;
+  typename ParameterType<P3>::HolderType param3;
+  typename ParameterType<P4>::HolderType param4;
 };
 
 /**
@@ -697,11 +670,11 @@ private:
  * Template parameters need to match the MemberFunction!
  * The message will contain copy of the value (in case of & or const&)
  */
-template< typename T, typename P2, typename P3, typename P4, typename P5 >
+template<typename T, typename P2, typename P3, typename P4, typename P5>
 class MessageDoubleBuffered4 : public MessageBase
 {
 public:
-  using MemberFunction = void ( T::* )( BufferIndex, typename ParameterType<P2>::PassingType, typename ParameterType<P3>::PassingType, typename ParameterType<P4>::PassingType, typename ParameterType<P5>::PassingType );
+  using MemberFunction = void (T::*)(BufferIndex, typename ParameterType<P2>::PassingType, typename ParameterType<P3>::PassingType, typename ParameterType<P4>::PassingType, typename ParameterType<P5>::PassingType);
 
   /**
    * Create a message.
@@ -714,21 +687,21 @@ public:
    * @param[in] p4 The forth parameter to pass.
    * @param[in] p5 The fifth parameter to pass.
    */
-  MessageDoubleBuffered4( const T* obj,
-                          MemberFunction member,
-                          typename ParameterType< P2 >::PassingType p2,
-                          typename ParameterType< P3 >::PassingType p3,
-                          typename ParameterType< P4 >::PassingType p4,
-                          typename ParameterType< P5 >::PassingType p5 )
+  MessageDoubleBuffered4(const T*                                obj,
+                         MemberFunction                          member,
+                         typename ParameterType<P2>::PassingType p2,
+                         typename ParameterType<P3>::PassingType p3,
+                         typename ParameterType<P4>::PassingType p4,
+                         typename ParameterType<P5>::PassingType p5)
   : MessageBase(),
-    object( const_cast< T* >( obj ) ),
-    memberFunction( member ),
-    param2( p2 ),
-    param3( p3 ),
-    param4( p4 ),
-    param5( p5 )
+    object(const_cast<T*>(obj)),
+    memberFunction(member),
+    param2(p2),
+    param3(p3),
+    param4(p4),
+    param5(p5)
   {
-    DALI_ASSERT_DEBUG( object && "nullptr passed into message as object" );
+    DALI_ASSERT_DEBUG(object && "nullptr passed into message as object");
   }
 
   /**
@@ -739,20 +712,18 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process( BufferIndex bufferIndex ) override
+  void Process(BufferIndex bufferIndex) override
   {
-    (object->*memberFunction)( bufferIndex, param2, param3, param4, param5 );
+    (object->*memberFunction)(bufferIndex, param2, param3, param4, param5);
   }
 
 private:
-
-  T* object;
-  MemberFunction memberFunction;
-  typename ParameterType< P2 >::HolderType param2;
-  typename ParameterType< P3 >::HolderType param3;
-  typename ParameterType< P4 >::HolderType param4;
-  typename ParameterType< P5 >::HolderType param5;
-
+  T*                                     object;
+  MemberFunction                         memberFunction;
+  typename ParameterType<P2>::HolderType param2;
+  typename ParameterType<P3>::HolderType param3;
+  typename ParameterType<P4>::HolderType param4;
+  typename ParameterType<P5>::HolderType param5;
 };
 
 } // namespace Internal

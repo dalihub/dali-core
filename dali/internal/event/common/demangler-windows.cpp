@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,22 +20,21 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
 std::string DemangleClassName(const char* typeIdName)
 {
-  std::string name = typeIdName;
-  int index = name.find_last_of(' ');
+  std::string name  = typeIdName;
+  int         index = name.find_last_of(' ');
 
-  if( 0 <= index )
+  if(0 <= index)
   {
-    name = name.substr( index + 1, name.size() - index );
+    name = name.substr(index + 1, name.size() - index);
   }
 
   index = name.find_last_of(':');
 
-  if( 0 <= index )
+  if(0 <= index)
   {
     name = name.substr(index + 1, name.size() - index);
   }

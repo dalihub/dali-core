@@ -2,7 +2,7 @@
 #define DALI_SHADER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -126,7 +126,7 @@ public:
    */
   static Shader New(std::string_view vertexShader,
                     std::string_view fragmentShader,
-                    Hint::Value        hints = Hint::NONE);
+                    Hint::Value      hints = Hint::NONE);
 
   /**
    * @brief Default constructor, creates an empty handle.

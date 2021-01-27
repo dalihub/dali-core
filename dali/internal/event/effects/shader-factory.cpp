@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,134 +22,130 @@
 #include <sstream>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/dali-core-version.h>
-#include <dali/public-api/common/dali-common.h>
 #include <dali/devel-api/common/hash.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/internal/event/common/thread-local-storage.h>
+#include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/dali-core-version.h>
 
 namespace
 {
 const char* VERSION_SEPARATOR = "-";
-const char* SHADER_SUFFIX = ".dali-bin";
-}
+const char* SHADER_SUFFIX     = ".dali-bin";
+} // namespace
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace
 {
-
 /**
  * @brief Generates a filename for a shader binary based on the hash value passed in.
  * @param[in] shaderHash A hash over shader sources.
  * @param[out] filename A string to overwrite with the filename.
  */
-void shaderBinaryFilename( size_t shaderHash, std::string& filename )
+void shaderBinaryFilename(size_t shaderHash, std::string& filename)
 {
-  std::stringstream binaryShaderFilenameBuilder( std::ios_base::out );
+  std::stringstream binaryShaderFilenameBuilder(std::ios_base::out);
   binaryShaderFilenameBuilder << CORE_MAJOR_VERSION << VERSION_SEPARATOR << CORE_MINOR_VERSION << VERSION_SEPARATOR << CORE_MICRO_VERSION << VERSION_SEPARATOR
                               << shaderHash
                               << SHADER_SUFFIX;
   filename = binaryShaderFilenameBuilder.str();
 }
 
-}
+} // namespace
 
 ShaderFactory::ShaderFactory() = default;
 
 ShaderFactory::~ShaderFactory()
 {
   // Let all the cached objects destroy themselves:
-  for( std::size_t i = 0, cacheSize = mShaderBinaryCache.Size(); i < cacheSize; ++i )
+  for(std::size_t i = 0, cacheSize = mShaderBinaryCache.Size(); i < cacheSize; ++i)
   {
-    if( mShaderBinaryCache[i] )
+    if(mShaderBinaryCache[i])
     {
       mShaderBinaryCache[i]->Unreference();
     }
   }
 }
 
-ShaderDataPtr ShaderFactory::Load( std::string_view vertexSource, std::string_view fragmentSource, const Dali::Shader::Hint::Value hints, size_t& shaderHash )
+ShaderDataPtr ShaderFactory::Load(std::string_view vertexSource, std::string_view fragmentSource, const Dali::Shader::Hint::Value hints, size_t& shaderHash)
 {
   // Work out the filename for the binary that the glsl source will be compiled and linked to:
-  shaderHash = CalculateHash( vertexSource.data(), fragmentSource.data() );
+  shaderHash = CalculateHash(vertexSource.data(), fragmentSource.data());
   std::string binaryShaderFilename;
-  shaderBinaryFilename( shaderHash, binaryShaderFilename );
+  shaderBinaryFilename(shaderHash, binaryShaderFilename);
 
   ShaderDataPtr shaderData;
 
   /// Check a cache of previously loaded shaders:
-  for( std::size_t i = 0, cacheSize = mShaderBinaryCache.Size(); i < cacheSize; ++i )
+  for(std::size_t i = 0, cacheSize = mShaderBinaryCache.Size(); i < cacheSize; ++i)
   {
-    if( mShaderBinaryCache[i]->GetHashValue() == shaderHash )
+    if(mShaderBinaryCache[i]->GetHashValue() == shaderHash)
     {
       shaderData = mShaderBinaryCache[i];
 
-      DALI_LOG_INFO( Debug::Filter::gShader, Debug::General, "Mem cache hit on path: \"%s\"\n", binaryShaderFilename.c_str() );
+      DALI_LOG_INFO(Debug::Filter::gShader, Debug::General, "Mem cache hit on path: \"%s\"\n", binaryShaderFilename.c_str());
       break;
     }
   }
 
   // If memory cache failed check the file system for a binary or return a source-only ShaderData:
-  if( shaderData.Get() == nullptr )
+  if(shaderData.Get() == nullptr)
   {
     // Allocate the structure that returns the loaded shader:
-    shaderData = new ShaderData( std::string(vertexSource), std::string(fragmentSource), hints );
-    shaderData->SetHashValue( shaderHash );
+    shaderData = new ShaderData(std::string(vertexSource), std::string(fragmentSource), hints);
+    shaderData->SetHashValue(shaderHash);
     shaderData->GetBuffer().Clear();
 
     // Try to load the binary (this will fail if the shader source has never been compiled before):
-    ThreadLocalStorage& tls = ThreadLocalStorage::Get();
+    ThreadLocalStorage&               tls                 = ThreadLocalStorage::Get();
     Integration::PlatformAbstraction& platformAbstraction = tls.GetPlatformAbstraction();
-    const bool loaded = platformAbstraction.LoadShaderBinaryFile( binaryShaderFilename, shaderData->GetBuffer() );
+    const bool                        loaded              = platformAbstraction.LoadShaderBinaryFile(binaryShaderFilename, shaderData->GetBuffer());
 
-    if( loaded )
+    if(loaded)
     {
-      MemoryCacheInsert( *shaderData );
+      MemoryCacheInsert(*shaderData);
     }
 
-    DALI_LOG_INFO(Debug::Filter::gShader, Debug::General, loaded ?
-        "loaded on path: \"%s\"\n" :
-        "failed to load on path: \"%s\"\n",
-        binaryShaderFilename.c_str());
+    DALI_LOG_INFO(Debug::Filter::gShader, Debug::General, loaded ? "loaded on path: \"%s\"\n" : "failed to load on path: \"%s\"\n", binaryShaderFilename.c_str());
   }
 
   return shaderData;
 }
 
-void ShaderFactory::SaveBinary( Internal::ShaderDataPtr shaderData )
+void ShaderFactory::SaveBinary(Internal::ShaderDataPtr shaderData)
 {
   // Save the binary to the file system:
   std::string binaryShaderFilename;
-  shaderBinaryFilename( shaderData->GetHashValue(), binaryShaderFilename );
+  shaderBinaryFilename(shaderData->GetHashValue(), binaryShaderFilename);
 
-  ThreadLocalStorage& tls = ThreadLocalStorage::Get();
+  ThreadLocalStorage&               tls                 = ThreadLocalStorage::Get();
   Integration::PlatformAbstraction& platformAbstraction = tls.GetPlatformAbstraction();
-  const bool saved = platformAbstraction.SaveShaderBinaryFile( binaryShaderFilename, &shaderData->GetBuffer()[0], static_cast<unsigned int>( shaderData->GetBufferSize() ) ); // don't expect buffer larger than unsigned int
+  const bool                        saved               = platformAbstraction.SaveShaderBinaryFile(binaryShaderFilename, &shaderData->GetBuffer()[0], static_cast<unsigned int>(shaderData->GetBufferSize())); // don't expect buffer larger than unsigned int
 
   // Save the binary into to memory cache:
-  MemoryCacheInsert( *shaderData );
+  MemoryCacheInsert(*shaderData);
 
-  DALI_LOG_INFO( Debug::Filter::gShader, Debug::General, saved ? "Saved to file: %s\n" : "Save to file failed: %s\n", binaryShaderFilename.c_str() );
-  if( saved ) {} // Avoid unused variable warning in release builds
+  DALI_LOG_INFO(Debug::Filter::gShader, Debug::General, saved ? "Saved to file: %s\n" : "Save to file failed: %s\n", binaryShaderFilename.c_str());
+  if(saved)
+  {
+  } // Avoid unused variable warning in release builds
 }
 
-void ShaderFactory::MemoryCacheInsert( ShaderData& shaderData )
+void ShaderFactory::MemoryCacheInsert(ShaderData& shaderData)
 {
-  DALI_ASSERT_DEBUG( shaderData.GetBufferSize() > 0 );
+  DALI_ASSERT_DEBUG(shaderData.GetBufferSize() > 0);
 
   // Save the binary into to memory cache:
-  if( shaderData.GetBufferSize() > 0 )
+  if(shaderData.GetBufferSize() > 0)
   {
-    mShaderBinaryCache.Reserve( mShaderBinaryCache.Size() + 1 ); // Make sure the push won't throw after we inc the ref count.
+    mShaderBinaryCache.Reserve(mShaderBinaryCache.Size() + 1); // Make sure the push won't throw after we inc the ref count.
     shaderData.Reference();
-    mShaderBinaryCache.PushBack( &shaderData );
-    DALI_LOG_INFO( Debug::Filter::gShader, Debug::General, "CACHED BINARY FOR HASH: %u\n", shaderData.GetHashValue() );
+    mShaderBinaryCache.PushBack(&shaderData);
+    DALI_LOG_INFO(Debug::Filter::gShader, Debug::General, "CACHED BINARY FOR HASH: %u\n", shaderData.GetHashValue());
   }
 }
 

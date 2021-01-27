@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_BUFFERS_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,10 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace SceneGraph
 {
-
 /**
  * Node values (position etc.) are double-buffered.  A SceneGraphBuffers object
  * can be used to keep track of which buffers are being written or read.
@@ -37,7 +34,6 @@ namespace SceneGraph
 class SceneGraphBuffers
 {
 public:
-
   static BufferIndex INITIAL_EVENT_BUFFER_INDEX;  // 0
   static BufferIndex INITIAL_UPDATE_BUFFER_INDEX; // 1
 
@@ -55,13 +51,19 @@ public:
    * Retrieve the current event-buffer index.
    * @return The buffer index.
    */
-  BufferIndex GetEventBufferIndex() const { return mEventBufferIndex; }
+  BufferIndex GetEventBufferIndex() const
+  {
+    return mEventBufferIndex;
+  }
 
   /**
    * Retrieve the current update-buffer index.
    * @return The buffer index.
    */
-  BufferIndex GetUpdateBufferIndex() const { return mUpdateBufferIndex; }
+  BufferIndex GetUpdateBufferIndex() const
+  {
+    return mUpdateBufferIndex;
+  }
 
   /**
    * Swap the Event & Update buffer indices.
@@ -69,7 +71,6 @@ public:
   void Swap();
 
 private:
-
   // Undefined
   SceneGraphBuffers(const SceneGraphBuffers&);
 
@@ -77,7 +78,6 @@ private:
   SceneGraphBuffers& operator=(const SceneGraphBuffers& rhs);
 
 private:
-
   BufferIndex mEventBufferIndex;  ///< 0 or 1 (opposite of mUpdateBufferIndex)
   BufferIndex mUpdateBufferIndex; ///< 0 or 1 (opposite of mEventBufferIndex)
 };

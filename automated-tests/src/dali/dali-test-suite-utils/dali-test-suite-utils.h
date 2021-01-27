@@ -2,7 +2,7 @@
 #define DALI_TEST_SUITE_UTILS_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -417,25 +417,25 @@ inline void DALI_TEST_PRINT_ASSERT(DaliException& e)
  * @param expressions code to execute
  * @param except the exception expected in the assert
  */
-#define DALI_TEST_THROWS(expressions, except)                                                               \
-  try                                                                                                       \
-  {                                                                                                         \
-    TestApplication::EnableLogging(false);                                                                  \
-    expressions;                                                                                            \
-    TestApplication::EnableLogging(true);                                                                   \
-    fprintf(stderr, "Test failed in %s, expected exception: '%s' didn't occur\n", __FILELINE__, #except);   \
-    tet_result(TET_FAIL);                                                                                   \
-    throw("TET_FAIL");                                                                                      \
-  }                                                                                                         \
-  catch(except &)                                                                                           \
-  {                                                                                                         \
-    tet_result(TET_PASS);                                                                                   \
-  }                                                                                                         \
-  catch(...)                                                                                                \
-  {                                                                                                         \
-    fprintf(stderr, "Test failed in %s, unexpected exception\n", __FILELINE__);                             \
-    tet_result(TET_FAIL);                                                                                   \
-    throw;                                                                                                  \
+#define DALI_TEST_THROWS(expressions, except)                                                             \
+  try                                                                                                     \
+  {                                                                                                       \
+    TestApplication::EnableLogging(false);                                                                \
+    expressions;                                                                                          \
+    TestApplication::EnableLogging(true);                                                                 \
+    fprintf(stderr, "Test failed in %s, expected exception: '%s' didn't occur\n", __FILELINE__, #except); \
+    tet_result(TET_FAIL);                                                                                 \
+    throw("TET_FAIL");                                                                                    \
+  }                                                                                                       \
+  catch(except&)                                                                                          \
+  {                                                                                                       \
+    tet_result(TET_PASS);                                                                                 \
+  }                                                                                                       \
+  catch(...)                                                                                              \
+  {                                                                                                       \
+    fprintf(stderr, "Test failed in %s, unexpected exception\n", __FILELINE__);                           \
+    tet_result(TET_FAIL);                                                                                 \
+    throw;                                                                                                \
   }
 
 // Functor to test whether an Applied signal is emitted

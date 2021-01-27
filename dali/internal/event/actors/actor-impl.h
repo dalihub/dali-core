@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
+#include <dali/internal/common/const-string.h>
 #include <dali/internal/common/internal-constants.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/event/actors/actor-declarations.h>
@@ -39,7 +40,6 @@
 #include <dali/public-api/math/viewport.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
-#include <dali/internal/common/const-string.h>
 
 namespace Dali
 {
@@ -137,7 +137,7 @@ public:
    * Set the name of the actor.
    * @param[in] name The new name.
    */
-  void SetName( std::string_view name );
+  void SetName(std::string_view name);
 
   /**
    * @copydoc Dali::Actor::GetId
@@ -225,7 +225,7 @@ public:
   /**
    * @copydoc Dali::Internal::ActorParent::FindChildByName
    */
-  ActorPtr FindChildByName( ConstString actorName ) override;
+  ActorPtr FindChildByName(ConstString actorName) override;
 
   /**
    * @copydoc Dali::Internal::ActorParent::FindChildById
