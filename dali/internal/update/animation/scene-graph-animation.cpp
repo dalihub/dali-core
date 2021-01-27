@@ -483,10 +483,7 @@ void Animation::UpdateAnimators( BufferIndex bufferIndex, bool bake, bool animat
   if(cleanup)
   {
     //Remove animators whose PropertyOwner has been destroyed
-    mAnimators.Erase(std::remove_if(mAnimators.begin(),
-                                    mAnimators.end(),
-                                    [](auto& animator) { return animator->Orphan(); }),
-                     mAnimators.end());
+    mAnimators.EraseIf([](auto& animator) { return animator->Orphan(); });
   }
 }
 
