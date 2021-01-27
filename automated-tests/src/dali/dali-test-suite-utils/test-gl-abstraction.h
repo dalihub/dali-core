@@ -102,6 +102,12 @@ public:
 
   inline void BindBuffer(GLenum target, GLuint buffer) override
   {
+    std::ostringstream o;
+    o << std::hex << target << ", " << buffer;
+    TraceCallStack::NamedParams namedParams;
+    namedParams["target"] = target;
+    namedParams["buffer"] = buffer;
+    mBufferTrace.PushCall("BindBuffer", o.str(), namedParams);
   }
 
   inline void BindFramebuffer(GLenum target, GLuint framebuffer) override
@@ -242,11 +248,28 @@ public:
 
   inline void BufferData(GLenum target, GLsizeiptr size, const void* data, GLenum usage) override
   {
+    std::ostringstream o;
+    o << std::hex << target << ", " << size << ", " << data << ", " << usage;
+    TraceCallStack::NamedParams namedParams;
+    namedParams["target"] = target;
+    namedParams["size"]   = size;
+    namedParams["usage"]  = usage;
+
+    mBufferTrace.PushCall("BufferData", o.str(), namedParams);
+
     mBufferDataCalls.push_back(size);
   }
 
   inline void BufferSubData(GLenum target, GLintptr offset, GLsizeiptr size, const void* data) override
   {
+    std::ostringstream o;
+    o << std::hex << target << ", " << offset << ", " << size << ", " << data;
+    TraceCallStack::NamedParams namedParams;
+    namedParams["target"] = target;
+    namedParams["offset"] = offset;
+    namedParams["size"]   = size;
+    mBufferTrace.PushCall("BufferSubData", o.str());
+
     mBufferSubDataCalls.push_back(size);
   }
 
@@ -613,6 +636,12 @@ public:
   {
     // avoids an assert in GpuBuffers
     *buffers = 1u;
+
+    std::ostringstream o;
+    o << n;
+    TraceCallStack::NamedParams namedParams;
+    namedParams["n"] = o.str();
+    mBufferTrace.PushCall("GenBuffers", o.str(), namedParams);
   }
 
   inline void GenerateMipmap(GLenum target) override
@@ -2171,6 +2200,10 @@ public: // TEST FUNCTIONS
   {
     return mViewportTrace;
   }
+  inline TraceCallStack& GetBufferTrace()
+  {
+    return mBufferTrace;
+  }
 
   template<typename T>
   inline bool GetUniformValue(const char* name, T& value) const
@@ -2434,10 +2467,11 @@ private:
 
   ActiveTextureType mActiveTextures[MIN_TEXTURE_UNIT_LIMIT];
 
+  TraceCallStack mBufferTrace{"gl"};
   TraceCallStack mCullFaceTrace;
   TraceCallStack mEnableDisableTrace;
   TraceCallStack mShaderTrace;
-  TraceCallStack mTextureTrace{"GlA Texture:"};
+  TraceCallStack mTextureTrace{"gl"};
   TraceCallStack mTexParamaterTrace;
   TraceCallStack mDrawTrace;
   TraceCallStack mDepthFunctionTrace;

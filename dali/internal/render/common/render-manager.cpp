@@ -532,7 +532,7 @@ void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear
                 const RenderItem& item = renderList->GetItem(itemIndex);
                 if(DALI_LIKELY(item.mRenderer))
                 {
-                  item.mRenderer->Upload(*mImpl->currentContext);
+                  item.mRenderer->Upload();
                 }
               }
             }

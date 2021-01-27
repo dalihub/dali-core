@@ -106,7 +106,7 @@ void Geometry::OnRenderFinished()
   mAttributesChanged = false;
 }
 
-void Geometry::Upload(Context& context)
+void Geometry::Upload(Graphics::Controller& graphicsController)
 {
   if(!mHasBeenUpdated)
   {
@@ -121,11 +121,11 @@ void Geometry::Upload(Context& context)
       {
         if(mIndexBuffer == nullptr)
         {
-          mIndexBuffer = new GpuBuffer(context);
+          mIndexBuffer = new GpuBuffer(graphicsController, 0 | Graphics::BufferUsage::INDEX_BUFFER);
         }
 
         uint32_t bufferSize = static_cast<uint32_t>(sizeof(uint16_t) * mIndices.Size());
-        mIndexBuffer->UpdateDataBuffer(context, bufferSize, &mIndices[0], GpuBuffer::STATIC_DRAW, GpuBuffer::ELEMENT_ARRAY_BUFFER);
+        mIndexBuffer->UpdateDataBuffer(graphicsController, bufferSize, &mIndices[0]);
       }
 
       mIndicesChanged = false;
@@ -133,7 +133,7 @@ void Geometry::Upload(Context& context)
 
     for(auto&& buffer : mVertexBuffers)
     {
-      if(!buffer->Update(context))
+      if(!buffer->Update(graphicsController))
       {
         //Vertex buffer is not ready ( Size, data or format has not been specified yet )
         return;
@@ -145,20 +145,32 @@ void Geometry::Upload(Context& context)
 }
 
 void Geometry::Draw(
-  Context&       context,
-  BufferIndex    bufferIndex,
-  Vector<GLint>& attributeLocation,
-  uint32_t       elementBufferOffset,
-  uint32_t       elementBufferCount)
+  Context&                 context,
+  Graphics::Controller&    graphicsController,
+  Graphics::CommandBuffer& commandBuffer,
+  BufferIndex              bufferIndex,
+  Vector<GLint>&           attributeLocation,
+  uint32_t                 elementBufferOffset,
+  uint32_t                 elementBufferCount)
 {
   //Bind buffers to attribute locations
   uint32_t       base              = 0u;
   const uint32_t vertexBufferCount = static_cast<uint32_t>(mVertexBuffers.Count());
+
+  std::vector<const Graphics::Buffer*> buffers;
+  std::vector<uint32_t>                offsets;
+
   for(uint32_t i = 0; i < vertexBufferCount; ++i)
   {
-    mVertexBuffers[i]->BindBuffer(context, GpuBuffer::ARRAY_BUFFER);
-    base += mVertexBuffers[i]->EnableVertexAttributes(context, attributeLocation, base);
+    Graphics::Buffer* buffer = mVertexBuffers[i]->GetGpuBuffer().GetGraphicsObject();
+
+    if(buffer)
+    {
+      buffers.push_back(buffer);
+      offsets.push_back(0u);
+    }
   }
+  commandBuffer.BindVertexBuffers(0, buffers, offsets);
 
   uint32_t numIndices(0u);
   intptr_t firstIndexOffset(0u);
@@ -223,7 +235,25 @@ void Geometry::Draw(
   if(mIndexBuffer && geometryGLType != GL_POINTS)
   {
     //Indexed draw call
-    mIndexBuffer->Bind(context, GpuBuffer::ELEMENT_ARRAY_BUFFER);
+    Graphics::Buffer* ibo = mIndexBuffer->GetGraphicsObject();
+    if(ibo)
+    {
+      commandBuffer.BindIndexBuffer(*ibo, 0, Graphics::Format::R16_UINT);
+    }
+
+    // Command buffer contains Texture bindings, vertex bindings and index buffer binding.
+    Graphics::SubmitInfo submitInfo{{}, 0 | Graphics::SubmitFlagBits::FLUSH};
+    submitInfo.cmdBuffer.push_back(&commandBuffer);
+    graphicsController.SubmitCommandBuffers(submitInfo);
+
+    //@todo This should all be done from inside Pipeline implementation.
+    //If there is only 1 vertex buffer, it should have been bound by SubmitCommandBuffers,
+    //and the single GL call from this will work on that bound buffer.
+    for(uint32_t i = 0; i < vertexBufferCount; ++i)
+    {
+      base += mVertexBuffers[i]->EnableVertexAttributes(context, attributeLocation, base);
+    }
+
     // numIndices truncated, no value loss happening in practice
     context.DrawElements(geometryGLType, static_cast<GLsizei>(numIndices), GL_UNSIGNED_SHORT, reinterpret_cast<void*>(firstIndexOffset));
   }
@@ -235,6 +265,19 @@ void Geometry::Draw(
     {
       // truncated, no value loss happening in practice
       numVertices = static_cast<GLsizei>(mVertexBuffers[0]->GetElementCount());
+    }
+
+    // Command buffer contains Texture bindings & vertex bindings
+    Graphics::SubmitInfo submitInfo{{}, 0 | Graphics::SubmitFlagBits::FLUSH};
+    submitInfo.cmdBuffer.push_back(&commandBuffer);
+    graphicsController.SubmitCommandBuffers(submitInfo);
+
+    //@todo This should all be done from inside Pipeline implementation.
+    //If there is only 1 vertex buffer, it should have been bound by SubmitCommandBuffers,
+    //and the single GL call from this will work on that bound buffer.
+    for(uint32_t i = 0; i < vertexBufferCount; ++i)
+    {
+      base += mVertexBuffers[i]->EnableVertexAttributes(context, attributeLocation, base);
     }
 
     context.DrawArrays(geometryGLType, 0, numVertices);

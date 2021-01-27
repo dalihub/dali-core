@@ -87,17 +87,10 @@ public:
   void SetSize(uint32_t size);
 
   /**
-   * @brief Bind the property buffer
-   * @param context The context to bind the the buffer
-   * @param[in] target The binding point
+   * Perform the upload of the buffer only when required
+   * @param graphicsController The controller
    */
-  void BindBuffer(Context& context, GpuBuffer::Target target);
-
-  /**
-   * Perform the upload of the buffer only when requiered
-   * @param[in] context The GL context
-   */
-  bool Update(Context& context);
+  bool Update(Graphics::Controller& graphicsController);
 
   /**
    * Enable the vertex attributes for each vertex buffer from the corresponding
@@ -182,6 +175,11 @@ public:
   inline const VertexBuffer::Format* GetFormat() const
   {
     return mFormat.Get();
+  }
+
+  inline GpuBuffer& GetGpuBuffer()
+  {
+    return *(const_cast<GpuBuffer*>(mGpuBuffer.Get())); // @todo change to unique_ptr to avoid const cast?
   }
 
 private:

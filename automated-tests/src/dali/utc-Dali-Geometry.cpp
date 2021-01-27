@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -178,6 +178,9 @@ int UtcDaliGeometryAddVertexBuffer(void)
   TestApplication application;
 
   tet_infoline("Test AddVertexBuffer");
+  auto& bufferTrace = application.GetGlAbstraction().GetBufferTrace();
+  bufferTrace.Enable(true);
+  bufferTrace.EnableLogging(true);
 
   VertexBuffer vertexBuffer1 = CreateVertexBuffer("aPosition1", "aTexCoord1");
   Geometry     geometry      = Geometry::New();
@@ -229,6 +232,9 @@ int UtcDaliGeometryAddVertexBuffer(void)
 int UtcDaliGeometryGetNumberOfVertexBuffers(void)
 {
   TestApplication application;
+  auto&           bufferTrace = application.GetGlAbstraction().GetBufferTrace();
+  bufferTrace.Enable(true);
+  bufferTrace.EnableLogging(true);
 
   tet_infoline("Test GetNumberOfVertexBuffers");
   VertexBuffer vertexBuffer1 = CreateVertexBuffer("aPosition1", "aTexCoord1");
@@ -252,6 +258,9 @@ int UtcDaliGeometryGetNumberOfVertexBuffers(void)
 int UtcDaliGeometryRemoveVertexBuffer(void)
 {
   TestApplication application;
+  auto&           bufferTrace = application.GetGlAbstraction().GetBufferTrace();
+  bufferTrace.Enable(true);
+  bufferTrace.EnableLogging(true);
 
   tet_infoline("Test RemoveVertexBuffer");
 
@@ -286,6 +295,9 @@ int UtcDaliGeometryRemoveVertexBuffer(void)
 int UtcDaliGeometrySetIndexBuffer(void)
 {
   TestApplication application;
+  auto&           bufferTrace = application.GetGlAbstraction().GetBufferTrace();
+  bufferTrace.Enable(true);
+  bufferTrace.EnableLogging(true);
 
   tet_infoline("Test SetIndexBuffer");
 
@@ -342,6 +354,9 @@ int UtcDaliGeometrySetIndexBuffer(void)
 int UtcDaliGeometrySetGetGeometryType01(void)
 {
   TestApplication application;
+  auto&           bufferTrace = application.GetGlAbstraction().GetBufferTrace();
+  bufferTrace.Enable(true);
+  bufferTrace.EnableLogging(true);
 
   tet_infoline("Test SetType and GetType: without index buffer");
 
@@ -470,6 +485,9 @@ int UtcDaliGeometrySetGetGeometryType01(void)
 int UtcDaliGeometrySetGetGeometryType02(void)
 {
   TestApplication application;
+  auto&           bufferTrace = application.GetGlAbstraction().GetBufferTrace();
+  bufferTrace.Enable(true);
+  bufferTrace.EnableLogging(true);
 
   tet_infoline("Test SetType and GetType: with index buffer");
 

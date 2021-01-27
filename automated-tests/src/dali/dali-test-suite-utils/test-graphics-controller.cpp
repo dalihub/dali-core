@@ -16,6 +16,7 @@
 
 #include "test-graphics-controller.h"
 
+#include "dali-test-suite-utils.h"
 #include "test-graphics-buffer.h"
 #include "test-graphics-command-buffer.h"
 #include "test-graphics-sampler.h"
@@ -140,6 +141,59 @@ std::ostream& operator<<(std::ostream& o, const Graphics::SamplerCreateInfo& cre
   return o;
 }
 
+class TestGraphicsMemory : public Graphics::Memory
+{
+public:
+  TestGraphicsMemory(TraceCallStack& callStack, TestGraphicsBuffer& buffer, uint32_t mappedOffset, uint32_t mappedSize)
+  : mCallStack(callStack),
+    mBuffer(buffer),
+    mMappedOffset(mappedOffset),
+    mMappedSize(mappedSize)
+  {
+  }
+
+  void* LockRegion(uint32_t offset, uint32_t size) override
+  {
+    std::ostringstream o;
+    o << offset << ", " << size;
+    mCallStack.PushCall("Memory::LockRegion", o.str());
+
+    if(offset > mMappedOffset + mMappedSize ||
+       size + offset > mMappedOffset + mMappedSize)
+    {
+      tet_infoline("TestGraphics.Memory::LockRegion() Out of bounds");
+      mBuffer.memory.resize(mMappedOffset + offset + size); // Grow to prevent memcpy from crashing
+    }
+    mLockedOffset = offset;
+    mLockedSize   = size;
+    return &mBuffer.memory[mMappedOffset + offset];
+  }
+
+  void Unlock(bool flush) override
+  {
+    mCallStack.PushCall("Memory::Unlock", (flush ? "Flush" : "NoFlush"));
+    if(flush)
+    {
+      Flush();
+    }
+  }
+
+  void Flush() override
+  {
+    mCallStack.PushCall("Memory::Flush", "");
+    mBuffer.Bind();
+    mBuffer.Upload(mMappedOffset + mLockedOffset, mLockedSize);
+    mBuffer.Unbind();
+  }
+
+  TraceCallStack&     mCallStack;
+  TestGraphicsBuffer& mBuffer;
+  uint32_t            mMappedOffset;
+  uint32_t            mMappedSize;
+  uint32_t            mLockedOffset;
+  uint32_t            mLockedSize;
+};
+
 TestGraphicsController::TestGraphicsController()
 {
   mCallStack.Enable(true);
@@ -158,7 +212,7 @@ void TestGraphicsController::SubmitCommandBuffers(const Graphics::SubmitInfo& su
   out << "cmdBuffer[" << submitInfo.cmdBuffer.size() << "], flags:" << std::hex << submitInfo.flags;
   namedParams["submitInfo"] = out.str();
 
-  mCallStack.PushCall("SubmitCommandBuffers", "", namedParams);
+  mCallStack.PushCall("Controller::SubmitCommandBuffers", "", namedParams);
 
   for(auto& commandBuffer : submitInfo.cmdBuffer)
   {
@@ -195,7 +249,7 @@ void TestGraphicsController::PresentRenderTarget(Graphics::RenderTarget* renderT
   TraceCallStack::NamedParams namedParams;
   out << std::hex << renderTarget;
   namedParams["renderTarget"] = out.str();
-  mCallStack.PushCall("PresentRenderTarget", "", namedParams);
+  mCallStack.PushCall("Controller::PresentRenderTarget", "", namedParams);
 }
 
 /**
@@ -203,7 +257,7 @@ void TestGraphicsController::PresentRenderTarget(Graphics::RenderTarget* renderT
  */
 void TestGraphicsController::WaitIdle()
 {
-  mCallStack.PushCall("WaitIdle", "");
+  mCallStack.PushCall("Controller::WaitIdle", "");
 }
 
 /**
@@ -211,7 +265,7 @@ void TestGraphicsController::WaitIdle()
  */
 void TestGraphicsController::Pause()
 {
-  mCallStack.PushCall("Pause", "");
+  mCallStack.PushCall("Controller::Pause", "");
 }
 
 /**
@@ -219,7 +273,7 @@ void TestGraphicsController::Pause()
  */
 void TestGraphicsController::Resume()
 {
-  mCallStack.PushCall("Resume", "");
+  mCallStack.PushCall("Controller::Resume", "");
 }
 
 void TestGraphicsController::UpdateTextures(const std::vector<Graphics::TextureUpdateInfo>&       updateInfoList,
@@ -233,7 +287,7 @@ void TestGraphicsController::UpdateTextures(const std::vector<Graphics::TextureU
   out << "[" << sourceList.size() << "]:";
   namedParams["sourceList"] = out.str();
 
-  mCallStack.PushCall("UpdateTextures", "", namedParams);
+  mCallStack.PushCall("Controller::UpdateTextures", "", namedParams);
 
   // Call either TexImage2D or TexSubImage2D
   for(unsigned int i = 0; i < updateInfoList.size(); ++i)
@@ -252,7 +306,7 @@ bool TestGraphicsController::EnableDepthStencilBuffer(bool enableDepth, bool ena
   TraceCallStack::NamedParams namedParams;
   namedParams["enableDepth"]   = enableDepth ? "T" : "F";
   namedParams["enableStencil"] = enableStencil ? "T" : "F";
-  mCallStack.PushCall("EnableDepthStencilBuffer", "", namedParams);
+  mCallStack.PushCall("Controller::EnableDepthStencilBuffer", "", namedParams);
   return false;
 }
 
@@ -262,17 +316,17 @@ void TestGraphicsController::RunGarbageCollector(size_t numberOfDiscardedRendere
   out << numberOfDiscardedRenderers;
   TraceCallStack::NamedParams namedParams;
   namedParams["numberOfDiscardedrenderers"] = out.str();
-  mCallStack.PushCall("RunGarbageCollector", "", namedParams);
+  mCallStack.PushCall("Controller::RunGarbageCollector", "", namedParams);
 }
 
 void TestGraphicsController::DiscardUnusedResources()
 {
-  mCallStack.PushCall("DiscardUnusedResources", "");
+  mCallStack.PushCall("Controller::DiscardUnusedResources", "");
 }
 
 bool TestGraphicsController::IsDiscardQueueEmpty()
 {
-  mCallStack.PushCall("IsDiscardQueueEmpty", "");
+  mCallStack.PushCall("Controller::IsDiscardQueueEmpty", "");
   return isDiscardQueueEmptyResult;
 }
 
@@ -283,30 +337,29 @@ bool TestGraphicsController::IsDiscardQueueEmpty()
  */
 bool TestGraphicsController::IsDrawOnResumeRequired()
 {
-  mCallStack.PushCall("IsDrawOnResumeRequired", "");
+  mCallStack.PushCall("Controller::IsDrawOnResumeRequired", "");
   return isDrawOnResumeRequiredResult;
 }
 
-Graphics::UniquePtr<Graphics::Buffer> TestGraphicsController::CreateBuffer(const Graphics::BufferCreateInfo& bufferCreateInfo, Graphics::UniquePtr<Graphics::Buffer>&& oldBuffer)
+Graphics::UniquePtr<Graphics::Buffer> TestGraphicsController::CreateBuffer(const Graphics::BufferCreateInfo& createInfo, Graphics::UniquePtr<Graphics::Buffer>&& oldBuffer)
 {
   std::ostringstream oss;
-  oss << "bufferCreateInfo:" << bufferCreateInfo;
-  mCallStack.PushCall("CreateBuffer", oss.str());
-
-  return Graphics::MakeUnique<TestGraphicsBuffer>();
+  oss << "bufferCreateInfo:" << createInfo;
+  mCallStack.PushCall("Controller::CreateBuffer", oss.str());
+  return Graphics::MakeUnique<TestGraphicsBuffer>(mCallStack, mGlAbstraction, createInfo.size, createInfo.usage);
 }
 
 Graphics::UniquePtr<Graphics::CommandBuffer> TestGraphicsController::CreateCommandBuffer(const Graphics::CommandBufferCreateInfo& commandBufferCreateInfo, Graphics::UniquePtr<Graphics::CommandBuffer>&& oldCommandBuffer)
 {
   std::ostringstream oss;
   oss << "commandBufferCreateInfo:" << commandBufferCreateInfo;
-  mCallStack.PushCall("CreateCommandBuffer", oss.str());
+  mCallStack.PushCall("Controller::CreateCommandBuffer", oss.str());
   return Graphics::MakeUnique<TestGraphicsCommandBuffer>(mCommandBufferCallStack, mGlAbstraction);
 }
 
 Graphics::UniquePtr<Graphics::RenderPass> TestGraphicsController::CreateRenderPass(const Graphics::RenderPassCreateInfo& renderPassCreateInfo, Graphics::UniquePtr<Graphics::RenderPass>&& oldRenderPass)
 {
-  mCallStack.PushCall("CreateRenderPass", "");
+  mCallStack.PushCall("Controller::CreateRenderPass", "");
   return nullptr;
 }
 
@@ -317,26 +370,26 @@ Graphics::UniquePtr<Graphics::Texture> TestGraphicsController::CreateTexture(con
   TraceCallStack::NamedParams namedParams;
   oss << textureCreateInfo;
   namedParams["textureCreateInfo"] = oss.str();
-  mCallStack.PushCall("CreateTexture", params.str(), namedParams);
+  mCallStack.PushCall("Controller::CreateTexture", params.str(), namedParams);
 
   return Graphics::MakeUnique<TestGraphicsTexture>(mGlAbstraction, textureCreateInfo);
 }
 
 Graphics::UniquePtr<Graphics::Framebuffer> TestGraphicsController::CreateFramebuffer(const Graphics::FramebufferCreateInfo& framebufferCreateInfo, Graphics::UniquePtr<Graphics::Framebuffer>&& oldFramebuffer)
 {
-  mCallStack.PushCall("CreateFramebuffer", "");
+  mCallStack.PushCall("Controller::CreateFramebuffer", "");
   return nullptr;
 }
 
 Graphics::UniquePtr<Graphics::Pipeline> TestGraphicsController::CreatePipeline(const Graphics::PipelineCreateInfo& pipelineCreateInfo, Graphics::UniquePtr<Graphics::Pipeline>&& oldPipeline)
 {
-  mCallStack.PushCall("CreatePipeline", "");
+  mCallStack.PushCall("Controller::CreatePipeline", "");
   return nullptr;
 }
 
 Graphics::UniquePtr<Graphics::Shader> TestGraphicsController::CreateShader(const Graphics::ShaderCreateInfo& shaderCreateInfo, Graphics::UniquePtr<Graphics::Shader>&& oldShader)
 {
-  mCallStack.PushCall("CreateShader", "");
+  mCallStack.PushCall("Controller::CreateShader", "");
   return nullptr;
 }
 
@@ -347,57 +400,61 @@ Graphics::UniquePtr<Graphics::Sampler> TestGraphicsController::CreateSampler(con
   TraceCallStack::NamedParams namedParams;
   oss << samplerCreateInfo;
   namedParams["samplerCreateInfo"] = oss.str();
-  mCallStack.PushCall("CreateSampler", params.str(), namedParams);
+  mCallStack.PushCall("Controller::CreateSampler", params.str(), namedParams);
 
   return Graphics::MakeUnique<TestGraphicsSampler>(mGlAbstraction, samplerCreateInfo);
 }
 
 Graphics::UniquePtr<Graphics::RenderTarget> TestGraphicsController::CreateRenderTarget(const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo, Graphics::UniquePtr<Graphics::RenderTarget>&& oldRenderTarget)
 {
-  mCallStack.PushCall("CreateRenderTarget", "");
+  mCallStack.PushCall("Controller::CreateRenderTarget", "");
   return nullptr;
 }
 
 Graphics::UniquePtr<Graphics::Memory> TestGraphicsController::MapBufferRange(const Graphics::MapBufferInfo& mapInfo)
 {
-  mCallStack.PushCall("MapBufferRange", "");
-  return nullptr;
+  mCallStack.PushCall("Controller::MapBufferRange", "");
+
+  auto buffer = static_cast<TestGraphicsBuffer*>(mapInfo.buffer);
+  buffer->memory.resize(mapInfo.offset + mapInfo.size); // For initial testing, allow writes past capacity
+
+  return std::make_unique<TestGraphicsMemory>(mCallStack, *buffer, mapInfo.offset, mapInfo.size);
 }
 
 Graphics::UniquePtr<Graphics::Memory> TestGraphicsController::MapTextureRange(const Graphics::MapTextureInfo& mapInfo)
 {
-  mCallStack.PushCall("MapTextureRange", "");
+  mCallStack.PushCall("Controller::MapTextureRange", "");
   return nullptr;
 }
 
 void TestGraphicsController::UnmapMemory(Graphics::UniquePtr<Graphics::Memory> memory)
 {
-  mCallStack.PushCall("UnmapMemory", "");
+  mCallStack.PushCall("Controller::UnmapMemory", "");
 }
 
 Graphics::MemoryRequirements TestGraphicsController::GetTextureMemoryRequirements(Graphics::Texture& texture) const
 {
-  mCallStack.PushCall("GetTextureMemoryRequirements", "");
+  mCallStack.PushCall("Controller::GetTextureMemoryRequirements", "");
   return Graphics::MemoryRequirements{};
 }
 
 Graphics::MemoryRequirements TestGraphicsController::GetBufferMemoryRequirements(Graphics::Buffer& buffer) const
 {
-  mCallStack.PushCall("GetBufferMemoryRequirements", "");
+  mCallStack.PushCall("Controller::GetBufferMemoryRequirements", "");
   return Graphics::MemoryRequirements{};
 }
 
 const Graphics::TextureProperties& TestGraphicsController::GetTextureProperties(const Graphics::Texture& texture)
 {
   static Graphics::TextureProperties textureProperties{};
-  mCallStack.PushCall("GetTextureProperties", "");
+  mCallStack.PushCall("Controller::GetTextureProperties", "");
 
   return textureProperties;
 }
 
 bool TestGraphicsController::PipelineEquals(const Graphics::Pipeline& pipeline0, const Graphics::Pipeline& pipeline1) const
 {
-  mCallStack.PushCall("PipelineEquals", "");
+  mCallStack.PushCall("Controller::PipelineEquals", "");
   return false;
 }
 

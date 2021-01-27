@@ -559,9 +559,9 @@ StencilOperation::Type Renderer::GetStencilOperationOnZPass() const
   return mStencilParameters.stencilOperationOnZPass;
 }
 
-void Renderer::Upload(Context& context)
+void Renderer::Upload()
 {
-  mGeometry->Upload(context);
+  mGeometry->Upload(*mGraphicsController);
 }
 
 void Renderer::Render(Context&                                             context,
@@ -651,11 +651,6 @@ void Renderer::Render(Context&                                             conte
   {
     // Only set up and draw if we have textures and they are all valid
 
-    // @todo Move to render manager. For now, ensure textures are bound before drawing
-    Graphics::SubmitInfo submitInfo{{}, 0 | Graphics::SubmitFlagBits::FLUSH};
-    submitInfo.cmdBuffer.push_back(commandBuffer.get());
-    mGraphicsController->SubmitCommandBuffers(submitInfo);
-
     // set projection and view matrix if program has not yet received them yet this frame
     SetMatrices(*program, modelMatrix, viewMatrix, projectionMatrix, modelViewMatrix);
 
@@ -693,6 +688,8 @@ void Renderer::Render(Context&                                             conte
       SetBlending(context, blend);
 
       mGeometry->Draw(context,
+                      *mGraphicsController,
+                      *commandBuffer.get(),
                       bufferIndex,
                       mAttributesLocation,
                       mIndexedDrawFirstElement,
@@ -706,7 +703,7 @@ void Renderer::Render(Context&                                             conte
         {
           //Set blending mode
           SetBlending(context, cmd->queue == DevelRenderer::RENDER_QUEUE_OPAQUE ? false : blend);
-          mGeometry->Draw(context, bufferIndex, mAttributesLocation, cmd->firstIndex, cmd->elementCount);
+          mGeometry->Draw(context, *mGraphicsController, *commandBuffer.get(), bufferIndex, mAttributesLocation, cmd->firstIndex, cmd->elementCount);
         }
       }
     }

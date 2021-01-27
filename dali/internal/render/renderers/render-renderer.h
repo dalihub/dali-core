@@ -347,9 +347,8 @@ public:
 
   /**
    * Called to upload during RenderManager::Render().
-   * @param[in] context The context used for uploading
    */
-  void Upload(Context& context);
+  void Upload();
 
   /**
    * Called to render during RenderManager::Render().

@@ -19,6 +19,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/owner-container.h>
+#include <dali/graphics-api/graphics-controller.h>
 #include <dali/integration-api/gl-abstraction.h>
 #include <dali/integration-api/gl-defines.h>
 #include <dali/internal/common/buffer-index.h>
@@ -116,23 +117,25 @@ public:
 
   /**
    * Upload the geometry if it has changed
-   * @param[in] context The GL context
    */
-  void Upload(Context& context);
+  void Upload(Graphics::Controller& graphicsController);
 
   /**
    * Set up the attributes and perform the Draw call corresponding to the geometry type
-   * @param[in] context The GL context
+   * @param[in] context The GL context @todo remove
+   * @param[in] graphicsController The graphics controller
    * @param[in] bufferIndex The current buffer index
    * @param[in] attributeLocation The location for the attributes in the shader
    * @param[in] elementBufferOffset The index of first element to draw if index buffer bound
    * @param[in] elementBufferCount Number of elements to draw if index buffer bound, uses whole buffer when 0
    */
-  void Draw(Context&       context,
-            BufferIndex    bufferIndex,
-            Vector<GLint>& attributeLocation,
-            uint32_t       elementBufferOffset,
-            uint32_t       elementBufferCount);
+  void Draw(Context&                 context,
+            Graphics::Controller&    graphicsController,
+            Graphics::CommandBuffer& commandBuffer,
+            BufferIndex              bufferIndex,
+            Vector<GLint>&           attributeLocation,
+            uint32_t                 elementBufferOffset,
+            uint32_t                 elementBufferCount);
 
 private:
   // VertexBuffers

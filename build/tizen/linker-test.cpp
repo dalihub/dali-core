@@ -21,17 +21,20 @@
 #include <cstdio>
 
 // Link with TET Test application, need to redefine TET functions
-void tet_infoline(const char* str)
+extern "C"
 {
-  puts(str);
-}
+  void tet_infoline(const char* str)
+  {
+    puts(str);
+  }
 
-void tet_printf(const char* str, ...)
-{
-  va_list args;
-  va_start(args, str);
-  vprintf(str, args);
-  va_end(args);
+  void tet_printf(const char* str, ...)
+  {
+    va_list args;
+    va_start(args, str);
+    vprintf(str, args);
+    va_end(args);
+  }
 }
 
 #include "test-application.h"

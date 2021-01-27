@@ -18,13 +18,28 @@
  */
 
 #include <dali/graphics-api/graphics-buffer.h>
+#include <dali/graphics-api/graphics-types.h>
+
+#include "test-gl-abstraction.h"
+#include "test-trace-call-stack.h"
 
 namespace Dali
 {
 class TestGraphicsBuffer : public Graphics::Buffer
 {
 public:
-  TestGraphicsBuffer() = default;
+  TestGraphicsBuffer(TraceCallStack& callStack, TestGlAbstraction& glAbstraction, uint32_t size, Graphics::BufferUsageFlags usage);
+  void   Bind();
+  void   Unbind();
+  void   Upload(uint32_t offset, uint32_t size);
+  GLenum GetTarget();
+
+  TraceCallStack&            mCallStack;
+  TestGlAbstraction&         mGl;
+  std::vector<uint8_t>       memory;
+  Graphics::BufferUsageFlags mUsage;
+  GLuint                     mId{0};
+  bool                       mCreated{false};
 };
 
 } // namespace Dali

@@ -138,7 +138,7 @@ void VertexBuffer::SetData(Dali::Vector<uint8_t>* data, uint32_t size)
   mDataChanged = true;
 }
 
-bool VertexBuffer::Update(Context& context)
+bool VertexBuffer::Update(Graphics::Controller& graphicsController)
 {
   if(!mData || !mFormat || !mSize)
   {
@@ -149,28 +149,20 @@ bool VertexBuffer::Update(Context& context)
   {
     if(!mGpuBuffer)
     {
-      mGpuBuffer = new GpuBuffer(context);
+      mGpuBuffer = new GpuBuffer(graphicsController, 0 | Graphics::BufferUsage::VERTEX_BUFFER);
     }
 
     // Update the GpuBuffer
     if(mGpuBuffer)
     {
       DALI_ASSERT_DEBUG(mSize && "No data in the property buffer!");
-      mGpuBuffer->UpdateDataBuffer(context, GetDataSize(), &((*mData)[0]), GpuBuffer::STATIC_DRAW, GpuBuffer::ARRAY_BUFFER);
+      mGpuBuffer->UpdateDataBuffer(graphicsController, GetDataSize(), &((*mData)[0]));
     }
 
     mDataChanged = false;
   }
 
   return true;
-}
-
-void VertexBuffer::BindBuffer(Context& context, GpuBuffer::Target target)
-{
-  if(mGpuBuffer)
-  {
-    mGpuBuffer->Bind(context, target);
-  }
 }
 
 uint32_t VertexBuffer::EnableVertexAttributes(Context& context, Vector<GLint>& vAttributeLocation, uint32_t locationBase)

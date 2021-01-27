@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/graphics-api/graphics-controller.h>
 #include <dali/internal/render/gl-resources/context.h>
 
 namespace Dali
@@ -39,31 +40,11 @@ class GpuBuffer
 {
 public:
   /**
-   * Enum to encapsulate the GL buffer type. This is to avoid having to store a whole int for type
-   */
-  enum Target
-  {
-    ARRAY_BUFFER,             ///< GL_ARRAY_BUFFER
-    ELEMENT_ARRAY_BUFFER,     ///< GL_ELEMENT_ARRAY_BUFFER
-    TRANSFORM_FEEDBACK_BUFFER ///< GL_TRANSFORM_FEEDBACK_BUFFER
-  };
-
-  /**
-   * Enum to encapsulate the GL draw mode. This is to avoid having to store a whole int for mode
-   */
-  enum Usage
-  {
-    STREAM_DRAW,  ///< GL_STREAM_DRAW
-    STATIC_DRAW,  ///< GL_STATIC_DRAW
-    DYNAMIC_DRAW, ///< GL_DYNAMIC_DRAW
-  };
-
-public:
-  /**
    * constructor
-   * @param context drawing context
+   * @param[in] graphicsController the graphics controller
+   * @param[in] usage The type of buffer
    */
-  GpuBuffer(Context& context);
+  GpuBuffer(Graphics::Controller& graphicsController, Graphics::BufferUsageFlags usage);
 
   /**
    * Destructor, non virtual as no virtual methods or inheritance
@@ -73,21 +54,11 @@ public:
   /**
    *
    * Creates or updates a buffer object and binds it to the target.
-   * @param context The context to bind the the buffer
+   * @param graphicsController The graphics controller
    * @param size Specifies the size in bytes of the buffer object's new data store.
    * @param data pointer to the data to load
-   * @param usage How the buffer will be used
-   * @param target The target buffer to update
    */
-  void UpdateDataBuffer(Context& context, GLsizeiptr size, const GLvoid* data, Usage usage, Target target);
-
-  /**
-   * Bind the buffer object to the target
-   * Will assert if the buffer size is zero
-   * @param context The context to bind the the buffer
-   * @param target The target buffer to bind
-   */
-  void Bind(Context& context, Target target) const;
+  void UpdateDataBuffer(Graphics::Controller& graphicsController, uint32_t size, const void* data);
 
   /**
    * @return true if the GPU buffer is valid, i.e. its created and not empty
@@ -98,30 +69,28 @@ public:
    * Get the size of the buffer
    * @return size
    */
-  GLsizeiptr GetBufferSize() const
+  uint32_t GetBufferSize() const
   {
     return mSize;
   }
 
+  inline Graphics::Buffer* GetGraphicsObject()
+  {
+    return mGraphicsObject.get();
+  }
+
   /**
-   * Needs to be called when GL context is destroyed
+   * ???
    */
-  void GlContextDestroyed();
+  void Destroy();
 
 private:
-  /**
-   * Perfoms a bind without checking the size of the buffer
-   * @param bufferId to bind
-   */
-  void BindNoChecks(GLuint bufferId) const;
+  Graphics::UniquePtr<Graphics::Buffer> mGraphicsObject;
+  uint32_t                              mCapacity{0}; ///< buffer capacity
+  uint32_t                              mSize{0};     ///< buffer size
 
-private:                // Data
-  Context&   mContext;  ///< shared context for dali drawing
-  GLsizeiptr mCapacity; ///< buffer capacity
-  GLsizeiptr mSize;     ///< buffer size
-  GLuint     mBufferId; ///< buffer object name(id)
-
-  bool mBufferCreated : 1; ///< whether buffer has been created
+  Graphics::BufferUsageFlags mUsage;
+  bool                       mBufferCreated : 1; ///< whether buffer has been created
 };
 
 } // namespace Internal
