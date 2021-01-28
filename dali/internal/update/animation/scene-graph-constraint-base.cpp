@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,24 +20,21 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace SceneGraph
 {
-
 #ifdef DEBUG_ENABLED
-  uint32_t ConstraintBase::mCurrentInstanceCount = 0;
-  uint32_t ConstraintBase::mTotalInstanceCount   = 0;
+uint32_t ConstraintBase::mCurrentInstanceCount = 0;
+uint32_t ConstraintBase::mTotalInstanceCount   = 0;
 #endif
 
-ConstraintBase::ConstraintBase( PropertyOwnerContainer& ownerSet, RemoveAction removeAction )
-: mRemoveAction( removeAction ),
-  mFirstApply( true ),
-  mDisconnected( true ),
-  mObservedOwners( ownerSet ),
-  mLifecycleObserver( nullptr )
+ConstraintBase::ConstraintBase(PropertyOwnerContainer& ownerSet, RemoveAction removeAction)
+: mRemoveAction(removeAction),
+  mFirstApply(true),
+  mDisconnected(true),
+  mObservedOwners(ownerSet),
+  mLifecycleObserver(nullptr)
 {
 #ifdef DEBUG_ENABLED
   ++mCurrentInstanceCount;
@@ -47,12 +44,12 @@ ConstraintBase::ConstraintBase( PropertyOwnerContainer& ownerSet, RemoveAction r
 
 ConstraintBase::~ConstraintBase()
 {
-  if ( !mDisconnected )
+  if(!mDisconnected)
   {
     StopObservation();
   }
 
-  if( mLifecycleObserver != nullptr )
+  if(mLifecycleObserver != nullptr)
   {
     mLifecycleObserver->ObjectDestroyed();
   }

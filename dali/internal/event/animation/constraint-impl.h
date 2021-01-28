@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ACTIVE_CONSTRAINT_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,36 +20,33 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/message.h>
-#include <dali/internal/event/common/event-thread-services.h>
-#include <dali/internal/event/common/object-impl.h>
-#include <dali/internal/event/common/thread-local-storage.h>
-#include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/animation/constraint-base.h>
 #include <dali/internal/event/animation/constraint-source-impl.h>
 #include <dali/internal/event/animation/property-constraint-ptr.h>
-#include <dali/internal/update/common/animatable-property.h>
-#include <dali/internal/update/common/property-owner.h>
-#include <dali/internal/update/common/property-owner-messages.h>
-#include <dali/internal/update/common/property-resetter.h>
-#include <dali/internal/update/animation/scene-graph-constraint.h>
+#include <dali/internal/event/common/event-thread-services.h>
+#include <dali/internal/event/common/object-impl.h>
+#include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/update/animation/property-accessor.h>
 #include <dali/internal/update/animation/property-component-accessor.h>
+#include <dali/internal/update/animation/scene-graph-constraint.h>
+#include <dali/internal/update/common/animatable-property.h>
+#include <dali/internal/update/common/property-owner-messages.h>
+#include <dali/internal/update/common/property-owner.h>
+#include <dali/internal/update/common/property-resetter.h>
 #include <memory>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 /**
  * Connects a constraint which takes another property as an input.
  */
-template < typename PropertyType >
+template<typename PropertyType>
 class Constraint : public ConstraintBase
 {
 public:
-
   using ConstraintFunctionPtr = typename PropertyConstraintPtr<PropertyType>::Type;
 
   /**
@@ -60,12 +57,12 @@ public:
    * @param[in] func The constraint function.
    * @return A newly allocated active-constraint.
    */
-  static ConstraintBase* New( Object& object,
-                              Property::Index targetIndex,
-                              SourceContainer& sources,
-                              ConstraintFunctionPtr func )
+  static ConstraintBase* New(Object&               object,
+                             Property::Index       targetIndex,
+                             SourceContainer&      sources,
+                             ConstraintFunctionPtr func)
   {
-    return new Constraint( object, targetIndex, sources, func );
+    return new Constraint(object, targetIndex, sources, func);
   }
 
   /**
@@ -77,36 +74,34 @@ public:
   }
 
 private:
-
   /**
    * @copydoc ConstraintBase::DoClone()
    */
-  ConstraintBase* DoClone( Object& object ) final
+  ConstraintBase* DoClone(Object& object) final
   {
-    ConstraintFunctionPtr funcPtr( mUserFunction->Clone() );
-    return new Constraint( object,
-                            mTargetPropertyIndex,
-                            mSources,
-                            funcPtr );
+    ConstraintFunctionPtr funcPtr(mUserFunction->Clone());
+    return new Constraint(object,
+                          mTargetPropertyIndex,
+                          mSources,
+                          funcPtr);
   }
 
   /**
    * Private constructor; see also Constraint::New().
    */
-  Constraint( Object& object,
-              Property::Index targetIndex,
-              SourceContainer& sources,
-              ConstraintFunctionPtr& func )
-  : ConstraintBase( object, targetIndex, sources ),
-    mUserFunction( func )
+  Constraint(Object&                object,
+             Property::Index        targetIndex,
+             SourceContainer&       sources,
+             ConstraintFunctionPtr& func)
+  : ConstraintBase(object, targetIndex, sources),
+    mUserFunction(func)
   {
   }
 
   // Undefined
-  Constraint() = delete;
-  Constraint( const Constraint& ) = delete;
-  Constraint& operator=( const Constraint& rhs ) = delete;
-
+  Constraint()                  = delete;
+  Constraint(const Constraint&) = delete;
+  Constraint& operator=(const Constraint& rhs) = delete;
 
   /**
    * @copydoc ConstraintBase::ConnectConstraint()
@@ -114,49 +109,49 @@ private:
   void ConnectConstraint() final
   {
     // Should not come here if target object has been destroyed
-    DALI_ASSERT_DEBUG( nullptr != mTargetObject );
+    DALI_ASSERT_DEBUG(nullptr != mTargetObject);
 
     // Guard against double connections
-    DALI_ASSERT_DEBUG( nullptr == mSceneGraphConstraint );
+    DALI_ASSERT_DEBUG(nullptr == mSceneGraphConstraint);
 
-    SceneGraph::PropertyOwner& targetObject = const_cast< SceneGraph::PropertyOwner& >( mTargetObject->GetSceneObject() );
+    SceneGraph::PropertyOwner& targetObject = const_cast<SceneGraph::PropertyOwner&>(mTargetObject->GetSceneObject());
 
     // Build a container of property-owners, providing the scene-graph properties
     SceneGraph::PropertyOwnerContainer propertyOwners;
-    propertyOwners.PushBack( &targetObject );
+    propertyOwners.PushBack(&targetObject);
 
     // Build the constraint function; this requires a scene-graph property from each source
-    ConstraintFunctionPtr func( ConnectConstraintFunction( propertyOwners ) );
+    ConstraintFunctionPtr func(ConnectConstraintFunction(propertyOwners));
 
-    if ( func )
+    if(func)
     {
       OwnerPointer<SceneGraph::PropertyResetterBase> resetter;
       // Create the SceneGraphConstraint and PropertyResetter, and connect them to the scene-graph
-      const SceneGraph::PropertyBase* targetProperty = mTargetObject->GetSceneObjectAnimatableProperty( mTargetPropertyIndex );
-      DALI_ASSERT_ALWAYS( targetProperty && "Constraint target property does not exist" );
-      if( targetProperty->IsTransformManagerProperty() )  //It is a property managed by the transform manager
+      const SceneGraph::PropertyBase* targetProperty = mTargetObject->GetSceneObjectAnimatableProperty(mTargetPropertyIndex);
+      DALI_ASSERT_ALWAYS(targetProperty && "Constraint target property does not exist");
+      if(targetProperty->IsTransformManagerProperty()) //It is a property managed by the transform manager
       {
         // Connect the constraint
-        mSceneGraphConstraint = SceneGraph::Constraint< PropertyType, TransformManagerPropertyAccessor<PropertyType> >::New( *targetProperty,
-                                                                                                                             propertyOwners,
-                                                                                                                             func,
-                                                                                                                             mRemoveAction );
+        mSceneGraphConstraint = SceneGraph::Constraint<PropertyType, TransformManagerPropertyAccessor<PropertyType> >::New(*targetProperty,
+                                                                                                                           propertyOwners,
+                                                                                                                           func,
+                                                                                                                           mRemoveAction);
         // Don't create a resetter for transform manager property, it's less efficient
       }
-      else  //SceneGraph property
+      else //SceneGraph property
       {
         // Connect the constraint
-        mSceneGraphConstraint = SceneGraph::Constraint< PropertyType, PropertyAccessor<PropertyType> >::New( *targetProperty,
-                                                                                                             propertyOwners,
-                                                                                                             func,
-                                                                                                             mRemoveAction );
-        resetter = SceneGraph::ConstraintResetter::New( targetObject, *targetProperty, *mSceneGraphConstraint );
+        mSceneGraphConstraint = SceneGraph::Constraint<PropertyType, PropertyAccessor<PropertyType> >::New(*targetProperty,
+                                                                                                           propertyOwners,
+                                                                                                           func,
+                                                                                                           mRemoveAction);
+        resetter              = SceneGraph::ConstraintResetter::New(targetObject, *targetProperty, *mSceneGraphConstraint);
       }
-      OwnerPointer< SceneGraph::ConstraintBase > transferOwnership( const_cast< SceneGraph::ConstraintBase* >( mSceneGraphConstraint ) );
-      ApplyConstraintMessage( GetEventThreadServices(), targetObject, transferOwnership );
-      if( resetter )
+      OwnerPointer<SceneGraph::ConstraintBase> transferOwnership(const_cast<SceneGraph::ConstraintBase*>(mSceneGraphConstraint));
+      ApplyConstraintMessage(GetEventThreadServices(), targetObject, transferOwnership);
+      if(resetter)
       {
-        AddResetterMessage( GetEventThreadServices().GetUpdateManager(), resetter );
+        AddResetterMessage(GetEventThreadServices().GetUpdateManager(), resetter);
       }
     }
   }
@@ -167,16 +162,16 @@ private:
    * @param[out] propertyOwners The container of property-owners providing the scene-graph properties.
    * @return A connected constraint-function, or nullptr if the scene-graph properties are not available.
    */
-  PropertyConstraint<PropertyType>* ConnectConstraintFunction( SceneGraph::PropertyOwnerContainer& propertyOwners )
+  PropertyConstraint<PropertyType>* ConnectConstraintFunction(SceneGraph::PropertyOwnerContainer& propertyOwners)
   {
     PropertyConstraint<PropertyType>* func = mUserFunction->Clone();
 
-    for ( auto&& source : mSources )
+    for(auto&& source : mSources)
     {
-      int32_t componentIndex = Property::INVALID_COMPONENT_INDEX;
-      PropertyInputImpl* inputProperty = AddInputProperty( source, propertyOwners, componentIndex );
+      int32_t            componentIndex = Property::INVALID_COMPONENT_INDEX;
+      PropertyInputImpl* inputProperty  = AddInputProperty(source, propertyOwners, componentIndex);
 
-      if ( nullptr == inputProperty )
+      if(nullptr == inputProperty)
       {
         delete func;
         func = nullptr;
@@ -185,26 +180,23 @@ private:
         break;
       }
 
-      func->AddInput( inputProperty, componentIndex );
+      func->AddInput(inputProperty, componentIndex);
     }
 
     return func;
   }
 
 protected:
-
   ConstraintFunctionPtr mUserFunction;
-
 };
 
 /**
  * Variant which allows float components to be constrained individually.
  */
-template <>
+template<>
 class Constraint<float> : public ConstraintBase
 {
 public:
-
   using ConstraintFunctionPtr = typename PropertyConstraintPtr<float>::Type;
 
   /**
@@ -215,12 +207,12 @@ public:
    * @param[in] func The constraint function.
    * @return A newly allocated constraint.
    */
-  static ConstraintBase* New( Object& object,
-                              Property::Index targetIndex,
-                              SourceContainer& sources,
-                              ConstraintFunctionPtr func )
+  static ConstraintBase* New(Object&               object,
+                             Property::Index       targetIndex,
+                             SourceContainer&      sources,
+                             ConstraintFunctionPtr func)
   {
-    return new Constraint( object, targetIndex, sources, func );
+    return new Constraint(object, targetIndex, sources, func);
   }
 
   /**
@@ -232,35 +224,34 @@ public:
   }
 
 private:
-
   /**
    * @copydoc ConstraintBase::DoClone()
    */
-  ConstraintBase* DoClone( Object& object ) final
+  ConstraintBase* DoClone(Object& object) final
   {
-    ConstraintFunctionPtr funcPtr( mUserFunction->Clone() );
-    return new Constraint( object,
-                           mTargetPropertyIndex,
-                           mSources,
-                           funcPtr );
+    ConstraintFunctionPtr funcPtr(mUserFunction->Clone());
+    return new Constraint(object,
+                          mTargetPropertyIndex,
+                          mSources,
+                          funcPtr);
   }
 
   /**
    * Private constructor; see also Constraint::New().
    */
-  Constraint( Object& object,
-              Property::Index targetIndex,
-              SourceContainer& sources,
-              ConstraintFunctionPtr& func )
-  : ConstraintBase( object, targetIndex, sources ),
-    mUserFunction( func )
+  Constraint(Object&                object,
+             Property::Index        targetIndex,
+             SourceContainer&       sources,
+             ConstraintFunctionPtr& func)
+  : ConstraintBase(object, targetIndex, sources),
+    mUserFunction(func)
   {
   }
 
   // Undefined
-  Constraint() = delete;
-  Constraint( const Constraint& ) = delete;
-  Constraint& operator=( const Constraint& rhs ) = delete;
+  Constraint()                  = delete;
+  Constraint(const Constraint&) = delete;
+  Constraint& operator=(const Constraint& rhs) = delete;
 
   /**
    * @copydoc ConstraintBase::ConnectConstraint()
@@ -268,127 +259,127 @@ private:
   void ConnectConstraint() final
   {
     // Should not come here if target object has been destroyed
-    DALI_ASSERT_DEBUG( nullptr != mTargetObject );
+    DALI_ASSERT_DEBUG(nullptr != mTargetObject);
     // Guard against double connections
-    DALI_ASSERT_DEBUG( nullptr == mSceneGraphConstraint );
+    DALI_ASSERT_DEBUG(nullptr == mSceneGraphConstraint);
 
-    SceneGraph::PropertyOwner& targetObject = const_cast< SceneGraph::PropertyOwner& >( mTargetObject->GetSceneObject() );
+    SceneGraph::PropertyOwner& targetObject = const_cast<SceneGraph::PropertyOwner&>(mTargetObject->GetSceneObject());
 
     // Build a container of property-owners, providing the scene-graph properties
     SceneGraph::PropertyOwnerContainer propertyOwners;
-    propertyOwners.PushBack( &targetObject );
+    propertyOwners.PushBack(&targetObject);
 
     // Build the constraint function; this requires a scene-graph property from each source
-    ConstraintFunctionPtr func( ConnectConstraintFunction( propertyOwners ) );
+    ConstraintFunctionPtr func(ConnectConstraintFunction(propertyOwners));
 
-    if ( func )
+    if(func)
     {
       // Create the SceneGraphConstraint, and connect to the scene-graph
-      bool resetterRequired = false;
-      const SceneGraph::PropertyBase* targetProperty = mTargetObject->GetSceneObjectAnimatableProperty( mTargetPropertyIndex );
+      bool                            resetterRequired = false;
+      const SceneGraph::PropertyBase* targetProperty   = mTargetObject->GetSceneObjectAnimatableProperty(mTargetPropertyIndex);
       // The targetProperty should exist, when targetObject exists
-      DALI_ASSERT_ALWAYS( nullptr != targetProperty && "Constraint target property does not exist" );
-      const int32_t componentIndex = mTargetObject->GetPropertyComponentIndex( mTargetPropertyIndex );
-      if ( Property::INVALID_COMPONENT_INDEX == componentIndex )
+      DALI_ASSERT_ALWAYS(nullptr != targetProperty && "Constraint target property does not exist");
+      const int32_t componentIndex = mTargetObject->GetPropertyComponentIndex(mTargetPropertyIndex);
+      if(Property::INVALID_COMPONENT_INDEX == componentIndex)
       {
         // Not a Vector2, Vector3 or Vector4 component, expecting float type
-        DALI_ASSERT_DEBUG( PropertyTypes::Get< float >() == targetProperty->GetType() );
+        DALI_ASSERT_DEBUG(PropertyTypes::Get<float>() == targetProperty->GetType());
 
-        mSceneGraphConstraint = SceneGraph::Constraint< float, PropertyAccessor<float> >::New( *targetProperty, propertyOwners, func, mRemoveAction );
-        resetterRequired = true;
+        mSceneGraphConstraint = SceneGraph::Constraint<float, PropertyAccessor<float> >::New(*targetProperty, propertyOwners, func, mRemoveAction);
+        resetterRequired      = true;
       }
       else
       {
         // Expecting Vector2, Vector3 or Vector4 type
-        if ( PropertyTypes::Get< Vector2 >() == targetProperty->GetType() )
+        if(PropertyTypes::Get<Vector2>() == targetProperty->GetType())
         {
           // Constrain float component of Vector2 property
-          if ( 0 == componentIndex )
+          if(0 == componentIndex)
           {
-            mSceneGraphConstraint = SceneGraph::Constraint< float, PropertyComponentAccessorX<Vector2> >::New( *targetProperty, propertyOwners, func, mRemoveAction );
+            mSceneGraphConstraint = SceneGraph::Constraint<float, PropertyComponentAccessorX<Vector2> >::New(*targetProperty, propertyOwners, func, mRemoveAction);
           }
-          else if ( 1 == componentIndex )
+          else if(1 == componentIndex)
           {
-            mSceneGraphConstraint = SceneGraph::Constraint< float, PropertyComponentAccessorY<Vector2> >::New( *targetProperty, propertyOwners, func, mRemoveAction );
+            mSceneGraphConstraint = SceneGraph::Constraint<float, PropertyComponentAccessorY<Vector2> >::New(*targetProperty, propertyOwners, func, mRemoveAction);
           }
           resetterRequired = (mSceneGraphConstraint != nullptr);
         }
-        else if ( PropertyTypes::Get< Vector3 >() == targetProperty->GetType() )
+        else if(PropertyTypes::Get<Vector3>() == targetProperty->GetType())
         {
           // Constrain float component of Vector3 property
-          if( targetProperty->IsTransformManagerProperty() )
+          if(targetProperty->IsTransformManagerProperty())
           {
-            if ( 0 == componentIndex )
+            if(0 == componentIndex)
             {
-              mSceneGraphConstraint = SceneGraph::Constraint< float, TransformManagerPropertyComponentAccessor<Vector3,0> >::New( *targetProperty,
-                                                                                                                                  propertyOwners,
-                                                                                                                                  func,
-                                                                                                                                  mRemoveAction );
+              mSceneGraphConstraint = SceneGraph::Constraint<float, TransformManagerPropertyComponentAccessor<Vector3, 0> >::New(*targetProperty,
+                                                                                                                                 propertyOwners,
+                                                                                                                                 func,
+                                                                                                                                 mRemoveAction);
             }
-            else if ( 1 == componentIndex )
+            else if(1 == componentIndex)
             {
-              mSceneGraphConstraint = SceneGraph::Constraint< float, TransformManagerPropertyComponentAccessor<Vector3,1> >::New( *targetProperty,
-                                                                                                                                  propertyOwners,
-                                                                                                                                  func,
-                                                                                                                                  mRemoveAction );
+              mSceneGraphConstraint = SceneGraph::Constraint<float, TransformManagerPropertyComponentAccessor<Vector3, 1> >::New(*targetProperty,
+                                                                                                                                 propertyOwners,
+                                                                                                                                 func,
+                                                                                                                                 mRemoveAction);
             }
-            else if ( 2 == componentIndex )
+            else if(2 == componentIndex)
             {
-              mSceneGraphConstraint = SceneGraph::Constraint< float, TransformManagerPropertyComponentAccessor<Vector3,2> >::New( *targetProperty,
-                                                                                                                                  propertyOwners,
-                                                                                                                                  func,
-                                                                                                                                  mRemoveAction );
+              mSceneGraphConstraint = SceneGraph::Constraint<float, TransformManagerPropertyComponentAccessor<Vector3, 2> >::New(*targetProperty,
+                                                                                                                                 propertyOwners,
+                                                                                                                                 func,
+                                                                                                                                 mRemoveAction);
             }
             // Do not create a resetter for transform manager property
           }
           else
           {
-            if ( 0 == componentIndex )
+            if(0 == componentIndex)
             {
-              mSceneGraphConstraint = SceneGraph::Constraint< float, PropertyComponentAccessorX<Vector3> >::New( *targetProperty, propertyOwners, func, mRemoveAction );
+              mSceneGraphConstraint = SceneGraph::Constraint<float, PropertyComponentAccessorX<Vector3> >::New(*targetProperty, propertyOwners, func, mRemoveAction);
             }
-            else if ( 1 == componentIndex )
+            else if(1 == componentIndex)
             {
-              mSceneGraphConstraint = SceneGraph::Constraint< float, PropertyComponentAccessorY<Vector3> >::New( *targetProperty, propertyOwners, func, mRemoveAction );
+              mSceneGraphConstraint = SceneGraph::Constraint<float, PropertyComponentAccessorY<Vector3> >::New(*targetProperty, propertyOwners, func, mRemoveAction);
             }
-            else if ( 2 == componentIndex )
+            else if(2 == componentIndex)
             {
-              mSceneGraphConstraint = SceneGraph::Constraint< float, PropertyComponentAccessorZ<Vector3> >::New( *targetProperty, propertyOwners, func, mRemoveAction );
+              mSceneGraphConstraint = SceneGraph::Constraint<float, PropertyComponentAccessorZ<Vector3> >::New(*targetProperty, propertyOwners, func, mRemoveAction);
             }
             resetterRequired = (mSceneGraphConstraint != nullptr);
           }
         }
-        else if ( PropertyTypes::Get< Vector4 >() == targetProperty->GetType() )
+        else if(PropertyTypes::Get<Vector4>() == targetProperty->GetType())
         {
           // Constrain float component of Vector4 property
-          if ( 0 == componentIndex )
+          if(0 == componentIndex)
           {
-            mSceneGraphConstraint = SceneGraph::Constraint< float, PropertyComponentAccessorX<Vector4> >::New( *targetProperty, propertyOwners, func, mRemoveAction );
+            mSceneGraphConstraint = SceneGraph::Constraint<float, PropertyComponentAccessorX<Vector4> >::New(*targetProperty, propertyOwners, func, mRemoveAction);
           }
-          else if ( 1 == componentIndex )
+          else if(1 == componentIndex)
           {
-            mSceneGraphConstraint = SceneGraph::Constraint< float, PropertyComponentAccessorY<Vector4> >::New( *targetProperty, propertyOwners, func, mRemoveAction );
+            mSceneGraphConstraint = SceneGraph::Constraint<float, PropertyComponentAccessorY<Vector4> >::New(*targetProperty, propertyOwners, func, mRemoveAction);
           }
-          else if ( 2 == componentIndex )
+          else if(2 == componentIndex)
           {
-            mSceneGraphConstraint = SceneGraph::Constraint< float, PropertyComponentAccessorZ<Vector4> >::New( *targetProperty, propertyOwners, func, mRemoveAction );
+            mSceneGraphConstraint = SceneGraph::Constraint<float, PropertyComponentAccessorZ<Vector4> >::New(*targetProperty, propertyOwners, func, mRemoveAction);
           }
-          else if ( 3 == componentIndex )
+          else if(3 == componentIndex)
           {
-            mSceneGraphConstraint = SceneGraph::Constraint< float, PropertyComponentAccessorW<Vector4> >::New( *targetProperty, propertyOwners, func, mRemoveAction );
+            mSceneGraphConstraint = SceneGraph::Constraint<float, PropertyComponentAccessorW<Vector4> >::New(*targetProperty, propertyOwners, func, mRemoveAction);
           }
 
           resetterRequired = (mSceneGraphConstraint != nullptr);
         }
       }
-      if( mSceneGraphConstraint )
+      if(mSceneGraphConstraint)
       {
-        OwnerPointer< SceneGraph::ConstraintBase > transferOwnership( const_cast< SceneGraph::ConstraintBase* >( mSceneGraphConstraint ) );
-        ApplyConstraintMessage( GetEventThreadServices(), targetObject, transferOwnership );
-        if( resetterRequired )
+        OwnerPointer<SceneGraph::ConstraintBase> transferOwnership(const_cast<SceneGraph::ConstraintBase*>(mSceneGraphConstraint));
+        ApplyConstraintMessage(GetEventThreadServices(), targetObject, transferOwnership);
+        if(resetterRequired)
         {
-          OwnerPointer<SceneGraph::PropertyResetterBase> resetter = SceneGraph::ConstraintResetter::New( targetObject, *targetProperty, *mSceneGraphConstraint );
-          AddResetterMessage( GetEventThreadServices().GetUpdateManager(), resetter );
+          OwnerPointer<SceneGraph::PropertyResetterBase> resetter = SceneGraph::ConstraintResetter::New(targetObject, *targetProperty, *mSceneGraphConstraint);
+          AddResetterMessage(GetEventThreadServices().GetUpdateManager(), resetter);
         }
       }
     }
@@ -400,16 +391,16 @@ private:
    * @param[out] propertyOwners The container of property-owners providing the scene-graph properties.
    * @return A connected constraint-function, or nullptr if the scene-graph properties are not available.
    */
-  PropertyConstraint<float>* ConnectConstraintFunction( SceneGraph::PropertyOwnerContainer& propertyOwners )
+  PropertyConstraint<float>* ConnectConstraintFunction(SceneGraph::PropertyOwnerContainer& propertyOwners)
   {
     PropertyConstraint<float>* func = mUserFunction->Clone();
 
-    for ( auto&& source : mSources )
+    for(auto&& source : mSources)
     {
-      int32_t componentIndex = Property::INVALID_COMPONENT_INDEX;
-      PropertyInputImpl* inputProperty = AddInputProperty( source, propertyOwners, componentIndex );
+      int32_t            componentIndex = Property::INVALID_COMPONENT_INDEX;
+      PropertyInputImpl* inputProperty  = AddInputProperty(source, propertyOwners, componentIndex);
 
-      if ( nullptr == inputProperty )
+      if(nullptr == inputProperty)
       {
         delete func;
         func = nullptr;
@@ -418,16 +409,14 @@ private:
         break;
       }
 
-      func->AddInput( inputProperty, componentIndex );
+      func->AddInput(inputProperty, componentIndex);
     }
 
     return func;
   }
 
 protected:
-
   ConstraintFunctionPtr mUserFunction;
-
 };
 
 } // namespace Internal

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PROPERTY_METADATA_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,10 +30,8 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace SceneGraph
 {
 class PropertyBase;
@@ -58,7 +56,6 @@ class PropertyBase;
 class PropertyMetadata
 {
 public:
-
   /**
    * @brief Virtual Destructor.
    */
@@ -68,7 +65,7 @@ public:
    * @brief Returns whether the property is animatable (i.e. if its a scene graph property).
    * @return True if animatable, false otherwise
    */
-  bool IsAnimatable( void ) const
+  bool IsAnimatable(void) const
   {
     return nullptr != mSceneGraphProperty;
   }
@@ -77,7 +74,7 @@ public:
    * @brief Whether the property can be written to.
    * @return True if the property can be written to, false otherwise
    */
-  bool IsWritable( void ) const
+  bool IsWritable(void) const
   {
     return mWritable;
   }
@@ -90,7 +87,7 @@ public:
    */
   const SceneGraph::PropertyBase* GetSceneGraphProperty() const
   {
-    DALI_ASSERT_DEBUG( mSceneGraphProperty && "Accessing uninitialized SceneGraph property" );
+    DALI_ASSERT_DEBUG(mSceneGraphProperty && "Accessing uninitialized SceneGraph property");
     return mSceneGraphProperty;
   }
 
@@ -107,7 +104,7 @@ public:
    * Set the cached value of the property.
    * @param[in] value The propertyValue to set.
    */
-  void SetPropertyValue( const Property::Value& propertyValue );
+  void SetPropertyValue(const Property::Value& propertyValue);
 
   /**
    * Get the cached value of a the property.
@@ -119,24 +116,23 @@ public:
    * Modifies the stored value by the relativeValue.
    * @param[in] relativeValue The value to change by.
    */
-  void AdjustPropertyValueBy( const Property::Value& relativeValue );
+  void AdjustPropertyValueBy(const Property::Value& relativeValue);
 
 protected:
-
   /**
    * @brief Constructor to create Metadata for a property.
    * @param[in] propertyValue       The value of the property (this is used by the event thread)
    * @param[in] sceneGraphProperty  A pointer to the scene-graph owned property
    * @param[in] writable            Whether the property is writable
    */
-  PropertyMetadata( Property::Value propertyValue,
-                    const SceneGraph::PropertyBase* sceneGraphProperty,
-                    bool writable )
-  : value( mStoredValue ),
-    componentIndex( Property::INVALID_COMPONENT_INDEX ),
-    mStoredValue( std::move(propertyValue) ),
-    mSceneGraphProperty( sceneGraphProperty ),
-    mWritable( writable )
+  PropertyMetadata(Property::Value                 propertyValue,
+                   const SceneGraph::PropertyBase* sceneGraphProperty,
+                   bool                            writable)
+  : value(mStoredValue),
+    componentIndex(Property::INVALID_COMPONENT_INDEX),
+    mStoredValue(std::move(propertyValue)),
+    mSceneGraphProperty(sceneGraphProperty),
+    mWritable(writable)
   {
   }
 
@@ -147,23 +143,21 @@ protected:
    * @param[in] baseValueRef            A reference to the metadata of the base animatable property
    * @param[in] propertyComponentIndex  The component index of the property
    */
-  PropertyMetadata( const SceneGraph::PropertyBase* sceneGraphProperty, bool writable, Property::Value& baseValueRef, int32_t propertyComponentIndex )
-  : value( baseValueRef ),
-    componentIndex( propertyComponentIndex ),
+  PropertyMetadata(const SceneGraph::PropertyBase* sceneGraphProperty, bool writable, Property::Value& baseValueRef, int32_t propertyComponentIndex)
+  : value(baseValueRef),
+    componentIndex(propertyComponentIndex),
     mStoredValue(),
-    mSceneGraphProperty( sceneGraphProperty ),
-    mWritable( writable )
+    mSceneGraphProperty(sceneGraphProperty),
+    mWritable(writable)
   {
   }
 
 private:
-
   // Not implemented
-  PropertyMetadata( const PropertyMetadata& );
-  PropertyMetadata& operator=( const PropertyMetadata& );
+  PropertyMetadata(const PropertyMetadata&);
+  PropertyMetadata& operator=(const PropertyMetadata&);
 
 public: // Data
-
   /**
    * @brief The value of this property used to read/write by the event thread.
    *
@@ -179,10 +173,9 @@ public: // Data
   int32_t componentIndex;
 
 private:
-
-  Property::Value mStoredValue;                         ///< The cached property value used to read/write by the event thread
-  const SceneGraph::PropertyBase* mSceneGraphProperty;  ///< A pointer to a scene-graph property; should not be modified from actor-thread
-  bool mWritable:1;                                     ///< Whether the property is writable
+  Property::Value                 mStoredValue;        ///< The cached property value used to read/write by the event thread
+  const SceneGraph::PropertyBase* mSceneGraphProperty; ///< A pointer to a scene-graph property; should not be modified from actor-thread
+  bool                            mWritable : 1;       ///< Whether the property is writable
 };
 
 /**
@@ -191,7 +184,6 @@ private:
 class AnimatablePropertyMetadata : public PropertyMetadata
 {
 public:
-
   /**
    * @brief Constructs metadata for a registered animatable property.
    * @param[in] propertyIndex           The index of the animatable property
@@ -201,13 +193,13 @@ public:
    *
    * @note The base animatable property MUST be created before the component animatable property.
    */
-  AnimatablePropertyMetadata( Property::Index propertyIndex,
-                              const Property::Value& propertyValue,
-                              const SceneGraph::PropertyBase* sceneGraphProperty )
-  : PropertyMetadata( propertyValue, sceneGraphProperty, true ),
-    index( propertyIndex )
+  AnimatablePropertyMetadata(Property::Index                 propertyIndex,
+                             const Property::Value&          propertyValue,
+                             const SceneGraph::PropertyBase* sceneGraphProperty)
+  : PropertyMetadata(propertyValue, sceneGraphProperty, true),
+    index(propertyIndex)
   {
-    DALI_ASSERT_DEBUG( sceneGraphProperty && "Uninitialized scene-graph property" );
+    DALI_ASSERT_DEBUG(sceneGraphProperty && "Uninitialized scene-graph property");
   }
 
   /**
@@ -219,14 +211,14 @@ public:
    *
    * @note The base animatable property MUST be created before the component animatable property.
    */
-  AnimatablePropertyMetadata( Property::Index propertyIndex,
-                              int propertyComponentIndex,
-                              Property::Value& baseValueRef,
-                              const SceneGraph::PropertyBase* sceneGraphProperty )
-  : PropertyMetadata( sceneGraphProperty, true, baseValueRef, propertyComponentIndex ),
-    index( propertyIndex )
+  AnimatablePropertyMetadata(Property::Index                 propertyIndex,
+                             int                             propertyComponentIndex,
+                             Property::Value&                baseValueRef,
+                             const SceneGraph::PropertyBase* sceneGraphProperty)
+  : PropertyMetadata(sceneGraphProperty, true, baseValueRef, propertyComponentIndex),
+    index(propertyIndex)
   {
-    DALI_ASSERT_DEBUG( sceneGraphProperty && "Uninitialized scene-graph property" );
+    DALI_ASSERT_DEBUG(sceneGraphProperty && "Uninitialized scene-graph property");
   }
 
   /**
@@ -235,21 +227,18 @@ public:
   ~AnimatablePropertyMetadata() override = default;
 
 private:
-
   // Not implemented
   AnimatablePropertyMetadata();
-  AnimatablePropertyMetadata( const AnimatablePropertyMetadata& );
-  AnimatablePropertyMetadata& operator=( const AnimatablePropertyMetadata& );
+  AnimatablePropertyMetadata(const AnimatablePropertyMetadata&);
+  AnimatablePropertyMetadata& operator=(const AnimatablePropertyMetadata&);
 
-public: // Data
-
-  Property::Index   index;    ///< The index of the property.
+public:                  // Data
+  Property::Index index; ///< The index of the property.
 };
 
 class CustomPropertyMetadata : public PropertyMetadata
 {
 public:
-
   /**
    * Constructs Metadata for scene-graph-based custom properties, i.e. animatable custom properties.
    * @param[in] propertyName        The name of the custom property
@@ -268,7 +257,7 @@ public:
     key(propertyKey),
     childPropertyIndex(Property::INVALID_INDEX)
   {
-    DALI_ASSERT_DEBUG( sceneGraphProperty && "Uninitialized scene-graph property" );
+    DALI_ASSERT_DEBUG(sceneGraphProperty && "Uninitialized scene-graph property");
   }
 
   /**
@@ -287,7 +276,7 @@ public:
     key(Property::INVALID_KEY),
     childPropertyIndex(Property::INVALID_INDEX)
   {
-    DALI_ASSERT_DEBUG( accessMode != Property::ANIMATABLE && "Event side only properties should not be animatable" );
+    DALI_ASSERT_DEBUG(accessMode != Property::ANIMATABLE && "Event side only properties should not be animatable");
   }
 
   /**
@@ -296,16 +285,15 @@ public:
   ~CustomPropertyMetadata() override = default;
 
 private:
-
   // Not implemented
   CustomPropertyMetadata();
-  CustomPropertyMetadata( const CustomPropertyMetadata& );
-  CustomPropertyMetadata& operator=( const CustomPropertyMetadata& );
+  CustomPropertyMetadata(const CustomPropertyMetadata&);
+  CustomPropertyMetadata& operator=(const CustomPropertyMetadata&);
 
-public: // Data
-  ConstString       name;                 ///< The name of the property.
-  Property::Index   key;                  ///< The key of the property.
-  Property::Index   childPropertyIndex;   ///< The index as a child property.
+public:                               // Data
+  ConstString     name;               ///< The name of the property.
+  Property::Index key;                ///< The key of the property.
+  Property::Index childPropertyIndex; ///< The index as a child property.
 };
 
 } // namespace Internal

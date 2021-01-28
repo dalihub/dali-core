@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1061,10 +1061,10 @@ int UtcDaliSceneSurfaceResizedAdditionalScene(void)
   END_TEST;
 }
 
-#define CLIPPING_RECT_X          (16)
-#define CLIPPING_RECT_Y          (768)
-#define CLIPPING_RECT_WIDTH      (32)
-#define CLIPPING_RECT_HEIGHT     (32)
+#define CLIPPING_RECT_X (16)
+#define CLIPPING_RECT_Y (768)
+#define CLIPPING_RECT_WIDTH (32)
+#define CLIPPING_RECT_HEIGHT (32)
 
 int UtcDaliSceneSurfaceRotatedWithAngle0(void)
 {
@@ -1099,7 +1099,8 @@ int UtcDaliSceneSurfaceRotatedWithAngle0(void)
 
   damagedRects.clear();
   application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
-                                        TestApplication::DEFAULT_SURFACE_HEIGHT, 0);
+                                        TestApplication::DEFAULT_SURFACE_HEIGHT,
+                                        0);
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
@@ -1149,7 +1150,8 @@ int UtcDaliSceneSurfaceRotatedWithAngle90(void)
 
   damagedRects.clear();
   application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
-                                        TestApplication::DEFAULT_SURFACE_HEIGHT, 90);
+                                        TestApplication::DEFAULT_SURFACE_HEIGHT,
+                                        90);
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
@@ -1160,9 +1162,9 @@ int UtcDaliSceneSurfaceRotatedWithAngle90(void)
 
   // It is recalculation for glScissor.
   // Because surface is rotated and glScissor is called with recalcurated value.
-  clippingRect.x = TestApplication::DEFAULT_SURFACE_HEIGHT - (CLIPPING_RECT_Y + CLIPPING_RECT_HEIGHT);
-  clippingRect.y = CLIPPING_RECT_X;
-  clippingRect.width = CLIPPING_RECT_HEIGHT;
+  clippingRect.x      = TestApplication::DEFAULT_SURFACE_HEIGHT - (CLIPPING_RECT_Y + CLIPPING_RECT_HEIGHT);
+  clippingRect.y      = CLIPPING_RECT_X;
+  clippingRect.width  = CLIPPING_RECT_HEIGHT;
   clippingRect.height = CLIPPING_RECT_WIDTH;
 
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
@@ -1206,7 +1208,8 @@ int UtcDaliSceneSurfaceRotatedWithAngle180(void)
 
   damagedRects.clear();
   application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
-                                        TestApplication::DEFAULT_SURFACE_HEIGHT, 180);
+                                        TestApplication::DEFAULT_SURFACE_HEIGHT,
+                                        180);
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
@@ -1217,9 +1220,9 @@ int UtcDaliSceneSurfaceRotatedWithAngle180(void)
 
   // It is recalculation for glScissor.
   // Because surface is rotated and glScissor is called with recalcurated value.
-  clippingRect.x = TestApplication::DEFAULT_SURFACE_WIDTH - (CLIPPING_RECT_X + CLIPPING_RECT_WIDTH);
-  clippingRect.y = TestApplication::DEFAULT_SURFACE_HEIGHT - (CLIPPING_RECT_Y +CLIPPING_RECT_HEIGHT);
-  clippingRect.width = CLIPPING_RECT_WIDTH;
+  clippingRect.x      = TestApplication::DEFAULT_SURFACE_WIDTH - (CLIPPING_RECT_X + CLIPPING_RECT_WIDTH);
+  clippingRect.y      = TestApplication::DEFAULT_SURFACE_HEIGHT - (CLIPPING_RECT_Y + CLIPPING_RECT_HEIGHT);
+  clippingRect.width  = CLIPPING_RECT_WIDTH;
   clippingRect.height = CLIPPING_RECT_HEIGHT;
 
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
@@ -1263,7 +1266,8 @@ int UtcDaliSceneSurfaceRotatedWithAngle270(void)
 
   damagedRects.clear();
   application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
-                                        TestApplication::DEFAULT_SURFACE_HEIGHT, 270);
+                                        TestApplication::DEFAULT_SURFACE_HEIGHT,
+                                        270);
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
@@ -1274,9 +1278,9 @@ int UtcDaliSceneSurfaceRotatedWithAngle270(void)
 
   // It is recalculation for glScissor.
   // Because surface is rotated and glScissor is called with recalcurated value.
-  clippingRect.x = CLIPPING_RECT_Y;
-  clippingRect.y = TestApplication::DEFAULT_SURFACE_WIDTH - (CLIPPING_RECT_X + CLIPPING_RECT_WIDTH);
-  clippingRect.width = CLIPPING_RECT_HEIGHT;
+  clippingRect.x      = CLIPPING_RECT_Y;
+  clippingRect.y      = TestApplication::DEFAULT_SURFACE_WIDTH - (CLIPPING_RECT_X + CLIPPING_RECT_WIDTH);
+  clippingRect.width  = CLIPPING_RECT_HEIGHT;
   clippingRect.height = CLIPPING_RECT_WIDTH;
 
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);

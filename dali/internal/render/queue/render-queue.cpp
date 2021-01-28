@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,10 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace // unnamed namespace
 {
-
 static const std::size_t INITIAL_BUFFER_SIZE = 32768;
 static const std::size_t MAX_BUFFER_SIZE     = 32768;
 
@@ -37,22 +34,21 @@ static const std::size_t MAX_BUFFER_SIZE     = 32768;
 
 namespace SceneGraph
 {
-
 RenderQueue::RenderQueue()
-: container0( nullptr ),
-  container1( nullptr )
+: container0(nullptr),
+  container1(nullptr)
 {
-  container0 = new MessageBuffer( INITIAL_BUFFER_SIZE );
-  container1 = new MessageBuffer( INITIAL_BUFFER_SIZE );
+  container0 = new MessageBuffer(INITIAL_BUFFER_SIZE);
+  container1 = new MessageBuffer(INITIAL_BUFFER_SIZE);
 }
 
 RenderQueue::~RenderQueue()
 {
-  if( container0 )
+  if(container0)
   {
-    for( MessageBuffer::Iterator iter = container0->Begin(); iter.IsValid(); iter.Next() )
+    for(MessageBuffer::Iterator iter = container0->Begin(); iter.IsValid(); iter.Next())
     {
-      MessageBase* message = reinterpret_cast< MessageBase* >( iter.Get() );
+      MessageBase* message = reinterpret_cast<MessageBase*>(iter.Get());
 
       // Call virtual destructor explictly; since delete will not be called after placement new
       message->~MessageBase();
@@ -61,11 +57,11 @@ RenderQueue::~RenderQueue()
     delete container0;
   }
 
-  if( container1 )
+  if(container1)
   {
-    for( MessageBuffer::Iterator iter = container1->Begin(); iter.IsValid(); iter.Next() )
+    for(MessageBuffer::Iterator iter = container1->Begin(); iter.IsValid(); iter.Next())
     {
-      MessageBase* message = reinterpret_cast< MessageBase* >( iter.Get() );
+      MessageBase* message = reinterpret_cast<MessageBase*>(iter.Get());
 
       // Call virtual destructor explictly; since delete will not be called after placement new
       message->~MessageBase();
@@ -75,22 +71,22 @@ RenderQueue::~RenderQueue()
   }
 }
 
-uint32_t* RenderQueue::ReserveMessageSlot( BufferIndex updateBufferIndex, std::size_t size )
+uint32_t* RenderQueue::ReserveMessageSlot(BufferIndex updateBufferIndex, std::size_t size)
 {
-  MessageBuffer* container = GetCurrentContainer( updateBufferIndex );
+  MessageBuffer* container = GetCurrentContainer(updateBufferIndex);
 
-  return container->ReserveMessageSlot( size );
+  return container->ReserveMessageSlot(size);
 }
 
-void RenderQueue::ProcessMessages( BufferIndex bufferIndex )
+void RenderQueue::ProcessMessages(BufferIndex bufferIndex)
 {
-  MessageBuffer* container = GetCurrentContainer( bufferIndex );
+  MessageBuffer* container = GetCurrentContainer(bufferIndex);
 
-  for( MessageBuffer::Iterator iter = container->Begin(); iter.IsValid(); iter.Next() )
+  for(MessageBuffer::Iterator iter = container->Begin(); iter.IsValid(); iter.Next())
   {
-    MessageBase* message = reinterpret_cast< MessageBase* >( iter.Get() );
+    MessageBase* message = reinterpret_cast<MessageBase*>(iter.Get());
 
-    message->Process( bufferIndex );
+    message->Process(bufferIndex);
 
     // Call virtual destructor explictly; since delete will not be called after placement new
     message->~MessageBase();
@@ -98,18 +94,18 @@ void RenderQueue::ProcessMessages( BufferIndex bufferIndex )
 
   container->Reset();
 
-  LimitBufferCapacity( bufferIndex );
+  LimitBufferCapacity(bufferIndex);
 }
 
-MessageBuffer* RenderQueue::GetCurrentContainer( BufferIndex bufferIndex )
+MessageBuffer* RenderQueue::GetCurrentContainer(BufferIndex bufferIndex)
 {
-  MessageBuffer* container( nullptr );
+  MessageBuffer* container(nullptr);
 
   /**
    * The update-thread queues messages with one container,
    * whilst the render-thread is processing the other.
    */
-  if ( !bufferIndex )
+  if(!bufferIndex)
   {
     container = container0;
   }
@@ -121,24 +117,24 @@ MessageBuffer* RenderQueue::GetCurrentContainer( BufferIndex bufferIndex )
   return container;
 }
 
-void RenderQueue::LimitBufferCapacity( BufferIndex bufferIndex )
+void RenderQueue::LimitBufferCapacity(BufferIndex bufferIndex)
 {
-  if ( !bufferIndex )
+  if(!bufferIndex)
   {
-    if( MAX_BUFFER_SIZE < container0->GetCapacity() )
+    if(MAX_BUFFER_SIZE < container0->GetCapacity())
     {
       delete container0;
       container0 = nullptr;
-      container0 = new MessageBuffer( INITIAL_BUFFER_SIZE );
+      container0 = new MessageBuffer(INITIAL_BUFFER_SIZE);
     }
   }
   else
   {
-    if( MAX_BUFFER_SIZE < container1->GetCapacity() )
+    if(MAX_BUFFER_SIZE < container1->GetCapacity())
     {
       delete container1;
       container1 = nullptr;
-      container1 = new MessageBuffer( INITIAL_BUFFER_SIZE );
+      container1 = new MessageBuffer(INITIAL_BUFFER_SIZE);
     }
   }
 }

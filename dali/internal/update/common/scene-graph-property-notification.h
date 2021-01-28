@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_PROPERTY_NOTIFICATION_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,29 +19,26 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/property-notification.h>
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/internal/event/common/property-notification-impl.h>
 #include <dali/internal/update/common/property-base.h>
+#include <dali/public-api/object/property-notification.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 class Object;
 class PropertyNotification;
 
 namespace SceneGraph
 {
-
 class PropertyNotification;
 
 using PropertyNotificationContainer = OwnerContainer<PropertyNotification*>;
 using PropertyNotificationIter      = PropertyNotificationContainer::Iterator;
 using PropertyNotificationConstIter = PropertyNotificationContainer::ConstIterator;
-using ConditionFunction             = bool ( * )( const Dali::PropertyInput&, Dali::Internal::PropertyNotification::RawArgumentContainer& );
+using ConditionFunction             = bool (*)(const Dali::PropertyInput&, Dali::Internal::PropertyNotification::RawArgumentContainer&);
 
 /**
  * PropertyNotifications are used to inspect properties of scene graph objects, as part of a scene
@@ -53,7 +50,7 @@ public:
   using NotifyMode           = Dali::PropertyNotification::NotifyMode;
   using ConditionType        = Dali::Internal::PropertyNotification::ConditionType;
   using RawArgumentContainer = Dali::Internal::PropertyNotification::RawArgumentContainer;
-  using GetPropertyFunction  = const void* (*)( const SceneGraph::PropertyBase*, int );
+  using GetPropertyFunction  = const void* (*)(const SceneGraph::PropertyBase*, int);
 
   /**
    * Construct a new PropertyNotification
@@ -67,14 +64,14 @@ public:
    * @param[in] compare The flag of comparing the previous and current data.
    * @return A new PropertyNotification object.
    */
-  static PropertyNotification* New(Object& object,
-                                   Property::Index propertyIndex,
-                                   Property::Type propertyType,
-                                   int componentIndex,
-                                   ConditionType condition,
+  static PropertyNotification* New(Object&               object,
+                                   Property::Index       propertyIndex,
+                                   Property::Type        propertyType,
+                                   int                   componentIndex,
+                                   ConditionType         condition,
                                    RawArgumentContainer& arguments,
-                                   NotifyMode notifyMode,
-                                   bool compare);
+                                   NotifyMode            notifyMode,
+                                   bool                  compare);
 
   /**
    * Virtual destructor
@@ -87,7 +84,7 @@ public:
    *
    * @param[in] notifyMode The notification mode setting
    */
-  void SetNotifyMode( NotifyMode notifyMode );
+  void SetNotifyMode(NotifyMode notifyMode);
 
   /**
    * Check this property notification condition,
@@ -95,7 +92,7 @@ public:
    * @param[in] bufferIndex The current update buffer index.
    * @return Whether the validity of this notification has changed.
    */
-  bool Check( BufferIndex bufferIndex );
+  bool Check(BufferIndex bufferIndex);
 
   /**
    * Returns the validity of the last condition check
@@ -105,7 +102,6 @@ public:
   bool GetValidity() const;
 
 protected:
-
   /**
    * Construct the PropertyNotification
    * @param[in] object The event-object for a scene-graph object to inspect.
@@ -116,24 +112,23 @@ protected:
    * @param[in] arguments The arguments which accompany the condition.
    * @param[in] notifyMode The notification mode setting
    */
-  PropertyNotification(Object& object,
-                       Property::Index propertyIndex,
-                       Property::Type propertyType,
-                       int componentIndex,
-                       ConditionType condition,
+  PropertyNotification(Object&               object,
+                       Property::Index       propertyIndex,
+                       Property::Type        propertyType,
+                       int                   componentIndex,
+                       ConditionType         condition,
                        RawArgumentContainer& arguments,
-                       NotifyMode notifyMode,
-                       bool compare);
+                       NotifyMode            notifyMode,
+                       bool                  compare);
 
 private:
-
   /**
    * Checks if bool is LessThan
    * @param[in] value The value being examined.
    * @param[in] arg The supplied arguments for the condition.
    * @return Condition result (true if condition met, false if not)
    */
-  static bool EvalFalse( const Dali::PropertyInput& value, Dali::Internal::PropertyNotification::RawArgumentContainer& arg );
+  static bool EvalFalse(const Dali::PropertyInput& value, Dali::Internal::PropertyNotification::RawArgumentContainer& arg);
 
   // Undefined
   PropertyNotification(const PropertyNotification&);
@@ -142,17 +137,16 @@ private:
   PropertyNotification& operator=(const PropertyNotification& rhs);
 
 protected:
-
-  Object* mObject;                              ///< Not owned by the property notification. Valid until ObjectDestroyed() is called.
-  Property::Index mPropertyIndex;               ///< The index of this property.
-  Property::Type mPropertyType;                 ///< The type of property this is.
-  const PropertyInputImpl* mProperty;           ///< The scene graph property
-  int mComponentIndex;                          ///< Used for accessing float components of Vector3/4
-  ConditionType mConditionType;                 ///< The ConditionType
-  RawArgumentContainer mArguments;              ///< The arguments.
-  bool mValid;                                  ///< Whether this property notification is currently valid or not.
-  NotifyMode mNotifyMode;                       ///< Whether to notify on invalid and/or valid
-  ConditionFunction mConditionFunction;         ///< The Condition Function pointer to be evaluated.
+  Object*                  mObject;            ///< Not owned by the property notification. Valid until ObjectDestroyed() is called.
+  Property::Index          mPropertyIndex;     ///< The index of this property.
+  Property::Type           mPropertyType;      ///< The type of property this is.
+  const PropertyInputImpl* mProperty;          ///< The scene graph property
+  int                      mComponentIndex;    ///< Used for accessing float components of Vector3/4
+  ConditionType            mConditionType;     ///< The ConditionType
+  RawArgumentContainer     mArguments;         ///< The arguments.
+  bool                     mValid;             ///< Whether this property notification is currently valid or not.
+  NotifyMode               mNotifyMode;        ///< Whether to notify on invalid and/or valid
+  ConditionFunction        mConditionFunction; ///< The Condition Function pointer to be evaluated.
 };
 
 } // namespace SceneGraph

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_LIST_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,8 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 class CompleteNotificationInterface;
 
 namespace SceneGraph
@@ -60,25 +58,25 @@ public:
    * Overriden delete operator
    * Deletes the RenderTaskList from its global memory pool
    */
-  void operator delete( void* ptr );
+  void operator delete(void* ptr);
 
   /**
    * Set the renderMessageDispatcher to send message.
    * @param[in] renderMessageDispatcher The renderMessageDispatcher to send messages.
    */
-  void SetRenderMessageDispatcher( RenderMessageDispatcher* renderMessageDispatcher );
+  void SetRenderMessageDispatcher(RenderMessageDispatcher* renderMessageDispatcher);
 
   /**
    * Add a new RenderTask to the list.
    * @param[in] newTask The RenderTaskList takes ownership of this task.
    */
-  void AddTask( OwnerPointer< RenderTask >& newTask );
+  void AddTask(OwnerPointer<RenderTask>& newTask);
 
   /**
    * Remove a RenderTask from the list.
    * @param[in] task The RenderTaskList will destroy this task.
    */
-  void RemoveTask( RenderTask* task );
+  void RemoveTask(RenderTask* task);
 
   /**
    * Retrieve the count of RenderTasks.
@@ -102,7 +100,7 @@ public:
    * Set the notification method to package in the NotifyFinishedMessage
    * @param object to store in notification managers queue
    */
-  void SetCompleteNotificationInterface( CompleteNotificationInterface* object );
+  void SetCompleteNotificationInterface(CompleteNotificationInterface* object);
 
   /**
    * Get the Notification interface for when 1+ render tasks have finished
@@ -110,14 +108,12 @@ public:
   CompleteNotificationInterface* GetCompleteNotificationInterface();
 
 protected:
-
   /**
    * Protected constructor. See New()
    */
   RenderTaskList();
 
 private:
-
   // Undefined
   RenderTaskList(const RenderTaskList&);
 
@@ -125,39 +121,37 @@ private:
   RenderTaskList& operator=(const RenderTaskList&);
 
 private:
-
-  CompleteNotificationInterface* mNotificationObject; ///< object to pass in to the complete notification
-  RenderMessageDispatcher* mRenderMessageDispatcher; ///< for sending messages to render thread
-  RenderTaskContainer mRenderTasks; ///< A container of owned RenderTasks
-
+  CompleteNotificationInterface* mNotificationObject;      ///< object to pass in to the complete notification
+  RenderMessageDispatcher*       mRenderMessageDispatcher; ///< for sending messages to render thread
+  RenderTaskContainer            mRenderTasks;             ///< A container of owned RenderTasks
 };
 
 // Messages for RenderTaskList
 
-inline void AddTaskMessage( EventThreadServices& eventThreadServices, const RenderTaskList& list, OwnerPointer< RenderTask >& task )
+inline void AddTaskMessage(EventThreadServices& eventThreadServices, const RenderTaskList& list, OwnerPointer<RenderTask>& task)
 {
   // Message has ownership of the RenderTask while in transit from event -> update
   using LocalType = MessageValue1<RenderTaskList, OwnerPointer<RenderTask> >;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &list, &RenderTaskList::AddTask, task );
+  new(slot) LocalType(&list, &RenderTaskList::AddTask, task);
 }
 
-inline void RemoveTaskMessage( EventThreadServices& eventThreadServices, const RenderTaskList& list, const RenderTask& constTask )
+inline void RemoveTaskMessage(EventThreadServices& eventThreadServices, const RenderTaskList& list, const RenderTask& constTask)
 {
   // Scene graph thread can destroy this object.
-  RenderTask& task = const_cast< RenderTask& >( constTask );
+  RenderTask& task = const_cast<RenderTask&>(constTask);
 
   using LocalType = MessageValue1<RenderTaskList, RenderTask*>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &list, &RenderTaskList::RemoveTask, &task );
+  new(slot) LocalType(&list, &RenderTaskList::RemoveTask, &task);
 }
 
 } // namespace SceneGraph

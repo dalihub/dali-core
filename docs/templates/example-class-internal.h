@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_EXAMPLE_CLASS_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,13 +27,11 @@
 
 namespace Dali
 {
-
 // Forward declarations for the Dali namespace
 class XXXX;
 
 namespace Internal
 {
-
 // Forward declarations for the Dali::Internal namespace
 class YYYY;
 
@@ -43,7 +41,6 @@ class YYYY;
 class ExampleClass : public ExampleBaseClass
 {
 public: // Types
-
   typedef std::list<XXXX> ExampleContainer;
 
   enum ExampleEnum
@@ -53,7 +50,6 @@ public: // Types
   };
 
 public: // Construction
-
   /**
    * Create an ExampleClass.
    */
@@ -71,7 +67,6 @@ public: // Construction
   virtual ~ExampleClass();
 
 public: // Public members
-
   /**
    * Set the name of an ExampleClass.
    * @pre TODO - Edit this example comment.
@@ -86,10 +81,12 @@ public: // Public members
    * @return The name of the example class.
    * @post TODO - Edit this example comment.
    */
-  std::string GetName() const { return mName; }
+  std::string GetName() const
+  {
+    return mName;
+  }
 
 protected: // Protected members
-
   /**
    * Example helper method, which is accessible by derived classes.
    * @param [in] exampleParam An an example parameter.
@@ -97,7 +94,6 @@ protected: // Protected members
   void HelperMember(ExampleEnum exampleParam);
 
 private: // Private members
-
   /**
    * Undefined copy constructor; declaring this prevents accidental copying.
    * @param[in] A reference to the ExampleClass to copy.
@@ -119,11 +115,9 @@ private: // Private members
   virtual void OnNameSet() = 0;
 
 protected: // Protected data
-
   ExampleContainer mContainer;
 
 private: // Private data
-
   std::string mName;
 };
 
@@ -152,4 +146,3 @@ inline const Internal::ExampleClass& GetImplementation(const Dali::ExampleClass&
 } // namespace Dali
 
 #endif // DALI_INTERNAL_EXAMPLE_CLASS_H
-

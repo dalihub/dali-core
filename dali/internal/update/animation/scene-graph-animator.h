@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_ANIMATOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,13 @@
 #include <functional>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/owner-container.h>
+#include <dali/integration-api/debug.h>
+#include <dali/internal/event/animation/key-frames-impl.h>
+#include <dali/internal/event/animation/path-impl.h>
+#include <dali/internal/update/animation/property-accessor.h>
+#include <dali/internal/update/common/property-base.h>
+#include <dali/internal/update/nodes/node.h>
 #include <dali/public-api/animation/alpha-function.h>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/animation/time-period.h>
@@ -30,26 +37,15 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/quaternion.h>
 #include <dali/public-api/math/radian.h>
-#include <dali/devel-api/common/owner-container.h>
-#include <dali/internal/event/animation/key-frames-impl.h>
-#include <dali/internal/event/animation/path-impl.h>
-#include <dali/internal/update/nodes/node.h>
-#include <dali/internal/update/common/property-base.h>
-#include <dali/internal/update/animation/property-accessor.h>
-#include <dali/integration-api/debug.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 using Interpolation = Dali::Animation::Interpolation;
-
 
 namespace SceneGraph
 {
-
 /**
  * An abstract base class for Animators, which can be added to scene graph animations.
  * Each animator changes a single property of an object in the scene graph.
@@ -57,7 +53,6 @@ namespace SceneGraph
 class AnimatorBase : public PropertyOwner::Observer
 {
 public:
-
   using AlphaFunc = float (*)(float progress); ///< Definition of an alpha function
 
   /**
@@ -78,25 +73,24 @@ public:
     virtual ~LifecycleObserver() = default;
   };
 
-
   /**
    * Constructor.
    */
-  AnimatorBase( PropertyOwner* propertyOwner,
-                AlphaFunction alphaFunction,
-                const TimePeriod& timePeriod )
-  : mLifecycleObserver( nullptr ),
-    mPropertyOwner( propertyOwner ),
-    mDurationSeconds( timePeriod.durationSeconds ),
-    mIntervalDelaySeconds( timePeriod.delaySeconds ),
-    mSpeedFactor( 1.0f ),
-    mCurrentProgress( 0.f ),
-    mAlphaFunction( alphaFunction ),
-    mDisconnectAction( Dali::Animation::BAKE_FINAL ),
-    mAnimationPlaying( false ),
-    mEnabled( true ),
-    mConnectedToSceneGraph( false ),
-    mAutoReverseEnabled( false )
+  AnimatorBase(PropertyOwner*    propertyOwner,
+               AlphaFunction     alphaFunction,
+               const TimePeriod& timePeriod)
+  : mLifecycleObserver(nullptr),
+    mPropertyOwner(propertyOwner),
+    mDurationSeconds(timePeriod.durationSeconds),
+    mIntervalDelaySeconds(timePeriod.delaySeconds),
+    mSpeedFactor(1.0f),
+    mCurrentProgress(0.f),
+    mAlphaFunction(alphaFunction),
+    mDisconnectAction(Dali::Animation::BAKE_FINAL),
+    mAnimationPlaying(false),
+    mEnabled(true),
+    mConnectedToSceneGraph(false),
+    mAutoReverseEnabled(false)
   {
   }
 
@@ -105,32 +99,31 @@ public:
    */
   ~AnimatorBase() override
   {
-    if (mPropertyOwner && mConnectedToSceneGraph)
+    if(mPropertyOwner && mConnectedToSceneGraph)
     {
       mPropertyOwner->RemoveObserver(*this);
     }
-    if( mLifecycleObserver != nullptr )
+    if(mLifecycleObserver != nullptr)
     {
       mLifecycleObserver->ObjectDestroyed();
     }
   }
 
-  void AddLifecycleObserver( LifecycleObserver& observer )
+  void AddLifecycleObserver(LifecycleObserver& observer)
   {
     mLifecycleObserver = &observer;
   }
 
-  void RemoveLifecycleObserver( LifecycleObserver& observer )
+  void RemoveLifecycleObserver(LifecycleObserver& observer)
   {
     mLifecycleObserver = nullptr;
   }
 
 private: // From PropertyOwner::Observer
-
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerConnected( PropertyOwner& owner )
    */
-  void PropertyOwnerConnected( PropertyOwner& owner ) final
+  void PropertyOwnerConnected(PropertyOwner& owner) final
   {
     mEnabled = true;
   }
@@ -138,13 +131,13 @@ private: // From PropertyOwner::Observer
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerDisconnected( BufferIndex bufferIndex, PropertyOwner& owner )
    */
-  void PropertyOwnerDisconnected( BufferIndex bufferIndex, PropertyOwner& owner ) final
+  void PropertyOwnerDisconnected(BufferIndex bufferIndex, PropertyOwner& owner) final
   {
     // If we are active, then bake the value if required
-    if ( mAnimationPlaying && mDisconnectAction != Dali::Animation::DISCARD )
+    if(mAnimationPlaying && mDisconnectAction != Dali::Animation::DISCARD)
     {
       // Bake to target-value if BakeFinal, otherwise bake current value
-      Update( bufferIndex, ( mDisconnectAction == Dali::Animation::BAKE ? mCurrentProgress : 1.0f ), true );
+      Update(bufferIndex, (mDisconnectAction == Dali::Animation::BAKE ? mCurrentProgress : 1.0f), true);
     }
 
     mEnabled = false;
@@ -153,7 +146,7 @@ private: // From PropertyOwner::Observer
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerDestroyed( PropertyOwner& owner )
    */
-  void PropertyOwnerDestroyed( PropertyOwner& owner ) final
+  void PropertyOwnerDestroyed(PropertyOwner& owner) final
   {
     mPropertyOwner = nullptr;
   }
@@ -192,7 +185,7 @@ public:
     return mDurationSeconds;
   }
 
-  void SetSpeedFactor( float factor )
+  void SetSpeedFactor(float factor)
   {
     mSpeedFactor = factor;
   }
@@ -202,20 +195,20 @@ public:
     mLoopCount = loopCount;
   }
 
-  float SetProgress( float progress )
+  float SetProgress(float progress)
   {
     float value = 0.0f;
 
-    if( mAutoReverseEnabled )
+    if(mAutoReverseEnabled)
     {
-      if( mSpeedFactor > 0.0f )
+      if(mSpeedFactor > 0.0f)
       {
-        value = 1.0f - 2.0f * std::abs( progress - 0.5f );
+        value = 1.0f - 2.0f * std::abs(progress - 0.5f);
       }
       // Reverse mode
-      else if( mSpeedFactor < 0.0f )
+      else if(mSpeedFactor < 0.0f)
       {
-        value = 2.0f * std::abs( progress - 0.5f );
+        value = 2.0f * std::abs(progress - 0.5f);
       }
     }
     else
@@ -268,12 +261,12 @@ public:
    * @param[in] Current progress
    * @return The progress after the alpha function has been aplied
    */
-  float ApplyAlphaFunction( float progress ) const
+  float ApplyAlphaFunction(float progress) const
   {
     float result = progress;
 
-    AlphaFunction::Mode alphaFunctionMode( mAlphaFunction.GetMode() );
-    if( alphaFunctionMode == AlphaFunction::BUILTIN_FUNCTION )
+    AlphaFunction::Mode alphaFunctionMode(mAlphaFunction.GetMode());
+    if(alphaFunctionMode == AlphaFunction::BUILTIN_FUNCTION)
     {
       switch(mAlphaFunction.GetBuiltinFunction())
       {
@@ -284,7 +277,7 @@ public:
         }
         case AlphaFunction::REVERSE:
         {
-          result = 1.0f-progress;
+          result = 1.0f - progress;
           break;
         }
         case AlphaFunction::EASE_IN_SQUARE:
@@ -294,7 +287,7 @@ public:
         }
         case AlphaFunction::EASE_OUT_SQUARE:
         {
-          result = 1.0f - (1.0f-progress) * (1.0f-progress);
+          result = 1.0f - (1.0f - progress) * (1.0f - progress);
           break;
         }
         case AlphaFunction::EASE_IN:
@@ -304,12 +297,12 @@ public:
         }
         case AlphaFunction::EASE_OUT:
         {
-          result = (progress-1.0f) * (progress-1.0f) * (progress-1.0f) + 1.0f;
+          result = (progress - 1.0f) * (progress - 1.0f) * (progress - 1.0f) + 1.0f;
           break;
         }
         case AlphaFunction::EASE_IN_OUT:
         {
-          result = progress*progress*(3.0f-2.0f*progress);
+          result = progress * progress * (3.0f - 2.0f * progress);
           break;
         }
         case AlphaFunction::EASE_IN_SINE:
@@ -341,7 +334,7 @@ public:
         {
           const float sqrt2 = 1.70158f;
           progress -= 1.0f;
-          result = 1.0f + progress * progress * ( ( sqrt2 + 1.0f ) * progress + sqrt2 );
+          result = 1.0f + progress * progress * ((sqrt2 + 1.0f) * progress + sqrt2);
           break;
         }
         case AlphaFunction::COUNT:
@@ -350,10 +343,10 @@ public:
         }
       }
     }
-    else if(  alphaFunctionMode == AlphaFunction::CUSTOM_FUNCTION )
+    else if(alphaFunctionMode == AlphaFunction::CUSTOM_FUNCTION)
     {
       AlphaFunctionPrototype customFunction = mAlphaFunction.GetCustomFunction();
-      if( customFunction )
+      if(customFunction)
       {
         result = customFunction(progress);
       }
@@ -362,20 +355,20 @@ public:
     {
       //If progress is very close to 0 or very close to 1 we don't need to evaluate the curve as the result will
       //be almost 0 or almost 1 respectively
-      if( ( progress > Math::MACHINE_EPSILON_1 ) && ((1.0f - progress) > Math::MACHINE_EPSILON_1) )
+      if((progress > Math::MACHINE_EPSILON_1) && ((1.0f - progress) > Math::MACHINE_EPSILON_1))
       {
         Dali::Vector4 controlPoints = mAlphaFunction.GetBezierControlPoints();
 
-        static const float tolerance = 0.001f;  //10 iteration max
+        static const float tolerance = 0.001f; //10 iteration max
 
         //Perform a binary search on the curve
         float lowerBound(0.0f);
         float upperBound(1.0f);
         float currentT(0.5f);
-        float currentX = EvaluateCubicBezier( controlPoints.x, controlPoints.z, currentT);
-        while( fabsf( progress - currentX ) > tolerance )
+        float currentX = EvaluateCubicBezier(controlPoints.x, controlPoints.z, currentT);
+        while(fabsf(progress - currentX) > tolerance)
         {
-          if( progress > currentX )
+          if(progress > currentX)
           {
             lowerBound = currentT;
           }
@@ -383,10 +376,10 @@ public:
           {
             upperBound = currentT;
           }
-          currentT = (upperBound+lowerBound)*0.5f;
-          currentX = EvaluateCubicBezier( controlPoints.x, controlPoints.z, currentT);
+          currentT = (upperBound + lowerBound) * 0.5f;
+          currentX = EvaluateCubicBezier(controlPoints.x, controlPoints.z, currentT);
         }
-        result = EvaluateCubicBezier( controlPoints.y, controlPoints.w, currentT);
+        result = EvaluateCubicBezier(controlPoints.y, controlPoints.w, currentT);
       }
     }
 
@@ -398,7 +391,7 @@ public:
    * Property is only baked if the animator is active.
    * @param [in] action The disconnect action.
    */
-  void SetDisconnectAction( Dali::Animation::EndAction action )
+  void SetDisconnectAction(Dali::Animation::EndAction action)
   {
     mDisconnectAction = action;
   }
@@ -418,7 +411,7 @@ public:
    * @post When the animator becomes active, it applies the disconnect-action if the property owner is then disconnected.
    * @note When the property owner is disconnected, the active state is set to false.
    */
-  void SetActive( bool active )
+  void SetActive(bool active)
   {
     mAnimationPlaying = active;
   }
@@ -436,7 +429,7 @@ public:
    * @brief Sets the looping mode.
    * @param[in] loopingMode True when the looping mode is AUTO_REVERSE
    */
-  void SetLoopingMode( bool loopingMode )
+  void SetLoopingMode(bool loopingMode)
   {
     mAutoReverseEnabled = loopingMode;
   }
@@ -458,23 +451,23 @@ public:
    * @param[in] progress A value from 0 to 1, where 0 is the start of the animation, and 1 is the end point.
    * @param[in] bake Bake.
    */
-  void Update( BufferIndex bufferIndex, float progress, bool bake )
+  void Update(BufferIndex bufferIndex, float progress, bool bake)
   {
-    if( mLoopCount >= 0 )
+    if(mLoopCount >= 0)
     {
       // Update the progress value
-      progress = SetProgress( progress );
+      progress = SetProgress(progress);
     }
 
-    if( mPropertyOwner )
+    if(mPropertyOwner)
     {
-      mPropertyOwner->SetUpdated( true );
+      mPropertyOwner->SetUpdated(true);
     }
 
-    float alpha = ApplyAlphaFunction( progress );
+    float alpha = ApplyAlphaFunction(progress);
 
     // PropertyType specific part
-    DoUpdate( bufferIndex, bake, alpha );
+    DoUpdate(bufferIndex, bake, alpha);
 
     mCurrentProgress = progress;
   }
@@ -485,10 +478,9 @@ public:
    * @param bake whether to bake or not
    * @param alpha value from alpha based on progress
    */
-  virtual void DoUpdate( BufferIndex bufferIndex, bool bake, float alpha ) = 0;
+  virtual void DoUpdate(BufferIndex bufferIndex, bool bake, float alpha) = 0;
 
 protected:
-
   /**
    * Helper function to evaluate a cubic bezier curve assuming first point is at 0.0 and last point is at 1.0
    * @param[in] p0 First control point of the bezier curve
@@ -496,14 +488,14 @@ protected:
    * @param[in] t A floating point value between 0.0 and 1.0
    * @return Value of the curve at progress t
    */
-  inline float EvaluateCubicBezier( float p0, float p1, float t ) const
+  inline float EvaluateCubicBezier(float p0, float p1, float t) const
   {
-    float tSquare = t*t;
-    return 3.0f*(1.0f-t)*(1.0f-t)*t*p0 + 3.0f*(1.0f-t)*tSquare*p1 + tSquare*t;
+    float tSquare = t * t;
+    return 3.0f * (1.0f - t) * (1.0f - t) * t * p0 + 3.0f * (1.0f - t) * tSquare * p1 + tSquare * t;
   }
 
   LifecycleObserver* mLifecycleObserver;
-  PropertyOwner* mPropertyOwner;
+  PropertyOwner*     mPropertyOwner;
 
   float mDurationSeconds;
   float mIntervalDelaySeconds;
@@ -513,11 +505,11 @@ protected:
   AlphaFunction mAlphaFunction;
 
   int32_t                    mLoopCount{1};
-  Dali::Animation::EndAction mDisconnectAction;     ///< EndAction to apply when target object gets disconnected from the stage.
-  bool mAnimationPlaying:1;                         ///< whether disconnect has been applied while it's running.
-  bool mEnabled:1;                                  ///< Animator is "enabled" while its target object is valid and on the stage.
-  bool mConnectedToSceneGraph:1;                    ///< True if ConnectToSceneGraph() has been called in update-thread.
-  bool mAutoReverseEnabled:1;
+  Dali::Animation::EndAction mDisconnectAction;          ///< EndAction to apply when target object gets disconnected from the stage.
+  bool                       mAnimationPlaying : 1;      ///< whether disconnect has been applied while it's running.
+  bool                       mEnabled : 1;               ///< Animator is "enabled" while its target object is valid and on the stage.
+  bool                       mConnectedToSceneGraph : 1; ///< True if ConnectToSceneGraph() has been called in update-thread.
+  bool                       mAutoReverseEnabled : 1;
 };
 
 /**
@@ -531,7 +523,6 @@ class Animator final : public AnimatorBase
   AnimatorFunction mAnimatorFunction;
 
 public:
-
   /**
    * Construct a new property animator.
    * @param[in] property The animatable property; only valid while the Animator is attached.
@@ -557,25 +548,24 @@ public:
   /**
    * @copydoc AnimatorBase::DoUpdate( BufferIndex bufferIndex, bool bake, float alpha )
    */
-  void DoUpdate( BufferIndex bufferIndex, bool bake, float alpha ) final
+  void DoUpdate(BufferIndex bufferIndex, bool bake, float alpha) final
   {
-    const PropertyType& current = mPropertyAccessor.Get( bufferIndex );
+    const PropertyType& current = mPropertyAccessor.Get(bufferIndex);
 
     // need to cast the return value in case property is integer
     const PropertyType result = static_cast<PropertyType>(mAnimatorFunction(alpha, current));
 
-    if ( bake )
+    if(bake)
     {
-      mPropertyAccessor.Bake( bufferIndex, result );
+      mPropertyAccessor.Bake(bufferIndex, result);
     }
     else
     {
-      mPropertyAccessor.Set( bufferIndex, result );
+      mPropertyAccessor.Set(bufferIndex, result);
     }
   }
 
 private:
-
   /**
    * Private constructor; see also Animator::New().
    */
@@ -593,18 +583,14 @@ private:
   }
 
   // Undefined
-  Animator( const Animator& );
+  Animator(const Animator&);
 
   // Undefined
-  Animator& operator=( const Animator& );
+  Animator& operator=(const Animator&);
 
 protected:
-
   PropertyAccessorType mPropertyAccessor;
-
 };
-
-
 
 /**
  * An animator for a specific property type PropertyType.
@@ -617,7 +603,6 @@ class AnimatorTransformProperty final : public AnimatorBase
   AnimatorFunction mAnimatorFunction;
 
 public:
-
   /**
    * Construct a new property animator.
    * @param[in] property The animatable property; only valid while the Animator is attached.
@@ -632,7 +617,6 @@ public:
                            AlphaFunction        alphaFunction,
                            const TimePeriod&    timePeriod)
   {
-
     // The property was const in the actor-thread, but animators are used in the scene-graph thread.
     return new AnimatorTransformProperty(const_cast<PropertyOwner*>(&propertyOwner),
                                          const_cast<PropertyBase*>(&property),
@@ -644,25 +628,24 @@ public:
   /**
    * @copydoc AnimatorBase::DoUpdate( BufferIndex bufferIndex, bool bake, float alpha )
    */
-  void DoUpdate( BufferIndex bufferIndex, bool bake, float alpha ) final
+  void DoUpdate(BufferIndex bufferIndex, bool bake, float alpha) final
   {
-    const PropertyType& current = mPropertyAccessor.Get( bufferIndex );
+    const PropertyType& current = mPropertyAccessor.Get(bufferIndex);
 
     // need to cast the return value in case property is integer
     const PropertyType result = static_cast<PropertyType>(mAnimatorFunction(alpha, current));
 
-    if ( bake )
+    if(bake)
     {
-      mPropertyAccessor.Bake( bufferIndex, result );
+      mPropertyAccessor.Bake(bufferIndex, result);
     }
     else
     {
-      mPropertyAccessor.Set( bufferIndex, result );
+      mPropertyAccessor.Set(bufferIndex, result);
     }
   }
 
 private:
-
   /**
    * Private constructor; see also Animator::New().
    */
@@ -680,14 +663,12 @@ private:
   }
 
   // Undefined
-  AnimatorTransformProperty() = delete;
-  AnimatorTransformProperty( const AnimatorTransformProperty& ) = delete;
-  AnimatorTransformProperty& operator=( const AnimatorTransformProperty& ) = delete;
+  AnimatorTransformProperty()                                 = delete;
+  AnimatorTransformProperty(const AnimatorTransformProperty&) = delete;
+  AnimatorTransformProperty& operator=(const AnimatorTransformProperty&) = delete;
 
 protected:
-
   PropertyAccessorType mPropertyAccessor;
-
 };
 
 } // namespace SceneGraph
@@ -704,7 +685,7 @@ struct AnimateByInteger
   float operator()(float alpha, const int32_t& property)
   {
     // integers need to be correctly rounded
-    return roundf(static_cast<float>( property ) + static_cast<float>( mRelative ) * alpha );
+    return roundf(static_cast<float>(property) + static_cast<float>(mRelative) * alpha);
   }
 
   int32_t mRelative;
@@ -720,7 +701,7 @@ struct AnimateToInteger
   float operator()(float alpha, const int32_t& property)
   {
     // integers need to be correctly rounded
-    return roundf(static_cast<float>( property ) + (static_cast<float>(mTarget - property) * alpha) );
+    return roundf(static_cast<float>(property) + (static_cast<float>(mTarget - property) * alpha));
   }
 
   int32_t mTarget;
@@ -917,14 +898,14 @@ struct AnimateToBoolean
 struct RotateByAngleAxis
 {
   RotateByAngleAxis(const Radian& angleRadians, const Vector3& axis)
-  : mAngleRadians( angleRadians ),
+  : mAngleRadians(angleRadians),
     mAxis(axis.x, axis.y, axis.z)
   {
   }
 
   Quaternion operator()(float alpha, const Quaternion& rotation)
   {
-    if (alpha > 0.0f)
+    if(alpha > 0.0f)
     {
       return rotation * Quaternion(mAngleRadians * alpha, mAxis);
     }
@@ -932,7 +913,7 @@ struct RotateByAngleAxis
     return rotation;
   }
 
-  Radian mAngleRadians;
+  Radian  mAngleRadians;
   Vector3 mAxis;
 };
 
@@ -984,11 +965,11 @@ struct KeyFrameIntegerFunctor
     {
       return static_cast<float>(mKeyFrames.GetValue(progress, mInterpolation));
     }
-    return static_cast<float>( property );
+    return static_cast<float>(property);
   }
 
   KeyFrameInteger mKeyFrames;
-  Interpolation mInterpolation;
+  Interpolation   mInterpolation;
 };
 
 struct KeyFrameNumberFunctor
@@ -1009,7 +990,7 @@ struct KeyFrameNumberFunctor
   }
 
   KeyFrameNumber mKeyFrames;
-  Interpolation mInterpolation;
+  Interpolation  mInterpolation;
 };
 
 struct KeyFrameVector2Functor
@@ -1030,7 +1011,7 @@ struct KeyFrameVector2Functor
   }
 
   KeyFrameVector2 mKeyFrames;
-  Interpolation mInterpolation;
+  Interpolation   mInterpolation;
 };
 
 struct KeyFrameVector3Functor
@@ -1051,7 +1032,7 @@ struct KeyFrameVector3Functor
   }
 
   KeyFrameVector3 mKeyFrames;
-  Interpolation mInterpolation;
+  Interpolation   mInterpolation;
 };
 
 struct KeyFrameVector4Functor
@@ -1072,7 +1053,7 @@ struct KeyFrameVector4Functor
   }
 
   KeyFrameVector4 mKeyFrames;
-  Interpolation mInterpolation;
+  Interpolation   mInterpolation;
 };
 
 struct KeyFrameQuaternionFunctor
@@ -1096,7 +1077,7 @@ struct KeyFrameQuaternionFunctor
 
 struct PathPositionFunctor
 {
-  PathPositionFunctor( PathPtr path )
+  PathPositionFunctor(PathPtr path)
   : mPath(path)
   {
   }
@@ -1104,7 +1085,7 @@ struct PathPositionFunctor
   Vector3 operator()(float progress, const Vector3& property)
   {
     Vector3 position(property);
-    static_cast<void>( mPath->SamplePosition(progress, position) );
+    static_cast<void>(mPath->SamplePosition(progress, position));
     return position;
   }
 
@@ -1113,9 +1094,9 @@ struct PathPositionFunctor
 
 struct PathRotationFunctor
 {
-  PathRotationFunctor( PathPtr path, const Vector3& forward )
+  PathRotationFunctor(PathPtr path, const Vector3& forward)
   : mPath(path),
-    mForward( forward )
+    mForward(forward)
   {
     mForward.Normalize();
   }
@@ -1123,9 +1104,9 @@ struct PathRotationFunctor
   Quaternion operator()(float progress, const Quaternion& property)
   {
     Vector3 tangent;
-    if( mPath->SampleTangent(progress, tangent) )
+    if(mPath->SampleTangent(progress, tangent))
     {
-      return Quaternion( mForward, tangent );
+      return Quaternion(mForward, tangent);
     }
     else
     {

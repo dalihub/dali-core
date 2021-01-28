@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_PROPERTY_COMPONENT_ACCESSOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,30 +19,27 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
 #include <dali/internal/update/common/animatable-property.h>
+#include <dali/public-api/common/dali-common.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 /**
  * A wrapper class for getting/setting a float component of another property.
  * Animators use this instead of accessing properties directly.
  */
-template < typename PropertyType >
+template<typename PropertyType>
 class PropertyComponentAccessorX
 {
 public:
-
   /**
    * Create a property component.
    * @param [in] property The property which holds a float component.
    */
-  PropertyComponentAccessorX( SceneGraph::PropertyBase* property )
-  : mProperty( static_cast< SceneGraph::AnimatableProperty<PropertyType>* >(property) ) // we know the type
+  PropertyComponentAccessorX(SceneGraph::PropertyBase* property)
+  : mProperty(static_cast<SceneGraph::AnimatableProperty<PropertyType>*>(property)) // we know the type
   {
   }
 
@@ -81,58 +78,54 @@ public:
    * Read access to the property.
    * @param [in] bufferIndex The current update buffer index.
    */
-  float Get( BufferIndex bufferIndex ) const
+  float Get(BufferIndex bufferIndex) const
   {
-    DALI_ASSERT_DEBUG( nullptr != mProperty && "PropertyComponentAccessorX::Get() mProperty was nullptr" );
-    return mProperty->Get( bufferIndex ).x; // X Component only!
+    DALI_ASSERT_DEBUG(nullptr != mProperty && "PropertyComponentAccessorX::Get() mProperty was nullptr");
+    return mProperty->Get(bufferIndex).x; // X Component only!
   }
 
   /**
    * @copydoc SceneGraph::AnimatableProperty<float>::Set()
    */
-  void Set( BufferIndex bufferIndex, float value ) const
+  void Set(BufferIndex bufferIndex, float value) const
   {
-    DALI_ASSERT_DEBUG( nullptr != mProperty && "PropertyComponentAccessorX::Set() mProperty was nullptr" );
-    mProperty->SetX( bufferIndex, value );
+    DALI_ASSERT_DEBUG(nullptr != mProperty && "PropertyComponentAccessorX::Set() mProperty was nullptr");
+    mProperty->SetX(bufferIndex, value);
   }
 
   /**
    * @copydoc SceneGraph::AnimatableProperty<float>::Bake()
    */
-  void Bake( BufferIndex bufferIndex, float value ) const
+  void Bake(BufferIndex bufferIndex, float value) const
   {
-    DALI_ASSERT_DEBUG( nullptr != mProperty && "PropertyComponentAccessorX::Bake() mProperty was nullptr" );
-    mProperty->BakeX( bufferIndex, value );
+    DALI_ASSERT_DEBUG(nullptr != mProperty && "PropertyComponentAccessorX::Bake() mProperty was nullptr");
+    mProperty->BakeX(bufferIndex, value);
   }
 
 private:
-
   // Undefined
-  PropertyComponentAccessorX() = delete;
+  PropertyComponentAccessorX()                                           = delete;
   PropertyComponentAccessorX(const PropertyComponentAccessorX& property) = delete;
   PropertyComponentAccessorX& operator=(const PropertyComponentAccessorX& rhs) = delete;
 
 private:
-
   SceneGraph::AnimatableProperty<PropertyType>* mProperty; ///< The real property
-
 };
 
 /**
  * A wrapper class for getting/setting a float component of another property.
  * Animators use this instead of accessing properties directly.
  */
-template < typename PropertyType >
+template<typename PropertyType>
 class PropertyComponentAccessorY
 {
 public:
-
   /**
    * Create a property component.
    * @param [in] property The property which holds a float component.
    */
-  PropertyComponentAccessorY( SceneGraph::PropertyBase* property )
-  : mProperty( static_cast< SceneGraph::AnimatableProperty<PropertyType>* >(property) ) // we know the type
+  PropertyComponentAccessorY(SceneGraph::PropertyBase* property)
+  : mProperty(static_cast<SceneGraph::AnimatableProperty<PropertyType>*>(property)) // we know the type
   {
   }
 
@@ -171,39 +164,37 @@ public:
    * Read access to the property.
    * @param [in] bufferIndex The current update buffer index.
    */
-  float Get( BufferIndex bufferIndex ) const
+  float Get(BufferIndex bufferIndex) const
   {
-    DALI_ASSERT_DEBUG( nullptr != mProperty && "PropertyComponentAccessorY::Get() mProperty was nullptr" );
-    return mProperty->Get( bufferIndex ).y; // Y Component only!
+    DALI_ASSERT_DEBUG(nullptr != mProperty && "PropertyComponentAccessorY::Get() mProperty was nullptr");
+    return mProperty->Get(bufferIndex).y; // Y Component only!
   }
 
   /**
    * @copydoc SceneGraph::AnimatableProperty<float>::Set()
    */
-  void Set( BufferIndex bufferIndex, float value ) const
+  void Set(BufferIndex bufferIndex, float value) const
   {
-    DALI_ASSERT_DEBUG( nullptr != mProperty && "PropertyComponentAccessorY::Set() mProperty was nullptr" );
-    mProperty->SetY( bufferIndex, value );
+    DALI_ASSERT_DEBUG(nullptr != mProperty && "PropertyComponentAccessorY::Set() mProperty was nullptr");
+    mProperty->SetY(bufferIndex, value);
   }
 
   /**
    * @copydoc SceneGraph::AnimatableProperty<float>::Bake()
    */
-  void Bake( BufferIndex bufferIndex, float value ) const
+  void Bake(BufferIndex bufferIndex, float value) const
   {
-    DALI_ASSERT_DEBUG( nullptr != mProperty && "PropertyComponentAccessorY::Bake() mProperty was nullptr" );
-    mProperty->BakeY( bufferIndex, value );
+    DALI_ASSERT_DEBUG(nullptr != mProperty && "PropertyComponentAccessorY::Bake() mProperty was nullptr");
+    mProperty->BakeY(bufferIndex, value);
   }
 
 private:
-
   // Undefined
-  PropertyComponentAccessorY() = delete;
+  PropertyComponentAccessorY()                                           = delete;
   PropertyComponentAccessorY(const PropertyComponentAccessorY& property) = delete;
   PropertyComponentAccessorY& operator=(const PropertyComponentAccessorY& rhs) = delete;
 
 private:
-
   SceneGraph::AnimatableProperty<PropertyType>* mProperty; ///< The real property
 };
 
@@ -211,17 +202,16 @@ private:
  * A wrapper class for getting/setting a float component of another property.
  * Animators use this instead of accessing properties directly.
  */
-template < typename PropertyType >
+template<typename PropertyType>
 class PropertyComponentAccessorZ
 {
 public:
-
   /**
    * Create a property component.
    * @param [in] property The property which holds a float component.
    */
-  PropertyComponentAccessorZ( SceneGraph::PropertyBase* property )
-  : mProperty( static_cast< SceneGraph::AnimatableProperty<PropertyType>* >(property) ) // we know the type
+  PropertyComponentAccessorZ(SceneGraph::PropertyBase* property)
+  : mProperty(static_cast<SceneGraph::AnimatableProperty<PropertyType>*>(property)) // we know the type
   {
   }
 
@@ -260,39 +250,37 @@ public:
    * Read access to the property.
    * @param [in] bufferIndex The current update buffer index.
    */
-  float Get( BufferIndex bufferIndex ) const
+  float Get(BufferIndex bufferIndex) const
   {
-    DALI_ASSERT_DEBUG( nullptr != mProperty && "PropertyComponentAccessorZ::Get() mProperty was nullptr" );
-    return mProperty->Get( bufferIndex ).z; // Z Component only!
+    DALI_ASSERT_DEBUG(nullptr != mProperty && "PropertyComponentAccessorZ::Get() mProperty was nullptr");
+    return mProperty->Get(bufferIndex).z; // Z Component only!
   }
 
   /**
    * @copydoc SceneGraph::AnimatableProperty<float>::Set()
    */
-  void Set( BufferIndex bufferIndex, float value ) const
+  void Set(BufferIndex bufferIndex, float value) const
   {
-    DALI_ASSERT_DEBUG( nullptr != mProperty && "PropertyComponentAccessorZ::Set() mProperty was nullptr" );
-    mProperty->SetZ( bufferIndex, value );
+    DALI_ASSERT_DEBUG(nullptr != mProperty && "PropertyComponentAccessorZ::Set() mProperty was nullptr");
+    mProperty->SetZ(bufferIndex, value);
   }
 
   /**
    * @copydoc SceneGraph::AnimatableProperty<float>::Bake()
    */
-  void Bake( BufferIndex bufferIndex, float value ) const
+  void Bake(BufferIndex bufferIndex, float value) const
   {
-    DALI_ASSERT_DEBUG( nullptr != mProperty && "PropertyComponentAccessorZ::Bake() mProperty was nullptr" );
-    mProperty->BakeZ( bufferIndex, value );
+    DALI_ASSERT_DEBUG(nullptr != mProperty && "PropertyComponentAccessorZ::Bake() mProperty was nullptr");
+    mProperty->BakeZ(bufferIndex, value);
   }
 
 private:
-
   // Undefined
-  PropertyComponentAccessorZ() = delete;
+  PropertyComponentAccessorZ()                                           = delete;
   PropertyComponentAccessorZ(const PropertyComponentAccessorZ& property) = delete;
   PropertyComponentAccessorZ& operator=(const PropertyComponentAccessorZ& rhs) = delete;
 
 private:
-
   SceneGraph::AnimatableProperty<PropertyType>* mProperty; ///< The real property
 };
 
@@ -300,17 +288,16 @@ private:
  * A wrapper class for getting/setting a float component of another property.
  * Animators use this instead of accessing properties directly.
  */
-template < typename PropertyType >
+template<typename PropertyType>
 class PropertyComponentAccessorW
 {
 public:
-
   /**
    * Create a property component.
    * @param [in] property The property which holds a float component.
    */
-  PropertyComponentAccessorW( SceneGraph::PropertyBase* property )
-  : mProperty( static_cast< SceneGraph::AnimatableProperty<PropertyType>* >(property) ) // we know the type
+  PropertyComponentAccessorW(SceneGraph::PropertyBase* property)
+  : mProperty(static_cast<SceneGraph::AnimatableProperty<PropertyType>*>(property)) // we know the type
   {
   }
 
@@ -349,41 +336,38 @@ public:
    * Read access to the property.
    * @param [in] bufferIndex The current update buffer index.
    */
-  float Get( BufferIndex bufferIndex ) const
+  float Get(BufferIndex bufferIndex) const
   {
-    DALI_ASSERT_DEBUG( nullptr != mProperty && "PropertyComponentAccessorW::Get() mProperty was nullptr" );
-    return mProperty->Get( bufferIndex ).w; // W Component only!
+    DALI_ASSERT_DEBUG(nullptr != mProperty && "PropertyComponentAccessorW::Get() mProperty was nullptr");
+    return mProperty->Get(bufferIndex).w; // W Component only!
   }
 
   /**
    * @copydoc SceneGraph::AnimatableProperty<float>::Set()
    */
-  void Set( BufferIndex bufferIndex, float value ) const
+  void Set(BufferIndex bufferIndex, float value) const
   {
-    DALI_ASSERT_DEBUG( nullptr != mProperty && "PropertyComponentAccessorW::Set() mProperty was nullptr" );
-    mProperty->SetW( bufferIndex, value );
+    DALI_ASSERT_DEBUG(nullptr != mProperty && "PropertyComponentAccessorW::Set() mProperty was nullptr");
+    mProperty->SetW(bufferIndex, value);
   }
 
   /**
    * @copydoc SceneGraph::AnimatableProperty<float>::Bake()
    */
-  void Bake( BufferIndex bufferIndex, float value ) const
+  void Bake(BufferIndex bufferIndex, float value) const
   {
-    DALI_ASSERT_DEBUG( nullptr != mProperty && "PropertyComponentAccessorW::Bake() mProperty was nullptr" );
-    mProperty->BakeW( bufferIndex, value );
+    DALI_ASSERT_DEBUG(nullptr != mProperty && "PropertyComponentAccessorW::Bake() mProperty was nullptr");
+    mProperty->BakeW(bufferIndex, value);
   }
 
 private:
-
   // Undefined
-  PropertyComponentAccessorW() = delete;
+  PropertyComponentAccessorW()                                           = delete;
   PropertyComponentAccessorW(const PropertyComponentAccessorW& property) = delete;
   PropertyComponentAccessorW& operator=(const PropertyComponentAccessorW& rhs) = delete;
 
 private:
-
   SceneGraph::AnimatableProperty<PropertyType>* mProperty; ///< The real property
-
 };
 
 } // namespace Internal

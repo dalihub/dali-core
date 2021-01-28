@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PINCH_GESTURE_EVENT_PROCESSOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,16 +19,14 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/events/pinch-gesture/pinch-gesture-detector-impl.h>
 #include <dali/internal/event/events/gesture-processor.h>
+#include <dali/internal/event/events/pinch-gesture/pinch-gesture-detector-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 class Scene;
 class Stage;
 
@@ -47,7 +45,6 @@ struct PinchGestureEvent;
 class PinchGestureProcessor : public GestureProcessor, public RecognizerObserver<PinchGestureEvent>
 {
 public:
-
   /**
    * Create a pinch gesture processor.
    */
@@ -59,31 +56,30 @@ public:
   ~PinchGestureProcessor() override;
 
 public: // To be called by GestureEventProcessor
-
   /**
    * This method sets the minimum distance to start a pinch
    * @param[in] value The distance in pixels
    */
-  void SetMinimumPinchDistance( float value );
+  void SetMinimumPinchDistance(float value);
 
   /**
    * Sets the minimum touch events required before a pinch can be started
    * @param[in] value The number of touch events
    */
-  void SetMinimumTouchEvents( uint32_t value );
+  void SetMinimumTouchEvents(uint32_t value);
 
   /**
    * Sets the minimum touch events required after a pinch started
    * @param[in] value The number of touch events
    */
-  void SetMinimumTouchEventsAfterStart( uint32_t value );
+  void SetMinimumTouchEventsAfterStart(uint32_t value);
 
   /**
    * This method is called whenever a pinch gesture event occurs.
    * @param[in] scene The scene the pinch gesture event occurs in.
    * @param[in] pinchEvent The event that has occurred.
    */
-  void Process( Scene& scene, const PinchGestureEvent& pinchEvent ) override;
+  void Process(Scene& scene, const PinchGestureEvent& pinchEvent) override;
 
   /**
    * Adds a gesture detector to this gesture processor.
@@ -108,13 +104,11 @@ public: // To be called by GestureEventProcessor
   void GestureDetectorUpdated(PinchGestureDetector* gestureDetector);
 
 private:
-
   // Undefined
   PinchGestureProcessor(const PinchGestureProcessor&);
   PinchGestureProcessor& operator=(const PinchGestureProcessor& rhs);
 
 private:
-
   // GestureProcessor overrides
 
   /**
@@ -125,22 +119,21 @@ private:
   /**
    * @copydoc GestureProcessor::CheckGestureDetector()
    */
-  bool CheckGestureDetector( GestureDetector* detector, Actor* actor ) override;
+  bool CheckGestureDetector(GestureDetector* detector, Actor* actor) override;
 
   /**
    * @copydoc GestureProcessor::EmitGestureSignal()
    */
-  void EmitGestureSignal( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates ) override;
+  void EmitGestureSignal(Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates) override;
 
 private:
-
   PinchGestureDetectorContainer mPinchGestureDetectors;
-  GestureDetectorContainer mCurrentPinchEmitters;
-  RenderTaskPtr mCurrentRenderTask;
+  GestureDetectorContainer      mCurrentPinchEmitters;
+  RenderTaskPtr                 mCurrentRenderTask;
 
   const PinchGestureEvent* mCurrentPinchEvent; ///< Pointer to current PinchEvent, used when calling ProcessAndEmit()
 
-  float mMinimumPinchDistance;
+  float    mMinimumPinchDistance;
   uint32_t mMinimumTouchEvents;
   uint32_t mMinimumTouchEventsAfterStart;
 };

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_PAN_GESTURE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,31 +20,27 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/threading/mutex.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/internal/event/events/pan-gesture/pan-gesture-impl.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/gestures/gesture-properties.h>
+#include <dali/public-api/common/vector-wrapper.h>
 
 namespace Dali
 {
-
 class PanGesture;
 
 namespace Internal
 {
-
 struct PanGestureProfiling;
 
 namespace SceneGraph
 {
-
 /**
  * The latest pan gesture information is stored in this scene object.
  */
 class PanGesture : public PropertyOwner
 {
 public:
-
   enum PredictionMode
   {
     PREDICTION_NONE = 0,
@@ -54,16 +50,16 @@ public:
 
   enum SmoothingMode
   {
-    SMOOTHING_NONE,           // No smoothing.
-    SMOOTHING_LAST_VALUE,     // Smooth between last value and latest value.
-    SMOOTHING_MULTI_TAP,      // Uses multitap smoothing, only available with Prediction mode 2.
+    SMOOTHING_NONE,       // No smoothing.
+    SMOOTHING_LAST_VALUE, // Smooth between last value and latest value.
+    SMOOTHING_MULTI_TAP,  // Uses multitap smoothing, only available with Prediction mode 2.
   };
 
   static const PredictionMode DEFAULT_PREDICTION_MODE;
-  static const int NUM_PREDICTION_MODES;
+  static const int            NUM_PREDICTION_MODES;
 
   static const SmoothingMode DEFAULT_SMOOTHING_MODE;
-  static const int NUM_SMOOTHING_MODES;
+  static const int           NUM_SMOOTHING_MODES;
 
   // Latest Pan Information
 
@@ -87,13 +83,13 @@ public:
       /**
        * Assignment operator
        */
-      Info& operator=( const Info& rhs )
+      Info& operator=(const Info& rhs)
       {
-        if( this != &rhs )
+        if(this != &rhs)
         {
-          velocity = rhs.velocity;
+          velocity     = rhs.velocity;
           displacement = rhs.displacement;
-          position = rhs.position;
+          position     = rhs.position;
         }
 
         return *this;
@@ -110,36 +106,36 @@ public:
      * Constructor
      */
     PanInfo()
-    : time( 0u ),
-      state( GestureState::CLEAR ),
-      read( true )
+    : time(0u),
+      state(GestureState::CLEAR),
+      read(true)
     {
     }
 
     /**
      * Copy constructor
      */
-    PanInfo( const PanInfo& rhs )
-    : time( rhs.time ),
-      state( rhs.state ),
-      local( rhs.local ),
-      screen( rhs.screen ),
-      read( true )
+    PanInfo(const PanInfo& rhs)
+    : time(rhs.time),
+      state(rhs.state),
+      local(rhs.local),
+      screen(rhs.screen),
+      read(true)
     {
     }
 
     /**
      * Assignment operator
      */
-    PanInfo& operator=( const PanInfo& rhs )
+    PanInfo& operator=(const PanInfo& rhs)
     {
-      if( this != &rhs )
+      if(this != &rhs)
       {
-        time = rhs.time;
-        state = rhs.state;
-        local = rhs.local;
+        time   = rhs.time;
+        state  = rhs.state;
+        local  = rhs.local;
         screen = rhs.screen;
-        read = rhs.read;
+        read   = rhs.read;
       }
 
       return *this;
@@ -149,27 +145,27 @@ public:
      * Assignment operator
      * @param[in] gesture A Dali::Gesture
      */
-    PanInfo& operator=( const Internal::PanGesture& rhs )
+    PanInfo& operator=(const Internal::PanGesture& rhs)
     {
-      time = rhs.GetTime();
+      time  = rhs.GetTime();
       state = rhs.GetState();
 
-      local.velocity = rhs.GetVelocity();
+      local.velocity     = rhs.GetVelocity();
       local.displacement = rhs.GetDisplacement();
-      local.position = rhs.GetPosition();
+      local.position     = rhs.GetPosition();
 
-      screen.velocity = rhs.GetScreenVelocity();
+      screen.velocity     = rhs.GetScreenVelocity();
       screen.displacement = rhs.GetScreenDisplacement();
-      screen.position = rhs.GetScreenPosition();
+      screen.position     = rhs.GetScreenPosition();
 
       return *this;
     }
 
     // Data
-    unsigned int time;
-    GestureState state;
-    Info local;
-    Info screen;
+    unsigned int  time;
+    GestureState  state;
+    Info          local;
+    Info          screen;
     volatile bool read;
   };
 
@@ -181,7 +177,6 @@ private:
   static const unsigned int PAN_GESTURE_HISTORY = 30u;
 
 public:
-
   /**
    * Create a new PanGesture
    */
@@ -196,7 +191,7 @@ public:
    * Adds a PanGesture to the internal circular-buffer waiting to be handled by UpdateProperties.
    * @param[in]  gesture  The latest pan gesture.
    */
-  void AddGesture( const Internal::PanGesture& gesture );
+  void AddGesture(const Internal::PanGesture& gesture);
 
   /**
    * @brief Removes pan events from the history that are older than maxAge, leaving at least minEvents
@@ -222,14 +217,14 @@ public:
    * @param[in,out] gesture     Pass in current gesture, outputs result of blend.
    * @param[in]     lastGesture Pass in gesture to blend between.
    */
-  void BlendPoints( PanInfo& gesture, PanInfo& lastGesture, float blendValue );
+  void BlendPoints(PanInfo& gesture, PanInfo& lastGesture, float blendValue);
 
   /**
    * Called by the update manager so that we can update the value of our properties.
    * @param[in]  nextRenderTime  The estimated time of the next render (in milliseconds).
    * @return true, if properties were updated.
    */
-  bool UpdateProperties( unsigned int lastRenderTime, unsigned int nextRenderTime );
+  bool UpdateProperties(unsigned int lastRenderTime, unsigned int nextRenderTime);
 
   /**
    * Retrieves a reference to the panning flag property.
@@ -327,56 +322,56 @@ public:
    *
    * @param[in] value True = use actual times, False = use perfect values
    */
-  void SetUseActualTimes( bool value );
+  void SetUseActualTimes(bool value);
 
   /**
    * @brief Sets the interpolation time range (ms) of past points to use (with weights) when interpolating.
    *
    * @param[in] value Time range in ms
    */
-  void SetInterpolationTimeRange( int value );
+  void SetInterpolationTimeRange(int value);
 
   /**
    * @brief Sets whether to use scalar only prediction, which when enabled, ignores acceleration.
    *
    * @param[in] value True = use scalar prediction only
    */
-  void SetScalarOnlyPredictionEnabled( bool value );
+  void SetScalarOnlyPredictionEnabled(bool value);
 
   /**
    * @brief Sets whether to use two point prediction. This combines two interpolated points to get more steady acceleration and velocity values.
    *
    * @param[in] value True = use two point prediction
    */
-  void SetTwoPointPredictionEnabled( bool value );
+  void SetTwoPointPredictionEnabled(bool value);
 
   /**
    * @brief Sets the time in the past to interpolate the second point when using two point interpolation.
    *
    * @param[in] value Time in past in ms
    */
-  void SetTwoPointInterpolatePastTime( int value );
+  void SetTwoPointInterpolatePastTime(int value);
 
   /**
    * @brief Sets the two point velocity bias. This is the ratio of first and second points to use for velocity.
    *
    * @param[in] value 0.0f = 100% first point. 1.0f = 100% of second point.
    */
-  void SetTwoPointVelocityBias( float value );
+  void SetTwoPointVelocityBias(float value);
 
   /**
    * @brief Sets the two point acceleration bias. This is the ratio of first and second points to use for acceleration.
    *
    * @param[in] value 0.0f = 100% first point. 1.0f = 100% of second point.
    */
-  void SetTwoPointAccelerationBias( float value );
+  void SetTwoPointAccelerationBias(float value);
 
   /**
    * @brief Sets the range of time (ms) of points in the history to perform multitap smoothing with (if enabled).
    *
    * @param[in] value Time in past in ms
    */
-  void SetMultitapSmoothingRange( int value );
+  void SetMultitapSmoothingRange(int value);
 
   /**
    * Called to provide pan-gesture profiling information.
@@ -387,10 +382,9 @@ public:
    * Reset default properties, custom ones not supported due to this being the only object in scene side
    * @param updateBufferIndex index to use
    */
-  void ResetDefaultProperties( BufferIndex updateBufferIndex );
+  void ResetDefaultProperties(BufferIndex updateBufferIndex);
 
 private:
-
   /**
    * Protected constructor.
    */
@@ -400,7 +394,6 @@ private:
   PanGesture(const PanGesture&);
 
 private:
-
   // Struct to keep pairs of local and screen data together.
   // TODO: This can encapsulate some functionality also.
   using RelativeVectors = struct
@@ -417,7 +410,7 @@ private:
    * @param[in]  lastVSyncTime The time of the last render (in milliseconds)
    * @param[in]  nextVSyncTime The estimated time of the next render (in milliseconds)
    */
-  bool NewAlgorithm( unsigned int lastVSyncTime, unsigned int nextVSyncTime );
+  bool NewAlgorithm(unsigned int lastVSyncTime, unsigned int nextVSyncTime);
 
   /**
    * Gets the (absolute) time difference between two times.
@@ -429,7 +422,7 @@ private:
    * @param[in]  minimumDelta The smallest amount the difference can become
    * @param[in]  overrideDifference The time difference to return if using perfect times
    */
-  inline float GetDivisibleTimeDifference( int timeA, int timeB, float minimumDelta, float overrideDifference );
+  inline float GetDivisibleTimeDifference(int timeA, int timeB, float minimumDelta, float overrideDifference);
 
   /**
    * This limits the change currentAcceleration can have over lastAcceleration by the specified changeLimit value.
@@ -438,7 +431,7 @@ private:
    * @param[in]  lastAcceleration The acceleration to limit against
    * @param[in]  changeLimit The maximum change (in either direction)
    */
-  void LimitAccelerationChange( RelativeVectors& currentAcceleration, RelativeVectors& lastAcceleration, float changeLimit );
+  void LimitAccelerationChange(RelativeVectors& currentAcceleration, RelativeVectors& lastAcceleration, float changeLimit);
 
   /**
    * Reads all events received this frame into a linear buffer.
@@ -459,8 +452,7 @@ private:
    * @param[out] justStarted Set to true if we are now starting a new gesture
    * @param[out] justFinished Set to true if we are now finishing a gesture
    */
-  bool InputRateConversion( PanInfo& rateConvertedGesture, unsigned int eventsThisFrame,
-      unsigned int currentFrameTime, unsigned int lastFrameTime, bool& justStarted, bool& justFinished );
+  bool InputRateConversion(PanInfo& rateConvertedGesture, unsigned int eventsThisFrame, unsigned int currentFrameTime, unsigned int lastFrameTime, bool& justStarted, bool& justFinished);
 
   /**
    * Generates an interpolated point at the specified point in time.
@@ -474,8 +466,7 @@ private:
    * @param[in]  outputTimeGranularity Time difference between output point (typically 60Hz)
    * @param[in]  eraseUnused Set to true to clean up any history not used by the function
    */
-  bool InterpolatePoint( PanInfoHistory& history, unsigned int currentTime, unsigned int targetTime, unsigned int range,
-      PanInfo& outPoint, RelativeVectors& acceleration, int outputTimeGranularity, bool eraseUnused );
+  bool InterpolatePoint(PanInfoHistory& history, unsigned int currentTime, unsigned int targetTime, unsigned int range, PanInfo& outPoint, RelativeVectors& acceleration, int outputTimeGranularity, bool eraseUnused);
 
   /**
    * Predicts a point in the future, based on the supplied point and acceleration.
@@ -488,11 +479,9 @@ private:
    * @param[in]  previousFrameTime Time of the last rendered frame
    * @param[in]  noPreviousData Set to true if we are just starting a gesture
    */
-  void PredictionMode2( PanInfo& startPoint, RelativeVectors& accelerationToUse,
-      PanInfo& predictedPoint, unsigned int currentFrameTime, unsigned int previousFrameTime, bool noPreviousData );
+  void PredictionMode2(PanInfo& startPoint, RelativeVectors& accelerationToUse, PanInfo& predictedPoint, unsigned int currentFrameTime, unsigned int previousFrameTime, bool noPreviousData);
 
 private:
-
   // Undefined
   PanGesture& operator=(const PanGesture&);
 
@@ -500,16 +489,16 @@ private:
   struct FrameGestureInfo
   {
     PanGesture::PanInfo frameGesture;
-    float acceleration;
-    unsigned int eventsThisFrame;
-    bool justStarted;
-    bool justFinished;
+    float               acceleration;
+    unsigned int        eventsThisFrame;
+    bool                justStarted;
+    bool                justFinished;
 
     FrameGestureInfo()
-    : acceleration( 0.0f ),
-      eventsThisFrame( 0 ),
-      justStarted( false ),
-      justFinished( false )
+    : acceleration(0.0f),
+      eventsThisFrame(0),
+      justStarted(false),
+      justFinished(false)
     {
     }
   };
@@ -519,17 +508,16 @@ private:
    * @param[out] info Written to with information about gestures read this frame.
    * @param[in] currentTimestamp The time of this frame.
    */
-  bool ReadGestures( FrameGestureInfo& info, unsigned int currentTimestamp );
+  bool ReadGestures(FrameGestureInfo& info, unsigned int currentTimestamp);
 
   /**
    * Reads gestures from input and resamples data, builds history.
    * @param[out] info Written to with information about gestures read this frame.
    * @param[in] currentTimestamp The time of this frame.
    */
-  bool ReadAndResampleGestures( FrameGestureInfo& info, unsigned int currentTimestamp );
+  bool ReadAndResampleGestures(FrameGestureInfo& info, unsigned int currentTimestamp);
 
 private:
-
   // Properties
   GesturePropertyBool    mPanning;            ///< panning flag
   GesturePropertyVector2 mScreenPosition;     ///< screenPosition
@@ -539,48 +527,48 @@ private:
   GesturePropertyVector2 mLocalDisplacement;  ///< localDisplacement
   GesturePropertyVector2 mLocalVelocity;      ///< localVelocity
 
-  PanInfoHistory mPanHistory;
-  PanInfoHistory mPredictionHistory;
-  PanInfo mGestures[PAN_GESTURE_HISTORY];     ///< Circular buffer storing the 4 most recent gestures.
-  PanInfo mReadGestures[PAN_GESTURE_HISTORY]; ///< Linear buffer storing the most recent gestures (to reduce read lock time).
-  PanInfo mLastGesture;                       ///< The last gesture. (last update frame).
-  PanInfo mTargetGesture;                     ///< The most recent input gesture, if the current used gesture does not match.
-  PanInfo mLastUnmodifiedGesture;             ///< The last gesture before any processing was done on it.
-  PanInfo mLastSecondInterpolatedPoint;       ///< Stores the last second interpolated point we generated.
-  PanInfo mLastFrameReadGesture;              ///< Stores the last gesture read.
-  PanInfo mLastPredictedPoint;                ///< Stores the last predicted point we generated.
-  RelativeVectors mLastAcceleration;          ///< Stores the acceleration value from the acceleration limiting last frame.
-  RelativeVectors mLastInterpolatedAcceleration;  ///< Stores the second interpolated point acceleration value from the last frame.
-  RelativeVectors mLastInitialAcceleration;   ///< Stores the initial acceleration value from the last frame.
+  PanInfoHistory  mPanHistory;
+  PanInfoHistory  mPredictionHistory;
+  PanInfo         mGestures[PAN_GESTURE_HISTORY];     ///< Circular buffer storing the 4 most recent gestures.
+  PanInfo         mReadGestures[PAN_GESTURE_HISTORY]; ///< Linear buffer storing the most recent gestures (to reduce read lock time).
+  PanInfo         mLastGesture;                       ///< The last gesture. (last update frame).
+  PanInfo         mTargetGesture;                     ///< The most recent input gesture, if the current used gesture does not match.
+  PanInfo         mLastUnmodifiedGesture;             ///< The last gesture before any processing was done on it.
+  PanInfo         mLastSecondInterpolatedPoint;       ///< Stores the last second interpolated point we generated.
+  PanInfo         mLastFrameReadGesture;              ///< Stores the last gesture read.
+  PanInfo         mLastPredictedPoint;                ///< Stores the last predicted point we generated.
+  RelativeVectors mLastAcceleration;                  ///< Stores the acceleration value from the acceleration limiting last frame.
+  RelativeVectors mLastInterpolatedAcceleration;      ///< Stores the second interpolated point acceleration value from the last frame.
+  RelativeVectors mLastInitialAcceleration;           ///< Stores the initial acceleration value from the last frame.
 
-  volatile unsigned int mWritePosition;       ///< The next PanInfo buffer to write to. (starts at 0).
-  unsigned int mReadPosition;                 ///< The next PanInfo buffer to read. (starts at 0).
-  bool mNotAtTarget;                          ///< Keeps track of if the last gesture used was the most recent received.
-  bool mInGesture;                            ///< True if the gesture is currently being handled i.e. between STARTED <-> FINISHED/CANCELLED.
-  bool mPredictionAmountOverridden;
-  bool mSmoothingAmountOverridden;
+  volatile unsigned int mWritePosition; ///< The next PanInfo buffer to write to. (starts at 0).
+  unsigned int          mReadPosition;  ///< The next PanInfo buffer to read. (starts at 0).
+  bool                  mNotAtTarget;   ///< Keeps track of if the last gesture used was the most recent received.
+  bool                  mInGesture;     ///< True if the gesture is currently being handled i.e. between STARTED <-> FINISHED/CANCELLED.
+  bool                  mPredictionAmountOverridden;
+  bool                  mSmoothingAmountOverridden;
 
-  PanGestureProfiling* mProfiling;            ///< NULL unless pan-gesture profiling information is required.
-  Dali::Mutex mMutex;                         ///< Mutex to lock access.
+  PanGestureProfiling* mProfiling; ///< NULL unless pan-gesture profiling information is required.
+  Dali::Mutex          mMutex;     ///< Mutex to lock access.
 
   // Environment variables:
 
-  PredictionMode mPredictionMode;             ///< The pan gesture prediction mode
-  unsigned int mPredictionAmount;             ///< how far into future to predict in milliseconds
-  unsigned int mCurrentPredictionAmount;      ///< the current prediction amount used by the prediction algorithm
-  unsigned int mMaxPredictionAmount;          ///< the maximum prediction amount used by the prediction algorithm
-  unsigned int mMinPredictionAmount;          ///< the minimum prediction amount used by the prediction algorithm
-  unsigned int mPredictionAmountAdjustment;   ///< the prediction amount to adjust in milliseconds when pan velocity changes
-  SmoothingMode mSmoothingMode;               ///< The pan gesture prediction mode
-  float         mSmoothingAmount;             ///< How much smoothing to apply [0.0f,1.0f]
-  bool mUseActualTimes;                       ///< Disable to optionally override actual times if they make results worse.
-  int mInterpolationTimeRange;                ///< Time into past history (ms) to use points to interpolate the first point.
-  bool mScalarOnlyPredictionEnabled;          ///< If enabled, prediction is done using velocity alone (no integration or acceleration).
-  bool mTwoPointPredictionEnabled;            ///< If enabled, a second interpolated point is predicted and combined with the first to get more stable values.
-  int mTwoPointPastInterpolateTime;           ///< The target time in the past to generate the second interpolated point.
-  float mTwoPointVelocityBias;                ///< The ratio of first and second interpolated points to use for velocity. 0.0f = 100% of first point. 1.0f = 100% of second point.
-  float mTwoPointAccelerationBias;            ///< The ratio of first and second interpolated points to use for acceleration. 0.0f = 100% of first point. 1.0f = 100% of second point.
-  int mMultiTapSmoothingRange;                ///< The range in time (ms) of points in the history to smooth the final output against.
+  PredictionMode mPredictionMode;              ///< The pan gesture prediction mode
+  unsigned int   mPredictionAmount;            ///< how far into future to predict in milliseconds
+  unsigned int   mCurrentPredictionAmount;     ///< the current prediction amount used by the prediction algorithm
+  unsigned int   mMaxPredictionAmount;         ///< the maximum prediction amount used by the prediction algorithm
+  unsigned int   mMinPredictionAmount;         ///< the minimum prediction amount used by the prediction algorithm
+  unsigned int   mPredictionAmountAdjustment;  ///< the prediction amount to adjust in milliseconds when pan velocity changes
+  SmoothingMode  mSmoothingMode;               ///< The pan gesture prediction mode
+  float          mSmoothingAmount;             ///< How much smoothing to apply [0.0f,1.0f]
+  bool           mUseActualTimes;              ///< Disable to optionally override actual times if they make results worse.
+  int            mInterpolationTimeRange;      ///< Time into past history (ms) to use points to interpolate the first point.
+  bool           mScalarOnlyPredictionEnabled; ///< If enabled, prediction is done using velocity alone (no integration or acceleration).
+  bool           mTwoPointPredictionEnabled;   ///< If enabled, a second interpolated point is predicted and combined with the first to get more stable values.
+  int            mTwoPointPastInterpolateTime; ///< The target time in the past to generate the second interpolated point.
+  float          mTwoPointVelocityBias;        ///< The ratio of first and second interpolated points to use for velocity. 0.0f = 100% of first point. 1.0f = 100% of second point.
+  float          mTwoPointAccelerationBias;    ///< The ratio of first and second interpolated points to use for acceleration. 0.0f = 100% of first point. 1.0f = 100% of second point.
+  int            mMultiTapSmoothingRange;      ///< The range in time (ms) of points in the history to smooth the final output against.
 };
 
 } // namespace SceneGraph

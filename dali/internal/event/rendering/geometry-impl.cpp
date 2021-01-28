@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,51 +27,50 @@ namespace Dali
 {
 namespace Internal
 {
-
 GeometryPtr Geometry::New()
 {
-  GeometryPtr geometry( new Geometry() );
+  GeometryPtr geometry(new Geometry());
   geometry->Initialize();
   return geometry;
 }
 
-uint32_t Geometry::AddVertexBuffer( VertexBuffer& vertexBuffer )
+uint32_t Geometry::AddVertexBuffer(VertexBuffer& vertexBuffer)
 {
-  mVertexBuffers.push_back( &vertexBuffer );
-  SceneGraph::AttachVertexBufferMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, *vertexBuffer.GetRenderObject() );
-  return static_cast<uint32_t>( mVertexBuffers.size() - 1u );
+  mVertexBuffers.push_back(&vertexBuffer);
+  SceneGraph::AttachVertexBufferMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject, *vertexBuffer.GetRenderObject());
+  return static_cast<uint32_t>(mVertexBuffers.size() - 1u);
 }
 
 uint32_t Geometry::GetNumberOfVertexBuffers() const
 {
-  return static_cast<uint32_t>( mVertexBuffers.size() );
+  return static_cast<uint32_t>(mVertexBuffers.size());
 }
 
-void Geometry::RemoveVertexBuffer( uint32_t index )
+void Geometry::RemoveVertexBuffer(uint32_t index)
 {
-  const Render::VertexBuffer& renderVertexBuffer = static_cast<const Render::VertexBuffer&>( *(mVertexBuffers[index]->GetRenderObject()) );
-  SceneGraph::RemoveVertexBufferMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, renderVertexBuffer );
+  const Render::VertexBuffer& renderVertexBuffer = static_cast<const Render::VertexBuffer&>(*(mVertexBuffers[index]->GetRenderObject()));
+  SceneGraph::RemoveVertexBufferMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject, renderVertexBuffer);
 
-  mVertexBuffers.erase( mVertexBuffers.begin() + index );
+  mVertexBuffers.erase(mVertexBuffers.begin() + index);
 }
 
-void Geometry::SetIndexBuffer( const uint16_t* indices, uint32_t count )
+void Geometry::SetIndexBuffer(const uint16_t* indices, uint32_t count)
 {
   Dali::Vector<uint16_t> indexData;
-  if( indices && count )
+  if(indices && count)
   {
-    indexData.Resize( count );
-    std::copy( indices, indices + count, indexData.Begin() );
+    indexData.Resize(count);
+    std::copy(indices, indices + count, indexData.Begin());
   }
 
-  SceneGraph::SetIndexBufferMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, indexData );
+  SceneGraph::SetIndexBufferMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject, indexData);
 }
 
-void Geometry::SetType( Dali::Geometry::Type geometryType )
+void Geometry::SetType(Dali::Geometry::Type geometryType)
 {
-  if( geometryType != mType )
+  if(geometryType != mType)
   {
-    SceneGraph::SetGeometryTypeMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject, geometryType );
+    SceneGraph::SetGeometryTypeMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject, geometryType);
 
     mType = geometryType;
   }
@@ -88,8 +87,8 @@ const Render::Geometry* Geometry::GetRenderObject() const
 }
 
 Geometry::Geometry()
-: mEventThreadServices( EventThreadServices::Get() ),
-  mRenderObject( nullptr ),
+: mEventThreadServices(EventThreadServices::Get()),
+  mRenderObject(nullptr),
   mType(Dali::Geometry::TRIANGLES)
 {
 }
@@ -97,15 +96,15 @@ Geometry::Geometry()
 void Geometry::Initialize()
 {
   mRenderObject = new Render::Geometry();
-  OwnerPointer< Render::Geometry > transferOwnership( mRenderObject );
-  AddGeometry( mEventThreadServices.GetUpdateManager(), transferOwnership );
+  OwnerPointer<Render::Geometry> transferOwnership(mRenderObject);
+  AddGeometry(mEventThreadServices.GetUpdateManager(), transferOwnership);
 }
 
 Geometry::~Geometry()
 {
-  if( EventThreadServices::IsCoreRunning() && mRenderObject )
+  if(EventThreadServices::IsCoreRunning() && mRenderObject)
   {
-    RemoveGeometry( mEventThreadServices.GetUpdateManager(), *mRenderObject );
+    RemoveGeometry(mEventThreadServices.GetUpdateManager(), *mRenderObject);
   }
 }
 

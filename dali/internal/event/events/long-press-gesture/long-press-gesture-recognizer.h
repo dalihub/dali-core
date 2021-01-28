@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_LONG_PRESS_GESTURE_RECOGNIZER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@
 
 namespace Dali
 {
-
 namespace Integration
 {
 struct TouchEvent;
@@ -36,7 +35,6 @@ struct TouchEvent;
 
 namespace Internal
 {
-
 struct LongPressGestureRequest;
 class CoreEventInterface;
 
@@ -48,7 +46,6 @@ class CoreEventInterface;
 class LongPressGestureRecognizer : public GestureRecognizer
 {
 public:
-
   using Observer = RecognizerObserver<LongPressGestureEvent>;
 
   /**
@@ -58,7 +55,7 @@ public:
    * @param[in] request     The long press gesture request.
    * @param[in] minimumHoldingTime The minimum holding time required in milliseconds.
    */
-  LongPressGestureRecognizer( Observer& observer, Vector2 screenSize, const LongPressGestureRequest& request, uint32_t minimumHoldingTime );
+  LongPressGestureRecognizer(Observer& observer, Vector2 screenSize, const LongPressGestureRequest& request, uint32_t minimumHoldingTime);
 
   /**
    * Virtual destructor.
@@ -66,7 +63,6 @@ public:
   ~LongPressGestureRecognizer() override;
 
 public:
-
   /**
    * @copydoc Dali::Internal::GestureDetector::SendEvent(const Integration::TouchEvent&)
    */
@@ -82,10 +78,9 @@ public:
    *
    * @param[in] value The time value in milliseconds
    */
-  void SetMinimumHoldingTime( uint32_t time );
+  void SetMinimumHoldingTime(uint32_t time);
 
 private:
-
   /**
    * Timer Callback
    * @return will return false; one-shot timer.
@@ -96,10 +91,9 @@ private:
    * Emits the long press gesture if all conditions are applicable.
    * @param[in] state The state of this gesture event.
    */
-  void EmitGesture( GestureState state );
+  void EmitGesture(GestureState state);
 
 private:
-
   // Reference to the gesture processor for this recognizer
   Observer& mObserver;
 
@@ -108,19 +102,19 @@ private:
    */
   enum State
   {
-    CLEAR,      ///< No gesture detected.
-    TOUCHED,    ///< User is touching the screen.
-    FAILED,     ///< Gesture has failed.
-    FINISHED    ///< Gesture has been detected and sent.
+    CLEAR,   ///< No gesture detected.
+    TOUCHED, ///< User is touching the screen.
+    FAILED,  ///< Gesture has failed.
+    FINISHED ///< Gesture has been detected and sent.
   };
 
   State mState; ///< The current state of the detector.
 
-  unsigned int mMinimumTouchesRequired;   ///< The minimum touches required before emitting a long press.
-  unsigned int mMaximumTouchesRequired;   ///< The maximum touches allowable. Any more and a long press is not emitted.
+  unsigned int mMinimumTouchesRequired; ///< The minimum touches required before emitting a long press.
+  unsigned int mMaximumTouchesRequired; ///< The maximum touches allowable. Any more and a long press is not emitted.
 
   std::map<int, Vector2> mTouchPositions; ///< A map with all the touch down positions.
-  uint32_t mTouchTime;               ///< The time we first pressed down.
+  uint32_t               mTouchTime;      ///< The time we first pressed down.
 
   uint32_t mTimerId;
 

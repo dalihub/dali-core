@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_MESSAGE_DISPATCHER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,11 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/render/renderers/render-renderer.h>
+#include <dali/internal/update/common/scene-graph-buffers.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
 class MessageBase;
@@ -36,7 +35,6 @@ class RenderTracker;
 
 namespace SceneGraph
 {
-
 class RenderManager;
 class RenderQueue;
 
@@ -46,11 +44,10 @@ class RenderQueue;
 class RenderMessageDispatcher
 {
 public:
-
   /**
    * Constructor
    */
-  RenderMessageDispatcher( RenderManager& renderManager, RenderQueue& renderQueue, const SceneGraphBuffers& buffers );
+  RenderMessageDispatcher(RenderManager& renderManager, RenderQueue& renderQueue, const SceneGraphBuffers& buffers);
 
   /**
    * Destructor
@@ -62,33 +59,32 @@ public:
    * @param[in] renderer The renderer to add.
    * @post renderer ownership is transferred.
    */
-  void AddRenderer( OwnerPointer< Render::Renderer >& renderer );
+  void AddRenderer(OwnerPointer<Render::Renderer>& renderer);
 
   /**
    * Remove a Renderer.
    * @param[in] renderer The renderer to remove.
    * @post renderer will be destroyed in the next Render.
    */
-  void RemoveRenderer( Render::Renderer& renderer );
+  void RemoveRenderer(Render::Renderer& renderer);
 
   /**
    * Add a Render tracker.
    * @param[in] renderTracker The render tracker to add.
    * @post ownership is transferred
    */
-  void AddRenderTracker( Render::RenderTracker& renderTracker );
+  void AddRenderTracker(Render::RenderTracker& renderTracker);
 
   /**
    * Remove a Render tracker.
    * @param[in] renderTracker The render tracker to add.
    * @post render tracker will be destroyed in the next Render pass.
    */
-  void RemoveRenderTracker( Render::RenderTracker& renderTracker );
+  void RemoveRenderTracker(Render::RenderTracker& renderTracker);
 
 private:
-
   RenderManager& mRenderManager;
-  RenderQueue& mRenderQueue;
+  RenderQueue&   mRenderQueue;
 
   const SceneGraphBuffers& mBuffers;
 };

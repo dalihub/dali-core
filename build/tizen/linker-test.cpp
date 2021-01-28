@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 
 #include "dali/public-api/dali-core.h"
 
-#include <cstdio>
 #include <stdarg.h>
+#include <cstdio>
 
 // Link with TET Test application, need to redefine TET functions
 void tet_infoline(const char* str)
@@ -34,7 +34,6 @@ void tet_printf(const char* str, ...)
   va_end(args);
 }
 
-
 #include "test-application.h"
 
 /*****************************************************************************
@@ -46,7 +45,7 @@ void tet_printf(const char* str, ...)
  * Also ensures TET Test Application is kept up-to-date.
  */
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
 #ifndef _ARCH_ARM_
   Dali::TestApplication application;

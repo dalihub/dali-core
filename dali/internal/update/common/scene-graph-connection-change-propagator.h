@@ -52,10 +52,11 @@ public:
     /**
      * Inform the observer of the object that the object is about to be destroyed
      */
-    virtual void ObservedObjectDestroyed(PropertyOwner& object){}
+    virtual void ObservedObjectDestroyed(PropertyOwner& object)
+    {
+    }
 
   protected:
-
     /**
      * Virtual destructor, no deletion through this interface
      */
@@ -98,7 +99,7 @@ public:
    * Inform the observers that the object is about to be destroyed
    * @param[in] object The connection owner
    */
-  void Destroy( PropertyOwner& object );
+  void Destroy(PropertyOwner& object);
 
 private:
   using Observers         = Dali::Vector<Observer*>;
@@ -107,9 +108,8 @@ private:
   Observers mObservers;
 };
 
-
-} // SceneGraph
-} // Internal
-} // Dali
+} // namespace SceneGraph
+} // namespace Internal
+} // namespace Dali
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_CONNECTION_CHANGE_PROPAGATOR_H

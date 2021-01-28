@@ -19,15 +19,13 @@
 #include <dali/internal/event/common/property-notification-manager.h>
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/common/property-notification-impl.h>
 #include <dali/internal/common/message.h>
+#include <dali/internal/event/common/property-notification-impl.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 PropertyNotificationManager* PropertyNotificationManager::New()
 {
   return new PropertyNotificationManager;
@@ -35,29 +33,29 @@ PropertyNotificationManager* PropertyNotificationManager::New()
 
 PropertyNotificationManager::~PropertyNotificationManager() = default;
 
-void PropertyNotificationManager::PropertyNotificationCreated( PropertyNotification& propertyNotification )
+void PropertyNotificationManager::PropertyNotificationCreated(PropertyNotification& propertyNotification)
 {
-  mPropertyNotifications.PushBack( &propertyNotification );
+  mPropertyNotifications.PushBack(&propertyNotification);
 }
 
-void PropertyNotificationManager::PropertyNotificationDestroyed( PropertyNotification& propertyNotification )
+void PropertyNotificationManager::PropertyNotificationDestroyed(PropertyNotification& propertyNotification)
 {
-  Dali::Vector< PropertyNotification* >::Iterator iter = std::find( mPropertyNotifications.Begin(), mPropertyNotifications.End(), &propertyNotification );
-  DALI_ASSERT_ALWAYS( iter != mPropertyNotifications.End() && "PropertyNotification not found" );
+  Dali::Vector<PropertyNotification*>::Iterator iter = std::find(mPropertyNotifications.Begin(), mPropertyNotifications.End(), &propertyNotification);
+  DALI_ASSERT_ALWAYS(iter != mPropertyNotifications.End() && "PropertyNotification not found");
 
-  mPropertyNotifications.Remove( iter );
+  mPropertyNotifications.Remove(iter);
 }
 
-void PropertyNotificationManager::NotifyProperty( SceneGraph::PropertyNotification* propertyNotification, bool validity )
+void PropertyNotificationManager::NotifyProperty(SceneGraph::PropertyNotification* propertyNotification, bool validity)
 {
-  Dali::Vector< PropertyNotification* >::Iterator iter = mPropertyNotifications.Begin();
-  const Dali::Vector< PropertyNotification* >::Iterator endIter = mPropertyNotifications.End();
+  Dali::Vector<PropertyNotification*>::Iterator       iter    = mPropertyNotifications.Begin();
+  const Dali::Vector<PropertyNotification*>::Iterator endIter = mPropertyNotifications.End();
 
   // walk the collection of PropertyNotifications
-  for( ; iter != endIter; ++iter )
+  for(; iter != endIter; ++iter)
   {
     // found one with the matching SceneGraph::PropertyNotification?
-    if( (*iter)->CompareSceneObject( propertyNotification ) )
+    if((*iter)->CompareSceneObject(propertyNotification))
     {
       // allow application to access the value that triggered this emit incase of NOTIFY_ON_CHANGED mode
       (*iter)->SetNotifyResult(validity);
@@ -73,4 +71,3 @@ PropertyNotificationManager::PropertyNotificationManager() = default;
 } // namespace Internal
 
 } // namespace Dali
-

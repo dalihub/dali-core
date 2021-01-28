@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_SHADER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,18 +23,15 @@
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/scene-graph-connection-change-propagator.h>
 
-
 namespace Dali
 {
 namespace Internal
 {
-
 class Program;
 class ProgramCache;
 
 namespace SceneGraph
 {
-
 class ConnectionObserver;
 class SceneController;
 /**
@@ -43,12 +40,11 @@ class SceneController;
 class Shader : public PropertyOwner, public UniformMap::Observer
 {
 public:
-
   /**
    * Constructor
    * @param hints Shader hints
    */
-  Shader( Dali::Shader::Hint::Value& hints );
+  Shader(Dali::Shader::Hint::Value& hints);
 
   /**
    * Virtual destructor
@@ -65,7 +61,7 @@ public:
    * @param[in] hint The hint to check.
    * @return True if the given hint is set.
    */
-  bool HintEnabled( Dali::Shader::Hint::Value hint ) const
+  bool HintEnabled(Dali::Shader::Hint::Value hint) const
   {
     return mHints & hint;
   }
@@ -89,7 +85,7 @@ public:
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyOwner::ResetDefaultProperties
    */
-  virtual void ResetDefaultProperties( BufferIndex updateBufferIndex )
+  virtual void ResetDefaultProperties(BufferIndex updateBufferIndex)
   {
     // no default properties
   }
@@ -105,9 +101,9 @@ public:
    * @param[in] modifiesGeometry  True if the vertex shader changes the positions of vertexes such that
    * they might exceed the bounding box of vertexes passing through the default transformation.
    */
-  void SetProgram( Internal::ShaderDataPtr shaderData,
-                   ProgramCache* programCache,
-                   bool modifiesGeometry );
+  void SetProgram(Internal::ShaderDataPtr shaderData,
+                  ProgramCache*           programCache,
+                  bool                    modifiesGeometry);
 
   /**
    * Get the program built for this shader
@@ -116,7 +112,6 @@ public:
   Program* GetProgram();
 
 public: // Implementation of ConnectionChangePropagator
-
   /**
    * @copydoc ConnectionChangePropagator::AddObserver
    */
@@ -131,15 +126,14 @@ public: // UniformMap::Observer
   /**
    * @copydoc UniformMap::Observer::UniformMappingsChanged
    */
-  void UniformMappingsChanged( const UniformMap& mappings ) override;
+  void UniformMappingsChanged(const UniformMap& mappings) override;
 
 private: // Data
+  Dali::Shader::Hint::Value mHints;
 
-  Dali::Shader::Hint::Value     mHints;
+  Program* mProgram;
 
-  Program*                       mProgram;
-
-  ConnectionChangePropagator     mConnectionObservers;
+  ConnectionChangePropagator mConnectionObservers;
 };
 
 } // namespace SceneGraph

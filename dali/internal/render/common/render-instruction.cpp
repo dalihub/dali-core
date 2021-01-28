@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,71 +19,68 @@
 #include <dali/internal/render/common/render-instruction.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/constants.h> // for Color::BLACK
-#include <dali/internal/render/common/render-tracker.h>
 #include <dali/integration-api/debug.h>
+#include <dali/internal/render/common/render-tracker.h>
+#include <dali/public-api/common/constants.h> // for Color::BLACK
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace SceneGraph
 {
-
 RenderInstruction::RenderInstruction()
-: mRenderTracker( nullptr ),
+: mRenderTracker(nullptr),
   mClearColor(),
-  mIsViewportSet( false ),
-  mIsClearColorSet( false ),
-  mIgnoreRenderToFbo( false ),
-  mFrameBuffer( nullptr ),
-  mCamera( nullptr ),
-  mNextFreeRenderList( 0 )
+  mIsViewportSet(false),
+  mIsClearColorSet(false),
+  mIgnoreRenderToFbo(false),
+  mFrameBuffer(nullptr),
+  mCamera(nullptr),
+  mNextFreeRenderList(0)
 {
   // reserve 6 lists, which is enough for three layers with opaque and transparent things on
-  mRenderLists.Reserve( 6 );
+  mRenderLists.Reserve(6);
 }
 
 RenderInstruction::~RenderInstruction()
 { // pointer container releases the renderlists
 }
 
-RenderList& RenderInstruction::GetNextFreeRenderList( size_t capacityRequired )
+RenderList& RenderInstruction::GetNextFreeRenderList(size_t capacityRequired)
 {
   // check if we have enough lists, we can only be one behind at worst
-  if( mRenderLists.Count() <= mNextFreeRenderList )
+  if(mRenderLists.Count() <= mNextFreeRenderList)
   {
-    mRenderLists.PushBack( new RenderList ); // Push a new empty render list
+    mRenderLists.PushBack(new RenderList); // Push a new empty render list
   }
 
   // check capacity of the list and reserve if not big enough
-  if( mRenderLists[ mNextFreeRenderList ]->Capacity() < capacityRequired )
+  if(mRenderLists[mNextFreeRenderList]->Capacity() < capacityRequired)
   {
-    mRenderLists[ mNextFreeRenderList ]->Reserve( capacityRequired );
+    mRenderLists[mNextFreeRenderList]->Reserve(capacityRequired);
   }
 
   // return the list mNextFreeRenderList points to and increase by one
-  return *mRenderLists[ mNextFreeRenderList++ ];
+  return *mRenderLists[mNextFreeRenderList++];
 }
 
 void RenderInstruction::UpdateCompleted()
 {
   // lets do some housekeeping, remove any lists that were not needed because
   // application might have removed a layer permanently
-  RenderListContainer::Iterator iter = mRenderLists.Begin();
-  RenderListContainer::ConstIterator end = mRenderLists.End();
-  for( ;iter != end; ++iter )
+  RenderListContainer::Iterator      iter = mRenderLists.Begin();
+  RenderListContainer::ConstIterator end  = mRenderLists.End();
+  for(; iter != end; ++iter)
   {
     // tell the list to do its housekeeping
     (*iter)->ReleaseUnusedItems();
   }
 
   // release any extra lists
-  if( mRenderLists.Count() > mNextFreeRenderList )
+  if(mRenderLists.Count() > mNextFreeRenderList)
   {
-    mRenderLists.Resize( mNextFreeRenderList );
+    mRenderLists.Resize(mNextFreeRenderList);
   }
 }
 
@@ -92,36 +89,36 @@ RenderListContainer::SizeType RenderInstruction::RenderListCount() const
   return mNextFreeRenderList;
 }
 
-const RenderList* RenderInstruction::GetRenderList( RenderListContainer::SizeType index ) const
+const RenderList* RenderInstruction::GetRenderList(RenderListContainer::SizeType index) const
 {
-  DALI_ASSERT_DEBUG( (index < mNextFreeRenderList ) && (index < mRenderLists.Size()) && "Renderlist index out of container bounds" );
+  DALI_ASSERT_DEBUG((index < mNextFreeRenderList) && (index < mRenderLists.Size()) && "Renderlist index out of container bounds");
 
   // Return null if the caller has passed an invalid index:
-  if( index >= std::min( mNextFreeRenderList, mRenderLists.Size() ) )
+  if(index >= std::min(mNextFreeRenderList, mRenderLists.Size()))
   {
     return nullptr;
   }
 
-  return mRenderLists[ index ];
+  return mRenderLists[index];
 }
 
-void RenderInstruction::Reset( Camera*         camera,
-                               Render::FrameBuffer* frameBuffer,
-                               const Viewport* viewport,
-                               const Vector4*  clearColor )
+void RenderInstruction::Reset(Camera*              camera,
+                              Render::FrameBuffer* frameBuffer,
+                              const Viewport*      viewport,
+                              const Vector4*       clearColor)
 {
-  mCamera = camera;
-  mViewport = viewport ? *viewport : Viewport();
-  mIsViewportSet = nullptr != viewport;
-  mClearColor = clearColor ? *clearColor : Color::BLACK;
-  mIsClearColorSet = nullptr != clearColor;
-  mRenderTracker = nullptr;
+  mCamera             = camera;
+  mViewport           = viewport ? *viewport : Viewport();
+  mIsViewportSet      = nullptr != viewport;
+  mClearColor         = clearColor ? *clearColor : Color::BLACK;
+  mIsClearColorSet    = nullptr != clearColor;
+  mRenderTracker      = nullptr;
   mNextFreeRenderList = 0;
-  mFrameBuffer = frameBuffer;
+  mFrameBuffer        = frameBuffer;
 
-  RenderListContainer::Iterator iter = mRenderLists.Begin();
-  RenderListContainer::ConstIterator end = mRenderLists.End();
-  for( ;iter != end; ++iter )
+  RenderListContainer::Iterator      iter = mRenderLists.Begin();
+  RenderListContainer::ConstIterator end  = mRenderLists.End();
+  for(; iter != end; ++iter)
   {
     // since mRenderLists is a vector of RenderLists we dont want to clear it
     // as it ends up releasing and later reallocating loads of vectors

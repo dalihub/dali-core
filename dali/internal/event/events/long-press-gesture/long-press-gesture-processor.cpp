@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,26 +22,23 @@
 #include <algorithm>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/actors/actor.h>
-#include <dali/public-api/common/dali-common.h>
-#include <dali/internal/event/events/long-press-gesture/long-press-gesture-impl.h>
-#include <dali/internal/event/events/long-press-gesture/long-press-gesture-event.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/scene-impl.h>
-#include <dali/internal/event/render-tasks/render-task-impl.h>
-#include <dali/internal/event/events/long-press-gesture/long-press-gesture-recognizer.h>
 #include <dali/internal/event/events/gesture-requests.h>
+#include <dali/internal/event/events/long-press-gesture/long-press-gesture-event.h>
+#include <dali/internal/event/events/long-press-gesture/long-press-gesture-impl.h>
+#include <dali/internal/event/events/long-press-gesture/long-press-gesture-recognizer.h>
+#include <dali/internal/event/render-tasks/render-task-impl.h>
+#include <dali/public-api/actors/actor.h>
+#include <dali/public-api/common/dali-common.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace
 {
-
 const unsigned long DEFAULT_MINIMUM_HOLDING_TIME = 500u;
 
 /**
@@ -52,22 +49,22 @@ const unsigned long DEFAULT_MINIMUM_HOLDING_TIME = 500u;
  * @param[in]  localPoint        Relative to the actor attached to the detector.
  */
 void EmitLongPressSignal(
-    Actor* actor,
-    const GestureDetectorContainer& gestureDetectors,
-    const LongPressGestureEvent& longPressEvent,
-    Vector2 localPoint)
+  Actor*                          actor,
+  const GestureDetectorContainer& gestureDetectors,
+  const LongPressGestureEvent&    longPressEvent,
+  Vector2                         localPoint)
 {
-  Internal::LongPressGesturePtr longPress( new Internal::LongPressGesture(longPressEvent.state ) );
-  longPress->SetTime( longPressEvent.time );
-  longPress->SetNumberOfTouches( longPressEvent.numberOfTouches );
-  longPress->SetScreenPoint( longPressEvent.point );
-  longPress->SetLocalPoint( localPoint );
+  Internal::LongPressGesturePtr longPress(new Internal::LongPressGesture(longPressEvent.state));
+  longPress->SetTime(longPressEvent.time);
+  longPress->SetNumberOfTouches(longPressEvent.numberOfTouches);
+  longPress->SetScreenPoint(longPressEvent.point);
+  longPress->SetLocalPoint(localPoint);
 
-  Dali::Actor actorHandle( actor );
+  Dali::Actor                                    actorHandle(actor);
   const GestureDetectorContainer::const_iterator endIter = gestureDetectors.end();
-  for ( GestureDetectorContainer::const_iterator iter = gestureDetectors.begin(); iter != endIter; ++iter )
+  for(GestureDetectorContainer::const_iterator iter = gestureDetectors.begin(); iter != endIter; ++iter)
   {
-    static_cast< LongPressGestureDetector* >( *iter )->EmitLongPressGestureSignal( actorHandle, Dali::LongPressGesture( longPress.Get() ) );
+    static_cast<LongPressGestureDetector*>(*iter)->EmitLongPressGestureSignal(actorHandle, Dali::LongPressGesture(longPress.Get()));
   }
 }
 
@@ -81,8 +78,8 @@ struct IsNotAttachedFunctor
    * Constructor
    * @param[in]  actor  The actor to check whether it is attached.
    */
-  IsNotAttachedFunctor( Actor* actor )
-  : actorToCheck( actor )
+  IsNotAttachedFunctor(Actor* actor)
+  : actorToCheck(actor)
   {
   }
 
@@ -91,9 +88,9 @@ struct IsNotAttachedFunctor
    * @param[in]  detector  The detector to check.
    * @return true, if not attached, false otherwise.
    */
-  bool operator()( const GestureDetector* detector ) const
+  bool operator()(const GestureDetector* detector) const
   {
-    return !detector->IsAttached( *actorToCheck );
+    return !detector->IsAttached(*actorToCheck);
   }
 
   Actor* actorToCheck; ///< The actor to check whether it is attached or not.
@@ -102,22 +99,22 @@ struct IsNotAttachedFunctor
 } // unnamed namespace
 
 LongPressGestureProcessor::LongPressGestureProcessor()
-: GestureProcessor( GestureType::LONG_PRESS ),
+: GestureProcessor(GestureType::LONG_PRESS),
   mLongPressGestureDetectors(),
   mCurrentEmitters(),
   mCurrentRenderTask(),
-  mMinTouchesRequired( 1 ),
-  mMaxTouchesRequired( 1 ),
-  mCurrentLongPressEvent( nullptr ),
-  mMinimumHoldingTime( DEFAULT_MINIMUM_HOLDING_TIME )
+  mMinTouchesRequired(1),
+  mMaxTouchesRequired(1),
+  mCurrentLongPressEvent(nullptr),
+  mMinimumHoldingTime(DEFAULT_MINIMUM_HOLDING_TIME)
 {
 }
 
 LongPressGestureProcessor::~LongPressGestureProcessor() = default;
 
-void LongPressGestureProcessor::Process( Scene& scene, const LongPressGestureEvent& longPressEvent )
+void LongPressGestureProcessor::Process(Scene& scene, const LongPressGestureEvent& longPressEvent)
 {
-  switch ( longPressEvent.state )
+  switch(longPressEvent.state)
   {
     case GestureState::POSSIBLE:
     {
@@ -125,9 +122,9 @@ void LongPressGestureProcessor::Process( Scene& scene, const LongPressGestureEve
       ResetActor();
 
       HitTestAlgorithm::Results hitTestResults;
-      if( HitTest( scene, longPressEvent.point, hitTestResults ) )
+      if(HitTest(scene, longPressEvent.point, hitTestResults))
       {
-        SetActor( &GetImplementation( hitTestResults.actor ) );
+        SetActor(&GetImplementation(hitTestResults.actor));
       }
       break;
     }
@@ -135,19 +132,19 @@ void LongPressGestureProcessor::Process( Scene& scene, const LongPressGestureEve
     case GestureState::STARTED:
     {
       Actor* currentGesturedActor = GetCurrentGesturedActor();
-      if ( currentGesturedActor )
+      if(currentGesturedActor)
       {
         HitTestAlgorithm::Results hitTestResults;
-        HitTest( scene, longPressEvent.point, hitTestResults );
+        HitTest(scene, longPressEvent.point, hitTestResults);
 
-        if ( hitTestResults.actor && ( currentGesturedActor == &GetImplementation( hitTestResults.actor ) ) )
+        if(hitTestResults.actor && (currentGesturedActor == &GetImplementation(hitTestResults.actor)))
         {
           // Record the current render-task for Screen->Actor coordinate conversions
           mCurrentRenderTask = hitTestResults.renderTask;
 
           // Set mCurrentLongPressEvent to use inside overridden methods called from ProcessAndEmit()
           mCurrentLongPressEvent = &longPressEvent;
-          ProcessAndEmit( hitTestResults );
+          ProcessAndEmit(hitTestResults);
           mCurrentLongPressEvent = nullptr;
         }
         else
@@ -168,21 +165,21 @@ void LongPressGestureProcessor::Process( Scene& scene, const LongPressGestureEve
       // Check if actor is still touchable.
 
       Actor* currentGesturedActor = GetCurrentGesturedActor();
-      if ( currentGesturedActor )
+      if(currentGesturedActor)
       {
-        if ( currentGesturedActor->IsHittable() && !mCurrentEmitters.empty() && mCurrentRenderTask )
+        if(currentGesturedActor->IsHittable() && !mCurrentEmitters.empty() && mCurrentRenderTask)
         {
           // Ensure actor is still attached to the emitters, if it is not then remove the emitter.
-          GestureDetectorContainer::iterator endIter = std::remove_if( mCurrentEmitters.begin(), mCurrentEmitters.end(), IsNotAttachedFunctor(currentGesturedActor) );
-          mCurrentEmitters.erase( endIter, mCurrentEmitters.end() );
+          GestureDetectorContainer::iterator endIter = std::remove_if(mCurrentEmitters.begin(), mCurrentEmitters.end(), IsNotAttachedFunctor(currentGesturedActor));
+          mCurrentEmitters.erase(endIter, mCurrentEmitters.end());
 
-          if ( !mCurrentEmitters.empty() )
+          if(!mCurrentEmitters.empty())
           {
-            Vector2 actorCoords;
+            Vector2     actorCoords;
             RenderTask& renderTaskImpl = *mCurrentRenderTask.Get();
-            currentGesturedActor->ScreenToLocal( renderTaskImpl, actorCoords.x, actorCoords.y, longPressEvent.point.x, longPressEvent.point.y );
+            currentGesturedActor->ScreenToLocal(renderTaskImpl, actorCoords.x, actorCoords.y, longPressEvent.point.x, longPressEvent.point.y);
 
-            EmitLongPressSignal( currentGesturedActor, mCurrentEmitters, longPressEvent, actorCoords );
+            EmitLongPressSignal(currentGesturedActor, mCurrentEmitters, longPressEvent, actorCoords);
           }
         }
 
@@ -202,25 +199,25 @@ void LongPressGestureProcessor::Process( Scene& scene, const LongPressGestureEve
 
     case GestureState::CONTINUING:
     {
-      DALI_ABORT( "Incorrect state received from Integration layer: CONTINUING\n" );
+      DALI_ABORT("Incorrect state received from Integration layer: CONTINUING\n");
       break;
     }
 
     case GestureState::CLEAR:
     {
-      DALI_ABORT( "Incorrect state received from Integration layer: CLEAR\n" );
+      DALI_ABORT("Incorrect state received from Integration layer: CLEAR\n");
       break;
     }
   }
 }
 
-void LongPressGestureProcessor::AddGestureDetector( LongPressGestureDetector* gestureDetector, Scene& scene )
+void LongPressGestureProcessor::AddGestureDetector(LongPressGestureDetector* gestureDetector, Scene& scene)
 {
   bool firstRegistration(mLongPressGestureDetectors.empty());
 
   mLongPressGestureDetectors.push_back(gestureDetector);
 
-  if (firstRegistration)
+  if(firstRegistration)
   {
     mMinTouchesRequired = gestureDetector->GetMinimumTouchesRequired();
     mMaxTouchesRequired = gestureDetector->GetMaximumTouchesRequired();
@@ -231,7 +228,7 @@ void LongPressGestureProcessor::AddGestureDetector( LongPressGestureDetector* ge
 
     Size size = scene.GetSize();
 
-    mGestureRecognizer = new LongPressGestureRecognizer(*this, Vector2(size.width, size.height), static_cast<const LongPressGestureRequest&>(request), mMinimumHoldingTime );
+    mGestureRecognizer = new LongPressGestureRecognizer(*this, Vector2(size.width, size.height), static_cast<const LongPressGestureRequest&>(request), mMinimumHoldingTime);
   }
   else
   {
@@ -239,16 +236,16 @@ void LongPressGestureProcessor::AddGestureDetector( LongPressGestureDetector* ge
   }
 }
 
-void LongPressGestureProcessor::RemoveGestureDetector( LongPressGestureDetector* gestureDetector )
+void LongPressGestureProcessor::RemoveGestureDetector(LongPressGestureDetector* gestureDetector)
 {
   // Find detector ...
-  LongPressGestureDetectorContainer::iterator endIter = std::remove( mLongPressGestureDetectors.begin(), mLongPressGestureDetectors.end(), gestureDetector );
-  DALI_ASSERT_DEBUG( endIter != mLongPressGestureDetectors.end() );
+  LongPressGestureDetectorContainer::iterator endIter = std::remove(mLongPressGestureDetectors.begin(), mLongPressGestureDetectors.end(), gestureDetector);
+  DALI_ASSERT_DEBUG(endIter != mLongPressGestureDetectors.end());
 
   // ... and remove it
-  mLongPressGestureDetectors.erase( endIter, mLongPressGestureDetectors.end() );
+  mLongPressGestureDetectors.erase(endIter, mLongPressGestureDetectors.end());
 
-  if ( mLongPressGestureDetectors.empty() )
+  if(mLongPressGestureDetectors.empty())
   {
     mGestureRecognizer = nullptr;
   }
@@ -258,25 +255,25 @@ void LongPressGestureProcessor::RemoveGestureDetector( LongPressGestureDetector*
   }
 }
 
-void LongPressGestureProcessor::GestureDetectorUpdated( LongPressGestureDetector* gestureDetector )
+void LongPressGestureProcessor::GestureDetectorUpdated(LongPressGestureDetector* gestureDetector)
 {
-  DALI_ASSERT_DEBUG( find( mLongPressGestureDetectors.begin(), mLongPressGestureDetectors.end(), gestureDetector ) != mLongPressGestureDetectors.end() );
+  DALI_ASSERT_DEBUG(find(mLongPressGestureDetectors.begin(), mLongPressGestureDetectors.end(), gestureDetector) != mLongPressGestureDetectors.end());
 
   UpdateDetection();
 }
 
-void LongPressGestureProcessor::SetMinimumHoldingTime( uint32_t time )
+void LongPressGestureProcessor::SetMinimumHoldingTime(uint32_t time)
 {
-  if( time > 0u && mMinimumHoldingTime != time )
+  if(time > 0u && mMinimumHoldingTime != time)
   {
     mMinimumHoldingTime = time;
 
-    if( mGestureRecognizer )
+    if(mGestureRecognizer)
     {
-      LongPressGestureRecognizer* longPressRecognizer = dynamic_cast<LongPressGestureRecognizer*>( mGestureRecognizer.Get() );
-      if( longPressRecognizer )
+      LongPressGestureRecognizer* longPressRecognizer = dynamic_cast<LongPressGestureRecognizer*>(mGestureRecognizer.Get());
+      if(longPressRecognizer)
       {
-        longPressRecognizer->SetMinimumHoldingTime( time );
+        longPressRecognizer->SetMinimumHoldingTime(time);
       }
     }
   }
@@ -294,27 +291,27 @@ void LongPressGestureProcessor::UpdateDetection()
   unsigned int minimumRequired = UINT_MAX;
   unsigned int maximumRequired = 0;
 
-  for ( LongPressGestureDetectorContainer::iterator iter = mLongPressGestureDetectors.begin(), endIter = mLongPressGestureDetectors.end(); iter != endIter; ++iter )
+  for(LongPressGestureDetectorContainer::iterator iter = mLongPressGestureDetectors.begin(), endIter = mLongPressGestureDetectors.end(); iter != endIter; ++iter)
   {
     LongPressGestureDetector* current(*iter);
 
-    if( current )
+    if(current)
     {
       unsigned int minimum = current->GetMinimumTouchesRequired();
-      if (minimum < minimumRequired)
+      if(minimum < minimumRequired)
       {
         minimumRequired = minimum;
       }
 
       unsigned int maximum = current->GetMaximumTouchesRequired();
-      if ( maximum > maximumRequired )
+      if(maximum > maximumRequired)
       {
         maximumRequired = maximum;
       }
     }
   }
 
-  if ( (minimumRequired != mMinTouchesRequired) || (maximumRequired != mMaxTouchesRequired) )
+  if((minimumRequired != mMinTouchesRequired) || (maximumRequired != mMaxTouchesRequired))
   {
     mMinTouchesRequired = minimumRequired;
     mMaxTouchesRequired = maximumRequired;
@@ -331,29 +328,29 @@ void LongPressGestureProcessor::OnGesturedActorStageDisconnection()
   mCurrentEmitters.clear();
 }
 
-bool LongPressGestureProcessor::CheckGestureDetector( GestureDetector* detector, Actor* actor )
+bool LongPressGestureProcessor::CheckGestureDetector(GestureDetector* detector, Actor* actor)
 {
-  DALI_ASSERT_DEBUG( mCurrentLongPressEvent );
+  DALI_ASSERT_DEBUG(mCurrentLongPressEvent);
 
-  LongPressGestureDetector* longPressDetector ( static_cast< LongPressGestureDetector* >( detector ) );
+  LongPressGestureDetector* longPressDetector(static_cast<LongPressGestureDetector*>(detector));
 
-  return ( longPressDetector->GetMinimumTouchesRequired() <= mCurrentLongPressEvent->numberOfTouches ) &&
-         ( longPressDetector->GetMaximumTouchesRequired() >= mCurrentLongPressEvent->numberOfTouches );
+  return (longPressDetector->GetMinimumTouchesRequired() <= mCurrentLongPressEvent->numberOfTouches) &&
+         (longPressDetector->GetMaximumTouchesRequired() >= mCurrentLongPressEvent->numberOfTouches);
 }
 
-void LongPressGestureProcessor::EmitGestureSignal( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates )
+void LongPressGestureProcessor::EmitGestureSignal(Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates)
 {
-  DALI_ASSERT_DEBUG( mCurrentLongPressEvent );
+  DALI_ASSERT_DEBUG(mCurrentLongPressEvent);
 
   mCurrentEmitters.clear();
   ResetActor();
 
-  EmitLongPressSignal( actor, gestureDetectors, *mCurrentLongPressEvent, actorCoordinates );
+  EmitLongPressSignal(actor, gestureDetectors, *mCurrentLongPressEvent, actorCoordinates);
 
-  if ( actor->OnScene() )
+  if(actor->OnScene())
   {
     mCurrentEmitters = gestureDetectors;
-    SetActor( actor );
+    SetActor(actor);
   }
 }
 

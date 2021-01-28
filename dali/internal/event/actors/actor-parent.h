@@ -1,7 +1,7 @@
 #ifndef DALI_INTERNAL_ACTOR_PARENT_H
 #define DALI_INTERNAL_ACTOR_PARENT_H
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use actor file except in compliance with the License.
@@ -18,8 +18,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/internal/event/actors/actor-declarations.h>
 #include <dali/internal/common/const-string.h>
+#include <dali/internal/event/actors/actor-declarations.h>
 
 namespace Dali
 {

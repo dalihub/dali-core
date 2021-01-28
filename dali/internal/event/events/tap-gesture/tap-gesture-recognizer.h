@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_EVENT_EVENTS_TAP_GESTURE_RECOGNIZER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,9 @@
  */
 
 // EXTERNAL INCLUDES
-#include <cstdint>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/integration-api/events/point.h>
-
+#include <dali/public-api/common/vector-wrapper.h>
+#include <cstdint>
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/gesture-recognizer.h>
@@ -30,7 +29,6 @@
 
 namespace Dali
 {
-
 namespace Integration
 {
 struct TouchEvent;
@@ -46,7 +44,6 @@ struct TapGestureRequest;
 class TapGestureRecognizer : public GestureRecognizer
 {
 public:
-
   using Observer = RecognizerObserver<TapGestureEvent>;
 
   /**
@@ -63,7 +60,6 @@ public:
   ~TapGestureRecognizer() override;
 
 public:
-
   /**
    * @copydoc Dali::Internal::GestureDetector::SendEvent(const Integration::TouchEvent&)
    */
@@ -75,14 +71,13 @@ public:
   void Update(const GestureRequest& request) override;
 
 private:
-
   /**
    * Checks if registered taps are within required bounds and emits tap gesture if they are.
    *
    * @param[in] state current state of incomplete gesture
    * @param[in] time time of this latest touch event
    */
-  void EmitGesture( GestureState state, uint32_t time );
+  void EmitGesture(GestureState state, uint32_t time);
 
   /**
    * Initialises tap gesture detector for next tap sequence
@@ -90,14 +85,14 @@ private:
    * @param[in] event registered touch event
    * @param[in] point position touch event occurred
    */
-  void SetupForTouchDown( const Integration::TouchEvent& event, const Integration::Point& point );
+  void SetupForTouchDown(const Integration::TouchEvent& event, const Integration::Point& point);
 
   /**
    * Emit a touch down event for hit testing
    *
    * @param[in] event registered touch event
    */
-  void EmitPossibleState( const Integration::TouchEvent& event );
+  void EmitPossibleState(const Integration::TouchEvent& event);
 
   /**
    * Force a touch event sequence to be treated as a single tap
@@ -105,7 +100,7 @@ private:
    * @param[in] time time of this latest touch event
    * @param[in] point position touch event occurred
     */
-  void EmitSingleTap( uint32_t time, const Integration::Point& point );
+  void EmitSingleTap(uint32_t time, const Integration::Point& point);
 
   /**
    * Emit a tap event
@@ -113,17 +108,16 @@ private:
    * @param[in] time time of this latest touch event
    * @param[in] event registered touch event
    */
-  void EmitTap( uint32_t time, TapGestureEvent& event );
+  void EmitTap(uint32_t time, TapGestureEvent& event);
 
   /**
    * Send the event for processing
    *
    * @param[in] tap event for processing
    */
-  void ProcessEvent( TapGestureEvent& event );
+  void ProcessEvent(TapGestureEvent& event);
 
 private:
-
   // Reference to the gesture processor for this recognizer
   Observer& mObserver;
 
@@ -144,15 +138,13 @@ private:
   int mMaximumTapsRequired; ///< Maximum number of taps required.
   int mTapsRegistered;      ///< In current detection, the number of taps registered.
 
-  Vector2 mTouchPosition;   ///< The initial touch down position.
-  uint32_t mTouchTime; ///< The initial touch down time.
-  uint32_t mLastTapTime; ///< Time last tap gesture was registered
-
+  Vector2  mTouchPosition; ///< The initial touch down position.
+  uint32_t mTouchTime;     ///< The initial touch down time.
+  uint32_t mLastTapTime;   ///< Time last tap gesture was registered
 };
 
 } // namespace Internal
 
 } // namespace Dali
-
 
 #endif // DALI_INTERNAL_EVENT_EVENTS_TAP_GESTURE_RECOGNIZER_H

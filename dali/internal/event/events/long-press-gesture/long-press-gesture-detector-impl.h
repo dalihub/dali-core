@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_LONG_PRESS_GESTURE_DETECTOR_IMPL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,13 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/events/long-press-gesture-detector.h>
 #include <dali/internal/event/events/gesture-detector-impl.h>
+#include <dali/public-api/events/long-press-gesture-detector.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 class LongPressGestureDetector;
 
 using LongPressGestureDetectorPtr       = IntrusivePtr<LongPressGestureDetector>;
@@ -39,7 +37,6 @@ using LongPressGestureDetectorContainer = DerivedGestureDetectorContainer<LongPr
 class LongPressGestureDetector : public GestureDetector
 {
 public: // Creation
-
   /**
    * Create a new gesture detector.
    * @return A smart-pointer to the newly allocated detector.
@@ -74,7 +71,6 @@ public: // Creation
   LongPressGestureDetector(unsigned int minTouches, unsigned int maxTouches);
 
 public:
-
   /**
    * @copydoc Dali::LongPressGestureDetector::SetTouchesRequired(unsigned int)
    */
@@ -101,7 +97,6 @@ public:
   uint32_t GetMinimumHoldingTime() const;
 
 public:
-
   /**
    * Called by the LongPressGestureProcessor when a tap gesture event occurs within the bounds of our
    * attached actor.
@@ -111,7 +106,6 @@ public:
   void EmitLongPressGestureSignal(Dali::Actor pressedActor, const Dali::LongPressGesture& longPress);
 
 public: // Signals
-
   /**
    * @copydoc Dali::LongPressGestureDetector::DetectedSignal()
    */
@@ -129,23 +123,20 @@ public: // Signals
    * @return True if the signal was connected.
    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
    */
-  static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
+  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor);
 
 protected:
-
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
   ~LongPressGestureDetector() override;
 
 private:
-
   // Undefined
   LongPressGestureDetector(const LongPressGestureDetector&);
   LongPressGestureDetector& operator=(const LongPressGestureDetector& rhs);
 
 private: // GestureDetector overrides
-
   /**
    * @copydoc Dali::Internal::GestureDetector::OnActorAttach(Actor&)
    */
@@ -162,7 +153,6 @@ private: // GestureDetector overrides
   void OnActorDestroyed(Object& object) override;
 
 private:
-
   Dali::LongPressGestureDetector::DetectedSignalType mDetectedSignal;
 
   unsigned int mMinimumTouchesRequired;
@@ -175,7 +165,7 @@ private:
 
 inline Internal::LongPressGestureDetector& GetImplementation(Dali::LongPressGestureDetector& detector)
 {
-  DALI_ASSERT_ALWAYS( detector && "LongPressGestureDetector handle is empty" );
+  DALI_ASSERT_ALWAYS(detector && "LongPressGestureDetector handle is empty");
 
   BaseObject& handle = detector.GetBaseObject();
 
@@ -184,7 +174,7 @@ inline Internal::LongPressGestureDetector& GetImplementation(Dali::LongPressGest
 
 inline const Internal::LongPressGestureDetector& GetImplementation(const Dali::LongPressGestureDetector& detector)
 {
-  DALI_ASSERT_ALWAYS( detector && "LongPressGestureDetector handle is empty" );
+  DALI_ASSERT_ALWAYS(detector && "LongPressGestureDetector handle is empty");
 
   const BaseObject& handle = detector.GetBaseObject();
 

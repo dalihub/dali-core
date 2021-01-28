@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,30 +19,28 @@
 #include <dali/internal/event/common/scene-impl.h>
 
 // INTERNAL INCLUDES
+#include <dali/internal/event/actors/camera-actor-impl.h>
 #include <dali/internal/event/actors/layer-impl.h>
 #include <dali/internal/event/actors/layer-list.h>
-#include <dali/internal/event/actors/camera-actor-impl.h>
-#include <dali/internal/event/common/thread-local-storage.h>
-#include <dali/internal/event/render-tasks/render-task-list-impl.h>
-#include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/internal/event/common/object-registry-impl.h>
-#include <dali/internal/update/nodes/node.h>
-#include <dali/internal/update/manager/update-manager.h>
+#include <dali/internal/event/common/thread-local-storage.h>
+#include <dali/internal/event/render-tasks/render-task-impl.h>
+#include <dali/internal/event/render-tasks/render-task-list-impl.h>
+#include <dali/internal/event/rendering/frame-buffer-impl.h>
+#include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
 #include <dali/internal/update/common/scene-graph-scene.h>
+#include <dali/internal/update/manager/update-manager.h>
+#include <dali/internal/update/nodes/node.h>
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
-#include <dali/internal/event/rendering/frame-buffer-impl.h>
-#include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
 
 using Dali::Internal::SceneGraph::Node;
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 ScenePtr Scene::New(Size size, int orientation)
 {
   ScenePtr scene = new Scene;
@@ -66,27 +64,27 @@ Scene::Scene()
 
 Scene::~Scene()
 {
-  if( EventThreadServices::IsCoreRunning() && mSceneObject )
+  if(EventThreadServices::IsCoreRunning() && mSceneObject)
   {
     ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
-    RemoveSceneMessage( tls->GetUpdateManager(), *mSceneObject );
+    RemoveSceneMessage(tls->GetUpdateManager(), *mSceneObject);
   }
 
-  if( mDefaultCamera )
+  if(mDefaultCamera)
   {
     // its enough to release the handle so the object is released
     // don't need to remove it from root actor as root actor will delete the object
     mDefaultCamera.Reset();
   }
 
-  if( mRootLayer )
+  if(mRootLayer)
   {
     // we are closing down so just delete the root, no point emit disconnect
     // signals or send messages to update
     mRootLayer.Reset();
   }
 
-  if( mRenderTaskList )
+  if(mRenderTaskList)
   {
     mRenderTaskList.Reset();
   }
@@ -99,29 +97,29 @@ void Scene::Initialize(Size size, int orientation)
 {
   ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
 
-  DALI_ASSERT_ALWAYS( tls && "Attempt to create scene before core exists!" );
+  DALI_ASSERT_ALWAYS(tls && "Attempt to create scene before core exists!");
 
-  tls->AddScene( this );
+  tls->AddScene(this);
 
   SceneGraph::UpdateManager& updateManager = tls->GetUpdateManager();
 
   // Create the ordered list of layers
-  mLayerList = LayerList::New( updateManager );
+  mLayerList = LayerList::New(updateManager);
 
   // The scene owns the default layer
-  mRootLayer = Layer::NewRoot( *mLayerList );
+  mRootLayer = Layer::NewRoot(*mLayerList);
   mRootLayer->SetName("RootLayer");
-  mRootLayer->SetScene( *this );
+  mRootLayer->SetScene(*this);
 
   // The root layer needs to have a fixed resize policy (as opposed to the default USE_NATURAL_SIZE).
   // This stops actors parented to the stage having their relayout requests propagating
   // up to the root layer, and down through other children unnecessarily.
-  mRootLayer->SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
+  mRootLayer->SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
 
   // Create the default camera actor first; this is needed by the RenderTaskList
   // The default camera attributes and position is such that children of the default layer,
   // can be positioned at (0,0) and be at the top-left of the viewport.
-  mDefaultCamera = CameraActor::New( size );
+  mDefaultCamera = CameraActor::New(size);
   mDefaultCamera->SetParentOrigin(ParentOrigin::CENTER);
   Add(*(mDefaultCamera.Get()));
 
@@ -129,25 +127,25 @@ void Scene::Initialize(Size size, int orientation)
   mRenderTaskList = RenderTaskList::New();
 
   // Create the default render-task and ensure clear is enabled on it to show the background color
-  RenderTaskPtr renderTask = mRenderTaskList->CreateTask( mRootLayer.Get(), mDefaultCamera.Get() );
+  RenderTaskPtr renderTask = mRenderTaskList->CreateTask(mRootLayer.Get(), mDefaultCamera.Get());
   renderTask->SetClearEnabled(true);
 
   // Create scene graph object
   mSceneObject = new SceneGraph::Scene();
-  OwnerPointer< SceneGraph::Scene > transferOwnership( const_cast< SceneGraph::Scene* >( mSceneObject ) );
-  AddSceneMessage( updateManager, transferOwnership );
+  OwnerPointer<SceneGraph::Scene> transferOwnership(const_cast<SceneGraph::Scene*>(mSceneObject));
+  AddSceneMessage(updateManager, transferOwnership);
 
-  SurfaceRotated( size.width, size.height, orientation );
+  SurfaceRotated(size.width, size.height, orientation);
 }
 
 void Scene::Add(Actor& actor)
 {
-  mRootLayer->Add( actor );
+  mRootLayer->Add(actor);
 }
 
 void Scene::Remove(Actor& actor)
 {
-  mRootLayer->Remove( actor );
+  mRootLayer->Remove(actor);
 }
 
 Size Scene::GetSize() const
@@ -172,7 +170,7 @@ RenderTaskList& Scene::GetRenderTaskList() const
 
 Dali::Layer Scene::GetRootLayer() const
 {
-  return Dali::Layer( mRootLayer.Get() );
+  return Dali::Layer(mRootLayer.Get());
 }
 
 LayerList& Scene::GetLayerList() const
@@ -185,9 +183,9 @@ uint32_t Scene::GetLayerCount() const
   return mLayerList->GetLayerCount();
 }
 
-Dali::Layer Scene::GetLayer( uint32_t depth ) const
+Dali::Layer Scene::GetLayer(uint32_t depth) const
 {
-  return Dali::Layer(mLayerList->GetLayer( depth ));
+  return Dali::Layer(mLayerList->GetLayer(depth));
 }
 
 CameraActor& Scene::GetDefaultCameraActor()
@@ -210,19 +208,19 @@ void Scene::SurfaceResized(float width, float height)
 
 void Scene::SurfaceReplaced()
 {
-  if ( mSceneObject )
+  if(mSceneObject)
   {
     ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
-    SurfaceReplacedMessage( tls->GetUpdateManager(), *mSceneObject );
+    SurfaceReplacedMessage(tls->GetUpdateManager(), *mSceneObject);
   }
 }
 
 void Scene::Discard()
 {
-  if( ThreadLocalStorage::Created() )
+  if(ThreadLocalStorage::Created())
   {
     ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
-    tls->RemoveScene( this );
+    tls->RemoveScene(this);
   }
 }
 
@@ -231,9 +229,9 @@ void Scene::RequestRebuildDepthTree()
   mDepthTreeDirty = true;
 }
 
-void Scene::QueueEvent( const Integration::Event& event )
+void Scene::QueueEvent(const Integration::Event& event)
 {
-  mEventProcessor.QueueEvent( event );
+  mEventProcessor.QueueEvent(event);
 }
 
 void Scene::ProcessEvents()
@@ -244,20 +242,20 @@ void Scene::ProcessEvents()
 void Scene::RebuildDepthTree()
 {
   // If the depth tree needs rebuilding, do it in this frame only.
-  if( mDepthTreeDirty )
+  if(mDepthTreeDirty)
   {
-    ActorPtr actor( mRootLayer.Get() );
+    ActorPtr actor(mRootLayer.Get());
     actor->RebuildDepthTree();
     mDepthTreeDirty = false;
   }
 }
 
-void Scene::SetBackgroundColor( const Vector4& color )
+void Scene::SetBackgroundColor(const Vector4& color)
 {
   mBackgroundColor = color;
 
-  mRenderTaskList->GetTask( 0u )->SetClearColor( color );
-  mRenderTaskList->GetTask( 0u )->SetClearEnabled( true );
+  mRenderTaskList->GetTask(0u)->SetClearColor(color);
+  mRenderTaskList->GetTask(0u)->SetClearEnabled(true);
 }
 
 Vector4 Scene::GetBackgroundColor() const
@@ -272,10 +270,10 @@ SceneGraph::Scene* Scene::GetSceneObject() const
 
 void Scene::EmitKeyEventSignal(const Dali::KeyEvent& event)
 {
-  if ( !mKeyEventSignal.Empty() )
+  if(!mKeyEventSignal.Empty())
   {
-    Dali::Integration::Scene handle( this );
-    mKeyEventSignal.Emit( event );
+    Dali::Integration::Scene handle(this);
+    mKeyEventSignal.Emit(event);
   }
 }
 
@@ -304,7 +302,7 @@ void Scene::ChangedSurface(float width, float height, int orientation)
   mRootLayer->SetSize(width, height);
 
   // Send the surface rectangle/orientation to SceneGraph::Scene for calculating glViewport/Scissor
-  ThreadLocalStorage*        tls           = ThreadLocalStorage::GetInternal();
+  ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
   SetSurfaceRectMessage(tls->GetEventThreadServices(), *mSceneObject, newSize);
   SetSurfaceOrientationMessage(tls->GetEventThreadServices(), *mSceneObject, static_cast<int32_t>(orientation));
 
@@ -321,57 +319,57 @@ bool Scene::IsSurfaceRectChanged() const
 bool Scene::EmitKeyEventGeneratedSignal(const Dali::KeyEvent& event)
 {
   // Emit the KeyEventGenerated signal when KeyEvent is generated
-  Dali::Integration::Scene handle( this );
-  return mKeyEventGeneratedSignal.Emit( event );
+  Dali::Integration::Scene handle(this);
+  return mKeyEventGeneratedSignal.Emit(event);
 }
 
 void Scene::EmitEventProcessingFinishedSignal()
 {
-  if ( !mEventProcessingFinishedSignal.Empty() )
+  if(!mEventProcessingFinishedSignal.Empty())
   {
-    Dali::Integration::Scene handle( this );
+    Dali::Integration::Scene handle(this);
     mEventProcessingFinishedSignal.Emit();
   }
 }
 
-void Scene::EmitTouchedSignal( const Dali::TouchEvent& touch )
+void Scene::EmitTouchedSignal(const Dali::TouchEvent& touch)
 {
-  Dali::Integration::Scene handle( this );
-  if ( !mTouchedSignal.Empty() )
+  Dali::Integration::Scene handle(this);
+  if(!mTouchedSignal.Empty())
   {
-    mTouchedSignal.Emit( touch );
+    mTouchedSignal.Emit(touch);
   }
 }
 
 void Scene::EmitWheelEventSignal(const Dali::WheelEvent& event)
 {
-  if ( !mWheelEventSignal.Empty() )
+  if(!mWheelEventSignal.Empty())
   {
-    Dali::Integration::Scene handle( this );
-    mWheelEventSignal.Emit( event );
+    Dali::Integration::Scene handle(this);
+    mWheelEventSignal.Emit(event);
   }
 }
 
-void Scene::AddFrameRenderedCallback( std::unique_ptr< CallbackBase > callback, int32_t frameId )
+void Scene::AddFrameRenderedCallback(std::unique_ptr<CallbackBase> callback, int32_t frameId)
 {
   ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
-  AddFrameRenderedCallbackMessage( tls->GetEventThreadServices(), *mSceneObject, callback.release(), frameId );
+  AddFrameRenderedCallbackMessage(tls->GetEventThreadServices(), *mSceneObject, callback.release(), frameId);
 }
 
-void Scene::AddFramePresentedCallback( std::unique_ptr< CallbackBase > callback, int32_t frameId )
+void Scene::AddFramePresentedCallback(std::unique_ptr<CallbackBase> callback, int32_t frameId)
 {
   ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
-  AddFramePresentedCallbackMessage( tls->GetEventThreadServices(), *mSceneObject, callback.release(), frameId );
+  AddFramePresentedCallbackMessage(tls->GetEventThreadServices(), *mSceneObject, callback.release(), frameId);
 }
 
-void Scene::GetFrameRenderedCallback( Dali::Integration::Scene::FrameCallbackContainer& callbacks )
+void Scene::GetFrameRenderedCallback(Dali::Integration::Scene::FrameCallbackContainer& callbacks)
 {
-  mSceneObject->GetFrameRenderedCallback( callbacks );
+  mSceneObject->GetFrameRenderedCallback(callbacks);
 }
 
-void Scene::GetFramePresentedCallback( Dali::Integration::Scene::FrameCallbackContainer& callbacks )
+void Scene::GetFramePresentedCallback(Dali::Integration::Scene::FrameCallbackContainer& callbacks)
 {
-  mSceneObject->GetFramePresentedCallback( callbacks );
+  mSceneObject->GetFramePresentedCallback(callbacks);
 }
 
 Integration::Scene::KeyEventSignalType& Scene::KeyEventSignal()
@@ -404,6 +402,6 @@ std::vector<Dali::Internal::SceneGraph::DirtyRect>& Scene::GetItemsDirtyRects()
   return mItemsDirtyRects;
 }
 
-} // Internal
+} // namespace Internal
 
-} // Dali
+} // namespace Dali

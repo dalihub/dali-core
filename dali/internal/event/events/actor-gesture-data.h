@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ACTOR_GESTURE_DATA_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,17 +23,14 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 /**
  * Holds gesture specific data for an Actor
  */
 class ActorGestureData
 {
 public:
-
   /**
    * Constructor
    */
@@ -51,7 +48,7 @@ public:
    * @note A raw pointer to the detector is stored, so the detector MUST remove itself when it is
    * destroyed using RemoveGestureDetector()
    */
-  void AddGestureDetector( GestureDetector& detector );
+  void AddGestureDetector(GestureDetector& detector);
 
   /**
    * Removes a previously added gesture detector from the data. If no more gesture detectors of
@@ -59,14 +56,14 @@ public:
    * gesture.
    * @param[in] detector The detector to remove.
    */
-  void RemoveGestureDetector( GestureDetector& detector );
+  void RemoveGestureDetector(GestureDetector& detector);
 
   /**
    * Queries whether the actor requires the gesture type.
    * @param[in] type The gesture type.
    * @return true if the gesture is required, false otherwise.
    */
-  inline bool IsGestureRequired( GestureType::Value type ) const
+  inline bool IsGestureRequired(GestureType::Value type) const
   {
     return type & gesturesRequired;
   }
@@ -76,18 +73,16 @@ public:
    * @param[in] type The container type required
    * @pre Ensure IsGestureRequired() is used to check if the container is actually available.
    */
-  GestureDetectorContainer& GetGestureDetectorContainer( GestureType::Value type );
+  GestureDetectorContainer& GetGestureDetectorContainer(GestureType::Value type);
 
 private:
-
   /**
    * Helper to retrieve the appropriate container type.
    * @param[in] type The container type required.
    */
-  inline GestureDetectorContainer*& GetContainerPtr( GestureType::Value type );
+  inline GestureDetectorContainer*& GetContainerPtr(GestureType::Value type);
 
 private:
-
   GestureType::Value gesturesRequired; ///< Stores which gestures are required
 
   GestureDetectorContainer* panDetectors;       ///< Pointer to a container of pan-detectors
@@ -102,4 +97,3 @@ private:
 } // namespace Dali
 
 #endif // DALI_INTERNAL_ACTOR_GESTURE_DATA_H
-

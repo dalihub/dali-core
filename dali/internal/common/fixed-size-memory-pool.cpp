@@ -24,10 +24,8 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 /**
  * @brief Private implementation class
  */
@@ -40,8 +38,8 @@ struct FixedSizeMemoryPool::Impl
    */
   struct Block
   {
-    void* blockMemory;      ///< The allocated memory from which allocations can be made
-    Block* nextBlock;       ///< The next block in the linked list
+    void*  blockMemory; ///< The allocated memory from which allocations can be made
+    Block* nextBlock;   ///< The next block in the linked list
 #ifdef DEBUG_ENABLED
     SizeType mBlockSize; ///< Size of the block in bytes
 #endif
@@ -50,14 +48,15 @@ struct FixedSizeMemoryPool::Impl
      *
      * @param size The size of the memory block to allocate in bytes. Must be non-zero.
      */
-    Block( SizeType size )
-    : nextBlock( nullptr )
+    Block(SizeType size)
+    : nextBlock(nullptr)
 #ifdef DEBUG_ENABLED
-      ,mBlockSize( size )
+      ,
+      mBlockSize(size)
 #endif
     {
-      blockMemory = ::operator new( size );
-      DALI_ASSERT_ALWAYS( blockMemory && "Out of memory" );
+      blockMemory = ::operator new(size);
+      DALI_ASSERT_ALWAYS(blockMemory && "Out of memory");
     }
 
     /**
@@ -65,32 +64,32 @@ struct FixedSizeMemoryPool::Impl
      */
     ~Block()
     {
-      ::operator delete( blockMemory );
+      ::operator delete(blockMemory);
     }
 
   private:
     // Undefined
-    Block( const Block& block );
+    Block(const Block& block);
 
     // Undefined
-    Block& operator=( const Block& block );
+    Block& operator=(const Block& block);
   };
 
   /**
    * @brief Constructor
    */
-  Impl( SizeType fixedSize, SizeType initialCapacity, SizeType maximumBlockCapacity )
-  :  mMutex(),
-     mFixedSize( fixedSize ),
-     mMemoryBlocks( initialCapacity * mFixedSize ),
-     mMaximumBlockCapacity( maximumBlockCapacity ),
-     mCurrentBlock( &mMemoryBlocks ),
-     mCurrentBlockCapacity( initialCapacity ),
-     mCurrentBlockSize( 0 ),
-     mDeletedObjects( nullptr )
+  Impl(SizeType fixedSize, SizeType initialCapacity, SizeType maximumBlockCapacity)
+  : mMutex(),
+    mFixedSize(fixedSize),
+    mMemoryBlocks(initialCapacity * mFixedSize),
+    mMaximumBlockCapacity(maximumBlockCapacity),
+    mCurrentBlock(&mMemoryBlocks),
+    mCurrentBlockCapacity(initialCapacity),
+    mCurrentBlockSize(0),
+    mDeletedObjects(nullptr)
   {
     // We need enough room to store the deleted list in the data
-    DALI_ASSERT_DEBUG( mFixedSize >= sizeof( void* ) );
+    DALI_ASSERT_DEBUG(mFixedSize >= sizeof(void*));
   }
 
   /**
@@ -100,7 +99,7 @@ struct FixedSizeMemoryPool::Impl
   {
     // Clean up memory block linked list (mMemoryBlocks will be auto-destroyed by its destructor)
     Block* block = mMemoryBlocks.nextBlock;
-    while( block )
+    while(block)
     {
       Block* nextBlock = block->nextBlock;
       delete block;
@@ -115,7 +114,7 @@ struct FixedSizeMemoryPool::Impl
   {
     // Double capacity for the new block
     SizeType size = mCurrentBlockCapacity * 2;
-    if( size > mMaximumBlockCapacity || size < mCurrentBlockCapacity )    // Check for overflow of size type
+    if(size > mMaximumBlockCapacity || size < mCurrentBlockCapacity) // Check for overflow of size type
     {
       size = mMaximumBlockCapacity;
     }
@@ -123,9 +122,9 @@ struct FixedSizeMemoryPool::Impl
     mCurrentBlockCapacity = size;
 
     // Allocate
-    Block* block = new Block( mCurrentBlockCapacity * mFixedSize );
-    mCurrentBlock->nextBlock = block;       // Add to end of linked list
-    mCurrentBlock = block;
+    Block* block             = new Block(mCurrentBlockCapacity * mFixedSize);
+    mCurrentBlock->nextBlock = block; // Add to end of linked list
+    mCurrentBlock            = block;
 
     mCurrentBlockSize = 0;
   }
@@ -135,43 +134,43 @@ struct FixedSizeMemoryPool::Impl
    * @brief check the memory being free'd exists inside the memory pool
    * @param[in] memory address of object to remove
    */
-  void CheckMemoryIsInsidePool( const void* const memory )
+  void CheckMemoryIsInsidePool(const void* const memory)
   {
-    bool inRange = false;
-    const Block* block = &mMemoryBlocks;
+    bool         inRange = false;
+    const Block* block   = &mMemoryBlocks;
 
-    while( block )
+    while(block)
     {
-      const void* const endOfBlock = reinterpret_cast<char *>( block->blockMemory )+ block->mBlockSize;
+      const void* const endOfBlock = reinterpret_cast<char*>(block->blockMemory) + block->mBlockSize;
 
-      if( ( memory >= block->blockMemory ) && ( memory < (endOfBlock) ) )
+      if((memory >= block->blockMemory) && (memory < (endOfBlock)))
       {
         inRange = true;
         break;
       }
       block = block->nextBlock;
     }
-    DALI_ASSERT_DEBUG( inRange && "Freeing memory that does not exist in memory pool" );
+    DALI_ASSERT_DEBUG(inRange && "Freeing memory that does not exist in memory pool");
   }
 #endif
 
-  Mutex mMutex;                       ///< Mutex for thread-safe allocation and deallocation
+  Mutex mMutex; ///< Mutex for thread-safe allocation and deallocation
 
-  SizeType mFixedSize;                ///< The size of each allocation in bytes
+  SizeType mFixedSize; ///< The size of each allocation in bytes
 
-  Block mMemoryBlocks;                ///< Linked list of allocated memory blocks
-  SizeType mMaximumBlockCapacity;     ///< The maximum allowed capacity of allocations in a new memory block
+  Block    mMemoryBlocks;         ///< Linked list of allocated memory blocks
+  SizeType mMaximumBlockCapacity; ///< The maximum allowed capacity of allocations in a new memory block
 
-  Block* mCurrentBlock;               ///< Pointer to the active block
-  SizeType mCurrentBlockCapacity;     ///< The maximum number of allocations that can be allocated for the current block
-  SizeType mCurrentBlockSize;         ///< The number of allocations allocated to the current block
+  Block*   mCurrentBlock;         ///< Pointer to the active block
+  SizeType mCurrentBlockCapacity; ///< The maximum number of allocations that can be allocated for the current block
+  SizeType mCurrentBlockSize;     ///< The number of allocations allocated to the current block
 
-  void* mDeletedObjects;              ///< Pointer to the head of the list of deleted objects. The addresses are stored in the allocated memory blocks.
+  void* mDeletedObjects; ///< Pointer to the head of the list of deleted objects. The addresses are stored in the allocated memory blocks.
 };
 
-FixedSizeMemoryPool::FixedSizeMemoryPool( SizeType fixedSize, SizeType initialCapacity, SizeType maximumBlockCapacity )
+FixedSizeMemoryPool::FixedSizeMemoryPool(SizeType fixedSize, SizeType initialCapacity, SizeType maximumBlockCapacity)
 {
-  mImpl = new Impl( fixedSize, initialCapacity, maximumBlockCapacity );
+  mImpl = new Impl(fixedSize, initialCapacity, maximumBlockCapacity);
 }
 
 FixedSizeMemoryPool::~FixedSizeMemoryPool()
@@ -182,56 +181,55 @@ FixedSizeMemoryPool::~FixedSizeMemoryPool()
 void* FixedSizeMemoryPool::Allocate()
 {
   // First, recycle deleted objects
-  if( mImpl->mDeletedObjects )
+  if(mImpl->mDeletedObjects)
   {
-    void* recycled = mImpl->mDeletedObjects;
-    mImpl->mDeletedObjects = *( reinterpret_cast< void** >( mImpl->mDeletedObjects ) );  // Pop head off front of deleted objects list
+    void* recycled         = mImpl->mDeletedObjects;
+    mImpl->mDeletedObjects = *(reinterpret_cast<void**>(mImpl->mDeletedObjects)); // Pop head off front of deleted objects list
     return recycled;
   }
 
   // Check if current block is full
-  if( mImpl->mCurrentBlockSize >= mImpl->mCurrentBlockCapacity )
+  if(mImpl->mCurrentBlockSize >= mImpl->mCurrentBlockCapacity)
   {
     mImpl->AllocateNewBlock();
   }
 
   // Placement new the object in block memory
-  uint8_t* objectAddress = static_cast< uint8_t* >( mImpl->mCurrentBlock->blockMemory );
+  uint8_t* objectAddress = static_cast<uint8_t*>(mImpl->mCurrentBlock->blockMemory);
   objectAddress += mImpl->mCurrentBlockSize * mImpl->mFixedSize;
   mImpl->mCurrentBlockSize++;
 
   return objectAddress;
 }
 
-void FixedSizeMemoryPool::Free( void* memory )
+void FixedSizeMemoryPool::Free(void* memory)
 {
-  if( memory )
+  if(memory)
   {
 #ifdef DEBUG_ENABLED
-    mImpl->CheckMemoryIsInsidePool( memory );
+    mImpl->CheckMemoryIsInsidePool(memory);
 #endif
 
     // Add memory to head of deleted objects list. Store next address in the same memory space as the old object.
-    *( reinterpret_cast< void** >( memory ) ) = mImpl->mDeletedObjects;
-    mImpl->mDeletedObjects = memory;
+    *(reinterpret_cast<void**>(memory)) = mImpl->mDeletedObjects;
+    mImpl->mDeletedObjects              = memory;
   }
 }
 
 void* FixedSizeMemoryPool::AllocateThreadSafe()
 {
-  Mutex::ScopedLock lock( mImpl->mMutex );
+  Mutex::ScopedLock lock(mImpl->mMutex);
   return Allocate();
 }
 
-void FixedSizeMemoryPool::FreeThreadSafe( void* memory )
+void FixedSizeMemoryPool::FreeThreadSafe(void* memory)
 {
-  if( memory )
+  if(memory)
   {
-    Mutex::ScopedLock lock( mImpl->mMutex );
-    Free( memory );
+    Mutex::ScopedLock lock(mImpl->mMutex);
+    Free(memory);
   }
 }
-
 
 } // namespace Internal
 

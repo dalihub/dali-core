@@ -806,8 +806,8 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       clearColor = Dali::RenderTask::DEFAULT_CLEAR_COLOR;
     }
 
-    Rect<int32_t> surfaceRect = sceneObject->GetSurfaceRect();
-    int32_t surfaceOrientation = sceneObject->GetSurfaceOrientation();
+    Rect<int32_t> surfaceRect        = sceneObject->GetSurfaceRect();
+    int32_t       surfaceOrientation = sceneObject->GetSurfaceOrientation();
 
     Integration::DepthBufferAvailable   depthBufferAvailable   = mImpl->depthBufferAvailable;
     Integration::StencilBufferAvailable stencilBufferAvailable = mImpl->stencilBufferAvailable;

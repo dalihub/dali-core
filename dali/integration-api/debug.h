@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_DEBUG_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -469,7 +469,7 @@ public:                                    \
  ********************************************************************************/
 #if defined(DEBUG_ENABLED)
 
- /**
+/**
   * @brief Get the monotonic time since the clock's epoch.
   *
   * @param[out]  timeInNanoseconds  The time in nanoseconds since the reference point.

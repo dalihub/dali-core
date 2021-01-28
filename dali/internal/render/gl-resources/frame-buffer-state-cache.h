@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_CONTEXT_FRAME_BUFFER_STATE_CACHE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,8 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 /**
  * @brief Keeps track of color, depth and stencil buffer state within each frame buffer.
  * Used to avoid redundant glClear calls.
@@ -36,8 +34,6 @@ namespace Internal
 class FrameBufferStateCache
 {
 public:
-
-
   /**
    * @brief Constructor
    */
@@ -56,27 +52,27 @@ public:
    * @param[in] scissorTestEnabled whether scissor test is enabled
    * @return new bitmask to pass to glClear
    */
-  GLbitfield GetClearMask( GLbitfield mask, bool forceClear, bool scissorTestEnabled );
+  GLbitfield GetClearMask(GLbitfield mask, bool forceClear, bool scissorTestEnabled);
 
   /**
    * @brief Set the current bound frame buffer
    * @param[in] frameBufferId frame buffer id
    */
-  void SetCurrentFrameBuffer( GLuint frameBufferId );
+  void SetCurrentFrameBuffer(GLuint frameBufferId);
 
   /**
    * @brief Called when frame buffers are deleted
    * @param[in] count number of frame buffers
    * @param[in] framebuffers array of frame buffer ids
    */
-  void FrameBuffersDeleted( GLsizei count, const GLuint* const frameBuffers );
+  void FrameBuffersDeleted(GLsizei count, const GLuint* const frameBuffers);
 
   /**
    * @brief Called when frame buffers are created
    * @param[in] count number of frame buffers
    * @param[in] framebuffers array of frame buffer ids
    */
-  void FrameBuffersCreated( GLsizei count, const GLuint* const frameBuffers );
+  void FrameBuffersCreated(GLsizei count, const GLuint* const frameBuffers);
 
   /**
    * @brief Draw operation performed on the current frame buffer
@@ -84,7 +80,7 @@ public:
    * @param[in] depthBufferUsed whether the depth buffer is being written to (glDepthMask )
    * @param[in] stencilBufferUsed whether the stencil buffer is being written to (glStencilMask )
    */
-  void DrawOperation( bool colorBufferUsed, bool depthBufferUsed, bool stencilBufferUsed );
+  void DrawOperation(bool colorBufferUsed, bool depthBufferUsed, bool stencilBufferUsed);
 
   /**
    * Reset the cache
@@ -92,15 +88,14 @@ public:
   void Reset();
 
 private:
-
   /**
    * Current status of the frame buffer
    */
   enum FrameBufferStatus
   {
-    COLOR_BUFFER_CLEAN      = 1 << 0, ///< color buffer clean
-    DEPTH_BUFFER_CLEAN      = 1 << 1, ///< depth buffer clean
-    STENCIL_BUFFER_CLEAN    = 1 << 2, ///< stencil buffer clean
+    COLOR_BUFFER_CLEAN   = 1 << 0, ///< color buffer clean
+    DEPTH_BUFFER_CLEAN   = 1 << 1, ///< depth buffer clean
+    STENCIL_BUFFER_CLEAN = 1 << 2, ///< stencil buffer clean
   };
 
   /**
@@ -111,13 +106,13 @@ private:
     /**
      * Constructor
      */
-    FrameBufferState( GLuint id )
-    :mId( id ),
-    mState( 0 )
+    FrameBufferState(GLuint id)
+    : mId(id),
+      mState(0)
     {
     }
-    GLuint mId;           ///< Frame buffer id
-    unsigned int mState;  ///< State, bitmask of FrameBufferStatus flags
+    GLuint       mId;    ///< Frame buffer id
+    unsigned int mState; ///< State, bitmask of FrameBufferStatus flags
   };
 
   using FrameBufferStateVector = Dali::Vector<FrameBufferState>;
@@ -127,29 +122,28 @@ private:
    * @param[in] pointer to frame buffer state object
    * @param[in] mask clear mask
    */
-  void SetClearState( FrameBufferState* state, GLbitfield mask );
+  void SetClearState(FrameBufferState* state, GLbitfield mask);
 
   /**
    * @brief Helper
    * @param[in] frameBufferId frame buffer id
    * @return pointer to  frame buffer state object ( NULL if it doesn't exist)
    */
-  FrameBufferState* GetFrameBufferState( GLuint frameBufferId );
+  FrameBufferState* GetFrameBufferState(GLuint frameBufferId);
 
   /**
    * @brief Helper to delete a frame buffer state object
    * @param[in] frameBufferId frame buffer id
    */
-  void DeleteFrameBuffer( GLuint frameBufferId );
+  void DeleteFrameBuffer(GLuint frameBufferId);
 
-  FrameBufferStateCache( const FrameBufferStateCache& );            ///< undefined copy constructor
+  FrameBufferStateCache(const FrameBufferStateCache&); ///< undefined copy constructor
 
-  FrameBufferStateCache& operator=( const FrameBufferStateCache& ); ///< undefined assignment operator
+  FrameBufferStateCache& operator=(const FrameBufferStateCache&); ///< undefined assignment operator
 
-private: // data
-
-  FrameBufferStateVector    mFrameBufferStates;     ///< state of the frame buffers
-  GLuint                    mCurrentFrameBufferId;  ///< currently bound frame buffer
+private:                                        // data
+  FrameBufferStateVector mFrameBufferStates;    ///< state of the frame buffers
+  GLuint                 mCurrentFrameBufferId; ///< currently bound frame buffer
 };
 
 } // namespace Internal

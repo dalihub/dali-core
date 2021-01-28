@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_FIXED_SIZE_MEMORY_POOL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,18 +24,16 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 /**
  * @brief Calculate the size of a type taking alignment into account
  */
-template< typename T >
+template<typename T>
 struct TypeSizeWithAlignment
 {
   ///< The size of the type with alignment taken into account
-  static const size_t size = ( ( sizeof( T ) + sizeof( void* ) - 1 ) / sizeof( void* ) ) * sizeof( void* );
+  static const size_t size = ((sizeof(T) + sizeof(void*) - 1) / sizeof(void*)) * sizeof(void*);
 };
 
 /**
@@ -55,7 +53,6 @@ public:
   using SizeType = uint32_t;
 
 public:
-
   /**
    * @brief Constructor.
    *
@@ -65,7 +62,7 @@ public:
    * @param maximumBlockCapacity The maximum size that a new block of memory can be allocated. Defaults to
    *                             a large value (1024 * 1024 = 1048576).
    */
-  explicit FixedSizeMemoryPool( SizeType fixedSize, SizeType initialCapacity = 32, SizeType maximumBlockCapacity = 1048576 );
+  explicit FixedSizeMemoryPool(SizeType fixedSize, SizeType initialCapacity = 32, SizeType maximumBlockCapacity = 1048576);
 
   /**
    * @brief Destructor.
@@ -91,28 +88,25 @@ public:
    *
    * @param memory The memory to be deleted. Must have been allocated by this memory pool
    */
-  void Free( void* memory );
+  void Free(void* memory);
 
   /**
    * @brief Thread-safe version of Free()
    *
    * @param memory The memory to be deleted. Must have been allocated by this memory pool
    */
-  void FreeThreadSafe( void* memory );
+  void FreeThreadSafe(void* memory);
 
 private:
+  // Undefined
+  FixedSizeMemoryPool(const FixedSizeMemoryPool& fixedSizeMemoryPool);
 
   // Undefined
-  FixedSizeMemoryPool( const FixedSizeMemoryPool& fixedSizeMemoryPool );
-
-  // Undefined
-  FixedSizeMemoryPool& operator=( const FixedSizeMemoryPool& fixedSizeMemoryPool );
+  FixedSizeMemoryPool& operator=(const FixedSizeMemoryPool& fixedSizeMemoryPool);
 
 private:
-
   struct Impl;
   Impl* mImpl;
-
 };
 
 } // namespace Internal

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_GL_CALL_DEBUG_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,15 +35,17 @@ namespace Internal
  * @param glAbstraction to use for error check
  * @param operation to be logged
  */
-void CheckGlError( Integration::GlAbstraction& glAbstraction, const char* operation );
+void CheckGlError(Integration::GlAbstraction& glAbstraction, const char* operation);
 
 // wrap gl calls with CHECK_GL e.g. "CHECK_GL( mGlAbstraction, mGlAbstraction.UseProgram(mProgramId) );"
 // will LOG any glErrors eg "glError (0x0501) GL_INVALID_VALUE - glBindTexture(textureId)"
 // only enable if specifically enabled as it can slow down GL a lot!
 #ifdef DALI_GL_ERROR_CHECK
-#define CHECK_GL(c,a)  (a); CheckGlError(c,#a)
+#define CHECK_GL(c, a) \
+  (a);                 \
+  CheckGlError(c, #a)
 #else
-#define CHECK_GL(c,a)  (a)
+#define CHECK_GL(c, a) (a)
 #endif
 
 #ifdef DEBUG_ENABLED
@@ -53,11 +55,10 @@ extern Debug::Filter* gGlLogFilter;
 
 // Don't put guards around here (LOG_INFO has it's own guards)
 #define LOG_GL(format, ...) \
-  DALI_LOG_INFO(gGlLogFilter, Debug::General, format, ## __VA_ARGS__)
+  DALI_LOG_INFO(gGlLogFilter, Debug::General, format, ##__VA_ARGS__)
 
-}
+} // namespace Internal
 
-}
+} // namespace Dali
 
 #endif // DALI_INTERNAL_GL_CALL_DEBUG_H
-

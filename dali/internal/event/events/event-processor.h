@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_EVENT_PROCESSOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,14 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/events/touch-event-processor.h>
+#include <dali/internal/common/message-buffer.h>
 #include <dali/internal/event/events/hover-event-processor.h>
 #include <dali/internal/event/events/key-event-processor.h>
+#include <dali/internal/event/events/touch-event-processor.h>
 #include <dali/internal/event/events/wheel-event-processor.h>
-#include <dali/internal/common/message-buffer.h>
 
 namespace Dali
 {
-
 namespace Integration
 {
 struct Event;
@@ -35,7 +34,6 @@ struct Event;
 
 namespace Internal
 {
-
 class Scene;
 class GestureEventProcessor;
 class NotificationManager;
@@ -50,13 +48,12 @@ class NotificationManager;
 class EventProcessor
 {
 public:
-
   /**
    * Constructor
    * @param[in] scene                  The scene.
    * @param[in] gestureEventProcessor  The gesture event processor.
    */
-  EventProcessor( Scene& scene, GestureEventProcessor& gestureEventProcessor );
+  EventProcessor(Scene& scene, GestureEventProcessor& gestureEventProcessor);
 
   /**
    * Destructor
@@ -64,12 +61,11 @@ public:
   virtual ~EventProcessor();
 
 public:
-
   /**
    * This function is called when an event is queued.
    * @param[in] event A event to queue.
    */
-  void QueueEvent( const Integration::Event& event );
+  void QueueEvent(const Integration::Event& event);
 
   /**
    * This function is called when events are processed.
@@ -77,17 +73,16 @@ public:
   void ProcessEvents();
 
 private:
-
-  Scene& mScene;                                        ///< The Scene events are processed for.
-  TouchEventProcessor      mTouchEventProcessor;        ///< Processes touch events.
-  HoverEventProcessor      mHoverEventProcessor;        ///< Processes hover events.
-  GestureEventProcessor&   mGestureEventProcessor;      ///< Processes gesture events.
-  KeyEventProcessor        mKeyEventProcessor;          ///< Processes key events.
-  WheelEventProcessor      mWheelEventProcessor;        ///< Processes wheel events.
+  Scene&                 mScene;                 ///< The Scene events are processed for.
+  TouchEventProcessor    mTouchEventProcessor;   ///< Processes touch events.
+  HoverEventProcessor    mHoverEventProcessor;   ///< Processes hover events.
+  GestureEventProcessor& mGestureEventProcessor; ///< Processes gesture events.
+  KeyEventProcessor      mKeyEventProcessor;     ///< Processes key events.
+  WheelEventProcessor    mWheelEventProcessor;   ///< Processes wheel events.
 
   // Allow messages to be added safely to one queue, while processing (iterating through) the second queue.
-  MessageBuffer mEventQueue0;        ///< An event queue.
-  MessageBuffer mEventQueue1;        ///< Another event queue.
+  MessageBuffer  mEventQueue0;       ///< An event queue.
+  MessageBuffer  mEventQueue1;       ///< Another event queue.
   MessageBuffer* mCurrentEventQueue; ///< QueueEvent() will queue here.
 };
 
@@ -96,4 +91,3 @@ private:
 } // namespace Dali
 
 #endif // DALI_INTERNAL_EVENT_PROCESSOR_H
-

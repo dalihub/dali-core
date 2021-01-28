@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,17 +47,17 @@ Mutex::~Mutex()
 }
 
 Mutex::Mutex(Mutex&& rhs) noexcept
-  : mImpl(rhs.mImpl)
+: mImpl(rhs.mImpl)
 {
   rhs.mImpl = nullptr;
 }
 
-Mutex &Mutex::operator=(Mutex&& rhs) noexcept
+Mutex& Mutex::operator=(Mutex&& rhs) noexcept
 {
-  if (mImpl != rhs.mImpl)
+  if(mImpl != rhs.mImpl)
   {
     delete mImpl;
-    mImpl = rhs.mImpl;
+    mImpl     = rhs.mImpl;
     rhs.mImpl = nullptr;
   }
 

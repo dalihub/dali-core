@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_GESTURE_RECOGNIZER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,14 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/internal/event/events/gesture-event.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/events/gesture.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/object/ref-object.h>
-#include <dali/internal/event/events/gesture-event.h>
 
 namespace Dali
 {
-
 namespace Integration
 {
 struct TouchEvent;
@@ -38,16 +37,15 @@ namespace Internal
 struct GestureRequest;
 class Scene;
 
-template< typename T>
+template<typename T>
 class RecognizerObserver
 {
 public:
-  virtual void Process( Scene& scene, const T& event ) = 0;
+  virtual void Process(Scene& scene, const T& event) = 0;
 
   virtual ~RecognizerObserver() = default;
   ;
 };
-
 
 /**
  * Abstract Base class for all adaptor gesture detectors.
@@ -57,7 +55,6 @@ public:
 class GestureRecognizer : public RefObject
 {
 public:
-
   /**
    * Called when it gets a touch event.  The gesture recognizer should
    * evaluate this event along with previously received events to determine
@@ -76,30 +73,32 @@ public:
    * Returns the type of gesture detector.
    * @return Type of gesture detector.
    */
-  GestureType::Value GetType() const { return mType; }
+  GestureType::Value GetType() const
+  {
+    return mType;
+  }
 
   /**
    * Called when we get a touch event.
    * @param[in]  scene  The scene the touch event has occurred on
    * @param[in]  event  The latest touch event
    */
-  void SendEvent( Scene& scene, const Integration::TouchEvent& event )
+  void SendEvent(Scene& scene, const Integration::TouchEvent& event)
   {
     mScene = &scene;
-    SendEvent( event );
+    SendEvent(event);
   }
 
 protected:
-
   /**
    * Protected Constructor. Should only be able to create derived class objects.
    * @param[in]  screenSize    The size of the screen.
    * @param[in]  detectorType  The type of gesture detector.
    */
-  GestureRecognizer( Vector2 screenSize, GestureType::Value detectorType )
-  : mScreenSize( screenSize ),
-    mType( detectorType ),
-    mScene( nullptr )
+  GestureRecognizer(Vector2 screenSize, GestureType::Value detectorType)
+  : mScreenSize(screenSize),
+    mType(detectorType),
+    mScene(nullptr)
   {
   }
 
@@ -109,8 +108,8 @@ protected:
    * Use this constructor with the screen size is not used in the dereived class.
    * @param[in]  detectorType  The type of gesture detector.
    */
-  GestureRecognizer( GestureType::Value detectorType )
-  : GestureRecognizer( Vector2::ZERO, detectorType )
+  GestureRecognizer(GestureType::Value detectorType)
+  : GestureRecognizer(Vector2::ZERO, detectorType)
   {
   }
 
@@ -120,9 +119,9 @@ protected:
   ~GestureRecognizer() override = default;
 
 protected:
-  Vector2 mScreenSize;
+  Vector2            mScreenSize;
   GestureType::Value mType;
-  Scene* mScene;
+  Scene*             mScene;
 };
 
 using GestureRecognizerPtr = IntrusivePtr<GestureRecognizer>;

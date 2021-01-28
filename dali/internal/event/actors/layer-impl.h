@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_LAYER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,30 +19,27 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/actors/layer.h>
-#include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/actor-declarations.h>
+#include <dali/internal/event/actors/actor-impl.h>
+#include <dali/public-api/actors/layer.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 class LayerList;
 
 namespace SceneGraph
 {
 class UpdateManager;
 class Layer;
-}
+} // namespace SceneGraph
 
 using ClippingBox = Dali::ClippingBox;
 
 class Layer : public Actor
 {
 public:
-
   /**
    * @copydoc Dali::Layer::ZValue(const Vector3&, float)
    *
@@ -71,7 +68,7 @@ public:
    * @param[in] layerList The layer will be added to this ordered list.
    * @return A smart-pointer to the newly allocated Actor.
    */
-  static LayerPtr NewRoot( LayerList& layerList );
+  static LayerPtr NewRoot(LayerList& layerList);
 
   /**
    * @copydoc Dali::Internal::Actor::OnInitialize
@@ -96,12 +93,12 @@ public:
   /**
    * @copydoc Dali::Layer::RaiseAbove
    */
-  void RaiseAbove( const Internal::Layer& target );
+  void RaiseAbove(const Internal::Layer& target);
 
   /**
    * @copydoc Dali::Layer::LowerBelow
    */
-  void LowerBelow( const Internal::Layer& target );
+  void LowerBelow(const Internal::Layer& target);
 
   /**
    * @copydoc Dali::Layer::RaiseToTop
@@ -116,12 +113,12 @@ public:
   /**
    * @copydoc Dali::Layer::MoveAbove
    */
-  void MoveAbove( const Internal::Layer& target );
+  void MoveAbove(const Internal::Layer& target);
 
   /**
    * @copydoc Dali::Layer::MoveAbove
    */
-  void MoveBelow( const Internal::Layer& target );
+  void MoveBelow(const Internal::Layer& target);
 
   /**
    * @copydoc Dali::Layer::SetClipping()
@@ -152,7 +149,7 @@ public:
   /**
    * @copydoc Dali::Layer::SetBehavior()
    */
-  void SetBehavior( Dali::Layer::Behavior behavior );
+  void SetBehavior(Dali::Layer::Behavior behavior);
 
   /**
    * @copydoc Dali::Layer::GetBehavior()
@@ -165,7 +162,7 @@ public:
   /**
    * @copydoc Dali::Layer::SetDepthTestDisabled()
    */
-  void SetDepthTestDisabled( bool disable );
+  void SetDepthTestDisabled(bool disable);
 
   /**
    * @copydoc Dali::Layer::IsDepthTestDisabled()
@@ -180,7 +177,7 @@ public:
   /**
    * @copydoc Dali::Layer::SetTouchConsumed()
    */
-  void SetTouchConsumed( bool consume );
+  void SetTouchConsumed(bool consume);
 
   /**
    * @copydoc Dali::Layer::IsTouchConsumed()
@@ -190,7 +187,7 @@ public:
   /**
    * @copydoc Dali::Layer::SetHoverConsumed()
    */
-  void SetHoverConsumed( bool consume );
+  void SetHoverConsumed(bool consume);
 
   /**
    * @copydoc Dali::Layer::IsHoverConsumed()
@@ -210,7 +207,6 @@ public:
   static bool DoAction(BaseObject* object, const std::string& actionName, const Property::Map& attributes);
 
 public: // Default property extensions from Object
-
   /**
    * @copydoc Dali::Internal::Object::SetDefaultProperty()
    */
@@ -219,21 +215,20 @@ public: // Default property extensions from Object
   /**
    * @copydoc Dali::Internal::Object::GetDefaultProperty()
    */
-  Property::Value GetDefaultProperty( Property::Index index ) const override;
+  Property::Value GetDefaultProperty(Property::Index index) const override;
 
   /**
    * @copydoc Dali::Internal::Object::GetDefaultProperty()
    */
-  Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const override;
+  Property::Value GetDefaultPropertyCurrentValue(Property::Index index) const override;
 
 protected:
-
   /**
    * Construct a new layer.
    * @param[in] type Either Actor::LAYER or Actor::ROOT_LAYER if this is the root actor.
    * @param[in] layer the scene graph layer
    */
-  Layer( Actor::DerivedType type, const SceneGraph::Layer& layer );
+  Layer(Actor::DerivedType type, const SceneGraph::Layer& layer);
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -241,7 +236,6 @@ protected:
   ~Layer() override;
 
 private: // From Actor
-
   /**
    * From Actor.
    */
@@ -253,20 +247,18 @@ private: // From Actor
   void OnSceneDisconnectionInternal() override;
 
 private:
-
   LayerList* mLayerList; ///< Only valid when layer is on-scene
 
   // These properties not animatable; the actor side has the most up-to-date values
-  ClippingBox mClippingBox;                     ///< The clipping box, in window coordinates
-  Dali::Layer::SortFunctionType mSortFunction;  ///< Used to sort semi-transparent geometry
+  ClippingBox                   mClippingBox;  ///< The clipping box, in window coordinates
+  Dali::Layer::SortFunctionType mSortFunction; ///< Used to sort semi-transparent geometry
 
-  Dali::Layer::Behavior mBehavior;              ///< Behavior of the layer
+  Dali::Layer::Behavior mBehavior; ///< Behavior of the layer
 
-  bool mIsClipping:1;                           ///< True when clipping is enabled
-  bool mDepthTestDisabled:1;                    ///< Whether depth test is disabled.
-  bool mTouchConsumed:1;                        ///< Whether we should consume touch (including gesture).
-  bool mHoverConsumed:1;                        ///< Whether we should consume hover.
-
+  bool mIsClipping : 1;        ///< True when clipping is enabled
+  bool mDepthTestDisabled : 1; ///< Whether depth test is disabled.
+  bool mTouchConsumed : 1;     ///< Whether we should consume touch (including gesture).
+  bool mHoverConsumed : 1;     ///< Whether we should consume hover.
 };
 
 } // namespace Internal
@@ -292,6 +284,5 @@ inline const Internal::Layer& GetImplementation(const Dali::Layer& layer)
 }
 
 } // namespace Dali
-
 
 #endif // DALI_INTERNAL_LAYER_H

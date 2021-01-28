@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_CONNECTABLE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,14 +24,12 @@ namespace Dali
 {
 namespace Internal
 {
-
 /**
  * @brief Interface for objects that can be connected to the stage.
  */
 class Connectable
 {
 public:
-
   /**
    * @brief Destructor
    */
@@ -51,7 +49,6 @@ public:
    * @brief Notify this objects that it has been disconnected to the stage.
    */
   virtual void Disconnect() = 0;
-
 };
 
 } // namespace Internal

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_HOVER_EVENT_PROCESSOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@
 
 namespace Dali
 {
-
 class Actor;
 struct Vector2;
 struct Vector4;
@@ -36,7 +35,6 @@ struct HoverEvent;
 
 namespace Internal
 {
-
 struct ActorObserver;
 class Scene;
 
@@ -51,12 +49,11 @@ class Scene;
 class HoverEventProcessor
 {
 public:
-
   /**
    * Create an event processor.
    * @param[in] scene The scene the event processor belongs to.
    */
-  HoverEventProcessor( Scene& scene );
+  HoverEventProcessor(Scene& scene);
 
   /**
    * Non-virtual destructor; HoverEventProcessor is not a base class
@@ -67,21 +64,20 @@ public:
    * This function is called by the event processor whenever a hover event occurs.
    * @param[in] event The hover event that has occurred.
    */
-  void ProcessHoverEvent( const Integration::HoverEvent& event );
+  void ProcessHoverEvent(const Integration::HoverEvent& event);
 
 private:
-
   // Undefined
   HoverEventProcessor(const HoverEventProcessor&);
 
   // Undefined
   HoverEventProcessor& operator=(const HoverEventProcessor& rhs);
 
-  Scene& mScene; ///< Reference to the scene
-  ActorObserver mLastPrimaryHitActor; ///< Stores the last primary point hit actor
-  ActorObserver mLastConsumedActor; ///< Stores the last consumed actor
+  Scene&        mScene;                   ///< Reference to the scene
+  ActorObserver mLastPrimaryHitActor;     ///< Stores the last primary point hit actor
+  ActorObserver mLastConsumedActor;       ///< Stores the last consumed actor
   ActorObserver mHoverStartConsumedActor; ///< Stores the hover-start consumed actor
-  RenderTaskPtr mLastRenderTask; ///< The RenderTask used for the last hit actor
+  RenderTaskPtr mLastRenderTask;          ///< The RenderTask used for the last hit actor
 };
 
 } // namespace Internal

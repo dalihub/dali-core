@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,44 +20,40 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
-#include <dali/internal/render/queue/render-queue.h>
-#include <dali/internal/render/common/render-debug.h>
-#include <dali/internal/render/shaders/program.h>
 #include <dali/internal/common/image-sampler.h>
-
+#include <dali/internal/render/common/render-debug.h>
+#include <dali/internal/render/queue/render-queue.h>
+#include <dali/internal/render/shaders/program.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace SceneGraph
 {
-
-Shader::Shader( Dali::Shader::Hint::Value& hints )
-: mHints( hints ),
-  mProgram( nullptr ),
+Shader::Shader(Dali::Shader::Hint::Value& hints)
+: mHints(hints),
+  mProgram(nullptr),
   mConnectionObservers()
 {
-  AddUniformMapObserver( *this );
+  AddUniformMapObserver(*this);
 }
 
 Shader::~Shader()
 {
-  mConnectionObservers.Destroy( *this );
+  mConnectionObservers.Destroy(*this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // The following methods are called during RenderManager::Render()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void Shader::SetProgram( Internal::ShaderDataPtr shaderData,
-                         ProgramCache* programCache,
-                         bool modifiesGeometry )
+void Shader::SetProgram(Internal::ShaderDataPtr shaderData,
+                        ProgramCache*           programCache,
+                        bool                    modifiesGeometry)
 {
-  DALI_LOG_TRACE_METHOD_FMT( Debug::Filter::gShader, "%d\n", shaderData->GetHashValue() );
+  DALI_LOG_TRACE_METHOD_FMT(Debug::Filter::gShader, "%d\n", shaderData->GetHashValue());
 
-  mProgram = Program::New( *programCache, shaderData, modifiesGeometry );
+  mProgram = Program::New(*programCache, shaderData, modifiesGeometry);
   // The program cache owns the Program object so we don't need to worry about this raw allocation here.
 
   mConnectionObservers.ConnectionsChanged(*this);
@@ -68,17 +64,17 @@ Program* Shader::GetProgram()
   return mProgram;
 }
 
-void Shader::AddConnectionObserver( ConnectionChangePropagator::Observer& observer )
+void Shader::AddConnectionObserver(ConnectionChangePropagator::Observer& observer)
 {
   mConnectionObservers.Add(observer);
 }
 
-void Shader::RemoveConnectionObserver( ConnectionChangePropagator::Observer& observer )
+void Shader::RemoveConnectionObserver(ConnectionChangePropagator::Observer& observer)
 {
   mConnectionObservers.Remove(observer);
 }
 
-void Shader::UniformMappingsChanged( const UniformMap& mappings )
+void Shader::UniformMappingsChanged(const UniformMap& mappings)
 {
   // Our uniform map, or that of one of the watched children has changed.
   // Inform connected observers.

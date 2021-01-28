@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_IMAGE_ATTRIBUTES_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@
 #include <stdint.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/images/pixel.h>
 #include <dali/public-api/images/image-operations.h>
+#include <dali/public-api/images/pixel.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector2.h>
 
@@ -31,7 +31,6 @@ namespace Dali
 {
 namespace Internal
 {
-
 /**
  * @brief Describes Image properties like dimensions and pixel format and
  * operations to be applied to images during the load process.
@@ -70,7 +69,6 @@ namespace Internal
 class ImageAttributes
 {
 public:
-
   /**
    * @brief Scaling options, used when resizing images on load to fit desired dimensions.
    *
@@ -137,7 +135,7 @@ public:
    * @param [in] width  desired width.
    * @param [in] height desired height
    */
-  void SetSize( uint32_t width, uint32_t height);
+  void SetSize(uint32_t width, uint32_t height);
 
   /**
    * @brief Set the image dimension properties.
@@ -148,7 +146,7 @@ public:
    *
    * @param [in] size desired size.
    */
-  void SetSize( const Size& size );
+  void SetSize(const Size& size);
 
   /**
    * @brief Set the scale field of the image attributes.
@@ -156,14 +154,14 @@ public:
    * By default, ShrinkToFit is set.
    * @param [in] scalingMode The desired scaling mode
    */
-  void SetScalingMode( ScalingMode scalingMode );
+  void SetScalingMode(ScalingMode scalingMode);
 
   /**
    * @brief Setter for the FilterMode.
    * By default, Box is set.
    * @param [in] filterMode The desired filter mode.
    */
-  void SetFilterMode( FilterMode filterMode );
+  void SetFilterMode(FilterMode filterMode);
 
   /**
    * @brief Set whether the image will be rotated/flipped back into portrait orientation.
@@ -191,8 +189,7 @@ public:
    * @param[in] sampling Sampling mode.
    * @param[in] orientation Orientation correction toggle.
    */
-  void Reset( ImageDimensions dimensions = ImageDimensions(0, 0), ScalingMode scaling = ScalingMode(), FilterMode sampling = FilterMode(), bool orientationCorrection = true );
-
+  void Reset(ImageDimensions dimensions = ImageDimensions(0, 0), ScalingMode scaling = ScalingMode(), FilterMode sampling = FilterMode(), bool orientationCorrection = true);
 
   /**
    * @brief Return the width currently represented by the attribute.

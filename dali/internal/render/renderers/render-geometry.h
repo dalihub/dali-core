@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_GEOMETRY_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,13 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-vector.h>
-#include <dali/public-api/rendering/geometry.h>
 #include <dali/devel-api/common/owner-container.h>
-#include <dali/internal/common/owner-pointer.h>
-#include <dali/internal/common/buffer-index.h>
-#include <dali/internal/common/owner-pointer.h>
 #include <dali/integration-api/gl-abstraction.h>
 #include <dali/integration-api/gl-defines.h>
+#include <dali/internal/common/buffer-index.h>
+#include <dali/internal/common/owner-pointer.h>
+#include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/rendering/geometry.h>
 
 namespace Dali
 {
@@ -59,7 +58,7 @@ public:
   /**
    * Called on Gl Context created
    */
-  void GlContextCreated( Context& context );
+  void GlContextCreated(Context& context);
 
   /**
    * Called on Gl Context destroyed.
@@ -70,19 +69,19 @@ public:
    * Adds a property buffer to the geometry
    * @param[in] dataProvider The VertexBuffer data provider
    */
-  void AddVertexBuffer( Render::VertexBuffer* vertexBuffer );
+  void AddVertexBuffer(Render::VertexBuffer* vertexBuffer);
 
   /**
    * Set the data for the index buffer to be used by the geometry
    * @param[in] indices A vector containing the indices
    */
-  void SetIndexBuffer( Dali::Vector<uint16_t>& indices );
+  void SetIndexBuffer(Dali::Vector<uint16_t>& indices);
 
   /**
    * Removes a VertexBuffer from the geometry
    * @param[in] vertexBuffer The property buffer to be removed
    */
-  void RemoveVertexBuffer(  const Render::VertexBuffer* vertexBuffer );
+  void RemoveVertexBuffer(const Render::VertexBuffer* vertexBuffer);
 
   /**
    * Gets the attribute locations on the shader for the attributes defined in the geometry RenderBuffers
@@ -90,7 +89,7 @@ public:
    * @param[in] program The program
    * @param[in] bufferIndex The current buffer index
    */
-  void GetAttributeLocationFromProgram( Vector<GLint>& attributeLocation, Program& program, BufferIndex bufferIndex ) const;
+  void GetAttributeLocationFromProgram(Vector<GLint>& attributeLocation, Program& program, BufferIndex bufferIndex) const;
 
   /**
    * Called from RenderManager to notify the geometry that current rendering pass has finished.
@@ -110,7 +109,7 @@ public:
    * Sets the geometry type
    * @param[in] type The new geometry type
    */
-  void SetType( Type type )
+  void SetType(Type type)
   {
     mGeometryType = type;
   }
@@ -119,7 +118,7 @@ public:
    * Upload the geometry if it has changed
    * @param[in] context The GL context
    */
-  void Upload( Context& context );
+  void Upload(Context& context);
 
   /**
    * Set up the attributes and perform the Draw call corresponding to the geometry type
@@ -129,20 +128,19 @@ public:
    * @param[in] elementBufferOffset The index of first element to draw if index buffer bound
    * @param[in] elementBufferCount Number of elements to draw if index buffer bound, uses whole buffer when 0
    */
-  void Draw(Context& context,
-            BufferIndex bufferIndex,
+  void Draw(Context&       context,
+            BufferIndex    bufferIndex,
             Vector<GLint>& attributeLocation,
-            uint32_t elementBufferOffset,
-            uint32_t elementBufferCount );
+            uint32_t       elementBufferOffset,
+            uint32_t       elementBufferCount);
 
 private:
-
   // VertexBuffers
-  Vector< Render::VertexBuffer* > mVertexBuffers;
+  Vector<Render::VertexBuffer*> mVertexBuffers;
 
-  Dali::Vector< uint16_t > mIndices;
-  OwnerPointer< GpuBuffer > mIndexBuffer;
-  Type mGeometryType;
+  Dali::Vector<uint16_t>  mIndices;
+  OwnerPointer<GpuBuffer> mIndexBuffer;
+  Type                    mGeometryType;
 
   // Booleans
   bool mIndicesChanged : 1;

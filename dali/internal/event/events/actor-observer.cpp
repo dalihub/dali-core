@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,57 +16,55 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/event/events/actor-observer.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/actors/actor-impl.h>
+#include <dali/internal/event/events/actor-observer.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace
 {
 #if defined(DEBUG_ENABLED)
-Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_ACTOR_OBSERVER" );
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_ACTOR_OBSERVER");
 #endif // defined(DEBUG_ENABLED)
-}
+} // namespace
 
 ActorObserver::ActorObserver()
-: ActorObserver( nullptr )
+: ActorObserver(nullptr)
 {
 }
 
-ActorObserver::ActorObserver( CallbackBase* callback )
-: mActor ( nullptr ),
-  mActorDisconnected( false ),
-  mRemoveCallback( callback )
+ActorObserver::ActorObserver(CallbackBase* callback)
+: mActor(nullptr),
+  mActorDisconnected(false),
+  mRemoveCallback(callback)
 {
-  DALI_LOG_TRACE_METHOD( gLogFilter );
+  DALI_LOG_TRACE_METHOD(gLogFilter);
 }
 
 ActorObserver::~ActorObserver()
 {
-  DALI_LOG_TRACE_METHOD( gLogFilter );
-  SetActor( nullptr );
+  DALI_LOG_TRACE_METHOD(gLogFilter);
+  SetActor(nullptr);
 
   delete mRemoveCallback;
 }
 
-ActorObserver::ActorObserver( ActorObserver&& other )
-: ActorObserver( nullptr )
+ActorObserver::ActorObserver(ActorObserver&& other)
+: ActorObserver(nullptr)
 {
-  operator=( std::move( other ) );
+  operator=(std::move(other));
 }
 
-ActorObserver& ActorObserver::operator=( ActorObserver&& other )
+ActorObserver& ActorObserver::operator=(ActorObserver&& other)
 {
-  if( this != &other )
+  if(this != &other)
   {
-    SetActor( other.mActor );
+    SetActor(other.mActor);
     mActorDisconnected = other.mActorDisconnected;
-    mRemoveCallback = other.mRemoveCallback;
+    mRemoveCallback    = other.mRemoveCallback;
     other.ResetActor();
     other.mRemoveCallback = nullptr;
   }
@@ -78,19 +76,19 @@ Actor* ActorObserver::GetActor() const
   return mActorDisconnected ? nullptr : mActor;
 }
 
-void ActorObserver::SetActor( Actor* actor )
+void ActorObserver::SetActor(Actor* actor)
 {
-  DALI_LOG_TRACE_METHOD( gLogFilter );
+  DALI_LOG_TRACE_METHOD(gLogFilter);
 
-  if ( mActor != actor )
+  if(mActor != actor)
   {
     ResetActor();
 
     mActor = actor;
 
-    if ( mActor )
+    if(mActor)
     {
-      mActor->AddObserver( *this );
+      mActor->AddObserver(*this);
       DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Start Observing:            %p\n", mActor);
     }
   }
@@ -101,34 +99,34 @@ void ActorObserver::SetActor( Actor* actor )
 
 void ActorObserver::ResetActor()
 {
-  if ( mActor )
+  if(mActor)
   {
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Stop Observing:             %p\n", mActor);
-    mActor->RemoveObserver( *this );
-    mActor = nullptr;
+    mActor->RemoveObserver(*this);
+    mActor             = nullptr;
     mActorDisconnected = false;
   }
 }
 
-void ActorObserver::SceneObjectAdded( Object& object )
+void ActorObserver::SceneObjectAdded(Object& object)
 {
-  DALI_LOG_TRACE_METHOD( gLogFilter );
+  DALI_LOG_TRACE_METHOD(gLogFilter);
 
-  if ( mActor == &object )
+  if(mActor == &object)
   {
     mActorDisconnected = false;
   }
 }
 
-void ActorObserver::SceneObjectRemoved( Object& object )
+void ActorObserver::SceneObjectRemoved(Object& object)
 {
-  DALI_LOG_TRACE_METHOD( gLogFilter );
+  DALI_LOG_TRACE_METHOD(gLogFilter);
 
-  if ( mActor == &object )
+  if(mActor == &object)
   {
-    if ( mRemoveCallback )
+    if(mRemoveCallback)
     {
-      CallbackBase::Execute( *mRemoveCallback, mActor );
+      CallbackBase::Execute(*mRemoveCallback, mActor);
     }
 
     // do not call object.RemoveObserver here, object is currently iterating through observers
@@ -138,9 +136,9 @@ void ActorObserver::SceneObjectRemoved( Object& object )
 
 void ActorObserver::ObjectDestroyed(Object& object)
 {
-  DALI_LOG_TRACE_METHOD( gLogFilter );
+  DALI_LOG_TRACE_METHOD(gLogFilter);
 
-  if ( mActor == &object )
+  if(mActor == &object)
   {
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Stop Observing:             %p\n", mActor);
     mActor = nullptr;
@@ -150,4 +148,3 @@ void ActorObserver::ObjectDestroyed(Object& object)
 } // namespace Internal
 
 } // namespace Dali
-

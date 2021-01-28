@@ -2,7 +2,7 @@
 #define DALI_FRAME_CALLBACK_INTERFACE_IMPL_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,14 +23,13 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
 namespace SceneGraph
 {
 class FrameCallback;
 }
-}
+} // namespace Internal
 
 /**
  * The Implementation of the FrameCallbackInterface
@@ -39,15 +38,14 @@ class FrameCallback;
 class FrameCallbackInterface::Impl final
 {
 public:
-
-  Impl() = default; ///< Default constructor.
+  Impl()  = default; ///< Default constructor.
   ~Impl() = default; ///< Default non-virtual destructor.
 
   /**
    * Retrieve the Impl of a FrameCallbackInterface.
    * @param[in]  frameCallback  The frame-callb
    */
-  static inline Impl& Get( FrameCallbackInterface& frameCallback )
+  static inline Impl& Get(FrameCallbackInterface& frameCallback)
   {
     return *frameCallback.mImpl;
   }
@@ -56,7 +54,7 @@ public:
    * Links this FrameCallback to the given scene-graph-frame-callback.
    * @param[in]  sceneGraphObject  The scene-graph-frame-callback to link this with.
    */
-  void ConnectToSceneGraphObject( Internal::SceneGraph::FrameCallback& sceneGraphObject )
+  void ConnectToSceneGraphObject(Internal::SceneGraph::FrameCallback& sceneGraphObject)
   {
     mSceneGraphFrameCallback = &sceneGraphObject;
   }
@@ -83,14 +81,14 @@ public:
    */
   void Invalidate()
   {
-    if( mSceneGraphFrameCallback )
+    if(mSceneGraphFrameCallback)
     {
       mSceneGraphFrameCallback->Invalidate();
     }
   }
 
 private:
-  Internal::SceneGraph::FrameCallback* mSceneGraphFrameCallback{ nullptr }; ///< Pointer to the scene-graph object, not owned.
+  Internal::SceneGraph::FrameCallback* mSceneGraphFrameCallback{nullptr}; ///< Pointer to the scene-graph object, not owned.
 };
 
 } // namespace Dali

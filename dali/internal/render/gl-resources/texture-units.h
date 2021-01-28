@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TEXTURE_UNITS_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ namespace Dali
 {
 namespace Internal
 {
-
 enum TextureUnit
 {
   TEXTURE_UNIT_IMAGE = 0,
@@ -39,14 +38,14 @@ enum TextureUnit
   TEXTURE_UNIT_LAST
 };
 
-inline unsigned int TextureUnitAsGLenum( TextureUnit unit )
+inline unsigned int TextureUnitAsGLenum(TextureUnit unit)
 {
   // GL texture units are #defines in growing order to converting that to index
-  return GL_TEXTURE0 + static_cast<unsigned int>( unit );
+  return GL_TEXTURE0 + static_cast<unsigned int>(unit);
 }
 
-}//Internal
+} // namespace Internal
 
-}//Dali
+} // namespace Dali
 
 #endif // DALI_INTERNAL_TEXTURE_UNITS_H

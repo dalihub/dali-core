@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_UNIFORM_MAP_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
  */
 
 // EXTERNAL INCLUDES
-#include <string>
 #include <cstdint> // uint32_t
+#include <string>
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/hash.h>
@@ -34,7 +34,6 @@ class PropertyInputImpl;
 
 namespace SceneGraph
 {
-
 /**
  * The uniform map is used to map a uniform name to a property value.
  */
@@ -53,7 +52,7 @@ public:
   UniformPropertyMapping() = default;
 
   const PropertyInputImpl* propertyPtr{nullptr};
-  ConstString uniformName;
+  ConstString              uniformName;
 };
 
 /**
@@ -71,7 +70,6 @@ public:
   class Observer
   {
   public:
-
     /**
      * Inform observer that uniform mappings have been changed
      * @param mappings
@@ -79,7 +77,6 @@ public:
     virtual void UniformMappingsChanged(const UniformMap& mappings) = 0;
 
   protected:
-
     /**
      * Virtual destructor, no deletion through this interface
      */
@@ -89,12 +86,12 @@ public:
   /**
    * Add an observer that watches for changes in the mappings
    */
-  void AddObserver( Observer& observer );
+  void AddObserver(Observer& observer);
 
   /**
    * Remove an observer
    */
-  void RemoveObserver( Observer& observer );
+  void RemoveObserver(Observer& observer);
 
   /**
    * Add a map to the mappings table.
@@ -104,13 +101,13 @@ public:
   /**
    * Remove a map from the mappings table
    */
-  void Remove( ConstString uniformName );
+  void Remove(ConstString uniformName);
 
   /**
    * Find a property given the uniform name.
    * @return The address of the property if it's in the map, or NULL otherwise.
    */
-  const PropertyInputImpl* Find( ConstString uniformName );
+  const PropertyInputImpl* Find(ConstString uniformName);
 
   /**
    * Get the count of uniforms in the map
@@ -123,7 +120,7 @@ public:
    * @param[in] index The index of the element to fetch
    * @return reference to the element in the map
    */
-  const UniformPropertyMapping& operator[]( SizeType index ) const;
+  const UniformPropertyMapping& operator[](SizeType index) const;
 
 private:
   /**
@@ -141,7 +138,6 @@ private:
 
   Observers mObservers;
 };
-
 
 } // namespace SceneGraph
 } // namespace Internal

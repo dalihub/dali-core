@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SHADER_FACTORY_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,17 +19,15 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-vector.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/shader-data.h>
 #include <dali/internal/common/shader-saver.h>
+#include <dali/public-api/common/dali-vector.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 class ShaderData;
 using ShaderDataPtr = IntrusivePtr<ShaderData>;
 
@@ -41,7 +39,6 @@ using ShaderDataPtr = IntrusivePtr<ShaderData>;
 class ShaderFactory : public ShaderSaver
 {
 public:
-
   /**
    * Default constructor
    */
@@ -67,7 +64,7 @@ public:
    *                            a compiled shader program binary if one could be found, else an
    *                            empty binary buffer cleared to size zero.
    */
-  Internal::ShaderDataPtr Load( std::string_view vertexSource, std::string_view fragmentSource, const Dali::Shader::Hint::Value hints, size_t& shaderHash );
+  Internal::ShaderDataPtr Load(std::string_view vertexSource, std::string_view fragmentSource, const Dali::Shader::Hint::Value hints, size_t& shaderHash);
 
   /**
    * @brief Saves shader to memory cache and filesystem.
@@ -77,28 +74,27 @@ public:
    * @param[in] shader The data to be saved.
    * @sa Load
    */
-  void SaveBinary( Internal::ShaderDataPtr shader ) override;
+  void SaveBinary(Internal::ShaderDataPtr shader) override;
 
 private:
-
-  void MemoryCacheInsert( Internal::ShaderData& shaderData );
-
-  // Undefined
-  ShaderFactory( const ShaderFactory& );
+  void MemoryCacheInsert(Internal::ShaderData& shaderData);
 
   // Undefined
-  ShaderFactory& operator=( const ShaderFactory& rhs );
+  ShaderFactory(const ShaderFactory&);
+
+  // Undefined
+  ShaderFactory& operator=(const ShaderFactory& rhs);
 
 private:
-  Dali::Vector< Internal::ShaderData* > mShaderBinaryCache; ///< Cache of pre-compiled shaders.
+  Dali::Vector<Internal::ShaderData*> mShaderBinaryCache; ///< Cache of pre-compiled shaders.
 
 }; // class ShaderFactory
 
-inline MessageBase* ShaderCompiledMessage( ShaderSaver& factory, Internal::ShaderDataPtr shaderData )
+inline MessageBase* ShaderCompiledMessage(ShaderSaver& factory, Internal::ShaderDataPtr shaderData)
 {
-  return new MessageValue1< ShaderSaver, Internal::ShaderDataPtr >( &factory,
-                                                            &ShaderSaver::SaveBinary,
-                                                            shaderData );
+  return new MessageValue1<ShaderSaver, Internal::ShaderDataPtr>(&factory,
+                                                                 &ShaderSaver::SaveBinary,
+                                                                 shaderData);
 }
 
 } // namespace Internal

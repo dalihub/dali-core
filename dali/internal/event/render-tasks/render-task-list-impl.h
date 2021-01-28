@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_TASK_LIST_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,16 +22,15 @@
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
+
 #include <dali/internal/event/common/complete-notification-interface.h>
-#include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/internal/event/events/actor-observer.h>
+#include <dali/internal/event/render-tasks/render-task-impl.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 class EventThreadServices;
 class RenderTaskDefaults;
 class Actor;
@@ -45,7 +44,7 @@ namespace SceneGraph
 {
 class RenderTaskList;
 class UpdateManager;
-}
+} // namespace SceneGraph
 
 /**
  * A proxy for the scene-graph RenderTaskList.
@@ -54,16 +53,15 @@ class UpdateManager;
 class RenderTaskList : public BaseObject, public CompleteNotificationInterface
 {
 public:
-
-  using RenderTaskContainer = std::vector< RenderTaskPtr >;
+  using RenderTaskContainer = std::vector<RenderTaskPtr>;
 
   struct Exclusive
   {
-    RenderTask* renderTaskPtr;        ///< Pointer for comparison with current rendertask.
-    ActorObserver actor;              ///< For comparison with current actor.
+    RenderTask*   renderTaskPtr; ///< Pointer for comparison with current rendertask.
+    ActorObserver actor;         ///< For comparison with current actor.
   };
 
-  using ExclusivesContainer = std::vector< Exclusive >;
+  using ExclusivesContainer = std::vector<Exclusive>;
 
   /**
    * Create a RenderTaskList.
@@ -85,12 +83,12 @@ public:
    * @param[in] cameraActor The actor from which the scene is viewed for this render task.
    * @return A valid handle to a new RenderTask
    */
-  RenderTaskPtr CreateTask( Actor* sourceActor, CameraActor* cameraActor);
+  RenderTaskPtr CreateTask(Actor* sourceActor, CameraActor* cameraActor);
 
   /**
    * @copydoc Dali::RenderTaskList::RemoveTask()
    */
-  void RemoveTask( Internal::RenderTask& task );
+  void RemoveTask(Internal::RenderTask& task);
 
   /**
    * @copydoc Dali::RenderTaskList::GetTaskCount()
@@ -100,7 +98,7 @@ public:
   /**
    * @copydoc Dali::RenderTaskList::GetTask()
    */
-  RenderTaskPtr GetTask( uint32_t index ) const;
+  RenderTaskPtr GetTask(uint32_t index) const;
 
   /**
    * Retrieve the container of render-tasks.
@@ -117,7 +115,7 @@ public:
    * @param[in] task Pointer to the rendertask.
    * @param[in] exclusive If a rendertask is to have exclusive acesss to its source actor.
    */
-  void SetExclusive( RenderTask* task, bool exclusive );
+  void SetExclusive(RenderTask* task, bool exclusive);
 
   /**
    * @brief Return the list of rendertasks that exclusively own their source actor.
@@ -135,7 +133,7 @@ public:
    * Queue NotifyFinishedMessage() from update-thread
    * @param object pointer to this class instance
    */
-  static void NotifyFinished( void* object );
+  static void NotifyFinished(void* object);
 
   /**
    * This method refreshes all render tasks that have a frame buffer
@@ -150,7 +148,6 @@ public:
   const SceneGraph::RenderTaskList& GetSceneObject() const;
 
 protected:
-
   /**
    * Construct a new RenderTaskList.
    */
@@ -167,21 +164,19 @@ protected:
   void Initialize();
 
 private: // from CompleteNotificationInterface
-
   /**
    * @copydoc CompleteNotificationInterface::NotifyCompleted()
    */
   void NotifyCompleted() override;
 
 private:
-
   EventThreadServices& mEventThreadServices;
-  RenderTaskDefaults& mDefaults;
+  RenderTaskDefaults&  mDefaults;
 
   SceneGraph::RenderTaskList* mSceneObject; ///< Raw-pointer to the scene-graph object; not owned.
 
-  RenderTaskContainer mTasks;           ///< Reference counted render-tasks
-  ExclusivesContainer mExclusives;      ///< List of rendertasks with exclusively owned source actors.
+  RenderTaskContainer mTasks;      ///< Reference counted render-tasks
+  ExclusivesContainer mExclusives; ///< List of rendertasks with exclusively owned source actors.
 };
 
 } // namespace Internal

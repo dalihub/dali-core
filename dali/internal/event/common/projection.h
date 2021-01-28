@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PROJECTION_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 
 namespace Dali
 {
-
 struct Vector4;
 struct Vector2;
 
@@ -28,36 +27,34 @@ class Matrix;
 
 namespace Internal
 {
-
 bool XyPlaneIntersect(const Dali::Vector4& pointA,
                       const Dali::Vector4& pointB,
-                      Dali::Vector4& intersect);
+                      Dali::Vector4&       intersect);
 
 bool UnprojectFull(const Dali::Vector4& windowPos,
-                   const Matrix& modelView,
-                   const Matrix& projection,
-                   float viewportWidth,
-                   float viewportHeight,
-                   Dali::Vector4& objectPos);
+                   const Matrix&        modelView,
+                   const Matrix&        projection,
+                   float                viewportWidth,
+                   float                viewportHeight,
+                   Dali::Vector4&       objectPos);
 
 bool Unproject(const Dali::Vector4& windowPos,
-               const Matrix& inverseMvp,
-               float viewportWidth,
-               float viewportHeight,
-               Dali::Vector4& objectPos);
+               const Matrix&        inverseMvp,
+               float                viewportWidth,
+               float                viewportHeight,
+               Dali::Vector4&       objectPos);
 
-bool ProjectFull( const Vector4& position,
-                  const Matrix& modelView,
-                  const Matrix& projection,
-                  float viewportX,
-                  float viewportY,
-                  float viewportWidth,
-                  float viewportHeight,
-                  Vector4& windowPos );
+bool ProjectFull(const Vector4& position,
+                 const Matrix&  modelView,
+                 const Matrix&  projection,
+                 float          viewportX,
+                 float          viewportY,
+                 float          viewportWidth,
+                 float          viewportHeight,
+                 Vector4&       windowPos);
 
 } // namespace Internal
 
 } // namespace Dali
 
 #endif // DALI_INTERNAL_PROJECTION_H
-

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PROPERTY_CONSTRAINT_PTR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,16 +19,14 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/animation/property-constraint.h>
 #include <dali/internal/common/owner-pointer.h>
+#include <dali/internal/event/animation/property-constraint.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
-template <class P>
+template<class P>
 struct PropertyConstraintPtr
 {
   using Type = OwnerPointer<PropertyConstraint<P> >;

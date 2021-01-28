@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,18 +23,15 @@
 
 // INTERNAL INCLUDES
 
-#include <dali/public-api/object/type-registry.h>
 #include <dali/internal/event/events/gesture-event-processor.h>
+#include <dali/public-api/object/type-registry.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace
 {
-
 // Signals
 
 const char* const SIGNAL_LONG_PRESS_DETECTED = "longPressDetected";
@@ -44,12 +41,11 @@ BaseHandle Create()
   return Dali::LongPressGestureDetector::New();
 }
 
-TypeRegistration mType( typeid(Dali::LongPressGestureDetector), typeid(Dali::GestureDetector), Create );
+TypeRegistration mType(typeid(Dali::LongPressGestureDetector), typeid(Dali::GestureDetector), Create);
 
-SignalConnectorType signalConnector1( mType, SIGNAL_LONG_PRESS_DETECTED, &LongPressGestureDetector::DoConnectSignal );
+SignalConnectorType signalConnector1(mType, SIGNAL_LONG_PRESS_DETECTED, &LongPressGestureDetector::DoConnectSignal);
 
-}
-
+} // namespace
 
 namespace
 {
@@ -89,13 +85,13 @@ LongPressGestureDetector::~LongPressGestureDetector() = default;
 
 void LongPressGestureDetector::SetTouchesRequired(unsigned int touches)
 {
-  DALI_ASSERT_ALWAYS( touches > 0 && "Can only set a positive number of required touches" );
+  DALI_ASSERT_ALWAYS(touches > 0 && "Can only set a positive number of required touches");
 
-  if (mMinimumTouchesRequired != touches || mMaximumTouchesRequired != touches)
+  if(mMinimumTouchesRequired != touches || mMaximumTouchesRequired != touches)
   {
     mMinimumTouchesRequired = mMaximumTouchesRequired = touches;
 
-    if (!mAttachedActors.empty())
+    if(!mAttachedActors.empty())
     {
       mGestureEventProcessor.GestureDetectorUpdated(this);
     }
@@ -108,12 +104,12 @@ void LongPressGestureDetector::SetTouchesRequired(unsigned int minTouches, unsig
   DALI_ASSERT_ALWAYS(maxTouches > 0 && "Can only set a positive number of minimum touches");
   DALI_ASSERT_ALWAYS(minTouches <= maxTouches && "Number of minimum touches must be less than maximum");
 
-  if (mMinimumTouchesRequired != minTouches || mMaximumTouchesRequired != maxTouches)
+  if(mMinimumTouchesRequired != minTouches || mMaximumTouchesRequired != maxTouches)
   {
     mMinimumTouchesRequired = minTouches;
     mMaximumTouchesRequired = maxTouches;
 
-    if (!mAttachedActors.empty())
+    if(!mAttachedActors.empty())
     {
       mGestureEventProcessor.GestureDetectorUpdated(this);
     }
@@ -133,19 +129,19 @@ unsigned int LongPressGestureDetector::GetMaximumTouchesRequired() const
 void LongPressGestureDetector::EmitLongPressGestureSignal(Dali::Actor pressedActor, const Dali::LongPressGesture& longPress)
 {
   // Guard against destruction during signal emission
-  Dali::LongPressGestureDetector handle( this );
+  Dali::LongPressGestureDetector handle(this);
 
-  mDetectedSignal.Emit( pressedActor, longPress );
+  mDetectedSignal.Emit(pressedActor, longPress);
 }
 
-bool LongPressGestureDetector::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
+bool LongPressGestureDetector::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
 {
-  bool connected( true );
-  LongPressGestureDetector* gesture = static_cast< LongPressGestureDetector* >(object); // TypeRegistry guarantees that this is the correct type.
+  bool                      connected(true);
+  LongPressGestureDetector* gesture = static_cast<LongPressGestureDetector*>(object); // TypeRegistry guarantees that this is the correct type.
 
-  if ( 0 == strcmp( signalName.c_str(), SIGNAL_LONG_PRESS_DETECTED ) )
+  if(0 == strcmp(signalName.c_str(), SIGNAL_LONG_PRESS_DETECTED))
   {
-    gesture->DetectedSignal().Connect( tracker, functor );
+    gesture->DetectedSignal().Connect(tracker, functor);
   }
   else
   {

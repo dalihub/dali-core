@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PERFORMANCE_MONITOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,8 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
-
-
 /**
  * @brief PerformanceMonitor.
  * Empty stubs should we decided to hook into monitoring counters
@@ -33,7 +29,6 @@ namespace Internal
 class PerformanceMonitor
 {
 public:
-
   /*
    * Metric enums
    */
@@ -61,9 +56,9 @@ public:
 #define PERF_MONITOR_START(x)     // start of timed event
 #define PERF_MONITOR_END(x)       // end of a timed event
 #define INCREASE_COUNTER(x)       // increase a counter by 1
-#define INCREASE_BY(x,y)          // increase a count by x
+#define INCREASE_BY(x, y)         // increase a count by x
 #define MATH_INCREASE_COUNTER(x)  // increase a math counter ( MATRIX_MULTIPLYS, QUATERNION_TO_MATRIX, FLOAT_POINT_MULTIPLY)
-#define MATH_INCREASE_BY(x,y)     // increase a math counter by x
+#define MATH_INCREASE_BY(x, y)    // increase a math counter by x
 #define PERF_MONITOR_NEXT_FRAME() // update started rendering a new frame
 
 } // namespace Internal

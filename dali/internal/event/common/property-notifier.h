@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PROPERTY_NOTIFIER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,10 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace SceneGraph
 {
-
 class PropertyNotification;
 
 } //namespace SceneGraph
@@ -40,7 +37,6 @@ class PropertyNotification;
 class PropertyNotifier
 {
 public:
-
   /**
    * Virtual destructor.
    */
@@ -52,18 +48,19 @@ public:
    * @param[in] propertyNotification A pointer to the SceneGraph::PropertyNotification that has been mnodified.
    * @param[in] validity Passes in whether the notification was triggered by a true or false condition result
    */
-  virtual void NotifyProperty( SceneGraph::PropertyNotification* propertyNotification, bool validity ) = 0;
+  virtual void NotifyProperty(SceneGraph::PropertyNotification* propertyNotification, bool validity) = 0;
 };
 
 /**
  * Notification message for when a property has been modified
  * @param[in] notifier This will provide the notification signal.
  */
-inline MessageBase* PropertyChangedMessage( PropertyNotifier& notifier, SceneGraph::PropertyNotification* propertyNotification, bool validity )
+inline MessageBase* PropertyChangedMessage(PropertyNotifier& notifier, SceneGraph::PropertyNotification* propertyNotification, bool validity)
 {
-  return new MessageValue2< PropertyNotifier, SceneGraph::PropertyNotification*, bool >( &notifier,
-                                                                                   &PropertyNotifier::NotifyProperty,
-                                                                                   propertyNotification, validity);
+  return new MessageValue2<PropertyNotifier, SceneGraph::PropertyNotification*, bool>(&notifier,
+                                                                                      &PropertyNotifier::NotifyProperty,
+                                                                                      propertyNotification,
+                                                                                      validity);
 }
 
 } // namespace Internal

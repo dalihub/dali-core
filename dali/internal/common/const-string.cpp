@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@
 #include <cstddef>
 #include <cstring>
 #include <functional>
-#include <vector>
 #include <mutex>
+#include <vector>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -33,7 +33,6 @@ namespace
 {
 class ArenaAllocator
 {
-
 public:
   ArenaAllocator()
   {
@@ -158,7 +157,7 @@ public:
     const std::lock_guard<std::mutex> lock(mMutex);
 
     auto  bucketNumber = FindBucket(str);
-    auto& bucket   = mTable[bucketNumber];
+    auto& bucket       = mTable[bucketNumber];
 
     if(bucket)
     {
@@ -199,11 +198,11 @@ private:
 
   unsigned FindBucket(std::string_view name)
   {
-    unsigned  bucketSize    = mBuckets;
-    unsigned  fullHashValue = std::hash<std::string_view>{}(name);
-    unsigned  bucketNumber      = fullHashValue & (bucketSize - 1);
+    unsigned bucketSize    = mBuckets;
+    unsigned fullHashValue = std::hash<std::string_view>{}(name);
+    unsigned bucketNumber  = fullHashValue & (bucketSize - 1);
     // point to the start of the hashvalue segment.
-    unsigned* hashTable     = reinterpret_cast<unsigned*>(mTable + mBuckets + 1);
+    unsigned* hashTable = reinterpret_cast<unsigned*>(mTable + mBuckets + 1);
 
     unsigned probeAmt = 1;
     while(true)

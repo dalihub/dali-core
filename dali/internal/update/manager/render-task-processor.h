@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_PROCESSOR_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,18 +19,15 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/update/manager/sorted-layers.h>
 #include <dali/internal/update/manager/render-instruction-processor.h>
+#include <dali/internal/update/manager/sorted-layers.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace SceneGraph
 {
-
 class RenderTaskList;
 
 /**
@@ -39,7 +36,6 @@ class RenderTaskList;
 class RenderTaskProcessor
 {
 public:
-
   /**
    * @brief Constructor.
    */
@@ -63,27 +59,24 @@ public:
    * @param[in]  isRenderingToFbo   Whether this frame is being rendered into the Frame Buffer Object (used to measure FPS above 60)
    * @return true if rendering should be kept, false otherwise.
    */
-  bool Process( BufferIndex updateBufferIndex,
-                RenderTaskList& renderTasks,
-                Layer& rootNode,
-                SortedLayerPointers& sortedLayers,
-                RenderInstructionContainer& instructions,
-                bool renderToFboEnabled,
-                bool isRenderingToFbo );
+  bool Process(BufferIndex                 updateBufferIndex,
+               RenderTaskList&             renderTasks,
+               Layer&                      rootNode,
+               SortedLayerPointers&        sortedLayers,
+               RenderInstructionContainer& instructions,
+               bool                        renderToFboEnabled,
+               bool                        isRenderingToFbo);
 
 private:
-
   /**
    * Undefine copy and assignment operators.
    */
-  RenderTaskProcessor( const RenderTaskProcessor& renderTaskProcessor );             ///< No definition
-  RenderTaskProcessor& operator=( const RenderTaskProcessor& renderTaskProcessor );  ///< No definition
+  RenderTaskProcessor(const RenderTaskProcessor& renderTaskProcessor);            ///< No definition
+  RenderTaskProcessor& operator=(const RenderTaskProcessor& renderTaskProcessor); ///< No definition
 
 private:
-
   RenderInstructionProcessor mRenderInstructionProcessor; ///< An instance of the RenderInstructionProcessor used to sort and handle the renderers for each layer.
 };
-
 
 } // namespace SceneGraph
 

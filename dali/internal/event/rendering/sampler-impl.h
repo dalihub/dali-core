@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SAMPLER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,13 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/actors/sampling.h>
-#include <dali/public-api/common/dali-common.h> // DALI_ASSERT_ALWAYS
-#include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
-#include <dali/public-api/rendering/sampler.h> // Dali::Sampler
-#include <dali/internal/event/common/connectable.h> // Dali::Internal::Connectable
+#include <dali/internal/event/common/connectable.h>      // Dali::Internal::Connectable
 #include <dali/internal/event/common/object-connector.h> // Dali::Internal::ObjectConnector
-#include <dali/internal/event/common/object-impl.h> // Dali::Internal::Object
+#include <dali/internal/event/common/object-impl.h>      // Dali::Internal::Object
+#include <dali/public-api/actors/sampling.h>
+#include <dali/public-api/common/dali-common.h>   // DALI_ASSERT_ALWAYS
+#include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
+#include <dali/public-api/rendering/sampler.h>    // Dali::Sampler
 
 namespace Dali
 {
@@ -46,22 +46,21 @@ using SamplerPtr = IntrusivePtr<Sampler>;
 class Sampler : public BaseObject
 {
 public:
-
   /**
    * Create a new Sampler.
    * @return A smart-pointer to the newly allocated Sampler.
    */
-  static SamplerPtr New( );
+  static SamplerPtr New();
 
   /**
    * @copydoc Dali::Sampler::SetFilterMode()
    */
-  void SetFilterMode( Dali::FilterMode::Type minFilter, Dali::FilterMode::Type magFilter );
+  void SetFilterMode(Dali::FilterMode::Type minFilter, Dali::FilterMode::Type magFilter);
 
   /**
    * @copydoc Dali::Sampler::SetWrapMode()
    */
-  void SetWrapMode( Dali::WrapMode::Type rWrap, Dali::WrapMode::Type sWrap, Dali::WrapMode::Type tWrap );
+  void SetWrapMode(Dali::WrapMode::Type rWrap, Dali::WrapMode::Type sWrap, Dali::WrapMode::Type tWrap);
 
   /**
    * Get the render thread sampler
@@ -76,7 +75,7 @@ private:
   /**
    * Second stage initialization
    */
-  void Initialize( );
+  void Initialize();
 
 protected:
   /**
@@ -84,10 +83,9 @@ protected:
    */
   ~Sampler() override;
 
-private: // data
-  EventThreadServices& mEventThreadServices;    ///<Used to send messages to the render thread via the update thread
-  Render::Sampler* mRenderObject;               ///<Render thread sampler for this sampler
-
+private:                                     // data
+  EventThreadServices& mEventThreadServices; ///<Used to send messages to the render thread via the update thread
+  Render::Sampler*     mRenderObject;        ///<Render thread sampler for this sampler
 };
 
 } // namespace Internal

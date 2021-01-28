@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ROTATION_GESTURE_EVENT_PROCESSOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,16 +19,14 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/events/rotation-gesture/rotation-gesture-detector-impl.h>
 #include <dali/internal/event/events/gesture-processor.h>
+#include <dali/internal/event/events/rotation-gesture/rotation-gesture-detector-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 class Scene;
 class Stage;
 
@@ -47,7 +45,6 @@ struct RotationGestureEvent;
 class RotationGestureProcessor : public GestureProcessor, public RecognizerObserver<RotationGestureEvent>
 {
 public:
-
   /**
    * Create a rotation gesture processor.
    */
@@ -58,17 +55,16 @@ public:
    */
   ~RotationGestureProcessor() override = default;
 
-  RotationGestureProcessor( const RotationGestureProcessor& )                = delete; ///< Deleted copy constructor.
-  RotationGestureProcessor& operator=( const RotationGestureProcessor& rhs ) = delete; ///< Deleted copy assignment operator.
+  RotationGestureProcessor(const RotationGestureProcessor&) = delete;                ///< Deleted copy constructor.
+  RotationGestureProcessor& operator=(const RotationGestureProcessor& rhs) = delete; ///< Deleted copy assignment operator.
 
 public: // To be called by GestureEventProcessor
-
   /**
    * This method is called whenever a rotation gesture event occurs.
    * @param[in] scene The scene the rotation gesture event occurs in.
    * @param[in] rotationEvent The event that has occurred.
    */
-  void Process( Scene& scene, const RotationGestureEvent& rotationEvent ) override;
+  void Process(Scene& scene, const RotationGestureEvent& rotationEvent) override;
 
   /**
    * Adds a gesture detector to this gesture processor.
@@ -77,7 +73,7 @@ public: // To be called by GestureEventProcessor
    * @param[in]  gestureDetector  The gesture detector being added
    * @param[in]  scene            The scene the rotation gesture occurred in
    */
-  void AddGestureDetector( RotationGestureDetector* gestureDetector, Scene& scene );
+  void AddGestureDetector(RotationGestureDetector* gestureDetector, Scene& scene);
 
   /**
    * Removes the specified gesture detector from this gesture processor.  If, after removing this
@@ -85,22 +81,21 @@ public: // To be called by GestureEventProcessor
    * the gesture from the adaptor.
    * @param[in]  gestureDetector  The gesture detector being removed.
    */
-  void RemoveGestureDetector( RotationGestureDetector* gestureDetector );
+  void RemoveGestureDetector(RotationGestureDetector* gestureDetector);
 
   /**
    * Sets the minimum touch events required before a rotation can be started
    * @param[in] value The number of touch events
    */
-  void SetMinimumTouchEvents( uint32_t value );
+  void SetMinimumTouchEvents(uint32_t value);
 
   /**
    * Sets the minimum touch events required after a rotation started
    * @param[in] value The number of touch events
    */
-  void SetMinimumTouchEventsAfterStart( uint32_t value );
+  void SetMinimumTouchEventsAfterStart(uint32_t value);
 
 private:
-
   // GestureProcessor overrides
 
   /**
@@ -111,18 +106,17 @@ private:
   /**
    * @copydoc GestureProcessor::CheckGestureDetector()
    */
-  bool CheckGestureDetector( GestureDetector* detector, Actor* actor ) override;
+  bool CheckGestureDetector(GestureDetector* detector, Actor* actor) override;
 
   /**
    * @copydoc GestureProcessor::EmitGestureSignal()
    */
-  void EmitGestureSignal( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates ) override;
+  void EmitGestureSignal(Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates) override;
 
 private:
-
   RotationGestureDetectorContainer mRotationGestureDetectors;
-  GestureDetectorContainer mCurrentRotationEmitters;
-  RenderTaskPtr mCurrentRenderTask;
+  GestureDetectorContainer         mCurrentRotationEmitters;
+  RenderTaskPtr                    mCurrentRenderTask;
 
   const RotationGestureEvent* mCurrentRotationEvent; ///< Pointer to current RotationEvent, used when calling ProcessAndEmit()
 

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RAY_TEST_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,11 @@
 
 namespace Dali
 {
-
 struct Vector2;
 struct Vector4;
 
 namespace Internal
 {
-
 class Actor;
 class EventThreadServices;
 
@@ -42,7 +40,6 @@ class EventThreadServices;
 class RayTest
 {
 public:
-
   /// Constructor
   RayTest();
 

@@ -1030,7 +1030,7 @@ inline void SetShaderProgramMessage(UpdateManager&          manager,
   new(slot) LocalType(&manager, &UpdateManager::SetShaderProgram, const_cast<Shader*>(&shader), shaderData, modifiesGeometry);
 }
 
-inline void SurfaceReplacedMessage( UpdateManager& manager, const SceneGraph::Scene& constScene )
+inline void SurfaceReplacedMessage(UpdateManager& manager, const SceneGraph::Scene& constScene)
 {
   // The scene-graph thread owns this object so it can safely edit it.
   Scene& scene = const_cast<Scene&>(constScene);
@@ -1044,7 +1044,7 @@ inline void SurfaceReplacedMessage( UpdateManager& manager, const SceneGraph::Sc
   new(slot) LocalType(&manager, &UpdateManager::SurfaceReplaced, &scene);
 }
 
-inline void KeepRenderingMessage( UpdateManager& manager, float durationSeconds )
+inline void KeepRenderingMessage(UpdateManager& manager, float durationSeconds)
 {
   using LocalType = MessageValue1<UpdateManager, float>;
 

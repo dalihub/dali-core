@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@
 
 namespace //Unnamed namespace
 {
-
 //Memory pool used to allocate new RenderTaskLists. Memory used by this pool will be released when shutting down DALi
 Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::RenderTaskList> gRenderTaskListMemoryPool;
 
@@ -31,55 +30,52 @@ Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::RenderTask
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace SceneGraph
 {
-
 RenderTaskList* RenderTaskList::New()
 {
-  return new ( gRenderTaskListMemoryPool.AllocateRawThreadSafe() ) RenderTaskList();
+  return new(gRenderTaskListMemoryPool.AllocateRawThreadSafe()) RenderTaskList();
 }
 
 RenderTaskList::RenderTaskList()
-: mNotificationObject( nullptr ),
-  mRenderMessageDispatcher( nullptr )
+: mNotificationObject(nullptr),
+  mRenderMessageDispatcher(nullptr)
 {
 }
 
 RenderTaskList::~RenderTaskList() = default;
 
-void RenderTaskList::operator delete( void* ptr )
+void RenderTaskList::operator delete(void* ptr)
 {
-  gRenderTaskListMemoryPool.FreeThreadSafe( static_cast<RenderTaskList*>( ptr ) );
+  gRenderTaskListMemoryPool.FreeThreadSafe(static_cast<RenderTaskList*>(ptr));
 }
 
-void RenderTaskList::SetRenderMessageDispatcher( RenderMessageDispatcher* renderMessageDispatcher )
+void RenderTaskList::SetRenderMessageDispatcher(RenderMessageDispatcher* renderMessageDispatcher)
 {
   mRenderMessageDispatcher = renderMessageDispatcher;
 }
 
-void RenderTaskList::AddTask( OwnerPointer< RenderTask >& newTask )
+void RenderTaskList::AddTask(OwnerPointer<RenderTask>& newTask)
 {
-  DALI_ASSERT_DEBUG( newTask != NULL && "SceneGraph RenderTask is null");
-  DALI_ASSERT_DEBUG( mRenderMessageDispatcher != NULL && "RenderMessageDispatcher is null");
+  DALI_ASSERT_DEBUG(newTask != NULL && "SceneGraph RenderTask is null");
+  DALI_ASSERT_DEBUG(mRenderMessageDispatcher != NULL && "RenderMessageDispatcher is null");
 
-  newTask->Initialize( *mRenderMessageDispatcher );
+  newTask->Initialize(*mRenderMessageDispatcher);
   // mRenderTasks container takes ownership
-  mRenderTasks.PushBack( newTask.Release() );
+  mRenderTasks.PushBack(newTask.Release());
 }
 
-void RenderTaskList::RemoveTask( RenderTask* task )
+void RenderTaskList::RemoveTask(RenderTask* task)
 {
   RenderTaskContainer::ConstIterator end = mRenderTasks.End();
-  for ( RenderTaskContainer::Iterator iter = mRenderTasks.Begin(); iter != end; ++iter )
+  for(RenderTaskContainer::Iterator iter = mRenderTasks.Begin(); iter != end; ++iter)
   {
-    if ( *iter == task )
+    if(*iter == task)
     {
       // Destroy the task
-      mRenderTasks.Erase( iter );
+      mRenderTasks.Erase(iter);
 
       break; // we're finished
     }
@@ -88,7 +84,7 @@ void RenderTaskList::RemoveTask( RenderTask* task )
 
 uint32_t RenderTaskList::GetTaskCount()
 {
-  return static_cast<uint32_t>( mRenderTasks.Count() );
+  return static_cast<uint32_t>(mRenderTasks.Count());
 }
 
 RenderTaskList::RenderTaskContainer& RenderTaskList::GetTasks()
@@ -101,15 +97,13 @@ const RenderTaskList::RenderTaskContainer& RenderTaskList::GetTasks() const
   return mRenderTasks;
 }
 
-void RenderTaskList::SetCompleteNotificationInterface( CompleteNotificationInterface* object )
+void RenderTaskList::SetCompleteNotificationInterface(CompleteNotificationInterface* object)
 {
-
   mNotificationObject = object;
 }
 
 CompleteNotificationInterface* RenderTaskList::GetCompleteNotificationInterface()
 {
-
   return mNotificationObject;
 }
 

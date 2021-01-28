@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,27 +20,25 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 HoverEvent::HoverEvent()
 : mPoints(),
-  mTime( 0 )
+  mTime(0)
 {
 }
 
-HoverEvent::HoverEvent( unsigned long time )
+HoverEvent::HoverEvent(unsigned long time)
 : mPoints(),
-  mTime( time )
+  mTime(time)
 {
 }
 
-HoverEventPtr HoverEvent::Clone( const HoverEvent& rhs )
+HoverEventPtr HoverEvent::Clone(const HoverEvent& rhs)
 {
-  HoverEventPtr hoverEvent( new HoverEvent );
+  HoverEventPtr hoverEvent(new HoverEvent);
   hoverEvent->mPoints = rhs.mPoints;
-  hoverEvent->mTime = rhs.mTime;
+  hoverEvent->mTime   = rhs.mTime;
   return hoverEvent;
 }
 
@@ -54,68 +52,68 @@ std::size_t HoverEvent::GetPointCount() const
   return mPoints.size();
 }
 
-int32_t HoverEvent::GetDeviceId( std::size_t point ) const
+int32_t HoverEvent::GetDeviceId(std::size_t point) const
 {
-  if( point < mPoints.size() )
+  if(point < mPoints.size())
   {
-    return mPoints[ point ].GetDeviceId();
+    return mPoints[point].GetDeviceId();
   }
   return -1;
 }
 
-PointState::Type HoverEvent::GetState( std::size_t point ) const
+PointState::Type HoverEvent::GetState(std::size_t point) const
 {
-  if( point < mPoints.size() )
+  if(point < mPoints.size())
   {
-    return mPoints[ point ].GetState();
+    return mPoints[point].GetState();
   }
   return PointState::FINISHED;
 }
 
-Dali::Actor HoverEvent::GetHitActor( std::size_t point ) const
+Dali::Actor HoverEvent::GetHitActor(std::size_t point) const
 {
-  if( point < mPoints.size() )
+  if(point < mPoints.size())
   {
-    return mPoints[ point ].GetHitActor();
+    return mPoints[point].GetHitActor();
   }
   return Dali::Actor();
 }
 
-const Vector2& HoverEvent::GetLocalPosition( std::size_t point ) const
+const Vector2& HoverEvent::GetLocalPosition(std::size_t point) const
 {
-  if( point < mPoints.size() )
+  if(point < mPoints.size())
   {
-    return mPoints[ point ].GetLocalPosition();
+    return mPoints[point].GetLocalPosition();
   }
   return Vector2::ZERO;
 }
 
-const Vector2& HoverEvent::GetScreenPosition( std::size_t point ) const
+const Vector2& HoverEvent::GetScreenPosition(std::size_t point) const
 {
-  if( point < mPoints.size() )
+  if(point < mPoints.size())
   {
-    return mPoints[ point ].GetScreenPosition();
+    return mPoints[point].GetScreenPosition();
   }
   return Vector2::ZERO;
 }
 
-const Integration::Point& HoverEvent::GetPoint( std::size_t point ) const
+const Integration::Point& HoverEvent::GetPoint(std::size_t point) const
 {
-  DALI_ASSERT_DEBUG( point < mPoints.size() && "No point at index" );
-  return mPoints[ point ];
+  DALI_ASSERT_DEBUG(point < mPoints.size() && "No point at index");
+  return mPoints[point];
 }
 
-Integration::Point& HoverEvent::GetPoint( std::size_t point )
+Integration::Point& HoverEvent::GetPoint(std::size_t point)
 {
-  DALI_ASSERT_DEBUG( point < mPoints.size() && "No point at index" );
-  return mPoints[ point ];
+  DALI_ASSERT_DEBUG(point < mPoints.size() && "No point at index");
+  return mPoints[point];
 }
 
-void HoverEvent::AddPoint( const Integration::Point& point )
+void HoverEvent::AddPoint(const Integration::Point& point)
 {
-  mPoints.push_back( point );
+  mPoints.push_back(point);
 }
 
-} // namsespace Internal
+} // namespace Internal
 
 } // namespace Dali

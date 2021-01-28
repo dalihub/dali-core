@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 #include <dali/internal/event/actors/layer-list.h>
 
 // EXTERNAL INCLUDES
-#include <algorithm>  // for std::swap
+#include <algorithm> // for std::swap
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
@@ -28,13 +28,10 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace // unnamed namespace
 {
-
 typedef std::vector<Layer*> LayerContainer;
 using LayerIter        = LayerContainer::iterator;
 using ReverseLayerIter = LayerContainer::reverse_iterator;
@@ -46,44 +43,45 @@ using ReverseLayerIter = LayerContainer::reverse_iterator;
  * @param[in] layer to search for
  * @return iterator to layer if found
  */
-template<class InputIterator> InputIterator Find( InputIterator first, InputIterator last, const Layer& layer )
+template<class InputIterator>
+InputIterator Find(InputIterator first, InputIterator last, const Layer& layer)
 {
-  for( ; first != last ; ++first )
+  for(; first != last; ++first)
   {
-    if( *first == &layer )
+    if(*first == &layer)
     {
       break;
     }
- }
- return first;
+  }
+  return first;
 }
 
 } // unnamed namespace
 
-LayerList* LayerList::New( SceneGraph::UpdateManager& updateManager )
+LayerList* LayerList::New(SceneGraph::UpdateManager& updateManager)
 {
-  return new LayerList( updateManager );
+  return new LayerList(updateManager);
 }
 
 LayerList::~LayerList() = default;
 
 uint32_t LayerList::GetLayerCount() const
 {
-  return static_cast<uint32_t>( mLayers.size() ); //  // only 4,294,967,295 layers supported
+  return static_cast<uint32_t>(mLayers.size()); //  // only 4,294,967,295 layers supported
 }
 
-Layer* LayerList::GetLayer( uint32_t depth ) const
+Layer* LayerList::GetLayer(uint32_t depth) const
 {
-  DALI_ASSERT_ALWAYS( depth < mLayers.size() );
+  DALI_ASSERT_ALWAYS(depth < mLayers.size());
 
-  return mLayers[ depth ];
+  return mLayers[depth];
 }
 
-uint32_t LayerList::GetDepth( const Layer* layer ) const
+uint32_t LayerList::GetDepth(const Layer* layer) const
 {
-  for( uint32_t count = 0; count < mLayers.size(); ++count )
+  for(uint32_t count = 0; count < mLayers.size(); ++count)
   {
-    if( layer == mLayers[ count ] )
+    if(layer == mLayers[count])
     {
       return count;
     }
@@ -93,7 +91,7 @@ uint32_t LayerList::GetDepth( const Layer* layer ) const
 
 void LayerList::RegisterLayer(Layer& layer)
 {
-  DALI_ASSERT_DEBUG(  mLayers.end() == Find( mLayers.begin(), mLayers.end(), layer) );
+  DALI_ASSERT_DEBUG(mLayers.end() == Find(mLayers.begin(), mLayers.end(), layer));
   mLayers.push_back(&layer);
 
   SetLayerDepths();
@@ -102,7 +100,7 @@ void LayerList::RegisterLayer(Layer& layer)
 void LayerList::UnregisterLayer(Layer& layer)
 {
   // Find the layer...
-  LayerIter iter = Find( mLayers.begin(), mLayers.end(), layer);
+  LayerIter iter = Find(mLayers.begin(), mLayers.end(), layer);
   DALI_ASSERT_DEBUG(iter != mLayers.end());
 
   // ...and remove it
@@ -113,12 +111,12 @@ void LayerList::UnregisterLayer(Layer& layer)
 
 void LayerList::RaiseLayer(Layer& raiseLayer)
 {
-  LayerIter iter = Find( mLayers.begin(), mLayers.end(), raiseLayer);
+  LayerIter iter = Find(mLayers.begin(), mLayers.end(), raiseLayer);
 
-  if (iter   != mLayers.end() &&
-      iter+1 != mLayers.end())
+  if(iter != mLayers.end() &&
+     iter + 1 != mLayers.end())
   {
-    LayerIter nextIter = iter+1;
+    LayerIter nextIter = iter + 1;
 
     // Swap the pointers
     std::swap(*iter, *nextIter);
@@ -129,12 +127,12 @@ void LayerList::RaiseLayer(Layer& raiseLayer)
 
 void LayerList::LowerLayer(Layer& lowerLayer)
 {
-  ReverseLayerIter iter =  Find( mLayers.rbegin(), mLayers.rend(), lowerLayer);
+  ReverseLayerIter iter = Find(mLayers.rbegin(), mLayers.rend(), lowerLayer);
 
-  if (iter   != mLayers.rend() &&
-      iter+1 != mLayers.rend())
+  if(iter != mLayers.rend() &&
+     iter + 1 != mLayers.rend())
   {
-    ReverseLayerIter nextIter = iter+1;
+    ReverseLayerIter nextIter = iter + 1;
 
     // Swap the pointers
     std::swap(*iter, *nextIter);
@@ -143,98 +141,98 @@ void LayerList::LowerLayer(Layer& lowerLayer)
   }
 }
 
-void LayerList::RaiseLayerToTop( const Layer& layer )
+void LayerList::RaiseLayerToTop(const Layer& layer)
 {
-  LayerIter iter = Find( mLayers.begin(), mLayers.end(), layer);
+  LayerIter iter = Find(mLayers.begin(), mLayers.end(), layer);
 
-  if (iter   != mLayers.end() &&
-      iter+1 != mLayers.end())
+  if(iter != mLayers.end() &&
+     iter + 1 != mLayers.end())
   {
     Layer* raised = *iter;
 
-    copy(iter+1, mLayers.end(), iter);
+    copy(iter + 1, mLayers.end(), iter);
     mLayers.back() = raised;
 
     SetLayerDepths();
   }
 }
 
-void LayerList::LowerLayerToBottom( const Layer& layer )
+void LayerList::LowerLayerToBottom(const Layer& layer)
 {
-  ReverseLayerIter iter =  Find( mLayers.rbegin(), mLayers.rend(), layer);
+  ReverseLayerIter iter = Find(mLayers.rbegin(), mLayers.rend(), layer);
 
-  if (iter   != mLayers.rend() &&
-      iter+1 != mLayers.rend())
+  if(iter != mLayers.rend() &&
+     iter + 1 != mLayers.rend())
   {
     Layer* lowered = *iter;
 
-    copy(iter+1, mLayers.rend(), iter);
+    copy(iter + 1, mLayers.rend(), iter);
     mLayers.front() = lowered;
 
     SetLayerDepths();
   }
 }
 
-void LayerList::MoveLayerAbove( const Layer& layer, const Layer& target )
+void LayerList::MoveLayerAbove(const Layer& layer, const Layer& target)
 {
   // check if it already is
-  if( layer.GetDepth() == ( target.GetDepth() + 1 ) )
+  if(layer.GetDepth() == (target.GetDepth() + 1))
   {
     return;
   }
 
   // find the layer to move
-  LayerIter iter = Find( mLayers.begin(), mLayers.end(), layer);
+  LayerIter iter = Find(mLayers.begin(), mLayers.end(), layer);
 
-  if( iter != mLayers.end() )
+  if(iter != mLayers.end())
   {
     Layer* moved = *iter;
-    mLayers.erase( iter );
+    mLayers.erase(iter);
     // find target
-    LayerIter iterT = Find( mLayers.begin(), mLayers.end(), target);
+    LayerIter iterT = Find(mLayers.begin(), mLayers.end(), target);
     // if target is not found there's a programming error somewhere
-    DALI_ASSERT_DEBUG( iterT != mLayers.end() );
+    DALI_ASSERT_DEBUG(iterT != mLayers.end());
     // iterT might be the last
-    if( ( iterT+1 ) == mLayers.end() )
+    if((iterT + 1) == mLayers.end())
     {
-      mLayers.push_back( moved );
+      mLayers.push_back(moved);
     }
     else
     {
-      mLayers.insert( iterT+1, moved );
+      mLayers.insert(iterT + 1, moved);
     }
 
     SetLayerDepths();
   }
 }
 
-void LayerList::MoveLayerBelow( const Layer& layer, const Layer& target )
+void LayerList::MoveLayerBelow(const Layer& layer, const Layer& target)
 {
   // check if it already is in correct order
-  if( layer.GetDepth() == ( target.GetDepth() - 1 ) )
+  if(layer.GetDepth() == (target.GetDepth() - 1))
   {
     return;
   }
 
   // find the layer to move
-  LayerIter iter = Find( mLayers.begin(), mLayers.end(), layer);
-  if( iter != mLayers.end() )
+  LayerIter iter = Find(mLayers.begin(), mLayers.end(), layer);
+  if(iter != mLayers.end())
   {
     Layer* moved = *iter;
-    mLayers.erase( iter );
+    mLayers.erase(iter);
     // find target
-    LayerIter iterT = Find( mLayers.begin(), mLayers.end(), target);
+    LayerIter iterT = Find(mLayers.begin(), mLayers.end(), target);
     // if target is not found there's a programming error somewhere
-    DALI_ASSERT_DEBUG( iterT != mLayers.end() );
-    mLayers.insert( iterT, moved );
+    DALI_ASSERT_DEBUG(iterT != mLayers.end());
+    mLayers.insert(iterT, moved);
 
     SetLayerDepths();
   }
 }
 
-LayerList::LayerList( SceneGraph::UpdateManager& updateManager )
-: mUpdateManager( updateManager ),
-  mRoot( nullptr )
+LayerList::LayerList(SceneGraph::UpdateManager& updateManager)
+: mUpdateManager(updateManager),
+  mRoot(nullptr)
 {
 }
 
@@ -242,18 +240,18 @@ void LayerList::SetLayerDepths()
 {
   // we've got a list of on-stage layers on actor side, need to get their stage
   // pointers so we can send them to the update manager
-  std::vector< SceneGraph::Layer* > layers;
-  layers.reserve( mLayers.size() );
+  std::vector<SceneGraph::Layer*> layers;
+  layers.reserve(mLayers.size());
 
   // Set the layers (possibly) new depth
-  for (LayerIter iter = mLayers.begin(); iter != mLayers.end(); ++iter)
+  for(LayerIter iter = mLayers.begin(); iter != mLayers.end(); ++iter)
   {
-    SceneGraph::Layer* layerPtr = const_cast< SceneGraph::Layer* >( &( (*iter)->GetSceneGraphLayer() ) );
-    layers.push_back( layerPtr );
+    SceneGraph::Layer* layerPtr = const_cast<SceneGraph::Layer*>(&((*iter)->GetSceneGraphLayer()));
+    layers.push_back(layerPtr);
   }
 
   // Layers are being used in a separate thread; queue a message to set order
-  SetLayerDepthsMessage( mUpdateManager, layers, &( mRoot->GetSceneGraphLayer() ) );
+  SetLayerDepthsMessage(mUpdateManager, layers, &(mRoot->GetSceneGraphLayer()));
 }
 
 void LayerList::SetRootLayer(Layer* rootLayer)

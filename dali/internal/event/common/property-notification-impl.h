@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PROPERTY_NOTIFICATION_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,24 +19,22 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-vector.h>
-#include <dali/public-api/object/ref-object.h>
-#include <dali/public-api/object/property-notification.h>
 #include <dali/internal/event/common/property-conditions-impl.h>
+#include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/object/property-notification.h>
+#include <dali/public-api/object/ref-object.h>
 
 namespace Dali
 {
-
 class PropertyCondition;
 
 namespace Internal
 {
-
 namespace SceneGraph
 {
 class PropertyNotification;
 class UpdateManager;
-}
+} // namespace SceneGraph
 
 class Actor;
 class PropertyNotification;
@@ -68,12 +66,11 @@ public:
    * @param[in] condition The condition for this notification.
    * @return A smart-pointer to the newly allocated PropertyNotification.
    */
-  static PropertyNotificationPtr New(Property& target,
-                                     int componentIndex,
+  static PropertyNotificationPtr New(Property&                      target,
+                                     int                            componentIndex,
                                      const Dali::PropertyCondition& condition);
 
 public:
-
   /**
    * @copydoc Dali::PropertyNotification::NotifySignal()
    */
@@ -119,7 +116,7 @@ public:
   /**
    * @copydoc Dali::PropertyNotification::SetNotifyMode
    */
-  void SetNotifyMode( NotifyMode mode );
+  void SetNotifyMode(NotifyMode mode);
 
   /**
    * @copydoc Dali::PropertyNotification::GetNotifyMode
@@ -136,10 +133,9 @@ public:
    * @param[in] sceneObject The SceneGraph::PropertyNotification pointer to compare
    * @return true if sceneObject is the same as the one created by this instance
    */
-   bool CompareSceneObject( const SceneGraph::PropertyNotification* sceneObject );
+  bool CompareSceneObject(const SceneGraph::PropertyNotification* sceneObject);
 
 protected:
-
   /**
    * Construct a new PropertyNotification.
    * @param[in] updateManager The UpdateManager associated with this PropertyNotification.
@@ -148,10 +144,10 @@ protected:
    * @param[in] componentIndex Index to the component of a complex property such as a Vector
    * @param[in] condition The condition for this notification.
    */
-  PropertyNotification(SceneGraph::UpdateManager& updateManager,
-                       PropertyNotificationManager& propertyNotificationManager,
-                       Property& target,
-                       int componentIndex,
+  PropertyNotification(SceneGraph::UpdateManager&     updateManager,
+                       PropertyNotificationManager&   propertyNotificationManager,
+                       Property&                      target,
+                       int                            componentIndex,
                        const Dali::PropertyCondition& condition);
 
   /**
@@ -170,7 +166,6 @@ protected:
   ~PropertyNotification() override;
 
 private:
-
   // Undefined
   PropertyNotification(const PropertyNotification&);
 
@@ -178,24 +173,22 @@ private:
   PropertyNotification& operator=(const PropertyNotification& rhs);
 
 protected:
-
-  SceneGraph::UpdateManager& mUpdateManager;
+  SceneGraph::UpdateManager&              mUpdateManager;
   const SceneGraph::PropertyNotification* mPropertyNotification;
 
   Dali::PropertyNotifySignalType mNotifySignal;
 
 private:
-
-  PropertyNotificationManager& mPropertyNotificationManager;  ///< Reference to the property notification manager
-  Object*                      mObject;                       ///< Target object, not owned by PropertyNotification.
-  Property::Index              mObjectPropertyIndex;          ///< Target object's property index of interest.
-  Property::Type               mPropertyType;                 ///< The type of property to evaluate
-  int                          mComponentIndex;               ///< Index to a specific component of a complex property such as a Vector
-  Dali::PropertyCondition      mCondition;                    ///< The PropertyCondition handle.
-  RawArgumentContainer         mRawConditionArgs;             ///< The Raw Condition args. (float type)
-  NotifyMode                   mNotifyMode;                   ///< The current notification mode.
-  bool                         mNotifyResult;                 ///< The result of the last condition check that caused a signal emit
-  bool                         mCompare;                      ///< The flag of comparing previous property's raw value and current.
+  PropertyNotificationManager& mPropertyNotificationManager; ///< Reference to the property notification manager
+  Object*                      mObject;                      ///< Target object, not owned by PropertyNotification.
+  Property::Index              mObjectPropertyIndex;         ///< Target object's property index of interest.
+  Property::Type               mPropertyType;                ///< The type of property to evaluate
+  int                          mComponentIndex;              ///< Index to a specific component of a complex property such as a Vector
+  Dali::PropertyCondition      mCondition;                   ///< The PropertyCondition handle.
+  RawArgumentContainer         mRawConditionArgs;            ///< The Raw Condition args. (float type)
+  NotifyMode                   mNotifyMode;                  ///< The current notification mode.
+  bool                         mNotifyResult;                ///< The result of the last condition check that caused a signal emit
+  bool                         mCompare;                     ///< The flag of comparing previous property's raw value and current.
 };
 
 } // namespace Internal
@@ -204,7 +197,7 @@ private:
 
 inline Internal::PropertyNotification& GetImplementation(Dali::PropertyNotification& pub)
 {
-  DALI_ASSERT_ALWAYS( pub && "PropertyNotification handle is empty" );
+  DALI_ASSERT_ALWAYS(pub && "PropertyNotification handle is empty");
 
   BaseObject& handle = pub.GetBaseObject();
 
@@ -213,7 +206,7 @@ inline Internal::PropertyNotification& GetImplementation(Dali::PropertyNotificat
 
 inline const Internal::PropertyNotification& GetImplementation(const Dali::PropertyNotification& pub)
 {
-  DALI_ASSERT_ALWAYS( pub && "PropertyNotification handle is empty" );
+  DALI_ASSERT_ALWAYS(pub && "PropertyNotification handle is empty");
 
   const BaseObject& handle = pub.GetBaseObject();
 

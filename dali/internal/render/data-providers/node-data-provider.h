@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_NODE_DATA_PROVIDER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,10 +29,8 @@ class Matrix;
 
 namespace Internal
 {
-
 namespace SceneGraph
 {
-
 class Node;
 class Renderer;
 class TextureSet;
@@ -42,15 +40,15 @@ class TextureSet;
  */
 struct PartialRenderingCacheInfo
 {
-  Node*             node{nullptr};        /// Node associated with the entry
-  const Renderer*   renderer{nullptr};    /// Renderer object
-  const TextureSet* textureSet{nullptr};  /// TextureSet object
-  Matrix            matrix{};             /// Model-view matrix
-  Vector4           color{};              /// Color
-  Vector3           size{};               /// Size
-  Vector3           updatedSize{};        /// Updated size
-  bool              isOpaque{};           /// Opacity state
-  uint32_t          depthIndex{0u};       /// Depth index
+  Node*             node{nullptr};       /// Node associated with the entry
+  const Renderer*   renderer{nullptr};   /// Renderer object
+  const TextureSet* textureSet{nullptr}; /// TextureSet object
+  Matrix            matrix{};            /// Model-view matrix
+  Vector4           color{};             /// Color
+  Vector3           size{};              /// Size
+  Vector3           updatedSize{};       /// Updated size
+  bool              isOpaque{};          /// Opacity state
+  uint32_t          depthIndex{0u};      /// Depth index
 };
 
 /**
@@ -74,7 +72,7 @@ struct PartialRenderingNodeData
    */
   bool IsUpdated()
   {
-    return 0 != memcmp( &mData[0], &mData[1], sizeof(PartialRenderingCacheInfo) );
+    return 0 != memcmp(&mData[0], &mData[1], sizeof(PartialRenderingCacheInfo));
   }
 
   /**
@@ -85,8 +83,8 @@ struct PartialRenderingNodeData
     mCurrentIndex = static_cast<uint8_t>((~mCurrentIndex) & 1);
   }
 
-  PartialRenderingCacheInfo mData[2u]; /// Double-buffered data
-  uint8_t mCurrentIndex {0u}; /// Current buffer index
+  PartialRenderingCacheInfo mData[2u];         /// Double-buffered data
+  uint8_t                   mCurrentIndex{0u}; /// Current buffer index
 };
 
 /**
@@ -95,7 +93,6 @@ struct PartialRenderingNodeData
 class PartialRenderingDataProvider
 {
 public:
-
   /**
    * Constructor
    */
@@ -116,7 +113,6 @@ public:
   }
 
 protected:
-
   PartialRenderingNodeData mPartialRenderingData;
 };
 
@@ -126,7 +122,6 @@ protected:
 class NodeDataProvider : UniformMapDataProvider, public PartialRenderingDataProvider
 {
 public:
-
   /**
    * Constructor. Nothing to do as a pure interface.
    */
@@ -136,23 +131,23 @@ public:
    * @param bufferIndex to use
    * @return a reference to the model matrix
    */
-  virtual const Matrix& GetModelMatrix( BufferIndex bufferIndex ) const = 0;
+  virtual const Matrix& GetModelMatrix(BufferIndex bufferIndex) const = 0;
 
   /**
    * @param bufferIndex to use
    * @return a reference to the color
    */
-  virtual const Vector4& GetRenderColor( BufferIndex bufferIndex ) const = 0;
+  virtual const Vector4& GetRenderColor(BufferIndex bufferIndex) const = 0;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::UniformMapDataProvider::GetUniformMapChanged()
    */
-  bool GetUniformMapChanged( BufferIndex bufferIndex ) const override = 0;
+  bool GetUniformMapChanged(BufferIndex bufferIndex) const override = 0;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::UniformMapDataProvider::GetUniformMap()
    */
-  const CollectedUniformMap& GetUniformMap( BufferIndex bufferIndex ) const override = 0;
+  const CollectedUniformMap& GetUniformMap(BufferIndex bufferIndex) const override = 0;
 
 protected:
   /**
@@ -161,8 +156,8 @@ protected:
   ~NodeDataProvider() override = default;
 };
 
-} // SceneGraph
-} // Internal
-} // Dali
+} // namespace SceneGraph
+} // namespace Internal
+} // namespace Dali
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_NODE_DATA_PROVIDER_H

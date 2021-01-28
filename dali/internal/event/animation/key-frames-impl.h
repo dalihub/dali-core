@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_KEY_FRAMES_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,11 @@
 #include <memory>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h>
-#include <dali/public-api/animation/key-frames.h>
-#include <dali/public-api/object/base-object.h>
-#include <dali/public-api/animation/alpha-function.h>
 #include <dali/internal/event/animation/key-frame-channel.h>
+#include <dali/public-api/animation/alpha-function.h>
+#include <dali/public-api/animation/key-frames.h>
+#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/object/base-object.h>
 
 namespace Dali
 {
@@ -45,7 +45,6 @@ public:
   static KeyFrames* New();
 
 private:
-
   /**
    * Create a specialization from the given type, and store it to the mSpec
    * member variable
@@ -104,7 +103,7 @@ public:
    * @param[in] index The index of the key frame to fetch
    * @param[out] value The value of the given key frame
    */
-  virtual void GetKeyFrameAsValue( std::size_t index, Property::Value& value ) = 0;
+  virtual void GetKeyFrameAsValue(std::size_t index, Property::Value& value) = 0;
 };
 
 /**
@@ -154,7 +153,7 @@ public:
   /**
    * @copydoc KeyFrameSpec::GetKeyFrameAsValue()
    */
-  void GetKeyFrameAsValue( std::size_t index, Property::Value& value ) override
+  void GetKeyFrameAsValue(std::size_t index, Property::Value& value) override
   {
     value = mChannel.mValues[index].mValue;
   }
@@ -195,25 +194,23 @@ auto GetSpecialization(const Internal::KeyFrames& keyFrames)
   return static_cast<DeriveClass>(keyFrames.GetKeyFramesBase());
 }
 
-} // Internal
-
+} // namespace Internal
 
 // Get impl of handle
 inline Internal::KeyFrames& GetImplementation(Dali::KeyFrames& keyFrames)
 {
-  DALI_ASSERT_ALWAYS( keyFrames && "KeyFrames handle is empty" );
+  DALI_ASSERT_ALWAYS(keyFrames && "KeyFrames handle is empty");
   Dali::RefObject& object = keyFrames.GetBaseObject();
   return static_cast<Internal::KeyFrames&>(object);
 }
 
 inline const Internal::KeyFrames& GetImplementation(const Dali::KeyFrames& keyFrames)
 {
-  DALI_ASSERT_ALWAYS( keyFrames && "KeyFrames handle is empty" );
+  DALI_ASSERT_ALWAYS(keyFrames && "KeyFrames handle is empty");
   const Dali::RefObject& object = keyFrames.GetBaseObject();
   return static_cast<const Internal::KeyFrames&>(object);
 }
 
-
-} // Dali
+} // namespace Dali
 
 #endif // DALI_INTERNAL_KEY_FRAMES_H

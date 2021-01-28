@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_PROPERTY_OWNER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,25 +19,21 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-vector.h>
 #include <dali/devel-api/common/owner-container.h>
+#include <dali/internal/common/const-string.h>
 #include <dali/internal/common/message.h>
+#include <dali/internal/update/animation/scene-graph-constraint-declarations.h>
 #include <dali/internal/update/common/property-base.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/update/common/uniform-map.h>
-#include <dali/internal/update/animation/scene-graph-constraint-declarations.h>
-#include <dali/internal/common/const-string.h>
-
+#include <dali/public-api/common/dali-vector.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace SceneGraph
 {
-
 class PropertyOwner;
 
 using OwnedPropertyContainer = OwnerContainer<PropertyBase*>;
@@ -50,23 +46,21 @@ using OwnedPropertyIter      = OwnedPropertyContainer::Iterator;
 class PropertyOwner
 {
 public:
-
   class Observer
   {
   public:
-
     /**
      * Called when the observable object is connected to the scene graph.
      * @param[in] owner A reference to the connected PropertyOwner
      */
-    virtual void PropertyOwnerConnected( PropertyOwner& owner ) = 0;
+    virtual void PropertyOwnerConnected(PropertyOwner& owner) = 0;
 
     /**
      * Called when the observable object is disconnected from the scene graph.
      * @param[in] currentBufferIndex The buffer to reset.
      * @param[in] owner A reference to the disconnected PropertyOwner
      */
-    virtual void PropertyOwnerDisconnected( BufferIndex updateBufferIndex, PropertyOwner& owner ) = 0;
+    virtual void PropertyOwnerDisconnected(BufferIndex updateBufferIndex, PropertyOwner& owner) = 0;
 
     /**
      * Called shortly before the observable object is destroyed.
@@ -74,10 +68,9 @@ public:
      * @note Cleanup should be done in both this and PropertyOwnerDisconnected as PropertyOwnerDisconnected
      * may not be called (i.e. when shutting down).
      */
-    virtual void PropertyOwnerDestroyed( PropertyOwner& owner ) = 0;
+    virtual void PropertyOwnerDestroyed(PropertyOwner& owner) = 0;
 
   protected:
-
     /**
      * Virtual destructor, no deletion through this interface
      */
@@ -133,14 +126,14 @@ public:
    * This occurs when the object is disconnected from the scene-graph during UpdateManager::Update().
    * @param[in] currentBufferIndex The current update buffer.
    */
-  void DisconnectFromSceneGraph( BufferIndex updateBufferIndex );
+  void DisconnectFromSceneGraph(BufferIndex updateBufferIndex);
 
   /**
    * Install a custom property.
    * @post The PropertyOwner takes ownership of the property.
    * @param[in] property A pointer to a newly allocated property.
    */
-  void InstallCustomProperty( OwnerPointer<PropertyBase>& property );
+  void InstallCustomProperty(OwnerPointer<PropertyBase>& property);
 
   /**
    * Retrieve the custom properties owned by the object.
@@ -184,13 +177,13 @@ public:
    * Apply a constraint.
    * @param[in] constraint The constraint to apply.
    */
-  void ApplyConstraint( OwnerPointer<ConstraintBase>& constraint );
+  void ApplyConstraint(OwnerPointer<ConstraintBase>& constraint);
 
   /**
    * Begin removal of constraints.
    * @param[in] constraint The constraint to remove.
    */
-  void RemoveConstraint( ConstraintBase* constraint );
+  void RemoveConstraint(ConstraintBase* constraint);
 
   /**
    * Retrieve the constraints that are currently applied.
@@ -206,7 +199,7 @@ public:
   /**
    * @copydoc UniformMap::Remove
    */
-  virtual void RemoveUniformMapping( const ConstString& uniformName );
+  virtual void RemoveUniformMapping(const ConstString& uniformName);
 
   /**
    * Get the mappings table
@@ -216,12 +209,12 @@ public:
   /**
    * @copydoc UniformMap::AddUniformMapObserver
    */
-  void AddUniformMapObserver( UniformMap::Observer& observer );
+  void AddUniformMapObserver(UniformMap::Observer& observer);
 
   /**
    * @copydoc UniformMap::RemoveUniformMapObserver
    */
-  void RemoveUniformMapObserver( UniformMap::Observer& observer );
+  void RemoveUniformMapObserver(UniformMap::Observer& observer);
 
   /**
    * Query whether playing an animation is possible or not.
@@ -233,14 +226,12 @@ public:
   }
 
 protected:
-
   /**
    * Protected constructor.
    */
   PropertyOwner();
 
 private:
-
   // Undefined
   PropertyOwner(const PropertyOwner&);
 
@@ -248,10 +239,9 @@ private:
   PropertyOwner& operator=(const PropertyOwner& rhs);
 
 protected:
-
   OwnedPropertyContainer mCustomProperties; ///< Properties provided with InstallCustomProperty()
-  UniformMap mUniformMaps; ///< Container of owned uniform maps
-  bool mUpdated;
+  UniformMap             mUniformMaps;      ///< Container of owned uniform maps
+  bool                   mUpdated;
   bool                   mIsConnectedToSceneGraph;
 
 private:

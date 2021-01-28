@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_EVENT_LONG_PRESS_GESTURE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,8 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 /**
  * If the adaptor detects a long press gesture, then it should create an instance of this structure and
  * send it to the Core.
@@ -47,7 +45,7 @@ struct LongPressGestureEvent : public GestureEvent
    * @param[in]  state  STARTED, when we detect a long press.
    *                    FINISHED, when all touches are finished.
    */
-  LongPressGestureEvent( GestureState state );
+  LongPressGestureEvent(GestureState state);
 
   /**
    * Virtual destructor

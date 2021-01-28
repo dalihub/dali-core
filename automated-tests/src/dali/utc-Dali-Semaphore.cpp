@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@
 #include <dali/public-api/dali-core.h>
 #include <algorithm>
 #include <chrono>
+#include <future>
 #include <stdexcept>
 #include <thread>
-#include <future>
 
 int UtcDaliSemaphoreTryAcquire(void)
 {
@@ -76,13 +76,12 @@ int UtcDaliSemaphoreAcquire(void)
 
   constexpr std::ptrdiff_t numTasks{2};
 
-  auto f = [](Dali::Semaphore<numTasks> &sem, bool &flag)
-  {
+  auto f = [](Dali::Semaphore<numTasks>& sem, bool& flag) {
     sem.Acquire();
     flag = true;
   };
 
-  auto flag1{false}, flag2{false};
+  auto                      flag1{false}, flag2{false};
   Dali::Semaphore<numTasks> sem(0);
 
   auto fut1 = std::async(std::launch::async, f, std::ref(sem), std::ref(flag1));

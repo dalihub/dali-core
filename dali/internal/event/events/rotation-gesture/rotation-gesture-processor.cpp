@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,26 +22,24 @@
 #include <algorithm>
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
+#include <dali/internal/event/common/scene-impl.h>
+#include <dali/internal/event/events/gesture-requests.h>
+#include <dali/internal/event/events/rotation-gesture/rotation-gesture-event.h>
+#include <dali/internal/event/events/rotation-gesture/rotation-gesture-impl.h>
+#include <dali/internal/event/events/rotation-gesture/rotation-gesture-recognizer.h>
+#include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/events/rotation-gesture.h>
 #include <dali/public-api/math/vector2.h>
-#include <dali/internal/event/events/rotation-gesture/rotation-gesture-event.h>
-#include <dali/integration-api/debug.h>
-#include <dali/internal/event/common/scene-impl.h>
-#include <dali/internal/event/render-tasks/render-task-impl.h>
-#include <dali/internal/event/events/rotation-gesture/rotation-gesture-recognizer.h>
-#include <dali/internal/event/events/gesture-requests.h>
-#include <dali/internal/event/events/rotation-gesture/rotation-gesture-impl.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace
 {
-const uint32_t MINIMUM_TOUCH_EVENTS_REQUIRED = 4u;
+const uint32_t MINIMUM_TOUCH_EVENTS_REQUIRED             = 4u;
 const uint32_t MINIMUM_TOUCH_EVENTS_REQUIRED_AFTER_START = 4u;
 
 /**
@@ -52,22 +50,22 @@ const uint32_t MINIMUM_TOUCH_EVENTS_REQUIRED_AFTER_START = 4u;
  * @param[in]  localCenter       Relative to the actor attached to the detector.
  */
 void EmitRotationSignal(
-    Actor* actor,
-    const GestureDetectorContainer& gestureDetectors,
-    const RotationGestureEvent& rotationEvent,
-    Vector2 localCenter)
+  Actor*                          actor,
+  const GestureDetectorContainer& gestureDetectors,
+  const RotationGestureEvent&     rotationEvent,
+  Vector2                         localCenter)
 {
-  Internal::RotationGesturePtr rotation( new Internal::RotationGesture(rotationEvent.state ) );
-  rotation->SetTime( rotationEvent.time );
-  rotation->SetRotation( rotationEvent.rotation );
-  rotation->SetScreenCenterPoint( rotationEvent.centerPoint );
-  rotation->SetLocalCenterPoint( localCenter );
+  Internal::RotationGesturePtr rotation(new Internal::RotationGesture(rotationEvent.state));
+  rotation->SetTime(rotationEvent.time);
+  rotation->SetRotation(rotationEvent.rotation);
+  rotation->SetScreenCenterPoint(rotationEvent.centerPoint);
+  rotation->SetLocalCenterPoint(localCenter);
 
-  Dali::Actor actorHandle( actor );
+  Dali::Actor                                    actorHandle(actor);
   const GestureDetectorContainer::const_iterator endIter = gestureDetectors.end();
-  for ( GestureDetectorContainer::const_iterator iter = gestureDetectors.begin(); iter != endIter; ++iter )
+  for(GestureDetectorContainer::const_iterator iter = gestureDetectors.begin(); iter != endIter; ++iter)
   {
-    static_cast< RotationGestureDetector* >( *iter )->EmitRotationGestureSignal( actorHandle, Dali::RotationGesture( rotation.Get() ) );
+    static_cast<RotationGestureDetector*>(*iter)->EmitRotationGestureSignal(actorHandle, Dali::RotationGesture(rotation.Get()));
   }
 }
 
@@ -102,18 +100,18 @@ struct IsNotAttachedFunctor
 } // unnamed namespace
 
 RotationGestureProcessor::RotationGestureProcessor()
-: GestureProcessor( GestureType::ROTATION ),
+: GestureProcessor(GestureType::ROTATION),
   mRotationGestureDetectors(),
   mCurrentRotationEmitters(),
-  mCurrentRotationEvent( nullptr ),
-  mMinimumTouchEvents( MINIMUM_TOUCH_EVENTS_REQUIRED ),
-  mMinimumTouchEventsAfterStart( MINIMUM_TOUCH_EVENTS_REQUIRED_AFTER_START )
+  mCurrentRotationEvent(nullptr),
+  mMinimumTouchEvents(MINIMUM_TOUCH_EVENTS_REQUIRED),
+  mMinimumTouchEventsAfterStart(MINIMUM_TOUCH_EVENTS_REQUIRED_AFTER_START)
 {
 }
 
-void RotationGestureProcessor::Process( Scene& scene, const RotationGestureEvent& rotationEvent )
+void RotationGestureProcessor::Process(Scene& scene, const RotationGestureEvent& rotationEvent)
 {
-  switch ( rotationEvent.state )
+  switch(rotationEvent.state)
   {
     case GestureState::STARTED:
     {
@@ -124,14 +122,14 @@ void RotationGestureProcessor::Process( Scene& scene, const RotationGestureEvent
       ResetActor();
 
       HitTestAlgorithm::Results hitTestResults;
-      if( HitTest( scene, rotationEvent.centerPoint, hitTestResults ) )
+      if(HitTest(scene, rotationEvent.centerPoint, hitTestResults))
       {
         // Record the current render-task for Screen->Actor coordinate conversions
         mCurrentRenderTask = hitTestResults.renderTask;
 
         // Set mCurrentRotationEvent to use inside overridden methods called from ProcessAndEmit()
         mCurrentRotationEvent = &rotationEvent;
-        ProcessAndEmit( hitTestResults );
+        ProcessAndEmit(hitTestResults);
         mCurrentRotationEvent = nullptr;
       }
       break;
@@ -145,21 +143,21 @@ void RotationGestureProcessor::Process( Scene& scene, const RotationGestureEvent
       // Check if actor is still touchable.
 
       Actor* currentGesturedActor = GetCurrentGesturedActor();
-      if ( currentGesturedActor )
+      if(currentGesturedActor)
       {
-        if ( currentGesturedActor->IsHittable() && !mCurrentRotationEmitters.empty() && mCurrentRenderTask )
+        if(currentGesturedActor->IsHittable() && !mCurrentRotationEmitters.empty() && mCurrentRenderTask)
         {
           // Ensure actor is still attached to the emitters, if it is not then remove the emitter.
-          GestureDetectorContainer::iterator endIter = std::remove_if( mCurrentRotationEmitters.begin(), mCurrentRotationEmitters.end(), IsNotAttachedFunctor(currentGesturedActor) );
-          mCurrentRotationEmitters.erase( endIter, mCurrentRotationEmitters.end() );
+          GestureDetectorContainer::iterator endIter = std::remove_if(mCurrentRotationEmitters.begin(), mCurrentRotationEmitters.end(), IsNotAttachedFunctor(currentGesturedActor));
+          mCurrentRotationEmitters.erase(endIter, mCurrentRotationEmitters.end());
 
-          if ( !mCurrentRotationEmitters.empty() )
+          if(!mCurrentRotationEmitters.empty())
           {
-            Vector2 actorCoords;
-            RenderTask& renderTaskImpl( *mCurrentRenderTask.Get() );
-            currentGesturedActor->ScreenToLocal( renderTaskImpl, actorCoords.x, actorCoords.y, rotationEvent.centerPoint.x, rotationEvent.centerPoint.y );
+            Vector2     actorCoords;
+            RenderTask& renderTaskImpl(*mCurrentRenderTask.Get());
+            currentGesturedActor->ScreenToLocal(renderTaskImpl, actorCoords.x, actorCoords.y, rotationEvent.centerPoint.x, rotationEvent.centerPoint.y);
 
-            EmitRotationSignal( currentGesturedActor, mCurrentRotationEmitters, rotationEvent, actorCoords );
+            EmitRotationSignal(currentGesturedActor, mCurrentRotationEmitters, rotationEvent, actorCoords);
           }
           else
           {
@@ -168,7 +166,7 @@ void RotationGestureProcessor::Process( Scene& scene, const RotationGestureEvent
           }
 
           // Clear current emitters if rotation gesture has ended or been cancelled.
-          if ( rotationEvent.state == GestureState::FINISHED || rotationEvent.state == GestureState::CANCELLED )
+          if(rotationEvent.state == GestureState::FINISHED || rotationEvent.state == GestureState::CANCELLED)
           {
             mCurrentRotationEmitters.clear();
             ResetActor();
@@ -192,75 +190,75 @@ void RotationGestureProcessor::Process( Scene& scene, const RotationGestureEvent
   }
 }
 
-void RotationGestureProcessor::AddGestureDetector( RotationGestureDetector* gestureDetector, Scene& /* scene */ )
+void RotationGestureProcessor::AddGestureDetector(RotationGestureDetector* gestureDetector, Scene& /* scene */)
 {
   bool createRecognizer(mRotationGestureDetectors.empty());
 
   mRotationGestureDetectors.push_back(gestureDetector);
 
-  if (createRecognizer)
+  if(createRecognizer)
   {
-    mGestureRecognizer = new RotationGestureRecognizer( *this, mMinimumTouchEvents, mMinimumTouchEventsAfterStart );
+    mGestureRecognizer = new RotationGestureRecognizer(*this, mMinimumTouchEvents, mMinimumTouchEventsAfterStart);
   }
 }
 
-void RotationGestureProcessor::RemoveGestureDetector( RotationGestureDetector* gestureDetector )
+void RotationGestureProcessor::RemoveGestureDetector(RotationGestureDetector* gestureDetector)
 {
-  if ( !mCurrentRotationEmitters.empty() )
+  if(!mCurrentRotationEmitters.empty())
   {
     // Check if the removed detector was one that is currently being rotated and remove it from emitters.
-    GestureDetectorContainer::iterator endIter = std::remove( mCurrentRotationEmitters.begin(), mCurrentRotationEmitters.end(), gestureDetector );
-    mCurrentRotationEmitters.erase( endIter, mCurrentRotationEmitters.end() );
+    GestureDetectorContainer::iterator endIter = std::remove(mCurrentRotationEmitters.begin(), mCurrentRotationEmitters.end(), gestureDetector);
+    mCurrentRotationEmitters.erase(endIter, mCurrentRotationEmitters.end());
 
     // If we no longer have any emitters, then we should clear mCurrentGesturedActor as well
-    if ( mCurrentRotationEmitters.empty() )
+    if(mCurrentRotationEmitters.empty())
     {
       ResetActor();
     }
   }
 
   // Find the detector...
-  RotationGestureDetectorContainer::iterator endIter = std::remove( mRotationGestureDetectors.begin(), mRotationGestureDetectors.end(), gestureDetector );
-  DALI_ASSERT_DEBUG( endIter != mRotationGestureDetectors.end() );
+  RotationGestureDetectorContainer::iterator endIter = std::remove(mRotationGestureDetectors.begin(), mRotationGestureDetectors.end(), gestureDetector);
+  DALI_ASSERT_DEBUG(endIter != mRotationGestureDetectors.end());
 
   // ...and remove it
   mRotationGestureDetectors.erase(endIter, mRotationGestureDetectors.end());
 
-  if (mRotationGestureDetectors.empty())
+  if(mRotationGestureDetectors.empty())
   {
     mGestureRecognizer = nullptr;
   }
 }
 
-void RotationGestureProcessor::SetMinimumTouchEvents( uint32_t value )
+void RotationGestureProcessor::SetMinimumTouchEvents(uint32_t value)
 {
-  if( value > 1u && mMinimumTouchEvents != value )
+  if(value > 1u && mMinimumTouchEvents != value)
   {
     mMinimumTouchEvents = value;
 
-    if( mGestureRecognizer )
+    if(mGestureRecognizer)
     {
-      RotationGestureRecognizer* rotationRecognizer = dynamic_cast<RotationGestureRecognizer*>( mGestureRecognizer.Get() );
-      if( rotationRecognizer )
+      RotationGestureRecognizer* rotationRecognizer = dynamic_cast<RotationGestureRecognizer*>(mGestureRecognizer.Get());
+      if(rotationRecognizer)
       {
-        rotationRecognizer->SetMinimumTouchEvents( value );
+        rotationRecognizer->SetMinimumTouchEvents(value);
       }
     }
   }
 }
 
-void RotationGestureProcessor::SetMinimumTouchEventsAfterStart( uint32_t value )
+void RotationGestureProcessor::SetMinimumTouchEventsAfterStart(uint32_t value)
 {
-  if( value > 1u && mMinimumTouchEventsAfterStart != value )
+  if(value > 1u && mMinimumTouchEventsAfterStart != value)
   {
     mMinimumTouchEventsAfterStart = value;
 
-    if( mGestureRecognizer )
+    if(mGestureRecognizer)
     {
-      RotationGestureRecognizer* rotationRecognizer = dynamic_cast<RotationGestureRecognizer*>( mGestureRecognizer.Get() );
-      if( rotationRecognizer )
+      RotationGestureRecognizer* rotationRecognizer = dynamic_cast<RotationGestureRecognizer*>(mGestureRecognizer.Get());
+      if(rotationRecognizer)
       {
-        rotationRecognizer->SetMinimumTouchEventsAfterStart( value );
+        rotationRecognizer->SetMinimumTouchEventsAfterStart(value);
       }
     }
   }
@@ -271,22 +269,22 @@ void RotationGestureProcessor::OnGesturedActorStageDisconnection()
   mCurrentRotationEmitters.clear();
 }
 
-bool RotationGestureProcessor::CheckGestureDetector( GestureDetector* detector, Actor* actor )
+bool RotationGestureProcessor::CheckGestureDetector(GestureDetector* detector, Actor* actor)
 {
   // No special case required for rotation.
   return true;
 }
 
-void RotationGestureProcessor::EmitGestureSignal( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates )
+void RotationGestureProcessor::EmitGestureSignal(Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates)
 {
-  DALI_ASSERT_DEBUG( mCurrentRotationEvent );
+  DALI_ASSERT_DEBUG(mCurrentRotationEvent);
 
-  EmitRotationSignal( actor, gestureDetectors, *mCurrentRotationEvent, actorCoordinates );
+  EmitRotationSignal(actor, gestureDetectors, *mCurrentRotationEvent, actorCoordinates);
 
-  if ( actor->OnScene() )
+  if(actor->OnScene())
   {
     mCurrentRotationEmitters = gestureDetectors;
-    SetActor( actor );
+    SetActor(actor);
   }
 }
 

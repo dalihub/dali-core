@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_BITMAP_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ namespace Dali
 {
 namespace Internal
 {
-
 class BitmapPackedPixel;
 using BitmapPackedPixelPtr = IntrusivePtr<BitmapPackedPixel>;
 
@@ -46,11 +45,17 @@ public:
    * Constructor
    * @param[in] discardable Flag to tell the bitmap if it can delete the buffer with the pixel data.
    */
-  BitmapPackedPixel( ResourcePolicy::Discardable discardable = ResourcePolicy::OWNED_RETAIN, Dali::Integration::PixelBuffer* pixBuf = nullptr );
+  BitmapPackedPixel(ResourcePolicy::Discardable discardable = ResourcePolicy::OWNED_RETAIN, Dali::Integration::PixelBuffer* pixBuf = nullptr);
 
 public:
-  const Bitmap::PackedPixelsProfile* GetPackedPixelsProfile() const override { return this; }
-  Bitmap::PackedPixelsProfile* GetPackedPixelsProfile() override { return this; }
+  const Bitmap::PackedPixelsProfile* GetPackedPixelsProfile() const override
+  {
+    return this;
+  }
+  Bitmap::PackedPixelsProfile* GetPackedPixelsProfile() override
+  {
+    return this;
+  }
 
   /**
    * (Re-)Allocate pixel buffer for the Bitmap. Any previously allocated pixel buffer is deleted.
@@ -65,10 +70,10 @@ public:
    * @return pixel buffer pointer
    */
   Dali::Integration::PixelBuffer* ReserveBuffer(Pixel::Format pixelFormat,
-                                     uint32_t width,
-                                     uint32_t height,
-                                     uint32_t bufferWidth = 0,
-                                     uint32_t bufferHeight = 0) override;
+                                                uint32_t      width,
+                                                uint32_t      height,
+                                                uint32_t      bufferWidth  = 0,
+                                                uint32_t      bufferHeight = 0) override;
 
   /**
    * Assign a pixel buffer. Any previously allocated pixel buffer is deleted.
@@ -83,13 +88,13 @@ public:
    * @param[in] bufferWidth   Buffer width (stride) in pixels
    * @param[in] bufferHeight  Buffer height in pixels
    */
-  void AssignBuffer(Pixel::Format pixelFormat,
-                            Dali::Integration::PixelBuffer* buffer,
-                            uint32_t bufferSize,
-                            uint32_t width,
-                            uint32_t height,
-                            uint32_t bufferWidth = 0,
-                            uint32_t bufferHeight = 0) override;
+  void AssignBuffer(Pixel::Format                   pixelFormat,
+                    Dali::Integration::PixelBuffer* buffer,
+                    uint32_t                        bufferSize,
+                    uint32_t                        width,
+                    uint32_t                        height,
+                    uint32_t                        bufferWidth  = 0,
+                    uint32_t                        bufferHeight = 0) override;
 
   /**
    * Get the width of the buffer (stride)
@@ -121,7 +126,10 @@ public:
   /**
    * See Dali::Integration::Bitmap::GetReleaseFunction()
    */
-  ReleaseFunction GetReleaseFunction() override{ return FREE; }
+  ReleaseFunction GetReleaseFunction() override
+  {
+    return FREE;
+  }
 
   /**
    * Get the pixel buffer stride.
@@ -145,20 +153,17 @@ public:
   void TestForTransparency() override;
 
 protected:
-
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
   ~BitmapPackedPixel() override;
 
 protected:
-
-  uint32_t  mBufferWidth;         ///< Buffer width (stride) in pixels
-  uint32_t  mBufferHeight;        ///< Buffer height in pixels
-  uint32_t  mBytesPerPixel;       ///< Bytes per pixel
+  uint32_t mBufferWidth;   ///< Buffer width (stride) in pixels
+  uint32_t mBufferHeight;  ///< Buffer height in pixels
+  uint32_t mBytesPerPixel; ///< Bytes per pixel
 
 private:
-
   /**
    * Initializes internal class members
    * @param[in] pixelFormat   pixel format
@@ -168,20 +173,19 @@ private:
    * @param[in] bufferHeight  Buffer height in pixels
    */
   void Initialize(Pixel::Format pixelFormat,
-                           uint32_t width,
-                           uint32_t height,
-                           uint32_t bufferWidth,
-                           uint32_t bufferHeight);
+                  uint32_t      width,
+                  uint32_t      height,
+                  uint32_t      bufferWidth,
+                  uint32_t      bufferHeight);
 
-
-  BitmapPackedPixel(const BitmapPackedPixel& other);  ///< defined private to prevent use
-  BitmapPackedPixel& operator = (const BitmapPackedPixel& other); ///< defined private to prevent use
+  BitmapPackedPixel(const BitmapPackedPixel& other);            ///< defined private to prevent use
+  BitmapPackedPixel& operator=(const BitmapPackedPixel& other); ///< defined private to prevent use
 
   // Changes scope, should be at end of class
   DALI_LOG_OBJECT_STRING_DECLARATION;
 };
 
-} // namespace Integration
+} // namespace Internal
 
 } // namespace Dali
 

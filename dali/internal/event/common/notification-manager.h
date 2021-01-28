@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_NOTIFICATION_MANAGER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +22,8 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 class CompleteNotificationInterface;
 class MessageBase;
 
@@ -36,7 +34,6 @@ class MessageBase;
 class NotificationManager
 {
 public:
-
   /**
    * Create an NotificationManager. Owned by Core in event thread side.
    */
@@ -47,26 +44,26 @@ public:
    */
   virtual ~NotificationManager();
 
-/// Update side interface, can only be called from Update-thread
+  /// Update side interface, can only be called from Update-thread
 
   /**
    * Queue a scene message to an interface. This method is thread-safe.
    * @param[in] instance to be notified about completion of the Update side event.
    */
-  void QueueCompleteNotification( CompleteNotificationInterface* instance );
+  void QueueCompleteNotification(CompleteNotificationInterface* instance);
 
   /**
    * Queue a scene message. This method is thread-safe.
    * @param[in] message A newly allocated message; NotificationManager takes ownership.
    */
-  void QueueMessage( MessageBase* message );
+  void QueueMessage(MessageBase* message);
 
   /**
    * Signal Notification Manager that update frame is completed so it can let event thread process the notifications
    */
   void UpdateCompleted();
 
-/// Event side interface, can only be called from Update-thread
+  /// Event side interface, can only be called from Update-thread
 
   /**
    * Query whether the NotificationManager has messages to process.
@@ -80,18 +77,15 @@ public:
   void ProcessMessages();
 
 private:
+  // Undefined
+  NotificationManager(const NotificationManager& notificationManager);
 
   // Undefined
-  NotificationManager( const NotificationManager& notificationManager );
-
-  // Undefined
-  NotificationManager& operator=( const NotificationManager& notificationManager );
+  NotificationManager& operator=(const NotificationManager& notificationManager);
 
 private:
-
   struct Impl;
   Impl* mImpl;
-
 };
 
 } // namespace Internal
@@ -99,4 +93,3 @@ private:
 } // namespace Dali
 
 #endif // DALI_INTERNAL_NOTIFICATION_MANAGER_H
-

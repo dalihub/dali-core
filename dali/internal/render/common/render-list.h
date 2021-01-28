@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_LIST_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@
 #include <cstdint>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/math/rect.h>
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/internal/render/common/render-item.h>
+#include <dali/public-api/math/rect.h>
 
 namespace Dali
 {
@@ -32,7 +32,6 @@ using ClippingBox = Rect<int>;
 
 namespace Internal
 {
-
 namespace Render
 {
 class Renderer;
@@ -40,7 +39,6 @@ class Renderer;
 
 namespace SceneGraph
 {
-
 class Layer;
 
 using RenderItemContainer = OwnerContainer<RenderItem*>;
@@ -54,15 +52,14 @@ using RenderListContainer = OwnerContainer<RenderList*>;
 struct RenderList
 {
 public:
-
   /**
    * Constructor
    */
   RenderList()
-  : mNextFree( 0 ),
-    mClippingBox( nullptr ),
-    mSourceLayer( nullptr ),
-    mHasColorRenderItems( false )
+  : mNextFree(0),
+    mClippingBox(nullptr),
+    mSourceLayer(nullptr),
+    mHasColorRenderItems(false)
   {
   }
 
@@ -91,10 +88,10 @@ public:
    * Reserve space in the render list
    * @param size to reserve
    */
-  void Reserve( RenderItemContainer::SizeType size )
+  void Reserve(RenderItemContainer::SizeType size)
   {
     mNextFree = 0;
-    mItems.Reserve( size );
+    mItems.Reserve(size);
   }
 
   /**
@@ -112,31 +109,31 @@ public:
   RenderItem& GetNextFreeItem()
   {
     // check if we have enough items, we can only be one behind at worst
-    if( mItems.Count() <= mNextFree )
+    if(mItems.Count() <= mNextFree)
     {
-      mItems.PushBack( RenderItem::New() ); // Push a new empty render item
+      mItems.PushBack(RenderItem::New()); // Push a new empty render item
     }
     // get the item mNextFree points to and increase by one
-    RenderItem& item = *mItems[ mNextFree++ ];
+    RenderItem& item = *mItems[mNextFree++];
     return item;
   }
 
   /**
    * Get item at a given position in the list
    */
-  RenderItem& GetItem( uint32_t index ) const
+  RenderItem& GetItem(uint32_t index) const
   {
-    DALI_ASSERT_DEBUG( index < GetCachedItemCount() );
-    return *mItems[ index ];
+    DALI_ASSERT_DEBUG(index < GetCachedItemCount());
+    return *mItems[index];
   }
 
   /**
    * Get renderer from an item in the list
    */
-  const Render::Renderer& GetRenderer( uint32_t index ) const
+  const Render::Renderer& GetRenderer(uint32_t index) const
   {
-    DALI_ASSERT_DEBUG( index < GetCachedItemCount() );
-    return *mItems[ index ]->mRenderer;
+    DALI_ASSERT_DEBUG(index < GetCachedItemCount());
+    return *mItems[index]->mRenderer;
   }
 
   /**
@@ -154,7 +151,7 @@ public:
    */
   uint32_t GetCachedItemCount() const
   {
-    return static_cast<uint32_t>( mItems.Count() );
+    return static_cast<uint32_t>(mItems.Count());
   }
 
   /**
@@ -162,7 +159,7 @@ public:
    */
   void ReuseCachedItems()
   {
-    mNextFree = static_cast<uint32_t>( mItems.Count() );
+    mNextFree = static_cast<uint32_t>(mItems.Count());
   }
 
   /**
@@ -170,7 +167,7 @@ public:
    */
   bool IsEmpty() const
   {
-    return ( mNextFree == 0 );
+    return (mNextFree == 0);
   }
 
   /**
@@ -178,12 +175,13 @@ public:
    * @param clipping on/off
    * @param box for clipping
    */
-  void SetClipping( bool clipping, const ClippingBox& box )
+  void SetClipping(bool clipping, const ClippingBox& box)
   {
-    if( clipping )
+    if(clipping)
     {
       delete mClippingBox;
-      mClippingBox = new ClippingBox( box );;
+      mClippingBox = new ClippingBox(box);
+      ;
     }
   }
 
@@ -192,7 +190,7 @@ public:
    */
   bool IsClipping() const
   {
-    return ( nullptr != mClippingBox );
+    return (nullptr != mClippingBox);
   }
 
   /**
@@ -217,9 +215,9 @@ public:
   void ReleaseUnusedItems()
   {
     // release any non-used RenderItems
-    if( mItems.Count() > mNextFree )
+    if(mItems.Count() > mNextFree)
     {
-      mItems.Resize( mNextFree );
+      mItems.Resize(mNextFree);
     }
   }
 
@@ -234,7 +232,7 @@ public:
   /**
    * @param layer The layer these RenderItems originate from
    */
-  void SetSourceLayer( Layer* layer )
+  void SetSourceLayer(Layer* layer)
   {
     mSourceLayer = layer;
   }
@@ -243,7 +241,7 @@ public:
    * Set if the RenderList contains color RenderItems
    * @param[in] hasColorRenderItems True if it contains color RenderItems, false otherwise
    */
-  void SetHasColorRenderItems( bool hasColorRenderItems )
+  void SetHasColorRenderItems(bool hasColorRenderItems)
   {
     mHasColorRenderItems = hasColorRenderItems;
   }
@@ -258,22 +256,19 @@ public:
   }
 
 private:
-
   /*
    * Copy constructor and assignment operator not defined
    */
-  RenderList( const RenderList& rhs );
-  const RenderList& operator=( const RenderList& rhs );
+  RenderList(const RenderList& rhs);
+  const RenderList& operator=(const RenderList& rhs);
 
-  RenderItemContainer mItems; ///< Each item is a renderer and matrix pair
-  uint32_t mNextFree;         ///< index for the next free item to use
+  RenderItemContainer mItems;    ///< Each item is a renderer and matrix pair
+  uint32_t            mNextFree; ///< index for the next free item to use
 
-  ClippingBox* mClippingBox;               ///< The clipping box, in window coordinates, when clipping is enabled
-  Layer*       mSourceLayer;              ///< The originating layer where the renderers are from
-  bool         mHasColorRenderItems : 1;  ///< True if list contains color render items
-
+  ClippingBox* mClippingBox;             ///< The clipping box, in window coordinates, when clipping is enabled
+  Layer*       mSourceLayer;             ///< The originating layer where the renderers are from
+  bool         mHasColorRenderItems : 1; ///< True if list contains color render items
 };
-
 
 } // namespace SceneGraph
 

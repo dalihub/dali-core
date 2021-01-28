@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ namespace Dali
 {
 namespace Internal
 {
-
 KeyFrames* KeyFrames::New()
 {
   return new KeyFrames();
@@ -71,7 +70,7 @@ void KeyFrames::CreateKeyFramesSpec(Property::Type type)
     }
     default:
     {
-      DALI_ABORT( "Property type is not animatable" );
+      DALI_ABORT("Property type is not animatable");
       break;
     }
   }
@@ -90,7 +89,7 @@ void KeyFrames::Add(float time, const Property::Value& value, AlphaFunction alph
   }
 
   // Once we have created a type, can only add values of the same type
-  DALI_ASSERT_ALWAYS( mType == value.GetType() && "Can only add values of the same type to a KeyFrame" );
+  DALI_ASSERT_ALWAYS(mType == value.GetType() && "Can only add values of the same type to a KeyFrame");
 
   auto keyframes = mKeyFrames.get();
 
@@ -156,13 +155,13 @@ Property::Value KeyFrames::GetLastKeyFrameValue() const
   Property::Value value;
 
   std::size_t noOfKeyFrames = mKeyFrames->GetNumberOfKeyFrames();
-  if( noOfKeyFrames )
+  if(noOfKeyFrames)
   {
-    mKeyFrames->GetKeyFrameAsValue( noOfKeyFrames - 1, value );
+    mKeyFrames->GetKeyFrameAsValue(noOfKeyFrames - 1, value);
   }
 
   return value;
 }
 
-} // Internal
-} // Dali
+} // namespace Internal
+} // namespace Dali

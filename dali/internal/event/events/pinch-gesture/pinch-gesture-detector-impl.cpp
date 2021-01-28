@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,20 +22,17 @@
 #include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
+#include <dali/internal/event/events/gesture-event-processor.h>
 #include <dali/public-api/events/pinch-gesture.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/internal/event/events/gesture-event-processor.h>
-#include <dali/integration-api/debug.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace
 {
-
 // Signals
 
 const char* const SIGNAL_PINCH_DETECTED = "pinchDetected";
@@ -45,12 +42,11 @@ BaseHandle Create()
   return Dali::PinchGestureDetector::New();
 }
 
-TypeRegistration mType( typeid(Dali::PinchGestureDetector), typeid(Dali::GestureDetector), Create );
+TypeRegistration mType(typeid(Dali::PinchGestureDetector), typeid(Dali::GestureDetector), Create);
 
-SignalConnectorType signalConnector1( mType, SIGNAL_PINCH_DETECTED, &PinchGestureDetector::DoConnectSignal );
+SignalConnectorType signalConnector1(mType, SIGNAL_PINCH_DETECTED, &PinchGestureDetector::DoConnectSignal);
 
-}
-
+} // namespace
 
 PinchGestureDetectorPtr PinchGestureDetector::New()
 {
@@ -67,19 +63,19 @@ PinchGestureDetector::~PinchGestureDetector() = default;
 void PinchGestureDetector::EmitPinchGestureSignal(Dali::Actor actor, const Dali::PinchGesture& pinch)
 {
   // Guard against destruction during signal emission
-  Dali::PinchGestureDetector handle( this );
+  Dali::PinchGestureDetector handle(this);
 
-  mDetectedSignal.Emit( actor, pinch );
+  mDetectedSignal.Emit(actor, pinch);
 }
 
-bool PinchGestureDetector::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
+bool PinchGestureDetector::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
 {
-  bool connected( true );
-  PinchGestureDetector* gesture = static_cast< PinchGestureDetector* >(object); // TypeRegistry guarantees that this is the correct type.
+  bool                  connected(true);
+  PinchGestureDetector* gesture = static_cast<PinchGestureDetector*>(object); // TypeRegistry guarantees that this is the correct type.
 
-  if ( 0 == strcmp( signalName.c_str(), SIGNAL_PINCH_DETECTED ) )
+  if(0 == strcmp(signalName.c_str(), SIGNAL_PINCH_DETECTED))
   {
-    gesture->DetectedSignal().Connect( tracker, functor );
+    gesture->DetectedSignal().Connect(tracker, functor);
   }
   else
   {

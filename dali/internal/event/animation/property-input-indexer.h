@@ -2,7 +2,7 @@
 #define DALI_PROPERTY_INPUT_INDEXER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,48 +23,45 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 /**
  * Helper object to map public-api PropertyInput methods to internal
  * PropertyInputImpl methods (which require the current buffer index).
  */
-template < typename AccessorType >
+template<typename AccessorType>
 class PropertyInputIndexer : public PropertyInput
 {
 public:
-
   /**
    * Create an indexer object.
    * @param[in] bufferIndex The current buffer index.
    * @param[in] input The internal property input.
    */
-  PropertyInputIndexer( BufferIndex bufferIndex, const AccessorType* input )
-  : mBufferIndex( bufferIndex ),
-    mInput( input )
+  PropertyInputIndexer(BufferIndex bufferIndex, const AccessorType* input)
+  : mBufferIndex(bufferIndex),
+    mInput(input)
   {
   }
 
   /**
    * Copy constructor
    */
-  PropertyInputIndexer( const PropertyInputIndexer& other )
-  : mBufferIndex( other.mBufferIndex ),
-    mInput( other.mInput )
+  PropertyInputIndexer(const PropertyInputIndexer& other)
+  : mBufferIndex(other.mBufferIndex),
+    mInput(other.mInput)
   {
   }
 
   /**
    * Assignment operator
    */
-  PropertyInputIndexer& operator=( const PropertyInputIndexer& other )
+  PropertyInputIndexer& operator=(const PropertyInputIndexer& other)
   {
-    if( this != &other )
+    if(this != &other)
     {
       mBufferIndex = other.mBufferIndex;
-      mInput = other.mInput;
+      mInput       = other.mInput;
     }
 
     return *this;
@@ -88,7 +85,7 @@ public:
    */
   const bool& GetBoolean() const override
   {
-    return mInput->GetConstraintInputBoolean( mBufferIndex );
+    return mInput->GetConstraintInputBoolean(mBufferIndex);
   }
 
   /**
@@ -96,7 +93,7 @@ public:
    */
   const int& GetInteger() const override
   {
-    return mInput->GetConstraintInputInteger( mBufferIndex );
+    return mInput->GetConstraintInputInteger(mBufferIndex);
   }
 
   /**
@@ -104,7 +101,7 @@ public:
    */
   const float& GetFloat() const override
   {
-    return mInput->GetConstraintInputFloat( mBufferIndex );
+    return mInput->GetConstraintInputFloat(mBufferIndex);
   }
 
   /**
@@ -112,7 +109,7 @@ public:
    */
   const Vector2& GetVector2() const override
   {
-    return mInput->GetConstraintInputVector2( mBufferIndex );
+    return mInput->GetConstraintInputVector2(mBufferIndex);
   }
 
   /**
@@ -120,7 +117,7 @@ public:
    */
   const Vector3& GetVector3() const override
   {
-    return mInput->GetConstraintInputVector3( mBufferIndex );
+    return mInput->GetConstraintInputVector3(mBufferIndex);
   }
 
   /**
@@ -128,7 +125,7 @@ public:
    */
   const Vector4& GetVector4() const override
   {
-    return mInput->GetConstraintInputVector4( mBufferIndex );
+    return mInput->GetConstraintInputVector4(mBufferIndex);
   }
 
   /**
@@ -136,7 +133,7 @@ public:
    */
   const Matrix3& GetMatrix3() const override
   {
-    return mInput->GetConstraintInputMatrix3( mBufferIndex );
+    return mInput->GetConstraintInputMatrix3(mBufferIndex);
   }
 
   /**
@@ -144,7 +141,7 @@ public:
    */
   const Matrix& GetMatrix() const override
   {
-    return mInput->GetConstraintInputMatrix( mBufferIndex );
+    return mInput->GetConstraintInputMatrix(mBufferIndex);
   }
 
   /**
@@ -152,12 +149,11 @@ public:
    */
   const Quaternion& GetQuaternion() const override
   {
-    return mInput->GetConstraintInputQuaternion( mBufferIndex );
+    return mInput->GetConstraintInputQuaternion(mBufferIndex);
   }
 
 public:
-
-  BufferIndex mBufferIndex;
+  BufferIndex         mBufferIndex;
   const AccessorType* mInput;
 };
 

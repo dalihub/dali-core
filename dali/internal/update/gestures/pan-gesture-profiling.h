@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PAN_GESTURE_PROFILING_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,29 +19,31 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/math/vector2.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/events/gesture-enumerations.h>
+#include <dali/public-api/math/vector2.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 struct PanGestureProfiling
 {
   struct Position
   {
-    Position( unsigned int time, Vector2 position, Vector2 displacement, Vector2 velocity, GestureState state )
-    : time( time ), position( position ), displacement( displacement ), velocity( velocity ), state( state )
+    Position(unsigned int time, Vector2 position, Vector2 displacement, Vector2 velocity, GestureState state)
+    : time(time),
+      position(position),
+      displacement(displacement),
+      velocity(velocity),
+      state(state)
     {
     }
 
     unsigned int time;
-    Vector2 position;
-    Vector2 displacement;
-    Vector2 velocity;
+    Vector2      position;
+    Vector2      displacement;
+    Vector2      velocity;
     GestureState state;
   };
 
@@ -49,7 +51,7 @@ struct PanGestureProfiling
 
   void PrintData() const;
 
-  void PrintData( const PanPositionContainer& dataContainer, const char * const prefix ) const;
+  void PrintData(const PanPositionContainer& dataContainer, const char* const prefix) const;
 
   void ClearData();
 
@@ -57,7 +59,6 @@ struct PanGestureProfiling
   PanPositionContainer mLatestData;
   PanPositionContainer mAveragedData;
 };
-
 
 } // namespace Internal
 
