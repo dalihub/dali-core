@@ -13653,9 +13653,57 @@ int UtcDaliAnimationStopPropertyValue(void)
   END_TEST;
 }
 
-int UtcDaliAnimationClearPropertyValue(void)
+int UtcDaliAnimationClearPropertyValue01(void)
 {
   CheckPropertyValuesWhenCallingAnimationMethod(TestFunction::CLEAR, "UtcDaliAnimationStopPropertyValue");
+  END_TEST;
+}
+
+int UtcDaliAnimationClearPropertyValue02(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  const float durationSeconds(1.0f);
+  const Vector3 targetPosition1(10.0f, 10.0f, 10.0f);
+  const Vector3 targetPosition2(20.0f, 20.0f, 20.0f);
+
+  // Build the animation
+  Animation animation1 = Animation::New(durationSeconds);
+  animation1.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition1, AlphaFunction::LINEAR);
+  animation1.Play();
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f) - 1u /*just less than the animation duration*/);
+
+  // The event side property should be set the current value immediately
+  DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::POSITION).Get<Vector3>(), targetPosition1, VECTOR3_EPSILON, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(2u /*just beyond the animation duration*/);
+
+  // Build a new animation
+  Animation animation2 = Animation::New(durationSeconds);
+  animation2.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition2, AlphaFunction::LINEAR);
+  animation2.Play();
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f) - 1u /*just less than the animation duration*/);
+
+  // The event side property should be set the current value immediately
+  DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::POSITION).Get<Vector3>(), targetPosition2, VECTOR3_EPSILON, TEST_LOCATION);
+
+  // Clear the first animation after finished
+  animation1.Clear();
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f) - 1u /*just less than the animation duration*/);
+
+  // The property should not be changed.
+  DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::POSITION).Get<Vector3>(), targetPosition2, VECTOR3_EPSILON, TEST_LOCATION);
+
   END_TEST;
 }
 
@@ -13663,7 +13711,6 @@ int UtcDaliAnimationPausePropertyValue(void)
 {
   const float   durationSeconds(1.0f);
   unsigned int  halfAnimationDuration(static_cast<unsigned int>(durationSeconds * 1000.0f * 0.5f));
-  const Vector3 originalPosition(Vector3::ZERO);
   const Vector3 targetPosition(10.0f, 10.0f, 10.0f);
   const Vector3 halfWayToTarget(targetPosition * 0.5f);
 

@@ -386,7 +386,7 @@ void Animation::Clear()
   DALI_ASSERT_DEBUG(mAnimation);
 
   // Only notify the objects with the current values if the end action is set to BAKE
-  if( mEndAction == EndAction::BAKE )
+  if(mEndAction == EndAction::BAKE && mState != Dali::Animation::STOPPED)
   {
     NotifyObjects( Notify::USE_CURRENT_VALUE );
   }
