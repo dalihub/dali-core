@@ -222,12 +222,10 @@ public:
    */
   void ActiveTexture(TextureUnit textureUnit)
   {
-    if(textureUnit != mActiveTextureUnit)
-    {
-      mActiveTextureUnit = textureUnit;
-      LOG_GL("ActiveTexture %x\n", textureUnit);
-      CHECK_GL(mGlAbstraction, mGlAbstraction.ActiveTexture(TextureUnitAsGLenum(textureUnit)));
-    }
+    // TODO: Temporarily removed caching and will need to add it back to avoid unnecessary GL call.
+    mActiveTextureUnit = textureUnit;
+    LOG_GL("ActiveTexture %x\n", textureUnit);
+    CHECK_GL(mGlAbstraction, mGlAbstraction.ActiveTexture(TextureUnitAsGLenum(textureUnit)));
   }
 
   /**
@@ -257,14 +255,11 @@ public:
    */
   void BindArrayBuffer(GLuint buffer)
   {
-    // Avoid unecessary calls to BindBuffer
-    if(mBoundArrayBufferId != buffer)
-    {
-      mBoundArrayBufferId = buffer;
+    // TODO: Temporarily removed caching and will need to add it back to avoid unnecessary GL call.
+    mBoundArrayBufferId = buffer;
 
-      LOG_GL("BindBuffer GL_ARRAY_BUFFER %d\n", buffer);
-      CHECK_GL(mGlAbstraction, mGlAbstraction.BindBuffer(GL_ARRAY_BUFFER, buffer));
-    }
+    LOG_GL("BindBuffer GL_ARRAY_BUFFER %d\n", buffer);
+    CHECK_GL(mGlAbstraction, mGlAbstraction.BindBuffer(GL_ARRAY_BUFFER, buffer));
   }
 
   /**
@@ -272,14 +267,11 @@ public:
    */
   void BindElementArrayBuffer(GLuint buffer)
   {
-    // Avoid unecessary calls to BindBuffer
-    if(mBoundElementArrayBufferId != buffer)
-    {
-      mBoundElementArrayBufferId = buffer;
+    // TODO: Temporarily removed caching and will need to add it back to avoid unnecessary GL call.
+    mBoundElementArrayBufferId = buffer;
 
-      LOG_GL("BindBuffer GL_ELEMENT_ARRAY_BUFFER %d\n", buffer);
-      CHECK_GL(mGlAbstraction, mGlAbstraction.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer));
-    }
+    LOG_GL("BindBuffer GL_ELEMENT_ARRAY_BUFFER %d\n", buffer);
+    CHECK_GL(mGlAbstraction, mGlAbstraction.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer));
   }
 
   /**
@@ -287,14 +279,11 @@ public:
    */
   void BindTransformFeedbackBuffer(GLuint buffer)
   {
-    // Avoid unecessary calls to BindBuffer
-    if(mBoundTransformFeedbackBufferId != buffer)
-    {
-      mBoundTransformFeedbackBufferId = buffer;
+    // TODO: Temporarily removed caching and will need to add it back to avoid unnecessary GL call.
+    mBoundTransformFeedbackBufferId = buffer;
 
-      LOG_GL("BindBuffer GL_TRANSFORM_FEEDBACK_BUFFER %d\n", buffer);
-      CHECK_GL(mGlAbstraction, mGlAbstraction.BindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, buffer));
-    }
+    LOG_GL("BindBuffer GL_TRANSFORM_FEEDBACK_BUFFER %d\n", buffer);
+    CHECK_GL(mGlAbstraction, mGlAbstraction.BindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, buffer));
   }
 
   /**
@@ -302,14 +291,11 @@ public:
    */
   void BindTransformFeedbackBufferBase(GLuint index, GLuint buffer)
   {
-    // Avoid unecessary calls to BindBufferBase
-    if(mBoundTransformFeedbackBufferId != buffer)
-    {
-      mBoundTransformFeedbackBufferId = buffer;
+    // TODO: Temporarily removed caching and will need to add it back to avoid unnecessary GL call.
+    mBoundTransformFeedbackBufferId = buffer;
 
-      LOG_GL("BindBufferBase GL_TRANSFORM_FEEDBACK_BUFFER %d %d\n", index, buffer);
-      CHECK_GL(mGlAbstraction, mGlAbstraction.BindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, index, buffer));
-    }
+    LOG_GL("BindBufferBase GL_TRANSFORM_FEEDBACK_BUFFER %d %d\n", index, buffer);
+    CHECK_GL(mGlAbstraction, mGlAbstraction.BindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, index, buffer));
   }
 
   /**
@@ -364,20 +350,12 @@ public:
     int16_t index = GetTextureIndexFromGlFormat(target);
     if(index >= 0)
     {
-      if(mBoundTextureId[mActiveTextureUnit][index] != texture)
-      {
-        mBoundTextureId[mActiveTextureUnit][index] = texture;
+      mBoundTextureId[mActiveTextureUnit][index] = texture;
+    }
 
-        LOG_GL("BindTexture target(%d) %d\n", target, texture);
-        CHECK_GL(mGlAbstraction, mGlAbstraction.BindTexture(target, texture));
-      }
-    }
-    else
-    {
-      // Don't use cache
-      LOG_GL("BindTexture target(%d) %d\n", target, texture);
-      CHECK_GL(mGlAbstraction, mGlAbstraction.BindTexture(target, texture));
-    }
+    // TODO: Temporarily removed caching and will need to add it back to avoid unnecessary GL call.
+    LOG_GL("BindTexture target(%d) %d\n", target, texture);
+    CHECK_GL(mGlAbstraction, mGlAbstraction.BindTexture(target, texture));
   }
 
   /**
@@ -385,11 +363,9 @@ public:
    */
   void SetDefaultBlendColor()
   {
-    if(!mUsingDefaultBlendColor)
-    {
-      SetCustomBlendColor(Color::TRANSPARENT);
-      mUsingDefaultBlendColor = true;
-    }
+    // TODO: Temporarily removed caching and will need to add it back to avoid unnecessary GL call.
+    SetCustomBlendColor(Color::TRANSPARENT);
+    mUsingDefaultBlendColor = true;
   }
 
   /**
@@ -397,13 +373,11 @@ public:
    */
   void SetCustomBlendColor(const Vector4& color)
   {
-    if(mUsingDefaultBlendColor || mBlendColor != color)
-    {
-      LOG_GL("BlendColor %f %f %f %f\n", color.r, color.g, color.b, color.a);
-      CHECK_GL(mGlAbstraction, mGlAbstraction.BlendColor(color.r, color.g, color.b, color.a));
-      mUsingDefaultBlendColor = false;
-      mBlendColor             = color;
-    }
+    // TODO: Temporarily removed caching and will need to add it back to avoid unnecessary GL call.
+    LOG_GL("BlendColor %f %f %f %f\n", color.r, color.g, color.b, color.a);
+    CHECK_GL(mGlAbstraction, mGlAbstraction.BlendColor(color.r, color.g, color.b, color.a));
+    mUsingDefaultBlendColor = false;
+    mBlendColor             = color;
   }
 
   /**
@@ -414,13 +388,11 @@ public:
     // DO NOT USE BlendEquationSeparate to set the same rgb and alpha modes
     // KHR blending extensions require use of glBlendEquation
 
-    if(mBlendEquationSeparateModeRGB != mode || mBlendEquationSeparateModeAlpha != mode)
-    {
-      mBlendEquationSeparateModeRGB   = mode;
-      mBlendEquationSeparateModeAlpha = mode;
-      LOG_GL("BlendEquation %d\n", mode);
-      CHECK_GL(mGlAbstraction, mGlAbstraction.BlendEquation(mode));
-    }
+    // TODO: Temporarily removed caching and will need to add it back to avoid unnecessary GL call.
+    mBlendEquationSeparateModeRGB   = mode;
+    mBlendEquationSeparateModeAlpha = mode;
+    LOG_GL("BlendEquation %d\n", mode);
+    CHECK_GL(mGlAbstraction, mGlAbstraction.BlendEquation(mode));
   }
 
   /**
@@ -428,14 +400,11 @@ public:
    */
   void BlendEquationSeparate(GLenum modeRGB, GLenum modeAlpha)
   {
-    if((modeRGB != mBlendEquationSeparateModeRGB) ||
-       (modeAlpha != mBlendEquationSeparateModeAlpha))
-    {
-      mBlendEquationSeparateModeRGB   = modeRGB;
-      mBlendEquationSeparateModeAlpha = modeAlpha;
-      LOG_GL("BlendEquationSeparate %d %d\n", modeRGB, modeAlpha);
-      CHECK_GL(mGlAbstraction, mGlAbstraction.BlendEquationSeparate(modeRGB, modeAlpha));
-    }
+    // TODO: Temporarily removed caching and will need to add it back to avoid unnecessary GL call.
+    mBlendEquationSeparateModeRGB   = modeRGB;
+    mBlendEquationSeparateModeAlpha = modeAlpha;
+    LOG_GL("BlendEquationSeparate %d %d\n", modeRGB, modeAlpha);
+    CHECK_GL(mGlAbstraction, mGlAbstraction.BlendEquationSeparate(modeRGB, modeAlpha));
   }
 
   /**
@@ -452,17 +421,14 @@ public:
    */
   void BlendFuncSeparate(GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha, GLenum dstAlpha)
   {
-    if((mBlendFuncSeparateSrcRGB != srcRGB) || (mBlendFuncSeparateDstRGB != dstRGB) ||
-       (mBlendFuncSeparateSrcAlpha != srcAlpha) || (mBlendFuncSeparateDstAlpha != dstAlpha))
-    {
-      mBlendFuncSeparateSrcRGB   = srcRGB;
-      mBlendFuncSeparateDstRGB   = dstRGB;
-      mBlendFuncSeparateSrcAlpha = srcAlpha;
-      mBlendFuncSeparateDstAlpha = dstAlpha;
+    // TODO: Temporarily removed caching and will need to add it back to avoid unnecessary GL call.
+    mBlendFuncSeparateSrcRGB   = srcRGB;
+    mBlendFuncSeparateDstRGB   = dstRGB;
+    mBlendFuncSeparateSrcAlpha = srcAlpha;
+    mBlendFuncSeparateDstAlpha = dstAlpha;
 
-      LOG_GL("BlendFuncSeparate %d %d %d %d\n", srcRGB, dstRGB, srcAlpha, dstAlpha);
-      CHECK_GL(mGlAbstraction, mGlAbstraction.BlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha));
-    }
+    LOG_GL("BlendFuncSeparate %d %d %d %d\n", srcRGB, dstRGB, srcAlpha, dstAlpha);
+    CHECK_GL(mGlAbstraction, mGlAbstraction.BlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha));
   }
 
   /**
@@ -510,11 +476,9 @@ public:
     bool forceClear = (mode == FORCE_CLEAR);
     mask            = mFrameBufferStateCache.GetClearMask(mask, forceClear, mScissorTestEnabled);
 
-    if(mask > 0)
-    {
-      LOG_GL("Clear %d\n", mask);
-      CHECK_GL(mGlAbstraction, mGlAbstraction.Clear(mask));
-    }
+    // TODO: Temporarily removed caching and will need to add it back to avoid unnecessary GL call.
+    LOG_GL("Clear %d\n", mask);
+    CHECK_GL(mGlAbstraction, mGlAbstraction.Clear(mask));
   }
 
   /**
@@ -524,14 +488,12 @@ public:
   {
     Vector4 newCol(red, green, blue, alpha);
 
-    if(!mClearColorSet || mClearColor != newCol)
-    {
-      LOG_GL("ClearColor %f %f %f %f\n", red, green, blue, alpha);
-      CHECK_GL(mGlAbstraction, mGlAbstraction.ClearColor(red, green, blue, alpha));
+    // TODO: Temporarily removed caching and will need to add it back to avoid unnecessary GL call.
+    LOG_GL("ClearColor %f %f %f %f\n", red, green, blue, alpha);
+    CHECK_GL(mGlAbstraction, mGlAbstraction.ClearColor(red, green, blue, alpha));
 
-      mClearColorSet = true;
-      mClearColor    = newCol;
-    }
+    mClearColorSet = true;
+    mClearColor    = newCol;
   }
 
   /**
@@ -558,13 +520,10 @@ public:
    */
   void ColorMask(bool flag)
   {
-    // only change state if needed
-    if(flag != mColorMask)
-    {
-      mColorMask = flag;
-      LOG_GL("ColorMask %s %s %s %s\n", flag ? "True" : "False", flag ? "True" : "False", flag ? "True" : "False", flag ? "True" : "False");
-      CHECK_GL(mGlAbstraction, mGlAbstraction.ColorMask(flag, flag, flag, flag));
-    }
+    // TODO: Temporarily removed caching and will need to add it back to avoid unnecessary GL call.
+    mColorMask = flag;
+    LOG_GL("ColorMask %s %s %s %s\n", flag ? "True" : "False", flag ? "True" : "False", flag ? "True" : "False", flag ? "True" : "False");
+    CHECK_GL(mGlAbstraction, mGlAbstraction.ColorMask(flag, flag, flag, flag));
   }
 
   /**
@@ -637,49 +596,46 @@ public:
    */
   void CullFace(Dali::FaceCullingMode::Type mode)
   {
-    // Avoid unnecessary calls to gl
-    if(mCullFaceMode != mode)
+    // TODO: Temporarily removed caching and will need to add it back to avoid unnecessary GL call.
+    mCullFaceMode = mode;
+    switch(mode)
     {
-      mCullFaceMode = mode;
-      switch(mode)
+      case Dali::FaceCullingMode::NONE:
       {
-        case Dali::FaceCullingMode::NONE:
-        {
-          LOG_GL("Disable GL_CULL_FACE\n");
-          CHECK_GL(mGlAbstraction, mGlAbstraction.Disable(GL_CULL_FACE));
-          break;
-        }
-
-        case Dali::FaceCullingMode::FRONT:
-        {
-          LOG_GL("Enable GL_CULL_FACE\n");
-          CHECK_GL(mGlAbstraction, mGlAbstraction.Enable(GL_CULL_FACE));
-          LOG_GL("Enable GL_FRONT\n");
-          CHECK_GL(mGlAbstraction, mGlAbstraction.CullFace(GL_FRONT));
-          break;
-        }
-
-        case Dali::FaceCullingMode::BACK:
-        {
-          LOG_GL("Enable GL_CULL_FACE\n");
-          CHECK_GL(mGlAbstraction, mGlAbstraction.Enable(GL_CULL_FACE));
-          LOG_GL("Enable GL_BACK\n");
-          CHECK_GL(mGlAbstraction, mGlAbstraction.CullFace(GL_BACK));
-          break;
-        }
-
-        case Dali::FaceCullingMode::FRONT_AND_BACK:
-        {
-          LOG_GL("Enable GL_CULL_FACE\n");
-          CHECK_GL(mGlAbstraction, mGlAbstraction.Enable(GL_CULL_FACE));
-          LOG_GL("Enable GL_FRONT_AND_BACK\n");
-          CHECK_GL(mGlAbstraction, mGlAbstraction.CullFace(GL_FRONT_AND_BACK));
-          break;
-        }
-
-        default:
-          break;
+        LOG_GL("Disable GL_CULL_FACE\n");
+        CHECK_GL(mGlAbstraction, mGlAbstraction.Disable(GL_CULL_FACE));
+        break;
       }
+
+      case Dali::FaceCullingMode::FRONT:
+      {
+        LOG_GL("Enable GL_CULL_FACE\n");
+        CHECK_GL(mGlAbstraction, mGlAbstraction.Enable(GL_CULL_FACE));
+        LOG_GL("Enable GL_FRONT\n");
+        CHECK_GL(mGlAbstraction, mGlAbstraction.CullFace(GL_FRONT));
+        break;
+      }
+
+      case Dali::FaceCullingMode::BACK:
+      {
+        LOG_GL("Enable GL_CULL_FACE\n");
+        CHECK_GL(mGlAbstraction, mGlAbstraction.Enable(GL_CULL_FACE));
+        LOG_GL("Enable GL_BACK\n");
+        CHECK_GL(mGlAbstraction, mGlAbstraction.CullFace(GL_BACK));
+        break;
+      }
+
+      case Dali::FaceCullingMode::FRONT_AND_BACK:
+      {
+        LOG_GL("Enable GL_CULL_FACE\n");
+        CHECK_GL(mGlAbstraction, mGlAbstraction.Enable(GL_CULL_FACE));
+        LOG_GL("Enable GL_FRONT_AND_BACK\n");
+        CHECK_GL(mGlAbstraction, mGlAbstraction.CullFace(GL_FRONT_AND_BACK));
+        break;
+      }
+
+      default:
+        break;
     }
   }
 
@@ -777,12 +733,10 @@ public:
    */
   void DepthFunc(GLenum func)
   {
-    if(func != mDepthFunction)
-    {
-      mDepthFunction = func;
-      LOG_GL("DepthFunc %x\n", func);
-      CHECK_GL(mGlAbstraction, mGlAbstraction.DepthFunc(func));
-    }
+    // TODO: Temporarily removed caching and will need to add it back to avoid unnecessary GL call.
+    mDepthFunction = func;
+    LOG_GL("DepthFunc %x\n", func);
+    CHECK_GL(mGlAbstraction, mGlAbstraction.DepthFunc(func));
   }
 
   /**
@@ -791,13 +745,11 @@ public:
   void DepthMask(GLboolean flag)
   {
     bool booleanFlag = flag != GL_FALSE;
-    // only change state if needed
-    if(booleanFlag != mDepthMaskEnabled)
-    {
-      mDepthMaskEnabled = booleanFlag;
-      LOG_GL("DepthMask %s\n", booleanFlag ? "True" : "False");
-      CHECK_GL(mGlAbstraction, mGlAbstraction.DepthMask(mDepthMaskEnabled));
-    }
+
+    // TODO: Temporarily removed caching and will need to add it back to avoid unnecessary GL call.
+    mDepthMaskEnabled = booleanFlag;
+    LOG_GL("DepthMask %s\n", booleanFlag ? "True" : "False");
+    CHECK_GL(mGlAbstraction, mGlAbstraction.DepthMask(mDepthMaskEnabled));
   }
 
   /**
@@ -983,21 +935,18 @@ public:
    */
   void SetBlend(bool enable)
   {
-    // Avoid unecessary calls to glEnable/glDisable
-    if(enable != mBlendEnabled)
-    {
-      mBlendEnabled = enable;
+    // TODO: Temporarily removed caching and will need to add it back to avoid unnecessary GL call.
+    mBlendEnabled = enable;
 
-      if(enable)
-      {
-        LOG_GL("Enable GL_BLEND\n");
-        CHECK_GL(mGlAbstraction, mGlAbstraction.Enable(GL_BLEND));
-      }
-      else
-      {
-        LOG_GL("Disable GL_BLEND\n");
-        CHECK_GL(mGlAbstraction, mGlAbstraction.Disable(GL_BLEND));
-      }
+    if(enable)
+    {
+      LOG_GL("Enable GL_BLEND\n");
+      CHECK_GL(mGlAbstraction, mGlAbstraction.Enable(GL_BLEND));
+    }
+    else
+    {
+      LOG_GL("Disable GL_BLEND\n");
+      CHECK_GL(mGlAbstraction, mGlAbstraction.Disable(GL_BLEND));
     }
   }
 
@@ -1011,21 +960,18 @@ public:
    */
   void EnableDepthBuffer(bool enable)
   {
-    // Avoid unecessary calls to glEnable/glDisable
-    if(enable != mDepthBufferEnabled)
-    {
-      mDepthBufferEnabled = enable;
+    // TODO: Temporarily removed caching and will need to add it back to avoid unnecessary GL call.
+    mDepthBufferEnabled = enable;
 
-      if(enable)
-      {
-        LOG_GL("Enable GL_DEPTH_TEST\n");
-        CHECK_GL(mGlAbstraction, mGlAbstraction.Enable(GL_DEPTH_TEST));
-      }
-      else
-      {
-        LOG_GL("Disable GL_DEPTH_TEST\n");
-        CHECK_GL(mGlAbstraction, mGlAbstraction.Disable(GL_DEPTH_TEST));
-      }
+    if(enable)
+    {
+      LOG_GL("Enable GL_DEPTH_TEST\n");
+      CHECK_GL(mGlAbstraction, mGlAbstraction.Enable(GL_DEPTH_TEST));
+    }
+    else
+    {
+      LOG_GL("Disable GL_DEPTH_TEST\n");
+      CHECK_GL(mGlAbstraction, mGlAbstraction.Disable(GL_DEPTH_TEST));
     }
   }
 
@@ -1035,21 +981,18 @@ public:
    */
   void SetDither(bool enable)
   {
-    // Avoid unecessary calls to glEnable/glDisable
-    if(enable != mDitherEnabled)
-    {
-      mDitherEnabled = enable;
+    // TODO: Temporarily removed caching and will need to add it back to avoid unnecessary GL call.
+    mDitherEnabled = enable;
 
-      if(enable)
-      {
-        LOG_GL("Enable GL_DITHER\n");
-        CHECK_GL(mGlAbstraction, mGlAbstraction.Enable(GL_DITHER));
-      }
-      else
-      {
-        LOG_GL("Disable GL_DITHER\n");
-        CHECK_GL(mGlAbstraction, mGlAbstraction.Disable(GL_DITHER));
-      }
+    if(enable)
+    {
+      LOG_GL("Enable GL_DITHER\n");
+      CHECK_GL(mGlAbstraction, mGlAbstraction.Enable(GL_DITHER));
+    }
+    else
+    {
+      LOG_GL("Disable GL_DITHER\n");
+      CHECK_GL(mGlAbstraction, mGlAbstraction.Disable(GL_DITHER));
     }
   }
 
@@ -1059,21 +1002,18 @@ public:
    */
   void SetPolygonOffsetFill(bool enable)
   {
-    // Avoid unecessary calls to glEnable/glDisable
-    if(enable != mPolygonOffsetFillEnabled)
-    {
-      mPolygonOffsetFillEnabled = enable;
+    // TODO: Temporarily removed caching and will need to add it back to avoid unnecessary GL call.
+    mPolygonOffsetFillEnabled = enable;
 
-      if(enable)
-      {
-        LOG_GL("Enable GL_POLYGON_OFFSET_FILL\n");
-        CHECK_GL(mGlAbstraction, mGlAbstraction.Enable(GL_POLYGON_OFFSET_FILL));
-      }
-      else
-      {
-        LOG_GL("Disable GL_POLYGON_OFFSET_FILL\n");
-        CHECK_GL(mGlAbstraction, mGlAbstraction.Disable(GL_POLYGON_OFFSET_FILL));
-      }
+    if(enable)
+    {
+      LOG_GL("Enable GL_POLYGON_OFFSET_FILL\n");
+      CHECK_GL(mGlAbstraction, mGlAbstraction.Enable(GL_POLYGON_OFFSET_FILL));
+    }
+    else
+    {
+      LOG_GL("Disable GL_POLYGON_OFFSET_FILL\n");
+      CHECK_GL(mGlAbstraction, mGlAbstraction.Disable(GL_POLYGON_OFFSET_FILL));
     }
   }
 
@@ -1083,21 +1023,18 @@ public:
    */
   void SetSampleAlphaToCoverage(bool enable)
   {
-    // Avoid unecessary calls to glEnable/glDisable
-    if(enable != mSampleAlphaToCoverageEnabled)
-    {
-      mSampleAlphaToCoverageEnabled = enable;
+    // TODO: Temporarily removed caching and will need to add it back to avoid unnecessary GL call.
+    mSampleAlphaToCoverageEnabled = enable;
 
-      if(enable)
-      {
-        LOG_GL("Enable GL_SAMPLE_ALPHA_TO_COVERAGE\n");
-        CHECK_GL(mGlAbstraction, mGlAbstraction.Enable(GL_SAMPLE_ALPHA_TO_COVERAGE));
-      }
-      else
-      {
-        LOG_GL("Disable GL_SAMPLE_ALPHA_TO_COVERAGE\n");
-        CHECK_GL(mGlAbstraction, mGlAbstraction.Disable(GL_SAMPLE_ALPHA_TO_COVERAGE));
-      }
+    if(enable)
+    {
+      LOG_GL("Enable GL_SAMPLE_ALPHA_TO_COVERAGE\n");
+      CHECK_GL(mGlAbstraction, mGlAbstraction.Enable(GL_SAMPLE_ALPHA_TO_COVERAGE));
+    }
+    else
+    {
+      LOG_GL("Disable GL_SAMPLE_ALPHA_TO_COVERAGE\n");
+      CHECK_GL(mGlAbstraction, mGlAbstraction.Disable(GL_SAMPLE_ALPHA_TO_COVERAGE));
     }
   }
 
@@ -1107,21 +1044,18 @@ public:
    */
   void SetSampleCoverage(bool enable)
   {
-    // Avoid unecessary calls to glEnable/glDisable
-    if(enable != mSampleCoverageEnabled)
-    {
-      mSampleCoverageEnabled = enable;
+    // TODO: Temporarily removed caching and will need to add it back to avoid unnecessary GL call.
+    mSampleCoverageEnabled = enable;
 
-      if(enable)
-      {
-        LOG_GL("Enable GL_SAMPLE_COVERAGE\n");
-        CHECK_GL(mGlAbstraction, mGlAbstraction.Enable(GL_SAMPLE_COVERAGE));
-      }
-      else
-      {
-        LOG_GL("Disable GL_SAMPLE_COVERAGE\n");
-        CHECK_GL(mGlAbstraction, mGlAbstraction.Disable(GL_SAMPLE_COVERAGE));
-      }
+    if(enable)
+    {
+      LOG_GL("Enable GL_SAMPLE_COVERAGE\n");
+      CHECK_GL(mGlAbstraction, mGlAbstraction.Enable(GL_SAMPLE_COVERAGE));
+    }
+    else
+    {
+      LOG_GL("Disable GL_SAMPLE_COVERAGE\n");
+      CHECK_GL(mGlAbstraction, mGlAbstraction.Disable(GL_SAMPLE_COVERAGE));
     }
   }
 
@@ -1131,21 +1065,18 @@ public:
    */
   void SetScissorTest(bool enable)
   {
-    // Avoid unecessary calls to glEnable/glDisable
-    if(enable != mScissorTestEnabled)
-    {
-      mScissorTestEnabled = enable;
+    // TODO: Temporarily removed caching and will need to add it back to avoid unnecessary GL call.
+    mScissorTestEnabled = enable;
 
-      if(enable)
-      {
-        LOG_GL("Enable GL_SCISSOR_TEST\n");
-        CHECK_GL(mGlAbstraction, mGlAbstraction.Enable(GL_SCISSOR_TEST));
-      }
-      else
-      {
-        LOG_GL("Disable GL_SCISSOR_TEST\n");
-        CHECK_GL(mGlAbstraction, mGlAbstraction.Disable(GL_SCISSOR_TEST));
-      }
+    if(enable)
+    {
+      LOG_GL("Enable GL_SCISSOR_TEST\n");
+      CHECK_GL(mGlAbstraction, mGlAbstraction.Enable(GL_SCISSOR_TEST));
+    }
+    else
+    {
+      LOG_GL("Disable GL_SCISSOR_TEST\n");
+      CHECK_GL(mGlAbstraction, mGlAbstraction.Disable(GL_SCISSOR_TEST));
     }
   }
 
@@ -1158,21 +1089,18 @@ public:
    */
   void EnableStencilBuffer(bool enable)
   {
-    // Avoid unecessary calls to glEnable/glDisable
-    if(enable != mStencilBufferEnabled)
-    {
-      mStencilBufferEnabled = enable;
+    // TODO: Temporarily removed caching and will need to add it back to avoid unnecessary GL call.
+    mStencilBufferEnabled = enable;
 
-      if(enable)
-      {
-        LOG_GL("Enable GL_STENCIL_TEST\n");
-        CHECK_GL(mGlAbstraction, mGlAbstraction.Enable(GL_STENCIL_TEST));
-      }
-      else
-      {
-        LOG_GL("Disable GL_STENCIL_TEST\n");
-        CHECK_GL(mGlAbstraction, mGlAbstraction.Disable(GL_STENCIL_TEST));
-      }
+    if(enable)
+    {
+      LOG_GL("Enable GL_STENCIL_TEST\n");
+      CHECK_GL(mGlAbstraction, mGlAbstraction.Enable(GL_STENCIL_TEST));
+    }
+    else
+    {
+      LOG_GL("Disable GL_STENCIL_TEST\n");
+      CHECK_GL(mGlAbstraction, mGlAbstraction.Disable(GL_STENCIL_TEST));
     }
   }
 
@@ -1621,15 +1549,13 @@ public:
    */
   void StencilFunc(GLenum func, GLint ref, GLuint mask)
   {
-    if((func != mStencilFunc) || (ref != mStencilFuncRef) || (mask != mStencilFuncMask))
-    {
-      mStencilFunc     = func;
-      mStencilFuncRef  = ref;
-      mStencilFuncMask = mask;
+    // TODO: Temporarily removed caching and will need to add it back to avoid unnecessary GL call.
+    mStencilFunc     = func;
+    mStencilFuncRef  = ref;
+    mStencilFuncMask = mask;
 
-      LOG_GL("StencilFunc %x %d %d\n", func, ref, mask);
-      CHECK_GL(mGlAbstraction, mGlAbstraction.StencilFunc(func, ref, mask));
-    }
+    LOG_GL("StencilFunc %x %d %d\n", func, ref, mask);
+    CHECK_GL(mGlAbstraction, mGlAbstraction.StencilFunc(func, ref, mask));
   }
 
   /**
@@ -1646,13 +1572,11 @@ public:
    */
   void StencilMask(GLuint mask)
   {
-    if(mask != mStencilMask)
-    {
-      mStencilMask = mask;
+    // TODO: Temporarily removed caching and will need to add it back to avoid unnecessary GL call.
+    mStencilMask = mask;
 
-      LOG_GL("StencilMask %d\n", mask);
-      CHECK_GL(mGlAbstraction, mGlAbstraction.StencilMask(mask));
-    }
+    LOG_GL("StencilMask %d\n", mask);
+    CHECK_GL(mGlAbstraction, mGlAbstraction.StencilMask(mask));
   }
 
   /**
@@ -1669,15 +1593,13 @@ public:
    */
   void StencilOp(GLenum fail, GLenum zfail, GLenum zpass)
   {
-    if((fail != mStencilOpFail) || (zfail != mStencilOpDepthFail) || (zpass != mStencilOpDepthPass))
-    {
-      mStencilOpFail      = fail;
-      mStencilOpDepthFail = zfail;
-      mStencilOpDepthPass = zpass;
+    // TODO: Temporarily removed caching and will need to add it back to avoid unnecessary GL call.
+    mStencilOpFail      = fail;
+    mStencilOpDepthFail = zfail;
+    mStencilOpDepthPass = zpass;
 
-      LOG_GL("StencilOp %x %x %x\n", fail, zfail, zpass);
-      CHECK_GL(mGlAbstraction, mGlAbstraction.StencilOp(fail, zfail, zpass));
-    }
+    LOG_GL("StencilOp %x %x %x\n", fail, zfail, zpass);
+    CHECK_GL(mGlAbstraction, mGlAbstraction.StencilOp(fail, zfail, zpass));
   }
 
   /**
