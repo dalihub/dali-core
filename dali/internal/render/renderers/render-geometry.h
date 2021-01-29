@@ -85,12 +85,10 @@ public:
   void RemoveVertexBuffer(const Render::VertexBuffer* vertexBuffer);
 
   /**
-   * Gets the attribute locations on the shader for the attributes defined in the geometry RenderBuffers
-   * @param[out] attributeLocation The vector where the attributes locations will be stored
-   * @param[in] program The program
-   * @param[in] bufferIndex The current buffer index
+   * Get the vertex buffers
+   * @return the list of vertex buffers
    */
-  void GetAttributeLocationFromProgram(Vector<GLint>& attributeLocation, Program& program, BufferIndex bufferIndex) const;
+  const Vector<Render::VertexBuffer*>& GetVertexBuffers() const;
 
   /**
    * Called from RenderManager to notify the geometry that current rendering pass has finished.
@@ -116,6 +114,11 @@ public:
   }
 
   /**
+   * @return the topology of this geometry
+   */
+  Graphics::PrimitiveTopology GetTopology() const;
+
+  /**
    * Upload the geometry if it has changed
    */
   void Upload(Graphics::Controller& graphicsController);
@@ -129,11 +132,8 @@ public:
    * @param[in] elementBufferOffset The index of first element to draw if index buffer bound
    * @param[in] elementBufferCount Number of elements to draw if index buffer bound, uses whole buffer when 0
    */
-  void Draw(Context&                 context,
-            Graphics::Controller&    graphicsController,
+  void Draw(Graphics::Controller&    graphicsController,
             Graphics::CommandBuffer& commandBuffer,
-            BufferIndex              bufferIndex,
-            Vector<GLint>&           attributeLocation,
             uint32_t                 elementBufferOffset,
             uint32_t                 elementBufferCount);
 

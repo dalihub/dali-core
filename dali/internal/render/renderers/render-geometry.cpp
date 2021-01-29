@@ -56,6 +56,11 @@ void Geometry::AddVertexBuffer(Render::VertexBuffer* vertexBuffer)
   mAttributesChanged = true;
 }
 
+const Vector<Render::VertexBuffer*>& Geometry::GetVertexBuffers() const
+{
+  return mVertexBuffers;
+}
+
 void Geometry::SetIndexBuffer(Dali::Vector<uint16_t>& indices)
 {
   mIndices.Swap(indices);
@@ -73,29 +78,6 @@ void Geometry::RemoveVertexBuffer(const Render::VertexBuffer* vertexBuffer)
       mVertexBuffers.Remove(iter);
       mAttributesChanged = true;
       break;
-    }
-  }
-}
-
-void Geometry::GetAttributeLocationFromProgram(Vector<GLint>& attributeLocation, Program& program, BufferIndex bufferIndex) const
-{
-  attributeLocation.Clear();
-
-  for(auto&& vertexBuffer : mVertexBuffers)
-  {
-    const uint32_t attributeCount = vertexBuffer->GetAttributeCount();
-    for(uint32_t j = 0; j < attributeCount; ++j)
-    {
-      auto     attributeName = vertexBuffer->GetAttributeName(j);
-      uint32_t index         = program.RegisterCustomAttribute(attributeName);
-      GLint    location      = program.GetCustomAttributeLocation(index);
-
-      if(-1 == location)
-      {
-        DALI_LOG_WARNING("Attribute not found in the shader: %s\n", attributeName.GetCString());
-      }
-
-      attributeLocation.PushBack(location);
     }
   }
 }
@@ -145,16 +127,12 @@ void Geometry::Upload(Graphics::Controller& graphicsController)
 }
 
 void Geometry::Draw(
-  Context&                 context,
   Graphics::Controller&    graphicsController,
   Graphics::CommandBuffer& commandBuffer,
-  BufferIndex              bufferIndex,
-  Vector<GLint>&           attributeLocation,
   uint32_t                 elementBufferOffset,
   uint32_t                 elementBufferCount)
 {
   //Bind buffers to attribute locations
-  uint32_t       base              = 0u;
   const uint32_t vertexBufferCount = static_cast<uint32_t>(mVertexBuffers.Count());
 
   std::vector<const Graphics::Buffer*> buffers;
@@ -191,48 +169,8 @@ void Geometry::Draw(
     }
   }
 
-  GLenum geometryGLType(GL_NONE);
-  switch(mGeometryType)
-  {
-    case Dali::Geometry::TRIANGLES:
-    {
-      geometryGLType = GL_TRIANGLES;
-      break;
-    }
-    case Dali::Geometry::LINES:
-    {
-      geometryGLType = GL_LINES;
-      break;
-    }
-    case Dali::Geometry::POINTS:
-    {
-      geometryGLType = GL_POINTS;
-      break;
-    }
-    case Dali::Geometry::TRIANGLE_STRIP:
-    {
-      geometryGLType = GL_TRIANGLE_STRIP;
-      break;
-    }
-    case Dali::Geometry::TRIANGLE_FAN:
-    {
-      geometryGLType = GL_TRIANGLE_FAN;
-      break;
-    }
-    case Dali::Geometry::LINE_LOOP:
-    {
-      geometryGLType = GL_LINE_LOOP;
-      break;
-    }
-    case Dali::Geometry::LINE_STRIP:
-    {
-      geometryGLType = GL_LINE_STRIP;
-      break;
-    }
-  }
-
   //Draw call
-  if(mIndexBuffer && geometryGLType != GL_POINTS)
+  if(mIndexBuffer && mGeometryType != Dali::Geometry::POINTS)
   {
     //Indexed draw call
     Graphics::Buffer* ibo = mIndexBuffer->GetGraphicsObject();
@@ -241,21 +179,7 @@ void Geometry::Draw(
       commandBuffer.BindIndexBuffer(*ibo, 0, Graphics::Format::R16_UINT);
     }
 
-    // Command buffer contains Texture bindings, vertex bindings and index buffer binding.
-    Graphics::SubmitInfo submitInfo{{}, 0 | Graphics::SubmitFlagBits::FLUSH};
-    submitInfo.cmdBuffer.push_back(&commandBuffer);
-    graphicsController.SubmitCommandBuffers(submitInfo);
-
-    //@todo This should all be done from inside Pipeline implementation.
-    //If there is only 1 vertex buffer, it should have been bound by SubmitCommandBuffers,
-    //and the single GL call from this will work on that bound buffer.
-    for(uint32_t i = 0; i < vertexBufferCount; ++i)
-    {
-      base += mVertexBuffers[i]->EnableVertexAttributes(context, attributeLocation, base);
-    }
-
-    // numIndices truncated, no value loss happening in practice
-    context.DrawElements(geometryGLType, static_cast<GLsizei>(numIndices), GL_UNSIGNED_SHORT, reinterpret_cast<void*>(firstIndexOffset));
+    commandBuffer.DrawIndexed(numIndices, 1, firstIndexOffset, 0, 0);
   }
   else
   {
@@ -267,30 +191,53 @@ void Geometry::Draw(
       numVertices = static_cast<GLsizei>(mVertexBuffers[0]->GetElementCount());
     }
 
-    // Command buffer contains Texture bindings & vertex bindings
-    Graphics::SubmitInfo submitInfo{{}, 0 | Graphics::SubmitFlagBits::FLUSH};
-    submitInfo.cmdBuffer.push_back(&commandBuffer);
-    graphicsController.SubmitCommandBuffers(submitInfo);
-
-    //@todo This should all be done from inside Pipeline implementation.
-    //If there is only 1 vertex buffer, it should have been bound by SubmitCommandBuffers,
-    //and the single GL call from this will work on that bound buffer.
-    for(uint32_t i = 0; i < vertexBufferCount; ++i)
-    {
-      base += mVertexBuffers[i]->EnableVertexAttributes(context, attributeLocation, base);
-    }
-
-    context.DrawArrays(geometryGLType, 0, numVertices);
+    commandBuffer.Draw(numVertices, 1, 0, 0);
   }
+}
 
-  //Disable attributes
-  for(auto&& attribute : attributeLocation)
+Graphics::PrimitiveTopology Geometry::GetTopology() const
+{
+  Graphics::PrimitiveTopology topology = Graphics::PrimitiveTopology::TRIANGLE_LIST;
+
+  switch(mGeometryType)
   {
-    if(attribute != -1)
+    case Dali::Geometry::TRIANGLES:
     {
-      context.DisableVertexAttributeArray(static_cast<GLuint>(attribute));
+      topology = Graphics::PrimitiveTopology::TRIANGLE_LIST;
+      break;
+    }
+    case Dali::Geometry::LINES:
+    {
+      topology = Graphics::PrimitiveTopology::LINE_LIST;
+      break;
+    }
+    case Dali::Geometry::POINTS:
+    {
+      topology = Graphics::PrimitiveTopology::POINT_LIST;
+      break;
+    }
+    case Dali::Geometry::TRIANGLE_STRIP:
+    {
+      topology = Graphics::PrimitiveTopology::TRIANGLE_STRIP;
+      break;
+    }
+    case Dali::Geometry::TRIANGLE_FAN:
+    {
+      topology = Graphics::PrimitiveTopology::TRIANGLE_FAN;
+      break;
+    }
+    case Dali::Geometry::LINE_LOOP:
+    {
+      topology = Graphics::PrimitiveTopology::LINE_LOOP;
+      break;
+    }
+    case Dali::Geometry::LINE_STRIP:
+    {
+      topology = Graphics::PrimitiveTopology::LINE_STRIP;
+      break;
     }
   }
+  return topology;
 }
 
 } // namespace Render

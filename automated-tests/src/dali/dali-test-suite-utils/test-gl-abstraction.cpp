@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,10 @@
 namespace Dali
 {
 TestGlAbstraction::TestGlAbstraction()
+: mBufferTrace(true, "gl"),
+  mTextureTrace(true, "gl"),
+  mTexParameterTrace(true, "gl"),
+  mDrawTrace(true, "gl")
 {
   Initialize();
 }
@@ -34,7 +38,6 @@ void TestGlAbstraction::Initialize()
   mCompileStatus                   = GL_TRUE;
   mLinkStatus                      = GL_TRUE;
   mNumberOfActiveUniforms          = 0;
-  mGetAttribLocationResult         = 0;
   mGetErrorResult                  = 0;
   mGetStringResult                 = NULL;
   mIsBufferResult                  = 0;
@@ -83,6 +86,9 @@ void TestGlAbstraction::Initialize()
   mProgramUniforms3f.clear();
   mProgramUniforms4f.clear();
 
+  mAttribLocs.clear();
+  mAttribLocs.push_back("aPosition");
+  mAttribLocs.push_back("aTexCoord");
   mCullFaceTrace.Reset();
   mDepthFunctionTrace.Reset();
   mEnableDisableTrace.Reset();
@@ -90,7 +96,7 @@ void TestGlAbstraction::Initialize()
   mStencilFunctionTrace.Reset();
   mScissorTrace.Reset();
   mTextureTrace.Reset();
-  mTexParamaterTrace.Reset();
+  mTexParameterTrace.Reset();
   mDrawTrace.Reset();
 
   for(unsigned int i = 0; i < MAX_ATTRIBUTE_CACHE_SIZE; ++i)

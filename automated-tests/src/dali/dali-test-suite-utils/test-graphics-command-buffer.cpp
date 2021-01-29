@@ -28,6 +28,9 @@ void TestGraphicsCommandBuffer::BindVertexBuffers(uint32_t                      
                                                   std::vector<const Graphics::Buffer*> buffers,
                                                   std::vector<uint32_t>                offsets)
 {
+  mVertexBufferBindings.firstBinding = firstBinding;
+  mVertexBufferBindings.buffers      = buffers; // Copy
+  mVertexBufferBindings.offsets      = offsets; // Copy
   mCallStack.PushCall("BindVertexBuffers", "");
 }
 
@@ -38,6 +41,7 @@ void TestGraphicsCommandBuffer::BindUniformBuffers(const std::vector<Graphics::U
 
 void TestGraphicsCommandBuffer::BindPipeline(const Graphics::Pipeline& pipeline)
 {
+  mPipeline = static_cast<TestGraphicsPipeline*>(const_cast<Graphics::Pipeline*>(&pipeline));
   mCallStack.PushCall("BindPipeline", "");
 }
 
@@ -66,6 +70,9 @@ void TestGraphicsCommandBuffer::BindIndexBuffer(const Graphics::Buffer& buffer,
                                                 uint32_t                offset,
                                                 Graphics::Format        format)
 {
+  mIndexBufferBinding.buffer = &buffer;
+  mIndexBufferBinding.offset = offset;
+  mIndexBufferBinding.format = format;
   mCallStack.PushCall("BindIndexBuffer", "");
 }
 
@@ -89,6 +96,11 @@ void TestGraphicsCommandBuffer::Draw(
   uint32_t firstVertex,
   uint32_t firstInstance)
 {
+  drawCommand.drawType                      = Draw::DrawType::Unindexed;
+  drawCommand.u.unindexedDraw.vertexCount   = vertexCount;
+  drawCommand.u.unindexedDraw.instanceCount = instanceCount;
+  drawCommand.u.unindexedDraw.firstVertex   = firstVertex;
+  drawCommand.u.unindexedDraw.firstInstance = firstInstance;
   mCallStack.PushCall("Draw", "");
 }
 
@@ -99,6 +111,12 @@ void TestGraphicsCommandBuffer::DrawIndexed(
   int32_t  vertexOffset,
   uint32_t firstInstance)
 {
+  drawCommand.drawType                    = TestGraphicsCommandBuffer::Draw::DrawType::Indexed;
+  drawCommand.u.indexedDraw.indexCount    = indexCount;
+  drawCommand.u.indexedDraw.instanceCount = instanceCount;
+  drawCommand.u.indexedDraw.firstIndex    = firstIndex;
+  drawCommand.u.indexedDraw.vertexOffset  = vertexOffset;
+  drawCommand.u.indexedDraw.firstInstance = firstInstance;
   mCallStack.PushCall("DrawIndexed", "");
 }
 

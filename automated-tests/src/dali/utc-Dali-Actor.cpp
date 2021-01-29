@@ -5036,9 +5036,9 @@ int UtcDaliActorRaiseToTopLowerToBottom(void)
   tet_printf("Trace Output:%s \n", glSetUniformStack.GetTraceString().c_str());
 
   // Test order of uniforms in stack
-  int indexC = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "3");
-  int indexB = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "2");
-  int indexA = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "1");
+  int indexC = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "3.000000");
+  int indexB = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "2.000000");
+  int indexA = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "1.000000");
 
   bool CBA = (indexC > indexB) && (indexB > indexA);
 
@@ -5089,9 +5089,9 @@ int UtcDaliActorRaiseToTopLowerToBottom(void)
   tet_printf("Trace:%s \n", glSetUniformStack.GetTraceString().c_str());
 
   // Test order of uniforms in stack
-  indexC = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "3");
-  indexB = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "2");
-  indexA = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "1");
+  indexC = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "3.000000");
+  indexB = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "2.000000");
+  indexA = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "1.000000");
 
   tet_infoline("Testing A above C and B at bottom\n");
   bool ACB = (indexA > indexC) && (indexC > indexB);
@@ -5126,9 +5126,9 @@ int UtcDaliActorRaiseToTopLowerToBottom(void)
   tet_printf("Trace:%s \n", glSetUniformStack.GetTraceString().c_str());
 
   // Test order of uniforms in stack
-  indexC = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "3");
-  indexB = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "2");
-  indexA = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "1");
+  indexC = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "3.000000");
+  indexB = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "2.000000");
+  indexA = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "1.000000");
 
   tet_infoline("Testing B above A and C at bottom\n");
   bool BAC = (indexB > indexA) && (indexA > indexC);
@@ -5174,9 +5174,9 @@ int UtcDaliActorRaiseToTopLowerToBottom(void)
   tet_printf("Trace:%s \n", glSetUniformStack.GetTraceString().c_str());
 
   // Test order of uniforms in stack
-  indexC = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "3");
-  indexB = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "2");
-  indexA = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "1");
+  indexC = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "3.000000");
+  indexB = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "2.000000");
+  indexA = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "1.000000");
 
   tet_infoline("Testing C above A and B at bottom\n");
   bool CAB = (indexC > indexA) && (indexA > indexB);
@@ -5498,9 +5498,9 @@ int UtcDaliActorLowerBelow(void)
   tet_printf("Trace:%s \n", glSetUniformStack.GetTraceString().c_str());
 
   // Test order of uniforms in stack
-  int indexC = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "3");
-  int indexB = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "2");
-  int indexA = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "1");
+  int indexC = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "3.000000");
+  int indexB = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "2.000000");
+  int indexA = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "1.000000");
 
   tet_infoline("Testing C above B and A at bottom\n");
   bool CBA = (indexC > indexB) && (indexB > indexA);
@@ -5556,9 +5556,9 @@ int UtcDaliActorLowerBelow(void)
   tet_printf("Trace:%s \n", glSetUniformStack.GetTraceString().c_str());
 
   // Test order of uniforms in stack
-  indexC = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "3");
-  indexB = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "2");
-  indexA = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "1");
+  indexC = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "3.000000");
+  indexB = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "2.000000");
+  indexA = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "1.000000");
 
   tet_infoline("Testing render order is A, C, B");
   DALI_TEST_EQUALS(indexC > indexA, true, TEST_LOCATION);
@@ -5592,9 +5592,9 @@ int UtcDaliActorLowerBelow(void)
   tet_printf("Trace:%s \n", glSetUniformStack.GetTraceString().c_str());
 
   // Test order of uniforms in stack
-  indexC = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "3");
-  indexB = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "2");
-  indexA = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "1");
+  indexC = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "3.000000");
+  indexB = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "2.000000");
+  indexA = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "1.000000");
 
   DALI_TEST_EQUALS(indexA > indexC, true, TEST_LOCATION);
   DALI_TEST_EQUALS(indexB > indexA, true, TEST_LOCATION);
@@ -5627,9 +5627,9 @@ int UtcDaliActorLowerBelow(void)
   tet_printf("Trace:%s \n", glSetUniformStack.GetTraceString().c_str());
 
   // Test order of uniforms in stack
-  indexC = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "3");
-  indexB = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "2");
-  indexA = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "1");
+  indexC = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "3.000000");
+  indexB = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "2.000000");
+  indexA = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "1.000000");
 
   DALI_TEST_EQUALS(indexC > indexB, true, TEST_LOCATION);
   DALI_TEST_EQUALS(indexA > indexC, true, TEST_LOCATION);
@@ -5723,9 +5723,9 @@ int UtcDaliActorLowerBelow2(void)
   tet_printf("Trace:%s \n", glSetUniformStack.GetTraceString().c_str());
 
   // Test order of uniforms in stack
-  int indexC = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "3");
-  int indexB = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "2");
-  int indexA = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "1");
+  int indexC = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "3.000000");
+  int indexB = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "2.000000");
+  int indexA = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "1.000000");
 
   tet_infoline("Testing C above B and A at bottom\n");
   bool CBA = (indexC > indexB) && (indexB > indexA);
@@ -5781,9 +5781,9 @@ int UtcDaliActorLowerBelow2(void)
   tet_printf("Trace:%s \n", glSetUniformStack.GetTraceString().c_str());
 
   // Test order of uniforms in stack
-  indexC = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "3");
-  indexB = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "2");
-  indexA = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "1");
+  indexC = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "3.000000");
+  indexB = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "2.000000");
+  indexA = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "1.000000");
 
   tet_infoline("Testing render order is A, C, B");
   DALI_TEST_EQUALS(indexC > indexA, true, TEST_LOCATION);
@@ -5817,9 +5817,9 @@ int UtcDaliActorLowerBelow2(void)
   tet_printf("Trace:%s \n", glSetUniformStack.GetTraceString().c_str());
 
   // Test order of uniforms in stack
-  indexC = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "3");
-  indexB = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "2");
-  indexA = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "1");
+  indexC = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "3.000000");
+  indexB = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "2.000000");
+  indexA = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "1.000000");
 
   DALI_TEST_EQUALS(indexA > indexC, true, TEST_LOCATION);
   DALI_TEST_EQUALS(indexB > indexA, true, TEST_LOCATION);
@@ -5852,9 +5852,9 @@ int UtcDaliActorLowerBelow2(void)
   tet_printf("Trace:%s \n", glSetUniformStack.GetTraceString().c_str());
 
   // Test order of uniforms in stack
-  indexC = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "3");
-  indexB = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "2");
-  indexA = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "1");
+  indexC = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "3.000000");
+  indexB = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "2.000000");
+  indexA = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "1.000000");
 
   DALI_TEST_EQUALS(indexC > indexB, true, TEST_LOCATION);
   DALI_TEST_EQUALS(indexA > indexC, true, TEST_LOCATION);

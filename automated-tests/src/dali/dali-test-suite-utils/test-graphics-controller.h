@@ -43,12 +43,12 @@ public:
 
   void Initialize()
   {
-    mGlAbstraction.Initialize();
+    mGl.Initialize();
   }
 
   Integration::GlAbstraction& GetGlAbstraction() override
   {
-    return mGlAbstraction;
+    return mGl;
   }
 
   Integration::GlSyncAbstraction& GetGlSyncAbstraction() override
@@ -276,10 +276,10 @@ public:
   bool PipelineEquals(const Graphics::Pipeline& pipeline0, const Graphics::Pipeline& pipeline1) const override;
 
 public:
-  mutable TraceCallStack mCallStack{"TestGraphics:"};
-  mutable TraceCallStack mCommandBufferCallStack{"TestCommandBuffer:"};
+  mutable TraceCallStack mCallStack;
+  mutable TraceCallStack mCommandBufferCallStack;
 
-  TestGlAbstraction              mGlAbstraction;
+  TestGlAbstraction              mGl;
   TestGlSyncAbstraction          mGlSyncAbstraction;
   TestGlContextHelperAbstraction mGlContextHelperAbstraction;
 

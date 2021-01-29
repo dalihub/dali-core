@@ -26,6 +26,7 @@
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/renderers/render-sampler.h>
 #include <dali/internal/render/renderers/render-texture.h>
+#include <dali/internal/render/renderers/render-vertex-buffer.h>
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 
@@ -99,6 +100,69 @@ inline void SetMatrices(Program&      program,
   }
 }
 
+// Helper to get the vertex input format
+Dali::Graphics::VertexInputFormat GetPropertyVertexFormat(Property::Type propertyType)
+{
+  Dali::Graphics::VertexInputFormat type{};
+
+  switch(propertyType)
+  {
+    case Property::NONE:
+    case Property::STRING:
+    case Property::ARRAY:
+    case Property::MAP:
+    case Property::EXTENTS:   // i4?
+    case Property::RECTANGLE: // i4/f4?
+    case Property::ROTATION:
+    {
+      type = Dali::Graphics::VertexInputFormat::UNDEFINED;
+      break;
+    }
+    case Property::BOOLEAN:
+    {
+      type = Dali::Graphics::VertexInputFormat::UNDEFINED; // type = GL_BYTE; @todo new type for this?
+      break;
+    }
+    case Property::INTEGER:
+    {
+      type = Dali::Graphics::VertexInputFormat::INTEGER; // (short)
+      break;
+    }
+    case Property::FLOAT:
+    {
+      type = Dali::Graphics::VertexInputFormat::FLOAT;
+      break;
+    }
+    case Property::VECTOR2:
+    {
+      type = Dali::Graphics::VertexInputFormat::FVECTOR2;
+      break;
+    }
+    case Property::VECTOR3:
+    {
+      type = Dali::Graphics::VertexInputFormat::FVECTOR3;
+      break;
+    }
+    case Property::VECTOR4:
+    {
+      type = Dali::Graphics::VertexInputFormat::FVECTOR4;
+      break;
+    }
+    case Property::MATRIX3:
+    {
+      type = Dali::Graphics::VertexInputFormat::FLOAT;
+      break;
+    }
+    case Property::MATRIX:
+    {
+      type = Dali::Graphics::VertexInputFormat::FLOAT;
+      break;
+    }
+  }
+
+  return type;
+}
+
 } // namespace
 
 namespace Render
@@ -131,7 +195,7 @@ Renderer::Renderer(SceneGraph::RenderDataProvider* dataProvider,
   mContext(nullptr),
   mGeometry(geometry),
   mUniformIndexMap(),
-  mAttributesLocation(),
+  mAttributeLocations(),
   mUniformsHash(),
   mStencilParameters(stencilParameters),
   mBlendingOptions(),
@@ -141,7 +205,7 @@ Renderer::Renderer(SceneGraph::RenderDataProvider* dataProvider,
   mFaceCullingMode(faceCullingMode),
   mDepthWriteMode(depthWriteMode),
   mDepthTestMode(depthTestMode),
-  mUpdateAttributesLocation(true),
+  mUpdateAttributeLocations(true),
   mPremultipledAlphaEnabled(preMultipliedAlphaEnabled),
   mShaderChanged(false),
   mUpdated(true)
@@ -165,7 +229,7 @@ Renderer::~Renderer() = default;
 void Renderer::SetGeometry(Render::Geometry* geometry)
 {
   mGeometry                 = geometry;
-  mUpdateAttributesLocation = true;
+  mUpdateAttributeLocations = true;
 }
 void Renderer::SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, uint32_t size)
 {
@@ -610,9 +674,6 @@ void Renderer::Render(Context&                                             conte
     return;
   }
 
-  // For now, create command buffer to perform only the texture / sample binding
-  // and submit it.
-  // Expect this call to glBindTextureForUnit, and glTexParameteri() for the sampler
   Graphics::UniquePtr<Graphics::CommandBuffer> commandBuffer = mGraphicsController->CreateCommandBuffer(
     Graphics::CommandBufferCreateInfo()
       .SetLevel(Graphics::CommandBufferLevel::SECONDARY),
@@ -647,6 +708,11 @@ void Renderer::Render(Context&                                             conte
     context.CullFace(mFaceCullingMode);
   }
 
+  // Temporarily create a pipeline here - this will be used for transporting
+  // topology and vertex format for now.
+  Graphics::UniquePtr<Graphics::Pipeline> pipeline = PrepareGraphicsPipeline(*program);
+  commandBuffer->BindPipeline(*pipeline.get());
+
   // Take the program into use so we can send uniforms to it
   program->Use();
 
@@ -675,28 +741,17 @@ void Renderer::Render(Context&                                             conte
 
     SetUniforms(bufferIndex, node, size, *program);
 
-    if(mUpdateAttributesLocation || mGeometry->AttributesChanged())
-    {
-      mGeometry->GetAttributeLocationFromProgram(mAttributesLocation, *program, bufferIndex);
-      mUpdateAttributesLocation = false;
-    }
-
     if(mBlendingOptions.IsAdvancedBlendEquationApplied() && mPremultipledAlphaEnabled)
     {
       context.BlendBarrier();
     }
 
+    //@todo manage mDrawCommands in the same way as above command buffer?!
     if(mDrawCommands.empty())
     {
       SetBlending(context, blend);
 
-      mGeometry->Draw(context,
-                      *mGraphicsController,
-                      *commandBuffer.get(),
-                      bufferIndex,
-                      mAttributesLocation,
-                      mIndexedDrawFirstElement,
-                      mIndexedDrawElementsCount);
+      mGeometry->Draw(*mGraphicsController, *commandBuffer.get(), mIndexedDrawFirstElement, mIndexedDrawElementsCount);
     }
     else
     {
@@ -706,10 +761,19 @@ void Renderer::Render(Context&                                             conte
         {
           //Set blending mode
           SetBlending(context, cmd->queue == DevelRenderer::RENDER_QUEUE_OPAQUE ? false : blend);
-          mGeometry->Draw(context, *mGraphicsController, *commandBuffer.get(), bufferIndex, mAttributesLocation, cmd->firstIndex, cmd->elementCount);
+
+          // @todo This should generate a command buffer per cmd
+          // Tests WILL fail.
+          mGeometry->Draw(*mGraphicsController, *commandBuffer.get(), cmd->firstIndex, cmd->elementCount);
         }
       }
     }
+
+    // Command buffer contains Texture bindings, vertex bindings, index buffer binding, pipeline(vertex format)
+    Graphics::SubmitInfo submitInfo{{}, 0 | Graphics::SubmitFlagBits::FLUSH};
+    submitInfo.cmdBuffer.push_back(commandBuffer.get());
+    mGraphicsController->SubmitCommandBuffers(submitInfo);
+
     mUpdated = false;
   }
 }
@@ -734,7 +798,7 @@ bool Renderer::Updated(BufferIndex bufferIndex, const SceneGraph::NodeDataProvid
     return true;
   }
 
-  if(mShaderChanged || mUpdateAttributesLocation || mGeometry->AttributesChanged())
+  if(mShaderChanged || mUpdateAttributeLocations || mGeometry->AttributesChanged())
   {
     return true;
   }
@@ -768,6 +832,64 @@ bool Renderer::Updated(BufferIndex bufferIndex, const SceneGraph::NodeDataProvid
   }
 
   return false;
+}
+
+Graphics::UniquePtr<Graphics::Pipeline> Renderer::PrepareGraphicsPipeline(Program& program)
+{
+  Graphics::InputAssemblyState inputAssemblyState{};
+  Graphics::VertexInputState   vertexInputState{};
+  uint32_t                     bindingIndex{0u};
+
+  if(mUpdateAttributeLocations || mGeometry->AttributesChanged())
+  {
+    mAttributeLocations.Clear();
+    mUpdateAttributeLocations = true;
+  }
+
+  uint32_t base = 0;
+  for(auto&& vertexBuffer : mGeometry->GetVertexBuffers())
+  {
+    const VertexBuffer::Format& vertexFormat = *vertexBuffer->GetFormat();
+
+    vertexInputState.bufferBindings.emplace_back(vertexFormat.size, // stride
+                                                 Graphics::VertexInputRate::PER_VERTEX);
+
+    const uint32_t attributeCount = vertexBuffer->GetAttributeCount();
+    for(uint32_t i = 0; i < attributeCount; ++i)
+    {
+      if(mUpdateAttributeLocations)
+      {
+        auto     attributeName = vertexBuffer->GetAttributeName(i);
+        uint32_t index         = program.RegisterCustomAttribute(attributeName);
+        int32_t  pLocation     = program.GetCustomAttributeLocation(index);
+        if(-1 == pLocation)
+        {
+          DALI_LOG_WARNING("Attribute not found in the shader: %s\n", attributeName.GetCString());
+        }
+        mAttributeLocations.PushBack(pLocation);
+      }
+
+      uint32_t location = static_cast<uint32_t>(mAttributeLocations[base + i]);
+
+      vertexInputState.attributes.emplace_back(location,
+                                               bindingIndex,
+                                               vertexFormat.components[i].offset,
+                                               GetPropertyVertexFormat(vertexFormat.components[i].type));
+    }
+    base += attributeCount;
+    ++bindingIndex;
+  }
+  mUpdateAttributeLocations = false;
+
+  // Get the topology
+  inputAssemblyState.SetTopology(mGeometry->GetTopology());
+
+  // Create a new pipeline
+  return mGraphicsController->CreatePipeline(
+    Graphics::PipelineCreateInfo()
+      .SetInputAssemblyState(&inputAssemblyState) // Passed as pointers - shallow copy will break. TOO C LIKE
+      .SetVertexInputState(&vertexInputState),
+    nullptr);
 }
 
 } // namespace Render

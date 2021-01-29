@@ -442,6 +442,11 @@ private:
    */
   bool BindTextures(Context& context, Program& program, Graphics::CommandBuffer& commandBuffer, Vector<Graphics::Texture*>& boundTextures);
 
+  /**
+   * Prepare a pipeline for this renderer
+   */
+  Graphics::UniquePtr<Graphics::Pipeline> PrepareGraphicsPipeline(Program& program);
+
 private:
   Graphics::Controller*                        mGraphicsController;
   OwnerPointer<SceneGraph::RenderDataProvider> mRenderDataProvider;
@@ -458,7 +463,7 @@ private:
   using UniformIndexMappings = Dali::Vector<UniformIndexMap>;
 
   UniformIndexMappings mUniformIndexMap;
-  Vector<GLint>        mAttributesLocation;
+  Vector<int32_t>      mAttributeLocations;
 
   uint64_t mUniformsHash;
 
@@ -472,7 +477,7 @@ private:
   FaceCullingMode::Type mFaceCullingMode : 3;          ///< The mode of face culling
   DepthWriteMode::Type  mDepthWriteMode : 3;           ///< The depth write mode
   DepthTestMode::Type   mDepthTestMode : 3;            ///< The depth test mode
-  bool                  mUpdateAttributesLocation : 1; ///< Indicates attribute locations have changed
+  bool                  mUpdateAttributeLocations : 1; ///< Indicates attribute locations have changed
   bool                  mPremultipledAlphaEnabled : 1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
   bool                  mShaderChanged : 1;            ///< Flag indicating the shader changed and uniform maps have to be updated
   bool                  mUpdated : 1;

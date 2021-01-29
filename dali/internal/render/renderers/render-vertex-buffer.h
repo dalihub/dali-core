@@ -18,13 +18,15 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/public-api/actors/sampling.h>
+#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/rendering/sampler.h>
+
+#include <dali/graphics-api/graphics-types.h>
 #include <dali/internal/common/const-string.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/render/gl-resources/gpu-buffer.h>
 #include <dali/internal/render/renderers/render-sampler.h>
-#include <dali/public-api/actors/sampling.h>
-#include <dali/public-api/common/vector-wrapper.h>
-#include <dali/public-api/rendering/sampler.h>
 
 namespace Dali
 {
@@ -88,18 +90,9 @@ public:
 
   /**
    * Perform the upload of the buffer only when required
-   * @param graphicsController The controller
+   * @param[in] graphicsController The controller
    */
   bool Update(Graphics::Controller& graphicsController);
-
-  /**
-   * Enable the vertex attributes for each vertex buffer from the corresponding
-   * shader program.
-   * @param[in] context The GL context
-   * @param[in] vAttributeLocation Vector containing attributes location for current program
-   * @param[in] locationBase Index in vAttributeLocation corresponding to the first attribute defined by this buffer
-   */
-  uint32_t EnableVertexAttributes(Context& context, Vector<GLint>& vAttributeLocation, uint32_t locationBase);
 
   /**
    * Get the number of attributes present in the buffer

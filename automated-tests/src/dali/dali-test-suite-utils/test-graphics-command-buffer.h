@@ -19,10 +19,12 @@
 
 #include <dali/graphics-api/graphics-command-buffer-create-info.h>
 #include <dali/graphics-api/graphics-command-buffer.h>
+#include <dali/graphics-api/graphics-pipeline.h>
 #include <dali/graphics-api/graphics-types.h>
 #include <cstdint>
 #include <vector>
 #include "test-gl-abstraction.h"
+#include "test-graphics-pipeline.h"
 #include "test-trace-call-stack.h"
 
 namespace Dali
@@ -89,10 +91,53 @@ public:
   void SetViewportEnable(bool value);
 
 public:
-  TraceCallStack&    mCallStack;
-  TestGlAbstraction& mGlAbstraction;
+  TraceCallStack&                       mCallStack;
+  TestGlAbstraction&                    mGlAbstraction;
+  TestGraphicsPipeline*                 mPipeline{nullptr};
+  std::vector<Graphics::TextureBinding> mTextureBindings{};
 
-  std::vector<Graphics::TextureBinding> mTextureBindings;
+  struct VertexBuffersBinding
+  {
+    uint32_t                             firstBinding;
+    std::vector<const Graphics::Buffer*> buffers;
+    std::vector<uint32_t>                offsets;
+  };
+  VertexBuffersBinding mVertexBufferBindings{};
+
+  struct IndexBufferBinding
+  {
+    const Graphics::Buffer* buffer;
+    uint32_t                offset;
+    Graphics::Format        format;
+  };
+  IndexBufferBinding mIndexBufferBinding{};
+
+  struct Draw
+  {
+    enum class DrawType
+    {
+      Indexed,
+      Unindexed
+    } drawType;
+    union
+    {
+      struct IndexedDraw
+      {
+        uint32_t indexCount;
+        uint32_t instanceCount;
+        uint32_t firstIndex;
+        int32_t  vertexOffset;
+        uint32_t firstInstance;
+      } indexedDraw;
+      struct UnindexedDraw
+      {
+        uint32_t vertexCount;
+        uint32_t instanceCount;
+        uint32_t firstVertex;
+        uint32_t firstInstance;
+      } unindexedDraw;
+    } u;
+  } drawCommand;
 };
 
 } // namespace Dali

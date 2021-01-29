@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,8 +40,8 @@ TextureSet CreateTextureSet(Texture texture)
 VertexBuffer CreateVertexBuffer()
 {
   Property::Map texturedQuadVertexFormat;
-  texturedQuadVertexFormat["aPosition"]    = Property::VECTOR2;
-  texturedQuadVertexFormat["aVertexCoord"] = Property::VECTOR2;
+  texturedQuadVertexFormat["aPosition"] = Property::VECTOR2;
+  texturedQuadVertexFormat["aTexCoord"] = Property::VECTOR2;
 
   VertexBuffer vertexData = VertexBuffer::New(texturedQuadVertexFormat);
   return vertexData;

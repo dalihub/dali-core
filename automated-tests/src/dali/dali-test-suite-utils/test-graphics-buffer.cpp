@@ -15,8 +15,8 @@
  */
 
 #include "test-graphics-buffer.h"
-
 #include <sstream>
+#include "dali-test-suite-utils.h"
 
 namespace Dali
 {
@@ -53,8 +53,8 @@ void TestGraphicsBuffer::Upload(uint32_t offset, uint32_t size)
   std::ostringstream o;
   o << offset << ", " << size;
   TraceCallStack::NamedParams namedParams;
-  namedParams["offset"] = offset;
-  namedParams["size"]   = size;
+  namedParams["offset"] << offset;
+  namedParams["size"] << size;
   mCallStack.PushCall("Buffer::Upload", o.str(), namedParams);
   if(size <= memory.size() && mCreated)
   {

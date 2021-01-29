@@ -42,12 +42,102 @@ class TraceCallStack
 {
 public:
   /// Typedef for passing and storing named parameters
-  typedef std::map<std::string, std::string> NamedParams;
+  class NamedParams
+  {
+  public:
+    struct NameValue
+    {
+      std::string        parameterName;
+      std::ostringstream value;
+      NameValue(std::string pname, std::string aValue)
+      : parameterName(pname),
+        value(aValue)
+      {
+      }
+      NameValue(const NameValue& rhs)
+      : parameterName(rhs.parameterName),
+        value(rhs.value.str())
+      {
+      }
+      NameValue& operator=(const NameValue& rhs)
+      {
+        if(this != &rhs)
+        {
+          this->parameterName = rhs.parameterName;
+          this->value.str(rhs.value.str());
+        }
+        return *this;
+      }
+
+      bool operator==(const NameValue& rhs)
+      {
+        return !parameterName.compare(rhs.parameterName) && !value.str().compare(rhs.value.str());
+      }
+    };
+
+    auto find(const std::string& param) const
+    {
+      auto iter = mParams.begin();
+      for(; iter != mParams.end(); ++iter)
+      {
+        if(!iter->parameterName.compare(param))
+        {
+          break;
+        }
+      }
+      return iter;
+    }
+
+    auto begin() const
+    {
+      return mParams.begin();
+    }
+    auto end() const
+    {
+      return mParams.end();
+    }
+
+    std::ostringstream& operator[](std::string name)
+    {
+      auto iter = mParams.begin();
+      for(; iter != mParams.end(); ++iter)
+      {
+        if(!iter->parameterName.compare(name))
+        {
+          break;
+        }
+      }
+
+      if(iter != mParams.end())
+      {
+        return iter->value;
+      }
+      else
+      {
+        mParams.push_back(NameValue(name, ""));
+        return mParams.back().value;
+      }
+    }
+
+    std::string str() const
+    {
+      std::ostringstream out;
+      bool               first = true;
+      for(auto& elem : mParams)
+      {
+        out << (first ? "" : " ") << elem.parameterName << ": " << elem.value.str();
+        first = false;
+      }
+      return out.str();
+    }
+    std::vector<NameValue> mParams{};
+  };
 
   /**
    * Constructor
    */
-  TraceCallStack(std::string prefix = "");
+  TraceCallStack(std::string prefix = "gl");
+  TraceCallStack(bool logging, std::string prefix = "gl");
 
   /**
    * Destructor

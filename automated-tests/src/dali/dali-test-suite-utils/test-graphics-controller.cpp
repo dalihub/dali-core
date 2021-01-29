@@ -16,18 +16,42 @@
 
 #include "test-graphics-controller.h"
 
-#include "dali-test-suite-utils.h"
 #include "test-graphics-buffer.h"
 #include "test-graphics-command-buffer.h"
 #include "test-graphics-sampler.h"
 #include "test-graphics-texture.h"
 
 #include <dali/integration-api/gl-defines.h>
+#include <cstdio>
 #include <iostream>
 #include <sstream>
 
 namespace Dali
 {
+template<typename T>
+T* Uncast(const Graphics::CommandBuffer* object)
+{
+  return const_cast<T*>(static_cast<const T*>(object));
+}
+
+template<typename T>
+T* Uncast(const Graphics::Texture* object)
+{
+  return const_cast<T*>(static_cast<const T*>(object));
+}
+
+template<typename T>
+T* Uncast(const Graphics::Sampler* object)
+{
+  return const_cast<T*>(static_cast<const T*>(object));
+}
+
+template<typename T>
+T* Uncast(const Graphics::Buffer* object)
+{
+  return const_cast<T*>(static_cast<const T*>(object));
+}
+
 std::ostream& operator<<(std::ostream& o, const Graphics::BufferCreateInfo& bufferCreateInfo)
 {
   return o << "usage:" << std::hex << bufferCreateInfo.usage << ", size:" << std::dec << bufferCreateInfo.size;
@@ -161,7 +185,7 @@ public:
     if(offset > mMappedOffset + mMappedSize ||
        size + offset > mMappedOffset + mMappedSize)
     {
-      tet_infoline("TestGraphics.Memory::LockRegion() Out of bounds");
+      fprintf(stderr, "TestGraphics.Memory::LockRegion() Out of bounds");
       mBuffer.memory.resize(mMappedOffset + offset + size); // Grow to prevent memcpy from crashing
     }
     mLockedOffset = offset;
@@ -195,38 +219,127 @@ public:
 };
 
 TestGraphicsController::TestGraphicsController()
+: mCallStack(true, "TestGraphicsController."),
+  mCommandBufferCallStack(true, "TestCommandBuffer.")
 {
   mCallStack.Enable(true);
-  mCallStack.EnableLogging(true);
   mCommandBufferCallStack.Enable(true);
-  mCommandBufferCallStack.EnableLogging(true);
-  auto& trace = mGlAbstraction.GetTextureTrace();
+  auto& trace = mGl.GetTextureTrace();
   trace.Enable(true);
   trace.EnableLogging(true);
 }
 
+int GetNumComponents(Graphics::VertexInputFormat vertexFormat)
+{
+  switch(vertexFormat)
+  {
+    case Graphics::VertexInputFormat::UNDEFINED:
+    case Graphics::VertexInputFormat::FLOAT:
+    case Graphics::VertexInputFormat::INTEGER:
+      return 1;
+    case Graphics::VertexInputFormat::IVECTOR2:
+    case Graphics::VertexInputFormat::FVECTOR2:
+      return 2;
+    case Graphics::VertexInputFormat::IVECTOR3:
+    case Graphics::VertexInputFormat::FVECTOR3:
+      return 3;
+    case Graphics::VertexInputFormat::FVECTOR4:
+    case Graphics::VertexInputFormat::IVECTOR4:
+      return 4;
+  }
+  return 1;
+}
+
+GLint GetSize(Graphics::VertexInputFormat vertexFormat)
+{
+  switch(vertexFormat)
+  {
+    case Graphics::VertexInputFormat::UNDEFINED:
+      return 1u;
+    case Graphics::VertexInputFormat::INTEGER:
+    case Graphics::VertexInputFormat::IVECTOR2:
+    case Graphics::VertexInputFormat::IVECTOR3:
+    case Graphics::VertexInputFormat::IVECTOR4:
+      return 2u;
+    case Graphics::VertexInputFormat::FLOAT:
+    case Graphics::VertexInputFormat::FVECTOR2:
+    case Graphics::VertexInputFormat::FVECTOR3:
+    case Graphics::VertexInputFormat::FVECTOR4:
+      return 4u;
+  }
+  return 1u;
+}
+
+GLint GetGlType(Graphics::VertexInputFormat vertexFormat)
+{
+  switch(vertexFormat)
+  {
+    case Graphics::VertexInputFormat::UNDEFINED:
+      return GL_BYTE;
+    case Graphics::VertexInputFormat::INTEGER:
+    case Graphics::VertexInputFormat::IVECTOR2:
+    case Graphics::VertexInputFormat::IVECTOR3:
+    case Graphics::VertexInputFormat::IVECTOR4:
+      return GL_SHORT;
+    case Graphics::VertexInputFormat::FLOAT:
+    case Graphics::VertexInputFormat::FVECTOR2:
+    case Graphics::VertexInputFormat::FVECTOR3:
+    case Graphics::VertexInputFormat::FVECTOR4:
+      return GL_FLOAT;
+  }
+  return GL_BYTE;
+}
+
+GLenum GetTopology(Graphics::PrimitiveTopology topology)
+{
+  switch(topology)
+  {
+    case Graphics::PrimitiveTopology::POINT_LIST:
+      return GL_POINTS;
+
+    case Graphics::PrimitiveTopology::LINE_LIST:
+      return GL_LINES;
+
+    case Graphics::PrimitiveTopology::LINE_LOOP:
+      return GL_LINE_LOOP;
+
+    case Graphics::PrimitiveTopology::LINE_STRIP:
+      return GL_LINE_STRIP;
+
+    case Graphics::PrimitiveTopology::TRIANGLE_LIST:
+      return GL_TRIANGLES;
+
+    case Graphics::PrimitiveTopology::TRIANGLE_STRIP:
+      return GL_TRIANGLE_STRIP;
+
+    case Graphics::PrimitiveTopology::TRIANGLE_FAN:
+      return GL_TRIANGLE_FAN;
+  }
+  return GL_TRIANGLES;
+}
+
 void TestGraphicsController::SubmitCommandBuffers(const Graphics::SubmitInfo& submitInfo)
 {
-  std::ostringstream          out;
   TraceCallStack::NamedParams namedParams;
-  out << "cmdBuffer[" << submitInfo.cmdBuffer.size() << "], flags:" << std::hex << submitInfo.flags;
-  namedParams["submitInfo"] = out.str();
+  namedParams["submitInfo"] << "cmdBuffer[" << submitInfo.cmdBuffer.size()
+                            << "], flags:" << std::hex << submitInfo.flags;
 
   mCallStack.PushCall("Controller::SubmitCommandBuffers", "", namedParams);
 
-  for(auto& commandBuffer : submitInfo.cmdBuffer)
+  for(auto& graphicsCommandBuffer : submitInfo.cmdBuffer)
   {
-    for(auto& binding : (static_cast<TestGraphicsCommandBuffer*>(commandBuffer))->mTextureBindings)
+    auto commandBuffer = Uncast<TestGraphicsCommandBuffer>(graphicsCommandBuffer);
+    for(auto& binding : commandBuffer->mTextureBindings)
     {
       if(binding.texture)
       {
-        auto texture = const_cast<TestGraphicsTexture*>(static_cast<const TestGraphicsTexture*>(binding.texture));
+        auto texture = Uncast<TestGraphicsTexture>(binding.texture);
 
         texture->Bind(binding.binding);
 
         if(binding.sampler)
         {
-          auto sampler = const_cast<TestGraphicsSampler*>(static_cast<const TestGraphicsSampler*>(binding.sampler));
+          auto sampler = Uncast<TestGraphicsSampler>(binding.sampler);
           if(sampler)
           {
             sampler->Apply(texture->GetTarget());
@@ -235,6 +348,58 @@ void TestGraphicsController::SubmitCommandBuffers(const Graphics::SubmitInfo& su
 
         texture->Prepare(); // Ensure native texture is ready
       }
+    }
+
+    // IndexBuffer binding,
+    auto& indexBufferBinding = commandBuffer->mIndexBufferBinding;
+    if(indexBufferBinding.buffer)
+    {
+      auto buffer = Uncast<TestGraphicsBuffer>(indexBufferBinding.buffer);
+      buffer->Bind();
+    }
+
+    // VertexBuffer binding,
+    for(auto graphicsBuffer : commandBuffer->mVertexBufferBindings.buffers)
+    {
+      auto vertexBuffer = Uncast<TestGraphicsBuffer>(graphicsBuffer);
+      vertexBuffer->Bind();
+    }
+
+    // Pipeline attribute setup
+    auto& vi = commandBuffer->mPipeline->vertexInputState;
+    for(auto& attribute : vi.attributes)
+    {
+      mGl.EnableVertexAttribArray(attribute.location);
+      uint32_t attributeOffset = attribute.offset;
+      GLsizei  stride          = vi.bufferBindings[attribute.binding].stride;
+
+      mGl.VertexAttribPointer(attribute.location,
+                              GetNumComponents(attribute.format),
+                              GetGlType(attribute.format),
+                              GL_FALSE, // Not normalized
+                              stride,
+                              reinterpret_cast<void*>(attributeOffset));
+    }
+
+    // draw call
+    auto topology = commandBuffer->mPipeline->inputAssemblyState.topology;
+
+    if(commandBuffer->drawCommand.drawType == TestGraphicsCommandBuffer::Draw::DrawType::Indexed)
+    {
+      mGl.DrawElements(GetTopology(topology),
+                       static_cast<GLsizei>(commandBuffer->drawCommand.u.indexedDraw.indexCount),
+                       GL_UNSIGNED_SHORT,
+                       reinterpret_cast<void*>(commandBuffer->drawCommand.u.indexedDraw.firstIndex));
+    }
+    else
+    {
+      mGl.DrawArrays(GetTopology(topology), 0, commandBuffer->drawCommand.u.unindexedDraw.vertexCount);
+    }
+
+    // attribute clear
+    for(auto& attribute : vi.attributes)
+    {
+      mGl.DisableVertexAttribArray(attribute.location);
     }
   }
 }
@@ -245,10 +410,8 @@ void TestGraphicsController::SubmitCommandBuffers(const Graphics::SubmitInfo& su
  */
 void TestGraphicsController::PresentRenderTarget(Graphics::RenderTarget* renderTarget)
 {
-  std::ostringstream          out;
   TraceCallStack::NamedParams namedParams;
-  out << std::hex << renderTarget;
-  namedParams["renderTarget"] = out.str();
+  namedParams["renderTarget"] << std::hex << renderTarget;
   mCallStack.PushCall("Controller::PresentRenderTarget", "", namedParams);
 }
 
@@ -279,13 +442,9 @@ void TestGraphicsController::Resume()
 void TestGraphicsController::UpdateTextures(const std::vector<Graphics::TextureUpdateInfo>&       updateInfoList,
                                             const std::vector<Graphics::TextureUpdateSourceInfo>& sourceList)
 {
-  std::ostringstream          out;
   TraceCallStack::NamedParams namedParams;
-  out << "[" << updateInfoList.size() << "]:";
-  namedParams["updateInfoList"] = out.str();
-  out.str("");
-  out << "[" << sourceList.size() << "]:";
-  namedParams["sourceList"] = out.str();
+  namedParams["updateInfoList"] << "[" << updateInfoList.size() << "]:";
+  namedParams["sourceList"] << "[" << sourceList.size() << "]:";
 
   mCallStack.PushCall("Controller::UpdateTextures", "", namedParams);
 
@@ -304,18 +463,16 @@ void TestGraphicsController::UpdateTextures(const std::vector<Graphics::TextureU
 bool TestGraphicsController::EnableDepthStencilBuffer(bool enableDepth, bool enableStencil)
 {
   TraceCallStack::NamedParams namedParams;
-  namedParams["enableDepth"]   = enableDepth ? "T" : "F";
-  namedParams["enableStencil"] = enableStencil ? "T" : "F";
+  namedParams["enableDepth"] << (enableDepth ? "T" : "F");
+  namedParams["enableStencil"] << (enableStencil ? "T" : "F");
   mCallStack.PushCall("Controller::EnableDepthStencilBuffer", "", namedParams);
   return false;
 }
 
 void TestGraphicsController::RunGarbageCollector(size_t numberOfDiscardedRenderers)
 {
-  std::ostringstream out;
-  out << numberOfDiscardedRenderers;
   TraceCallStack::NamedParams namedParams;
-  namedParams["numberOfDiscardedrenderers"] = out.str();
+  namedParams["numberOfDiscardedRenderers"] << numberOfDiscardedRenderers;
   mCallStack.PushCall("Controller::RunGarbageCollector", "", namedParams);
 }
 
@@ -346,7 +503,7 @@ Graphics::UniquePtr<Graphics::Buffer> TestGraphicsController::CreateBuffer(const
   std::ostringstream oss;
   oss << "bufferCreateInfo:" << createInfo;
   mCallStack.PushCall("Controller::CreateBuffer", oss.str());
-  return Graphics::MakeUnique<TestGraphicsBuffer>(mCallStack, mGlAbstraction, createInfo.size, createInfo.usage);
+  return Graphics::MakeUnique<TestGraphicsBuffer>(mCallStack, mGl, createInfo.size, createInfo.usage);
 }
 
 Graphics::UniquePtr<Graphics::CommandBuffer> TestGraphicsController::CreateCommandBuffer(const Graphics::CommandBufferCreateInfo& commandBufferCreateInfo, Graphics::UniquePtr<Graphics::CommandBuffer>&& oldCommandBuffer)
@@ -354,7 +511,7 @@ Graphics::UniquePtr<Graphics::CommandBuffer> TestGraphicsController::CreateComma
   std::ostringstream oss;
   oss << "commandBufferCreateInfo:" << commandBufferCreateInfo;
   mCallStack.PushCall("Controller::CreateCommandBuffer", oss.str());
-  return Graphics::MakeUnique<TestGraphicsCommandBuffer>(mCommandBufferCallStack, mGlAbstraction);
+  return Graphics::MakeUnique<TestGraphicsCommandBuffer>(mCommandBufferCallStack, mGl);
 }
 
 Graphics::UniquePtr<Graphics::RenderPass> TestGraphicsController::CreateRenderPass(const Graphics::RenderPassCreateInfo& renderPassCreateInfo, Graphics::UniquePtr<Graphics::RenderPass>&& oldRenderPass)
@@ -365,14 +522,11 @@ Graphics::UniquePtr<Graphics::RenderPass> TestGraphicsController::CreateRenderPa
 
 Graphics::UniquePtr<Graphics::Texture> TestGraphicsController::CreateTexture(const Graphics::TextureCreateInfo& textureCreateInfo, Graphics::UniquePtr<Graphics::Texture>&& oldTexture)
 {
-  std::ostringstream params, oss;
-  params << "textureCreateInfo:" << textureCreateInfo;
   TraceCallStack::NamedParams namedParams;
-  oss << textureCreateInfo;
-  namedParams["textureCreateInfo"] = oss.str();
-  mCallStack.PushCall("Controller::CreateTexture", params.str(), namedParams);
+  namedParams["textureCreateInfo"] << textureCreateInfo;
+  mCallStack.PushCall("Controller::CreateTexture", namedParams.str(), namedParams);
 
-  return Graphics::MakeUnique<TestGraphicsTexture>(mGlAbstraction, textureCreateInfo);
+  return Graphics::MakeUnique<TestGraphicsTexture>(mGl, textureCreateInfo);
 }
 
 Graphics::UniquePtr<Graphics::Framebuffer> TestGraphicsController::CreateFramebuffer(const Graphics::FramebufferCreateInfo& framebufferCreateInfo, Graphics::UniquePtr<Graphics::Framebuffer>&& oldFramebuffer)
@@ -384,7 +538,7 @@ Graphics::UniquePtr<Graphics::Framebuffer> TestGraphicsController::CreateFramebu
 Graphics::UniquePtr<Graphics::Pipeline> TestGraphicsController::CreatePipeline(const Graphics::PipelineCreateInfo& pipelineCreateInfo, Graphics::UniquePtr<Graphics::Pipeline>&& oldPipeline)
 {
   mCallStack.PushCall("Controller::CreatePipeline", "");
-  return nullptr;
+  return std::make_unique<TestGraphicsPipeline>(mGl, pipelineCreateInfo);
 }
 
 Graphics::UniquePtr<Graphics::Shader> TestGraphicsController::CreateShader(const Graphics::ShaderCreateInfo& shaderCreateInfo, Graphics::UniquePtr<Graphics::Shader>&& oldShader)
@@ -395,14 +549,11 @@ Graphics::UniquePtr<Graphics::Shader> TestGraphicsController::CreateShader(const
 
 Graphics::UniquePtr<Graphics::Sampler> TestGraphicsController::CreateSampler(const Graphics::SamplerCreateInfo& samplerCreateInfo, Graphics::UniquePtr<Graphics::Sampler>&& oldSampler)
 {
-  std::ostringstream params, oss;
-  params << "samplerCreateInfo:" << samplerCreateInfo;
   TraceCallStack::NamedParams namedParams;
-  oss << samplerCreateInfo;
-  namedParams["samplerCreateInfo"] = oss.str();
-  mCallStack.PushCall("Controller::CreateSampler", params.str(), namedParams);
+  namedParams["samplerCreateInfo"] << samplerCreateInfo;
+  mCallStack.PushCall("Controller::CreateSampler", namedParams.str(), namedParams);
 
-  return Graphics::MakeUnique<TestGraphicsSampler>(mGlAbstraction, samplerCreateInfo);
+  return Graphics::MakeUnique<TestGraphicsSampler>(mGl, samplerCreateInfo);
 }
 
 Graphics::UniquePtr<Graphics::RenderTarget> TestGraphicsController::CreateRenderTarget(const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo, Graphics::UniquePtr<Graphics::RenderTarget>&& oldRenderTarget)
