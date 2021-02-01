@@ -1501,22 +1501,40 @@ int UtcDaliTouchEventClippedActor(void)
   TouchEventFunctor functor(data);
   actor.TouchedSignal().Connect(&application, functor);
 
-  // Emit an event within clipped area - no hit.
+  // Emit an event within clipped area - we should have a hit.
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Emit an event within clipped child area - we should still have a hit.
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(40.0f, 40.0f)));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Now connect to the clippingChild's touch signal
+  SignalData        clippingChildData;
+  TouchEventFunctor clippingChildFunctor(clippingChildData);
+  clippingChild.TouchedSignal().Connect(&application, clippingChildFunctor);
+
+  // Emit an event within clipped child area - no hit on actor, but hit on clipped child.
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(40.0f, 40.0f)));
+  DALI_TEST_EQUALS(true, clippingChildData.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   data.Reset();
+  clippingChildData.Reset();
 
   // Emit an event outside the clipped area but within the actor area, we should have a hit.
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(60.0f, 60.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
+  clippingChildData.Reset();
 
-  clippingChild.TouchedSignal().Connect(&application, functor);
-
-  // Emit an event inside part of the child which is within the clipped area, we should have a hit.
+  // Emit an event inside part of the child which is within the clipped area, we should have a hit on the clipped child but not the actor.
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(30.0f, 30.0f)));
-  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, clippingChildData.functorCalled, TEST_LOCATION);
   data.Reset();
+  clippingChildData.Reset();
 
   END_TEST;
 }

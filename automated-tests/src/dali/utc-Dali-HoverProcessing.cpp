@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1261,9 +1261,9 @@ int UtcDaliHoverClippingActor(void)
   HoverEventFunctor functor(data);
   actor.HoveredSignal().Connect(&application, functor);
 
-  // Emit an event within clipped area - no hit.
+  // Emit an event within clipped area - we should have a hit.
   application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(10.0f, 10.0f)));
-  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
 
   // Emit an event outside the clipped area but within the actor area, we should have a hit.
