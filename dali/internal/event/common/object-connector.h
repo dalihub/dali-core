@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_OBJECT_CONNECTOR_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 /**
  * @brief Wrapper class which helps managing intrusive pointer assignments and Connect / Disconnect.
  *
@@ -51,15 +49,15 @@ public:
   /**
    * @brief Copy constructor
    */
-  ObjectConnector( const ObjectConnector& connector )
-  : mObject( connector.mObject )
+  ObjectConnector(const ObjectConnector& connector)
+  : mObject(connector.mObject)
   {
   }
 
   /**
    * @brief Assignment operator
    */
-  ObjectConnector& operator=( const ObjectConnector& connector )
+  ObjectConnector& operator=(const ObjectConnector& connector)
   {
     this->mObject = connector.mObject;
     return *this;
@@ -79,12 +77,12 @@ public:
    * @param [in] object smart pointer to a object
    * @param [in] onScene whether the object is used on stage or not
    */
-  void Set( Object& object, bool onScene )
+  void Set(Object& object, bool onScene)
   {
-    if ( mObject.Get() != &object )
+    if(mObject.Get() != &object)
     {
       // Disconnect from old object
-      if ( mObject && onScene )
+      if(mObject && onScene)
       {
         mObject->Disconnect();
       }
@@ -92,7 +90,7 @@ public:
       mObject = &object;
 
       // Connect to new object
-      if ( mObject && onScene )
+      if(mObject && onScene)
       {
         mObject->Connect();
       }
@@ -106,7 +104,7 @@ public:
    */
   void OnSceneConnect()
   {
-    if ( mObject )
+    if(mObject)
     {
       mObject->Connect();
     }
@@ -119,15 +117,14 @@ public:
    */
   void OnSceneDisconnect()
   {
-    if ( mObject )
+    if(mObject)
     {
       mObject->Disconnect();
     }
   }
 
-private: //data
-  ObjectPtr mObject;  ///< intrusive pointer to the Object. ObjectConnector owns this.
-
+private:             //data
+  ObjectPtr mObject; ///< intrusive pointer to the Object. ObjectConnector owns this.
 };
 
 } // namespace Internal

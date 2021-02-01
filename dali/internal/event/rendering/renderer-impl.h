@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDERER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,16 +19,16 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h> // DALI_ASSERT_ALWAYS
-#include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
-#include <dali/public-api/rendering/renderer.h> // Dali::Renderer
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/internal/common/blending-options.h>
-#include <dali/internal/event/common/object-connector.h> // Dali::Internal::ObjectConnector
-#include <dali/internal/event/common/object-impl.h> // Dali::Internal::Object
+#include <dali/internal/event/common/object-connector.h>    // Dali::Internal::ObjectConnector
+#include <dali/internal/event/common/object-impl.h>         // Dali::Internal::Object
+#include <dali/internal/event/rendering/geometry-impl.h>    // Dali::Internal::Geometry
 #include <dali/internal/event/rendering/texture-set-impl.h> // Dali::Internal::TextureSet
-#include <dali/internal/event/rendering/geometry-impl.h> // Dali::Internal::Geometry
 #include <dali/internal/render/renderers/render-renderer.h> // Dali::Render::Renderer::StencilParameters
+#include <dali/public-api/common/dali-common.h>             // DALI_ASSERT_ALWAYS
+#include <dali/public-api/common/intrusive-ptr.h>           // Dali::IntrusivePtr
+#include <dali/public-api/rendering/renderer.h>             // Dali::Renderer
 
 namespace Dali
 {
@@ -48,7 +48,6 @@ using RendererPtr = IntrusivePtr<Renderer>;
 class Renderer : public Object
 {
 public:
-
   /**
    * Create a new Renderer.
    * @return A smart-pointer to the newly allocated Renderer.
@@ -58,7 +57,7 @@ public:
   /**
    * @copydoc Dali::Renderer::SetGeometry()
    */
-  void SetGeometry( Geometry& geometry );
+  void SetGeometry(Geometry& geometry);
 
   /**
    * @copydoc Dali::Renderer::GetGeometry()
@@ -68,7 +67,7 @@ public:
   /**
    * @copydoc Dali::Renderer::SetTextures()
    */
-  void SetTextures( TextureSet& textureSet );
+  void SetTextures(TextureSet& textureSet);
 
   /**
    * @copydoc Dali::Renderer::GetTextures()
@@ -78,7 +77,7 @@ public:
   /**
    * @copydoc Dali::Renderer::SetShader()
    */
-  void SetShader( Shader& shader );
+  void SetShader(Shader& shader);
 
   /**
    * @copydoc Dali::Renderer::GetShader()
@@ -88,7 +87,7 @@ public:
   /**
    * @copydoc Dali::Renderer::SetDepthIndex()
    */
-  void SetDepthIndex( int32_t depthIndex );
+  void SetDepthIndex(int32_t depthIndex);
 
   /**
    * @copydoc Dali::Renderer::GetDepthIndex()
@@ -98,7 +97,7 @@ public:
   /**
    * @copydoc Dali::Renderer::SetBlendMode()
    */
-  void SetBlendMode( BlendMode::Type mode );
+  void SetBlendMode(BlendMode::Type mode);
 
   /**
    * @copydoc Dali::Renderer::GetBlendMode()
@@ -108,51 +107,49 @@ public:
   /**
    * @copydoc Dali::Renderer::SetBlendFunc()
    */
-  void SetBlendFunc( BlendFactor::Type srcFactorRgba, BlendFactor::Type destFactorRgba );
+  void SetBlendFunc(BlendFactor::Type srcFactorRgba, BlendFactor::Type destFactorRgba);
 
   /**
    * @copydoc Dali::Renderer::SetBlendFunc()
    */
-  void SetBlendFunc( BlendFactor::Type srcFactorRgb,   BlendFactor::Type destFactorRgb,
-                     BlendFactor::Type srcFactorAlpha, BlendFactor::Type destFactorAlpha );
+  void SetBlendFunc(BlendFactor::Type srcFactorRgb, BlendFactor::Type destFactorRgb, BlendFactor::Type srcFactorAlpha, BlendFactor::Type destFactorAlpha);
 
   /**
    * @copydoc Dali::Renderer::GetBlendFunc()
    */
-  void GetBlendFunc( BlendFactor::Type& srcFactorRgb,   BlendFactor::Type& destFactorRgb,
-                    BlendFactor::Type& srcFactorAlpha, BlendFactor::Type& destFactorAlpha ) const;
+  void GetBlendFunc(BlendFactor::Type& srcFactorRgb, BlendFactor::Type& destFactorRgb, BlendFactor::Type& srcFactorAlpha, BlendFactor::Type& destFactorAlpha) const;
 
   /**
    * @brief Set same Blend Equation for the RGB and alpha
    */
-  void SetBlendEquation( DevelBlendEquation::Type equationRgba );
+  void SetBlendEquation(DevelBlendEquation::Type equationRgba);
 
   /**
    * @brief Set Blend Equation separately for the RGB and alpha
    */
-  void SetBlendEquation( DevelBlendEquation::Type equationRgb, DevelBlendEquation::Type equationAlpha );
+  void SetBlendEquation(DevelBlendEquation::Type equationRgb, DevelBlendEquation::Type equationAlpha);
 
   /**
    * @brief Get Blend Equation of rgb and alpha
    */
-  void GetBlendEquation( DevelBlendEquation::Type& equationRgb, DevelBlendEquation::Type& equationAlpha ) const;
+  void GetBlendEquation(DevelBlendEquation::Type& equationRgb, DevelBlendEquation::Type& equationAlpha) const;
 
   /**
    * @copydoc Dali::Renderer::SetIndexedDrawFirstElement
    */
-  void SetIndexedDrawFirstElement( uint32_t firstElement );
+  void SetIndexedDrawFirstElement(uint32_t firstElement);
 
   /**
    * @copydoc Dali::Renderer::SetIndexedDrawElementsCount
    */
-  void SetIndexedDrawElementsCount( uint32_t elementsCount );
+  void SetIndexedDrawElementsCount(uint32_t elementsCount);
 
   /**
    * @brief Set whether the Pre-multiplied Alpha Blending is required
    *
    * @param[in] preMultipled whether alpha is pre-multiplied.
    */
-  void EnablePreMultipliedAlpha( bool preMultipled );
+  void EnablePreMultipliedAlpha(bool preMultipled);
 
   /**
    * @brief Query whether alpha is pre-multiplied.
@@ -176,7 +173,6 @@ public:
   const SceneGraph::Renderer& GetRendererSceneObject() const;
 
 public: // Default property extensions from Object
-
   /**
    * @copydoc Dali::Internal::Object::SetDefaultProperty()
    */
@@ -185,27 +181,27 @@ public: // Default property extensions from Object
   /**
    * @copydoc Dali::Internal::Object::GetDefaultProperty()
    */
-  Property::Value GetDefaultProperty( Property::Index index ) const override;
+  Property::Value GetDefaultProperty(Property::Index index) const override;
 
   /**
    * @copydoc Dali::Internal::Object::GetDefaultPropertyCurrentValue()
    */
-  Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const override;
+  Property::Value GetDefaultPropertyCurrentValue(Property::Index index) const override;
 
-   /**
+  /**
     * @copydoc Dali::Internal::Object::OnNotifyDefaultPropertyAnimation()
     */
-   void OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType ) override;
+  void OnNotifyDefaultPropertyAnimation(Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType) override;
 
   /**
    * @copydoc Dali::Internal::Object::GetSceneObjectAnimatableProperty()
    */
-  const SceneGraph::PropertyBase* GetSceneObjectAnimatableProperty( Property::Index index ) const override;
+  const SceneGraph::PropertyBase* GetSceneObjectAnimatableProperty(Property::Index index) const override;
 
   /**
    * @copydoc Dali::Internal::Object::GetSceneObjectInputProperty()
    */
-  const PropertyInputImpl* GetSceneObjectInputProperty( Property::Index index ) const override;
+  const PropertyInputImpl* GetSceneObjectInputProperty(Property::Index index) const override;
 
   /**
    * @brief Adds a draw command to the Renderer.
@@ -213,22 +209,21 @@ public: // Default property extensions from Object
    *
    * @param[in] command Valid reference to a DrawCommand objects
    */
-  void AddDrawCommand( const Dali::DevelRenderer::DrawCommand& command );
+  void AddDrawCommand(const Dali::DevelRenderer::DrawCommand& command);
 
 private: // implementation
-
   /**
    * @brief Constructor.
    *
    * @param sceneObject the scene graph renderer
    */
-  Renderer( const SceneGraph::Renderer* sceneObject );
+  Renderer(const SceneGraph::Renderer* sceneObject);
 
   /**
    * @brief Sets the blend color.
    * @param[in] blendColor The blend color to set.
    */
-  void SetBlendColor( const Vector4& blendColor );
+  void SetBlendColor(const Vector4& blendColor);
 
   /**
    * @brief Retrieves the blend-color.
@@ -242,7 +237,7 @@ private: // implementation
    * @param[out] value  Is set with the cached value of the property if found.
    * @return True if value set, false otherwise.
    */
-  bool GetCachedPropertyValue( Property::Index index, Property::Value& value ) const;
+  bool GetCachedPropertyValue(Property::Index index, Property::Value& value) const;
 
   /**
    * @brief Retrieves the current value of a default property from the scene-graph.
@@ -250,7 +245,7 @@ private: // implementation
    * @param[out] value  Is set with the current scene-graph value of the property
    * @return True if value set, false otherwise.
    */
-  bool GetCurrentPropertyValue( Property::Index index, Property::Value& value  ) const;
+  bool GetCurrentPropertyValue(Property::Index index, Property::Value& value) const;
 
 protected:
   /**
@@ -259,39 +254,38 @@ protected:
   ~Renderer() override;
 
 private: // unimplemented methods
-  Renderer( const Renderer& );
-  Renderer& operator=( const Renderer& );
+  Renderer(const Renderer&);
+  Renderer& operator=(const Renderer&);
 
-private: // data
+private:                     // data
+  GeometryPtr   mGeometry;   ///< Intrusive pointer to the geometry used by this renderer
+  TextureSetPtr mTextureSet; ///< Intrusive pointer to the texture set used by this renderer
+  ShaderPtr     mShader;     ///< Intrusive pointer to the shader used by this renderer
 
-  GeometryPtr                         mGeometry;                   ///< Intrusive pointer to the geometry used by this renderer
-  TextureSetPtr                       mTextureSet;                 ///< Intrusive pointer to the texture set used by this renderer
-  ShaderPtr                           mShader;                     ///< Intrusive pointer to the shader used by this renderer
+  int32_t mDepthIndex;
 
-  int32_t                             mDepthIndex;
+  uint32_t mIndexedDrawFirstElement; ///< Offset of first element to draw from bound index buffer
+  uint32_t mIndexedDrawElementCount; ///< Number of elements to draw
 
-  uint32_t                            mIndexedDrawFirstElement;    ///< Offset of first element to draw from bound index buffer
-  uint32_t                            mIndexedDrawElementCount;    ///< Number of elements to draw
+  Render::Renderer::StencilParameters mStencilParameters; ///< Struct containing all stencil related options
+  BlendingOptions                     mBlendingOptions;   ///< Local copy of blending options bitmask
 
-  Render::Renderer::StencilParameters mStencilParameters;          ///< Struct containing all stencil related options
-  BlendingOptions                     mBlendingOptions;            ///< Local copy of blending options bitmask
+  float                          mOpacity;                      ///< Local copy of the opacity
+  DepthFunction::Type            mDepthFunction : 4;            ///< Local copy of the depth function
+  FaceCullingMode::Type          mFaceCullingMode : 3;          ///< Local copy of the mode of face culling
+  BlendMode::Type                mBlendMode : 3;                ///< Local copy of the mode of blending
+  DepthWriteMode::Type           mDepthWriteMode : 3;           ///< Local copy of the depth write mode
+  DepthTestMode::Type            mDepthTestMode : 3;            ///< Local copy of the depth test mode
+  DevelRenderer::Rendering::Type mRenderingBehavior : 2;        ///< The rendering behavior
+  bool                           mPremultipledAlphaEnabled : 1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 
-  float                               mOpacity;                    ///< Local copy of the opacity
-  DepthFunction::Type                 mDepthFunction:4;            ///< Local copy of the depth function
-  FaceCullingMode::Type               mFaceCullingMode:3;          ///< Local copy of the mode of face culling
-  BlendMode::Type                     mBlendMode:3;                ///< Local copy of the mode of blending
-  DepthWriteMode::Type                mDepthWriteMode:3;           ///< Local copy of the depth write mode
-  DepthTestMode::Type                 mDepthTestMode:3;            ///< Local copy of the depth test mode
-  DevelRenderer::Rendering::Type      mRenderingBehavior:2;        ///< The rendering behavior
-  bool                                mPremultipledAlphaEnabled:1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
-
-  std::vector<Dali::DevelRenderer::DrawCommand> mDrawCommands;     ///< list of draw commands
+  std::vector<Dali::DevelRenderer::DrawCommand> mDrawCommands; ///< list of draw commands
 };
 
 } // namespace Internal
 
 // Helpers for public-api forwarding methods
-inline Internal::Renderer& GetImplementation( Dali::Renderer& handle )
+inline Internal::Renderer& GetImplementation(Dali::Renderer& handle)
 {
   DALI_ASSERT_ALWAYS(handle && "Renderer handle is empty");
 
@@ -300,7 +294,7 @@ inline Internal::Renderer& GetImplementation( Dali::Renderer& handle )
   return static_cast<Internal::Renderer&>(object);
 }
 
-inline const Internal::Renderer& GetImplementation( const Dali::Renderer& handle )
+inline const Internal::Renderer& GetImplementation(const Dali::Renderer& handle)
 {
   DALI_ASSERT_ALWAYS(handle && "Renderer handle is empty");
 

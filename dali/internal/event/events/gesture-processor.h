@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_GESTURE_PROCESSOR_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,32 +19,29 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/events/gesture-detector-impl.h>
-#include <dali/internal/event/events/hit-test-algorithm-impl.h>
-#include <dali/internal/event/events/gesture-recognizer.h>
 #include <dali/internal/event/common/object-impl.h>
+#include <dali/internal/event/events/gesture-detector-impl.h>
+#include <dali/internal/event/events/gesture-recognizer.h>
+#include <dali/internal/event/events/hit-test-algorithm-impl.h>
 
 namespace Dali
 {
-
 class Actor;
 
 namespace Internal
 {
-
 /**
  * Base class for the different Gesture Processors.
  */
 class GestureProcessor : public Object::Observer
 {
 public:
-
   /**
    * Process the touch event in the attached recognizer
    * @param[in] scene Scene.
    * @param[in] event Touch event to process
    */
-  void ProcessTouch( Scene& scene, const Integration::TouchEvent& event );
+  void ProcessTouch(Scene& scene, const Integration::TouchEvent& event);
 
   /**
    * Returns whether any GestureDetector requires a Core::Update
@@ -53,18 +50,17 @@ public:
   inline bool NeedsUpdate()
   {
     bool updateRequired = mNeedsUpdate;
-    mNeedsUpdate = false;
+    mNeedsUpdate        = false;
     return updateRequired;
   }
 
 protected:
-
   // Construction & Destruction
 
   /**
    * Protected constructor.  Cannot create an instance of GestureProcessor
    */
-  GestureProcessor( GestureType::Value type );
+  GestureProcessor(GestureType::Value type);
 
   /**
    * Virtual protected destructor.
@@ -82,7 +78,7 @@ protected:
    * @note Uses CheckGestureDetector() to check if a the current gesture matches the criteria the gesture detector requires.
    * @pre gestureDetectors should be empty.
    */
-  void GetGesturedActor( Actor*& actor, GestureDetectorContainer& gestureDetectors );
+  void GetGesturedActor(Actor*& actor, GestureDetectorContainer& gestureDetectors);
 
   /**
    * Calls the emission method in the deriving class for matching gesture-detectors with the hit-actor (or one of its parents).
@@ -93,7 +89,7 @@ protected:
    *       and EmitGestureSignal() to emit the signal.
    * @pre Hit Testing should already be done.
    */
-  void ProcessAndEmit( HitTestAlgorithm::Results& hitTestResults );
+  void ProcessAndEmit(HitTestAlgorithm::Results& hitTestResults);
 
   /**
    * Hit test the screen coordinates, and place the results in hitTestResults.
@@ -102,13 +98,13 @@ protected:
    * @param[out] hitTestResults Structure to write results into.
    * @return false if the system overlay was hit or no actor was hit.
    */
-  virtual bool HitTest( Scene& scene, Vector2 screenCoordinates, HitTestAlgorithm::Results& hitTestResults);
+  virtual bool HitTest(Scene& scene, Vector2 screenCoordinates, HitTestAlgorithm::Results& hitTestResults);
 
   /**
    * Sets the mCurrentGesturedActor and connects to the required signals.
    * @actor  actor  The actor so set.
    */
-  void SetActor( Actor* actor );
+  void SetActor(Actor* actor);
 
   /**
    * Resets the set actor and disconnects any connected signals.
@@ -123,7 +119,6 @@ protected:
   Actor* GetCurrentGesturedActor();
 
 private:
-
   // For derived classes to override
 
   /**
@@ -140,7 +135,7 @@ private:
    *
    * @return true, if the detector meets the parameters, false otherwise.
    */
-  virtual bool CheckGestureDetector( GestureDetector* detector, Actor* actor ) = 0;
+  virtual bool CheckGestureDetector(GestureDetector* detector, Actor* actor) = 0;
 
   /**
    * Called by the ProcessAndEmit() method when the gesture meets all applicable criteria and
@@ -151,12 +146,12 @@ private:
    * @param[in]  gestureDetectors  The detectors that should emit the signal.
    * @param[in]  actorCoordinates  The local actor coordinates where the gesture took place.
    */
-  virtual void EmitGestureSignal( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates ) = 0;
+  virtual void EmitGestureSignal(Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates) = 0;
 
   // Undefined
 
-  GestureProcessor( const GestureProcessor& );
-  GestureProcessor& operator=( const GestureProcessor& );
+  GestureProcessor(const GestureProcessor&);
+  GestureProcessor& operator=(const GestureProcessor&);
 
   // SceneObject overrides
 
@@ -165,7 +160,9 @@ private:
    * @param[in] object The object object.
    * @see Object::Observer::SceneObjectAdded()
    */
-  void SceneObjectAdded(Object& object) override { }
+  void SceneObjectAdded(Object& object) override
+  {
+  }
 
   /**
    * This will be called when the actor is removed from the stage, we should clear and stop
@@ -182,17 +179,14 @@ private:
    */
   void ObjectDestroyed(Object& object) override;
 
+protected:                                 //Data
+  GestureRecognizerPtr mGestureRecognizer; ///< The gesture recognizer
+  bool                 mNeedsUpdate;       ///< Indicates if any GestureDetector requires a Core::Update
 
-protected:  //Data
-
-  GestureRecognizerPtr mGestureRecognizer;  ///< The gesture recognizer
-  bool   mNeedsUpdate;                 ///< Indicates if any GestureDetector requires a Core::Update
-
-private: // Data
-
-  GestureType::Value mType;            ///< Type of GestureProcessor
-  Actor* mCurrentGesturedActor;        ///< The current actor that has been gestured.
-  bool   mGesturedActorDisconnected:1; ///< Indicates whether the gestured actor has been disconnected from the scene
+private:                                             // Data
+  GestureType::Value mType;                          ///< Type of GestureProcessor
+  Actor*             mCurrentGesturedActor;          ///< The current actor that has been gestured.
+  bool               mGesturedActorDisconnected : 1; ///< Indicates whether the gestured actor has been disconnected from the scene
 };
 
 } // namespace Internal

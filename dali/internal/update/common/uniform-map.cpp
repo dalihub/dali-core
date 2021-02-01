@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,29 +25,28 @@ namespace Internal
 {
 namespace SceneGraph
 {
-
-void UniformMap::AddObserver( Observer& observer )
+void UniformMap::AddObserver(Observer& observer)
 {
   bool foundObserver = false;
-  for( ObserversIter iter = mObservers.Begin(); iter != mObservers.End(); ++iter )
+  for(ObserversIter iter = mObservers.Begin(); iter != mObservers.End(); ++iter)
   {
-    if( *iter == &observer )
+    if(*iter == &observer)
     {
       foundObserver = true;
       break;
     }
   }
-  if( !foundObserver )
+  if(!foundObserver)
   {
-    mObservers.PushBack( &observer );
+    mObservers.PushBack(&observer);
   }
 }
 
-void UniformMap::RemoveObserver( Observer& observer )
+void UniformMap::RemoveObserver(Observer& observer)
 {
-  for( ObserversIter iter = mObservers.Begin(); iter != mObservers.End(); ++iter )
+  for(ObserversIter iter = mObservers.Begin(); iter != mObservers.End(); ++iter)
   {
-    if( *iter == &observer )
+    if(*iter == &observer)
     {
       mObservers.Erase(iter);
       return;
@@ -57,10 +56,10 @@ void UniformMap::RemoveObserver( Observer& observer )
 
 void UniformMap::MappingChanged()
 {
-  for( ObserversIter iter = mObservers.Begin(); iter != mObservers.End(); ++iter )
+  for(ObserversIter iter = mObservers.Begin(); iter != mObservers.End(); ++iter)
   {
     Observer* observer = (*iter);
-    observer->UniformMappingsChanged( *this );
+    observer->UniformMappingsChanged(*this);
   }
 }
 
@@ -84,7 +83,7 @@ void UniformMap::Add(UniformPropertyMapping newMap)
   MappingChanged();
 }
 
-void UniformMap::Remove( ConstString uniformName )
+void UniformMap::Remove(ConstString uniformName)
 {
   auto iter = std::find_if(mUniformMaps.Begin(),
                            mUniformMaps.End(),
@@ -108,14 +107,14 @@ const PropertyInputImpl* UniformMap::Find(ConstString uniformName)
 
 UniformMap::SizeType UniformMap::Count() const
 {
-  return static_cast<UniformMap::SizeType>( mUniformMaps.Count() );
+  return static_cast<UniformMap::SizeType>(mUniformMaps.Count());
 }
 
-const UniformPropertyMapping& UniformMap::operator[]( UniformMap::SizeType index ) const
+const UniformPropertyMapping& UniformMap::operator[](UniformMap::SizeType index) const
 {
   return mUniformMaps[index];
 }
 
-} // SceneGraph
-} // Internal
-} // Dali
+} // namespace SceneGraph
+} // namespace Internal
+} // namespace Dali

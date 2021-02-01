@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,12 @@
 #include <dali/internal/update/queue/update-message-queue.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/integration-api/render-controller.h>
-#include <dali/internal/common/message.h>
 #include <dali/internal/common/message-buffer.h>
+#include <dali/internal/common/message.h>
 #include <dali/internal/render/common/performance-monitor.h>
+#include <dali/public-api/common/vector-wrapper.h>
 
 using std::vector;
 
@@ -33,21 +33,18 @@ using Dali::Internal::SceneGraph::SceneGraphBuffers;
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace // unnamed namespace
 {
-
 // A message to set Actor::SIZE is 72 bytes on 32bit device
 // A buffer of size 32768 would store (32768 - 4) / (72 + 4) = 431 of those messages
-static const std::size_t INITIAL_BUFFER_SIZE =  32768;
-static const std::size_t MAX_BUFFER_CAPACITY = 73728; // Avoid keeping buffers which exceed this
-static const std::size_t MAX_FREE_BUFFER_COUNT = 3; // Allow this number of buffers to be recycled
+static const std::size_t INITIAL_BUFFER_SIZE   = 32768;
+static const std::size_t MAX_BUFFER_CAPACITY   = 73728; // Avoid keeping buffers which exceed this
+static const std::size_t MAX_FREE_BUFFER_COUNT = 3;     // Allow this number of buffers to be recycled
 
 // A queue of message buffers
-typedef vector< MessageBuffer* > MessageBufferQueue;
+typedef vector<MessageBuffer*> MessageBufferQueue;
 using MessageBufferIter = MessageBufferQueue::iterator;
 
 using MessageQueueMutex = Dali::Mutex;
@@ -56,19 +53,18 @@ using MessageQueueMutex = Dali::Mutex;
 
 namespace Update
 {
-
 /**
  * Private MessageQueue data
  */
 struct MessageQueue::Impl
 {
-  Impl( RenderController& controller, const SceneGraphBuffers& buffers )
+  Impl(RenderController& controller, const SceneGraphBuffers& buffers)
   : renderController(controller),
     sceneGraphBuffers(buffers),
     processingEvents(false),
     queueWasEmpty(true),
-    sceneUpdateFlag( false ),
-    sceneUpdate( 0 ),
+    sceneUpdateFlag(false),
+    sceneUpdate(0),
     currentMessageBuffer(nullptr)
   {
   }
@@ -76,70 +72,70 @@ struct MessageQueue::Impl
   ~Impl()
   {
     // Delete the current buffer
-    if( currentMessageBuffer )
+    if(currentMessageBuffer)
     {
-      DeleteBufferContents( currentMessageBuffer );
+      DeleteBufferContents(currentMessageBuffer);
       delete currentMessageBuffer;
     }
 
     // Delete the unprocessed buffers
     const MessageBufferIter processQueueEndIter = processQueue.end();
-    for ( MessageBufferIter iter = processQueue.begin(); iter != processQueueEndIter; ++iter )
+    for(MessageBufferIter iter = processQueue.begin(); iter != processQueueEndIter; ++iter)
     {
       MessageBuffer* unprocessedBuffer = *iter;
-      DeleteBufferContents( unprocessedBuffer );
+      DeleteBufferContents(unprocessedBuffer);
       delete unprocessedBuffer;
     }
 
     // Delete the recycled buffers
     const MessageBufferIter recycleQueueEndIter = recycleQueue.end();
-    for ( MessageBufferIter iter = recycleQueue.begin(); iter != recycleQueueEndIter; ++iter )
+    for(MessageBufferIter iter = recycleQueue.begin(); iter != recycleQueueEndIter; ++iter)
     {
       MessageBuffer* recycledBuffer = *iter;
-      DeleteBufferContents( recycledBuffer );
+      DeleteBufferContents(recycledBuffer);
       delete recycledBuffer;
     }
 
     const MessageBufferIter freeQueueEndIter = freeQueue.end();
-    for ( MessageBufferIter iter = freeQueue.begin(); iter != freeQueueEndIter; ++iter )
+    for(MessageBufferIter iter = freeQueue.begin(); iter != freeQueueEndIter; ++iter)
     {
       MessageBuffer* freeBuffer = *iter;
-      DeleteBufferContents( freeBuffer );
+      DeleteBufferContents(freeBuffer);
       delete freeBuffer;
     }
   }
 
-  void DeleteBufferContents( MessageBuffer* buffer )
+  void DeleteBufferContents(MessageBuffer* buffer)
   {
-    for( MessageBuffer::Iterator iter = buffer->Begin(); iter.IsValid(); iter.Next() )
+    for(MessageBuffer::Iterator iter = buffer->Begin(); iter.IsValid(); iter.Next())
     {
-      MessageBase* message = reinterpret_cast< MessageBase* >( iter.Get() );
+      MessageBase* message = reinterpret_cast<MessageBase*>(iter.Get());
 
       // Call virtual destructor explictly; since delete will not be called after placement new
       message->~MessageBase();
     }
   }
 
-  RenderController&        renderController;     ///< render controller
-  const SceneGraphBuffers& sceneGraphBuffers;    ///< Used to keep track of which buffers are being written or read.
+  RenderController&        renderController;  ///< render controller
+  const SceneGraphBuffers& sceneGraphBuffers; ///< Used to keep track of which buffers are being written or read.
 
-  bool                     processingEvents;     ///< Whether messages queued will be flushed by core
-  bool                     queueWasEmpty;        ///< Flag whether the queue was empty during the Update()
-  bool                     sceneUpdateFlag;      ///< true when there is a new message that requires a scene-graph node tree update
-  int                      sceneUpdate;          ///< Non zero when there is a message in the queue requiring a scene-graph node tree update
+  bool processingEvents; ///< Whether messages queued will be flushed by core
+  bool queueWasEmpty;    ///< Flag whether the queue was empty during the Update()
+  bool sceneUpdateFlag;  ///< true when there is a new message that requires a scene-graph node tree update
+  int  sceneUpdate;      ///< Non zero when there is a message in the queue requiring a scene-graph node tree update
 
-  MessageQueueMutex        queueMutex;           ///< queueMutex must be locked whilst accessing processQueue or recycleQueue
-  MessageBufferQueue       processQueue;         ///< to process in the next update
-  MessageBufferQueue       recycleQueue;         ///< to recycle MessageBuffers after the messages have been processed
+  MessageQueueMutex  queueMutex;   ///< queueMutex must be locked whilst accessing processQueue or recycleQueue
+  MessageBufferQueue processQueue; ///< to process in the next update
+  MessageBufferQueue recycleQueue; ///< to recycle MessageBuffers after the messages have been processed
 
-  MessageBuffer*           currentMessageBuffer; ///< can be used without locking
-  MessageBufferQueue       freeQueue;            ///< buffers from the recycleQueue; can be used without locking
+  MessageBuffer*     currentMessageBuffer; ///< can be used without locking
+  MessageBufferQueue freeQueue;            ///< buffers from the recycleQueue; can be used without locking
 };
 
-MessageQueue::MessageQueue( Integration::RenderController& controller, const SceneGraph::SceneGraphBuffers& buffers )
+MessageQueue::MessageQueue(Integration::RenderController& controller, const SceneGraph::SceneGraphBuffers& buffers)
 : mImpl(nullptr)
 {
-  mImpl = new Impl( controller, buffers );
+  mImpl = new Impl(controller, buffers);
 }
 
 MessageQueue::~MessageQueue()
@@ -153,85 +149,85 @@ void MessageQueue::EventProcessingStarted()
 }
 
 // Called from event thread
-uint32_t* MessageQueue::ReserveMessageSlot( uint32_t requestedSize, bool updateScene )
+uint32_t* MessageQueue::ReserveMessageSlot(uint32_t requestedSize, bool updateScene)
 {
-  DALI_ASSERT_DEBUG( 0 != requestedSize );
+  DALI_ASSERT_DEBUG(0 != requestedSize);
 
-  if( updateScene )
+  if(updateScene)
   {
     mImpl->sceneUpdateFlag = true;
   }
 
-  if ( !mImpl->currentMessageBuffer )
+  if(!mImpl->currentMessageBuffer)
   {
     const MessageBufferIter endIter = mImpl->freeQueue.end();
 
     // Find the largest recycled buffer from freeQueue
     MessageBufferIter nextBuffer = endIter;
-    for ( MessageBufferIter iter = mImpl->freeQueue.begin(); iter != endIter; ++iter )
+    for(MessageBufferIter iter = mImpl->freeQueue.begin(); iter != endIter; ++iter)
     {
-      if ( endIter == nextBuffer ||
-           (*nextBuffer)->GetCapacity() < (*iter)->GetCapacity() )
+      if(endIter == nextBuffer ||
+         (*nextBuffer)->GetCapacity() < (*iter)->GetCapacity())
       {
         nextBuffer = iter;
       }
     }
 
-    if ( endIter != nextBuffer )
+    if(endIter != nextBuffer)
     {
       // Reuse a recycled buffer from freeQueue
       mImpl->currentMessageBuffer = *nextBuffer;
-      mImpl->freeQueue.erase( nextBuffer );
+      mImpl->freeQueue.erase(nextBuffer);
     }
     else
     {
-      mImpl->currentMessageBuffer = new MessageBuffer( INITIAL_BUFFER_SIZE );
+      mImpl->currentMessageBuffer = new MessageBuffer(INITIAL_BUFFER_SIZE);
     }
   }
 
   // If we are inside Core::ProcessEvents(), core will automatically flush the queue.
   // If we are outside, then we have to request a call to Core::ProcessEvents() on idle.
-  if ( false == mImpl->processingEvents )
+  if(false == mImpl->processingEvents)
   {
-    mImpl->renderController.RequestProcessEventsOnIdle( false );
+    mImpl->renderController.RequestProcessEventsOnIdle(false);
   }
 
-  return mImpl->currentMessageBuffer->ReserveMessageSlot( requestedSize );
+  return mImpl->currentMessageBuffer->ReserveMessageSlot(requestedSize);
 }
 
 // Called from event thread
 bool MessageQueue::FlushQueue()
 {
-  const bool messagesToProcess = ( nullptr != mImpl->currentMessageBuffer );
+  const bool messagesToProcess = (nullptr != mImpl->currentMessageBuffer);
 
   // If there're messages to flush
-  if ( messagesToProcess )
+  if(messagesToProcess)
   {
     // queueMutex must be locked whilst accessing processQueue or recycleQueue
-    MessageQueueMutex::ScopedLock lock( mImpl->queueMutex );
+    MessageQueueMutex::ScopedLock lock(mImpl->queueMutex);
 
-    mImpl->processQueue.push_back( mImpl->currentMessageBuffer );
+    mImpl->processQueue.push_back(mImpl->currentMessageBuffer);
     mImpl->currentMessageBuffer = nullptr;
 
     // Grab any recycled MessageBuffers
-    while ( !mImpl->recycleQueue.empty() )
+    while(!mImpl->recycleQueue.empty())
     {
       MessageBuffer* recycled = mImpl->recycleQueue.back();
       mImpl->recycleQueue.pop_back();
 
       // Guard against excessive message buffer growth
-      if ( MAX_FREE_BUFFER_COUNT < mImpl->freeQueue.size() ||
-           MAX_BUFFER_CAPACITY   < recycled->GetCapacity() )
+      if(MAX_FREE_BUFFER_COUNT < mImpl->freeQueue.size() ||
+         MAX_BUFFER_CAPACITY < recycled->GetCapacity())
       {
         delete recycled;
       }
       else
       {
-        mImpl->freeQueue.push_back( recycled );
+        mImpl->freeQueue.push_back(recycled);
       }
     }
 
-    if( mImpl->sceneUpdateFlag )
+    if(mImpl->sceneUpdateFlag)
     {
       mImpl->sceneUpdate |= 2;
       mImpl->sceneUpdateFlag = false;
@@ -243,23 +239,23 @@ bool MessageQueue::FlushQueue()
   return messagesToProcess;
 }
 
-bool MessageQueue::ProcessMessages( BufferIndex updateBufferIndex )
+bool MessageQueue::ProcessMessages(BufferIndex updateBufferIndex)
 {
   PERF_MONITOR_START(PerformanceMonitor::PROCESS_MESSAGES);
 
   // queueMutex must be locked whilst accessing queue
-  MessageQueueMutex::ScopedLock lock( mImpl->queueMutex );
+  MessageQueueMutex::ScopedLock lock(mImpl->queueMutex);
 
   const MessageBufferIter processQueueEndIter = mImpl->processQueue.end();
-  for ( MessageBufferIter iter = mImpl->processQueue.begin(); iter != processQueueEndIter ; ++iter )
+  for(MessageBufferIter iter = mImpl->processQueue.begin(); iter != processQueueEndIter; ++iter)
   {
     MessageBuffer* buffer = *iter;
 
-    for( MessageBuffer::Iterator iter = buffer->Begin(); iter.IsValid(); iter.Next() )
+    for(MessageBuffer::Iterator iter = buffer->Begin(); iter.IsValid(); iter.Next())
     {
-      MessageBase* message = reinterpret_cast< MessageBase* >( iter.Get() );
+      MessageBase* message = reinterpret_cast<MessageBase*>(iter.Get());
 
-      message->Process( updateBufferIndex  );
+      message->Process(updateBufferIndex);
 
       // Call virtual destructor explictly; since delete will not be called after placement new
       message->~MessageBase();
@@ -267,7 +263,7 @@ bool MessageQueue::ProcessMessages( BufferIndex updateBufferIndex )
     buffer->Reset();
 
     // Pass back for use in the event-thread
-    mImpl->recycleQueue.push_back( buffer );
+    mImpl->recycleQueue.push_back(buffer);
   }
 
   mImpl->sceneUpdate >>= 1;
@@ -278,7 +274,7 @@ bool MessageQueue::ProcessMessages( BufferIndex updateBufferIndex )
 
   PERF_MONITOR_END(PerformanceMonitor::PROCESS_MESSAGES);
 
-  return ( mImpl->sceneUpdate & 0x01 ); // if it was previously 2, scene graph was updated.
+  return (mImpl->sceneUpdate & 0x01); // if it was previously 2, scene graph was updated.
 }
 
 bool MessageQueue::WasEmpty() const

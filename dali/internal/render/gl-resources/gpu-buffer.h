@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_GPU_BUFFER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 /**
  * Used to create and update a GPU memory buffer.
  *
@@ -40,7 +38,6 @@ namespace Internal
 class GpuBuffer
 {
 public:
-
   /**
    * Enum to encapsulate the GL buffer type. This is to avoid having to store a whole int for type
    */
@@ -62,12 +59,11 @@ public:
   };
 
 public:
-
   /**
    * constructor
    * @param context drawing context
    */
-  GpuBuffer( Context& context );
+  GpuBuffer(Context& context);
 
   /**
    * Destructor, non virtual as no virtual methods or inheritance
@@ -83,7 +79,7 @@ public:
    * @param usage How the buffer will be used
    * @param target The target buffer to update
    */
-  void UpdateDataBuffer(Context& context, GLsizeiptr size, const GLvoid *data, Usage usage, Target target);
+  void UpdateDataBuffer(Context& context, GLsizeiptr size, const GLvoid* data, Usage usage, Target target);
 
   /**
    * Bind the buffer object to the target
@@ -113,22 +109,19 @@ public:
   void GlContextDestroyed();
 
 private:
-
   /**
    * Perfoms a bind without checking the size of the buffer
    * @param bufferId to bind
    */
   void BindNoChecks(GLuint bufferId) const;
 
-private: // Data
+private:                // Data
+  Context&   mContext;  ///< shared context for dali drawing
+  GLsizeiptr mCapacity; ///< buffer capacity
+  GLsizeiptr mSize;     ///< buffer size
+  GLuint     mBufferId; ///< buffer object name(id)
 
-  Context&           mContext;             ///< shared context for dali drawing
-  GLsizeiptr         mCapacity;            ///< buffer capacity
-  GLsizeiptr         mSize;                ///< buffer size
-  GLuint             mBufferId;            ///< buffer object name(id)
-
-  bool               mBufferCreated:1;     ///< whether buffer has been created
-
+  bool mBufferCreated : 1; ///< whether buffer has been created
 };
 
 } // namespace Internal

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PROPERTY_INPUT_IMPL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,19 +22,18 @@
 #include <iostream>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/property-input.h>
+#include <dali/internal/common/buffer-index.h>
+#include <dali/public-api/math/matrix.h>
+#include <dali/public-api/math/matrix3.h>
+#include <dali/public-api/math/quaternion.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector4.h>
-#include <dali/public-api/math/quaternion.h>
-#include <dali/public-api/math/matrix3.h>
-#include <dali/public-api/math/matrix.h>
-#include <dali/internal/common/buffer-index.h>
+#include <dali/public-api/object/property-input.h>
 
-#if defined (ANDROID) || defined(WIN32) || defined(__APPLE__)
+#if defined(ANDROID) || defined(WIN32) || defined(__APPLE__)
 namespace std
 {
-
 uint64_t _Hash_bytes(const void* bytes, uint64_t size, uint64_t seed);
 
 }
@@ -42,10 +41,8 @@ uint64_t _Hash_bytes(const void* bytes, uint64_t size, uint64_t seed);
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 /**
  * An abstract interface for receiving property values, and for querying whether
  * a property value has changed i.e. whether a constraint needs to be reapplied.
@@ -53,7 +50,6 @@ namespace Internal
 class PropertyInputImpl
 {
 public:
-
   /**
    * Virtual destructor.
    */
@@ -83,7 +79,7 @@ public:
    * @param[in] bufferIndex The buffer to read from.
    * @return The boolean value.
    */
-  virtual const bool& GetBoolean( BufferIndex bufferIndex ) const
+  virtual const bool& GetBoolean(BufferIndex bufferIndex) const
   {
     // the return will never be executed, it's just to keep the compiler happy
     return reinterpret_cast<const bool&>(*this);
@@ -95,7 +91,7 @@ public:
    * @param[in] bufferIndex The buffer to read from.
    * @return The integer value.
    */
-  virtual const int& GetInteger( BufferIndex bufferIndex ) const
+  virtual const int& GetInteger(BufferIndex bufferIndex) const
   {
     // the return will never be executed, it's just to keep the compiler happy
     return reinterpret_cast<const int&>(*this);
@@ -107,7 +103,7 @@ public:
    * @param[in] bufferIndex The buffer to read from.
    * @return The float value.
    */
-  virtual const float& GetFloat( BufferIndex bufferIndex ) const
+  virtual const float& GetFloat(BufferIndex bufferIndex) const
   {
     // the return will never be executed, it's just to keep the compiler happy
     return reinterpret_cast<const float&>(*this);
@@ -119,7 +115,7 @@ public:
    * @param[in] bufferIndex The buffer to read from.
    * @return The Vector2 value.
    */
-  virtual const Vector2& GetVector2( BufferIndex bufferIndex ) const
+  virtual const Vector2& GetVector2(BufferIndex bufferIndex) const
   {
     // the return will never be executed, it's just to keep the compiler happy
     return reinterpret_cast<const Vector2&>(*this);
@@ -131,7 +127,7 @@ public:
    * @param[in] bufferIndex The buffer to read from.
    * @return The Vector3 value.
    */
-  virtual const Vector3& GetVector3( BufferIndex bufferIndex ) const
+  virtual const Vector3& GetVector3(BufferIndex bufferIndex) const
   {
     // the return will never be executed, it's just to keep the compiler happy
     return reinterpret_cast<const Vector3&>(*this);
@@ -143,7 +139,7 @@ public:
    * @param[in] bufferIndex The buffer to read from.
    * @return The Vector4 value.
    */
-  virtual const Vector4& GetVector4( BufferIndex bufferIndex ) const
+  virtual const Vector4& GetVector4(BufferIndex bufferIndex) const
   {
     // the return will never be executed, it's just to keep the compiler happy
     return reinterpret_cast<const Vector4&>(*this);
@@ -155,7 +151,7 @@ public:
    * @param[in] bufferIndex The buffer to read from.
    * @return The Quaternion value.
    */
-  virtual const Quaternion& GetQuaternion( BufferIndex bufferIndex ) const
+  virtual const Quaternion& GetQuaternion(BufferIndex bufferIndex) const
   {
     // the return will never be executed, it's just to keep the compiler happy
     return reinterpret_cast<const Quaternion&>(*this);
@@ -167,7 +163,7 @@ public:
    * @param[in] bufferIndex The buffer to read from.
    * @return The Matrix value.
    */
-  virtual const Matrix3& GetMatrix3( BufferIndex bufferIndex ) const
+  virtual const Matrix3& GetMatrix3(BufferIndex bufferIndex) const
   {
     // the return will never be executed, it's just to keep the compiler happy
     return reinterpret_cast<const Matrix3&>(*this);
@@ -179,7 +175,7 @@ public:
    * @param[in] bufferIndex The buffer to read from.
    * @return The Matrix value.
    */
-  virtual const Matrix& GetMatrix( BufferIndex bufferIndex ) const
+  virtual const Matrix& GetMatrix(BufferIndex bufferIndex) const
   {
     // the return will never be executed, it's just to keep the compiler happy
     return reinterpret_cast<const Matrix&>(*this);
@@ -195,9 +191,9 @@ public:
    * @param[in] updateBufferIndex The current update buffer index.
    * @return The boolean value.
    */
-  virtual const bool& GetConstraintInputBoolean( BufferIndex updateBufferIndex ) const
+  virtual const bool& GetConstraintInputBoolean(BufferIndex updateBufferIndex) const
   {
-    return GetBoolean( updateBufferIndex );
+    return GetBoolean(updateBufferIndex);
   }
 
   /**
@@ -208,9 +204,9 @@ public:
    * @param[in] updateBufferIndex The current update buffer index.
    * @return The integer value.
    */
-  virtual const int& GetConstraintInputInteger( BufferIndex updateBufferIndex ) const
+  virtual const int& GetConstraintInputInteger(BufferIndex updateBufferIndex) const
   {
-    return GetInteger( updateBufferIndex );
+    return GetInteger(updateBufferIndex);
   }
 
   /**
@@ -221,9 +217,9 @@ public:
    * @param[in] updateBufferIndex The current update buffer index.
    * @return The float value.
    */
-  virtual const float& GetConstraintInputFloat( BufferIndex updateBufferIndex ) const
+  virtual const float& GetConstraintInputFloat(BufferIndex updateBufferIndex) const
   {
-    return GetFloat( updateBufferIndex );
+    return GetFloat(updateBufferIndex);
   }
 
   /**
@@ -234,9 +230,9 @@ public:
    * @param[in] updateBufferIndex The buffer to read from.
    * @return The Vector2 value.
    */
-  virtual const Vector2& GetConstraintInputVector2( BufferIndex updateBufferIndex ) const
+  virtual const Vector2& GetConstraintInputVector2(BufferIndex updateBufferIndex) const
   {
-    return GetVector2( updateBufferIndex );
+    return GetVector2(updateBufferIndex);
   }
 
   /**
@@ -247,9 +243,9 @@ public:
    * @param[in] updateBufferIndex The buffer to read from.
    * @return The Vector3 value.
    */
-  virtual const Vector3& GetConstraintInputVector3( BufferIndex updateBufferIndex ) const
+  virtual const Vector3& GetConstraintInputVector3(BufferIndex updateBufferIndex) const
   {
-    return GetVector3( updateBufferIndex );
+    return GetVector3(updateBufferIndex);
   }
 
   /**
@@ -260,9 +256,9 @@ public:
    * @param[in] updateBufferIndex The buffer to read from.
    * @return The Vector4 value.
    */
-  virtual const Vector4& GetConstraintInputVector4( BufferIndex updateBufferIndex ) const
+  virtual const Vector4& GetConstraintInputVector4(BufferIndex updateBufferIndex) const
   {
-    return GetVector4( updateBufferIndex );
+    return GetVector4(updateBufferIndex);
   }
 
   /**
@@ -273,9 +269,9 @@ public:
    * @param[in] updateBufferIndex The buffer to read from.
    * @return The Quaternion value.
    */
-  virtual const Quaternion& GetConstraintInputQuaternion( BufferIndex updateBufferIndex ) const
+  virtual const Quaternion& GetConstraintInputQuaternion(BufferIndex updateBufferIndex) const
   {
-    return GetQuaternion( updateBufferIndex );
+    return GetQuaternion(updateBufferIndex);
   }
 
   /**
@@ -286,9 +282,9 @@ public:
    * @param[in] updateBufferIndex The buffer to read from.
    * @return The Matrix value.
    */
-  virtual const Matrix3& GetConstraintInputMatrix3( BufferIndex updateBufferIndex ) const
+  virtual const Matrix3& GetConstraintInputMatrix3(BufferIndex updateBufferIndex) const
   {
-    return GetMatrix3( updateBufferIndex );
+    return GetMatrix3(updateBufferIndex);
   }
 
   /**
@@ -299,9 +295,9 @@ public:
    * @param[in] updateBufferIndex The buffer to read from.
    * @return The Matrix value.
    */
-  virtual const Matrix& GetConstraintInputMatrix( BufferIndex updateBufferIndex ) const
+  virtual const Matrix& GetConstraintInputMatrix(BufferIndex updateBufferIndex) const
   {
-    return GetMatrix( updateBufferIndex );
+    return GetMatrix(updateBufferIndex);
   }
 
   /**
@@ -316,7 +312,7 @@ public:
 
   std::uint64_t Hash(BufferIndex bufferIndex, uint64_t seed) const
   {
-    switch ( GetType() )
+    switch(GetType())
     {
       case Property::BOOLEAN:
       {
@@ -370,68 +366,67 @@ public:
     return seed;
   }
 
-
   /**
    * Print the property value using a stream.
    * @param[in] debugStream The output stream.
    * @param[in] bufferIndex The buffer to read from.
    * @todo Place this far-too-large-to-be-inlined function in a cpp and remove <iostream> header dependency from this file.
    */
-  void DebugPrint( std::ostream& debugStream, BufferIndex bufferIndex ) const
+  void DebugPrint(std::ostream& debugStream, BufferIndex bufferIndex) const
   {
-    switch ( GetType() )
+    switch(GetType())
     {
       case Property::BOOLEAN:
       {
-        debugStream << GetBoolean( bufferIndex );
+        debugStream << GetBoolean(bufferIndex);
         break;
       }
 
       case Property::INTEGER:
       {
-        debugStream << GetInteger( bufferIndex );
+        debugStream << GetInteger(bufferIndex);
         break;
       }
 
       case Property::FLOAT:
       {
-        debugStream << GetFloat( bufferIndex );
+        debugStream << GetFloat(bufferIndex);
         break;
       }
 
       case Property::VECTOR2:
       {
-        debugStream << GetVector2( bufferIndex );
+        debugStream << GetVector2(bufferIndex);
         break;
       }
 
       case Property::VECTOR3:
       {
-        debugStream << GetVector3( bufferIndex );
+        debugStream << GetVector3(bufferIndex);
         break;
       }
 
       case Property::VECTOR4:
       {
-        debugStream << GetVector4( bufferIndex );
+        debugStream << GetVector4(bufferIndex);
         break;
       }
 
       case Property::ROTATION:
       {
-        debugStream << GetQuaternion( bufferIndex );
+        debugStream << GetQuaternion(bufferIndex);
         break;
       }
 
       case Property::MATRIX:
       {
-        debugStream << GetMatrix( bufferIndex );
+        debugStream << GetMatrix(bufferIndex);
         break;
       }
 
       case Property::MATRIX3:
       {
-        debugStream << GetMatrix3( bufferIndex );
+        debugStream << GetMatrix3(bufferIndex);
         break;
       }
 

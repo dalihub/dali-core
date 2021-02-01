@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_PROPERTY_BASE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,27 +22,23 @@
 #include <cstddef>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/property.h>
 #include <dali/internal/common/type-abstraction.h>
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
+#include <dali/public-api/object/property.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace SceneGraph
 {
-
 /**
  * Polymorphic base class for scene-graph properties, held by Nodes etc.
  */
 class PropertyBase : public PropertyInputImpl
 {
 public:
-
   /**
    * Default constructor.
    */
@@ -74,7 +70,6 @@ public:
   virtual bool IsClean() const = 0;
 
 private:
-
   // Undefined
   PropertyBase(const PropertyBase& property);
 

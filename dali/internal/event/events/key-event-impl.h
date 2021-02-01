@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_KEY_EVENT_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,12 +24,10 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 class KeyEvent;
-typedef IntrusivePtr< KeyEvent > KeyEventPtr;
+typedef IntrusivePtr<KeyEvent> KeyEventPtr;
 
 /**
  * @copydoc Dali::KeyEvent
@@ -37,7 +35,6 @@ typedef IntrusivePtr< KeyEvent > KeyEventPtr;
 class KeyEvent : public BaseObject
 {
 public:
-
   /**
    * @brief Default constructor.
    */
@@ -58,17 +55,17 @@ public:
    * @param[in]  deviceClass     The class of device the key event originated from
    * @param[in]  deviceSubclass  The subclass of device the key event originated from
    */
-  KeyEvent( const std::string& keyName,
-            const std::string& logicalKey,
-            const std::string& keyString,
-            int keyCode,
-            int keyModifier,
-            unsigned long timeStamp,
-            const Dali::KeyEvent::State& keyState,
-            const std::string& compose,
-            const std::string& deviceName,
-            const Device::Class::Type deviceClass,
-            const Device::Subclass::Type deviceSubclass );
+  KeyEvent(const std::string&           keyName,
+           const std::string&           logicalKey,
+           const std::string&           keyString,
+           int                          keyCode,
+           int                          keyModifier,
+           unsigned long                timeStamp,
+           const Dali::KeyEvent::State& keyState,
+           const std::string&           compose,
+           const std::string&           deviceName,
+           const Device::Class::Type    deviceClass,
+           const Device::Subclass::Type deviceSubclass);
 
   /**
    * Create a new KeyEvent.
@@ -86,17 +83,17 @@ public:
    * @param[in]  deviceSubclass  The subclass of device the key event originated from
    * @return A smart-pointer to the newly allocated KeyEvent.
    */
-  static KeyEventPtr New( const std::string& keyName,
-                          const std::string& logicalKey,
-                          const std::string& keyString,
-                          int keyCode,
-                          int keyModifier,
-                          unsigned long timeStamp,
-                          const Dali::KeyEvent::State& keyState,
-                          const std::string& compose,
-                          const std::string& deviceName,
-                          const Device::Class::Type deviceClass,
-                          const Device::Subclass::Type deviceSubclass );
+  static KeyEventPtr New(const std::string&           keyName,
+                         const std::string&           logicalKey,
+                         const std::string&           keyString,
+                         int                          keyCode,
+                         int                          keyModifier,
+                         unsigned long                timeStamp,
+                         const Dali::KeyEvent::State& keyState,
+                         const std::string&           compose,
+                         const std::string&           deviceName,
+                         const Device::Class::Type    deviceClass,
+                         const Device::Subclass::Type deviceSubclass);
 
   /**
    * @copydoc Dali::KeyEvent::IsShiftModifier()
@@ -173,45 +170,44 @@ public:
    *
    * @param[in] keyName The name given to the key pressed.
    */
-  void SetKeyName( const std::string& keyName );
+  void SetKeyName(const std::string& keyName);
 
   /**
    * @brief Set the actual string of input characters that should be used for input editors.
    *
    * @param[in] The actual string of input characters
    */
-  void SetKeyString( const std::string& keyString );
+  void SetKeyString(const std::string& keyString);
 
   /**
    * @brief Set the unique key code for the key pressed.
    *
    * @param[in] keyCode The unique key code for the key pressed
    */
-  void SetKeyCode( int32_t keyCode );
+  void SetKeyCode(int32_t keyCode);
 
   /**
    * @brief Set the key modifier for special keys like Shift, Alt and Ctrl which modify the next key pressed.
    *
    * @param[in] keyModifier The key modifier
    */
-  void SetKeyModifier( int32_t keyModifier );
+  void SetKeyModifier(int32_t keyModifier);
 
   /**
    * @brief Set the time (in ms) that the key event occurred.
    *
    * @param[in] time The time (in ms)
    */
-  void SetTime( unsigned long time );
+  void SetTime(unsigned long time);
 
   /**
    * @brief Set the state of the key event.
    *
    * @param[in] state The state of the key event
    */
-  void SetState( const Dali::KeyEvent::State& state );
+  void SetState(const Dali::KeyEvent::State& state);
 
 private:
-
   /**
    * @brief Destructor.
    *
@@ -221,46 +217,45 @@ private:
 
   // Not copyable or movable
 
-  KeyEvent( const KeyEvent& rhs ) = delete;             ///< Deleted copy constructor
-  KeyEvent( KeyEvent&& rhs ) = delete;                  ///< Deleted move constructor
-  KeyEvent& operator=( const KeyEvent& rhs ) = delete;  ///< Deleted copy assignment operator
-  KeyEvent& operator=( KeyEvent&& rhs ) = delete;       ///< Deleted move assignment operator
+  KeyEvent(const KeyEvent& rhs) = delete;            ///< Deleted copy constructor
+  KeyEvent(KeyEvent&& rhs)      = delete;            ///< Deleted move constructor
+  KeyEvent& operator=(const KeyEvent& rhs) = delete; ///< Deleted copy assignment operator
+  KeyEvent& operator=(KeyEvent&& rhs) = delete;      ///< Deleted move assignment operator
 
 private:
-
-  std::string mKeyName;                      ///< The name of the key pressed
-  std::string mLogicalKey;                   ///< The logical key symbol
-  std::string mKeyString;                    ///< The string of input characters
-  int  mKeyCode;                             ///< TThe unique key code
-  int  mKeyModifier;                         ///< The key modifier
-  unsigned long mTime;                       ///< The time that the key event occurred.
-  Dali::KeyEvent::State mState;              ///< The state of the key event.
-  std::string mCompose;                      ///< The key compose
-  std::string mDeviceName;                   ///< The name of device the key event originated from
-  Device::Class::Type mDeviceClass;          ///< The class of device the key event originated from
-  Device::Subclass::Type mDeviceSubclass;    ///< The subclass of device the key event originated from
+  std::string            mKeyName;        ///< The name of the key pressed
+  std::string            mLogicalKey;     ///< The logical key symbol
+  std::string            mKeyString;      ///< The string of input characters
+  int                    mKeyCode;        ///< TThe unique key code
+  int                    mKeyModifier;    ///< The key modifier
+  unsigned long          mTime;           ///< The time that the key event occurred.
+  Dali::KeyEvent::State  mState;          ///< The state of the key event.
+  std::string            mCompose;        ///< The key compose
+  std::string            mDeviceName;     ///< The name of device the key event originated from
+  Device::Class::Type    mDeviceClass;    ///< The class of device the key event originated from
+  Device::Subclass::Type mDeviceSubclass; ///< The subclass of device the key event originated from
 };
 
 } // namespace Internal
 
 // Helpers for public-api forwarding methods
 
-inline Internal::KeyEvent& GetImplementation( Dali::KeyEvent& keyEvent )
+inline Internal::KeyEvent& GetImplementation(Dali::KeyEvent& keyEvent)
 {
-  DALI_ASSERT_ALWAYS( keyEvent && "Key Event handle is empty" );
+  DALI_ASSERT_ALWAYS(keyEvent && "Key Event handle is empty");
 
   BaseObject& object = keyEvent.GetBaseObject();
 
-  return static_cast< Internal::KeyEvent& >( object );
+  return static_cast<Internal::KeyEvent&>(object);
 }
 
-inline const Internal::KeyEvent& GetImplementation( const Dali::KeyEvent& keyEvent )
+inline const Internal::KeyEvent& GetImplementation(const Dali::KeyEvent& keyEvent)
 {
-  DALI_ASSERT_ALWAYS( keyEvent && "Key Event handle is empty" );
+  DALI_ASSERT_ALWAYS(keyEvent && "Key Event handle is empty");
 
   const BaseObject& object = keyEvent.GetBaseObject();
 
-  return static_cast< const Internal::KeyEvent& >( object );
+  return static_cast<const Internal::KeyEvent&>(object);
 }
 
 } // namespace Dali

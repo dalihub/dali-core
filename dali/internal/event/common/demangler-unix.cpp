@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ size_t ExtractNumber(std::string_view& src)
   for(auto i = 0u; i < src.size(); ++i)
   {
     char c = src[i];
-    if( !IsDigit( c ) )
+    if(!IsDigit(c))
     {
       //update the src view.
       src.remove_prefix(i);
@@ -81,11 +81,10 @@ std::string_view ExtractDemangleNestedName(std::string_view mangledName)
   return result;
 }
 
-} // anon namespace
+} // namespace
 
 namespace Dali
 {
-
 namespace Internal
 {
 std::string DemangleClassName(const char* typeIdName)

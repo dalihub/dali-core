@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_PROPERTY_CONDITION_VARIABLE_STEP_FUNCTIONS_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,21 +19,18 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/property-value.h>
 #include <dali/internal/update/common/scene-graph-property-notification.h>
+#include <dali/public-api/object/property-value.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 class Object;
 class PropertyNotification;
 
 namespace SceneGraph
 {
-
 /**
  * VariableStep condition class,
  * Uses a list of values, this condition notifies when the Property crosses between different values
@@ -46,23 +43,20 @@ namespace SceneGraph
  */
 class VariableStep
 {
-
 public:
-
   /**
    * @return function pointer to the correct condition function, based on
    * the type of value being examined.
    */
-  static ConditionFunction GetFunction( Property::Type valueType );
+  static ConditionFunction GetFunction(Property::Type valueType);
 
 private:
-
   /**
    * Helper function used to evaluate our property
    *
    *
    */
-  static bool Evaluate( const float propertyValue, PropertyNotification::RawArgumentContainer& arg );
+  static bool Evaluate(const float propertyValue, PropertyNotification::RawArgumentContainer& arg);
 
   /**
    * Checks if integer is Outside
@@ -70,7 +64,7 @@ private:
    * @param[in] arg The supplied arguments for the condition.
    * @return Condition result (true if condition met, false if not)
    */
-  static bool EvalInteger( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg );
+  static bool EvalInteger(const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg);
 
   /**
    * Checks if float is Outside
@@ -78,7 +72,7 @@ private:
    * @param[in] arg The supplied arguments for the condition.
    * @return Condition result (true if condition met, false if not)
    */
-  static bool EvalFloat( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg );
+  static bool EvalFloat(const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg);
 
   /**
    * Checks if Vector2.Length() is Outside
@@ -86,7 +80,7 @@ private:
    * @param[in] arg The supplied arguments for the condition.
    * @return Condition result (true if condition met, false if not)
    */
-  static bool EvalVector2( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg );
+  static bool EvalVector2(const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg);
 
   /**
    * Checks if Vector3.Length() is Outside
@@ -94,7 +88,7 @@ private:
    * @param[in] arg The supplied arguments for the condition.
    * @return Condition result (true if condition met, false if not)
    */
-  static bool EvalVector3( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg );
+  static bool EvalVector3(const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg);
 
   /**
    * Checks if Vector4.Length() is Outside
@@ -102,7 +96,7 @@ private:
    * @param[in] arg The supplied arguments for the condition.
    * @return Condition result (true if condition met, false if not)
    */
-  static bool EvalVector4( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg );
+  static bool EvalVector4(const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg);
 
   /**
    * Default check for other types.
@@ -110,8 +104,7 @@ private:
    * @param[in] arg The supplied arguments for the condition.
    * @return Condition result (true if condition met, false if not)
    */
-  static bool EvalDefault( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg );
-
+  static bool EvalDefault(const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg);
 };
 
 } // namespace SceneGraph

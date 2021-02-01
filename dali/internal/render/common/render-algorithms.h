@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_ALGORITHMS_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
 class Context;
@@ -34,24 +33,22 @@ namespace SceneGraph
 {
 class RenderInstruction;
 struct RenderItem;
-}
+} // namespace SceneGraph
 
 namespace Render
 {
-
 /**
  * @brief The responsibility of the RenderAlgorithms object is to action renders required by a RenderInstruction.
  */
 class RenderAlgorithms
 {
-  public:
-
-    /**
+public:
+  /**
      * Constructor.
      */
-    RenderAlgorithms();
+  RenderAlgorithms();
 
-    /**
+  /**
      * Process a render-instruction.
      * @param[in] instruction            The render-instruction to process.
      * @param[in] context                The GL context.
@@ -60,26 +57,25 @@ class RenderAlgorithms
      * @param[in] stencilBufferAvailable Whether the stencil buffer is available
      * @param[in] boundTextures          The textures bound for rendering
      */
-    void ProcessRenderInstruction( const SceneGraph::RenderInstruction& instruction,
-                                   Context& context,
-                                   BufferIndex bufferIndex,
-                                   Integration::DepthBufferAvailable depthBufferAvailable,
-                                   Integration::StencilBufferAvailable stencilBufferAvailable,
-                                   Vector<GLuint>& boundTextures,
-                                   const Rect<int>& rootClippingRect );
+  void ProcessRenderInstruction(const SceneGraph::RenderInstruction& instruction,
+                                Context&                             context,
+                                BufferIndex                          bufferIndex,
+                                Integration::DepthBufferAvailable    depthBufferAvailable,
+                                Integration::StencilBufferAvailable  stencilBufferAvailable,
+                                Vector<GLuint>&                      boundTextures,
+                                const Rect<int>&                     rootClippingRect);
 
-  private:
-
-    /**
+private:
+  /**
      * @brief Calculate a 2D AABB (axis aligned bounding box) in screen space.
      * The RenderItems dimensions are translated and a Z value of 0 is assumed for this purpose.
      * No projection is performed, but rotation on Z is supported.
      * @param[in] item The RenderItem to generate an AABB for
      * @return         The generated AABB in screen space
      */
-    inline Dali::ClippingBox CalculateScreenSpaceAABB( const Dali::Internal::SceneGraph::RenderItem& item );
+  inline Dali::ClippingBox CalculateScreenSpaceAABB(const Dali::Internal::SceneGraph::RenderItem& item);
 
-    /**
+  /**
      * @brief Perform any scissor clipping related operations based on the current RenderItem.
      * This includes:
      *  - Determining if any action is to be taken (so the method can be exited early if not).
@@ -90,9 +86,9 @@ class RenderAlgorithms
      * @param[in] context     The current Context
      * @param[in] instruction The render-instruction to process.
      */
-    inline void SetupScissorClipping(const Dali::Internal::SceneGraph::RenderItem& item, Context& context, const Dali::Internal::SceneGraph::RenderInstruction& instruction);
+  inline void SetupScissorClipping(const Dali::Internal::SceneGraph::RenderItem& item, Context& context, const Dali::Internal::SceneGraph::RenderInstruction& instruction);
 
-    /**
+  /**
      * @brief Set up the clipping based on the specified clipping settings.
      * @param[in]     item                     The current RenderItem (about to be rendered)
      * @param[in]     context                  The context
@@ -102,15 +98,15 @@ class RenderAlgorithms
      * @param[in]     stencilBufferAvailable   Whether the stencil buffer is available
      * @param[in]     instruction              The render-instruction to process.
      */
-    inline void SetupClipping(const Dali::Internal::SceneGraph::RenderItem&        item,
-                              Context&                                             context,
-                              bool&                                                usedStencilBuffer,
-                              uint32_t&                                            lastClippingDepth,
-                              uint32_t&                                            lastClippingId,
-                              Integration::StencilBufferAvailable                  stencilBufferAvailable,
-                              const Dali::Internal::SceneGraph::RenderInstruction& instruction);
+  inline void SetupClipping(const Dali::Internal::SceneGraph::RenderItem&        item,
+                            Context&                                             context,
+                            bool&                                                usedStencilBuffer,
+                            uint32_t&                                            lastClippingDepth,
+                            uint32_t&                                            lastClippingId,
+                            Integration::StencilBufferAvailable                  stencilBufferAvailable,
+                            const Dali::Internal::SceneGraph::RenderInstruction& instruction);
 
-    /**
+  /**
      * @brief Process a render-list.
      * @param[in] renderList             The render-list to process.
      * @param[in] context                The GL context.
@@ -121,29 +117,28 @@ class RenderAlgorithms
      * @param[in] stencilBufferAvailable Whether the stencil buffer is available
      * @param[in] boundTextures          The textures bound for rendering
      */
-    inline void ProcessRenderList( const Dali::Internal::SceneGraph::RenderList& renderList,
-                                   Context& context,
-                                   BufferIndex bufferIndex,
-                                   const Matrix& viewMatrix,
-                                   const Matrix& projectionMatrix,
-                                   Integration::DepthBufferAvailable depthBufferAvailable,
-                                   Integration::StencilBufferAvailable stencilBufferAvailable,
-                                   Vector<GLuint>& boundTextures,
-                                   const Dali::Internal::SceneGraph::RenderInstruction& instruction, // in the case of reflection, things like CullFace need to be adjusted for reflection world
-                                   const Rect<int>& rootClippingRect );
+  inline void ProcessRenderList(const Dali::Internal::SceneGraph::RenderList&        renderList,
+                                Context&                                             context,
+                                BufferIndex                                          bufferIndex,
+                                const Matrix&                                        viewMatrix,
+                                const Matrix&                                        projectionMatrix,
+                                Integration::DepthBufferAvailable                    depthBufferAvailable,
+                                Integration::StencilBufferAvailable                  stencilBufferAvailable,
+                                Vector<GLuint>&                                      boundTextures,
+                                const Dali::Internal::SceneGraph::RenderInstruction& instruction, // in the case of reflection, things like CullFace need to be adjusted for reflection world
+                                const Rect<int>&                                     rootClippingRect);
 
-    // Prevent copying:
-    RenderAlgorithms( RenderAlgorithms& rhs );
-    RenderAlgorithms& operator=( const RenderAlgorithms& rhs );
+  // Prevent copying:
+  RenderAlgorithms(RenderAlgorithms& rhs);
+  RenderAlgorithms& operator=(const RenderAlgorithms& rhs);
 
+  // Member variables:
 
-    // Member variables:
+  using ScissorStackType = std::vector<Dali::ClippingBox>; ///< The container type used to maintain the applied scissor hierarchy
 
-    using ScissorStackType = std::vector<Dali::ClippingBox>;      ///< The container type used to maintain the applied scissor hierarchy
-
-    ScissorStackType                        mScissorStack;        ///< Contains the currently applied scissor hierarchy (so we can undo clips)
-    Dali::ClippingBox                       mViewportRectangle;   ///< The viewport dimensions, used to translate AABBs to scissor coordinates
-    bool                                    mHasLayerScissor:1;   ///< Marks if the currently process render instruction has a layer-based clipping region
+  ScissorStackType  mScissorStack;        ///< Contains the currently applied scissor hierarchy (so we can undo clips)
+  Dali::ClippingBox mViewportRectangle;   ///< The viewport dimensions, used to translate AABBs to scissor coordinates
+  bool              mHasLayerScissor : 1; ///< Marks if the currently process render instruction has a layer-based clipping region
 };
 
 } // namespace Render

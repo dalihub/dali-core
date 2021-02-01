@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_INSTRUCTION_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,19 +19,17 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/internal/render/common/render-list.h>
+#include <dali/internal/render/gl-resources/context.h>
+#include <dali/internal/render/renderers/render-frame-buffer.h>
+#include <dali/internal/update/render-tasks/scene-graph-camera.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/viewport.h>
-#include <dali/internal/update/render-tasks/scene-graph-camera.h>
-#include <dali/internal/render/common/render-list.h>
-#include <dali/internal/render/renderers/render-frame-buffer.h>
-#include <dali/internal/render/gl-resources/context.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace Render
 {
 class RenderTracker;
@@ -39,7 +37,6 @@ class RenderTracker;
 
 namespace SceneGraph
 {
-
 /**
  * A set of rendering instructions consisting of:
  * - The list(s) of renderers sorted in the correct rendering order.
@@ -51,7 +48,6 @@ namespace SceneGraph
 class RenderInstruction
 {
 public:
-
   /**
    * Default constructor so this can be stored in STL containers
    */
@@ -67,7 +63,7 @@ public:
    * @param capacityRequired in this list
    * @return the renderlist
    */
-  RenderList& GetNextFreeRenderList( size_t capacityRequired );
+  RenderList& GetNextFreeRenderList(size_t capacityRequired);
 
   /**
    * Inform the RenderInstruction that processing for this frame is complete
@@ -86,7 +82,7 @@ public:
    * @param index of list to return
    * @return pointer to the renderlist, or null if the index is out of bounds.
    */
-  const RenderList* GetRenderList( RenderListContainer::SizeType index ) const;
+  const RenderList* GetRenderList(RenderListContainer::SizeType index) const;
 
   /**
    * Reset render-instruction
@@ -98,20 +94,20 @@ public:
    * @param[in] viewport A pointer to a viewport, of NULL.
    * @param[in] clearColor A pointer to a color to clear with, or NULL if no clear is required.
    */
-  void Reset( Camera* camera,
-              Render::FrameBuffer* frameBuffer,
-              const Viewport* viewport,
-              const Vector4* clearColor );
+  void Reset(Camera*              camera,
+             Render::FrameBuffer* frameBuffer,
+             const Viewport*      viewport,
+             const Vector4*       clearColor);
 
   /**
    * Get the view matrix for rendering
    * @param index of the rendering side
    * @return the view matrix
    */
-  const Matrix* GetViewMatrix( BufferIndex index ) const
+  const Matrix* GetViewMatrix(BufferIndex index) const
   {
     // inlined as this is called once per frame per render instruction
-    return &mCamera->GetViewMatrix( index );
+    return &mCamera->GetViewMatrix(index);
   }
 
   /**
@@ -119,7 +115,7 @@ public:
    * @param index of the rendering side
    * @return the projection matrix
    */
-  const Matrix* GetProjectionMatrix( BufferIndex index ) const
+  const Matrix* GetProjectionMatrix(BufferIndex index) const
   {
     // inlined as this is called once per frame per render instruction
     return &mCamera->GetFinalProjectionMatrix(index);
@@ -131,30 +127,26 @@ public:
   }
 
 private:
-
   // Undefined
   RenderInstruction(const RenderInstruction&);
   // Undefined
   RenderInstruction& operator=(const RenderInstruction& rhs);
 
-public: // Data
+public:                                  // Data
+  Render::RenderTracker* mRenderTracker; ///< Pointer to an optional tracker object (not owned)
 
-  Render::RenderTracker* mRenderTracker;        ///< Pointer to an optional tracker object (not owned)
-
-  Viewport mViewport;                   ///< Optional viewport
-  Vector4  mClearColor;                 ///< Optional color to clear with
-  bool     mIsViewportSet:1;            ///< Flag to determine whether the viewport is set
-  bool     mIsClearColorSet:1;          ///< Flag to determine whether the clearColor is set
-  bool     mIgnoreRenderToFbo:1;        ///< Whether to ignore the render to FBO option (used to measure the performance above 60 fps)
+  Viewport mViewport;              ///< Optional viewport
+  Vector4  mClearColor;            ///< Optional color to clear with
+  bool     mIsViewportSet : 1;     ///< Flag to determine whether the viewport is set
+  bool     mIsClearColorSet : 1;   ///< Flag to determine whether the clearColor is set
+  bool     mIgnoreRenderToFbo : 1; ///< Whether to ignore the render to FBO option (used to measure the performance above 60 fps)
 
   Render::FrameBuffer* mFrameBuffer;
 
-private: // Data
-
-  Camera* mCamera;  ///< camera that is used
-  RenderListContainer mRenderLists;     ///< container of all render lists
-  RenderListContainer::SizeType mNextFreeRenderList;     ///< index for the next free render list
-
+private:                                             // Data
+  Camera*                       mCamera;             ///< camera that is used
+  RenderListContainer           mRenderLists;        ///< container of all render lists
+  RenderListContainer::SizeType mNextFreeRenderList; ///< index for the next free render list
 };
 
 } // namespace SceneGraph

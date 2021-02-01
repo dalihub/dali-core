@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_SCENE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,8 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 class Context;
 
 namespace SceneGraph
@@ -39,7 +37,6 @@ class RenderInstructionContainer;
 class Scene
 {
 public:
-
   /**
    * Constructor
    * @param[in] surface The render surface
@@ -55,7 +52,7 @@ public:
    * Creates a scene object in the GPU.
    * @param[in] context The GL context
    */
-  void Initialize( Context& context );
+  void Initialize(Context& context);
 
   /**
    * Gets the context holding the GL state of rendering for the scene
@@ -83,7 +80,7 @@ public:
    *
    * @note Ownership of the callback is passed onto this class.
    */
-  void AddFrameRenderedCallback( CallbackBase* callback, int32_t frameId );
+  void AddFrameRenderedCallback(CallbackBase* callback, int32_t frameId);
 
   /**
    * @brief Adds a callback that is called when the frame is displayed on the display.
@@ -99,27 +96,27 @@ public:
    *
    * @note Ownership of the callback is passed onto this class.
    */
-  void AddFramePresentedCallback( CallbackBase* callback, int32_t frameId );
+  void AddFramePresentedCallback(CallbackBase* callback, int32_t frameId);
 
   /**
    * @brief Gets the callback list that is called when the frame rendering is done by the graphics driver.
    *
    * @param[out] callbacks The callback list
    */
-  void GetFrameRenderedCallback( Dali::Integration::Scene::FrameCallbackContainer& callbacks );
+  void GetFrameRenderedCallback(Dali::Integration::Scene::FrameCallbackContainer& callbacks);
 
   /**
    * @brief Gets the callback list that is called when the frame is displayed on the display.
    *
    * @param[out] callbacks The callback list
    */
-  void GetFramePresentedCallback( Dali::Integration::Scene::FrameCallbackContainer& callbacks );
+  void GetFramePresentedCallback(Dali::Integration::Scene::FrameCallbackContainer& callbacks);
 
   /**
    * @brief Sets whether rendering should be skipped or not.
    * @param[in] skip true if rendering should be skipped.
    */
-  void SetSkipRendering( bool skip );
+  void SetSkipRendering(bool skip);
 
   /**
    * @brief Query whether rendering should be skipped or not.
@@ -133,7 +130,7 @@ public:
    * @param[in] scene The resized scene.
    * @param[in] rect The retangle representing the surface.
    */
-  void SetSurfaceRect( const Rect<int32_t>& rect );
+  void SetSurfaceRect(const Rect<int32_t>& rect);
 
   /**
    * Get the surface rectangle.
@@ -148,7 +145,7 @@ public:
    * @param[in] scene The rotated scene.
    * @param[in] orientation The orientation value representing the surface.
    */
-  void SetSurfaceOrientation( int32_t orientation );
+  void SetSurfaceOrientation(int32_t orientation);
 
   /**
    * Get the surface orientation.
@@ -164,67 +161,66 @@ public:
   bool IsSurfaceRectChanged();
 
 private:
-
-  Context*                    mContext;   ///< The context holding the GL state of rendering for the scene, not owned
+  Context* mContext; ///< The context holding the GL state of rendering for the scene, not owned
 
   // Render instructions describe what should be rendered during RenderManager::RenderScene()
   // Update manager updates instructions for the next frame while we render the current one
 
-  RenderInstructionContainer  mInstructions;   ///< Render instructions for the scene
+  RenderInstructionContainer mInstructions; ///< Render instructions for the scene
 
-  Dali::Integration::Scene::FrameCallbackContainer mFrameRenderedCallbacks;   ///< Frame rendered callbacks
-  Dali::Integration::Scene::FrameCallbackContainer mFramePresentedCallbacks;  ///< Frame presented callbacks
+  Dali::Integration::Scene::FrameCallbackContainer mFrameRenderedCallbacks;  ///< Frame rendered callbacks
+  Dali::Integration::Scene::FrameCallbackContainer mFramePresentedCallbacks; ///< Frame presented callbacks
 
-  bool                        mSkipRendering;  ///< A flag to skip rendering
+  bool mSkipRendering; ///< A flag to skip rendering
 
-  Rect<int32_t>               mSurfaceRect;           ///< The rectangle of surface which is related ot this scene.
-  int32_t                     mSurfaceOrientation;    ///< The orientation of surface which is related of this scene
-  bool                        mSurfaceRectChanged;    ///< The flag of surface's rectangle is changed when is resized, moved or rotated.
+  Rect<int32_t> mSurfaceRect;        ///< The rectangle of surface which is related ot this scene.
+  int32_t       mSurfaceOrientation; ///< The orientation of surface which is related of this scene
+  bool          mSurfaceRectChanged; ///< The flag of surface's rectangle is changed when is resized, moved or rotated.
 };
 
 /// Messages
-inline void AddFrameRenderedCallbackMessage( EventThreadServices& eventThreadServices, const Scene& scene, const CallbackBase* callback, int32_t frameId )
+inline void AddFrameRenderedCallbackMessage(EventThreadServices& eventThreadServices, const Scene& scene, const CallbackBase* callback, int32_t frameId)
 {
   using LocalType = MessageValue2<Scene, CallbackBase*, int32_t>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &scene, &Scene::AddFrameRenderedCallback, const_cast< CallbackBase* >( callback ), frameId );
+  new(slot) LocalType(&scene, &Scene::AddFrameRenderedCallback, const_cast<CallbackBase*>(callback), frameId);
 }
 
-inline void AddFramePresentedCallbackMessage( EventThreadServices& eventThreadServices, const Scene& scene, const CallbackBase* callback, int32_t frameId )
+inline void AddFramePresentedCallbackMessage(EventThreadServices& eventThreadServices, const Scene& scene, const CallbackBase* callback, int32_t frameId)
 {
   using LocalType = MessageValue2<Scene, CallbackBase*, int32_t>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &scene, &Scene::AddFramePresentedCallback, const_cast< CallbackBase* >( callback ), frameId );
+  new(slot) LocalType(&scene, &Scene::AddFramePresentedCallback, const_cast<CallbackBase*>(callback), frameId);
 }
 
-inline void SetSurfaceRectMessage( EventThreadServices& eventThreadServices, const Scene& scene, const Rect<int32_t>& rect )
+inline void SetSurfaceRectMessage(EventThreadServices& eventThreadServices, const Scene& scene, const Rect<int32_t>& rect)
 {
   using LocalType = MessageValue1<Scene, Rect<int32_t> >;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &scene, &Scene::SetSurfaceRect, rect );
+  new(slot) LocalType(&scene, &Scene::SetSurfaceRect, rect);
 }
 
-inline void SetSurfaceOrientationMessage( EventThreadServices& eventThreadServices, const Scene& scene, int32_t orientation )
+inline void SetSurfaceOrientationMessage(EventThreadServices& eventThreadServices, const Scene& scene, int32_t orientation)
 {
   using LocalType = MessageValue1<Scene, int32_t>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &scene, &Scene::SetSurfaceOrientation, orientation );
+  new(slot) LocalType(&scene, &Scene::SetSurfaceOrientation, orientation);
 }
 
 } // namespace SceneGraph
@@ -232,6 +228,5 @@ inline void SetSurfaceOrientationMessage( EventThreadServices& eventThreadServic
 } // namespace Internal
 
 } // namespace Dali
-
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_SCENE_H

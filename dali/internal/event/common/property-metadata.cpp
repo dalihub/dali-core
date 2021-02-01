@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,34 +19,31 @@
 #include <dali/internal/event/common/property-metadata.h>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/extents.h>
+#include <dali/public-api/math/matrix.h>
+#include <dali/public-api/math/matrix3.h>
 #include <dali/public-api/math/quaternion.h>
+#include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector4.h>
-#include <dali/public-api/object/property.h>
-#include <dali/public-api/common/extents.h>
-#include <dali/public-api/math/matrix3.h>
-#include <dali/public-api/math/matrix.h>
-#include <dali/public-api/math/rect.h>
-#include <dali/public-api/object/property-map.h>
 #include <dali/public-api/object/property-array.h>
+#include <dali/public-api/object/property-map.h>
+#include <dali/public-api/object/property.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace
 {
-
 /// Helper to adjust the property value by an amount specified in another property-value
-template < typename PropertyType >
-inline void AdjustProperty( Property::Value& currentPropertyValue, const Property::Value& relativePropertyValue )
+template<typename PropertyType>
+inline void AdjustProperty(Property::Value& currentPropertyValue, const Property::Value& relativePropertyValue)
 {
   PropertyType currentValue;
   PropertyType relativeValue;
-  if( currentPropertyValue.Get( currentValue ) && relativePropertyValue.Get( relativeValue ) )
+  if(currentPropertyValue.Get(currentValue) && relativePropertyValue.Get(relativeValue))
   {
     currentPropertyValue = currentValue + relativeValue;
   }
@@ -54,9 +51,9 @@ inline void AdjustProperty( Property::Value& currentPropertyValue, const Propert
 
 } // unnamed namespace
 
-void PropertyMetadata::SetPropertyValue( const Property::Value& propertyValue )
+void PropertyMetadata::SetPropertyValue(const Property::Value& propertyValue)
 {
-  switch ( GetType() )
+  switch(GetType())
   {
     case Property::NONE:
     {
@@ -67,7 +64,7 @@ void PropertyMetadata::SetPropertyValue( const Property::Value& propertyValue )
     case Property::RECTANGLE:
     {
       Rect<int32_t> convertedValue;
-      if( propertyValue.Get( convertedValue ) )
+      if(propertyValue.Get(convertedValue))
       {
         value = convertedValue;
       }
@@ -77,7 +74,7 @@ void PropertyMetadata::SetPropertyValue( const Property::Value& propertyValue )
     case Property::STRING:
     {
       std::string convertedValue;
-      if( propertyValue.Get( convertedValue ) )
+      if(propertyValue.Get(convertedValue))
       {
         value = convertedValue;
       }
@@ -87,7 +84,7 @@ void PropertyMetadata::SetPropertyValue( const Property::Value& propertyValue )
     case Property::ARRAY:
     {
       const Property::Array* array = propertyValue.GetArray();
-      if( array )
+      if(array)
       {
         value = *array;
       }
@@ -97,7 +94,7 @@ void PropertyMetadata::SetPropertyValue( const Property::Value& propertyValue )
     case Property::MAP:
     {
       const Property::Map* map = propertyValue.GetMap();
-      if( map )
+      if(map)
       {
         value = *map;
       }
@@ -107,7 +104,7 @@ void PropertyMetadata::SetPropertyValue( const Property::Value& propertyValue )
     case Property::EXTENTS:
     {
       Extents convertedValue;
-      if( propertyValue.Get( convertedValue ) )
+      if(propertyValue.Get(convertedValue))
       {
         value = convertedValue;
       }
@@ -117,7 +114,7 @@ void PropertyMetadata::SetPropertyValue( const Property::Value& propertyValue )
     case Property::BOOLEAN:
     {
       bool convertedValue;
-      if( propertyValue.Get( convertedValue ) )
+      if(propertyValue.Get(convertedValue))
       {
         value = convertedValue;
       }
@@ -127,7 +124,7 @@ void PropertyMetadata::SetPropertyValue( const Property::Value& propertyValue )
     case Property::INTEGER:
     {
       int32_t convertedValue;
-      if( propertyValue.Get( convertedValue ) )
+      if(propertyValue.Get(convertedValue))
       {
         value = convertedValue;
       }
@@ -137,7 +134,7 @@ void PropertyMetadata::SetPropertyValue( const Property::Value& propertyValue )
     case Property::FLOAT:
     {
       float convertedValue;
-      if( propertyValue.Get( convertedValue ) )
+      if(propertyValue.Get(convertedValue))
       {
         value = convertedValue;
       }
@@ -147,7 +144,7 @@ void PropertyMetadata::SetPropertyValue( const Property::Value& propertyValue )
     case Property::ROTATION:
     {
       Quaternion convertedValue;
-      if( propertyValue.Get( convertedValue ) )
+      if(propertyValue.Get(convertedValue))
       {
         value = convertedValue;
       }
@@ -157,7 +154,7 @@ void PropertyMetadata::SetPropertyValue( const Property::Value& propertyValue )
     case Property::MATRIX:
     {
       Matrix convertedValue;
-      if( propertyValue.Get( convertedValue ) )
+      if(propertyValue.Get(convertedValue))
       {
         value = convertedValue;
       }
@@ -167,7 +164,7 @@ void PropertyMetadata::SetPropertyValue( const Property::Value& propertyValue )
     case Property::MATRIX3:
     {
       Matrix3 convertedValue;
-      if( propertyValue.Get( convertedValue ) )
+      if(propertyValue.Get(convertedValue))
       {
         value = convertedValue;
       }
@@ -177,19 +174,19 @@ void PropertyMetadata::SetPropertyValue( const Property::Value& propertyValue )
     case Property::VECTOR2:
     {
       Vector2 vector2Value;
-      value.Get( vector2Value );
+      value.Get(vector2Value);
 
-      if( componentIndex == 0 )
+      if(componentIndex == 0)
       {
-        vector2Value.x = propertyValue.Get< float >();
+        vector2Value.x = propertyValue.Get<float>();
       }
-      else if( componentIndex == 1 )
+      else if(componentIndex == 1)
       {
-        vector2Value.y = propertyValue.Get< float >();
+        vector2Value.y = propertyValue.Get<float>();
       }
       else
       {
-        propertyValue.Get( vector2Value );
+        propertyValue.Get(vector2Value);
       }
 
       value = vector2Value;
@@ -199,23 +196,23 @@ void PropertyMetadata::SetPropertyValue( const Property::Value& propertyValue )
     case Property::VECTOR3:
     {
       Vector3 vector3Value;
-      value.Get( vector3Value );
+      value.Get(vector3Value);
 
-      if( componentIndex == 0 )
+      if(componentIndex == 0)
       {
-        vector3Value.x = propertyValue.Get< float >();
+        vector3Value.x = propertyValue.Get<float>();
       }
-      else if( componentIndex == 1 )
+      else if(componentIndex == 1)
       {
-        vector3Value.y = propertyValue.Get< float >();
+        vector3Value.y = propertyValue.Get<float>();
       }
-      else if( componentIndex == 2 )
+      else if(componentIndex == 2)
       {
-        vector3Value.z = propertyValue.Get< float >();
+        vector3Value.z = propertyValue.Get<float>();
       }
       else
       {
-        propertyValue.Get( vector3Value );
+        propertyValue.Get(vector3Value);
       }
 
       value = vector3Value;
@@ -225,27 +222,27 @@ void PropertyMetadata::SetPropertyValue( const Property::Value& propertyValue )
     case Property::VECTOR4:
     {
       Vector4 vector4Value;
-      value.Get( vector4Value );
+      value.Get(vector4Value);
 
-      if( componentIndex == 0 )
+      if(componentIndex == 0)
       {
-        vector4Value.x = propertyValue.Get< float >();
+        vector4Value.x = propertyValue.Get<float>();
       }
-      else if( componentIndex == 1 )
+      else if(componentIndex == 1)
       {
-        vector4Value.y = propertyValue.Get< float >();
+        vector4Value.y = propertyValue.Get<float>();
       }
-      else if( componentIndex == 2 )
+      else if(componentIndex == 2)
       {
-        vector4Value.z = propertyValue.Get< float >();
+        vector4Value.z = propertyValue.Get<float>();
       }
-      else if( componentIndex == 3 )
+      else if(componentIndex == 3)
       {
-        vector4Value.w = propertyValue.Get< float >();
+        vector4Value.w = propertyValue.Get<float>();
       }
       else
       {
-        propertyValue.Get( vector4Value );
+        propertyValue.Get(vector4Value);
       }
 
       value = vector4Value;
@@ -258,13 +255,13 @@ Property::Value PropertyMetadata::GetPropertyValue() const
 {
   Property::Value propertyValue;
 
-  if( !IsAnimatable() )
+  if(!IsAnimatable())
   {
     propertyValue = value;
   }
   else
   {
-    switch ( GetType() )
+    switch(GetType())
     {
       case Property::NONE:
       case Property::RECTANGLE:
@@ -286,13 +283,13 @@ Property::Value PropertyMetadata::GetPropertyValue() const
       case Property::VECTOR2:
       {
         Vector2 vector2Value;
-        value.Get( vector2Value );
+        value.Get(vector2Value);
 
-        if( componentIndex == 0 )
+        if(componentIndex == 0)
         {
           propertyValue = vector2Value.x;
         }
-        else if( componentIndex == 1 )
+        else if(componentIndex == 1)
         {
           propertyValue = vector2Value.y;
         }
@@ -306,17 +303,17 @@ Property::Value PropertyMetadata::GetPropertyValue() const
       case Property::VECTOR3:
       {
         Vector3 vector3Value;
-        value.Get( vector3Value );
+        value.Get(vector3Value);
 
-        if( componentIndex == 0 )
+        if(componentIndex == 0)
         {
           propertyValue = vector3Value.x;
         }
-        else if( componentIndex == 1 )
+        else if(componentIndex == 1)
         {
           propertyValue = vector3Value.y;
         }
-        else if( componentIndex == 2 )
+        else if(componentIndex == 2)
         {
           propertyValue = vector3Value.z;
         }
@@ -330,21 +327,21 @@ Property::Value PropertyMetadata::GetPropertyValue() const
       case Property::VECTOR4:
       {
         Vector4 vector4Value;
-        value.Get( vector4Value );
+        value.Get(vector4Value);
 
-        if( componentIndex == 0 )
+        if(componentIndex == 0)
         {
           propertyValue = vector4Value.x;
         }
-        else if( componentIndex == 1 )
+        else if(componentIndex == 1)
         {
           propertyValue = vector4Value.y;
         }
-        else if( componentIndex == 2 )
+        else if(componentIndex == 2)
         {
           propertyValue = vector4Value.z;
         }
-        else if( componentIndex == 3 )
+        else if(componentIndex == 3)
         {
           propertyValue = vector4Value.w;
         }
@@ -360,9 +357,9 @@ Property::Value PropertyMetadata::GetPropertyValue() const
   return propertyValue;
 }
 
-void PropertyMetadata::AdjustPropertyValueBy( const Property::Value& relativePropertyValue )
+void PropertyMetadata::AdjustPropertyValueBy(const Property::Value& relativePropertyValue)
 {
-  switch ( GetType() )
+  switch(GetType())
   {
     case Property::NONE:
     case Property::RECTANGLE:
@@ -379,9 +376,9 @@ void PropertyMetadata::AdjustPropertyValueBy( const Property::Value& relativePro
 
     case Property::BOOLEAN:
     {
-      bool currentValue = false;
+      bool currentValue  = false;
       bool relativeValue = false;
-      if( value.Get( currentValue ) && relativePropertyValue.Get( relativeValue ) )
+      if(value.Get(currentValue) && relativePropertyValue.Get(relativeValue))
       {
         value = currentValue || relativeValue;
       }
@@ -390,13 +387,13 @@ void PropertyMetadata::AdjustPropertyValueBy( const Property::Value& relativePro
 
     case Property::INTEGER:
     {
-      AdjustProperty< int >( value, relativePropertyValue );
+      AdjustProperty<int>(value, relativePropertyValue);
       break;
     }
 
     case Property::FLOAT:
     {
-      AdjustProperty< float >( value, relativePropertyValue );
+      AdjustProperty<float>(value, relativePropertyValue);
       break;
     }
 
@@ -404,7 +401,7 @@ void PropertyMetadata::AdjustPropertyValueBy( const Property::Value& relativePro
     {
       Quaternion currentValue;
       Quaternion relativeValue;
-      if( value.Get( currentValue ) && relativePropertyValue.Get( relativeValue ) )
+      if(value.Get(currentValue) && relativePropertyValue.Get(relativeValue))
       {
         value = currentValue * relativeValue;
       }
@@ -413,22 +410,22 @@ void PropertyMetadata::AdjustPropertyValueBy( const Property::Value& relativePro
 
     case Property::VECTOR2:
     {
-      if( componentIndex == Property::INVALID_COMPONENT_INDEX )
+      if(componentIndex == Property::INVALID_COMPONENT_INDEX)
       {
-        AdjustProperty< Vector2 >( value, relativePropertyValue );
+        AdjustProperty<Vector2>(value, relativePropertyValue);
       }
       else
       {
         Vector2 vector2Value;
-        value.Get( vector2Value );
+        value.Get(vector2Value);
 
-        if( componentIndex == 0 )
+        if(componentIndex == 0)
         {
-          vector2Value.x += relativePropertyValue.Get< float >();
+          vector2Value.x += relativePropertyValue.Get<float>();
         }
-        else if( componentIndex == 1 )
+        else if(componentIndex == 1)
         {
-          vector2Value.y += relativePropertyValue.Get< float >();
+          vector2Value.y += relativePropertyValue.Get<float>();
         }
 
         value = vector2Value;
@@ -439,26 +436,26 @@ void PropertyMetadata::AdjustPropertyValueBy( const Property::Value& relativePro
 
     case Property::VECTOR3:
     {
-      if( componentIndex == Property::INVALID_COMPONENT_INDEX )
+      if(componentIndex == Property::INVALID_COMPONENT_INDEX)
       {
-        AdjustProperty< Vector3 >( value, relativePropertyValue );
+        AdjustProperty<Vector3>(value, relativePropertyValue);
       }
       else
       {
         Vector3 vector3Value;
-        value.Get( vector3Value );
+        value.Get(vector3Value);
 
-        if( componentIndex == 0 )
+        if(componentIndex == 0)
         {
-          vector3Value.x += relativePropertyValue.Get< float >();
+          vector3Value.x += relativePropertyValue.Get<float>();
         }
-        else if( componentIndex == 1 )
+        else if(componentIndex == 1)
         {
-          vector3Value.y += relativePropertyValue.Get< float >();
+          vector3Value.y += relativePropertyValue.Get<float>();
         }
-        else if( componentIndex == 2 )
+        else if(componentIndex == 2)
         {
-          vector3Value.z += relativePropertyValue.Get< float >();
+          vector3Value.z += relativePropertyValue.Get<float>();
         }
 
         value = vector3Value;
@@ -468,30 +465,30 @@ void PropertyMetadata::AdjustPropertyValueBy( const Property::Value& relativePro
 
     case Property::VECTOR4:
     {
-      if( componentIndex == Property::INVALID_COMPONENT_INDEX )
+      if(componentIndex == Property::INVALID_COMPONENT_INDEX)
       {
-        AdjustProperty< Vector4 >( value, relativePropertyValue );
+        AdjustProperty<Vector4>(value, relativePropertyValue);
       }
       else
       {
         Vector4 vector4Value;
-        value.Get( vector4Value );
+        value.Get(vector4Value);
 
-        if( componentIndex == 0 )
+        if(componentIndex == 0)
         {
-          vector4Value.x += relativePropertyValue.Get< float >();
+          vector4Value.x += relativePropertyValue.Get<float>();
         }
-        else if( componentIndex == 1 )
+        else if(componentIndex == 1)
         {
-          vector4Value.y += relativePropertyValue.Get< float >();
+          vector4Value.y += relativePropertyValue.Get<float>();
         }
-        else if( componentIndex == 2 )
+        else if(componentIndex == 2)
         {
-          vector4Value.z += relativePropertyValue.Get< float >();
+          vector4Value.z += relativePropertyValue.Get<float>();
         }
-        else if( componentIndex == 3 )
+        else if(componentIndex == 3)
         {
-          vector4Value.w += relativePropertyValue.Get< float >();
+          vector4Value.w += relativePropertyValue.Get<float>();
         }
 
         value = vector4Value;

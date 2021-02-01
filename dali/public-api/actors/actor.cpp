@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,12 +25,12 @@
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/math/vector2.h>
 
+#include <dali/internal/common/const-string.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/layer-impl.h>
 #include <dali/internal/event/animation/constraint-impl.h>
 #include <dali/internal/event/rendering/renderer-impl.h>
 #include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
-#include <dali/internal/common/const-string.h>
 
 namespace Dali
 {

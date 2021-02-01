@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_EVENT_GESTURE_EVENT_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,8 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 /**
  * This is the abstract base structure for any gestures that the adaptor detects and wishes to send
  * to the Core.
@@ -58,14 +56,13 @@ struct GestureEvent
    */
   uint32_t time;
 
-protected:  // Constructors only to be used by derived structures.
-
+protected: // Constructors only to be used by derived structures.
   /**
    * This constructor is only used by derived classes.
    * @param[in] gesture       The type of gesture event.
    * @param[in] gestureState  The state of the gesture event.
    */
-  GestureEvent( GestureType::Value gesture, GestureState gestureState);
+  GestureEvent(GestureType::Value gesture, GestureState gestureState);
 };
 
 } // namespace Internal

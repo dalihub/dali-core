@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,17 +25,16 @@ namespace Dali
 {
 namespace Internal
 {
-
 const ImageAttributes ImageAttributes::DEFAULT_ATTRIBUTES;
 
 struct ImageAttributes::ImageAttributesImpl
 {
   ImageAttributesImpl()
-  :  width(0),
-     height(0),
-     scaling(Dali::FittingMode::SHRINK_TO_FIT),
-     filtering(SamplingMode::BOX),
-     mOrientationCorrection(false)
+  : width(0),
+    height(0),
+    scaling(Dali::FittingMode::SHRINK_TO_FIT),
+    filtering(SamplingMode::BOX),
+    mOrientationCorrection(false)
   {
   }
 
@@ -45,11 +44,11 @@ struct ImageAttributes::ImageAttributesImpl
 
   ImageAttributesImpl& operator=(const ImageAttributesImpl& rhs)
   {
-    if (this != &rhs)
+    if(this != &rhs)
     {
-      width = rhs.width;
-      height = rhs.height;
-      scaling = rhs.scaling;
+      width     = rhs.width;
+      height    = rhs.height;
+      scaling   = rhs.scaling;
       filtering = rhs.filtering;
 
       mOrientationCorrection = rhs.mOrientationCorrection;
@@ -58,21 +57,20 @@ struct ImageAttributes::ImageAttributesImpl
     return *this;
   }
 
-  uint16_t  width;       ///< image width in pixels
-  uint16_t  height;      ///< image height in pixels
-  ScalingMode   scaling : 3;      ///< scaling option, ShrinkToFit is default
-  FilterMode    filtering : 4;    ///< filtering option. Box is the default
-  bool          mOrientationCorrection : 1; ///< If true, image pixels are reordered according to orientation metadata on load.
+  uint16_t    width;                      ///< image width in pixels
+  uint16_t    height;                     ///< image height in pixels
+  ScalingMode scaling : 3;                ///< scaling option, ShrinkToFit is default
+  FilterMode  filtering : 4;              ///< filtering option. Box is the default
+  bool        mOrientationCorrection : 1; ///< If true, image pixels are reordered according to orientation metadata on load.
 };
 
-
 ImageAttributes::ImageAttributes()
-: impl( new ImageAttributesImpl() )
+: impl(new ImageAttributesImpl())
 {
 }
 
 ImageAttributes::ImageAttributes(const ImageAttributes& rhs)
-: impl( new ImageAttributesImpl(*rhs.impl) )
+: impl(new ImageAttributesImpl(*rhs.impl))
 {
 }
 
@@ -90,22 +88,22 @@ ImageAttributes::~ImageAttributes()
 
 void ImageAttributes::SetSize(uint32_t width, uint32_t height)
 {
-  impl->width = static_cast<uint16_t>( width ); // truncated
-  impl->height = static_cast<uint16_t>( height ); // truncated
+  impl->width  = static_cast<uint16_t>(width);  // truncated
+  impl->height = static_cast<uint16_t>(height); // truncated
 }
 
-void ImageAttributes::SetSize( const Size& size )
+void ImageAttributes::SetSize(const Size& size)
 {
-  impl->width = static_cast<uint16_t>( size.width ); // truncated
-  impl->height = static_cast<uint16_t>( size.height ); // truncated
+  impl->width  = static_cast<uint16_t>(size.width);  // truncated
+  impl->height = static_cast<uint16_t>(size.height); // truncated
 }
 
-void ImageAttributes::SetScalingMode( ScalingMode scale )
+void ImageAttributes::SetScalingMode(ScalingMode scale)
 {
   impl->scaling = scale;
 }
 
-void ImageAttributes::SetFilterMode( FilterMode filtering )
+void ImageAttributes::SetFilterMode(FilterMode filtering)
 {
   impl->filtering = filtering;
 }
@@ -115,12 +113,12 @@ void ImageAttributes::SetOrientationCorrection(const bool enabled)
   impl->mOrientationCorrection = enabled;
 }
 
-void ImageAttributes::Reset( ImageDimensions dimensions, ScalingMode scaling, FilterMode sampling, bool orientationCorrection )
+void ImageAttributes::Reset(ImageDimensions dimensions, ScalingMode scaling, FilterMode sampling, bool orientationCorrection)
 {
-  impl->width = dimensions.GetWidth();
-  impl->height = dimensions.GetHeight();
-  impl->scaling = scaling;
-  impl->filtering = sampling;
+  impl->width                  = dimensions.GetWidth();
+  impl->height                 = dimensions.GetHeight();
+  impl->scaling                = scaling;
+  impl->filtering              = sampling;
   impl->mOrientationCorrection = orientationCorrection;
 }
 
@@ -166,27 +164,27 @@ ImageAttributes ImageAttributes::New()
  */
 bool operator<(const ImageAttributes& a, const ImageAttributes& b)
 {
-  if (a.impl->width != b.impl->width)
+  if(a.impl->width != b.impl->width)
   {
     return a.impl->width < b.impl->width;
   }
 
-  if (a.impl->height != b.impl->height)
+  if(a.impl->height != b.impl->height)
   {
     return a.impl->height < b.impl->height;
   }
 
-  if (a.impl->mOrientationCorrection != b.impl->mOrientationCorrection)
+  if(a.impl->mOrientationCorrection != b.impl->mOrientationCorrection)
   {
     return a.impl->mOrientationCorrection < b.impl->mOrientationCorrection;
   }
 
-  if (a.impl->scaling != b.impl->scaling)
+  if(a.impl->scaling != b.impl->scaling)
   {
     return a.impl->scaling < b.impl->scaling;
   }
 
-  if (a.impl->filtering != b.impl->filtering)
+  if(a.impl->filtering != b.impl->filtering)
   {
     return a.impl->filtering < b.impl->filtering;
   }
@@ -202,11 +200,11 @@ bool operator<(const ImageAttributes& a, const ImageAttributes& b)
  */
 bool operator==(const ImageAttributes& a, const ImageAttributes& b)
 {
-  return a.impl->width                  == b.impl->width       &&
-         a.impl->height                 == b.impl->height      &&
+  return a.impl->width == b.impl->width &&
+         a.impl->height == b.impl->height &&
          a.impl->mOrientationCorrection == b.impl->mOrientationCorrection &&
-         a.impl->scaling                == b.impl->scaling     &&
-         a.impl->filtering              == b.impl->filtering;
+         a.impl->scaling == b.impl->scaling &&
+         a.impl->filtering == b.impl->filtering;
 }
 
 /**

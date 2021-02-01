@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_NODE_MESSAGES_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,24 +21,20 @@
 // INTERNAL INCLUDES
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/message.h>
-#include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/manager/update-manager.h>
+#include <dali/internal/update/nodes/node.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace SceneGraph
 {
-
 // Messages for Node
 
 class NodePropertyMessageBase : public MessageBase
 {
 public:
-
   /**
    * Create a message.
    */
@@ -50,24 +46,22 @@ public:
   ~NodePropertyMessageBase() override;
 
 private:
-
   // Undefined
   NodePropertyMessageBase(const NodePropertyMessageBase&);
   NodePropertyMessageBase& operator=(const NodePropertyMessageBase& rhs);
 
 protected:
-
   UpdateManager& mUpdateManager;
 };
 
 /**
  * Templated message which bakes a Node property.
  */
-template< typename P >
+template<typename P>
 class NodePropertyMessage : public NodePropertyMessageBase
 {
 public:
-  using MemberFunction = void ( AnimatableProperty<P>::* )( BufferIndex, typename ParameterType<P>::PassingType );
+  using MemberFunction = void (AnimatableProperty<P>::*)(BufferIndex, typename ParameterType<P>::PassingType);
 
   /**
    * Create a message.
@@ -79,17 +73,17 @@ public:
    * @param[in] member The member function of the object.
    * @param[in] value The new value of the property.
    */
-  static void Send( EventThreadServices& eventThreadServices,
-                    const Node* node,
-                    const AnimatableProperty<P>* property,
-                    MemberFunction member,
-                    typename ParameterType< P >::PassingType value )
+  static void Send(EventThreadServices&                   eventThreadServices,
+                   const Node*                            node,
+                   const AnimatableProperty<P>*           property,
+                   MemberFunction                         member,
+                   typename ParameterType<P>::PassingType value)
   {
     // Reserve some memory inside the message queue
-    uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( NodePropertyMessage ) );
+    uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(NodePropertyMessage));
 
     // Construct message in the message queue memory; note that delete should not be called on the return value
-    new (slot) NodePropertyMessage( eventThreadServices.GetUpdateManager(), node, property, member, value );
+    new(slot) NodePropertyMessage(eventThreadServices.GetUpdateManager(), node, property, member, value);
   }
 
   /**
@@ -100,13 +94,12 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process( BufferIndex updateBufferIndex ) override
+  void Process(BufferIndex updateBufferIndex) override
   {
-    (mProperty->*mMemberFunction)( updateBufferIndex, mParam );
+    (mProperty->*mMemberFunction)(updateBufferIndex, mParam);
   }
 
 private:
-
   /**
    * Create a message.
    * @note The node is expected to be const in the thread which sends this message.
@@ -117,35 +110,34 @@ private:
    * @param[in] member The member function of the object.
    * @param[in] value The new value of the property.
    */
-  NodePropertyMessage( UpdateManager& updateManager,
-                       const Node* node,
-                       const AnimatableProperty<P>* property,
-                       MemberFunction member,
-                       typename ParameterType< P >::PassingType value )
-  : NodePropertyMessageBase( updateManager ),
-    mNode( const_cast< Node* >( node ) ),
-    mProperty( const_cast< AnimatableProperty<P>* >( property ) ),
-    mMemberFunction( member ),
-    mParam( value )
+  NodePropertyMessage(UpdateManager&                         updateManager,
+                      const Node*                            node,
+                      const AnimatableProperty<P>*           property,
+                      MemberFunction                         member,
+                      typename ParameterType<P>::PassingType value)
+  : NodePropertyMessageBase(updateManager),
+    mNode(const_cast<Node*>(node)),
+    mProperty(const_cast<AnimatableProperty<P>*>(property)),
+    mMemberFunction(member),
+    mParam(value)
   {
   }
 
 private:
-
-  Node* mNode;
-  AnimatableProperty<P>* mProperty;
-  MemberFunction mMemberFunction;
-  typename ParameterType< P >::HolderType mParam;
+  Node*                                 mNode;
+  AnimatableProperty<P>*                mProperty;
+  MemberFunction                        mMemberFunction;
+  typename ParameterType<P>::HolderType mParam;
 };
 
 /**
  * Templated message which bakes a Node property.
  */
-template< typename P >
+template<typename P>
 class NodePropertyComponentMessage : public NodePropertyMessageBase
 {
 public:
-  using MemberFunction = void ( AnimatableProperty<P>::* )( BufferIndex, float );
+  using MemberFunction = void (AnimatableProperty<P>::*)(BufferIndex, float);
 
   /**
    * Send a message.
@@ -157,17 +149,17 @@ public:
    * @param[in] member The member function of the object.
    * @param[in] value The new value of the X,Y,Z or W component.
    */
-  static void Send( EventThreadServices& eventThreadServices,
-                    const Node* node,
-                    const AnimatableProperty<P>* property,
-                    MemberFunction member,
-                    float value )
+  static void Send(EventThreadServices&         eventThreadServices,
+                   const Node*                  node,
+                   const AnimatableProperty<P>* property,
+                   MemberFunction               member,
+                   float                        value)
   {
     // Reserve some memory inside the message queue
-    uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( NodePropertyComponentMessage ) );
+    uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(NodePropertyComponentMessage));
 
     // Construct message in the message queue memory; note that delete should not be called on the return value
-    new (slot) NodePropertyComponentMessage( eventThreadServices.GetUpdateManager(), node, property, member, value );
+    new(slot) NodePropertyComponentMessage(eventThreadServices.GetUpdateManager(), node, property, member, value);
   }
 
   /**
@@ -178,13 +170,12 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process( BufferIndex updateBufferIndex ) override
+  void Process(BufferIndex updateBufferIndex) override
   {
-    (mProperty->*mMemberFunction)( updateBufferIndex, mParam );
+    (mProperty->*mMemberFunction)(updateBufferIndex, mParam);
   }
 
 private:
-
   /**
    * Create a message.
    * @note The node is expected to be const in the thread which sends this message.
@@ -195,33 +186,31 @@ private:
    * @param[in] member The member function of the object.
    * @param[in] value The new value of the X,Y,Z or W component.
   */
-  NodePropertyComponentMessage( UpdateManager& updateManager,
-                                const Node* node,
-                                const AnimatableProperty<P>* property,
-                                MemberFunction member,
-                                float value )
-  : NodePropertyMessageBase( updateManager ),
-    mNode( const_cast< Node* >( node ) ),
-    mProperty( const_cast< AnimatableProperty<P>* >( property ) ),
-    mMemberFunction( member ),
-    mParam( value )
+  NodePropertyComponentMessage(UpdateManager&               updateManager,
+                               const Node*                  node,
+                               const AnimatableProperty<P>* property,
+                               MemberFunction               member,
+                               float                        value)
+  : NodePropertyMessageBase(updateManager),
+    mNode(const_cast<Node*>(node)),
+    mProperty(const_cast<AnimatableProperty<P>*>(property)),
+    mMemberFunction(member),
+    mParam(value)
   {
   }
 
 private:
-
-  Node* mNode;
+  Node*                  mNode;
   AnimatableProperty<P>* mProperty;
-  MemberFunction mMemberFunction;
-  float mParam;
+  MemberFunction         mMemberFunction;
+  float                  mParam;
 };
 
-
-template <typename P>
+template<typename P>
 class NodeTransformPropertyMessage : public NodePropertyMessageBase
 {
 public:
-  using MemberFunction = void ( TransformManagerPropertyHandler<P>::* )( BufferIndex, const P& );
+  using MemberFunction = void (TransformManagerPropertyHandler<P>::*)(BufferIndex, const P&);
 
   /**
    * Create a message.
@@ -233,17 +222,17 @@ public:
    * @param[in] member The member function of the object.
    * @param[in] value The new value of the property.
    */
-  static void Send( EventThreadServices& eventThreadServices,
-                    const Node* node,
-                    const TransformManagerPropertyHandler<P>* property,
-                    MemberFunction member,
-                    const P& value )
+  static void Send(EventThreadServices&                      eventThreadServices,
+                   const Node*                               node,
+                   const TransformManagerPropertyHandler<P>* property,
+                   MemberFunction                            member,
+                   const P&                                  value)
   {
     // Reserve some memory inside the message queue
-    uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( NodeTransformPropertyMessage ) );
+    uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(NodeTransformPropertyMessage));
 
     // Construct message in the message queue memory; note that delete should not be called on the return value
-    new (slot) NodeTransformPropertyMessage( eventThreadServices.GetUpdateManager(), node, property, member, value );
+    new(slot) NodeTransformPropertyMessage(eventThreadServices.GetUpdateManager(), node, property, member, value);
   }
 
   /**
@@ -254,13 +243,12 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process( BufferIndex updateBufferIndex ) override
+  void Process(BufferIndex updateBufferIndex) override
   {
-    (mProperty->*mMemberFunction)( updateBufferIndex, mParam );
+    (mProperty->*mMemberFunction)(updateBufferIndex, mParam);
   }
 
 private:
-
   /**
    * Create a message.
    * @note The node is expected to be const in the thread which sends this message.
@@ -271,33 +259,31 @@ private:
    * @param[in] member The member function of the object.
    * @param[in] value The new value of the property.
    */
-  NodeTransformPropertyMessage( UpdateManager& updateManager,
-                       const Node* node,
-                       const TransformManagerPropertyHandler<P>* property,
-                       MemberFunction member,
-                       const P& value )
-  : NodePropertyMessageBase( updateManager ),
-    mNode( const_cast< Node* >( node ) ),
-    mProperty( const_cast< TransformManagerPropertyHandler<P>* >( property ) ),
-    mMemberFunction( member ),
-    mParam( value )
+  NodeTransformPropertyMessage(UpdateManager&                            updateManager,
+                               const Node*                               node,
+                               const TransformManagerPropertyHandler<P>* property,
+                               MemberFunction                            member,
+                               const P&                                  value)
+  : NodePropertyMessageBase(updateManager),
+    mNode(const_cast<Node*>(node)),
+    mProperty(const_cast<TransformManagerPropertyHandler<P>*>(property)),
+    mMemberFunction(member),
+    mParam(value)
   {
   }
 
 private:
-
-  Node* mNode;
+  Node*                               mNode;
   TransformManagerPropertyHandler<P>* mProperty;
-  MemberFunction mMemberFunction;
-  P mParam;
+  MemberFunction                      mMemberFunction;
+  P                                   mParam;
 };
 
-
-template <typename P>
+template<typename P>
 class NodeTransformComponentMessage : public NodePropertyMessageBase
 {
 public:
-  using MemberFunction = void ( TransformManagerPropertyHandler<P>::* )( BufferIndex, float );
+  using MemberFunction = void (TransformManagerPropertyHandler<P>::*)(BufferIndex, float);
 
   /**
    * Send a message.
@@ -309,17 +295,17 @@ public:
    * @param[in] member The member function of the object.
    * @param[in] value The new value of the X,Y,Z or W component.
    */
-  static void Send( EventThreadServices& eventThreadServices,
-                    const Node* node,
-                    const TransformManagerPropertyHandler<P>* property,
-                    MemberFunction member,
-                    float value )
+  static void Send(EventThreadServices&                      eventThreadServices,
+                   const Node*                               node,
+                   const TransformManagerPropertyHandler<P>* property,
+                   MemberFunction                            member,
+                   float                                     value)
   {
     // Reserve some memory inside the message queue
-    uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( NodeTransformComponentMessage ) );
+    uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(NodeTransformComponentMessage));
 
     // Construct message in the message queue memory; note that delete should not be called on the return value
-    new (slot) NodeTransformComponentMessage( eventThreadServices.GetUpdateManager(), node, property, member, value );
+    new(slot) NodeTransformComponentMessage(eventThreadServices.GetUpdateManager(), node, property, member, value);
   }
 
   /**
@@ -330,13 +316,12 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process( BufferIndex updateBufferIndex ) override
+  void Process(BufferIndex updateBufferIndex) override
   {
-    (mProperty->*mMemberFunction)( updateBufferIndex, mParam );
+    (mProperty->*mMemberFunction)(updateBufferIndex, mParam);
   }
 
 private:
-
   /**
    * Create a message.
    * @note The node is expected to be const in the thread which sends this message.
@@ -347,25 +332,24 @@ private:
    * @param[in] member The member function of the object.
    * @param[in] value The new value of the X,Y,Z or W component.
   */
-  NodeTransformComponentMessage( UpdateManager& updateManager,
-                                const Node* node,
+  NodeTransformComponentMessage(UpdateManager&                            updateManager,
+                                const Node*                               node,
                                 const TransformManagerPropertyHandler<P>* property,
-                                MemberFunction member,
-                                float value )
-  : NodePropertyMessageBase( updateManager ),
-    mNode( const_cast< Node* >( node ) ),
-    mProperty( const_cast< TransformManagerPropertyHandler<P>* >( property ) ),
-    mMemberFunction( member ),
-    mParam( value )
+                                MemberFunction                            member,
+                                float                                     value)
+  : NodePropertyMessageBase(updateManager),
+    mNode(const_cast<Node*>(node)),
+    mProperty(const_cast<TransformManagerPropertyHandler<P>*>(property)),
+    mMemberFunction(member),
+    mParam(value)
   {
   }
 
 private:
-
-  Node* mNode;
+  Node*                               mNode;
   TransformManagerPropertyHandler<P>* mProperty;
-  MemberFunction mMemberFunction;
-  float mParam;
+  MemberFunction                      mMemberFunction;
+  float                               mParam;
 };
 
 } // namespace SceneGraph

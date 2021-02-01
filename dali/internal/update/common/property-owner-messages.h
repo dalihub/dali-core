@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_PROPERTY_OWNER_MESSAGES_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,11 @@
 #include <string>
 
 // INTERNAL INCLUDES
+#include <dali/internal/common/const-string.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/property-input-impl.h>
-#include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
-#include <dali/internal/common/const-string.h>
+#include <dali/internal/update/common/property-owner.h>
 
 namespace Dali
 {
@@ -46,7 +46,6 @@ class PropertyOwner;
 class PropertyOwnerMessageBase : public MessageBase
 {
 public:
-
   /**
    * Create a message.
    */
@@ -58,7 +57,6 @@ public:
   ~PropertyOwnerMessageBase() override;
 
 private:
-
   // Undefined
   PropertyOwnerMessageBase(const PropertyOwnerMessageBase&);
   PropertyOwnerMessageBase& operator=(const PropertyOwnerMessageBase& rhs);
@@ -67,11 +65,11 @@ private:
 /**
  * Templated message which bakes a property.
  */
-template< typename P >
+template<typename P>
 class AnimatablePropertyMessage : public PropertyOwnerMessageBase
 {
 public:
-  using MemberFunction = void ( AnimatableProperty<P>::* )( BufferIndex, typename ParameterType<P>::PassingType );
+  using MemberFunction = void (AnimatableProperty<P>::*)(BufferIndex, typename ParameterType<P>::PassingType);
 
   /**
    * Create a message.
@@ -83,17 +81,17 @@ public:
    * @param[in] member The member function of the object.
    * @param[in] value The new value of the property.
    */
-  static void Send( EventThreadServices& eventThreadServices,
-                    const PropertyOwner* sceneObject,
-                    const AnimatableProperty<P>* property,
-                    MemberFunction member,
-                    typename ParameterType< P >::PassingType value )
+  static void Send(EventThreadServices&                   eventThreadServices,
+                   const PropertyOwner*                   sceneObject,
+                   const AnimatableProperty<P>*           property,
+                   MemberFunction                         member,
+                   typename ParameterType<P>::PassingType value)
   {
     // Reserve some memory inside the message queue
-    uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( AnimatablePropertyMessage ) );
+    uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(AnimatablePropertyMessage));
 
     // Construct message in the message queue memory; note that delete should not be called on the return value
-    new (slot) AnimatablePropertyMessage( sceneObject, property, member, value );
+    new(slot) AnimatablePropertyMessage(sceneObject, property, member, value);
   }
 
   /**
@@ -104,13 +102,12 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process( BufferIndex updateBufferIndex ) override
+  void Process(BufferIndex updateBufferIndex) override
   {
-    (mProperty->*mMemberFunction)( updateBufferIndex, mParam );
+    (mProperty->*mMemberFunction)(updateBufferIndex, mParam);
   }
 
 private:
-
   /**
    * Create a message.
    * @note The property owner is expected to be const in the thread which sends this message.
@@ -120,34 +117,33 @@ private:
    * @param[in] member The member function of the object.
    * @param[in] value The new value of the property.
    */
-  AnimatablePropertyMessage( const PropertyOwner* sceneObject,
-                             const AnimatableProperty<P>* property,
-                             MemberFunction member,
-                             typename ParameterType< P >::PassingType value )
+  AnimatablePropertyMessage(const PropertyOwner*                   sceneObject,
+                            const AnimatableProperty<P>*           property,
+                            MemberFunction                         member,
+                            typename ParameterType<P>::PassingType value)
   : PropertyOwnerMessageBase(),
-    mSceneObject( const_cast< PropertyOwner* >( sceneObject ) ),
-    mProperty( const_cast< AnimatableProperty<P>* >( property ) ),
-    mMemberFunction( member ),
-    mParam( value )
+    mSceneObject(const_cast<PropertyOwner*>(sceneObject)),
+    mProperty(const_cast<AnimatableProperty<P>*>(property)),
+    mMemberFunction(member),
+    mParam(value)
   {
   }
 
 private:
-
-  PropertyOwner* mSceneObject;
-  AnimatableProperty<P>* mProperty;
-  MemberFunction mMemberFunction;
-  typename ParameterType< P >::HolderType mParam;
+  PropertyOwner*                        mSceneObject;
+  AnimatableProperty<P>*                mProperty;
+  MemberFunction                        mMemberFunction;
+  typename ParameterType<P>::HolderType mParam;
 };
 
 /**
  * Templated message which bakes a property.
  */
-template< typename P >
+template<typename P>
 class AnimatablePropertyComponentMessage : public PropertyOwnerMessageBase
 {
 public:
-  using MemberFunction = void ( AnimatableProperty<P>::* )( BufferIndex, float );
+  using MemberFunction = void (AnimatableProperty<P>::*)(BufferIndex, float);
 
   /**
    * Send a message.
@@ -159,17 +155,17 @@ public:
    * @param[in] member The member function of the object.
    * @param[in] value The new value of the X,Y,Z or W component.
    */
-  static void Send( EventThreadServices& eventThreadServices,
-                    const PropertyOwner* sceneObject,
-                    const AnimatableProperty<P>* property,
-                    MemberFunction member,
-                    float value )
+  static void Send(EventThreadServices&         eventThreadServices,
+                   const PropertyOwner*         sceneObject,
+                   const AnimatableProperty<P>* property,
+                   MemberFunction               member,
+                   float                        value)
   {
     // Reserve some memory inside the message queue
-    uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( AnimatablePropertyComponentMessage ) );
+    uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(AnimatablePropertyComponentMessage));
 
     // Construct message in the message queue memory; note that delete should not be called on the return value
-    new (slot) AnimatablePropertyComponentMessage( sceneObject, property, member, value );
+    new(slot) AnimatablePropertyComponentMessage(sceneObject, property, member, value);
   }
 
   /**
@@ -180,13 +176,12 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process( BufferIndex updateBufferIndex ) override
+  void Process(BufferIndex updateBufferIndex) override
   {
-    (mProperty->*mMemberFunction)( updateBufferIndex, mParam );
+    (mProperty->*mMemberFunction)(updateBufferIndex, mParam);
   }
 
 private:
-
   /**
    * Create a message.
    * @note The scene object is expected to be const in the thread which sends this message.
@@ -196,62 +191,61 @@ private:
    * @param[in] member The member function of the object.
    * @param[in] value The new value of the X,Y,Z or W component.
   */
-  AnimatablePropertyComponentMessage( const PropertyOwner* sceneObject,
-                                      const AnimatableProperty<P>* property,
-                                      MemberFunction member,
-                                      float value )
+  AnimatablePropertyComponentMessage(const PropertyOwner*         sceneObject,
+                                     const AnimatableProperty<P>* property,
+                                     MemberFunction               member,
+                                     float                        value)
   : PropertyOwnerMessageBase(),
-    mSceneObject( const_cast< PropertyOwner* >( sceneObject ) ),
-    mProperty( const_cast< AnimatableProperty<P>* >( property ) ),
-    mMemberFunction( member ),
-    mParam( value )
+    mSceneObject(const_cast<PropertyOwner*>(sceneObject)),
+    mProperty(const_cast<AnimatableProperty<P>*>(property)),
+    mMemberFunction(member),
+    mParam(value)
   {
   }
 
 private:
-  PropertyOwner* mSceneObject;
+  PropertyOwner*         mSceneObject;
   AnimatableProperty<P>* mProperty;
-  MemberFunction mMemberFunction;
-  float mParam;
+  MemberFunction         mMemberFunction;
+  float                  mParam;
 };
-
 
 // Messages for PropertyOwner
 
-inline void InstallCustomPropertyMessage( EventThreadServices& eventThreadServices, const PropertyOwner& owner, OwnerPointer<PropertyBase>& property )
+inline void InstallCustomPropertyMessage(EventThreadServices& eventThreadServices, const PropertyOwner& owner, OwnerPointer<PropertyBase>& property)
 {
   using LocalType = MessageValue1<PropertyOwner, OwnerPointer<PropertyBase> >;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &owner, &PropertyOwner::InstallCustomProperty, property );
+  new(slot) LocalType(&owner, &PropertyOwner::InstallCustomProperty, property);
 }
 
-inline void ApplyConstraintMessage( EventThreadServices& eventThreadServices, const PropertyOwner& owner, OwnerPointer<ConstraintBase>& constraint )
+inline void ApplyConstraintMessage(EventThreadServices& eventThreadServices, const PropertyOwner& owner, OwnerPointer<ConstraintBase>& constraint)
 {
   using LocalType = MessageValue1<PropertyOwner, OwnerPointer<ConstraintBase> >;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &owner, &PropertyOwner::ApplyConstraint, constraint );
+  new(slot) LocalType(&owner, &PropertyOwner::ApplyConstraint, constraint);
 }
 
-inline void RemoveConstraintMessage( EventThreadServices& eventThreadServices, const PropertyOwner& owner, const ConstraintBase& constConstraint )
+inline void RemoveConstraintMessage(EventThreadServices& eventThreadServices, const PropertyOwner& owner, const ConstraintBase& constConstraint)
 {
   // The update-thread can modify this object.
-  ConstraintBase& constraint = const_cast< ConstraintBase& >( constConstraint );
+  ConstraintBase& constraint = const_cast<ConstraintBase&>(constConstraint);
 
   using LocalType = MessageValue1<PropertyOwner, ConstraintBase*>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &owner, &PropertyOwner::RemoveConstraint, &constraint );
+  new(slot) LocalType(&owner, &PropertyOwner::RemoveConstraint, &constraint);
 }
 
 inline void AddUniformMapMessage(EventThreadServices& eventThreadServices, const PropertyOwner& owner, UniformPropertyMapping map)
@@ -259,21 +253,20 @@ inline void AddUniformMapMessage(EventThreadServices& eventThreadServices, const
   using LocalType = MessageValue1<PropertyOwner, UniformPropertyMapping>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
-  new (slot) LocalType( &owner, &PropertyOwner::AddUniformMapping, map );
+  new(slot) LocalType(&owner, &PropertyOwner::AddUniformMapping, map);
 }
 
-inline void RemoveUniformMapMessage( EventThreadServices& eventThreadServices, const PropertyOwner& owner, ConstString uniformName )
+inline void RemoveUniformMapMessage(EventThreadServices& eventThreadServices, const PropertyOwner& owner, ConstString uniformName)
 {
   using LocalType = MessageValue1<PropertyOwner, ConstString>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
-  new (slot) LocalType( &owner, &PropertyOwner::RemoveUniformMapping, uniformName );
+  new(slot) LocalType(&owner, &PropertyOwner::RemoveUniformMapping, uniformName);
 }
-
 
 } // namespace SceneGraph
 

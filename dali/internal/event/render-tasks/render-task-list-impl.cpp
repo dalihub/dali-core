@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,15 @@
 #include <dali/internal/event/render-tasks/render-task-list-impl.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
+#include <dali/internal/event/actors/camera-actor-impl.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/render-tasks/render-task-defaults.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
-#include <dali/internal/event/actors/camera-actor-impl.h>
-#include <dali/internal/update/render-tasks/scene-graph-render-task.h>
-#include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
 #include <dali/internal/update/manager/update-manager.h>
+#include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
+#include <dali/internal/update/render-tasks/scene-graph-render-task.h>
+#include <dali/public-api/common/dali-common.h>
 
 using Dali::Internal::SceneGraph::UpdateManager;
 
@@ -42,7 +42,6 @@ namespace Dali
 {
 namespace Internal
 {
-
 RenderTaskListPtr RenderTaskList::New()
 {
   RenderTaskListPtr taskList = new RenderTaskList();
@@ -54,38 +53,38 @@ RenderTaskListPtr RenderTaskList::New()
 
 RenderTaskPtr RenderTaskList::CreateTask()
 {
-  return CreateTask( &mDefaults.GetDefaultRootActor(), &mDefaults.GetDefaultCameraActor() );
+  return CreateTask(&mDefaults.GetDefaultRootActor(), &mDefaults.GetDefaultCameraActor());
 }
 
-RenderTaskPtr RenderTaskList::CreateTask( Actor* sourceActor, CameraActor* cameraActor)
+RenderTaskPtr RenderTaskList::CreateTask(Actor* sourceActor, CameraActor* cameraActor)
 {
-  RenderTaskPtr task = RenderTask::New( sourceActor, cameraActor, *this );
+  RenderTaskPtr task = RenderTask::New(sourceActor, cameraActor, *this);
 
-  mTasks.push_back( task );
+  mTasks.push_back(task);
 
   return task;
 }
 
-void RenderTaskList::RemoveTask( Internal::RenderTask& task )
+void RenderTaskList::RemoveTask(Internal::RenderTask& task)
 {
-  for ( RenderTaskContainer::iterator iter = mTasks.begin(); mTasks.end() != iter; ++iter )
+  for(RenderTaskContainer::iterator iter = mTasks.begin(); mTasks.end() != iter; ++iter)
   {
-    RenderTask *ptr = iter->Get();
+    RenderTask* ptr = iter->Get();
 
-    if ( ptr == &task )
+    if(ptr == &task)
     {
       const SceneGraph::RenderTask& sceneObject = task.GetRenderTaskSceneObject();
 
       // delete the task
-      mTasks.erase( iter );
+      mTasks.erase(iter);
       // send a message to remove the scene-graph RenderTask
-      RemoveTaskMessage( mEventThreadServices, *mSceneObject, sceneObject );
+      RemoveTaskMessage(mEventThreadServices, *mSceneObject, sceneObject);
 
-      for ( auto exclusiveIt = mExclusives.begin(); exclusiveIt != mExclusives.end(); ++exclusiveIt )
+      for(auto exclusiveIt = mExclusives.begin(); exclusiveIt != mExclusives.end(); ++exclusiveIt)
       {
-        if ( exclusiveIt->renderTaskPtr == ptr )
+        if(exclusiveIt->renderTaskPtr == ptr)
         {
-          mExclusives.erase( exclusiveIt );
+          mExclusives.erase(exclusiveIt);
           break;
         }
       }
@@ -96,58 +95,58 @@ void RenderTaskList::RemoveTask( Internal::RenderTask& task )
 
 uint32_t RenderTaskList::GetTaskCount() const
 {
-  return static_cast<uint32_t>( mTasks.size() ); // only 4,294,967,295 render tasks supported
+  return static_cast<uint32_t>(mTasks.size()); // only 4,294,967,295 render tasks supported
 }
 
-RenderTaskPtr RenderTaskList::GetTask( uint32_t index ) const
+RenderTaskPtr RenderTaskList::GetTask(uint32_t index) const
 {
-  DALI_ASSERT_ALWAYS( ( index < mTasks.size() ) && "RenderTask index out-of-range" );
+  DALI_ASSERT_ALWAYS((index < mTasks.size()) && "RenderTask index out-of-range");
 
-  return mTasks[ index ];
+  return mTasks[index];
 }
 
-void RenderTaskList::SetExclusive( RenderTask* task, bool exclusive )
+void RenderTaskList::SetExclusive(RenderTask* task, bool exclusive)
 {
   // Check to see if this rendertask has an entry?
-  for ( auto exclusiveIt = mExclusives.begin(); exclusiveIt != mExclusives.end(); ++exclusiveIt )
+  for(auto exclusiveIt = mExclusives.begin(); exclusiveIt != mExclusives.end(); ++exclusiveIt)
   {
-    if ( exclusiveIt->renderTaskPtr == task )
+    if(exclusiveIt->renderTaskPtr == task)
     {
-      if ( !exclusive )
+      if(!exclusive)
       {
-        mExclusives.erase( exclusiveIt );
+        mExclusives.erase(exclusiveIt);
         break;
       }
       else
       {
-        exclusiveIt->actor.SetActor( task->GetSourceActor() );
+        exclusiveIt->actor.SetActor(task->GetSourceActor());
         exclusive = false;
         break;
       }
     }
   }
-  if ( exclusive )
+  if(exclusive)
   {
     Exclusive exclusiveSlot;
     exclusiveSlot.renderTaskPtr = task;
-    exclusiveSlot.actor.SetActor( task->GetSourceActor() );
-    mExclusives.emplace_back( std::move( exclusiveSlot ) );
+    exclusiveSlot.actor.SetActor(task->GetSourceActor());
+    mExclusives.emplace_back(std::move(exclusiveSlot));
   }
 }
 
 RenderTaskList::RenderTaskList()
-: mEventThreadServices( EventThreadServices::Get() ),
-  mDefaults( *Stage::GetCurrent() ),
-  mSceneObject( nullptr )
+: mEventThreadServices(EventThreadServices::Get()),
+  mDefaults(*Stage::GetCurrent()),
+  mSceneObject(nullptr)
 {
 }
 
 RenderTaskList::~RenderTaskList()
 {
-  if( EventThreadServices::IsCoreRunning() && mSceneObject )
+  if(EventThreadServices::IsCoreRunning() && mSceneObject)
   {
     // Remove the render task list using a message to the update manager
-    RemoveRenderTaskListMessage( mEventThreadServices.GetUpdateManager(), *mSceneObject );
+    RemoveRenderTaskListMessage(mEventThreadServices.GetUpdateManager(), *mSceneObject);
   }
 }
 
@@ -156,11 +155,11 @@ void RenderTaskList::Initialize()
   // Create a new render task list, Keep a const pointer to the render task list.
   mSceneObject = SceneGraph::RenderTaskList::New();
 
-  OwnerPointer< SceneGraph::RenderTaskList > transferOwnership( const_cast< SceneGraph::RenderTaskList* >( mSceneObject ) );
-  AddRenderTaskListMessage( mEventThreadServices.GetUpdateManager(), transferOwnership );
+  OwnerPointer<SceneGraph::RenderTaskList> transferOwnership(const_cast<SceneGraph::RenderTaskList*>(mSceneObject));
+  AddRenderTaskListMessage(mEventThreadServices.GetUpdateManager(), transferOwnership);
 
   // set the callback to call us back when tasks are completed
-  mSceneObject->SetCompleteNotificationInterface( this );
+  mSceneObject->SetCompleteNotificationInterface(this);
 }
 
 void RenderTaskList::NotifyCompleted()
@@ -171,16 +170,16 @@ void RenderTaskList::NotifyCompleted()
 
   // Since render tasks can be unreferenced during the signal emissions, iterators into render tasks pointers may be invalidated.
   // First copy the finished render tasks, then emit signals
-  for ( RenderTaskContainer::iterator iter = mTasks.begin(), endIt = mTasks.end(); iter != endIt; ++iter )
+  for(RenderTaskContainer::iterator iter = mTasks.begin(), endIt = mTasks.end(); iter != endIt; ++iter)
   {
-    if( (*iter)->HasFinished() )
+    if((*iter)->HasFinished())
     {
-      finishedRenderTasks.push_back( *iter );
+      finishedRenderTasks.push_back(*iter);
     }
   }
 
   // Now it's safe to emit the signals
-  for ( auto&& item : finishedRenderTasks )
+  for(auto&& item : finishedRenderTasks)
   {
     item->EmitSignalFinish();
   }
@@ -188,12 +187,12 @@ void RenderTaskList::NotifyCompleted()
 
 void RenderTaskList::RecoverFromContextLoss()
 {
-  for ( auto&& item : mTasks )
+  for(auto&& item : mTasks)
   {
     // If the render target renders only once to an offscreen, re-render the render task
-    if( item->GetRefreshRate() == Dali::RenderTask::REFRESH_ONCE && item->GetFrameBuffer() )
+    if(item->GetRefreshRate() == Dali::RenderTask::REFRESH_ONCE && item->GetFrameBuffer())
     {
-      item->SetRefreshRate( Dali::RenderTask::REFRESH_ONCE );
+      item->SetRefreshRate(Dali::RenderTask::REFRESH_ONCE);
     }
   }
 }

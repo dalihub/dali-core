@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,26 +22,24 @@
 #include <algorithm>
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
+#include <dali/internal/event/common/scene-impl.h>
+#include <dali/internal/event/events/gesture-requests.h>
+#include <dali/internal/event/events/pinch-gesture/pinch-gesture-event.h>
+#include <dali/internal/event/events/pinch-gesture/pinch-gesture-impl.h>
+#include <dali/internal/event/events/pinch-gesture/pinch-gesture-recognizer.h>
+#include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/events/pinch-gesture.h>
 #include <dali/public-api/math/vector2.h>
-#include <dali/internal/event/events/pinch-gesture/pinch-gesture-event.h>
-#include <dali/integration-api/debug.h>
-#include <dali/internal/event/common/scene-impl.h>
-#include <dali/internal/event/render-tasks/render-task-impl.h>
-#include <dali/internal/event/events/pinch-gesture/pinch-gesture-recognizer.h>
-#include <dali/internal/event/events/pinch-gesture/pinch-gesture-impl.h>
-#include <dali/internal/event/events/gesture-requests.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace
 {
-const uint32_t MINIMUM_TOUCH_EVENTS_REQUIRED = 4u;
+const uint32_t MINIMUM_TOUCH_EVENTS_REQUIRED             = 4u;
 const uint32_t MINIMUM_TOUCH_EVENTS_REQUIRED_AFTER_START = 4u;
 
 /**
@@ -52,25 +50,25 @@ const uint32_t MINIMUM_TOUCH_EVENTS_REQUIRED_AFTER_START = 4u;
  * @param[in]  localCenter       Relative to the actor attached to the detector.
  */
 void EmitPinchSignal(
-    Actor* actor,
-    const GestureDetectorContainer& gestureDetectors,
-    const PinchGestureEvent& pinchEvent,
-    Vector2 localCenter)
+  Actor*                          actor,
+  const GestureDetectorContainer& gestureDetectors,
+  const PinchGestureEvent&        pinchEvent,
+  Vector2                         localCenter)
 {
-  Internal::PinchGesturePtr pinch( new Internal::PinchGesture(pinchEvent.state ) );
-  pinch->SetTime( pinchEvent.time );
+  Internal::PinchGesturePtr pinch(new Internal::PinchGesture(pinchEvent.state));
+  pinch->SetTime(pinchEvent.time);
 
-  pinch->SetScale( pinchEvent.scale );
-  pinch->SetSpeed( pinchEvent.speed );
-  pinch->SetScreenCenterPoint( pinchEvent.centerPoint );
+  pinch->SetScale(pinchEvent.scale);
+  pinch->SetSpeed(pinchEvent.speed);
+  pinch->SetScreenCenterPoint(pinchEvent.centerPoint);
 
-  pinch->SetLocalCenterPoint( localCenter );
+  pinch->SetLocalCenterPoint(localCenter);
 
-  Dali::Actor actorHandle( actor );
+  Dali::Actor                                    actorHandle(actor);
   const GestureDetectorContainer::const_iterator endIter = gestureDetectors.end();
-  for ( GestureDetectorContainer::const_iterator iter = gestureDetectors.begin(); iter != endIter; ++iter )
+  for(GestureDetectorContainer::const_iterator iter = gestureDetectors.begin(); iter != endIter; ++iter)
   {
-    static_cast< PinchGestureDetector* >( *iter )->EmitPinchGestureSignal( actorHandle, Dali::PinchGesture( pinch.Get() ) );
+    static_cast<PinchGestureDetector*>(*iter)->EmitPinchGestureSignal(actorHandle, Dali::PinchGesture(pinch.Get()));
   }
 }
 
@@ -105,69 +103,69 @@ struct IsNotAttachedFunctor
 } // unnamed namespace
 
 PinchGestureProcessor::PinchGestureProcessor()
-: GestureProcessor( GestureType::PINCH ),
+: GestureProcessor(GestureType::PINCH),
   mPinchGestureDetectors(),
   mCurrentPinchEmitters(),
   mCurrentPinchEvent(nullptr),
   mMinimumPinchDistance(-1.0f),
-  mMinimumTouchEvents( MINIMUM_TOUCH_EVENTS_REQUIRED ),
-  mMinimumTouchEventsAfterStart( MINIMUM_TOUCH_EVENTS_REQUIRED_AFTER_START )
+  mMinimumTouchEvents(MINIMUM_TOUCH_EVENTS_REQUIRED),
+  mMinimumTouchEventsAfterStart(MINIMUM_TOUCH_EVENTS_REQUIRED_AFTER_START)
 {
 }
 
 PinchGestureProcessor::~PinchGestureProcessor() = default;
 
-void PinchGestureProcessor::SetMinimumPinchDistance( float value )
+void PinchGestureProcessor::SetMinimumPinchDistance(float value)
 {
   mMinimumPinchDistance = value;
 
-  if( mGestureRecognizer )
+  if(mGestureRecognizer)
   {
     PinchGestureRecognizer* pinchRecognizer = dynamic_cast<PinchGestureRecognizer*>(mGestureRecognizer.Get());
-    if( pinchRecognizer )
+    if(pinchRecognizer)
     {
       pinchRecognizer->SetMinimumPinchDistance(value);
     }
   }
 }
 
-void PinchGestureProcessor::SetMinimumTouchEvents( uint32_t value )
+void PinchGestureProcessor::SetMinimumTouchEvents(uint32_t value)
 {
-  if( value > 1u && mMinimumTouchEvents != value )
+  if(value > 1u && mMinimumTouchEvents != value)
   {
     mMinimumTouchEvents = value;
 
-    if( mGestureRecognizer )
+    if(mGestureRecognizer)
     {
-      PinchGestureRecognizer* pinchRecognizer = dynamic_cast<PinchGestureRecognizer*>( mGestureRecognizer.Get() );
-      if( pinchRecognizer )
+      PinchGestureRecognizer* pinchRecognizer = dynamic_cast<PinchGestureRecognizer*>(mGestureRecognizer.Get());
+      if(pinchRecognizer)
       {
-        pinchRecognizer->SetMinimumTouchEvents( value );
+        pinchRecognizer->SetMinimumTouchEvents(value);
       }
     }
   }
 }
 
-void PinchGestureProcessor::SetMinimumTouchEventsAfterStart( uint32_t value )
+void PinchGestureProcessor::SetMinimumTouchEventsAfterStart(uint32_t value)
 {
-  if( value > 1u && mMinimumTouchEventsAfterStart != value )
+  if(value > 1u && mMinimumTouchEventsAfterStart != value)
   {
     mMinimumTouchEventsAfterStart = value;
 
-    if( mGestureRecognizer )
+    if(mGestureRecognizer)
     {
-      PinchGestureRecognizer* pinchRecognizer = dynamic_cast<PinchGestureRecognizer*>( mGestureRecognizer.Get() );
-      if( pinchRecognizer )
+      PinchGestureRecognizer* pinchRecognizer = dynamic_cast<PinchGestureRecognizer*>(mGestureRecognizer.Get());
+      if(pinchRecognizer)
       {
-        pinchRecognizer->SetMinimumTouchEventsAfterStart( value );
+        pinchRecognizer->SetMinimumTouchEventsAfterStart(value);
       }
     }
   }
 }
 
-void PinchGestureProcessor::Process( Scene& scene, const PinchGestureEvent& pinchEvent )
+void PinchGestureProcessor::Process(Scene& scene, const PinchGestureEvent& pinchEvent)
 {
-  switch ( pinchEvent.state )
+  switch(pinchEvent.state)
   {
     case GestureState::STARTED:
     {
@@ -178,14 +176,14 @@ void PinchGestureProcessor::Process( Scene& scene, const PinchGestureEvent& pinc
       ResetActor();
 
       HitTestAlgorithm::Results hitTestResults;
-      if( HitTest( scene, pinchEvent.centerPoint, hitTestResults ) )
+      if(HitTest(scene, pinchEvent.centerPoint, hitTestResults))
       {
         // Record the current render-task for Screen->Actor coordinate conversions
         mCurrentRenderTask = hitTestResults.renderTask;
 
         // Set mCurrentPinchEvent to use inside overridden methods called from ProcessAndEmit()
         mCurrentPinchEvent = &pinchEvent;
-        ProcessAndEmit( hitTestResults );
+        ProcessAndEmit(hitTestResults);
         mCurrentPinchEvent = nullptr;
       }
       break;
@@ -199,21 +197,21 @@ void PinchGestureProcessor::Process( Scene& scene, const PinchGestureEvent& pinc
       // Check if actor is still touchable.
 
       Actor* currentGesturedActor = GetCurrentGesturedActor();
-      if ( currentGesturedActor )
+      if(currentGesturedActor)
       {
-        if ( currentGesturedActor->IsHittable() && !mCurrentPinchEmitters.empty() && mCurrentRenderTask )
+        if(currentGesturedActor->IsHittable() && !mCurrentPinchEmitters.empty() && mCurrentRenderTask)
         {
           // Ensure actor is still attached to the emitters, if it is not then remove the emitter.
-          GestureDetectorContainer::iterator endIter = std::remove_if( mCurrentPinchEmitters.begin(), mCurrentPinchEmitters.end(), IsNotAttachedFunctor(currentGesturedActor) );
-          mCurrentPinchEmitters.erase( endIter, mCurrentPinchEmitters.end() );
+          GestureDetectorContainer::iterator endIter = std::remove_if(mCurrentPinchEmitters.begin(), mCurrentPinchEmitters.end(), IsNotAttachedFunctor(currentGesturedActor));
+          mCurrentPinchEmitters.erase(endIter, mCurrentPinchEmitters.end());
 
-          if ( !mCurrentPinchEmitters.empty() )
+          if(!mCurrentPinchEmitters.empty())
           {
-            Vector2 actorCoords;
-            RenderTask& renderTaskImpl( *mCurrentRenderTask.Get() );
-            currentGesturedActor->ScreenToLocal( renderTaskImpl, actorCoords.x, actorCoords.y, pinchEvent.centerPoint.x, pinchEvent.centerPoint.y );
+            Vector2     actorCoords;
+            RenderTask& renderTaskImpl(*mCurrentRenderTask.Get());
+            currentGesturedActor->ScreenToLocal(renderTaskImpl, actorCoords.x, actorCoords.y, pinchEvent.centerPoint.x, pinchEvent.centerPoint.y);
 
-            EmitPinchSignal( currentGesturedActor, mCurrentPinchEmitters, pinchEvent, actorCoords );
+            EmitPinchSignal(currentGesturedActor, mCurrentPinchEmitters, pinchEvent, actorCoords);
           }
           else
           {
@@ -222,7 +220,7 @@ void PinchGestureProcessor::Process( Scene& scene, const PinchGestureEvent& pinc
           }
 
           // Clear current emitters if pinch gesture has ended or been cancelled.
-          if ( pinchEvent.state == GestureState::FINISHED || pinchEvent.state == GestureState::CANCELLED )
+          if(pinchEvent.state == GestureState::FINISHED || pinchEvent.state == GestureState::CANCELLED)
           {
             mCurrentPinchEmitters.clear();
             ResetActor();
@@ -239,59 +237,59 @@ void PinchGestureProcessor::Process( Scene& scene, const PinchGestureEvent& pinc
 
     case GestureState::CLEAR:
     {
-      DALI_ABORT( "Incorrect state received from Integration layer: CLEAR\n" );
+      DALI_ABORT("Incorrect state received from Integration layer: CLEAR\n");
       break;
     }
     case GestureState::POSSIBLE:
     {
-      DALI_ABORT( "Incorrect state received from Integration layer: POSSIBLE\n" );
+      DALI_ABORT("Incorrect state received from Integration layer: POSSIBLE\n");
       break;
     }
   }
 }
 
-void PinchGestureProcessor::AddGestureDetector( PinchGestureDetector* gestureDetector, Scene& scene )
+void PinchGestureProcessor::AddGestureDetector(PinchGestureDetector* gestureDetector, Scene& scene)
 {
   bool createRecognizer(mPinchGestureDetectors.empty());
 
   mPinchGestureDetectors.push_back(gestureDetector);
 
-  if (createRecognizer)
+  if(createRecognizer)
   {
-    Size size = scene.GetSize();
-    mGestureRecognizer = new PinchGestureRecognizer( *this, Vector2(size.width, size.height), scene.GetDpi(), mMinimumPinchDistance, mMinimumTouchEventsAfterStart, mMinimumTouchEventsAfterStart );
+    Size size          = scene.GetSize();
+    mGestureRecognizer = new PinchGestureRecognizer(*this, Vector2(size.width, size.height), scene.GetDpi(), mMinimumPinchDistance, mMinimumTouchEventsAfterStart, mMinimumTouchEventsAfterStart);
   }
 }
 
-void PinchGestureProcessor::RemoveGestureDetector( PinchGestureDetector* gestureDetector )
+void PinchGestureProcessor::RemoveGestureDetector(PinchGestureDetector* gestureDetector)
 {
-  if ( !mCurrentPinchEmitters.empty() )
+  if(!mCurrentPinchEmitters.empty())
   {
     // Check if the removed detector was one that is currently being pinched and remove it from emitters.
-    GestureDetectorContainer::iterator endIter = std::remove( mCurrentPinchEmitters.begin(), mCurrentPinchEmitters.end(), gestureDetector );
-    mCurrentPinchEmitters.erase( endIter, mCurrentPinchEmitters.end() );
+    GestureDetectorContainer::iterator endIter = std::remove(mCurrentPinchEmitters.begin(), mCurrentPinchEmitters.end(), gestureDetector);
+    mCurrentPinchEmitters.erase(endIter, mCurrentPinchEmitters.end());
 
     // If we no longer have any emitters, then we should clear mCurrentGesturedActor as well
-    if ( mCurrentPinchEmitters.empty() )
+    if(mCurrentPinchEmitters.empty())
     {
       ResetActor();
     }
   }
 
   // Find the detector...
-  PinchGestureDetectorContainer::iterator endIter = std::remove( mPinchGestureDetectors.begin(), mPinchGestureDetectors.end(), gestureDetector );
-  DALI_ASSERT_DEBUG( endIter != mPinchGestureDetectors.end() );
+  PinchGestureDetectorContainer::iterator endIter = std::remove(mPinchGestureDetectors.begin(), mPinchGestureDetectors.end(), gestureDetector);
+  DALI_ASSERT_DEBUG(endIter != mPinchGestureDetectors.end());
 
   // ...and remove it
   mPinchGestureDetectors.erase(endIter, mPinchGestureDetectors.end());
 
-  if (mPinchGestureDetectors.empty())
+  if(mPinchGestureDetectors.empty())
   {
     mGestureRecognizer = nullptr;
   }
 }
 
-void PinchGestureProcessor::GestureDetectorUpdated( PinchGestureDetector* gestureDetector )
+void PinchGestureProcessor::GestureDetectorUpdated(PinchGestureDetector* gestureDetector)
 {
   // Nothing to do as PinchGestureDetector does not have any specific parameters.
 }
@@ -301,22 +299,22 @@ void PinchGestureProcessor::OnGesturedActorStageDisconnection()
   mCurrentPinchEmitters.clear();
 }
 
-bool PinchGestureProcessor::CheckGestureDetector( GestureDetector* detector, Actor* actor )
+bool PinchGestureProcessor::CheckGestureDetector(GestureDetector* detector, Actor* actor)
 {
   // No special case required for pinch.
   return true;
 }
 
-void PinchGestureProcessor::EmitGestureSignal( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates )
+void PinchGestureProcessor::EmitGestureSignal(Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates)
 {
-  DALI_ASSERT_DEBUG( mCurrentPinchEvent );
+  DALI_ASSERT_DEBUG(mCurrentPinchEvent);
 
-  EmitPinchSignal( actor, gestureDetectors, *mCurrentPinchEvent, actorCoordinates );
+  EmitPinchSignal(actor, gestureDetectors, *mCurrentPinchEvent, actorCoordinates);
 
-  if ( actor->OnScene() )
+  if(actor->OnScene())
   {
     mCurrentPinchEmitters = gestureDetectors;
-    SetActor( actor );
+    SetActor(actor);
   }
 }
 

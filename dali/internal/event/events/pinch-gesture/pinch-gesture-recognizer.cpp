@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,23 +24,20 @@
 #include <dali/devel-api/events/touch-point.h>
 #include <dali/public-api/math/vector2.h>
 
-#include <dali/internal/event/events/pinch-gesture/pinch-gesture-event.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/internal/event/common/scene-impl.h>
+#include <dali/internal/event/events/pinch-gesture/pinch-gesture-event.h>
 
 // INTERNAL INCLUDES
 
-
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace
 {
 const float MINIMUM_DISTANCE_IN_MILLIINCH = 45.0f; // This value is used for measuring minimum pinch distance in pixel.
-const float MINIMUM_DISTANCE_IN_PIXEL = 10.0f; // This value is for devices that do not provide a valid dpi value. (assumes 220dpi)
+const float MINIMUM_DISTANCE_IN_PIXEL     = 10.0f; // This value is for devices that do not provide a valid dpi value. (assumes 220dpi)
 
 inline float GetDistance(const Integration::Point& point1, const Integration::Point& point2)
 {
@@ -53,29 +50,29 @@ inline Vector2 GetCenterPoint(const Integration::Point& point1, const Integratio
   return Vector2(point1.GetScreenPosition() + point2.GetScreenPosition()) * 0.5f;
 }
 
-inline bool IsValidDpi( const Vector2& dpi )
+inline bool IsValidDpi(const Vector2& dpi)
 {
   return dpi.x > 0.f && dpi.y > 0.f;
 }
 
-inline float GetDefaultMinimumPinchDistance( const Vector2& dpi )
+inline float GetDefaultMinimumPinchDistance(const Vector2& dpi)
 {
-  return IsValidDpi( dpi ) ? ( ( MINIMUM_DISTANCE_IN_MILLIINCH * std::min( dpi.x, dpi.y ) ) / 1000.f ) : MINIMUM_DISTANCE_IN_PIXEL;
+  return IsValidDpi(dpi) ? ((MINIMUM_DISTANCE_IN_MILLIINCH * std::min(dpi.x, dpi.y)) / 1000.f) : MINIMUM_DISTANCE_IN_PIXEL;
 }
 
 } // unnamed namespace
 
-PinchGestureRecognizer::PinchGestureRecognizer( Observer& observer, Vector2 screenSize, Vector2 screenDpi, float minimumPinchDistance, uint32_t minimumTouchEvents, uint32_t minimumTouchEventsAfterStart )
-: GestureRecognizer( screenSize, GestureType::PINCH ),
-  mObserver( observer ),
-  mState( CLEAR ),
+PinchGestureRecognizer::PinchGestureRecognizer(Observer& observer, Vector2 screenSize, Vector2 screenDpi, float minimumPinchDistance, uint32_t minimumTouchEvents, uint32_t minimumTouchEventsAfterStart)
+: GestureRecognizer(screenSize, GestureType::PINCH),
+  mObserver(observer),
+  mState(CLEAR),
   mTouchEvents(),
-  mDefaultMinimumDistanceDelta( GetDefaultMinimumPinchDistance( screenDpi ) ),
-  mStartingDistance( 0.0f ),
-  mMinimumTouchEvents( minimumTouchEvents ),
-  mMinimumTouchEventsAfterStart( minimumTouchEventsAfterStart )
+  mDefaultMinimumDistanceDelta(GetDefaultMinimumPinchDistance(screenDpi)),
+  mStartingDistance(0.0f),
+  mMinimumTouchEvents(minimumTouchEvents),
+  mMinimumTouchEventsAfterStart(minimumTouchEventsAfterStart)
 {
-  SetMinimumPinchDistance( minimumPinchDistance );
+  SetMinimumPinchDistance(minimumPinchDistance);
 }
 
 PinchGestureRecognizer::~PinchGestureRecognizer() = default;
@@ -87,14 +84,14 @@ void PinchGestureRecognizer::SetMinimumPinchDistance(float value)
 
 void PinchGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
 {
-  int pointCount = event.GetPointCount();
+  int                  pointCount = event.GetPointCount();
   GestureRecognizerPtr ptr(this); // To keep us from being destroyed during the life-time of this method
 
-  switch (mState)
+  switch(mState)
   {
     case CLEAR:
     {
-      if (pointCount == 2)
+      if(pointCount == 2)
       {
         // Change state to possible as we have two touch points.
         mState = POSSIBLE;
@@ -105,7 +102,7 @@ void PinchGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
 
     case POSSIBLE:
     {
-      if (pointCount != 2)
+      if(pointCount != 2)
       {
         // We no longer have two touch points so change state back to CLEAR.
         mState = CLEAR;
@@ -116,7 +113,7 @@ void PinchGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
         const Integration::Point& currentPoint1 = event.points[0];
         const Integration::Point& currentPoint2 = event.points[1];
 
-        if (currentPoint1.GetState() == PointState::UP || currentPoint2.GetState() == PointState::UP || currentPoint1.GetState() == PointState::INTERRUPTED)
+        if(currentPoint1.GetState() == PointState::UP || currentPoint2.GetState() == PointState::UP || currentPoint1.GetState() == PointState::INTERRUPTED)
         {
           // One of our touch points has an Up event so change our state back to CLEAR.
           mState = CLEAR;
@@ -127,22 +124,22 @@ void PinchGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
           mTouchEvents.push_back(event);
 
           // We can only determine a pinch after a certain number of touch points have been collected.
-          if( mTouchEvents.size() >= mMinimumTouchEvents )
+          if(mTouchEvents.size() >= mMinimumTouchEvents)
           {
             const Integration::Point& firstPoint1 = mTouchEvents[0].points[0];
             const Integration::Point& firstPoint2 = mTouchEvents[0].points[1];
 
-            float firstDistance = GetDistance(firstPoint1, firstPoint2);
+            float firstDistance   = GetDistance(firstPoint1, firstPoint2);
             float currentDistance = GetDistance(currentPoint1, currentPoint2);
             float distanceChanged = firstDistance - currentDistance;
 
             // Check if distance has changed enough
-            if (fabsf(distanceChanged) > mMinimumDistanceDelta)
+            if(fabsf(distanceChanged) > mMinimumDistanceDelta)
             {
               // Remove the first few events from the vector otherwise values are exaggerated
-              mTouchEvents.erase( mTouchEvents.begin(), mTouchEvents.end() - mMinimumTouchEvents );
+              mTouchEvents.erase(mTouchEvents.begin(), mTouchEvents.end() - mMinimumTouchEvents);
 
-              if ( !mTouchEvents.empty() )
+              if(!mTouchEvents.empty())
               {
                 mStartingDistance = GetDistance(mTouchEvents.begin()->points[0], mTouchEvents.begin()->points[1]);
 
@@ -155,7 +152,7 @@ void PinchGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
               mTouchEvents.clear();
             }
 
-            if (mState == POSSIBLE)
+            if(mState == POSSIBLE)
             {
               // No pinch, so restart detection
               mState = CLEAR;
@@ -177,7 +174,7 @@ void PinchGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
         mState = CLEAR;
         mTouchEvents.clear();
       }
-      else if (pointCount != 2)
+      else if(pointCount != 2)
       {
         // Send pinch finished event
         SendPinch(GestureState::FINISHED, event);
@@ -190,7 +187,7 @@ void PinchGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
         const Integration::Point& currentPoint1 = event.points[0];
         const Integration::Point& currentPoint2 = event.points[1];
 
-        if (currentPoint1.GetState() == PointState::UP || currentPoint2.GetState() == PointState::UP)
+        if(currentPoint1.GetState() == PointState::UP || currentPoint2.GetState() == PointState::UP)
         {
           mTouchEvents.push_back(event);
           // Send pinch finished event
@@ -203,7 +200,7 @@ void PinchGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
         {
           mTouchEvents.push_back(event);
 
-          if( mTouchEvents.size() >= mMinimumTouchEventsAfterStart )
+          if(mTouchEvents.size() >= mMinimumTouchEventsAfterStart)
           {
             // Send pinch continuing
             SendPinch(GestureState::CONTINUING, event);
@@ -226,33 +223,33 @@ void PinchGestureRecognizer::SendPinch(GestureState state, const Integration::To
 {
   PinchGestureEvent gesture(state);
 
-  if ( !mTouchEvents.empty() )
+  if(!mTouchEvents.empty())
   {
     const Integration::TouchEvent& firstEvent = mTouchEvents[0];
 
     // Assert if we have been holding TouchEvents that do not have 2 points
-    DALI_ASSERT_DEBUG( firstEvent.GetPointCount() == 2 );
+    DALI_ASSERT_DEBUG(firstEvent.GetPointCount() == 2);
 
     // We should use the current event in our calculations unless it does not have two points.
     // If it does not have two points, then we should use the last point in mTouchEvents.
-    Integration::TouchEvent event( currentEvent );
-    if ( event.GetPointCount() != 2 )
+    Integration::TouchEvent event(currentEvent);
+    if(event.GetPointCount() != 2)
     {
       event = *mTouchEvents.rbegin();
     }
 
-    const Integration::Point& firstPoint1( firstEvent.points[0] );
-    const Integration::Point& firstPoint2( firstEvent.points[1] );
-    const Integration::Point& currentPoint1( event.points[0] );
-    const Integration::Point& currentPoint2( event.points[1] );
+    const Integration::Point& firstPoint1(firstEvent.points[0]);
+    const Integration::Point& firstPoint2(firstEvent.points[1]);
+    const Integration::Point& currentPoint1(event.points[0]);
+    const Integration::Point& currentPoint2(event.points[1]);
 
-    float firstDistance = GetDistance(firstPoint1, firstPoint2);
+    float firstDistance   = GetDistance(firstPoint1, firstPoint2);
     float currentDistance = GetDistance(currentPoint1, currentPoint2);
-    gesture.scale = currentDistance / mStartingDistance;
+    gesture.scale         = currentDistance / mStartingDistance;
 
     float distanceDelta = fabsf(firstDistance - currentDistance);
-    float timeDelta = static_cast<float> ( currentEvent.time - firstEvent.time );
-    gesture.speed = ( distanceDelta / timeDelta ) * 1000.0f;
+    float timeDelta     = static_cast<float>(currentEvent.time - firstEvent.time);
+    gesture.speed       = (distanceDelta / timeDelta) * 1000.0f;
 
     gesture.centerPoint = GetCenterPoint(currentPoint1, currentPoint2);
   }
@@ -264,7 +261,7 @@ void PinchGestureRecognizer::SendPinch(GestureState state, const Integration::To
 
   gesture.time = currentEvent.time;
 
-  if( mScene )
+  if(mScene)
   {
     // Create another handle so the recognizer cannot be destroyed during process function
     GestureRecognizerPtr recognizerHandle = this;
@@ -273,12 +270,12 @@ void PinchGestureRecognizer::SendPinch(GestureState state, const Integration::To
   }
 }
 
-void PinchGestureRecognizer::SetMinimumTouchEvents( uint32_t value )
+void PinchGestureRecognizer::SetMinimumTouchEvents(uint32_t value)
 {
   mMinimumTouchEvents = value;
 }
 
-void PinchGestureRecognizer::SetMinimumTouchEventsAfterStart( uint32_t value )
+void PinchGestureRecognizer::SetMinimumTouchEventsAfterStart(uint32_t value)
 {
   mMinimumTouchEventsAfterStart = value;
 }

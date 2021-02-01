@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,48 +20,46 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
-PixelData::PixelData( uint8_t* buffer,
-                      uint32_t bufferSize,
-                      uint32_t width,
-                      uint32_t height,
-                      Pixel::Format pixelFormat,
-                      Dali::PixelData::ReleaseFunction releaseFunction )
-: mBuffer( buffer ),
-  mBufferSize( bufferSize ),
-  mWidth( width ),
-  mHeight( height ),
-  mPixelFormat( pixelFormat ),
-  mReleaseFunction( releaseFunction )
+PixelData::PixelData(uint8_t*                         buffer,
+                     uint32_t                         bufferSize,
+                     uint32_t                         width,
+                     uint32_t                         height,
+                     Pixel::Format                    pixelFormat,
+                     Dali::PixelData::ReleaseFunction releaseFunction)
+: mBuffer(buffer),
+  mBufferSize(bufferSize),
+  mWidth(width),
+  mHeight(height),
+  mPixelFormat(pixelFormat),
+  mReleaseFunction(releaseFunction)
 {
 }
 
 PixelData::~PixelData()
 {
-  if( mBuffer )
+  if(mBuffer)
   {
-    if( mReleaseFunction == Dali::PixelData::FREE )
+    if(mReleaseFunction == Dali::PixelData::FREE)
     {
-      free( mBuffer );
+      free(mBuffer);
     }
     else
     {
       delete[] mBuffer;
     }
   }
- }
+}
 
-PixelDataPtr PixelData::New( uint8_t* buffer,
-                             uint32_t bufferSize,
-                             uint32_t width,
-                             uint32_t height,
-                             Pixel::Format pixelFormat,
-                             Dali::PixelData::ReleaseFunction releaseFunction )
+PixelDataPtr PixelData::New(uint8_t*                         buffer,
+                            uint32_t                         bufferSize,
+                            uint32_t                         width,
+                            uint32_t                         height,
+                            Pixel::Format                    pixelFormat,
+                            Dali::PixelData::ReleaseFunction releaseFunction)
 {
-  return new PixelData( buffer, bufferSize, width, height, pixelFormat, releaseFunction );
+  return new PixelData(buffer, bufferSize, width, height, pixelFormat, releaseFunction);
 }
 
 uint32_t PixelData::GetWidth() const
@@ -96,7 +94,6 @@ DevelPixelData::PixelDataBuffer PixelData::ReleaseBuffer()
   return pixelDataBuffer;
 }
 
+} // namespace Internal
 
-}// namespace Internal
-
-}// namespace Dali
+} // namespace Dali

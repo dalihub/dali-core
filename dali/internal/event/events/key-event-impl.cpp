@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,87 +23,85 @@
 
 namespace Dali
 {
-
 namespace
 {
 const uint32_t MODIFIER_SHIFT   = 0x1;
 const uint32_t MODIFIER_CTRL    = 0x2;
 const uint32_t MODIFIER_ALT     = 0x4;
 const int32_t  KEY_INVALID_CODE = -1;
-}
+} // namespace
 
 namespace Internal
 {
-
 KeyEvent::KeyEvent()
-: mKeyName( "" ),
-  mLogicalKey( "" ),
-  mKeyString( "" ),
-  mKeyCode( KEY_INVALID_CODE ),
-  mKeyModifier( 0 ),
-  mTime( 0 ),
-  mState( Dali::KeyEvent::DOWN ),
-  mCompose( "" ),
-  mDeviceName( "" ),
-  mDeviceClass( Device::Class::NONE ),
-  mDeviceSubclass( Device::Subclass::NONE )
+: mKeyName(""),
+  mLogicalKey(""),
+  mKeyString(""),
+  mKeyCode(KEY_INVALID_CODE),
+  mKeyModifier(0),
+  mTime(0),
+  mState(Dali::KeyEvent::DOWN),
+  mCompose(""),
+  mDeviceName(""),
+  mDeviceClass(Device::Class::NONE),
+  mDeviceSubclass(Device::Subclass::NONE)
 {
 }
 
-KeyEvent::KeyEvent( const std::string& keyName,
-          const std::string& logicalKey,
-          const std::string& keyString,
-          int keyCode,
-          int keyModifier,
-          unsigned long timeStamp,
-          const Dali::KeyEvent::State& keyState,
-          const std::string& compose,
-          const std::string& deviceName,
-          const Device::Class::Type deviceClass,
-          const Device::Subclass::Type deviceSubclass )
-: mKeyName( keyName ),
-  mLogicalKey( logicalKey ),
-  mKeyString( keyString ),
-  mKeyCode( keyCode ),
-  mKeyModifier( keyModifier ),
-  mTime( timeStamp ),
-  mState( keyState ),
-  mCompose( compose ),
-  mDeviceName( deviceName ),
-  mDeviceClass( deviceClass ),
-  mDeviceSubclass( deviceSubclass )
+KeyEvent::KeyEvent(const std::string&           keyName,
+                   const std::string&           logicalKey,
+                   const std::string&           keyString,
+                   int                          keyCode,
+                   int                          keyModifier,
+                   unsigned long                timeStamp,
+                   const Dali::KeyEvent::State& keyState,
+                   const std::string&           compose,
+                   const std::string&           deviceName,
+                   const Device::Class::Type    deviceClass,
+                   const Device::Subclass::Type deviceSubclass)
+: mKeyName(keyName),
+  mLogicalKey(logicalKey),
+  mKeyString(keyString),
+  mKeyCode(keyCode),
+  mKeyModifier(keyModifier),
+  mTime(timeStamp),
+  mState(keyState),
+  mCompose(compose),
+  mDeviceName(deviceName),
+  mDeviceClass(deviceClass),
+  mDeviceSubclass(deviceSubclass)
 {
 }
 
-KeyEventPtr KeyEvent::New( const std::string& keyName,
-                           const std::string& logicalKey,
-                           const std::string& keyString,
-                           int keyCode,
-                           int keyModifier,
-                           unsigned long timeStamp,
-                           const Dali::KeyEvent::State& keyState,
-                           const std::string& compose,
-                           const std::string& deviceName,
-                           const Device::Class::Type deviceClass,
-                           const Device::Subclass::Type deviceSubclass )
+KeyEventPtr KeyEvent::New(const std::string&           keyName,
+                          const std::string&           logicalKey,
+                          const std::string&           keyString,
+                          int                          keyCode,
+                          int                          keyModifier,
+                          unsigned long                timeStamp,
+                          const Dali::KeyEvent::State& keyState,
+                          const std::string&           compose,
+                          const std::string&           deviceName,
+                          const Device::Class::Type    deviceClass,
+                          const Device::Subclass::Type deviceSubclass)
 {
-  KeyEventPtr keyEvent = new KeyEvent( keyName, logicalKey, keyString, keyCode, keyModifier, timeStamp, keyState, compose, deviceName, deviceClass, deviceSubclass );
+  KeyEventPtr keyEvent = new KeyEvent(keyName, logicalKey, keyString, keyCode, keyModifier, timeStamp, keyState, compose, deviceName, deviceClass, deviceSubclass);
   return keyEvent;
 }
 
 bool KeyEvent::IsShiftModifier() const
 {
-  return ( ( MODIFIER_SHIFT & mKeyModifier ) == MODIFIER_SHIFT );
+  return ((MODIFIER_SHIFT & mKeyModifier) == MODIFIER_SHIFT);
 }
 
 bool KeyEvent::IsCtrlModifier() const
 {
-  return ( ( MODIFIER_CTRL & mKeyModifier ) == MODIFIER_CTRL );
+  return ((MODIFIER_CTRL & mKeyModifier) == MODIFIER_CTRL);
 }
 
 bool KeyEvent::IsAltModifier() const
 {
-  return ( ( MODIFIER_ALT & mKeyModifier ) == MODIFIER_ALT );
+  return ((MODIFIER_ALT & mKeyModifier) == MODIFIER_ALT);
 }
 
 const std::string& KeyEvent::GetCompose() const
@@ -116,92 +114,77 @@ const std::string& KeyEvent::GetDeviceName() const
   return mDeviceName;
 }
 
-
 Device::Class::Type KeyEvent::GetDeviceClass() const
 {
   return mDeviceClass;
 }
-
 
 Device::Subclass::Type KeyEvent::GetDeviceSubclass() const
 {
   return mDeviceSubclass;
 }
 
-
 const std::string& KeyEvent::GetKeyName() const
 {
   return mKeyName;
 }
-
 
 const std::string& KeyEvent::GetKeyString() const
 {
   return mKeyString;
 }
 
-
 const std::string& KeyEvent::GetLogicalKey() const
 {
   return mLogicalKey;
 }
-
 
 int32_t KeyEvent::GetKeyCode() const
 {
   return mKeyCode;
 }
 
-
 int32_t KeyEvent::GetKeyModifier() const
 {
   return mKeyModifier;
 }
-
 
 unsigned long KeyEvent::GetTime() const
 {
   return mTime;
 }
 
-
 Dali::KeyEvent::State KeyEvent::GetState() const
 {
   return mState;
 }
 
-
-void KeyEvent::SetKeyName( const std::string& keyName )
+void KeyEvent::SetKeyName(const std::string& keyName)
 {
   mKeyName = keyName;
 }
 
-
-void KeyEvent::SetKeyString( const std::string& keyString )
+void KeyEvent::SetKeyString(const std::string& keyString)
 {
   mKeyString = keyString;
 }
 
-
-void KeyEvent::SetKeyCode( int32_t keyCode )
+void KeyEvent::SetKeyCode(int32_t keyCode)
 {
   mKeyCode = keyCode;
 }
 
-
-void KeyEvent::SetKeyModifier( int32_t keyModifier )
+void KeyEvent::SetKeyModifier(int32_t keyModifier)
 {
   mKeyModifier = keyModifier;
 }
 
-
-void KeyEvent::SetTime( unsigned long time )
+void KeyEvent::SetTime(unsigned long time)
 {
   mTime = time;
 }
 
-
-void KeyEvent::SetState( const Dali::KeyEvent::State& state )
+void KeyEvent::SetState(const Dali::KeyEvent::State& state)
 {
   mState = state;
 }

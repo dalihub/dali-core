@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -166,7 +166,6 @@ void BaseSignal::SlotDisconnected(CallbackBase* callback)
   DALI_ABORT("Callback lost in SlotDisconnected()");
 }
 
-
 int32_t BaseSignal::FindCallback(CallbackBase* callback) const noexcept
 {
   int32_t index(INVALID_CALLBACK_INDEX);
@@ -191,7 +190,6 @@ int32_t BaseSignal::FindCallback(CallbackBase* callback) const noexcept
 
 void BaseSignal::DeleteConnection(std::size_t connectionIndex)
 {
-
   if(mEmittingFlag)
   {
     // IMPORTANT - do not remove from items from mSignalConnections, reset instead.

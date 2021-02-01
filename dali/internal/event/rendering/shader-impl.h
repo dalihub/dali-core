@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SHADER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,12 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h> // DALI_ASSERT_ALWAYS
-#include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
-#include <dali/public-api/rendering/shader.h> // Dali::Shader
+#include <dali/internal/common/shader-data.h>            // ShaderPtr
 #include <dali/internal/event/common/object-connector.h> // Dali::Internal::ObjectConnector
-#include <dali/internal/event/common/object-impl.h> // Dali::Internal::Object
-#include <dali/internal/common/shader-data.h> // ShaderPtr
+#include <dali/internal/event/common/object-impl.h>      // Dali::Internal::Object
+#include <dali/public-api/common/dali-common.h>          // DALI_ASSERT_ALWAYS
+#include <dali/public-api/common/intrusive-ptr.h>        // Dali::IntrusivePtr
+#include <dali/public-api/rendering/shader.h>            // Dali::Shader
 
 namespace Dali
 {
@@ -45,13 +45,12 @@ using ShaderPtr = IntrusivePtr<Shader>;
 class Shader : public Object
 {
 public:
-
   /**
    * @copydoc Dali::Shader::New()
    */
-  static ShaderPtr New( std::string_view vertexShader,
-                        std::string_view fragmentShader,
-                        Dali::Shader::Hint::Value hints );
+  static ShaderPtr New(std::string_view          vertexShader,
+                       std::string_view          fragmentShader,
+                       Dali::Shader::Hint::Value hints);
 
   /**
    * Retrieve the scene-graph shader added by this object.
@@ -60,7 +59,6 @@ public:
   const SceneGraph::Shader& GetShaderSceneObject() const;
 
 public: // Default property extensions from Object
-
   /**
    * @copydoc Dali::Internal::Object::SetDefaultProperty()
    */
@@ -69,26 +67,25 @@ public: // Default property extensions from Object
   /**
    * @copydoc Dali::Internal::Object::GetDefaultProperty()
    */
-  Property::Value GetDefaultProperty( Property::Index index ) const override;
+  Property::Value GetDefaultProperty(Property::Index index) const override;
 
   /**
    * @copydoc Dali::Internal::Object::GetDefaultPropertyCurrentValue()
    */
-  Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const override;
+  Property::Value GetDefaultPropertyCurrentValue(Property::Index index) const override;
 
 private: // implementation
-
   /**
    * Constructor
    *
    * @param sceneObject the scene object
    */
-  Shader( const SceneGraph::Shader* sceneObject );
+  Shader(const SceneGraph::Shader* sceneObject);
 
   /**
    * Second stage initialization
    */
-  void SetShader( std::string_view vertexShader, std::string_view fragmentShader, Dali::Shader::Hint::Value hints );
+  void SetShader(std::string_view vertexShader, std::string_view fragmentShader, Dali::Shader::Hint::Value hints);
 
 protected:
   /**
@@ -97,17 +94,14 @@ protected:
   ~Shader() override;
 
 private: // unimplemented methods
-
-  Shader() = delete;
-  Shader( const Shader& ) = delete;
-  Shader& operator=( const Shader& ) = delete;
+  Shader()              = delete;
+  Shader(const Shader&) = delete;
+  Shader& operator=(const Shader&) = delete;
 
 private:
-
   Internal::ShaderDataPtr mShaderData;
 
 public:
-
   /**
    * @copydoc Dali::Shader::GetShaderVersionPrefix()
    */
@@ -122,13 +116,12 @@ public:
    * @copydoc Dali::Shader::GetFragmentShaderPrefix()
    */
   static std::string GetFragmentShaderPrefix();
-
 };
 
 } // namespace Internal
 
 // Helpers for public-api forwarding methods
-inline Internal::Shader& GetImplementation( Dali::Shader& handle )
+inline Internal::Shader& GetImplementation(Dali::Shader& handle)
 {
   DALI_ASSERT_ALWAYS(handle && "Shader handle is empty");
 
@@ -137,7 +130,7 @@ inline Internal::Shader& GetImplementation( Dali::Shader& handle )
   return static_cast<Internal::Shader&>(object);
 }
 
-inline const Internal::Shader& GetImplementation( const Dali::Shader& handle )
+inline const Internal::Shader& GetImplementation(const Dali::Shader& handle)
 {
   DALI_ASSERT_ALWAYS(handle && "Shader handle is empty");
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,37 +24,35 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 Constrainer::Constrainer()
-:Object( nullptr ) // we don't have our own scene object
+: Object(nullptr) // we don't have our own scene object
 {
 }
 
 Constrainer::~Constrainer()
 {
   //Remove all the constraints created by the object
-  uint32_t tag = static_cast<uint32_t>( reinterpret_cast<uintptr_t>( this ) ); // taking 32bits of this as tag
+  uint32_t         tag = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(this)); // taking 32bits of this as tag
   const ObjectIter end = mObservedObjects.End();
-  for( ObjectIter iter = mObservedObjects.Begin(); iter != end; ++iter )
+  for(ObjectIter iter = mObservedObjects.Begin(); iter != end; ++iter)
   {
     //Remove Constrainer from the observers list of the object
-    (*iter)->RemoveObserver( *this );
+    (*iter)->RemoveObserver(*this);
 
     //Remove constraints
-    (*iter)->RemoveConstraints( tag );
+    (*iter)->RemoveConstraints(tag);
   }
 }
 
-void Constrainer::ObjectDestroyed( Object& object )
+void Constrainer::ObjectDestroyed(Object& object)
 {
   //Remove object from the list of observed
   const ObjectIter end = mObservedObjects.End();
-  for( ObjectIter iter = mObservedObjects.Begin(); iter != end; ++iter )
+  for(ObjectIter iter = mObservedObjects.Begin(); iter != end; ++iter)
   {
-    if( *iter == &object )
+    if(*iter == &object)
     {
       mObservedObjects.Erase(iter);
       return;
@@ -62,20 +60,20 @@ void Constrainer::ObjectDestroyed( Object& object )
   }
 }
 
-void Constrainer::Remove( Dali::Handle& target )
+void Constrainer::Remove(Dali::Handle& target)
 {
-  uint32_t tag = static_cast<uint32_t>( reinterpret_cast<uintptr_t>( this ) ); // taking 32bits of this as tag
-  Object& object = GetImplementation(target);
-  const ObjectIter end = mObservedObjects.End();
-  for( ObjectIter iter = mObservedObjects.Begin(); iter != end; ++iter )
+  uint32_t         tag    = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(this)); // taking 32bits of this as tag
+  Object&          object = GetImplementation(target);
+  const ObjectIter end    = mObservedObjects.End();
+  for(ObjectIter iter = mObservedObjects.Begin(); iter != end; ++iter)
   {
-    if( *iter == &object )
+    if(*iter == &object)
     {
       //Stop observing the object
-      (*iter)->RemoveObserver( *this );
+      (*iter)->RemoveObserver(*this);
 
       //Remove constraints created in the object
-      target.RemoveConstraints( tag );
+      target.RemoveConstraints(tag);
 
       //Remove object from the vector of observed objects
       mObservedObjects.Erase(iter);
@@ -83,32 +81,31 @@ void Constrainer::Remove( Dali::Handle& target )
   }
 }
 
-void Constrainer::Observe( Dali::Handle& handle )
+void Constrainer::Observe(Dali::Handle& handle)
 {
   Object& object = GetImplementation(handle);
 
   //Add the object to the list of observed objects if it is not in it already
-  const ObjectIter end = mObservedObjects.End();
-  ObjectIter iter = mObservedObjects.Begin();
-  for(; iter != end; ++iter )
+  const ObjectIter end  = mObservedObjects.End();
+  ObjectIter       iter = mObservedObjects.Begin();
+  for(; iter != end; ++iter)
   {
-    if( *iter == &object )
+    if(*iter == &object)
     {
       break;
     }
   }
 
-  if( iter == end )
+  if(iter == end)
   {
     //Start observing the object
-    object.AddObserver( *this );
+    object.AddObserver(*this);
 
     //Add object in the observed objects vector
-    mObservedObjects.PushBack( &object );
+    mObservedObjects.PushBack(&object);
   }
 }
 
 } // namespace Internal
 
 } // namespace Dali
-

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_QUEUE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,22 +24,18 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 class MessageBase;
 
 namespace SceneGraph
 {
-
 /**
  * Allows messages to be queued for RenderManager, during the scene-graph Update.
  */
 class RenderQueue
 {
 public:
-
   /**
    * Create a new RenderQueue.
    */
@@ -58,39 +54,37 @@ public:
    * @param[in] size The message size with respect to the size of type "char".
    * @return A pointer to the first char allocated for the message.
    */
-  uint32_t* ReserveMessageSlot( BufferIndex updateBufferIndex, std::size_t size );
+  uint32_t* ReserveMessageSlot(BufferIndex updateBufferIndex, std::size_t size);
 
   /**
    * Process the batch of messages, which were queued in the previous update.
    * @pre This message should only be called by RenderManager from within the render-thread.
    * @param[in] bufferIndex The previous update buffer index.
    */
-  void ProcessMessages( BufferIndex bufferIndex );
+  void ProcessMessages(BufferIndex bufferIndex);
 
 private:
-
   /**
    * Helper to retrieve the current container.
    * The update-thread queues messages with one container, whilst the render-thread is processing the other.
    * @param[in] bufferIndex The current buffer index.
    * @return The container.
    */
-  MessageBuffer* GetCurrentContainer( BufferIndex bufferIndex );
+  MessageBuffer* GetCurrentContainer(BufferIndex bufferIndex);
 
   /**
    * Helper to limit the buffer capacity i.e. after a frame when an extreme number of messages have been sent.
    * @param[in] bufferIndex The current buffer index.
    */
-  void LimitBufferCapacity( BufferIndex bufferIndex );
+  void LimitBufferCapacity(BufferIndex bufferIndex);
 
   // Undefined
-  RenderQueue( const RenderQueue& );
+  RenderQueue(const RenderQueue&);
 
   // Undefined
-  RenderQueue& operator=( const RenderQueue& rhs );
+  RenderQueue& operator=(const RenderQueue& rhs);
 
 private:
-
   MessageBuffer* container0; ///< Messages are queued here when the update buffer index == 0
   MessageBuffer* container1; ///< Messages are queued here when the update buffer index == 1
 };

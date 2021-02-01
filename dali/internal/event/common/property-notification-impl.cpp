@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,28 +19,26 @@
 #include <dali/internal/event/common/property-notification-impl.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/math/vector2.h>
-#include <dali/public-api/math/radian.h>
-#include <dali/public-api/actors/actor.h>
 #include <dali/internal/event/actors/actor-impl.h>
-#include <dali/internal/event/common/property-notification-manager.h>
 #include <dali/internal/event/common/object-impl.h>
+#include <dali/internal/event/common/property-notification-manager.h>
 #include <dali/internal/event/common/stage-impl.h>
-#include <dali/internal/update/manager/update-manager.h>
-#include <dali/internal/update/common/scene-graph-property-notification.h>
 #include <dali/internal/event/common/thread-local-storage.h>
+#include <dali/internal/update/common/scene-graph-property-notification.h>
+#include <dali/internal/update/manager/update-manager.h>
+#include <dali/public-api/actors/actor.h>
+#include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/math/radian.h>
+#include <dali/public-api/math/vector2.h>
 
 using Dali::Internal::SceneGraph::UpdateManager;
 
 namespace Dali
 {
-
 namespace Internal
 {
-
-PropertyNotificationPtr PropertyNotification::New(Property& target,
-                                                  int componentIndex,
+PropertyNotificationPtr PropertyNotification::New(Property&                      target,
+                                                  int                            componentIndex,
                                                   const Dali::PropertyCondition& condition)
 {
   ThreadLocalStorage& tls = ThreadLocalStorage::Get();
@@ -48,7 +46,7 @@ PropertyNotificationPtr PropertyNotification::New(Property& target,
   UpdateManager& updateManager = tls.GetUpdateManager();
 
   PropertyNotificationManager& propertyNotificationManager = tls.GetPropertyNotificationManager();
-  PropertyNotificationPtr propertyNotification = new PropertyNotification(updateManager,
+  PropertyNotificationPtr      propertyNotification        = new PropertyNotification(updateManager,
                                                                           propertyNotificationManager,
                                                                           target,
                                                                           componentIndex,
@@ -56,38 +54,38 @@ PropertyNotificationPtr PropertyNotification::New(Property& target,
   return propertyNotification;
 }
 
-PropertyNotification::PropertyNotification( UpdateManager& updateManager,
-                                            PropertyNotificationManager& propertyNotificationManager,
-                                            Property& target,
-                                            int componentIndex,
-                                            const Dali::PropertyCondition& condition )
-: mUpdateManager( updateManager ),
-  mPropertyNotification( nullptr ),
-  mPropertyNotificationManager( propertyNotificationManager ),
-  mObjectPropertyIndex( target.propertyIndex ),
-  mPropertyType( Property::NONE ),
-  mComponentIndex( componentIndex ),
-  mCondition( condition ),
-  mNotifyMode( Dali::PropertyNotification::NOTIFY_ON_TRUE ),
-  mNotifyResult( false ),
-  mCompare( false )
+PropertyNotification::PropertyNotification(UpdateManager&                 updateManager,
+                                           PropertyNotificationManager&   propertyNotificationManager,
+                                           Property&                      target,
+                                           int                            componentIndex,
+                                           const Dali::PropertyCondition& condition)
+: mUpdateManager(updateManager),
+  mPropertyNotification(nullptr),
+  mPropertyNotificationManager(propertyNotificationManager),
+  mObjectPropertyIndex(target.propertyIndex),
+  mPropertyType(Property::NONE),
+  mComponentIndex(componentIndex),
+  mCondition(condition),
+  mNotifyMode(Dali::PropertyNotification::NOTIFY_ON_TRUE),
+  mNotifyResult(false),
+  mCompare(false)
 {
-  const Internal::PropertyCondition& conditionImpl = GetImplementation( condition );
+  const Internal::PropertyCondition& conditionImpl = GetImplementation(condition);
 
   Dali::Vector<float>::SizeType count = conditionImpl.arguments.Count();
-  for( Dali::Vector<float>::SizeType index = 0; index < count; ++index )
+  for(Dali::Vector<float>::SizeType index = 0; index < count; ++index)
   {
-    mRawConditionArgs.PushBack( conditionImpl.arguments[ index ] );
+    mRawConditionArgs.PushBack(conditionImpl.arguments[index]);
   }
 
   // Observe target object and create/destroy notification scene object accordingly.
-  mObject = dynamic_cast<Object*>( &GetImplementation(target.object) );
-  if ( mObject )
+  mObject = dynamic_cast<Object*>(&GetImplementation(target.object));
+  if(mObject)
   {
     mPropertyType = mObject->GetPropertyType(mObjectPropertyIndex);
 
     int internalComponentIndex = mObject->GetPropertyComponentIndex(mObjectPropertyIndex);
-    if( internalComponentIndex != Property::INVALID_COMPONENT_INDEX )
+    if(internalComponentIndex != Property::INVALID_COMPONENT_INDEX)
     {
       // override the one passed in
       mComponentIndex = internalComponentIndex;
@@ -95,32 +93,29 @@ PropertyNotification::PropertyNotification( UpdateManager& updateManager,
     if(mComponentIndex != Property::INVALID_COMPONENT_INDEX)
     {
       Property::Type type = mObject->GetPropertyType(mObjectPropertyIndex);
-      if( type == Property::VECTOR2
-          || type == Property::VECTOR3
-          || type == Property::VECTOR4 )
+      if(type == Property::VECTOR2 || type == Property::VECTOR3 || type == Property::VECTOR4)
       {
         mPropertyType = Property::FLOAT;
       }
     }
 
-  // In Size Property case, swapping components occurs sometimes.
-  // To cover swapping components, previous and current components should be compared.
-  if( mObjectPropertyIndex == Dali::Actor::Property::SIZE
-      && mObject->GetPropertyType(mObjectPropertyIndex) == Property::VECTOR3 )
-  {
-    mCompare = true;
-    for( int i = 0; i < 3; ++i )
+    // In Size Property case, swapping components occurs sometimes.
+    // To cover swapping components, previous and current components should be compared.
+    if(mObjectPropertyIndex == Dali::Actor::Property::SIZE && mObject->GetPropertyType(mObjectPropertyIndex) == Property::VECTOR3)
     {
-      mRawConditionArgs.PushBack( 0.0f );
+      mCompare = true;
+      for(int i = 0; i < 3; ++i)
+      {
+        mRawConditionArgs.PushBack(0.0f);
+      }
     }
-  }
 
     // all objects always have scene object
     CreateSceneObject();
   }
 
   // Connect to the property notification manager
-  mPropertyNotificationManager.PropertyNotificationCreated( *this );
+  mPropertyNotificationManager.PropertyNotificationCreated(*this);
 }
 
 PropertyNotification::~PropertyNotification()
@@ -128,10 +123,10 @@ PropertyNotification::~PropertyNotification()
   Disable();
 
   // Guard to disallow use of PropertyNotificationManager after Core has been destroyed
-  if ( Stage::IsInstalled() )
+  if(Stage::IsInstalled())
   {
     // Disconnect from the property notification manager
-    mPropertyNotificationManager.PropertyNotificationDestroyed( *this );
+    mPropertyNotificationManager.PropertyNotificationDestroyed(*this);
   }
 }
 
@@ -144,7 +139,7 @@ void PropertyNotification::EmitSignalNotify()
 {
   Dali::PropertyNotification source(this);
 
-  mNotifySignal.Emit( source );
+  mNotifySignal.Emit(source);
 }
 
 void PropertyNotification::Enable()
@@ -155,14 +150,14 @@ void PropertyNotification::Enable()
 void PropertyNotification::Disable()
 {
   // Guard to allow handle destruction after Core has been destroyed
-  if ( Stage::IsInstalled() )
+  if(Stage::IsInstalled())
   {
     // Stop scene-graph from monitoring the target's properties.
     DestroySceneObject();
   }
 }
 
-void PropertyNotification::SetNotifyResult( bool result )
+void PropertyNotification::SetNotifyResult(bool result)
 {
   mNotifyResult = result;
 }
@@ -184,12 +179,12 @@ Property::Index PropertyNotification::GetTargetProperty() const
   return mObjectPropertyIndex;
 }
 
-void PropertyNotification::SetNotifyMode( NotifyMode mode )
+void PropertyNotification::SetNotifyMode(NotifyMode mode)
 {
   mNotifyMode = mode;
-  if( mPropertyNotification )
+  if(mPropertyNotification)
   {
-    PropertyNotificationSetNotifyModeMessage( mUpdateManager, mPropertyNotification, mode );
+    PropertyNotificationSetNotifyModeMessage(mUpdateManager, mPropertyNotification, mode);
   }
 }
 
@@ -203,7 +198,7 @@ bool PropertyNotification::GetNotifyResult() const
   return mNotifyResult;
 }
 
-bool PropertyNotification::CompareSceneObject( const SceneGraph::PropertyNotification* sceneObject )
+bool PropertyNotification::CompareSceneObject(const SceneGraph::PropertyNotification* sceneObject)
 {
   return sceneObject && sceneObject == mPropertyNotification;
 }
@@ -211,28 +206,28 @@ bool PropertyNotification::CompareSceneObject( const SceneGraph::PropertyNotific
 void PropertyNotification::CreateSceneObject()
 {
   // this method can be called from constructor and on stage connection
-  if( !mPropertyNotification )
+  if(!mPropertyNotification)
   {
     // Create a new PropertyNotification, keep a const pointer to it
-    mPropertyNotification = SceneGraph::PropertyNotification::New( *mObject,
-                                                                   mObjectPropertyIndex,
-                                                                   mPropertyType,
-                                                                   mComponentIndex,
-                                                                   GetImplementation( mCondition ).type,
-                                                                   mRawConditionArgs,
-                                                                   mNotifyMode,
-                                                                   mCompare );
-    OwnerPointer< SceneGraph::PropertyNotification > transferOwnership( const_cast<SceneGraph::PropertyNotification*>( mPropertyNotification ) );
-    AddPropertyNotificationMessage( mUpdateManager, transferOwnership );
+    mPropertyNotification = SceneGraph::PropertyNotification::New(*mObject,
+                                                                  mObjectPropertyIndex,
+                                                                  mPropertyType,
+                                                                  mComponentIndex,
+                                                                  GetImplementation(mCondition).type,
+                                                                  mRawConditionArgs,
+                                                                  mNotifyMode,
+                                                                  mCompare);
+    OwnerPointer<SceneGraph::PropertyNotification> transferOwnership(const_cast<SceneGraph::PropertyNotification*>(mPropertyNotification));
+    AddPropertyNotificationMessage(mUpdateManager, transferOwnership);
   }
 }
 
 void PropertyNotification::DestroySceneObject()
 {
-  if ( mPropertyNotification != nullptr )
+  if(mPropertyNotification != nullptr)
   {
     // Remove PropertyNotification using a message to the update manager
-    RemovePropertyNotificationMessage( mUpdateManager, *mPropertyNotification );
+    RemovePropertyNotificationMessage(mUpdateManager, *mPropertyNotification);
     mPropertyNotification = nullptr;
   }
 }

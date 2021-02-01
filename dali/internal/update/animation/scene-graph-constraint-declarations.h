@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_CONSTRAINT_DECLARATIONS_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,16 +24,13 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace SceneGraph
 {
-
 class ConstraintBase;
 
-using ConstraintOwnerContainer = OwnerContainer<ConstraintBase *>;
+using ConstraintOwnerContainer = OwnerContainer<ConstraintBase*>;
 using ConstraintIter           = ConstraintOwnerContainer::Iterator;
 
 } // namespace SceneGraph

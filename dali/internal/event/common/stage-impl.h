@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_STAGE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,8 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/common/stage.h>
-#include <dali/public-api/object/ref-object.h>
-#include <dali/public-api/object/base-object.h>
-#include <dali/public-api/math/vector2.h>
-#include <dali/public-api/math/vector3.h>
-#include <dali/public-api/math/vector4.h>
 #include <dali/devel-api/common/stage-devel.h>
+#include <dali/devel-api/common/stage.h>
 #include <dali/integration-api/context-notifier.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/event/actors/layer-impl.h>
@@ -33,12 +28,16 @@
 #include <dali/internal/event/common/object-registry-impl.h>
 #include <dali/internal/event/common/stage-def.h>
 #include <dali/internal/event/render-tasks/render-task-defaults.h>
-#include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
+#include <dali/internal/update/manager/update-manager.h>
+#include <dali/public-api/math/vector2.h>
+#include <dali/public-api/math/vector3.h>
+#include <dali/public-api/math/vector4.h>
+#include <dali/public-api/object/base-object.h>
+#include <dali/public-api/object/ref-object.h>
 
 namespace Dali
 {
-
 struct Vector2;
 
 namespace Integration
@@ -48,7 +47,6 @@ class RenderController;
 
 namespace Internal
 {
-
 namespace SceneGraph
 {
 class UpdateManager;
@@ -68,18 +66,17 @@ class Scene;
 class Stage : public BaseObject, public RenderTaskDefaults, public Integration::ContextNotifierInterface, public ConnectionTracker
 {
 public:
-
   /**
    * Create the stage
    * @param[in] updateManager
    */
-  static StagePtr New( SceneGraph::UpdateManager& updateManager );
+  static StagePtr New(SceneGraph::UpdateManager& updateManager);
 
   /**
    * Initialize the stage.
    * @param[in] scene The default scene (for main window).
    */
-  void Initialize( Scene& scene );
+  void Initialize(Scene& scene);
 
   /**
    * @copydoc Dali::Stage::GetCurrent()
@@ -108,12 +105,12 @@ public:
   /**
    * @copydoc Dali::Stage::Add()
    */
-  void Add( Actor& actor );
+  void Add(Actor& actor);
 
   /**
    * @copydoc Dali::Stage::Remove()
    */
-  void Remove( Actor& actor );
+  void Remove(Actor& actor);
 
   /**
    * Returns the size of the Stage in pixels as a Vector.
@@ -150,7 +147,7 @@ public:
   /**
    * @copydoc Dali::Stage::GetLayer()
    */
-  Dali::Layer GetLayer( uint32_t depth ) const;
+  Dali::Layer GetLayer(uint32_t depth) const;
 
   /**
    * @copydoc Dali::Stage::GetRootLayer()
@@ -183,12 +180,12 @@ public:
   /**
    * @copydoc Dali::Stage::KeepRendering()
    */
-  void KeepRendering( float durationSeconds );
+  void KeepRendering(float durationSeconds);
 
   /**
    * @copydoc Dali::DevelStage::SetRenderingBehavior()
    */
-  void SetRenderingBehavior( DevelStage::Rendering renderingBehavior );
+  void SetRenderingBehavior(DevelStage::Rendering renderingBehavior);
 
   /**
    * @copydoc Dali::DevelStage::GetRenderingBehavior()
@@ -203,17 +200,17 @@ public:
   /**
    * Callback for Internal::Scene KeyEventSignal signal
    */
-  void OnKeyEvent( const Dali::KeyEvent& event );
+  void OnKeyEvent(const Dali::KeyEvent& event);
 
   /**
    * Callback for Internal::Scene TouchedSignal signal
    */
-  void OnTouchEvent( const Dali::TouchEvent& touch );
+  void OnTouchEvent(const Dali::TouchEvent& touch);
 
   /**
    * Callback for Internal::Scene WheelEventSignal signal
    */
-  void OnWheelEvent( const Dali::WheelEvent& event );
+  void OnWheelEvent(const Dali::WheelEvent& event);
 
   /**
    * Used by the EventProcessor to emit key event signals.
@@ -239,13 +236,13 @@ public:
    * Emits the touched signal.
    * @param[in] touch The touch event details.
    */
-  void EmitTouchedSignal( const Dali::TouchEvent& touch );
+  void EmitTouchedSignal(const Dali::TouchEvent& touch);
 
   /**
    * Used by the EventProcessor to emit wheel event signals.
    * @param[in] event The wheel event.
    */
-  void EmitWheelEventSignal( const WheelEvent& event );
+  void EmitWheelEventSignal(const WheelEvent& event);
 
   /**
    * Emits the scene created.
@@ -295,12 +292,12 @@ public:
   /**
    * @copydoc Dali::DevelStage::AddFrameCallback()
    */
-  void AddFrameCallback( FrameCallbackInterface& frameCallback, Actor& rootActor );
+  void AddFrameCallback(FrameCallbackInterface& frameCallback, Actor& rootActor);
 
   /**
    * @copydoc Dali::DevelStage::RemoveFrameCallback()
    */
-  void RemoveFrameCallback( FrameCallbackInterface& frameCallback );
+  void RemoveFrameCallback(FrameCallbackInterface& frameCallback);
 
   /**
    * Connects a callback function with the object's signals.
@@ -311,10 +308,9 @@ public:
    * @return True if the signal was connected.
    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
    */
-  static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
+  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor);
 
 private: // Implementation of ContextNotificationInterface:
-
   /**
    * @copydoc Dali::Integration::NotifyContextLost();
    */
@@ -326,11 +322,10 @@ private: // Implementation of ContextNotificationInterface:
   void NotifyContextRegained() override;
 
 private:
-
   /**
    * Protected constructor; see also Stage::New()
    */
-  Stage( SceneGraph::UpdateManager& updateManager );
+  Stage(SceneGraph::UpdateManager& updateManager);
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -338,23 +333,22 @@ private:
   ~Stage() override;
 
 private:
-
   SceneGraph::UpdateManager& mUpdateManager;
 
   IntrusivePtr<Scene> mScene;
 
   // The key event signal
-  Dali::Stage::KeyEventSignalType                 mKeyEventSignal;
-  Dali::DevelStage::KeyEventGeneratedSignalType   mKeyEventGeneratedSignal;
+  Dali::Stage::KeyEventSignalType               mKeyEventSignal;
+  Dali::DevelStage::KeyEventGeneratedSignalType mKeyEventGeneratedSignal;
 
   // The event processing finished signal
-  Dali::Stage::EventProcessingFinishedSignalType  mEventProcessingFinishedSignal;
+  Dali::Stage::EventProcessingFinishedSignalType mEventProcessingFinishedSignal;
 
   // The touched signal
-  Dali::Stage::TouchEventSignalType               mTouchedSignal;
+  Dali::Stage::TouchEventSignalType mTouchedSignal;
 
   // The wheel event signal
-  Dali::Stage::WheelEventSignalType               mWheelEventSignal;
+  Dali::Stage::WheelEventSignalType mWheelEventSignal;
 
   Dali::Stage::ContextStatusSignal mContextLostSignal;
   Dali::Stage::ContextStatusSignal mContextRegainedSignal;
@@ -370,7 +364,7 @@ private:
 
 inline Internal::Stage& GetImplementation(Dali::Stage& stage)
 {
-  DALI_ASSERT_ALWAYS( stage && "Stage handle is empty" );
+  DALI_ASSERT_ALWAYS(stage && "Stage handle is empty");
 
   BaseObject& handle = stage.GetBaseObject();
 
@@ -379,7 +373,7 @@ inline Internal::Stage& GetImplementation(Dali::Stage& stage)
 
 inline const Internal::Stage& GetImplementation(const Dali::Stage& stage)
 {
-  DALI_ASSERT_ALWAYS( stage && "Stage handle is empty" );
+  DALI_ASSERT_ALWAYS(stage && "Stage handle is empty");
 
   const BaseObject& handle = stage.GetBaseObject();
 

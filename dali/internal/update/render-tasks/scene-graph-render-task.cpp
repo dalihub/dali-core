@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/math/matrix.h>
-#include <dali/internal/update/controllers/render-message-dispatcher.h>
-#include <dali/internal/update/nodes/node.h>
 #include <dali/internal/render/common/render-instruction.h>
 #include <dali/internal/render/common/render-tracker.h>
+#include <dali/internal/update/controllers/render-message-dispatcher.h>
+#include <dali/internal/update/nodes/node.h>
+#include <dali/public-api/math/matrix.h>
 
 #include <dali/internal/update/render-tasks/scene-graph-render-task-debug.h>
 
@@ -31,10 +31,8 @@ namespace Dali
 {
 namespace Internal
 {
-
 namespace SceneGraph
 {
-
 RenderTask* RenderTask::New()
 {
   return new RenderTask();
@@ -42,49 +40,49 @@ RenderTask* RenderTask::New()
 
 RenderTask::~RenderTask()
 {
-  if ( mSourceNode )
+  if(mSourceNode)
   {
-    mSourceNode->RemoveObserver( *this );
-    if( mExclusive )
+    mSourceNode->RemoveObserver(*this);
+    if(mExclusive)
     {
-      mSourceNode->SetExclusiveRenderTask( nullptr );
+      mSourceNode->SetExclusiveRenderTask(nullptr);
     }
   }
-  if ( mCameraNode )
+  if(mCameraNode)
   {
-    mCameraNode->RemoveObserver( *this );
+    mCameraNode->RemoveObserver(*this);
   }
-  if( mRenderSyncTracker )
+  if(mRenderSyncTracker)
   {
-    mRenderMessageDispatcher->RemoveRenderTracker( *mRenderSyncTracker );
+    mRenderMessageDispatcher->RemoveRenderTracker(*mRenderSyncTracker);
   }
 }
 
-void RenderTask::Initialize( RenderMessageDispatcher& renderMessageDispatcher )
+void RenderTask::Initialize(RenderMessageDispatcher& renderMessageDispatcher)
 {
   mRenderMessageDispatcher = &renderMessageDispatcher;
 }
 
-void RenderTask::SetSourceNode( Node* node )
+void RenderTask::SetSourceNode(Node* node)
 {
   // Stop observing the old node (if we were)
-  if ( mSourceNode )
+  if(mSourceNode)
   {
-    mSourceNode->RemoveObserver( *this );
-    if( this == mSourceNode->GetExclusiveRenderTask() )
+    mSourceNode->RemoveObserver(*this);
+    if(this == mSourceNode->GetExclusiveRenderTask())
     {
-      mSourceNode->SetExclusiveRenderTask( nullptr );
+      mSourceNode->SetExclusiveRenderTask(nullptr);
     }
   }
 
   mSourceNode = node;
 
-  if ( mSourceNode )
+  if(mSourceNode)
   {
-    mSourceNode->AddObserver( *this );
-    if( mExclusive )
+    mSourceNode->AddObserver(*this);
+    if(mExclusive)
     {
-      mSourceNode->SetExclusiveRenderTask( this );
+      mSourceNode->SetExclusiveRenderTask(this);
     }
   }
   SetActiveStatus();
@@ -95,19 +93,19 @@ Node* RenderTask::GetSourceNode() const
   return mSourceNode;
 }
 
-void RenderTask::SetExclusive( bool exclusive )
+void RenderTask::SetExclusive(bool exclusive)
 {
   mExclusive = exclusive;
 
-  if ( mSourceNode )
+  if(mSourceNode)
   {
-    if ( mExclusive )
+    if(mExclusive)
     {
-      mSourceNode->SetExclusiveRenderTask( this );
+      mSourceNode->SetExclusiveRenderTask(this);
     }
-    else if ( this == mSourceNode->GetExclusiveRenderTask() )
+    else if(this == mSourceNode->GetExclusiveRenderTask())
     {
-      mSourceNode->SetExclusiveRenderTask( nullptr );
+      mSourceNode->SetExclusiveRenderTask(nullptr);
     }
   }
 }
@@ -117,24 +115,24 @@ bool RenderTask::IsExclusive() const
   return mExclusive;
 }
 
-void RenderTask::SetCamera( Node* cameraNode, Camera* camera )
+void RenderTask::SetCamera(Node* cameraNode, Camera* camera)
 {
-  if ( mCameraNode )
+  if(mCameraNode)
   {
-    mCameraNode->RemoveObserver( *this );
+    mCameraNode->RemoveObserver(*this);
   }
 
   mCameraNode = cameraNode;
-  mCamera = camera;
+  mCamera     = camera;
 
-  if ( mCameraNode )
+  if(mCameraNode)
   {
-    mCameraNode->AddObserver( *this );
+    mCameraNode->AddObserver(*this);
   }
   SetActiveStatus();
 }
 
-void RenderTask::SetFrameBuffer( Render::FrameBuffer* frameBuffer )
+void RenderTask::SetFrameBuffer(Render::FrameBuffer* frameBuffer)
 {
   mFrameBuffer = frameBuffer;
 }
@@ -144,37 +142,37 @@ Render::FrameBuffer* RenderTask::GetFrameBuffer()
   return mFrameBuffer;
 }
 
-bool RenderTask::QueryViewport( BufferIndex bufferIndex, Viewport& viewport ) const
+bool RenderTask::QueryViewport(BufferIndex bufferIndex, Viewport& viewport) const
 {
-  if( ! GetViewportEnabled( bufferIndex ) )
+  if(!GetViewportEnabled(bufferIndex))
   {
     return false;
   }
 
-  viewport.x = static_cast<int>( mViewportPosition[bufferIndex].x ); // truncated
-  viewport.y = static_cast<int>( mViewportPosition[bufferIndex].y ); // truncated
-  viewport.width = static_cast<int>( mViewportSize[bufferIndex].width ); // truncated
-  viewport.height = static_cast<int>( mViewportSize[bufferIndex].height ); // truncated
+  viewport.x      = static_cast<int>(mViewportPosition[bufferIndex].x);  // truncated
+  viewport.y      = static_cast<int>(mViewportPosition[bufferIndex].y);  // truncated
+  viewport.width  = static_cast<int>(mViewportSize[bufferIndex].width);  // truncated
+  viewport.height = static_cast<int>(mViewportSize[bufferIndex].height); // truncated
 
   return true;
 }
 
-void RenderTask::SetClearColor( BufferIndex updateBufferIndex, const Vector4& value )
+void RenderTask::SetClearColor(BufferIndex updateBufferIndex, const Vector4& value)
 {
-  mClearColor.Set( updateBufferIndex, value );
+  mClearColor.Set(updateBufferIndex, value);
 }
 
-const Vector4& RenderTask::GetClearColor( BufferIndex bufferIndex ) const
+const Vector4& RenderTask::GetClearColor(BufferIndex bufferIndex) const
 {
   return mClearColor[bufferIndex];
 }
 
-void RenderTask::BakeClearColor( BufferIndex updateBufferIndex, const Vector4& value )
+void RenderTask::BakeClearColor(BufferIndex updateBufferIndex, const Vector4& value)
 {
-  mClearColor.Bake( updateBufferIndex, value );
+  mClearColor.Bake(updateBufferIndex, value);
 }
 
-void RenderTask::SetClearEnabled( bool enabled )
+void RenderTask::SetClearEnabled(bool enabled)
 {
   mClearEnabled = enabled;
 }
@@ -184,7 +182,7 @@ bool RenderTask::GetClearEnabled() const
   return mClearEnabled;
 }
 
-void RenderTask::SetCullMode( bool mode )
+void RenderTask::SetCullMode(bool mode)
 {
   mCullMode = mode;
 }
@@ -194,21 +192,21 @@ bool RenderTask::GetCullMode() const
   return mCullMode;
 }
 
-void RenderTask::SetRefreshRate( uint32_t refreshRate )
+void RenderTask::SetRefreshRate(uint32_t refreshRate)
 {
   DALI_LOG_TRACE_METHOD_FMT(gRenderTaskLogFilter, "this:%p RefreshRate:%d\n", this, refreshRate);
 
   mRefreshRate = refreshRate;
 
-  if( mRefreshRate > 0 )
+  if(mRefreshRate > 0)
   {
     mState = RENDER_CONTINUOUSLY;
   }
   else
   {
-    mState = RENDER_ONCE_WAITING_FOR_RESOURCES;
+    mState           = RENDER_ONCE_WAITING_FOR_RESOURCES;
     mWaitingToRender = true;
-    mNotifyTrigger = false;
+    mNotifyTrigger   = false;
   }
 
   mFrameCounter = 0u;
@@ -219,7 +217,7 @@ uint32_t RenderTask::GetRefreshRate() const
   return mRefreshRate;
 }
 
-bool RenderTask::ReadyToRender( BufferIndex updateBufferIndex )
+bool RenderTask::ReadyToRender(BufferIndex updateBufferIndex)
 {
   return mActive;
 }
@@ -228,7 +226,7 @@ bool RenderTask::IsRenderRequired()
 {
   bool required = false;
 
-  switch( mState )
+  switch(mState)
   {
     case RENDER_CONTINUOUSLY:
     {
@@ -247,7 +245,7 @@ bool RenderTask::IsRenderRequired()
     }
   }
 
-  TASK_LOG_FMT( Debug::General, " State:%s = %s\n", STATE_STRING(mState), required?"T":"F" );
+  TASK_LOG_FMT(Debug::General, " State:%s = %s\n", STATE_STRING(mState), required ? "T" : "F");
 
   return required;
 }
@@ -256,22 +254,22 @@ bool RenderTask::IsRenderRequired()
 // If render was not required, ignore resourcesFinished.
 void RenderTask::UpdateState()
 {
-  TASK_LOG_FMT( Debug::General, "FC:%d State:%s RR:%d\n", mFrameCounter, STATE_STRING(mState), mRefreshRate );
+  TASK_LOG_FMT(Debug::General, "FC:%d State:%s RR:%d\n", mFrameCounter, STATE_STRING(mState), mRefreshRate);
 
-  switch( mState )
+  switch(mState)
   {
     case RENDER_CONTINUOUSLY:
     {
-      if( mRefreshRate != Dali::RenderTask::REFRESH_ALWAYS )
+      if(mRefreshRate != Dali::RenderTask::REFRESH_ALWAYS)
       {
-        if( mFrameCounter == 0 )
+        if(mFrameCounter == 0)
         {
           ++mFrameCounter; // Only start skipping frames when resources are loaded
         }
         else // Continue counting to skip frames
         {
           ++mFrameCounter;
-          if( mFrameCounter >= mRefreshRate )
+          if(mFrameCounter >= mRefreshRate)
           {
             mFrameCounter = 0;
           }
@@ -290,19 +288,19 @@ void RenderTask::UpdateState()
     case RENDERED_ONCE:
     {
       mWaitingToRender = true;
-      mNotifyTrigger = false;
-      if( mFrameBuffer )
+      mNotifyTrigger   = false;
+      if(mFrameBuffer)
       {
-        if( !mRenderSyncTracker || (mRenderSyncTracker && mRenderSyncTracker->IsSynced() ))
+        if(!mRenderSyncTracker || (mRenderSyncTracker && mRenderSyncTracker->IsSynced()))
         {
           mWaitingToRender = false;
-          mNotifyTrigger = true;
+          mNotifyTrigger   = true;
         }
       }
       else
       {
         mWaitingToRender = false;
-        mNotifyTrigger = true;
+        mNotifyTrigger   = true;
       }
     }
 
@@ -312,27 +310,27 @@ void RenderTask::UpdateState()
       break;
   }
 
-  TASK_LOG_FMT( Debug::General, " EXIT FC:%d State:%s Notify:%s\n", mFrameCounter, STATE_STRING(mState), mNotifyTrigger?"T":"F");
+  TASK_LOG_FMT(Debug::General, " EXIT FC:%d State:%s Notify:%s\n", mFrameCounter, STATE_STRING(mState), mNotifyTrigger ? "T" : "F");
 }
 
 bool RenderTask::IsWaitingToRender()
 {
-  TASK_LOG_FMT(Debug::Verbose, " State:%s waiting:%s \n", STATE_STRING(mState), mWaitingToRender?"T":"F");
+  TASK_LOG_FMT(Debug::Verbose, " State:%s waiting:%s \n", STATE_STRING(mState), mWaitingToRender ? "T" : "F");
   return mWaitingToRender;
 }
 
 bool RenderTask::HasRendered()
 {
   bool notify = false;
-  if( mNotifyTrigger == true )
+  if(mNotifyTrigger == true)
   {
     ++mRenderedOnceCounter;
-    mState = RENDERED_ONCE_AND_NOTIFIED;
+    mState         = RENDERED_ONCE_AND_NOTIFIED;
     mNotifyTrigger = false;
-    notify = true;
+    notify         = true;
   }
 
-  TASK_LOG_FMT(Debug::Verbose, " State:%s hasRendered:%s \n", STATE_STRING(mState), notify?"T":"F");
+  TASK_LOG_FMT(Debug::Verbose, " State:%s hasRendered:%s \n", STATE_STRING(mState), notify ? "T" : "F");
   return notify;
 }
 
@@ -341,48 +339,48 @@ uint32_t RenderTask::GetRenderedOnceCounter() const
   return mRenderedOnceCounter;
 }
 
-const Matrix& RenderTask::GetViewMatrix( BufferIndex bufferIndex ) const
+const Matrix& RenderTask::GetViewMatrix(BufferIndex bufferIndex) const
 {
-  DALI_ASSERT_DEBUG( nullptr != mCamera );
+  DALI_ASSERT_DEBUG(nullptr != mCamera);
 
-  return mCamera->GetViewMatrix( bufferIndex );
+  return mCamera->GetViewMatrix(bufferIndex);
 }
 
 SceneGraph::Camera& RenderTask::GetCamera() const
 {
-  DALI_ASSERT_DEBUG( nullptr != mCamera );
+  DALI_ASSERT_DEBUG(nullptr != mCamera);
   return *mCamera;
 }
 
-const Matrix& RenderTask::GetProjectionMatrix( BufferIndex bufferIndex ) const
+const Matrix& RenderTask::GetProjectionMatrix(BufferIndex bufferIndex) const
 {
-  DALI_ASSERT_DEBUG( nullptr != mCamera );
+  DALI_ASSERT_DEBUG(nullptr != mCamera);
 
-  return mCamera->GetProjectionMatrix( bufferIndex );
+  return mCamera->GetProjectionMatrix(bufferIndex);
 }
 
-RenderInstruction& RenderTask::PrepareRenderInstruction( BufferIndex updateBufferIndex )
+RenderInstruction& RenderTask::PrepareRenderInstruction(BufferIndex updateBufferIndex)
 {
-  DALI_ASSERT_DEBUG( nullptr != mCamera );
+  DALI_ASSERT_DEBUG(nullptr != mCamera);
 
   TASK_LOG(Debug::General);
 
   Viewport viewport;
-  bool viewportSet = QueryViewport( updateBufferIndex, viewport );
+  bool     viewportSet = QueryViewport(updateBufferIndex, viewport);
 
-  mRenderInstruction[updateBufferIndex].Reset( mCamera,
-                                               GetFrameBuffer(),
-                                               viewportSet ? &viewport : nullptr,
-                                               mClearEnabled ? &GetClearColor( updateBufferIndex ) : nullptr );
+  mRenderInstruction[updateBufferIndex].Reset(mCamera,
+                                              GetFrameBuffer(),
+                                              viewportSet ? &viewport : nullptr,
+                                              mClearEnabled ? &GetClearColor(updateBufferIndex) : nullptr);
 
-  if( mRequiresSync &&
-      mRefreshRate == Dali::RenderTask::REFRESH_ONCE )
+  if(mRequiresSync &&
+     mRefreshRate == Dali::RenderTask::REFRESH_ONCE)
   {
     // create tracker if one doesn't yet exist.
-    if( !mRenderSyncTracker )
+    if(!mRenderSyncTracker)
     {
       mRenderSyncTracker = new Render::RenderTracker();
-      mRenderMessageDispatcher->AddRenderTracker( *mRenderSyncTracker );
+      mRenderMessageDispatcher->AddRenderTracker(*mRenderSyncTracker);
     }
     mRenderInstruction[updateBufferIndex].mRenderTracker = mRenderSyncTracker;
   }
@@ -398,44 +396,44 @@ RenderInstruction& RenderTask::PrepareRenderInstruction( BufferIndex updateBuffe
 bool RenderTask::ViewMatrixUpdated()
 {
   bool retval = false;
-  if( mCamera )
+  if(mCamera)
   {
     retval = mCamera->ViewMatrixUpdated();
   }
   return retval;
 }
 
-void RenderTask::SetViewportPosition( BufferIndex updateBufferIndex, const Vector2& value )
+void RenderTask::SetViewportPosition(BufferIndex updateBufferIndex, const Vector2& value)
 {
-  mViewportPosition.Set( updateBufferIndex, value );
+  mViewportPosition.Set(updateBufferIndex, value);
 }
 
-const Vector2& RenderTask::GetViewportPosition( BufferIndex bufferIndex ) const
+const Vector2& RenderTask::GetViewportPosition(BufferIndex bufferIndex) const
 {
   return mViewportPosition[bufferIndex];
 }
 
-void RenderTask::BakeViewportPosition( BufferIndex updateBufferIndex, const Vector2& value )
+void RenderTask::BakeViewportPosition(BufferIndex updateBufferIndex, const Vector2& value)
 {
-  mViewportPosition.Bake( updateBufferIndex, value );
+  mViewportPosition.Bake(updateBufferIndex, value);
 }
 
-void RenderTask::SetViewportSize( BufferIndex updateBufferIndex, const Vector2& value )
+void RenderTask::SetViewportSize(BufferIndex updateBufferIndex, const Vector2& value)
 {
-  mViewportSize.Set( updateBufferIndex, value );
+  mViewportSize.Set(updateBufferIndex, value);
 }
 
-const Vector2& RenderTask::GetViewportSize( BufferIndex bufferIndex ) const
+const Vector2& RenderTask::GetViewportSize(BufferIndex bufferIndex) const
 {
   return mViewportSize[bufferIndex];
 }
 
-void RenderTask::BakeViewportSize( BufferIndex updateBufferIndex, const Vector2& value )
+void RenderTask::BakeViewportSize(BufferIndex updateBufferIndex, const Vector2& value)
 {
-  mViewportSize.Bake( updateBufferIndex, value );
+  mViewportSize.Bake(updateBufferIndex, value);
 }
 
-bool RenderTask::GetViewportEnabled( BufferIndex bufferIndex ) const
+bool RenderTask::GetViewportEnabled(BufferIndex bufferIndex) const
 {
   if(fabsf(mViewportPosition[bufferIndex].x) > Math::MACHINE_EPSILON_1 ||
      fabsf(mViewportPosition[bufferIndex].y) > Math::MACHINE_EPSILON_1 ||
@@ -448,67 +446,67 @@ bool RenderTask::GetViewportEnabled( BufferIndex bufferIndex ) const
   return false;
 }
 
-void RenderTask::SetSyncRequired( bool requiresSync )
+void RenderTask::SetSyncRequired(bool requiresSync)
 {
   mRequiresSync = requiresSync;
 }
 
-void RenderTask::PropertyOwnerConnected( PropertyOwner& owner )
+void RenderTask::PropertyOwnerConnected(PropertyOwner& owner)
 {
   // check if we've gone from inactive to active
   SetActiveStatus();
 }
 
-void RenderTask::PropertyOwnerDisconnected( BufferIndex /*updateBufferIndex*/, PropertyOwner& owner )
+void RenderTask::PropertyOwnerDisconnected(BufferIndex /*updateBufferIndex*/, PropertyOwner& owner)
 {
   mActive = false; // if either source or camera disconnected, we're no longer active
 }
 
-void RenderTask::PropertyOwnerDestroyed( PropertyOwner& owner )
+void RenderTask::PropertyOwnerDestroyed(PropertyOwner& owner)
 {
-  if( static_cast<PropertyOwner*>( mSourceNode ) == &owner )
+  if(static_cast<PropertyOwner*>(mSourceNode) == &owner)
   {
     mSourceNode = nullptr;
   }
-  else if( static_cast<PropertyOwner*>( mCameraNode ) == &owner )
+  else if(static_cast<PropertyOwner*>(mCameraNode) == &owner)
   {
     mCameraNode = nullptr;
   }
 }
 
 RenderTask::RenderTask()
-: mViewportPosition( Vector2::ZERO),
-  mViewportSize( Vector2::ZERO),
-  mClearColor( Dali::RenderTask::DEFAULT_CLEAR_COLOR ),
-  mRenderMessageDispatcher( nullptr ),
-  mRenderSyncTracker( nullptr ),
-  mSourceNode( nullptr ),
-  mCameraNode( nullptr ),
-  mCamera( nullptr ),
+: mViewportPosition(Vector2::ZERO),
+  mViewportSize(Vector2::ZERO),
+  mClearColor(Dali::RenderTask::DEFAULT_CLEAR_COLOR),
+  mRenderMessageDispatcher(nullptr),
+  mRenderSyncTracker(nullptr),
+  mSourceNode(nullptr),
+  mCameraNode(nullptr),
+  mCamera(nullptr),
   mFrameBuffer(nullptr),
-  mRefreshRate( Dali::RenderTask::DEFAULT_REFRESH_RATE ),
-  mFrameCounter( 0u ),
-  mRenderedOnceCounter( 0u ),
-  mState( (Dali::RenderTask::DEFAULT_REFRESH_RATE == Dali::RenderTask::REFRESH_ALWAYS)
-          ? RENDER_CONTINUOUSLY
-          : RENDER_ONCE_WAITING_FOR_RESOURCES ),
-  mRequiresSync( false ),
-  mActive( false ),
-  mWaitingToRender( false ),
-  mNotifyTrigger( false ),
-  mExclusive( Dali::RenderTask::DEFAULT_EXCLUSIVE ),
-  mClearEnabled( Dali::RenderTask::DEFAULT_CLEAR_ENABLED ),
-  mCullMode( Dali::RenderTask::DEFAULT_CULL_MODE )
+  mRefreshRate(Dali::RenderTask::DEFAULT_REFRESH_RATE),
+  mFrameCounter(0u),
+  mRenderedOnceCounter(0u),
+  mState((Dali::RenderTask::DEFAULT_REFRESH_RATE == Dali::RenderTask::REFRESH_ALWAYS)
+           ? RENDER_CONTINUOUSLY
+           : RENDER_ONCE_WAITING_FOR_RESOURCES),
+  mRequiresSync(false),
+  mActive(false),
+  mWaitingToRender(false),
+  mNotifyTrigger(false),
+  mExclusive(Dali::RenderTask::DEFAULT_EXCLUSIVE),
+  mClearEnabled(Dali::RenderTask::DEFAULT_CLEAR_ENABLED),
+  mCullMode(Dali::RenderTask::DEFAULT_CULL_MODE)
 {
 }
 
 void RenderTask::SetActiveStatus()
 {
   // must have a source and camera both connected to scene
-  mActive = ( mSourceNode && mSourceNode->ConnectedToScene() &&
-              mCameraNode && mCameraNode->ConnectedToScene() && mCamera );
-  TASK_LOG_FMT( Debug::General, " Source node(%x) active %d.  Frame counter: %d\n", mSourceNode, mSourceNode && mSourceNode->ConnectedToScene(), mFrameCounter );
-  TASK_LOG_FMT( Debug::General, " Camera node(%x) active %d\n", mCameraNode, mCameraNode && mCameraNode->ConnectedToScene() );
+  mActive = (mSourceNode && mSourceNode->ConnectedToScene() &&
+             mCameraNode && mCameraNode->ConnectedToScene() && mCamera);
+  TASK_LOG_FMT(Debug::General, " Source node(%x) active %d.  Frame counter: %d\n", mSourceNode, mSourceNode && mSourceNode->ConnectedToScene(), mFrameCounter);
+  TASK_LOG_FMT(Debug::General, " Camera node(%x) active %d\n", mCameraNode, mCameraNode && mCameraNode->ConnectedToScene());
 }
 
 } // namespace SceneGraph

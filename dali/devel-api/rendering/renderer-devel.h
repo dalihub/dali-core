@@ -2,7 +2,7 @@
 #define DALI_RENDERER_DEVEL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,39 +23,37 @@
 
 namespace Dali
 {
-
 namespace DevelBlendEquation
 {
-
 /**
  * @brief Enumeration for blend equation.
  */
 enum Type
 {
-  ADD                           = Dali::BlendEquation::ADD,
-  SUBTRACT                      = Dali::BlendEquation::SUBTRACT,
-  REVERSE_SUBTRACT              = Dali::BlendEquation::REVERSE_SUBTRACT,
+  ADD              = Dali::BlendEquation::ADD,
+  SUBTRACT         = Dali::BlendEquation::SUBTRACT,
+  REVERSE_SUBTRACT = Dali::BlendEquation::REVERSE_SUBTRACT,
 
   // OpenGL es 3.0 enumeration
-  MIN                           = 0x8007,
-  MAX                           = 0x8008,
+  MIN = 0x8007,
+  MAX = 0x8008,
 
   // OpenGL es 3.2 or KHR_Blend_Equation_Advanced enumeration
-  MULTIPLY                      = 0x9294,
-  SCREEN                        = 0x9295,
-  OVERLAY                       = 0x9296,
-  DARKEN                        = 0x9297,
-  LIGHTEN                       = 0x9298,
-  COLOR_DODGE                   = 0x9299,
-  COLOR_BURN                    = 0x929A,
-  HARD_LIGHT                    = 0x929B,
-  SOFT_LIGHT                    = 0x929C,
-  DIFFERENCE                    = 0x929E,
-  EXCLUSION                     = 0x92A0,
-  HUE                           = 0x92AD,
-  SATURATION                    = 0x92AE,
-  COLOR                         = 0x92AF,
-  LUMINOSITY                    = 0x92B0
+  MULTIPLY    = 0x9294,
+  SCREEN      = 0x9295,
+  OVERLAY     = 0x9296,
+  DARKEN      = 0x9297,
+  LIGHTEN     = 0x9298,
+  COLOR_DODGE = 0x9299,
+  COLOR_BURN  = 0x929A,
+  HARD_LIGHT  = 0x929B,
+  SOFT_LIGHT  = 0x929C,
+  DIFFERENCE  = 0x929E,
+  EXCLUSION   = 0x92A0,
+  HUE         = 0x92AD,
+  SATURATION  = 0x92AE,
+  COLOR       = 0x92AF,
+  LUMINOSITY  = 0x92B0
 };
 
 } // namespace DevelBlendEquation
@@ -163,13 +161,12 @@ enum Type
 
 } // namespace Rendering
 
-
 /**
  * @brief Query whether current blend equation is advanced option.
  * @param[in] renderer to be checked whether it has been applied advanced blend equation or not
  * @return True if current blend equation is advanced.
  */
-DALI_CORE_API bool IsAdvancedBlendEquationApplied( const Renderer& renderer );
+DALI_CORE_API bool IsAdvancedBlendEquationApplied(const Renderer& renderer);
 
 } // namespace DevelRenderer
 

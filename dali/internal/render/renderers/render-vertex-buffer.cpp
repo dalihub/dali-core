@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,20 +15,19 @@
  *
  */
 
+#include <dali/internal/event/rendering/vertex-buffer-impl.h> // Dali::Internal::VertexBuffer
 #include <dali/internal/render/renderers/render-vertex-buffer.h>
-#include <dali/internal/event/rendering/vertex-buffer-impl.h>  // Dali::Internal::VertexBuffer
 
 namespace
 {
-
 using Dali::Property;
 using Dali::Internal::PropertyImplementationType;
 
-Dali::GLenum GetPropertyImplementationGlType( Property::Type propertyType )
+Dali::GLenum GetPropertyImplementationGlType(Property::Type propertyType)
 {
   Dali::GLenum type = GL_BYTE;
 
-  switch( propertyType )
+  switch(propertyType)
   {
     case Property::NONE:
     case Property::STRING:
@@ -66,11 +65,11 @@ Dali::GLenum GetPropertyImplementationGlType( Property::Type propertyType )
   return type;
 }
 
-Dali::GLint GetPropertyImplementationGlSize( Property::Type propertyType )
+Dali::GLint GetPropertyImplementationGlSize(Property::Type propertyType)
 {
   Dali::GLint size = 1u;
 
-  switch( propertyType )
+  switch(propertyType)
   {
     case Property::NONE:
     case Property::STRING:
@@ -115,50 +114,49 @@ namespace Internal
 {
 namespace Render
 {
-
 VertexBuffer::VertexBuffer()
-:mFormat(nullptr),
- mData(nullptr),
- mGpuBuffer(nullptr),
- mSize(0),
- mDataChanged(true)
+: mFormat(nullptr),
+  mData(nullptr),
+  mGpuBuffer(nullptr),
+  mSize(0),
+  mDataChanged(true)
 {
 }
 
 VertexBuffer::~VertexBuffer() = default;
 
-void VertexBuffer::SetFormat( VertexBuffer::Format* format )
+void VertexBuffer::SetFormat(VertexBuffer::Format* format)
 {
-  mFormat = format;
+  mFormat      = format;
   mDataChanged = true;
 }
 
-void VertexBuffer::SetData( Dali::Vector<uint8_t>* data, uint32_t size )
+void VertexBuffer::SetData(Dali::Vector<uint8_t>* data, uint32_t size)
 {
-  mData = data;
-  mSize = size;
+  mData        = data;
+  mSize        = size;
   mDataChanged = true;
 }
 
-bool VertexBuffer::Update( Context& context )
+bool VertexBuffer::Update(Context& context)
 {
-  if( !mData || !mFormat || !mSize )
+  if(!mData || !mFormat || !mSize)
   {
     return false;
   }
 
-  if( !mGpuBuffer || mDataChanged )
+  if(!mGpuBuffer || mDataChanged)
   {
-    if ( ! mGpuBuffer )
+    if(!mGpuBuffer)
     {
-      mGpuBuffer = new GpuBuffer( context );
+      mGpuBuffer = new GpuBuffer(context);
     }
 
     // Update the GpuBuffer
-    if ( mGpuBuffer )
+    if(mGpuBuffer)
     {
-      DALI_ASSERT_DEBUG( mSize && "No data in the property buffer!" );
-      mGpuBuffer->UpdateDataBuffer( context, GetDataSize(), &((*mData)[0]), GpuBuffer::STATIC_DRAW, GpuBuffer::ARRAY_BUFFER );
+      DALI_ASSERT_DEBUG(mSize && "No data in the property buffer!");
+      mGpuBuffer->UpdateDataBuffer(context, GetDataSize(), &((*mData)[0]), GpuBuffer::STATIC_DRAW, GpuBuffer::ARRAY_BUFFER);
     }
 
     mDataChanged = false;
@@ -167,7 +165,7 @@ bool VertexBuffer::Update( Context& context )
   return true;
 }
 
-void VertexBuffer::BindBuffer( Context& context, GpuBuffer::Target target )
+void VertexBuffer::BindBuffer(Context& context, GpuBuffer::Target target)
 {
   if(mGpuBuffer)
   {
@@ -175,35 +173,35 @@ void VertexBuffer::BindBuffer( Context& context, GpuBuffer::Target target )
   }
 }
 
-uint32_t VertexBuffer::EnableVertexAttributes( Context& context, Vector<GLint>& vAttributeLocation, uint32_t locationBase )
+uint32_t VertexBuffer::EnableVertexAttributes(Context& context, Vector<GLint>& vAttributeLocation, uint32_t locationBase)
 {
-  const uint32_t attributeCount = static_cast<uint32_t>( mFormat->components.size() );
+  const uint32_t attributeCount = static_cast<uint32_t>(mFormat->components.size());
 
   GLsizei elementSize = mFormat->size;
 
-  for( uint32_t i = 0; i < attributeCount; ++i )
+  for(uint32_t i = 0; i < attributeCount; ++i)
   {
-    GLint attributeLocation = vAttributeLocation[i+locationBase];
-    if( attributeLocation != -1 )
+    GLint attributeLocation = vAttributeLocation[i + locationBase];
+    if(attributeLocation != -1)
     {
-      context.EnableVertexAttributeArray( attributeLocation );
+      context.EnableVertexAttributeArray(attributeLocation);
 
-      const GLint attributeSize = mFormat->components[i].size;
-      uint32_t attributeOffset = mFormat->components[i].offset;
-      const Property::Type attributeType = mFormat->components[i].type;
+      const GLint          attributeSize   = mFormat->components[i].size;
+      uint32_t             attributeOffset = mFormat->components[i].offset;
+      const Property::Type attributeType   = mFormat->components[i].type;
 
-      context.VertexAttribPointer( attributeLocation,
-                                   attributeSize  / GetPropertyImplementationGlSize(attributeType),
-                                   GetPropertyImplementationGlType(attributeType),
-                                   GL_FALSE,  // Not normalized
-                                   elementSize,
-                                   reinterpret_cast< void* >( attributeOffset ) );
+      context.VertexAttribPointer(attributeLocation,
+                                  attributeSize / GetPropertyImplementationGlSize(attributeType),
+                                  GetPropertyImplementationGlType(attributeType),
+                                  GL_FALSE, // Not normalized
+                                  elementSize,
+                                  reinterpret_cast<void*>(attributeOffset));
     }
   }
 
   return attributeCount;
 }
 
-} //Render
-} //Internal
-} //Dali
+} // namespace Render
+} // namespace Internal
+} // namespace Dali

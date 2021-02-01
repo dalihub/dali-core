@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_INSTRUCTION_PROCESSOR_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,8 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace Render
 {
 class Geometry;
@@ -36,7 +34,6 @@ class Geometry;
 
 namespace SceneGraph
 {
-
 class RenderTracker;
 struct RenderItem;
 class Shader;
@@ -44,14 +41,12 @@ struct RenderList;
 class RenderTask;
 class RenderInstructionContainer;
 
-
 /**
  * @brief This class handles the sorting and preparation of Renderers for each layer.
  */
 class RenderInstructionProcessor
 {
 public:
-
   /**
    * @brief Constructor.
    */
@@ -69,21 +64,20 @@ public:
   struct SortAttributes
   {
     SortAttributes()
-    : renderItem( nullptr ),
-      shader( nullptr ),
-      textureSet( nullptr ),
-      geometry( nullptr ),
-      zValue( 0.0f )
+    : renderItem(nullptr),
+      shader(nullptr),
+      textureSet(nullptr),
+      geometry(nullptr),
+      zValue(0.0f)
     {
     }
 
-    RenderItem*             renderItem;        ///< The render item that is being sorted (includes depth index)
-    const Shader*           shader;            ///< The shader instance
-    const void*             textureSet;        ///< The textureSet instance
-    const Render::Geometry* geometry;          ///< The geometry instance
-    float                   zValue;            ///< The Z value of the given renderer (either distance from camera, or a custom calculated value)
+    RenderItem*             renderItem; ///< The render item that is being sorted (includes depth index)
+    const Shader*           shader;     ///< The shader instance
+    const void*             textureSet; ///< The textureSet instance
+    const Render::Geometry* geometry;   ///< The geometry instance
+    float                   zValue;     ///< The Z value of the given renderer (either distance from camera, or a custom calculated value)
   };
-
 
   /**
    * @brief Sorts and prepares the list of opaque/transparent Renderers for each layer.
@@ -102,23 +96,21 @@ public:
    * @param[in]  hasClippingNodes  Whether any clipping nodes exist within this layer, to optimize sorting if not
    * @param[out] instructions      The rendering instructions for the next frame.
    */
-  void Prepare( BufferIndex updateBufferIndex,
-                SortedLayerPointers& sortedLayers,
-                RenderTask& renderTask,
-                bool cull,
-                bool hasClippingNodes,
-                RenderInstructionContainer& instructions );
+  void Prepare(BufferIndex                 updateBufferIndex,
+               SortedLayerPointers&        sortedLayers,
+               RenderTask&                 renderTask,
+               bool                        cull,
+               bool                        hasClippingNodes,
+               RenderInstructionContainer& instructions);
 
 private:
-
   /**
    * Undefine copy and assignment operators.
    */
-  RenderInstructionProcessor( const RenderInstructionProcessor& renderInstructionProcessor );             ///< No definition
-  RenderInstructionProcessor& operator=( const RenderInstructionProcessor& renderInstructionProcessor );  ///< No definition
+  RenderInstructionProcessor(const RenderInstructionProcessor& renderInstructionProcessor);            ///< No definition
+  RenderInstructionProcessor& operator=(const RenderInstructionProcessor& renderInstructionProcessor); ///< No definition
 
 private:
-
   /**
    * @brief Sort render items
    * @param bufferIndex The buffer to read from
@@ -126,18 +118,16 @@ private:
    * @param layer where the Renderers are from
    * @param respectClippingOrder Sort with the correct clipping hierarchy.
    */
-  inline void SortRenderItems( BufferIndex bufferIndex, RenderList& renderList, Layer& layer, bool respectClippingOrder );
+  inline void SortRenderItems(BufferIndex bufferIndex, RenderList& renderList, Layer& layer, bool respectClippingOrder);
 
   /// Sort comparitor function pointer type.
-  using ComparitorPointer = bool ( * )( const SortAttributes&, const SortAttributes& );
+  using ComparitorPointer = bool (*)(const SortAttributes&, const SortAttributes&);
 
   using SortingHelper = std::vector<SortAttributes>;
 
-  Dali::Vector< ComparitorPointer > mSortComparitors;       ///< Contains all sort comparitors, used for quick look-up
-  RenderInstructionProcessor::SortingHelper mSortingHelper; ///< Helper used to sort Renderers
-
+  Dali::Vector<ComparitorPointer>           mSortComparitors; ///< Contains all sort comparitors, used for quick look-up
+  RenderInstructionProcessor::SortingHelper mSortingHelper;   ///< Helper used to sort Renderers
 };
-
 
 } // namespace SceneGraph
 

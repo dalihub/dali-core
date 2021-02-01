@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_EVENT_THREAD_SERVICES_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@
 
 namespace Dali
 {
-
 class BaseObject;
 
 namespace Integration
@@ -36,7 +35,6 @@ class RenderController;
 
 namespace Internal
 {
-
 namespace SceneGraph
 {
 class UpdateManager;
@@ -50,7 +48,6 @@ class UpdateManager;
 class EventThreadServices
 {
 public:
-
   /**
    * Virtual destructor
    */
@@ -67,14 +64,14 @@ public:
    *
    * @param[in] object to register
    */
-  virtual void RegisterObject( BaseObject* object) = 0;
+  virtual void RegisterObject(BaseObject* object) = 0;
 
   /**
    * @brief Unregisters the object from Object registry.
    *
    * @param[in] object to unregister
    */
-  virtual void UnregisterObject( BaseObject* object) = 0;
+  virtual void UnregisterObject(BaseObject* object) = 0;
 
   /**
    * @brief Get a reference to the UpdateManager
@@ -98,12 +95,12 @@ public:
    * @param[in] updateScene A flag, when true denotes that the message will cause the scene-graph node tree to require an update.
    * @return A pointer to the first char allocated for the message.
    */
-  virtual uint32_t* ReserveMessageSlot( uint32_t size, bool updateScene = true ) = 0;
+  virtual uint32_t* ReserveMessageSlot(uint32_t size, bool updateScene = true) = 0;
 
   /**
    * @return the current event-buffer index.
    */
-  virtual BufferIndex GetEventBufferIndex() const  = 0;
+  virtual BufferIndex GetEventBufferIndex() const = 0;
 
   /**
    * @brief Indicate that the next rendering is really required.

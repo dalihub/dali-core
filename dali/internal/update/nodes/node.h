@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_NODE_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,42 +19,44 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/actors/actor-enumerations.h>
-#include <dali/public-api/actors/draw-mode.h>
-#include <dali/public-api/math/quaternion.h>
-#include <dali/public-api/math/math-utils.h>
-#include <dali/public-api/math/vector3.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>
 #include <dali/internal/update/common/animatable-property.h>
+#include <dali/internal/update/common/inherited-property.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
-#include <dali/internal/update/common/inherited-property.h>
-#include <dali/internal/update/manager/transform-manager.h>
 #include <dali/internal/update/manager/transform-manager-property.h>
+#include <dali/internal/update/manager/transform-manager.h>
 #include <dali/internal/update/nodes/node-declarations.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
+#include <dali/public-api/actors/actor-enumerations.h>
+#include <dali/public-api/actors/draw-mode.h>
+#include <dali/public-api/math/math-utils.h>
+#include <dali/public-api/math/quaternion.h>
+#include <dali/public-api/math/vector3.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 // Value types used by messages.
-template <> struct ParameterType< ColorMode > : public BasicType< ColorMode > {};
-template <> struct ParameterType< ClippingMode::Type > : public BasicType< ClippingMode::Type > {};
+template<>
+struct ParameterType<ColorMode> : public BasicType<ColorMode>
+{
+};
+template<>
+struct ParameterType<ClippingMode::Type> : public BasicType<ClippingMode::Type>
+{
+};
 
 namespace SceneGraph
 {
-
 class DiscardQueue;
 class Layer;
 class RenderTask;
 class UpdateManager;
-
 
 // Flags which require the scene renderable lists to be updated
 static NodePropertyFlags RenderableUpdateFlags = NodePropertyFlags::TRANSFORM | NodePropertyFlags::CHILD_DELETED;
@@ -70,7 +72,6 @@ static NodePropertyFlags RenderableUpdateFlags = NodePropertyFlags::TRANSFORM | 
 class Node : public PropertyOwner, public NodeDataProvider
 {
 public:
-
   // Defaults
   static const ColorMode DEFAULT_COLOR_MODE;
 
@@ -84,7 +85,7 @@ public:
   /**
    * Deletes a Node.
    */
-  static void Delete( Node* node );
+  static void Delete(Node* node);
 
   /**
    * Called during UpdateManager::DestroyNode shortly before Node is destroyed.
@@ -125,9 +126,9 @@ public:
   {
     mUpdated = updated;
 
-    for (Node* child : mChildren)
+    for(Node* child : mChildren)
     {
-       child->SetUpdated(updated);
+      child->SetUpdated(updated);
     }
   }
 
@@ -138,12 +139,12 @@ public:
    * @param[in] clippingDepth The Clipping Depth of the node to set
    * @param[in] scissorDepth The Scissor Clipping Depth of the node to set
    */
-  void SetClippingInformation( const uint32_t clippingId, const uint32_t clippingDepth, const uint32_t scissorDepth )
+  void SetClippingInformation(const uint32_t clippingId, const uint32_t clippingDepth, const uint32_t scissorDepth)
   {
     // We only set up the sort value if we have a stencil clipping depth, IE. At least 1 clipping node has been hit.
     // If not, if we traverse down a clipping tree and back up, and there is another
     // node on the parent, this will have a non-zero clipping ID that must be ignored
-    if( clippingDepth > 0u )
+    if(clippingDepth > 0u)
     {
       mClippingDepth = clippingDepth;
 
@@ -151,7 +152,7 @@ public:
       // The items must be sorted by Clipping ID first (so the ID is kept in the most-significant bits).
       // For the same ID, the clipping nodes must be first, so we negate the
       // clipping enabled flag and set it as the least significant bit.
-      mClippingSortModifier = ( clippingId << 1u ) | ( mClippingMode == ClippingMode::DISABLED ? 1u : 0u );
+      mClippingSortModifier = (clippingId << 1u) | (mClippingMode == ClippingMode::DISABLED ? 1u : 0u);
     }
     else
     {
@@ -195,7 +196,7 @@ public:
    * Sets the clipping mode for this node.
    * @param[in] clippingMode The ClippingMode to set
    */
-  void SetClippingMode( const ClippingMode::Type clippingMode )
+  void SetClippingMode(const ClippingMode::Type clippingMode)
   {
     mClippingMode = clippingMode;
   }
@@ -213,19 +214,19 @@ public:
    * Add a renderer to the node
    * @param[in] renderer The renderer added to the node
    */
-  void AddRenderer( Renderer* renderer );
+  void AddRenderer(Renderer* renderer);
 
   /**
    * Remove a renderer from the node
    * @param[in] renderer The renderer to be removed
    */
-  void RemoveRenderer( const Renderer* renderer );
+  void RemoveRenderer(const Renderer* renderer);
 
   /*
    * Get the renderer at the given index
    * @param[in] index
    */
-  Renderer* GetRendererAt( uint32_t index ) const
+  Renderer* GetRendererAt(uint32_t index) const
   {
     return mRenderer[index];
   }
@@ -235,7 +236,7 @@ public:
    */
   uint32_t GetRendererCount() const
   {
-    return static_cast<uint32_t>( mRenderer.Size() );
+    return static_cast<uint32_t>(mRenderer.Size());
   }
 
   // Containment methods
@@ -292,7 +293,7 @@ public:
    * @pre The childNode is not a root node.
    * @param[in] childNode The child to add.
    */
-  void ConnectChild( Node* childNode );
+  void ConnectChild(Node* childNode);
 
   /**
    * Disconnect a child (& its children) from the scene-graph.
@@ -300,7 +301,7 @@ public:
    * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] childNode The node to disconnect.
    */
-  void DisconnectChild( BufferIndex updateBufferIndex, Node& childNode );
+  void DisconnectChild(BufferIndex updateBufferIndex, Node& childNode);
 
   /**
    * Retrieve the children a Node.
@@ -326,7 +327,7 @@ public:
    * Flag that one of the node values has changed in the current frame.
    * @param[in] flag The flag to set.
    */
-  void SetDirtyFlag( NodePropertyFlags flag )
+  void SetDirtyFlag(NodePropertyFlags flag)
   {
     mDirtyFlags |= flag;
   }
@@ -351,7 +352,7 @@ public:
    * @param The parentFlags to or with
    * @return The inherited dirty flags
    */
-  NodePropertyFlags GetInheritedDirtyFlags( NodePropertyFlags parentFlags ) const;
+  NodePropertyFlags GetInheritedDirtyFlags(NodePropertyFlags parentFlags) const;
 
   /**
    * Retrieve the parent-origin of the node.
@@ -368,7 +369,7 @@ public:
    */
   void SetParentOrigin(const Vector3& origin)
   {
-    mParentOrigin.Set(0,origin );
+    mParentOrigin.Set(0, origin);
   }
 
   /**
@@ -386,7 +387,7 @@ public:
    */
   void SetAnchorPoint(const Vector3& anchor)
   {
-    mAnchorPoint.Set(0, anchor );
+    mAnchorPoint.Set(0, anchor);
   }
 
   /**
@@ -396,7 +397,7 @@ public:
    */
   const Vector3& GetPosition(BufferIndex bufferIndex) const
   {
-    if( mTransformManagerData.Id() != INVALID_TRANSFORM_ID )
+    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
     {
       return mPosition.Get(bufferIndex);
     }
@@ -408,7 +409,7 @@ public:
    * Retrieve the position of the node derived from the position of all its parents.
    * @return The world position.
    */
-  const Vector3& GetWorldPosition( BufferIndex bufferIndex ) const
+  const Vector3& GetWorldPosition(BufferIndex bufferIndex) const
   {
     return mWorldPosition.Get(bufferIndex);
   }
@@ -419,9 +420,9 @@ public:
    */
   void SetInheritPosition(bool inherit)
   {
-    if( mTransformManagerData.Id() != INVALID_TRANSFORM_ID )
+    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
     {
-      mTransformManagerData.Manager()->SetInheritPosition( mTransformManagerData.Id(), inherit );
+      mTransformManagerData.Manager()->SetInheritPosition(mTransformManagerData.Id(), inherit);
     }
   }
 
@@ -432,7 +433,7 @@ public:
    */
   const Quaternion& GetOrientation(BufferIndex bufferIndex) const
   {
-    if( mTransformManagerData.Id() != INVALID_TRANSFORM_ID )
+    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
     {
       return mOrientation.Get(0);
     }
@@ -445,7 +446,7 @@ public:
    * @param[in] bufferIndex The buffer to read from.
    * @return The world rotation.
    */
-  const Quaternion& GetWorldOrientation( BufferIndex bufferIndex ) const
+  const Quaternion& GetWorldOrientation(BufferIndex bufferIndex) const
   {
     return mWorldOrientation.Get(0);
   }
@@ -456,9 +457,9 @@ public:
    */
   void SetInheritOrientation(bool inherit)
   {
-    if( mTransformManagerData.Id() != INVALID_TRANSFORM_ID )
+    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
     {
-      mTransformManagerData.Manager()->SetInheritOrientation(mTransformManagerData.Id(), inherit );
+      mTransformManagerData.Manager()->SetInheritOrientation(mTransformManagerData.Id(), inherit);
     }
   }
 
@@ -469,7 +470,7 @@ public:
    */
   const Vector3& GetScale(BufferIndex bufferIndex) const
   {
-    if( mTransformManagerData.Id() != INVALID_TRANSFORM_ID )
+    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
     {
       return mScale.Get(0);
     }
@@ -477,13 +478,12 @@ public:
     return Vector3::ONE;
   }
 
-
   /**
    * Retrieve the scale of the node derived from the scale of all its parents.
    * @param[in] bufferIndex The buffer to read from.
    * @return The world scale.
    */
-  const Vector3& GetWorldScale( BufferIndex bufferIndex ) const
+  const Vector3& GetWorldScale(BufferIndex bufferIndex) const
   {
     return mWorldScale.Get(0);
   }
@@ -492,11 +492,11 @@ public:
    * Set whether the Node inherits scale.
    * @param inherit True if the Node inherits scale.
    */
-  void SetInheritScale( bool inherit )
+  void SetInheritScale(bool inherit)
   {
-    if( mTransformManagerData.Id() != INVALID_TRANSFORM_ID )
+    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
     {
-      mTransformManagerData.Manager()->SetInheritScale(mTransformManagerData.Id(), inherit );
+      mTransformManagerData.Manager()->SetInheritScale(mTransformManagerData.Id(), inherit);
     }
   }
 
@@ -537,7 +537,7 @@ public:
    */
   void SetWorldColor(const Vector4& color, BufferIndex updateBufferIndex)
   {
-    mWorldColor.Set( updateBufferIndex, color );
+    mWorldColor.Set(updateBufferIndex, color);
   }
 
   /**
@@ -546,27 +546,27 @@ public:
    * @pre The node has a parent.
    * @param[in] updateBufferIndex The current update buffer index.
    */
-  void InheritWorldColor( BufferIndex updateBufferIndex )
+  void InheritWorldColor(BufferIndex updateBufferIndex)
   {
     DALI_ASSERT_DEBUG(mParent != NULL);
 
     // default first
-    if( mColorMode == USE_OWN_MULTIPLY_PARENT_ALPHA )
+    if(mColorMode == USE_OWN_MULTIPLY_PARENT_ALPHA)
     {
       const Vector4& ownColor = mColor[updateBufferIndex];
-      mWorldColor.Set( updateBufferIndex, ownColor.r, ownColor.g, ownColor.b, ownColor.a * mParent->GetWorldColor(updateBufferIndex).a );
+      mWorldColor.Set(updateBufferIndex, ownColor.r, ownColor.g, ownColor.b, ownColor.a * mParent->GetWorldColor(updateBufferIndex).a);
     }
-    else if( mColorMode == USE_OWN_MULTIPLY_PARENT_COLOR )
+    else if(mColorMode == USE_OWN_MULTIPLY_PARENT_COLOR)
     {
-      mWorldColor.Set( updateBufferIndex, mParent->GetWorldColor(updateBufferIndex) * mColor[updateBufferIndex] );
+      mWorldColor.Set(updateBufferIndex, mParent->GetWorldColor(updateBufferIndex) * mColor[updateBufferIndex]);
     }
-    else if( mColorMode == USE_PARENT_COLOR )
+    else if(mColorMode == USE_PARENT_COLOR)
     {
-      mWorldColor.Set( updateBufferIndex, mParent->GetWorldColor(updateBufferIndex) );
+      mWorldColor.Set(updateBufferIndex, mParent->GetWorldColor(updateBufferIndex));
     }
     else // USE_OWN_COLOR
     {
-      mWorldColor.Set( updateBufferIndex, mColor[updateBufferIndex] );
+      mWorldColor.Set(updateBufferIndex, mColor[updateBufferIndex]);
     }
   }
 
@@ -576,9 +576,9 @@ public:
    * does not need to be recalculated in the current frame.
    * @param[in] updateBufferIndex The current update buffer index.
    */
-  void CopyPreviousWorldColor( BufferIndex updateBufferIndex )
+  void CopyPreviousWorldColor(BufferIndex updateBufferIndex)
   {
-    mWorldColor.CopyPrevious( updateBufferIndex );
+    mWorldColor.CopyPrevious(updateBufferIndex);
   }
 
   /**
@@ -597,11 +597,11 @@ public:
    * or inherits its parent color.
    * @param[in] colorMode The new color mode.
    */
-  void SetColorMode( ColorMode colorMode )
+  void SetColorMode(ColorMode colorMode)
   {
     mColorMode = colorMode;
 
-    SetDirtyFlag( NodePropertyFlags::COLOR );
+    SetDirtyFlag(NodePropertyFlags::COLOR);
   }
 
   /**
@@ -620,7 +620,7 @@ public:
    */
   const Vector3& GetSize(BufferIndex bufferIndex) const
   {
-    if( mTransformManagerData.Id() != INVALID_TRANSFORM_ID )
+    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
     {
       return mSize.Get(0);
     }
@@ -634,7 +634,7 @@ public:
    */
   const Vector3& GetUpdateSizeHint() const
   {
-    if( mTransformManagerData.Id() != INVALID_TRANSFORM_ID )
+    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
     {
       return mUpdateSizeHint.Get(0);
     }
@@ -648,9 +648,9 @@ public:
    */
   const Vector4& GetBoundingSphere() const
   {
-    if( mTransformManagerData.Id() != INVALID_TRANSFORM_ID )
+    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
     {
-      return mTransformManagerData.Manager()->GetBoundingSphere( mTransformManagerData.Id() );
+      return mTransformManagerData.Manager()->GetBoundingSphere(mTransformManagerData.Id());
     }
 
     return Vector4::ZERO;
@@ -661,11 +661,11 @@ public:
    * @param[out] The local to world matrix of the node
    * @param[out] size The current size of the node
    */
-  void GetWorldMatrixAndSize( Matrix& worldMatrix, Vector3& size ) const
+  void GetWorldMatrixAndSize(Matrix& worldMatrix, Vector3& size) const
   {
-    if( mTransformManagerData.Id() != INVALID_TRANSFORM_ID )
+    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
     {
-      mTransformManagerData.Manager()->GetWorldMatrixAndSize( mTransformManagerData.Id(), worldMatrix, size );
+      mTransformManagerData.Manager()->GetWorldMatrixAndSize(mTransformManagerData.Id(), worldMatrix, size);
     }
   }
 
@@ -676,7 +676,7 @@ public:
   bool IsLocalMatrixDirty() const
   {
     return (mTransformManagerData.Id() != INVALID_TRANSFORM_ID) &&
-           (mTransformManagerData.Manager()->IsLocalMatrixDirty( mTransformManagerData.Id() ));
+           (mTransformManagerData.Manager()->IsLocalMatrixDirty(mTransformManagerData.Id()));
   }
 
   /**
@@ -684,7 +684,7 @@ public:
    * @param[in] bufferIndex The buffer to read from.
    * @return The world-matrix.
    */
-  const Matrix& GetWorldMatrix( BufferIndex bufferIndex ) const
+  const Matrix& GetWorldMatrix(BufferIndex bufferIndex) const
   {
     return mWorldMatrix.Get(bufferIndex);
   }
@@ -693,7 +693,7 @@ public:
    * Mark the node as exclusive to a single RenderTask.
    * @param[in] renderTask The render-task, or NULL if the Node is not exclusive to a single RenderTask.
    */
-  void SetExclusiveRenderTask( RenderTask* renderTask )
+  void SetExclusiveRenderTask(RenderTask* renderTask)
   {
     mExclusiveRenderTask = renderTask;
   }
@@ -711,7 +711,7 @@ public:
    * Set how the Node and its children should be drawn; see Dali::Actor::SetDrawMode() for more details.
    * @param[in] drawMode The new draw-mode to use.
    */
-  void SetDrawMode( const DrawMode::Type& drawMode )
+  void SetDrawMode(const DrawMode::Type& drawMode)
   {
     mDrawMode = drawMode;
   }
@@ -738,16 +738,16 @@ public:
    * Equality operator, checks for identity, not values.
    * @param[in]
    */
-  bool operator==( const Node* rhs ) const
+  bool operator==(const Node* rhs) const
   {
-    return ( this == rhs );
+    return (this == rhs);
   }
 
   /**
    * @brief Sets the sibling order of the node
    * @param[in] order The new order
    */
-  void SetDepthIndex( uint32_t depthIndex )
+  void SetDepthIndex(uint32_t depthIndex)
   {
     mDepthIndex = depthIndex;
   }
@@ -765,12 +765,12 @@ public:
    * @brief Sets the boolean which states whether the position should use the anchor-point.
    * @param[in] positionUsesAnchorPoint True if the position should use the anchor-point
    */
-  void SetPositionUsesAnchorPoint( bool positionUsesAnchorPoint )
+  void SetPositionUsesAnchorPoint(bool positionUsesAnchorPoint)
   {
-    if( mTransformManagerData.Id() != INVALID_TRANSFORM_ID && mPositionUsesAnchorPoint != positionUsesAnchorPoint )
+    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID && mPositionUsesAnchorPoint != positionUsesAnchorPoint)
     {
       mPositionUsesAnchorPoint = positionUsesAnchorPoint;
-      mTransformManagerData.Manager()->SetPositionUsesAnchorPoint( mTransformManagerData.Id(), mPositionUsesAnchorPoint );
+      mTransformManagerData.Manager()->SetPositionUsesAnchorPoint(mTransformManagerData.Id(), mPositionUsesAnchorPoint);
     }
   }
 
@@ -779,7 +779,7 @@ public:
    * @param[in] bufferIndex The buffer to read from.
    * @param[in] culled True if the node is culled.
    */
-  void SetCulled( BufferIndex bufferIndex, bool culled )
+  void SetCulled(BufferIndex bufferIndex, bool culled)
   {
     mCulled[bufferIndex] = culled;
   }
@@ -789,7 +789,7 @@ public:
    * @param[in] bufferIndex The buffer to read from.
    * @return True if the node is culled.
    */
-  bool IsCulled( BufferIndex bufferIndex ) const
+  bool IsCulled(BufferIndex bufferIndex) const
   {
     return mCulled[bufferIndex];
   }
@@ -803,7 +803,7 @@ public:
   /**
    * @copydoc UniformMap::Remove
    */
-  void RemoveUniformMapping( const ConstString& uniformName ) override;
+  void RemoveUniformMapping(const ConstString& uniformName) override;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyOwner::IsAnimationPossible
@@ -815,7 +815,7 @@ public:
    * This is called by the UpdateManager when an object is due to be rendered in the current frame.
    * @param[in] updateBufferIndex The current update buffer index.
    */
-  void PrepareRender( BufferIndex bufferIndex );
+  void PrepareRender(BufferIndex bufferIndex);
 
   /**
    * Called by UpdateManager when the node is added.
@@ -823,23 +823,21 @@ public:
    * related to the transformation
    * @param[in] transformManager A pointer to the trnasform manager (Owned by UpdateManager)
    */
-  void CreateTransform( SceneGraph::TransformManager* transformManager );
+  void CreateTransform(SceneGraph::TransformManager* transformManager);
 
   /**
    * Reset dirty flags
    */
-  void ResetDirtyFlags( BufferIndex updateBufferIndex );
+  void ResetDirtyFlags(BufferIndex updateBufferIndex);
 
 protected:
-
   /**
    * Set the parent of a Node.
    * @param[in] parentNode the new parent.
    */
-  void SetParent( Node& parentNode );
+  void SetParent(Node& parentNode);
 
 protected:
-
   /**
    * Protected constructor; See also Node::New()
    */
@@ -852,28 +850,27 @@ protected:
   ~Node() override;
 
 private: // from NodeDataProvider
-
   /**
    * @copydoc NodeDataProvider::GetModelMatrix
    */
-  const Matrix& GetModelMatrix( BufferIndex bufferIndex ) const override
+  const Matrix& GetModelMatrix(BufferIndex bufferIndex) const override
   {
-    return GetWorldMatrix( bufferIndex );
+    return GetWorldMatrix(bufferIndex);
   }
 
   /**
    * @copydoc NodeDataProvider::GetRenderColor
    */
-  const Vector4& GetRenderColor( BufferIndex bufferIndex ) const override
+  const Vector4& GetRenderColor(BufferIndex bufferIndex) const override
   {
-    return GetWorldColor( bufferIndex );
+    return GetWorldColor(bufferIndex);
   }
 
 public: // From UniformMapDataProvider
   /**
    * @copydoc UniformMapDataProvider::GetUniformMapChanged
    */
-  bool GetUniformMapChanged( BufferIndex bufferIndex ) const override
+  bool GetUniformMapChanged(BufferIndex bufferIndex) const override
   {
     return mUniformMapChanged[bufferIndex];
   }
@@ -881,13 +878,12 @@ public: // From UniformMapDataProvider
   /**
    * @copydoc UniformMapDataProvider::GetUniformMap
    */
-  const CollectedUniformMap& GetUniformMap( BufferIndex bufferIndex ) const override
+  const CollectedUniformMap& GetUniformMap(BufferIndex bufferIndex) const override
   {
     return mCollectedUniformMap[bufferIndex];
   }
 
 private:
-
   // Undefined
   Node(const Node&);
 
@@ -899,68 +895,65 @@ private:
    * Disconnected Nodes have no parent or children.
    * @param[in] updateBufferIndex The current update buffer index.
    */
-  void RecursiveDisconnectFromSceneGraph( BufferIndex updateBufferIndex );
+  void RecursiveDisconnectFromSceneGraph(BufferIndex updateBufferIndex);
 
 public: // Default properties
   using TransformManagerParentsOrigin = TransformManagerPropertyVector3<TRANSFORM_PROPERTY_PARENT_ORIGIN>;
-  using TransformManagerAnchorPoint = TransformManagerPropertyVector3<TRANSFORM_PROPERTY_ANCHOR_POINT>;
-  using TransformManagerSize = TransformManagerPropertyVector3<TRANSFORM_PROPERTY_SIZE>;
-  using TransformManagerPosition = TransformManagerPropertyVector3<TRANSFORM_PROPERTY_POSITION>;
-  using TransformManagerScale = TransformManagerPropertyVector3<TRANSFORM_PROPERTY_SCALE>;
-
+  using TransformManagerAnchorPoint   = TransformManagerPropertyVector3<TRANSFORM_PROPERTY_ANCHOR_POINT>;
+  using TransformManagerSize          = TransformManagerPropertyVector3<TRANSFORM_PROPERTY_SIZE>;
+  using TransformManagerPosition      = TransformManagerPropertyVector3<TRANSFORM_PROPERTY_POSITION>;
+  using TransformManagerScale         = TransformManagerPropertyVector3<TRANSFORM_PROPERTY_SCALE>;
 
   TransformManagerData               mTransformManagerData;
-  TransformManagerParentsOrigin      mParentOrigin;           ///< Local transform; the position is relative to this. Sets the Transform flag dirty when changed
-  TransformManagerAnchorPoint        mAnchorPoint;            ///< Local transform; local center of rotation. Sets the Transform flag dirty when changed
-  TransformManagerSize               mSize;                   ///< Size is provided for layouting
-  TransformManagerPosition           mPosition;               ///< Local transform; distance between parent-origin & anchor-point
-  TransformManagerScale              mScale;                  ///< Local transform; scale relative to parent node
-  TransformManagerPropertyQuaternion mOrientation;            ///< Local transform; rotation relative to parent node
+  TransformManagerParentsOrigin      mParentOrigin; ///< Local transform; the position is relative to this. Sets the Transform flag dirty when changed
+  TransformManagerAnchorPoint        mAnchorPoint;  ///< Local transform; local center of rotation. Sets the Transform flag dirty when changed
+  TransformManagerSize               mSize;         ///< Size is provided for layouting
+  TransformManagerPosition           mPosition;     ///< Local transform; distance between parent-origin & anchor-point
+  TransformManagerScale              mScale;        ///< Local transform; scale relative to parent node
+  TransformManagerPropertyQuaternion mOrientation;  ///< Local transform; rotation relative to parent node
 
-  AnimatableProperty<bool>           mVisible;                ///< Visibility can be inherited from the Node hierachy
-  AnimatableProperty<bool>           mCulled;                 ///< True if the node is culled. This is not animatable. It is just double-buffered.
-  AnimatableProperty<Vector4>        mColor;                  ///< Color can be inherited from the Node hierarchy
-  AnimatableProperty<Vector3>        mUpdateSizeHint;         ///< Update size hint is provided for damaged area calculation. This is not animatable. It is just double-buffered. (Because all these bloody properties are).
-
+  AnimatableProperty<bool>    mVisible;        ///< Visibility can be inherited from the Node hierachy
+  AnimatableProperty<bool>    mCulled;         ///< True if the node is culled. This is not animatable. It is just double-buffered.
+  AnimatableProperty<Vector4> mColor;          ///< Color can be inherited from the Node hierarchy
+  AnimatableProperty<Vector3> mUpdateSizeHint; ///< Update size hint is provided for damaged area calculation. This is not animatable. It is just double-buffered. (Because all these bloody properties are).
 
   // Inherited properties; read-only from public API
 
-  TransformManagerVector3Input       mWorldPosition;          ///< Full inherited position
-  TransformManagerVector3Input       mWorldScale;
-  TransformManagerQuaternionInput    mWorldOrientation;       ///< Full inherited orientation
-  TransformManagerMatrixInput        mWorldMatrix;            ///< Full inherited world matrix
-  InheritedColor                     mWorldColor;             ///< Full inherited color
+  TransformManagerVector3Input    mWorldPosition; ///< Full inherited position
+  TransformManagerVector3Input    mWorldScale;
+  TransformManagerQuaternionInput mWorldOrientation; ///< Full inherited orientation
+  TransformManagerMatrixInput     mWorldMatrix;      ///< Full inherited world matrix
+  InheritedColor                  mWorldColor;       ///< Full inherited color
 
-  uint32_t                           mClippingSortModifier;   ///< Contains bit-packed clipping information for quick access when sorting
-  const uint32_t                     mId;                     ///< The Unique ID of the node.
+  uint32_t       mClippingSortModifier; ///< Contains bit-packed clipping information for quick access when sorting
+  const uint32_t mId;                   ///< The Unique ID of the node.
 
 protected:
+  static uint32_t mNodeCounter; ///< count of total nodes, used for unique ids
 
-  static uint32_t                    mNodeCounter;            ///< count of total nodes, used for unique ids
+  Node*       mParent;              ///< Pointer to parent node (a child is owned by its parent)
+  RenderTask* mExclusiveRenderTask; ///< Nodes can be marked as exclusive to a single RenderTask
 
-  Node*                              mParent;                 ///< Pointer to parent node (a child is owned by its parent)
-  RenderTask*                        mExclusiveRenderTask;    ///< Nodes can be marked as exclusive to a single RenderTask
+  RendererContainer mRenderer; ///< Container of renderers; not owned
 
-  RendererContainer                  mRenderer;               ///< Container of renderers; not owned
+  NodeContainer mChildren; ///< Container of children; not owned
 
-  NodeContainer                      mChildren;               ///< Container of children; not owned
+  CollectedUniformMap mCollectedUniformMap[2]; ///< Uniform maps of the node
+  uint32_t            mUniformMapChanged[2];   ///< Records if the uniform map has been altered this frame
+  uint32_t            mClippingDepth;          ///< The number of stencil clipping nodes deep this node is
+  uint32_t            mScissorDepth;           ///< The number of scissor clipping nodes deep this node is
 
-  CollectedUniformMap                mCollectedUniformMap[2]; ///< Uniform maps of the node
-  uint32_t                           mUniformMapChanged[2];   ///< Records if the uniform map has been altered this frame
-  uint32_t                           mClippingDepth;          ///< The number of stencil clipping nodes deep this node is
-  uint32_t                           mScissorDepth;           ///< The number of scissor clipping nodes deep this node is
-
-  uint32_t                           mDepthIndex;             ///< Depth index of the node
+  uint32_t mDepthIndex; ///< Depth index of the node
 
   // flags, compressed to bitfield
-  NodePropertyFlags                  mDirtyFlags;             ///< Dirty flags for each of the Node properties
-  uint32_t                           mRegenerateUniformMap:2; ///< Indicate if the uniform map has to be regenerated this frame
-  DrawMode::Type                     mDrawMode:3;             ///< How the Node and its children should be drawn
-  ColorMode                          mColorMode:3;            ///< Determines whether mWorldColor is inherited, 2 bits is enough
-  ClippingMode::Type                 mClippingMode:3;         ///< The clipping mode of this node
-  bool                               mIsRoot:1;               ///< True if the node cannot have a parent
-  bool                               mIsLayer:1;              ///< True if the node is a layer
-  bool                               mPositionUsesAnchorPoint:1; ///< True if the node should use the anchor-point when calculating the position
+  NodePropertyFlags  mDirtyFlags;                  ///< Dirty flags for each of the Node properties
+  uint32_t           mRegenerateUniformMap : 2;    ///< Indicate if the uniform map has to be regenerated this frame
+  DrawMode::Type     mDrawMode : 3;                ///< How the Node and its children should be drawn
+  ColorMode          mColorMode : 3;               ///< Determines whether mWorldColor is inherited, 2 bits is enough
+  ClippingMode::Type mClippingMode : 3;            ///< The clipping mode of this node
+  bool               mIsRoot : 1;                  ///< True if the node cannot have a parent
+  bool               mIsLayer : 1;                 ///< True if the node is a layer
+  bool               mPositionUsesAnchorPoint : 1; ///< True if the node should use the anchor-point when calculating the position
 
   // Changes scope, should be at end of class
   DALI_LOG_OBJECT_STRING_DECLARATION;
@@ -968,145 +961,145 @@ protected:
 
 // Messages for Node
 
-inline void SetInheritOrientationMessage( EventThreadServices& eventThreadServices, const Node& node, bool inherit )
+inline void SetInheritOrientationMessage(EventThreadServices& eventThreadServices, const Node& node, bool inherit)
 {
   using LocalType = MessageValue1<Node, bool>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &node, &Node::SetInheritOrientation, inherit );
+  new(slot) LocalType(&node, &Node::SetInheritOrientation, inherit);
 }
 
-inline void SetParentOriginMessage( EventThreadServices& eventThreadServices, const Node& node, const Vector3& origin )
+inline void SetParentOriginMessage(EventThreadServices& eventThreadServices, const Node& node, const Vector3& origin)
 {
   using LocalType = MessageValue1<Node, Vector3>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &node, &Node::SetParentOrigin, origin );
+  new(slot) LocalType(&node, &Node::SetParentOrigin, origin);
 }
 
-inline void SetAnchorPointMessage( EventThreadServices& eventThreadServices, const Node& node, const Vector3& anchor )
+inline void SetAnchorPointMessage(EventThreadServices& eventThreadServices, const Node& node, const Vector3& anchor)
 {
   using LocalType = MessageValue1<Node, Vector3>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &node, &Node::SetAnchorPoint, anchor );
+  new(slot) LocalType(&node, &Node::SetAnchorPoint, anchor);
 }
 
-inline void SetInheritPositionMessage( EventThreadServices& eventThreadServices, const Node& node, bool inherit )
+inline void SetInheritPositionMessage(EventThreadServices& eventThreadServices, const Node& node, bool inherit)
 {
   using LocalType = MessageValue1<Node, bool>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &node, &Node::SetInheritPosition, inherit );
+  new(slot) LocalType(&node, &Node::SetInheritPosition, inherit);
 }
 
-inline void SetInheritScaleMessage( EventThreadServices& eventThreadServices, const Node& node, bool inherit )
+inline void SetInheritScaleMessage(EventThreadServices& eventThreadServices, const Node& node, bool inherit)
 {
   using LocalType = MessageValue1<Node, bool>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &node, &Node::SetInheritScale, inherit );
+  new(slot) LocalType(&node, &Node::SetInheritScale, inherit);
 }
 
-inline void SetColorModeMessage( EventThreadServices& eventThreadServices, const Node& node, ColorMode colorMode )
+inline void SetColorModeMessage(EventThreadServices& eventThreadServices, const Node& node, ColorMode colorMode)
 {
   using LocalType = MessageValue1<Node, ColorMode>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &node, &Node::SetColorMode, colorMode );
+  new(slot) LocalType(&node, &Node::SetColorMode, colorMode);
 }
 
-inline void SetDrawModeMessage( EventThreadServices& eventThreadServices, const Node& node, DrawMode::Type drawMode )
+inline void SetDrawModeMessage(EventThreadServices& eventThreadServices, const Node& node, DrawMode::Type drawMode)
 {
   using LocalType = MessageValue1<Node, DrawMode::Type>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &node, &Node::SetDrawMode, drawMode );
+  new(slot) LocalType(&node, &Node::SetDrawMode, drawMode);
 }
 
-inline void AttachRendererMessage( EventThreadServices& eventThreadServices, const Node& node, const Renderer& renderer )
+inline void AttachRendererMessage(EventThreadServices& eventThreadServices, const Node& node, const Renderer& renderer)
 {
   using LocalType = MessageValue1<Node, Renderer*>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &node, &Node::AddRenderer, const_cast<Renderer*>( &renderer ) );
+  new(slot) LocalType(&node, &Node::AddRenderer, const_cast<Renderer*>(&renderer));
 }
 
-inline void DetachRendererMessage( EventThreadServices& eventThreadServices, const Node& node, const Renderer& renderer )
+inline void DetachRendererMessage(EventThreadServices& eventThreadServices, const Node& node, const Renderer& renderer)
 {
   using LocalType = MessageValue1<Node, const Renderer*>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &node, &Node::RemoveRenderer, &renderer );
+  new(slot) LocalType(&node, &Node::RemoveRenderer, &renderer);
 }
 
-inline void SetDepthIndexMessage( EventThreadServices& eventThreadServices, const Node& node, uint32_t depthIndex )
+inline void SetDepthIndexMessage(EventThreadServices& eventThreadServices, const Node& node, uint32_t depthIndex)
 {
   using LocalType = MessageValue1<Node, uint32_t>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &node, &Node::SetDepthIndex, depthIndex );
+  new(slot) LocalType(&node, &Node::SetDepthIndex, depthIndex);
 }
 
-inline void SetClippingModeMessage( EventThreadServices& eventThreadServices, const Node& node, ClippingMode::Type clippingMode )
+inline void SetClippingModeMessage(EventThreadServices& eventThreadServices, const Node& node, ClippingMode::Type clippingMode)
 {
   using LocalType = MessageValue1<Node, ClippingMode::Type>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &node, &Node::SetClippingMode, clippingMode );
+  new(slot) LocalType(&node, &Node::SetClippingMode, clippingMode);
 }
 
-inline void SetPositionUsesAnchorPointMessage( EventThreadServices& eventThreadServices, const Node& node, bool positionUsesAnchorPoint )
+inline void SetPositionUsesAnchorPointMessage(EventThreadServices& eventThreadServices, const Node& node, bool positionUsesAnchorPoint)
 {
   using LocalType = MessageValue1<Node, bool>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &node, &Node::SetPositionUsesAnchorPoint, positionUsesAnchorPoint );
+  new(slot) LocalType(&node, &Node::SetPositionUsesAnchorPoint, positionUsesAnchorPoint);
 }
 
 } // namespace SceneGraph
 
 // Template specialisation for OwnerPointer<Node>, because delete is protected
-template <>
+template<>
 inline void OwnerPointer<Dali::Internal::SceneGraph::Node>::Reset()
 {
-  if (mObject != nullptr)
+  if(mObject != nullptr)
   {
     Dali::Internal::SceneGraph::Node::Delete(mObject);
     mObject = nullptr;
@@ -1115,8 +1108,8 @@ inline void OwnerPointer<Dali::Internal::SceneGraph::Node>::Reset()
 } // namespace Internal
 
 // Template specialisations for OwnerContainer<Node*>, because delete is protected
-template <>
-inline void OwnerContainer<Dali::Internal::SceneGraph::Node*>::Delete( Dali::Internal::SceneGraph::Node* pointer )
+template<>
+inline void OwnerContainer<Dali::Internal::SceneGraph::Node*>::Delete(Dali::Internal::SceneGraph::Node* pointer)
 {
   Dali::Internal::SceneGraph::Node::Delete(pointer);
 }

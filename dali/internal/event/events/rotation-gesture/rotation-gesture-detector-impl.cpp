@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,20 +22,17 @@
 #include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
+#include <dali/internal/event/events/gesture-event-processor.h>
 #include <dali/public-api/events/rotation-gesture.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/internal/event/events/gesture-event-processor.h>
-#include <dali/integration-api/debug.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace
 {
-
 // Signals
 
 const char* const SIGNAL_ROTATION_DETECTED = "rotationDetected";
@@ -45,12 +42,11 @@ BaseHandle Create()
   return Dali::RotationGestureDetector::New();
 }
 
-TypeRegistration mType( typeid( Dali::RotationGestureDetector ), typeid( Dali::GestureDetector ), Create );
+TypeRegistration mType(typeid(Dali::RotationGestureDetector), typeid(Dali::GestureDetector), Create);
 
-SignalConnectorType signalConnector1( mType, SIGNAL_ROTATION_DETECTED, &RotationGestureDetector::DoConnectSignal );
+SignalConnectorType signalConnector1(mType, SIGNAL_ROTATION_DETECTED, &RotationGestureDetector::DoConnectSignal);
 
-}
-
+} // namespace
 
 RotationGestureDetectorPtr RotationGestureDetector::New()
 {
@@ -58,26 +54,26 @@ RotationGestureDetectorPtr RotationGestureDetector::New()
 }
 
 RotationGestureDetector::RotationGestureDetector()
-: GestureDetector( GestureType::ROTATION )
+: GestureDetector(GestureType::ROTATION)
 {
 }
 
-void RotationGestureDetector::EmitRotationGestureSignal( Dali::Actor actor, const Dali::RotationGesture& rotation )
+void RotationGestureDetector::EmitRotationGestureSignal(Dali::Actor actor, const Dali::RotationGesture& rotation)
 {
   // Guard against destruction during signal emission
-  Dali::RotationGestureDetector handle( this );
+  Dali::RotationGestureDetector handle(this);
 
-  mDetectedSignal.Emit( actor, rotation );
+  mDetectedSignal.Emit(actor, rotation);
 }
 
-bool RotationGestureDetector::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
+bool RotationGestureDetector::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
 {
-  bool connected( true );
-  RotationGestureDetector* gesture = static_cast< RotationGestureDetector* >( object ); // TypeRegistry guarantees that this is the correct type.
+  bool                     connected(true);
+  RotationGestureDetector* gesture = static_cast<RotationGestureDetector*>(object); // TypeRegistry guarantees that this is the correct type.
 
-  if ( 0 == strcmp( signalName.c_str(), SIGNAL_ROTATION_DETECTED ) )
+  if(0 == strcmp(signalName.c_str(), SIGNAL_ROTATION_DETECTED))
   {
-    gesture->DetectedSignal().Connect( tracker, functor );
+    gesture->DetectedSignal().Connect(tracker, functor);
   }
   else
   {

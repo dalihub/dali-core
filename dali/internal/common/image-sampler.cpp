@@ -23,24 +23,21 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace ImageSampler
 {
-
 /**
  * Utility to store one of the sampling parameters values.
  * @param[out] options A bitmask used to store the FilterMode values.
  * @param[in] factor The FilterMode value.
  * @param[in] bitshift Used to shift to the correct part of options.
  */
-void StoreSamplingParameter( unsigned int& options, unsigned int mode, int bitShift )
+void StoreSamplingParameter(unsigned int& options, unsigned int mode, int bitShift)
 {
-  if( mode != 0 )
+  if(mode != 0)
   {
-    options |= ( mode << bitShift );
+    options |= (mode << bitShift);
   }
 }
 
@@ -51,42 +48,42 @@ void StoreSamplingParameter( unsigned int& options, unsigned int mode, int bitSh
  * @param[in] bitshift Used to shift to the correct part of options.
  * @return Return the filter mode.
  */
-unsigned int RetrieveSamplingParameter( unsigned int options, int mask, int bitShift )
+unsigned int RetrieveSamplingParameter(unsigned int options, int mask, int bitShift)
 {
   unsigned int index = options & mask;
 
-  index = ( index >> bitShift );    // Zero based index for array
+  index = (index >> bitShift); // Zero based index for array
   return index;
 }
 
-unsigned int PackBitfield( FilterMode::Type minify, FilterMode::Type magnify, WrapMode::Type uWrap, WrapMode::Type vWrap )
+unsigned int PackBitfield(FilterMode::Type minify, FilterMode::Type magnify, WrapMode::Type uWrap, WrapMode::Type vWrap)
 {
   unsigned int bitfield = 0;
-  StoreSamplingParameter( bitfield, minify, MINIFY_BIT_SHIFT );
-  StoreSamplingParameter( bitfield, magnify, MAGNIFY_BIT_SHIFT );
-  StoreSamplingParameter( bitfield, uWrap, UWRAP_BIT_SHIFT );
-  StoreSamplingParameter( bitfield, vWrap, VWRAP_BIT_SHIFT );
+  StoreSamplingParameter(bitfield, minify, MINIFY_BIT_SHIFT);
+  StoreSamplingParameter(bitfield, magnify, MAGNIFY_BIT_SHIFT);
+  StoreSamplingParameter(bitfield, uWrap, UWRAP_BIT_SHIFT);
+  StoreSamplingParameter(bitfield, vWrap, VWRAP_BIT_SHIFT);
   return bitfield;
 }
 
-FilterMode::Type GetMinifyFilterMode( unsigned int bitfield )
+FilterMode::Type GetMinifyFilterMode(unsigned int bitfield)
 {
-  return static_cast<FilterMode::Type>( RetrieveSamplingParameter( bitfield, MASK_MINIFY_FILTER, MINIFY_BIT_SHIFT ) );
+  return static_cast<FilterMode::Type>(RetrieveSamplingParameter(bitfield, MASK_MINIFY_FILTER, MINIFY_BIT_SHIFT));
 }
 
-FilterMode::Type GetMagnifyFilterMode( unsigned int bitfield )
+FilterMode::Type GetMagnifyFilterMode(unsigned int bitfield)
 {
-  return static_cast<FilterMode::Type>( RetrieveSamplingParameter( bitfield, MASK_MAGNIFY_FILTER, MAGNIFY_BIT_SHIFT ) );
+  return static_cast<FilterMode::Type>(RetrieveSamplingParameter(bitfield, MASK_MAGNIFY_FILTER, MAGNIFY_BIT_SHIFT));
 }
 
-WrapMode::Type GetUWrapMode( unsigned int bitfield )
+WrapMode::Type GetUWrapMode(unsigned int bitfield)
 {
-  return static_cast<WrapMode::Type>( RetrieveSamplingParameter( bitfield, MASK_UWRAP_MODE, UWRAP_BIT_SHIFT ) );
+  return static_cast<WrapMode::Type>(RetrieveSamplingParameter(bitfield, MASK_UWRAP_MODE, UWRAP_BIT_SHIFT));
 }
 
-WrapMode::Type GetVWrapMode( unsigned int bitfield )
+WrapMode::Type GetVWrapMode(unsigned int bitfield)
 {
-  return static_cast<WrapMode::Type>( RetrieveSamplingParameter( bitfield, MASK_VWRAP_MODE, VWRAP_BIT_SHIFT ) );
+  return static_cast<WrapMode::Type>(RetrieveSamplingParameter(bitfield, MASK_VWRAP_MODE, VWRAP_BIT_SHIFT));
 }
 
 } // namespace ImageSampler

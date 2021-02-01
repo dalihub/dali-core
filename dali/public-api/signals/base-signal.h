@@ -2,7 +2,7 @@
 #define DALI_BASE_SIGNAL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -313,8 +313,8 @@ private:
   BaseSignal& operator=(BaseSignal&&) = delete;      ///< Deleted move assignment operator. @SINCE_1_9.25
 
 private:
-  std::vector<SignalConnection> mSignalConnections; ///< Array of connections
-  uint32_t                      mNullConnections{0}; ///< Empty Connections in the array.
+  std::vector<SignalConnection> mSignalConnections;   ///< Array of connections
+  uint32_t                      mNullConnections{0};  ///< Empty Connections in the array.
   bool                          mEmittingFlag{false}; ///< Used to guard against nested Emit() calls
 };
 

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_GESTURE_DETECTOR_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,16 +19,15 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/internal/event/actors/actor-impl.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/events/gesture-detector.h>
 #include <dali/public-api/events/gesture.h>
 #include <dali/public-api/signals/slot-delegate.h>
-#include <dali/public-api/events/gesture-detector.h>
-#include <dali/internal/event/actors/actor-impl.h>
 
 namespace Dali
 {
-
 namespace Integration
 {
 struct GestureEvent;
@@ -36,7 +35,6 @@ struct GestureEvent;
 
 namespace Internal
 {
-
 class GestureDetector;
 class GestureEventProcessor;
 
@@ -47,7 +45,7 @@ using GestureDetectorActorContainer = std::vector<Actor*>;
 /**
  * This is a type trait that should be used by deriving gesture detectors for their container type.
  */
-template< typename Detector >
+template<typename Detector>
 struct DerivedGestureDetectorContainer
 {
   using type = std::vector<Detector*>;
@@ -59,7 +57,6 @@ struct DerivedGestureDetectorContainer
 class GestureDetector : public Object, public Object::Observer
 {
 public:
-
   /**
    * @copydoc Dali::GestureDetector::Attach()
    */
@@ -111,14 +108,13 @@ public:
   bool IsAttached(Actor& actor) const;
 
 protected: // Creation & Destruction
-
   /**
    * Construct a new GestureDetector.
    * @param type the type of gesture
    * @param pointer to the scene object, nullptr if none
    * by default GestureDetectors don't have our own scene object
    */
-  GestureDetector( GestureType::Value type, const SceneGraph::PropertyOwner* sceneObject = nullptr );
+  GestureDetector(GestureType::Value type, const SceneGraph::PropertyOwner* sceneObject = nullptr);
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -126,9 +122,8 @@ protected: // Creation & Destruction
   ~GestureDetector() override;
 
 private:
-
   // Undefined
-  GestureDetector() = delete;
+  GestureDetector()                       = delete;
   GestureDetector(const GestureDetector&) = delete;
   GestureDetector& operator=(const GestureDetector& rhs) = delete;
 
@@ -140,7 +135,9 @@ private:
   /**
    * @copydoc Dali::Internal::Object::Observer::SceneObjectAdded()
    */
-  void SceneObjectRemoved(Object& object) override {}
+  void SceneObjectRemoved(Object& object) override
+  {
+  }
 
   /**
    * @copydoc Dali::Internal::Object::Observer::ObjectDestroyed()
@@ -168,7 +165,6 @@ private:
   virtual void OnActorDestroyed(Object& object) = 0;
 
 protected:
-
   GestureType::Value            mType;                  ///< The gesture detector will detect this type of gesture.
   GestureDetectorActorContainer mAttachedActors;        ///< Object::Observer is used to provide weak-pointer behaviour
   GestureDetectorActorContainer mPendingAttachActors;   ///< Object::Observer is used to provide weak-pointer behaviour
@@ -181,7 +177,7 @@ protected:
 
 inline Internal::GestureDetector& GetImplementation(Dali::GestureDetector& detector)
 {
-  DALI_ASSERT_ALWAYS( detector && "GestureDetector handle is empty" );
+  DALI_ASSERT_ALWAYS(detector && "GestureDetector handle is empty");
 
   BaseObject& handle = detector.GetBaseObject();
 
@@ -190,7 +186,7 @@ inline Internal::GestureDetector& GetImplementation(Dali::GestureDetector& detec
 
 inline const Internal::GestureDetector& GetImplementation(const Dali::GestureDetector& detector)
 {
-  DALI_ASSERT_ALWAYS( detector && "GestureDetector handle is empty" );
+  DALI_ASSERT_ALWAYS(detector && "GestureDetector handle is empty");
 
   const BaseObject& handle = detector.GetBaseObject();
 

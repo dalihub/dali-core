@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,21 +22,18 @@
 #include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
-#include <dali/public-api/events/tap-gesture.h>
-#include <dali/public-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/events/gesture-event-processor.h>
+#include <dali/public-api/events/tap-gesture.h>
+#include <dali/public-api/object/type-registry.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace
 {
-
-const unsigned int DEFAULT_TAPS_REQUIRED = 1u;
+const unsigned int DEFAULT_TAPS_REQUIRED    = 1u;
 const unsigned int DEFAULT_TOUCHES_REQUIRED = 1u;
 
 // Signals
@@ -47,35 +44,35 @@ BaseHandle Create()
   return Dali::TapGestureDetector::New();
 }
 
-TypeRegistration mType( typeid(Dali::TapGestureDetector), typeid(Dali::GestureDetector), Create );
+TypeRegistration mType(typeid(Dali::TapGestureDetector), typeid(Dali::GestureDetector), Create);
 
-SignalConnectorType signalConnector1( mType, SIGNAL_TAP_DETECTED, &TapGestureDetector::DoConnectSignal );
+SignalConnectorType signalConnector1(mType, SIGNAL_TAP_DETECTED, &TapGestureDetector::DoConnectSignal);
 
-}
+} // namespace
 
 TapGestureDetectorPtr TapGestureDetector::New()
 {
   return new TapGestureDetector;
 }
 
-TapGestureDetectorPtr TapGestureDetector::New( unsigned int tapsRequired )
+TapGestureDetectorPtr TapGestureDetector::New(unsigned int tapsRequired)
 {
-  return new TapGestureDetector( tapsRequired );
+  return new TapGestureDetector(tapsRequired);
 }
 
 TapGestureDetector::TapGestureDetector()
-: GestureDetector( GestureType::TAP ),
-  mMinimumTapsRequired( DEFAULT_TAPS_REQUIRED ),
-  mMaximumTapsRequired( DEFAULT_TAPS_REQUIRED ),
-  mTouchesRequired( DEFAULT_TOUCHES_REQUIRED )
+: GestureDetector(GestureType::TAP),
+  mMinimumTapsRequired(DEFAULT_TAPS_REQUIRED),
+  mMaximumTapsRequired(DEFAULT_TAPS_REQUIRED),
+  mTouchesRequired(DEFAULT_TOUCHES_REQUIRED)
 {
 }
 
-TapGestureDetector::TapGestureDetector( unsigned int tapsRequired )
-: GestureDetector( GestureType::TAP ),
-  mMinimumTapsRequired( tapsRequired ),
-  mMaximumTapsRequired( tapsRequired ),
-  mTouchesRequired( DEFAULT_TOUCHES_REQUIRED )
+TapGestureDetector::TapGestureDetector(unsigned int tapsRequired)
+: GestureDetector(GestureType::TAP),
+  mMinimumTapsRequired(tapsRequired),
+  mMaximumTapsRequired(tapsRequired),
+  mTouchesRequired(DEFAULT_TOUCHES_REQUIRED)
 {
 }
 
@@ -83,11 +80,11 @@ TapGestureDetector::~TapGestureDetector() = default;
 
 void TapGestureDetector::SetMinimumTapsRequired(unsigned int taps)
 {
-  if ( mMinimumTapsRequired != taps )
+  if(mMinimumTapsRequired != taps)
   {
     mMinimumTapsRequired = taps;
 
-    if ( !mAttachedActors.empty() )
+    if(!mAttachedActors.empty())
     {
       mGestureEventProcessor.GestureDetectorUpdated(this);
     }
@@ -96,11 +93,11 @@ void TapGestureDetector::SetMinimumTapsRequired(unsigned int taps)
 
 void TapGestureDetector::SetMaximumTapsRequired(unsigned int taps)
 {
-  if ( mMaximumTapsRequired != taps )
+  if(mMaximumTapsRequired != taps)
   {
     mMaximumTapsRequired = taps;
 
-    if ( !mAttachedActors.empty() )
+    if(!mAttachedActors.empty())
     {
       mGestureEventProcessor.GestureDetectorUpdated(this);
     }
@@ -109,11 +106,11 @@ void TapGestureDetector::SetMaximumTapsRequired(unsigned int taps)
 
 void TapGestureDetector::SetTouchesRequired(unsigned int touches)
 {
-  if (mTouchesRequired != touches)
+  if(mTouchesRequired != touches)
   {
     mTouchesRequired = touches;
 
-    if (!mAttachedActors.empty())
+    if(!mAttachedActors.empty())
     {
       mGestureEventProcessor.GestureDetectorUpdated(this);
     }
@@ -138,19 +135,19 @@ unsigned int TapGestureDetector::GetTouchesRequired() const
 void TapGestureDetector::EmitTapGestureSignal(Dali::Actor tappedActor, const Dali::TapGesture& tap)
 {
   // Guard against destruction during signal emission
-  Dali::TapGestureDetector handle( this );
+  Dali::TapGestureDetector handle(this);
 
-  mDetectedSignal.Emit( tappedActor, tap );
+  mDetectedSignal.Emit(tappedActor, tap);
 }
 
-bool TapGestureDetector::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
+bool TapGestureDetector::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
 {
-  bool connected( true );
-  TapGestureDetector* gesture = static_cast< TapGestureDetector* >(object); // TypeRegistry guarantees that this is the correct type.
+  bool                connected(true);
+  TapGestureDetector* gesture = static_cast<TapGestureDetector*>(object); // TypeRegistry guarantees that this is the correct type.
 
-  if ( 0 == strcmp( signalName.c_str(), SIGNAL_TAP_DETECTED ) )
+  if(0 == strcmp(signalName.c_str(), SIGNAL_TAP_DETECTED))
   {
-    gesture->DetectedSignal().Connect( tracker, functor );
+    gesture->DetectedSignal().Connect(tracker, functor);
   }
   else
   {

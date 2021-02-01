@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PIXEL_DATA_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,23 +19,20 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/images/pixel-data-devel.h>
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/object/base-object.h>
-#include <dali/devel-api/images/pixel-data-devel.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 class PixelData;
 using PixelDataPtr = IntrusivePtr<PixelData>;
 
 class PixelData : public BaseObject
 {
 public:
-
   /**
    * @brief Create a PixelData object.
    *
@@ -46,12 +43,12 @@ public:
    * @param [in] pixelFormat      The pixel format
    * @param [in] releaseFunction  The function used to release the memory.
    */
-  static PixelDataPtr New( uint8_t* buffer,
-                           uint32_t bufferSize,
-                           uint32_t width,
-                           uint32_t height,
-                           Pixel::Format pixelFormat,
-                           Dali::PixelData::ReleaseFunction releaseFunction);
+  static PixelDataPtr New(uint8_t*                         buffer,
+                          uint32_t                         bufferSize,
+                          uint32_t                         width,
+                          uint32_t                         height,
+                          Pixel::Format                    pixelFormat,
+                          Dali::PixelData::ReleaseFunction releaseFunction);
 
   /**
    * @brief Constructor.
@@ -63,15 +60,14 @@ public:
    * @param [in] pixelFormat      The pixel format
    * @param [in] releaseFunction  The function used to release the memory.
    */
-  PixelData( uint8_t* buffer,
-             uint32_t bufferSize,
-             uint32_t width,
-             uint32_t height,
-             Pixel::Format pixelFormat,
-             Dali::PixelData::ReleaseFunction releaseFunction );
+  PixelData(uint8_t*                         buffer,
+            uint32_t                         bufferSize,
+            uint32_t                         width,
+            uint32_t                         height,
+            Pixel::Format                    pixelFormat,
+            Dali::PixelData::ReleaseFunction releaseFunction);
 
 protected:
-
   /**
    * @brief Destructor.
    *
@@ -80,7 +76,6 @@ protected:
   ~PixelData() override;
 
 public:
-
   /**
    * Get the width of the buffer in pixels.
    * @return The width of the buffer in pixels
@@ -118,7 +113,6 @@ public:
   DevelPixelData::PixelDataBuffer ReleaseBuffer();
 
 private:
-
   /*
    * Undefined copy constructor.
    */
@@ -127,16 +121,15 @@ private:
   /*
    * Undefined assignment operator.
    */
-  PixelData& operator = (const PixelData& other);
+  PixelData& operator=(const PixelData& other);
 
 private:
-
-  uint8_t*   mBuffer;           ///< The raw pixel data
-  uint32_t   mBufferSize;       ///< Buffer sized in bytes
-  uint32_t   mWidth;            ///< Buffer width in pixels
-  uint32_t   mHeight;           ///< Buffer height in pixels
-  Pixel::Format  mPixelFormat;  ///< Pixel format
-  Dali::PixelData::ReleaseFunction mReleaseFunction;  ///< Function for releasing memory
+  uint8_t*                         mBuffer;          ///< The raw pixel data
+  uint32_t                         mBufferSize;      ///< Buffer sized in bytes
+  uint32_t                         mWidth;           ///< Buffer width in pixels
+  uint32_t                         mHeight;          ///< Buffer height in pixels
+  Pixel::Format                    mPixelFormat;     ///< Pixel format
+  Dali::PixelData::ReleaseFunction mReleaseFunction; ///< Function for releasing memory
 };
 
 } // namespace Internal
@@ -144,22 +137,22 @@ private:
 /**
  * Helper methods for public API
  */
-inline Internal::PixelData& GetImplementation( Dali::PixelData& handle )
+inline Internal::PixelData& GetImplementation(Dali::PixelData& handle)
 {
-  DALI_ASSERT_ALWAYS( handle && "handle is empty" );
+  DALI_ASSERT_ALWAYS(handle && "handle is empty");
 
   BaseObject& object = handle.GetBaseObject();
 
-  return static_cast<Internal::PixelData&>( object );
+  return static_cast<Internal::PixelData&>(object);
 }
 
-inline const Internal::PixelData& GetImplementation( const Dali::PixelData& handle )
+inline const Internal::PixelData& GetImplementation(const Dali::PixelData& handle)
 {
-  DALI_ASSERT_ALWAYS( handle && "handle is empty" );
+  DALI_ASSERT_ALWAYS(handle && "handle is empty");
 
   const BaseObject& object = handle.GetBaseObject();
 
-  return static_cast<const Internal::PixelData&>( object );
+  return static_cast<const Internal::PixelData&>(object);
 }
 
 } // namespace Dali

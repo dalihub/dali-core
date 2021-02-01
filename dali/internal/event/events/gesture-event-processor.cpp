@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,26 +23,24 @@
 #endif
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
 #include <dali/integration-api/render-controller.h>
 #include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/event/events/pan-gesture/pan-gesture-impl.h>
 #include <dali/internal/event/events/pinch-gesture/pinch-gesture-detector-impl.h>
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
-#include <dali/internal/event/events/pan-gesture/pan-gesture-impl.h>
-#include <dali/integration-api/debug.h>
-
 
 namespace Dali
 {
-
 namespace Internal
 {
-GestureEventProcessor::GestureEventProcessor( SceneGraph::UpdateManager& updateManager, Integration::RenderController& renderController )
+GestureEventProcessor::GestureEventProcessor(SceneGraph::UpdateManager& updateManager, Integration::RenderController& renderController)
 : mLongPressGestureProcessor(),
-  mPanGestureProcessor( updateManager ),
+  mPanGestureProcessor(updateManager),
   mPinchGestureProcessor(),
   mTapGestureProcessor(),
   mRotationGestureProcessor(),
-  mRenderController( renderController ),
+  mRenderController(renderController),
   envOptionMinimumPanDistance(-1),
   envOptionMinimumPanEvents(-1)
 {
@@ -50,7 +48,7 @@ GestureEventProcessor::GestureEventProcessor( SceneGraph::UpdateManager& updateM
 
 GestureEventProcessor::~GestureEventProcessor() = default;
 
-void GestureEventProcessor::ProcessTouchEvent( Scene& scene, const Integration::TouchEvent& event)
+void GestureEventProcessor::ProcessTouchEvent(Scene& scene, const Integration::TouchEvent& event)
 {
   mLongPressGestureProcessor.ProcessTouch(scene, event);
   mPanGestureProcessor.ProcessTouch(scene, event);
@@ -61,7 +59,7 @@ void GestureEventProcessor::ProcessTouchEvent( Scene& scene, const Integration::
 
 void GestureEventProcessor::AddGestureDetector(GestureDetector* gestureDetector, Scene& scene)
 {
-  switch (gestureDetector->GetType())
+  switch(gestureDetector->GetType())
   {
     case GestureType::LONG_PRESS:
     {
@@ -102,7 +100,7 @@ void GestureEventProcessor::AddGestureDetector(GestureDetector* gestureDetector,
 
 void GestureEventProcessor::RemoveGestureDetector(GestureDetector* gestureDetector)
 {
-  switch (gestureDetector->GetType())
+  switch(gestureDetector->GetType())
   {
     case GestureType::LONG_PRESS:
     {
@@ -143,7 +141,7 @@ void GestureEventProcessor::RemoveGestureDetector(GestureDetector* gestureDetect
 
 void GestureEventProcessor::GestureDetectorUpdated(GestureDetector* gestureDetector)
 {
-  switch (gestureDetector->GetType())
+  switch(gestureDetector->GetType())
   {
     case GestureType::LONG_PRESS:
     {
@@ -181,15 +179,15 @@ void GestureEventProcessor::GestureDetectorUpdated(GestureDetector* gestureDetec
   }
 }
 
-void GestureEventProcessor::SetGestureProperties( const Dali::Gesture& gesture )
+void GestureEventProcessor::SetGestureProperties(const Dali::Gesture& gesture)
 {
-  DALI_ASSERT_DEBUG( gesture.GetType() == GestureType::PAN && "Only PanGesture has a scene object\n" );
+  DALI_ASSERT_DEBUG(gesture.GetType() == GestureType::PAN && "Only PanGesture has a scene object\n");
 
-  const Dali::PanGesture& pan = static_cast< const Dali::PanGesture& >( gesture );
-  if( mPanGestureProcessor.SetPanGestureProperties( pan ) )
+  const Dali::PanGesture& pan = static_cast<const Dali::PanGesture&>(gesture);
+  if(mPanGestureProcessor.SetPanGestureProperties(pan))
   {
     // We may not be updating so we need to ask the render controller for an update.
-    mRenderController.RequestUpdate( false );
+    mRenderController.RequestUpdate(false);
   }
 }
 
@@ -216,114 +214,114 @@ void GestureEventProcessor::SetPanGesturePredictionMode(int mode)
   mPanGestureProcessor.SetPredictionMode(mode);
 }
 
-void GestureEventProcessor::SetPanGesturePredictionAmount( uint32_t amount )
+void GestureEventProcessor::SetPanGesturePredictionAmount(uint32_t amount)
 {
   mPanGestureProcessor.SetPredictionAmount(amount);
 }
 
-void GestureEventProcessor::SetPanGestureMaximumPredictionAmount( uint32_t amount )
+void GestureEventProcessor::SetPanGestureMaximumPredictionAmount(uint32_t amount)
 {
   mPanGestureProcessor.SetMaximumPredictionAmount(amount);
 }
 
-void GestureEventProcessor::SetPanGestureMinimumPredictionAmount( uint32_t amount )
+void GestureEventProcessor::SetPanGestureMinimumPredictionAmount(uint32_t amount)
 {
   mPanGestureProcessor.SetMinimumPredictionAmount(amount);
 }
 
-void GestureEventProcessor::SetPanGesturePredictionAmountAdjustment( uint32_t amount )
+void GestureEventProcessor::SetPanGesturePredictionAmountAdjustment(uint32_t amount)
 {
   mPanGestureProcessor.SetPredictionAmountAdjustment(amount);
 }
 
-void GestureEventProcessor::SetPanGestureSmoothingMode( int32_t mode )
+void GestureEventProcessor::SetPanGestureSmoothingMode(int32_t mode)
 {
   mPanGestureProcessor.SetSmoothingMode(mode);
 }
 
-void GestureEventProcessor::SetPanGestureSmoothingAmount( float amount )
+void GestureEventProcessor::SetPanGestureSmoothingAmount(float amount)
 {
   mPanGestureProcessor.SetSmoothingAmount(amount);
 }
 
-void GestureEventProcessor::SetPanGestureUseActualTimes( bool value )
+void GestureEventProcessor::SetPanGestureUseActualTimes(bool value)
 {
-  mPanGestureProcessor.SetUseActualTimes( value );
+  mPanGestureProcessor.SetUseActualTimes(value);
 }
 
-void GestureEventProcessor::SetPanGestureInterpolationTimeRange( int32_t value )
+void GestureEventProcessor::SetPanGestureInterpolationTimeRange(int32_t value)
 {
-  mPanGestureProcessor.SetInterpolationTimeRange( value );
+  mPanGestureProcessor.SetInterpolationTimeRange(value);
 }
 
-void GestureEventProcessor::SetPanGestureScalarOnlyPredictionEnabled( bool value )
+void GestureEventProcessor::SetPanGestureScalarOnlyPredictionEnabled(bool value)
 {
-  mPanGestureProcessor.SetScalarOnlyPredictionEnabled( value );
+  mPanGestureProcessor.SetScalarOnlyPredictionEnabled(value);
 }
 
-void GestureEventProcessor::SetPanGestureTwoPointPredictionEnabled( bool value )
+void GestureEventProcessor::SetPanGestureTwoPointPredictionEnabled(bool value)
 {
-  mPanGestureProcessor.SetTwoPointPredictionEnabled( value );
+  mPanGestureProcessor.SetTwoPointPredictionEnabled(value);
 }
 
-void GestureEventProcessor::SetPanGestureTwoPointInterpolatePastTime( int value )
+void GestureEventProcessor::SetPanGestureTwoPointInterpolatePastTime(int value)
 {
-  mPanGestureProcessor.SetTwoPointInterpolatePastTime( value );
+  mPanGestureProcessor.SetTwoPointInterpolatePastTime(value);
 }
 
-void GestureEventProcessor::SetPanGestureTwoPointVelocityBias( float value )
+void GestureEventProcessor::SetPanGestureTwoPointVelocityBias(float value)
 {
-  mPanGestureProcessor.SetTwoPointVelocityBias( value );
+  mPanGestureProcessor.SetTwoPointVelocityBias(value);
 }
 
-void GestureEventProcessor::SetPanGestureTwoPointAccelerationBias( float value )
+void GestureEventProcessor::SetPanGestureTwoPointAccelerationBias(float value)
 {
-  mPanGestureProcessor.SetTwoPointAccelerationBias( value );
+  mPanGestureProcessor.SetTwoPointAccelerationBias(value);
 }
 
-void GestureEventProcessor::SetPanGestureMultitapSmoothingRange( int32_t value )
+void GestureEventProcessor::SetPanGestureMultitapSmoothingRange(int32_t value)
 {
-  mPanGestureProcessor.SetMultitapSmoothingRange( value );
+  mPanGestureProcessor.SetMultitapSmoothingRange(value);
 }
 
-void GestureEventProcessor::SetPanGestureMinimumDistance( int32_t value )
+void GestureEventProcessor::SetPanGestureMinimumDistance(int32_t value)
 {
-  envOptionMinimumPanDistance =  value;
+  envOptionMinimumPanDistance = value;
 }
 
-void GestureEventProcessor::SetPanGestureMinimumPanEvents( int32_t value )
+void GestureEventProcessor::SetPanGestureMinimumPanEvents(int32_t value)
 {
   envOptionMinimumPanEvents = value;
 }
 
-void GestureEventProcessor::SetPinchGestureMinimumDistance( float value)
+void GestureEventProcessor::SetPinchGestureMinimumDistance(float value)
 {
-  mPinchGestureProcessor.SetMinimumPinchDistance( value );
+  mPinchGestureProcessor.SetMinimumPinchDistance(value);
 }
 
-void GestureEventProcessor::SetPinchGestureMinimumTouchEvents( uint32_t value )
+void GestureEventProcessor::SetPinchGestureMinimumTouchEvents(uint32_t value)
 {
-  mPinchGestureProcessor.SetMinimumTouchEvents( value );
+  mPinchGestureProcessor.SetMinimumTouchEvents(value);
 }
 
-void GestureEventProcessor::SetPinchGestureMinimumTouchEventsAfterStart( uint32_t value )
+void GestureEventProcessor::SetPinchGestureMinimumTouchEventsAfterStart(uint32_t value)
 {
-  mPinchGestureProcessor.SetMinimumTouchEventsAfterStart( value );
+  mPinchGestureProcessor.SetMinimumTouchEventsAfterStart(value);
 }
 
-void GestureEventProcessor::SetRotationGestureMinimumTouchEvents( uint32_t value )
+void GestureEventProcessor::SetRotationGestureMinimumTouchEvents(uint32_t value)
 {
-  mRotationGestureProcessor.SetMinimumTouchEvents( value );
+  mRotationGestureProcessor.SetMinimumTouchEvents(value);
 }
 
-void GestureEventProcessor::SetRotationGestureMinimumTouchEventsAfterStart( uint32_t value )
+void GestureEventProcessor::SetRotationGestureMinimumTouchEventsAfterStart(uint32_t value)
 {
-  mRotationGestureProcessor.SetMinimumTouchEventsAfterStart( value );
+  mRotationGestureProcessor.SetMinimumTouchEventsAfterStart(value);
 }
 
-void GestureEventProcessor::SetLongPressMinimumHoldingTime( uint32_t value )
+void GestureEventProcessor::SetLongPressMinimumHoldingTime(uint32_t value)
 {
-  mLongPressGestureProcessor.SetMinimumHoldingTime( value );
+  mLongPressGestureProcessor.SetMinimumHoldingTime(value);
 }
 
 uint32_t GestureEventProcessor::GetLongPressMinimumHoldingTime() const

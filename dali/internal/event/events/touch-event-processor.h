@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TOUCH_EVENT_PROCESSOR_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@
 
 namespace Dali
 {
-
 class Actor;
 struct Vector2;
 struct Vector4;
@@ -36,7 +35,6 @@ struct TouchEvent;
 
 namespace Internal
 {
-
 class Actor;
 class Scene;
 struct ActorObserver;
@@ -52,12 +50,11 @@ struct ActorObserver;
 class TouchEventProcessor
 {
 public:
-
   /**
    * Create an event processor.
    * @param[in] scene The scene the event processor belongs to.
    */
-  TouchEventProcessor( Scene& scene );
+  TouchEventProcessor(Scene& scene);
 
   /**
    * Non-virtual destructor; TouchEventProcessor is not a base class
@@ -69,10 +66,9 @@ public:
    * @param[in] event The touch event that has occurred.
    * @return true if consumed
    */
-  bool ProcessTouchEvent( const Integration::TouchEvent& event );
+  bool ProcessTouchEvent(const Integration::TouchEvent& event);
 
 private:
-
   // Undefined
   TouchEventProcessor(const TouchEventProcessor&);
 
@@ -80,7 +76,6 @@ private:
   TouchEventProcessor& operator=(const TouchEventProcessor& rhs);
 
 private:
-
   Scene& mScene; ///< Used to deliver touch events
 
   /**
@@ -88,13 +83,13 @@ private:
    *
    * @param[in]  actor  The actor that has been disconnected.
    */
-  void OnObservedActorDisconnected( Actor* actor );
+  void OnObservedActorDisconnected(Actor* actor);
 
-  ActorObserver mLastPrimaryHitActor; ///< Stores the last primary point hit actor
-  ActorObserver mLastConsumedActor; ///< Stores the last consumed actor
-  ActorObserver mCapturingTouchActor; ///< Stored the actor that captures touch
+  ActorObserver mLastPrimaryHitActor;    ///< Stores the last primary point hit actor
+  ActorObserver mLastConsumedActor;      ///< Stores the last consumed actor
+  ActorObserver mCapturingTouchActor;    ///< Stored the actor that captures touch
   ActorObserver mTouchDownConsumedActor; ///< Stores the touch-down consumed actor
-  RenderTaskPtr mLastRenderTask; ///< The RenderTask used for the last hit actor
+  RenderTaskPtr mLastRenderTask;         ///< The RenderTask used for the last hit actor
 };
 
 } // namespace Internal

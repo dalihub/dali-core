@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -564,7 +564,7 @@ int UtcDaliTextureSetMultipleTextures(void)
   DALI_TEST_CHECK(boundTextures0[boundTextures0.size() - 1] == 1u); // the latest one should be 0.
 
   const std::vector<GLuint>& boundTextures1 = application.GetGlAbstraction().GetBoundTextures(GL_TEXTURE1);
-  size_t count = boundTextures1.size();
+  size_t                     count          = boundTextures1.size();
   DALI_TEST_CHECK(boundTextures1[count - 1] == 2u); // the latest one should be 1.
 
   // Create a new TextureSet
@@ -582,7 +582,7 @@ int UtcDaliTextureSetMultipleTextures(void)
   DALI_TEST_CHECK(gl.GetActiveTextureUnit() == GL_TEXTURE0);
 
   DALI_TEST_CHECK(boundTextures0[boundTextures0.size() - 1] == 1u);
-  DALI_TEST_CHECK(boundTextures1.size() == count);  // The bound texture count of GL_TEXTURE1 should not be changed.
+  DALI_TEST_CHECK(boundTextures1.size() == count); // The bound texture count of GL_TEXTURE1 should not be changed.
 
   END_TEST;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,46 +19,43 @@
 #include <dali/internal/render/common/render-item.h>
 
 // INTERNAL INCLUDES
+#include <dali/internal/common/math.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/render/renderers/render-renderer.h>
-#include <dali/internal/common/math.h>
 
 namespace
 {
 //Memory pool used to allocate new RenderItems. Memory used by this pool will be released when shutting down DALi
 Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::RenderItem> gRenderItemPool;
-}
+} // namespace
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace SceneGraph
 {
-
 RenderItem* RenderItem::New()
 {
-  return new ( gRenderItemPool.AllocateRaw() ) RenderItem();
+  return new(gRenderItemPool.AllocateRaw()) RenderItem();
 }
 
 RenderItem::RenderItem()
-: mModelMatrix( false ),
-  mModelViewMatrix( false ),
-  mColor( Vector4::ZERO ),
+: mModelMatrix(false),
+  mModelViewMatrix(false),
+  mColor(Vector4::ZERO),
   mSize(),
-  mRenderer( nullptr ),
-  mNode( nullptr ),
-  mTextureSet( nullptr ),
-  mDepthIndex( 0 ),
-  mIsOpaque( true ),
-  mIsUpdated( false )
+  mRenderer(nullptr),
+  mNode(nullptr),
+  mTextureSet(nullptr),
+  mDepthIndex(0),
+  mIsOpaque(true),
+  mIsUpdated(false)
 {
 }
 
 RenderItem::~RenderItem() = default;
 
-ClippingBox RenderItem::CalculateViewportSpaceAABB( const Vector3& size, const int viewportWidth, const int viewportHeight ) const
+ClippingBox RenderItem::CalculateViewportSpaceAABB(const Vector3& size, const int viewportWidth, const int viewportHeight) const
 {
   // Calculate extent vector of the AABB:
   const float halfActorX = size.x * 0.5f;
@@ -71,12 +68,12 @@ ClippingBox RenderItem::CalculateViewportSpaceAABB( const Vector3& size, const i
   // We place the coords into the array in clockwise order, so we know opposite corners are always i + 2 from corner i.
   // We skip the 4th corner here as we can calculate that from the other 3, bypassing matrix multiplication.
   // Note: The below transform methods use a fast (2D) matrix multiply (only 4 multiplications are done).
-  Vector2 corners[4]{ Transform2D( mModelViewMatrix, -halfActorX, -halfActorY ),
-                      Transform2D( mModelViewMatrix,  halfActorX, -halfActorY ),
-                      Transform2D( mModelViewMatrix,  halfActorX,  halfActorY ) };
+  Vector2 corners[4]{Transform2D(mModelViewMatrix, -halfActorX, -halfActorY),
+                     Transform2D(mModelViewMatrix, halfActorX, -halfActorY),
+                     Transform2D(mModelViewMatrix, halfActorX, halfActorY)};
 
   // As we are dealing with a rectangle, we can do a fast calculation to get the 4th corner from knowing the other 3 (even if rotated).
-  corners[3] = Vector2( corners[0] + ( corners[2] - corners[1] ) );
+  corners[3] = Vector2(corners[0] + (corners[2] - corners[1]));
 
   // Calculate the AABB:
   // We use knowledge that opposite corners will be the max/min of each other. Doing this reduces the normal 12 branching comparisons to 3.
@@ -88,9 +85,9 @@ ClippingBox RenderItem::CalculateViewportSpaceAABB( const Vector3& size, const i
   unsigned int smallestX = 0u;
   // Loop 3 times to find the index of the smallest X value.
   // Note: We deliberately do NOT unroll the code here as this hampers the compilers output.
-  for( unsigned int i = 1u; i < 4u; ++i )
+  for(unsigned int i = 1u; i < 4u; ++i)
   {
-    if( corners[i].x < corners[smallestX].x )
+    if(corners[i].x < corners[smallestX].x)
     {
       smallestX = i;
     }
@@ -98,26 +95,26 @@ ClippingBox RenderItem::CalculateViewportSpaceAABB( const Vector3& size, const i
 
   // As we are dealing with a rectangle, we can assume opposite corners are the largest.
   // So without doing min/max branching, we can fetch the min/max values of all the remaining X/Y coords from this one index.
-  Vector4 aabb( corners[smallestX].x, corners[( smallestX + 3u ) % 4].y, corners[( smallestX + 2u ) % 4].x, corners[( smallestX + 1u ) % 4].y );
+  Vector4 aabb(corners[smallestX].x, corners[(smallestX + 3u) % 4].y, corners[(smallestX + 2u) % 4].x, corners[(smallestX + 1u) % 4].y);
 
   // Return the AABB in screen-space pixels (x, y, width, height).
   // Note: This is a algebraic simplification of: ( viewport.x - aabb.width ) / 2 - ( ( aabb.width / 2 ) + aabb.x ) per axis.
-  Vector4 aabbInScreen( static_cast<float>( viewportWidth )  * 0.5f - aabb.z,
-                        static_cast<float>( viewportHeight ) * 0.5f - aabb.w,
-                        static_cast<float>( viewportWidth )  * 0.5f - aabb.x,
-                        static_cast<float>( viewportHeight ) * 0.5f - aabb.y );
+  Vector4 aabbInScreen(static_cast<float>(viewportWidth) * 0.5f - aabb.z,
+                       static_cast<float>(viewportHeight) * 0.5f - aabb.w,
+                       static_cast<float>(viewportWidth) * 0.5f - aabb.x,
+                       static_cast<float>(viewportHeight) * 0.5f - aabb.y);
 
-  int x = static_cast< int >( floor( aabbInScreen.x ) );
-  int y = static_cast< int >( floor( aabbInScreen.y ) );
-  int z = static_cast< int >( roundf( aabbInScreen.z ) );
-  int w = static_cast< int >( roundf( aabbInScreen.w ) );
+  int x = static_cast<int>(floor(aabbInScreen.x));
+  int y = static_cast<int>(floor(aabbInScreen.y));
+  int z = static_cast<int>(roundf(aabbInScreen.z));
+  int w = static_cast<int>(roundf(aabbInScreen.w));
 
-  return ClippingBox( x, y, z - x, w - y );
+  return ClippingBox(x, y, z - x, w - y);
 }
 
-void RenderItem::operator delete( void* ptr )
+void RenderItem::operator delete(void* ptr)
 {
-  gRenderItemPool.Free( static_cast<RenderItem*>( ptr ) );
+  gRenderItemPool.Free(static_cast<RenderItem*>(ptr));
 }
 
 } // namespace SceneGraph

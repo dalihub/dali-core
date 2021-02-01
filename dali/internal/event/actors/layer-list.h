@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_LAYER_LIST_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,8 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace SceneGraph
 {
 class UpdateManager;
@@ -45,12 +43,11 @@ class Layer;
 class LayerList
 {
 public:
-
   /**
    * Create a new list of layers.
    * @param[in] updateManager A reference to the update manager.
    */
-  static LayerList* New( SceneGraph::UpdateManager& updateManager );
+  static LayerList* New(SceneGraph::UpdateManager& updateManager);
 
   /**
    * Non-virtual destructor; not suitable as a base class.
@@ -69,19 +66,19 @@ public:
    * @param[in] depth The depth.
    * @return The layer found at the given depth.
    */
-  Layer* GetLayer( uint32_t depth ) const;
+  Layer* GetLayer(uint32_t depth) const;
 
   /**
    * Gets the depth of a given layer
    * @param layer which depth to check
    */
-  uint32_t GetDepth( const Layer* layer ) const;
+  uint32_t GetDepth(const Layer* layer) const;
 
   /**
    * Register a layer with the stage.
    * The stage determines the relative depth of each layer.
    */
-  void RegisterLayer( Layer& layer );
+  void RegisterLayer(Layer& layer);
 
   /**
    * Unregister a layer from the stage
@@ -105,14 +102,14 @@ public:
    * @pre layer is on stage
    * @param layer to move
    */
-  void RaiseLayerToTop( const Layer& layer );
+  void RaiseLayerToTop(const Layer& layer);
 
   /**
    * Lowers the layer to the bottom of the stage
    * @pre layer is on stage
    * @param layer to move
    */
-  void LowerLayerToBottom( const Layer& layer );
+  void LowerLayerToBottom(const Layer& layer);
 
   /**
    * Moves the layer above the target layer on the stage
@@ -121,7 +118,7 @@ public:
    * @param layer to move
    * @param target to move above of
    */
-  void MoveLayerAbove( const Layer& layer, const Layer& target );
+  void MoveLayerAbove(const Layer& layer, const Layer& target);
 
   /**
    * Moves the layer below the target layer on the stage
@@ -130,7 +127,7 @@ public:
    * @param layer to move
    * @param target to move below of
    */
-  void MoveLayerBelow( const Layer& layer, const Layer& target );
+  void MoveLayerBelow(const Layer& layer, const Layer& target);
 
   /**
    * Sets the root layer that this layer list belongs to
@@ -140,12 +137,11 @@ public:
   void SetRootLayer(Layer* rootLayer);
 
 private:
-
   /**
    * Protected constructor; see also LayerList::New().
    * @param[in] updateManager to send messages.
    */
-  LayerList( SceneGraph::UpdateManager& updateManager );
+  LayerList(SceneGraph::UpdateManager& updateManager);
 
   /**
    * A private helper method to set the depth for each layer.
@@ -155,10 +151,9 @@ private:
   void SetLayerDepths();
 
 private:
-
   SceneGraph::UpdateManager& mUpdateManager;
 
-  Layer* mRoot;        ///< The root layer that this ordered list of layers belong to
+  Layer* mRoot; ///< The root layer that this ordered list of layers belong to
 
   using LayerContainer = std::vector<Layer*>;
 

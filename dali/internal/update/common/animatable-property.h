@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_ANIMATABLE_PROPERTY_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,26 +22,23 @@
 #include <limits>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/object/property.h>
-#include <dali/public-api/object/property-input.h>
-#include <dali/public-api/object/property-types.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/update/common/double-buffered.h>
 #include <dali/internal/update/common/property-base.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
+#include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/object/property-input.h>
+#include <dali/public-api/object/property-types.h>
+#include <dali/public-api/object/property.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace SceneGraph
 {
-
 /**
  * Dirty flags record whether an animatable property has changed.
  * In the frame following a change, the property is reset to a base value.
@@ -56,7 +53,7 @@ static const uint32_t CLEAN_FLAG = 0x00; ///< Indicates that the value did not c
 static const uint32_t BAKED_FLAG = 0x01; ///< Indicates that the value was Baked during the previous frame
 static const uint32_t SET_FLAG   = 0x02; ///< Indicates that the value was Set during the previous frame
 
-template <class T>
+template<class T>
 class AnimatableProperty;
 
 /**
@@ -65,14 +62,14 @@ class AnimatableProperty;
 class AnimatablePropertyBase : public PropertyBase
 {
 public:
-
   /**
    * Constructor, initialize the dirty flag
    */
   AnimatablePropertyBase()
   : PropertyBase(),
-    mDirtyFlags( BAKED_FLAG )
-  {}
+    mDirtyFlags(BAKED_FLAG)
+  {
+  }
 
   /**
    * Virtual destructor.
@@ -80,7 +77,6 @@ public:
   ~AnimatablePropertyBase() override = default;
 
 protected: // for derived classes
-
   /**
    * Flag that the property has been Set during the current frame.
    */
@@ -98,13 +94,12 @@ protected: // for derived classes
   }
 
 public: // From PropertyBase
-
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::IsClean()
    */
   bool IsClean() const override
   {
-    return ( CLEAN_FLAG == mDirtyFlags );
+    return (CLEAN_FLAG == mDirtyFlags);
   }
 
   /**
@@ -115,28 +110,24 @@ public: // From PropertyBase
     return true; // Animatable properties are always valid
   }
 
-protected: // so that ResetToBaseValue can set it directly
-
+protected:              // so that ResetToBaseValue can set it directly
   uint32_t mDirtyFlags; ///< Flag whether value changed during previous 2 frames
-
 };
-
 
 /**
  * An boolean animatable property of a scene-graph object.
  */
-template <>
+template<>
 class AnimatableProperty<bool> : public AnimatablePropertyBase
 {
 public:
-
   /**
    * Create an animatable property.
    * @param [in] initialValue The initial value of the property.
    */
-  AnimatableProperty( bool initialValue )
-  : mValue( initialValue ),
-    mBaseValue( initialValue )
+  AnimatableProperty(bool initialValue)
+  : mValue(initialValue),
+    mBaseValue(initialValue)
   {
   }
 
@@ -158,20 +149,20 @@ public:
    */
   void ResetToBaseValue(BufferIndex updateBufferIndex) override
   {
-    if (CLEAN_FLAG != mDirtyFlags)
+    if(CLEAN_FLAG != mDirtyFlags)
     {
       mValue[updateBufferIndex] = mBaseValue;
 
-      mDirtyFlags = ( mDirtyFlags >> 1 );
+      mDirtyFlags = (mDirtyFlags >> 1);
     }
   }
 
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetBoolean()
    */
-  const bool& GetBoolean( BufferIndex bufferIndex ) const override
+  const bool& GetBoolean(BufferIndex bufferIndex) const override
   {
-    return mValue[ bufferIndex ];
+    return mValue[bufferIndex];
   }
 
   /**
@@ -183,7 +174,7 @@ public:
   void Set(BufferIndex bufferIndex, bool value)
   {
     // check if the value actually changed to avoid dirtying nodes unnecessarily
-    if( mValue[bufferIndex] != value )
+    if(mValue[bufferIndex] != value)
     {
       mValue[bufferIndex] = value;
 
@@ -200,7 +191,7 @@ public:
   {
     // check if the value actually changed to avoid dirtying nodes unnecessarily
     // false + false does not change value, true + false does not either
-    if( delta && !mValue[bufferIndex] )
+    if(delta && !mValue[bufferIndex])
     {
       mValue[bufferIndex] = delta;
 
@@ -211,7 +202,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  bool& Get( BufferIndex bufferIndex )
+  bool& Get(BufferIndex bufferIndex)
   {
     return mValue[bufferIndex];
   }
@@ -219,7 +210,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  const bool& Get( BufferIndex bufferIndex ) const
+  const bool& Get(BufferIndex bufferIndex) const
   {
     return mValue[bufferIndex];
   }
@@ -229,7 +220,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  bool& operator[]( BufferIndex bufferIndex )
+  bool& operator[](BufferIndex bufferIndex)
   {
     return mValue[bufferIndex];
   }
@@ -239,7 +230,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  const bool& operator[]( BufferIndex bufferIndex ) const
+  const bool& operator[](BufferIndex bufferIndex) const
   {
     return mValue[bufferIndex];
   }
@@ -252,13 +243,13 @@ public:
   void Bake(BufferIndex bufferIndex, bool value)
   {
     // bake has to check the base value as current buffer value can be correct by constraint or something else
-    if( mBaseValue != value )
+    if(mBaseValue != value)
     {
       mBaseValue = value;
       // It's ok to bake both buffers as render is performed in same thread as update. Reading from event side
       // has never been atomically safe.
-      mValue[bufferIndex] = value;
-      mValue[1-bufferIndex] = value;
+      mValue[bufferIndex]     = value;
+      mValue[1 - bufferIndex] = value;
 
       OnBake();
     }
@@ -272,13 +263,12 @@ public:
   void BakeRelative(BufferIndex bufferIndex, bool delta)
   {
     mValue[bufferIndex] = mValue[bufferIndex] || delta;
-    mBaseValue = mValue[bufferIndex];
+    mBaseValue          = mValue[bufferIndex];
 
     OnBake();
   }
 
 private:
-
   // Undefined
   AnimatableProperty(const AnimatableProperty& property);
 
@@ -286,28 +276,24 @@ private:
   AnimatableProperty& operator=(const AnimatableProperty& rhs);
 
 private:
-
-  DoubleBuffered<bool> mValue; ///< The double-buffered property value
-  bool mBaseValue;             ///< Reset to this base value at the beginning of each frame
-
+  DoubleBuffered<bool> mValue;     ///< The double-buffered property value
+  bool                 mBaseValue; ///< Reset to this base value at the beginning of each frame
 };
-
 
 /**
  * An integer animatable property of a scene-graph object.
  */
-template <>
+template<>
 class AnimatableProperty<int> : public AnimatablePropertyBase
 {
 public:
-
   /**
    * Create an animatable property.
    * @param [in] initialValue The initial value of the property.
    */
-  AnimatableProperty( int initialValue )
-  : mValue( initialValue ),
-    mBaseValue( initialValue )
+  AnimatableProperty(int initialValue)
+  : mValue(initialValue),
+    mBaseValue(initialValue)
   {
   }
 
@@ -329,20 +315,20 @@ public:
    */
   void ResetToBaseValue(BufferIndex updateBufferIndex) override
   {
-    if (CLEAN_FLAG != mDirtyFlags)
+    if(CLEAN_FLAG != mDirtyFlags)
     {
       mValue[updateBufferIndex] = mBaseValue;
 
-      mDirtyFlags = ( mDirtyFlags >> 1 );
+      mDirtyFlags = (mDirtyFlags >> 1);
     }
   }
 
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetInteger()
    */
-  const int& GetInteger( BufferIndex bufferIndex ) const override
+  const int& GetInteger(BufferIndex bufferIndex) const override
   {
-    return mValue[ bufferIndex ];
+    return mValue[bufferIndex];
   }
 
   /**
@@ -373,7 +359,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  int& Get( BufferIndex bufferIndex )
+  int& Get(BufferIndex bufferIndex)
   {
     return mValue[bufferIndex];
   }
@@ -381,7 +367,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  const int& Get( BufferIndex bufferIndex ) const
+  const int& Get(BufferIndex bufferIndex) const
   {
     return mValue[bufferIndex];
   }
@@ -391,7 +377,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  int& operator[]( BufferIndex bufferIndex )
+  int& operator[](BufferIndex bufferIndex)
   {
     return mValue[bufferIndex];
   }
@@ -401,7 +387,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  const int& operator[]( BufferIndex bufferIndex ) const
+  const int& operator[](BufferIndex bufferIndex) const
   {
     return mValue[bufferIndex];
   }
@@ -413,9 +399,9 @@ public:
    */
   void Bake(BufferIndex bufferIndex, int value)
   {
-    mValue[bufferIndex] = value;
-    mValue[1-bufferIndex] = value;
-    mBaseValue = mValue[bufferIndex];
+    mValue[bufferIndex]     = value;
+    mValue[1 - bufferIndex] = value;
+    mBaseValue              = mValue[bufferIndex];
 
     OnBake();
   }
@@ -428,7 +414,7 @@ public:
   void BakeRelative(BufferIndex bufferIndex, int delta)
   {
     mValue[bufferIndex] = mValue[bufferIndex] + delta;
-    mBaseValue = mValue[bufferIndex];
+    mBaseValue          = mValue[bufferIndex];
 
     OnBake();
   }
@@ -452,13 +438,12 @@ public:
    */
   void SetInitialRelative(const int& delta)
   {
-    mValue[0] = mValue[0] + delta;
-    mValue[1] = mValue[0];
+    mValue[0]  = mValue[0] + delta;
+    mValue[1]  = mValue[0];
     mBaseValue = mValue[0];
   }
 
 private:
-
   // Undefined
   AnimatableProperty(const AnimatableProperty& property);
 
@@ -466,27 +451,24 @@ private:
   AnimatableProperty& operator=(const AnimatableProperty& rhs);
 
 private:
-
-  DoubleBuffered<int> mValue; ///< The double-buffered property value
-  int mBaseValue;             ///< Reset to this base value at the beginning of each frame
-
+  DoubleBuffered<int> mValue;     ///< The double-buffered property value
+  int                 mBaseValue; ///< Reset to this base value at the beginning of each frame
 };
 
 /**
  * An float animatable property of a scene-graph object.
  */
-template <>
+template<>
 class AnimatableProperty<float> : public AnimatablePropertyBase
 {
 public:
-
   /**
    * Create an animatable property.
    * @param [in] initialValue The initial value of the property.
    */
-  AnimatableProperty( float initialValue )
-  : mValue( initialValue ),
-    mBaseValue( initialValue )
+  AnimatableProperty(float initialValue)
+  : mValue(initialValue),
+    mBaseValue(initialValue)
   {
   }
 
@@ -508,20 +490,20 @@ public:
    */
   void ResetToBaseValue(BufferIndex updateBufferIndex) override
   {
-    if (CLEAN_FLAG != mDirtyFlags)
+    if(CLEAN_FLAG != mDirtyFlags)
     {
       mValue[updateBufferIndex] = mBaseValue;
 
-      mDirtyFlags = ( mDirtyFlags >> 1 );
+      mDirtyFlags = (mDirtyFlags >> 1);
     }
   }
 
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetFloat()
    */
-  const float& GetFloat( BufferIndex bufferIndex ) const override
+  const float& GetFloat(BufferIndex bufferIndex) const override
   {
-    return mValue[ bufferIndex ];
+    return mValue[bufferIndex];
   }
 
   /**
@@ -552,7 +534,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  float& Get( BufferIndex bufferIndex )
+  float& Get(BufferIndex bufferIndex)
   {
     return mValue[bufferIndex];
   }
@@ -560,7 +542,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  const float& Get( BufferIndex bufferIndex ) const
+  const float& Get(BufferIndex bufferIndex) const
   {
     return mValue[bufferIndex];
   }
@@ -570,7 +552,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  float& operator[]( BufferIndex bufferIndex )
+  float& operator[](BufferIndex bufferIndex)
   {
     return mValue[bufferIndex];
   }
@@ -580,7 +562,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  const float& operator[]( BufferIndex bufferIndex ) const
+  const float& operator[](BufferIndex bufferIndex) const
   {
     return mValue[bufferIndex];
   }
@@ -594,9 +576,9 @@ public:
   {
     // It's ok to bake both buffers as render is performed in same thread as update. Reading from event side
     // has never been atomically safe.
-    mValue[bufferIndex] = value;
-    mValue[1-bufferIndex] = value;
-    mBaseValue = mValue[bufferIndex];
+    mValue[bufferIndex]     = value;
+    mValue[1 - bufferIndex] = value;
+    mBaseValue              = mValue[bufferIndex];
 
     OnBake();
   }
@@ -609,7 +591,7 @@ public:
   void BakeRelative(BufferIndex bufferIndex, float delta)
   {
     mValue[bufferIndex] = mValue[bufferIndex] + delta;
-    mBaseValue = mValue[bufferIndex];
+    mBaseValue          = mValue[bufferIndex];
 
     OnBake();
   }
@@ -633,13 +615,12 @@ public:
    */
   void SetInitialRelative(const float& delta)
   {
-    mValue[0] = mValue[0] + delta;
-    mValue[1] = mValue[0];
+    mValue[0]  = mValue[0] + delta;
+    mValue[1]  = mValue[0];
     mBaseValue = mValue[0];
   }
 
 private:
-
   // Undefined
   AnimatableProperty(const AnimatableProperty& property);
 
@@ -647,26 +628,24 @@ private:
   AnimatableProperty& operator=(const AnimatableProperty& rhs);
 
 private:
-
-  DoubleBuffered<float> mValue; ///< The double-buffered property value
-  float mBaseValue;             ///< Reset to this base value at the beginning of each frame
+  DoubleBuffered<float> mValue;     ///< The double-buffered property value
+  float                 mBaseValue; ///< Reset to this base value at the beginning of each frame
 };
 
 /**
  * An Vector2 animatable property of a scene-graph object.
  */
-template <>
+template<>
 class AnimatableProperty<Vector2> : public AnimatablePropertyBase
 {
 public:
-
   /**
    * Create an animatable property.
    * @param [in] initialValue The initial value of the property.
    */
-  AnimatableProperty( const Vector2& initialValue )
-  : mValue( initialValue ),
-    mBaseValue( initialValue )
+  AnimatableProperty(const Vector2& initialValue)
+  : mValue(initialValue),
+    mBaseValue(initialValue)
   {
   }
 
@@ -688,20 +667,20 @@ public:
    */
   void ResetToBaseValue(BufferIndex updateBufferIndex) override
   {
-    if (CLEAN_FLAG != mDirtyFlags)
+    if(CLEAN_FLAG != mDirtyFlags)
     {
       mValue[updateBufferIndex] = mBaseValue;
 
-      mDirtyFlags = ( mDirtyFlags >> 1 );
+      mDirtyFlags = (mDirtyFlags >> 1);
     }
   }
 
   /**
    * @copydoc Dali::PropertyInput::GetVector2()
    */
-  const Vector2& GetVector2( BufferIndex bufferIndex ) const override
+  const Vector2& GetVector2(BufferIndex bufferIndex) const override
   {
-    return mValue[ bufferIndex ];
+    return mValue[bufferIndex];
   }
 
   /**
@@ -782,7 +761,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  Vector2& Get( BufferIndex bufferIndex )
+  Vector2& Get(BufferIndex bufferIndex)
   {
     return mValue[bufferIndex];
   }
@@ -790,7 +769,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  const Vector2& Get( BufferIndex bufferIndex ) const
+  const Vector2& Get(BufferIndex bufferIndex) const
   {
     return mValue[bufferIndex];
   }
@@ -800,7 +779,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  Vector2& operator[]( BufferIndex bufferIndex )
+  Vector2& operator[](BufferIndex bufferIndex)
   {
     return mValue[bufferIndex];
   }
@@ -810,7 +789,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  const Vector2& operator[]( BufferIndex bufferIndex ) const
+  const Vector2& operator[](BufferIndex bufferIndex) const
   {
     return mValue[bufferIndex];
   }
@@ -824,9 +803,9 @@ public:
   {
     // It's ok to bake both buffers as render is performed in same thread as update. Reading from event side
     // has never been atomically safe.
-    mValue[bufferIndex] = value;
-    mValue[1-bufferIndex] = value;
-    mBaseValue = value;
+    mValue[bufferIndex]     = value;
+    mValue[1 - bufferIndex] = value;
+    mBaseValue              = value;
 
     OnBake();
   }
@@ -838,9 +817,9 @@ public:
    */
   void BakeX(BufferIndex bufferIndex, float value)
   {
-    mValue[bufferIndex].x = value;
-    mValue[1-bufferIndex].x = value;
-    mBaseValue.x = value;
+    mValue[bufferIndex].x     = value;
+    mValue[1 - bufferIndex].x = value;
+    mBaseValue.x              = value;
 
     OnBake();
   }
@@ -852,9 +831,9 @@ public:
    */
   void BakeY(BufferIndex bufferIndex, float value)
   {
-    mValue[bufferIndex].y = value;
-    mValue[1-bufferIndex].y = value;
-    mBaseValue.y = value;
+    mValue[bufferIndex].y     = value;
+    mValue[1 - bufferIndex].y = value;
+    mBaseValue.y              = value;
 
     OnBake();
   }
@@ -899,7 +878,6 @@ public:
   }
 
 private:
-
   // Undefined
   AnimatableProperty(const AnimatableProperty& property);
 
@@ -907,20 +885,17 @@ private:
   AnimatableProperty& operator=(const AnimatableProperty& rhs);
 
 private:
-
-  DoubleBuffered<Vector2> mValue; ///< The double-buffered property value
-  Vector2 mBaseValue;             ///< Reset to this base value at the beginning of each frame
-
+  DoubleBuffered<Vector2> mValue;     ///< The double-buffered property value
+  Vector2                 mBaseValue; ///< Reset to this base value at the beginning of each frame
 };
 
 /**
  * A Vector3 animatable property of a scene-graph object.
  */
-template <>
+template<>
 class AnimatableProperty<Vector3> : public AnimatablePropertyBase
 {
 public:
-
   /**
    * Create an animatable property.
    */
@@ -934,9 +909,9 @@ public:
    * Create an animatable property.
    * @param [in] initialValue The initial value of the property.
    */
-  AnimatableProperty( const Vector3& initialValue )
-  : mValue( initialValue ),
-    mBaseValue( initialValue )
+  AnimatableProperty(const Vector3& initialValue)
+  : mValue(initialValue),
+    mBaseValue(initialValue)
   {
   }
 
@@ -958,20 +933,20 @@ public:
    */
   void ResetToBaseValue(BufferIndex updateBufferIndex) override
   {
-    if (CLEAN_FLAG != mDirtyFlags)
+    if(CLEAN_FLAG != mDirtyFlags)
     {
       mValue[updateBufferIndex] = mBaseValue;
 
-      mDirtyFlags = ( mDirtyFlags >> 1 );
+      mDirtyFlags = (mDirtyFlags >> 1);
     }
   }
 
   /**
    * @copydoc Dali::PropertyInput::GetVector3()
    */
-  const Vector3& GetVector3( BufferIndex bufferIndex ) const override
+  const Vector3& GetVector3(BufferIndex bufferIndex) const override
   {
-    return mValue[ bufferIndex ];
+    return mValue[bufferIndex];
   }
 
   /**
@@ -1077,7 +1052,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  Vector3& Get( BufferIndex bufferIndex )
+  Vector3& Get(BufferIndex bufferIndex)
   {
     return mValue[bufferIndex];
   }
@@ -1085,7 +1060,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  const Vector3& Get( BufferIndex bufferIndex ) const
+  const Vector3& Get(BufferIndex bufferIndex) const
   {
     return mValue[bufferIndex];
   }
@@ -1095,7 +1070,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  Vector3& operator[]( BufferIndex bufferIndex )
+  Vector3& operator[](BufferIndex bufferIndex)
   {
     return mValue[bufferIndex];
   }
@@ -1105,7 +1080,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  const Vector3& operator[]( BufferIndex bufferIndex ) const
+  const Vector3& operator[](BufferIndex bufferIndex) const
   {
     return mValue[bufferIndex];
   }
@@ -1117,9 +1092,9 @@ public:
    */
   void Bake(BufferIndex bufferIndex, const Vector3& value)
   {
-    mValue[bufferIndex] = value;
-    mValue[1-bufferIndex] = value;
-    mBaseValue = value;
+    mValue[bufferIndex]     = value;
+    mValue[1 - bufferIndex] = value;
+    mBaseValue              = value;
 
     OnBake();
   }
@@ -1131,9 +1106,9 @@ public:
    */
   void BakeX(BufferIndex bufferIndex, float value)
   {
-    mValue[bufferIndex].x = value;
-    mValue[1-bufferIndex].x = value;
-    mBaseValue.x = value;
+    mValue[bufferIndex].x     = value;
+    mValue[1 - bufferIndex].x = value;
+    mBaseValue.x              = value;
 
     OnBake();
   }
@@ -1145,9 +1120,9 @@ public:
    */
   void BakeY(BufferIndex bufferIndex, float value)
   {
-    mValue[bufferIndex].y = value;
-    mValue[1-bufferIndex].y = value;
-    mBaseValue.y = value;
+    mValue[bufferIndex].y     = value;
+    mValue[1 - bufferIndex].y = value;
+    mBaseValue.y              = value;
 
     OnBake();
   }
@@ -1159,9 +1134,9 @@ public:
    */
   void BakeZ(BufferIndex bufferIndex, float value)
   {
-    mValue[bufferIndex].z = value;
-    mValue[1-bufferIndex].z = value;
-    mBaseValue.z = value;
+    mValue[bufferIndex].z     = value;
+    mValue[1 - bufferIndex].z = value;
+    mBaseValue.z              = value;
 
     OnBake();
   }
@@ -1232,7 +1207,6 @@ public:
   }
 
 private:
-
   // Undefined
   AnimatableProperty(const AnimatableProperty& property);
 
@@ -1240,27 +1214,24 @@ private:
   AnimatableProperty& operator=(const AnimatableProperty& rhs);
 
 private:
-
-  DoubleBuffered<Vector3> mValue; ///< The double-buffered property value
-  Vector3 mBaseValue;             ///< Reset to this base value at the beginning of each frame
-
+  DoubleBuffered<Vector3> mValue;     ///< The double-buffered property value
+  Vector3                 mBaseValue; ///< Reset to this base value at the beginning of each frame
 };
 
 /**
  * A Vector4 animatable property of a scene-graph object.
  */
-template <>
+template<>
 class AnimatableProperty<Vector4> : public AnimatablePropertyBase
 {
 public:
-
   /**
    * Create an animatable property.
    * @param [in] initialValue The initial value of the property.
    */
-  AnimatableProperty( const Vector4& initialValue )
-  : mValue( initialValue ),
-    mBaseValue( initialValue )
+  AnimatableProperty(const Vector4& initialValue)
+  : mValue(initialValue),
+    mBaseValue(initialValue)
   {
   }
 
@@ -1282,20 +1253,20 @@ public:
    */
   void ResetToBaseValue(BufferIndex updateBufferIndex) override
   {
-    if (CLEAN_FLAG != mDirtyFlags)
+    if(CLEAN_FLAG != mDirtyFlags)
     {
       mValue[updateBufferIndex] = mBaseValue;
 
-      mDirtyFlags = ( mDirtyFlags >> 1 );
+      mDirtyFlags = (mDirtyFlags >> 1);
     }
   }
 
   /**
    * @copydoc Dali::PropertyInput::GetVector4()
    */
-  const Vector4& GetVector4( BufferIndex bufferIndex ) const override
+  const Vector4& GetVector4(BufferIndex bufferIndex) const override
   {
-    return mValue[ bufferIndex ];
+    return mValue[bufferIndex];
   }
 
   /**
@@ -1426,7 +1397,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  Vector4& Get( BufferIndex bufferIndex )
+  Vector4& Get(BufferIndex bufferIndex)
   {
     return mValue[bufferIndex];
   }
@@ -1434,7 +1405,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  const Vector4& Get( BufferIndex bufferIndex ) const
+  const Vector4& Get(BufferIndex bufferIndex) const
   {
     return mValue[bufferIndex];
   }
@@ -1444,7 +1415,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  Vector4& operator[]( BufferIndex bufferIndex )
+  Vector4& operator[](BufferIndex bufferIndex)
   {
     return mValue[bufferIndex];
   }
@@ -1454,7 +1425,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  const Vector4& operator[]( BufferIndex bufferIndex ) const
+  const Vector4& operator[](BufferIndex bufferIndex) const
   {
     return mValue[bufferIndex];
   }
@@ -1466,9 +1437,9 @@ public:
    */
   void Bake(BufferIndex bufferIndex, const Vector4& value)
   {
-    mValue[bufferIndex] = value;
-    mValue[1-bufferIndex] = value;
-    mBaseValue = mValue[bufferIndex];
+    mValue[bufferIndex]     = value;
+    mValue[1 - bufferIndex] = value;
+    mBaseValue              = mValue[bufferIndex];
 
     OnBake();
   }
@@ -1480,9 +1451,9 @@ public:
    */
   void BakeX(BufferIndex bufferIndex, float value)
   {
-    mValue[bufferIndex].x = value;
-    mValue[1-bufferIndex].x = value;
-    mBaseValue.x = mValue[bufferIndex].x;
+    mValue[bufferIndex].x     = value;
+    mValue[1 - bufferIndex].x = value;
+    mBaseValue.x              = mValue[bufferIndex].x;
 
     OnBake();
   }
@@ -1494,9 +1465,9 @@ public:
    */
   void BakeY(BufferIndex bufferIndex, float value)
   {
-    mValue[bufferIndex].y = value;
-    mValue[1-bufferIndex].y = value;
-    mBaseValue.y = mValue[bufferIndex].y;
+    mValue[bufferIndex].y     = value;
+    mValue[1 - bufferIndex].y = value;
+    mBaseValue.y              = mValue[bufferIndex].y;
 
     OnBake();
   }
@@ -1508,9 +1479,9 @@ public:
    */
   void BakeZ(BufferIndex bufferIndex, float value)
   {
-    mValue[bufferIndex].z = value;
-    mValue[1-bufferIndex].z = value;
-    mBaseValue.z = mValue[bufferIndex].z;
+    mValue[bufferIndex].z     = value;
+    mValue[1 - bufferIndex].z = value;
+    mBaseValue.z              = mValue[bufferIndex].z;
 
     OnBake();
   }
@@ -1522,9 +1493,9 @@ public:
    */
   void BakeW(BufferIndex bufferIndex, float value)
   {
-    mValue[bufferIndex].w = value;
-    mValue[1-bufferIndex].w = value;
-    mBaseValue.w = mValue[bufferIndex].w;
+    mValue[bufferIndex].w     = value;
+    mValue[1 - bufferIndex].w = value;
+    mBaseValue.w              = mValue[bufferIndex].w;
 
     OnBake();
   }
@@ -1537,7 +1508,7 @@ public:
   void BakeRelative(BufferIndex bufferIndex, const Vector4& delta)
   {
     mValue[bufferIndex] = mValue[bufferIndex] + delta;
-    mBaseValue = mValue[bufferIndex];
+    mBaseValue          = mValue[bufferIndex];
 
     OnBake();
   }
@@ -1550,7 +1521,7 @@ public:
   void BakeXRelative(BufferIndex bufferIndex, float delta)
   {
     mValue[bufferIndex].x = mValue[bufferIndex].x + delta;
-    mBaseValue.x = mValue[bufferIndex].x;
+    mBaseValue.x          = mValue[bufferIndex].x;
 
     OnBake();
   }
@@ -1563,7 +1534,7 @@ public:
   void BakeYRelative(BufferIndex bufferIndex, float delta)
   {
     mValue[bufferIndex].y = mValue[bufferIndex].y + delta;
-    mBaseValue.y = mValue[bufferIndex].y;
+    mBaseValue.y          = mValue[bufferIndex].y;
 
     OnBake();
   }
@@ -1576,7 +1547,7 @@ public:
   void BakeZRelative(BufferIndex bufferIndex, float delta)
   {
     mValue[bufferIndex].z = mValue[bufferIndex].z + delta;
-    mBaseValue.z = mValue[bufferIndex].z;
+    mBaseValue.z          = mValue[bufferIndex].z;
 
     OnBake();
   }
@@ -1589,7 +1560,7 @@ public:
   void BakeWRelative(BufferIndex bufferIndex, float delta)
   {
     mValue[bufferIndex].w = mValue[bufferIndex].w + delta;
-    mBaseValue.w = mValue[bufferIndex].w;
+    mBaseValue.w          = mValue[bufferIndex].w;
 
     OnBake();
   }
@@ -1607,7 +1578,6 @@ public:
   }
 
 private:
-
   // Undefined
   AnimatableProperty(const AnimatableProperty& property);
 
@@ -1615,19 +1585,16 @@ private:
   AnimatableProperty& operator=(const AnimatableProperty& rhs);
 
 private:
-
-  DoubleBuffered<Vector4> mValue; ///< The double-buffered property value
-  Vector4 mBaseValue;             ///< Reset to this base value at the beginning of each frame
-
+  DoubleBuffered<Vector4> mValue;     ///< The double-buffered property value
+  Vector4                 mBaseValue; ///< Reset to this base value at the beginning of each frame
 };
 /**
  * An Quaternion animatable property of a scene-graph object.
  */
-template <>
+template<>
 class AnimatableProperty<Quaternion> : public AnimatablePropertyBase
 {
 public:
-
   /**
    * Create an animatable property.
    */
@@ -1641,9 +1608,9 @@ public:
    * Create an animatable property.
    * @param [in] initialValue The initial value of the property.
    */
-  AnimatableProperty( const Quaternion& initialValue )
-  : mValue( initialValue ),
-    mBaseValue( initialValue )
+  AnimatableProperty(const Quaternion& initialValue)
+  : mValue(initialValue),
+    mBaseValue(initialValue)
   {
   }
 
@@ -1665,20 +1632,20 @@ public:
    */
   void ResetToBaseValue(BufferIndex updateBufferIndex) override
   {
-    if (CLEAN_FLAG != mDirtyFlags)
+    if(CLEAN_FLAG != mDirtyFlags)
     {
       mValue[updateBufferIndex] = mBaseValue;
 
-      mDirtyFlags = ( mDirtyFlags >> 1 );
+      mDirtyFlags = (mDirtyFlags >> 1);
     }
   }
 
   /**
    * @copydoc Dali::PropertyInput::GetQuaternion()
    */
-  const Quaternion& GetQuaternion( BufferIndex bufferIndex ) const override
+  const Quaternion& GetQuaternion(BufferIndex bufferIndex) const override
   {
-    return mValue[ bufferIndex ];
+    return mValue[bufferIndex];
   }
 
   /**
@@ -1709,7 +1676,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  Quaternion& Get( BufferIndex bufferIndex )
+  Quaternion& Get(BufferIndex bufferIndex)
   {
     return mValue[bufferIndex];
   }
@@ -1717,7 +1684,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  const Quaternion& Get( BufferIndex bufferIndex ) const
+  const Quaternion& Get(BufferIndex bufferIndex) const
   {
     return mValue[bufferIndex];
   }
@@ -1727,7 +1694,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  Quaternion& operator[]( BufferIndex bufferIndex )
+  Quaternion& operator[](BufferIndex bufferIndex)
   {
     return mValue[bufferIndex];
   }
@@ -1737,7 +1704,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  const Quaternion& operator[]( BufferIndex bufferIndex ) const
+  const Quaternion& operator[](BufferIndex bufferIndex) const
   {
     return mValue[bufferIndex];
   }
@@ -1751,9 +1718,9 @@ public:
   {
     // It's ok to bake both buffers as render is performed in same thread as update. Reading from event side
     // has never been atomically safe.
-    mValue[bufferIndex] = value;
-    mValue[1-bufferIndex] = value;
-    mBaseValue = value;
+    mValue[bufferIndex]     = value;
+    mValue[1 - bufferIndex] = value;
+    mBaseValue              = value;
 
     OnBake();
   }
@@ -1772,7 +1739,6 @@ public:
   }
 
 private:
-
   // Undefined
   AnimatableProperty(const AnimatableProperty& property);
 
@@ -1780,27 +1746,24 @@ private:
   AnimatableProperty& operator=(const AnimatableProperty& rhs);
 
 private:
-
-  DoubleBuffered<Quaternion> mValue; ///< The double-buffered property value
-  Quaternion mBaseValue;             ///< Reset to this base value at the beginning of each frame
-
+  DoubleBuffered<Quaternion> mValue;     ///< The double-buffered property value
+  Quaternion                 mBaseValue; ///< Reset to this base value at the beginning of each frame
 };
 
 /**
  * A Matrix animatable property of a scene-graph object.
  */
-template <>
+template<>
 class AnimatableProperty<Matrix> : public AnimatablePropertyBase
 {
 public:
-
   /**
    * Create an animatable property.
    * @param [in] initialValue The initial value of the property.
    */
-  AnimatableProperty( const Matrix& initialValue )
-  : mValue( initialValue ),
-    mBaseValue( initialValue )
+  AnimatableProperty(const Matrix& initialValue)
+  : mValue(initialValue),
+    mBaseValue(initialValue)
   {
   }
 
@@ -1822,20 +1785,20 @@ public:
    */
   void ResetToBaseValue(BufferIndex updateBufferIndex) override
   {
-    if (CLEAN_FLAG != mDirtyFlags)
+    if(CLEAN_FLAG != mDirtyFlags)
     {
       mValue[updateBufferIndex] = mBaseValue;
 
-      mDirtyFlags = ( mDirtyFlags >> 1 );
+      mDirtyFlags = (mDirtyFlags >> 1);
     }
   }
 
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetMatrix()
    */
-  const Matrix& GetMatrix( BufferIndex bufferIndex ) const override
+  const Matrix& GetMatrix(BufferIndex bufferIndex) const override
   {
-    return mValue[ bufferIndex ];
+    return mValue[bufferIndex];
   }
 
   /**
@@ -1849,7 +1812,6 @@ public:
     mValue[bufferIndex] = value;
     OnSet();
   }
-
 
   /**
    * Change the property value by a relative amount.
@@ -1868,7 +1830,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  Matrix& Get( BufferIndex bufferIndex )
+  Matrix& Get(BufferIndex bufferIndex)
   {
     return mValue[bufferIndex];
   }
@@ -1876,7 +1838,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  const Matrix& Get( BufferIndex bufferIndex ) const
+  const Matrix& Get(BufferIndex bufferIndex) const
   {
     return mValue[bufferIndex];
   }
@@ -1886,7 +1848,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  Matrix& operator[]( BufferIndex bufferIndex )
+  Matrix& operator[](BufferIndex bufferIndex)
   {
     return mValue[bufferIndex];
   }
@@ -1896,7 +1858,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  const Matrix& operator[]( BufferIndex bufferIndex ) const
+  const Matrix& operator[](BufferIndex bufferIndex) const
   {
     return mValue[bufferIndex];
   }
@@ -1910,9 +1872,9 @@ public:
   {
     // It's ok to bake both buffers as render is performed in same thread as update. Reading from event side
     // has never been atomically safe.
-    mValue[bufferIndex] = value;
-    mValue[1-bufferIndex] = value;
-    mBaseValue = mValue[bufferIndex];
+    mValue[bufferIndex]     = value;
+    mValue[1 - bufferIndex] = value;
+    mBaseValue              = mValue[bufferIndex];
 
     OnBake();
   }
@@ -1927,13 +1889,12 @@ public:
     Matrix temp;
     Matrix::Multiply(temp, mValue[bufferIndex], delta);
     mValue[bufferIndex] = temp;
-    mBaseValue = temp;
+    mBaseValue          = temp;
 
     OnBake();
   }
 
 private:
-
   // Undefined
   AnimatableProperty(const AnimatableProperty& property);
 
@@ -1941,27 +1902,24 @@ private:
   AnimatableProperty& operator=(const AnimatableProperty& rhs);
 
 private:
-
-  DoubleBuffered<Matrix> mValue; ///< The double-buffered property value
-  Matrix mBaseValue;             ///< Reset to this base value at the beginning of each frame
-
+  DoubleBuffered<Matrix> mValue;     ///< The double-buffered property value
+  Matrix                 mBaseValue; ///< Reset to this base value at the beginning of each frame
 };
 
 /**
  * A Matrix3 animatable property of a scene-graph object.
  */
-template <>
+template<>
 class AnimatableProperty<Matrix3> : public AnimatablePropertyBase
 {
 public:
-
   /**
    * Create an animatable property.
    * @param [in] initialValue The initial value of the property.
    */
-  AnimatableProperty( const Matrix3& initialValue )
-  : mValue( initialValue ),
-    mBaseValue( initialValue )
+  AnimatableProperty(const Matrix3& initialValue)
+  : mValue(initialValue),
+    mBaseValue(initialValue)
   {
   }
 
@@ -1983,20 +1941,20 @@ public:
    */
   void ResetToBaseValue(BufferIndex updateBufferIndex) override
   {
-    if (CLEAN_FLAG != mDirtyFlags)
+    if(CLEAN_FLAG != mDirtyFlags)
     {
       mValue[updateBufferIndex] = mBaseValue;
 
-      mDirtyFlags = ( mDirtyFlags >> 1 );
+      mDirtyFlags = (mDirtyFlags >> 1);
     }
   }
 
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetMatrix3()
    */
-  const Matrix3& GetMatrix3( BufferIndex bufferIndex ) const override
+  const Matrix3& GetMatrix3(BufferIndex bufferIndex) const override
   {
-    return mValue[ bufferIndex ];
+    return mValue[bufferIndex];
   }
 
   /**
@@ -2027,7 +1985,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  Matrix3& Get( BufferIndex bufferIndex )
+  Matrix3& Get(BufferIndex bufferIndex)
   {
     return mValue[bufferIndex];
   }
@@ -2035,7 +1993,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  const Matrix3& Get( BufferIndex bufferIndex ) const
+  const Matrix3& Get(BufferIndex bufferIndex) const
   {
     return mValue[bufferIndex];
   }
@@ -2045,7 +2003,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  Matrix3& operator[]( BufferIndex bufferIndex )
+  Matrix3& operator[](BufferIndex bufferIndex)
   {
     return mValue[bufferIndex];
   }
@@ -2055,7 +2013,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  const Matrix3& operator[]( BufferIndex bufferIndex ) const
+  const Matrix3& operator[](BufferIndex bufferIndex) const
   {
     return mValue[bufferIndex];
   }
@@ -2069,9 +2027,9 @@ public:
   {
     // It's ok to bake both buffers as render is performed in same thread as update. Reading from event side
     // has never been atomically safe.
-    mValue[bufferIndex] = value;
-    mValue[1-bufferIndex] = value;
-    mBaseValue = mValue[bufferIndex];
+    mValue[bufferIndex]     = value;
+    mValue[1 - bufferIndex] = value;
+    mBaseValue              = mValue[bufferIndex];
 
     OnBake();
   }
@@ -2086,13 +2044,12 @@ public:
     Matrix3 temp;
     Matrix3::Multiply(temp, mValue[bufferIndex], delta);
     mValue[bufferIndex] = temp;
-    mBaseValue = temp;
+    mBaseValue          = temp;
 
     OnBake();
   }
 
 private:
-
   // Undefined
   AnimatableProperty(const AnimatableProperty& property);
 
@@ -2100,110 +2057,108 @@ private:
   AnimatableProperty& operator=(const AnimatableProperty& rhs);
 
 private:
-
-  DoubleBuffered<Matrix3> mValue; ///< The double-buffered property value
-  Matrix3 mBaseValue;             ///< Reset to this base value at the beginning of each frame
-
+  DoubleBuffered<Matrix3> mValue;     ///< The double-buffered property value
+  Matrix3                 mBaseValue; ///< Reset to this base value at the beginning of each frame
 };
 
 } // namespace SceneGraph
 
 // Messages for AnimatableProperty<T>
 
-template <class T>
-void BakeMessage( EventThreadServices& eventThreadServices,
-                  const SceneGraph::AnimatableProperty<T>& property,
-                  typename ParameterType< T >::PassingType newValue )
+template<class T>
+void BakeMessage(EventThreadServices&                     eventThreadServices,
+                 const SceneGraph::AnimatableProperty<T>& property,
+                 typename ParameterType<T>::PassingType   newValue)
 {
   using LocalType = MessageDoubleBuffered1<SceneGraph::AnimatableProperty<T>, T>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &property,
-                        &SceneGraph::AnimatableProperty<T>::Bake,
-                        newValue );
+  new(slot) LocalType(&property,
+                      &SceneGraph::AnimatableProperty<T>::Bake,
+                      newValue);
 }
 
-template <class T>
-void BakeRelativeMessage( EventThreadServices& eventThreadServices,
-                          const SceneGraph::AnimatableProperty<T>& property,
-                          const T& delta )
+template<class T>
+void BakeRelativeMessage(EventThreadServices&                     eventThreadServices,
+                         const SceneGraph::AnimatableProperty<T>& property,
+                         const T&                                 delta)
 {
   using LocalType = MessageDoubleBuffered1<SceneGraph::AnimatableProperty<T>, const T&>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &property,
-                        &SceneGraph::AnimatableProperty<T>::BakeRelative,
-                         delta );
+  new(slot) LocalType(&property,
+                      &SceneGraph::AnimatableProperty<T>::BakeRelative,
+                      delta);
 }
 
-template <class T>
-void SetXComponentMessage( EventThreadServices& eventThreadServices,
-                           const SceneGraph::AnimatableProperty<T>& property,
-                           typename ParameterType< float >::PassingType newValue )
+template<class T>
+void SetXComponentMessage(EventThreadServices&                       eventThreadServices,
+                          const SceneGraph::AnimatableProperty<T>&   property,
+                          typename ParameterType<float>::PassingType newValue)
 {
   using LocalType = MessageDoubleBuffered1<SceneGraph::AnimatableProperty<T>, float>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &property,
-                        &SceneGraph::AnimatableProperty<T>::BakeX,
-                        newValue );
+  new(slot) LocalType(&property,
+                      &SceneGraph::AnimatableProperty<T>::BakeX,
+                      newValue);
 }
 
-template <class T>
-void SetYComponentMessage( EventThreadServices& eventThreadServices,
-                           const SceneGraph::AnimatableProperty<T>& property,
-                           typename ParameterType< float >::PassingType newValue )
+template<class T>
+void SetYComponentMessage(EventThreadServices&                       eventThreadServices,
+                          const SceneGraph::AnimatableProperty<T>&   property,
+                          typename ParameterType<float>::PassingType newValue)
 {
   using LocalType = MessageDoubleBuffered1<SceneGraph::AnimatableProperty<T>, float>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &property,
-                        &SceneGraph::AnimatableProperty<T>::BakeY,
-                        newValue );
+  new(slot) LocalType(&property,
+                      &SceneGraph::AnimatableProperty<T>::BakeY,
+                      newValue);
 }
 
-template <class T>
-void SetZComponentMessage( EventThreadServices& eventThreadServices,
-                           const SceneGraph::AnimatableProperty<T>& property,
-                           typename ParameterType< float >::PassingType newValue )
+template<class T>
+void SetZComponentMessage(EventThreadServices&                       eventThreadServices,
+                          const SceneGraph::AnimatableProperty<T>&   property,
+                          typename ParameterType<float>::PassingType newValue)
 {
   using LocalType = MessageDoubleBuffered1<SceneGraph::AnimatableProperty<T>, float>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &property,
-                        &SceneGraph::AnimatableProperty<T>::BakeZ,
-                        newValue );
+  new(slot) LocalType(&property,
+                      &SceneGraph::AnimatableProperty<T>::BakeZ,
+                      newValue);
 }
 
-template <class T>
-void SetWComponentMessage( EventThreadServices& eventThreadServices,
-                           const SceneGraph::AnimatableProperty<T>& property,
-                           typename ParameterType< float >::PassingType newValue )
+template<class T>
+void SetWComponentMessage(EventThreadServices&                       eventThreadServices,
+                          const SceneGraph::AnimatableProperty<T>&   property,
+                          typename ParameterType<float>::PassingType newValue)
 {
   using LocalType = MessageDoubleBuffered1<SceneGraph::AnimatableProperty<T>, float>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &property,
-                        &SceneGraph::AnimatableProperty<T>::BakeW,
-                        newValue );
+  new(slot) LocalType(&property,
+                      &SceneGraph::AnimatableProperty<T>::BakeW,
+                      newValue);
 }
 
 } // namespace Internal

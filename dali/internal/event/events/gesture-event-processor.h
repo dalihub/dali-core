@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_GESTURE_EVENT_PROCESSOR_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,21 +19,19 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/actors/actor.h>
-#include <dali/public-api/events/gesture.h>
 #include <dali/internal/event/events/gesture-detector-impl.h>
 #include <dali/internal/event/events/long-press-gesture/long-press-gesture-processor.h>
 #include <dali/internal/event/events/pan-gesture/pan-gesture-processor.h>
 #include <dali/internal/event/events/pinch-gesture/pinch-gesture-processor.h>
 #include <dali/internal/event/events/rotation-gesture/rotation-gesture-processor.h>
 #include <dali/internal/event/events/tap-gesture/tap-gesture-processor.h>
+#include <dali/public-api/actors/actor.h>
+#include <dali/public-api/events/gesture.h>
 
 namespace Dali
 {
-
 namespace Integration
 {
-
 class RenderController;
 }
 
@@ -44,7 +42,6 @@ class UpdateManager;
 
 namespace Internal
 {
-
 class Stage;
 class Scene;
 
@@ -57,13 +54,12 @@ class Scene;
 class GestureEventProcessor
 {
 public:
-
   /**
    * Create a gesture event processor.
    * @param[in] updateManager The update manager
    * @param[in] renderController The render controller
    */
-  GestureEventProcessor( SceneGraph::UpdateManager& updateManager, Integration::RenderController& renderController );
+  GestureEventProcessor(SceneGraph::UpdateManager& updateManager, Integration::RenderController& renderController);
 
   /**
    * Non-virtual destructor; GestureProcessor is not a base class
@@ -71,16 +67,14 @@ public:
   ~GestureEventProcessor();
 
 public: // To be called by EventProcessor
-
   /**
    * This function is called by Core whenever a touch event occurs
    * @param[in] scene The scene
    * @param[in] event The event that has occurred
    */
-  void ProcessTouchEvent( Scene& scene, const Integration::TouchEvent& event);
+  void ProcessTouchEvent(Scene& scene, const Integration::TouchEvent& event);
 
 public: // To be called by gesture detectors
-
   /**
    * This method adds the specified gesture detector to the relevant gesture processor.
    * @param[in]  gestureDetector  The gesture detector to add
@@ -104,10 +98,9 @@ public: // To be called by gesture detectors
    * @param[in]  gesture  The gesture whose values will be used in the Update object.
    * @note If we are in the middle of processing the gesture being set, then this call is ignored.
    */
-  void SetGestureProperties( const Dali::Gesture& gesture );
+  void SetGestureProperties(const Dali::Gesture& gesture);
 
 public: // Called by Core
-
   /**
    * Returns true if any GestureDetector requires a Core::Update. Clears
    * the state flag after reading.
@@ -126,28 +119,28 @@ public: // Called by Core
    *
    * @param[in] mode The prediction mode to use
    */
-  void SetPanGesturePredictionMode( int32_t mode );
+  void SetPanGesturePredictionMode(int32_t mode);
 
   /**
    * @brief Sets the prediction amount of the pan gesture
    *
    * @param[in] amount The prediction amount in milliseconds
    */
-  void SetPanGesturePredictionAmount( uint32_t amount );
+  void SetPanGesturePredictionAmount(uint32_t amount);
 
   /**
    * @brief Sets the upper bound of the prediction amount for clamping
    *
    * @param[in] amount The prediction amount in milliseconds
    */
-  void SetPanGestureMaximumPredictionAmount( uint32_t amount );
+  void SetPanGestureMaximumPredictionAmount(uint32_t amount);
 
   /**
    * @brief Sets the lower bound of the prediction amount for clamping
    *
    * @param[in] amount The prediction amount in milliseconds
    */
-  void SetPanGestureMinimumPredictionAmount( uint32_t amount );
+  void SetPanGestureMinimumPredictionAmount(uint32_t amount);
 
   /**
    * @brief Sets the prediction amount to adjust when the pan velocity is changed.
@@ -158,133 +151,133 @@ public: // Called by Core
    *
    * @param[in] amount The prediction amount in milliseconds
    */
-  void SetPanGesturePredictionAmountAdjustment( uint32_t amount );
+  void SetPanGesturePredictionAmountAdjustment(uint32_t amount);
 
   /**
    * @brief Called to set how pan gestures smooth input
    *
    * @param[in] mode The smoothing mode to use
    */
-  void SetPanGestureSmoothingMode( int32_t mode );
+  void SetPanGestureSmoothingMode(int32_t mode);
 
   /**
    * @brief Sets the prediction amount of the pan gesture
    *
    * @param[in] amount The smoothing amount [0.0f,1.0f] - 0.0f would be no smoothing, 1.0f maximum smoothing
    */
-  void SetPanGestureSmoothingAmount( float amount );
+  void SetPanGestureSmoothingAmount(float amount);
 
   /*
    * @brief Sets whether to use actual times of the real gesture and frames or not.
    *
    * @param[in] value True = use actual times, False = use perfect values
    */
-  void SetPanGestureUseActualTimes( bool value );
+  void SetPanGestureUseActualTimes(bool value);
 
   /**
    * @brief Sets the interpolation time range (ms) of past points to use (with weights) when interpolating.
    *
    * @param[in] value Time range in ms
    */
-  void SetPanGestureInterpolationTimeRange( int32_t value );
+  void SetPanGestureInterpolationTimeRange(int32_t value);
 
   /**
    * @brief Sets whether to use scalar only prediction, which when enabled, ignores acceleration.
    *
    * @param[in] value True = use scalar prediction only
    */
-  void SetPanGestureScalarOnlyPredictionEnabled( bool value );
+  void SetPanGestureScalarOnlyPredictionEnabled(bool value);
 
   /**
    * @brief Sets whether to use two point prediction. This combines two interpolated points to get more steady acceleration and velocity values.
    *
    * @param[in] value True = use two point prediction
    */
-  void SetPanGestureTwoPointPredictionEnabled( bool value );
+  void SetPanGestureTwoPointPredictionEnabled(bool value);
 
   /**
    * @brief Sets the time in the past to interpolate the second point when using two point interpolation.
    *
    * @param[in] value Time in past in ms
    */
-  void SetPanGestureTwoPointInterpolatePastTime( int32_t value );
+  void SetPanGestureTwoPointInterpolatePastTime(int32_t value);
 
   /**
    * @brief Sets the two point velocity bias. This is the ratio of first and second points to use for velocity.
    *
    * @param[in] value 0.0f = 100% first point. 1.0f = 100% of second point.
    */
-  void SetPanGestureTwoPointVelocityBias( float value );
+  void SetPanGestureTwoPointVelocityBias(float value);
 
   /**
    * @brief Sets the two point acceleration bias. This is the ratio of first and second points to use for acceleration.
    *
    * @param[in] value 0.0f = 100% first point. 1.0f = 100% of second point.
    */
-  void SetPanGestureTwoPointAccelerationBias( float value );
+  void SetPanGestureTwoPointAccelerationBias(float value);
 
   /**
    * @brief Sets the range of time (ms) of points in the history to perform multitap smoothing with (if enabled).
    *
    * @param[in] value Time in past in ms
    */
-  void SetPanGestureMultitapSmoothingRange( int32_t value );
+  void SetPanGestureMultitapSmoothingRange(int32_t value);
 
   /**
    * @brief Sets the minimum distance required to start a pan event
    *
    * @param[in] value Distance in pixels
    */
-  void SetPanGestureMinimumDistance( int32_t value );
+  void SetPanGestureMinimumDistance(int32_t value);
 
   /**
    * @brief Sets the minimum number of touch events required to start a pan
    *
    * @param[in] value Number of touch events
    */
-  void SetPanGestureMinimumPanEvents( int32_t value );
+  void SetPanGestureMinimumPanEvents(int32_t value);
 
   /**
    * @brief Sets the minimum distance required to start a pinch event
    *
    * @param[in] value Distance in pixels
    */
-  void SetPinchGestureMinimumDistance( float value);
+  void SetPinchGestureMinimumDistance(float value);
 
   /**
    * @brief Sets the minimum touch events required before a pinch can be started
    *
    * @param[in] value The number of touch events
    */
-  void SetPinchGestureMinimumTouchEvents( uint32_t value );
+  void SetPinchGestureMinimumTouchEvents(uint32_t value);
 
   /**
    * @brief Sets the minimum touch events required after a pinch started
    *
    * @param[in] value The number of touch events
    */
-  void SetPinchGestureMinimumTouchEventsAfterStart( uint32_t value );
+  void SetPinchGestureMinimumTouchEventsAfterStart(uint32_t value);
 
   /**
    * @brief Sets the minimum touch events required before a rotation can be started
    *
    * @param[in] value The number of touch events
    */
-  void SetRotationGestureMinimumTouchEvents( uint32_t value );
+  void SetRotationGestureMinimumTouchEvents(uint32_t value);
 
   /**
    * @brief Sets the minimum touch events required after a rotation started
    *
    * @param[in] value The number of touch events
    */
-  void SetRotationGestureMinimumTouchEventsAfterStart( uint32_t value );
+  void SetRotationGestureMinimumTouchEventsAfterStart(uint32_t value);
 
   /**
    * @brief Sets the minimum holding time required to be recognized as a long press gesture
    *
    * @param[in] value The time value in milliseconds
    */
-  void SetLongPressMinimumHoldingTime( uint32_t value );
+  void SetLongPressMinimumHoldingTime(uint32_t value);
 
   /**
    * @return The minimum holding time required to be recognized as a long press gesture in milliseconds
@@ -292,25 +285,22 @@ public: // Called by Core
   uint32_t GetLongPressMinimumHoldingTime() const;
 
 public: // needed for PanGesture
-
   /**
    * @return the pan gesture processor
    */
   const PanGestureProcessor& GetPanGestureProcessor();
 
 private:
-
   // Undefined
   GestureEventProcessor(const GestureEventProcessor&);
   GestureEventProcessor& operator=(const GestureEventProcessor& rhs);
 
 private:
-
-  LongPressGestureProcessor mLongPressGestureProcessor;
-  PanGestureProcessor mPanGestureProcessor;
-  PinchGestureProcessor mPinchGestureProcessor;
-  TapGestureProcessor mTapGestureProcessor;
-  RotationGestureProcessor mRotationGestureProcessor;
+  LongPressGestureProcessor      mLongPressGestureProcessor;
+  PanGestureProcessor            mPanGestureProcessor;
+  PinchGestureProcessor          mPinchGestureProcessor;
+  TapGestureProcessor            mTapGestureProcessor;
+  RotationGestureProcessor       mRotationGestureProcessor;
   Integration::RenderController& mRenderController;
 
   int32_t envOptionMinimumPanDistance;

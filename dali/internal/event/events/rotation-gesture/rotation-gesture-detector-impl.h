@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ROTATION_GESTURE_DETECTOR_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,16 +19,14 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/internal/event/events/gesture-detector-impl.h>
 #include <dali/public-api/events/rotation-gesture-detector.h>
 #include <dali/public-api/events/rotation-gesture.h>
-#include <dali/internal/event/events/gesture-detector-impl.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 class RotationGestureDetector;
 
 using RotationGestureDetectorPtr       = IntrusivePtr<RotationGestureDetector>;
@@ -40,7 +38,6 @@ using RotationGestureDetectorContainer = DerivedGestureDetectorContainer<Rotatio
 class RotationGestureDetector : public GestureDetector
 {
 public: // Creation
-
   /**
    * Create a new gesture detector.
    * @return A smart-pointer to the newly allocated detector.
@@ -54,21 +51,19 @@ public: // Creation
 
   // Not copyable
 
-  RotationGestureDetector( const RotationGestureDetector& )              = delete; ///< Deleted copy constructor
+  RotationGestureDetector(const RotationGestureDetector&) = delete;                ///< Deleted copy constructor
   RotationGestureDetector& operator=(const RotationGestureDetector& rhs) = delete; ///< Deleted copy assignment operator
 
 public:
-
   /**
    * Called by the RotationGestureProcessor when a rotation gesture event occurs within the bounds of our
    * attached actor.
    * @param[in]  actor     The rotated actor
    * @param[in]  rotation  The rotation gesture
    */
-  void EmitRotationGestureSignal( Dali::Actor actor, const Dali::RotationGesture& rotation );
+  void EmitRotationGestureSignal(Dali::Actor actor, const Dali::RotationGesture& rotation);
 
 public: // Signals
-
   /**
    * @copydoc Dali::RotationGestureDetector::DetectedSignal()
    */
@@ -86,34 +81,37 @@ public: // Signals
    * @return True if the signal was connected.
    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
    */
-  static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
+  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor);
 
 protected:
-
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
   ~RotationGestureDetector() override = default;
 
 private: // GestureDetector overrides
-
   /**
    * @copydoc Dali::Internal::GestureDetector::OnActorAttach(Actor&)
    */
-  void OnActorAttach( Actor& actor ) override { /* Nothing to do */ }
+  void OnActorAttach(Actor& actor) override
+  { /* Nothing to do */
+  }
 
   /**
    * @copydoc Dali::Internal::GestureDetector::OnActorDetach(Actor&)
    */
-  void OnActorDetach( Actor& actor ) override { /* Nothing to do */ }
+  void OnActorDetach(Actor& actor) override
+  { /* Nothing to do */
+  }
 
   /**
    * @copydoc Dali::Internal::GestureDetector::OnActorDestroyed(Object&)
    */
-  void OnActorDestroyed( Object& object ) override { /* Nothing to do */ }
+  void OnActorDestroyed(Object& object) override
+  { /* Nothing to do */
+  }
 
 private:
-
   Dali::RotationGestureDetector::DetectedSignalType mDetectedSignal;
 };
 
@@ -121,22 +119,22 @@ private:
 
 // Helpers for public-api forwarding methods
 
-inline Internal::RotationGestureDetector& GetImplementation( Dali::RotationGestureDetector& detector )
+inline Internal::RotationGestureDetector& GetImplementation(Dali::RotationGestureDetector& detector)
 {
-  DALI_ASSERT_ALWAYS( detector && "RotationGestureDetector handle is empty" );
+  DALI_ASSERT_ALWAYS(detector && "RotationGestureDetector handle is empty");
 
   BaseObject& handle = detector.GetBaseObject();
 
-  return static_cast<Internal::RotationGestureDetector&>( handle );
+  return static_cast<Internal::RotationGestureDetector&>(handle);
 }
 
-inline const Internal::RotationGestureDetector& GetImplementation( const Dali::RotationGestureDetector& detector )
+inline const Internal::RotationGestureDetector& GetImplementation(const Dali::RotationGestureDetector& detector)
 {
-  DALI_ASSERT_ALWAYS( detector && "RotationGestureDetector handle is empty" );
+  DALI_ASSERT_ALWAYS(detector && "RotationGestureDetector handle is empty");
 
   const BaseObject& handle = detector.GetBaseObject();
 
-  return static_cast<const Internal::RotationGestureDetector&>( handle );
+  return static_cast<const Internal::RotationGestureDetector&>(handle);
 }
 
 } // namespace Dali

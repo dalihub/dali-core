@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_WHEEL_EVENT_PROCESSOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@
 
 namespace Dali
 {
-
 namespace Integration
 {
 struct WheelEvent;
@@ -30,7 +29,6 @@ struct WheelEvent;
 
 namespace Internal
 {
-
 class Scene;
 
 /**
@@ -44,11 +42,10 @@ class Scene;
 class WheelEventProcessor
 {
 public:
-
   /**
    * Create a wheel event processor.
    */
-  WheelEventProcessor( Scene& scenes );
+  WheelEventProcessor(Scene& scenes);
 
   /**
    * Non-virtual destructor; WheelEventProcessor is not a base class
@@ -62,7 +59,6 @@ public:
   void ProcessWheelEvent(const Integration::WheelEvent& event);
 
 private:
-
   // Undefined
   WheelEventProcessor(const WheelEventProcessor&);
 
@@ -70,8 +66,7 @@ private:
   WheelEventProcessor& operator=(const WheelEventProcessor& rhs);
 
 private:
-
-  Scene& mScene;               ///< Used to deliver the wheel events
+  Scene& mScene; ///< Used to deliver the wheel events
 };
 
 } // namespace Internal

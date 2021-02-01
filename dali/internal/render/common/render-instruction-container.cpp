@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,10 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace SceneGraph
 {
-
 RenderInstructionContainer::RenderInstructionContainer()
 : mInstructions{}
 {
@@ -37,35 +34,35 @@ RenderInstructionContainer::RenderInstructionContainer()
 
 RenderInstructionContainer::~RenderInstructionContainer() = default;
 
-void RenderInstructionContainer::ResetAndReserve( BufferIndex bufferIndex, uint32_t capacityRequired )
+void RenderInstructionContainer::ResetAndReserve(BufferIndex bufferIndex, uint32_t capacityRequired)
 {
   // Only re-allocate if necessary.
-  if( mInstructions.size() < capacityRequired )
+  if(mInstructions.size() < capacityRequired)
   {
-    mInstructions.reserve( capacityRequired );
+    mInstructions.reserve(capacityRequired);
   }
 
   mInstructions.clear();
 }
 
-uint32_t RenderInstructionContainer::Count( BufferIndex bufferIndex )
+uint32_t RenderInstructionContainer::Count(BufferIndex bufferIndex)
 {
-  return static_cast<uint32_t>( mInstructions.size() );
+  return static_cast<uint32_t>(mInstructions.size());
 }
 
-RenderInstruction& RenderInstructionContainer::At( BufferIndex bufferIndex, uint32_t index )
+RenderInstruction& RenderInstructionContainer::At(BufferIndex bufferIndex, uint32_t index)
 {
-  DALI_ASSERT_DEBUG( index < mInstructions.size() );
+  DALI_ASSERT_DEBUG(index < mInstructions.size());
 
-  return *mInstructions[ index ];
+  return *mInstructions[index];
 }
 
-void RenderInstructionContainer::PushBack( BufferIndex bufferIndex, RenderInstruction* renderInstruction )
+void RenderInstructionContainer::PushBack(BufferIndex bufferIndex, RenderInstruction* renderInstruction)
 {
-  mInstructions.push_back( renderInstruction );
+  mInstructions.push_back(renderInstruction);
 }
 
-void RenderInstructionContainer::DiscardCurrentInstruction( BufferIndex updateBufferIndex )
+void RenderInstructionContainer::DiscardCurrentInstruction(BufferIndex updateBufferIndex)
 {
   mInstructions.pop_back();
 }

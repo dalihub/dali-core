@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PROGRAM_CACHE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,8 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 class Program;
 
 /**
@@ -36,7 +34,6 @@ class Program;
 class ProgramCache
 {
 public:
-
   /**
    * Constructor
    */
@@ -48,7 +45,6 @@ public:
   virtual ~ProgramCache() = default;
 
 public: // API
-
   /**
    * @return GlAbstraction
    */
@@ -59,14 +55,14 @@ public: // API
    * @param shaderHash to use
    * @return program
    */
-  virtual Program* GetProgram( size_t shaderHash ) = 0;
+  virtual Program* GetProgram(size_t shaderHash) = 0;
 
   /**
    * Add a program to cache
    * @param shaderHash of the program
    * @param program to add
    */
-  virtual void AddProgram( size_t shaderHash, Program* program ) = 0;
+  virtual void AddProgram(size_t shaderHash, Program* program) = 0;
 
   /**
    * Get currently bound program
@@ -78,7 +74,7 @@ public: // API
    * Set the currently bound program
    * @param program that is used
    */
-  virtual void SetCurrentProgram( Program* program ) = 0;
+  virtual void SetCurrentProgram(Program* program) = 0;
 
   /**
    * @return true if program binaries are supported
@@ -93,19 +89,15 @@ public: // API
   /**
    * @param programData to store/save
    */
-  virtual void StoreBinary( Internal::ShaderDataPtr programData ) = 0;
+  virtual void StoreBinary(Internal::ShaderDataPtr programData) = 0;
 
 private: // not implemented as non-copyable
-
-  ProgramCache( const ProgramCache& rhs );
-  ProgramCache& operator=( const ProgramCache& rhs );
-
+  ProgramCache(const ProgramCache& rhs);
+  ProgramCache& operator=(const ProgramCache& rhs);
 };
-
 
 } // namespace Internal
 
 } // namespace Dali
 
 #endif // DALI_INTERNAL_PROGRAM_CACHE_H
-

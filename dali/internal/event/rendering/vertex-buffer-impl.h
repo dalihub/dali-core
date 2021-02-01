@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_VERTEX_BUFFER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,18 +19,17 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h> // DALI_ASSERT_ALWAYS
+#include <dali/internal/event/common/event-thread-services.h>
+#include <dali/internal/render/renderers/render-vertex-buffer.h>
+#include <dali/public-api/common/dali-common.h>   // DALI_ASSERT_ALWAYS
 #include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/property-map.h> // Dali::Property::Map
-#include <dali/internal/event/common/event-thread-services.h>
-#include <dali/internal/render/renderers/render-vertex-buffer.h>
 
 namespace Dali
 {
 namespace Internal
 {
-
 class VertexBuffer;
 using VertexBufferPtr = IntrusivePtr<VertexBuffer>;
 
@@ -41,16 +40,15 @@ using VertexBufferPtr = IntrusivePtr<VertexBuffer>;
 class VertexBuffer : public BaseObject
 {
 public:
-
   /**
    * @copydoc PropertBuffer::New()
    */
-  static VertexBufferPtr New( Dali::Property::Map& format );
+  static VertexBufferPtr New(Dali::Property::Map& format);
 
   /**
    * @copydoc PropertBuffer::SetData()
    */
-  void SetData( const void* data, uint32_t size );
+  void SetData(const void* data, uint32_t size);
 
   /**
    * @copydoc PropertBuffer::GetSize()
@@ -58,7 +56,6 @@ public:
   uint32_t GetSize() const;
 
 public: // Default property extensions from Object
-
   /**
    * @brief Get the render thread side of the VertexBuffer
    *
@@ -81,23 +78,24 @@ private: // implementation
   /**
    * Second stage initialization
    */
-  void Initialize( Dali::Property::Map& format );
+  void Initialize(Dali::Property::Map& format);
 
 private: // unimplemented methods
-  VertexBuffer( const VertexBuffer& );
-  VertexBuffer& operator=( const VertexBuffer& );
+  VertexBuffer(const VertexBuffer&);
+  VertexBuffer& operator=(const VertexBuffer&);
 
-private: // data
-  EventThreadServices& mEventThreadServices;    ///<Used to send messages to the render thread via update thread
+private:                                      // data
+  EventThreadServices&  mEventThreadServices; ///<Used to send messages to the render thread via update thread
   Render::VertexBuffer* mRenderObject;        ///<Render side object
-  uint32_t mBufferFormatSize;
-  uint32_t mSize; ///< Number of elements in the buffer
+  uint32_t              mBufferFormatSize;
+  uint32_t              mSize; ///< Number of elements in the buffer
 };
 
 /**
  * Get the implementation type from a Property::Type
  */
-template<Property::Type type> struct PropertyImplementationType
+template<Property::Type type>
+struct PropertyImplementationType
 {
   // typedef ... Type; not defined, only support types declared below
 };
@@ -152,7 +150,7 @@ struct PropertyImplementationType<Property::ROTATION>
   using Type = Quaternion;
 };
 
-uint32_t GetPropertyImplementationSize( Property::Type& propertyType );
+uint32_t GetPropertyImplementationSize(Property::Type& propertyType);
 
 } // namespace Internal
 

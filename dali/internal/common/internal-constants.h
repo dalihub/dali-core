@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_CONSTANTS_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,8 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 // Constants used by renderers and actors to determine if something is visible.
 static constexpr float FULLY_OPAQUE(0.99f);      ///< Alpha values must drop below this, before an object is considered to be transparent.
 static constexpr float FULLY_TRANSPARENT(0.01f); ///< Alpha values must rise above this, before an object is considered to be visible.
@@ -31,6 +29,5 @@ static constexpr float FULLY_TRANSPARENT(0.01f); ///< Alpha values must rise abo
 } // namespace Internal
 
 } // namespace Dali
-
 
 #endif // DALI_INTERNAL_CONSTANTS_H

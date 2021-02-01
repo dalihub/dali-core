@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_FRAME_BUFFER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,13 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h> // DALI_ASSERT_ALWAYS
-#include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
-#include <dali/public-api/object/base-object.h>
-#include <dali/public-api/rendering/frame-buffer.h>
 #include <dali/devel-api/rendering/frame-buffer-devel.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/rendering/texture-impl.h>
+#include <dali/public-api/common/dali-common.h>   // DALI_ASSERT_ALWAYS
+#include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
+#include <dali/public-api/object/base-object.h>
+#include <dali/public-api/rendering/frame-buffer.h>
 
 namespace Dali
 {
@@ -44,7 +44,6 @@ using FrameBufferPtr = IntrusivePtr<FrameBuffer>;
 class FrameBuffer : public BaseObject
 {
 public:
-
   using Mask = Dali::FrameBuffer::Attachment::Mask;
 
   /**
@@ -55,7 +54,7 @@ public:
    * @param[in] attachments The attachments comprising the format of the FrameBuffer (bit-mask)
    * @return A smart-pointer to the newly allocated Texture.
    */
-  static FrameBufferPtr New( uint32_t width, uint32_t height, Mask attachments );
+  static FrameBufferPtr New(uint32_t width, uint32_t height, Mask attachments);
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -72,17 +71,17 @@ public:
   /**
    * @copydoc Dali::FrameBuffer::AttachColorTexture()
    */
-  void AttachColorTexture( TexturePtr texture, uint32_t mipmapLevel, uint32_t layer );
+  void AttachColorTexture(TexturePtr texture, uint32_t mipmapLevel, uint32_t layer);
 
   /**
    * @copydoc Dali::DevelFrameBuffer::AttachDepthTexture()
    */
-  void AttachDepthTexture( TexturePtr texture, uint32_t mipmapLevel );
+  void AttachDepthTexture(TexturePtr texture, uint32_t mipmapLevel);
 
   /**
    * @copydoc Dali::DevelFrameBuffer::AttachDepthStencilTexture()
    */
-  void AttachDepthStencilTexture( TexturePtr texture, uint32_t mipmapLevel );
+  void AttachDepthStencilTexture(TexturePtr texture, uint32_t mipmapLevel);
 
   /**
    * @copydoc Dali::FrameBuffer::GetColorTexture()
@@ -104,17 +103,16 @@ public:
    * @param[in] width The width size
    * @param[in] height The height size
    */
-  void SetSize( uint32_t width, uint32_t height );
+  void SetSize(uint32_t width, uint32_t height);
 
 private: // implementation
-
   /**
    * Constructor
    * @param[in] width       The width of the FrameBuffer
    * @param[in] height      The height of the FrameBuffer
    * @param[in] attachments The attachments comprising the format of the FrameBuffer (bit-mask)
    */
-  FrameBuffer( uint32_t width, uint32_t height, Mask attachments );
+  FrameBuffer(uint32_t width, uint32_t height, Mask attachments);
 
   /**
    * Second stage initialization of the Texture
@@ -122,25 +120,22 @@ private: // implementation
   void Initialize();
 
 protected:
-
 private: // unimplemented methods
+  FrameBuffer()                   = delete;
+  FrameBuffer(const FrameBuffer&) = delete;
+  FrameBuffer& operator=(const FrameBuffer&) = delete;
 
-  FrameBuffer() = delete;
-  FrameBuffer( const FrameBuffer& ) = delete;
-  FrameBuffer& operator=( const FrameBuffer& ) = delete;
-
-private: // data
-
+private:                                               // data
   Internal::EventThreadServices& mEventThreadServices; ///< Used to send messages to the render thread via update thread
   Internal::Render::FrameBuffer* mRenderObject;        ///< The Render::Texture associated to this texture
 
-  TexturePtr mColor[ Dali::DevelFrameBuffer::MAX_COLOR_ATTACHMENTS ];
+  TexturePtr mColor[Dali::DevelFrameBuffer::MAX_COLOR_ATTACHMENTS];
   TexturePtr mDepth;
   TexturePtr mStencil;
-  uint32_t mWidth;
-  uint32_t mHeight;
-  Mask mAttachments;                           ///< Bit-mask of type FrameBuffer::Attachment::Mask
-  uint8_t mColorAttachmentCount;
+  uint32_t   mWidth;
+  uint32_t   mHeight;
+  Mask       mAttachments; ///< Bit-mask of type FrameBuffer::Attachment::Mask
+  uint8_t    mColorAttachmentCount;
 };
 
 } // namespace Internal

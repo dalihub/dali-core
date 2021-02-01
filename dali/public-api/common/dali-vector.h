@@ -2,7 +2,7 @@
 #define DALI_VECTOR_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -843,11 +843,11 @@ public: // API
  * @param[in] vector The vector
  * @param[in] value The value to be removed.
  */
-template <class T, class U>
+template<class T, class U>
 inline void Erase(Dali::Vector<T>& vector, const U& value)
 {
   auto begin = vector.Begin();
-  auto end = vector.End();
+  auto end   = vector.End();
 
   vector.Erase(std::remove(begin, end, value), end);
 }
@@ -859,11 +859,11 @@ inline void Erase(Dali::Vector<T>& vector, const U& value)
  * @param[in] vector The vector
  * @param[in] predicate The predicate
  */
-template <class T, class Predicate>
+template<class T, class Predicate>
 inline void EraseIf(Dali::Vector<T>& vector, Predicate predicate)
 {
   auto begin = vector.Begin();
-  auto end = vector.End();
+  auto end   = vector.End();
 
   vector.Erase(std::remove_if(begin, end, predicate), end);
 }

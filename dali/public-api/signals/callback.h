@@ -2,7 +2,7 @@
 #define DALI_CALLBACK_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,7 +86,7 @@ public:
     {
       // convert function type
       using Function = R (*)(Args...);
-      returnVal       = (*(reinterpret_cast<Function>(callback.mFunction)))(args...);
+      returnVal      = (*(reinterpret_cast<Function>(callback.mFunction)))(args...);
     }
 
     return returnVal;
@@ -137,8 +137,6 @@ public:
   CallbackBase(Function function);
 
 protected: // Constructors for deriving classes
-
-
   /**
    * @brief Member function.
    * @SINCE_1_0.0
@@ -222,8 +220,8 @@ public: // Data for deriving classes & Dispatchers
  */
 inline bool operator==(const CallbackBase& lhs, const CallbackBase& rhs)
 {
-  if (lhs.mFunction == rhs.mFunction &&
-      lhs.mImpl.mObjectPointer == rhs.mImpl.mObjectPointer)
+  if(lhs.mFunction == rhs.mFunction &&
+     lhs.mImpl.mObjectPointer == rhs.mImpl.mObjectPointer)
   {
     return true;
   }

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENEGRAPH_PROPERTY_RESETTER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,10 @@
 // EXTERNAL INCLDUES
 #include <cstdint> // int8_t
 
-#include <dali/internal/update/animation/scene-graph-animator.h>
-#include <dali/internal/update/animation/scene-graph-constraint-base.h>
 #include <dali/internal/update/animation/property-accessor.h>
 #include <dali/internal/update/animation/property-component-accessor.h>
+#include <dali/internal/update/animation/scene-graph-animator.h>
+#include <dali/internal/update/animation/scene-graph-constraint-base.h>
 #include <dali/internal/update/common/property-owner.h>
 
 namespace Dali
@@ -32,7 +32,6 @@ namespace Internal
 {
 namespace SceneGraph
 {
-
 /**
  * Class to reset the watched property to it's base value. Used by UpdateManager to
  * reset animating and constrained properties. The derived classes AnimatorResetter and
@@ -47,7 +46,7 @@ public:
    */
   ~PropertyResetterBase() override
   {
-    if( mPropertyOwner != nullptr )
+    if(mPropertyOwner != nullptr)
     {
       mPropertyOwner->RemoveObserver(*this);
     }
@@ -67,19 +66,19 @@ public:
    * Reset the property to it's base value if the property owner is still alive and on stage
    * @param[in] updateBufferIndex the current buffer index
    */
-  void ResetToBaseValue( BufferIndex updateBufferIndex )
+  void ResetToBaseValue(BufferIndex updateBufferIndex)
   {
-    if( mPropertyOwner != nullptr && mActive )
+    if(mPropertyOwner != nullptr && mActive)
     {
       // If property-owner has disconnected, start aging.
       // We need to reset the property for two frames after disconnection to ensure both
       // property values are set appropriately.
-      if( mDisconnected )
+      if(mDisconnected)
       {
         --mActive;
       }
 
-      mBaseProperty->ResetToBaseValue( updateBufferIndex );
+      mBaseProperty->ResetToBaseValue(updateBufferIndex);
     }
   };
 
@@ -91,10 +90,10 @@ public:
    *
    * @param[in] owner The property owner
    */
-  void PropertyOwnerConnected( PropertyOwner& owner ) override
+  void PropertyOwnerConnected(PropertyOwner& owner) override
   {
     mDisconnected = false;
-    mActive = ACTIVE;
+    mActive       = ACTIVE;
   }
 
   /**
@@ -102,7 +101,7 @@ public:
    * @param[in] bufferIndex the current buffer index
    * @param[in] owner The property owner
    */
-  void PropertyOwnerDisconnected( BufferIndex bufferIndex, PropertyOwner& owner ) override
+  void PropertyOwnerDisconnected(BufferIndex bufferIndex, PropertyOwner& owner) override
   {
     mDisconnected = true;
   }
@@ -111,13 +110,13 @@ public:
    * Called shortly before the propertyOwner is destroyed
    * @param[in] owner The property owner
    */
-  void PropertyOwnerDestroyed( PropertyOwner& owner ) override
+  void PropertyOwnerDestroyed(PropertyOwner& owner) override
   {
-    mDisconnected = true;
+    mDisconnected  = true;
     mPropertyOwner = nullptr;
 
     // Don't need to wait another frame as the property is being destroyed
-    mActive = STOPPED;
+    mActive  = STOPPED;
     mRunning = STOPPED;
   }
 
@@ -133,7 +132,7 @@ public:
   virtual bool IsFinished()
   {
     bool finished = mRunning <= STOPPED;
-    if( mRunning == AGING )
+    if(mRunning == AGING)
     {
       mRunning = STOPPED;
     }
@@ -141,7 +140,6 @@ public:
   }
 
 protected:
-
   enum
   {
     STOPPED = 0,
@@ -155,32 +153,30 @@ protected:
    * @param[in] propertyOwner The property owner storing the base property
    * @param[in] baseProperty The base property
    */
-  PropertyResetterBase( PropertyOwner* propertyOwner,
-                        PropertyBase* baseProperty )
-  : mPropertyOwner( propertyOwner ),
-    mBaseProperty( baseProperty ),
-    mRunning( ACTIVE ),
-    mActive( ACTIVE ),
-    mDisconnected( false )
+  PropertyResetterBase(PropertyOwner* propertyOwner,
+                       PropertyBase*  baseProperty)
+  : mPropertyOwner(propertyOwner),
+    mBaseProperty(baseProperty),
+    mRunning(ACTIVE),
+    mActive(ACTIVE),
+    mDisconnected(false)
   {
   }
 
   PropertyOwner* mPropertyOwner; ///< The property owner
-  PropertyBase* mBaseProperty;   ///< The base property being animated or constrained
-  int8_t mRunning;                  ///< Used to determine if we should finish or not, 2 if running, 1 if aging, 0 if stopped
-  int8_t mActive;                   ///< 2 if active, 1 if aging, 0 if stopped
-  bool mDisconnected;            ///< True if the property owner has been disconnected
+  PropertyBase*  mBaseProperty;  ///< The base property being animated or constrained
+  int8_t         mRunning;       ///< Used to determine if we should finish or not, 2 if running, 1 if aging, 0 if stopped
+  int8_t         mActive;        ///< 2 if active, 1 if aging, 0 if stopped
+  bool           mDisconnected;  ///< True if the property owner has been disconnected
 };
-
 
 /**
  * Specialization of Resetter based on templated modifier type (either Constraint or Animator)
  */
-template< typename ModifierType>
+template<typename ModifierType>
 class Resetter : public PropertyResetterBase, public ModifierType::LifecycleObserver
 {
 public:
-
   /**
    * New method.
    * @param[in] propertyOwner  The owner of the property
@@ -188,13 +184,13 @@ public:
    * @param[in] modifier       The scene-graph animator/constraint of the property
    * @return the new property resetter
    */
-  static PropertyResetterBase* New( const PropertyOwner& propertyOwner,
-                                    const PropertyBase& baseProperty,
-                                    const ModifierType& modifier )
+  static PropertyResetterBase* New(const PropertyOwner& propertyOwner,
+                                   const PropertyBase&  baseProperty,
+                                   const ModifierType&  modifier)
   {
-    return new Resetter<ModifierType>( const_cast<PropertyOwner*>( &propertyOwner ),
-                                       const_cast<PropertyBase*>( &baseProperty ),
-                                       const_cast<ModifierType*>( &modifier ) );
+    return new Resetter<ModifierType>(const_cast<PropertyOwner*>(&propertyOwner),
+                                      const_cast<PropertyBase*>(&baseProperty),
+                                      const_cast<ModifierType*>(&modifier));
   }
 
   /**
@@ -204,7 +200,7 @@ public:
   {
     // Disconnect from modifier object. Although this resetter should match the lifecycle of the modifier object,
     // there are situations where it is deleted first (e.g. if the property owner is destroyed)
-    if( mModifier )
+    if(mModifier)
     {
       mModifier->RemoveLifecycleObserver(*this);
     }
@@ -217,11 +213,11 @@ private:
    * @param[in] baseProperty  The property being animated
    * @param[in] modifier      The scene-graph animator/constraint of the property
    */
-  Resetter( PropertyOwner* propertyOwner,
-            PropertyBase* baseProperty,
-            ModifierType* modifier )
-  : PropertyResetterBase( propertyOwner, baseProperty ),
-    mModifier( modifier )
+  Resetter(PropertyOwner* propertyOwner,
+           PropertyBase*  baseProperty,
+           ModifierType*  modifier)
+  : PropertyResetterBase(propertyOwner, baseProperty),
+    mModifier(modifier)
   {
     // Track the lifecycle of the modifying object
     mModifier->AddLifecycleObserver(*this);

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_CONTEXT_RECOVERY_INTERFACE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,26 +20,21 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 /**
  * Abstract interface for Context Recovery
  *
  */
 class ContextRecoveryInterface
 {
-
 public:
-
   /**
    * Restore the object after context loss
    */
   virtual void RecoverFromContextLoss() = 0;
 
 protected:
-
   /**
    * Constructor
    */
@@ -54,15 +49,12 @@ protected:
   }
 
 private:
-
   // Undefined copy constructor.
-  ContextRecoveryInterface( const ContextRecoveryInterface& );
+  ContextRecoveryInterface(const ContextRecoveryInterface&);
 
   // Undefined assignment operator.
-  ContextRecoveryInterface& operator=( const ContextRecoveryInterface& );
-
+  ContextRecoveryInterface& operator=(const ContextRecoveryInterface&);
 };
-
 
 } // namespace Internal
 

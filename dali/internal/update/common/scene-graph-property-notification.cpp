@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,45 +15,41 @@
  *
  */
 
-#include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/animation/property-constraint.h>
 #include <dali/internal/event/animation/property-input-accessor.h>
 #include <dali/internal/event/animation/property-input-indexer.h>
+#include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/update/common/property-base.h>
+#include <dali/internal/update/common/property-condition-functions.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/scene-graph-property-notification.h>
-#include <dali/internal/update/common/property-condition-functions.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace SceneGraph
 {
-
-PropertyNotification* PropertyNotification::New(Object& object,
-                                                Property::Index propertyIndex,
-                                                Property::Type propertyType,
-                                                int componentIndex,
-                                                ConditionType condition,
+PropertyNotification* PropertyNotification::New(Object&               object,
+                                                Property::Index       propertyIndex,
+                                                Property::Type        propertyType,
+                                                int                   componentIndex,
+                                                ConditionType         condition,
                                                 RawArgumentContainer& arguments,
-                                                NotifyMode notifyMode,
-                                                bool compare)
+                                                NotifyMode            notifyMode,
+                                                bool                  compare)
 {
-  return new PropertyNotification( object, propertyIndex, propertyType, componentIndex, condition, arguments, notifyMode, compare );
+  return new PropertyNotification(object, propertyIndex, propertyType, componentIndex, condition, arguments, notifyMode, compare);
 }
 
-
-PropertyNotification::PropertyNotification(Object& object,
-                                           Property::Index propertyIndex,
-                                           Property::Type propertyType,
-                                           int componentIndex,
-                                           ConditionType condition,
+PropertyNotification::PropertyNotification(Object&               object,
+                                           Property::Index       propertyIndex,
+                                           Property::Type        propertyType,
+                                           int                   componentIndex,
+                                           ConditionType         condition,
                                            RawArgumentContainer& arguments,
-                                           NotifyMode notifyMode,
-                                           bool compare)
+                                           NotifyMode            notifyMode,
+                                           bool                  compare)
 : mObject(&object),
   mPropertyIndex(propertyIndex),
   mPropertyType(propertyType),
@@ -62,7 +58,7 @@ PropertyNotification::PropertyNotification(Object& object,
   mConditionType(condition),
   mArguments(arguments),
   mValid(false),
-  mNotifyMode( Dali::PropertyNotification::DISABLED ),
+  mNotifyMode(Dali::PropertyNotification::DISABLED),
   mConditionFunction(nullptr)
 {
   SetNotifyMode(notifyMode);
@@ -91,7 +87,7 @@ PropertyNotification::PropertyNotification(Object& object,
     }
     case PropertyCondition::Step:
     {
-      if( compare == true )
+      if(compare == true)
       {
         mConditionFunction = Step::GetCompareFunction(mPropertyType);
       }
@@ -113,9 +109,9 @@ PropertyNotification::PropertyNotification(Object& object,
     }
   }
 
-  mProperty = mObject->GetSceneObjectInputProperty( mPropertyIndex );
+  mProperty                  = mObject->GetSceneObjectInputProperty(mPropertyIndex);
   int internalComponentIndex = mObject->GetPropertyComponentIndex(mPropertyIndex);
-  if( internalComponentIndex != Property::INVALID_COMPONENT_INDEX )
+  if(internalComponentIndex != Property::INVALID_COMPONENT_INDEX)
   {
     // override the one passed in
     mComponentIndex = internalComponentIndex;
@@ -124,42 +120,40 @@ PropertyNotification::PropertyNotification(Object& object,
 
 PropertyNotification::~PropertyNotification() = default;
 
-bool PropertyNotification::EvalFalse( const Dali::PropertyInput& value, RawArgumentContainer& arg )
+bool PropertyNotification::EvalFalse(const Dali::PropertyInput& value, RawArgumentContainer& arg)
 {
   return false;
 }
 
-void PropertyNotification::SetNotifyMode( NotifyMode notifyMode )
+void PropertyNotification::SetNotifyMode(NotifyMode notifyMode)
 {
   mNotifyMode = notifyMode;
 }
 
-bool PropertyNotification::Check( BufferIndex bufferIndex )
+bool PropertyNotification::Check(BufferIndex bufferIndex)
 {
   bool notifyRequired = false;
-  bool currentValid = false;
+  bool currentValid   = false;
 
-  if ( Property::INVALID_COMPONENT_INDEX != mComponentIndex )
+  if(Property::INVALID_COMPONENT_INDEX != mComponentIndex)
   {
     // Evaluate Condition
-    const PropertyInputAccessor component( mProperty, mComponentIndex );
-    const PropertyInputIndexer< PropertyInputAccessor > input( bufferIndex, &component );
+    const PropertyInputAccessor                       component(mProperty, mComponentIndex);
+    const PropertyInputIndexer<PropertyInputAccessor> input(bufferIndex, &component);
     currentValid = mConditionFunction(input, mArguments);
   }
   else
   {
     // Evaluate Condition
-    const PropertyInputIndexer< PropertyInputImpl > input( bufferIndex, mProperty );
+    const PropertyInputIndexer<PropertyInputImpl> input(bufferIndex, mProperty);
     currentValid = mConditionFunction(input, mArguments);
   }
 
-  if( mValid != currentValid
-      || ( currentValid && ( ( mConditionType == PropertyCondition::Step )
-                        || ( mConditionType == PropertyCondition::VariableStep ) ) ) )
+  if(mValid != currentValid || (currentValid && ((mConditionType == PropertyCondition::Step) || (mConditionType == PropertyCondition::VariableStep))))
   {
     mValid = currentValid;
     //  means don't notify so notifyRequired stays false
-    switch( mNotifyMode )
+    switch(mNotifyMode)
     {
       case Dali::PropertyNotification::DISABLED:
       {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,38 +20,36 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
-bool CompareTokens( const char * first, const char * second, uint32_t& size )
+bool CompareTokens(const char* first, const char* second, uint32_t& size)
 {
   size = 0;
-  while( ( *first != '\0' ) && ( *second != '\0' ) && ( *first != ',') && ( *second != ',') )
+  while((*first != '\0') && (*second != '\0') && (*first != ',') && (*second != ','))
   {
     ++size;
     char ca = *first;
     char cb = *second;
 
-    if( ( ( ca == '-' ) || ( ca == '_') ) &&
-        ( ( cb == '-' ) || ( cb == '_') ) )
+    if(((ca == '-') || (ca == '_')) &&
+       ((cb == '-') || (cb == '_')))
     {
       ++first;
       ++second;
       continue;
     }
 
-    if( ( 'A' <= ca ) && ( ca <= 'Z') )
+    if(('A' <= ca) && (ca <= 'Z'))
     {
-      ca = static_cast<char>( ca + ( 'a' - 'A' ) ); // don't expect overflow
+      ca = static_cast<char>(ca + ('a' - 'A')); // don't expect overflow
     }
 
-    if( ( 'A' <= cb ) && ( cb <= 'Z') )
+    if(('A' <= cb) && (cb <= 'Z'))
     {
-      cb = static_cast<char>( cb + ( 'a' - 'A' ) ); // don't expect overflow
+      cb = static_cast<char>(cb + ('a' - 'A')); // don't expect overflow
     }
 
-    if( ca != cb )
+    if(ca != cb)
     {
       return false;
     }
@@ -61,9 +59,9 @@ bool CompareTokens( const char * first, const char * second, uint32_t& size )
   }
 
   // enums can be comma separated so check ends and comma
-  if( ( ( *first == '\0' ) && ( *second == '\0' ) ) ||
-      ( ( *first == '\0' ) && ( *second == ','  ) ) ||
-      ( ( *first == ','  ) && ( *second == '\0' ) ) )
+  if(((*first == '\0') && (*second == '\0')) ||
+     ((*first == '\0') && (*second == ',')) ||
+     ((*first == ',') && (*second == '\0')))
   {
     return true;
   }

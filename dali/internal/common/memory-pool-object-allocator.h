@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_MEMORY_POOL_OBJECT_ALLOCATOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 /**
  * @brief Helper for allocating/deallocating objects using a memory pool.
  *
@@ -34,16 +32,15 @@ namespace Internal
  * The type may be a class or POD.
  *
  */
-template< typename T >
+template<typename T>
 class MemoryPoolObjectAllocator
 {
 public:
-
   /**
    * @brief Constructor
    */
   MemoryPoolObjectAllocator()
-  : mPool( nullptr )
+  : mPool(nullptr)
   {
     ResetMemoryPool();
   }
@@ -63,7 +60,7 @@ public:
    */
   T* Allocate()
   {
-    return new ( mPool->Allocate() ) T();
+    return new(mPool->Allocate()) T();
   }
 
   /**
@@ -73,7 +70,7 @@ public:
    */
   T* AllocateThreadSafe()
   {
-    return new ( mPool->AllocateThreadSafe() ) T();
+    return new(mPool->AllocateThreadSafe()) T();
   }
 
   /**
@@ -106,9 +103,9 @@ public:
    *
    * @param object Pointer to the object to delete
    */
-  void Free( T* object )
+  void Free(T* object)
   {
-    mPool->Free( object );
+    mPool->Free(object);
   }
 
   /**
@@ -118,9 +115,9 @@ public:
    *
    * @param object Pointer to the object to delete
    */
-  void FreeThreadSafe( T* object )
+  void FreeThreadSafe(T* object)
   {
-    mPool->FreeThreadSafe( object );
+    mPool->FreeThreadSafe(object);
   }
 
   /**
@@ -129,10 +126,10 @@ public:
    *
    * @param object Pointer to the object to delete
    */
-  void Destroy( T* object )
+  void Destroy(T* object)
   {
     object->~T();
-    mPool->Free( object );
+    mPool->Free(object);
   }
 
   /**
@@ -141,10 +138,10 @@ public:
    *
    * @param object Pointer to the object to delete
    */
-  void DestroyThreadSafe( T* object )
+  void DestroyThreadSafe(T* object)
   {
     object->~T();
-    mPool->FreeThreadSafe( object );
+    mPool->FreeThreadSafe(object);
   }
 
   /**
@@ -154,21 +151,18 @@ public:
   {
     delete mPool;
 
-    mPool = new FixedSizeMemoryPool( TypeSizeWithAlignment< T >::size );
+    mPool = new FixedSizeMemoryPool(TypeSizeWithAlignment<T>::size);
   }
 
 private:
+  // Undefined
+  MemoryPoolObjectAllocator(const MemoryPoolObjectAllocator& memoryPoolObjectAllocator);
 
   // Undefined
-  MemoryPoolObjectAllocator( const MemoryPoolObjectAllocator& memoryPoolObjectAllocator );
-
-  // Undefined
-  MemoryPoolObjectAllocator& operator=( const MemoryPoolObjectAllocator& memoryPoolObjectAllocator );
+  MemoryPoolObjectAllocator& operator=(const MemoryPoolObjectAllocator& memoryPoolObjectAllocator);
 
 private:
-
-  FixedSizeMemoryPool* mPool;      ///< Memory pool from which allocations are made
-
+  FixedSizeMemoryPool* mPool; ///< Memory pool from which allocations are made
 };
 
 } // namespace Internal

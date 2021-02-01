@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_VERTEX_BUFFER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,13 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/internal/common/const-string.h>
+#include <dali/internal/common/owner-pointer.h>
+#include <dali/internal/render/gl-resources/gpu-buffer.h>
+#include <dali/internal/render/renderers/render-sampler.h>
 #include <dali/public-api/actors/sampling.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/rendering/sampler.h>
-#include <dali/internal/common/owner-pointer.h>
-#include <dali/internal/render/renderers/render-sampler.h>
-#include <dali/internal/render/gl-resources/gpu-buffer.h>
-#include <dali/internal/common/const-string.h>
 
 namespace Dali
 {
@@ -32,11 +32,9 @@ namespace Internal
 {
 namespace Render
 {
-
 class VertexBuffer
 {
 public:
-
   struct Component
   {
     ConstString    name;
@@ -71,7 +69,7 @@ public:
    *
    * @param[in] format The format for the VertexBuffer
    */
-  void SetFormat( VertexBuffer::Format* format );
+  void SetFormat(VertexBuffer::Format* format);
 
   /**
    * @brief Set the data of the VertexBuffer
@@ -80,26 +78,26 @@ public:
    * @param[in] data The new data of the VertexBuffer
    * @param[in] size The new size of the buffer
    */
-  void SetData( Dali::Vector<uint8_t>* data, uint32_t size );
+  void SetData(Dali::Vector<uint8_t>* data, uint32_t size);
 
   /**
    * @brief Set the number of elements
    * @param[in] size The number of elements
    */
-  void SetSize( uint32_t size );
+  void SetSize(uint32_t size);
 
   /**
    * @brief Bind the property buffer
    * @param context The context to bind the the buffer
    * @param[in] target The binding point
    */
-  void BindBuffer( Context& context, GpuBuffer::Target target );
+  void BindBuffer(Context& context, GpuBuffer::Target target);
 
   /**
    * Perform the upload of the buffer only when requiered
    * @param[in] context The GL context
    */
-  bool Update( Context& context );
+  bool Update(Context& context);
 
   /**
    * Enable the vertex attributes for each vertex buffer from the corresponding
@@ -108,7 +106,7 @@ public:
    * @param[in] vAttributeLocation Vector containing attributes location for current program
    * @param[in] locationBase Index in vAttributeLocation corresponding to the first attribute defined by this buffer
    */
-  uint32_t EnableVertexAttributes( Context& context, Vector<GLint>& vAttributeLocation, uint32_t locationBase );
+  uint32_t EnableVertexAttributes(Context& context, Vector<GLint>& vAttributeLocation, uint32_t locationBase);
 
   /**
    * Get the number of attributes present in the buffer
@@ -116,8 +114,8 @@ public:
    */
   inline uint32_t GetAttributeCount() const
   {
-    DALI_ASSERT_DEBUG( mFormat && "Format should be set ");
-    return static_cast<uint32_t>( mFormat->components.size() );
+    DALI_ASSERT_DEBUG(mFormat && "Format should be set ");
+    return static_cast<uint32_t>(mFormat->components.size());
   }
 
   /**
@@ -125,9 +123,9 @@ public:
    * @param[in] index The index of the attribute
    * @return The name of the attribute
    */
-  inline ConstString GetAttributeName( uint32_t index ) const
+  inline ConstString GetAttributeName(uint32_t index) const
   {
-    DALI_ASSERT_DEBUG( mFormat && "Format should be set ");
+    DALI_ASSERT_DEBUG(mFormat && "Format should be set ");
     return mFormat->components[index].name;
   }
 
@@ -137,7 +135,7 @@ public:
    */
   inline uint32_t GetDataSize() const
   {
-    DALI_ASSERT_DEBUG( mFormat && "Format should be set ");
+    DALI_ASSERT_DEBUG(mFormat && "Format should be set ");
     return mFormat->size * mSize;
   }
 
@@ -147,7 +145,7 @@ public:
    */
   inline uint32_t GetElementSize() const
   {
-    DALI_ASSERT_DEBUG( mFormat && "Format should be set ");
+    DALI_ASSERT_DEBUG(mFormat && "Format should be set ");
     return mFormat->size;
   }
 
@@ -164,7 +162,7 @@ public:
    * Retrieve reference to the data storage vector
    * @return Reference to the data storage
    */
-  inline const Dali::Vector< uint8_t >& GetData() const
+  inline const Dali::Vector<uint8_t>& GetData() const
   {
     return *mData.Get();
   }
@@ -173,12 +171,12 @@ public:
    * Retrieve data writeable pointer ( direct access to the buffer data )
    * @return Pointer to data converted to requested type
    */
-  template <typename T>
+  template<typename T>
   inline T* GetDataTypedPtr()
   {
-    Dali::Vector< uint8_t >* data = mData.Release();
-    mData = data;
-    return reinterpret_cast<T*>( &data->operator[]( 0 ) );
+    Dali::Vector<uint8_t>* data = mData.Release();
+    mData                       = data;
+    return reinterpret_cast<T*>(&data->operator[](0));
   }
 
   inline const VertexBuffer::Format* GetFormat() const
@@ -187,12 +185,12 @@ public:
   }
 
 private:
-  OwnerPointer< VertexBuffer::Format >  mFormat;    ///< Format of the buffer
-  OwnerPointer< Dali::Vector< uint8_t > > mData;      ///< Data
-  OwnerPointer< GpuBuffer >               mGpuBuffer; ///< Pointer to the GpuBuffer associated with this RenderVertexBuffer
+  OwnerPointer<VertexBuffer::Format>   mFormat;    ///< Format of the buffer
+  OwnerPointer<Dali::Vector<uint8_t> > mData;      ///< Data
+  OwnerPointer<GpuBuffer>              mGpuBuffer; ///< Pointer to the GpuBuffer associated with this RenderVertexBuffer
 
-  uint32_t mSize;       ///< Number of Elements in the buffer
-  bool mDataChanged;  ///< Flag to know if data has changed in a frame
+  uint32_t mSize;        ///< Number of Elements in the buffer
+  bool     mDataChanged; ///< Flag to know if data has changed in a frame
 };
 
 } // namespace Render
@@ -200,6 +198,5 @@ private:
 } // namespace Internal
 
 } // namespace Dali
-
 
 #endif //  DALI_INTERNAL_RENDER_VERTEX_BUFFER_H

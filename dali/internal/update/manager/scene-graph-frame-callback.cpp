@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,57 +26,54 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace SceneGraph
 {
-
-FrameCallback* FrameCallback::New( FrameCallbackInterface& frameCallbackInterface )
+FrameCallback* FrameCallback::New(FrameCallbackInterface& frameCallbackInterface)
 {
-  return new FrameCallback( &frameCallbackInterface );
+  return new FrameCallback(&frameCallbackInterface);
 }
 
 FrameCallback::~FrameCallback()
 {
-  if( mUpdateProxy )
+  if(mUpdateProxy)
   {
-    mUpdateProxy->GetRootNode().RemoveObserver( *this );
+    mUpdateProxy->GetRootNode().RemoveObserver(*this);
   }
 
   {
-    Mutex::ScopedLock lock( mMutex );
-    if( mFrameCallbackInterface )
+    Mutex::ScopedLock lock(mMutex);
+    if(mFrameCallbackInterface)
     {
-      FrameCallbackInterface::Impl::Get( *mFrameCallbackInterface ).DisconnectFromSceneGraphObject();
+      FrameCallbackInterface::Impl::Get(*mFrameCallbackInterface).DisconnectFromSceneGraphObject();
     }
   }
 }
 
-void FrameCallback::ConnectToSceneGraph( UpdateManager& updateManager, TransformManager& transformManager, Node& rootNode )
+void FrameCallback::ConnectToSceneGraph(UpdateManager& updateManager, TransformManager& transformManager, Node& rootNode)
 {
-  mUpdateProxy = std::unique_ptr< UpdateProxy >( new UpdateProxy( updateManager, transformManager, rootNode ) );
-  rootNode.AddObserver( *this );
+  mUpdateProxy = std::unique_ptr<UpdateProxy>(new UpdateProxy(updateManager, transformManager, rootNode));
+  rootNode.AddObserver(*this);
 }
 
-bool FrameCallback::Update( BufferIndex bufferIndex, float elapsedSeconds, bool nodeHierarchyChanged )
+bool FrameCallback::Update(BufferIndex bufferIndex, float elapsedSeconds, bool nodeHierarchyChanged)
 {
   bool continueCalling = false;
-  if( mUpdateProxy )
+  if(mUpdateProxy)
   {
-    mUpdateProxy->SetCurrentBufferIndex( bufferIndex );
+    mUpdateProxy->SetCurrentBufferIndex(bufferIndex);
 
-    if( nodeHierarchyChanged )
+    if(nodeHierarchyChanged)
     {
       mUpdateProxy->NodeHierarchyChanged();
     }
 
-    Mutex::ScopedLock lock( mMutex );
-    if( mFrameCallbackInterface )
+    Mutex::ScopedLock lock(mMutex);
+    if(mFrameCallbackInterface)
     {
-      Dali::UpdateProxy updateProxy( *mUpdateProxy );
-      mFrameCallbackInterface->Update( updateProxy, elapsedSeconds );
+      Dali::UpdateProxy updateProxy(*mUpdateProxy);
+      mFrameCallbackInterface->Update(updateProxy, elapsedSeconds);
       continueCalling = true;
     }
   }
@@ -85,26 +82,26 @@ bool FrameCallback::Update( BufferIndex bufferIndex, float elapsedSeconds, bool 
 
 void FrameCallback::Invalidate()
 {
-  Mutex::ScopedLock lock( mMutex );
-  if( mFrameCallbackInterface )
+  Mutex::ScopedLock lock(mMutex);
+  if(mFrameCallbackInterface)
   {
-    FrameCallbackInterface::Impl::Get( *mFrameCallbackInterface ).DisconnectFromSceneGraphObject();
+    FrameCallbackInterface::Impl::Get(*mFrameCallbackInterface).DisconnectFromSceneGraphObject();
     mFrameCallbackInterface = nullptr;
   }
 }
 
-void FrameCallback::PropertyOwnerDestroyed( PropertyOwner& owner )
+void FrameCallback::PropertyOwnerDestroyed(PropertyOwner& owner)
 {
   Invalidate();
 }
 
-FrameCallback::FrameCallback( FrameCallbackInterface* frameCallbackInterface )
+FrameCallback::FrameCallback(FrameCallbackInterface* frameCallbackInterface)
 : mMutex(),
-  mFrameCallbackInterface( frameCallbackInterface )
+  mFrameCallbackInterface(frameCallbackInterface)
 {
-  if( frameCallbackInterface )
+  if(frameCallbackInterface)
   {
-    FrameCallbackInterface::Impl::Get( *mFrameCallbackInterface ).ConnectToSceneGraphObject( *this );
+    FrameCallbackInterface::Impl::Get(*mFrameCallbackInterface).ConnectToSceneGraphObject(*this);
   }
 }
 

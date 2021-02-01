@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_KEY_EVENT_PROCESSOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@
 
 namespace Dali
 {
-
 namespace Integration
 {
 struct KeyEvent;
@@ -30,7 +29,6 @@ struct KeyEvent;
 
 namespace Internal
 {
-
 class Scene;
 class Stage;
 
@@ -44,12 +42,11 @@ class Stage;
 class KeyEventProcessor
 {
 public:
-
   /**
    * Create a Key event processor.
    * @param[in] scene The scene the event processor belongs to.
    */
-  KeyEventProcessor( Scene& scene );
+  KeyEventProcessor(Scene& scene);
 
   /**
    * Non-virtual destructor; KeyEventProcessor is not a base class
@@ -63,7 +60,6 @@ public:
   void ProcessKeyEvent(const Integration::KeyEvent& event);
 
 private:
-
   // Undefined
   KeyEventProcessor(const KeyEventProcessor&);
 
@@ -71,7 +67,6 @@ private:
   KeyEventProcessor& operator=(const KeyEventProcessor& rhs);
 
 private:
-
   Scene& mScene; ///< Used to deliver key events
 };
 

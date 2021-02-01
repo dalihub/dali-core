@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,34 +22,30 @@
 #include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
+#include <dali/internal/event/common/property-helper.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/internal/event/common/property-helper.h>
-
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace
 {
-
 // Properties
 //              Name            Type   writable animatable constraint-input  enum for index-checking
 DALI_PROPERTY_TABLE_BEGIN
-DALI_PROPERTY( "value",        ARRAY,     true,    false,       false,        Dali::LinearConstrainer::Property::VALUE )
-DALI_PROPERTY( "progress",     ARRAY,     true,    false,       false,        Dali::LinearConstrainer::Property::PROGRESS )
-DALI_PROPERTY_TABLE_END( DEFAULT_OBJECT_PROPERTY_START_INDEX, LinearConstrainerDefaultProperties )
+DALI_PROPERTY("value", ARRAY, true, false, false, Dali::LinearConstrainer::Property::VALUE)
+DALI_PROPERTY("progress", ARRAY, true, false, false, Dali::LinearConstrainer::Property::PROGRESS)
+DALI_PROPERTY_TABLE_END(DEFAULT_OBJECT_PROPERTY_START_INDEX, LinearConstrainerDefaultProperties)
 
 BaseHandle Create()
 {
   return Dali::LinearConstrainer::New();
 }
 
-TypeRegistration mType( typeid( Dali::LinearConstrainer ), typeid( Dali::Handle ), Create, LinearConstrainerDefaultProperties );
+TypeRegistration mType(typeid(Dali::LinearConstrainer), typeid(Dali::Handle), Create, LinearConstrainerDefaultProperties);
 
 } //Unnamed namespace
 
@@ -65,36 +61,36 @@ LinearConstrainer::LinearConstrainer()
 
 LinearConstrainer::~LinearConstrainer() = default;
 
-Property::Value LinearConstrainer::GetDefaultProperty( Property::Index index ) const
+Property::Value LinearConstrainer::GetDefaultProperty(Property::Index index) const
 {
-  if( index == Dali::LinearConstrainer::Property::VALUE )
+  if(index == Dali::LinearConstrainer::Property::VALUE)
   {
-    Property::Value value( Property::ARRAY );
+    Property::Value  value(Property::ARRAY);
     Property::Array* array = value.GetArray();
-    uint32_t count = static_cast<uint32_t>( mValue.Size() );
+    uint32_t         count = static_cast<uint32_t>(mValue.Size());
 
-    if( array )
+    if(array)
     {
-      array->Reserve( count );
-      for( uint32_t i( 0 ); i != count; ++i )
+      array->Reserve(count);
+      for(uint32_t i(0); i != count; ++i)
       {
-        array->PushBack( mValue[i] );
+        array->PushBack(mValue[i]);
       }
     }
     return value;
   }
-  else if( index == Dali::LinearConstrainer::Property::PROGRESS )
+  else if(index == Dali::LinearConstrainer::Property::PROGRESS)
   {
-    Property::Value value( Property::ARRAY );
+    Property::Value  value(Property::ARRAY);
     Property::Array* array = value.GetArray();
-    uint32_t count = static_cast<uint32_t>( mProgress.Size() );
+    uint32_t         count = static_cast<uint32_t>(mProgress.Size());
 
-    if( array )
+    if(array)
     {
-      array->Reserve( count );
-      for( uint32_t i( 0 ); i != count; ++i )
+      array->Reserve(count);
+      for(uint32_t i(0); i != count; ++i)
       {
-        array->PushBack( mProgress[i] );
+        array->PushBack(mProgress[i]);
       }
     }
     return value;
@@ -103,51 +99,51 @@ Property::Value LinearConstrainer::GetDefaultProperty( Property::Index index ) c
   return Property::Value();
 }
 
-Property::Value LinearConstrainer::GetDefaultPropertyCurrentValue( Property::Index index ) const
+Property::Value LinearConstrainer::GetDefaultPropertyCurrentValue(Property::Index index) const
 {
-  return GetDefaultProperty( index ); // Event-side only properties
+  return GetDefaultProperty(index); // Event-side only properties
 }
 
-void LinearConstrainer::SetDefaultProperty( Property::Index index, const Property::Value& propertyValue )
+void LinearConstrainer::SetDefaultProperty(Property::Index index, const Property::Value& propertyValue)
 {
   const Property::Array* array = propertyValue.GetArray();
-  if( array )
+  if(array)
   {
-    uint32_t propertyArrayCount = static_cast<uint32_t>( array->Count() );
-    if( index == Dali::LinearConstrainer::Property::VALUE  )
+    uint32_t propertyArrayCount = static_cast<uint32_t>(array->Count());
+    if(index == Dali::LinearConstrainer::Property::VALUE)
     {
       mValue.Clear(); // remove old values
-      mValue.Resize( propertyArrayCount );
-      for( uint32_t i(0); i != propertyArrayCount; ++i )
+      mValue.Resize(propertyArrayCount);
+      for(uint32_t i(0); i != propertyArrayCount; ++i)
       {
-        array->GetElementAt( i ).Get( mValue[ i ] );
+        array->GetElementAt(i).Get(mValue[i]);
       }
     }
-    else if( index == Dali::LinearConstrainer::Property::PROGRESS  )
+    else if(index == Dali::LinearConstrainer::Property::PROGRESS)
     {
       mProgress.Clear(); // remove old values
-      mProgress.Resize( propertyArrayCount );
-      for( uint32_t i(0); i != propertyArrayCount; ++i )
+      mProgress.Resize(propertyArrayCount);
+      for(uint32_t i(0); i != propertyArrayCount; ++i)
       {
-        array->GetElementAt( i ).Get( mProgress[ i ] );
+        array->GetElementAt(i).Get(mProgress[i]);
       }
     }
   }
 }
 
-void LinearConstrainer::Apply( Property target, Property source, const Vector2& range, const Vector2& wrap)
+void LinearConstrainer::Apply(Property target, Property source, const Vector2& range, const Vector2& wrap)
 {
-  Dali::Constraint constraint = Dali::Constraint::New<float>( target.object, target.propertyIndex, LinearConstraintFunctor( mValue, mProgress, range, wrap ) );
-  constraint.AddSource( Dali::Source(source.object, source.propertyIndex ) );
+  Dali::Constraint constraint = Dali::Constraint::New<float>(target.object, target.propertyIndex, LinearConstraintFunctor(mValue, mProgress, range, wrap));
+  constraint.AddSource(Dali::Source(source.object, source.propertyIndex));
 
-  constraint.SetTag( static_cast<uint32_t>( reinterpret_cast<uintptr_t>( this ) ) ); // taking 32bits of this as tag
-  constraint.SetRemoveAction( Dali::Constraint::DISCARD );
+  constraint.SetTag(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(this))); // taking 32bits of this as tag
+  constraint.SetRemoveAction(Dali::Constraint::DISCARD);
   constraint.Apply();
 
   //Start observing the object
-  Observe( target.object );
+  Observe(target.object);
 }
 
-} // Internal
+} // namespace Internal
 
-} // Dali
+} // namespace Dali

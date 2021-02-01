@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,18 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/internal/event/actors/layer-impl.h>
+#include <dali/internal/update/nodes/scene-graph-layer.h>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace SceneGraph
 {
-
 SceneGraph::Layer* Layer::New()
 {
   // Layers are currently heap allocated, unlike Nodes which are in a memory pool
@@ -40,30 +37,30 @@ SceneGraph::Layer* Layer::New()
 
 Layer::Layer()
 : Node(),
-  mSortFunction( Internal::Layer::ZValue ),
-  mClippingBox( 0,0,0,0 ),
-  mLastCamera( nullptr ),
-  mBehavior( Dali::Layer::LAYER_UI ),
-  mIsClipping( false ),
-  mDepthTestDisabled( true ),
-  mIsDefaultSortFunction( true )
+  mSortFunction(Internal::Layer::ZValue),
+  mClippingBox(0, 0, 0, 0),
+  mLastCamera(nullptr),
+  mBehavior(Dali::Layer::LAYER_UI),
+  mIsClipping(false),
+  mDepthTestDisabled(true),
+  mIsDefaultSortFunction(true)
 {
   // set a flag the node to say this is a layer
   mIsLayer = true;
 
   // layer starts off dirty
-  mAllChildTransformsClean[ 0 ] = false;
-  mAllChildTransformsClean[ 1 ] = false;
+  mAllChildTransformsClean[0] = false;
+  mAllChildTransformsClean[1] = false;
 }
 
 Layer::~Layer() = default;
 
-void Layer::SetSortFunction( Dali::Layer::SortFunctionType function )
+void Layer::SetSortFunction(Dali::Layer::SortFunctionType function)
 {
-  if( mSortFunction != function )
+  if(mSortFunction != function)
   {
     // is a custom sort function used
-    if( function != Internal::Layer::ZValue )
+    if(function != Internal::Layer::ZValue)
     {
       mIsDefaultSortFunction = false;
     }
@@ -73,9 +70,9 @@ void Layer::SetSortFunction( Dali::Layer::SortFunctionType function )
     }
 
     // changing the sort function makes the layer dirty
-    mAllChildTransformsClean[ 0 ] = false;
-    mAllChildTransformsClean[ 1 ] = false;
-    mSortFunction = function;
+    mAllChildTransformsClean[0] = false;
+    mAllChildTransformsClean[1] = false;
+    mSortFunction               = function;
   }
 }
 
@@ -89,12 +86,12 @@ void Layer::SetClippingBox(const Dali::ClippingBox& box)
   mClippingBox.Set(box.x, box.y, box.width, box.height);
 }
 
-void Layer::SetBehavior( Dali::Layer::Behavior behavior )
+void Layer::SetBehavior(Dali::Layer::Behavior behavior)
 {
   mBehavior = behavior;
 }
 
-void Layer::SetDepthTestDisabled( bool disable )
+void Layer::SetDepthTestDisabled(bool disable)
 {
   mDepthTestDisabled = disable;
 }

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_UPDATE_MESSAGE_QUEUE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@
 
 namespace Dali
 {
-
 namespace Integration
 {
 class RenderController;
@@ -39,24 +38,21 @@ namespace SceneGraph
 class SceneGraphBuffers;
 }
 
-
 namespace Update
 {
-
 /**
  * Used by UpdateManager to receive messages from the event-thread.
  */
 class MessageQueue
 {
 public:
-
   /**
    * Create a new UpdateMessageQueue.
    * @param[in] renderController After messages are flushed, we request a render from the RenderController.
    * @param[in] sceneGraphBuffers Used to keep track of which buffers are being written or read.
    */
-  MessageQueue( Integration::RenderController& renderController,
-                const SceneGraph::SceneGraphBuffers& sceneGraphBuffers );
+  MessageQueue(Integration::RenderController&       renderController,
+               const SceneGraph::SceneGraphBuffers& sceneGraphBuffers);
 
   /**
    * Destructor
@@ -74,7 +70,7 @@ public:
    * @param[in] updateScene If set to true, denotes that the message will cause the scene graph node tree to require an update
    * @return A pointer to the first char allocated for the message
    */
-  uint32_t* ReserveMessageSlot( uint32_t size, bool updateScene );
+  uint32_t* ReserveMessageSlot(uint32_t size, bool updateScene);
 
   /**
    * Flushes the message queue
@@ -89,7 +85,7 @@ public:
    * @param updateBufferIndex to use
    * @return true if the scene graph node tree is updated
    */
-  bool ProcessMessages( BufferIndex updateBufferIndex );
+  bool ProcessMessages(BufferIndex updateBufferIndex);
 
   /**
    * Query whether the queue was empty this frame.
@@ -104,22 +100,19 @@ public:
   bool IsSceneUpdateRequired() const;
 
 private:
-
   /**
    * Helper to call Process and destructor on each queued message
    * @param[in] minorQueue The queue to process.
    */
-  void ProcessMinorQueue( char* minorQueue );
+  void ProcessMinorQueue(char* minorQueue);
 
 private:
-
   // Not copyable:
-  MessageQueue() = delete;
-  MessageQueue ( const MessageQueue& rhs ) = delete;
-  MessageQueue& operator=( const MessageQueue& rhs ) = delete;
+  MessageQueue()                        = delete;
+  MessageQueue(const MessageQueue& rhs) = delete;
+  MessageQueue& operator=(const MessageQueue& rhs) = delete;
 
 private:
-
   struct Impl;
   Impl* mImpl;
 };

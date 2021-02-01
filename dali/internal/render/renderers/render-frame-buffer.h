@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_FRAME_BUFFER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/rendering/frame-buffer.h>
 #include <dali/devel-api/rendering/frame-buffer-devel.h>
+#include <dali/integration-api/gl-defines.h>
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/renderers/render-sampler.h>
-#include <dali/integration-api/gl-defines.h>
+#include <dali/public-api/rendering/frame-buffer.h>
 
 namespace Dali
 {
@@ -37,11 +37,10 @@ class Texture;
 class FrameBuffer
 {
 public:
-
   /**
    * Constructor
    */
-  FrameBuffer( uint32_t width, uint32_t height, Mask attachments );
+  FrameBuffer(uint32_t width, uint32_t height, Mask attachments);
 
   /**
    * Destructor
@@ -52,13 +51,13 @@ public:
    * Creates a FrameBuffer object in the GPU.
    * @param[in] context The GL context
    */
-  virtual void Initialize( Context& context );
+  virtual void Initialize(Context& context);
 
   /**
    * Deletes the framebuffer object from the GPU
    * @param[in] context The GL context
    */
-  virtual void Destroy( Context& context );
+  virtual void Destroy(Context& context);
 
   /**
    * Called by RenderManager to inform the framebuffer that the context has been destroyed
@@ -69,7 +68,7 @@ public:
    * @brief Bind the framebuffer
    * @param[in] context The GL context
    */
-  virtual void Bind( Context& context );
+  virtual void Bind(Context& context);
 
   /**
    * @brief Get the width of the FrameBuffer
@@ -91,7 +90,7 @@ public:
    * @param[in] layer Indicates which layer of a cube map or array texture to attach. Unused for 2D textures
    * @note A maximum of Dali::FrameBuffer::MAX_COLOR_ATTACHMENTS are supported.
    */
-  void AttachColorTexture( Context& context, Render::Texture* texture, uint32_t mipmapLevel, uint32_t layer );
+  void AttachColorTexture(Context& context, Render::Texture* texture, uint32_t mipmapLevel, uint32_t layer);
 
   /**
    * @brief Attaches a texture for the depth rendering. This API is valid only for frame buffer with DEPTH attachments.
@@ -99,7 +98,7 @@ public:
    * @param[in] texture The texture that will be used as output when rendering
    * @param[in] mipmapLevel The mipmap of the texture to be attached
    */
-  void AttachDepthTexture( Context& context, Render::Texture* texture, uint32_t mipmapLevel );
+  void AttachDepthTexture(Context& context, Render::Texture* texture, uint32_t mipmapLevel);
 
   /**
    * @brief Attaches a texture for the depth/stencil rendering. This API is valid only for frame buffer with DEPTH_STENCIL attachments.
@@ -107,41 +106,45 @@ public:
    * @param[in] texture The texture that will be used as output when rendering
    * @param[in] mipmapLevel The mipmap of the texture to be attached
    */
-  void AttachDepthStencilTexture( Context& context, Render::Texture* texture, uint32_t mipmapLevel );
+  void AttachDepthStencilTexture(Context& context, Render::Texture* texture, uint32_t mipmapLevel);
 
   /**
    * @brief Get the number of textures bound to this frame buffer as color attachments.
    * @return The number of color attachments.
    */
-  uint8_t GetColorAttachmentCount() const { return mColorAttachmentCount; }
+  uint8_t GetColorAttachmentCount() const
+  {
+    return mColorAttachmentCount;
+  }
 
   /**
    * @brief Get the id (OpenGL handle) of the texture bound to this frame buffer as color attachment @a index.
    * @return The texture id.
    */
-  GLuint GetTextureId(uint8_t index) { return mTextureId[index]; };
+  GLuint GetTextureId(uint8_t index)
+  {
+    return mTextureId[index];
+  };
 
 private:
-
   /**
    * @brief Undefined copy constructor. FrameBuffer cannot be copied
    */
-  FrameBuffer( const FrameBuffer& rhs ) = delete;
+  FrameBuffer(const FrameBuffer& rhs) = delete;
 
   /**
    * @brief Undefined assignment operator. FrameBuffer cannot be copied
    */
-  FrameBuffer& operator=( const FrameBuffer& rhs ) = delete;
+  FrameBuffer& operator=(const FrameBuffer& rhs) = delete;
 
 private:
-
-  GLuint mId;
-  GLuint mTextureId[ Dali::DevelFrameBuffer::MAX_COLOR_ATTACHMENTS ];
-  GLuint mDepthBuffer;
-  GLuint mStencilBuffer;
+  GLuint   mId;
+  GLuint   mTextureId[Dali::DevelFrameBuffer::MAX_COLOR_ATTACHMENTS];
+  GLuint   mDepthBuffer;
+  GLuint   mStencilBuffer;
   uint32_t mWidth;
   uint32_t mHeight;
-  uint8_t mColorAttachmentCount;
+  uint8_t  mColorAttachmentCount;
 };
 
 } // namespace Render
@@ -149,6 +152,5 @@ private:
 } // namespace Internal
 
 } // namespace Dali
-
 
 #endif // DALI_INTERNAL_RENDER_FRAME_BUFFER_H

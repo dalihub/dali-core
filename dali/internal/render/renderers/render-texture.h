@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_TEXTURE_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,17 +18,17 @@
  */
 
 // EXTERNAL INCLUDES
-#include <string>
 #include <cstdint> // uint16_t, uint32_t
+#include <string>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/images/image-operations.h> // Dali::ImageDimensions
-#include <dali/public-api/rendering/sampler.h>
-#include <dali/public-api/rendering/texture.h>
+#include <dali/integration-api/gl-defines.h>
 #include <dali/internal/event/rendering/texture-impl.h>
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/renderers/render-sampler.h>
-#include <dali/integration-api/gl-defines.h>
+#include <dali/public-api/images/image-operations.h> // Dali::ImageDimensions
+#include <dali/public-api/rendering/sampler.h>
+#include <dali/public-api/rendering/texture.h>
 
 namespace Dali
 {
@@ -49,13 +49,13 @@ public:
    * @param[in] format The format of the pixel data
    * @param[in] size The size of the texture
    */
-  Texture( Type type, Pixel::Format format, ImageDimensions size );
+  Texture(Type type, Pixel::Format format, ImageDimensions size);
 
   /**
    * Constructor from native image
    * @param[in] nativeImageInterface The native image
    */
-  Texture( NativeImageInterfacePtr nativeImageInterface );
+  Texture(NativeImageInterfacePtr nativeImageInterface);
 
   /**
    * Destructor
@@ -67,13 +67,13 @@ public:
    * Creates the texture and reserves memory for the first mipmap level
    * @param[in] context The GL context
    */
-  void Initialize( Context& context );
+  void Initialize(Context& context);
 
   /**
    * Deletes the texture from the GPU
    * @param[in] context The GL context
    */
-  void Destroy( Context& context );
+  void Destroy(Context& context);
 
   /**
    * Called by RenderManager to inform the texture that the context has been destroyed
@@ -86,7 +86,7 @@ public:
    * @param[in] pixelData A pixel data object
    * @param[in] params Upload parameters. See UploadParams
    */
-  void Upload( Context& context, PixelDataPtr pixelData, const Internal::Texture::UploadParams& params );
+  void Upload(Context& context, PixelDataPtr pixelData, const Internal::Texture::UploadParams& params);
 
   /**
    * Bind the texture to the given texture unit and applies the given sampler
@@ -95,13 +95,13 @@ public:
    * @param[in] sampler The sampler to be used with the texture
    * @return true if the bind succeeded, false otherwise
    */
-  bool Bind( Context& context, uint32_t textureUnit, Render::Sampler* sampler );
+  bool Bind(Context& context, uint32_t textureUnit, Render::Sampler* sampler);
 
   /**
    * Auto generates mipmaps for the texture
    * @param[in] context The GL context
    */
-  void GenerateMipmaps( Context& context );
+  void GenerateMipmaps(Context& context);
 
   /**
    * Retrieve wheter the texture has an alpha channel
@@ -146,36 +146,32 @@ public:
   }
 
 private:
-
   /**
    * Helper method to apply a sampler to the texture
    * @param[in] context The GL context
    * @param[in] sampler The sampler
    */
-  void ApplySampler( Context& context, Render::Sampler* sampler );
+  void ApplySampler(Context& context, Render::Sampler* sampler);
 
-  NativeImageInterfacePtr mNativeImage; ///< Pointer to native image
-  Render::Sampler mSampler;             ///< The current sampler state
-  GLuint mId;                           ///< Id of the texture
-  GLuint mTarget;                       ///< Specifies the target to which the texture is bound.
-  GLint mGlInternalFormat;              ///< The gl internal format of the pixel data
-  GLenum mGlFormat;                     ///< The gl format of the pixel data
-  GLenum mPixelDataType;                ///< The data type of the pixel data
-  uint16_t mWidth;                      ///< Width of the texture
-  uint16_t mHeight;                     ///< Height of the texture
-  uint16_t mMaxMipMapLevel;             ///< Maximum mipmap level
-  Type mType:3;                         ///< Type of the texture
-  bool mHasAlpha : 1;                   ///< Whether the format has an alpha channel
-  bool mIsCompressed : 1;               ///< Whether the format is compressed
-
+  NativeImageInterfacePtr mNativeImage;      ///< Pointer to native image
+  Render::Sampler         mSampler;          ///< The current sampler state
+  GLuint                  mId;               ///< Id of the texture
+  GLuint                  mTarget;           ///< Specifies the target to which the texture is bound.
+  GLint                   mGlInternalFormat; ///< The gl internal format of the pixel data
+  GLenum                  mGlFormat;         ///< The gl format of the pixel data
+  GLenum                  mPixelDataType;    ///< The data type of the pixel data
+  uint16_t                mWidth;            ///< Width of the texture
+  uint16_t                mHeight;           ///< Height of the texture
+  uint16_t                mMaxMipMapLevel;   ///< Maximum mipmap level
+  Type                    mType : 3;         ///< Type of the texture
+  bool                    mHasAlpha : 1;     ///< Whether the format has an alpha channel
+  bool                    mIsCompressed : 1; ///< Whether the format is compressed
 };
-
 
 } // namespace Render
 
 } // namespace Internal
 
 } // namespace Dali
-
 
 #endif //  DALI_INTERNAL_RENDER_TEXTURE_H

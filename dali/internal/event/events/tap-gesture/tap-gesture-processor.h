@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TAP_GESTURE_EVENT_PROCESSOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,16 +19,14 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/events/tap-gesture/tap-gesture-detector-impl.h>
-#include <dali/internal/event/events/gesture-processor.h>
 #include <dali/internal/event/events/actor-observer.h>
+#include <dali/internal/event/events/gesture-processor.h>
+#include <dali/internal/event/events/tap-gesture/tap-gesture-detector-impl.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 class Scene;
 class Stage;
 class Actor;
@@ -46,7 +44,6 @@ struct TapGestureEvent;
 class TapGestureProcessor : public GestureProcessor, public RecognizerObserver<TapGestureEvent>
 {
 public:
-
   /**
    * Create a tap gesture processor.
    */
@@ -58,13 +55,12 @@ public:
   ~TapGestureProcessor() override;
 
 public: // To be called by GestureEventProcessor
-
   /**
    * This method is called whenever a tap gesture event occurs.
    * @param[in] scene The scene the tap gesture event occurs in.
    * @param[in] tapEvent The event that has occurred.
    */
-  void Process( Scene& scene, const TapGestureEvent& event) override;
+  void Process(Scene& scene, const TapGestureEvent& event) override;
 
   /**
    * Adds a gesture detector to this gesture processor.
@@ -89,13 +85,11 @@ public: // To be called by GestureEventProcessor
   void GestureDetectorUpdated(TapGestureDetector* gestureDetector);
 
 private:
-
   // Undefined
   TapGestureProcessor(const TapGestureProcessor&);
   TapGestureProcessor& operator=(const TapGestureProcessor& rhs);
 
 private:
-
   /**
    * Iterates through our GestureDetectors and determines if we need to ask the adaptor to update
    * its detection policy.  If it does, it sends the appropriate gesture update request to adaptor.
@@ -107,20 +101,21 @@ private:
   /**
    * @copydoc GestureProcessor::OnGesturedActorStageDisconnection()
    */
-  void OnGesturedActorStageDisconnection() override { /* Nothing to do */ }
+  void OnGesturedActorStageDisconnection() override
+  { /* Nothing to do */
+  }
 
   /**
    * @copydoc GestureProcessor::CheckGestureDetector()
    */
-  bool CheckGestureDetector( GestureDetector* detector, Actor* actor ) override;
+  bool CheckGestureDetector(GestureDetector* detector, Actor* actor) override;
 
   /**
    * @copydoc GestureProcessor::EmitGestureSignal()
    */
-  void EmitGestureSignal( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates ) override;
+  void EmitGestureSignal(Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates) override;
 
 private:
-
   TapGestureDetectorContainer mTapGestureDetectors;
 
   unsigned int mMinTapsRequired;
@@ -128,9 +123,9 @@ private:
   unsigned int mMinTouchesRequired;
   unsigned int mMaxTouchesRequired;
 
-  ActorObserver mCurrentTapActor; ///< Observer for the current gesture actor
-  const TapGestureEvent* mCurrentTapEvent; ///< Pointer to current TapEvent, used when calling ProcessAndEmit()
-  bool mPossibleProcessed; ///< Indication of whether we've processed a touch down for this gestuee
+  ActorObserver          mCurrentTapActor;   ///< Observer for the current gesture actor
+  const TapGestureEvent* mCurrentTapEvent;   ///< Pointer to current TapEvent, used when calling ProcessAndEmit()
+  bool                   mPossibleProcessed; ///< Indication of whether we've processed a touch down for this gestuee
 };
 
 } // namespace Internal

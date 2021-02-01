@@ -2,7 +2,7 @@
 #define DALI_BASE_OBJECT_IMPL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,32 +23,29 @@
 
 namespace Dali
 {
-
 /**
  * @brief Holds the Implementation for the BaseObject class
  */
 class BaseObject::Impl
 {
-
 public:
-
   /**
    * @brief Retrieves the implementation of the internal BaseObject class.
    * @param[in] internalBaseObject A ref to the BaseObject whose internal implementation is required
    * @return The internal implementation
    */
-  static BaseObject::Impl& Get( BaseObject& baseObject );
+  static BaseObject::Impl& Get(BaseObject& baseObject);
 
   /**
    * @copydoc Get( BaseObject& )
    */
-  static const BaseObject::Impl& Get( const BaseObject& baseObject );
+  static const BaseObject::Impl& Get(const BaseObject& baseObject);
 
   /**
    * @brief Constructor.
    * @param[in] baseObject The base object which owns this implementation
    */
-  Impl( BaseObject& baseObject );
+  Impl(BaseObject& baseObject);
 
   /**
    * @brief Destructor.
@@ -58,15 +55,13 @@ public:
   class Observer
   {
   public:
-
     /**
      * Called shortly before the object itself is destroyed; no further callbacks will be received.
      * @param[in] object The base object.
      */
-    virtual void ObjectDestroyed( BaseObject& object ) = 0;
+    virtual void ObjectDestroyed(BaseObject& object) = 0;
 
   protected:
-
     /**
      * Virtual destructor
      */
@@ -77,18 +72,17 @@ public:
    * Add an observer to the object.
    * @param[in] observer The observer to add.
    */
-  void AddObserver( Observer& observer );
+  void AddObserver(Observer& observer);
 
   /**
    * Remove an observer from the object
    * @pre The observer has already been added.
    * @param[in] observer The observer to remove.
    */
-  void RemoveObserver( Observer& observer );
+  void RemoveObserver(Observer& observer);
 
 private:
-
-  BaseObject& mBaseObject;
+  BaseObject&             mBaseObject;
   Dali::Vector<Observer*> mObservers;
 };
 

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_CONSTRAINT_BASE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,24 +19,25 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/animation/constraint.h>
-#include <dali/public-api/common/dali-common.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/event-thread-services.h>
+#include <dali/internal/update/animation/scene-graph-constraint-declarations.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
-#include <dali/internal/update/animation/scene-graph-constraint-declarations.h>
+#include <dali/public-api/animation/constraint.h>
+#include <dali/public-api/common/dali-common.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 // value types used by messages
-template <> struct ParameterType< Dali::Constraint::RemoveAction >
-: public BasicType< Dali::Constraint::RemoveAction > {};
+template<>
+struct ParameterType<Dali::Constraint::RemoveAction>
+: public BasicType<Dali::Constraint::RemoveAction>
+{
+};
 
 namespace SceneGraph
 {
@@ -76,7 +77,7 @@ public:
    * @param ownerContainer the properties to constraint
    * @oparam removeAction perform when removed
    */
-  ConstraintBase( PropertyOwnerContainer& ownerContainer, RemoveAction removeAction );
+  ConstraintBase(PropertyOwnerContainer& ownerContainer, RemoveAction removeAction);
 
   /**
    * Virtual destructor.
@@ -86,7 +87,7 @@ public:
   /**
    * Property resetter observes the lifecycle of this object
    */
-  void AddLifecycleObserver( LifecycleObserver& observer )
+  void AddLifecycleObserver(LifecycleObserver& observer)
   {
     mLifecycleObserver = &observer;
   }
@@ -94,7 +95,7 @@ public:
   /**
    * Property resetter observers the lifecycle of this object
    */
-  void RemoveLifecycleObserver( LifecycleObserver& observer )
+  void RemoveLifecycleObserver(LifecycleObserver& observer)
   {
     mLifecycleObserver = nullptr;
   }
@@ -113,7 +114,7 @@ public:
   /**
    * @copydoc Dali::Constraint::SetRemoveAction()
    */
-  void SetRemoveAction( RemoveAction action )
+  void SetRemoveAction(RemoveAction action)
   {
     mRemoveAction = action;
   }
@@ -130,7 +131,7 @@ public:
    * Constrain the associated scene object.
    * @param[in] updateBufferIndex The current update buffer index.
    */
-  virtual void Apply( BufferIndex updateBufferIndex ) = 0;
+  virtual void Apply(BufferIndex updateBufferIndex) = 0;
 
   /**
    * Helper for internal test cases; only available for debug builds.
@@ -145,16 +146,15 @@ public:
   static uint32_t GetTotalInstanceCount();
 
 private:
-
   /**
    * Helper to start observing property owners
    */
   void StartObservation()
   {
-    const PropertyOwnerIter end =  mObservedOwners.End();
-    for( PropertyOwnerIter iter = mObservedOwners.Begin(); end != iter; ++iter )
+    const PropertyOwnerIter end = mObservedOwners.End();
+    for(PropertyOwnerIter iter = mObservedOwners.Begin(); end != iter; ++iter)
     {
-      (*iter)->AddObserver( *this );
+      (*iter)->AddObserver(*this);
     }
   }
 
@@ -163,10 +163,10 @@ private:
    */
   void StopObservation()
   {
-    const PropertyOwnerIter end =  mObservedOwners.End();
-    for( PropertyOwnerIter iter = mObservedOwners.Begin(); end != iter; ++iter )
+    const PropertyOwnerIter end = mObservedOwners.End();
+    for(PropertyOwnerIter iter = mObservedOwners.Begin(); end != iter; ++iter)
     {
-      (*iter)->RemoveObserver( *this );
+      (*iter)->RemoveObserver(*this);
     }
 
     mObservedOwners.Clear();
@@ -175,16 +175,16 @@ private:
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerConnected()
    */
-  void PropertyOwnerConnected( PropertyOwner& owner ) override
+  void PropertyOwnerConnected(PropertyOwner& owner) override
   {
   }
 
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerDisconnected()
    */
-  void PropertyOwnerDisconnected( BufferIndex bufferIndex, PropertyOwner& owner ) override
+  void PropertyOwnerDisconnected(BufferIndex bufferIndex, PropertyOwner& owner) override
   {
-    if ( !mDisconnected )
+    if(!mDisconnected)
     {
       // Stop observing property owners
       StopObservation();
@@ -199,16 +199,16 @@ private:
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerDestroyed()
    */
-  void PropertyOwnerDestroyed( PropertyOwner& owner ) override
+  void PropertyOwnerDestroyed(PropertyOwner& owner) override
   {
-    if ( !mDisconnected )
+    if(!mDisconnected)
     {
       // Discard pointer to destroyed property owner. Otherwise StopObservation() would crash when trying to remove
       //the constraint from the destroyed PropertyOwner's observers list
-      PropertyOwnerIter iter = std::find( mObservedOwners.Begin(), mObservedOwners.End(), &owner );
-      if( mObservedOwners.End() != iter )
+      PropertyOwnerIter iter = std::find(mObservedOwners.Begin(), mObservedOwners.End(), &owner);
+      if(mObservedOwners.End() != iter)
       {
-        mObservedOwners.Erase( iter );
+        mObservedOwners.Erase(iter);
       }
 
       // Stop observing the rest of property owners
@@ -218,7 +218,6 @@ private:
       OnDisconnect();
 
       mDisconnected = true;
-
     }
   }
 
@@ -228,34 +227,32 @@ private:
   virtual void OnDisconnect() = 0;
 
 protected:
-
   RemoveAction mRemoveAction;
 
-  bool mFirstApply   : 1;
+  bool mFirstApply : 1;
   bool mDisconnected : 1;
 
 private:
-
-  PropertyOwnerContainer mObservedOwners; ///< A set of pointers to each observed object. Not owned.
-  LifecycleObserver* mLifecycleObserver; ///< Resetter observers this object
+  PropertyOwnerContainer mObservedOwners;    ///< A set of pointers to each observed object. Not owned.
+  LifecycleObserver*     mLifecycleObserver; ///< Resetter observers this object
 
 #ifdef DEBUG_ENABLED
-  static uint32_t mCurrentInstanceCount;  ///< The current number of Constraint instances in existence.
-  static uint32_t mTotalInstanceCount;    ///< The total number of Constraint instances created during the Dali core lifetime.
+  static uint32_t mCurrentInstanceCount; ///< The current number of Constraint instances in existence.
+  static uint32_t mTotalInstanceCount;   ///< The total number of Constraint instances created during the Dali core lifetime.
 #endif
 };
 
 // Messages for ConstraintBase
 
-inline void  SetRemoveActionMessage( EventThreadServices& eventThreadServices, const ConstraintBase& constraint, Dali::Constraint::RemoveAction removeAction )
+inline void SetRemoveActionMessage(EventThreadServices& eventThreadServices, const ConstraintBase& constraint, Dali::Constraint::RemoveAction removeAction)
 {
   using LocalType = MessageValue1<ConstraintBase, Dali::Constraint::RemoveAction>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &constraint, &ConstraintBase::SetRemoveAction, removeAction );
+  new(slot) LocalType(&constraint, &ConstraintBase::SetRemoveAction, removeAction);
 }
 
 } // namespace SceneGraph

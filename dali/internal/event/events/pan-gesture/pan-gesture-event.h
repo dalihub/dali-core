@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_EVENT_PAN_GESTURE_EVENT_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,8 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 /**
  * If the adaptor detects a pan gesture, then it should create an instance of this structure and
  * send it to the Core.
@@ -42,7 +40,7 @@ namespace Internal
  * A STARTED state will be ignored if a POSSIBLE state does not precede it.
  * Likewise, a CONTINUING or FINISHED state will be ignored if a STARTED state does not precede it.
  */
-struct PanGestureEvent: public GestureEvent
+struct PanGestureEvent : public GestureEvent
 {
   // Construction & Destruction
 

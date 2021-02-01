@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PINCH_GESTURE_DETECTOR_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,16 +19,14 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/internal/event/events/gesture-detector-impl.h>
 #include <dali/public-api/events/pinch-gesture-detector.h>
 #include <dali/public-api/events/pinch-gesture.h>
-#include <dali/internal/event/events/gesture-detector-impl.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 class PinchGestureDetector;
 
 using PinchGestureDetectorPtr       = IntrusivePtr<PinchGestureDetector>;
@@ -40,7 +38,6 @@ using PinchGestureDetectorContainer = DerivedGestureDetectorContainer<PinchGestu
 class PinchGestureDetector : public GestureDetector
 {
 public: // Creation
-
   /**
    * Create a new gesture detector.
    * @return A smart-pointer to the newly allocated detector.
@@ -53,7 +50,6 @@ public: // Creation
   PinchGestureDetector();
 
 public:
-
   /**
    * Called by the PinchGestureProcessor when a pinch gesture event occurs within the bounds of our
    * attached actor.
@@ -63,7 +59,6 @@ public:
   void EmitPinchGestureSignal(Dali::Actor actor, const Dali::PinchGesture& pinch);
 
 public: // Signals
-
   /**
    * @copydoc Dali::PinchGestureDetector::DetectedSignal()
    */
@@ -81,23 +76,20 @@ public: // Signals
    * @return True if the signal was connected.
    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
    */
-  static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
+  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor);
 
 protected:
-
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
   ~PinchGestureDetector() override;
 
 private:
-
   // Undefined
   PinchGestureDetector(const PinchGestureDetector&);
   PinchGestureDetector& operator=(const PinchGestureDetector& rhs);
 
 private: // GestureDetector overrides
-
   /**
    * @copydoc Dali::Internal::GestureDetector::OnActorAttach(Actor&)
    */
@@ -114,7 +106,6 @@ private: // GestureDetector overrides
   void OnActorDestroyed(Object& object) override;
 
 private:
-
   Dali::PinchGestureDetector::DetectedSignalType mDetectedSignal;
 };
 
@@ -124,7 +115,7 @@ private:
 
 inline Internal::PinchGestureDetector& GetImplementation(Dali::PinchGestureDetector& detector)
 {
-  DALI_ASSERT_ALWAYS( detector && "PinchGestureDetector handle is empty" );
+  DALI_ASSERT_ALWAYS(detector && "PinchGestureDetector handle is empty");
 
   BaseObject& handle = detector.GetBaseObject();
 
@@ -133,7 +124,7 @@ inline Internal::PinchGestureDetector& GetImplementation(Dali::PinchGestureDetec
 
 inline const Internal::PinchGestureDetector& GetImplementation(const Dali::PinchGestureDetector& detector)
 {
-  DALI_ASSERT_ALWAYS( detector && "PinchGestureDetector handle is empty" );
+  DALI_ASSERT_ALWAYS(detector && "PinchGestureDetector handle is empty");
 
   const BaseObject& handle = detector.GetBaseObject();
 

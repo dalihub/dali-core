@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_LONG_PRESS_GESTURE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,8 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 class LongPressGesture;
 using LongPressGesturePtr = IntrusivePtr<LongPressGesture>;
 
@@ -38,27 +36,26 @@ using LongPressGesturePtr = IntrusivePtr<LongPressGesture>;
 class LongPressGesture final : public Gesture
 {
 public:
-
   /**
    * Default Constructor
    * @param[in]  state  STARTED, when we detect a long press.
    *                    FINISHED, when all touches are finished.
    */
-  LongPressGesture( GestureState state )
-  : Gesture( GestureType::LONG_PRESS, state )
+  LongPressGesture(GestureState state)
+  : Gesture(GestureType::LONG_PRESS, state)
   {
   }
 
-  LongPressGesture(const LongPressGesture&) = delete; ///< Deleted copy constructor
-  LongPressGesture(LongPressGesture&&) = delete; ///< Deleted move constructor
+  LongPressGesture(const LongPressGesture&) = delete;            ///< Deleted copy constructor
+  LongPressGesture(LongPressGesture&&)      = delete;            ///< Deleted move constructor
   LongPressGesture& operator=(const LongPressGesture&) = delete; ///< Deleted copy assignment operator
-  LongPressGesture& operator=(LongPressGesture&&) = delete; ///< Deleted move assignment operator
+  LongPressGesture& operator=(LongPressGesture&&) = delete;      ///< Deleted move assignment operator
 
   /**
    * @brief Set the number of touch points.
    * @param[in] numberOfTouches The number of touch points to set.
    */
-  inline void SetNumberOfTouches( uint32_t numberOfTouches )
+  inline void SetNumberOfTouches(uint32_t numberOfTouches)
   {
     mNumberOfTouches = numberOfTouches;
   }
@@ -75,7 +72,7 @@ public:
    * @brief Set This is the point, in screen coordinates.
    * @param[in] screenPoint The point in screen coordinates to set.
    */
-  inline void SetScreenPoint( const Vector2& screenPoint )
+  inline void SetScreenPoint(const Vector2& screenPoint)
   {
     mScreenPoint = screenPoint;
   }
@@ -92,7 +89,7 @@ public:
    * @brief Set This is the point, in local actor coordinates.
    * @param[in] localPoint The point in local actor coordinates to set.
    */
-  inline void SetLocalPoint( const Vector2& localPoint )
+  inline void SetLocalPoint(const Vector2& localPoint)
   {
     mLocalPoint = localPoint;
   }
@@ -106,7 +103,6 @@ public:
   }
 
 private:
-
   /**
    * @brief Virtual destructor
    *
@@ -115,8 +111,8 @@ private:
   ~LongPressGesture() override = default;
 
 private:
-  Vector2 mScreenPoint;
-  Vector2 mLocalPoint;
+  Vector2  mScreenPoint;
+  Vector2  mLocalPoint;
   uint32_t mNumberOfTouches{1u};
 };
 
@@ -124,22 +120,22 @@ private:
 
 // Helpers for public-api forwarding methods
 
-inline Internal::LongPressGesture& GetImplementation( Dali::LongPressGesture& longPressGesture )
+inline Internal::LongPressGesture& GetImplementation(Dali::LongPressGesture& longPressGesture)
 {
-  DALI_ASSERT_ALWAYS( longPressGesture && "longPressGesture handle is empty" );
+  DALI_ASSERT_ALWAYS(longPressGesture && "longPressGesture handle is empty");
 
   BaseObject& object = longPressGesture.GetBaseObject();
 
-  return static_cast< Internal::LongPressGesture& >( object );
+  return static_cast<Internal::LongPressGesture&>(object);
 }
 
-inline const Internal::LongPressGesture& GetImplementation( const Dali::LongPressGesture& longPressGesture )
+inline const Internal::LongPressGesture& GetImplementation(const Dali::LongPressGesture& longPressGesture)
 {
-  DALI_ASSERT_ALWAYS( longPressGesture && "longPressGesture handle is empty" );
+  DALI_ASSERT_ALWAYS(longPressGesture && "longPressGesture handle is empty");
 
   const BaseObject& object = longPressGesture.GetBaseObject();
 
-  return static_cast< const Internal::LongPressGesture& >( object );
+  return static_cast<const Internal::LongPressGesture&>(object);
 }
 
 } // namespace Dali

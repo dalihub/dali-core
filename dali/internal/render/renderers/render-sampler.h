@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_SAMPLER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ namespace Internal
 {
 namespace Render
 {
-
 struct Sampler
 {
   using FilterMode = Dali::FilterMode::Type;
@@ -36,12 +35,13 @@ struct Sampler
    * Constructor
    */
   Sampler()
-  :mMinificationFilter(FilterMode::DEFAULT),
-   mMagnificationFilter(FilterMode::DEFAULT),
-   mSWrapMode(WrapMode::DEFAULT),
-   mTWrapMode(WrapMode::DEFAULT),
-   mRWrapMode(WrapMode::DEFAULT)
-  {}
+  : mMinificationFilter(FilterMode::DEFAULT),
+    mMagnificationFilter(FilterMode::DEFAULT),
+    mSWrapMode(WrapMode::DEFAULT),
+    mTWrapMode(WrapMode::DEFAULT),
+    mRWrapMode(WrapMode::DEFAULT)
+  {
+  }
 
   /**
    * Destructor
@@ -50,11 +50,11 @@ struct Sampler
 
   bool operator==(const Sampler& rhs) const
   {
-    return ( ( mMinificationFilter == rhs.mMinificationFilter ) &&
-             ( mMagnificationFilter == rhs.mMagnificationFilter ) &&
-             ( mSWrapMode == rhs.mSWrapMode ) &&
-             ( mTWrapMode == rhs.mTWrapMode ) &&
-             ( mRWrapMode == rhs.mRWrapMode ) );
+    return ((mMinificationFilter == rhs.mMinificationFilter) &&
+            (mMagnificationFilter == rhs.mMagnificationFilter) &&
+            (mSWrapMode == rhs.mSWrapMode) &&
+            (mTWrapMode == rhs.mTWrapMode) &&
+            (mRWrapMode == rhs.mRWrapMode));
   }
 
   bool operator!=(const Sampler& rhs) const
@@ -62,11 +62,11 @@ struct Sampler
     return !(*this == rhs);
   }
 
-  FilterMode  mMinificationFilter   : 4;    ///< The minify filter
-  FilterMode  mMagnificationFilter  : 4;    ///< The magnify filter
-  WrapMode    mSWrapMode            : 4;    ///< The horizontal wrap mode
-  WrapMode    mTWrapMode            : 4;    ///< The vertical wrap mode
-  WrapMode    mRWrapMode            : 4;    ///< The vertical wrap mode
+  FilterMode mMinificationFilter : 4;  ///< The minify filter
+  FilterMode mMagnificationFilter : 4; ///< The magnify filter
+  WrapMode   mSWrapMode : 4;           ///< The horizontal wrap mode
+  WrapMode   mTWrapMode : 4;           ///< The vertical wrap mode
+  WrapMode   mRWrapMode : 4;           ///< The vertical wrap mode
 };
 
 } // namespace Render
@@ -74,6 +74,5 @@ struct Sampler
 } // namespace Internal
 
 } // namespace Dali
-
 
 #endif //  DALI_INTERNAL_RENDER_SAMPLER_H

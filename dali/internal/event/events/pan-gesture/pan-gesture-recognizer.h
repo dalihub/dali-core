@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_EVENT_PAN_GESTURE_RECOGNIZER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@
  */
 
 // EXTERNAL INCLUDES
-#include <cstdint> // uint32_t
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/math/vector2.h>
+#include <cstdint> // uint32_t
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/gesture-recognizer.h>
@@ -29,17 +29,15 @@
 
 namespace Dali
 {
-
 namespace Integration
 {
 class Core;
 struct TouchEvent;
 
-}
+} // namespace Integration
 
 namespace Internal
 {
-
 struct PanGestureRequest;
 /**
  * When given a set of touch events, this detector attempts to determine if a pan gesture has taken place.
@@ -47,7 +45,6 @@ struct PanGestureRequest;
 class PanGestureRecognizer : public GestureRecognizer
 {
 public:
-
   using Observer = RecognizerObserver<PanGestureEvent>;
 
   /**
@@ -55,7 +52,7 @@ public:
    * @param[in]  screenSize  The size of the screen.
    * @param[in]  request     The details of the request.
    */
-  PanGestureRecognizer( Observer& observer, Vector2 screenSize, const PanGestureRequest& request, int32_t minimumDistance, int32_t minimumPanEvents);
+  PanGestureRecognizer(Observer& observer, Vector2 screenSize, const PanGestureRequest& request, int32_t minimumDistance, int32_t minimumPanEvents);
 
   /**
    * Virtual destructor.
@@ -63,7 +60,6 @@ public:
   ~PanGestureRecognizer() override;
 
 public:
-
   /**
    * @copydoc Dali::Internal::GestureDetector::SendEvent(const Integration::TouchEvent&)
    */
@@ -75,7 +71,6 @@ public:
   void Update(const GestureRequest& request) override;
 
 private:
-
   /**
    * Emits the pan gesture event (performs some smoothing operation).
    * @param[in]  state         The state of the pan.
@@ -84,7 +79,6 @@ private:
   void SendPan(GestureState state, const Integration::TouchEvent& currentEvent);
 
 private:
-
   // Reference to the gesture processor for this recognizer
   Observer& mObserver;
 
@@ -100,8 +94,8 @@ private:
     FAILED,   ///< Current touch event data suggests a pan gesture is not possible.
   };
 
-  State mState; ///< The current state of the detector.
-  std::vector<Integration::TouchEvent> mTouchEvents;     ///< A container of all touch events after an initial down event.
+  State                                mState;       ///< The current state of the detector.
+  std::vector<Integration::TouchEvent> mTouchEvents; ///< A container of all touch events after an initial down event.
 
   Vector2 mPrimaryTouchDownLocation;    ///< The initial touch down point.
   Vector2 mThresholdAdjustmentPerFrame; ///< The adjustment per frame at the start of a slow pan.
@@ -110,7 +104,7 @@ private:
   unsigned int mThresholdAdjustmentsRemaining; ///< No. of threshold adjustments still to apply (for a slow-pan).
   unsigned int mThresholdTotalAdjustments;     ///< The total number of adjustments required.
 
-  uint32_t mPrimaryTouchDownTime;       ///< The initial touch down time.
+  uint32_t     mPrimaryTouchDownTime;   ///< The initial touch down time.
   unsigned int mMinimumTouchesRequired; ///< The minimum touches required before a pan should be emitted.
   unsigned int mMaximumTouchesRequired; ///< The maximum touches after which a pan should not be emitted.
 

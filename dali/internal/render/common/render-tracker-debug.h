@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_TRACKER_DEBUG_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,25 +26,24 @@ namespace Internal
 {
 namespace Render
 {
-
 #if defined(DEBUG_ENABLED)
 
 Debug::Filter* gRenderTrackerLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_RENDER_TRACKER");
 
-#define TRACKER_LOG(level)                                              \
+#define TRACKER_LOG(level) \
   DALI_LOG_INFO(gRenderTrackerLogFilter, level, "RenderTracker::%s: this:%p\n", __FUNCTION__, this)
 
 #define TRACKER_LOG_FMT(level, format, ...) \
-  DALI_LOG_INFO(gRenderTrackerLogFilter, level, "RenderTracker::%s: this:%p " format, __FUNCTION__, this, ## __VA_ARGS__)
+  DALI_LOG_INFO(gRenderTrackerLogFilter, level, "RenderTracker::%s: this:%p " format, __FUNCTION__, this, ##__VA_ARGS__)
 #else
 #define TRACKER_LOG(level)
 #define TRACKER_LOG_FMT(level, format, ...)
 #endif
 
-} // Render
+} // namespace Render
 
-} // Internal
+} // namespace Internal
 
-} // Dali
+} // namespace Dali
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_RENDER_TRACKER_DEBUG_H

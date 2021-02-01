@@ -20,10 +20,8 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace SceneGraph
 {
 PropertyBase::PropertyBase() = default;

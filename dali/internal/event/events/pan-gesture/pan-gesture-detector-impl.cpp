@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,38 +22,35 @@
 #include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
-#include <dali/public-api/events/pan-gesture.h>
-#include <dali/public-api/object/type-registry.h>
-#include <dali/public-api/math/radian.h>
-#include <dali/public-api/math/degree.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/events/gesture-event-processor.h>
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
+#include <dali/public-api/events/pan-gesture.h>
+#include <dali/public-api/math/degree.h>
+#include <dali/public-api/math/radian.h>
+#include <dali/public-api/object/type-registry.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace
 {
-
 // Properties
 
 //              Name                  Type   writable animatable constraint-input  enum for index-checking
 DALI_PROPERTY_TABLE_BEGIN
-DALI_PROPERTY( "screenPosition",      VECTOR2, false, false, true,   Dali::PanGestureDetector::Property::SCREEN_POSITION     )
-DALI_PROPERTY( "screenDisplacement",  VECTOR2, false, false, true,   Dali::PanGestureDetector::Property::SCREEN_DISPLACEMENT )
-DALI_PROPERTY( "screenVelocity",      VECTOR2, false, false, true,   Dali::PanGestureDetector::Property::SCREEN_VELOCITY     )
-DALI_PROPERTY( "localPosition",       VECTOR2, false, false, true,   Dali::PanGestureDetector::Property::LOCAL_POSITION      )
-DALI_PROPERTY( "localDisplacement",   VECTOR2, false, false, true,   Dali::PanGestureDetector::Property::LOCAL_DISPLACEMENT  )
-DALI_PROPERTY( "localVelocity",       VECTOR2, false, false, true,   Dali::PanGestureDetector::Property::LOCAL_VELOCITY      )
-DALI_PROPERTY( "panning",             BOOLEAN, false, false, true,   Dali::PanGestureDetector::Property::PANNING             )
-DALI_PROPERTY_TABLE_END( DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX, PanGestureDetectorDefaultProperties )
+DALI_PROPERTY("screenPosition", VECTOR2, false, false, true, Dali::PanGestureDetector::Property::SCREEN_POSITION)
+DALI_PROPERTY("screenDisplacement", VECTOR2, false, false, true, Dali::PanGestureDetector::Property::SCREEN_DISPLACEMENT)
+DALI_PROPERTY("screenVelocity", VECTOR2, false, false, true, Dali::PanGestureDetector::Property::SCREEN_VELOCITY)
+DALI_PROPERTY("localPosition", VECTOR2, false, false, true, Dali::PanGestureDetector::Property::LOCAL_POSITION)
+DALI_PROPERTY("localDisplacement", VECTOR2, false, false, true, Dali::PanGestureDetector::Property::LOCAL_DISPLACEMENT)
+DALI_PROPERTY("localVelocity", VECTOR2, false, false, true, Dali::PanGestureDetector::Property::LOCAL_VELOCITY)
+DALI_PROPERTY("panning", BOOLEAN, false, false, true, Dali::PanGestureDetector::Property::PANNING)
+DALI_PROPERTY_TABLE_END(DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX, PanGestureDetectorDefaultProperties)
 
 // Signals
 
@@ -64,21 +61,21 @@ BaseHandle Create()
   return Dali::PanGestureDetector::New();
 }
 
-TypeRegistration mType( typeid(Dali::PanGestureDetector), typeid(Dali::GestureDetector), Create, PanGestureDetectorDefaultProperties );
+TypeRegistration mType(typeid(Dali::PanGestureDetector), typeid(Dali::GestureDetector), Create, PanGestureDetectorDefaultProperties);
 
-SignalConnectorType signalConnector1( mType, SIGNAL_PAN_DETECTED, &PanGestureDetector::DoConnectSignal );
+SignalConnectorType signalConnector1(mType, SIGNAL_PAN_DETECTED, &PanGestureDetector::DoConnectSignal);
 
 #if defined(DEBUG_ENABLED)
-Integration::Log::Filter* gLogFilter  = Integration::Log::Filter::New(Debug::NoLogging, false, "LOG_PAN_GESTURE_DETECTOR");
+Integration::Log::Filter* gLogFilter = Integration::Log::Filter::New(Debug::NoLogging, false, "LOG_PAN_GESTURE_DETECTOR");
 #endif
 
 /**
  * Returns the angle going in the opposite direction to that specified by angle.
  */
-float GetOppositeAngle( float angle )
+float GetOppositeAngle(float angle)
 {
   // Calculate the opposite angle so that we cover both directions.
-  if ( angle <= 0.0f )
+  if(angle <= 0.0f)
   {
     angle += Math::PI;
   }
@@ -95,22 +92,22 @@ float GetOppositeAngle( float angle )
 PanGestureDetectorPtr PanGestureDetector::New()
 {
   const SceneGraph::PanGesture& sceneObject = ThreadLocalStorage::Get().GetGestureEventProcessor().GetPanGestureProcessor().GetSceneObject();
-  return new PanGestureDetector( sceneObject );
+  return new PanGestureDetector(sceneObject);
 }
 
 void PanGestureDetector::SetMinimumTouchesRequired(unsigned int minimum)
 {
-  DALI_ASSERT_ALWAYS( minimum > 0 && "Can only set a positive number of required touches" );
+  DALI_ASSERT_ALWAYS(minimum > 0 && "Can only set a positive number of required touches");
 
-  if (mMinimumTouches != minimum)
+  if(mMinimumTouches != minimum)
   {
-    DALI_LOG_INFO( gLogFilter, Debug::Concise, "Minimum Touches Set: %d\n", minimum );
+    DALI_LOG_INFO(gLogFilter, Debug::Concise, "Minimum Touches Set: %d\n", minimum);
 
     mMinimumTouches = minimum;
 
-    if (!mAttachedActors.empty())
+    if(!mAttachedActors.empty())
     {
-      DALI_LOG_INFO( gLogFilter, Debug::General, "Updating Gesture Detector\n");
+      DALI_LOG_INFO(gLogFilter, Debug::General, "Updating Gesture Detector\n");
 
       mGestureEventProcessor.GestureDetectorUpdated(this);
     }
@@ -119,17 +116,17 @@ void PanGestureDetector::SetMinimumTouchesRequired(unsigned int minimum)
 
 void PanGestureDetector::SetMaximumTouchesRequired(unsigned int maximum)
 {
-  DALI_ASSERT_ALWAYS( maximum > 0 && "Can only set a positive number of maximum touches" );
+  DALI_ASSERT_ALWAYS(maximum > 0 && "Can only set a positive number of maximum touches");
 
-  if (mMaximumTouches != maximum)
+  if(mMaximumTouches != maximum)
   {
-    DALI_LOG_INFO( gLogFilter, Debug::Concise, "Maximum Touches Set: %d\n", maximum );
+    DALI_LOG_INFO(gLogFilter, Debug::Concise, "Maximum Touches Set: %d\n", maximum);
 
     mMaximumTouches = maximum;
 
-    if (!mAttachedActors.empty())
+    if(!mAttachedActors.empty())
     {
-      DALI_LOG_INFO( gLogFilter, Debug::General, "Updating Gesture Detector\n");
+      DALI_LOG_INFO(gLogFilter, Debug::General, "Updating Gesture Detector\n");
 
       mGestureEventProcessor.GestureDetectorUpdated(this);
     }
@@ -146,46 +143,46 @@ uint32_t PanGestureDetector::GetMaximumTouchesRequired() const
   return mMaximumTouches;
 }
 
-void PanGestureDetector::AddAngle( Radian angle, Radian threshold )
+void PanGestureDetector::AddAngle(Radian angle, Radian threshold)
 {
-  threshold = fabsf( threshold ); // Ensure the threshold is positive.
+  threshold = fabsf(threshold); // Ensure the threshold is positive.
 
   // If the threshold is greater than PI, then just use PI
   // This means that any panned angle will invoke the pan gesture. We should still add this angle as
   // an angle may have been added previously with a small threshold.
-  if ( threshold > Math::PI )
+  if(threshold > Math::PI)
   {
     threshold = Math::PI;
   }
 
-  angle = WrapInDomain( angle, -Math::PI, Math::PI );
+  angle = WrapInDomain(angle, -Math::PI, Math::PI);
 
-  DALI_LOG_INFO( gLogFilter, Debug::Concise, "Angle Added: %.2f, Threshold: %.2f\n", Degree(angle), Degree(threshold) );
+  DALI_LOG_INFO(gLogFilter, Debug::Concise, "Angle Added: %.2f, Threshold: %.2f\n", Degree(angle), Degree(threshold));
 
-  AngleThresholdPair pair( angle, threshold );
-  mAngleContainer.push_back( pair );
+  AngleThresholdPair pair(angle, threshold);
+  mAngleContainer.push_back(pair);
 }
 
-void PanGestureDetector::AddDirection( Radian direction, Radian threshold )
+void PanGestureDetector::AddDirection(Radian direction, Radian threshold)
 {
-  AddAngle( direction, threshold );
+  AddAngle(direction, threshold);
 
   // Calculate the opposite angle so that we cover the entire direction.
-  direction = GetOppositeAngle( direction );
+  direction = GetOppositeAngle(direction);
 
-  AddAngle( direction, threshold );
+  AddAngle(direction, threshold);
 }
 
 uint32_t PanGestureDetector::GetAngleCount() const
 {
-  return static_cast<uint32_t>( mAngleContainer.size() );
+  return static_cast<uint32_t>(mAngleContainer.size());
 }
 
 PanGestureDetector::AngleThresholdPair PanGestureDetector::GetAngle(uint32_t index) const
 {
-  PanGestureDetector::AngleThresholdPair ret( Radian(0),Radian(0) );
+  PanGestureDetector::AngleThresholdPair ret(Radian(0), Radian(0));
 
-  if( index < mAngleContainer.size() )
+  if(index < mAngleContainer.size())
   {
     ret = mAngleContainer[index];
   }
@@ -193,34 +190,33 @@ PanGestureDetector::AngleThresholdPair PanGestureDetector::GetAngle(uint32_t ind
   return ret;
 }
 
-
 void PanGestureDetector::ClearAngles()
 {
   mAngleContainer.clear();
 }
 
-void PanGestureDetector::RemoveAngle( Radian angle )
+void PanGestureDetector::RemoveAngle(Radian angle)
 {
-  angle = WrapInDomain( angle, -Math::PI, Math::PI );
+  angle = WrapInDomain(angle, -Math::PI, Math::PI);
 
-  for (AngleContainer::iterator iter = mAngleContainer.begin(), endIter = mAngleContainer.end(); iter != endIter; ++iter )
+  for(AngleContainer::iterator iter = mAngleContainer.begin(), endIter = mAngleContainer.end(); iter != endIter; ++iter)
   {
-    if ( iter->first == angle )
+    if(iter->first == angle)
     {
-      mAngleContainer.erase( iter );
+      mAngleContainer.erase(iter);
       break;
     }
   }
 }
 
-void PanGestureDetector::RemoveDirection( Radian direction )
+void PanGestureDetector::RemoveDirection(Radian direction)
 {
-  RemoveAngle( direction );
+  RemoveAngle(direction);
 
   // Calculate the opposite angle so that we cover the entire direction.
-  direction = GetOppositeAngle( direction );
+  direction = GetOppositeAngle(direction);
 
-  RemoveAngle( direction );
+  RemoveAngle(direction);
 }
 
 bool PanGestureDetector::RequiresDirectionalPan() const
@@ -229,26 +225,24 @@ bool PanGestureDetector::RequiresDirectionalPan() const
   return !mAngleContainer.empty();
 }
 
-bool PanGestureDetector::CheckAngleAllowed( Radian angle ) const
+bool PanGestureDetector::CheckAngleAllowed(Radian angle) const
 {
-  bool allowed( false );
-  if ( mAngleContainer.empty() )
+  bool allowed(false);
+  if(mAngleContainer.empty())
   {
     allowed = true;
   }
   else
   {
-    for ( AngleContainer::const_iterator iter = mAngleContainer.begin(), endIter = mAngleContainer.end(); iter != endIter; ++iter )
+    for(AngleContainer::const_iterator iter = mAngleContainer.begin(), endIter = mAngleContainer.end(); iter != endIter; ++iter)
     {
-      float angleAllowed( iter->first );
-      float threshold ( iter->second );
+      float angleAllowed(iter->first);
+      float threshold(iter->second);
 
-      DALI_LOG_INFO( gLogFilter, Debug::General,
-                     "AngleToCheck: %.2f, CompareWith: %.2f, Threshold: %.2f\n",
-                     Degree(angle), Degree(angleAllowed), Degree(threshold) );
+      DALI_LOG_INFO(gLogFilter, Debug::General, "AngleToCheck: %.2f, CompareWith: %.2f, Threshold: %.2f\n", Degree(angle), Degree(angleAllowed), Degree(threshold));
 
-      float relativeAngle( fabsf( WrapInDomain( angle - angleAllowed, -Math::PI, Math::PI ) ) );
-      if ( relativeAngle <= threshold )
+      float relativeAngle(fabsf(WrapInDomain(angle - angleAllowed, -Math::PI, Math::PI)));
+      if(relativeAngle <= threshold)
       {
         allowed = true;
         break;
@@ -261,25 +255,25 @@ bool PanGestureDetector::CheckAngleAllowed( Radian angle ) const
 
 void PanGestureDetector::EmitPanGestureSignal(Dali::Actor actor, const Dali::PanGesture& pan)
 {
-  if ( !mDetectedSignal.Empty() )
+  if(!mDetectedSignal.Empty())
   {
     // Guard against destruction during signal emission
-    Dali::PanGestureDetector handle( this );
+    Dali::PanGestureDetector handle(this);
 
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Emitting Signal (%p)\n", this );
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Emitting Signal (%p)\n", this);
 
-    mDetectedSignal.Emit( actor, pan );
+    mDetectedSignal.Emit(actor, pan);
   }
 }
 
-bool PanGestureDetector::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
+bool PanGestureDetector::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
 {
-  bool connected( true );
-  PanGestureDetector* gesture = static_cast< PanGestureDetector* >(object); // TypeRegistry guarantees that this is the correct type.
+  bool                connected(true);
+  PanGestureDetector* gesture = static_cast<PanGestureDetector*>(object); // TypeRegistry guarantees that this is the correct type.
 
-  if ( 0 == strcmp( signalName.c_str(), SIGNAL_PAN_DETECTED ) )
+  if(0 == strcmp(signalName.c_str(), SIGNAL_PAN_DETECTED))
   {
-    gesture->DetectedSignal().Connect( tracker, functor );
+    gesture->DetectedSignal().Connect(tracker, functor);
   }
   else
   {
@@ -290,13 +284,13 @@ bool PanGestureDetector::DoConnectSignal( BaseObject* object, ConnectionTrackerI
   return connected;
 }
 
-void PanGestureDetector::SetPanGestureProperties( const Dali::PanGesture& pan )
+void PanGestureDetector::SetPanGestureProperties(const Dali::PanGesture& pan)
 {
-  ThreadLocalStorage::Get().GetGestureEventProcessor().SetGestureProperties( pan );
+  ThreadLocalStorage::Get().GetGestureEventProcessor().SetGestureProperties(pan);
 }
 
-PanGestureDetector::PanGestureDetector( const SceneGraph::PanGesture& sceneObject )
-: GestureDetector( GestureType::PAN, &sceneObject ),
+PanGestureDetector::PanGestureDetector(const SceneGraph::PanGesture& sceneObject)
+: GestureDetector(GestureType::PAN, &sceneObject),
   mMinimumTouches(1),
   mMaximumTouches(1)
 {
@@ -306,7 +300,7 @@ PanGestureDetector::~PanGestureDetector() = default;
 
 const SceneGraph::PanGesture& PanGestureDetector::GetPanGestureSceneObject() const
 {
-  return static_cast<const SceneGraph::PanGesture&>( GetSceneObject() );
+  return static_cast<const SceneGraph::PanGesture&>(GetSceneObject());
 }
 
 void PanGestureDetector::OnActorAttach(Actor& actor)
@@ -324,21 +318,21 @@ void PanGestureDetector::OnActorDestroyed(Object& object)
   // Do nothing
 }
 
-void PanGestureDetector::SetDefaultProperty( Property::Index index, const Property::Value& property )
+void PanGestureDetector::SetDefaultProperty(Property::Index index, const Property::Value& property)
 {
   // None of our properties should be settable from Public API
 }
 
-Property::Value PanGestureDetector::GetDefaultProperty( Property::Index index ) const
+Property::Value PanGestureDetector::GetDefaultProperty(Property::Index index) const
 {
-  return GetDefaultPropertyCurrentValue( index ); // Scene-graph only properties
+  return GetDefaultPropertyCurrentValue(index); // Scene-graph only properties
 }
 
-Property::Value PanGestureDetector::GetDefaultPropertyCurrentValue( Property::Index index ) const
+Property::Value PanGestureDetector::GetDefaultPropertyCurrentValue(Property::Index index) const
 {
   Property::Value value;
 
-  switch ( index )
+  switch(index)
   {
     case Dali::PanGestureDetector::Property::SCREEN_POSITION:
     {
@@ -384,7 +378,7 @@ Property::Value PanGestureDetector::GetDefaultPropertyCurrentValue( Property::In
 
     default:
     {
-      DALI_ASSERT_ALWAYS(false && "PanGestureDetector Property index invalid" ); // should not come here
+      DALI_ASSERT_ALWAYS(false && "PanGestureDetector Property index invalid"); // should not come here
       break;
     }
   }
@@ -392,11 +386,11 @@ Property::Value PanGestureDetector::GetDefaultPropertyCurrentValue( Property::In
   return value;
 }
 
-const PropertyInputImpl* PanGestureDetector::GetSceneObjectInputProperty( Property::Index index ) const
+const PropertyInputImpl* PanGestureDetector::GetSceneObjectInputProperty(Property::Index index) const
 {
   const PropertyInputImpl* property = nullptr;
 
-  switch ( index )
+  switch(index)
   {
     case Dali::PanGestureDetector::Property::SCREEN_POSITION:
     {
@@ -443,10 +437,10 @@ const PropertyInputImpl* PanGestureDetector::GetSceneObjectInputProperty( Proper
     default:
       break;
   }
-  if( !property )
+  if(!property)
   {
     // not our property, ask base
-    property = Object::GetSceneObjectInputProperty( index );
+    property = Object::GetSceneObjectInputProperty(index);
   }
 
   return property;

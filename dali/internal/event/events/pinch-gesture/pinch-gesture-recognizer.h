@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_EVENT_PINCH_GESTURE_RECOGNIZER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@
 
 namespace Dali
 {
-
 namespace Integration
 {
 struct TouchEvent;
@@ -35,14 +34,12 @@ struct TouchEvent;
 
 namespace Internal
 {
-
 /**
  * When given a set of touch events, this detector attempts to determine if a pinch gesture has taken place.
  */
 class PinchGestureRecognizer : public GestureRecognizer
 {
 public:
-
   using Observer = RecognizerObserver<PinchGestureEvent>;
 
   /**
@@ -53,7 +50,7 @@ public:
    * @param[in] minimumTouchEvents The number of touch events required
    * @param[in] minimumTouchEventsAfterStart The number of touch events required after a gesture started
    */
-  PinchGestureRecognizer( Observer& observer, Vector2 screenSize, Vector2 screenDpi, float minimumPinchDistance, uint32_t minimumTouchEvents, uint32_t minimumTouchEventsAfterStart );
+  PinchGestureRecognizer(Observer& observer, Vector2 screenSize, Vector2 screenDpi, float minimumPinchDistance, uint32_t minimumTouchEvents, uint32_t minimumTouchEventsAfterStart);
 
   /**
    * Virtual destructor.
@@ -61,20 +58,19 @@ public:
   ~PinchGestureRecognizer() override;
 
 public:
-
   void SetMinimumPinchDistance(float value);
 
   /**
    * Sets the minimum touch events required before a pinch can be started
    * @param[in] value The number of touch events
    */
-  void SetMinimumTouchEvents( uint32_t value );
+  void SetMinimumTouchEvents(uint32_t value);
 
   /**
    * Sets the minimum touch events required after a pinch started
    * @param[in] value The number of touch events
    */
-  void SetMinimumTouchEventsAfterStart( uint32_t value );
+  void SetMinimumTouchEventsAfterStart(uint32_t value);
 
   /**
    * @copydoc Dali::Internal::GestureDetector::SendEvent(const Integration::TouchEvent&)
@@ -87,7 +83,6 @@ public:
   void Update(const GestureRequest& request) override;
 
 private:
-
   /**
    * Emits the pinch gesture event to the core.
    * @param[in]  state         The state of the pinch (whether it's starting, continuing or finished).
@@ -96,7 +91,6 @@ private:
   void SendPinch(GestureState state, const Integration::TouchEvent& currentEvent);
 
 private:
-
   // Reference to the gesture processor for this recognizer
   Observer& mObserver;
 
@@ -110,7 +104,7 @@ private:
     STARTED,  ///< A gesture has been detected.
   };
 
-  State mState; ///< The current state of the detector.
+  State                                mState;       ///< The current state of the detector.
   std::vector<Integration::TouchEvent> mTouchEvents; ///< The touch events since initial touch down.
 
   float mDefaultMinimumDistanceDelta; ///< The default value of the mMinimumDistanceDelta.

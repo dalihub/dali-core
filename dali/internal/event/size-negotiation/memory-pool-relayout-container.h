@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_MEMORY_POOL_RELAYOUT_CONTAINER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,20 +18,17 @@
  *
  */
 
-
 // INTERNAL INCLUDES
-#include <dali/public-api/size-negotiation/relayout-container.h>
-#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/actors/actor.h>
+#include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/size-negotiation/relayout-container.h>
 
 #include <dali/internal/common/memory-pool-object-allocator.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 /**
  * @brief Container to encapsulate information required for relayout.
  *
@@ -40,14 +37,13 @@ namespace Internal
 class MemoryPoolRelayoutContainer : public RelayoutContainer
 {
 public:
-
   /**
    * Struct to store the relayout information
    */
   struct RelayoutInfo
   {
-    Dali::Actor actor;            ///< The actor to relayout
-    Vector2 size;           ///< The desired size of the actor
+    Dali::Actor actor; ///< The actor to relayout
+    Vector2     size;  ///< The desired size of the actor
   };
 
   /**
@@ -55,7 +51,7 @@ public:
    *
    * @param objectAllocator A memory pool that can allocate memory for RelayoutInfos
    */
-  MemoryPoolRelayoutContainer( MemoryPoolObjectAllocator< RelayoutInfo >& objectAllocator );
+  MemoryPoolRelayoutContainer(MemoryPoolObjectAllocator<RelayoutInfo>& objectAllocator);
 
   /**
    * Virtual destructor
@@ -68,7 +64,7 @@ public:
    * @param actor The actor to relayout
    * @param size The size to relayout
    */
-  void Add( const Dali::Actor& actor, const Vector2& size ) override;
+  void Add(const Dali::Actor& actor, const Vector2& size) override;
 
   /**
    * @brief Remove information from the container
@@ -80,7 +76,7 @@ public:
    *
    * @param index The index of the information to retrieve
    */
-  void Get( size_t index, Dali::Actor& actorOut, Vector2& sizeOut  ) const;
+  void Get(size_t index, Dali::Actor& actorOut, Vector2& sizeOut) const;
 
   /**
    * @brief The count of information in the container
@@ -92,7 +88,7 @@ public:
    *
    * @param capacity The new capacity for the container
    */
-  void Reserve( size_t capacity );
+  void Reserve(size_t capacity);
 
   /**
    * @brief Reset the container, freeing all memory
@@ -105,14 +101,14 @@ public:
    * @param actor The actor to search for
    * @return Return if the actor was found or not
    */
-  bool Contains( const Dali::Actor& actor );
+  bool Contains(const Dali::Actor& actor);
 
 private:
   using RelayoutInfoContainer = Vector<RelayoutInfo*>;
 
-  RelayoutInfoContainer mRelayoutInfos;     ///< The list of relayout infos
+  RelayoutInfoContainer mRelayoutInfos; ///< The list of relayout infos
 
-  MemoryPoolObjectAllocator< RelayoutInfo >& mAllocator;         ///< The memory pool from which the infos are allocated
+  MemoryPoolObjectAllocator<RelayoutInfo>& mAllocator; ///< The memory pool from which the infos are allocated
 };
 
 } // namespace Internal

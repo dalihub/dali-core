@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_OWNER_POINTER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,15 +23,12 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
-template< typename T >
+template<typename T>
 class OwnerPointer
 {
 public:
-
   /**
    * Default constructor. Creates an OwnerPointer that does not own any object.
    * @note This does not protect against two different OwnerPointers pointing to the same object.
@@ -39,7 +36,7 @@ public:
    *       could lead to a crash.
    */
   OwnerPointer()
-  : mObject( nullptr )
+  : mObject(nullptr)
   {
   }
 
@@ -47,8 +44,8 @@ public:
    * Constructor. Creates an OwnerPointer that owns the object.
    * @param[in] object A pointer to a heap allocated object.
    */
-  OwnerPointer( T* object )
-  : mObject( object )
+  OwnerPointer(T* object)
+  : mObject(object)
   {
   }
 
@@ -56,8 +53,8 @@ public:
    * Copy constructor. Passes the ownership of a pointer to another.
    * @param[in] other The pointer that gives away the ownership.
    */
-  OwnerPointer( const OwnerPointer& other )
-  : OwnerPointer( static_cast< OwnerPointer&& >( const_cast<OwnerPointer&>( other ) ) ) // Remove constness & cast to rvalue to use the move constructor
+  OwnerPointer(const OwnerPointer& other)
+  : OwnerPointer(static_cast<OwnerPointer&&>(const_cast<OwnerPointer&>(other))) // Remove constness & cast to rvalue to use the move constructor
   {
     // other needs to be const for compiler to pick up this as copy constructor;
     // though we are using this as move as there can only be one owner
@@ -67,22 +64,22 @@ public:
    * Move constructor. Passes the ownership of a pointer to another.
    * @param[in] other The pointer that gives away the ownership.
    */
-  OwnerPointer( OwnerPointer&& other )
-  : mObject( nullptr )
+  OwnerPointer(OwnerPointer&& other)
+  : mObject(nullptr)
   {
-    Swap( other );
+    Swap(other);
   }
 
   /**
    * Assignment operator. Passes the ownership of a pointer to another.
    * @param[in] other The pointer that gives away the ownership.
    */
-  OwnerPointer& operator=( OwnerPointer& other )
+  OwnerPointer& operator=(OwnerPointer& other)
   {
-    if( this != &other )    // no self-assignment
+    if(this != &other) // no self-assignment
     {
       delete mObject;
-      mObject = other.mObject;
+      mObject       = other.mObject;
       other.mObject = nullptr;
     }
 
@@ -94,10 +91,10 @@ public:
    * Move assignment operator. Passes the ownership of a pointer to another.
    * @param[in] other The pointer that gives away the ownership.
    */
-  OwnerPointer& operator=( OwnerPointer&& other )
+  OwnerPointer& operator=(OwnerPointer&& other)
   {
     // Reuse operator=
-    return operator=( other );
+    return operator=(other);
   }
 
   /**
@@ -105,9 +102,9 @@ public:
    * If it owns an object already, it will be deleted.
    * @param[in] pointer A pointer to a heap allocated object.
    */
-  OwnerPointer& operator=( T* pointer )
+  OwnerPointer& operator=(T* pointer)
   {
-    if( mObject != pointer )
+    if(mObject != pointer)
     {
       Reset();
       mObject = pointer;
@@ -130,7 +127,7 @@ public:
    */
   T& operator*()
   {
-    DALI_ASSERT_DEBUG( mObject );
+    DALI_ASSERT_DEBUG(mObject);
 
     return *mObject;
   }
@@ -141,10 +138,10 @@ public:
    */
   T& operator*() const
   {
-    DALI_ASSERT_DEBUG( mObject );
+    DALI_ASSERT_DEBUG(mObject);
 
     // Pointer semantics: A const pointer does not mean const data.
-    return const_cast< T& >( *mObject );
+    return const_cast<T&>(*mObject);
   }
 
   /**
@@ -163,16 +160,16 @@ public:
   T* operator->() const
   {
     // Pointer semantics: A const pointer does not mean const data.
-    return const_cast< T* >( mObject );
+    return const_cast<T*>(mObject);
   }
 
   /**
    * Compare with a raw pointer.
    * @return true if the raw pointer matches the one owned by this object.
    */
-  bool operator==( const T* pointer )
+  bool operator==(const T* pointer)
   {
-    return ( mObject == pointer );
+    return (mObject == pointer);
   }
 
   /**
@@ -190,7 +187,7 @@ public:
    */
   T* Release()
   {
-    T* tmp = mObject;
+    T* tmp  = mObject;
     mObject = nullptr;
     return tmp;
   }
@@ -208,12 +205,12 @@ public:
    * Swap owned objects
    * @param[in] other The pointer to swap the owned objects with.
    */
-  void Swap( OwnerPointer& other )
+  void Swap(OwnerPointer& other)
   {
-    if( this != &other )
+    if(this != &other)
     {
-      T* tmp = mObject;
-      mObject = other.mObject;
+      T* tmp        = mObject;
+      mObject       = other.mObject;
       other.mObject = tmp;
     }
   }
@@ -223,7 +220,7 @@ public:
   /**
    * Pointer-to-member type. Objects can be implicitly converted to this for validity checks.
    */
-  using BooleanType = void ( OwnerPointer<T>::* )() const;
+  using BooleanType = void (OwnerPointer<T>::*)() const;
 
   /**
    * Converts an object handle to a BooleanType.
@@ -231,15 +228,16 @@ public:
    */
   operator BooleanType() const
   {
-    return ( mObject != nullptr ) ? &OwnerPointer::ThisIsSaferThanReturningVoidStar : nullptr;
+    return (mObject != nullptr) ? &OwnerPointer::ThisIsSaferThanReturningVoidStar : nullptr;
   }
 
 private:
-
   /**
    * Used by the safe bool idiom.
    */
-  void ThisIsSaferThanReturningVoidStar() const {}
+  void ThisIsSaferThanReturningVoidStar() const
+  {
+  }
 
   // data
   T* mObject; ///< Raw pointer to the object

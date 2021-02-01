@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_ANIMATION_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,13 +28,10 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace SceneGraph
 {
-
 /**
  * Animations are used to change the properties of scene graph objects, as part of a scene
  * managers "update" phase. An animation is a container of Animator objects; the actual setting
@@ -43,7 +40,6 @@ namespace SceneGraph
 class Animation
 {
 public:
-
   using EndAction = Dali::Animation::EndAction;
 
   enum State
@@ -64,7 +60,7 @@ public:
    * @param[in] disconnectAction The action to perform when the property owner of an animator is disconnected.
    * @return A new Animation
    */
-  static Animation* New( float durationSeconds, float speedFactor, const Vector2& playRange, int32_t loopCount, EndAction endAction, EndAction disconnectAction );
+  static Animation* New(float durationSeconds, float speedFactor, const Vector2& playRange, int32_t loopCount, EndAction endAction, EndAction disconnectAction);
 
   /**
    * Virtual destructor
@@ -75,7 +71,7 @@ public:
    * Overriden delete operator
    * Deletes the animation from its global memory pool
    */
-  void operator delete( void* ptr );
+  void operator delete(void* ptr);
 
   /**
    * Set the duration of an animation.
@@ -88,7 +84,7 @@ public:
    * Set the progress marker to trigger notification
    * @param[in] progress percent of progress to trigger notification, 0.0f < progress <= 1.0f
    */
-  void SetProgressNotification( float progress );
+  void SetProgressNotification(float progress);
 
   /**
    * Retrieve the duration of the animation.
@@ -105,7 +101,7 @@ public:
    */
   float GetCurrentProgress() const
   {
-    if( mDurationSeconds > 0.0f )
+    if(mDurationSeconds > 0.0f)
     {
       return mElapsedSeconds / mDurationSeconds;
     }
@@ -117,7 +113,7 @@ public:
    * Sets the progress of the animation.
    * @param[in] The new progress as a normalized value between [0,1]
    */
-  void SetCurrentProgress( float progress )
+  void SetCurrentProgress(float progress)
   {
     mElapsedSeconds = mDurationSeconds * progress;
   }
@@ -126,7 +122,7 @@ public:
    * Specifies a speed factor for the animation.
    * @param[in] factor A value which will multiply the velocity
    */
-  void SetSpeedFactor( float factor )
+  void SetSpeedFactor(float factor)
   {
     mSpeedFactor = factor;
   }
@@ -194,7 +190,7 @@ public:
    *
    * @param[in] range Two values between [0,1] to specify minimum and maximum progress.
    */
-  void SetPlayRange( const Vector2& range );
+  void SetPlayRange(const Vector2& range);
 
   /**
    * Play the animation.
@@ -205,13 +201,13 @@ public:
    * Play the animation from a given point
    * @param[in] progress A value between [0,1] form where the animation should start playing
    */
-  void PlayFrom( float progress );
+  void PlayFrom(float progress);
 
   /**
    * @brief Play the animation after a given delay time.
    * @param[in] delaySeconds The delay time
    */
-  void PlayAfter( float delaySeconds );
+  void PlayAfter(float delaySeconds);
 
   /**
    * Pause the animation.
@@ -274,7 +270,7 @@ public:
    * Animation plays forwards and then restarts from the beginning or runs backwards again.
    * @param[in] loopingMode True when the looping mode is AUTO_REVERSE
    */
-  void SetLoopingMode( bool loopingMode );
+  void SetLoopingMode(bool loopingMode);
 
   /**
    * Add a newly created animator.
@@ -283,7 +279,7 @@ public:
    * @param[in] propertyOwner The scene-object that owns the animatable property.
    * @post The animator is owned by this animation.
    */
-  void AddAnimator( OwnerPointer<AnimatorBase>& animator );
+  void AddAnimator(OwnerPointer<AnimatorBase>& animator);
 
   /**
    * This causes the animators to change the properties of objects in the scene graph.
@@ -294,26 +290,22 @@ public:
    * @param[out] finished True if the animation has finished.
    * @param[out] progressReached True if progress marker reached
    */
-  void Update(BufferIndex bufferIndex, float elapsedSeconds, bool& looped, bool& finished, bool& progressReached );
-
+  void Update(BufferIndex bufferIndex, float elapsedSeconds, bool& looped, bool& finished, bool& progressReached);
 
 protected:
-
   /**
    * Protected constructor. See New()
    */
-  Animation( float durationSeconds, float speedFactor, const Vector2& playRange, int32_t loopCount, EndAction endAction, EndAction disconnectAction );
-
+  Animation(float durationSeconds, float speedFactor, const Vector2& playRange, int32_t loopCount, EndAction endAction, EndAction disconnectAction);
 
 private:
-
   /**
    * Helper for Update, also used to bake when the animation is stopped or destroyed.
    * @param[in] bufferIndex The buffer to update.
    * @param[in] bake True if the final result should be baked.
    * @param[in] animationFinished True if the animation has finished.
    */
-  void UpdateAnimators( BufferIndex bufferIndex, bool bake, bool animationFinished );
+  void UpdateAnimators(BufferIndex bufferIndex, bool bake, bool animationFinished);
 
   /**
    * Helper function to bake the result of the animation when it is stopped or
@@ -321,13 +313,13 @@ private:
    * @param[in] bufferIndex The buffer to update.
    * @param[in] action The end action specified.
    */
-  void Bake(BufferIndex bufferIndex, EndAction action );
+  void Bake(BufferIndex bufferIndex, EndAction action);
 
   /**
    * Helper function to set active state of animators.
    * @param[in] active Every animator is set to this state
    */
-  void SetAnimatorsActive( bool active );
+  void SetAnimatorsActive(bool active);
 
   // Undefined
   Animation(const Animation&);
@@ -336,8 +328,7 @@ private:
   Animation& operator=(const Animation& rhs);
 
 protected:
-
-  OwnerContainer< AnimatorBase* > mAnimators;
+  OwnerContainer<AnimatorBase*> mAnimators;
 
   Vector2 mPlayRange;
 
@@ -345,187 +336,188 @@ protected:
   float mDelaySeconds;
   float mElapsedSeconds;
   float mSpeedFactor;
-  float mProgressMarker;         // Progress marker to trigger a notification
+  float mProgressMarker; // Progress marker to trigger a notification
 
-  int32_t mPlayedCount;              // Incremented at end of animation or completion of all loops
-                                 // Never incremented when looping forever. Event thread tracks to signal end.
-  int32_t mLoopCount;                // N loop setting
-  int32_t mCurrentLoop;              // Current loop number
+  int32_t mPlayedCount; // Incremented at end of animation or completion of all loops
+                        // Never incremented when looping forever. Event thread tracks to signal end.
+  int32_t mLoopCount;   // N loop setting
+  int32_t mCurrentLoop; // Current loop number
 
   EndAction mEndAction;
   EndAction mDisconnectAction;
 
   State mState;
 
-  bool mProgressReachedSignalRequired;  // Flag to indicate the progress marker was hit
-  bool mAutoReverseEnabled;             // Flag to identify that the looping mode is auto reverse.
-  bool mIsActive[2];                    // Flag to indicate whether the animation is active in the current frame (which is double buffered)
+  bool mProgressReachedSignalRequired; // Flag to indicate the progress marker was hit
+  bool mAutoReverseEnabled;            // Flag to identify that the looping mode is auto reverse.
+  bool mIsActive[2];                   // Flag to indicate whether the animation is active in the current frame (which is double buffered)
 };
 
 }; //namespace SceneGraph
 
 // value types used by messages
-template <> struct ParameterType< Dali::Animation::EndAction > : public BasicType< Dali::Animation::EndAction > {};
+template<>
+struct ParameterType<Dali::Animation::EndAction> : public BasicType<Dali::Animation::EndAction>
+{
+};
 
 namespace SceneGraph
 {
-
 // Messages for Animation
 
-inline void SetDurationMessage( EventThreadServices& eventThreadServices, const Animation& animation, float durationSeconds )
+inline void SetDurationMessage(EventThreadServices& eventThreadServices, const Animation& animation, float durationSeconds)
 {
-  using LocalType = MessageValue1< Animation, float >;
+  using LocalType = MessageValue1<Animation, float>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &animation, &Animation::SetDuration, durationSeconds );
+  new(slot) LocalType(&animation, &Animation::SetDuration, durationSeconds);
 }
 
-inline void SetProgressNotificationMessage( EventThreadServices& eventThreadServices, const Animation& animation, float progress )
+inline void SetProgressNotificationMessage(EventThreadServices& eventThreadServices, const Animation& animation, float progress)
 {
-  using LocalType = MessageValue1< Animation, float >;
+  using LocalType = MessageValue1<Animation, float>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &animation, &Animation::SetProgressNotification, progress );
+  new(slot) LocalType(&animation, &Animation::SetProgressNotification, progress);
 }
 
-
-inline void SetLoopingMessage( EventThreadServices& eventThreadServices, const Animation& animation, int32_t loopCount )
+inline void SetLoopingMessage(EventThreadServices& eventThreadServices, const Animation& animation, int32_t loopCount)
 {
-  using LocalType = MessageValue1< Animation, int32_t >;
+  using LocalType = MessageValue1<Animation, int32_t>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &animation, &Animation::SetLoopCount, loopCount );
+  new(slot) LocalType(&animation, &Animation::SetLoopCount, loopCount);
 }
 
-inline void SetEndActionMessage( EventThreadServices& eventThreadServices, const Animation& animation, Dali::Animation::EndAction action )
+inline void SetEndActionMessage(EventThreadServices& eventThreadServices, const Animation& animation, Dali::Animation::EndAction action)
 {
-  using LocalType = MessageValue1< Animation, Dali::Animation::EndAction >;
+  using LocalType = MessageValue1<Animation, Dali::Animation::EndAction>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &animation, &Animation::SetEndAction, action );
+  new(slot) LocalType(&animation, &Animation::SetEndAction, action);
 }
 
-inline void SetDisconnectActionMessage( EventThreadServices& eventThreadServices, const Animation& animation, Dali::Animation::EndAction action )
+inline void SetDisconnectActionMessage(EventThreadServices& eventThreadServices, const Animation& animation, Dali::Animation::EndAction action)
 {
-  using LocalType = MessageValue1< Animation, Dali::Animation::EndAction >;
+  using LocalType = MessageValue1<Animation, Dali::Animation::EndAction>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &animation, &Animation::SetDisconnectAction, action );
+  new(slot) LocalType(&animation, &Animation::SetDisconnectAction, action);
 }
 
-inline void SetCurrentProgressMessage( EventThreadServices& eventThreadServices, const Animation& animation, float progress )
+inline void SetCurrentProgressMessage(EventThreadServices& eventThreadServices, const Animation& animation, float progress)
 {
-  using LocalType = MessageValue1< Animation, float >;
+  using LocalType = MessageValue1<Animation, float>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &animation, &Animation::SetCurrentProgress, progress );
+  new(slot) LocalType(&animation, &Animation::SetCurrentProgress, progress);
 }
 
-inline void SetSpeedFactorMessage( EventThreadServices& eventThreadServices, const Animation& animation, float factor )
+inline void SetSpeedFactorMessage(EventThreadServices& eventThreadServices, const Animation& animation, float factor)
 {
-  using LocalType = MessageValue1< Animation, float >;
+  using LocalType = MessageValue1<Animation, float>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &animation, &Animation::SetSpeedFactor, factor );
+  new(slot) LocalType(&animation, &Animation::SetSpeedFactor, factor);
 }
 
-inline void SetPlayRangeMessage( EventThreadServices& eventThreadServices, const Animation& animation, const Vector2& range )
+inline void SetPlayRangeMessage(EventThreadServices& eventThreadServices, const Animation& animation, const Vector2& range)
 {
-  using LocalType = MessageValue1< Animation, Vector2 >;
+  using LocalType = MessageValue1<Animation, Vector2>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &animation, &Animation::SetPlayRange, range );
+  new(slot) LocalType(&animation, &Animation::SetPlayRange, range);
 }
 
-inline void PlayAnimationMessage( EventThreadServices& eventThreadServices, const Animation& animation )
+inline void PlayAnimationMessage(EventThreadServices& eventThreadServices, const Animation& animation)
 {
-  using LocalType = Message< Animation >;
+  using LocalType = Message<Animation>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &animation, &Animation::Play );
+  new(slot) LocalType(&animation, &Animation::Play);
 }
 
-inline void PlayAnimationFromMessage( EventThreadServices& eventThreadServices, const Animation& animation, float progress )
+inline void PlayAnimationFromMessage(EventThreadServices& eventThreadServices, const Animation& animation, float progress)
 {
-  using LocalType = MessageValue1< Animation, float >;
+  using LocalType = MessageValue1<Animation, float>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &animation, &Animation::PlayFrom, progress );
+  new(slot) LocalType(&animation, &Animation::PlayFrom, progress);
 }
 
-inline void PauseAnimationMessage( EventThreadServices& eventThreadServices, const Animation& animation )
+inline void PauseAnimationMessage(EventThreadServices& eventThreadServices, const Animation& animation)
 {
-  using LocalType = Message< Animation >;
+  using LocalType = Message<Animation>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &animation, &Animation::Pause );
+  new(slot) LocalType(&animation, &Animation::Pause);
 }
 
-inline void AddAnimatorMessage( EventThreadServices& eventThreadServices, const Animation& animation, AnimatorBase& animator )
+inline void AddAnimatorMessage(EventThreadServices& eventThreadServices, const Animation& animation, AnimatorBase& animator)
 {
-  using LocalType = MessageValue1< Animation, OwnerPointer<AnimatorBase> >;
+  using LocalType = MessageValue1<Animation, OwnerPointer<AnimatorBase> >;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  OwnerPointer<AnimatorBase> parameter( &animator );
-  new (slot) LocalType( &animation, &Animation::AddAnimator, parameter );
+  OwnerPointer<AnimatorBase> parameter(&animator);
+  new(slot) LocalType(&animation, &Animation::AddAnimator, parameter);
 }
 
-inline void PlayAfterMessage( EventThreadServices& eventThreadServices, const Animation& animation, float delaySeconds )
+inline void PlayAfterMessage(EventThreadServices& eventThreadServices, const Animation& animation, float delaySeconds)
 {
-  using LocalType = MessageValue1< Animation, float >;
+  using LocalType = MessageValue1<Animation, float>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &animation, &Animation::PlayAfter, delaySeconds );
+  new(slot) LocalType(&animation, &Animation::PlayAfter, delaySeconds);
 }
 
-inline void SetLoopingModeMessage( EventThreadServices& eventThreadServices, const Animation& animation, bool loopingMode )
+inline void SetLoopingModeMessage(EventThreadServices& eventThreadServices, const Animation& animation, bool loopingMode)
 {
-  using LocalType = MessageValue1< Animation, bool >;
+  using LocalType = MessageValue1<Animation, bool>;
 
   // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &animation, &Animation::SetLoopingMode, loopingMode );
+  new(slot) LocalType(&animation, &Animation::SetLoopingMode, loopingMode);
 }
 
 } // namespace SceneGraph

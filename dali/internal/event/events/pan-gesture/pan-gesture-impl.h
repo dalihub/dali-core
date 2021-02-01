@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PAN_GESTURE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,17 +19,15 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/internal/event/events/gesture-impl.h>
+#include <dali/public-api/events/pan-gesture.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/object/base-object.h>
-#include <dali/public-api/events/pan-gesture.h>
-#include <dali/internal/event/events/gesture-impl.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 class PanGesture;
 using PanGesturePtr = IntrusivePtr<PanGesture>;
 
@@ -39,7 +37,6 @@ using PanGesturePtr = IntrusivePtr<PanGesture>;
 class PanGesture final : public Gesture
 {
 public:
-
   /**
    * @brief Default constructor
    */
@@ -48,10 +45,10 @@ public:
   {
   }
 
-  PanGesture(const PanGesture&) = delete; ///< Deleted copy constructor
-  PanGesture(PanGesture&&) = delete; ///< Deleted move constructor
+  PanGesture(const PanGesture&) = delete;            ///< Deleted copy constructor
+  PanGesture(PanGesture&&)      = delete;            ///< Deleted move constructor
   PanGesture& operator=(const PanGesture&) = delete; ///< Deleted copy assignment operator
-  PanGesture& operator=(PanGesture&&) = delete; ///< Deleted move assignment operator
+  PanGesture& operator=(PanGesture&&) = delete;      ///< Deleted move assignment operator
 
   /**
    * @brief Set The velocity at which the user is moving their fingers.
@@ -207,7 +204,6 @@ public:
   }
 
 private:
-
   /**
    * @brief Virtual destructor
    *
@@ -216,12 +212,12 @@ private:
   ~PanGesture() override = default;
 
 private:
-  Vector2 mVelocity;
-  Vector2 mDisplacement;
-  Vector2 mPosition;
-  Vector2 mScreenVelocity;
-  Vector2 mScreenDisplacement;
-  Vector2 mScreenPosition;
+  Vector2  mVelocity;
+  Vector2  mDisplacement;
+  Vector2  mPosition;
+  Vector2  mScreenVelocity;
+  Vector2  mScreenDisplacement;
+  Vector2  mScreenPosition;
   uint32_t mNumberOfTouches{1u};
 };
 
@@ -229,22 +225,22 @@ private:
 
 // Helpers for public-api forwarding methods
 
-inline Internal::PanGesture& GetImplementation( Dali::PanGesture& panGesture )
+inline Internal::PanGesture& GetImplementation(Dali::PanGesture& panGesture)
 {
-  DALI_ASSERT_ALWAYS( panGesture && "panGesture handle is empty" );
+  DALI_ASSERT_ALWAYS(panGesture && "panGesture handle is empty");
 
   BaseObject& object = panGesture.GetBaseObject();
 
-  return static_cast< Internal::PanGesture& >( object );
+  return static_cast<Internal::PanGesture&>(object);
 }
 
-inline const Internal::PanGesture& GetImplementation( const Dali::PanGesture& panGesture )
+inline const Internal::PanGesture& GetImplementation(const Dali::PanGesture& panGesture)
 {
-  DALI_ASSERT_ALWAYS( panGesture && "panGesture handle is empty" );
+  DALI_ASSERT_ALWAYS(panGesture && "panGesture handle is empty");
 
   const BaseObject& object = panGesture.GetBaseObject();
 
-  return static_cast< const Internal::PanGesture& >( object );
+  return static_cast<const Internal::PanGesture&>(object);
 }
 
 } // namespace Dali

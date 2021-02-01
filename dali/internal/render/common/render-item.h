@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_ITEM_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,17 +19,15 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h>
-#include <dali/public-api/actors/layer.h>
-#include <dali/public-api/math/matrix.h>
 #include <dali/internal/update/nodes/node.h>
+#include <dali/public-api/actors/layer.h>
+#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/math/matrix.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace Render
 {
 class Renderer;
@@ -37,7 +35,6 @@ class Renderer;
 
 namespace SceneGraph
 {
-
 /**
  * A RenderItem contains all the data needed for rendering
  */
@@ -67,14 +64,14 @@ struct RenderItem
    * @param[in]    viewportHeight    The height of the viewport to calculate for
    * @return                         The AABB coordinates in viewport-space (x, y, width, height)
    */
-  ClippingBox CalculateViewportSpaceAABB( const Vector3& size, const int viewportWidth, const int viewportHeight ) const;
+  ClippingBox CalculateViewportSpaceAABB(const Vector3& size, const int viewportWidth, const int viewportHeight) const;
 
   /**
    * Overriden delete operator.
    * Deletes the RenderItem from its global memory pool
    * @param[in] A pointer to the RenderItem to delete.
    */
-  void operator delete( void* ptr );
+  void operator delete(void* ptr);
 
   Matrix            mModelMatrix;
   Matrix            mModelViewMatrix;
@@ -83,22 +80,20 @@ struct RenderItem
   Vector3           mUpdateSize;
   Render::Renderer* mRenderer;
   Node*             mNode;
-  const void*       mTextureSet;        //< Used for sorting only
+  const void*       mTextureSet; //< Used for sorting only
   int               mDepthIndex;
-  bool              mIsOpaque:1;
-  bool              mIsUpdated:1;
+  bool              mIsOpaque : 1;
+  bool              mIsUpdated : 1;
 
 private:
-
   /**
    * Private constructor. See RenderItem::New
    */
   RenderItem();
 
   // RenderItems should not be copied as they are heavy
-  RenderItem( const RenderItem& item );
-  RenderItem& operator = ( const RenderItem& item );
-
+  RenderItem(const RenderItem& item);
+  RenderItem& operator=(const RenderItem& item);
 };
 
 } // namespace SceneGraph

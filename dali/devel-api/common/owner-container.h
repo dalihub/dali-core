@@ -86,6 +86,32 @@ public:
   }
 
   /**
+   * @brief Erases all elements that satisfy the predicate from the OwnerContainer.
+   *
+   * @param[in] predicate The predicate
+   */
+  template<class Predicate>
+  void EraseIf(Predicate predicate)
+  {
+    auto begin = Vector<T>::Begin();
+    auto end   = Vector<T>::End();
+
+    auto function = [predicate](auto& obj) {
+      if(predicate(obj))
+      {
+        delete obj;
+        return true;
+      }
+      else
+      {
+        return false;
+      }
+    };
+
+    Vector<T>::Erase(std::remove_if(begin, end, function), end);
+  }
+
+  /**
    * Erases a range of elements.(delete from heap).
    */
   Iterator Erase(Iterator first, Iterator last)

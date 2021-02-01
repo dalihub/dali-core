@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SHADER_DISPATCHER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,8 @@
 
 // EXTERNAL INCLUDES
 
-
 namespace Dali
 {
-
 namespace Internal
 {
 class ShaderData;
@@ -38,12 +36,11 @@ using ShaderDataPtr = IntrusivePtr<ShaderData>;
 class ShaderSaver
 {
 public:
-
   /**
    * A function saving the binary from a ShaderDataPtr or passing it on to where it can be saved.
    * @param[in] shaderData A smart pointer to a ShaderData for which the program binary should be saved.
    */
-  virtual void SaveBinary( Internal::ShaderDataPtr shaderData ) = 0;
+  virtual void SaveBinary(Internal::ShaderDataPtr shaderData) = 0;
 
 protected:
   /**

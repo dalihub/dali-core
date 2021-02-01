@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_UPDATE_MANAGER_DEBUG_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@
 #include <string>
 
 // INTERNAL INCLUDES
-#include <dali/internal/update/nodes/node.h>
 #include <dali/integration-api/debug.h>
+#include <dali/internal/update/nodes/node.h>
 
 // Define this to access debug functions for the update manager.
 #undef DALI_PRINT_UPDATE_INFO
@@ -32,22 +32,19 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace SceneGraph
 {
+void PrintNodes(const Node& node, BufferIndex updateBufferIndex, int level);
 
-void PrintNodes( const Node& node, BufferIndex updateBufferIndex, int level);
+void PrintNodeTree(const Node& node, BufferIndex bufferIndex, std::string indentation = "");
 
-void PrintNodeTree( const Node& node, BufferIndex bufferIndex, std::string indentation="" );
+} // namespace SceneGraph
 
-} // SceneGraph
+} // namespace Internal
 
-} // Internal
-
-} // Dali
+} // namespace Dali
 
 #endif
 

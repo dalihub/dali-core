@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_CUSTOM_ACTOR_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,21 +19,18 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/actor-declarations.h>
+#include <dali/internal/event/actors/actor-impl.h>
 #include <dali/public-api/actors/custom-actor.h>
 #include <dali/public-api/animation/animation.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 class CustomActor : public Actor
 {
 public:
-
   /**
    * Create a new custom actor.
    * @return A smart-pointer to the newly allocated Actor.
@@ -66,20 +63,18 @@ public:
   Dali::TypeInfo GetTypeInfo();
 
 protected:
-
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
   ~CustomActor() override;
 
 private:
-
   /**
    * @copydoc Internal::Actor::OnSceneConnectionExternal
    */
-  void OnSceneConnectionExternal( int32_t depth ) override
+  void OnSceneConnectionExternal(int32_t depth) override
   {
-    mImpl->OnSceneConnection( depth );
+    mImpl->OnSceneConnection(depth);
   }
 
   /**
@@ -111,7 +106,7 @@ private:
   /**
    * @copydoc Internal::Actor::OnPropertySet
    */
-  void OnPropertySet( Property::Index index, const Property::Value& propertyValue ) override
+  void OnPropertySet(Property::Index index, const Property::Value& propertyValue) override
   {
     mImpl->OnPropertySet(index, propertyValue);
   }
@@ -136,17 +131,17 @@ private:
   /**
    * @copydoc Internal::Actor::OnRelayout
    */
-  void OnRelayout( const Vector2& size, RelayoutContainer& container ) override
+  void OnRelayout(const Vector2& size, RelayoutContainer& container) override
   {
-    mImpl->OnRelayout( size, container );
+    mImpl->OnRelayout(size, container);
   }
 
   /**
    * @copydoc Internal::Actor::OnSetResizePolicy
    */
-  void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension ) override
+  void OnSetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension) override
   {
-    mImpl->OnSetResizePolicy( policy, dimension );
+    mImpl->OnSetResizePolicy(policy, dimension);
   }
 
   /**
@@ -160,65 +155,63 @@ private:
   /**
    * @copydoc Internal::Actor::CalculateChildSize
    */
-  float CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension ) override
+  float CalculateChildSize(const Dali::Actor& child, Dimension::Type dimension) override
   {
-    return mImpl->CalculateChildSize( child, dimension );
+    return mImpl->CalculateChildSize(child, dimension);
   }
 
   /**
    * @copydoc Internal::Actor::GetHeightForWidth
    */
-  float GetHeightForWidth( float width ) override
+  float GetHeightForWidth(float width) override
   {
-    return mImpl->GetHeightForWidth( width );
+    return mImpl->GetHeightForWidth(width);
   }
 
   /**
    * @copydoc Internal::Actor::GetWidthForHeight
    */
-  float GetWidthForHeight( float height ) override
+  float GetWidthForHeight(float height) override
   {
-    return mImpl->GetWidthForHeight( height );
+    return mImpl->GetWidthForHeight(height);
   }
 
   /**
    * @copydoc Internal::Actor::RelayoutDependentOnChildren
    */
-  bool RelayoutDependentOnChildren( Dimension::Type dimension = Dimension::ALL_DIMENSIONS ) override
+  bool RelayoutDependentOnChildren(Dimension::Type dimension = Dimension::ALL_DIMENSIONS) override
   {
-    return mImpl->RelayoutDependentOnChildren( dimension );
+    return mImpl->RelayoutDependentOnChildren(dimension);
   }
 
   /**
    * @copydoc Internal::Actor::OnCalculateRelayoutSize
    */
-  void OnCalculateRelayoutSize( Dimension::Type dimension ) override
+  void OnCalculateRelayoutSize(Dimension::Type dimension) override
   {
-    return mImpl->OnCalculateRelayoutSize( dimension );
+    return mImpl->OnCalculateRelayoutSize(dimension);
   }
 
   /**
    * @copydoc Internal::Actor::OnLayoutNegotiated
    */
-  void OnLayoutNegotiated( float size, Dimension::Type dimension ) override
+  void OnLayoutNegotiated(float size, Dimension::Type dimension) override
   {
-    return mImpl->OnLayoutNegotiated( size, dimension );
+    return mImpl->OnLayoutNegotiated(size, dimension);
   }
 
   /**
    * Private constructor; see also CustomActor::New()
    */
-  CustomActor( const SceneGraph::Node& node, CustomActorImpl& extension );
+  CustomActor(const SceneGraph::Node& node, CustomActorImpl& extension);
 
   // no default or copy constructor or assignment
-  CustomActor() = delete;
-  CustomActor( const CustomActor& ) = delete;
-  CustomActor& operator=( const CustomActor& rhs ) = delete;
+  CustomActor()                   = delete;
+  CustomActor(const CustomActor&) = delete;
+  CustomActor& operator=(const CustomActor& rhs) = delete;
 
 protected:
-
   CustomActorImplPtr mImpl;
-
 };
 
 } // namespace Internal
@@ -227,7 +220,7 @@ protected:
 
 inline Internal::CustomActor& GetImpl(Dali::CustomActor& actor)
 {
-  DALI_ASSERT_ALWAYS( actor && "CustomActor handle is empty" );
+  DALI_ASSERT_ALWAYS(actor && "CustomActor handle is empty");
 
   BaseObject& handle = actor.GetBaseObject();
 
@@ -236,7 +229,7 @@ inline Internal::CustomActor& GetImpl(Dali::CustomActor& actor)
 
 inline const Internal::CustomActor& GetImpl(const Dali::CustomActor& actor)
 {
-  DALI_ASSERT_ALWAYS( actor && "CustomActor handle is empty" );
+  DALI_ASSERT_ALWAYS(actor && "CustomActor handle is empty");
 
   const BaseObject& handle = actor.GetBaseObject();
 
