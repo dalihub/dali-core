@@ -24,10 +24,23 @@
 
 namespace Dali
 {
+std::ostream& operator<<(std::ostream& o, const Graphics::BufferCreateInfo& bufferCreateInfo);
+std::ostream& operator<<(std::ostream& o, const Graphics::CommandBufferCreateInfo& commandBufferCreateInfo);
+std::ostream& operator<<(std::ostream& o, const Graphics::TextureType& textureType);
+std::ostream& operator<<(std::ostream& o, const Graphics::Extent2D extent);
+std::ostream& operator<<(std::ostream& o, const Graphics::TextureCreateInfo& createInfo);
+std::ostream& operator<<(std::ostream& o, Graphics::SamplerAddressMode addressMode);
+std::ostream& operator<<(std::ostream& o, Graphics::SamplerFilter filterMode);
+std::ostream& operator<<(std::ostream& o, Graphics::SamplerMipmapMode mipmapMode);
+std::ostream& operator<<(std::ostream& o, const Graphics::SamplerCreateInfo& createInfo);
+
 class TestGraphicsController : public Dali::Graphics::Controller
 {
 public:
-  TestGraphicsController()          = default;
+  TestGraphicsController()
+  {
+  }
+
   virtual ~TestGraphicsController() = default;
 
   void Initialize()
@@ -50,10 +63,301 @@ public:
     return mGlContextHelperAbstraction;
   }
 
-private:
+  void SubmitCommandBuffers(const Graphics::SubmitInfo& submitInfo) override
+  {
+  }
+
+  /**
+   * @brief Presents render target
+   * @param renderTarget render target to present
+   */
+  void PresentRenderTarget(Graphics::RenderTarget* renderTarget) override
+  {
+  }
+
+  /**
+   * @brief Waits until the GPU is idle
+   */
+  void WaitIdle() override
+  {
+  }
+
+  /**
+   * @brief Lifecycle pause event
+   */
+  void Pause() override
+  {
+  }
+
+  /**
+   * @brief Lifecycle resume event
+   */
+  void Resume() override
+  {
+  }
+
+  /**
+   * @brief Executes batch update of textures
+   *
+   * This function may perform full or partial update of many textures.
+   * The data source may come from:
+   * - CPU memory (client side)
+   * - GPU memory (another Texture or Buffer)
+   *
+   * UpdateTextures() is the only way to update unmappable Texture objects.
+   * It is recommended to batch updates as it may help with optimizing
+   * memory transfers based on dependencies.
+   *
+   */
+  void UpdateTextures(const std::vector<Graphics::TextureUpdateInfo>&       updateInfoList,
+                      const std::vector<Graphics::TextureUpdateSourceInfo>& sourceList) override
+  {
+  }
+
+  /**
+   * TBD: do we need those functions in the new implementation?
+   */
+  bool EnableDepthStencilBuffer(bool enableDepth, bool enableStencil) override
+  {
+    return {};
+  }
+
+  void RunGarbageCollector(size_t numberOfDiscardedRenderers) override
+  {
+  }
+
+  void DiscardUnusedResources() override
+  {
+  }
+
+  bool IsDiscardQueueEmpty() override
+  {
+    return {};
+  }
+
+  /**
+   * @brief Test if the graphics subsystem has resumed & should force a draw
+   *
+   * @return true if the graphics subsystem requires a re-draw
+   */
+  bool IsDrawOnResumeRequired() override
+  {
+    return {};
+  }
+
+  /**
+   * @brief Creates new Buffer object
+   *
+   * The Buffer object is created with underlying memory. The Buffer
+   * specification is immutable. Based on the BufferCreateInfo::usage,
+   * the memory may be client-side mappable or not.
+   *
+   * The old buffer may be passed as BufferCreateInfo::oldbuffer, however,
+   * it's up to the implementation whether the object will be reused or
+   * discarded and replaced by the new one.
+   *
+   * @param[in] bufferCreateInfo The valid BufferCreateInfo structure
+   * @return pointer to the Buffer object
+   */
+  std::unique_ptr<Graphics::Buffer> CreateBuffer(const Graphics::BufferCreateInfo& bufferCreateInfo, std::unique_ptr<Graphics::Buffer>&& oldBuffer) override
+  {
+    return {};
+  }
+
+  /**
+   * @brief Creates new CommandBuffer object
+   *
+   * @param[in] bufferCreateInfo The valid BufferCreateInfo structure
+   * @return pointer to the CommandBuffer object
+   */
+  std::unique_ptr<Graphics::CommandBuffer> CreateCommandBuffer(const Graphics::CommandBufferCreateInfo& commandBufferCreateInfo, std::unique_ptr<Graphics::CommandBuffer>&& oldCommandBuffer) override
+  {
+    return {};
+  }
+
+  /**
+   * @brief Creates new RenderPass object
+   *
+   * @param[in] renderPassCreateInfo The valid RenderPassCreateInfo structure
+   * @return pointer to the RenderPass object
+   */
+  std::unique_ptr<Graphics::RenderPass> CreateRenderPass(const Graphics::RenderPassCreateInfo& renderPassCreateInfo, std::unique_ptr<Graphics::RenderPass>&& oldRenderPass) override
+  {
+    return {};
+  }
+
+  /**
+   * @brief Creates new Texture object
+   *
+   * @param[in] textureCreateInfo The valid TextureCreateInfo structure
+   * @return pointer to the TextureCreateInfo object
+   */
+  std::unique_ptr<Graphics::Texture> CreateTexture(const Graphics::TextureCreateInfo& textureCreateInfo, std::unique_ptr<Graphics::Texture>&& oldTexture) override
+  {
+    return {};
+  }
+
+  /**
+   * @brief Creates new Framebuffer object
+   *
+   * @param[in] framebufferCreateInfo The valid FramebufferCreateInfo structure
+   * @return pointer to the Framebuffer object
+   */
+  std::unique_ptr<Graphics::Framebuffer> CreateFramebuffer(const Graphics::FramebufferCreateInfo& framebufferCreateInfo, std::unique_ptr<Graphics::Framebuffer>&& oldFramebuffer) override
+  {
+    return {};
+  }
+
+  /**
+   * @brief Creates new Pipeline object
+   *
+   * @param[in] pipelineCreateInfo The valid PipelineCreateInfo structure
+   * @return pointer to the Pipeline object
+   */
+  std::unique_ptr<Graphics::Pipeline> CreatePipeline(const Graphics::PipelineCreateInfo& pipelineCreateInfo, std::unique_ptr<Graphics::Pipeline>&& oldPipeline) override
+  {
+    return {};
+  }
+
+  /**
+   * @brief Creates new Shader object
+   *
+   * @param[in] shaderCreateInfo The valid ShaderCreateInfo structure
+   * @return pointer to the Shader object
+   */
+  std::unique_ptr<Graphics::Shader> CreateShader(const Graphics::ShaderCreateInfo& shaderCreateInfo, std::unique_ptr<Graphics::Shader>&& oldShader) override
+  {
+    return {};
+  }
+
+  /**
+   * @brief Creates new Sampler object
+   *
+   * @param[in] samplerCreateInfo The valid SamplerCreateInfo structure
+   * @return pointer to the Sampler object
+   */
+  std::unique_ptr<Graphics::Sampler> CreateSampler(const Graphics::SamplerCreateInfo& samplerCreateInfo, std::unique_ptr<Graphics::Sampler>&& oldSampler) override
+  {
+    return {};
+  }
+
+  /**
+   * @brief Creates new RenderTarget object
+   *
+   * @param[in] renderTargetCreateInfo The valid RenderTargetCreateInfo structure
+   * @return pointer to the RenderTarget object
+   */
+  std::unique_ptr<Graphics::RenderTarget> CreateRenderTarget(const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo, std::unique_ptr<Graphics::RenderTarget>&& oldRenderTarget) override
+  {
+    return {};
+  }
+
+  /**
+   * @brief Maps memory associated with Buffer object
+   *
+   * @param[in] mapInfo Filled details of mapped resource
+   *
+   * @return Returns pointer to Memory object or Graphicsnullptr on error
+   */
+  std::unique_ptr<Graphics::Memory> MapBufferRange(const Graphics::MapBufferInfo& mapInfo) override
+  {
+    return {};
+  }
+
+  /**
+   * @brief Maps memory associated with the texture.
+   *
+   * Only Texture objects that are backed with linear memory (staging memory) can be mapped.
+   * Example:
+   * 1) GLES implementation may create PBO object as staging memory and couple it
+   * with the texture. Texture can be mapped and the memory can be read/write on demand.
+   *
+   * 2) Vulkan implementation may allocate DeviceMemory and use linear layout.
+   *
+   * @param[in] mapInfo Filled details of mapped resource
+   *
+   * @return Valid Memory object or nullptr on error
+   */
+  std::unique_ptr<Graphics::Memory> MapTextureRange(const Graphics::MapTextureInfo& mapInfo) override
+  {
+    return {};
+  }
+
+  /**
+   * @brief Unmaps memory and discards Memory object
+   *
+   * This function automatically removes lock if Memory has been
+   * previously locked.
+   *
+   * @param[in] memory Valid and previously mapped Memory object
+   */
+  void UnmapMemory(std::unique_ptr<Graphics::Memory> memory) override
+  {
+  }
+
+  /**
+   * @brief Returns memory requirements of the Texture object.
+   *
+   * Call this function whenever it's necessary to know how much memory
+   * is needed to store all the texture data and what memory alignment
+   * the data should follow.
+   *
+   * @return Returns memory requirements of Texture
+   */
+  Graphics::MemoryRequirements GetTextureMemoryRequirements(Graphics::Texture& texture) const override
+  {
+    return {};
+  }
+
+  /**
+   * @brief Returns memory requirements of the Buffer object.
+   *
+   * Call this function whenever it's necessary to know how much memory
+   * is needed to store all the buffer data and what memory alignment
+   * the data should follow.
+   *
+   * @return Returns memory requirements of Buffer
+   */
+  Graphics::MemoryRequirements GetBufferMemoryRequirements(Graphics::Buffer& buffer) const override
+  {
+    return {};
+  }
+
+  /**
+   * @brief Returns specification of the Texture object
+   *
+   * Function obtains specification of the Texture object. It may retrieve
+   * implementation dependent details like ie. whether the texture is
+   * emulated (for example, RGB emulated on RGBA), compressed etc.
+   *
+   * @return Returns the TextureProperties object
+   */
+  const Graphics::TextureProperties& GetTextureProperties(const Graphics::Texture& texture) override
+  {
+    static Graphics::TextureProperties properties{};
+    return properties;
+  }
+
+  /**
+   * @brief Tests whether two Pipelines are the same.
+   *
+   * On the higher level, this function may help wit creating pipeline cache.
+   *
+   * @return true if pipeline objects match
+   */
+  bool PipelineEquals(const Graphics::Pipeline& pipeline0, const Graphics::Pipeline& pipeline1) const override
+  {
+    return {};
+  }
+
+public:
+
   TestGlAbstraction              mGlAbstraction;
   TestGlSyncAbstraction          mGlSyncAbstraction;
   TestGlContextHelperAbstraction mGlContextHelperAbstraction;
+
+  bool isDiscardQueueEmptyResult{true};
+  bool isDrawOnResumeRequiredResult{true};
 };
 
 } // namespace Dali

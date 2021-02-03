@@ -4,4 +4,26 @@ SET( graphics_src_dir ${ROOT_SRC_DIR}/dali/graphics-api )
 
 SET( GRAPHICS_API_HEADERS ${GRAPHICS_API_HEADERS}
    ${graphics_src_dir}/graphics-controller.h
+   ${graphics_src_dir}/graphics-buffer-create-info.h
+   ${graphics_src_dir}/graphics-buffer.h
+   ${graphics_src_dir}/graphics-command-buffer-create-info.h
+   ${graphics_src_dir}/graphics-command-buffer.h
+   ${graphics_src_dir}/graphics-controller.h
+   ${graphics_src_dir}/graphics-debug.h
+   ${graphics_src_dir}/graphics-framebuffer-create-info.h
+   ${graphics_src_dir}/graphics-framebuffer.h
+   ${graphics_src_dir}/graphics-memory.h
+   ${graphics_src_dir}/graphics-pipeline-create-info.h 
+   ${graphics_src_dir}/graphics-pipeline.h
+   ${graphics_src_dir}/graphics-render-pass-create-info.h
+   ${graphics_src_dir}/graphics-render-pass.h
+   ${graphics_src_dir}/graphics-render-target-create-info.h
+   ${graphics_src_dir}/graphics-render-target.h
+   ${graphics_src_dir}/graphics-sampler-create-info.h
+   ${graphics_src_dir}/graphics-sampler.h
+   ${graphics_src_dir}/graphics-shader-create-info.h
+   ${graphics_src_dir}/graphics-shader.h
+   ${graphics_src_dir}/graphics-texture-create-info.h
+   ${graphics_src_dir}/graphics-texture.h
+   ${graphics_src_dir}/graphics-types.h
 )
