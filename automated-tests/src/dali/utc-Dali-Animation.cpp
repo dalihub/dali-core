@@ -18,6 +18,7 @@
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/animation/animation-devel.h>
+#include <dali/devel-api/animation/key-frames-devel.h>
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
 
@@ -9183,6 +9184,48 @@ int UtcDaliAnimationKeyFrames07N(void)
       keyFrames.Add(0.7f, 1.1f);
     },
     "mType == value.GetType()");
+
+  END_TEST;
+}
+
+int UtcDaliAnimationKeyFramesGetKeyFrameCountP(void)
+{
+  TestApplication application;
+
+  KeyFrames keyFrames = KeyFrames::New();
+  keyFrames.Add(0.0f, Vector4(0.0f, 0.0f, 0.0f, 0.6f));
+  keyFrames.Add(0.6f, Vector4(0.0f, 0.0f, 0.0f, 0.3f));
+  keyFrames.Add(1.0f, Vector4(0.0f, 0.0f, 0.0f, 0.8f));
+
+  DALI_TEST_EQUALS(DevelKeyFrames::GetKeyFrameCount(keyFrames), 3, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimationKeyFramesGetKeyFrameP(void)
+{
+  TestApplication application;
+
+  float inputTime = 0.6f;
+  Vector4 inputValue = Vector4(0.0f, 0.0f, 0.0f, 0.3f);
+
+  KeyFrames keyFrames = KeyFrames::New();
+  keyFrames.Add(0.0f, Vector4(0.0f, 0.0f, 0.0f, 0.6f));
+  keyFrames.Add(inputTime, inputValue);
+  keyFrames.Add(1.0f, Vector4(0.0f, 0.0f, 0.0f, 0.8f));
+
+  float outputTime;
+  Property::Value outputValue;
+
+  DevelKeyFrames::GetKeyFrame(keyFrames, 3, outputTime, outputValue);
+
+  DALI_TEST_EQUALS(outputValue.GetType(), Property::Type::NONE, TEST_LOCATION);
+
+  DevelKeyFrames::GetKeyFrame(keyFrames, 1, outputTime, outputValue);
+
+  DALI_TEST_EQUALS(outputTime, inputTime, TEST_LOCATION);
+  DALI_TEST_EQUALS(outputValue.GetType(), Property::Type::VECTOR4, TEST_LOCATION);
+  DALI_TEST_EQUALS(outputValue.Get<Vector4>(), inputValue, TEST_LOCATION);
 
   END_TEST;
 }
