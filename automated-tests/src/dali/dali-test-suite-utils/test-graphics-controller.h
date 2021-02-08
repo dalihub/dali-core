@@ -159,7 +159,7 @@ public:
    * @param[in] bufferCreateInfo The valid BufferCreateInfo structure
    * @return pointer to the Buffer object
    */
-  std::unique_ptr<Graphics::Buffer> CreateBuffer(const Graphics::BufferCreateInfo& bufferCreateInfo, std::unique_ptr<Graphics::Buffer>&& oldBuffer) override
+  Graphics::UniquePtr<Graphics::Buffer> CreateBuffer(const Graphics::BufferCreateInfo& bufferCreateInfo, Graphics::UniquePtr<Graphics::Buffer>&& oldBuffer) override
   {
     return {};
   }
@@ -170,7 +170,7 @@ public:
    * @param[in] bufferCreateInfo The valid BufferCreateInfo structure
    * @return pointer to the CommandBuffer object
    */
-  std::unique_ptr<Graphics::CommandBuffer> CreateCommandBuffer(const Graphics::CommandBufferCreateInfo& commandBufferCreateInfo, std::unique_ptr<Graphics::CommandBuffer>&& oldCommandBuffer) override
+  Graphics::UniquePtr<Graphics::CommandBuffer> CreateCommandBuffer(const Graphics::CommandBufferCreateInfo& commandBufferCreateInfo, Graphics::UniquePtr<Graphics::CommandBuffer>&& oldCommandBuffer) override
   {
     return {};
   }
@@ -181,7 +181,7 @@ public:
    * @param[in] renderPassCreateInfo The valid RenderPassCreateInfo structure
    * @return pointer to the RenderPass object
    */
-  std::unique_ptr<Graphics::RenderPass> CreateRenderPass(const Graphics::RenderPassCreateInfo& renderPassCreateInfo, std::unique_ptr<Graphics::RenderPass>&& oldRenderPass) override
+  Graphics::UniquePtr<Graphics::RenderPass> CreateRenderPass(const Graphics::RenderPassCreateInfo& renderPassCreateInfo, Graphics::UniquePtr<Graphics::RenderPass>&& oldRenderPass) override
   {
     return {};
   }
@@ -192,7 +192,7 @@ public:
    * @param[in] textureCreateInfo The valid TextureCreateInfo structure
    * @return pointer to the TextureCreateInfo object
    */
-  std::unique_ptr<Graphics::Texture> CreateTexture(const Graphics::TextureCreateInfo& textureCreateInfo, std::unique_ptr<Graphics::Texture>&& oldTexture) override
+  Graphics::UniquePtr<Graphics::Texture> CreateTexture(const Graphics::TextureCreateInfo& textureCreateInfo, Graphics::UniquePtr<Graphics::Texture>&& oldTexture) override
   {
     return {};
   }
@@ -203,7 +203,7 @@ public:
    * @param[in] framebufferCreateInfo The valid FramebufferCreateInfo structure
    * @return pointer to the Framebuffer object
    */
-  std::unique_ptr<Graphics::Framebuffer> CreateFramebuffer(const Graphics::FramebufferCreateInfo& framebufferCreateInfo, std::unique_ptr<Graphics::Framebuffer>&& oldFramebuffer) override
+  Graphics::UniquePtr<Graphics::Framebuffer> CreateFramebuffer(const Graphics::FramebufferCreateInfo& framebufferCreateInfo, Graphics::UniquePtr<Graphics::Framebuffer>&& oldFramebuffer) override
   {
     return {};
   }
@@ -214,7 +214,7 @@ public:
    * @param[in] pipelineCreateInfo The valid PipelineCreateInfo structure
    * @return pointer to the Pipeline object
    */
-  std::unique_ptr<Graphics::Pipeline> CreatePipeline(const Graphics::PipelineCreateInfo& pipelineCreateInfo, std::unique_ptr<Graphics::Pipeline>&& oldPipeline) override
+  Graphics::UniquePtr<Graphics::Pipeline> CreatePipeline(const Graphics::PipelineCreateInfo& pipelineCreateInfo, Graphics::UniquePtr<Graphics::Pipeline>&& oldPipeline) override
   {
     return {};
   }
@@ -225,7 +225,7 @@ public:
    * @param[in] shaderCreateInfo The valid ShaderCreateInfo structure
    * @return pointer to the Shader object
    */
-  std::unique_ptr<Graphics::Shader> CreateShader(const Graphics::ShaderCreateInfo& shaderCreateInfo, std::unique_ptr<Graphics::Shader>&& oldShader) override
+  Graphics::UniquePtr<Graphics::Shader> CreateShader(const Graphics::ShaderCreateInfo& shaderCreateInfo, Graphics::UniquePtr<Graphics::Shader>&& oldShader) override
   {
     return {};
   }
@@ -236,7 +236,7 @@ public:
    * @param[in] samplerCreateInfo The valid SamplerCreateInfo structure
    * @return pointer to the Sampler object
    */
-  std::unique_ptr<Graphics::Sampler> CreateSampler(const Graphics::SamplerCreateInfo& samplerCreateInfo, std::unique_ptr<Graphics::Sampler>&& oldSampler) override
+  Graphics::UniquePtr<Graphics::Sampler> CreateSampler(const Graphics::SamplerCreateInfo& samplerCreateInfo, Graphics::UniquePtr<Graphics::Sampler>&& oldSampler) override
   {
     return {};
   }
@@ -247,7 +247,7 @@ public:
    * @param[in] renderTargetCreateInfo The valid RenderTargetCreateInfo structure
    * @return pointer to the RenderTarget object
    */
-  std::unique_ptr<Graphics::RenderTarget> CreateRenderTarget(const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo, std::unique_ptr<Graphics::RenderTarget>&& oldRenderTarget) override
+  Graphics::UniquePtr<Graphics::RenderTarget> CreateRenderTarget(const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo, Graphics::UniquePtr<Graphics::RenderTarget>&& oldRenderTarget) override
   {
     return {};
   }
@@ -259,7 +259,7 @@ public:
    *
    * @return Returns pointer to Memory object or Graphicsnullptr on error
    */
-  std::unique_ptr<Graphics::Memory> MapBufferRange(const Graphics::MapBufferInfo& mapInfo) override
+  Graphics::UniquePtr<Graphics::Memory> MapBufferRange(const Graphics::MapBufferInfo& mapInfo) override
   {
     return {};
   }
@@ -278,7 +278,7 @@ public:
    *
    * @return Valid Memory object or nullptr on error
    */
-  std::unique_ptr<Graphics::Memory> MapTextureRange(const Graphics::MapTextureInfo& mapInfo) override
+  Graphics::UniquePtr<Graphics::Memory> MapTextureRange(const Graphics::MapTextureInfo& mapInfo) override
   {
     return {};
   }
@@ -291,7 +291,7 @@ public:
    *
    * @param[in] memory Valid and previously mapped Memory object
    */
-  void UnmapMemory(std::unique_ptr<Graphics::Memory> memory) override
+  void UnmapMemory(Graphics::UniquePtr<Graphics::Memory> memory) override
   {
   }
 

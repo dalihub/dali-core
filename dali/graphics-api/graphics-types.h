@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -1244,6 +1245,82 @@ struct ExtensionCreateInfo
   GraphicsStructureType type{};
   ExtensionCreateInfo*  nextExtension{};
 };
+
+/**
+ * @brief Default deleter for graphics unique pointers
+ *
+ * Returned unique_ptr may require custom deleter. To get it working
+ * with std::unique_ptr the custom type is used with polymorphic deleter
+ */
+template<class T>
+struct DefaultDeleter
+{
+  DefaultDeleter() = default;
+
+  /**
+   * @brief Conversion constructor
+   *
+   * This constructor will set the lambda for type passed
+   * as an argument.
+   */
+  template<class P, template<typename> typename U>
+  DefaultDeleter(const U<P>& deleter)
+  {
+    deleteFunction = [](T* object) { U<P>()(static_cast<P*>(object)); };
+  }
+
+  /**
+   * @brief Conversion constructor from DefaultDelete<P>
+   *
+   * This constructor transfers deleteFunction only
+   */
+  template<class P>
+  explicit DefaultDeleter(const DefaultDeleter<P>& deleter)
+  {
+    deleteFunction = decltype(deleteFunction)(deleter.deleteFunction);
+  }
+
+  /**
+   * @brief Default deleter
+   *
+   * Default deleter will use standard 'delete' call in order
+   * to discard graphics objects unless a custom deleter was
+   * used.
+   *
+   * @param[in] object Object to delete
+   */
+  void operator()(T* object)
+  {
+    if(deleteFunction)
+    {
+      deleteFunction(object);
+    }
+    else
+    {
+      delete object;
+    }
+  }
+
+  void (*deleteFunction)(T* object){nullptr}; ///< Custom delete function
+};
+
+/**
+ * unique_ptr defined in the Graphics scope
+ */
+template<class T, class D = DefaultDeleter<T>>
+using UniquePtr = std::unique_ptr<T, D>;
+
+/**
+ * @brief MakeUnique<> version that returns Graphics::UniquePtr
+ * @param[in] args Arguments for construction
+ * @return
+ */
+template<class T, class Deleter = DefaultDeleter<T>, class... Args>
+std::enable_if_t<!std::is_array<T>::value, Graphics::UniquePtr<T>>
+MakeUnique(Args&&... args)
+{
+  return UniquePtr<T>(new T(std::forward<Args>(args)...), Deleter());
+}
 
 } // namespace Graphics
 } // namespace Dali

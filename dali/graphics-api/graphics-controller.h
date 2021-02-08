@@ -173,7 +173,7 @@ public:
    * @param[in] oldBuffer The valid pointer to the old object or nullptr. The object will be reused or destroyed.
    * @return pointer to the Buffer object
    */
-  virtual std::unique_ptr<Buffer> CreateBuffer(const BufferCreateInfo& bufferCreateInfo, std::unique_ptr<Buffer>&& oldBuffer) = 0;
+  virtual UniquePtr<Buffer> CreateBuffer(const BufferCreateInfo& bufferCreateInfo, UniquePtr<Buffer>&& oldBuffer) = 0;
 
   /**
    * @brief Creates new CommandBuffer object
@@ -182,7 +182,7 @@ public:
    * @param[in] oldCommandBuffer The valid pointer to the old object or nullptr. The object will be reused or destroyed.
    * @return pointer to the CommandBuffer object
    */
-  virtual std::unique_ptr<CommandBuffer> CreateCommandBuffer(const CommandBufferCreateInfo& commandBufferCreateInfo, std::unique_ptr<CommandBuffer>&& oldCommandBuffer) = 0;
+  virtual UniquePtr<CommandBuffer> CreateCommandBuffer(const CommandBufferCreateInfo& commandBufferCreateInfo, UniquePtr<CommandBuffer>&& oldCommandBuffer) = 0;
 
   /**
    * @brief Creates new RenderPass object
@@ -191,7 +191,7 @@ public:
    * @param[in] oldRenderPass The valid pointer to the old object or nullptr. The object will be reused or destroyed.
    * @return pointer to the RenderPass object
    */
-  virtual std::unique_ptr<RenderPass> CreateRenderPass(const RenderPassCreateInfo& renderPassCreateInfo, std::unique_ptr<RenderPass>&& oldRenderPass) = 0;
+  virtual UniquePtr<RenderPass> CreateRenderPass(const RenderPassCreateInfo& renderPassCreateInfo, UniquePtr<RenderPass>&& oldRenderPass) = 0;
 
   /**
    * @brief Creates new Texture object
@@ -200,7 +200,7 @@ public:
    * @param[in] oldTexture The valid pointer to the old object or nullptr. The object will be reused or destroyed.
    * @return pointer to the TextureCreateInfo object
    */
-  virtual std::unique_ptr<Texture> CreateTexture(const TextureCreateInfo& textureCreateInfo, std::unique_ptr<Texture>&& oldTexture) = 0;
+  virtual UniquePtr<Texture> CreateTexture(const TextureCreateInfo& textureCreateInfo, UniquePtr<Texture>&& oldTexture) = 0;
 
   /**
    * @brief Creates new Framebuffer object
@@ -209,7 +209,7 @@ public:
    * @param[in] oldFramebuffer The valid pointer to the old object or nullptr. The object will be reused or destroyed.
    * @return pointer to the Framebuffer object
    */
-  virtual std::unique_ptr<Framebuffer> CreateFramebuffer(const FramebufferCreateInfo& framebufferCreateInfo, std::unique_ptr<Framebuffer>&& oldFramebuffer) = 0;
+  virtual UniquePtr<Framebuffer> CreateFramebuffer(const FramebufferCreateInfo& framebufferCreateInfo, UniquePtr<Framebuffer>&& oldFramebuffer) = 0;
 
   /**
    * @brief Creates new Pipeline object
@@ -218,8 +218,7 @@ public:
    * @param[in] oldPipeline The valid pointer to the old object or nullptr. The object will be reused or destroyed.
    * @return pointer to the Pipeline object
    */
-  virtual std::unique_ptr<Pipeline> CreatePipeline(const PipelineCreateInfo& pipelineCreateInfo, std::unique_ptr<Pipeline>&& oldPipeline) = 0;
-
+  virtual UniquePtr<Pipeline> CreatePipeline(const PipelineCreateInfo& pipelineCreateInfo, UniquePtr<Pipeline>&& oldPipeline) = 0;
   /**
    * @brief Creates new Shader object
    *
@@ -227,7 +226,7 @@ public:
    * @param[in] oldShader The valid pointer to the old object or nullptr. The object will be reused or destroyed.
    * @return pointer to the Shader object
    */
-  virtual std::unique_ptr<Shader> CreateShader(const ShaderCreateInfo& shaderCreateInfo, std::unique_ptr<Shader>&& oldShader) = 0;
+  virtual UniquePtr<Shader> CreateShader(const ShaderCreateInfo& shaderCreateInfo, UniquePtr<Shader>&& oldShader) = 0;
 
   /**
    * @brief Creates new Sampler object
@@ -236,7 +235,7 @@ public:
    * @param[in] oldSampler The valid pointer to the old object or nullptr. The object will be reused or destroyed.
    * @return pointer to the Sampler object
    */
-  virtual std::unique_ptr<Sampler> CreateSampler(const SamplerCreateInfo& samplerCreateInfo, std::unique_ptr<Sampler>&& oldSampler) = 0;
+  virtual UniquePtr<Sampler> CreateSampler(const SamplerCreateInfo& samplerCreateInfo, UniquePtr<Sampler>&& oldSampler) = 0;
 
   /**
    * @brief Creates new RenderTarget object
@@ -245,7 +244,7 @@ public:
    * @param[in] oldRenderTarget The valid pointer to the old object or nullptr. The object will be reused or destroyed.
    * @return pointer to the RenderTarget object
    */
-  virtual std::unique_ptr<RenderTarget> CreateRenderTarget(const RenderTargetCreateInfo& renderTargetCreateInfo, std::unique_ptr<RenderTarget>&& oldRenderTarget) = 0;
+  virtual UniquePtr<RenderTarget> CreateRenderTarget(const RenderTargetCreateInfo& renderTargetCreateInfo, UniquePtr<RenderTarget>&& oldRenderTarget) = 0;
 
   /**
    * @brief Maps memory associated with Buffer object
@@ -253,7 +252,7 @@ public:
    * @param[in] mapInfo Filled details of mapped resource
    * @return Returns pointer to Memory object or nullptr on error
    */
-  virtual std::unique_ptr<Memory> MapBufferRange(const MapBufferInfo& mapInfo) = 0;
+  virtual UniquePtr<Memory> MapBufferRange(const MapBufferInfo& mapInfo) = 0;
 
   /**
    * @brief Maps memory associated with the texture.
@@ -269,7 +268,7 @@ public:
    *
    * @return Valid Memory object or nullptr on error
    */
-  virtual std::unique_ptr<Memory> MapTextureRange(const MapTextureInfo& mapInfo) = 0;
+  virtual UniquePtr<Memory> MapTextureRange(const MapTextureInfo& mapInfo) = 0;
 
   /**
    * @brief Unmaps memory and discards Memory object
@@ -279,7 +278,7 @@ public:
    *
    * @param[in] memory Valid and previously mapped Memory object
    */
-  virtual void UnmapMemory(std::unique_ptr<Memory> memory) = 0;
+  virtual void UnmapMemory(UniquePtr<Memory> memory) = 0;
 
   /**
    * @brief Returns memory requirements of the Texture object.
