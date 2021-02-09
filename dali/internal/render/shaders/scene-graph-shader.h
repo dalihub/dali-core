@@ -35,6 +35,7 @@ namespace SceneGraph
 {
 class ConnectionObserver;
 class SceneController;
+
 /**
  * A holder class for Program; also enables sharing of uniform properties
  */

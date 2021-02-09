@@ -318,6 +318,125 @@ GLenum GetTopology(Graphics::PrimitiveTopology topology)
   return GL_TRIANGLES;
 }
 
+GLenum GetCullFace(Graphics::CullMode cullMode)
+{
+  switch(cullMode)
+  {
+    case Graphics::CullMode::NONE:
+      return GL_NONE;
+    case Graphics::CullMode::FRONT:
+      return GL_FRONT;
+    case Graphics::CullMode::BACK:
+      return GL_BACK;
+    case Graphics::CullMode::FRONT_AND_BACK:
+      return GL_FRONT_AND_BACK;
+  }
+  return GL_NONE;
+}
+
+GLenum GetFrontFace(Graphics::FrontFace frontFace)
+{
+  if(frontFace == Graphics::FrontFace::CLOCKWISE)
+  {
+    return GL_CW;
+  }
+  return GL_CCW;
+}
+
+GLenum GetBlendFactor(Graphics::BlendFactor blendFactor)
+{
+  GLenum glFactor = GL_ZERO;
+
+  switch(blendFactor)
+  {
+    case Graphics::BlendFactor::ZERO:
+      glFactor = GL_ZERO;
+      break;
+    case Graphics::BlendFactor::ONE:
+      glFactor = GL_ONE;
+      break;
+    case Graphics::BlendFactor::SRC_COLOR:
+      glFactor = GL_SRC_COLOR;
+      break;
+    case Graphics::BlendFactor::ONE_MINUS_SRC_COLOR:
+      glFactor = GL_ONE_MINUS_SRC_COLOR;
+      break;
+    case Graphics::BlendFactor::DST_COLOR:
+      glFactor = GL_DST_COLOR;
+      break;
+    case Graphics::BlendFactor::ONE_MINUS_DST_COLOR:
+      glFactor = GL_ONE_MINUS_DST_COLOR;
+      break;
+    case Graphics::BlendFactor::SRC_ALPHA:
+      glFactor = GL_SRC_ALPHA;
+      break;
+    case Graphics::BlendFactor::ONE_MINUS_SRC_ALPHA:
+      glFactor = GL_ONE_MINUS_SRC_ALPHA;
+      break;
+    case Graphics::BlendFactor::DST_ALPHA:
+      glFactor = GL_DST_ALPHA;
+      break;
+    case Graphics::BlendFactor::ONE_MINUS_DST_ALPHA:
+      glFactor = GL_ONE_MINUS_DST_ALPHA;
+      break;
+    case Graphics::BlendFactor::CONSTANT_COLOR:
+      glFactor = GL_CONSTANT_COLOR;
+      break;
+    case Graphics::BlendFactor::ONE_MINUS_CONSTANT_COLOR:
+      glFactor = GL_ONE_MINUS_CONSTANT_COLOR;
+      break;
+    case Graphics::BlendFactor::CONSTANT_ALPHA:
+      glFactor = GL_CONSTANT_ALPHA;
+      break;
+    case Graphics::BlendFactor::ONE_MINUS_CONSTANT_ALPHA:
+      glFactor = GL_ONE_MINUS_CONSTANT_ALPHA;
+      break;
+    case Graphics::BlendFactor::SRC_ALPHA_SATURATE:
+      glFactor = GL_SRC_ALPHA_SATURATE;
+      break;
+      // GLES doesn't appear to have dual source blending.
+    case Graphics::BlendFactor::SRC1_COLOR:
+      glFactor = GL_SRC_COLOR;
+      break;
+    case Graphics::BlendFactor::ONE_MINUS_SRC1_COLOR:
+      glFactor = GL_ONE_MINUS_SRC_COLOR;
+      break;
+    case Graphics::BlendFactor::SRC1_ALPHA:
+      glFactor = GL_SRC_ALPHA;
+      break;
+    case Graphics::BlendFactor::ONE_MINUS_SRC1_ALPHA:
+      glFactor = GL_ONE_MINUS_SRC_ALPHA;
+      break;
+  }
+  return glFactor;
+}
+
+GLenum GetBlendOp(Graphics::BlendOp blendOp)
+{
+  GLenum op = GL_FUNC_ADD;
+  switch(blendOp)
+  {
+    case Graphics::BlendOp::ADD:
+      op = GL_FUNC_ADD;
+      break;
+    case Graphics::BlendOp::SUBTRACT:
+      op = GL_FUNC_SUBTRACT;
+      break;
+    case Graphics::BlendOp::REVERSE_SUBTRACT:
+      op = GL_FUNC_REVERSE_SUBTRACT;
+      break;
+    case Graphics::BlendOp::MIN:
+      op = GL_MIN;
+      break;
+    case Graphics::BlendOp::MAX:
+      op = GL_MAX;
+      break;
+
+      // @todo Add advanced blend equations
+  }
+  return op;
+}
+
 void TestGraphicsController::SubmitCommandBuffers(const Graphics::SubmitInfo& submitInfo)
 {
   TraceCallStack::NamedParams namedParams;
@@ -379,6 +498,50 @@ void TestGraphicsController::SubmitCommandBuffers(const Graphics::SubmitInfo& su
                               GL_FALSE, // Not normalized
                               stride,
                               reinterpret_cast<void*>(attributeOffset));
+    }
+
+    // Cull face setup
+    auto& rasterizationState = commandBuffer->mPipeline->rasterizationState;
+    if(rasterizationState.cullMode == Graphics::CullMode::NONE)
+    {
+      mGl.Disable(GL_CULL_FACE);
+    }
+    else
+    {
+      mGl.Enable(GL_CULL_FACE);
+      mGl.CullFace(GetCullFace(rasterizationState.cullMode));
+    }
+
+    mGl.FrontFace(GetFrontFace(rasterizationState.frontFace));
+    // We don't modify glPolygonMode in our context/abstraction from GL_FILL (the GL default),
+    // so it isn't present in the API (and won't have any tests!)
+
+    // Blending setup
+    auto& colorBlendState = commandBuffer->mPipeline->colorBlendState;
+    if(colorBlendState.blendEnable)
+    {
+      mGl.Enable(GL_BLEND);
+
+      mGl.BlendFuncSeparate(GetBlendFactor(colorBlendState.srcColorBlendFactor),
+                            GetBlendFactor(colorBlendState.dstColorBlendFactor),
+                            GetBlendFactor(colorBlendState.srcAlphaBlendFactor),
+                            GetBlendFactor(colorBlendState.dstAlphaBlendFactor));
+      if(colorBlendState.colorBlendOp != colorBlendState.alphaBlendOp)
+      {
+        mGl.BlendEquationSeparate(GetBlendOp(colorBlendState.colorBlendOp), GetBlendOp(colorBlendState.alphaBlendOp));
+      }
+      else
+      {
+        mGl.BlendEquation(GetBlendOp(colorBlendState.colorBlendOp));
+      }
+      mGl.BlendColor(colorBlendState.blendConstants[0],
+                     colorBlendState.blendConstants[1],
+                     colorBlendState.blendConstants[2],
+                     colorBlendState.blendConstants[3]);
+    }
+    else
+    {
+      mGl.Disable(GL_BLEND);
     }
 
     // draw call

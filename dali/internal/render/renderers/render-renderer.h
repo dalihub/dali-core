@@ -442,12 +442,15 @@ private:
    * @param[in] boundTextures The textures bound for rendering
    * @return False if create or bind failed, true if success.
    */
-  bool BindTextures(Context& context, Program& program, Graphics::CommandBuffer& commandBuffer, Vector<Graphics::Texture*>& boundTextures);
+  bool BindTextures(Program& program, Graphics::CommandBuffer& commandBuffer, Vector<Graphics::Texture*>& boundTextures);
 
   /**
    * Prepare a pipeline for this renderer
    */
-  Graphics::UniquePtr<Graphics::Pipeline> PrepareGraphicsPipeline(Program& program);
+  Graphics::UniquePtr<Graphics::Pipeline> PrepareGraphicsPipeline(
+    Program&                                             program,
+    const Dali::Internal::SceneGraph::RenderInstruction& instruction,
+    bool                                                 blend);
 
 private:
   Graphics::Controller*                        mGraphicsController;

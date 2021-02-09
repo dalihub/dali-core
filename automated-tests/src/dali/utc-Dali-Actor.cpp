@@ -4262,7 +4262,9 @@ int UtcDaliActorPropertyClippingActor(void)
   CheckColorMask(glAbstraction, true);
 
   // Check the stencil buffer was enabled.
-  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Enable", "2960")); // 2960 is GL_STENCIL_TEST
+  std::ostringstream oss;
+  oss << std::hex << GL_STENCIL_TEST;
+  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Enable", oss.str()));
 
   // Check the stencil buffer was cleared.
   DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("ClearStencil", "0", startIndex));
@@ -4298,7 +4300,9 @@ int UtcDaliActorPropertyClippingActorEnableThenDisable(void)
   CheckColorMask(glAbstraction, true);
 
   // Check the stencil buffer was enabled.
-  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Enable", "2960")); // 2960 is GL_STENCIL_TEST
+  std::ostringstream oss;
+  oss << std::hex << GL_STENCIL_TEST;
+  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Enable", oss.str()));
 
   // Check the stencil buffer was cleared.
   DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("ClearStencil", "0", startIndex));
@@ -4315,7 +4319,9 @@ int UtcDaliActorPropertyClippingActorEnableThenDisable(void)
   GenerateTrace(application, enabledDisableTrace, stencilTrace);
 
   // Check the stencil buffer was disabled.
-  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Disable", "2960")); // 2960 is GL_STENCIL_TEST
+  std::ostringstream stencil;
+  stencil << std::hex << GL_STENCIL_TEST;
+  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Disable", stencil.str()));
 
   // Ensure all values in stencil-mask are set to 1.
   startIndex = 0u;
@@ -4362,7 +4368,9 @@ int UtcDaliActorPropertyClippingNestedChildren(void)
   CheckColorMask(glAbstraction, true);
 
   // Check the stencil buffer was enabled.
-  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Enable", "2960")); // 2960 is GL_STENCIL_TEST
+  std::ostringstream oss;
+  oss << std::hex << GL_STENCIL_TEST;
+  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Enable", oss.str()));
 
   // Perform the test twice, once for 2D layer, and once for 3D.
   for(unsigned int i = 0u; i < 2u; ++i)
@@ -4469,10 +4477,15 @@ int UtcDaliActorPropertyClippingActorDrawOrder(void)
      Note: Correct enable call trace:    StackTrace: Index:0, Function:Enable, ParamList:3042 StackTrace: Index:1, Function:Enable, ParamList:2960 StackTrace: Index:2, Function:Disable, ParamList:2960
            Incorrect enable call trace:  StackTrace: Index:0, Function:Enable, ParamList:3042 StackTrace: Index:1, Function:Enable, ParamList:2960
   */
-  size_t startIndex = 0u;
-  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParamsFromStartIndex("Enable", "3042", startIndex));
-  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParamsFromStartIndex("Enable", "2960", startIndex)); // 2960 is GL_STENCIL_TEST
-  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParamsFromStartIndex("Disable", "2960", startIndex));
+  size_t             startIndex = 0u;
+  std::ostringstream blend;
+  blend << std::hex << GL_BLEND;
+  std::ostringstream stencil;
+  stencil << std::hex << GL_STENCIL_TEST;
+
+  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParamsFromStartIndex("Enable", blend.str(), startIndex));
+  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParamsFromStartIndex("Enable", stencil.str(), startIndex));
+  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParamsFromStartIndex("Disable", stencil.str(), startIndex));
 
   // Swap the clipping actor from top of left branch to top of right branch.
   actors[1].SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::DISABLED);
@@ -4488,8 +4501,8 @@ int UtcDaliActorPropertyClippingActorDrawOrder(void)
   // Check stencil is enabled but NOT disabled again (as right-hand branch of tree is drawn).
   // This proves the draw order has remained the same.
   startIndex = 0u;
-  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParamsFromStartIndex("Enable", "2960", startIndex));
-  DALI_TEST_CHECK(!enabledDisableTrace.FindMethodAndParamsFromStartIndex("Disable", "2960", startIndex));
+  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParamsFromStartIndex("Enable", stencil.str(), startIndex));
+  DALI_TEST_CHECK(!enabledDisableTrace.FindMethodAndParamsFromStartIndex("Disable", stencil.str(), startIndex));
 
   END_TEST;
 }
@@ -4523,7 +4536,10 @@ int UtcDaliActorPropertyScissorClippingActor(void)
   CheckColorMask(glAbstraction, true);
 
   // Check scissor test was enabled.
-  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Enable", "3089")); // 3089 = 0xC11 (GL_SCISSOR_TEST)
+
+  std::ostringstream scissor;
+  scissor << std::hex << GL_SCISSOR_TEST;
+  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Enable", scissor.str()));
 
   // Check the scissor was set, and the coordinates are correct.
   std::stringstream compareParametersString;
@@ -4584,7 +4600,9 @@ int UtcDaliActorPropertyScissorClippingActorSiblings(void)
   CheckColorMask(glAbstraction, true);
 
   // Check scissor test was enabled.
-  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Enable", "3089")); // 3089 = 0xC11 (GL_SCISSOR_TEST)
+  std::ostringstream scissor;
+  scissor << std::hex << GL_SCISSOR_TEST;
+  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Enable", scissor.str()));
 
   // Check the scissor was set, and the coordinates are correct.
   std::stringstream compareParametersString;
@@ -4663,7 +4681,9 @@ int UtcDaliActorPropertyScissorClippingActorNested01(void)
     CheckColorMask(glAbstraction, true);
 
     // Check scissor test was enabled.
-    DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Enable", "3089")); // 3089 = 0xC11 (GL_SCISSOR_TEST)
+    std::ostringstream scissor;
+    scissor << std::hex << GL_SCISSOR_TEST;
+    DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Enable", scissor.str()));
 
     // Check the scissor was set, and the coordinates are correct.
     const Vector4&    expectResults(expect[test]);
@@ -4747,7 +4767,9 @@ int UtcDaliActorPropertyScissorClippingActorNested02(void)
   CheckColorMask(glAbstraction, true);
 
   // Check scissor test was enabled.
-  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Enable", "3089")); // 3089 = 0xC11 (GL_SCISSOR_TEST)
+  std::ostringstream scissor;
+  scissor << std::hex << GL_SCISSOR_TEST;
+  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Enable", scissor.str()));
 
   // Check the scissor was set, and the coordinates are correct.
   std::string clipA("0, 500, 480, 200");
@@ -4789,7 +4811,9 @@ int UtcDaliActorPropertyClippingActorWithRendererOverride(void)
   CheckColorMask(glAbstraction, true);
 
   // Check the stencil buffer was not enabled.
-  DALI_TEST_CHECK(!enabledDisableTrace.FindMethodAndParams("Enable", "2960")); // 2960 is GL_STENCIL_TEST
+  std::ostringstream stencil;
+  stencil << std::hex << GL_STENCIL_TEST;
+  DALI_TEST_CHECK(!enabledDisableTrace.FindMethodAndParams("Enable", stencil.str()));
 
   // Check stencil functions are not called.
   DALI_TEST_CHECK(!stencilTrace.FindMethod("StencilFunc"));
@@ -4806,7 +4830,9 @@ int UtcDaliActorPropertyClippingActorWithRendererOverride(void)
   GenerateTrace(application, enabledDisableTrace, scissorTrace);
 
   // Check the stencil buffer was not enabled.
-  DALI_TEST_CHECK(!enabledDisableTrace.FindMethodAndParams("Enable", "3089")); // 3089 = 0xC11 (GL_SCISSOR_TEST)
+  std::ostringstream scissor;
+  scissor << std::hex << GL_SCISSOR_TEST;
+  DALI_TEST_CHECK(!enabledDisableTrace.FindMethodAndParams("Enable", scissor.str()));
 
   DALI_TEST_CHECK(!scissorTrace.FindMethod("StencilFunc"));
 

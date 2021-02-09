@@ -407,10 +407,10 @@ public:
   inline void CullFace(GLenum mode) override
   {
     std::stringstream out;
-    out << mode;
+    out << std::hex << mode;
 
     TraceCallStack::NamedParams namedParams;
-    namedParams["program"] << mode;
+    namedParams["mode"] << std::hex << mode;
 
     mCullFaceTrace.PushCall("CullFace", out.str(), namedParams);
   }
@@ -498,7 +498,7 @@ public:
   inline void DepthFunc(GLenum func) override
   {
     std::stringstream out;
-    out << func;
+    out << std::hex << func;
 
     TraceCallStack::NamedParams namedParams;
     namedParams["func"] << std::hex << func;
@@ -533,7 +533,7 @@ public:
   inline void Disable(GLenum cap) override
   {
     std::stringstream out;
-    out << cap;
+    out << std::hex << cap;
     TraceCallStack::NamedParams namedParams;
     namedParams["cap"] << std::hex << cap;
     mEnableDisableTrace.PushCall("Disable", out.str(), namedParams);
@@ -576,7 +576,7 @@ public:
   inline void Enable(GLenum cap) override
   {
     std::stringstream out;
-    out << cap;
+    out << std::hex << cap;
     TraceCallStack::NamedParams namedParams;
     namedParams["cap"] << std::hex << cap;
     mEnableDisableTrace.PushCall("Enable", out.str(), namedParams);
@@ -631,6 +631,7 @@ public:
 
   inline void FrontFace(GLenum mode) override
   {
+    // do nothing
   }
 
   inline void GenBuffers(GLsizei n, GLuint* buffers) override

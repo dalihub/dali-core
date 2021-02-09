@@ -3410,7 +3410,9 @@ int UtcDaliRenderTaskClippingMode01(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Enable", "3089")); // 3089 = 0xC11 (GL_SCISSOR_TEST)
+  std::ostringstream scissor;
+  scissor << std::hex << GL_SCISSOR_TEST;
+  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Enable", scissor.str()));
 
   // Check the scissor was set, and the coordinates are correct.
   Vector4           expectResults(position.x, TestApplication::DEFAULT_SURFACE_HEIGHT - size.height - position.y, size.width, size.height); // (100, 500, 200, 200)
@@ -3468,7 +3470,9 @@ int UtcDaliRenderTaskClippingMode02(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Enable", "3089")); // 3089 = 0xC11 (GL_SCISSOR_TEST)
+  std::ostringstream scissor;
+  scissor << std::hex << GL_SCISSOR_TEST;
+  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Enable", scissor.str()));
 
   // Check the scissor was set, and the coordinates are correct.
   Vector4           expectResults(position.x, position.y, size.width, size.height); // (100, 100, 200, 200)

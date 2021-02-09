@@ -19,6 +19,7 @@
 #include <dali/internal/render/renderers/render-renderer.h>
 
 // INTERNAL INCLUDES
+#include <dali/graphics-api/graphics-types.h>
 #include <dali/internal/common/image-sampler.h>
 #include <dali/internal/render/common/render-instruction.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>
@@ -163,6 +164,100 @@ Dali::Graphics::VertexInputFormat GetPropertyVertexFormat(Property::Type propert
   return type;
 }
 
+constexpr Graphics::CullMode ConvertCullFace(Dali::FaceCullingMode::Type mode)
+{
+  switch(mode)
+  {
+    case Dali::FaceCullingMode::NONE:
+    {
+      return Graphics::CullMode::NONE;
+    }
+    case Dali::FaceCullingMode::FRONT:
+    {
+      return Graphics::CullMode::FRONT;
+    }
+    case Dali::FaceCullingMode::BACK:
+    {
+      return Graphics::CullMode::BACK;
+    }
+    case Dali::FaceCullingMode::FRONT_AND_BACK:
+    {
+      return Graphics::CullMode::FRONT_AND_BACK;
+    }
+  }
+  return Graphics::CullMode::NONE;
+}
+
+constexpr Graphics::BlendFactor ConvertBlendFactor(BlendFactor::Type blendFactor)
+{
+  switch(blendFactor)
+  {
+    case BlendFactor::ZERO:
+      return Graphics::BlendFactor::ZERO;
+    case BlendFactor::ONE:
+      return Graphics::BlendFactor::ONE;
+    case BlendFactor::SRC_COLOR:
+      return Graphics::BlendFactor::SRC_COLOR;
+    case BlendFactor::ONE_MINUS_SRC_COLOR:
+      return Graphics::BlendFactor::ONE_MINUS_SRC_COLOR;
+    case BlendFactor::SRC_ALPHA:
+      return Graphics::BlendFactor::SRC_ALPHA;
+    case BlendFactor::ONE_MINUS_SRC_ALPHA:
+      return Graphics::BlendFactor::ONE_MINUS_SRC_ALPHA;
+    case BlendFactor::DST_ALPHA:
+      return Graphics::BlendFactor::DST_ALPHA;
+    case BlendFactor::ONE_MINUS_DST_ALPHA:
+      return Graphics::BlendFactor::ONE_MINUS_DST_ALPHA;
+    case BlendFactor::DST_COLOR:
+      return Graphics::BlendFactor::DST_COLOR;
+    case BlendFactor::ONE_MINUS_DST_COLOR:
+      return Graphics::BlendFactor::ONE_MINUS_DST_COLOR;
+    case BlendFactor::SRC_ALPHA_SATURATE:
+      return Graphics::BlendFactor::SRC_ALPHA_SATURATE;
+    case BlendFactor::CONSTANT_COLOR:
+      return Graphics::BlendFactor::CONSTANT_COLOR;
+    case BlendFactor::ONE_MINUS_CONSTANT_COLOR:
+      return Graphics::BlendFactor::ONE_MINUS_CONSTANT_COLOR;
+    case BlendFactor::CONSTANT_ALPHA:
+      return Graphics::BlendFactor::CONSTANT_ALPHA;
+    case BlendFactor::ONE_MINUS_CONSTANT_ALPHA:
+      return Graphics::BlendFactor::ONE_MINUS_CONSTANT_ALPHA;
+  }
+  return Graphics::BlendFactor{};
+}
+
+constexpr Graphics::BlendOp ConvertBlendEquation(DevelBlendEquation::Type blendEquation)
+{
+  switch(blendEquation)
+  {
+    case DevelBlendEquation::ADD:
+      return Graphics::BlendOp::ADD;
+    case DevelBlendEquation::SUBTRACT:
+      return Graphics::BlendOp::SUBTRACT;
+    case DevelBlendEquation::REVERSE_SUBTRACT:
+      return Graphics::BlendOp::REVERSE_SUBTRACT;
+    case DevelBlendEquation::COLOR:
+    case DevelBlendEquation::COLOR_BURN:
+    case DevelBlendEquation::COLOR_DODGE:
+    case DevelBlendEquation::DARKEN:
+    case DevelBlendEquation::DIFFERENCE:
+    case DevelBlendEquation::EXCLUSION:
+    case DevelBlendEquation::HARD_LIGHT:
+    case DevelBlendEquation::HUE:
+    case DevelBlendEquation::LIGHTEN:
+    case DevelBlendEquation::LUMINOSITY:
+    case DevelBlendEquation::MAX:
+    case DevelBlendEquation::MIN:
+    case DevelBlendEquation::MULTIPLY:
+    case DevelBlendEquation::OVERLAY:
+    case DevelBlendEquation::SATURATION:
+    case DevelBlendEquation::SCREEN:
+    case DevelBlendEquation::SOFT_LIGHT:
+      return Graphics::BlendOp{};
+  }
+  return Graphics::BlendOp{};
+}
+
 } // namespace
 
 namespace Render
@@ -237,49 +332,6 @@ void Renderer::SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, 
 {
   mDrawCommands.clear();
   mDrawCommands.insert(mDrawCommands.end(), pDrawCommands, pDrawCommands + size);
-}
-
-void Renderer::SetBlending(Context& context, bool blend)
-{
-  context.SetBlend(blend);
-  if(blend)
-  {
-    // Blend color is optional and rarely used
-    const Vector4* blendColor = mBlendingOptions.GetBlendColor();
-    if(blendColor)
-    {
-      context.SetCustomBlendColor(*blendColor);
-    }
-    else
-    {
-      context.SetDefaultBlendColor();
-    }
-
-    // Set blend source & destination factors
-    context.BlendFuncSeparate(mBlendingOptions.GetBlendSrcFactorRgb(),
-                              mBlendingOptions.GetBlendDestFactorRgb(),
-                              mBlendingOptions.GetBlendSrcFactorAlpha(),
-                              mBlendingOptions.GetBlendDestFactorAlpha());
-
-    // Set blend equations
-    Dali::DevelBlendEquation::Type rgbEquation   = mBlendingOptions.GetBlendEquationRgb();
-    Dali::DevelBlendEquation::Type alphaEquation = mBlendingOptions.GetBlendEquationAlpha();
-
-    if(mBlendingOptions.IsAdvancedBlendEquationApplied() && mPremultipledAlphaEnabled)
-    {
-      if(rgbEquation != alphaEquation)
-      {
-        DALI_LOG_ERROR("Advanced Blend Equation have to be appried by using BlendEquation.\n");
-      }
-      context.BlendEquation(rgbEquation);
-    }
-    else
-    {
-      context.BlendEquationSeparate(rgbEquation, alphaEquation);
-    }
-  }
-
-  mUpdated = true;
 }
 
 void Renderer::GlContextDestroyed()
@@ -430,7 +482,7 @@ void Renderer::SetUniformFromProperty(BufferIndex bufferIndex, Program& program,
   }
 }
 
-bool Renderer::BindTextures(Context& context, Program& program, Graphics::CommandBuffer& commandBuffer, Vector<Graphics::Texture*>& boundTextures)
+bool Renderer::BindTextures(Program& program, Graphics::CommandBuffer& commandBuffer, Vector<Graphics::Texture*>& boundTextures)
 {
   uint32_t textureUnit = 0;
   bool     result      = true;
@@ -684,44 +736,18 @@ void Renderer::Render(Context&                                             conte
       .SetLevel(Graphics::CommandBufferLevel::SECONDARY),
     nullptr);
 
-  //Set cull face  mode
-  const Dali::Internal::SceneGraph::Camera* cam = instruction.GetCamera();
-  if(cam->GetReflectionUsed())
+  //Set blending mode
+  if(!mDrawCommands.empty())
   {
-    auto adjFaceCullingMode = mFaceCullingMode;
-    switch(mFaceCullingMode)
-    {
-      case FaceCullingMode::Type::FRONT:
-      {
-        adjFaceCullingMode = FaceCullingMode::Type::BACK;
-        break;
-      }
-      case FaceCullingMode::Type::BACK:
-      {
-        adjFaceCullingMode = FaceCullingMode::Type::FRONT;
-        break;
-      }
-      default:
-      {
-        // nothing to do, leave culling as it is
-      }
-    }
-    context.CullFace(adjFaceCullingMode);
-  }
-  else
-  {
-    context.CullFace(mFaceCullingMode);
+    blend = (commands[0]->queue == DevelRenderer::RENDER_QUEUE_OPAQUE ? false : blend);
   }
 
   // Temporarily create a pipeline here - this will be used for transporting
-  // topology and vertex format for now.
-  Graphics::UniquePtr<Graphics::Pipeline> pipeline = PrepareGraphicsPipeline(*program);
+  // topology, vertex format, attrs, rasterization state
+  Graphics::UniquePtr<Graphics::Pipeline> pipeline = PrepareGraphicsPipeline(*program, instruction, blend);
   commandBuffer->BindPipeline(*pipeline.get());
 
-  // Take the program into use so we can send uniforms to it
-  program->Use();
-
-  if(DALI_LIKELY(BindTextures(context, *program, *commandBuffer.get(), boundTextures)))
+  if(DALI_LIKELY(BindTextures(*program, *commandBuffer.get(), boundTextures)))
   {
     // Only set up and draw if we have textures and they are all valid
 
@@ -746,34 +772,21 @@ void Renderer::Render(Context&                                             conte
 
     SetUniforms(bufferIndex, node, size, *program);
 
-    if(mBlendingOptions.IsAdvancedBlendEquationApplied() && mPremultipledAlphaEnabled)
-    {
-      context.BlendBarrier();
-    }
-
     bool drawn = false; // Draw can fail if there are no vertex buffers or they haven't been uploaded yet
                         // @todo We should detect this case much earlier to prevent unnecessary work
 
     //@todo manage mDrawCommands in the same way as above command buffer?!
     if(mDrawCommands.empty())
     {
-      SetBlending(context, blend);
-
       drawn = mGeometry->Draw(*mGraphicsController, *commandBuffer.get(), mIndexedDrawFirstElement, mIndexedDrawElementsCount);
     }
     else
     {
       for(auto& cmd : commands)
       {
-        if(cmd->queue == queueIndex)
-        {
-          //Set blending mode
-          SetBlending(context, cmd->queue == DevelRenderer::RENDER_QUEUE_OPAQUE ? false : blend);
-
-          // @todo This should generate a command buffer per cmd
-          // Tests WILL fail.
-          mGeometry->Draw(*mGraphicsController, *commandBuffer.get(), cmd->firstIndex, cmd->elementCount);
-        }
+        // @todo This should generate a command buffer per cmd
+        // Tests WILL fail. (Temporarily commented out)
+        mGeometry->Draw(*mGraphicsController, *commandBuffer.get(), cmd->firstIndex, cmd->elementCount);
       }
     }
 
@@ -848,7 +861,10 @@ bool Renderer::Updated(BufferIndex bufferIndex, const SceneGraph::NodeDataProvid
   return false;
 }
 
-Graphics::UniquePtr<Graphics::Pipeline> Renderer::PrepareGraphicsPipeline(Program& program)
+Graphics::UniquePtr<Graphics::Pipeline> Renderer::PrepareGraphicsPipeline(
+  Program&                                             program,
+  const Dali::Internal::SceneGraph::RenderInstruction& instruction,
+  bool                                                 blend)
 {
   Graphics::InputAssemblyState inputAssemblyState{};
   Graphics::VertexInputState   vertexInputState{};
@@ -860,6 +876,9 @@ Graphics::UniquePtr<Graphics::Pipeline> Renderer::PrepareGraphicsPipeline(Progra
     mUpdateAttributeLocations = true;
   }
 
+  /**
+   * Bind Attributes
+   */
   uint32_t base = 0;
   for(auto&& vertexBuffer : mGeometry->GetVertexBuffers())
   {
@@ -898,11 +917,112 @@ Graphics::UniquePtr<Graphics::Pipeline> Renderer::PrepareGraphicsPipeline(Progra
   // Get the topology
   inputAssemblyState.SetTopology(mGeometry->GetTopology());
 
+  Graphics::RasterizationState rasterizationState{};
+
+  //Set cull face  mode
+  const Dali::Internal::SceneGraph::Camera* cam = instruction.GetCamera();
+  if(cam->GetReflectionUsed())
+  {
+    auto adjFaceCullingMode = mFaceCullingMode;
+    switch(mFaceCullingMode)
+    {
+      case FaceCullingMode::Type::FRONT:
+      {
+        adjFaceCullingMode = FaceCullingMode::Type::BACK;
+        break;
+      }
+      case FaceCullingMode::Type::BACK:
+      {
+        adjFaceCullingMode = FaceCullingMode::Type::FRONT;
+        break;
+      }
+      default:
+      {
+        // nothing to do, leave culling as it is
+      }
+    }
+    rasterizationState.SetCullMode(ConvertCullFace(adjFaceCullingMode));
+  }
+  else
+  {
+    rasterizationState.SetCullMode(ConvertCullFace(mFaceCullingMode));
+  }
+
+  rasterizationState.SetFrontFace(Graphics::FrontFace::COUNTER_CLOCKWISE);
+
+  /**
+   * Set Polygon mode
+   */
+  switch(mGeometry->GetTopology())
+  {
+    case Graphics::PrimitiveTopology::TRIANGLE_LIST:
+    case Graphics::PrimitiveTopology::TRIANGLE_STRIP:
+    case Graphics::PrimitiveTopology::TRIANGLE_FAN:
+      rasterizationState.SetPolygonMode(Graphics::PolygonMode::FILL);
+      break;
+    case Graphics::PrimitiveTopology::LINE_LIST:
+    case Graphics::PrimitiveTopology::LINE_LOOP:
+    case Graphics::PrimitiveTopology::LINE_STRIP:
+      rasterizationState.SetPolygonMode(Graphics::PolygonMode::LINE);
+      break;
+    case Graphics::PrimitiveTopology::POINT_LIST:
+      rasterizationState.SetPolygonMode(Graphics::PolygonMode::POINT);
+      break;
+  }
+
+  // @todo How to signal a blend barrier is needed?
+  //if(mBlendingOptions.IsAdvancedBlendEquationApplied() && mPremultipledAlphaEnabled)
+  //{
+  //  context.BlendBarrier();
+  //}
+
+  Graphics::ColorBlendState colorBlendState{};
+  colorBlendState.SetBlendEnable(false);
+
+  if(blend)
+  {
+    colorBlendState.SetBlendEnable(true);
+
+    Graphics::BlendOp rgbOp   = ConvertBlendEquation(mBlendingOptions.GetBlendEquationRgb());
+    Graphics::BlendOp alphaOp = ConvertBlendEquation(mBlendingOptions.GetBlendEquationRgb());
+    if(mBlendingOptions.IsAdvancedBlendEquationApplied() && mPremultipledAlphaEnabled)
+    {
+      if(rgbOp != alphaOp)
+      {
+        DALI_LOG_ERROR("Advanced Blend Equation MUST be applied by using BlendEquation.\n");
+        alphaOp = rgbOp;
+      }
+    }
+
+    colorBlendState
+      .SetSrcColorBlendFactor(ConvertBlendFactor(mBlendingOptions.GetBlendSrcFactorRgb()))
+      .SetSrcAlphaBlendFactor(ConvertBlendFactor(mBlendingOptions.GetBlendSrcFactorAlpha()))
+      .SetDstColorBlendFactor(ConvertBlendFactor(mBlendingOptions.GetBlendDestFactorRgb()))
+      .SetDstAlphaBlendFactor(ConvertBlendFactor(mBlendingOptions.GetBlendDestFactorAlpha()))
+      .SetColorBlendOp(rgbOp)
+      .SetAlphaBlendOp(alphaOp);
+
+    // Blend color is optional and rarely used
+    Vector4* blendColor = const_cast<Vector4*>(mBlendingOptions.GetBlendColor());
+    if(blendColor)
+    {
+      colorBlendState.SetBlendConstants(blendColor->AsFloat());
+    }
+  }
+
+  // Take the program into use so we can send uniforms to it
+  // @todo Remove this call entirely!
+  program.Use();
+
+  mUpdated = true;
+
   // Create a new pipeline
   return mGraphicsController->CreatePipeline(
     Graphics::PipelineCreateInfo()
       .SetInputAssemblyState(&inputAssemblyState) // Passed as pointers - shallow copy will break. TOO C LIKE
-      .SetVertexInputState(&vertexInputState),
+      .SetVertexInputState(&vertexInputState)
+      .SetRasterizationState(&rasterizationState)
+      .SetColorBlendState(&colorBlendState),
     nullptr);
 }
 

@@ -49,7 +49,7 @@ const BlendEquation::Type DEFAULT_BLEND_EQUATION_ALPHA(BlendEquation::ADD);
 std::string GetStencilTestString(void)
 {
   std::stringstream stream;
-  stream << GL_STENCIL_TEST;
+  stream << std::hex << GL_STENCIL_TEST;
   return stream.str();
 }
 
@@ -60,7 +60,7 @@ std::string GetStencilTestString(void)
 std::string GetDepthTestString(void)
 {
   std::stringstream stream;
-  stream << GL_DEPTH_TEST;
+  stream << std::hex << GL_DEPTH_TEST;
   return stream.str();
 }
 
@@ -477,7 +477,7 @@ int UtcDaliRendererSetGetFaceCullingMode(void)
     DALI_TEST_EQUALS(cullFaceStack.CountMethod("CullFace"), 1, TEST_LOCATION);
 
     std::ostringstream cullModeString;
-    cullModeString << GL_FRONT_AND_BACK;
+    cullModeString << std::hex << GL_FRONT_AND_BACK;
 
     DALI_TEST_CHECK(cullFaceStack.FindMethodAndParams("CullFace", cullModeString.str()));
     cullFace = renderer.GetProperty<int>(Renderer::Property::FACE_CULLING_MODE);
@@ -493,7 +493,7 @@ int UtcDaliRendererSetGetFaceCullingMode(void)
     DALI_TEST_EQUALS(cullFaceStack.CountMethod("CullFace"), 1, TEST_LOCATION);
 
     std::ostringstream cullModeString;
-    cullModeString << GL_BACK;
+    cullModeString << std::hex << GL_BACK;
 
     DALI_TEST_CHECK(cullFaceStack.FindMethodAndParams("CullFace", cullModeString.str()));
     cullFace = renderer.GetProperty<int>(Renderer::Property::FACE_CULLING_MODE);
@@ -509,7 +509,7 @@ int UtcDaliRendererSetGetFaceCullingMode(void)
     DALI_TEST_EQUALS(cullFaceStack.CountMethod("CullFace"), 1, TEST_LOCATION);
 
     std::ostringstream cullModeString;
-    cullModeString << GL_FRONT;
+    cullModeString << std::hex << GL_FRONT;
 
     DALI_TEST_CHECK(cullFaceStack.FindMethodAndParams("CullFace", cullModeString.str()));
     cullFace = renderer.GetProperty<int>(Renderer::Property::FACE_CULLING_MODE);
@@ -837,10 +837,10 @@ int UtcDaliRendererSetBlendMode01(void)
   application.SendNotification();
   application.Render();
 
-  TraceCallStack&    glEnableStack = glAbstraction.GetEnableDisableTrace();
-  std::ostringstream blendStr;
-  blendStr << GL_BLEND;
-  DALI_TEST_CHECK(glEnableStack.FindMethodAndParams("Enable", blendStr.str().c_str()));
+  TraceCallStack&             glEnableStack = glAbstraction.GetEnableDisableTrace();
+  TraceCallStack::NamedParams params;
+  params["cap"] << std::hex << GL_BLEND;
+  DALI_TEST_CHECK(glEnableStack.FindMethodAndParams("Enable", params));
 
   END_TEST;
 }
@@ -870,9 +870,7 @@ int UtcDaliRendererSetBlendMode01b(void)
   application.SendNotification();
   application.Render();
 
-  TraceCallStack&    glEnableStack = glAbstraction.GetEnableDisableTrace();
-  std::ostringstream blendStr;
-  blendStr << GL_BLEND;
+  TraceCallStack& glEnableStack = glAbstraction.GetEnableDisableTrace();
   DALI_TEST_CHECK(!glEnableStack.FindMethod("Enable"));
 
   DALI_TEST_CHECK(!glAbstraction.GetDrawTrace().FindMethod("DrawElements"));
@@ -904,10 +902,10 @@ int UtcDaliRendererSetBlendMode02(void)
   application.SendNotification();
   application.Render();
 
-  TraceCallStack&    glEnableStack = glAbstraction.GetEnableDisableTrace();
-  std::ostringstream blendStr;
-  blendStr << GL_BLEND;
-  DALI_TEST_CHECK(!glEnableStack.FindMethodAndParams("Enable", blendStr.str().c_str()));
+  TraceCallStack&             glEnableStack = glAbstraction.GetEnableDisableTrace();
+  TraceCallStack::NamedParams params;
+  params["cap"] << std::hex << GL_BLEND;
+  DALI_TEST_CHECK(!glEnableStack.FindMethodAndParams("Enable", params));
 
   END_TEST;
 }
@@ -936,10 +934,10 @@ int UtcDaliRendererSetBlendMode03(void)
   application.SendNotification();
   application.Render();
 
-  TraceCallStack&    glEnableStack = glAbstraction.GetEnableDisableTrace();
-  std::ostringstream blendStr;
-  blendStr << GL_BLEND;
-  DALI_TEST_CHECK(glEnableStack.FindMethodAndParams("Enable", blendStr.str().c_str()));
+  TraceCallStack&             glEnableStack = glAbstraction.GetEnableDisableTrace();
+  TraceCallStack::NamedParams params;
+  params["cap"] << std::hex << GL_BLEND;
+  DALI_TEST_CHECK(glEnableStack.FindMethodAndParams("Enable", params));
 
   END_TEST;
 }
@@ -967,10 +965,11 @@ int UtcDaliRendererSetBlendMode04(void)
   application.SendNotification();
   application.Render();
 
-  TraceCallStack&    glEnableStack = glAbstraction.GetEnableDisableTrace();
-  std::ostringstream blendStr;
-  blendStr << GL_BLEND;
-  DALI_TEST_CHECK(!glEnableStack.FindMethodAndParams("Enable", blendStr.str().c_str()));
+  TraceCallStack&             glEnableStack = glAbstraction.GetEnableDisableTrace();
+  TraceCallStack::NamedParams params;
+  params["cap"] << std::hex << GL_BLEND;
+  DALI_TEST_CHECK(!glEnableStack.FindMethodAndParams("Enable", params));
+  DALI_TEST_CHECK(glEnableStack.FindMethodAndParams("Disable", params));
 
   END_TEST;
 }
@@ -999,10 +998,10 @@ int UtcDaliRendererSetBlendMode04b(void)
   application.SendNotification();
   application.Render();
 
-  TraceCallStack&    glEnableStack = glAbstraction.GetEnableDisableTrace();
-  std::ostringstream blendStr;
-  blendStr << GL_BLEND;
-  DALI_TEST_CHECK(glEnableStack.FindMethodAndParams("Enable", blendStr.str().c_str()));
+  TraceCallStack&             glEnableStack = glAbstraction.GetEnableDisableTrace();
+  TraceCallStack::NamedParams params;
+  params["cap"] << std::hex << GL_BLEND;
+  DALI_TEST_CHECK(glEnableStack.FindMethodAndParams("Enable", params));
 
   END_TEST;
 }
@@ -1031,10 +1030,11 @@ int UtcDaliRendererSetBlendMode04c(void)
   application.SendNotification();
   application.Render();
 
-  TraceCallStack&    glEnableStack = glAbstraction.GetEnableDisableTrace();
-  std::ostringstream blendStr;
-  blendStr << GL_BLEND;
-  DALI_TEST_CHECK(!glEnableStack.FindMethodAndParams("Enable", blendStr.str().c_str()));
+  TraceCallStack&             glEnableStack = glAbstraction.GetEnableDisableTrace();
+  TraceCallStack::NamedParams params;
+  params["cap"] << std::hex << GL_BLEND;
+  DALI_TEST_CHECK(!glEnableStack.FindMethodAndParams("Enable", params));
+  DALI_TEST_CHECK(glEnableStack.FindMethodAndParams("Disable", params));
 
   END_TEST;
 }
@@ -1066,10 +1066,10 @@ int UtcDaliRendererSetBlendMode05(void)
   application.SendNotification();
   application.Render();
 
-  TraceCallStack&    glEnableStack = glAbstraction.GetEnableDisableTrace();
-  std::ostringstream blendStr;
-  blendStr << GL_BLEND;
-  DALI_TEST_CHECK(glEnableStack.FindMethodAndParams("Enable", blendStr.str().c_str()));
+  TraceCallStack&             glEnableStack = glAbstraction.GetEnableDisableTrace();
+  TraceCallStack::NamedParams params;
+  params["cap"] << std::hex << GL_BLEND;
+  DALI_TEST_CHECK(glEnableStack.FindMethodAndParams("Enable", params));
 
   END_TEST;
 }
@@ -1097,10 +1097,10 @@ int UtcDaliRendererSetBlendMode06(void)
   application.SendNotification();
   application.Render();
 
-  TraceCallStack&    glEnableStack = glAbstraction.GetEnableDisableTrace();
-  std::ostringstream blendStr;
-  blendStr << GL_BLEND;
-  DALI_TEST_CHECK(glEnableStack.FindMethodAndParams("Enable", blendStr.str().c_str()));
+  TraceCallStack&             glEnableStack = glAbstraction.GetEnableDisableTrace();
+  TraceCallStack::NamedParams params;
+  params["cap"] << std::hex << GL_BLEND;
+  DALI_TEST_CHECK(glEnableStack.FindMethodAndParams("Enable", params));
 
   END_TEST;
 }
@@ -1131,8 +1131,10 @@ int UtcDaliRendererSetBlendMode07(void)
   application.SendNotification();
   application.Render();
 
-  TraceCallStack& glEnableStack = glAbstraction.GetEnableDisableTrace();
-  DALI_TEST_CHECK(!glEnableStack.FindMethodAndParams("Enable", "GL_BLEND"));
+  TraceCallStack&             glEnableStack = glAbstraction.GetEnableDisableTrace();
+  TraceCallStack::NamedParams params;
+  params["cap"] << std::hex << GL_BLEND;
+  DALI_TEST_CHECK(!glEnableStack.FindMethodAndParams("Enable", params));
 
   END_TEST;
 }
@@ -1165,10 +1167,10 @@ int UtcDaliRendererSetBlendMode08(void)
     application.SendNotification();
     application.Render();
 
-    TraceCallStack&    glEnableStack = glAbstraction.GetEnableDisableTrace();
-    std::ostringstream blendStr;
-    blendStr << GL_BLEND;
-    DALI_TEST_CHECK(glEnableStack.FindMethodAndParams("Enable", blendStr.str().c_str()));
+    TraceCallStack&             glEnableStack = glAbstraction.GetEnableDisableTrace();
+    TraceCallStack::NamedParams params;
+    params["cap"] << std::hex << GL_BLEND;
+    DALI_TEST_CHECK(glEnableStack.FindMethodAndParams("Enable", params));
   }
 
   END_TEST;
@@ -1202,10 +1204,10 @@ int UtcDaliRendererSetBlendMode08b(void)
     application.SendNotification();
     application.Render();
 
-    TraceCallStack&    glEnableStack = glAbstraction.GetEnableDisableTrace();
-    std::ostringstream blendStr;
-    blendStr << GL_BLEND;
-    DALI_TEST_CHECK(!glEnableStack.FindMethodAndParams("Enable", blendStr.str().c_str()));
+    TraceCallStack&             glEnableStack = glAbstraction.GetEnableDisableTrace();
+    TraceCallStack::NamedParams params;
+    params["cap"] << std::hex << GL_BLEND;
+    DALI_TEST_CHECK(!glEnableStack.FindMethodAndParams("Enable", params));
   }
 
   END_TEST;
@@ -2360,15 +2362,17 @@ int UtcDaliRendererSetDepthFunction(void)
   scene.GetRootLayer().SetProperty(Layer::Property::BEHAVIOR, Layer::LAYER_3D);
   scene.Add(actor);
 
-  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
-  glAbstraction.EnableEnableDisableCallTrace(true);
-  glAbstraction.EnableDepthFunctionCallTrace(true);
+  TestGlAbstraction& glAbstraction        = application.GetGlAbstraction();
+  TraceCallStack&    glEnableDisableStack = glAbstraction.GetEnableDisableTrace();
+  TraceCallStack&    glDepthFunctionStack = glAbstraction.GetDepthFunctionTrace();
 
-  TraceCallStack& glEnableDisableStack = glAbstraction.GetEnableDisableTrace();
-  TraceCallStack& glDepthFunctionStack = glAbstraction.GetDepthFunctionTrace();
+  glEnableDisableStack.Enable(true);
+  glDepthFunctionStack.Enable(true);
+  glEnableDisableStack.EnableLogging(true);
+  glDepthFunctionStack.EnableLogging(true);
 
   std::ostringstream depthTestStr;
-  depthTestStr << GL_DEPTH_TEST;
+  depthTestStr << std::hex << GL_DEPTH_TEST;
 
   //GL_NEVER
   {
@@ -2381,7 +2385,7 @@ int UtcDaliRendererSetDepthFunction(void)
 
     DALI_TEST_CHECK(glEnableDisableStack.FindMethodAndParams("Enable", depthTestStr.str().c_str()));
     std::ostringstream depthFunctionStr;
-    depthFunctionStr << GL_NEVER;
+    depthFunctionStr << std::hex << GL_NEVER;
     DALI_TEST_CHECK(glDepthFunctionStack.FindMethodAndParams("DepthFunc", depthFunctionStr.str().c_str()));
   }
 
@@ -2394,7 +2398,7 @@ int UtcDaliRendererSetDepthFunction(void)
     application.Render();
 
     std::ostringstream depthFunctionStr;
-    depthFunctionStr << GL_ALWAYS;
+    depthFunctionStr << std::hex << GL_ALWAYS;
     DALI_TEST_CHECK(glDepthFunctionStack.FindMethodAndParams("DepthFunc", depthFunctionStr.str().c_str()));
   }
 
@@ -2407,7 +2411,7 @@ int UtcDaliRendererSetDepthFunction(void)
     application.Render();
 
     std::ostringstream depthFunctionStr;
-    depthFunctionStr << GL_LESS;
+    depthFunctionStr << std::hex << GL_LESS;
     DALI_TEST_CHECK(glDepthFunctionStack.FindMethodAndParams("DepthFunc", depthFunctionStr.str().c_str()));
   }
 
@@ -2420,7 +2424,7 @@ int UtcDaliRendererSetDepthFunction(void)
     application.Render();
 
     std::ostringstream depthFunctionStr;
-    depthFunctionStr << GL_GREATER;
+    depthFunctionStr << std::hex << GL_GREATER;
     DALI_TEST_CHECK(glDepthFunctionStack.FindMethodAndParams("DepthFunc", depthFunctionStr.str().c_str()));
   }
 
@@ -2433,7 +2437,7 @@ int UtcDaliRendererSetDepthFunction(void)
     application.Render();
 
     std::ostringstream depthFunctionStr;
-    depthFunctionStr << GL_EQUAL;
+    depthFunctionStr << std::hex << GL_EQUAL;
     DALI_TEST_CHECK(glDepthFunctionStack.FindMethodAndParams("DepthFunc", depthFunctionStr.str().c_str()));
   }
 
@@ -2446,7 +2450,7 @@ int UtcDaliRendererSetDepthFunction(void)
     application.Render();
 
     std::ostringstream depthFunctionStr;
-    depthFunctionStr << GL_NOTEQUAL;
+    depthFunctionStr << std::hex << GL_NOTEQUAL;
     DALI_TEST_CHECK(glDepthFunctionStack.FindMethodAndParams("DepthFunc", depthFunctionStr.str().c_str()));
   }
 
@@ -2459,7 +2463,7 @@ int UtcDaliRendererSetDepthFunction(void)
     application.Render();
 
     std::ostringstream depthFunctionStr;
-    depthFunctionStr << GL_LEQUAL;
+    depthFunctionStr << std::hex << GL_LEQUAL;
     DALI_TEST_CHECK(glDepthFunctionStack.FindMethodAndParams("DepthFunc", depthFunctionStr.str().c_str()));
   }
 
@@ -2472,7 +2476,7 @@ int UtcDaliRendererSetDepthFunction(void)
     application.Render();
 
     std::ostringstream depthFunctionStr;
-    depthFunctionStr << GL_GEQUAL;
+    depthFunctionStr << std::hex << GL_GEQUAL;
     DALI_TEST_CHECK(glDepthFunctionStack.FindMethodAndParams("DepthFunc", depthFunctionStr.str().c_str()));
   }
 
@@ -2592,10 +2596,11 @@ int UtcDaliRendererSetDepthTestMode(void)
   TestApplication application;
   tet_infoline("Test setting the DepthTestMode");
 
-  Renderer           renderer      = RendererTestFixture(application);
-  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
-  glAbstraction.EnableEnableDisableCallTrace(true);
-  TraceCallStack& glEnableDisableStack = glAbstraction.GetEnableDisableTrace();
+  Renderer           renderer             = RendererTestFixture(application);
+  TestGlAbstraction& glAbstraction        = application.GetGlAbstraction();
+  TraceCallStack&    glEnableDisableStack = glAbstraction.GetEnableDisableTrace();
+  glEnableDisableStack.Enable(true);
+  glEnableDisableStack.EnableLogging(true);
 
   glEnableDisableStack.Reset();
   application.SendNotification();
@@ -2703,12 +2708,14 @@ int UtcDaliRendererCheckStencilDefaults(void)
   TestApplication application;
   tet_infoline("Test the stencil defaults");
 
-  Renderer           renderer      = RendererTestFixture(application);
-  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
-  glAbstraction.EnableEnableDisableCallTrace(true);
-  glAbstraction.EnableStencilFunctionCallTrace(true);
-  TraceCallStack& glEnableDisableStack   = glAbstraction.GetEnableDisableTrace();
-  TraceCallStack& glStencilFunctionStack = glAbstraction.GetStencilFunctionTrace();
+  Renderer           renderer               = RendererTestFixture(application);
+  TestGlAbstraction& glAbstraction          = application.GetGlAbstraction();
+  TraceCallStack&    glEnableDisableStack   = glAbstraction.GetEnableDisableTrace();
+  TraceCallStack&    glStencilFunctionStack = glAbstraction.GetStencilFunctionTrace();
+  glEnableDisableStack.Enable(true);
+  glEnableDisableStack.EnableLogging(true);
+  glStencilFunctionStack.Enable(true);
+  glStencilFunctionStack.EnableLogging(true);
 
   ResetDebugAndFlush(application, glEnableDisableStack, glStencilFunctionStack);
 
@@ -2729,12 +2736,14 @@ int UtcDaliRendererSetRenderModeToUseStencilBuffer(void)
   TestApplication application;
   tet_infoline("Test setting the RenderMode to use the stencil buffer");
 
-  Renderer           renderer      = RendererTestFixture(application);
-  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
-  glAbstraction.EnableEnableDisableCallTrace(true);
-  glAbstraction.EnableStencilFunctionCallTrace(true);
-  TraceCallStack& glEnableDisableStack   = glAbstraction.GetEnableDisableTrace();
-  TraceCallStack& glStencilFunctionStack = glAbstraction.GetStencilFunctionTrace();
+  Renderer           renderer               = RendererTestFixture(application);
+  TestGlAbstraction& glAbstraction          = application.GetGlAbstraction();
+  TraceCallStack&    glEnableDisableStack   = glAbstraction.GetEnableDisableTrace();
+  TraceCallStack&    glStencilFunctionStack = glAbstraction.GetStencilFunctionTrace();
+  glEnableDisableStack.Enable(true);
+  glEnableDisableStack.EnableLogging(true);
+  glStencilFunctionStack.Enable(true);
+  glStencilFunctionStack.EnableLogging(true);
 
   // Set the StencilFunction to something other than the default, to confirm it is set as a property,
   // but NO GL call has been made while the RenderMode is set to not use the stencil buffer.
@@ -2820,12 +2829,14 @@ int UtcDaliRendererSetStencilFunction(void)
   TestApplication application;
   tet_infoline("Test setting the StencilFunction");
 
-  Renderer           renderer      = RendererTestFixture(application);
-  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
-  glAbstraction.EnableEnableDisableCallTrace(true);
-  glAbstraction.EnableStencilFunctionCallTrace(true);
-  TraceCallStack& glEnableDisableStack   = glAbstraction.GetEnableDisableTrace();
-  TraceCallStack& glStencilFunctionStack = glAbstraction.GetStencilFunctionTrace();
+  Renderer           renderer               = RendererTestFixture(application);
+  TestGlAbstraction& glAbstraction          = application.GetGlAbstraction();
+  TraceCallStack&    glEnableDisableStack   = glAbstraction.GetEnableDisableTrace();
+  TraceCallStack&    glStencilFunctionStack = glAbstraction.GetStencilFunctionTrace();
+  glEnableDisableStack.Enable(true);
+  glEnableDisableStack.EnableLogging(true);
+  glStencilFunctionStack.Enable(true);
+  glStencilFunctionStack.EnableLogging(true);
 
   // RenderMode must use the stencil for StencilFunction to operate.
   renderer.SetProperty(Renderer::Property::RENDER_MODE, RenderMode::STENCIL);
@@ -2913,12 +2924,14 @@ int UtcDaliRendererSetStencilOperation(void)
   TestApplication application;
   tet_infoline("Test setting the StencilOperation");
 
-  Renderer           renderer      = RendererTestFixture(application);
-  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
-  glAbstraction.EnableEnableDisableCallTrace(true);
-  glAbstraction.EnableStencilFunctionCallTrace(true);
-  TraceCallStack& glEnableDisableStack   = glAbstraction.GetEnableDisableTrace();
-  TraceCallStack& glStencilFunctionStack = glAbstraction.GetStencilFunctionTrace();
+  Renderer           renderer               = RendererTestFixture(application);
+  TestGlAbstraction& glAbstraction          = application.GetGlAbstraction();
+  TraceCallStack&    glEnableDisableStack   = glAbstraction.GetEnableDisableTrace();
+  TraceCallStack&    glStencilFunctionStack = glAbstraction.GetStencilFunctionTrace();
+  glEnableDisableStack.Enable(true);
+  glEnableDisableStack.EnableLogging(true);
+  glStencilFunctionStack.Enable(true);
+  glStencilFunctionStack.EnableLogging(true);
 
   // RenderMode must use the stencil for StencilOperation to operate.
   renderer.SetProperty(Renderer::Property::RENDER_MODE, RenderMode::STENCIL);
@@ -3008,12 +3021,14 @@ int UtcDaliRendererSetStencilMask(void)
   TestApplication application;
   tet_infoline("Test setting the StencilMask");
 
-  Renderer           renderer      = RendererTestFixture(application);
-  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
-  glAbstraction.EnableEnableDisableCallTrace(true);
-  glAbstraction.EnableStencilFunctionCallTrace(true);
-  TraceCallStack& glEnableDisableStack   = glAbstraction.GetEnableDisableTrace();
-  TraceCallStack& glStencilFunctionStack = glAbstraction.GetStencilFunctionTrace();
+  Renderer           renderer               = RendererTestFixture(application);
+  TestGlAbstraction& glAbstraction          = application.GetGlAbstraction();
+  TraceCallStack&    glEnableDisableStack   = glAbstraction.GetEnableDisableTrace();
+  TraceCallStack&    glStencilFunctionStack = glAbstraction.GetStencilFunctionTrace();
+  glEnableDisableStack.Enable(true);
+  glEnableDisableStack.EnableLogging(true);
+  glStencilFunctionStack.Enable(true);
+  glStencilFunctionStack.EnableLogging(true);
 
   // RenderMode must use the stencil for StencilMask to operate.
   renderer.SetProperty(Renderer::Property::RENDER_MODE, RenderMode::STENCIL);
@@ -3080,6 +3095,7 @@ int UtcDaliRendererWrongNumberOfTextures(void)
   TraceCallStack&    drawTrace = gl.GetDrawTrace();
   drawTrace.Reset();
   drawTrace.Enable(true);
+  drawTrace.EnableLogging(true);
 
   application.SendNotification();
   application.Render(0);
