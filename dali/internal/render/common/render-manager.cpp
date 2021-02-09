@@ -247,7 +247,7 @@ void RenderManager::SetShaderSaver(ShaderSaver& upstream)
 void RenderManager::AddRenderer(OwnerPointer<Render::Renderer>& renderer)
 {
   // Initialize the renderer as we are now in render thread
-  renderer->Initialize(mImpl->context);
+  renderer->Initialize(mImpl->context, mImpl->programController);
 
   mImpl->rendererContainer.PushBack(renderer.Release());
 }
@@ -335,6 +335,7 @@ void RenderManager::RemoveFrameBuffer(Render::FrameBuffer* frameBuffer)
     }
   }
 }
+
 void RenderManager::InitializeScene(SceneGraph::Scene* scene)
 {
   scene->Initialize(*mImpl->CreateSceneContext());
