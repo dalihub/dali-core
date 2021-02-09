@@ -558,12 +558,6 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
     return;
   }
 
-  // @TODO We need to do partial rendering rotation.
-  if( sceneObject && sceneObject->GetSurfaceOrientation() != 0 )
-  {
-    return;
-  }
-
   class DamagedRectsCleaner
   {
   public:
