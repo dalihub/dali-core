@@ -298,6 +298,14 @@ HitActor HitTestWithinLayer(Actor&                                     actor,
                                                clippingBitPlaneMask,
                                                rayTest));
 
+        // Make sure the set hit actor is actually hittable. This is usually required when we have some
+        // clipping as we need to hit-test all actors as we descend the tree regardless of whether they
+        // are hittable or not.
+        if(currentHit.actor && !hitCheck.IsActorHittable(currentHit.actor))
+        {
+          continue;
+        }
+
         bool updateChildHit = false;
         if(currentHit.distance >= 0.0f)
         {
