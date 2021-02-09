@@ -157,10 +157,24 @@ Property::Value KeyFrames::GetLastKeyFrameValue() const
   std::size_t noOfKeyFrames = mKeyFrames->GetNumberOfKeyFrames();
   if(noOfKeyFrames)
   {
-    mKeyFrames->GetKeyFrameAsValue(noOfKeyFrames - 1, value);
+    float time;
+    mKeyFrames->GetKeyFrameAsValue(noOfKeyFrames - 1, time, value);
   }
 
   return value;
+}
+
+std::size_t KeyFrames::GetKeyFrameCount() const
+{
+  return mKeyFrames->GetNumberOfKeyFrames();
+}
+
+void KeyFrames::GetKeyFrame(std::size_t index, float& time, Property::Value& value) const
+{
+  if(index < mKeyFrames->GetNumberOfKeyFrames())
+  {
+    mKeyFrames->GetKeyFrameAsValue(index, time, value);
+  }
 }
 
 } // namespace Internal
