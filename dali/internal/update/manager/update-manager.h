@@ -300,12 +300,11 @@ public:
   void RemoveShader(Shader* shader);
 
   /**
-   * Set the shader program for a Shader object
+   * Set the shader data for a Shader object
    * @param[in] shader        The shader to modify
    * @param[in] shaderData    Source code, hash over source, and optional compiled binary for the shader program
-   * @param[in] modifiesGeometry True if the vertex shader modifies geometry
    */
-  void SetShaderProgram(Shader* shader, Internal::ShaderDataPtr shaderData, bool modifiesGeometry);
+  void SetShaderData(Shader* shader, Internal::ShaderDataPtr shaderData);
 
   /**
    * @brief Accept compiled shaders passed back on render thread for saving.
@@ -1014,20 +1013,6 @@ inline void RemoveShaderMessage(UpdateManager& manager, const Shader* shader)
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&manager, &UpdateManager::RemoveShader, const_cast<Shader*>(shader));
-}
-
-inline void SetShaderProgramMessage(UpdateManager&          manager,
-                                    const Shader&           shader,
-                                    Internal::ShaderDataPtr shaderData,
-                                    bool                    modifiesGeometry)
-{
-  using LocalType = MessageValue3<UpdateManager, Shader*, Internal::ShaderDataPtr, bool>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &UpdateManager::SetShaderProgram, const_cast<Shader*>(&shader), shaderData, modifiesGeometry);
 }
 
 inline void SurfaceReplacedMessage(UpdateManager& manager, const SceneGraph::Scene& constScene)

@@ -39,6 +39,7 @@ namespace Internal
 class Context;
 class Texture;
 class Program;
+class ProgramCache;
 
 namespace SceneGraph
 {
@@ -165,8 +166,9 @@ public:
    * Second-phase construction.
    * This is called when the renderer is inside render thread
    * @param[in] context Context used by the renderer
+   * @param[in] programCache Cache of program objects
    */
-  void Initialize(Context& context);
+  void Initialize(Context& context, ProgramCache& programCache);
 
   /**
    * Destructor
@@ -445,6 +447,8 @@ private:
 
   Context*          mContext;
   Render::Geometry* mGeometry;
+
+  ProgramCache* mProgramCache;
 
   struct UniformIndexMap
   {
