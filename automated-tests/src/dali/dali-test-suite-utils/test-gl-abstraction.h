@@ -621,6 +621,11 @@ public:
     {
       mFramebufferStencilAttached = true;
     }
+    else if(attachment == GL_DEPTH_STENCIL_ATTACHMENT)
+    {
+      mFramebufferStencilAttached = true;
+      mFramebufferDepthAttached   = true;
+    }
   }
 
   inline void FramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level) override

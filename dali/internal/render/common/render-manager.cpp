@@ -231,7 +231,7 @@ void RenderManager::ContextDestroyed()
   //Inform framebuffers
   for(auto&& framebuffer : mImpl->frameBufferContainer)
   {
-    framebuffer->GlContextDestroyed();
+    framebuffer->Destroy();
   }
 
   // inform renderers
@@ -325,7 +325,7 @@ void RenderManager::AddFrameBuffer(OwnerPointer<Render::FrameBuffer>& frameBuffe
 {
   Render::FrameBuffer* frameBufferPtr = frameBuffer.Release();
   mImpl->frameBufferContainer.PushBack(frameBufferPtr);
-  frameBufferPtr->Initialize(mImpl->context);
+  frameBufferPtr->Initialize(mImpl->graphicsController);
 }
 
 void RenderManager::RemoveFrameBuffer(Render::FrameBuffer* frameBuffer)
@@ -337,7 +337,7 @@ void RenderManager::RemoveFrameBuffer(Render::FrameBuffer* frameBuffer)
   {
     if(iter == frameBuffer)
     {
-      frameBuffer->Destroy(mImpl->context);
+      frameBuffer->Destroy();
       mImpl->frameBufferContainer.Erase(&iter); // frameBuffer found; now destroy it
 
       break;
@@ -370,17 +370,17 @@ void RenderManager::SurfaceReplaced(SceneGraph::Scene* scene)
 
 void RenderManager::AttachColorTextureToFrameBuffer(Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel, uint32_t layer)
 {
-  frameBuffer->AttachColorTexture(mImpl->context, texture, mipmapLevel, layer);
+  frameBuffer->AttachColorTexture(texture, mipmapLevel, layer);
 }
 
 void RenderManager::AttachDepthTextureToFrameBuffer(Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel)
 {
-  frameBuffer->AttachDepthTexture(mImpl->context, texture, mipmapLevel);
+  frameBuffer->AttachDepthTexture(texture, mipmapLevel);
 }
 
 void RenderManager::AttachDepthStencilTextureToFrameBuffer(Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel)
 {
-  frameBuffer->AttachDepthStencilTexture(mImpl->context, texture, mipmapLevel);
+  frameBuffer->AttachDepthStencilTexture(texture, mipmapLevel);
 }
 
 void RenderManager::AddVertexBuffer(OwnerPointer<Render::VertexBuffer>& vertexBuffer)
@@ -863,7 +863,8 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
     if(instruction.mFrameBuffer)
     {
-      instruction.mFrameBuffer->Bind(*mImpl->currentContext);
+      //instruction.mFrameBuffer->Bind(*mImpl->currentContext);
+      // @todo Temporarily set per renderer per pipeline. Should use RenderPass instead
 
       // For each offscreen buffer, update the dependency list with the new texture id used by this frame buffer.
       for(unsigned int i0 = 0, i1 = instruction.mFrameBuffer->GetColorAttachmentCount(); i0 < i1; ++i0)
@@ -964,6 +965,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
     // @todo The following block should be a command in it's own right.
     // Currently takes account of surface orientation in Context.
+    // Or move entirely to RenderPass implementation
     mImpl->currentContext->Viewport(viewportRect.x, viewportRect.y, viewportRect.width, viewportRect.height);
     if(instruction.mIsClearColorSet)
     {
@@ -1032,7 +1034,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
           // For off-screen buffer
 
           // Wait until all rendering calls for the currently context are executed
-          mImpl->graphicsController.GetGlContextHelperAbstraction().WaitClient();
+          // mImpl->graphicsController.GetGlContextHelperAbstraction().WaitClient();
 
           // Clear the dependency list
           mImpl->textureDependencyList.Clear();

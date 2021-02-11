@@ -36,6 +36,42 @@ std::ostream& operator<<(std::ostream& o, Graphics::SamplerFilter filterMode);
 std::ostream& operator<<(std::ostream& o, Graphics::SamplerMipmapMode mipmapMode);
 std::ostream& operator<<(std::ostream& o, const Graphics::SamplerCreateInfo& createInfo);
 
+template<typename T>
+T* Uncast(const Graphics::CommandBuffer* object)
+{
+  return const_cast<T*>(static_cast<const T*>(object));
+}
+
+template<typename T>
+T* Uncast(const Graphics::Texture* object)
+{
+  return const_cast<T*>(static_cast<const T*>(object));
+}
+
+template<typename T>
+T* Uncast(const Graphics::Sampler* object)
+{
+  return const_cast<T*>(static_cast<const T*>(object));
+}
+
+template<typename T>
+T* Uncast(const Graphics::Buffer* object)
+{
+  return const_cast<T*>(static_cast<const T*>(object));
+}
+
+template<typename T>
+T* Uncast(const Graphics::Shader* object)
+{
+  return const_cast<T*>(static_cast<const T*>(object));
+}
+
+template<typename T>
+T* Uncast(const Graphics::Framebuffer* object)
+{
+  return const_cast<T*>(static_cast<const T*>(object));
+}
+
 class TestGraphicsController : public Dali::Graphics::Controller
 {
 public:
@@ -334,6 +370,7 @@ public: // Test Functions
 public:
   mutable TraceCallStack                    mCallStack;
   mutable TraceCallStack                    mCommandBufferCallStack;
+  mutable TraceCallStack                    mFrameBufferCallStack;
   mutable std::vector<Graphics::SubmitInfo> mSubmitStack;
 
   TestGlAbstraction              mGl;

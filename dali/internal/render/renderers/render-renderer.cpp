@@ -1237,13 +1237,24 @@ Graphics::UniquePtr<Graphics::Pipeline> Renderer::PrepareGraphicsPipeline(
 
   mUpdated = true;
 
+  // @todo Should instead set framebuffer once through Renderpass, rather than modifying
+  // pipeline repeatedly.
+  Graphics::FramebufferState framebufferState{};
+  if(instruction.mFrameBuffer)
+  {
+    instruction.mFrameBuffer->Bind(); // Ensure graphics object is created.
+    framebufferState.SetFramebuffer(*instruction.mFrameBuffer->GetGraphicsObject());
+  }
+
   // Create a new pipeline
+  // @todo Passed as pointers - shallow copy will break. Implementation MUST deep copy.
   return mGraphicsController->CreatePipeline(
     Graphics::PipelineCreateInfo()
-      .SetInputAssemblyState(&inputAssemblyState) // Passed as pointers - shallow copy will break. TOO C LIKE
+      .SetInputAssemblyState(&inputAssemblyState)
       .SetVertexInputState(&vertexInputState)
       .SetRasterizationState(&rasterizationState)
       .SetColorBlendState(&colorBlendState)
+      .SetFramebufferState(&framebufferState)
       .SetProgramState(&programState)
       .SetNextExtension(&mLegacyProgram),
     std::move(oldPipeline));

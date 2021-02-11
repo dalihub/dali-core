@@ -49,26 +49,19 @@ public:
 
   /**
    * Creates a FrameBuffer object in the GPU.
-   * @param[in] context The GL context
+   * @param[in] graphicsController The Graphics Controller
    */
-  virtual void Initialize(Context& context);
+  virtual void Initialize(Graphics::Controller& graphicsController);
 
   /**
    * Deletes the framebuffer object from the GPU
-   * @param[in] context The GL context
    */
-  virtual void Destroy(Context& context);
+  virtual void Destroy();
 
   /**
-   * Called by RenderManager to inform the framebuffer that the context has been destroyed
+   * @brief Bind the framebuffer. Do nothing
    */
-  virtual void GlContextDestroyed();
-
-  /**
-   * @brief Bind the framebuffer
-   * @param[in] context The GL context
-   */
-  virtual void Bind(Context& context);
+  virtual void Bind();
 
   /**
    * @brief Get the width of the FrameBuffer
@@ -84,29 +77,26 @@ public:
 
   /**
    * @brief Attaches a texture for the color rendering. This API is valid only for frame buffer with COLOR attachments.
-   * @param[in] context The GL context
    * @param[in] texture The texture that will be used as output when rendering
    * @param[in] mipmapLevel The mipmap of the texture to be attached
    * @param[in] layer Indicates which layer of a cube map or array texture to attach. Unused for 2D textures
    * @note A maximum of Dali::FrameBuffer::MAX_COLOR_ATTACHMENTS are supported.
    */
-  void AttachColorTexture(Context& context, Render::Texture* texture, uint32_t mipmapLevel, uint32_t layer);
+  void AttachColorTexture(Render::Texture* texture, uint32_t mipmapLevel, uint32_t layer);
 
   /**
    * @brief Attaches a texture for the depth rendering. This API is valid only for frame buffer with DEPTH attachments.
-   * @param[in] context The GL context
    * @param[in] texture The texture that will be used as output when rendering
    * @param[in] mipmapLevel The mipmap of the texture to be attached
    */
-  void AttachDepthTexture(Context& context, Render::Texture* texture, uint32_t mipmapLevel);
+  void AttachDepthTexture(Render::Texture* texture, uint32_t mipmapLevel);
 
   /**
    * @brief Attaches a texture for the depth/stencil rendering. This API is valid only for frame buffer with DEPTH_STENCIL attachments.
-   * @param[in] context The GL context
    * @param[in] texture The texture that will be used as output when rendering
    * @param[in] mipmapLevel The mipmap of the texture to be attached
    */
-  void AttachDepthStencilTexture(Context& context, Render::Texture* texture, uint32_t mipmapLevel);
+  void AttachDepthStencilTexture(Render::Texture* texture, uint32_t mipmapLevel);
 
   /**
    * @brief Get the number of textures bound to this frame buffer as color attachments.
@@ -114,7 +104,7 @@ public:
    */
   uint8_t GetColorAttachmentCount() const
   {
-    return mColorAttachmentCount;
+    return mCreateInfo.colorAttachments.size();
   }
 
   /**
@@ -123,8 +113,13 @@ public:
    */
   Graphics::Texture* GetTexture(uint8_t index)
   {
-    return mTextures[index];
+    return mCreateInfo.colorAttachments[index].texture;
   };
+
+  Graphics::Framebuffer* GetGraphicsObject()
+  {
+    return mGraphicsObject.get();
+  }
 
 private:
   /**
@@ -138,13 +133,16 @@ private:
   FrameBuffer& operator=(const FrameBuffer& rhs) = delete;
 
 private:
-  GLuint             mId;
-  Graphics::Texture* mTextures[Dali::DevelFrameBuffer::MAX_COLOR_ATTACHMENTS];
-  GLuint             mDepthBuffer;
-  GLuint             mStencilBuffer;
-  uint32_t           mWidth;
-  uint32_t           mHeight;
-  uint8_t            mColorAttachmentCount;
+  Graphics::Controller*                      mGraphicsController{nullptr};
+  Graphics::UniquePtr<Graphics::Framebuffer> mGraphicsObject{nullptr};
+
+  Graphics::FramebufferCreateInfo mCreateInfo;
+
+  uint32_t mWidth;
+  uint32_t mHeight;
+
+  bool mDepthBuffer;
+  bool mStencilBuffer;
 };
 
 } // namespace Render

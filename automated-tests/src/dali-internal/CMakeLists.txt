@@ -35,6 +35,7 @@ LIST(APPEND TC_SOURCES
         ../dali/dali-test-suite-utils/test-graphics-buffer.cpp
         ../dali/dali-test-suite-utils/test-graphics-command-buffer.cpp
         ../dali/dali-test-suite-utils/test-graphics-controller.cpp
+        ../dali/dali-test-suite-utils/test-graphics-framebuffer.cpp
         ../dali/dali-test-suite-utils/test-graphics-pipeline.cpp
         ../dali/dali-test-suite-utils/test-graphics-program.cpp
         ../dali/dali-test-suite-utils/test-graphics-reflection.cpp

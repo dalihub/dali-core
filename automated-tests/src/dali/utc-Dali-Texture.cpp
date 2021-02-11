@@ -35,17 +35,6 @@ void texture_set_cleanup(void)
   test_return_value = TET_PASS;
 }
 
-Texture CreateTexture(TextureType::Type type, Pixel::Format format, int width, int height)
-{
-  Texture texture = Texture::New(type, format, width, height);
-
-  int       bufferSize = width * height * Pixel::GetBytesPerPixel(format);
-  uint8_t*  buffer     = reinterpret_cast<uint8_t*>(malloc(bufferSize));
-  PixelData pixelData  = PixelData::New(buffer, bufferSize, width, height, format, PixelData::FREE);
-  texture.Upload(pixelData, 0u, 0u, 0u, 0u, width, height);
-  return texture;
-}
-
 int UtcDaliTextureNew01(void)
 {
   TestApplication application;

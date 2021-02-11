@@ -26,6 +26,7 @@
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/public-api/dali-core.h>
 #include <mesh-builder.h>
+#include <test-actor-utils.h>
 
 #include <cfloat> // For FLT_MAX
 #include <string>
@@ -58,17 +59,6 @@ bool gHoverCallBackCalled = false;
 static bool gTestConstraintCalled;
 
 LayoutDirection::Type gLayoutDirectionType;
-
-Texture CreateTexture(TextureType::Type type, Pixel::Format format, int width, int height)
-{
-  Texture texture = Texture::New(type, format, width, height);
-
-  int       bufferSize = width * height * 2;
-  uint8_t*  buffer     = reinterpret_cast<uint8_t*>(malloc(bufferSize));
-  PixelData pixelData  = PixelData::New(buffer, bufferSize, width, height, format, PixelData::FREE);
-  texture.Upload(pixelData, 0u, 0u, 0u, 0u, width, height);
-  return texture;
-}
 
 struct TestConstraint
 {

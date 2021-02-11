@@ -878,7 +878,7 @@ inline BufferUsageFlags operator|(BufferUsageFlags flags, BufferUsage usage)
  */
 enum class BufferPropertiesFlagBit : uint32_t
 {
-  CPU_ALLOCATED = 1 << 0, ///< Buffer is allocated on the CPU side
+  CPU_ALLOCATED    = 1 << 0, ///< Buffer is allocated on the CPU side
   TRANSIENT_MEMORY = 1 << 1, ///< Buffer memory will be short-lived
 };
 
@@ -1002,6 +1002,10 @@ struct ColorAttachment
 struct DepthStencilAttachment
 {
   // TODO:
+  Texture* depthTexture;
+  Texture* stencilTexture;
+  uint32_t depthLevel;
+  uint32_t stencilLevel;
 };
 
 /**

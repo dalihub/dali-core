@@ -26,133 +26,74 @@ namespace Internal
 {
 namespace Render
 {
-namespace
-{
-const GLenum COLOR_ATTACHMENTS[] =
-  {
-    GL_COLOR_ATTACHMENT0,
-    GL_COLOR_ATTACHMENT1,
-    GL_COLOR_ATTACHMENT2,
-    GL_COLOR_ATTACHMENT3,
-    GL_COLOR_ATTACHMENT4,
-    GL_COLOR_ATTACHMENT5,
-    GL_COLOR_ATTACHMENT6,
-    GL_COLOR_ATTACHMENT7,
-};
-}
-
 FrameBuffer::FrameBuffer(uint32_t width, uint32_t height, Mask attachments)
-: mId(0u),
-  mTextures{0u},
-  mDepthBuffer(attachments & Dali::FrameBuffer::Attachment::DEPTH),
-  mStencilBuffer(attachments & Dali::FrameBuffer::Attachment::STENCIL),
-  mWidth(width),
+: mWidth(width),
   mHeight(height),
-  mColorAttachmentCount(0u)
+  mDepthBuffer(attachments & Dali::FrameBuffer::Attachment::DEPTH),
+  mStencilBuffer(attachments & Dali::FrameBuffer::Attachment::STENCIL)
 {
 }
 
 FrameBuffer::~FrameBuffer() = default;
 
-void FrameBuffer::Destroy(Context& context)
+void FrameBuffer::Destroy()
 {
-  if(mId)
+  mGraphicsObject.reset();
+}
+
+void FrameBuffer::Initialize(Graphics::Controller& graphicsController)
+{
+  mGraphicsController = &graphicsController;
+}
+
+void FrameBuffer::AttachColorTexture(Render::Texture* texture, uint32_t mipmapLevel, uint32_t layer)
+{
+  if(texture)
   {
-    context.DeleteFramebuffers(1, &mId);
+    if(!texture->GetGraphicsObject())
+    {
+      texture->Create(0 | Graphics::TextureUsageFlagBits::COLOR_ATTACHMENT | Graphics::TextureUsageFlagBits::SAMPLE);
+    }
+
+    uint32_t                  attachmentId = mCreateInfo.colorAttachments.size();
+    Graphics::ColorAttachment colorAttachment{attachmentId, texture->GetGraphicsObject(), layer, mipmapLevel};
+    mCreateInfo.colorAttachments.push_back(colorAttachment);
   }
 }
 
-void FrameBuffer::GlContextDestroyed()
+void FrameBuffer::AttachDepthTexture(Render::Texture* texture, uint32_t mipmapLevel)
 {
-  mId = 0u;
+  if(texture && mDepthBuffer)
+  {
+    if(!texture->GetGraphicsObject())
+    {
+      texture->Create(0 | Graphics::TextureUsageFlagBits::DEPTH_STENCIL_ATTACHMENT | Graphics::TextureUsageFlagBits::SAMPLE);
+    }
+
+    mCreateInfo.depthStencilAttachment.depthTexture = texture->GetGraphicsObject();
+    mCreateInfo.depthStencilAttachment.depthLevel   = mipmapLevel;
+  }
 }
 
-void FrameBuffer::Initialize(Context& context)
+void FrameBuffer::AttachDepthStencilTexture(Render::Texture* texture, uint32_t mipmapLevel)
 {
-  context.GenFramebuffers(1, &mId);
-  context.BindFramebuffer(GL_FRAMEBUFFER, mId);
-
-  if(mDepthBuffer)
+  if(texture && mStencilBuffer)
   {
-    // Create a depth render target.
-    context.GenRenderbuffers(1, &mDepthBuffer);
-    context.BindRenderbuffer(GL_RENDERBUFFER, mDepthBuffer);
-    context.RenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, mWidth, mHeight);
-    context.FramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mDepthBuffer);
+    if(!texture->GetGraphicsObject())
+    {
+      texture->Create(0 | Graphics::TextureUsageFlagBits::DEPTH_STENCIL_ATTACHMENT | Graphics::TextureUsageFlagBits::SAMPLE);
+    }
+    mCreateInfo.depthStencilAttachment.stencilTexture = texture->GetGraphicsObject();
+    mCreateInfo.depthStencilAttachment.stencilLevel   = mipmapLevel;
   }
-
-  if(mStencilBuffer)
-  {
-    // Create a stencil render target.
-    context.GenRenderbuffers(1, &mStencilBuffer);
-    context.BindRenderbuffer(GL_RENDERBUFFER, mStencilBuffer);
-    context.RenderbufferStorage(GL_RENDERBUFFER, GL_STENCIL_INDEX8, mWidth, mHeight);
-    context.FramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, mStencilBuffer);
-  }
-
-  context.BindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void FrameBuffer::AttachColorTexture(Context& context, Render::Texture* texture, uint32_t mipmapLevel, uint32_t layer)
+void FrameBuffer::Bind()
 {
-  context.BindFramebuffer(GL_FRAMEBUFFER, mId);
-
-  mTextures[mColorAttachmentCount] = texture->GetGraphicsObject();
-  GLuint textureId                 = 0; //@todo Temp
-
-  // Create a color attachment.
-  const GLenum iAttachment = COLOR_ATTACHMENTS[mColorAttachmentCount];
-  if(texture->GetType() == TextureType::TEXTURE_2D)
+  if(!mGraphicsObject)
   {
-    context.FramebufferTexture2D(GL_FRAMEBUFFER, iAttachment, GL_TEXTURE_2D, textureId, mipmapLevel);
+    mGraphicsObject = mGraphicsController->CreateFramebuffer(mCreateInfo, nullptr);
   }
-  else
-  {
-    context.FramebufferTexture2D(GL_FRAMEBUFFER, iAttachment, GL_TEXTURE_CUBE_MAP_POSITIVE_X + layer, textureId, mipmapLevel);
-  }
-
-  ++mColorAttachmentCount;
-  context.DrawBuffers(mColorAttachmentCount, COLOR_ATTACHMENTS);
-  DALI_ASSERT_DEBUG(context.CheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
-
-  context.BindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-void FrameBuffer::AttachDepthTexture(Context& context, Render::Texture* texture, uint32_t mipmapLevel)
-{
-  context.BindFramebuffer(GL_FRAMEBUFFER, mId);
-
-  //@todo Temp
-  GLuint textureId = 0;
-
-  // Create a depth attachment.
-  if(texture->GetType() == TextureType::TEXTURE_2D)
-  {
-    context.FramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, textureId, mipmapLevel);
-  }
-
-  context.BindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-void FrameBuffer::AttachDepthStencilTexture(Context& context, Render::Texture* texture, uint32_t mipmapLevel)
-{
-  context.BindFramebuffer(GL_FRAMEBUFFER, mId);
-
-  //@todo temp
-  GLuint textureId = 0;
-
-  // Create a depth/stencil attachment.
-  if(texture->GetType() == TextureType::TEXTURE_2D)
-  {
-    context.FramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, textureId, mipmapLevel);
-  }
-
-  context.BindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-void FrameBuffer::Bind(Context& context)
-{
-  context.BindFramebuffer(GL_FRAMEBUFFER, mId);
 }
 
 uint32_t FrameBuffer::GetWidth() const

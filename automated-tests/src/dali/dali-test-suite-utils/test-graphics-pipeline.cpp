@@ -21,7 +21,7 @@ namespace Dali
 TestGraphicsPipeline::TestGraphicsPipeline(TestGlAbstraction& gl, const Graphics::PipelineCreateInfo& createInfo)
 : mGl(gl)
 {
-  // Need to deep copy, otherwise pointed at memory will go out of scope. Probably should do something about this.
+  // Need to deep copy, otherwise pointed at memory will go out of scope. @todo Probably should do something about this.
 
   if(createInfo.colorBlendState)
     colorBlendState = *createInfo.colorBlendState;

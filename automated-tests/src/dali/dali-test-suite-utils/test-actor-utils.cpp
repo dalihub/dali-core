@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,6 +89,17 @@ Actor CreateRenderableActor(Texture texture, const std::string& vertexShader, co
   }
 
   return actor;
+}
+
+Texture CreateTexture(TextureType::Type type, Pixel::Format format, int width, int height)
+{
+  Texture texture = Texture::New(type, format, width, height);
+
+  int       bufferSize = width * height * 2;
+  uint8_t*  buffer     = reinterpret_cast<uint8_t*>(malloc(bufferSize));
+  PixelData pixelData  = PixelData::New(buffer, bufferSize, width, height, format, PixelData::FREE);
+  texture.Upload(pixelData, 0u, 0u, 0u, 0u, width, height);
+  return texture;
 }
 
 } // namespace Dali
