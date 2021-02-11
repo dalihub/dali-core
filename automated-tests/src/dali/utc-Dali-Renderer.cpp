@@ -3540,3 +3540,43 @@ int UtcDaliRendererGetShaderNegative(void)
   }
   END_TEST;
 }
+
+int UtcDaliRendererCheckTextureBindingP(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test adding draw commands to the renderer");
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  glAbstraction.EnableEnableDisableCallTrace(true);
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader   shader   = Shader::New("vertexSrc", "fragmentSrc");
+  Renderer renderer = Renderer::New(geometry, shader);
+
+  renderer.SetProperty(Renderer::Property::BLEND_MODE, Dali::BlendMode::ON);
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+  actor.SetProperty(Actor::Property::COLOR, Vector4(1.0f, 0.0f, 1.0f, 1.0f));
+  application.GetScene().Add(actor);
+
+  TestGraphicsController& graphics        = application.GetGraphicsController();
+  TraceCallStack&         cmdBufCallstack = graphics.mCommandBufferCallStack;
+  cmdBufCallstack.Enable(true);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(!cmdBufCallstack.FindMethod("BindTextures"));
+
+  Texture    image0      = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGB888, 64, 64);
+  TextureSet textureSet0 = CreateTextureSet(image0);
+  renderer.SetTextures(textureSet0);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(cmdBufCallstack.FindMethod("BindTextures"));
+  END_TEST;
+}

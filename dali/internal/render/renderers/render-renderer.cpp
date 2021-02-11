@@ -397,7 +397,10 @@ bool Renderer::BindTextures(Context& context, Program& program, Graphics::Comman
     }
   }
 
-  commandBuffer.BindTextures(textureBindings);
+  if(textureBindings.size() > 0)
+  {
+    commandBuffer.BindTextures(textureBindings);
+  }
 
   return result;
 }

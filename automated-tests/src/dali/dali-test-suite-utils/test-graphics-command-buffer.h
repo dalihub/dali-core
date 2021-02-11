@@ -89,7 +89,7 @@ public:
   void SetViewportEnable(bool value);
 
 public:
-  TraceCallStack     mCallStack;
+  TraceCallStack&    mCallStack;
   TestGlAbstraction& mGlAbstraction;
 
   std::vector<Graphics::TextureBinding> mTextureBindings;
