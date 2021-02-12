@@ -126,7 +126,7 @@ void Geometry::Upload(Graphics::Controller& graphicsController)
   }
 }
 
-void Geometry::Draw(
+bool Geometry::Draw(
   Graphics::Controller&    graphicsController,
   Graphics::CommandBuffer& commandBuffer,
   uint32_t                 elementBufferOffset,
@@ -140,14 +140,24 @@ void Geometry::Draw(
 
   for(uint32_t i = 0; i < vertexBufferCount; ++i)
   {
-    Graphics::Buffer* buffer = mVertexBuffers[i]->GetGpuBuffer().GetGraphicsObject();
-
-    if(buffer)
+    const GpuBuffer* gpuBuffer = mVertexBuffers[i]->GetGpuBuffer();
+    if(gpuBuffer)
     {
-      buffers.push_back(buffer);
-      offsets.push_back(0u);
+      const Graphics::Buffer* buffer = gpuBuffer->GetGraphicsObject();
+
+      if(buffer)
+      {
+        buffers.push_back(buffer);
+        offsets.push_back(0u);
+      }
     }
+    //@todo Figure out why this is being drawn without geometry having been uploaded
   }
+  if(buffers.size() == 0)
+  {
+    return false;
+  }
+
   commandBuffer.BindVertexBuffers(0, buffers, offsets);
 
   uint32_t numIndices(0u);
@@ -173,7 +183,7 @@ void Geometry::Draw(
   if(mIndexBuffer && mGeometryType != Dali::Geometry::POINTS)
   {
     //Indexed draw call
-    Graphics::Buffer* ibo = mIndexBuffer->GetGraphicsObject();
+    const Graphics::Buffer* ibo = mIndexBuffer->GetGraphicsObject();
     if(ibo)
     {
       commandBuffer.BindIndexBuffer(*ibo, 0, Graphics::Format::R16_UINT);
@@ -193,6 +203,7 @@ void Geometry::Draw(
 
     commandBuffer.Draw(numVertices, 1, 0, 0);
   }
+  return true;
 }
 
 Graphics::PrimitiveTopology Geometry::GetTopology() const

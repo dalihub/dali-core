@@ -170,9 +170,9 @@ public:
     return mFormat.Get();
   }
 
-  inline GpuBuffer& GetGpuBuffer()
+  inline const GpuBuffer* GetGpuBuffer() const
   {
-    return *(const_cast<GpuBuffer*>(mGpuBuffer.Get())); // @todo change to unique_ptr to avoid const cast?
+    return mGpuBuffer.Get();
   }
 
 private:

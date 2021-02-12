@@ -746,12 +746,15 @@ void Renderer::Render(Context&                                             conte
       context.BlendBarrier();
     }
 
+    bool drawn = false; // Draw can fail if there are no vertex buffers or they haven't been uploaded yet
+                        // @todo We should detect this case much earlier to prevent unnecessary work
+
     //@todo manage mDrawCommands in the same way as above command buffer?!
     if(mDrawCommands.empty())
     {
       SetBlending(context, blend);
 
-      mGeometry->Draw(*mGraphicsController, *commandBuffer.get(), mIndexedDrawFirstElement, mIndexedDrawElementsCount);
+      drawn = mGeometry->Draw(*mGraphicsController, *commandBuffer.get(), mIndexedDrawFirstElement, mIndexedDrawElementsCount);
     }
     else
     {
@@ -770,9 +773,15 @@ void Renderer::Render(Context&                                             conte
     }
 
     // Command buffer contains Texture bindings, vertex bindings, index buffer binding, pipeline(vertex format)
-    Graphics::SubmitInfo submitInfo{{}, 0 | Graphics::SubmitFlagBits::FLUSH};
-    submitInfo.cmdBuffer.push_back(commandBuffer.get());
-    mGraphicsController->SubmitCommandBuffers(submitInfo);
+    // @todo We should return the command buffer(s) and let the calling method submit
+    // If not drawn, then don't add command buffer to submit info, and if empty, don't
+    // submit.
+    if(drawn)
+    {
+      Graphics::SubmitInfo submitInfo{{}, 0 | Graphics::SubmitFlagBits::FLUSH};
+      submitInfo.cmdBuffer.push_back(commandBuffer.get());
+      mGraphicsController->SubmitCommandBuffers(submitInfo);
+    }
 
     mUpdated = false;
   }

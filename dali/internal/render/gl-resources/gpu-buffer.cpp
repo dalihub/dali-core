@@ -46,11 +46,11 @@ void GpuBuffer::UpdateDataBuffer(Graphics::Controller& graphicsController, uint3
   DALI_ASSERT_DEBUG(size > 0);
   mSize = size;
 
-  if(!mGraphicsObject)
+  if(!mGraphicsObject || size > mCapacity)
   {
     Graphics::BufferCreateInfo createInfo{};
     createInfo.SetUsage(mUsage).SetSize(size);
-    mGraphicsObject = graphicsController.CreateBuffer(createInfo, nullptr);
+    mGraphicsObject = graphicsController.CreateBuffer(createInfo, std::move(mGraphicsObject));
     mCapacity       = size;
   }
 

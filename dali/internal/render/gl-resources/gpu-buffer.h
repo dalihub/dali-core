@@ -74,7 +74,7 @@ public:
     return mSize;
   }
 
-  inline Graphics::Buffer* GetGraphicsObject()
+  inline const Graphics::Buffer* GetGraphicsObject() const
   {
     return mGraphicsObject.get();
   }
