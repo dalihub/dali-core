@@ -18,6 +18,7 @@
 
 #include "test-graphics-buffer.h"
 #include "test-graphics-command-buffer.h"
+#include "test-graphics-reflection.h"
 #include "test-graphics-sampler.h"
 #include "test-graphics-texture.h"
 
@@ -764,6 +765,14 @@ const Graphics::TextureProperties& TestGraphicsController::GetTextureProperties(
   mCallStack.PushCall("Controller::GetTextureProperties", "");
 
   return textureProperties;
+}
+
+const Graphics::Reflection& TestGraphicsController::GetPipelineReflection(const Graphics::Pipeline& pipeline)
+{
+  static TestGraphicsReflection reflection(mGl);
+  mCallStack.PushCall("Controller::GetPipelineReflection", "");
+
+  return reflection;
 }
 
 bool TestGraphicsController::PipelineEquals(const Graphics::Pipeline& pipeline0, const Graphics::Pipeline& pipeline1) const

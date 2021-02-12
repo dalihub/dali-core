@@ -301,6 +301,11 @@ public:
     return mViewMatrix;
   }
 
+  GLuint GetProgramId()
+  {
+    return mProgramId;
+  }
+
 private: // Implementation
   /**
    * Constructor, private so no direct instantiation

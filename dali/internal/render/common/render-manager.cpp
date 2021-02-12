@@ -38,6 +38,7 @@
 #include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/renderers/render-frame-buffer.h>
 #include <dali/internal/render/renderers/render-texture.h>
+#include <dali/internal/render/renderers/shader-cache.h>
 #include <dali/internal/render/shaders/program-controller.h>
 
 namespace Dali
@@ -75,6 +76,7 @@ struct RenderManager::Impl
     frameBufferContainer(),
     lastFrameWasRendered(false),
     programController(graphicsController),
+    shaderCache(graphicsController),
     depthBufferAvailable(depthBufferAvailableParam),
     stencilBufferAvailable(stencilBufferAvailableParam),
     partialUpdateAvailable(partialUpdateAvailableParam)
@@ -161,7 +163,8 @@ struct RenderManager::Impl
 
   OwnerContainer<Render::RenderTracker*> mRenderTrackers; ///< List of render trackers
 
-  ProgramController programController; ///< Owner of the GL programs
+  ProgramController   programController; ///< Owner of the GL programs
+  Render::ShaderCache shaderCache;       ///< The cache for the graphics shaders
 
   Integration::DepthBufferAvailable   depthBufferAvailable;   ///< Whether the depth buffer is available
   Integration::StencilBufferAvailable stencilBufferAvailable; ///< Whether the stencil buffer is available
@@ -247,7 +250,7 @@ void RenderManager::SetShaderSaver(ShaderSaver& upstream)
 void RenderManager::AddRenderer(OwnerPointer<Render::Renderer>& renderer)
 {
   // Initialize the renderer as we are now in render thread
-  renderer->Initialize(mImpl->context, mImpl->graphicsController, mImpl->programController);
+  renderer->Initialize(mImpl->context, mImpl->graphicsController, mImpl->programController, mImpl->shaderCache);
 
   mImpl->rendererContainer.PushBack(renderer.Release());
 }

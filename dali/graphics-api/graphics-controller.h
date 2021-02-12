@@ -28,6 +28,7 @@
 #include "graphics-framebuffer-create-info.h"
 #include "graphics-memory.h"
 #include "graphics-pipeline-create-info.h"
+#include "graphics-reflection.h"
 #include "graphics-render-pass-create-info.h"
 #include "graphics-render-target-create-info.h"
 #include "graphics-sampler-create-info.h"
@@ -312,6 +313,14 @@ public:
    * @return Returns the TextureProperties object
    */
   virtual const TextureProperties& GetTextureProperties(const Texture& texture) = 0;
+
+  /**
+   * @brief Returns the reflection of the given pipeline
+   *
+   * @param[in] pipeline The pipeline
+   * @return The reflection of the pipeline
+   */
+  virtual const Reflection& GetPipelineReflection(const Pipeline& pipeline) = 0;
 
   /**
    * @brief Tests whether two Pipelines are the same.

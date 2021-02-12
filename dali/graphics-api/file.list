@@ -3,7 +3,6 @@
 SET( graphics_src_dir ${ROOT_SRC_DIR}/dali/graphics-api )
 
 SET( GRAPHICS_API_HEADERS ${GRAPHICS_API_HEADERS}
-   ${graphics_src_dir}/graphics-controller.h
    ${graphics_src_dir}/graphics-buffer-create-info.h
    ${graphics_src_dir}/graphics-buffer.h
    ${graphics_src_dir}/graphics-command-buffer-create-info.h
@@ -15,6 +14,7 @@ SET( GRAPHICS_API_HEADERS ${GRAPHICS_API_HEADERS}
    ${graphics_src_dir}/graphics-memory.h
    ${graphics_src_dir}/graphics-pipeline-create-info.h 
    ${graphics_src_dir}/graphics-pipeline.h
+   ${graphics_src_dir}/graphics-reflection.h
    ${graphics_src_dir}/graphics-render-pass-create-info.h
    ${graphics_src_dir}/graphics-render-pass.h
    ${graphics_src_dir}/graphics-render-target-create-info.h

@@ -28,6 +28,7 @@
 #include <dali/internal/render/renderers/render-sampler.h>
 #include <dali/internal/render/renderers/render-texture.h>
 #include <dali/internal/render/renderers/render-vertex-buffer.h>
+#include <dali/internal/render/renderers/shader-cache.h>
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 
@@ -314,11 +315,12 @@ Renderer::Renderer(SceneGraph::RenderDataProvider* dataProvider,
   mBlendingOptions.SetBlendColor(blendColor);
 }
 
-void Renderer::Initialize(Context& context, Graphics::Controller& graphicsController, ProgramCache& programCache)
+void Renderer::Initialize(Context& context, Graphics::Controller& graphicsController, ProgramCache& programCache, Render::ShaderCache& shaderCache)
 {
   mContext            = &context;
   mGraphicsController = &graphicsController;
   mProgramCache       = &programCache;
+  mShaderCache        = &shaderCache;
 }
 
 Renderer::~Renderer() = default;
@@ -742,10 +744,31 @@ void Renderer::Render(Context&                                             conte
     blend = (commands[0]->queue == DevelRenderer::RENDER_QUEUE_OPAQUE ? false : blend);
   }
 
+  // Create Shader.
+  // Really, need to have a pipeline cache in implementation.
+
+  mLegacyProgram.programId = program->GetProgramId();
+
+  Dali::Graphics::Shader& vertexShader = mShaderCache->GetShader(
+    shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::VERTEX_SHADER),
+    Graphics::PipelineStage::VERTEX_SHADER,
+    shaderData->GetSourceMode());
+
+  Dali::Graphics::Shader& fragmentShader = mShaderCache->GetShader(
+    shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER),
+    Graphics::PipelineStage::FRAGMENT_SHADER,
+    shaderData->GetSourceMode());
+
+  mShaderStates.clear();
+  mShaderStates.push_back(Graphics::ShaderState().SetShader(vertexShader).SetPipelineStage(Graphics::PipelineStage::VERTEX_SHADER));
+  mShaderStates.push_back(Graphics::ShaderState().SetShader(fragmentShader).SetPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER));
+
+  auto createInfo = Graphics::PipelineCreateInfo().SetShaderState(mShaderStates).SetNextExtension(&mLegacyProgram);
+
   // Temporarily create a pipeline here - this will be used for transporting
   // topology, vertex format, attrs, rasterization state
-  Graphics::UniquePtr<Graphics::Pipeline> pipeline = PrepareGraphicsPipeline(*program, instruction, blend);
-  commandBuffer->BindPipeline(*pipeline.get());
+  mGraphicsPipeline = std::move(PrepareGraphicsPipeline(*program, instruction, blend, createInfo)); // WRONG: @todo FIXME. Renderer can't own a pipeline.
+  commandBuffer->BindPipeline(*mGraphicsPipeline.get());
 
   if(DALI_LIKELY(BindTextures(*program, *commandBuffer.get(), boundTextures)))
   {
@@ -864,7 +887,8 @@ bool Renderer::Updated(BufferIndex bufferIndex, const SceneGraph::NodeDataProvid
 Graphics::UniquePtr<Graphics::Pipeline> Renderer::PrepareGraphicsPipeline(
   Program&                                             program,
   const Dali::Internal::SceneGraph::RenderInstruction& instruction,
-  bool                                                 blend)
+  bool                                                 blend,
+  Graphics::PipelineCreateInfo&                        createInfo)
 {
   Graphics::InputAssemblyState inputAssemblyState{};
   Graphics::VertexInputState   vertexInputState{};
@@ -1018,7 +1042,7 @@ Graphics::UniquePtr<Graphics::Pipeline> Renderer::PrepareGraphicsPipeline(
 
   // Create a new pipeline
   return mGraphicsController->CreatePipeline(
-    Graphics::PipelineCreateInfo()
+    createInfo
       .SetInputAssemblyState(&inputAssemblyState) // Passed as pointers - shallow copy will break. TOO C LIKE
       .SetVertexInputState(&vertexInputState)
       .SetRasterizationState(&rasterizationState)

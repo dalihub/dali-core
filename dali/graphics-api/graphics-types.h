@@ -1039,6 +1039,19 @@ enum class VertexInputAttributeFormat
 };
 
 /**
+ * @brief Uniform class
+ */
+enum class UniformClass
+{
+  SAMPLER,
+  IMAGE,
+  COMBINED_IMAGE_SAMPLER,
+  UNIFORM_BUFFER,
+  UNIFORM,
+  UNDEFINED
+};
+
+/**
  * @brief Type of texture
  */
 enum class TextureType
@@ -1046,6 +1059,41 @@ enum class TextureType
   TEXTURE_2D,
   TEXTURE_3D,
   TEXTURE_CUBEMAP,
+};
+
+/**
+ * @brief The information of the uniform
+ */
+struct UniformInfo
+{
+  std::string  name{""};
+  UniformClass uniformClass{UniformClass::UNDEFINED};
+  uint32_t     binding{0u};
+  uint32_t     bufferIndex{0u};
+  uint32_t     offset{0u};
+  uint32_t     location{0u};
+
+  bool operator==(const UniformInfo& rhs)
+  {
+    return name == rhs.name &&
+           uniformClass == rhs.uniformClass &&
+           binding == rhs.binding &&
+           bufferIndex == rhs.bufferIndex &&
+           offset == rhs.offset &&
+           location == rhs.location;
+  }
+};
+
+/**
+ * @brief The information of the uniform block
+ */
+struct UniformBlockInfo
+{
+  std::string              name{""};
+  uint32_t                 descriptorSet{0u};
+  uint32_t                 binding{0u};
+  uint32_t                 size{0u};
+  std::vector<UniformInfo> members{};
 };
 
 /**

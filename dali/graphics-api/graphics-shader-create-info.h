@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <cstring>
 #include <memory>
 
 // INTERNAL INCLUDES
@@ -126,6 +127,17 @@ struct ShaderCreateInfo
   {
     allocationCallbacks = &value;
     return *this;
+  }
+
+  /**
+   * @brief Equality operator.
+   *
+   * @param[in] rhs The ShaderCreateInfo to test against
+   * @return True if the ShaderCreateInfo are equal
+   */
+  bool operator==(const ShaderCreateInfo& rhs) const
+  {
+    return (sourceSize == rhs.sourceSize && 0 == memcmp(sourceData, rhs.sourceData, sourceSize) && pipelineStage == rhs.pipelineStage && allocationCallbacks == rhs.allocationCallbacks);
   }
 
   GraphicsStructureType type{GraphicsStructureType::SHADER_CREATE_INFO_STRUCT};

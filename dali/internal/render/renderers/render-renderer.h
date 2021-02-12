@@ -54,6 +54,8 @@ class RenderInstruction; //for relfection effect
 
 namespace Render
 {
+struct ShaderCache;
+
 /**
  * Renderers are used to render meshes
  * These objects are used during RenderManager::Render(), so properties modified during
@@ -170,8 +172,9 @@ public:
    * @param[in] context Context used by the renderer (To be removed)
    * @param[in] graphicsController The graphics controller to use
    * @param[in] programCache Cache of program objects
+   * @param[in] shaderCache Cache of shaders
    */
-  void Initialize(Context& context, Graphics::Controller& graphicsController, ProgramCache& programCache);
+  void Initialize(Context& context, Graphics::Controller& graphicsController, ProgramCache& programCache, Render::ShaderCache& shaderCache);
 
   /**
    * Destructor
@@ -450,7 +453,8 @@ private:
   Graphics::UniquePtr<Graphics::Pipeline> PrepareGraphicsPipeline(
     Program&                                             program,
     const Dali::Internal::SceneGraph::RenderInstruction& instruction,
-    bool                                                 blend);
+    bool                                                 blend,
+    Graphics::PipelineCreateInfo&                        createInfo);
 
 private:
   Graphics::Controller*                        mGraphicsController;
@@ -459,7 +463,10 @@ private:
   Context*          mContext;
   Render::Geometry* mGeometry;
 
-  ProgramCache* mProgramCache;
+  ProgramCache*                           mProgramCache{};
+  Render::ShaderCache*                    mShaderCache{};
+  Graphics::UniquePtr<Graphics::Pipeline> mGraphicsPipeline{}; ///< The graphics pipeline. @todo MOVE TO RenderManager
+  std::vector<Graphics::ShaderState>      mShaderStates{};
 
   struct UniformIndexMap
   {
@@ -490,6 +497,13 @@ private:
   bool                  mUpdated : 1;
 
   std::vector<Dali::DevelRenderer::DrawCommand> mDrawCommands; // Devel stuff
+
+  struct LegacyProgram : Graphics::ExtensionCreateInfo
+  {
+    uint32_t programId{0};
+  };
+
+  LegacyProgram mLegacyProgram; ///< The structure to pass the program ID into Graphics::PipelineCreateInfo
 };
 
 } // namespace Render

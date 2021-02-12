@@ -21,6 +21,7 @@
 #include "test-gl-abstraction.h"
 #include "test-gl-context-helper-abstraction.h"
 #include "test-gl-sync-abstraction.h"
+#include "test-graphics-reflection.h"
 
 namespace Dali
 {
@@ -265,6 +266,14 @@ public:
    * @return Returns the TextureProperties object
    */
   const Graphics::TextureProperties& GetTextureProperties(const Graphics::Texture& texture) override;
+
+  /**
+   * @brief Returns the reflection of the given pipeline
+   *
+   * @param[in] pipeline The pipeline
+   * @return The reflection of the pipeline
+   */
+  const Graphics::Reflection& GetPipelineReflection(const Graphics::Pipeline& pipeline) override;
 
   /**
    * @brief Tests whether two Pipelines are the same.
