@@ -370,6 +370,8 @@ IF( ENABLE_LINK_TEST )
     ${DALI_TEST_SUITE_DIR}/test-graphics-texture.cpp
     ${DALI_TEST_SUITE_DIR}/test-graphics-buffer.cpp
     ${DALI_TEST_SUITE_DIR}/test-graphics-pipeline.cpp
+    ${DALI_TEST_SUITE_DIR}/test-graphics-program.cpp
+    ${DALI_TEST_SUITE_DIR}/test-graphics-shader.cpp
     ${DALI_TEST_SUITE_DIR}/test-graphics-reflection.cpp
     ${DALI_TEST_SUITE_DIR}/test-graphics-command-buffer.cpp
     ${DALI_TEST_SUITE_DIR}/test-platform-abstraction.cpp

@@ -72,4 +72,46 @@ Geometry CreateQuadGeometry(void)
   return geometry;
 }
 
+Property::Map CreateModelVertexFormat()
+{
+  Property::Map modelVF;
+  modelVF["aPosition"]       = Property::VECTOR3;
+  modelVF["aNormal"]         = Property::VECTOR3;
+  modelVF["aTexCoord1"]      = Property::VECTOR3;
+  modelVF["aTexCoord2"]      = Property::VECTOR3;
+  modelVF["aBoneIndex[0]"]   = Property::INTEGER;
+  modelVF["aBoneIndex[1]"]   = Property::INTEGER;
+  modelVF["aBoneIndex[2]"]   = Property::INTEGER;
+  modelVF["aBoneIndex[3]"]   = Property::INTEGER;
+  modelVF["aBoneWeights[0]"] = Property::FLOAT;
+  modelVF["aBoneWeights[1]"] = Property::FLOAT;
+  modelVF["aBoneWeights[2]"] = Property::FLOAT;
+  modelVF["aBoneWeights[3]"] = Property::FLOAT;
+  return modelVF;
+}
+
+Geometry CreateModelGeometry(Property::Map& vf)
+{
+  VertexBuffer vertexData = VertexBuffer::New(vf);
+
+  struct Vertex
+  {
+    Vector3 position;
+    Vector3 diffuseTexCoords;
+    Vector3 metalRoughTexCoords;
+    int     boneIndices[4];
+    float   boneWeights[4];
+  };
+
+  Vertex verts[30];
+  vertexData.SetData(verts, 30);
+  unsigned short indexData[40];
+
+  Geometry geometry = Geometry::New();
+  geometry.AddVertexBuffer(vertexData);
+  geometry.SetIndexBuffer(indexData, sizeof(indexData) / sizeof(indexData[0]));
+
+  return geometry;
+}
+
 } // namespace Dali

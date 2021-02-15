@@ -1,5 +1,5 @@
-#ifndef DALI_GRAPHICS_TEXTURE_H
-#define DALI_GRAPHICS_TEXTURE_H
+#ifndef DALI_TEST_GRAPHICS_SHADER_H
+#define DALI_TEST_GRAPHICS_SHADER_H
 
 /*
  * Copyright (c) 2021 Samsung Electronics Co., Ltd.
@@ -15,35 +15,24 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
+#include <dali/graphics-api/graphics-shader-create-info.h>
+#include <dali/graphics-api/graphics-shader.h>
+#include "test-gl-abstraction.h"
 
 namespace Dali
 {
-namespace Graphics
-{
-/**
- * @brief The Texture class represents a GPU texture object.
- *
- * It's slightly higher level than the Vulkan VkImage (more like
- * combined image sampler).
- */
-class Texture
+class TestGraphicsShader : public Graphics::Shader
 {
 public:
-  Texture()          = default;
-  virtual ~Texture() = default;
+  TestGraphicsShader(TestGlAbstraction& gl, const Graphics::ShaderCreateInfo& createInfo);
 
-  // not copyable
-  Texture(const Texture&) = delete;
-  Texture& operator=(const Texture&) = delete;
-
-protected:
-  Texture(Texture&&) = default;
-  Texture& operator=(Texture&&) = default;
+public:
+  TestGlAbstraction&         mGl;
+  Graphics::ShaderCreateInfo mCreateInfo;
 };
 
-} // namespace Graphics
 } // namespace Dali
 
-#endif
+#endif //DALI_TEST_GRAPHICS_SHADER_H

@@ -1,5 +1,5 @@
-#ifndef DALI_GRAPHICS_TEXTURE_H
-#define DALI_GRAPHICS_TEXTURE_H
+#ifndef DALI_GRAPHICS_PROGRAM_H
+#define DALI_GRAPHICS_PROGRAM_H
 
 /*
  * Copyright (c) 2021 Samsung Electronics Co., Ltd.
@@ -15,7 +15,6 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 
 namespace Dali
@@ -23,27 +22,28 @@ namespace Dali
 namespace Graphics
 {
 /**
- * @brief The Texture class represents a GPU texture object.
- *
- * It's slightly higher level than the Vulkan VkImage (more like
- * combined image sampler).
+ * @brief The Program class represents a set of shaders that can
+ * be compiled into a complete program and attached to a Pipeline.
+ * It can be used to fetch a Reflection object to determine the
+ * structure of attributes, uniforms and samplers within the shaders.
  */
-class Texture
+class Program
 {
 public:
-  Texture()          = default;
-  virtual ~Texture() = default;
+  Program()          = default;
+  virtual ~Program() = default;
 
   // not copyable
-  Texture(const Texture&) = delete;
-  Texture& operator=(const Texture&) = delete;
+  Program(const Program&) = delete;
+  Program& operator=(const Program&) = delete;
 
 protected:
-  Texture(Texture&&) = default;
-  Texture& operator=(Texture&&) = default;
+  Program(Program&&) = default;
+  Program& operator=(Program&&) = default;
 };
 
 } // namespace Graphics
+
 } // namespace Dali
 
-#endif
+#endif //DALI_GRAPHICS_PROGRAM_H

@@ -19,6 +19,7 @@
 #include <dali/internal/render/renderers/render-renderer.h>
 
 // INTERNAL INCLUDES
+#include <dali/graphics-api/graphics-program.h>
 #include <dali/graphics-api/graphics-types.h>
 #include <dali/internal/common/image-sampler.h>
 #include <dali/internal/render/common/render-instruction.h>
@@ -759,15 +760,18 @@ void Renderer::Render(Context&                                             conte
     Graphics::PipelineStage::FRAGMENT_SHADER,
     shaderData->GetSourceMode());
 
-  mShaderStates.clear();
-  mShaderStates.push_back(Graphics::ShaderState().SetShader(vertexShader).SetPipelineStage(Graphics::PipelineStage::VERTEX_SHADER));
-  mShaderStates.push_back(Graphics::ShaderState().SetShader(fragmentShader).SetPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER));
+  std::vector<Graphics::ShaderState> shaderStates{
+    Graphics::ShaderState().SetShader(vertexShader).SetPipelineStage(Graphics::PipelineStage::VERTEX_SHADER),
+    Graphics::ShaderState().SetShader(fragmentShader).SetPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER)};
+  auto createInfo = Graphics::ProgramCreateInfo();
+  createInfo.SetShaderState(shaderStates);
 
-  auto createInfo = Graphics::PipelineCreateInfo().SetShaderState(mShaderStates).SetNextExtension(&mLegacyProgram);
+  mGraphicsProgram = mGraphicsController->CreateProgram(createInfo, nullptr);
 
   // Temporarily create a pipeline here - this will be used for transporting
   // topology, vertex format, attrs, rasterization state
-  mGraphicsPipeline = std::move(PrepareGraphicsPipeline(*program, instruction, blend, createInfo)); // WRONG: @todo FIXME. Renderer can't own a pipeline.
+  mGraphicsPipeline = std::move(PrepareGraphicsPipeline(*program, instruction, blend));
+
   commandBuffer->BindPipeline(*mGraphicsPipeline.get());
 
   if(DALI_LIKELY(BindTextures(*program, *commandBuffer.get(), boundTextures)))
@@ -887,11 +891,11 @@ bool Renderer::Updated(BufferIndex bufferIndex, const SceneGraph::NodeDataProvid
 Graphics::UniquePtr<Graphics::Pipeline> Renderer::PrepareGraphicsPipeline(
   Program&                                             program,
   const Dali::Internal::SceneGraph::RenderInstruction& instruction,
-  bool                                                 blend,
-  Graphics::PipelineCreateInfo&                        createInfo)
+  bool                                                 blend)
 {
   Graphics::InputAssemblyState inputAssemblyState{};
   Graphics::VertexInputState   vertexInputState{};
+  Graphics::ProgramState       programState{};
   uint32_t                     bindingIndex{0u};
 
   if(mUpdateAttributeLocations || mGeometry->AttributesChanged())
@@ -899,6 +903,8 @@ Graphics::UniquePtr<Graphics::Pipeline> Renderer::PrepareGraphicsPipeline(
     mAttributeLocations.Clear();
     mUpdateAttributeLocations = true;
   }
+
+  auto& reflection = mGraphicsController->GetProgramReflection(*mGraphicsProgram.get());
 
   /**
    * Bind Attributes
@@ -916,9 +922,8 @@ Graphics::UniquePtr<Graphics::Pipeline> Renderer::PrepareGraphicsPipeline(
     {
       if(mUpdateAttributeLocations)
       {
-        auto     attributeName = vertexBuffer->GetAttributeName(i);
-        uint32_t index         = program.RegisterCustomAttribute(attributeName);
-        int32_t  pLocation     = program.GetCustomAttributeLocation(index);
+        auto    attributeName = vertexBuffer->GetAttributeName(i);
+        int32_t pLocation     = reflection.GetVertexAttributeLocation(std::string(attributeName.GetStringView()));
         if(-1 == pLocation)
         {
           DALI_LOG_WARNING("Attribute not found in the shader: %s\n", attributeName.GetCString());
@@ -940,6 +945,9 @@ Graphics::UniquePtr<Graphics::Pipeline> Renderer::PrepareGraphicsPipeline(
 
   // Get the topology
   inputAssemblyState.SetTopology(mGeometry->GetTopology());
+
+  // Get the program
+  programState.SetProgram(*mGraphicsProgram.get());
 
   Graphics::RasterizationState rasterizationState{};
 
@@ -1042,11 +1050,13 @@ Graphics::UniquePtr<Graphics::Pipeline> Renderer::PrepareGraphicsPipeline(
 
   // Create a new pipeline
   return mGraphicsController->CreatePipeline(
-    createInfo
+    Graphics::PipelineCreateInfo()
       .SetInputAssemblyState(&inputAssemblyState) // Passed as pointers - shallow copy will break. TOO C LIKE
       .SetVertexInputState(&vertexInputState)
       .SetRasterizationState(&rasterizationState)
-      .SetColorBlendState(&colorBlendState),
+      .SetColorBlendState(&colorBlendState)
+      .SetProgramState(&programState)
+      .SetNextExtension(&mLegacyProgram),
     nullptr);
 }
 

@@ -15,16 +15,44 @@
  */
 
 #include "test-graphics-reflection.h"
+#include <dali/public-api/object/property-map.h>
 
 namespace Dali
 {
-TestGraphicsReflection::TestGraphicsReflection(TestGlAbstraction& gl)
+TestGraphicsReflection::TestGraphicsReflection(TestGlAbstraction& gl, Property::Array& vfs)
 : mGl(gl)
 {
+  for(Property::Array::SizeType i = 0; i < vfs.Count(); ++i)
+  {
+    Property::Map* vertexFormat = vfs[i].GetMap();
+    if(vertexFormat)
+    {
+      for(Property::Map::SizeType j = 0; j < vertexFormat->Count(); ++j)
+      {
+        auto key = vertexFormat->GetKeyAt(j);
+        if(key.type == Property::Key::STRING)
+        {
+          mAttributes.push_back(key.stringKey);
+        }
+      }
+    }
+  }
 }
 
 uint32_t TestGraphicsReflection::GetVertexAttributeLocation(const std::string& name) const
 {
+  // Automatically assign locations to named attributes when requested
+  auto iter = std::find(mAttributes.begin(), mAttributes.end(), name);
+  if(iter != mAttributes.end())
+  {
+    return iter - mAttributes.begin();
+  }
+  else
+  {
+    uint32_t location = mAttributes.size();
+    mAttributes.push_back(name);
+    return location;
+  }
   return 0u;
 }
 
@@ -40,7 +68,12 @@ std::string TestGraphicsReflection::GetVertexAttributeName(uint32_t location) co
 
 std::vector<uint32_t> TestGraphicsReflection::GetVertexAttributeLocations() const
 {
-  return std::vector<uint32_t>{};
+  std::vector<uint32_t> locs;
+  for(uint32_t i = 0; i < mAttributes.size(); ++i)
+  {
+    locs.push_back(i);
+  }
+  return locs;
 }
 
 uint32_t TestGraphicsReflection::GetUniformBlockCount() const

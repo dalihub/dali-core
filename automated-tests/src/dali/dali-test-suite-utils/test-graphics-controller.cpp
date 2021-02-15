@@ -20,6 +20,7 @@
 #include "test-graphics-command-buffer.h"
 #include "test-graphics-reflection.h"
 #include "test-graphics-sampler.h"
+#include "test-graphics-shader.h"
 #include "test-graphics-texture.h"
 
 #include <dali/integration-api/gl-defines.h>
@@ -444,7 +445,9 @@ void TestGraphicsController::SubmitCommandBuffers(const Graphics::SubmitInfo& su
   namedParams["submitInfo"] << "cmdBuffer[" << submitInfo.cmdBuffer.size()
                             << "], flags:" << std::hex << submitInfo.flags;
 
-  mCallStack.PushCall("Controller::SubmitCommandBuffers", "", namedParams);
+  mCallStack.PushCall("SubmitCommandBuffers", "", namedParams);
+
+  mSubmitStack.emplace_back(submitInfo);
 
   for(auto& graphicsCommandBuffer : submitInfo.cmdBuffer)
   {
@@ -576,7 +579,7 @@ void TestGraphicsController::PresentRenderTarget(Graphics::RenderTarget* renderT
 {
   TraceCallStack::NamedParams namedParams;
   namedParams["renderTarget"] << std::hex << renderTarget;
-  mCallStack.PushCall("Controller::PresentRenderTarget", "", namedParams);
+  mCallStack.PushCall("PresentRenderTarget", "", namedParams);
 }
 
 /**
@@ -584,7 +587,7 @@ void TestGraphicsController::PresentRenderTarget(Graphics::RenderTarget* renderT
  */
 void TestGraphicsController::WaitIdle()
 {
-  mCallStack.PushCall("Controller::WaitIdle", "");
+  mCallStack.PushCall("WaitIdle", "");
 }
 
 /**
@@ -592,7 +595,7 @@ void TestGraphicsController::WaitIdle()
  */
 void TestGraphicsController::Pause()
 {
-  mCallStack.PushCall("Controller::Pause", "");
+  mCallStack.PushCall("Pause", "");
 }
 
 /**
@@ -600,7 +603,7 @@ void TestGraphicsController::Pause()
  */
 void TestGraphicsController::Resume()
 {
-  mCallStack.PushCall("Controller::Resume", "");
+  mCallStack.PushCall("Resume", "");
 }
 
 void TestGraphicsController::UpdateTextures(const std::vector<Graphics::TextureUpdateInfo>&       updateInfoList,
@@ -610,7 +613,7 @@ void TestGraphicsController::UpdateTextures(const std::vector<Graphics::TextureU
   namedParams["updateInfoList"] << "[" << updateInfoList.size() << "]:";
   namedParams["sourceList"] << "[" << sourceList.size() << "]:";
 
-  mCallStack.PushCall("Controller::UpdateTextures", "", namedParams);
+  mCallStack.PushCall("UpdateTextures", "", namedParams);
 
   // Call either TexImage2D or TexSubImage2D
   for(unsigned int i = 0; i < updateInfoList.size(); ++i)
@@ -629,7 +632,7 @@ bool TestGraphicsController::EnableDepthStencilBuffer(bool enableDepth, bool ena
   TraceCallStack::NamedParams namedParams;
   namedParams["enableDepth"] << (enableDepth ? "T" : "F");
   namedParams["enableStencil"] << (enableStencil ? "T" : "F");
-  mCallStack.PushCall("Controller::EnableDepthStencilBuffer", "", namedParams);
+  mCallStack.PushCall("EnableDepthStencilBuffer", "", namedParams);
   return false;
 }
 
@@ -637,17 +640,17 @@ void TestGraphicsController::RunGarbageCollector(size_t numberOfDiscardedRendere
 {
   TraceCallStack::NamedParams namedParams;
   namedParams["numberOfDiscardedRenderers"] << numberOfDiscardedRenderers;
-  mCallStack.PushCall("Controller::RunGarbageCollector", "", namedParams);
+  mCallStack.PushCall("RunGarbageCollector", "", namedParams);
 }
 
 void TestGraphicsController::DiscardUnusedResources()
 {
-  mCallStack.PushCall("Controller::DiscardUnusedResources", "");
+  mCallStack.PushCall("DiscardUnusedResources", "");
 }
 
 bool TestGraphicsController::IsDiscardQueueEmpty()
 {
-  mCallStack.PushCall("Controller::IsDiscardQueueEmpty", "");
+  mCallStack.PushCall("IsDiscardQueueEmpty", "");
   return isDiscardQueueEmptyResult;
 }
 
@@ -658,7 +661,7 @@ bool TestGraphicsController::IsDiscardQueueEmpty()
  */
 bool TestGraphicsController::IsDrawOnResumeRequired()
 {
-  mCallStack.PushCall("Controller::IsDrawOnResumeRequired", "");
+  mCallStack.PushCall("IsDrawOnResumeRequired", "");
   return isDrawOnResumeRequiredResult;
 }
 
@@ -666,7 +669,7 @@ Graphics::UniquePtr<Graphics::Buffer> TestGraphicsController::CreateBuffer(const
 {
   std::ostringstream oss;
   oss << "bufferCreateInfo:" << createInfo;
-  mCallStack.PushCall("Controller::CreateBuffer", oss.str());
+  mCallStack.PushCall("CreateBuffer", oss.str());
   return Graphics::MakeUnique<TestGraphicsBuffer>(mCallStack, mGl, createInfo.size, createInfo.usage);
 }
 
@@ -674,13 +677,13 @@ Graphics::UniquePtr<Graphics::CommandBuffer> TestGraphicsController::CreateComma
 {
   std::ostringstream oss;
   oss << "commandBufferCreateInfo:" << commandBufferCreateInfo;
-  mCallStack.PushCall("Controller::CreateCommandBuffer", oss.str());
+  mCallStack.PushCall("CreateCommandBuffer", oss.str());
   return Graphics::MakeUnique<TestGraphicsCommandBuffer>(mCommandBufferCallStack, mGl);
 }
 
 Graphics::UniquePtr<Graphics::RenderPass> TestGraphicsController::CreateRenderPass(const Graphics::RenderPassCreateInfo& renderPassCreateInfo, Graphics::UniquePtr<Graphics::RenderPass>&& oldRenderPass)
 {
-  mCallStack.PushCall("Controller::CreateRenderPass", "");
+  mCallStack.PushCall("CreateRenderPass", "");
   return nullptr;
 }
 
@@ -688,47 +691,53 @@ Graphics::UniquePtr<Graphics::Texture> TestGraphicsController::CreateTexture(con
 {
   TraceCallStack::NamedParams namedParams;
   namedParams["textureCreateInfo"] << textureCreateInfo;
-  mCallStack.PushCall("Controller::CreateTexture", namedParams.str(), namedParams);
+  mCallStack.PushCall("CreateTexture", namedParams.str(), namedParams);
 
   return Graphics::MakeUnique<TestGraphicsTexture>(mGl, textureCreateInfo);
 }
 
 Graphics::UniquePtr<Graphics::Framebuffer> TestGraphicsController::CreateFramebuffer(const Graphics::FramebufferCreateInfo& framebufferCreateInfo, Graphics::UniquePtr<Graphics::Framebuffer>&& oldFramebuffer)
 {
-  mCallStack.PushCall("Controller::CreateFramebuffer", "");
+  mCallStack.PushCall("CreateFramebuffer", "");
   return nullptr;
 }
 
 Graphics::UniquePtr<Graphics::Pipeline> TestGraphicsController::CreatePipeline(const Graphics::PipelineCreateInfo& pipelineCreateInfo, Graphics::UniquePtr<Graphics::Pipeline>&& oldPipeline)
 {
-  mCallStack.PushCall("Controller::CreatePipeline", "");
+  mCallStack.PushCall("CreatePipeline", "");
   return std::make_unique<TestGraphicsPipeline>(mGl, pipelineCreateInfo);
+}
+
+Graphics::UniquePtr<Graphics::Program> TestGraphicsController::CreateProgram(const Graphics::ProgramCreateInfo& programCreateInfo, Graphics::UniquePtr<Graphics::Program>&& oldProgram)
+{
+  mCallStack.PushCall("CreateProgram", "");
+  return Graphics::MakeUnique<TestGraphicsProgram>(mGl, programCreateInfo, mVertexFormats);
 }
 
 Graphics::UniquePtr<Graphics::Shader> TestGraphicsController::CreateShader(const Graphics::ShaderCreateInfo& shaderCreateInfo, Graphics::UniquePtr<Graphics::Shader>&& oldShader)
 {
-  mCallStack.PushCall("Controller::CreateShader", "");
-  return nullptr;
+  mCallStack.PushCall("CreateShader", "");
+  return Graphics::MakeUnique<TestGraphicsShader>(mGl, shaderCreateInfo);
 }
 
 Graphics::UniquePtr<Graphics::Sampler> TestGraphicsController::CreateSampler(const Graphics::SamplerCreateInfo& samplerCreateInfo, Graphics::UniquePtr<Graphics::Sampler>&& oldSampler)
 {
   TraceCallStack::NamedParams namedParams;
   namedParams["samplerCreateInfo"] << samplerCreateInfo;
-  mCallStack.PushCall("Controller::CreateSampler", namedParams.str(), namedParams);
+  mCallStack.PushCall("CreateSampler", namedParams.str(), namedParams);
 
   return Graphics::MakeUnique<TestGraphicsSampler>(mGl, samplerCreateInfo);
 }
 
 Graphics::UniquePtr<Graphics::RenderTarget> TestGraphicsController::CreateRenderTarget(const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo, Graphics::UniquePtr<Graphics::RenderTarget>&& oldRenderTarget)
 {
-  mCallStack.PushCall("Controller::CreateRenderTarget", "");
+  mCallStack.PushCall("CreateRenderTarget", "");
   return nullptr;
 }
 
 Graphics::UniquePtr<Graphics::Memory> TestGraphicsController::MapBufferRange(const Graphics::MapBufferInfo& mapInfo)
 {
-  mCallStack.PushCall("Controller::MapBufferRange", "");
+  mCallStack.PushCall("MapBufferRange", "");
 
   auto buffer = static_cast<TestGraphicsBuffer*>(mapInfo.buffer);
   buffer->memory.resize(mapInfo.offset + mapInfo.size); // For initial testing, allow writes past capacity
@@ -738,46 +747,45 @@ Graphics::UniquePtr<Graphics::Memory> TestGraphicsController::MapBufferRange(con
 
 Graphics::UniquePtr<Graphics::Memory> TestGraphicsController::MapTextureRange(const Graphics::MapTextureInfo& mapInfo)
 {
-  mCallStack.PushCall("Controller::MapTextureRange", "");
+  mCallStack.PushCall("MapTextureRange", "");
   return nullptr;
 }
 
 void TestGraphicsController::UnmapMemory(Graphics::UniquePtr<Graphics::Memory> memory)
 {
-  mCallStack.PushCall("Controller::UnmapMemory", "");
+  mCallStack.PushCall("UnmapMemory", "");
 }
 
 Graphics::MemoryRequirements TestGraphicsController::GetTextureMemoryRequirements(Graphics::Texture& texture) const
 {
-  mCallStack.PushCall("Controller::GetTextureMemoryRequirements", "");
+  mCallStack.PushCall("GetTextureMemoryRequirements", "");
   return Graphics::MemoryRequirements{};
 }
 
 Graphics::MemoryRequirements TestGraphicsController::GetBufferMemoryRequirements(Graphics::Buffer& buffer) const
 {
-  mCallStack.PushCall("Controller::GetBufferMemoryRequirements", "");
+  mCallStack.PushCall("GetBufferMemoryRequirements", "");
   return Graphics::MemoryRequirements{};
 }
 
 const Graphics::TextureProperties& TestGraphicsController::GetTextureProperties(const Graphics::Texture& texture)
 {
   static Graphics::TextureProperties textureProperties{};
-  mCallStack.PushCall("Controller::GetTextureProperties", "");
+  mCallStack.PushCall("GetTextureProperties", "");
 
   return textureProperties;
 }
 
-const Graphics::Reflection& TestGraphicsController::GetPipelineReflection(const Graphics::Pipeline& pipeline)
+const Graphics::Reflection& TestGraphicsController::GetProgramReflection(const Graphics::Program& program)
 {
-  static TestGraphicsReflection reflection(mGl);
-  mCallStack.PushCall("Controller::GetPipelineReflection", "");
+  mCallStack.PushCall("GetProgramReflection", "");
 
-  return reflection;
+  return static_cast<const TestGraphicsProgram*>(&program)->GetReflection();
 }
 
 bool TestGraphicsController::PipelineEquals(const Graphics::Pipeline& pipeline0, const Graphics::Pipeline& pipeline1) const
 {
-  mCallStack.PushCall("Controller::PipelineEquals", "");
+  mCallStack.PushCall("PipelineEquals", "");
   return false;
 }
 

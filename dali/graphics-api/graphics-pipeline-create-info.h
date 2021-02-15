@@ -58,8 +58,20 @@ struct PipelineCreateInfo
   }
 
   /**
+   * @brief Set the program
+   *
+   * @param[in] value
+   * @return a reference to this structure
+   */
+  auto& SetProgramState(ProgramState* value)
+  {
+    programState = value;
+    return *this;
+  }
+
+  /**
    * @brief Sets the color blend state
-   * param[in] pointer to valid color blend state structure
+   * @param[in] value pointer to valid color blend state structure
    * @return reference to this structure
    */
   auto& SetColorBlendState(ColorBlendState* value)
@@ -69,45 +81,9 @@ struct PipelineCreateInfo
   }
 
   /**
-   * @brief Sets the shader state for the pipeline
+   * @brief Sets the viewport state.
    *
-   * The function takes an array of shader states in order to compile
-   * the pipeline. Each ShaderState structure determines the pipeline stage
-   * the shader should be executed on. The Shader object may be already created
-   * with a specific stage. Then the ShaderState::inheritPipelineStage must be
-   * set to true.
-   *
-   * Sample:
-   * SetShaderState( { ShaderState().SetShader( vertexShader)
-   *                                .SetPipelineStage( PipelineStage::VERTEX_SHADER ),
-   *                   ShaderState().SetShader( fragmentShader )
-   *                                .SetPipelineStage( PipelineStage::FRAGMENT_SHADER )
-   *                  } );
-   *
-   * In modern graphics API it is possible to attach more than one Shader to a single
-   * stage. For example, one Shader may be just a library of functions:
-   * SetShaderState( { ShaderState().SetShader( vertexShader)
-   *                                .SetPipelineStage( PipelineStage::VERTEX_SHADER ),
-   *                   ShaderState().SetShader( shaderCommons )
-   *                                .SetPipelineStage( PipelineStage::VERTEX_SHADER ),
-   *                   ShaderState().SetShader( fragmentShader )
-   *                                .SetPipelineStage( PipelineStage::FRAGMENT_SHADER )
-   *                  } );
-   *
-   * The Pipeline will compile and link all given shaders.
-   *
-   * param[in] value Valid array of shder states
-   * @return reference to this structure
-   */
-  auto& SetShaderState(const std::vector<ShaderState>& value)
-  {
-    shaderState = &value;
-    return *this;
-  }
-
-  /**
-   * @brief Sets the viewport state
-   * param[in] pointer to valid viewport state structure
+   * @param[in] value pointer to valid viewport state structure
    * @return reference to this structure
    */
   auto& SetViewportState(ViewportState* value)
@@ -117,8 +93,9 @@ struct PipelineCreateInfo
   }
 
   /**
-   * @brief Sets the framebuffer state
-   * param[in] pointer to valid framebuffer state structure
+   * @brief Sets the framebuffer state.
+   *
+   * @param[in] value pointer to valid framebuffer state structure
    * @return reference to this structure
    */
   auto& SetFramebufferState(FramebufferState* value)
@@ -128,13 +105,13 @@ struct PipelineCreateInfo
   }
 
   /**
-   * @brief Sets the base pipeline
+   * @brief Sets the base pipeline.
    *
    * Setting base pipeline allows inheriting that pipeline state
    * and build the new pipeline from it. The base pipeline
    * must stay valid until derived pipeline needs it.
    *
-   * param[in] pointer to valid pipeline object
+   * @param[in] value pointer to valid pipeline object
    * @return reference to this structure
    */
   auto& SetBasePipeline(Pipeline* value)
@@ -144,8 +121,9 @@ struct PipelineCreateInfo
   }
 
   /**
-   * @brief Sets the depth/stencil state
-   * param[in] pointer to valid depth/stencil state structure
+   * @brief Sets the depth/stencil state.
+   *
+   * @param[in] pointer to valid depth/stencil state structure
    * @return reference to this structure
    */
   auto& SetDepthStencilState(DepthStencilState* value)
@@ -155,8 +133,9 @@ struct PipelineCreateInfo
   }
 
   /**
-   * @brief Sets the rasterization state
-   * param[in] pointer to valid rasterization state structure
+   * @brief Sets the rasterization state.
+   *
+   * @param[in] pointer to valid rasterization state structure
    * @return reference to this structure
    */
   auto& SetRasterizationState(RasterizationState* value)
@@ -166,12 +145,12 @@ struct PipelineCreateInfo
   }
 
   /**
-   * @brief Sets the vertex input state
+   * @brief Sets the vertex input state.
    *
    * Vertex input state describes format of vertices and must
    * be compatible with attached shaders.
    *
-   * param[in] pointer to vertex input state structure
+   * @param[in] pointer to vertex input state structure
    * @return reference to this structure
    */
   auto& SetVertexInputState(VertexInputState* value)
@@ -181,11 +160,11 @@ struct PipelineCreateInfo
   }
 
   /**
-   * @brief Sets the input assembly state
+   * @brief Sets the input assembly state.
    *
    * This state describes the topology of the pipeline.
    *
-   * param[in] pointer to valid input assembly state structure
+   * @param[in] pointer to valid input assembly state structure
    * @return reference to this structure
    */
   auto& SetInputAssemblyState(InputAssemblyState* value)
@@ -195,13 +174,13 @@ struct PipelineCreateInfo
   }
 
   /**
-   * @brief Sets the dynamic state mask
+   * @brief Sets the dynamic state mask.
    *
    * Certain states can be modified on fly without a need of
    * creating new pipeline. The commands which modify particular
    * states may be issued later by executing command buffers.
    *
-   * param[in] pointer to valid color blend state structure
+   * @param[in] pointer to valid color blend state structure
    * @return reference to this structure
    */
   auto& SetDynamicStateMask(PipelineDynamicStateMask value)
@@ -226,16 +205,16 @@ struct PipelineCreateInfo
   GraphicsStructureType type{GraphicsStructureType::PIPELINE_CREATE_INFO_STRUCT};
   ExtensionCreateInfo*  nextExtension{nullptr};
 
-  ColorBlendState*                colorBlendState{nullptr};
-  const std::vector<ShaderState>* shaderState{nullptr};
-  ViewportState*                  viewportState{nullptr};
-  FramebufferState*               framebufferState{nullptr};
-  Pipeline*                       basePipeline{nullptr};
-  DepthStencilState*              depthStencilState{nullptr};
-  RasterizationState*             rasterizationState{nullptr};
-  VertexInputState*               vertexInputState{nullptr};
-  InputAssemblyState*             inputAssemblyState{nullptr};
-  PipelineDynamicStateMask        dynamicStateMask{0u};
+  ProgramState*            programState{nullptr};
+  ColorBlendState*         colorBlendState{nullptr};
+  ViewportState*           viewportState{nullptr};
+  FramebufferState*        framebufferState{nullptr};
+  Pipeline*                basePipeline{nullptr};
+  DepthStencilState*       depthStencilState{nullptr};
+  RasterizationState*      rasterizationState{nullptr};
+  VertexInputState*        vertexInputState{nullptr};
+  InputAssemblyState*      inputAssemblyState{nullptr};
+  PipelineDynamicStateMask dynamicStateMask{0u};
 
   const AllocationCallbacks* allocationCallbacks{nullptr};
 };

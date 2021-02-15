@@ -28,6 +28,7 @@
 #include "graphics-framebuffer-create-info.h"
 #include "graphics-memory.h"
 #include "graphics-pipeline-create-info.h"
+#include "graphics-program-create-info.h"
 #include "graphics-reflection.h"
 #include "graphics-render-pass-create-info.h"
 #include "graphics-render-target-create-info.h"
@@ -220,6 +221,16 @@ public:
    * @return pointer to the Pipeline object
    */
   virtual UniquePtr<Pipeline> CreatePipeline(const PipelineCreateInfo& pipelineCreateInfo, UniquePtr<Pipeline>&& oldPipeline) = 0;
+
+  /**
+   * @brief Creates new Program object
+   *
+   * @param[in] ProgramCreateInfo The valid ProgramCreateInfo structure
+   * @param[in] oldProgram The valid pointer to the old object or nullptr. The object will be reused or destroyed.
+   * @return pointer to the Program object
+   */
+  virtual UniquePtr<Program> CreateProgram(const ProgramCreateInfo& programCreateInfo, UniquePtr<Program>&& oldProgram) = 0;
+
   /**
    * @brief Creates new Shader object
    *
@@ -315,12 +326,12 @@ public:
   virtual const TextureProperties& GetTextureProperties(const Texture& texture) = 0;
 
   /**
-   * @brief Returns the reflection of the given pipeline
+   * @brief Returns the reflection of the given program
    *
-   * @param[in] pipeline The pipeline
-   * @return The reflection of the pipeline
+   * @param[in] program The program
+   * @return The reflection of the program
    */
-  virtual const Reflection& GetPipelineReflection(const Pipeline& pipeline) = 0;
+  virtual const Reflection& GetProgramReflection(const Program& program) = 0;
 
   /**
    * @brief Tests whether two Pipelines are the same.

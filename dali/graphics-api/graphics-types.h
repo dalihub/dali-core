@@ -28,11 +28,12 @@ namespace Dali
 {
 namespace Graphics
 {
-class CommandBuffer;
-class Texture;
 class Buffer;
-class Shader;
+class CommandBuffer;
 class Framebuffer;
+class Program;
+class Shader;
+class Texture;
 
 /**
  * @brief Structure describes 2D offset
@@ -356,7 +357,21 @@ struct ColorBlendState
 };
 
 /**
- * @brief  Framebuffer state
+ * @brief Program State
+ */
+struct ProgramState
+{
+  const Program* program{nullptr};
+
+  auto& SetProgram(const Program& value)
+  {
+    program = &value;
+    return *this;
+  }
+};
+
+/**
+ * @brief  Framebuffer state.
  */
 struct FramebufferState
 {
@@ -1251,6 +1266,7 @@ enum class GraphicsStructureType : uint32_t
   BUFFER_CREATE_INFO_STRUCT,
   COMMAND_BUFFER_CREATE_INFO_STRUCT,
   FRAMEBUFFER_CREATE_INFO_STRUCT,
+  PROGRAM_CREATE_INFO_STRUCT,
   PIPELINE_CREATE_INFO_STRUCT,
   RENDERPASS_CREATE_INFO_STRUCT,
   SAMPLER_CREATE_INFO_STRUCT,

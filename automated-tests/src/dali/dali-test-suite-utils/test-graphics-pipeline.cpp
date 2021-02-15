@@ -26,8 +26,8 @@ TestGraphicsPipeline::TestGraphicsPipeline(TestGlAbstraction& gl, const Graphics
   if(createInfo.colorBlendState)
     colorBlendState = *createInfo.colorBlendState;
 
-  if(createInfo.shaderState)
-    shaderState = *createInfo.shaderState;
+  if(createInfo.programState)
+    programState = *createInfo.programState;
 
   if(createInfo.viewportState)
     viewportState = *createInfo.viewportState;

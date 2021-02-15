@@ -25,7 +25,7 @@ namespace Dali
 class TestGraphicsReflection : public Graphics::Reflection
 {
 public:
-  TestGraphicsReflection(TestGlAbstraction& gl);
+  TestGraphicsReflection(TestGlAbstraction& gl, Property::Array& vertexFormats);
 
   uint32_t                                   GetVertexAttributeLocation(const std::string& name) const override;
   Dali::Graphics::VertexInputAttributeFormat GetVertexAttributeFormat(uint32_t location) const override;
@@ -44,7 +44,19 @@ public:
   std::vector<Dali::Graphics::UniformInfo>   GetSamplers() const override;
   Graphics::ShaderLanguage                   GetLanguage() const override;
 
-  TestGlAbstraction& mGl;
+public: // Test methods
+  void SetAttributes(std::vector<std::string> locations)
+  {
+    mAttributes.clear();
+    mAttributes.resize(locations.size());
+    for(auto& location : locations)
+    {
+      mAttributes.push_back(location);
+    }
+  }
+
+  TestGlAbstraction&               mGl;
+  mutable std::vector<std::string> mAttributes;
 };
 
 } // namespace Dali

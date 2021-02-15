@@ -176,6 +176,14 @@ public:
   Graphics::UniquePtr<Graphics::Pipeline> CreatePipeline(const Graphics::PipelineCreateInfo& pipelineCreateInfo, Graphics::UniquePtr<Graphics::Pipeline>&& oldPipeline) override;
 
   /**
+   * @brief Creates new Program object
+   *
+   * @param[in] programCreateInfo The valid ProgramCreateInfo structure
+   * @return pointer to the Program object
+   */
+  Graphics::UniquePtr<Graphics::Program> CreateProgram(const Graphics::ProgramCreateInfo& programCreateInfo, Graphics::UniquePtr<Graphics::Program>&& oldProgram) override;
+
+  /**
    * @brief Creates new Shader object
    *
    * @param[in] shaderCreateInfo The valid ShaderCreateInfo structure
@@ -268,12 +276,12 @@ public:
   const Graphics::TextureProperties& GetTextureProperties(const Graphics::Texture& texture) override;
 
   /**
-   * @brief Returns the reflection of the given pipeline
+   * @brief Returns the reflection of the given program
    *
-   * @param[in] pipeline The pipeline
-   * @return The reflection of the pipeline
+   * @param[in] program The program
+   * @return The reflection of the program
    */
-  const Graphics::Reflection& GetPipelineReflection(const Graphics::Pipeline& pipeline) override;
+  const Graphics::Reflection& GetProgramReflection(const Graphics::Program& program) override;
 
   /**
    * @brief Tests whether two Pipelines are the same.
@@ -284,9 +292,21 @@ public:
    */
   bool PipelineEquals(const Graphics::Pipeline& pipeline0, const Graphics::Pipeline& pipeline1) const override;
 
+public: // Test Functions
+  void SetVertexFormats(Property::Array& vfs)
+  {
+    mVertexFormats = vfs;
+  }
+
+  void ClearSubmitStack()
+  {
+    mSubmitStack.clear();
+  }
+
 public:
-  mutable TraceCallStack mCallStack;
-  mutable TraceCallStack mCommandBufferCallStack;
+  mutable TraceCallStack                    mCallStack;
+  mutable TraceCallStack                    mCommandBufferCallStack;
+  mutable std::vector<Graphics::SubmitInfo> mSubmitStack;
 
   TestGlAbstraction              mGl;
   TestGlSyncAbstraction          mGlSyncAbstraction;
@@ -294,6 +314,8 @@ public:
 
   bool isDiscardQueueEmptyResult{true};
   bool isDrawOnResumeRequiredResult{true};
+
+  Property::Array mVertexFormats;
 };
 
 } // namespace Dali

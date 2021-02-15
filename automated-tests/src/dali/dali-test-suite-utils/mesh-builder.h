@@ -2,7 +2,7 @@
 #define MESH_BUILDER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,11 +23,13 @@
 
 namespace Dali
 {
-Shader       CreateShader();
-TextureSet   CreateTextureSet();
-TextureSet   CreateTextureSet(Texture texture);
-Geometry     CreateQuadGeometry();
-VertexBuffer CreateVertexBuffer();
+Shader        CreateShader();
+TextureSet    CreateTextureSet();
+TextureSet    CreateTextureSet(Texture texture);
+Geometry      CreateQuadGeometry();
+Geometry      CreateModelGeometry(Property::Map& vf);
+VertexBuffer  CreateVertexBuffer();
+Property::Map CreateModelVertexFormat();
 
 } // namespace Dali
 

@@ -12,8 +12,10 @@ SET( GRAPHICS_API_HEADERS ${GRAPHICS_API_HEADERS}
    ${graphics_src_dir}/graphics-framebuffer-create-info.h
    ${graphics_src_dir}/graphics-framebuffer.h
    ${graphics_src_dir}/graphics-memory.h
-   ${graphics_src_dir}/graphics-pipeline-create-info.h 
+   ${graphics_src_dir}/graphics-pipeline-create-info.h
    ${graphics_src_dir}/graphics-pipeline.h
+   ${graphics_src_dir}/graphics-program-create-info.h
+   ${graphics_src_dir}/graphics-program.h
    ${graphics_src_dir}/graphics-reflection.h
    ${graphics_src_dir}/graphics-render-pass-create-info.h
    ${graphics_src_dir}/graphics-render-pass.h

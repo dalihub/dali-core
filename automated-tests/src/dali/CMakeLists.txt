@@ -116,7 +116,9 @@ LIST(APPEND TC_SOURCES
         dali-test-suite-utils/test-graphics-command-buffer.cpp
         dali-test-suite-utils/test-graphics-controller.cpp
         dali-test-suite-utils/test-graphics-pipeline.cpp
+        dali-test-suite-utils/test-graphics-program.cpp
         dali-test-suite-utils/test-graphics-reflection.cpp
+        dali-test-suite-utils/test-graphics-shader.cpp
         dali-test-suite-utils/test-graphics-texture.cpp
         dali-test-suite-utils/test-graphics-sampler.cpp
         dali-test-suite-utils/test-native-image.cpp

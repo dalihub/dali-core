@@ -453,8 +453,7 @@ private:
   Graphics::UniquePtr<Graphics::Pipeline> PrepareGraphicsPipeline(
     Program&                                             program,
     const Dali::Internal::SceneGraph::RenderInstruction& instruction,
-    bool                                                 blend,
-    Graphics::PipelineCreateInfo&                        createInfo);
+    bool                                                 blend);
 
 private:
   Graphics::Controller*                        mGraphicsController;
@@ -463,9 +462,11 @@ private:
   Context*          mContext;
   Render::Geometry* mGeometry;
 
-  ProgramCache*                           mProgramCache{};
-  Render::ShaderCache*                    mShaderCache{};
-  Graphics::UniquePtr<Graphics::Pipeline> mGraphicsPipeline{}; ///< The graphics pipeline. @todo MOVE TO RenderManager
+  ProgramCache*        mProgramCache{};
+  Render::ShaderCache* mShaderCache{};
+
+  Graphics::UniquePtr<Graphics::Program>  mGraphicsProgram{};  ///< The graphics program. (Cached implementation)
+  Graphics::UniquePtr<Graphics::Pipeline> mGraphicsPipeline{}; ///< The graphics pipeline. (Cached implementation)
   std::vector<Graphics::ShaderState>      mShaderStates{};
 
   struct UniformIndexMap

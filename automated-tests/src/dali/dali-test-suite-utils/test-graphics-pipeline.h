@@ -20,18 +20,34 @@
 #include <dali/graphics-api/graphics-pipeline-create-info.h>
 #include <dali/graphics-api/graphics-pipeline.h>
 #include "test-gl-abstraction.h"
+#include "test-graphics-program.h"
+#include "test-graphics-reflection.h"
 
 namespace Dali
 {
+class TestGraphicsReflection;
+
+template<typename T>
+T* Uncast(const Graphics::Program* object)
+{
+  return const_cast<T*>(static_cast<const T*>(object));
+}
+
 class TestGraphicsPipeline : public Graphics::Pipeline
 {
 public:
   TestGraphicsPipeline(TestGlAbstraction& gl, const Graphics::PipelineCreateInfo& createInfo);
 
+  const TestGraphicsReflection& GetReflection() const
+  {
+    return Uncast<TestGraphicsProgram>(programState.program)->GetReflection();
+  }
+
+public:
   TestGlAbstraction& mGl;
 
   Graphics::ColorBlendState          colorBlendState;
-  std::vector<Graphics::ShaderState> shaderState;
+  Graphics::ProgramState             programState;
   Graphics::ViewportState            viewportState;
   Graphics::FramebufferState         framebufferState;
   Graphics::Pipeline                 basePipeline;

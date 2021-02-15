@@ -36,9 +36,11 @@ LIST(APPEND TC_SOURCES
         ../dali/dali-test-suite-utils/test-graphics-command-buffer.cpp
         ../dali/dali-test-suite-utils/test-graphics-controller.cpp
         ../dali/dali-test-suite-utils/test-graphics-pipeline.cpp
+        ../dali/dali-test-suite-utils/test-graphics-program.cpp
         ../dali/dali-test-suite-utils/test-graphics-reflection.cpp
-        ../dali/dali-test-suite-utils/test-graphics-texture.cpp
         ../dali/dali-test-suite-utils/test-graphics-sampler.cpp
+        ../dali/dali-test-suite-utils/test-graphics-shader.cpp
+        ../dali/dali-test-suite-utils/test-graphics-texture.cpp
         ../dali/dali-test-suite-utils/test-native-image.cpp
         ../dali/dali-test-suite-utils/test-platform-abstraction.cpp
         ../dali/dali-test-suite-utils/test-render-controller.cpp
