@@ -203,10 +203,8 @@ void Shader::SetShader(std::string_view          vertexSource,
   size_t              shaderHash;
   mShaderData = shaderFactory.Load(vertexSource, fragmentSource, hints, shaderHash);
 
-  // Add shader program to scene-object using a message to the UpdateManager
-  EventThreadServices&       eventThreadServices = GetEventThreadServices();
-  SceneGraph::UpdateManager& updateManager       = eventThreadServices.GetUpdateManager();
-  SetShaderProgramMessage(updateManager, GetShaderSceneObject(), mShaderData, (hints & Dali::Shader::Hint::MODIFIES_GEOMETRY) != 0x0);
+  // Add shader data to scene-object
+  SceneGraph::SetShaderDataMessage(GetEventThreadServices(), GetShaderSceneObject(), mShaderData);
 }
 
 Shader::~Shader()

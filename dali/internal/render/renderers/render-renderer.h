@@ -41,6 +41,7 @@ namespace Internal
 class Context;
 class Texture;
 class Program;
+class ProgramCache;
 
 namespace SceneGraph
 {
@@ -168,8 +169,9 @@ public:
    * This is called when the renderer is inside render thread
    * @param[in] context Context used by the renderer (To be removed)
    * @param[in] graphicsController The graphics controller to use
+   * @param[in] programCache Cache of program objects
    */
-  void Initialize(Context& context, Graphics::Controller& graphicsController);
+  void Initialize(Context& context, Graphics::Controller& graphicsController, ProgramCache& programCache);
 
   /**
    * Destructor
@@ -453,6 +455,8 @@ private:
 
   Context*          mContext;
   Render::Geometry* mGeometry;
+
+  ProgramCache* mProgramCache;
 
   struct UniformIndexMap
   {

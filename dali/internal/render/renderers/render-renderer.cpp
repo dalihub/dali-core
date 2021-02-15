@@ -194,6 +194,7 @@ Renderer::Renderer(SceneGraph::RenderDataProvider* dataProvider,
 : mRenderDataProvider(dataProvider),
   mContext(nullptr),
   mGeometry(geometry),
+  mProgramCache(nullptr),
   mUniformIndexMap(),
   mAttributeLocations(),
   mUniformsHash(),
@@ -218,10 +219,11 @@ Renderer::Renderer(SceneGraph::RenderDataProvider* dataProvider,
   mBlendingOptions.SetBlendColor(blendColor);
 }
 
-void Renderer::Initialize(Context& context, Graphics::Controller& graphicsController)
+void Renderer::Initialize(Context& context, Graphics::Controller& graphicsController, ProgramCache& programCache)
 {
   mContext            = &context;
   mGraphicsController = &graphicsController;
+  mProgramCache       = &programCache;
 }
 
 Renderer::~Renderer() = default;
@@ -666,8 +668,11 @@ void Renderer::Render(Context&                                             conte
     return;
   }
 
-  // Get the program to use:
-  Program* program = mRenderDataProvider->GetShader().GetProgram();
+  // Get the program to use
+  // The program cache owns the Program object so we don't need to worry about this raw allocation here.
+  ShaderDataPtr shaderData = mRenderDataProvider->GetShader().GetShaderData();
+  Program*      program    = Program::New(*mProgramCache, shaderData, (shaderData->GetHints() & Dali::Shader::Hint::MODIFIES_GEOMETRY) != 0x0);
+
   if(!program)
   {
     DALI_LOG_ERROR("Failed to get program for shader at address %p.\n", reinterpret_cast<void*>(&mRenderDataProvider->GetShader()));

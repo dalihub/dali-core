@@ -582,22 +582,6 @@ void UpdateManager::RemoveShader(Shader* shader)
   EraseUsingDiscardQueue(mImpl->shaders, shader, mImpl->discardQueue, mSceneGraphBuffers.GetUpdateBufferIndex());
 }
 
-void UpdateManager::SetShaderProgram(Shader*                 shader,
-                                     Internal::ShaderDataPtr shaderData,
-                                     bool                    modifiesGeometry)
-{
-  if(shaderData)
-  {
-    using DerivedType = MessageValue3<Shader, Internal::ShaderDataPtr, ProgramCache*, bool>;
-
-    // Reserve some memory inside the render queue
-    uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot(mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof(DerivedType));
-
-    // Construct message in the render queue memory; note that delete should not be called on the return value
-    new(slot) DerivedType(shader, &Shader::SetProgram, shaderData, mImpl->renderManager.GetProgramCache(), modifiesGeometry);
-  }
-}
-
 void UpdateManager::SaveBinary(Internal::ShaderDataPtr shaderData)
 {
   DALI_ASSERT_DEBUG(shaderData && "No NULL shader data pointers please.");

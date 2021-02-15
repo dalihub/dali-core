@@ -82,6 +82,16 @@ public:
    */
   Dali::Property::Value GetLastKeyFrameValue() const;
 
+  /**
+   * @copydoc Dali::DevelKeyFrames::GetKeyFrameCount()
+   */
+  std::size_t GetKeyFrameCount() const;
+
+  /**
+   * @copydoc Dali::DevelKeyFrames::GetKeyFrame()
+   */
+  void GetKeyFrame(std::size_t index, float& time, Property::Value& value) const;
+
 private:
   Dali::Property::Type          mType{Property::NONE}; // Type of the specialization
   std::unique_ptr<KeyFrameSpec> mKeyFrames;            // Pointer to the specialized key frame object
@@ -101,9 +111,10 @@ public:
   /**
    * Get the key frame value as a Property::Value.
    * @param[in] index The index of the key frame to fetch
+   * @param[out] time The progress of the given key frame
    * @param[out] value The value of the given key frame
    */
-  virtual void GetKeyFrameAsValue(std::size_t index, Property::Value& value) = 0;
+  virtual void GetKeyFrameAsValue(std::size_t index, float& time, Property::Value& value) const = 0;
 };
 
 /**
@@ -153,9 +164,11 @@ public:
   /**
    * @copydoc KeyFrameSpec::GetKeyFrameAsValue()
    */
-  void GetKeyFrameAsValue(std::size_t index, Property::Value& value) override
+  void GetKeyFrameAsValue(std::size_t index, float& time, Property::Value& value) const override
   {
-    value = mChannel.mValues[index].mValue;
+    const auto& element = mChannel.mValues[index];
+    time                = element.mProgress;
+    value               = element.mValue;
   }
 
   /**

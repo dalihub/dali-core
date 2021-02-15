@@ -33,7 +33,6 @@ namespace SceneGraph
 {
 Shader::Shader(Dali::Shader::Hint::Value& hints)
 : mHints(hints),
-  mProgram(nullptr),
   mConnectionObservers()
 {
   AddUniformMapObserver(*this);
@@ -44,24 +43,18 @@ Shader::~Shader()
   mConnectionObservers.Destroy(*this);
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// The following methods are called during RenderManager::Render()
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void Shader::SetProgram(Internal::ShaderDataPtr shaderData,
-                        ProgramCache*           programCache,
-                        bool                    modifiesGeometry)
+void Shader::SetShaderData(ShaderDataPtr shaderData)
 {
   DALI_LOG_TRACE_METHOD_FMT(Debug::Filter::gShader, "%d\n", shaderData->GetHashValue());
 
-  mProgram = Program::New(*programCache, shaderData, modifiesGeometry);
-  // The program cache owns the Program object so we don't need to worry about this raw allocation here.
+  mShaderData = shaderData;
 
   mConnectionObservers.ConnectionsChanged(*this);
 }
 
-Program* Shader::GetProgram()
+ShaderDataPtr Shader::GetShaderData() const
 {
-  return mProgram;
+  return mShaderData;
 }
 
 void Shader::AddConnectionObserver(ConnectionChangePropagator::Observer& observer)

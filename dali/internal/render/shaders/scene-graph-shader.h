@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/shader-data.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/scene-graph-connection-change-propagator.h>
 
@@ -95,21 +96,16 @@ public:
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   /**
-   * @brief Set the program for this shader.
-   * @param[in] shaderData        The program's vertex/fragment source and optionally precompiled shader binary.
-   * @param[in] programCache      Owner of the Programs.
-   * @param[in] modifiesGeometry  True if the vertex shader changes the positions of vertexes such that
-   * they might exceed the bounding box of vertexes passing through the default transformation.
+   * @brief Set the shader data for this shader.
+   * @param[in] shaderData The program's vertex/fragment source and optionally pre-compiled shader binary.
    */
-  void SetProgram(Internal::ShaderDataPtr shaderData,
-                  ProgramCache*           programCache,
-                  bool                    modifiesGeometry);
+  void SetShaderData(ShaderDataPtr shaderData);
 
   /**
-   * Get the program built for this shader
-   * @return The program built from the shader sources.
+   * Get the shader data for this shader.
+   * @return The shader data.
    */
-  Program* GetProgram();
+  ShaderDataPtr GetShaderData() const;
 
 public: // Implementation of ConnectionChangePropagator
   /**
@@ -131,10 +127,21 @@ public: // UniformMap::Observer
 private: // Data
   Dali::Shader::Hint::Value mHints;
 
-  Program* mProgram;
+  ShaderDataPtr mShaderData;
 
   ConnectionChangePropagator mConnectionObservers;
 };
+
+inline void SetShaderDataMessage(EventThreadServices& eventThreadServices, const Shader& shader, ShaderDataPtr shaderData)
+{
+  using LocalType = MessageValue1<Shader, ShaderDataPtr>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new(slot) LocalType(&shader, &Shader::SetShaderData, shaderData);
+}
 
 } // namespace SceneGraph
 
