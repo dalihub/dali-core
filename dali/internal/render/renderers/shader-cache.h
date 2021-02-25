@@ -75,11 +75,6 @@ struct ShaderCache
    */
   Dali::Graphics::Shader& GetShader(const std::vector<char> shaderCode, Graphics::PipelineStage stage, Graphics::ShaderSourceMode type);
 
-  /**
-   * Destroy any graphics objects owned by this scene graph object
-   */
-  void DestroyGraphicsObjects();
-
 private:
   std::vector<Item>           mItems;
   Dali::Graphics::Controller& mController;

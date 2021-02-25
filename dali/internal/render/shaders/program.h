@@ -31,6 +31,11 @@
 
 namespace Dali
 {
+namespace Graphics
+{
+class Controller;
+class Program;
+}
 class Matrix;
 
 namespace Integration
@@ -102,10 +107,12 @@ public:
    * @param[in] shaderData  A pointer to a data structure containing the program source
    *                        and optionally precompiled binary. If the binary is empty the program bytecode
    *                        is copied into it after compilation and linking)
+   * param[in]  gfxController Reference to valid graphics Controller object
+   * param[in]  gfxProgram Reference to vali graphics Program object
    * @param[in] modifiesGeometry True if the shader modifies geometry
    * @return pointer to the program
    */
-  static Program* New(ProgramCache& cache, Internal::ShaderDataPtr shaderData, bool modifiesGeometry);
+  static Program* New(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& gfxController, Graphics::Program& gfxProgram, bool modifiesGeometry);
 
   /**
    * Takes this program into use
@@ -311,9 +318,10 @@ private: // Implementation
    * Constructor, private so no direct instantiation
    * @param[in] cache where the programs are stored
    * @param[in] shaderData A smart pointer to a data structure containing the program source and binary
+   * @param[in] programId A GL program id
    * @param[in] modifiesGeometry True if the vertex shader changes geometry
    */
-  Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, bool modifiesGeometry);
+  Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, uint32_t programId, bool modifiesGeometry);
 
 public:
   /**

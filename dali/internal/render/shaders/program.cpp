@@ -32,7 +32,8 @@
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/dali-vector.h>
-
+#include <dali/graphics-api/graphics-program.h>
+#include <dali/graphics-api/graphics-controller.h>
 namespace
 {
 void LogWithLineNumbers(const char* source)
@@ -99,21 +100,28 @@ const char* const gStdUniforms[Program::UNIFORM_TYPE_LAST] =
 
 // IMPLEMENTATION
 
-Program* Program::New(ProgramCache& cache, Internal::ShaderDataPtr shaderData, bool modifiesGeometry)
+Program* Program::New(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& gfxController, Graphics::Program& gfxProgram, bool modifiesGeometry)
 {
-  size_t   shaderHash = shaderData->GetHashValue();
+  uint32_t programId{0u};
+
+  // Get program id and use it as hash for the cache
+  // in order to maintain current functionality as long as needed
+  gfxController.GetProgramParameter( gfxProgram, 1, &programId );
+
+  size_t   shaderHash = programId;
+
   Program* program    = cache.GetProgram(shaderHash);
 
   if(nullptr == program)
   {
     // program not found so create it
-    program = new Program(cache, shaderData, modifiesGeometry);
+    program = new Program(cache, shaderData, programId, modifiesGeometry);
     program->Load();
     cache.AddProgram(shaderHash, program);
   }
-
   return program;
 }
+
 
 void Program::Use()
 {
@@ -624,7 +632,7 @@ bool Program::ModifiesGeometry()
   return mModifiesGeometry;
 }
 
-Program::Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, bool modifiesGeometry)
+Program::Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, uint32_t programId, bool modifiesGeometry)
 : mCache(cache),
   mGlAbstraction(mCache.GetGlAbstraction()),
   mProjectionMatrix(nullptr),
@@ -653,6 +661,9 @@ Program::Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, bool m
 
   // reset values
   ResetAttribsUniformCache();
+
+  mProgramId = programId;
+  mLinked = true;
 }
 
 Program::~Program()
@@ -662,6 +673,13 @@ Program::~Program()
 
 void Program::Load()
 {
+  // Temporary, exist if program id is already set
+  if(mProgramId)
+  {
+    GetActiveSamplerUniforms();
+    return;
+  }
+
   DALI_ASSERT_ALWAYS(nullptr != mProgramData.Get() && "Program data is not initialized");
   DALI_ASSERT_DEBUG(mProgramId == 0 && "mProgramId != 0, so about to leak a GL resource by overwriting it.");
 
@@ -749,6 +767,11 @@ void Program::Load()
 
 void Program::Unload()
 {
+  // Bypass when using gfx program
+  if(!mProgramData && mProgramId)
+  {
+    return;
+  }
   FreeShaders();
 
   if(this == mCache.GetCurrentProgram())
@@ -770,6 +793,11 @@ void Program::Unload()
 
 bool Program::CompileShader(GLenum shaderType, GLuint& shaderId, const char* src)
 {
+  // Bypass when using gfx program
+  if(!mProgramData && mProgramId)
+  {
+    return true;
+  }
   if(!shaderId)
   {
     LOG_GL("CreateShader(%d)\n", shaderType);
@@ -811,6 +839,11 @@ bool Program::CompileShader(GLenum shaderType, GLuint& shaderId, const char* src
 
 void Program::Link()
 {
+  // Bypass when using gfx program
+  if(!mProgramData && mProgramId)
+  {
+    return;
+  }
   LOG_GL("LinkProgram(%d)\n", mProgramId);
   CHECK_GL(mGlAbstraction, mGlAbstraction.LinkProgram(mProgramId));
 
@@ -840,6 +873,11 @@ void Program::Link()
 
 void Program::FreeShaders()
 {
+  // Bypass when using gfx program
+  if(!mProgramData && mProgramId)
+  {
+    return;
+  }
   if(mVertexShaderId)
   {
     LOG_GL("DeleteShader(%d)\n", mVertexShaderId);

@@ -303,6 +303,18 @@ public: // Test Functions
     mSubmitStack.clear();
   }
 
+  /**
+   * @brief Retrieves program parameters
+   *
+   * This function can be used to retrieve data from internal implementation
+   *
+   * @param[in] program Valid program object
+   * @param[in] parameterId Integer parameter id
+   * @param[out] outData Pointer to output memory
+   * @return True on success
+   */
+  bool GetProgramParameter(Graphics::Program& program, uint32_t parameterId, void* outData ) override;
+
 public:
   mutable TraceCallStack                    mCallStack;
   mutable TraceCallStack                    mCommandBufferCallStack;

@@ -51,11 +51,6 @@ Dali::Graphics::Shader& ShaderCache::GetShader(const std::vector<char> shaderCod
   return *retval;
 }
 
-void ShaderCache::DestroyGraphicsObjects()
-{
-  mItems.clear();
-}
-
 } // namespace Render
 } // namespace Internal
 } // namespace Dali

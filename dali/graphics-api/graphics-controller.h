@@ -342,6 +342,18 @@ public:
    */
   virtual bool PipelineEquals(const Pipeline& pipeline0, const Pipeline& pipeline1) const = 0;
 
+  /**
+   * @brief Retrieves program parameters
+   *
+   * This function can be used to retrieve data from internal implementation
+   *
+   * @param[in] program Valid program object
+   * @param[in] parameterId Integer parameter id
+   * @param[out] outData Pointer to output memory
+   * @return True on success
+   */
+  virtual bool GetProgramParameter(Graphics::Program& program, uint32_t parameterId, void* outData ) = 0;
+
 protected:
   /**
    * Creates controller

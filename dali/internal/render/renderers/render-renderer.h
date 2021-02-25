@@ -453,7 +453,8 @@ private:
   Graphics::UniquePtr<Graphics::Pipeline> PrepareGraphicsPipeline(
     Program&                                             program,
     const Dali::Internal::SceneGraph::RenderInstruction& instruction,
-    bool                                                 blend);
+    bool                                                 blend,
+    Graphics::UniquePtr<Graphics::Pipeline>&& oldPipeline);
 
 private:
   Graphics::Controller*                        mGraphicsController;

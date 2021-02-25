@@ -723,17 +723,6 @@ void Renderer::Render(Context&                                             conte
     return;
   }
 
-  // Get the program to use
-  // The program cache owns the Program object so we don't need to worry about this raw allocation here.
-  ShaderDataPtr shaderData = mRenderDataProvider->GetShader().GetShaderData();
-  Program*      program    = Program::New(*mProgramCache, shaderData, (shaderData->GetHints() & Dali::Shader::Hint::MODIFIES_GEOMETRY) != 0x0);
-
-  if(!program)
-  {
-    DALI_LOG_ERROR("Failed to get program for shader at address %p.\n", reinterpret_cast<void*>(&mRenderDataProvider->GetShader()));
-    return;
-  }
-
   Graphics::UniquePtr<Graphics::CommandBuffer> commandBuffer = mGraphicsController->CreateCommandBuffer(
     Graphics::CommandBufferCreateInfo()
       .SetLevel(Graphics::CommandBufferLevel::SECONDARY),
@@ -747,8 +736,9 @@ void Renderer::Render(Context&                                             conte
 
   // Create Shader.
   // Really, need to have a pipeline cache in implementation.
-
-  mLegacyProgram.programId = program->GetProgramId();
+  // Get the program to use
+  // The program cache owns the Program object so we don't need to worry about this raw allocation here.
+  ShaderDataPtr shaderData = mRenderDataProvider->GetShader().GetShaderData();
 
   Dali::Graphics::Shader& vertexShader = mShaderCache->GetShader(
     shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::VERTEX_SHADER),
@@ -761,16 +751,32 @@ void Renderer::Render(Context&                                             conte
     shaderData->GetSourceMode());
 
   std::vector<Graphics::ShaderState> shaderStates{
-    Graphics::ShaderState().SetShader(vertexShader).SetPipelineStage(Graphics::PipelineStage::VERTEX_SHADER),
-    Graphics::ShaderState().SetShader(fragmentShader).SetPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER)};
+    Graphics::ShaderState()
+      .SetShader(vertexShader)
+      .SetPipelineStage(Graphics::PipelineStage::VERTEX_SHADER),
+    Graphics::ShaderState()
+      .SetShader(fragmentShader)
+      .SetPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER)};
+
   auto createInfo = Graphics::ProgramCreateInfo();
   createInfo.SetShaderState(shaderStates);
 
-  mGraphicsProgram = mGraphicsController->CreateProgram(createInfo, nullptr);
+  mGraphicsProgram = mGraphicsController->CreateProgram(createInfo, std::move(mGraphicsProgram));
+  Program* program = Program::New(*mProgramCache,
+                                  shaderData,
+                                  *mGraphicsController,
+                                  *mGraphicsProgram,
+                                  (shaderData->GetHints() & Dali::Shader::Hint::MODIFIES_GEOMETRY) != 0x0);
+
+  if(!program)
+  {
+    DALI_LOG_ERROR("Failed to get program for shader at address %p.\n", reinterpret_cast<void*>(&mRenderDataProvider->GetShader()));
+    return;
+  }
 
   // Temporarily create a pipeline here - this will be used for transporting
   // topology, vertex format, attrs, rasterization state
-  mGraphicsPipeline = std::move(PrepareGraphicsPipeline(*program, instruction, blend));
+  mGraphicsPipeline = PrepareGraphicsPipeline(*program, instruction, blend, std::move(mGraphicsPipeline));
 
   commandBuffer->BindPipeline(*mGraphicsPipeline.get());
 
@@ -891,7 +897,8 @@ bool Renderer::Updated(BufferIndex bufferIndex, const SceneGraph::NodeDataProvid
 Graphics::UniquePtr<Graphics::Pipeline> Renderer::PrepareGraphicsPipeline(
   Program&                                             program,
   const Dali::Internal::SceneGraph::RenderInstruction& instruction,
-  bool                                                 blend)
+  bool                                                 blend,
+  Graphics::UniquePtr<Graphics::Pipeline>&&            oldPipeline)
 {
   Graphics::InputAssemblyState inputAssemblyState{};
   Graphics::VertexInputState   vertexInputState{};
@@ -1057,7 +1064,7 @@ Graphics::UniquePtr<Graphics::Pipeline> Renderer::PrepareGraphicsPipeline(
       .SetColorBlendState(&colorBlendState)
       .SetProgramState(&programState)
       .SetNextExtension(&mLegacyProgram),
-    nullptr);
+    std::move(oldPipeline));
 }
 
 } // namespace Render
