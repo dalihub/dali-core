@@ -35,7 +35,9 @@ namespace Graphics
 {
 class Controller;
 class Program;
+class Reflection;
 } // namespace Graphics
+
 class Matrix;
 
 namespace Integration
@@ -99,6 +101,21 @@ public:
 
     UNIFORM_SIZE,
     UNIFORM_TYPE_LAST
+  };
+
+  /**
+   * Indices of default uniforms
+   */
+  enum class DefaultUniformIndex
+  {
+    MODEL_MATRIX = 0,
+    MVP_MATRIX,
+    VIEW_MATRIX,
+    MODEL_VIEW_MATRIX,
+    NORMAL_MATRIX,
+    PROJECTION_MATRIX,
+    SIZE,
+    COLOR
   };
 
   /**
@@ -318,6 +335,34 @@ public:
     return *mGfxProgram;
   }
 
+  /**
+   * Retrieves uniform data.
+   * The lookup tries to minimise string comparisons. Ideally, when the hashedName is known
+   * and there are no hash collisions in the reflection it's the most optimal case.
+   *
+   * @param name Name of uniform
+   * @param hashedName Hash value from name or 0 if unknown
+   * @param out Reference to output structure
+   *
+   * @return False when uniform is not found or due to hash collision the result is ambiguous
+   */
+  bool GetUniform(const std::string& name, size_t hashedName, Graphics::UniformInfo& out) const;
+
+  /**
+   * Retrieves default uniform
+   * @param[in] defaultUniformIndex index of the uniform
+   * @param[out] outputUniformInfo the reference to UniformInfo object
+   * @return True is uniform found, false otherwise
+   */
+  bool GetDefaultUniform(DefaultUniformIndex defaultUniformIndex, Graphics::UniformInfo& outputUniformInfo) const;
+
+  /**
+   * Retrievs default uniform
+   * @param[in] defaultUniformIndex index of the uniform
+   * @return Valid pointer to the UniformInfo object or nullptr
+   */
+  const Graphics::UniformInfo* GetDefaultUniform(DefaultUniformIndex defaultUniformIndex) const;
+
 private: // Implementation
   /**
    * Constructor, private so no direct instantiation
@@ -345,6 +390,23 @@ private:
    */
   void ResetAttribsUniformCache();
 
+  /**
+   * Struct ReflectionUniformInfo
+   * Contains details of a single uniform buffer field and/or sampler.
+   */
+  struct ReflectionUniformInfo
+  {
+    size_t                hashValue{0};
+    bool                  hasCollision{false};
+    Graphics::UniformInfo uniformInfo{};
+  };
+
+  /**
+   * Build optimized shader reflection of uniforms
+   * @param graphicsReflection The graphics reflection
+   */
+  void BuildReflection(const Graphics::Reflection& graphicsReflection);
+
 private:                                                    // Data
   ProgramCache&                          mCache;            ///< The program cache
   Integration::GlAbstraction&            mGlAbstraction;    ///< The OpenGL Abstraction layer
@@ -370,6 +432,11 @@ private:                                                    // Data
   GLfloat mUniformCacheFloat4[MAX_UNIFORM_CACHE_SIZE][4]; ///< Value cache for uniforms of four floats
   Vector3 mSizeUniformCache;                              ///< Cache value for size uniform
   bool    mModifiesGeometry;                              ///< True if the program changes geometry
+
+  using UniformReflectionContainer = std::vector<ReflectionUniformInfo>;
+
+  UniformReflectionContainer mReflection{};                ///< Contains reflection build per program
+  UniformReflectionContainer mReflectionDefaultUniforms{}; ///< Contains default uniforms
 };
 
 } // namespace Internal

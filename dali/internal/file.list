@@ -118,8 +118,9 @@ SET( internal_src_files
   ${internal_src_dir}/render/renderers/render-sampler.cpp
   ${internal_src_dir}/render/renderers/render-texture.cpp
   ${internal_src_dir}/render/renderers/render-vertex-buffer.cpp
-
   ${internal_src_dir}/render/renderers/shader-cache.cpp
+  ${internal_src_dir}/render/renderers/uniform-buffer-manager.cpp
+
   ${internal_src_dir}/render/shaders/program.cpp
   ${internal_src_dir}/render/shaders/program-controller.cpp
   ${internal_src_dir}/render/shaders/scene-graph-shader.cpp

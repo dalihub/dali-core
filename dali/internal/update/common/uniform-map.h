@@ -40,19 +40,40 @@ namespace SceneGraph
 class UniformPropertyMapping
 {
 public:
+  using Hash = unsigned long;
+
   /**
    * Constructor
    */
   UniformPropertyMapping(ConstString theUniformName, const PropertyInputImpl* thePropertyPtr)
   : propertyPtr(thePropertyPtr),
-    uniformName(theUniformName)
+    uniformName(theUniformName),
+    uniformNameHash(0u),
+    uniformNameHashNoArray(0u),
+    arrayIndex(0u)
   {
+    // Look for array index closing bracket
+    auto pos = theUniformName.GetStringView().rfind("]");
+
+    // If found, extract the array index and store it
+    if(pos != std::string::npos)
+    {
+      auto pos0  = theUniformName.GetStringView().rfind("[", pos);
+      arrayIndex = atoi(theUniformName.GetCString() + pos0 + 1);
+      // Calculate hash from name without array index
+      uniformNameHashNoArray = Dali::CalculateHash(theUniformName.GetStringView().substr(0, pos0).data());
+    }
+    uniformName     = theUniformName;
+    uniformNameHash = Dali::CalculateHash(theUniformName.GetCString());
   }
 
   UniformPropertyMapping() = default;
 
   const PropertyInputImpl* propertyPtr{nullptr};
-  ConstString              uniformName;
+  ConstString              uniformName{};
+  Hash                     uniformNameHash{0u};
+  Hash                     uniformNameHashNoArray{0u};
+  int32_t                  arrayIndex{0u};
 };
 
 /**

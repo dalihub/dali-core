@@ -39,6 +39,7 @@
 #include <dali/internal/render/renderers/render-frame-buffer.h>
 #include <dali/internal/render/renderers/render-texture.h>
 #include <dali/internal/render/renderers/shader-cache.h>
+#include <dali/internal/render/renderers/uniform-buffer-manager.h>
 #include <dali/internal/render/shaders/program-controller.h>
 
 namespace Dali
@@ -84,6 +85,8 @@ struct RenderManager::Impl
     // Create thread pool with just one thread ( there may be a need to create more threads in the future ).
     threadPool = std::unique_ptr<Dali::ThreadPool>(new Dali::ThreadPool());
     threadPool->Initialize(1u);
+
+    uniformBufferManager.reset(new Render::UniformBufferManager(&graphicsController));
   }
 
   ~Impl()
@@ -165,6 +168,8 @@ struct RenderManager::Impl
 
   ProgramController   programController; ///< Owner of the GL programs
   Render::ShaderCache shaderCache;       ///< The cache for the graphics shaders
+
+  std::unique_ptr<Render::UniformBufferManager> uniformBufferManager; ///< The uniform buffer manager
 
   Integration::DepthBufferAvailable   depthBufferAvailable;   ///< Whether the depth buffer is available
   Integration::StencilBufferAvailable stencilBufferAvailable; ///< Whether the stencil buffer is available
@@ -250,7 +255,7 @@ void RenderManager::SetShaderSaver(ShaderSaver& upstream)
 void RenderManager::AddRenderer(OwnerPointer<Render::Renderer>& renderer)
 {
   // Initialize the renderer as we are now in render thread
-  renderer->Initialize(mImpl->context, mImpl->graphicsController, mImpl->programController, mImpl->shaderCache);
+  renderer->Initialize(mImpl->context, mImpl->graphicsController, mImpl->programController, mImpl->shaderCache, *(mImpl->uniformBufferManager.get()));
 
   mImpl->rendererContainer.PushBack(renderer.Release());
 }

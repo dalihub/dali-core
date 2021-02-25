@@ -26,12 +26,15 @@
 #include <dali/graphics-api/graphics-controller.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/common/blending-options.h>
+#include <dali/internal/common/const-string.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/render/data-providers/render-data-provider.h>
 #include <dali/internal/render/gl-resources/gl-resource-owner.h>
 #include <dali/internal/render/renderers/render-geometry.h>
+#include <dali/internal/render/renderers/uniform-buffer-manager.h>
+#include <dali/internal/render/shaders/program.h>
 #include <dali/internal/update/manager/render-instruction-processor.h>
 
 namespace Dali
@@ -40,7 +43,6 @@ namespace Internal
 {
 class Context;
 class Texture;
-class Program;
 class ProgramCache;
 
 namespace SceneGraph
@@ -55,6 +57,7 @@ class RenderInstruction; //for relfection effect
 namespace Render
 {
 struct ShaderCache;
+class UniformBufferManager;
 
 /**
  * Renderers are used to render meshes
@@ -173,8 +176,9 @@ public:
    * @param[in] graphicsController The graphics controller to use
    * @param[in] programCache Cache of program objects
    * @param[in] shaderCache Cache of shaders
+   * @param[in] uniformBufferManager Uniform buffer manager
    */
-  void Initialize(Context& context, Graphics::Controller& graphicsController, ProgramCache& programCache, Render::ShaderCache& shaderCache);
+  void Initialize(Context& context, Graphics::Controller& graphicsController, ProgramCache& programCache, Render::ShaderCache& shaderCache, Render::UniformBufferManager& uniformBufferManager);
 
   /**
    * Destructor
@@ -405,6 +409,14 @@ public:
    */
   bool Updated(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider* node);
 
+  template<class T>
+  bool WriteDefaultUniform(const Graphics::UniformInfo* uniformInfo, Render::UniformBuffer& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const T& data);
+
+  template<class T>
+  void WriteUniform(Render::UniformBuffer& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const Graphics::UniformInfo& uniformInfo, const T& data);
+
+  void WriteUniform(Render::UniformBuffer& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const Graphics::UniformInfo& uniformInfo, const void* data, uint32_t size);
+
 private:
   struct UniformIndexMap;
 
@@ -422,13 +434,13 @@ private:
   void SetBlending(Context& context, bool blend);
 
   /**
-   * Set the uniforms from properties according to the uniform map
+   * Builds a uniform map based on the index of the cached location in the Program.
    * @param[in] bufferIndex The index of the previous update buffer.
    * @param[in] node The node using the renderer
    * @param[in] size The size of the renderer
    * @param[in] program The shader program on which to set the uniforms.
    */
-  void SetUniforms(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider& node, const Vector3& size, Program& program);
+  void BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider& node, const Vector3& size, Program& program);
 
   /**
    * Set the program uniform in the map from the mapped property
@@ -454,7 +466,23 @@ private:
     Program&                                             program,
     const Dali::Internal::SceneGraph::RenderInstruction& instruction,
     bool                                                 blend,
-    Graphics::UniquePtr<Graphics::Pipeline>&& oldPipeline);
+    Graphics::UniquePtr<Graphics::Pipeline>&&            oldPipeline);
+
+  /**
+   * @brief Fill uniform buffer at index. Writes uniforms into given memory address
+   *
+   * @param[in] instruction The render instruction
+   * @param[in,out] ubo Target uniform buffer object
+   * @param[out] outBindings output bindings vector
+   * @param[out] offset output offset of the next uniform buffer memory address
+   * @param[in] updateBufferIndex update buffer index
+   */
+  void FillUniformBuffers(Program&                                      program,
+                          const SceneGraph::RenderInstruction&          instruction,
+                          Render::UniformBuffer&                        ubo,
+                          std::vector<Graphics::UniformBufferBinding>*& outBindings,
+                          uint32_t&                                     offset,
+                          BufferIndex                                   updateBufferIndex);
 
 private:
   Graphics::Controller*                        mGraphicsController;
@@ -466,13 +494,21 @@ private:
   ProgramCache*        mProgramCache{};
   Render::ShaderCache* mShaderCache{};
 
+  Render::UniformBufferManager*               mUniformBufferManager{};
+  std::vector<Graphics::UniformBufferBinding> mUniformBufferBindings{};
+
   Graphics::UniquePtr<Graphics::Pipeline> mGraphicsPipeline{}; ///< The graphics pipeline. (Cached implementation)
   std::vector<Graphics::ShaderState>      mShaderStates{};
 
+  using Hash = unsigned long;
   struct UniformIndexMap
   {
-    uint32_t                 uniformIndex; ///< The index of the cached location in the Program
-    const PropertyInputImpl* propertyValue;
+    uint32_t                 uniformIndex;  ///< The index of the cached location in the Program
+    ConstString              uniformName;   ///< The uniform name
+    const PropertyInputImpl* propertyValue; ///< The property value
+    Hash                     uniformNameHash{0u};
+    Hash                     uniformNameHashNoArray{0u};
+    int32_t                  arrayIndex; ///< The array index
   };
 
   using UniformIndexMappings = Dali::Vector<UniformIndexMap>;
@@ -505,6 +541,9 @@ private:
   };
 
   LegacyProgram mLegacyProgram; ///< The structure to pass the program ID into Graphics::PipelineCreateInfo
+
+  using UniformBufferList = std::array<Graphics::UniquePtr<Render::UniformBuffer>, 2u>;
+  UniformBufferList mUniformBuffer{}; ///< The double-buffered uniform buffer
 };
 
 } // namespace Render

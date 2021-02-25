@@ -32,6 +32,7 @@
 #include <dali/internal/render/renderers/shader-cache.h>
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
+#include <dali/internal/update/common/uniform-map.h>
 
 namespace Dali
 {
@@ -39,6 +40,12 @@ namespace Internal
 {
 namespace
 {
+// Size of uniform buffer page used when resizing
+constexpr uint32_t UBO_PAGE_SIZE = 8192u;
+
+// UBO allocation threshold below which the UBO will shrink
+constexpr auto UBO_SHRINK_THRESHOLD = 0.75f;
+
 /**
  * Helper to set view and projection matrices once per program
  * @param program to set the matrices to
@@ -260,6 +267,16 @@ constexpr Graphics::BlendOp ConvertBlendEquation(DevelBlendEquation::Type blendE
   return Graphics::BlendOp{};
 }
 
+/**
+ * Helper function to calculate the correct alignment of data for uniform buffers
+ * @param dataSize size of uniform buffer
+ * @return aligned offset of data
+ */
+inline uint32_t GetUniformBufferDataAlignment(uint32_t dataSize)
+{
+  return ((dataSize / 256u) + ((dataSize % 256u) ? 1u : 0u)) * 256u;
+}
+
 } // namespace
 
 namespace Render
@@ -316,12 +333,13 @@ Renderer::Renderer(SceneGraph::RenderDataProvider* dataProvider,
   mBlendingOptions.SetBlendColor(blendColor);
 }
 
-void Renderer::Initialize(Context& context, Graphics::Controller& graphicsController, ProgramCache& programCache, Render::ShaderCache& shaderCache)
+void Renderer::Initialize(Context& context, Graphics::Controller& graphicsController, ProgramCache& programCache, Render::ShaderCache& shaderCache, Render::UniformBufferManager& uniformBufferManager)
 {
-  mContext            = &context;
-  mGraphicsController = &graphicsController;
-  mProgramCache       = &programCache;
-  mShaderCache        = &shaderCache;
+  mContext              = &context;
+  mGraphicsController   = &graphicsController;
+  mProgramCache         = &programCache;
+  mShaderCache          = &shaderCache;
+  mUniformBufferManager = &uniformBufferManager;
 }
 
 Renderer::~Renderer() = default;
@@ -346,7 +364,7 @@ void Renderer::GlCleanup()
 {
 }
 
-void Renderer::SetUniforms(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider& node, const Vector3& size, Program& program)
+void Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider& node, const Vector3& size, Program& program)
 {
   // Check if the map has changed
   DALI_ASSERT_DEBUG(mRenderDataProvider && "No Uniform map data provider available");
@@ -371,8 +389,12 @@ void Renderer::SetUniforms(BufferIndex bufferIndex, const SceneGraph::NodeDataPr
     uint32_t mapIndex = 0;
     for(; mapIndex < uniformMap.Count(); ++mapIndex)
     {
-      mUniformIndexMap[mapIndex].propertyValue = uniformMap[mapIndex].propertyPtr;
-      mUniformIndexMap[mapIndex].uniformIndex  = program.RegisterUniform(uniformMap[mapIndex].uniformName);
+      mUniformIndexMap[mapIndex].propertyValue          = uniformMap[mapIndex].propertyPtr;
+      mUniformIndexMap[mapIndex].uniformIndex           = program.RegisterUniform(uniformMap[mapIndex].uniformName);
+      mUniformIndexMap[mapIndex].uniformName            = uniformMap[mapIndex].uniformName;
+      mUniformIndexMap[mapIndex].uniformNameHash        = uniformMap[mapIndex].uniformNameHash;
+      mUniformIndexMap[mapIndex].uniformNameHashNoArray = uniformMap[mapIndex].uniformNameHashNoArray;
+      mUniformIndexMap[mapIndex].arrayIndex             = uniformMap[mapIndex].arrayIndex;
     }
 
     for(uint32_t nodeMapIndex = 0; nodeMapIndex < uniformMapNode.Count(); ++nodeMapIndex)
@@ -391,8 +413,12 @@ void Renderer::SetUniforms(BufferIndex bufferIndex, const SceneGraph::NodeDataPr
 
       if(!found)
       {
-        mUniformIndexMap[mapIndex].propertyValue = uniformMapNode[nodeMapIndex].propertyPtr;
-        mUniformIndexMap[mapIndex].uniformIndex  = uniformIndex;
+        mUniformIndexMap[mapIndex].propertyValue          = uniformMapNode[nodeMapIndex].propertyPtr;
+        mUniformIndexMap[mapIndex].uniformName            = uniformMapNode[nodeMapIndex].uniformName;
+        mUniformIndexMap[mapIndex].uniformIndex           = uniformIndex;
+        mUniformIndexMap[mapIndex].uniformNameHash        = uniformMapNode[nodeMapIndex].uniformNameHash;
+        mUniformIndexMap[mapIndex].uniformNameHashNoArray = uniformMapNode[nodeMapIndex].uniformNameHashNoArray;
+        mUniformIndexMap[mapIndex].arrayIndex             = uniformMapNode[nodeMapIndex].arrayIndex;
         ++mapIndex;
       }
     }
@@ -400,6 +426,9 @@ void Renderer::SetUniforms(BufferIndex bufferIndex, const SceneGraph::NodeDataPr
     mUniformIndexMap.Resize(mapIndex);
   }
 
+  // The code below is disabled because the uniforms should now be set in the graphics backend.
+
+  /*
   // Set uniforms in local map
   for(UniformIndexMappings::Iterator iter = mUniformIndexMap.Begin(),
                                      end  = mUniformIndexMap.End();
@@ -414,6 +443,7 @@ void Renderer::SetUniforms(BufferIndex bufferIndex, const SceneGraph::NodeDataPr
   {
     program.SetSizeUniform3f(sizeLoc, size.x, size.y, size.z);
   }
+*/
 }
 
 void Renderer::SetUniformFromProperty(BufferIndex bufferIndex, Program& program, UniformIndexMap& map)
@@ -784,6 +814,9 @@ void Renderer::Render(Context&                                             conte
   {
     // Only set up and draw if we have textures and they are all valid
 
+    // The code below is disabled because the uniforms should now be set in the graphics backend.
+
+    /*
     // set projection and view matrix if program has not yet received them yet this frame
     SetMatrices(*program, modelMatrix, viewMatrix, projectionMatrix, modelViewMatrix);
 
@@ -802,8 +835,87 @@ void Renderer::Render(Context&                                             conte
         program->SetUniform4f(loc, color.r, color.g, color.b, color.a * mRenderDataProvider->GetOpacity(bufferIndex));
       }
     }
+*/
 
-    SetUniforms(bufferIndex, node, size, *program);
+    BuildUniformIndexMap(bufferIndex, node, size, *program);
+
+    // Create the UBO
+    uint32_t uniformBlockAllocationBytes{0u};
+    uint32_t uniformBlockMaxSize{0u};
+    uint32_t uboOffset{0u};
+
+    auto& reflection = mGraphicsController->GetProgramReflection(program->GetGraphicsProgram());
+    for(auto i = 0u; i < reflection.GetUniformBlockCount(); ++i)
+    {
+      auto blockSize = GetUniformBufferDataAlignment(reflection.GetUniformBlockSize(i));
+      if(uniformBlockMaxSize < blockSize)
+      {
+        uniformBlockMaxSize = blockSize;
+      }
+      uniformBlockAllocationBytes += blockSize;
+    }
+
+    auto pagedAllocation = ((uniformBlockAllocationBytes / UBO_PAGE_SIZE + 1u)) * UBO_PAGE_SIZE;
+
+    // Allocate twice memory as required by the uniform buffers
+    // todo: memory usage backlog to use optimal allocation
+    if(uniformBlockAllocationBytes && !mUniformBuffer[bufferIndex])
+    {
+      mUniformBuffer[bufferIndex] = std::move(mUniformBufferManager->AllocateUniformBuffer(pagedAllocation));
+    }
+    else if(uniformBlockAllocationBytes && (mUniformBuffer[bufferIndex]->GetSize() < pagedAllocation ||
+                                            (pagedAllocation < uint32_t(float(mUniformBuffer[bufferIndex]->GetSize()) * UBO_SHRINK_THRESHOLD))))
+    {
+      mUniformBuffer[bufferIndex]->Reserve(pagedAllocation);
+    }
+
+    // Clear UBO
+    if(mUniformBuffer[bufferIndex])
+    {
+      mUniformBuffer[bufferIndex]->Fill(0, 0u, 0u);
+    }
+
+    // update the uniform buffer
+    // pass shared UBO and offset, return new offset for next item to be used
+    // don't process bindings if there are no uniform buffers allocated
+    auto ubo = mUniformBuffer[bufferIndex].get();
+    if(ubo)
+    {
+      std::vector<Graphics::UniformBufferBinding>* bindings{nullptr};
+      FillUniformBuffers(*program, instruction, *ubo, bindings, uboOffset, bufferIndex);
+
+      Vector4        finalColor;
+      const Vector4& color = node.GetRenderColor(bufferIndex);
+      if(mPremultipledAlphaEnabled)
+      {
+        float alpha = color.a * mRenderDataProvider->GetOpacity(bufferIndex);
+        finalColor  = Vector4(color.r * alpha, color.g * alpha, color.b * alpha, alpha);
+      }
+      else
+      {
+        finalColor = Vector4(color.r, color.g, color.b, color.a * mRenderDataProvider->GetOpacity(bufferIndex));
+      }
+
+      // We know bindings for this renderer, so we can use 'offset' and write additional uniforms
+      Matrix modelViewProjectionMatrix(false);
+      Matrix::Multiply(modelViewProjectionMatrix, modelViewMatrix, projectionMatrix);
+
+      WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::MODEL_MATRIX), *ubo, *bindings, modelMatrix);
+      WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::VIEW_MATRIX), *ubo, *bindings, viewMatrix);
+      WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::PROJECTION_MATRIX), *ubo, *bindings, projectionMatrix);
+      WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::MVP_MATRIX), *ubo, *bindings, modelViewProjectionMatrix);
+      WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::MODEL_VIEW_MATRIX), *ubo, *bindings, modelViewMatrix);
+      WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::SIZE), *ubo, *bindings, size);
+      WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::COLOR), *ubo, *bindings, finalColor);
+
+      // Update normal matrix only when used in the shader
+      Matrix3 normalMatrix(modelViewMatrix);
+      normalMatrix.Invert();
+      normalMatrix.Transpose();
+      WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::NORMAL_MATRIX), *ubo, *bindings, normalMatrix);
+
+      commandBuffer->BindUniformBuffers(*bindings);
+    }
 
     bool drawn = false; // Draw can fail if there are no vertex buffers or they haven't been uploaded yet
                         // @todo We should detect this case much earlier to prevent unnecessary work
@@ -836,6 +948,132 @@ void Renderer::Render(Context&                                             conte
 
     mUpdated = false;
   }
+}
+
+template<class T>
+bool Renderer::WriteDefaultUniform(const Graphics::UniformInfo* uniformInfo, Render::UniformBuffer& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const T& data)
+{
+  if(uniformInfo)
+  {
+    WriteUniform(ubo, bindings, *uniformInfo, data);
+    return true;
+  }
+  return false;
+}
+
+template<class T>
+void Renderer::WriteUniform(Render::UniformBuffer& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const Graphics::UniformInfo& uniformInfo, const T& data)
+{
+  WriteUniform(ubo, bindings, uniformInfo, &data, sizeof(T));
+}
+
+void Renderer::WriteUniform(Render::UniformBuffer& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const Graphics::UniformInfo& uniformInfo, const void* data, uint32_t size)
+{
+  ubo.Write(data, size, bindings[uniformInfo.bufferIndex].offset + uniformInfo.offset);
+}
+
+void Renderer::FillUniformBuffers(Program&                                      program,
+                                  const SceneGraph::RenderInstruction&          instruction,
+                                  Render::UniformBuffer&                        ubo,
+                                  std::vector<Graphics::UniformBufferBinding>*& outBindings,
+                                  uint32_t&                                     offset,
+                                  BufferIndex                                   updateBufferIndex)
+{
+  auto& reflection = mGraphicsController->GetProgramReflection(program.GetGraphicsProgram());
+  auto  uboCount   = reflection.GetUniformBlockCount();
+
+  mUniformBufferBindings.resize(uboCount);
+
+  // Setup bindings
+  uint32_t dataOffset = offset;
+  for(auto i = 0u; i < uboCount; ++i)
+  {
+    mUniformBufferBindings[i].dataSize = reflection.GetUniformBlockSize(i);
+    mUniformBufferBindings[i].binding  = reflection.GetUniformBlockBinding(i);
+    mUniformBufferBindings[i].offset   = dataOffset;
+
+    dataOffset += GetUniformBufferDataAlignment(mUniformBufferBindings[i].dataSize);
+    mUniformBufferBindings[i].buffer = ubo.GetBuffer();
+
+    for(UniformIndexMappings::Iterator iter = mUniformIndexMap.Begin(),
+                                       end  = mUniformIndexMap.End();
+        iter != end;
+        ++iter)
+    {
+      // @todo This means parsing the uniform string every frame. Instead, store the array index if present.
+      int arrayIndex = (*iter).arrayIndex;
+
+      auto uniformInfo  = Graphics::UniformInfo{};
+      auto uniformFound = program.GetUniform((*iter).uniformName.GetCString(),
+                                             (*iter).uniformNameHashNoArray ? (*iter).uniformNameHashNoArray : (*iter).uniformNameHash,
+                                             uniformInfo);
+
+      if(uniformFound)
+      {
+        auto dst = mUniformBufferBindings[uniformInfo.bufferIndex].offset + uniformInfo.offset;
+
+        switch((*iter).propertyValue->GetType())
+        {
+          case Property::Type::FLOAT:
+          case Property::Type::INTEGER:
+          case Property::Type::BOOLEAN:
+          {
+            ubo.Write(&(*iter).propertyValue->GetFloat(updateBufferIndex),
+                      sizeof(float),
+                      dst + static_cast<uint32_t>(sizeof(Vector4)) * arrayIndex);
+            break;
+          }
+          case Property::Type::VECTOR2:
+          {
+            ubo.Write(&(*iter).propertyValue->GetVector2(updateBufferIndex),
+                      sizeof(Vector2),
+                      dst + static_cast<uint32_t>(sizeof(Vector4)) * arrayIndex);
+            break;
+          }
+          case Property::Type::VECTOR3:
+          {
+            ubo.Write(&(*iter).propertyValue->GetVector3(updateBufferIndex),
+                      sizeof(Vector3),
+                      dst + static_cast<uint32_t>(sizeof(Vector4)) * arrayIndex);
+            break;
+          }
+          case Property::Type::VECTOR4:
+          {
+            ubo.Write(&(*iter).propertyValue->GetVector4(updateBufferIndex),
+                      sizeof(Vector4),
+                      dst + static_cast<uint32_t>(sizeof(Vector4)) * arrayIndex);
+            break;
+          }
+          case Property::Type::MATRIX:
+          {
+            ubo.Write(&(*iter).propertyValue->GetMatrix(updateBufferIndex),
+                      sizeof(Matrix),
+                      dst + static_cast<uint32_t>(sizeof(Matrix)) * arrayIndex);
+            break;
+          }
+          case Property::Type::MATRIX3:
+          {
+            const auto& matrix = &(*iter).propertyValue->GetMatrix3(updateBufferIndex);
+            for(int i = 0; i < 3; ++i)
+            {
+              ubo.Write(&matrix->AsFloat()[i * 3],
+                        sizeof(float) * 3,
+                        dst + (i * static_cast<uint32_t>(sizeof(Vector4))));
+            }
+            break;
+          }
+          default:
+          {
+          }
+        }
+      }
+    }
+  }
+  // write output bindings
+  outBindings = &mUniformBufferBindings;
+
+  // Update offset
+  offset = dataOffset;
 }
 
 void Renderer::SetSortAttributes(BufferIndex                                             bufferIndex,

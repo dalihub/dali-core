@@ -21,10 +21,13 @@
 // EXTERNAL INCLUDES
 #include <cstring>
 #include <iomanip>
+#include <map>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/hash.h>
 #include <dali/graphics-api/graphics-controller.h>
 #include <dali/graphics-api/graphics-program.h>
+#include <dali/graphics-api/graphics-reflection.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/gl-defines.h>
 #include <dali/internal/common/shader-data.h>
@@ -34,6 +37,40 @@
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/dali-vector.h>
+
+namespace
+{
+void LogWithLineNumbers(const char* source)
+{
+  uint32_t    lineNumber = 0u;
+  const char* prev       = source;
+  const char* ptr        = prev;
+
+  while(true)
+  {
+    if(lineNumber > 200u)
+    {
+      break;
+    }
+    // seek the next end of line or end of text
+    while(*ptr != '\n' && *ptr != '\0')
+    {
+      ++ptr;
+    }
+
+    std::string line(prev, ptr - prev);
+    Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugError, "%4d %s\n", lineNumber, line.c_str());
+
+    if(*ptr == '\0')
+    {
+      break;
+    }
+    prev = ++ptr;
+    ++lineNumber;
+  }
+}
+
+} //namespace
 
 namespace Dali
 {
@@ -63,6 +100,20 @@ const char* const gStdUniforms[Program::UNIFORM_TYPE_LAST] =
     "uSize"          // UNIFORM_SIZE
 };
 
+/**
+ * List of all default uniforms used for quicker lookup
+ */
+std::array<size_t, 8> DEFAULT_UNIFORM_HASHTABLE =
+  {
+    CalculateHash(std::string("uModelMatrix")),
+    CalculateHash(std::string("uMvpMatrix")),
+    CalculateHash(std::string("uViewMatrix")),
+    CalculateHash(std::string("uModelView")),
+    CalculateHash(std::string("uNormalMatrix")),
+    CalculateHash(std::string("uProjection")),
+    CalculateHash(std::string("uSize")),
+    CalculateHash(std::string("uColor"))};
+
 } // namespace
 
 // IMPLEMENTATION
@@ -75,8 +126,9 @@ Program* Program::New(ProgramCache& cache, Internal::ShaderDataPtr shaderData, G
   // in order to maintain current functionality as long as needed
   gfxController.GetProgramParameter(*gfxProgram, 1, &programId);
 
-  size_t   shaderHash = programId;
-  Program* program    = cache.GetProgram(shaderHash);
+  size_t shaderHash = programId;
+
+  Program* program = cache.GetProgram(shaderHash);
 
   if(nullptr == program)
   {
@@ -85,6 +137,7 @@ Program* Program::New(ProgramCache& cache, Internal::ShaderDataPtr shaderData, G
     program->GetActiveSamplerUniforms();
     cache.AddProgram(shaderHash, program);
   }
+
   return program;
 }
 
@@ -617,6 +670,8 @@ Program::Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphi
   // Get program id and use it as hash for the cache
   // in order to maintain current functionality as long as needed
   mGfxController.GetProgramParameter(*mGfxProgram, 1, &mProgramId);
+
+  BuildReflection(controller.GetProgramReflection(*mGfxProgram.get()));
 }
 
 Program::~Program()
@@ -655,6 +710,123 @@ void Program::ResetAttribsUniformCache()
     mUniformCacheFloat4[i][2] = 0.0f;
     mUniformCacheFloat4[i][3] = 0.0f;
   }
+}
+
+void Program::BuildReflection(const Graphics::Reflection& graphicsReflection)
+{
+  mReflectionDefaultUniforms.clear();
+  mReflectionDefaultUniforms.resize(DEFAULT_UNIFORM_HASHTABLE.size());
+
+  auto uniformBlockCount = graphicsReflection.GetUniformBlockCount();
+
+  // add uniform block fields
+  for(auto i = 0u; i < uniformBlockCount; ++i)
+  {
+    Graphics::UniformBlockInfo uboInfo;
+    graphicsReflection.GetUniformBlock(i, uboInfo);
+
+    // for each member store data
+    for(const auto& item : uboInfo.members)
+    {
+      auto hashValue = CalculateHash(item.name);
+      mReflection.emplace_back(ReflectionUniformInfo{hashValue, false, item});
+
+      // update buffer index
+      mReflection.back().uniformInfo.bufferIndex = i;
+
+      // Update default uniforms
+      for(auto i = 0u; i < DEFAULT_UNIFORM_HASHTABLE.size(); ++i)
+      {
+        if(hashValue == DEFAULT_UNIFORM_HASHTABLE[i])
+        {
+          mReflectionDefaultUniforms[i] = mReflection.back();
+          break;
+        }
+      }
+    }
+  }
+
+  // add samplers
+  auto samplers = graphicsReflection.GetSamplers();
+  for(const auto& sampler : samplers)
+  {
+    mReflection.emplace_back(ReflectionUniformInfo{CalculateHash(sampler.name), false, sampler});
+  }
+
+  // check for potential collisions
+  std::map<size_t, bool> hashTest;
+  bool                   hasCollisions(false);
+  for(auto&& item : mReflection)
+  {
+    if(hashTest.find(item.hashValue) == hashTest.end())
+    {
+      hashTest[item.hashValue] = false;
+    }
+    else
+    {
+      hashTest[item.hashValue] = true;
+      hasCollisions            = true;
+    }
+  }
+
+  // update collision flag for further use
+  if(hasCollisions)
+  {
+    for(auto&& item : mReflection)
+    {
+      item.hasCollision = hashTest[item.hashValue];
+    }
+  }
+}
+
+bool Program::GetUniform(const std::string& name, size_t hashedName, Graphics::UniformInfo& out) const
+{
+  if(mReflection.empty())
+  {
+    return false;
+  }
+
+  hashedName = !hashedName ? CalculateHash(name) : hashedName;
+
+  for(const ReflectionUniformInfo& item : mReflection)
+  {
+    if(item.hashValue == hashedName)
+    {
+      if(!item.hasCollision || item.uniformInfo.name == name)
+      {
+        out = item.uniformInfo;
+        return true;
+      }
+      else
+      {
+        return false;
+      }
+    }
+  }
+  return false;
+}
+
+bool Program::GetDefaultUniform(DefaultUniformIndex defaultUniformIndex, Graphics::UniformInfo& out) const
+{
+  if(mReflectionDefaultUniforms.empty())
+  {
+    return false;
+  }
+
+  auto& value = mReflectionDefaultUniforms[static_cast<uint32_t>(defaultUniformIndex)];
+  out         = value.uniformInfo;
+  return true;
+}
+
+const Graphics::UniformInfo* Program::GetDefaultUniform(DefaultUniformIndex defaultUniformIndex) const
+{
+  if(mReflectionDefaultUniforms.empty())
+  {
+    return nullptr;
+  }
+
+  const auto value = &mReflectionDefaultUniforms[static_cast<uint32_t>(defaultUniformIndex)];
+  return &value->uniformInfo;
 }
 
 } // namespace Internal
