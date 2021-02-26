@@ -792,7 +792,8 @@ bool TestGraphicsController::PipelineEquals(const Graphics::Pipeline& pipeline0,
 bool TestGraphicsController::GetProgramParameter(Graphics::Program& program, uint32_t parameterId, void* outData )
 {
   mCallStack.PushCall("GetProgramParameter", "");
-  return false;
+  auto graphicsProgram = Uncast<TestGraphicsProgram>(&program);
+  return graphicsProgram->GetParameter(parameterId, outData);
 }
 
 } // namespace Dali

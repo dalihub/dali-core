@@ -23,6 +23,15 @@ TestGraphicsProgram::TestGraphicsProgram(TestGlAbstraction& gl, const Graphics::
   mCreateInfo(createInfo),
   mReflection(gl, vertexFormats)
 {
+  mId = 0;//mGl.CreateProgram();
 }
+
+bool TestGraphicsProgram::GetParameter(uint32_t parameterId, void* outData )
+{
+  reinterpret_cast<uint32_t*>(outData)[0] = mId;
+  return true;
+}
+
+
 
 } // namespace Dali

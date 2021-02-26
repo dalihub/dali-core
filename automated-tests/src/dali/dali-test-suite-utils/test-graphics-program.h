@@ -42,8 +42,11 @@ public:
     return mReflection;
   }
 
+  bool GetParameter(uint32_t parameterId, void* outData );
+
 public:
   TestGlAbstraction&          mGl;
+  uint32_t                    mId;
   Graphics::ProgramCreateInfo mCreateInfo;
   TestGraphicsReflection      mReflection;
 };
