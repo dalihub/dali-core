@@ -466,7 +466,6 @@ private:
   ProgramCache*        mProgramCache{};
   Render::ShaderCache* mShaderCache{};
 
-  Graphics::UniquePtr<Graphics::Program>  mGraphicsProgram{};  ///< The graphics program. (Cached implementation)
   Graphics::UniquePtr<Graphics::Pipeline> mGraphicsPipeline{}; ///< The graphics pipeline. (Cached implementation)
   std::vector<Graphics::ShaderState>      mShaderStates{};
 

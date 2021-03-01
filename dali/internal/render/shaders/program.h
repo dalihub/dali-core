@@ -112,7 +112,7 @@ public:
    * @param[in] modifiesGeometry True if the shader modifies geometry
    * @return pointer to the program
    */
-  static Program* New(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& gfxController, Graphics::Program& gfxProgram, bool modifiesGeometry);
+  static Program* New(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& gfxController, Graphics::UniquePtr<Graphics::Program>&& gfxProgram, bool modifiesGeometry);
 
   /**
    * Takes this program into use
@@ -313,15 +313,21 @@ public:
     return mProgramId;
   }
 
+  [[nodiscard]] Graphics::Program& GetGraphicsProgram() const
+  {
+    return *mGfxProgram;
+  }
+
 private: // Implementation
   /**
    * Constructor, private so no direct instantiation
    * @param[in] cache where the programs are stored
    * @param[in] shaderData A smart pointer to a data structure containing the program source and binary
-   * @param[in] programId A GL program id
+   * @param[in] gfxProgram Graphics Program object
+   * @param[in] gfxController Reference to Graphics Controller object
    * @param[in] modifiesGeometry True if the vertex shader changes geometry
    */
-  Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, uint32_t programId, bool modifiesGeometry);
+  Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& gfxController, Graphics::UniquePtr<Graphics::Program>&& gfxProgram, bool modifiesGeometry);
 
 public:
   /**
@@ -377,6 +383,8 @@ private:                                         // Data
   GLuint                      mVertexShaderId;   ///< GL identifier for vertex shader
   GLuint                      mFragmentShaderId; ///< GL identifier for fragment shader
   GLuint                      mProgramId;        ///< GL identifier for program
+  Graphics::UniquePtr<Graphics::Program> mGfxProgram; ///< Gfx program
+  Graphics::Controller&       mGfxController;    /// < Gfx controller
   Internal::ShaderDataPtr     mProgramData;      ///< Shader program source and binary (when compiled & linked or loaded)
 
   // location caches

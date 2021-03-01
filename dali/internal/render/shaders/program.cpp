@@ -100,13 +100,13 @@ const char* const gStdUniforms[Program::UNIFORM_TYPE_LAST] =
 
 // IMPLEMENTATION
 
-Program* Program::New(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& gfxController, Graphics::Program& gfxProgram, bool modifiesGeometry)
+Program* Program::New(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& gfxController, Graphics::UniquePtr<Graphics::Program>&& gfxProgram, bool modifiesGeometry)
 {
   uint32_t programId{0u};
 
   // Get program id and use it as hash for the cache
   // in order to maintain current functionality as long as needed
-  gfxController.GetProgramParameter( gfxProgram, 1, &programId );
+  gfxController.GetProgramParameter( *gfxProgram, 1, &programId );
 
   size_t   shaderHash = programId;
 
@@ -115,7 +115,7 @@ Program* Program::New(ProgramCache& cache, Internal::ShaderDataPtr shaderData, G
   if(nullptr == program)
   {
     // program not found so create it
-    program = new Program(cache, shaderData, programId, modifiesGeometry);
+    program = new Program(cache, shaderData, gfxController, std::move(gfxProgram), modifiesGeometry);
     program->Load();
     cache.AddProgram(shaderHash, program);
   }
@@ -632,7 +632,7 @@ bool Program::ModifiesGeometry()
   return mModifiesGeometry;
 }
 
-Program::Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, uint32_t programId, bool modifiesGeometry)
+Program::Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& controller, Graphics::UniquePtr<Graphics::Program>&& gfxProgram, bool modifiesGeometry)
 : mCache(cache),
   mGlAbstraction(mCache.GetGlAbstraction()),
   mProjectionMatrix(nullptr),
@@ -641,6 +641,8 @@ Program::Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, uint32
   mVertexShaderId(0),
   mFragmentShaderId(0),
   mProgramId(0),
+  mGfxProgram( std::move(gfxProgram)),
+  mGfxController( controller ),
   mProgramData(shaderData),
   mModifiesGeometry(modifiesGeometry)
 {
@@ -662,7 +664,9 @@ Program::Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, uint32
   // reset values
   ResetAttribsUniformCache();
 
-  mProgramId = programId;
+  // Get program id and use it as hash for the cache
+  // in order to maintain current functionality as long as needed
+  mGfxController.GetProgramParameter( *mGfxProgram, 1, &mProgramId );
   mLinked = true;
 }
 

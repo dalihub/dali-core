@@ -761,11 +761,11 @@ void Renderer::Render(Context&                                             conte
   auto createInfo = Graphics::ProgramCreateInfo();
   createInfo.SetShaderState(shaderStates);
 
-  mGraphicsProgram = mGraphicsController->CreateProgram(createInfo, std::move(mGraphicsProgram));
+  auto graphicsProgram = mGraphicsController->CreateProgram(createInfo, nullptr);
   Program* program = Program::New(*mProgramCache,
                                   shaderData,
                                   *mGraphicsController,
-                                  *mGraphicsProgram,
+                                  std::move(graphicsProgram),
                                   (shaderData->GetHints() & Dali::Shader::Hint::MODIFIES_GEOMETRY) != 0x0);
 
   if(!program)
@@ -911,7 +911,7 @@ Graphics::UniquePtr<Graphics::Pipeline> Renderer::PrepareGraphicsPipeline(
     mUpdateAttributeLocations = true;
   }
 
-  auto& reflection = mGraphicsController->GetProgramReflection(*mGraphicsProgram.get());
+  auto& reflection = mGraphicsController->GetProgramReflection(program.GetGraphicsProgram());
 
   /**
    * Bind Attributes
@@ -954,7 +954,7 @@ Graphics::UniquePtr<Graphics::Pipeline> Renderer::PrepareGraphicsPipeline(
   inputAssemblyState.SetTopology(mGeometry->GetTopology());
 
   // Get the program
-  programState.SetProgram(*mGraphicsProgram.get());
+  programState.SetProgram(program.GetGraphicsProgram());
 
   Graphics::RasterizationState rasterizationState{};
 
