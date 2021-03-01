@@ -488,16 +488,15 @@ void Renderer::SetUniformFromProperty(BufferIndex bufferIndex, Program& program,
 bool Renderer::BindTextures(Program& program, Graphics::CommandBuffer& commandBuffer, Vector<Graphics::Texture*>& boundTextures)
 {
   uint32_t textureUnit = 0;
-  bool     result      = true;
 
   GLint                          uniformLocation(-1);
   std::vector<Render::Sampler*>& samplers(mRenderDataProvider->GetSamplers());
   std::vector<Render::Texture*>& textures(mRenderDataProvider->GetTextures());
 
   std::vector<Graphics::TextureBinding> textureBindings;
-  for(uint32_t i = 0; i < static_cast<uint32_t>(textures.size()) && result; ++i) // not expecting more than uint32_t of textures
+  for(uint32_t i = 0; i < static_cast<uint32_t>(textures.size()); ++i) // not expecting more than uint32_t of textures
   {
-    if(textures[i])
+    if(textures[i] && textures[i]->GetGraphicsObject())
     {
       if(program.GetSamplerUniformLocation(i, uniformLocation))
       {
@@ -523,7 +522,8 @@ bool Renderer::BindTextures(Program& program, Graphics::CommandBuffer& commandBu
     commandBuffer.BindTextures(textureBindings);
   }
 
-  return result;
+  // @todo remove check from caller.
+  return true;
 }
 
 void Renderer::SetFaceCullingMode(FaceCullingMode::Type mode)
@@ -761,8 +761,8 @@ void Renderer::Render(Context&                                             conte
   auto createInfo = Graphics::ProgramCreateInfo();
   createInfo.SetShaderState(shaderStates);
 
-  auto graphicsProgram = mGraphicsController->CreateProgram(createInfo, nullptr);
-  Program* program = Program::New(*mProgramCache,
+  auto     graphicsProgram = mGraphicsController->CreateProgram(createInfo, nullptr);
+  Program* program         = Program::New(*mProgramCache,
                                   shaderData,
                                   *mGraphicsController,
                                   std::move(graphicsProgram),
