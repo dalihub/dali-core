@@ -24,10 +24,10 @@
 
 namespace Dali
 {
-class TestGraphicsProgram : public Graphics::Program
+class TestGraphicsProgramImpl
 {
 public:
-  TestGraphicsProgram(TestGlAbstraction& gl, const Graphics::ProgramCreateInfo& createInfo, Property::Array& vertexFormats);
+  TestGraphicsProgramImpl(TestGlAbstraction& gl, const Graphics::ProgramCreateInfo& createInfo, Property::Array& vertexFormats);
 
   // For API
   const TestGraphicsReflection& GetReflection() const
@@ -37,18 +37,42 @@ public:
   }
 
   // For tests
-  TestGraphicsReflection& GetProgamReflection()
+  TestGraphicsReflection& GetProgramReflection()
   {
     return mReflection;
   }
 
-  bool GetParameter(uint32_t parameterId, void* outData );
+  bool GetParameter(uint32_t parameterId, void* outData);
 
 public:
   TestGlAbstraction&          mGl;
   uint32_t                    mId;
   Graphics::ProgramCreateInfo mCreateInfo;
   TestGraphicsReflection      mReflection;
+};
+
+class TestGraphicsProgram : public Graphics::Program
+{
+public:
+  TestGraphicsProgram(TestGlAbstraction& gl, const Graphics::ProgramCreateInfo& createInfo, Property::Array& vertexFormats);
+  TestGraphicsProgram(TestGraphicsProgramImpl* impl);
+
+  const TestGraphicsReflection& GetReflection() const
+  {
+    return mImpl->GetReflection();
+  }
+  bool GetParameter(uint32_t parameterId, void* outData)
+  {
+    return mImpl->GetParameter(parameterId, outData);
+  }
+
+  TestGraphicsReflection& GetProgamReflection()
+  {
+    return mImpl->GetProgramReflection();
+  }
+
+public:
+  TestGraphicsProgramImpl* mImpl;
 };
 
 } // namespace Dali

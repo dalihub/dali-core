@@ -2496,7 +2496,7 @@ private:
 
   // Shaders & Uniforms
   GLuint                                 mLastShaderIdUsed;
-  GLuint                                 mLastProgramIdUsed;
+  GLuint                                 mLastProgramIdUsed{0u};
   GLuint                                 mLastUniformIdUsed;
   typedef std::map<std::string, GLint>   UniformIDMap;
   typedef std::map<GLuint, UniformIDMap> ProgramUniformMap;

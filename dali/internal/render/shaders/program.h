@@ -35,7 +35,7 @@ namespace Graphics
 {
 class Controller;
 class Program;
-}
+} // namespace Graphics
 class Matrix;
 
 namespace Integration
@@ -341,51 +341,19 @@ private:
   Program& operator=(const Program&); ///< assignment operator, not defined
 
   /**
-   * Load the shader, from a precompiled binary if available, else from source code
-   */
-  void Load();
-
-  /**
-   * Unload the shader
-   */
-  void Unload();
-
-  /**
-   * Compile the shader
-   * @param shaderType vertex or fragment shader
-   * @param shaderId of the shader, returned
-   * @param src of the shader
-   * @return true if the compilation succeeded
-   */
-  bool CompileShader(GLenum shaderType, GLuint& shaderId, const char* src);
-
-  /**
-   * Links the shaders together to create program
-   */
-  void Link();
-
-  /**
-   * Frees the shader programs
-   */
-  void FreeShaders();
-
-  /**
    * Resets caches
    */
   void ResetAttribsUniformCache();
 
-private:                                         // Data
-  ProgramCache&               mCache;            ///< The program cache
-  Integration::GlAbstraction& mGlAbstraction;    ///< The OpenGL Abstraction layer
-  const Matrix*               mProjectionMatrix; ///< currently set projection matrix
-  const Matrix*               mViewMatrix;       ///< currently set view matrix
-  bool                        mLinked;           ///< whether the program is linked
-  GLuint                      mVertexShaderId;   ///< GL identifier for vertex shader
-  GLuint                      mFragmentShaderId; ///< GL identifier for fragment shader
-  GLuint                      mProgramId;        ///< GL identifier for program
-  Graphics::UniquePtr<Graphics::Program> mGfxProgram; ///< Gfx program
-  Graphics::Controller&       mGfxController;    /// < Gfx controller
-  Internal::ShaderDataPtr     mProgramData;      ///< Shader program source and binary (when compiled & linked or loaded)
+private:                                                    // Data
+  ProgramCache&                          mCache;            ///< The program cache
+  Integration::GlAbstraction&            mGlAbstraction;    ///< The OpenGL Abstraction layer
+  const Matrix*                          mProjectionMatrix; ///< currently set projection matrix
+  const Matrix*                          mViewMatrix;       ///< currently set view matrix
+  GLuint                                 mProgramId;        ///< GL identifier for program
+  Graphics::UniquePtr<Graphics::Program> mGfxProgram;       ///< Gfx program
+  Graphics::Controller&                  mGfxController;    /// < Gfx controller
+  Internal::ShaderDataPtr                mProgramData;      ///< Shader program source and binary (when compiled & linked or loaded)
 
   // location caches
   using NameLocationPair = std::pair<ConstString, GLint>;

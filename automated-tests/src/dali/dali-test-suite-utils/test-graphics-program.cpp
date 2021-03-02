@@ -18,20 +18,29 @@
 
 namespace Dali
 {
-TestGraphicsProgram::TestGraphicsProgram(TestGlAbstraction& gl, const Graphics::ProgramCreateInfo& createInfo, Property::Array& vertexFormats)
+TestGraphicsProgramImpl::TestGraphicsProgramImpl(TestGlAbstraction& gl, const Graphics::ProgramCreateInfo& createInfo, Property::Array& vertexFormats)
 : mGl(gl),
   mCreateInfo(createInfo),
   mReflection(gl, vertexFormats)
 {
-  mId = 0;//mGl.CreateProgram();
+  mId = mGl.CreateProgram();
+  mGl.LinkProgram(1); // Ensure active sampler uniforms are set
 }
 
-bool TestGraphicsProgram::GetParameter(uint32_t parameterId, void* outData )
+bool TestGraphicsProgramImpl::GetParameter(uint32_t parameterId, void* outData)
 {
   reinterpret_cast<uint32_t*>(outData)[0] = mId;
   return true;
 }
 
+TestGraphicsProgram::TestGraphicsProgram(TestGlAbstraction& gl, const Graphics::ProgramCreateInfo& createInfo, Property::Array& vertexFormats)
+{
+  mImpl = new TestGraphicsProgramImpl(gl, createInfo, vertexFormats);
+}
 
+TestGraphicsProgram::TestGraphicsProgram(TestGraphicsProgramImpl* impl)
+{
+  mImpl = impl;
+}
 
 } // namespace Dali

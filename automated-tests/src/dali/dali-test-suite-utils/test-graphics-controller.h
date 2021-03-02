@@ -21,6 +21,7 @@
 #include "test-gl-abstraction.h"
 #include "test-gl-context-helper-abstraction.h"
 #include "test-gl-sync-abstraction.h"
+#include "test-graphics-program.h"
 #include "test-graphics-reflection.h"
 
 namespace Dali
@@ -313,7 +314,7 @@ public: // Test Functions
    * @param[out] outData Pointer to output memory
    * @return True on success
    */
-  bool GetProgramParameter(Graphics::Program& program, uint32_t parameterId, void* outData ) override;
+  bool GetProgramParameter(Graphics::Program& program, uint32_t parameterId, void* outData) override;
 
 public:
   mutable TraceCallStack                    mCallStack;
@@ -328,6 +329,13 @@ public:
   bool isDrawOnResumeRequiredResult{true};
 
   Property::Array mVertexFormats;
+
+  struct ProgramCache
+  {
+    std::map<Graphics::PipelineStage, const void*> shaders;
+    TestGraphicsProgramImpl*                       programImpl;
+  };
+  std::vector<ProgramCache> mProgramCache;
 };
 
 } // namespace Dali

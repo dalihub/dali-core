@@ -54,6 +54,12 @@ T* Uncast(const Graphics::Buffer* object)
   return const_cast<T*>(static_cast<const T*>(object));
 }
 
+template<typename T>
+T* Uncast(const Graphics::Shader* object)
+{
+  return const_cast<T*>(static_cast<const T*>(object));
+}
+
 std::ostream& operator<<(std::ostream& o, const Graphics::BufferCreateInfo& bufferCreateInfo)
 {
   return o << "usage:" << std::hex << bufferCreateInfo.usage << ", size:" << std::dec << bufferCreateInfo.size;
@@ -711,7 +717,33 @@ Graphics::UniquePtr<Graphics::Pipeline> TestGraphicsController::CreatePipeline(c
 Graphics::UniquePtr<Graphics::Program> TestGraphicsController::CreateProgram(const Graphics::ProgramCreateInfo& programCreateInfo, Graphics::UniquePtr<Graphics::Program>&& oldProgram)
 {
   mCallStack.PushCall("CreateProgram", "");
-  return Graphics::MakeUnique<TestGraphicsProgram>(mGl, programCreateInfo, mVertexFormats);
+
+  for(auto cacheEntry : mProgramCache)
+  {
+    bool found = true;
+    for(auto& shader : *(programCreateInfo.shaderState))
+    {
+      auto graphicsShader = Uncast<TestGraphicsShader>(shader.shader);
+      if(memcmp(cacheEntry.shaders[shader.pipelineStage], graphicsShader->mCreateInfo.sourceData, graphicsShader->mCreateInfo.sourceSize))
+      {
+        found = false;
+        break;
+      }
+    }
+    if(found)
+    {
+      return Graphics::MakeUnique<TestGraphicsProgram>(cacheEntry.programImpl);
+    }
+  }
+
+  mProgramCache.emplace_back();
+  mProgramCache.back().programImpl = new TestGraphicsProgramImpl(mGl, programCreateInfo, mVertexFormats);
+  for(auto& shader : *(programCreateInfo.shaderState))
+  {
+    auto graphicsShader                                = Uncast<TestGraphicsShader>(shader.shader);
+    mProgramCache.back().shaders[shader.pipelineStage] = graphicsShader->mCreateInfo.sourceData;
+  }
+  return Graphics::MakeUnique<TestGraphicsProgram>(mProgramCache.back().programImpl);
 }
 
 Graphics::UniquePtr<Graphics::Shader> TestGraphicsController::CreateShader(const Graphics::ShaderCreateInfo& shaderCreateInfo, Graphics::UniquePtr<Graphics::Shader>&& oldShader)
@@ -789,7 +821,7 @@ bool TestGraphicsController::PipelineEquals(const Graphics::Pipeline& pipeline0,
   return false;
 }
 
-bool TestGraphicsController::GetProgramParameter(Graphics::Program& program, uint32_t parameterId, void* outData )
+bool TestGraphicsController::GetProgramParameter(Graphics::Program& program, uint32_t parameterId, void* outData)
 {
   mCallStack.PushCall("GetProgramParameter", "");
   auto graphicsProgram = Uncast<TestGraphicsProgram>(&program);

@@ -23,6 +23,8 @@
 #include <iomanip>
 
 // INTERNAL INCLUDES
+#include <dali/graphics-api/graphics-controller.h>
+#include <dali/graphics-api/graphics-program.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/gl-defines.h>
 #include <dali/internal/common/shader-data.h>
@@ -32,41 +34,6 @@
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/dali-vector.h>
-#include <dali/graphics-api/graphics-program.h>
-#include <dali/graphics-api/graphics-controller.h>
-namespace
-{
-void LogWithLineNumbers(const char* source)
-{
-  uint32_t    lineNumber = 0u;
-  const char* prev       = source;
-  const char* ptr        = prev;
-
-  while(true)
-  {
-    if(lineNumber > 200u)
-    {
-      break;
-    }
-    // seek the next end of line or end of text
-    while(*ptr != '\n' && *ptr != '\0')
-    {
-      ++ptr;
-    }
-
-    std::string line(prev, ptr - prev);
-    Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugError, "%4d %s\n", lineNumber, line.c_str());
-
-    if(*ptr == '\0')
-    {
-      break;
-    }
-    prev = ++ptr;
-    ++lineNumber;
-  }
-}
-
-} //namespace
 
 namespace Dali
 {
@@ -106,35 +73,26 @@ Program* Program::New(ProgramCache& cache, Internal::ShaderDataPtr shaderData, G
 
   // Get program id and use it as hash for the cache
   // in order to maintain current functionality as long as needed
-  gfxController.GetProgramParameter( *gfxProgram, 1, &programId );
+  gfxController.GetProgramParameter(*gfxProgram, 1, &programId);
 
   size_t   shaderHash = programId;
-
   Program* program    = cache.GetProgram(shaderHash);
 
   if(nullptr == program)
   {
     // program not found so create it
     program = new Program(cache, shaderData, gfxController, std::move(gfxProgram), modifiesGeometry);
-    program->Load();
+    program->GetActiveSamplerUniforms();
     cache.AddProgram(shaderHash, program);
   }
   return program;
 }
 
-
 void Program::Use()
 {
-  if(mLinked)
-  {
-    if(this != mCache.GetCurrentProgram())
-    {
-      LOG_GL("UseProgram(%d)\n", mProgramId);
-      CHECK_GL(mGlAbstraction, mGlAbstraction.UseProgram(mProgramId));
-
-      mCache.SetCurrentProgram(this);
-    }
-  }
+  LOG_GL("UseProgram(%d)\n", mProgramId);
+  CHECK_GL(mGlAbstraction, mGlAbstraction.UseProgram(mProgramId));
+  mCache.SetCurrentProgram(this);
 }
 
 bool Program::IsUsed()
@@ -619,11 +577,6 @@ void Program::GlContextCreated()
 
 void Program::GlContextDestroyed()
 {
-  mLinked           = false;
-  mVertexShaderId   = 0;
-  mFragmentShaderId = 0;
-  mProgramId        = 0;
-
   ResetAttribsUniformCache();
 }
 
@@ -637,12 +590,9 @@ Program::Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphi
   mGlAbstraction(mCache.GetGlAbstraction()),
   mProjectionMatrix(nullptr),
   mViewMatrix(nullptr),
-  mLinked(false),
-  mVertexShaderId(0),
-  mFragmentShaderId(0),
   mProgramId(0),
-  mGfxProgram( std::move(gfxProgram)),
-  mGfxController( controller ),
+  mGfxProgram(std::move(gfxProgram)),
+  mGfxController(controller),
   mProgramData(shaderData),
   mModifiesGeometry(modifiesGeometry)
 {
@@ -666,237 +616,11 @@ Program::Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphi
 
   // Get program id and use it as hash for the cache
   // in order to maintain current functionality as long as needed
-  mGfxController.GetProgramParameter( *mGfxProgram, 1, &mProgramId );
-  mLinked = true;
+  mGfxController.GetProgramParameter(*mGfxProgram, 1, &mProgramId);
 }
 
 Program::~Program()
 {
-  Unload();
-}
-
-void Program::Load()
-{
-  // Temporary, exist if program id is already set
-  if(mProgramId)
-  {
-    GetActiveSamplerUniforms();
-    return;
-  }
-
-  DALI_ASSERT_ALWAYS(nullptr != mProgramData.Get() && "Program data is not initialized");
-  DALI_ASSERT_DEBUG(mProgramId == 0 && "mProgramId != 0, so about to leak a GL resource by overwriting it.");
-
-  LOG_GL("CreateProgram()\n");
-  mProgramId = CHECK_GL(mGlAbstraction, mGlAbstraction.CreateProgram());
-
-  GLint linked = GL_FALSE;
-
-  const bool binariesSupported = mCache.IsBinarySupported();
-
-  // if shader binaries are supported and ShaderData contains compiled bytecode?
-  if(binariesSupported && mProgramData->HasBinary())
-  {
-    DALI_LOG_INFO(Debug::Filter::gShader, Debug::General, "Program::Load() - Using Compiled Shader, Size = %d\n", mProgramData->GetBufferSize());
-
-    CHECK_GL(mGlAbstraction, mGlAbstraction.ProgramBinary(mProgramId, mCache.ProgramBinaryFormat(), mProgramData->GetBufferData(), static_cast<GLsizei>(mProgramData->GetBufferSize()))); // truncated
-
-    CHECK_GL(mGlAbstraction, mGlAbstraction.ValidateProgram(mProgramId));
-
-    GLint success;
-    CHECK_GL(mGlAbstraction, mGlAbstraction.GetProgramiv(mProgramId, GL_VALIDATE_STATUS, &success));
-
-    DALI_LOG_INFO(Debug::Filter::gShader, Debug::General, "ValidateProgram Status = %d\n", success);
-
-    CHECK_GL(mGlAbstraction, mGlAbstraction.GetProgramiv(mProgramId, GL_LINK_STATUS, &linked));
-
-    if(GL_FALSE == linked)
-    {
-      DALI_LOG_ERROR("Failed to load program binary \n");
-
-      GLint nLength;
-      CHECK_GL(mGlAbstraction, mGlAbstraction.GetProgramiv(mProgramId, GL_INFO_LOG_LENGTH, &nLength));
-      if(nLength > 0)
-      {
-        Dali::Vector<char> szLog;
-        szLog.Reserve(nLength); // Don't call Resize as we don't want to initialise the data, just reserve a buffer
-        CHECK_GL(mGlAbstraction, mGlAbstraction.GetProgramInfoLog(mProgramId, nLength, &nLength, szLog.Begin()));
-        DALI_LOG_ERROR("Program Link Error: %s\n", szLog.Begin());
-      }
-    }
-    else
-    {
-      mLinked = true;
-      DALI_LOG_INFO(Debug::Filter::gShader, Debug::General, "Reused binary.\n");
-    }
-  }
-
-  // Fall back to compiling and linking the vertex and fragment sources
-  if(GL_FALSE == linked)
-  {
-    DALI_LOG_INFO(Debug::Filter::gShader, Debug::General, "Program::Load() - Runtime compilation\n");
-    if(CompileShader(GL_VERTEX_SHADER, mVertexShaderId, mProgramData->GetVertexShader()))
-    {
-      if(CompileShader(GL_FRAGMENT_SHADER, mFragmentShaderId, mProgramData->GetFragmentShader()))
-      {
-        Link();
-
-        if(binariesSupported && mLinked)
-        {
-          GLint  binaryLength = 0;
-          GLenum binaryFormat;
-          DALI_LOG_INFO(Debug::Filter::gShader, Debug::General, "Compiled and linked.\n\nVS:\n%s\nFS:\n%s\n", mProgramData->GetVertexShader(), mProgramData->GetFragmentShader());
-
-          CHECK_GL(mGlAbstraction, mGlAbstraction.GetProgramiv(mProgramId, GL_PROGRAM_BINARY_LENGTH_OES, &binaryLength));
-          DALI_LOG_INFO(Debug::Filter::gShader, Debug::General, "Program::Load() - GL_PROGRAM_BINARY_LENGTH_OES: %d\n", binaryLength);
-          if(binaryLength > 0)
-          {
-            // Allocate space for the bytecode in ShaderData
-            mProgramData->AllocateBuffer(binaryLength);
-            // Copy the bytecode to ShaderData
-            CHECK_GL(mGlAbstraction, mGlAbstraction.GetProgramBinary(mProgramId, binaryLength, nullptr, &binaryFormat, mProgramData->GetBufferData()));
-            mCache.StoreBinary(mProgramData);
-            DALI_LOG_INFO(Debug::Filter::gShader, Debug::General, "Saved binary.\n");
-          }
-        }
-      }
-    }
-  }
-
-  GetActiveSamplerUniforms();
-
-  // No longer needed
-  FreeShaders();
-}
-
-void Program::Unload()
-{
-  // Bypass when using gfx program
-  if(!mProgramData && mProgramId)
-  {
-    return;
-  }
-  FreeShaders();
-
-  if(this == mCache.GetCurrentProgram())
-  {
-    CHECK_GL(mGlAbstraction, mGlAbstraction.UseProgram(0));
-
-    mCache.SetCurrentProgram(nullptr);
-  }
-
-  if(mProgramId)
-  {
-    LOG_GL("DeleteProgram(%d)\n", mProgramId);
-    CHECK_GL(mGlAbstraction, mGlAbstraction.DeleteProgram(mProgramId));
-    mProgramId = 0;
-  }
-
-  mLinked = false;
-}
-
-bool Program::CompileShader(GLenum shaderType, GLuint& shaderId, const char* src)
-{
-  // Bypass when using gfx program
-  if(!mProgramData && mProgramId)
-  {
-    return true;
-  }
-  if(!shaderId)
-  {
-    LOG_GL("CreateShader(%d)\n", shaderType);
-    shaderId = CHECK_GL(mGlAbstraction, mGlAbstraction.CreateShader(shaderType));
-    LOG_GL("AttachShader(%d,%d)\n", mProgramId, shaderId);
-    CHECK_GL(mGlAbstraction, mGlAbstraction.AttachShader(mProgramId, shaderId));
-  }
-
-  LOG_GL("ShaderSource(%d)\n", shaderId);
-  CHECK_GL(mGlAbstraction, mGlAbstraction.ShaderSource(shaderId, 1, &src, nullptr));
-
-  LOG_GL("CompileShader(%d)\n", shaderId);
-  CHECK_GL(mGlAbstraction, mGlAbstraction.CompileShader(shaderId));
-
-  GLint compiled;
-  LOG_GL("GetShaderiv(%d)\n", shaderId);
-  CHECK_GL(mGlAbstraction, mGlAbstraction.GetShaderiv(shaderId, GL_COMPILE_STATUS, &compiled));
-
-  if(compiled == GL_FALSE)
-  {
-    DALI_LOG_ERROR("Failed to compile shader\n");
-    LogWithLineNumbers(src);
-
-    GLint nLength;
-    mGlAbstraction.GetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &nLength);
-    if(nLength > 0)
-    {
-      Dali::Vector<char> szLog;
-      szLog.Reserve(nLength); // Don't call Resize as we don't want to initialise the data, just reserve a buffer
-      mGlAbstraction.GetShaderInfoLog(shaderId, nLength, &nLength, szLog.Begin());
-      DALI_LOG_ERROR("Shader Compiler Error: %s\n", szLog.Begin());
-    }
-
-    DALI_ASSERT_ALWAYS(0 && "Shader compilation failure");
-  }
-
-  return compiled != 0;
-}
-
-void Program::Link()
-{
-  // Bypass when using gfx program
-  if(!mProgramData && mProgramId)
-  {
-    return;
-  }
-  LOG_GL("LinkProgram(%d)\n", mProgramId);
-  CHECK_GL(mGlAbstraction, mGlAbstraction.LinkProgram(mProgramId));
-
-  GLint linked;
-  LOG_GL("GetProgramiv(%d)\n", mProgramId);
-  CHECK_GL(mGlAbstraction, mGlAbstraction.GetProgramiv(mProgramId, GL_LINK_STATUS, &linked));
-
-  if(linked == GL_FALSE)
-  {
-    DALI_LOG_ERROR("Shader failed to link \n");
-
-    GLint nLength;
-    mGlAbstraction.GetProgramiv(mProgramId, GL_INFO_LOG_LENGTH, &nLength);
-    if(nLength > 0)
-    {
-      Dali::Vector<char> szLog;
-      szLog.Reserve(nLength); // Don't call Resize as we don't want to initialise the data, just reserve a buffer
-      mGlAbstraction.GetProgramInfoLog(mProgramId, nLength, &nLength, szLog.Begin());
-      DALI_LOG_ERROR("Shader Link Error: %s\n", szLog.Begin());
-    }
-
-    DALI_ASSERT_ALWAYS(0 && "Shader linking failure");
-  }
-
-  mLinked = linked != GL_FALSE;
-}
-
-void Program::FreeShaders()
-{
-  // Bypass when using gfx program
-  if(!mProgramData && mProgramId)
-  {
-    return;
-  }
-  if(mVertexShaderId)
-  {
-    LOG_GL("DeleteShader(%d)\n", mVertexShaderId);
-    CHECK_GL(mGlAbstraction, mGlAbstraction.DetachShader(mProgramId, mVertexShaderId));
-    CHECK_GL(mGlAbstraction, mGlAbstraction.DeleteShader(mVertexShaderId));
-    mVertexShaderId = 0;
-  }
-
-  if(mFragmentShaderId)
-  {
-    LOG_GL("DeleteShader(%d)\n", mFragmentShaderId);
-    CHECK_GL(mGlAbstraction, mGlAbstraction.DetachShader(mProgramId, mFragmentShaderId));
-    CHECK_GL(mGlAbstraction, mGlAbstraction.DeleteShader(mFragmentShaderId));
-    mFragmentShaderId = 0;
-  }
 }
 
 void Program::ResetAttribsUniformCache()
