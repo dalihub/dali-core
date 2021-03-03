@@ -46,13 +46,6 @@ std::string ToString(float x)
 /**
  * Constructor
  */
-TraceCallStack::TraceCallStack(std::string prefix)
-: mTraceActive(false),
-  mLogging(false),
-  mPrefix(prefix)
-{
-}
-
 TraceCallStack::TraceCallStack(bool logging, std::string prefix)
 : mTraceActive(false),
   mLogging(logging),

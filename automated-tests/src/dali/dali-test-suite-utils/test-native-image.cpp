@@ -32,7 +32,8 @@ TestNativeImage::TestNativeImage(uint32_t width, uint32_t height)
   mExtensionCreateCalls(0),
   mExtensionDestroyCalls(0),
   mTargetTextureCalls(0),
-  createResult(true)
+  createResult(true),
+  mCallStack(true, "NativeImage::")
 {
   mCallStack.EnableLogging(true);
 }

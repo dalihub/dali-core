@@ -136,8 +136,10 @@ public:
   /**
    * Constructor
    */
-  TraceCallStack(std::string prefix = "gl");
-  TraceCallStack(bool logging, std::string prefix = "gl");
+  TraceCallStack(bool logging, std::string prefix);
+
+  TraceCallStack(const TraceCallStack&) = delete;
+  TraceCallStack(TraceCallStack&&)      = delete;
 
   /**
    * Destructor

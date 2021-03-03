@@ -116,7 +116,7 @@ public:
   int32_t                mTargetTextureCalls;
   uint32_t               mTargetTextureError{0u};
   bool                   createResult;
-  mutable TraceCallStack mCallStack{"NativeImage:"};
+  mutable TraceCallStack mCallStack;
 };
 
 } // namespace Dali

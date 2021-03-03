@@ -5106,8 +5106,7 @@ int UtcDaliActorRaiseToTopLowerToBottom(void)
 
   application.ProcessEvent(touchEvent);
 
-  glAbstraction.ResetSetUniformCallStack();
-  glSetUniformStack = glAbstraction.GetSetUniformTrace();
+  glSetUniformStack.Reset();
 
   application.SendNotification();
   application.Render();
@@ -5143,8 +5142,7 @@ int UtcDaliActorRaiseToTopLowerToBottom(void)
 
   application.ProcessEvent(touchEvent);
 
-  glAbstraction.ResetSetUniformCallStack();
-  glSetUniformStack = glAbstraction.GetSetUniformTrace();
+  glSetUniformStack.Reset();
 
   application.SendNotification();
   application.Render();
@@ -5191,8 +5189,7 @@ int UtcDaliActorRaiseToTopLowerToBottom(void)
 
   application.ProcessEvent(touchEvent);
 
-  glAbstraction.ResetSetUniformCallStack();
-  glSetUniformStack = glAbstraction.GetSetUniformTrace();
+  glSetUniformStack.Reset();
 
   application.SendNotification();
   application.Render();
@@ -5519,8 +5516,6 @@ int UtcDaliActorLowerBelow(void)
   application.SendNotification();
   application.Render();
 
-  glSetUniformStack = glAbstraction.GetSetUniformTrace();
-
   tet_printf("Trace:%s \n", glSetUniformStack.GetTraceString().c_str());
 
   // Test order of uniforms in stack
@@ -5573,8 +5568,7 @@ int UtcDaliActorLowerBelow(void)
 
   application.ProcessEvent(touchEvent); // touch event
 
-  glAbstraction.ResetSetUniformCallStack();
-  glSetUniformStack = glAbstraction.GetSetUniformTrace();
+  glSetUniformStack.Reset();
 
   application.SendNotification();
   application.Render();
@@ -5611,8 +5605,7 @@ int UtcDaliActorLowerBelow(void)
 
   application.ProcessEvent(touchEvent);
 
-  glAbstraction.ResetSetUniformCallStack();
-  glSetUniformStack = glAbstraction.GetSetUniformTrace();
+  glSetUniformStack.Reset();
 
   application.Render();
   tet_printf("Trace:%s \n", glSetUniformStack.GetTraceString().c_str());
@@ -5646,8 +5639,7 @@ int UtcDaliActorLowerBelow(void)
 
   application.ProcessEvent(touchEvent);
 
-  glAbstraction.ResetSetUniformCallStack();
-  glSetUniformStack = glAbstraction.GetSetUniformTrace();
+  glSetUniformStack.Reset();
 
   application.Render();
   tet_printf("Trace:%s \n", glSetUniformStack.GetTraceString().c_str());
@@ -5744,8 +5736,6 @@ int UtcDaliActorLowerBelow2(void)
   application.SendNotification();
   application.Render();
 
-  glSetUniformStack = glAbstraction.GetSetUniformTrace();
-
   tet_printf("Trace:%s \n", glSetUniformStack.GetTraceString().c_str());
 
   // Test order of uniforms in stack
@@ -5798,8 +5788,7 @@ int UtcDaliActorLowerBelow2(void)
 
   application.ProcessEvent(touchEvent); // touch event
 
-  glAbstraction.ResetSetUniformCallStack();
-  glSetUniformStack = glAbstraction.GetSetUniformTrace();
+  glSetUniformStack.Reset();
 
   application.SendNotification();
   application.Render();
@@ -5836,8 +5825,7 @@ int UtcDaliActorLowerBelow2(void)
 
   application.ProcessEvent(touchEvent);
 
-  glAbstraction.ResetSetUniformCallStack();
-  glSetUniformStack = glAbstraction.GetSetUniformTrace();
+  glSetUniformStack.Reset();
 
   application.Render();
   tet_printf("Trace:%s \n", glSetUniformStack.GetTraceString().c_str());
@@ -5871,8 +5859,7 @@ int UtcDaliActorLowerBelow2(void)
 
   application.ProcessEvent(touchEvent);
 
-  glAbstraction.ResetSetUniformCallStack();
-  glSetUniformStack = glAbstraction.GetSetUniformTrace();
+  glSetUniformStack.Reset();
 
   application.Render();
   tet_printf("Trace:%s \n", glSetUniformStack.GetTraceString().c_str());

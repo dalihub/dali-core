@@ -157,10 +157,10 @@ public:
     }
 
     std::stringstream out;
-    out << target << ", " << texture;
+    out << std::hex << target << ", " << std::dec << texture;
 
     TraceCallStack::NamedParams namedParams;
-    namedParams["target"] << target;
+    namedParams["target"] << std::hex << target;
     namedParams["texture"] << texture;
 
     mTextureTrace.PushCall("BindTexture", out.str(), namedParams);
@@ -829,6 +829,9 @@ public:
         *params = mNumberOfActiveUniforms;
         break;
       case GL_ACTIVE_UNIFORM_MAX_LENGTH:
+        *params = 100;
+        break;
+      case GL_ACTIVE_ATTRIBUTE_MAX_LENGTH:
         *params = 100;
         break;
     }
@@ -1580,7 +1583,12 @@ public:
 
   inline GLboolean UnmapBuffer(GLenum target) override
   {
-    return false;
+    if(mMappedBuffer)
+    {
+      free(mMappedBuffer);
+      mMappedBuffer = nullptr;
+    }
+    return true; // false indicates corruption, nothing else.
   }
 
   inline void GetBufferPointerv(GLenum target, GLenum pname, GLvoid** params) override
@@ -1629,7 +1637,8 @@ public:
 
   inline GLvoid* MapBufferRange(GLenum target, GLintptr offset, GLsizeiptr length, GLbitfield access) override
   {
-    return NULL;
+    mMappedBuffer = reinterpret_cast<GLvoid*>(malloc(offset + length));
+    return mMappedBuffer;
   }
 
   inline void FlushMappedBufferRange(GLenum target, GLintptr offset, GLsizeiptr length) override
@@ -2425,6 +2434,7 @@ private:
   GLuint                                mCompileStatus;
   BufferDataCalls                       mBufferDataCalls;
   BufferSubDataCalls                    mBufferSubDataCalls;
+  GLvoid*                               mMappedBuffer{nullptr};
   GLuint                                mLinkStatus;
   GLint                                 mNumberOfActiveUniforms;
   GLenum                                mGetErrorResult;

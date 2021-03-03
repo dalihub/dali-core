@@ -16,14 +16,23 @@
  */
 
 #include "test-gl-abstraction.h"
+#include "test-trace-call-stack.h"
 
 namespace Dali
 {
 TestGlAbstraction::TestGlAbstraction()
-: mBufferTrace(true, "gl"),
-  mTextureTrace(true, "gl"),
+: mBufferTrace(true, std::string("gl")),
+  mCullFaceTrace(true, "gl"),
+  mEnableDisableTrace(true, "gl"),
+  mShaderTrace(true, "gl"),
+  mTextureTrace(true, std::string("gl")),
   mTexParameterTrace(true, "gl"),
-  mDrawTrace(true, "gl")
+  mDrawTrace(true, "gl"),
+  mDepthFunctionTrace(true, "gl"),
+  mStencilFunctionTrace(true, "gl"),
+  mScissorTrace(true, "gl"),
+  mSetUniformTrace(true, "Uniform "),
+  mViewportTrace(true, "gl")
 {
   Initialize();
 }

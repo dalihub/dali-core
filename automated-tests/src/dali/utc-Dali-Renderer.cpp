@@ -1907,7 +1907,7 @@ int UtcDaliRendererRenderOrder2DLayer(void)
   for(unsigned int i(0); i < 4; ++i)
   {
     std::stringstream params;
-    params << GL_TEXTURE_2D << ", " << i + 1;
+    params << std::hex << GL_TEXTURE_2D << std::dec << ", " << i + 1;
     textureBindIndex[i] = gl.GetTextureTrace().FindIndexFromMethodAndParams("BindTexture", params.str());
   }
 
@@ -1975,7 +1975,7 @@ int UtcDaliRendererRenderOrder2DLayerMultipleRenderers(void)
   for(unsigned int i(0); i < 6; ++i)
   {
     std::stringstream params;
-    params << GL_TEXTURE_2D << ", " << i + 1;
+    params << std::hex << GL_TEXTURE_2D << std::dec << ", " << i + 1;
     textureBindIndex[i] = gl.GetTextureTrace().FindIndexFromMethodAndParams("BindTexture", params.str());
   }
 
@@ -2064,7 +2064,7 @@ int UtcDaliRendererRenderOrder2DLayerSiblingOrder(void)
   for(unsigned int i(0); i < 6; ++i)
   {
     std::stringstream params;
-    params << GL_TEXTURE_2D << ", " << i + 1;
+    params << std::hex << GL_TEXTURE_2D << std::dec << ", " << i + 1;
     textureBindIndex[i] = gl.GetTextureTrace().FindIndexFromMethodAndParams("BindTexture", params.str());
   }
 
@@ -2086,7 +2086,7 @@ int UtcDaliRendererRenderOrder2DLayerSiblingOrder(void)
   for(unsigned int i(0); i < 6; ++i)
   {
     std::stringstream params;
-    params << GL_TEXTURE_2D << ", " << i + 1;
+    params << std::hex << GL_TEXTURE_2D << std::dec << ", " << i + 1;
     textureBindIndex[i] = gl.GetTextureTrace().FindIndexFromMethodAndParams("BindTexture", params.str());
   }
 
@@ -2166,7 +2166,7 @@ int UtcDaliRendererRenderOrder2DLayerOverlay(void)
   for(unsigned int i(0); i < 5; ++i)
   {
     std::stringstream params;
-    params << GL_TEXTURE_2D << ", " << i + 1;
+    params << std::hex << GL_TEXTURE_2D << std::dec << ", " << i + 1;
     textureBindIndex[i] = gl.GetTextureTrace().FindIndexFromMethodAndParams("BindTexture", params.str());
   }
 
