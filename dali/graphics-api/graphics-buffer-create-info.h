@@ -81,6 +81,20 @@ struct BufferCreateInfo
   }
 
   /**
+   * @brief Sets properties flags
+   *
+   * Properties flag bits can alter behaviour of the implementation
+   *
+   * @param[in] value Flags
+   * @return reference to this structure
+   */
+  auto& SetBufferPropertiesFlags( BufferPropertiesFlags value )
+  {
+    propertiesFlags = value;
+    return *this;
+  }
+
+  /**
    * @brief Sets allocation callbacks which will be used when object is created
    * and destroyed.
    *
@@ -97,7 +111,7 @@ struct BufferCreateInfo
   ExtensionCreateInfo*  nextExtension{nullptr};
   BufferUsageFlags      usage{};
   uint32_t              size{0u};
-
+  BufferPropertiesFlags propertiesFlags{};
   const AllocationCallbacks* allocationCallbacks{nullptr};
 };
 

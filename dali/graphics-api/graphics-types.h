@@ -872,6 +872,28 @@ inline BufferUsageFlags operator|(BufferUsageFlags flags, BufferUsage usage)
 }
 
 /**
+ * @brief Buffer property bits
+ *
+ * Use these bits to set BufferPropertiesFlags.
+ */
+enum class BufferPropertiesFlagBit : uint32_t
+{
+  CPU_ALLOCATED = 1 << 0, ///< Buffer is allocated on the CPU side
+  TRANSIENT_MEMORY = 1 << 1, ///< Buffer memory will be short-lived
+};
+
+/**
+ * @brief BufferPropetiesFlags alters behaviour of implementation
+ */
+using BufferPropertiesFlags = uint32_t;
+
+inline BufferPropertiesFlags operator|(BufferPropertiesFlags flags, BufferPropertiesFlagBit usage)
+{
+  flags |= static_cast<uint32_t>(usage);
+  return flags;
+}
+
+/**
  * @brief The structure describes memory requirements of GPU resource (texture, buffer)
  */
 struct MemoryRequirements

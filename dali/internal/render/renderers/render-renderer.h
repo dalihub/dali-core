@@ -491,6 +491,8 @@ private:
   Context*          mContext;
   Render::Geometry* mGeometry;
 
+  Graphics::UniquePtr<Graphics::CommandBuffer> mGraphicsCommandBuffer{};
+
   ProgramCache*        mProgramCache{};
   Render::ShaderCache* mShaderCache{};
 

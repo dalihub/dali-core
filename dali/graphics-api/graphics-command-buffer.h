@@ -263,7 +263,7 @@ public:
    * It is useful if the command buffer has to be re-recorded frequently, for example,
    * every frame.
    */
-  virtual void Reset(CommandBuffer& commandBuffer) = 0;
+  virtual void Reset() = 0;
 
   /**
    * @brief Changes scissor rect

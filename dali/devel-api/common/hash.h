@@ -47,6 +47,14 @@ DALI_CORE_API std::size_t CalculateHash(const std::string& toHash);
  */
 DALI_CORE_API std::size_t CalculateHash(const std::string& string1, const std::string& string2);
 
+/**
+ * @brief Create a hash code for a string
+ * @param toHash string to hash
+ * @param terminator character terminating the hashing
+ * @return hash code
+ */
+DALI_CORE_API std::size_t CalculateHash(const std::string& toHash, char terminator);
+
 } // namespace Dali
 
 #endif // DALI_HASH

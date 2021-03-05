@@ -38,40 +38,6 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/dali-vector.h>
 
-namespace
-{
-void LogWithLineNumbers(const char* source)
-{
-  uint32_t    lineNumber = 0u;
-  const char* prev       = source;
-  const char* ptr        = prev;
-
-  while(true)
-  {
-    if(lineNumber > 200u)
-    {
-      break;
-    }
-    // seek the next end of line or end of text
-    while(*ptr != '\n' && *ptr != '\0')
-    {
-      ++ptr;
-    }
-
-    std::string line(prev, ptr - prev);
-    Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugError, "%4d %s\n", lineNumber, line.c_str());
-
-    if(*ptr == '\0')
-    {
-      break;
-    }
-    prev = ++ptr;
-    ++lineNumber;
-  }
-}
-
-} //namespace
-
 namespace Dali
 {
 namespace Internal
@@ -786,7 +752,7 @@ bool Program::GetUniform(const std::string& name, size_t hashedName, Graphics::U
     return false;
   }
 
-  hashedName = !hashedName ? CalculateHash(name) : hashedName;
+  hashedName = !hashedName ? CalculateHash(name, '[') : hashedName;
 
   for(const ReflectionUniformInfo& item : mReflection)
   {

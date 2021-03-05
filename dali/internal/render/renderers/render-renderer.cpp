@@ -752,11 +752,19 @@ void Renderer::Render(Context&                                             conte
   {
     return;
   }
+  if(!mGraphicsCommandBuffer)
+  {
+    mGraphicsCommandBuffer = mGraphicsController->CreateCommandBuffer(
+      Graphics::CommandBufferCreateInfo()
+        .SetLevel(Graphics::CommandBufferLevel::SECONDARY),
+      nullptr);
+  }
+  else
+  {
+    mGraphicsCommandBuffer->Reset();
+  }
 
-  Graphics::UniquePtr<Graphics::CommandBuffer> commandBuffer = mGraphicsController->CreateCommandBuffer(
-    Graphics::CommandBufferCreateInfo()
-      .SetLevel(Graphics::CommandBufferLevel::SECONDARY),
-    nullptr);
+  auto& commandBuffer = mGraphicsCommandBuffer;
 
   //Set blending mode
   if(!mDrawCommands.empty())
@@ -953,7 +961,7 @@ void Renderer::Render(Context&                                             conte
 template<class T>
 bool Renderer::WriteDefaultUniform(const Graphics::UniformInfo* uniformInfo, Render::UniformBuffer& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const T& data)
 {
-  if(uniformInfo)
+  if(uniformInfo && !uniformInfo->name.empty())
   {
     WriteUniform(ubo, bindings, *uniformInfo, data);
     return true;
@@ -1014,27 +1022,39 @@ void Renderer::FillUniformBuffers(Program&                                      
 
         switch((*iter).propertyValue->GetType())
         {
-          case Property::Type::FLOAT:
-          case Property::Type::INTEGER:
           case Property::Type::BOOLEAN:
+          {
+            ubo.Write(&(*iter).propertyValue->GetBoolean(updateBufferIndex),
+                      sizeof(bool),
+                      dst + static_cast<uint32_t>(sizeof(bool)) * arrayIndex);
+            break;
+          }
+          case Property::Type::INTEGER:
+          {
+            ubo.Write(&(*iter).propertyValue->GetInteger(updateBufferIndex),
+                      sizeof(int32_t),
+                      dst + static_cast<int32_t>(sizeof(int32_t)) * arrayIndex);
+            break;
+          }
+          case Property::Type::FLOAT:
           {
             ubo.Write(&(*iter).propertyValue->GetFloat(updateBufferIndex),
                       sizeof(float),
-                      dst + static_cast<uint32_t>(sizeof(Vector4)) * arrayIndex);
+                      dst + static_cast<uint32_t>(sizeof(float)) * arrayIndex);
             break;
           }
           case Property::Type::VECTOR2:
           {
             ubo.Write(&(*iter).propertyValue->GetVector2(updateBufferIndex),
                       sizeof(Vector2),
-                      dst + static_cast<uint32_t>(sizeof(Vector4)) * arrayIndex);
+                      dst + static_cast<uint32_t>(sizeof(Vector2)) * arrayIndex);
             break;
           }
           case Property::Type::VECTOR3:
           {
             ubo.Write(&(*iter).propertyValue->GetVector3(updateBufferIndex),
                       sizeof(Vector3),
-                      dst + static_cast<uint32_t>(sizeof(Vector4)) * arrayIndex);
+                      dst + static_cast<uint32_t>(sizeof(Vector3)) * arrayIndex);
             break;
           }
           case Property::Type::VECTOR4:
@@ -1053,13 +1073,20 @@ void Renderer::FillUniformBuffers(Program&                                      
           }
           case Property::Type::MATRIX3:
           {
-            const auto& matrix = &(*iter).propertyValue->GetMatrix3(updateBufferIndex);
-            for(int i = 0; i < 3; ++i)
-            {
-              ubo.Write(&matrix->AsFloat()[i * 3],
-                        sizeof(float) * 3,
-                        dst + (i * static_cast<uint32_t>(sizeof(Vector4))));
-            }
+            // todo: handle data padding properly
+            // Vulkan:
+            //
+            //const auto& matrix = &(*iter).propertyValue->GetMatrix3(updateBufferIndex);
+            //for(int i = 0; i < 3; ++i)
+            //{
+              //ubo.Write(&matrix->AsFloat()[i * 3],
+              //          sizeof(float) * 3,
+              //          dst + (i * static_cast<uint32_t>(sizeof(Vector4))));
+            //}
+            // GL:
+            ubo.Write(&(*iter).propertyValue->GetMatrix3(updateBufferIndex),
+                      sizeof(Matrix3),
+                      dst + static_cast<uint32_t>(sizeof(Matrix3)) * arrayIndex);
             break;
           }
           default:

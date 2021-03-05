@@ -61,7 +61,7 @@ public:
       auto pos0  = theUniformName.GetStringView().rfind("[", pos);
       arrayIndex = atoi(theUniformName.GetCString() + pos0 + 1);
       // Calculate hash from name without array index
-      uniformNameHashNoArray = Dali::CalculateHash(theUniformName.GetStringView().substr(0, pos0).data());
+      uniformNameHashNoArray = Dali::CalculateHash(theUniformName.GetStringView().substr(0, pos0).data(), '[');
     }
     uniformName     = theUniformName;
     uniformNameHash = Dali::CalculateHash(theUniformName.GetCString());

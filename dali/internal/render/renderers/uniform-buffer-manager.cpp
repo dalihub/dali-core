@@ -70,10 +70,12 @@ void UniformBuffer::Reserve(uint32_t size)
 
   mSize = size;
 
-  Graphics::BufferCreateInfo createInfo;
-  createInfo.SetSize(mSize);
-  createInfo.SetUsage(mUsageFlags);
-  mBuffer = std::move(mController->CreateBuffer(createInfo, std::move(mBuffer)));
+  auto createInfo = Graphics::BufferCreateInfo()
+    .SetSize(mSize)
+    .SetBufferPropertiesFlags( 0 | Graphics::BufferPropertiesFlagBit::CPU_ALLOCATED )
+    .SetUsage(mUsageFlags);
+
+  mBuffer = mController->CreateBuffer(createInfo, std::move(mBuffer));
 
   mMapBufferInfo.buffer = mBuffer.get();
   mMapBufferInfo.usage  = 0 | Graphics::MemoryUsageFlagBits::WRITE;
