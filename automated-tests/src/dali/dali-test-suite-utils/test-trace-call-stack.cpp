@@ -16,9 +16,9 @@
  */
 
 #include "test-trace-call-stack.h"
-
 #include <iostream>
 #include <sstream>
+#include "dali-test-suite-utils.h"
 
 namespace Dali
 {
@@ -255,6 +255,45 @@ int TraceCallStack::FindIndexFromMethodAndParams(std::string method, const Trace
   return index;
 }
 
+const TraceCallStack::NamedParams* TraceCallStack::FindLastMatch(std::string method, const TraceCallStack::NamedParams& params) const
+{
+  int index = -1;
+
+  if(mCallStack.size() > 0)
+  {
+    for(index = static_cast<int>(mCallStack.size() - 1); index >= 0; --index)
+    {
+      if(0 == mCallStack[index].method.compare(method))
+      {
+        // Test each of the passed in parameters:
+        bool match = true;
+
+        for(auto iter = params.mParams.begin(); iter != params.mParams.end(); ++iter)
+        {
+          auto        paramIter = mCallStack[index].namedParams.find(iter->parameterName);
+          std::string value     = paramIter->value.str();
+          std::string iValue    = iter->value.str();
+
+          if(paramIter == mCallStack[index].namedParams.end() || value.compare(iValue))
+          {
+            match = false;
+            break;
+          }
+        }
+        if(match == true)
+        {
+          break;
+        }
+      }
+    }
+  }
+  if(index >= 0)
+  {
+    return &mCallStack[index].namedParams;
+  }
+  return nullptr;
+}
+
 /**
  * Test if the given method and parameters are at a given index in the stack
  * @param[in] index Index in the call stack
@@ -272,6 +311,19 @@ bool TraceCallStack::TestMethodAndParams(int index, std::string method, std::str
 void TraceCallStack::Reset()
 {
   mCallStack.clear();
+}
+
+bool TraceCallStack::NamedParams::NameValue::operator==(int match) const
+{
+  std::ostringstream matchStr;
+  matchStr << match;
+  std::string valueStr = value.str();
+  bool        retval   = !valueStr.compare(matchStr.str());
+  if(!retval)
+  {
+    tet_printf("Comparing parameter \"%s\": %s with %s failed\n", parameterName.c_str(), value.str().c_str(), matchStr.str().c_str());
+  }
+  return retval;
 }
 
 } // namespace Dali

@@ -73,6 +73,8 @@ public:
       {
         return !parameterName.compare(rhs.parameterName) && !value.str().compare(rhs.value.str());
       }
+
+      bool operator==(int match) const;
     };
 
     auto find(const std::string& param) const
@@ -238,6 +240,14 @@ public:
   int FindIndexFromMethodAndParams(std::string method, const NamedParams& params) const;
 
   /**
+   * Search for the most recent occurrence of the method with the given (partial) parameters.
+   * @param[in] method The name of the method
+   * @param[in] params A map of named parameter values to match
+   * @return The full named parameters of the matching call.
+   */
+  const NamedParams* FindLastMatch(std::string method, const TraceCallStack::NamedParams& params) const;
+
+  /**
    * Test if the given method and parameters are at a given index in the stack
    * @param[in] index Index in the call stack
    * @param[in] method Name of method to test
@@ -267,7 +277,7 @@ public:
     return traceStream.str();
   }
 
-private:
+public:
   bool        mTraceActive{false}; ///< True if the trace is active
   bool        mLogging{false};     ///< True if the trace is logged to stdout
   std::string mPrefix;

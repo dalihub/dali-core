@@ -1181,16 +1181,10 @@ public:
     out << std::hex << target << ", " << pname << ", " << param;
     std::string params = out.str();
 
-    out.str("");
-    out << std::hex << target;
     TraceCallStack::NamedParams namedParams;
-    namedParams["target"] << out.str();
-    out.str("");
-    out << std::hex << pname;
-    namedParams["pname"] << out.str();
-    out.str("");
-    out << std::hex << param;
-    namedParams["param"] << out.str();
+    namedParams["target"] << std::hex << target;
+    namedParams["pname"] << std::hex << pname;
+    namedParams["param"] << param;
     mTexParameterTrace.PushCall("TexParameteri", params, namedParams);
   }
 
