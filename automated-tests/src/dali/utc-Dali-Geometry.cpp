@@ -202,7 +202,7 @@ int UtcDaliGeometryAddVertexBuffer(void)
     const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
       application.GetGlAbstraction().GetBufferDataCalls();
 
-    DALI_TEST_EQUALS(bufferDataCalls.size(), 1u, TEST_LOCATION);
+    DALI_TEST_EQUALS(bufferDataCalls.size(), 3u, TEST_LOCATION);
 
     DALI_TEST_EQUALS(bufferDataCalls[0], 4 * sizeof(TexturedQuadVertex), TEST_LOCATION);
   }
@@ -322,7 +322,7 @@ int UtcDaliGeometrySetIndexBuffer(void)
     const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
       application.GetGlAbstraction().GetBufferDataCalls();
 
-    DALI_TEST_EQUALS(bufferDataCalls.size(), 1u, TEST_LOCATION);
+    DALI_TEST_EQUALS(bufferDataCalls.size(), 3u, TEST_LOCATION);
 
     DALI_TEST_EQUALS(bufferDataCalls[0], 4 * sizeof(TexturedQuadVertex), TEST_LOCATION);
   }

@@ -191,7 +191,7 @@ int UtcDaliVertexBufferSetData01(void)
     const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
       application.GetGlAbstraction().GetBufferDataCalls();
 
-    DALI_TEST_EQUALS(bufferDataCalls.size(), 1u, TEST_LOCATION);
+    DALI_TEST_EQUALS(bufferDataCalls.size(), 3u, TEST_LOCATION);
 
     DALI_TEST_EQUALS(bufferDataCalls[0], sizeof(texturedQuadVertexData), TEST_LOCATION);
   }
@@ -244,7 +244,7 @@ int UtcDaliVertexBufferSetData02(void)
     const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
       application.GetGlAbstraction().GetBufferDataCalls();
 
-    DALI_TEST_EQUALS(bufferDataCalls.size(), 1u, TEST_LOCATION);
+    DALI_TEST_EQUALS(bufferDataCalls.size(), 2u, TEST_LOCATION);
 
     DALI_TEST_EQUALS(bufferDataCalls[0], sizeof(texturedQuadVertexData), TEST_LOCATION);
   }
@@ -262,8 +262,9 @@ int UtcDaliVertexBufferSetData02(void)
     const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
       application.GetGlAbstraction().GetBufferDataCalls();
 
-    DALI_TEST_EQUALS(bufferSubDataCalls.size(), 1u, TEST_LOCATION);
-    DALI_TEST_EQUALS(bufferDataCalls.size(), 1u, TEST_LOCATION);
+    // test below includes updates of uniform buffers
+    DALI_TEST_EQUALS(bufferSubDataCalls.size(), 17u, TEST_LOCATION);
+    DALI_TEST_EQUALS(bufferDataCalls.size(), 3u, TEST_LOCATION);
 
     if(bufferSubDataCalls.size())
     {

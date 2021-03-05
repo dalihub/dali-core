@@ -16,11 +16,52 @@
 
 #include "test-graphics-reflection.h"
 #include <dali/public-api/object/property-map.h>
-
+#include <vector>
+#include <string>
 namespace Dali
 {
+namespace
+{
+// Add members
+struct UniformData
+{
+  std::string     name;
+  Property::Type  type;
+  UniformData( const std::string& name, Property::Type type = Property::Type::NONE)
+  : name(name), type(type)
+  {}
+};
+static const std::vector<UniformData> UNIFORMS =
+                                        {
+                                          UniformData("uRendererColor",Property::Type::FLOAT),
+                                          UniformData("uCustom", Property::Type::INTEGER),
+                                          UniformData("uCustom3", Property::Type::VECTOR3),
+                                          UniformData("uFadeColor", Property::Type::VECTOR4),
+                                          UniformData("uUniform1", Property::Type::VECTOR4),
+                                          UniformData("uUniform2", Property::Type::VECTOR4),
+                                          UniformData("uUniform3", Property::Type::VECTOR4),
+                                          UniformData("uFadeProgress", Property::Type::FLOAT),
+                                          UniformData("uANormalMatrix", Property::Type::MATRIX3),
+                                          UniformData("sEffect", Property::Type::FLOAT),
+                                          UniformData("sTexture", Property::Type::FLOAT),
+                                          UniformData("sTextureRect", Property::Type::FLOAT),
+                                          UniformData("sGloss", Property::Type::FLOAT),
+                                          UniformData("uColor", Property::Type::VECTOR4),
+                                          UniformData("uModelMatrix", Property::Type::MATRIX),
+                                          UniformData("uModelView", Property::Type::MATRIX),
+                                          UniformData("uMvpMatrix", Property::Type::MATRIX),
+                                          UniformData("uNormalMatrix", Property::Type::MATRIX3),
+                                          UniformData("uProjection", Property::Type::MATRIX),
+                                          UniformData("uSize", Property::Type::VECTOR3),
+                                          UniformData("uViewMatrix", Property::Type::MATRIX),
+                                          UniformData("uLightCameraProjectionMatrix", Property::Type::MATRIX),
+                                          UniformData("uLightCameraViewMatrix", Property::Type::MATRIX),
+
+                                        };
+}
+
 TestGraphicsReflection::TestGraphicsReflection(TestGlAbstraction& gl, Property::Array& vfs)
-: mGl(gl)
+  : mGl(gl)
 {
   for(Property::Array::SizeType i = 0; i < vfs.Count(); ++i)
   {
@@ -78,7 +119,7 @@ std::vector<uint32_t> TestGraphicsReflection::GetVertexAttributeLocations() cons
 
 uint32_t TestGraphicsReflection::GetUniformBlockCount() const
 {
-  return 0u;
+  return 1u;
 }
 
 uint32_t TestGraphicsReflection::GetUniformBlockBinding(uint32_t index) const
@@ -88,11 +129,32 @@ uint32_t TestGraphicsReflection::GetUniformBlockBinding(uint32_t index) const
 
 uint32_t TestGraphicsReflection::GetUniformBlockSize(uint32_t index) const
 {
-  return 0u;
+  // 64 bytes per uniform (64 = 4x4 matrix)
+  // TODO: fix if array will be used
+  return 64 * UNIFORMS.size();
 }
 
 bool TestGraphicsReflection::GetUniformBlock(uint32_t index, Dali::Graphics::UniformBlockInfo& out) const
 {
+  auto& info = out;
+  info.name = "";
+  info.members = {};
+  info.binding = 0;
+  info.size = 64 * UNIFORMS.size();
+  info.descriptorSet = 0;
+  info.members.clear();
+  int loc = 0;
+  for( const auto& data : UNIFORMS )
+  {
+    info.members.emplace_back();
+    auto& item = info.members.back();
+    item.name = data.name;
+    item.binding = 0;
+    item.offset = loc*64;
+    item.location = loc++;
+    item.bufferIndex = 0;
+    item.uniformClass = Graphics::UniformClass::UNIFORM;
+  }
   return true;
 }
 
@@ -108,12 +170,12 @@ std::string TestGraphicsReflection::GetUniformBlockName(uint32_t blockIndex) con
 
 uint32_t TestGraphicsReflection::GetUniformBlockMemberCount(uint32_t blockIndex) const
 {
-  return 0u;
+  return UNIFORMS.size();
 }
 
 std::string TestGraphicsReflection::GetUniformBlockMemberName(uint32_t blockIndex, uint32_t memberLocation) const
 {
-  return std::string{};
+  return UNIFORMS[memberLocation].name;
 }
 
 uint32_t TestGraphicsReflection::GetUniformBlockMemberOffset(uint32_t blockIndex, uint32_t memberLocation) const
@@ -134,6 +196,11 @@ std::vector<Dali::Graphics::UniformInfo> TestGraphicsReflection::GetSamplers() c
 Graphics::ShaderLanguage TestGraphicsReflection::GetLanguage() const
 {
   return Graphics::ShaderLanguage::GLSL_3_1;
+}
+
+Dali::Property::Type TestGraphicsReflection::GetMemberType( int blockIndex, int location) const
+{
+  return UNIFORMS[location].type;
 }
 
 } // namespace Dali

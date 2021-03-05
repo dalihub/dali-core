@@ -458,121 +458,157 @@ void TestGraphicsController::SubmitCommandBuffers(const Graphics::SubmitInfo& su
   for(auto& graphicsCommandBuffer : submitInfo.cmdBuffer)
   {
     auto commandBuffer = Uncast<TestGraphicsCommandBuffer>(graphicsCommandBuffer);
-    for(auto& binding : commandBuffer->mTextureBindings)
+
+    auto value = commandBuffer->GetCommandsByType(0 | CommandType::BIND_TEXTURES);
+    if(!value.empty())
     {
-      if(binding.texture)
+      // must be fixed
+      for (auto &binding : value[0]->bindTextures.textureBindings)
       {
-        auto texture = Uncast<TestGraphicsTexture>(binding.texture);
-
-        texture->Bind(binding.binding);
-
-        if(binding.sampler)
+        if (binding.texture)
         {
-          auto sampler = Uncast<TestGraphicsSampler>(binding.sampler);
-          if(sampler)
-          {
-            sampler->Apply(texture->GetTarget());
-          }
-        }
+          auto texture = Uncast<TestGraphicsTexture>(binding.texture);
 
-        texture->Prepare(); // Ensure native texture is ready
+          texture->Bind(binding.binding);
+
+          if (binding.sampler)
+          {
+            auto sampler = Uncast<TestGraphicsSampler>(binding.sampler);
+            if (sampler)
+            {
+              sampler->Apply(texture->GetTarget());
+            }
+          }
+
+          texture->Prepare(); // Ensure native texture is ready
+        }
       }
     }
 
     // IndexBuffer binding,
-    auto& indexBufferBinding = commandBuffer->mIndexBufferBinding;
-    if(indexBufferBinding.buffer)
+    auto bindIndexBufferCmds = commandBuffer->GetCommandsByType(0 | CommandType::BIND_INDEX_BUFFER);
+    if (!bindIndexBufferCmds.empty())
     {
-      auto buffer = Uncast<TestGraphicsBuffer>(indexBufferBinding.buffer);
-      buffer->Bind();
+      auto &indexBufferBinding = bindIndexBufferCmds[0]->bindIndexBuffer;
+      if (indexBufferBinding.buffer)
+      {
+        auto buffer = Uncast<TestGraphicsBuffer>(indexBufferBinding.buffer);
+        buffer->Bind();
+      }
     }
 
     // VertexBuffer binding,
-    for(auto graphicsBuffer : commandBuffer->mVertexBufferBindings.buffers)
+    auto bindVertexBufferCmds = commandBuffer->GetCommandsByType(0 | CommandType::BIND_VERTEX_BUFFERS);
+    if (!bindVertexBufferCmds.empty())
     {
-      auto vertexBuffer = Uncast<TestGraphicsBuffer>(graphicsBuffer);
-      vertexBuffer->Bind();
-    }
-
-    // Pipeline attribute setup
-    auto& vi = commandBuffer->mPipeline->vertexInputState;
-    for(auto& attribute : vi.attributes)
-    {
-      mGl.EnableVertexAttribArray(attribute.location);
-      uint32_t attributeOffset = attribute.offset;
-      GLsizei  stride          = vi.bufferBindings[attribute.binding].stride;
-
-      mGl.VertexAttribPointer(attribute.location,
-                              GetNumComponents(attribute.format),
-                              GetGlType(attribute.format),
-                              GL_FALSE, // Not normalized
-                              stride,
-                              reinterpret_cast<void*>(attributeOffset));
-    }
-
-    // Cull face setup
-    auto& rasterizationState = commandBuffer->mPipeline->rasterizationState;
-    if(rasterizationState.cullMode == Graphics::CullMode::NONE)
-    {
-      mGl.Disable(GL_CULL_FACE);
-    }
-    else
-    {
-      mGl.Enable(GL_CULL_FACE);
-      mGl.CullFace(GetCullFace(rasterizationState.cullMode));
-    }
-
-    mGl.FrontFace(GetFrontFace(rasterizationState.frontFace));
-    // We don't modify glPolygonMode in our context/abstraction from GL_FILL (the GL default),
-    // so it isn't present in the API (and won't have any tests!)
-
-    // Blending setup
-    auto& colorBlendState = commandBuffer->mPipeline->colorBlendState;
-    if(colorBlendState.blendEnable)
-    {
-      mGl.Enable(GL_BLEND);
-
-      mGl.BlendFuncSeparate(GetBlendFactor(colorBlendState.srcColorBlendFactor),
-                            GetBlendFactor(colorBlendState.dstColorBlendFactor),
-                            GetBlendFactor(colorBlendState.srcAlphaBlendFactor),
-                            GetBlendFactor(colorBlendState.dstAlphaBlendFactor));
-      if(colorBlendState.colorBlendOp != colorBlendState.alphaBlendOp)
+      for (auto &binding : bindVertexBufferCmds[0]->bindVertexBuffers.vertexBufferBindings)
       {
-        mGl.BlendEquationSeparate(GetBlendOp(colorBlendState.colorBlendOp), GetBlendOp(colorBlendState.alphaBlendOp));
+        auto graphicsBuffer = binding.buffer;
+        auto vertexBuffer   = Uncast<TestGraphicsBuffer>(graphicsBuffer);
+        vertexBuffer->Bind();
+      }
+    }
+    // Pipeline attribute setup
+    auto bindPipelineCmds     = commandBuffer->GetCommandsByType(0 | CommandType::BIND_PIPELINE);
+    if (!bindPipelineCmds.empty())
+    {
+      auto      pipeline = bindPipelineCmds[0]->bindPipeline.pipeline;
+      auto      &vi      = pipeline->vertexInputState;
+      for (auto &attribute : vi.attributes)
+      {
+        mGl.EnableVertexAttribArray(attribute.location);
+        uint32_t attributeOffset = attribute.offset;
+        GLsizei  stride          = vi.bufferBindings[attribute.binding].stride;
+
+        mGl.VertexAttribPointer(attribute.location,
+                                GetNumComponents(attribute.format),
+                                GetGlType(attribute.format),
+                                GL_FALSE, // Not normalized
+                                stride,
+                                reinterpret_cast<void *>(attributeOffset));
+      }
+      // Cull face setup
+      auto &rasterizationState = pipeline->rasterizationState;
+      if (rasterizationState.cullMode == Graphics::CullMode::NONE)
+      {
+        mGl.Disable(GL_CULL_FACE);
       }
       else
       {
-        mGl.BlendEquation(GetBlendOp(colorBlendState.colorBlendOp));
+        mGl.Enable(GL_CULL_FACE);
+        mGl.CullFace(GetCullFace(rasterizationState.cullMode));
       }
-      mGl.BlendColor(colorBlendState.blendConstants[0],
-                     colorBlendState.blendConstants[1],
-                     colorBlendState.blendConstants[2],
-                     colorBlendState.blendConstants[3]);
-    }
-    else
-    {
-      mGl.Disable(GL_BLEND);
-    }
 
-    // draw call
-    auto topology = commandBuffer->mPipeline->inputAssemblyState.topology;
+      mGl.FrontFace(GetFrontFace(rasterizationState.frontFace));
+      // We don't modify glPolygonMode in our context/abstraction from GL_FILL (the GL default),
+      // so it isn't present in the API (and won't have any tests!)
 
-    if(commandBuffer->drawCommand.drawType == TestGraphicsCommandBuffer::Draw::DrawType::Indexed)
-    {
-      mGl.DrawElements(GetTopology(topology),
-                       static_cast<GLsizei>(commandBuffer->drawCommand.u.indexedDraw.indexCount),
-                       GL_UNSIGNED_SHORT,
-                       reinterpret_cast<void*>(commandBuffer->drawCommand.u.indexedDraw.firstIndex));
-    }
-    else
-    {
-      mGl.DrawArrays(GetTopology(topology), 0, commandBuffer->drawCommand.u.unindexedDraw.vertexCount);
-    }
+      // Blending setup
+      auto &colorBlendState = pipeline->colorBlendState;
+      if (colorBlendState.blendEnable)
+      {
+        mGl.Enable(GL_BLEND);
 
-    // attribute clear
-    for(auto& attribute : vi.attributes)
-    {
-      mGl.DisableVertexAttribArray(attribute.location);
+        mGl.BlendFuncSeparate(GetBlendFactor(colorBlendState.srcColorBlendFactor),
+                              GetBlendFactor(colorBlendState.dstColorBlendFactor),
+                              GetBlendFactor(colorBlendState.srcAlphaBlendFactor),
+                              GetBlendFactor(colorBlendState.dstAlphaBlendFactor));
+        if (colorBlendState.colorBlendOp != colorBlendState.alphaBlendOp)
+        {
+          mGl.BlendEquationSeparate(GetBlendOp(colorBlendState.colorBlendOp), GetBlendOp(colorBlendState.alphaBlendOp));
+        }
+        else
+        {
+          mGl.BlendEquation(GetBlendOp(colorBlendState.colorBlendOp));
+        }
+        mGl.BlendColor(colorBlendState.blendConstants[0],
+                       colorBlendState.blendConstants[1],
+                       colorBlendState.blendConstants[2],
+                       colorBlendState.blendConstants[3]);
+      }
+      else
+      {
+        mGl.Disable(GL_BLEND);
+      }
+
+      // draw call
+      auto topology = pipeline->inputAssemblyState.topology;
+
+      // UniformBuffer binding (once we know pipeline)
+      auto bindUniformBuffersCmds = commandBuffer->GetCommandsByType(0 | CommandType::BIND_UNIFORM_BUFFER);
+      if (!bindUniformBuffersCmds.empty())
+      {
+        auto buffer = bindUniformBuffersCmds[0]->bindUniformBuffers.standaloneUniformsBufferBinding;
+        printf("%p\n", buffer.buffer);
+
+        // based on reflection, issue gl calls
+        buffer.buffer->BindAsUniformBuffer( static_cast<const TestGraphicsProgram*>(pipeline->programState.program) );
+      }
+
+      auto drawCmds = commandBuffer->GetCommandsByType( 0 |
+        CommandType::DRAW |
+        CommandType::DRAW_INDEXED_INDIRECT |
+        CommandType::DRAW_INDEXED );
+
+      if(!drawCmds.empty())
+      {
+        if (drawCmds[0]->draw.type == DrawCallDescriptor::Type::DRAW_INDEXED )
+        {
+          mGl.DrawElements(GetTopology(topology),
+                           static_cast<GLsizei>(drawCmds[0]->draw.drawIndexed.indexCount),
+                           GL_UNSIGNED_SHORT,
+                           reinterpret_cast<void *>(drawCmds[0]->draw.drawIndexed.firstIndex));
+        }
+        else
+        {
+          mGl.DrawArrays(GetTopology(topology), 0, drawCmds[0]->draw.draw.vertexCount);
+        }
+      }
+      // attribute clear
+      for (auto &attribute : vi.attributes)
+      {
+        mGl.DisableVertexAttribArray(attribute.location);
+      }
     }
   }
 }

@@ -899,7 +899,7 @@ public:
     if(it2 == uniformIDs.end())
     {
       // Uniform not found, so add it...
-      uniformIDs[name] = ++mLastUniformIdUsed;
+      uniformIDs[name] = mLastUniformIdUsed++;
       return mLastUniformIdUsed;
     }
 
@@ -971,9 +971,30 @@ public:
     mShaderTrace.PushCall("LinkProgram", out.str(), namedParams);
 
     mNumberOfActiveUniforms = 3;
-    GetUniformLocation(program, "sTexture");
+
+    GetUniformLocation(program, "uRendererColor");
+    GetUniformLocation(program, "uCustom");
+    GetUniformLocation(program, "uCustom3");
+    GetUniformLocation(program, "uFadeColor");
+    GetUniformLocation(program, "uUniform1");
+    GetUniformLocation(program, "uUniform2");
+    GetUniformLocation(program, "uUniform3");
+    GetUniformLocation(program, "uFadeProgress");
+    GetUniformLocation(program, "uANormalMatrix");
     GetUniformLocation(program, "sEffect");
+    GetUniformLocation(program, "sTexture");
+    GetUniformLocation(program, "sTextureRect");
     GetUniformLocation(program, "sGloss");
+    GetUniformLocation(program, "uColor");
+    GetUniformLocation(program, "uModelMatrix");
+    GetUniformLocation(program, "uModelView");
+    GetUniformLocation(program, "uMvpMatrix");
+    GetUniformLocation(program, "uNormalMatrix");
+    GetUniformLocation(program, "uProjection");
+    GetUniformLocation(program, "uSize");
+    GetUniformLocation(program, "uViewMatrix");
+    GetUniformLocation(program, "uLightCameraProjectionMatrix");
+    GetUniformLocation(program, "uLightCameraViewMatrix");
   }
 
   inline void PixelStorei(GLenum pname, GLint param) override

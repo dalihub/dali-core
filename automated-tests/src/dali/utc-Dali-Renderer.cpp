@@ -3650,8 +3650,11 @@ int UtcDaliRendererPreparePipeline(void)
   std::vector<Graphics::SubmitInfo>& submissions = graphics.mSubmitStack;
   DALI_TEST_EQUALS(submissions.size(), 1, TEST_LOCATION);
   DALI_TEST_EQUALS(submissions[0].cmdBuffer.size(), 1, TEST_LOCATION);
-  const TestGraphicsCommandBuffer* cmdBuf   = static_cast<TestGraphicsCommandBuffer*>((submissions[0].cmdBuffer[0]));
-  auto                             pipeline = cmdBuf->mPipeline;
+  TestGraphicsCommandBuffer* cmdBuf   = static_cast<TestGraphicsCommandBuffer*>((submissions[0].cmdBuffer[0]));
+  //auto                             pipeline = cmdBuf->mPipeline;
+  auto result = cmdBuf->GetCommandsByType( 0 | CommandType::BIND_PIPELINE );
+  auto pipeline = result[0]->bindPipeline.pipeline;
+
   if(pipeline)
   {
     DALI_TEST_EQUALS(pipeline->vertexInputState.attributes.size(), 12, TEST_LOCATION);

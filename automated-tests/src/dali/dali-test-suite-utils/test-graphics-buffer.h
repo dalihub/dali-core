@@ -25,6 +25,7 @@
 
 namespace Dali
 {
+class TestGraphicsProgram;
 class TestGraphicsBuffer : public Graphics::Buffer
 {
 public:
@@ -33,6 +34,13 @@ public:
   void   Unbind();
   void   Upload(uint32_t offset, uint32_t size);
   GLenum GetTarget();
+
+  bool IsCPUAllocated() const
+  {
+    return true;
+  }
+
+  void BindAsUniformBuffer( const TestGraphicsProgram* program ) const;
 
   TraceCallStack&            mCallStack;
   TestGlAbstraction&         mGl;

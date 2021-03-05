@@ -24,134 +24,55 @@ TestGraphicsCommandBuffer::TestGraphicsCommandBuffer(TraceCallStack& callstack, 
 {
 }
 
-void TestGraphicsCommandBuffer::BindVertexBuffers(uint32_t                             firstBinding,
-                                                  std::vector<const Graphics::Buffer*> buffers,
-                                                  std::vector<uint32_t>                offsets)
+int TestGraphicsCommandBuffer::GetDrawCallsCount()
 {
-  mVertexBufferBindings.firstBinding = firstBinding;
-  mVertexBufferBindings.buffers      = buffers; // Copy
-  mVertexBufferBindings.offsets      = offsets; // Copy
-  mCallStack.PushCall("BindVertexBuffers", "");
-}
-
-void TestGraphicsCommandBuffer::BindUniformBuffers(const std::vector<Graphics::UniformBufferBinding>& bindings)
-{
-  mCallStack.PushCall("BindUniformBuffers", "");
-}
-
-void TestGraphicsCommandBuffer::BindPipeline(const Graphics::Pipeline& pipeline)
-{
-  mPipeline = static_cast<TestGraphicsPipeline*>(const_cast<Graphics::Pipeline*>(&pipeline));
-  mCallStack.PushCall("BindPipeline", "");
-}
-
-void TestGraphicsCommandBuffer::BindTextures(std::vector<Graphics::TextureBinding>& textureBindings)
-{
-  mCallStack.PushCall("BindTextures", "");
-  for(auto& binding : textureBindings)
+  int count = 0;
+  for( auto& cmd : mCommands )
   {
-    mTextureBindings.push_back(binding);
+    if( cmd.type == CommandType::DRAW ||
+      cmd.type == CommandType::DRAW_INDEXED ||
+      cmd.type == CommandType::DRAW_INDEXED_INDIRECT )
+    {
+      ++count;
+    }
   }
+  return count;
 }
 
-void TestGraphicsCommandBuffer::BindSamplers(std::vector<Graphics::SamplerBinding>& samplerBindings)
+void TestGraphicsCommandBuffer::GetStateForDrawCall( int drawCallIndex )
 {
-  mCallStack.PushCall("BindSamplers", "");
+  int index = 0;
+  std::vector<Command> mCommandStack{};
+  for( auto& cmd : mCommands )
+  {
+    mCommandStack.push_back(cmd);
+    if( cmd.type == CommandType::DRAW ||
+        cmd.type == CommandType::DRAW_INDEXED ||
+        cmd.type == CommandType::DRAW_INDEXED_INDIRECT )
+    {
+      if( index == drawCallIndex )
+      {
+        break;
+      }
+      mCommandStack.clear();
+      ++index;
+    }
+  }
+
+  //
 }
 
-void TestGraphicsCommandBuffer::BindPushConstants(void*    data,
-                                                  uint32_t size,
-                                                  uint32_t binding)
+std::vector<Command*> TestGraphicsCommandBuffer::GetCommandsByType( CommandTypeMask mask )
 {
-  mCallStack.PushCall("BindPushConstants", "");
-}
-
-void TestGraphicsCommandBuffer::BindIndexBuffer(const Graphics::Buffer& buffer,
-                                                uint32_t                offset,
-                                                Graphics::Format        format)
-{
-  mIndexBufferBinding.buffer = &buffer;
-  mIndexBufferBinding.offset = offset;
-  mIndexBufferBinding.format = format;
-  mCallStack.PushCall("BindIndexBuffer", "");
-}
-
-void TestGraphicsCommandBuffer::BeginRenderPass(
-  Graphics::RenderPass&             renderPass,
-  Graphics::RenderTarget&           renderTarget,
-  Graphics::Extent2D                renderArea,
-  std::vector<Graphics::ClearValue> clearValues)
-{
-  mCallStack.PushCall("BeginRenderPass", "");
-}
-
-void TestGraphicsCommandBuffer::EndRenderPass()
-{
-  mCallStack.PushCall("EndRenderPass", "");
-}
-
-void TestGraphicsCommandBuffer::Draw(
-  uint32_t vertexCount,
-  uint32_t instanceCount,
-  uint32_t firstVertex,
-  uint32_t firstInstance)
-{
-  drawCommand.drawType                      = Draw::DrawType::Unindexed;
-  drawCommand.u.unindexedDraw.vertexCount   = vertexCount;
-  drawCommand.u.unindexedDraw.instanceCount = instanceCount;
-  drawCommand.u.unindexedDraw.firstVertex   = firstVertex;
-  drawCommand.u.unindexedDraw.firstInstance = firstInstance;
-  mCallStack.PushCall("Draw", "");
-}
-
-void TestGraphicsCommandBuffer::DrawIndexed(
-  uint32_t indexCount,
-  uint32_t instanceCount,
-  uint32_t firstIndex,
-  int32_t  vertexOffset,
-  uint32_t firstInstance)
-{
-  drawCommand.drawType                    = TestGraphicsCommandBuffer::Draw::DrawType::Indexed;
-  drawCommand.u.indexedDraw.indexCount    = indexCount;
-  drawCommand.u.indexedDraw.instanceCount = instanceCount;
-  drawCommand.u.indexedDraw.firstIndex    = firstIndex;
-  drawCommand.u.indexedDraw.vertexOffset  = vertexOffset;
-  drawCommand.u.indexedDraw.firstInstance = firstInstance;
-  mCallStack.PushCall("DrawIndexed", "");
-}
-
-void TestGraphicsCommandBuffer::DrawIndexedIndirect(
-  Graphics::Buffer& buffer,
-  uint32_t          offset,
-  uint32_t          drawCount,
-  uint32_t          stride)
-{
-  mCallStack.PushCall("DrawIndexedIndirect", "");
-}
-
-void TestGraphicsCommandBuffer::Reset(Graphics::CommandBuffer& commandBuffer)
-{
-  mCallStack.PushCall("Reset", "");
-}
-
-void TestGraphicsCommandBuffer::SetScissor(Graphics::Extent2D value)
-{
-  mCallStack.PushCall("SetScissor", "");
-}
-
-void TestGraphicsCommandBuffer::SetScissorTestEnable(bool value)
-{
-  mCallStack.PushCall("SetScissorTestEnable", "");
-}
-
-void TestGraphicsCommandBuffer::SetViewport(Graphics::Viewport value)
-{
-  mCallStack.PushCall("SetViewport", "");
-}
-
-void TestGraphicsCommandBuffer::SetViewportEnable(bool value)
-{
-  mCallStack.PushCall("SetViewportEnable", "");
+  std::vector<Command*> mCommandStack{};
+  for( auto& cmd : mCommands )
+  {
+    if(uint32_t(cmd.type) == (mask & uint32_t(cmd.type)) )
+    {
+      mCommandStack.emplace_back( &cmd );
+    }
+  }
+  return mCommandStack;
 }
 
 } // namespace Dali

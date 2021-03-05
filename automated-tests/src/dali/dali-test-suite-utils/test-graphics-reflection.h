@@ -55,6 +55,8 @@ public: // Test methods
     }
   }
 
+  Dali::Property::Type GetMemberType( int blockIndex, int location) const;
+
   TestGlAbstraction&               mGl;
   mutable std::vector<std::string> mAttributes;
 };
