@@ -299,6 +299,11 @@ public: // Test Functions
     mVertexFormats = vfs;
   }
 
+  void AddCustomUniforms(std::vector<UniformData>& customUniforms)
+  {
+    mCustomUniforms = customUniforms;
+  }
+
   void ClearSubmitStack()
   {
     mSubmitStack.clear();
@@ -336,6 +341,8 @@ public:
     TestGraphicsProgramImpl*                       programImpl;
   };
   std::vector<ProgramCache> mProgramCache;
+
+  std::vector<UniformData> mCustomUniforms;
 };
 
 } // namespace Dali

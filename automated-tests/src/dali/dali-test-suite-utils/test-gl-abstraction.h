@@ -38,6 +38,16 @@
 
 namespace Dali
 {
+
+struct UniformData
+{
+  std::string     name;
+  Property::Type  type;
+  UniformData( const std::string& name, Property::Type type = Property::Type::NONE)
+  : name(name), type(type)
+  {}
+};
+
 class DALI_CORE_API TestGlAbstraction : public Dali::Integration::GlAbstraction
 {
 public:
@@ -995,6 +1005,11 @@ public:
     GetUniformLocation(program, "uViewMatrix");
     GetUniformLocation(program, "uLightCameraProjectionMatrix");
     GetUniformLocation(program, "uLightCameraViewMatrix");
+
+    for( const auto& uniform : mCustomUniformData )
+    {
+      GetUniformLocation(program, uniform.name.c_str());
+    }
   }
 
   inline void PixelStorei(GLenum pname, GLint param) override
@@ -2291,7 +2306,7 @@ public: // TEST FUNCTIONS
       }
     }
 
-    fprintf(stderr, "Not found, printing possible values:\n");
+    fprintf(stderr, "%s Not found, printing possible values:\n", name);
     for(ProgramUniformMap::const_iterator program_it = mUniforms.begin();
         program_it != mUniforms.end();
         ++program_it)
@@ -2310,7 +2325,7 @@ public: // TEST FUNCTIONS
         if(mProgramUniforms.GetUniformValue(programId, uniformId, origValue))
         {
           std::stringstream out;
-          out << uniform_it->first << ": " << origValue;
+          out << "Program: " << programId << ", " << uniform_it->first << ": " << origValue;
           fprintf(stderr, "%s\n", out.str().c_str());
         }
       }
@@ -2342,6 +2357,11 @@ public: // TEST FUNCTIONS
       }
     }
     return false;
+  }
+
+  inline void SetCustomUniforms(std::vector<UniformData>& customUniformData)
+  {
+    mCustomUniformData = customUniformData;
   }
 
   inline GLuint GetLastShaderCompiled() const
@@ -2526,6 +2546,8 @@ private:
   typedef std::map<std::string, GLint>   UniformIDMap;
   typedef std::map<GLuint, UniformIDMap> ProgramUniformMap;
   ProgramUniformMap                      mUniforms;
+
+  std::vector<UniformData>               mCustomUniformData{};
 
   template<typename T>
   struct ProgramUniformValue : public std::map<GLuint, std::map<GLint, T> >

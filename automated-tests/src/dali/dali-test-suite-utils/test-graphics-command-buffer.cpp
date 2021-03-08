@@ -58,8 +58,6 @@ void TestGraphicsCommandBuffer::GetStateForDrawCall( int drawCallIndex )
       ++index;
     }
   }
-
-  //
 }
 
 std::vector<Command*> TestGraphicsCommandBuffer::GetCommandsByType( CommandTypeMask mask )

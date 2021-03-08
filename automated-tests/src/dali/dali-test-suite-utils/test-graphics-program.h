@@ -27,7 +27,7 @@ namespace Dali
 class TestGraphicsProgramImpl
 {
 public:
-  TestGraphicsProgramImpl(TestGlAbstraction& gl, const Graphics::ProgramCreateInfo& createInfo, Property::Array& vertexFormats);
+  TestGraphicsProgramImpl(TestGlAbstraction& gl, const Graphics::ProgramCreateInfo& createInfo, Property::Array& vertexFormats, std::vector<UniformData>& customUniforms);
 
   // For API
   const TestGraphicsReflection& GetReflection() const
@@ -54,7 +54,7 @@ public:
 class TestGraphicsProgram : public Graphics::Program
 {
 public:
-  TestGraphicsProgram(TestGlAbstraction& gl, const Graphics::ProgramCreateInfo& createInfo, Property::Array& vertexFormats);
+  TestGraphicsProgram(TestGlAbstraction& gl, const Graphics::ProgramCreateInfo& createInfo, Property::Array& vertexFormats, std::vector<UniformData>& customUniforms);
   TestGraphicsProgram(TestGraphicsProgramImpl* impl);
 
   const TestGraphicsReflection& GetReflection() const

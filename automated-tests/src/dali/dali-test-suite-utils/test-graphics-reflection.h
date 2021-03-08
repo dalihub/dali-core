@@ -18,14 +18,16 @@
  */
 
 #include <dali/graphics-api/graphics-reflection.h>
+#include <dali/graphics-api/graphics-program-create-info.h>
 #include "test-gl-abstraction.h"
 
 namespace Dali
 {
+
 class TestGraphicsReflection : public Graphics::Reflection
 {
 public:
-  TestGraphicsReflection(TestGlAbstraction& gl, Property::Array& vertexFormats);
+  TestGraphicsReflection(TestGlAbstraction& gl, Property::Array& vertexFormats, const Graphics::ProgramCreateInfo& createInfo, std::vector<UniformData>& customUniforms);
 
   uint32_t                                   GetVertexAttributeLocation(const std::string& name) const override;
   Dali::Graphics::VertexInputAttributeFormat GetVertexAttributeFormat(uint32_t location) const override;
@@ -59,6 +61,10 @@ public: // Test methods
 
   TestGlAbstraction&               mGl;
   mutable std::vector<std::string> mAttributes;
+  std::vector<UniformData>         mCustomUniforms;
+
+  Graphics::UniformBlockInfo              mDefaultUniformBlock{};       ///< The emulated UBO containing all the standalone uniforms
+  std::vector<Graphics::UniformBlockInfo> mUniformBlocks{};             ///< List of uniform blocks
 };
 
 } // namespace Dali

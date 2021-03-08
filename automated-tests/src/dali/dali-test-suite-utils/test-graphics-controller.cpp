@@ -579,7 +579,6 @@ void TestGraphicsController::SubmitCommandBuffers(const Graphics::SubmitInfo& su
       if (!bindUniformBuffersCmds.empty())
       {
         auto buffer = bindUniformBuffersCmds[0]->bindUniformBuffers.standaloneUniformsBufferBinding;
-        printf("%p\n", buffer.buffer);
 
         // based on reflection, issue gl calls
         buffer.buffer->BindAsUniformBuffer( static_cast<const TestGraphicsProgram*>(pipeline->programState.program) );
@@ -773,7 +772,7 @@ Graphics::UniquePtr<Graphics::Program> TestGraphicsController::CreateProgram(con
   }
 
   mProgramCache.emplace_back();
-  mProgramCache.back().programImpl = new TestGraphicsProgramImpl(mGl, programCreateInfo, mVertexFormats);
+  mProgramCache.back().programImpl = new TestGraphicsProgramImpl(mGl, programCreateInfo, mVertexFormats, mCustomUniforms);
   for(auto& shader : *(programCreateInfo.shaderState))
   {
     auto graphicsShader                                = Uncast<TestGraphicsShader>(shader.shader);

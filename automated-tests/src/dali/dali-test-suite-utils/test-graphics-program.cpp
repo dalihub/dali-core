@@ -18,13 +18,16 @@
 
 namespace Dali
 {
-TestGraphicsProgramImpl::TestGraphicsProgramImpl(TestGlAbstraction& gl, const Graphics::ProgramCreateInfo& createInfo, Property::Array& vertexFormats)
+TestGraphicsProgramImpl::TestGraphicsProgramImpl(TestGlAbstraction& gl, const Graphics::ProgramCreateInfo& createInfo, Property::Array& vertexFormats, std::vector<UniformData>& customUniforms)
 : mGl(gl),
   mCreateInfo(createInfo),
-  mReflection(gl, vertexFormats)
+  mReflection(gl, vertexFormats, createInfo, customUniforms)
 {
   mId = mGl.CreateProgram();
-  mGl.LinkProgram(1); // Ensure active sampler uniforms are set
+
+  // Ensure active sampler uniforms are set
+  mGl.SetCustomUniforms(customUniforms);
+  mGl.LinkProgram(mId);
 }
 
 bool TestGraphicsProgramImpl::GetParameter(uint32_t parameterId, void* outData)
@@ -33,9 +36,9 @@ bool TestGraphicsProgramImpl::GetParameter(uint32_t parameterId, void* outData)
   return true;
 }
 
-TestGraphicsProgram::TestGraphicsProgram(TestGlAbstraction& gl, const Graphics::ProgramCreateInfo& createInfo, Property::Array& vertexFormats)
+TestGraphicsProgram::TestGraphicsProgram(TestGlAbstraction& gl, const Graphics::ProgramCreateInfo& createInfo, Property::Array& vertexFormats, std::vector<UniformData>& customUniforms)
 {
-  mImpl = new TestGraphicsProgramImpl(gl, createInfo, vertexFormats);
+  mImpl = new TestGraphicsProgramImpl(gl, createInfo, vertexFormats, customUniforms);
 }
 
 TestGraphicsProgram::TestGraphicsProgram(TestGraphicsProgramImpl* impl)
