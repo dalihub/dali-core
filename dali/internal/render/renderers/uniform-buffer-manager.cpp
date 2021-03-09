@@ -125,10 +125,10 @@ void UniformBuffer::Write(const void* data, uint32_t size, uint32_t dstOffset)
 
   if(mMemory)
   {
-    void* ptr = mMemory->LockRegion(0, size);
-    if(dstOffset + size < mSize)
+    void* ptr = mMemory->LockRegion(dstOffset, size);
+    if(ptr && dstOffset + size < mSize)
     {
-      memcpy(reinterpret_cast<char*>(ptr) + dstOffset, data, size);
+      memcpy(ptr, data, size);
     }
     mMemory->Unlock(true);
   }
