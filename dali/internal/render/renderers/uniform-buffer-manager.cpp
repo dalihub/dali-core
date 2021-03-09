@@ -46,10 +46,8 @@ UniformBuffer::UniformBuffer(Dali::Graphics::Controller* controller,
 
 UniformBuffer::~UniformBuffer()
 {
-  if(mBuffer && mMemory)
-  {
-    mController->UnmapMemory(std::move(mMemory));
-  }
+  Flush();
+  Unmap();
 }
 
 void UniformBuffer::Flush()
@@ -71,9 +69,9 @@ void UniformBuffer::Reserve(uint32_t size)
   mSize = size;
 
   auto createInfo = Graphics::BufferCreateInfo()
-    .SetSize(mSize)
-    .SetBufferPropertiesFlags( 0 | Graphics::BufferPropertiesFlagBit::CPU_ALLOCATED )
-    .SetUsage(mUsageFlags);
+                      .SetSize(mSize)
+                      .SetBufferPropertiesFlags(0 | Graphics::BufferPropertiesFlagBit::CPU_ALLOCATED)
+                      .SetUsage(mUsageFlags);
 
   mBuffer = mController->CreateBuffer(createInfo, std::move(mBuffer));
 

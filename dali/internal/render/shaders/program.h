@@ -349,14 +349,6 @@ public:
   bool GetUniform(const std::string& name, size_t hashedName, Graphics::UniformInfo& out) const;
 
   /**
-   * Retrieves default uniform
-   * @param[in] defaultUniformIndex index of the uniform
-   * @param[out] outputUniformInfo the reference to UniformInfo object
-   * @return True is uniform found, false otherwise
-   */
-  bool GetDefaultUniform(DefaultUniformIndex defaultUniformIndex, Graphics::UniformInfo& outputUniformInfo) const;
-
-  /**
    * Retrievs default uniform
    * @param[in] defaultUniformIndex index of the uniform
    * @return Valid pointer to the UniformInfo object or nullptr

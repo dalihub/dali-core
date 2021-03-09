@@ -772,18 +772,6 @@ bool Program::GetUniform(const std::string& name, size_t hashedName, Graphics::U
   return false;
 }
 
-bool Program::GetDefaultUniform(DefaultUniformIndex defaultUniformIndex, Graphics::UniformInfo& out) const
-{
-  if(mReflectionDefaultUniforms.empty())
-  {
-    return false;
-  }
-
-  auto& value = mReflectionDefaultUniforms[static_cast<uint32_t>(defaultUniformIndex)];
-  out         = value.uniformInfo;
-  return true;
-}
-
 const Graphics::UniformInfo* Program::GetDefaultUniform(DefaultUniformIndex defaultUniformIndex) const
 {
   if(mReflectionDefaultUniforms.empty())
