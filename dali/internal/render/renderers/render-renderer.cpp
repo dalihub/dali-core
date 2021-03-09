@@ -889,8 +889,27 @@ void Renderer::Render(Context&                                             conte
     auto ubo = mUniformBuffer[bufferIndex].get();
     if(ubo)
     {
-      std::vector<Graphics::UniformBufferBinding>* bindings{nullptr};
-      FillUniformBuffers(*program, instruction, *ubo, bindings, uboOffset, bufferIndex);
+      auto& reflection = mGraphicsController->GetProgramReflection(program->GetGraphicsProgram());
+      auto  uboCount   = reflection.GetUniformBlockCount();
+      mUniformBufferBindings.resize(uboCount);
+
+      std::vector<Graphics::UniformBufferBinding>* bindings{&mUniformBufferBindings};
+
+      // Write default uniforms
+      Matrix modelViewProjectionMatrix(false);
+      Matrix::Multiply(modelViewProjectionMatrix, modelViewMatrix, projectionMatrix);
+
+      WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::MODEL_MATRIX), *ubo, *bindings, modelMatrix);
+      WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::VIEW_MATRIX), *ubo, *bindings, viewMatrix);
+      WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::PROJECTION_MATRIX), *ubo, *bindings, projectionMatrix);
+      WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::MVP_MATRIX), *ubo, *bindings, modelViewProjectionMatrix);
+      WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::MODEL_VIEW_MATRIX), *ubo, *bindings, modelViewMatrix);
+
+      // Update normal matrix only when used in the shader
+      Matrix3 normalMatrix(modelViewMatrix);
+      normalMatrix.Invert();
+      normalMatrix.Transpose();
+      WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::NORMAL_MATRIX), *ubo, *bindings, normalMatrix);
 
       Vector4        finalColor;
       const Vector4& color = node.GetRenderColor(bufferIndex);
@@ -903,24 +922,13 @@ void Renderer::Render(Context&                                             conte
       {
         finalColor = Vector4(color.r, color.g, color.b, color.a * mRenderDataProvider->GetOpacity(bufferIndex));
       }
-
-      // We know bindings for this renderer, so we can use 'offset' and write additional uniforms
-      Matrix modelViewProjectionMatrix(false);
-      Matrix::Multiply(modelViewProjectionMatrix, modelViewMatrix, projectionMatrix);
-
-      WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::MODEL_MATRIX), *ubo, *bindings, modelMatrix);
-      WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::VIEW_MATRIX), *ubo, *bindings, viewMatrix);
-      WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::PROJECTION_MATRIX), *ubo, *bindings, projectionMatrix);
-      WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::MVP_MATRIX), *ubo, *bindings, modelViewProjectionMatrix);
-      WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::MODEL_VIEW_MATRIX), *ubo, *bindings, modelViewMatrix);
-      WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::SIZE), *ubo, *bindings, size);
       WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::COLOR), *ubo, *bindings, finalColor);
 
-      // Update normal matrix only when used in the shader
-      Matrix3 normalMatrix(modelViewMatrix);
-      normalMatrix.Invert();
-      normalMatrix.Transpose();
-      WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::NORMAL_MATRIX), *ubo, *bindings, normalMatrix);
+      // Write uniforms from the uniform map
+      FillUniformBuffers(*program, instruction, *ubo, bindings, uboOffset, bufferIndex);
+
+      // Write uSize in the end, as it shouldn't be overridable by dynamic properties.
+      WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::SIZE), *ubo, *bindings, size);
 
       commandBuffer->BindUniformBuffers(*bindings);
     }
@@ -989,8 +997,6 @@ void Renderer::FillUniformBuffers(Program&                                      
 {
   auto& reflection = mGraphicsController->GetProgramReflection(program.GetGraphicsProgram());
   auto  uboCount   = reflection.GetUniformBlockCount();
-
-  mUniformBufferBindings.resize(uboCount);
 
   // Setup bindings
   uint32_t dataOffset = offset;
