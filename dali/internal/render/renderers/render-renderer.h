@@ -178,7 +178,11 @@ public:
    * @param[in] shaderCache Cache of shaders
    * @param[in] uniformBufferManager Uniform buffer manager
    */
-  void Initialize(Context& context, Graphics::Controller& graphicsController, ProgramCache& programCache, Render::ShaderCache& shaderCache, Render::UniformBufferManager& uniformBufferManager);
+  void Initialize(Context&                      context,
+                  Graphics::Controller&         graphicsController,
+                  ProgramCache&                 programCache,
+                  Render::ShaderCache&          shaderCache,
+                  Render::UniformBufferManager& uniformBufferManager);
 
   /**
    * Destructor
@@ -410,12 +414,22 @@ public:
   bool Updated(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider* node);
 
   template<class T>
-  bool WriteDefaultUniform(const Graphics::UniformInfo* uniformInfo, Render::UniformBuffer& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const T& data);
+  bool WriteDefaultUniform(const Graphics::UniformInfo*                       uniformInfo,
+                           Render::UniformBuffer&                             ubo,
+                           const std::vector<Graphics::UniformBufferBinding>& bindings,
+                           const T&                                           data);
 
   template<class T>
-  void WriteUniform(Render::UniformBuffer& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const Graphics::UniformInfo& uniformInfo, const T& data);
+  void WriteUniform(Render::UniformBuffer&                             ubo,
+                    const std::vector<Graphics::UniformBufferBinding>& bindings,
+                    const Graphics::UniformInfo&                       uniformInfo,
+                    const T&                                           data);
 
-  void WriteUniform(Render::UniformBuffer& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const Graphics::UniformInfo& uniformInfo, const void* data, uint32_t size);
+  void WriteUniform(Render::UniformBuffer&                             ubo,
+                    const std::vector<Graphics::UniformBufferBinding>& bindings,
+                    const Graphics::UniformInfo&                       uniformInfo,
+                    const void*                                        data,
+                    uint32_t                                           size);
 
 private:
   struct UniformIndexMap;
@@ -455,9 +469,8 @@ private:
    * @param[in] context The GL context
    * @param[in] program The shader program
    * @param[in] boundTextures The textures bound for rendering
-   * @return False if create or bind failed, true if success.
    */
-  bool BindTextures(Program& program, Graphics::CommandBuffer& commandBuffer, Vector<Graphics::Texture*>& boundTextures);
+  void BindTextures(Program& program, Graphics::CommandBuffer& commandBuffer, Vector<Graphics::Texture*>& boundTextures);
 
   /**
    * Prepare a pipeline for this renderer
@@ -469,6 +482,30 @@ private:
     Graphics::UniquePtr<Graphics::Pipeline>&&            oldPipeline);
 
   /**
+   * Setup and write data to the uniform buffer
+   *
+   * @param[in] bufferIndex The current buffer index
+   * @param[in] commandBuffer The command buffer to bind the uniform buffer to
+   * @param[in] node The node using this renderer
+   * @param[in] modelViewMatrix The model-view matrix.
+   * @param[in] viewMatrix The view matrix.
+   * @param[in] projectionMatrix The projection matrix.
+   * @param[in] size Size of the render item
+   * @param[in] blend If true, blending is enabled
+   * @param[in] instruction The render instruction
+   */
+  void WriteUniformBuffer(BufferIndex                          bufferIndex,
+                          Graphics::CommandBuffer&             commandBuffer,
+                          Program*                             program,
+                          const SceneGraph::RenderInstruction& instruction,
+                          const SceneGraph::NodeDataProvider&  node,
+                          const Matrix&                        modelMatrix,
+                          const Matrix&                        modelViewMatrix,
+                          const Matrix&                        viewMatrix,
+                          const Matrix&                        projectionMatrix,
+                          const Vector3&                       size);
+
+  /**
    * @brief Fill uniform buffer at index. Writes uniforms into given memory address
    *
    * @param[in] instruction The render instruction
@@ -477,12 +514,12 @@ private:
    * @param[out] offset output offset of the next uniform buffer memory address
    * @param[in] updateBufferIndex update buffer index
    */
-  void FillUniformBuffers(Program&                                      program,
-                          const SceneGraph::RenderInstruction&          instruction,
-                          Render::UniformBuffer&                        ubo,
-                          std::vector<Graphics::UniformBufferBinding>*& outBindings,
-                          uint32_t&                                     offset,
-                          BufferIndex                                   updateBufferIndex);
+  void FillUniformBuffer(Program&                                      program,
+                         const SceneGraph::RenderInstruction&          instruction,
+                         Render::UniformBuffer&                        ubo,
+                         std::vector<Graphics::UniformBufferBinding>*& outBindings,
+                         uint32_t&                                     offset,
+                         BufferIndex                                   updateBufferIndex);
 
 private:
   Graphics::Controller*                        mGraphicsController;
