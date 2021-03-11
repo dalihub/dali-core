@@ -40,7 +40,7 @@ struct ShaderCache
     Item(Item&&)      = default;
 
     Item(Graphics::UniquePtr<Dali::Graphics::Shader> shader,
-         const std::vector<char>                     shaderCode,
+         const std::vector<char>&                    shaderCode,
          Graphics::PipelineStage                     stage,
          Graphics::ShaderSourceMode                  type)
     : shader(std::move(shader)),
@@ -53,7 +53,7 @@ struct ShaderCache
     ~Item() = default;
 
     Graphics::UniquePtr<Dali::Graphics::Shader> shader{nullptr};
-    const std::vector<char>                     shaderCode;
+    std::vector<char>                           shaderCode;
     Graphics::PipelineStage                     stage;
     Graphics::ShaderSourceMode                  type;
   };
@@ -73,7 +73,7 @@ struct ShaderCache
    * @param[in] type The type of the shader (i.e. text or binary)
    * @return the graphics shader
    */
-  Dali::Graphics::Shader& GetShader(const std::vector<char> shaderCode, Graphics::PipelineStage stage, Graphics::ShaderSourceMode type);
+  Dali::Graphics::Shader& GetShader(const std::vector<char>& shaderCode, Graphics::PipelineStage stage, Graphics::ShaderSourceMode type);
 
 private:
   std::vector<Item>           mItems;

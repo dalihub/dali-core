@@ -493,8 +493,8 @@ private:
 
   Graphics::UniquePtr<Graphics::CommandBuffer> mGraphicsCommandBuffer{};
 
-  ProgramCache*        mProgramCache{};
-  Render::ShaderCache* mShaderCache{};
+  ProgramCache*        mProgramCache{nullptr};
+  Render::ShaderCache* mShaderCache{nullptr};
 
   Render::UniformBufferManager*               mUniformBufferManager{};
   std::vector<Graphics::UniformBufferBinding> mUniformBufferBindings{};

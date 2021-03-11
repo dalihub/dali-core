@@ -777,16 +777,16 @@ void Renderer::Render(Context&                                             conte
   // Get the program to use
   // The program cache owns the Program object so we don't need to worry about this raw allocation here.
   ShaderDataPtr shaderData = mRenderDataProvider->GetShader().GetShaderData();
-
+  const std::vector<char>& vertShader = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::VERTEX_SHADER);
+  const std::vector<char>& fragShader = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER);
   Dali::Graphics::Shader& vertexShader = mShaderCache->GetShader(
-    shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::VERTEX_SHADER),
+    vertShader,
     Graphics::PipelineStage::VERTEX_SHADER,
     shaderData->GetSourceMode());
 
-  Dali::Graphics::Shader& fragmentShader = mShaderCache->GetShader(
-    shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER),
-    Graphics::PipelineStage::FRAGMENT_SHADER,
-    shaderData->GetSourceMode());
+  Dali::Graphics::Shader& fragmentShader = mShaderCache->GetShader( fragShader,
+                                                                    Graphics::PipelineStage::FRAGMENT_SHADER,
+                                                                    shaderData->GetSourceMode());
 
   std::vector<Graphics::ShaderState> shaderStates{
     Graphics::ShaderState()

@@ -28,7 +28,7 @@ ShaderCache::ShaderCache(Dali::Graphics::Controller& controller)
 {
 }
 
-Dali::Graphics::Shader& ShaderCache::GetShader(const std::vector<char> shaderCode, Graphics::PipelineStage stage, Graphics::ShaderSourceMode type)
+Dali::Graphics::Shader& ShaderCache::GetShader(const std::vector<char>& shaderCode, Graphics::PipelineStage stage, Graphics::ShaderSourceMode type)
 {
   for(auto&& item : mItems)
   {
@@ -44,11 +44,10 @@ Dali::Graphics::Shader& ShaderCache::GetShader(const std::vector<char> shaderCod
   shaderCreateInfo.SetSourceSize(shaderCode.size());
   shaderCreateInfo.SetSourceMode(type);
 
-  auto shader = mController.CreateShader(shaderCreateInfo, nullptr);
+  Graphics::UniquePtr<Graphics::Shader> shader = mController.CreateShader(shaderCreateInfo, nullptr);
 
-  auto retval = shader.get();
   mItems.emplace_back(std::move(shader), shaderCode, stage, type);
-  return *retval;
+  return *mItems.back().shader.get();
 }
 
 } // namespace Render
