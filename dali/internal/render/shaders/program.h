@@ -115,7 +115,9 @@ public:
     NORMAL_MATRIX,
     PROJECTION_MATRIX,
     SIZE,
-    COLOR
+    COLOR,
+
+    COUNT
   };
 
   /**

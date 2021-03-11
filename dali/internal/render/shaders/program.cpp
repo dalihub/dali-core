@@ -66,10 +66,12 @@ const char* const gStdUniforms[Program::UNIFORM_TYPE_LAST] =
     "uSize"          // UNIFORM_SIZE
 };
 
+const unsigned int NUMBER_OF_DEFAULT_UNIFORMS = static_cast<unsigned int>(Program::DefaultUniformIndex::COUNT);
+
 /**
  * List of all default uniforms used for quicker lookup
  */
-std::array<size_t, 8> DEFAULT_UNIFORM_HASHTABLE =
+size_t DEFAULT_UNIFORM_HASHTABLE[NUMBER_OF_DEFAULT_UNIFORMS] =
   {
     CalculateHash(std::string("uModelMatrix")),
     CalculateHash(std::string("uMvpMatrix")),
@@ -681,7 +683,7 @@ void Program::ResetAttribsUniformCache()
 void Program::BuildReflection(const Graphics::Reflection& graphicsReflection)
 {
   mReflectionDefaultUniforms.clear();
-  mReflectionDefaultUniforms.resize(DEFAULT_UNIFORM_HASHTABLE.size());
+  mReflectionDefaultUniforms.resize(NUMBER_OF_DEFAULT_UNIFORMS);
 
   auto uniformBlockCount = graphicsReflection.GetUniformBlockCount();
 
@@ -701,7 +703,7 @@ void Program::BuildReflection(const Graphics::Reflection& graphicsReflection)
       mReflection.back().uniformInfo.bufferIndex = i;
 
       // Update default uniforms
-      for(auto i = 0u; i < DEFAULT_UNIFORM_HASHTABLE.size(); ++i)
+      for(auto i = 0u; i < NUMBER_OF_DEFAULT_UNIFORMS; ++i)
       {
         if(hashValue == DEFAULT_UNIFORM_HASHTABLE[i])
         {

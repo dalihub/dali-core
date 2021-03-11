@@ -544,8 +544,7 @@ private:
 
   LegacyProgram mLegacyProgram; ///< The structure to pass the program ID into Graphics::PipelineCreateInfo
 
-  using UniformBufferList = std::array<Graphics::UniquePtr<Render::UniformBuffer>, 2u>;
-  UniformBufferList mUniformBuffer{}; ///< The double-buffered uniform buffer
+  Graphics::UniquePtr<Render::UniformBuffer> mUniformBuffer[2]{nullptr, nullptr}; ///< The double-buffered uniform buffer
 };
 
 } // namespace Render
