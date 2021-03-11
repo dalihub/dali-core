@@ -15,10 +15,10 @@
  */
 
 #include "test-graphics-buffer.h"
-#include "test-graphics-program.h"
-#include "test-graphics-reflection.h"
 #include <sstream>
 #include "dali-test-suite-utils.h"
+#include "test-graphics-program.h"
+#include "test-graphics-reflection.h"
 
 namespace Dali
 {
@@ -27,7 +27,7 @@ TestGraphicsBuffer::TestGraphicsBuffer(TraceCallStack& callStack, TestGlAbstract
   mGl(glAbstraction),
   mUsage(usage)
 {
-  memory.reserve(size);
+  memory.resize(size);
   mGl.GetBufferTrace().EnableLogging(true);
 }
 
@@ -80,7 +80,7 @@ GLenum TestGraphicsBuffer::GetTarget()
   return target;
 }
 
-void TestGraphicsBuffer::BindAsUniformBuffer( const TestGraphicsProgram* program ) const
+void TestGraphicsBuffer::BindAsUniformBuffer(const TestGraphicsProgram* program) const
 {
   auto* reflection = static_cast<const TestGraphicsReflection*>(&program->GetReflection());
 
@@ -89,62 +89,60 @@ void TestGraphicsBuffer::BindAsUniformBuffer( const TestGraphicsProgram* program
 
   auto* data = memory.data();
 
-  for( const auto& member : uboInfo.members )
+  for(const auto& member : uboInfo.members)
   {
-    auto type = reflection->GetMemberType( 0, member.location );
+    auto type = reflection->GetMemberType(0, member.location);
     switch(type)
     {
       case Property::VECTOR4:
       {
-        auto value = *reinterpret_cast<const Dali::Vector4*>(data+member.offset);
-        mGl.Uniform4f( member.location, value.x, value.y, value.z, value.w );
+        auto value = *reinterpret_cast<const Dali::Vector4*>(data + member.offset);
+        mGl.Uniform4f(member.location, value.x, value.y, value.z, value.w);
         break;
       }
       case Property::VECTOR3:
       {
-        auto value = *reinterpret_cast<const Dali::Vector3*>(data+member.offset);
-        mGl.Uniform3f( member.location, value.x, value.y, value.z );
+        auto value = *reinterpret_cast<const Dali::Vector3*>(data + member.offset);
+        mGl.Uniform3f(member.location, value.x, value.y, value.z);
         break;
       }
       case Property::VECTOR2:
       {
-        auto value = *reinterpret_cast<const Dali::Vector2*>(data+member.offset);
-        mGl.Uniform2f( member.location, value.x, value.y );
+        auto value = *reinterpret_cast<const Dali::Vector2*>(data + member.offset);
+        mGl.Uniform2f(member.location, value.x, value.y);
         break;
       }
       case Property::FLOAT:
       {
-        auto value = *reinterpret_cast<const float*>(data+member.offset);
-        mGl.Uniform1f( member.location, value );
+        auto value = *reinterpret_cast<const float*>(data + member.offset);
+        mGl.Uniform1f(member.location, value);
         break;
       }
       case Property::INTEGER:
       {
-        auto ptr = reinterpret_cast<const GLint*>(data+member.offset);
+        auto ptr   = reinterpret_cast<const GLint*>(data + member.offset);
         auto value = *ptr;
-        mGl.Uniform1i( member.location, value );
+        mGl.Uniform1i(member.location, value);
         break;
       }
       case Property::MATRIX:
       {
-        auto value = reinterpret_cast<const float*>(data+member.offset);
-        mGl.UniformMatrix4fv( member.location, 1, GL_FALSE, value );
+        auto value = reinterpret_cast<const float*>(data + member.offset);
+        mGl.UniformMatrix4fv(member.location, 1, GL_FALSE, value);
         break;
       }
       case Property::MATRIX3:
       {
-        auto value = reinterpret_cast<const float*>(data+member.offset);
-        mGl.UniformMatrix3fv( member.location, 1, GL_FALSE, value );
+        auto value = reinterpret_cast<const float*>(data + member.offset);
+        mGl.UniformMatrix3fv(member.location, 1, GL_FALSE, value);
         break;
       }
       default:
       {
-
+        fprintf(stderr, "\n%s type not found\n", member.name.c_str());
       }
     }
   }
-
-
 }
 
 } // namespace Dali

@@ -18,43 +18,43 @@
 #include "test-graphics-shader.h"
 
 #include <dali/public-api/object/property-map.h>
-#include <vector>
 #include <string>
+#include <vector>
 namespace Dali
 {
 namespace
 {
 static const std::vector<UniformData> UNIFORMS =
-{
-  UniformData("uRendererColor",Property::Type::FLOAT),
-  UniformData("uCustom", Property::Type::INTEGER),
-  UniformData("uCustom3", Property::Type::VECTOR3),
-  UniformData("uFadeColor", Property::Type::VECTOR4),
-  UniformData("uUniform1", Property::Type::VECTOR4),
-  UniformData("uUniform2", Property::Type::VECTOR4),
-  UniformData("uUniform3", Property::Type::VECTOR4),
-  UniformData("uFadeProgress", Property::Type::FLOAT),
-  UniformData("uANormalMatrix", Property::Type::MATRIX3),
-  UniformData("sEffect", Property::Type::FLOAT),
-  UniformData("sTexture", Property::Type::FLOAT),
-  UniformData("sTextureRect", Property::Type::FLOAT),
-  UniformData("sGloss", Property::Type::FLOAT),
-  UniformData("uColor", Property::Type::VECTOR4),
-  UniformData("uModelMatrix", Property::Type::MATRIX),
-  UniformData("uModelView", Property::Type::MATRIX),
-  UniformData("uMvpMatrix", Property::Type::MATRIX),
-  UniformData("uNormalMatrix", Property::Type::MATRIX3),
-  UniformData("uProjection", Property::Type::MATRIX),
-  UniformData("uSize", Property::Type::VECTOR3),
-  UniformData("uViewMatrix", Property::Type::MATRIX),
-  UniformData("uLightCameraProjectionMatrix", Property::Type::MATRIX),
-  UniformData("uLightCameraViewMatrix", Property::Type::MATRIX),
+  {
+    UniformData("uRendererColor", Property::Type::FLOAT),
+    UniformData("uCustom", Property::Type::INTEGER),
+    UniformData("uCustom3", Property::Type::VECTOR3),
+    UniformData("uFadeColor", Property::Type::VECTOR4),
+    UniformData("uUniform1", Property::Type::VECTOR4),
+    UniformData("uUniform2", Property::Type::VECTOR4),
+    UniformData("uUniform3", Property::Type::VECTOR4),
+    UniformData("uFadeProgress", Property::Type::FLOAT),
+    UniformData("uANormalMatrix", Property::Type::MATRIX3),
+    UniformData("sEffect", Property::Type::FLOAT),
+    UniformData("sTexture", Property::Type::FLOAT),
+    UniformData("sTextureRect", Property::Type::FLOAT),
+    UniformData("sGloss", Property::Type::FLOAT),
+    UniformData("uColor", Property::Type::VECTOR4),
+    UniformData("uModelMatrix", Property::Type::MATRIX),
+    UniformData("uModelView", Property::Type::MATRIX),
+    UniformData("uMvpMatrix", Property::Type::MATRIX),
+    UniformData("uNormalMatrix", Property::Type::MATRIX3),
+    UniformData("uProjection", Property::Type::MATRIX),
+    UniformData("uSize", Property::Type::VECTOR3),
+    UniformData("uViewMatrix", Property::Type::MATRIX),
+    UniformData("uLightCameraProjectionMatrix", Property::Type::MATRIX),
+    UniformData("uLightCameraViewMatrix", Property::Type::MATRIX),
 };
 }
 
 TestGraphicsReflection::TestGraphicsReflection(TestGlAbstraction& gl, Property::Array& vfs, const Graphics::ProgramCreateInfo& createInfo, std::vector<UniformData>& customUniforms)
-  : mGl(gl),
-    mCustomUniforms(customUniforms)
+: mGl(gl),
+  mCustomUniforms(customUniforms)
 {
   for(Property::Array::SizeType i = 0; i < vfs.Count(); ++i)
   {
@@ -72,35 +72,35 @@ TestGraphicsReflection::TestGraphicsReflection(TestGlAbstraction& gl, Property::
     }
   }
 
-  mDefaultUniformBlock.name = "";
-  mDefaultUniformBlock.members = {};
-  mDefaultUniformBlock.binding = 0;
-  mDefaultUniformBlock.size = 64 * (UNIFORMS.size() + mCustomUniforms.size());
+  mDefaultUniformBlock.name          = "";
+  mDefaultUniformBlock.members       = {};
+  mDefaultUniformBlock.binding       = 0;
+  mDefaultUniformBlock.size          = 64 * (UNIFORMS.size() + mCustomUniforms.size());
   mDefaultUniformBlock.descriptorSet = 0;
   mDefaultUniformBlock.members.clear();
   int loc = 0;
-  for( const auto& data : UNIFORMS )
+  for(const auto& data : UNIFORMS)
   {
     mDefaultUniformBlock.members.emplace_back();
-    auto& item = mDefaultUniformBlock.members.back();
-    item.name = data.name;
-    item.binding = 0;
-    item.offset = loc*64;
-    item.location = loc++;
-    item.bufferIndex = 0;
+    auto& item        = mDefaultUniformBlock.members.back();
+    item.name         = data.name;
+    item.binding      = 0;
+    item.offset       = loc * 64;
+    item.location     = loc++;
+    item.bufferIndex  = 0;
     item.uniformClass = Graphics::UniformClass::UNIFORM;
   }
 
-  for( const auto& data : mCustomUniforms )
+  for(const auto& data : mCustomUniforms)
   {
     fprintf(stderr, "\ncustom uniforms: %s\n", data.name.c_str());
     mDefaultUniformBlock.members.emplace_back();
-    auto& item = mDefaultUniformBlock.members.back();
-    item.name = data.name;
-    item.binding = 0;
-    item.offset = loc*64;
-    item.location = loc++;
-    item.bufferIndex = 0;
+    auto& item        = mDefaultUniformBlock.members.back();
+    item.name         = data.name;
+    item.binding      = 0;
+    item.offset       = loc * 64;
+    item.location     = loc++;
+    item.bufferIndex  = 0;
     item.uniformClass = Graphics::UniformClass::UNIFORM;
   }
 
@@ -250,7 +250,7 @@ Graphics::ShaderLanguage TestGraphicsReflection::GetLanguage() const
   return Graphics::ShaderLanguage::GLSL_3_1;
 }
 
-Dali::Property::Type TestGraphicsReflection::GetMemberType( int blockIndex, int location) const
+Dali::Property::Type TestGraphicsReflection::GetMemberType(int blockIndex, int location) const
 {
   return location < static_cast<int>(UNIFORMS.size()) ? UNIFORMS[location].type : mCustomUniforms[location - UNIFORMS.size()].type;
 }

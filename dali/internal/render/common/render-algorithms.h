@@ -44,60 +44,67 @@ class RenderAlgorithms
 {
 public:
   /**
-     * Constructor.
-     */
-  RenderAlgorithms();
+   * Constructor.
+   *
+   * @param[in] graphicsController The graphics controller
+   */
+  RenderAlgorithms(Graphics::Controller& graphicsController);
 
   /**
-     * Process a render-instruction.
-     * @param[in] instruction            The render-instruction to process.
-     * @param[in] context                The GL context.
-     * @param[in] bufferIndex            The current render buffer index (previous update buffer)
-     * @param[in] depthBufferAvailable   Whether the depth buffer is available
-     * @param[in] stencilBufferAvailable Whether the stencil buffer is available
-     * @param[in] boundTextures          The textures bound for rendering
-     */
+   * Process a render-instruction.
+   * @param[in] instruction            The render-instruction to process.
+   * @param[in] context                The GL context.
+   * @param[in] bufferIndex            The current render buffer index (previous update buffer)
+   * @param[in] depthBufferAvailable   Whether the depth buffer is available
+   * @param[in] stencilBufferAvailable Whether the stencil buffer is available
+   * @param[in] boundTextures          The textures bound for rendering
+   * @param[in] viewport               The viewport for drawing
+   * @param[in] rootClippingRect       The clipping rectangle
+   * @param[in] orientation            The surface orientation
+   */
   void ProcessRenderInstruction(const SceneGraph::RenderInstruction& instruction,
                                 Context&                             context,
                                 BufferIndex                          bufferIndex,
                                 Integration::DepthBufferAvailable    depthBufferAvailable,
                                 Integration::StencilBufferAvailable  stencilBufferAvailable,
                                 Vector<Graphics::Texture*>&          boundTextures,
-                                const Rect<int>&                     rootClippingRect);
+                                const Rect<int32_t>&                 viewport,
+                                const Rect<int>&                     rootClippingRect,
+                                int                                  orientation);
 
 private:
   /**
-     * @brief Calculate a 2D AABB (axis aligned bounding box) in screen space.
-     * The RenderItems dimensions are translated and a Z value of 0 is assumed for this purpose.
-     * No projection is performed, but rotation on Z is supported.
-     * @param[in] item The RenderItem to generate an AABB for
-     * @return         The generated AABB in screen space
-     */
+   * @brief Calculate a 2D AABB (axis aligned bounding box) in screen space.
+   * The RenderItems dimensions are translated and a Z value of 0 is assumed for this purpose.
+   * No projection is performed, but rotation on Z is supported.
+   * @param[in] item The RenderItem to generate an AABB for
+   * @return         The generated AABB in screen space
+   */
   inline Dali::ClippingBox CalculateScreenSpaceAABB(const Dali::Internal::SceneGraph::RenderItem& item);
 
   /**
-     * @brief Perform any scissor clipping related operations based on the current RenderItem.
-     * This includes:
-     *  - Determining if any action is to be taken (so the method can be exited early if not).
-     *  - If the node is a clipping node, apply the nodes clip intersected with the current/parent scissor clip.
-     *  - If we have gone up the scissor hierarchy, and need to un-apply a scissor clip.
-     *  - Disable scissor clipping completely if it is not needed
-     * @param[in] item        The current RenderItem (about to be rendered)
-     * @param[in] context     The current Context
-     * @param[in] instruction The render-instruction to process.
-     */
+   * @brief Perform any scissor clipping related operations based on the current RenderItem.
+   * This includes:
+   *  - Determining if any action is to be taken (so the method can be exited early if not).
+   *  - If the node is a clipping node, apply the nodes clip intersected with the current/parent scissor clip.
+   *  - If we have gone up the scissor hierarchy, and need to un-apply a scissor clip.
+   *  - Disable scissor clipping completely if it is not needed
+   * @param[in] item        The current RenderItem (about to be rendered)
+   * @param[in] context     The current Context
+   * @param[in] instruction The render-instruction to process.
+   */
   inline void SetupScissorClipping(const Dali::Internal::SceneGraph::RenderItem& item, Context& context, const Dali::Internal::SceneGraph::RenderInstruction& instruction);
 
   /**
-     * @brief Set up the clipping based on the specified clipping settings.
-     * @param[in]     item                     The current RenderItem (about to be rendered)
-     * @param[in]     context                  The context
-     * @param[in/out] usedStencilBuffer        True if the stencil buffer has been used so far within this RenderList. Used by StencilMode::ON.
-     * @param[in/out] lastClippingDepth        The stencil depth of the last renderer drawn. Used by the clipping feature.
-     * @param[in/out] lastClippingId           The clipping ID of the last renderer drawn.   Used by the clipping feature.
-     * @param[in]     stencilBufferAvailable   Whether the stencil buffer is available
-     * @param[in]     instruction              The render-instruction to process.
-     */
+   * @brief Set up the clipping based on the specified clipping settings.
+   * @param[in]     item                     The current RenderItem (about to be rendered)
+   * @param[in]     context                  The context
+   * @param[in/out] usedStencilBuffer        True if the stencil buffer has been used so far within this RenderList. Used by StencilMode::ON.
+   * @param[in/out] lastClippingDepth        The stencil depth of the last renderer drawn. Used by the clipping feature.
+   * @param[in/out] lastClippingId           The clipping ID of the last renderer drawn.   Used by the clipping feature.
+   * @param[in]     stencilBufferAvailable   Whether the stencil buffer is available
+   * @param[in]     instruction              The render-instruction to process.
+   */
   inline void SetupClipping(const Dali::Internal::SceneGraph::RenderItem&        item,
                             Context&                                             context,
                             bool&                                                usedStencilBuffer,
@@ -107,16 +114,19 @@ private:
                             const Dali::Internal::SceneGraph::RenderInstruction& instruction);
 
   /**
-     * @brief Process a render-list.
-     * @param[in] renderList             The render-list to process.
-     * @param[in] context                The GL context.
-     * @param[in] buffer                 The current render buffer index (previous update buffer)
-     * @param[in] viewMatrix             The view matrix from the appropriate camera.
-     * @param[in] projectionMatrix       The projection matrix from the appropriate camera.
-     * @param[in] depthBufferAvailable   Whether the depth buffer is available
-     * @param[in] stencilBufferAvailable Whether the stencil buffer is available
-     * @param[in] boundTextures          The textures bound for rendering
-     */
+   * @brief Process a render-list.
+   * @param[in] renderList             The render-list to process.
+   * @param[in] context                The GL context.
+   * @param[in] buffer                 The current render buffer index (previous update buffer)
+   * @param[in] viewMatrix             The view matrix from the appropriate camera.
+   * @param[in] projectionMatrix       The projection matrix from the appropriate camera.
+   * @param[in] depthBufferAvailable   Whether the depth buffer is available
+   * @param[in] stencilBufferAvailable Whether the stencil buffer is available
+   * @param[in] boundTextures          The textures bound for rendering
+   * @param[in] viewport               The Viewport
+   * @param[in] rootClippingRect       The root clipping rectangle
+   * @param[in] orientation            The Scene's surface orientation
+   */
   inline void ProcessRenderList(const Dali::Internal::SceneGraph::RenderList&        renderList,
                                 Context&                                             context,
                                 BufferIndex                                          bufferIndex,
@@ -126,7 +136,9 @@ private:
                                 Integration::StencilBufferAvailable                  stencilBufferAvailable,
                                 Vector<Graphics::Texture*>&                          boundTextures,
                                 const Dali::Internal::SceneGraph::RenderInstruction& instruction, // in the case of reflection, things like CullFace need to be adjusted for reflection world
-                                const Rect<int>&                                     rootClippingRect);
+                                const Rect<int32_t>&                                 viewport,
+                                const Rect<int>&                                     rootClippingRect,
+                                int                                                  orientation);
 
   // Prevent copying:
   RenderAlgorithms(RenderAlgorithms& rhs);
@@ -135,6 +147,9 @@ private:
   // Member variables:
 
   using ScissorStackType = std::vector<Dali::ClippingBox>; ///< The container type used to maintain the applied scissor hierarchy
+
+  Graphics::Controller&                        mGraphicsController;
+  Graphics::UniquePtr<Graphics::CommandBuffer> mGraphicsCommandBuffer{};
 
   ScissorStackType  mScissorStack;        ///< Contains the currently applied scissor hierarchy (so we can undo clips)
   Dali::ClippingBox mViewportRectangle;   ///< The viewport dimensions, used to translate AABBs to scissor coordinates

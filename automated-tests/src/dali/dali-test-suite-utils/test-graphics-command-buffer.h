@@ -24,8 +24,8 @@
 #include <cstdint>
 #include <vector>
 #include "test-gl-abstraction.h"
-#include "test-graphics-pipeline.h"
 #include "test-graphics-buffer.h"
+#include "test-graphics-pipeline.h"
 #include "test-trace-call-stack.h"
 
 namespace Dali
@@ -37,16 +37,20 @@ class TestGraphicsPipeline;
 
 enum class CommandType
 {
-  FLUSH = 1 << 0,
-  BIND_TEXTURES = 1 << 1,
-  BIND_SAMPLERS = 1 << 2,
-  BIND_VERTEX_BUFFERS = 1 << 3,
-  BIND_INDEX_BUFFER = 1 << 4,
-  BIND_UNIFORM_BUFFER = 1 << 5,
-  BIND_PIPELINE = 1 << 6,
-  DRAW = 1 << 7,
-  DRAW_INDEXED = 1 << 8,
-  DRAW_INDEXED_INDIRECT = 1 << 9
+  FLUSH                 = 1 << 0,
+  BIND_TEXTURES         = 1 << 1,
+  BIND_SAMPLERS         = 1 << 2,
+  BIND_VERTEX_BUFFERS   = 1 << 3,
+  BIND_INDEX_BUFFER     = 1 << 4,
+  BIND_UNIFORM_BUFFER   = 1 << 5,
+  BIND_PIPELINE         = 1 << 6,
+  DRAW                  = 1 << 7,
+  DRAW_INDEXED          = 1 << 8,
+  DRAW_INDEXED_INDIRECT = 1 << 9,
+  SET_SCISSOR           = 1 << 10,
+  SET_SCISSOR_TEST      = 1 << 11,
+  SET_VIEWPORT          = 1 << 12,
+  SET_VIEWPORT_TEST     = 1 << 13
 };
 
 using CommandTypeMask = uint32_t;
@@ -63,7 +67,7 @@ inline CommandTypeMask operator|(T flags, CommandType bit)
 struct VertexBufferBindingDescriptor
 {
   const TestGraphicsBuffer* buffer{nullptr};
-  uint32_t            offset{0u};
+  uint32_t                  offset{0u};
 };
 
 /**
@@ -73,8 +77,8 @@ struct VertexBufferBindingDescriptor
 struct IndexBufferBindingDescriptor
 {
   const TestGraphicsBuffer* buffer{nullptr};
-  uint32_t            offset{};
-  Graphics::Format    format{};
+  uint32_t                  offset{};
+  Graphics::Format          format{};
 };
 
 /**
@@ -84,9 +88,9 @@ struct IndexBufferBindingDescriptor
 struct UniformBufferBindingDescriptor
 {
   const TestGraphicsBuffer* buffer{nullptr};
-  uint32_t            binding{0u};
-  uint32_t            offset{0u};
-  bool                emulated; ///<true if UBO is emulated for old gfx API
+  uint32_t                  binding{0u};
+  uint32_t                  offset{0u};
+  bool                      emulated; ///<true if UBO is emulated for old gfx API
 };
 
 /**
@@ -140,9 +144,9 @@ struct DrawCallDescriptor
     struct
     {
       const TestGraphicsBuffer* buffer;
-      uint32_t            offset;
-      uint32_t            drawCount;
-      uint32_t            stride;
+      uint32_t                  offset;
+      uint32_t                  drawCount;
+      uint32_t                  stride;
     } drawIndexedIndirect;
   };
 };
@@ -221,12 +225,32 @@ struct Command
         // Nothing to do
         break;
       }
+      case CommandType::SET_SCISSOR:
+      {
+        data.scissor.region = rhs.data.scissor.region;
+        break;
+      }
+      case CommandType::SET_SCISSOR_TEST:
+      {
+        data.scissorTest.enable = rhs.data.scissorTest.enable;
+        break;
+      }
+      case CommandType::SET_VIEWPORT:
+      {
+        data.viewport.region = rhs.data.viewport.region;
+        break;
+      }
+      case CommandType::SET_VIEWPORT_TEST:
+      {
+        data.viewportTest.enable = rhs.data.viewportTest.enable;
+        break;
+      }
     }
     type = rhs.type;
   }
 
   /**
-   * @brief Copy constructor
+   * @brief move constructor
    * @param[in] rhs Command
    */
   Command(Command&& rhs) noexcept
@@ -286,6 +310,26 @@ struct Command
         // Nothing to do
         break;
       }
+      case CommandType::SET_SCISSOR:
+      {
+        data.scissor.region = rhs.data.scissor.region;
+        break;
+      }
+      case CommandType::SET_SCISSOR_TEST:
+      {
+        data.scissorTest.enable = rhs.data.scissorTest.enable;
+        break;
+      }
+      case CommandType::SET_VIEWPORT:
+      {
+        data.viewport.region = rhs.data.viewport.region;
+        break;
+      }
+      case CommandType::SET_VIEWPORT_TEST:
+      {
+        data.viewportTest.enable = rhs.data.viewportTest.enable;
+        break;
+      }
     }
     type = rhs.type;
   }
@@ -335,9 +379,25 @@ struct Command
     struct : public DrawCallDescriptor
     {
     } draw;
+
+    struct
+    {
+      Graphics::Rect2D region;
+    } scissor;
+    struct
+    {
+      bool enable;
+    } scissorTest;
+    struct
+    {
+      Graphics::Viewport region;
+    } viewport;
+    struct
+    {
+      bool enable;
+    } viewportTest;
   } data;
 };
-
 
 class TestGraphicsCommandBuffer : public Graphics::CommandBuffer
 {
@@ -345,7 +405,6 @@ public:
   TestGraphicsCommandBuffer(TraceCallStack& callstack, TestGlAbstraction& glAbstraction);
   ~TestGraphicsCommandBuffer()
   {
-
   }
 
   void BindVertexBuffers(uint32_t                             firstBinding,
@@ -437,7 +496,7 @@ public:
 
   void BindIndexBuffer(const Graphics::Buffer& buffer,
                        uint32_t                offset,
-                       Graphics::Format                  format) override
+                       Graphics::Format        format) override
   {
     mCommands.emplace_back();
     mCommands.back().type                   = CommandType::BIND_INDEX_BUFFER;
@@ -448,8 +507,8 @@ public:
   }
 
   void BeginRenderPass(
-    Graphics::RenderPass&   renderPass,
-    Graphics::RenderTarget& renderTarget,
+    Graphics::RenderPass&             renderPass,
+    Graphics::RenderTarget&           renderTarget,
     Graphics::Extent2D                renderArea,
     std::vector<Graphics::ClearValue> clearValues) override
   {
@@ -529,24 +588,56 @@ public:
     mCallStack.PushCall("Reset", "");
   }
 
-  void SetScissor(Graphics::Extent2D value) override
+  void SetScissor(Graphics::Rect2D value) override
   {
-    mCallStack.PushCall("SetScissor", "");
+    TraceCallStack::NamedParams params;
+    params["x"] << value.x;
+    params["y"] << value.y;
+    params["width"] << value.width;
+    params["height"] << value.height;
+    mCallStack.PushCall("SetScissor", params.str(), params);
+
+    mCommands.emplace_back();
+    mCommands.back().type           = CommandType::SET_SCISSOR;
+    mCommands.back().data.scissor.region = value;
   }
 
   void SetScissorTestEnable(bool value) override
   {
-    mCallStack.PushCall("SetScissorTestEnable", "");
+    TraceCallStack::NamedParams params;
+    params["value"] << (value ? "T" : "F");
+    mCallStack.PushCall("SetScissorTestEnable", params.str(), params);
+
+    mCommands.emplace_back();
+    mCommands.back().type               = CommandType::SET_SCISSOR_TEST;
+    mCommands.back().data.scissorTest.enable = value;
   }
 
   void SetViewport(Graphics::Viewport value) override
   {
-    mCallStack.PushCall("SetViewport", "");
+    TraceCallStack::NamedParams params;
+    params["x"] << value.x;
+    params["y"] << value.y;
+    params["width"] << value.width;
+    params["height"] << value.height;
+    params["minDepth"] << value.minDepth;
+    params["maxDepth"] << value.maxDepth;
+    mCallStack.PushCall("SetViewport", params.str(), params);
+
+    mCommands.emplace_back();
+    mCommands.back().type            = CommandType::SET_VIEWPORT;
+    mCommands.back().data.viewport.region = value;
   }
 
   void SetViewportEnable(bool value) override
   {
-    mCallStack.PushCall("SetViewportEnable", "");
+    TraceCallStack::NamedParams params;
+    params["value"] << (value ? "T" : "F");
+    mCallStack.PushCall("SetViewportEnable", params.str(), params);
+
+    mCommands.emplace_back();
+    mCommands.back().type                = CommandType::SET_VIEWPORT_TEST;
+    mCommands.back().data.viewportTest.enable = value;
   }
 
   [[nodiscard]] const std::vector<Command>& GetCommands() const
@@ -564,17 +655,17 @@ public:
    * Retrieves state resolve for selected draw call
    * @param drawCommandIndex
    */
-  void GetStateForDrawCall( int drawCallIndex );
+  void GetStateForDrawCall(int drawCallIndex);
 
   /**
    * Retrieves commands of specified type
    */
-  std::vector<Command*> GetCommandsByType( CommandTypeMask mask );
-
+  std::vector<Command*> GetCommandsByType(CommandTypeMask mask);
 
 private:
-  TraceCallStack&                       mCallStack;
-  TestGlAbstraction&                    mGlAbstraction;
+  TraceCallStack&    mCallStack;
+  TestGlAbstraction& mGlAbstraction;
+
   std::vector<Command> mCommands;
 };
 

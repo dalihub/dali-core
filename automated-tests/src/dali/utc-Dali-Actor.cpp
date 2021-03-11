@@ -4781,7 +4781,7 @@ int UtcDaliActorPropertyScissorClippingActorNested02(void)
   DALI_TEST_CHECK(scissorTrace.FindMethodAndParams("Scissor", clipB));
   DALI_TEST_CHECK(scissorTrace.FindMethodAndParams("Scissor", clipC));
   DALI_TEST_CHECK(scissorTrace.FindMethodAndParams("Scissor", clipD));
-  DALI_TEST_CHECK(scissorTrace.CountMethod("Scissor") == 4); // Scissor rect should not be changed in clippingActorE case. So count should be 4.
+  DALI_TEST_EQUALS(scissorTrace.CountMethod("Scissor"), 4, TEST_LOCATION); // Scissor rect should not be changed in clippingActorE case. So count should be 4.
 
   END_TEST;
 }

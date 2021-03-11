@@ -27,11 +27,11 @@ TestGraphicsCommandBuffer::TestGraphicsCommandBuffer(TraceCallStack& callstack, 
 int TestGraphicsCommandBuffer::GetDrawCallsCount()
 {
   int count = 0;
-  for( auto& cmd : mCommands )
+  for(auto& cmd : mCommands)
   {
-    if( cmd.type == CommandType::DRAW ||
-      cmd.type == CommandType::DRAW_INDEXED ||
-      cmd.type == CommandType::DRAW_INDEXED_INDIRECT )
+    if(cmd.type == CommandType::DRAW ||
+       cmd.type == CommandType::DRAW_INDEXED ||
+       cmd.type == CommandType::DRAW_INDEXED_INDIRECT)
     {
       ++count;
     }
@@ -39,18 +39,18 @@ int TestGraphicsCommandBuffer::GetDrawCallsCount()
   return count;
 }
 
-void TestGraphicsCommandBuffer::GetStateForDrawCall( int drawCallIndex )
+void TestGraphicsCommandBuffer::GetStateForDrawCall(int drawCallIndex)
 {
-  int index = 0;
+  int                  index = 0;
   std::vector<Command> mCommandStack{};
-  for( auto& cmd : mCommands )
+  for(auto& cmd : mCommands)
   {
     mCommandStack.push_back(cmd);
-    if( cmd.type == CommandType::DRAW ||
-        cmd.type == CommandType::DRAW_INDEXED ||
-        cmd.type == CommandType::DRAW_INDEXED_INDIRECT )
+    if(cmd.type == CommandType::DRAW ||
+       cmd.type == CommandType::DRAW_INDEXED ||
+       cmd.type == CommandType::DRAW_INDEXED_INDIRECT)
     {
-      if( index == drawCallIndex )
+      if(index == drawCallIndex)
       {
         break;
       }
@@ -60,14 +60,14 @@ void TestGraphicsCommandBuffer::GetStateForDrawCall( int drawCallIndex )
   }
 }
 
-std::vector<Command*> TestGraphicsCommandBuffer::GetCommandsByType( CommandTypeMask mask )
+std::vector<Command*> TestGraphicsCommandBuffer::GetCommandsByType(CommandTypeMask mask)
 {
   std::vector<Command*> mCommandStack{};
-  for( auto& cmd : mCommands )
+  for(auto& cmd : mCommands)
   {
-    if(uint32_t(cmd.type) == (mask & uint32_t(cmd.type)) )
+    if(uint32_t(cmd.type) == (mask & uint32_t(cmd.type)))
     {
-      mCommandStack.emplace_back( &cmd );
+      mCommandStack.emplace_back(&cmd);
     }
   }
   return mCommandStack;

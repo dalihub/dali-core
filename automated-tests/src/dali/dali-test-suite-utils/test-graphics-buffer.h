@@ -40,7 +40,7 @@ public:
     return true;
   }
 
-  void BindAsUniformBuffer( const TestGraphicsProgram* program ) const;
+  void BindAsUniformBuffer(const TestGraphicsProgram* program) const;
 
   TraceCallStack&            mCallStack;
   TestGlAbstraction&         mGl;

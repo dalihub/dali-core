@@ -268,9 +268,9 @@ public:
   /**
    * @brief Changes scissor rect
    *
-   * @param[in] value 2D scissor area
+   * @param[in] value 2D scissor rectangle
    */
-  virtual void SetScissor(Extent2D value) = 0;
+  virtual void SetScissor(Rect2D value) = 0;
 
   /**
    * @brief Enables/disables scissor test

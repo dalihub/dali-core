@@ -68,7 +68,7 @@ struct RenderManager::Impl
     currentContext(&context),
     graphicsController(graphicsController),
     renderQueue(),
-    renderAlgorithms(),
+    renderAlgorithms(graphicsController),
     frameCount(0u),
     renderBufferIndex(SceneGraphBuffers::INITIAL_UPDATE_BUFFER_INDEX),
     rendererContainer(),
@@ -876,6 +876,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       mImpl->currentContext->BindFramebuffer(GL_FRAMEBUFFER, 0u);
     }
 
+    // @todo Should this be a command in it's own right?
     if(!instruction.mFrameBuffer)
     {
       mImpl->currentContext->Viewport(surfaceRect.x,
@@ -938,6 +939,8 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     // Set surface orientation
     mImpl->currentContext->SetSurfaceOrientation(surfaceOrientation);
 
+    /*** Clear region of framebuffer or surface before drawing ***/
+
     bool clearFullFrameRect = true;
     if(instruction.mFrameBuffer != nullptr)
     {
@@ -959,8 +962,9 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       clearFullFrameRect = false;
     }
 
+    // @todo The following block should be a command in it's own right.
+    // Currently takes account of surface orientation in Context.
     mImpl->currentContext->Viewport(viewportRect.x, viewportRect.y, viewportRect.width, viewportRect.height);
-
     if(instruction.mIsClearColorSet)
     {
       mImpl->currentContext->ClearColor(clearColor.r,
@@ -1001,7 +1005,9 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       depthBufferAvailable,
       stencilBufferAvailable,
       mImpl->boundTextures,
-      clippingRect);
+      viewportRect,
+      clippingRect,
+      surfaceOrientation);
 
     // Synchronise the FBO/Texture access when there are multiple contexts
     if(mImpl->currentContext->IsSurfacelessContextSupported())

@@ -463,18 +463,18 @@ void TestGraphicsController::SubmitCommandBuffers(const Graphics::SubmitInfo& su
     if(!value.empty())
     {
       // must be fixed
-      for (auto &binding : value[0]->data.bindTextures.textureBindings)
+      for (auto& binding : value[0]->data.bindTextures.textureBindings)
       {
-        if (binding.texture)
+        if(binding.texture)
         {
           auto texture = Uncast<TestGraphicsTexture>(binding.texture);
 
           texture->Bind(binding.binding);
 
-          if (binding.sampler)
+          if(binding.sampler)
           {
             auto sampler = Uncast<TestGraphicsSampler>(binding.sampler);
-            if (sampler)
+            if(sampler)
             {
               sampler->Apply(texture->GetTarget());
             }
@@ -487,10 +487,10 @@ void TestGraphicsController::SubmitCommandBuffers(const Graphics::SubmitInfo& su
 
     // IndexBuffer binding,
     auto bindIndexBufferCmds = commandBuffer->GetCommandsByType(0 | CommandType::BIND_INDEX_BUFFER);
-    if (!bindIndexBufferCmds.empty())
+    if(!bindIndexBufferCmds.empty())
     {
       auto &indexBufferBinding = bindIndexBufferCmds[0]->data.bindIndexBuffer;
-      if (indexBufferBinding.buffer)
+      if(indexBufferBinding.buffer)
       {
         auto buffer = Uncast<TestGraphicsBuffer>(indexBufferBinding.buffer);
         buffer->Bind();
@@ -499,7 +499,7 @@ void TestGraphicsController::SubmitCommandBuffers(const Graphics::SubmitInfo& su
 
     // VertexBuffer binding,
     auto bindVertexBufferCmds = commandBuffer->GetCommandsByType(0 | CommandType::BIND_VERTEX_BUFFERS);
-    if (!bindVertexBufferCmds.empty())
+    if(!bindVertexBufferCmds.empty())
     {
       for (auto &binding : bindVertexBufferCmds[0]->data.bindVertexBuffers.vertexBufferBindings)
       {
@@ -508,13 +508,45 @@ void TestGraphicsController::SubmitCommandBuffers(const Graphics::SubmitInfo& su
         vertexBuffer->Bind();
       }
     }
+
+    bool scissorEnabled = false;
+
+    auto scissorTestList = commandBuffer->GetCommandsByType(0 | CommandType::SET_SCISSOR_TEST);
+    if(!scissorTestList.empty())
+    {
+      if(scissorTestList[0]->data.scissorTest.enable)
+      {
+        mGl.Enable(GL_SCISSOR_TEST);
+        scissorEnabled = true;
+      }
+      else
+      {
+        mGl.Disable(GL_SCISSOR_TEST);
+      }
+    }
+
+    auto scissorList = commandBuffer->GetCommandsByType(0 | CommandType::SET_SCISSOR);
+    if(!scissorList.empty() && scissorEnabled)
+    {
+      auto& rect = scissorList[0]->data.scissor.region;
+      mGl.Scissor(rect.x, rect.y, rect.width, rect.height);
+    }
+
+    auto viewportList = commandBuffer->GetCommandsByType(0 | CommandType::SET_VIEWPORT);
+    if(!viewportList.empty())
+    {
+      mGl.Viewport(viewportList[0]->data.viewport.region.x, viewportList[0]->data.viewport.region.y, viewportList[0]->data.viewport.region.width, viewportList[0]->data.viewport.region.height);
+    }
+
+    // ignore viewport enable
+
     // Pipeline attribute setup
-    auto bindPipelineCmds     = commandBuffer->GetCommandsByType(0 | CommandType::BIND_PIPELINE);
-    if (!bindPipelineCmds.empty())
+    auto bindPipelineCmds = commandBuffer->GetCommandsByType(0 | CommandType::BIND_PIPELINE);
+    if(!bindPipelineCmds.empty())
     {
       auto      pipeline = bindPipelineCmds[0]->data.bindPipeline.pipeline;
-      auto      &vi      = pipeline->vertexInputState;
-      for (auto &attribute : vi.attributes)
+      auto& vi       = pipeline->vertexInputState;
+      for(auto& attribute : vi.attributes)
       {
         mGl.EnableVertexAttribArray(attribute.location);
         uint32_t attributeOffset = attribute.offset;
@@ -525,11 +557,12 @@ void TestGraphicsController::SubmitCommandBuffers(const Graphics::SubmitInfo& su
                                 GetGlType(attribute.format),
                                 GL_FALSE, // Not normalized
                                 stride,
-                                reinterpret_cast<void *>(attributeOffset));
+                                reinterpret_cast<void*>(attributeOffset));
       }
+
       // Cull face setup
-      auto &rasterizationState = pipeline->rasterizationState;
-      if (rasterizationState.cullMode == Graphics::CullMode::NONE)
+      auto& rasterizationState = pipeline->rasterizationState;
+      if(rasterizationState.cullMode == Graphics::CullMode::NONE)
       {
         mGl.Disable(GL_CULL_FACE);
       }
@@ -544,8 +577,8 @@ void TestGraphicsController::SubmitCommandBuffers(const Graphics::SubmitInfo& su
       // so it isn't present in the API (and won't have any tests!)
 
       // Blending setup
-      auto &colorBlendState = pipeline->colorBlendState;
-      if (colorBlendState.blendEnable)
+      auto& colorBlendState = pipeline->colorBlendState;
+      if(colorBlendState.blendEnable)
       {
         mGl.Enable(GL_BLEND);
 
@@ -553,7 +586,7 @@ void TestGraphicsController::SubmitCommandBuffers(const Graphics::SubmitInfo& su
                               GetBlendFactor(colorBlendState.dstColorBlendFactor),
                               GetBlendFactor(colorBlendState.srcAlphaBlendFactor),
                               GetBlendFactor(colorBlendState.dstAlphaBlendFactor));
-        if (colorBlendState.colorBlendOp != colorBlendState.alphaBlendOp)
+        if(colorBlendState.colorBlendOp != colorBlendState.alphaBlendOp)
         {
           mGl.BlendEquationSeparate(GetBlendOp(colorBlendState.colorBlendOp), GetBlendOp(colorBlendState.alphaBlendOp));
         }
@@ -576,18 +609,18 @@ void TestGraphicsController::SubmitCommandBuffers(const Graphics::SubmitInfo& su
 
       // UniformBuffer binding (once we know pipeline)
       auto bindUniformBuffersCmds = commandBuffer->GetCommandsByType(0 | CommandType::BIND_UNIFORM_BUFFER);
-      if (!bindUniformBuffersCmds.empty())
+      if(!bindUniformBuffersCmds.empty())
       {
         auto buffer = bindUniformBuffersCmds[0]->data.bindUniformBuffers.standaloneUniformsBufferBinding;
 
         // based on reflection, issue gl calls
-        buffer.buffer->BindAsUniformBuffer( static_cast<const TestGraphicsProgram*>(pipeline->programState.program) );
+        buffer.buffer->BindAsUniformBuffer(static_cast<const TestGraphicsProgram*>(pipeline->programState.program));
       }
 
-      auto drawCmds = commandBuffer->GetCommandsByType( 0 |
-        CommandType::DRAW |
-        CommandType::DRAW_INDEXED_INDIRECT |
-        CommandType::DRAW_INDEXED );
+      auto drawCmds = commandBuffer->GetCommandsByType(0 |
+                                                       CommandType::DRAW |
+                                                       CommandType::DRAW_INDEXED_INDIRECT |
+                                                       CommandType::DRAW_INDEXED);
 
       if(!drawCmds.empty())
       {
@@ -604,7 +637,7 @@ void TestGraphicsController::SubmitCommandBuffers(const Graphics::SubmitInfo& su
         }
       }
       // attribute clear
-      for (auto &attribute : vi.attributes)
+      for(auto& attribute : vi.attributes)
       {
         mGl.DisableVertexAttribArray(attribute.location);
       }
@@ -758,8 +791,12 @@ Graphics::UniquePtr<Graphics::Program> TestGraphicsController::CreateProgram(con
     bool found = true;
     for(auto& shader : *(programCreateInfo.shaderState))
     {
-      auto graphicsShader = Uncast<TestGraphicsShader>(shader.shader);
-      if(memcmp(cacheEntry.shaders[shader.pipelineStage], graphicsShader->mCreateInfo.sourceData, graphicsShader->mCreateInfo.sourceSize))
+      auto                 graphicsShader = Uncast<TestGraphicsShader>(shader.shader);
+      std::vector<uint8_t> source;
+      source.resize(graphicsShader->mCreateInfo.sourceSize);
+      memcpy(&source[0], graphicsShader->mCreateInfo.sourceData, graphicsShader->mCreateInfo.sourceSize);
+
+      if(!std::equal(source.begin(), source.end(), cacheEntry.shaders[shader.pipelineStage].begin()))
       {
         found = false;
         break;
@@ -775,8 +812,9 @@ Graphics::UniquePtr<Graphics::Program> TestGraphicsController::CreateProgram(con
   mProgramCache.back().programImpl = new TestGraphicsProgramImpl(mGl, programCreateInfo, mVertexFormats, mCustomUniforms);
   for(auto& shader : *(programCreateInfo.shaderState))
   {
-    auto graphicsShader                                = Uncast<TestGraphicsShader>(shader.shader);
-    mProgramCache.back().shaders[shader.pipelineStage] = graphicsShader->mCreateInfo.sourceData;
+    auto graphicsShader = Uncast<TestGraphicsShader>(shader.shader);
+    mProgramCache.back().shaders[shader.pipelineStage].resize(graphicsShader->mCreateInfo.sourceSize);
+    memcpy(&mProgramCache.back().shaders[shader.pipelineStage][0], graphicsShader->mCreateInfo.sourceData, graphicsShader->mCreateInfo.sourceSize);
   }
   return Graphics::MakeUnique<TestGraphicsProgram>(mProgramCache.back().programImpl);
 }

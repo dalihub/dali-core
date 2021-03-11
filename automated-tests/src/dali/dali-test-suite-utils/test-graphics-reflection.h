@@ -17,13 +17,12 @@
  * limitations under the License.
  */
 
-#include <dali/graphics-api/graphics-reflection.h>
 #include <dali/graphics-api/graphics-program-create-info.h>
+#include <dali/graphics-api/graphics-reflection.h>
 #include "test-gl-abstraction.h"
 
 namespace Dali
 {
-
 class TestGraphicsReflection : public Graphics::Reflection
 {
 public:
@@ -57,14 +56,14 @@ public: // Test methods
     }
   }
 
-  Dali::Property::Type GetMemberType( int blockIndex, int location) const;
+  Dali::Property::Type GetMemberType(int blockIndex, int location) const;
 
   TestGlAbstraction&               mGl;
   mutable std::vector<std::string> mAttributes;
   std::vector<UniformData>         mCustomUniforms;
 
-  Graphics::UniformBlockInfo              mDefaultUniformBlock{};       ///< The emulated UBO containing all the standalone uniforms
-  std::vector<Graphics::UniformBlockInfo> mUniformBlocks{};             ///< List of uniform blocks
+  Graphics::UniformBlockInfo              mDefaultUniformBlock{}; ///< The emulated UBO containing all the standalone uniforms
+  std::vector<Graphics::UniformBlockInfo> mUniformBlocks{};       ///< List of uniform blocks
 };
 
 } // namespace Dali
