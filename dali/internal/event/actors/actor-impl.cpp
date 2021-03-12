@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,54 +19,51 @@
 #include <dali/internal/event/actors/actor-impl.h>
 
 // EXTERNAL INCLUDES
-#include <cmath>
 #include <algorithm>
 #include <cfloat>
+#include <cmath>
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/actors/layer-devel.h>
-#include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/common/constants.h>
-#include <dali/public-api/math/vector2.h>
-#include <dali/public-api/math/vector3.h>
-#include <dali/public-api/math/radian.h>
-#include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/actors/layer-devel.h>
+#include <dali/integration-api/debug.h>
 #include <dali/internal/event/actors/actor-property-handler.h>
 #include <dali/internal/event/actors/actor-relayouter.h>
-#include <dali/internal/event/common/event-thread-services.h>
-#include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/internal/event/actors/camera-actor-impl.h>
-#include <dali/internal/event/render-tasks/render-task-list-impl.h>
-#include <dali/internal/event/common/property-helper.h>
-#include <dali/internal/event/common/stage-impl.h>
-#include <dali/internal/event/common/type-info-impl.h>
-#include <dali/internal/event/common/scene-impl.h>
-#include <dali/internal/event/common/thread-local-storage.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/projection.h>
+#include <dali/internal/event/common/property-helper.h>
+#include <dali/internal/event/common/scene-impl.h>
+#include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/event/common/thread-local-storage.h>
+#include <dali/internal/event/common/type-info-impl.h>
+#include <dali/internal/event/events/actor-gesture-data.h>
+#include <dali/internal/event/render-tasks/render-task-impl.h>
+#include <dali/internal/event/render-tasks/render-task-list-impl.h>
 #include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
 #include <dali/internal/update/nodes/node-messages.h>
-#include <dali/internal/event/events/actor-gesture-data.h>
-#include <dali/integration-api/debug.h>
+#include <dali/public-api/common/constants.h>
+#include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/math/radian.h>
+#include <dali/public-api/math/vector2.h>
+#include <dali/public-api/math/vector3.h>
+#include <dali/public-api/object/type-registry.h>
 
-using Dali::Internal::SceneGraph::Node;
 using Dali::Internal::SceneGraph::AnimatableProperty;
+using Dali::Internal::SceneGraph::Node;
 using Dali::Internal::SceneGraph::PropertyBase;
 
 #if defined(DEBUG_ENABLED)
-Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_DEPTH_TIMER" );
-Debug::Filter* gLogRelayoutFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_RELAYOUT_TIMER" );
+Debug::Filter* gLogFilter         = Debug::Filter::New(Debug::NoLogging, false, "LOG_DEPTH_TIMER");
+Debug::Filter* gLogRelayoutFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_RELAYOUT_TIMER");
 #endif
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace // unnamed namespace
 {
-
 // Properties
 
 /**
@@ -75,89 +72,89 @@ namespace // unnamed namespace
  *              Name                  Type   writable animatable constraint-input  enum for index-checking
  */
 DALI_PROPERTY_TABLE_BEGIN
-DALI_PROPERTY( "parentOrigin",              VECTOR3,  true,  false, true,  Dali::Actor::Property::PARENT_ORIGIN )
-DALI_PROPERTY( "parentOriginX",             FLOAT,    true,  false, true,  Dali::Actor::Property::PARENT_ORIGIN_X )
-DALI_PROPERTY( "parentOriginY",             FLOAT,    true,  false, true,  Dali::Actor::Property::PARENT_ORIGIN_Y )
-DALI_PROPERTY( "parentOriginZ",             FLOAT,    true,  false, true,  Dali::Actor::Property::PARENT_ORIGIN_Z )
-DALI_PROPERTY( "anchorPoint",               VECTOR3,  true,  false, true,  Dali::Actor::Property::ANCHOR_POINT )
-DALI_PROPERTY( "anchorPointX",              FLOAT,    true,  false, true,  Dali::Actor::Property::ANCHOR_POINT_X )
-DALI_PROPERTY( "anchorPointY",              FLOAT,    true,  false, true,  Dali::Actor::Property::ANCHOR_POINT_Y )
-DALI_PROPERTY( "anchorPointZ",              FLOAT,    true,  false, true,  Dali::Actor::Property::ANCHOR_POINT_Z )
-DALI_PROPERTY( "size",                      VECTOR3,  true,  true,  true,  Dali::Actor::Property::SIZE )
-DALI_PROPERTY( "sizeWidth",                 FLOAT,    true,  true,  true,  Dali::Actor::Property::SIZE_WIDTH )
-DALI_PROPERTY( "sizeHeight",                FLOAT,    true,  true,  true,  Dali::Actor::Property::SIZE_HEIGHT )
-DALI_PROPERTY( "sizeDepth",                 FLOAT,    true,  true,  true,  Dali::Actor::Property::SIZE_DEPTH )
-DALI_PROPERTY( "position",                  VECTOR3,  true,  true,  true,  Dali::Actor::Property::POSITION )
-DALI_PROPERTY( "positionX",                 FLOAT,    true,  true,  true,  Dali::Actor::Property::POSITION_X )
-DALI_PROPERTY( "positionY",                 FLOAT,    true,  true,  true,  Dali::Actor::Property::POSITION_Y )
-DALI_PROPERTY( "positionZ",                 FLOAT,    true,  true,  true,  Dali::Actor::Property::POSITION_Z )
-DALI_PROPERTY( "worldPosition",             VECTOR3,  false, false, true,  Dali::Actor::Property::WORLD_POSITION )
-DALI_PROPERTY( "worldPositionX",            FLOAT,    false, false, true,  Dali::Actor::Property::WORLD_POSITION_X )
-DALI_PROPERTY( "worldPositionY",            FLOAT,    false, false, true,  Dali::Actor::Property::WORLD_POSITION_Y )
-DALI_PROPERTY( "worldPositionZ",            FLOAT,    false, false, true,  Dali::Actor::Property::WORLD_POSITION_Z )
-DALI_PROPERTY( "orientation",               ROTATION, true,  true,  true,  Dali::Actor::Property::ORIENTATION )
-DALI_PROPERTY( "worldOrientation",          ROTATION, false, false, true,  Dali::Actor::Property::WORLD_ORIENTATION )
-DALI_PROPERTY( "scale",                     VECTOR3,  true,  true,  true,  Dali::Actor::Property::SCALE )
-DALI_PROPERTY( "scaleX",                    FLOAT,    true,  true,  true,  Dali::Actor::Property::SCALE_X )
-DALI_PROPERTY( "scaleY",                    FLOAT,    true,  true,  true,  Dali::Actor::Property::SCALE_Y )
-DALI_PROPERTY( "scaleZ",                    FLOAT,    true,  true,  true,  Dali::Actor::Property::SCALE_Z )
-DALI_PROPERTY( "worldScale",                VECTOR3,  false, false, true,  Dali::Actor::Property::WORLD_SCALE )
-DALI_PROPERTY( "visible",                   BOOLEAN,  true,  true,  true,  Dali::Actor::Property::VISIBLE )
-DALI_PROPERTY( "color",                     VECTOR4,  true,  true,  true,  Dali::Actor::Property::COLOR )
-DALI_PROPERTY( "colorRed",                  FLOAT,    true,  true,  true,  Dali::Actor::Property::COLOR_RED )
-DALI_PROPERTY( "colorGreen",                FLOAT,    true,  true,  true,  Dali::Actor::Property::COLOR_GREEN )
-DALI_PROPERTY( "colorBlue",                 FLOAT,    true,  true,  true,  Dali::Actor::Property::COLOR_BLUE )
-DALI_PROPERTY( "colorAlpha",                FLOAT,    true,  true,  true,  Dali::Actor::Property::COLOR_ALPHA )
-DALI_PROPERTY( "worldColor",                VECTOR4,  false, false, true,  Dali::Actor::Property::WORLD_COLOR )
-DALI_PROPERTY( "worldMatrix",               MATRIX,   false, false, true,  Dali::Actor::Property::WORLD_MATRIX )
-DALI_PROPERTY( "name",                      STRING,   true,  false, false, Dali::Actor::Property::NAME )
-DALI_PROPERTY( "sensitive",                 BOOLEAN,  true,  false, false, Dali::Actor::Property::SENSITIVE )
-DALI_PROPERTY( "leaveRequired",             BOOLEAN,  true,  false, false, Dali::Actor::Property::LEAVE_REQUIRED )
-DALI_PROPERTY( "inheritOrientation",        BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_ORIENTATION )
-DALI_PROPERTY( "inheritScale",              BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_SCALE )
-DALI_PROPERTY( "colorMode",                 INTEGER,  true,  false, false, Dali::Actor::Property::COLOR_MODE )
-DALI_PROPERTY( "drawMode",                  INTEGER,  true,  false, false, Dali::Actor::Property::DRAW_MODE )
-DALI_PROPERTY( "sizeModeFactor",            VECTOR3,  true,  false, false, Dali::Actor::Property::SIZE_MODE_FACTOR )
-DALI_PROPERTY( "widthResizePolicy",         STRING,   true,  false, false, Dali::Actor::Property::WIDTH_RESIZE_POLICY )
-DALI_PROPERTY( "heightResizePolicy",        STRING,   true,  false, false, Dali::Actor::Property::HEIGHT_RESIZE_POLICY )
-DALI_PROPERTY( "sizeScalePolicy",           INTEGER,  true,  false, false, Dali::Actor::Property::SIZE_SCALE_POLICY )
-DALI_PROPERTY( "widthForHeight",            BOOLEAN,  true,  false, false, Dali::Actor::Property::WIDTH_FOR_HEIGHT )
-DALI_PROPERTY( "heightForWidth",            BOOLEAN,  true,  false, false, Dali::Actor::Property::HEIGHT_FOR_WIDTH )
-DALI_PROPERTY( "padding",                   VECTOR4,  true,  false, false, Dali::Actor::Property::PADDING )
-DALI_PROPERTY( "minimumSize",               VECTOR2,  true,  false, false, Dali::Actor::Property::MINIMUM_SIZE )
-DALI_PROPERTY( "maximumSize",               VECTOR2,  true,  false, false, Dali::Actor::Property::MAXIMUM_SIZE )
-DALI_PROPERTY( "inheritPosition",           BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_POSITION )
-DALI_PROPERTY( "clippingMode",              STRING,   true,  false, false, Dali::Actor::Property::CLIPPING_MODE )
-DALI_PROPERTY( "layoutDirection",           STRING,   true,  false, false, Dali::Actor::Property::LAYOUT_DIRECTION )
-DALI_PROPERTY( "inheritLayoutDirection",    BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_LAYOUT_DIRECTION )
-DALI_PROPERTY( "opacity",                   FLOAT,    true,  true,  true,  Dali::Actor::Property::OPACITY )
-DALI_PROPERTY( "screenPosition",            VECTOR2,  false, false, false, Dali::Actor::Property::SCREEN_POSITION )
-DALI_PROPERTY( "positionUsesAnchorPoint",   BOOLEAN,  true,  false, false, Dali::Actor::Property::POSITION_USES_ANCHOR_POINT )
-DALI_PROPERTY( "culled",                    BOOLEAN,  false, false, true,  Dali::Actor::Property::CULLED )
-DALI_PROPERTY( "id",                        INTEGER,  false, false, false, Dali::Actor::Property::ID )
-DALI_PROPERTY( "hierarchyDepth",            INTEGER,  false, false, false, Dali::Actor::Property::HIERARCHY_DEPTH )
-DALI_PROPERTY( "isRoot",                    BOOLEAN,  false, false, false, Dali::Actor::Property::IS_ROOT )
-DALI_PROPERTY( "isLayer",                   BOOLEAN,  false, false, false, Dali::Actor::Property::IS_LAYER )
-DALI_PROPERTY( "connectedToScene",          BOOLEAN,  false, false, false, Dali::Actor::Property::CONNECTED_TO_SCENE )
-DALI_PROPERTY( "keyboardFocusable",         BOOLEAN,  true,  false, false, Dali::Actor::Property::KEYBOARD_FOCUSABLE )
-DALI_PROPERTY( "siblingOrder",              INTEGER,  true,  false, false, Dali::DevelActor::Property::SIBLING_ORDER )
-DALI_PROPERTY( "updateSizeHint",            VECTOR2,  true,  false, false, Dali::DevelActor::Property::UPDATE_SIZE_HINT )
-DALI_PROPERTY( "captureAllTouchAfterStart", BOOLEAN,  true,  false, false, Dali::DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START )
-DALI_PROPERTY( "touchArea",                 VECTOR2,  true,  false, false, Dali::DevelActor::Property::TOUCH_AREA )
-DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX, ActorDefaultProperties )
+DALI_PROPERTY("parentOrigin", VECTOR3, true, false, true, Dali::Actor::Property::PARENT_ORIGIN)
+DALI_PROPERTY("parentOriginX", FLOAT, true, false, true, Dali::Actor::Property::PARENT_ORIGIN_X)
+DALI_PROPERTY("parentOriginY", FLOAT, true, false, true, Dali::Actor::Property::PARENT_ORIGIN_Y)
+DALI_PROPERTY("parentOriginZ", FLOAT, true, false, true, Dali::Actor::Property::PARENT_ORIGIN_Z)
+DALI_PROPERTY("anchorPoint", VECTOR3, true, false, true, Dali::Actor::Property::ANCHOR_POINT)
+DALI_PROPERTY("anchorPointX", FLOAT, true, false, true, Dali::Actor::Property::ANCHOR_POINT_X)
+DALI_PROPERTY("anchorPointY", FLOAT, true, false, true, Dali::Actor::Property::ANCHOR_POINT_Y)
+DALI_PROPERTY("anchorPointZ", FLOAT, true, false, true, Dali::Actor::Property::ANCHOR_POINT_Z)
+DALI_PROPERTY("size", VECTOR3, true, true, true, Dali::Actor::Property::SIZE)
+DALI_PROPERTY("sizeWidth", FLOAT, true, true, true, Dali::Actor::Property::SIZE_WIDTH)
+DALI_PROPERTY("sizeHeight", FLOAT, true, true, true, Dali::Actor::Property::SIZE_HEIGHT)
+DALI_PROPERTY("sizeDepth", FLOAT, true, true, true, Dali::Actor::Property::SIZE_DEPTH)
+DALI_PROPERTY("position", VECTOR3, true, true, true, Dali::Actor::Property::POSITION)
+DALI_PROPERTY("positionX", FLOAT, true, true, true, Dali::Actor::Property::POSITION_X)
+DALI_PROPERTY("positionY", FLOAT, true, true, true, Dali::Actor::Property::POSITION_Y)
+DALI_PROPERTY("positionZ", FLOAT, true, true, true, Dali::Actor::Property::POSITION_Z)
+DALI_PROPERTY("worldPosition", VECTOR3, false, false, true, Dali::Actor::Property::WORLD_POSITION)
+DALI_PROPERTY("worldPositionX", FLOAT, false, false, true, Dali::Actor::Property::WORLD_POSITION_X)
+DALI_PROPERTY("worldPositionY", FLOAT, false, false, true, Dali::Actor::Property::WORLD_POSITION_Y)
+DALI_PROPERTY("worldPositionZ", FLOAT, false, false, true, Dali::Actor::Property::WORLD_POSITION_Z)
+DALI_PROPERTY("orientation", ROTATION, true, true, true, Dali::Actor::Property::ORIENTATION)
+DALI_PROPERTY("worldOrientation", ROTATION, false, false, true, Dali::Actor::Property::WORLD_ORIENTATION)
+DALI_PROPERTY("scale", VECTOR3, true, true, true, Dali::Actor::Property::SCALE)
+DALI_PROPERTY("scaleX", FLOAT, true, true, true, Dali::Actor::Property::SCALE_X)
+DALI_PROPERTY("scaleY", FLOAT, true, true, true, Dali::Actor::Property::SCALE_Y)
+DALI_PROPERTY("scaleZ", FLOAT, true, true, true, Dali::Actor::Property::SCALE_Z)
+DALI_PROPERTY("worldScale", VECTOR3, false, false, true, Dali::Actor::Property::WORLD_SCALE)
+DALI_PROPERTY("visible", BOOLEAN, true, true, true, Dali::Actor::Property::VISIBLE)
+DALI_PROPERTY("color", VECTOR4, true, true, true, Dali::Actor::Property::COLOR)
+DALI_PROPERTY("colorRed", FLOAT, true, true, true, Dali::Actor::Property::COLOR_RED)
+DALI_PROPERTY("colorGreen", FLOAT, true, true, true, Dali::Actor::Property::COLOR_GREEN)
+DALI_PROPERTY("colorBlue", FLOAT, true, true, true, Dali::Actor::Property::COLOR_BLUE)
+DALI_PROPERTY("colorAlpha", FLOAT, true, true, true, Dali::Actor::Property::COLOR_ALPHA)
+DALI_PROPERTY("worldColor", VECTOR4, false, false, true, Dali::Actor::Property::WORLD_COLOR)
+DALI_PROPERTY("worldMatrix", MATRIX, false, false, true, Dali::Actor::Property::WORLD_MATRIX)
+DALI_PROPERTY("name", STRING, true, false, false, Dali::Actor::Property::NAME)
+DALI_PROPERTY("sensitive", BOOLEAN, true, false, false, Dali::Actor::Property::SENSITIVE)
+DALI_PROPERTY("leaveRequired", BOOLEAN, true, false, false, Dali::Actor::Property::LEAVE_REQUIRED)
+DALI_PROPERTY("inheritOrientation", BOOLEAN, true, false, false, Dali::Actor::Property::INHERIT_ORIENTATION)
+DALI_PROPERTY("inheritScale", BOOLEAN, true, false, false, Dali::Actor::Property::INHERIT_SCALE)
+DALI_PROPERTY("colorMode", INTEGER, true, false, false, Dali::Actor::Property::COLOR_MODE)
+DALI_PROPERTY("drawMode", INTEGER, true, false, false, Dali::Actor::Property::DRAW_MODE)
+DALI_PROPERTY("sizeModeFactor", VECTOR3, true, false, false, Dali::Actor::Property::SIZE_MODE_FACTOR)
+DALI_PROPERTY("widthResizePolicy", STRING, true, false, false, Dali::Actor::Property::WIDTH_RESIZE_POLICY)
+DALI_PROPERTY("heightResizePolicy", STRING, true, false, false, Dali::Actor::Property::HEIGHT_RESIZE_POLICY)
+DALI_PROPERTY("sizeScalePolicy", INTEGER, true, false, false, Dali::Actor::Property::SIZE_SCALE_POLICY)
+DALI_PROPERTY("widthForHeight", BOOLEAN, true, false, false, Dali::Actor::Property::WIDTH_FOR_HEIGHT)
+DALI_PROPERTY("heightForWidth", BOOLEAN, true, false, false, Dali::Actor::Property::HEIGHT_FOR_WIDTH)
+DALI_PROPERTY("padding", VECTOR4, true, false, false, Dali::Actor::Property::PADDING)
+DALI_PROPERTY("minimumSize", VECTOR2, true, false, false, Dali::Actor::Property::MINIMUM_SIZE)
+DALI_PROPERTY("maximumSize", VECTOR2, true, false, false, Dali::Actor::Property::MAXIMUM_SIZE)
+DALI_PROPERTY("inheritPosition", BOOLEAN, true, false, false, Dali::Actor::Property::INHERIT_POSITION)
+DALI_PROPERTY("clippingMode", STRING, true, false, false, Dali::Actor::Property::CLIPPING_MODE)
+DALI_PROPERTY("layoutDirection", STRING, true, false, false, Dali::Actor::Property::LAYOUT_DIRECTION)
+DALI_PROPERTY("inheritLayoutDirection", BOOLEAN, true, false, false, Dali::Actor::Property::INHERIT_LAYOUT_DIRECTION)
+DALI_PROPERTY("opacity", FLOAT, true, true, true, Dali::Actor::Property::OPACITY)
+DALI_PROPERTY("screenPosition", VECTOR2, false, false, false, Dali::Actor::Property::SCREEN_POSITION)
+DALI_PROPERTY("positionUsesAnchorPoint", BOOLEAN, true, false, false, Dali::Actor::Property::POSITION_USES_ANCHOR_POINT)
+DALI_PROPERTY("culled", BOOLEAN, false, false, true, Dali::Actor::Property::CULLED)
+DALI_PROPERTY("id", INTEGER, false, false, false, Dali::Actor::Property::ID)
+DALI_PROPERTY("hierarchyDepth", INTEGER, false, false, false, Dali::Actor::Property::HIERARCHY_DEPTH)
+DALI_PROPERTY("isRoot", BOOLEAN, false, false, false, Dali::Actor::Property::IS_ROOT)
+DALI_PROPERTY("isLayer", BOOLEAN, false, false, false, Dali::Actor::Property::IS_LAYER)
+DALI_PROPERTY("connectedToScene", BOOLEAN, false, false, false, Dali::Actor::Property::CONNECTED_TO_SCENE)
+DALI_PROPERTY("keyboardFocusable", BOOLEAN, true, false, false, Dali::Actor::Property::KEYBOARD_FOCUSABLE)
+DALI_PROPERTY("siblingOrder", INTEGER, true, false, false, Dali::DevelActor::Property::SIBLING_ORDER)
+DALI_PROPERTY("updateSizeHint", VECTOR2, true, false, false, Dali::DevelActor::Property::UPDATE_SIZE_HINT)
+DALI_PROPERTY("captureAllTouchAfterStart", BOOLEAN, true, false, false, Dali::DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START)
+DALI_PROPERTY("touchAreaOffset", RECTANGLE, true, false, false, Dali::DevelActor::Property::TOUCH_AREA_OFFSET)
+DALI_PROPERTY_TABLE_END(DEFAULT_ACTOR_PROPERTY_START_INDEX, ActorDefaultProperties)
 
 // Signals
 
-const char* const SIGNAL_HOVERED = "hovered";
-const char* const SIGNAL_WHEEL_EVENT = "wheelEvent";
-const char* const SIGNAL_ON_SCENE = "onScene";
-const char* const SIGNAL_OFF_SCENE = "offScene";
-const char* const SIGNAL_ON_RELAYOUT = "onRelayout";
-const char* const SIGNAL_TOUCHED = "touched";
-const char* const SIGNAL_VISIBILITY_CHANGED = "visibilityChanged";
+const char* const SIGNAL_HOVERED                  = "hovered";
+const char* const SIGNAL_WHEEL_EVENT              = "wheelEvent";
+const char* const SIGNAL_ON_SCENE                 = "onScene";
+const char* const SIGNAL_OFF_SCENE                = "offScene";
+const char* const SIGNAL_ON_RELAYOUT              = "onRelayout";
+const char* const SIGNAL_TOUCHED                  = "touched";
+const char* const SIGNAL_VISIBILITY_CHANGED       = "visibilityChanged";
 const char* const SIGNAL_LAYOUT_DIRECTION_CHANGED = "layoutDirectionChanged";
-const char* const SIGNAL_CHILD_ADDED = "childAdded";
-const char* const SIGNAL_CHILD_REMOVED = "childRemoved";
+const char* const SIGNAL_CHILD_ADDED              = "childAdded";
+const char* const SIGNAL_CHILD_REMOVED            = "childRemoved";
 
 // Actions
 
@@ -169,21 +166,21 @@ BaseHandle CreateActor()
   return Dali::Actor::New();
 }
 
-TypeRegistration mType( typeid(Dali::Actor), typeid(Dali::Handle), CreateActor, ActorDefaultProperties );
+TypeRegistration mType(typeid(Dali::Actor), typeid(Dali::Handle), CreateActor, ActorDefaultProperties);
 
-SignalConnectorType signalConnector2( mType, SIGNAL_HOVERED, &Actor::DoConnectSignal );
-SignalConnectorType signalConnector3( mType, SIGNAL_WHEEL_EVENT, &Actor::DoConnectSignal );
-SignalConnectorType signalConnector4( mType, SIGNAL_ON_SCENE, &Actor::DoConnectSignal );
-SignalConnectorType signalConnector5( mType, SIGNAL_OFF_SCENE, &Actor::DoConnectSignal );
-SignalConnectorType signalConnector6( mType, SIGNAL_ON_RELAYOUT, &Actor::DoConnectSignal );
-SignalConnectorType signalConnector7( mType, SIGNAL_TOUCHED, &Actor::DoConnectSignal );
-SignalConnectorType signalConnector8( mType, SIGNAL_VISIBILITY_CHANGED, &Actor::DoConnectSignal );
-SignalConnectorType signalConnector9( mType, SIGNAL_LAYOUT_DIRECTION_CHANGED, &Actor::DoConnectSignal );
-SignalConnectorType signalConnector10( mType, SIGNAL_CHILD_ADDED, &Actor::DoConnectSignal );
-SignalConnectorType signalConnector11( mType, SIGNAL_CHILD_REMOVED, &Actor::DoConnectSignal );
+SignalConnectorType signalConnector2(mType, SIGNAL_HOVERED, &Actor::DoConnectSignal);
+SignalConnectorType signalConnector3(mType, SIGNAL_WHEEL_EVENT, &Actor::DoConnectSignal);
+SignalConnectorType signalConnector4(mType, SIGNAL_ON_SCENE, &Actor::DoConnectSignal);
+SignalConnectorType signalConnector5(mType, SIGNAL_OFF_SCENE, &Actor::DoConnectSignal);
+SignalConnectorType signalConnector6(mType, SIGNAL_ON_RELAYOUT, &Actor::DoConnectSignal);
+SignalConnectorType signalConnector7(mType, SIGNAL_TOUCHED, &Actor::DoConnectSignal);
+SignalConnectorType signalConnector8(mType, SIGNAL_VISIBILITY_CHANGED, &Actor::DoConnectSignal);
+SignalConnectorType signalConnector9(mType, SIGNAL_LAYOUT_DIRECTION_CHANGED, &Actor::DoConnectSignal);
+SignalConnectorType signalConnector10(mType, SIGNAL_CHILD_ADDED, &Actor::DoConnectSignal);
+SignalConnectorType signalConnector11(mType, SIGNAL_CHILD_REMOVED, &Actor::DoConnectSignal);
 
-TypeAction a1( mType, ACTION_SHOW, &Actor::DoAction );
-TypeAction a2( mType, ACTION_HIDE, &Actor::DoAction );
+TypeAction a1(mType, ACTION_SHOW, &Actor::DoAction);
+TypeAction a2(mType, ACTION_HIDE, &Actor::DoAction);
 
 /**
  * @brief Extract a given dimension from a Vector2
@@ -192,9 +189,9 @@ TypeAction a2( mType, ACTION_HIDE, &Actor::DoAction );
  * @param[in] dimension The dimension to extract
  * @return Return the value for the dimension
  */
-constexpr float GetDimensionValue( const Vector2& values, Dimension::Type dimension )
+constexpr float GetDimensionValue(const Vector2& values, Dimension::Type dimension)
 {
-  switch( dimension )
+  switch(dimension)
   {
     case Dimension::WIDTH:
     {
@@ -219,9 +216,9 @@ constexpr float GetDimensionValue( const Vector2& values, Dimension::Type dimens
  * @param[in] dimension The dimension to extract
  * @return Return the value for the dimension
  */
-float GetDimensionValue( const Vector3& values, Dimension::Type dimension )
+float GetDimensionValue(const Vector3& values, Dimension::Type dimension)
 {
-  return GetDimensionValue( values.GetVectorXY(), dimension );
+  return GetDimensionValue(values.GetVectorXY(), dimension);
 }
 
 /**
@@ -230,17 +227,17 @@ float GetDimensionValue( const Vector3& values, Dimension::Type dimension )
  * @param[in] visible The new visibility of the actor
  * @param[in] type Whether the actor's visible property has changed or a parent's
  */
-void EmitVisibilityChangedSignalRecursively( ActorPtr actor, bool visible, DevelActor::VisibilityChange::Type type )
+void EmitVisibilityChangedSignalRecursively(ActorPtr actor, bool visible, DevelActor::VisibilityChange::Type type)
 {
-  if( actor )
+  if(actor)
   {
-    actor->EmitVisibilityChangedSignal( visible, type );
+    actor->EmitVisibilityChangedSignal(visible, type);
 
-    if( actor->GetChildCount() > 0 )
+    if(actor->GetChildCount() > 0)
     {
-      for( auto& child : actor->GetChildrenInternal() )
+      for(auto& child : actor->GetChildrenInternal())
       {
-        EmitVisibilityChangedSignalRecursively( child, visible, DevelActor::VisibilityChange::PARENT );
+        EmitVisibilityChangedSignalRecursively(child, visible, DevelActor::VisibilityChange::PARENT);
       }
     }
   }
@@ -248,14 +245,14 @@ void EmitVisibilityChangedSignalRecursively( ActorPtr actor, bool visible, Devel
 
 /// Helper for emitting a signal
 template<typename Signal, typename Event>
-bool EmitConsumingSignal( Actor& actor, Signal& signal, const Event& event )
+bool EmitConsumingSignal(Actor& actor, Signal& signal, const Event& event)
 {
   bool consumed = false;
 
-  if( !signal.Empty() )
+  if(!signal.Empty())
   {
-    Dali::Actor handle( &actor );
-    consumed = signal.Emit( handle, event );
+    Dali::Actor handle(&actor);
+    consumed = signal.Emit(handle, event);
   }
 
   return consumed;
@@ -263,59 +260,59 @@ bool EmitConsumingSignal( Actor& actor, Signal& signal, const Event& event )
 
 /// Helper for emitting signals with multiple parameters
 template<typename Signal, typename... Param>
-void EmitSignal( Actor& actor, Signal& signal, Param... params)
+void EmitSignal(Actor& actor, Signal& signal, Param... params)
 {
-  if( !signal.Empty() )
+  if(!signal.Empty())
   {
-    Dali::Actor handle( &actor );
-    signal.Emit( handle, params... );
+    Dali::Actor handle(&actor);
+    signal.Emit(handle, params...);
   }
 }
 
 bool ScreenToLocalInternal(
-    const Matrix& viewMatrix,
-    const Matrix& projectionMatrix,
-    const Matrix& worldMatrix,
-    const Viewport& viewport,
-    const Vector3& currentSize,
-    float& localX,
-    float& localY,
-    float screenX,
-    float screenY )
+  const Matrix&   viewMatrix,
+  const Matrix&   projectionMatrix,
+  const Matrix&   worldMatrix,
+  const Viewport& viewport,
+  const Vector3&  currentSize,
+  float&          localX,
+  float&          localY,
+  float           screenX,
+  float           screenY)
 {
   // Get the ModelView matrix
   Matrix modelView;
-  Matrix::Multiply( modelView, worldMatrix, viewMatrix );
+  Matrix::Multiply(modelView, worldMatrix, viewMatrix);
 
   // Calculate the inverted ModelViewProjection matrix; this will be used for 2 unprojects
-  Matrix invertedMvp( false/*don't init*/);
-  Matrix::Multiply( invertedMvp, modelView, projectionMatrix );
+  Matrix invertedMvp(false /*don't init*/);
+  Matrix::Multiply(invertedMvp, modelView, projectionMatrix);
   bool success = invertedMvp.Invert();
 
   // Convert to GL coordinates
-  Vector4 screenPos( screenX - static_cast<float>( viewport.x ), static_cast<float>( viewport.height ) - screenY - static_cast<float>( viewport.y ), 0.f, 1.f );
+  Vector4 screenPos(screenX - static_cast<float>(viewport.x), static_cast<float>(viewport.height) - screenY - static_cast<float>(viewport.y), 0.f, 1.f);
 
   Vector4 nearPos;
-  if( success )
+  if(success)
   {
-    success = Unproject( screenPos, invertedMvp, static_cast<float>( viewport.width ), static_cast<float>( viewport.height ), nearPos );
+    success = Unproject(screenPos, invertedMvp, static_cast<float>(viewport.width), static_cast<float>(viewport.height), nearPos);
   }
 
   Vector4 farPos;
-  if( success )
+  if(success)
   {
     screenPos.z = 1.0f;
-    success = Unproject( screenPos, invertedMvp, static_cast<float>( viewport.width ), static_cast<float>( viewport.height ), farPos );
+    success     = Unproject(screenPos, invertedMvp, static_cast<float>(viewport.width), static_cast<float>(viewport.height), farPos);
   }
 
-  if( success )
+  if(success)
   {
     Vector4 local;
-    if( XyPlaneIntersect( nearPos, farPos, local ) )
+    if(XyPlaneIntersect(nearPos, farPos, local))
     {
       Vector3 size = currentSize;
-      localX = local.x + size.x * 0.5f;
-      localY = local.y + size.y * 0.5f;
+      localX       = local.x + size.x * 0.5f;
+      localY       = local.y + size.y * 0.5f;
     }
     else
     {
@@ -331,7 +328,7 @@ bool ScreenToLocalInternal(
 ActorPtr Actor::New()
 {
   // pass a reference to actor, actor does not own its node
-  ActorPtr actor( new Actor( BASIC, *CreateNode() ) );
+  ActorPtr actor(new Actor(BASIC, *CreateNode()));
 
   // Second-phase construction
   actor->Initialize();
@@ -342,23 +339,23 @@ ActorPtr Actor::New()
 const SceneGraph::Node* Actor::CreateNode()
 {
   // create node. Nodes are owned by the update manager
-  SceneGraph::Node* node = SceneGraph::Node::New();
-  OwnerPointer< SceneGraph::Node > transferOwnership( node );
-  Internal::ThreadLocalStorage* tls = Internal::ThreadLocalStorage::GetInternal();
+  SceneGraph::Node*              node = SceneGraph::Node::New();
+  OwnerPointer<SceneGraph::Node> transferOwnership(node);
+  Internal::ThreadLocalStorage*  tls = Internal::ThreadLocalStorage::GetInternal();
 
-  DALI_ASSERT_ALWAYS( tls && "ThreadLocalStorage is null" );
+  DALI_ASSERT_ALWAYS(tls && "ThreadLocalStorage is null");
 
-  AddNodeMessage( tls->GetUpdateManager(), transferOwnership );
+  AddNodeMessage(tls->GetUpdateManager(), transferOwnership);
 
   return node;
 }
 
-void Actor::SetName( const std::string& name )
+void Actor::SetName(const std::string& name)
 {
   mName = name;
 
   // ATTENTION: string for debug purposes is not thread safe.
-  DALI_LOG_SET_OBJECT_STRING( const_cast< SceneGraph::Node* >( &GetNode() ), name );
+  DALI_LOG_SET_OBJECT_STRING(const_cast<SceneGraph::Node*>(&GetNode()), name);
 }
 
 uint32_t Actor::GetId() const
@@ -371,67 +368,67 @@ Dali::Layer Actor::GetLayer()
   Dali::Layer layer;
 
   // Short-circuit for Layer derived actors
-  if( mIsLayer )
+  if(mIsLayer)
   {
-    layer = Dali::Layer( static_cast< Dali::Internal::Layer* >( this ) ); // static cast as we trust the flag
+    layer = Dali::Layer(static_cast<Dali::Internal::Layer*>(this)); // static cast as we trust the flag
   }
 
   // Find the immediate Layer parent
-  for( Actor* parent = mParent; !layer && parent != nullptr; parent = parent->GetParent() )
+  for(Actor* parent = mParent; !layer && parent != nullptr; parent = parent->GetParent())
   {
-    if( parent->IsLayer() )
+    if(parent->IsLayer())
     {
-      layer = Dali::Layer( static_cast< Dali::Internal::Layer* >( parent ) ); // static cast as we trust the flag
+      layer = Dali::Layer(static_cast<Dali::Internal::Layer*>(parent)); // static cast as we trust the flag
     }
   }
 
   return layer;
 }
 
-void Actor::Add( Actor& child )
+void Actor::Add(Actor& child)
 {
-  DALI_ASSERT_ALWAYS( this != &child && "Cannot add actor to itself" );
-  DALI_ASSERT_ALWAYS( !child.IsRoot() && "Cannot add root actor" );
+  DALI_ASSERT_ALWAYS(this != &child && "Cannot add actor to itself");
+  DALI_ASSERT_ALWAYS(!child.IsRoot() && "Cannot add root actor");
 
-  if( !mChildren )
+  if(!mChildren)
   {
     mChildren = new ActorContainer;
   }
 
-  Actor* const oldParent( child.mParent );
+  Actor* const oldParent(child.mParent);
 
   // child might already be ours
-  if( this != oldParent )
+  if(this != oldParent)
   {
     // if we already have parent, unparent us first
-    if( oldParent )
+    if(oldParent)
     {
-      oldParent->Remove( child ); // This causes OnChildRemove callback & ChildRemoved signal
+      oldParent->Remove(child); // This causes OnChildRemove callback & ChildRemoved signal
 
       // Old parent may need to readjust to missing child
-      if( oldParent->RelayoutDependentOnChildren() )
+      if(oldParent->RelayoutDependentOnChildren())
       {
         oldParent->RelayoutRequest();
       }
     }
 
     // Guard against Add() during previous OnChildRemove callback
-    if( !child.mParent )
+    if(!child.mParent)
     {
       // Do this first, since user callbacks from within SetParent() may need to remove child
-      mChildren->push_back( ActorPtr( &child ) );
+      mChildren->push_back(ActorPtr(&child));
 
       // SetParent asserts that child can be added
-      child.SetParent( this );
+      child.SetParent(this);
 
       // Notification for derived classes
-      OnChildAdd( child );
-      EmitChildAddedSignal( child );
+      OnChildAdd(child);
+      EmitChildAddedSignal(child);
 
-      InheritLayoutDirectionRecursively( ActorPtr( &child ), mLayoutDirection );
+      InheritLayoutDirectionRecursively(ActorPtr(&child), mLayoutDirection);
 
       // Only put in a relayout request if there is a suitable dependency
-      if( RelayoutDependentOnChildren() )
+      if(RelayoutDependentOnChildren())
       {
         RelayoutRequest();
       }
@@ -439,9 +436,9 @@ void Actor::Add( Actor& child )
   }
 }
 
-void Actor::Remove( Actor& child )
+void Actor::Remove(Actor& child)
 {
-  if( (this == &child) || (!mChildren) )
+  if((this == &child) || (!mChildren))
   {
     // no children or removing itself
     return;
@@ -451,76 +448,76 @@ void Actor::Remove( Actor& child )
 
   // Find the child in mChildren, and unparent it
   ActorIter end = mChildren->end();
-  for( ActorIter iter = mChildren->begin(); iter != end; ++iter )
+  for(ActorIter iter = mChildren->begin(); iter != end; ++iter)
   {
     ActorPtr actor = (*iter);
 
-    if( actor.Get() == &child )
+    if(actor.Get() == &child)
     {
       // Keep handle for OnChildRemove notification
       removed = actor;
 
       // Do this first, since user callbacks from within SetParent() may need to add the child
-      mChildren->erase( iter );
+      mChildren->erase(iter);
 
-      DALI_ASSERT_DEBUG( actor->GetParent() == this );
-      actor->SetParent( nullptr );
+      DALI_ASSERT_DEBUG(actor->GetParent() == this);
+      actor->SetParent(nullptr);
 
       break;
     }
   }
 
-  if( removed )
+  if(removed)
   {
     // Only put in a relayout request if there is a suitable dependency
-    if( RelayoutDependentOnChildren() )
+    if(RelayoutDependentOnChildren())
     {
       RelayoutRequest();
     }
   }
 
   // Notification for derived classes
-  OnChildRemove( child );
-  EmitChildRemovedSignal( child );
+  OnChildRemove(child);
+  EmitChildRemovedSignal(child);
 }
 
 void Actor::Unparent()
 {
-  if( mParent )
+  if(mParent)
   {
     // Remove this actor from the parent. The remove will put a relayout request in for
     // the parent if required
-    mParent->Remove( *this );
+    mParent->Remove(*this);
     // mParent is now NULL!
   }
 }
 
 uint32_t Actor::GetChildCount() const
 {
-  return ( nullptr != mChildren ) ? static_cast<uint32_t>( mChildren->size() ) : 0; // only 4,294,967,295 children per actor
+  return (nullptr != mChildren) ? static_cast<uint32_t>(mChildren->size()) : 0; // only 4,294,967,295 children per actor
 }
 
-ActorPtr Actor::GetChildAt( uint32_t index ) const
+ActorPtr Actor::GetChildAt(uint32_t index) const
 {
-  DALI_ASSERT_ALWAYS( index < GetChildCount() );
+  DALI_ASSERT_ALWAYS(index < GetChildCount());
 
-  return ( ( mChildren ) ? ( *mChildren )[ index ] : ActorPtr() );
+  return ((mChildren) ? (*mChildren)[index] : ActorPtr());
 }
 
-ActorPtr Actor::FindChildByName( const std::string& actorName )
+ActorPtr Actor::FindChildByName(const std::string& actorName)
 {
   ActorPtr child = nullptr;
-  if( actorName == mName )
+  if(actorName == mName)
   {
     child = this;
   }
-  else if( mChildren )
+  else if(mChildren)
   {
-    for( const auto& actor : *mChildren )
+    for(const auto& actor : *mChildren)
     {
-      child = actor->FindChildByName( actorName );
+      child = actor->FindChildByName(actorName);
 
-      if( child )
+      if(child)
       {
         break;
       }
@@ -529,20 +526,20 @@ ActorPtr Actor::FindChildByName( const std::string& actorName )
   return child;
 }
 
-ActorPtr Actor::FindChildById( const uint32_t id )
+ActorPtr Actor::FindChildById(const uint32_t id)
 {
   ActorPtr child = nullptr;
-  if( id == GetId() )
+  if(id == GetId())
   {
     child = this;
   }
-  else if( mChildren )
+  else if(mChildren)
   {
-    for( const auto& actor : *mChildren )
+    for(const auto& actor : *mChildren)
     {
-      child = actor->FindChildById( id );
+      child = actor->FindChildById(id);
 
-      if( child )
+      if(child)
       {
         break;
       }
@@ -551,18 +548,18 @@ ActorPtr Actor::FindChildById( const uint32_t id )
   return child;
 }
 
-void Actor::SetParentOrigin( const Vector3& origin )
+void Actor::SetParentOrigin(const Vector3& origin)
 {
   // node is being used in a separate thread; queue a message to set the value & base value
-  SetParentOriginMessage( GetEventThreadServices(), GetNode(), origin );
+  SetParentOriginMessage(GetEventThreadServices(), GetNode(), origin);
 
   // Cache for event-thread access
-  if( !mParentOrigin )
+  if(!mParentOrigin)
   {
     // not allocated, check if different from default
-    if( ParentOrigin::DEFAULT != origin )
+    if(ParentOrigin::DEFAULT != origin)
     {
-      mParentOrigin = new Vector3( origin );
+      mParentOrigin = new Vector3(origin);
     }
   }
   else
@@ -575,21 +572,21 @@ void Actor::SetParentOrigin( const Vector3& origin )
 const Vector3& Actor::GetCurrentParentOrigin() const
 {
   // Cached for event-thread access
-  return ( mParentOrigin ) ? *mParentOrigin : ParentOrigin::DEFAULT;
+  return (mParentOrigin) ? *mParentOrigin : ParentOrigin::DEFAULT;
 }
 
-void Actor::SetAnchorPoint( const Vector3& anchor )
+void Actor::SetAnchorPoint(const Vector3& anchor)
 {
   // node is being used in a separate thread; queue a message to set the value & base value
-  SetAnchorPointMessage( GetEventThreadServices(), GetNode(), anchor );
+  SetAnchorPointMessage(GetEventThreadServices(), GetNode(), anchor);
 
   // Cache for event-thread access
-  if( !mAnchorPoint )
+  if(!mAnchorPoint)
   {
     // not allocated, check if different from default
-    if( AnchorPoint::DEFAULT != anchor )
+    if(AnchorPoint::DEFAULT != anchor)
     {
-      mAnchorPoint = new Vector3( anchor );
+      mAnchorPoint = new Vector3(anchor);
     }
   }
   else
@@ -602,57 +599,57 @@ void Actor::SetAnchorPoint( const Vector3& anchor )
 const Vector3& Actor::GetCurrentAnchorPoint() const
 {
   // Cached for event-thread access
-  return ( mAnchorPoint ) ? *mAnchorPoint : AnchorPoint::DEFAULT;
+  return (mAnchorPoint) ? *mAnchorPoint : AnchorPoint::DEFAULT;
 }
 
-void Actor::SetPosition( float x, float y )
+void Actor::SetPosition(float x, float y)
 {
-  SetPosition( Vector3( x, y, 0.0f ) );
+  SetPosition(Vector3(x, y, 0.0f));
 }
 
-void Actor::SetPosition( float x, float y, float z )
+void Actor::SetPosition(float x, float y, float z)
 {
-  SetPosition( Vector3( x, y, z ) );
+  SetPosition(Vector3(x, y, z));
 }
 
-void Actor::SetPosition( const Vector3& position )
+void Actor::SetPosition(const Vector3& position)
 {
   mTargetPosition = position;
 
   // node is being used in a separate thread; queue a message to set the value & base value
-  SceneGraph::NodeTransformPropertyMessage<Vector3>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mPosition, &SceneGraph::TransformManagerPropertyHandler<Vector3>::Bake, position );
+  SceneGraph::NodeTransformPropertyMessage<Vector3>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mPosition, &SceneGraph::TransformManagerPropertyHandler<Vector3>::Bake, position);
 }
 
-void Actor::SetX( float x )
+void Actor::SetX(float x)
 {
   mTargetPosition.x = x;
 
   // node is being used in a separate thread; queue a message to set the value & base value
-  SceneGraph::NodeTransformComponentMessage<Vector3>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mPosition, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeX, x );
+  SceneGraph::NodeTransformComponentMessage<Vector3>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mPosition, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeX, x);
 }
 
-void Actor::SetY( float y )
+void Actor::SetY(float y)
 {
   mTargetPosition.y = y;
 
   // node is being used in a separate thread; queue a message to set the value & base value
-  SceneGraph::NodeTransformComponentMessage<Vector3>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mPosition, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeY, y );
+  SceneGraph::NodeTransformComponentMessage<Vector3>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mPosition, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeY, y);
 }
 
-void Actor::SetZ( float z )
+void Actor::SetZ(float z)
 {
   mTargetPosition.z = z;
 
   // node is being used in a separate thread; queue a message to set the value & base value
-  SceneGraph::NodeTransformComponentMessage<Vector3>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mPosition, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeZ, z );
+  SceneGraph::NodeTransformComponentMessage<Vector3>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mPosition, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeZ, z);
 }
 
-void Actor::TranslateBy( const Vector3& distance )
+void Actor::TranslateBy(const Vector3& distance)
 {
   mTargetPosition += distance;
 
   // node is being used in a separate thread; queue a message to set the value & base value
-  SceneGraph::NodeTransformPropertyMessage<Vector3>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mPosition, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeRelative, distance );
+  SceneGraph::NodeTransformPropertyMessage<Vector3>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mPosition, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeRelative, distance);
 }
 
 const Vector3& Actor::GetCurrentPosition() const
@@ -664,68 +661,68 @@ const Vector3& Actor::GetCurrentPosition() const
 const Vector3& Actor::GetCurrentWorldPosition() const
 {
   // node is being used in a separate thread; copy the value from the previous update
-  return GetNode().GetWorldPosition( GetEventThreadServices().GetEventBufferIndex() );
+  return GetNode().GetWorldPosition(GetEventThreadServices().GetEventBufferIndex());
 }
 
 const Vector2 Actor::GetCurrentScreenPosition() const
 {
-  if( mScene && OnScene() )
+  if(mScene && OnScene())
   {
-    Vector3 worldPosition =  GetNode().GetWorldPosition( GetEventThreadServices().GetEventBufferIndex() );
-    Vector3 cameraPosition = mScene->GetDefaultCameraActor().GetNode().GetWorldPosition( GetEventThreadServices().GetEventBufferIndex() );
+    Vector3 worldPosition  = GetNode().GetWorldPosition(GetEventThreadServices().GetEventBufferIndex());
+    Vector3 cameraPosition = mScene->GetDefaultCameraActor().GetNode().GetWorldPosition(GetEventThreadServices().GetEventBufferIndex());
     worldPosition -= cameraPosition;
 
     Vector3 actorSize = GetCurrentSize() * GetCurrentWorldScale();
-    Vector2 halfSceneSize( mScene->GetSize() * 0.5f ); // World position origin is center of scene
-    Vector3 halfActorSize( actorSize * 0.5f );
-    Vector3 anchorPointOffSet = halfActorSize - actorSize * ( mPositionUsesAnchorPoint ? GetCurrentAnchorPoint() : AnchorPoint::TOP_LEFT );
+    Vector2 halfSceneSize(mScene->GetSize() * 0.5f); // World position origin is center of scene
+    Vector3 halfActorSize(actorSize * 0.5f);
+    Vector3 anchorPointOffSet = halfActorSize - actorSize * (mPositionUsesAnchorPoint ? GetCurrentAnchorPoint() : AnchorPoint::TOP_LEFT);
 
-    return Vector2( halfSceneSize.width + worldPosition.x - anchorPointOffSet.x,
-                    halfSceneSize.height + worldPosition.y - anchorPointOffSet.y );
+    return Vector2(halfSceneSize.width + worldPosition.x - anchorPointOffSet.x,
+                   halfSceneSize.height + worldPosition.y - anchorPointOffSet.y);
   }
 
   return Vector2::ZERO;
 }
 
-void Actor::SetInheritPosition( bool inherit )
+void Actor::SetInheritPosition(bool inherit)
 {
-  if( mInheritPosition != inherit )
+  if(mInheritPosition != inherit)
   {
     // non animatable so keep local copy
     mInheritPosition = inherit;
-    SetInheritPositionMessage( GetEventThreadServices(), GetNode(), inherit );
+    SetInheritPositionMessage(GetEventThreadServices(), GetNode(), inherit);
   }
 }
 
-void Actor::SetOrientation( const Radian& angle, const Vector3& axis )
+void Actor::SetOrientation(const Radian& angle, const Vector3& axis)
 {
-  Vector3 normalizedAxis( axis.x, axis.y, axis.z );
+  Vector3 normalizedAxis(axis.x, axis.y, axis.z);
   normalizedAxis.Normalize();
 
-  Quaternion orientation( angle, normalizedAxis );
+  Quaternion orientation(angle, normalizedAxis);
 
-  SetOrientation( orientation );
+  SetOrientation(orientation);
 }
 
-void Actor::SetOrientation( const Quaternion& orientation )
+void Actor::SetOrientation(const Quaternion& orientation)
 {
   mTargetOrientation = orientation;
 
   // node is being used in a separate thread; queue a message to set the value & base value
-  SceneGraph::NodeTransformPropertyMessage<Quaternion>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mOrientation, &SceneGraph::TransformManagerPropertyHandler<Quaternion>::Bake, orientation );
+  SceneGraph::NodeTransformPropertyMessage<Quaternion>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mOrientation, &SceneGraph::TransformManagerPropertyHandler<Quaternion>::Bake, orientation);
 }
 
-void Actor::RotateBy( const Radian& angle, const Vector3& axis )
+void Actor::RotateBy(const Radian& angle, const Vector3& axis)
 {
-  RotateBy( Quaternion(angle, axis) );
+  RotateBy(Quaternion(angle, axis));
 }
 
-void Actor::RotateBy( const Quaternion& relativeRotation )
+void Actor::RotateBy(const Quaternion& relativeRotation)
 {
-  mTargetOrientation *= Quaternion( relativeRotation );
+  mTargetOrientation *= Quaternion(relativeRotation);
 
   // node is being used in a separate thread; queue a message to set the value & base value
-  SceneGraph::NodeTransformPropertyMessage<Quaternion>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mOrientation, &SceneGraph::TransformManagerPropertyHandler<Quaternion>::BakeRelative, relativeRotation );
+  SceneGraph::NodeTransformPropertyMessage<Quaternion>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mOrientation, &SceneGraph::TransformManagerPropertyHandler<Quaternion>::BakeRelative, relativeRotation);
 }
 
 const Quaternion& Actor::GetCurrentOrientation() const
@@ -737,49 +734,49 @@ const Quaternion& Actor::GetCurrentOrientation() const
 const Quaternion& Actor::GetCurrentWorldOrientation() const
 {
   // node is being used in a separate thread; copy the value from the previous update
-  return GetNode().GetWorldOrientation( GetEventThreadServices().GetEventBufferIndex() );
+  return GetNode().GetWorldOrientation(GetEventThreadServices().GetEventBufferIndex());
 }
 
-void Actor::SetScale( float scale )
+void Actor::SetScale(float scale)
 {
-  SetScale( Vector3( scale, scale, scale ) );
+  SetScale(Vector3(scale, scale, scale));
 }
 
-void Actor::SetScale( float x, float y, float z )
+void Actor::SetScale(float x, float y, float z)
 {
-  SetScale( Vector3( x, y, z ) );
+  SetScale(Vector3(x, y, z));
 }
 
-void Actor::SetScale( const Vector3& scale )
+void Actor::SetScale(const Vector3& scale)
 {
   mTargetScale = scale;
 
   // node is being used in a separate thread; queue a message to set the value & base value
-  SceneGraph::NodeTransformPropertyMessage<Vector3>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mScale, &SceneGraph::TransformManagerPropertyHandler<Vector3>::Bake, scale );
+  SceneGraph::NodeTransformPropertyMessage<Vector3>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mScale, &SceneGraph::TransformManagerPropertyHandler<Vector3>::Bake, scale);
 }
 
-void Actor::SetScaleX( float x )
+void Actor::SetScaleX(float x)
 {
   mTargetScale.x = x;
 
   // node is being used in a separate thread; queue a message to set the value & base value
-  SceneGraph::NodeTransformComponentMessage<Vector3>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mScale, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeX, x );
+  SceneGraph::NodeTransformComponentMessage<Vector3>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mScale, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeX, x);
 }
 
-void Actor::SetScaleY( float y )
+void Actor::SetScaleY(float y)
 {
   mTargetScale.y = y;
 
   // node is being used in a separate thread; queue a message to set the value & base value
-  SceneGraph::NodeTransformComponentMessage<Vector3>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mScale, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeY, y );
+  SceneGraph::NodeTransformComponentMessage<Vector3>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mScale, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeY, y);
 }
 
-void Actor::SetScaleZ( float z )
+void Actor::SetScaleZ(float z)
 {
   mTargetScale.z = z;
 
   // node is being used in a separate thread; queue a message to set the value & base value
-  SceneGraph::NodeTransformComponentMessage<Vector3>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mScale, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeZ, z );
+  SceneGraph::NodeTransformComponentMessage<Vector3>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mScale, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeZ, z);
 }
 
 void Actor::ScaleBy(const Vector3& relativeScale)
@@ -787,7 +784,7 @@ void Actor::ScaleBy(const Vector3& relativeScale)
   mTargetScale *= relativeScale;
 
   // node is being used in a separate thread; queue a message to set the value & base value
-  SceneGraph::NodeTransformPropertyMessage<Vector3>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mScale, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeRelativeMultiply, relativeScale );
+  SceneGraph::NodeTransformPropertyMessage<Vector3>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mScale, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeRelativeMultiply, relativeScale);
 }
 
 const Vector3& Actor::GetCurrentScale() const
@@ -799,17 +796,17 @@ const Vector3& Actor::GetCurrentScale() const
 const Vector3& Actor::GetCurrentWorldScale() const
 {
   // node is being used in a separate thread; copy the value from the previous update
-  return GetNode().GetWorldScale( GetEventThreadServices().GetEventBufferIndex() );
+  return GetNode().GetWorldScale(GetEventThreadServices().GetEventBufferIndex());
 }
 
-void Actor::SetInheritScale( bool inherit )
+void Actor::SetInheritScale(bool inherit)
 {
-  if( mInheritScale != inherit )
+  if(mInheritScale != inherit)
   {
     // non animatable so keep local copy
     mInheritScale = inherit;
     // node is being used in a separate thread; queue a message to set the value
-    SetInheritScaleMessage( GetEventThreadServices(), GetNode(), inherit );
+    SetInheritScaleMessage(GetEventThreadServices(), GetNode(), inherit);
   }
 }
 
@@ -818,23 +815,23 @@ Matrix Actor::GetCurrentWorldMatrix() const
   return GetNode().GetWorldMatrix(0);
 }
 
-void Actor::SetVisible( bool visible )
+void Actor::SetVisible(bool visible)
 {
-  SetVisibleInternal( visible, SendMessage::TRUE );
+  SetVisibleInternal(visible, SendMessage::TRUE);
 }
 
 bool Actor::IsVisible() const
 {
   // node is being used in a separate thread; copy the value from the previous update
-  return GetNode().IsVisible( GetEventThreadServices().GetEventBufferIndex() );
+  return GetNode().IsVisible(GetEventThreadServices().GetEventBufferIndex());
 }
 
-void Actor::SetOpacity( float opacity )
+void Actor::SetOpacity(float opacity)
 {
   mTargetColor.a = opacity;
 
   // node is being used in a separate thread; queue a message to set the value & base value
-  SceneGraph::NodePropertyComponentMessage<Vector4>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mColor, &AnimatableProperty<Vector4>::BakeW, opacity );
+  SceneGraph::NodePropertyComponentMessage<Vector4>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mColor, &AnimatableProperty<Vector4>::BakeW, opacity);
 }
 
 float Actor::GetCurrentOpacity() const
@@ -845,39 +842,39 @@ float Actor::GetCurrentOpacity() const
 
 const Vector4& Actor::GetCurrentWorldColor() const
 {
-  return GetNode().GetWorldColor( GetEventThreadServices().GetEventBufferIndex() );
+  return GetNode().GetWorldColor(GetEventThreadServices().GetEventBufferIndex());
 }
 
-void Actor::SetColor( const Vector4& color )
+void Actor::SetColor(const Vector4& color)
 {
   mTargetColor = color;
 
   // node is being used in a separate thread; queue a message to set the value & base value
-  SceneGraph::NodePropertyMessage<Vector4>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mColor, &AnimatableProperty<Vector4>::Bake, color );
+  SceneGraph::NodePropertyMessage<Vector4>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mColor, &AnimatableProperty<Vector4>::Bake, color);
 }
 
-void Actor::SetColorRed( float red )
+void Actor::SetColorRed(float red)
 {
   mTargetColor.r = red;
 
   // node is being used in a separate thread; queue a message to set the value & base value
-  SceneGraph::NodePropertyComponentMessage<Vector4>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mColor, &AnimatableProperty<Vector4>::BakeX, red );
+  SceneGraph::NodePropertyComponentMessage<Vector4>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mColor, &AnimatableProperty<Vector4>::BakeX, red);
 }
 
-void Actor::SetColorGreen( float green )
+void Actor::SetColorGreen(float green)
 {
   mTargetColor.g = green;
 
   // node is being used in a separate thread; queue a message to set the value & base value
-  SceneGraph::NodePropertyComponentMessage<Vector4>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mColor, &AnimatableProperty<Vector4>::BakeY, green );
+  SceneGraph::NodePropertyComponentMessage<Vector4>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mColor, &AnimatableProperty<Vector4>::BakeY, green);
 }
 
-void Actor::SetColorBlue( float blue )
+void Actor::SetColorBlue(float blue)
 {
   mTargetColor.b = blue;
 
   // node is being used in a separate thread; queue a message to set the value & base value
-  SceneGraph::NodePropertyComponentMessage<Vector4>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mColor, &AnimatableProperty<Vector4>::BakeZ, blue );
+  SceneGraph::NodePropertyComponentMessage<Vector4>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mColor, &AnimatableProperty<Vector4>::BakeZ, blue);
 }
 
 const Vector4& Actor::GetCurrentColor() const
@@ -886,18 +883,18 @@ const Vector4& Actor::GetCurrentColor() const
   return GetNode().GetColor(GetEventThreadServices().GetEventBufferIndex());
 }
 
-void Actor::SetInheritOrientation( bool inherit )
+void Actor::SetInheritOrientation(bool inherit)
 {
-  if( mInheritOrientation != inherit )
+  if(mInheritOrientation != inherit)
   {
     // non animatable so keep local copy
     mInheritOrientation = inherit;
     // node is being used in a separate thread; queue a message to set the value
-    SetInheritOrientationMessage( GetEventThreadServices(), GetNode(), inherit );
+    SetInheritOrientationMessage(GetEventThreadServices(), GetNode(), inherit);
   }
 }
 
-void Actor::SetSizeModeFactor( const Vector3& factor )
+void Actor::SetSizeModeFactor(const Vector3& factor)
 {
   EnsureRelayouter();
 
@@ -906,7 +903,7 @@ void Actor::SetSizeModeFactor( const Vector3& factor )
 
 const Vector3& Actor::GetSizeModeFactor() const
 {
-  if ( mRelayoutData )
+  if(mRelayoutData)
   {
     return mRelayoutData->sizeModeFactor;
   }
@@ -914,79 +911,79 @@ const Vector3& Actor::GetSizeModeFactor() const
   return Relayouter::DEFAULT_SIZE_MODE_FACTOR;
 }
 
-void Actor::SetColorMode( ColorMode colorMode )
+void Actor::SetColorMode(ColorMode colorMode)
 {
   // non animatable so keep local copy
   mColorMode = colorMode;
   // node is being used in a separate thread; queue a message to set the value
-  SetColorModeMessage( GetEventThreadServices(), GetNode(), colorMode );
+  SetColorModeMessage(GetEventThreadServices(), GetNode(), colorMode);
 }
 
-void Actor::SetSize( float width, float height )
+void Actor::SetSize(float width, float height)
 {
-  SetSize( Vector2( width, height ) );
+  SetSize(Vector2(width, height));
 }
 
-void Actor::SetSize( float width, float height, float depth )
+void Actor::SetSize(float width, float height, float depth)
 {
-  SetSize( Vector3( width, height, depth ) );
+  SetSize(Vector3(width, height, depth));
 }
 
-void Actor::SetSize( const Vector2& size )
+void Actor::SetSize(const Vector2& size)
 {
-  SetSize( Vector3( size.width, size.height, 0.f ) );
+  SetSize(Vector3(size.width, size.height, 0.f));
 }
 
-void Actor::SetSizeInternal( const Vector2& size )
+void Actor::SetSizeInternal(const Vector2& size)
 {
-  SetSizeInternal( Vector3( size.width, size.height, 0.f ) );
+  SetSizeInternal(Vector3(size.width, size.height, 0.f));
 }
 
-void Actor::SetSize( const Vector3& size )
+void Actor::SetSize(const Vector3& size)
 {
-  if( IsRelayoutEnabled() && !mRelayoutData->insideRelayout )
+  if(IsRelayoutEnabled() && !mRelayoutData->insideRelayout)
   {
     // TODO we cannot just ignore the given Z but that means rewrite the size negotiation!!
-    SetPreferredSize( size.GetVectorXY() );
+    SetPreferredSize(size.GetVectorXY());
   }
   else
   {
-    SetSizeInternal( size );
+    SetSizeInternal(size);
   }
 }
 
-void Actor::SetSizeInternal( const Vector3& size )
+void Actor::SetSizeInternal(const Vector3& size)
 {
   // dont allow recursive loop
-  DALI_ASSERT_ALWAYS( !mInsideOnSizeSet && "Cannot call SetSize from OnSizeSet" );
+  DALI_ASSERT_ALWAYS(!mInsideOnSizeSet && "Cannot call SetSize from OnSizeSet");
   // check that we have a node AND the new size width, height or depth is at least a little bit different from the old one
-  if( ( fabsf( mTargetSize.width - size.width  ) > Math::MACHINE_EPSILON_1 )||
-      ( fabsf( mTargetSize.height- size.height ) > Math::MACHINE_EPSILON_1 )||
-      ( fabsf( mTargetSize.depth - size.depth  ) > Math::MACHINE_EPSILON_1 ) )
+  if((fabsf(mTargetSize.width - size.width) > Math::MACHINE_EPSILON_1) ||
+     (fabsf(mTargetSize.height - size.height) > Math::MACHINE_EPSILON_1) ||
+     (fabsf(mTargetSize.depth - size.depth) > Math::MACHINE_EPSILON_1))
   {
     mTargetSize = size;
 
     // node is being used in a separate thread; queue a message to set the value & base value
-    SceneGraph::NodeTransformPropertyMessage<Vector3>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mSize, &SceneGraph::TransformManagerPropertyHandler<Vector3>::Bake, mTargetSize );
+    SceneGraph::NodeTransformPropertyMessage<Vector3>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mSize, &SceneGraph::TransformManagerPropertyHandler<Vector3>::Bake, mTargetSize);
 
     // Notification for derived classes
     mInsideOnSizeSet = true;
-    OnSizeSet( mTargetSize );
+    OnSizeSet(mTargetSize);
     mInsideOnSizeSet = false;
 
     // Raise a relayout request if the flag is not locked
-    if( mRelayoutData && !mRelayoutData->insideRelayout )
+    if(mRelayoutData && !mRelayoutData->insideRelayout)
     {
       RelayoutRequest();
     }
   }
 }
 
-void Actor::SetWidth( float width )
+void Actor::SetWidth(float width)
 {
-  if( IsRelayoutEnabled() && !mRelayoutData->insideRelayout )
+  if(IsRelayoutEnabled() && !mRelayoutData->insideRelayout)
   {
-    SetResizePolicy( ResizePolicy::FIXED, Dimension::WIDTH );
+    SetResizePolicy(ResizePolicy::FIXED, Dimension::WIDTH);
     mRelayoutData->preferredSize.width = width;
   }
   else
@@ -994,7 +991,7 @@ void Actor::SetWidth( float width )
     mTargetSize.width = width;
 
     // node is being used in a separate thread; queue a message to set the value & base value
-    SceneGraph::NodeTransformComponentMessage<Vector3>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mSize, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeX, width );
+    SceneGraph::NodeTransformComponentMessage<Vector3>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mSize, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeX, width);
   }
 
   mUseAnimatedSize &= ~AnimatedSizeFlag::WIDTH;
@@ -1002,11 +999,11 @@ void Actor::SetWidth( float width )
   RelayoutRequest();
 }
 
-void Actor::SetHeight( float height )
+void Actor::SetHeight(float height)
 {
-  if( IsRelayoutEnabled() && !mRelayoutData->insideRelayout )
+  if(IsRelayoutEnabled() && !mRelayoutData->insideRelayout)
   {
-    SetResizePolicy( ResizePolicy::FIXED, Dimension::HEIGHT );
+    SetResizePolicy(ResizePolicy::FIXED, Dimension::HEIGHT);
     mRelayoutData->preferredSize.height = height;
   }
   else
@@ -1014,7 +1011,7 @@ void Actor::SetHeight( float height )
     mTargetSize.height = height;
 
     // node is being used in a separate thread; queue a message to set the value & base value
-    SceneGraph::NodeTransformComponentMessage<Vector3>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mSize, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeY, height );
+    SceneGraph::NodeTransformComponentMessage<Vector3>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mSize, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeY, height);
   }
 
   mUseAnimatedSize &= ~AnimatedSizeFlag::HEIGHT;
@@ -1022,21 +1019,21 @@ void Actor::SetHeight( float height )
   RelayoutRequest();
 }
 
-void Actor::SetDepth( float depth )
+void Actor::SetDepth(float depth)
 {
   mTargetSize.depth = depth;
 
   mUseAnimatedSize &= ~AnimatedSizeFlag::DEPTH;
 
   // node is being used in a separate thread; queue a message to set the value & base value
-  SceneGraph::NodeTransformComponentMessage<Vector3>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mSize, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeZ, depth );
+  SceneGraph::NodeTransformComponentMessage<Vector3>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mSize, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeZ, depth);
 }
 
 Vector3 Actor::GetTargetSize() const
 {
   Vector3 size = mTargetSize;
 
-  if( mUseAnimatedSize & AnimatedSizeFlag::WIDTH )
+  if(mUseAnimatedSize & AnimatedSizeFlag::WIDTH)
   {
     // Should return animated size if size is animated
     size.width = mAnimatedSize.width;
@@ -1044,25 +1041,25 @@ Vector3 Actor::GetTargetSize() const
   else
   {
     // Should return preferred size if size is fixed as set by SetSize
-    if( GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::FIXED )
+    if(GetResizePolicy(Dimension::WIDTH) == ResizePolicy::FIXED)
     {
       size.width = GetPreferredSize().width;
     }
   }
 
-  if( mUseAnimatedSize & AnimatedSizeFlag::HEIGHT )
+  if(mUseAnimatedSize & AnimatedSizeFlag::HEIGHT)
   {
     size.height = mAnimatedSize.height;
   }
   else
   {
-    if( GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::FIXED )
+    if(GetResizePolicy(Dimension::HEIGHT) == ResizePolicy::FIXED)
     {
       size.height = GetPreferredSize().height;
     }
   }
 
-  if( mUseAnimatedSize & AnimatedSizeFlag::DEPTH )
+  if(mUseAnimatedSize & AnimatedSizeFlag::DEPTH)
   {
     size.depth = mAnimatedSize.depth;
   }
@@ -1073,28 +1070,28 @@ Vector3 Actor::GetTargetSize() const
 const Vector3& Actor::GetCurrentSize() const
 {
   // node is being used in a separate thread; copy the value from the previous update
-  return GetNode().GetSize( GetEventThreadServices().GetEventBufferIndex() );
+  return GetNode().GetSize(GetEventThreadServices().GetEventBufferIndex());
 }
 
 Vector3 Actor::GetNaturalSize() const
 {
   // It is up to deriving classes to return the appropriate natural size
-  return Vector3( 0.0f, 0.0f, 0.0f );
+  return Vector3(0.0f, 0.0f, 0.0f);
 }
 
-void Actor::SetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension )
+void Actor::SetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension)
 {
   EnsureRelayouter().SetResizePolicy(policy, dimension, mTargetSize);
 
-  OnSetResizePolicy( policy, dimension );
+  OnSetResizePolicy(policy, dimension);
 
   // Trigger relayout on this control
   RelayoutRequest();
 }
 
-ResizePolicy::Type Actor::GetResizePolicy( Dimension::Type dimension ) const
+ResizePolicy::Type Actor::GetResizePolicy(Dimension::Type dimension) const
 {
-  if ( mRelayoutData )
+  if(mRelayoutData)
   {
     return mRelayoutData->GetResizePolicy(dimension);
   }
@@ -1102,7 +1099,7 @@ ResizePolicy::Type Actor::GetResizePolicy( Dimension::Type dimension ) const
   return ResizePolicy::DEFAULT;
 }
 
-void Actor::SetSizeScalePolicy( SizeScalePolicy::Type policy )
+void Actor::SetSizeScalePolicy(SizeScalePolicy::Type policy)
 {
   EnsureRelayouter();
 
@@ -1114,7 +1111,7 @@ void Actor::SetSizeScalePolicy( SizeScalePolicy::Type policy )
 
 SizeScalePolicy::Type Actor::GetSizeScalePolicy() const
 {
-  if ( mRelayoutData )
+  if(mRelayoutData)
   {
     return mRelayoutData->sizeSetPolicy;
   }
@@ -1122,30 +1119,30 @@ SizeScalePolicy::Type Actor::GetSizeScalePolicy() const
   return Relayouter::DEFAULT_SIZE_SCALE_POLICY;
 }
 
-void Actor::SetDimensionDependency( Dimension::Type dimension, Dimension::Type dependency )
+void Actor::SetDimensionDependency(Dimension::Type dimension, Dimension::Type dependency)
 {
   EnsureRelayouter().SetDimensionDependency(dimension, dependency);
 }
 
-Dimension::Type Actor::GetDimensionDependency( Dimension::Type dimension ) const
+Dimension::Type Actor::GetDimensionDependency(Dimension::Type dimension) const
 {
-  if ( mRelayoutData )
+  if(mRelayoutData)
   {
     return mRelayoutData->GetDimensionDependency(dimension);
   }
 
-  return Dimension::ALL_DIMENSIONS;   // Default
+  return Dimension::ALL_DIMENSIONS; // Default
 }
 
-void Actor::SetRelayoutEnabled( bool relayoutEnabled )
+void Actor::SetRelayoutEnabled(bool relayoutEnabled)
 {
   // If relayout data has not been allocated yet and the client is requesting
   // to disable it, do nothing
-  if( mRelayoutData || relayoutEnabled )
+  if(mRelayoutData || relayoutEnabled)
   {
     EnsureRelayouter();
 
-    DALI_ASSERT_DEBUG( mRelayoutData && "mRelayoutData not created" );
+    DALI_ASSERT_DEBUG(mRelayoutData && "mRelayoutData not created");
 
     mRelayoutData->relayoutEnabled = relayoutEnabled;
   }
@@ -1158,113 +1155,113 @@ bool Actor::IsRelayoutEnabled() const
   return mRelayoutData && mRelayoutData->relayoutEnabled;
 }
 
-void Actor::SetLayoutDirty( bool dirty, Dimension::Type dimension )
+void Actor::SetLayoutDirty(bool dirty, Dimension::Type dimension)
 {
   EnsureRelayouter().SetLayoutDirty(dirty, dimension);
 }
 
-bool Actor::IsLayoutDirty( Dimension::Type dimension ) const
+bool Actor::IsLayoutDirty(Dimension::Type dimension) const
 {
   return mRelayoutData && mRelayoutData->IsLayoutDirty(dimension);
 }
 
-bool Actor::RelayoutPossible( Dimension::Type dimension ) const
+bool Actor::RelayoutPossible(Dimension::Type dimension) const
 {
-  return mRelayoutData && mRelayoutData->relayoutEnabled && !IsLayoutDirty( dimension );
+  return mRelayoutData && mRelayoutData->relayoutEnabled && !IsLayoutDirty(dimension);
 }
 
-bool Actor::RelayoutRequired( Dimension::Type dimension ) const
+bool Actor::RelayoutRequired(Dimension::Type dimension) const
 {
-  return mRelayoutData && mRelayoutData->relayoutEnabled && IsLayoutDirty( dimension );
+  return mRelayoutData && mRelayoutData->relayoutEnabled && IsLayoutDirty(dimension);
 }
 
-uint32_t Actor::AddRenderer( Renderer& renderer )
+uint32_t Actor::AddRenderer(Renderer& renderer)
 {
-  if( !mRenderers )
+  if(!mRenderers)
   {
     mRenderers = new RendererContainer;
   }
 
-  uint32_t index = static_cast<uint32_t>( mRenderers->size() ); //  4,294,967,295 renderers per actor
-  RendererPtr rendererPtr = RendererPtr( &renderer );
-  mRenderers->push_back( rendererPtr );
-  AttachRendererMessage( GetEventThreadServices(), GetNode(), renderer.GetRendererSceneObject() );
+  uint32_t    index       = static_cast<uint32_t>(mRenderers->size()); //  4,294,967,295 renderers per actor
+  RendererPtr rendererPtr = RendererPtr(&renderer);
+  mRenderers->push_back(rendererPtr);
+  AttachRendererMessage(GetEventThreadServices(), GetNode(), renderer.GetRendererSceneObject());
   return index;
 }
 
 uint32_t Actor::GetRendererCount() const
 {
   uint32_t rendererCount(0);
-  if( mRenderers )
+  if(mRenderers)
   {
-    rendererCount = static_cast<uint32_t>( mRenderers->size() ); //  4,294,967,295 renderers per actor
+    rendererCount = static_cast<uint32_t>(mRenderers->size()); //  4,294,967,295 renderers per actor
   }
 
   return rendererCount;
 }
 
-RendererPtr Actor::GetRendererAt( uint32_t index )
+RendererPtr Actor::GetRendererAt(uint32_t index)
 {
   RendererPtr renderer;
-  if( index < GetRendererCount() )
+  if(index < GetRendererCount())
   {
-    renderer = ( *mRenderers )[ index ];
+    renderer = (*mRenderers)[index];
   }
 
   return renderer;
 }
 
-void Actor::RemoveRenderer( Renderer& renderer )
+void Actor::RemoveRenderer(Renderer& renderer)
 {
-  if( mRenderers )
+  if(mRenderers)
   {
     RendererIter end = mRenderers->end();
-    for( RendererIter iter = mRenderers->begin(); iter != end; ++iter )
+    for(RendererIter iter = mRenderers->begin(); iter != end; ++iter)
     {
-      if( (*iter).Get() == &renderer )
+      if((*iter).Get() == &renderer)
       {
-        mRenderers->erase( iter );
-        DetachRendererMessage( GetEventThreadServices(), GetNode(), renderer.GetRendererSceneObject() );
+        mRenderers->erase(iter);
+        DetachRendererMessage(GetEventThreadServices(), GetNode(), renderer.GetRendererSceneObject());
         break;
       }
     }
   }
 }
 
-void Actor::RemoveRenderer( uint32_t index )
+void Actor::RemoveRenderer(uint32_t index)
 {
-  if( index < GetRendererCount() )
+  if(index < GetRendererCount())
   {
-    RendererPtr renderer = ( *mRenderers )[ index ];
-    DetachRendererMessage( GetEventThreadServices(), GetNode(), renderer.Get()->GetRendererSceneObject() );
-    mRenderers->erase( mRenderers->begin()+index );
+    RendererPtr renderer = (*mRenderers)[index];
+    DetachRendererMessage(GetEventThreadServices(), GetNode(), renderer.Get()->GetRendererSceneObject());
+    mRenderers->erase(mRenderers->begin() + index);
   }
 }
 
-void Actor::SetDrawMode( DrawMode::Type drawMode )
+void Actor::SetDrawMode(DrawMode::Type drawMode)
 {
   // this flag is not animatable so keep the value
   mDrawMode = drawMode;
 
   // node is being used in a separate thread; queue a message to set the value
-  SetDrawModeMessage( GetEventThreadServices(), GetNode(), drawMode );
+  SetDrawModeMessage(GetEventThreadServices(), GetNode(), drawMode);
 }
 
-bool Actor::ScreenToLocal( float& localX, float& localY, float screenX, float screenY ) const
+bool Actor::ScreenToLocal(float& localX, float& localY, float screenX, float screenY) const
 {
   // only valid when on-stage
-  if( mScene && OnScene() )
+  if(mScene && OnScene())
   {
     const RenderTaskList& taskList = mScene->GetRenderTaskList();
 
-    Vector2 converted( screenX, screenY );
+    Vector2 converted(screenX, screenY);
 
     // do a reverse traversal of all lists (as the default onscreen one is typically the last one)
     uint32_t taskCount = taskList.GetTaskCount();
-    for( uint32_t i = taskCount; i > 0; --i )
+    for(uint32_t i = taskCount; i > 0; --i)
     {
-      RenderTaskPtr task = taskList.GetTask( i - 1 );
-      if( ScreenToLocal( *task, localX, localY, screenX, screenY ) )
+      RenderTaskPtr task = taskList.GetTask(i - 1);
+      if(ScreenToLocal(*task, localX, localY, screenX, screenY))
       {
         // found a task where this conversion was ok so return
         return true;
@@ -1274,30 +1271,30 @@ bool Actor::ScreenToLocal( float& localX, float& localY, float screenX, float sc
   return false;
 }
 
-bool Actor::ScreenToLocal( const RenderTask& renderTask, float& localX, float& localY, float screenX, float screenY ) const
+bool Actor::ScreenToLocal(const RenderTask& renderTask, float& localX, float& localY, float screenX, float screenY) const
 {
   bool retval = false;
   // only valid when on-stage
-  if( OnScene() )
+  if(OnScene())
   {
     CameraActor* camera = renderTask.GetCameraActor();
-    if( camera )
+    if(camera)
     {
       Viewport viewport;
-      renderTask.GetViewport( viewport );
+      renderTask.GetViewport(viewport);
 
       // need to translate coordinates to render tasks coordinate space
-      Vector2 converted( screenX, screenY );
-      if( renderTask.TranslateCoordinates( converted ) )
+      Vector2 converted(screenX, screenY);
+      if(renderTask.TranslateCoordinates(converted))
       {
-        retval = ScreenToLocal( camera->GetViewMatrix(), camera->GetProjectionMatrix(), viewport, localX, localY, converted.x, converted.y );
+        retval = ScreenToLocal(camera->GetViewMatrix(), camera->GetProjectionMatrix(), viewport, localX, localY, converted.x, converted.y);
       }
     }
   }
   return retval;
 }
 
-bool Actor::ScreenToLocal( const Matrix& viewMatrix, const Matrix& projectionMatrix, const Viewport& viewport, float& localX, float& localY, float screenX, float screenY ) const
+bool Actor::ScreenToLocal(const Matrix& viewMatrix, const Matrix& projectionMatrix, const Viewport& viewport, float& localX, float& localY, float screenX, float screenY) const
 {
   return OnScene() && ScreenToLocalInternal(viewMatrix, projectionMatrix, GetNode().GetWorldMatrix(0), viewport, GetCurrentSize(), localX, localY, screenX, screenY);
 }
@@ -1306,102 +1303,102 @@ ActorGestureData& Actor::GetGestureData()
 {
   // Likely scenario is that once gesture-data is created for this actor, the actor will require
   // that gesture for its entire life-time so no need to destroy it until the actor is destroyed
-  if( nullptr == mGestureData )
+  if(nullptr == mGestureData)
   {
     mGestureData = new ActorGestureData;
   }
   return *mGestureData;
 }
 
-bool Actor::IsGestureRequired( GestureType::Value type ) const
+bool Actor::IsGestureRequired(GestureType::Value type) const
 {
-  return mGestureData && mGestureData->IsGestureRequired( type );
+  return mGestureData && mGestureData->IsGestureRequired(type);
 }
 
-bool Actor::EmitInterceptTouchEventSignal( const Dali::TouchEvent& touch )
+bool Actor::EmitInterceptTouchEventSignal(const Dali::TouchEvent& touch)
 {
-  return EmitConsumingSignal( *this, mInterceptTouchedSignal, touch );
+  return EmitConsumingSignal(*this, mInterceptTouchedSignal, touch);
 }
 
-bool Actor::EmitTouchEventSignal( const Dali::TouchEvent& touch )
+bool Actor::EmitTouchEventSignal(const Dali::TouchEvent& touch)
 {
-  return EmitConsumingSignal( *this, mTouchedSignal, touch );
+  return EmitConsumingSignal(*this, mTouchedSignal, touch);
 }
 
-bool Actor::EmitHoverEventSignal( const Dali::HoverEvent& event )
+bool Actor::EmitHoverEventSignal(const Dali::HoverEvent& event)
 {
-  return EmitConsumingSignal( *this, mHoveredSignal, event );
+  return EmitConsumingSignal(*this, mHoveredSignal, event);
 }
 
-bool Actor::EmitWheelEventSignal( const Dali::WheelEvent& event )
+bool Actor::EmitWheelEventSignal(const Dali::WheelEvent& event)
 {
-  return EmitConsumingSignal( *this, mWheelEventSignal, event );
+  return EmitConsumingSignal(*this, mWheelEventSignal, event);
 }
 
-void Actor::EmitVisibilityChangedSignal( bool visible, DevelActor::VisibilityChange::Type type )
+void Actor::EmitVisibilityChangedSignal(bool visible, DevelActor::VisibilityChange::Type type)
 {
-  EmitSignal( *this, mVisibilityChangedSignal, visible, type );
+  EmitSignal(*this, mVisibilityChangedSignal, visible, type);
 }
 
-void Actor::EmitLayoutDirectionChangedSignal( LayoutDirection::Type type )
+void Actor::EmitLayoutDirectionChangedSignal(LayoutDirection::Type type)
 {
-  EmitSignal( *this, mLayoutDirectionChangedSignal, type );
+  EmitSignal(*this, mLayoutDirectionChangedSignal, type);
 }
 
-void Actor::EmitChildAddedSignal( Actor& child )
+void Actor::EmitChildAddedSignal(Actor& child)
 {
-  EmitSignal( child, mChildAddedSignal );
+  EmitSignal(child, mChildAddedSignal);
 }
 
-void Actor::EmitChildRemovedSignal( Actor& child )
+void Actor::EmitChildRemovedSignal(Actor& child)
 {
-  EmitSignal( child, mChildRemovedSignal );
+  EmitSignal(child, mChildRemovedSignal);
 }
 
-bool Actor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
+bool Actor::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
 {
-  bool connected( true );
-  Actor* actor = static_cast< Actor* >( object ); // TypeRegistry guarantees that this is the correct type.
+  bool   connected(true);
+  Actor* actor = static_cast<Actor*>(object); // TypeRegistry guarantees that this is the correct type.
 
-  if( 0 == signalName.compare( SIGNAL_HOVERED ) )
+  if(0 == signalName.compare(SIGNAL_HOVERED))
   {
-    actor->HoveredSignal().Connect( tracker, functor );
+    actor->HoveredSignal().Connect(tracker, functor);
   }
-  else if( 0 == signalName.compare( SIGNAL_WHEEL_EVENT ) )
+  else if(0 == signalName.compare(SIGNAL_WHEEL_EVENT))
   {
-    actor->WheelEventSignal().Connect( tracker, functor );
+    actor->WheelEventSignal().Connect(tracker, functor);
   }
-  else if( 0 == signalName.compare( SIGNAL_ON_SCENE ) )
+  else if(0 == signalName.compare(SIGNAL_ON_SCENE))
   {
-    actor->OnSceneSignal().Connect( tracker, functor );
+    actor->OnSceneSignal().Connect(tracker, functor);
   }
-  else if( 0 == signalName.compare( SIGNAL_OFF_SCENE ) )
+  else if(0 == signalName.compare(SIGNAL_OFF_SCENE))
   {
-    actor->OffSceneSignal().Connect( tracker, functor );
+    actor->OffSceneSignal().Connect(tracker, functor);
   }
-  else if( 0 == signalName.compare( SIGNAL_ON_RELAYOUT ) )
+  else if(0 == signalName.compare(SIGNAL_ON_RELAYOUT))
   {
-    actor->OnRelayoutSignal().Connect( tracker, functor );
+    actor->OnRelayoutSignal().Connect(tracker, functor);
   }
-  else if( 0 == signalName.compare( SIGNAL_TOUCHED ) )
+  else if(0 == signalName.compare(SIGNAL_TOUCHED))
   {
-    actor->TouchedSignal().Connect( tracker, functor );
+    actor->TouchedSignal().Connect(tracker, functor);
   }
-  else if( 0 == signalName.compare( SIGNAL_VISIBILITY_CHANGED ) )
+  else if(0 == signalName.compare(SIGNAL_VISIBILITY_CHANGED))
   {
-    actor->VisibilityChangedSignal().Connect( tracker, functor );
+    actor->VisibilityChangedSignal().Connect(tracker, functor);
   }
-  else if( 0 == signalName.compare( SIGNAL_LAYOUT_DIRECTION_CHANGED ) )
+  else if(0 == signalName.compare(SIGNAL_LAYOUT_DIRECTION_CHANGED))
   {
-    actor->LayoutDirectionChangedSignal().Connect( tracker, functor );
+    actor->LayoutDirectionChangedSignal().Connect(tracker, functor);
   }
-  else if( 0 == signalName.compare( SIGNAL_CHILD_ADDED ) )
+  else if(0 == signalName.compare(SIGNAL_CHILD_ADDED))
   {
-    actor->ChildAddedSignal().Connect( tracker, functor );
+    actor->ChildAddedSignal().Connect(tracker, functor);
   }
-  else if( 0 == signalName.compare( SIGNAL_CHILD_REMOVED ) )
+  else if(0 == signalName.compare(SIGNAL_CHILD_REMOVED))
   {
-    actor->ChildRemovedSignal().Connect( tracker, functor );
+    actor->ChildRemovedSignal().Connect(tracker, functor);
   }
   else
   {
@@ -1412,16 +1409,16 @@ bool Actor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
   return connected;
 }
 
-Actor::Actor( DerivedType derivedType, const SceneGraph::Node& node )
-: Object( &node ),
-  mScene( nullptr ),
-  mParent( nullptr ),
-  mChildren( nullptr ),
-  mRenderers( nullptr ),
-  mParentOrigin( nullptr ),
-  mAnchorPoint( nullptr ),
-  mRelayoutData( nullptr ),
-  mGestureData( nullptr ),
+Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
+: Object(&node),
+  mScene(nullptr),
+  mParent(nullptr),
+  mChildren(nullptr),
+  mRenderers(nullptr),
+  mParentOrigin(nullptr),
+  mAnchorPoint(nullptr),
+  mRelayoutData(nullptr),
+  mGestureData(nullptr),
   mInterceptTouchedSignal(),
   mTouchedSignal(),
   mHoveredSignal(),
@@ -1434,36 +1431,36 @@ Actor::Actor( DerivedType derivedType, const SceneGraph::Node& node )
   mChildAddedSignal(),
   mChildRemovedSignal(),
   mChildOrderChangedSignal(),
-  mTargetOrientation( Quaternion::IDENTITY ),
-  mTargetColor( Color::WHITE ),
-  mTargetSize( Vector3::ZERO ),
-  mTargetPosition( Vector3::ZERO ),
-  mTargetScale( Vector3::ONE ),
-  mAnimatedSize( Vector3::ZERO ),
-  mTouchArea( Vector2::ZERO ),
+  mTargetOrientation(Quaternion::IDENTITY),
+  mTargetColor(Color::WHITE),
+  mTargetSize(Vector3::ZERO),
+  mTargetPosition(Vector3::ZERO),
+  mTargetScale(Vector3::ONE),
+  mAnimatedSize(Vector3::ZERO),
+  mTouchAreaOffset(0, 0, 0, 0),
   mName(),
-  mSortedDepth( 0u ),
-  mDepth( 0u ),
-  mUseAnimatedSize( AnimatedSizeFlag::CLEAR ),
-  mIsRoot( ROOT_LAYER == derivedType ),
-  mIsLayer( LAYER == derivedType || ROOT_LAYER == derivedType ),
-  mIsOnScene( false ),
-  mSensitive( true ),
-  mLeaveRequired( false ),
-  mKeyboardFocusable( false ),
-  mOnSceneSignalled( false ),
-  mInsideOnSizeSet( false ),
-  mInheritPosition( true ),
-  mInheritOrientation( true ),
-  mInheritScale( true ),
-  mPositionUsesAnchorPoint( true ),
-  mVisible( true ),
-  mInheritLayoutDirection( true ),
-  mCaptureAllTouchAfterStart( false ),
-  mLayoutDirection( LayoutDirection::LEFT_TO_RIGHT ),
-  mDrawMode( DrawMode::NORMAL ),
-  mColorMode( Node::DEFAULT_COLOR_MODE ),
-  mClippingMode( ClippingMode::DISABLED )
+  mSortedDepth(0u),
+  mDepth(0u),
+  mUseAnimatedSize(AnimatedSizeFlag::CLEAR),
+  mIsRoot(ROOT_LAYER == derivedType),
+  mIsLayer(LAYER == derivedType || ROOT_LAYER == derivedType),
+  mIsOnScene(false),
+  mSensitive(true),
+  mLeaveRequired(false),
+  mKeyboardFocusable(false),
+  mOnSceneSignalled(false),
+  mInsideOnSizeSet(false),
+  mInheritPosition(true),
+  mInheritOrientation(true),
+  mInheritScale(true),
+  mPositionUsesAnchorPoint(true),
+  mVisible(true),
+  mInheritLayoutDirection(true),
+  mCaptureAllTouchAfterStart(false),
+  mLayoutDirection(LayoutDirection::LEFT_TO_RIGHT),
+  mDrawMode(DrawMode::NORMAL),
+  mColorMode(Node::DEFAULT_COLOR_MODE),
+  mClippingMode(ClippingMode::DISABLED)
 {
 }
 
@@ -1471,32 +1468,32 @@ void Actor::Initialize()
 {
   OnInitialize();
 
-  GetEventThreadServices().RegisterObject( this );
+  GetEventThreadServices().RegisterObject(this);
 }
 
 Actor::~Actor()
 {
   // Remove mParent pointers from children even if we're destroying core,
   // to guard against GetParent() & Unparent() calls from CustomActor destructors.
-  if( mChildren )
+  if(mChildren)
   {
-    for( const auto& actor : *mChildren )
+    for(const auto& actor : *mChildren)
     {
-      actor->SetParent( nullptr );
+      actor->SetParent(nullptr);
     }
   }
   delete mChildren;
   delete mRenderers;
 
   // Guard to allow handle destruction after Core has been destroyed
-  if( EventThreadServices::IsCoreRunning() )
+  if(EventThreadServices::IsCoreRunning())
   {
     // Root layer will destroy its node in its own destructor
-    if ( !mIsRoot )
+    if(!mIsRoot)
     {
-      DestroyNodeMessage( GetEventThreadServices().GetUpdateManager(), GetNode() );
+      DestroyNodeMessage(GetEventThreadServices().GetUpdateManager(), GetNode());
 
-      GetEventThreadServices().UnregisterObject( this );
+      GetEventThreadServices().UnregisterObject(this);
     }
   }
 
@@ -1511,22 +1508,22 @@ Actor::~Actor()
   delete mRelayoutData;
 }
 
-void Actor::ConnectToScene( uint32_t parentDepth )
+void Actor::ConnectToScene(uint32_t parentDepth)
 {
   // This container is used instead of walking the Actor hierarchy.
   // It protects us when the Actor hierarchy is modified during OnSceneConnectionExternal callbacks.
   ActorContainer connectionList;
 
-  if( mScene )
+  if(mScene)
   {
     mScene->RequestRebuildDepthTree();
   }
 
   // This stage is atomic i.e. not interrupted by user callbacks.
-  RecursiveConnectToScene( connectionList, parentDepth + 1 );
+  RecursiveConnectToScene(connectionList, parentDepth + 1);
 
   // Notify applications about the newly connected actors.
-  for( const auto& actor : connectionList )
+  for(const auto& actor : connectionList)
   {
     actor->NotifyStageConnection();
   }
@@ -1534,12 +1531,12 @@ void Actor::ConnectToScene( uint32_t parentDepth )
   RelayoutRequest();
 }
 
-void Actor::RecursiveConnectToScene( ActorContainer& connectionList, uint32_t depth )
+void Actor::RecursiveConnectToScene(ActorContainer& connectionList, uint32_t depth)
 {
-  DALI_ASSERT_ALWAYS( !OnScene() );
+  DALI_ASSERT_ALWAYS(!OnScene());
 
   mIsOnScene = true;
-  mDepth = static_cast< uint16_t >( depth ); // overflow ignored, not expected in practice
+  mDepth     = static_cast<uint16_t>(depth); // overflow ignored, not expected in practice
 
   ConnectToSceneGraph();
 
@@ -1547,15 +1544,15 @@ void Actor::RecursiveConnectToScene( ActorContainer& connectionList, uint32_t de
   OnSceneConnectionInternal();
 
   // This stage is atomic; avoid emitting callbacks until all Actors are connected
-  connectionList.push_back( ActorPtr( this ) );
+  connectionList.push_back(ActorPtr(this));
 
   // Recursively connect children
-  if( mChildren )
+  if(mChildren)
   {
-    for( const auto& actor : *mChildren )
+    for(const auto& actor : *mChildren)
     {
-      actor->SetScene( *mScene );
-      actor->RecursiveConnectToScene( connectionList, depth + 1 );
+      actor->SetScene(*mScene);
+      actor->RecursiveConnectToScene(connectionList, depth + 1);
     }
   }
 }
@@ -1568,10 +1565,10 @@ void Actor::RecursiveConnectToScene( ActorContainer& connectionList, uint32_t de
  */
 void Actor::ConnectToSceneGraph()
 {
-  DALI_ASSERT_DEBUG( mParent != NULL);
+  DALI_ASSERT_DEBUG(mParent != NULL);
 
   // Reparent Node in next Update
-  ConnectNodeMessage( GetEventThreadServices().GetUpdateManager(), mParent->GetNode(), GetNode() );
+  ConnectNodeMessage(GetEventThreadServices().GetUpdateManager(), mParent->GetNode(), GetNode());
 
   // Request relayout on all actors that are added to the scenegraph
   RelayoutRequest();
@@ -1584,19 +1581,19 @@ void Actor::NotifyStageConnection()
 {
   // Actors can be removed (in a callback), before the on-stage stage is reported.
   // The actor may also have been reparented, in which case mOnSceneSignalled will be true.
-  if( OnScene() && !mOnSceneSignalled )
+  if(OnScene() && !mOnSceneSignalled)
   {
     // Notification for external (CustomActor) derived classes
-    OnSceneConnectionExternal( mDepth );
+    OnSceneConnectionExternal(mDepth);
 
-    if( !mOnSceneSignal.Empty() )
+    if(!mOnSceneSignal.Empty())
     {
-      Dali::Actor handle( this );
-      mOnSceneSignal.Emit( handle );
+      Dali::Actor handle(this);
+      mOnSceneSignal.Emit(handle);
     }
 
     // Guard against Remove during callbacks
-    if( OnScene() )
+    if(OnScene())
     {
       mOnSceneSignalled = true; // signal required next time Actor is removed
     }
@@ -1609,37 +1606,37 @@ void Actor::DisconnectFromStage()
   // It protects us when the Actor hierachy is modified during OnSceneDisconnectionExternal callbacks.
   ActorContainer disconnectionList;
 
-  if( mScene )
+  if(mScene)
   {
     mScene->RequestRebuildDepthTree();
   }
 
   // This stage is atomic i.e. not interrupted by user callbacks
-  RecursiveDisconnectFromStage( disconnectionList );
+  RecursiveDisconnectFromStage(disconnectionList);
 
   // Notify applications about the newly disconnected actors.
-  for( const auto& actor : disconnectionList )
+  for(const auto& actor : disconnectionList)
   {
     actor->NotifyStageDisconnection();
   }
 }
 
-void Actor::RecursiveDisconnectFromStage( ActorContainer& disconnectionList )
+void Actor::RecursiveDisconnectFromStage(ActorContainer& disconnectionList)
 {
   // need to change state first so that internals relying on IsOnScene() inside OnSceneDisconnectionInternal() get the correct value
   mIsOnScene = false;
 
   // Recursively disconnect children
-  if( mChildren )
+  if(mChildren)
   {
-    for( const auto& child : *mChildren )
+    for(const auto& child : *mChildren)
     {
-      child->RecursiveDisconnectFromStage( disconnectionList );
+      child->RecursiveDisconnectFromStage(disconnectionList);
     }
   }
 
   // This stage is atomic; avoid emitting callbacks until all Actors are disconnected
-  disconnectionList.push_back( ActorPtr( this ) );
+  disconnectionList.push_back(ActorPtr(this));
 
   // Notification for internal derived classes
   OnSceneDisconnectionInternal();
@@ -1662,19 +1659,19 @@ void Actor::NotifyStageDisconnection()
   // Actors can be added (in a callback), before the off-stage state is reported.
   // Also if the actor was added & removed before mOnSceneSignalled was set, then we don't notify here.
   // only do this step if there is a stage, i.e. Core is not being shut down
-  if ( EventThreadServices::IsCoreRunning() && !OnScene() && mOnSceneSignalled )
+  if(EventThreadServices::IsCoreRunning() && !OnScene() && mOnSceneSignalled)
   {
     // Notification for external (CustomeActor) derived classes
     OnSceneDisconnectionExternal();
 
-    if( !mOffSceneSignal.Empty() )
+    if(!mOffSceneSignal.Empty())
     {
-      Dali::Actor handle( this );
-      mOffSceneSignal.Emit( handle );
+      Dali::Actor handle(this);
+      mOffSceneSignal.Emit(handle);
     }
 
     // Guard against Add during callbacks
-    if( !OnScene() )
+    if(!OnScene())
     {
       mOnSceneSignalled = false; // signal required next time Actor is added
     }
@@ -1683,11 +1680,11 @@ void Actor::NotifyStageDisconnection()
 
 bool Actor::IsNodeConnected() const
 {
-  bool connected( false );
+  bool connected(false);
 
-  if( OnScene() )
+  if(OnScene())
   {
-    if( IsRoot() || GetNode().GetParent() )
+    if(IsRoot() || GetNode().GetParent())
     {
       connected = true;
     }
@@ -1708,126 +1705,126 @@ void Actor::RebuildDepthTree()
 
   // Vector of scene-graph nodes and their depths to send to UpdateManager
   // in a single message
-  OwnerPointer<SceneGraph::NodeDepths> sceneGraphNodeDepths( new SceneGraph::NodeDepths() );
+  OwnerPointer<SceneGraph::NodeDepths> sceneGraphNodeDepths(new SceneGraph::NodeDepths());
 
   int32_t depthIndex = 1;
-  DepthTraverseActorTree( sceneGraphNodeDepths, depthIndex );
+  DepthTraverseActorTree(sceneGraphNodeDepths, depthIndex);
 
-  SetDepthIndicesMessage( GetEventThreadServices().GetUpdateManager(), sceneGraphNodeDepths );
+  SetDepthIndicesMessage(GetEventThreadServices().GetUpdateManager(), sceneGraphNodeDepths);
   DALI_LOG_TIMER_END(depthTimer, gLogFilter, Debug::Concise, "Depth tree traversal time: ");
 }
 
-void Actor::DepthTraverseActorTree( OwnerPointer<SceneGraph::NodeDepths>& sceneGraphNodeDepths, int32_t& depthIndex )
+void Actor::DepthTraverseActorTree(OwnerPointer<SceneGraph::NodeDepths>& sceneGraphNodeDepths, int32_t& depthIndex)
 {
   mSortedDepth = depthIndex * DevelLayer::SIBLING_ORDER_MULTIPLIER;
-  sceneGraphNodeDepths->Add( const_cast<SceneGraph::Node*>( &GetNode() ), mSortedDepth );
+  sceneGraphNodeDepths->Add(const_cast<SceneGraph::Node*>(&GetNode()), mSortedDepth);
 
   // Create/add to children of this node
-  if( mChildren )
+  if(mChildren)
   {
-    for( const auto& child : *mChildren )
+    for(const auto& child : *mChildren)
     {
       Actor* childActor = child.Get();
       ++depthIndex;
-      childActor->DepthTraverseActorTree( sceneGraphNodeDepths, depthIndex );
+      childActor->DepthTraverseActorTree(sceneGraphNodeDepths, depthIndex);
     }
   }
 }
 
-void Actor::SetDefaultProperty( Property::Index index, const Property::Value& property )
+void Actor::SetDefaultProperty(Property::Index index, const Property::Value& property)
 {
   PropertyHandler::SetDefaultProperty(*this, index, property);
 }
 
 // TODO: This method needs to be removed
-void Actor::SetSceneGraphProperty( Property::Index index, const PropertyMetadata& entry, const Property::Value& value )
+void Actor::SetSceneGraphProperty(Property::Index index, const PropertyMetadata& entry, const Property::Value& value)
 {
   PropertyHandler::SetSceneGraphProperty(index, entry, value, GetEventThreadServices(), GetNode());
 }
 
-Property::Value Actor::GetDefaultProperty( Property::Index index ) const
+Property::Value Actor::GetDefaultProperty(Property::Index index) const
 {
   Property::Value value;
 
-  if( ! GetCachedPropertyValue( index, value ) )
+  if(!GetCachedPropertyValue(index, value))
   {
     // If property value is not stored in the event-side, then it must be a scene-graph only property
-    GetCurrentPropertyValue( index, value );
+    GetCurrentPropertyValue(index, value);
   }
 
   return value;
 }
 
-Property::Value Actor::GetDefaultPropertyCurrentValue( Property::Index index ) const
+Property::Value Actor::GetDefaultPropertyCurrentValue(Property::Index index) const
 {
   Property::Value value;
 
-  if( ! GetCurrentPropertyValue( index, value ) )
+  if(!GetCurrentPropertyValue(index, value))
   {
     // If unable to retrieve scene-graph property value, then it must be an event-side only property
-    GetCachedPropertyValue( index, value );
+    GetCachedPropertyValue(index, value);
   }
 
   return value;
 }
 
-void Actor::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType )
+void Actor::OnNotifyDefaultPropertyAnimation(Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType)
 {
   PropertyHandler::OnNotifyDefaultPropertyAnimation(*this, animation, index, value, animationType);
 }
 
-const PropertyBase* Actor::GetSceneObjectAnimatableProperty( Property::Index index ) const
+const PropertyBase* Actor::GetSceneObjectAnimatableProperty(Property::Index index) const
 {
   const PropertyBase* property = PropertyHandler::GetSceneObjectAnimatableProperty(index, GetNode());
-  if( !property )
+  if(!property)
   {
     // not our property, ask base
-    property = Object::GetSceneObjectAnimatableProperty( index );
+    property = Object::GetSceneObjectAnimatableProperty(index);
   }
 
   return property;
 }
 
-const PropertyInputImpl* Actor::GetSceneObjectInputProperty( Property::Index index ) const
+const PropertyInputImpl* Actor::GetSceneObjectInputProperty(Property::Index index) const
 {
   const PropertyInputImpl* property = PropertyHandler::GetSceneObjectInputProperty(index, GetNode());
-  if( !property )
+  if(!property)
   {
     // reuse animatable property getter as animatable properties are inputs as well
     // animatable property chains back to Object::GetSceneObjectInputProperty() so all properties get covered
-    property = GetSceneObjectAnimatableProperty( index );
+    property = GetSceneObjectAnimatableProperty(index);
   }
 
   return property;
 }
 
-int32_t Actor::GetPropertyComponentIndex( Property::Index index ) const
+int32_t Actor::GetPropertyComponentIndex(Property::Index index) const
 {
   int32_t componentIndex = PropertyHandler::GetPropertyComponentIndex(index);
-  if( Property::INVALID_COMPONENT_INDEX == componentIndex )
+  if(Property::INVALID_COMPONENT_INDEX == componentIndex)
   {
     // ask base
-    componentIndex = Object::GetPropertyComponentIndex( index );
+    componentIndex = Object::GetPropertyComponentIndex(index);
   }
 
   return componentIndex;
 }
 
-void Actor::SetParent( Actor* parent )
+void Actor::SetParent(Actor* parent)
 {
-  if( parent )
+  if(parent)
   {
-    DALI_ASSERT_ALWAYS( !mParent && "Actor cannot have 2 parents" );
+    DALI_ASSERT_ALWAYS(!mParent && "Actor cannot have 2 parents");
 
     mParent = parent;
 
     mScene = parent->mScene;
 
-    if ( EventThreadServices::IsCoreRunning() && // Don't emit signals or send messages during Core destruction
-         parent->OnScene() )
+    if(EventThreadServices::IsCoreRunning() && // Don't emit signals or send messages during Core destruction
+       parent->OnScene())
     {
       // Instruct each actor to create a corresponding node in the scene graph
-      ConnectToScene( parent->GetHierarchyDepth() );
+      ConnectToScene(parent->GetHierarchyDepth());
     }
 
     // Resolve the name and index for the child properties if any
@@ -1835,15 +1832,15 @@ void Actor::SetParent( Actor* parent )
   }
   else // parent being set to NULL
   {
-    DALI_ASSERT_ALWAYS( mParent != nullptr && "Actor should have a parent" );
+    DALI_ASSERT_ALWAYS(mParent != nullptr && "Actor should have a parent");
 
     mParent = nullptr;
 
-    if ( EventThreadServices::IsCoreRunning() && // Don't emit signals or send messages during Core destruction
-         OnScene() )
+    if(EventThreadServices::IsCoreRunning() && // Don't emit signals or send messages during Core destruction
+       OnScene())
     {
       // Disconnect the Node & its children from the scene-graph.
-      DisconnectNodeMessage( GetEventThreadServices().GetUpdateManager(), GetNode() );
+      DisconnectNodeMessage(GetEventThreadServices().GetUpdateManager(), GetNode());
 
       // Instruct each actor to discard pointers to the scene-graph
       DisconnectFromStage();
@@ -1853,21 +1850,21 @@ void Actor::SetParent( Actor* parent )
   }
 }
 
-bool Actor::DoAction( BaseObject* object, const std::string& actionName, const Property::Map& /* attributes */ )
+bool Actor::DoAction(BaseObject* object, const std::string& actionName, const Property::Map& /* attributes */)
 {
-  bool done = false;
-  Actor* actor = dynamic_cast< Actor* >( object );
+  bool   done  = false;
+  Actor* actor = dynamic_cast<Actor*>(object);
 
-  if( actor )
+  if(actor)
   {
-    if( 0 == actionName.compare( ACTION_SHOW ) )
+    if(0 == actionName.compare(ACTION_SHOW))
     {
-      actor->SetVisible( true );
+      actor->SetVisible(true);
       done = true;
     }
-    else if( 0 == actionName.compare( ACTION_HIDE ) )
+    else if(0 == actionName.compare(ACTION_HIDE))
     {
-      actor->SetVisible( false );
+      actor->SetVisible(false);
       done = true;
     }
   }
@@ -1875,21 +1872,21 @@ bool Actor::DoAction( BaseObject* object, const std::string& actionName, const P
   return done;
 }
 
-Rect<> Actor::CalculateScreenExtents( ) const
+Rect<> Actor::CalculateScreenExtents() const
 {
-  auto screenPosition = GetCurrentScreenPosition();
-  Vector3 size = GetCurrentSize() * GetCurrentWorldScale();
-  Vector3 anchorPointOffSet = size * ( mPositionUsesAnchorPoint ? GetCurrentAnchorPoint() : AnchorPoint::TOP_LEFT );
-  Vector2 position = Vector2( screenPosition.x - anchorPointOffSet.x, screenPosition.y - anchorPointOffSet.y );
-  return { position.x, position.y, size.x, size.y };
+  auto    screenPosition    = GetCurrentScreenPosition();
+  Vector3 size              = GetCurrentSize() * GetCurrentWorldScale();
+  Vector3 anchorPointOffSet = size * (mPositionUsesAnchorPoint ? GetCurrentAnchorPoint() : AnchorPoint::TOP_LEFT);
+  Vector2 position          = Vector2(screenPosition.x - anchorPointOffSet.x, screenPosition.y - anchorPointOffSet.y);
+  return {position.x, position.y, size.x, size.y};
 }
 
-bool Actor::GetCachedPropertyValue( Property::Index index, Property::Value& value ) const
+bool Actor::GetCachedPropertyValue(Property::Index index, Property::Value& value) const
 {
   return PropertyHandler::GetCachedPropertyValue(*this, index, value);
 }
 
-bool Actor::GetCurrentPropertyValue( Property::Index index, Property::Value& value  ) const
+bool Actor::GetCurrentPropertyValue(Property::Index index, Property::Value& value) const
 {
   return PropertyHandler::GetCurrentPropertyValue(*this, index, value);
 }
@@ -1897,7 +1894,7 @@ bool Actor::GetCurrentPropertyValue( Property::Index index, Property::Value& val
 Actor::Relayouter& Actor::EnsureRelayouter()
 {
   // Assign relayouter
-  if( !mRelayoutData )
+  if(!mRelayoutData)
   {
     mRelayoutData = new Relayouter();
   }
@@ -1905,15 +1902,15 @@ Actor::Relayouter& Actor::EnsureRelayouter()
   return *mRelayoutData;
 }
 
-bool Actor::RelayoutDependentOnParent( Dimension::Type dimension )
+bool Actor::RelayoutDependentOnParent(Dimension::Type dimension)
 {
   // Check if actor is dependent on parent
-  for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+  for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
   {
-    if( ( dimension & ( 1 << i ) ) )
+    if((dimension & (1 << i)))
     {
-      const ResizePolicy::Type resizePolicy = GetResizePolicy( static_cast< Dimension::Type >( 1 << i ) );
-      if( resizePolicy == ResizePolicy::FILL_TO_PARENT || resizePolicy == ResizePolicy::SIZE_RELATIVE_TO_PARENT || resizePolicy == ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT )
+      const ResizePolicy::Type resizePolicy = GetResizePolicy(static_cast<Dimension::Type>(1 << i));
+      if(resizePolicy == ResizePolicy::FILL_TO_PARENT || resizePolicy == ResizePolicy::SIZE_RELATIVE_TO_PARENT || resizePolicy == ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT)
       {
         return true;
       }
@@ -1923,18 +1920,18 @@ bool Actor::RelayoutDependentOnParent( Dimension::Type dimension )
   return false;
 }
 
-bool Actor::RelayoutDependentOnChildren( Dimension::Type dimension )
+bool Actor::RelayoutDependentOnChildren(Dimension::Type dimension)
 {
   // Check if actor is dependent on children
-  for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+  for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
   {
-    if( ( dimension & ( 1 << i ) ) )
+    if((dimension & (1 << i)))
     {
-      const ResizePolicy::Type resizePolicy = GetResizePolicy( static_cast< Dimension::Type >( 1 << i ) );
-      switch( resizePolicy )
+      const ResizePolicy::Type resizePolicy = GetResizePolicy(static_cast<Dimension::Type>(1 << i));
+      switch(resizePolicy)
       {
         case ResizePolicy::FIT_TO_CHILDREN:
-        case ResizePolicy::USE_NATURAL_SIZE:      // i.e. For things that calculate their size based on children
+        case ResizePolicy::USE_NATURAL_SIZE: // i.e. For things that calculate their size based on children
         {
           return true;
         }
@@ -1950,65 +1947,65 @@ bool Actor::RelayoutDependentOnChildren( Dimension::Type dimension )
   return false;
 }
 
-bool Actor::RelayoutDependentOnChildrenBase( Dimension::Type dimension )
+bool Actor::RelayoutDependentOnChildrenBase(Dimension::Type dimension)
 {
-  return Actor::RelayoutDependentOnChildren( dimension );
+  return Actor::RelayoutDependentOnChildren(dimension);
 }
 
-bool Actor::RelayoutDependentOnDimension( Dimension::Type dimension, Dimension::Type dependentDimension )
+bool Actor::RelayoutDependentOnDimension(Dimension::Type dimension, Dimension::Type dependentDimension)
 {
   // Check each possible dimension and see if it is dependent on the input one
-  for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+  for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
   {
-    if( dimension & ( 1 << i ) )
+    if(dimension & (1 << i))
     {
-      return mRelayoutData->resizePolicies[ i ] == ResizePolicy::DIMENSION_DEPENDENCY && mRelayoutData->dimensionDependencies[ i ] == dependentDimension;
+      return mRelayoutData->resizePolicies[i] == ResizePolicy::DIMENSION_DEPENDENCY && mRelayoutData->dimensionDependencies[i] == dependentDimension;
     }
   }
 
   return false;
 }
 
-void Actor::SetNegotiatedDimension( float negotiatedDimension, Dimension::Type dimension )
+void Actor::SetNegotiatedDimension(float negotiatedDimension, Dimension::Type dimension)
 {
-  for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+  for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
   {
-    if( dimension & ( 1 << i ) )
+    if(dimension & (1 << i))
     {
-      mRelayoutData->negotiatedDimensions[ i ] = negotiatedDimension;
+      mRelayoutData->negotiatedDimensions[i] = negotiatedDimension;
     }
   }
 }
 
-float Actor::GetNegotiatedDimension( Dimension::Type dimension ) const
+float Actor::GetNegotiatedDimension(Dimension::Type dimension) const
 {
   // If more than one dimension is requested, just return the first one found
-  for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+  for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
   {
-    if( ( dimension & ( 1 << i ) ) )
+    if((dimension & (1 << i)))
     {
-      return mRelayoutData->negotiatedDimensions[ i ];
+      return mRelayoutData->negotiatedDimensions[i];
     }
   }
 
-  return 0.0f;   // Default
+  return 0.0f; // Default
 }
 
-void Actor::SetPadding( const Vector2& padding, Dimension::Type dimension )
+void Actor::SetPadding(const Vector2& padding, Dimension::Type dimension)
 {
-  EnsureRelayouter().SetPadding( padding, dimension );
+  EnsureRelayouter().SetPadding(padding, dimension);
 }
 
-Vector2 Actor::GetPadding( Dimension::Type dimension ) const
+Vector2 Actor::GetPadding(Dimension::Type dimension) const
 {
-  if ( mRelayoutData )
+  if(mRelayoutData)
   {
     // If more than one dimension is requested, just return the first one found
-    for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+    for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
     {
-      if( ( dimension & ( 1 << i ) ) )
+      if((dimension & (1 << i)))
       {
-        return mRelayoutData->dimensionPadding[ i ];
+        return mRelayoutData->dimensionPadding[i];
       }
     }
   }
@@ -2016,22 +2013,22 @@ Vector2 Actor::GetPadding( Dimension::Type dimension ) const
   return Relayouter::DEFAULT_DIMENSION_PADDING;
 }
 
-void Actor::SetLayoutNegotiated( bool negotiated, Dimension::Type dimension )
+void Actor::SetLayoutNegotiated(bool negotiated, Dimension::Type dimension)
 {
   EnsureRelayouter().SetLayoutNegotiated(negotiated, dimension);
 }
 
-bool Actor::IsLayoutNegotiated( Dimension::Type dimension ) const
+bool Actor::IsLayoutNegotiated(Dimension::Type dimension) const
 {
   return mRelayoutData && mRelayoutData->IsLayoutNegotiated(dimension);
 }
 
-float Actor::GetHeightForWidthBase( float width )
+float Actor::GetHeightForWidthBase(float width)
 {
   float height = 0.0f;
 
   const Vector3 naturalSize = GetNaturalSize();
-  if( naturalSize.width > 0.0f )
+  if(naturalSize.width > 0.0f)
   {
     height = naturalSize.height * width / naturalSize.width;
   }
@@ -2043,12 +2040,12 @@ float Actor::GetHeightForWidthBase( float width )
   return height;
 }
 
-float Actor::GetWidthForHeightBase( float height )
+float Actor::GetWidthForHeightBase(float height)
 {
   float width = 0.0f;
 
   const Vector3 naturalSize = GetNaturalSize();
-  if( naturalSize.height > 0.0f )
+  if(naturalSize.height > 0.0f)
   {
     width = naturalSize.width * height / naturalSize.height;
   }
@@ -2060,150 +2057,150 @@ float Actor::GetWidthForHeightBase( float height )
   return width;
 }
 
-float Actor::CalculateChildSizeBase( const Dali::Actor& child, Dimension::Type dimension )
+float Actor::CalculateChildSizeBase(const Dali::Actor& child, Dimension::Type dimension)
 {
   // Fill to parent, taking size mode factor into account
-  switch( child.GetResizePolicy( dimension ) )
+  switch(child.GetResizePolicy(dimension))
   {
     case ResizePolicy::FILL_TO_PARENT:
     {
-      return GetLatestSize( dimension );
+      return GetLatestSize(dimension);
     }
 
     case ResizePolicy::SIZE_RELATIVE_TO_PARENT:
     {
-      return GetLatestSize( dimension ) * GetDimensionValue( child.GetProperty< Vector3 >( Dali::Actor::Property::SIZE_MODE_FACTOR ), dimension );
+      return GetLatestSize(dimension) * GetDimensionValue(child.GetProperty<Vector3>(Dali::Actor::Property::SIZE_MODE_FACTOR), dimension);
     }
 
     case ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT:
     {
-      return GetLatestSize( dimension ) + GetDimensionValue( child.GetProperty< Vector3 >( Dali::Actor::Property::SIZE_MODE_FACTOR ), dimension );
+      return GetLatestSize(dimension) + GetDimensionValue(child.GetProperty<Vector3>(Dali::Actor::Property::SIZE_MODE_FACTOR), dimension);
     }
 
     default:
     {
-      return GetLatestSize( dimension );
+      return GetLatestSize(dimension);
     }
   }
 }
 
-float Actor::CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension )
+float Actor::CalculateChildSize(const Dali::Actor& child, Dimension::Type dimension)
 {
   // Can be overridden in derived class
-  return CalculateChildSizeBase( child, dimension );
+  return CalculateChildSizeBase(child, dimension);
 }
 
-float Actor::GetHeightForWidth( float width )
+float Actor::GetHeightForWidth(float width)
 {
   // Can be overridden in derived class
-  return GetHeightForWidthBase( width );
+  return GetHeightForWidthBase(width);
 }
 
-float Actor::GetWidthForHeight( float height )
+float Actor::GetWidthForHeight(float height)
 {
   // Can be overridden in derived class
-  return GetWidthForHeightBase( height );
+  return GetWidthForHeightBase(height);
 }
 
-float Actor::GetLatestSize( Dimension::Type dimension ) const
+float Actor::GetLatestSize(Dimension::Type dimension) const
 {
-  return IsLayoutNegotiated( dimension ) ? GetNegotiatedDimension( dimension ) : GetSize( dimension );
+  return IsLayoutNegotiated(dimension) ? GetNegotiatedDimension(dimension) : GetSize(dimension);
 }
 
-float Actor::GetRelayoutSize( Dimension::Type dimension ) const
+float Actor::GetRelayoutSize(Dimension::Type dimension) const
 {
-  Vector2 padding = GetPadding( dimension );
+  Vector2 padding = GetPadding(dimension);
 
-  return GetLatestSize( dimension ) + padding.x + padding.y;
+  return GetLatestSize(dimension) + padding.x + padding.y;
 }
 
-float Actor::NegotiateFromParent( Dimension::Type dimension )
+float Actor::NegotiateFromParent(Dimension::Type dimension)
 {
   Actor* parent = GetParent();
-  if( parent )
+  if(parent)
   {
-    Vector2 padding( GetPadding( dimension ) );
-    Vector2 parentPadding( parent->GetPadding( dimension ) );
-    return parent->CalculateChildSize( Dali::Actor( this ), dimension ) - parentPadding.x - parentPadding.y - padding.x - padding.y;
+    Vector2 padding(GetPadding(dimension));
+    Vector2 parentPadding(parent->GetPadding(dimension));
+    return parent->CalculateChildSize(Dali::Actor(this), dimension) - parentPadding.x - parentPadding.y - padding.x - padding.y;
   }
 
   return 0.0f;
 }
 
-float Actor::NegotiateFromChildren( Dimension::Type dimension )
+float Actor::NegotiateFromChildren(Dimension::Type dimension)
 {
   float maxDimensionPoint = 0.0f;
 
-  for( uint32_t i = 0, count = GetChildCount(); i < count; ++i )
+  for(uint32_t i = 0, count = GetChildCount(); i < count; ++i)
   {
-    ActorPtr child = GetChildAt( i );
+    ActorPtr child = GetChildAt(i);
 
-    if( !child->RelayoutDependentOnParent( dimension ) )
+    if(!child->RelayoutDependentOnParent(dimension))
     {
       // Calculate the min and max points that the children range across
-      float childPosition = GetDimensionValue( child->GetTargetPosition(), dimension );
-      float dimensionSize = child->GetRelayoutSize( dimension );
-      maxDimensionPoint = std::max( maxDimensionPoint, childPosition + dimensionSize );
+      float childPosition = GetDimensionValue(child->GetTargetPosition(), dimension);
+      float dimensionSize = child->GetRelayoutSize(dimension);
+      maxDimensionPoint   = std::max(maxDimensionPoint, childPosition + dimensionSize);
     }
   }
 
   return maxDimensionPoint;
 }
 
-float Actor::GetSize( Dimension::Type dimension ) const
+float Actor::GetSize(Dimension::Type dimension) const
 {
-  return GetDimensionValue( mTargetSize, dimension );
+  return GetDimensionValue(mTargetSize, dimension);
 }
 
-float Actor::GetNaturalSize( Dimension::Type dimension ) const
+float Actor::GetNaturalSize(Dimension::Type dimension) const
 {
-  return GetDimensionValue( GetNaturalSize(), dimension );
+  return GetDimensionValue(GetNaturalSize(), dimension);
 }
 
-float Actor::CalculateSize( Dimension::Type dimension, const Vector2& maximumSize )
+float Actor::CalculateSize(Dimension::Type dimension, const Vector2& maximumSize)
 {
-  switch( GetResizePolicy( dimension ) )
+  switch(GetResizePolicy(dimension))
   {
     case ResizePolicy::USE_NATURAL_SIZE:
     {
-      return GetNaturalSize( dimension );
+      return GetNaturalSize(dimension);
     }
 
     case ResizePolicy::FIXED:
     {
-      return GetDimensionValue( GetPreferredSize(), dimension );
+      return GetDimensionValue(GetPreferredSize(), dimension);
     }
 
     case ResizePolicy::USE_ASSIGNED_SIZE:
     {
-      return GetDimensionValue( maximumSize, dimension );
+      return GetDimensionValue(maximumSize, dimension);
     }
 
     case ResizePolicy::FILL_TO_PARENT:
     case ResizePolicy::SIZE_RELATIVE_TO_PARENT:
     case ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT:
     {
-      return NegotiateFromParent( dimension );
+      return NegotiateFromParent(dimension);
     }
 
     case ResizePolicy::FIT_TO_CHILDREN:
     {
-      return NegotiateFromChildren( dimension );
+      return NegotiateFromChildren(dimension);
     }
 
     case ResizePolicy::DIMENSION_DEPENDENCY:
     {
-      const Dimension::Type dimensionDependency = GetDimensionDependency( dimension );
+      const Dimension::Type dimensionDependency = GetDimensionDependency(dimension);
 
       // Custom rules
-      if( dimension == Dimension::WIDTH && dimensionDependency == Dimension::HEIGHT )
+      if(dimension == Dimension::WIDTH && dimensionDependency == Dimension::HEIGHT)
       {
-        return GetWidthForHeight( GetNegotiatedDimension( Dimension::HEIGHT ) );
+        return GetWidthForHeight(GetNegotiatedDimension(Dimension::HEIGHT));
       }
 
-      if( dimension == Dimension::HEIGHT && dimensionDependency == Dimension::WIDTH )
+      if(dimension == Dimension::HEIGHT && dimensionDependency == Dimension::WIDTH)
       {
-        return GetHeightForWidth( GetNegotiatedDimension( Dimension::WIDTH ) );
+        return GetHeightForWidth(GetNegotiatedDimension(Dimension::WIDTH));
       }
 
       break;
@@ -2215,75 +2212,75 @@ float Actor::CalculateSize( Dimension::Type dimension, const Vector2& maximumSiz
     }
   }
 
-  return 0.0f;  // Default
+  return 0.0f; // Default
 }
 
-void Actor::NegotiateDimension( Dimension::Type dimension, const Vector2& allocatedSize, ActorDimensionStack& recursionStack )
+void Actor::NegotiateDimension(Dimension::Type dimension, const Vector2& allocatedSize, ActorDimensionStack& recursionStack)
 {
   // Check if it needs to be negotiated
-  if( IsLayoutDirty( dimension ) && !IsLayoutNegotiated( dimension ) )
+  if(IsLayoutDirty(dimension) && !IsLayoutNegotiated(dimension))
   {
     // Check that we havn't gotten into an infinite loop
-    ActorDimensionPair searchActor = ActorDimensionPair( this, dimension );
-    bool recursionFound = false;
-    for( auto& element : recursionStack )
+    ActorDimensionPair searchActor    = ActorDimensionPair(this, dimension);
+    bool               recursionFound = false;
+    for(auto& element : recursionStack)
     {
-      if( element == searchActor )
+      if(element == searchActor)
       {
         recursionFound = true;
         break;
       }
     }
 
-    if( !recursionFound )
+    if(!recursionFound)
     {
       // Record the path that we have taken
-      recursionStack.push_back( ActorDimensionPair( this, dimension ) );
+      recursionStack.push_back(ActorDimensionPair(this, dimension));
 
       // Dimension dependency check
-      for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+      for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
       {
-        Dimension::Type dimensionToCheck = static_cast< Dimension::Type >( 1 << i );
+        Dimension::Type dimensionToCheck = static_cast<Dimension::Type>(1 << i);
 
-        if( RelayoutDependentOnDimension( dimension, dimensionToCheck ) )
+        if(RelayoutDependentOnDimension(dimension, dimensionToCheck))
         {
-          NegotiateDimension( dimensionToCheck, allocatedSize, recursionStack );
+          NegotiateDimension(dimensionToCheck, allocatedSize, recursionStack);
         }
       }
 
       // Parent dependency check
       Actor* parent = GetParent();
-      if( parent && RelayoutDependentOnParent( dimension ) )
+      if(parent && RelayoutDependentOnParent(dimension))
       {
-        parent->NegotiateDimension( dimension, allocatedSize, recursionStack );
+        parent->NegotiateDimension(dimension, allocatedSize, recursionStack);
       }
 
       // Children dependency check
-      if( RelayoutDependentOnChildren( dimension ) )
+      if(RelayoutDependentOnChildren(dimension))
       {
-        for( uint32_t i = 0, count = GetChildCount(); i < count; ++i )
+        for(uint32_t i = 0, count = GetChildCount(); i < count; ++i)
         {
-          ActorPtr child = GetChildAt( i );
+          ActorPtr child = GetChildAt(i);
 
           // Only relayout child first if it is not dependent on this actor
-          if( !child->RelayoutDependentOnParent( dimension ) )
+          if(!child->RelayoutDependentOnParent(dimension))
           {
-            child->NegotiateDimension( dimension, allocatedSize, recursionStack );
+            child->NegotiateDimension(dimension, allocatedSize, recursionStack);
           }
         }
       }
 
       // For deriving classes
-      OnCalculateRelayoutSize( dimension );
+      OnCalculateRelayoutSize(dimension);
 
       // All dependencies checked, calculate the size and set negotiated flag
-      const float newSize = Relayouter::ClampDimension( *this, CalculateSize( dimension, allocatedSize ), dimension );
+      const float newSize = Relayouter::ClampDimension(*this, CalculateSize(dimension, allocatedSize), dimension);
 
-      SetNegotiatedDimension( newSize, dimension );
-      SetLayoutNegotiated( true, dimension );
+      SetNegotiatedDimension(newSize, dimension);
+      SetLayoutNegotiated(true, dimension);
 
       // For deriving classes
-      OnLayoutNegotiated( newSize, dimension );
+      OnLayoutNegotiated(newSize, dimension);
 
       // This actor has been successfully processed, pop it off the recursion stack
       recursionStack.pop_back();
@@ -2291,57 +2288,57 @@ void Actor::NegotiateDimension( Dimension::Type dimension, const Vector2& alloca
     else
     {
       // TODO: Break infinite loop
-      SetLayoutNegotiated( true, dimension );
+      SetLayoutNegotiated(true, dimension);
     }
   }
 }
 
-void Actor::NegotiateDimensions( const Vector2& allocatedSize )
+void Actor::NegotiateDimensions(const Vector2& allocatedSize)
 {
   // Negotiate all dimensions that require it
   ActorDimensionStack recursionStack;
 
-  for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+  for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
   {
-    const Dimension::Type dimension = static_cast< Dimension::Type >( 1 << i );
+    const Dimension::Type dimension = static_cast<Dimension::Type>(1 << i);
 
     // Negotiate
-    NegotiateDimension( dimension, allocatedSize, recursionStack );
+    NegotiateDimension(dimension, allocatedSize, recursionStack);
   }
 }
 
-Vector2 Actor::ApplySizeSetPolicy( const Vector2& size )
+Vector2 Actor::ApplySizeSetPolicy(const Vector2& size)
 {
   return mRelayoutData->ApplySizeSetPolicy(*this, size);
 }
 
-void Actor::SetNegotiatedSize( RelayoutContainer& container )
+void Actor::SetNegotiatedSize(RelayoutContainer& container)
 {
   // Do the set actor size
-  Vector2 negotiatedSize( GetLatestSize( Dimension::WIDTH ), GetLatestSize( Dimension::HEIGHT ) );
+  Vector2 negotiatedSize(GetLatestSize(Dimension::WIDTH), GetLatestSize(Dimension::HEIGHT));
 
   // Adjust for size set policy
-  negotiatedSize = ApplySizeSetPolicy( negotiatedSize );
+  negotiatedSize = ApplySizeSetPolicy(negotiatedSize);
 
   // Lock the flag to stop recursive relayouts on set size
   mRelayoutData->insideRelayout = true;
-  SetSize( negotiatedSize );
+  SetSize(negotiatedSize);
   mRelayoutData->insideRelayout = false;
 
   // Clear flags for all dimensions
-  SetLayoutDirty( false );
+  SetLayoutDirty(false);
 
   // Give deriving classes a chance to respond
-  OnRelayout( negotiatedSize, container );
+  OnRelayout(negotiatedSize, container);
 
-  if( !mOnRelayoutSignal.Empty() )
+  if(!mOnRelayoutSignal.Empty())
   {
-    Dali::Actor handle( this );
-    mOnRelayoutSignal.Emit( handle );
+    Dali::Actor handle(this);
+    mOnRelayoutSignal.Emit(handle);
   }
 }
 
-void Actor::NegotiateSize( const Vector2& allocatedSize, RelayoutContainer& container )
+void Actor::NegotiateSize(const Vector2& allocatedSize, RelayoutContainer& container)
 {
   // Force a size negotiation for actors that has assigned size during relayout
   // This is required as otherwise the flags that force a relayout will not
@@ -2350,75 +2347,75 @@ void Actor::NegotiateSize( const Vector2& allocatedSize, RelayoutContainer& cont
   // relayout container afterwards, the dirty flags would still be clear...
   // causing a relayout to be skipped. Here we force any actors added to the
   // container to be relayed out.
-  DALI_LOG_TIMER_START( NegSizeTimer1 );
+  DALI_LOG_TIMER_START(NegSizeTimer1);
 
-  if( GetUseAssignedSize(Dimension::WIDTH ) )
+  if(GetUseAssignedSize(Dimension::WIDTH))
   {
-    SetLayoutNegotiated( false, Dimension::WIDTH );
+    SetLayoutNegotiated(false, Dimension::WIDTH);
   }
-  if( GetUseAssignedSize( Dimension::HEIGHT ) )
+  if(GetUseAssignedSize(Dimension::HEIGHT))
   {
-    SetLayoutNegotiated( false, Dimension::HEIGHT );
+    SetLayoutNegotiated(false, Dimension::HEIGHT);
   }
 
   // Do the negotiation
-  NegotiateDimensions( allocatedSize );
+  NegotiateDimensions(allocatedSize);
 
   // Set the actor size
-  SetNegotiatedSize( container );
+  SetNegotiatedSize(container);
 
   // Negotiate down to children
-  for( uint32_t i = 0, count = GetChildCount(); i < count; ++i )
+  for(uint32_t i = 0, count = GetChildCount(); i < count; ++i)
   {
-    ActorPtr child = GetChildAt( i );
+    ActorPtr child = GetChildAt(i);
 
     // Forces children that have already been laid out to be relayed out
     // if they have assigned size during relayout.
-    if( child->GetUseAssignedSize(Dimension::WIDTH) )
+    if(child->GetUseAssignedSize(Dimension::WIDTH))
     {
       child->SetLayoutNegotiated(false, Dimension::WIDTH);
       child->SetLayoutDirty(true, Dimension::WIDTH);
     }
 
-    if( child->GetUseAssignedSize(Dimension::HEIGHT) )
+    if(child->GetUseAssignedSize(Dimension::HEIGHT))
     {
       child->SetLayoutNegotiated(false, Dimension::HEIGHT);
       child->SetLayoutDirty(true, Dimension::HEIGHT);
     }
 
     // Only relayout if required
-    if( child->RelayoutRequired() )
+    if(child->RelayoutRequired())
     {
-      container.Add( Dali::Actor( child.Get() ), mTargetSize.GetVectorXY() );
+      container.Add(Dali::Actor(child.Get()), mTargetSize.GetVectorXY());
     }
   }
-  DALI_LOG_TIMER_END( NegSizeTimer1, gLogRelayoutFilter, Debug::Concise, "NegotiateSize() took: ");
+  DALI_LOG_TIMER_END(NegSizeTimer1, gLogRelayoutFilter, Debug::Concise, "NegotiateSize() took: ");
 }
 
-void Actor::SetUseAssignedSize( bool use, Dimension::Type dimension )
+void Actor::SetUseAssignedSize(bool use, Dimension::Type dimension)
 {
-  if( mRelayoutData )
+  if(mRelayoutData)
   {
     mRelayoutData->SetUseAssignedSize(use, dimension);
   }
 }
 
-bool Actor::GetUseAssignedSize( Dimension::Type dimension ) const
+bool Actor::GetUseAssignedSize(Dimension::Type dimension) const
 {
   return mRelayoutData && mRelayoutData->GetUseAssignedSize(dimension);
 }
 
-void Actor::RelayoutRequest( Dimension::Type dimension )
+void Actor::RelayoutRequest(Dimension::Type dimension)
 {
   Internal::RelayoutController* relayoutController = Internal::RelayoutController::Get();
-  if( relayoutController )
+  if(relayoutController)
   {
-    Dali::Actor self( this );
-    relayoutController->RequestRelayout( self, dimension );
+    Dali::Actor self(this);
+    relayoutController->RequestRelayout(self, dimension);
   }
 }
 
-void Actor::SetPreferredSize( const Vector2& size )
+void Actor::SetPreferredSize(const Vector2& size)
 {
   EnsureRelayouter();
 
@@ -2426,14 +2423,14 @@ void Actor::SetPreferredSize( const Vector2& size )
   // A 0 width or height may also be required so if the resize policy has not been changed, i.e. is still set to DEFAULT,
   // then change to FIXED as well
 
-  if( size.width > 0.0f || GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::DEFAULT )
+  if(size.width > 0.0f || GetResizePolicy(Dimension::WIDTH) == ResizePolicy::DEFAULT)
   {
-    SetResizePolicy( ResizePolicy::FIXED, Dimension::WIDTH );
+    SetResizePolicy(ResizePolicy::FIXED, Dimension::WIDTH);
   }
 
-  if( size.height > 0.0f || GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::DEFAULT )
+  if(size.height > 0.0f || GetResizePolicy(Dimension::HEIGHT) == ResizePolicy::DEFAULT)
   {
-    SetResizePolicy( ResizePolicy::FIXED, Dimension::HEIGHT );
+    SetResizePolicy(ResizePolicy::FIXED, Dimension::HEIGHT);
   }
 
   mRelayoutData->preferredSize = size;
@@ -2445,85 +2442,85 @@ void Actor::SetPreferredSize( const Vector2& size )
 
 Vector2 Actor::GetPreferredSize() const
 {
-  if ( mRelayoutData )
+  if(mRelayoutData)
   {
-    return Vector2( mRelayoutData->preferredSize );
+    return Vector2(mRelayoutData->preferredSize);
   }
 
   return Relayouter::DEFAULT_PREFERRED_SIZE;
 }
 
-void Actor::SetMinimumSize( float size, Dimension::Type dimension )
+void Actor::SetMinimumSize(float size, Dimension::Type dimension)
 {
   EnsureRelayouter().SetMinimumSize(size, dimension);
   RelayoutRequest();
 }
 
-float Actor::GetMinimumSize( Dimension::Type dimension ) const
+float Actor::GetMinimumSize(Dimension::Type dimension) const
 {
-  if ( mRelayoutData )
+  if(mRelayoutData)
   {
     return mRelayoutData->GetMinimumSize(dimension);
   }
 
-  return 0.0f;  // Default
+  return 0.0f; // Default
 }
 
-void Actor::SetMaximumSize( float size, Dimension::Type dimension )
+void Actor::SetMaximumSize(float size, Dimension::Type dimension)
 {
   EnsureRelayouter().SetMaximumSize(size, dimension);
   RelayoutRequest();
 }
 
-float Actor::GetMaximumSize( Dimension::Type dimension ) const
+float Actor::GetMaximumSize(Dimension::Type dimension) const
 {
-  if ( mRelayoutData )
+  if(mRelayoutData)
   {
     return mRelayoutData->GetMaximumSize(dimension);
   }
 
-  return FLT_MAX;  // Default
+  return FLT_MAX; // Default
 }
 
-void Actor::SetVisibleInternal( bool visible, SendMessage::Type sendMessage )
+void Actor::SetVisibleInternal(bool visible, SendMessage::Type sendMessage)
 {
-  if( mVisible != visible )
+  if(mVisible != visible)
   {
-    if( sendMessage == SendMessage::TRUE )
+    if(sendMessage == SendMessage::TRUE)
     {
       // node is being used in a separate thread; queue a message to set the value & base value
-      SceneGraph::NodePropertyMessage<bool>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mVisible, &AnimatableProperty<bool>::Bake, visible );
+      SceneGraph::NodePropertyMessage<bool>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mVisible, &AnimatableProperty<bool>::Bake, visible);
     }
 
     mVisible = visible;
 
     // Emit the signal on this actor and all its children
-    EmitVisibilityChangedSignalRecursively( this, visible, DevelActor::VisibilityChange::SELF );
+    EmitVisibilityChangedSignalRecursively(this, visible, DevelActor::VisibilityChange::SELF);
   }
 }
 
-void Actor::SetSiblingOrder( uint32_t order )
+void Actor::SetSiblingOrder(uint32_t order)
 {
-  if ( mParent )
+  if(mParent)
   {
-    ActorContainer& siblings = *(mParent->mChildren);
-    uint32_t currentOrder = GetSiblingOrder();
+    ActorContainer& siblings     = *(mParent->mChildren);
+    uint32_t        currentOrder = GetSiblingOrder();
 
-    if( order != currentOrder )
+    if(order != currentOrder)
     {
-      if( order == 0 )
+      if(order == 0)
       {
         LowerToBottom();
       }
-      else if( order < siblings.size() -1 )
+      else if(order < siblings.size() - 1)
       {
-        if( order > currentOrder )
+        if(order > currentOrder)
         {
-          RaiseAbove( *siblings[order] );
+          RaiseAbove(*siblings[order]);
         }
         else
         {
-          LowerBelow( *siblings[order] );
+          LowerBelow(*siblings[order]);
         }
       }
       else
@@ -2538,14 +2535,14 @@ uint32_t Actor::GetSiblingOrder() const
 {
   uint32_t order = 0;
 
-  if ( mParent )
+  if(mParent)
   {
     ActorContainer& siblings = *(mParent->mChildren);
-    for( std::size_t i = 0; i < siblings.size(); ++i )
+    for(std::size_t i = 0; i < siblings.size(); ++i)
     {
-      if( siblings[i] == this )
+      if(siblings[i] == this)
       {
-        order = static_cast<uint32_t>( i );
+        order = static_cast<uint32_t>(i);
         break;
       }
     }
@@ -2556,9 +2553,9 @@ uint32_t Actor::GetSiblingOrder() const
 
 void Actor::RequestRebuildDepthTree()
 {
-  if( mIsOnScene )
+  if(mIsOnScene)
   {
-    if( mScene )
+    if(mScene)
     {
       mScene->RequestRebuildDepthTree();
     }
@@ -2567,221 +2564,221 @@ void Actor::RequestRebuildDepthTree()
 
 void Actor::Raise()
 {
-  if ( mParent )
+  if(mParent)
   {
     ActorContainer& siblings = *(mParent->mChildren);
-    if( siblings.back() != this ) // If not already at end
+    if(siblings.back() != this) // If not already at end
     {
-      for( std::size_t i=0; i<siblings.size(); ++i )
+      for(std::size_t i = 0; i < siblings.size(); ++i)
       {
-        if( siblings[i] == this )
+        if(siblings[i] == this)
         {
           // Swap with next
-          ActorPtr next = siblings[i+1];
-          siblings[i+1] = this;
-          siblings[i] = next;
+          ActorPtr next   = siblings[i + 1];
+          siblings[i + 1] = this;
+          siblings[i]     = next;
           break;
         }
       }
     }
 
-    Dali::Actor handle( this );
-    mParent->mChildOrderChangedSignal.Emit( handle );
+    Dali::Actor handle(this);
+    mParent->mChildOrderChangedSignal.Emit(handle);
 
     RequestRebuildDepthTree();
   }
   else
   {
-    DALI_LOG_WARNING( "Actor must have a parent, Sibling order not changed.\n" );
+    DALI_LOG_WARNING("Actor must have a parent, Sibling order not changed.\n");
   }
 }
 
 void Actor::Lower()
 {
-  if ( mParent )
+  if(mParent)
   {
     ActorContainer& siblings = *(mParent->mChildren);
-    if( siblings.front() != this ) // If not already at beginning
+    if(siblings.front() != this) // If not already at beginning
     {
-      for( std::size_t i=1; i<siblings.size(); ++i )
+      for(std::size_t i = 1; i < siblings.size(); ++i)
       {
-        if( siblings[i] == this )
+        if(siblings[i] == this)
         {
           // Swap with previous
-          ActorPtr previous = siblings[i-1];
-          siblings[i-1] = this;
-          siblings[i] = previous;
+          ActorPtr previous = siblings[i - 1];
+          siblings[i - 1]   = this;
+          siblings[i]       = previous;
           break;
         }
       }
     }
 
-    Dali::Actor handle( this );
-    mParent->mChildOrderChangedSignal.Emit( handle );
+    Dali::Actor handle(this);
+    mParent->mChildOrderChangedSignal.Emit(handle);
 
     RequestRebuildDepthTree();
   }
   else
   {
-    DALI_LOG_WARNING( "Actor must have a parent, Sibling order not changed.\n" );
+    DALI_LOG_WARNING("Actor must have a parent, Sibling order not changed.\n");
   }
 }
 
 void Actor::RaiseToTop()
 {
-  if ( mParent )
+  if(mParent)
   {
     ActorContainer& siblings = *(mParent->mChildren);
-    if( siblings.back() != this ) // If not already at end
+    if(siblings.back() != this) // If not already at end
     {
-      auto iter = std::find( siblings.begin(), siblings.end(), this );
-      if( iter != siblings.end() )
+      auto iter = std::find(siblings.begin(), siblings.end(), this);
+      if(iter != siblings.end())
       {
         siblings.erase(iter);
         siblings.push_back(ActorPtr(this));
       }
     }
 
-    Dali::Actor handle( this );
-    mParent->mChildOrderChangedSignal.Emit( handle );
+    Dali::Actor handle(this);
+    mParent->mChildOrderChangedSignal.Emit(handle);
 
     RequestRebuildDepthTree();
   }
   else
   {
-    DALI_LOG_WARNING( "Actor must have a parent, Sibling order not changed.\n" );
+    DALI_LOG_WARNING("Actor must have a parent, Sibling order not changed.\n");
   }
 }
 
 void Actor::LowerToBottom()
 {
-  if ( mParent )
+  if(mParent)
   {
     ActorContainer& siblings = *(mParent->mChildren);
-    if( siblings.front() != this ) // If not already at bottom,
+    if(siblings.front() != this) // If not already at bottom,
     {
       ActorPtr thisPtr(this); // ensure this actor remains referenced.
 
-      auto iter = std::find( siblings.begin(), siblings.end(), this );
-      if( iter != siblings.end() )
+      auto iter = std::find(siblings.begin(), siblings.end(), this);
+      if(iter != siblings.end())
       {
         siblings.erase(iter);
         siblings.insert(siblings.begin(), thisPtr);
       }
     }
 
-    Dali::Actor handle( this );
-    mParent->mChildOrderChangedSignal.Emit( handle );
+    Dali::Actor handle(this);
+    mParent->mChildOrderChangedSignal.Emit(handle);
 
     RequestRebuildDepthTree();
   }
   else
   {
-    DALI_LOG_WARNING( "Actor must have a parent, Sibling order not changed.\n" );
+    DALI_LOG_WARNING("Actor must have a parent, Sibling order not changed.\n");
   }
 }
 
-void Actor::RaiseAbove( Internal::Actor& target )
+void Actor::RaiseAbove(Internal::Actor& target)
 {
-  if ( mParent )
+  if(mParent)
   {
     ActorContainer& siblings = *(mParent->mChildren);
-    if( siblings.back() != this && target.mParent == mParent ) // If not already at top
+    if(siblings.back() != this && target.mParent == mParent) // If not already at top
     {
       ActorPtr thisPtr(this); // ensure this actor remains referenced.
 
-      auto targetIter = std::find( siblings.begin(), siblings.end(), &target );
-      auto thisIter   = std::find( siblings.begin(), siblings.end(), this );
-      if( thisIter < targetIter )
+      auto targetIter = std::find(siblings.begin(), siblings.end(), &target);
+      auto thisIter   = std::find(siblings.begin(), siblings.end(), this);
+      if(thisIter < targetIter)
       {
         siblings.erase(thisIter);
         // Erasing early invalidates the targetIter. (Conversely, inserting first may also
         // invalidate thisIter)
-        targetIter = std::find( siblings.begin(), siblings.end(), &target );
+        targetIter = std::find(siblings.begin(), siblings.end(), &target);
         ++targetIter;
         siblings.insert(targetIter, thisPtr);
       }
 
-      Dali::Actor handle( this );
-      mParent->mChildOrderChangedSignal.Emit( handle );
+      Dali::Actor handle(this);
+      mParent->mChildOrderChangedSignal.Emit(handle);
 
       RequestRebuildDepthTree();
     }
   }
   else
   {
-    DALI_LOG_WARNING( "Actor must have a parent, Sibling order not changed.\n" );
+    DALI_LOG_WARNING("Actor must have a parent, Sibling order not changed.\n");
   }
 }
 
-void Actor::LowerBelow( Internal::Actor& target )
+void Actor::LowerBelow(Internal::Actor& target)
 {
-  if ( mParent )
+  if(mParent)
   {
     ActorContainer& siblings = *(mParent->mChildren);
-    if( siblings.front() != this && target.mParent == mParent ) // If not already at bottom
+    if(siblings.front() != this && target.mParent == mParent) // If not already at bottom
     {
       ActorPtr thisPtr(this); // ensure this actor remains referenced.
 
-      auto targetIter = std::find( siblings.begin(), siblings.end(), &target );
-      auto thisIter   = std::find( siblings.begin(), siblings.end(), this );
+      auto targetIter = std::find(siblings.begin(), siblings.end(), &target);
+      auto thisIter   = std::find(siblings.begin(), siblings.end(), this);
 
-      if( thisIter > targetIter )
+      if(thisIter > targetIter)
       {
         siblings.erase(thisIter); // this only invalidates iterators at or after this point.
         siblings.insert(targetIter, thisPtr);
       }
 
-      Dali::Actor handle( this );
-      mParent->mChildOrderChangedSignal.Emit( handle );
+      Dali::Actor handle(this);
+      mParent->mChildOrderChangedSignal.Emit(handle);
 
       RequestRebuildDepthTree();
     }
   }
   else
   {
-    DALI_LOG_WARNING( "Actor must have a parent, Sibling order not changed.\n" );
+    DALI_LOG_WARNING("Actor must have a parent, Sibling order not changed.\n");
   }
 }
 
-void Actor::SetInheritLayoutDirection( bool inherit )
+void Actor::SetInheritLayoutDirection(bool inherit)
 {
-  if( mInheritLayoutDirection != inherit )
+  if(mInheritLayoutDirection != inherit)
   {
     mInheritLayoutDirection = inherit;
 
-    if( inherit && mParent )
+    if(inherit && mParent)
     {
-      InheritLayoutDirectionRecursively( this, mParent->mLayoutDirection );
+      InheritLayoutDirectionRecursively(this, mParent->mLayoutDirection);
     }
   }
 }
 
-void Actor::InheritLayoutDirectionRecursively( ActorPtr actor, Dali::LayoutDirection::Type direction, bool set )
+void Actor::InheritLayoutDirectionRecursively(ActorPtr actor, Dali::LayoutDirection::Type direction, bool set)
 {
-  if( actor && ( actor->mInheritLayoutDirection || set ) )
+  if(actor && (actor->mInheritLayoutDirection || set))
   {
-    if( actor->mLayoutDirection != direction )
+    if(actor->mLayoutDirection != direction)
     {
       actor->mLayoutDirection = direction;
-      actor->EmitLayoutDirectionChangedSignal( direction );
+      actor->EmitLayoutDirectionChangedSignal(direction);
       actor->RelayoutRequest();
     }
 
-    if( actor->GetChildCount() > 0 )
+    if(actor->GetChildCount() > 0)
     {
-      for( const auto& child : actor->GetChildrenInternal() )
+      for(const auto& child : actor->GetChildrenInternal())
       {
-        InheritLayoutDirectionRecursively( child, direction );
+        InheritLayoutDirectionRecursively(child, direction);
       }
     }
   }
 }
 
-void Actor::SetUpdateSizeHint( const Vector2& updateSizeHint )
+void Actor::SetUpdateSizeHint(const Vector2& updateSizeHint)
 {
   // node is being used in a separate thread; queue a message to set the value & base value
-  SceneGraph::NodePropertyMessage<Vector3>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mUpdateSizeHint, &AnimatableProperty<Vector3>::Bake, Vector3(updateSizeHint.width, updateSizeHint.height, 0.f ) );
+  SceneGraph::NodePropertyMessage<Vector3>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mUpdateSizeHint, &AnimatableProperty<Vector3>::Bake, Vector3(updateSizeHint.width, updateSizeHint.height, 0.f));
 }
 
 } // namespace Internal

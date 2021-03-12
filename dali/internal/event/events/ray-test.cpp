@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,27 +19,25 @@
 #include <dali/internal/event/events/ray-test.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/math/vector2.h>
-#include <dali/public-api/math/vector3.h>
-#include <dali/public-api/math/vector4.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/nodes/node.h>
+#include <dali/public-api/math/vector2.h>
+#include <dali/public-api/math/vector3.h>
+#include <dali/public-api/math/vector4.h>
 
 using Dali::Internal::SceneGraph::Node;
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 RayTest::RayTest()
-: mEventThreadServices( EventThreadServices::Get() )
+: mEventThreadServices(EventThreadServices::Get())
 {
 }
 
-bool RayTest::SphereTest( const Internal::Actor& actor, const Vector4& rayOrigin, const Vector4& rayDir ) const
+bool RayTest::SphereTest(const Internal::Actor& actor, const Vector4& rayOrigin, const Vector4& rayDir) const
 {
   /*
    http://wiki.cgsociety.org/index.php/Ray_Sphere_Intersection
@@ -102,33 +100,33 @@ bool RayTest::SphereTest( const Internal::Actor& actor, const Vector4& rayOrigin
    */
 
   // Early out if not on the scene
-  if( ! actor.OnScene() )
+  if(!actor.OnScene())
   {
     return false;
   }
 
-  const Node& node = actor.GetNode();
-  const BufferIndex bufferIndex = EventThreadServices::Get().GetEventBufferIndex();
-  const Vector3& translation = node.GetWorldPosition( bufferIndex );
-  const Vector3& size = node.GetSize( bufferIndex );
-  const Vector3& scale = node.GetWorldScale( bufferIndex );
+  const Node&       node            = actor.GetNode();
+  const BufferIndex bufferIndex     = EventThreadServices::Get().GetEventBufferIndex();
+  const Vector3&    translation     = node.GetWorldPosition(bufferIndex);
+  const Vector3&    size            = node.GetSize(bufferIndex);
+  const Vector3&    scale           = node.GetWorldScale(bufferIndex);
+  const Rect<int>&  touchAreaOffset = actor.GetTouchAreaOffset(); // (left, right, bottom, top)
 
   // Transforms the ray to the local reference system. As the test is against a sphere, only the translation and scale are needed.
-  const Vector3 rayOriginLocal( rayOrigin.x - translation.x, rayOrigin.y - translation.y, rayOrigin.z - translation.z );
+  const Vector3 rayOriginLocal(rayOrigin.x - translation.x - (touchAreaOffset.left + touchAreaOffset.right) * 0.5, rayOrigin.y - translation.y - (touchAreaOffset.top + touchAreaOffset.bottom) * 0.5, rayOrigin.z - translation.z);
 
   // Computing the radius is not needed, a square radius is enough so can just use size but we do need to scale the sphere
-  const float width = size.width * scale.width;
-  const float height = size.height * scale.height;
+  const float width  = size.width * scale.width + touchAreaOffset.right - touchAreaOffset.left;
+  const float height = size.height * scale.height + touchAreaOffset.bottom - touchAreaOffset.top;
 
-  float squareSphereRadius = 0.5f * ( width * width + height * height );
+  float squareSphereRadius = 0.5f * (width * width + height * height);
 
-  float a = rayDir.Dot( rayDir );                                       // a
-  float b2 = rayDir.Dot( rayOriginLocal );                              // b/2
-  float c = rayOriginLocal.Dot( rayOriginLocal ) - squareSphereRadius;  // c
+  float a  = rayDir.Dot(rayDir);                                      // a
+  float b2 = rayDir.Dot(rayOriginLocal);                              // b/2
+  float c  = rayOriginLocal.Dot(rayOriginLocal) - squareSphereRadius; // c
 
-  return ( b2 * b2 - a * c ) >= 0.0f;
+  return (b2 * b2 - a * c) >= 0.0f;
 }
-
 
 bool RayTest::ActorTest(const Internal::Actor& actor, const Vector4& rayOrigin, const Vector4& rayDir, Vector2& hitPointLocal, float& distance) const
 {
@@ -140,7 +138,7 @@ bool RayTest::ActorTest(const Internal::Actor& actor, const Vector4& rayOrigin, 
 
     // Transforms the ray to the local reference system.
     // Calculate the inverse of Model matrix
-    Matrix invModelMatrix( false/*don't init*/);
+    Matrix invModelMatrix(false /*don't init*/);
     invModelMatrix = node.GetWorldMatrix(0);
     invModelMatrix.Invert();
 
@@ -151,17 +149,18 @@ bool RayTest::ActorTest(const Internal::Actor& actor, const Vector4& rayOrigin, 
     float a = -rayOriginLocal.z;
     float b = rayDirLocal.z;
 
-    if( fabsf( b ) > Math::MACHINE_EPSILON_1 )
+    if(fabsf(b) > Math::MACHINE_EPSILON_1)
     {
       // Ray travels distance * rayDirLocal to intersect with plane.
       distance = a / b;
 
-      const Vector2& size = actor.GetTouchArea() == Vector2::ZERO ? Vector2(node.GetSize(EventThreadServices::Get().GetEventBufferIndex())) : actor.GetTouchArea();
-      hitPointLocal.x = rayOriginLocal.x + rayDirLocal.x * distance + size.x * 0.5f;
-      hitPointLocal.y = rayOriginLocal.y + rayDirLocal.y * distance + size.y * 0.5f;
+      const Vector2&   size            = Vector2(node.GetSize(EventThreadServices::Get().GetEventBufferIndex()));
+      const Rect<int>& touchAreaOffset = actor.GetTouchAreaOffset(); // (left, right, bottom, top)
+      hitPointLocal.x                  = rayOriginLocal.x + rayDirLocal.x * distance + size.x * 0.5f;
+      hitPointLocal.y                  = rayOriginLocal.y + rayDirLocal.y * distance + size.y * 0.5f;
 
       // Test with the actor's geometry.
-      hit = (hitPointLocal.x >= 0.f) && (hitPointLocal.x <= size.x) && (hitPointLocal.y >= 0.f) && (hitPointLocal.y <= size.y);
+      hit = (hitPointLocal.x >= touchAreaOffset.left) && (hitPointLocal.x <= (size.x + touchAreaOffset.right) && (hitPointLocal.y >= touchAreaOffset.top) && (hitPointLocal.y <= (size.y + touchAreaOffset.bottom)));
     }
   }
 

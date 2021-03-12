@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2087,7 +2087,6 @@ int UtcDaliTouchEventIntegNewTouchEvent(void)
   END_TEST;
 }
 
-
 int UtcDaliTouchEventIntercept(void)
 {
   TestApplication application;
@@ -2110,7 +2109,6 @@ int UtcDaliTouchEventIntercept(void)
   SignalData        data;
   TouchEventFunctor functor(data, false /* Do not consume */);
   actor.TouchedSignal().Connect(&application, functor);
-
 
   // Connect to parent's touched signal
   SignalData        parentData;
@@ -2139,7 +2137,7 @@ int UtcDaliTouchEventIntercept(void)
   END_TEST;
 }
 
-int UtcDaliTouchArea(void)
+int UtcDaliTouchAreaOffset(void)
 {
   TestApplication application;
 
@@ -2165,14 +2163,29 @@ int UtcDaliTouchArea(void)
   data.Reset();
 
   // set a bigger touch area
-  actor.SetProperty(DevelActor::Property::TOUCH_AREA, Vector2(200.0f, 200.0f));
+  actor.SetProperty(DevelActor::Property::TOUCH_AREA_OFFSET, Rect<int>(-70, 70, 70, -70)); // left, right, bottom, top
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Emit a down signal
-  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(110.0f, 110.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(150.0f, 150.0f)));
+  // The actor touched signal is called because the touch area is inside touchArea.
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::DOWN, data.receivedTouch.points[0].state, TEST_LOCATION);
+  DALI_TEST_CHECK(actor == data.receivedTouch.points[0].hitActor);
+  data.Reset();
+
+  // set a offset touch area
+  actor.SetProperty(DevelActor::Property::TOUCH_AREA_OFFSET, Rect<int>(50, 100, -50, 0)); // left, right, bottom, top
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Emit a down signal
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(190.0f, 25.0f)));
   // The actor touched signal is called because the touch area is inside touchArea.
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(PointState::DOWN, data.receivedTouch.points[0].state, TEST_LOCATION);
@@ -2180,20 +2193,20 @@ int UtcDaliTouchArea(void)
   data.Reset();
 
   // set a smaller touch area
-  actor.SetProperty(DevelActor::Property::TOUCH_AREA, Vector2(50.0f, 50.0f));
+  actor.SetProperty(DevelActor::Property::TOUCH_AREA_OFFSET, Rect<int>(50, 0, 0, 50));
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Emit a down signal
-  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(80.0f, 80.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(40.0f, 40.0f)));
   // The actor touched signal is not called because the touch area is outside touchArea.
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   data.Reset();
 
   // Emit a down signal
-  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(30.0f, 30.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(90.0f, 90.0f)));
   // The actor touched signal is called because the touch area is inside touchArea.
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(PointState::DOWN, data.receivedTouch.points[0].state, TEST_LOCATION);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -7926,20 +7926,20 @@ int UtcDaliActorCaptureAllTouchAfterStartPropertyN(void)
   END_TEST;
 }
 
-int UtcDaliActorTouchAreaPropertyP(void)
+int UtcDaliActorTouchAreaOffsetPropertyP(void)
 {
   TestApplication application;
 
-  Actor actor = Actor::New();
-  Vector2 touchArea = actor.GetProperty(DevelActor::Property::TOUCH_AREA).Get<Vector2>();
-  DALI_TEST_EQUALS(touchArea, Vector2::ZERO, TEST_LOCATION);
-  actor.SetProperty(DevelActor::Property::TOUCH_AREA, Vector2(10.f, 10.f));
-  touchArea = actor.GetProperty(DevelActor::Property::TOUCH_AREA).Get<Vector2>();
-  DALI_TEST_EQUALS(touchArea, Vector2(10.f, 10.f), TEST_LOCATION);
+  Actor     actor           = Actor::New();
+  Rect<int> touchAreaOffset = actor.GetProperty(DevelActor::Property::TOUCH_AREA_OFFSET).Get<Rect<int>>();
+  DALI_TEST_EQUALS(Rect<int>(0, 0, 0, 0), touchAreaOffset, TEST_LOCATION);
+  actor.SetProperty(DevelActor::Property::TOUCH_AREA_OFFSET, Rect<int>(10, 20, 30, 40));
+  touchAreaOffset = actor.GetProperty(DevelActor::Property::TOUCH_AREA_OFFSET).Get<Rect<int>>();
+  DALI_TEST_EQUALS(Rect<int>(10, 20, 30, 40), touchAreaOffset, TEST_LOCATION);
   END_TEST;
 }
 
-int UtcDaliActorTouchAreaPropertyN(void)
+int UtcDaliActorTouchAreaOffsetPropertyN(void)
 {
   TestApplication application;
 
@@ -7948,12 +7948,12 @@ int UtcDaliActorTouchAreaPropertyN(void)
   // Make sure setting invalid types does not cause a crash
   try
   {
-    actor.SetProperty(DevelActor::Property::TOUCH_AREA, 1.0f);
-    actor.SetProperty(DevelActor::Property::TOUCH_AREA, Vector2::ONE);
-    actor.SetProperty(DevelActor::Property::TOUCH_AREA, Vector3::ONE);
-    actor.SetProperty(DevelActor::Property::TOUCH_AREA, Vector4::ONE);
-    actor.SetProperty(DevelActor::Property::TOUCH_AREA, Property::Map());
-    actor.SetProperty(DevelActor::Property::TOUCH_AREA, Property::Array());
+    actor.SetProperty(DevelActor::Property::TOUCH_AREA_OFFSET, 1.0f);
+    actor.SetProperty(DevelActor::Property::TOUCH_AREA_OFFSET, Vector2::ONE);
+    actor.SetProperty(DevelActor::Property::TOUCH_AREA_OFFSET, Vector3::ONE);
+    actor.SetProperty(DevelActor::Property::TOUCH_AREA_OFFSET, Vector4::ONE);
+    actor.SetProperty(DevelActor::Property::TOUCH_AREA_OFFSET, Property::Map());
+    actor.SetProperty(DevelActor::Property::TOUCH_AREA_OFFSET, Property::Array());
     tet_result(TET_PASS);
   }
   catch(...)
