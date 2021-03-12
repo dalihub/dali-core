@@ -108,7 +108,7 @@ bool RayTest::SphereTest(const Internal::Actor& actor, const Vector4& rayOrigin,
   const Node&       node        = actor.GetNode();
   const BufferIndex bufferIndex = EventThreadServices::Get().GetEventBufferIndex();
   const Vector3&    translation = node.GetWorldPosition(bufferIndex);
-  const Vector3&    size        = node.GetSize(bufferIndex);
+  const Vector3&    size        = actor.GetTouchArea() == Vector2::ZERO ? node.GetSize(bufferIndex) : Vector3(actor.GetTouchArea());
   const Vector3&    scale       = node.GetWorldScale(bufferIndex);
 
   // Transforms the ray to the local reference system. As the test is against a sphere, only the translation and scale are needed.
