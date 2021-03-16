@@ -170,50 +170,50 @@ struct Command
     {
       case CommandType::BIND_VERTEX_BUFFERS:
       {
-        bindVertexBuffers = rhs.bindVertexBuffers;
+        data.bindVertexBuffers = rhs.data.bindVertexBuffers;
         break;
       }
       case CommandType::BIND_INDEX_BUFFER:
       {
-        bindIndexBuffer = rhs.bindIndexBuffer;
+        data.bindIndexBuffer = rhs.data.bindIndexBuffer;
         break;
       }
       case CommandType::BIND_SAMPLERS:
       {
-        bindSamplers = rhs.bindSamplers;
+        data.bindSamplers = rhs.data.bindSamplers;
         break;
       }
       case CommandType::BIND_TEXTURES:
       {
-        bindTextures = rhs.bindTextures;
+        data.bindTextures = rhs.data.bindTextures;
         break;
       }
       case CommandType::BIND_PIPELINE:
       {
-        bindPipeline = rhs.bindPipeline;
+        data.bindPipeline = rhs.data.bindPipeline;
         break;
       }
       case CommandType::BIND_UNIFORM_BUFFER:
       {
-        bindUniformBuffers = rhs.bindUniformBuffers;
+        data.bindUniformBuffers = rhs.data.bindUniformBuffers;
         break;
       }
       case CommandType::DRAW:
       {
-        draw.type = rhs.draw.type;
-        draw.draw = rhs.draw.draw;
+        data.draw.type = rhs.data.draw.type;
+        data.draw.draw = rhs.data.draw.draw;
         break;
       }
       case CommandType::DRAW_INDEXED:
       {
-        draw.type        = rhs.draw.type;
-        draw.drawIndexed = rhs.draw.drawIndexed;
+        data.draw.type        = rhs.data.draw.type;
+        data.draw.drawIndexed = rhs.data.draw.drawIndexed;
         break;
       }
       case CommandType::DRAW_INDEXED_INDIRECT:
       {
-        draw.type                = rhs.draw.type;
-        draw.drawIndexedIndirect = rhs.draw.drawIndexedIndirect;
+        data.draw.type                = rhs.data.draw.type;
+        data.draw.drawIndexedIndirect = rhs.data.draw.drawIndexedIndirect;
         break;
       }
       case CommandType::FLUSH:
@@ -235,50 +235,50 @@ struct Command
     {
       case CommandType::BIND_VERTEX_BUFFERS:
       {
-        bindVertexBuffers = std::move(rhs.bindVertexBuffers);
+        data.bindVertexBuffers = std::move(rhs.data.bindVertexBuffers);
         break;
       }
       case CommandType::BIND_INDEX_BUFFER:
       {
-        bindIndexBuffer = rhs.bindIndexBuffer;
+        data.bindIndexBuffer = rhs.data.bindIndexBuffer;
         break;
       }
       case CommandType::BIND_UNIFORM_BUFFER:
       {
-        bindUniformBuffers = std::move(rhs.bindUniformBuffers);
+        data.bindUniformBuffers = std::move(rhs.data.bindUniformBuffers);
         break;
       }
       case CommandType::BIND_SAMPLERS:
       {
-        bindSamplers = std::move(rhs.bindSamplers);
+        data.bindSamplers = std::move(rhs.data.bindSamplers);
         break;
       }
       case CommandType::BIND_TEXTURES:
       {
-        bindTextures = std::move(rhs.bindTextures);
+        data.bindTextures = std::move(rhs.data.bindTextures);
         break;
       }
       case CommandType::BIND_PIPELINE:
       {
-        bindPipeline = rhs.bindPipeline;
+        data.bindPipeline = rhs.data.bindPipeline;
         break;
       }
       case CommandType::DRAW:
       {
-        draw.type = rhs.draw.type;
-        draw.draw = rhs.draw.draw;
+        data.draw.type = rhs.data.draw.type;
+        data.draw.draw = rhs.data.draw.draw;
         break;
       }
       case CommandType::DRAW_INDEXED:
       {
-        draw.type        = rhs.draw.type;
-        draw.drawIndexed = rhs.draw.drawIndexed;
+        data.draw.type        = rhs.data.draw.type;
+        data.draw.drawIndexed = rhs.data.draw.drawIndexed;
         break;
       }
       case CommandType::DRAW_INDEXED_INDIRECT:
       {
-        draw.type                = rhs.draw.type;
-        draw.drawIndexedIndirect = rhs.draw.drawIndexedIndirect;
+        data.draw.type                = rhs.data.draw.type;
+        data.draw.drawIndexedIndirect = rhs.data.draw.drawIndexedIndirect;
         break;
       }
       case CommandType::FLUSH:
@@ -292,8 +292,14 @@ struct Command
 
   CommandType type{CommandType::FLUSH}; ///< Type of command
 
-  union
+  union CommandData
   {
+    CommandData()
+    {}
+
+    ~CommandData()
+    {} // do nothing
+
     struct
     {
       std::vector<Graphics::TextureBinding> textureBindings;
@@ -329,7 +335,7 @@ struct Command
     struct : public DrawCallDescriptor
     {
     } draw;
-  };
+  } data;
 };
 
 
@@ -348,7 +354,7 @@ public:
   {
     mCommands.emplace_back();
     mCommands.back().type = CommandType::BIND_VERTEX_BUFFERS;
-    auto& bindings        = mCommands.back().bindVertexBuffers.vertexBufferBindings;
+    auto& bindings        = mCommands.back().data.bindVertexBuffers.vertexBufferBindings;
     if(bindings.size() < firstBinding + buffers.size())
     {
       bindings.resize(firstBinding + buffers.size());
@@ -368,7 +374,7 @@ public:
     mCommands.emplace_back();
     auto& cmd     = mCommands.back();
     cmd.type      = CommandType::BIND_UNIFORM_BUFFER;
-    auto& bindCmd = cmd.bindUniformBuffers;
+    auto& bindCmd = cmd.data.bindUniformBuffers;
     for(const auto& binding : bindings)
     {
       if(binding.buffer)
@@ -403,7 +409,7 @@ public:
   {
     mCommands.emplace_back();
     mCommands.back().type                  = CommandType::BIND_PIPELINE;
-    mCommands.back().bindPipeline.pipeline = static_cast<const TestGraphicsPipeline*>(&pipeline);
+    mCommands.back().data.bindPipeline.pipeline = static_cast<const TestGraphicsPipeline*>(&pipeline);
     mCallStack.PushCall("BindPipeline", "");
   }
 
@@ -411,14 +417,14 @@ public:
   {
     mCommands.emplace_back();
     mCommands.back().type                         = CommandType::BIND_TEXTURES;
-    mCommands.back().bindTextures.textureBindings = std::move(textureBindings);
+    mCommands.back().data.bindTextures.textureBindings = std::move(textureBindings);
     mCallStack.PushCall("BindTextures", "");
   }
 
   void BindSamplers(std::vector<Graphics::SamplerBinding>& samplerBindings) override
   {
     mCommands.emplace_back();
-    mCommands.back().bindSamplers.samplerBindings = std::move(samplerBindings);
+    mCommands.back().data.bindSamplers.samplerBindings = std::move(samplerBindings);
     mCallStack.PushCall("BindSamplers", "");
   }
 
@@ -435,9 +441,9 @@ public:
   {
     mCommands.emplace_back();
     mCommands.back().type                   = CommandType::BIND_INDEX_BUFFER;
-    mCommands.back().bindIndexBuffer.buffer = static_cast<const TestGraphicsBuffer*>(&buffer);
-    mCommands.back().bindIndexBuffer.offset = offset;
-    mCommands.back().bindIndexBuffer.format = format;
+    mCommands.back().data.bindIndexBuffer.buffer = static_cast<const TestGraphicsBuffer*>(&buffer);
+    mCommands.back().data.bindIndexBuffer.offset = offset;
+    mCommands.back().data.bindIndexBuffer.format = format;
     mCallStack.PushCall("BindIndexBuffer", "");
   }
 
@@ -472,7 +478,7 @@ public:
   {
     mCommands.emplace_back();
     mCommands.back().type  = CommandType::DRAW;
-    auto& cmd              = mCommands.back().draw;
+    auto& cmd              = mCommands.back().data.draw;
     cmd.type               = DrawCallDescriptor::Type::DRAW;
     cmd.draw.vertexCount   = vertexCount;
     cmd.draw.instanceCount = instanceCount;
@@ -490,7 +496,7 @@ public:
   {
     mCommands.emplace_back();
     mCommands.back().type         = CommandType::DRAW_INDEXED;
-    auto& cmd                     = mCommands.back().draw;
+    auto& cmd                     = mCommands.back().data.draw;
     cmd.type                      = DrawCallDescriptor::Type::DRAW_INDEXED;
     cmd.drawIndexed.firstIndex    = firstIndex;
     cmd.drawIndexed.firstInstance = firstInstance;
@@ -508,7 +514,7 @@ public:
   {
     mCommands.emplace_back();
     mCommands.back().type             = CommandType::DRAW_INDEXED_INDIRECT;
-    auto& cmd                         = mCommands.back().draw;
+    auto& cmd                         = mCommands.back().data.draw;
     cmd.type                          = DrawCallDescriptor::Type::DRAW_INDEXED_INDIRECT;
     cmd.drawIndexedIndirect.buffer    = static_cast<const TestGraphicsBuffer*>(&buffer);
     cmd.drawIndexedIndirect.offset    = offset;

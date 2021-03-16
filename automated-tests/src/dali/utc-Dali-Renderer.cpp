@@ -3653,7 +3653,7 @@ int UtcDaliRendererPreparePipeline(void)
   TestGraphicsCommandBuffer* cmdBuf   = static_cast<TestGraphicsCommandBuffer*>((submissions[0].cmdBuffer[0]));
   //auto                             pipeline = cmdBuf->mPipeline;
   auto result = cmdBuf->GetCommandsByType( 0 | CommandType::BIND_PIPELINE );
-  auto pipeline = result[0]->bindPipeline.pipeline;
+  auto pipeline = result[0]->data.bindPipeline.pipeline;
 
   if(pipeline)
   {
