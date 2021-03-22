@@ -85,6 +85,7 @@ struct PartialRenderingNodeData
 
   PartialRenderingCacheInfo mData[2u];         /// Double-buffered data
   uint8_t                   mCurrentIndex{0u}; /// Current buffer index
+  bool                      mVisible{true};    /// Visible state
 };
 
 /**

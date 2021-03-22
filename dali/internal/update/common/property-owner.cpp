@@ -88,6 +88,7 @@ void PropertyOwner::Destroy()
 void PropertyOwner::ConnectToSceneGraph()
 {
   mIsConnectedToSceneGraph = true;
+  SetUpdated(true);
 
   // Notification for observers
   const ConstObserverIter endIter = mObservers.End();
