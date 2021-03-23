@@ -309,6 +309,12 @@ public:
   void AttachDepthStencilTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel );
 
   /**
+   * Request to capture rendered result
+   * @param[in] frameBuffer The FrameBuffer
+   */
+  void CaptureRenderingResult(Render::FrameBuffer* frameBuffer);
+
+  /**
    * Initializes a Scene to the render manager
    * @param[in] scene The Scene to initialize
    */

@@ -1449,6 +1449,17 @@ void UpdateManager::AttachDepthStencilTextureToFrameBuffer( Render::FrameBuffer*
   new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::AttachDepthStencilTextureToFrameBuffer, frameBuffer, texture, mipmapLevel );
 }
 
+void UpdateManager::CaptureRenderingResult(Render::FrameBuffer* frameBuffer)
+{
+  using DerivedType = MessageValue1<RenderManager, Render::FrameBuffer*>;
+
+  // Reserve some memory inside the render queue
+  uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot(mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof(DerivedType));
+
+  // Construct message in the render queue memory; note that delete should not be called on the return value
+  new(slot) DerivedType(&mImpl->renderManager, &RenderManager::CaptureRenderingResult, frameBuffer);
+}
+
 } // namespace SceneGraph
 
 } // namespace Internal

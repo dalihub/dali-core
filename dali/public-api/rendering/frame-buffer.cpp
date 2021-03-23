@@ -98,4 +98,14 @@ Texture FrameBuffer::GetColorTexture()
   return Dali::Texture(texturePtr);
 }
 
+uint8_t* FrameBuffer::GetRenderedBuffer()
+{
+  return GetImplementation(*this).GetRenderedBuffer();
+}
+
+void FrameBuffer::CaptureRenderedResult()
+{
+  GetImplementation(*this).CaptureRenderedResult();
+}
+
 } //namespace Dali

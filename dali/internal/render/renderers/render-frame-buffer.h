@@ -121,6 +121,22 @@ public:
    */
   GLuint GetTextureId(uint8_t index) { return mTextureId[index]; };
 
+  /**
+   * @brief Read render result
+   */
+  void DrawRenderedBuffer(Context& context);
+
+  /**
+   * @brief Retrieve rendered buffer.
+   * @return Buffer pointer
+   */
+  GLubyte* GetRenderedBuffer();
+
+  /**
+   * @brief Request to Read rendered result.
+   */
+  void CaptureRenderingResult();
+
 private:
 
   /**
@@ -142,6 +158,9 @@ private:
   uint32_t mWidth;
   uint32_t mHeight;
   uint8_t mColorAttachmentCount;
+  GLubyte* mRenderedBuffer;
+  bool     mCaptureRenderedResult;
+  bool     mCaptured;
 };
 
 } // namespace Render

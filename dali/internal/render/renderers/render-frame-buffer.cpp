@@ -48,11 +48,19 @@ FrameBuffer::FrameBuffer( uint32_t width, uint32_t height, Mask attachments )
   mStencilBuffer( attachments & Dali::FrameBuffer::Attachment::STENCIL ),
   mWidth( width ),
   mHeight( height ),
-  mColorAttachmentCount( 0u )
+  mColorAttachmentCount( 0u ),
+  mCaptureRenderedResult(false),
+  mCaptured(false)
 {
 }
 
-FrameBuffer::~FrameBuffer() = default;
+FrameBuffer::~FrameBuffer()
+{
+  if(mCaptured)
+  {
+    delete[] mRenderedBuffer;
+  }
+}
 
 void FrameBuffer::Destroy( Context& context )
 {
@@ -157,6 +165,43 @@ uint32_t FrameBuffer::GetWidth() const
 uint32_t FrameBuffer::GetHeight() const
 {
   return mHeight;
+}
+
+void FrameBuffer::DrawRenderedBuffer(Context& context)
+{
+  if(!mCaptureRenderedResult)
+  {
+    return;
+  }
+
+  if(mCaptured)
+  {
+    delete[] mRenderedBuffer;
+  }
+
+  context.BindFramebuffer(GL_FRAMEBUFFER, mId);
+  mRenderedBuffer = new GLubyte[mWidth * mHeight * sizeof(GL_UNSIGNED_BYTE)];
+  context.ReadPixels(0, 0, mWidth, mHeight, GL_RGBA, GL_UNSIGNED_BYTE, mRenderedBuffer);
+  context.BindFramebuffer(GL_FRAMEBUFFER, 0);
+  mCaptureRenderedResult = false;
+  mCaptured = true;
+}
+
+GLubyte* FrameBuffer::GetRenderedBuffer()
+{
+  if(mCaptured)
+  {
+    return mRenderedBuffer;
+  }
+  else
+  {
+    return nullptr;
+  }
+}
+
+void FrameBuffer::CaptureRenderingResult()
+{
+  mCaptureRenderedResult = true;
 }
 
 

@@ -386,6 +386,11 @@ void RenderManager::AttachDepthStencilTextureToFrameBuffer( Render::FrameBuffer*
   frameBuffer->AttachDepthStencilTexture( mImpl->context, texture, mipmapLevel );
 }
 
+void RenderManager::CaptureRenderingResult(Render::FrameBuffer* frameBuffer)
+{
+  frameBuffer->CaptureRenderingResult();
+}
+
 void RenderManager::AddVertexBuffer( OwnerPointer< Render::VertexBuffer >& vertexBuffer )
 {
   mImpl->vertexBufferContainer.PushBack( vertexBuffer.Release() );
@@ -1088,6 +1093,7 @@ void RenderManager::RenderScene( Integration::RenderStatus& status, Integration:
     if ( renderToFbo )
     {
       mImpl->currentContext->Flush();
+      instruction.mFrameBuffer->DrawRenderedBuffer(*mImpl->currentContext);
     }
   }
 

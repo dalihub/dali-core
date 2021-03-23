@@ -185,6 +185,18 @@ public:
    */
   Texture GetColorTexture();
 
+  /**
+   * @brief Retrieve rendered buffer.
+   * @return Buffer pointer of captured image.
+   */
+  uint8_t* GetRenderedBuffer();
+
+  /**
+   * @brief Request to capture rendered result
+   * @note This method request to capture once,
+   */
+  void CaptureRenderedResult();
+
 public:
   /**
    * @brief The constructor.
