@@ -142,6 +142,22 @@ public:
                                                             Graphics::AttachmentStoreOp colorStoreOp) const;
 
   /**
+   * @brief Read render result
+   */
+  void DrawRenderedBuffer(uint8_t* inputBuffer);
+
+  /**
+   * @brief Retrieve rendered buffer.
+   * @return Buffer pointer
+   */
+  uint8_t* GetRenderedBuffer();
+
+  /**
+   * @brief Request to Read rendered result.
+   */
+  void CaptureRenderingResult();
+
+  /**
    * The function returns initialized array of clear values
    * which then can be modified and assed to BeginRenderPass()
    * command.
@@ -183,6 +199,12 @@ private:
 
   uint32_t mWidth;
   uint32_t mHeight;
+
+  std::unique_ptr<CallbackBase> mCaptureRenderedCallback;
+
+  uint8_t* mRenderedBuffer;
+  bool     mCaptureRenderedResult;
+  bool     mCaptured;
 
   bool mDepthBuffer;
   bool mStencilBuffer;

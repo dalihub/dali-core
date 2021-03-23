@@ -104,6 +104,18 @@ public:
   Texture* GetDepthStencilTexture() const;
 
   /**
+   * @brief Retrieve captured buffer
+   *
+   * @return a pointer of the buffer.
+   */
+  uint8_t* GetRenderedBuffer();
+
+  /**
+   * @copydoc Dali::FrameBuffer::CaptureRenderedResult()
+   */
+  void CaptureRenderedResult();
+
+  /**
    * @brief Sets the frame buffer size.
    * @param[in] width The width size
    * @param[in] height The height size

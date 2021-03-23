@@ -380,6 +380,9 @@ public:
    */
   virtual bool GetProgramParameter(Graphics::Program& program, uint32_t parameterId, void* outData) = 0;
 
+public: // Framebuffer Capture
+  virtual void CaptureRenderingResult(Graphics::Framebuffer& framebuffer, CallbackBase* capturedCallback, uint8_t* capturedBuffer) = 0;
+
 protected:
   /**
    * Creates controller

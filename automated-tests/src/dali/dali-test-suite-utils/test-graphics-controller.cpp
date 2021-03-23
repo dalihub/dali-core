@@ -1330,4 +1330,9 @@ bool TestGraphicsController::GetProgramParameter(Graphics::Program& program, uin
   return graphicsProgram->GetParameter(parameterId, outData);
 }
 
+void TestGraphicsController::CaptureRenderingResult(Graphics::Framebuffer& framebuffer, CallbackBase* capturedCallback, uint8_t* capturedBuffer)
+{
+  mCallStack.PushCall("CaptureRenderingResult", "");
+}
+
 } // namespace Dali

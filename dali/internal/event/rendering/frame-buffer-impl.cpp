@@ -127,6 +127,16 @@ Texture* FrameBuffer::GetDepthStencilTexture() const
   return (mStencil) ? mStencil.Get() : nullptr;
 }
 
+uint8_t* FrameBuffer::GetRenderedBuffer()
+{
+  return mRenderObject->GetRenderedBuffer();
+}
+
+void FrameBuffer::CaptureRenderedResult()
+{
+  CaptureRenderingResult(mEventThreadServices.GetUpdateManager(), *mRenderObject);
+}
+
 void FrameBuffer::SetSize(uint32_t width, uint32_t height)
 {
   mWidth  = width;

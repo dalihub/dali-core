@@ -354,6 +354,11 @@ void RenderManager::SetMultiSamplingLevelToFrameBuffer(Render::FrameBuffer* fram
   frameBuffer->SetMultiSamplingLevel(multiSamplingLevel);
 }
 
+void RenderManager::CaptureRenderingResult(Render::FrameBuffer* frameBuffer)
+{
+  frameBuffer->CaptureRenderingResult();
+}
+
 void RenderManager::AddVertexBuffer(OwnerPointer<Render::VertexBuffer>& vertexBuffer)
 {
   mImpl->vertexBufferContainer.PushBack(vertexBuffer.Release());

@@ -30,6 +30,9 @@ namespace Render
 FrameBuffer::FrameBuffer(uint32_t width, uint32_t height, Mask attachments)
 : mWidth(width),
   mHeight(height),
+  mRenderedBuffer(nullptr),
+  mCaptureRenderedResult(false),
+  mCaptured(false),
   mDepthBuffer(attachments & Dali::FrameBuffer::Attachment::DEPTH),
   mStencilBuffer(attachments & Dali::FrameBuffer::Attachment::STENCIL)
 {
@@ -45,7 +48,13 @@ FrameBuffer::FrameBuffer(uint32_t width, uint32_t height, Mask attachments)
   }
 }
 
-FrameBuffer::~FrameBuffer() = default;
+FrameBuffer::~FrameBuffer()
+{
+  if(mRenderedBuffer != nullptr)
+  {
+    delete[] mRenderedBuffer;
+  }
+}
 
 void FrameBuffer::Destroy()
 {
@@ -123,6 +132,13 @@ bool FrameBuffer::CreateGraphicsObjects()
     else
     {
       mGraphicsObject = mGraphicsController->CreateFramebuffer(mCreateInfo, std::move(mGraphicsObject));
+
+      if(mCaptureRenderedResult)
+      {
+        mCaptureRenderedCallback.reset(MakeCallback(this, &FrameBuffer::DrawRenderedBuffer));
+        mGraphicsController->CaptureRenderingResult(*mGraphicsObject, mCaptureRenderedCallback.get(), mRenderedBuffer);
+        mCaptureRenderedResult = false;
+      }
 
       // Create render target
       Graphics::RenderTargetCreateInfo rtInfo{};
@@ -203,6 +219,46 @@ uint32_t FrameBuffer::GetHeight() const
     return mRenderPass[1].get();
   }
 }
+
+void FrameBuffer::DrawRenderedBuffer(uint8_t* inputBuffer)
+{
+  mCaptured = true;
+  mCaptureRenderedCallback.reset();
+}
+
+uint8_t* FrameBuffer::GetRenderedBuffer()
+{
+  if(mCaptured)
+  {
+    return mRenderedBuffer;
+  }
+  else
+  {
+    return nullptr;
+  }
+}
+
+void FrameBuffer::CaptureRenderingResult()
+{
+  if(mRenderedBuffer == nullptr)
+  {
+    mRenderedBuffer = new uint8_t[mWidth * mHeight * sizeof(uint8_t) * 4u];
+  }
+
+  // Reset captured flag
+  mCaptured = false;
+
+  if(mGraphicsObject)
+  {
+    mCaptureRenderedCallback.reset(MakeCallback(this, &FrameBuffer::DrawRenderedBuffer));
+    mGraphicsController->CaptureRenderingResult(*mGraphicsObject, mCaptureRenderedCallback.get(), mRenderedBuffer);
+  }
+  else
+  {
+    mCaptureRenderedResult = true;
+  }
+}
+
 
 } // namespace Render
 

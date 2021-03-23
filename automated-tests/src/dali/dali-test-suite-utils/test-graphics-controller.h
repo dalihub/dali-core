@@ -373,6 +373,8 @@ public:
    */
   bool PipelineEquals(const Graphics::Pipeline& pipeline0, const Graphics::Pipeline& pipeline1) const override;
 
+  void CaptureRenderingResult(Graphics::Framebuffer& framebuffer, CallbackBase* capturedCallback, uint8_t* capturedBuffer) override;
+
 public: // Test Functions
   void SetVertexFormats(Property::Array& vfs)
   {
