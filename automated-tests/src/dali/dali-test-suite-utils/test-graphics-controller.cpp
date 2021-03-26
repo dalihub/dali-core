@@ -463,7 +463,7 @@ void TestGraphicsController::SubmitCommandBuffers(const Graphics::SubmitInfo& su
     if(!value.empty())
     {
       // must be fixed
-      for (auto& binding : value[0]->data.bindTextures.textureBindings)
+      for(auto& binding : value[0]->data.bindTextures.textureBindings)
       {
         if(binding.texture)
         {
@@ -489,7 +489,7 @@ void TestGraphicsController::SubmitCommandBuffers(const Graphics::SubmitInfo& su
     auto bindIndexBufferCmds = commandBuffer->GetCommandsByType(0 | CommandType::BIND_INDEX_BUFFER);
     if(!bindIndexBufferCmds.empty())
     {
-      auto &indexBufferBinding = bindIndexBufferCmds[0]->data.bindIndexBuffer;
+      auto& indexBufferBinding = bindIndexBufferCmds[0]->data.bindIndexBuffer;
       if(indexBufferBinding.buffer)
       {
         auto buffer = Uncast<TestGraphicsBuffer>(indexBufferBinding.buffer);
@@ -501,7 +501,7 @@ void TestGraphicsController::SubmitCommandBuffers(const Graphics::SubmitInfo& su
     auto bindVertexBufferCmds = commandBuffer->GetCommandsByType(0 | CommandType::BIND_VERTEX_BUFFERS);
     if(!bindVertexBufferCmds.empty())
     {
-      for (auto &binding : bindVertexBufferCmds[0]->data.bindVertexBuffers.vertexBufferBindings)
+      for(auto& binding : bindVertexBufferCmds[0]->data.bindVertexBuffers.vertexBufferBindings)
       {
         auto graphicsBuffer = binding.buffer;
         auto vertexBuffer   = Uncast<TestGraphicsBuffer>(graphicsBuffer);
@@ -544,7 +544,7 @@ void TestGraphicsController::SubmitCommandBuffers(const Graphics::SubmitInfo& su
     auto bindPipelineCmds = commandBuffer->GetCommandsByType(0 | CommandType::BIND_PIPELINE);
     if(!bindPipelineCmds.empty())
     {
-      auto      pipeline = bindPipelineCmds[0]->data.bindPipeline.pipeline;
+      auto  pipeline = bindPipelineCmds[0]->data.bindPipeline.pipeline;
       auto& vi       = pipeline->vertexInputState;
       for(auto& attribute : vi.attributes)
       {
@@ -624,12 +624,12 @@ void TestGraphicsController::SubmitCommandBuffers(const Graphics::SubmitInfo& su
 
       if(!drawCmds.empty())
       {
-        if (drawCmds[0]->data.draw.type == DrawCallDescriptor::Type::DRAW_INDEXED )
+        if(drawCmds[0]->data.draw.type == DrawCallDescriptor::Type::DRAW_INDEXED)
         {
           mGl.DrawElements(GetTopology(topology),
                            static_cast<GLsizei>(drawCmds[0]->data.draw.drawIndexed.indexCount),
                            GL_UNSIGNED_SHORT,
-                           reinterpret_cast<void *>(drawCmds[0]->data.draw.drawIndexed.firstIndex));
+                           reinterpret_cast<void*>(drawCmds[0]->data.draw.drawIndexed.firstIndex));
         }
         else
         {

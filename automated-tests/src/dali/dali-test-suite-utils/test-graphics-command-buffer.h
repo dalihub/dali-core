@@ -339,10 +339,12 @@ struct Command
   union CommandData
   {
     CommandData()
-    {}
+    {
+    }
 
     ~CommandData()
-    {} // do nothing
+    {
+    } // do nothing
 
     struct
     {
@@ -467,7 +469,7 @@ public:
   void BindPipeline(const Graphics::Pipeline& pipeline) override
   {
     mCommands.emplace_back();
-    mCommands.back().type                  = CommandType::BIND_PIPELINE;
+    mCommands.back().type                       = CommandType::BIND_PIPELINE;
     mCommands.back().data.bindPipeline.pipeline = static_cast<const TestGraphicsPipeline*>(&pipeline);
     mCallStack.PushCall("BindPipeline", "");
   }
@@ -475,7 +477,7 @@ public:
   void BindTextures(std::vector<Graphics::TextureBinding>& textureBindings) override
   {
     mCommands.emplace_back();
-    mCommands.back().type                         = CommandType::BIND_TEXTURES;
+    mCommands.back().type                              = CommandType::BIND_TEXTURES;
     mCommands.back().data.bindTextures.textureBindings = std::move(textureBindings);
     mCallStack.PushCall("BindTextures", "");
   }
@@ -499,7 +501,7 @@ public:
                        Graphics::Format        format) override
   {
     mCommands.emplace_back();
-    mCommands.back().type                   = CommandType::BIND_INDEX_BUFFER;
+    mCommands.back().type                        = CommandType::BIND_INDEX_BUFFER;
     mCommands.back().data.bindIndexBuffer.buffer = static_cast<const TestGraphicsBuffer*>(&buffer);
     mCommands.back().data.bindIndexBuffer.offset = offset;
     mCommands.back().data.bindIndexBuffer.format = format;
@@ -598,7 +600,7 @@ public:
     mCallStack.PushCall("SetScissor", params.str(), params);
 
     mCommands.emplace_back();
-    mCommands.back().type           = CommandType::SET_SCISSOR;
+    mCommands.back().type                = CommandType::SET_SCISSOR;
     mCommands.back().data.scissor.region = value;
   }
 
@@ -609,7 +611,7 @@ public:
     mCallStack.PushCall("SetScissorTestEnable", params.str(), params);
 
     mCommands.emplace_back();
-    mCommands.back().type               = CommandType::SET_SCISSOR_TEST;
+    mCommands.back().type                    = CommandType::SET_SCISSOR_TEST;
     mCommands.back().data.scissorTest.enable = value;
   }
 
@@ -625,7 +627,7 @@ public:
     mCallStack.PushCall("SetViewport", params.str(), params);
 
     mCommands.emplace_back();
-    mCommands.back().type            = CommandType::SET_VIEWPORT;
+    mCommands.back().type                 = CommandType::SET_VIEWPORT;
     mCommands.back().data.viewport.region = value;
   }
 
@@ -636,7 +638,7 @@ public:
     mCallStack.PushCall("SetViewportEnable", params.str(), params);
 
     mCommands.emplace_back();
-    mCommands.back().type                = CommandType::SET_VIEWPORT_TEST;
+    mCommands.back().type                     = CommandType::SET_VIEWPORT_TEST;
     mCommands.back().data.viewportTest.enable = value;
   }
 
