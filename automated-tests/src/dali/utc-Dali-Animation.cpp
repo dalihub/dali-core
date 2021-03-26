@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -9206,7 +9206,7 @@ int UtcDaliAnimationKeyFramesGetKeyFrameP(void)
 {
   TestApplication application;
 
-  float inputTime = 0.6f;
+  float   inputTime  = 0.6f;
   Vector4 inputValue = Vector4(0.0f, 0.0f, 0.0f, 0.3f);
 
   KeyFrames keyFrames = KeyFrames::New();
@@ -9214,7 +9214,7 @@ int UtcDaliAnimationKeyFramesGetKeyFrameP(void)
   keyFrames.Add(inputTime, inputValue);
   keyFrames.Add(1.0f, Vector4(0.0f, 0.0f, 0.0f, 0.8f));
 
-  float outputTime;
+  float           outputTime;
   Property::Value outputValue;
 
   DevelKeyFrames::GetKeyFrame(keyFrames, 3, outputTime, outputValue);
@@ -13709,7 +13709,7 @@ int UtcDaliAnimationClearPropertyValue02(void)
   Actor actor = Actor::New();
   application.GetScene().Add(actor);
 
-  const float durationSeconds(1.0f);
+  const float   durationSeconds(1.0f);
   const Vector3 targetPosition1(10.0f, 10.0f, 10.0f);
   const Vector3 targetPosition2(20.0f, 20.0f, 20.0f);
 

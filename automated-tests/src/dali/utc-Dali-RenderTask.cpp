@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -174,9 +174,20 @@ Actor CreateRenderableActorSuccess(TestApplication& application, std::string fil
   return actor;
 }
 
+Texture CreateTexture(TextureType::Type type, Pixel::Format format, int width, int height)
+{
+  Texture texture = Texture::New(type, format, width, height);
+
+  int       bufferSize = width * height * 2;
+  uint8_t*  buffer     = reinterpret_cast<uint8_t*>(malloc(bufferSize));
+  PixelData pixelData  = PixelData::New(buffer, bufferSize, width, height, format, PixelData::FREE);
+  texture.Upload(pixelData, 0u, 0u, 0u, 0u, width, height);
+  return texture;
+}
+
 Texture CreateTexture()
 {
-  return Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 80u, 80u);
+  return CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 80, 80);
 }
 
 RenderTask CreateRenderTask(TestApplication& application,
@@ -346,7 +357,7 @@ int UtcDaliRenderTaskSetSourceActorP01(void)
   Actor actor = task.GetSourceActor();
   DALI_TEST_CHECK(actor);
 
-  Texture img      = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1);
+  Texture img      = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1);
   Actor   newActor = CreateRenderableActor(img);
   newActor.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
   stage.Add(newActor);
@@ -390,7 +401,7 @@ int UtcDaliRenderTaskSetSourceActorP02(void)
   Actor actor = task.GetSourceActor();
   DALI_TEST_CHECK(actor);
 
-  Texture img      = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1);
+  Texture img      = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1);
   Actor   newActor = CreateRenderableActor(img);
   newActor.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
   stage.Add(newActor);
@@ -449,7 +460,7 @@ int UtcDaliRenderTaskSetSourceActorOffScene(void)
   TraceCallStack&    drawTrace = gl.GetDrawTrace();
   drawTrace.Enable(true);
 
-  Texture img      = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1);
+  Texture img      = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1);
   Actor   newActor = CreateRenderableActor(img);
   newActor.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
   task.SetSourceActor(newActor);
@@ -498,7 +509,7 @@ int UtcDaliRenderTaskSetSourceActorEmpty(void)
   Actor actor = task.GetSourceActor();
   DALI_TEST_CHECK(actor);
 
-  Texture img      = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1);
+  Texture img      = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1);
   Actor   newActor = CreateRenderableActor(img);
   newActor.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
   stage.Add(newActor);
@@ -548,7 +559,7 @@ int UtcDaliRenderTaskSetSourceActorDestroyed(void)
   Actor actor = task.GetSourceActor();
   DALI_TEST_CHECK(actor);
 
-  Texture img = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1);
+  Texture img = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1);
 
   Actor newActor = CreateRenderableActor(img);
   newActor.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
@@ -643,7 +654,7 @@ int UtcDaliRenderTaskSetExclusive(void)
   ids.push_back(10); // 10 = actor3
   application.GetGlAbstraction().SetNextTextureIds(ids);
 
-  Texture img1   = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1);
+  Texture img1   = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1);
   Actor   actor1 = CreateRenderableActor(img1);
   actor1.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
   application.GetScene().Add(actor1);
@@ -658,15 +669,11 @@ int UtcDaliRenderTaskSetExclusive(void)
 
   if(boundTextures.size())
   {
-    int c = 0;
-    DALI_TEST_EQUALS(boundTextures[c++], 8u /*unique to actor1*/, TEST_LOCATION);
-    if(boundTextures.size() > 1)
-    {
-      DALI_TEST_EQUALS(boundTextures[c++], 8u /*unique to actor1*/, TEST_LOCATION);
-    }
+    int a = boundTextures.size() - 1;
+    DALI_TEST_EQUALS(boundTextures[a], 8u /*unique to actor1*/, TEST_LOCATION);
   }
 
-  Texture img2 = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1);
+  Texture img2 = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1);
 
   Actor actor2 = CreateRenderableActor(img2);
   actor2.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
@@ -685,18 +692,15 @@ int UtcDaliRenderTaskSetExclusive(void)
   // Check that the actors were rendered
   DALI_TEST_GREATER(boundTextures.size(), static_cast<std::vector<GLuint>::size_type>(1), TEST_LOCATION);
 
-  if(boundTextures.size())
+  if(boundTextures.size() >= 2)
   {
-    int c = 0;
-    DALI_TEST_EQUALS(boundTextures[c++], 9u /*unique to actor2*/, TEST_LOCATION);
-    if(boundTextures.size() > 2)
-    {
-      DALI_TEST_EQUALS(boundTextures[c++], 9u /*unique to actor1*/, TEST_LOCATION);
-    }
-    DALI_TEST_EQUALS(boundTextures[c++], 8u /*unique to actor1*/, TEST_LOCATION);
+    int a = boundTextures.size() - 2;
+    int b = boundTextures.size() - 1;
+    DALI_TEST_EQUALS(boundTextures[a], 9u /*unique to actor2*/, TEST_LOCATION);
+    DALI_TEST_EQUALS(boundTextures[b], 8u /*unique to actor1*/, TEST_LOCATION);
   }
 
-  Texture img3   = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1);
+  Texture img3   = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1);
   Actor   actor3 = CreateRenderableActor(img3);
   actor3.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
 
@@ -714,16 +718,14 @@ int UtcDaliRenderTaskSetExclusive(void)
   // Check that the actors were rendered
   DALI_TEST_GREATER(boundTextures.size(), static_cast<std::vector<GLuint>::size_type>(2), TEST_LOCATION);
 
-  if(boundTextures.size())
+  if(boundTextures.size() >= 3)
   {
-    int c = 0;
-    DALI_TEST_EQUALS(boundTextures[c++], 10u /*unique to actor3*/, TEST_LOCATION);
-    if(boundTextures.size() > 3)
-    {
-      DALI_TEST_EQUALS(boundTextures[c++], 10u /*unique to actor2*/, TEST_LOCATION);
-    }
-    DALI_TEST_EQUALS(boundTextures[c++], 9u /*unique to actor2*/, TEST_LOCATION);
-    DALI_TEST_EQUALS(boundTextures[c++], 8u /*unique to actor1*/, TEST_LOCATION);
+    int a = boundTextures.size() - 3;
+    int b = boundTextures.size() - 2;
+    int c = boundTextures.size() - 1;
+    DALI_TEST_EQUALS(boundTextures[a], 10u /*unique to actor3*/, TEST_LOCATION);
+    DALI_TEST_EQUALS(boundTextures[b], 9u /*unique to actor2*/, TEST_LOCATION);
+    DALI_TEST_EQUALS(boundTextures[c], 8u /*unique to actor1*/, TEST_LOCATION);
   }
 
   // Both actors are now connected to the root node
@@ -743,17 +745,19 @@ int UtcDaliRenderTaskSetExclusive(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(boundTextures.size(), 4u, TEST_LOCATION);
-
-  if(boundTextures.size() == 4)
+  if(boundTextures.size() >= 4)
   {
     // Test that task 1 renders actor3, then actor2 & then actor1
-    DALI_TEST_CHECK(boundTextures[0] == 10u);
-    DALI_TEST_CHECK(boundTextures[1] == 9u);
-    DALI_TEST_CHECK(boundTextures[2] == 8u);
+    int a = boundTextures.size() - 4;
+    int b = boundTextures.size() - 3;
+    int c = boundTextures.size() - 2;
+    int d = boundTextures.size() - 1;
+    DALI_TEST_EQUALS(boundTextures[a], 10u /*unique to actor3*/, TEST_LOCATION);
+    DALI_TEST_EQUALS(boundTextures[b], 9u /*unique to actor2*/, TEST_LOCATION);
+    DALI_TEST_EQUALS(boundTextures[c], 8u /*unique to actor1*/, TEST_LOCATION);
 
     // Test that task 2 renders actor2
-    DALI_TEST_EQUALS(boundTextures[3], 9u, TEST_LOCATION);
+    DALI_TEST_EQUALS(boundTextures[d], 9u, TEST_LOCATION);
   }
 
   // Make actor2 exclusive to task2
@@ -796,7 +800,7 @@ int UtcDaliRenderTaskSetExclusive02(void)
   ids.push_back(8); // 8 = actor1
   application.GetGlAbstraction().SetNextTextureIds(ids);
 
-  Texture img1   = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1);
+  Texture img1   = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1);
   Actor   actor1 = CreateRenderableActor(img1);
   actor1.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
   application.GetScene().Add(actor1);
@@ -1796,7 +1800,7 @@ int UtcDaliRenderTaskSignalFinished(void)
 
   application.GetScene().Add(offscreenCameraActor);
 
-  Texture image     = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 10, 10);
+  Texture image     = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 10, 10);
   Actor   rootActor = CreateRenderableActor(image);
   rootActor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
   application.GetScene().Add(rootActor);
@@ -2469,7 +2473,7 @@ int UtcDaliRenderTaskFinishInvisibleSourceActor(void)
 
   application.GetScene().Add(offscreenCameraActor);
 
-  Texture image     = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 10, 10);
+  Texture image     = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 10, 10);
   Actor   rootActor = CreateRenderableActor(image);
   rootActor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
   rootActor.SetProperty(Actor::Property::VISIBLE, false);
@@ -2552,7 +2556,7 @@ int UtcDaliRenderTaskFinishMissingImage(void)
 
   Integration::Scene stage = application.GetScene();
 
-  Texture image     = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 10, 10);
+  Texture image     = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 10, 10);
   Actor   rootActor = CreateRenderableActor(image);
   rootActor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
   stage.Add(rootActor);
@@ -3406,7 +3410,9 @@ int UtcDaliRenderTaskClippingMode01(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Enable", "3089")); // 3089 = 0xC11 (GL_SCISSOR_TEST)
+  std::ostringstream scissor;
+  scissor << std::hex << GL_SCISSOR_TEST;
+  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Enable", scissor.str()));
 
   // Check the scissor was set, and the coordinates are correct.
   Vector4           expectResults(position.x, TestApplication::DEFAULT_SURFACE_HEIGHT - size.height - position.y, size.width, size.height); // (100, 500, 200, 200)
@@ -3464,7 +3470,9 @@ int UtcDaliRenderTaskClippingMode02(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Enable", "3089")); // 3089 = 0xC11 (GL_SCISSOR_TEST)
+  std::ostringstream scissor;
+  scissor << std::hex << GL_SCISSOR_TEST;
+  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Enable", scissor.str()));
 
   // Check the scissor was set, and the coordinates are correct.
   Vector4           expectResults(position.x, position.y, size.width, size.height); // (100, 100, 200, 200)

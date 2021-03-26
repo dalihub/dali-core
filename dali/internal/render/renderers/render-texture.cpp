@@ -30,919 +30,287 @@ namespace Render
 {
 namespace
 {
-// These match the GL specification
-const GLint GL_MINIFY_DEFAULT  = GL_NEAREST_MIPMAP_LINEAR;
-const GLint GL_MAGNIFY_DEFAULT = GL_LINEAR;
-const GLint GL_WRAP_DEFAULT    = GL_CLAMP_TO_EDGE;
-
-// These are the Dali defaults
-const GLint DALI_MINIFY_DEFAULT  = GL_LINEAR;
-const GLint DALI_MAGNIFY_DEFAULT = GL_LINEAR;
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gTextureFilter = Debug::Filter::New(Debug::Concise, false, "LOG_TEXTURE");
+#endif
 
 /**
- * @brief Convert a FilterMode to its corresponding GL type.
- *
- * @param[in] filterMode The FilterMode type.
- * @param[in] daliDefault The filter mode to use if filterMode is DEFAULT.
- * @param[in] glDefault The filter mode to use if filterMode is NONE.
- * @return the equivalent GL filter mode.
+ * Converts DALi pixel format to Graphics::Format
+ * @param format
+ * @return
  */
-GLint FilterModeToGL(FilterMode::Type filterMode, GLint daliDefault, GLint glDefault)
+constexpr Graphics::Format ConvertPixelFormat(Pixel::Format format)
 {
-  switch(filterMode)
+  switch(format)
   {
-    case FilterMode::NEAREST:
-    {
-      return GL_NEAREST;
-    }
-    case FilterMode::LINEAR:
-    {
-      return GL_LINEAR;
-    }
-    case FilterMode::NONE:
-    {
-      return glDefault;
-    }
-    case FilterMode::NEAREST_MIPMAP_NEAREST:
-    {
-      return GL_NEAREST_MIPMAP_NEAREST;
-    }
-    case FilterMode::LINEAR_MIPMAP_NEAREST:
-    {
-      return GL_LINEAR_MIPMAP_NEAREST;
-    }
-    case FilterMode::NEAREST_MIPMAP_LINEAR:
-    {
-      return GL_NEAREST_MIPMAP_LINEAR;
-    }
-    case FilterMode::LINEAR_MIPMAP_LINEAR:
-    {
-      return GL_LINEAR_MIPMAP_LINEAR;
-    }
-    case FilterMode::DEFAULT:
-    {
-      return daliDefault;
-    }
-  }
-
-  return daliDefault;
-}
-
-/**
- * @brief Convert from a WrapMode to its corresponding GL enumeration
- * @param[in] wrapMode The wrap mode
- * @param[in] defaultWrapMode The mode to use if WrapMode is Default
- * @return The equivalent GL wrap mode
- */
-GLint WrapModeToGL(WrapMode::Type wrapMode, GLint defaultWrapMode)
-{
-  switch(wrapMode)
-  {
-    case WrapMode::CLAMP_TO_EDGE:
-    {
-      return GL_CLAMP_TO_EDGE;
-    }
-    case WrapMode::REPEAT:
-    {
-      return GL_REPEAT;
-    }
-    case WrapMode::MIRRORED_REPEAT:
-    {
-      return GL_MIRRORED_REPEAT;
-    }
-    case WrapMode::DEFAULT:
-    {
-      return defaultWrapMode;
-    }
-  }
-
-  return defaultWrapMode;
-}
-
-/**
- * @brief Retrives the GL format, GL internal format and pixel data type from a Pixel::Format
- * @param[in] pixelFormat The pixel format.
- * @param[out] glFormat The gl format.
- * @param[out] glInternalFormat The gl internal format.
- * @param[out] pixelDataType The data type of the pixel data.
- */
-void PixelFormatToGl(Pixel::Format pixelFormat, GLenum& glFormat, GLint& glInternalFormat, GLenum& pixelDataType)
-{
-  // Compressed textures have no pixelDataType, so init to an invalid value:
-  pixelDataType = -1;
-
-  switch(pixelFormat)
-  {
+    case Pixel::INVALID:
+      return Graphics::Format::UNDEFINED;
     case Pixel::A8:
-    {
-      pixelDataType = GL_UNSIGNED_BYTE;
-      glFormat      = GL_ALPHA;
-      break;
-    }
+      return Graphics::Format::R8_UNORM;
 
     case Pixel::L8:
-    {
-      pixelDataType = GL_UNSIGNED_BYTE;
-      glFormat      = GL_LUMINANCE;
-      break;
-    }
-
+      return Graphics::Format::L8;
     case Pixel::LA88:
-    {
-      pixelDataType = GL_UNSIGNED_BYTE;
-      glFormat      = GL_LUMINANCE_ALPHA;
-      break;
-    }
-
+      return Graphics::Format::L8A8;
     case Pixel::RGB565:
-    {
-      pixelDataType = GL_UNSIGNED_SHORT_5_6_5;
-      glFormat      = GL_RGB;
-      break;
-    }
-
+      return Graphics::Format::R5G6B5_UNORM_PACK16;
     case Pixel::BGR565:
-    {
-      DALI_LOG_ERROR("Pixel format BGR565 is not supported by GLES.\n");
-      pixelDataType = GL_UNSIGNED_SHORT_5_6_5;
-#ifdef _ARCH_ARM_
-      glFormat = GL_BGRA_EXT; // alpha is reserved but not used
-#else
-      glFormat = GL_RGBA; // alpha is reserved but not used
-#endif
-      break;
-    }
-
+      return Graphics::Format::B5G6R5_UNORM_PACK16;
     case Pixel::RGBA4444:
-    {
-      pixelDataType = GL_UNSIGNED_SHORT_4_4_4_4;
-      glFormat      = GL_RGBA;
-      break;
-    }
+      return Graphics::Format::R4G4B4A4_UNORM_PACK16;
 
     case Pixel::BGRA4444:
-    {
-      DALI_LOG_ERROR("Pixel format BGRA4444 is not supported by GLES.\n");
-      pixelDataType = GL_UNSIGNED_SHORT_4_4_4_4;
-#ifdef _ARCH_ARM_
-      glFormat = GL_BGRA_EXT; // alpha is reserved but not used
-#else
-      glFormat = GL_RGBA; // alpha is reserved but not used
-#endif
-      break;
-    }
-
+      return Graphics::Format::B4G4R4A4_UNORM_PACK16;
     case Pixel::RGBA5551:
-    {
-      pixelDataType = GL_UNSIGNED_SHORT_5_5_5_1;
-      glFormat      = GL_RGBA;
-      break;
-    }
-
+      return Graphics::Format::R5G5B5A1_UNORM_PACK16;
     case Pixel::BGRA5551:
-    {
-      DALI_LOG_ERROR("Pixel format BGRA5551 is not supported by GLES.\n");
-      pixelDataType = GL_UNSIGNED_SHORT_5_5_5_1;
-#ifdef _ARCH_ARM_
-      glFormat = GL_BGRA_EXT; // alpha is reserved but not used
-#else
-      glFormat = GL_RGBA; // alpha is reserved but not used
-#endif
-      break;
-    }
-
+      return Graphics::Format::B5G5R5A1_UNORM_PACK16;
     case Pixel::RGB888:
-    {
-      pixelDataType = GL_UNSIGNED_BYTE;
-      glFormat      = GL_RGB;
-      break;
-    }
-
+      return Graphics::Format::R8G8B8_UNORM;
     case Pixel::RGB8888:
-    {
-      pixelDataType = GL_UNSIGNED_BYTE;
-      glFormat      = GL_RGBA; // alpha is reserved but not used
-      break;
-    }
-
+      return Graphics::Format::R8G8B8A8_UNORM;
     case Pixel::BGR8888:
-    {
-      pixelDataType = GL_UNSIGNED_BYTE;
-#ifdef GL_BGRA_EXT
-      glFormat = GL_BGRA_EXT; // alpha is reserved but not used
-#else
-      glFormat = GL_RGBA; // alpha is reserved but not used
-#endif
-      break;
-    }
-
+      return Graphics::Format::B8G8R8A8_UNORM;
     case Pixel::RGBA8888:
-    {
-      pixelDataType = GL_UNSIGNED_BYTE;
-      glFormat      = GL_RGBA;
-      break;
-    }
-
+      return Graphics::Format::R8G8B8A8_UNORM;
     case Pixel::BGRA8888:
-    {
-      pixelDataType = GL_UNSIGNED_BYTE;
-#ifdef GL_BGRA_EXT
-      glFormat = GL_BGRA_EXT; // alpha is reserved but not used
-#else
-      glFormat = GL_RGBA; // alpha is reserved but not used
-#endif
-      break;
-    }
+      return Graphics::Format::B8G8R8A8_UNORM;
 
-    // GLES 2 extension compressed formats:
-    case Pixel::COMPRESSED_RGB8_ETC1:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using non-standard GLES 2.0 extension compressed pixel format COMPRESSED_RGB8_ETC1.\n");
-      glFormat = 0x8D64; ///! < Hardcoded so we can test before we move to GLES 3.0 or greater.
-      break;
-    }
-    case Pixel::COMPRESSED_RGB_PVRTC_4BPPV1:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using non-standard GLES 2.0 extension compressed pixel format COMPRESSED_RGB_PVRTC_4BPPV1.\n");
-      glFormat = 0x8C00; ///! < Hardcoded so we can test before we move to GLES 3.0 or greater.
-      break;
-    }
-
-    // GLES 3.0 standard compressed formats:
-    case Pixel::COMPRESSED_R11_EAC:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.0 standard compressed pixel format COMPRESSED_R11_EAC.\n");
-      glFormat = GL_COMPRESSED_R11_EAC;
-      break;
-    }
-    case Pixel::COMPRESSED_SIGNED_R11_EAC:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.0 standard compressed pixel format COMPRESSED_SIGNED_R11_EAC.\n");
-      glFormat = GL_COMPRESSED_SIGNED_R11_EAC;
-      break;
-    }
-    case Pixel::COMPRESSED_RG11_EAC:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.0 standard compressed pixel format COMPRESSED_RG11_EAC.\n");
-      glFormat = GL_COMPRESSED_RG11_EAC;
-      break;
-    }
-    case Pixel::COMPRESSED_SIGNED_RG11_EAC:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.0 standard compressed pixel format COMPRESSED_SIGNED_RG11_EAC.\n");
-      glFormat = GL_COMPRESSED_SIGNED_RG11_EAC;
-      break;
-    }
-    case Pixel::COMPRESSED_RGB8_ETC2:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.0 standard compressed pixel format COMPRESSED_RGB8_ETC2.\n");
-      glFormat = GL_COMPRESSED_RGB8_ETC2;
-      break;
-    }
-    case Pixel::COMPRESSED_SRGB8_ETC2:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.0 standard compressed pixel format COMPRESSED_SRGB8_ETC2.\n");
-      glFormat = GL_COMPRESSED_SRGB8_ETC2;
-      break;
-    }
-    case Pixel::COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.0 standard compressed pixel format COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2.\n");
-      glFormat = GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2;
-      break;
-    }
-    case Pixel::COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.0 standard compressed pixel format COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2.\n");
-      glFormat = GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2;
-      break;
-    }
-    case Pixel::COMPRESSED_RGBA8_ETC2_EAC:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.0 standard compressed pixel format COMPRESSED_RGBA8_ETC2_EAC.\n");
-      glFormat = GL_COMPRESSED_RGBA8_ETC2_EAC;
-      break;
-    }
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ETC2_EAC:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.0 standard compressed pixel format COMPRESSED_SRGB8_ALPHA8_ETC2_EAC.\n");
-      glFormat = GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC;
-      break;
-    }
-
-    // GLES 3.1 extension compressed formats:
-    case Pixel::COMPRESSED_RGBA_ASTC_4x4_KHR:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_RGBA_ASTC_4x4_KHR.\n");
-      glFormat = GL_COMPRESSED_RGBA_ASTC_4x4_KHR;
-      break;
-    }
-    case Pixel::COMPRESSED_RGBA_ASTC_5x4_KHR:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_RGBA_ASTC_5x4_KHR.\n");
-      glFormat = GL_COMPRESSED_RGBA_ASTC_5x4_KHR;
-      break;
-    }
-    case Pixel::COMPRESSED_RGBA_ASTC_5x5_KHR:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_RGBA_ASTC_5x5_KHR.\n");
-      glFormat = GL_COMPRESSED_RGBA_ASTC_5x5_KHR;
-      break;
-    }
-    case Pixel::COMPRESSED_RGBA_ASTC_6x5_KHR:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_RGBA_ASTC_6x5_KHR.\n");
-      glFormat = GL_COMPRESSED_RGBA_ASTC_6x5_KHR;
-      break;
-    }
-    case Pixel::COMPRESSED_RGBA_ASTC_6x6_KHR:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_RGBA_ASTC_6x6_KHR.\n");
-      glFormat = GL_COMPRESSED_RGBA_ASTC_6x6_KHR;
-      break;
-    }
-    case Pixel::COMPRESSED_RGBA_ASTC_8x5_KHR:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_RGBA_ASTC_8x5_KHR.\n");
-      glFormat = GL_COMPRESSED_RGBA_ASTC_8x5_KHR;
-      break;
-    }
-    case Pixel::COMPRESSED_RGBA_ASTC_8x6_KHR:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_RGBA_ASTC_8x6_KHR.\n");
-      glFormat = GL_COMPRESSED_RGBA_ASTC_8x6_KHR;
-      break;
-    }
-    case Pixel::COMPRESSED_RGBA_ASTC_8x8_KHR:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_RGBA_ASTC_8x8_KHR.\n");
-      glFormat = GL_COMPRESSED_RGBA_ASTC_8x8_KHR;
-      break;
-    }
-    case Pixel::COMPRESSED_RGBA_ASTC_10x5_KHR:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_RGBA_ASTC_10x5_KHR.\n");
-      glFormat = GL_COMPRESSED_RGBA_ASTC_10x5_KHR;
-      break;
-    }
-    case Pixel::COMPRESSED_RGBA_ASTC_10x6_KHR:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_RGBA_ASTC_10x6_KHR.\n");
-      glFormat = GL_COMPRESSED_RGBA_ASTC_10x6_KHR;
-      break;
-    }
-    case Pixel::COMPRESSED_RGBA_ASTC_10x8_KHR:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_RGBA_ASTC_10x8_KHR.\n");
-      glFormat = GL_COMPRESSED_RGBA_ASTC_10x8_KHR;
-      break;
-    }
-    case Pixel::COMPRESSED_RGBA_ASTC_10x10_KHR:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_RGBA_ASTC_10x10_KHR.\n");
-      glFormat = GL_COMPRESSED_RGBA_ASTC_10x10_KHR;
-      break;
-    }
-    case Pixel::COMPRESSED_RGBA_ASTC_12x10_KHR:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_RGBA_ASTC_12x10_KHR.\n");
-      glFormat = GL_COMPRESSED_RGBA_ASTC_12x10_KHR;
-      break;
-    }
-    case Pixel::COMPRESSED_RGBA_ASTC_12x12_KHR:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_RGBA_ASTC_12x12_KHR.\n");
-      glFormat = GL_COMPRESSED_RGBA_ASTC_12x12_KHR;
-      break;
-    }
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR.\n");
-      glFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR;
-      break;
-    }
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR.\n");
-      glFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR;
-      break;
-    }
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR.\n");
-      glFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR;
-      break;
-    }
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR.\n");
-      glFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR;
-      break;
-    }
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR.\n");
-      glFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR;
-      break;
-    }
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR.\n");
-      glFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR;
-      break;
-    }
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR.\n");
-      glFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR;
-      break;
-    }
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR.\n");
-      glFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR;
-      break;
-    }
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR.\n");
-      glFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR;
-      break;
-    }
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR.\n");
-      glFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR;
-      break;
-    }
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR.\n");
-      glFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR;
-      break;
-    }
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR.\n");
-      glFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR;
-      break;
-    }
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR.\n");
-      glFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR;
-      break;
-    }
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR:
-    {
-      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.1 standard compressed pixel format COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR.\n");
-      glFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR;
-      break;
-    }
-
-    // GLES 3.0 floating point formats.
-    case Pixel::RGB16F:
-    {
-      glFormat      = GL_RGB;
-      pixelDataType = GL_HALF_FLOAT;
-      break;
-    }
-    case Pixel::RGB32F:
-    {
-      glFormat      = GL_RGB;
-      pixelDataType = GL_FLOAT;
-      break;
-    }
-
-    // GLES 3.0 depth and stencil formats
     case Pixel::DEPTH_UNSIGNED_INT:
-    {
-      glFormat      = GL_DEPTH_COMPONENT;
-      pixelDataType = GL_UNSIGNED_INT;
-      break;
-    }
-
+      return Graphics::Format::D16_UNORM;
     case Pixel::DEPTH_FLOAT:
-    {
-      glFormat      = GL_DEPTH_COMPONENT;
-      pixelDataType = GL_FLOAT;
-      break;
-    }
-
+      return Graphics::Format::D32_SFLOAT;
     case Pixel::DEPTH_STENCIL:
-    {
-      glFormat      = GL_DEPTH_STENCIL;
-      pixelDataType = GL_UNSIGNED_INT_24_8;
-      break;
-    }
+      return Graphics::Format::D24_UNORM_S8_UINT;
 
-    case Pixel::INVALID:
-    {
-      DALI_LOG_ERROR("Invalid pixel format for bitmap\n");
-      glFormat = 0;
-      break;
-    }
-  }
+    // EAC
+    case Pixel::COMPRESSED_R11_EAC:
+      return Graphics::Format::EAC_R11_UNORM_BLOCK;
+    case Pixel::COMPRESSED_SIGNED_R11_EAC:
+      return Graphics::Format::EAC_R11_SNORM_BLOCK;
+    case Pixel::COMPRESSED_RG11_EAC:
+      return Graphics::Format::EAC_R11G11_UNORM_BLOCK;
+    case Pixel::COMPRESSED_SIGNED_RG11_EAC:
+      return Graphics::Format::EAC_R11G11_SNORM_BLOCK;
 
-  switch(pixelFormat)
-  {
+    // ETC
+    case Pixel::COMPRESSED_RGB8_ETC2:
+      return Graphics::Format::ETC2_R8G8B8_UNORM_BLOCK;
+    case Pixel::COMPRESSED_SRGB8_ETC2:
+      return Graphics::Format::ETC2_R8G8B8_SRGB_BLOCK;
+
+    case Pixel::COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2:
+      return Graphics::Format::ETC2_R8G8B8A1_UNORM_BLOCK; // no 'punchthrough' format
+
+    case Pixel::COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2:
+      return Graphics::Format::ETC2_R8G8B8A1_SRGB_BLOCK; // no 'punchthrough' format
+
+    case Pixel::COMPRESSED_RGBA8_ETC2_EAC:
+      return Graphics::Format::ETC2_R8G8B8_UNORM_BLOCK; // doesn't seem to map onto any format
+
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ETC2_EAC:
+      return Graphics::Format::ETC2_R8G8B8A8_SRGB_BLOCK; // doesn't seem to map onto any format
+
+    case Pixel::COMPRESSED_RGB8_ETC1:
+      return Graphics::Format::ETC2_R8G8B8_UNORM_BLOCK; // doesn't seem to be supported at all
+
+    case Pixel::COMPRESSED_RGB_PVRTC_4BPPV1:
+      return Graphics::Format::PVRTC1_4BPP_UNORM_BLOCK_IMG; // or SRGB?
+
+    // ASTC
+    case Pixel::COMPRESSED_RGBA_ASTC_4x4_KHR:
+      return Graphics::Format::ASTC_4x4_UNORM_BLOCK; // or SRGB?
+    case Pixel::COMPRESSED_RGBA_ASTC_5x4_KHR:
+      return Graphics::Format::ASTC_5x4_UNORM_BLOCK;
+    case Pixel::COMPRESSED_RGBA_ASTC_5x5_KHR:
+      return Graphics::Format::ASTC_5x5_UNORM_BLOCK;
+    case Pixel::COMPRESSED_RGBA_ASTC_6x5_KHR:
+      return Graphics::Format::ASTC_6x5_UNORM_BLOCK;
+    case Pixel::COMPRESSED_RGBA_ASTC_6x6_KHR:
+      return Graphics::Format::ASTC_6x6_UNORM_BLOCK;
+    case Pixel::COMPRESSED_RGBA_ASTC_8x5_KHR:
+      return Graphics::Format::ASTC_8x5_UNORM_BLOCK;
+    case Pixel::COMPRESSED_RGBA_ASTC_8x6_KHR:
+      return Graphics::Format::ASTC_8x6_UNORM_BLOCK;
+    case Pixel::COMPRESSED_RGBA_ASTC_8x8_KHR:
+      return Graphics::Format::ASTC_8x8_UNORM_BLOCK;
+    case Pixel::COMPRESSED_RGBA_ASTC_10x5_KHR:
+      return Graphics::Format::ASTC_10x5_UNORM_BLOCK;
+    case Pixel::COMPRESSED_RGBA_ASTC_10x6_KHR:
+      return Graphics::Format::ASTC_10x6_UNORM_BLOCK;
+    case Pixel::COMPRESSED_RGBA_ASTC_10x8_KHR:
+      return Graphics::Format::ASTC_10x8_UNORM_BLOCK;
+    case Pixel::COMPRESSED_RGBA_ASTC_10x10_KHR:
+      return Graphics::Format::ASTC_10x10_UNORM_BLOCK;
+    case Pixel::COMPRESSED_RGBA_ASTC_12x10_KHR:
+      return Graphics::Format::ASTC_12x10_UNORM_BLOCK;
+    case Pixel::COMPRESSED_RGBA_ASTC_12x12_KHR:
+      return Graphics::Format::ASTC_12x12_UNORM_BLOCK;
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR:
+
+      return Graphics::Format::ASTC_4x4_SRGB_BLOCK; // not type with alpha, but likely to use SRGB
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR:
+      return Graphics::Format::ASTC_5x4_SRGB_BLOCK;
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR:
+      return Graphics::Format::ASTC_5x5_SRGB_BLOCK;
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR:
+      return Graphics::Format::ASTC_6x5_SRGB_BLOCK;
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR:
+      return Graphics::Format::ASTC_6x6_SRGB_BLOCK;
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR:
+      return Graphics::Format::ASTC_8x5_SRGB_BLOCK;
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR:
+      return Graphics::Format::ASTC_8x6_UNORM_BLOCK;
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR:
+      return Graphics::Format::ASTC_8x8_SRGB_BLOCK;
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR:
+      return Graphics::Format::ASTC_10x5_SRGB_BLOCK;
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR:
+      return Graphics::Format::ASTC_10x6_SRGB_BLOCK;
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR:
+      return Graphics::Format::ASTC_10x8_SRGB_BLOCK;
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR:
+      return Graphics::Format::ASTC_10x10_SRGB_BLOCK;
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR:
+      return Graphics::Format::ASTC_12x10_SRGB_BLOCK;
+    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR:
+      return Graphics::Format::ASTC_12x12_SRGB_BLOCK;
     case Pixel::RGB16F:
-    case Pixel::RGB32F: // FALL THROUGH
-    {
-      glInternalFormat = GL_R11F_G11F_B10F;
-      break;
-    }
-    case Pixel::DEPTH_FLOAT:
-    {
-      glInternalFormat = GL_DEPTH_COMPONENT32F;
-      break;
-    }
-    case Pixel::DEPTH_STENCIL:
-    {
-      glInternalFormat = GL_DEPTH24_STENCIL8;
-      break;
-    }
-    default:
-    {
-      glInternalFormat = glFormat;
-    }
+      return Graphics::Format::R16G16B16_SFLOAT;
+    case Pixel::RGB32F:
+      return Graphics::Format::R32G32B32_SFLOAT;
   }
+  return Graphics::Format::UNDEFINED;
 }
 
-/**
- * @brief Whether specified pixel format is compressed.
- *
- * @param [in] pixelformat Pixel format
- * @return true if format is compressed, false otherwise
- */
-bool IsCompressedFormat(Pixel::Format pixelFormat)
+constexpr Graphics::TextureType ConvertType(Texture::Type type)
 {
-  switch(pixelFormat)
+  switch(type)
   {
-    case Pixel::L8:
-    case Pixel::A8:
-    case Pixel::LA88:
-    case Pixel::RGB565:
-    case Pixel::RGBA4444:
-    case Pixel::RGBA5551:
-    case Pixel::BGR565:
-    case Pixel::BGRA4444:
-    case Pixel::BGRA5551:
-    case Pixel::RGB888:
-    case Pixel::RGB8888:
-    case Pixel::BGR8888:
-    case Pixel::RGBA8888:
-    case Pixel::BGRA8888:
-    case Pixel::RGB16F:
-    case Pixel::RGB32F:
-    case Pixel::DEPTH_UNSIGNED_INT:
-    case Pixel::DEPTH_FLOAT:
-    case Pixel::DEPTH_STENCIL:
-    case Pixel::INVALID:
-    {
-      return false;
-    }
-
-    case Pixel::COMPRESSED_R11_EAC:
-    case Pixel::COMPRESSED_SIGNED_R11_EAC:
-    case Pixel::COMPRESSED_RG11_EAC:
-    case Pixel::COMPRESSED_SIGNED_RG11_EAC:
-    case Pixel::COMPRESSED_RGB8_ETC2:
-    case Pixel::COMPRESSED_SRGB8_ETC2:
-    case Pixel::COMPRESSED_RGB8_ETC1:
-    case Pixel::COMPRESSED_RGB_PVRTC_4BPPV1:
-    case Pixel::COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2:
-    case Pixel::COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2:
-    case Pixel::COMPRESSED_RGBA8_ETC2_EAC:
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ETC2_EAC:
-    case Pixel::COMPRESSED_RGBA_ASTC_4x4_KHR:
-    case Pixel::COMPRESSED_RGBA_ASTC_5x4_KHR:
-    case Pixel::COMPRESSED_RGBA_ASTC_5x5_KHR:
-    case Pixel::COMPRESSED_RGBA_ASTC_6x5_KHR:
-    case Pixel::COMPRESSED_RGBA_ASTC_6x6_KHR:
-    case Pixel::COMPRESSED_RGBA_ASTC_8x5_KHR:
-    case Pixel::COMPRESSED_RGBA_ASTC_8x6_KHR:
-    case Pixel::COMPRESSED_RGBA_ASTC_8x8_KHR:
-    case Pixel::COMPRESSED_RGBA_ASTC_10x5_KHR:
-    case Pixel::COMPRESSED_RGBA_ASTC_10x6_KHR:
-    case Pixel::COMPRESSED_RGBA_ASTC_10x8_KHR:
-    case Pixel::COMPRESSED_RGBA_ASTC_10x10_KHR:
-    case Pixel::COMPRESSED_RGBA_ASTC_12x10_KHR:
-    case Pixel::COMPRESSED_RGBA_ASTC_12x12_KHR:
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR:
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR:
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR:
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR:
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR:
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR:
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR:
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR:
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR:
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR:
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR:
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR:
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR:
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR:
-    {
-      return true;
-    }
+    case TextureType::TEXTURE_2D:
+      return Graphics::TextureType::TEXTURE_2D;
+    case TextureType::TEXTURE_CUBE:
+      return Graphics::TextureType::TEXTURE_CUBEMAP;
   }
-
-  return false;
+  return Graphics::TextureType::TEXTURE_2D;
 }
 
 } //Unnamed namespace
 
 Texture::Texture(Type type, Pixel::Format format, ImageDimensions size)
-: mNativeImage(),
+: mGraphicsController(nullptr),
+  mGraphicsTexture(nullptr),
+  mNativeImage(),
   mSampler(),
-  mId(0),
-  mTarget((type == TextureType::TEXTURE_2D) ? GL_TEXTURE_2D : GL_TEXTURE_CUBE_MAP),
-  mGlInternalFormat(GL_RGB),
-  mGlFormat(GL_RGB),
-  mPixelDataType(GL_UNSIGNED_BYTE),
+  mPixelFormat(format),
   mWidth(size.GetWidth()),
   mHeight(size.GetHeight()),
   mMaxMipMapLevel(0),
   mType(type),
-  mHasAlpha(HasAlpha(format)),
-  mIsCompressed(IsCompressedFormat(format))
+  mHasAlpha(HasAlpha(format))
 {
-  PixelFormatToGl(format,
-                  mGlFormat,
-                  mGlInternalFormat,
-                  mPixelDataType);
 }
 
 Texture::Texture(NativeImageInterfacePtr nativeImageInterface)
-: mNativeImage(nativeImageInterface),
+: mGraphicsController(nullptr),
+  mGraphicsTexture(nullptr),
+  mNativeImage(nativeImageInterface),
   mSampler(),
-  mId(0),
-  mTarget(GL_TEXTURE_2D),
-  mGlInternalFormat(GL_RGB),
-  mGlFormat(GL_RGB),
-  mPixelDataType(GL_UNSIGNED_BYTE),
+  mPixelFormat(Pixel::RGBA8888),
   mWidth(static_cast<uint16_t>(nativeImageInterface->GetWidth())),   // ignoring overflow, not happening in practice
   mHeight(static_cast<uint16_t>(nativeImageInterface->GetHeight())), // ignoring overflow, not happening in practice
   mMaxMipMapLevel(0),
   mType(TextureType::TEXTURE_2D),
-  mHasAlpha(nativeImageInterface->RequiresBlending()),
-  mIsCompressed(false)
+  mHasAlpha(nativeImageInterface->RequiresBlending())
 {
 }
 
 Texture::~Texture() = default;
 
-void Texture::Destroy(Context& context)
+void Texture::Initialize(Graphics::Controller& graphicsController)
 {
-  if(mId)
-  {
-    context.DeleteTextures(1, &mId);
-
-    if(mNativeImage)
-    {
-      mNativeImage->DestroyResource();
-    }
-  }
-}
-
-void Texture::GlContextDestroyed()
-{
-  mId = 0u;
-}
-
-void Texture::Initialize(Context& context)
-{
+  mGraphicsController = &graphicsController;
   if(mNativeImage)
   {
-    if(mNativeImage->CreateResource())
-    {
-      mTarget = mNativeImage->GetTextureTarget();
-
-      context.GenTextures(1, &mId);
-      context.BindTexture(mTarget, mId);
-      context.PixelStorei(GL_UNPACK_ALIGNMENT, 1); // We always use tightly packed data
-
-      //Apply default sampling parameters
-      context.TexParameteri(mTarget, GL_TEXTURE_MIN_FILTER, DALI_MINIFY_DEFAULT);
-      context.TexParameteri(mTarget, GL_TEXTURE_MAG_FILTER, DALI_MAGNIFY_DEFAULT);
-      context.TexParameteri(mTarget, GL_TEXTURE_WRAP_S, GL_WRAP_DEFAULT);
-      context.TexParameteri(mTarget, GL_TEXTURE_WRAP_T, GL_WRAP_DEFAULT);
-
-      // platform specific implementation decides on what GL extension to use
-      if(mNativeImage->TargetTexture() != 0u)
-      {
-        context.DeleteTextures(1, &mId);
-        mNativeImage->DestroyResource();
-        mId = 0u;
-      }
-    }
-  }
-  else
-  {
-    //Create the texture and reserve memory for the first mipmap level.
-    context.GenTextures(1, &mId);
-    context.BindTexture(mTarget, mId);
-    context.PixelStorei(GL_UNPACK_ALIGNMENT, 1); // We always use tightly packed data
-
-    //Apply default sampling parameters
-    context.TexParameteri(mTarget, GL_TEXTURE_MIN_FILTER, DALI_MINIFY_DEFAULT);
-    context.TexParameteri(mTarget, GL_TEXTURE_MAG_FILTER, DALI_MAGNIFY_DEFAULT);
-    context.TexParameteri(mTarget, GL_TEXTURE_WRAP_S, GL_WRAP_DEFAULT);
-    context.TexParameteri(mTarget, GL_TEXTURE_WRAP_T, GL_WRAP_DEFAULT);
-
-    if(mType == TextureType::TEXTURE_2D)
-    {
-      if(!mIsCompressed)
-      {
-        context.TexImage2D(GL_TEXTURE_2D, 0, mGlInternalFormat, mWidth, mHeight, 0, mGlFormat, mPixelDataType, nullptr);
-      }
-      else
-      {
-        context.CompressedTexImage2D(GL_TEXTURE_2D, 0, mGlInternalFormat, mWidth, mHeight, 0, 0, nullptr);
-      }
-    }
-    else if(mType == TextureType::TEXTURE_CUBE)
-    {
-      if(!mIsCompressed)
-      {
-        for(uint32_t i(0); i < 6; ++i)
-        {
-          context.TexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, mGlInternalFormat, mWidth, mHeight, 0, mGlFormat, mPixelDataType, nullptr);
-        }
-      }
-      else
-      {
-        for(uint32_t i(0); i < 6; ++i)
-        {
-          context.CompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, mGlInternalFormat, mWidth, mHeight, 0, 0, nullptr);
-        }
-      }
-      context.TexParameteri(mTarget, GL_TEXTURE_WRAP_R, GL_WRAP_DEFAULT);
-    }
+    Create(static_cast<uint32_t>(Graphics::TextureUsageFlagBits::SAMPLE));
   }
 }
 
-void Texture::Upload(Context& context, PixelDataPtr pixelData, const Internal::Texture::UploadParams& params)
+void Texture::Destroy()
+{
+  mGraphicsTexture.reset();
+}
+
+Graphics::Texture* Texture::GetGraphicsObject() const
+{
+  DALI_LOG_INFO(gTextureFilter, Debug::General, "SC::Texture(%p)::GetGraphicsObject() = %p\n", this, mGraphicsTexture.get());
+
+  return mGraphicsTexture.get();
+}
+
+void Texture::Create(Graphics::TextureUsageFlags usage)
+{
+  CreateWithData(usage, nullptr, 0u);
+}
+
+void Texture::CreateWithData(Graphics::TextureUsageFlags usage, uint8_t* data, uint32_t size)
+{
+  auto createInfo = Graphics::TextureCreateInfo();
+  createInfo
+    .SetTextureType(ConvertType(mType))
+    .SetUsageFlags(usage)
+    .SetFormat(ConvertPixelFormat(mPixelFormat))
+    .SetSize({mWidth, mHeight})
+    .SetLayout(Graphics::TextureLayout::LINEAR)
+    .SetData(data)
+    .SetDataSize(size)
+    .SetNativeImage(mNativeImage)
+    .SetMipMapFlag(Graphics::TextureMipMapFlag::DISABLED);
+
+  mGraphicsTexture = mGraphicsController->CreateTexture(createInfo, std::move(mGraphicsTexture));
+}
+
+void Texture::Upload(PixelDataPtr pixelData, const Internal::Texture::UploadParams& params)
 {
   DALI_ASSERT_ALWAYS(mNativeImage == nullptr);
 
-  //Get pointer to the data of the PixelData object
-  uint8_t* buffer(pixelData->GetBuffer());
-
-  //This buffer is only used if manually converting from RGB to RGBA
-  std::vector<uint8_t> tempBuffer;
-
-  //Retrieves the pixel data element type, the gl format and gl internal format of the data contained in the PixelData object.
-  GLenum glFormat;
-  GLint  glInternalFormat;
-  GLenum pixelDataElementType;
-  PixelFormatToGl(pixelData->GetPixelFormat(), glFormat, glInternalFormat, pixelDataElementType);
-
-  //Get the maximum mipmap level to set GL_TEXTURE_MAX_LEVEL parameter in GLES3x because is not
-  //necessary to upload all the mipmap levels
-  mMaxMipMapLevel = (mMaxMipMapLevel > params.mipmap) ? mMaxMipMapLevel : params.mipmap;
-
-  const bool isSubImage = ((params.xOffset != 0) ||
-                           (params.yOffset != 0) ||
-                           (params.width != (mWidth / (1 << params.mipmap))) ||
-                           (params.height != (mHeight / (1 << params.mipmap))));
-
-  if(context.TextureRequiresConverting(glFormat, mGlFormat, isSubImage))
+  if(!mGraphicsTexture)
   {
-    uint32_t dataSize = static_cast<uint32_t>(params.width) * params.height;
-    //reserve() does not allocate the memory on some systems so can crash if not populated using push_back
-    tempBuffer.resize(dataSize * 4u);
-    for(uint32_t i = 0u; i < dataSize; ++i)
-    {
-      tempBuffer[i * 4u]     = buffer[i * 3u];
-      tempBuffer[i * 4u + 1] = buffer[i * 3u + 1];
-      tempBuffer[i * 4u + 2] = buffer[i * 3u + 2];
-      tempBuffer[i * 4u + 3] = 0xFF;
-    }
-
-    buffer   = &tempBuffer[0];
-    glFormat = mGlFormat; // Set the glFormat to GL_RGBA
+    Create(static_cast<Graphics::TextureUsageFlags>(Graphics::TextureUsageFlagBits::SAMPLE));
   }
 
-  //Upload data to the texture
+  Graphics::TextureUpdateInfo info{};
+  info.dstTexture   = mGraphicsTexture.get();
+  info.dstOffset2D  = {params.xOffset, params.yOffset};
+  info.layer        = params.layer;
+  info.level        = params.mipmap;
+  info.srcReference = 0;
+  info.srcExtent2D  = {params.width, params.height};
+  info.srcOffset    = 0;
+  info.srcSize      = pixelData->GetBufferSize();
 
-  context.BindTexture(mTarget, mId);
-  GLenum target(mTarget);
-  if(mType == TextureType::TEXTURE_CUBE)
-  {
-    target = GL_TEXTURE_CUBE_MAP_POSITIVE_X + params.layer;
-  }
+  Graphics::TextureUpdateSourceInfo updateSourceInfo{};
+  updateSourceInfo.sourceType          = Graphics::TextureUpdateSourceInfo::Type::MEMORY;
+  updateSourceInfo.memorySource.memory = pixelData->GetBuffer();
 
-  context.PixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-  if(!isSubImage)
-  {
-    //Specifying the whole image for the mipmap. We cannot assume that storage for that mipmap has been created so we need to use TexImage2D
-    if(!mIsCompressed)
-    {
-      context.TexImage2D(target, params.mipmap, mGlInternalFormat, params.width, params.height, 0, glFormat, pixelDataElementType, buffer);
-    }
-    else
-    {
-      context.CompressedTexImage2D(target, params.mipmap, mGlInternalFormat, params.width, params.height, 0, static_cast<GLsizei>(pixelData->GetBufferSize()), buffer);
-    }
-  }
-  else
-  {
-    //Specifying part of the image for the mipmap
-    if(!mIsCompressed)
-    {
-      context.TexSubImage2D(target, params.mipmap, params.xOffset, params.yOffset, params.width, params.height, glFormat, pixelDataElementType, buffer);
-    }
-    else
-    {
-      context.CompressedTexSubImage2D(target, params.mipmap, params.xOffset, params.yOffset, params.width, params.height, glFormat, static_cast<GLsizei>(pixelData->GetBufferSize()), buffer);
-    }
-  }
-}
-
-bool Texture::Bind(Context& context, uint32_t textureUnit, Render::Sampler* sampler)
-{
-  if(mNativeImage && mId == 0)
-  {
-    Initialize(context);
-  }
-
-  if(mId != 0)
-  {
-    context.BindTextureForUnit(static_cast<TextureUnit>(textureUnit), mTarget, mId);
-    ApplySampler(context, sampler);
-
-    if(mNativeImage)
-    {
-      mNativeImage->PrepareTexture();
-    }
-
-    return true;
-  }
-
-  return false;
-}
-
-void Texture::ApplySampler(Context& context, Render::Sampler* sampler)
-{
-  Render::Sampler oldSampler = mSampler;
-  mSampler                   = sampler ? *sampler : Sampler();
-
-  if(mSampler != oldSampler)
-  {
-    GLint mode = FilterModeToGL(mSampler.mMinificationFilter, DALI_MINIFY_DEFAULT, GL_MINIFY_DEFAULT);
-    if(mode != FilterModeToGL(oldSampler.mMinificationFilter, DALI_MINIFY_DEFAULT, GL_MINIFY_DEFAULT))
-    {
-      context.TexParameteri(mTarget, GL_TEXTURE_MIN_FILTER, mode);
-    }
-
-    mode = FilterModeToGL(mSampler.mMagnificationFilter, DALI_MAGNIFY_DEFAULT, GL_MAGNIFY_DEFAULT);
-    if(mode != FilterModeToGL(oldSampler.mMagnificationFilter, DALI_MAGNIFY_DEFAULT, GL_MAGNIFY_DEFAULT))
-    {
-      context.TexParameteri(mTarget, GL_TEXTURE_MAG_FILTER, mode);
-    }
-
-    mode = WrapModeToGL(mSampler.mSWrapMode, GL_WRAP_DEFAULT);
-    if(mode != WrapModeToGL(oldSampler.mSWrapMode, GL_WRAP_DEFAULT))
-    {
-      context.TexParameteri(mTarget, GL_TEXTURE_WRAP_S, mode);
-    }
-
-    mode = WrapModeToGL(mSampler.mTWrapMode, GL_WRAP_DEFAULT);
-    if(mode != WrapModeToGL(oldSampler.mTWrapMode, GL_WRAP_DEFAULT))
-    {
-      context.TexParameteri(mTarget, GL_TEXTURE_WRAP_T, mode);
-    }
-
-    if(mType == TextureType::TEXTURE_CUBE)
-    {
-      mode = WrapModeToGL(mSampler.mRWrapMode, GL_WRAP_DEFAULT);
-      if(mode != WrapModeToGL(oldSampler.mRWrapMode, GL_WRAP_DEFAULT))
-      {
-        context.TexParameteri(mTarget, GL_TEXTURE_WRAP_R, mode);
-      }
-    }
-
-    if(mMaxMipMapLevel)
-    {
-      context.TexParameteri(mTarget, GL_TEXTURE_MAX_LEVEL, mMaxMipMapLevel);
-    }
-  }
+  mGraphicsController->UpdateTextures({info}, {updateSourceInfo});
 }
 
 bool Texture::HasAlphaChannel() const
 {
-  return mHasAlpha;
+  bool alpha = mHasAlpha;
+  if(mNativeImage)
+  {
+    alpha = mNativeImage->RequiresBlending();
+  }
+  return alpha;
 }
 
-void Texture::GenerateMipmaps(Context& context)
+void Texture::GenerateMipmaps()
 {
-  //GL_TEXTURE_MAX_LEVEL does not need to be set when mipmaps are generated by GL
   mMaxMipMapLevel = 0;
-  context.BindTexture(mTarget, mId);
-  context.GenerateMipmap(mTarget);
+  DALI_LOG_ERROR("FIXME: GRAPHICS");
+  //@todo Implement with Graphics API
 }
 
 } // namespace Render

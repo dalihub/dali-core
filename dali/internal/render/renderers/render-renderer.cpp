@@ -19,6 +19,8 @@
 #include <dali/internal/render/renderers/render-renderer.h>
 
 // INTERNAL INCLUDES
+#include <dali/graphics-api/graphics-program.h>
+#include <dali/graphics-api/graphics-types.h>
 #include <dali/internal/common/image-sampler.h>
 #include <dali/internal/render/common/render-instruction.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>
@@ -26,8 +28,11 @@
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/renderers/render-sampler.h>
 #include <dali/internal/render/renderers/render-texture.h>
+#include <dali/internal/render/renderers/render-vertex-buffer.h>
+#include <dali/internal/render/renderers/shader-cache.h>
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
+#include <dali/internal/update/common/uniform-map.h>
 
 namespace Dali
 {
@@ -35,68 +40,177 @@ namespace Internal
 {
 namespace
 {
-/**
- * Helper to set view and projection matrices once per program
- * @param program to set the matrices to
- * @param modelMatrix to set
- * @param viewMatrix to set
- * @param projectionMatrix to set
- * @param modelViewMatrix to set
- * @param modelViewProjectionMatrix to set
- */
-inline void SetMatrices(Program&      program,
-                        const Matrix& modelMatrix,
-                        const Matrix& viewMatrix,
-                        const Matrix& projectionMatrix,
-                        const Matrix& modelViewMatrix)
+// Size of uniform buffer page used when resizing
+constexpr uint32_t UBO_PAGE_SIZE = 8192u;
+
+// UBO allocation threshold below which the UBO will shrink
+constexpr auto UBO_SHRINK_THRESHOLD = 0.75f;
+
+// Helper to get the vertex input format
+Dali::Graphics::VertexInputFormat GetPropertyVertexFormat(Property::Type propertyType)
 {
-  GLint loc = program.GetUniformLocation(Program::UNIFORM_MODEL_MATRIX);
-  if(Program::UNIFORM_UNKNOWN != loc)
+  Dali::Graphics::VertexInputFormat type{};
+
+  switch(propertyType)
   {
-    program.SetUniformMatrix4fv(loc, 1, modelMatrix.AsFloat());
-  }
-  loc = program.GetUniformLocation(Program::UNIFORM_VIEW_MATRIX);
-  if(Program::UNIFORM_UNKNOWN != loc)
-  {
-    if(program.GetViewMatrix() != &viewMatrix)
+    case Property::NONE:
+    case Property::STRING:
+    case Property::ARRAY:
+    case Property::MAP:
+    case Property::EXTENTS:   // i4?
+    case Property::RECTANGLE: // i4/f4?
+    case Property::ROTATION:
     {
-      program.SetViewMatrix(&viewMatrix);
-      program.SetUniformMatrix4fv(loc, 1, viewMatrix.AsFloat());
+      type = Dali::Graphics::VertexInputFormat::UNDEFINED;
+      break;
+    }
+    case Property::BOOLEAN:
+    {
+      type = Dali::Graphics::VertexInputFormat::UNDEFINED; // type = GL_BYTE; @todo new type for this?
+      break;
+    }
+    case Property::INTEGER:
+    {
+      type = Dali::Graphics::VertexInputFormat::INTEGER; // (short)
+      break;
+    }
+    case Property::FLOAT:
+    {
+      type = Dali::Graphics::VertexInputFormat::FLOAT;
+      break;
+    }
+    case Property::VECTOR2:
+    {
+      type = Dali::Graphics::VertexInputFormat::FVECTOR2;
+      break;
+    }
+    case Property::VECTOR3:
+    {
+      type = Dali::Graphics::VertexInputFormat::FVECTOR3;
+      break;
+    }
+    case Property::VECTOR4:
+    {
+      type = Dali::Graphics::VertexInputFormat::FVECTOR4;
+      break;
+    }
+    case Property::MATRIX3:
+    {
+      type = Dali::Graphics::VertexInputFormat::FLOAT;
+      break;
+    }
+    case Property::MATRIX:
+    {
+      type = Dali::Graphics::VertexInputFormat::FLOAT;
+      break;
     }
   }
-  // set projection matrix if program has not yet received it this frame or if it is dirty
-  loc = program.GetUniformLocation(Program::UNIFORM_PROJECTION_MATRIX);
-  if(Program::UNIFORM_UNKNOWN != loc)
+
+  return type;
+}
+
+constexpr Graphics::CullMode ConvertCullFace(Dali::FaceCullingMode::Type mode)
+{
+  switch(mode)
   {
-    if(program.GetProjectionMatrix() != &projectionMatrix)
+    case Dali::FaceCullingMode::NONE:
     {
-      program.SetProjectionMatrix(&projectionMatrix);
-      program.SetUniformMatrix4fv(loc, 1, projectionMatrix.AsFloat());
+      return Graphics::CullMode::NONE;
+    }
+    case Dali::FaceCullingMode::FRONT:
+    {
+      return Graphics::CullMode::FRONT;
+    }
+    case Dali::FaceCullingMode::BACK:
+    {
+      return Graphics::CullMode::BACK;
+    }
+    case Dali::FaceCullingMode::FRONT_AND_BACK:
+    {
+      return Graphics::CullMode::FRONT_AND_BACK;
     }
   }
-  loc = program.GetUniformLocation(Program::UNIFORM_MODELVIEW_MATRIX);
-  if(Program::UNIFORM_UNKNOWN != loc)
-  {
-    program.SetUniformMatrix4fv(loc, 1, modelViewMatrix.AsFloat());
-  }
+  return Graphics::CullMode::NONE;
+}
 
-  loc = program.GetUniformLocation(Program::UNIFORM_MVP_MATRIX);
-  if(Program::UNIFORM_UNKNOWN != loc)
+constexpr Graphics::BlendFactor ConvertBlendFactor(BlendFactor::Type blendFactor)
+{
+  switch(blendFactor)
   {
-    Matrix modelViewProjectionMatrix(false);
-    Matrix::Multiply(modelViewProjectionMatrix, modelViewMatrix, projectionMatrix);
-    program.SetUniformMatrix4fv(loc, 1, modelViewProjectionMatrix.AsFloat());
+    case BlendFactor::ZERO:
+      return Graphics::BlendFactor::ZERO;
+    case BlendFactor::ONE:
+      return Graphics::BlendFactor::ONE;
+    case BlendFactor::SRC_COLOR:
+      return Graphics::BlendFactor::SRC_COLOR;
+    case BlendFactor::ONE_MINUS_SRC_COLOR:
+      return Graphics::BlendFactor::ONE_MINUS_SRC_COLOR;
+    case BlendFactor::SRC_ALPHA:
+      return Graphics::BlendFactor::SRC_ALPHA;
+    case BlendFactor::ONE_MINUS_SRC_ALPHA:
+      return Graphics::BlendFactor::ONE_MINUS_SRC_ALPHA;
+    case BlendFactor::DST_ALPHA:
+      return Graphics::BlendFactor::DST_ALPHA;
+    case BlendFactor::ONE_MINUS_DST_ALPHA:
+      return Graphics::BlendFactor::ONE_MINUS_DST_ALPHA;
+    case BlendFactor::DST_COLOR:
+      return Graphics::BlendFactor::DST_COLOR;
+    case BlendFactor::ONE_MINUS_DST_COLOR:
+      return Graphics::BlendFactor::ONE_MINUS_DST_COLOR;
+    case BlendFactor::SRC_ALPHA_SATURATE:
+      return Graphics::BlendFactor::SRC_ALPHA_SATURATE;
+    case BlendFactor::CONSTANT_COLOR:
+      return Graphics::BlendFactor::CONSTANT_COLOR;
+    case BlendFactor::ONE_MINUS_CONSTANT_COLOR:
+      return Graphics::BlendFactor::ONE_MINUS_CONSTANT_COLOR;
+    case BlendFactor::CONSTANT_ALPHA:
+      return Graphics::BlendFactor::CONSTANT_ALPHA;
+    case BlendFactor::ONE_MINUS_CONSTANT_ALPHA:
+      return Graphics::BlendFactor::ONE_MINUS_CONSTANT_ALPHA;
   }
+  return Graphics::BlendFactor{};
+}
 
-  loc = program.GetUniformLocation(Program::UNIFORM_NORMAL_MATRIX);
-  if(Program::UNIFORM_UNKNOWN != loc)
+constexpr Graphics::BlendOp ConvertBlendEquation(DevelBlendEquation::Type blendEquation)
+{
+  switch(blendEquation)
   {
-    Matrix3 normalMatrix;
-    normalMatrix = modelViewMatrix;
-    normalMatrix.Invert();
-    normalMatrix.Transpose();
-    program.SetUniformMatrix3fv(loc, 1, normalMatrix.AsFloat());
+    case DevelBlendEquation::ADD:
+      return Graphics::BlendOp::ADD;
+    case DevelBlendEquation::SUBTRACT:
+      return Graphics::BlendOp::SUBTRACT;
+    case DevelBlendEquation::REVERSE_SUBTRACT:
+      return Graphics::BlendOp::REVERSE_SUBTRACT;
+    case DevelBlendEquation::COLOR:
+    case DevelBlendEquation::COLOR_BURN:
+    case DevelBlendEquation::COLOR_DODGE:
+    case DevelBlendEquation::DARKEN:
+    case DevelBlendEquation::DIFFERENCE:
+    case DevelBlendEquation::EXCLUSION:
+    case DevelBlendEquation::HARD_LIGHT:
+    case DevelBlendEquation::HUE:
+    case DevelBlendEquation::LIGHTEN:
+    case DevelBlendEquation::LUMINOSITY:
+    case DevelBlendEquation::MAX:
+    case DevelBlendEquation::MIN:
+    case DevelBlendEquation::MULTIPLY:
+    case DevelBlendEquation::OVERLAY:
+    case DevelBlendEquation::SATURATION:
+    case DevelBlendEquation::SCREEN:
+    case DevelBlendEquation::SOFT_LIGHT:
+      return Graphics::BlendOp{};
   }
+  return Graphics::BlendOp{};
+}
+
+/**
+ * Helper function to calculate the correct alignment of data for uniform buffers
+ * @param dataSize size of uniform buffer
+ * @return aligned offset of data
+ */
+inline uint32_t GetUniformBufferDataAlignment(uint32_t dataSize)
+{
+  return ((dataSize / 256u) + ((dataSize % 256u) ? 1u : 0u)) * 256u;
 }
 
 } // namespace
@@ -132,7 +246,7 @@ Renderer::Renderer(SceneGraph::RenderDataProvider* dataProvider,
   mGeometry(geometry),
   mProgramCache(nullptr),
   mUniformIndexMap(),
-  mAttributesLocation(),
+  mAttributeLocations(),
   mUniformsHash(),
   mStencilParameters(stencilParameters),
   mBlendingOptions(),
@@ -142,7 +256,7 @@ Renderer::Renderer(SceneGraph::RenderDataProvider* dataProvider,
   mFaceCullingMode(faceCullingMode),
   mDepthWriteMode(depthWriteMode),
   mDepthTestMode(depthTestMode),
-  mUpdateAttributesLocation(true),
+  mUpdateAttributeLocations(true),
   mPremultipledAlphaEnabled(preMultipliedAlphaEnabled),
   mShaderChanged(false),
   mUpdated(true)
@@ -155,10 +269,13 @@ Renderer::Renderer(SceneGraph::RenderDataProvider* dataProvider,
   mBlendingOptions.SetBlendColor(blendColor);
 }
 
-void Renderer::Initialize(Context& context, ProgramCache& programCache)
+void Renderer::Initialize(Context& context, Graphics::Controller& graphicsController, ProgramCache& programCache, Render::ShaderCache& shaderCache, Render::UniformBufferManager& uniformBufferManager)
 {
-  mContext      = &context;
-  mProgramCache = &programCache;
+  mContext              = &context;
+  mGraphicsController   = &graphicsController;
+  mProgramCache         = &programCache;
+  mShaderCache          = &shaderCache;
+  mUniformBufferManager = &uniformBufferManager;
 }
 
 Renderer::~Renderer() = default;
@@ -166,55 +283,12 @@ Renderer::~Renderer() = default;
 void Renderer::SetGeometry(Render::Geometry* geometry)
 {
   mGeometry                 = geometry;
-  mUpdateAttributesLocation = true;
+  mUpdateAttributeLocations = true;
 }
 void Renderer::SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, uint32_t size)
 {
   mDrawCommands.clear();
   mDrawCommands.insert(mDrawCommands.end(), pDrawCommands, pDrawCommands + size);
-}
-
-void Renderer::SetBlending(Context& context, bool blend)
-{
-  context.SetBlend(blend);
-  if(blend)
-  {
-    // Blend color is optional and rarely used
-    const Vector4* blendColor = mBlendingOptions.GetBlendColor();
-    if(blendColor)
-    {
-      context.SetCustomBlendColor(*blendColor);
-    }
-    else
-    {
-      context.SetDefaultBlendColor();
-    }
-
-    // Set blend source & destination factors
-    context.BlendFuncSeparate(mBlendingOptions.GetBlendSrcFactorRgb(),
-                              mBlendingOptions.GetBlendDestFactorRgb(),
-                              mBlendingOptions.GetBlendSrcFactorAlpha(),
-                              mBlendingOptions.GetBlendDestFactorAlpha());
-
-    // Set blend equations
-    Dali::DevelBlendEquation::Type rgbEquation   = mBlendingOptions.GetBlendEquationRgb();
-    Dali::DevelBlendEquation::Type alphaEquation = mBlendingOptions.GetBlendEquationAlpha();
-
-    if(mBlendingOptions.IsAdvancedBlendEquationApplied() && mPremultipledAlphaEnabled)
-    {
-      if(rgbEquation != alphaEquation)
-      {
-        DALI_LOG_ERROR("Advanced Blend Equation have to be appried by using BlendEquation.\n");
-      }
-      context.BlendEquation(rgbEquation);
-    }
-    else
-    {
-      context.BlendEquationSeparate(rgbEquation, alphaEquation);
-    }
-  }
-
-  mUpdated = true;
 }
 
 void Renderer::GlContextDestroyed()
@@ -224,76 +298,6 @@ void Renderer::GlContextDestroyed()
 
 void Renderer::GlCleanup()
 {
-}
-
-void Renderer::SetUniforms(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider& node, const Vector3& size, Program& program)
-{
-  // Check if the map has changed
-  DALI_ASSERT_DEBUG(mRenderDataProvider && "No Uniform map data provider available");
-
-  const SceneGraph::UniformMapDataProvider& uniformMapDataProvider = mRenderDataProvider->GetUniformMap();
-
-  if(uniformMapDataProvider.GetUniformMapChanged(bufferIndex) ||
-     node.GetUniformMapChanged(bufferIndex) ||
-     mUniformIndexMap.Count() == 0 ||
-     mShaderChanged)
-  {
-    // Reset shader pointer
-    mShaderChanged = false;
-
-    const SceneGraph::CollectedUniformMap& uniformMap     = uniformMapDataProvider.GetUniformMap(bufferIndex);
-    const SceneGraph::CollectedUniformMap& uniformMapNode = node.GetUniformMap(bufferIndex);
-
-    uint32_t maxMaps = static_cast<uint32_t>(uniformMap.Count() + uniformMapNode.Count()); // 4,294,967,295 maps should be enough
-    mUniformIndexMap.Clear();                                                              // Clear contents, but keep memory if we don't change size
-    mUniformIndexMap.Resize(maxMaps);
-
-    uint32_t mapIndex = 0;
-    for(; mapIndex < uniformMap.Count(); ++mapIndex)
-    {
-      mUniformIndexMap[mapIndex].propertyValue = uniformMap[mapIndex].propertyPtr;
-      mUniformIndexMap[mapIndex].uniformIndex  = program.RegisterUniform(uniformMap[mapIndex].uniformName);
-    }
-
-    for(uint32_t nodeMapIndex = 0; nodeMapIndex < uniformMapNode.Count(); ++nodeMapIndex)
-    {
-      uint32_t uniformIndex = program.RegisterUniform(uniformMapNode[nodeMapIndex].uniformName);
-      bool     found(false);
-      for(uint32_t i = 0; i < uniformMap.Count(); ++i)
-      {
-        if(mUniformIndexMap[i].uniformIndex == uniformIndex)
-        {
-          mUniformIndexMap[i].propertyValue = uniformMapNode[nodeMapIndex].propertyPtr;
-          found                             = true;
-          break;
-        }
-      }
-
-      if(!found)
-      {
-        mUniformIndexMap[mapIndex].propertyValue = uniformMapNode[nodeMapIndex].propertyPtr;
-        mUniformIndexMap[mapIndex].uniformIndex  = uniformIndex;
-        ++mapIndex;
-      }
-    }
-
-    mUniformIndexMap.Resize(mapIndex);
-  }
-
-  // Set uniforms in local map
-  for(UniformIndexMappings::Iterator iter = mUniformIndexMap.Begin(),
-                                     end  = mUniformIndexMap.End();
-      iter != end;
-      ++iter)
-  {
-    SetUniformFromProperty(bufferIndex, program, *iter);
-  }
-
-  GLint sizeLoc = program.GetUniformLocation(Program::UNIFORM_SIZE);
-  if(-1 != sizeLoc)
-  {
-    program.SetSizeUniform3f(sizeLoc, size.x, size.y, size.z);
-  }
 }
 
 void Renderer::SetUniformFromProperty(BufferIndex bufferIndex, Program& program, UniformIndexMap& map)
@@ -365,29 +369,42 @@ void Renderer::SetUniformFromProperty(BufferIndex bufferIndex, Program& program,
   }
 }
 
-bool Renderer::BindTextures(Context& context, Program& program, Vector<GLuint>& boundTextures)
+void Renderer::BindTextures(Program& program, Graphics::CommandBuffer& commandBuffer, Vector<Graphics::Texture*>& boundTextures)
 {
   uint32_t textureUnit = 0;
-  bool     result      = true;
 
   GLint                          uniformLocation(-1);
   std::vector<Render::Sampler*>& samplers(mRenderDataProvider->GetSamplers());
   std::vector<Render::Texture*>& textures(mRenderDataProvider->GetTextures());
-  for(uint32_t i = 0; i < static_cast<uint32_t>(textures.size()) && result; ++i) // not expecting more than uint32_t of textures
+
+  std::vector<Graphics::TextureBinding> textureBindings;
+  for(uint32_t i = 0; i < static_cast<uint32_t>(textures.size()); ++i) // not expecting more than uint32_t of textures
   {
-    if(textures[i])
+    if(textures[i] && textures[i]->GetGraphicsObject())
     {
-      result = textures[i]->Bind(context, textureUnit, samplers[i]);
-      boundTextures.PushBack(textures[i]->GetId());
-      if(result && program.GetSamplerUniformLocation(i, uniformLocation))
+      if(program.GetSamplerUniformLocation(i, uniformLocation))
       {
-        program.SetUniform1i(uniformLocation, textureUnit);
+        // if the sampler exists,
+        //   if it's default, delete the graphics object
+        //   otherwise re-initialize it if dirty
+
+        const Graphics::Sampler* graphicsSampler = (samplers[i] ? samplers[i]->GetGraphicsObject()
+                                                                : nullptr);
+
+        boundTextures.PushBack(textures[i]->GetGraphicsObject());
+        const Graphics::TextureBinding textureBinding{textures[i]->GetGraphicsObject(), graphicsSampler, textureUnit};
+        textureBindings.push_back(textureBinding);
+
+        program.SetUniform1i(uniformLocation, textureUnit); // Get through shader reflection
         ++textureUnit;
       }
     }
   }
 
-  return result;
+  if(textureBindings.size() > 0)
+  {
+    commandBuffer.BindTextures(textureBindings);
+  }
 }
 
 void Renderer::SetFaceCullingMode(FaceCullingMode::Type mode)
@@ -547,9 +564,9 @@ StencilOperation::Type Renderer::GetStencilOperationOnZPass() const
   return mStencilParameters.stencilOperationOnZPass;
 }
 
-void Renderer::Upload(Context& context)
+void Renderer::Upload()
 {
-  mGeometry->Upload(context);
+  mGeometry->Upload(*mGraphicsController);
 }
 
 void Renderer::Render(Context&                                             context,
@@ -561,7 +578,7 @@ void Renderer::Render(Context&                                             conte
                       const Matrix&                                        projectionMatrix,
                       const Vector3&                                       size,
                       bool                                                 blend,
-                      Vector<GLuint>&                                      boundTextures,
+                      Vector<Graphics::Texture*>&                          boundTextures,
                       const Dali::Internal::SceneGraph::RenderInstruction& instruction,
                       uint32_t                                             queueIndex)
 {
@@ -587,10 +604,58 @@ void Renderer::Render(Context&                                             conte
     return;
   }
 
-  // Get the program to use
-  // The program cache owns the Program object so we don't need to worry about this raw allocation here.
-  ShaderDataPtr shaderData = mRenderDataProvider->GetShader().GetShaderData();
-  Program*      program    = Program::New(*mProgramCache, shaderData, (shaderData->GetHints() & Dali::Shader::Hint::MODIFIES_GEOMETRY) != 0x0);
+  // Create command buffer if not present
+  if(!mGraphicsCommandBuffer)
+  {
+    mGraphicsCommandBuffer = mGraphicsController->CreateCommandBuffer(
+      Graphics::CommandBufferCreateInfo()
+        .SetLevel(Graphics::CommandBufferLevel::SECONDARY),
+      nullptr);
+  }
+  else
+  {
+    mGraphicsCommandBuffer->Reset();
+  }
+
+  auto& commandBuffer = mGraphicsCommandBuffer;
+
+  // Set blending mode
+  if(!mDrawCommands.empty())
+  {
+    blend = (commands[0]->queue == DevelRenderer::RENDER_QUEUE_OPAQUE ? false : blend);
+  }
+
+  // Create Program
+  ShaderDataPtr            shaderData   = mRenderDataProvider->GetShader().GetShaderData();
+  const std::vector<char>& vertShader   = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::VERTEX_SHADER);
+  const std::vector<char>& fragShader   = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER);
+  Dali::Graphics::Shader&  vertexShader = mShaderCache->GetShader(
+    vertShader,
+    Graphics::PipelineStage::VERTEX_SHADER,
+    shaderData->GetSourceMode());
+
+  Dali::Graphics::Shader& fragmentShader = mShaderCache->GetShader(
+    fragShader,
+    Graphics::PipelineStage::FRAGMENT_SHADER,
+    shaderData->GetSourceMode());
+
+  std::vector<Graphics::ShaderState> shaderStates{
+    Graphics::ShaderState()
+      .SetShader(vertexShader)
+      .SetPipelineStage(Graphics::PipelineStage::VERTEX_SHADER),
+    Graphics::ShaderState()
+      .SetShader(fragmentShader)
+      .SetPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER)};
+
+  auto createInfo = Graphics::ProgramCreateInfo();
+  createInfo.SetShaderState(shaderStates);
+
+  auto     graphicsProgram = mGraphicsController->CreateProgram(createInfo, nullptr);
+  Program* program         = Program::New(*mProgramCache,
+                                  shaderData,
+                                  *mGraphicsController,
+                                  std::move(graphicsProgram),
+                                  (shaderData->GetHints() & Dali::Shader::Hint::MODIFIES_GEOMETRY) != 0x0);
 
   if(!program)
   {
@@ -598,98 +663,360 @@ void Renderer::Render(Context&                                             conte
     return;
   }
 
-  //Set cull face  mode
-  const Dali::Internal::SceneGraph::Camera* cam = instruction.GetCamera();
-  if(cam->GetReflectionUsed())
+  // Temporarily create a pipeline here - this will be used for transporting
+  // topology, vertex format, attrs, rasterization state
+  mGraphicsPipeline = PrepareGraphicsPipeline(*program, instruction, blend, std::move(mGraphicsPipeline));
+
+  commandBuffer->BindPipeline(*mGraphicsPipeline.get());
+
+  BindTextures(*program, *commandBuffer.get(), boundTextures);
+
+  BuildUniformIndexMap(bufferIndex, node, size, *program);
+
+  WriteUniformBuffer(bufferIndex, *commandBuffer.get(), program, instruction, node, modelMatrix, modelViewMatrix, viewMatrix, projectionMatrix, size);
+
+  bool drawn = false; // Draw can fail if there are no vertex buffers or they haven't been uploaded yet
+                      // @todo We should detect this case much earlier to prevent unnecessary work
+
+  //@todo manage mDrawCommands in the same way as above command buffer?!
+  if(mDrawCommands.empty())
   {
-    auto adjFaceCullingMode = mFaceCullingMode;
-    switch(mFaceCullingMode)
-    {
-      case FaceCullingMode::Type::FRONT:
-      {
-        adjFaceCullingMode = FaceCullingMode::Type::BACK;
-        break;
-      }
-      case FaceCullingMode::Type::BACK:
-      {
-        adjFaceCullingMode = FaceCullingMode::Type::FRONT;
-        break;
-      }
-      default:
-      {
-        // nothing to do, leave culling as it is
-      }
-    }
-    context.CullFace(adjFaceCullingMode);
+    drawn = mGeometry->Draw(*mGraphicsController, *commandBuffer.get(), mIndexedDrawFirstElement, mIndexedDrawElementsCount);
   }
   else
   {
-    context.CullFace(mFaceCullingMode);
+    for(auto& cmd : commands)
+    {
+      // @todo This should generate a command buffer per cmd
+      // Tests WILL fail. (Temporarily commented out)
+      mGeometry->Draw(*mGraphicsController, *commandBuffer.get(), cmd->firstIndex, cmd->elementCount);
+    }
   }
 
-  // Take the program into use so we can send uniforms to it
-  program->Use();
-
-  if(DALI_LIKELY(BindTextures(context, *program, boundTextures)))
+  // Command buffer contains Texture bindings, vertex bindings, index buffer binding, pipeline(vertex format)
+  // @todo We should return the command buffer(s) and let the calling method submit
+  // If not drawn, then don't add command buffer to submit info, and if empty, don't
+  // submit.
+  if(drawn)
   {
-    // Only set up and draw if we have textures and they are all valid
+    Graphics::SubmitInfo submitInfo{{}, 0 | Graphics::SubmitFlagBits::FLUSH};
+    submitInfo.cmdBuffer.push_back(commandBuffer.get());
+    mGraphicsController->SubmitCommandBuffers(submitInfo);
+  }
 
-    // set projection and view matrix if program has not yet received them yet this frame
-    SetMatrices(*program, modelMatrix, viewMatrix, projectionMatrix, modelViewMatrix);
+  mUpdated = false;
+}
 
-    // set color uniform
-    GLint loc = program->GetUniformLocation(Program::UNIFORM_COLOR);
-    if(Program::UNIFORM_UNKNOWN != loc)
+void Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider& node, const Vector3& size, Program& program)
+{
+  // Check if the map has changed
+  DALI_ASSERT_DEBUG(mRenderDataProvider && "No Uniform map data provider available");
+
+  const SceneGraph::UniformMapDataProvider& uniformMapDataProvider = mRenderDataProvider->GetUniformMap();
+
+  if(uniformMapDataProvider.GetUniformMapChanged(bufferIndex) ||
+     node.GetUniformMapChanged(bufferIndex) ||
+     mUniformIndexMap.Count() == 0 ||
+     mShaderChanged)
+  {
+    // Reset shader pointer
+    mShaderChanged = false;
+
+    const SceneGraph::CollectedUniformMap& uniformMap     = uniformMapDataProvider.GetUniformMap(bufferIndex);
+    const SceneGraph::CollectedUniformMap& uniformMapNode = node.GetUniformMap(bufferIndex);
+
+    uint32_t maxMaps = static_cast<uint32_t>(uniformMap.Count() + uniformMapNode.Count()); // 4,294,967,295 maps should be enough
+    mUniformIndexMap.Clear();                                                              // Clear contents, but keep memory if we don't change size
+    mUniformIndexMap.Resize(maxMaps);
+
+    uint32_t mapIndex = 0;
+    for(; mapIndex < uniformMap.Count(); ++mapIndex)
     {
-      const Vector4& color = node.GetRenderColor(bufferIndex);
-      if(mPremultipledAlphaEnabled)
+      mUniformIndexMap[mapIndex].propertyValue          = uniformMap[mapIndex].propertyPtr;
+      mUniformIndexMap[mapIndex].uniformIndex           = program.RegisterUniform(uniformMap[mapIndex].uniformName);
+      mUniformIndexMap[mapIndex].uniformName            = uniformMap[mapIndex].uniformName;
+      mUniformIndexMap[mapIndex].uniformNameHash        = uniformMap[mapIndex].uniformNameHash;
+      mUniformIndexMap[mapIndex].uniformNameHashNoArray = uniformMap[mapIndex].uniformNameHashNoArray;
+      mUniformIndexMap[mapIndex].arrayIndex             = uniformMap[mapIndex].arrayIndex;
+    }
+
+    for(uint32_t nodeMapIndex = 0; nodeMapIndex < uniformMapNode.Count(); ++nodeMapIndex)
+    {
+      uint32_t uniformIndex = program.RegisterUniform(uniformMapNode[nodeMapIndex].uniformName);
+      bool     found(false);
+      for(uint32_t i = 0; i < uniformMap.Count(); ++i)
       {
-        float alpha = color.a * mRenderDataProvider->GetOpacity(bufferIndex);
-        program->SetUniform4f(loc, color.r * alpha, color.g * alpha, color.b * alpha, alpha);
+        if(mUniformIndexMap[i].uniformIndex == uniformIndex)
+        {
+          mUniformIndexMap[i].propertyValue = uniformMapNode[nodeMapIndex].propertyPtr;
+          found                             = true;
+          break;
+        }
       }
-      else
+
+      if(!found)
       {
-        program->SetUniform4f(loc, color.r, color.g, color.b, color.a * mRenderDataProvider->GetOpacity(bufferIndex));
+        mUniformIndexMap[mapIndex].propertyValue          = uniformMapNode[nodeMapIndex].propertyPtr;
+        mUniformIndexMap[mapIndex].uniformName            = uniformMapNode[nodeMapIndex].uniformName;
+        mUniformIndexMap[mapIndex].uniformIndex           = uniformIndex;
+        mUniformIndexMap[mapIndex].uniformNameHash        = uniformMapNode[nodeMapIndex].uniformNameHash;
+        mUniformIndexMap[mapIndex].uniformNameHashNoArray = uniformMapNode[nodeMapIndex].uniformNameHashNoArray;
+        mUniformIndexMap[mapIndex].arrayIndex             = uniformMapNode[nodeMapIndex].arrayIndex;
+        ++mapIndex;
       }
     }
 
-    SetUniforms(bufferIndex, node, size, *program);
+    mUniformIndexMap.Resize(mapIndex);
+  }
+}
 
-    if(mUpdateAttributesLocation || mGeometry->AttributesChanged())
+void Renderer::WriteUniformBuffer(
+  BufferIndex                          bufferIndex,
+  Graphics::CommandBuffer&             commandBuffer,
+  Program*                             program,
+  const SceneGraph::RenderInstruction& instruction,
+  const SceneGraph::NodeDataProvider&  node,
+  const Matrix&                        modelMatrix,
+  const Matrix&                        modelViewMatrix,
+  const Matrix&                        viewMatrix,
+  const Matrix&                        projectionMatrix,
+  const Vector3&                       size)
+{
+  // Create the UBO
+  uint32_t uniformBlockAllocationBytes{0u};
+  uint32_t uniformBlockMaxSize{0u};
+  uint32_t uboOffset{0u};
+
+  auto& reflection = mGraphicsController->GetProgramReflection(program->GetGraphicsProgram());
+  for(auto i = 0u; i < reflection.GetUniformBlockCount(); ++i)
+  {
+    auto blockSize = GetUniformBufferDataAlignment(reflection.GetUniformBlockSize(i));
+    if(uniformBlockMaxSize < blockSize)
     {
-      mGeometry->GetAttributeLocationFromProgram(mAttributesLocation, *program, bufferIndex);
-      mUpdateAttributesLocation = false;
+      uniformBlockMaxSize = blockSize;
+    }
+    uniformBlockAllocationBytes += blockSize;
+  }
+
+  auto pagedAllocation = ((uniformBlockAllocationBytes / UBO_PAGE_SIZE + 1u)) * UBO_PAGE_SIZE;
+
+  // Allocate twice memory as required by the uniform buffers
+  // todo: memory usage backlog to use optimal allocation
+  if(uniformBlockAllocationBytes && !mUniformBuffer[bufferIndex])
+  {
+    mUniformBuffer[bufferIndex] = mUniformBufferManager->AllocateUniformBuffer(pagedAllocation);
+  }
+  else if(uniformBlockAllocationBytes && (mUniformBuffer[bufferIndex]->GetSize() < pagedAllocation ||
+                                          (pagedAllocation < uint32_t(float(mUniformBuffer[bufferIndex]->GetSize()) * UBO_SHRINK_THRESHOLD))))
+  {
+    mUniformBuffer[bufferIndex]->Reserve(pagedAllocation);
+  }
+
+  // Clear UBO
+  if(mUniformBuffer[bufferIndex])
+  {
+    mUniformBuffer[bufferIndex]->Fill(0, 0u, 0u);
+  }
+
+  // update the uniform buffer
+  // pass shared UBO and offset, return new offset for next item to be used
+  // don't process bindings if there are no uniform buffers allocated
+  auto ubo = mUniformBuffer[bufferIndex].get();
+  if(ubo)
+  {
+    auto uboCount = reflection.GetUniformBlockCount();
+    mUniformBufferBindings.resize(uboCount);
+
+    std::vector<Graphics::UniformBufferBinding>* bindings{&mUniformBufferBindings};
+
+    // Write default uniforms
+    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::MODEL_MATRIX), *ubo, *bindings, modelMatrix);
+    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::VIEW_MATRIX), *ubo, *bindings, viewMatrix);
+    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::PROJECTION_MATRIX), *ubo, *bindings, projectionMatrix);
+    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::MODEL_VIEW_MATRIX), *ubo, *bindings, modelViewMatrix);
+
+    auto mvpUniformInfo = program->GetDefaultUniform(Program::DefaultUniformIndex::MVP_MATRIX);
+    if(mvpUniformInfo && !mvpUniformInfo->name.empty())
+    {
+      Matrix modelViewProjectionMatrix(false);
+      Matrix::Multiply(modelViewProjectionMatrix, modelViewMatrix, projectionMatrix);
+      WriteDefaultUniform(mvpUniformInfo, *ubo, *bindings, modelViewProjectionMatrix);
     }
 
-    if(mBlendingOptions.IsAdvancedBlendEquationApplied() && mPremultipledAlphaEnabled)
+    auto normalUniformInfo = program->GetDefaultUniform(Program::DefaultUniformIndex::NORMAL_MATRIX);
+    if(normalUniformInfo && !normalUniformInfo->name.empty())
     {
-      context.BlendBarrier();
+      Matrix3 normalMatrix(modelViewMatrix);
+      normalMatrix.Invert();
+      normalMatrix.Transpose();
+      WriteDefaultUniform(normalUniformInfo, *ubo, *bindings, normalMatrix);
     }
 
-    if(mDrawCommands.empty())
+    Vector4        finalColor;
+    const Vector4& color = node.GetRenderColor(bufferIndex);
+    if(mPremultipledAlphaEnabled)
     {
-      SetBlending(context, blend);
-
-      mGeometry->Draw(context,
-                      bufferIndex,
-                      mAttributesLocation,
-                      mIndexedDrawFirstElement,
-                      mIndexedDrawElementsCount);
+      float alpha = color.a * mRenderDataProvider->GetOpacity(bufferIndex);
+      finalColor  = Vector4(color.r * alpha, color.g * alpha, color.b * alpha, alpha);
     }
     else
     {
-      for(auto& cmd : commands)
+      finalColor = Vector4(color.r, color.g, color.b, color.a * mRenderDataProvider->GetOpacity(bufferIndex));
+    }
+    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::COLOR), *ubo, *bindings, finalColor);
+
+    // Write uniforms from the uniform map
+    FillUniformBuffer(*program, instruction, *ubo, bindings, uboOffset, bufferIndex);
+
+    // Write uSize in the end, as it shouldn't be overridable by dynamic properties.
+    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::SIZE), *ubo, *bindings, size);
+
+    commandBuffer.BindUniformBuffers(*bindings);
+  }
+}
+
+template<class T>
+bool Renderer::WriteDefaultUniform(const Graphics::UniformInfo* uniformInfo, Render::UniformBuffer& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const T& data)
+{
+  if(uniformInfo && !uniformInfo->name.empty())
+  {
+    WriteUniform(ubo, bindings, *uniformInfo, data);
+    return true;
+  }
+  return false;
+}
+
+template<class T>
+void Renderer::WriteUniform(Render::UniformBuffer& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const Graphics::UniformInfo& uniformInfo, const T& data)
+{
+  WriteUniform(ubo, bindings, uniformInfo, &data, sizeof(T));
+}
+
+void Renderer::WriteUniform(Render::UniformBuffer& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const Graphics::UniformInfo& uniformInfo, const void* data, uint32_t size)
+{
+  ubo.Write(data, size, bindings[uniformInfo.bufferIndex].offset + uniformInfo.offset);
+}
+
+void Renderer::FillUniformBuffer(Program&                                      program,
+                                 const SceneGraph::RenderInstruction&          instruction,
+                                 Render::UniformBuffer&                        ubo,
+                                 std::vector<Graphics::UniformBufferBinding>*& outBindings,
+                                 uint32_t&                                     offset,
+                                 BufferIndex                                   updateBufferIndex)
+{
+  auto& reflection = mGraphicsController->GetProgramReflection(program.GetGraphicsProgram());
+  auto  uboCount   = reflection.GetUniformBlockCount();
+
+  // Setup bindings
+  uint32_t dataOffset = offset;
+  for(auto i = 0u; i < uboCount; ++i)
+  {
+    mUniformBufferBindings[i].dataSize = reflection.GetUniformBlockSize(i);
+    mUniformBufferBindings[i].binding  = reflection.GetUniformBlockBinding(i);
+    mUniformBufferBindings[i].offset   = dataOffset;
+
+    dataOffset += GetUniformBufferDataAlignment(mUniformBufferBindings[i].dataSize);
+    mUniformBufferBindings[i].buffer = ubo.GetBuffer();
+
+    for(UniformIndexMappings::Iterator iter = mUniformIndexMap.Begin(),
+                                       end  = mUniformIndexMap.End();
+        iter != end;
+        ++iter)
+    {
+      // @todo This means parsing the uniform string every frame. Instead, store the array index if present.
+      int arrayIndex = (*iter).arrayIndex;
+
+      auto uniformInfo  = Graphics::UniformInfo{};
+      auto uniformFound = program.GetUniform((*iter).uniformName.GetCString(),
+                                             (*iter).uniformNameHashNoArray ? (*iter).uniformNameHashNoArray
+                                                                            : (*iter).uniformNameHash,
+                                             uniformInfo);
+
+      if(uniformFound)
       {
-        if(cmd->queue == queueIndex)
+        auto dst = mUniformBufferBindings[uniformInfo.bufferIndex].offset + uniformInfo.offset;
+
+        switch((*iter).propertyValue->GetType())
         {
-          //Set blending mode
-          SetBlending(context, cmd->queue == DevelRenderer::RENDER_QUEUE_OPAQUE ? false : blend);
-          mGeometry->Draw(context, bufferIndex, mAttributesLocation, cmd->firstIndex, cmd->elementCount);
+          case Property::Type::BOOLEAN:
+          {
+            ubo.Write(&(*iter).propertyValue->GetBoolean(updateBufferIndex),
+                      sizeof(bool),
+                      dst + static_cast<uint32_t>(sizeof(bool)) * arrayIndex);
+            break;
+          }
+          case Property::Type::INTEGER:
+          {
+            ubo.Write(&(*iter).propertyValue->GetInteger(updateBufferIndex),
+                      sizeof(int32_t),
+                      dst + static_cast<int32_t>(sizeof(int32_t)) * arrayIndex);
+            break;
+          }
+          case Property::Type::FLOAT:
+          {
+            ubo.Write(&(*iter).propertyValue->GetFloat(updateBufferIndex),
+                      sizeof(float),
+                      dst + static_cast<uint32_t>(sizeof(float)) * arrayIndex);
+            break;
+          }
+          case Property::Type::VECTOR2:
+          {
+            ubo.Write(&(*iter).propertyValue->GetVector2(updateBufferIndex),
+                      sizeof(Vector2),
+                      dst + static_cast<uint32_t>(sizeof(Vector2)) * arrayIndex);
+            break;
+          }
+          case Property::Type::VECTOR3:
+          {
+            ubo.Write(&(*iter).propertyValue->GetVector3(updateBufferIndex),
+                      sizeof(Vector3),
+                      dst + static_cast<uint32_t>(sizeof(Vector3)) * arrayIndex);
+            break;
+          }
+          case Property::Type::VECTOR4:
+          {
+            ubo.Write(&(*iter).propertyValue->GetVector4(updateBufferIndex),
+                      sizeof(Vector4),
+                      dst + static_cast<uint32_t>(sizeof(Vector4)) * arrayIndex);
+            break;
+          }
+          case Property::Type::MATRIX:
+          {
+            ubo.Write(&(*iter).propertyValue->GetMatrix(updateBufferIndex),
+                      sizeof(Matrix),
+                      dst + static_cast<uint32_t>(sizeof(Matrix)) * arrayIndex);
+            break;
+          }
+          case Property::Type::MATRIX3:
+          {
+            // todo: handle data padding properly
+            // Vulkan:
+            //
+            //const auto& matrix = &(*iter).propertyValue->GetMatrix3(updateBufferIndex);
+            //for(int i = 0; i < 3; ++i)
+            //{
+            //ubo.Write(&matrix->AsFloat()[i * 3],
+            //          sizeof(float) * 3,
+            //          dst + (i * static_cast<uint32_t>(sizeof(Vector4))));
+            //}
+            // GL:
+            ubo.Write(&(*iter).propertyValue->GetMatrix3(updateBufferIndex),
+                      sizeof(Matrix3),
+                      dst + static_cast<uint32_t>(sizeof(Matrix3)) * arrayIndex);
+            break;
+          }
+          default:
+          {
+          }
         }
       }
     }
-    mUpdated = false;
   }
+  // write output bindings
+  outBindings = &mUniformBufferBindings;
+
+  // Update offset
+  offset = dataOffset;
 }
 
 void Renderer::SetSortAttributes(BufferIndex                                             bufferIndex,
@@ -712,7 +1039,7 @@ bool Renderer::Updated(BufferIndex bufferIndex, const SceneGraph::NodeDataProvid
     return true;
   }
 
-  if(mShaderChanged || mUpdateAttributesLocation || mGeometry->AttributesChanged())
+  if(mShaderChanged || mUpdateAttributeLocations || mGeometry->AttributesChanged())
   {
     return true;
   }
@@ -746,6 +1073,179 @@ bool Renderer::Updated(BufferIndex bufferIndex, const SceneGraph::NodeDataProvid
   }
 
   return false;
+}
+
+Graphics::UniquePtr<Graphics::Pipeline> Renderer::PrepareGraphicsPipeline(
+  Program&                                             program,
+  const Dali::Internal::SceneGraph::RenderInstruction& instruction,
+  bool                                                 blend,
+  Graphics::UniquePtr<Graphics::Pipeline>&&            oldPipeline)
+{
+  Graphics::InputAssemblyState inputAssemblyState{};
+  Graphics::VertexInputState   vertexInputState{};
+  Graphics::ProgramState       programState{};
+  uint32_t                     bindingIndex{0u};
+
+  if(mUpdateAttributeLocations || mGeometry->AttributesChanged())
+  {
+    mAttributeLocations.Clear();
+    mUpdateAttributeLocations = true;
+  }
+
+  auto& reflection = mGraphicsController->GetProgramReflection(program.GetGraphicsProgram());
+
+  /**
+   * Bind Attributes
+   */
+  uint32_t base = 0;
+  for(auto&& vertexBuffer : mGeometry->GetVertexBuffers())
+  {
+    const VertexBuffer::Format& vertexFormat = *vertexBuffer->GetFormat();
+
+    vertexInputState.bufferBindings.emplace_back(vertexFormat.size, // stride
+                                                 Graphics::VertexInputRate::PER_VERTEX);
+
+    const uint32_t attributeCount = vertexBuffer->GetAttributeCount();
+    for(uint32_t i = 0; i < attributeCount; ++i)
+    {
+      if(mUpdateAttributeLocations)
+      {
+        auto    attributeName = vertexBuffer->GetAttributeName(i);
+        int32_t pLocation     = reflection.GetVertexAttributeLocation(std::string(attributeName.GetStringView()));
+        if(-1 == pLocation)
+        {
+          DALI_LOG_WARNING("Attribute not found in the shader: %s\n", attributeName.GetCString());
+        }
+        mAttributeLocations.PushBack(pLocation);
+      }
+
+      uint32_t location = static_cast<uint32_t>(mAttributeLocations[base + i]);
+
+      vertexInputState.attributes.emplace_back(location,
+                                               bindingIndex,
+                                               vertexFormat.components[i].offset,
+                                               GetPropertyVertexFormat(vertexFormat.components[i].type));
+    }
+    base += attributeCount;
+    ++bindingIndex;
+  }
+  mUpdateAttributeLocations = false;
+
+  // Get the topology
+  inputAssemblyState.SetTopology(mGeometry->GetTopology());
+
+  // Get the program
+  programState.SetProgram(program.GetGraphicsProgram());
+
+  Graphics::RasterizationState rasterizationState{};
+
+  //Set cull face  mode
+  const Dali::Internal::SceneGraph::Camera* cam = instruction.GetCamera();
+  if(cam->GetReflectionUsed())
+  {
+    auto adjFaceCullingMode = mFaceCullingMode;
+    switch(mFaceCullingMode)
+    {
+      case FaceCullingMode::Type::FRONT:
+      {
+        adjFaceCullingMode = FaceCullingMode::Type::BACK;
+        break;
+      }
+      case FaceCullingMode::Type::BACK:
+      {
+        adjFaceCullingMode = FaceCullingMode::Type::FRONT;
+        break;
+      }
+      default:
+      {
+        // nothing to do, leave culling as it is
+      }
+    }
+    rasterizationState.SetCullMode(ConvertCullFace(adjFaceCullingMode));
+  }
+  else
+  {
+    rasterizationState.SetCullMode(ConvertCullFace(mFaceCullingMode));
+  }
+
+  rasterizationState.SetFrontFace(Graphics::FrontFace::COUNTER_CLOCKWISE);
+
+  /**
+   * Set Polygon mode
+   */
+  switch(mGeometry->GetTopology())
+  {
+    case Graphics::PrimitiveTopology::TRIANGLE_LIST:
+    case Graphics::PrimitiveTopology::TRIANGLE_STRIP:
+    case Graphics::PrimitiveTopology::TRIANGLE_FAN:
+      rasterizationState.SetPolygonMode(Graphics::PolygonMode::FILL);
+      break;
+    case Graphics::PrimitiveTopology::LINE_LIST:
+    case Graphics::PrimitiveTopology::LINE_LOOP:
+    case Graphics::PrimitiveTopology::LINE_STRIP:
+      rasterizationState.SetPolygonMode(Graphics::PolygonMode::LINE);
+      break;
+    case Graphics::PrimitiveTopology::POINT_LIST:
+      rasterizationState.SetPolygonMode(Graphics::PolygonMode::POINT);
+      break;
+  }
+
+  // @todo How to signal a blend barrier is needed?
+  //if(mBlendingOptions.IsAdvancedBlendEquationApplied() && mPremultipledAlphaEnabled)
+  //{
+  //  context.BlendBarrier();
+  //}
+
+  Graphics::ColorBlendState colorBlendState{};
+  colorBlendState.SetBlendEnable(false);
+
+  if(blend)
+  {
+    colorBlendState.SetBlendEnable(true);
+
+    Graphics::BlendOp rgbOp   = ConvertBlendEquation(mBlendingOptions.GetBlendEquationRgb());
+    Graphics::BlendOp alphaOp = ConvertBlendEquation(mBlendingOptions.GetBlendEquationRgb());
+    if(mBlendingOptions.IsAdvancedBlendEquationApplied() && mPremultipledAlphaEnabled)
+    {
+      if(rgbOp != alphaOp)
+      {
+        DALI_LOG_ERROR("Advanced Blend Equation MUST be applied by using BlendEquation.\n");
+        alphaOp = rgbOp;
+      }
+    }
+
+    colorBlendState
+      .SetSrcColorBlendFactor(ConvertBlendFactor(mBlendingOptions.GetBlendSrcFactorRgb()))
+      .SetSrcAlphaBlendFactor(ConvertBlendFactor(mBlendingOptions.GetBlendSrcFactorAlpha()))
+      .SetDstColorBlendFactor(ConvertBlendFactor(mBlendingOptions.GetBlendDestFactorRgb()))
+      .SetDstAlphaBlendFactor(ConvertBlendFactor(mBlendingOptions.GetBlendDestFactorAlpha()))
+      .SetColorBlendOp(rgbOp)
+      .SetAlphaBlendOp(alphaOp);
+
+    // Blend color is optional and rarely used
+    Vector4* blendColor = const_cast<Vector4*>(mBlendingOptions.GetBlendColor());
+    if(blendColor)
+    {
+      colorBlendState.SetBlendConstants(blendColor->AsFloat());
+    }
+  }
+
+  // Take the program into use so we can send uniforms to it
+  // @todo Remove this call entirely!
+  program.Use();
+
+  mUpdated = true;
+
+  // Create a new pipeline
+  return mGraphicsController->CreatePipeline(
+    Graphics::PipelineCreateInfo()
+      .SetInputAssemblyState(&inputAssemblyState) // Passed as pointers - shallow copy will break. TOO C LIKE
+      .SetVertexInputState(&vertexInputState)
+      .SetRasterizationState(&rasterizationState)
+      .SetColorBlendState(&colorBlendState)
+      .SetProgramState(&programState)
+      .SetNextExtension(&mLegacyProgram),
+    std::move(oldPipeline));
 }
 
 } // namespace Render

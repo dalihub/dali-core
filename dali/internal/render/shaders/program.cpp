@@ -21,8 +21,13 @@
 // EXTERNAL INCLUDES
 #include <cstring>
 #include <iomanip>
+#include <map>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/hash.h>
+#include <dali/graphics-api/graphics-controller.h>
+#include <dali/graphics-api/graphics-program.h>
+#include <dali/graphics-api/graphics-reflection.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/gl-defines.h>
 #include <dali/internal/common/shader-data.h>
@@ -32,40 +37,6 @@
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/dali-vector.h>
-
-namespace
-{
-void LogWithLineNumbers(const char* source)
-{
-  uint32_t    lineNumber = 0u;
-  const char* prev       = source;
-  const char* ptr        = prev;
-
-  while(true)
-  {
-    if(lineNumber > 200u)
-    {
-      break;
-    }
-    // seek the next end of line or end of text
-    while(*ptr != '\n' && *ptr != '\0')
-    {
-      ++ptr;
-    }
-
-    std::string line(prev, ptr - prev);
-    Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugError, "%4d %s\n", lineNumber, line.c_str());
-
-    if(*ptr == '\0')
-    {
-      break;
-    }
-    prev = ++ptr;
-    ++lineNumber;
-  }
-}
-
-} //namespace
 
 namespace Dali
 {
@@ -95,20 +66,43 @@ const char* const gStdUniforms[Program::UNIFORM_TYPE_LAST] =
     "uSize"          // UNIFORM_SIZE
 };
 
+const unsigned int NUMBER_OF_DEFAULT_UNIFORMS = static_cast<unsigned int>(Program::DefaultUniformIndex::COUNT);
+
+/**
+ * List of all default uniforms used for quicker lookup
+ */
+size_t DEFAULT_UNIFORM_HASHTABLE[NUMBER_OF_DEFAULT_UNIFORMS] =
+  {
+    CalculateHash(std::string("uModelMatrix")),
+    CalculateHash(std::string("uMvpMatrix")),
+    CalculateHash(std::string("uViewMatrix")),
+    CalculateHash(std::string("uModelView")),
+    CalculateHash(std::string("uNormalMatrix")),
+    CalculateHash(std::string("uProjection")),
+    CalculateHash(std::string("uSize")),
+    CalculateHash(std::string("uColor"))};
+
 } // namespace
 
 // IMPLEMENTATION
 
-Program* Program::New(ProgramCache& cache, Internal::ShaderDataPtr shaderData, bool modifiesGeometry)
+Program* Program::New(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& gfxController, Graphics::UniquePtr<Graphics::Program>&& gfxProgram, bool modifiesGeometry)
 {
-  size_t   shaderHash = shaderData->GetHashValue();
-  Program* program    = cache.GetProgram(shaderHash);
+  uint32_t programId{0u};
+
+  // Get program id and use it as hash for the cache
+  // in order to maintain current functionality as long as needed
+  gfxController.GetProgramParameter(*gfxProgram, 1, &programId);
+
+  size_t shaderHash = programId;
+
+  Program* program = cache.GetProgram(shaderHash);
 
   if(nullptr == program)
   {
     // program not found so create it
-    program = new Program(cache, shaderData, modifiesGeometry);
-    program->Load();
+    program = new Program(cache, shaderData, gfxController, std::move(gfxProgram), modifiesGeometry);
+    program->GetActiveSamplerUniforms();
     cache.AddProgram(shaderHash, program);
   }
 
@@ -117,16 +111,9 @@ Program* Program::New(ProgramCache& cache, Internal::ShaderDataPtr shaderData, b
 
 void Program::Use()
 {
-  if(mLinked)
-  {
-    if(this != mCache.GetCurrentProgram())
-    {
-      LOG_GL("UseProgram(%d)\n", mProgramId);
-      CHECK_GL(mGlAbstraction, mGlAbstraction.UseProgram(mProgramId));
-
-      mCache.SetCurrentProgram(this);
-    }
-  }
+  LOG_GL("UseProgram(%d)\n", mProgramId);
+  CHECK_GL(mGlAbstraction, mGlAbstraction.UseProgram(mProgramId));
+  mCache.SetCurrentProgram(this);
 }
 
 bool Program::IsUsed()
@@ -611,11 +598,6 @@ void Program::GlContextCreated()
 
 void Program::GlContextDestroyed()
 {
-  mLinked           = false;
-  mVertexShaderId   = 0;
-  mFragmentShaderId = 0;
-  mProgramId        = 0;
-
   ResetAttribsUniformCache();
 }
 
@@ -624,15 +606,14 @@ bool Program::ModifiesGeometry()
   return mModifiesGeometry;
 }
 
-Program::Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, bool modifiesGeometry)
+Program::Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& controller, Graphics::UniquePtr<Graphics::Program>&& gfxProgram, bool modifiesGeometry)
 : mCache(cache),
   mGlAbstraction(mCache.GetGlAbstraction()),
   mProjectionMatrix(nullptr),
   mViewMatrix(nullptr),
-  mLinked(false),
-  mVertexShaderId(0),
-  mFragmentShaderId(0),
   mProgramId(0),
+  mGfxProgram(std::move(gfxProgram)),
+  mGfxController(controller),
   mProgramData(shaderData),
   mModifiesGeometry(modifiesGeometry)
 {
@@ -653,208 +634,16 @@ Program::Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, bool m
 
   // reset values
   ResetAttribsUniformCache();
+
+  // Get program id and use it as hash for the cache
+  // in order to maintain current functionality as long as needed
+  mGfxController.GetProgramParameter(*mGfxProgram, 1, &mProgramId);
+
+  BuildReflection(controller.GetProgramReflection(*mGfxProgram.get()));
 }
 
 Program::~Program()
 {
-  Unload();
-}
-
-void Program::Load()
-{
-  DALI_ASSERT_ALWAYS(nullptr != mProgramData.Get() && "Program data is not initialized");
-  DALI_ASSERT_DEBUG(mProgramId == 0 && "mProgramId != 0, so about to leak a GL resource by overwriting it.");
-
-  LOG_GL("CreateProgram()\n");
-  mProgramId = CHECK_GL(mGlAbstraction, mGlAbstraction.CreateProgram());
-
-  GLint linked = GL_FALSE;
-
-  const bool binariesSupported = mCache.IsBinarySupported();
-
-  // if shader binaries are supported and ShaderData contains compiled bytecode?
-  if(binariesSupported && mProgramData->HasBinary())
-  {
-    DALI_LOG_INFO(Debug::Filter::gShader, Debug::General, "Program::Load() - Using Compiled Shader, Size = %d\n", mProgramData->GetBufferSize());
-
-    CHECK_GL(mGlAbstraction, mGlAbstraction.ProgramBinary(mProgramId, mCache.ProgramBinaryFormat(), mProgramData->GetBufferData(), static_cast<GLsizei>(mProgramData->GetBufferSize()))); // truncated
-
-    CHECK_GL(mGlAbstraction, mGlAbstraction.ValidateProgram(mProgramId));
-
-    GLint success;
-    CHECK_GL(mGlAbstraction, mGlAbstraction.GetProgramiv(mProgramId, GL_VALIDATE_STATUS, &success));
-
-    DALI_LOG_INFO(Debug::Filter::gShader, Debug::General, "ValidateProgram Status = %d\n", success);
-
-    CHECK_GL(mGlAbstraction, mGlAbstraction.GetProgramiv(mProgramId, GL_LINK_STATUS, &linked));
-
-    if(GL_FALSE == linked)
-    {
-      DALI_LOG_ERROR("Failed to load program binary \n");
-
-      GLint nLength;
-      CHECK_GL(mGlAbstraction, mGlAbstraction.GetProgramiv(mProgramId, GL_INFO_LOG_LENGTH, &nLength));
-      if(nLength > 0)
-      {
-        Dali::Vector<char> szLog;
-        szLog.Reserve(nLength); // Don't call Resize as we don't want to initialise the data, just reserve a buffer
-        CHECK_GL(mGlAbstraction, mGlAbstraction.GetProgramInfoLog(mProgramId, nLength, &nLength, szLog.Begin()));
-        DALI_LOG_ERROR("Program Link Error: %s\n", szLog.Begin());
-      }
-    }
-    else
-    {
-      mLinked = true;
-      DALI_LOG_INFO(Debug::Filter::gShader, Debug::General, "Reused binary.\n");
-    }
-  }
-
-  // Fall back to compiling and linking the vertex and fragment sources
-  if(GL_FALSE == linked)
-  {
-    DALI_LOG_INFO(Debug::Filter::gShader, Debug::General, "Program::Load() - Runtime compilation\n");
-    if(CompileShader(GL_VERTEX_SHADER, mVertexShaderId, mProgramData->GetVertexShader()))
-    {
-      if(CompileShader(GL_FRAGMENT_SHADER, mFragmentShaderId, mProgramData->GetFragmentShader()))
-      {
-        Link();
-
-        if(binariesSupported && mLinked)
-        {
-          GLint  binaryLength = 0;
-          GLenum binaryFormat;
-          DALI_LOG_INFO(Debug::Filter::gShader, Debug::General, "Compiled and linked.\n\nVS:\n%s\nFS:\n%s\n", mProgramData->GetVertexShader(), mProgramData->GetFragmentShader());
-
-          CHECK_GL(mGlAbstraction, mGlAbstraction.GetProgramiv(mProgramId, GL_PROGRAM_BINARY_LENGTH_OES, &binaryLength));
-          DALI_LOG_INFO(Debug::Filter::gShader, Debug::General, "Program::Load() - GL_PROGRAM_BINARY_LENGTH_OES: %d\n", binaryLength);
-          if(binaryLength > 0)
-          {
-            // Allocate space for the bytecode in ShaderData
-            mProgramData->AllocateBuffer(binaryLength);
-            // Copy the bytecode to ShaderData
-            CHECK_GL(mGlAbstraction, mGlAbstraction.GetProgramBinary(mProgramId, binaryLength, nullptr, &binaryFormat, mProgramData->GetBufferData()));
-            mCache.StoreBinary(mProgramData);
-            DALI_LOG_INFO(Debug::Filter::gShader, Debug::General, "Saved binary.\n");
-          }
-        }
-      }
-    }
-  }
-
-  GetActiveSamplerUniforms();
-
-  // No longer needed
-  FreeShaders();
-}
-
-void Program::Unload()
-{
-  FreeShaders();
-
-  if(this == mCache.GetCurrentProgram())
-  {
-    CHECK_GL(mGlAbstraction, mGlAbstraction.UseProgram(0));
-
-    mCache.SetCurrentProgram(nullptr);
-  }
-
-  if(mProgramId)
-  {
-    LOG_GL("DeleteProgram(%d)\n", mProgramId);
-    CHECK_GL(mGlAbstraction, mGlAbstraction.DeleteProgram(mProgramId));
-    mProgramId = 0;
-  }
-
-  mLinked = false;
-}
-
-bool Program::CompileShader(GLenum shaderType, GLuint& shaderId, const char* src)
-{
-  if(!shaderId)
-  {
-    LOG_GL("CreateShader(%d)\n", shaderType);
-    shaderId = CHECK_GL(mGlAbstraction, mGlAbstraction.CreateShader(shaderType));
-    LOG_GL("AttachShader(%d,%d)\n", mProgramId, shaderId);
-    CHECK_GL(mGlAbstraction, mGlAbstraction.AttachShader(mProgramId, shaderId));
-  }
-
-  LOG_GL("ShaderSource(%d)\n", shaderId);
-  CHECK_GL(mGlAbstraction, mGlAbstraction.ShaderSource(shaderId, 1, &src, nullptr));
-
-  LOG_GL("CompileShader(%d)\n", shaderId);
-  CHECK_GL(mGlAbstraction, mGlAbstraction.CompileShader(shaderId));
-
-  GLint compiled;
-  LOG_GL("GetShaderiv(%d)\n", shaderId);
-  CHECK_GL(mGlAbstraction, mGlAbstraction.GetShaderiv(shaderId, GL_COMPILE_STATUS, &compiled));
-
-  if(compiled == GL_FALSE)
-  {
-    DALI_LOG_ERROR("Failed to compile shader\n");
-    LogWithLineNumbers(src);
-
-    GLint nLength;
-    mGlAbstraction.GetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &nLength);
-    if(nLength > 0)
-    {
-      Dali::Vector<char> szLog;
-      szLog.Reserve(nLength); // Don't call Resize as we don't want to initialise the data, just reserve a buffer
-      mGlAbstraction.GetShaderInfoLog(shaderId, nLength, &nLength, szLog.Begin());
-      DALI_LOG_ERROR("Shader Compiler Error: %s\n", szLog.Begin());
-    }
-
-    DALI_ASSERT_ALWAYS(0 && "Shader compilation failure");
-  }
-
-  return compiled != 0;
-}
-
-void Program::Link()
-{
-  LOG_GL("LinkProgram(%d)\n", mProgramId);
-  CHECK_GL(mGlAbstraction, mGlAbstraction.LinkProgram(mProgramId));
-
-  GLint linked;
-  LOG_GL("GetProgramiv(%d)\n", mProgramId);
-  CHECK_GL(mGlAbstraction, mGlAbstraction.GetProgramiv(mProgramId, GL_LINK_STATUS, &linked));
-
-  if(linked == GL_FALSE)
-  {
-    DALI_LOG_ERROR("Shader failed to link \n");
-
-    GLint nLength;
-    mGlAbstraction.GetProgramiv(mProgramId, GL_INFO_LOG_LENGTH, &nLength);
-    if(nLength > 0)
-    {
-      Dali::Vector<char> szLog;
-      szLog.Reserve(nLength); // Don't call Resize as we don't want to initialise the data, just reserve a buffer
-      mGlAbstraction.GetProgramInfoLog(mProgramId, nLength, &nLength, szLog.Begin());
-      DALI_LOG_ERROR("Shader Link Error: %s\n", szLog.Begin());
-    }
-
-    DALI_ASSERT_ALWAYS(0 && "Shader linking failure");
-  }
-
-  mLinked = linked != GL_FALSE;
-}
-
-void Program::FreeShaders()
-{
-  if(mVertexShaderId)
-  {
-    LOG_GL("DeleteShader(%d)\n", mVertexShaderId);
-    CHECK_GL(mGlAbstraction, mGlAbstraction.DetachShader(mProgramId, mVertexShaderId));
-    CHECK_GL(mGlAbstraction, mGlAbstraction.DeleteShader(mVertexShaderId));
-    mVertexShaderId = 0;
-  }
-
-  if(mFragmentShaderId)
-  {
-    LOG_GL("DeleteShader(%d)\n", mFragmentShaderId);
-    CHECK_GL(mGlAbstraction, mGlAbstraction.DetachShader(mProgramId, mFragmentShaderId));
-    CHECK_GL(mGlAbstraction, mGlAbstraction.DeleteShader(mFragmentShaderId));
-    mFragmentShaderId = 0;
-  }
 }
 
 void Program::ResetAttribsUniformCache()
@@ -889,6 +678,111 @@ void Program::ResetAttribsUniformCache()
     mUniformCacheFloat4[i][2] = 0.0f;
     mUniformCacheFloat4[i][3] = 0.0f;
   }
+}
+
+void Program::BuildReflection(const Graphics::Reflection& graphicsReflection)
+{
+  mReflectionDefaultUniforms.clear();
+  mReflectionDefaultUniforms.resize(NUMBER_OF_DEFAULT_UNIFORMS);
+
+  auto uniformBlockCount = graphicsReflection.GetUniformBlockCount();
+
+  // add uniform block fields
+  for(auto i = 0u; i < uniformBlockCount; ++i)
+  {
+    Graphics::UniformBlockInfo uboInfo;
+    graphicsReflection.GetUniformBlock(i, uboInfo);
+
+    // for each member store data
+    for(const auto& item : uboInfo.members)
+    {
+      auto hashValue = CalculateHash(item.name);
+      mReflection.emplace_back(ReflectionUniformInfo{hashValue, false, item});
+
+      // update buffer index
+      mReflection.back().uniformInfo.bufferIndex = i;
+
+      // Update default uniforms
+      for(auto i = 0u; i < NUMBER_OF_DEFAULT_UNIFORMS; ++i)
+      {
+        if(hashValue == DEFAULT_UNIFORM_HASHTABLE[i])
+        {
+          mReflectionDefaultUniforms[i] = mReflection.back();
+          break;
+        }
+      }
+    }
+  }
+
+  // add samplers
+  auto samplers = graphicsReflection.GetSamplers();
+  for(const auto& sampler : samplers)
+  {
+    mReflection.emplace_back(ReflectionUniformInfo{CalculateHash(sampler.name), false, sampler});
+  }
+
+  // check for potential collisions
+  std::map<size_t, bool> hashTest;
+  bool                   hasCollisions(false);
+  for(auto&& item : mReflection)
+  {
+    if(hashTest.find(item.hashValue) == hashTest.end())
+    {
+      hashTest[item.hashValue] = false;
+    }
+    else
+    {
+      hashTest[item.hashValue] = true;
+      hasCollisions            = true;
+    }
+  }
+
+  // update collision flag for further use
+  if(hasCollisions)
+  {
+    for(auto&& item : mReflection)
+    {
+      item.hasCollision = hashTest[item.hashValue];
+    }
+  }
+}
+
+bool Program::GetUniform(const std::string& name, size_t hashedName, Graphics::UniformInfo& out) const
+{
+  if(mReflection.empty())
+  {
+    return false;
+  }
+
+  hashedName = !hashedName ? CalculateHash(name, '[') : hashedName;
+
+  for(const ReflectionUniformInfo& item : mReflection)
+  {
+    if(item.hashValue == hashedName)
+    {
+      if(!item.hasCollision || item.uniformInfo.name == name)
+      {
+        out = item.uniformInfo;
+        return true;
+      }
+      else
+      {
+        return false;
+      }
+    }
+  }
+  return false;
+}
+
+const Graphics::UniformInfo* Program::GetDefaultUniform(DefaultUniformIndex defaultUniformIndex) const
+{
+  if(mReflectionDefaultUniforms.empty())
+  {
+    return nullptr;
+  }
+
+  const auto value = &mReflectionDefaultUniforms[static_cast<uint32_t>(defaultUniformIndex)];
+  return &value->uniformInfo;
 }
 
 } // namespace Internal

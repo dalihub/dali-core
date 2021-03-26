@@ -32,9 +32,20 @@ enum SetSampler
   DONT_SET_SAMPLER
 };
 
+Texture CreateTexture(TextureType::Type type, Pixel::Format format, int width, int height)
+{
+  Texture texture = Texture::New(type, format, width, height);
+
+  int       bufferSize = width * height * 2;
+  uint8_t*  buffer     = reinterpret_cast<uint8_t*>(malloc(bufferSize));
+  PixelData pixelData  = PixelData::New(buffer, bufferSize, width, height, format, PixelData::FREE);
+  texture.Upload(pixelData, 0u, 0u, 0u, 0u, width, height);
+  return texture;
+}
+
 Actor CreateActor(SetSampler setSamplerOption)
 {
-  Texture texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
+  Texture texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
 
   Shader     shader     = CreateShader();
   TextureSet textureSet = CreateTextureSet();
@@ -93,7 +104,7 @@ int UtcDaliTextureSetCopyConstructor(void)
 {
   TestApplication application;
 
-  Texture    image      = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 32, 32);
+  Texture    image      = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 32, 32);
   TextureSet textureSet = TextureSet::New();
   textureSet.SetTexture(0u, image);
 
@@ -126,7 +137,7 @@ int UtcDaliTextureSetMoveConstructor(void)
   DALI_TEST_CHECK(textureSet);
   DALI_TEST_EQUALS(1, textureSet.GetBaseObject().ReferenceCount(), TEST_LOCATION);
 
-  Texture texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 32, 32);
+  Texture texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 32, 32);
   textureSet.SetTexture(0u, texture);
   DALI_TEST_EQUALS(textureSet.GetTexture(0u), texture, TEST_LOCATION);
 
@@ -147,7 +158,7 @@ int UtcDaliTextureSetMoveAssignment(void)
   DALI_TEST_CHECK(textureSet);
   DALI_TEST_EQUALS(1, textureSet.GetBaseObject().ReferenceCount(), TEST_LOCATION);
 
-  Texture texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 32, 32);
+  Texture texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 32, 32);
   textureSet.SetTexture(0u, texture);
   DALI_TEST_EQUALS(textureSet.GetTexture(0u), texture, TEST_LOCATION);
 
@@ -259,6 +270,7 @@ int UtcDaliTextureSetMultiple(void)
   TraceCallStack& texParameterTrace = gl.GetTexParameterTrace();
   texParameterTrace.Reset();
   texParameterTrace.Enable(true);
+  texParameterTrace.EnableLogging(true);
   application.SendNotification();
   application.Render();
 
@@ -271,7 +283,7 @@ int UtcDaliTextureSetMultiple(void)
   // Verify gl state
   // For each actor there are four calls to TexParameteri when the texture is first created
   // Texture minification and magnification filters are now different than default so
-  //there should have been two extra TexParameteri calls to set the new filter mode
+  // there should have been two extra TexParameteri calls to set the new filter mode
   DALI_TEST_EQUALS(texParameterTrace.CountMethod("TexParameteri"), 2 * 6, TEST_LOCATION);
 
   END_TEST;
@@ -281,7 +293,7 @@ int UtcDaliTextureSetSetSampler(void)
 {
   TestApplication application;
 
-  Texture image = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
+  Texture image = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
 
   Shader     shader     = CreateShader();
   TextureSet textureSet = CreateTextureSet(image);
@@ -301,6 +313,7 @@ int UtcDaliTextureSetSetSampler(void)
 
   TraceCallStack& texParameterTrace = gl.GetTexParameterTrace();
   texParameterTrace.Reset();
+  texParameterTrace.EnableLogging(true);
   texParameterTrace.Enable(true);
   application.SendNotification();
   application.Render();
@@ -344,7 +357,7 @@ int UtcDaliTextureSetGetTexture(void)
   DALI_TEST_EQUALS(textureSet.GetTexture(1), Texture(), TEST_LOCATION);
   DALI_TEST_EQUALS(textureSet.GetTexture(2), Texture(), TEST_LOCATION);
 
-  Texture texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
+  Texture texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
   textureSet.SetTexture(0u, texture);
 
   DALI_TEST_EQUALS(textureSet.GetTexture(0), texture, TEST_LOCATION);
@@ -401,7 +414,7 @@ int UtcDaliTextureSetGetTextureCount0(void)
   TextureSet textureSet = CreateTextureSet();
   DALI_TEST_EQUALS(textureSet.GetTextureCount(), 0u, TEST_LOCATION);
 
-  Texture image = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
+  Texture image = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
   textureSet.SetTexture(0u, image);
   DALI_TEST_EQUALS(textureSet.GetTextureCount(), 1u, TEST_LOCATION);
 
@@ -427,7 +440,7 @@ int UtcDaliTextureSetGetTextureCount1(void)
   TextureSet textureSet = CreateTextureSet();
   DALI_TEST_EQUALS(textureSet.GetTextureCount(), 0u, TEST_LOCATION);
 
-  Texture texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
+  Texture texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
   textureSet.SetTexture(0u, texture);
   DALI_TEST_EQUALS(textureSet.GetTextureCount(), 1u, TEST_LOCATION);
 
@@ -540,10 +553,10 @@ int UtcDaliTextureSetMultipleTextures(void)
   TextureSet textureSet = CreateTextureSet();
 
   // Set 2 textures
-  Texture texture1 = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
+  Texture texture1 = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
   textureSet.SetTexture(0u, texture1);
 
-  Texture texture2 = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
+  Texture texture2 = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
   textureSet.SetTexture(1u, texture2);
 
   Geometry geometry = CreateQuadGeometry();

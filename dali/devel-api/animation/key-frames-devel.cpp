@@ -23,7 +23,6 @@ namespace Dali
 {
 namespace DevelKeyFrames
 {
-
 std::size_t GetKeyFrameCount(KeyFrames keyFrames)
 {
   return GetImplementation(keyFrames).GetKeyFrameCount();

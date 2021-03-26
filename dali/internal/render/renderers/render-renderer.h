@@ -19,18 +19,23 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/public-api/math/matrix.h>
+#include <dali/public-api/math/vector4.h>
+#include <dali/public-api/rendering/texture-set.h>
+
+#include <dali/graphics-api/graphics-controller.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/common/blending-options.h>
+#include <dali/internal/common/const-string.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/render/data-providers/render-data-provider.h>
 #include <dali/internal/render/gl-resources/gl-resource-owner.h>
 #include <dali/internal/render/renderers/render-geometry.h>
+#include <dali/internal/render/renderers/uniform-buffer-manager.h>
+#include <dali/internal/render/shaders/program.h>
 #include <dali/internal/update/manager/render-instruction-processor.h>
-#include <dali/public-api/math/matrix.h>
-#include <dali/public-api/math/vector4.h>
-#include <dali/public-api/rendering/texture-set.h>
 
 namespace Dali
 {
@@ -38,7 +43,6 @@ namespace Internal
 {
 class Context;
 class Texture;
-class Program;
 class ProgramCache;
 
 namespace SceneGraph
@@ -52,6 +56,9 @@ class RenderInstruction; //for relfection effect
 
 namespace Render
 {
+struct ShaderCache;
+class UniformBufferManager;
+
 /**
  * Renderers are used to render meshes
  * These objects are used during RenderManager::Render(), so properties modified during
@@ -165,10 +172,17 @@ public:
   /**
    * Second-phase construction.
    * This is called when the renderer is inside render thread
-   * @param[in] context Context used by the renderer
+   * @param[in] context Context used by the renderer (To be removed)
+   * @param[in] graphicsController The graphics controller to use
    * @param[in] programCache Cache of program objects
+   * @param[in] shaderCache Cache of shaders
+   * @param[in] uniformBufferManager Uniform buffer manager
    */
-  void Initialize(Context& context, ProgramCache& programCache);
+  void Initialize(Context&                      context,
+                  Graphics::Controller&         graphicsController,
+                  ProgramCache&                 programCache,
+                  Render::ShaderCache&          shaderCache,
+                  Render::UniformBufferManager& uniformBufferManager);
 
   /**
    * Destructor
@@ -346,9 +360,8 @@ public:
 
   /**
    * Called to upload during RenderManager::Render().
-   * @param[in] context The context used for uploading
    */
-  void Upload(Context& context);
+  void Upload();
 
   /**
    * Called to render during RenderManager::Render().
@@ -373,7 +386,7 @@ public:
               const Matrix&                                        projectionMatrix,
               const Vector3&                                       size,
               bool                                                 blend,
-              Vector<GLuint>&                                      boundTextures,
+              Vector<Graphics::Texture*>&                          boundTextures,
               const Dali::Internal::SceneGraph::RenderInstruction& instruction,
               uint32_t                                             queueIndex);
 
@@ -400,6 +413,24 @@ public:
    */
   bool Updated(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider* node);
 
+  template<class T>
+  bool WriteDefaultUniform(const Graphics::UniformInfo*                       uniformInfo,
+                           Render::UniformBuffer&                             ubo,
+                           const std::vector<Graphics::UniformBufferBinding>& bindings,
+                           const T&                                           data);
+
+  template<class T>
+  void WriteUniform(Render::UniformBuffer&                             ubo,
+                    const std::vector<Graphics::UniformBufferBinding>& bindings,
+                    const Graphics::UniformInfo&                       uniformInfo,
+                    const T&                                           data);
+
+  void WriteUniform(Render::UniformBuffer&                             ubo,
+                    const std::vector<Graphics::UniformBufferBinding>& bindings,
+                    const Graphics::UniformInfo&                       uniformInfo,
+                    const void*                                        data,
+                    uint32_t                                           size);
+
 private:
   struct UniformIndexMap;
 
@@ -417,13 +448,13 @@ private:
   void SetBlending(Context& context, bool blend);
 
   /**
-   * Set the uniforms from properties according to the uniform map
+   * Builds a uniform map based on the index of the cached location in the Program.
    * @param[in] bufferIndex The index of the previous update buffer.
    * @param[in] node The node using the renderer
    * @param[in] size The size of the renderer
    * @param[in] program The shader program on which to set the uniforms.
    */
-  void SetUniforms(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider& node, const Vector3& size, Program& program);
+  void BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider& node, const Vector3& size, Program& program);
 
   /**
    * Set the program uniform in the map from the mapped property
@@ -438,28 +469,91 @@ private:
    * @param[in] context The GL context
    * @param[in] program The shader program
    * @param[in] boundTextures The textures bound for rendering
-   * @return False if create or bind failed, true if success.
    */
-  bool BindTextures(Context& context, Program& program, Vector<GLuint>& boundTextures);
+  void BindTextures(Program& program, Graphics::CommandBuffer& commandBuffer, Vector<Graphics::Texture*>& boundTextures);
+
+  /**
+   * Prepare a pipeline for this renderer
+   */
+  Graphics::UniquePtr<Graphics::Pipeline> PrepareGraphicsPipeline(
+    Program&                                             program,
+    const Dali::Internal::SceneGraph::RenderInstruction& instruction,
+    bool                                                 blend,
+    Graphics::UniquePtr<Graphics::Pipeline>&&            oldPipeline);
+
+  /**
+   * Setup and write data to the uniform buffer
+   *
+   * @param[in] bufferIndex The current buffer index
+   * @param[in] commandBuffer The command buffer to bind the uniform buffer to
+   * @param[in] node The node using this renderer
+   * @param[in] modelViewMatrix The model-view matrix.
+   * @param[in] viewMatrix The view matrix.
+   * @param[in] projectionMatrix The projection matrix.
+   * @param[in] size Size of the render item
+   * @param[in] blend If true, blending is enabled
+   * @param[in] instruction The render instruction
+   */
+  void WriteUniformBuffer(BufferIndex                          bufferIndex,
+                          Graphics::CommandBuffer&             commandBuffer,
+                          Program*                             program,
+                          const SceneGraph::RenderInstruction& instruction,
+                          const SceneGraph::NodeDataProvider&  node,
+                          const Matrix&                        modelMatrix,
+                          const Matrix&                        modelViewMatrix,
+                          const Matrix&                        viewMatrix,
+                          const Matrix&                        projectionMatrix,
+                          const Vector3&                       size);
+
+  /**
+   * @brief Fill uniform buffer at index. Writes uniforms into given memory address
+   *
+   * @param[in] instruction The render instruction
+   * @param[in,out] ubo Target uniform buffer object
+   * @param[out] outBindings output bindings vector
+   * @param[out] offset output offset of the next uniform buffer memory address
+   * @param[in] updateBufferIndex update buffer index
+   */
+  void FillUniformBuffer(Program&                                      program,
+                         const SceneGraph::RenderInstruction&          instruction,
+                         Render::UniformBuffer&                        ubo,
+                         std::vector<Graphics::UniformBufferBinding>*& outBindings,
+                         uint32_t&                                     offset,
+                         BufferIndex                                   updateBufferIndex);
 
 private:
+  Graphics::Controller*                        mGraphicsController;
   OwnerPointer<SceneGraph::RenderDataProvider> mRenderDataProvider;
 
   Context*          mContext;
   Render::Geometry* mGeometry;
 
-  ProgramCache* mProgramCache;
+  Graphics::UniquePtr<Graphics::CommandBuffer> mGraphicsCommandBuffer{};
 
+  ProgramCache*        mProgramCache{nullptr};
+  Render::ShaderCache* mShaderCache{nullptr};
+
+  Render::UniformBufferManager*               mUniformBufferManager{};
+  std::vector<Graphics::UniformBufferBinding> mUniformBufferBindings{};
+
+  Graphics::UniquePtr<Graphics::Pipeline> mGraphicsPipeline{}; ///< The graphics pipeline. (Cached implementation)
+  std::vector<Graphics::ShaderState>      mShaderStates{};
+
+  using Hash = unsigned long;
   struct UniformIndexMap
   {
-    uint32_t                 uniformIndex; ///< The index of the cached location in the Program
-    const PropertyInputImpl* propertyValue;
+    uint32_t                 uniformIndex;  ///< The index of the cached location in the Program
+    ConstString              uniformName;   ///< The uniform name
+    const PropertyInputImpl* propertyValue; ///< The property value
+    Hash                     uniformNameHash{0u};
+    Hash                     uniformNameHashNoArray{0u};
+    int32_t                  arrayIndex; ///< The array index
   };
 
   using UniformIndexMappings = Dali::Vector<UniformIndexMap>;
 
   UniformIndexMappings mUniformIndexMap;
-  Vector<GLint>        mAttributesLocation;
+  Vector<int32_t>      mAttributeLocations;
 
   uint64_t mUniformsHash;
 
@@ -473,12 +567,21 @@ private:
   FaceCullingMode::Type mFaceCullingMode : 3;          ///< The mode of face culling
   DepthWriteMode::Type  mDepthWriteMode : 3;           ///< The depth write mode
   DepthTestMode::Type   mDepthTestMode : 3;            ///< The depth test mode
-  bool                  mUpdateAttributesLocation : 1; ///< Indicates attribute locations have changed
+  bool                  mUpdateAttributeLocations : 1; ///< Indicates attribute locations have changed
   bool                  mPremultipledAlphaEnabled : 1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
   bool                  mShaderChanged : 1;            ///< Flag indicating the shader changed and uniform maps have to be updated
   bool                  mUpdated : 1;
 
   std::vector<Dali::DevelRenderer::DrawCommand> mDrawCommands; // Devel stuff
+
+  struct LegacyProgram : Graphics::ExtensionCreateInfo
+  {
+    uint32_t programId{0};
+  };
+
+  LegacyProgram mLegacyProgram; ///< The structure to pass the program ID into Graphics::PipelineCreateInfo
+
+  Graphics::UniquePtr<Render::UniformBuffer> mUniformBuffer[2]{nullptr, nullptr}; ///< The double-buffered uniform buffer
 };
 
 } // namespace Render

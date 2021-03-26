@@ -19,6 +19,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/owner-container.h>
+#include <dali/graphics-api/graphics-controller.h>
 #include <dali/integration-api/gl-abstraction.h>
 #include <dali/integration-api/gl-defines.h>
 #include <dali/internal/common/buffer-index.h>
@@ -84,12 +85,10 @@ public:
   void RemoveVertexBuffer(const Render::VertexBuffer* vertexBuffer);
 
   /**
-   * Gets the attribute locations on the shader for the attributes defined in the geometry RenderBuffers
-   * @param[out] attributeLocation The vector where the attributes locations will be stored
-   * @param[in] program The program
-   * @param[in] bufferIndex The current buffer index
+   * Get the vertex buffers
+   * @return the list of vertex buffers
    */
-  void GetAttributeLocationFromProgram(Vector<GLint>& attributeLocation, Program& program, BufferIndex bufferIndex) const;
+  const Vector<Render::VertexBuffer*>& GetVertexBuffers() const;
 
   /**
    * Called from RenderManager to notify the geometry that current rendering pass has finished.
@@ -115,24 +114,30 @@ public:
   }
 
   /**
-   * Upload the geometry if it has changed
-   * @param[in] context The GL context
+   * @return the topology of this geometry
    */
-  void Upload(Context& context);
+  Graphics::PrimitiveTopology GetTopology() const;
 
   /**
-   * Set up the attributes and perform the Draw call corresponding to the geometry type
-   * @param[in] context The GL context
+   * Upload the geometry if it has changed
+   */
+  void Upload(Graphics::Controller& graphicsController);
+
+  /**
+   * Set up the attributes and perform the Draw call corresponding to the geometry type.
+   *
+   * @param[in] context The GL context @todo remove
+   * @param[in] graphicsController The graphics controller
    * @param[in] bufferIndex The current buffer index
    * @param[in] attributeLocation The location for the attributes in the shader
    * @param[in] elementBufferOffset The index of first element to draw if index buffer bound
    * @param[in] elementBufferCount Number of elements to draw if index buffer bound, uses whole buffer when 0
+   * @return true if the draw command was issued, false otherwise
    */
-  void Draw(Context&       context,
-            BufferIndex    bufferIndex,
-            Vector<GLint>& attributeLocation,
-            uint32_t       elementBufferOffset,
-            uint32_t       elementBufferCount);
+  bool Draw(Graphics::Controller&    graphicsController,
+            Graphics::CommandBuffer& commandBuffer,
+            uint32_t                 elementBufferOffset,
+            uint32_t                 elementBufferCount);
 
 private:
   // VertexBuffers

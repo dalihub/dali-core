@@ -31,6 +31,13 @@
 
 namespace Dali
 {
+namespace Graphics
+{
+class Controller;
+class Program;
+class Reflection;
+} // namespace Graphics
+
 class Matrix;
 
 namespace Integration
@@ -97,15 +104,34 @@ public:
   };
 
   /**
+   * Indices of default uniforms
+   */
+  enum class DefaultUniformIndex
+  {
+    MODEL_MATRIX = 0,
+    MVP_MATRIX,
+    VIEW_MATRIX,
+    MODEL_VIEW_MATRIX,
+    NORMAL_MATRIX,
+    PROJECTION_MATRIX,
+    SIZE,
+    COLOR,
+
+    COUNT
+  };
+
+  /**
    * Creates a new program, or returns a copy of an existing program in the program cache
    * @param[in] cache where the programs are stored
    * @param[in] shaderData  A pointer to a data structure containing the program source
    *                        and optionally precompiled binary. If the binary is empty the program bytecode
    *                        is copied into it after compilation and linking)
+   * param[in]  gfxController Reference to valid graphics Controller object
+   * param[in]  gfxProgram Reference to vali graphics Program object
    * @param[in] modifiesGeometry True if the shader modifies geometry
    * @return pointer to the program
    */
-  static Program* New(ProgramCache& cache, Internal::ShaderDataPtr shaderData, bool modifiesGeometry);
+  static Program* New(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& gfxController, Graphics::UniquePtr<Graphics::Program>&& gfxProgram, bool modifiesGeometry);
 
   /**
    * Takes this program into use
@@ -301,14 +327,46 @@ public:
     return mViewMatrix;
   }
 
+  GLuint GetProgramId()
+  {
+    return mProgramId;
+  }
+
+  [[nodiscard]] Graphics::Program& GetGraphicsProgram() const
+  {
+    return *mGfxProgram;
+  }
+
+  /**
+   * Retrieves uniform data.
+   * The lookup tries to minimise string comparisons. Ideally, when the hashedName is known
+   * and there are no hash collisions in the reflection it's the most optimal case.
+   *
+   * @param name Name of uniform
+   * @param hashedName Hash value from name or 0 if unknown
+   * @param out Reference to output structure
+   *
+   * @return False when uniform is not found or due to hash collision the result is ambiguous
+   */
+  bool GetUniform(const std::string& name, size_t hashedName, Graphics::UniformInfo& out) const;
+
+  /**
+   * Retrievs default uniform
+   * @param[in] defaultUniformIndex index of the uniform
+   * @return Valid pointer to the UniformInfo object or nullptr
+   */
+  const Graphics::UniformInfo* GetDefaultUniform(DefaultUniformIndex defaultUniformIndex) const;
+
 private: // Implementation
   /**
    * Constructor, private so no direct instantiation
    * @param[in] cache where the programs are stored
    * @param[in] shaderData A smart pointer to a data structure containing the program source and binary
+   * @param[in] gfxProgram Graphics Program object
+   * @param[in] gfxController Reference to Graphics Controller object
    * @param[in] modifiesGeometry True if the vertex shader changes geometry
    */
-  Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, bool modifiesGeometry);
+  Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& gfxController, Graphics::UniquePtr<Graphics::Program>&& gfxProgram, bool modifiesGeometry);
 
 public:
   /**
@@ -322,49 +380,36 @@ private:
   Program& operator=(const Program&); ///< assignment operator, not defined
 
   /**
-   * Load the shader, from a precompiled binary if available, else from source code
-   */
-  void Load();
-
-  /**
-   * Unload the shader
-   */
-  void Unload();
-
-  /**
-   * Compile the shader
-   * @param shaderType vertex or fragment shader
-   * @param shaderId of the shader, returned
-   * @param src of the shader
-   * @return true if the compilation succeeded
-   */
-  bool CompileShader(GLenum shaderType, GLuint& shaderId, const char* src);
-
-  /**
-   * Links the shaders together to create program
-   */
-  void Link();
-
-  /**
-   * Frees the shader programs
-   */
-  void FreeShaders();
-
-  /**
    * Resets caches
    */
   void ResetAttribsUniformCache();
 
-private:                                         // Data
-  ProgramCache&               mCache;            ///< The program cache
-  Integration::GlAbstraction& mGlAbstraction;    ///< The OpenGL Abstraction layer
-  const Matrix*               mProjectionMatrix; ///< currently set projection matrix
-  const Matrix*               mViewMatrix;       ///< currently set view matrix
-  bool                        mLinked;           ///< whether the program is linked
-  GLuint                      mVertexShaderId;   ///< GL identifier for vertex shader
-  GLuint                      mFragmentShaderId; ///< GL identifier for fragment shader
-  GLuint                      mProgramId;        ///< GL identifier for program
-  Internal::ShaderDataPtr     mProgramData;      ///< Shader program source and binary (when compiled & linked or loaded)
+  /**
+   * Struct ReflectionUniformInfo
+   * Contains details of a single uniform buffer field and/or sampler.
+   */
+  struct ReflectionUniformInfo
+  {
+    size_t                hashValue{0};
+    bool                  hasCollision{false};
+    Graphics::UniformInfo uniformInfo{};
+  };
+
+  /**
+   * Build optimized shader reflection of uniforms
+   * @param graphicsReflection The graphics reflection
+   */
+  void BuildReflection(const Graphics::Reflection& graphicsReflection);
+
+private:                                                    // Data
+  ProgramCache&                          mCache;            ///< The program cache
+  Integration::GlAbstraction&            mGlAbstraction;    ///< The OpenGL Abstraction layer
+  const Matrix*                          mProjectionMatrix; ///< currently set projection matrix
+  const Matrix*                          mViewMatrix;       ///< currently set view matrix
+  GLuint                                 mProgramId;        ///< GL identifier for program
+  Graphics::UniquePtr<Graphics::Program> mGfxProgram;       ///< Gfx program
+  Graphics::Controller&                  mGfxController;    /// < Gfx controller
+  Internal::ShaderDataPtr                mProgramData;      ///< Shader program source and binary (when compiled & linked or loaded)
 
   // location caches
   using NameLocationPair = std::pair<ConstString, GLint>;
@@ -381,6 +426,11 @@ private:                                         // Data
   GLfloat mUniformCacheFloat4[MAX_UNIFORM_CACHE_SIZE][4]; ///< Value cache for uniforms of four floats
   Vector3 mSizeUniformCache;                              ///< Cache value for size uniform
   bool    mModifiesGeometry;                              ///< True if the program changes geometry
+
+  using UniformReflectionContainer = std::vector<ReflectionUniformInfo>;
+
+  UniformReflectionContainer mReflection{};                ///< Contains reflection build per program
+  UniformReflectionContainer mReflectionDefaultUniforms{}; ///< Contains default uniforms
 };
 
 } // namespace Internal

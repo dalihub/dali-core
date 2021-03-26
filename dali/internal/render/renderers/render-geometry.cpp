@@ -56,6 +56,11 @@ void Geometry::AddVertexBuffer(Render::VertexBuffer* vertexBuffer)
   mAttributesChanged = true;
 }
 
+const Vector<Render::VertexBuffer*>& Geometry::GetVertexBuffers() const
+{
+  return mVertexBuffers;
+}
+
 void Geometry::SetIndexBuffer(Dali::Vector<uint16_t>& indices)
 {
   mIndices.Swap(indices);
@@ -77,36 +82,13 @@ void Geometry::RemoveVertexBuffer(const Render::VertexBuffer* vertexBuffer)
   }
 }
 
-void Geometry::GetAttributeLocationFromProgram(Vector<GLint>& attributeLocation, Program& program, BufferIndex bufferIndex) const
-{
-  attributeLocation.Clear();
-
-  for(auto&& vertexBuffer : mVertexBuffers)
-  {
-    const uint32_t attributeCount = vertexBuffer->GetAttributeCount();
-    for(uint32_t j = 0; j < attributeCount; ++j)
-    {
-      auto     attributeName = vertexBuffer->GetAttributeName(j);
-      uint32_t index         = program.RegisterCustomAttribute(attributeName);
-      GLint    location      = program.GetCustomAttributeLocation(index);
-
-      if(-1 == location)
-      {
-        DALI_LOG_WARNING("Attribute not found in the shader: %s\n", attributeName.GetCString());
-      }
-
-      attributeLocation.PushBack(location);
-    }
-  }
-}
-
 void Geometry::OnRenderFinished()
 {
   mHasBeenUpdated    = false;
   mAttributesChanged = false;
 }
 
-void Geometry::Upload(Context& context)
+void Geometry::Upload(Graphics::Controller& graphicsController)
 {
   if(!mHasBeenUpdated)
   {
@@ -121,11 +103,11 @@ void Geometry::Upload(Context& context)
       {
         if(mIndexBuffer == nullptr)
         {
-          mIndexBuffer = new GpuBuffer(context);
+          mIndexBuffer = new GpuBuffer(graphicsController, 0 | Graphics::BufferUsage::INDEX_BUFFER);
         }
 
         uint32_t bufferSize = static_cast<uint32_t>(sizeof(uint16_t) * mIndices.Size());
-        mIndexBuffer->UpdateDataBuffer(context, bufferSize, &mIndices[0], GpuBuffer::STATIC_DRAW, GpuBuffer::ELEMENT_ARRAY_BUFFER);
+        mIndexBuffer->UpdateDataBuffer(graphicsController, bufferSize, &mIndices[0]);
       }
 
       mIndicesChanged = false;
@@ -133,7 +115,7 @@ void Geometry::Upload(Context& context)
 
     for(auto&& buffer : mVertexBuffers)
     {
-      if(!buffer->Update(context))
+      if(!buffer->Update(graphicsController))
       {
         //Vertex buffer is not ready ( Size, data or format has not been specified yet )
         return;
@@ -144,21 +126,39 @@ void Geometry::Upload(Context& context)
   }
 }
 
-void Geometry::Draw(
-  Context&       context,
-  BufferIndex    bufferIndex,
-  Vector<GLint>& attributeLocation,
-  uint32_t       elementBufferOffset,
-  uint32_t       elementBufferCount)
+bool Geometry::Draw(
+  Graphics::Controller&    graphicsController,
+  Graphics::CommandBuffer& commandBuffer,
+  uint32_t                 elementBufferOffset,
+  uint32_t                 elementBufferCount)
 {
   //Bind buffers to attribute locations
-  uint32_t       base              = 0u;
   const uint32_t vertexBufferCount = static_cast<uint32_t>(mVertexBuffers.Count());
+
+  std::vector<const Graphics::Buffer*> buffers;
+  std::vector<uint32_t>                offsets;
+
   for(uint32_t i = 0; i < vertexBufferCount; ++i)
   {
-    mVertexBuffers[i]->BindBuffer(context, GpuBuffer::ARRAY_BUFFER);
-    base += mVertexBuffers[i]->EnableVertexAttributes(context, attributeLocation, base);
+    const GpuBuffer* gpuBuffer = mVertexBuffers[i]->GetGpuBuffer();
+    if(gpuBuffer)
+    {
+      const Graphics::Buffer* buffer = gpuBuffer->GetGraphicsObject();
+
+      if(buffer)
+      {
+        buffers.push_back(buffer);
+        offsets.push_back(0u);
+      }
+    }
+    //@todo Figure out why this is being drawn without geometry having been uploaded
   }
+  if(buffers.size() == 0)
+  {
+    return false;
+  }
+
+  commandBuffer.BindVertexBuffers(0, buffers, offsets);
 
   uint32_t numIndices(0u);
   intptr_t firstIndexOffset(0u);
@@ -179,53 +179,17 @@ void Geometry::Draw(
     }
   }
 
-  GLenum geometryGLType(GL_NONE);
-  switch(mGeometryType)
-  {
-    case Dali::Geometry::TRIANGLES:
-    {
-      geometryGLType = GL_TRIANGLES;
-      break;
-    }
-    case Dali::Geometry::LINES:
-    {
-      geometryGLType = GL_LINES;
-      break;
-    }
-    case Dali::Geometry::POINTS:
-    {
-      geometryGLType = GL_POINTS;
-      break;
-    }
-    case Dali::Geometry::TRIANGLE_STRIP:
-    {
-      geometryGLType = GL_TRIANGLE_STRIP;
-      break;
-    }
-    case Dali::Geometry::TRIANGLE_FAN:
-    {
-      geometryGLType = GL_TRIANGLE_FAN;
-      break;
-    }
-    case Dali::Geometry::LINE_LOOP:
-    {
-      geometryGLType = GL_LINE_LOOP;
-      break;
-    }
-    case Dali::Geometry::LINE_STRIP:
-    {
-      geometryGLType = GL_LINE_STRIP;
-      break;
-    }
-  }
-
   //Draw call
-  if(mIndexBuffer && geometryGLType != GL_POINTS)
+  if(mIndexBuffer && mGeometryType != Dali::Geometry::POINTS)
   {
     //Indexed draw call
-    mIndexBuffer->Bind(context, GpuBuffer::ELEMENT_ARRAY_BUFFER);
-    // numIndices truncated, no value loss happening in practice
-    context.DrawElements(geometryGLType, static_cast<GLsizei>(numIndices), GL_UNSIGNED_SHORT, reinterpret_cast<void*>(firstIndexOffset));
+    const Graphics::Buffer* ibo = mIndexBuffer->GetGraphicsObject();
+    if(ibo)
+    {
+      commandBuffer.BindIndexBuffer(*ibo, 0, Graphics::Format::R16_UINT);
+    }
+
+    commandBuffer.DrawIndexed(numIndices, 1, firstIndexOffset, 0, 0);
   }
   else
   {
@@ -237,17 +201,54 @@ void Geometry::Draw(
       numVertices = static_cast<GLsizei>(mVertexBuffers[0]->GetElementCount());
     }
 
-    context.DrawArrays(geometryGLType, 0, numVertices);
+    commandBuffer.Draw(numVertices, 1, 0, 0);
   }
+  return true;
+}
 
-  //Disable attributes
-  for(auto&& attribute : attributeLocation)
+Graphics::PrimitiveTopology Geometry::GetTopology() const
+{
+  Graphics::PrimitiveTopology topology = Graphics::PrimitiveTopology::TRIANGLE_LIST;
+
+  switch(mGeometryType)
   {
-    if(attribute != -1)
+    case Dali::Geometry::TRIANGLES:
     {
-      context.DisableVertexAttributeArray(static_cast<GLuint>(attribute));
+      topology = Graphics::PrimitiveTopology::TRIANGLE_LIST;
+      break;
+    }
+    case Dali::Geometry::LINES:
+    {
+      topology = Graphics::PrimitiveTopology::LINE_LIST;
+      break;
+    }
+    case Dali::Geometry::POINTS:
+    {
+      topology = Graphics::PrimitiveTopology::POINT_LIST;
+      break;
+    }
+    case Dali::Geometry::TRIANGLE_STRIP:
+    {
+      topology = Graphics::PrimitiveTopology::TRIANGLE_STRIP;
+      break;
+    }
+    case Dali::Geometry::TRIANGLE_FAN:
+    {
+      topology = Graphics::PrimitiveTopology::TRIANGLE_FAN;
+      break;
+    }
+    case Dali::Geometry::LINE_LOOP:
+    {
+      topology = Graphics::PrimitiveTopology::LINE_LOOP;
+      break;
+    }
+    case Dali::Geometry::LINE_STRIP:
+    {
+      topology = Graphics::PrimitiveTopology::LINE_STRIP;
+      break;
     }
   }
+  return topology;
 }
 
 } // namespace Render

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -191,7 +191,7 @@ int UtcDaliVertexBufferSetData01(void)
     const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
       application.GetGlAbstraction().GetBufferDataCalls();
 
-    DALI_TEST_EQUALS(bufferDataCalls.size(), 1u, TEST_LOCATION);
+    DALI_TEST_EQUALS(bufferDataCalls.size(), 3u, TEST_LOCATION);
 
     DALI_TEST_EQUALS(bufferDataCalls[0], sizeof(texturedQuadVertexData), TEST_LOCATION);
   }
@@ -238,15 +238,13 @@ int UtcDaliVertexBufferSetData02(void)
   application.GetScene().Add(actor);
 
   application.SendNotification();
-  application.Render(0);
   application.Render();
-  application.SendNotification();
 
   {
     const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
       application.GetGlAbstraction().GetBufferDataCalls();
 
-    DALI_TEST_EQUALS(bufferDataCalls.size(), 1u, TEST_LOCATION);
+    DALI_TEST_EQUALS(bufferDataCalls.size(), 2u, TEST_LOCATION);
 
     DALI_TEST_EQUALS(bufferDataCalls[0], sizeof(texturedQuadVertexData), TEST_LOCATION);
   }
@@ -256,8 +254,6 @@ int UtcDaliVertexBufferSetData02(void)
 
   application.SendNotification();
   application.Render(0);
-  application.Render();
-  application.SendNotification();
 
   {
     const TestGlAbstraction::BufferSubDataCalls& bufferSubDataCalls =
@@ -266,8 +262,9 @@ int UtcDaliVertexBufferSetData02(void)
     const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
       application.GetGlAbstraction().GetBufferDataCalls();
 
-    DALI_TEST_EQUALS(bufferSubDataCalls.size(), 1u, TEST_LOCATION);
-    DALI_TEST_EQUALS(bufferDataCalls.size(), 1u, TEST_LOCATION);
+    // test below includes updates of uniform buffers
+    DALI_TEST_EQUALS(bufferSubDataCalls.size(), 17u, TEST_LOCATION);
+    DALI_TEST_EQUALS(bufferDataCalls.size(), 3u, TEST_LOCATION);
 
     if(bufferSubDataCalls.size())
     {

@@ -22,6 +22,7 @@
 #include <string>
 
 // INTERNAL INCLUDES
+#include <dali/graphics-api/graphics-types.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/rendering/shader.h> // ShaderHints
@@ -32,6 +33,20 @@ namespace Internal
 {
 class ShaderData;
 using ShaderDataPtr = IntrusivePtr<ShaderData>;
+
+namespace
+{
+static const std::vector<char> emptyShader;
+
+inline std::vector<char> StringToVector(const std::string& str)
+{
+  auto retval = std::vector<char>{};
+  retval.insert(retval.begin(), str.begin(), str.end());
+  retval.push_back('\0');
+  return retval;
+}
+
+} // namespace
 
 /**
  * ShaderData class.
@@ -44,12 +59,29 @@ public:
    * Constructor
    * @param[in] vertexSource   Source code for vertex program
    * @param[in] fragmentSource Source code for fragment program
+   * @param[in] hints          Hints for rendering
    */
   ShaderData(std::string vertexSource, std::string fragmentSource, const Dali::Shader::Hint::Value hints)
   : mShaderHash(-1),
-    mVertexShader(std::move(vertexSource)),
-    mFragmentShader(std::move(fragmentSource)),
-    mHints(hints)
+    mVertexShader(StringToVector(vertexSource)),
+    mFragmentShader(StringToVector(fragmentSource)),
+    mHints(hints),
+    mSourceMode(Graphics::ShaderSourceMode::TEXT)
+  {
+  }
+
+  /**
+   * Creates a shader data containing binary content
+   * @param[in] vertexSource   Source code for vertex program
+   * @param[in] fragmentSource Source code for fragment program
+   * @param[in] hints          Hints for rendering
+   */
+  ShaderData(std::vector<char>& vertexSource, std::vector<char>& fragmentSource, const Dali::Shader::Hint::Value hints)
+  : mShaderHash(-1),
+    mVertexShader(vertexSource),
+    mFragmentShader(fragmentSource),
+    mHints(hints),
+    mSourceMode(Graphics::ShaderSourceMode::BINARY)
   {
   }
 
@@ -89,7 +121,7 @@ public: // API
    */
   const char* GetVertexShader() const
   {
-    return mVertexShader.c_str();
+    return &mVertexShader[0];
   }
 
   /**
@@ -97,7 +129,29 @@ public: // API
    */
   const char* GetFragmentShader() const
   {
-    return mFragmentShader.c_str();
+    return &mFragmentShader[0];
+  }
+
+  /**
+   * Returns a std::vector containing the shader code associated with particular pipeline stage
+   * @param[in] the graphics pipeline stage
+   * @return the shader code
+   */
+  const std::vector<char>& GetShaderForPipelineStage(Graphics::PipelineStage stage) const
+  {
+    if(stage == Graphics::PipelineStage::VERTEX_SHADER)
+    {
+      return mVertexShader;
+    }
+    else if(stage == Graphics::PipelineStage::FRAGMENT_SHADER)
+    {
+      return mFragmentShader;
+    }
+    else
+    {
+      //      DALI_LOG_ERROR("Unsupported shader stage\n");
+      return emptyShader;
+    }
   }
 
   /**
@@ -153,16 +207,26 @@ public: // API
     return mBuffer;
   }
 
+  /**
+   * Get the source mode of shader data
+   * @return the source mode of shader data ( text or binary )
+   */
+  Graphics::ShaderSourceMode GetSourceMode() const
+  {
+    return mSourceMode;
+  }
+
 private:                                        // Not implemented
   ShaderData(const ShaderData& other);          ///< no copying of this object
   ShaderData& operator=(const ShaderData& rhs); ///< no copying of this object
 
-private:                                     // Data
-  std::size_t               mShaderHash;     ///< hash key created with vertex and fragment shader code
-  std::string               mVertexShader;   ///< source code for vertex program
-  std::string               mFragmentShader; ///< source code for fragment program
-  Dali::Shader::Hint::Value mHints;          ///< take a hint
-  Dali::Vector<uint8_t>     mBuffer;         ///< buffer containing compiled binary bytecode
+private:                                      // Data
+  std::size_t                mShaderHash;     ///< hash key created with vertex and fragment shader code
+  std::vector<char>          mVertexShader;   ///< source code for vertex program
+  std::vector<char>          mFragmentShader; ///< source code for fragment program
+  Dali::Shader::Hint::Value  mHints;          ///< take a hint
+  Dali::Vector<uint8_t>      mBuffer;         ///< buffer containing compiled binary bytecode
+  Graphics::ShaderSourceMode mSourceMode;     ///< Source mode of shader data ( text or binary )
 };
 
 } // namespace Internal

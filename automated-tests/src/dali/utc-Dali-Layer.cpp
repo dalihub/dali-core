@@ -765,7 +765,9 @@ int UtcDaliLayer3DSort(void)
   application.Render();
   enabledDisableTrace.Enable(false);
 
-  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Enable", "2929")); // 2929 is GL_DEPTH_TEST
+  std::ostringstream depth;
+  depth << std::hex << GL_DEPTH_TEST;
+  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Enable", depth.str()));
 
   END_TEST;
 }
