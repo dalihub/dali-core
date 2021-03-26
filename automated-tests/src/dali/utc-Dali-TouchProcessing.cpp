@@ -2170,7 +2170,7 @@ int UtcDaliTouchArea(void)
   application.Render();
 
   // Emit a down signal
-  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(110.0f, 110.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(150.0f, 150.0f)));
   // The actor touched signal is called because the touch area is inside touchArea.
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(PointState::DOWN, data.receivedTouch.points[0].state, TEST_LOCATION);
