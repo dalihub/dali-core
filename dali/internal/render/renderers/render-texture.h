@@ -130,6 +130,28 @@ public:
   {
     return static_cast<bool>(mNativeImage);
   }
+  /**
+   * Set the updated flag.
+   * @param[in] updated The updated flag
+   */
+  void SetUpdated(bool updated)
+  {
+    mUpdated = updated;
+  }
+
+  /**
+   * Check if the texture is updated
+   * @return True if the texture is updated
+   */
+  [[nodiscard]] bool Updated()
+  {
+    if(mUpdated || IsNativeImage())
+    {
+      mUpdated = false; ///< 2023-06-07 tizen_7.0 branch only logic
+      return true;
+    }
+    return false;
+  }
 
 private:
   /**
@@ -150,6 +172,7 @@ private:
   uint16_t      mHeight;       ///< Height of the texture
   Type          mType : 3;     ///< Type of the texture
   bool          mHasAlpha : 1; ///< Whether the format has an alpha channel
+  bool          mUpdated : 1;  ///< Whether the texture is updated
 };
 
 } // namespace Render

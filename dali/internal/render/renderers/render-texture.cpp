@@ -214,7 +214,8 @@ Texture::Texture(Type type, Pixel::Format format, ImageDimensions size)
   mWidth(size.GetWidth()),
   mHeight(size.GetHeight()),
   mType(type),
-  mHasAlpha(HasAlpha(format))
+  mHasAlpha(HasAlpha(format)),
+  mUpdated(true)
 {
 }
 
@@ -227,7 +228,8 @@ Texture::Texture(NativeImageInterfacePtr nativeImageInterface)
   mWidth(static_cast<uint16_t>(nativeImageInterface->GetWidth())),   // ignoring overflow, not happening in practice
   mHeight(static_cast<uint16_t>(nativeImageInterface->GetHeight())), // ignoring overflow, not happening in practice
   mType(TextureType::TEXTURE_2D),
-  mHasAlpha(nativeImageInterface->RequiresBlending())
+  mHasAlpha(nativeImageInterface->RequiresBlending()),
+  mUpdated(true)
 {
 }
 
@@ -345,6 +347,8 @@ void Texture::Upload(PixelDataPtr pixelData, const Internal::Texture::UploadPara
   updateSourceInfo.memorySource.memory = pixelData->GetBuffer();
 
   mGraphicsController->UpdateTextures({info}, {updateSourceInfo});
+
+  SetUpdated(true);
 }
 
 bool Texture::HasAlphaChannel() const

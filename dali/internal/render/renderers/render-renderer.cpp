@@ -905,7 +905,7 @@ bool Renderer::Updated(BufferIndex bufferIndex, const SceneGraph::NodeDataProvid
     for(auto iter = textures->Begin(), end = textures->End(); iter < end; ++iter)
     {
       auto texture = *iter;
-      if(texture && texture->IsNativeImage())
+      if(texture && texture->Updated())
       {
         return true;
       }

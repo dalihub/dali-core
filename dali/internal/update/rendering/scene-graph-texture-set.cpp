@@ -68,6 +68,11 @@ void TextureSet::SetSampler(uint32_t index, Render::Sampler* sampler)
   }
 
   mSamplers[index] = sampler;
+
+  if(index < static_cast<uint32_t>(mTextures.Size()) && mTextures[index])
+  {
+    mTextures[index]->SetUpdated(true);
+  }
 }
 
 void TextureSet::SetTexture(uint32_t index, Render::Texture* texture)
@@ -99,6 +104,7 @@ void TextureSet::SetTexture(uint32_t index, Render::Texture* texture)
   if(texture)
   {
     mHasAlpha |= texture->HasAlphaChannel();
+    texture->SetUpdated(true);
   }
 }
 
