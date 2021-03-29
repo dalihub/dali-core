@@ -20,6 +20,8 @@
 #include "test-graphics-command-buffer.h"
 #include "test-graphics-framebuffer.h"
 #include "test-graphics-reflection.h"
+#include "test-graphics-render-pass.h"
+#include "test-graphics-render-target.h"
 #include "test-graphics-sampler.h"
 #include "test-graphics-shader.h"
 #include "test-graphics-texture.h"
@@ -465,206 +467,302 @@ void TestGraphicsController::SubmitCommandBuffers(const Graphics::SubmitInfo& su
   for(auto& graphicsCommandBuffer : submitInfo.cmdBuffer)
   {
     auto commandBuffer = Uncast<TestGraphicsCommandBuffer>(graphicsCommandBuffer);
+    ProcessCommandBuffer(*commandBuffer);
+  }
+}
 
-    // Change framebuffer
-    auto bindPipelineCmds = commandBuffer->GetCommandsByType(0 | CommandType::BIND_PIPELINE);
-    if(!bindPipelineCmds.empty())
-    {
-      auto pipeline    = bindPipelineCmds[0]->data.bindPipeline.pipeline;
-      auto framebuffer = pipeline->framebufferState.framebuffer;
-      if(framebuffer)
-      {
-        auto graphicsFramebuffer = Uncast<TestGraphicsFramebuffer>(framebuffer);
-        graphicsFramebuffer->Bind();
-      }
-      else
-      {
-        mGl.BindFramebuffer(GL_FRAMEBUFFER, 0);
-      }
-    }
+void TestGraphicsController::ProcessCommandBuffer(TestGraphicsCommandBuffer& commandBuffer)
+{
+  bool                     scissorEnabled = false;
+  TestGraphicsFramebuffer* currentFramebuffer{nullptr};
+  TestGraphicsPipeline*    currentPipeline{nullptr};
 
-    auto value = commandBuffer->GetCommandsByType(0 | CommandType::BIND_TEXTURES);
-    if(!value.empty())
+  for(auto& cmd : commandBuffer.GetCommands())
+  {
+    // process command
+    switch(cmd.type)
     {
-      // must be fixed
-      for(auto& binding : value[0]->data.bindTextures.textureBindings)
+      case CommandType::FLUSH:
       {
-        if(binding.texture)
+        // Nothing to do here
+        break;
+      }
+      case CommandType::BIND_TEXTURES:
+      {
+        for(auto& binding : cmd.data.bindTextures.textureBindings)
         {
-          auto texture = Uncast<TestGraphicsTexture>(binding.texture);
-
-          texture->Bind(binding.binding);
-
-          if(binding.sampler)
+          if(binding.texture)
           {
-            auto sampler = Uncast<TestGraphicsSampler>(binding.sampler);
-            if(sampler)
+            auto texture = Uncast<TestGraphicsTexture>(binding.texture);
+            texture->Bind(binding.binding);
+
+            if(binding.sampler)
             {
-              sampler->Apply(texture->GetTarget());
+              auto sampler = Uncast<TestGraphicsSampler>(binding.sampler);
+              if(sampler)
+              {
+                sampler->Apply(texture->GetTarget());
+              }
             }
+
+            texture->Prepare(); // Ensure native texture is ready
           }
-
-          texture->Prepare(); // Ensure native texture is ready
         }
+        break;
       }
-    }
-
-    // IndexBuffer binding,
-    auto bindIndexBufferCmds = commandBuffer->GetCommandsByType(0 | CommandType::BIND_INDEX_BUFFER);
-    if(!bindIndexBufferCmds.empty())
-    {
-      auto& indexBufferBinding = bindIndexBufferCmds[0]->data.bindIndexBuffer;
-      if(indexBufferBinding.buffer)
+      case CommandType::BIND_VERTEX_BUFFERS:
       {
-        auto buffer = Uncast<TestGraphicsBuffer>(indexBufferBinding.buffer);
-        buffer->Bind();
-      }
-    }
-
-    // VertexBuffer binding,
-    auto bindVertexBufferCmds = commandBuffer->GetCommandsByType(0 | CommandType::BIND_VERTEX_BUFFERS);
-    if(!bindVertexBufferCmds.empty())
-    {
-      for(auto& binding : bindVertexBufferCmds[0]->data.bindVertexBuffers.vertexBufferBindings)
-      {
-        auto graphicsBuffer = binding.buffer;
-        auto vertexBuffer   = Uncast<TestGraphicsBuffer>(graphicsBuffer);
-        vertexBuffer->Bind();
-      }
-    }
-
-    bool scissorEnabled = false;
-
-    auto scissorTestList = commandBuffer->GetCommandsByType(0 | CommandType::SET_SCISSOR_TEST);
-    if(!scissorTestList.empty())
-    {
-      if(scissorTestList[0]->data.scissorTest.enable)
-      {
-        mGl.Enable(GL_SCISSOR_TEST);
-        scissorEnabled = true;
-      }
-      else
-      {
-        mGl.Disable(GL_SCISSOR_TEST);
-      }
-    }
-
-    auto scissorList = commandBuffer->GetCommandsByType(0 | CommandType::SET_SCISSOR);
-    if(!scissorList.empty() && scissorEnabled)
-    {
-      auto& rect = scissorList[0]->data.scissor.region;
-      mGl.Scissor(rect.x, rect.y, rect.width, rect.height);
-    }
-
-    auto viewportList = commandBuffer->GetCommandsByType(0 | CommandType::SET_VIEWPORT);
-    if(!viewportList.empty())
-    {
-      mGl.Viewport(viewportList[0]->data.viewport.region.x, viewportList[0]->data.viewport.region.y, viewportList[0]->data.viewport.region.width, viewportList[0]->data.viewport.region.height);
-    }
-
-    // ignore viewport enable
-
-    // Pipeline attribute setup
-    if(!bindPipelineCmds.empty())
-    {
-      auto  pipeline = bindPipelineCmds[0]->data.bindPipeline.pipeline;
-      auto& vi       = pipeline->vertexInputState;
-      for(auto& attribute : vi.attributes)
-      {
-        mGl.EnableVertexAttribArray(attribute.location);
-        uint32_t attributeOffset = attribute.offset;
-        GLsizei  stride          = vi.bufferBindings[attribute.binding].stride;
-
-        mGl.VertexAttribPointer(attribute.location,
-                                GetNumComponents(attribute.format),
-                                GetGlType(attribute.format),
-                                GL_FALSE, // Not normalized
-                                stride,
-                                reinterpret_cast<void*>(attributeOffset));
-      }
-
-      // Cull face setup
-      auto& rasterizationState = pipeline->rasterizationState;
-      if(rasterizationState.cullMode == Graphics::CullMode::NONE)
-      {
-        mGl.Disable(GL_CULL_FACE);
-      }
-      else
-      {
-        mGl.Enable(GL_CULL_FACE);
-        mGl.CullFace(GetCullFace(rasterizationState.cullMode));
-      }
-
-      mGl.FrontFace(GetFrontFace(rasterizationState.frontFace));
-      // We don't modify glPolygonMode in our context/abstraction from GL_FILL (the GL default),
-      // so it isn't present in the API (and won't have any tests!)
-
-      // Blending setup
-      auto& colorBlendState = pipeline->colorBlendState;
-      if(colorBlendState.blendEnable)
-      {
-        mGl.Enable(GL_BLEND);
-
-        mGl.BlendFuncSeparate(GetBlendFactor(colorBlendState.srcColorBlendFactor),
-                              GetBlendFactor(colorBlendState.dstColorBlendFactor),
-                              GetBlendFactor(colorBlendState.srcAlphaBlendFactor),
-                              GetBlendFactor(colorBlendState.dstAlphaBlendFactor));
-        if(colorBlendState.colorBlendOp != colorBlendState.alphaBlendOp)
+        for(auto& binding : cmd.data.bindVertexBuffers.vertexBufferBindings)
         {
-          mGl.BlendEquationSeparate(GetBlendOp(colorBlendState.colorBlendOp), GetBlendOp(colorBlendState.alphaBlendOp));
+          auto graphicsBuffer = binding.buffer;
+          auto vertexBuffer   = Uncast<TestGraphicsBuffer>(graphicsBuffer);
+          vertexBuffer->Bind();
         }
-        else
+        break;
+      }
+      case CommandType::BIND_INDEX_BUFFER:
+      {
+        auto& indexBufferBinding = cmd.data.bindIndexBuffer;
+        if(indexBufferBinding.buffer)
         {
-          mGl.BlendEquation(GetBlendOp(colorBlendState.colorBlendOp));
+          auto buffer = Uncast<TestGraphicsBuffer>(indexBufferBinding.buffer);
+          buffer->Bind();
         }
-        mGl.BlendColor(colorBlendState.blendConstants[0],
-                       colorBlendState.blendConstants[1],
-                       colorBlendState.blendConstants[2],
-                       colorBlendState.blendConstants[3]);
+        break;
       }
-      else
+      case CommandType::BIND_UNIFORM_BUFFER:
       {
-        mGl.Disable(GL_BLEND);
-      }
-
-      // draw call
-      auto topology = pipeline->inputAssemblyState.topology;
-
-      // UniformBuffer binding (once we know pipeline)
-      auto bindUniformBuffersCmds = commandBuffer->GetCommandsByType(0 | CommandType::BIND_UNIFORM_BUFFER);
-      if(!bindUniformBuffersCmds.empty())
-      {
-        auto buffer = bindUniformBuffersCmds[0]->data.bindUniformBuffers.standaloneUniformsBufferBinding;
+        auto& bindings = cmd.data.bindUniformBuffers;
+        auto  buffer   = bindings.standaloneUniformsBufferBinding;
 
         // based on reflection, issue gl calls
-        buffer.buffer->BindAsUniformBuffer(static_cast<const TestGraphicsProgram*>(pipeline->programState.program));
+        buffer.buffer->BindAsUniformBuffer(static_cast<const TestGraphicsProgram*>(currentPipeline->programState.program));
+        break;
       }
-
-      auto drawCmds = commandBuffer->GetCommandsByType(0 |
-                                                       CommandType::DRAW |
-                                                       CommandType::DRAW_INDEXED_INDIRECT |
-                                                       CommandType::DRAW_INDEXED);
-
-      if(!drawCmds.empty())
+      case CommandType::BIND_SAMPLERS:
       {
-        if(drawCmds[0]->data.draw.type == DrawCallDescriptor::Type::DRAW_INDEXED)
+        break;
+      }
+      case CommandType::BIND_PIPELINE:
+      {
+        currentPipeline = Uncast<TestGraphicsPipeline>(cmd.data.bindPipeline.pipeline);
+
+        // Bind framebuffer if different. @todo Move to RenderPass
+        auto framebuffer = currentPipeline->framebufferState.framebuffer;
+        if(framebuffer && framebuffer != currentFramebuffer)
         {
-          mGl.DrawElements(GetTopology(topology),
-                           static_cast<GLsizei>(drawCmds[0]->data.draw.drawIndexed.indexCount),
-                           GL_UNSIGNED_SHORT,
-                           reinterpret_cast<void*>(drawCmds[0]->data.draw.drawIndexed.firstIndex));
+          auto graphicsFramebuffer = Uncast<TestGraphicsFramebuffer>(framebuffer);
+          graphicsFramebuffer->Bind();
         }
         else
         {
-          mGl.DrawArrays(GetTopology(topology), 0, drawCmds[0]->data.draw.draw.vertexCount);
+          if(currentFramebuffer)
+            currentFramebuffer->Bind();
+          else
+            mGl.BindFramebuffer(GL_FRAMEBUFFER, 0);
         }
+        BindPipeline(currentPipeline);
+        break;
       }
-      // attribute clear
-      for(auto& attribute : vi.attributes)
+      case CommandType::DRAW:
       {
-        mGl.DisableVertexAttribArray(attribute.location);
+        mGl.DrawArrays(GetTopology(currentPipeline->inputAssemblyState.topology),
+                       0,
+                       cmd.data.draw.draw.vertexCount);
+        break;
+      }
+      case CommandType::DRAW_INDEXED:
+      {
+        mGl.DrawElements(GetTopology(currentPipeline->inputAssemblyState.topology),
+                         static_cast<GLsizei>(cmd.data.draw.drawIndexed.indexCount),
+                         GL_UNSIGNED_SHORT,
+                         reinterpret_cast<void*>(cmd.data.draw.drawIndexed.firstIndex));
+        break;
+      }
+      case CommandType::DRAW_INDEXED_INDIRECT:
+      {
+        mGl.DrawElements(GetTopology(currentPipeline->inputAssemblyState.topology),
+                         static_cast<GLsizei>(cmd.data.draw.drawIndexed.indexCount),
+                         GL_UNSIGNED_SHORT,
+                         reinterpret_cast<void*>(cmd.data.draw.drawIndexed.firstIndex));
+        break;
+      }
+      case CommandType::SET_SCISSOR:
+      {
+        if(scissorEnabled)
+        {
+          auto& rect = cmd.data.scissor.region;
+          mGl.Scissor(rect.x, rect.y, rect.width, rect.height);
+        }
+        break;
+      }
+      case CommandType::SET_SCISSOR_TEST:
+      {
+        if(cmd.data.scissorTest.enable)
+        {
+          mGl.Enable(GL_SCISSOR_TEST);
+          scissorEnabled = true;
+        }
+        else
+        {
+          mGl.Disable(GL_SCISSOR_TEST);
+          scissorEnabled = false;
+        }
+        break;
+      }
+      case CommandType::SET_VIEWPORT_TEST:
+      {
+        break;
+      }
+      case CommandType::SET_VIEWPORT: // @todo Consider correcting for orientation here?
+      {
+        auto& rect = cmd.data.viewport.region;
+        mGl.Viewport(rect.x, rect.y, rect.width, rect.height);
+        break;
+      }
+      case CommandType::EXECUTE_COMMAND_BUFFERS:
+      {
+        // Process secondary command buffers
+        for(auto& buf : cmd.data.executeCommandBuffers.buffers)
+        {
+          ProcessCommandBuffer(*static_cast<TestGraphicsCommandBuffer*>(buf));
+        }
+        break;
+      }
+      case CommandType::BEGIN_RENDER_PASS:
+      {
+        auto renderTarget = Uncast<TestGraphicsRenderTarget>(cmd.data.beginRenderPass.renderTarget);
+
+        if(renderTarget)
+        {
+          auto fb = renderTarget->mCreateInfo.framebuffer;
+          if(fb)
+          {
+            if(currentFramebuffer != fb)
+            {
+              currentFramebuffer = Uncast<TestGraphicsFramebuffer>(fb);
+              currentFramebuffer->Bind();
+            }
+          }
+          else
+          {
+            mGl.BindFramebuffer(GL_FRAMEBUFFER, 0);
+          }
+        }
+        else
+        {
+          mGl.BindFramebuffer(GL_FRAMEBUFFER, 0);
+        }
+
+        auto& clearValues = cmd.data.beginRenderPass.clearValues;
+        if(clearValues.size() > 0)
+        {
+          const auto renderPass = static_cast<TestGraphicsRenderPass*>(cmd.data.beginRenderPass.renderPass);
+          if(renderPass)
+          {
+            const auto& color0 = renderPass->attachments[0];
+            GLuint      mask   = 0;
+            if(color0.loadOp == Graphics::AttachmentLoadOp::CLEAR)
+            {
+              mask |= GL_COLOR_BUFFER_BIT;
+
+              // Set clear color (todo: cache it!)
+              // Something goes wrong here if Alpha mask is GL_TRUE
+              mGl.ColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_FALSE);
+              mGl.ClearColor(clearValues[0].color.r,
+                             clearValues[0].color.g,
+                             clearValues[0].color.b,
+                             clearValues[0].color.a);
+            }
+
+            // check for depth stencil
+            if(renderPass->attachments.size() > 1)
+            {
+              const auto& depthStencil = renderPass->attachments.back();
+              if(depthStencil.loadOp == Graphics::AttachmentLoadOp::CLEAR)
+              {
+                mask |= GL_DEPTH_BUFFER_BIT;
+              }
+              if(depthStencil.stencilLoadOp == Graphics::AttachmentLoadOp::CLEAR)
+              {
+                mask |= GL_STENCIL_BUFFER_BIT;
+              }
+            }
+
+            mGl.Clear(mask);
+          }
+          else
+          {
+            DALI_ASSERT_DEBUG(0 && "BeginRenderPass has no render pass");
+          }
+        }
+        break;
+      }
+      case CommandType::END_RENDER_PASS:
+      {
+        break;
       }
     }
+  }
+}
+
+void TestGraphicsController::BindPipeline(TestGraphicsPipeline* pipeline)
+{
+  auto& vi = pipeline->vertexInputState;
+  for(auto& attribute : vi.attributes)
+  {
+    mGl.EnableVertexAttribArray(attribute.location);
+    uint32_t attributeOffset = attribute.offset;
+    GLsizei  stride          = vi.bufferBindings[attribute.binding].stride;
+
+    mGl.VertexAttribPointer(attribute.location,
+                            GetNumComponents(attribute.format),
+                            GetGlType(attribute.format),
+                            GL_FALSE, // Not normalized
+                            stride,
+                            reinterpret_cast<void*>(attributeOffset));
+  }
+
+  // Cull face setup
+  auto& rasterizationState = pipeline->rasterizationState;
+  if(rasterizationState.cullMode == Graphics::CullMode::NONE)
+  {
+    mGl.Disable(GL_CULL_FACE);
+  }
+  else
+  {
+    mGl.Enable(GL_CULL_FACE);
+    mGl.CullFace(GetCullFace(rasterizationState.cullMode));
+  }
+
+  mGl.FrontFace(GetFrontFace(rasterizationState.frontFace));
+
+  // Blending setup
+  auto& colorBlendState = pipeline->colorBlendState;
+  if(colorBlendState.blendEnable)
+  {
+    mGl.Enable(GL_BLEND);
+
+    mGl.BlendFuncSeparate(GetBlendFactor(colorBlendState.srcColorBlendFactor),
+                          GetBlendFactor(colorBlendState.dstColorBlendFactor),
+                          GetBlendFactor(colorBlendState.srcAlphaBlendFactor),
+                          GetBlendFactor(colorBlendState.dstAlphaBlendFactor));
+    if(colorBlendState.colorBlendOp != colorBlendState.alphaBlendOp)
+    {
+      mGl.BlendEquationSeparate(GetBlendOp(colorBlendState.colorBlendOp), GetBlendOp(colorBlendState.alphaBlendOp));
+    }
+    else
+    {
+      mGl.BlendEquation(GetBlendOp(colorBlendState.colorBlendOp));
+    }
+    mGl.BlendColor(colorBlendState.blendConstants[0],
+                   colorBlendState.blendConstants[1],
+                   colorBlendState.blendConstants[2],
+                   colorBlendState.blendConstants[3]);
+  }
+  else
+  {
+    mGl.Disable(GL_BLEND);
   }
 }
 
@@ -791,7 +889,7 @@ Graphics::UniquePtr<Graphics::CommandBuffer> TestGraphicsController::CreateComma
 Graphics::UniquePtr<Graphics::RenderPass> TestGraphicsController::CreateRenderPass(const Graphics::RenderPassCreateInfo& renderPassCreateInfo, Graphics::UniquePtr<Graphics::RenderPass>&& oldRenderPass)
 {
   mCallStack.PushCall("CreateRenderPass", "");
-  return nullptr;
+  return Graphics::MakeUnique<TestGraphicsRenderPass>(mGl, renderPassCreateInfo);
 }
 
 Graphics::UniquePtr<Graphics::Texture> TestGraphicsController::CreateTexture(const Graphics::TextureCreateInfo& textureCreateInfo, Graphics::UniquePtr<Graphics::Texture>&& oldTexture)
@@ -875,7 +973,7 @@ Graphics::UniquePtr<Graphics::Sampler> TestGraphicsController::CreateSampler(con
 Graphics::UniquePtr<Graphics::RenderTarget> TestGraphicsController::CreateRenderTarget(const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo, Graphics::UniquePtr<Graphics::RenderTarget>&& oldRenderTarget)
 {
   mCallStack.PushCall("CreateRenderTarget", "");
-  return nullptr;
+  return Graphics::MakeUnique<TestGraphicsRenderTarget>(mGl, renderTargetCreateInfo);
 }
 
 Graphics::UniquePtr<Graphics::Memory> TestGraphicsController::MapBufferRange(const Graphics::MapBufferInfo& mapInfo)

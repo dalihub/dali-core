@@ -18,6 +18,7 @@
 #include <dali/internal/render/renderers/render-frame-buffer.h>
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
 #include <dali/internal/render/renderers/render-texture.h>
 
 namespace Dali
@@ -88,63 +89,79 @@ void FrameBuffer::AttachDepthStencilTexture(Render::Texture* texture, uint32_t m
   }
 }
 
-void FrameBuffer::Bind()
+bool FrameBuffer::CreateGraphicsObjects()
 {
+  bool created = false;
+
   if(!mGraphicsObject)
   {
-    mGraphicsObject = mGraphicsController->CreateFramebuffer(mCreateInfo, std::move(mGraphicsObject));
-
-    // Create render target
-    Graphics::RenderTargetCreateInfo rtInfo{};
-    rtInfo
-      .SetFramebuffer( mGraphicsObject.get() )
-      .SetExtent( {mWidth, mHeight} )
-      .SetPreTransform( 0 | Graphics::RenderTargetTransformFlagBits::TRANSFORM_IDENTITY_BIT );
-    mRenderTarget = mGraphicsController->CreateRenderTarget( rtInfo, std::move(mRenderTarget) );
-
-    std::vector<Graphics::AttachmentDescription> attachmentDescriptions;
-
-    // Default behaviour for color attachments is to CLEAR and STORE
-    //@todo Ideally, we should create new render pass whenever
-    //      the loadop, storeop changes and the list of such renderpasses
-    //      should be managed accordingly (as in Vulkan)
-    mClearValues.clear();
-    for(auto& att: mCreateInfo.colorAttachments )
+    // Only create a graphics object if there are attachments for it to render into
+    if(mCreateInfo.colorAttachments.empty() &&
+       mCreateInfo.depthStencilAttachment.depthTexture == nullptr &&
+       mCreateInfo.depthStencilAttachment.stencilTexture == nullptr)
     {
-      if(att.texture)
+      DALI_LOG_ERROR("Attempting to bind a framebuffer with no attachments\n");
+    }
+    else
+    {
+      mGraphicsObject = mGraphicsController->CreateFramebuffer(mCreateInfo, std::move(mGraphicsObject));
+
+      // Create render target
+      Graphics::RenderTargetCreateInfo rtInfo{};
+      rtInfo
+        .SetFramebuffer(mGraphicsObject.get())
+        .SetExtent({mWidth, mHeight})
+        .SetPreTransform(0 | Graphics::RenderTargetTransformFlagBits::TRANSFORM_IDENTITY_BIT);
+      mRenderTarget = mGraphicsController->CreateRenderTarget(rtInfo, std::move(mRenderTarget));
+
+      std::vector<Graphics::AttachmentDescription> attachmentDescriptions;
+
+      // Default behaviour for color attachments is to CLEAR and STORE
+      //@todo Ideally, we should create new render pass whenever
+      //      the loadop, storeop changes and the list of such renderpasses
+      //      should be managed accordingly (as in Vulkan)
+      mClearValues.clear();
+      for(auto& attachments : mCreateInfo.colorAttachments)
       {
-        Graphics::AttachmentDescription desc{};
-        desc.SetLoadOp(Graphics::AttachmentLoadOp::CLEAR);
-        desc.SetStoreOp(Graphics::AttachmentStoreOp::STORE);
-        attachmentDescriptions.push_back(desc);
+        if(attachments.texture)
+        {
+          Graphics::AttachmentDescription desc{};
+          desc.SetLoadOp(Graphics::AttachmentLoadOp::CLEAR);
+          desc.SetStoreOp(Graphics::AttachmentStoreOp::STORE);
+          attachmentDescriptions.push_back(desc);
+          mClearValues.emplace_back();
+        }
+      }
+
+      if(mCreateInfo.depthStencilAttachment.depthTexture || mCreateInfo.depthStencilAttachment.stencilTexture)
+      {
+        Graphics::AttachmentDescription depthStencilDesc{};
+        depthStencilDesc.SetStencilLoadOp(Graphics::AttachmentLoadOp::CLEAR)
+          .SetStoreOp(Graphics::AttachmentStoreOp::DONT_CARE);
+
+        if(mCreateInfo.depthStencilAttachment.stencilTexture)
+        {
+          depthStencilDesc.SetStencilLoadOp(Graphics::AttachmentLoadOp::CLEAR)
+            .SetStoreOp(Graphics::AttachmentStoreOp::DONT_CARE);
+        }
         mClearValues.emplace_back();
+        attachmentDescriptions.push_back(depthStencilDesc);
       }
+
+      Graphics::RenderPassCreateInfo rpInfo{};
+      rpInfo.SetAttachments(attachmentDescriptions);
+
+      // Add default render pass (loadOp = clear)
+      mRenderPass.emplace_back(mGraphicsController->CreateRenderPass(rpInfo, nullptr));
+
+      // Add default render pass (loadOp = dontcare)
+      attachmentDescriptions[0].SetLoadOp(Graphics::AttachmentLoadOp::DONT_CARE);
+      mRenderPass.emplace_back(mGraphicsController->CreateRenderPass(rpInfo, nullptr));
+
+      created = true;
     }
-
-    if(mCreateInfo.depthStencilAttachment.depthTexture)
-    {
-      Graphics::AttachmentDescription depthStencilDesc{};
-      depthStencilDesc.SetStencilLoadOp( Graphics::AttachmentLoadOp::CLEAR )
-      .SetStoreOp( Graphics::AttachmentStoreOp::DONT_CARE );
-      if(mCreateInfo.depthStencilAttachment.stencilTexture)
-      {
-        depthStencilDesc.SetStencilLoadOp( Graphics::AttachmentLoadOp::CLEAR)
-        .SetStoreOp( Graphics::AttachmentStoreOp::DONT_CARE);
-      }
-      mClearValues.emplace_back();
-      attachmentDescriptions.push_back(depthStencilDesc);
-    }
-
-    Graphics::RenderPassCreateInfo rpInfo{};
-    rpInfo.SetAttachments( attachmentDescriptions );
-
-    // Add default render pass (loadOp = clear)
-    mRenderPass.emplace_back( mGraphicsController->CreateRenderPass( rpInfo, nullptr ) );
-
-    // Add default render pass (loadOp = dontcare)
-    attachmentDescriptions[0].SetLoadOp( Graphics::AttachmentLoadOp::DONT_CARE );
-    mRenderPass.emplace_back( mGraphicsController->CreateRenderPass( rpInfo, nullptr ) );
   }
+  return created;
 }
 
 uint32_t FrameBuffer::GetWidth() const
@@ -157,11 +174,11 @@ uint32_t FrameBuffer::GetHeight() const
   return mHeight;
 }
 
-[[nodiscard]] Graphics::RenderPass* FrameBuffer::GetGraphicsRenderPass( Graphics::AttachmentLoadOp colorLoadOp,
-                                                                        Graphics::AttachmentStoreOp colorStoreOp ) const
+[[nodiscard]] Graphics::RenderPass* FrameBuffer::GetGraphicsRenderPass(Graphics::AttachmentLoadOp  colorLoadOp,
+                                                                       Graphics::AttachmentStoreOp colorStoreOp) const
 {
   // clear only when requested
-  if( colorLoadOp == Graphics::AttachmentLoadOp::CLEAR )
+  if(colorLoadOp == Graphics::AttachmentLoadOp::CLEAR)
   {
     return mRenderPass[0].get();
   }
@@ -170,7 +187,6 @@ uint32_t FrameBuffer::GetHeight() const
     return mRenderPass[1].get();
   }
 }
-
 
 } // namespace Render
 

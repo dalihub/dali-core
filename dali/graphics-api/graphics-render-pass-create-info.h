@@ -74,12 +74,12 @@ struct RenderPassCreateInfo
     return *this;
   }
 
-  GraphicsStructureType type{GraphicsStructureType::RENDERPASS_CREATE_INFO_STRUCT};
-  ExtensionCreateInfo*  nextExtension{nullptr};
+  GraphicsStructureType                     type{GraphicsStructureType::RENDERPASS_CREATE_INFO_STRUCT};
+  ExtensionCreateInfo*                      nextExtension{nullptr};
   const std::vector<AttachmentDescription>* attachments{nullptr};
-  const AllocationCallbacks* allocationCallbacks{nullptr};
+  const AllocationCallbacks*                allocationCallbacks{nullptr};
 };
 
-} // namespace Dali
+} // namespace Dali::Graphics
 
 #endif // DALI_GRAPHICS_FRAMEBUFFER_FACTORY_H

@@ -841,11 +841,22 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
     if(instruction.mFrameBuffer)
     {
+      // Ensure graphics framebuffer is created, bind atachments and create render passes
+      // Only happens once per framebuffer. If the create fails, e.g. no attachments yet,
+      // then don't render to this framebuffer.
+      if(!instruction.mFrameBuffer->GetGraphicsObject())
+      {
+        const bool created = instruction.mFrameBuffer->CreateGraphicsObjects();
+        if(!created)
+        {
+          continue;
+        }
+      }
+
       auto& clearValues = instruction.mFrameBuffer->GetGraphicsRenderPassClearValues();
-      // todo: use no-clear renderpass instead (not implemented yet)
 
       // Set the clear color for first color attachment
-      if(instruction.mIsClearColorSet)
+      if(instruction.mIsClearColorSet && clearValues.size() > 0)
       {
         clearValues[0].color = {
           instruction.mClearColor.r,
@@ -853,9 +864,11 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
           instruction.mClearColor.b,
           instruction.mClearColor.a};
       }
+      auto loadOp = instruction.mIsClearColorSet ? Graphics::AttachmentLoadOp::CLEAR : Graphics::AttachmentLoadOp::LOAD;
+
       // offscreen buffer
       mainCommandBuffer->BeginRenderPass(
-        instruction.mFrameBuffer->GetGraphicsRenderPass(Graphics::AttachmentLoadOp::CLEAR, Graphics::AttachmentStoreOp::STORE),
+        instruction.mFrameBuffer->GetGraphicsRenderPass(loadOp, Graphics::AttachmentStoreOp::STORE),
         instruction.mFrameBuffer->GetGraphicsRenderTarget(),
         {instruction.mFrameBuffer->GetWidth(), instruction.mFrameBuffer->GetHeight()},
         clearValues);
@@ -917,9 +930,6 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
     if(instruction.mFrameBuffer)
     {
-      //instruction.mFrameBuffer->Bind(*mImpl->currentContext);
-      // @todo Temporarily set per renderer per pipeline. Should use RenderPass instead
-
       // For each offscreen buffer, update the dependency list with the new texture id used by this frame buffer.
       for(unsigned int i0 = 0, i1 = instruction.mFrameBuffer->GetColorAttachmentCount(); i0 < i1; ++i0)
       {
@@ -1032,11 +1042,10 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     // @todo The following block should be a command in it's own right.
     // Currently takes account of surface orientation in Context.
     // Or move entirely to RenderPass implementation
-    mainCommandBuffer->SetViewport( {
-      float(viewportRect.x),
-      float(viewportRect.y),
-      float(viewportRect.width),
-      float(viewportRect.height)} );
+    mainCommandBuffer->SetViewport({float(viewportRect.x),
+                                    float(viewportRect.y),
+                                    float(viewportRect.width),
+                                    float(viewportRect.height)});
 
     //mImpl->currentContext->Viewport(viewportRect.x, viewportRect.y, viewportRect.width, viewportRect.height);
     if(instruction.mIsClearColorSet)

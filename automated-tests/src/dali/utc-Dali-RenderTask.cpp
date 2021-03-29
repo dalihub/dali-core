@@ -2113,7 +2113,7 @@ int UtcDaliRenderTaskOnce03(void)
 
   newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
   application.SendNotification();
-
+  //                                                   drawn   sig    finished  Keep updating
   DALI_TEST_CHECK(UpdateRender(application, drawTrace, true, finished, false, true, __LINE__));
 
   Integration::GlSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
@@ -2167,7 +2167,7 @@ int UtcDaliRenderTaskOnce04(void)
 
   newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
   application.SendNotification();
-
+  //   FAILS                                          drawn   sig    finished  Keep updating
   DALI_TEST_CHECK(UpdateRender(application, drawTrace, true, finished, false, true, __LINE__));
 
   Integration::GlSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();

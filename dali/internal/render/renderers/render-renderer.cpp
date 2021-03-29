@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/graphics-api/graphics-program.h>
 #include <dali/graphics-api/graphics-types.h>
+#include <dali/integration-api/debug.h>
 #include <dali/internal/common/image-sampler.h>
 #include <dali/internal/render/common/render-instruction.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>

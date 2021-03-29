@@ -32,25 +32,29 @@ namespace Dali
 {
 class TestGraphicsTexture;
 class TestGraphicsBuffer;
+class TestGraphicsCommandBuffer;
 class TestGraphicsSampler;
 class TestGraphicsPipeline;
 
 enum class CommandType
 {
-  FLUSH                 = 1 << 0,
-  BIND_TEXTURES         = 1 << 1,
-  BIND_SAMPLERS         = 1 << 2,
-  BIND_VERTEX_BUFFERS   = 1 << 3,
-  BIND_INDEX_BUFFER     = 1 << 4,
-  BIND_UNIFORM_BUFFER   = 1 << 5,
-  BIND_PIPELINE         = 1 << 6,
-  DRAW                  = 1 << 7,
-  DRAW_INDEXED          = 1 << 8,
-  DRAW_INDEXED_INDIRECT = 1 << 9,
-  SET_SCISSOR           = 1 << 10,
-  SET_SCISSOR_TEST      = 1 << 11,
-  SET_VIEWPORT          = 1 << 12,
-  SET_VIEWPORT_TEST     = 1 << 13
+  FLUSH                   = 1 << 0,
+  BIND_TEXTURES           = 1 << 1,
+  BIND_SAMPLERS           = 1 << 2,
+  BIND_VERTEX_BUFFERS     = 1 << 3,
+  BIND_INDEX_BUFFER       = 1 << 4,
+  BIND_UNIFORM_BUFFER     = 1 << 5,
+  BIND_PIPELINE           = 1 << 6,
+  DRAW                    = 1 << 7,
+  DRAW_INDEXED            = 1 << 8,
+  DRAW_INDEXED_INDIRECT   = 1 << 9,
+  SET_SCISSOR             = 1 << 10,
+  SET_SCISSOR_TEST        = 1 << 11,
+  SET_VIEWPORT            = 1 << 12,
+  SET_VIEWPORT_TEST       = 1 << 13,
+  BEGIN_RENDER_PASS       = 1 << 14,
+  END_RENDER_PASS         = 1 << 15,
+  EXECUTE_COMMAND_BUFFERS = 1 << 16
 };
 
 using CommandTypeMask = uint32_t;
@@ -160,8 +164,37 @@ struct Command
   {
   }
 
+  Command(CommandType type)
+  : type(type)
+  {
+    // do non-trivial initialization
+    switch(type)
+    {
+      case CommandType::BEGIN_RENDER_PASS:
+      {
+        new(&data.beginRenderPass) CommandData::BeginRenderPassDescriptor();
+        break;
+      }
+      default:
+      {
+      }
+    }
+  }
+
   ~Command()
   {
+    switch(type)
+    {
+      case CommandType::BEGIN_RENDER_PASS:
+      {
+        data.beginRenderPass.~BeginRenderPassDescriptor();
+        break;
+      }
+      default:
+      {
+        break;
+      }
+    }
   }
 
   /**
@@ -172,6 +205,22 @@ struct Command
   {
     switch(rhs.type)
     {
+      case CommandType::BEGIN_RENDER_PASS:
+      {
+        new(&data.beginRenderPass) CommandData::BeginRenderPassDescriptor(rhs.data.beginRenderPass);
+        break;
+      }
+      case CommandType::END_RENDER_PASS:
+      {
+        data.endRenderPass = rhs.data.endRenderPass;
+        break;
+      }
+      case CommandType::EXECUTE_COMMAND_BUFFERS:
+      {
+        data.executeCommandBuffers = rhs.data.executeCommandBuffers;
+        break;
+      }
+
       case CommandType::BIND_VERTEX_BUFFERS:
       {
         data.bindVertexBuffers = rhs.data.bindVertexBuffers;
@@ -257,6 +306,21 @@ struct Command
   {
     switch(rhs.type)
     {
+      case CommandType::BEGIN_RENDER_PASS:
+      {
+        new(&data.beginRenderPass) CommandData::BeginRenderPassDescriptor(std::move(rhs.data.beginRenderPass));
+        break;
+      }
+      case CommandType::END_RENDER_PASS:
+      {
+        data.endRenderPass = std::move(rhs.data.endRenderPass);
+        break;
+      }
+      case CommandType::EXECUTE_COMMAND_BUFFERS:
+      {
+        data.executeCommandBuffers = std::move(rhs.data.executeCommandBuffers);
+        break;
+      }
       case CommandType::BIND_VERTEX_BUFFERS:
       {
         data.bindVertexBuffers = std::move(rhs.data.bindVertexBuffers);
@@ -398,6 +462,24 @@ struct Command
     {
       bool enable;
     } viewportTest;
+
+    struct BeginRenderPassDescriptor
+    {
+      Graphics::RenderPass*             renderPass;
+      Graphics::RenderTarget*           renderTarget;
+      Graphics::Extent2D                renderArea;
+      std::vector<Graphics::ClearValue> clearValues;
+    } beginRenderPass;
+
+    struct
+    {
+    } endRenderPass;
+
+    struct
+    {
+      std::vector<TestGraphicsCommandBuffer*> buffers;
+    } executeCommandBuffers;
+
   } data;
 };
 
@@ -514,7 +596,18 @@ public:
     Graphics::Extent2D                renderArea,
     std::vector<Graphics::ClearValue> clearValues) override
   {
-    mCallStack.PushCall("BeginRenderPass", "");
+    mCommands.emplace_back(CommandType::BEGIN_RENDER_PASS);
+    auto& cmd                             = mCommands.back();
+    cmd.data.beginRenderPass.renderPass   = renderPass;
+    cmd.data.beginRenderPass.renderTarget = renderTarget;
+    cmd.data.beginRenderPass.renderArea   = renderArea;
+    cmd.data.beginRenderPass.clearValues  = clearValues;
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["renderPass"] << std::hex << renderPass;
+    namedParams["renderTarget"] << std::hex << renderTarget;
+    namedParams["renderArea"] << renderArea.width << ", " << renderArea.height;
+    mCallStack.PushCall("BeginRenderPass", namedParams.str(), namedParams);
   }
 
   /**
@@ -533,6 +626,14 @@ public:
 
   void ExecuteCommandBuffers(std::vector<CommandBuffer*>&& commandBuffers) override
   {
+    mCommands.emplace_back();
+    auto& cmd = mCommands.back();
+    cmd.type  = CommandType::EXECUTE_COMMAND_BUFFERS;
+    cmd.data.executeCommandBuffers.buffers.reserve(commandBuffers.size());
+    for(auto&& item : commandBuffers)
+    {
+      cmd.data.executeCommandBuffers.buffers.emplace_back(static_cast<TestGraphicsCommandBuffer*>(item));
+    }
     mCallStack.PushCall("ExecuteCommandBuffers", "");
   }
 
@@ -668,6 +769,8 @@ public:
    * Retrieves commands of specified type
    */
   std::vector<Command*> GetCommandsByType(CommandTypeMask mask);
+
+  std::vector<Command*> GetChildCommandsByType(CommandTypeMask mask);
 
 private:
   TraceCallStack&    mCallStack;

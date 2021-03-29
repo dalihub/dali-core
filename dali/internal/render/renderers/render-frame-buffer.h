@@ -59,9 +59,17 @@ public:
   virtual void Destroy();
 
   /**
-   * @brief Bind the framebuffer. Do nothing
+   * @brief Create the graphics objects if needed.
+   *
+   * Doesn't re-create them if they are already generated, also doesn't
+   * check for new attachments.
+   *
+   * Creates the framebuffer, attaches color and depth textures, generates
+   * render target and render passes.
+   *
+   * @return true if there are attachments and the graphics objects have been created.
    */
-  virtual void Bind();
+  virtual bool CreateGraphicsObjects();
 
   /**
    * @brief Get the width of the FrameBuffer
@@ -126,8 +134,8 @@ public:
     return mRenderTarget.get();
   }
 
-  [[nodiscard]] Graphics::RenderPass* GetGraphicsRenderPass( Graphics::AttachmentLoadOp colorLoadOp,
-                                                             Graphics::AttachmentStoreOp colorStoreOp ) const;
+  [[nodiscard]] Graphics::RenderPass* GetGraphicsRenderPass(Graphics::AttachmentLoadOp  colorLoadOp,
+                                                            Graphics::AttachmentStoreOp colorStoreOp) const;
 
   /**
    * The function returns initialized array of clear values
@@ -164,7 +172,7 @@ private:
    * amd store = STORE for color attachment.
    */
   std::vector<Graphics::UniquePtr<Graphics::RenderPass>> mRenderPass{};
-  Graphics::UniquePtr<Graphics::RenderTarget> mRenderTarget{nullptr};
+  Graphics::UniquePtr<Graphics::RenderTarget>            mRenderTarget{nullptr};
 
   // clear colors
   std::vector<Graphics::ClearValue> mClearValues{};

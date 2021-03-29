@@ -73,4 +73,27 @@ std::vector<Command*> TestGraphicsCommandBuffer::GetCommandsByType(CommandTypeMa
   return mCommandStack;
 }
 
+std::vector<Command*> TestGraphicsCommandBuffer::GetChildCommandsByType(CommandTypeMask mask)
+{
+  std::vector<Command*> mCommandStack{};
+  for(auto& cmd : mCommands)
+  {
+    if(uint32_t(cmd.type) == (mask & uint32_t(cmd.type)))
+    {
+      mCommandStack.emplace_back(&cmd);
+    }
+    if(cmd.type == CommandType::EXECUTE_COMMAND_BUFFERS)
+    {
+      for(auto secondaryCB : cmd.data.executeCommandBuffers.buffers)
+      {
+        for(auto command : secondaryCB->GetChildCommandsByType(mask))
+        {
+          mCommandStack.push_back(command);
+        }
+      }
+    }
+  }
+  return mCommandStack;
+}
+
 } // namespace Dali

@@ -21,6 +21,7 @@
 #include "test-gl-abstraction.h"
 #include "test-gl-context-helper-abstraction.h"
 #include "test-gl-sync-abstraction.h"
+#include "test-graphics-command-buffer.h"
 #include "test-graphics-program.h"
 #include "test-graphics-reflection.h"
 
@@ -68,6 +69,18 @@ T* Uncast(const Graphics::Shader* object)
 
 template<typename T>
 T* Uncast(const Graphics::Framebuffer* object)
+{
+  return const_cast<T*>(static_cast<const T*>(object));
+}
+
+template<typename T>
+T* Uncast(const Graphics::Pipeline* object)
+{
+  return const_cast<T*>(static_cast<const T*>(object));
+}
+
+template<typename T>
+T* Uncast(const Graphics::RenderTarget* object)
 {
   return const_cast<T*>(static_cast<const T*>(object));
 }
@@ -366,6 +379,10 @@ public: // Test Functions
    * @return True on success
    */
   bool GetProgramParameter(Graphics::Program& program, uint32_t parameterId, void* outData) override;
+
+  void ProcessCommandBuffer(TestGraphicsCommandBuffer& commandBuffer);
+
+  void BindPipeline(TestGraphicsPipeline* pipeline);
 
 public:
   mutable TraceCallStack                    mCallStack;
