@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,13 @@
 // CLASS HEADER
 #include <dali/integration-api/scene.h>
 
-// INTERNAL INCLUDES
-#include <dali/internal/event/common/scene-impl.h>
+// EXTERNAL INCLUDES
+#include <dali/graphics-api/graphics-render-target.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
+
+// INTERNAL INCLUDES
+#include <dali/internal/event/common/scene-impl.h>
 
 namespace Dali
 {
@@ -119,6 +122,11 @@ void Scene::SurfaceReplaced()
 void Scene::Discard()
 {
   GetImplementation(*this).Discard();
+}
+
+void Scene::SetSurfaceRenderTarget(Graphics::RenderTarget* renderTarget)
+{
+  GetImplementation(*this).SetSurfaceRenderTarget(renderTarget);
 }
 
 Integration::Scene Scene::Get(Actor actor)

@@ -44,9 +44,26 @@ Scene::~Scene()
   mFramePresentedCallbacks.clear();
 }
 
-void Scene::Initialize(Context& context)
+void Scene::Initialize(Context& context, Graphics::Controller& graphicsController)
 {
   mContext = &context;
+
+  // Create the render pass for the surface
+  std::vector<Graphics::AttachmentDescription> attachmentDescriptions;
+
+  // Default behaviour for color attachments is to CLEAR and STORE
+  mClearValues.clear();
+  Graphics::AttachmentDescription desc{};
+  desc.SetLoadOp(Graphics::AttachmentLoadOp::CLEAR);
+  desc.SetStoreOp(Graphics::AttachmentStoreOp::STORE);
+  attachmentDescriptions.push_back(desc);
+  mClearValues.emplace_back();
+
+  Graphics::RenderPassCreateInfo rpInfo{};
+  rpInfo.SetAttachments(attachmentDescriptions);
+
+  // Add default render pass (loadOp = clear)
+  mRenderPass = graphicsController.CreateRenderPass(rpInfo, nullptr);
 }
 
 Context* Scene::GetContext()

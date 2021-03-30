@@ -89,8 +89,8 @@ struct RenderManager::Impl
     uniformBufferManager.reset(new Render::UniformBufferManager(&graphicsController));
 
     // initialize main command buffer
-    auto info = Graphics::CommandBufferCreateInfo().SetLevel( Graphics::CommandBufferLevel::PRIMARY );
-    mainCommandBuffer = graphicsController.CreateCommandBuffer( info, nullptr );
+    auto info         = Graphics::CommandBufferCreateInfo().SetLevel(Graphics::CommandBufferLevel::PRIMARY);
+    mainCommandBuffer = graphicsController.CreateCommandBuffer(info, nullptr);
   }
 
   ~Impl()
@@ -186,8 +186,6 @@ struct RenderManager::Impl
   Graphics::UniquePtr<Graphics::CommandBuffer> mainCommandBuffer; ///< Main command buffer
 
   Graphics::UniquePtr<Graphics::RenderPass> mainRenderPass; ///< Main renderpass
-
-
 };
 
 RenderManager* RenderManager::New(Graphics::Controller&               graphicsController,
@@ -357,7 +355,7 @@ void RenderManager::RemoveFrameBuffer(Render::FrameBuffer* frameBuffer)
 
 void RenderManager::InitializeScene(SceneGraph::Scene* scene)
 {
-  scene->Initialize(*mImpl->CreateSceneContext());
+  scene->Initialize(*mImpl->CreateSceneContext(), mImpl->graphicsController);
   mImpl->sceneContainer.push_back(scene);
 }
 
@@ -375,7 +373,7 @@ void RenderManager::UninitializeScene(SceneGraph::Scene* scene)
 void RenderManager::SurfaceReplaced(SceneGraph::Scene* scene)
 {
   Context* newContext = mImpl->ReplaceSceneContext(scene->GetContext());
-  scene->Initialize(*newContext);
+  scene->Initialize(*newContext, mImpl->graphicsController);
 }
 
 void RenderManager::AttachColorTextureToFrameBuffer(Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel, uint32_t layer)
@@ -514,10 +512,11 @@ void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear
     {
       mImpl->currentContext = &mImpl->context;
 
-      if(mImpl->currentContext->IsSurfacelessContextSupported())
-      {
-        mImpl->graphicsController.GetGlContextHelperAbstraction().MakeSurfacelessContextCurrent();
-      }
+      // Context switch now happens when the uploading happens in graphics side
+      //      if(mImpl->currentContext->IsSurfacelessContextSupported())
+      //      {
+      //        mImpl->graphicsController.GetGlContextHelperAbstraction().MakeSurfacelessContextCurrent();
+      //      }
 
       // Clear the current cached program when the context is switched
       mImpl->programController.ClearCurrentProgram();
@@ -846,32 +845,31 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       // todo: use no-clear renderpass instead (not implemented yet)
 
       // Set the clear color for first color attachment
-      if( instruction.mIsClearColorSet )
+      if(instruction.mIsClearColorSet)
       {
         clearValues[0].color = {
           instruction.mClearColor.r,
           instruction.mClearColor.g,
           instruction.mClearColor.b,
-          instruction.mClearColor.a
-        };
+          instruction.mClearColor.a};
       }
       // offscreen buffer
       mainCommandBuffer->BeginRenderPass(
-        instruction.mFrameBuffer->GetGraphicsRenderPass( Graphics::AttachmentLoadOp::CLEAR, Graphics::AttachmentStoreOp::STORE ),
+        instruction.mFrameBuffer->GetGraphicsRenderPass(Graphics::AttachmentLoadOp::CLEAR, Graphics::AttachmentStoreOp::STORE),
         instruction.mFrameBuffer->GetGraphicsRenderTarget(),
-        { instruction.mFrameBuffer->GetWidth(), instruction.mFrameBuffer->GetHeight() },
-        clearValues
-        );
+        {instruction.mFrameBuffer->GetWidth(), instruction.mFrameBuffer->GetHeight()},
+        clearValues);
 
       if(mImpl->currentContext != &mImpl->context)
       {
         // Switch to shared context for off-screen buffer
         mImpl->currentContext = &mImpl->context;
 
-        if(mImpl->currentContext->IsSurfacelessContextSupported())
-        {
-          mImpl->graphicsController.GetGlContextHelperAbstraction().MakeSurfacelessContextCurrent();
-        }
+        // Context switch now happens when render pass starts
+        //        if(mImpl->currentContext->IsSurfacelessContextSupported())
+        //        {
+        //          mImpl->graphicsController.GetGlContextHelperAbstraction().MakeSurfacelessContextCurrent();
+        //        }
 
         // Clear the current cached program when the context is switched
         mImpl->programController.ClearCurrentProgram();
@@ -890,6 +888,24 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
           mImpl->programController.ClearCurrentProgram();
         }
       }
+
+      // surface
+      auto& clearValues = sceneObject->GetGraphicsRenderPassClearValues();
+
+      if(instruction.mIsClearColorSet)
+      {
+        clearValues[0].color = {
+          instruction.mClearColor.r,
+          instruction.mClearColor.g,
+          instruction.mClearColor.b,
+          instruction.mClearColor.a};
+      }
+
+      mainCommandBuffer->BeginRenderPass(
+        sceneObject->GetGraphicsRenderPass(),
+        sceneObject->GetSurfaceRenderTarget(),
+        {static_cast<uint32_t>(surfaceRect.width), static_cast<uint32_t>(surfaceRect.height)},
+        clearValues);
     }
 
     // Make sure that GL context must be created
@@ -901,7 +917,6 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
     if(instruction.mFrameBuffer)
     {
-
       //instruction.mFrameBuffer->Bind(*mImpl->currentContext);
       // @todo Temporarily set per renderer per pipeline. Should use RenderPass instead
 
@@ -913,17 +928,20 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     }
     else
     {
-      mImpl->currentContext->BindFramebuffer(GL_FRAMEBUFFER, 0u);
+      //mImpl->currentContext->BindFramebuffer(GL_FRAMEBUFFER, 0u);
     }
 
     // @todo Should this be a command in it's own right?
     // @todo yes
     if(!instruction.mFrameBuffer)
     {
+      /*
       mImpl->currentContext->Viewport(surfaceRect.x,
                                       surfaceRect.y,
                                       surfaceRect.width,
                                       surfaceRect.height);
+                                      */
+
       /*
       mainCommandBuffer->SetViewport( {surfaceRect.x,
                                         surfaceRect.y,
@@ -936,6 +954,8 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     // It is important to clear all 3 buffers when they are being used, for performance on deferred renderers
     // e.g. previously when the depth & stencil buffers were NOT cleared, it caused the DDK to exceed a "vertex count limit",
     // and then stall. That problem is only noticeable when rendering a large number of vertices per frame.
+
+    /*
     GLbitfield clearMask = GL_COLOR_BUFFER_BIT;
 
     mImpl->currentContext->ColorMask(true);
@@ -952,7 +972,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       mImpl->currentContext->StencilMask(0xFF); // 8 bit stencil mask, all 1's
       clearMask |= GL_STENCIL_BUFFER_BIT;
     }
-
+    */
     if(!instruction.mIgnoreRenderToFbo && (instruction.mFrameBuffer != nullptr))
     {
       // Offscreen buffer rendering
@@ -1012,34 +1032,36 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     // @todo The following block should be a command in it's own right.
     // Currently takes account of surface orientation in Context.
     // Or move entirely to RenderPass implementation
-    mImpl->currentContext->Viewport(viewportRect.x, viewportRect.y, viewportRect.width, viewportRect.height);
+    mainCommandBuffer->SetViewport( {
+      float(viewportRect.x),
+      float(viewportRect.y),
+      float(viewportRect.width),
+      float(viewportRect.height)} );
+
+    //mImpl->currentContext->Viewport(viewportRect.x, viewportRect.y, viewportRect.width, viewportRect.height);
     if(instruction.mIsClearColorSet)
     {
-      mImpl->currentContext->ClearColor(clearColor.r,
-                                        clearColor.g,
-                                        clearColor.b,
-                                        clearColor.a);
       if(!clearFullFrameRect)
       {
         if(!clippingRect.IsEmpty())
         {
-          mImpl->currentContext->SetScissorTest(true);
-          mImpl->currentContext->Scissor(clippingRect.x, clippingRect.y, clippingRect.width, clippingRect.height);
-          mImpl->currentContext->Clear(clearMask, Context::FORCE_CLEAR);
-          mImpl->currentContext->SetScissorTest(false);
+          //mImpl->currentContext->SetScissorTest(true);
+          //mImpl->currentContext->Scissor(clippingRect.x, clippingRect.y, clippingRect.width, clippingRect.height);
+          //mImpl->currentContext->Clear(clearMask, Context::FORCE_CLEAR);
+          //mImpl->currentContext->SetScissorTest(false);
         }
         else
         {
-          mImpl->currentContext->SetScissorTest(true);
-          mImpl->currentContext->Scissor(viewportRect.x, viewportRect.y, viewportRect.width, viewportRect.height);
-          mImpl->currentContext->Clear(clearMask, Context::FORCE_CLEAR);
-          mImpl->currentContext->SetScissorTest(false);
+          //mImpl->currentContext->SetScissorTest(true);
+          //mImpl->currentContext->Scissor(viewportRect.x, viewportRect.y, viewportRect.width, viewportRect.height);
+          //mImpl->currentContext->Clear(clearMask, Context::FORCE_CLEAR);
+          //mImpl->currentContext->SetScissorTest(false);
         }
       }
       else
       {
-        mImpl->currentContext->SetScissorTest(false);
-        mImpl->currentContext->Clear(clearMask, Context::FORCE_CLEAR);
+        //mImpl->currentContext->SetScissorTest(false);
+        //mImpl->currentContext->Clear(clearMask, Context::FORCE_CLEAR);
       }
     }
 
@@ -1122,10 +1144,11 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       instruction.mRenderTracker = nullptr; // Only create once.
     }
 
-    if(renderToFbo)
-    {
-      mImpl->currentContext->Flush();
-    }
+    // This now happens when the render pass for frame buffer finishes
+    //    if(renderToFbo)
+    //    {
+    //      mImpl->currentContext->Flush();
+    //    }
 
     // End render pass
     mainCommandBuffer->EndRenderPass();
@@ -1143,10 +1166,11 @@ void RenderManager::PostRender(bool uploadOnly)
 
   if(!uploadOnly)
   {
-    if(mImpl->currentContext->IsSurfacelessContextSupported())
-    {
-      mImpl->graphicsController.GetGlContextHelperAbstraction().MakeSurfacelessContextCurrent();
-    }
+    // Context switch now happens outside the render manager
+    //    if(mImpl->currentContext->IsSurfacelessContextSupported())
+    //    {
+    //      mImpl->graphicsController.GetGlContextHelperAbstraction().MakeSurfacelessContextCurrent();
+    //    }
 
     GLenum attachments[] = {GL_DEPTH, GL_STENCIL};
     mImpl->context.InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);

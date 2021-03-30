@@ -2,7 +2,7 @@
 #define DALI_SCENE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,11 @@ class WheelEvent;
 namespace Internal DALI_INTERNAL
 {
 class Scene;
+}
+
+namespace Graphics
+{
+class RenderTarget;
 }
 
 namespace Integration
@@ -216,6 +221,13 @@ public:
    * @brief Discards this Scene from the Core.
    */
   void Discard();
+
+  /**
+   * @brief Sets the render target for the surface.
+   *
+   * @param[in] renderTarget The render target for the surface
+   */
+  void SetSurfaceRenderTarget(Graphics::RenderTarget* renderTarget);
 
   /**
    * @brief Retrieve the Scene that the given actor belongs to.

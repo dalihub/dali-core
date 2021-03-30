@@ -316,6 +316,13 @@ bool Scene::IsSurfaceRectChanged() const
   return mSceneObject->IsSurfaceRectChanged();
 }
 
+void Scene::SetSurfaceRenderTarget(Graphics::RenderTarget* renderTarget)
+{
+  // Send the surface render target to SceneGraph::Scene
+  ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
+  SetSurfaceRenderTargetMessage(tls->GetEventThreadServices(), *mSceneObject, renderTarget);
+}
+
 bool Scene::EmitKeyEventGeneratedSignal(const Dali::KeyEvent& event)
 {
   // Emit the KeyEventGenerated signal when KeyEvent is generated

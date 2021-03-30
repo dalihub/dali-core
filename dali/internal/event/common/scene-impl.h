@@ -257,6 +257,11 @@ public:
   bool IsSurfaceRectChanged() const;
 
   /**
+   * @copydoc Dali::Integration::Scene::SetSurfaceRenderTarget
+   */
+  void SetSurfaceRenderTarget(Graphics::RenderTarget* renderTarget);
+
+  /**
    * Used by the EventProcessor to emit key event signals.
    * @param[in] event The key event.
    */
