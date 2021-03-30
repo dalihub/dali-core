@@ -19,7 +19,9 @@
 #include <dali/internal/render/gl-resources/gpu-buffer.h>
 
 // INTERNAL INCLUDES
+#include <dali/graphics-api/graphics-types.h>
 #include <dali/public-api/common/dali-common.h>
+#include <cstring>
 
 namespace Dali
 {
@@ -27,158 +29,54 @@ namespace Internal
 {
 namespace
 {
-/**
- * Helper to get our drawmode enum as GL enum
- * @param type to convert
- * @return the corresponding GL enum or -1
- */
-inline GLenum ModeAsGlEnum(GpuBuffer::Usage type)
-{
-  GLenum retval(-1);
-  switch(type)
-  {
-    case GpuBuffer::STREAM_DRAW:
-    {
-      retval = GL_STREAM_DRAW;
-      break;
-    }
-    case GpuBuffer::STATIC_DRAW:
-    {
-      retval = GL_STATIC_DRAW;
-      break;
-    }
-    case GpuBuffer::DYNAMIC_DRAW:
-    {
-      retval = GL_DYNAMIC_DRAW;
-      break;
-    }
-  }
-  return retval;
-}
-
 } // namespace
 
-GpuBuffer::GpuBuffer(Context& context)
-: mContext(context),
-  mCapacity(0),
-  mSize(0),
-  mBufferId(0),
+GpuBuffer::GpuBuffer(Graphics::Controller& graphicsController, Graphics::BufferUsageFlags usage)
+: mUsage(usage),
   mBufferCreated(false)
 {
 }
 
 GpuBuffer::~GpuBuffer()
 {
-  // If we have a buffer then delete it.
-  if(mBufferId)
-  {
-    // If a buffer object that is currently bound is deleted, the binding reverts to 0
-    // (the absence of any buffer object, which reverts to client memory usage)
-    mContext.DeleteBuffers(1, &mBufferId);
-  }
 }
 
-/*
- * Creates or updates the buffer data depending on whether it
- * already exists or not.
- */
-void GpuBuffer::UpdateDataBuffer(Context& context, GLsizeiptr size, const GLvoid* data, Usage usage, Target target)
+void GpuBuffer::UpdateDataBuffer(Graphics::Controller& graphicsController, uint32_t size, const void* data)
 {
   DALI_ASSERT_DEBUG(size > 0);
   mSize = size;
-  // make sure we have a buffer name/id before uploading
-  if(mBufferId == 0)
+
+  if(!mGraphicsObject || size > mCapacity)
   {
-    mContext.GenBuffers(1, &mBufferId);
-    DALI_ASSERT_DEBUG(mBufferId);
+    Graphics::BufferCreateInfo createInfo{};
+    createInfo.SetUsage(mUsage).SetSize(size);
+    mGraphicsObject = graphicsController.CreateBuffer(createInfo, std::move(mGraphicsObject));
+    mCapacity       = size;
   }
 
-  GLenum glTargetEnum = GL_ARRAY_BUFFER;
+  Graphics::MapBufferInfo info;
+  info.buffer = mGraphicsObject.get();
+  info.usage  = 0 | Graphics::MemoryUsageFlagBits::WRITE;
+  info.offset = 0;
+  info.size   = size;
 
-  // make sure the buffer is bound, don't perform any checks because size may be zero
-  if(ARRAY_BUFFER == target)
-  {
-    context.BindArrayBuffer(mBufferId);
-  }
-  else if(ELEMENT_ARRAY_BUFFER == target)
-  {
-    glTargetEnum = GL_ELEMENT_ARRAY_BUFFER;
-    context.BindElementArrayBuffer(mBufferId);
-  }
-  else if(TRANSFORM_FEEDBACK_BUFFER == target)
-  {
-    glTargetEnum = GL_TRANSFORM_FEEDBACK_BUFFER;
-    context.BindTransformFeedbackBuffer(mBufferId);
-  }
-
-  // if the buffer has already been created, just update the data providing it fits
-  if(mBufferCreated)
-  {
-    // if the data will fit in the existing buffer, just update it
-    if(size <= mCapacity)
-    {
-      context.BufferSubData(glTargetEnum, 0, size, data);
-    }
-    else
-    {
-      // create a new buffer of the larger size,
-      // gl should automatically deallocate the old buffer
-      context.BufferData(glTargetEnum, size, data, ModeAsGlEnum(usage));
-      mCapacity = size;
-    }
-  }
-  else
-  {
-    // create the buffer
-    context.BufferData(glTargetEnum, size, data, ModeAsGlEnum(usage));
-    mBufferCreated = true;
-    mCapacity      = size;
-  }
-
-  if(ARRAY_BUFFER == target)
-  {
-    context.BindArrayBuffer(0);
-  }
-  else if(ELEMENT_ARRAY_BUFFER == target)
-  {
-    context.BindElementArrayBuffer(0);
-  }
-  else if(TRANSFORM_FEEDBACK_BUFFER == target)
-  {
-    context.BindTransformFeedbackBuffer(0);
-  }
-}
-
-void GpuBuffer::Bind(Context& context, Target target) const
-{
-  DALI_ASSERT_DEBUG(mCapacity);
-
-  if(target == ARRAY_BUFFER)
-  {
-    context.BindArrayBuffer(mBufferId);
-  }
-  else if(target == ELEMENT_ARRAY_BUFFER)
-  {
-    context.BindElementArrayBuffer(mBufferId);
-  }
-  else if(target == TRANSFORM_FEEDBACK_BUFFER)
-  {
-    context.BindTransformFeedbackBuffer(mBufferId);
-  }
+  auto  memory = graphicsController.MapBufferRange(info);
+  void* ptr    = memory->LockRegion(0, size);
+  memcpy(ptr, data, size);
+  memory->Unlock(true);
+  graphicsController.UnmapMemory(std::move(memory));
 }
 
 bool GpuBuffer::BufferIsValid() const
 {
-  return mBufferCreated && (0 != mCapacity);
+  return mGraphicsObject && (0 != mCapacity);
 }
 
-void GpuBuffer::GlContextDestroyed()
+void GpuBuffer::Destroy()
 {
-  // If the context is destroyed, GL would have released the buffer.
-  mCapacity      = 0;
-  mSize          = 0;
-  mBufferId      = 0;
-  mBufferCreated = false;
+  mCapacity = 0;
+  mSize     = 0;
+  mGraphicsObject.reset();
 }
 
 } // namespace Internal

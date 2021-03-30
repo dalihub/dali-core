@@ -38,6 +38,8 @@
 #include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/renderers/render-frame-buffer.h>
 #include <dali/internal/render/renderers/render-texture.h>
+#include <dali/internal/render/renderers/shader-cache.h>
+#include <dali/internal/render/renderers/uniform-buffer-manager.h>
 #include <dali/internal/render/shaders/program-controller.h>
 
 namespace Dali
@@ -66,7 +68,7 @@ struct RenderManager::Impl
     currentContext(&context),
     graphicsController(graphicsController),
     renderQueue(),
-    renderAlgorithms(),
+    renderAlgorithms(graphicsController),
     frameCount(0u),
     renderBufferIndex(SceneGraphBuffers::INITIAL_UPDATE_BUFFER_INDEX),
     rendererContainer(),
@@ -75,6 +77,7 @@ struct RenderManager::Impl
     frameBufferContainer(),
     lastFrameWasRendered(false),
     programController(graphicsController),
+    shaderCache(graphicsController),
     depthBufferAvailable(depthBufferAvailableParam),
     stencilBufferAvailable(stencilBufferAvailableParam),
     partialUpdateAvailable(partialUpdateAvailableParam)
@@ -82,6 +85,8 @@ struct RenderManager::Impl
     // Create thread pool with just one thread ( there may be a need to create more threads in the future ).
     threadPool = std::unique_ptr<Dali::ThreadPool>(new Dali::ThreadPool());
     threadPool->Initialize(1u);
+
+    uniformBufferManager.reset(new Render::UniformBufferManager(&graphicsController));
   }
 
   ~Impl()
@@ -161,15 +166,18 @@ struct RenderManager::Impl
 
   OwnerContainer<Render::RenderTracker*> mRenderTrackers; ///< List of render trackers
 
-  ProgramController programController; ///< Owner of the GL programs
+  ProgramController   programController; ///< Owner of the GL programs
+  Render::ShaderCache shaderCache;       ///< The cache for the graphics shaders
+
+  std::unique_ptr<Render::UniformBufferManager> uniformBufferManager; ///< The uniform buffer manager
 
   Integration::DepthBufferAvailable   depthBufferAvailable;   ///< Whether the depth buffer is available
   Integration::StencilBufferAvailable stencilBufferAvailable; ///< Whether the stencil buffer is available
   Integration::PartialUpdateAvailable partialUpdateAvailable; ///< Whether the partial update is available
 
   std::unique_ptr<Dali::ThreadPool> threadPool;            ///< The thread pool
-  Vector<GLuint>                    boundTextures;         ///< The textures bound for rendering
-  Vector<GLuint>                    textureDependencyList; ///< The dependency list of binded textures
+  Vector<Graphics::Texture*>        boundTextures;         ///< The textures bound for rendering
+  Vector<Graphics::Texture*>        textureDependencyList; ///< The dependency list of binded textures
 };
 
 RenderManager* RenderManager::New(Graphics::Controller&               graphicsController,
@@ -217,7 +225,7 @@ void RenderManager::ContextDestroyed()
   //Inform textures
   for(auto&& texture : mImpl->textureContainer)
   {
-    texture->GlContextDestroyed();
+    texture->Destroy();
   }
 
   //Inform framebuffers
@@ -247,7 +255,7 @@ void RenderManager::SetShaderSaver(ShaderSaver& upstream)
 void RenderManager::AddRenderer(OwnerPointer<Render::Renderer>& renderer)
 {
   // Initialize the renderer as we are now in render thread
-  renderer->Initialize(mImpl->context, mImpl->programController);
+  renderer->Initialize(mImpl->context, mImpl->graphicsController, mImpl->programController, mImpl->shaderCache, *(mImpl->uniformBufferManager.get()));
 
   mImpl->rendererContainer.PushBack(renderer.Release());
 }
@@ -259,6 +267,7 @@ void RenderManager::RemoveRenderer(Render::Renderer* renderer)
 
 void RenderManager::AddSampler(OwnerPointer<Render::Sampler>& sampler)
 {
+  sampler->Initialize(mImpl->graphicsController);
   mImpl->samplerContainer.PushBack(sampler.Release());
 }
 
@@ -269,7 +278,7 @@ void RenderManager::RemoveSampler(Render::Sampler* sampler)
 
 void RenderManager::AddTexture(OwnerPointer<Render::Texture>& texture)
 {
-  texture->Initialize(mImpl->context);
+  texture->Initialize(mImpl->graphicsController);
   mImpl->textureContainer.PushBack(texture.Release());
 }
 
@@ -282,7 +291,7 @@ void RenderManager::RemoveTexture(Render::Texture* texture)
   {
     if(iter == texture)
     {
-      texture->Destroy(mImpl->context);
+      texture->Destroy();
       mImpl->textureContainer.Erase(&iter); // Texture found; now destroy it
       return;
     }
@@ -291,25 +300,25 @@ void RenderManager::RemoveTexture(Render::Texture* texture)
 
 void RenderManager::UploadTexture(Render::Texture* texture, PixelDataPtr pixelData, const Texture::UploadParams& params)
 {
-  texture->Upload(mImpl->context, pixelData, params);
+  texture->Upload(pixelData, params);
 }
 
 void RenderManager::GenerateMipmaps(Render::Texture* texture)
 {
-  texture->GenerateMipmaps(mImpl->context);
+  texture->GenerateMipmaps();
 }
 
 void RenderManager::SetFilterMode(Render::Sampler* sampler, uint32_t minFilterMode, uint32_t magFilterMode)
 {
-  sampler->mMinificationFilter  = static_cast<Dali::FilterMode::Type>(minFilterMode);
-  sampler->mMagnificationFilter = static_cast<Dali::FilterMode::Type>(magFilterMode);
+  sampler->SetFilterMode(static_cast<Dali::FilterMode::Type>(minFilterMode),
+                         static_cast<Dali::FilterMode::Type>(magFilterMode));
 }
 
 void RenderManager::SetWrapMode(Render::Sampler* sampler, uint32_t rWrapMode, uint32_t sWrapMode, uint32_t tWrapMode)
 {
-  sampler->mRWrapMode = static_cast<Dali::WrapMode::Type>(rWrapMode);
-  sampler->mSWrapMode = static_cast<Dali::WrapMode::Type>(sWrapMode);
-  sampler->mTWrapMode = static_cast<Dali::WrapMode::Type>(tWrapMode);
+  sampler->SetWrapMode(static_cast<Dali::WrapMode::Type>(rWrapMode),
+                       static_cast<Dali::WrapMode::Type>(sWrapMode),
+                       static_cast<Dali::WrapMode::Type>(tWrapMode));
 }
 
 void RenderManager::AddFrameBuffer(OwnerPointer<Render::FrameBuffer>& frameBuffer)
@@ -532,7 +541,7 @@ void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear
                 const RenderItem& item = renderList->GetItem(itemIndex);
                 if(DALI_LIKELY(item.mRenderer))
                 {
-                  item.mRenderer->Upload(*mImpl->currentContext);
+                  item.mRenderer->Upload();
                 }
               }
             }
@@ -859,7 +868,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       // For each offscreen buffer, update the dependency list with the new texture id used by this frame buffer.
       for(unsigned int i0 = 0, i1 = instruction.mFrameBuffer->GetColorAttachmentCount(); i0 < i1; ++i0)
       {
-        mImpl->textureDependencyList.PushBack(instruction.mFrameBuffer->GetTextureId(i0));
+        mImpl->textureDependencyList.PushBack(instruction.mFrameBuffer->GetTexture(i0));
       }
     }
     else
@@ -867,6 +876,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       mImpl->currentContext->BindFramebuffer(GL_FRAMEBUFFER, 0u);
     }
 
+    // @todo Should this be a command in it's own right?
     if(!instruction.mFrameBuffer)
     {
       mImpl->currentContext->Viewport(surfaceRect.x,
@@ -929,6 +939,8 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     // Set surface orientation
     mImpl->currentContext->SetSurfaceOrientation(surfaceOrientation);
 
+    /*** Clear region of framebuffer or surface before drawing ***/
+
     bool clearFullFrameRect = true;
     if(instruction.mFrameBuffer != nullptr)
     {
@@ -950,8 +962,9 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       clearFullFrameRect = false;
     }
 
+    // @todo The following block should be a command in it's own right.
+    // Currently takes account of surface orientation in Context.
     mImpl->currentContext->Viewport(viewportRect.x, viewportRect.y, viewportRect.width, viewportRect.height);
-
     if(instruction.mIsClearColorSet)
     {
       mImpl->currentContext->ClearColor(clearColor.r,
@@ -992,20 +1005,22 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       depthBufferAvailable,
       stencilBufferAvailable,
       mImpl->boundTextures,
-      clippingRect);
+      viewportRect,
+      clippingRect,
+      surfaceOrientation);
 
     // Synchronise the FBO/Texture access when there are multiple contexts
     if(mImpl->currentContext->IsSurfacelessContextSupported())
     {
-      // Check whether any binded texture is in the dependency list
+      // Check whether any bound texture is in the dependency list
       bool textureFound = false;
 
       if(mImpl->boundTextures.Count() > 0u && mImpl->textureDependencyList.Count() > 0u)
       {
-        for(auto textureId : mImpl->textureDependencyList)
+        for(auto texture : mImpl->textureDependencyList)
         {
-          textureFound = std::find_if(mImpl->boundTextures.Begin(), mImpl->boundTextures.End(), [textureId](GLuint id) {
-                           return textureId == id;
+          textureFound = std::find_if(mImpl->boundTextures.Begin(), mImpl->boundTextures.End(), [texture](Graphics::Texture* graphicsTexture) {
+                           return texture == graphicsTexture;
                          }) != mImpl->boundTextures.End();
         }
       }

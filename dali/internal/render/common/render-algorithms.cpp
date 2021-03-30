@@ -51,6 +51,68 @@ const int DaliStencilFunctionToGL[] = {GL_NEVER, GL_LESS, GL_EQUAL, GL_LEQUAL, G
 // Note: These MUST be in the same order as Dali::StencilOperation enum.
 const int DaliStencilOperationToGL[] = {GL_ZERO, GL_KEEP, GL_REPLACE, GL_INCR, GL_DECR, GL_INVERT, GL_INCR_WRAP, GL_DECR_WRAP};
 
+inline Graphics::Viewport ViewportFromClippingBox(ClippingBox clippingBox, int orientation)
+{
+  Graphics::Viewport viewport{static_cast<float>(clippingBox.x), static_cast<float>(clippingBox.y), static_cast<float>(clippingBox.width), static_cast<float>(clippingBox.height), 0.0f, 0.0f};
+
+  if(orientation == 80 || orientation == 270)
+  {
+    viewport.width  = static_cast<float>(clippingBox.height);
+    viewport.height = static_cast<float>(clippingBox.width);
+  }
+  return viewport;
+}
+
+inline Graphics::Rect2D RecalculateRect(Graphics::Rect2D rect, int orientation, Graphics::Viewport viewport)
+{
+  Graphics::Rect2D newRect;
+
+  // scissor's value should be set based on the default system coordinates.
+  // when the surface is rotated, the input valus already were set with the rotated angle.
+  // So, re-calculation is needed.
+  if(orientation == 90)
+  {
+    newRect.x      = viewport.height - (rect.y + rect.height);
+    newRect.y      = rect.x;
+    newRect.width  = rect.height;
+    newRect.height = rect.width;
+  }
+  else if(orientation == 180)
+  {
+    newRect.x      = viewport.width - (rect.x + rect.width);
+    newRect.y      = viewport.height - (rect.y + rect.height);
+    newRect.width  = rect.width;
+    newRect.height = rect.height;
+  }
+  else if(orientation == 270)
+  {
+    newRect.x      = rect.y;
+    newRect.y      = viewport.width - (rect.x + rect.width);
+    newRect.width  = rect.height;
+    newRect.height = rect.width;
+  }
+  else
+  {
+    newRect.x      = rect.x;
+    newRect.y      = rect.y;
+    newRect.width  = rect.width;
+    newRect.height = rect.height;
+  }
+  return newRect;
+}
+
+inline Graphics::Rect2D Rect2DFromClippingBox(ClippingBox clippingBox, int orientation, Graphics::Viewport viewport)
+{
+  Graphics::Rect2D rect2D{clippingBox.x, clippingBox.y, static_cast<uint32_t>(abs(clippingBox.width)), static_cast<uint32_t>(abs(clippingBox.height))};
+  return RecalculateRect(rect2D, orientation, viewport);
+}
+
+inline Graphics::Rect2D Rect2DFromRect(Dali::Rect<int> rect, int orientation, Graphics::Viewport viewport)
+{
+  Graphics::Rect2D rect2D{rect.x, rect.y, static_cast<uint32_t>(abs(rect.width)), static_cast<uint32_t>(abs(rect.height))};
+  return RecalculateRect(rect2D, orientation, viewport);
+}
+
 /**
  * @brief Find the intersection of two AABB rectangles.
  * This is a logical AND operation. IE. The intersection is the area overlapped by both rectangles.
@@ -392,9 +454,11 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
                                                 const Matrix&                       projectionMatrix,
                                                 Integration::DepthBufferAvailable   depthBufferAvailable,
                                                 Integration::StencilBufferAvailable stencilBufferAvailable,
-                                                Vector<GLuint>&                     boundTextures,
+                                                Vector<Graphics::Texture*>&         boundTextures,
                                                 const RenderInstruction&            instruction,
-                                                const Rect<int>&                    rootClippingRect)
+                                                const Rect<int32_t>&                viewport,
+                                                const Rect<int>&                    rootClippingRect,
+                                                int                                 orientation)
 {
   DALI_PRINT_RENDER_LIST(renderList);
 
@@ -408,35 +472,56 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
   uint32_t          lastClippingId(0u);
   bool              usedStencilBuffer(false);
   bool              firstDepthBufferUse(true);
-  mViewportRectangle = context.GetViewport();
-  mHasLayerScissor   = false;
+
+  if(!mGraphicsCommandBuffer)
+  {
+    mGraphicsCommandBuffer = mGraphicsController.CreateCommandBuffer(
+      Graphics::CommandBufferCreateInfo()
+        .SetLevel(Graphics::CommandBufferLevel::SECONDARY),
+      nullptr);
+  }
+  else
+  {
+    mGraphicsCommandBuffer->Reset();
+  }
+
+  mViewportRectangle = viewport;
+  mGraphicsCommandBuffer->SetViewport(ViewportFromClippingBox(mViewportRectangle, orientation));
+  mHasLayerScissor = false;
 
   // Setup Scissor testing (for both viewport and per-node scissor)
   mScissorStack.clear();
 
-  // Add root clipping rect (set manually for Render function ny partial update for example)
+  // Add root clipping rect (set manually for Render function by partial update for example)
   // on the bottom of the stack
   if(!rootClippingRect.IsEmpty())
   {
-    context.SetScissorTest(true);
-    context.Scissor(rootClippingRect.x, rootClippingRect.y, rootClippingRect.width, rootClippingRect.height);
+    Graphics::Viewport graphicsViewport = ViewportFromClippingBox(mViewportRectangle, 0);
+    mGraphicsCommandBuffer->SetScissorTestEnable(true);
+    mGraphicsCommandBuffer->SetScissor(Rect2DFromRect(rootClippingRect, orientation, graphicsViewport));
     mScissorStack.push_back(rootClippingRect);
   }
   // We are not performing a layer clip and no clipping rect set. Add the viewport as the root scissor rectangle.
   else if(!renderList.IsClipping())
   {
-    context.SetScissorTest(false);
+    mGraphicsCommandBuffer->SetScissorTestEnable(false);
     mScissorStack.push_back(mViewportRectangle);
   }
 
   if(renderList.IsClipping())
   {
-    context.SetScissorTest(true);
+    Graphics::Viewport graphicsViewport = ViewportFromClippingBox(mViewportRectangle, 0);
+    mGraphicsCommandBuffer->SetScissorTestEnable(true);
     const ClippingBox& layerScissorBox = renderList.GetClippingBox();
-    context.Scissor(layerScissorBox.x, layerScissorBox.y, layerScissorBox.width, layerScissorBox.height);
+    mGraphicsCommandBuffer->SetScissor(Rect2DFromClippingBox(layerScissorBox, orientation, graphicsViewport));
     mScissorStack.push_back(layerScissorBox);
     mHasLayerScissor = true;
   }
+
+  // Submit scissor/viewport
+  Graphics::SubmitInfo submitInfo{{}, 0 | Graphics::SubmitFlagBits::FLUSH};
+  submitInfo.cmdBuffer.push_back(mGraphicsCommandBuffer.get());
+  mGraphicsController.SubmitCommandBuffers(submitInfo);
 
   // Loop through all RenderList in the RenderList, set up any prerequisites to render them, then perform the render.
   for(uint32_t index = 0u; index < count; ++index)
@@ -495,8 +580,9 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
   }
 }
 
-RenderAlgorithms::RenderAlgorithms()
-: mViewportRectangle(),
+RenderAlgorithms::RenderAlgorithms(Graphics::Controller& graphicsController)
+: mGraphicsController(graphicsController),
+  mViewportRectangle(),
   mHasLayerScissor(false)
 {
 }
@@ -506,8 +592,10 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
                                                 BufferIndex                         bufferIndex,
                                                 Integration::DepthBufferAvailable   depthBufferAvailable,
                                                 Integration::StencilBufferAvailable stencilBufferAvailable,
-                                                Vector<GLuint>&                     boundTextures,
-                                                const Rect<int>&                    rootClippingRect)
+                                                Vector<Graphics::Texture*>&         boundTextures,
+                                                const Rect<int32_t>&                viewport,
+                                                const Rect<int>&                    rootClippingRect,
+                                                int                                 orientation)
 {
   DALI_PRINT_RENDER_INSTRUCTION(instruction, bufferIndex);
 
@@ -538,7 +626,9 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
                           stencilBufferAvailable,
                           boundTextures,
                           instruction, //added for reflection effect
-                          rootClippingRect);
+                          viewport,
+                          rootClippingRect,
+                          orientation);
       }
     }
   }

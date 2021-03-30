@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,20 @@ void sampler_test_cleanup(void)
 {
   test_return_value = TET_PASS;
 }
+
+namespace
+{
+Texture CreateTexture(TextureType::Type type, Pixel::Format format, int width, int height)
+{
+  Texture texture = Texture::New(type, format, width, height);
+
+  int       bufferSize = width * height * 2;
+  uint8_t*  buffer     = reinterpret_cast<uint8_t*>(malloc(bufferSize));
+  PixelData pixelData  = PixelData::New(buffer, bufferSize, width, height, format, PixelData::FREE);
+  texture.Upload(pixelData, 0u, 0u, 0u, 0u, width, height);
+  return texture;
+}
+} // namespace
 
 int UtcDaliSamplerNew01(void)
 {
@@ -152,7 +166,7 @@ int UtcSamplerSetFilterMode(void)
 {
   TestApplication application;
 
-  Texture image   = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
+  Texture image   = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
   Sampler sampler = Sampler::New();
 
   TextureSet textureSet = CreateTextureSet();
@@ -176,6 +190,7 @@ int UtcSamplerSetFilterMode(void)
   TraceCallStack& texParameterTrace = gl.GetTexParameterTrace();
   texParameterTrace.Reset();
   texParameterTrace.Enable(true);
+  texParameterTrace.EnableLogging(true);
 
   sampler.SetFilterMode(FilterMode::DEFAULT, FilterMode::DEFAULT);
   application.SendNotification();
@@ -189,7 +204,7 @@ int UtcSamplerSetFilterMode(void)
   DALI_TEST_EQUALS(texParameterTrace.CountMethod("TexParameteri"), 4, TEST_LOCATION);
 
   std::stringstream out;
-  out << GL_TEXTURE_2D << ", " << GL_TEXTURE_MIN_FILTER << ", " << GL_LINEAR;
+  out << std::hex << GL_TEXTURE_2D << ", " << GL_TEXTURE_MIN_FILTER << ", " << GL_LINEAR;
   DALI_TEST_EQUALS(texParameterTrace.TestMethodAndParams(0, "TexParameteri", out.str()), true, TEST_LOCATION);
 
   /**************************************************************/
@@ -227,11 +242,11 @@ int UtcSamplerSetFilterMode(void)
   DALI_TEST_EQUALS(texParameterTrace.CountMethod("TexParameteri"), 2, TEST_LOCATION);
 
   out.str("");
-  out << GL_TEXTURE_2D << ", " << GL_TEXTURE_MIN_FILTER << ", " << GL_NEAREST;
+  out << std::hex << GL_TEXTURE_2D << ", " << GL_TEXTURE_MIN_FILTER << ", " << GL_NEAREST;
   DALI_TEST_EQUALS(texParameterTrace.TestMethodAndParams(0, "TexParameteri", out.str()), true, TEST_LOCATION);
 
   out.str("");
-  out << GL_TEXTURE_2D << ", " << GL_TEXTURE_MAG_FILTER << ", " << GL_NEAREST;
+  out << std::hex << GL_TEXTURE_2D << ", " << GL_TEXTURE_MAG_FILTER << ", " << GL_NEAREST;
   DALI_TEST_EQUALS(texParameterTrace.TestMethodAndParams(1, "TexParameteri", out.str()), true, TEST_LOCATION);
 
   /**************************************************************/
@@ -251,7 +266,87 @@ int UtcSamplerSetFilterMode(void)
   DALI_TEST_EQUALS(texParameterTrace.CountMethod("TexParameteri"), 1, TEST_LOCATION);
 
   out.str("");
-  out << GL_TEXTURE_2D << ", " << GL_TEXTURE_MAG_FILTER << ", " << GL_LINEAR;
+  out << std::hex << GL_TEXTURE_2D << ", " << GL_TEXTURE_MAG_FILTER << ", " << GL_LINEAR;
+  DALI_TEST_EQUALS(texParameterTrace.TestMethodAndParams(0, "TexParameteri", out.str()), true, TEST_LOCATION);
+
+  /**************************************************************/
+  // Nearest+mipmap nearest/Linear
+  texParameterTrace.Reset();
+  texParameterTrace.Enable(true);
+
+  sampler.SetFilterMode(FilterMode::NEAREST_MIPMAP_NEAREST, FilterMode::LINEAR);
+
+  // Flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  texParameterTrace.Enable(false);
+
+  // Verify actor gl state
+  DALI_TEST_EQUALS(texParameterTrace.CountMethod("TexParameteri"), 1, TEST_LOCATION);
+
+  out.str("");
+  out << std::hex << GL_TEXTURE_2D << ", " << GL_TEXTURE_MIN_FILTER << ", " << GL_NEAREST_MIPMAP_NEAREST;
+  DALI_TEST_EQUALS(texParameterTrace.TestMethodAndParams(0, "TexParameteri", out.str()), true, TEST_LOCATION);
+
+  /**************************************************************/
+  // Nearest+mipmap linear/Linear
+  texParameterTrace.Reset();
+  texParameterTrace.Enable(true);
+
+  sampler.SetFilterMode(FilterMode::NEAREST_MIPMAP_LINEAR, FilterMode::LINEAR);
+
+  // Flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  texParameterTrace.Enable(false);
+
+  // Verify actor gl state
+  DALI_TEST_EQUALS(texParameterTrace.CountMethod("TexParameteri"), 1, TEST_LOCATION);
+
+  out.str("");
+  out << std::hex << GL_TEXTURE_2D << ", " << GL_TEXTURE_MIN_FILTER << ", " << GL_NEAREST_MIPMAP_LINEAR;
+  DALI_TEST_EQUALS(texParameterTrace.TestMethodAndParams(0, "TexParameteri", out.str()), true, TEST_LOCATION);
+
+  /**************************************************************/
+  // linear+mipmap nearest/Linear
+  texParameterTrace.Reset();
+  texParameterTrace.Enable(true);
+
+  sampler.SetFilterMode(FilterMode::LINEAR_MIPMAP_NEAREST, FilterMode::LINEAR);
+
+  // Flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  texParameterTrace.Enable(false);
+
+  // Verify actor gl state
+  DALI_TEST_EQUALS(texParameterTrace.CountMethod("TexParameteri"), 1, TEST_LOCATION);
+
+  out.str("");
+  out << std::hex << GL_TEXTURE_2D << ", " << GL_TEXTURE_MIN_FILTER << ", " << GL_LINEAR_MIPMAP_NEAREST;
+  DALI_TEST_EQUALS(texParameterTrace.TestMethodAndParams(0, "TexParameteri", out.str()), true, TEST_LOCATION);
+
+  /**************************************************************/
+  // linear+mipmap linear/Linear
+  texParameterTrace.Reset();
+  texParameterTrace.Enable(true);
+
+  sampler.SetFilterMode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR);
+
+  // Flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  texParameterTrace.Enable(false);
+
+  // Verify actor gl state
+  DALI_TEST_EQUALS(texParameterTrace.CountMethod("TexParameteri"), 1, TEST_LOCATION);
+
+  out.str("");
+  out << std::hex << GL_TEXTURE_2D << ", " << GL_TEXTURE_MIN_FILTER << ", " << GL_LINEAR_MIPMAP_LINEAR;
   DALI_TEST_EQUALS(texParameterTrace.TestMethodAndParams(0, "TexParameteri", out.str()), true, TEST_LOCATION);
 
   /**************************************************************/
@@ -271,7 +366,7 @@ int UtcSamplerSetFilterMode(void)
   DALI_TEST_EQUALS(texParameterTrace.CountMethod("TexParameteri"), 1, TEST_LOCATION);
 
   out.str("");
-  out << GL_TEXTURE_2D << ", " << GL_TEXTURE_MIN_FILTER << ", " << GL_NEAREST_MIPMAP_LINEAR;
+  out << std::hex << GL_TEXTURE_2D << ", " << GL_TEXTURE_MIN_FILTER << ", " << GL_NEAREST_MIPMAP_LINEAR;
   DALI_TEST_EQUALS(texParameterTrace.TestMethodAndParams(0, "TexParameteri", out.str()), true, TEST_LOCATION);
 
   END_TEST;
@@ -281,7 +376,7 @@ int UtcSamplerSetWrapMode1(void)
 {
   TestApplication application;
 
-  Texture    image      = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
+  Texture    image      = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
   TextureSet textureSet = CreateTextureSet();
   Sampler    sampler    = Sampler::New();
   textureSet.SetTexture(0u, image);
@@ -305,6 +400,7 @@ int UtcSamplerSetWrapMode1(void)
   TraceCallStack& texParameterTrace = gl.GetTexParameterTrace();
   texParameterTrace.Reset();
   texParameterTrace.Enable(true);
+  texParameterTrace.EnableLogging(true);
 
   application.SendNotification();
   application.Render();
@@ -317,11 +413,11 @@ int UtcSamplerSetWrapMode1(void)
   DALI_TEST_EQUALS(texParameterTrace.CountMethod("TexParameteri"), 4, TEST_LOCATION);
 
   std::stringstream out;
-  out << GL_TEXTURE_2D << ", " << GL_TEXTURE_WRAP_S << ", " << GL_CLAMP_TO_EDGE;
+  out << std::hex << GL_TEXTURE_2D << ", " << GL_TEXTURE_WRAP_S << ", " << GL_CLAMP_TO_EDGE;
   DALI_TEST_EQUALS(texParameterTrace.TestMethodAndParams(2, "TexParameteri", out.str()), true, TEST_LOCATION);
 
   out.str("");
-  out << GL_TEXTURE_2D << ", " << GL_TEXTURE_WRAP_T << ", " << GL_CLAMP_TO_EDGE;
+  out << std::hex << GL_TEXTURE_2D << ", " << GL_TEXTURE_WRAP_T << ", " << GL_CLAMP_TO_EDGE;
   DALI_TEST_EQUALS(texParameterTrace.TestMethodAndParams(3, "TexParameteri", out.str()), true, TEST_LOCATION);
 
   texParameterTrace.Reset();
@@ -352,7 +448,7 @@ int UtcSamplerSetWrapMode2(void)
   // Create a cube-map texture.
   unsigned int width   = 8u;
   unsigned int height  = 8u;
-  Texture      texture = Texture::New(TextureType::TEXTURE_CUBE, Pixel::RGBA8888, width, height);
+  Texture      texture = CreateTexture(TextureType::TEXTURE_CUBE, Pixel::RGBA8888, width, height);
 
   // Create source image data.
   unsigned int   bufferSize(width * height * 4);
@@ -395,6 +491,7 @@ int UtcSamplerSetWrapMode2(void)
   TraceCallStack& texParameterTrace = gl.GetTexParameterTrace();
   texParameterTrace.Reset();
   texParameterTrace.Enable(true);
+  texParameterTrace.EnableLogging(true);
 
   // Call the 3 dimensional wrap mode API.
   sampler.SetWrapMode(WrapMode::CLAMP_TO_EDGE, WrapMode::CLAMP_TO_EDGE, WrapMode::CLAMP_TO_EDGE);
@@ -405,7 +502,7 @@ int UtcSamplerSetWrapMode2(void)
   // Verify that no TexParameteri calls occurred since wrap mode hasn't changed.
   DALI_TEST_EQUALS(texParameterTrace.CountMethod("TexParameteri"), 0u, TEST_LOCATION);
 
-  sampler.SetWrapMode(WrapMode::REPEAT, WrapMode::REPEAT, WrapMode::REPEAT);
+  sampler.SetWrapMode(WrapMode::MIRRORED_REPEAT, WrapMode::REPEAT, WrapMode::REPEAT);
   texParameterTrace.Reset();
   application.SendNotification();
   application.Render();
@@ -413,6 +510,9 @@ int UtcSamplerSetWrapMode2(void)
   texParameterTrace.Enable(false);
 
   // Verify that 3 TexParameteri calls occurred.
+  std::ostringstream out;
+  out << std::hex << GL_TEXTURE_CUBE_MAP << ", " << GL_TEXTURE_WRAP_R << ", " << GL_MIRRORED_REPEAT;
+  DALI_TEST_CHECK(texParameterTrace.FindMethodAndParams("TexParameteri", out.str()));
   DALI_TEST_EQUALS(texParameterTrace.CountMethod("TexParameteri"), 3u, TEST_LOCATION);
   END_TEST;
 }

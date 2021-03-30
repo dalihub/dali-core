@@ -204,6 +204,7 @@ void Shader::SetShader(std::string_view          vertexSource,
   mShaderData = shaderFactory.Load(vertexSource, fragmentSource, hints, shaderHash);
 
   // Add shader data to scene-object
+
   SceneGraph::SetShaderDataMessage(GetEventThreadServices(), GetShaderSceneObject(), mShaderData);
 }
 

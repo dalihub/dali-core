@@ -35,6 +35,7 @@ namespace SceneGraph
 {
 class ConnectionObserver;
 class SceneController;
+
 /**
  * A holder class for Program; also enables sharing of uniform properties
  */
@@ -90,11 +91,6 @@ public:
   {
     // no default properties
   }
-
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // The following methods are called during Render
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
   /**
    * @brief Set the shader data for this shader.
    * @param[in] shaderData The program's vertex/fragment source and optionally pre-compiled shader binary.

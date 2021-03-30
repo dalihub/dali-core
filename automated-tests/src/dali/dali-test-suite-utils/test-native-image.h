@@ -2,7 +2,7 @@
 #define TEST_NATIVE_IMAGE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,40 +40,52 @@ public:
   inline virtual bool CreateResource()
   {
     ++mExtensionCreateCalls;
+    mCallStack.PushCall("CreateResource", "");
     return createResult;
   };
   inline virtual void DestroyResource()
   {
     ++mExtensionDestroyCalls;
+    mCallStack.PushCall("DestroyResource", "");
   };
   inline virtual GLenum TargetTexture()
   {
     ++mTargetTextureCalls;
-    return mTargetTextureError;
+    mCallStack.PushCall("TargetTexture", "");
+    return mTargetTextureError--;
   };
-  inline virtual void     PrepareTexture(){};
+  inline virtual void PrepareTexture()
+  {
+    mCallStack.PushCall("PrepareTexture", "");
+  };
   inline virtual uint32_t GetWidth() const
   {
+    mCallStack.PushCall("GetWidth", "");
     return mWidth;
   };
   inline virtual uint32_t GetHeight() const
   {
+    mCallStack.PushCall("GetHeight", "");
     return mHeight;
   };
   inline virtual bool RequiresBlending() const
   {
+    mCallStack.PushCall("RequiresBlending", "");
     return true;
   };
   inline virtual int GetTextureTarget() const
   {
+    mCallStack.PushCall("GetTextureTarget", "");
     return GL_TEXTURE_EXTERNAL_OES;
   };
   inline virtual const char* GetCustomFragmentPrefix() const
   {
+    mCallStack.PushCall("GetCustomFragmentPrefix", "");
     return "#extension GL_OES_EGL_image_external:require\n";
   };
   inline const char* GetCustomSamplerTypename() const override
   {
+    mCallStack.PushCall("GetCustomSamplerTypename", "");
     return "samplerExternalOES";
   };
 
@@ -99,11 +111,12 @@ private:
   uint32_t mHeight;
 
 public:
-  int32_t  mExtensionCreateCalls;
-  int32_t  mExtensionDestroyCalls;
-  int32_t  mTargetTextureCalls;
-  uint32_t mTargetTextureError = 0u;
-  bool     createResult;
+  int32_t                mExtensionCreateCalls;
+  int32_t                mExtensionDestroyCalls;
+  int32_t                mTargetTextureCalls;
+  uint32_t               mTargetTextureError{0u};
+  bool                   createResult;
+  mutable TraceCallStack mCallStack;
 };
 
 } // namespace Dali

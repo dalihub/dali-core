@@ -370,7 +370,7 @@ int UtcDaliShaderAnimatedProperty02(void)
   application.Render(100);
 
   // register another custom property as well
-  Property::Index customIndex = shader.RegisterProperty("uCustom", Vector3(1, 2, 3));
+  Property::Index customIndex = shader.RegisterProperty("uCustom3", Vector3(1, 2, 3));
   DALI_TEST_EQUALS(shader.GetProperty<Vector3>(customIndex), Vector3(1, 2, 3), TEST_LOCATION);
 
   application.SendNotification();
@@ -380,7 +380,7 @@ int UtcDaliShaderAnimatedProperty02(void)
   DALI_TEST_EQUALS(actualValue, Color::TRANSPARENT, TEST_LOCATION);
 
   Vector3 customValue;
-  DALI_TEST_CHECK(gl.GetUniformValue<Vector3>("uCustom", customValue));
+  DALI_TEST_CHECK(gl.GetUniformValue<Vector3>("uCustom3", customValue));
   DALI_TEST_EQUALS(customValue, Vector3(1, 2, 3), TEST_LOCATION);
   END_TEST;
 }

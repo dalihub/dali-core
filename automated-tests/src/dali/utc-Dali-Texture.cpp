@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,17 @@ void texture_set_startup(void)
 void texture_set_cleanup(void)
 {
   test_return_value = TET_PASS;
+}
+
+Texture CreateTexture(TextureType::Type type, Pixel::Format format, int width, int height)
+{
+  Texture texture = Texture::New(type, format, width, height);
+
+  int       bufferSize = width * height * Pixel::GetBytesPerPixel(format);
+  uint8_t*  buffer     = reinterpret_cast<uint8_t*>(malloc(bufferSize));
+  PixelData pixelData  = PixelData::New(buffer, bufferSize, width, height, format, PixelData::FREE);
+  texture.Upload(pixelData, 0u, 0u, 0u, 0u, width, height);
+  return texture;
 }
 
 int UtcDaliTextureNew01(void)
@@ -178,7 +189,7 @@ int UtcDaliTextureUpload01(void)
   //Create the texture
   unsigned int width(64);
   unsigned int height(64);
-  Texture      texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  Texture      texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
 
   application.GetGlAbstraction().EnableTextureCallTrace(true);
 
@@ -186,13 +197,6 @@ int UtcDaliTextureUpload01(void)
   application.Render();
 
   TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
-
-  //TexImage2D should be called with a null pointer to reserve storage for the texture in the gpu
-  {
-    std::stringstream out;
-    out << GL_TEXTURE_2D << ", " << 0u << ", " << width << ", " << height;
-    DALI_TEST_CHECK(callStack.FindMethodAndParams("TexImage2D", out.str().c_str()));
-  }
 
   //Upload data to the texture
   callStack.Reset();
@@ -237,7 +241,7 @@ int UtcDaliTextureUpload02(void)
   //Create the texture
   unsigned int width(64);
   unsigned int height(64);
-  Texture      texture = Texture::New(TextureType::TEXTURE_CUBE, Pixel::RGBA8888, width, height);
+  Texture      texture = CreateTexture(TextureType::TEXTURE_CUBE, Pixel::RGBA8888, width, height);
 
   application.GetGlAbstraction().EnableTextureCallTrace(true);
 
@@ -246,7 +250,7 @@ int UtcDaliTextureUpload02(void)
 
   TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
 
-  //TexImage2D should be called six times with a null pointer to reserve storage for the six textures of the cube map
+  tet_infoline("TexImage2D should be called six times with a null pointer to reserve storage for the six textures of the cube map");
   for(unsigned int i(0); i < 6; ++i)
   {
     std::stringstream out;
@@ -363,7 +367,7 @@ int UtcDaliTextureUpload03(void)
   unsigned int widthMipmap1(32);
   unsigned int heightMipmap1(32);
 
-  Texture texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  Texture texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
 
   application.GetGlAbstraction().EnableTextureCallTrace(true);
 
@@ -372,7 +376,7 @@ int UtcDaliTextureUpload03(void)
 
   TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
 
-  //TexImage2D should be called with a null pointer to reserve storage for the texture in the gpu
+  tet_infoline("TexImage2D should be called with a null pointer to reserve storage for the texture in the gpu");
   {
     std::stringstream out;
     out << GL_TEXTURE_2D << ", " << 0u << ", " << width << ", " << height;
@@ -419,7 +423,7 @@ int UtcDaliTextureUpload04(void)
   unsigned int widthMipmap1(32);
   unsigned int heightMipmap1(32);
 
-  Texture texture = Texture::New(TextureType::TEXTURE_CUBE, Pixel::RGBA8888, width, height);
+  Texture texture = CreateTexture(TextureType::TEXTURE_CUBE, Pixel::RGBA8888, width, height);
 
   application.GetGlAbstraction().EnableTextureCallTrace(true);
   TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
@@ -506,7 +510,7 @@ int UtcDaliTextureUpload05(void)
     //Create a texture with a compressed format
     unsigned int width(64);
     unsigned int height(64);
-    Texture      texture = Texture::New(TextureType::TEXTURE_2D, COMPRESSED_PIXEL_FORMATS[index], width, height);
+    Texture      texture = CreateTexture(TextureType::TEXTURE_2D, COMPRESSED_PIXEL_FORMATS[index], width, height);
 
     application.GetGlAbstraction().EnableTextureCallTrace(true);
 
@@ -515,7 +519,7 @@ int UtcDaliTextureUpload05(void)
 
     TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
 
-    //CompressedTexImage2D should be called with a null pointer to reserve storage for the texture in the gpu
+    tet_infoline("CompressedTexImage2D should be called with a null pointer to reserve storage for the texture in the gpu");
     {
       std::stringstream out;
       out << GL_TEXTURE_2D << ", " << 0u << ", " << width << ", " << height;
@@ -569,7 +573,7 @@ int UtcDaliTextureUpload06(void)
   unsigned int width(64);
   unsigned int height(64);
   tet_infoline("Creating a Texure with an alpha channel");
-  Texture texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  Texture texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
 
   application.GetGlAbstraction().EnableTextureCallTrace(true);
 
@@ -623,7 +627,7 @@ int UtcDaliTextureUpload07(void)
     unsigned int width(64);
     unsigned int height(64);
     tet_infoline("Creating a floating point texture");
-    Texture texture = Texture::New(TextureType::TEXTURE_2D, FLOATING_POINT_PIXEL_FORMATS[index], width, height);
+    Texture texture = CreateTexture(TextureType::TEXTURE_2D, FLOATING_POINT_PIXEL_FORMATS[index], width, height);
 
     application.GetGlAbstraction().EnableTextureCallTrace(true);
 
@@ -661,6 +665,58 @@ int UtcDaliTextureUpload07(void)
   END_TEST;
 }
 
+int UtcDaliTextureUploadPixelFormats(void)
+{
+  TestApplication application;
+  application.GetGlAbstraction().EnableTextureCallTrace(true);
+
+  //Create the texture
+  unsigned int width(64);
+  unsigned int height(64);
+
+  std::vector<Pixel::Format> formats =
+    {
+      Pixel::A8,
+      Pixel::L8,
+      Pixel::LA88,
+      Pixel::RGB565,
+      Pixel::BGR565,
+      Pixel::RGBA4444,
+      Pixel::BGRA4444,
+      Pixel::RGBA5551,
+      Pixel::BGRA5551,
+      Pixel::RGB888,
+      Pixel::RGB8888,
+      Pixel::BGR8888,
+      Pixel::RGBA8888,
+      Pixel::BGRA8888,
+      Pixel::DEPTH_UNSIGNED_INT,
+      Pixel::DEPTH_FLOAT,
+      Pixel::DEPTH_STENCIL};
+
+  for(auto format : formats)
+  {
+    tet_infoline("Creating a Texure with an alpha channel");
+    Texture texture = CreateTexture(TextureType::TEXTURE_2D, format, width, height);
+
+    application.SendNotification();
+    application.Render();
+
+    TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
+
+    tet_infoline("TexImage2D should be called twice per texture");
+    DALI_TEST_EQUALS(callStack.CountMethod("TexImage2D"), 2, TEST_LOCATION);
+    {
+      std::stringstream out;
+      out << GL_TEXTURE_2D << ", " << 0u << ", " << width << ", " << height;
+      DALI_TEST_CHECK(callStack.FindMethodAndParams("TexImage2D", out.str().c_str()));
+    }
+    callStack.Reset();
+  }
+
+  END_TEST;
+}
+
 int UtcDaliTextureUploadSmallerThanSize(void)
 {
   TestApplication application;
@@ -668,7 +724,7 @@ int UtcDaliTextureUploadSmallerThanSize(void)
   //Create the texture
   unsigned int width(64);
   unsigned int height(64);
-  Texture      texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  Texture      texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
 
   application.GetGlAbstraction().EnableTextureCallTrace(true);
 
@@ -676,8 +732,11 @@ int UtcDaliTextureUploadSmallerThanSize(void)
   application.Render();
 
   TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
+  callStack.EnableLogging(true);
+  TraceCallStack& texParamCallStack = application.GetGlAbstraction().GetTexParameterTrace();
+  texParamCallStack.EnableLogging(true);
 
-  //TexImage2D should be called with a null pointer to reserve storage for the texture in the gpu
+  tet_infoline("TexImage2D should be called with a null pointer to reserve storage for the texture in the gpu");
   {
     std::stringstream out;
     out << GL_TEXTURE_2D << ", " << 0u << ", " << width << ", " << height;
@@ -696,7 +755,7 @@ int UtcDaliTextureUploadSmallerThanSize(void)
   application.SendNotification();
   application.Render();
 
-  //TexImage2D should be called to upload the data
+  //TexSubImage2D should be called to upload the data
   {
     std::stringstream out;
     out << GL_TEXTURE_2D << ", " << 0u << ", " << 0u << ", " << 0u << ", " << width / 2 << ", " << height / 2;
@@ -704,20 +763,20 @@ int UtcDaliTextureUploadSmallerThanSize(void)
     DALI_TEST_CHECK(callStack.FindMethodAndGetParameters("TexSubImage2D", params));
     DALI_TEST_EQUALS(out.str(), params, TEST_LOCATION);
   }
-
   END_TEST;
 }
 
 int UtcDaliTextureGenerateMipmaps(void)
 {
+#ifdef OLD_GRAPHICS_TEST
   TestApplication application;
   unsigned int    width(64);
   unsigned int    height(64);
 
-  Texture texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  Texture texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
   texture.GenerateMipmaps();
 
-  Texture textureCubemap = Texture::New(TextureType::TEXTURE_CUBE, Pixel::RGBA8888, width, height);
+  Texture textureCubemap = CreateTexture(TextureType::TEXTURE_CUBE, Pixel::RGBA8888, width, height);
   textureCubemap.GenerateMipmaps();
 
   application.GetGlAbstraction().EnableTextureCallTrace(true);
@@ -735,6 +794,9 @@ int UtcDaliTextureGenerateMipmaps(void)
     out << GL_TEXTURE_CUBE_MAP;
     DALI_TEST_CHECK(callStack.FindMethodAndParams("GenerateMipmap", out.str().c_str()));
   }
+#else
+  DALI_TEST_CHECK(1);
+#endif
 
   END_TEST;
 }
@@ -745,7 +807,7 @@ int UtcDaliTextureGetWidth(void)
   unsigned int    width(64);
   unsigned int    height(64);
 
-  Texture texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  Texture texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
   DALI_TEST_EQUALS(texture.GetWidth(), width, TEST_LOCATION);
   END_TEST;
 }
@@ -756,7 +818,7 @@ int UtcDaliTextureGetHeight(void)
   unsigned int    width(64);
   unsigned int    height(64);
 
-  Texture texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  Texture texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
   DALI_TEST_EQUALS(texture.GetHeight(), height, TEST_LOCATION);
 
   END_TEST;
@@ -770,7 +832,7 @@ int UtcDaliTextureContextLoss(void)
   //Create the texture
   unsigned int width(64);
   unsigned int height(64);
-  Texture      texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  Texture      texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
   DALI_TEST_CHECK(texture);
 
   application.SendNotification();
@@ -836,8 +898,9 @@ int UtcDaliNativeImageTexture02(void)
 
     // Expect 2 attempts to create the texture - once when adding the texture
     // to the scene-graph, and again since that failed, during the Bind.
+    // The second one succeeds (TargetTexture only errors once)
     DALI_TEST_EQUALS(imageInterface->mExtensionCreateCalls, 2, TEST_LOCATION);
-    DALI_TEST_EQUALS(imageInterface->mExtensionDestroyCalls, 2, TEST_LOCATION);
+    DALI_TEST_EQUALS(imageInterface->mExtensionDestroyCalls, 1, TEST_LOCATION);
 
     UnparentAndReset(actor);
 
@@ -958,7 +1021,7 @@ int UtcDaliTextureCheckNativeN1(void)
   TestApplication application;
   unsigned int    width(64);
   unsigned int    height(64);
-  Texture         texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  Texture         texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
 
   DALI_TEST_CHECK(texture);
   DALI_TEST_CHECK(!DevelTexture::IsNative(texture));
@@ -1046,7 +1109,7 @@ int UtcDaliTextureApplyFragShaderN2(void)
   TestApplication application;
   unsigned int    width(64);
   unsigned int    height(64);
-  Texture         texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  Texture         texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
 
   const std::string baseFragShader =
     "varying mediump vec4 uColor;\n"

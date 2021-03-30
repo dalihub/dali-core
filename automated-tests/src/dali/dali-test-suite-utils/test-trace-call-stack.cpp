@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,9 @@
  */
 
 #include "test-trace-call-stack.h"
-
+#include <iostream>
 #include <sstream>
+#include "dali-test-suite-utils.h"
 
 namespace Dali
 {
@@ -45,8 +46,10 @@ std::string ToString(float x)
 /**
  * Constructor
  */
-TraceCallStack::TraceCallStack()
-: mTraceActive(false)
+TraceCallStack::TraceCallStack(bool logging, std::string prefix)
+: mTraceActive(false),
+  mLogging(logging),
+  mPrefix(prefix)
 {
 }
 
@@ -70,6 +73,11 @@ bool TraceCallStack::IsEnabled()
   return mTraceActive;
 }
 
+void TraceCallStack::EnableLogging(bool enablelogging)
+{
+  mLogging = enablelogging;
+}
+
 /**
  * Push a call onto the stack if the trace is active
  * @param[in] method The name of the method
@@ -82,6 +90,10 @@ void TraceCallStack::PushCall(std::string method, std::string params)
     FunctionCall stackFrame(method, params);
     mCallStack.push_back(stackFrame);
   }
+  if(mLogging)
+  {
+    fprintf(stderr, "%s%s(%s)\n", mPrefix.c_str(), method.c_str(), params.c_str());
+  }
 }
 
 void TraceCallStack::PushCall(std::string method, std::string params, const TraceCallStack::NamedParams& altParams)
@@ -90,6 +102,10 @@ void TraceCallStack::PushCall(std::string method, std::string params, const Trac
   {
     FunctionCall stackFrame(method, params, altParams);
     mCallStack.push_back(stackFrame);
+  }
+  if(mLogging)
+  {
+    fprintf(stderr, "%s%s(%s)\n", mPrefix.c_str(), method.c_str(), params.c_str());
   }
 }
 
@@ -109,6 +125,10 @@ bool TraceCallStack::FindMethod(std::string method) const
       break;
     }
   }
+  if(!found)
+  {
+    fprintf(stderr, "Search for %s failed\n", method.c_str());
+  }
   return found;
 }
 
@@ -123,6 +143,10 @@ bool TraceCallStack::FindMethodAndGetParameters(std::string method, std::string&
       params = mCallStack[i].paramList;
       break;
     }
+  }
+  if(!found)
+  {
+    fprintf(stderr, "Search for %s(%s) failed\n", method.c_str(), params.c_str());
   }
   return found;
 }
@@ -186,6 +210,10 @@ int32_t TraceCallStack::FindIndexFromMethodAndParams(std::string method, std::st
       break;
     }
   }
+  if(index == -1)
+  {
+    fprintf(stderr, "Search for %s(%s) failed\n", method.c_str(), params.c_str());
+  }
   return index;
 }
 
@@ -198,10 +226,14 @@ int TraceCallStack::FindIndexFromMethodAndParams(std::string method, const Trace
     {
       // Test each of the passed in parameters:
       bool match = true;
-      for(NamedParams::const_iterator iter = params.begin(); iter != params.end(); ++iter)
+
+      for(auto iter = params.mParams.begin(); iter != params.mParams.end(); ++iter)
       {
-        NamedParams::const_iterator paramIter = mCallStack[i].namedParams.find(iter->first);
-        if(paramIter == params.end() || paramIter->second.compare(iter->second) != 0)
+        auto        paramIter = mCallStack[i].namedParams.find(iter->parameterName);
+        std::string value     = paramIter->value.str();
+        std::string iValue    = iter->value.str();
+
+        if(paramIter == mCallStack[i].namedParams.end() || value.compare(iValue))
         {
           match = false;
           break;
@@ -214,7 +246,52 @@ int TraceCallStack::FindIndexFromMethodAndParams(std::string method, const Trace
       }
     }
   }
+
+  if(index == -1)
+  {
+    fprintf(stderr, "Search for %s(%s) failed\n", method.c_str(), params.str().c_str());
+  }
+
   return index;
+}
+
+const TraceCallStack::NamedParams* TraceCallStack::FindLastMatch(std::string method, const TraceCallStack::NamedParams& params) const
+{
+  int index = -1;
+
+  if(mCallStack.size() > 0)
+  {
+    for(index = static_cast<int>(mCallStack.size() - 1); index >= 0; --index)
+    {
+      if(0 == mCallStack[index].method.compare(method))
+      {
+        // Test each of the passed in parameters:
+        bool match = true;
+
+        for(auto iter = params.mParams.begin(); iter != params.mParams.end(); ++iter)
+        {
+          auto        paramIter = mCallStack[index].namedParams.find(iter->parameterName);
+          std::string value     = paramIter->value.str();
+          std::string iValue    = iter->value.str();
+
+          if(paramIter == mCallStack[index].namedParams.end() || value.compare(iValue))
+          {
+            match = false;
+            break;
+          }
+        }
+        if(match == true)
+        {
+          break;
+        }
+      }
+    }
+  }
+  if(index >= 0)
+  {
+    return &mCallStack[index].namedParams;
+  }
+  return nullptr;
 }
 
 /**
@@ -234,6 +311,19 @@ bool TraceCallStack::TestMethodAndParams(int index, std::string method, std::str
 void TraceCallStack::Reset()
 {
   mCallStack.clear();
+}
+
+bool TraceCallStack::NamedParams::NameValue::operator==(int match) const
+{
+  std::ostringstream matchStr;
+  matchStr << match;
+  std::string valueStr = value.str();
+  bool        retval   = !valueStr.compare(matchStr.str());
+  if(!retval)
+  {
+    tet_printf("Comparing parameter \"%s\": %s with %s failed\n", parameterName.c_str(), value.str().c_str(), matchStr.str().c_str());
+  }
+  return retval;
 }
 
 } // namespace Dali
