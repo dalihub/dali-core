@@ -110,15 +110,7 @@ bool AddRenderablesForTask(BufferIndex updateBufferIndex,
   // Short-circuit for invisible nodes
   if(!node.IsVisible(updateBufferIndex))
   {
-    node.GetPartialRenderingData().mVisible = false;
     return keepRendering;
-  }
-
-  // If the node was not previously visible
-  if(!node.GetPartialRenderingData().mVisible)
-  {
-    node.GetPartialRenderingData().mVisible = true;
-    node.SetUpdated(true);
   }
 
   // Check whether node is exclusive to a different render-task
