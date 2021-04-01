@@ -92,7 +92,58 @@ void FrameBuffer::Bind()
 {
   if(!mGraphicsObject)
   {
-    mGraphicsObject = mGraphicsController->CreateFramebuffer(mCreateInfo, nullptr);
+    mGraphicsObject = mGraphicsController->CreateFramebuffer(mCreateInfo, std::move(mGraphicsObject));
+
+    // Create render target
+    Graphics::RenderTargetCreateInfo rtInfo{};
+    rtInfo
+      .SetFramebuffer( mGraphicsObject.get() )
+      .SetExtent( {mWidth, mHeight} )
+      .SetPreTransform( 0 | Graphics::RenderTargetTransformFlagBits::TRANSFORM_IDENTITY_BIT );
+    mRenderTarget = mGraphicsController->CreateRenderTarget( rtInfo, std::move(mRenderTarget) );
+
+    std::vector<Graphics::AttachmentDescription> attachmentDescriptions;
+
+    // Default behaviour for color attachments is to CLEAR and STORE
+    //@todo Ideally, we should create new render pass whenever
+    //      the loadop, storeop changes and the list of such renderpasses
+    //      should be managed accordingly (as in Vulkan)
+    mClearValues.clear();
+    for(auto& att: mCreateInfo.colorAttachments )
+    {
+      if(att.texture)
+      {
+        Graphics::AttachmentDescription desc{};
+        desc.SetLoadOp(Graphics::AttachmentLoadOp::CLEAR);
+        desc.SetStoreOp(Graphics::AttachmentStoreOp::STORE);
+        attachmentDescriptions.push_back(desc);
+        mClearValues.emplace_back();
+      }
+    }
+
+    if(mCreateInfo.depthStencilAttachment.depthTexture)
+    {
+      Graphics::AttachmentDescription depthStencilDesc{};
+      depthStencilDesc.SetStencilLoadOp( Graphics::AttachmentLoadOp::CLEAR )
+      .SetStoreOp( Graphics::AttachmentStoreOp::DONT_CARE );
+      if(mCreateInfo.depthStencilAttachment.stencilTexture)
+      {
+        depthStencilDesc.SetStencilLoadOp( Graphics::AttachmentLoadOp::CLEAR)
+        .SetStoreOp( Graphics::AttachmentStoreOp::DONT_CARE);
+      }
+      mClearValues.emplace_back();
+      attachmentDescriptions.push_back(depthStencilDesc);
+    }
+
+    Graphics::RenderPassCreateInfo rpInfo{};
+    rpInfo.SetAttachments( attachmentDescriptions );
+
+    // Add default render pass (loadOp = clear)
+    mRenderPass.emplace_back( mGraphicsController->CreateRenderPass( rpInfo, nullptr ) );
+
+    // Add default render pass (loadOp = dontcare)
+    attachmentDescriptions[0].SetLoadOp( Graphics::AttachmentLoadOp::DONT_CARE );
+    mRenderPass.emplace_back( mGraphicsController->CreateRenderPass( rpInfo, nullptr ) );
   }
 }
 
@@ -105,6 +156,21 @@ uint32_t FrameBuffer::GetHeight() const
 {
   return mHeight;
 }
+
+[[nodiscard]] Graphics::RenderPass* FrameBuffer::GetGraphicsRenderPass( Graphics::AttachmentLoadOp colorLoadOp,
+                                                                        Graphics::AttachmentStoreOp colorStoreOp ) const
+{
+  // clear only when requested
+  if( colorLoadOp == Graphics::AttachmentLoadOp::CLEAR )
+  {
+    return mRenderPass[0].get();
+  }
+  else
+  {
+    return mRenderPass[1].get();
+  }
+}
+
 
 } // namespace Render
 

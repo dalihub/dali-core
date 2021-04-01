@@ -93,18 +93,6 @@ struct PipelineCreateInfo
   }
 
   /**
-   * @brief Sets the framebuffer state.
-   *
-   * @param[in] value pointer to valid framebuffer state structure
-   * @return reference to this structure
-   */
-  auto& SetFramebufferState(FramebufferState* value)
-  {
-    framebufferState = value;
-    return *this;
-  }
-
-  /**
    * @brief Sets the base pipeline.
    *
    * Setting base pipeline allows inheriting that pipeline state
@@ -208,7 +196,6 @@ struct PipelineCreateInfo
   ProgramState*            programState{nullptr};
   ColorBlendState*         colorBlendState{nullptr};
   ViewportState*           viewportState{nullptr};
-  FramebufferState*        framebufferState{nullptr};
   Pipeline*                basePipeline{nullptr};
   DepthStencilState*       depthStencilState{nullptr};
   RasterizationState*      rasterizationState{nullptr};

@@ -72,6 +72,21 @@ public:
                                 const Rect<int>&                     rootClippingRect,
                                 int                                  orientation);
 
+  /**
+   * Resets main command buffer (per scene)
+   */
+  void ResetCommandBuffer();
+
+  /**
+   * Submits main command buffer (per scene)
+   */
+  void SubmitCommandBuffer();
+
+  [[nodiscard]] Graphics::CommandBuffer* GetMainCommandBuffer() const
+  {
+    return mGraphicsCommandBuffer.get();
+  }
+
 private:
   /**
    * @brief Calculate a 2D AABB (axis aligned bounding box) in screen space.
@@ -150,6 +165,8 @@ private:
 
   Graphics::Controller&                        mGraphicsController;
   Graphics::UniquePtr<Graphics::CommandBuffer> mGraphicsCommandBuffer{};
+
+  std::vector<Graphics::CommandBuffer*> mGraphicsRenderItemCommandBuffers{};
 
   ScissorStackType  mScissorStack;        ///< Contains the currently applied scissor hierarchy (so we can undo clips)
   Dali::ClippingBox mViewportRectangle;   ///< The viewport dimensions, used to translate AABBs to scissor coordinates

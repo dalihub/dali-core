@@ -509,8 +509,8 @@ public:
   }
 
   void BeginRenderPass(
-    Graphics::RenderPass&             renderPass,
-    Graphics::RenderTarget&           renderTarget,
+    Graphics::RenderPass*             renderPass,
+    Graphics::RenderTarget*           renderTarget,
     Graphics::Extent2D                renderArea,
     std::vector<Graphics::ClearValue> clearValues) override
   {
@@ -529,6 +529,11 @@ public:
   void EndRenderPass() override
   {
     mCallStack.PushCall("EndRenderPass", "");
+  }
+
+  void ExecuteCommandBuffers(std::vector<CommandBuffer*>&& commandBuffers) override
+  {
+    mCallStack.PushCall("ExecuteCommandBuffers", "");
   }
 
   void Draw(

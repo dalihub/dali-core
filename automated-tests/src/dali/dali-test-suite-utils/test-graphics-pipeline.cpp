@@ -32,9 +32,6 @@ TestGraphicsPipeline::TestGraphicsPipeline(TestGlAbstraction& gl, const Graphics
   if(createInfo.viewportState)
     viewportState = *createInfo.viewportState;
 
-  if(createInfo.framebufferState)
-    framebufferState = *createInfo.framebufferState;
-
   if(createInfo.depthStencilState)
     depthStencilState = *createInfo.depthStencilState;
 

@@ -54,6 +54,58 @@ struct RenderTargetCreateInfo
   }
 
   /**
+   * @brief Sets surface associated with the RenderTarget
+   *
+   * The surface is a a pointer to any native surface object.
+   *
+   * @param[in] value Pointer to the native surface
+   * @return reference to this structure
+   */
+  auto& SetSurface( Surface* value )
+  {
+    surface = value;
+    return *this;
+  }
+
+  /**
+   * @brief Sets framebuffer associated with the RenderTarget
+   *
+   * The framebuffer and surface must not be set together.
+   *
+   * @param[in] value Pointer to the Framebuffer object
+   * @return reference to this structure
+   */
+  auto& SetFramebuffer( Framebuffer* value )
+  {
+    framebuffer = value;
+    return *this;
+  }
+
+  /**
+   * @brief Sets render target size
+   *
+   * @param[in] value Size of render target
+   * @return reference to this structure
+   */
+  auto& SetExtent( Extent2D value )
+  {
+    extent = value;
+    return *this;
+  }
+
+  /**
+   * @brief Sets pre-transform of the render target
+   *
+   * @param[in] value transform flags
+   * @return reference to this structure
+   */
+  auto& SetPreTransform( RenderTargetTransformFlags value )
+  {
+    preTransform = value;
+    return *this;
+  }
+
+  /**
    * @brief Sets allocation callbacks which will be used when object is created
    * and destroyed.
    *
@@ -66,8 +118,12 @@ struct RenderTargetCreateInfo
     return *this;
   }
 
-  GraphicsStructureType type{GraphicsStructureType::RENDER_TARGET_CREATE_INFO_STRUCT};
-  ExtensionCreateInfo*  nextExtension{nullptr};
+  GraphicsStructureType         type{GraphicsStructureType::RENDER_TARGET_CREATE_INFO_STRUCT};
+  Surface*                      surface{nullptr};
+  Framebuffer*                  framebuffer{nullptr};
+  Extent2D                      extent{};
+  RenderTargetTransformFlags    preTransform{0u};
+  ExtensionCreateInfo*          nextExtension{nullptr};
 
   const AllocationCallbacks* allocationCallbacks{nullptr};
 };

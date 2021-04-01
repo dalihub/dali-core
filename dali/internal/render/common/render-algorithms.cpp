@@ -473,18 +473,6 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
   bool              usedStencilBuffer(false);
   bool              firstDepthBufferUse(true);
 
-  if(!mGraphicsCommandBuffer)
-  {
-    mGraphicsCommandBuffer = mGraphicsController.CreateCommandBuffer(
-      Graphics::CommandBufferCreateInfo()
-        .SetLevel(Graphics::CommandBufferLevel::SECONDARY),
-      nullptr);
-  }
-  else
-  {
-    mGraphicsCommandBuffer->Reset();
-  }
-
   mViewportRectangle = viewport;
   mGraphicsCommandBuffer->SetViewport(ViewportFromClippingBox(mViewportRectangle, orientation));
   mHasLayerScissor = false;
@@ -519,10 +507,11 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
   }
 
   // Submit scissor/viewport
-  Graphics::SubmitInfo submitInfo{{}, 0 | Graphics::SubmitFlagBits::FLUSH};
-  submitInfo.cmdBuffer.push_back(mGraphicsCommandBuffer.get());
-  mGraphicsController.SubmitCommandBuffers(submitInfo);
+  //Graphics::SubmitInfo submitInfo{{}, 0 | Graphics::SubmitFlagBits::FLUSH};
+  //submitInfo.cmdBuffer.push_back(mGraphicsCommandBuffer.get());
+  //mGraphicsController.SubmitCommandBuffers(submitInfo);
 
+  mGraphicsRenderItemCommandBuffers.clear();
   // Loop through all RenderList in the RenderList, set up any prerequisites to render them, then perform the render.
   for(uint32_t index = 0u; index < count; ++index)
   {
@@ -550,6 +539,8 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
     // The Renderer API will be used if specified. If AUTO, the Actors automatic clipping feature will be used.
     SetupClipping(item, context, usedStencilBuffer, lastClippingDepth, lastClippingId, stencilBufferAvailable, instruction);
 
+
+
     if(DALI_LIKELY(item.mRenderer))
     {
       // Set up the depth buffer based on per-renderer flags if depth buffer is available
@@ -572,11 +563,20 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
         auto const MAX_QUEUE = item.mRenderer->GetDrawCommands().empty() ? 1 : DevelRenderer::RENDER_QUEUE_MAX;
         for(auto queue = 0u; queue < MAX_QUEUE; ++queue)
         {
-          // Render the item.
-          item.mRenderer->Render(context, bufferIndex, *item.mNode, item.mModelMatrix, item.mModelViewMatrix, viewMatrix, projectionMatrix, item.mSize, !item.mIsOpaque, boundTextures, instruction, queue);
+          // Render the item. If rendered, add its command buffer into the list
+          if( item.mRenderer->Render(context, bufferIndex, *item.mNode, item.mModelMatrix, item.mModelViewMatrix, viewMatrix, projectionMatrix, item.mSize, !item.mIsOpaque, boundTextures, instruction, queue) )
+          {
+            mGraphicsRenderItemCommandBuffers.emplace_back( item.mRenderer->GetGraphicsCommandBuffer() );
+          }
         }
       }
     }
+  }
+
+  // Execute command buffers
+  if(!mGraphicsRenderItemCommandBuffers.empty())
+  {
+    mGraphicsCommandBuffer->ExecuteCommandBuffers( std::move(mGraphicsRenderItemCommandBuffers) );
   }
 }
 
@@ -585,6 +585,34 @@ RenderAlgorithms::RenderAlgorithms(Graphics::Controller& graphicsController)
   mViewportRectangle(),
   mHasLayerScissor(false)
 {
+}
+
+void RenderAlgorithms::ResetCommandBuffer()
+{
+  // Reset main command buffer
+  if(!mGraphicsCommandBuffer)
+  {
+    mGraphicsCommandBuffer = mGraphicsController.CreateCommandBuffer(
+      Graphics::CommandBufferCreateInfo()
+        .SetLevel(Graphics::CommandBufferLevel::SECONDARY),
+      nullptr);
+  }
+  else
+  {
+    mGraphicsCommandBuffer->Reset();
+  }
+
+  // Reset list of secondary buffers to submit
+  mGraphicsRenderItemCommandBuffers.clear();
+}
+
+void RenderAlgorithms::SubmitCommandBuffer()
+{
+  // Submit main command buffer
+  Graphics::SubmitInfo submitInfo;
+  submitInfo.cmdBuffer.push_back(  mGraphicsCommandBuffer.get() );
+  submitInfo.flags = 0 | Graphics::SubmitFlagBits::FLUSH;
+  mGraphicsController.SubmitCommandBuffers( submitInfo );
 }
 
 void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&            instruction,

@@ -21,9 +21,7 @@
 // INTERNAL INCLUDES
 #include "graphics-types.h"
 
-namespace Dali
-{
-namespace Graphics
+namespace Dali::Graphics
 {
 class Buffer;
 class Pipeline;
@@ -179,13 +177,14 @@ public:
    * Calling EndRenderPass() is necessary to finalize the render pass.
    *
    * @param[in] renderPass valid render pass object
-   * @param[in] renderTarget valid render target
+   * @param[in] renderTarget valid render target, must not be used when framebuffer set
+   * @param[in] framebuffer valid framebuffer, must not be used with renderTarget
    * @param[in] renderArea area to draw
    * @param[in] clearValues clear values (compatible with renderpass spec)
    */
   virtual void BeginRenderPass(
-    RenderPass&             renderPass,
-    RenderTarget&           renderTarget,
+    RenderPass*             renderPass,
+    RenderTarget*           renderTarget,
     Extent2D                renderArea,
     std::vector<ClearValue> clearValues) = 0;
 
@@ -199,6 +198,13 @@ public:
    * before passing it to another render pass).
    */
   virtual void EndRenderPass() = 0;
+
+  /**
+   * @brief Executes a list of secondary command buffers
+   *
+   * @param[in] commandBuffers List of buffers to execute
+   */
+  virtual void ExecuteCommandBuffers( std::vector<CommandBuffer*>&& commandBuffers ) = 0;
 
   /**
    * @brief Draw primitives
@@ -296,7 +302,6 @@ protected:
   CommandBuffer(CommandBuffer&&) = default;
   CommandBuffer& operator=(CommandBuffer&&) = default;
 };
-} // Namespace Graphics
 } // Namespace Dali
 
 #endif

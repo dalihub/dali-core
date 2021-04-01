@@ -377,7 +377,7 @@ public:
    * @param[in] instruction. for use case like reflection where CullFace needs to be adjusted
 
    */
-  void Render(Context&                                             context,
+  bool Render(Context&                                             context,
               BufferIndex                                          bufferIndex,
               const SceneGraph::NodeDataProvider&                  node,
               const Matrix&                                        modelMatrix,
@@ -430,6 +430,11 @@ public:
                     const Graphics::UniformInfo&                       uniformInfo,
                     const void*                                        data,
                     uint32_t                                           size);
+
+  [[nodiscard]] Graphics::CommandBuffer* GetGraphicsCommandBuffer() const
+  {
+    return mGraphicsCommandBuffer.get();
+  }
 
 private:
   struct UniformIndexMap;

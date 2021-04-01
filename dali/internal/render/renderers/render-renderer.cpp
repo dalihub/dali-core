@@ -570,7 +570,7 @@ void Renderer::Upload()
   mGeometry->Upload(*mGraphicsController);
 }
 
-void Renderer::Render(Context&                                             context,
+bool Renderer::Render(Context&                                             context,
                       BufferIndex                                          bufferIndex,
                       const SceneGraph::NodeDataProvider&                  node,
                       const Matrix&                                        modelMatrix,
@@ -586,7 +586,7 @@ void Renderer::Render(Context&                                             conte
   // Before doing anything test if the call happens in the right queue
   if(mDrawCommands.empty() && queueIndex > 0)
   {
-    return;
+    return false;
   }
 
   // Prepare commands
@@ -602,7 +602,7 @@ void Renderer::Render(Context&                                             conte
   // Have commands but nothing to be drawn - abort
   if(!mDrawCommands.empty() && commands.empty())
   {
-    return;
+    return false;
   }
 
   // Create command buffer if not present
@@ -661,7 +661,7 @@ void Renderer::Render(Context&                                             conte
   if(!program)
   {
     DALI_LOG_ERROR("Failed to get program for shader at address %p.\n", reinterpret_cast<void*>(&mRenderDataProvider->GetShader()));
-    return;
+    return false;
   }
 
   // Temporarily create a pipeline here - this will be used for transporting
@@ -698,14 +698,16 @@ void Renderer::Render(Context&                                             conte
   // @todo We should return the command buffer(s) and let the calling method submit
   // If not drawn, then don't add command buffer to submit info, and if empty, don't
   // submit.
+  /*
   if(drawn)
   {
     Graphics::SubmitInfo submitInfo{{}, 0 | Graphics::SubmitFlagBits::FLUSH};
     submitInfo.cmdBuffer.push_back(commandBuffer.get());
     mGraphicsController->SubmitCommandBuffers(submitInfo);
   }
-
+  */
   mUpdated = false;
+  return drawn;
 }
 
 void Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider& node, const Vector3& size, Program& program)
@@ -1237,15 +1239,6 @@ Graphics::UniquePtr<Graphics::Pipeline> Renderer::PrepareGraphicsPipeline(
 
   mUpdated = true;
 
-  // @todo Should instead set framebuffer once through Renderpass, rather than modifying
-  // pipeline repeatedly.
-  Graphics::FramebufferState framebufferState{};
-  if(instruction.mFrameBuffer)
-  {
-    instruction.mFrameBuffer->Bind(); // Ensure graphics object is created.
-    framebufferState.SetFramebuffer(*instruction.mFrameBuffer->GetGraphicsObject());
-  }
-
   // Create a new pipeline
   // @todo Passed as pointers - shallow copy will break. Implementation MUST deep copy.
   return mGraphicsController->CreatePipeline(
@@ -1254,7 +1247,6 @@ Graphics::UniquePtr<Graphics::Pipeline> Renderer::PrepareGraphicsPipeline(
       .SetVertexInputState(&vertexInputState)
       .SetRasterizationState(&rasterizationState)
       .SetColorBlendState(&colorBlendState)
-      .SetFramebufferState(&framebufferState)
       .SetProgramState(&programState)
       .SetNextExtension(&mLegacyProgram),
     std::move(oldPipeline));

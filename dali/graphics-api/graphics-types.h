@@ -1302,6 +1302,96 @@ enum class GraphicsStructureType : uint32_t
 };
 
 /**
+ * @brief Enum describes load operation associated
+ * with particular framebuffer attachment
+ */
+enum class AttachmentLoadOp
+{
+  LOAD, ///< Load previous content
+  CLEAR, ///< Clear the attachment
+  DONT_CARE ///< Let driver decide
+};
+
+/**
+ * @brief Enum describes store operation associated
+ * with particular framebuffer attachment
+ */
+enum class AttachmentStoreOp
+{
+  STORE, ///< Store content (color attachemnts)
+  DONT_CARE ///< Let driver decide (depth/stencil attachemnt with no intention of reading)
+};
+
+/**
+ * @brief The structure describes the read/write
+ * modes of a single framebuffer attachment
+ *
+ * The attachment description specifies what is going to
+ * happen to the attachment at the beginning and end of the
+ * render pass.
+ *
+ * The stencil operation is separated as it may be set
+ * independent from the depth component (use loadOp, storeOp
+ * to set up the depth component and stencilLoadOp, stencilStoreOp
+ * for stencil component).
+ */
+struct AttachmentDescription
+{
+  /**
+   * @brief Sets load operation for the attachment
+   *
+   * @param value Load operation
+   * @return this structure
+   */
+  auto& SetLoadOp( AttachmentLoadOp value )
+  {
+    loadOp = value;
+    return *this;
+  }
+
+  /**
+   * @brief Sets store operation for the attachment
+   *
+   * @param value Store operation
+   * @return this structure
+   */
+  auto& SetStoreOp( AttachmentStoreOp value )
+  {
+    storeOp = value;
+    return *this;
+  }
+
+  /**
+   * @brief Sets load operation for the stencil part of attachment
+   *
+   * @param value load operation
+   * @return this structure
+   */
+  auto& SetStencilLoadOp( AttachmentLoadOp value )
+  {
+    stencilLoadOp = value;
+    return *this;
+  }
+
+  /**
+   * @brief Sets store operation for the stencil part of attachment
+   *
+   * @param value store operation
+   * @return this structure
+   */
+  auto& SetStencilStoreOp( AttachmentStoreOp value )
+  {
+    stencilStoreOp = value;
+    return *this;
+  }
+
+  AttachmentLoadOp loadOp{};
+  AttachmentStoreOp storeOp{};
+  AttachmentLoadOp stencilLoadOp{};
+  AttachmentStoreOp stencilStoreOp{};
+};
+
+/**
  * @brief Helper function to be used by the extension developers
  *
  * The value of custom type must be unique and recognizable by the
@@ -1394,6 +1484,34 @@ struct DefaultDeleter
 
   void (*deleteFunction)(T* object){nullptr}; ///< Custom delete function
 };
+
+/**
+ * Surface type is just a void* to any native object.
+ */
+using Surface = void;
+
+/**
+ * @brief Enum describing preTransform of render target
+ */
+enum class RenderTargetTransformFlagBits
+{
+  TRANSFORM_IDENTITY_BIT = 0x00000001,
+  ROTATE_90_BIT = 0x00000002,
+  ROTATE_180_BIT = 0x00000004,
+  ROTATE_270_BIT = 0x00000008,
+  HORIZONTAL_MIRROR_BIT = 0x00000010,
+  HORIZONTAL_MIRROR_ROTATE_90_BIT = 0x00000020,
+  HORIZONTAL_MIRROR_ROTATE_180_BIT = 0x00000040,
+  HORIZONTAL_MIRROR_ROTATE_270_BIT = 0x00000080,
+};
+
+using RenderTargetTransformFlags = uint32_t;
+
+template<typename T>
+inline RenderTargetTransformFlags operator|(T flags, RenderTargetTransformFlagBits bit)
+{
+  return static_cast<RenderTargetTransformFlags>(flags) | static_cast<RenderTargetTransformFlags>(bit);
+}
 
 /**
  * unique_ptr defined in the Graphics scope

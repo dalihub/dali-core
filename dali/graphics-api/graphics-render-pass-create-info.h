@@ -18,16 +18,11 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <memory>
-
 // INTERNAL INCLUDES
 #include "graphics-render-pass.h"
 #include "graphics-types.h"
 
-namespace Dali
-{
-namespace Graphics
+namespace Dali::Graphics
 {
 class RenderTarget;
 /**
@@ -55,14 +50,14 @@ struct RenderPassCreateInfo
   }
 
   /**
-   * @brief Binds render target to render pass
+   * @brief Sets array of attachment descriptions
    *
-   * @param[in] value valid RenderTarget object
+   * @param[in] value pointer valid array of attachment descriptions
    * @return reference to this structure
    */
-  auto& SetRenderTarget(RenderTarget* value)
+  auto& SetAttachments(const std::vector<AttachmentDescription>& value)
   {
-    renderTarget = value;
+    attachments = &value;
     return *this;
   }
 
@@ -81,12 +76,10 @@ struct RenderPassCreateInfo
 
   GraphicsStructureType type{GraphicsStructureType::RENDERPASS_CREATE_INFO_STRUCT};
   ExtensionCreateInfo*  nextExtension{nullptr};
-  RenderTarget*         renderTarget{nullptr};
-
+  const std::vector<AttachmentDescription>* attachments{nullptr};
   const AllocationCallbacks* allocationCallbacks{nullptr};
 };
 
-} // namespace Graphics
 } // namespace Dali
 
 #endif // DALI_GRAPHICS_FRAMEBUFFER_FACTORY_H

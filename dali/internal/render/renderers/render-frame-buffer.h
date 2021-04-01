@@ -121,6 +121,24 @@ public:
     return mGraphicsObject.get();
   }
 
+  [[nodiscard]] Graphics::RenderTarget* GetGraphicsRenderTarget() const
+  {
+    return mRenderTarget.get();
+  }
+
+  [[nodiscard]] Graphics::RenderPass* GetGraphicsRenderPass( Graphics::AttachmentLoadOp colorLoadOp,
+                                                             Graphics::AttachmentStoreOp colorStoreOp ) const;
+
+  /**
+   * The function returns initialized array of clear values
+   * which then can be modified and assed to BeginRenderPass()
+   * command.
+   */
+  [[nodiscard]] auto& GetGraphicsRenderPassClearValues()
+  {
+    return mClearValues;
+  }
+
 private:
   /**
    * @brief Undefined copy constructor. FrameBuffer cannot be copied
@@ -137,6 +155,19 @@ private:
   Graphics::UniquePtr<Graphics::Framebuffer> mGraphicsObject{nullptr};
 
   Graphics::FramebufferCreateInfo mCreateInfo;
+
+  // Render pass and render target
+
+  /**
+   * Render passes are created on fly depending on Load and Store operations
+   * The default render pass (most likely to be used) is the load = CLEAR
+   * amd store = STORE for color attachment.
+   */
+  std::vector<Graphics::UniquePtr<Graphics::RenderPass>> mRenderPass{};
+  Graphics::UniquePtr<Graphics::RenderTarget> mRenderTarget{nullptr};
+
+  // clear colors
+  std::vector<Graphics::ClearValue> mClearValues{};
 
   uint32_t mWidth;
   uint32_t mHeight;

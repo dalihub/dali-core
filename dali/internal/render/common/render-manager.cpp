@@ -87,6 +87,10 @@ struct RenderManager::Impl
     threadPool->Initialize(1u);
 
     uniformBufferManager.reset(new Render::UniformBufferManager(&graphicsController));
+
+    // initialize main command buffer
+    auto info = Graphics::CommandBufferCreateInfo().SetLevel( Graphics::CommandBufferLevel::PRIMARY );
+    mainCommandBuffer = graphicsController.CreateCommandBuffer( info, nullptr );
   }
 
   ~Impl()
@@ -178,6 +182,12 @@ struct RenderManager::Impl
   std::unique_ptr<Dali::ThreadPool> threadPool;            ///< The thread pool
   Vector<Graphics::Texture*>        boundTextures;         ///< The textures bound for rendering
   Vector<Graphics::Texture*>        textureDependencyList; ///< The dependency list of binded textures
+
+  Graphics::UniquePtr<Graphics::CommandBuffer> mainCommandBuffer; ///< Main command buffer
+
+  Graphics::UniquePtr<Graphics::RenderPass> mainRenderPass; ///< Main renderpass
+
+
 };
 
 RenderManager* RenderManager::New(Graphics::Controller&               graphicsController,
@@ -489,6 +499,9 @@ void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear
 
   const bool haveInstructions = count > 0u;
 
+  // Reset main command buffer
+  mImpl->mainCommandBuffer->Reset();
+
   DALI_LOG_INFO(gLogFilter, Debug::General, "Render: haveInstructions(%s) || mImpl->lastFrameWasRendered(%s) || forceClear(%s)\n", haveInstructions ? "true" : "false", mImpl->lastFrameWasRendered ? "true" : "false", forceClear ? "true" : "false");
 
   // Only render if we have instructions to render, or the last frame was rendered (and therefore a clear is required).
@@ -787,6 +800,11 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
 void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo, Rect<int>& clippingRect)
 {
+  // Reset main algorithms command buffer
+  mImpl->renderAlgorithms.ResetCommandBuffer();
+
+  auto mainCommandBuffer = mImpl->renderAlgorithms.GetMainCommandBuffer();
+
   Internal::Scene&   sceneInternal = GetImplementation(scene);
   SceneGraph::Scene* sceneObject   = sceneInternal.GetSceneObject();
 
@@ -824,7 +842,27 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
     if(instruction.mFrameBuffer)
     {
+      auto& clearValues = instruction.mFrameBuffer->GetGraphicsRenderPassClearValues();
+      // todo: use no-clear renderpass instead (not implemented yet)
+
+      // Set the clear color for first color attachment
+      if( instruction.mIsClearColorSet )
+      {
+        clearValues[0].color = {
+          instruction.mClearColor.r,
+          instruction.mClearColor.g,
+          instruction.mClearColor.b,
+          instruction.mClearColor.a
+        };
+      }
       // offscreen buffer
+      mainCommandBuffer->BeginRenderPass(
+        instruction.mFrameBuffer->GetGraphicsRenderPass( Graphics::AttachmentLoadOp::CLEAR, Graphics::AttachmentStoreOp::STORE ),
+        instruction.mFrameBuffer->GetGraphicsRenderTarget(),
+        { instruction.mFrameBuffer->GetWidth(), instruction.mFrameBuffer->GetHeight() },
+        clearValues
+        );
+
       if(mImpl->currentContext != &mImpl->context)
       {
         // Switch to shared context for off-screen buffer
@@ -863,6 +901,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
     if(instruction.mFrameBuffer)
     {
+
       //instruction.mFrameBuffer->Bind(*mImpl->currentContext);
       // @todo Temporarily set per renderer per pipeline. Should use RenderPass instead
 
@@ -878,12 +917,19 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     }
 
     // @todo Should this be a command in it's own right?
+    // @todo yes
     if(!instruction.mFrameBuffer)
     {
       mImpl->currentContext->Viewport(surfaceRect.x,
                                       surfaceRect.y,
                                       surfaceRect.width,
                                       surfaceRect.height);
+      /*
+      mainCommandBuffer->SetViewport( {surfaceRect.x,
+                                        surfaceRect.y,
+                                        surfaceRect.width,
+                                        surfaceRect.height} );
+      */
     }
 
     // Clear the entire color, depth and stencil buffers for the default framebuffer, if required.
@@ -1080,6 +1126,10 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     {
       mImpl->currentContext->Flush();
     }
+
+    // End render pass
+    mainCommandBuffer->EndRenderPass();
+    mImpl->renderAlgorithms.SubmitCommandBuffer();
   }
 
   GLenum attachments[] = {GL_DEPTH, GL_STENCIL};
@@ -1088,6 +1138,9 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
 void RenderManager::PostRender(bool uploadOnly)
 {
+  // Submit main command buffer
+  //mImpl->renderAlgorithms.SubmitCommandBuffer();
+
   if(!uploadOnly)
   {
     if(mImpl->currentContext->IsSurfacelessContextSupported())
