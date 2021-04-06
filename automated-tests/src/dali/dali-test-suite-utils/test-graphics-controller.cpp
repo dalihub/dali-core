@@ -689,7 +689,10 @@ void TestGraphicsController::ProcessCommandBuffer(TestGraphicsCommandBuffer& com
               }
             }
 
-            mGl.Clear(mask);
+            if(mask != 0)
+            {
+              mGl.Clear(mask);
+            }
           }
           else
           {

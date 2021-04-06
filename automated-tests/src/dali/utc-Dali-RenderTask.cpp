@@ -636,6 +636,14 @@ int UtcDaliRenderTaskSetExclusive(void)
 
   RenderTaskList taskList = application.GetScene().GetRenderTaskList();
 
+  // Creates:
+  //           Root
+  //  Actor1   Layer    Layer
+  //           Actor2  Actor3
+
+  // Task 1 is the default render task, should render from Root, incl Actor2
+  // Task 2 uses Actor2 as a source actor (texture id 9)
+
   // Manipulate the GenTextures behaviour, to identify different actors
 
   std::vector<GLuint> ids;

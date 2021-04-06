@@ -1161,8 +1161,8 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
     // End render pass
     mainCommandBuffer->EndRenderPass();
-    mImpl->renderAlgorithms.SubmitCommandBuffer();
   }
+  mImpl->renderAlgorithms.SubmitCommandBuffer();
 
   GLenum attachments[] = {GL_DEPTH, GL_STENCIL};
   mImpl->currentContext->InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
