@@ -467,7 +467,7 @@ struct Command
     {
       Graphics::RenderPass*             renderPass;
       Graphics::RenderTarget*           renderTarget;
-      Graphics::Extent2D                renderArea;
+      Graphics::Rect2D                  renderArea;
       std::vector<Graphics::ClearValue> clearValues;
     } beginRenderPass;
 
@@ -593,7 +593,7 @@ public:
   void BeginRenderPass(
     Graphics::RenderPass*             renderPass,
     Graphics::RenderTarget*           renderTarget,
-    Graphics::Extent2D                renderArea,
+    Graphics::Rect2D                  renderArea,
     std::vector<Graphics::ClearValue> clearValues) override
   {
     mCommands.emplace_back(CommandType::BEGIN_RENDER_PASS);

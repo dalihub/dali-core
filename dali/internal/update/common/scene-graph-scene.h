@@ -187,9 +187,16 @@ public:
    *
    * @return the graphics render pass
    */
-  [[nodiscard]] Graphics::RenderPass* GetGraphicsRenderPass() const
+  [[nodiscard]] Graphics::RenderPass* GetGraphicsRenderPass(Graphics::AttachmentLoadOp loadOp, Graphics::AttachmentStoreOp storeOp) const
   {
-    return mRenderPass.get();
+    if(loadOp == Graphics::AttachmentLoadOp::CLEAR)
+    {
+      return mRenderPass.get();
+    }
+    else
+    {
+      return mRenderPassNoClear.get();
+    }
   }
 
   /**
@@ -227,6 +234,7 @@ private:
    * and store = STORE for color attachment.
    */
   Graphics::UniquePtr<Graphics::RenderPass> mRenderPass{nullptr};   ///< The render pass created to render the surface
+  Graphics::UniquePtr<Graphics::RenderPass> mRenderPassNoClear{nullptr};   ///< The render pass created to render the surface without clearing color
   Graphics::RenderTarget*                   mRenderTarget{nullptr}; ///< This is created in the event thread when surface is created/resized/replaced
 
   // clear colors

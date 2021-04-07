@@ -809,6 +809,8 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
   uint32_t count = sceneObject->GetRenderInstructions().Count(mImpl->renderBufferIndex);
 
+  std::vector<Graphics::RenderTarget*> targetstoPresent;
+
   for(uint32_t i = 0; i < count; ++i)
   {
     RenderInstruction& instruction = sceneObject->GetRenderInstructions().At(mImpl->renderBufferIndex, i);
@@ -839,6 +841,10 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     Integration::DepthBufferAvailable   depthBufferAvailable   = mImpl->depthBufferAvailable;
     Integration::StencilBufferAvailable stencilBufferAvailable = mImpl->stencilBufferAvailable;
 
+    Graphics::RenderTarget* currentRenderTarget = nullptr;
+    Graphics::RenderPass* currentRenderPass = nullptr;
+    std::vector<Graphics::ClearValue> currentClearValues {};
+
     if(instruction.mFrameBuffer)
     {
       // Ensure graphics framebuffer is created, bind atachments and create render passes
@@ -864,14 +870,14 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
           instruction.mClearColor.b,
           instruction.mClearColor.a};
       }
+
+      currentClearValues = clearValues;
+
       auto loadOp = instruction.mIsClearColorSet ? Graphics::AttachmentLoadOp::CLEAR : Graphics::AttachmentLoadOp::LOAD;
 
       // offscreen buffer
-      mainCommandBuffer->BeginRenderPass(
-        instruction.mFrameBuffer->GetGraphicsRenderPass(loadOp, Graphics::AttachmentStoreOp::STORE),
-        instruction.mFrameBuffer->GetGraphicsRenderTarget(),
-        {instruction.mFrameBuffer->GetWidth(), instruction.mFrameBuffer->GetHeight()},
-        clearValues);
+      currentRenderTarget = instruction.mFrameBuffer->GetGraphicsRenderTarget();
+      currentRenderPass = instruction.mFrameBuffer->GetGraphicsRenderPass(loadOp, Graphics::AttachmentStoreOp::STORE);
 
       if(mImpl->currentContext != &mImpl->context)
       {
@@ -914,12 +920,15 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
           instruction.mClearColor.a};
       }
 
-      mainCommandBuffer->BeginRenderPass(
-        sceneObject->GetGraphicsRenderPass(),
-        sceneObject->GetSurfaceRenderTarget(),
-        {static_cast<uint32_t>(surfaceRect.width), static_cast<uint32_t>(surfaceRect.height)},
-        clearValues);
+      currentClearValues = clearValues;
+
+      auto loadOp = instruction.mIsClearColorSet ? Graphics::AttachmentLoadOp::CLEAR : Graphics::AttachmentLoadOp::LOAD;
+
+      currentRenderTarget = sceneObject->GetSurfaceRenderTarget();
+      currentRenderPass = sceneObject->GetGraphicsRenderPass(loadOp, Graphics::AttachmentStoreOp::STORE);
     }
+
+    targetstoPresent.emplace_back( currentRenderTarget );
 
     // Make sure that GL context must be created
     mImpl->currentContext->GlContextCreated();
@@ -1039,6 +1048,16 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       clearFullFrameRect = false;
     }
 
+    // Begin render pass
+    mainCommandBuffer->BeginRenderPass(
+      currentRenderPass,
+      currentRenderTarget,
+      {
+        viewportRect.x, viewportRect.y,
+        uint32_t(viewportRect.width), uint32_t(viewportRect.height)
+      },
+      currentClearValues);
+
     // @todo The following block should be a command in it's own right.
     // Currently takes account of surface orientation in Context.
     // Or move entirely to RenderPass implementation
@@ -1054,6 +1073,9 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       {
         if(!clippingRect.IsEmpty())
         {
+          Graphics::Rect2D scissorArea = {clippingRect.x, clippingRect.y, uint32_t(clippingRect.width), uint32_t(clippingRect.height)};
+          mainCommandBuffer->SetScissor( scissorArea );
+          mainCommandBuffer->SetScissorTestEnable( true );
           //mImpl->currentContext->SetScissorTest(true);
           //mImpl->currentContext->Scissor(clippingRect.x, clippingRect.y, clippingRect.width, clippingRect.height);
           //mImpl->currentContext->Clear(clearMask, Context::FORCE_CLEAR);
@@ -1163,6 +1185,18 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     mainCommandBuffer->EndRenderPass();
   }
   mImpl->renderAlgorithms.SubmitCommandBuffer();
+
+  std::sort( targetstoPresent.begin(), targetstoPresent.end() );
+
+  Graphics::RenderTarget* rt = nullptr;
+  for( auto& target : targetstoPresent )
+  {
+    if(target != rt)
+    {
+      mImpl->graphicsController.PresentRenderTarget(target);
+      rt = target;
+    }
+  }
 
   GLenum attachments[] = {GL_DEPTH, GL_STENCIL};
   mImpl->currentContext->InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);

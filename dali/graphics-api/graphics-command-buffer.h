@@ -179,13 +179,13 @@ public:
    * @param[in] renderPass valid render pass object
    * @param[in] renderTarget valid render target, must not be used when framebuffer set
    * @param[in] framebuffer valid framebuffer, must not be used with renderTarget
-   * @param[in] renderArea area to draw
+   * @param[in] renderArea area to draw (clear operation is affected)
    * @param[in] clearValues clear values (compatible with renderpass spec)
    */
   virtual void BeginRenderPass(
     RenderPass*             renderPass,
     RenderTarget*           renderTarget,
-    Extent2D                renderArea,
+    Rect2D                  renderArea,
     std::vector<ClearValue> clearValues) = 0;
 
   /**

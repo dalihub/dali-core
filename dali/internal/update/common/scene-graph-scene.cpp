@@ -64,6 +64,10 @@ void Scene::Initialize(Context& context, Graphics::Controller& graphicsControlle
 
   // Add default render pass (loadOp = clear)
   mRenderPass = graphicsController.CreateRenderPass(rpInfo, nullptr);
+
+  desc.SetLoadOp( Graphics::AttachmentLoadOp::LOAD );
+  attachmentDescriptions[0] = desc;
+  mRenderPassNoClear = graphicsController.CreateRenderPass(rpInfo, nullptr);
 }
 
 Context* Scene::GetContext()
