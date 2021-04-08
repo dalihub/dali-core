@@ -23,11 +23,13 @@ namespace Internal
 namespace Render
 {
 Sampler::Sampler()
-: mMinificationFilter(FilterMode::DEFAULT),
+: mGraphicsController(nullptr),
+  mMinificationFilter(FilterMode::DEFAULT),
   mMagnificationFilter(FilterMode::DEFAULT),
   mSWrapMode(WrapMode::DEFAULT),
   mTWrapMode(WrapMode::DEFAULT),
-  mRWrapMode(WrapMode::DEFAULT)
+  mRWrapMode(WrapMode::DEFAULT),
+  mIsDirty(false)
 {
 }
 

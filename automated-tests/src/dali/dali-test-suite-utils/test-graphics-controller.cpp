@@ -180,7 +180,9 @@ public:
   : mCallStack(callStack),
     mBuffer(buffer),
     mMappedOffset(mappedOffset),
-    mMappedSize(mappedSize)
+    mMappedSize(mappedSize),
+    mLockedOffset(0u),
+    mLockedSize(0u)
   {
   }
 

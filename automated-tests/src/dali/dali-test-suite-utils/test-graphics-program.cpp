@@ -36,11 +36,6 @@ bool TestGraphicsProgramImpl::GetParameter(uint32_t parameterId, void* outData)
   return true;
 }
 
-TestGraphicsProgram::TestGraphicsProgram(TestGlAbstraction& gl, const Graphics::ProgramCreateInfo& createInfo, Property::Array& vertexFormats, std::vector<UniformData>& customUniforms)
-{
-  mImpl = new TestGraphicsProgramImpl(gl, createInfo, vertexFormats, customUniforms);
-}
-
 TestGraphicsProgram::TestGraphicsProgram(TestGraphicsProgramImpl* impl)
 {
   mImpl = impl;
