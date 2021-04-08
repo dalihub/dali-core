@@ -110,6 +110,16 @@ public:
   virtual void Resume() = 0;
 
   /**
+   * @brief Lifecycle shutdown event
+   */
+  virtual void Shutdown() = 0;
+
+  /**
+   * @brief Lifecycle destroy event
+   */
+  virtual void Destroy() = 0;
+
+  /**
    * @brief Executes batch update of textures
    *
    * This function may perform full or partial update of many textures.
