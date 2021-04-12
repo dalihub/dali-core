@@ -1426,6 +1426,14 @@ int UtcDaliSceneEmptySceneRendering(void)
   Shader   shader   = CreateShader();
   Renderer renderer = Renderer::New(geometry, shader);
 
+  // Render before adding renderer
+  application.SendNotification();
+  application.Render();
+
+  // Check the clear count and the render status
+  DALI_TEST_EQUALS(glAbstraction.GetClearCountCalled(), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetRenderNeedsPostRender(), false, TEST_LOCATION);
+
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
 
