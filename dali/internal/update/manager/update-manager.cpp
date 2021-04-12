@@ -604,7 +604,6 @@ void UpdateManager::AddRenderer(OwnerPointer<Renderer>& renderer)
 
   renderer->ConnectToSceneGraph(*mImpl->sceneController, mSceneGraphBuffers.GetUpdateBufferIndex());
   mImpl->renderers.PushBack(renderer.Release());
-  mImpl->renderersAdded = true;
 }
 
 void UpdateManager::RemoveRenderer(Renderer* renderer)
@@ -615,6 +614,12 @@ void UpdateManager::RemoveRenderer(Renderer* renderer)
   EraseUsingDiscardQueue(mImpl->renderers, renderer, mImpl->discardQueue, mSceneGraphBuffers.GetUpdateBufferIndex());
   // Need to remove the render object as well
   renderer->DisconnectFromSceneGraph(*mImpl->sceneController, mSceneGraphBuffers.GetUpdateBufferIndex());
+}
+
+void UpdateManager::AttachRenderer(Node* node, Renderer* renderer)
+{
+  node->AddRenderer(renderer);
+  mImpl->renderersAdded = true;
 }
 
 void UpdateManager::SetPanGestureProcessor(PanGesture* panGestureProcessor)
