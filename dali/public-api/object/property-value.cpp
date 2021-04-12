@@ -321,14 +321,28 @@ struct Property::Value::Impl
       }
       case Property::ARRAY:
       {
-        auto obj = other.GetArray();
-        ConstructInplace(mData.mArray.member, std::move(obj));
+        if(isSameType)
+        {
+          mData.mArray.member = other.GetArray();
+        }
+        else
+        {
+          auto obj = other.GetArray();
+          ConstructInplace(mData.mArray.member, std::move(obj));
+        }
         break;
       }
       case Property::MAP:
       {
-        auto obj = other.GetMap();
-        ConstructInplace(mData.mMap.member, std::move(obj));
+        if(isSameType)
+        {
+          mData.mMap.member = other.GetMap();
+        }
+        else
+        {
+          auto obj = other.GetMap();
+          ConstructInplace(mData.mMap.member, std::move(obj));
+        }
         break;
       }
       case Property::VECTOR4:
