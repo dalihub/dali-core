@@ -87,6 +87,16 @@ public:
   void Resume() override;
 
   /**
+   * @brief Lifecycle shutdown event
+   */
+  void Shutdown() override;
+
+  /**
+   * @brief Lifecycle destroy event
+   */
+  void Destroy() override;
+
+  /**
    * @brief Executes batch update of textures
    *
    * This function may perform full or partial update of many textures.

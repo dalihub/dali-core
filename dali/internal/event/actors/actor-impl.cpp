@@ -1038,7 +1038,7 @@ uint32_t Actor::AddRenderer(Renderer& renderer)
   uint32_t    index       = static_cast<uint32_t>(mRenderers->size()); //  4,294,967,295 renderers per actor
   RendererPtr rendererPtr = RendererPtr(&renderer);
   mRenderers->push_back(rendererPtr);
-  AttachRendererMessage(GetEventThreadServices(), GetNode(), renderer.GetRendererSceneObject());
+  AttachRendererMessage(GetEventThreadServices().GetUpdateManager(), GetNode(), renderer.GetRendererSceneObject());
   return index;
 }
 
