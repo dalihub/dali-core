@@ -92,6 +92,8 @@ void FrameCallback::Invalidate()
 
 void FrameCallback::PropertyOwnerDestroyed(PropertyOwner& owner)
 {
+  mUpdateProxy.reset();
+
   Invalidate();
 }
 
