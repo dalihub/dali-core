@@ -19,7 +19,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/buffer-index.h>
-#include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/gl-resources/gpu-buffer.h>
 #include <dali/internal/render/renderers/render-vertex-buffer.h>
 #include <dali/internal/render/shaders/program.h>
@@ -41,14 +40,6 @@ Geometry::Geometry()
 }
 
 Geometry::~Geometry() = default;
-
-void Geometry::GlContextCreated(Context& context)
-{
-}
-
-void Geometry::GlContextDestroyed()
-{
-}
 
 void Geometry::AddVertexBuffer(Render::VertexBuffer* vertexBuffer)
 {

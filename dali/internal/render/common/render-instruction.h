@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/render/common/render-list.h>
-#include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/renderers/render-frame-buffer.h>
 #include <dali/internal/update/render-tasks/scene-graph-camera.h>
 #include <dali/public-api/math/matrix.h>

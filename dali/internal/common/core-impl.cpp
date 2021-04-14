@@ -49,7 +49,6 @@
 
 #include <dali/internal/render/common/performance-monitor.h>
 #include <dali/internal/render/common/render-manager.h>
-#include <dali/internal/render/gl-resources/context.h>
 
 using Dali::Internal::SceneGraph::DiscardQueue;
 using Dali::Internal::SceneGraph::RenderManager;

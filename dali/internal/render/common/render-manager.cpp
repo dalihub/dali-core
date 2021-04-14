@@ -87,7 +87,6 @@ struct RenderManager::Impl
     threadPool->Initialize(1u);
 
     uniformBufferManager.reset(new Render::UniformBufferManager(&graphicsController));
-
   }
 
   ~Impl()
@@ -233,12 +232,6 @@ void RenderManager::ContextDestroyed()
   for(auto&& framebuffer : mImpl->frameBufferContainer)
   {
     framebuffer->Destroy();
-  }
-
-  // inform renderers
-  for(auto&& renderer : mImpl->rendererContainer)
-  {
-    renderer->GlContextDestroyed();
   }
 
   // inform context
@@ -825,9 +818,9 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     Integration::DepthBufferAvailable   depthBufferAvailable   = mImpl->depthBufferAvailable;
     Integration::StencilBufferAvailable stencilBufferAvailable = mImpl->stencilBufferAvailable;
 
-    Graphics::RenderTarget* currentRenderTarget = nullptr;
-    Graphics::RenderPass* currentRenderPass = nullptr;
-    std::vector<Graphics::ClearValue> currentClearValues {};
+    Graphics::RenderTarget*           currentRenderTarget = nullptr;
+    Graphics::RenderPass*             currentRenderPass   = nullptr;
+    std::vector<Graphics::ClearValue> currentClearValues{};
 
     if(instruction.mFrameBuffer)
     {
@@ -861,7 +854,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
       // offscreen buffer
       currentRenderTarget = instruction.mFrameBuffer->GetGraphicsRenderTarget();
-      currentRenderPass = instruction.mFrameBuffer->GetGraphicsRenderPass(loadOp, Graphics::AttachmentStoreOp::STORE);
+      currentRenderPass   = instruction.mFrameBuffer->GetGraphicsRenderPass(loadOp, Graphics::AttachmentStoreOp::STORE);
 
       if(mImpl->currentContext != &mImpl->context)
       {
@@ -903,10 +896,10 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       auto loadOp = instruction.mIsClearColorSet ? Graphics::AttachmentLoadOp::CLEAR : Graphics::AttachmentLoadOp::LOAD;
 
       currentRenderTarget = sceneObject->GetSurfaceRenderTarget();
-      currentRenderPass = sceneObject->GetGraphicsRenderPass(loadOp, Graphics::AttachmentStoreOp::STORE);
+      currentRenderPass   = sceneObject->GetGraphicsRenderPass(loadOp, Graphics::AttachmentStoreOp::STORE);
     }
 
-    targetstoPresent.emplace_back( currentRenderTarget );
+    targetstoPresent.emplace_back(currentRenderTarget);
 
     // Make sure that GL context must be created
     mImpl->currentContext->GlContextCreated();
@@ -980,7 +973,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       clearFullFrameRect = false;
     }
 
-    Graphics::Rect2D scissorArea{ viewportRect.x, viewportRect.y, uint32_t(viewportRect.width), uint32_t(viewportRect.height) };
+    Graphics::Rect2D scissorArea{viewportRect.x, viewportRect.y, uint32_t(viewportRect.width), uint32_t(viewportRect.height)};
     if(instruction.mIsClearColorSet)
     {
       if(!clearFullFrameRect)
@@ -1000,9 +993,9 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       currentClearValues);
 
     mainCommandBuffer->SetViewport({float(viewportRect.x),
-                                     float(viewportRect.y),
-                                     float(viewportRect.width),
-                                     float(viewportRect.height)});
+                                    float(viewportRect.y),
+                                    float(viewportRect.width),
+                                    float(viewportRect.height)});
 
     // Clear the list of bound textures
     mImpl->boundTextures.Clear();
@@ -1085,10 +1078,10 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
   }
   mImpl->renderAlgorithms.SubmitCommandBuffer();
 
-  std::sort( targetstoPresent.begin(), targetstoPresent.end() );
+  std::sort(targetstoPresent.begin(), targetstoPresent.end());
 
   Graphics::RenderTarget* rt = nullptr;
-  for( auto& target : targetstoPresent )
+  for(auto& target : targetstoPresent)
   {
     if(target != rt)
     {

@@ -57,16 +57,6 @@ public:
   ~Geometry();
 
   /**
-   * Called on Gl Context created
-   */
-  void GlContextCreated(Context& context);
-
-  /**
-   * Called on Gl Context destroyed.
-   */
-  void GlContextDestroyed();
-
-  /**
    * Adds a property buffer to the geometry
    * @param[in] dataProvider The VertexBuffer data provider
    */

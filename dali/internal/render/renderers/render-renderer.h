@@ -64,7 +64,7 @@ class UniformBufferManager;
  * These objects are used during RenderManager::Render(), so properties modified during
  * the Update must either be double-buffered, or set via a message added to the RenderQueue.
  */
-class Renderer : public GlResourceOwner
+class Renderer
 {
 public:
   /**
@@ -93,16 +93,6 @@ public:
     StencilOperation::Type stencilOperationOnZFail : 4; ///< The stencil operation for depth test fail
     StencilOperation::Type stencilOperationOnZPass : 4; ///< The stencil operation for depth test pass
   };
-
-  /**
-   * @copydoc Dali::Internal::GlResourceOwner::GlContextDestroyed()
-   */
-  void GlContextDestroyed() override;
-
-  /**
-   * @copydoc Dali::Internal::GlResourceOwner::GlCleanup()
-   */
-  void GlCleanup() override;
 
   /**
    * Create a new renderer instance
@@ -187,7 +177,7 @@ public:
   /**
    * Destructor
    */
-  ~Renderer() override;
+  ~Renderer();
 
   /**
    * Set the face-culling mode.

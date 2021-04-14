@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/graphics-api/graphics-controller.h>
-#include <dali/internal/render/gl-resources/context.h>
 
 namespace Dali
 {

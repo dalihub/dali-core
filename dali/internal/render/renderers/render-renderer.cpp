@@ -293,15 +293,6 @@ void Renderer::SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, 
   mDrawCommands.insert(mDrawCommands.end(), pDrawCommands, pDrawCommands + size);
 }
 
-void Renderer::GlContextDestroyed()
-{
-  mGeometry->GlContextDestroyed();
-}
-
-void Renderer::GlCleanup()
-{
-}
-
 void Renderer::SetUniformFromProperty(BufferIndex bufferIndex, Program& program, UniformIndexMap& map)
 {
   GLint location = program.GetUniformLocation(map.uniformIndex);
