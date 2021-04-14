@@ -691,7 +691,24 @@ void TestGraphicsController::ProcessCommandBuffer(TestGraphicsCommandBuffer& com
 
             if(mask != 0)
             {
-              mGl.Clear(mask);
+              // Test scissor area and RT size
+              const auto& area = cmd.data.beginRenderPass.renderArea;
+              if( area.x == 0 &&
+              area.y == 0 &&
+              area.width == renderTarget->mCreateInfo.extent.width &&
+              area.height == renderTarget->mCreateInfo.extent.height )
+              {
+                mGl.Disable(GL_SCISSOR_TEST);
+                mGl.Clear(mask);
+              }
+              else
+              {
+                mGl.Enable(GL_SCISSOR_TEST);
+                mGl.Scissor(cmd.data.beginRenderPass.renderArea.x, cmd.data.beginRenderPass.renderArea.y,
+                            cmd.data.beginRenderPass.renderArea.width, cmd.data.beginRenderPass.renderArea.height);
+                mGl.Clear(mask);
+                mGl.Disable(GL_SCISSOR_TEST);
+              }
             }
           }
           else

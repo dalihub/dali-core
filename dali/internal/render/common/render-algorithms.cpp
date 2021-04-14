@@ -344,7 +344,10 @@ inline void RenderAlgorithms::SetupScissorClipping(const RenderItem& item, Conte
     const bool scissorEnabled = (mScissorStack.size() > 0u) || mHasLayerScissor;
 
     // Enable the scissor test based on the above calculation
-    context.SetScissorTest(scissorEnabled);
+    if(scissorEnabled)
+    {
+      mGraphicsCommandBuffer->SetScissorTestEnable( scissorEnabled );
+    }
 
     // If scissor is enabled, we use the calculated screen-space coordinates (now in the stack).
     if(scissorEnabled)
@@ -355,7 +358,11 @@ inline void RenderAlgorithms::SetupScissorClipping(const RenderItem& item, Conte
       {
         useScissorBox.y = (instruction.mFrameBuffer->GetHeight() - useScissorBox.height) - useScissorBox.y;
       }
-      context.Scissor(useScissorBox.x, useScissorBox.y, useScissorBox.width, useScissorBox.height);
+     Graphics::Rect2D scissorBox = {
+        useScissorBox.x, useScissorBox.y,
+       uint32_t(useScissorBox.width), uint32_t(useScissorBox.height)
+      };
+     mGraphicsCommandBuffer->SetScissor( scissorBox );
     }
   }
 }
@@ -506,11 +513,6 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
     mHasLayerScissor = true;
   }
 
-  // Submit scissor/viewport
-  //Graphics::SubmitInfo submitInfo{{}, 0 | Graphics::SubmitFlagBits::FLUSH};
-  //submitInfo.cmdBuffer.push_back(mGraphicsCommandBuffer.get());
-  //mGraphicsController.SubmitCommandBuffers(submitInfo);
-
   mGraphicsRenderItemCommandBuffers.clear();
   // Loop through all RenderList in the RenderList, set up any prerequisites to render them, then perform the render.
   for(uint32_t index = 0u; index < count; ++index)
@@ -538,8 +540,6 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
     // Set up clipping based on both the Renderer and Actor APIs.
     // The Renderer API will be used if specified. If AUTO, the Actors automatic clipping feature will be used.
     SetupClipping(item, context, usedStencilBuffer, lastClippingDepth, lastClippingId, stencilBufferAvailable, instruction);
-
-
 
     if(DALI_LIKELY(item.mRenderer))
     {

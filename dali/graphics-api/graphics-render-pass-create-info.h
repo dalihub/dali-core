@@ -52,6 +52,9 @@ struct RenderPassCreateInfo
   /**
    * @brief Sets array of attachment descriptions
    *
+   * The attachment descriptions should be ordered as for the framebuffer
+   * or (in case of swapchain), color attachment preceeds depth/stencil.
+   *
    * @param[in] value pointer valid array of attachment descriptions
    * @return reference to this structure
    */

@@ -88,9 +88,6 @@ struct RenderManager::Impl
 
     uniformBufferManager.reset(new Render::UniformBufferManager(&graphicsController));
 
-    // initialize main command buffer
-    auto info         = Graphics::CommandBufferCreateInfo().SetLevel(Graphics::CommandBufferLevel::PRIMARY);
-    mainCommandBuffer = graphicsController.CreateCommandBuffer(info, nullptr);
   }
 
   ~Impl()
@@ -181,11 +178,7 @@ struct RenderManager::Impl
 
   std::unique_ptr<Dali::ThreadPool> threadPool;            ///< The thread pool
   Vector<Graphics::Texture*>        boundTextures;         ///< The textures bound for rendering
-  Vector<Graphics::Texture*>        textureDependencyList; ///< The dependency list of binded textures
-
-  Graphics::UniquePtr<Graphics::CommandBuffer> mainCommandBuffer; ///< Main command buffer
-
-  Graphics::UniquePtr<Graphics::RenderPass> mainRenderPass; ///< Main renderpass
+  Vector<Graphics::Texture*>        textureDependencyList; ///< The dependency list of bound textures
 };
 
 RenderManager* RenderManager::New(Graphics::Controller&               graphicsController,
@@ -497,9 +490,6 @@ void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear
 
   const bool haveInstructions = count > 0u;
 
-  // Reset main command buffer
-  mImpl->mainCommandBuffer->Reset();
-
   DALI_LOG_INFO(gLogFilter, Debug::General, "Render: haveInstructions(%s) || mImpl->lastFrameWasRendered(%s) || forceClear(%s)\n", haveInstructions ? "true" : "false", mImpl->lastFrameWasRendered ? "true" : "false", forceClear ? "true" : "false");
 
   // Only render if we have instructions to render, or the last frame was rendered (and therefore a clear is required).
@@ -511,12 +501,6 @@ void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear
     if(mImpl->currentContext != &mImpl->context)
     {
       mImpl->currentContext = &mImpl->context;
-
-      // Context switch now happens when the uploading happens in graphics side
-      //      if(mImpl->currentContext->IsSurfacelessContextSupported())
-      //      {
-      //        mImpl->graphicsController.GetGlContextHelperAbstraction().MakeSurfacelessContextCurrent();
-      //      }
 
       // Clear the current cached program when the context is switched
       mImpl->programController.ClearCurrentProgram();
@@ -884,12 +868,6 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
         // Switch to shared context for off-screen buffer
         mImpl->currentContext = &mImpl->context;
 
-        // Context switch now happens when render pass starts
-        //        if(mImpl->currentContext->IsSurfacelessContextSupported())
-        //        {
-        //          mImpl->graphicsController.GetGlContextHelperAbstraction().MakeSurfacelessContextCurrent();
-        //        }
-
         // Clear the current cached program when the context is switched
         mImpl->programController.ClearCurrentProgram();
       }
@@ -945,53 +923,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
         mImpl->textureDependencyList.PushBack(instruction.mFrameBuffer->GetTexture(i0));
       }
     }
-    else
-    {
-      //mImpl->currentContext->BindFramebuffer(GL_FRAMEBUFFER, 0u);
-    }
 
-    // @todo Should this be a command in it's own right?
-    // @todo yes
-    if(!instruction.mFrameBuffer)
-    {
-      /*
-      mImpl->currentContext->Viewport(surfaceRect.x,
-                                      surfaceRect.y,
-                                      surfaceRect.width,
-                                      surfaceRect.height);
-                                      */
-
-      /*
-      mainCommandBuffer->SetViewport( {surfaceRect.x,
-                                        surfaceRect.y,
-                                        surfaceRect.width,
-                                        surfaceRect.height} );
-      */
-    }
-
-    // Clear the entire color, depth and stencil buffers for the default framebuffer, if required.
-    // It is important to clear all 3 buffers when they are being used, for performance on deferred renderers
-    // e.g. previously when the depth & stencil buffers were NOT cleared, it caused the DDK to exceed a "vertex count limit",
-    // and then stall. That problem is only noticeable when rendering a large number of vertices per frame.
-
-    /*
-    GLbitfield clearMask = GL_COLOR_BUFFER_BIT;
-
-    mImpl->currentContext->ColorMask(true);
-
-    if(depthBufferAvailable == Integration::DepthBufferAvailable::TRUE)
-    {
-      mImpl->currentContext->DepthMask(true);
-      clearMask |= GL_DEPTH_BUFFER_BIT;
-    }
-
-    if(stencilBufferAvailable == Integration::StencilBufferAvailable::TRUE)
-    {
-      mImpl->currentContext->ClearStencil(0);
-      mImpl->currentContext->StencilMask(0xFF); // 8 bit stencil mask, all 1's
-      clearMask |= GL_STENCIL_BUFFER_BIT;
-    }
-    */
     if(!instruction.mIgnoreRenderToFbo && (instruction.mFrameBuffer != nullptr))
     {
       // Offscreen buffer rendering
@@ -1048,53 +980,29 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       clearFullFrameRect = false;
     }
 
-    // Begin render pass
-    mainCommandBuffer->BeginRenderPass(
-      currentRenderPass,
-      currentRenderTarget,
-      {
-        viewportRect.x, viewportRect.y,
-        uint32_t(viewportRect.width), uint32_t(viewportRect.height)
-      },
-      currentClearValues);
-
-    // @todo The following block should be a command in it's own right.
-    // Currently takes account of surface orientation in Context.
-    // Or move entirely to RenderPass implementation
-    mainCommandBuffer->SetViewport({float(viewportRect.x),
-                                    float(viewportRect.y),
-                                    float(viewportRect.width),
-                                    float(viewportRect.height)});
-
-    //mImpl->currentContext->Viewport(viewportRect.x, viewportRect.y, viewportRect.width, viewportRect.height);
+    Graphics::Rect2D scissorArea{ viewportRect.x, viewportRect.y, uint32_t(viewportRect.width), uint32_t(viewportRect.height) };
     if(instruction.mIsClearColorSet)
     {
       if(!clearFullFrameRect)
       {
         if(!clippingRect.IsEmpty())
         {
-          Graphics::Rect2D scissorArea = {clippingRect.x, clippingRect.y, uint32_t(clippingRect.width), uint32_t(clippingRect.height)};
-          mainCommandBuffer->SetScissor( scissorArea );
-          mainCommandBuffer->SetScissorTestEnable( true );
-          //mImpl->currentContext->SetScissorTest(true);
-          //mImpl->currentContext->Scissor(clippingRect.x, clippingRect.y, clippingRect.width, clippingRect.height);
-          //mImpl->currentContext->Clear(clearMask, Context::FORCE_CLEAR);
-          //mImpl->currentContext->SetScissorTest(false);
+          scissorArea = {clippingRect.x, clippingRect.y, uint32_t(clippingRect.width), uint32_t(clippingRect.height)};
         }
-        else
-        {
-          //mImpl->currentContext->SetScissorTest(true);
-          //mImpl->currentContext->Scissor(viewportRect.x, viewportRect.y, viewportRect.width, viewportRect.height);
-          //mImpl->currentContext->Clear(clearMask, Context::FORCE_CLEAR);
-          //mImpl->currentContext->SetScissorTest(false);
-        }
-      }
-      else
-      {
-        //mImpl->currentContext->SetScissorTest(false);
-        //mImpl->currentContext->Clear(clearMask, Context::FORCE_CLEAR);
       }
     }
+
+    // Begin render pass
+    mainCommandBuffer->BeginRenderPass(
+      currentRenderPass,
+      currentRenderTarget,
+      scissorArea,
+      currentClearValues);
+
+    mainCommandBuffer->SetViewport({float(viewportRect.x),
+                                     float(viewportRect.y),
+                                     float(viewportRect.width),
+                                     float(viewportRect.height)});
 
     // Clear the list of bound textures
     mImpl->boundTextures.Clear();
@@ -1131,9 +1039,6 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
         if(instruction.mFrameBuffer)
         {
           // For off-screen buffer
-
-          // Wait until all rendering calls for the currently context are executed
-          // mImpl->graphicsController.GetGlContextHelperAbstraction().WaitClient();
 
           // Clear the dependency list
           mImpl->textureDependencyList.Clear();
@@ -1175,12 +1080,6 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       instruction.mRenderTracker = nullptr; // Only create once.
     }
 
-    // This now happens when the render pass for frame buffer finishes
-    //    if(renderToFbo)
-    //    {
-    //      mImpl->currentContext->Flush();
-    //    }
-
     // End render pass
     mainCommandBuffer->EndRenderPass();
   }
@@ -1197,29 +1096,11 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       rt = target;
     }
   }
-
-  GLenum attachments[] = {GL_DEPTH, GL_STENCIL};
-  mImpl->currentContext->InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
 }
 
 void RenderManager::PostRender(bool uploadOnly)
 {
-  // Submit main command buffer
-  //mImpl->renderAlgorithms.SubmitCommandBuffer();
-
-  if(!uploadOnly)
-  {
-    // Context switch now happens outside the render manager
-    //    if(mImpl->currentContext->IsSurfacelessContextSupported())
-    //    {
-    //      mImpl->graphicsController.GetGlContextHelperAbstraction().MakeSurfacelessContextCurrent();
-    //    }
-
-    GLenum attachments[] = {GL_DEPTH, GL_STENCIL};
-    mImpl->context.InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
-  }
-
-  //Notify RenderGeometries that rendering has finished
+  // Notify RenderGeometries that rendering has finished
   for(auto&& iter : mImpl->geometryContainer)
   {
     iter->OnRenderFinished();

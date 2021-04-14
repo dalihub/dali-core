@@ -108,6 +108,8 @@ protected:
   uint32_t mSurfaceHeight;
   uint32_t mFrame;
 
+  Graphics::UniquePtr<Graphics::RenderTarget> mRenderTarget;
+
   struct
   {
     uint32_t x;

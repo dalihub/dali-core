@@ -178,7 +178,6 @@ public:
    *
    * @param[in] renderPass valid render pass object
    * @param[in] renderTarget valid render target, must not be used when framebuffer set
-   * @param[in] framebuffer valid framebuffer, must not be used with renderTarget
    * @param[in] renderArea area to draw (clear operation is affected)
    * @param[in] clearValues clear values (compatible with renderpass spec)
    */
@@ -201,6 +200,9 @@ public:
 
   /**
    * @brief Executes a list of secondary command buffers
+   *
+   * The secondary command buffers are executed as a part of a primary
+   * command buffer that calls this function.
    *
    * @param[in] commandBuffers List of buffers to execute
    */

@@ -41,6 +41,6 @@ protected:
   RenderTarget& operator=(RenderTarget&&) = default;
 };
 
-} // Namespace Dali
+} // Namespace Dali::Graphics
 
 #endif

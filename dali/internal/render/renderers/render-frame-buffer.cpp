@@ -117,9 +117,6 @@ bool FrameBuffer::CreateGraphicsObjects()
       std::vector<Graphics::AttachmentDescription> attachmentDescriptions;
 
       // Default behaviour for color attachments is to CLEAR and STORE
-      //@todo Ideally, we should create new render pass whenever
-      //      the loadop, storeop changes and the list of such renderpasses
-      //      should be managed accordingly (as in Vulkan)
       mClearValues.clear();
       for(auto& attachments : mCreateInfo.colorAttachments)
       {

@@ -375,7 +375,8 @@ public:
    * @param[in] blend If true, blending is enabled
    * @param[in] boundTextures The textures bound for rendering
    * @param[in] instruction. for use case like reflection where CullFace needs to be adjusted
-
+   *
+   * @return True if the content has been rendered, false if skipped.
    */
   bool Render(Context&                                             context,
               BufferIndex                                          bufferIndex,
@@ -431,6 +432,14 @@ public:
                     const void*                                        data,
                     uint32_t                                           size);
 
+  /**
+   * Returns the pointer to valid command buffer
+   *
+   * CommandBuffer associated with Renderer contains baked commands
+   * needed to issue draw call for this renderer.
+   *
+   * @return Pointer to valid CommandBuffer
+   */
   [[nodiscard]] Graphics::CommandBuffer* GetGraphicsCommandBuffer() const
   {
     return mGraphicsCommandBuffer.get();

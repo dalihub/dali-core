@@ -82,6 +82,14 @@ public:
    */
   void SubmitCommandBuffer();
 
+  /**
+   * Returns main command buffer
+   *
+   * 'Main' command buffer exists per each scene and it is used
+   * to bake all render instructions for the scene.
+   *
+   * @return main command buffer
+   */
   [[nodiscard]] Graphics::CommandBuffer* GetMainCommandBuffer() const
   {
     return mGraphicsCommandBuffer.get();
@@ -166,7 +174,7 @@ private:
   Graphics::Controller&                        mGraphicsController;
   Graphics::UniquePtr<Graphics::CommandBuffer> mGraphicsCommandBuffer{};
 
-  std::vector<Graphics::CommandBuffer*> mGraphicsRenderItemCommandBuffers{};
+  std::vector<Graphics::CommandBuffer*> mGraphicsRenderItemCommandBuffers{}; ///< Collection of command buffers issuing single draw call
 
   ScissorStackType  mScissorStack;        ///< Contains the currently applied scissor hierarchy (so we can undo clips)
   Dali::ClippingBox mViewportRectangle;   ///< The viewport dimensions, used to translate AABBs to scissor coordinates
