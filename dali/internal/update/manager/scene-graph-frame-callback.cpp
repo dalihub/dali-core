@@ -92,7 +92,7 @@ void FrameCallback::Invalidate()
 
 void FrameCallback::PropertyOwnerDestroyed(PropertyOwner& owner)
 {
-  mUpdateProxy.reset();
+  mUpdateProxy.reset(); // Root node is being destroyed so no point keeping the update-proxy either
 
   Invalidate();
 }
