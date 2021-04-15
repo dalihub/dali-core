@@ -461,20 +461,11 @@ private:
   void BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider& node, const Vector3& size, Program& program);
 
   /**
-   * Set the program uniform in the map from the mapped property
-   * @param[in] bufferIndex The index of the previous update buffer.
-   * @param[in] program The shader program
-   * @param[in] map The uniform
-   */
-  void SetUniformFromProperty(BufferIndex bufferIndex, Program& program, UniformIndexMap& map);
-
-  /**
    * Bind the textures and setup the samplers
-   * @param[in] context The GL context
-   * @param[in] program The shader program
+   * @param[in] commandBuffer The command buffer to record binding into
    * @param[in] boundTextures The textures bound for rendering
    */
-  void BindTextures(Program& program, Graphics::CommandBuffer& commandBuffer, Vector<Graphics::Texture*>& boundTextures);
+  void BindTextures(Graphics::CommandBuffer& commandBuffer, Vector<Graphics::Texture*>& boundTextures);
 
   /**
    * Prepare a pipeline for this renderer

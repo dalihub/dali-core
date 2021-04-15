@@ -176,7 +176,6 @@ std::ostream& operator<<(std::ostream& o, const Graphics::FramebufferCreateInfo&
   return o;
 }
 
-
 int GetNumComponents(Graphics::VertexInputFormat vertexFormat)
 {
   switch(vertexFormat)
@@ -385,7 +384,6 @@ GLenum GetBlendOp(Graphics::BlendOp blendOp)
   return op;
 }
 
-
 class TestGraphicsMemory : public Graphics::Memory
 {
 public:
@@ -452,7 +450,6 @@ TestGraphicsController::TestGraphicsController()
   trace.Enable(true);
   trace.EnableLogging(true);
 }
-
 
 void TestGraphicsController::SubmitCommandBuffers(const Graphics::SubmitInfo& submitInfo)
 {
@@ -693,10 +690,10 @@ void TestGraphicsController::ProcessCommandBuffer(TestGraphicsCommandBuffer& com
             {
               // Test scissor area and RT size
               const auto& area = cmd.data.beginRenderPass.renderArea;
-              if( area.x == 0 &&
-              area.y == 0 &&
-              area.width == renderTarget->mCreateInfo.extent.width &&
-              area.height == renderTarget->mCreateInfo.extent.height )
+              if(area.x == 0 &&
+                 area.y == 0 &&
+                 area.width == renderTarget->mCreateInfo.extent.width &&
+                 area.height == renderTarget->mCreateInfo.extent.height)
               {
                 mGl.Disable(GL_SCISSOR_TEST);
                 mGl.Clear(mask);
@@ -704,8 +701,7 @@ void TestGraphicsController::ProcessCommandBuffer(TestGraphicsCommandBuffer& com
               else
               {
                 mGl.Enable(GL_SCISSOR_TEST);
-                mGl.Scissor(cmd.data.beginRenderPass.renderArea.x, cmd.data.beginRenderPass.renderArea.y,
-                            cmd.data.beginRenderPass.renderArea.width, cmd.data.beginRenderPass.renderArea.height);
+                mGl.Scissor(cmd.data.beginRenderPass.renderArea.x, cmd.data.beginRenderPass.renderArea.y, cmd.data.beginRenderPass.renderArea.width, cmd.data.beginRenderPass.renderArea.height);
                 mGl.Clear(mask);
                 mGl.Disable(GL_SCISSOR_TEST);
               }
@@ -784,6 +780,9 @@ void TestGraphicsController::BindPipeline(TestGraphicsPipeline* pipeline)
   {
     mGl.Disable(GL_BLEND);
   }
+
+  auto* program = static_cast<const TestGraphicsProgram*>(pipeline->programState.program);
+  mGl.UseProgram(program->mImpl->mId);
 }
 
 /**

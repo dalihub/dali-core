@@ -293,80 +293,10 @@ void Renderer::SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, 
   mDrawCommands.insert(mDrawCommands.end(), pDrawCommands, pDrawCommands + size);
 }
 
-void Renderer::SetUniformFromProperty(BufferIndex bufferIndex, Program& program, UniformIndexMap& map)
-{
-  GLint location = program.GetUniformLocation(map.uniformIndex);
-  if(Program::UNIFORM_UNKNOWN != location)
-  {
-    // switch based on property type to use correct GL uniform setter
-    switch(map.propertyValue->GetType())
-    {
-      case Property::INTEGER:
-      {
-        program.SetUniform1i(location, map.propertyValue->GetInteger(bufferIndex));
-        break;
-      }
-      case Property::FLOAT:
-      {
-        program.SetUniform1f(location, map.propertyValue->GetFloat(bufferIndex));
-        break;
-      }
-      case Property::VECTOR2:
-      {
-        Vector2 value(map.propertyValue->GetVector2(bufferIndex));
-        program.SetUniform2f(location, value.x, value.y);
-        break;
-      }
-
-      case Property::VECTOR3:
-      {
-        Vector3 value(map.propertyValue->GetVector3(bufferIndex));
-        program.SetUniform3f(location, value.x, value.y, value.z);
-        break;
-      }
-
-      case Property::VECTOR4:
-      {
-        Vector4 value(map.propertyValue->GetVector4(bufferIndex));
-        program.SetUniform4f(location, value.x, value.y, value.z, value.w);
-        break;
-      }
-
-      case Property::ROTATION:
-      {
-        Quaternion value(map.propertyValue->GetQuaternion(bufferIndex));
-        program.SetUniform4f(location, value.mVector.x, value.mVector.y, value.mVector.z, value.mVector.w);
-        break;
-      }
-
-      case Property::MATRIX:
-      {
-        const Matrix& value = map.propertyValue->GetMatrix(bufferIndex);
-        program.SetUniformMatrix4fv(location, 1, value.AsFloat());
-        break;
-      }
-
-      case Property::MATRIX3:
-      {
-        const Matrix3& value = map.propertyValue->GetMatrix3(bufferIndex);
-        program.SetUniformMatrix3fv(location, 1, value.AsFloat());
-        break;
-      }
-
-      default:
-      {
-        // Other property types are ignored
-        break;
-      }
-    }
-  }
-}
-
-void Renderer::BindTextures(Program& program, Graphics::CommandBuffer& commandBuffer, Vector<Graphics::Texture*>& boundTextures)
+void Renderer::BindTextures(Graphics::CommandBuffer& commandBuffer, Vector<Graphics::Texture*>& boundTextures)
 {
   uint32_t textureUnit = 0;
 
-  GLint                          uniformLocation(-1);
   std::vector<Render::Sampler*>& samplers(mRenderDataProvider->GetSamplers());
   std::vector<Render::Texture*>& textures(mRenderDataProvider->GetTextures());
 
@@ -375,22 +305,18 @@ void Renderer::BindTextures(Program& program, Graphics::CommandBuffer& commandBu
   {
     if(textures[i] && textures[i]->GetGraphicsObject())
     {
-      if(program.GetSamplerUniformLocation(i, uniformLocation))
-      {
-        // if the sampler exists,
-        //   if it's default, delete the graphics object
-        //   otherwise re-initialize it if dirty
+      // if the sampler exists,
+      //   if it's default, delete the graphics object
+      //   otherwise re-initialize it if dirty
 
-        const Graphics::Sampler* graphicsSampler = (samplers[i] ? samplers[i]->GetGraphicsObject()
-                                                                : nullptr);
+      const Graphics::Sampler* graphicsSampler = (samplers[i] ? samplers[i]->GetGraphicsObject()
+                                                              : nullptr);
 
-        boundTextures.PushBack(textures[i]->GetGraphicsObject());
-        const Graphics::TextureBinding textureBinding{textures[i]->GetGraphicsObject(), graphicsSampler, textureUnit};
-        textureBindings.push_back(textureBinding);
+      boundTextures.PushBack(textures[i]->GetGraphicsObject());
+      const Graphics::TextureBinding textureBinding{textures[i]->GetGraphicsObject(), graphicsSampler, textureUnit};
+      textureBindings.push_back(textureBinding);
 
-        program.SetUniform1i(uniformLocation, textureUnit); // Get through shader reflection
-        ++textureUnit;
-      }
+      ++textureUnit;
     }
   }
 
@@ -662,7 +588,7 @@ bool Renderer::Render(Context&                                             conte
 
   commandBuffer->BindPipeline(*mGraphicsPipeline.get());
 
-  BindTextures(*program, *commandBuffer.get(), boundTextures);
+  BindTextures(*commandBuffer.get(), boundTextures);
 
   BuildUniformIndexMap(bufferIndex, node, size, *program);
 
@@ -1224,10 +1150,6 @@ Graphics::UniquePtr<Graphics::Pipeline> Renderer::PrepareGraphicsPipeline(
       colorBlendState.SetBlendConstants(blendColor->AsFloat());
     }
   }
-
-  // Take the program into use so we can send uniforms to it
-  // @todo Remove this call entirely!
-  program.Use();
 
   mUpdated = true;
 

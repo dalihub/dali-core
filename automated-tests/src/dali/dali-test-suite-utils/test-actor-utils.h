@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/rendering/texture-set.h>
 #include <dali/public-api/rendering/texture.h>
 #include <string>
 
@@ -49,6 +50,15 @@ Actor CreateRenderableActor(Texture texture);
  * @return An actor with a renderer.
  */
 Actor CreateRenderableActor(Texture texture, const std::string& vertexShader, const std::string& fragmentShader);
+
+/**
+ * @brief Creates a renderable-actor with a texture and custom shaders.
+ * @param[in] textures TextureSet to set.
+ * @param[in] vertexShader The vertex-shader.
+ * @param[in] fragmentShader The fragment-shader.
+ * @return An actor with a renderer.
+ */
+Actor CreateRenderableActor2(TextureSet textures, const std::string& vertexShader, const std::string& fragmentShader);
 
 Texture CreateTexture(TextureType::Type type, Pixel::Format format, int width, int height);
 

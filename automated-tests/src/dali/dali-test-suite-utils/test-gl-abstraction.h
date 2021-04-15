@@ -49,6 +49,13 @@ struct UniformData
   }
 };
 
+struct ActiveUniform
+{
+  std::string name;
+  GLenum      type;
+  GLint       size;
+};
+
 class DALI_CORE_API TestGlAbstraction : public Dali::Integration::GlAbstraction
 {
 public:
@@ -754,27 +761,18 @@ public:
   {
   }
 
+  inline void SetActiveUniforms(const std::vector<ActiveUniform>& uniforms)
+  {
+    mActiveUniforms = uniforms;
+  }
+
   inline void GetActiveUniform(GLuint program, GLuint index, GLsizei bufsize, GLsizei* length, GLint* size, GLenum* type, char* name) override
   {
-    switch(index)
+    if(index < mActiveUniforms.size())
     {
-      case 0:
-        *length = snprintf(name, bufsize, "sTexture");
-        *type   = GL_SAMPLER_2D;
-        *size   = 1;
-        break;
-      case 1:
-        *length = snprintf(name, bufsize, "sEffect");
-        *type   = GL_SAMPLER_2D;
-        *size   = 1;
-        break;
-      case 2:
-        *length = snprintf(name, bufsize, "sGloss");
-        *type   = GL_SAMPLER_2D;
-        *size   = 1;
-        break;
-      default:
-        break;
+      *length = snprintf(name, bufsize, "%s", mActiveUniforms[index].name.c_str());
+      *type   = mActiveUniforms[index].type;
+      *size   = mActiveUniforms[index].size;
     }
   }
 
@@ -842,7 +840,7 @@ public:
         *params = mProgramBinaryLength;
         break;
       case GL_ACTIVE_UNIFORMS:
-        *params = mNumberOfActiveUniforms;
+        *params = mActiveUniforms.size();
         break;
       case GL_ACTIVE_UNIFORM_MAX_LENGTH:
         *params = 100;
@@ -986,31 +984,10 @@ public:
     namedParams["program"] << program;
     mShaderTrace.PushCall("LinkProgram", out.str(), namedParams);
 
-    mNumberOfActiveUniforms = 3;
-
-    GetUniformLocation(program, "uRendererColor");
-    GetUniformLocation(program, "uCustom");
-    GetUniformLocation(program, "uCustom3");
-    GetUniformLocation(program, "uFadeColor");
-    GetUniformLocation(program, "uUniform1");
-    GetUniformLocation(program, "uUniform2");
-    GetUniformLocation(program, "uUniform3");
-    GetUniformLocation(program, "uFadeProgress");
-    GetUniformLocation(program, "uANormalMatrix");
-    GetUniformLocation(program, "sEffect");
-    GetUniformLocation(program, "sTexture");
-    GetUniformLocation(program, "sTextureRect");
-    GetUniformLocation(program, "sGloss");
-    GetUniformLocation(program, "uColor");
-    GetUniformLocation(program, "uModelMatrix");
-    GetUniformLocation(program, "uModelView");
-    GetUniformLocation(program, "uMvpMatrix");
-    GetUniformLocation(program, "uNormalMatrix");
-    GetUniformLocation(program, "uProjection");
-    GetUniformLocation(program, "uSize");
-    GetUniformLocation(program, "uViewMatrix");
-    GetUniformLocation(program, "uLightCameraProjectionMatrix");
-    GetUniformLocation(program, "uLightCameraViewMatrix");
+    for(const auto& uniform : mActiveUniforms)
+    {
+      GetUniformLocation(program, uniform.name.c_str());
+    }
 
     for(const auto& uniform : mCustomUniformData)
     {
@@ -2470,14 +2447,13 @@ public: // TEST FUNCTIONS
     mBufferSubDataCalls.clear();
   }
 
-private:
+public:
   GLuint                                mCurrentProgram;
   GLuint                                mCompileStatus;
   BufferDataCalls                       mBufferDataCalls;
   BufferSubDataCalls                    mBufferSubDataCalls;
   GLvoid*                               mMappedBuffer{nullptr};
   GLuint                                mLinkStatus;
-  GLint                                 mNumberOfActiveUniforms;
   GLenum                                mGetErrorResult;
   GLubyte*                              mGetStringResult;
   GLboolean                             mIsBufferResult;
@@ -2552,8 +2528,8 @@ private:
   typedef std::map<std::string, GLint>   UniformIDMap;
   typedef std::map<GLuint, UniformIDMap> ProgramUniformMap;
   ProgramUniformMap                      mUniforms;
-
-  std::vector<UniformData> mCustomUniformData{};
+  std::vector<ActiveUniform>             mActiveUniforms;
+  std::vector<UniformData>               mCustomUniformData{};
 
   template<typename T>
   struct ProgramUniformValue : public std::map<GLuint, std::map<GLint, T> >

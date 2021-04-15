@@ -79,9 +79,9 @@ void TestApplication::CreateScene()
 
   // Create render target for the scene
   Graphics::RenderTargetCreateInfo rtInfo{};
-  rtInfo.SetExtent( {mSurfaceWidth, mSurfaceHeight });
-  mRenderTarget = mGraphicsController.CreateRenderTarget( rtInfo, nullptr );
-  mScene.SetSurfaceRenderTarget( mRenderTarget.get() );
+  rtInfo.SetExtent({mSurfaceWidth, mSurfaceHeight});
+  mRenderTarget = mGraphicsController.CreateRenderTarget(rtInfo, nullptr);
+  mScene.SetSurfaceRenderTarget(mRenderTarget.get());
 }
 
 void TestApplication::InitializeCore()

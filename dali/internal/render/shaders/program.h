@@ -52,8 +52,7 @@ class ProgramCache;
 
 /**
  * A program contains a vertex & fragment shader.
- *
- * Program caches some of vertex attribute locations and uniform variable values to reduce unnecessary state changes.
+ * It interfaces to the implementation program and it's reflection.
  */
 class Program
 {
@@ -66,20 +65,9 @@ public:
   static const int32_t MAX_UNIFORM_CACHE_SIZE = 16;
 
   /**
-   * Constant for uniform / attribute not found
+   * Constant for uniform not found
    */
   static const int32_t NOT_FOUND = -1;
-
-  /**
-   * Vertex attributes
-   */
-  enum AttribType
-  {
-    ATTRIB_UNKNOWN = -1,
-    ATTRIB_POSITION,
-    ATTRIB_TEXCOORD,
-    ATTRIB_TYPE_LAST
-  };
 
   /**
    * Common shader uniform names
@@ -133,148 +121,12 @@ public:
    */
   static Program* New(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& gfxController, Graphics::UniquePtr<Graphics::Program>&& gfxProgram, bool modifiesGeometry);
 
-  /**
-   * Takes this program into use
-   */
-  void Use();
-
-  /**
-   * @return true if this program is used currently
-   */
-  bool IsUsed();
-
-  /**
-   * @param [in] type of the attribute
-   * @return the index of the attribute
-   */
-  GLint GetAttribLocation(AttribType type);
-
-  /**
-   * Register an attribute name in our local cache
-   * @param [in] name attribute name
-   * @return the index of the attribute name in local cache
-   */
-  uint32_t RegisterCustomAttribute(ConstString name);
-
-  /**
-   * Gets the location of a pre-registered attribute.
-   * @param [in] attributeIndex of the attribute in local cache
-   * @return the index of the attribute in the GL program
-   */
-  GLint GetCustomAttributeLocation(uint32_t attributeIndex);
-
-  /**
+  /*
    * Register a uniform name in our local cache
    * @param [in] name uniform name
    * @return the index of the uniform name in local cache
    */
   uint32_t RegisterUniform(ConstString name);
-
-  /**
-   * Gets the location of a pre-registered uniform.
-   * Uniforms in list UniformType are always registered and in the order of the enumeration
-   * @param [in] uniformIndex of the uniform in local cache
-   * @return the index of the uniform in the GL program
-   */
-  GLint GetUniformLocation(uint32_t uniformIndex);
-
-  /**
-   * Introspect the newly loaded shader to get the active sampler locations
-   */
-  void GetActiveSamplerUniforms();
-
-  /**
-   * Gets the uniform location for a sampler
-   * @param [in] index The index of the active sampler
-   * @param [out] location The location of the requested sampler
-   * @return true if the active sampler was found
-   */
-  bool GetSamplerUniformLocation(uint32_t index, GLint& location);
-
-  /**
-   * Get the number of active samplers present in the shader
-   * @return The number of active samplers
-   */
-  uint32_t GetActiveSamplerCount() const;
-
-  /**
-   * Sets the uniform value
-   * @param [in] location of uniform
-   * @param [in] value0 as int
-   */
-  void SetUniform1i(GLint location, GLint value0);
-
-  /**
-   * Sets the uniform value
-   * @param [in] location of uniform
-   * @param [in] value0 as int
-   * @param [in] value1 as int
-   * @param [in] value2 as int
-   * @param [in] value3 as int
-   */
-  void SetUniform4i(GLint location, GLint value0, GLint value1, GLint value2, GLint value3);
-
-  /**
-   * Sets the uniform value
-   * @param [in] location of uniform
-   * @param [in] value0 as float
-   */
-  void SetUniform1f(GLint location, GLfloat value0);
-
-  /**
-   * Sets the uniform value
-   * @param [in] location of uniform
-   * @param [in] value0 as float
-   * @param [in] value1 as float
-   */
-  void SetUniform2f(GLint location, GLfloat value0, GLfloat value1);
-
-  /**
-   * Special handling for size as we're using uniform geometry so size is passed on to most programs
-   * but it rarely changes so we can cache it
-   * @param [in] location of uniform
-   * @param [in] value0 as float
-   * @param [in] value1 as float
-   * @param [in] value2 as float
-   */
-  void SetSizeUniform3f(GLint location, GLfloat value0, GLfloat value1, GLfloat value2);
-
-  /**
-   * Sets the uniform value
-   * @param [in] location of uniform
-   * @param [in] value0 as float
-   * @param [in] value1 as float
-   * @param [in] value2 as float
-   */
-  void SetUniform3f(GLint location, GLfloat value0, GLfloat value1, GLfloat value2);
-
-  /**
-   * Sets the uniform value
-   * @param [in] location of uniform
-   * @param [in] value0 as float
-   * @param [in] value1 as float
-   * @param [in] value2 as float
-   * @param [in] value3 as float
-   */
-  void SetUniform4f(GLint location, GLfloat value0, GLfloat value1, GLfloat value2, GLfloat value3);
-
-  /**
-   * Sets the uniform value as matrix. NOTE! we never want GPU to transpose
-   * so make sure your matrix is in correct order for GL.
-   * @param [in] location Location of uniform
-   * @param [in] count Count of matrices
-   * @param [in] value values as float pointers
-   */
-  void SetUniformMatrix4fv(GLint location, GLsizei count, const GLfloat* value);
-
-  /**
-   * Sets the uniform value as matrix. NOTE! we never want GPU to transpose
-   * so make sure your matrix is in correct order for GL.
-   * @param [in] location Location of uniform
-   * @param [in] count Count of matrices
-   * @param [in] value values as float pointers
-   */
-  void SetUniformMatrix3fv(GLint location, GLsizei count, const GLfloat* value);
 
   /**
    * Needs to be called when GL context is (re)created
@@ -380,9 +232,9 @@ private:
   Program& operator=(const Program&); ///< assignment operator, not defined
 
   /**
-   * Resets caches
+   * Resets uniform cache
    */
-  void ResetAttribsUniformCache();
+  void ResetUniformCache();
 
   /**
    * Struct ReflectionUniformInfo
@@ -415,7 +267,6 @@ private:                                                    // Data
   using NameLocationPair = std::pair<ConstString, GLint>;
   using Locations        = std::vector<NameLocationPair>;
 
-  Locations          mAttributeLocations;      ///< attribute location cache
   Locations          mUniformLocations;        ///< uniform location cache
   std::vector<GLint> mSamplerUniformLocations; ///< sampler uniform location cache
 

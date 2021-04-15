@@ -91,6 +91,35 @@ Actor CreateRenderableActor(Texture texture, const std::string& vertexShader, co
   return actor;
 }
 
+Actor CreateRenderableActor2(TextureSet textures, const std::string& vertexShader, const std::string& fragmentShader)
+{
+  // Create the geometry
+  Geometry geometry = CreateQuadGeometry();
+
+  // Create Shader
+  Shader shader = Shader::New(vertexShader, fragmentShader);
+
+  // Create renderer from geometry and material
+  Renderer renderer = Renderer::New(geometry, shader);
+
+  // Create actor and set renderer
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+
+  // If we a texture, then create a texture-set and add to renderer
+  if(textures)
+  {
+    renderer.SetTextures(textures);
+
+    auto texture = textures.GetTexture(0);
+
+    // Set actor to the size of the texture if set
+    actor.SetProperty(Actor::Property::SIZE, Vector2(texture.GetWidth(), texture.GetHeight()));
+  }
+
+  return actor;
+}
+
 Texture CreateTexture(TextureType::Type type, Pixel::Format format, int width, int height)
 {
   Texture texture = Texture::New(type, format, width, height);
