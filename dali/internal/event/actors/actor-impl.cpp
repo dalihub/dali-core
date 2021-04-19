@@ -146,7 +146,7 @@ DALI_PROPERTY("keyboardFocusable", BOOLEAN, true, false, false, Dali::Actor::Pro
 DALI_PROPERTY("siblingOrder", INTEGER, true, false, false, Dali::DevelActor::Property::SIBLING_ORDER)
 DALI_PROPERTY("updateSizeHint", VECTOR2, true, false, false, Dali::DevelActor::Property::UPDATE_SIZE_HINT)
 DALI_PROPERTY("captureAllTouchAfterStart", BOOLEAN, true, false, false, Dali::DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START)
-DALI_PROPERTY("touchAreaOffset", RECTANGLE, true, false, false, Dali::DevelActor::Property::TOUCH_AREA_OFFSET)
+DALI_PROPERTY("touchArea", VECTOR2, true, false, false, Dali::DevelActor::Property::TOUCH_AREA)
 DALI_PROPERTY("blendEquation", INTEGER, true, false, false, Dali::DevelActor::Property::BLEND_EQUATION)
 DALI_PROPERTY_TABLE_END(DEFAULT_ACTOR_PROPERTY_START_INDEX, ActorDefaultProperties)
 
@@ -1321,7 +1321,7 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mTargetPosition(Vector3::ZERO),
   mTargetScale(Vector3::ONE),
   mAnimatedSize(Vector3::ZERO),
-  mTouchAreaOffset(0, 0, 0, 0),
+  mTouchArea(Vector2::ZERO),
   mName(),
   mSortedDepth(0u),
   mDepth(0u),

@@ -2,7 +2,7 @@
 #define DALI_ACTOR_DEVEL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -120,36 +120,18 @@ enum Type
   CAPTURE_ALL_TOUCH_AFTER_START,
 
   /**
-    * @brief If you set the TOUCH_AREA_OFFSET on an actor, when you touch the actor, the touch area is expand from the size of actor.
-    * @details Name "touchAreaOffset", type Property::Rect<int> (left, right, bottom, top)
+    * @brief If you set the TOUCH_AREA on an actor, when you touch the actor, the touch area is used rather than the size of the actor
+    * @details Name "touchArea", type Property::Vector2
+    * @note Default is Vector2::ZERO.
     * @note for example
     *  Actor actor = Actor::New();
-    *  actor.SetProperty(Actor::Property::SIZE, Vector2(20.0f, 20.0f));
-    *  actor.SetProperty(DevelActor::Property::TOUCH_AREA_OFFSET, Rect<int>(-10, 20, 30, -40));
+    *  actor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+    *  actor.SetProperty(DevelActor::Property::TOUCH_AREA, Vector2(200.0f, 200.0f));
     *  actor.TouchedSignal().Connect(OnTouchCallback);
     *
-    * +---------------------+
-    * |         ^           |
-    * |         |           |
-    * |         | -40       |
-    * |         |           |
-    * |         |           |
-    * |    +----+----+      |
-    * |    |         |      |
-    * | -10|         | 20   |
-    * |<---+         +----->|
-    * |    |         |      |
-    * |    |         |      |
-    * |    +----+----+      |
-    * |         |           |
-    * |         | 30        |
-    * |         |           |
-    * |         v           |
-    * +---------------------+
-
-    *  The actual touched size is actor.width + touchAreaOffset.right - touchAreaOffset.left and actor.height + touchAreaOffset.bottom - touchAreaOffset.top
+    *  If you want to reset the touch area to an area different with the size of the actor, you can set this TOUCH_AREA property.
     */
-  TOUCH_AREA_OFFSET,
+  TOUCH_AREA,
 
   /**
    * @brief Determines which blend equation will be used to render renderers of this actor.

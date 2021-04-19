@@ -1363,21 +1363,21 @@ public:
   }
 
   /**
-   * Sets the touch area offset of an actor.
-   * @param [in] offset The new offset of area (left, right, bottom, top).
+   * Sets the touch area of an actor.
+   * @param [in] area The new area.
    */
-  void SetTouchAreaOffset(Rect<int> offset)
+  void SetTouchArea(Vector2 area)
   {
-    mTouchAreaOffset = offset;
+    mTouchArea = area;
   }
 
   /**
-   * Retrieve the Actor's touch area offset.
-   * @return The Actor's touch area offset.
+   * Retrieve the Actor's touch area.
+   * @return The Actor's touch area.
    */
-  const Rect<int>& GetTouchAreaOffset() const
+  const Vector2& GetTouchArea() const
   {
-    return mTouchAreaOffset;
+    return mTouchArea;
   }
 
   // Gestures
@@ -2024,7 +2024,7 @@ protected:
   Vector3    mTargetPosition;    ///< Event-side storage for position (not a pointer as most actors will have a position)
   Vector3    mTargetScale;       ///< Event-side storage for scale
   Vector3    mAnimatedSize;      ///< Event-side storage for size animation
-  Rect<int>  mTouchAreaOffset;   ///< touch area offset (left, right, bottom, top)
+  Vector2    mTouchArea;         ///< touch area
 
   ConstString mName;            ///< Name of the actor
   uint32_t    mSortedDepth;     ///< The sorted depth index. A combination of tree traversal and sibling order.

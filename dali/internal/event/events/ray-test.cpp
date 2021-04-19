@@ -105,19 +105,18 @@ bool RayTest::SphereTest(const Internal::Actor& actor, const Vector4& rayOrigin,
     return false;
   }
 
-  const Node&       node            = actor.GetNode();
-  const BufferIndex bufferIndex     = EventThreadServices::Get().GetEventBufferIndex();
-  const Vector3&    translation     = node.GetWorldPosition(bufferIndex);
-  const Vector3&    size            = node.GetSize(bufferIndex);
-  const Vector3&    scale           = node.GetWorldScale(bufferIndex);
-  const Rect<int>&  touchAreaOffset = actor.GetTouchAreaOffset(); // (left, right, bottom, top)
+  const Node&       node        = actor.GetNode();
+  const BufferIndex bufferIndex = EventThreadServices::Get().GetEventBufferIndex();
+  const Vector3&    translation = node.GetWorldPosition(bufferIndex);
+  const Vector3&    size        = actor.GetTouchArea() == Vector2::ZERO ? node.GetSize(bufferIndex) : Vector3(actor.GetTouchArea());
+  const Vector3&    scale       = node.GetWorldScale(bufferIndex);
 
   // Transforms the ray to the local reference system. As the test is against a sphere, only the translation and scale are needed.
-  const Vector3 rayOriginLocal(rayOrigin.x - translation.x - (touchAreaOffset.left + touchAreaOffset.right) * 0.5, rayOrigin.y - translation.y - (touchAreaOffset.top + touchAreaOffset.bottom) * 0.5, rayOrigin.z - translation.z);
+  const Vector3 rayOriginLocal(rayOrigin.x - translation.x, rayOrigin.y - translation.y, rayOrigin.z - translation.z);
 
   // Computing the radius is not needed, a square radius is enough so can just use size but we do need to scale the sphere
-  const float width  = size.width * scale.width + touchAreaOffset.right - touchAreaOffset.left;
-  const float height = size.height * scale.height + touchAreaOffset.bottom - touchAreaOffset.top;
+  const float width  = size.width * scale.width;
+  const float height = size.height * scale.height;
 
   float squareSphereRadius = 0.5f * (width * width + height * height);
 
@@ -154,13 +153,12 @@ bool RayTest::ActorTest(const Internal::Actor& actor, const Vector4& rayOrigin, 
       // Ray travels distance * rayDirLocal to intersect with plane.
       distance = a / b;
 
-      const Vector2&   size            = Vector2(node.GetSize(EventThreadServices::Get().GetEventBufferIndex()));
-      const Rect<int>& touchAreaOffset = actor.GetTouchAreaOffset(); // (left, right, bottom, top)
-      hitPointLocal.x                  = rayOriginLocal.x + rayDirLocal.x * distance + size.x * 0.5f;
-      hitPointLocal.y                  = rayOriginLocal.y + rayDirLocal.y * distance + size.y * 0.5f;
+      const Vector2& size = actor.GetTouchArea() == Vector2::ZERO ? Vector2(node.GetSize(EventThreadServices::Get().GetEventBufferIndex())) : actor.GetTouchArea();
+      hitPointLocal.x     = rayOriginLocal.x + rayDirLocal.x * distance + size.x * 0.5f;
+      hitPointLocal.y     = rayOriginLocal.y + rayDirLocal.y * distance + size.y * 0.5f;
 
       // Test with the actor's geometry.
-      hit = (hitPointLocal.x >= touchAreaOffset.left) && (hitPointLocal.x <= (size.x + touchAreaOffset.right) && (hitPointLocal.y >= touchAreaOffset.top) && (hitPointLocal.y <= (size.y + touchAreaOffset.bottom)));
+      hit = (hitPointLocal.x >= 0.f) && (hitPointLocal.x <= size.x) && (hitPointLocal.y >= 0.f) && (hitPointLocal.y <= size.y);
     }
   }
 
