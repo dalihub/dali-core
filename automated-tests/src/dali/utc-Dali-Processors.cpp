@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ public:
   {
   }
 
-  virtual void Process(bool postProcessor)
+  virtual void Process()
   {
     processRun = true;
   }
@@ -112,41 +112,6 @@ int UtcDaliCoreProcessorMultipleP(void)
   DALI_TEST_CHECK(testProcessor1.processRun);
   DALI_TEST_CHECK(testProcessor2.processRun == false);
   DALI_TEST_CHECK(testProcessor3.processRun);
-
-  END_TEST;
-}
-
-int UtcDaliCorePostProcessorP(void)
-{
-  TestApplication application;
-
-  TestProcessor      testProcessor;
-  Integration::Core& core = application.GetCore();
-  core.RegisterProcessor(testProcessor, true);
-
-  tet_infoline("Test that the processor has not been executed yet:");
-  DALI_TEST_CHECK(testProcessor.processRun == false);
-
-  application.SendNotification();
-
-  tet_infoline("Test that the processor has been executed:");
-  DALI_TEST_CHECK(testProcessor.processRun);
-
-  // Clear down for next part of test
-  testProcessor.processRun = false;
-
-  core.UnregisterProcessor(testProcessor);
-  application.SendNotification();
-  tet_infoline("Test that the processor is still executed:");
-  DALI_TEST_CHECK(testProcessor.processRun);
-
-  // Clear down for next part of test
-  testProcessor.processRun = false;
-
-  core.UnregisterProcessor(testProcessor, true);
-  application.SendNotification();
-  tet_infoline("Test that the processor has not been executed again:");
-  DALI_TEST_CHECK(testProcessor.processRun == false);
 
   END_TEST;
 }

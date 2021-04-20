@@ -392,16 +392,14 @@ public:
    *
    * Note, Core does not take ownership of this processor.
    * @param[in] processor The process to register
-   * @param[in] postProcessor set this processor required to be called after size negotiation. Default is false.
    */
-  void RegisterProcessor(Processor& processor, bool postProcessor = false);
+  void RegisterProcessor(Processor& processor);
 
   /**
    * @brief Unregister a processor
    * @param[in] processor The process to unregister
-   * @param[in] postProcessor True if the processor to be unregister is for post processor.
    */
-  void UnregisterProcessor(Processor& processor, bool postProcessor = false);
+  void UnregisterProcessor(Processor& processor);
 
   /**
    * @brief Gets the Object registry.
