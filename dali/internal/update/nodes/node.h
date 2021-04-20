@@ -1038,6 +1038,17 @@ inline void SetDrawModeMessage(EventThreadServices& eventThreadServices, const N
   new(slot) LocalType(&node, &Node::SetDrawMode, drawMode);
 }
 
+inline void AttachRendererMessage(EventThreadServices& eventThreadServices, const Node& node, const Renderer& renderer)
+{
+  using LocalType = MessageValue1<Node, Renderer*>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new(slot) LocalType(&node, &Node::AddRenderer, const_cast<Renderer*>(&renderer));
+}
+
 inline void DetachRendererMessage(EventThreadServices& eventThreadServices, const Node& node, const Renderer& renderer)
 {
   using LocalType = MessageValue1<Node, const Renderer*>;
