@@ -129,7 +129,7 @@ private:
 
   uint32_t mCapacity{0}; ///< buffer capacity
   uint32_t mSize;        ///< buffer size
-  uint32_t mAlignment{0};
+  uint32_t mAlignment;
   bool     mPersistentMappedEnabled;
 
   Graphics::BufferUsageFlags mUsageFlags;
