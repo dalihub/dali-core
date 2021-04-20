@@ -682,6 +682,16 @@ void TestGraphicsController::Resume()
   mCallStack.PushCall("Resume", "");
 }
 
+void TestGraphicsController::Shutdown()
+{
+  mCallStack.PushCall("Shutdown", "");
+}
+
+void TestGraphicsController::Destroy()
+{
+  mCallStack.PushCall("Destroy", "");
+}
+
 void TestGraphicsController::UpdateTextures(const std::vector<Graphics::TextureUpdateInfo>&       updateInfoList,
                                             const std::vector<Graphics::TextureUpdateSourceInfo>& sourceList)
 {
