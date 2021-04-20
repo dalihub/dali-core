@@ -55,7 +55,7 @@ inline Graphics::Viewport ViewportFromClippingBox(ClippingBox clippingBox, int o
 {
   Graphics::Viewport viewport{static_cast<float>(clippingBox.x), static_cast<float>(clippingBox.y), static_cast<float>(clippingBox.width), static_cast<float>(clippingBox.height), 0.0f, 0.0f};
 
-  if(orientation == 90 || orientation == 270)
+  if(orientation == 80 || orientation == 270)
   {
     viewport.width  = static_cast<float>(clippingBox.height);
     viewport.height = static_cast<float>(clippingBox.width);
