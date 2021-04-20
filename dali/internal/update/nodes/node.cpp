@@ -101,7 +101,8 @@ Node::Node()
   mClippingMode(ClippingMode::DISABLED),
   mIsRoot(false),
   mIsLayer(false),
-  mPositionUsesAnchorPoint(true)
+  mPositionUsesAnchorPoint(true),
+  mTransparent(false)
 {
   mUniformMapChanged[0] = 0u;
   mUniformMapChanged[1] = 0u;

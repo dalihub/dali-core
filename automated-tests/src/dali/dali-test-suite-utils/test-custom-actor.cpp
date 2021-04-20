@@ -204,6 +204,16 @@ uint32_t TestCustomActor::GetDepth()
   return GetImpl().mDepth;
 }
 
+void TestCustomActor::SetTransparent(bool transparent)
+{
+  return GetImpl().SetTransparent(transparent);
+}
+
+bool TestCustomActor::GetTransparent()
+{
+  return GetImpl().GetTransparent();
+}
+
 TestCustomActor::TestCustomActor()
 {
 }
@@ -384,6 +394,16 @@ void TestCustomActor::OnLayoutNegotiated(float size, Dimension::Type dimension)
 bool TestCustomActor::RelayoutDependentOnChildren(Dimension::Type dimension)
 {
   return false;
+}
+
+void TestCustomActor::SetTransparent(bool transparent)
+{
+  CustomActorImpl::SetTransparent(transparent);
+}
+
+bool TestCustomActor::GetTransparent() const
+{
+  return CustomActorImpl::GetTransparent();
 }
 
 void TestCustomActor::SetDaliProperty(std::string s)
