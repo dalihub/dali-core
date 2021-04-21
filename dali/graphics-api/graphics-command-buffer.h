@@ -206,7 +206,7 @@ public:
    *
    * @param[in] commandBuffers List of buffers to execute
    */
-  virtual void ExecuteCommandBuffers( std::vector<CommandBuffer*>&& commandBuffers ) = 0;
+  virtual void ExecuteCommandBuffers(std::vector<const CommandBuffer*>&& commandBuffers) = 0;
 
   /**
    * @brief Draw primitives
@@ -304,6 +304,6 @@ protected:
   CommandBuffer(CommandBuffer&&) = default;
   CommandBuffer& operator=(CommandBuffer&&) = default;
 };
-} // Namespace Dali
+} // namespace Dali::Graphics
 
 #endif

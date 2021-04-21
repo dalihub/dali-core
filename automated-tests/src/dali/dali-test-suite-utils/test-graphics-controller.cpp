@@ -543,21 +543,6 @@ void TestGraphicsController::ProcessCommandBuffer(TestGraphicsCommandBuffer& com
       case CommandType::BIND_PIPELINE:
       {
         currentPipeline = Uncast<TestGraphicsPipeline>(cmd.data.bindPipeline.pipeline);
-
-        // Bind framebuffer if different. @todo Move to RenderPass
-        auto framebuffer = currentPipeline->framebufferState.framebuffer;
-        if(framebuffer && framebuffer != currentFramebuffer)
-        {
-          auto graphicsFramebuffer = Uncast<TestGraphicsFramebuffer>(framebuffer);
-          graphicsFramebuffer->Bind();
-        }
-        else
-        {
-          if(currentFramebuffer)
-            currentFramebuffer->Bind();
-          else
-            mGl.BindFramebuffer(GL_FRAMEBUFFER, 0);
-        }
         BindPipeline(currentPipeline);
         break;
       }
@@ -622,7 +607,7 @@ void TestGraphicsController::ProcessCommandBuffer(TestGraphicsCommandBuffer& com
         // Process secondary command buffers
         for(auto& buf : cmd.data.executeCommandBuffers.buffers)
         {
-          ProcessCommandBuffer(*static_cast<TestGraphicsCommandBuffer*>(buf));
+          ProcessCommandBuffer(*Uncast<TestGraphicsCommandBuffer>(buf));
         }
         break;
       }

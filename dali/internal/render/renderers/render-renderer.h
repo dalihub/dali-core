@@ -355,7 +355,7 @@ public:
 
   /**
    * Called to render during RenderManager::Render().
-   * @param[in] context The context used for rendering
+   * @param[in,out] commandBuffer The command buffer to write into
    * @param[in] bufferIndex The index of the previous update buffer.
    * @param[in] node The node using this renderer
    * @param[in] modelViewMatrix The model-view matrix.
@@ -368,7 +368,7 @@ public:
    *
    * @return True if the content has been rendered, false if skipped.
    */
-  bool Render(Context&                                             context,
+  bool Render(Graphics::CommandBuffer&                             commandBuffer,
               BufferIndex                                          bufferIndex,
               const SceneGraph::NodeDataProvider&                  node,
               const Matrix&                                        modelMatrix,
@@ -468,13 +468,18 @@ private:
   void BindTextures(Graphics::CommandBuffer& commandBuffer, Vector<Graphics::Texture*>& boundTextures);
 
   /**
-   * Prepare a pipeline for this renderer
+   * Prepare a pipeline for this renderer.
+   *
+   * As a renderer can be re-used in a single frame (e.g. being used by multiple nodes, or
+   * by non-exclusive render tasks), we store a pipeline per node/instruction.
+   * In practice, the implementation will cached pipelines, so we normally only have
+   * multiple handles.
    */
-  Graphics::UniquePtr<Graphics::Pipeline> PrepareGraphicsPipeline(
+  Graphics::Pipeline& PrepareGraphicsPipeline(
     Program&                                             program,
     const Dali::Internal::SceneGraph::RenderInstruction& instruction,
-    bool                                                 blend,
-    Graphics::UniquePtr<Graphics::Pipeline>&&            oldPipeline);
+    const SceneGraph::NodeDataProvider&                  node,
+    bool                                                 blend);
 
   /**
    * Setup and write data to the uniform buffer
@@ -531,8 +536,7 @@ private:
   Render::UniformBufferManager*               mUniformBufferManager{};
   std::vector<Graphics::UniformBufferBinding> mUniformBufferBindings{};
 
-  Graphics::UniquePtr<Graphics::Pipeline> mGraphicsPipeline{}; ///< The graphics pipeline. (Cached implementation)
-  std::vector<Graphics::ShaderState>      mShaderStates{};
+  std::vector<Graphics::ShaderState> mShaderStates{};
 
   using Hash = unsigned long;
   struct UniformIndexMap
@@ -549,8 +553,18 @@ private:
 
   UniformIndexMappings mUniformIndexMap;
   Vector<int32_t>      mAttributeLocations;
+  uint64_t             mUniformsHash;
 
-  uint64_t mUniformsHash;
+  struct HashedPipeline
+  {
+    uint64_t                                mHash{0u};
+    Graphics::UniquePtr<Graphics::Pipeline> mGraphicsPipeline{nullptr};
+    inline static uint64_t                  GetHash(const void* node, const void* instruction, bool blend)
+    {
+      return (reinterpret_cast<uint64_t>(node) << 32) | ((reinterpret_cast<uint64_t>(instruction) & 0xFFFFFFF) << 1) | blend;
+    }
+  };
+  std::vector<HashedPipeline> mGraphicsPipelines{};
 
   StencilParameters mStencilParameters; ///< Struct containing all stencil related options
   BlendingOptions   mBlendingOptions;   ///< Blending options including blend color, blend func and blend equation

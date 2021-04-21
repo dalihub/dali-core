@@ -26,7 +26,6 @@
 #include <dali/internal/render/common/render-instruction.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>
 #include <dali/internal/render/data-providers/uniform-map-data-provider.h>
-#include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/renderers/render-sampler.h>
 #include <dali/internal/render/renderers/render-texture.h>
 #include <dali/internal/render/renderers/render-vertex-buffer.h>
@@ -488,7 +487,7 @@ void Renderer::Upload()
   mGeometry->Upload(*mGraphicsController);
 }
 
-bool Renderer::Render(Context&                                             context,
+bool Renderer::Render(Graphics::CommandBuffer&                             commandBuffer,
                       BufferIndex                                          bufferIndex,
                       const SceneGraph::NodeDataProvider&                  node,
                       const Matrix&                                        modelMatrix,
@@ -522,21 +521,6 @@ bool Renderer::Render(Context&                                             conte
   {
     return false;
   }
-
-  // Create command buffer if not present
-  if(!mGraphicsCommandBuffer)
-  {
-    mGraphicsCommandBuffer = mGraphicsController->CreateCommandBuffer(
-      Graphics::CommandBufferCreateInfo()
-        .SetLevel(Graphics::CommandBufferLevel::SECONDARY),
-      nullptr);
-  }
-  else
-  {
-    mGraphicsCommandBuffer->Reset();
-  }
-
-  auto& commandBuffer = mGraphicsCommandBuffer;
 
   // Set blending mode
   if(!mDrawCommands.empty())
@@ -582,48 +566,32 @@ bool Renderer::Render(Context&                                             conte
     return false;
   }
 
-  // Temporarily create a pipeline here - this will be used for transporting
-  // topology, vertex format, attrs, rasterization state
-  mGraphicsPipeline = PrepareGraphicsPipeline(*program, instruction, blend, std::move(mGraphicsPipeline));
+  // Prepare the graphics pipeline. This may either re-use an existing pipeline or create a new one.
+  auto& pipeline = PrepareGraphicsPipeline(*program, instruction, node, blend);
 
-  commandBuffer->BindPipeline(*mGraphicsPipeline.get());
+  commandBuffer.BindPipeline(pipeline);
 
-  BindTextures(*commandBuffer.get(), boundTextures);
+  BindTextures(commandBuffer, boundTextures);
 
   BuildUniformIndexMap(bufferIndex, node, size, *program);
 
-  WriteUniformBuffer(bufferIndex, *commandBuffer.get(), program, instruction, node, modelMatrix, modelViewMatrix, viewMatrix, projectionMatrix, size);
+  WriteUniformBuffer(bufferIndex, commandBuffer, program, instruction, node, modelMatrix, modelViewMatrix, viewMatrix, projectionMatrix, size);
 
   bool drawn = false; // Draw can fail if there are no vertex buffers or they haven't been uploaded yet
                       // @todo We should detect this case much earlier to prevent unnecessary work
 
-  //@todo manage mDrawCommands in the same way as above command buffer?!
   if(mDrawCommands.empty())
   {
-    drawn = mGeometry->Draw(*mGraphicsController, *commandBuffer.get(), mIndexedDrawFirstElement, mIndexedDrawElementsCount);
+    drawn = mGeometry->Draw(*mGraphicsController, commandBuffer, mIndexedDrawFirstElement, mIndexedDrawElementsCount);
   }
   else
   {
     for(auto& cmd : commands)
     {
-      // @todo This should generate a command buffer per cmd
-      // Tests WILL fail. (Temporarily commented out)
-      mGeometry->Draw(*mGraphicsController, *commandBuffer.get(), cmd->firstIndex, cmd->elementCount);
+      mGeometry->Draw(*mGraphicsController, commandBuffer, cmd->firstIndex, cmd->elementCount);
     }
   }
 
-  // Command buffer contains Texture bindings, vertex bindings, index buffer binding, pipeline(vertex format)
-  // @todo We should return the command buffer(s) and let the calling method submit
-  // If not drawn, then don't add command buffer to submit info, and if empty, don't
-  // submit.
-  /*
-  if(drawn)
-  {
-    Graphics::SubmitInfo submitInfo{{}, 0 | Graphics::SubmitFlagBits::FLUSH};
-    submitInfo.cmdBuffer.push_back(commandBuffer.get());
-    mGraphicsController->SubmitCommandBuffers(submitInfo);
-  }
-  */
   mUpdated = false;
   return drawn;
 }
@@ -996,11 +964,11 @@ bool Renderer::Updated(BufferIndex bufferIndex, const SceneGraph::NodeDataProvid
   return false;
 }
 
-Graphics::UniquePtr<Graphics::Pipeline> Renderer::PrepareGraphicsPipeline(
+Graphics::Pipeline& Renderer::PrepareGraphicsPipeline(
   Program&                                             program,
   const Dali::Internal::SceneGraph::RenderInstruction& instruction,
-  bool                                                 blend,
-  Graphics::UniquePtr<Graphics::Pipeline>&&            oldPipeline)
+  const SceneGraph::NodeDataProvider&                  node,
+  bool                                                 blend)
 {
   Graphics::InputAssemblyState inputAssemblyState{};
   Graphics::VertexInputState   vertexInputState{};
@@ -1153,17 +1121,46 @@ Graphics::UniquePtr<Graphics::Pipeline> Renderer::PrepareGraphicsPipeline(
 
   mUpdated = true;
 
-  // Create a new pipeline
-  // @todo Passed as pointers - shallow copy will break. Implementation MUST deep copy.
-  return mGraphicsController->CreatePipeline(
-    Graphics::PipelineCreateInfo()
-      .SetInputAssemblyState(&inputAssemblyState)
-      .SetVertexInputState(&vertexInputState)
-      .SetRasterizationState(&rasterizationState)
-      .SetColorBlendState(&colorBlendState)
-      .SetProgramState(&programState)
-      .SetNextExtension(&mLegacyProgram),
-    std::move(oldPipeline));
+  // Create the pipeline
+  Graphics::PipelineCreateInfo createInfo;
+  createInfo
+    .SetInputAssemblyState(&inputAssemblyState)
+    .SetVertexInputState(&vertexInputState)
+    .SetRasterizationState(&rasterizationState)
+    .SetColorBlendState(&colorBlendState)
+    .SetProgramState(&programState)
+    .SetNextExtension(&mLegacyProgram);
+
+  // Store a pipeline per renderer per render (renderer can be owned by multiple nodes,
+  // and re-drawn in multiple instructions).
+  // @todo This is only needed because ColorBlend state can change. Fixme!
+  // This is ameliorated by the fact that implementation caches pipelines, and we're only storing
+  // handles.
+  auto            hash           = HashedPipeline::GetHash(&node, &instruction, blend);
+  HashedPipeline* hashedPipeline = nullptr;
+  for(auto& element : mGraphicsPipelines)
+  {
+    if(element.mHash == hash)
+    {
+      hashedPipeline = &element;
+      break;
+    }
+  }
+
+  if(hashedPipeline != nullptr)
+  {
+    hashedPipeline->mGraphicsPipeline = mGraphicsController->CreatePipeline(
+      createInfo,
+      std::move(hashedPipeline->mGraphicsPipeline));
+  }
+  else
+  {
+    mGraphicsPipelines.emplace_back();
+    mGraphicsPipelines.back().mHash             = hash;
+    mGraphicsPipelines.back().mGraphicsPipeline = mGraphicsController->CreatePipeline(createInfo, nullptr);
+    hashedPipeline                              = &mGraphicsPipelines.back();
+  }
+  return *hashedPipeline->mGraphicsPipeline.get();
 }
 
 } // namespace Render

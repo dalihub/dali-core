@@ -477,7 +477,7 @@ struct Command
 
     struct
     {
-      std::vector<TestGraphicsCommandBuffer*> buffers;
+      std::vector<const TestGraphicsCommandBuffer*> buffers;
     } executeCommandBuffers;
 
   } data;
@@ -624,7 +624,7 @@ public:
     mCallStack.PushCall("EndRenderPass", "");
   }
 
-  void ExecuteCommandBuffers(std::vector<CommandBuffer*>&& commandBuffers) override
+  void ExecuteCommandBuffers(std::vector<const CommandBuffer*>&& commandBuffers) override
   {
     mCommands.emplace_back();
     auto& cmd = mCommands.back();
@@ -632,7 +632,7 @@ public:
     cmd.data.executeCommandBuffers.buffers.reserve(commandBuffers.size());
     for(auto&& item : commandBuffers)
     {
-      cmd.data.executeCommandBuffers.buffers.emplace_back(static_cast<TestGraphicsCommandBuffer*>(item));
+      cmd.data.executeCommandBuffers.buffers.emplace_back(static_cast<const TestGraphicsCommandBuffer*>(item));
     }
     mCallStack.PushCall("ExecuteCommandBuffers", "");
   }
@@ -768,9 +768,9 @@ public:
   /**
    * Retrieves commands of specified type
    */
-  std::vector<Command*> GetCommandsByType(CommandTypeMask mask);
+  std::vector<const Command*> GetCommandsByType(CommandTypeMask mask) const;
 
-  std::vector<Command*> GetChildCommandsByType(CommandTypeMask mask);
+  std::vector<const Command*> GetChildCommandsByType(CommandTypeMask mask) const;
 
 private:
   TraceCallStack&    mCallStack;

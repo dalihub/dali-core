@@ -60,9 +60,9 @@ void TestGraphicsCommandBuffer::GetStateForDrawCall(int drawCallIndex)
   }
 }
 
-std::vector<Command*> TestGraphicsCommandBuffer::GetCommandsByType(CommandTypeMask mask)
+std::vector<const Command*> TestGraphicsCommandBuffer::GetCommandsByType(CommandTypeMask mask) const
 {
-  std::vector<Command*> mCommandStack{};
+  std::vector<const Command*> mCommandStack{};
   for(auto& cmd : mCommands)
   {
     if(uint32_t(cmd.type) == (mask & uint32_t(cmd.type)))
@@ -73,9 +73,9 @@ std::vector<Command*> TestGraphicsCommandBuffer::GetCommandsByType(CommandTypeMa
   return mCommandStack;
 }
 
-std::vector<Command*> TestGraphicsCommandBuffer::GetChildCommandsByType(CommandTypeMask mask)
+std::vector<const Command*> TestGraphicsCommandBuffer::GetChildCommandsByType(CommandTypeMask mask) const
 {
-  std::vector<Command*> mCommandStack{};
+  std::vector<const Command*> mCommandStack{};
   for(auto& cmd : mCommands)
   {
     if(uint32_t(cmd.type) == (mask & uint32_t(cmd.type)))

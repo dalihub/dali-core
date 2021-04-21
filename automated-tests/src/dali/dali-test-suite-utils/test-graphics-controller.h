@@ -406,6 +406,10 @@ public:
   };
   std::vector<ProgramCache> mProgramCache;
 
+  struct PipelineCache
+  {
+  };
+
   std::vector<UniformData> mCustomUniforms;
 };
 

@@ -286,10 +286,15 @@ inline void SetupDepthBuffer(const RenderItem& item, Context& context, bool dept
  * A stack of scissor clips at each depth of clipping is maintained, so it can be applied and unapplied.
  * As the clips are hierarchical, this RenderItems AABB is clipped against the current "active" scissor bounds via an intersection operation.
  * @param[in]     item                     The current RenderItem about to be rendered
+ * @param[in,out] commandBuffer            The command buffer to write into
  * @param[in]     context                  The context
  * @param[in]     instruction              The render-instruction to process.
  */
-inline void RenderAlgorithms::SetupScissorClipping(const RenderItem& item, Context& context, const RenderInstruction& instruction)
+inline void RenderAlgorithms::SetupScissorClipping(
+  const RenderItem&        item,
+  Graphics::CommandBuffer& commandBuffer,
+  Context&                 context,
+  const RenderInstruction& instruction)
 {
   // Get the number of child scissors in the stack (do not include layer or root box).
   size_t         childStackDepth = mScissorStack.size() - 1u;
@@ -346,7 +351,7 @@ inline void RenderAlgorithms::SetupScissorClipping(const RenderItem& item, Conte
     // Enable the scissor test based on the above calculation
     if(scissorEnabled)
     {
-      mGraphicsCommandBuffer->SetScissorTestEnable( scissorEnabled );
+      commandBuffer.SetScissorTestEnable(scissorEnabled);
     }
 
     // If scissor is enabled, we use the calculated screen-space coordinates (now in the stack).
@@ -358,16 +363,15 @@ inline void RenderAlgorithms::SetupScissorClipping(const RenderItem& item, Conte
       {
         useScissorBox.y = (instruction.mFrameBuffer->GetHeight() - useScissorBox.height) - useScissorBox.y;
       }
-     Graphics::Rect2D scissorBox = {
-        useScissorBox.x, useScissorBox.y,
-       uint32_t(useScissorBox.width), uint32_t(useScissorBox.height)
-      };
-     mGraphicsCommandBuffer->SetScissor( scissorBox );
+      Graphics::Rect2D scissorBox = {
+        useScissorBox.x, useScissorBox.y, uint32_t(useScissorBox.width), uint32_t(useScissorBox.height)};
+      commandBuffer.SetScissor(scissorBox);
     }
   }
 }
 
 inline void RenderAlgorithms::SetupClipping(const RenderItem&                   item,
+                                            Graphics::CommandBuffer&            commandBuffer,
                                             Context&                            context,
                                             bool&                               usedStencilBuffer,
                                             uint32_t&                           lastClippingDepth,
@@ -395,7 +399,7 @@ inline void RenderAlgorithms::SetupClipping(const RenderItem&                   
       // As both scissor and stencil clips can be nested, we may be simultaneously traversing up the scissor tree, requiring a scissor to be un-done. Whilst simultaneously adding a new stencil clip.
       // We process both based on our current and old clipping depths for each mode.
       // Both methods with return rapidly if there is nothing to be done for that type of clipping.
-      SetupScissorClipping(item, context, instruction);
+      SetupScissorClipping(item, commandBuffer, context, instruction);
 
       if(stencilBufferAvailable == Integration::StencilBufferAvailable::TRUE)
       {
@@ -481,7 +485,12 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
   bool              firstDepthBufferUse(true);
 
   mViewportRectangle = viewport;
-  mGraphicsCommandBuffer->SetViewport(ViewportFromClippingBox(mViewportRectangle, orientation));
+
+  auto* mutableRenderList      = const_cast<RenderList*>(&renderList);
+  auto& secondaryCommandBuffer = mutableRenderList->GetCommandBuffer(mGraphicsController);
+  secondaryCommandBuffer.Reset();
+
+  secondaryCommandBuffer.SetViewport(ViewportFromClippingBox(mViewportRectangle, orientation));
   mHasLayerScissor = false;
 
   // Setup Scissor testing (for both viewport and per-node scissor)
@@ -492,29 +501,28 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
   if(!rootClippingRect.IsEmpty())
   {
     Graphics::Viewport graphicsViewport = ViewportFromClippingBox(mViewportRectangle, 0);
-    mGraphicsCommandBuffer->SetScissorTestEnable(true);
-    mGraphicsCommandBuffer->SetScissor(Rect2DFromRect(rootClippingRect, orientation, graphicsViewport));
+    secondaryCommandBuffer.SetScissorTestEnable(true);
+    secondaryCommandBuffer.SetScissor(Rect2DFromRect(rootClippingRect, orientation, graphicsViewport));
     mScissorStack.push_back(rootClippingRect);
   }
   // We are not performing a layer clip and no clipping rect set. Add the viewport as the root scissor rectangle.
   else if(!renderList.IsClipping())
   {
-    mGraphicsCommandBuffer->SetScissorTestEnable(false);
+    secondaryCommandBuffer.SetScissorTestEnable(false);
     mScissorStack.push_back(mViewportRectangle);
   }
 
   if(renderList.IsClipping())
   {
     Graphics::Viewport graphicsViewport = ViewportFromClippingBox(mViewportRectangle, 0);
-    mGraphicsCommandBuffer->SetScissorTestEnable(true);
+    secondaryCommandBuffer.SetScissorTestEnable(true);
     const ClippingBox& layerScissorBox = renderList.GetClippingBox();
-    mGraphicsCommandBuffer->SetScissor(Rect2DFromClippingBox(layerScissorBox, orientation, graphicsViewport));
+    secondaryCommandBuffer.SetScissor(Rect2DFromClippingBox(layerScissorBox, orientation, graphicsViewport));
     mScissorStack.push_back(layerScissorBox);
     mHasLayerScissor = true;
   }
 
-  mGraphicsRenderItemCommandBuffers.clear();
-  // Loop through all RenderList in the RenderList, set up any prerequisites to render them, then perform the render.
+  // Loop through all RenderItems in the RenderList, set up any prerequisites to render them, then perform the render.
   for(uint32_t index = 0u; index < count; ++index)
   {
     const RenderItem& item = renderList.GetItem(index);
@@ -539,7 +547,7 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
 
     // Set up clipping based on both the Renderer and Actor APIs.
     // The Renderer API will be used if specified. If AUTO, the Actors automatic clipping feature will be used.
-    SetupClipping(item, context, usedStencilBuffer, lastClippingDepth, lastClippingId, stencilBufferAvailable, instruction);
+    SetupClipping(item, secondaryCommandBuffer, context, usedStencilBuffer, lastClippingDepth, lastClippingId, stencilBufferAvailable, instruction);
 
     if(DALI_LIKELY(item.mRenderer))
     {
@@ -563,20 +571,11 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
         auto const MAX_QUEUE = item.mRenderer->GetDrawCommands().empty() ? 1 : DevelRenderer::RENDER_QUEUE_MAX;
         for(auto queue = 0u; queue < MAX_QUEUE; ++queue)
         {
-          // Render the item. If rendered, add its command buffer into the list
-          if( item.mRenderer->Render(context, bufferIndex, *item.mNode, item.mModelMatrix, item.mModelViewMatrix, viewMatrix, projectionMatrix, item.mSize, !item.mIsOpaque, boundTextures, instruction, queue) )
-          {
-            mGraphicsRenderItemCommandBuffers.emplace_back( item.mRenderer->GetGraphicsCommandBuffer() );
-          }
+          // Render the item. It will write into the command buffer everything it has to render
+          item.mRenderer->Render(secondaryCommandBuffer, bufferIndex, *item.mNode, item.mModelMatrix, item.mModelViewMatrix, viewMatrix, projectionMatrix, item.mSize, !item.mIsOpaque, boundTextures, instruction, queue);
         }
       }
     }
-  }
-
-  // Execute command buffers
-  if(!mGraphicsRenderItemCommandBuffers.empty())
-  {
-    mGraphicsCommandBuffer->ExecuteCommandBuffers( std::move(mGraphicsRenderItemCommandBuffers) );
   }
 }
 
@@ -594,25 +593,22 @@ void RenderAlgorithms::ResetCommandBuffer()
   {
     mGraphicsCommandBuffer = mGraphicsController.CreateCommandBuffer(
       Graphics::CommandBufferCreateInfo()
-        .SetLevel(Graphics::CommandBufferLevel::SECONDARY),
+        .SetLevel(Graphics::CommandBufferLevel::PRIMARY),
       nullptr);
   }
   else
   {
     mGraphicsCommandBuffer->Reset();
   }
-
-  // Reset list of secondary buffers to submit
-  mGraphicsRenderItemCommandBuffers.clear();
 }
 
 void RenderAlgorithms::SubmitCommandBuffer()
 {
   // Submit main command buffer
   Graphics::SubmitInfo submitInfo;
-  submitInfo.cmdBuffer.push_back(  mGraphicsCommandBuffer.get() );
+  submitInfo.cmdBuffer.push_back(mGraphicsCommandBuffer.get());
   submitInfo.flags = 0 | Graphics::SubmitFlagBits::FLUSH;
-  mGraphicsController.SubmitCommandBuffers( submitInfo );
+  mGraphicsController.SubmitCommandBuffers(submitInfo);
 }
 
 void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&            instruction,
@@ -635,7 +631,8 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
 
   if(viewMatrix && projectionMatrix)
   {
-    const RenderListContainer::SizeType count = instruction.RenderListCount();
+    std::vector<const Graphics::CommandBuffer*> buffers;
+    const RenderListContainer::SizeType         count = instruction.RenderListCount();
 
     // Iterate through each render list in order. If a pair of render lists
     // are marked as interleaved, then process them together.
@@ -657,7 +654,18 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
                           viewport,
                           rootClippingRect,
                           orientation);
+
+        // Execute command buffer
+        auto* commandBuffer = renderList->GetCommandBuffer();
+        if(commandBuffer)
+        {
+          buffers.push_back(commandBuffer);
+        }
       }
+    }
+    if(buffers.size() > 0)
+    {
+      mGraphicsCommandBuffer->ExecuteCommandBuffers(std::move(buffers));
     }
   }
 }
