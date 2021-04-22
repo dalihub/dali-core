@@ -44,6 +44,8 @@ bool DALI_CORE_API IsNative(Dali::Texture texture);
  */
 bool DALI_CORE_API ApplyNativeFragmentShader(Dali::Texture texture, std::string& shader);
 
+bool DALI_CORE_API IsUploaded(Dali::Texture texture);
+
 } // namespace DevelTexture
 } // namespace Dali
 

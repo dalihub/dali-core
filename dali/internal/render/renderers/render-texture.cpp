@@ -672,7 +672,8 @@ Texture::Texture( Type type, Pixel::Format format, ImageDimensions size )
   mMaxMipMapLevel( 0 ),
   mType( type ),
   mHasAlpha( HasAlpha( format ) ),
-  mIsCompressed( IsCompressedFormat( format ) )
+  mIsCompressed( IsCompressedFormat( format ) ),
+  mIsUploaded( false )
 {
   PixelFormatToGl( format,
                    mGlFormat,
@@ -693,7 +694,8 @@ Texture::Texture( NativeImageInterfacePtr nativeImageInterface )
   mMaxMipMapLevel( 0 ),
   mType( TextureType::TEXTURE_2D ),
   mHasAlpha( nativeImageInterface->RequiresBlending() ),
-  mIsCompressed( false )
+  mIsCompressed( false ),
+  mIsUploaded( false )
 {
 }
 
@@ -870,6 +872,7 @@ void Texture::Upload( Context& context, PixelDataPtr pixelData, const Internal::
                                        glFormat, static_cast<GLsizei>( pixelData->GetBufferSize() ), buffer );
     }
   }
+  mIsUploaded = true;
 }
 
 bool Texture::Bind( Context& context, uint32_t textureUnit, Render::Sampler* sampler )

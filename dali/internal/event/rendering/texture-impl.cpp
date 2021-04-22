@@ -244,5 +244,14 @@ bool Texture::ApplyNativeFragmentShader(std::string& shader)
   return modified;
 }
 
+bool Texture::IsUploaded()
+{
+  if(EventThreadServices::IsCoreRunning() && mRenderObject)
+  {
+    return mRenderObject->IsUploaded();
+  }
+  return false;
+}
+
 } // namespace Internal
 } // namespace Dali

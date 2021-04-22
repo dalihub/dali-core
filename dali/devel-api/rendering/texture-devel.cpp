@@ -33,5 +33,11 @@ bool ApplyNativeFragmentShader(Dali::Texture texture, std::string& shader)
   return impl.ApplyNativeFragmentShader(shader);
 }
 
+bool IsUploaded(Dali::Texture texture)
+{
+  auto& impl = GetImplementation(texture);
+  return impl.IsUploaded();
+}
+
 } // namespace DevelTexture
 } // namespace Dali

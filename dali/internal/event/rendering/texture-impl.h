@@ -127,6 +127,11 @@ public:
    */
   bool ApplyNativeFragmentShader(std::string& shader);
 
+  /**
+   * @brief Check whether texture is uploaded or not.
+   */
+  bool IsUploaded();
+
 private: // implementation
   /**
    * Constructor

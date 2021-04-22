@@ -145,6 +145,11 @@ public:
     return mNativeImage;
   }
 
+  bool IsUploaded() const
+  {
+    return mIsUploaded;
+  }
+
 private:
 
   /**
@@ -167,6 +172,7 @@ private:
   Type mType:3;                         ///< Type of the texture
   bool mHasAlpha : 1;                   ///< Whether the format has an alpha channel
   bool mIsCompressed : 1;               ///< Whether the format is compressed
+  bool mIsUploaded : 1;
 
 };
 
