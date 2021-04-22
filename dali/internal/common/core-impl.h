@@ -175,12 +175,12 @@ public:
   /**
    * @copydoc Dali::Integration::Core::RegisterProcessor
    */
-  void RegisterProcessor(Dali::Integration::Processor& processor);
+  void RegisterProcessor(Integration::Processor& processor, bool postProcessor = false);
 
   /**
    * @copydoc Dali::Integration::Core::UnregisterProcessor
    */
-  void UnregisterProcessor(Dali::Integration::Processor& processor);
+  void UnregisterProcessor(Dali::Integration::Processor& processor, bool postProcessor = false);
 
   /**
    * @copydoc Dali::Internal::ThreadLocalStorage::AddScene()
@@ -244,6 +244,11 @@ private:
    * Run each registered processor
    */
   void RunProcessors();
+
+  /**
+   * Run each registered postprocessor
+   */
+  void RunPostProcessors();
 
   // for use by ThreadLocalStorage
 
@@ -343,6 +348,7 @@ private:
   OwnerPointer<NotificationManager>             mNotificationManager;   ///< Notification manager
   OwnerPointer<GestureEventProcessor>           mGestureEventProcessor; ///< The gesture event processor
   Dali::Vector<Integration::Processor*>         mProcessors;            ///< Registered processors (not owned)
+  Dali::Vector<Integration::Processor*>         mPostProcessors;        ///< Registered post processors those will called after relayout(not owned)
 
   using SceneContainer = std::vector<ScenePtr>;
   SceneContainer mScenes; ///< A container of scenes that bound to a surface for rendering, owned by Core

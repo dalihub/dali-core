@@ -297,6 +297,9 @@ void Core::ProcessEvents()
   // Run the size negotiation after event processing finished signal
   mRelayoutController->Relayout();
 
+  // Run any registered post processors
+  RunPostProcessors();
+
   // Rebuild depth tree after event processing has finished
   for(auto scene : scenes)
   {
@@ -328,17 +331,35 @@ uint32_t Core::GetMaximumUpdateCount() const
   return MAXIMUM_UPDATE_COUNT;
 }
 
-void Core::RegisterProcessor(Integration::Processor& processor)
+void Core::RegisterProcessor(Integration::Processor& processor, bool postProcessor)
 {
-  mProcessors.PushBack(&processor);
+  if(postProcessor)
+  {
+    mPostProcessors.PushBack(&processor);
+  }
+  else
+  {
+    mProcessors.PushBack(&processor);
+  }
 }
 
-void Core::UnregisterProcessor(Integration::Processor& processor)
+void Core::UnregisterProcessor(Integration::Processor& processor, bool postProcessor)
 {
-  auto iter = std::find(mProcessors.Begin(), mProcessors.End(), &processor);
-  if(iter != mProcessors.End())
+  if(postProcessor)
   {
-    mProcessors.Erase(iter);
+    auto iter = std::find(mPostProcessors.Begin(), mPostProcessors.End(), &processor);
+    if(iter != mPostProcessors.End())
+    {
+      mPostProcessors.Erase(iter);
+    }
+  }
+  else
+  {
+    auto iter = std::find(mProcessors.Begin(), mProcessors.End(), &processor);
+    if(iter != mProcessors.End())
+    {
+      mProcessors.Erase(iter);
+    }
   }
 }
 
@@ -351,7 +372,21 @@ void Core::RunProcessors()
   {
     if(processor)
     {
-      processor->Process();
+      processor->Process(false);
+    }
+  }
+}
+
+void Core::RunPostProcessors()
+{
+  // Copy processor pointers to prevent changes to vector affecting loop iterator.
+  Dali::Vector<Integration::Processor*> processors(mPostProcessors);
+
+  for(auto processor : processors)
+  {
+    if(processor)
+    {
+      processor->Process(true);
     }
   }
 }
