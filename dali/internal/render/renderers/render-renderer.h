@@ -41,7 +41,6 @@ namespace Dali
 {
 namespace Internal
 {
-class Context;
 class Texture;
 class ProgramCache;
 
@@ -162,14 +161,12 @@ public:
   /**
    * Second-phase construction.
    * This is called when the renderer is inside render thread
-   * @param[in] context Context used by the renderer (To be removed)
    * @param[in] graphicsController The graphics controller to use
    * @param[in] programCache Cache of program objects
    * @param[in] shaderCache Cache of shaders
    * @param[in] uniformBufferManager Uniform buffer manager
    */
-  void Initialize(Context&                      context,
-                  Graphics::Controller&         graphicsController,
+  void Initialize(Graphics::Controller&         graphicsController,
                   ProgramCache&                 programCache,
                   Render::ShaderCache&          shaderCache,
                   Render::UniformBufferManager& uniformBufferManager);
@@ -366,7 +363,7 @@ public:
    * @param[in] boundTextures The textures bound for rendering
    * @param[in] instruction. for use case like reflection where CullFace needs to be adjusted
    *
-   * @return True if the content has been rendered, false if skipped.
+   * @return True if commands have been added to the command buffer
    */
   bool Render(Graphics::CommandBuffer&                             commandBuffer,
               BufferIndex                                          bufferIndex,
@@ -443,13 +440,6 @@ private:
 
   // Undefined
   Renderer& operator=(const Renderer& rhs);
-
-  /**
-   * Sets blending options
-   * @param context to use
-   * @param blend Wheter blending should be enabled or not
-   */
-  void SetBlending(Context& context, bool blend);
 
   /**
    * Builds a uniform map based on the index of the cached location in the Program.

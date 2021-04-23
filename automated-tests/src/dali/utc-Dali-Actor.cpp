@@ -4237,9 +4237,6 @@ int UtcDaliActorPropertyClippingActor(void)
   tet_infoline("Testing Actor::Property::ClippingMode: CLIP_CHILDREN actor");
   TestApplication application;
 
-  // @todo temporary until stencil code has been fixed.
-#ifdef TEMPORARY_TEST_REMOVAL
-
   TestGlAbstraction& glAbstraction       = application.GetGlAbstraction();
   TraceCallStack&    stencilTrace        = glAbstraction.GetStencilFunctionTrace();
   TraceCallStack&    enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
@@ -4268,9 +4265,6 @@ int UtcDaliActorPropertyClippingActor(void)
   DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("StencilFunc", "514, 1, 0", startIndex)); // 514 is GL_EQUAL, But testing no bit-planes for the first clipping node.
   DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("StencilMask", "1", startIndex));
   DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("StencilOp", "7680, 7681, 7681", startIndex)); // GL_KEEP, GL_REPLACE, GL_REPLACE
-#else
-  DALI_TEST_CHECK(true);
-#endif
 
   END_TEST;
 }
@@ -4280,9 +4274,6 @@ int UtcDaliActorPropertyClippingActorEnableThenDisable(void)
   // This test checks that an actor is correctly setup for clipping and then correctly setup when clipping is disabled
   tet_infoline("Testing Actor::Property::ClippingMode: CLIP_CHILDREN actor enable and then disable");
   TestApplication application;
-
-  // @todo temporary until stencil code has been fixed.
-#ifdef TEMPORARY_TEST_REMOVAL
 
   TestGlAbstraction& glAbstraction       = application.GetGlAbstraction();
   TraceCallStack&    stencilTrace        = glAbstraction.GetStencilFunctionTrace();
@@ -4328,10 +4319,6 @@ int UtcDaliActorPropertyClippingActorEnableThenDisable(void)
   startIndex = 0u;
   DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("StencilMask", "255", startIndex));
 
-#else
-  DALI_TEST_CHECK(true);
-#endif
-
   END_TEST;
 }
 
@@ -4340,9 +4327,6 @@ int UtcDaliActorPropertyClippingNestedChildren(void)
   // This test checks that a hierarchy of actors are clipped correctly by
   // writing to and reading from the correct bit-planes of the stencil buffer.
   tet_infoline("Testing Actor::Property::ClippingMode: CLIP_CHILDREN nested children");
-
-  // @todo temporary until stencil code has been fixed.
-#ifdef TEMPORARY_TEST_REMOVAL
   TestApplication    application;
   TestGlAbstraction& glAbstraction       = application.GetGlAbstraction();
   TraceCallStack&    stencilTrace        = glAbstraction.GetStencilFunctionTrace();
@@ -4414,9 +4398,6 @@ int UtcDaliActorPropertyClippingNestedChildren(void)
       GenerateTrace(application, enabledDisableTrace, stencilTrace);
     }
   }
-#else
-  DALI_TEST_CHECK(true);
-#endif
 
   END_TEST;
 }
@@ -4425,9 +4406,6 @@ int UtcDaliActorPropertyClippingActorDrawOrder(void)
 {
   // This test checks that a hierarchy of actors are drawn in the correct order when clipping is enabled.
   tet_infoline("Testing Actor::Property::ClippingMode: CLIP_CHILDREN draw order");
-
-  // @todo temporary until stencil code has been fixed.
-#ifdef TEMPORARY_TEST_REMOVAL
   TestApplication    application;
   TestGlAbstraction& glAbstraction       = application.GetGlAbstraction();
   TraceCallStack&    enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
@@ -4517,10 +4495,6 @@ int UtcDaliActorPropertyClippingActorDrawOrder(void)
   startIndex = 0u;
   DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParamsFromStartIndex("Enable", stencil.str(), startIndex));
   DALI_TEST_CHECK(!enabledDisableTrace.FindMethodAndParamsFromStartIndex("Disable", stencil.str(), startIndex));
-
-#else
-  DALI_TEST_CHECK(true);
-#endif
 
   END_TEST;
 }
