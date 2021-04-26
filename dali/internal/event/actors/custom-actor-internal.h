@@ -62,22 +62,6 @@ public:
    */
   Dali::TypeInfo GetTypeInfo();
 
-  /**
-   * @copydoc Internal::CustomActorImpl::SetTransparent()
-   */
-  void SetTransparent(bool transparent) override
-  {
-    Actor::SetTransparent(transparent);
-  }
-
-  /**
-   * @copydoc Internal::CustomActorImpl::GetTransparent()
-   */
-  bool GetTransparent() const override
-  {
-    return Actor::GetTransparent();
-  }
-
 protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()

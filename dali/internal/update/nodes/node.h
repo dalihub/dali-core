@@ -725,16 +725,6 @@ public:
     return mDrawMode;
   }
 
-  void SetTransparent(bool transparent)
-  {
-    mTransparent = transparent;
-  }
-
-  bool GetTransparent() const
-  {
-    return mTransparent;
-  }
-
   /*
    * Returns the transform id of the node
    * @return The transform component id of the node
@@ -964,7 +954,6 @@ protected:
   bool               mIsRoot : 1;                  ///< True if the node cannot have a parent
   bool               mIsLayer : 1;                 ///< True if the node is a layer
   bool               mPositionUsesAnchorPoint : 1; ///< True if the node should use the anchor-point when calculating the position
-  bool               mTransparent : 1;
 
   // Changes scope, should be at end of class
   DALI_LOG_OBJECT_STRING_DECLARATION;
@@ -1047,17 +1036,6 @@ inline void SetDrawModeMessage(EventThreadServices& eventThreadServices, const N
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&node, &Node::SetDrawMode, drawMode);
-}
-
-inline void SetTransparentMessage(EventThreadServices& eventThreadServices, const Node& node, bool transparent)
-{
-  using LocalType = MessageValue1<Node, bool>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&node, &Node::SetTransparent, transparent);
 }
 
 inline void DetachRendererMessage(EventThreadServices& eventThreadServices, const Node& node, const Renderer& renderer)
