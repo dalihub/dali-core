@@ -3425,8 +3425,6 @@ int UtcDaliRendererAddDrawCommands(void)
   DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION);
 
   tet_infoline("\n\nTesting extension draw commands\n");
-  tet_infoline("TEMPORARILY REMOVED. MUST PUT BACK!\n");
-#ifdef TEMPORARY_TEST_REMOVAL
   auto drawCommand1         = DevelRenderer::DrawCommand{};
   drawCommand1.drawType     = DevelRenderer::DrawType::INDEXED;
   drawCommand1.firstIndex   = 0;
@@ -3455,7 +3453,6 @@ int UtcDaliRendererAddDrawCommands(void)
   application.Render();
 
   DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 3, TEST_LOCATION);
-#endif
   END_TEST;
 }
 int UtcDaliRendererSetGeometryNegative(void)
