@@ -19,6 +19,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/graphics-api/graphics-controller.h>
+#include <dali/integration-api/core.h>
 #include <dali/integration-api/scene.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/event-thread-services.h>
@@ -53,8 +54,10 @@ public:
    * Creates a scene object in the GPU.
    * @param[in] context The GL context
    * @param[in] graphicsController The graphics controller
+   * @param[in] depthBufferAvailable True if there is a depth buffer
+   * @param[in] stencilBufferAvailable True if there is a stencil buffer
    */
-  void Initialize(Context& context, Graphics::Controller& graphicsController);
+  void Initialize(Context& context, Graphics::Controller& graphicsController, Integration::DepthBufferAvailable depthBufferAvailable, Integration::StencilBufferAvailable stencilBufferAvailable);
 
   /**
    * Gets the context holding the GL state of rendering for the scene
@@ -233,9 +236,9 @@ private:
    * The default render pass (most likely to be used) is the load = CLEAR
    * and store = STORE for color attachment.
    */
-  Graphics::UniquePtr<Graphics::RenderPass> mRenderPass{nullptr};   ///< The render pass created to render the surface
-  Graphics::UniquePtr<Graphics::RenderPass> mRenderPassNoClear{nullptr};   ///< The render pass created to render the surface without clearing color
-  Graphics::RenderTarget*                   mRenderTarget{nullptr}; ///< This is created in the event thread when surface is created/resized/replaced
+  Graphics::UniquePtr<Graphics::RenderPass> mRenderPass{nullptr};        ///< The render pass created to render the surface
+  Graphics::UniquePtr<Graphics::RenderPass> mRenderPassNoClear{nullptr}; ///< The render pass created to render the surface without clearing color
+  Graphics::RenderTarget*                   mRenderTarget{nullptr};      ///< This is created in the event thread when surface is created/resized/replaced
 
   // clear colors
   std::vector<Graphics::ClearValue> mClearValues{};

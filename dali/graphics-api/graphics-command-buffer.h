@@ -81,8 +81,8 @@ struct ClearValue
     } color;
     struct
     {
-      float    depth;
-      uint32_t stencil;
+      float    depth;   // glClearDepthf
+      uint32_t stencil; // glClearStencil
     } depthStencil;
   };
 };
@@ -201,7 +201,7 @@ public:
   /**
    * @brief Executes a list of secondary command buffers
    *
-   * The secondary command buffers are executed as a part of a primary
+   * The secondary command buffers will be executed as a part of a primary
    * command buffer that calls this function.
    *
    * @param[in] commandBuffers List of buffers to execute
@@ -299,6 +299,31 @@ public:
    * @param[in] value state of viewport
    */
   virtual void SetViewportEnable(bool value) = 0;
+
+  /**
+   * @brief Sets the color mask for all channels.
+   */
+  virtual void SetColorMask(bool enabled) = 0;
+
+  /**
+   * @brief Clears the stencil buffer (outside of BeginRenderPass) to the current stencil mask
+   */
+  virtual void ClearStencilBuffer() = 0;
+  virtual void ClearDepthBuffer()   = 0;
+
+  virtual void SetStencilTestEnable(bool stencilEnable) = 0;
+  virtual void SetStencilWriteMask(uint32_t writeMask)  = 0;
+  virtual void SetStencilFunc(Graphics::CompareOp compareOp,
+                              uint32_t            reference,
+                              uint32_t            compareMask)     = 0;
+
+  virtual void SetStencilOp(Graphics::StencilOp failOp,
+                            Graphics::StencilOp passOp,
+                            Graphics::StencilOp depthFailOp) = 0;
+
+  virtual void SetDepthCompareOp(Graphics::CompareOp compareOp) = 0;
+  virtual void SetDepthTestEnable(bool depthTestEnable)         = 0;
+  virtual void SetDepthWriteEnable(bool depthWriteEnable)       = 0;
 
 protected:
   CommandBuffer(CommandBuffer&&) = default;

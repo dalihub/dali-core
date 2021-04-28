@@ -2804,9 +2804,6 @@ int UtcDaliRendererSetRenderModeToUseColorBuffer(void)
 
   Renderer renderer = RendererTestFixture(application);
 
-  // @todo temporary until stencil code has been fixed.
-#ifdef TEMPORARY_TEST_REMOVAL
-
   // Set the RenderMode property to a value that should not allow color buffer writes.
   // Then check if ColorMask has been called, and that the values are correct.
   CheckRenderModeColorMask(application, renderer, RenderMode::AUTO, true);
@@ -2815,9 +2812,6 @@ int UtcDaliRendererSetRenderModeToUseColorBuffer(void)
   CheckRenderModeColorMask(application, renderer, RenderMode::STENCIL, false);
   CheckRenderModeColorMask(application, renderer, RenderMode::COLOR_STENCIL, true);
 
-#else
-  DALI_TEST_CHECK(true);
-#endif
   END_TEST;
 }
 

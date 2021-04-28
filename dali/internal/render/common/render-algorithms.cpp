@@ -22,7 +22,6 @@
 #include <dali/internal/render/common/render-debug.h>
 #include <dali/internal/render/common/render-instruction.h>
 #include <dali/internal/render/common/render-list.h>
-#include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 
@@ -39,17 +38,110 @@ namespace Render
 {
 namespace
 {
-// Table for fast look-up of Dali::DepthFunction enum to a GL depth function.
-// Note: These MUST be in the same order as Dali::DepthFunction enum.
-const int DaliDepthToGLDepthTable[] = {GL_NEVER, GL_ALWAYS, GL_LESS, GL_GREATER, GL_EQUAL, GL_NOTEQUAL, GL_LEQUAL, GL_GEQUAL};
+struct GraphicsDepthCompareOp
+{
+  constexpr explicit GraphicsDepthCompareOp(DepthFunction::Type compareOp)
+  {
+    switch(compareOp)
+    {
+      case DepthFunction::NEVER:
+        op = Graphics::CompareOp::NEVER;
+        break;
+      case DepthFunction::LESS:
+        op = Graphics::CompareOp::LESS;
+        break;
+      case DepthFunction::EQUAL:
+        op = Graphics::CompareOp::EQUAL;
+        break;
+      case DepthFunction::LESS_EQUAL:
+        op = Graphics::CompareOp::LESS_OR_EQUAL;
+        break;
+      case DepthFunction::GREATER:
+        op = Graphics::CompareOp::GREATER;
+        break;
+      case DepthFunction::NOT_EQUAL:
+        op = Graphics::CompareOp::NOT_EQUAL;
+        break;
+      case DepthFunction::GREATER_EQUAL:
+        op = Graphics::CompareOp::GREATER_OR_EQUAL;
+        break;
+      case DepthFunction::ALWAYS:
+        op = Graphics::CompareOp::ALWAYS;
+        break;
+    }
+  }
+  Graphics::CompareOp op{Graphics::CompareOp::NEVER};
+};
 
-// Table for fast look-up of Dali::StencilFunction enum to a GL stencil function.
-// Note: These MUST be in the same order as Dali::StencilFunction enum.
-const int DaliStencilFunctionToGL[] = {GL_NEVER, GL_LESS, GL_EQUAL, GL_LEQUAL, GL_GREATER, GL_NOTEQUAL, GL_GEQUAL, GL_ALWAYS};
+struct GraphicsStencilCompareOp
+{
+  constexpr explicit GraphicsStencilCompareOp(StencilFunction::Type compareOp)
+  {
+    switch(compareOp)
+    {
+      case StencilFunction::NEVER:
+        op = Graphics::CompareOp::NEVER;
+        break;
+      case StencilFunction::LESS:
+        op = Graphics::CompareOp::LESS;
+        break;
+      case StencilFunction::EQUAL:
+        op = Graphics::CompareOp::EQUAL;
+        break;
+      case StencilFunction::LESS_EQUAL:
+        op = Graphics::CompareOp::LESS_OR_EQUAL;
+        break;
+      case StencilFunction::GREATER:
+        op = Graphics::CompareOp::GREATER;
+        break;
+      case StencilFunction::NOT_EQUAL:
+        op = Graphics::CompareOp::NOT_EQUAL;
+        break;
+      case StencilFunction::GREATER_EQUAL:
+        op = Graphics::CompareOp::GREATER_OR_EQUAL;
+        break;
+      case StencilFunction::ALWAYS:
+        op = Graphics::CompareOp::ALWAYS;
+        break;
+    }
+  }
+  Graphics::CompareOp op{Graphics::CompareOp::NEVER};
+};
 
-// Table for fast look-up of Dali::StencilOperation enum to a GL stencil operation.
-// Note: These MUST be in the same order as Dali::StencilOperation enum.
-const int DaliStencilOperationToGL[] = {GL_ZERO, GL_KEEP, GL_REPLACE, GL_INCR, GL_DECR, GL_INVERT, GL_INCR_WRAP, GL_DECR_WRAP};
+struct GraphicsStencilOp
+{
+  constexpr explicit GraphicsStencilOp(StencilOperation::Type stencilOp)
+  {
+    switch(stencilOp)
+    {
+      case Dali::StencilOperation::KEEP:
+        op = Graphics::StencilOp::KEEP;
+        break;
+      case Dali::StencilOperation::ZERO:
+        op = Graphics::StencilOp::ZERO;
+        break;
+      case Dali::StencilOperation::REPLACE:
+        op = Graphics::StencilOp::REPLACE;
+        break;
+      case Dali::StencilOperation::INCREMENT:
+        op = Graphics::StencilOp::INCREMENT_AND_CLAMP;
+        break;
+      case Dali::StencilOperation::DECREMENT:
+        op = Graphics::StencilOp::DECREMENT_AND_CLAMP;
+        break;
+      case Dali::StencilOperation::INVERT:
+        op = Graphics::StencilOp::INVERT;
+        break;
+      case Dali::StencilOperation::INCREMENT_WRAP:
+        op = Graphics::StencilOp::INCREMENT_AND_WRAP;
+        break;
+      case Dali::StencilOperation::DECREMENT_WRAP:
+        op = Graphics::StencilOp::DECREMENT_AND_WRAP;
+        break;
+    }
+  }
+  Graphics::StencilOp op{Graphics::StencilOp::KEEP};
+};
 
 inline Graphics::Viewport ViewportFromClippingBox(ClippingBox clippingBox, int orientation)
 {
@@ -141,11 +233,11 @@ inline ClippingBox IntersectAABB(const ClippingBox& aabbA, const ClippingBox& aa
 /**
  * @brief Set up the stencil and color buffer for automatic clipping (StencilMode::AUTO).
  * @param[in]     item                     The current RenderItem about to be rendered
- * @param[in]     context                  The context
- * @param[in/out] lastClippingDepth        The stencil depth of the last renderer drawn.
- * @param[in/out] lastClippingId           The clipping ID of the last renderer drawn.
+ * @param[in,out] commandBuffer            The command buffer to write stencil commands into
+ * @param[in,out] lastClippingDepth        The stencil depth of the last renderer drawn.
+ * @param[in,out] lastClippingId           The clipping ID of the last renderer drawn.
  */
-inline void SetupStencilClipping(const RenderItem& item, Context& context, uint32_t& lastClippingDepth, uint32_t& lastClippingId)
+inline void SetupStencilClipping(const RenderItem& item, Graphics::CommandBuffer& commandBuffer, uint32_t& lastClippingDepth, uint32_t& lastClippingId)
 {
   const Dali::Internal::SceneGraph::Node* node       = item.mNode;
   const uint32_t                          clippingId = node->GetClippingId();
@@ -154,11 +246,10 @@ inline void SetupStencilClipping(const RenderItem& item, Context& context, uint3
   if(clippingId == 0u)
   {
     // Exit immediately if there are no clipping actions to perform (EG. we have not yet hit a clipping node).
-    context.EnableStencilBuffer(false);
+    commandBuffer.SetStencilTestEnable(false);
     return;
   }
-
-  context.EnableStencilBuffer(true);
+  commandBuffer.SetStencilTestEnable(true);
 
   const uint32_t clippingDepth = node->GetClippingDepth();
 
@@ -175,8 +266,9 @@ inline void SetupStencilClipping(const RenderItem& item, Context& context, uint3
     {
       // We are enabling the stencil-buffer for the first time within this render list.
       // Clear the buffer at this point.
-      context.StencilMask(0xff);
-      context.Clear(GL_STENCIL_BUFFER_BIT, Context::CHECK_CACHED_VALUES);
+
+      commandBuffer.SetStencilWriteMask(0xFF);
+      commandBuffer.ClearStencilBuffer();
     }
     else if((clippingDepth < lastClippingDepth) ||
             ((clippingDepth == lastClippingDepth) && (clippingId > lastClippingId)))
@@ -190,8 +282,8 @@ inline void SetupStencilClipping(const RenderItem& item, Context& context, uint3
       // This has the effect of clearing everything except the bit-planes up to (and including) our current depth.
       const uint32_t stencilClearMask = (currentDepthMask >> 1u) ^ 0xff;
 
-      context.StencilMask(stencilClearMask);
-      context.Clear(GL_STENCIL_BUFFER_BIT, Context::CHECK_CACHED_VALUES);
+      commandBuffer.SetStencilWriteMask(stencilClearMask);
+      commandBuffer.ClearStencilBuffer();
     }
 
     // We keep track of the last clipping Id and depth so we can determine when we are
@@ -208,17 +300,19 @@ inline void SetupStencilClipping(const RenderItem& item, Context& context, uint3
     // As the mask is made up of contiguous "1" values, we can do this quickly with a bit-shift.
     const uint32_t testMask = currentDepthMask >> 1u;
 
-    context.StencilFunc(GL_EQUAL, currentDepthMask, testMask); // Test against existing stencil bit-planes. All must match up to (but not including) this depth.
-    context.StencilMask(currentDepthMask);                     // Write to the new stencil bit-plane (the other previous bit-planes are also written to).
-    context.StencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
+    // Test against existing stencil bit-planes. All must match up to (but not including) this depth.
+    commandBuffer.SetStencilFunc(Graphics::CompareOp::EQUAL, currentDepthMask, testMask);
+    // Write to the new stencil bit-plane (the other previous bit-planes are also written to).
+    commandBuffer.SetStencilWriteMask(currentDepthMask);
+    commandBuffer.SetStencilOp(Graphics::StencilOp::KEEP, Graphics::StencilOp::REPLACE, Graphics::StencilOp::REPLACE);
   }
   else
   {
     // We are reading from the stencil buffer. Set up the stencil accordingly
     // This calculation sets all the bits up to the current depth bit.
     // This has the effect of testing that the pixel being written to exists in every bit-plane up to the current depth.
-    context.StencilFunc(GL_EQUAL, currentDepthMask, currentDepthMask);
-    context.StencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+    commandBuffer.SetStencilFunc(Graphics::CompareOp::EQUAL, currentDepthMask, currentDepthMask);
+    commandBuffer.SetStencilOp(Graphics::StencilOp::KEEP, Graphics::StencilOp::KEEP, Graphics::StencilOp::KEEP);
   }
 }
 
@@ -228,11 +322,11 @@ inline void SetupStencilClipping(const RenderItem& item, Context& context, uint3
  *  - If AUTO is selected for reading, the decision will be based on the Layer Behavior.
  *  - If AUTO is selected for writing, the decision will be based on the items opacity.
  * @param[in]     item                The RenderItem to set up the depth buffer for.
- * @param[in]     context             The context used to execute GL commands.
+ * @param[in,out] secondaryCommandBuffer The secondary command buffer to write depth commands to
  * @param[in]     depthTestEnabled    True if depth testing has been enabled.
  * @param[in/out] firstDepthBufferUse Initialize to true on the first call, this method will set it to false afterwards.
  */
-inline void SetupDepthBuffer(const RenderItem& item, Context& context, bool depthTestEnabled, bool& firstDepthBufferUse)
+inline void SetupDepthBuffer(const RenderItem& item, Graphics::CommandBuffer& commandBuffer, bool depthTestEnabled, bool& firstDepthBufferUse)
 {
   // Set up whether or not to write to the depth buffer.
   const DepthWriteMode::Type depthWriteMode = item.mRenderer->GetDepthWriteMode();
@@ -242,6 +336,7 @@ inline void SetupDepthBuffer(const RenderItem& item, Context& context, bool dept
 
   // Set up whether or not to read from (test) the depth buffer.
   const DepthTestMode::Type depthTestMode = item.mRenderer->GetDepthTestMode();
+
   // Most common mode (AUTO) is tested first.
   const bool enableDepthTest = ((depthTestMode == DepthTestMode::AUTO) && depthTestEnabled) ||
                                (depthTestMode == DepthTestMode::ON);
@@ -250,10 +345,10 @@ inline void SetupDepthBuffer(const RenderItem& item, Context& context, bool dept
   if(enableDepthWrite || enableDepthTest)
   {
     // The depth buffer must be enabled if either reading or writing.
-    context.EnableDepthBuffer(true);
+    commandBuffer.SetDepthTestEnable(true);
 
-    // Look-up the GL depth function from the Dali::DepthFunction enum, and set it.
-    context.DepthFunc(DaliDepthToGLDepthTable[item.mRenderer->GetDepthFunction()]);
+    // Look-up the depth function from the Dali::DepthFunction enum, and set it.
+    commandBuffer.SetDepthCompareOp(GraphicsDepthCompareOp(item.mRenderer->GetDepthFunction()).op);
 
     // If this is the first use of the depth buffer this RenderTask, perform a clear.
     // Note: We could do this at the beginning of the RenderTask and rely on the
@@ -265,17 +360,18 @@ inline void SetupDepthBuffer(const RenderItem& item, Context& context, bool dept
       firstDepthBufferUse = false;
 
       // Note: The buffer will only be cleared if written to since a previous clear.
-      context.DepthMask(true);
-      context.Clear(GL_DEPTH_BUFFER_BIT, Context::CHECK_CACHED_VALUES);
+      commandBuffer.SetDepthWriteEnable(true);
+      commandBuffer.ClearDepthBuffer();
     }
 
     // Set up the depth mask based on our depth write setting.
-    context.DepthMask(enableDepthWrite);
+    //context.DepthMask(enableDepthWrite);
+    commandBuffer.SetDepthWriteEnable(enableDepthWrite);
   }
   else
   {
     // The depth buffer is not being used by this renderer, so we must disable it to stop it being tested.
-    context.EnableDepthBuffer(false);
+    commandBuffer.SetDepthTestEnable(false);
   }
 }
 
@@ -287,13 +383,11 @@ inline void SetupDepthBuffer(const RenderItem& item, Context& context, bool dept
  * As the clips are hierarchical, this RenderItems AABB is clipped against the current "active" scissor bounds via an intersection operation.
  * @param[in]     item                     The current RenderItem about to be rendered
  * @param[in,out] commandBuffer            The command buffer to write into
- * @param[in]     context                  The context
  * @param[in]     instruction              The render-instruction to process.
  */
 inline void RenderAlgorithms::SetupScissorClipping(
   const RenderItem&        item,
   Graphics::CommandBuffer& commandBuffer,
-  Context&                 context,
   const RenderInstruction& instruction)
 {
   // Get the number of child scissors in the stack (do not include layer or root box).
@@ -363,8 +457,7 @@ inline void RenderAlgorithms::SetupScissorClipping(
       {
         useScissorBox.y = (instruction.mFrameBuffer->GetHeight() - useScissorBox.height) - useScissorBox.y;
       }
-      Graphics::Rect2D scissorBox = {
-        useScissorBox.x, useScissorBox.y, uint32_t(useScissorBox.width), uint32_t(useScissorBox.height)};
+      Graphics::Rect2D scissorBox = {useScissorBox.x, useScissorBox.y, uint32_t(useScissorBox.width), uint32_t(useScissorBox.height)};
       commandBuffer.SetScissor(scissorBox);
     }
   }
@@ -372,7 +465,6 @@ inline void RenderAlgorithms::SetupScissorClipping(
 
 inline void RenderAlgorithms::SetupClipping(const RenderItem&                   item,
                                             Graphics::CommandBuffer&            commandBuffer,
-                                            Context&                            context,
                                             bool&                               usedStencilBuffer,
                                             uint32_t&                           lastClippingDepth,
                                             uint32_t&                           lastClippingId,
@@ -393,17 +485,17 @@ inline void RenderAlgorithms::SetupClipping(const RenderItem&                   
     case RenderMode::AUTO:
     {
       // Turn the color buffer on as we always want to render this renderer, regardless of clipping hierarchy.
-      context.ColorMask(true);
+      commandBuffer.SetColorMask(true);
 
       // The automatic clipping feature will manage the scissor and stencil functions, only if stencil buffer is available for the latter.
       // As both scissor and stencil clips can be nested, we may be simultaneously traversing up the scissor tree, requiring a scissor to be un-done. Whilst simultaneously adding a new stencil clip.
       // We process both based on our current and old clipping depths for each mode.
       // Both methods with return rapidly if there is nothing to be done for that type of clipping.
-      SetupScissorClipping(item, commandBuffer, context, instruction);
+      SetupScissorClipping(item, commandBuffer, instruction);
 
       if(stencilBufferAvailable == Integration::StencilBufferAvailable::TRUE)
       {
-        SetupStencilClipping(item, context, lastClippingDepth, lastClippingId);
+        SetupStencilClipping(item, commandBuffer, lastClippingDepth, lastClippingId);
       }
       break;
     }
@@ -416,11 +508,11 @@ inline void RenderAlgorithms::SetupClipping(const RenderItem&                   
       // The stencil buffer will not be used at all, but we only need to disable it if it's available.
       if(stencilBufferAvailable == Integration::StencilBufferAvailable::TRUE)
       {
-        context.EnableStencilBuffer(false);
+        commandBuffer.SetStencilTestEnable(false);
       }
 
       // Setup the color buffer based on the RenderMode.
-      context.ColorMask(renderMode == RenderMode::COLOR);
+      commandBuffer.SetColorMask(renderMode == RenderMode::COLOR);
       break;
     }
 
@@ -432,26 +524,26 @@ inline void RenderAlgorithms::SetupClipping(const RenderItem&                   
         // We are using the low-level Renderer Stencil API.
         // The stencil buffer must be enabled for every renderer with stencil mode on, as renderers in between can disable it.
         // Note: As the command state is cached, it is only sent when needed.
-        context.EnableStencilBuffer(true);
+        commandBuffer.SetStencilTestEnable(true);
 
         // Setup the color buffer based on the RenderMode.
-        context.ColorMask(renderMode == RenderMode::COLOR_STENCIL);
+        commandBuffer.SetColorMask(renderMode == RenderMode::COLOR_STENCIL);
 
         // If this is the first use of the stencil buffer within this RenderList, clear it (this avoids unnecessary clears).
         if(!usedStencilBuffer)
         {
-          context.Clear(GL_STENCIL_BUFFER_BIT, Context::CHECK_CACHED_VALUES);
+          commandBuffer.ClearStencilBuffer();
           usedStencilBuffer = true;
         }
 
-        // Setup the stencil buffer based on the renderers properties.
-        context.StencilFunc(DaliStencilFunctionToGL[renderer->GetStencilFunction()],
-                            renderer->GetStencilFunctionReference(),
-                            renderer->GetStencilFunctionMask());
-        context.StencilOp(DaliStencilOperationToGL[renderer->GetStencilOperationOnFail()],
-                          DaliStencilOperationToGL[renderer->GetStencilOperationOnZFail()],
-                          DaliStencilOperationToGL[renderer->GetStencilOperationOnZPass()]);
-        context.StencilMask(renderer->GetStencilMask());
+        // Setup the stencil buffer based on the renderer's properties.
+        commandBuffer.SetStencilOp(GraphicsStencilOp(renderer->GetStencilOperationOnFail()).op,
+                                   GraphicsStencilOp(renderer->GetStencilOperationOnZPass()).op,
+                                   GraphicsStencilOp(renderer->GetStencilOperationOnZFail()).op);
+        commandBuffer.SetStencilFunc(GraphicsStencilCompareOp(renderer->GetStencilFunction()).op,
+                                     renderer->GetStencilFunctionReference(),
+                                     renderer->GetStencilFunctionMask());
+        commandBuffer.SetStencilWriteMask(renderer->GetStencilMask());
       }
       break;
     }
@@ -459,7 +551,6 @@ inline void RenderAlgorithms::SetupClipping(const RenderItem&                   
 }
 
 inline void RenderAlgorithms::ProcessRenderList(const RenderList&                   renderList,
-                                                Context&                            context,
                                                 BufferIndex                         bufferIndex,
                                                 const Matrix&                       viewMatrix,
                                                 const Matrix&                       projectionMatrix,
@@ -547,18 +638,18 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
 
     // Set up clipping based on both the Renderer and Actor APIs.
     // The Renderer API will be used if specified. If AUTO, the Actors automatic clipping feature will be used.
-    SetupClipping(item, secondaryCommandBuffer, context, usedStencilBuffer, lastClippingDepth, lastClippingId, stencilBufferAvailable, instruction);
+    SetupClipping(item, secondaryCommandBuffer, usedStencilBuffer, lastClippingDepth, lastClippingId, stencilBufferAvailable, instruction);
 
     if(DALI_LIKELY(item.mRenderer))
     {
       // Set up the depth buffer based on per-renderer flags if depth buffer is available
       // If the per renderer flags are set to "ON" or "OFF", they will always override any Layer depth mode or
       // draw-mode state, such as Overlays.
-      // If the flags are set to "AUTO", the behavior then depends on the type of renderer. Overlay Renderers will always
-      // disable depth testing and writing. Color Renderers will enable them if the Layer does.
+      // If the flags are set to "AUTO", the behavior then depends on the type of renderer. Overlay Renderers will
+      // always disable depth testing and writing. Color Renderers will enable them if the Layer does.
       if(depthBufferAvailable == Integration::DepthBufferAvailable::TRUE)
       {
-        SetupDepthBuffer(item, context, autoDepthTestMode, firstDepthBufferUse);
+        SetupDepthBuffer(item, secondaryCommandBuffer, autoDepthTestMode, firstDepthBufferUse);
       }
 
       // Depending on whether the renderer has draw commands attached or not the rendering process will
@@ -612,7 +703,6 @@ void RenderAlgorithms::SubmitCommandBuffer()
 }
 
 void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&            instruction,
-                                                Context&                            context,
                                                 BufferIndex                         bufferIndex,
                                                 Integration::DepthBufferAvailable   depthBufferAvailable,
                                                 Integration::StencilBufferAvailable stencilBufferAvailable,
@@ -643,7 +733,6 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
       if(renderList && !renderList->IsEmpty())
       {
         ProcessRenderList(*renderList,
-                          context,
                           bufferIndex,
                           *viewMatrix,
                           *projectionMatrix,

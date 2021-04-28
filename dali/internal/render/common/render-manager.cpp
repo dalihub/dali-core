@@ -249,7 +249,7 @@ void RenderManager::SetShaderSaver(ShaderSaver& upstream)
 void RenderManager::AddRenderer(OwnerPointer<Render::Renderer>& renderer)
 {
   // Initialize the renderer as we are now in render thread
-  renderer->Initialize(mImpl->context, mImpl->graphicsController, mImpl->programController, mImpl->shaderCache, *(mImpl->uniformBufferManager.get()));
+  renderer->Initialize(mImpl->graphicsController, mImpl->programController, mImpl->shaderCache, *(mImpl->uniformBufferManager.get()));
 
   mImpl->rendererContainer.PushBack(renderer.Release());
 }
@@ -341,7 +341,7 @@ void RenderManager::RemoveFrameBuffer(Render::FrameBuffer* frameBuffer)
 
 void RenderManager::InitializeScene(SceneGraph::Scene* scene)
 {
-  scene->Initialize(*mImpl->CreateSceneContext(), mImpl->graphicsController);
+  scene->Initialize(*mImpl->CreateSceneContext(), mImpl->graphicsController, mImpl->depthBufferAvailable, mImpl->stencilBufferAvailable);
   mImpl->sceneContainer.push_back(scene);
 }
 
@@ -359,7 +359,7 @@ void RenderManager::UninitializeScene(SceneGraph::Scene* scene)
 void RenderManager::SurfaceReplaced(SceneGraph::Scene* scene)
 {
   Context* newContext = mImpl->ReplaceSceneContext(scene->GetContext());
-  scene->Initialize(*newContext, mImpl->graphicsController);
+  scene->Initialize(*newContext, mImpl->graphicsController, mImpl->depthBufferAvailable, mImpl->stencilBufferAvailable);
 }
 
 void RenderManager::AttachColorTextureToFrameBuffer(Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel, uint32_t layer)
@@ -815,6 +815,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     Rect<int32_t> surfaceRect        = sceneObject->GetSurfaceRect();
     int32_t       surfaceOrientation = sceneObject->GetSurfaceOrientation();
 
+    // @todo Should these be part of scene?
     Integration::DepthBufferAvailable   depthBufferAvailable   = mImpl->depthBufferAvailable;
     Integration::StencilBufferAvailable stencilBufferAvailable = mImpl->stencilBufferAvailable;
 
@@ -865,7 +866,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
         mImpl->programController.ClearCurrentProgram();
       }
     }
-    else
+    else // no framebuffer
     {
       if(mImpl->currentContext->IsSurfacelessContextSupported())
       {
@@ -892,6 +893,17 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       }
 
       currentClearValues = clearValues;
+
+      // @todo SceneObject should already have the depth clear / stencil clear in the clearValues array.
+      // if the window has a depth/stencil buffer.
+      if((depthBufferAvailable == Integration::DepthBufferAvailable::TRUE ||
+          stencilBufferAvailable == Integration::StencilBufferAvailable::TRUE) &&
+         (currentClearValues.size() <= 1))
+      {
+        currentClearValues.emplace_back();
+        currentClearValues.back().depthStencil.depth   = 0;
+        currentClearValues.back().depthStencil.stencil = 0;
+      }
 
       auto loadOp = instruction.mIsClearColorSet ? Graphics::AttachmentLoadOp::CLEAR : Graphics::AttachmentLoadOp::LOAD;
 
@@ -1002,7 +1014,6 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
     mImpl->renderAlgorithms.ProcessRenderInstruction(
       instruction,
-      *mImpl->currentContext,
       mImpl->renderBufferIndex,
       depthBufferAvailable,
       stencilBufferAvailable,

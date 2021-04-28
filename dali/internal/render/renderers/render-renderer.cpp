@@ -243,7 +243,6 @@ Renderer::Renderer(SceneGraph::RenderDataProvider* dataProvider,
                    StencilParameters&              stencilParameters)
 : mGraphicsController(nullptr),
   mRenderDataProvider(dataProvider),
-  mContext(nullptr),
   mGeometry(geometry),
   mProgramCache(nullptr),
   mUniformIndexMap(),
@@ -270,9 +269,8 @@ Renderer::Renderer(SceneGraph::RenderDataProvider* dataProvider,
   mBlendingOptions.SetBlendColor(blendColor);
 }
 
-void Renderer::Initialize(Context& context, Graphics::Controller& graphicsController, ProgramCache& programCache, Render::ShaderCache& shaderCache, Render::UniformBufferManager& uniformBufferManager)
+void Renderer::Initialize(Graphics::Controller& graphicsController, ProgramCache& programCache, Render::ShaderCache& shaderCache, Render::UniformBufferManager& uniformBufferManager)
 {
-  mContext              = &context;
   mGraphicsController   = &graphicsController;
   mProgramCache         = &programCache;
   mShaderCache          = &shaderCache;

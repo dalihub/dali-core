@@ -384,6 +384,76 @@ GLenum GetBlendOp(Graphics::BlendOp blendOp)
   return op;
 }
 
+struct GLCompareOp
+{
+  constexpr explicit GLCompareOp(Graphics::CompareOp compareOp)
+  {
+    switch(compareOp)
+    {
+      case Graphics::CompareOp::NEVER:
+        op = GL_NEVER;
+        break;
+      case Graphics::CompareOp::LESS:
+        op = GL_LESS;
+        break;
+      case Graphics::CompareOp::EQUAL:
+        op = GL_EQUAL;
+        break;
+      case Graphics::CompareOp::LESS_OR_EQUAL:
+        op = GL_LEQUAL;
+        break;
+      case Graphics::CompareOp::GREATER:
+        op = GL_GREATER;
+        break;
+      case Graphics::CompareOp::NOT_EQUAL:
+        op = GL_NOTEQUAL;
+        break;
+      case Graphics::CompareOp::GREATER_OR_EQUAL:
+        op = GL_GEQUAL;
+        break;
+      case Graphics::CompareOp::ALWAYS:
+        op = GL_ALWAYS;
+        break;
+    }
+  }
+  GLenum op{GL_LESS};
+};
+
+struct GLStencilOp
+{
+  constexpr explicit GLStencilOp(Graphics::StencilOp stencilOp)
+  {
+    switch(stencilOp)
+    {
+      case Graphics::StencilOp::KEEP:
+        op = GL_KEEP;
+        break;
+      case Graphics::StencilOp::ZERO:
+        op = GL_ZERO;
+        break;
+      case Graphics::StencilOp::REPLACE:
+        op = GL_REPLACE;
+        break;
+      case Graphics::StencilOp::INCREMENT_AND_CLAMP:
+        op = GL_INCR;
+        break;
+      case Graphics::StencilOp::DECREMENT_AND_CLAMP:
+        op = GL_DECR;
+        break;
+      case Graphics::StencilOp::INVERT:
+        op = GL_INVERT;
+        break;
+      case Graphics::StencilOp::INCREMENT_AND_WRAP:
+        op = GL_INCR_WRAP;
+        break;
+      case Graphics::StencilOp::DECREMENT_AND_WRAP:
+        op = GL_DECR_WRAP;
+        break;
+    }
+  }
+  GLenum op{GL_KEEP};
+};
+
 class TestGraphicsMemory : public Graphics::Memory
 {
 public:
@@ -602,6 +672,82 @@ void TestGraphicsController::ProcessCommandBuffer(TestGraphicsCommandBuffer& com
         mGl.Viewport(rect.x, rect.y, rect.width, rect.height);
         break;
       }
+
+      case CommandType::SET_COLOR_MASK:
+      {
+        // Set all channels to the same mask
+        const bool mask = cmd.data.colorMask.enabled;
+        mGl.ColorMask(mask, mask, mask, mask);
+        break;
+      }
+      case CommandType::CLEAR_STENCIL_BUFFER:
+      {
+        mGl.Clear(GL_STENCIL_BUFFER_BIT);
+        break;
+      }
+      case CommandType::CLEAR_DEPTH_BUFFER:
+      {
+        mGl.Clear(GL_DEPTH_BUFFER_BIT);
+        break;
+      }
+
+      case CommandType::SET_STENCIL_TEST_ENABLE:
+      {
+        if(cmd.data.stencilTest.enabled)
+        {
+          mGl.Enable(GL_STENCIL_TEST);
+        }
+        else
+        {
+          mGl.Disable(GL_STENCIL_TEST);
+        }
+        break;
+      }
+
+      case CommandType::SET_STENCIL_FUNC:
+      {
+        mGl.StencilFunc(GLCompareOp(cmd.data.stencilFunc.compareOp).op,
+                        cmd.data.stencilFunc.reference,
+                        cmd.data.stencilFunc.compareMask);
+        break;
+      }
+
+      case CommandType::SET_STENCIL_WRITE_MASK:
+      {
+        mGl.StencilMask(cmd.data.stencilWriteMask.mask);
+        break;
+      }
+      case CommandType::SET_STENCIL_OP:
+      {
+        mGl.StencilOp(GLStencilOp(cmd.data.stencilOp.failOp).op,
+                      GLStencilOp(cmd.data.stencilOp.depthFailOp).op,
+                      GLStencilOp(cmd.data.stencilOp.passOp).op);
+        break;
+      }
+
+      case CommandType::SET_DEPTH_COMPARE_OP:
+      {
+        mGl.DepthFunc(GLCompareOp(cmd.data.depth.compareOp).op);
+        break;
+      }
+      case CommandType::SET_DEPTH_TEST_ENABLE:
+      {
+        if(cmd.data.depth.testEnabled)
+        {
+          mGl.Enable(GL_DEPTH_TEST);
+        }
+        else
+        {
+          mGl.Disable(GL_DEPTH_TEST);
+        }
+        break;
+      }
+      case CommandType::SET_DEPTH_WRITE_ENABLE:
+      {
+        mGl.DepthMask(cmd.data.depth.writeEnabled);
+        break;
+      }
+
       case CommandType::EXECUTE_COMMAND_BUFFERS:
       {
         // Process secondary command buffers
@@ -663,10 +809,24 @@ void TestGraphicsController::ProcessCommandBuffer(TestGraphicsCommandBuffer& com
               const auto& depthStencil = renderPass->attachments.back();
               if(depthStencil.loadOp == Graphics::AttachmentLoadOp::CLEAR)
               {
+                mGl.DepthMask(true);
+                uint32_t depthClearColor = 0u;
+                if(clearValues.size() == renderPass->attachments.size())
+                {
+                  depthClearColor = clearValues.back().depthStencil.depth;
+                }
+                mGl.ClearDepthf(depthClearColor);
                 mask |= GL_DEPTH_BUFFER_BIT;
               }
               if(depthStencil.stencilLoadOp == Graphics::AttachmentLoadOp::CLEAR)
               {
+                uint32_t stencilClearColor = 0u;
+                if(clearValues.size() == renderPass->attachments.size())
+                {
+                  stencilClearColor = clearValues.back().depthStencil.stencil;
+                }
+                mGl.ClearStencil(stencilClearColor);
+                mGl.StencilMask(0xFF); // Clear all the bitplanes (assume 8)
                 mask |= GL_STENCIL_BUFFER_BIT;
               }
             }

@@ -27,8 +27,6 @@ namespace Dali
 {
 namespace Internal
 {
-class Context;
-
 namespace SceneGraph
 {
 class RenderInstruction;
@@ -53,7 +51,6 @@ public:
   /**
    * Process a render-instruction.
    * @param[in] instruction            The render-instruction to process.
-   * @param[in] context                The GL context.
    * @param[in] bufferIndex            The current render buffer index (previous update buffer)
    * @param[in] depthBufferAvailable   Whether the depth buffer is available
    * @param[in] stencilBufferAvailable Whether the stencil buffer is available
@@ -63,7 +60,6 @@ public:
    * @param[in] orientation            The surface orientation
    */
   void ProcessRenderInstruction(const SceneGraph::RenderInstruction& instruction,
-                                Context&                             context,
                                 BufferIndex                          bufferIndex,
                                 Integration::DepthBufferAvailable    depthBufferAvailable,
                                 Integration::StencilBufferAvailable  stencilBufferAvailable,
@@ -114,19 +110,17 @@ private:
    *  - Disable scissor clipping completely if it is not needed
    * @param[in] item          The current RenderItem (about to be rendered)
    * @param[in] commandBuffer The command buffer to write into
-   * @param[in] context       The current Context
+
    * @param[in] instruction   The render-instruction to process.
    */
   inline void SetupScissorClipping(
     const Dali::Internal::SceneGraph::RenderItem&        item,
     Graphics::CommandBuffer&                             commandBuffer,
-    Context&                                             context,
     const Dali::Internal::SceneGraph::RenderInstruction& instruction);
 
   /**
    * @brief Set up the clipping based on the specified clipping settings.
    * @param[in]     item                     The current RenderItem (about to be rendered)
-   * @param[in]     context                  The context
    * @param[in,out] commandBuffer            The command buffer to write commands to
    * @param[in/out] usedStencilBuffer        True if the stencil buffer has been used so far within this RenderList. Used by StencilMode::ON.
    * @param[in/out] lastClippingDepth        The stencil depth of the last renderer drawn. Used by the clipping feature.
@@ -136,7 +130,6 @@ private:
    */
   inline void SetupClipping(const Dali::Internal::SceneGraph::RenderItem&        item,
                             Graphics::CommandBuffer&                             commandBuffer,
-                            Context&                                             context,
                             bool&                                                usedStencilBuffer,
                             uint32_t&                                            lastClippingDepth,
                             uint32_t&                                            lastClippingId,
@@ -146,7 +139,6 @@ private:
   /**
    * @brief Process a render-list.
    * @param[in] renderList             The render-list to process.
-   * @param[in] context                The GL context.
    * @param[in] buffer                 The current render buffer index (previous update buffer)
    * @param[in] viewMatrix             The view matrix from the appropriate camera.
    * @param[in] projectionMatrix       The projection matrix from the appropriate camera.
@@ -158,7 +150,6 @@ private:
    * @param[in] orientation            The Scene's surface orientation
    */
   inline void ProcessRenderList(const Dali::Internal::SceneGraph::RenderList&        renderList,
-                                Context&                                             context,
                                 BufferIndex                                          bufferIndex,
                                 const Matrix&                                        viewMatrix,
                                 const Matrix&                                        projectionMatrix,

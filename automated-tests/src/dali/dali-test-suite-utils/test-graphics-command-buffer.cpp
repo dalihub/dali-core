@@ -18,6 +18,70 @@
 
 namespace Dali
 {
+std::ostream& operator<<(std::ostream& os, Graphics::StencilOp op)
+{
+  switch(op)
+  {
+    case Graphics::StencilOp::KEEP:
+      os << "KEEP";
+      return os;
+    case Graphics::StencilOp::ZERO:
+      os << "ZERO";
+      return os;
+    case Graphics::StencilOp::REPLACE:
+      os << "REPLACE";
+      return os;
+    case Graphics::StencilOp::INCREMENT_AND_CLAMP:
+      os << "INCREMENT_AND_CLAMP";
+      return os;
+    case Graphics::StencilOp::DECREMENT_AND_CLAMP:
+      os << "DECREMENT_AND_CLAMP";
+      return os;
+    case Graphics::StencilOp::INVERT:
+      os << "INVERT";
+      return os;
+    case Graphics::StencilOp::INCREMENT_AND_WRAP:
+      os << "INCREMENT_AND_WRAP";
+      return os;
+    case Graphics::StencilOp::DECREMENT_AND_WRAP:
+      os << "DECREMENT_AND_WRAP";
+      return os;
+  }
+  return os;
+};
+
+std::ostream& operator<<(std::ostream& os, Graphics::CompareOp op)
+{
+  switch(op)
+  {
+    case Graphics::CompareOp::NEVER:
+      os << "NEVER";
+      return os;
+    case Graphics::CompareOp::LESS:
+      os << "LESS";
+      return os;
+    case Graphics::CompareOp::EQUAL:
+      os << "EQUAL";
+      return os;
+    case Graphics::CompareOp::LESS_OR_EQUAL:
+      os << "LESS_OR_EQUAL";
+      return os;
+    case Graphics::CompareOp::GREATER:
+      os << "GREATER";
+      return os;
+    case Graphics::CompareOp::NOT_EQUAL:
+      os << "NOT_EQUAL";
+      return os;
+    case Graphics::CompareOp::GREATER_OR_EQUAL:
+      os << "GREATER_OR_EQUAL";
+      return os;
+    case Graphics::CompareOp::ALWAYS:
+      os << "ALWAYS";
+      return os;
+  }
+  return os;
+};
+
 TestGraphicsCommandBuffer::TestGraphicsCommandBuffer(TraceCallStack& callstack, TestGlAbstraction& glAbstraction)
 : mCallStack(callstack),
   mGlAbstraction(glAbstraction)
