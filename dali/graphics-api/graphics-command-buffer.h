@@ -309,21 +309,68 @@ public:
    * @brief Clears the stencil buffer (outside of BeginRenderPass) to the current stencil mask
    */
   virtual void ClearStencilBuffer() = 0;
-  virtual void ClearDepthBuffer()   = 0;
 
+  /**
+   * @brief Clears the depth buffer (outside of BeginRenderPass) to the current depth mask
+   */
+  virtual void ClearDepthBuffer() = 0;
+
+  /**
+   * @brief Enable or disable the stencil test
+   *
+   * @param[in] stencilEnable whether stencil test should be enabled
+   */
   virtual void SetStencilTestEnable(bool stencilEnable) = 0;
-  virtual void SetStencilWriteMask(uint32_t writeMask)  = 0;
+
+  /**
+   * @brief The mask used for writing to the stencil buffer.
+   *
+   * It should be as wide as necessary for the stencil texture format.
+   * @param[in] writeMask The mask for wriing to / clearing the stencil buffer
+   */
+  virtual void SetStencilWriteMask(uint32_t writeMask) = 0;
+
+  /**
+   * @brief Setup the stencil function
+   *
+   * @param[in] compareOp How the stencil buffer, reference and compareMask are combined to determine whether to draw a pixel or not.
+   * @param[in] reference A reference value that is ANDed with the mask in the compare op.
+   * @param[in] compareMask The bitplanes from the stencil buffer that are active.
+   */
   virtual void SetStencilFunc(Graphics::CompareOp compareOp,
                               uint32_t            reference,
-                              uint32_t            compareMask)     = 0;
+                              uint32_t            compareMask) = 0;
 
+  /**
+   * @brief Set how subsequent draws will affect the stencil buffer.
+   * @param[in] failOp What happens to stencil buffer if drawing a pixel fails the stencil test
+   * @param[in] passOp What happens to stencil buffer if drawing a pixel passes stencil & depth test
+   * @param[in] depthFailOp What happens to stencil buffer if drawing a pixel passes stencil but fails depth test.
+   */
   virtual void SetStencilOp(Graphics::StencilOp failOp,
                             Graphics::StencilOp passOp,
                             Graphics::StencilOp depthFailOp) = 0;
 
+  /**
+   * @brief Defines the comparison operator for passing the depth test.
+   *
+   * @param[in] compareOp The comparison operator
+   */
   virtual void SetDepthCompareOp(Graphics::CompareOp compareOp) = 0;
-  virtual void SetDepthTestEnable(bool depthTestEnable)         = 0;
-  virtual void SetDepthWriteEnable(bool depthWriteEnable)       = 0;
+
+  /**
+   * @brief Enables depth testing
+   *
+   * @param[in] depthTestEnable True if depth testing will be enabled.
+   */
+  virtual void SetDepthTestEnable(bool depthTestEnable) = 0;
+
+  /**
+   * @brief Enables depth writing / clearing
+   *
+   * @param[in] depthWriteEnabled True if the depth buffer can be updated or cleared.
+   */
+  virtual void SetDepthWriteEnable(bool depthWriteEnable) = 0;
 
 protected:
   CommandBuffer(CommandBuffer&&) = default;
