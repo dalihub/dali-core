@@ -107,16 +107,6 @@ public: // API
   void ResetProgramMatrices();
 
   /**
-   * Notifies the cache that context is (re)created
-   */
-  void GlContextCreated();
-
-  /**
-   * Notifies cache that context is lost
-   */
-  void GlContextDestroyed();
-
-  /**
    * Set the destination for compiler shader binaries so they can be saved.
    * @note Must be called during initialisation.
    */
@@ -128,11 +118,6 @@ public: // API
   void ClearCurrentProgram();
 
 private: // From ProgramCache
-  /**
-   * @copydoc ProgramCache::GetGlAbstraction
-   */
-  Integration::GlAbstraction& GetGlAbstraction() override;
-
   /**
    * @copydoc ProgramCache::GetProgram
    */

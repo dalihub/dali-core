@@ -31,7 +31,6 @@
 #include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/render/data-providers/render-data-provider.h>
-#include <dali/internal/render/gl-resources/gl-resource-owner.h>
 #include <dali/internal/render/renderers/render-geometry.h>
 #include <dali/internal/render/renderers/uniform-buffer-manager.h>
 #include <dali/internal/render/shaders/program.h>
@@ -515,7 +514,6 @@ private:
   Graphics::Controller*                        mGraphicsController;
   OwnerPointer<SceneGraph::RenderDataProvider> mRenderDataProvider;
 
-  Context*          mContext;
   Render::Geometry* mGeometry;
 
   Graphics::UniquePtr<Graphics::CommandBuffer> mGraphicsCommandBuffer{};

@@ -30,8 +30,6 @@ namespace Dali
 {
 namespace Internal
 {
-class Context;
-
 namespace SceneGraph
 {
 class RenderInstructionContainer;
@@ -52,18 +50,11 @@ public:
 
   /**
    * Creates a scene object in the GPU.
-   * @param[in] context The GL context
    * @param[in] graphicsController The graphics controller
    * @param[in] depthBufferAvailable True if there is a depth buffer
    * @param[in] stencilBufferAvailable True if there is a stencil buffer
    */
-  void Initialize(Context& context, Graphics::Controller& graphicsController, Integration::DepthBufferAvailable depthBufferAvailable, Integration::StencilBufferAvailable stencilBufferAvailable);
-
-  /**
-   * Gets the context holding the GL state of rendering for the scene
-   * @return the context
-   */
-  Context* GetContext();
+  void Initialize(Graphics::Controller& graphicsController, Integration::DepthBufferAvailable depthBufferAvailable, Integration::StencilBufferAvailable stencilBufferAvailable);
 
   /**
    * Gets the render instructions for the scene
@@ -213,8 +204,6 @@ public:
   }
 
 private:
-  Context* mContext; ///< The context holding the GL state of rendering for the scene, not owned
-
   // Render instructions describe what should be rendered during RenderManager::RenderScene()
   // Update manager updates instructions for the next frame while we render the current one
 

@@ -1077,11 +1077,8 @@ Graphics::Pipeline& Renderer::PrepareGraphicsPipeline(
       break;
   }
 
-  // @todo How to signal a blend barrier is needed?
-  //if(mBlendingOptions.IsAdvancedBlendEquationApplied() && mPremultipledAlphaEnabled)
-  //{
-  //  context.BlendBarrier();
-  //}
+  // @todo Add blend barrier to the Graphics API if we are using advanced
+  // blending options. Command?
 
   Graphics::ColorBlendState colorBlendState{};
   colorBlendState.SetBlendEnable(false);

@@ -352,8 +352,8 @@ inline void SetupDepthBuffer(const RenderItem& item, Graphics::CommandBuffer& co
 
     // If this is the first use of the depth buffer this RenderTask, perform a clear.
     // Note: We could do this at the beginning of the RenderTask and rely on the
-    // context cache to ignore the clear if not required, but, we would have to enable
-    // the depth buffer to do so, which could be a redundant enable.
+    // graphics implementation to ignore the clear if not required, but, we would
+    // have to enable the depth buffer to do so, which could be a redundant enable.
     if(DALI_UNLIKELY(firstDepthBufferUse))
     {
       // This is the first time the depth buffer is being written to or read.
@@ -365,7 +365,6 @@ inline void SetupDepthBuffer(const RenderItem& item, Graphics::CommandBuffer& co
     }
 
     // Set up the depth mask based on our depth write setting.
-    //context.DepthMask(enableDepthWrite);
     commandBuffer.SetDepthWriteEnable(enableDepthWrite);
   }
   else

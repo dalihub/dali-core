@@ -32,7 +32,6 @@
 #include <dali/integration-api/gl-defines.h>
 #include <dali/internal/common/shader-data.h>
 #include <dali/internal/render/common/performance-monitor.h>
-#include <dali/internal/render/gl-resources/gl-call-debug.h>
 #include <dali/internal/render/shaders/program-cache.h>
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
@@ -119,15 +118,6 @@ uint32_t Program::RegisterUniform(ConstString name)
   return index;
 }
 
-void Program::GlContextCreated()
-{
-}
-
-void Program::GlContextDestroyed()
-{
-  ResetUniformCache();
-}
-
 bool Program::ModifiesGeometry()
 {
   return mModifiesGeometry;
@@ -135,7 +125,6 @@ bool Program::ModifiesGeometry()
 
 Program::Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& controller, Graphics::UniquePtr<Graphics::Program>&& gfxProgram, bool modifiesGeometry)
 : mCache(cache),
-  mGlAbstraction(mCache.GetGlAbstraction()),
   mProjectionMatrix(nullptr),
   mViewMatrix(nullptr),
   mProgramId(0),

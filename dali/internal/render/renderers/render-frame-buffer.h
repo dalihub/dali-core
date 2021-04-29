@@ -20,7 +20,6 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/rendering/frame-buffer-devel.h>
 #include <dali/integration-api/gl-defines.h>
-#include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/renderers/render-sampler.h>
 #include <dali/public-api/rendering/frame-buffer.h>
 

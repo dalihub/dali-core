@@ -19,7 +19,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/core-enumerations.h>
-#include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
 
 namespace Dali
@@ -29,8 +28,7 @@ namespace Internal
 namespace SceneGraph
 {
 Scene::Scene()
-: mContext(nullptr),
-  mFrameRenderedCallbacks(),
+: mFrameRenderedCallbacks(),
   mFramePresentedCallbacks(),
   mSkipRendering(false),
   mSurfaceRect(),
@@ -45,10 +43,8 @@ Scene::~Scene()
   mFramePresentedCallbacks.clear();
 }
 
-void Scene::Initialize(Context& context, Graphics::Controller& graphicsController, Integration::DepthBufferAvailable depthBufferAvailable, Integration::StencilBufferAvailable stencilBufferAvailable)
+void Scene::Initialize(Graphics::Controller& graphicsController, Integration::DepthBufferAvailable depthBufferAvailable, Integration::StencilBufferAvailable stencilBufferAvailable)
 {
-  mContext = &context;
-
   // Create the render pass for the surface
   std::vector<Graphics::AttachmentDescription> attachmentDescriptions;
 
@@ -95,11 +91,6 @@ void Scene::Initialize(Context& context, Graphics::Controller& graphicsControlle
   }
 
   mRenderPassNoClear = graphicsController.CreateRenderPass(rpInfo, nullptr); // Warning: Shallow ptr
-}
-
-Context* Scene::GetContext()
-{
-  return mContext;
 }
 
 RenderInstructionContainer& Scene::GetRenderInstructions()

@@ -129,16 +129,6 @@ public:
   uint32_t RegisterUniform(ConstString name);
 
   /**
-   * Needs to be called when GL context is (re)created
-   */
-  void GlContextCreated();
-
-  /**
-   * Needs to be called when GL context is destroyed
-   */
-  void GlContextDestroyed();
-
-  /**
    * @return true if this program modifies geometry
    */
   bool ModifiesGeometry();
@@ -255,7 +245,6 @@ private:
 
 private:                                                    // Data
   ProgramCache&                          mCache;            ///< The program cache
-  Integration::GlAbstraction&            mGlAbstraction;    ///< The OpenGL Abstraction layer
   const Matrix*                          mProjectionMatrix; ///< currently set projection matrix
   const Matrix*                          mViewMatrix;       ///< currently set view matrix
   GLuint                                 mProgramId;        ///< GL identifier for program

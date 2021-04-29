@@ -19,7 +19,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/buffer-index.h>
-#include <dali/internal/render/gl-resources/gpu-buffer.h>
 #include <dali/internal/render/renderers/render-vertex-buffer.h>
 #include <dali/internal/render/shaders/program.h>
 

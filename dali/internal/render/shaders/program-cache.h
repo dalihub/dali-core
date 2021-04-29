@@ -46,11 +46,6 @@ public:
 
 public: // API
   /**
-   * @return GlAbstraction
-   */
-  virtual Integration::GlAbstraction& GetGlAbstraction() = 0;
-
-  /**
    * Get the program from cache with hash
    * @param shaderHash to use
    * @return program

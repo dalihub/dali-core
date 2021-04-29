@@ -21,6 +21,7 @@
 #include <math.h> //floor, log2
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
 
 namespace Dali
 {

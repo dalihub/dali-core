@@ -31,7 +31,6 @@ namespace Dali
 {
 namespace Internal
 {
-class Context;
 class Program;
 class GpuBuffer;
 
@@ -116,10 +115,8 @@ public:
   /**
    * Set up the attributes and perform the Draw call corresponding to the geometry type.
    *
-   * @param[in] context The GL context @todo remove
    * @param[in] graphicsController The graphics controller
    * @param[in] bufferIndex The current buffer index
-   * @param[in] attributeLocation The location for the attributes in the shader
    * @param[in] elementBufferOffset The index of first element to draw if index buffer bound
    * @param[in] elementBufferCount Number of elements to draw if index buffer bound, uses whole buffer when 0
    * @return true if the draw command was issued, false otherwise

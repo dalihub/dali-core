@@ -32,7 +32,6 @@
 #include <dali/graphics-api/graphics-types.h>
 #include <dali/integration-api/gl-defines.h>
 #include <dali/internal/event/rendering/texture-impl.h>
-#include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/renderers/render-sampler.h>
 
 namespace Dali
@@ -142,7 +141,6 @@ public:
 private:
   /**
    * Helper method to apply a sampler to the texture
-   * @param[in] context The GL context
    * @param[in] sampler The sampler
    */
   void ApplySampler(Render::Sampler* sampler);

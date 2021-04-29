@@ -181,12 +181,10 @@ void Core::RecoverFromContextLoss()
 
 void Core::ContextCreated()
 {
-  mRenderManager->ContextCreated();
 }
 
 void Core::ContextDestroyed()
 {
-  mRenderManager->ContextDestroyed();
 }
 
 void Core::Update(float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uint32_t nextVSyncTimeMilliseconds, Integration::UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo)

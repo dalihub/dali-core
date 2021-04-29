@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/render/gl-resources/gpu-buffer.h>
+#include <dali/internal/render/renderers/gpu-buffer.h>
 
 // INTERNAL INCLUDES
 #include <dali/graphics-api/graphics-types.h>

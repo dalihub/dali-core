@@ -18,15 +18,13 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/actors/sampling.h>
 #include <dali/public-api/common/vector-wrapper.h>
-#include <dali/public-api/rendering/sampler.h>
+#include <dali/public-api/object/property.h>
 
 #include <dali/graphics-api/graphics-types.h>
 #include <dali/internal/common/const-string.h>
 #include <dali/internal/common/owner-pointer.h>
-#include <dali/internal/render/gl-resources/gpu-buffer.h>
-#include <dali/internal/render/renderers/render-sampler.h>
+#include <dali/internal/render/renderers/gpu-buffer.h>
 
 namespace Dali
 {

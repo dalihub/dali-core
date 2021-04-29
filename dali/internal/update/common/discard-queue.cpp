@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/message.h>
-#include <dali/internal/render/gl-resources/gl-resource-owner.h>
 #include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>

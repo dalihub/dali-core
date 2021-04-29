@@ -64,9 +64,7 @@ struct RenderManager::Impl
        Integration::DepthBufferAvailable   depthBufferAvailableParam,
        Integration::StencilBufferAvailable stencilBufferAvailableParam,
        Integration::PartialUpdateAvailable partialUpdateAvailableParam)
-  : context(graphicsController.GetGlAbstraction(), &sceneContextContainer),
-    currentContext(&context),
-    graphicsController(graphicsController),
+  : graphicsController(graphicsController),
     renderQueue(),
     renderAlgorithms(graphicsController),
     frameCount(0u),
@@ -105,33 +103,6 @@ struct RenderManager::Impl
     mRenderTrackers.EraseObject(renderTracker);
   }
 
-  Context* CreateSceneContext()
-  {
-    Context* context = new Context(graphicsController.GetGlAbstraction());
-    sceneContextContainer.PushBack(context);
-    return context;
-  }
-
-  void DestroySceneContext(Context* sceneContext)
-  {
-    auto iter = std::find(sceneContextContainer.Begin(), sceneContextContainer.End(), sceneContext);
-    if(iter != sceneContextContainer.End())
-    {
-      (*iter)->GlContextDestroyed();
-      sceneContextContainer.Erase(iter);
-    }
-  }
-
-  Context* ReplaceSceneContext(Context* oldSceneContext)
-  {
-    Context* newContext = new Context(graphicsController.GetGlAbstraction());
-
-    oldSceneContext->GlContextDestroyed();
-
-    std::replace(sceneContextContainer.begin(), sceneContextContainer.end(), oldSceneContext, newContext);
-    return newContext;
-  }
-
   void UpdateTrackers()
   {
     for(auto&& iter : mRenderTrackers)
@@ -141,12 +112,8 @@ struct RenderManager::Impl
   }
 
   // the order is important for destruction,
-  // programs are owned by context at the moment.
-  Context                  context;               ///< Holds the GL state of the share resource context
-  Context*                 currentContext;        ///< Holds the GL state of the current context for rendering
-  OwnerContainer<Context*> sceneContextContainer; ///< List of owned contexts holding the GL state per scene
-  Graphics::Controller&    graphicsController;
-  RenderQueue              renderQueue; ///< A message queue for receiving messages from the update-thread.
+  Graphics::Controller& graphicsController;
+  RenderQueue           renderQueue; ///< A message queue for receiving messages from the update-thread.
 
   std::vector<SceneGraph::Scene*> sceneContainer; ///< List of pointers to the scene graph objects of the scenes
 
@@ -206,39 +173,6 @@ RenderManager::~RenderManager()
 RenderQueue& RenderManager::GetRenderQueue()
 {
   return mImpl->renderQueue;
-}
-
-void RenderManager::ContextCreated()
-{
-  mImpl->context.GlContextCreated();
-  mImpl->programController.GlContextCreated();
-
-  // renderers, textures and gpu buffers cannot reinitialize themselves
-  // so they rely on someone reloading the data for them
-}
-
-void RenderManager::ContextDestroyed()
-{
-  mImpl->context.GlContextDestroyed();
-  mImpl->programController.GlContextDestroyed();
-
-  //Inform textures
-  for(auto&& texture : mImpl->textureContainer)
-  {
-    texture->Destroy();
-  }
-
-  //Inform framebuffers
-  for(auto&& framebuffer : mImpl->frameBufferContainer)
-  {
-    framebuffer->Destroy();
-  }
-
-  // inform context
-  for(auto&& context : mImpl->sceneContextContainer)
-  {
-    context->GlContextDestroyed();
-  }
 }
 
 void RenderManager::SetShaderSaver(ShaderSaver& upstream)
@@ -341,14 +275,12 @@ void RenderManager::RemoveFrameBuffer(Render::FrameBuffer* frameBuffer)
 
 void RenderManager::InitializeScene(SceneGraph::Scene* scene)
 {
-  scene->Initialize(*mImpl->CreateSceneContext(), mImpl->graphicsController, mImpl->depthBufferAvailable, mImpl->stencilBufferAvailable);
+  scene->Initialize(mImpl->graphicsController, mImpl->depthBufferAvailable, mImpl->stencilBufferAvailable);
   mImpl->sceneContainer.push_back(scene);
 }
 
 void RenderManager::UninitializeScene(SceneGraph::Scene* scene)
 {
-  mImpl->DestroySceneContext(scene->GetContext());
-
   auto iter = std::find(mImpl->sceneContainer.begin(), mImpl->sceneContainer.end(), scene);
   if(iter != mImpl->sceneContainer.end())
   {
@@ -358,8 +290,7 @@ void RenderManager::UninitializeScene(SceneGraph::Scene* scene)
 
 void RenderManager::SurfaceReplaced(SceneGraph::Scene* scene)
 {
-  Context* newContext = mImpl->ReplaceSceneContext(scene->GetContext());
-  scene->Initialize(*newContext, mImpl->graphicsController, mImpl->depthBufferAvailable, mImpl->stencilBufferAvailable);
+  scene->Initialize(mImpl->graphicsController, mImpl->depthBufferAvailable, mImpl->stencilBufferAvailable);
 }
 
 void RenderManager::AttachColorTextureToFrameBuffer(Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel, uint32_t layer)
@@ -466,9 +397,6 @@ void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear
 {
   DALI_PRINT_RENDER_START(mImpl->renderBufferIndex);
 
-  // Core::Render documents that GL context must be current before calling Render
-  DALI_ASSERT_DEBUG(mImpl->context.IsGlContextCreated());
-
   // Increment the frame count at the beginning of each frame
   ++mImpl->frameCount;
 
@@ -489,15 +417,6 @@ void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear
   if(haveInstructions || mImpl->lastFrameWasRendered || forceClear)
   {
     DALI_LOG_INFO(gLogFilter, Debug::General, "Render: Processing\n");
-
-    // Switch to the shared context
-    if(mImpl->currentContext != &mImpl->context)
-    {
-      mImpl->currentContext = &mImpl->context;
-
-      // Clear the current cached program when the context is switched
-      mImpl->programController.ClearCurrentProgram();
-    }
 
     // Upload the geometries
     for(uint32_t i = 0; i < mImpl->sceneContainer.size(); ++i)
@@ -856,30 +775,9 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       // offscreen buffer
       currentRenderTarget = instruction.mFrameBuffer->GetGraphicsRenderTarget();
       currentRenderPass   = instruction.mFrameBuffer->GetGraphicsRenderPass(loadOp, Graphics::AttachmentStoreOp::STORE);
-
-      if(mImpl->currentContext != &mImpl->context)
-      {
-        // Switch to shared context for off-screen buffer
-        mImpl->currentContext = &mImpl->context;
-
-        // Clear the current cached program when the context is switched
-        mImpl->programController.ClearCurrentProgram();
-      }
     }
     else // no framebuffer
     {
-      if(mImpl->currentContext->IsSurfacelessContextSupported())
-      {
-        if(mImpl->currentContext != sceneObject->GetContext())
-        {
-          // Switch the correct context if rendering to a surface
-          mImpl->currentContext = sceneObject->GetContext();
-
-          // Clear the current cached program when the context is switched
-          mImpl->programController.ClearCurrentProgram();
-        }
-      }
-
       // surface
       auto& clearValues = sceneObject->GetGraphicsRenderPassClearValues();
 
@@ -912,9 +810,6 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     }
 
     targetstoPresent.emplace_back(currentRenderTarget);
-
-    // Make sure that GL context must be created
-    mImpl->currentContext->GlContextCreated();
 
     // reset the program matrices for all programs once per frame
     // this ensures we will set view and projection matrix once per program per camera
@@ -960,7 +855,8 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     }
 
     // Set surface orientation
-    mImpl->currentContext->SetSurfaceOrientation(surfaceOrientation);
+    // @todo Inform graphics impl by another route.
+    // was: mImpl->currentContext->SetSurfaceOrientation(surfaceOrientation);
 
     /*** Clear region of framebuffer or surface before drawing ***/
 
@@ -1022,55 +918,53 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       clippingRect,
       surfaceOrientation);
 
-    // Synchronise the FBO/Texture access when there are multiple contexts
-    if(mImpl->currentContext->IsSurfacelessContextSupported())
+    // Synchronise the FBO/Texture access
+
+    // Check whether any bound texture is in the dependency list
+    bool textureFound = false;
+
+    if(mImpl->boundTextures.Count() > 0u && mImpl->textureDependencyList.Count() > 0u)
     {
-      // Check whether any bound texture is in the dependency list
-      bool textureFound = false;
-
-      if(mImpl->boundTextures.Count() > 0u && mImpl->textureDependencyList.Count() > 0u)
+      for(auto texture : mImpl->textureDependencyList)
       {
-        for(auto texture : mImpl->textureDependencyList)
-        {
-          textureFound = std::find_if(mImpl->boundTextures.Begin(), mImpl->boundTextures.End(), [texture](Graphics::Texture* graphicsTexture) {
-                           return texture == graphicsTexture;
-                         }) != mImpl->boundTextures.End();
-        }
+        textureFound = std::find_if(mImpl->boundTextures.Begin(), mImpl->boundTextures.End(), [texture](Graphics::Texture* graphicsTexture) {
+                         return texture == graphicsTexture;
+                       }) != mImpl->boundTextures.End();
       }
+    }
 
-      if(textureFound)
+    if(textureFound)
+    {
+      if(instruction.mFrameBuffer)
       {
-        if(instruction.mFrameBuffer)
+        // For off-screen buffer
+
+        // Clear the dependency list
+        mImpl->textureDependencyList.Clear();
+      }
+      else
+      {
+        // Worker thread lambda function
+        auto& glContextHelperAbstraction = mImpl->graphicsController.GetGlContextHelperAbstraction();
+        auto  workerFunction             = [&glContextHelperAbstraction](int workerThread) {
+          // Switch to the shared context in the worker thread
+          glContextHelperAbstraction.MakeSurfacelessContextCurrent();
+
+          // Wait until all rendering calls for the shared context are executed
+          glContextHelperAbstraction.WaitClient();
+
+          // Must clear the context in the worker thread
+          // Otherwise the shared context cannot be switched to from the render thread
+          glContextHelperAbstraction.MakeContextNull();
+        };
+
+        auto future = mImpl->threadPool->SubmitTask(0u, workerFunction);
+        if(future)
         {
-          // For off-screen buffer
+          mImpl->threadPool->Wait();
 
           // Clear the dependency list
           mImpl->textureDependencyList.Clear();
-        }
-        else
-        {
-          // Worker thread lambda function
-          auto& glContextHelperAbstraction = mImpl->graphicsController.GetGlContextHelperAbstraction();
-          auto  workerFunction             = [&glContextHelperAbstraction](int workerThread) {
-            // Switch to the shared context in the worker thread
-            glContextHelperAbstraction.MakeSurfacelessContextCurrent();
-
-            // Wait until all rendering calls for the shared context are executed
-            glContextHelperAbstraction.WaitClient();
-
-            // Must clear the context in the worker thread
-            // Otherwise the shared context cannot be switched to from the render thread
-            glContextHelperAbstraction.MakeContextNull();
-          };
-
-          auto future = mImpl->threadPool->SubmitTask(0u, workerFunction);
-          if(future)
-          {
-            mImpl->threadPool->Wait();
-
-            // Clear the dependency list
-            mImpl->textureDependencyList.Clear();
-          }
         }
       }
     }
@@ -1080,6 +974,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       // This will create a sync object every frame this render tracker
       // is alive (though it should be now be created only for
       // render-once render tasks)
+      // @todo Add syncing to Graphics API
       instruction.mRenderTracker->CreateSyncObject(mImpl->graphicsController.GetGlSyncAbstraction());
       instruction.mRenderTracker = nullptr; // Only create once.
     }
