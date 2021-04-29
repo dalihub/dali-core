@@ -32,7 +32,7 @@ namespace Internal
 class ShaderSaver;
 
 /**
- * This class is the owner of GL shader programs
+ * This class is the owner of shader programs
  */
 class ProgramController : public ProgramCache
 {
@@ -75,7 +75,7 @@ public:
      * Inline getter for the hash
      * @return the hash
      */
-    inline size_t GetHash() const
+    [[nodiscard]] inline size_t GetHash() const
     {
       return mShaderHash;
     }
@@ -108,12 +108,6 @@ public: // API
    */
   void ResetProgramMatrices();
 
-  /**
-   * Set the destination for compiler shader binaries so they can be saved.
-   * @note Must be called during initialisation.
-   */
-  void SetShaderSaver(ShaderSaver& shaderSaver);
-
 private: // From ProgramCache
   /**
    * @copydoc ProgramCache::GetProgram
@@ -125,42 +119,12 @@ private: // From ProgramCache
    */
   void AddProgram(size_t shaderHash, Program* program) override;
 
-  /**
-   * @copydoc ProgramCache::GetCurrentProgram
-   */
-  Program* GetCurrentProgram() override;
-
-  /**
-   * @copydoc ProgramCache::SetCurrentProgram
-   */
-  void SetCurrentProgram(Program* program) override;
-
-  /**
-   * @copydoc ProgramCache::IsBinarySupported
-   */
-  bool IsBinarySupported() override;
-
-  /**
-   * @copydoc ProgramCache::ProgramBinaryFormat
-   */
-  GLenum ProgramBinaryFormat() override;
-
-  /**
-   * @copydoc ProgramCache::StoreBinary
-   */
-  void StoreBinary(Internal::ShaderDataPtr programData) override;
-
 private: // Data
-  ShaderSaver*          mShaderSaver;
   Graphics::Controller& mGraphicsController;
-  Program*              mCurrentProgram;
 
   using ProgramContainer = OwnerContainer<ProgramPair*>;
   using ProgramIterator  = ProgramContainer::Iterator;
   ProgramContainer mProgramCache;
-
-  GLint mProgramBinaryFormat;
-  GLint mNumberOfProgramBinaryFormats;
 };
 
 } // namespace Internal

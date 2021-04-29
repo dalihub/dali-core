@@ -50,7 +50,7 @@ RenderQueue::~RenderQueue()
     {
       MessageBase* message = reinterpret_cast<MessageBase*>(iter.Get());
 
-      // Call virtual destructor explictly; since delete will not be called after placement new
+      // Call virtual destructor explicitly; since delete will not be called after placement new
       message->~MessageBase();
     }
 
@@ -63,7 +63,7 @@ RenderQueue::~RenderQueue()
     {
       MessageBase* message = reinterpret_cast<MessageBase*>(iter.Get());
 
-      // Call virtual destructor explictly; since delete will not be called after placement new
+      // Call virtual destructor explicitly; since delete will not be called after placement new
       message->~MessageBase();
     }
 

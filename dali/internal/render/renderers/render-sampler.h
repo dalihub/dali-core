@@ -68,9 +68,7 @@ struct Sampler
    */
   const Dali::Graphics::Sampler* GetGraphicsObject();
 
-  void DestroyGraphicsObjects();
-
-  inline Graphics::SamplerAddressMode GetGraphicsSamplerAddressMode(WrapMode mode) const
+  [[nodiscard]] static inline Graphics::SamplerAddressMode GetGraphicsSamplerAddressMode(WrapMode mode)
   {
     switch(mode)
     {
@@ -79,23 +77,20 @@ struct Sampler
       case WrapMode::MIRRORED_REPEAT:
         return Graphics::SamplerAddressMode::MIRRORED_REPEAT;
       case WrapMode::CLAMP_TO_EDGE:
-        return Graphics::SamplerAddressMode::CLAMP_TO_EDGE;
       case WrapMode::DEFAULT:
         return Graphics::SamplerAddressMode::CLAMP_TO_EDGE;
     }
     return {};
   }
 
-  inline Graphics::SamplerMipmapMode GetGraphicsSamplerMipmapMode(FilterMode mode) const
+  [[nodiscard]] static inline Graphics::SamplerMipmapMode GetGraphicsSamplerMipmapMode(FilterMode mode)
   {
     switch(mode)
     {
       case FilterMode::LINEAR_MIPMAP_LINEAR:
-        return Graphics::SamplerMipmapMode::LINEAR;
       case FilterMode::NEAREST_MIPMAP_LINEAR:
         return Graphics::SamplerMipmapMode::LINEAR;
       case FilterMode::NEAREST_MIPMAP_NEAREST:
-        return Graphics::SamplerMipmapMode::NEAREST;
       case FilterMode::LINEAR_MIPMAP_NEAREST:
         return Graphics::SamplerMipmapMode::NEAREST;
       default:
@@ -104,7 +99,7 @@ struct Sampler
     return {};
   }
 
-  inline Graphics::SamplerFilter GetGraphicsFilter(FilterMode mode) const
+  [[nodiscard]] static inline Graphics::SamplerFilter GetGraphicsFilter(FilterMode mode)
   {
     switch(mode)
     {
@@ -157,7 +152,7 @@ struct Sampler
   /**
    * Check if the sampler has default values
    */
-  inline bool IsDefaultSampler()
+  [[nodiscard]] inline bool IsDefaultSampler() const
   {
     return (mMagnificationFilter == FilterMode::DEFAULT &&
             mMinificationFilter == FilterMode::DEFAULT &&

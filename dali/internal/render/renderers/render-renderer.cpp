@@ -95,10 +95,6 @@ Dali::Graphics::VertexInputFormat GetPropertyVertexFormat(Property::Type propert
       break;
     }
     case Property::MATRIX3:
-    {
-      type = Dali::Graphics::VertexInputFormat::FLOAT;
-      break;
-    }
     case Property::MATRIX:
     {
       type = Dali::Graphics::VertexInputFormat::FLOAT;
@@ -257,7 +253,7 @@ Renderer::Renderer(SceneGraph::RenderDataProvider* dataProvider,
   mDepthWriteMode(depthWriteMode),
   mDepthTestMode(depthTestMode),
   mUpdateAttributeLocations(true),
-  mPremultipledAlphaEnabled(preMultipliedAlphaEnabled),
+  mPremultipliedAlphaEnabled(preMultipliedAlphaEnabled),
   mShaderChanged(false),
   mUpdated(true)
 {
@@ -317,7 +313,7 @@ void Renderer::BindTextures(Graphics::CommandBuffer& commandBuffer, Vector<Graph
     }
   }
 
-  if(textureBindings.size() > 0)
+  if(!textureBindings.empty())
   {
     commandBuffer.BindTextures(textureBindings);
   }
@@ -355,8 +351,8 @@ void Renderer::SetIndexedDrawElementsCount(uint32_t elementsCount)
 
 void Renderer::EnablePreMultipliedAlpha(bool enable)
 {
-  mPremultipledAlphaEnabled = enable;
-  mUpdated                  = true;
+  mPremultipliedAlphaEnabled = enable;
+  mUpdated                   = true;
 }
 
 void Renderer::SetDepthWriteMode(DepthWriteMode::Type depthWriteMode)
@@ -523,7 +519,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
   // Set blending mode
   if(!mDrawCommands.empty())
   {
-    blend = (commands[0]->queue == DevelRenderer::RENDER_QUEUE_OPAQUE ? false : blend);
+    blend = (commands[0]->queue != DevelRenderer::RENDER_QUEUE_OPAQUE) && blend;
   }
 
   // Create Program
@@ -741,7 +737,7 @@ void Renderer::WriteUniformBuffer(
 
     Vector4        finalColor;
     const Vector4& color = node.GetRenderColor(bufferIndex);
-    if(mPremultipledAlphaEnabled)
+    if(mPremultipliedAlphaEnabled)
     {
       float alpha = color.a * mRenderDataProvider->GetOpacity(bufferIndex);
       finalColor  = Vector4(color.r * alpha, color.g * alpha, color.b * alpha, alpha);
@@ -906,8 +902,7 @@ void Renderer::FillUniformBuffer(Program&                                      p
   offset = dataOffset;
 }
 
-void Renderer::SetSortAttributes(BufferIndex                                             bufferIndex,
-                                 SceneGraph::RenderInstructionProcessor::SortAttributes& sortAttributes) const
+void Renderer::SetSortAttributes(SceneGraph::RenderInstructionProcessor::SortAttributes& sortAttributes) const
 {
   sortAttributes.shader   = &(mRenderDataProvider->GetShader());
   sortAttributes.geometry = mGeometry;
@@ -1006,7 +1001,7 @@ Graphics::Pipeline& Renderer::PrepareGraphicsPipeline(
         mAttributeLocations.PushBack(pLocation);
       }
 
-      uint32_t location = static_cast<uint32_t>(mAttributeLocations[base + i]);
+      auto location = static_cast<uint32_t>(mAttributeLocations[base + i]);
 
       vertexInputState.attributes.emplace_back(location,
                                                bindingIndex,
@@ -1089,7 +1084,7 @@ Graphics::Pipeline& Renderer::PrepareGraphicsPipeline(
 
     Graphics::BlendOp rgbOp   = ConvertBlendEquation(mBlendingOptions.GetBlendEquationRgb());
     Graphics::BlendOp alphaOp = ConvertBlendEquation(mBlendingOptions.GetBlendEquationRgb());
-    if(mBlendingOptions.IsAdvancedBlendEquationApplied() && mPremultipledAlphaEnabled)
+    if(mBlendingOptions.IsAdvancedBlendEquationApplied() && mPremultipliedAlphaEnabled)
     {
       if(rgbOp != alphaOp)
       {
@@ -1107,7 +1102,7 @@ Graphics::Pipeline& Renderer::PrepareGraphicsPipeline(
       .SetAlphaBlendOp(alphaOp);
 
     // Blend color is optional and rarely used
-    Vector4* blendColor = const_cast<Vector4*>(mBlendingOptions.GetBlendColor());
+    auto* blendColor = const_cast<Vector4*>(mBlendingOptions.GetBlendColor());
     if(blendColor)
     {
       colorBlendState.SetBlendConstants(blendColor->AsFloat());
@@ -1123,8 +1118,7 @@ Graphics::Pipeline& Renderer::PrepareGraphicsPipeline(
     .SetVertexInputState(&vertexInputState)
     .SetRasterizationState(&rasterizationState)
     .SetColorBlendState(&colorBlendState)
-    .SetProgramState(&programState)
-    .SetNextExtension(&mLegacyProgram);
+    .SetProgramState(&programState);
 
   // Store a pipeline per renderer per render (renderer can be owned by multiple nodes,
   // and re-drawn in multiple instructions).

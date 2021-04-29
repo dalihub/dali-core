@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <cstring>
-#include <iomanip>
 #include <map>
 
 // INTERNAL INCLUDES
@@ -97,9 +96,7 @@ Program::Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphi
   BuildReflection(controller.GetProgramReflection(*mGfxProgram.get()));
 }
 
-Program::~Program()
-{
-}
+Program::~Program() = default;
 
 void Program::BuildReflection(const Graphics::Reflection& graphicsReflection)
 {
@@ -124,11 +121,11 @@ void Program::BuildReflection(const Graphics::Reflection& graphicsReflection)
       mReflection.back().uniformInfo.bufferIndex = i;
 
       // Update default uniforms
-      for(auto i = 0u; i < NUMBER_OF_DEFAULT_UNIFORMS; ++i)
+      for(auto j = 0u; j < NUMBER_OF_DEFAULT_UNIFORMS; ++j)
       {
-        if(hashValue == DEFAULT_UNIFORM_HASHTABLE[i])
+        if(hashValue == DEFAULT_UNIFORM_HASHTABLE[j])
         {
-          mReflectionDefaultUniforms[i] = mReflection.back();
+          mReflectionDefaultUniforms[j] = mReflection.back();
           break;
         }
       }

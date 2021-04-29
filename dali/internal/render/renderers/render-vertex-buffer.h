@@ -81,12 +81,6 @@ public:
   void SetData(Dali::Vector<uint8_t>* data, uint32_t size);
 
   /**
-   * @brief Set the number of elements
-   * @param[in] size The number of elements
-   */
-  void SetSize(uint32_t size);
-
-  /**
    * Perform the upload of the buffer only when required
    * @param[in] graphicsController The controller
    */
@@ -96,7 +90,7 @@ public:
    * Get the number of attributes present in the buffer
    * @return The number of attributes stored in this buffer
    */
-  inline uint32_t GetAttributeCount() const
+  [[nodiscard]] inline uint32_t GetAttributeCount() const
   {
     DALI_ASSERT_DEBUG(mFormat && "Format should be set ");
     return static_cast<uint32_t>(mFormat->components.size());
@@ -107,7 +101,7 @@ public:
    * @param[in] index The index of the attribute
    * @return The name of the attribute
    */
-  inline ConstString GetAttributeName(uint32_t index) const
+  [[nodiscard]] inline ConstString GetAttributeName(uint32_t index) const
   {
     DALI_ASSERT_DEBUG(mFormat && "Format should be set ");
     return mFormat->components[index].name;
@@ -117,7 +111,7 @@ public:
    * Retrieve the size of the buffer in bytes
    * @return The total size of the buffer
    */
-  inline uint32_t GetDataSize() const
+  [[nodiscard]] inline uint32_t GetDataSize() const
   {
     DALI_ASSERT_DEBUG(mFormat && "Format should be set ");
     return mFormat->size * mSize;
@@ -127,7 +121,7 @@ public:
    * Retrieve the size of one element of the buffer
    * @return The size of one element
    */
-  inline uint32_t GetElementSize() const
+  [[nodiscard]] inline uint32_t GetElementSize() const
   {
     DALI_ASSERT_DEBUG(mFormat && "Format should be set ");
     return mFormat->size;
@@ -137,38 +131,17 @@ public:
    * Retrieve the number of elements in the buffer
    * @return The total number of elements
    */
-  inline uint32_t GetElementCount() const
+  [[nodiscard]] inline uint32_t GetElementCount() const
   {
     return mSize;
   }
 
-  /**
-   * Retrieve reference to the data storage vector
-   * @return Reference to the data storage
-   */
-  inline const Dali::Vector<uint8_t>& GetData() const
-  {
-    return *mData.Get();
-  }
-
-  /**
-   * Retrieve data writeable pointer ( direct access to the buffer data )
-   * @return Pointer to data converted to requested type
-   */
-  template<typename T>
-  inline T* GetDataTypedPtr()
-  {
-    Dali::Vector<uint8_t>* data = mData.Release();
-    mData                       = data;
-    return reinterpret_cast<T*>(&data->operator[](0));
-  }
-
-  inline const VertexBuffer::Format* GetFormat() const
+  [[nodiscard]] inline const VertexBuffer::Format* GetFormat() const
   {
     return mFormat.Get();
   }
 
-  inline const GpuBuffer* GetGpuBuffer() const
+  [[nodiscard]] inline const GpuBuffer* GetGpuBuffer() const
   {
     return mGpuBuffer.Get();
   }

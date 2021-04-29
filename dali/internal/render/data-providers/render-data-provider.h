@@ -58,7 +58,7 @@ public:
    * The RendererAttachment that creates this object will initialize the members
    * directly.
    */
-  RenderDataProvider(AnimatableProperty<float>& opacity);
+  explicit RenderDataProvider(AnimatableProperty<float>& opacity);
 
   /**
    * Destructor
@@ -75,7 +75,7 @@ public:
   /**
    * Get the uniform map data provider
    */
-  const UniformMapDataProvider& GetUniformMap() const;
+  [[nodiscard]] const UniformMapDataProvider& GetUniformMap() const;
 
   /**
    * Set the shader data provider
@@ -87,7 +87,7 @@ public:
    * Returns the shader
    * @return The shader
    */
-  Shader& GetShader() const;
+  [[nodiscard]] Shader& GetShader() const;
 
   /**
    * Returns the list of samplers

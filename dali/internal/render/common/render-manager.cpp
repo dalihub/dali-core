@@ -94,7 +94,7 @@ struct RenderManager::Impl
 
   void AddRenderTracker(Render::RenderTracker* renderTracker)
   {
-    DALI_ASSERT_DEBUG(renderTracker != NULL);
+    DALI_ASSERT_DEBUG(renderTracker != nullptr);
     mRenderTrackers.PushBack(renderTracker);
   }
 
@@ -152,8 +152,8 @@ RenderManager* RenderManager::New(Graphics::Controller&               graphicsCo
                                   Integration::StencilBufferAvailable stencilBufferAvailable,
                                   Integration::PartialUpdateAvailable partialUpdateAvailable)
 {
-  RenderManager* manager = new RenderManager;
-  manager->mImpl         = new Impl(graphicsController,
+  auto* manager  = new RenderManager;
+  manager->mImpl = new Impl(graphicsController,
                             depthBufferAvailable,
                             stencilBufferAvailable,
                             partialUpdateAvailable);
@@ -177,7 +177,6 @@ RenderQueue& RenderManager::GetRenderQueue()
 
 void RenderManager::SetShaderSaver(ShaderSaver& upstream)
 {
-  mImpl->programController.SetShaderSaver(upstream);
 }
 
 void RenderManager::AddRenderer(OwnerPointer<Render::Renderer>& renderer)
@@ -258,7 +257,7 @@ void RenderManager::AddFrameBuffer(OwnerPointer<Render::FrameBuffer>& frameBuffe
 
 void RenderManager::RemoveFrameBuffer(Render::FrameBuffer* frameBuffer)
 {
-  DALI_ASSERT_DEBUG(NULL != frameBuffer);
+  DALI_ASSERT_DEBUG(nullptr != frameBuffer);
 
   // Find the sampler, use reference so we can safely do the erase
   for(auto&& iter : mImpl->frameBufferContainer)
@@ -345,7 +344,7 @@ void RenderManager::RemoveGeometry(Render::Geometry* geometry)
 
 void RenderManager::AttachVertexBuffer(Render::Geometry* geometry, Render::VertexBuffer* vertexBuffer)
 {
-  DALI_ASSERT_DEBUG(NULL != geometry);
+  DALI_ASSERT_DEBUG(nullptr != geometry);
 
   // Find the geometry
   for(auto&& iter : mImpl->geometryContainer)
@@ -360,7 +359,7 @@ void RenderManager::AttachVertexBuffer(Render::Geometry* geometry, Render::Verte
 
 void RenderManager::RemoveVertexBuffer(Render::Geometry* geometry, Render::VertexBuffer* vertexBuffer)
 {
-  DALI_ASSERT_DEBUG(NULL != geometry);
+  DALI_ASSERT_DEBUG(nullptr != geometry);
 
   // Find the geometry
   for(auto&& iter : mImpl->geometryContainer)
@@ -388,11 +387,6 @@ void RenderManager::RemoveRenderTracker(Render::RenderTracker* renderTracker)
   mImpl->RemoveRenderTracker(renderTracker);
 }
 
-ProgramCache* RenderManager::GetProgramCache()
-{
-  return &(mImpl->programController);
-}
-
 void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear, bool uploadOnly)
 {
   DALI_PRINT_RENDER_START(mImpl->renderBufferIndex);
@@ -404,9 +398,9 @@ void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear
   mImpl->renderQueue.ProcessMessages(mImpl->renderBufferIndex);
 
   uint32_t count = 0u;
-  for(uint32_t i = 0; i < mImpl->sceneContainer.size(); ++i)
+  for(auto& i : mImpl->sceneContainer)
   {
-    count += mImpl->sceneContainer[i]->GetRenderInstructions().Count(mImpl->renderBufferIndex);
+    count += i->GetRenderInstructions().Count(mImpl->renderBufferIndex);
   }
 
   const bool haveInstructions = count > 0u;
@@ -419,9 +413,9 @@ void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear
     DALI_LOG_INFO(gLogFilter, Debug::General, "Render: Processing\n");
 
     // Upload the geometries
-    for(uint32_t i = 0; i < mImpl->sceneContainer.size(); ++i)
+    for(auto& i : mImpl->sceneContainer)
     {
-      RenderInstructionContainer& instructions = mImpl->sceneContainer[i]->GetRenderInstructions();
+      RenderInstructionContainer& instructions = i->GetRenderInstructions();
       for(uint32_t j = 0; j < instructions.Count(mImpl->renderBufferIndex); ++j)
       {
         RenderInstruction& instruction = instructions.At(mImpl->renderBufferIndex, j);
@@ -479,7 +473,7 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
   class DamagedRectsCleaner
   {
   public:
-    DamagedRectsCleaner(std::vector<Rect<int>>& damagedRects)
+    explicit DamagedRectsCleaner(std::vector<Rect<int>>& damagedRects)
     : mDamagedRects(damagedRects),
       mCleanOnReturn(true)
     {
@@ -516,8 +510,8 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
     dirtyRect.visited = false;
   }
 
-  uint32_t count = sceneObject->GetRenderInstructions().Count(mImpl->renderBufferIndex);
-  for(uint32_t i = 0; i < count; ++i)
+  uint32_t instructionCount = sceneObject->GetRenderInstructions().Count(mImpl->renderBufferIndex);
+  for(uint32_t i = 0; i < instructionCount; ++i)
   {
     RenderInstruction& instruction = sceneObject->GetRenderInstructions().At(mImpl->renderBufferIndex, i);
 
@@ -581,10 +575,10 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
         const RenderList* renderList = instruction.GetRenderList(index);
         if(renderList && !renderList->IsEmpty())
         {
-          const std::size_t count = renderList->Count();
-          for(uint32_t index = 0u; index < count; ++index)
+          const std::size_t listCount = renderList->Count();
+          for(uint32_t listIndex = 0u; listIndex < listCount; ++listIndex)
           {
-            RenderItem& item = renderList->GetItem(index);
+            RenderItem& item = renderList->GetItem(listIndex);
             // If the item does 3D transformation, do early exit and clean the damaged rect array
             if(item.mUpdateSize == Vector3::ZERO)
             {
@@ -720,16 +714,6 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     status.SetNeedsPostRender(true);
 
     Rect<int32_t> viewportRect;
-    Vector4       clearColor;
-
-    if(instruction.mIsClearColorSet)
-    {
-      clearColor = instruction.mClearColor;
-    }
-    else
-    {
-      clearColor = Dali::RenderTask::DEFAULT_CLEAR_COLOR;
-    }
 
     Rect<int32_t> surfaceRect        = sceneObject->GetSurfaceRect();
     int32_t       surfaceOrientation = sceneObject->GetSurfaceOrientation();
@@ -744,7 +728,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
     if(instruction.mFrameBuffer)
     {
-      // Ensure graphics framebuffer is created, bind atachments and create render passes
+      // Ensure graphics framebuffer is created, bind attachments and create render passes
       // Only happens once per framebuffer. If the create fails, e.g. no attachments yet,
       // then don't render to this framebuffer.
       if(!instruction.mFrameBuffer->GetGraphicsObject())
@@ -759,7 +743,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       auto& clearValues = instruction.mFrameBuffer->GetGraphicsRenderPassClearValues();
 
       // Set the clear color for first color attachment
-      if(instruction.mIsClearColorSet && clearValues.size() > 0)
+      if(instruction.mIsClearColorSet && !clearValues.empty())
       {
         clearValues[0].color = {
           instruction.mClearColor.r,
@@ -859,16 +843,11 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     // was: mImpl->currentContext->SetSurfaceOrientation(surfaceOrientation);
 
     /*** Clear region of framebuffer or surface before drawing ***/
-
-    bool clearFullFrameRect = true;
+    bool clearFullFrameRect = (surfaceRect == viewportRect);
     if(instruction.mFrameBuffer != nullptr)
     {
       Viewport frameRect(0, 0, instruction.mFrameBuffer->GetWidth(), instruction.mFrameBuffer->GetHeight());
       clearFullFrameRect = (frameRect == viewportRect);
-    }
-    else
-    {
-      clearFullFrameRect = (surfaceRect == viewportRect);
     }
 
     if(!clippingRect.IsEmpty())
@@ -1008,9 +987,9 @@ void RenderManager::PostRender(bool uploadOnly)
   mImpl->UpdateTrackers();
 
   uint32_t count = 0u;
-  for(uint32_t i = 0; i < mImpl->sceneContainer.size(); ++i)
+  for(auto& scene : mImpl->sceneContainer)
   {
-    count += mImpl->sceneContainer[i]->GetRenderInstructions().Count(mImpl->renderBufferIndex);
+    count += scene->GetRenderInstructions().Count(mImpl->renderBufferIndex);
   }
 
   const bool haveInstructions = count > 0u;

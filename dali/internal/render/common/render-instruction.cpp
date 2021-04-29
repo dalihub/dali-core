@@ -43,9 +43,7 @@ RenderInstruction::RenderInstruction()
   mRenderLists.Reserve(6);
 }
 
-RenderInstruction::~RenderInstruction()
-{ // pointer container releases the renderlists
-}
+RenderInstruction::~RenderInstruction() = default;
 
 RenderList& RenderInstruction::GetNextFreeRenderList(size_t capacityRequired)
 {

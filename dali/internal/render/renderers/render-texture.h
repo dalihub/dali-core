@@ -59,7 +59,7 @@ public:
    * Constructor from native image
    * @param[in] nativeImageInterface The native image
    */
-  Texture(NativeImageInterfacePtr nativeImageInterface);
+  explicit Texture(NativeImageInterfacePtr nativeImageInterface);
 
   /**
    * Destructor
@@ -99,12 +99,6 @@ public:
   void Upload(PixelDataPtr pixelData, const Internal::Texture::UploadParams& params);
 
   /**
-   * Called when the texture is about to be used for drawing.
-   * Allows native textures to be set up appropriately.
-   */
-  void Prepare();
-
-  /**
    * Auto generates mipmaps for the texture
    */
   void GenerateMipmaps();
@@ -113,18 +107,18 @@ public:
    * Retrieve whether the texture has an alpha channel
    * @return True if the texture has alpha channel, false otherwise
    */
-  bool HasAlphaChannel() const;
+  [[nodiscard]] bool HasAlphaChannel() const;
 
   /**
    * Get the graphics object associated with this texture
    */
-  Graphics::Texture* GetGraphicsObject() const;
+  [[nodiscard]] Graphics::Texture* GetGraphicsObject() const;
 
   /**
    * Get the type of the texture
    * @return Type of the texture
    */
-  Type GetType() const
+  [[nodiscard]] Type GetType() const
   {
     return mType;
   }
@@ -133,7 +127,7 @@ public:
    * Check if the texture is a native image
    * @return if the texture is a native image
    */
-  bool IsNativeImage() const
+  [[nodiscard]] bool IsNativeImage() const
   {
     return mNativeImage;
   }

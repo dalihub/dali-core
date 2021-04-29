@@ -439,7 +439,7 @@ inline void RenderAlgorithms::SetupScissorClipping(
 
     // The scissor test is enabled if we have any children on the stack, OR, if there are none but it is a user specified layer scissor box.
     // IE. It is not enabled if we are at the top of the stack and the layer does not have a specified clipping box.
-    const bool scissorEnabled = (mScissorStack.size() > 0u) || mHasLayerScissor;
+    const bool scissorEnabled = (!mScissorStack.empty()) || mHasLayerScissor;
 
     // Enable the scissor test based on the above calculation
     if(scissorEnabled)
@@ -751,7 +751,7 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
         }
       }
     }
-    if(buffers.size() > 0)
+    if(!buffers.empty())
     {
       mGraphicsCommandBuffer->ExecuteCommandBuffers(std::move(buffers));
     }

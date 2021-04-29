@@ -62,11 +62,6 @@ void RenderInstructionContainer::PushBack(BufferIndex bufferIndex, RenderInstruc
   mInstructions.push_back(renderInstruction);
 }
 
-void RenderInstructionContainer::DiscardCurrentInstruction(BufferIndex updateBufferIndex)
-{
-  mInstructions.pop_back();
-}
-
 } // namespace SceneGraph
 
 } // namespace Internal

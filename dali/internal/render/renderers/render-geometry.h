@@ -77,7 +77,7 @@ public:
    * Get the vertex buffers
    * @return the list of vertex buffers
    */
-  const Vector<Render::VertexBuffer*>& GetVertexBuffers() const;
+  [[nodiscard]] const Vector<Render::VertexBuffer*>& GetVertexBuffers() const;
 
   /**
    * Called from RenderManager to notify the geometry that current rendering pass has finished.
@@ -88,7 +88,7 @@ public:
    * Check if the attributes for the geometry have changed
    * @return True if vertex buffers have been added or removed since last frame, false otherwise
    */
-  bool AttributesChanged() const
+  [[nodiscard]] bool AttributesChanged() const
   {
     return mAttributesChanged;
   }
@@ -105,7 +105,7 @@ public:
   /**
    * @return the topology of this geometry
    */
-  Graphics::PrimitiveTopology GetTopology() const;
+  [[nodiscard]] Graphics::PrimitiveTopology GetTopology() const;
 
   /**
    * Upload the geometry if it has changed

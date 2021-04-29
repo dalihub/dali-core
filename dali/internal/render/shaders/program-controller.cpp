@@ -28,13 +28,8 @@ namespace Dali
 namespace Internal
 {
 ProgramController::ProgramController(Graphics::Controller& graphicsController)
-: mShaderSaver(nullptr),
-  mGraphicsController(graphicsController),
-  mCurrentProgram(nullptr),
-  mProgramBinaryFormat(0),
-  mNumberOfProgramBinaryFormats(0)
+: mGraphicsController(graphicsController)
 {
-  // we have 17 default programs so make room for those and a few custom ones as well
   mProgramCache.Reserve(32);
 }
 
@@ -69,45 +64,9 @@ Program* ProgramController::GetProgram(size_t shaderHash)
 
 void ProgramController::AddProgram(size_t shaderHash, Program* program)
 {
-  // we expect unique hash values so its event thread sides job to guarantee that
+  // we expect unique hash values so it is event thread side's job to guarantee that
   // AddProgram is only called after program checks that GetProgram returns NULL
   mProgramCache.PushBack(new ProgramPair(program, shaderHash));
-}
-
-Program* ProgramController::GetCurrentProgram()
-{
-  return mCurrentProgram;
-}
-
-void ProgramController::SetCurrentProgram(Program* program)
-{
-  mCurrentProgram = program;
-}
-
-bool ProgramController::IsBinarySupported()
-{
-  return mNumberOfProgramBinaryFormats > 0;
-}
-
-GLenum ProgramController::ProgramBinaryFormat()
-{
-  return mProgramBinaryFormat;
-}
-
-void ProgramController::StoreBinary(Internal::ShaderDataPtr programData)
-{
-  DALI_ASSERT_DEBUG(programData->GetBufferSize() > 0);
-  DALI_ASSERT_DEBUG(mShaderSaver && "SetShaderSaver() should have been called during startup.");
-
-  if(mShaderSaver != nullptr)
-  {
-    mShaderSaver->SaveBinary(programData);
-  }
-}
-
-void ProgramController::SetShaderSaver(ShaderSaver& shaderSaver)
-{
-  mShaderSaver = &shaderSaver;
 }
 
 } // namespace Internal

@@ -73,6 +73,12 @@ public:
     delete mClippingBox;
   }
 
+  /*
+   * Copy constructor and assignment operator not defined
+   */
+  RenderList(const RenderList& rhs) = delete;
+  const RenderList& operator=(const RenderList& rhs) = delete;
+
   /**
    * Reset the render list for next frame
    */
@@ -182,7 +188,6 @@ public:
     {
       delete mClippingBox;
       mClippingBox = new ClippingBox(box);
-      ;
     }
   }
 
@@ -272,12 +277,6 @@ public:
   }
 
 private:
-  /*
-   * Copy constructor and assignment operator not defined
-   */
-  RenderList(const RenderList& rhs);
-  const RenderList& operator=(const RenderList& rhs);
-
   RenderItemContainer mItems;    ///< Each item is a renderer and matrix pair
   uint32_t            mNextFree; ///< index for the next free item to use
 

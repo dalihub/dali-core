@@ -59,33 +59,6 @@ public: // API
    */
   virtual void AddProgram(size_t shaderHash, Program* program) = 0;
 
-  /**
-   * Get currently bound program
-   * @return program that is currently used
-   */
-  virtual Program* GetCurrentProgram() = 0;
-
-  /**
-   * Set the currently bound program
-   * @param program that is used
-   */
-  virtual void SetCurrentProgram(Program* program) = 0;
-
-  /**
-   * @return true if program binaries are supported
-   */
-  virtual bool IsBinarySupported() = 0;
-
-  /**
-   * @return the binary format to use
-   */
-  virtual GLenum ProgramBinaryFormat() = 0;
-
-  /**
-   * @param programData to store/save
-   */
-  virtual void StoreBinary(Internal::ShaderDataPtr programData) = 0;
-
   ProgramCache(const ProgramCache& rhs) = delete;
   ProgramCache& operator=(const ProgramCache& rhs) = delete;
 };

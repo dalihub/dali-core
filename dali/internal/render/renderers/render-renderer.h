@@ -48,8 +48,7 @@ namespace SceneGraph
 class SceneController;
 class Shader;
 class NodeDataProvider;
-
-class RenderInstruction; //for relfection effect
+class RenderInstruction; //for reflection effect
 } // namespace SceneGraph
 
 namespace Render
@@ -152,7 +151,7 @@ public:
    * @brief Returns a reference to an array of draw commands
    * @return Valid array of draw commands (may be empty)
    */
-  const std::vector<Dali::DevelRenderer::DrawCommand>& GetDrawCommands() const
+  [[nodiscard]] const std::vector<Dali::DevelRenderer::DrawCommand>& GetDrawCommands() const
   {
     return mDrawCommands;
   }
@@ -222,7 +221,7 @@ public:
    * Query the Renderer's depth write mode
    * @return The renderer depth write mode
    */
-  DepthWriteMode::Type GetDepthWriteMode() const;
+  [[nodiscard]] DepthWriteMode::Type GetDepthWriteMode() const;
 
   /**
    * Sets the depth test mode
@@ -234,7 +233,7 @@ public:
    * Query the Renderer's depth test mode
    * @return The renderer depth test mode
    */
-  DepthTestMode::Type GetDepthTestMode() const;
+  [[nodiscard]] DepthTestMode::Type GetDepthTestMode() const;
 
   /**
    * Sets the depth function
@@ -246,7 +245,7 @@ public:
    * Query the Renderer's depth function
    * @return The renderer depth function
    */
-  DepthFunction::Type GetDepthFunction() const;
+  [[nodiscard]] DepthFunction::Type GetDepthFunction() const;
 
   /**
    * Sets the render mode
@@ -258,7 +257,7 @@ public:
    * Gets the render mode
    * @return The render mode
    */
-  RenderMode::Type GetRenderMode() const;
+  [[nodiscard]] RenderMode::Type GetRenderMode() const;
 
   /**
    * Sets the stencil function
@@ -270,7 +269,7 @@ public:
    * Gets the stencil function
    * @return The stencil function
    */
-  StencilFunction::Type GetStencilFunction() const;
+  [[nodiscard]] StencilFunction::Type GetStencilFunction() const;
 
   /**
    * Sets the stencil function mask
@@ -282,7 +281,7 @@ public:
    * Gets the stencil function mask
    * @return The stencil function mask
    */
-  int GetStencilFunctionMask() const;
+  [[nodiscard]] int GetStencilFunctionMask() const;
 
   /**
    * Sets the stencil function reference
@@ -294,7 +293,7 @@ public:
    * Gets the stencil function reference
    * @return The stencil function reference
    */
-  int GetStencilFunctionReference() const;
+  [[nodiscard]] int GetStencilFunctionReference() const;
 
   /**
    * Sets the stencil mask
@@ -306,7 +305,7 @@ public:
    * Gets the stencil mask
    * @return The stencil mask
    */
-  int GetStencilMask() const;
+  [[nodiscard]] int GetStencilMask() const;
 
   /**
    * Sets the stencil operation for when the stencil test fails
@@ -318,7 +317,7 @@ public:
    * Gets the stencil operation for when the stencil test fails
    * @return The stencil operation
    */
-  StencilOperation::Type GetStencilOperationOnFail() const;
+  [[nodiscard]] StencilOperation::Type GetStencilOperationOnFail() const;
 
   /**
    * Sets the stencil operation for when the depth test fails
@@ -330,7 +329,7 @@ public:
    * Gets the stencil operation for when the depth test fails
    * @return The stencil operation
    */
-  StencilOperation::Type GetStencilOperationOnZFail() const;
+  [[nodiscard]] StencilOperation::Type GetStencilOperationOnZFail() const;
 
   /**
    * Sets the stencil operation for when the depth test passes
@@ -342,7 +341,7 @@ public:
    * Gets the stencil operation for when the depth test passes
    * @return The stencil operation
    */
-  StencilOperation::Type GetStencilOperationOnZPass() const;
+  [[nodiscard]] StencilOperation::Type GetStencilOperationOnZPass() const;
 
   /**
    * Called to upload during RenderManager::Render().
@@ -380,10 +379,9 @@ public:
   /**
    * Write the renderer's sort attributes to the passed in reference
    *
-   * @param[in] bufferIndex The current update buffer index.
    * @param[out] sortAttributes
    */
-  void SetSortAttributes(BufferIndex bufferIndex, SceneGraph::RenderInstructionProcessor::SortAttributes& sortAttributes) const;
+  void SetSortAttributes(SceneGraph::RenderInstructionProcessor::SortAttributes& sortAttributes) const;
 
   /**
    * Sets the flag indicating whether shader changed.
@@ -417,19 +415,6 @@ public:
                     const Graphics::UniformInfo&                       uniformInfo,
                     const void*                                        data,
                     uint32_t                                           size);
-
-  /**
-   * Returns the pointer to valid command buffer
-   *
-   * CommandBuffer associated with Renderer contains baked commands
-   * needed to issue draw call for this renderer.
-   *
-   * @return Pointer to valid CommandBuffer
-   */
-  [[nodiscard]] Graphics::CommandBuffer* GetGraphicsCommandBuffer() const
-  {
-    return mGraphicsCommandBuffer.get();
-  }
 
 private:
   struct UniformIndexMap;
@@ -516,15 +501,11 @@ private:
 
   Render::Geometry* mGeometry;
 
-  Graphics::UniquePtr<Graphics::CommandBuffer> mGraphicsCommandBuffer{};
-
   ProgramCache*        mProgramCache{nullptr};
   Render::ShaderCache* mShaderCache{nullptr};
 
   Render::UniformBufferManager*               mUniformBufferManager{};
   std::vector<Graphics::UniformBufferBinding> mUniformBufferBindings{};
-
-  std::vector<Graphics::ShaderState> mShaderStates{};
 
   using Hash = unsigned long;
   struct UniformIndexMap
@@ -559,23 +540,16 @@ private:
   uint32_t mIndexedDrawFirstElement;  ///< Offset of first element to draw
   uint32_t mIndexedDrawElementsCount; ///< Number of elements to draw
 
-  DepthFunction::Type   mDepthFunction : 4;            ///< The depth function
-  FaceCullingMode::Type mFaceCullingMode : 3;          ///< The mode of face culling
-  DepthWriteMode::Type  mDepthWriteMode : 3;           ///< The depth write mode
-  DepthTestMode::Type   mDepthTestMode : 3;            ///< The depth test mode
-  bool                  mUpdateAttributeLocations : 1; ///< Indicates attribute locations have changed
-  bool                  mPremultipledAlphaEnabled : 1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
-  bool                  mShaderChanged : 1;            ///< Flag indicating the shader changed and uniform maps have to be updated
+  DepthFunction::Type   mDepthFunction : 4;             ///< The depth function
+  FaceCullingMode::Type mFaceCullingMode : 3;           ///< The mode of face culling
+  DepthWriteMode::Type  mDepthWriteMode : 3;            ///< The depth write mode
+  DepthTestMode::Type   mDepthTestMode : 3;             ///< The depth test mode
+  bool                  mUpdateAttributeLocations : 1;  ///< Indicates attribute locations have changed
+  bool                  mPremultipliedAlphaEnabled : 1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
+  bool                  mShaderChanged : 1;             ///< Flag indicating the shader changed and uniform maps have to be updated
   bool                  mUpdated : 1;
 
   std::vector<Dali::DevelRenderer::DrawCommand> mDrawCommands; // Devel stuff
-
-  struct LegacyProgram : Graphics::ExtensionCreateInfo
-  {
-    uint32_t programId{0};
-  };
-
-  LegacyProgram mLegacyProgram; ///< The structure to pass the program ID into Graphics::PipelineCreateInfo
 
   Graphics::UniquePtr<Render::UniformBuffer> mUniformBuffer[2]{nullptr, nullptr}; ///< The double-buffered uniform buffer
 };

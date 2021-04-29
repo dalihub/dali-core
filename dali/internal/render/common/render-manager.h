@@ -317,12 +317,6 @@ public:
    */
   void RemoveRenderTracker(Render::RenderTracker* renderTracker);
 
-  /**
-   * returns the Program controller for sending program messages
-   * @return the ProgramController
-   */
-  ProgramCache* GetProgramCache();
-
   // This method should be called from Core::PreRender()
 
   /**

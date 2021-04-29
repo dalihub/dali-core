@@ -46,8 +46,11 @@ public:
    *
    * @param[in] graphicsController The graphics controller
    */
-  RenderAlgorithms(Graphics::Controller& graphicsController);
+  explicit RenderAlgorithms(Graphics::Controller& graphicsController);
 
+  RenderAlgorithms(RenderAlgorithms& rhs) = delete; // Prevent copying
+
+  RenderAlgorithms& operator=(const RenderAlgorithms& rhs) = delete; // Prevent Copying
   /**
    * Process a render-instruction.
    * @param[in] instruction            The render-instruction to process.
@@ -160,10 +163,6 @@ private:
                                 const Rect<int32_t>&                                 viewport,
                                 const Rect<int>&                                     rootClippingRect,
                                 int                                                  orientation);
-
-  // Prevent copying:
-  RenderAlgorithms(RenderAlgorithms& rhs);
-  RenderAlgorithms& operator=(const RenderAlgorithms& rhs);
 
   // Member variables:
 

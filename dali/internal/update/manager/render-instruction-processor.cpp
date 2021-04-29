@@ -376,7 +376,7 @@ inline void RenderInstructionProcessor::SortRenderItems(BufferIndex bufferIndex,
 
       if(item.mRenderer)
       {
-        item.mRenderer->SetSortAttributes(bufferIndex, mSortingHelper[index]);
+        item.mRenderer->SetSortAttributes(mSortingHelper[index]);
       }
 
       // texture set
@@ -396,7 +396,7 @@ inline void RenderInstructionProcessor::SortRenderItems(BufferIndex bufferIndex,
     {
       RenderItem& item = renderList.GetItem(index);
 
-      item.mRenderer->SetSortAttributes(bufferIndex, mSortingHelper[index]);
+      item.mRenderer->SetSortAttributes(mSortingHelper[index]);
 
       // texture set
       mSortingHelper[index].textureSet = item.mTextureSet;
