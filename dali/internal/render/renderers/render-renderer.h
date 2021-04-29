@@ -529,12 +529,11 @@ private:
   using Hash = unsigned long;
   struct UniformIndexMap
   {
-    uint32_t                 uniformIndex;  ///< The index of the cached location in the Program
-    ConstString              uniformName;   ///< The uniform name
-    const PropertyInputImpl* propertyValue; ///< The property value
+    ConstString              uniformName;            ///< The uniform name
+    const PropertyInputImpl* propertyValue{nullptr}; ///< The property value
     Hash                     uniformNameHash{0u};
     Hash                     uniformNameHashNoArray{0u};
-    int32_t                  arrayIndex; ///< The array index
+    int32_t                  arrayIndex{-1}; ///< The array index
   };
 
   using UniformIndexMappings = Dali::Vector<UniformIndexMap>;

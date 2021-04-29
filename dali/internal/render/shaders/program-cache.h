@@ -86,9 +86,8 @@ public: // API
    */
   virtual void StoreBinary(Internal::ShaderDataPtr programData) = 0;
 
-private: // not implemented as non-copyable
-  ProgramCache(const ProgramCache& rhs);
-  ProgramCache& operator=(const ProgramCache& rhs);
+  ProgramCache(const ProgramCache& rhs) = delete;
+  ProgramCache& operator=(const ProgramCache& rhs) = delete;
 };
 
 } // namespace Internal

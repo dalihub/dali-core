@@ -44,21 +44,6 @@ namespace Internal
 // LOCAL STUFF
 namespace
 {
-const char* const gStdUniforms[Program::UNIFORM_TYPE_LAST] =
-  {
-    "uMvpMatrix",    // UNIFORM_MVP_MATRIX
-    "uModelView",    // UNIFORM_MODELVIEW_MATRIX
-    "uProjection",   // UNIFORM_PROJECTION_MATRIX
-    "uModelMatrix",  // UNIFORM_MODEL_MATRIX,
-    "uViewMatrix",   // UNIFORM_VIEW_MATRIX,
-    "uNormalMatrix", // UNIFORM_NORMAL_MATRIX
-    "uColor",        // UNIFORM_COLOR
-    "sTexture",      // UNIFORM_SAMPLER
-    "sTextureRect",  // UNIFORM_SAMPLER_RECT
-    "sEffect",       // UNIFORM_EFFECT_SAMPLER
-    "uSize"          // UNIFORM_SIZE
-};
-
 const unsigned int NUMBER_OF_DEFAULT_UNIFORMS = static_cast<unsigned int>(Program::DefaultUniformIndex::COUNT);
 
 /**
@@ -79,7 +64,7 @@ size_t DEFAULT_UNIFORM_HASHTABLE[NUMBER_OF_DEFAULT_UNIFORMS] =
 
 // IMPLEMENTATION
 
-Program* Program::New(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& gfxController, Graphics::UniquePtr<Graphics::Program>&& gfxProgram, bool modifiesGeometry)
+Program* Program::New(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& gfxController, Graphics::UniquePtr<Graphics::Program>&& gfxProgram)
 {
   uint32_t programId{0u};
 
@@ -94,94 +79,26 @@ Program* Program::New(ProgramCache& cache, Internal::ShaderDataPtr shaderData, G
   if(nullptr == program)
   {
     // program not found so create it
-    program = new Program(cache, shaderData, gfxController, std::move(gfxProgram), modifiesGeometry);
+    program = new Program(cache, shaderData, gfxController, std::move(gfxProgram));
     cache.AddProgram(shaderHash, program);
   }
 
   return program;
 }
 
-uint32_t Program::RegisterUniform(ConstString name)
-{
-  uint32_t index = 0;
-  // find the value from cache
-  for(; index < static_cast<uint32_t>(mUniformLocations.size()); ++index)
-  {
-    if(mUniformLocations[index].first == name)
-    {
-      // name found so return index
-      return index;
-    }
-  }
-  // if we get here, index is one past end so push back the new name
-  mUniformLocations.push_back(std::make_pair(name, UNIFORM_NOT_QUERIED));
-  return index;
-}
-
-bool Program::ModifiesGeometry()
-{
-  return mModifiesGeometry;
-}
-
-Program::Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& controller, Graphics::UniquePtr<Graphics::Program>&& gfxProgram, bool modifiesGeometry)
+Program::Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& controller, Graphics::UniquePtr<Graphics::Program>&& gfxProgram)
 : mCache(cache),
   mProjectionMatrix(nullptr),
   mViewMatrix(nullptr),
-  mProgramId(0),
   mGfxProgram(std::move(gfxProgram)),
   mGfxController(controller),
-  mProgramData(shaderData),
-  mModifiesGeometry(modifiesGeometry)
+  mProgramData(shaderData)
 {
-  // reserve space for standard uniforms
-  mUniformLocations.reserve(UNIFORM_TYPE_LAST);
-
-  // reset built in uniform names in cache
-  for(uint32_t i = 0; i < UNIFORM_TYPE_LAST; ++i)
-  {
-    RegisterUniform(ConstString(gStdUniforms[i]));
-  }
-
-  // reset values
-  ResetUniformCache();
-
-  // Get program id and use it as hash for the cache
-  // in order to maintain current functionality as long as needed
-  mGfxController.GetProgramParameter(*mGfxProgram, 1, &mProgramId);
-
   BuildReflection(controller.GetProgramReflection(*mGfxProgram.get()));
 }
 
 Program::~Program()
 {
-}
-
-void Program::ResetUniformCache()
-{
-  // reset all gl uniform locations
-  for(uint32_t i = 0; i < mUniformLocations.size(); ++i)
-  {
-    // reset gl program locations and names
-    mUniformLocations[i].second = UNIFORM_NOT_QUERIED;
-  }
-
-  mSamplerUniformLocations.clear();
-
-  // reset uniform caches
-  mSizeUniformCache.x = mSizeUniformCache.y = mSizeUniformCache.z = 0.f;
-
-  for(uint32_t i = 0; i < MAX_UNIFORM_CACHE_SIZE; ++i)
-  {
-    // GL initializes uniforms to 0
-    mUniformCacheInt[i]       = 0;
-    mUniformCacheFloat[i]     = 0.0f;
-    mUniformCacheFloat2[i][0] = 0.0f;
-    mUniformCacheFloat2[i][1] = 0.0f;
-    mUniformCacheFloat4[i][0] = 0.0f;
-    mUniformCacheFloat4[i][1] = 0.0f;
-    mUniformCacheFloat4[i][2] = 0.0f;
-    mUniformCacheFloat4[i][3] = 0.0f;
-  }
 }
 
 void Program::BuildReflection(const Graphics::Reflection& graphicsReflection)

@@ -120,7 +120,7 @@ SET( internal_src_files
 
   ${internal_src_dir}/render/shaders/program.cpp
   ${internal_src_dir}/render/shaders/program-controller.cpp
-  ${internal_src_dir}/render/shaders/scene-graph-shader.cpp
+  ${internal_src_dir}/render/shaders/render-shader.cpp
 
   ${internal_src_dir}/update/animation/scene-graph-animation.cpp
   ${internal_src_dir}/update/animation/scene-graph-constraint-base.cpp

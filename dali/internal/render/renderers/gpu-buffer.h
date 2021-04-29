@@ -1,5 +1,5 @@
-#ifndef DALI_INTERNAL_GPU_BUFFER_H
-#define DALI_INTERNAL_GPU_BUFFER_H
+#ifndef DALI_INTERNAL_RENDERERS_GPU_BUFFER_H
+#define DALI_INTERNAL_RENDERERS_GPU_BUFFER_H
 
 /*
  * Copyright (c) 2021 Samsung Electronics Co., Ltd.
@@ -48,7 +48,7 @@ public:
   /**
    * Destructor, non virtual as no virtual methods or inheritance
    */
-  ~GpuBuffer();
+  ~GpuBuffer() = default;
 
   /**
    *
@@ -60,26 +60,21 @@ public:
   void UpdateDataBuffer(Graphics::Controller& graphicsController, uint32_t size, const void* data);
 
   /**
-   * @return true if the GPU buffer is valid, i.e. its created and not empty
-   */
-  bool BufferIsValid() const;
-
-  /**
    * Get the size of the buffer
    * @return size
    */
-  uint32_t GetBufferSize() const
+  [[nodiscard]] uint32_t GetBufferSize() const
   {
     return mSize;
   }
 
-  inline const Graphics::Buffer* GetGraphicsObject() const
+  [[nodiscard]] inline const Graphics::Buffer* GetGraphicsObject() const
   {
     return mGraphicsObject.get();
   }
 
   /**
-   * ???
+   * Destroy the graphics buffer and reset.
    */
   void Destroy();
 
@@ -87,13 +82,10 @@ private:
   Graphics::UniquePtr<Graphics::Buffer> mGraphicsObject;
   uint32_t                              mCapacity{0}; ///< buffer capacity
   uint32_t                              mSize{0};     ///< buffer size
-
-  Graphics::BufferUsageFlags mUsage;
-  bool                       mBufferCreated : 1; ///< whether buffer has been created
+  Graphics::BufferUsageFlags            mUsage;
 };
 
 } // namespace Internal
-
 } // namespace Dali
 
-#endif // DALI_INTERNAL_GPU_BUFFER_H
+#endif // DALI_INTERNAL_RENDERERS_GPU_BUFFER_H

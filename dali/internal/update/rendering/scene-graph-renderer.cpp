@@ -25,7 +25,7 @@
 #include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/renderers/render-geometry.h>
 #include <dali/internal/render/shaders/program.h>
-#include <dali/internal/render/shaders/scene-graph-shader.h>
+#include <dali/internal/render/shaders/render-shader.h>
 #include <dali/internal/update/controllers/render-message-dispatcher.h>
 #include <dali/internal/update/controllers/scene-controller.h>
 #include <dali/internal/update/nodes/node.h>

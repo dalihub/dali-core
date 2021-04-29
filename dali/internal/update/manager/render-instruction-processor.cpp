@@ -26,7 +26,7 @@
 #include <dali/internal/render/common/render-item.h>
 #include <dali/internal/render/common/render-tracker.h>
 #include <dali/internal/render/renderers/render-renderer.h>
-#include <dali/internal/render/shaders/scene-graph-shader.h>
+#include <dali/internal/render/shaders/render-shader.h>
 #include <dali/internal/update/manager/sorted-layers.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>

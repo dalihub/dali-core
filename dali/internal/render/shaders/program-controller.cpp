@@ -110,11 +110,6 @@ void ProgramController::SetShaderSaver(ShaderSaver& shaderSaver)
   mShaderSaver = &shaderSaver;
 }
 
-void ProgramController::ClearCurrentProgram()
-{
-  SetCurrentProgram(nullptr);
-}
-
 } // namespace Internal
 
 } // namespace Dali

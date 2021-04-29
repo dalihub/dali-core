@@ -31,7 +31,7 @@
 #include <dali/internal/render/renderers/render-vertex-buffer.h>
 #include <dali/internal/render/renderers/shader-cache.h>
 #include <dali/internal/render/shaders/program.h>
-#include <dali/internal/render/shaders/scene-graph-shader.h>
+#include <dali/internal/render/shaders/render-shader.h>
 #include <dali/internal/update/common/uniform-map.h>
 
 namespace Dali
@@ -555,8 +555,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
   Program* program         = Program::New(*mProgramCache,
                                   shaderData,
                                   *mGraphicsController,
-                                  std::move(graphicsProgram),
-                                  (shaderData->GetHints() & Dali::Shader::Hint::MODIFIES_GEOMETRY) != 0x0);
+                                  std::move(graphicsProgram));
 
   if(!program)
   {
@@ -612,15 +611,15 @@ void Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::N
     const SceneGraph::CollectedUniformMap& uniformMap     = uniformMapDataProvider.GetUniformMap(bufferIndex);
     const SceneGraph::CollectedUniformMap& uniformMapNode = node.GetUniformMap(bufferIndex);
 
-    uint32_t maxMaps = static_cast<uint32_t>(uniformMap.Count() + uniformMapNode.Count()); // 4,294,967,295 maps should be enough
-    mUniformIndexMap.Clear();                                                              // Clear contents, but keep memory if we don't change size
+    auto maxMaps = static_cast<uint32_t>(uniformMap.Count() + uniformMapNode.Count()); // 4,294,967,295 maps should be enough
+    mUniformIndexMap.Clear();                                                          // Clear contents, but keep memory if we don't change size
     mUniformIndexMap.Resize(maxMaps);
 
+    // Copy uniform map into mUniformIndexMap
     uint32_t mapIndex = 0;
     for(; mapIndex < uniformMap.Count(); ++mapIndex)
     {
       mUniformIndexMap[mapIndex].propertyValue          = uniformMap[mapIndex].propertyPtr;
-      mUniformIndexMap[mapIndex].uniformIndex           = program.RegisterUniform(uniformMap[mapIndex].uniformName);
       mUniformIndexMap[mapIndex].uniformName            = uniformMap[mapIndex].uniformName;
       mUniformIndexMap[mapIndex].uniformNameHash        = uniformMap[mapIndex].uniformNameHash;
       mUniformIndexMap[mapIndex].uniformNameHashNoArray = uniformMap[mapIndex].uniformNameHashNoArray;
@@ -629,11 +628,13 @@ void Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::N
 
     for(uint32_t nodeMapIndex = 0; nodeMapIndex < uniformMapNode.Count(); ++nodeMapIndex)
     {
-      uint32_t uniformIndex = program.RegisterUniform(uniformMapNode[nodeMapIndex].uniformName);
-      bool     found(false);
+      auto  hash = uniformMapNode[nodeMapIndex].uniformNameHash;
+      auto& name = uniformMapNode[nodeMapIndex].uniformName;
+      bool  found(false);
       for(uint32_t i = 0; i < uniformMap.Count(); ++i)
       {
-        if(mUniformIndexMap[i].uniformIndex == uniformIndex)
+        if(mUniformIndexMap[i].uniformNameHash == hash &&
+           mUniformIndexMap[i].uniformName == name)
         {
           mUniformIndexMap[i].propertyValue = uniformMapNode[nodeMapIndex].propertyPtr;
           found                             = true;
@@ -645,7 +646,6 @@ void Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::N
       {
         mUniformIndexMap[mapIndex].propertyValue          = uniformMapNode[nodeMapIndex].propertyPtr;
         mUniformIndexMap[mapIndex].uniformName            = uniformMapNode[nodeMapIndex].uniformName;
-        mUniformIndexMap[mapIndex].uniformIndex           = uniformIndex;
         mUniformIndexMap[mapIndex].uniformNameHash        = uniformMapNode[nodeMapIndex].uniformNameHash;
         mUniformIndexMap[mapIndex].uniformNameHashNoArray = uniformMapNode[nodeMapIndex].uniformNameHashNoArray;
         mUniformIndexMap[mapIndex].arrayIndex             = uniformMapNode[nodeMapIndex].arrayIndex;

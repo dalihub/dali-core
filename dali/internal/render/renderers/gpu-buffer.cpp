@@ -32,12 +32,7 @@ namespace
 } // namespace
 
 GpuBuffer::GpuBuffer(Graphics::Controller& graphicsController, Graphics::BufferUsageFlags usage)
-: mUsage(usage),
-  mBufferCreated(false)
-{
-}
-
-GpuBuffer::~GpuBuffer()
+: mUsage(usage)
 {
 }
 
@@ -54,7 +49,7 @@ void GpuBuffer::UpdateDataBuffer(Graphics::Controller& graphicsController, uint3
     mCapacity       = size;
   }
 
-  Graphics::MapBufferInfo info;
+  Graphics::MapBufferInfo info{};
   info.buffer = mGraphicsObject.get();
   info.usage  = 0 | Graphics::MemoryUsageFlagBits::WRITE;
   info.offset = 0;
@@ -65,11 +60,6 @@ void GpuBuffer::UpdateDataBuffer(Graphics::Controller& graphicsController, uint3
   memcpy(ptr, data, size);
   memory->Unlock(true);
   graphicsController.UnmapMemory(std::move(memory));
-}
-
-bool GpuBuffer::BufferIsValid() const
-{
-  return mGraphicsObject && (0 != mCapacity);
 }
 
 void GpuBuffer::Destroy()

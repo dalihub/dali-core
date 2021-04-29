@@ -1,5 +1,5 @@
-#ifndef DALI_INTERNAL_SCENE_GRAPH_SHADER_H
-#define DALI_INTERNAL_SCENE_GRAPH_SHADER_H
+#ifndef DALI_INTERNAL_RENDER_SHADER_H
+#define DALI_INTERNAL_RENDER_SHADER_H
 
 /*
  * Copyright (c) 2021 Samsung Electronics Co., Ltd.
@@ -33,7 +33,6 @@ class ProgramCache;
 
 namespace SceneGraph
 {
-class ConnectionObserver;
 class SceneController;
 
 /**
@@ -46,51 +45,27 @@ public:
    * Constructor
    * @param hints Shader hints
    */
-  Shader(Dali::Shader::Hint::Value& hints);
+  explicit Shader(Dali::Shader::Hint::Value& hints);
 
   /**
    * Virtual destructor
    */
   ~Shader() override;
 
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // The following methods are called during Update
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
   /**
    * Query whether a shader hint is set.
+   *
+   * @warning This method is called from Update Algorithms.
+   *
    * @pre The shader has been initialized.
    * @param[in] hint The hint to check.
    * @return True if the given hint is set.
    */
-  bool HintEnabled(Dali::Shader::Hint::Value hint) const
+  [[nodiscard]] bool HintEnabled(Dali::Shader::Hint::Value hint) const
   {
     return mHints & hint;
   }
 
-  /**
-   * @return True if the fragment shader outputs only 1.0 on the alpha channel
-   *
-   * @note Shaders that can output any value on the alpha channel
-   * including 1.0 should return false for this.
-   */
-  bool IsOutputOpaque();
-
-  /**
-   * @return True if the fragment shader can output any value but 1.0 on the alpha channel
-   *
-   * @note Shaders that can output any value on the alpha channel
-   * including 1.0 should return false for this
-   */
-  bool IsOutputTransparent();
-
-  /**
-   * @copydoc Dali::Internal::SceneGraph::PropertyOwner::ResetDefaultProperties
-   */
-  virtual void ResetDefaultProperties(BufferIndex updateBufferIndex)
-  {
-    // no default properties
-  }
   /**
    * @brief Set the shader data for this shader.
    * @param[in] shaderData The program's vertex/fragment source and optionally pre-compiled shader binary.
@@ -101,9 +76,9 @@ public:
    * Get the shader data for this shader.
    * @return The shader data.
    */
-  ShaderDataPtr GetShaderData() const;
+  [[nodiscard]] ShaderDataPtr GetShaderData() const;
 
-public: // Implementation of ConnectionChangePropagator
+public:
   /**
    * @copydoc ConnectionChangePropagator::AddObserver
    */
@@ -145,4 +120,4 @@ inline void SetShaderDataMessage(EventThreadServices& eventThreadServices, const
 
 } // namespace Dali
 
-#endif // DALI_INTERNAL_SCENE_GRAPH_SHADER_H
+#endif // DALI_INTERNAL_RENDER_SHADER_H
