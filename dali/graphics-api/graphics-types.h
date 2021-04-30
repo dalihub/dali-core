@@ -925,6 +925,7 @@ struct TextureUpdateInfo
   Extent2D srcExtent2D{};
   uint32_t srcOffset{};
   uint32_t srcSize{};
+  Format   srcFormat{}; ///< Should match dstTexture's format, otherwise conversion may occur
 };
 
 /**
@@ -1307,8 +1308,8 @@ enum class GraphicsStructureType : uint32_t
  */
 enum class AttachmentLoadOp
 {
-  LOAD, ///< Load previous content
-  CLEAR, ///< Clear the attachment
+  LOAD,     ///< Load previous content
+  CLEAR,    ///< Clear the attachment
   DONT_CARE ///< Let driver decide
 };
 
@@ -1318,7 +1319,7 @@ enum class AttachmentLoadOp
  */
 enum class AttachmentStoreOp
 {
-  STORE, ///< Store content (color attachemnts)
+  STORE,    ///< Store content (color attachemnts)
   DONT_CARE ///< Let driver decide (depth/stencil attachemnt with no intention of reading)
 };
 
@@ -1343,7 +1344,7 @@ struct AttachmentDescription
    * @param value Load operation
    * @return this structure
    */
-  auto& SetLoadOp( AttachmentLoadOp value )
+  auto& SetLoadOp(AttachmentLoadOp value)
   {
     loadOp = value;
     return *this;
@@ -1355,7 +1356,7 @@ struct AttachmentDescription
    * @param value Store operation
    * @return this structure
    */
-  auto& SetStoreOp( AttachmentStoreOp value )
+  auto& SetStoreOp(AttachmentStoreOp value)
   {
     storeOp = value;
     return *this;
@@ -1367,7 +1368,7 @@ struct AttachmentDescription
    * @param value load operation
    * @return this structure
    */
-  auto& SetStencilLoadOp( AttachmentLoadOp value )
+  auto& SetStencilLoadOp(AttachmentLoadOp value)
   {
     stencilLoadOp = value;
     return *this;
@@ -1379,15 +1380,15 @@ struct AttachmentDescription
    * @param value store operation
    * @return this structure
    */
-  auto& SetStencilStoreOp( AttachmentStoreOp value )
+  auto& SetStencilStoreOp(AttachmentStoreOp value)
   {
     stencilStoreOp = value;
     return *this;
   }
 
-  AttachmentLoadOp loadOp{};
+  AttachmentLoadOp  loadOp{};
   AttachmentStoreOp storeOp{};
-  AttachmentLoadOp stencilLoadOp{};
+  AttachmentLoadOp  stencilLoadOp{};
   AttachmentStoreOp stencilStoreOp{};
 };
 
@@ -1495,12 +1496,12 @@ using Surface = void;
  */
 enum class RenderTargetTransformFlagBits
 {
-  TRANSFORM_IDENTITY_BIT = 0x00000001,
-  ROTATE_90_BIT = 0x00000002,
-  ROTATE_180_BIT = 0x00000004,
-  ROTATE_270_BIT = 0x00000008,
-  HORIZONTAL_MIRROR_BIT = 0x00000010,
-  HORIZONTAL_MIRROR_ROTATE_90_BIT = 0x00000020,
+  TRANSFORM_IDENTITY_BIT           = 0x00000001,
+  ROTATE_90_BIT                    = 0x00000002,
+  ROTATE_180_BIT                   = 0x00000004,
+  ROTATE_270_BIT                   = 0x00000008,
+  HORIZONTAL_MIRROR_BIT            = 0x00000010,
+  HORIZONTAL_MIRROR_ROTATE_90_BIT  = 0x00000020,
   HORIZONTAL_MIRROR_ROTATE_180_BIT = 0x00000040,
   HORIZONTAL_MIRROR_ROTATE_270_BIT = 0x00000080,
 };

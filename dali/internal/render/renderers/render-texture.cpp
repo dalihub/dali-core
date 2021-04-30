@@ -289,6 +289,7 @@ void Texture::Upload(PixelDataPtr pixelData, const Internal::Texture::UploadPara
   info.srcExtent2D  = {params.width, params.height};
   info.srcOffset    = 0;
   info.srcSize      = pixelData->GetBufferSize();
+  info.srcFormat    = ConvertPixelFormat(pixelData->GetPixelFormat());
 
   Graphics::TextureUpdateSourceInfo updateSourceInfo{};
   updateSourceInfo.sourceType          = Graphics::TextureUpdateSourceInfo::Type::MEMORY;
