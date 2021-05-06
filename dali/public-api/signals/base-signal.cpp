@@ -43,6 +43,12 @@ BaseSignal::~BaseSignal()
   if(mEmittingFlag)
   {
     DALI_LOG_ERROR("Invalid destruction of Signal during Emit()\n");
+
+    // Set the signal deletion flag as well if set
+    if(mSignalDeleted)
+    {
+      *mSignalDeleted = true;
+    }
   }
 
   // The signal is being destroyed. We have to inform any slots
