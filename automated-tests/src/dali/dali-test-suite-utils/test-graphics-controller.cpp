@@ -996,6 +996,15 @@ void TestGraphicsController::UpdateTextures(const std::vector<Graphics::TextureU
   }
 }
 
+void TestGraphicsController::GenerateTextureMipmaps(const Graphics::Texture& texture)
+{
+  mCallStack.PushCall("GenerateTextureMipmaps", "");
+
+  auto gfxTexture = Uncast<TestGraphicsTexture>(&texture);
+  mGl.BindTexture(gfxTexture->GetTarget(), 0);
+  mGl.GenerateMipmap(gfxTexture->GetTarget());
+}
+
 bool TestGraphicsController::EnableDepthStencilBuffer(bool enableDepth, bool enableStencil)
 {
   TraceCallStack::NamedParams namedParams;

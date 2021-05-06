@@ -136,6 +136,12 @@ public:
                               const std::vector<TextureUpdateSourceInfo>& sourceList) = 0;
 
   /**
+   * Auto generates mipmaps for the texture
+   * @param[in] texture The texture
+   */
+  virtual void GenerateTextureMipmaps(const Texture& texture) = 0;
+
+  /**
    * @brief Enables depth/stencil buffer
    *
    * @param[in] enableDepth True to enable depth
@@ -362,7 +368,7 @@ public:
    * @param[out] outData Pointer to output memory
    * @return True on success
    */
-  virtual bool GetProgramParameter(Graphics::Program& program, uint32_t parameterId, void* outData ) = 0;
+  virtual bool GetProgramParameter(Graphics::Program& program, uint32_t parameterId, void* outData) = 0;
 
 protected:
   /**

@@ -206,7 +206,6 @@ Texture::Texture(Type type, Pixel::Format format, ImageDimensions size)
   mPixelFormat(format),
   mWidth(size.GetWidth()),
   mHeight(size.GetHeight()),
-  mMaxMipMapLevel(0),
   mType(type),
   mHasAlpha(HasAlpha(format))
 {
@@ -220,7 +219,6 @@ Texture::Texture(NativeImageInterfacePtr nativeImageInterface)
   mPixelFormat(Pixel::RGBA8888),
   mWidth(static_cast<uint16_t>(nativeImageInterface->GetWidth())),   // ignoring overflow, not happening in practice
   mHeight(static_cast<uint16_t>(nativeImageInterface->GetHeight())), // ignoring overflow, not happening in practice
-  mMaxMipMapLevel(0),
   mType(TextureType::TEXTURE_2D),
   mHasAlpha(nativeImageInterface->RequiresBlending())
 {
@@ -310,9 +308,12 @@ bool Texture::HasAlphaChannel() const
 
 void Texture::GenerateMipmaps()
 {
-  mMaxMipMapLevel = 0;
-  DALI_LOG_ERROR("FIXME: GRAPHICS");
-  //@todo Implement with Graphics API
+  if(!mGraphicsTexture)
+  {
+    Create(static_cast<Graphics::TextureUsageFlags>(Graphics::TextureUsageFlagBits::SAMPLE));
+  }
+
+  mGraphicsController->GenerateTextureMipmaps(*mGraphicsTexture.get());
 }
 
 } // namespace Render

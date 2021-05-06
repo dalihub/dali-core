@@ -757,7 +757,6 @@ int UtcDaliTextureUploadSmallerThanSize(void)
 
 int UtcDaliTextureGenerateMipmaps(void)
 {
-#ifdef OLD_GRAPHICS_TEST
   TestApplication application;
   unsigned int    width(64);
   unsigned int    height(64);
@@ -783,9 +782,6 @@ int UtcDaliTextureGenerateMipmaps(void)
     out << GL_TEXTURE_CUBE_MAP;
     DALI_TEST_CHECK(callStack.FindMethodAndParams("GenerateMipmap", out.str().c_str()));
   }
-#else
-  DALI_TEST_CHECK(1);
-#endif
 
   END_TEST;
 }

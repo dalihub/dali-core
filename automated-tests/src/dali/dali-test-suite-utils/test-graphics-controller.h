@@ -162,6 +162,12 @@ public:
                       const std::vector<Graphics::TextureUpdateSourceInfo>& sourceList) override;
 
   /**
+   * Auto generates mipmaps for the texture
+   * @param[in] texture The texture
+   */
+  void GenerateTextureMipmaps(const Graphics::Texture& texture) override;
+
+  /**
    * TBD: do we need those functions in the new implementation?
    */
   bool EnableDepthStencilBuffer(bool enableDepth, bool enableStencil) override;

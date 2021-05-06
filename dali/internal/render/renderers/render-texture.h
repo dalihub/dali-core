@@ -146,12 +146,11 @@ private:
   NativeImageInterfacePtr mNativeImage; ///< Pointer to native image
   Render::Sampler         mSampler;     ///< The current sampler state
 
-  Pixel::Format mPixelFormat;    ///< Pixel format of the texture
-  uint16_t      mWidth;          ///< Width of the texture
-  uint16_t      mHeight;         ///< Height of the texture
-  uint16_t      mMaxMipMapLevel; ///< Maximum mipmap level
-  Type          mType : 3;       ///< Type of the texture
-  bool          mHasAlpha : 1;   ///< Whether the format has an alpha channel
+  Pixel::Format mPixelFormat;  ///< Pixel format of the texture
+  uint16_t      mWidth;        ///< Width of the texture
+  uint16_t      mHeight;       ///< Height of the texture
+  Type          mType : 3;     ///< Type of the texture
+  bool          mHasAlpha : 1; ///< Whether the format has an alpha channel
 };
 
 } // namespace Render
