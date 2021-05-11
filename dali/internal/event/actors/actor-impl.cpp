@@ -1459,6 +1459,7 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mVisible(true),
   mInheritLayoutDirection(true),
   mCaptureAllTouchAfterStart(false),
+  mNeedGesturePropagation(false),
   mLayoutDirection(LayoutDirection::LEFT_TO_RIGHT),
   mDrawMode(DrawMode::NORMAL),
   mColorMode(Node::DEFAULT_COLOR_MODE),
@@ -1881,6 +1882,16 @@ Rect<> Actor::CalculateScreenExtents() const
   Vector3 anchorPointOffSet = size * (mPositionUsesAnchorPoint ? GetCurrentAnchorPoint() : AnchorPoint::TOP_LEFT);
   Vector2 position          = Vector2(screenPosition.x - anchorPointOffSet.x, screenPosition.y - anchorPointOffSet.y);
   return {position.x, position.y, size.x, size.y};
+}
+
+void Actor::SetNeedGesturePropagation(bool propagation)
+{
+  mNeedGesturePropagation = propagation;
+}
+
+bool Actor::NeedGesturePropagation()
+{
+  return mNeedGesturePropagation;
 }
 
 bool Actor::GetCachedPropertyValue(Property::Index index, Property::Value& value) const

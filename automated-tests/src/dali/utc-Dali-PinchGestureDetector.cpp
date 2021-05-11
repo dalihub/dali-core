@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
  */
 
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/render-task-list-integ.h>
 #include <dali/public-api/dali-core.h>
@@ -1145,6 +1146,84 @@ int UtcDaliPinchGestureDisableDetectionDuringPinchN(void)
   {
     DALI_TEST_CHECK(false); // If we crash, the test has failed
   }
+
+  END_TEST;
+}
+
+int UtcDaliPinchGestureWhenGesturePropargation(void)
+{
+  TestApplication application;
+
+  Actor parentActor = Actor::New();
+  parentActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  parentActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  Actor childActor = Actor::New();
+  childActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  childActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  parentActor.Add(childActor);
+  application.GetScene().Add(parentActor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  SignalData             pData;
+  GestureReceivedFunctor pFunctor(pData);
+
+  PinchGestureDetector parentDetector = PinchGestureDetector::New();
+  parentDetector.Attach(parentActor);
+  parentDetector.DetectedSignal().Connect(&application, pFunctor);
+
+  SignalData             cData;
+  GestureReceivedFunctor cFunctor(cData);
+
+  PinchGestureDetector childDetector = PinchGestureDetector::New();
+  childDetector.Attach(childActor);
+  childDetector.DetectedSignal().Connect(&application, cFunctor);
+
+  // Start gesture within the actor's area, we receive the gesture not parent actor but child actor.
+  TestStartPinch(application, Vector2(2.0f, 20.0f), Vector2(38.0f, 20.0f), Vector2(10.0f, 20.0f), Vector2(30.0f, 20.0f), 100);
+  DALI_TEST_EQUALS(true, cData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, pData.functorCalled, TEST_LOCATION);
+  cData.Reset();
+  pData.Reset();
+
+  TestContinuePinch(application, Vector2(112.0f, 100.0f), Vector2(112.0f, 124.0f), Vector2(5.0f, 5.0f), Vector2(35.0f, 35.0f), 200);
+  DALI_TEST_EQUALS(true, cData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, pData.functorCalled, TEST_LOCATION);
+  cData.Reset();
+  pData.Reset();
+
+  TestEndPinch(application, Vector2(15.0f, 20.0f), Vector2(25.0f, 20.0f), Vector2(19.0f, 20.0f), Vector2(21.0f, 20.0f), 300);
+  DALI_TEST_EQUALS(true, cData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, pData.functorCalled, TEST_LOCATION);
+  cData.Reset();
+  pData.Reset();
+
+  // If GesturePropargation is set, a gesture event is to pass over to the parent.
+  Dali::DevelActor::SetNeedGesturePropagation(childActor, true);
+
+  // So now the parent got the gesture event.
+  TestStartPinch(application, Vector2(2.0f, 20.0f), Vector2(38.0f, 20.0f), Vector2(10.0f, 20.0f), Vector2(30.0f, 20.0f), 700);
+  DALI_TEST_EQUALS(true, cData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, pData.functorCalled, TEST_LOCATION);
+  cData.Reset();
+  pData.Reset();
+
+  // child does not receive gestures. This is because we have passed the permission of the gesture to the parent.
+  TestContinuePinch(application, Vector2(112.0f, 100.0f), Vector2(112.0f, 124.0f), Vector2(5.0f, 5.0f), Vector2(35.0f, 35.0f), 800);
+  DALI_TEST_EQUALS(false, cData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, pData.functorCalled, TEST_LOCATION);
+  cData.Reset();
+  pData.Reset();
+
+  TestEndPinch(application, Vector2(15.0f, 20.0f), Vector2(25.0f, 20.0f), Vector2(19.0f, 20.0f), Vector2(21.0f, 20.0f), 900);
+  DALI_TEST_EQUALS(false, cData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, pData.functorCalled, TEST_LOCATION);
+  cData.Reset();
+  pData.Reset();
 
   END_TEST;
 }

@@ -260,6 +260,17 @@ public:
   Rect<> CalculateScreenExtents() const;
 
   /**
+   * @copydoc DevelActor::SetNeedGesturePropagation.
+   */
+  void SetNeedGesturePropagation(bool propagation);
+
+  /**
+   * Retrieve need gesture propagation value
+   * @return The actor's need gesture propagation value.
+   */
+  bool NeedGesturePropagation();
+
+  /**
    * Sets the size of an actor.
    * This does not interfere with the actors scale factor.
    * @param [in] width  The new width.
@@ -2063,26 +2074,27 @@ protected:
   int16_t     mDepth;           ///< The depth in the hierarchy of the actor. Only 32,767 levels of depth are supported
   uint16_t    mUseAnimatedSize; ///< Whether the size is animated.
 
-  const bool            mIsRoot : 1;                    ///< Flag to identify the root actor
-  const bool            mIsLayer : 1;                   ///< Flag to identify that this is a layer
-  bool                  mIsOnScene : 1;                 ///< Flag to identify whether the actor is on-scene
-  bool                  mSensitive : 1;                 ///< Whether the actor emits touch event signals
-  bool                  mLeaveRequired : 1;             ///< Whether a touch event signal is emitted when the a touch leaves the actor's bounds
-  bool                  mKeyboardFocusable : 1;         ///< Whether the actor should be focusable by keyboard navigation
-  bool                  mTouchFocusable : 1;            ///< Whether the actor should be focusable by touch
-  bool                  mOnSceneSignalled : 1;          ///< Set to true before OnSceneConnection signal is emitted, and false before OnSceneDisconnection
-  bool                  mInsideOnSizeSet : 1;           ///< Whether we are inside OnSizeSet
-  bool                  mInheritPosition : 1;           ///< Cached: Whether the parent's position should be inherited.
-  bool                  mInheritOrientation : 1;        ///< Cached: Whether the parent's orientation should be inherited.
-  bool                  mInheritScale : 1;              ///< Cached: Whether the parent's scale should be inherited.
-  bool                  mPositionUsesAnchorPoint : 1;   ///< Cached: Whether the position uses the anchor point or not.
-  bool                  mVisible : 1;                   ///< Cached: Whether the actor is visible or not.
-  bool                  mInheritLayoutDirection : 1;    ///< Whether the actor inherits the layout direction from parent.
-  bool                  mCaptureAllTouchAfterStart : 1; ///< Whether the actor should capture all touch after touch starts even if the motion moves outside of the actor area.
-  LayoutDirection::Type mLayoutDirection : 2;           ///< Layout direction, Left to Right or Right to Left.
-  DrawMode::Type        mDrawMode : 3;                  ///< Cached: How the actor and its children should be drawn
-  ColorMode             mColorMode : 3;                 ///< Cached: Determines whether mWorldColor is inherited
-  ClippingMode::Type    mClippingMode : 3;              ///< Cached: Determines which clipping mode (if any) to use.
+  const bool               mIsRoot : 1;                    ///< Flag to identify the root actor
+  const bool               mIsLayer : 1;                   ///< Flag to identify that this is a layer
+  bool                     mIsOnScene : 1;                 ///< Flag to identify whether the actor is on-scene
+  bool                     mSensitive : 1;                 ///< Whether the actor emits touch event signals
+  bool                     mLeaveRequired : 1;             ///< Whether a touch event signal is emitted when the a touch leaves the actor's bounds
+  bool                     mKeyboardFocusable : 1;         ///< Whether the actor should be focusable by keyboard navigation
+  bool                     mTouchFocusable : 1;            ///< Whether the actor should be focusable by touch
+  bool                     mOnSceneSignalled : 1;          ///< Set to true before OnSceneConnection signal is emitted, and false before OnSceneDisconnection
+  bool                     mInsideOnSizeSet : 1;           ///< Whether we are inside OnSizeSet
+  bool                     mInheritPosition : 1;           ///< Cached: Whether the parent's position should be inherited.
+  bool                     mInheritOrientation : 1;        ///< Cached: Whether the parent's orientation should be inherited.
+  bool                     mInheritScale : 1;              ///< Cached: Whether the parent's scale should be inherited.
+  bool                     mPositionUsesAnchorPoint : 1;   ///< Cached: Whether the position uses the anchor point or not.
+  bool                     mVisible : 1;                   ///< Cached: Whether the actor is visible or not.
+  bool                     mInheritLayoutDirection : 1;    ///< Whether the actor inherits the layout direction from parent.
+  bool                     mCaptureAllTouchAfterStart : 1; ///< Whether the actor should capture all touch after touch starts even if the motion moves outside of the actor area.
+  bool                     mNeedGesturePropagation : 1;    ///< Whether the parent listens for gesture events or not
+  LayoutDirection::Type    mLayoutDirection : 2;           ///< Layout direction, Left to Right or Right to Left.
+  DrawMode::Type           mDrawMode : 3;                  ///< Cached: How the actor and its children should be drawn
+  ColorMode                mColorMode : 3;                 ///< Cached: Determines whether mWorldColor is inherited
+  ClippingMode::Type       mClippingMode : 3;              ///< Cached: Determines which clipping mode (if any) to use.
 
 private:
   static ActorContainer mNullChildren; ///< Empty container (shared by all actors, returned by GetChildren() const)
