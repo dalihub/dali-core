@@ -143,7 +143,12 @@ void GestureProcessor::ProcessAndEmit(HitTestAlgorithm::Results& hitTestResults)
         {
           // Our gesture detector's attached actor WAS the hit actor so we can can emit the signal.
           EmitGestureSignal(actor, gestureDetectors, hitTestResults.actorCoordinates);
-          break; // We have found AND emitted a signal on the gestured actor, break out.
+          // If NeedGesturePropagation is true, it passes the gesture to the parent.
+          if(!actor->NeedGesturePropagation())
+          {
+            break; // We have found AND emitted a signal on the gestured actor, break out.
+          }
+          actor->SetNeedGesturePropagation(false);
         }
         else
         {
@@ -162,7 +167,12 @@ void GestureProcessor::ProcessAndEmit(HitTestAlgorithm::Results& hitTestResults)
                 {
                   // One of the parents was the gestured actor so we can emit the signal for that actor.
                   EmitGestureSignal(actor, gestureDetectors, hitPointLocal);
-                  break; // We have found AND emitted a signal on the gestured actor, break out.
+                  // If NeedGesturePropagation is true, it passes the gesture to the parent.
+                  if(!actor->NeedGesturePropagation())
+                  {
+                    break; // We have found AND emitted a signal on the gestured actor, break out.
+                  }
+                  actor->SetNeedGesturePropagation(false);
                 }
               }
             }
