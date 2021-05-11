@@ -41,7 +41,7 @@ namespace Internal
 namespace
 {
 // Size of uniform buffer page used when resizing
-constexpr uint32_t UBO_PAGE_SIZE = 8192u;
+constexpr uint32_t UBO_PAGE_SIZE = 64;
 
 // UBO allocation threshold below which the UBO will shrink
 constexpr auto UBO_SHRINK_THRESHOLD = 0.75f;
