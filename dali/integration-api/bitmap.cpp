@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -420,6 +420,13 @@ void ConvertToGlFormat(Format pixelformat, unsigned& pixelDataType, unsigned& in
       DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.0 GLES 3.0 floating point format.\n");
       pixelDataType  = GL_FLOAT;
       internalFormat = GL_RGB;
+      break;
+    }
+    case R11G11B10F:
+    {
+      DALI_LOG_INFO(Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.0 GLES 3.0 floating point format.\n");
+      pixelDataType  = GL_FLOAT;
+      internalFormat = GL_R11F_G11F_B10F;
       break;
     }
 

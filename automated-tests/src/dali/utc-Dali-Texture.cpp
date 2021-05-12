@@ -681,11 +681,15 @@ int UtcDaliTextureUploadPixelFormats(void)
       Pixel::BGRA8888,
       Pixel::DEPTH_UNSIGNED_INT,
       Pixel::DEPTH_FLOAT,
-      Pixel::DEPTH_STENCIL};
+      Pixel::DEPTH_STENCIL,
+      Pixel::RGB16F,
+      Pixel::RGB32F,
+      Pixel::R11G11B10F,
+    };
 
   for(auto format : formats)
   {
-    tet_infoline("Creating a Texure with an alpha channel");
+    tet_infoline("Creating a Texure with a new or recent format");
     Texture texture = CreateTexture(TextureType::TEXTURE_2D, format, width, height);
 
     application.SendNotification();

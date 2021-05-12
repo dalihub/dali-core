@@ -2,7 +2,7 @@
 #define DALI_PIXEL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -117,7 +117,9 @@ enum Format
   DEPTH_UNSIGNED_INT, ///< Unsigned int depth format 32-bit. @SINCE_1_9.9
   DEPTH_FLOAT,        ///< Float depth format 32-bit. @SINCE_1_9.9
 
-  DEPTH_STENCIL ///< Depth stencil 32-bit, 24 bit for depth, 8 bit for stencil. @SINCE_1_9.9
+  DEPTH_STENCIL, ///< Depth stencil 32-bit, 24 bit for depth, 8 bit for stencil. @SINCE_1_9.9
+
+  R11G11B10F ///< Packed 32-bit, 11-11-10 unsigned floating point.
   ///! Update LAST_VALID_PIXEL_FORMAT below if you add an enum value here.
 };
 
@@ -133,7 +135,7 @@ const Format FIRST_VALID_PIXEL_FORMAT = A8;
  *
  * Sync it to the last value above.
  */
-const Format LAST_VALID_PIXEL_FORMAT = DEPTH_STENCIL;
+const Format LAST_VALID_PIXEL_FORMAT = R11G11B10F;
 
 /**
  * @brief Whether specified pixel format contains an alpha value.

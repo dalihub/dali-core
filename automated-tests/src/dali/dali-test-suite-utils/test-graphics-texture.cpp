@@ -183,6 +183,7 @@ bool IsCompressedFormat(Graphics::Format pixelFormat)
     case Graphics::Format::R64G64B64A64_SINT:
     case Graphics::Format::R64G64B64A64_SFLOAT:
     case Graphics::Format::B10G11R11_UFLOAT_PACK32:
+    case Graphics::Format::R11G11B10_UFLOAT_PACK32:
     case Graphics::Format::E5B9G9R9_UFLOAT_PACK32:
     case Graphics::Format::D16_UNORM:
     case Graphics::Format::X8_D24_UNORM_PACK32:
@@ -618,6 +619,12 @@ void PixelFormatToGl(Graphics::Format pixelFormat, GLenum& glFormat, GLint& glIn
       glFormat = 0;
       break;
     }
+    case Graphics::Format::R11G11B10_UFLOAT_PACK32:
+    {
+      glFormat      = GL_RGB;
+      pixelDataType = GL_FLOAT;
+      break;
+    }
 
     case Graphics::Format::R4G4_UNORM_PACK8:
     case Graphics::Format::A1R5G5B5_UNORM_PACK16:
@@ -768,6 +775,7 @@ void PixelFormatToGl(Graphics::Format pixelFormat, GLenum& glFormat, GLint& glIn
   {
     case Graphics::Format::R16G16B16A16_SFLOAT:
     case Graphics::Format::R32G32B32A32_SFLOAT:
+    case Graphics::Format::R11G11B10_UFLOAT_PACK32:
     {
       glInternalFormat = GL_R11F_G11F_B10F;
       break;
