@@ -169,6 +169,10 @@ public:
       return returnVal;
     }
 
+    // Guards against calling CleanupConnections if the signal is deleted during emission
+    bool signalDeleted{false};
+    mSignalDeleted = &signalDeleted;
+
     // If more connections are added by callbacks, these are ignore until the next Emit()
     // Note that count cannot be reduced while iterating
     const std::size_t initialCount(mSignalConnections.size());
@@ -185,8 +189,12 @@ public:
       }
     }
 
-    // Cleanup NULL values from Connection container
-    CleanupConnections();
+    if(!signalDeleted)
+    {
+      // Cleanup NULL values from Connection container
+      CleanupConnections();
+      mSignalDeleted = nullptr;
+    }
 
     return returnVal;
   }
@@ -208,6 +216,10 @@ public:
       return;
     }
 
+    // Guards against calling CleanupConnections if the signal is deleted during emission
+    bool signalDeleted{false};
+    mSignalDeleted = &signalDeleted;
+
     // If more connections are added by callbacks, these are ignore until the next Emit()
     // Note that count cannot be reduced while iterating
     const std::size_t initialCount(mSignalConnections.size());
@@ -224,8 +236,12 @@ public:
       }
     }
 
-    // Cleanup NULL values from Connection container
-    CleanupConnections();
+    if(!signalDeleted)
+    {
+      // Cleanup NULL values from Connection container
+      CleanupConnections();
+      mSignalDeleted = nullptr;
+    }
   }
 
   // Connect / Disconnect function for use by Signal implementations
@@ -313,9 +329,10 @@ private:
   BaseSignal& operator=(BaseSignal&&) = delete;      ///< Deleted move assignment operator. @SINCE_1_9.25
 
 private:
-  std::vector<SignalConnection> mSignalConnections;   ///< Array of connections
-  uint32_t                      mNullConnections{0};  ///< Empty Connections in the array.
-  bool                          mEmittingFlag{false}; ///< Used to guard against nested Emit() calls
+  std::vector<SignalConnection> mSignalConnections;      ///< Array of connections
+  uint32_t                      mNullConnections{0};     ///< Empty Connections in the array.
+  bool                          mEmittingFlag{false};    ///< Used to guard against nested Emit() calls.
+  bool*                         mSignalDeleted{nullptr}; ///< Used to guard against deletion during Emit() calls.
 };
 
 /**
