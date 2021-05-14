@@ -180,6 +180,8 @@ constexpr Graphics::Format ConvertPixelFormat(Pixel::Format format)
       return Graphics::Format::R16G16B16_SFLOAT;
     case Pixel::RGB32F:
       return Graphics::Format::R32G32B32_SFLOAT;
+    case Pixel::R11G11B10F:
+      return Graphics::Format::R11G11B10_UFLOAT_PACK32;
   }
   return Graphics::Format::UNDEFINED;
 }
