@@ -40,7 +40,10 @@
 #include <dali/internal/render/renderers/render-texture.h>
 #include <dali/internal/render/renderers/shader-cache.h>
 #include <dali/internal/render/renderers/uniform-buffer-manager.h>
+#include <dali/internal/render/renderers/uniform-buffer-view-pool.h>
 #include <dali/internal/render/shaders/program-controller.h>
+
+#include <dali/internal/render/renderers/uniform-buffer-manager.h>
 
 namespace Dali
 {
@@ -390,6 +393,9 @@ void RenderManager::RemoveRenderTracker(Render::RenderTracker* renderTracker)
 void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear, bool uploadOnly)
 {
   DALI_PRINT_RENDER_START(mImpl->renderBufferIndex);
+
+  // Rollback
+  mImpl->uniformBufferManager->GetUniformBufferViewPool(mImpl->renderBufferIndex)->Rollback();
 
   // Increment the frame count at the beginning of each frame
   ++mImpl->frameCount;

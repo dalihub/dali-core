@@ -80,14 +80,15 @@ GLenum TestGraphicsBuffer::GetTarget()
   return target;
 }
 
-void TestGraphicsBuffer::BindAsUniformBuffer(const TestGraphicsProgram* program) const
+void TestGraphicsBuffer::BindAsUniformBuffer(const TestGraphicsProgram* program, const Dali::UniformBufferBindingDescriptor& uboBinding) const
 {
   auto* reflection = static_cast<const TestGraphicsReflection*>(&program->GetReflection());
 
   Graphics::UniformBlockInfo uboInfo{};
   reflection->GetUniformBlock(0, uboInfo);
 
-  auto* data = memory.data();
+  auto offset = uboBinding.offset;
+  auto* data = memory.data() + offset;
 
   for(const auto& member : uboInfo.members)
   {

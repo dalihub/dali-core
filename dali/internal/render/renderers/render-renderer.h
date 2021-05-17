@@ -400,17 +400,17 @@ public:
 
   template<class T>
   bool WriteDefaultUniform(const Graphics::UniformInfo*                       uniformInfo,
-                           Render::UniformBuffer&                             ubo,
+                           Render::UniformBufferView&                             ubo,
                            const std::vector<Graphics::UniformBufferBinding>& bindings,
                            const T&                                           data);
 
   template<class T>
-  void WriteUniform(Render::UniformBuffer&                             ubo,
+  void WriteUniform(Render::UniformBufferView&                             ubo,
                     const std::vector<Graphics::UniformBufferBinding>& bindings,
                     const Graphics::UniformInfo&                       uniformInfo,
                     const T&                                           data);
 
-  void WriteUniform(Render::UniformBuffer&                             ubo,
+  void WriteUniform(Render::UniformBufferView&                             ubo,
                     const std::vector<Graphics::UniformBufferBinding>& bindings,
                     const Graphics::UniformInfo&                       uniformInfo,
                     const void*                                        data,
@@ -490,7 +490,7 @@ private:
    */
   void FillUniformBuffer(Program&                                      program,
                          const SceneGraph::RenderInstruction&          instruction,
-                         Render::UniformBuffer&                        ubo,
+                         Render::UniformBufferView&                        ubo,
                          std::vector<Graphics::UniformBufferBinding>*& outBindings,
                          uint32_t&                                     offset,
                          BufferIndex                                   updateBufferIndex);
@@ -550,8 +550,6 @@ private:
   bool                  mUpdated : 1;
 
   std::vector<Dali::DevelRenderer::DrawCommand> mDrawCommands; // Devel stuff
-
-  Graphics::UniquePtr<Render::UniformBuffer> mUniformBuffer[2]{nullptr, nullptr}; ///< The double-buffered uniform buffer
 };
 
 } // namespace Render

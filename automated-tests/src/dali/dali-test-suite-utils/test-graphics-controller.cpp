@@ -604,7 +604,7 @@ void TestGraphicsController::ProcessCommandBuffer(TestGraphicsCommandBuffer& com
         auto  buffer   = bindings.standaloneUniformsBufferBinding;
 
         // based on reflection, issue gl calls
-        buffer.buffer->BindAsUniformBuffer(static_cast<const TestGraphicsProgram*>(currentPipeline->programState.program));
+        buffer.buffer->BindAsUniformBuffer(static_cast<const TestGraphicsProgram*>(currentPipeline->programState.program), bindings.standaloneUniformsBufferBinding);
         break;
       }
       case CommandType::BIND_SAMPLERS:

@@ -19,7 +19,6 @@
 #include <dali/internal/render/renderers/render-renderer.h>
 
 // INTERNAL INCLUDES
-#include <dali/graphics-api/graphics-program.h>
 #include <dali/graphics-api/graphics-types.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/common/image-sampler.h>
@@ -33,19 +32,13 @@
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/shaders/render-shader.h>
 #include <dali/internal/update/common/uniform-map.h>
+#include <dali/internal/render/renderers/uniform-buffer-view.h>
+#include <dali/internal/render/renderers/uniform-buffer-view-pool.h>
 
-namespace Dali
-{
-namespace Internal
+namespace Dali::Internal
 {
 namespace
 {
-// Size of uniform buffer page used when resizing
-constexpr uint32_t UBO_PAGE_SIZE = 64;
-
-// UBO allocation threshold below which the UBO will shrink
-constexpr auto UBO_SHRINK_THRESHOLD = 0.75f;
-
 // Helper to get the vertex input format
 Dali::Graphics::VertexInputFormat GetPropertyVertexFormat(Property::Type propertyType)
 {
@@ -681,49 +674,39 @@ void Renderer::WriteUniformBuffer(
     uniformBlockAllocationBytes += blockSize;
   }
 
-  auto pagedAllocation = ((uniformBlockAllocationBytes / UBO_PAGE_SIZE + 1u)) * UBO_PAGE_SIZE;
+  // Create uniform buffer view from uniform buffer
+  Graphics::UniquePtr<Render::UniformBufferView> uboView {nullptr};
+  if(uniformBlockAllocationBytes)
+  {
+    auto uboPoolView = mUniformBufferManager->GetUniformBufferViewPool( bufferIndex );
 
-  // Allocate twice memory as required by the uniform buffers
-  // todo: memory usage backlog to use optimal allocation
-  if(uniformBlockAllocationBytes && !mUniformBuffer[bufferIndex])
-  {
-    mUniformBuffer[bufferIndex] = mUniformBufferManager->AllocateUniformBuffer(pagedAllocation);
-  }
-  else if(uniformBlockAllocationBytes && (mUniformBuffer[bufferIndex]->GetSize() < pagedAllocation ||
-                                          (pagedAllocation < uint32_t(float(mUniformBuffer[bufferIndex]->GetSize()) * UBO_SHRINK_THRESHOLD))))
-  {
-    mUniformBuffer[bufferIndex]->Reserve(pagedAllocation);
-  }
-
-  // Clear UBO
-  if(mUniformBuffer[bufferIndex])
-  {
-    mUniformBuffer[bufferIndex]->Fill(0, 0u, 0u);
+    uboView = uboPoolView->CreateUniformBufferView( uniformBlockAllocationBytes );
   }
 
   // update the uniform buffer
   // pass shared UBO and offset, return new offset for next item to be used
   // don't process bindings if there are no uniform buffers allocated
-  auto ubo = mUniformBuffer[bufferIndex].get();
-  if(ubo)
+  if(uboView)
   {
     auto uboCount = reflection.GetUniformBlockCount();
     mUniformBufferBindings.resize(uboCount);
 
     std::vector<Graphics::UniformBufferBinding>* bindings{&mUniformBufferBindings};
 
+    mUniformBufferBindings[0].buffer = uboView->GetBuffer( &mUniformBufferBindings[0].offset );
+
     // Write default uniforms
-    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::MODEL_MATRIX), *ubo, *bindings, modelMatrix);
-    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::VIEW_MATRIX), *ubo, *bindings, viewMatrix);
-    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::PROJECTION_MATRIX), *ubo, *bindings, projectionMatrix);
-    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::MODEL_VIEW_MATRIX), *ubo, *bindings, modelViewMatrix);
+    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::MODEL_MATRIX), *uboView, *bindings, modelMatrix);
+    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::VIEW_MATRIX), *uboView, *bindings, viewMatrix);
+    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::PROJECTION_MATRIX), *uboView, *bindings, projectionMatrix);
+    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::MODEL_VIEW_MATRIX), *uboView, *bindings, modelViewMatrix);
 
     auto mvpUniformInfo = program->GetDefaultUniform(Program::DefaultUniformIndex::MVP_MATRIX);
     if(mvpUniformInfo && !mvpUniformInfo->name.empty())
     {
       Matrix modelViewProjectionMatrix(false);
       Matrix::Multiply(modelViewProjectionMatrix, modelViewMatrix, projectionMatrix);
-      WriteDefaultUniform(mvpUniformInfo, *ubo, *bindings, modelViewProjectionMatrix);
+      WriteDefaultUniform(mvpUniformInfo, *uboView, *bindings, modelViewProjectionMatrix);
     }
 
     auto normalUniformInfo = program->GetDefaultUniform(Program::DefaultUniformIndex::NORMAL_MATRIX);
@@ -732,7 +715,7 @@ void Renderer::WriteUniformBuffer(
       Matrix3 normalMatrix(modelViewMatrix);
       normalMatrix.Invert();
       normalMatrix.Transpose();
-      WriteDefaultUniform(normalUniformInfo, *ubo, *bindings, normalMatrix);
+      WriteDefaultUniform(normalUniformInfo, *uboView, *bindings, normalMatrix);
     }
 
     Vector4        finalColor;
@@ -746,20 +729,20 @@ void Renderer::WriteUniformBuffer(
     {
       finalColor = Vector4(color.r, color.g, color.b, color.a * mRenderDataProvider->GetOpacity(bufferIndex));
     }
-    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::COLOR), *ubo, *bindings, finalColor);
+    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::COLOR), *uboView, *bindings, finalColor);
 
     // Write uniforms from the uniform map
-    FillUniformBuffer(*program, instruction, *ubo, bindings, uboOffset, bufferIndex);
+    FillUniformBuffer(*program, instruction, *uboView, bindings, uboOffset, bufferIndex);
 
     // Write uSize in the end, as it shouldn't be overridable by dynamic properties.
-    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::SIZE), *ubo, *bindings, size);
+    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::SIZE), *uboView, *bindings, size);
 
     commandBuffer.BindUniformBuffers(*bindings);
   }
 }
 
 template<class T>
-bool Renderer::WriteDefaultUniform(const Graphics::UniformInfo* uniformInfo, Render::UniformBuffer& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const T& data)
+bool Renderer::WriteDefaultUniform(const Graphics::UniformInfo* uniformInfo, Render::UniformBufferView& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const T& data)
 {
   if(uniformInfo && !uniformInfo->name.empty())
   {
@@ -770,19 +753,19 @@ bool Renderer::WriteDefaultUniform(const Graphics::UniformInfo* uniformInfo, Ren
 }
 
 template<class T>
-void Renderer::WriteUniform(Render::UniformBuffer& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const Graphics::UniformInfo& uniformInfo, const T& data)
+void Renderer::WriteUniform(Render::UniformBufferView& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const Graphics::UniformInfo& uniformInfo, const T& data)
 {
   WriteUniform(ubo, bindings, uniformInfo, &data, sizeof(T));
 }
 
-void Renderer::WriteUniform(Render::UniformBuffer& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const Graphics::UniformInfo& uniformInfo, const void* data, uint32_t size)
+void Renderer::WriteUniform(Render::UniformBufferView& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const Graphics::UniformInfo& uniformInfo, const void* data, uint32_t size)
 {
-  ubo.Write(data, size, bindings[uniformInfo.bufferIndex].offset + uniformInfo.offset);
+  ubo.Write(data, size, ubo.GetOffset() + uniformInfo.offset);
 }
 
 void Renderer::FillUniformBuffer(Program&                                      program,
                                  const SceneGraph::RenderInstruction&          instruction,
-                                 Render::UniformBuffer&                        ubo,
+                                 Render::UniformBufferView&                    ubo,
                                  std::vector<Graphics::UniformBufferBinding>*& outBindings,
                                  uint32_t&                                     offset,
                                  BufferIndex                                   updateBufferIndex)
@@ -796,10 +779,9 @@ void Renderer::FillUniformBuffer(Program&                                      p
   {
     mUniformBufferBindings[i].dataSize = reflection.GetUniformBlockSize(i);
     mUniformBufferBindings[i].binding  = reflection.GetUniformBlockBinding(i);
-    mUniformBufferBindings[i].offset   = dataOffset;
 
     dataOffset += GetUniformBufferDataAlignment(mUniformBufferBindings[i].dataSize);
-    mUniformBufferBindings[i].buffer = ubo.GetBuffer();
+    mUniformBufferBindings[i].buffer = ubo.GetBuffer( &mUniformBufferBindings[i].offset );
 
     for(UniformIndexMappings::Iterator iter = mUniformIndexMap.Begin(),
                                        end  = mUniformIndexMap.End();
@@ -817,8 +799,7 @@ void Renderer::FillUniformBuffer(Program&                                      p
 
       if(uniformFound)
       {
-        auto dst = mUniformBufferBindings[uniformInfo.bufferIndex].offset + uniformInfo.offset;
-
+        auto dst = ubo.GetOffset() + uniformInfo.offset;
         switch((*iter).propertyValue->GetType())
         {
           case Property::Type::BOOLEAN:
@@ -1153,7 +1134,5 @@ Graphics::Pipeline& Renderer::PrepareGraphicsPipeline(
 }
 
 } // namespace Render
-
-} // namespace Internal
 
 } // namespace Dali
