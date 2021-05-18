@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -508,6 +508,54 @@ int UtcDaliTapGestureRecognizerMultipleDetectors(void)
 
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, data2.functorCalled, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTapGestureRecognizerTripleTap(void)
+{
+  TestApplication application;
+
+  TapGestureDetector detector = TapGestureDetector::New(3);
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  detector.Attach(actor);
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 200));
+
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 250));
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 300));
+
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 350));
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 400));
+
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
   END_TEST;
 }
