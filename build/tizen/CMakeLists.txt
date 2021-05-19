@@ -366,7 +366,8 @@ IF( ENABLE_LINK_TEST )
     linker-test.cpp
     ${DALI_TEST_SUITE_DIR}/test-application.cpp
     ${DALI_TEST_SUITE_DIR}/test-gl-abstraction.cpp
-    ${DALI_TEST_SUITE_DIR}/test-gl-sync-abstraction.cpp
+    ${DALI_TEST_SUITE_DIR}/test-graphics-sync-impl.cpp
+    ${DALI_TEST_SUITE_DIR}/test-graphics-sync-object.cpp
     ${DALI_TEST_SUITE_DIR}/test-graphics-buffer.cpp
     ${DALI_TEST_SUITE_DIR}/test-graphics-command-buffer.cpp
     ${DALI_TEST_SUITE_DIR}/test-graphics-controller.cpp

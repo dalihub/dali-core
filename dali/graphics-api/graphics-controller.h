@@ -34,6 +34,7 @@
 #include "graphics-render-target-create-info.h"
 #include "graphics-sampler-create-info.h"
 #include "graphics-shader-create-info.h"
+#include "graphics-sync-object-create-info.h"
 #include "graphics-texture-create-info.h"
 
 namespace Dali
@@ -41,23 +42,23 @@ namespace Dali
 namespace Integration
 {
 class GlAbstraction;
-class GlSyncAbstraction;
 class GlContextHelperAbstraction;
 } // namespace Integration
 
 namespace Graphics
 {
-class CommandBuffer;
 class Command;
-class RenderTarget;
-class RenderPass;
+class CommandBuffer;
 class Buffer;
-class Texture;
-class Shader;
 class Framebuffer;
-class Pipeline;
-class Sampler;
 class Memory;
+class Pipeline;
+class RenderPass;
+class RenderTarget;
+class Sampler;
+class Shader;
+class SyncObject;
+class Texture;
 
 /**
  * @brief Controller class controls render loop
@@ -70,7 +71,6 @@ class Controller
 public:
   // Temporary until graphics api is complete
   virtual Integration::GlAbstraction&              GetGlAbstraction()              = 0;
-  virtual Integration::GlSyncAbstraction&          GetGlSyncAbstraction()          = 0;
   virtual Integration::GlContextHelperAbstraction& GetGlContextHelperAbstraction() = 0;
 
   /**
@@ -273,6 +273,16 @@ public:
    * @return pointer to the RenderTarget object
    */
   virtual UniquePtr<RenderTarget> CreateRenderTarget(const RenderTargetCreateInfo& renderTargetCreateInfo, UniquePtr<RenderTarget>&& oldRenderTarget) = 0;
+
+  /**
+   * Create a synchronisation object.
+   *
+   * @return A pointer to an opaque sync object
+   * @param[in] syncObjectCreateInfo The valid SyncObjectCreateInfo structure
+   * @param[in] oldSyncObject The valid pointer to the old object or nullptr. The object will be reused or destroyed.
+   */
+  virtual UniquePtr<SyncObject> CreateSyncObject(const SyncObjectCreateInfo& syncObjectCreateInfo,
+                                                 UniquePtr<SyncObject>&&     oldSyncObject) = 0;
 
   /**
    * @brief Maps memory associated with Buffer object

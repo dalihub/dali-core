@@ -25,10 +25,11 @@ namespace Dali::Graphics
 {
 class Buffer;
 class Pipeline;
-class Texture;
-class Sampler;
 class RenderTarget;
 class RenderPass;
+class Sampler;
+class SyncObject;
+class Texture;
 
 /**
  * @brief Uniform buffer bindings.
@@ -195,8 +196,15 @@ public:
    * the Controller may use end RP marker in order to resolve resource
    * dependencies (for example, to know when target texture is ready
    * before passing it to another render pass).
+   *
+   * The caller may query the sync object to determine when this render
+   * pass has actually finished on the GPU.
+   *
+   * @param[in] syncObject If non-null, this object will ensure an
+   * appropriate fence sync object is created after the render pass is
+   * executed.
    */
-  virtual void EndRenderPass() = 0;
+  virtual void EndRenderPass(Graphics::SyncObject* syncObject) = 0;
 
   /**
    * @brief Executes a list of secondary command buffers

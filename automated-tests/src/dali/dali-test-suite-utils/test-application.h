@@ -65,8 +65,8 @@ public:
   TestGraphicsController&  GetGraphicsController();
 
   TestGlAbstraction&              GetGlAbstraction();
-  TestGlSyncAbstraction&          GetGlSyncAbstraction();
   TestGlContextHelperAbstraction& GetGlContextHelperAbstraction();
+  TestGraphicsSyncImplementation& GetGraphicsSyncImpl();
 
   void        ProcessEvent(const Integration::Event& event);
   void        SendNotification();

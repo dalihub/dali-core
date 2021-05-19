@@ -20,10 +20,10 @@
 #include <dali/graphics-api/graphics-controller.h>
 #include "test-gl-abstraction.h"
 #include "test-gl-context-helper-abstraction.h"
-#include "test-gl-sync-abstraction.h"
 #include "test-graphics-command-buffer.h"
 #include "test-graphics-program.h"
 #include "test-graphics-reflection.h"
+#include "test-graphics-sync-impl.h"
 
 namespace Dali
 {
@@ -85,6 +85,12 @@ T* Uncast(const Graphics::RenderTarget* object)
   return const_cast<T*>(static_cast<const T*>(object));
 }
 
+template<typename T>
+T* Uncast(const Graphics::SyncObject* object)
+{
+  return const_cast<T*>(static_cast<const T*>(object));
+}
+
 class TestGraphicsController : public Dali::Graphics::Controller
 {
 public:
@@ -102,14 +108,14 @@ public:
     return mGl;
   }
 
-  Integration::GlSyncAbstraction& GetGlSyncAbstraction() override
-  {
-    return mGlSyncAbstraction;
-  }
-
   Integration::GlContextHelperAbstraction& GetGlContextHelperAbstraction() override
   {
     return mGlContextHelperAbstraction;
+  }
+
+  TestGraphicsSyncImplementation& GetGraphicsSyncImpl()
+  {
+    return mGraphicsSyncImpl;
   }
 
   void SubmitCommandBuffers(const Graphics::SubmitInfo& submitInfo) override;
@@ -274,11 +280,20 @@ public:
   Graphics::UniquePtr<Graphics::RenderTarget> CreateRenderTarget(const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo, Graphics::UniquePtr<Graphics::RenderTarget>&& oldRenderTarget) override;
 
   /**
+   * @brief Creates new sync object
+   * Could add timeout etc to createinfo... but nah.
+   *
+   * @return pointer to the SyncObject
+   */
+  Graphics::UniquePtr<Graphics::SyncObject> CreateSyncObject(const Graphics::SyncObjectCreateInfo&       syncObjectCreateInfo,
+                                                             Graphics::UniquePtr<Graphics::SyncObject>&& oldSyncObject) override;
+
+  /**
    * @brief Maps memory associated with Buffer object
    *
    * @param[in] mapInfo Filled details of mapped resource
    *
-   * @return Returns pointer to Memory object or Graphicsnullptr on error
+   * @return Returns pointer to Memory object or nullptr on error
    */
   Graphics::UniquePtr<Graphics::Memory> MapBufferRange(const Graphics::MapBufferInfo& mapInfo) override;
 
@@ -397,7 +412,7 @@ public:
   mutable std::vector<Graphics::SubmitInfo> mSubmitStack;
 
   TestGlAbstraction              mGl;
-  TestGlSyncAbstraction          mGlSyncAbstraction;
+  TestGraphicsSyncImplementation mGraphicsSyncImpl;
   TestGlContextHelperAbstraction mGlContextHelperAbstraction;
 
   bool isDiscardQueueEmptyResult{true};

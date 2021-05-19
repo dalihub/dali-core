@@ -52,7 +52,6 @@ class FrameCallbackInterface;
 
 namespace Integration
 {
-class GlSyncAbstraction;
 class RenderController;
 
 } // namespace Integration

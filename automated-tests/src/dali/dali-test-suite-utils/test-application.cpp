@@ -155,14 +155,14 @@ TestGlAbstraction& TestApplication::GetGlAbstraction()
   return static_cast<TestGlAbstraction&>(mGraphicsController.GetGlAbstraction());
 }
 
-TestGlSyncAbstraction& TestApplication::GetGlSyncAbstraction()
-{
-  return static_cast<TestGlSyncAbstraction&>(mGraphicsController.GetGlSyncAbstraction());
-}
-
 TestGlContextHelperAbstraction& TestApplication::GetGlContextHelperAbstraction()
 {
   return static_cast<TestGlContextHelperAbstraction&>(mGraphicsController.GetGlContextHelperAbstraction());
+}
+
+TestGraphicsSyncImplementation& TestApplication::GetGraphicsSyncImpl()
+{
+  return static_cast<TestGraphicsSyncImplementation&>(mGraphicsController.GetGraphicsSyncImpl());
 }
 
 void TestApplication::ProcessEvent(const Integration::Event& event)

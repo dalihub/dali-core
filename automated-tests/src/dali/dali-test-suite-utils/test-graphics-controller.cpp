@@ -24,6 +24,7 @@
 #include "test-graphics-render-target.h"
 #include "test-graphics-sampler.h"
 #include "test-graphics-shader.h"
+#include "test-graphics-sync-object.h"
 #include "test-graphics-texture.h"
 
 #include <dali/integration-api/gl-defines.h>
@@ -861,6 +862,11 @@ void TestGraphicsController::ProcessCommandBuffer(TestGraphicsCommandBuffer& com
       }
       case CommandType::END_RENDER_PASS:
       {
+        if(cmd.data.endRenderPass.syncObject != nullptr)
+        {
+          auto syncObject = Uncast<TestGraphicsSyncObject>(cmd.data.endRenderPass.syncObject);
+          syncObject->InitializeResource(); // create the sync object.
+        }
         break;
       }
     }
@@ -1147,6 +1153,14 @@ Graphics::UniquePtr<Graphics::RenderTarget> TestGraphicsController::CreateRender
 {
   mCallStack.PushCall("CreateRenderTarget", "");
   return Graphics::MakeUnique<TestGraphicsRenderTarget>(mGl, renderTargetCreateInfo);
+}
+
+Graphics::UniquePtr<Graphics::SyncObject> TestGraphicsController::CreateSyncObject(
+  const Graphics::SyncObjectCreateInfo&       syncObjectCreateInfo,
+  Graphics::UniquePtr<Graphics::SyncObject>&& oldSyncObject)
+{
+  mCallStack.PushCall("CreateSyncObject", "");
+  return Graphics::MakeUnique<TestGraphicsSyncObject>(mGraphicsSyncImpl, syncObjectCreateInfo);
 }
 
 Graphics::UniquePtr<Graphics::Memory> TestGraphicsController::MapBufferRange(const Graphics::MapBufferInfo& mapInfo)

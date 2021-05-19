@@ -593,6 +593,7 @@ struct Command
 
     struct
     {
+      Graphics::SyncObject* syncObject;
     } endRenderPass;
 
     struct
@@ -774,9 +775,16 @@ public:
    * dependencies (for example, to know when target texture is ready
    * before passing it to another render pass).
    */
-  void EndRenderPass() override
+  void EndRenderPass(Graphics::SyncObject* syncObject) override
   {
-    mCallStack.PushCall("EndRenderPass", "");
+    mCommands.emplace_back(CommandType::END_RENDER_PASS);
+    auto& cmd = mCommands.back();
+
+    cmd.data.endRenderPass.syncObject = syncObject;
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["syncObject"] << std::hex << syncObject;
+    mCallStack.PushCall("EndRenderPass", namedParams.str(), namedParams);
   }
 
   void ExecuteCommandBuffers(std::vector<const CommandBuffer*>&& commandBuffers) override

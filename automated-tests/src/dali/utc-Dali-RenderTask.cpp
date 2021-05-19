@@ -1792,7 +1792,7 @@ int UtcDaliRenderTaskSignalFinished(void)
   tet_infoline("Testing RenderTask::SignalFinished()");
 
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
-  TestGlSyncAbstraction& sync = application.GetGlSyncAbstraction();
+  auto& sync = application.GetGraphicsSyncImpl();
 
   CameraActor offscreenCameraActor = CameraActor::New();
 
@@ -1834,7 +1834,7 @@ int UtcDaliRenderTaskSignalFinished(void)
   application.SendNotification();
   DALI_TEST_CHECK(!finished);
 
-  Integration::GlSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
+  Integration::GraphicsSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
   DALI_TEST_CHECK(lastSyncObj != NULL);
 
   application.Render();
@@ -2013,8 +2013,8 @@ int UtcDaliRenderTaskOnce01(void)
 
   // SETUP AN OFFSCREEN RENDER TASK
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
-  TestGlSyncAbstraction& sync      = application.GetGlSyncAbstraction();
-  TraceCallStack&        drawTrace = application.GetGlAbstraction().GetDrawTrace();
+  auto&           sync      = application.GetGraphicsSyncImpl();
+  TraceCallStack& drawTrace = application.GetGlAbstraction().GetDrawTrace();
   drawTrace.Enable(true);
 
   Actor rootActor = Actor::New();
@@ -2034,7 +2034,7 @@ int UtcDaliRenderTaskOnce01(void)
 
   DALI_TEST_CHECK(UpdateRender(application, drawTrace, true, finished, false, true, __LINE__));
 
-  Integration::GlSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
+  Integration::GraphicsSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
   DALI_TEST_CHECK(lastSyncObj != NULL);
   sync.SetObjectSynced(lastSyncObj, true);
 
@@ -2051,8 +2051,8 @@ int UtcDaliRenderTaskOnce02(void)
 
   // SETUP AN OFFSCREEN RENDER TASK
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
-  TestGlSyncAbstraction& sync      = application.GetGlSyncAbstraction();
-  TraceCallStack&        drawTrace = application.GetGlAbstraction().GetDrawTrace();
+  auto&           sync      = application.GetGraphicsSyncImpl();
+  TraceCallStack& drawTrace = application.GetGlAbstraction().GetDrawTrace();
   drawTrace.Enable(true);
 
   Actor rootActor = Actor::New();
@@ -2081,7 +2081,7 @@ int UtcDaliRenderTaskOnce02(void)
 
   DALI_TEST_CHECK(UpdateRender(application, drawTrace, true, finished, false, true, __LINE__));
 
-  Integration::GlSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
+  Integration::GraphicsSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
   DALI_TEST_CHECK(lastSyncObj != NULL);
   sync.SetObjectSynced(lastSyncObj, true);
 
@@ -2099,8 +2099,8 @@ int UtcDaliRenderTaskOnce03(void)
 
   // SETUP A CONTINUOUS OFFSCREEN RENDER TASK
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
-  TestGlSyncAbstraction& sync      = application.GetGlSyncAbstraction();
-  TraceCallStack&        drawTrace = application.GetGlAbstraction().GetDrawTrace();
+  auto&           sync      = application.GetGraphicsSyncImpl();
+  TraceCallStack& drawTrace = application.GetGlAbstraction().GetDrawTrace();
   drawTrace.Enable(true);
 
   Actor rootActor = Actor::New();
@@ -2124,7 +2124,7 @@ int UtcDaliRenderTaskOnce03(void)
   //                                                   drawn   sig    finished  Keep updating
   DALI_TEST_CHECK(UpdateRender(application, drawTrace, true, finished, false, true, __LINE__));
 
-  Integration::GlSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
+  Integration::GraphicsSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
   DALI_TEST_CHECK(lastSyncObj != NULL);
   sync.SetObjectSynced(lastSyncObj, true);
 
@@ -2143,8 +2143,8 @@ int UtcDaliRenderTaskOnce04(void)
 
   // SETUP AN OFFSCREEN RENDER TASK
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
-  TestGlSyncAbstraction& sync      = application.GetGlSyncAbstraction();
-  TraceCallStack&        drawTrace = application.GetGlAbstraction().GetDrawTrace();
+  auto&           sync      = application.GetGraphicsSyncImpl();
+  TraceCallStack& drawTrace = application.GetGlAbstraction().GetDrawTrace();
   drawTrace.Enable(true);
 
   Actor rootActor = Actor::New();
@@ -2178,7 +2178,7 @@ int UtcDaliRenderTaskOnce04(void)
   //   FAILS                                          drawn   sig    finished  Keep updating
   DALI_TEST_CHECK(UpdateRender(application, drawTrace, true, finished, false, true, __LINE__));
 
-  Integration::GlSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
+  Integration::GraphicsSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
   DALI_TEST_CHECK(lastSyncObj != NULL);
   sync.SetObjectSynced(lastSyncObj, true);
 
@@ -2338,8 +2338,8 @@ int UtcDaliRenderTaskOnceNoSync04(void)
   application.SendNotification();
 
   DALI_TEST_CHECK(UpdateRender(application, drawTrace, true, finished, false, false, __LINE__));
-  TestGlSyncAbstraction&                      sync        = application.GetGlSyncAbstraction();
-  Integration::GlSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
+  auto&                                             sync        = application.GetGraphicsSyncImpl();
+  Integration::GraphicsSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
   DALI_TEST_CHECK(lastSyncObj == NULL);
 
   newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
@@ -2465,7 +2465,7 @@ int UtcDaliRenderTaskFinishInvisibleSourceActor(void)
   tet_infoline("Testing RenderTask::FinishInvisibleSourceActor()");
 
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
-  TestGlSyncAbstraction& sync = application.GetGlSyncAbstraction();
+  auto& sync = application.GetGraphicsSyncImpl();
 
   CameraActor offscreenCameraActor = CameraActor::New();
 
@@ -2514,7 +2514,7 @@ int UtcDaliRenderTaskFinishInvisibleSourceActor(void)
   application.SendNotification();
   DALI_TEST_CHECK(!finished);
 
-  Integration::GlSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
+  Integration::GraphicsSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
   DALI_TEST_CHECK(lastSyncObj != NULL);
 
   application.Render();

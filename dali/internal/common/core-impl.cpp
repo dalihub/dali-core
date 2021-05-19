@@ -24,7 +24,6 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/events/event.h>
 #include <dali/integration-api/gl-context-helper-abstraction.h>
-#include <dali/integration-api/gl-sync-abstraction.h>
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/integration-api/processor-interface.h>
 #include <dali/integration-api/render-controller.h>
@@ -72,7 +71,6 @@ namespace Internal
 using Integration::Event;
 using Integration::GlAbstraction;
 using Integration::GlContextHelperAbstraction;
-using Integration::GlSyncAbstraction;
 using Integration::PlatformAbstraction;
 using Integration::RenderController;
 using Integration::RenderStatus;

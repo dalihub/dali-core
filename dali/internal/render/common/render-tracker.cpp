@@ -19,7 +19,7 @@
 #include <dali/internal/render/common/render-tracker.h>
 
 // INTERNAL INCLUDES
-#include <dali/integration-api/gl-sync-abstraction.h>
+#include <dali/graphics-api/graphics-sync-object-create-info.h>
 #include <dali/internal/render/common/render-tracker-debug.h>
 
 // EXTERNAL INCLUDES
@@ -31,7 +31,7 @@ namespace Internal
 namespace Render
 {
 RenderTracker::RenderTracker()
-: mGlSyncAbstraction(nullptr),
+: mGraphicsController(nullptr),
   mSyncObject(nullptr),
   mSyncTrigger(0)
 {
@@ -41,26 +41,18 @@ RenderTracker::RenderTracker()
 RenderTracker::~RenderTracker()
 {
   TRACKER_LOG(Debug::Verbose);
-  if(mSyncObject)
-  {
-    mGlSyncAbstraction->DestroySyncObject(mSyncObject);
-    mSyncObject = nullptr;
-  }
+  mSyncObject.reset(nullptr); // Will destroy sync object immediately
 }
 
-void RenderTracker::CreateSyncObject(Integration::GlSyncAbstraction& glSyncAbstraction)
+Graphics::SyncObject* RenderTracker::CreateSyncObject(Graphics::Controller& graphicsController)
 {
-  mGlSyncAbstraction = &glSyncAbstraction;
+  mGraphicsController = &graphicsController;
+
   TRACKER_LOG(Debug::General);
 
-  // Destroy any previous sync object
-  if(mSyncObject)
-  {
-    mGlSyncAbstraction->DestroySyncObject(mSyncObject);
-    mSyncObject = nullptr;
-  }
   ResetSyncFlag();
-  mSyncObject = mGlSyncAbstraction->CreateSyncObject();
+  mSyncObject = mGraphicsController->CreateSyncObject(Graphics::SyncObjectCreateInfo{}, std::move(mSyncObject));
+  return mSyncObject.get();
 }
 
 void RenderTracker::PollSyncObject()
@@ -68,8 +60,7 @@ void RenderTracker::PollSyncObject()
   if(mSyncObject && mSyncObject->IsSynced())
   {
     SetSyncFlag();
-    mGlSyncAbstraction->DestroySyncObject(mSyncObject);
-    mSyncObject = nullptr;
+    mSyncObject.reset();
 
     TRACKER_LOG_FMT(Debug::General, " Synced\n");
     return;

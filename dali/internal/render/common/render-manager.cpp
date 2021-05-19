@@ -948,18 +948,16 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       }
     }
 
+    Graphics::SyncObject* syncObject{nullptr};
+    // If the render instruction has an associated render tracker (owned separately)
+    // and framebuffer, create a one shot sync object, and use it to determine when
+    // the render pass has finished executing on GPU.
     if(instruction.mRenderTracker && instruction.mFrameBuffer)
     {
-      // This will create a sync object every frame this render tracker
-      // is alive (though it should be now be created only for
-      // render-once render tasks)
-      // @todo Add syncing to Graphics API
-      instruction.mRenderTracker->CreateSyncObject(mImpl->graphicsController.GetGlSyncAbstraction());
-      instruction.mRenderTracker = nullptr; // Only create once.
+      syncObject                 = instruction.mRenderTracker->CreateSyncObject(mImpl->graphicsController);
+      instruction.mRenderTracker = nullptr;
     }
-
-    // End render pass
-    mainCommandBuffer->EndRenderPass();
+    mainCommandBuffer->EndRenderPass(syncObject);
   }
   mImpl->renderAlgorithms.SubmitCommandBuffer();
 
