@@ -2,7 +2,7 @@
 #define DALI_SCENE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ public:
    *
    * @return a handle to a newly allocated Dali resource.
    */
-  static Scene New(Size size, int orientation = 0);
+  static Scene New(Size size, int32_t orientation = 0);
 
   /**
    * @brief Downcast an Object handle to Scene handle.
@@ -242,7 +242,7 @@ public:
    *
    * @note A callback of the following type may be used:
    * @code
-   *   void MyFunction( int frameId );
+   *   void MyFunction( int32_t frameId );
    * @endcode
    * This callback will be deleted once it is called.
    *
@@ -258,7 +258,7 @@ public:
    *
    * @note A callback of the following type may be used:
    * @code
-   *   void MyFunction( int frameId );
+   *   void MyFunction( int32_t frameId );
    * @endcode
    * This callback will be deleted once it is called.
    *
@@ -291,7 +291,21 @@ public:
    * @param[in] height The height of rotated surface
    * @param[in] orientation The orientation of rotated surface
    */
-  void SurfaceRotated(float width, float height, int orientation);
+  void SurfaceRotated(float width, float height, int32_t orientation);
+
+  /**
+   * @brief Gets the current surface orientation. It gets the value from the scene object.
+   *
+   * @return The current surface orientation.
+   */
+  int32_t GetCurrentSurfaceOrientation() const;
+
+  /**
+   * @brief Gets the current surface rectangle. It gets the value from the scene object.
+   *
+   * @return The current surface rectangle
+   */
+  const Rect<int32_t>& GetCurrentSurfaceRect() const;
 
   /**
    * Query wheter the surface rect is changed or not.
