@@ -50,7 +50,7 @@ class Scene;
 
 struct DirtyRect
 {
-  DirtyRect(Node* node, Render::Renderer* renderer, int frame, Rect<int>& rect)
+  DirtyRect(Node* node, Render::Renderer* renderer, int32_t frame, Rect<int>& rect)
   : node(node),
     renderer(renderer),
     frame(frame),
@@ -89,10 +89,10 @@ struct DirtyRect
 
   Node*             node;
   Render::Renderer* renderer;
-  int               frame;
+  int32_t           frame;
 
-  Rect<int> rect;
-  bool      visited;
+  Rect<int32_t> rect;
+  bool          visited;
 };
 
 } // namespace SceneGraph
@@ -116,7 +116,7 @@ public:
   /**
    * @copydoc Dali::Integration::Scene::New
    */
-  static ScenePtr New(Size size, int orientation = 0);
+  static ScenePtr New(Size size, int32_t orientation = 0);
 
   /**
    * virtual destructor
@@ -242,14 +242,17 @@ public:
    * @param[in] height The height of rotated surface
    * @param[in] orientation The orientation of rotated surface
    */
-  void SurfaceRotated(float width, float height, int orientation);
+  void SurfaceRotated(float width, float height, int32_t orientation);
 
   /**
-   * @brief Get surface's current orientation
-   *
-   * @return surface orientation
+   * @copydoc Dali::Integration::Scene::GetCurrentSurfaceOrientation
    */
-  int GetSurfaceOrientation();
+  int32_t GetCurrentSurfaceOrientation() const;
+
+  /**
+   * @copydoc Dali::Integration::Scene::GetCurrentSurfaceRect
+   */
+  const Rect<int32_t>& GetCurrentSurfaceRect() const;
 
   /**
    * @copydoc Dali::Integration::Scene::IsSurfaceRectChanged
@@ -368,7 +371,7 @@ private:
    * @param[in] size The size of the set surface
    * @param[in] orientation The orientation of the set surface for this scene
    */
-  void Initialize(Size size, int orientation);
+  void Initialize(Size size, int32_t orientation);
 
   // Undefined
   Scene(const Scene&) = delete;
@@ -383,7 +386,7 @@ private:
    * @param[in] height The height of rotated surface
    * @param[in] orientation The orientation of rotated surface
    */
-  void ChangedSurface(float width, float height, int orientation);
+  void ChangedSurface(float width, float height, int32_t orientation);
 
 private:
   Internal::SceneGraph::Scene* mSceneObject;
@@ -409,7 +412,7 @@ private:
   EventProcessor mEventProcessor;
 
   // The Surface's orientation
-  int mSurfaceOrientation;
+  int32_t mSurfaceOrientation;
 
   // The key event signal
   Integration::Scene::KeyEventSignalType          mKeyEventSignal;

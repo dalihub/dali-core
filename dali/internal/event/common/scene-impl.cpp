@@ -41,7 +41,7 @@ namespace Dali
 {
 namespace Internal
 {
-ScenePtr Scene::New(Size size, int orientation)
+ScenePtr Scene::New(Size size, int32_t orientation)
 {
   ScenePtr scene = new Scene;
 
@@ -93,7 +93,7 @@ Scene::~Scene()
   // When this destructor is called, the scene has either already been removed from Core or Core has already been destroyed
 }
 
-void Scene::Initialize(Size size, int orientation)
+void Scene::Initialize(Size size, int32_t orientation)
 {
   ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
 
@@ -277,18 +277,23 @@ void Scene::EmitKeyEventSignal(const Dali::KeyEvent& event)
   }
 }
 
-void Scene::SurfaceRotated(float width, float height, int orientation)
+void Scene::SurfaceRotated(float width, float height, int32_t orientation)
 {
   mSurfaceOrientation = orientation;
   ChangedSurface(width, height, orientation);
 }
 
-int Scene::GetSurfaceOrientation()
+int32_t Scene::GetCurrentSurfaceOrientation() const
 {
-  return mSurfaceOrientation;
+  return mSceneObject->GetSurfaceOrientation();
 }
 
-void Scene::ChangedSurface(float width, float height, int orientation)
+const Rect<int32_t>& Scene::GetCurrentSurfaceRect() const
+{
+  return mSceneObject->GetSurfaceRect();
+}
+
+void Scene::ChangedSurface(float width, float height, int32_t orientation)
 {
   Rect<int32_t> newSize(0, 0, static_cast<int32_t>(width), static_cast<int32_t>(height)); // truncated
   mSize.width  = width;

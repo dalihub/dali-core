@@ -87,8 +87,8 @@ void TestGraphicsBuffer::BindAsUniformBuffer(const TestGraphicsProgram* program,
   Graphics::UniformBlockInfo uboInfo{};
   reflection->GetUniformBlock(0, uboInfo);
 
-  auto offset = uboBinding.offset;
-  auto* data = memory.data() + offset;
+  auto  offset = uboBinding.offset;
+  auto* data   = memory.data() + offset;
 
   for(const auto& member : uboInfo.members)
   {
