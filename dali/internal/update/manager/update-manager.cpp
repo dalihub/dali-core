@@ -44,20 +44,20 @@
 //#define NODE_TREE_LOGGING 1
 
 #if(defined(DEBUG_ENABLED) && defined(NODE_TREE_LOGGING))
-#define SNAPSHOT_NODE_LOGGING                                                       \
-  const uint32_t FRAME_COUNT_TRIGGER = 16;                                          \
-  if(mImpl->frameCounter >= FRAME_COUNT_TRIGGER)                                    \
-  {                                                                                 \
-    for(auto&& scene : mImpl->scenes)                                               \
-    {                                                                               \
-      if(scene && scene->root)                                                      \
-      {                                                                             \
-        mImpl->frameCounter = 0;                                                    \
-        PrintNodeTree(*scene->root, mSceneGraphBuffers.GetUpdateBufferIndex(), ""); \
-      }                                                                             \
-    }                                                                               \
-  }
-mImpl->frameCounter++;
+#define SNAPSHOT_NODE_LOGGING                                                   \
+  const uint32_t FRAME_COUNT_TRIGGER = 16;                                      \
+  if(mImpl->frameCounter >= FRAME_COUNT_TRIGGER)                                \
+  {                                                                             \
+    for(auto&& scene : mImpl->scenes)                                           \
+    {                                                                           \
+      if(scene && scene->root)                                                  \
+      {                                                                         \
+        mImpl->frameCounter = 0;                                                \
+        PrintNodes(*scene->root, mSceneGraphBuffers.GetUpdateBufferIndex(), 0); \
+      }                                                                         \
+    }                                                                           \
+  }                                                                             \
+  mImpl->frameCounter++;
 #else
 #define SNAPSHOT_NODE_LOGGING
 #endif
