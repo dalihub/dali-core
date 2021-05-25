@@ -1056,53 +1056,6 @@ int UtcDaliPinchGestureLayerConsumesTouch(void)
   END_TEST;
 }
 
-int UtcDaliPinchGestureInterruptedWhenTouchConsumed(void)
-{
-  TestApplication application;
-
-  Actor actor = Actor::New();
-  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
-  application.GetScene().Add(actor);
-
-  bool                           consume = false;
-  TouchEventFunctorConsumeSetter touchFunctor(consume);
-  actor.TouchedSignal().Connect(&application, touchFunctor);
-
-  // Render and notify
-  application.SendNotification();
-  application.Render();
-
-  SignalData             data;
-  GestureReceivedFunctor functor(data);
-
-  PinchGestureDetector detector = PinchGestureDetector::New();
-  detector.Attach(actor);
-  detector.DetectedSignal().Connect(&application, functor);
-
-  // Start gesture within the actor's area, we should receive the pinch as the touch is NOT being consumed
-  TestStartPinch(application, Vector2(2.0f, 20.0f), Vector2(38.0f, 20.0f), Vector2(10.0f, 20.0f), Vector2(30.0f, 20.0f), 100);
-
-  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(GestureState::STARTED, data.receivedGesture.GetState(), TEST_LOCATION);
-  data.Reset();
-
-  // Continue the gesture within the actor's area, but now the touch consumes thus cancelling the gesture
-  consume = true;
-
-  TestContinuePinch(application, Vector2(112.0f, 100.0f), Vector2(112.0f, 124.0f), Vector2(5.0f, 5.0f), Vector2(35.0f, 35.0f), 200);
-
-  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(GestureState::CANCELLED, data.receivedGesture.GetState(), TEST_LOCATION);
-  data.Reset();
-
-  // Start another pinch, we should not even get the callback this time
-  TestStartPinch(application, Vector2(2.0f, 20.0f), Vector2(38.0f, 20.0f), Vector2(10.0f, 20.0f), Vector2(30.0f, 20.0f), 100);
-  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
-
-  END_TEST;
-}
-
 int UtcDaliPinchGestureDisableDetectionDuringPinchN(void)
 {
   // Crash sometimes occurred when gesture-recognizer was deleted internally during a signal when the attached actor was detached

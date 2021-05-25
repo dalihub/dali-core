@@ -994,49 +994,6 @@ int UtcDaliLongPressGestureSetMinimumHoldingTime(void)
   END_TEST;
 }
 
-int UtcDaliLongPressGestureInterruptedWhenTouchConsumed(void)
-{
-  TestApplication application;
-
-  Actor actor = Actor::New();
-  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
-  application.GetScene().Add(actor);
-
-  bool                           consume = false;
-  TouchEventFunctorConsumeSetter touchFunctor(consume);
-  actor.TouchedSignal().Connect(&application, touchFunctor);
-
-  // Render and notify
-  application.SendNotification();
-  application.Render();
-
-  SignalData             data;
-  GestureReceivedFunctor functor(data);
-
-  LongPressGestureDetector detector = LongPressGestureDetector::New();
-  detector.Attach(actor);
-  detector.DetectedSignal().Connect(&application, functor);
-
-  // Start gesture within the actor's area, we should receive the gesture as the touch is NOT being consumed
-  TestGenerateLongPress(application, 50.0f, 50.0f);
-  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  data.Reset();
-  TestEndLongPress(application, 50.0f, 50.0f);
-  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  data.Reset();
-
-  // Another gesture in the same location, this time we will not receive it as touch is being consumed
-  consume = true;
-  TestGenerateLongPress(application, 50.0f, 50.0f);
-  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
-  data.Reset();
-  TestEndLongPress(application, 50.0f, 50.0f);
-  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
-
-  END_TEST;
-}
-
 int UtcDaliLongPressGestureDisableDetectionDuringLongPressN(void)
 {
   // Crash occurred when gesture-recognizer was deleted internally during a signal when the attached actor was detached
