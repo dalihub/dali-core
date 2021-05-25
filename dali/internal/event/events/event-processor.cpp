@@ -153,15 +153,7 @@ void EventProcessor::ProcessEvents()
       case Event::Touch:
       {
         Integration::TouchEvent& touchEvent = static_cast<Integration::TouchEvent&>(*event);
-        const bool consumed = mTouchEventProcessor.ProcessTouchEvent( touchEvent );
-
-        // If touch is consumed, then gestures should be cancelled
-        // Do this by sending an interrupted event to the GestureEventProcessor
-        if( consumed )
-        {
-          // Integration::Point& point = touchEvent.GetPoint(0);
-          // point.SetState( PointState::INTERRUPTED );
-        }
+        mTouchEventProcessor.ProcessTouchEvent(touchEvent);
 
         mGestureEventProcessor.ProcessTouchEvent(mScene, touchEvent);
         break;

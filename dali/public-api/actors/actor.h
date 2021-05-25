@@ -2,7 +2,7 @@
 #define DALI_ACTOR_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1166,7 +1166,6 @@ public: // Signals
    * @endcode
    * The return value of True, indicates that the touch event has been consumed.
    * Otherwise the signal will be emitted on the next sensitive parent of the actor.
-   * A true return will also cancel any ongoing gestures.
    * @SINCE_1_9.28
    * @return The signal to connect to
    * @pre The Actor has been initialized.
