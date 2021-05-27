@@ -40,8 +40,8 @@ public:
   TraceCallStack&                 mCallStack;
 
   GLuint mId{0};
-  GLuint mDepthBuffer;
-  GLuint mStencilBuffer;
+  GLuint mDepthBuffer{0};
+  GLuint mStencilBuffer{0};
 };
 
 } // namespace Dali

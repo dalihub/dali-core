@@ -600,11 +600,14 @@ void TestGraphicsController::ProcessCommandBuffer(TestGraphicsCommandBuffer& com
       }
       case CommandType::BIND_UNIFORM_BUFFER:
       {
-        auto& bindings = cmd.data.bindUniformBuffers;
-        auto  buffer   = bindings.standaloneUniformsBufferBinding;
+        if(currentPipeline)
+        {
+          auto& bindings = cmd.data.bindUniformBuffers;
+          auto  buffer   = bindings.standaloneUniformsBufferBinding;
 
-        // based on reflection, issue gl calls
-        buffer.buffer->BindAsUniformBuffer(static_cast<const TestGraphicsProgram*>(currentPipeline->programState.program), bindings.standaloneUniformsBufferBinding);
+          // based on reflection, issue gl calls
+          buffer.buffer->BindAsUniformBuffer(static_cast<const TestGraphicsProgram*>(currentPipeline->programState.program), bindings.standaloneUniformsBufferBinding);
+        }
         break;
       }
       case CommandType::BIND_SAMPLERS:
@@ -619,25 +622,34 @@ void TestGraphicsController::ProcessCommandBuffer(TestGraphicsCommandBuffer& com
       }
       case CommandType::DRAW:
       {
-        mGl.DrawArrays(GetTopology(currentPipeline->inputAssemblyState.topology),
-                       0,
-                       cmd.data.draw.draw.vertexCount);
+        if(currentPipeline)
+        {
+          mGl.DrawArrays(GetTopology(currentPipeline->inputAssemblyState.topology),
+                         0,
+                         cmd.data.draw.draw.vertexCount);
+        }
         break;
       }
       case CommandType::DRAW_INDEXED:
       {
-        mGl.DrawElements(GetTopology(currentPipeline->inputAssemblyState.topology),
-                         static_cast<GLsizei>(cmd.data.draw.drawIndexed.indexCount),
-                         GL_UNSIGNED_SHORT,
-                         reinterpret_cast<void*>(cmd.data.draw.drawIndexed.firstIndex));
+        if(currentPipeline)
+        {
+          mGl.DrawElements(GetTopology(currentPipeline->inputAssemblyState.topology),
+                           static_cast<GLsizei>(cmd.data.draw.drawIndexed.indexCount),
+                           GL_UNSIGNED_SHORT,
+                           reinterpret_cast<void*>(cmd.data.draw.drawIndexed.firstIndex));
+        }
         break;
       }
       case CommandType::DRAW_INDEXED_INDIRECT:
       {
-        mGl.DrawElements(GetTopology(currentPipeline->inputAssemblyState.topology),
-                         static_cast<GLsizei>(cmd.data.draw.drawIndexed.indexCount),
-                         GL_UNSIGNED_SHORT,
-                         reinterpret_cast<void*>(cmd.data.draw.drawIndexed.firstIndex));
+        if(currentPipeline)
+        {
+          mGl.DrawElements(GetTopology(currentPipeline->inputAssemblyState.topology),
+                           static_cast<GLsizei>(cmd.data.draw.drawIndexed.indexCount),
+                           GL_UNSIGNED_SHORT,
+                           reinterpret_cast<void*>(cmd.data.draw.drawIndexed.firstIndex));
+        }
         break;
       }
       case CommandType::SET_SCISSOR:
@@ -838,6 +850,7 @@ void TestGraphicsController::ProcessCommandBuffer(TestGraphicsCommandBuffer& com
               const auto& area = cmd.data.beginRenderPass.renderArea;
               if(area.x == 0 &&
                  area.y == 0 &&
+                 renderTarget &&
                  area.width == renderTarget->mCreateInfo.extent.width &&
                  area.height == renderTarget->mCreateInfo.extent.height)
               {
