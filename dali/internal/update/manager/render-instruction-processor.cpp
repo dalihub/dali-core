@@ -167,7 +167,7 @@ inline void AddRendererToRenderList(BufferIndex         updateBufferIndex,
   if(inside)
   {
     Renderer::OpacityType opacityType = renderable.mRenderer ? renderable.mRenderer->GetOpacityType(updateBufferIndex, *renderable.mNode) : Renderer::OPAQUE;
-    if(opacityType != Renderer::TRANSPARENT || node->GetClippingMode() == ClippingMode::CLIP_CHILDREN)
+    if(opacityType != Renderer::TRANSPARENT || node->GetClippingMode() != ClippingMode::DISABLED)
     {
       // Get the next free RenderItem.
       RenderItem& item = renderList.GetNextFreeItem();
