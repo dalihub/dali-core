@@ -103,24 +103,18 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
       {
         if(pointState == PointState::UP)
         {
+          // This is a possible multiple tap, so has it been quick enough?
+          uint32_t timeDelta                    = event.time - mLastTapTime;
           uint32_t deltaBetweenTouchDownTouchUp = event.time - mTouchTime;
-
-          if(deltaBetweenTouchDownTouchUp < MAXIMUM_TIME_ALLOWED)
+          if(timeDelta > MAXIMUM_TIME_ALLOWED) // If exceeded time between taps then just a single tap
           {
-            // This is a possible multiple tap, so has it been quick enough?
-            uint32_t timeDelta = event.time - mLastTapTime;
-            if(timeDelta > MAXIMUM_TIME_ALLOWED) // If exceeded time between taps then just a single tap
-            {
-              mLastTapTime = event.time;
-              EmitSingleTap(event.time, point);
-              mState = REGISTERED;
-            }
-            else
-            {
-              ++mTapsRegistered;
-              EmitGesture(GestureState::STARTED, event.time);
-              mState = CLEAR;
-            }
+            mLastTapTime = event.time;
+            EmitSingleTap(event.time, point);
+          }
+          else if(deltaBetweenTouchDownTouchUp < MAXIMUM_TIME_ALLOWED)
+          {
+            ++mTapsRegistered;
+            EmitGesture(GestureState::STARTED, event.time);
           }
           else // Delta between touch down and touch up too long to be considered a TAP event
           {
