@@ -121,6 +121,21 @@ struct TouchEventFunctor
   }
 };
 
+Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector2& screenPosition, int source, uint32_t time)
+{
+  Integration::TouchEvent touchEvent;
+  Integration::Point      point;
+  point.SetState(state);
+  point.SetDeviceId(4);
+  point.SetScreenPosition(screenPosition);
+  point.SetDeviceClass(Device::Class::TOUCH);
+  point.SetDeviceSubclass(Device::Subclass::NONE);
+  point.SetMouseButton(static_cast<MouseButton::Type>(source));
+  touchEvent.points.push_back(point);
+  touchEvent.time = time;
+  return touchEvent;
+}
+
 } // namespace
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1041,6 +1056,67 @@ int UtcDaliTapGestureWhenGesturePropargation(void)
   DALI_TEST_EQUALS(true, pData.functorCalled, TEST_LOCATION);
   cData.Reset();
   pData.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliTapGestureGetSourceType(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+
+  TapGestureDetector detector = TapGestureDetector::New();
+  detector.Attach(actor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  // Emit a down signal with MouseButton
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 0, 100));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 0, 120));
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetSourceType(), GestureSourceType::INVALID, TEST_LOCATION);
+
+  data.Reset();
+
+  // Emit a down signal with MouseButton
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 1, 700));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 1, 720));
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetSourceType(), GestureSourceType::PRIMARY, TEST_LOCATION);
+
+  data.Reset();
+
+  // Emit a down signal with MouseButton
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 3, 1300));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 3, 1320));
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetSourceType(), GestureSourceType::SECONDARY, TEST_LOCATION);
+
+  data.Reset();
+
+  // Emit a down signal with MouseButton
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 2, 1900));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 2, 1920));
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetSourceType(), GestureSourceType::TERTIARY, TEST_LOCATION);
 
   END_TEST;
 }

@@ -141,6 +141,8 @@ private:
   Vector2  mTouchPosition; ///< The initial touch down position.
   uint32_t mTouchTime;     ///< The initial touch down time.
   uint32_t mLastTapTime;   ///< Time last tap gesture was registered
+
+  GestureSourceType mGestureSourceType; /// < Gesture input source type value.
 };
 
 } // namespace Internal
