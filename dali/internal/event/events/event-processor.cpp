@@ -156,8 +156,8 @@ void EventProcessor::ProcessEvents()
         // Do this by sending an interrupted event to the GestureEventProcessor
         if(consumed)
         {
-          Integration::Point& point = touchEvent.GetPoint(0);
-          point.SetState(PointState::INTERRUPTED);
+          // Integration::Point& point = touchEvent.GetPoint(0);
+          // point.SetState(PointState::INTERRUPTED);
         }
 
         mGestureEventProcessor.ProcessTouchEvent(mScene, touchEvent);
