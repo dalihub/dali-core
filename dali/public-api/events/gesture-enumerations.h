@@ -2,7 +2,7 @@
 #define DALI_GESTURE_ENUMERATIONS_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,17 @@ enum class GestureState : uint8_t
   FINISHED,   ///< The user has lifted a finger or touched an additional point on the screen. @SINCE_1_9.28
   CANCELLED,  ///< The gesture has been cancelled. @SINCE_1_9.28
   POSSIBLE    ///< A gesture is possible. @SINCE_1_9.28
+};
+
+/**
+ * @brief Enumeration for gesture input source type.
+ */
+enum class GestureSourceType : int8_t
+{
+  INVALID   = -1, ///< invalid data
+  PRIMARY   = 1,  ///< Primary
+  SECONDARY = 3,  ///< Secondary
+  TERTIARY  = 2,  ///< Third (tertiary)
 };
 
 } // namespace Dali

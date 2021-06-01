@@ -74,6 +74,11 @@ struct TapGestureEvent : public GestureEvent
    * If a multi-touch tap, then this should be the centroid of all the touch points.
    */
   Vector2 point;
+
+  /**
+   * This is the value of which input was tapped.
+   */
+  GestureSourceType gestureSourceType;
 };
 
 } // namespace Internal

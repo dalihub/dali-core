@@ -121,6 +121,23 @@ public:
     return mLocalPoint;
   }
 
+  /**
+   * @brief This is the value of which input was tapped.
+   * @param[in] source This is the value of which input was tapped to set.
+   */
+  inline void SetGestureSourceType(const GestureSourceType sourceType)
+  {
+    mGestureSourceType = sourceType;
+  }
+
+  /**
+   * @copydoc Dali::TapGesture::GetSourceType()
+   */
+  inline const GestureSourceType& GetSourceType() const
+  {
+    return mGestureSourceType;
+  }
+
 private:
 
   /**
@@ -131,10 +148,11 @@ private:
   ~TapGesture() override = default;
 
 private:
-  Vector2 mScreenPoint;
-  Vector2 mLocalPoint;
-  uint32_t mNumberOfTaps{1u};
-  uint32_t mNumberOfTouches{1u};
+  Vector2           mScreenPoint;
+  Vector2           mLocalPoint;
+  uint32_t          mNumberOfTaps{1u};
+  uint32_t          mNumberOfTouches{1u};
+  GestureSourceType mGestureSourceType{GestureSourceType::INVALID};
 };
 
 } // namespace Internal

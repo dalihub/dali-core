@@ -27,7 +27,8 @@ namespace Internal
 TapGestureEvent::TapGestureEvent( GestureState state )
 : GestureEvent(GestureType::TAP, state),
   numberOfTaps(1),
-  numberOfTouches(1)
+  numberOfTouches(1),
+  gestureSourceType(GestureSourceType::INVALID)
 {
 }
 

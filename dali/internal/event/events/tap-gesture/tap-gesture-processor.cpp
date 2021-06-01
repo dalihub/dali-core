@@ -63,6 +63,7 @@ void EmitTapSignal(
   tap->SetNumberOfTouches(tapEvent.numberOfTouches);
   tap->SetScreenPoint(tapEvent.point);
   tap->SetLocalPoint(localPoint);
+  tap->SetGestureSourceType(tapEvent.gestureSourceType);
 
   Dali::Actor actorHandle( actor );
   const GestureDetectorContainer::const_iterator endIter = gestureDetectors.end();
