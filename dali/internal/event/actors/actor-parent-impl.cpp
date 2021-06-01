@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,6 +62,11 @@ void ActorParentImpl::Add(Actor& child)
   DALI_ASSERT_ALWAYS(&mOwner != &child && "Cannot add actor to itself");
   DALI_ASSERT_ALWAYS(!child.IsRoot() && "Cannot add root actor");
 
+  if(!mChildren)
+  {
+    mChildren = new ActorContainer;
+  }
+
   Actor* oldParent = child.GetParent();
 
   // child might already be ours
@@ -83,7 +88,7 @@ void ActorParentImpl::Add(Actor& child)
     if(!child.GetParent())
     {
       // Do this first, since user callbacks from within SetParent() may need to remove child
-      AddWithoutNotify(child);
+      mChildren->push_back(ActorPtr(&child));
 
       // SetParent asserts that child can be added
       child.SetParent(&mOwner);
@@ -105,44 +110,10 @@ void ActorParentImpl::Add(Actor& child)
 
 void ActorParentImpl::Remove(Actor& child)
 {
-  bool removed = RemoveWithoutNotify(child);
-
-  if(removed)
-  {
-    child.SetParent(nullptr);
-    // Only put in a relayout request if there is a suitable dependency
-    if(mOwner.RelayoutDependentOnChildren())
-    {
-      mOwner.RelayoutRequest();
-    }
-  }
-
-  // Notification for derived classes
-  mOwner.OnChildRemove(child);
-  EmitChildRemovedSignal(child);
-}
-
-void ActorParentImpl::AddWithoutNotify(Actor& child)
-{
-  if(!mChildren)
-  {
-    mChildren = new ActorContainer;
-  }
-
-  // child might already be ours
-  if(&mOwner != child.GetParent())
-  {
-    // Do this first, since user callbacks from within SetParent() may need to remove child
-    mChildren->push_back(ActorPtr(&child));
-  }
-}
-
-bool ActorParentImpl::RemoveWithoutNotify(Actor& child)
-{
   if((&mOwner == &child) || (!mChildren))
   {
     // no children or removing itself
-    return false;
+    return;
   }
 
   ActorPtr removed;
@@ -162,11 +133,24 @@ bool ActorParentImpl::RemoveWithoutNotify(Actor& child)
       mChildren->erase(iter);
 
       DALI_ASSERT_DEBUG(actor->GetParent() == &mOwner);
+      actor->SetParent(nullptr);
 
       break;
     }
   }
-  return removed;
+
+  if(removed)
+  {
+    // Only put in a relayout request if there is a suitable dependency
+    if(mOwner.RelayoutDependentOnChildren())
+    {
+      mOwner.RelayoutRequest();
+    }
+  }
+
+  // Notification for derived classes
+  mOwner.OnChildRemove(child);
+  EmitChildRemovedSignal(child);
 }
 
 uint32_t ActorParentImpl::GetChildCount() const
