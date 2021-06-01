@@ -21,6 +21,7 @@
 #include <math.h> //floor, log2
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
 
 namespace Dali
 {
@@ -179,6 +180,8 @@ constexpr Graphics::Format ConvertPixelFormat(Pixel::Format format)
       return Graphics::Format::R16G16B16_SFLOAT;
     case Pixel::RGB32F:
       return Graphics::Format::R32G32B32_SFLOAT;
+    case Pixel::R11G11B10F:
+      return Graphics::Format::R11G11B10_UFLOAT_PACK32;
   }
   return Graphics::Format::UNDEFINED;
 }
@@ -205,7 +208,6 @@ Texture::Texture(Type type, Pixel::Format format, ImageDimensions size)
   mPixelFormat(format),
   mWidth(size.GetWidth()),
   mHeight(size.GetHeight()),
-  mMaxMipMapLevel(0),
   mType(type),
   mHasAlpha(HasAlpha(format))
 {
@@ -219,7 +221,6 @@ Texture::Texture(NativeImageInterfacePtr nativeImageInterface)
   mPixelFormat(Pixel::RGBA8888),
   mWidth(static_cast<uint16_t>(nativeImageInterface->GetWidth())),   // ignoring overflow, not happening in practice
   mHeight(static_cast<uint16_t>(nativeImageInterface->GetHeight())), // ignoring overflow, not happening in practice
-  mMaxMipMapLevel(0),
   mType(TextureType::TEXTURE_2D),
   mHasAlpha(nativeImageInterface->RequiresBlending())
 {
@@ -288,6 +289,7 @@ void Texture::Upload(PixelDataPtr pixelData, const Internal::Texture::UploadPara
   info.srcExtent2D  = {params.width, params.height};
   info.srcOffset    = 0;
   info.srcSize      = pixelData->GetBufferSize();
+  info.srcFormat    = ConvertPixelFormat(pixelData->GetPixelFormat());
 
   Graphics::TextureUpdateSourceInfo updateSourceInfo{};
   updateSourceInfo.sourceType          = Graphics::TextureUpdateSourceInfo::Type::MEMORY;
@@ -308,9 +310,12 @@ bool Texture::HasAlphaChannel() const
 
 void Texture::GenerateMipmaps()
 {
-  mMaxMipMapLevel = 0;
-  DALI_LOG_ERROR("FIXME: GRAPHICS");
-  //@todo Implement with Graphics API
+  if(!mGraphicsTexture)
+  {
+    Create(static_cast<Graphics::TextureUsageFlags>(Graphics::TextureUsageFlagBits::SAMPLE));
+  }
+
+  mGraphicsController->GenerateTextureMipmaps(*mGraphicsTexture.get());
 }
 
 } // namespace Render

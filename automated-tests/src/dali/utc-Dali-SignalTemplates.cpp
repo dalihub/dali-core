@@ -1621,13 +1621,25 @@ int UtcDaliSignalDeleteDuringEmit(void)
 
   TestApplication application; // Create core for debug logging
 
-  TestSignals::VoidRetNoParamSignal* signal = new TestSignals::VoidRetNoParamSignal;
+  {
+    TestSignals::VoidRetNoParamSignal* signal = new TestSignals::VoidRetNoParamSignal;
 
-  TestEmitDuringCallback handler1;
-  handler1.DeleteDuringEmitConnect(*signal);
+    TestEmitDuringCallback handler1;
+    handler1.DeleteDuringEmitConnect(*signal);
 
-  // should just log an error
-  signal->Emit();
+    // should just log an error
+    signal->Emit();
+  }
+
+  {
+    TestSignals::FloatRet0ParamSignal* signal = new TestSignals::FloatRet0ParamSignal;
+
+    TestEmitDuringCallback handler1;
+    handler1.DeleteDuringEmitConnect(*signal);
+
+    // should just log an error
+    signal->Emit();
+  }
 
   tet_result(TET_PASS);
 

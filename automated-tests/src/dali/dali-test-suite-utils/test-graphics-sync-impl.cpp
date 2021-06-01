@@ -15,18 +15,21 @@
  *
  */
 
-#include "test-gl-sync-abstraction.h"
+#include "test-graphics-sync-impl.h"
 
 namespace Dali
 {
-TestSyncObject::TestSyncObject(TraceCallStack& trace)
+TestSyncObject::TestSyncObject(Dali::TraceCallStack& trace)
+
 : synced(false),
   mTrace(trace)
 {
+  mTrace.PushCall("TestSyncObject cons", ""); // Trace the method
 }
 
 TestSyncObject::~TestSyncObject()
 {
+  mTrace.PushCall("TestSyncObject dstr", ""); // Trace the method
 }
 
 bool TestSyncObject::IsSynced()
@@ -35,7 +38,7 @@ bool TestSyncObject::IsSynced()
   return synced;
 }
 
-TestGlSyncAbstraction::TestGlSyncAbstraction()
+TestGraphicsSyncImplementation::TestGraphicsSyncImplementation()
 {
   Initialize();
 }
@@ -43,7 +46,7 @@ TestGlSyncAbstraction::TestGlSyncAbstraction()
 /**
  * Destructor
  */
-TestGlSyncAbstraction::~TestGlSyncAbstraction()
+TestGraphicsSyncImplementation::~TestGraphicsSyncImplementation()
 {
   for(SyncIter iter = mSyncObjects.begin(), end = mSyncObjects.end(); iter != end; ++iter)
   {
@@ -52,18 +55,14 @@ TestGlSyncAbstraction::~TestGlSyncAbstraction()
 }
 
 /**
- * Initialize the sync objects - clear down the map
+ * Initialize the sync objects
  */
-void TestGlSyncAbstraction::Initialize()
+void TestGraphicsSyncImplementation::Initialize()
 {
   mSyncObjects.clear();
 }
 
-/**
- * Create a sync object
- * @return the sync object
- */
-Integration::GlSyncAbstraction::SyncObject* TestGlSyncAbstraction::CreateSyncObject()
+Integration::GraphicsSyncAbstraction::SyncObject* TestGraphicsSyncImplementation::CreateSyncObject()
 {
   mTrace.PushCall("CreateSyncObject", ""); // Trace the method
 
@@ -76,7 +75,7 @@ Integration::GlSyncAbstraction::SyncObject* TestGlSyncAbstraction::CreateSyncObj
  * Destroy a sync object
  * @param[in] syncObject The object to destroy
  */
-void TestGlSyncAbstraction::DestroySyncObject(Integration::GlSyncAbstraction::SyncObject* syncObject)
+void TestGraphicsSyncImplementation::DestroySyncObject(Integration::GraphicsSyncAbstraction::SyncObject* syncObject)
 {
   std::stringstream out;
   out << syncObject;
@@ -93,7 +92,7 @@ void TestGlSyncAbstraction::DestroySyncObject(Integration::GlSyncAbstraction::Sy
   }
 }
 
-Integration::GlSyncAbstraction::SyncObject* TestGlSyncAbstraction::GetLastSyncObject()
+Integration::GraphicsSyncAbstraction::SyncObject* TestGraphicsSyncImplementation::GetLastSyncObject()
 {
   if(!mSyncObjects.empty())
   {
@@ -107,7 +106,7 @@ Integration::GlSyncAbstraction::SyncObject* TestGlSyncAbstraction::GetLastSyncOb
  * @param[in]
  * @param[in] sync The sync value to set
  */
-void TestGlSyncAbstraction::SetObjectSynced(Integration::GlSyncAbstraction::SyncObject* syncObject, bool sync)
+void TestGraphicsSyncImplementation::SetObjectSynced(Integration::GraphicsSyncAbstraction::SyncObject* syncObject, bool sync)
 {
   TestSyncObject* testSyncObject = static_cast<TestSyncObject*>(syncObject);
   testSyncObject->synced         = sync;
@@ -116,7 +115,7 @@ void TestGlSyncAbstraction::SetObjectSynced(Integration::GlSyncAbstraction::Sync
 /**
  * Turn trace on
  */
-void TestGlSyncAbstraction::EnableTrace(bool enable)
+void TestGraphicsSyncImplementation::EnableTrace(bool enable)
 {
   mTrace.Enable(enable);
 }
@@ -124,7 +123,7 @@ void TestGlSyncAbstraction::EnableTrace(bool enable)
 /**
  * Reset the trace callstack
  */
-void TestGlSyncAbstraction::ResetTrace()
+void TestGraphicsSyncImplementation::ResetTrace()
 {
   mTrace.Reset();
 }
@@ -132,12 +131,12 @@ void TestGlSyncAbstraction::ResetTrace()
 /**
  * Get the trace object (allows test case to find methods on it)
  */
-TraceCallStack& TestGlSyncAbstraction::GetTrace()
+TraceCallStack& TestGraphicsSyncImplementation::GetTrace()
 {
   return mTrace;
 }
 
-int32_t TestGlSyncAbstraction::GetNumberOfSyncObjects()
+int32_t TestGraphicsSyncImplementation::GetNumberOfSyncObjects()
 {
   return static_cast<int32_t>(mSyncObjects.size());
 }

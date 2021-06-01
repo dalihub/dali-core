@@ -26,6 +26,7 @@
 namespace Dali
 {
 class TestGraphicsProgram;
+class UniformBufferBindingDescriptor;
 class TestGraphicsBuffer : public Graphics::Buffer
 {
 public:
@@ -40,7 +41,7 @@ public:
     return true;
   }
 
-  void BindAsUniformBuffer(const TestGraphicsProgram* program) const;
+  void BindAsUniformBuffer(const TestGraphicsProgram* program, const Dali::UniformBufferBindingDescriptor& uboBinding) const;
 
   TraceCallStack&            mCallStack;
   TestGlAbstraction&         mGl;

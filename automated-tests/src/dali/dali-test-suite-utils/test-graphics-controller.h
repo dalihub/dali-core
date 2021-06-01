@@ -20,9 +20,10 @@
 #include <dali/graphics-api/graphics-controller.h>
 #include "test-gl-abstraction.h"
 #include "test-gl-context-helper-abstraction.h"
-#include "test-gl-sync-abstraction.h"
+#include "test-graphics-command-buffer.h"
 #include "test-graphics-program.h"
 #include "test-graphics-reflection.h"
+#include "test-graphics-sync-impl.h"
 
 namespace Dali
 {
@@ -35,6 +36,60 @@ std::ostream& operator<<(std::ostream& o, Graphics::SamplerAddressMode addressMo
 std::ostream& operator<<(std::ostream& o, Graphics::SamplerFilter filterMode);
 std::ostream& operator<<(std::ostream& o, Graphics::SamplerMipmapMode mipmapMode);
 std::ostream& operator<<(std::ostream& o, const Graphics::SamplerCreateInfo& createInfo);
+
+template<typename T>
+T* Uncast(const Graphics::CommandBuffer* object)
+{
+  return const_cast<T*>(static_cast<const T*>(object));
+}
+
+template<typename T>
+T* Uncast(const Graphics::Texture* object)
+{
+  return const_cast<T*>(static_cast<const T*>(object));
+}
+
+template<typename T>
+T* Uncast(const Graphics::Sampler* object)
+{
+  return const_cast<T*>(static_cast<const T*>(object));
+}
+
+template<typename T>
+T* Uncast(const Graphics::Buffer* object)
+{
+  return const_cast<T*>(static_cast<const T*>(object));
+}
+
+template<typename T>
+T* Uncast(const Graphics::Shader* object)
+{
+  return const_cast<T*>(static_cast<const T*>(object));
+}
+
+template<typename T>
+T* Uncast(const Graphics::Framebuffer* object)
+{
+  return const_cast<T*>(static_cast<const T*>(object));
+}
+
+template<typename T>
+T* Uncast(const Graphics::Pipeline* object)
+{
+  return const_cast<T*>(static_cast<const T*>(object));
+}
+
+template<typename T>
+T* Uncast(const Graphics::RenderTarget* object)
+{
+  return const_cast<T*>(static_cast<const T*>(object));
+}
+
+template<typename T>
+T* Uncast(const Graphics::SyncObject* object)
+{
+  return const_cast<T*>(static_cast<const T*>(object));
+}
 
 class TestGraphicsController : public Dali::Graphics::Controller
 {
@@ -53,14 +108,14 @@ public:
     return mGl;
   }
 
-  Integration::GlSyncAbstraction& GetGlSyncAbstraction() override
-  {
-    return mGlSyncAbstraction;
-  }
-
   Integration::GlContextHelperAbstraction& GetGlContextHelperAbstraction() override
   {
     return mGlContextHelperAbstraction;
+  }
+
+  TestGraphicsSyncImplementation& GetGraphicsSyncImpl()
+  {
+    return mGraphicsSyncImpl;
   }
 
   void SubmitCommandBuffers(const Graphics::SubmitInfo& submitInfo) override;
@@ -111,6 +166,12 @@ public:
    */
   void UpdateTextures(const std::vector<Graphics::TextureUpdateInfo>&       updateInfoList,
                       const std::vector<Graphics::TextureUpdateSourceInfo>& sourceList) override;
+
+  /**
+   * Auto generates mipmaps for the texture
+   * @param[in] texture The texture
+   */
+  void GenerateTextureMipmaps(const Graphics::Texture& texture) override;
 
   /**
    * TBD: do we need those functions in the new implementation?
@@ -219,11 +280,20 @@ public:
   Graphics::UniquePtr<Graphics::RenderTarget> CreateRenderTarget(const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo, Graphics::UniquePtr<Graphics::RenderTarget>&& oldRenderTarget) override;
 
   /**
+   * @brief Creates new sync object
+   * Could add timeout etc to createinfo... but nah.
+   *
+   * @return pointer to the SyncObject
+   */
+  Graphics::UniquePtr<Graphics::SyncObject> CreateSyncObject(const Graphics::SyncObjectCreateInfo&       syncObjectCreateInfo,
+                                                             Graphics::UniquePtr<Graphics::SyncObject>&& oldSyncObject) override;
+
+  /**
    * @brief Maps memory associated with Buffer object
    *
    * @param[in] mapInfo Filled details of mapped resource
    *
-   * @return Returns pointer to Memory object or Graphicsnullptr on error
+   * @return Returns pointer to Memory object or nullptr on error
    */
   Graphics::UniquePtr<Graphics::Memory> MapBufferRange(const Graphics::MapBufferInfo& mapInfo) override;
 
@@ -331,13 +401,18 @@ public: // Test Functions
    */
   bool GetProgramParameter(Graphics::Program& program, uint32_t parameterId, void* outData) override;
 
+  void ProcessCommandBuffer(TestGraphicsCommandBuffer& commandBuffer);
+
+  void BindPipeline(TestGraphicsPipeline* pipeline);
+
 public:
   mutable TraceCallStack                    mCallStack;
   mutable TraceCallStack                    mCommandBufferCallStack;
+  mutable TraceCallStack                    mFrameBufferCallStack;
   mutable std::vector<Graphics::SubmitInfo> mSubmitStack;
 
   TestGlAbstraction              mGl;
-  TestGlSyncAbstraction          mGlSyncAbstraction;
+  TestGraphicsSyncImplementation mGraphicsSyncImpl;
   TestGlContextHelperAbstraction mGlContextHelperAbstraction;
 
   bool isDiscardQueueEmptyResult{true};
@@ -351,6 +426,10 @@ public:
     TestGraphicsProgramImpl*                                programImpl;
   };
   std::vector<ProgramCache> mProgramCache;
+
+  struct PipelineCache
+  {
+  };
 
   std::vector<UniformData> mCustomUniforms;
 };

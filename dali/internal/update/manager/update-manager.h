@@ -31,7 +31,7 @@
 #include <dali/internal/event/rendering/texture-impl.h>
 #include <dali/internal/render/renderers/render-texture.h> // For OwnerPointer<Render::Texture>
 #include <dali/internal/render/renderers/render-vertex-buffer.h>
-#include <dali/internal/render/shaders/scene-graph-shader.h> // for OwnerPointer< Shader >
+#include <dali/internal/render/shaders/render-shader.h> // for OwnerPointer< Shader >
 #include <dali/internal/update/animation/scene-graph-animation.h>
 #include <dali/internal/update/common/property-resetter.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
@@ -52,7 +52,6 @@ class FrameCallbackInterface;
 
 namespace Integration
 {
-class GlSyncAbstraction;
 class RenderController;
 
 } // namespace Integration

@@ -26,7 +26,7 @@
 #include <dali/internal/render/common/render-item.h>
 #include <dali/internal/render/common/render-tracker.h>
 #include <dali/internal/render/renderers/render-renderer.h>
-#include <dali/internal/render/shaders/scene-graph-shader.h>
+#include <dali/internal/render/shaders/render-shader.h>
 #include <dali/internal/update/manager/sorted-layers.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
@@ -167,7 +167,7 @@ inline void AddRendererToRenderList(BufferIndex         updateBufferIndex,
   if(inside)
   {
     Renderer::OpacityType opacityType = renderable.mRenderer ? renderable.mRenderer->GetOpacityType(updateBufferIndex, *renderable.mNode) : Renderer::OPAQUE;
-    if(opacityType != Renderer::TRANSPARENT || node->GetClippingMode() == ClippingMode::CLIP_CHILDREN)
+    if(opacityType != Renderer::TRANSPARENT || node->GetClippingMode() != ClippingMode::DISABLED)
     {
       // Get the next free RenderItem.
       RenderItem& item = renderList.GetNextFreeItem();
@@ -376,7 +376,7 @@ inline void RenderInstructionProcessor::SortRenderItems(BufferIndex bufferIndex,
 
       if(item.mRenderer)
       {
-        item.mRenderer->SetSortAttributes(bufferIndex, mSortingHelper[index]);
+        item.mRenderer->SetSortAttributes(mSortingHelper[index]);
       }
 
       // texture set
@@ -396,7 +396,7 @@ inline void RenderInstructionProcessor::SortRenderItems(BufferIndex bufferIndex,
     {
       RenderItem& item = renderList.GetItem(index);
 
-      item.mRenderer->SetSortAttributes(bufferIndex, mSortingHelper[index]);
+      item.mRenderer->SetSortAttributes(mSortingHelper[index]);
 
       // texture set
       mSortingHelper[index].textureSet = item.mTextureSet;

@@ -35,17 +35,6 @@ void texture_set_cleanup(void)
   test_return_value = TET_PASS;
 }
 
-Texture CreateTexture(TextureType::Type type, Pixel::Format format, int width, int height)
-{
-  Texture texture = Texture::New(type, format, width, height);
-
-  int       bufferSize = width * height * Pixel::GetBytesPerPixel(format);
-  uint8_t*  buffer     = reinterpret_cast<uint8_t*>(malloc(bufferSize));
-  PixelData pixelData  = PixelData::New(buffer, bufferSize, width, height, format, PixelData::FREE);
-  texture.Upload(pixelData, 0u, 0u, 0u, 0u, width, height);
-  return texture;
-}
-
 int UtcDaliTextureNew01(void)
 {
   TestApplication application;
@@ -692,11 +681,15 @@ int UtcDaliTextureUploadPixelFormats(void)
       Pixel::BGRA8888,
       Pixel::DEPTH_UNSIGNED_INT,
       Pixel::DEPTH_FLOAT,
-      Pixel::DEPTH_STENCIL};
+      Pixel::DEPTH_STENCIL,
+      Pixel::RGB16F,
+      Pixel::RGB32F,
+      Pixel::R11G11B10F,
+    };
 
   for(auto format : formats)
   {
-    tet_infoline("Creating a Texure with an alpha channel");
+    tet_infoline("Creating a Texure with a new or recent format");
     Texture texture = CreateTexture(TextureType::TEXTURE_2D, format, width, height);
 
     application.SendNotification();
@@ -768,7 +761,6 @@ int UtcDaliTextureUploadSmallerThanSize(void)
 
 int UtcDaliTextureGenerateMipmaps(void)
 {
-#ifdef OLD_GRAPHICS_TEST
   TestApplication application;
   unsigned int    width(64);
   unsigned int    height(64);
@@ -794,9 +786,6 @@ int UtcDaliTextureGenerateMipmaps(void)
     out << GL_TEXTURE_CUBE_MAP;
     DALI_TEST_CHECK(callStack.FindMethodAndParams("GenerateMipmap", out.str().c_str()));
   }
-#else
-  DALI_TEST_CHECK(1);
-#endif
 
   END_TEST;
 }

@@ -22,14 +22,13 @@
 #include <dali/public-api/common/vector-wrapper.h> // std::vector
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/common/connectable.h>           // Dali::Internal::Connectable
-#include <dali/internal/event/common/object-connector.h>      // Dali::Internal::ObjectConnector
-#include <dali/internal/event/common/object-impl.h>           // Dali::Internal::Object
-#include <dali/internal/event/rendering/vertex-buffer-impl.h> // Dali::Internal::VertexBuffer
-#include <dali/internal/render/renderers/render-geometry.h>
 #include <dali/public-api/common/dali-common.h>   // DALI_ASSERT_ALWAYS
 #include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
-#include <dali/public-api/rendering/geometry.h>   // Dali::Geometry
+#include <dali/public-api/object/base-object.h>
+#include <dali/public-api/rendering/geometry.h> // Dali::Geometry
+
+#include <dali/internal/event/rendering/vertex-buffer-impl.h> // Dali::Internal::VertexBuffer
+#include <dali/internal/render/renderers/render-geometry.h>
 
 namespace Dali
 {

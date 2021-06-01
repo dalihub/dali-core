@@ -24,7 +24,6 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/events/event.h>
 #include <dali/integration-api/gl-context-helper-abstraction.h>
-#include <dali/integration-api/gl-sync-abstraction.h>
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/integration-api/processor-interface.h>
 #include <dali/integration-api/render-controller.h>
@@ -49,7 +48,6 @@
 
 #include <dali/internal/render/common/performance-monitor.h>
 #include <dali/internal/render/common/render-manager.h>
-#include <dali/internal/render/gl-resources/context.h>
 
 using Dali::Internal::SceneGraph::DiscardQueue;
 using Dali::Internal::SceneGraph::RenderManager;
@@ -73,7 +71,6 @@ namespace Internal
 using Integration::Event;
 using Integration::GlAbstraction;
 using Integration::GlContextHelperAbstraction;
-using Integration::GlSyncAbstraction;
 using Integration::PlatformAbstraction;
 using Integration::RenderController;
 using Integration::RenderStatus;
@@ -182,12 +179,10 @@ void Core::RecoverFromContextLoss()
 
 void Core::ContextCreated()
 {
-  mRenderManager->ContextCreated();
 }
 
 void Core::ContextDestroyed()
 {
-  mRenderManager->ContextDestroyed();
 }
 
 void Core::Update(float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uint32_t nextVSyncTimeMilliseconds, Integration::UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo)

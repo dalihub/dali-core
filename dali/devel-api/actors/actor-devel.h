@@ -121,8 +121,9 @@ enum Type
 
   /**
     * @brief If you set the TOUCH_AREA_OFFSET on an actor, when you touch the actor, the touch area is expand from the size of actor.
-    * @details Name "touchAreaOffset", type Property::Rect<int> (left, right, bottom, top)
-    * @note for example
+    * @details Name "touchAreaOffset", type Property::Rect<int> (left, right, bottom, top).
+    * For example
+    * @code{.cpp}
     *  Actor actor = Actor::New();
     *  actor.SetProperty(Actor::Property::SIZE, Vector2(20.0f, 20.0f));
     *  actor.SetProperty(DevelActor::Property::TOUCH_AREA_OFFSET, Rect<int>(-10, 20, 30, -40));
@@ -146,8 +147,8 @@ enum Type
     * |         |           |
     * |         v           |
     * +---------------------+
-
-    *  The actual touched size is actor.width + touchAreaOffset.right - touchAreaOffset.left and actor.height + touchAreaOffset.bottom - touchAreaOffset.top
+    * @endcode
+    * The actual touched size is actor.width + touchAreaOffset.right - touchAreaOffset.left and actor.height + touchAreaOffset.bottom - touchAreaOffset.top
     */
   TOUCH_AREA_OFFSET,
 

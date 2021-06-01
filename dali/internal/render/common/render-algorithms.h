@@ -27,8 +27,6 @@ namespace Dali
 {
 namespace Internal
 {
-class Context;
-
 namespace SceneGraph
 {
 class RenderInstruction;
@@ -48,12 +46,14 @@ public:
    *
    * @param[in] graphicsController The graphics controller
    */
-  RenderAlgorithms(Graphics::Controller& graphicsController);
+  explicit RenderAlgorithms(Graphics::Controller& graphicsController);
 
+  RenderAlgorithms(RenderAlgorithms& rhs) = delete; // Prevent copying
+
+  RenderAlgorithms& operator=(const RenderAlgorithms& rhs) = delete; // Prevent Copying
   /**
    * Process a render-instruction.
    * @param[in] instruction            The render-instruction to process.
-   * @param[in] context                The GL context.
    * @param[in] bufferIndex            The current render buffer index (previous update buffer)
    * @param[in] depthBufferAvailable   Whether the depth buffer is available
    * @param[in] stencilBufferAvailable Whether the stencil buffer is available
@@ -63,7 +63,6 @@ public:
    * @param[in] orientation            The surface orientation
    */
   void ProcessRenderInstruction(const SceneGraph::RenderInstruction& instruction,
-                                Context&                             context,
                                 BufferIndex                          bufferIndex,
                                 Integration::DepthBufferAvailable    depthBufferAvailable,
                                 Integration::StencilBufferAvailable  stencilBufferAvailable,
@@ -71,6 +70,29 @@ public:
                                 const Rect<int32_t>&                 viewport,
                                 const Rect<int>&                     rootClippingRect,
                                 int                                  orientation);
+
+  /**
+   * Resets main command buffer (per scene)
+   */
+  void ResetCommandBuffer();
+
+  /**
+   * Submits main command buffer (per scene)
+   */
+  void SubmitCommandBuffer();
+
+  /**
+   * Returns main command buffer
+   *
+   * 'Main' command buffer exists per each scene and it is used
+   * to bake all render instructions for the scene.
+   *
+   * @return main command buffer
+   */
+  [[nodiscard]] Graphics::CommandBuffer* GetMainCommandBuffer() const
+  {
+    return mGraphicsCommandBuffer.get();
+  }
 
 private:
   /**
@@ -89,16 +111,20 @@ private:
    *  - If the node is a clipping node, apply the nodes clip intersected with the current/parent scissor clip.
    *  - If we have gone up the scissor hierarchy, and need to un-apply a scissor clip.
    *  - Disable scissor clipping completely if it is not needed
-   * @param[in] item        The current RenderItem (about to be rendered)
-   * @param[in] context     The current Context
-   * @param[in] instruction The render-instruction to process.
+   * @param[in] item          The current RenderItem (about to be rendered)
+   * @param[in] commandBuffer The command buffer to write into
+
+   * @param[in] instruction   The render-instruction to process.
    */
-  inline void SetupScissorClipping(const Dali::Internal::SceneGraph::RenderItem& item, Context& context, const Dali::Internal::SceneGraph::RenderInstruction& instruction);
+  inline void SetupScissorClipping(
+    const Dali::Internal::SceneGraph::RenderItem&        item,
+    Graphics::CommandBuffer&                             commandBuffer,
+    const Dali::Internal::SceneGraph::RenderInstruction& instruction);
 
   /**
    * @brief Set up the clipping based on the specified clipping settings.
    * @param[in]     item                     The current RenderItem (about to be rendered)
-   * @param[in]     context                  The context
+   * @param[in,out] commandBuffer            The command buffer to write commands to
    * @param[in/out] usedStencilBuffer        True if the stencil buffer has been used so far within this RenderList. Used by StencilMode::ON.
    * @param[in/out] lastClippingDepth        The stencil depth of the last renderer drawn. Used by the clipping feature.
    * @param[in/out] lastClippingId           The clipping ID of the last renderer drawn.   Used by the clipping feature.
@@ -106,7 +132,7 @@ private:
    * @param[in]     instruction              The render-instruction to process.
    */
   inline void SetupClipping(const Dali::Internal::SceneGraph::RenderItem&        item,
-                            Context&                                             context,
+                            Graphics::CommandBuffer&                             commandBuffer,
                             bool&                                                usedStencilBuffer,
                             uint32_t&                                            lastClippingDepth,
                             uint32_t&                                            lastClippingId,
@@ -116,7 +142,6 @@ private:
   /**
    * @brief Process a render-list.
    * @param[in] renderList             The render-list to process.
-   * @param[in] context                The GL context.
    * @param[in] buffer                 The current render buffer index (previous update buffer)
    * @param[in] viewMatrix             The view matrix from the appropriate camera.
    * @param[in] projectionMatrix       The projection matrix from the appropriate camera.
@@ -128,7 +153,6 @@ private:
    * @param[in] orientation            The Scene's surface orientation
    */
   inline void ProcessRenderList(const Dali::Internal::SceneGraph::RenderList&        renderList,
-                                Context&                                             context,
                                 BufferIndex                                          bufferIndex,
                                 const Matrix&                                        viewMatrix,
                                 const Matrix&                                        projectionMatrix,
@@ -140,16 +164,14 @@ private:
                                 const Rect<int>&                                     rootClippingRect,
                                 int                                                  orientation);
 
-  // Prevent copying:
-  RenderAlgorithms(RenderAlgorithms& rhs);
-  RenderAlgorithms& operator=(const RenderAlgorithms& rhs);
-
   // Member variables:
 
   using ScissorStackType = std::vector<Dali::ClippingBox>; ///< The container type used to maintain the applied scissor hierarchy
 
   Graphics::Controller&                        mGraphicsController;
   Graphics::UniquePtr<Graphics::CommandBuffer> mGraphicsCommandBuffer{};
+
+  std::vector<Graphics::CommandBuffer*> mGraphicsRenderItemCommandBuffers{}; ///< Collection of command buffers issuing single draw call
 
   ScissorStackType  mScissorStack;        ///< Contains the currently applied scissor hierarchy (so we can undo clips)
   Dali::ClippingBox mViewportRectangle;   ///< The viewport dimensions, used to translate AABBs to scissor coordinates

@@ -20,10 +20,9 @@
 
 #include "graphics-types.h"
 
-namespace Dali
+namespace Dali::Graphics
 {
-namespace Graphics
-{
+class Framebuffer;
 /**
  * @brief RenderTarget object binds to any presentable graphics output.
  */
@@ -42,7 +41,6 @@ protected:
   RenderTarget& operator=(RenderTarget&&) = default;
 };
 
-} // Namespace Graphics
-} // Namespace Dali
+} // Namespace Dali::Graphics
 
 #endif

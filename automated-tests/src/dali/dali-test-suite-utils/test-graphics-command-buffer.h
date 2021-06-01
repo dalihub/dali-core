@@ -32,26 +32,44 @@ namespace Dali
 {
 class TestGraphicsTexture;
 class TestGraphicsBuffer;
+class TestGraphicsCommandBuffer;
 class TestGraphicsSampler;
 class TestGraphicsPipeline;
 
 enum class CommandType
 {
-  FLUSH                 = 1 << 0,
-  BIND_TEXTURES         = 1 << 1,
-  BIND_SAMPLERS         = 1 << 2,
-  BIND_VERTEX_BUFFERS   = 1 << 3,
-  BIND_INDEX_BUFFER     = 1 << 4,
-  BIND_UNIFORM_BUFFER   = 1 << 5,
-  BIND_PIPELINE         = 1 << 6,
-  DRAW                  = 1 << 7,
-  DRAW_INDEXED          = 1 << 8,
-  DRAW_INDEXED_INDIRECT = 1 << 9,
-  SET_SCISSOR           = 1 << 10,
-  SET_SCISSOR_TEST      = 1 << 11,
-  SET_VIEWPORT          = 1 << 12,
-  SET_VIEWPORT_TEST     = 1 << 13
+  FLUSH                   = 1 << 0,
+  BIND_TEXTURES           = 1 << 1,
+  BIND_SAMPLERS           = 1 << 2,
+  BIND_VERTEX_BUFFERS     = 1 << 3,
+  BIND_INDEX_BUFFER       = 1 << 4,
+  BIND_UNIFORM_BUFFER     = 1 << 5,
+  BIND_PIPELINE           = 1 << 6,
+  DRAW                    = 1 << 7,
+  DRAW_INDEXED            = 1 << 8,
+  DRAW_INDEXED_INDIRECT   = 1 << 9,
+  SET_SCISSOR             = 1 << 10,
+  SET_SCISSOR_TEST        = 1 << 11,
+  SET_VIEWPORT            = 1 << 12,
+  SET_VIEWPORT_TEST       = 1 << 13,
+  BEGIN_RENDER_PASS       = 1 << 14,
+  END_RENDER_PASS         = 1 << 15,
+  EXECUTE_COMMAND_BUFFERS = 1 << 16,
+  SET_COLOR_MASK          = 1 << 17,
+  CLEAR_STENCIL_BUFFER    = 1 << 18,
+  CLEAR_DEPTH_BUFFER      = 1 << 19,
+  SET_STENCIL_TEST_ENABLE = 1 << 20,
+  SET_STENCIL_WRITE_MASK  = 1 << 21,
+  SET_STENCIL_OP          = 1 << 22,
+  SET_STENCIL_FUNC        = 1 << 23,
+  SET_DEPTH_COMPARE_OP    = 1 << 24,
+  SET_DEPTH_TEST_ENABLE   = 1 << 25,
+  SET_DEPTH_WRITE_ENABLE  = 1 << 26,
 };
+
+std::ostream& operator<<(std::ostream& os, Graphics::StencilOp op);
+
+std::ostream& operator<<(std::ostream& os, Graphics::CompareOp op);
 
 using CommandTypeMask = uint32_t;
 template<typename T>
@@ -160,8 +178,37 @@ struct Command
   {
   }
 
+  Command(CommandType type)
+  : type(type)
+  {
+    // do non-trivial initialization
+    switch(type)
+    {
+      case CommandType::BEGIN_RENDER_PASS:
+      {
+        new(&data.beginRenderPass) CommandData::BeginRenderPassDescriptor();
+        break;
+      }
+      default:
+      {
+      }
+    }
+  }
+
   ~Command()
   {
+    switch(type)
+    {
+      case CommandType::BEGIN_RENDER_PASS:
+      {
+        data.beginRenderPass.~BeginRenderPassDescriptor();
+        break;
+      }
+      default:
+      {
+        break;
+      }
+    }
   }
 
   /**
@@ -172,6 +219,22 @@ struct Command
   {
     switch(rhs.type)
     {
+      case CommandType::BEGIN_RENDER_PASS:
+      {
+        new(&data.beginRenderPass) CommandData::BeginRenderPassDescriptor(rhs.data.beginRenderPass);
+        break;
+      }
+      case CommandType::END_RENDER_PASS:
+      {
+        data.endRenderPass = rhs.data.endRenderPass;
+        break;
+      }
+      case CommandType::EXECUTE_COMMAND_BUFFERS:
+      {
+        data.executeCommandBuffers = rhs.data.executeCommandBuffers;
+        break;
+      }
+
       case CommandType::BIND_VERTEX_BUFFERS:
       {
         data.bindVertexBuffers = rhs.data.bindVertexBuffers;
@@ -245,6 +308,59 @@ struct Command
         data.viewportTest.enable = rhs.data.viewportTest.enable;
         break;
       }
+      case CommandType::SET_COLOR_MASK:
+      {
+        data.colorMask.enabled = rhs.data.colorMask.enabled;
+        break;
+      }
+      case CommandType::CLEAR_STENCIL_BUFFER:
+      {
+        break;
+      }
+      case CommandType::CLEAR_DEPTH_BUFFER:
+      {
+        break;
+      }
+      case CommandType::SET_STENCIL_TEST_ENABLE:
+      {
+        data.stencilTest.enabled = rhs.data.stencilTest.enabled;
+        break;
+      }
+      case CommandType::SET_STENCIL_FUNC:
+      {
+        data.stencilFunc.compareMask = rhs.data.stencilFunc.compareMask;
+        data.stencilFunc.compareOp   = rhs.data.stencilFunc.compareOp;
+        data.stencilFunc.reference   = rhs.data.stencilFunc.reference;
+        break;
+      }
+      case CommandType::SET_STENCIL_WRITE_MASK:
+      {
+        data.stencilWriteMask.mask = rhs.data.stencilWriteMask.mask;
+        break;
+      }
+      case CommandType::SET_STENCIL_OP:
+      {
+        data.stencilOp.failOp      = rhs.data.stencilOp.failOp;
+        data.stencilOp.depthFailOp = rhs.data.stencilOp.depthFailOp;
+        data.stencilOp.passOp      = rhs.data.stencilOp.passOp;
+        break;
+      }
+
+      case CommandType::SET_DEPTH_COMPARE_OP:
+      {
+        data.depth.compareOp = rhs.data.depth.compareOp;
+        break;
+      }
+      case CommandType::SET_DEPTH_TEST_ENABLE:
+      {
+        data.depth.testEnabled = rhs.data.depth.testEnabled;
+        break;
+      }
+      case CommandType::SET_DEPTH_WRITE_ENABLE:
+      {
+        data.depth.writeEnabled = rhs.data.depth.writeEnabled;
+        break;
+      }
     }
     type = rhs.type;
   }
@@ -257,6 +373,21 @@ struct Command
   {
     switch(rhs.type)
     {
+      case CommandType::BEGIN_RENDER_PASS:
+      {
+        new(&data.beginRenderPass) CommandData::BeginRenderPassDescriptor(std::move(rhs.data.beginRenderPass));
+        break;
+      }
+      case CommandType::END_RENDER_PASS:
+      {
+        data.endRenderPass = std::move(rhs.data.endRenderPass);
+        break;
+      }
+      case CommandType::EXECUTE_COMMAND_BUFFERS:
+      {
+        data.executeCommandBuffers = std::move(rhs.data.executeCommandBuffers);
+        break;
+      }
       case CommandType::BIND_VERTEX_BUFFERS:
       {
         data.bindVertexBuffers = std::move(rhs.data.bindVertexBuffers);
@@ -330,6 +461,59 @@ struct Command
         data.viewportTest.enable = rhs.data.viewportTest.enable;
         break;
       }
+
+      case CommandType::SET_COLOR_MASK:
+      {
+        data.colorMask.enabled = rhs.data.colorMask.enabled;
+        break;
+      }
+      case CommandType::CLEAR_STENCIL_BUFFER:
+      {
+        break;
+      }
+      case CommandType::CLEAR_DEPTH_BUFFER:
+      {
+        break;
+      }
+      case CommandType::SET_STENCIL_TEST_ENABLE:
+      {
+        data.stencilTest.enabled = rhs.data.stencilTest.enabled;
+        break;
+      }
+      case CommandType::SET_STENCIL_WRITE_MASK:
+      {
+        data.stencilWriteMask.mask = rhs.data.stencilWriteMask.mask;
+        break;
+      }
+      case CommandType::SET_STENCIL_OP:
+      {
+        data.stencilOp.failOp      = rhs.data.stencilOp.failOp;
+        data.stencilOp.depthFailOp = rhs.data.stencilOp.depthFailOp;
+        data.stencilOp.passOp      = rhs.data.stencilOp.passOp;
+        break;
+      }
+      case CommandType::SET_STENCIL_FUNC:
+      {
+        data.stencilFunc.compareMask = rhs.data.stencilFunc.compareMask;
+        data.stencilFunc.compareOp   = rhs.data.stencilFunc.compareOp;
+        data.stencilFunc.reference   = rhs.data.stencilFunc.reference;
+        break;
+      }
+      case CommandType::SET_DEPTH_COMPARE_OP:
+      {
+        data.depth.compareOp = rhs.data.depth.compareOp;
+        break;
+      }
+      case CommandType::SET_DEPTH_TEST_ENABLE:
+      {
+        data.depth.testEnabled = rhs.data.depth.testEnabled;
+        break;
+      }
+      case CommandType::SET_DEPTH_WRITE_ENABLE:
+      {
+        data.depth.writeEnabled = rhs.data.depth.writeEnabled;
+        break;
+      }
     }
     type = rhs.type;
   }
@@ -398,6 +582,60 @@ struct Command
     {
       bool enable;
     } viewportTest;
+
+    struct BeginRenderPassDescriptor
+    {
+      Graphics::RenderPass*             renderPass;
+      Graphics::RenderTarget*           renderTarget;
+      Graphics::Rect2D                  renderArea;
+      std::vector<Graphics::ClearValue> clearValues;
+    } beginRenderPass;
+
+    struct
+    {
+      Graphics::SyncObject* syncObject;
+    } endRenderPass;
+
+    struct
+    {
+      std::vector<const TestGraphicsCommandBuffer*> buffers;
+    } executeCommandBuffers;
+
+    struct
+    {
+      Graphics::CompareOp compareOp;
+      bool                testEnabled;
+      bool                writeEnabled;
+    } depth;
+
+    struct
+    {
+      Graphics::StencilOp failOp;
+      Graphics::StencilOp passOp;
+      Graphics::StencilOp depthFailOp;
+    } stencilOp;
+
+    struct
+    {
+      uint32_t mask;
+    } stencilWriteMask;
+
+    struct
+    {
+      uint32_t            compareMask;
+      Graphics::CompareOp compareOp;
+      uint32_t            reference;
+    } stencilFunc;
+
+    struct
+    {
+      bool enabled;
+    } stencilTest;
+
+    struct
+    {
+      bool enabled;
+    } colorMask;
   } data;
 };
 
@@ -509,12 +747,23 @@ public:
   }
 
   void BeginRenderPass(
-    Graphics::RenderPass&             renderPass,
-    Graphics::RenderTarget&           renderTarget,
-    Graphics::Extent2D                renderArea,
+    Graphics::RenderPass*             renderPass,
+    Graphics::RenderTarget*           renderTarget,
+    Graphics::Rect2D                  renderArea,
     std::vector<Graphics::ClearValue> clearValues) override
   {
-    mCallStack.PushCall("BeginRenderPass", "");
+    mCommands.emplace_back(CommandType::BEGIN_RENDER_PASS);
+    auto& cmd                             = mCommands.back();
+    cmd.data.beginRenderPass.renderPass   = renderPass;
+    cmd.data.beginRenderPass.renderTarget = renderTarget;
+    cmd.data.beginRenderPass.renderArea   = renderArea;
+    cmd.data.beginRenderPass.clearValues  = clearValues;
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["renderPass"] << std::hex << renderPass;
+    namedParams["renderTarget"] << std::hex << renderTarget;
+    namedParams["renderArea"] << renderArea.width << ", " << renderArea.height;
+    mCallStack.PushCall("BeginRenderPass", namedParams.str(), namedParams);
   }
 
   /**
@@ -526,9 +775,29 @@ public:
    * dependencies (for example, to know when target texture is ready
    * before passing it to another render pass).
    */
-  void EndRenderPass() override
+  void EndRenderPass(Graphics::SyncObject* syncObject) override
   {
-    mCallStack.PushCall("EndRenderPass", "");
+    mCommands.emplace_back(CommandType::END_RENDER_PASS);
+    auto& cmd = mCommands.back();
+
+    cmd.data.endRenderPass.syncObject = syncObject;
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["syncObject"] << std::hex << syncObject;
+    mCallStack.PushCall("EndRenderPass", namedParams.str(), namedParams);
+  }
+
+  void ExecuteCommandBuffers(std::vector<const CommandBuffer*>&& commandBuffers) override
+  {
+    mCommands.emplace_back();
+    auto& cmd = mCommands.back();
+    cmd.type  = CommandType::EXECUTE_COMMAND_BUFFERS;
+    cmd.data.executeCommandBuffers.buffers.reserve(commandBuffers.size());
+    for(auto&& item : commandBuffers)
+    {
+      cmd.data.executeCommandBuffers.buffers.emplace_back(static_cast<const TestGraphicsCommandBuffer*>(item));
+    }
+    mCallStack.PushCall("ExecuteCommandBuffers", "");
   }
 
   void Draw(
@@ -642,6 +911,112 @@ public:
     mCommands.back().data.viewportTest.enable = value;
   }
 
+  void SetColorMask(bool enabled) override
+  {
+    TraceCallStack::NamedParams params;
+    params["enabled"] << (enabled ? "T" : "F");
+    mCallStack.PushCall("SetColorMask", params.str(), params);
+    mCommands.emplace_back();
+    mCommands.back().type                   = CommandType::SET_COLOR_MASK;
+    mCommands.back().data.colorMask.enabled = enabled;
+  }
+
+  void ClearStencilBuffer() override
+  {
+    mCallStack.PushCall("SetStencilMask", "");
+    mCommands.emplace_back();
+    mCommands.back().type = CommandType::CLEAR_STENCIL_BUFFER;
+  }
+
+  void SetStencilTestEnable(bool stencilEnable) override
+  {
+    TraceCallStack::NamedParams params;
+    params["enabled"] << (stencilEnable ? "T" : "F");
+    mCallStack.PushCall("SetStencilTestEnable", params.str(), params);
+    mCommands.emplace_back();
+    mCommands.back().type                     = CommandType::SET_STENCIL_TEST_ENABLE;
+    mCommands.back().data.stencilTest.enabled = stencilEnable;
+  }
+
+  void SetStencilWriteMask(uint32_t writeMask) override
+  {
+    TraceCallStack::NamedParams params;
+    params["writeMask"] << std::hex << writeMask;
+    mCallStack.PushCall("SetStencilWriteMask", params.str(), params);
+    mCommands.emplace_back();
+    mCommands.back().type                       = CommandType::SET_STENCIL_WRITE_MASK;
+    mCommands.back().data.stencilWriteMask.mask = writeMask;
+  }
+
+  void SetStencilOp(Graphics::StencilOp failOp,
+                    Graphics::StencilOp passOp,
+                    Graphics::StencilOp depthFailOp) override
+  {
+    TraceCallStack::NamedParams params;
+    params["failOp"] << failOp;
+    params["passOp"] << passOp;
+    params["depthFailOp"] << depthFailOp;
+    mCallStack.PushCall("SetStencilOp", params.str(), params);
+    mCommands.emplace_back();
+    mCommands.back().type                       = CommandType::SET_STENCIL_OP;
+    mCommands.back().data.stencilOp.failOp      = failOp;
+    mCommands.back().data.stencilOp.passOp      = passOp;
+    mCommands.back().data.stencilOp.depthFailOp = depthFailOp;
+  }
+
+  void SetStencilFunc(Graphics::CompareOp compareOp,
+                      uint32_t            reference,
+                      uint32_t            compareMask) override
+  {
+    TraceCallStack::NamedParams params;
+    params["compareOp"] << compareOp;
+    params["compareMask"] << std::hex << compareMask;
+    params["reference"] << std::hex << reference;
+    mCallStack.PushCall("SetStencilFunc", params.str(), params);
+
+    mCommands.emplace_back();
+    mCommands.back().type = CommandType::SET_STENCIL_FUNC;
+
+    mCommands.back().data.stencilFunc.compareOp   = compareOp;
+    mCommands.back().data.stencilFunc.compareMask = compareMask;
+    mCommands.back().data.stencilFunc.reference   = reference;
+  }
+
+  void SetDepthCompareOp(Graphics::CompareOp compareOp) override
+  {
+    TraceCallStack::NamedParams params;
+    params["compareOp"] << compareOp;
+    mCallStack.PushCall("SetDepthCompareOp", params.str(), params);
+    mCommands.emplace_back();
+    mCommands.back().type                 = CommandType::SET_DEPTH_COMPARE_OP;
+    mCommands.back().data.depth.compareOp = compareOp;
+  }
+
+  void SetDepthTestEnable(bool depthTestEnable) override
+  {
+    TraceCallStack::NamedParams params;
+    params["enabled"] << (depthTestEnable ? "T" : "F");
+    mCallStack.PushCall("SetDepthTestEnable", params.str(), params);
+    mCommands.emplace_back();
+    mCommands.back().type                   = CommandType::SET_DEPTH_TEST_ENABLE;
+    mCommands.back().data.depth.testEnabled = depthTestEnable;
+  }
+  void SetDepthWriteEnable(bool depthWriteEnable) override
+  {
+    TraceCallStack::NamedParams params;
+    params["enabled"] << (depthWriteEnable ? "T" : "F");
+    mCallStack.PushCall("SetDepthWriteEnable", params.str(), params);
+    mCommands.emplace_back();
+    mCommands.back().type                    = CommandType::SET_DEPTH_WRITE_ENABLE;
+    mCommands.back().data.depth.writeEnabled = depthWriteEnable;
+  }
+  void ClearDepthBuffer() override
+  {
+    mCallStack.PushCall("ClearDepthBuffer", "");
+    mCommands.emplace_back();
+    mCommands.back().type = CommandType::CLEAR_DEPTH_BUFFER;
+  }
+
   [[nodiscard]] const std::vector<Command>& GetCommands() const
   {
     return mCommands;
@@ -662,7 +1037,9 @@ public:
   /**
    * Retrieves commands of specified type
    */
-  std::vector<Command*> GetCommandsByType(CommandTypeMask mask);
+  std::vector<const Command*> GetCommandsByType(CommandTypeMask mask) const;
+
+  std::vector<const Command*> GetChildCommandsByType(CommandTypeMask mask) const;
 
 private:
   TraceCallStack&    mCallStack;

@@ -18,7 +18,7 @@
 #include <dali/internal/update/common/scene-graph-scene.h>
 
 // INTERNAL INCLUDES
-#include <dali/internal/render/gl-resources/context.h>
+#include <dali/integration-api/core-enumerations.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
 
 namespace Dali
@@ -28,8 +28,7 @@ namespace Internal
 namespace SceneGraph
 {
 Scene::Scene()
-: mContext(nullptr),
-  mFrameRenderedCallbacks(),
+: mFrameRenderedCallbacks(),
   mFramePresentedCallbacks(),
   mSkipRendering(false),
   mSurfaceRect(),
@@ -44,14 +43,54 @@ Scene::~Scene()
   mFramePresentedCallbacks.clear();
 }
 
-void Scene::Initialize(Context& context)
+void Scene::Initialize(Graphics::Controller& graphicsController, Integration::DepthBufferAvailable depthBufferAvailable, Integration::StencilBufferAvailable stencilBufferAvailable)
 {
-  mContext = &context;
-}
+  // Create the render pass for the surface
+  std::vector<Graphics::AttachmentDescription> attachmentDescriptions;
 
-Context* Scene::GetContext()
-{
-  return mContext;
+  // Default behaviour for color attachments is to CLEAR and STORE
+  mClearValues.clear();
+  mClearValues.emplace_back();
+
+  // Assume single color attachment
+  Graphics::AttachmentDescription desc{};
+  desc.SetLoadOp(Graphics::AttachmentLoadOp::CLEAR);
+  desc.SetStoreOp(Graphics::AttachmentStoreOp::STORE);
+  attachmentDescriptions.push_back(desc);
+
+  if(depthBufferAvailable == Integration::DepthBufferAvailable::TRUE ||
+     stencilBufferAvailable == Integration::StencilBufferAvailable::TRUE)
+  {
+    // Depth
+    desc.SetLoadOp(Graphics::AttachmentLoadOp::CLEAR);
+    desc.SetStoreOp(Graphics::AttachmentStoreOp::STORE);
+
+    // Stencil
+    desc.SetStencilLoadOp(Graphics::AttachmentLoadOp::CLEAR);
+    desc.SetStencilStoreOp(Graphics::AttachmentStoreOp::STORE);
+    attachmentDescriptions.push_back(desc);
+
+    mClearValues.emplace_back();
+    mClearValues.back().depthStencil.depth   = 0;
+    mClearValues.back().depthStencil.stencil = 0;
+  }
+
+  Graphics::RenderPassCreateInfo rpInfo{};
+  rpInfo.SetAttachments(attachmentDescriptions);
+
+  // Add default render pass (loadOp = clear)
+  mRenderPass = graphicsController.CreateRenderPass(rpInfo, nullptr); // Warning: Shallow ptr
+
+  desc.SetLoadOp(Graphics::AttachmentLoadOp::LOAD);
+  attachmentDescriptions[0] = desc;
+  if(attachmentDescriptions.size() > 1)
+  {
+    desc.SetLoadOp(Graphics::AttachmentLoadOp::LOAD);
+    desc.SetStencilLoadOp(Graphics::AttachmentLoadOp::LOAD);
+    attachmentDescriptions.back() = desc;
+  }
+
+  mRenderPassNoClear = graphicsController.CreateRenderPass(rpInfo, nullptr); // Warning: Shallow ptr
 }
 
 RenderInstructionContainer& Scene::GetRenderInstructions()

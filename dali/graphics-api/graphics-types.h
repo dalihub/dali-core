@@ -774,6 +774,7 @@ enum class Format
   R64G64B64A64_UINT,
   R64G64B64A64_SINT,
   R64G64B64A64_SFLOAT,
+  R11G11B10_UFLOAT_PACK32,
   B10G11R11_UFLOAT_PACK32,
   E5B9G9R9_UFLOAT_PACK32,
   D16_UNORM,
@@ -878,7 +879,7 @@ inline BufferUsageFlags operator|(BufferUsageFlags flags, BufferUsage usage)
  */
 enum class BufferPropertiesFlagBit : uint32_t
 {
-  CPU_ALLOCATED = 1 << 0, ///< Buffer is allocated on the CPU side
+  CPU_ALLOCATED    = 1 << 0, ///< Buffer is allocated on the CPU side
   TRANSIENT_MEMORY = 1 << 1, ///< Buffer memory will be short-lived
 };
 
@@ -925,6 +926,7 @@ struct TextureUpdateInfo
   Extent2D srcExtent2D{};
   uint32_t srcOffset{};
   uint32_t srcSize{};
+  Format   srcFormat{}; ///< Should match dstTexture's format, otherwise conversion may occur
 };
 
 /**
@@ -1002,6 +1004,10 @@ struct ColorAttachment
 struct DepthStencilAttachment
 {
   // TODO:
+  Texture* depthTexture;
+  Texture* stencilTexture;
+  uint32_t depthLevel;
+  uint32_t stencilLevel;
 };
 
 /**
@@ -1294,7 +1300,98 @@ enum class GraphicsStructureType : uint32_t
   SAMPLER_CREATE_INFO_STRUCT,
   SHADER_CREATE_INFO_STRUCT,
   TEXTURE_CREATE_INFO_STRUCT,
-  RENDER_TARGET_CREATE_INFO_STRUCT
+  RENDER_TARGET_CREATE_INFO_STRUCT,
+  SYNC_OBJECT_CREATE_INFO_STRUCT
+};
+
+/**
+ * @brief Enum describes load operation associated
+ * with particular framebuffer attachment
+ */
+enum class AttachmentLoadOp
+{
+  LOAD,     ///< Load previous content
+  CLEAR,    ///< Clear the attachment
+  DONT_CARE ///< Let driver decide
+};
+
+/**
+ * @brief Enum describes store operation associated
+ * with particular framebuffer attachment
+ */
+enum class AttachmentStoreOp
+{
+  STORE,    ///< Store content (color attachemnts)
+  DONT_CARE ///< Let driver decide (depth/stencil attachemnt with no intention of reading)
+};
+
+/**
+ * @brief The structure describes the read/write
+ * modes of a single framebuffer attachment
+ *
+ * The attachment description specifies what is going to
+ * happen to the attachment at the beginning and end of the
+ * render pass.
+ *
+ * The stencil operation is separated as it may be set
+ * independent from the depth component (use loadOp, storeOp
+ * to set up the depth component and stencilLoadOp, stencilStoreOp
+ * for stencil component).
+ */
+struct AttachmentDescription
+{
+  /**
+   * @brief Sets load operation for the attachment
+   *
+   * @param value Load operation
+   * @return this structure
+   */
+  auto& SetLoadOp(AttachmentLoadOp value)
+  {
+    loadOp = value;
+    return *this;
+  }
+
+  /**
+   * @brief Sets store operation for the attachment
+   *
+   * @param value Store operation
+   * @return this structure
+   */
+  auto& SetStoreOp(AttachmentStoreOp value)
+  {
+    storeOp = value;
+    return *this;
+  }
+
+  /**
+   * @brief Sets load operation for the stencil part of attachment
+   *
+   * @param value load operation
+   * @return this structure
+   */
+  auto& SetStencilLoadOp(AttachmentLoadOp value)
+  {
+    stencilLoadOp = value;
+    return *this;
+  }
+
+  /**
+   * @brief Sets store operation for the stencil part of attachment
+   *
+   * @param value store operation
+   * @return this structure
+   */
+  auto& SetStencilStoreOp(AttachmentStoreOp value)
+  {
+    stencilStoreOp = value;
+    return *this;
+  }
+
+  AttachmentLoadOp  loadOp{};
+  AttachmentStoreOp storeOp{};
+  AttachmentLoadOp  stencilLoadOp{};
+  AttachmentStoreOp stencilStoreOp{};
 };
 
 /**
@@ -1390,6 +1487,34 @@ struct DefaultDeleter
 
   void (*deleteFunction)(T* object){nullptr}; ///< Custom delete function
 };
+
+/**
+ * Surface type is just a void* to any native object.
+ */
+using Surface = void;
+
+/**
+ * @brief Enum describing preTransform of render target
+ */
+enum class RenderTargetTransformFlagBits
+{
+  TRANSFORM_IDENTITY_BIT           = 0x00000001,
+  ROTATE_90_BIT                    = 0x00000002,
+  ROTATE_180_BIT                   = 0x00000004,
+  ROTATE_270_BIT                   = 0x00000008,
+  HORIZONTAL_MIRROR_BIT            = 0x00000010,
+  HORIZONTAL_MIRROR_ROTATE_90_BIT  = 0x00000020,
+  HORIZONTAL_MIRROR_ROTATE_180_BIT = 0x00000040,
+  HORIZONTAL_MIRROR_ROTATE_270_BIT = 0x00000080,
+};
+
+using RenderTargetTransformFlags = uint32_t;
+
+template<typename T>
+inline RenderTargetTransformFlags operator|(T flags, RenderTargetTransformFlagBits bit)
+{
+  return static_cast<RenderTargetTransformFlags>(flags) | static_cast<RenderTargetTransformFlags>(bit);
+}
 
 /**
  * unique_ptr defined in the Graphics scope

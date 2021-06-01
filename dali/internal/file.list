@@ -107,11 +107,8 @@ SET( internal_src_files
   ${internal_src_dir}/render/common/render-tracker.cpp
   ${internal_src_dir}/render/common/render-manager.cpp
   ${internal_src_dir}/render/data-providers/render-data-provider.cpp
-  ${internal_src_dir}/render/gl-resources/context.cpp
-  ${internal_src_dir}/render/gl-resources/frame-buffer-state-cache.cpp
-  ${internal_src_dir}/render/gl-resources/gl-call-debug.cpp
-  ${internal_src_dir}/render/gl-resources/gpu-buffer.cpp
   ${internal_src_dir}/render/queue/render-queue.cpp
+  ${internal_src_dir}/render/renderers/gpu-buffer.cpp
   ${internal_src_dir}/render/renderers/render-frame-buffer.cpp
   ${internal_src_dir}/render/renderers/render-geometry.cpp
   ${internal_src_dir}/render/renderers/render-renderer.cpp
@@ -119,11 +116,14 @@ SET( internal_src_files
   ${internal_src_dir}/render/renderers/render-texture.cpp
   ${internal_src_dir}/render/renderers/render-vertex-buffer.cpp
   ${internal_src_dir}/render/renderers/shader-cache.cpp
+  ${internal_src_dir}/render/renderers/uniform-buffer.cpp
   ${internal_src_dir}/render/renderers/uniform-buffer-manager.cpp
+  ${internal_src_dir}/render/renderers/uniform-buffer-view.cpp
+  ${internal_src_dir}/render/renderers/uniform-buffer-view-pool.cpp
 
   ${internal_src_dir}/render/shaders/program.cpp
   ${internal_src_dir}/render/shaders/program-controller.cpp
-  ${internal_src_dir}/render/shaders/scene-graph-shader.cpp
+  ${internal_src_dir}/render/shaders/render-shader.cpp
 
   ${internal_src_dir}/update/animation/scene-graph-animation.cpp
   ${internal_src_dir}/update/animation/scene-graph-constraint-base.cpp

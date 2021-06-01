@@ -47,11 +47,6 @@ const Dali::Graphics::Sampler* Sampler::GetGraphicsObject()
   return mGraphicsSampler.get();
 }
 
-void Sampler::DestroyGraphicsObjects()
-{
-  mGraphicsSampler.reset();
-}
-
 void Sampler::Initialize(Graphics::Controller& graphicsController)
 {
   mGraphicsController = &graphicsController;

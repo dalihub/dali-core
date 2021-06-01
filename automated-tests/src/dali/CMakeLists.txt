@@ -111,16 +111,18 @@ LIST(APPEND TC_SOURCES
         dali-test-suite-utils/test-application.cpp
         dali-test-suite-utils/test-gesture-generator.cpp
         dali-test-suite-utils/test-gl-abstraction.cpp
-        dali-test-suite-utils/test-gl-sync-abstraction.cpp
         dali-test-suite-utils/test-graphics-buffer.cpp
         dali-test-suite-utils/test-graphics-command-buffer.cpp
         dali-test-suite-utils/test-graphics-controller.cpp
+        dali-test-suite-utils/test-graphics-framebuffer.cpp
         dali-test-suite-utils/test-graphics-pipeline.cpp
         dali-test-suite-utils/test-graphics-program.cpp
         dali-test-suite-utils/test-graphics-reflection.cpp
         dali-test-suite-utils/test-graphics-shader.cpp
         dali-test-suite-utils/test-graphics-texture.cpp
         dali-test-suite-utils/test-graphics-sampler.cpp
+        dali-test-suite-utils/test-graphics-sync-impl.cpp
+        dali-test-suite-utils/test-graphics-sync-object.cpp
         dali-test-suite-utils/test-native-image.cpp
         dali-test-suite-utils/test-platform-abstraction.cpp
         dali-test-suite-utils/test-render-controller.cpp

@@ -32,7 +32,6 @@
 #include <dali/graphics-api/graphics-types.h>
 #include <dali/integration-api/gl-defines.h>
 #include <dali/internal/event/rendering/texture-impl.h>
-#include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/renderers/render-sampler.h>
 
 namespace Dali
@@ -60,7 +59,7 @@ public:
    * Constructor from native image
    * @param[in] nativeImageInterface The native image
    */
-  Texture(NativeImageInterfacePtr nativeImageInterface);
+  explicit Texture(NativeImageInterfacePtr nativeImageInterface);
 
   /**
    * Destructor
@@ -100,12 +99,6 @@ public:
   void Upload(PixelDataPtr pixelData, const Internal::Texture::UploadParams& params);
 
   /**
-   * Called when the texture is about to be used for drawing.
-   * Allows native textures to be set up appropriately.
-   */
-  void Prepare();
-
-  /**
    * Auto generates mipmaps for the texture
    */
   void GenerateMipmaps();
@@ -114,18 +107,18 @@ public:
    * Retrieve whether the texture has an alpha channel
    * @return True if the texture has alpha channel, false otherwise
    */
-  bool HasAlphaChannel() const;
+  [[nodiscard]] bool HasAlphaChannel() const;
 
   /**
    * Get the graphics object associated with this texture
    */
-  Graphics::Texture* GetGraphicsObject() const;
+  [[nodiscard]] Graphics::Texture* GetGraphicsObject() const;
 
   /**
    * Get the type of the texture
    * @return Type of the texture
    */
-  Type GetType() const
+  [[nodiscard]] Type GetType() const
   {
     return mType;
   }
@@ -134,7 +127,7 @@ public:
    * Check if the texture is a native image
    * @return if the texture is a native image
    */
-  bool IsNativeImage() const
+  [[nodiscard]] bool IsNativeImage() const
   {
     return mNativeImage;
   }
@@ -142,7 +135,6 @@ public:
 private:
   /**
    * Helper method to apply a sampler to the texture
-   * @param[in] context The GL context
    * @param[in] sampler The sampler
    */
   void ApplySampler(Render::Sampler* sampler);
@@ -154,12 +146,11 @@ private:
   NativeImageInterfacePtr mNativeImage; ///< Pointer to native image
   Render::Sampler         mSampler;     ///< The current sampler state
 
-  Pixel::Format mPixelFormat;    ///< Pixel format of the texture
-  uint16_t      mWidth;          ///< Width of the texture
-  uint16_t      mHeight;         ///< Height of the texture
-  uint16_t      mMaxMipMapLevel; ///< Maximum mipmap level
-  Type          mType : 3;       ///< Type of the texture
-  bool          mHasAlpha : 1;   ///< Whether the format has an alpha channel
+  Pixel::Format mPixelFormat;  ///< Pixel format of the texture
+  uint16_t      mWidth;        ///< Width of the texture
+  uint16_t      mHeight;       ///< Height of the texture
+  Type          mType : 3;     ///< Type of the texture
+  bool          mHasAlpha : 1; ///< Whether the format has an alpha channel
 };
 
 } // namespace Render

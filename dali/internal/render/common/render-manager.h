@@ -23,7 +23,6 @@
 #include <dali/integration-api/core-enumerations.h>
 #include <dali/internal/common/shader-saver.h>
 #include <dali/internal/event/rendering/texture-impl.h>
-#include <dali/internal/render/gl-resources/gpu-buffer.h>
 #include <dali/internal/render/renderers/render-vertex-buffer.h>
 #include <dali/public-api/math/rect.h>
 
@@ -32,7 +31,6 @@ namespace Dali
 namespace Integration
 {
 class GlAbstraction;
-class GlSyncAbstraction;
 class GlContextHelperAbstraction;
 class RenderStatus;
 class Scene;
@@ -42,7 +40,6 @@ struct Vector4;
 
 namespace Internal
 {
-class Context;
 class ProgramCache;
 class ShaderSaver;
 
@@ -92,16 +89,6 @@ public:
    * @return The render queue.
    */
   RenderQueue& GetRenderQueue();
-
-  /**
-   * @copydoc Dali::Integration::Core::ContextCreated()
-   */
-  void ContextCreated();
-
-  /**
-   * @copydoc Dali::Integration::Core::ContextToBeDestroyed()
-   */
-  void ContextDestroyed();
 
   /**
    * Set the upstream interface for compiled shader binaries to be sent back to for eventual
@@ -329,19 +316,13 @@ public:
    */
   void RemoveRenderTracker(Render::RenderTracker* renderTracker);
 
-  /**
-   * returns the Program controller for sending program messages
-   * @return the ProgramController
-   */
-  ProgramCache* GetProgramCache();
-
   // This method should be called from Core::PreRender()
 
   /**
    * This is called before rendering any scene in the next frame. This method should be preceded
    * by a call up Update.
    * Multi-threading note: this method should be called from a dedicated rendering thread.
-   * @pre The GL context must have been created, and made current.
+   * @pre The graphics implementation must be initialized
    * @param[out] status showing whether update is required to run.
    * @param[in] forceClear force the Clear on the framebuffer even if nothing is rendered.
    * @param[in] uploadOnly uploadOnly Upload the resource only without rendering.
@@ -354,7 +335,7 @@ public:
    * This is called before rendering any scene in the next frame. This method should be preceded
    * by a call up Update.
    * Multi-threading note: this method should be called from a dedicated rendering thread.
-   * @pre The GL context must have been created, and made current.
+   * @pre The graphics implementation must be initialized
    * @param[in] scene The scene to be rendered.
    * @param[out] damagedRects The list of damaged rects for the current render pass.
    */
@@ -367,7 +348,7 @@ public:
    * This method should be called twice. The first pass to render off-screen frame buffers if any,
    * and the second pass to render the surface.
    * Multi-threading note: this method should be called from a dedicated rendering thread.
-   * @pre The GL context must have been created, and made current.
+   * @pre The graphics implementation must be initialized
    * @param[out] status contains the rendering flags.
    * @param[in] scene The scene to be rendered.
    * @param[in] renderToFbo True to render off-screen frame buffers only if any, and False to render the surface only.
@@ -379,7 +360,7 @@ public:
    * This method should be called twice. The first pass to render off-screen frame buffers if any,
    * and the second pass to render the surface.
    * Multi-threading note: this method should be called from a dedicated rendering thread.
-   * @pre The GL context must have been created, and made current.
+   * @pre The graphics implementation must be initialized
    * @param[out] status contains the rendering flags.
    * @param[in] scene The scene to be rendered.
    * @param[in] renderToFbo True to render off-screen frame buffers only if any, and False to render the surface only.
@@ -393,7 +374,7 @@ public:
    * This is called after rendering all the scenes in the next frame. This method should be
    * followed by a call up RenderScene.
    * Multi-threading note: this method should be called from a dedicated rendering thread.
-   * @pre The GL context must have been created, and made current.
+   * @pre The graphics implementation must be initialized
    * @param[in] uploadOnly uploadOnly Upload the resource only without rendering.
    */
   void PostRender(bool uploadOnly);

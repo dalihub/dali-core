@@ -19,8 +19,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/buffer-index.h>
-#include <dali/internal/render/gl-resources/context.h>
-#include <dali/internal/render/gl-resources/gpu-buffer.h>
 #include <dali/internal/render/renderers/render-vertex-buffer.h>
 #include <dali/internal/render/shaders/program.h>
 
@@ -41,14 +39,6 @@ Geometry::Geometry()
 }
 
 Geometry::~Geometry() = default;
-
-void Geometry::GlContextCreated(Context& context)
-{
-}
-
-void Geometry::GlContextDestroyed()
-{
-}
 
 void Geometry::AddVertexBuffer(Render::VertexBuffer* vertexBuffer)
 {
@@ -133,7 +123,7 @@ bool Geometry::Draw(
   uint32_t                 elementBufferCount)
 {
   //Bind buffers to attribute locations
-  const uint32_t vertexBufferCount = static_cast<uint32_t>(mVertexBuffers.Count());
+  const auto vertexBufferCount = static_cast<uint32_t>(mVertexBuffers.Count());
 
   std::vector<const Graphics::Buffer*> buffers;
   std::vector<uint32_t>                offsets;
@@ -153,7 +143,7 @@ bool Geometry::Draw(
     }
     //@todo Figure out why this is being drawn without geometry having been uploaded
   }
-  if(buffers.size() == 0)
+  if(buffers.empty())
   {
     return false;
   }
@@ -193,7 +183,7 @@ bool Geometry::Draw(
   }
   else
   {
-    //Unindex draw call
+    // Un-indexed draw call
     GLsizei numVertices(0u);
     if(vertexBufferCount > 0)
     {

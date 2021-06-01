@@ -18,143 +18,75 @@
  *
  */
 
+// INTERNAL INCLUDES
 #include <dali/graphics-api/graphics-controller.h>
 
-#include <memory>
-
-namespace Dali
+namespace Dali::Internal::Render
 {
-namespace Internal
-{
-namespace Render
-{
-class UniformBuffer
-{
-  friend class UniformBufferManager;
+class UniformBuffer;
+class UniformBufferView;
+class UniformBufferViewPool;
 
-private:
-  /**
-   * Constructor of UniformBuffer
-   *
-   * @param[in] mController Pointer of the graphics controller
-   * @param[in] sizeInBytes initial size of allocated buffer
-   * @param[in] alignment memory alignment in bytes
-   * @param[in] persistentMappingEnabled if true, buffer is mapped persistently
-   * @param[in] usageFlags type of usage ( Graphics::BufferUsage )
-   */
-  UniformBuffer(Dali::Graphics::Controller* mController,
-                uint32_t                    sizeInBytes,
-                uint32_t                    alignment,
-                bool                        persistentMappingEnabled,
-                Graphics::BufferUsageFlags  usageFlags);
-
-public:
-  /**
-   * Destructor of UniformBuffer
-   */
-  ~UniformBuffer();
-
-  /**
-   * Writes data into the buffer
-   *
-   * @param[in] data pointer to the source data
-   * @param[in] size size of source data
-   * @param[in] offset destination offset
-   */
-  void Write(const void* data, uint32_t size, uint32_t offset);
-
-  /**
-   * Flushes whole buffer range
-   */
-  void Flush();
-
-  /**
-   * Returns allocated ( requested ) size
-   * @return size of buffer
-   */
-  uint32_t GetSize() const
-  {
-    return mSize;
-  }
-
-  /**
-   * Return Graphics API buffer
-   * @return pointer to the buffer object
-   */
-  Dali::Graphics::Buffer* GetBuffer() const
-  {
-    return mBuffer.get();
-  }
-
-  /**
-   * Returns memory alignment
-   * @return memory alignment
-   */
-  uint32_t GetAlignment() const
-  {
-    return mAlignment;
-  }
-
-  /**
-   * Reserves buffer memory
-   *
-   * @param size requested size
-   */
-  void Reserve(uint32_t size);
-
-  /**
-   * Maps buffer memory
-   */
-  void Map();
-
-  /**
-   * Unmaps buffer memory
-   */
-  void Unmap();
-
-  /**
-   * Fills the buffer from the given offset with given data ( single 8bit value )
-   * @param data char type data
-   * @param offset start offset
-   * @param size size to write, 0 if whole size
-   */
-  void Fill(char data, uint32_t offset, uint32_t size);
-
-private:
-  Graphics::UniquePtr<Graphics::Buffer> mBuffer;
-  Dali::Graphics::Controller*           mController;
-  Graphics::UniquePtr<Graphics::Memory> mMemory{nullptr};
-
-  Graphics::MapBufferInfo mMapBufferInfo{};
-
-  uint32_t mCapacity{0}; ///< buffer capacity
-  uint32_t mSize;        ///< buffer size
-  uint32_t mAlignment{0};
-  bool     mPersistentMappedEnabled;
-
-  Graphics::BufferUsageFlags mUsageFlags;
-};
-
+/**
+ * Class UniformBufferManager
+ *
+ * Manages the uniform buffers.
+ *
+ */
 class UniformBufferManager
 {
 public:
-  UniformBufferManager(Dali::Graphics::Controller* controller);
+
+  explicit UniformBufferManager(Dali::Graphics::Controller* controller);
 
   ~UniformBufferManager();
 
   /**
-   * Allocates uniform buffer with given size
+   * Allocates uniform buffer with given size and alignment
+   * @param size Size of uniform buffer
+   * @param alignment Alignment
+   * @return new UniformBuffer
+   */
+  Graphics::UniquePtr<UniformBuffer> AllocateUniformBuffer(uint32_t size, uint32_t alignment = 256);
+
+  /**
+   * Creates a view on UniformBuffer
+   *
+   * @param uniformBuffer
+   * @param size
+   * @return Uniform buffer view
+   */
+  Graphics::UniquePtr<UniformBufferView> CreateUniformBufferView( UniformBuffer* uniformBuffer, uint32_t offset, uint32_t size);
+
+  /**
+   * Creates uniform buffer pool view
    * @param size
    * @return
    */
-  Graphics::UniquePtr<UniformBuffer> AllocateUniformBuffer(uint32_t size);
+  Graphics::UniquePtr<UniformBufferViewPool> CreateUniformBufferViewPool();
+
+  /**
+   * Returns Controller object
+   * @return controller object
+   */
+  [[nodiscard]] Graphics::Controller& GetController() const
+  {
+    return *mController;
+  }
+
+  /**
+   * Returns embedded uniform buffer pool view for specified DAli buffer index
+   * @return Pointer to valid uniform buffer pool view
+   */
+  [[nodiscard]] UniformBufferViewPool* GetUniformBufferViewPool( uint32_t bufferIndex );
 
 private:
+
   Dali::Graphics::Controller* mController;
+
+  Graphics::UniquePtr<UniformBufferViewPool> mUniformBufferPoolStorage[2u]; ///< The pool view into UniformBuffer (double buffered)
 };
 
-} // namespace Render
-} // namespace Internal
 } // namespace Dali
 
 #endif // DALI_INTERNAL_UNIFORM_BUFFER_MANAGER_H

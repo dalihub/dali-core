@@ -18,21 +18,24 @@
 #include "test-gl-abstraction.h"
 #include "test-trace-call-stack.h"
 
+static const bool TRACE{
+  false};
+
 namespace Dali
 {
 TestGlAbstraction::TestGlAbstraction()
-: mBufferTrace(true, std::string("gl")),
-  mCullFaceTrace(true, "gl"),
-  mEnableDisableTrace(true, "gl"),
-  mShaderTrace(true, "gl"),
-  mTextureTrace(true, std::string("gl")),
-  mTexParameterTrace(true, "gl"),
-  mDrawTrace(true, "gl"),
-  mDepthFunctionTrace(true, "gl"),
-  mStencilFunctionTrace(true, "gl"),
-  mScissorTrace(true, "gl"),
-  mSetUniformTrace(true, "Uniform "),
-  mViewportTrace(true, "gl")
+: mBufferTrace(TRACE, std::string("gl")),
+  mCullFaceTrace(TRACE, "gl"),
+  mEnableDisableTrace(TRACE, "gl"),
+  mShaderTrace(TRACE, "gl"),
+  mTextureTrace(TRACE, std::string("gl")),
+  mTexParameterTrace(TRACE, "gl"),
+  mDrawTrace(TRACE, "gl"),
+  mDepthFunctionTrace(TRACE, "gl"),
+  mStencilFunctionTrace(TRACE, "gl"),
+  mScissorTrace(TRACE, "gl"),
+  mSetUniformTrace(TRACE, "Uniform "),
+  mViewportTrace(TRACE, "gl")
 {
   Initialize();
 }
@@ -46,7 +49,6 @@ void TestGlAbstraction::Initialize()
   mCurrentProgram                  = 0;
   mCompileStatus                   = GL_TRUE;
   mLinkStatus                      = GL_TRUE;
-  mNumberOfActiveUniforms          = 0;
   mGetErrorResult                  = 0;
   mGetStringResult                 = NULL;
   mIsBufferResult                  = 0;
@@ -112,6 +114,31 @@ void TestGlAbstraction::Initialize()
   {
     mVertexAttribArrayState[i] = false;
   }
+
+  mActiveUniforms = std::vector<ActiveUniform>{
+    {"uRendererColor", GL_FLOAT, 1},
+    {"uCustom", GL_FLOAT_VEC3, 1},
+    {"uCustom3", GL_FLOAT_VEC3, 1},
+    {"uFadeColor", GL_FLOAT_VEC4, 1},
+    {"uUniform1", GL_FLOAT_VEC4, 1},
+    {"uUniform2", GL_FLOAT_VEC4, 1},
+    {"uUniform3", GL_FLOAT_VEC4, 1},
+    {"uFadeProgress", GL_FLOAT, 1},
+    {"uANormalMatrix", GL_FLOAT_MAT3, 1},
+    {"sEffect", GL_SAMPLER_2D, 1},
+    {"sTexture", GL_SAMPLER_2D, 1},
+    {"sTextureRect", GL_SAMPLER_2D, 1},
+    {"sGloss", GL_SAMPLER_2D, 1},
+    {"uColor", GL_FLOAT_VEC4, 1},
+    {"uModelMatrix", GL_FLOAT_MAT4, 1},
+    {"uModelView", GL_FLOAT_MAT4, 1},
+    {"uMvpMatrix", GL_FLOAT_MAT4, 1},
+    {"uNormalMatrix", GL_FLOAT_MAT4, 1},
+    {"uProjection", GL_FLOAT_MAT4, 1},
+    {"uSize", GL_FLOAT_VEC3, 1},
+    {"uViewMatrix", GL_FLOAT_MAT4, 1},
+    {"uLightCameraProjectionMatrix", GL_FLOAT_MAT4, 1},
+    {"uLightCameraViewMatrix", GL_FLOAT_MAT4, 1}};
 }
 
 void TestGlAbstraction::PreRender()

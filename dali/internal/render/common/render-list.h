@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/owner-container.h>
+#include <dali/graphics-api/graphics-controller.h>
 #include <dali/internal/render/common/render-item.h>
 #include <dali/public-api/math/rect.h>
 
@@ -71,6 +72,12 @@ public:
     // Pointer container deletes the render items
     delete mClippingBox;
   }
+
+  /*
+   * Copy constructor and assignment operator not defined
+   */
+  RenderList(const RenderList& rhs) = delete;
+  const RenderList& operator=(const RenderList& rhs) = delete;
 
   /**
    * Reset the render list for next frame
@@ -181,7 +188,6 @@ public:
     {
       delete mClippingBox;
       mClippingBox = new ClippingBox(box);
-      ;
     }
   }
 
@@ -255,15 +261,26 @@ public:
     return mHasColorRenderItems;
   }
 
-private:
-  /*
-   * Copy constructor and assignment operator not defined
-   */
-  RenderList(const RenderList& rhs);
-  const RenderList& operator=(const RenderList& rhs);
+  Graphics::CommandBuffer& GetCommandBuffer(Graphics::Controller& controller)
+  {
+    if(!mGraphicsCommandBuffer)
+    {
+      mGraphicsCommandBuffer = controller.CreateCommandBuffer(
+        Graphics::CommandBufferCreateInfo().SetLevel(Graphics::CommandBufferLevel::SECONDARY), nullptr);
+    }
+    return *mGraphicsCommandBuffer.get();
+  }
 
+  const Graphics::CommandBuffer* GetCommandBuffer() const
+  {
+    return mGraphicsCommandBuffer.get();
+  }
+
+private:
   RenderItemContainer mItems;    ///< Each item is a renderer and matrix pair
   uint32_t            mNextFree; ///< index for the next free item to use
+
+  mutable Graphics::UniquePtr<Graphics::CommandBuffer> mGraphicsCommandBuffer{nullptr};
 
   ClippingBox* mClippingBox;             ///< The clipping box, in window coordinates, when clipping is enabled
   Layer*       mSourceLayer;             ///< The originating layer where the renderers are from

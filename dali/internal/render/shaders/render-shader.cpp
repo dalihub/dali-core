@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/render/shaders/scene-graph-shader.h>
+#include <dali/internal/render/shaders/render-shader.h>
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
@@ -43,9 +43,6 @@ Shader::~Shader()
   mConnectionObservers.Destroy(*this);
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// The following methods are called during RenderManager::Render()
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void Shader::SetShaderData(ShaderDataPtr shaderData)
 {
   DALI_LOG_TRACE_METHOD_FMT(Debug::Filter::gShader, "%d\n", shaderData->GetHashValue());

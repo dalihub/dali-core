@@ -31,7 +31,6 @@ namespace Dali
 {
 namespace Internal
 {
-class Context;
 class Program;
 class GpuBuffer;
 
@@ -57,16 +56,6 @@ public:
   ~Geometry();
 
   /**
-   * Called on Gl Context created
-   */
-  void GlContextCreated(Context& context);
-
-  /**
-   * Called on Gl Context destroyed.
-   */
-  void GlContextDestroyed();
-
-  /**
    * Adds a property buffer to the geometry
    * @param[in] dataProvider The VertexBuffer data provider
    */
@@ -88,7 +77,7 @@ public:
    * Get the vertex buffers
    * @return the list of vertex buffers
    */
-  const Vector<Render::VertexBuffer*>& GetVertexBuffers() const;
+  [[nodiscard]] const Vector<Render::VertexBuffer*>& GetVertexBuffers() const;
 
   /**
    * Called from RenderManager to notify the geometry that current rendering pass has finished.
@@ -99,7 +88,7 @@ public:
    * Check if the attributes for the geometry have changed
    * @return True if vertex buffers have been added or removed since last frame, false otherwise
    */
-  bool AttributesChanged() const
+  [[nodiscard]] bool AttributesChanged() const
   {
     return mAttributesChanged;
   }
@@ -116,7 +105,7 @@ public:
   /**
    * @return the topology of this geometry
    */
-  Graphics::PrimitiveTopology GetTopology() const;
+  [[nodiscard]] Graphics::PrimitiveTopology GetTopology() const;
 
   /**
    * Upload the geometry if it has changed
@@ -126,10 +115,8 @@ public:
   /**
    * Set up the attributes and perform the Draw call corresponding to the geometry type.
    *
-   * @param[in] context The GL context @todo remove
    * @param[in] graphicsController The graphics controller
    * @param[in] bufferIndex The current buffer index
-   * @param[in] attributeLocation The location for the attributes in the shader
    * @param[in] elementBufferOffset The index of first element to draw if index buffer bound
    * @param[in] elementBufferCount Number of elements to draw if index buffer bound, uses whole buffer when 0
    * @return true if the draw command was issued, false otherwise

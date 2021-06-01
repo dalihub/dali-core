@@ -18,7 +18,7 @@
  *
  */
 
-#include <dali/integration-api/gl-sync-abstraction.h>
+#include <dali/graphics-api/graphics-controller.h>
 #include <dali/internal/common/message.h>
 
 namespace Dali
@@ -46,8 +46,10 @@ public:
 
   /**
    * Creates a sync object for this tracker. Will delete any existing sync object.
+   *
+   * @param[in] graphicsController The graphics subsystem
    */
-  void CreateSyncObject(Integration::GlSyncAbstraction& glSyncAbstraction);
+  Graphics::SyncObject* CreateSyncObject(Graphics::Controller& graphicsController);
 
   /**
    * Check the GL Sync objects. This is called from Render Thread.
@@ -73,9 +75,9 @@ public:
   void SetSyncFlag();
 
 private:
-  Integration::GlSyncAbstraction*             mGlSyncAbstraction; // The sync abstraction
-  Integration::GlSyncAbstraction::SyncObject* mSyncObject;        // Associated sync object
-  volatile int                                mSyncTrigger;       // Trigger that update thread can read
+  Graphics::Controller*                     mGraphicsController; ///<  The graphics subsystem
+  Graphics::UniquePtr<Graphics::SyncObject> mSyncObject;         ///< Associated sync object
+  volatile int                              mSyncTrigger;        ///< Trigger that update thread can read
 };
 
 } // namespace Render

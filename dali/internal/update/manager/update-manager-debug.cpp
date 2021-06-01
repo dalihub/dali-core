@@ -47,14 +47,6 @@ static Debug::Filter* gNodeLogFilter = Debug::Filter::New(Debug::Verbose, false,
  */
 void PrintNodes(const Node& node, BufferIndex updateBufferIndex, int level)
 {
-  const Vector3&    position = node.GetPosition(updateBufferIndex);
-  const Vector3&    scale    = node.GetScale(updateBufferIndex);
-  const Vector3&    fullPos  = node.GetWorldPosition(updateBufferIndex);
-  const Quaternion& rotation = node.GetOrientation(updateBufferIndex);
-  Vector3           axis;
-  Radian            angle;
-  rotation.ToAxisAngle(axis, angle);
-
   std::string nodeName = DALI_LOG_GET_OBJECT_STRING((&node));
 
   {
@@ -64,26 +56,15 @@ void PrintNodes(const Node& node, BufferIndex updateBufferIndex, int level)
     mask |= std::ios_base::fixed;
     oss << std::setprecision(2) << std::setiosflags(mask)
         << std::setw(level * 2) << std::setfill(' ') << "";
+
     oss << "Node " << nodeName << " " << &node
-        << "  Position (" << position.x << ", " << position.y << ", " << position.z << ")"
-        << "  WorldPosition (" << fullPos.x << ", " << fullPos.y << ", " << fullPos.z << ")"
-        << "  Orientation (" << Degree(angle).degree << "degrees <" << axis.x << ", " << axis.y << ", " << axis.z << ">)"
-        << "  Scale (" << scale.x << ", " << scale.y << ", " << scale.z << ")"
+        << " Position: " << node.GetPosition(updateBufferIndex)
+        << " WorldPosition: " << node.GetWorldPosition(updateBufferIndex)
+        << " Size: " << node.GetSize(updateBufferIndex)
+        << " Visible: " << node.IsVisible(updateBufferIndex)
         << std::endl;
 
-    DALI_LOG_INFO(gNodeLogFilter, Debug::Verbose, "%s\n", oss.str().c_str());
-  }
-
-  {
-    std::ostringstream      oss;
-    std::ios_base::fmtflags mask = oss.flags();
-    mask &= ~std::ios_base::scientific;
-    mask |= std::ios_base::fixed;
-    oss << std::setprecision(2) << std::setiosflags(mask)
-        << std::setw(level * 2) << std::setfill(' ') << "";
-
-    std::string trafoMatrix = Debug::MatrixToString(node.GetWorldMatrix(updateBufferIndex), 2, level * 2);
-    DALI_LOG_INFO(gNodeLogFilter, Debug::Verbose, "%s\n", trafoMatrix.c_str());
+    DALI_LOG_INFO(gNodeLogFilter, Debug::Verbose, "%s", oss.str().c_str());
   }
 
   ++level;

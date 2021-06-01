@@ -1,8 +1,8 @@
-#ifndef DALI_INTEGRATION_GL_SYNC_ABSTRACTION_H
-#define DALI_INTEGRATION_GL_SYNC_ABSTRACTION_H
+#ifndef DALI_INTEGRATION_GRAPHICS_SYNC_ABSTRACTION_H
+#define DALI_INTEGRATION_GRAPHICS_SYNC_ABSTRACTION_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,13 +29,13 @@ namespace Integration
  * A typical use case is to determine when GL draw calls have finished drawing
  * to a framebuffer.
  */
-class GlSyncAbstraction
+class GraphicsSyncAbstraction
 {
 protected:
   /**
    * Virtual protected destructor, no deletion through this interface
    */
-  virtual ~GlSyncAbstraction() = default;
+  virtual ~GraphicsSyncAbstraction() = default;
 
 public:
   class SyncObject
@@ -74,4 +74,4 @@ public:
 } // namespace Integration
 } // namespace Dali
 
-#endif // DALI_INTEGRATION_GL_SYNC_ABSTRACTION_H
+#endif // DALI_INTEGRATION_GRAPHICS_SYNC_ABSTRACTION_H

@@ -23,6 +23,7 @@
 // INTERNAL INCLUDES
 #include <dali-test-suite-utils.h>
 #include <mesh-builder.h>
+#include <test-actor-utils.h>
 
 using namespace Dali;
 
@@ -35,20 +36,6 @@ void sampler_test_cleanup(void)
 {
   test_return_value = TET_PASS;
 }
-
-namespace
-{
-Texture CreateTexture(TextureType::Type type, Pixel::Format format, int width, int height)
-{
-  Texture texture = Texture::New(type, format, width, height);
-
-  int       bufferSize = width * height * 2;
-  uint8_t*  buffer     = reinterpret_cast<uint8_t*>(malloc(bufferSize));
-  PixelData pixelData  = PixelData::New(buffer, bufferSize, width, height, format, PixelData::FREE);
-  texture.Upload(pixelData, 0u, 0u, 0u, 0u, width, height);
-  return texture;
-}
-} // namespace
 
 int UtcDaliSamplerNew01(void)
 {

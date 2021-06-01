@@ -21,7 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/gl-defines.h>
 #include <dali/internal/common/shader-saver.h>
-#include <dali/internal/render/gl-resources/gl-call-debug.h>
 #include <dali/internal/render/shaders/program.h>
 
 namespace Dali
@@ -29,13 +28,8 @@ namespace Dali
 namespace Internal
 {
 ProgramController::ProgramController(Graphics::Controller& graphicsController)
-: mShaderSaver(nullptr),
-  mGraphicsController(graphicsController),
-  mCurrentProgram(nullptr),
-  mProgramBinaryFormat(0),
-  mNumberOfProgramBinaryFormats(0)
+: mGraphicsController(graphicsController)
 {
-  // we have 17 default programs so make room for those and a few custom ones as well
   mProgramCache.Reserve(32);
 }
 
@@ -50,47 +44,6 @@ void ProgramController::ResetProgramMatrices()
     program->SetProjectionMatrix(nullptr);
     program->SetViewMatrix(nullptr);
   }
-}
-
-void ProgramController::GlContextCreated()
-{
-  // reset any potential previous errors
-  LOG_GL("GetError()\n");
-  Integration::GlAbstraction& glAbstraction = GetGlAbstraction();
-  CHECK_GL(glAbstraction, glAbstraction.GetError());
-
-  // find out if program binaries are supported and the format enum as well
-  Dali::Vector<GLint> programBinaryFormats;
-
-  CHECK_GL(glAbstraction(), glAbstraction.GetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS_OES, &mNumberOfProgramBinaryFormats));
-  LOG_GL("GetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS_OES) = %d\n", mNumberOfProgramBinaryFormats);
-
-  if(GL_NO_ERROR == glAbstraction.GetError() && 0 < mNumberOfProgramBinaryFormats)
-  {
-    programBinaryFormats.Resize(mNumberOfProgramBinaryFormats);
-    CHECK_GL(glAbstraction, glAbstraction.GetIntegerv(GL_PROGRAM_BINARY_FORMATS_OES, &programBinaryFormats[0]));
-    LOG_GL("GetIntegerv(GL_PROGRAM_BINARY_FORMATS_OES) = %d\n", programBinaryFormats[0]);
-    mProgramBinaryFormat = programBinaryFormats[0];
-  }
-}
-
-void ProgramController::GlContextDestroyed()
-{
-  mNumberOfProgramBinaryFormats = 0;
-  mProgramBinaryFormat          = 0;
-
-  SetCurrentProgram(nullptr);
-  // Inform programs they are no longer valid
-  const ProgramIterator end = mProgramCache.End();
-  for(ProgramIterator iter = mProgramCache.Begin(); iter != end; ++iter)
-  {
-    (*iter)->GetProgram()->GlContextDestroyed();
-  }
-}
-
-Integration::GlAbstraction& ProgramController::GetGlAbstraction()
-{
-  return mGraphicsController.GetGlAbstraction();
 }
 
 Program* ProgramController::GetProgram(size_t shaderHash)
@@ -111,50 +64,9 @@ Program* ProgramController::GetProgram(size_t shaderHash)
 
 void ProgramController::AddProgram(size_t shaderHash, Program* program)
 {
-  // we expect unique hash values so its event thread sides job to guarantee that
+  // we expect unique hash values so it is event thread side's job to guarantee that
   // AddProgram is only called after program checks that GetProgram returns NULL
   mProgramCache.PushBack(new ProgramPair(program, shaderHash));
-}
-
-Program* ProgramController::GetCurrentProgram()
-{
-  return mCurrentProgram;
-}
-
-void ProgramController::SetCurrentProgram(Program* program)
-{
-  mCurrentProgram = program;
-}
-
-bool ProgramController::IsBinarySupported()
-{
-  return mNumberOfProgramBinaryFormats > 0;
-}
-
-GLenum ProgramController::ProgramBinaryFormat()
-{
-  return mProgramBinaryFormat;
-}
-
-void ProgramController::StoreBinary(Internal::ShaderDataPtr programData)
-{
-  DALI_ASSERT_DEBUG(programData->GetBufferSize() > 0);
-  DALI_ASSERT_DEBUG(mShaderSaver && "SetShaderSaver() should have been called during startup.");
-
-  if(mShaderSaver != nullptr)
-  {
-    mShaderSaver->SaveBinary(programData);
-  }
-}
-
-void ProgramController::SetShaderSaver(ShaderSaver& shaderSaver)
-{
-  mShaderSaver = &shaderSaver;
-}
-
-void ProgramController::ClearCurrentProgram()
-{
-  SetCurrentProgram(nullptr);
 }
 
 } // namespace Internal

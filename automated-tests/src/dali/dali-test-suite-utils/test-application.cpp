@@ -76,6 +76,12 @@ void TestApplication::CreateScene()
 {
   mScene = Dali::Integration::Scene::New(Size(static_cast<float>(mSurfaceWidth), static_cast<float>(mSurfaceHeight)));
   mScene.SetDpi(Vector2(static_cast<float>(mDpi.x), static_cast<float>(mDpi.y)));
+
+  // Create render target for the scene
+  Graphics::RenderTargetCreateInfo rtInfo{};
+  rtInfo.SetExtent({mSurfaceWidth, mSurfaceHeight});
+  mRenderTarget = mGraphicsController.CreateRenderTarget(rtInfo, nullptr);
+  mScene.SetSurfaceRenderTarget(mRenderTarget.get());
 }
 
 void TestApplication::InitializeCore()
@@ -149,14 +155,14 @@ TestGlAbstraction& TestApplication::GetGlAbstraction()
   return static_cast<TestGlAbstraction&>(mGraphicsController.GetGlAbstraction());
 }
 
-TestGlSyncAbstraction& TestApplication::GetGlSyncAbstraction()
-{
-  return static_cast<TestGlSyncAbstraction&>(mGraphicsController.GetGlSyncAbstraction());
-}
-
 TestGlContextHelperAbstraction& TestApplication::GetGlContextHelperAbstraction()
 {
   return static_cast<TestGlContextHelperAbstraction&>(mGraphicsController.GetGlContextHelperAbstraction());
+}
+
+TestGraphicsSyncImplementation& TestApplication::GetGraphicsSyncImpl()
+{
+  return static_cast<TestGraphicsSyncImplementation&>(mGraphicsController.GetGraphicsSyncImpl());
 }
 
 void TestApplication::ProcessEvent(const Integration::Event& event)

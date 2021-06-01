@@ -75,12 +75,6 @@ public:
    */
   void PushBack(BufferIndex index, RenderInstruction* renderInstruction);
 
-  /**
-   * Discard an instruction from the end of the container
-   * @param bufferIndex to use
-   */
-  void DiscardCurrentInstruction(BufferIndex updateBufferIndex);
-
 private:
   std::vector<RenderInstruction*> mInstructions;
 };

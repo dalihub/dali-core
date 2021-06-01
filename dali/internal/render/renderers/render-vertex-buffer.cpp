@@ -15,8 +15,11 @@
  *
  */
 
-#include <dali/internal/event/rendering/vertex-buffer-impl.h> // Dali::Internal::VertexBuffer
+// CLASS HEADER
 #include <dali/internal/render/renderers/render-vertex-buffer.h>
+
+// INTERNAL HEADERS
+#include <dali/internal/event/rendering/vertex-buffer-impl.h> // Dali::Internal::VertexBuffer
 
 namespace Dali
 {

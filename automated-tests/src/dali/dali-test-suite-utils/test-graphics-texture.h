@@ -49,6 +49,22 @@ public:
   GLuint GetTarget();
 
   /**
+   * Get the texture type
+   */
+  Graphics::TextureType GetType()
+  {
+    return mCreateInfo.textureType;
+  }
+
+  /**
+   * Get the texture format
+   */
+  Graphics::Format GetFormat()
+  {
+    return mCreateInfo.format;
+  }
+
+  /**
    * Bind this texture, ensure Native image is initialized if necessary.
    */
   void Bind(uint32_t textureUnit);

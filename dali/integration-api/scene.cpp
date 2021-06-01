@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +18,19 @@
 // CLASS HEADER
 #include <dali/integration-api/scene.h>
 
-// INTERNAL INCLUDES
-#include <dali/internal/event/common/scene-impl.h>
+// EXTERNAL INCLUDES
+#include <dali/graphics-api/graphics-render-target.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
+
+// INTERNAL INCLUDES
+#include <dali/internal/event/common/scene-impl.h>
 
 namespace Dali
 {
 namespace Integration
 {
-Scene Scene::New(Size size, int orientation)
+Scene Scene::New(Size size, int32_t orientation)
 {
   Internal::ScenePtr internal = Internal::Scene::New(size, orientation);
   return Scene(internal.Get());
@@ -121,6 +124,11 @@ void Scene::Discard()
   GetImplementation(*this).Discard();
 }
 
+void Scene::SetSurfaceRenderTarget(Graphics::RenderTarget* renderTarget)
+{
+  GetImplementation(*this).SetSurfaceRenderTarget(renderTarget);
+}
+
 Integration::Scene Scene::Get(Actor actor)
 {
   return Dali::Integration::Scene(&GetImplementation(actor).GetScene());
@@ -156,9 +164,19 @@ void Scene::GetFramePresentedCallback(FrameCallbackContainer& callbacks)
   GetImplementation(*this).GetFramePresentedCallback(callbacks);
 }
 
-void Scene::SurfaceRotated(float width, float height, int orientation)
+void Scene::SurfaceRotated(float width, float height, int32_t orientation)
 {
   GetImplementation(*this).SurfaceRotated(width, height, orientation);
+}
+
+int32_t Scene::GetCurrentSurfaceOrientation() const
+{
+  return GetImplementation(*this).GetCurrentSurfaceOrientation();
+}
+
+const Rect<int32_t>& Scene::GetCurrentSurfaceRect() const
+{
+  return GetImplementation(*this).GetCurrentSurfaceRect();
 }
 
 bool Scene::IsSurfaceRectChanged() const

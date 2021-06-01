@@ -50,7 +50,7 @@ public:
    * @param[in] bufferIndex The buffer index
    * @return true if the uniform map has changed
    */
-  virtual bool GetUniformMapChanged(BufferIndex bufferIndex) const = 0;
+  [[nodiscard]] virtual bool GetUniformMapChanged(BufferIndex bufferIndex) const = 0;
 
   /**
    * Get the complete map of uniforms to property value addresses
@@ -59,7 +59,7 @@ public:
    * @param[in] bufferIndex The bufferIndex
    * @return the uniform map
    */
-  virtual const CollectedUniformMap& GetUniformMap(BufferIndex bufferIndex) const = 0;
+  [[nodiscard]] virtual const CollectedUniformMap& GetUniformMap(BufferIndex bufferIndex) const = 0;
 
 protected:
   /**

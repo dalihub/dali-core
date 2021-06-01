@@ -65,8 +65,8 @@ public:
   TestGraphicsController&  GetGraphicsController();
 
   TestGlAbstraction&              GetGlAbstraction();
-  TestGlSyncAbstraction&          GetGlSyncAbstraction();
   TestGlContextHelperAbstraction& GetGlContextHelperAbstraction();
+  TestGraphicsSyncImplementation& GetGraphicsSyncImpl();
 
   void        ProcessEvent(const Integration::Event& event);
   void        SendNotification();
@@ -107,6 +107,8 @@ protected:
   uint32_t mSurfaceWidth;
   uint32_t mSurfaceHeight;
   uint32_t mFrame;
+
+  Graphics::UniquePtr<Graphics::RenderTarget> mRenderTarget;
 
   struct
   {

@@ -31,7 +31,6 @@
 #include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/render/data-providers/render-data-provider.h>
-#include <dali/internal/render/gl-resources/gl-resource-owner.h>
 #include <dali/internal/render/renderers/render-geometry.h>
 #include <dali/internal/render/renderers/uniform-buffer-manager.h>
 #include <dali/internal/render/shaders/program.h>
@@ -41,7 +40,6 @@ namespace Dali
 {
 namespace Internal
 {
-class Context;
 class Texture;
 class ProgramCache;
 
@@ -50,8 +48,7 @@ namespace SceneGraph
 class SceneController;
 class Shader;
 class NodeDataProvider;
-
-class RenderInstruction; //for relfection effect
+class RenderInstruction; //for reflection effect
 } // namespace SceneGraph
 
 namespace Render
@@ -64,7 +61,7 @@ class UniformBufferManager;
  * These objects are used during RenderManager::Render(), so properties modified during
  * the Update must either be double-buffered, or set via a message added to the RenderQueue.
  */
-class Renderer : public GlResourceOwner
+class Renderer
 {
 public:
   /**
@@ -93,16 +90,6 @@ public:
     StencilOperation::Type stencilOperationOnZFail : 4; ///< The stencil operation for depth test fail
     StencilOperation::Type stencilOperationOnZPass : 4; ///< The stencil operation for depth test pass
   };
-
-  /**
-   * @copydoc Dali::Internal::GlResourceOwner::GlContextDestroyed()
-   */
-  void GlContextDestroyed() override;
-
-  /**
-   * @copydoc Dali::Internal::GlResourceOwner::GlCleanup()
-   */
-  void GlCleanup() override;
 
   /**
    * Create a new renderer instance
@@ -164,7 +151,7 @@ public:
    * @brief Returns a reference to an array of draw commands
    * @return Valid array of draw commands (may be empty)
    */
-  const std::vector<Dali::DevelRenderer::DrawCommand>& GetDrawCommands() const
+  [[nodiscard]] const std::vector<Dali::DevelRenderer::DrawCommand>& GetDrawCommands() const
   {
     return mDrawCommands;
   }
@@ -172,14 +159,12 @@ public:
   /**
    * Second-phase construction.
    * This is called when the renderer is inside render thread
-   * @param[in] context Context used by the renderer (To be removed)
    * @param[in] graphicsController The graphics controller to use
    * @param[in] programCache Cache of program objects
    * @param[in] shaderCache Cache of shaders
    * @param[in] uniformBufferManager Uniform buffer manager
    */
-  void Initialize(Context&                      context,
-                  Graphics::Controller&         graphicsController,
+  void Initialize(Graphics::Controller&         graphicsController,
                   ProgramCache&                 programCache,
                   Render::ShaderCache&          shaderCache,
                   Render::UniformBufferManager& uniformBufferManager);
@@ -187,7 +172,7 @@ public:
   /**
    * Destructor
    */
-  ~Renderer() override;
+  ~Renderer();
 
   /**
    * Set the face-culling mode.
@@ -236,7 +221,7 @@ public:
    * Query the Renderer's depth write mode
    * @return The renderer depth write mode
    */
-  DepthWriteMode::Type GetDepthWriteMode() const;
+  [[nodiscard]] DepthWriteMode::Type GetDepthWriteMode() const;
 
   /**
    * Sets the depth test mode
@@ -248,7 +233,7 @@ public:
    * Query the Renderer's depth test mode
    * @return The renderer depth test mode
    */
-  DepthTestMode::Type GetDepthTestMode() const;
+  [[nodiscard]] DepthTestMode::Type GetDepthTestMode() const;
 
   /**
    * Sets the depth function
@@ -260,7 +245,7 @@ public:
    * Query the Renderer's depth function
    * @return The renderer depth function
    */
-  DepthFunction::Type GetDepthFunction() const;
+  [[nodiscard]] DepthFunction::Type GetDepthFunction() const;
 
   /**
    * Sets the render mode
@@ -272,7 +257,7 @@ public:
    * Gets the render mode
    * @return The render mode
    */
-  RenderMode::Type GetRenderMode() const;
+  [[nodiscard]] RenderMode::Type GetRenderMode() const;
 
   /**
    * Sets the stencil function
@@ -284,7 +269,7 @@ public:
    * Gets the stencil function
    * @return The stencil function
    */
-  StencilFunction::Type GetStencilFunction() const;
+  [[nodiscard]] StencilFunction::Type GetStencilFunction() const;
 
   /**
    * Sets the stencil function mask
@@ -296,7 +281,7 @@ public:
    * Gets the stencil function mask
    * @return The stencil function mask
    */
-  int GetStencilFunctionMask() const;
+  [[nodiscard]] int GetStencilFunctionMask() const;
 
   /**
    * Sets the stencil function reference
@@ -308,7 +293,7 @@ public:
    * Gets the stencil function reference
    * @return The stencil function reference
    */
-  int GetStencilFunctionReference() const;
+  [[nodiscard]] int GetStencilFunctionReference() const;
 
   /**
    * Sets the stencil mask
@@ -320,7 +305,7 @@ public:
    * Gets the stencil mask
    * @return The stencil mask
    */
-  int GetStencilMask() const;
+  [[nodiscard]] int GetStencilMask() const;
 
   /**
    * Sets the stencil operation for when the stencil test fails
@@ -332,7 +317,7 @@ public:
    * Gets the stencil operation for when the stencil test fails
    * @return The stencil operation
    */
-  StencilOperation::Type GetStencilOperationOnFail() const;
+  [[nodiscard]] StencilOperation::Type GetStencilOperationOnFail() const;
 
   /**
    * Sets the stencil operation for when the depth test fails
@@ -344,7 +329,7 @@ public:
    * Gets the stencil operation for when the depth test fails
    * @return The stencil operation
    */
-  StencilOperation::Type GetStencilOperationOnZFail() const;
+  [[nodiscard]] StencilOperation::Type GetStencilOperationOnZFail() const;
 
   /**
    * Sets the stencil operation for when the depth test passes
@@ -356,7 +341,7 @@ public:
    * Gets the stencil operation for when the depth test passes
    * @return The stencil operation
    */
-  StencilOperation::Type GetStencilOperationOnZPass() const;
+  [[nodiscard]] StencilOperation::Type GetStencilOperationOnZPass() const;
 
   /**
    * Called to upload during RenderManager::Render().
@@ -365,7 +350,7 @@ public:
 
   /**
    * Called to render during RenderManager::Render().
-   * @param[in] context The context used for rendering
+   * @param[in,out] commandBuffer The command buffer to write into
    * @param[in] bufferIndex The index of the previous update buffer.
    * @param[in] node The node using this renderer
    * @param[in] modelViewMatrix The model-view matrix.
@@ -375,9 +360,10 @@ public:
    * @param[in] blend If true, blending is enabled
    * @param[in] boundTextures The textures bound for rendering
    * @param[in] instruction. for use case like reflection where CullFace needs to be adjusted
-
+   *
+   * @return True if commands have been added to the command buffer
    */
-  void Render(Context&                                             context,
+  bool Render(Graphics::CommandBuffer&                             commandBuffer,
               BufferIndex                                          bufferIndex,
               const SceneGraph::NodeDataProvider&                  node,
               const Matrix&                                        modelMatrix,
@@ -393,10 +379,9 @@ public:
   /**
    * Write the renderer's sort attributes to the passed in reference
    *
-   * @param[in] bufferIndex The current update buffer index.
    * @param[out] sortAttributes
    */
-  void SetSortAttributes(BufferIndex bufferIndex, SceneGraph::RenderInstructionProcessor::SortAttributes& sortAttributes) const;
+  void SetSortAttributes(SceneGraph::RenderInstructionProcessor::SortAttributes& sortAttributes) const;
 
   /**
    * Sets the flag indicating whether shader changed.
@@ -415,17 +400,17 @@ public:
 
   template<class T>
   bool WriteDefaultUniform(const Graphics::UniformInfo*                       uniformInfo,
-                           Render::UniformBuffer&                             ubo,
+                           Render::UniformBufferView&                             ubo,
                            const std::vector<Graphics::UniformBufferBinding>& bindings,
                            const T&                                           data);
 
   template<class T>
-  void WriteUniform(Render::UniformBuffer&                             ubo,
+  void WriteUniform(Render::UniformBufferView&                             ubo,
                     const std::vector<Graphics::UniformBufferBinding>& bindings,
                     const Graphics::UniformInfo&                       uniformInfo,
                     const T&                                           data);
 
-  void WriteUniform(Render::UniformBuffer&                             ubo,
+  void WriteUniform(Render::UniformBufferView&                             ubo,
                     const std::vector<Graphics::UniformBufferBinding>& bindings,
                     const Graphics::UniformInfo&                       uniformInfo,
                     const void*                                        data,
@@ -441,13 +426,6 @@ private:
   Renderer& operator=(const Renderer& rhs);
 
   /**
-   * Sets blending options
-   * @param context to use
-   * @param blend Wheter blending should be enabled or not
-   */
-  void SetBlending(Context& context, bool blend);
-
-  /**
    * Builds a uniform map based on the index of the cached location in the Program.
    * @param[in] bufferIndex The index of the previous update buffer.
    * @param[in] node The node using the renderer
@@ -457,29 +435,25 @@ private:
   void BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider& node, const Vector3& size, Program& program);
 
   /**
-   * Set the program uniform in the map from the mapped property
-   * @param[in] bufferIndex The index of the previous update buffer.
-   * @param[in] program The shader program
-   * @param[in] map The uniform
-   */
-  void SetUniformFromProperty(BufferIndex bufferIndex, Program& program, UniformIndexMap& map);
-
-  /**
    * Bind the textures and setup the samplers
-   * @param[in] context The GL context
-   * @param[in] program The shader program
+   * @param[in] commandBuffer The command buffer to record binding into
    * @param[in] boundTextures The textures bound for rendering
    */
-  void BindTextures(Program& program, Graphics::CommandBuffer& commandBuffer, Vector<Graphics::Texture*>& boundTextures);
+  void BindTextures(Graphics::CommandBuffer& commandBuffer, Vector<Graphics::Texture*>& boundTextures);
 
   /**
-   * Prepare a pipeline for this renderer
+   * Prepare a pipeline for this renderer.
+   *
+   * As a renderer can be re-used in a single frame (e.g. being used by multiple nodes, or
+   * by non-exclusive render tasks), we store a pipeline per node/instruction.
+   * In practice, the implementation will cached pipelines, so we normally only have
+   * multiple handles.
    */
-  Graphics::UniquePtr<Graphics::Pipeline> PrepareGraphicsPipeline(
+  Graphics::Pipeline& PrepareGraphicsPipeline(
     Program&                                             program,
     const Dali::Internal::SceneGraph::RenderInstruction& instruction,
-    bool                                                 blend,
-    Graphics::UniquePtr<Graphics::Pipeline>&&            oldPipeline);
+    const SceneGraph::NodeDataProvider&                  node,
+    bool                                                 blend);
 
   /**
    * Setup and write data to the uniform buffer
@@ -516,7 +490,7 @@ private:
    */
   void FillUniformBuffer(Program&                                      program,
                          const SceneGraph::RenderInstruction&          instruction,
-                         Render::UniformBuffer&                        ubo,
+                         Render::UniformBufferView&                        ubo,
                          std::vector<Graphics::UniformBufferBinding>*& outBindings,
                          uint32_t&                                     offset,
                          BufferIndex                                   updateBufferIndex);
@@ -525,10 +499,7 @@ private:
   Graphics::Controller*                        mGraphicsController;
   OwnerPointer<SceneGraph::RenderDataProvider> mRenderDataProvider;
 
-  Context*          mContext;
   Render::Geometry* mGeometry;
-
-  Graphics::UniquePtr<Graphics::CommandBuffer> mGraphicsCommandBuffer{};
 
   ProgramCache*        mProgramCache{nullptr};
   Render::ShaderCache* mShaderCache{nullptr};
@@ -536,26 +507,32 @@ private:
   Render::UniformBufferManager*               mUniformBufferManager{};
   std::vector<Graphics::UniformBufferBinding> mUniformBufferBindings{};
 
-  Graphics::UniquePtr<Graphics::Pipeline> mGraphicsPipeline{}; ///< The graphics pipeline. (Cached implementation)
-  std::vector<Graphics::ShaderState>      mShaderStates{};
-
   using Hash = unsigned long;
   struct UniformIndexMap
   {
-    uint32_t                 uniformIndex;  ///< The index of the cached location in the Program
-    ConstString              uniformName;   ///< The uniform name
-    const PropertyInputImpl* propertyValue; ///< The property value
+    ConstString              uniformName;            ///< The uniform name
+    const PropertyInputImpl* propertyValue{nullptr}; ///< The property value
     Hash                     uniformNameHash{0u};
     Hash                     uniformNameHashNoArray{0u};
-    int32_t                  arrayIndex; ///< The array index
+    int32_t                  arrayIndex{-1}; ///< The array index
   };
 
   using UniformIndexMappings = Dali::Vector<UniformIndexMap>;
 
   UniformIndexMappings mUniformIndexMap;
   Vector<int32_t>      mAttributeLocations;
+  uint64_t             mUniformsHash;
 
-  uint64_t mUniformsHash;
+  struct HashedPipeline
+  {
+    uint64_t                                mHash{0u};
+    Graphics::UniquePtr<Graphics::Pipeline> mGraphicsPipeline{nullptr};
+    inline static uint64_t                  GetHash(const void* node, const void* instruction, bool blend)
+    {
+      return (reinterpret_cast<uint64_t>(node) << 32) | ((reinterpret_cast<uint64_t>(instruction) & 0xFFFFFFF) << 1) | blend;
+    }
+  };
+  std::vector<HashedPipeline> mGraphicsPipelines{};
 
   StencilParameters mStencilParameters; ///< Struct containing all stencil related options
   BlendingOptions   mBlendingOptions;   ///< Blending options including blend color, blend func and blend equation
@@ -563,25 +540,16 @@ private:
   uint32_t mIndexedDrawFirstElement;  ///< Offset of first element to draw
   uint32_t mIndexedDrawElementsCount; ///< Number of elements to draw
 
-  DepthFunction::Type   mDepthFunction : 4;            ///< The depth function
-  FaceCullingMode::Type mFaceCullingMode : 3;          ///< The mode of face culling
-  DepthWriteMode::Type  mDepthWriteMode : 3;           ///< The depth write mode
-  DepthTestMode::Type   mDepthTestMode : 3;            ///< The depth test mode
-  bool                  mUpdateAttributeLocations : 1; ///< Indicates attribute locations have changed
-  bool                  mPremultipledAlphaEnabled : 1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
-  bool                  mShaderChanged : 1;            ///< Flag indicating the shader changed and uniform maps have to be updated
+  DepthFunction::Type   mDepthFunction : 4;             ///< The depth function
+  FaceCullingMode::Type mFaceCullingMode : 3;           ///< The mode of face culling
+  DepthWriteMode::Type  mDepthWriteMode : 3;            ///< The depth write mode
+  DepthTestMode::Type   mDepthTestMode : 3;             ///< The depth test mode
+  bool                  mUpdateAttributeLocations : 1;  ///< Indicates attribute locations have changed
+  bool                  mPremultipliedAlphaEnabled : 1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
+  bool                  mShaderChanged : 1;             ///< Flag indicating the shader changed and uniform maps have to be updated
   bool                  mUpdated : 1;
 
   std::vector<Dali::DevelRenderer::DrawCommand> mDrawCommands; // Devel stuff
-
-  struct LegacyProgram : Graphics::ExtensionCreateInfo
-  {
-    uint32_t programId{0};
-  };
-
-  LegacyProgram mLegacyProgram; ///< The structure to pass the program ID into Graphics::PipelineCreateInfo
-
-  Graphics::UniquePtr<Render::UniformBuffer> mUniformBuffer[2]{nullptr, nullptr}; ///< The double-buffered uniform buffer
 };
 
 } // namespace Render

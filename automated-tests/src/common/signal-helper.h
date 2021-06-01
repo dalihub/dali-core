@@ -2,7 +2,7 @@
 #define SIGNAL_HELPER
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -720,6 +720,12 @@ public:
     signal.Connect(this, &TestEmitDuringCallback::DeleteSignalDuringEmit);
   }
 
+  void DeleteDuringEmitConnect(TestSignals::FloatRet0ParamSignal& signal)
+  {
+    mFloatRet0ParamSignal = &signal;
+    signal.Connect(this, &TestEmitDuringCallback::DeleteRetSignalDuringEmit);
+  }
+
   void VoidSlotVoid()
   {
     // Emitting during Emit is very bad!
@@ -731,6 +737,13 @@ public:
   {
     // deleting the signal during the emit
     delete mVoidSignalVoid;
+  }
+
+  float DeleteRetSignalDuringEmit()
+  {
+    // deleting the signal during the emit
+    delete mFloatRet0ParamSignal;
+    return 0.0f;
   }
 
   float FloatRet0Param()
