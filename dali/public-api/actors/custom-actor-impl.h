@@ -268,16 +268,6 @@ public:
   virtual void OnLayoutNegotiated(float size, Dimension::Type dimension) = 0;
 
   /**
-   * @brief Set this CustomActor is transparent or not without any affection on the child Actors.
-   */
-  void SetTransparent(bool transparent);
-
-  /**
-   * @brief Get this CustomActor is transparent or not.
-   */
-  bool GetTransparent() const;
-
-  /**
    * @brief Retrieves the extension for this control.
    *
    * @SINCE_1_0.0
@@ -362,6 +352,16 @@ protected: // For derived classes
    * @return Return if the actor is dependent on it's children
    */
   bool RelayoutDependentOnChildrenBase(Dimension::Type dimension = Dimension::ALL_DIMENSIONS);
+
+  /**
+   * @brief Set this CustomActor is transparent or not without any affection on the child Actors.
+   */
+  virtual void SetTransparent(bool transparent);
+
+  /**
+   * @brief Get this CustomActor is transparent or not.
+   */
+  virtual bool GetTransparent() const;
 
 public: // Not intended for application developers
   /**
