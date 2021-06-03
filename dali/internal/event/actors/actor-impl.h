@@ -1319,6 +1319,24 @@ public:
   }
 
   /**
+   * Set whether this view can focus by touch.
+   * @param[in] focusable focuable by touch.
+   */
+  void SetTouchFocusable(bool focusable)
+  {
+    mTouchFocusable = focusable;
+  }
+
+  /**
+   * This returns whether this actor can focus by touch.
+   * @return true if this actor can focus by touch.
+   */
+  bool IsTouchFocusable() const
+  {
+    return mTouchFocusable;
+  }
+
+  /**
    * Query whether the application or derived actor type requires intercept touch events.
    * @return True if intercept touch events are required.
    */
@@ -2048,6 +2066,7 @@ protected:
   bool                     mSensitive : 1;                 ///< Whether the actor emits touch event signals
   bool                     mLeaveRequired : 1;             ///< Whether a touch event signal is emitted when the a touch leaves the actor's bounds
   bool                     mKeyboardFocusable : 1;         ///< Whether the actor should be focusable by keyboard navigation
+  bool                     mTouchFocusable : 1;            ///< Whether the actor should be focusable by touch
   bool                     mOnSceneSignalled : 1;          ///< Set to true before OnSceneConnection signal is emitted, and false before OnSceneDisconnection
   bool                     mInsideOnSizeSet : 1;           ///< Whether we are inside OnSizeSet
   bool                     mInheritPosition : 1;           ///< Cached: Whether the parent's position should be inherited.
