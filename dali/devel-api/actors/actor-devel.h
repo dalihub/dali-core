@@ -150,6 +150,17 @@ enum Type
     *  The actual touched size is actor.width + touchAreaOffset.right - touchAreaOffset.left and actor.height + touchAreaOffset.bottom - touchAreaOffset.top
     */
   TOUCH_AREA_OFFSET,
+
+  /**
+   * @brief Sets whether this view can focus by touch. If user sets this to true, the actor will be focused when user touch it.
+   * @code
+   * Actor actor = Actor::New();
+   * actor.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true); // whether the view can have focus or not with keyboard navigation.
+   * actor.SetProperty(DevelActor::Property::TOUCH_FOCUSABLE, true); // Whether the user can focus by touch, user can set focus by touching the actor.
+   * @endcode
+   * @details Name "touchFocusable", type Property::BOOLEAN.
+   */
+  TOUCH_FOCUSABLE
 };
 
 } // namespace Property

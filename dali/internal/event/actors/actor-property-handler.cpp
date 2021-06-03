@@ -581,6 +581,16 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
       break;
     }
 
+    case Dali::DevelActor::Property::TOUCH_FOCUSABLE:
+    {
+      bool value = false;
+      if(property.Get(value))
+      {
+        actor.SetTouchFocusable(value);
+      }
+      break;
+    }
+
     default:
     {
       // this can happen in the case of a non-animatable default property so just do nothing
@@ -1613,6 +1623,12 @@ bool Actor::PropertyHandler::GetCachedPropertyValue(const Internal::Actor& actor
     case Dali::DevelActor::Property::TOUCH_AREA_OFFSET:
     {
       value = actor.GetTouchAreaOffset();
+      break;
+    }
+
+    case Dali::DevelActor::Property::TOUCH_FOCUSABLE:
+    {
+      value = actor.IsTouchFocusable();
       break;
     }
 

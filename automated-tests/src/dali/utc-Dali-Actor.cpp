@@ -2522,6 +2522,30 @@ int UtcDaliActorIsKeyboardFocusable(void)
   END_TEST;
 }
 
+int UtcDaliActorSetTouchFocusable(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  actor.SetProperty(DevelActor::Property::TOUCH_FOCUSABLE, true);
+  DALI_TEST_CHECK(actor.GetProperty<bool>(DevelActor::Property::TOUCH_FOCUSABLE) == true);
+
+  actor.SetProperty(DevelActor::Property::TOUCH_FOCUSABLE, false);
+  DALI_TEST_CHECK(actor.GetProperty<bool>(DevelActor::Property::TOUCH_FOCUSABLE) == false);
+  END_TEST;
+}
+
+int UtcDaliActorIsTouchFocusable(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  DALI_TEST_CHECK(actor.GetProperty<bool>(DevelActor::Property::TOUCH_FOCUSABLE) == false);
+  END_TEST;
+}
+
 int UtcDaliActorRemoveConstraints(void)
 {
   tet_infoline(" UtcDaliActorRemoveConstraints");
