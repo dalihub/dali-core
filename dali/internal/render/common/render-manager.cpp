@@ -58,6 +58,43 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_REN
 } // unnamed namespace
 #endif
 
+namespace
+{
+inline Graphics::Rect2D RecalculateScissorArea(Graphics::Rect2D scissorArea, int orientation, Rect<int32_t> viewportRect)
+{
+  Graphics::Rect2D newScissorArea;
+
+  if(orientation == 90)
+  {
+    newScissorArea.x      = viewportRect.height - (scissorArea.y + scissorArea.height);
+    newScissorArea.y      = scissorArea.x;
+    newScissorArea.width  = scissorArea.height;
+    newScissorArea.height = scissorArea.width;
+  }
+  else if(orientation == 180)
+  {
+    newScissorArea.x      = viewportRect.width - (scissorArea.x + scissorArea.width);
+    newScissorArea.y      = viewportRect.height - (scissorArea.y + scissorArea.height);
+    newScissorArea.width  = scissorArea.width;
+    newScissorArea.height = scissorArea.height;
+  }
+  else if(orientation == 270)
+  {
+    newScissorArea.x      = scissorArea.y;
+    newScissorArea.y      = viewportRect.width - (scissorArea.x + scissorArea.width);
+    newScissorArea.width  = scissorArea.height;
+    newScissorArea.height = scissorArea.width;
+  }
+  else
+  {
+    newScissorArea.x      = scissorArea.x;
+    newScissorArea.y      = scissorArea.y;
+    newScissorArea.width  = scissorArea.width;
+    newScissorArea.height = scissorArea.height;
+  }
+  return newScissorArea;
+}
+} // namespace
 /**
  * Structure to contain internal data
  */
@@ -877,6 +914,11 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
         }
       }
     }
+
+    // Scissor's value should be set based on the default system coordinates.
+    // When the surface is rotated, the input values already were set with the rotated angle.
+    // So, re-calculation is needed.
+    scissorArea = RecalculateScissorArea(scissorArea, surfaceOrientation, viewportRect);
 
     // Begin render pass
     mainCommandBuffer->BeginRenderPass(
