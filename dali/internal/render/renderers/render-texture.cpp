@@ -107,10 +107,10 @@ constexpr Graphics::Format ConvertPixelFormat(Pixel::Format format)
       return Graphics::Format::ETC2_R8G8B8A1_SRGB_BLOCK; // no 'punchthrough' format
 
     case Pixel::COMPRESSED_RGBA8_ETC2_EAC:
-      return Graphics::Format::ETC2_R8G8B8_UNORM_BLOCK; // doesn't seem to map onto any format
+      return Graphics::Format::ETC2_R8G8B8A8_UNORM_BLOCK;
 
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ETC2_EAC:
-      return Graphics::Format::ETC2_R8G8B8A8_SRGB_BLOCK; // doesn't seem to map onto any format
+      return Graphics::Format::ETC2_R8G8B8A8_SRGB_BLOCK;
 
     case Pixel::COMPRESSED_RGB8_ETC1:
       return Graphics::Format::ETC2_R8G8B8_UNORM_BLOCK; // doesn't seem to be supported at all
