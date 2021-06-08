@@ -383,11 +383,13 @@ inline void SetupDepthBuffer(const RenderItem& item, Graphics::CommandBuffer& co
  * @param[in]     item                     The current RenderItem about to be rendered
  * @param[in,out] commandBuffer            The command buffer to write into
  * @param[in]     instruction              The render-instruction to process.
+ * @param[in]     orientation              The Scene's surface orientation.
  */
 inline void RenderAlgorithms::SetupScissorClipping(
   const RenderItem&        item,
   Graphics::CommandBuffer& commandBuffer,
-  const RenderInstruction& instruction)
+  const RenderInstruction& instruction,
+  int orientation)
 {
   // Get the number of child scissors in the stack (do not include layer or root box).
   size_t         childStackDepth = mScissorStack.size() - 1u;
@@ -456,8 +458,9 @@ inline void RenderAlgorithms::SetupScissorClipping(
       {
         useScissorBox.y = (instruction.mFrameBuffer->GetHeight() - useScissorBox.height) - useScissorBox.y;
       }
-      Graphics::Rect2D scissorBox = {useScissorBox.x, useScissorBox.y, uint32_t(useScissorBox.width), uint32_t(useScissorBox.height)};
-      commandBuffer.SetScissor(scissorBox);
+
+      Graphics::Viewport graphicsViewport = ViewportFromClippingBox(mViewportRectangle, 0);
+      commandBuffer.SetScissor(Rect2DFromClippingBox(useScissorBox, orientation, graphicsViewport));
     }
   }
 }
@@ -468,7 +471,8 @@ inline void RenderAlgorithms::SetupClipping(const RenderItem&                   
                                             uint32_t&                           lastClippingDepth,
                                             uint32_t&                           lastClippingId,
                                             Integration::StencilBufferAvailable stencilBufferAvailable,
-                                            const RenderInstruction&            instruction)
+                                            const RenderInstruction&            instruction,
+                                            int                                 orientation)
 {
   RenderMode::Type renderMode = RenderMode::AUTO;
   const Renderer*  renderer   = item.mRenderer;
@@ -490,7 +494,7 @@ inline void RenderAlgorithms::SetupClipping(const RenderItem&                   
       // As both scissor and stencil clips can be nested, we may be simultaneously traversing up the scissor tree, requiring a scissor to be un-done. Whilst simultaneously adding a new stencil clip.
       // We process both based on our current and old clipping depths for each mode.
       // Both methods with return rapidly if there is nothing to be done for that type of clipping.
-      SetupScissorClipping(item, commandBuffer, instruction);
+      SetupScissorClipping(item, commandBuffer, instruction, orientation);
 
       if(stencilBufferAvailable == Integration::StencilBufferAvailable::TRUE)
       {
@@ -637,7 +641,7 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
 
     // Set up clipping based on both the Renderer and Actor APIs.
     // The Renderer API will be used if specified. If AUTO, the Actors automatic clipping feature will be used.
-    SetupClipping(item, secondaryCommandBuffer, usedStencilBuffer, lastClippingDepth, lastClippingId, stencilBufferAvailable, instruction);
+    SetupClipping(item, secondaryCommandBuffer, usedStencilBuffer, lastClippingDepth, lastClippingId, stencilBufferAvailable, instruction, orientation);
 
     if(DALI_LIKELY(item.mRenderer))
     {
