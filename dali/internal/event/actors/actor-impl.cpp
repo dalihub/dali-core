@@ -1118,6 +1118,16 @@ DevelBlendEquation::Type Actor::GetBlendEquation() const
   return mBlendEquation;
 }
 
+void Actor::SetTransparent(bool transparent)
+{
+  SetTransparentMessage(GetEventThreadServices(), GetNode(), transparent);
+}
+
+bool Actor::GetTransparent() const
+{
+  return GetNode().GetTransparent();
+}
+
 void Actor::SetDrawMode(DrawMode::Type drawMode)
 {
   // this flag is not animatable so keep the value
@@ -1398,6 +1408,48 @@ void Actor::Remove(Actor& child)
   mParentImpl.Remove(child);
 }
 
+void Actor::SwitchParent(Actor& newParent)
+{
+  DALI_ASSERT_ALWAYS(this != &newParent && "Cannot add actor to itself");
+
+  DALI_ASSERT_ALWAYS((this->OnScene() && newParent.OnScene()) && "Both of current parent and new parent must be on Scene");
+
+  Actor* oldParent = this->GetParent();
+  if(oldParent->RemoveWithoutNotify(*this))
+  {
+    // Only put in a relayout request if there is a suitable dependency
+    if(oldParent->RelayoutDependentOnChildren())
+    {
+      oldParent->RelayoutRequest();
+    }
+  }
+
+  newParent.AddWithoutNotify(*this);
+  mParent            = &newParent;
+  Actor* parentActor = static_cast<Actor*>(&newParent);
+  mScene             = parentActor->mScene;
+
+  // Resolve the name and index for the child properties if any
+  ResolveChildProperties();
+
+  this->InheritLayoutDirectionRecursively(newParent.GetLayoutDirection());
+  // Only put in a relayout request if there is a suitable dependency
+  if(newParent.RelayoutDependentOnChildren())
+  {
+    newParent.RelayoutRequest();
+  }
+}
+
+void Actor::AddWithoutNotify(Actor& child)
+{
+  mParentImpl.AddWithoutNotify(child);
+}
+
+bool Actor::RemoveWithoutNotify(Actor& child)
+{
+  return mParentImpl.RemoveWithoutNotify(child);
+}
+
 uint32_t Actor::GetChildCount() const
 {
   return mParentImpl.GetChildCount();
@@ -1595,6 +1647,8 @@ void Actor::NotifyStageDisconnection()
     {
       mOnSceneSignalled = false; // signal required next time Actor is added
     }
+
+    SetTransparent(false);
   }
 }
 

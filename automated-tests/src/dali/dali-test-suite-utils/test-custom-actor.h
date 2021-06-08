@@ -2,7 +2,7 @@
 #define TEST_CUSTOM_ACTOR_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,6 +89,8 @@ public:
   float                     TestCalculateChildSizeBase(const Dali::Actor& child, Dali::Dimension::Type dimension);
   bool                      TestRelayoutDependentOnChildrenBase(Dali::Dimension::Type dimension);
   uint32_t                  GetDepth();
+  void                      SetTransparent(bool transparent);
+  bool                      GetTransparent();
 
 private:
   TestCustomActor(Impl::TestCustomActor& impl);
@@ -146,6 +148,8 @@ public:
   float                        CalculateChildSize(const Dali::Actor& child, Dali::Dimension::Type dimension) override;
   void                         OnLayoutNegotiated(float size, Dali::Dimension::Type dimension) override;
   bool                         RelayoutDependentOnChildren(Dali::Dimension::Type dimension = Dali::Dimension::ALL_DIMENSIONS) override;
+  void                         SetTransparent(bool transparent) override;
+  bool                         GetTransparent() const override;
   static void                  SetProperty(Dali::BaseObject* object, Dali::Property::Index index, const Dali::Property::Value& value);
   static Dali::Property::Value GetProperty(Dali::BaseObject* object, Dali::Property::Index index);
 
