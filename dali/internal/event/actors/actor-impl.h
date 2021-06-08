@@ -200,21 +200,6 @@ public:
   void Remove(Actor& child) override;
 
   /**
-   * @copydoc Dali::DevelActor::SwitchParent()
-   */
-  void SwitchParent(Actor& newParent);
-
-  /**
-   * @copydoc Dali::Internal::ActorParent::AddWithoutNotify()
-   */
-  void AddWithoutNotify(Actor& child);
-
-  /**
-   * @copydoc Dali::Internal::ActorParent::RemoveWithoutNotify()
-   */
-  bool RemoveWithoutNotify(Actor& child);
-
-  /**
    * @copydoc Dali::Actor::Unparent
    */
   void Unparent();
@@ -1229,7 +1214,7 @@ public:
   void RemoveRenderer(uint32_t index);
 
   /**
-   * @brief Set BlendEquation at each renderer that added on this Actor.
+   * Set BlendEquation at each renderer that added on this Actor.
    */
   void SetBlendEquation(DevelBlendEquation::Type blendEquation);
 
@@ -1237,16 +1222,6 @@ public:
    * @brief Get Blend Equation that applied to this Actor
    */
   DevelBlendEquation::Type GetBlendEquation() const;
-
-  /**
-   * @brief Set this Actor is transparent or not without any affection on the child Actors.
-   */
-  virtual void SetTransparent(bool transparent);
-
-  /**
-   * @brief Get this Actor is transparent or not.
-   */
-  virtual bool GetTransparent() const;
 
 public:
   /**
