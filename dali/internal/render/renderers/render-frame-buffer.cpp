@@ -33,6 +33,16 @@ FrameBuffer::FrameBuffer(uint32_t width, uint32_t height, Mask attachments)
   mDepthBuffer(attachments & Dali::FrameBuffer::Attachment::DEPTH),
   mStencilBuffer(attachments & Dali::FrameBuffer::Attachment::STENCIL)
 {
+  mCreateInfo.size.width  = width;
+  mCreateInfo.size.height = height;
+  if(mDepthBuffer)
+  {
+    mCreateInfo.depthStencilAttachment.depthUsage = Graphics::DepthStencilAttachment::Usage::WRITE;
+  }
+  if(mStencilBuffer)
+  {
+    mCreateInfo.depthStencilAttachment.stencilUsage = Graphics::DepthStencilAttachment::Usage::WRITE;
+  }
 }
 
 FrameBuffer::~FrameBuffer() = default;
@@ -64,7 +74,7 @@ void FrameBuffer::AttachColorTexture(Render::Texture* texture, uint32_t mipmapLe
 
 void FrameBuffer::AttachDepthTexture(Render::Texture* texture, uint32_t mipmapLevel)
 {
-  if(texture && mDepthBuffer)
+  if(texture)
   {
     if(!texture->GetGraphicsObject())
     {
@@ -72,19 +82,21 @@ void FrameBuffer::AttachDepthTexture(Render::Texture* texture, uint32_t mipmapLe
     }
 
     mCreateInfo.depthStencilAttachment.depthTexture = texture->GetGraphicsObject();
+    mCreateInfo.depthStencilAttachment.depthUsage   = Graphics::DepthStencilAttachment::Usage::WRITE;
     mCreateInfo.depthStencilAttachment.depthLevel   = mipmapLevel;
   }
 }
 
 void FrameBuffer::AttachDepthStencilTexture(Render::Texture* texture, uint32_t mipmapLevel)
 {
-  if(texture && mStencilBuffer)
+  if(texture)
   {
     if(!texture->GetGraphicsObject())
     {
       texture->Create(0 | Graphics::TextureUsageFlagBits::DEPTH_STENCIL_ATTACHMENT | Graphics::TextureUsageFlagBits::SAMPLE);
     }
     mCreateInfo.depthStencilAttachment.stencilTexture = texture->GetGraphicsObject();
+    mCreateInfo.depthStencilAttachment.stencilUsage   = Graphics::DepthStencilAttachment::Usage::WRITE;
     mCreateInfo.depthStencilAttachment.stencilLevel   = mipmapLevel;
   }
 }
@@ -98,7 +110,8 @@ bool FrameBuffer::CreateGraphicsObjects()
     // Only create a graphics object if there are attachments for it to render into
     if(mCreateInfo.colorAttachments.empty() &&
        mCreateInfo.depthStencilAttachment.depthTexture == nullptr &&
-       mCreateInfo.depthStencilAttachment.stencilTexture == nullptr)
+       mCreateInfo.depthStencilAttachment.stencilTexture == nullptr &&
+       !mDepthBuffer && !mStencilBuffer)
     {
       DALI_LOG_ERROR("Attempting to bind a framebuffer with no attachments\n");
     }
@@ -130,16 +143,17 @@ bool FrameBuffer::CreateGraphicsObjects()
         }
       }
 
-      if(mCreateInfo.depthStencilAttachment.depthTexture || mCreateInfo.depthStencilAttachment.stencilTexture)
+      if(mCreateInfo.depthStencilAttachment.depthTexture || mCreateInfo.depthStencilAttachment.stencilTexture ||
+         mDepthBuffer || mStencilBuffer)
       {
         Graphics::AttachmentDescription depthStencilDesc{};
-        depthStencilDesc.SetStencilLoadOp(Graphics::AttachmentLoadOp::CLEAR)
+        depthStencilDesc.SetLoadOp(Graphics::AttachmentLoadOp::CLEAR)
           .SetStoreOp(Graphics::AttachmentStoreOp::DONT_CARE);
 
-        if(mCreateInfo.depthStencilAttachment.stencilTexture)
+        if(mCreateInfo.depthStencilAttachment.stencilTexture || mStencilBuffer)
         {
           depthStencilDesc.SetStencilLoadOp(Graphics::AttachmentLoadOp::CLEAR)
-            .SetStoreOp(Graphics::AttachmentStoreOp::DONT_CARE);
+            .SetStencilStoreOp(Graphics::AttachmentStoreOp::DONT_CARE);
         }
         mClearValues.emplace_back();
         attachmentDescriptions.push_back(depthStencilDesc);
