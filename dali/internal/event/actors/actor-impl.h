@@ -192,12 +192,17 @@ public:
   /**
    * @copydoc Dali::Internal::ActorParent::Add()
    */
-  void Add(Actor& child) override;
+  void Add(Actor& child, bool notify = true) override;
 
   /**
    * @copydoc Dali::Internal::ActorParent::Remove()
    */
-  void Remove(Actor& child) override;
+  void Remove(Actor& child, bool notify = true) override;
+
+  /**
+   * @copydoc Dali::DevelActor::SwitchParent()
+   */
+  void SwitchParent(Actor& newParent);
 
   /**
    * @copydoc Dali::Actor::Unparent
@@ -1225,7 +1230,7 @@ public:
   void RemoveRenderer(uint32_t index);
 
   /**
-   * Set BlendEquation at each renderer that added on this Actor.
+   * @brief Set BlendEquation at each renderer that added on this Actor.
    */
   void SetBlendEquation(DevelBlendEquation::Type blendEquation);
 
@@ -1233,6 +1238,16 @@ public:
    * @brief Get Blend Equation that applied to this Actor
    */
   DevelBlendEquation::Type GetBlendEquation() const;
+
+  /**
+   * @brief Set this Actor is transparent or not without any affection on the child Actors.
+   */
+  void SetTransparent(bool transparent);
+
+  /**
+   * @brief Get this Actor is transparent or not.
+   */
+  bool IsTransparent() const;
 
 public:
   /**
@@ -1812,8 +1827,9 @@ private:
   /**
    * Set the actor's parent.
    * @param[in] parent The new parent.
+   * @param[in] keepOnScene Keep this actor to be on Scene if this is true.
    */
-  void SetParent(ActorParent* parent);
+  void SetParent(ActorParent* parent, bool keepOnScene = false);
 
   /**
    * For use in derived classes, called after Initialize()

@@ -268,6 +268,16 @@ public:
   virtual void OnLayoutNegotiated(float size, Dimension::Type dimension) = 0;
 
   /**
+   * @brief Set this CustomActor is transparent or not without any affection on the child Actors.
+   */
+  void SetTransparent(bool transparent);
+
+  /**
+   * @brief Get this CustomActor is transparent or not.
+   */
+  bool IsTransparent() const;
+
+  /**
    * @brief Retrieves the extension for this control.
    *
    * @SINCE_1_0.0

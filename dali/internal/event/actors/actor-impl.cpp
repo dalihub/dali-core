@@ -1118,6 +1118,16 @@ DevelBlendEquation::Type Actor::GetBlendEquation() const
   return mBlendEquation;
 }
 
+void Actor::SetTransparent(bool transparent)
+{
+  SetTransparentMessage(GetEventThreadServices(), GetNode(), transparent);
+}
+
+bool Actor::IsTransparent() const
+{
+  return GetNode().IsTransparent();
+}
+
 void Actor::SetDrawMode(DrawMode::Type drawMode)
 {
   // this flag is not animatable so keep the value
@@ -1388,14 +1398,31 @@ Actor::~Actor()
   delete mRelayoutData;
 }
 
-void Actor::Add(Actor& child)
+void Actor::Add(Actor& child, bool notify)
 {
-  mParentImpl.Add(child);
+  mParentImpl.Add(child, notify);
 }
 
-void Actor::Remove(Actor& child)
+void Actor::Remove(Actor& child, bool notify)
 {
-  mParentImpl.Remove(child);
+  mParentImpl.Remove(child, notify);
+}
+
+void Actor::SwitchParent(Actor& newParent)
+{
+  if(this == &newParent)
+  {
+    DALI_LOG_ERROR("Cannot add actor to itself");
+    return;
+  }
+
+  if(!this->OnScene() || !newParent.OnScene())
+  {
+    DALI_LOG_ERROR("Both of current parent and new parent must be on Scene");
+    return;
+  }
+
+  newParent.Add(*this, false);
 }
 
 uint32_t Actor::GetChildCount() const
@@ -1807,7 +1834,7 @@ void Actor::LowerBelow(Internal::Actor& target)
   }
 }
 
-void Actor::SetParent(ActorParent* parent)
+void Actor::SetParent(ActorParent* parent, bool keepOnScene)
 {
   if(parent)
   {
@@ -1818,7 +1845,7 @@ void Actor::SetParent(ActorParent* parent)
     mScene             = parentActor->mScene;
 
     if(EventThreadServices::IsCoreRunning() && // Don't emit signals or send messages during Core destruction
-       parentActor->OnScene())
+       parentActor->OnScene() && !keepOnScene)
     {
       // Instruct each actor to create a corresponding node in the scene graph
       ConnectToScene(parentActor->GetHierarchyDepth());
@@ -1834,7 +1861,7 @@ void Actor::SetParent(ActorParent* parent)
     mParent = nullptr;
 
     if(EventThreadServices::IsCoreRunning() && // Don't emit signals or send messages during Core destruction
-       OnScene())
+       OnScene() && !keepOnScene)
     {
       // Disconnect the Node & its children from the scene-graph.
       DisconnectNodeMessage(GetEventThreadServices().GetUpdateManager(), GetNode());
