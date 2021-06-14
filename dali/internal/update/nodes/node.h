@@ -622,6 +622,9 @@ public:
   {
     if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
     {
+      DALI_LOG_RELEASE_INFO("id = %d, data = %p, manager = %p, id = %d, mSize data = %p\n",
+                            mId, &mTransformManagerData, mTransformManagerData.mManager, mTransformManagerData.mId, mSize.mTxManagerData);
+
       return mSize.Get(0);
     }
 
