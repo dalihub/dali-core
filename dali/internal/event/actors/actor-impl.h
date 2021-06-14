@@ -254,17 +254,6 @@ public:
   Rect<> CalculateScreenExtents() const;
 
   /**
-   * @copydoc DevelActor::SetNeedGesturePropagation.
-   */
-  void SetNeedGesturePropagation(bool propagation);
-
-  /**
-   * Retrieve need gesture propagation value
-   * @return The actor's need gesture propagation value.
-   */
-  bool NeedGesturePropagation();
-
-  /**
    * Sets the size of an actor.
    * This does not interfere with the actors scale factor.
    * @param [in] width  The new width.
@@ -2057,13 +2046,12 @@ protected:
   bool                     mVisible : 1;                   ///< Cached: Whether the actor is visible or not.
   bool                     mInheritLayoutDirection : 1;    ///< Whether the actor inherits the layout direction from parent.
   bool                     mCaptureAllTouchAfterStart : 1; ///< Whether the actor should capture all touch after touch starts even if the motion moves outside of the actor area.
-  bool                     mIsBlendEquationSet : 1;        ///< Flag to identify whether the Blend equation is set
-  bool                     mNeedGesturePropagation : 1;    ///< Whether the parent listens for gesture events or not
   LayoutDirection::Type    mLayoutDirection : 2;           ///< Layout direction, Left to Right or Right to Left.
   DrawMode::Type           mDrawMode : 3;                  ///< Cached: How the actor and its children should be drawn
   ColorMode                mColorMode : 3;                 ///< Cached: Determines whether mWorldColor is inherited
   ClippingMode::Type       mClippingMode : 3;              ///< Cached: Determines which clipping mode (if any) to use.
   DevelBlendEquation::Type mBlendEquation : 16;            ///< Cached: Determines which blend equation will be used to render renderers.
+  bool                     mIsBlendEquationSet : 1;        ///< Flag to identify whether the Blend equation is set
 
 private:
   static ActorContainer mNullChildren; ///< Empty container (shared by all actors, returned by GetChildren() const)
