@@ -62,25 +62,6 @@ public:
   void Remove(Actor& child);
 
   /**
-   * Adds a child Actor to this ActorParent.
-   * @pre The child actor is not the same as the parent actor.
-   * @pre The child actor could already have a parent.
-   * @param [in] child The child.
-   * @post The child will be referenced by its parent
-   * @note Even though child has already a parent, this method didn't emit off scene callback.
-   */
-  void AddWithoutNotify(Actor& child);
-
-  /**
-   * Removes a child Actor from this ActorParent.
-   * @param [in] child The child.
-   * @post The child will be unreferenced.
-   * @note This method do not call off scene callback of child.
-   * This method must be called just for switching parent Actor.
-   */
-  bool RemoveWithoutNotify(Actor& child);
-
-  /**
    * Retrieve the number of children held by the actor.
    * @return The number of children
    */

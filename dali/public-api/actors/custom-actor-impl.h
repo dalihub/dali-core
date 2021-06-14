@@ -353,16 +353,6 @@ protected: // For derived classes
    */
   bool RelayoutDependentOnChildrenBase(Dimension::Type dimension = Dimension::ALL_DIMENSIONS);
 
-  /**
-   * @brief Set this CustomActor is transparent or not without any affection on the child Actors.
-   */
-  virtual void SetTransparent(bool transparent);
-
-  /**
-   * @brief Get this CustomActor is transparent or not.
-   */
-  virtual bool GetTransparent() const;
-
 public: // Not intended for application developers
   /**
    * @brief Initializes a CustomActor.
