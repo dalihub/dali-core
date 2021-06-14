@@ -291,6 +291,45 @@ DALI_CORE_API ChildOrderChangedSignalType& ChildOrderChangedSignal(Actor actor);
  */
 DALI_CORE_API Actor::TouchEventSignalType& InterceptTouchedSignal(Actor actor);
 
+/**
+ * @brief This is used when the parent actor wants to listen to gesture events.
+ *
+ * @note example The child is overlapped on the parent.
+ * Currently, if you tap a child, the parent cannot listen to the tap event.
+ * Now, If set to SetNeedGesturePropagation(true), the parent can receive gesture events.
+ * Please call this setting inside a gesture callback, it will be reset after the gesture callback is called.
+ * @code
+ * {
+ *    Actor parent = Actor::New();
+ *    Actor child = Actor::New();
+ *    parent.Add(child);
+ *    parentTapDetector = TapGestureDetector::New();
+ *    childTapDetector = TapGestureDetector::New();
+ *    parentTapDetector.Attach(parent);
+ *    childTapDetector.Attach(child);
+ *    parentTapDetector.DetectedSignal().Connect(this, &OnParentTap);
+ *    childTapDetector.DetectedSignal().Connect(this, &OnChildTap);
+ * }
+ * void OnChildTap(Dali::Actor actor, const Dali::TapGesture& tap)
+ * {
+ *    // If you set SetNeedGesturePropagation to true here, the parent actor can also listen to events
+ *    Dali::DevelActor::SetNeedGesturePropagation(Self(), true);
+ * }
+ * @endcode
+ *
+ */
+DALI_CORE_API void SetNeedGesturePropagation(Actor actor, bool propagation);
+
+/**
+ * Switch parent in the same tree.
+ * This method changes the actor's parent with keeping on scene state.
+ * Both of current parent Actor and new parent Actor must already be added on Scene.
+ * This method don't emit notification about add/remove and on/off scene.
+ * @param [in] actor This actor
+ * @param [in] newParent An actor to be a new parent of this actor.
+ */
+DALI_CORE_API void SwitchParent(Actor actor, Actor newParent);
+
 } // namespace DevelActor
 
 } // namespace Dali

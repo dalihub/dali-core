@@ -192,12 +192,17 @@ public:
   /**
    * @copydoc Dali::Internal::ActorParent::Add()
    */
-  void Add(Actor& child) override;
+  void Add(Actor& child, bool notify = true) override;
 
   /**
    * @copydoc Dali::Internal::ActorParent::Remove()
    */
-  void Remove(Actor& child) override;
+  void Remove(Actor& child, bool notify = true) override;
+
+  /**
+   * @copydoc Dali::DevelActor::SwitchParent()
+   */
+  void SwitchParent(Actor& newParent);
 
   /**
    * @copydoc Dali::Actor::Unparent
@@ -252,6 +257,17 @@ public:
    * @return pair of two values, position of top-left corner on screen and size respectively.
    */
   Rect<> CalculateScreenExtents() const;
+
+  /**
+   * @copydoc DevelActor::SetNeedGesturePropagation.
+   */
+  void SetNeedGesturePropagation(bool propagation);
+
+  /**
+   * Retrieve need gesture propagation value
+   * @return The actor's need gesture propagation value.
+   */
+  bool NeedGesturePropagation();
 
   /**
    * Sets the size of an actor.
@@ -1214,7 +1230,7 @@ public:
   void RemoveRenderer(uint32_t index);
 
   /**
-   * Set BlendEquation at each renderer that added on this Actor.
+   * @brief Set BlendEquation at each renderer that added on this Actor.
    */
   void SetBlendEquation(DevelBlendEquation::Type blendEquation);
 
@@ -1222,6 +1238,16 @@ public:
    * @brief Get Blend Equation that applied to this Actor
    */
   DevelBlendEquation::Type GetBlendEquation() const;
+
+  /**
+   * @brief Set this Actor is transparent or not without any affection on the child Actors.
+   */
+  void SetTransparent(bool transparent);
+
+  /**
+   * @brief Get this Actor is transparent or not.
+   */
+  bool IsTransparent() const;
 
 public:
   /**
@@ -1801,8 +1827,9 @@ private:
   /**
    * Set the actor's parent.
    * @param[in] parent The new parent.
+   * @param[in] keepOnScene Keep this actor to be on Scene if this is true.
    */
-  void SetParent(ActorParent* parent);
+  void SetParent(ActorParent* parent, bool keepOnScene = false);
 
   /**
    * For use in derived classes, called after Initialize()
@@ -2046,12 +2073,13 @@ protected:
   bool                     mVisible : 1;                   ///< Cached: Whether the actor is visible or not.
   bool                     mInheritLayoutDirection : 1;    ///< Whether the actor inherits the layout direction from parent.
   bool                     mCaptureAllTouchAfterStart : 1; ///< Whether the actor should capture all touch after touch starts even if the motion moves outside of the actor area.
+  bool                     mIsBlendEquationSet : 1;        ///< Flag to identify whether the Blend equation is set
+  bool                     mNeedGesturePropagation : 1;    ///< Whether the parent listens for gesture events or not
   LayoutDirection::Type    mLayoutDirection : 2;           ///< Layout direction, Left to Right or Right to Left.
   DrawMode::Type           mDrawMode : 3;                  ///< Cached: How the actor and its children should be drawn
   ColorMode                mColorMode : 3;                 ///< Cached: Determines whether mWorldColor is inherited
   ClippingMode::Type       mClippingMode : 3;              ///< Cached: Determines which clipping mode (if any) to use.
   DevelBlendEquation::Type mBlendEquation : 16;            ///< Cached: Determines which blend equation will be used to render renderers.
-  bool                     mIsBlendEquationSet : 1;        ///< Flag to identify whether the Blend equation is set
 
 private:
   static ActorContainer mNullChildren; ///< Empty container (shared by all actors, returned by GetChildren() const)

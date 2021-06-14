@@ -191,7 +191,6 @@ bool Renderer::PrepareRender(BufferIndex updateBufferIndex)
       const UniformMap& rendererUniformMap = PropertyOwner::GetUniformMap();
 
       auto size = rendererUniformMap.Count();
-
       if(mShader)
       {
         size += mShader->GetUniformMap().Count();
@@ -695,6 +694,11 @@ const CollectedUniformMap& Renderer::GetUniformMap(BufferIndex bufferIndex) cons
 Renderer::OpacityType Renderer::GetOpacityType(BufferIndex updateBufferIndex, const Node& node) const
 {
   Renderer::OpacityType opacityType = Renderer::OPAQUE;
+
+  if(node.IsTransparent())
+  {
+    return Renderer::TRANSPARENT;
+  }
 
   switch(mBlendMode)
   {

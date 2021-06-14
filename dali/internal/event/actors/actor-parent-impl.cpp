@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ ActorParentImpl::~ActorParentImpl()
   delete mChildren;
 }
 
-void ActorParentImpl::Add(Actor& child)
+void ActorParentImpl::Add(Actor& child, bool notify)
 {
   DALI_ASSERT_ALWAYS(&mOwner != &child && "Cannot add actor to itself");
   DALI_ASSERT_ALWAYS(!child.IsRoot() && "Cannot add root actor");
@@ -75,7 +75,7 @@ void ActorParentImpl::Add(Actor& child)
     // if we already have parent, unparent us first
     if(oldParent)
     {
-      oldParent->Remove(child); // This causes OnChildRemove callback & ChildRemoved signal
+      oldParent->Remove(child, notify); // This causes OnChildRemove callback & ChildRemoved signal
 
       // Old parent may need to readjust to missing child
       if(oldParent->RelayoutDependentOnChildren())
@@ -91,11 +91,14 @@ void ActorParentImpl::Add(Actor& child)
       mChildren->push_back(ActorPtr(&child));
 
       // SetParent asserts that child can be added
-      child.SetParent(&mOwner);
+      child.SetParent(&mOwner, !notify);
 
-      // Notification for derived classes
-      mOwner.OnChildAdd(child);
-      EmitChildAddedSignal(child);
+      if(notify)
+      {
+        // Notification for derived classes
+        mOwner.OnChildAdd(child);
+        EmitChildAddedSignal(child);
+      }
 
       child.InheritLayoutDirectionRecursively(mOwner.GetLayoutDirection());
 
@@ -108,7 +111,7 @@ void ActorParentImpl::Add(Actor& child)
   }
 }
 
-void ActorParentImpl::Remove(Actor& child)
+void ActorParentImpl::Remove(Actor& child, bool notify)
 {
   if((&mOwner == &child) || (!mChildren))
   {
@@ -133,7 +136,7 @@ void ActorParentImpl::Remove(Actor& child)
       mChildren->erase(iter);
 
       DALI_ASSERT_DEBUG(actor->GetParent() == &mOwner);
-      actor->SetParent(nullptr);
+      actor->SetParent(nullptr, (notify) ? false : true);
 
       break;
     }
@@ -148,9 +151,12 @@ void ActorParentImpl::Remove(Actor& child)
     }
   }
 
-  // Notification for derived classes
-  mOwner.OnChildRemove(child);
-  EmitChildRemovedSignal(child);
+  if(notify)
+  {
+    // Notification for derived classes
+    mOwner.OnChildRemove(child);
+    EmitChildRemovedSignal(child);
+  }
 }
 
 uint32_t ActorParentImpl::GetChildCount() const

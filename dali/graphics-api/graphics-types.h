@@ -1003,11 +1003,17 @@ struct ColorAttachment
  */
 struct DepthStencilAttachment
 {
-  // TODO:
-  Texture* depthTexture;
-  Texture* stencilTexture;
-  uint32_t depthLevel;
-  uint32_t stencilLevel;
+  enum class Usage
+  {
+    WRITE, // If no texture, will create a RenderBuffer instead
+    NONE   // If no attachment/RenderBuffer required
+  };
+  Texture* depthTexture{nullptr};
+  Texture* stencilTexture{nullptr};
+  uint32_t depthLevel{0};
+  uint32_t stencilLevel{0};
+  Usage    depthUsage{Usage::NONE};
+  Usage    stencilUsage{Usage::NONE};
 };
 
 /**
