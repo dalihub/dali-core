@@ -1252,12 +1252,12 @@ public:
   /**
    * @brief Set this Actor is transparent or not without any affection on the child Actors.
    */
-  void SetTransparent(bool transparent);
+  virtual void SetTransparent(bool transparent);
 
   /**
    * @brief Get this Actor is transparent or not.
    */
-  bool GetTransparent() const;
+  virtual bool GetTransparent() const;
 
 public:
   /**
