@@ -100,8 +100,8 @@ struct ActorTouchableCheck : public HitTestInterface
 {
   bool IsActorHittable(Actor* actor) override
   {
-    return actor->GetTouchRequired() && // Does the Application or derived actor type require a touch event?
-           actor->IsHittable();         // Is actor sensitive, visible and on the scene?
+    return (actor->GetTouchRequired() || actor->IsTouchFocusable()) && // Does the Application or derived actor type require a touch event? or focusable by touch?
+           actor->IsHittable();                                        // Is actor sensitive, visible and on the scene?
   }
 
   bool DescendActorHierarchy(Actor* actor) override
