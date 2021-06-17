@@ -96,7 +96,7 @@ public:
    * @param[in] dataProviders The data providers for the renderer
    * @param[in] geometry The geometry for the renderer
    * @param[in] blendingBitmask A bitmask of blending options.
-   * @param[in] blendColor The blend color to pass to GL
+   * @param[in] blendColor The blend color
    * @param[in] faceCullingMode The face-culling mode.
    * @param[in] preMultipliedAlphaEnabled whether alpha is pre-multiplied.
    * @param[in] depthWriteMode Depth buffer write mode
@@ -120,7 +120,7 @@ public:
    * @param[in] dataProviders The data providers for the renderer
    * @param[in] geometry The geometry for the renderer
    * @param[in] blendingBitmask A bitmask of blending options.
-   * @param[in] blendColor The blend color to pass to GL
+   * @param[in] blendColor The blend color
    * @param[in] faceCullingMode The face-culling mode.
    * @param[in] preMultipliedAlphaEnabled whether alpha is pre-multiplied.
    * @param[in] depthWriteMode Depth buffer write mode
@@ -188,7 +188,7 @@ public:
 
   /**
    * Set the blend color for blending options
-   * @param[in] blendColor The blend color to pass to GL
+   * @param[in] blendColor The blend color
    */
   void SetBlendColor(const Vector4& color);
 
@@ -400,17 +400,17 @@ public:
 
   template<class T>
   bool WriteDefaultUniform(const Graphics::UniformInfo*                       uniformInfo,
-                           Render::UniformBufferView&                             ubo,
+                           Render::UniformBufferView&                         ubo,
                            const std::vector<Graphics::UniformBufferBinding>& bindings,
                            const T&                                           data);
 
   template<class T>
-  void WriteUniform(Render::UniformBufferView&                             ubo,
+  void WriteUniform(Render::UniformBufferView&                         ubo,
                     const std::vector<Graphics::UniformBufferBinding>& bindings,
                     const Graphics::UniformInfo&                       uniformInfo,
                     const T&                                           data);
 
-  void WriteUniform(Render::UniformBufferView&                             ubo,
+  void WriteUniform(Render::UniformBufferView&                         ubo,
                     const std::vector<Graphics::UniformBufferBinding>& bindings,
                     const Graphics::UniformInfo&                       uniformInfo,
                     const void*                                        data,
@@ -490,7 +490,7 @@ private:
    */
   void FillUniformBuffer(Program&                                      program,
                          const SceneGraph::RenderInstruction&          instruction,
-                         Render::UniformBufferView&                        ubo,
+                         Render::UniformBufferView&                    ubo,
                          std::vector<Graphics::UniformBufferBinding>*& outBindings,
                          uint32_t&                                     offset,
                          BufferIndex                                   updateBufferIndex);

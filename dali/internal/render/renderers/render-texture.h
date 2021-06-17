@@ -30,7 +30,6 @@
 #include <dali/graphics-api/graphics-texture-create-info.h>
 #include <dali/graphics-api/graphics-texture.h>
 #include <dali/graphics-api/graphics-types.h>
-#include <dali/integration-api/gl-defines.h>
 #include <dali/internal/event/rendering/texture-impl.h>
 #include <dali/internal/render/renderers/render-sampler.h>
 
