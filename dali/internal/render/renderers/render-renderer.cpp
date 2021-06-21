@@ -700,17 +700,17 @@ void Renderer::WriteUniformBuffer(
     mUniformBufferBindings[0].buffer = uboView->GetBuffer(&mUniformBufferBindings[0].offset);
 
     // Write default uniforms
-    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::MODEL_MATRIX), *uboView, *bindings, modelMatrix);
-    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::VIEW_MATRIX), *uboView, *bindings, viewMatrix);
-    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::PROJECTION_MATRIX), *uboView, *bindings, projectionMatrix);
-    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::MODEL_VIEW_MATRIX), *uboView, *bindings, modelViewMatrix);
+    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::MODEL_MATRIX), *uboView, modelMatrix);
+    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::VIEW_MATRIX), *uboView, viewMatrix);
+    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::PROJECTION_MATRIX), *uboView, projectionMatrix);
+    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::MODEL_VIEW_MATRIX), *uboView, modelViewMatrix);
 
     auto mvpUniformInfo = program->GetDefaultUniform(Program::DefaultUniformIndex::MVP_MATRIX);
     if(mvpUniformInfo && !mvpUniformInfo->name.empty())
     {
       Matrix modelViewProjectionMatrix(false);
       Matrix::Multiply(modelViewProjectionMatrix, modelViewMatrix, projectionMatrix);
-      WriteDefaultUniform(mvpUniformInfo, *uboView, *bindings, modelViewProjectionMatrix);
+      WriteDefaultUniform(mvpUniformInfo, *uboView, modelViewProjectionMatrix);
     }
 
     auto normalUniformInfo = program->GetDefaultUniform(Program::DefaultUniformIndex::NORMAL_MATRIX);
@@ -719,7 +719,7 @@ void Renderer::WriteUniformBuffer(
       Matrix3 normalMatrix(modelViewMatrix);
       normalMatrix.Invert();
       normalMatrix.Transpose();
-      WriteDefaultUniform(normalUniformInfo, *uboView, *bindings, normalMatrix);
+      WriteDefaultUniform(normalUniformInfo, *uboView, normalMatrix);
     }
 
     Vector4        finalColor;
@@ -733,36 +733,36 @@ void Renderer::WriteUniformBuffer(
     {
       finalColor = Vector4(color.r, color.g, color.b, color.a * mRenderDataProvider->GetOpacity(bufferIndex));
     }
-    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::COLOR), *uboView, *bindings, finalColor);
+    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::COLOR), *uboView, finalColor);
 
     // Write uniforms from the uniform map
     FillUniformBuffer(*program, instruction, *uboView, bindings, uboOffset, bufferIndex);
 
     // Write uSize in the end, as it shouldn't be overridable by dynamic properties.
-    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::SIZE), *uboView, *bindings, size);
+    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::SIZE), *uboView, size);
 
     commandBuffer.BindUniformBuffers(*bindings);
   }
 }
 
 template<class T>
-bool Renderer::WriteDefaultUniform(const Graphics::UniformInfo* uniformInfo, Render::UniformBufferView& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const T& data)
+bool Renderer::WriteDefaultUniform(const Graphics::UniformInfo* uniformInfo, Render::UniformBufferView& ubo, const T& data)
 {
   if(uniformInfo && !uniformInfo->name.empty())
   {
-    WriteUniform(ubo, bindings, *uniformInfo, data);
+    WriteUniform(ubo, *uniformInfo, data);
     return true;
   }
   return false;
 }
 
 template<class T>
-void Renderer::WriteUniform(Render::UniformBufferView& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const Graphics::UniformInfo& uniformInfo, const T& data)
+void Renderer::WriteUniform(Render::UniformBufferView& ubo, const Graphics::UniformInfo& uniformInfo, const T& data)
 {
-  WriteUniform(ubo, bindings, uniformInfo, &data, sizeof(T));
+  WriteUniform(ubo, uniformInfo, &data, sizeof(T));
 }
 
-void Renderer::WriteUniform(Render::UniformBufferView& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const Graphics::UniformInfo& uniformInfo, const void* data, uint32_t size)
+void Renderer::WriteUniform(Render::UniformBufferView& ubo, const Graphics::UniformInfo& uniformInfo, const void* data, uint32_t size)
 {
   ubo.Write(data, size, ubo.GetOffset() + uniformInfo.offset);
 }

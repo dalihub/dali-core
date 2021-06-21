@@ -401,17 +401,14 @@ public:
   template<class T>
   bool WriteDefaultUniform(const Graphics::UniformInfo*                       uniformInfo,
                            Render::UniformBufferView&                         ubo,
-                           const std::vector<Graphics::UniformBufferBinding>& bindings,
                            const T&                                           data);
 
   template<class T>
-  void WriteUniform(Render::UniformBufferView&                         ubo,
-                    const std::vector<Graphics::UniformBufferBinding>& bindings,
+  void WriteUniform(Render::UniformBufferView&                             ubo,
                     const Graphics::UniformInfo&                       uniformInfo,
                     const T&                                           data);
 
-  void WriteUniform(Render::UniformBufferView&                         ubo,
-                    const std::vector<Graphics::UniformBufferBinding>& bindings,
+  void WriteUniform(Render::UniformBufferView&                             ubo,
                     const Graphics::UniformInfo&                       uniformInfo,
                     const void*                                        data,
                     uint32_t                                           size);
