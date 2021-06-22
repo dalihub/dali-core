@@ -644,6 +644,10 @@ void Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::N
 
     mUniformIndexMap.Resize(mapIndex);
   }
+
+  // @todo Temporary workaround to reduce workload each frame. Find a better way.
+  auto& sceneGraphRenderer = const_cast<SceneGraph::Renderer&>(static_cast<const SceneGraph::Renderer&>(uniformMapDataProvider));
+  sceneGraphRenderer.AgeUniformMap();
 }
 
 void Renderer::WriteUniformBuffer(
