@@ -159,7 +159,7 @@ bool Geometry::Draw(
     if(elementBufferOffset != 0u)
     {
       elementBufferOffset = (elementBufferOffset >= numIndices) ? numIndices - 1 : elementBufferOffset;
-      firstIndexOffset    = elementBufferOffset * sizeof(GLushort);
+      firstIndexOffset    = elementBufferOffset * sizeof(uint16_t);
       numIndices -= elementBufferOffset;
     }
 
@@ -184,11 +184,11 @@ bool Geometry::Draw(
   else
   {
     // Un-indexed draw call
-    GLsizei numVertices(0u);
+    uint32_t numVertices(0u);
     if(vertexBufferCount > 0)
     {
       // truncated, no value loss happening in practice
-      numVertices = static_cast<GLsizei>(mVertexBuffers[0]->GetElementCount());
+      numVertices = static_cast<uint32_t>(mVertexBuffers[0]->GetElementCount());
     }
 
     commandBuffer.Draw(numVertices, 1, 0, 0);

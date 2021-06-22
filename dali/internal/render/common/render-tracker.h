@@ -52,8 +52,8 @@ public:
   Graphics::SyncObject* CreateSyncObject(Graphics::Controller& graphicsController);
 
   /**
-   * Check the GL Sync objects. This is called from Render Thread.
-   * If the GlSyncObject has been triggered, then atomically set the sync trigger
+   * Check the Sync objects. This is called from Render Thread.
+   * If the SyncObject has been triggered, then atomically set the sync trigger
    */
   void PollSyncObject();
 
