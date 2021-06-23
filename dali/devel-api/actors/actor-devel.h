@@ -159,7 +159,18 @@ enum Type
    * @note Color of each renderer will be blended with rendering framebuffer.
    * @note To check the blend equation is supported in the system, use Dali::Capabilities::IsBlendEquationSupported
    */
-  BLEND_EQUATION
+  BLEND_EQUATION,
+
+  /**
+   * @brief Sets whether this view can focus by touch. If user sets this to true, the actor will be focused when user touch it.
+   * @code
+   * Actor actor = Actor::New();
+   * actor.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true); // whether the view can have focus or not with keyboard navigation.
+   * actor.SetProperty(DevelActor::Property::TOUCH_FOCUSABLE, true); // Whether the user can focus by touch, user can set focus by touching the actor.
+   * @endcode
+   * @details Name "touchFocusable", type Property::BOOLEAN.
+   */
+  TOUCH_FOCUSABLE
 };
 
 } // namespace Property

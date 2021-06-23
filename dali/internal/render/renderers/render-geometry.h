@@ -20,8 +20,6 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/graphics-api/graphics-controller.h>
-#include <dali/integration-api/gl-abstraction.h>
-#include <dali/integration-api/gl-defines.h>
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/public-api/common/dali-vector.h>

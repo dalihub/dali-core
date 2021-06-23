@@ -29,11 +29,11 @@
 #include <dali/internal/render/renderers/render-texture.h>
 #include <dali/internal/render/renderers/render-vertex-buffer.h>
 #include <dali/internal/render/renderers/shader-cache.h>
+#include <dali/internal/render/renderers/uniform-buffer-view-pool.h>
+#include <dali/internal/render/renderers/uniform-buffer-view.h>
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/shaders/render-shader.h>
 #include <dali/internal/update/common/uniform-map.h>
-#include <dali/internal/render/renderers/uniform-buffer-view.h>
-#include <dali/internal/render/renderers/uniform-buffer-view-pool.h>
 
 namespace Dali::Internal
 {
@@ -644,6 +644,10 @@ void Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::N
 
     mUniformIndexMap.Resize(mapIndex);
   }
+
+  // @todo Temporary workaround to reduce workload each frame. Find a better way.
+  auto& sceneGraphRenderer = const_cast<SceneGraph::Renderer&>(static_cast<const SceneGraph::Renderer&>(uniformMapDataProvider));
+  sceneGraphRenderer.AgeUniformMap();
 }
 
 void Renderer::WriteUniformBuffer(
@@ -675,12 +679,12 @@ void Renderer::WriteUniformBuffer(
   }
 
   // Create uniform buffer view from uniform buffer
-  Graphics::UniquePtr<Render::UniformBufferView> uboView {nullptr};
+  Graphics::UniquePtr<Render::UniformBufferView> uboView{nullptr};
   if(uniformBlockAllocationBytes)
   {
-    auto uboPoolView = mUniformBufferManager->GetUniformBufferViewPool( bufferIndex );
+    auto uboPoolView = mUniformBufferManager->GetUniformBufferViewPool(bufferIndex);
 
-    uboView = uboPoolView->CreateUniformBufferView( uniformBlockAllocationBytes );
+    uboView = uboPoolView->CreateUniformBufferView(uniformBlockAllocationBytes);
   }
 
   // update the uniform buffer
@@ -693,7 +697,7 @@ void Renderer::WriteUniformBuffer(
 
     std::vector<Graphics::UniformBufferBinding>* bindings{&mUniformBufferBindings};
 
-    mUniformBufferBindings[0].buffer = uboView->GetBuffer( &mUniformBufferBindings[0].offset );
+    mUniformBufferBindings[0].buffer = uboView->GetBuffer(&mUniformBufferBindings[0].offset);
 
     // Write default uniforms
     WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::MODEL_MATRIX), *uboView, *bindings, modelMatrix);
@@ -781,7 +785,7 @@ void Renderer::FillUniformBuffer(Program&                                      p
     mUniformBufferBindings[i].binding  = reflection.GetUniformBlockBinding(i);
 
     dataOffset += GetUniformBufferDataAlignment(mUniformBufferBindings[i].dataSize);
-    mUniformBufferBindings[i].buffer = ubo.GetBuffer( &mUniformBufferBindings[i].offset );
+    mUniformBufferBindings[i].buffer = ubo.GetBuffer(&mUniformBufferBindings[i].offset);
 
     for(UniformIndexMappings::Iterator iter = mUniformIndexMap.Begin(),
                                        end  = mUniformIndexMap.End();
@@ -853,7 +857,9 @@ void Renderer::FillUniformBuffer(Program&                                      p
           }
           case Property::Type::MATRIX3:
           {
-            // todo: handle data padding properly
+            // @todo: handle data padding properly
+            // Get padding requirement from Graphics
+            //
             // Vulkan:
             //
             //const auto& matrix = &(*iter).propertyValue->GetMatrix3(updateBufferIndex);
@@ -1135,4 +1141,4 @@ Graphics::Pipeline& Renderer::PrepareGraphicsPipeline(
 
 } // namespace Render
 
-} // namespace Dali
+} // namespace Dali::Internal

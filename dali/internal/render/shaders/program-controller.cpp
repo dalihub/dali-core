@@ -19,7 +19,6 @@
 #include <dali/internal/render/shaders/program-controller.h>
 
 // INTERNAL INCLUDES
-#include <dali/integration-api/gl-defines.h>
 #include <dali/internal/common/shader-saver.h>
 #include <dali/internal/render/shaders/program.h>
 

@@ -28,7 +28,6 @@
 #include <dali/graphics-api/graphics-program.h>
 #include <dali/graphics-api/graphics-reflection.h>
 #include <dali/integration-api/debug.h>
-#include <dali/integration-api/gl-defines.h>
 #include <dali/internal/common/shader-data.h>
 #include <dali/internal/render/common/performance-monitor.h>
 #include <dali/internal/render/shaders/program-cache.h>

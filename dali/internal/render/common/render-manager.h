@@ -30,8 +30,6 @@ namespace Dali
 {
 namespace Integration
 {
-class GlAbstraction;
-class GlContextHelperAbstraction;
 class RenderStatus;
 class Scene;
 } // namespace Integration

@@ -24,7 +24,6 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/threading/thread-pool.h>
 #include <dali/integration-api/core.h>
-#include <dali/integration-api/gl-context-helper-abstraction.h>
 
 #include <dali/internal/event/common/scene-impl.h>
 
@@ -58,6 +57,43 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_REN
 } // unnamed namespace
 #endif
 
+namespace
+{
+inline Graphics::Rect2D RecalculateScissorArea(Graphics::Rect2D scissorArea, int orientation, Rect<int32_t> viewportRect)
+{
+  Graphics::Rect2D newScissorArea;
+
+  if(orientation == 90)
+  {
+    newScissorArea.x      = viewportRect.height - (scissorArea.y + scissorArea.height);
+    newScissorArea.y      = scissorArea.x;
+    newScissorArea.width  = scissorArea.height;
+    newScissorArea.height = scissorArea.width;
+  }
+  else if(orientation == 180)
+  {
+    newScissorArea.x      = viewportRect.width - (scissorArea.x + scissorArea.width);
+    newScissorArea.y      = viewportRect.height - (scissorArea.y + scissorArea.height);
+    newScissorArea.width  = scissorArea.width;
+    newScissorArea.height = scissorArea.height;
+  }
+  else if(orientation == 270)
+  {
+    newScissorArea.x      = scissorArea.y;
+    newScissorArea.y      = viewportRect.width - (scissorArea.x + scissorArea.width);
+    newScissorArea.width  = scissorArea.height;
+    newScissorArea.height = scissorArea.width;
+  }
+  else
+  {
+    newScissorArea.x      = scissorArea.x;
+    newScissorArea.y      = scissorArea.y;
+    newScissorArea.width  = scissorArea.width;
+    newScissorArea.height = scissorArea.height;
+  }
+  return newScissorArea;
+}
+} // namespace
 /**
  * Structure to contain internal data
  */
@@ -136,7 +172,7 @@ struct RenderManager::Impl
 
   OwnerContainer<Render::RenderTracker*> mRenderTrackers; ///< List of render trackers
 
-  ProgramController   programController; ///< Owner of the GL programs
+  ProgramController   programController; ///< Owner of the programs
   Render::ShaderCache shaderCache;       ///< The cache for the graphics shaders
 
   std::unique_ptr<Render::UniformBufferManager> uniformBufferManager; ///< The uniform buffer manager
@@ -819,7 +855,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       // Offscreen buffer rendering
       if(instruction.mIsViewportSet)
       {
-        // For glViewport the lower-left corner is (0,0)
+        // For Viewport the lower-left corner is (0,0)
         const int32_t y = (instruction.mFrameBuffer->GetHeight() - instruction.mViewport.height) - instruction.mViewport.y;
         viewportRect.Set(instruction.mViewport.x, y, instruction.mViewport.width, instruction.mViewport.height);
       }
@@ -834,7 +870,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       // Check whether a viewport is specified, otherwise the full surface size is used
       if(instruction.mIsViewportSet)
       {
-        // For glViewport the lower-left corner is (0,0)
+        // For Viewport the lower-left corner is (0,0)
         const int32_t y = (surfaceRect.height - instruction.mViewport.height) - instruction.mViewport.y;
         viewportRect.Set(instruction.mViewport.x, y, instruction.mViewport.width, instruction.mViewport.height);
       }
@@ -878,6 +914,11 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       }
     }
 
+    // Scissor's value should be set based on the default system coordinates.
+    // When the surface is rotated, the input values already were set with the rotated angle.
+    // So, re-calculation is needed.
+    scissorArea = RecalculateScissorArea(scissorArea, surfaceOrientation, viewportRect);
+
     // Begin render pass
     mainCommandBuffer->BeginRenderPass(
       currentRenderPass,
@@ -902,57 +943,6 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       viewportRect,
       clippingRect,
       surfaceOrientation);
-
-    // Synchronise the FBO/Texture access
-
-    // Check whether any bound texture is in the dependency list
-    bool textureFound = false;
-
-    if(mImpl->boundTextures.Count() > 0u && mImpl->textureDependencyList.Count() > 0u)
-    {
-      for(auto texture : mImpl->textureDependencyList)
-      {
-        textureFound = std::find_if(mImpl->boundTextures.Begin(), mImpl->boundTextures.End(), [texture](Graphics::Texture* graphicsTexture) {
-                         return texture == graphicsTexture;
-                       }) != mImpl->boundTextures.End();
-      }
-    }
-
-    if(textureFound)
-    {
-      if(instruction.mFrameBuffer)
-      {
-        // For off-screen buffer
-
-        // Clear the dependency list
-        mImpl->textureDependencyList.Clear();
-      }
-      else
-      {
-        // Worker thread lambda function
-        auto& glContextHelperAbstraction = mImpl->graphicsController.GetGlContextHelperAbstraction();
-        auto  workerFunction             = [&glContextHelperAbstraction](int workerThread) {
-          // Switch to the shared context in the worker thread
-          glContextHelperAbstraction.MakeSurfacelessContextCurrent();
-
-          // Wait until all rendering calls for the shared context are executed
-          glContextHelperAbstraction.WaitClient();
-
-          // Must clear the context in the worker thread
-          // Otherwise the shared context cannot be switched to from the render thread
-          glContextHelperAbstraction.MakeContextNull();
-        };
-
-        auto future = mImpl->threadPool->SubmitTask(0u, workerFunction);
-        if(future)
-        {
-          mImpl->threadPool->Wait();
-
-          // Clear the dependency list
-          mImpl->textureDependencyList.Clear();
-        }
-      }
-    }
 
     Graphics::SyncObject* syncObject{nullptr};
     // If the render instruction has an associated render tracker (owned separately)

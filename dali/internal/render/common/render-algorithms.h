@@ -60,7 +60,7 @@ public:
    * @param[in] boundTextures          The textures bound for rendering
    * @param[in] viewport               The viewport for drawing
    * @param[in] rootClippingRect       The clipping rectangle
-   * @param[in] orientation            The surface orientation
+   * @param[in] orientation            The Scene's surface orientation.
    */
   void ProcessRenderInstruction(const SceneGraph::RenderInstruction& instruction,
                                 BufferIndex                          bufferIndex,
@@ -115,11 +115,13 @@ private:
    * @param[in] commandBuffer The command buffer to write into
 
    * @param[in] instruction   The render-instruction to process.
+   * @param[in] orientation   The Scene's surface orientation.
    */
   inline void SetupScissorClipping(
     const Dali::Internal::SceneGraph::RenderItem&        item,
     Graphics::CommandBuffer&                             commandBuffer,
-    const Dali::Internal::SceneGraph::RenderInstruction& instruction);
+    const Dali::Internal::SceneGraph::RenderInstruction& instruction,
+    int orientation);
 
   /**
    * @brief Set up the clipping based on the specified clipping settings.
@@ -130,6 +132,7 @@ private:
    * @param[in/out] lastClippingId           The clipping ID of the last renderer drawn.   Used by the clipping feature.
    * @param[in]     stencilBufferAvailable   Whether the stencil buffer is available
    * @param[in]     instruction              The render-instruction to process.
+   * @param[in]     orientation              The Scene's surface orientation.
    */
   inline void SetupClipping(const Dali::Internal::SceneGraph::RenderItem&        item,
                             Graphics::CommandBuffer&                             commandBuffer,
@@ -137,7 +140,8 @@ private:
                             uint32_t&                                            lastClippingDepth,
                             uint32_t&                                            lastClippingId,
                             Integration::StencilBufferAvailable                  stencilBufferAvailable,
-                            const Dali::Internal::SceneGraph::RenderInstruction& instruction);
+                            const Dali::Internal::SceneGraph::RenderInstruction& instruction,
+                            int                                                  orientation);
 
   /**
    * @brief Process a render-list.

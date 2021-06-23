@@ -49,7 +49,8 @@ TapGestureRecognizer::TapGestureRecognizer(Observer& observer, Vector2 screenSiz
   mTapsRegistered(0),
   mTouchPosition(),
   mTouchTime(0u),
-  mLastTapTime(0u)
+  mLastTapTime(0u),
+  mGestureSourceType(GestureSourceType::INVALID)
 {
 }
 
@@ -63,6 +64,36 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
   {
     const Integration::Point& point      = event.points[0];
     PointState::Type          pointState = point.GetState();
+
+    MouseButton::Type mouseButton = point.GetMouseButton();
+    switch(mouseButton)
+    {
+      case MouseButton::INVALID:
+      {
+        mGestureSourceType = GestureSourceType::INVALID;
+        break;
+      }
+      case MouseButton::PRIMARY:
+      {
+        mGestureSourceType = GestureSourceType::PRIMARY;
+        break;
+      }
+      case MouseButton::SECONDARY:
+      {
+        mGestureSourceType = GestureSourceType::SECONDARY;
+        break;
+      }
+      case MouseButton::TERTIARY:
+      {
+        mGestureSourceType = GestureSourceType::TERTIARY;
+        break;
+      }
+      default:
+      {
+        mGestureSourceType = GestureSourceType::INVALID;
+        break;
+      }
+    }
 
     switch(mState)
     {
@@ -167,14 +198,16 @@ void TapGestureRecognizer::SetupForTouchDown(const Integration::TouchEvent& even
   mLastTapTime    = 0u;
   mTapsRegistered = 0;
   mState          = TOUCHED;
+
   EmitPossibleState(event);
 }
 
 void TapGestureRecognizer::EmitPossibleState(const Integration::TouchEvent& event)
 {
   TapGestureEvent tapEvent(GestureState::POSSIBLE);
-  tapEvent.point = mTouchPosition;
-  tapEvent.time  = event.time;
+  tapEvent.point             = mTouchPosition;
+  tapEvent.time              = event.time;
+  tapEvent.gestureSourceType = mGestureSourceType;
 
   ProcessEvent(tapEvent);
 }
@@ -216,9 +249,10 @@ void TapGestureRecognizer::EmitSingleTap(uint32_t time, const Integration::Point
 
 void TapGestureRecognizer::EmitTap(uint32_t time, TapGestureEvent& event)
 {
-  event.numberOfTaps = mTapsRegistered;
-  event.point        = mTouchPosition;
-  event.time         = time;
+  event.numberOfTaps      = mTapsRegistered;
+  event.point             = mTouchPosition;
+  event.time              = time;
+  event.gestureSourceType = mGestureSourceType;
 
   ProcessEvent(event);
 }

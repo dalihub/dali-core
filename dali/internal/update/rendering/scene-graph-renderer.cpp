@@ -177,13 +177,14 @@ void Renderer::operator delete(void* ptr)
 
 bool Renderer::PrepareRender(BufferIndex updateBufferIndex)
 {
-  if(mRegenerateUniformMap == UNIFORM_MAP_READY)
+  switch(mRegenerateUniformMap)
   {
-    mUniformMapChanged[updateBufferIndex] = false;
-  }
-  else
-  {
-    if(mRegenerateUniformMap == REGENERATE_UNIFORM_MAP)
+    case UNIFORM_MAP_READY: // Now, only set to zero on start and by render side
+    {
+      mUniformMapChanged[updateBufferIndex] = false;
+      break;
+    }
+    case REGENERATE_UNIFORM_MAP:
     {
       CollectedUniformMap& localMap = mCollectedUniformMap[updateBufferIndex];
       localMap.Clear();
@@ -204,8 +205,10 @@ bool Renderer::PrepareRender(BufferIndex updateBufferIndex)
       {
         AddMappings(localMap, mShader->GetUniformMap());
       }
+      mUniformMapChanged[updateBufferIndex] = true;
+      break;
     }
-    else if(mRegenerateUniformMap == COPY_UNIFORM_MAP)
+    case COPY_UNIFORM_MAP:
     {
       // Copy old map into current map
       CollectedUniformMap& localMap = mCollectedUniformMap[updateBufferIndex];
@@ -218,10 +221,9 @@ bool Renderer::PrepareRender(BufferIndex updateBufferIndex)
       {
         localMap[index] = *iter;
       }
+      mUniformMapChanged[updateBufferIndex] = true;
+      break;
     }
-
-    mUniformMapChanged[updateBufferIndex] = true;
-    mRegenerateUniformMap--;
   }
 
   bool rendererUpdated = mUniformMapChanged[updateBufferIndex] || mResendFlag || mRenderingBehavior == DevelRenderer::Rendering::CONTINUOUSLY;
@@ -372,6 +374,14 @@ bool Renderer::PrepareRender(BufferIndex updateBufferIndex)
   }
 
   return rendererUpdated;
+}
+
+void Renderer::AgeUniformMap()
+{
+  if(mRegenerateUniformMap > 0)
+  {
+    mRegenerateUniformMap--;
+  }
 }
 
 void Renderer::SetTextures(TextureSet* textureSet)
