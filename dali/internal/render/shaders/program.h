@@ -74,10 +74,9 @@ public:
    *                        and optionally precompiled binary. If the binary is empty the program bytecode
    *                        is copied into it after compilation and linking)
    * @param[in]  gfxController Reference to valid graphics Controller object
-   * @param[in]  gfxProgram Reference to valid graphics Program object
    * @return pointer to the program
    */
-  static Program* New(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& gfxController, Graphics::UniquePtr<Graphics::Program>&& gfxProgram);
+ static Program* New(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& gfxController);
 
   /**
    * Set the projection matrix that has currently been sent
@@ -120,6 +119,13 @@ public:
     return *mGfxProgram;
   }
 
+  [[nodiscard]] Graphics::Program* GetGraphicsProgramPtr() const
+  {
+    return mGfxProgram.get();
+  }
+
+  void SetGraphicsProgram( Graphics::UniquePtr<Graphics::Program>&& program );
+
   /**
    * Retrieves uniform data.
    * The lookup tries to minimise string comparisons. Ideally, when the hashedName is known
@@ -145,10 +151,9 @@ private: // Implementation
    * Constructor, private so no direct instantiation
    * @param[in] cache where the programs are stored
    * @param[in] shaderData A smart pointer to a data structure containing the program source and binary
-   * @param[in] gfxProgram Graphics Program object
    * @param[in] gfxController Reference to Graphics Controller object
    */
-  Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& gfxController, Graphics::UniquePtr<Graphics::Program>&& gfxProgram);
+  Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& gfxController);
 
 public:
   Program()               = delete;            ///< default constructor, not defined

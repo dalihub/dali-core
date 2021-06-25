@@ -72,37 +72,30 @@ inline uint32_t GetUniformBufferDataAlignment(uint32_t dataSize)
 
 // IMPLEMENTATION
 
-Program* Program::New(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& gfxController, Graphics::UniquePtr<Graphics::Program>&& gfxProgram)
+Program* Program::New(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& gfxController)
 {
-  uint32_t programId{0u};
-
-  // Get program id and use it as hash for the cache
-  // in order to maintain current functionality as long as needed
-  gfxController.GetProgramParameter(*gfxProgram, 1, &programId);
-
-  size_t shaderHash = programId;
+  size_t shaderHash = shaderData->GetHashValue();
 
   Program* program = cache.GetProgram(shaderHash);
 
   if(nullptr == program)
   {
     // program not found so create it
-    program = new Program(cache, shaderData, gfxController, std::move(gfxProgram));
+    program = new Program(cache, shaderData, gfxController);
     cache.AddProgram(shaderHash, program);
   }
 
   return program;
 }
 
-Program::Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& controller, Graphics::UniquePtr<Graphics::Program>&& gfxProgram)
+Program::Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& controller)
 : mCache(cache),
   mProjectionMatrix(nullptr),
   mViewMatrix(nullptr),
-  mGfxProgram(std::move(gfxProgram)),
+  mGfxProgram(nullptr),
   mGfxController(controller),
   mProgramData(shaderData)
 {
-  BuildReflection(controller.GetProgramReflection(*mGfxProgram.get()));
 }
 
 Program::~Program() = default;
@@ -182,6 +175,13 @@ void Program::BuildReflection(const Graphics::Reflection& graphicsReflection)
     mUniformBlockRequirements.totalSizeRequired += blockSize;
   }
 }
+
+void Program::SetGraphicsProgram( Graphics::UniquePtr<Graphics::Program>&& program )
+{
+  mGfxProgram = std::move(program);
+  BuildReflection(mGfxController.GetProgramReflection(*mGfxProgram.get()));
+}
+
 
 bool Program::GetUniform(const std::string& name, size_t hashedName, Graphics::UniformInfo& out) const
 {

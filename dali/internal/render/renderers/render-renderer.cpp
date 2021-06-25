@@ -432,39 +432,43 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
 
   // Create Program
   ShaderDataPtr            shaderData   = mRenderDataProvider->GetShader().GetShaderData();
-  const std::vector<char>& vertShader   = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::VERTEX_SHADER);
-  const std::vector<char>& fragShader   = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER);
-  Dali::Graphics::Shader&  vertexShader = mShaderCache->GetShader(
-    vertShader,
-    Graphics::PipelineStage::VERTEX_SHADER,
-    shaderData->GetSourceMode());
 
-  Dali::Graphics::Shader& fragmentShader = mShaderCache->GetShader(
-    fragShader,
-    Graphics::PipelineStage::FRAGMENT_SHADER,
-    shaderData->GetSourceMode());
-
-  std::vector<Graphics::ShaderState> shaderStates{
-    Graphics::ShaderState()
-      .SetShader(vertexShader)
-      .SetPipelineStage(Graphics::PipelineStage::VERTEX_SHADER),
-    Graphics::ShaderState()
-      .SetShader(fragmentShader)
-      .SetPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER)};
-
-  auto createInfo = Graphics::ProgramCreateInfo();
-  createInfo.SetShaderState(shaderStates);
-
-  auto     graphicsProgram = mGraphicsController->CreateProgram(createInfo, nullptr);
   Program* program         = Program::New(*mProgramCache,
                                   shaderData,
-                                  *mGraphicsController,
-                                  std::move(graphicsProgram));
-
+                                  *mGraphicsController);
   if(!program)
   {
     DALI_LOG_ERROR("Failed to get program for shader at address %p.\n", reinterpret_cast<void*>(&mRenderDataProvider->GetShader()));
     return false;
+  }
+
+  // If program doesn't have Gfx program object assigned yet, prepare it.
+  if(!program->GetGraphicsProgramPtr())
+  {
+    const std::vector<char> &vertShader   = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::VERTEX_SHADER);
+    const std::vector<char> &fragShader   = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER);
+    Dali::Graphics::Shader  &vertexShader = mShaderCache->GetShader(
+      vertShader,
+      Graphics::PipelineStage::VERTEX_SHADER,
+      shaderData->GetSourceMode());
+
+    Dali::Graphics::Shader &fragmentShader = mShaderCache->GetShader(
+      fragShader,
+      Graphics::PipelineStage::FRAGMENT_SHADER,
+      shaderData->GetSourceMode());
+
+    std::vector<Graphics::ShaderState> shaderStates{
+      Graphics::ShaderState()
+        .SetShader(vertexShader)
+        .SetPipelineStage(Graphics::PipelineStage::VERTEX_SHADER),
+      Graphics::ShaderState()
+        .SetShader(fragmentShader)
+        .SetPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER)};
+
+    auto createInfo = Graphics::ProgramCreateInfo();
+    createInfo.SetShaderState(shaderStates);
+    auto graphicsProgram = mGraphicsController->CreateProgram(createInfo, nullptr);
+    program->SetGraphicsProgram(std::move(graphicsProgram));
   }
 
   // Prepare the graphics pipeline. This may either re-use an existing pipeline or create a new one.
