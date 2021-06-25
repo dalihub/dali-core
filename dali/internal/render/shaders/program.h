@@ -178,6 +178,26 @@ public:
    */
   void BuildReflection(const Graphics::Reflection& graphicsReflection);
 
+  /**
+   * Struct UniformBlockMemoryRequirements
+   * Contains details of a uniform blocks memory requirements
+   */
+  struct UniformBlockMemoryRequirements
+  {
+    uint32_t blockCount;
+    uint32_t totalSizeRequired;
+  };
+
+  /**
+   * Retrieves uniform blocks requirements
+   *
+   * @return Reference to the valid UniformBlockMemoryRequirements struct
+   */
+  [[nodiscard]] const UniformBlockMemoryRequirements& GetUniformBlocksMemoryRequirements() const
+  {
+    return mUniformBlockRequirements;
+  }
+
 private:                           // Data
   ProgramCache& mCache;            ///< The program cache
   const Matrix* mProjectionMatrix; ///< currently set projection matrix
@@ -194,6 +214,7 @@ private:                           // Data
 
   UniformReflectionContainer mReflection{};                ///< Contains reflection build per program
   UniformReflectionContainer mReflectionDefaultUniforms{}; ///< Contains default uniforms
+  UniformBlockMemoryRequirements mUniformBlockRequirements{}; ///< Memory requirements for uniform blocks
 };
 
 } // namespace Internal

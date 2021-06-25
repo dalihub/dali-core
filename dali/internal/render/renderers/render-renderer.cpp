@@ -39,6 +39,74 @@ namespace Dali::Internal
 {
 namespace
 {
+// Helper to get the property value getter by type
+typedef const float&(PropertyInputImpl::*FuncGetter )(BufferIndex) const;
+constexpr FuncGetter GetPropertyValueGetter(Property::Type type)
+{
+  switch(type)
+  {
+    case Property::BOOLEAN:
+    {
+      return FuncGetter(&PropertyInputImpl::GetBoolean);
+    }
+    case Property::INTEGER:
+    {
+      return FuncGetter(&PropertyInputImpl::GetInteger);
+    }
+    case Property::FLOAT:
+    {
+      return FuncGetter(&PropertyInputImpl::GetFloat);
+    }
+    case Property::VECTOR2:
+    {
+      return FuncGetter(&PropertyInputImpl::GetVector2);
+    }
+    case Property::VECTOR3:
+    {
+      return FuncGetter(&PropertyInputImpl::GetVector3);
+    }
+    case Property::VECTOR4:
+    {
+      return FuncGetter(&PropertyInputImpl::GetVector4);
+    }
+    case Property::MATRIX3:
+    {
+      return FuncGetter(&PropertyInputImpl::GetMatrix3);
+    }
+    case Property::MATRIX:
+    {
+      return FuncGetter(&PropertyInputImpl::GetMatrix);
+    }
+    default:
+    {
+      return nullptr;
+    }
+  }
+}
+
+/**
+ * Helper function that returns size of uniform datatypes based
+ * on property type.
+ */
+constexpr int GetPropertyValueSizeForUniform( Property::Type type )
+{
+  switch(type)
+  {
+    case Property::Type::BOOLEAN:{ return sizeof(bool);}
+    case Property::Type::FLOAT:{ return sizeof(float);}
+    case Property::Type::INTEGER:{ return sizeof(int);}
+    case Property::Type::VECTOR2:{ return sizeof(Vector2);}
+    case Property::Type::VECTOR3:{ return sizeof(Vector3);}
+    case Property::Type::VECTOR4:{ return sizeof(Vector4);}
+    case Property::Type::MATRIX3:{ return sizeof(Matrix3);}
+    case Property::Type::MATRIX:{ return sizeof(Matrix);}
+    default:
+    {
+      return 0;
+    }
+  };
+}
+
 // Helper to get the vertex input format
 Dali::Graphics::VertexInputFormat GetPropertyVertexFormat(Property::Type propertyType)
 {
@@ -663,20 +731,11 @@ void Renderer::WriteUniformBuffer(
   const Vector3&                       size)
 {
   // Create the UBO
-  uint32_t uniformBlockAllocationBytes{0u};
-  uint32_t uniformBlockMaxSize{0u};
   uint32_t uboOffset{0u};
 
-  auto& reflection = mGraphicsController->GetProgramReflection(program->GetGraphicsProgram());
-  for(auto i = 0u; i < reflection.GetUniformBlockCount(); ++i)
-  {
-    auto blockSize = GetUniformBufferDataAlignment(reflection.GetUniformBlockSize(i));
-    if(uniformBlockMaxSize < blockSize)
-    {
-      uniformBlockMaxSize = blockSize;
-    }
-    uniformBlockAllocationBytes += blockSize;
-  }
+  auto &reflection = mGraphicsController->GetProgramReflection(program->GetGraphicsProgram());
+
+  uint32_t uniformBlockAllocationBytes = program->GetUniformBlocksMemoryRequirements().totalSizeRequired;
 
   // Create uniform buffer view from uniform buffer
   Graphics::UniquePtr<Render::UniformBufferView> uboView{nullptr};
@@ -804,81 +863,12 @@ void Renderer::FillUniformBuffer(Program&                                      p
       if(uniformFound)
       {
         auto dst = ubo.GetOffset() + uniformInfo.offset;
-        switch((*iter).propertyValue->GetType())
-        {
-          case Property::Type::BOOLEAN:
-          {
-            ubo.Write(&(*iter).propertyValue->GetBoolean(updateBufferIndex),
-                      sizeof(bool),
-                      dst + static_cast<uint32_t>(sizeof(bool)) * arrayIndex);
-            break;
-          }
-          case Property::Type::INTEGER:
-          {
-            ubo.Write(&(*iter).propertyValue->GetInteger(updateBufferIndex),
-                      sizeof(int32_t),
-                      dst + static_cast<int32_t>(sizeof(int32_t)) * arrayIndex);
-            break;
-          }
-          case Property::Type::FLOAT:
-          {
-            ubo.Write(&(*iter).propertyValue->GetFloat(updateBufferIndex),
-                      sizeof(float),
-                      dst + static_cast<uint32_t>(sizeof(float)) * arrayIndex);
-            break;
-          }
-          case Property::Type::VECTOR2:
-          {
-            ubo.Write(&(*iter).propertyValue->GetVector2(updateBufferIndex),
-                      sizeof(Vector2),
-                      dst + static_cast<uint32_t>(sizeof(Vector2)) * arrayIndex);
-            break;
-          }
-          case Property::Type::VECTOR3:
-          {
-            ubo.Write(&(*iter).propertyValue->GetVector3(updateBufferIndex),
-                      sizeof(Vector3),
-                      dst + static_cast<uint32_t>(sizeof(Vector3)) * arrayIndex);
-            break;
-          }
-          case Property::Type::VECTOR4:
-          {
-            ubo.Write(&(*iter).propertyValue->GetVector4(updateBufferIndex),
-                      sizeof(Vector4),
-                      dst + static_cast<uint32_t>(sizeof(Vector4)) * arrayIndex);
-            break;
-          }
-          case Property::Type::MATRIX:
-          {
-            ubo.Write(&(*iter).propertyValue->GetMatrix(updateBufferIndex),
-                      sizeof(Matrix),
-                      dst + static_cast<uint32_t>(sizeof(Matrix)) * arrayIndex);
-            break;
-          }
-          case Property::Type::MATRIX3:
-          {
-            // @todo: handle data padding properly
-            // Get padding requirement from Graphics
-            //
-            // Vulkan:
-            //
-            //const auto& matrix = &(*iter).propertyValue->GetMatrix3(updateBufferIndex);
-            //for(int i = 0; i < 3; ++i)
-            //{
-            //ubo.Write(&matrix->AsFloat()[i * 3],
-            //          sizeof(float) * 3,
-            //          dst + (i * static_cast<uint32_t>(sizeof(Vector4))));
-            //}
-            // GL:
-            ubo.Write(&(*iter).propertyValue->GetMatrix3(updateBufferIndex),
-                      sizeof(Matrix3),
-                      dst + static_cast<uint32_t>(sizeof(Matrix3)) * arrayIndex);
-            break;
-          }
-          default:
-          {
-          }
-        }
+        const auto typeSize = GetPropertyValueSizeForUniform( (*iter).propertyValue->GetType() );
+        const auto dest = dst + static_cast<uint32_t>(typeSize) * arrayIndex;
+        const auto func = GetPropertyValueGetter((*iter).propertyValue->GetType());
+        ubo.Write(&((*iter).propertyValue->*func)(updateBufferIndex),
+                  typeSize,
+                  dest);
       }
     }
   }

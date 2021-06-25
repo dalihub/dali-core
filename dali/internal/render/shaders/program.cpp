@@ -58,6 +58,16 @@ size_t DEFAULT_UNIFORM_HASHTABLE[NUMBER_OF_DEFAULT_UNIFORMS] =
     CalculateHash(std::string("uSize")),
     CalculateHash(std::string("uColor"))};
 
+/**
+ * Helper function to calculate the correct alignment of data for uniform buffers
+ * @param dataSize size of uniform buffer
+ * @return aligned offset of data
+ */
+inline uint32_t GetUniformBufferDataAlignment(uint32_t dataSize)
+{
+  return ((dataSize / 256u) + ((dataSize % 256u) ? 1u : 0u)) * 256u;
+}
+
 } // namespace
 
 // IMPLEMENTATION
@@ -161,6 +171,15 @@ void Program::BuildReflection(const Graphics::Reflection& graphicsReflection)
     {
       item.hasCollision = hashTest[item.hashValue];
     }
+  }
+
+  // Calculate size of memory for uniform blocks
+  mUniformBlockRequirements.totalSizeRequired = 0;
+  mUniformBlockRequirements.blockCount = graphicsReflection.GetUniformBlockCount();
+  for (auto i = 0u; i < mUniformBlockRequirements.blockCount; ++i)
+  {
+    auto blockSize = GetUniformBufferDataAlignment(graphicsReflection.GetUniformBlockSize(i));
+    mUniformBlockRequirements.totalSizeRequired += blockSize;
   }
 }
 
