@@ -34,6 +34,7 @@
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/shaders/render-shader.h>
 #include <dali/internal/update/common/uniform-map.h>
+#include <dali/internal/render/renderers/pipeline-cache.h>
 
 namespace Dali::Internal
 {
@@ -107,159 +108,6 @@ constexpr int GetPropertyValueSizeForUniform( Property::Type type )
   };
 }
 
-// Helper to get the vertex input format
-Dali::Graphics::VertexInputFormat GetPropertyVertexFormat(Property::Type propertyType)
-{
-  Dali::Graphics::VertexInputFormat type{};
-
-  switch(propertyType)
-  {
-    case Property::NONE:
-    case Property::STRING:
-    case Property::ARRAY:
-    case Property::MAP:
-    case Property::EXTENTS:   // i4?
-    case Property::RECTANGLE: // i4/f4?
-    case Property::ROTATION:
-    {
-      type = Dali::Graphics::VertexInputFormat::UNDEFINED;
-      break;
-    }
-    case Property::BOOLEAN:
-    {
-      type = Dali::Graphics::VertexInputFormat::UNDEFINED; // type = GL_BYTE; @todo new type for this?
-      break;
-    }
-    case Property::INTEGER:
-    {
-      type = Dali::Graphics::VertexInputFormat::INTEGER; // (short)
-      break;
-    }
-    case Property::FLOAT:
-    {
-      type = Dali::Graphics::VertexInputFormat::FLOAT;
-      break;
-    }
-    case Property::VECTOR2:
-    {
-      type = Dali::Graphics::VertexInputFormat::FVECTOR2;
-      break;
-    }
-    case Property::VECTOR3:
-    {
-      type = Dali::Graphics::VertexInputFormat::FVECTOR3;
-      break;
-    }
-    case Property::VECTOR4:
-    {
-      type = Dali::Graphics::VertexInputFormat::FVECTOR4;
-      break;
-    }
-    case Property::MATRIX3:
-    case Property::MATRIX:
-    {
-      type = Dali::Graphics::VertexInputFormat::FLOAT;
-      break;
-    }
-  }
-
-  return type;
-}
-
-constexpr Graphics::CullMode ConvertCullFace(Dali::FaceCullingMode::Type mode)
-{
-  switch(mode)
-  {
-    case Dali::FaceCullingMode::NONE:
-    {
-      return Graphics::CullMode::NONE;
-    }
-    case Dali::FaceCullingMode::FRONT:
-    {
-      return Graphics::CullMode::FRONT;
-    }
-    case Dali::FaceCullingMode::BACK:
-    {
-      return Graphics::CullMode::BACK;
-    }
-    case Dali::FaceCullingMode::FRONT_AND_BACK:
-    {
-      return Graphics::CullMode::FRONT_AND_BACK;
-    }
-  }
-  return Graphics::CullMode::NONE;
-}
-
-constexpr Graphics::BlendFactor ConvertBlendFactor(BlendFactor::Type blendFactor)
-{
-  switch(blendFactor)
-  {
-    case BlendFactor::ZERO:
-      return Graphics::BlendFactor::ZERO;
-    case BlendFactor::ONE:
-      return Graphics::BlendFactor::ONE;
-    case BlendFactor::SRC_COLOR:
-      return Graphics::BlendFactor::SRC_COLOR;
-    case BlendFactor::ONE_MINUS_SRC_COLOR:
-      return Graphics::BlendFactor::ONE_MINUS_SRC_COLOR;
-    case BlendFactor::SRC_ALPHA:
-      return Graphics::BlendFactor::SRC_ALPHA;
-    case BlendFactor::ONE_MINUS_SRC_ALPHA:
-      return Graphics::BlendFactor::ONE_MINUS_SRC_ALPHA;
-    case BlendFactor::DST_ALPHA:
-      return Graphics::BlendFactor::DST_ALPHA;
-    case BlendFactor::ONE_MINUS_DST_ALPHA:
-      return Graphics::BlendFactor::ONE_MINUS_DST_ALPHA;
-    case BlendFactor::DST_COLOR:
-      return Graphics::BlendFactor::DST_COLOR;
-    case BlendFactor::ONE_MINUS_DST_COLOR:
-      return Graphics::BlendFactor::ONE_MINUS_DST_COLOR;
-    case BlendFactor::SRC_ALPHA_SATURATE:
-      return Graphics::BlendFactor::SRC_ALPHA_SATURATE;
-    case BlendFactor::CONSTANT_COLOR:
-      return Graphics::BlendFactor::CONSTANT_COLOR;
-    case BlendFactor::ONE_MINUS_CONSTANT_COLOR:
-      return Graphics::BlendFactor::ONE_MINUS_CONSTANT_COLOR;
-    case BlendFactor::CONSTANT_ALPHA:
-      return Graphics::BlendFactor::CONSTANT_ALPHA;
-    case BlendFactor::ONE_MINUS_CONSTANT_ALPHA:
-      return Graphics::BlendFactor::ONE_MINUS_CONSTANT_ALPHA;
-  }
-  return Graphics::BlendFactor{};
-}
-
-constexpr Graphics::BlendOp ConvertBlendEquation(DevelBlendEquation::Type blendEquation)
-{
-  switch(blendEquation)
-  {
-    case DevelBlendEquation::ADD:
-      return Graphics::BlendOp::ADD;
-    case DevelBlendEquation::SUBTRACT:
-      return Graphics::BlendOp::SUBTRACT;
-    case DevelBlendEquation::REVERSE_SUBTRACT:
-      return Graphics::BlendOp::REVERSE_SUBTRACT;
-    case DevelBlendEquation::COLOR:
-    case DevelBlendEquation::COLOR_BURN:
-    case DevelBlendEquation::COLOR_DODGE:
-    case DevelBlendEquation::DARKEN:
-    case DevelBlendEquation::DIFFERENCE:
-    case DevelBlendEquation::EXCLUSION:
-    case DevelBlendEquation::HARD_LIGHT:
-    case DevelBlendEquation::HUE:
-    case DevelBlendEquation::LIGHTEN:
-    case DevelBlendEquation::LUMINOSITY:
-    case DevelBlendEquation::MAX:
-    case DevelBlendEquation::MIN:
-    case DevelBlendEquation::MULTIPLY:
-    case DevelBlendEquation::OVERLAY:
-    case DevelBlendEquation::SATURATION:
-    case DevelBlendEquation::SCREEN:
-    case DevelBlendEquation::SOFT_LIGHT:
-      return Graphics::BlendOp{};
-  }
-  return Graphics::BlendOp{};
-}
-
 /**
  * Helper function to calculate the correct alignment of data for uniform buffers
  * @param dataSize size of uniform buffer
@@ -303,7 +151,6 @@ Renderer::Renderer(SceneGraph::RenderDataProvider* dataProvider,
   mGeometry(geometry),
   mProgramCache(nullptr),
   mUniformIndexMap(),
-  mAttributeLocations(),
   mUniformsHash(),
   mStencilParameters(stencilParameters),
   mBlendingOptions(),
@@ -313,7 +160,6 @@ Renderer::Renderer(SceneGraph::RenderDataProvider* dataProvider,
   mFaceCullingMode(faceCullingMode),
   mDepthWriteMode(depthWriteMode),
   mDepthTestMode(depthTestMode),
-  mUpdateAttributeLocations(true),
   mPremultipliedAlphaEnabled(preMultipliedAlphaEnabled),
   mShaderChanged(false),
   mUpdated(true)
@@ -326,20 +172,21 @@ Renderer::Renderer(SceneGraph::RenderDataProvider* dataProvider,
   mBlendingOptions.SetBlendColor(blendColor);
 }
 
-void Renderer::Initialize(Graphics::Controller& graphicsController, ProgramCache& programCache, Render::ShaderCache& shaderCache, Render::UniformBufferManager& uniformBufferManager)
+void Renderer::Initialize(Graphics::Controller& graphicsController, ProgramCache& programCache, Render::ShaderCache& shaderCache, Render::UniformBufferManager& uniformBufferManager, Render::PipelineCache& pipelineCache)
 {
   mGraphicsController   = &graphicsController;
   mProgramCache         = &programCache;
   mShaderCache          = &shaderCache;
   mUniformBufferManager = &uniformBufferManager;
+  mPipelineCache        = &pipelineCache;
 }
 
 Renderer::~Renderer() = default;
 
 void Renderer::SetGeometry(Render::Geometry* geometry)
 {
-  mGeometry                 = geometry;
-  mUpdateAttributeLocations = true;
+  mGeometry  = geometry;
+  mUpdated   = true;
 }
 void Renderer::SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, uint32_t size)
 {
@@ -898,7 +745,7 @@ bool Renderer::Updated(BufferIndex bufferIndex, const SceneGraph::NodeDataProvid
     return true;
   }
 
-  if(mShaderChanged || mUpdateAttributeLocations || mGeometry->AttributesChanged())
+  if(mShaderChanged || mGeometry->AttributesChanged())
   {
     return true;
   }
@@ -940,193 +787,25 @@ Graphics::Pipeline& Renderer::PrepareGraphicsPipeline(
   const SceneGraph::NodeDataProvider&                  node,
   bool                                                 blend)
 {
-  Graphics::InputAssemblyState inputAssemblyState{};
-  Graphics::VertexInputState   vertexInputState{};
-  Graphics::ProgramState       programState{};
-  uint32_t                     bindingIndex{0u};
-
-  if(mUpdateAttributeLocations || mGeometry->AttributesChanged())
+  if(mGeometry->AttributesChanged())
   {
-    mAttributeLocations.Clear();
-    mUpdateAttributeLocations = true;
+    mUpdated = true;
   }
 
-  auto& reflection = mGraphicsController->GetProgramReflection(program.GetGraphicsProgram());
+  // Prepare query info
+  PipelineCacheQueryInfo queryInfo{};
+  queryInfo.program = &program;
+  queryInfo.renderer = this;
+  queryInfo.geometry = mGeometry;
+  queryInfo.blendingEnabled = blend;
+  queryInfo.blendingOptions = &mBlendingOptions;
+  queryInfo.alphaPremultiplied = mPremultipliedAlphaEnabled;
+  queryInfo.cameraUsingReflection = instruction.GetCamera()->GetReflectionUsed();
 
-  /**
-   * Bind Attributes
-   */
-  uint32_t base = 0;
-  for(auto&& vertexBuffer : mGeometry->GetVertexBuffers())
-  {
-    const VertexBuffer::Format& vertexFormat = *vertexBuffer->GetFormat();
+  auto pipelineResult = mPipelineCache->GetPipeline( queryInfo, true );
 
-    vertexInputState.bufferBindings.emplace_back(vertexFormat.size, // stride
-                                                 Graphics::VertexInputRate::PER_VERTEX);
-
-    const uint32_t attributeCount = vertexBuffer->GetAttributeCount();
-    for(uint32_t i = 0; i < attributeCount; ++i)
-    {
-      if(mUpdateAttributeLocations)
-      {
-        auto    attributeName = vertexBuffer->GetAttributeName(i);
-        int32_t pLocation     = reflection.GetVertexAttributeLocation(std::string(attributeName.GetStringView()));
-        if(-1 == pLocation)
-        {
-          DALI_LOG_WARNING("Attribute not found in the shader: %s\n", attributeName.GetCString());
-        }
-        mAttributeLocations.PushBack(pLocation);
-      }
-
-      auto location = static_cast<uint32_t>(mAttributeLocations[base + i]);
-
-      vertexInputState.attributes.emplace_back(location,
-                                               bindingIndex,
-                                               vertexFormat.components[i].offset,
-                                               GetPropertyVertexFormat(vertexFormat.components[i].type));
-    }
-    base += attributeCount;
-    ++bindingIndex;
-  }
-  mUpdateAttributeLocations = false;
-
-  // Get the topology
-  inputAssemblyState.SetTopology(mGeometry->GetTopology());
-
-  // Get the program
-  programState.SetProgram(program.GetGraphicsProgram());
-
-  Graphics::RasterizationState rasterizationState{};
-
-  //Set cull face  mode
-  const Dali::Internal::SceneGraph::Camera* cam = instruction.GetCamera();
-  if(cam->GetReflectionUsed())
-  {
-    auto adjFaceCullingMode = mFaceCullingMode;
-    switch(mFaceCullingMode)
-    {
-      case FaceCullingMode::Type::FRONT:
-      {
-        adjFaceCullingMode = FaceCullingMode::Type::BACK;
-        break;
-      }
-      case FaceCullingMode::Type::BACK:
-      {
-        adjFaceCullingMode = FaceCullingMode::Type::FRONT;
-        break;
-      }
-      default:
-      {
-        // nothing to do, leave culling as it is
-      }
-    }
-    rasterizationState.SetCullMode(ConvertCullFace(adjFaceCullingMode));
-  }
-  else
-  {
-    rasterizationState.SetCullMode(ConvertCullFace(mFaceCullingMode));
-  }
-
-  rasterizationState.SetFrontFace(Graphics::FrontFace::COUNTER_CLOCKWISE);
-
-  /**
-   * Set Polygon mode
-   */
-  switch(mGeometry->GetTopology())
-  {
-    case Graphics::PrimitiveTopology::TRIANGLE_LIST:
-    case Graphics::PrimitiveTopology::TRIANGLE_STRIP:
-    case Graphics::PrimitiveTopology::TRIANGLE_FAN:
-      rasterizationState.SetPolygonMode(Graphics::PolygonMode::FILL);
-      break;
-    case Graphics::PrimitiveTopology::LINE_LIST:
-    case Graphics::PrimitiveTopology::LINE_LOOP:
-    case Graphics::PrimitiveTopology::LINE_STRIP:
-      rasterizationState.SetPolygonMode(Graphics::PolygonMode::LINE);
-      break;
-    case Graphics::PrimitiveTopology::POINT_LIST:
-      rasterizationState.SetPolygonMode(Graphics::PolygonMode::POINT);
-      break;
-  }
-
-  // @todo Add blend barrier to the Graphics API if we are using advanced
-  // blending options. Command?
-
-  Graphics::ColorBlendState colorBlendState{};
-  colorBlendState.SetBlendEnable(false);
-
-  if(blend)
-  {
-    colorBlendState.SetBlendEnable(true);
-
-    Graphics::BlendOp rgbOp   = ConvertBlendEquation(mBlendingOptions.GetBlendEquationRgb());
-    Graphics::BlendOp alphaOp = ConvertBlendEquation(mBlendingOptions.GetBlendEquationRgb());
-    if(mBlendingOptions.IsAdvancedBlendEquationApplied() && mPremultipliedAlphaEnabled)
-    {
-      if(rgbOp != alphaOp)
-      {
-        DALI_LOG_ERROR("Advanced Blend Equation MUST be applied by using BlendEquation.\n");
-        alphaOp = rgbOp;
-      }
-    }
-
-    colorBlendState
-      .SetSrcColorBlendFactor(ConvertBlendFactor(mBlendingOptions.GetBlendSrcFactorRgb()))
-      .SetSrcAlphaBlendFactor(ConvertBlendFactor(mBlendingOptions.GetBlendSrcFactorAlpha()))
-      .SetDstColorBlendFactor(ConvertBlendFactor(mBlendingOptions.GetBlendDestFactorRgb()))
-      .SetDstAlphaBlendFactor(ConvertBlendFactor(mBlendingOptions.GetBlendDestFactorAlpha()))
-      .SetColorBlendOp(rgbOp)
-      .SetAlphaBlendOp(alphaOp);
-
-    // Blend color is optional and rarely used
-    auto* blendColor = const_cast<Vector4*>(mBlendingOptions.GetBlendColor());
-    if(blendColor)
-    {
-      colorBlendState.SetBlendConstants(blendColor->AsFloat());
-    }
-  }
-
-  mUpdated = true;
-
-  // Create the pipeline
-  Graphics::PipelineCreateInfo createInfo;
-  createInfo
-    .SetInputAssemblyState(&inputAssemblyState)
-    .SetVertexInputState(&vertexInputState)
-    .SetRasterizationState(&rasterizationState)
-    .SetColorBlendState(&colorBlendState)
-    .SetProgramState(&programState);
-
-  // Store a pipeline per renderer per render (renderer can be owned by multiple nodes,
-  // and re-drawn in multiple instructions).
-  // @todo This is only needed because ColorBlend state can change. Fixme!
-  // This is ameliorated by the fact that implementation caches pipelines, and we're only storing
-  // handles.
-  auto            hash           = HashedPipeline::GetHash(&node, &instruction, blend);
-  HashedPipeline* hashedPipeline = nullptr;
-  for(auto& element : mGraphicsPipelines)
-  {
-    if(element.mHash == hash)
-    {
-      hashedPipeline = &element;
-      break;
-    }
-  }
-
-  if(hashedPipeline != nullptr)
-  {
-    hashedPipeline->mGraphicsPipeline = mGraphicsController->CreatePipeline(
-      createInfo,
-      std::move(hashedPipeline->mGraphicsPipeline));
-  }
-  else
-  {
-    mGraphicsPipelines.emplace_back();
-    mGraphicsPipelines.back().mHash             = hash;
-    mGraphicsPipelines.back().mGraphicsPipeline = mGraphicsController->CreatePipeline(createInfo, nullptr);
-    hashedPipeline                              = &mGraphicsPipelines.back();
-  }
-  return *hashedPipeline->mGraphicsPipeline.get();
+  // should be never null?
+  return *pipelineResult.pipeline;
 }
 
 } // namespace Render

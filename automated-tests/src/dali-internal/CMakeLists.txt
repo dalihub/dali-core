@@ -17,6 +17,7 @@ SET(TC_SOURCES
         utc-Dali-Internal-OwnerPointer.cpp
         utc-Dali-Internal-PinchGesture.cpp
         utc-Dali-Internal-PinchGestureProcessor.cpp
+        utc-Dali-Internal-PipelineCache.cpp
         utc-Dali-Internal-RotationGesture.cpp
         utc-Dali-Internal-TapGesture.cpp
         utc-Dali-Internal-TapGestureProcessor.cpp

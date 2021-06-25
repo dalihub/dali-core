@@ -54,7 +54,9 @@ class RenderInstruction; //for reflection effect
 namespace Render
 {
 struct ShaderCache;
+class PipelineCache;
 class UniformBufferManager;
+class PipelineCache;
 
 /**
  * Renderers are used to render meshes
@@ -163,11 +165,13 @@ public:
    * @param[in] programCache Cache of program objects
    * @param[in] shaderCache Cache of shaders
    * @param[in] uniformBufferManager Uniform buffer manager
+   * @param[in] pipelineCache Cache of pipelines
    */
   void Initialize(Graphics::Controller&         graphicsController,
                   ProgramCache&                 programCache,
                   Render::ShaderCache&          shaderCache,
-                  Render::UniformBufferManager& uniformBufferManager);
+                  Render::UniformBufferManager& uniformBufferManager,
+                  Render::PipelineCache&        pipelineCache);
 
   /**
    * Destructor
@@ -413,6 +417,11 @@ public:
                     const void*                                        data,
                     uint32_t                                           size);
 
+  [[nodiscard]] FaceCullingMode::Type GetFaceCullMode() const
+  {
+    return mFaceCullingMode;
+  }
+
 private:
   struct UniformIndexMap;
 
@@ -504,6 +513,8 @@ private:
   Render::UniformBufferManager*               mUniformBufferManager{};
   std::vector<Graphics::UniformBufferBinding> mUniformBufferBindings{};
 
+  Render::PipelineCache* mPipelineCache{nullptr};
+
   using Hash = unsigned long;
   struct UniformIndexMap
   {
@@ -517,7 +528,6 @@ private:
   using UniformIndexMappings = Dali::Vector<UniformIndexMap>;
 
   UniformIndexMappings mUniformIndexMap;
-  Vector<int32_t>      mAttributeLocations;
   uint64_t             mUniformsHash;
 
   struct HashedPipeline
@@ -529,7 +539,6 @@ private:
       return (reinterpret_cast<uint64_t>(node) << 32) | ((reinterpret_cast<uint64_t>(instruction) & 0xFFFFFFF) << 1) | blend;
     }
   };
-  std::vector<HashedPipeline> mGraphicsPipelines{};
 
   StencilParameters mStencilParameters; ///< Struct containing all stencil related options
   BlendingOptions   mBlendingOptions;   ///< Blending options including blend color, blend func and blend equation
@@ -541,7 +550,6 @@ private:
   FaceCullingMode::Type mFaceCullingMode : 3;           ///< The mode of face culling
   DepthWriteMode::Type  mDepthWriteMode : 3;            ///< The depth write mode
   DepthTestMode::Type   mDepthTestMode : 3;             ///< The depth test mode
-  bool                  mUpdateAttributeLocations : 1;  ///< Indicates attribute locations have changed
   bool                  mPremultipliedAlphaEnabled : 1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
   bool                  mShaderChanged : 1;             ///< Flag indicating the shader changed and uniform maps have to be updated
   bool                  mUpdated : 1;

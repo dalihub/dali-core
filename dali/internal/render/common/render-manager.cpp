@@ -41,8 +41,9 @@
 #include <dali/internal/render/renderers/uniform-buffer-manager.h>
 #include <dali/internal/render/renderers/uniform-buffer-view-pool.h>
 #include <dali/internal/render/shaders/program-controller.h>
+#include <dali/internal/render/renderers/pipeline-cache.h>
 
-#include <dali/internal/render/renderers/uniform-buffer-manager.h>
+#include <memory>
 
 namespace Dali
 {
@@ -120,10 +121,11 @@ struct RenderManager::Impl
     partialUpdateAvailable(partialUpdateAvailableParam)
   {
     // Create thread pool with just one thread ( there may be a need to create more threads in the future ).
-    threadPool = std::unique_ptr<Dali::ThreadPool>(new Dali::ThreadPool());
+    threadPool = std::make_unique<Dali::ThreadPool>();
     threadPool->Initialize(1u);
 
-    uniformBufferManager.reset(new Render::UniformBufferManager(&graphicsController));
+    uniformBufferManager = std::make_unique<Render::UniformBufferManager>(&graphicsController);
+    pipelineCache = std::make_unique<Render::PipelineCache>(graphicsController);
   }
 
   ~Impl()
@@ -176,6 +178,7 @@ struct RenderManager::Impl
   Render::ShaderCache shaderCache;       ///< The cache for the graphics shaders
 
   std::unique_ptr<Render::UniformBufferManager> uniformBufferManager; ///< The uniform buffer manager
+  std::unique_ptr<Render::PipelineCache> pipelineCache;
 
   Integration::DepthBufferAvailable   depthBufferAvailable;   ///< Whether the depth buffer is available
   Integration::StencilBufferAvailable stencilBufferAvailable; ///< Whether the stencil buffer is available
@@ -221,7 +224,8 @@ void RenderManager::SetShaderSaver(ShaderSaver& upstream)
 void RenderManager::AddRenderer(OwnerPointer<Render::Renderer>& renderer)
 {
   // Initialize the renderer as we are now in render thread
-  renderer->Initialize(mImpl->graphicsController, mImpl->programController, mImpl->shaderCache, *(mImpl->uniformBufferManager.get()));
+  renderer->Initialize(mImpl->graphicsController, mImpl->programController, mImpl->shaderCache, *(mImpl->uniformBufferManager.get()),
+                       *(mImpl->pipelineCache.get()));
 
   mImpl->rendererContainer.PushBack(renderer.Release());
 }
