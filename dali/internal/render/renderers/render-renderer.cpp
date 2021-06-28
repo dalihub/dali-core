@@ -34,162 +34,78 @@
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/shaders/render-shader.h>
 #include <dali/internal/update/common/uniform-map.h>
+#include <dali/internal/render/renderers/pipeline-cache.h>
 
 namespace Dali::Internal
 {
 namespace
 {
-// Helper to get the vertex input format
-Dali::Graphics::VertexInputFormat GetPropertyVertexFormat(Property::Type propertyType)
+// Helper to get the property value getter by type
+typedef const float&(PropertyInputImpl::*FuncGetter )(BufferIndex) const;
+constexpr FuncGetter GetPropertyValueGetter(Property::Type type)
 {
-  Dali::Graphics::VertexInputFormat type{};
-
-  switch(propertyType)
+  switch(type)
   {
-    case Property::NONE:
-    case Property::STRING:
-    case Property::ARRAY:
-    case Property::MAP:
-    case Property::EXTENTS:   // i4?
-    case Property::RECTANGLE: // i4/f4?
-    case Property::ROTATION:
-    {
-      type = Dali::Graphics::VertexInputFormat::UNDEFINED;
-      break;
-    }
     case Property::BOOLEAN:
     {
-      type = Dali::Graphics::VertexInputFormat::UNDEFINED; // type = GL_BYTE; @todo new type for this?
-      break;
+      return FuncGetter(&PropertyInputImpl::GetBoolean);
     }
     case Property::INTEGER:
     {
-      type = Dali::Graphics::VertexInputFormat::INTEGER; // (short)
-      break;
+      return FuncGetter(&PropertyInputImpl::GetInteger);
     }
     case Property::FLOAT:
     {
-      type = Dali::Graphics::VertexInputFormat::FLOAT;
-      break;
+      return FuncGetter(&PropertyInputImpl::GetFloat);
     }
     case Property::VECTOR2:
     {
-      type = Dali::Graphics::VertexInputFormat::FVECTOR2;
-      break;
+      return FuncGetter(&PropertyInputImpl::GetVector2);
     }
     case Property::VECTOR3:
     {
-      type = Dali::Graphics::VertexInputFormat::FVECTOR3;
-      break;
+      return FuncGetter(&PropertyInputImpl::GetVector3);
     }
     case Property::VECTOR4:
     {
-      type = Dali::Graphics::VertexInputFormat::FVECTOR4;
-      break;
+      return FuncGetter(&PropertyInputImpl::GetVector4);
     }
     case Property::MATRIX3:
+    {
+      return FuncGetter(&PropertyInputImpl::GetMatrix3);
+    }
     case Property::MATRIX:
     {
-      type = Dali::Graphics::VertexInputFormat::FLOAT;
-      break;
+      return FuncGetter(&PropertyInputImpl::GetMatrix);
+    }
+    default:
+    {
+      return nullptr;
     }
   }
-
-  return type;
 }
 
-constexpr Graphics::CullMode ConvertCullFace(Dali::FaceCullingMode::Type mode)
+/**
+ * Helper function that returns size of uniform datatypes based
+ * on property type.
+ */
+constexpr int GetPropertyValueSizeForUniform( Property::Type type )
 {
-  switch(mode)
+  switch(type)
   {
-    case Dali::FaceCullingMode::NONE:
+    case Property::Type::BOOLEAN:{ return sizeof(bool);}
+    case Property::Type::FLOAT:{ return sizeof(float);}
+    case Property::Type::INTEGER:{ return sizeof(int);}
+    case Property::Type::VECTOR2:{ return sizeof(Vector2);}
+    case Property::Type::VECTOR3:{ return sizeof(Vector3);}
+    case Property::Type::VECTOR4:{ return sizeof(Vector4);}
+    case Property::Type::MATRIX3:{ return sizeof(Matrix3);}
+    case Property::Type::MATRIX:{ return sizeof(Matrix);}
+    default:
     {
-      return Graphics::CullMode::NONE;
+      return 0;
     }
-    case Dali::FaceCullingMode::FRONT:
-    {
-      return Graphics::CullMode::FRONT;
-    }
-    case Dali::FaceCullingMode::BACK:
-    {
-      return Graphics::CullMode::BACK;
-    }
-    case Dali::FaceCullingMode::FRONT_AND_BACK:
-    {
-      return Graphics::CullMode::FRONT_AND_BACK;
-    }
-  }
-  return Graphics::CullMode::NONE;
-}
-
-constexpr Graphics::BlendFactor ConvertBlendFactor(BlendFactor::Type blendFactor)
-{
-  switch(blendFactor)
-  {
-    case BlendFactor::ZERO:
-      return Graphics::BlendFactor::ZERO;
-    case BlendFactor::ONE:
-      return Graphics::BlendFactor::ONE;
-    case BlendFactor::SRC_COLOR:
-      return Graphics::BlendFactor::SRC_COLOR;
-    case BlendFactor::ONE_MINUS_SRC_COLOR:
-      return Graphics::BlendFactor::ONE_MINUS_SRC_COLOR;
-    case BlendFactor::SRC_ALPHA:
-      return Graphics::BlendFactor::SRC_ALPHA;
-    case BlendFactor::ONE_MINUS_SRC_ALPHA:
-      return Graphics::BlendFactor::ONE_MINUS_SRC_ALPHA;
-    case BlendFactor::DST_ALPHA:
-      return Graphics::BlendFactor::DST_ALPHA;
-    case BlendFactor::ONE_MINUS_DST_ALPHA:
-      return Graphics::BlendFactor::ONE_MINUS_DST_ALPHA;
-    case BlendFactor::DST_COLOR:
-      return Graphics::BlendFactor::DST_COLOR;
-    case BlendFactor::ONE_MINUS_DST_COLOR:
-      return Graphics::BlendFactor::ONE_MINUS_DST_COLOR;
-    case BlendFactor::SRC_ALPHA_SATURATE:
-      return Graphics::BlendFactor::SRC_ALPHA_SATURATE;
-    case BlendFactor::CONSTANT_COLOR:
-      return Graphics::BlendFactor::CONSTANT_COLOR;
-    case BlendFactor::ONE_MINUS_CONSTANT_COLOR:
-      return Graphics::BlendFactor::ONE_MINUS_CONSTANT_COLOR;
-    case BlendFactor::CONSTANT_ALPHA:
-      return Graphics::BlendFactor::CONSTANT_ALPHA;
-    case BlendFactor::ONE_MINUS_CONSTANT_ALPHA:
-      return Graphics::BlendFactor::ONE_MINUS_CONSTANT_ALPHA;
-  }
-  return Graphics::BlendFactor{};
-}
-
-constexpr Graphics::BlendOp ConvertBlendEquation(DevelBlendEquation::Type blendEquation)
-{
-  switch(blendEquation)
-  {
-    case DevelBlendEquation::ADD:
-      return Graphics::BlendOp::ADD;
-    case DevelBlendEquation::SUBTRACT:
-      return Graphics::BlendOp::SUBTRACT;
-    case DevelBlendEquation::REVERSE_SUBTRACT:
-      return Graphics::BlendOp::REVERSE_SUBTRACT;
-    case DevelBlendEquation::COLOR:
-    case DevelBlendEquation::COLOR_BURN:
-    case DevelBlendEquation::COLOR_DODGE:
-    case DevelBlendEquation::DARKEN:
-    case DevelBlendEquation::DIFFERENCE:
-    case DevelBlendEquation::EXCLUSION:
-    case DevelBlendEquation::HARD_LIGHT:
-    case DevelBlendEquation::HUE:
-    case DevelBlendEquation::LIGHTEN:
-    case DevelBlendEquation::LUMINOSITY:
-    case DevelBlendEquation::MAX:
-    case DevelBlendEquation::MIN:
-    case DevelBlendEquation::MULTIPLY:
-    case DevelBlendEquation::OVERLAY:
-    case DevelBlendEquation::SATURATION:
-    case DevelBlendEquation::SCREEN:
-    case DevelBlendEquation::SOFT_LIGHT:
-      return Graphics::BlendOp{};
-  }
-  return Graphics::BlendOp{};
+  };
 }
 
 /**
@@ -235,7 +151,6 @@ Renderer::Renderer(SceneGraph::RenderDataProvider* dataProvider,
   mGeometry(geometry),
   mProgramCache(nullptr),
   mUniformIndexMap(),
-  mAttributeLocations(),
   mUniformsHash(),
   mStencilParameters(stencilParameters),
   mBlendingOptions(),
@@ -245,7 +160,6 @@ Renderer::Renderer(SceneGraph::RenderDataProvider* dataProvider,
   mFaceCullingMode(faceCullingMode),
   mDepthWriteMode(depthWriteMode),
   mDepthTestMode(depthTestMode),
-  mUpdateAttributeLocations(true),
   mPremultipliedAlphaEnabled(preMultipliedAlphaEnabled),
   mShaderChanged(false),
   mUpdated(true)
@@ -258,20 +172,21 @@ Renderer::Renderer(SceneGraph::RenderDataProvider* dataProvider,
   mBlendingOptions.SetBlendColor(blendColor);
 }
 
-void Renderer::Initialize(Graphics::Controller& graphicsController, ProgramCache& programCache, Render::ShaderCache& shaderCache, Render::UniformBufferManager& uniformBufferManager)
+void Renderer::Initialize(Graphics::Controller& graphicsController, ProgramCache& programCache, Render::ShaderCache& shaderCache, Render::UniformBufferManager& uniformBufferManager, Render::PipelineCache& pipelineCache)
 {
   mGraphicsController   = &graphicsController;
   mProgramCache         = &programCache;
   mShaderCache          = &shaderCache;
   mUniformBufferManager = &uniformBufferManager;
+  mPipelineCache        = &pipelineCache;
 }
 
 Renderer::~Renderer() = default;
 
 void Renderer::SetGeometry(Render::Geometry* geometry)
 {
-  mGeometry                 = geometry;
-  mUpdateAttributeLocations = true;
+  mGeometry  = geometry;
+  mUpdated   = true;
 }
 void Renderer::SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, uint32_t size)
 {
@@ -517,39 +432,43 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
 
   // Create Program
   ShaderDataPtr            shaderData   = mRenderDataProvider->GetShader().GetShaderData();
-  const std::vector<char>& vertShader   = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::VERTEX_SHADER);
-  const std::vector<char>& fragShader   = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER);
-  Dali::Graphics::Shader&  vertexShader = mShaderCache->GetShader(
-    vertShader,
-    Graphics::PipelineStage::VERTEX_SHADER,
-    shaderData->GetSourceMode());
 
-  Dali::Graphics::Shader& fragmentShader = mShaderCache->GetShader(
-    fragShader,
-    Graphics::PipelineStage::FRAGMENT_SHADER,
-    shaderData->GetSourceMode());
-
-  std::vector<Graphics::ShaderState> shaderStates{
-    Graphics::ShaderState()
-      .SetShader(vertexShader)
-      .SetPipelineStage(Graphics::PipelineStage::VERTEX_SHADER),
-    Graphics::ShaderState()
-      .SetShader(fragmentShader)
-      .SetPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER)};
-
-  auto createInfo = Graphics::ProgramCreateInfo();
-  createInfo.SetShaderState(shaderStates);
-
-  auto     graphicsProgram = mGraphicsController->CreateProgram(createInfo, nullptr);
   Program* program         = Program::New(*mProgramCache,
                                   shaderData,
-                                  *mGraphicsController,
-                                  std::move(graphicsProgram));
-
+                                  *mGraphicsController);
   if(!program)
   {
     DALI_LOG_ERROR("Failed to get program for shader at address %p.\n", reinterpret_cast<void*>(&mRenderDataProvider->GetShader()));
     return false;
+  }
+
+  // If program doesn't have Gfx program object assigned yet, prepare it.
+  if(!program->GetGraphicsProgramPtr())
+  {
+    const std::vector<char> &vertShader   = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::VERTEX_SHADER);
+    const std::vector<char> &fragShader   = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER);
+    Dali::Graphics::Shader  &vertexShader = mShaderCache->GetShader(
+      vertShader,
+      Graphics::PipelineStage::VERTEX_SHADER,
+      shaderData->GetSourceMode());
+
+    Dali::Graphics::Shader &fragmentShader = mShaderCache->GetShader(
+      fragShader,
+      Graphics::PipelineStage::FRAGMENT_SHADER,
+      shaderData->GetSourceMode());
+
+    std::vector<Graphics::ShaderState> shaderStates{
+      Graphics::ShaderState()
+        .SetShader(vertexShader)
+        .SetPipelineStage(Graphics::PipelineStage::VERTEX_SHADER),
+      Graphics::ShaderState()
+        .SetShader(fragmentShader)
+        .SetPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER)};
+
+    auto createInfo = Graphics::ProgramCreateInfo();
+    createInfo.SetShaderState(shaderStates);
+    auto graphicsProgram = mGraphicsController->CreateProgram(createInfo, nullptr);
+    program->SetGraphicsProgram(std::move(graphicsProgram));
   }
 
   // Prepare the graphics pipeline. This may either re-use an existing pipeline or create a new one.
@@ -663,20 +582,11 @@ void Renderer::WriteUniformBuffer(
   const Vector3&                       size)
 {
   // Create the UBO
-  uint32_t uniformBlockAllocationBytes{0u};
-  uint32_t uniformBlockMaxSize{0u};
   uint32_t uboOffset{0u};
 
-  auto& reflection = mGraphicsController->GetProgramReflection(program->GetGraphicsProgram());
-  for(auto i = 0u; i < reflection.GetUniformBlockCount(); ++i)
-  {
-    auto blockSize = GetUniformBufferDataAlignment(reflection.GetUniformBlockSize(i));
-    if(uniformBlockMaxSize < blockSize)
-    {
-      uniformBlockMaxSize = blockSize;
-    }
-    uniformBlockAllocationBytes += blockSize;
-  }
+  auto &reflection = mGraphicsController->GetProgramReflection(program->GetGraphicsProgram());
+
+  uint32_t uniformBlockAllocationBytes = program->GetUniformBlocksMemoryRequirements().totalSizeRequired;
 
   // Create uniform buffer view from uniform buffer
   Graphics::UniquePtr<Render::UniformBufferView> uboView{nullptr};
@@ -700,17 +610,17 @@ void Renderer::WriteUniformBuffer(
     mUniformBufferBindings[0].buffer = uboView->GetBuffer(&mUniformBufferBindings[0].offset);
 
     // Write default uniforms
-    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::MODEL_MATRIX), *uboView, *bindings, modelMatrix);
-    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::VIEW_MATRIX), *uboView, *bindings, viewMatrix);
-    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::PROJECTION_MATRIX), *uboView, *bindings, projectionMatrix);
-    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::MODEL_VIEW_MATRIX), *uboView, *bindings, modelViewMatrix);
+    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::MODEL_MATRIX), *uboView, modelMatrix);
+    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::VIEW_MATRIX), *uboView, viewMatrix);
+    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::PROJECTION_MATRIX), *uboView, projectionMatrix);
+    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::MODEL_VIEW_MATRIX), *uboView, modelViewMatrix);
 
     auto mvpUniformInfo = program->GetDefaultUniform(Program::DefaultUniformIndex::MVP_MATRIX);
     if(mvpUniformInfo && !mvpUniformInfo->name.empty())
     {
       Matrix modelViewProjectionMatrix(false);
       Matrix::Multiply(modelViewProjectionMatrix, modelViewMatrix, projectionMatrix);
-      WriteDefaultUniform(mvpUniformInfo, *uboView, *bindings, modelViewProjectionMatrix);
+      WriteDefaultUniform(mvpUniformInfo, *uboView, modelViewProjectionMatrix);
     }
 
     auto normalUniformInfo = program->GetDefaultUniform(Program::DefaultUniformIndex::NORMAL_MATRIX);
@@ -719,7 +629,7 @@ void Renderer::WriteUniformBuffer(
       Matrix3 normalMatrix(modelViewMatrix);
       normalMatrix.Invert();
       normalMatrix.Transpose();
-      WriteDefaultUniform(normalUniformInfo, *uboView, *bindings, normalMatrix);
+      WriteDefaultUniform(normalUniformInfo, *uboView, normalMatrix);
     }
 
     Vector4        finalColor;
@@ -733,36 +643,36 @@ void Renderer::WriteUniformBuffer(
     {
       finalColor = Vector4(color.r, color.g, color.b, color.a * mRenderDataProvider->GetOpacity(bufferIndex));
     }
-    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::COLOR), *uboView, *bindings, finalColor);
+    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::COLOR), *uboView, finalColor);
 
     // Write uniforms from the uniform map
     FillUniformBuffer(*program, instruction, *uboView, bindings, uboOffset, bufferIndex);
 
     // Write uSize in the end, as it shouldn't be overridable by dynamic properties.
-    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::SIZE), *uboView, *bindings, size);
+    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::SIZE), *uboView, size);
 
     commandBuffer.BindUniformBuffers(*bindings);
   }
 }
 
 template<class T>
-bool Renderer::WriteDefaultUniform(const Graphics::UniformInfo* uniformInfo, Render::UniformBufferView& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const T& data)
+bool Renderer::WriteDefaultUniform(const Graphics::UniformInfo* uniformInfo, Render::UniformBufferView& ubo, const T& data)
 {
   if(uniformInfo && !uniformInfo->name.empty())
   {
-    WriteUniform(ubo, bindings, *uniformInfo, data);
+    WriteUniform(ubo, *uniformInfo, data);
     return true;
   }
   return false;
 }
 
 template<class T>
-void Renderer::WriteUniform(Render::UniformBufferView& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const Graphics::UniformInfo& uniformInfo, const T& data)
+void Renderer::WriteUniform(Render::UniformBufferView& ubo, const Graphics::UniformInfo& uniformInfo, const T& data)
 {
-  WriteUniform(ubo, bindings, uniformInfo, &data, sizeof(T));
+  WriteUniform(ubo, uniformInfo, &data, sizeof(T));
 }
 
-void Renderer::WriteUniform(Render::UniformBufferView& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const Graphics::UniformInfo& uniformInfo, const void* data, uint32_t size)
+void Renderer::WriteUniform(Render::UniformBufferView& ubo, const Graphics::UniformInfo& uniformInfo, const void* data, uint32_t size)
 {
   ubo.Write(data, size, ubo.GetOffset() + uniformInfo.offset);
 }
@@ -804,81 +714,12 @@ void Renderer::FillUniformBuffer(Program&                                      p
       if(uniformFound)
       {
         auto dst = ubo.GetOffset() + uniformInfo.offset;
-        switch((*iter).propertyValue->GetType())
-        {
-          case Property::Type::BOOLEAN:
-          {
-            ubo.Write(&(*iter).propertyValue->GetBoolean(updateBufferIndex),
-                      sizeof(bool),
-                      dst + static_cast<uint32_t>(sizeof(bool)) * arrayIndex);
-            break;
-          }
-          case Property::Type::INTEGER:
-          {
-            ubo.Write(&(*iter).propertyValue->GetInteger(updateBufferIndex),
-                      sizeof(int32_t),
-                      dst + static_cast<int32_t>(sizeof(int32_t)) * arrayIndex);
-            break;
-          }
-          case Property::Type::FLOAT:
-          {
-            ubo.Write(&(*iter).propertyValue->GetFloat(updateBufferIndex),
-                      sizeof(float),
-                      dst + static_cast<uint32_t>(sizeof(float)) * arrayIndex);
-            break;
-          }
-          case Property::Type::VECTOR2:
-          {
-            ubo.Write(&(*iter).propertyValue->GetVector2(updateBufferIndex),
-                      sizeof(Vector2),
-                      dst + static_cast<uint32_t>(sizeof(Vector2)) * arrayIndex);
-            break;
-          }
-          case Property::Type::VECTOR3:
-          {
-            ubo.Write(&(*iter).propertyValue->GetVector3(updateBufferIndex),
-                      sizeof(Vector3),
-                      dst + static_cast<uint32_t>(sizeof(Vector3)) * arrayIndex);
-            break;
-          }
-          case Property::Type::VECTOR4:
-          {
-            ubo.Write(&(*iter).propertyValue->GetVector4(updateBufferIndex),
-                      sizeof(Vector4),
-                      dst + static_cast<uint32_t>(sizeof(Vector4)) * arrayIndex);
-            break;
-          }
-          case Property::Type::MATRIX:
-          {
-            ubo.Write(&(*iter).propertyValue->GetMatrix(updateBufferIndex),
-                      sizeof(Matrix),
-                      dst + static_cast<uint32_t>(sizeof(Matrix)) * arrayIndex);
-            break;
-          }
-          case Property::Type::MATRIX3:
-          {
-            // @todo: handle data padding properly
-            // Get padding requirement from Graphics
-            //
-            // Vulkan:
-            //
-            //const auto& matrix = &(*iter).propertyValue->GetMatrix3(updateBufferIndex);
-            //for(int i = 0; i < 3; ++i)
-            //{
-            //ubo.Write(&matrix->AsFloat()[i * 3],
-            //          sizeof(float) * 3,
-            //          dst + (i * static_cast<uint32_t>(sizeof(Vector4))));
-            //}
-            // GL:
-            ubo.Write(&(*iter).propertyValue->GetMatrix3(updateBufferIndex),
-                      sizeof(Matrix3),
-                      dst + static_cast<uint32_t>(sizeof(Matrix3)) * arrayIndex);
-            break;
-          }
-          default:
-          {
-          }
-        }
+        const auto typeSize = GetPropertyValueSizeForUniform( (*iter).propertyValue->GetType() );
+        const auto dest = dst + static_cast<uint32_t>(typeSize) * arrayIndex;
+        const auto func = GetPropertyValueGetter((*iter).propertyValue->GetType());
+        ubo.Write(&((*iter).propertyValue->*func)(updateBufferIndex),
+                  typeSize,
+                  dest);
       }
     }
   }
@@ -908,7 +749,7 @@ bool Renderer::Updated(BufferIndex bufferIndex, const SceneGraph::NodeDataProvid
     return true;
   }
 
-  if(mShaderChanged || mUpdateAttributeLocations || mGeometry->AttributesChanged())
+  if(mShaderChanged || mGeometry->AttributesChanged())
   {
     return true;
   }
@@ -950,193 +791,25 @@ Graphics::Pipeline& Renderer::PrepareGraphicsPipeline(
   const SceneGraph::NodeDataProvider&                  node,
   bool                                                 blend)
 {
-  Graphics::InputAssemblyState inputAssemblyState{};
-  Graphics::VertexInputState   vertexInputState{};
-  Graphics::ProgramState       programState{};
-  uint32_t                     bindingIndex{0u};
-
-  if(mUpdateAttributeLocations || mGeometry->AttributesChanged())
+  if(mGeometry->AttributesChanged())
   {
-    mAttributeLocations.Clear();
-    mUpdateAttributeLocations = true;
+    mUpdated = true;
   }
 
-  auto& reflection = mGraphicsController->GetProgramReflection(program.GetGraphicsProgram());
+  // Prepare query info
+  PipelineCacheQueryInfo queryInfo{};
+  queryInfo.program = &program;
+  queryInfo.renderer = this;
+  queryInfo.geometry = mGeometry;
+  queryInfo.blendingEnabled = blend;
+  queryInfo.blendingOptions = &mBlendingOptions;
+  queryInfo.alphaPremultiplied = mPremultipliedAlphaEnabled;
+  queryInfo.cameraUsingReflection = instruction.GetCamera()->GetReflectionUsed();
 
-  /**
-   * Bind Attributes
-   */
-  uint32_t base = 0;
-  for(auto&& vertexBuffer : mGeometry->GetVertexBuffers())
-  {
-    const VertexBuffer::Format& vertexFormat = *vertexBuffer->GetFormat();
+  auto pipelineResult = mPipelineCache->GetPipeline( queryInfo, true );
 
-    vertexInputState.bufferBindings.emplace_back(vertexFormat.size, // stride
-                                                 Graphics::VertexInputRate::PER_VERTEX);
-
-    const uint32_t attributeCount = vertexBuffer->GetAttributeCount();
-    for(uint32_t i = 0; i < attributeCount; ++i)
-    {
-      if(mUpdateAttributeLocations)
-      {
-        auto    attributeName = vertexBuffer->GetAttributeName(i);
-        int32_t pLocation     = reflection.GetVertexAttributeLocation(std::string(attributeName.GetStringView()));
-        if(-1 == pLocation)
-        {
-          DALI_LOG_WARNING("Attribute not found in the shader: %s\n", attributeName.GetCString());
-        }
-        mAttributeLocations.PushBack(pLocation);
-      }
-
-      auto location = static_cast<uint32_t>(mAttributeLocations[base + i]);
-
-      vertexInputState.attributes.emplace_back(location,
-                                               bindingIndex,
-                                               vertexFormat.components[i].offset,
-                                               GetPropertyVertexFormat(vertexFormat.components[i].type));
-    }
-    base += attributeCount;
-    ++bindingIndex;
-  }
-  mUpdateAttributeLocations = false;
-
-  // Get the topology
-  inputAssemblyState.SetTopology(mGeometry->GetTopology());
-
-  // Get the program
-  programState.SetProgram(program.GetGraphicsProgram());
-
-  Graphics::RasterizationState rasterizationState{};
-
-  //Set cull face  mode
-  const Dali::Internal::SceneGraph::Camera* cam = instruction.GetCamera();
-  if(cam->GetReflectionUsed())
-  {
-    auto adjFaceCullingMode = mFaceCullingMode;
-    switch(mFaceCullingMode)
-    {
-      case FaceCullingMode::Type::FRONT:
-      {
-        adjFaceCullingMode = FaceCullingMode::Type::BACK;
-        break;
-      }
-      case FaceCullingMode::Type::BACK:
-      {
-        adjFaceCullingMode = FaceCullingMode::Type::FRONT;
-        break;
-      }
-      default:
-      {
-        // nothing to do, leave culling as it is
-      }
-    }
-    rasterizationState.SetCullMode(ConvertCullFace(adjFaceCullingMode));
-  }
-  else
-  {
-    rasterizationState.SetCullMode(ConvertCullFace(mFaceCullingMode));
-  }
-
-  rasterizationState.SetFrontFace(Graphics::FrontFace::COUNTER_CLOCKWISE);
-
-  /**
-   * Set Polygon mode
-   */
-  switch(mGeometry->GetTopology())
-  {
-    case Graphics::PrimitiveTopology::TRIANGLE_LIST:
-    case Graphics::PrimitiveTopology::TRIANGLE_STRIP:
-    case Graphics::PrimitiveTopology::TRIANGLE_FAN:
-      rasterizationState.SetPolygonMode(Graphics::PolygonMode::FILL);
-      break;
-    case Graphics::PrimitiveTopology::LINE_LIST:
-    case Graphics::PrimitiveTopology::LINE_LOOP:
-    case Graphics::PrimitiveTopology::LINE_STRIP:
-      rasterizationState.SetPolygonMode(Graphics::PolygonMode::LINE);
-      break;
-    case Graphics::PrimitiveTopology::POINT_LIST:
-      rasterizationState.SetPolygonMode(Graphics::PolygonMode::POINT);
-      break;
-  }
-
-  // @todo Add blend barrier to the Graphics API if we are using advanced
-  // blending options. Command?
-
-  Graphics::ColorBlendState colorBlendState{};
-  colorBlendState.SetBlendEnable(false);
-
-  if(blend)
-  {
-    colorBlendState.SetBlendEnable(true);
-
-    Graphics::BlendOp rgbOp   = ConvertBlendEquation(mBlendingOptions.GetBlendEquationRgb());
-    Graphics::BlendOp alphaOp = ConvertBlendEquation(mBlendingOptions.GetBlendEquationRgb());
-    if(mBlendingOptions.IsAdvancedBlendEquationApplied() && mPremultipliedAlphaEnabled)
-    {
-      if(rgbOp != alphaOp)
-      {
-        DALI_LOG_ERROR("Advanced Blend Equation MUST be applied by using BlendEquation.\n");
-        alphaOp = rgbOp;
-      }
-    }
-
-    colorBlendState
-      .SetSrcColorBlendFactor(ConvertBlendFactor(mBlendingOptions.GetBlendSrcFactorRgb()))
-      .SetSrcAlphaBlendFactor(ConvertBlendFactor(mBlendingOptions.GetBlendSrcFactorAlpha()))
-      .SetDstColorBlendFactor(ConvertBlendFactor(mBlendingOptions.GetBlendDestFactorRgb()))
-      .SetDstAlphaBlendFactor(ConvertBlendFactor(mBlendingOptions.GetBlendDestFactorAlpha()))
-      .SetColorBlendOp(rgbOp)
-      .SetAlphaBlendOp(alphaOp);
-
-    // Blend color is optional and rarely used
-    auto* blendColor = const_cast<Vector4*>(mBlendingOptions.GetBlendColor());
-    if(blendColor)
-    {
-      colorBlendState.SetBlendConstants(blendColor->AsFloat());
-    }
-  }
-
-  mUpdated = true;
-
-  // Create the pipeline
-  Graphics::PipelineCreateInfo createInfo;
-  createInfo
-    .SetInputAssemblyState(&inputAssemblyState)
-    .SetVertexInputState(&vertexInputState)
-    .SetRasterizationState(&rasterizationState)
-    .SetColorBlendState(&colorBlendState)
-    .SetProgramState(&programState);
-
-  // Store a pipeline per renderer per render (renderer can be owned by multiple nodes,
-  // and re-drawn in multiple instructions).
-  // @todo This is only needed because ColorBlend state can change. Fixme!
-  // This is ameliorated by the fact that implementation caches pipelines, and we're only storing
-  // handles.
-  auto            hash           = HashedPipeline::GetHash(&node, &instruction, blend);
-  HashedPipeline* hashedPipeline = nullptr;
-  for(auto& element : mGraphicsPipelines)
-  {
-    if(element.mHash == hash)
-    {
-      hashedPipeline = &element;
-      break;
-    }
-  }
-
-  if(hashedPipeline != nullptr)
-  {
-    hashedPipeline->mGraphicsPipeline = mGraphicsController->CreatePipeline(
-      createInfo,
-      std::move(hashedPipeline->mGraphicsPipeline));
-  }
-  else
-  {
-    mGraphicsPipelines.emplace_back();
-    mGraphicsPipelines.back().mHash             = hash;
-    mGraphicsPipelines.back().mGraphicsPipeline = mGraphicsController->CreatePipeline(createInfo, nullptr);
-    hashedPipeline                              = &mGraphicsPipelines.back();
-  }
-  return *hashedPipeline->mGraphicsPipeline.get();
+  // should be never null?
+  return *pipelineResult.pipeline;
 }
 
 } // namespace Render

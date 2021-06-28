@@ -58,41 +58,44 @@ size_t DEFAULT_UNIFORM_HASHTABLE[NUMBER_OF_DEFAULT_UNIFORMS] =
     CalculateHash(std::string("uSize")),
     CalculateHash(std::string("uColor"))};
 
+/**
+ * Helper function to calculate the correct alignment of data for uniform buffers
+ * @param dataSize size of uniform buffer
+ * @return aligned offset of data
+ */
+inline uint32_t GetUniformBufferDataAlignment(uint32_t dataSize)
+{
+  return ((dataSize / 256u) + ((dataSize % 256u) ? 1u : 0u)) * 256u;
+}
+
 } // namespace
 
 // IMPLEMENTATION
 
-Program* Program::New(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& gfxController, Graphics::UniquePtr<Graphics::Program>&& gfxProgram)
+Program* Program::New(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& gfxController)
 {
-  uint32_t programId{0u};
-
-  // Get program id and use it as hash for the cache
-  // in order to maintain current functionality as long as needed
-  gfxController.GetProgramParameter(*gfxProgram, 1, &programId);
-
-  size_t shaderHash = programId;
+  size_t shaderHash = shaderData->GetHashValue();
 
   Program* program = cache.GetProgram(shaderHash);
 
   if(nullptr == program)
   {
     // program not found so create it
-    program = new Program(cache, shaderData, gfxController, std::move(gfxProgram));
+    program = new Program(cache, shaderData, gfxController);
     cache.AddProgram(shaderHash, program);
   }
 
   return program;
 }
 
-Program::Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& controller, Graphics::UniquePtr<Graphics::Program>&& gfxProgram)
+Program::Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& controller)
 : mCache(cache),
   mProjectionMatrix(nullptr),
   mViewMatrix(nullptr),
-  mGfxProgram(std::move(gfxProgram)),
+  mGfxProgram(nullptr),
   mGfxController(controller),
   mProgramData(shaderData)
 {
-  BuildReflection(controller.GetProgramReflection(*mGfxProgram.get()));
 }
 
 Program::~Program() = default;
@@ -162,7 +165,23 @@ void Program::BuildReflection(const Graphics::Reflection& graphicsReflection)
       item.hasCollision = hashTest[item.hashValue];
     }
   }
+
+  // Calculate size of memory for uniform blocks
+  mUniformBlockRequirements.totalSizeRequired = 0;
+  mUniformBlockRequirements.blockCount = graphicsReflection.GetUniformBlockCount();
+  for (auto i = 0u; i < mUniformBlockRequirements.blockCount; ++i)
+  {
+    auto blockSize = GetUniformBufferDataAlignment(graphicsReflection.GetUniformBlockSize(i));
+    mUniformBlockRequirements.totalSizeRequired += blockSize;
+  }
 }
+
+void Program::SetGraphicsProgram( Graphics::UniquePtr<Graphics::Program>&& program )
+{
+  mGfxProgram = std::move(program);
+  BuildReflection(mGfxController.GetProgramReflection(*mGfxProgram.get()));
+}
+
 
 bool Program::GetUniform(const std::string& name, size_t hashedName, Graphics::UniformInfo& out) const
 {
