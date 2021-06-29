@@ -43,7 +43,7 @@ Dali::Graphics::BufferFactory& GraphicsBufferFactory::SetSize( uint32_t size )
 Dali::Graphics::BufferFactory::PointerType GraphicsBufferFactory::Create() const
 {
   auto buffer = std::make_unique< GraphicsBuffer >( mController, mUsageFlags, mSize );
-  return std::move(buffer);
+  return buffer;
 }
 
 } // Test

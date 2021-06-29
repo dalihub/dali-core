@@ -91,7 +91,6 @@ public:
    *
    * When an actor is connected, it will be directly or indirectly parented to the root Actor.
    * @SINCE_1_0.0
-   * @param[in] depth The depth in the hierarchy for the actor
    *
    * @note The root Actor is provided automatically by Dali::Stage, and is always considered to be connected.
    * When the parent of a set of actors is connected to the stage, then all of the children

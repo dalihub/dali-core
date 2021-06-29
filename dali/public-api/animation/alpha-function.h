@@ -89,7 +89,6 @@ public:
    * @brief Default constructor.
    * Creates an alpha function object with the default built-in alpha function.
    * @SINCE_1_0.0
-   * @return The alpha function
    */
   AlphaFunction();
 
@@ -99,7 +98,6 @@ public:
    * to the constructor.
    * @SINCE_1_0.0
    * @param[in] function One of the built-in alpha functions
-   * @return The alpha function
    */
   AlphaFunction( BuiltinFunction function);
 
@@ -109,7 +107,6 @@ public:
    * to the constructor.
    * @SINCE_1_0.0
    * @param[in] function A pointer to an alpha function
-   * @return The alpha function
    */
   AlphaFunction( AlphaFunctionPrototype function);
 
@@ -121,7 +118,6 @@ public:
    * @SINCE_1_0.0
    * @param[in] controlPoint0 A Vector2 which will be used as the first control point of the curve
    * @param[in] controlPoint1 A Vector2 which will be used as the second control point of the curve
-   * @return The alpha function
    * @note The x components of the control points will be clamped to the range [0,1] to prevent
    * non monotonic curves.
    */

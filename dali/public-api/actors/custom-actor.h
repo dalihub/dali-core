@@ -94,7 +94,6 @@ public:
    *
    * @SINCE_1_0.0
    * @param[in] implementation The implementation for this custom actor
-   * @return A handle to a newly allocated Dali resource
    */
   CustomActor(CustomActorImpl& implementation);
 

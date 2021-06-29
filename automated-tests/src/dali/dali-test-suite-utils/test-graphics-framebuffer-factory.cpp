@@ -61,7 +61,7 @@ Dali::Graphics::FramebufferFactory& GraphicsFramebufferFactory::SetDepthStencilA
 Dali::Graphics::FramebufferFactory::PointerType GraphicsFramebufferFactory::Create() const
 {
   auto fb = std::make_unique<Test::GraphicsFramebuffer>( mController, mSize, mColorAttachments, mDepthAttachment );
-  return std::move(fb);
+  return fb;
 }
 
 void GraphicsFramebufferFactory::TestReset()

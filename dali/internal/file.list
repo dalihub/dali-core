@@ -120,7 +120,6 @@ internal_src_files = \
   $(internal_src_dir)/update/render-tasks/scene-graph-camera.cpp \
   $(internal_src_dir)/update/render-tasks/scene-graph-render-task.cpp \
   $(internal_src_dir)/update/render-tasks/scene-graph-render-task-list.cpp \
-  $(internal_src_dir)/update/rendering/data-providers/render-data-provider.cpp \
   $(internal_src_dir)/update/rendering/render-instruction-container.cpp \
   $(internal_src_dir)/update/rendering/render-instruction.cpp \
   $(internal_src_dir)/update/rendering/render-item.cpp \

@@ -27,7 +27,6 @@
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/uniform-map.h>
 #include <dali/internal/update/common/scene-graph-connection-change-propagator.h>
-#include <dali/internal/update/rendering/data-providers/uniform-map-data-provider.h>
 #include <dali/internal/update/rendering/render-command-container.h>
 #include <dali/internal/update/rendering/stencil-parameters.h>
 #include <dali/graphics-api/graphics-api-controller.h>
@@ -53,6 +52,8 @@ class Renderer;
 typedef Dali::Vector< Renderer* > RendererContainer;
 typedef RendererContainer::Iterator RendererIter;
 typedef RendererContainer::ConstIterator RendererConstIter;
+
+typedef Dali::Vector< const UniformPropertyMapping* > CollectedUniformMap;
 
 class Renderer : public PropertyOwner,
                  public UniformMap::Observer,
@@ -342,14 +343,14 @@ public:
    * @return The opacity
    */
   float GetOpacity( BufferIndex updateBufferIndex ) const;
-  
+
   /**
    * Helper function to update the uniform map.
    * @param[in] bufferIndex The buffer to read from.
    * @param[in] node NodeDataProvider to get uniform map
    */
   void UpdateUniformMap( BufferIndex bufferIndex, Node& node );
-  
+
   /**
    * Sets the rendering behavior
    * @param[in] renderingBehavior The rendering behavior required.

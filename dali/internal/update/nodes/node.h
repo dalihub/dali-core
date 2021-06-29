@@ -34,9 +34,6 @@
 #include <dali/internal/update/manager/transform-manager.h>
 #include <dali/internal/update/manager/transform-manager-property.h>
 #include <dali/internal/update/nodes/node-declarations.h>
-#include <dali/internal/update/rendering/data-providers/node-data-provider.h>
-
-//#include <dali/internal/update/rendering/scene-graph-renderer.h>
 
 
 namespace Dali
