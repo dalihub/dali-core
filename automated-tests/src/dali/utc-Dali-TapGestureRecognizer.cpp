@@ -211,6 +211,7 @@ int UtcDaliTapGestureRecognizerMoveTooFar(void)
   TestApplication application;
 
   TapGestureDetector detector = TapGestureDetector::New();
+  detector.SetMaximumTapsRequired(2);
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -233,6 +234,7 @@ int UtcDaliTapGestureRecognizerMoveTooFar(void)
 
   application.SendNotification();
 
+  application.GetPlatform().TriggerTimer();
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   END_TEST;
@@ -487,6 +489,7 @@ int UtcDaliTapGestureRecognizerMultipleDetectors(void)
 
   application.SendNotification();
 
+  application.GetPlatform().TriggerTimer();
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, actor == data.tappedActor, TEST_LOCATION);
   data.Reset();
@@ -506,6 +509,7 @@ int UtcDaliTapGestureRecognizerMultipleDetectors(void)
 
   application.SendNotification();
 
+  application.GetPlatform().TriggerTimer();
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, data2.functorCalled, TEST_LOCATION);
 
