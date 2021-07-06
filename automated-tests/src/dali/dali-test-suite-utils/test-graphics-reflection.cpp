@@ -240,9 +240,10 @@ bool TestGraphicsReflection::GetNamedUniform(const std::string& name, Dali::Grap
   return true;
 }
 
-std::vector<Dali::Graphics::UniformInfo> TestGraphicsReflection::GetSamplers() const
+const std::vector<Dali::Graphics::UniformInfo>& TestGraphicsReflection::GetSamplers() const
 {
-  return std::vector<Dali::Graphics::UniformInfo>{};
+  static std::vector<Dali::Graphics::UniformInfo> samplers{};
+  return samplers;
 }
 
 Graphics::ShaderLanguage TestGraphicsReflection::GetLanguage() const

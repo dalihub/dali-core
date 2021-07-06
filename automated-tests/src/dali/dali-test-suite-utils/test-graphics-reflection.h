@@ -28,22 +28,22 @@ class TestGraphicsReflection : public Graphics::Reflection
 public:
   TestGraphicsReflection(TestGlAbstraction& gl, Property::Array& vertexFormats, const Graphics::ProgramCreateInfo& createInfo, std::vector<UniformData>& customUniforms);
 
-  uint32_t                                   GetVertexAttributeLocation(const std::string& name) const override;
-  Dali::Graphics::VertexInputAttributeFormat GetVertexAttributeFormat(uint32_t location) const override;
-  std::string                                GetVertexAttributeName(uint32_t location) const override;
-  std::vector<uint32_t>                      GetVertexAttributeLocations() const override;
-  uint32_t                                   GetUniformBlockCount() const override;
-  uint32_t                                   GetUniformBlockBinding(uint32_t index) const override;
-  uint32_t                                   GetUniformBlockSize(uint32_t index) const override;
-  bool                                       GetUniformBlock(uint32_t index, Dali::Graphics::UniformBlockInfo& out) const override;
-  std::vector<uint32_t>                      GetUniformBlockLocations() const override;
-  std::string                                GetUniformBlockName(uint32_t blockIndex) const override;
-  uint32_t                                   GetUniformBlockMemberCount(uint32_t blockIndex) const override;
-  std::string                                GetUniformBlockMemberName(uint32_t blockIndex, uint32_t memberLocation) const override;
-  uint32_t                                   GetUniformBlockMemberOffset(uint32_t blockIndex, uint32_t memberLocation) const override;
-  bool                                       GetNamedUniform(const std::string& name, Dali::Graphics::UniformInfo& out) const override;
-  std::vector<Dali::Graphics::UniformInfo>   GetSamplers() const override;
-  Graphics::ShaderLanguage                   GetLanguage() const override;
+  uint32_t                                        GetVertexAttributeLocation(const std::string& name) const override;
+  Dali::Graphics::VertexInputAttributeFormat      GetVertexAttributeFormat(uint32_t location) const override;
+  std::string                                     GetVertexAttributeName(uint32_t location) const override;
+  std::vector<uint32_t>                           GetVertexAttributeLocations() const override;
+  uint32_t                                        GetUniformBlockCount() const override;
+  uint32_t                                        GetUniformBlockBinding(uint32_t index) const override;
+  uint32_t                                        GetUniformBlockSize(uint32_t index) const override;
+  bool                                            GetUniformBlock(uint32_t index, Dali::Graphics::UniformBlockInfo& out) const override;
+  std::vector<uint32_t>                           GetUniformBlockLocations() const override;
+  std::string                                     GetUniformBlockName(uint32_t blockIndex) const override;
+  uint32_t                                        GetUniformBlockMemberCount(uint32_t blockIndex) const override;
+  std::string                                     GetUniformBlockMemberName(uint32_t blockIndex, uint32_t memberLocation) const override;
+  uint32_t                                        GetUniformBlockMemberOffset(uint32_t blockIndex, uint32_t memberLocation) const override;
+  bool                                            GetNamedUniform(const std::string& name, Dali::Graphics::UniformInfo& out) const override;
+  const std::vector<Dali::Graphics::UniformInfo>& GetSamplers() const override;
+  Graphics::ShaderLanguage                        GetLanguage() const override;
 
 public: // Test methods
   void SetAttributes(std::vector<std::string> locations)

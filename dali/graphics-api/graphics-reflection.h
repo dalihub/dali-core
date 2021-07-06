@@ -170,7 +170,7 @@ public:
    *
    * @return A vector of the sampler uniforms
    */
-  virtual std::vector<Dali::Graphics::UniformInfo> GetSamplers() const = 0;
+  virtual const std::vector<Dali::Graphics::UniformInfo>& GetSamplers() const = 0;
 
   // Language
 
