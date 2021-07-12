@@ -131,6 +131,7 @@ SET( internal_src_files
 
   ${internal_src_dir}/update/animation/scene-graph-animation.cpp
   ${internal_src_dir}/update/animation/scene-graph-constraint-base.cpp
+  ${internal_src_dir}/update/common/collected-uniform-map.cpp
   ${internal_src_dir}/update/common/discard-queue.cpp
   ${internal_src_dir}/update/common/property-base.cpp
   ${internal_src_dir}/update/common/property-owner-messages.cpp
@@ -139,7 +140,6 @@ SET( internal_src_files
   ${internal_src_dir}/update/common/property-condition-variable-step-functions.cpp
   ${internal_src_dir}/update/common/property-owner.cpp
   ${internal_src_dir}/update/common/scene-graph-buffers.cpp
-  ${internal_src_dir}/update/common/scene-graph-connection-change-propagator.cpp
   ${internal_src_dir}/update/common/scene-graph-property-notification.cpp
   ${internal_src_dir}/update/common/scene-graph-scene.cpp
   ${internal_src_dir}/update/common/uniform-map.cpp

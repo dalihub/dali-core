@@ -26,7 +26,6 @@
 #include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/property-owner.h>
-#include <dali/internal/update/common/scene-graph-connection-change-propagator.h>
 #include <dali/internal/update/common/uniform-map.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/renderer.h> // Dali::Renderer
@@ -56,8 +55,7 @@ class Geometry;
 class Renderer : public PropertyOwner,
                  public UniformMapDataProvider,
                  public RenderDataProvider,
-                 public UniformMap::Observer,
-                 public ConnectionChangePropagator::Observer
+                 public UniformMap::Observer
 {
 public:
   enum OpacityType
@@ -398,38 +396,25 @@ public:
     return mRenderCallback;
   }
 
-public: // Implementation of ConnectionChangePropagator
   /**
-   * @copydoc ConnectionChangePropagator::AddObserver
+   * Merge shader uniform map into renderer uniform map if any of the
+   * maps have changed.  Only update uniform map if added to render
+   * instructions.
+   *
+   * @return true if map has been updated, false otherwise
    */
-  void AddConnectionObserver(ConnectionChangePropagator::Observer& observer){};
+  bool UpdateUniformMap();
 
   /**
-   * @copydoc ConnectionChangePropagator::RemoveObserver
+   * Set the given external draw commands on this renderer.
    */
-  void RemoveConnectionObserver(ConnectionChangePropagator::Observer& observer){};
+  void SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, uint32_t size);
 
 public: // UniformMap::Observer
   /**
    * @copydoc UniformMap::Observer::UniformMappingsChanged
    */
   void UniformMappingsChanged(const UniformMap& mappings) override;
-
-public: // ConnectionChangePropagator::Observer
-  /**
-   * @copydoc ConnectionChangePropagator::ConnectionsChanged
-   */
-  void ConnectionsChanged(PropertyOwner& owner) override;
-
-  /**
-   * @copydoc ConnectionChangePropagator::ConnectedUniformMapChanged
-   */
-  void ConnectedUniformMapChanged() override;
-
-  /**
-   * @copydoc ConnectionChangePropagator::ConnectedUniformMapChanged
-   */
-  void ObservedObjectDestroyed(PropertyOwner& owner) override;
 
 public: // PropertyOwner implementation
   /**
@@ -439,19 +424,9 @@ public: // PropertyOwner implementation
 
 public: // From UniformMapDataProvider
   /**
-   * @copydoc UniformMapDataProvider::GetUniformMapChanged
+   * @copydoc UniformMapDataProvider::GetCollectedUniformMap
    */
-  bool GetUniformMapChanged(BufferIndex bufferIndex) const override
-  {
-    return mUniformMapChanged[bufferIndex];
-  }
-
-  /**
-   * @copydoc UniformMapDataProvider::GetUniformMap
-   */
-  const CollectedUniformMap& GetUniformMap(BufferIndex bufferIndex) const override;
-
-  void SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, uint32_t size);
+  const CollectedUniformMap& GetCollectedUniformMap() const override;
 
 public: // For VisualProperties
   /**
@@ -477,7 +452,15 @@ private:
   Renderer();
 
 private:
-  CollectedUniformMap mCollectedUniformMap[2]; ///< Uniform maps collected by the renderer
+  enum Decay
+  {
+    DONE    = 0,
+    LAST    = 1,
+    INITIAL = 2
+  };
+
+private:
+  CollectedUniformMap mCollectedUniformMap; ///< Uniform maps collected by the renderer
 
   SceneController*                            mSceneController;           ///< Used for initializing renderers
   Render::Renderer*                           mRenderer;                  ///< Raw pointer to the renderer (that's owned by RenderManager)
@@ -489,21 +472,22 @@ private:
 
   Dali::Internal::Render::Renderer::StencilParameters mStencilParameters; ///< Struct containing all stencil related options
 
-  uint32_t mIndexedDrawFirstElement;  ///< first element index to be drawn using indexed draw
-  uint32_t mIndexedDrawElementsCount; ///< number of elements to be drawn using indexed draw
-  uint32_t mBlendBitmask;             ///< The bitmask of blending options
-  uint32_t mRegenerateUniformMap;     ///< 2 if the map should be regenerated, 1 if it should be copied.
-  uint32_t mResendFlag;               ///< Indicate whether data should be resent to the renderer
+  uint32_t mIndexedDrawFirstElement;     ///< first element index to be drawn using indexed draw
+  uint32_t mIndexedDrawElementsCount;    ///< number of elements to be drawn using indexed draw
+  uint32_t mBlendBitmask;                ///< The bitmask of blending options
+  uint32_t mResendFlag;                  ///< Indicate whether data should be resent to the renderer
+  uint32_t mUniformMapChangeCounter{0u}; ///< Value to check if uniform data should be updated
 
-  DepthFunction::Type            mDepthFunction : 4;            ///< Local copy of the depth function
-  FaceCullingMode::Type          mFaceCullingMode : 3;          ///< Local copy of the mode of face culling
-  BlendMode::Type                mBlendMode : 3;                ///< Local copy of the mode of blending
-  DepthWriteMode::Type           mDepthWriteMode : 3;           ///< Local copy of the depth write mode
-  DepthTestMode::Type            mDepthTestMode : 3;            ///< Local copy of the depth test mode
-  DevelRenderer::Rendering::Type mRenderingBehavior : 2;        ///< The rendering behavior
-  bool                           mUniformMapChanged[2];         ///< Records if the uniform map has been altered this frame
-  bool                           mPremultipledAlphaEnabled : 1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
+  DepthFunction::Type            mDepthFunction : 4;     ///< Local copy of the depth function
+  FaceCullingMode::Type          mFaceCullingMode : 3;   ///< Local copy of the mode of face culling
+  BlendMode::Type                mBlendMode : 3;         ///< Local copy of the mode of blending
+  DepthWriteMode::Type           mDepthWriteMode : 3;    ///< Local copy of the depth write mode
+  DepthTestMode::Type            mDepthTestMode : 3;     ///< Local copy of the depth test mode
+  DevelRenderer::Rendering::Type mRenderingBehavior : 2; ///< The rendering behavior
+  Decay                          mUpdateDecay : 2;       ///< Update decay (aging)
 
+  bool                                          mRegenerateUniformMap : 1;     ///< true if the map should be regenerated
+  bool                                          mPremultipledAlphaEnabled : 1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
   std::vector<Dali::DevelRenderer::DrawCommand> mDrawCommands;
   Dali::RenderCallback*                         mRenderCallback{nullptr};
 

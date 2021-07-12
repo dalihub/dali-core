@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/rendering/texture-set.h>
@@ -455,8 +456,10 @@ private:
    * @param[in] node The node using the renderer
    * @param[in] size The size of the renderer
    * @param[in] program The shader program on which to set the uniforms.
+   *
+   * @return the index of the node in change counters store / uniform maps store.
    */
-  void BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider& node, const Vector3& size, Program& program);
+  int BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider& node, const Vector3& size, Program& program);
 
   /**
    * Bind the textures and setup the samplers
@@ -491,6 +494,7 @@ private:
    * @param[in] size Size of the render item
    * @param[in] blend If true, blending is enabled
    * @param[in] instruction The render instruction
+   * @param[in] The node index
    */
   void WriteUniformBuffer(BufferIndex                          bufferIndex,
                           Graphics::CommandBuffer&             commandBuffer,
@@ -501,7 +505,8 @@ private:
                           const Matrix&                        modelViewMatrix,
                           const Matrix&                        viewMatrix,
                           const Matrix&                        projectionMatrix,
-                          const Vector3&                       size);
+                          const Vector3&                       size,
+                          int                                  nodeIndex);
 
   /**
    * @brief Fill uniform buffer at index. Writes uniforms into given memory address
@@ -517,7 +522,8 @@ private:
                          Render::UniformBufferView&                    ubo,
                          std::vector<Graphics::UniformBufferBinding>*& outBindings,
                          uint32_t&                                     offset,
-                         BufferIndex                                   updateBufferIndex);
+                         BufferIndex                                   updateBufferIndex,
+                         int                                           nodeIndex);
 
 private:
   Graphics::Controller*           mGraphicsController;
@@ -551,26 +557,26 @@ private:
     FuncGetter uniformFunc{0};
   };
 
-  using UniformIndexMappings = Dali::Vector<UniformIndexMap>;
-
-  UniformIndexMappings mUniformIndexMap;
-  uint64_t             mUniformsHash;
-
-  struct HashedPipeline
-  {
-    uint64_t                                mHash{0u};
-    Graphics::UniquePtr<Graphics::Pipeline> mGraphicsPipeline{nullptr};
-    inline static uint64_t                  GetHash(const void* node, const void* instruction, bool blend)
-    {
-      return (reinterpret_cast<uint64_t>(node) << 32) | ((reinterpret_cast<uint64_t>(instruction) & 0xFFFFFFF) << 1) | blend;
-    }
-  };
-
   StencilParameters mStencilParameters; ///< Struct containing all stencil related options
   BlendingOptions   mBlendingOptions;   ///< Blending options including blend color, blend func and blend equation
 
   uint32_t mIndexedDrawFirstElement;  ///< Offset of first element to draw
   uint32_t mIndexedDrawElementsCount; ///< Number of elements to draw
+
+  /** Struct to map node to index into mNodeMapCounters and mUniformIndexMaps */
+  struct RenderItemLookup
+  {
+    const SceneGraph::NodeDataProvider* node{nullptr}; ///<Node key
+
+    std::size_t index{0};                       ///<Index into mUniformIndexMap
+    std::size_t nodeChangeCounter{0};           ///<The last known change counter for this node's uniform map
+    std::size_t renderItemMapChangeCounter{0u}; ///< Change counter of the renderer & shader collected uniform map for this render item (node/renderer pair)
+  };
+  std::vector<RenderItemLookup> mNodeIndexMap; ///< usually only 1 element.
+  using UniformIndexMappings = std::vector<UniformIndexMap>;
+  std::vector<UniformIndexMappings> mUniformIndexMaps; ///< Cached map per node/renderer/shader.
+
+  uint64_t mUniformsHash{0}; ///< Hash of uniform map property values
 
   DepthFunction::Type   mDepthFunction : 4;             ///< The depth function
   FaceCullingMode::Type mFaceCullingMode : 3;           ///< The mode of face culling

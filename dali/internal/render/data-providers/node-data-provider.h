@@ -121,7 +121,7 @@ protected:
 /**
  * An interface to provide data for a Renderer
  */
-class NodeDataProvider : UniformMapDataProvider, public PartialRenderingDataProvider
+class NodeDataProvider : public PartialRenderingDataProvider
 {
 public:
   /**
@@ -142,14 +142,9 @@ public:
   virtual const Vector4& GetRenderColor(BufferIndex bufferIndex) const = 0;
 
   /**
-   * @copydoc Dali::Internal::SceneGraph::UniformMapDataProvider::GetUniformMapChanged()
+   * Get the map of uniforms to property value addresses (for node only)
    */
-  bool GetUniformMapChanged(BufferIndex bufferIndex) const override = 0;
-
-  /**
-   * @copydoc Dali::Internal::SceneGraph::UniformMapDataProvider::GetUniformMap()
-   */
-  const CollectedUniformMap& GetUniformMap(BufferIndex bufferIndex) const override = 0;
+  virtual const UniformMap& GetNodeUniformMap() const = 0;
 
 protected:
   /**

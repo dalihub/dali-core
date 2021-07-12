@@ -175,8 +175,6 @@ Renderer::Renderer(SceneGraph::RenderDataProvider* dataProvider,
   mRenderDataProvider(dataProvider),
   mGeometry(geometry),
   mProgramCache(nullptr),
-  mUniformIndexMap(),
-  mUniformsHash(),
   mStencilParameters(stencilParameters),
   mBlendingOptions(),
   mIndexedDrawFirstElement(0),
@@ -531,9 +529,9 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
 
   BindTextures(commandBuffer, boundTextures);
 
-  BuildUniformIndexMap(bufferIndex, node, size, *program);
+  int nodeIndex = BuildUniformIndexMap(bufferIndex, node, size, *program);
 
-  WriteUniformBuffer(bufferIndex, commandBuffer, program, instruction, node, modelMatrix, modelViewMatrix, viewMatrix, projectionMatrix, size);
+  WriteUniformBuffer(bufferIndex, commandBuffer, program, instruction, node, modelMatrix, modelViewMatrix, viewMatrix, projectionMatrix, size, nodeIndex);
 
   bool drawn = false; // Draw can fail if there are no vertex buffers or they haven't been uploaded yet
                       // @todo We should detect this case much earlier to prevent unnecessary work
@@ -554,39 +552,69 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
   return drawn;
 }
 
-void Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider& node, const Vector3& size, Program& program)
+int Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider& node, const Vector3& size, Program& program)
 {
   // Check if the map has changed
   DALI_ASSERT_DEBUG(mRenderDataProvider && "No Uniform map data provider available");
 
   const SceneGraph::UniformMapDataProvider& uniformMapDataProvider = mRenderDataProvider->GetUniformMapDataProvider();
+  const SceneGraph::CollectedUniformMap&    uniformMap             = uniformMapDataProvider.GetCollectedUniformMap();
+  const SceneGraph::UniformMap&             uniformMapNode         = node.GetNodeUniformMap();
 
-  if(uniformMapDataProvider.GetUniformMapChanged(bufferIndex) ||
-     node.GetUniformMapChanged(bufferIndex) ||
-     mUniformIndexMap.Count() == 0 ||
-     mShaderChanged)
+  bool updateMaps;
+
+  // Usual case is to only have 1 node, however we do allow multiple nodes to reuse the same
+  // renderer, so we have to cache uniform map per render item (node / renderer pair).
+
+  const void* nodePtr = static_cast<const void*>(&node);
+  auto        iter    = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [nodePtr](RenderItemLookup& element) { return element.node == nodePtr; });
+
+  int renderItemMapIndex;
+  if(iter == mNodeIndexMap.end())
+  {
+    renderItemMapIndex = mUniformIndexMaps.size();
+    RenderItemLookup renderItemLookup;
+    renderItemLookup.node                       = &node;
+    renderItemLookup.index                      = renderItemMapIndex;
+    renderItemLookup.nodeChangeCounter          = uniformMapNode.GetChangeCounter();
+    renderItemLookup.renderItemMapChangeCounter = uniformMap.GetChangeCounter();
+    mNodeIndexMap.emplace_back(renderItemLookup);
+
+    updateMaps = true;
+    mUniformIndexMaps.resize(mUniformIndexMaps.size() + 1);
+  }
+  else
+  {
+    renderItemMapIndex = iter->index;
+
+    updateMaps = (uniformMapNode.GetChangeCounter() != iter->nodeChangeCounter) ||
+                 (uniformMap.GetChangeCounter() != iter->renderItemMapChangeCounter) ||
+                 (mUniformIndexMaps[renderItemMapIndex].size() == 0);
+
+    iter->nodeChangeCounter          = uniformMapNode.GetChangeCounter();
+    iter->renderItemMapChangeCounter = uniformMap.GetChangeCounter();
+  }
+
+  if(updateMaps || mShaderChanged)
   {
     // Reset shader pointer
     mShaderChanged = false;
 
-    const SceneGraph::CollectedUniformMap& uniformMap     = uniformMapDataProvider.GetUniformMap(bufferIndex);
-    const SceneGraph::CollectedUniformMap& uniformMapNode = node.GetUniformMap(bufferIndex);
-
     const uint32_t mapCount     = uniformMap.Count();
     const uint32_t mapNodeCount = uniformMapNode.Count();
 
-    mUniformIndexMap.Clear(); // Clear contents, but keep memory if we don't change size
-    mUniformIndexMap.Resize(mapCount + mapNodeCount);
+    mUniformIndexMaps[renderItemMapIndex].clear(); // Clear contents, but keep memory if we don't change size
+    mUniformIndexMaps[renderItemMapIndex].resize(mapCount + mapNodeCount);
 
     // Copy uniform map into mUniformIndexMap
     uint32_t mapIndex = 0;
     for(; mapIndex < mapCount; ++mapIndex)
     {
-      mUniformIndexMap[mapIndex].propertyValue          = uniformMap[mapIndex].propertyPtr;
-      mUniformIndexMap[mapIndex].uniformName            = uniformMap[mapIndex].uniformName;
-      mUniformIndexMap[mapIndex].uniformNameHash        = uniformMap[mapIndex].uniformNameHash;
-      mUniformIndexMap[mapIndex].uniformNameHashNoArray = uniformMap[mapIndex].uniformNameHashNoArray;
-      mUniformIndexMap[mapIndex].arrayIndex             = uniformMap[mapIndex].arrayIndex;
+      mUniformIndexMaps[renderItemMapIndex][mapIndex].propertyValue          = uniformMap.mUniformMap[mapIndex].propertyPtr;
+      mUniformIndexMaps[renderItemMapIndex][mapIndex].uniformName            = uniformMap.mUniformMap[mapIndex].uniformName;
+      mUniformIndexMaps[renderItemMapIndex][mapIndex].uniformNameHash        = uniformMap.mUniformMap[mapIndex].uniformNameHash;
+      mUniformIndexMaps[renderItemMapIndex][mapIndex].uniformNameHashNoArray = uniformMap.mUniformMap[mapIndex].uniformNameHashNoArray;
+      mUniformIndexMaps[renderItemMapIndex][mapIndex].arrayIndex             = uniformMap.mUniformMap[mapIndex].arrayIndex;
     }
 
     for(uint32_t nodeMapIndex = 0; nodeMapIndex < mapNodeCount; ++nodeMapIndex)
@@ -596,28 +624,29 @@ void Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::N
       bool  found(false);
       for(uint32_t i = 0; i < mapCount; ++i)
       {
-        if(mUniformIndexMap[i].uniformNameHash == hash &&
-           mUniformIndexMap[i].uniformName == name)
+        if(mUniformIndexMaps[renderItemMapIndex][i].uniformNameHash == hash &&
+           mUniformIndexMaps[renderItemMapIndex][i].uniformName == name)
         {
-          mUniformIndexMap[i].propertyValue = uniformMapNode[nodeMapIndex].propertyPtr;
-          found                             = true;
+          mUniformIndexMaps[renderItemMapIndex][i].propertyValue = uniformMapNode[nodeMapIndex].propertyPtr;
+          found                                                  = true;
           break;
         }
       }
 
       if(!found)
       {
-        mUniformIndexMap[mapIndex].propertyValue          = uniformMapNode[nodeMapIndex].propertyPtr;
-        mUniformIndexMap[mapIndex].uniformName            = uniformMapNode[nodeMapIndex].uniformName;
-        mUniformIndexMap[mapIndex].uniformNameHash        = uniformMapNode[nodeMapIndex].uniformNameHash;
-        mUniformIndexMap[mapIndex].uniformNameHashNoArray = uniformMapNode[nodeMapIndex].uniformNameHashNoArray;
-        mUniformIndexMap[mapIndex].arrayIndex             = uniformMapNode[nodeMapIndex].arrayIndex;
+        mUniformIndexMaps[renderItemMapIndex][mapIndex].propertyValue          = uniformMapNode[nodeMapIndex].propertyPtr;
+        mUniformIndexMaps[renderItemMapIndex][mapIndex].uniformName            = uniformMapNode[nodeMapIndex].uniformName;
+        mUniformIndexMaps[renderItemMapIndex][mapIndex].uniformNameHash        = uniformMapNode[nodeMapIndex].uniformNameHash;
+        mUniformIndexMaps[renderItemMapIndex][mapIndex].uniformNameHashNoArray = uniformMapNode[nodeMapIndex].uniformNameHashNoArray;
+        mUniformIndexMaps[renderItemMapIndex][mapIndex].arrayIndex             = uniformMapNode[nodeMapIndex].arrayIndex;
         ++mapIndex;
       }
     }
 
-    mUniformIndexMap.Resize(mapIndex);
+    mUniformIndexMaps[renderItemMapIndex].resize(mapIndex);
   }
+  return renderItemMapIndex;
 }
 
 void Renderer::WriteUniformBuffer(
@@ -630,7 +659,8 @@ void Renderer::WriteUniformBuffer(
   const Matrix&                        modelViewMatrix,
   const Matrix&                        viewMatrix,
   const Matrix&                        projectionMatrix,
-  const Vector3&                       size)
+  const Vector3&                       size,
+  int                                  nodeIndex)
 {
   // Create the UBO
   uint32_t uboOffset{0u};
@@ -697,7 +727,7 @@ void Renderer::WriteUniformBuffer(
     WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::ACTOR_COLOR), *uboView, color);
 
     // Write uniforms from the uniform map
-    FillUniformBuffer(*program, instruction, *uboView, bindings, uboOffset, bufferIndex);
+    FillUniformBuffer(*program, instruction, *uboView, bindings, uboOffset, bufferIndex, nodeIndex);
 
     // Write uSize in the end, as it shouldn't be overridable by dynamic properties.
     WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::SIZE), *uboView, size);
@@ -733,7 +763,8 @@ void Renderer::FillUniformBuffer(Program&                                      p
                                  Render::UniformBufferView&                    ubo,
                                  std::vector<Graphics::UniformBufferBinding>*& outBindings,
                                  uint32_t&                                     offset,
-                                 BufferIndex                                   updateBufferIndex)
+                                 BufferIndex                                   updateBufferIndex,
+                                 int                                           nodeIndex)
 {
   auto& reflection = mGraphicsController->GetProgramReflection(program.GetGraphicsProgram());
   auto  uboCount   = reflection.GetUniformBlockCount();
@@ -748,8 +779,8 @@ void Renderer::FillUniformBuffer(Program&                                      p
     dataOffset += GetUniformBufferDataAlignment(mUniformBufferBindings[i].dataSize);
     mUniformBufferBindings[i].buffer = ubo.GetBuffer(&mUniformBufferBindings[i].offset);
 
-    for(UniformIndexMappings::Iterator iter = mUniformIndexMap.Begin(),
-                                       end  = mUniformIndexMap.End();
+    for(auto iter = mUniformIndexMaps[nodeIndex].begin(),
+             end  = mUniformIndexMaps[nodeIndex].end();
         iter != end;
         ++iter)
     {
@@ -839,18 +870,19 @@ bool Renderer::Updated(BufferIndex bufferIndex, const SceneGraph::NodeDataProvid
     }
   }
 
-  uint64_t                               hash           = 0xc70f6907UL;
-  const SceneGraph::CollectedUniformMap& uniformMapNode = node->GetUniformMap(bufferIndex);
-  for(const auto& uniformProperty : uniformMapNode)
+  // Hash the property values. If the values are different, then rendering is required.
+  uint64_t                      hash           = 0xc70f6907UL;
+  const SceneGraph::UniformMap& uniformMapNode = node->GetNodeUniformMap();
+  for(uint32_t i = 0u, count = uniformMapNode.Count(); i < count; ++i)
   {
-    hash = uniformProperty.propertyPtr->Hash(bufferIndex, hash);
+    hash = uniformMapNode[i].propertyPtr->Hash(bufferIndex, hash);
   }
 
   const SceneGraph::UniformMapDataProvider& uniformMapDataProvider = mRenderDataProvider->GetUniformMapDataProvider();
-  const SceneGraph::CollectedUniformMap&    uniformMap             = uniformMapDataProvider.GetUniformMap(bufferIndex);
-  for(const auto& uniformProperty : uniformMap)
+  const SceneGraph::CollectedUniformMap&    collectedUniformMap    = uniformMapDataProvider.GetCollectedUniformMap();
+  for(uint32_t i = 0u, count = collectedUniformMap.Count(); i < count; ++i)
   {
-    hash = uniformProperty.propertyPtr->Hash(bufferIndex, hash);
+    hash = collectedUniformMap.mUniformMap[i].propertyPtr->Hash(bufferIndex, hash);
   }
 
   if(mUniformsHash != hash)
