@@ -516,6 +516,9 @@ private:
   Render::PipelineCache* mPipelineCache{nullptr};
 
   using Hash = unsigned long;
+
+  typedef const float&(PropertyInputImpl::*FuncGetter )(BufferIndex) const;
+
   struct UniformIndexMap
   {
     ConstString              uniformName;            ///< The uniform name
@@ -523,6 +526,11 @@ private:
     Hash                     uniformNameHash{0u};
     Hash                     uniformNameHashNoArray{0u};
     int32_t                  arrayIndex{-1}; ///< The array index
+
+    int16_t                  uniformLocation{0u};
+    uint16_t                 uniformOffset{0u};
+    uint16_t                 uniformSize{0u};
+    FuncGetter               uniformFunc{0};
   };
 
   using UniformIndexMappings = Dali::Vector<UniformIndexMap>;
