@@ -382,7 +382,15 @@ void RenderManager::AddGeometry(OwnerPointer<Render::Geometry>& geometry)
 
 void RenderManager::RemoveGeometry(Render::Geometry* geometry)
 {
-  mImpl->geometryContainer.EraseObject(geometry);
+  auto it = std::find_if( mImpl->geometryContainer.begin(), mImpl->geometryContainer.end(),[geometry]( auto& item )
+  {
+    return geometry == item;
+  });
+
+  if(it != mImpl->geometryContainer.end())
+  {
+    mImpl->geometryContainer.Erase(it);
+  }
 }
 
 void RenderManager::AttachVertexBuffer(Render::Geometry* geometry, Render::VertexBuffer* vertexBuffer)
@@ -459,43 +467,9 @@ void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear
     DALI_LOG_INFO(gLogFilter, Debug::General, "Render: Processing\n");
 
     // Upload the geometries
-    for(auto& i : mImpl->sceneContainer)
+    for(auto&& geom : mImpl->geometryContainer)
     {
-      RenderInstructionContainer& instructions = i->GetRenderInstructions();
-      for(uint32_t j = 0; j < instructions.Count(mImpl->renderBufferIndex); ++j)
-      {
-        RenderInstruction& instruction = instructions.At(mImpl->renderBufferIndex, j);
-
-        const Matrix* viewMatrix       = instruction.GetViewMatrix(mImpl->renderBufferIndex);
-        const Matrix* projectionMatrix = instruction.GetProjectionMatrix(mImpl->renderBufferIndex);
-
-        DALI_ASSERT_DEBUG(viewMatrix);
-        DALI_ASSERT_DEBUG(projectionMatrix);
-
-        if(viewMatrix && projectionMatrix)
-        {
-          const RenderListContainer::SizeType renderListCount = instruction.RenderListCount();
-
-          // Iterate through each render list.
-          for(RenderListContainer::SizeType index = 0; index < renderListCount; ++index)
-          {
-            const RenderList* renderList = instruction.GetRenderList(index);
-
-            if(renderList && !renderList->IsEmpty())
-            {
-              const std::size_t itemCount = renderList->Count();
-              for(uint32_t itemIndex = 0u; itemIndex < itemCount; ++itemIndex)
-              {
-                const RenderItem& item = renderList->GetItem(itemIndex);
-                if(DALI_LIKELY(item.mRenderer))
-                {
-                  item.mRenderer->Upload();
-                }
-              }
-            }
-          }
-        }
-      }
+      geom->Upload( mImpl->graphicsController );
     }
   }
 }

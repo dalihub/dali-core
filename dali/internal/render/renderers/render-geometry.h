@@ -86,7 +86,7 @@ public:
    * Check if the attributes for the geometry have changed
    * @return True if vertex buffers have been added or removed since last frame, false otherwise
    */
-  [[nodiscard]] bool AttributesChanged() const
+  [[maybe_unused]] [[nodiscard]] bool AttributesChanged() const
   {
     return mAttributesChanged;
   }
