@@ -2835,50 +2835,6 @@ int UtcDaliPanGestureNoTimeDiff(void)
   END_TEST;
 }
 
-int UtcDaliPanGestureInterruptedWhenTouchConsumed(void)
-{
-  TestApplication application;
-
-  Actor actor = Actor::New();
-  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
-  application.GetScene().Add(actor);
-
-  bool                           consume = false;
-  TouchEventFunctorConsumeSetter touchFunctor(consume);
-  actor.TouchedSignal().Connect(&application, touchFunctor);
-
-  // Render and notify
-  application.SendNotification();
-  application.Render();
-
-  SignalData             data;
-  GestureReceivedFunctor functor(data);
-
-  PanGestureDetector detector = PanGestureDetector::New();
-  detector.Attach(actor);
-  detector.DetectedSignal().Connect(&application, functor);
-
-  // Start gesture within the actor's area, we should receive the pan as the touch is NOT being consumed
-  uint32_t time = 100;
-  TestStartPan(application, Vector2(10.0f, 20.0f), Vector2(26.0f, 20.0f), time);
-
-  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(GestureState::STARTED, data.receivedGesture.GetState(), TEST_LOCATION);
-  data.Reset();
-
-  // Continue the gesture within the actor's area, but now the touch consumes thus cancelling the gesture
-  consume = true;
-
-  TestMovePan(application, Vector2(26.0f, 4.0f), time);
-  time += TestGetFrameInterval();
-
-  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(GestureState::CANCELLED, data.receivedGesture.GetState(), TEST_LOCATION);
-
-  END_TEST;
-}
-
 int UtcDaliPanGestureDisableDetectionDuringPanN(void)
 {
   // Crash occurred when gesture-recognizer was deleted internally during a signal when the attached actor was detached

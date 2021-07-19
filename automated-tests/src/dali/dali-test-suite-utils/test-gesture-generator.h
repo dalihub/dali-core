@@ -2,7 +2,7 @@
 #define DALI_TEST_GESTURE_GENERATOR_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,6 +92,11 @@ void TestMovePan(TestApplication& application, Vector2 pos, uint32_t time = 400)
  * End a pan gesture at position pos
  */
 void TestEndPan(TestApplication& application, Vector2 pos, uint32_t time = 500);
+
+/**
+ * Triggers the timer to begin a tap gesture
+ */
+void TestTriggerTap(TestApplication& application);
 
 /**
  * Produces a single point tap gesture with a 20ms interval

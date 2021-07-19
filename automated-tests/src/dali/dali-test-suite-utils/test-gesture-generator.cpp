@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -149,16 +149,23 @@ void TestEndPan(TestApplication& application, Vector2 pos, uint32_t time)
   application.ProcessEvent(GenerateSingleTouch(PointState::UP, pos, time));
 }
 
+void TestTriggerTap(TestApplication& application)
+{
+  application.GetPlatform().TriggerTimer();
+}
+
 void TestGenerateTap(TestApplication& application, float x, float y, uint32_t time_down)
 {
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(x, y), time_down));
   application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(x, y), time_down + 20));
+  TestTriggerTap(application);
 }
 
 void TestGenerateTwoPointTap(TestApplication& application, float x1, float y1, float x2, float y2, uint32_t time_down)
 {
   application.ProcessEvent(GenerateDoubleTouch(PointState::DOWN, Vector2(x1, y1), PointState::DOWN, Vector2(x2, y2), time_down));
   application.ProcessEvent(GenerateDoubleTouch(PointState::UP, Vector2(x1, y1), PointState::UP, Vector2(x2, y2), time_down + 20));
+  TestTriggerTap(application);
 }
 
 void TestGenerateRotation(TestApplication& application)

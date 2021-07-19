@@ -433,12 +433,6 @@ public: // From UniformMapDataProvider
 
   void SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, uint32_t size);
 
-  /**
-   * Temporary fix to age mRegenerateUniformMap from render side.
-   * (aging should only be done if renderer is visible, not when PrepareRender is called)
-   */
-  void AgeUniformMap();
-
 private:
   /**
    * Protected constructor; See also Renderer::New()

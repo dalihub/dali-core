@@ -117,6 +117,12 @@ private:
    */
   void ProcessEvent(TapGestureEvent& event);
 
+  /**
+   * Timer Callback
+   * @return will return false; one-shot timer.
+   */
+  bool TimerCallback();
+
 private:
   // Reference to the gesture processor for this recognizer
   Observer& mObserver;
@@ -141,8 +147,11 @@ private:
   Vector2  mTouchPosition; ///< The initial touch down position.
   uint32_t mTouchTime;     ///< The initial touch down time.
   uint32_t mLastTapTime;   ///< Time last tap gesture was registered
+  uint32_t mEventTime;     ///< The touch event time.
 
   GestureSourceType mGestureSourceType; /// < Gesture input source type value.
+
+  uint32_t mTimerId;
 };
 
 } // namespace Internal
