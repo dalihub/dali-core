@@ -698,21 +698,43 @@ void Renderer::FillUniformBuffer(Program&                                      p
         iter != end;
         ++iter)
     {
-      // @todo This means parsing the uniform string every frame. Instead, store the array index if present.
-      int arrayIndex = (*iter).arrayIndex;
+      auto& uniform = *iter;
+      int arrayIndex = uniform.arrayIndex;
 
-      auto uniformInfo  = Graphics::UniformInfo{};
-      auto uniformFound = program.GetUniform((*iter).uniformName.GetCString(),
-                                             (*iter).uniformNameHashNoArray ? (*iter).uniformNameHashNoArray
-                                                                            : (*iter).uniformNameHash,
-                                             uniformInfo);
-
-      if(uniformFound)
+      if(!uniform.uniformFunc)
       {
-        auto dst = ubo.GetOffset() + uniformInfo.offset;
-        const auto typeSize = GetPropertyValueSizeForUniform( (*iter).propertyValue->GetType() );
-        const auto dest = dst + static_cast<uint32_t>(typeSize) * arrayIndex;
-        const auto func = GetPropertyValueGetter((*iter).propertyValue->GetType());
+        auto uniformInfo  = Graphics::UniformInfo{};
+        auto uniformFound = program.GetUniform(uniform.uniformName.GetCString(),
+                                               uniform.uniformNameHashNoArray ? uniform.uniformNameHashNoArray
+                                                                              : uniform.uniformNameHash,
+                                               uniformInfo);
+
+        uniform.uniformOffset   = uniformInfo.offset;
+        uniform.uniformLocation = uniformInfo.location;
+
+        if (uniformFound)
+        {
+          auto       dst      = ubo.GetOffset() + uniformInfo.offset;
+          const auto typeSize = GetPropertyValueSizeForUniform((*iter).propertyValue->GetType());
+          const auto dest     = dst + static_cast<uint32_t>(typeSize) * arrayIndex;
+          const auto func     = GetPropertyValueGetter((*iter).propertyValue->GetType());
+
+          ubo.Write(&((*iter).propertyValue->*func)(updateBufferIndex),
+                    typeSize,
+                    dest);
+
+          uniform.uniformSize = typeSize;
+          uniform.uniformFunc = func;
+        }
+      }
+      else
+      {
+        auto       dst      = ubo.GetOffset() + uniform.uniformOffset;
+        const auto typeSize = uniform.uniformSize;
+        const auto dest     = dst + static_cast<uint32_t>(typeSize) * arrayIndex;
+        const auto func     = uniform.uniformFunc;
+
+
         ubo.Write(&((*iter).propertyValue->*func)(updateBufferIndex),
                   typeSize,
                   dest);
