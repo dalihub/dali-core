@@ -22,6 +22,7 @@
 #include <dali/internal/common/internal-constants.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>
+#include <dali/internal/render/data-providers/render-data-provider.h>
 #include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/renderers/render-geometry.h>
 #include <dali/internal/render/shaders/program.h>
@@ -131,7 +132,6 @@ Renderer::Renderer()
   mTextureSet(nullptr),
   mGeometry(nullptr),
   mShader(nullptr),
-  mRenderDataProvider(nullptr),
   mBlendColor(nullptr),
   mStencilParameters(RenderMode::AUTO, StencilFunction::ALWAYS, 0xFF, 0x00, 0xFF, StencilOperation::KEEP, StencilOperation::KEEP, StencilOperation::KEEP),
   mIndexedDrawFirstElement(0u),
@@ -160,7 +160,6 @@ Renderer::~Renderer()
 {
   if(mTextureSet)
   {
-    mTextureSet->RemoveObserver(this);
     mTextureSet = nullptr;
   }
   if(mShader)
@@ -378,16 +377,18 @@ void Renderer::SetTextures(TextureSet* textureSet)
 {
   DALI_ASSERT_DEBUG(textureSet != NULL && "Texture set pointer is NULL");
 
-  if(mTextureSet)
-  {
-    mTextureSet->RemoveObserver(this);
-  }
-
-  mTextureSet = textureSet;
-  mTextureSet->AddObserver(this);
+  mTextureSet           = textureSet;
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
+}
 
-  UpdateTextureSet();
+const Vector<Render::Texture*>* Renderer::GetTextures() const
+{
+  return mTextureSet ? &(mTextureSet->GetTextures()) : nullptr;
+}
+
+const Vector<Render::Sampler*>* Renderer::GetSamplers() const
+{
+  return mTextureSet ? &(mTextureSet->GetSamplers()) : nullptr;
 }
 
 void Renderer::SetShader(Shader* shader)
@@ -403,11 +404,6 @@ void Renderer::SetShader(Shader* shader)
   mShader->AddConnectionObserver(*this);
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
   mResendFlag |= RESEND_GEOMETRY | RESEND_SHADER;
-
-  if(mRenderDataProvider)
-  {
-    mRenderDataProvider->mShader = mShader;
-  }
 }
 
 void Renderer::SetGeometry(Render::Geometry* geometry)
@@ -636,10 +632,7 @@ void Renderer::ConnectToSceneGraph(SceneController& sceneController, BufferIndex
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
   mSceneController      = &sceneController;
 
-  mRenderDataProvider                          = new RenderDataProvider(mOpacity);
-  mRenderDataProvider->mUniformMapDataProvider = this;
-
-  mRenderer = Render::Renderer::New(mRenderDataProvider, mGeometry, mBlendBitmask, GetBlendColor(), static_cast<FaceCullingMode::Type>(mFaceCullingMode), mPremultipledAlphaEnabled, mDepthWriteMode, mDepthTestMode, mDepthFunction, mStencilParameters);
+  mRenderer = Render::Renderer::New(this, mGeometry, mBlendBitmask, GetBlendColor(), static_cast<FaceCullingMode::Type>(mFaceCullingMode), mPremultipledAlphaEnabled, mDepthWriteMode, mDepthTestMode, mDepthFunction, mStencilParameters);
 
   OwnerPointer<Render::Renderer> transferOwnership(mRenderer);
   mSceneController->GetRenderMessageDispatcher().AddRenderer(transferOwnership);
@@ -654,31 +647,7 @@ void Renderer::DisconnectFromSceneGraph(SceneController& sceneController, Buffer
     mSceneController->GetRenderMessageDispatcher().RemoveRenderer(*mRenderer);
     mRenderer = nullptr;
   }
-  mSceneController    = nullptr;
-  mRenderDataProvider = nullptr;
-}
-
-void Renderer::UpdateTextureSet()
-{
-  if(mRenderDataProvider)
-  {
-    if(mTextureSet)
-    {
-      uint32_t textureCount = mTextureSet->GetTextureCount();
-      mRenderDataProvider->mTextures.resize(textureCount);
-      mRenderDataProvider->mSamplers.resize(textureCount);
-      for(uint32_t i = 0; i < textureCount; ++i)
-      {
-        mRenderDataProvider->mTextures[i] = mTextureSet->GetTexture(i);
-        mRenderDataProvider->mSamplers[i] = mTextureSet->GetTextureSampler(i);
-      }
-    }
-    else
-    {
-      mRenderDataProvider->mTextures.clear();
-      mRenderDataProvider->mSamplers.clear();
-    }
-  }
+  mSceneController = nullptr;
 }
 
 Render::Renderer& Renderer::GetRenderer()
@@ -751,22 +720,6 @@ Renderer::OpacityType Renderer::GetOpacityType(BufferIndex updateBufferIndex, co
   }
 
   return opacityType;
-}
-
-void Renderer::TextureSetChanged()
-{
-  mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
-
-  UpdateTextureSet();
-}
-
-void Renderer::TextureSetDeleted()
-{
-  mTextureSet = nullptr;
-
-  mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
-
-  UpdateTextureSet();
 }
 
 void Renderer::ConnectionsChanged(PropertyOwner& object)

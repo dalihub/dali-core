@@ -76,47 +76,19 @@ public:
   bool HasAlpha() const;
 
   /**
-   * Adds a renderer to the Renderers list of the texture set.
-   * Renderers using the TextureSet get a notification when the texture set changes
-   *
-   * @param[in] renderer The renderer using the TextureSet
+   * Accessor for textures (used by RenderDataProvider impl)
    */
-  void AddObserver(Renderer* renderer);
-
-  /**
-   * Removes a renderer from the TextureSet renderers list
-   *
-   * @param[in] renderer The renderer no longer using the TextureSet
-   */
-  void RemoveObserver(Renderer* renderer);
-
-  /**
-   * Get the sampler of a texture in the TextureSet
-   * @param[in] index The index of the texture in the textures array
-   * @return the sampler used by the texture
-   */
-  Render::Sampler* GetTextureSampler(uint32_t index)
+  const Vector<Render::Texture*>& GetTextures()
   {
-    return mSamplers[index];
+    return mTextures;
   }
 
   /**
-   * Get the number of Textures in the texture set
-   * @return The number of Textures
+   * Accessor for samplers (used by RenderDataProvider impl)
    */
-  uint32_t GetTextureCount()
+  const Vector<Render::Sampler*>& GetSamplers()
   {
-    return static_cast<uint32_t>(mTextures.Size());
-  }
-
-  /**
-   * Get the pointer to  a Texture in the TextureSet
-   * @param[in] index The index of the texture in the textures array
-   * @return the pointer to the Texture in that position
-   */
-  Render::Texture* GetTexture(uint32_t index)
-  {
-    return mTextures[index];
+    return mSamplers;
   }
 
 private:
@@ -125,17 +97,10 @@ private:
    */
   TextureSet();
 
-  /**
-   * Helper method to notify the renderers observing the TextureSet
-   * that the TextureSet has changed
-   */
-  void NotifyChangeToRenderers();
-
-private:                               // Data
-  Vector<Render::Sampler*> mSamplers;  ///< List of samplers used by each texture. Not owned
-  Vector<Render::Texture*> mTextures;  ///< List of Textures. Not owned
-  Vector<Renderer*>        mRenderers; ///< List of renderers using the TextureSet
-  bool                     mHasAlpha;  ///< if any of the textures has an alpha channel
+private:                              // Data
+  Vector<Render::Sampler*> mSamplers; ///< List of samplers used by each texture. Not owned
+  Vector<Render::Texture*> mTextures; ///< List of Textures. Not owned
+  bool                     mHasAlpha; ///< if any of the textures has an alpha channel
 };
 
 inline void SetTextureMessage(EventThreadServices& eventThreadServices, const TextureSet& textureSet, uint32_t index, Render::Texture* texture)
