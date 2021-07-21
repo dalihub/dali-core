@@ -185,7 +185,7 @@ inline void AddRendererToRenderList(BufferIndex         updateBufferIndex,
 
       if(renderable.mRenderer)
       {
-        partialRenderingCacheInfo.textureSet = renderable.mRenderer->GetTextures();
+        partialRenderingCacheInfo.textureSet = renderable.mRenderer->GetTextureSet();
       }
 
       item.mNode     = renderable.mNode;
@@ -201,7 +201,7 @@ inline void AddRendererToRenderList(BufferIndex         updateBufferIndex,
       if(DALI_LIKELY(renderable.mRenderer))
       {
         item.mRenderer   = &renderable.mRenderer->GetRenderer();
-        item.mTextureSet = renderable.mRenderer->GetTextures();
+        item.mTextureSet = renderable.mRenderer->GetTextureSet();
         item.mDepthIndex += renderable.mRenderer->GetDepthIndex();
       }
       else

@@ -106,7 +106,6 @@ SET( internal_src_files
   ${internal_src_dir}/render/common/render-item.cpp
   ${internal_src_dir}/render/common/render-tracker.cpp
   ${internal_src_dir}/render/common/render-manager.cpp
-  ${internal_src_dir}/render/data-providers/render-data-provider.cpp
   ${internal_src_dir}/render/queue/render-queue.cpp
   ${internal_src_dir}/render/renderers/gpu-buffer.cpp
   ${internal_src_dir}/render/renderers/pipeline-cache.cpp

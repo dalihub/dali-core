@@ -50,72 +50,41 @@ class Renderer;
  */
 class RenderDataProvider
 {
-public:
-  using Samplers = std::vector<Render::Sampler*>;
-
-  /**
-   * Constructor.
-   * The RendererAttachment that creates this object will initialize the members
-   * directly.
-   */
-  explicit RenderDataProvider(AnimatableProperty<float>& opacity);
-
+protected:
   /**
    * Destructor
    */
-  ~RenderDataProvider();
+  virtual ~RenderDataProvider() = default;
 
 public:
   /**
-   * Set the uniform map data provider
-   * @param[in] uniformMapDataProvider The uniform map data provider
-   */
-  void SetUniformMap(const UniformMapDataProvider& uniformMapDataProvider);
-
-  /**
    * Get the uniform map data provider
    */
-  [[nodiscard]] const UniformMapDataProvider& GetUniformMap() const;
-
-  /**
-   * Set the shader data provider
-   * @param[in] shader The shader data provider
-   */
-  void SetShader(Shader& shader);
+  virtual const UniformMapDataProvider& GetUniformMapDataProvider() const = 0;
 
   /**
    * Returns the shader
    * @return The shader
    */
-  [[nodiscard]] Shader& GetShader() const;
+  virtual const Shader& GetShader() const = 0;
 
   /**
    * Returns the list of samplers
    * @return The list of samplers
    */
-  Samplers& GetSamplers();
+  virtual const Dali::Vector<Render::Sampler*>* GetSamplers() const = 0;
 
   /**
    * Returns the list of Textures
    * @return The list of Textures
    */
-  std::vector<Render::Texture*>& GetTextures();
+  virtual const Dali::Vector<Render::Texture*>* GetTextures() const = 0;
 
   /**
    * Get the opacity
    * @return The opacity
    */
-  float GetOpacity(BufferIndex bufferIndex);
-
-private:
-  const UniformMapDataProvider* mUniformMapDataProvider;
-  Shader*                       mShader;
-  std::vector<Render::Texture*> mTextures;
-  Samplers                      mSamplers;
-  AnimatableProperty<float>&    mOpacity;
-
-  // Give Renderer access to our private data to reduce copying vectors on construction.
-  friend class Renderer;
+  virtual float GetOpacity(BufferIndex bufferIndex) const = 0;
 };
 
 } // namespace SceneGraph

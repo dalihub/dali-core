@@ -54,6 +54,7 @@ class Geometry;
 
 class Renderer : public PropertyOwner,
                  public UniformMapDataProvider,
+                 public RenderDataProvider,
                  public UniformMap::Observer,
                  public ConnectionChangePropagator::Observer
 {
@@ -87,14 +88,20 @@ public:
    */
   void SetTextures(TextureSet* textureSet);
 
-  /**
-   * Returns current texture set object
-   * @return Pointer to the texture set
-   */
-  const TextureSet* GetTextures() const
+  const SceneGraph::TextureSet* GetTextureSet() const
   {
     return mTextureSet;
   }
+
+  /**
+   * @copydoc RenderDataProvider::GetTextures()
+   */
+  const Vector<Render::Texture*>* GetTextures() const override;
+
+  /**
+   * @copydoc RenderDataProvider::GetSamplers()
+   */
+  const Vector<Render::Sampler*>* GetSamplers() const override;
 
   /**
    * Set the shader for the renderer
@@ -103,10 +110,9 @@ public:
   void SetShader(Shader* shader);
 
   /**
-   * Get the shader used by this renderer
-   * @return the shader this renderer uses
+   * @copydoc RenderDataProvider::GetShader()
    */
-  const Shader& GetShader() const
+  const Shader& GetShader() const override
   {
     return *mShader;
   }
@@ -314,11 +320,9 @@ public:
   void BakeOpacity(BufferIndex updateBufferIndex, float opacity);
 
   /**
-   * Gets the opacity
-   * @param[in] bufferIndex The buffer to read from.
-   * @return The opacity
+   * @copydoc RenderDataProvider::GetOpacity()
    */
-  float GetOpacity(BufferIndex updateBufferIndex) const;
+  float GetOpacity(BufferIndex updateBufferIndex) const override;
 
   /**
    * Sets the rendering behavior
@@ -354,16 +358,6 @@ public:
   OpacityType GetOpacityType(BufferIndex updateBufferIndex, const Node& node) const;
 
   /**
-   * Called by the TextureSet to notify to the renderer that it has changed
-   */
-  void TextureSetChanged();
-
-  /**
-   * Called by the TextureSet to notify to the renderer that it is about to be deleted
-   */
-  void TextureSetDeleted();
-
-  /**
    * Connect the object to the scene graph
    *
    * @param[in] sceneController The scene controller - used for sending messages to render thread
@@ -377,6 +371,14 @@ public:
    * @param[in] bufferIndex The current buffer index - used for sending messages to render thread
    */
   void DisconnectFromSceneGraph(SceneController& sceneController, BufferIndex bufferIndex);
+
+  /**
+   * @copydoc RenderDataProvider::GetUniformMapDataProvider()
+   */
+  const UniformMapDataProvider& GetUniformMapDataProvider() const override
+  {
+    return *this;
+  };
 
 public: // Implementation of ConnectionChangePropagator
   /**
@@ -439,21 +441,15 @@ private:
    */
   Renderer();
 
-  /**
-   * Update texture set to the render data provider
-   */
-  void UpdateTextureSet();
-
 private:
   CollectedUniformMap mCollectedUniformMap[2]; ///< Uniform maps collected by the renderer
 
-  SceneController*      mSceneController;    ///< Used for initializing renderers
-  Render::Renderer*     mRenderer;           ///< Raw pointer to the renderer (that's owned by RenderManager)
-  TextureSet*           mTextureSet;         ///< The texture set this renderer uses. (Not owned)
-  Render::Geometry*     mGeometry;           ///< The geometry this renderer uses. (Not owned)
-  Shader*               mShader;             ///< The shader this renderer uses. (Not owned)
-  RenderDataProvider*   mRenderDataProvider; ///< The render data provider
-  OwnerPointer<Vector4> mBlendColor;         ///< The blend color for blending operation
+  SceneController*      mSceneController; ///< Used for initializing renderers
+  Render::Renderer*     mRenderer;        ///< Raw pointer to the renderer (that's owned by RenderManager)
+  TextureSet*           mTextureSet;      ///< The texture set this renderer uses. (Not owned)
+  Render::Geometry*     mGeometry;        ///< The geometry this renderer uses. (Not owned)
+  Shader*               mShader;          ///< The shader this renderer uses. (Not owned)
+  OwnerPointer<Vector4> mBlendColor;      ///< The blend color for blending operation
 
   Dali::Internal::Render::Renderer::StencilParameters mStencilParameters; ///< Struct containing all stencil related options
 
