@@ -122,13 +122,13 @@ public:
    * @param[in] updated The updated flag
    * (used for partial rendering to mark an animating sub tree for example).
    */
-  void SetUpdated(bool updated) override
+  void SetUpdatedTree(bool updated)
   {
     mUpdated = updated;
 
     for(Node* child : mChildren)
     {
-      child->SetUpdated(updated);
+      child->SetUpdatedTree(updated);
     }
   }
 

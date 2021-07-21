@@ -118,7 +118,7 @@ bool AddRenderablesForTask(BufferIndex updateBufferIndex,
   if(!node.GetPartialRenderingData().mVisible)
   {
     node.GetPartialRenderingData().mVisible = true;
-    node.SetUpdated(true);
+    node.SetUpdatedTree(true);
   }
 
   // Check whether node is exclusive to a different render-task
