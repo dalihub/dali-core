@@ -83,6 +83,23 @@ public:
     mCallStack.PushCall("GetCustomFragmentPrefix", "");
     return "#extension GL_OES_EGL_image_external:require\n";
   };
+  inline virtual bool ApplyNativeFragmentShader(std::string& shader)
+  {
+    mCallStack.PushCall("ApplyNativeFragmentShader", "");
+    shader = "#extension GL_OES_EGL_image_external:require\n" + shader;
+
+    //Get custom sampler type name
+    const char* customSamplerTypename = GetCustomSamplerTypename();
+    if(customSamplerTypename)
+    {
+      size_t samplerPosition = shader.find("sampler2D");
+      if(samplerPosition != std::string::npos)
+      {
+        shader.replace(samplerPosition, strlen("sampler2D"), customSamplerTypename);
+      }
+    }
+    return true;
+  };
   inline const char* GetCustomSamplerTypename() const override
   {
     mCallStack.PushCall("GetCustomSamplerTypename", "");
