@@ -334,6 +334,11 @@ const PanGestureProcessor& GestureEventProcessor::GetPanGestureProcessor()
   return mPanGestureProcessor;
 }
 
+void GestureEventProcessor::SetTapMaximumAllowedTime(uint32_t time)
+{
+  mTapGestureProcessor.SetMaximumAllowedTime(time);
+}
+
 } // namespace Internal
 
 } // namespace Dali

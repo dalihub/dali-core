@@ -148,6 +148,12 @@ void SetLongPressMinimumHoldingTime(unsigned int value)
   eventProcessor.SetLongPressMinimumHoldingTime(value);
 }
 
+void SetTapMaximumAllowedTime(uint32_t time)
+{
+  GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
+  eventProcessor.SetTapMaximumAllowedTime(time);
+}
+
 } // namespace Integration
 
 } // namespace Dali

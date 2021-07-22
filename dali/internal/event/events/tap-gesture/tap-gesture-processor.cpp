@@ -41,6 +41,8 @@ namespace Internal
 {
 namespace
 {
+constexpr uint32_t DEFAULT_MAXIMUM_ALLOWED_TIME = 500u;
+
 /**
  * Creates a TapGesture and asks the specified detector to emit its detected signal.
  * @param[in]  actor             The actor on which a tap has occurred.
@@ -80,7 +82,8 @@ TapGestureProcessor::TapGestureProcessor()
   mMinTouchesRequired(1),
   mMaxTouchesRequired(1),
   mCurrentTapEvent(nullptr),
-  mPossibleProcessed(false)
+  mPossibleProcessed(false),
+  mMaximumAllowedTime(DEFAULT_MAXIMUM_ALLOWED_TIME)
 {
 }
 
@@ -180,7 +183,7 @@ void TapGestureProcessor::AddGestureDetector(TapGestureDetector* gestureDetector
     request.maxTouches = mMaxTouchesRequired;
 
     Size size          = scene.GetSize();
-    mGestureRecognizer = new TapGestureRecognizer(*this, Vector2(size.width, size.height), static_cast<const TapGestureRequest&>(request));
+    mGestureRecognizer = new TapGestureRecognizer(*this, Vector2(size.width, size.height), static_cast<const TapGestureRequest&>(request), mMaximumAllowedTime);
   }
   else
   {
@@ -240,6 +243,28 @@ void TapGestureProcessor::GestureDetectorUpdated(TapGestureDetector* gestureDete
   DALI_ASSERT_ALWAYS(minTapsRequired <= maxTapsRequired && "Minimum taps requested is greater than the maximum requested");
 
   UpdateDetection();
+}
+
+void TapGestureProcessor::SetMaximumAllowedTime(uint32_t time)
+{
+  if(time == 0u)
+  {
+    DALI_LOG_WARNING("MaximumAllowedTime must be greater than zero.");
+    return;
+  }
+  if(mMaximumAllowedTime != time)
+  {
+    mMaximumAllowedTime = time;
+
+    if(mGestureRecognizer)
+    {
+      TapGestureRecognizer* tapRecognizer = dynamic_cast<TapGestureRecognizer*>(mGestureRecognizer.Get());
+      if(tapRecognizer)
+      {
+        tapRecognizer->SetMaximumAllowedTime(time);
+      }
+    }
+  }
 }
 
 void TapGestureProcessor::UpdateDetection()

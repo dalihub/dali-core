@@ -36,11 +36,10 @@ namespace Internal
 namespace
 {
 // TODO: Set these according to DPI
-const float         MAXIMUM_MOTION_ALLOWED = 20.0f;
-const unsigned long MAXIMUM_TIME_ALLOWED   = 500u;
+constexpr float MAXIMUM_MOTION_ALLOWED = 20.0f;
 } // unnamed namespace
 
-TapGestureRecognizer::TapGestureRecognizer(Observer& observer, Vector2 screenSize, const TapGestureRequest& request)
+TapGestureRecognizer::TapGestureRecognizer(Observer& observer, Vector2 screenSize, const TapGestureRequest& request, uint32_t maximumAllowedTime)
 : GestureRecognizer(screenSize, GestureType::TAP),
   mObserver(observer),
   mState(CLEAR),
@@ -50,7 +49,8 @@ TapGestureRecognizer::TapGestureRecognizer(Observer& observer, Vector2 screenSiz
   mTouchPosition(),
   mTouchTime(0u),
   mLastTapTime(0u),
-  mGestureSourceType(GestureSourceType::INVALID)
+  mGestureSourceType(GestureSourceType::INVALID),
+  mMaximumAllowedTime(maximumAllowedTime)
 {
 }
 
@@ -112,7 +112,7 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
 
         if(pointState == PointState::UP)
         {
-          if(deltaBetweenTouchDownTouchUp < MAXIMUM_TIME_ALLOWED)
+          if(deltaBetweenTouchDownTouchUp < mMaximumAllowedTime)
           {
             mLastTapTime = mTouchTime;
             EmitSingleTap(event.time, point);
@@ -137,12 +137,12 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
           // This is a possible multiple tap, so has it been quick enough?
           uint32_t timeDelta                    = event.time - mLastTapTime;
           uint32_t deltaBetweenTouchDownTouchUp = event.time - mTouchTime;
-          if(timeDelta > MAXIMUM_TIME_ALLOWED) // If exceeded time between taps then just a single tap
+          if(timeDelta > mMaximumAllowedTime) // If exceeded time between taps then just a single tap
           {
             mLastTapTime = event.time;
             EmitSingleTap(event.time, point);
           }
-          else if(deltaBetweenTouchDownTouchUp < MAXIMUM_TIME_ALLOWED)
+          else if(deltaBetweenTouchDownTouchUp < mMaximumAllowedTime)
           {
             ++mTapsRegistered;
             EmitGesture(GestureState::STARTED, event.time);
@@ -162,7 +162,7 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
 
           if(distanceDelta.x > MAXIMUM_MOTION_ALLOWED ||
              distanceDelta.y > MAXIMUM_MOTION_ALLOWED ||
-             timeDelta > MAXIMUM_TIME_ALLOWED)
+             timeDelta > mMaximumAllowedTime)
           {
             SetupForTouchDown(event, point);
           }
@@ -218,6 +218,11 @@ void TapGestureRecognizer::Update(const GestureRequest& request)
 
   mMinimumTapsRequired = tap.minTaps;
   mMaximumTapsRequired = tap.maxTaps;
+}
+
+void TapGestureRecognizer::SetMaximumAllowedTime(uint32_t time)
+{
+  mMaximumAllowedTime = time;
 }
 
 void TapGestureRecognizer::EmitGesture(GestureState state, uint32_t time)

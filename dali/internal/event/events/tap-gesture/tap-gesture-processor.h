@@ -84,6 +84,13 @@ public: // To be called by GestureEventProcessor
    */
   void GestureDetectorUpdated(TapGestureDetector* gestureDetector);
 
+  /**
+   * @brief This method sets the maximum allowed time required to be recognized as a multi tap gesture (millisecond)
+   *
+   * @param[in] time The time value in milliseconds
+   */
+  void SetMaximumAllowedTime(uint32_t time);
+
 private:
   // Undefined
   TapGestureProcessor(const TapGestureProcessor&);
@@ -126,6 +133,8 @@ private:
   ActorObserver          mCurrentTapActor;   ///< Observer for the current gesture actor
   const TapGestureEvent* mCurrentTapEvent;   ///< Pointer to current TapEvent, used when calling ProcessAndEmit()
   bool                   mPossibleProcessed; ///< Indication of whether we've processed a touch down for this gestuee
+
+  uint32_t mMaximumAllowedTime; ///< The maximum allowed time required to be recognized as a multi tap gesture (millisecond)
 };
 
 } // namespace Internal

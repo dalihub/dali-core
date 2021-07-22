@@ -51,8 +51,9 @@ public:
    * @param[in] coreEventInterface Used to send events to Core.
    * @param[in]  screenSize  The size of the screen.
    * @param[in]  request     The tap gesture request.
+   * @param[in]  maximumAllowedTime    The maximum allowed time required in milliseconds.
    */
-  TapGestureRecognizer(Observer& observer, Vector2 screenSize, const TapGestureRequest& request);
+  TapGestureRecognizer(Observer& observer, Vector2 screenSize, const TapGestureRequest& request, uint32_t maximumAllowedTime);
 
   /**
    * Virtual destructor.
@@ -69,6 +70,13 @@ public:
    * @copydoc Dali::Internal::GestureDetector::Update(const Integration::GestureRequest&)
    */
   void Update(const GestureRequest& request) override;
+
+  /**
+   * @brief This method sets the maximum allowed time required to be recognized as a multi tap gesture (millisecond)
+   *
+   * @param[in] time The time value in milliseconds
+   */
+  void SetMaximumAllowedTime(uint32_t time);
 
 private:
   /**
@@ -142,7 +150,8 @@ private:
   uint32_t mTouchTime;     ///< The initial touch down time.
   uint32_t mLastTapTime;   ///< Time last tap gesture was registered
 
-  GestureSourceType mGestureSourceType; /// < Gesture input source type value.
+  GestureSourceType mGestureSourceType;  /// < Gesture input source type value.
+  uint32_t          mMaximumAllowedTime; ///< The maximum allowed time required to be recognized as a multi tap gesture (millisecond)
 };
 
 } // namespace Internal
