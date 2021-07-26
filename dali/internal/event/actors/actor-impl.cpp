@@ -1457,7 +1457,7 @@ void Actor::UnparentChildren()
   mParentImpl.UnparentChildren();
 }
 
-void Actor::ConnectToScene(uint32_t parentDepth)
+void Actor::ConnectToScene(uint32_t parentDepth, bool notify)
 {
   // This container is used instead of walking the Actor hierarchy.
   // It protects us when the Actor hierarchy is modified during OnSceneConnectionExternal callbacks.
@@ -1474,7 +1474,7 @@ void Actor::ConnectToScene(uint32_t parentDepth)
   // Notify applications about the newly connected actors.
   for(const auto& actor : connectionList)
   {
-    actor->NotifyStageConnection();
+    actor->NotifyStageConnection(notify);
   }
 
   RelayoutRequest();
@@ -1526,19 +1526,22 @@ void Actor::ConnectToSceneGraph()
   OnSceneObjectAdd();
 }
 
-void Actor::NotifyStageConnection()
+void Actor::NotifyStageConnection(bool notify)
 {
   // Actors can be removed (in a callback), before the on-stage stage is reported.
   // The actor may also have been reparented, in which case mOnSceneSignalled will be true.
   if(OnScene() && !mOnSceneSignalled)
   {
-    // Notification for external (CustomActor) derived classes
-    OnSceneConnectionExternal(mDepth);
-
-    if(!mOnSceneSignal.Empty())
+    if(notify)
     {
-      Dali::Actor handle(this);
-      mOnSceneSignal.Emit(handle);
+      // Notification for external (CustomActor) derived classes
+      OnSceneConnectionExternal(mDepth);
+
+      if(!mOnSceneSignal.Empty())
+      {
+        Dali::Actor handle(this);
+        mOnSceneSignal.Emit(handle);
+      }
     }
 
     // Guard against Remove during callbacks
@@ -1549,7 +1552,7 @@ void Actor::NotifyStageConnection()
   }
 }
 
-void Actor::DisconnectFromStage()
+void Actor::DisconnectFromStage(bool notify)
 {
   // This container is used instead of walking the Actor hierachy.
   // It protects us when the Actor hierachy is modified during OnSceneDisconnectionExternal callbacks.
@@ -1566,7 +1569,7 @@ void Actor::DisconnectFromStage()
   // Notify applications about the newly disconnected actors.
   for(const auto& actor : disconnectionList)
   {
-    actor->NotifyStageDisconnection();
+    actor->NotifyStageDisconnection(notify);
   }
 }
 
@@ -1603,20 +1606,23 @@ void Actor::DisconnectFromSceneGraph()
   OnSceneObjectRemove();
 }
 
-void Actor::NotifyStageDisconnection()
+void Actor::NotifyStageDisconnection(bool notify)
 {
   // Actors can be added (in a callback), before the off-stage state is reported.
   // Also if the actor was added & removed before mOnSceneSignalled was set, then we don't notify here.
   // only do this step if there is a stage, i.e. Core is not being shut down
   if(EventThreadServices::IsCoreRunning() && !OnScene() && mOnSceneSignalled)
   {
-    // Notification for external (CustomeActor) derived classes
-    OnSceneDisconnectionExternal();
-
-    if(!mOffSceneSignal.Empty())
+    if(notify)
     {
-      Dali::Actor handle(this);
-      mOffSceneSignal.Emit(handle);
+      // Notification for external (CustomeActor) derived classes
+      OnSceneDisconnectionExternal();
+
+      if(!mOffSceneSignal.Empty())
+      {
+        Dali::Actor handle(this);
+        mOffSceneSignal.Emit(handle);
+      }
     }
 
     // Guard against Add during callbacks
@@ -1836,7 +1842,7 @@ void Actor::LowerBelow(Internal::Actor& target)
   }
 }
 
-void Actor::SetParent(ActorParent* parent, bool keepOnScene)
+void Actor::SetParent(ActorParent* parent, bool notify)
 {
   if(parent)
   {
@@ -1847,10 +1853,10 @@ void Actor::SetParent(ActorParent* parent, bool keepOnScene)
     mScene             = parentActor->mScene;
 
     if(EventThreadServices::IsCoreRunning() && // Don't emit signals or send messages during Core destruction
-       parentActor->OnScene() && !keepOnScene)
+       parentActor->OnScene())
     {
       // Instruct each actor to create a corresponding node in the scene graph
-      ConnectToScene(parentActor->GetHierarchyDepth());
+      ConnectToScene(parentActor->GetHierarchyDepth(), notify);
     }
 
     // Resolve the name and index for the child properties if any
@@ -1863,13 +1869,13 @@ void Actor::SetParent(ActorParent* parent, bool keepOnScene)
     mParent = nullptr;
 
     if(EventThreadServices::IsCoreRunning() && // Don't emit signals or send messages during Core destruction
-       OnScene() && !keepOnScene)
+       OnScene())
     {
       // Disconnect the Node & its children from the scene-graph.
       DisconnectNodeMessage(GetEventThreadServices().GetUpdateManager(), GetNode());
 
       // Instruct each actor to discard pointers to the scene-graph
-      DisconnectFromStage();
+      DisconnectFromStage(notify);
     }
 
     mScene = nullptr;

@@ -35,13 +35,13 @@
 #include <dali/internal/render/common/render-instruction.h>
 #include <dali/internal/render/common/render-tracker.h>
 #include <dali/internal/render/queue/render-queue.h>
+#include <dali/internal/render/renderers/pipeline-cache.h>
 #include <dali/internal/render/renderers/render-frame-buffer.h>
 #include <dali/internal/render/renderers/render-texture.h>
 #include <dali/internal/render/renderers/shader-cache.h>
 #include <dali/internal/render/renderers/uniform-buffer-manager.h>
 #include <dali/internal/render/renderers/uniform-buffer-view-pool.h>
 #include <dali/internal/render/shaders/program-controller.h>
-#include <dali/internal/render/renderers/pipeline-cache.h>
 
 #include <memory>
 
@@ -125,7 +125,7 @@ struct RenderManager::Impl
     threadPool->Initialize(1u);
 
     uniformBufferManager = std::make_unique<Render::UniformBufferManager>(&graphicsController);
-    pipelineCache = std::make_unique<Render::PipelineCache>(graphicsController);
+    pipelineCache        = std::make_unique<Render::PipelineCache>(graphicsController);
   }
 
   ~Impl()
@@ -178,7 +178,7 @@ struct RenderManager::Impl
   Render::ShaderCache shaderCache;       ///< The cache for the graphics shaders
 
   std::unique_ptr<Render::UniformBufferManager> uniformBufferManager; ///< The uniform buffer manager
-  std::unique_ptr<Render::PipelineCache> pipelineCache;
+  std::unique_ptr<Render::PipelineCache>        pipelineCache;
 
   Integration::DepthBufferAvailable   depthBufferAvailable;   ///< Whether the depth buffer is available
   Integration::StencilBufferAvailable stencilBufferAvailable; ///< Whether the stencil buffer is available
@@ -224,8 +224,7 @@ void RenderManager::SetShaderSaver(ShaderSaver& upstream)
 void RenderManager::AddRenderer(OwnerPointer<Render::Renderer>& renderer)
 {
   // Initialize the renderer as we are now in render thread
-  renderer->Initialize(mImpl->graphicsController, mImpl->programController, mImpl->shaderCache, *(mImpl->uniformBufferManager.get()),
-                       *(mImpl->pipelineCache.get()));
+  renderer->Initialize(mImpl->graphicsController, mImpl->programController, mImpl->shaderCache, *(mImpl->uniformBufferManager.get()), *(mImpl->pipelineCache.get()));
 
   mImpl->rendererContainer.PushBack(renderer.Release());
 }
@@ -382,7 +381,14 @@ void RenderManager::AddGeometry(OwnerPointer<Render::Geometry>& geometry)
 
 void RenderManager::RemoveGeometry(Render::Geometry* geometry)
 {
-  mImpl->geometryContainer.EraseObject(geometry);
+  auto it = std::find_if(mImpl->geometryContainer.begin(), mImpl->geometryContainer.end(), [geometry](auto& item) {
+    return geometry == item;
+  });
+
+  if(it != mImpl->geometryContainer.end())
+  {
+    mImpl->geometryContainer.Erase(it);
+  }
 }
 
 void RenderManager::AttachVertexBuffer(Render::Geometry* geometry, Render::VertexBuffer* vertexBuffer)
@@ -459,43 +465,9 @@ void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear
     DALI_LOG_INFO(gLogFilter, Debug::General, "Render: Processing\n");
 
     // Upload the geometries
-    for(auto& i : mImpl->sceneContainer)
+    for(auto&& geom : mImpl->geometryContainer)
     {
-      RenderInstructionContainer& instructions = i->GetRenderInstructions();
-      for(uint32_t j = 0; j < instructions.Count(mImpl->renderBufferIndex); ++j)
-      {
-        RenderInstruction& instruction = instructions.At(mImpl->renderBufferIndex, j);
-
-        const Matrix* viewMatrix       = instruction.GetViewMatrix(mImpl->renderBufferIndex);
-        const Matrix* projectionMatrix = instruction.GetProjectionMatrix(mImpl->renderBufferIndex);
-
-        DALI_ASSERT_DEBUG(viewMatrix);
-        DALI_ASSERT_DEBUG(projectionMatrix);
-
-        if(viewMatrix && projectionMatrix)
-        {
-          const RenderListContainer::SizeType renderListCount = instruction.RenderListCount();
-
-          // Iterate through each render list.
-          for(RenderListContainer::SizeType index = 0; index < renderListCount; ++index)
-          {
-            const RenderList* renderList = instruction.GetRenderList(index);
-
-            if(renderList && !renderList->IsEmpty())
-            {
-              const std::size_t itemCount = renderList->Count();
-              for(uint32_t itemIndex = 0u; itemIndex < itemCount; ++itemIndex)
-              {
-                const RenderItem& item = renderList->GetItem(itemIndex);
-                if(DALI_LIKELY(item.mRenderer))
-                {
-                  item.mRenderer->Upload();
-                }
-              }
-            }
-          }
-        }
-      }
+      geom->Upload(mImpl->graphicsController);
     }
   }
 }
@@ -639,7 +611,7 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
                 (item.mNode->Updated() || (item.mRenderer && item.mRenderer->Updated(mImpl->renderBufferIndex, item.mNode)))))
             {
               item.mIsUpdated = false;
-              item.mNode->SetUpdated(false);
+              item.mNode->SetUpdatedTree(false);
 
               rect = item.CalculateViewportSpaceAABB(item.mUpdateSize, viewportRect.width, viewportRect.height);
               if(rect.IsValid() && rect.Intersect(viewportRect) && !rect.IsEmpty())

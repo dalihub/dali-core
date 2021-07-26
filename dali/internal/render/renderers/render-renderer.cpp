@@ -25,6 +25,7 @@
 #include <dali/internal/render/common/render-instruction.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>
 #include <dali/internal/render/data-providers/uniform-map-data-provider.h>
+#include <dali/internal/render/renderers/pipeline-cache.h>
 #include <dali/internal/render/renderers/render-sampler.h>
 #include <dali/internal/render/renderers/render-texture.h>
 #include <dali/internal/render/renderers/render-vertex-buffer.h>
@@ -34,14 +35,13 @@
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/shaders/render-shader.h>
 #include <dali/internal/update/common/uniform-map.h>
-#include <dali/internal/render/renderers/pipeline-cache.h>
 
 namespace Dali::Internal
 {
 namespace
 {
 // Helper to get the property value getter by type
-typedef const float&(PropertyInputImpl::*FuncGetter )(BufferIndex) const;
+typedef const float& (PropertyInputImpl::*FuncGetter)(BufferIndex) const;
 constexpr FuncGetter GetPropertyValueGetter(Property::Type type)
 {
   switch(type)
@@ -89,18 +89,42 @@ constexpr FuncGetter GetPropertyValueGetter(Property::Type type)
  * Helper function that returns size of uniform datatypes based
  * on property type.
  */
-constexpr int GetPropertyValueSizeForUniform( Property::Type type )
+constexpr int GetPropertyValueSizeForUniform(Property::Type type)
 {
   switch(type)
   {
-    case Property::Type::BOOLEAN:{ return sizeof(bool);}
-    case Property::Type::FLOAT:{ return sizeof(float);}
-    case Property::Type::INTEGER:{ return sizeof(int);}
-    case Property::Type::VECTOR2:{ return sizeof(Vector2);}
-    case Property::Type::VECTOR3:{ return sizeof(Vector3);}
-    case Property::Type::VECTOR4:{ return sizeof(Vector4);}
-    case Property::Type::MATRIX3:{ return sizeof(Matrix3);}
-    case Property::Type::MATRIX:{ return sizeof(Matrix);}
+    case Property::Type::BOOLEAN:
+    {
+      return sizeof(bool);
+    }
+    case Property::Type::FLOAT:
+    {
+      return sizeof(float);
+    }
+    case Property::Type::INTEGER:
+    {
+      return sizeof(int);
+    }
+    case Property::Type::VECTOR2:
+    {
+      return sizeof(Vector2);
+    }
+    case Property::Type::VECTOR3:
+    {
+      return sizeof(Vector3);
+    }
+    case Property::Type::VECTOR4:
+    {
+      return sizeof(Vector4);
+    }
+    case Property::Type::MATRIX3:
+    {
+      return sizeof(Matrix3);
+    }
+    case Property::Type::MATRIX:
+    {
+      return sizeof(Matrix);
+    }
     default:
     {
       return 0;
@@ -185,8 +209,8 @@ Renderer::~Renderer() = default;
 
 void Renderer::SetGeometry(Render::Geometry* geometry)
 {
-  mGeometry  = geometry;
-  mUpdated   = true;
+  mGeometry = geometry;
+  mUpdated  = true;
 }
 void Renderer::SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, uint32_t size)
 {
@@ -198,26 +222,31 @@ void Renderer::BindTextures(Graphics::CommandBuffer& commandBuffer, Vector<Graph
 {
   uint32_t textureUnit = 0;
 
-  std::vector<Render::Sampler*>& samplers(mRenderDataProvider->GetSamplers());
-  std::vector<Render::Texture*>& textures(mRenderDataProvider->GetTextures());
+  const Dali::Vector<Render::Texture*>* textures(mRenderDataProvider->GetTextures());
+  const Dali::Vector<Render::Sampler*>* samplers(mRenderDataProvider->GetSamplers());
 
   std::vector<Graphics::TextureBinding> textureBindings;
-  for(uint32_t i = 0; i < static_cast<uint32_t>(textures.size()); ++i) // not expecting more than uint32_t of textures
+
+  if(textures != nullptr)
   {
-    if(textures[i] && textures[i]->GetGraphicsObject())
+    for(uint32_t i = 0; i < static_cast<uint32_t>(textures->Count()); ++i) // not expecting more than uint32_t of textures
     {
-      // if the sampler exists,
-      //   if it's default, delete the graphics object
-      //   otherwise re-initialize it if dirty
+      if((*textures)[i] && (*textures)[i]->GetGraphicsObject())
+      {
+        // if the sampler exists,
+        //   if it's default, delete the graphics object
+        //   otherwise re-initialize it if dirty
 
-      const Graphics::Sampler* graphicsSampler = (samplers[i] ? samplers[i]->GetGraphicsObject()
-                                                              : nullptr);
+        const Graphics::Sampler* graphicsSampler = samplers ? ((*samplers)[i] ? (*samplers)[i]->GetGraphicsObject()
+                                                                              : nullptr)
+                                                            : nullptr;
 
-      boundTextures.PushBack(textures[i]->GetGraphicsObject());
-      const Graphics::TextureBinding textureBinding{textures[i]->GetGraphicsObject(), graphicsSampler, textureUnit};
-      textureBindings.push_back(textureBinding);
+        boundTextures.PushBack((*textures)[i]->GetGraphicsObject());
+        const Graphics::TextureBinding textureBinding{(*textures)[i]->GetGraphicsObject(), graphicsSampler, textureUnit};
+        textureBindings.push_back(textureBinding);
 
-      ++textureUnit;
+        ++textureUnit;
+      }
     }
   }
 
@@ -431,28 +460,28 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
   }
 
   // Create Program
-  ShaderDataPtr            shaderData   = mRenderDataProvider->GetShader().GetShaderData();
+  ShaderDataPtr shaderData = mRenderDataProvider->GetShader().GetShaderData();
 
-  Program* program         = Program::New(*mProgramCache,
+  Program* program = Program::New(*mProgramCache,
                                   shaderData,
                                   *mGraphicsController);
   if(!program)
   {
-    DALI_LOG_ERROR("Failed to get program for shader at address %p.\n", reinterpret_cast<void*>(&mRenderDataProvider->GetShader()));
+    DALI_LOG_ERROR("Failed to get program for shader at address %p.\n", reinterpret_cast<const void*>(&mRenderDataProvider->GetShader()));
     return false;
   }
 
   // If program doesn't have Gfx program object assigned yet, prepare it.
   if(!program->GetGraphicsProgramPtr())
   {
-    const std::vector<char> &vertShader   = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::VERTEX_SHADER);
-    const std::vector<char> &fragShader   = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER);
-    Dali::Graphics::Shader  &vertexShader = mShaderCache->GetShader(
+    const std::vector<char>& vertShader   = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::VERTEX_SHADER);
+    const std::vector<char>& fragShader   = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER);
+    Dali::Graphics::Shader&  vertexShader = mShaderCache->GetShader(
       vertShader,
       Graphics::PipelineStage::VERTEX_SHADER,
       shaderData->GetSourceMode());
 
-    Dali::Graphics::Shader &fragmentShader = mShaderCache->GetShader(
+    Dali::Graphics::Shader& fragmentShader = mShaderCache->GetShader(
       fragShader,
       Graphics::PipelineStage::FRAGMENT_SHADER,
       shaderData->GetSourceMode());
@@ -506,7 +535,7 @@ void Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::N
   // Check if the map has changed
   DALI_ASSERT_DEBUG(mRenderDataProvider && "No Uniform map data provider available");
 
-  const SceneGraph::UniformMapDataProvider& uniformMapDataProvider = mRenderDataProvider->GetUniformMap();
+  const SceneGraph::UniformMapDataProvider& uniformMapDataProvider = mRenderDataProvider->GetUniformMapDataProvider();
 
   if(uniformMapDataProvider.GetUniformMapChanged(bufferIndex) ||
      node.GetUniformMapChanged(bufferIndex) ||
@@ -580,7 +609,7 @@ void Renderer::WriteUniformBuffer(
   // Create the UBO
   uint32_t uboOffset{0u};
 
-  auto &reflection = mGraphicsController->GetProgramReflection(program->GetGraphicsProgram());
+  auto& reflection = mGraphicsController->GetProgramReflection(program->GetGraphicsProgram());
 
   uint32_t uniformBlockAllocationBytes = program->GetUniformBlocksMemoryRequirements().totalSizeRequired;
 
@@ -698,21 +727,42 @@ void Renderer::FillUniformBuffer(Program&                                      p
         iter != end;
         ++iter)
     {
-      // @todo This means parsing the uniform string every frame. Instead, store the array index if present.
-      int arrayIndex = (*iter).arrayIndex;
+      auto& uniform    = *iter;
+      int   arrayIndex = uniform.arrayIndex;
 
-      auto uniformInfo  = Graphics::UniformInfo{};
-      auto uniformFound = program.GetUniform((*iter).uniformName.GetCString(),
-                                             (*iter).uniformNameHashNoArray ? (*iter).uniformNameHashNoArray
-                                                                            : (*iter).uniformNameHash,
-                                             uniformInfo);
-
-      if(uniformFound)
+      if(!uniform.uniformFunc)
       {
-        auto dst = ubo.GetOffset() + uniformInfo.offset;
-        const auto typeSize = GetPropertyValueSizeForUniform( (*iter).propertyValue->GetType() );
-        const auto dest = dst + static_cast<uint32_t>(typeSize) * arrayIndex;
-        const auto func = GetPropertyValueGetter((*iter).propertyValue->GetType());
+        auto uniformInfo  = Graphics::UniformInfo{};
+        auto uniformFound = program.GetUniform(uniform.uniformName.GetCString(),
+                                               uniform.uniformNameHashNoArray ? uniform.uniformNameHashNoArray
+                                                                              : uniform.uniformNameHash,
+                                               uniformInfo);
+
+        uniform.uniformOffset   = uniformInfo.offset;
+        uniform.uniformLocation = uniformInfo.location;
+
+        if(uniformFound)
+        {
+          auto       dst      = ubo.GetOffset() + uniformInfo.offset;
+          const auto typeSize = GetPropertyValueSizeForUniform((*iter).propertyValue->GetType());
+          const auto dest     = dst + static_cast<uint32_t>(typeSize) * arrayIndex;
+          const auto func     = GetPropertyValueGetter((*iter).propertyValue->GetType());
+
+          ubo.Write(&((*iter).propertyValue->*func)(updateBufferIndex),
+                    typeSize,
+                    dest);
+
+          uniform.uniformSize = typeSize;
+          uniform.uniformFunc = func;
+        }
+      }
+      else
+      {
+        auto       dst      = ubo.GetOffset() + uniform.uniformOffset;
+        const auto typeSize = uniform.uniformSize;
+        const auto dest     = dst + static_cast<uint32_t>(typeSize) * arrayIndex;
+        const auto func     = uniform.uniformFunc;
+
         ubo.Write(&((*iter).propertyValue->*func)(updateBufferIndex),
                   typeSize,
                   dest);
@@ -750,11 +800,16 @@ bool Renderer::Updated(BufferIndex bufferIndex, const SceneGraph::NodeDataProvid
     return true;
   }
 
-  for(const auto& texture : mRenderDataProvider->GetTextures())
+  auto* textures = mRenderDataProvider->GetTextures();
+  if(textures)
   {
-    if(texture && texture->IsNativeImage())
+    for(auto iter = textures->Begin(), end = textures->End(); iter < end; ++iter)
     {
-      return true;
+      auto texture = *iter;
+      if(texture && texture->IsNativeImage())
+      {
+        return true;
+      }
     }
   }
 
@@ -765,7 +820,7 @@ bool Renderer::Updated(BufferIndex bufferIndex, const SceneGraph::NodeDataProvid
     hash = uniformProperty.propertyPtr->Hash(bufferIndex, hash);
   }
 
-  const SceneGraph::UniformMapDataProvider& uniformMapDataProvider = mRenderDataProvider->GetUniformMap();
+  const SceneGraph::UniformMapDataProvider& uniformMapDataProvider = mRenderDataProvider->GetUniformMapDataProvider();
   const SceneGraph::CollectedUniformMap&    uniformMap             = uniformMapDataProvider.GetUniformMap(bufferIndex);
   for(const auto& uniformProperty : uniformMap)
   {
@@ -794,15 +849,15 @@ Graphics::Pipeline& Renderer::PrepareGraphicsPipeline(
 
   // Prepare query info
   PipelineCacheQueryInfo queryInfo{};
-  queryInfo.program = &program;
-  queryInfo.renderer = this;
-  queryInfo.geometry = mGeometry;
-  queryInfo.blendingEnabled = blend;
-  queryInfo.blendingOptions = &mBlendingOptions;
-  queryInfo.alphaPremultiplied = mPremultipliedAlphaEnabled;
+  queryInfo.program               = &program;
+  queryInfo.renderer              = this;
+  queryInfo.geometry              = mGeometry;
+  queryInfo.blendingEnabled       = blend;
+  queryInfo.blendingOptions       = &mBlendingOptions;
+  queryInfo.alphaPremultiplied    = mPremultipliedAlphaEnabled;
   queryInfo.cameraUsingReflection = instruction.GetCamera()->GetReflectionUsed();
 
-  auto pipelineResult = mPipelineCache->GetPipeline( queryInfo, true );
+  auto pipelineResult = mPipelineCache->GetPipeline(queryInfo, true);
 
   // should be never null?
   return *pipelineResult.pipeline;

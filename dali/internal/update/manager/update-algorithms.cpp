@@ -102,7 +102,8 @@ inline NodePropertyFlags UpdateNodes(Node&             node,
                                      BufferIndex       updateBufferIndex,
                                      RenderQueue&      renderQueue,
                                      Layer&            currentLayer,
-                                     uint32_t          inheritedDrawMode)
+                                     uint32_t          inheritedDrawMode,
+                                     bool              updated)
 {
   // Apply constraints to the node
   ConstrainPropertyOwner(node, updateBufferIndex);
@@ -141,6 +142,16 @@ inline NodePropertyFlags UpdateNodes(Node&             node,
     layer->SetReuseRenderers(updateBufferIndex, false);
   }
 
+  // For partial update, mark all children of an animating node as updated.
+  if(updated) // Only set to updated if parent was updated.
+  {
+    node.SetUpdated(true);
+  }
+  else if(node.Updated()) // Only propagate updated==true downwards.
+  {
+    updated = true;
+  }
+
   // recurse children
   NodeContainer& children = node.GetChildren();
   const NodeIter endIter  = children.End();
@@ -152,7 +163,8 @@ inline NodePropertyFlags UpdateNodes(Node&             node,
                                         updateBufferIndex,
                                         renderQueue,
                                         *layer,
-                                        inheritedDrawMode);
+                                        inheritedDrawMode,
+                                        updated);
   }
 
   return cumulativeDirtyFlags;
@@ -189,6 +201,8 @@ NodePropertyFlags UpdateNodeTree(Layer&       rootNode,
 
   DrawMode::Type drawMode(rootNode.GetDrawMode());
 
+  bool updated = rootNode.Updated();
+
   // recurse children
   NodeContainer& children = rootNode.GetChildren();
   const NodeIter endIter  = children.End();
@@ -200,7 +214,8 @@ NodePropertyFlags UpdateNodeTree(Layer&       rootNode,
                                         updateBufferIndex,
                                         renderQueue,
                                         rootNode,
-                                        drawMode);
+                                        drawMode,
+                                        updated);
   }
 
   return cumulativeDirtyFlags;

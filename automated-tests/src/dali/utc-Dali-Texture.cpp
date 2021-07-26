@@ -1048,8 +1048,11 @@ int UtcDaliTextureApplyFragShaderP1(void)
   std::string fragShader = baseFragShader;
   bool        applied    = DevelTexture::ApplyNativeFragmentShader(nativeTexture, fragShader);
 
+  std::string fragPrefix = testNativeImage->GetCustomFragmentPrefix();
+
   DALI_TEST_CHECK(applied);
   DALI_TEST_CHECK(baseFragShader.compare(fragShader));
+  DALI_TEST_CHECK(fragShader.compare(fragPrefix + baseFragShader) == 0);
   DALI_TEST_CHECK(!fragShader.empty());
   END_TEST;
 }

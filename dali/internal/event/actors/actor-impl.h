@@ -1638,8 +1638,9 @@ protected:
   /**
    * Called on a child during Add() when the parent actor is connected to the Scene.
    * @param[in] parentDepth The depth of the parent in the hierarchy.
+   * @param[in] notify Emits notification if set to true.
    */
-  void ConnectToScene(uint32_t parentDepth);
+  void ConnectToScene(uint32_t parentDepth, bool notify);
 
   /**
    * Helper for ConnectToScene, to recursively connect a tree of actors.
@@ -1656,13 +1657,15 @@ protected:
 
   /**
    * Helper for ConnectToScene, to notify a connected actor through the public API.
+   * @param[in] notify Emits notification if set to true.
    */
-  void NotifyStageConnection();
+  void NotifyStageConnection(bool notify);
 
   /**
    * Called on a child during Remove() when the actor was previously on the Stage.
+   * @param[in] notify Emits notification if set to true.
    */
-  void DisconnectFromStage();
+  void DisconnectFromStage(bool notify);
 
   /**
    * Helper for DisconnectFromStage, to recursively disconnect a tree of actors.
@@ -1678,8 +1681,9 @@ protected:
 
   /**
    * Helper for DisconnectFromStage, to notify a disconnected actor through the public API.
+   * @param[in] notify Emits notification if set to true.
    */
-  void NotifyStageDisconnection();
+  void NotifyStageDisconnection(bool notify);
 
   /**
    * When the Actor is OnScene, checks whether the corresponding Node is connected to the scene graph.
@@ -1845,9 +1849,9 @@ private:
   /**
    * Set the actor's parent.
    * @param[in] parent The new parent.
-   * @param[in] keepOnScene Keep this actor to be on Scene if this is true.
+   * @param[in] notify Emits notification if set to true. Default is true.
    */
-  void SetParent(ActorParent* parent, bool keepOnScene = false);
+  void SetParent(ActorParent* parent, bool notify = true);
 
   /**
    * For use in derived classes, called after Initialize()

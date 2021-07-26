@@ -403,19 +403,19 @@ public:
   bool Updated(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider* node);
 
   template<class T>
-  bool WriteDefaultUniform(const Graphics::UniformInfo*                       uniformInfo,
-                           Render::UniformBufferView&                         ubo,
-                           const T&                                           data);
+  bool WriteDefaultUniform(const Graphics::UniformInfo* uniformInfo,
+                           Render::UniformBufferView&   ubo,
+                           const T&                     data);
 
   template<class T>
-  void WriteUniform(Render::UniformBufferView&                             ubo,
-                    const Graphics::UniformInfo&                       uniformInfo,
-                    const T&                                           data);
+  void WriteUniform(Render::UniformBufferView&   ubo,
+                    const Graphics::UniformInfo& uniformInfo,
+                    const T&                     data);
 
-  void WriteUniform(Render::UniformBufferView&                             ubo,
-                    const Graphics::UniformInfo&                       uniformInfo,
-                    const void*                                        data,
-                    uint32_t                                           size);
+  void WriteUniform(Render::UniformBufferView&   ubo,
+                    const Graphics::UniformInfo& uniformInfo,
+                    const void*                  data,
+                    uint32_t                     size);
 
   [[nodiscard]] FaceCullingMode::Type GetFaceCullMode() const
   {
@@ -502,8 +502,8 @@ private:
                          BufferIndex                                   updateBufferIndex);
 
 private:
-  Graphics::Controller*                        mGraphicsController;
-  OwnerPointer<SceneGraph::RenderDataProvider> mRenderDataProvider;
+  Graphics::Controller*           mGraphicsController;
+  SceneGraph::RenderDataProvider* mRenderDataProvider;
 
   Render::Geometry* mGeometry;
 
@@ -516,6 +516,9 @@ private:
   Render::PipelineCache* mPipelineCache{nullptr};
 
   using Hash = unsigned long;
+
+  typedef const float& (PropertyInputImpl::*FuncGetter)(BufferIndex) const;
+
   struct UniformIndexMap
   {
     ConstString              uniformName;            ///< The uniform name
@@ -523,6 +526,11 @@ private:
     Hash                     uniformNameHash{0u};
     Hash                     uniformNameHashNoArray{0u};
     int32_t                  arrayIndex{-1}; ///< The array index
+
+    int16_t    uniformLocation{0u};
+    uint16_t   uniformOffset{0u};
+    uint16_t   uniformSize{0u};
+    FuncGetter uniformFunc{0};
   };
 
   using UniformIndexMappings = Dali::Vector<UniformIndexMap>;

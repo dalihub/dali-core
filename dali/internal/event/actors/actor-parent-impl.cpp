@@ -91,7 +91,7 @@ void ActorParentImpl::Add(Actor& child, bool notify)
       mChildren->push_back(ActorPtr(&child));
 
       // SetParent asserts that child can be added
-      child.SetParent(&mOwner, !notify);
+      child.SetParent(&mOwner, notify);
 
       if(notify)
       {
@@ -136,7 +136,7 @@ void ActorParentImpl::Remove(Actor& child, bool notify)
       mChildren->erase(iter);
 
       DALI_ASSERT_DEBUG(actor->GetParent() == &mOwner);
-      actor->SetParent(nullptr, (notify) ? false : true);
+      actor->SetParent(nullptr, notify);
 
       break;
     }

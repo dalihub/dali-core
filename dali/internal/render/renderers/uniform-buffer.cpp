@@ -181,7 +181,13 @@ void UniformBuffer::Write(const void* data, uint32_t size, uint32_t dstOffset)
     void* ptr = bufferDesc.memory->LockRegion(bufferOffset, size);
     if(ptr && bufferOffset + size < mSize)
     {
-      memcpy(ptr, data, size);
+      // size always divides by 4 (std140 alignment rules, so we can replace memcpy with unrolled assignments)
+      auto ptr32 = reinterpret_cast<uint32_t*>(ptr);
+      auto data32 = reinterpret_cast<const uint32_t*>(data);
+      for(auto i = 0u; i < size; i +=4 )
+      {
+        *ptr32++ = *data32++;;
+      }
     }
     bufferDesc.memory->Unlock(true);
   }

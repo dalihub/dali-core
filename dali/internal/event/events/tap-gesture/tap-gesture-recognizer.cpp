@@ -39,6 +39,7 @@ namespace
 // TODO: Set these according to DPI
 const float         MAXIMUM_MOTION_ALLOWED = 20.0f;
 const unsigned long MAXIMUM_TIME_ALLOWED   = 500u;
+const uint32_t      WAIT_TIME              = 330u;
 } // unnamed namespace
 
 TapGestureRecognizer::TapGestureRecognizer(Observer& observer, Vector2 screenSize, const TapGestureRequest& request)
@@ -128,7 +129,7 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
             if(mMaximumTapsRequired > mMinimumTapsRequired)
             {
               mEventTime = event.time;
-              mTimerId   = platformAbstraction.StartTimer(MAXIMUM_TIME_ALLOWED, MakeCallback(this, &TapGestureRecognizer::TimerCallback));
+              mTimerId   = platformAbstraction.StartTimer(WAIT_TIME, MakeCallback(this, &TapGestureRecognizer::TimerCallback));
             }
 
             mLastTapTime = mTouchTime;
@@ -165,7 +166,7 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
             if(mMaximumTapsRequired > mMinimumTapsRequired)
             {
               mEventTime = event.time;
-              mTimerId   = platformAbstraction.StartTimer(MAXIMUM_TIME_ALLOWED, MakeCallback(this, &TapGestureRecognizer::TimerCallback));
+              mTimerId   = platformAbstraction.StartTimer(WAIT_TIME, MakeCallback(this, &TapGestureRecognizer::TimerCallback));
             }
             else
             {

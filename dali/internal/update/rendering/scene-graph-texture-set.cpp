@@ -42,17 +42,12 @@ TextureSet* TextureSet::New()
 
 TextureSet::TextureSet()
 : mSamplers(),
-  mRenderers(),
   mHasAlpha(false)
 {
 }
 
 TextureSet::~TextureSet()
 {
-  for(auto&& renderer : mRenderers)
-  {
-    renderer->TextureSetDeleted();
-  }
 }
 
 void TextureSet::operator delete(void* ptr)
@@ -73,7 +68,6 @@ void TextureSet::SetSampler(uint32_t index, Render::Sampler* sampler)
   }
 
   mSamplers[index] = sampler;
-  NotifyChangeToRenderers();
 }
 
 void TextureSet::SetTexture(uint32_t index, Render::Texture* texture)
@@ -106,47 +100,11 @@ void TextureSet::SetTexture(uint32_t index, Render::Texture* texture)
   {
     mHasAlpha |= texture->HasAlphaChannel();
   }
-
-  NotifyChangeToRenderers();
 }
 
 bool TextureSet::HasAlpha() const
 {
   return mHasAlpha;
-}
-
-void TextureSet::AddObserver(Renderer* renderer)
-{
-  for(auto&& element : mRenderers)
-  {
-    if(element == renderer)
-    {
-      //Renderer already in the list
-      return;
-    }
-  }
-
-  mRenderers.PushBack(renderer);
-}
-
-void TextureSet::RemoveObserver(Renderer* renderer)
-{
-  for(auto &&iter = mRenderers.Begin(), end = mRenderers.End(); iter != end; ++iter)
-  {
-    if(*iter == renderer)
-    {
-      mRenderers.Remove(iter);
-      return;
-    }
-  }
-}
-
-void TextureSet::NotifyChangeToRenderers()
-{
-  for(auto&& element : mRenderers)
-  {
-    element->TextureSetChanged();
-  }
 }
 
 } // namespace SceneGraph

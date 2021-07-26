@@ -23,14 +23,6 @@
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/update/manager/update-manager.h>
 
-// EXTERNAL INCLUDES
-#include <cstring>
-
-namespace
-{
-const char* DEFAULT_SAMPLER_TYPENAME = "sampler2D";
-} // namespace
-
 namespace Dali
 {
 namespace Internal
@@ -210,44 +202,10 @@ bool Texture::IsNative() const
 
 bool Texture::ApplyNativeFragmentShader(std::string& shader)
 {
-  std::string fragmentShader;
-  bool        modified = false;
+  bool modified = false;
   if(mNativeImage != nullptr && !shader.empty())
   {
-    const char* fragmentPrefix        = mNativeImage->GetCustomFragmentPrefix();
-    const char* customSamplerTypename = mNativeImage->GetCustomSamplerTypename();
-
-    size_t prefixIndex = shader.find(Dali::Shader::GetShaderVersionPrefix());
-    if(fragmentPrefix != nullptr)
-    {
-      modified = true;
-      if(prefixIndex == std::string::npos)
-      {
-        fragmentShader = fragmentPrefix;
-        fragmentShader += "\n";
-      }
-      else
-      {
-        fragmentShader.clear();
-        shader.insert(prefixIndex + Dali::Shader::GetShaderVersionPrefix().length(), std::string(fragmentPrefix) + "\n");
-      }
-    }
-    fragmentShader += shader;
-
-    if(customSamplerTypename != nullptr)
-    {
-      modified   = true;
-      size_t pos = fragmentShader.find(DEFAULT_SAMPLER_TYPENAME);
-      if(pos < fragmentShader.length())
-      {
-        fragmentShader.replace(pos, strlen(DEFAULT_SAMPLER_TYPENAME), customSamplerTypename);
-      }
-    }
-  }
-
-  if(modified)
-  {
-    shader = fragmentShader;
+    modified = mNativeImage->ApplyNativeFragmentShader(shader);
   }
 
   return modified;

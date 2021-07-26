@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <cstddef>
 #include <cstdint> // uint32_t
+#include <string>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/any.h>
@@ -119,6 +120,14 @@ public:
    * @return Custom fragment prefix code as string.
    */
   virtual const char* GetCustomFragmentPrefix() const = 0;
+
+  /**
+   * @brief Apply custom fragment prefix for rendering native image.
+   *
+   * @param[in,out] shader shader code that will be applied fragment prefix.
+   * @return True if the shader is changed.
+   */
+  virtual bool ApplyNativeFragmentShader(std::string& shader) = 0;
 
   /**
    * @brief Get custom sampler type name for rendering native image.
