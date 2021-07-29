@@ -97,6 +97,11 @@ public:
    */
   unsigned int GetTouchesRequired() const;
 
+  /**
+   * @copydoc Dali::TapGestureDetector::ReceiveAllTapEvents()
+   */
+  void ReceiveAllTapEvents(bool receive);
+
 public:
 
   /**
@@ -141,6 +146,12 @@ private:
   TapGestureDetector(const TapGestureDetector&);
   TapGestureDetector& operator=(const TapGestureDetector& rhs);
 
+  /**
+   * Timer Callback
+   * @return will return false; one-shot timer.
+   */
+  bool TimerCallback();
+
 private: // GestureDetector overrides
 
   /**
@@ -162,9 +173,13 @@ private:
 
   Dali::TapGestureDetector::DetectedSignalType mDetectedSignal;
 
-  unsigned int mMinimumTapsRequired;
-  unsigned int mMaximumTapsRequired;
-  unsigned int mTouchesRequired;
+  unsigned int     mMinimumTapsRequired;
+  unsigned int     mMaximumTapsRequired;
+  unsigned int     mTouchesRequired;
+  uint32_t         mTimerId;
+  Dali::Actor      mTappedActor;
+  Dali::TapGesture mTap;
+  bool             mReceiveAllTapEvents;
 };
 
 } // namespace Internal

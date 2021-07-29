@@ -1082,3 +1082,66 @@ int UtcDaliTapGestureGetSourceType(void)
 
   END_TEST;
 }
+
+int UtcDaliTapGestureReceiveAllTapEvents(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+
+  TapGestureDetector detector = TapGestureDetector::New();
+  detector.SetMaximumTapsRequired(2u);
+  detector.Attach(actor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  // Emit signals, Because MaximumTapsRequired is 2, a timer that checks whether it is a single tap or a double tap operates internally.
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(50.0f, 50.0f), 0, 100));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(50.0f, 50.0f), 0, 120));
+  application.SendNotification();
+
+  // So detector don't get the tap event yet.
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Emit signals, Send the second tab.
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 0, 130));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 0, 150));
+  application.SendNotification();
+  application.GetPlatform().TriggerTimer();
+
+  // It find out to be a double tap. Detector receives events.
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Detector want to receive all tap events.
+  detector.ReceiveAllTapEvents(true);
+
+  // Emit signals, should receive
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(50.0f, 50.0f), 0, 500));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(50.0f, 50.0f), 0, 520));
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Emit signals, should receive
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 0, 530));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 0, 550));
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  END_TEST;
+}

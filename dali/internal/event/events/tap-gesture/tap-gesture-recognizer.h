@@ -120,7 +120,7 @@ private:
    *
    * @param[in] tap event for processing
    */
-  void ProcessEvent( TapGestureEvent& event );
+  void ProcessEvent(TapGestureEvent& event);
 
 private:
 
