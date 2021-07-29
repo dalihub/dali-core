@@ -23,7 +23,10 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/platform-abstraction.h>
+#include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/events/gesture-event-processor.h>
+#include <dali/internal/event/events/tap-gesture/tap-gesture-impl.h>
 #include <dali/public-api/events/tap-gesture.h>
 #include <dali/public-api/object/type-registry.h>
 
@@ -33,8 +36,9 @@ namespace Internal
 {
 namespace
 {
-const unsigned int DEFAULT_TAPS_REQUIRED    = 1u;
-const unsigned int DEFAULT_TOUCHES_REQUIRED = 1u;
+constexpr uint32_t DEFAULT_TAPS_REQUIRED    = 1u;
+constexpr uint32_t DEFAULT_TOUCHES_REQUIRED = 1u;
+constexpr uint32_t DEFAULT_TAP_WAIT_TIME    = 330u;
 
 // Signals
 const char* const SIGNAL_TAP_DETECTED = "tapDetected";
@@ -64,7 +68,10 @@ TapGestureDetector::TapGestureDetector()
 : GestureDetector(GestureType::TAP),
   mMinimumTapsRequired(DEFAULT_TAPS_REQUIRED),
   mMaximumTapsRequired(DEFAULT_TAPS_REQUIRED),
-  mTouchesRequired(DEFAULT_TOUCHES_REQUIRED)
+  mTouchesRequired(DEFAULT_TOUCHES_REQUIRED),
+  mTimerId(0),
+  mTappedActor(),
+  mTap()
 {
 }
 
@@ -72,11 +79,21 @@ TapGestureDetector::TapGestureDetector(unsigned int tapsRequired)
 : GestureDetector(GestureType::TAP),
   mMinimumTapsRequired(tapsRequired),
   mMaximumTapsRequired(tapsRequired),
-  mTouchesRequired(DEFAULT_TOUCHES_REQUIRED)
+  mTouchesRequired(DEFAULT_TOUCHES_REQUIRED),
+  mTimerId(0),
+  mTappedActor(),
+  mTap()
 {
 }
 
-TapGestureDetector::~TapGestureDetector() = default;
+TapGestureDetector::~TapGestureDetector()
+{
+  if(mTimerId != 0 && ThreadLocalStorage::Created())
+  {
+    Dali::Integration::PlatformAbstraction& platformAbstraction = ThreadLocalStorage::Get().GetPlatformAbstraction();
+    platformAbstraction.CancelTimer(mTimerId);
+  }
+}
 
 void TapGestureDetector::SetMinimumTapsRequired(unsigned int taps)
 {
@@ -134,10 +151,45 @@ unsigned int TapGestureDetector::GetTouchesRequired() const
 
 void TapGestureDetector::EmitTapGestureSignal(Dali::Actor tappedActor, const Dali::TapGesture& tap)
 {
+  Dali::Integration::PlatformAbstraction& platformAbstraction = ThreadLocalStorage::Get().GetPlatformAbstraction();
+  if(mTimerId != 0)
+  {
+    platformAbstraction.CancelTimer(mTimerId);
+    mTimerId = 0;
+  }
+  if(mMaximumTapsRequired > tap.GetNumberOfTaps())
+  {
+    mTappedActor = tappedActor;
+
+    Internal::TapGesturePtr internalTap(new Internal::TapGesture(tap.GetState()));
+    internalTap->SetTime(tap.GetTime());
+    internalTap->SetNumberOfTaps(tap.GetNumberOfTaps());
+    internalTap->SetNumberOfTouches(tap.GetNumberOfTouches());
+    internalTap->SetScreenPoint(tap.GetScreenPoint());
+    internalTap->SetLocalPoint(tap.GetLocalPoint());
+    internalTap->SetGestureSourceType(tap.GetSourceType());
+    mTap = Dali::TapGesture(internalTap.Get());
+
+    mTimerId = platformAbstraction.StartTimer(DEFAULT_TAP_WAIT_TIME, MakeCallback(this, &TapGestureDetector::TimerCallback));
+  }
+  else
+  {
+    // Guard against destruction during signal emission
+    Dali::TapGestureDetector handle(this);
+
+    mDetectedSignal.Emit(tappedActor, tap);
+  }
+}
+
+bool TapGestureDetector::TimerCallback()
+{
   // Guard against destruction during signal emission
   Dali::TapGestureDetector handle(this);
 
-  mDetectedSignal.Emit(tappedActor, tap);
+  mDetectedSignal.Emit(mTappedActor, mTap);
+
+  mTimerId = 0;
+  return false;
 }
 
 bool TapGestureDetector::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)

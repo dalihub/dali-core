@@ -23,11 +23,10 @@
 
 #include <dali/public-api/math/vector2.h>
 
-// INTERNAL INCLUDES
 #include <dali/integration-api/events/touch-event-integ.h>
-#include <dali/integration-api/platform-abstraction.h>
+
+// INTERNAL INCLUDES
 #include <dali/internal/event/common/scene-impl.h>
-#include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/events/gesture-requests.h>
 
 namespace Dali
@@ -39,7 +38,6 @@ namespace
 // TODO: Set these according to DPI
 const float         MAXIMUM_MOTION_ALLOWED = 20.0f;
 const unsigned long MAXIMUM_TIME_ALLOWED   = 500u;
-const uint32_t      WAIT_TIME              = 330u;
 } // unnamed namespace
 
 TapGestureRecognizer::TapGestureRecognizer(Observer& observer, Vector2 screenSize, const TapGestureRequest& request)
@@ -52,20 +50,11 @@ TapGestureRecognizer::TapGestureRecognizer(Observer& observer, Vector2 screenSiz
   mTouchPosition(),
   mTouchTime(0u),
   mLastTapTime(0u),
-  mEventTime(0u),
-  mGestureSourceType(GestureSourceType::INVALID),
-  mTimerId(0)
+  mGestureSourceType(GestureSourceType::INVALID)
 {
 }
 
-TapGestureRecognizer::~TapGestureRecognizer()
-{
-  if(mTimerId != 0 && ThreadLocalStorage::Created())
-  {
-    Dali::Integration::PlatformAbstraction& platformAbstraction = ThreadLocalStorage::Get().GetPlatformAbstraction();
-    platformAbstraction.CancelTimer(mTimerId);
-  }
-}
+TapGestureRecognizer::~TapGestureRecognizer() = default;
 
 void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
 {
@@ -73,9 +62,8 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
 
   if(event.GetPointCount() == 1)
   {
-    const Integration::Point&               point               = event.points[0];
-    PointState::Type                        pointState          = point.GetState();
-    Dali::Integration::PlatformAbstraction& platformAbstraction = ThreadLocalStorage::Get().GetPlatformAbstraction();
+    const Integration::Point& point      = event.points[0];
+    PointState::Type          pointState = point.GetState();
 
     MouseButton::Type mouseButton = point.GetMouseButton();
     switch(mouseButton)
@@ -126,12 +114,6 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
         {
           if(deltaBetweenTouchDownTouchUp < MAXIMUM_TIME_ALLOWED)
           {
-            if(mMaximumTapsRequired > mMinimumTapsRequired)
-            {
-              mEventTime = event.time;
-              mTimerId   = platformAbstraction.StartTimer(WAIT_TIME, MakeCallback(this, &TapGestureRecognizer::TimerCallback));
-            }
-
             mLastTapTime = mTouchTime;
             EmitSingleTap(event.time, point);
             mState = REGISTERED;
@@ -163,15 +145,7 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
           else if(deltaBetweenTouchDownTouchUp < MAXIMUM_TIME_ALLOWED)
           {
             ++mTapsRegistered;
-            if(mMaximumTapsRequired > mMinimumTapsRequired)
-            {
-              mEventTime = event.time;
-              mTimerId   = platformAbstraction.StartTimer(WAIT_TIME, MakeCallback(this, &TapGestureRecognizer::TimerCallback));
-            }
-            else
-            {
-              EmitGesture(GestureState::STARTED, event.time);
-            }
+            EmitGesture(GestureState::STARTED, event.time);
           }
           else // Delta between touch down and touch up too long to be considered a TAP event
           {
@@ -196,12 +170,6 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
           {
             EmitPossibleState(event);
           }
-
-          if(mTimerId != 0)
-          {
-            platformAbstraction.CancelTimer(mTimerId);
-            mTimerId = 0;
-          }
         }
         break;
       }
@@ -221,14 +189,6 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
     // We have entered a multi-touch event so emit registered gestures if required.
     EmitGesture(GestureState::STARTED, event.time);
   }
-}
-
-bool TapGestureRecognizer::TimerCallback()
-{
-  EmitGesture(GestureState::STARTED, mEventTime);
-
-  mTimerId = 0;
-  return false;
 }
 
 void TapGestureRecognizer::SetupForTouchDown(const Integration::TouchEvent& event, const Integration::Point& point)
@@ -278,22 +238,13 @@ void TapGestureRecognizer::EmitSingleTap(uint32_t time, const Integration::Point
   Vector2         distanceDelta(std::abs(mTouchPosition.x - screen.x),
                         std::abs(mTouchPosition.y - screen.y));
 
-  mTapsRegistered = 1u;
   if(distanceDelta.x > MAXIMUM_MOTION_ALLOWED ||
      distanceDelta.y > MAXIMUM_MOTION_ALLOWED)
   {
     event.state = GestureState::CANCELLED;
-    if(mTimerId != 0)
-    {
-      Dali::Integration::PlatformAbstraction& platformAbstraction = ThreadLocalStorage::Get().GetPlatformAbstraction();
-      platformAbstraction.CancelTimer(mTimerId);
-      mTimerId = 0;
-    }
   }
-  if(mTimerId == 0)
-  {
-    EmitTap(time, event);
-  }
+  mTapsRegistered = 1u;
+  EmitTap(time, event);
 }
 
 void TapGestureRecognizer::EmitTap(uint32_t time, TapGestureEvent& event)
