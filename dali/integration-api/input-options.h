@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_INPUT_OPTIONS_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -197,6 +197,13 @@ DALI_CORE_API void SetRotationGestureMinimumTouchEventsAfterStart(uint32_t value
  * @param[in] value The time value in milliseconds
  */
 DALI_CORE_API void SetLongPressMinimumHoldingTime(unsigned int value);
+
+/**
+ * @brief Sets the maximum allowed time required to be recognized as a multi tap gesture (millisecond)
+ *
+ * @param[in] time The time value in milliseconds
+ */
+DALI_CORE_API void SetTapMaximumAllowedTime(uint32_t time);
 
 } // namespace Integration
 

@@ -17,6 +17,7 @@
 
 #include <dali-test-suite-utils.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/integration-api/input-options.h>
 #include <dali/integration-api/render-task-list-integ.h>
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
@@ -560,6 +561,62 @@ int UtcDaliTapGestureRecognizerTripleTap(void)
   application.SendNotification();
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTapGestureSetMaximumAllowedTime(void)
+{
+  TestApplication application;
+
+  TapGestureDetector detector = TapGestureDetector::New(2);
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  detector.Attach(actor);
+
+  try
+  {
+    Integration::SetTapMaximumAllowedTime(0);
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+
+  // Reduce the maximum allowable time. 500 -> 100
+  Integration::SetTapMaximumAllowedTime(100);
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 200));
+
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 250));
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 300));
+
+  application.SendNotification();
+
+  // The double tap fails because the maximum allowed time has been exceeded
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+
+  // reset maximum allowed time
+  Integration::SetTapMaximumAllowedTime(500);
 
   END_TEST;
 }

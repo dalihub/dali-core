@@ -284,6 +284,13 @@ public: // Called by Core
    */
   uint32_t GetLongPressMinimumHoldingTime() const;
 
+  /**
+   * @brief Sets the maximum allowed time required to be recognized as a multi tap gesture (millisecond)
+   *
+   * @param[in] time The time value in milliseconds
+   */
+  void SetTapMaximumAllowedTime(uint32_t time);
+
 public: // needed for PanGesture
   /**
    * @return the pan gesture processor

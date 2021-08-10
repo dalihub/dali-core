@@ -133,6 +133,12 @@ private:
   TapGestureDetector(const TapGestureDetector&);
   TapGestureDetector& operator=(const TapGestureDetector& rhs);
 
+  /**
+   * Timer Callback
+   * @return will return false; one-shot timer.
+   */
+  bool TimerCallback();
+
 private: // GestureDetector overrides
   /**
    * @copydoc Dali::Internal::GestureDetector::OnActorAttach(Actor&)
@@ -152,9 +158,12 @@ private: // GestureDetector overrides
 private:
   Dali::TapGestureDetector::DetectedSignalType mDetectedSignal;
 
-  unsigned int mMinimumTapsRequired;
-  unsigned int mMaximumTapsRequired;
-  unsigned int mTouchesRequired;
+  unsigned int     mMinimumTapsRequired;
+  unsigned int     mMaximumTapsRequired;
+  unsigned int     mTouchesRequired;
+  uint32_t         mTimerId;
+  Dali::Actor      mTappedActor;
+  Dali::TapGesture mTap;
 };
 
 } // namespace Internal
