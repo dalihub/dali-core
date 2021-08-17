@@ -119,6 +119,9 @@ Node::~Node()
     mTransformManagerData.Manager()->RemoveTransform(mTransformManagerData.Id());
   }
 
+  // For debugging
+  mDepthIndex = 0xABABABAB;
+
 #ifdef DEBUG_ENABLED
   gNodeCount--;
 #endif
