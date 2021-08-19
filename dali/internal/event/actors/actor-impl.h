@@ -1337,6 +1337,22 @@ public:
   }
 
   /**
+   * @copydoc Dali::Actor::SetKeyboardFocusableChildren()
+   */
+  void SetKeyboardFocusableChildren(bool focusable)
+  {
+    mKeyboardFocusableChildren = focusable;
+  }
+
+  /**
+   * @copydoc Dali::Actor::AreChildrenKeyBoardFocusable()
+   */
+  bool AreChildrenKeyBoardFocusable() const
+  {
+    return mKeyboardFocusableChildren;
+  }
+
+  /**
    * Set whether this view can focus by touch.
    * @param[in] focusable focuable by touch.
    */
@@ -2080,6 +2096,7 @@ protected:
   bool                     mSensitive : 1;                 ///< Whether the actor emits touch event signals
   bool                     mLeaveRequired : 1;             ///< Whether a touch event signal is emitted when the a touch leaves the actor's bounds
   bool                     mKeyboardFocusable : 1;         ///< Whether the actor should be focusable by keyboard navigation
+  bool                     mKeyboardFocusableChildren : 1; ///< Whether the children of this actor can be focusable by keyboard navigation.
   bool                     mTouchFocusable : 1;            ///< Whether the actor should be focusable by touch
   bool                     mOnSceneSignalled : 1;          ///< Set to true before OnSceneConnection signal is emitted, and false before OnSceneDisconnection
   bool                     mInsideOnSizeSet : 1;           ///< Whether we are inside OnSizeSet

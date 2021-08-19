@@ -160,7 +160,14 @@ enum Type
    * @endcode
    * @details Name "touchFocusable", type Property::BOOLEAN.
    */
-  TOUCH_FOCUSABLE
+  TOUCH_FOCUSABLE,
+
+  /**
+   * @brief Whether the children of this actor can be focusable by keyboard navigation. If user sets this to false, the children of this actor will not be focused.
+   * @details Name "keyboardFocusableChildren", type Property::BOOLEAN.
+   * @note Default value is true.
+   */
+  KEYBOARD_FOCUSABLE_CHILDREN
 };
 
 } // namespace Property

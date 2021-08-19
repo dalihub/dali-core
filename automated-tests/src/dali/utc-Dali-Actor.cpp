@@ -2522,6 +2522,30 @@ int UtcDaliActorIsKeyboardFocusable(void)
   END_TEST;
 }
 
+int UtcDaliActorSetKeyboardFocusableChildren(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  actor.SetProperty(DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN, true);
+  DALI_TEST_CHECK(actor.GetProperty<bool>(DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN) == true);
+
+  actor.SetProperty(DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN, false);
+  DALI_TEST_CHECK(actor.GetProperty<bool>(DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN) == false);
+  END_TEST;
+}
+
+int UtcDaliActorAreChildrenKeyBoardFocusable(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  DALI_TEST_CHECK(actor.GetProperty<bool>(DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN) == true);
+  END_TEST;
+}
+
 int UtcDaliActorSetTouchFocusable(void)
 {
   TestApplication application;
