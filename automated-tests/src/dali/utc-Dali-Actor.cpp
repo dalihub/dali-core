@@ -2550,6 +2550,30 @@ int UtcDaliActorIsKeyboardFocusable(void)
   END_TEST;
 }
 
+int UtcDaliActorSetKeyboardFocusableChildren(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  actor.SetProperty(DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN, true);
+  DALI_TEST_CHECK(actor.GetProperty<bool>(DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN) == true);
+
+  actor.SetProperty(DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN, false);
+  DALI_TEST_CHECK(actor.GetProperty<bool>(DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN) == false);
+  END_TEST;
+}
+
+int UtcDaliActorAreChildrenKeyBoardFocusable(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  DALI_TEST_CHECK(actor.GetProperty<bool>(DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN) == true);
+  END_TEST;
+}
+
 int UtcDaliActorSetTouchFocusable(void)
 {
   TestApplication application;
@@ -7716,12 +7740,12 @@ int UtcDaliActorSwitchParentP(void)
   Actor parent2 = Actor::New();
   application.GetScene().Add(parent2);
 
-  bool  addSignalReceived = false;
+  bool                  addSignalReceived = false;
   ChildAddedSignalCheck addedSignal(addSignalReceived, child);
   DevelActor::ChildAddedSignal(application.GetScene().GetRootLayer()).Connect(&application, addedSignal);
   DALI_TEST_EQUALS(addSignalReceived, false, TEST_LOCATION);
 
-  bool  removedSignalReceived = false;
+  bool                    removedSignalReceived = false;
   ChildRemovedSignalCheck removedSignal(removedSignalReceived, child);
   DevelActor::ChildRemovedSignal(application.GetScene().GetRootLayer()).Connect(&application, removedSignal);
   DALI_TEST_EQUALS(removedSignalReceived, false, TEST_LOCATION);
