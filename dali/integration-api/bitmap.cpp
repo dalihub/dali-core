@@ -36,7 +36,7 @@ using namespace Dali::Pixel;
 void ConvertToGlFormat(Format pixelformat, unsigned& pixelDataType, unsigned& internalFormat)
 {
   // Compressed textures have no pixelDataType, so init to an invalid value:
-  pixelDataType = -1;
+  pixelDataType = GL_INVALID_VALUE;
 
   switch(pixelformat)
   {
