@@ -99,9 +99,8 @@ PropertyNotification::PropertyNotification(UpdateManager&                 update
       }
     }
 
-    // In Size Property case, swapping components occurs sometimes.
     // To cover swapping components, previous and current components should be compared.
-    if(mObjectPropertyIndex == Dali::Actor::Property::SIZE && mObject->GetPropertyType(mObjectPropertyIndex) == Property::VECTOR3)
+    if(mObject->GetPropertyType(mObjectPropertyIndex) == Property::VECTOR3)
     {
       mCompare = true;
       for(int i = 0; i < 3; ++i)
