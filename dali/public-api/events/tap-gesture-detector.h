@@ -2,7 +2,7 @@
 #define DALI_TAP_GESTURE_DETECTOR_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -148,6 +148,7 @@ public: // Setters
    * @param[in] minimumTaps The minimum taps required
    * @pre The gesture detector has been initialized.
    * @note The default is '1', the maximum is 2.
+   * @see ReceiveAllTapEvents
    */
   void SetMinimumTapsRequired(uint32_t minimumTaps);
 
@@ -159,8 +160,18 @@ public: // Setters
    * @param[in] maximumTaps The maximum taps required
    * @pre The gesture detector has been initialized.
    * @note The default is '1', the maximum is 2.
+   * @see ReceiveAllTapEvents
    */
   void SetMaximumTapsRequired(uint32_t maximumTaps);
+
+  /**
+   * @brief When set to true, all tap gestures will be received when multiple taps are supported by the gesture detector.
+   *
+   * @param[in] receive The receiving all tap events flag
+   * @pre The gesture detector has been initialized.
+   * @note The default is false.
+   */
+  void ReceiveAllTapEvents(bool receive);
 
 public: // Getters
   /**
