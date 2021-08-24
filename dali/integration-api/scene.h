@@ -326,6 +326,30 @@ public:
   bool IsSurfaceRectChanged() const;
 
   /**
+   * @brief Send message to acknowledge for completing window rotation with current window orientation.
+   *
+   * If this function is called, the message is sent to render thread, then mSurfaceRectChanged in scene-graph-scene is set with true.
+   * After that, render thread checks whether window rotation event is received, mSurfaceRectChanged and the neccessary flag are set.
+   * If they are all true, rotation done function is called to complete window rotation.
+   */
+  void SetRotationCompletedAcknowledgement();
+
+  /**
+   * @brief Query wheter is set to acknowledge for completing surface rotation.
+   * @return true it should be acknowledged.
+   *
+   * If SetRotationCompletedAcknowledgement() is called and the related message is received to scene-graph-scene,
+   * then mSurfaceRectChanged in scene-graph-scene is set with true.
+   *
+   * When this function is called, the mSurfaceRectChanged in scene-graph-scene is return.
+   * Then, the flag will be reset.
+   *
+   * @note This function should be not called the application's main thread.
+   * Because this function should be called in windwow surface's postrender() function to complete window rotation manually.
+   */
+  bool IsRotationCompletedAcknowledgementSet() const;
+
+  /**
    * @brief This signal is emitted just after the event processing is finished.
    *
    * @return The signal to connect to

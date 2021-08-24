@@ -138,7 +138,6 @@ public:
   /**
    * Set the surface orientation when surface is rotated.
    *
-   * @param[in] scene The rotated scene.
    * @param[in] orientation The orientation value representing the surface.
    */
   void SetSurfaceOrientation(int32_t orientation);
@@ -155,6 +154,17 @@ public:
    * @return true if the surface rect is changed.
    */
   bool IsSurfaceRectChanged();
+
+  /**
+   * @brief Set the internal flag to acknowledge surface rotation.
+   */
+  void SetRotationCompletedAcknowledgement();
+
+  /**
+   * @brief Query wheter is set to acknowledge for completing surface rotation.
+   * @return true it should be acknowledged.
+   */
+  bool IsRotationCompletedAcknowledgementSet();
 
   /**
    * Set the render target of the surface
@@ -217,6 +227,7 @@ private:
   Rect<int32_t> mSurfaceRect;        ///< The rectangle of surface which is related ot this scene.
   int32_t       mSurfaceOrientation; ///< The orientation of surface which is related of this scene
   bool          mSurfaceRectChanged; ///< The flag of surface's rectangle is changed when is resized, moved or rotated.
+  bool          mRotationCompletedAcknowledgement; ///< The flag of sending the acknowledgement to complete window rotation.
 
   // Render pass and render target
 
@@ -276,6 +287,17 @@ inline void SetSurfaceOrientationMessage(EventThreadServices& eventThreadService
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&scene, &Scene::SetSurfaceOrientation, orientation);
+}
+
+inline void SetRotationCompletedAcknowledgementMessage(EventThreadServices& eventThreadServices, const Scene& scene)
+{
+  using LocalType = Message<Scene>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new(slot) LocalType(&scene, &Scene::SetRotationCompletedAcknowledgement);
 }
 
 inline void SetSurfaceRenderTargetMessage(EventThreadServices& eventThreadServices, const Scene& scene, Graphics::RenderTarget* renderTarget)
