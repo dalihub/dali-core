@@ -186,7 +186,11 @@ struct TransformManagerPropertyVector3 final : public TransformManagerPropertyHa
 
   const Vector3& Get(BufferIndex bufferIndex) const override
   {
-    return mTxManagerData->Manager()->GetVector3PropertyValue(mTxManagerData->Id(), PropertyT);
+    return mTxManagerData->
+        Manager()->
+        GetVector3PropertyValue(
+          mTxManagerData->Id(),
+          PropertyT);
   }
 
   const Vector3& GetVector3(BufferIndex bufferIndex) const override
