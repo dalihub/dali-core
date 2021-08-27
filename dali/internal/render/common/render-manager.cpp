@@ -613,7 +613,7 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
               item.mIsUpdated = false;
               item.mNode->SetUpdatedTree(false);
 
-              rect = item.CalculateViewportSpaceAABB(item.mUpdateSize, viewportRect.width, viewportRect.height);
+              rect = RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, item.mUpdateSize, viewportRect.width, viewportRect.height);
               if(rect.IsValid() && rect.Intersect(viewportRect) && !rect.IsEmpty())
               {
                 const int left   = rect.x;

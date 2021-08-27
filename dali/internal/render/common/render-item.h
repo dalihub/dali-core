@@ -60,11 +60,13 @@ struct RenderItem
    *
    * Note: We pass in the viewport dimensions rather than allow the caller to modify the raw AABB in order to optimally generate the final result.
    *
+   * @param[in]    modelViewMatrix   The model view matrix
+   * @param[in]    size              The size of the render item
    * @param[in]    viewportWidth     The width of the viewport to calculate for
    * @param[in]    viewportHeight    The height of the viewport to calculate for
    * @return                         The AABB coordinates in viewport-space (x, y, width, height)
    */
-  ClippingBox CalculateViewportSpaceAABB(const Vector3& size, const int viewportWidth, const int viewportHeight) const;
+  static ClippingBox CalculateViewportSpaceAABB(const Matrix& modelViewMatrix, const Vector3& size, const int viewportWidth, const int viewportHeight);
 
   /**
    * Overriden delete operator.
