@@ -65,7 +65,7 @@ void TestGraphicsBuffer::Upload(uint32_t offset, uint32_t size)
   }
   else
   {
-    mGl.BufferData(GetTarget(), size, &memory[0], GL_STATIC_DRAW); //@todo Query - do we need other usages?
+    mGl.BufferData(GetTarget(), GLsizeiptr(size), &memory[0], GL_STATIC_DRAW); //@todo Query - do we need other usages?
     mCreated = true;
   }
 }

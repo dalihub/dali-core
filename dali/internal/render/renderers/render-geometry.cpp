@@ -159,7 +159,7 @@ bool Geometry::Draw(
     if(elementBufferOffset != 0u)
     {
       elementBufferOffset = (elementBufferOffset >= numIndices) ? numIndices - 1 : elementBufferOffset;
-      firstIndexOffset    = elementBufferOffset * sizeof(uint16_t);
+      firstIndexOffset    = intptr_t(elementBufferOffset * sizeof(uint16_t));
       numIndices -= elementBufferOffset;
     }
 
