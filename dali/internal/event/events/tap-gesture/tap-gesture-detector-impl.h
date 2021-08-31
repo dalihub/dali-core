@@ -93,6 +93,11 @@ public:
    */
   unsigned int GetTouchesRequired() const;
 
+  /**
+   * @copydoc Dali::TapGestureDetector::ReceiveAllTapEvents()
+   */
+  void ReceiveAllTapEvents(bool receive);
+
 public:
   /**
    * Called by the TapGestureProcessor when a tap gesture event occurs within the bounds of our
@@ -164,6 +169,7 @@ private:
   uint32_t         mTimerId;
   Dali::Actor      mTappedActor;
   Dali::TapGesture mTap;
+  bool             mReceiveAllTapEvents;
 };
 
 } // namespace Internal

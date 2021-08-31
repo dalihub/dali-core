@@ -78,11 +78,6 @@ public:
     mCallStack.PushCall("GetTextureTarget", "");
     return GL_TEXTURE_EXTERNAL_OES;
   };
-  inline virtual const char* GetCustomFragmentPrefix() const
-  {
-    mCallStack.PushCall("GetCustomFragmentPrefix", "");
-    return "#extension GL_OES_EGL_image_external:require\n";
-  };
   inline virtual bool ApplyNativeFragmentShader(std::string& shader)
   {
     mCallStack.PushCall("ApplyNativeFragmentShader", "");

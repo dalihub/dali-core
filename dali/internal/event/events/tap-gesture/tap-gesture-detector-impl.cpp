@@ -71,7 +71,8 @@ TapGestureDetector::TapGestureDetector()
   mTouchesRequired(DEFAULT_TOUCHES_REQUIRED),
   mTimerId(0),
   mTappedActor(),
-  mTap()
+  mTap(),
+  mReceiveAllTapEvents(false)
 {
 }
 
@@ -149,6 +150,11 @@ unsigned int TapGestureDetector::GetTouchesRequired() const
   return mTouchesRequired;
 }
 
+void TapGestureDetector::ReceiveAllTapEvents(bool receive)
+{
+  mReceiveAllTapEvents = receive;
+}
+
 void TapGestureDetector::EmitTapGestureSignal(Dali::Actor tappedActor, const Dali::TapGesture& tap)
 {
   Dali::Integration::PlatformAbstraction& platformAbstraction = ThreadLocalStorage::Get().GetPlatformAbstraction();
@@ -157,7 +163,7 @@ void TapGestureDetector::EmitTapGestureSignal(Dali::Actor tappedActor, const Dal
     platformAbstraction.CancelTimer(mTimerId);
     mTimerId = 0;
   }
-  if(mMaximumTapsRequired > tap.GetNumberOfTaps())
+  if(mMaximumTapsRequired > tap.GetNumberOfTaps() && !mReceiveAllTapEvents)
   {
     mTappedActor = tappedActor;
 

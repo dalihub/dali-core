@@ -114,14 +114,6 @@ public:
   virtual int GetTextureTarget() const = 0;
 
   /**
-   * @brief Get custom fragment prefix for rendering native image.
-   *
-   * @SINCE_1_9.23
-   * @return Custom fragment prefix code as string.
-   */
-  virtual const char* GetCustomFragmentPrefix() const = 0;
-
-  /**
    * @brief Apply custom fragment prefix for rendering native image.
    *
    * @param[in,out] shader shader code that will be applied fragment prefix.
