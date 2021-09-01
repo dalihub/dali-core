@@ -814,7 +814,7 @@ int UtcDaliRendererSetBlendMode01(void)
   Renderer renderer = Renderer::New(geometry, shader);
 
   Actor actor = Actor::New();
-  actor.SetProperty(Actor::Property::OPACITY, 0.98f);
+  actor.SetProperty(Actor::Property::OPACITY, 1.0f);
   actor.AddRenderer(renderer);
   actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
   application.GetScene().Add(actor);
@@ -1203,6 +1203,71 @@ int UtcDaliRendererSetBlendMode08b(void)
   END_TEST;
 }
 
+int UtcDaliRendererSetBlendMode09(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test setting the blend mode to on_without_cull with an opaque color renders with blending enabled");
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader   shader   = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::OPACITY, 1.0f);
+  actor.AddRenderer(renderer);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+  application.GetScene().Add(actor);
+
+  renderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON_WITHOUT_CULL);
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  glAbstraction.EnableEnableDisableCallTrace(true);
+
+  application.SendNotification();
+  application.Render();
+
+  TraceCallStack&             glEnableStack = glAbstraction.GetEnableDisableTrace();
+  TraceCallStack::NamedParams params;
+  params["cap"] << std::hex << GL_BLEND;
+  DALI_TEST_CHECK(glEnableStack.FindMethodAndParams("Enable", params));
+
+  END_TEST;
+}
+
+int UtcDaliRendererSetBlendMode09b(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test setting the blend mode to on_without_cull with an transparent color renders with blending enabled");
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader   shader   = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::OPACITY, 0.0f);
+  actor.AddRenderer(renderer);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+  application.GetScene().Add(actor);
+
+  renderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON_WITHOUT_CULL);
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  glAbstraction.EnableEnableDisableCallTrace(true);
+  glAbstraction.EnableDrawCallTrace(true);
+
+  application.SendNotification();
+  application.Render();
+
+  TraceCallStack& glEnableStack = glAbstraction.GetEnableDisableTrace();
+  DALI_TEST_CHECK(glEnableStack.FindMethod("Enable"));
+
+  DALI_TEST_CHECK(glAbstraction.GetDrawTrace().FindMethod("DrawElements"));
+
+  END_TEST;
+}
+
 int UtcDaliRendererGetBlendMode(void)
 {
   TestApplication application;
@@ -1226,6 +1291,11 @@ int UtcDaliRendererGetBlendMode(void)
   renderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::OFF);
   mode = renderer.GetProperty<int>(Renderer::Property::BLEND_MODE);
   DALI_TEST_EQUALS(static_cast<BlendMode::Type>(mode), BlendMode::OFF, TEST_LOCATION);
+
+  // ON_WITHOUT_CULL
+  renderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON_WITHOUT_CULL);
+  mode = renderer.GetProperty<int>(Renderer::Property::BLEND_MODE);
+  DALI_TEST_EQUALS(static_cast<BlendMode::Type>(mode), BlendMode::ON_WITHOUT_CULL, TEST_LOCATION);
 
   END_TEST;
 }

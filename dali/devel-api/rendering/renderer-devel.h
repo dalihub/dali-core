@@ -144,7 +144,7 @@ enum Type
    * @brief name "blendEquation", type INTEGER
    * @note The default value is BlendEquation::ADD
    */
-  BLEND_EQUATION,
+  BLEND_EQUATION = STENCIL_OPERATION_ON_Z_PASS + 3,
 };
 } // namespace Property
 
