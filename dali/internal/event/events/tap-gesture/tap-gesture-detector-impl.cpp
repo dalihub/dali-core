@@ -83,7 +83,8 @@ TapGestureDetector::TapGestureDetector(unsigned int tapsRequired)
   mTouchesRequired(DEFAULT_TOUCHES_REQUIRED),
   mTimerId(0),
   mTappedActor(),
-  mTap()
+  mTap(),
+  mReceiveAllTapEvents(false)
 {
 }
 
