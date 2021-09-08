@@ -49,6 +49,7 @@ FrameBuffer::FrameBuffer( uint32_t width, uint32_t height, Mask attachments )
   mWidth( width ),
   mHeight( height ),
   mColorAttachmentCount( 0u ),
+  mRenderedBuffer( nullptr ),
   mCaptureRenderedResult(false),
   mCaptured(false)
 {
