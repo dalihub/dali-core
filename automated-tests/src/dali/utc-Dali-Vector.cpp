@@ -15,8 +15,6 @@
  *
  */
 
-#define ENABLE_VECTOR_ASSERTS
-
 #include <dali-test-suite-utils.h>
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
