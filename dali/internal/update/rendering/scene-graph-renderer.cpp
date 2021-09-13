@@ -671,6 +671,11 @@ Renderer::OpacityType Renderer::GetOpacityType(BufferIndex updateBufferIndex, co
 
   switch(mBlendMode)
   {
+    case BlendMode::ON_WITHOUT_CULL: // If the renderer should always be use blending and never want to be transparent by alpha.
+    {
+      opacityType = Renderer::TRANSLUCENT;
+      break;
+    }
     case BlendMode::ON: // If the renderer should always be use blending
     {
       float alpha = node.GetWorldColor(updateBufferIndex).a * mOpacity[updateBufferIndex];

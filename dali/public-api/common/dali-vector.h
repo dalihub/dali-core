@@ -28,21 +28,7 @@
 #include <dali/public-api/common/type-traits.h>
 #include <dali/public-api/math/math-utils.h>
 
-/**
- * @brief For DALi internal use, asserts are enabled in debug builds.
- *
- * For Application use, asserts can be enabled manually.
- * @SINCE_1_0.0
- */
-#if defined(DEBUG_ENABLED)
-#define ENABLE_VECTOR_ASSERTS
-#endif
-
-#if defined(ENABLE_VECTOR_ASSERTS)
 #define DALI_ASSERT_VECTOR(cond) DALI_ASSERT_ALWAYS(cond)
-#else
-#define DALI_ASSERT_VECTOR(cond)
-#endif
 
 namespace Dali
 {
