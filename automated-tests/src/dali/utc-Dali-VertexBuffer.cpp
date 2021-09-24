@@ -262,8 +262,8 @@ int UtcDaliVertexBufferSetData02(void)
     const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
       application.GetGlAbstraction().GetBufferDataCalls();
 
-    // Should be 15 (using single uniform buffer now)
-    DALI_TEST_EQUALS(bufferSubDataCalls.size(), 15u, TEST_LOCATION);
+    // Should be 17 (using single uniform buffer now)
+    DALI_TEST_EQUALS(bufferSubDataCalls.size(), 17u, TEST_LOCATION);
     DALI_TEST_EQUALS(bufferDataCalls.size(), 3u, TEST_LOCATION);
 
     if(bufferSubDataCalls.size())

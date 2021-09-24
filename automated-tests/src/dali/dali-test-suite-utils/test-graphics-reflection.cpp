@@ -40,6 +40,7 @@ static const std::vector<UniformData> UNIFORMS =
     UniformData("sTextureRect", Property::Type::FLOAT),
     UniformData("sGloss", Property::Type::FLOAT),
     UniformData("uColor", Property::Type::VECTOR4),
+    UniformData("uActorColor", Property::Type::VECTOR4),
     UniformData("uModelMatrix", Property::Type::MATRIX),
     UniformData("uModelView", Property::Type::MATRIX),
     UniformData("uMvpMatrix", Property::Type::MATRIX),
