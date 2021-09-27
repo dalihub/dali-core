@@ -56,7 +56,8 @@ size_t DEFAULT_UNIFORM_HASHTABLE[NUMBER_OF_DEFAULT_UNIFORMS] =
     CalculateHash(std::string("uNormalMatrix")),
     CalculateHash(std::string("uProjection")),
     CalculateHash(std::string("uSize")),
-    CalculateHash(std::string("uColor"))};
+    CalculateHash(std::string("uColor")),
+    CalculateHash(std::string("uActorColor"))};
 
 /**
  * Helper function to calculate the correct alignment of data for uniform buffers

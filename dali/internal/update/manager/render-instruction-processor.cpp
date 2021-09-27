@@ -137,6 +137,33 @@ bool CompareItems3DWithClipping(const RenderInstructionProcessor::SortAttributes
 }
 
 /**
+ * Set the update size of the node
+ * @param[in] node The node of the renderer
+ * @param[in] isLayer3d Whether we are processing a 3D layer or not
+ * @param[in,out] nodeWorldMatrix The world matrix of the node
+ * @param[in,out] nodeSize The size of the node
+ * @param[in,out] nodeUpdateSize The update size of the node
+ */
+inline void SetNodeUpdateSize(Node* node, bool isLayer3d, Matrix& nodeWorldMatrix, Vector3& nodeSize, Vector3& nodeUpdateSize)
+{
+  node->GetWorldMatrixAndSize(nodeWorldMatrix, nodeSize);
+
+  if(node->GetUpdateSizeHint() == Vector3::ZERO)
+  {
+    // RenderItem::CalculateViewportSpaceAABB cannot cope with z transform
+    // I don't use item.mModelMatrix.GetTransformComponents() for z transform, would be too slow
+    if(!isLayer3d && nodeWorldMatrix.GetZAxis() == Vector3(0.0f, 0.0f, 1.0f))
+    {
+      nodeUpdateSize = nodeSize;
+    }
+  }
+  else
+  {
+    nodeUpdateSize = node->GetUpdateSizeHint();
+  }
+}
+
+/**
  * Add a renderer to the list
  * @param updateBufferIndex to read the model matrix from
  * @param renderList to add the item to
@@ -144,6 +171,8 @@ bool CompareItems3DWithClipping(const RenderInstructionProcessor::SortAttributes
  * @param viewMatrix used to calculate modelview matrix for the item
  * @param camera The camera used to render
  * @param isLayer3d Whether we are processing a 3D layer or not
+ * @param viewportSet Whether the viewport is set or not
+ * @param viewport The viewport
  * @param cull Whether frustum culling is enabled or not
  */
 inline void AddRendererToRenderList(BufferIndex         updateBufferIndex,
@@ -152,21 +181,48 @@ inline void AddRendererToRenderList(BufferIndex         updateBufferIndex,
                                     const Matrix&       viewMatrix,
                                     SceneGraph::Camera& camera,
                                     bool                isLayer3d,
+                                    bool                viewportSet,
+                                    const Viewport&     viewport,
                                     bool                cull)
 {
-  bool  inside(true);
-  Node* node = renderable.mNode;
+  bool    inside(true);
+  Node*   node = renderable.mNode;
+  Matrix  nodeWorldMatrix(false);
+  Vector3 nodeSize;
+  Vector3 nodeUpdateSize;
+  bool    nodeUpdateSizeSet(false);
+  Matrix  nodeModelViewMatrix(false);
+  bool    nodeModelViewMatrixSet(false);
 
   if(cull && renderable.mRenderer && !renderable.mRenderer->GetShader().HintEnabled(Dali::Shader::Hint::MODIFIES_GEOMETRY))
   {
     const Vector4& boundingSphere = node->GetBoundingSphere();
     inside                        = (boundingSphere.w > Math::MACHINE_EPSILON_1000) &&
              (camera.CheckSphereInFrustum(updateBufferIndex, Vector3(boundingSphere), boundingSphere.w));
+
+    if(inside && !isLayer3d && viewportSet)
+    {
+      SetNodeUpdateSize(node, isLayer3d, nodeWorldMatrix, nodeSize, nodeUpdateSize);
+      nodeUpdateSizeSet = true;
+
+      const Vector3& scale    = node->GetWorldScale(updateBufferIndex);
+      const Vector3& halfSize = nodeUpdateSize * scale * 0.5f;
+      float          radius(halfSize.Length());
+
+      if(radius > Math::MACHINE_EPSILON_1000)
+      {
+        Matrix::Multiply(nodeModelViewMatrix, nodeWorldMatrix, viewMatrix);
+        nodeModelViewMatrixSet = true;
+
+        ClippingBox clippingBox = RenderItem::CalculateViewportSpaceAABB(nodeModelViewMatrix, nodeUpdateSize, viewport.width, viewport.height);
+        inside                  = clippingBox.Intersects(viewport);
+      }
+    }
   }
 
   if(inside)
   {
-    Renderer::OpacityType opacityType = renderable.mRenderer ? renderable.mRenderer->GetOpacityType(updateBufferIndex, *renderable.mNode) : Renderer::OPAQUE;
+    Renderer::OpacityType opacityType = renderable.mRenderer ? renderable.mRenderer->GetOpacityType(updateBufferIndex, *node) : Renderer::OPAQUE;
 
     // We can skip render when node is not clipping and transparent
     const bool skipRender(opacityType == Renderer::TRANSPARENT && node->GetClippingMode() == ClippingMode::DISABLED);
@@ -183,22 +239,22 @@ inline void AddRendererToRenderList(BufferIndex         updateBufferIndex,
       partialRenderingCacheInfo.node       = node;
       partialRenderingCacheInfo.isOpaque   = (opacityType == Renderer::OPAQUE);
       partialRenderingCacheInfo.renderer   = renderable.mRenderer;
-      partialRenderingCacheInfo.color      = renderable.mNode->GetColor(updateBufferIndex);
-      partialRenderingCacheInfo.depthIndex = renderable.mNode->GetDepthIndex();
+      partialRenderingCacheInfo.color      = node->GetColor(updateBufferIndex);
+      partialRenderingCacheInfo.depthIndex = node->GetDepthIndex();
 
       if(renderable.mRenderer)
       {
         partialRenderingCacheInfo.textureSet = renderable.mRenderer->GetTextureSet();
       }
 
-      item.mNode     = renderable.mNode;
+      item.mNode     = node;
       item.mIsOpaque = (opacityType == Renderer::OPAQUE);
-      item.mColor    = renderable.mNode->GetColor(updateBufferIndex);
+      item.mColor    = node->GetColor(updateBufferIndex);
 
       item.mDepthIndex = 0;
       if(!isLayer3d)
       {
-        item.mDepthIndex = renderable.mNode->GetDepthIndex();
+        item.mDepthIndex = node->GetDepthIndex();
       }
 
       if(DALI_LIKELY(renderable.mRenderer))
@@ -214,27 +270,23 @@ inline void AddRendererToRenderList(BufferIndex         updateBufferIndex,
 
       item.mIsUpdated |= isLayer3d;
 
-      // Save ModelView matrix onto the item.
-      node->GetWorldMatrixAndSize(item.mModelMatrix, item.mSize);
-      Matrix::Multiply(item.mModelViewMatrix, item.mModelMatrix, viewMatrix);
-
-      partialRenderingCacheInfo.matrix = item.mModelViewMatrix;
-      partialRenderingCacheInfo.size   = item.mSize;
-
-      if(renderable.mNode->GetUpdateSizeHint() == Vector3::ZERO)
+      if(!nodeUpdateSizeSet)
       {
-        // RenderItem::CalculateViewportSpaceAABB cannot cope with z transform
-        // I don't use item.mModelMatrix.GetTransformComponents() for z transform, would be to slow
-        if(!isLayer3d && item.mModelMatrix.GetZAxis() == Vector3(0.0f, 0.0f, 1.0f))
-        {
-          item.mUpdateSize = item.mSize;
-        }
-      }
-      else
-      {
-        item.mUpdateSize = renderable.mNode->GetUpdateSizeHint();
+        SetNodeUpdateSize(node, isLayer3d, nodeWorldMatrix, nodeSize, nodeUpdateSize);
       }
 
+      item.mSize        = nodeSize;
+      item.mUpdateSize  = nodeUpdateSize;
+      item.mModelMatrix = nodeWorldMatrix;
+
+      if(!nodeModelViewMatrixSet)
+      {
+        Matrix::Multiply(nodeModelViewMatrix, nodeWorldMatrix, viewMatrix);
+      }
+      item.mModelViewMatrix = nodeModelViewMatrix;
+
+      partialRenderingCacheInfo.matrix      = item.mModelViewMatrix;
+      partialRenderingCacheInfo.size        = item.mSize;
       partialRenderingCacheInfo.updatedSize = item.mUpdateSize;
 
       item.mIsUpdated = partialRenderingData.IsUpdated() || item.mIsUpdated;
@@ -265,6 +317,8 @@ inline void AddRenderersToRenderList(BufferIndex          updateBufferIndex,
                                      const Matrix&        viewMatrix,
                                      SceneGraph::Camera&  camera,
                                      bool                 isLayer3d,
+                                     bool                 viewportSet,
+                                     const Viewport&      viewport,
                                      bool                 cull)
 {
   DALI_LOG_INFO(gRenderListLogFilter, Debug::Verbose, "AddRenderersToRenderList()\n");
@@ -277,6 +331,8 @@ inline void AddRenderersToRenderList(BufferIndex          updateBufferIndex,
                             viewMatrix,
                             camera,
                             isLayer3d,
+                            viewportSet,
+                            viewport,
                             cull);
   }
 }
@@ -446,6 +502,9 @@ void RenderInstructionProcessor::Prepare(BufferIndex                 updateBuffe
   const Matrix&       viewMatrix = renderTask.GetViewMatrix(updateBufferIndex);
   SceneGraph::Camera& camera     = renderTask.GetCamera();
 
+  Viewport viewport;
+  bool     viewportSet = renderTask.QueryViewport(updateBufferIndex, viewport);
+
   const SortedLayersIter endIter = sortedLayers.end();
   for(SortedLayersIter iter = sortedLayers.begin(); iter != endIter; ++iter)
   {
@@ -473,6 +532,8 @@ void RenderInstructionProcessor::Prepare(BufferIndex                 updateBuffe
                                  viewMatrix,
                                  camera,
                                  isLayer3D,
+                                 viewportSet,
+                                 viewport,
                                  cull);
 
         // We only use the clipping version of the sort comparitor if any clipping nodes exist within the RenderList.
@@ -495,6 +556,8 @@ void RenderInstructionProcessor::Prepare(BufferIndex                 updateBuffe
                                  viewMatrix,
                                  camera,
                                  isLayer3D,
+                                 viewportSet,
+                                 viewport,
                                  cull);
 
         // Clipping hierarchy is irrelevant when sorting overlay items, so we specify using the non-clipping version of the sort comparitor.

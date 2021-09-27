@@ -63,6 +63,7 @@ public:
     PROJECTION_MATRIX,
     SIZE,
     COLOR,
+    ACTOR_COLOR,
 
     COUNT
   };

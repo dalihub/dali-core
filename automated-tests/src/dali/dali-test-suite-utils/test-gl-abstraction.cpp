@@ -130,6 +130,7 @@ void TestGlAbstraction::Initialize()
     {"sTextureRect", GL_SAMPLER_2D, 1},
     {"sGloss", GL_SAMPLER_2D, 1},
     {"uColor", GL_FLOAT_VEC4, 1},
+    {"uActorColor", GL_FLOAT_VEC4, 1},
     {"uModelMatrix", GL_FLOAT_MAT4, 1},
     {"uModelView", GL_FLOAT_MAT4, 1},
     {"uMvpMatrix", GL_FLOAT_MAT4, 1},

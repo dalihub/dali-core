@@ -389,7 +389,7 @@ inline void RenderAlgorithms::SetupScissorClipping(
   const RenderItem&        item,
   Graphics::CommandBuffer& commandBuffer,
   const RenderInstruction& instruction,
-  int orientation)
+  int                      orientation)
 {
   // Get the number of child scissors in the stack (do not include layer or root box).
   size_t         childStackDepth = mScissorStack.size() - 1u;
@@ -429,7 +429,7 @@ inline void RenderAlgorithms::SetupScissorClipping(
       // This is a clipping node. We generate the AABB for this node and intersect it with the previous intersection further up the tree.
 
       // Get the AABB bounding box for the current render item.
-      const ClippingBox scissorBox(item.CalculateViewportSpaceAABB(item.mSize, mViewportRectangle.width, mViewportRectangle.height));
+      const ClippingBox scissorBox(RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, item.mSize, mViewportRectangle.width, mViewportRectangle.height));
 
       // Get the AABB for the parent item that we must intersect with.
       const ClippingBox& parentBox(mScissorStack.back());
@@ -625,7 +625,7 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
     bool skip = true;
     if(!rootClippingRect.IsEmpty())
     {
-      auto rect = item.CalculateViewportSpaceAABB(item.mUpdateSize, mViewportRectangle.width, mViewportRectangle.height);
+      auto rect = RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, item.mUpdateSize, mViewportRectangle.width, mViewportRectangle.height);
 
       if(rect.Intersect(rootClippingRect))
       {

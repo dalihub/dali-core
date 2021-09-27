@@ -1411,9 +1411,12 @@ int UtcDaliRendererPreMultipledAlpha(void)
   application.Render();
 
   Vector4            actualValue(Vector4::ZERO);
+  Vector4            actualActorColor(Vector4::ZERO);
   TestGlAbstraction& gl = application.GetGlAbstraction();
   DALI_TEST_CHECK(gl.GetUniformValue<Vector4>("uColor", actualValue));
   DALI_TEST_EQUALS(actualValue, Vector4(1.0f, 0.0f, 1.0f, 0.5f), TEST_LOCATION);
+  DALI_TEST_CHECK(gl.GetUniformValue<Vector4>("uActorColor", actualActorColor));
+  DALI_TEST_EQUALS(actualActorColor, Vector4(1.0f, 0.0f, 1.0f, 0.5f), TEST_LOCATION);
 
   // Enable pre-multiplied alpha
   renderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true);
@@ -1441,6 +1444,9 @@ int UtcDaliRendererPreMultipledAlpha(void)
 
   DALI_TEST_CHECK(gl.GetUniformValue<Vector4>("uColor", actualValue));
   DALI_TEST_EQUALS(actualValue, Vector4(0.5f, 0.0f, 0.5f, 0.5f), TEST_LOCATION);
+  // Note : uActorColor doesn't premultiplied.
+  DALI_TEST_CHECK(gl.GetUniformValue<Vector4>("uActorColor", actualActorColor));
+  DALI_TEST_EQUALS(actualActorColor, Vector4(1.0f, 0.0f, 1.0f, 0.5f), TEST_LOCATION);
 
   // Disable pre-multiplied alpha again
   renderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, false);
@@ -1468,6 +1474,8 @@ int UtcDaliRendererPreMultipledAlpha(void)
 
   DALI_TEST_CHECK(gl.GetUniformValue<Vector4>("uColor", actualValue));
   DALI_TEST_EQUALS(actualValue, Vector4(1.0f, 0.0f, 1.0f, 0.5f), TEST_LOCATION);
+  DALI_TEST_CHECK(gl.GetUniformValue<Vector4>("uActorColor", actualActorColor));
+  DALI_TEST_EQUALS(actualActorColor, Vector4(1.0f, 0.0f, 1.0f, 0.5f), TEST_LOCATION);
 
   END_TEST;
 }
@@ -3204,9 +3212,12 @@ int UtcDaliRendererOpacity(void)
   application.Render();
 
   Vector4            actualValue;
+  Vector4            actualActorColor;
   TestGlAbstraction& gl = application.GetGlAbstraction();
   DALI_TEST_CHECK(gl.GetUniformValue<Vector4>("uColor", actualValue));
   DALI_TEST_EQUALS(actualValue.a, 1.0f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_CHECK(gl.GetUniformValue<Vector4>("uActorColor", actualActorColor));
+  DALI_TEST_EQUALS(actualActorColor.a, 1.0f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
 
   renderer.SetProperty(DevelRenderer::Property::OPACITY, 0.5f);
 
@@ -3223,6 +3234,10 @@ int UtcDaliRendererOpacity(void)
 
   DALI_TEST_CHECK(gl.GetUniformValue<Vector4>("uColor", actualValue));
   DALI_TEST_EQUALS(actualValue.a, 0.5f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+
+  // Note : Renderer opacity doesn't apply to uActorColor.
+  DALI_TEST_CHECK(gl.GetUniformValue<Vector4>("uActorColor", actualActorColor));
+  DALI_TEST_EQUALS(actualActorColor.a, 1.0f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
 
   END_TEST;
 }

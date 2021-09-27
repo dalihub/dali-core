@@ -657,18 +657,19 @@ void Renderer::WriteUniformBuffer(
       WriteDefaultUniform(normalUniformInfo, *uboView, normalMatrix);
     }
 
-    Vector4        finalColor;
-    const Vector4& color = node.GetRenderColor(bufferIndex);
+    Vector4        finalColor;                               ///< Applied renderer's opacity color
+    const Vector4& color = node.GetRenderColor(bufferIndex); ///< Actor's original color
     if(mPremultipliedAlphaEnabled)
     {
-      float alpha = color.a * mRenderDataProvider->GetOpacity(bufferIndex);
-      finalColor  = Vector4(color.r * alpha, color.g * alpha, color.b * alpha, alpha);
+      const float& alpha = color.a * mRenderDataProvider->GetOpacity(bufferIndex);
+      finalColor         = Vector4(color.r * alpha, color.g * alpha, color.b * alpha, alpha);
     }
     else
     {
       finalColor = Vector4(color.r, color.g, color.b, color.a * mRenderDataProvider->GetOpacity(bufferIndex));
     }
     WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::COLOR), *uboView, finalColor);
+    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::ACTOR_COLOR), *uboView, color);
 
     // Write uniforms from the uniform map
     FillUniformBuffer(*program, instruction, *uboView, bindings, uboOffset, bufferIndex);
