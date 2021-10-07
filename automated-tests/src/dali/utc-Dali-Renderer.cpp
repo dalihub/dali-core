@@ -698,6 +698,8 @@ int UtcDaliRendererBlendOptions05(void)
   actor.AddRenderer(renderer);
   actor.SetProperty(Actor::Property::SIZE, Vector2(400, 400));
   application.GetScene().Add(actor);
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  glAbstraction.EnableEnableDisableCallTrace(true);
 
   if(Dali::Capabilities::IsBlendEquationSupported(DevelBlendEquation::MAX))
   {
@@ -756,48 +758,93 @@ int UtcDaliRendererBlendOptions05(void)
   {
     renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::MULTIPLY);
     DALI_TEST_EQUALS((int)DevelBlendEquation::MULTIPLY, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
+    application.SendNotification();
+    application.Render();
+    DALI_TEST_EQUALS(glAbstraction.GetLastBlendEquationRgb(), GL_MULTIPLY, TEST_LOCATION);
 
     renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::SCREEN);
     DALI_TEST_EQUALS((int)DevelBlendEquation::SCREEN, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
+    application.SendNotification();
+    application.Render();
+    DALI_TEST_EQUALS(glAbstraction.GetLastBlendEquationRgb(), GL_SCREEN, TEST_LOCATION);
 
     renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::OVERLAY);
     DALI_TEST_EQUALS((int)DevelBlendEquation::OVERLAY, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
+    application.SendNotification();
+    application.Render();
+    DALI_TEST_EQUALS(glAbstraction.GetLastBlendEquationRgb(), GL_OVERLAY, TEST_LOCATION);
 
     renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::DARKEN);
     DALI_TEST_EQUALS((int)DevelBlendEquation::DARKEN, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
+    application.SendNotification();
+    application.Render();
+    DALI_TEST_EQUALS(glAbstraction.GetLastBlendEquationRgb(), GL_DARKEN, TEST_LOCATION);
 
     renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::LIGHTEN);
     DALI_TEST_EQUALS((int)DevelBlendEquation::LIGHTEN, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
+    application.SendNotification();
+    application.Render();
+    DALI_TEST_EQUALS(glAbstraction.GetLastBlendEquationRgb(), GL_LIGHTEN, TEST_LOCATION);
 
     renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::COLOR_DODGE);
     DALI_TEST_EQUALS((int)DevelBlendEquation::COLOR_DODGE, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
+    application.SendNotification();
+    application.Render();
+    DALI_TEST_EQUALS(glAbstraction.GetLastBlendEquationRgb(), GL_COLORDODGE, TEST_LOCATION);
 
     renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::COLOR_BURN);
     DALI_TEST_EQUALS((int)DevelBlendEquation::COLOR_BURN, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
+    application.SendNotification();
+    application.Render();
+    DALI_TEST_EQUALS(glAbstraction.GetLastBlendEquationRgb(), GL_COLORBURN, TEST_LOCATION);
 
     renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::HARD_LIGHT);
     DALI_TEST_EQUALS((int)DevelBlendEquation::HARD_LIGHT, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
+    application.SendNotification();
+    application.Render();
+    DALI_TEST_EQUALS(glAbstraction.GetLastBlendEquationRgb(), GL_HARDLIGHT, TEST_LOCATION);
 
     renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::SOFT_LIGHT);
     DALI_TEST_EQUALS((int)DevelBlendEquation::SOFT_LIGHT, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
+    application.SendNotification();
+    application.Render();
+    DALI_TEST_EQUALS(glAbstraction.GetLastBlendEquationRgb(), GL_SOFTLIGHT, TEST_LOCATION);
 
     renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::DIFFERENCE);
     DALI_TEST_EQUALS((int)DevelBlendEquation::DIFFERENCE, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
+    application.SendNotification();
+    application.Render();
+    DALI_TEST_EQUALS(glAbstraction.GetLastBlendEquationRgb(), GL_DIFFERENCE, TEST_LOCATION);
 
     renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::EXCLUSION);
     DALI_TEST_EQUALS((int)DevelBlendEquation::EXCLUSION, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
+    application.SendNotification();
+    application.Render();
+    DALI_TEST_EQUALS(glAbstraction.GetLastBlendEquationRgb(), GL_EXCLUSION, TEST_LOCATION);
 
     renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::HUE);
     DALI_TEST_EQUALS((int)DevelBlendEquation::HUE, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
+    application.SendNotification();
+    application.Render();
+    DALI_TEST_EQUALS(glAbstraction.GetLastBlendEquationRgb(), GL_HSL_HUE, TEST_LOCATION);
 
     renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::SATURATION);
     DALI_TEST_EQUALS((int)DevelBlendEquation::SATURATION, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
+    application.SendNotification();
+    application.Render();
+    DALI_TEST_EQUALS(glAbstraction.GetLastBlendEquationRgb(), GL_HSL_SATURATION, TEST_LOCATION);
 
     renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::COLOR);
     DALI_TEST_EQUALS((int)DevelBlendEquation::COLOR, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
+    application.SendNotification();
+    application.Render();
+    DALI_TEST_EQUALS(glAbstraction.GetLastBlendEquationRgb(), GL_HSL_COLOR, TEST_LOCATION);
 
     renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::LUMINOSITY);
     DALI_TEST_EQUALS((int)DevelBlendEquation::LUMINOSITY, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
+    application.SendNotification();
+    application.Render();
+    DALI_TEST_EQUALS(glAbstraction.GetLastBlendEquationRgb(), GL_HSL_LUMINOSITY, TEST_LOCATION);
   }
 
   END_TEST;

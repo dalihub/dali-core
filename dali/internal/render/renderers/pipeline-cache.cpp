@@ -152,23 +152,39 @@ constexpr Graphics::BlendOp ConvertBlendEquation(DevelBlendEquation::Type blendE
     case DevelBlendEquation::REVERSE_SUBTRACT:
       return Graphics::BlendOp::REVERSE_SUBTRACT;
     case DevelBlendEquation::COLOR:
+      return Graphics::BlendOp::COLOR;
     case DevelBlendEquation::COLOR_BURN:
+      return Graphics::BlendOp::COLOR_BURN;
     case DevelBlendEquation::COLOR_DODGE:
+      return Graphics::BlendOp::COLOR_DODGE;
     case DevelBlendEquation::DARKEN:
+      return Graphics::BlendOp::DARKEN;
     case DevelBlendEquation::DIFFERENCE:
+      return Graphics::BlendOp::DIFFERENCE;
     case DevelBlendEquation::EXCLUSION:
+      return Graphics::BlendOp::EXCLUSION;
     case DevelBlendEquation::HARD_LIGHT:
+      return Graphics::BlendOp::HARD_LIGHT;
     case DevelBlendEquation::HUE:
+      return Graphics::BlendOp::HUE;
     case DevelBlendEquation::LIGHTEN:
+      return Graphics::BlendOp::LIGHTEN;
     case DevelBlendEquation::LUMINOSITY:
+      return Graphics::BlendOp::LUMINOSITY;
     case DevelBlendEquation::MAX:
+      return Graphics::BlendOp::MAX;
     case DevelBlendEquation::MIN:
+      return Graphics::BlendOp::MIN;
     case DevelBlendEquation::MULTIPLY:
+      return Graphics::BlendOp::MULTIPLY;
     case DevelBlendEquation::OVERLAY:
+      return Graphics::BlendOp::OVERLAY;
     case DevelBlendEquation::SATURATION:
+      return Graphics::BlendOp::SATURATION;
     case DevelBlendEquation::SCREEN:
+      return Graphics::BlendOp::SCREEN;
     case DevelBlendEquation::SOFT_LIGHT:
-      return Graphics::BlendOp{};
+      return Graphics::BlendOp::SOFT_LIGHT;
   }
   return Graphics::BlendOp{};
 }
@@ -414,9 +430,6 @@ PipelineResult PipelineCache::GetPipeline(const PipelineCacheQueryInfo& queryInf
 
     // Store a pipeline per renderer per render (renderer can be owned by multiple nodes,
     // and re-drawn in multiple instructions).
-    // @todo This is only needed because ColorBlend state can change. Fixme!
-    // This is ameliorated by the fact that implementation caches pipelines, and we're only storing
-    // handles.
     level2->pipeline = graphicsController->CreatePipeline(createInfo, nullptr);
   }
 
