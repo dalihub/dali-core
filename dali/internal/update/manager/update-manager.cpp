@@ -268,6 +268,7 @@ struct UpdateManager::Impl
   OwnerContainer<PropertyOwner*> customObjects; ///< A container of owned objects (with custom properties)
 
   OwnerContainer<PropertyResetterBase*> propertyResetters;     ///< A container of property resetters
+  OwnerContainer<NodeResetter*>         nodeResetters;         ///< A container of node resetters
   OwnerContainer<Animation*>            animations;            ///< A container of owned animations
   PropertyNotificationContainer         propertyNotifications; ///< A container of owner property notifications.
   OwnerContainer<Renderer*>             renderers;             ///< A container of owned renderers
@@ -340,6 +341,9 @@ void UpdateManager::InstallRoot(OwnerPointer<Layer>& layer)
   rootLayer->CreateTransform(&mImpl->transformManager);
   rootLayer->SetRoot(true);
 
+  OwnerPointer<SceneGraph::NodeResetter> nodeResetter = SceneGraph::NodeResetter::New(*rootLayer);
+  AddNodeResetter(nodeResetter);
+
   mImpl->scenes.emplace_back(new Impl::SceneInfo(rootLayer));
 }
 
@@ -383,6 +387,9 @@ void UpdateManager::ConnectNode(Node* parent, Node* node)
   DALI_LOG_INFO(gLogFilter, Debug::General, "[%x] ConnectNode\n", node);
 
   parent->ConnectChild(node);
+
+  OwnerPointer<SceneGraph::NodeResetter> nodeResetter = SceneGraph::NodeResetter::New(*node);
+  AddNodeResetter(nodeResetter);
 
   // Inform the frame-callback-processor, if set, about the node-hierarchy changing
   if(mImpl->frameCallbackProcessor)
@@ -555,6 +562,12 @@ void UpdateManager::AddPropertyResetter(OwnerPointer<PropertyResetterBase>& prop
   mImpl->propertyResetters.PushBack(propertyResetter.Release());
 }
 
+void UpdateManager::AddNodeResetter(OwnerPointer<NodeResetter>& nodeResetter)
+{
+  nodeResetter->Initialize();
+  mImpl->nodeResetters.PushBack(nodeResetter.Release());
+}
+
 void UpdateManager::AddPropertyNotification(OwnerPointer<PropertyNotification>& propertyNotification)
 {
   mImpl->propertyNotifications.PushBack(propertyNotification.Release());
@@ -659,19 +672,36 @@ void UpdateManager::ResetProperties(BufferIndex bufferIndex)
   // Clear the "animations finished" flag; This should be set if any (previously playing) animation is stopped
   mImpl->animationFinishedDuringUpdate = false;
 
+  // Reset node properties
+  std::vector<NodeResetter*> nodeResetterToDelete;
+  for(auto&& element : mImpl->nodeResetters)
+  {
+    element->ResetToBaseValue(bufferIndex);
+    if(element->IsFinished())
+    {
+      nodeResetterToDelete.push_back(element);
+    }
+  }
+
+  // If a node resetter is no longer required, delete it.
+  for(auto&& elementPtr : nodeResetterToDelete)
+  {
+    mImpl->nodeResetters.EraseObject(elementPtr);
+  }
+
   // Reset all animating / constrained properties
-  std::vector<PropertyResetterBase*> toDelete;
+  std::vector<PropertyResetterBase*> propertyResettertoDelete;
   for(auto&& element : mImpl->propertyResetters)
   {
     element->ResetToBaseValue(bufferIndex);
     if(element->IsFinished())
     {
-      toDelete.push_back(element);
+      propertyResettertoDelete.push_back(element);
     }
   }
 
-  // If a resetter is no longer required (the animator or constraint has been removed), delete it.
-  for(auto&& elementPtr : toDelete)
+  // If a property resetter is no longer required (the animator or constraint has been removed), delete it.
+  for(auto&& elementPtr : propertyResettertoDelete)
   {
     mImpl->propertyResetters.EraseObject(elementPtr);
   }

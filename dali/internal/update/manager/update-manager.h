@@ -33,6 +33,7 @@
 #include <dali/internal/render/renderers/render-vertex-buffer.h>
 #include <dali/internal/render/shaders/render-shader.h> // for OwnerPointer< Shader >
 #include <dali/internal/update/animation/scene-graph-animation.h>
+#include <dali/internal/update/common/node-resetter.h>
 #include <dali/internal/update/common/property-resetter.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/update/common/scene-graph-property-notification.h>
@@ -258,6 +259,13 @@ public:
    * constraint has finished; or the property owner of the property is destroyed.
    */
   void AddPropertyResetter(OwnerPointer<PropertyResetterBase>& propertyResetter);
+
+  /**
+   * Add a node resetter. UpdateManager takes ownership of the object.
+   * It will be killed by UpdateManager when the node is disconnected from the scene graph;
+   * or when the node is destroyed.
+   */
+  void AddNodeResetter(OwnerPointer<NodeResetter>& nodeResetter);
 
   // Property Notification
 
