@@ -19,6 +19,8 @@
 
 namespace Dali
 {
+const Rect<int> TestApplication::DEFAULT_SURFACE_RECT = Rect<int>(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+
 bool TestApplication::mLoggingEnabled = true;
 
 TestApplication::TestApplication(uint32_t surfaceWidth,
@@ -225,7 +227,7 @@ bool TestApplication::PreRenderWithPartialUpdate(uint32_t intervalMilliseconds, 
 
 bool TestApplication::RenderWithPartialUpdate(std::vector<Rect<int>>& damagedRects, Rect<int>& clippingRect)
 {
-  mCore->RenderScene(mRenderStatus, mScene, true /*render the off-screen buffers*/, clippingRect);
+  mCore->RenderScene(mRenderStatus, mScene, true /*render the off-screen buffers*/);
   mCore->RenderScene(mRenderStatus, mScene, false /*render the surface*/, clippingRect);
   mCore->PostRender(false /*do not skip rendering*/);
 

@@ -1103,6 +1103,8 @@ int UtcDaliSceneSurfaceRotatedWithAngle0(void)
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
   DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+
+  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   Actor actor = CreateRenderableActor();
@@ -1167,6 +1169,8 @@ int UtcDaliSceneSurfaceRotatedWithAngle90(void)
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
   DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+
+  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   Actor actor = CreateRenderableActor();
@@ -1238,6 +1242,8 @@ int UtcDaliSceneSurfaceRotatedWithAngle180(void)
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
   DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+
+  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   Actor actor = CreateRenderableActor();
@@ -1309,6 +1315,8 @@ int UtcDaliSceneSurfaceRotatedWithAngle270(void)
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
   DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+
+  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   Actor actor = CreateRenderableActor();

@@ -491,8 +491,9 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
   class DamagedRectsCleaner
   {
   public:
-    explicit DamagedRectsCleaner(std::vector<Rect<int>>& damagedRects)
+    explicit DamagedRectsCleaner(std::vector<Rect<int>>& damagedRects, Rect<int>& surfaceRect)
     : mDamagedRects(damagedRects),
+      mSurfaceRect(surfaceRect),
       mCleanOnReturn(true)
     {
     }
@@ -507,18 +508,20 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
       if(mCleanOnReturn)
       {
         mDamagedRects.clear();
+        mDamagedRects.push_back(mSurfaceRect);
       }
     }
 
   private:
     std::vector<Rect<int>>& mDamagedRects;
+    Rect<int>               mSurfaceRect;
     bool                    mCleanOnReturn;
   };
 
   Rect<int32_t> surfaceRect = sceneObject->GetSurfaceRect();
 
   // Clean collected dirty/damaged rects on exit if 3d layer or 3d node or other conditions.
-  DamagedRectsCleaner damagedRectCleaner(damagedRects);
+  DamagedRectsCleaner damagedRectCleaner(damagedRects, surfaceRect);
 
   // Mark previous dirty rects in the sorted array. The array is already sorted by node and renderer, frame number.
   // so you don't need to sort: std::stable_sort(itemsDirtyRects.begin(), itemsDirtyRects.end());
@@ -707,6 +710,12 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
 void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo, Rect<int>& clippingRect)
 {
+  if(mImpl->partialUpdateAvailable == Integration::PartialUpdateAvailable::TRUE && !renderToFbo && clippingRect.IsEmpty())
+  {
+    // ClippingRect is empty. Skip rendering
+    return;
+  }
+
   // Reset main algorithms command buffer
   mImpl->renderAlgorithms.ResetCommandBuffer();
 
@@ -718,6 +727,15 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
   uint32_t count = sceneObject->GetRenderInstructions().Count(mImpl->renderBufferIndex);
 
   std::vector<Graphics::RenderTarget*> targetstoPresent;
+
+  Rect<int32_t> surfaceRect = sceneObject->GetSurfaceRect();
+  if(clippingRect == surfaceRect)
+  {
+    // Full rendering case
+    // Make clippingRect empty because we're doing full rendering now if the clippingRect is empty.
+    // To reduce side effects, keep this logic now.
+    clippingRect = Rect<int>();
+  }
 
   for(uint32_t i = 0; i < count; ++i)
   {
@@ -733,8 +751,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
     Rect<int32_t> viewportRect;
 
-    Rect<int32_t> surfaceRect        = sceneObject->GetSurfaceRect();
-    int32_t       surfaceOrientation = sceneObject->GetSurfaceOrientation();
+    int32_t surfaceOrientation = sceneObject->GetSurfaceOrientation();
 
     // @todo Should these be part of scene?
     Integration::DepthBufferAvailable   depthBufferAvailable   = mImpl->depthBufferAvailable;
