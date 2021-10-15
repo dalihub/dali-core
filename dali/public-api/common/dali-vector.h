@@ -552,6 +552,7 @@ public: // API
     DALI_ASSERT_VECTOR(index < VectorBase::Count() && "Index out of bounds");
     if(index >= VectorBase::Count())
     {
+      // Assert to debug
       assert(0);
     }
     ItemType* address = reinterpret_cast<ItemType*>(VectorBase::mData);
