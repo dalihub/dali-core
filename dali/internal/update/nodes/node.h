@@ -360,7 +360,12 @@ public:
    */
   const Vector3& GetParentOrigin() const
   {
-    return mParentOrigin.Get(0);
+    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID && mParentOrigin.mTxManagerData)
+    {
+      return mParentOrigin.Get(0);
+    }
+
+    return Vector3::ZERO;
   }
 
   /**
@@ -378,7 +383,12 @@ public:
    */
   const Vector3& GetAnchorPoint() const
   {
-    return mAnchorPoint.Get(0);
+    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID && mAnchorPoint.mTxManagerData)
+    {
+      return mAnchorPoint.Get(0);
+    }
+
+    return Vector3::ZERO;
   }
 
   /**
@@ -397,7 +407,7 @@ public:
    */
   const Vector3& GetPosition(BufferIndex bufferIndex) const
   {
-    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
+    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID && mPosition.mTxManagerData)
     {
       return mPosition.Get(bufferIndex);
     }
@@ -433,7 +443,7 @@ public:
    */
   const Quaternion& GetOrientation(BufferIndex bufferIndex) const
   {
-    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
+    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID && mOrientation.mTxManagerData)
     {
       return mOrientation.Get(0);
     }
@@ -470,7 +480,7 @@ public:
    */
   const Vector3& GetScale(BufferIndex bufferIndex) const
   {
-    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
+    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID && mScale.mTxManagerData)
     {
       return mScale.Get(0);
     }
@@ -620,7 +630,7 @@ public:
    */
   const Vector3& GetSize(BufferIndex bufferIndex) const
   {
-    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
+    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID && mSize.mTxManagerData)
     {
       return mSize.Get(0);
     }
