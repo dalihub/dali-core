@@ -32,7 +32,6 @@
 #include <dali/public-api/object/type-registry.h>
 
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/actors/layer-devel.h>
 #include <dali/devel-api/common/capabilities.h>
 
 #include <dali/integration-api/debug.h>
@@ -1344,8 +1343,8 @@ void Actor::ConnectToScene(uint32_t parentDepth, bool notify)
     mScene->RequestRebuildDepthTree();
   }
 
-  // This stage is atomic i.e. not interrupted by user callbacks.
-  RecursiveConnectToScene(connectionList, parentDepth + 1);
+  // This stage is not interrupted by user callbacks.
+  mParentImpl.RecursiveConnectToScene(connectionList, parentDepth + 1);
 
   // Notify applications about the newly connected actors.
   for(const auto& actor : connectionList)
@@ -1354,32 +1353,6 @@ void Actor::ConnectToScene(uint32_t parentDepth, bool notify)
   }
 
   RelayoutRequest();
-}
-
-void Actor::RecursiveConnectToScene(ActorContainer& connectionList, uint32_t depth)
-{
-  DALI_ASSERT_ALWAYS(!OnScene());
-
-  mIsOnScene = true;
-  mDepth     = static_cast<uint16_t>(depth); // overflow ignored, not expected in practice
-
-  ConnectToSceneGraph();
-
-  // Notification for internal derived classes
-  OnSceneConnectionInternal();
-
-  // This stage is atomic; avoid emitting callbacks until all Actors are connected
-  connectionList.push_back(ActorPtr(this));
-
-  // Recursively connect children
-  if(GetChildCount() > 0)
-  {
-    for(const auto& child : mParentImpl.GetChildrenInternal())
-    {
-      child->SetScene(*mScene);
-      child->RecursiveConnectToScene(connectionList, depth + 1);
-    }
-  }
 }
 
 /**
@@ -1439,37 +1412,14 @@ void Actor::DisconnectFromStage(bool notify)
     mScene->RequestRebuildDepthTree();
   }
 
-  // This stage is atomic i.e. not interrupted by user callbacks
-  RecursiveDisconnectFromStage(disconnectionList);
+  // This stage is not interrupted by user callbacks
+  mParentImpl.RecursiveDisconnectFromScene(disconnectionList);
 
   // Notify applications about the newly disconnected actors.
   for(const auto& actor : disconnectionList)
   {
     actor->NotifyStageDisconnection(notify);
   }
-}
-
-void Actor::RecursiveDisconnectFromStage(ActorContainer& disconnectionList)
-{
-  // need to change state first so that internals relying on IsOnScene() inside OnSceneDisconnectionInternal() get the correct value
-  mIsOnScene = false;
-
-  // Recursively disconnect children
-  if(GetChildCount() > 0)
-  {
-    for(const auto& child : mParentImpl.GetChildrenInternal())
-    {
-      child->RecursiveDisconnectFromStage(disconnectionList);
-    }
-  }
-
-  // This stage is atomic; avoid emitting callbacks until all Actors are disconnected
-  disconnectionList.push_back(ActorPtr(this));
-
-  // Notification for internal derived classes
-  OnSceneDisconnectionInternal();
-
-  DisconnectFromSceneGraph();
 }
 
 /**
@@ -1511,17 +1461,7 @@ void Actor::NotifyStageDisconnection(bool notify)
 
 bool Actor::IsNodeConnected() const
 {
-  bool connected(false);
-
-  if(OnScene())
-  {
-    if(IsRoot() || GetNode().GetParent())
-    {
-      connected = true;
-    }
-  }
-
-  return connected;
+  return OnScene() && (IsRoot() || GetNode().GetParent());
 }
 
 // This method initiates traversal of the actor tree using depth-first
@@ -1539,27 +1479,10 @@ void Actor::RebuildDepthTree()
   OwnerPointer<SceneGraph::NodeDepths> sceneGraphNodeDepths(new SceneGraph::NodeDepths());
 
   int32_t depthIndex = 1;
-  DepthTraverseActorTree(sceneGraphNodeDepths, depthIndex);
+  mParentImpl.DepthTraverseActorTree(sceneGraphNodeDepths, depthIndex);
 
   SetDepthIndicesMessage(GetEventThreadServices().GetUpdateManager(), sceneGraphNodeDepths);
   DALI_LOG_TIMER_END(depthTimer, gLogFilter, Debug::Concise, "Depth tree traversal time: ");
-}
-
-void Actor::DepthTraverseActorTree(OwnerPointer<SceneGraph::NodeDepths>& sceneGraphNodeDepths, int32_t& depthIndex)
-{
-  mSortedDepth = depthIndex * DevelLayer::SIBLING_ORDER_MULTIPLIER;
-  sceneGraphNodeDepths->Add(const_cast<SceneGraph::Node*>(&GetNode()), mSortedDepth);
-
-  // Create/add to children of this node
-  if(GetChildCount() > 0)
-  {
-    for(const auto& child : mParentImpl.GetChildrenInternal())
-    {
-      Actor* childActor = child.Get();
-      ++depthIndex;
-      childActor->DepthTraverseActorTree(sceneGraphNodeDepths, depthIndex);
-    }
-  }
 }
 
 void Actor::SetDefaultProperty(Property::Index index, const Property::Value& property)
@@ -1944,36 +1867,14 @@ bool Actor::IsLayoutNegotiated(Dimension::Type dimension) const
 
 float Actor::GetHeightForWidthBase(float width)
 {
-  float height = 0.0f;
-
   const Vector3 naturalSize = GetNaturalSize();
-  if(naturalSize.width > 0.0f)
-  {
-    height = naturalSize.height * width / naturalSize.width;
-  }
-  else // we treat 0 as 1:1 aspect ratio
-  {
-    height = width;
-  }
-
-  return height;
+  return naturalSize.width > 0.0f ? naturalSize.height * width / naturalSize.width : width;
 }
 
 float Actor::GetWidthForHeightBase(float height)
 {
-  float width = 0.0f;
-
   const Vector3 naturalSize = GetNaturalSize();
-  if(naturalSize.height > 0.0f)
-  {
-    width = naturalSize.width * height / naturalSize.height;
-  }
-  else // we treat 0 as 1:1 aspect ratio
-  {
-    width = height;
-  }
-
-  return width;
+  return naturalSize.height > 0.0f ? naturalSize.width * height / naturalSize.height : height;
 }
 
 float Actor::CalculateChildSizeBase(const Dali::Actor& child, Dimension::Type dimension)
@@ -2200,12 +2101,7 @@ void Actor::SetPreferredSize(const Vector2& size)
 
 Vector2 Actor::GetPreferredSize() const
 {
-  if(mRelayoutData)
-  {
-    return Vector2(mRelayoutData->preferredSize);
-  }
-
-  return Relayouter::DEFAULT_PREFERRED_SIZE;
+  return mRelayoutData ? Vector2(mRelayoutData->preferredSize) : Relayouter::DEFAULT_PREFERRED_SIZE;
 }
 
 void Actor::SetMinimumSize(float size, Dimension::Type dimension)
@@ -2216,12 +2112,7 @@ void Actor::SetMinimumSize(float size, Dimension::Type dimension)
 
 float Actor::GetMinimumSize(Dimension::Type dimension) const
 {
-  if(mRelayoutData)
-  {
-    return mRelayoutData->GetMinimumSize(dimension);
-  }
-
-  return 0.0f; // Default
+  return mRelayoutData ? mRelayoutData->GetMinimumSize(dimension) : 0.0f;
 }
 
 void Actor::SetMaximumSize(float size, Dimension::Type dimension)
@@ -2232,12 +2123,7 @@ void Actor::SetMaximumSize(float size, Dimension::Type dimension)
 
 float Actor::GetMaximumSize(Dimension::Type dimension) const
 {
-  if(mRelayoutData)
-  {
-    return mRelayoutData->GetMaximumSize(dimension);
-  }
-
-  return FLT_MAX; // Default
+  return mRelayoutData ? mRelayoutData->GetMaximumSize(dimension) : FLT_MAX;
 }
 
 void Actor::SetVisibleInternal(bool visible, SendMessage::Type sendMessage)
@@ -2255,7 +2141,7 @@ void Actor::SetVisibleInternal(bool visible, SendMessage::Type sendMessage)
     mVisible = visible;
 
     // Emit the signal on this actor and all its children
-    EmitVisibilityChangedSignalRecursively(visible, DevelActor::VisibilityChange::SELF);
+    mParentImpl.EmitVisibilityChangedSignalRecursively(visible, DevelActor::VisibilityChange::SELF);
   }
 }
 
@@ -2307,28 +2193,7 @@ void Actor::SetInheritLayoutDirection(bool inherit)
 
     if(inherit && mParent)
     {
-      InheritLayoutDirectionRecursively(GetParent()->mLayoutDirection);
-    }
-  }
-}
-
-void Actor::InheritLayoutDirectionRecursively(Dali::LayoutDirection::Type direction, bool set)
-{
-  if(mInheritLayoutDirection || set)
-  {
-    if(mLayoutDirection != direction)
-    {
-      mLayoutDirection = direction;
-      EmitLayoutDirectionChangedSignal(direction);
-      RelayoutRequest();
-    }
-
-    if(GetChildCount() > 0)
-    {
-      for(const auto& child : mParentImpl.GetChildrenInternal())
-      {
-        child->InheritLayoutDirectionRecursively(direction);
-      }
+      mParentImpl.InheritLayoutDirectionRecursively(GetParent()->mLayoutDirection);
     }
   }
 }
@@ -2337,20 +2202,6 @@ void Actor::SetUpdateSizeHint(const Vector2& updateSizeHint)
 {
   // node is being used in a separate thread; queue a message to set the value & base value
   SceneGraph::NodePropertyMessage<Vector3>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mUpdateSizeHint, &AnimatableProperty<Vector3>::Bake, Vector3(updateSizeHint.width, updateSizeHint.height, 0.f));
-}
-
-void Actor::EmitVisibilityChangedSignalRecursively(bool                               visible,
-                                                   DevelActor::VisibilityChange::Type type)
-{
-  EmitVisibilityChangedSignal(visible, type);
-
-  if(GetChildCount() > 0)
-  {
-    for(auto& child : mParentImpl.GetChildrenInternal())
-    {
-      child->EmitVisibilityChangedSignalRecursively(visible, DevelActor::VisibilityChange::PARENT);
-    }
-  }
 }
 
 } // namespace Internal

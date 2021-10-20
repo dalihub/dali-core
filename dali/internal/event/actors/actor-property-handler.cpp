@@ -536,7 +536,7 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
 
       if(Scripting::GetEnumerationProperty<LayoutDirection::Type>(property, LAYOUT_DIRECTION_TABLE, LAYOUT_DIRECTION_TABLE_COUNT, direction))
       {
-        actor.InheritLayoutDirectionRecursively(direction, true);
+        actor.mParentImpl.InheritLayoutDirectionRecursively(direction, true);
       }
       break;
     }
