@@ -975,67 +975,34 @@ uint32_t Actor::AddRenderer(Renderer& renderer)
 {
   if(!mRenderers)
   {
-    mRenderers = new RendererContainer;
+    mRenderers = new RendererContainer(GetEventThreadServices());
   }
-
-  if(mIsBlendEquationSet)
-  {
-    renderer.SetBlendEquation(static_cast<DevelBlendEquation::Type>(mBlendEquation));
-  }
-
-  uint32_t    index       = static_cast<uint32_t>(mRenderers->size()); //  4,294,967,295 renderers per actor
-  RendererPtr rendererPtr = RendererPtr(&renderer);
-  mRenderers->push_back(rendererPtr);
-  AttachRendererMessage(GetEventThreadServices().GetUpdateManager(), GetNode(), renderer.GetRendererSceneObject());
-  return index;
+  return mRenderers->Add(GetNode(), renderer, mIsBlendEquationSet, mBlendEquation);
 }
 
 uint32_t Actor::GetRendererCount() const
 {
-  uint32_t rendererCount(0);
-  if(mRenderers)
-  {
-    rendererCount = static_cast<uint32_t>(mRenderers->size()); //  4,294,967,295 renderers per actor
-  }
-
-  return rendererCount;
+  return mRenderers ? mRenderers->GetCount() : 0u;
 }
 
 RendererPtr Actor::GetRendererAt(uint32_t index)
 {
-  RendererPtr renderer;
-  if(index < GetRendererCount())
-  {
-    renderer = (*mRenderers)[index];
-  }
-
-  return renderer;
+  return mRenderers ? mRenderers->GetRendererAt(index) : nullptr;
 }
 
 void Actor::RemoveRenderer(Renderer& renderer)
 {
   if(mRenderers)
   {
-    RendererIter end = mRenderers->end();
-    for(RendererIter iter = mRenderers->begin(); iter != end; ++iter)
-    {
-      if((*iter).Get() == &renderer)
-      {
-        mRenderers->erase(iter);
-        DetachRendererMessage(GetEventThreadServices(), GetNode(), renderer.GetRendererSceneObject());
-        break;
-      }
-    }
+    mRenderers->Remove(GetNode(), renderer);
   }
 }
 
 void Actor::RemoveRenderer(uint32_t index)
 {
-  if(index < GetRendererCount())
+  if(mRenderers)
   {
-    RendererPtr renderer = (*mRenderers)[index];
-    DetachRendererMessage(GetEventThreadServices(), GetNode(), renderer.Get()->GetRendererSceneObject());
-    mRenderers->erase(mRenderers->begin() + index);
+    mRenderers->Remove(GetNode(), index);
   }
 }
 
@@ -1045,12 +1012,10 @@ void Actor::SetBlendEquation(DevelBlendEquation::Type blendEquation)
   {
     if(mBlendEquation != blendEquation)
     {
-      mBlendEquation         = blendEquation;
-      uint32_t rendererCount = GetRendererCount();
-      for(uint32_t i = 0; i < rendererCount; ++i)
+      mBlendEquation = blendEquation;
+      if(mRenderers)
       {
-        RendererPtr renderer = GetRendererAt(i);
-        renderer->SetBlendEquation(static_cast<DevelBlendEquation::Type>(blendEquation));
+        mRenderers->SetBlending(blendEquation);
       }
     }
     mIsBlendEquationSet = true;

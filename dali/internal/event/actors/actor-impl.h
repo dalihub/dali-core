@@ -30,6 +30,7 @@
 #include <dali/internal/event/actors/actor-declarations.h>
 #include <dali/internal/event/actors/actor-parent-impl.h>
 #include <dali/internal/event/actors/actor-parent.h>
+#include <dali/internal/event/actors/actor-renderer-container.h>
 #include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/common/stage-def.h>
 #include <dali/internal/update/nodes/node-declarations.h>
@@ -56,10 +57,6 @@ class Animation;
 class RenderTask;
 class Renderer;
 class Scene;
-
-using RendererPtr       = IntrusivePtr<Renderer>;
-using RendererContainer = std::vector<RendererPtr>;
-using RendererIter      = RendererContainer::iterator;
 
 class ActorDepthTreeNode;
 using DepthNodeMemoryPool = Dali::Internal::MemoryPoolObjectAllocator<ActorDepthTreeNode>;
@@ -170,7 +167,7 @@ public:
   bool IsRenderable() const
   {
     // inlined as this is called a lot in hit testing
-    return mRenderers && !mRenderers->empty();
+    return mRenderers && !mRenderers->IsEmpty();
   }
 
   /**
