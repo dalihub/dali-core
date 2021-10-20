@@ -37,12 +37,12 @@
 
 #include <dali/integration-api/debug.h>
 
+#include <dali/internal/event/actors/actor-coords.h>
 #include <dali/internal/event/actors/actor-parent.h>
 #include <dali/internal/event/actors/actor-property-handler.h>
 #include <dali/internal/event/actors/actor-relayouter.h>
 #include <dali/internal/event/actors/camera-actor-impl.h>
 #include <dali/internal/event/common/event-thread-services.h>
-#include <dali/internal/event/common/projection.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/common/stage-impl.h>
@@ -254,60 +254,6 @@ void EmitSignal(Actor& actor, Signal& signal, Param... params)
     Dali::Actor handle(&actor);
     signal.Emit(handle, params...);
   }
-}
-
-bool ScreenToLocalInternal(
-  const Matrix&   viewMatrix,
-  const Matrix&   projectionMatrix,
-  const Matrix&   worldMatrix,
-  const Viewport& viewport,
-  const Vector3&  currentSize,
-  float&          localX,
-  float&          localY,
-  float           screenX,
-  float           screenY)
-{
-  // Get the ModelView matrix
-  Matrix modelView;
-  Matrix::Multiply(modelView, worldMatrix, viewMatrix);
-
-  // Calculate the inverted ModelViewProjection matrix; this will be used for 2 unprojects
-  Matrix invertedMvp(false /*don't init*/);
-  Matrix::Multiply(invertedMvp, modelView, projectionMatrix);
-  bool success = invertedMvp.Invert();
-
-  // Convert to GL coordinates
-  Vector4 screenPos(screenX - static_cast<float>(viewport.x), static_cast<float>(viewport.height) - screenY - static_cast<float>(viewport.y), 0.f, 1.f);
-
-  Vector4 nearPos;
-  if(success)
-  {
-    success = Unproject(screenPos, invertedMvp, static_cast<float>(viewport.width), static_cast<float>(viewport.height), nearPos);
-  }
-
-  Vector4 farPos;
-  if(success)
-  {
-    screenPos.z = 1.0f;
-    success     = Unproject(screenPos, invertedMvp, static_cast<float>(viewport.width), static_cast<float>(viewport.height), farPos);
-  }
-
-  if(success)
-  {
-    Vector4 local;
-    if(XyPlaneIntersect(nearPos, farPos, local))
-    {
-      Vector3 size = currentSize;
-      localX       = local.x + size.x * 0.5f;
-      localY       = local.y + size.y * 0.5f;
-    }
-    else
-    {
-      success = false;
-    }
-  }
-
-  return success;
 }
 
 } // unnamed namespace
@@ -1141,54 +1087,17 @@ void Actor::SetDrawMode(DrawMode::Type drawMode)
 
 bool Actor::ScreenToLocal(float& localX, float& localY, float screenX, float screenY) const
 {
-  // only valid when on-stage
-  if(mScene && OnScene())
-  {
-    const RenderTaskList& taskList = mScene->GetRenderTaskList();
-
-    Vector2 converted(screenX, screenY);
-
-    // do a reverse traversal of all lists (as the default onscreen one is typically the last one)
-    uint32_t taskCount = taskList.GetTaskCount();
-    for(uint32_t i = taskCount; i > 0; --i)
-    {
-      RenderTaskPtr task = taskList.GetTask(i - 1);
-      if(ScreenToLocal(*task, localX, localY, screenX, screenY))
-      {
-        // found a task where this conversion was ok so return
-        return true;
-      }
-    }
-  }
-  return false;
+  return mScene && OnScene() && ConvertScreenToLocalRenderTaskList(mScene->GetRenderTaskList(), GetNode().GetWorldMatrix(0), GetCurrentSize(), localX, localY, screenX, screenY);
 }
 
 bool Actor::ScreenToLocal(const RenderTask& renderTask, float& localX, float& localY, float screenX, float screenY) const
 {
-  bool retval = false;
-  // only valid when on-stage
-  if(OnScene())
-  {
-    CameraActor* camera = renderTask.GetCameraActor();
-    if(camera)
-    {
-      Viewport viewport;
-      renderTask.GetViewport(viewport);
-
-      // need to translate coordinates to render tasks coordinate space
-      Vector2 converted(screenX, screenY);
-      if(renderTask.TranslateCoordinates(converted))
-      {
-        retval = ScreenToLocal(camera->GetViewMatrix(), camera->GetProjectionMatrix(), viewport, localX, localY, converted.x, converted.y);
-      }
-    }
-  }
-  return retval;
+  return OnScene() && ConvertScreenToLocalRenderTask(renderTask, GetNode().GetWorldMatrix(0), GetCurrentSize(), localX, localY, screenX, screenY);
 }
 
 bool Actor::ScreenToLocal(const Matrix& viewMatrix, const Matrix& projectionMatrix, const Viewport& viewport, float& localX, float& localY, float screenX, float screenY) const
 {
-  return OnScene() && ScreenToLocalInternal(viewMatrix, projectionMatrix, GetNode().GetWorldMatrix(0), viewport, GetCurrentSize(), localX, localY, screenX, screenY);
+  return OnScene() && ConvertScreenToLocal(viewMatrix, projectionMatrix, GetNode().GetWorldMatrix(0), GetCurrentSize(), viewport, localX, localY, screenX, screenY);
 }
 
 ActorGestureData& Actor::GetGestureData()
