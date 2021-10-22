@@ -601,10 +601,15 @@ uint32_t Camera::UpdateProjection(BufferIndex updateBufferIndex)
   // Early-exit if no update required
   if(0u != mUpdateProjectionFlag)
   {
+    Matrix& finalProjection = mFinalProjection[updateBufferIndex];
+    finalProjection.SetIdentity();
+
     if(COPY_PREVIOUS_MATRIX == mUpdateProjectionFlag)
     {
       // The projection matrix was updated in the previous frame; copy it
       mProjectionMatrix.CopyPrevious(updateBufferIndex);
+
+      finalProjection = mProjectionMatrix[updateBufferIndex];
     }
     else // UPDATE_COUNT == mUpdateProjectionFlag
     {
@@ -663,9 +668,6 @@ uint32_t Camera::UpdateProjection(BufferIndex updateBufferIndex)
       }
 
       mProjectionMatrix.SetDirty(updateBufferIndex);
-
-      Matrix& finalProjection = mFinalProjection[updateBufferIndex];
-      finalProjection.SetIdentity();
 
       Quaternion rotationAngle;
       switch(mProjectionRotation)
