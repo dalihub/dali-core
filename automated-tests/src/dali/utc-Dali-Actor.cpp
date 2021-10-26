@@ -8065,6 +8065,139 @@ int utcDaliActorGetSizeAfterAnimation(void)
   END_TEST;
 }
 
+int utcDaliActorRelayoutAndAnimation(void)
+{
+  TestApplication application;
+  tet_infoline("Check the actor size when relayoutting and playing animation");
+
+  Vector3 parentSize(300.0f, 300.0f, 0.0f);
+  Vector3 actorSize(100.0f, 100.0f, 0.0f);
+
+  {
+    Actor parentA = Actor::New();
+    parentA.SetProperty(Actor::Property::SIZE, parentSize);
+    parentA.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+    application.GetScene().Add(parentA);
+
+    Actor parentB = Actor::New();
+    parentB.SetProperty(Actor::Property::SIZE, parentSize);
+    parentB.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+    application.GetScene().Add(parentB);
+
+    Actor actor = Actor::New();
+    actor.SetProperty(Actor::Property::SIZE, actorSize);
+    actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+    parentA.Add(actor);
+
+    Vector3 size = actor.GetProperty(Actor::Property::SIZE).Get<Vector3>();
+    DALI_TEST_EQUALS(size, actorSize, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+    Vector3 targetValue(200.0f, 200.0f, 0.0f);
+
+    Animation animation = Animation::New(1.0f);
+    animation.AnimateTo(Property(actor, Actor::Property::SIZE), targetValue);
+    animation.Play();
+
+    size = actor.GetProperty(Actor::Property::SIZE).Get<Vector3>();
+    DALI_TEST_EQUALS(size, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render(1100); // After the animation
+
+    // Size and current size should be updated.
+    size = actor.GetProperty(Actor::Property::SIZE).Get<Vector3>();
+    DALI_TEST_EQUALS(size, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+    Vector3 currentSize = actor.GetCurrentProperty(Actor::Property::SIZE).Get<Vector3>();
+    DALI_TEST_EQUALS(currentSize, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+    // Trigger relayout
+    parentB.Add(actor);
+
+    application.SendNotification();
+    application.Render();
+
+    // Size and current size should be same.
+    size = actor.GetProperty(Actor::Property::SIZE).Get<Vector3>();
+    DALI_TEST_EQUALS(size, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+    currentSize = actor.GetCurrentProperty(Actor::Property::SIZE).Get<Vector3>();
+    DALI_TEST_EQUALS(currentSize, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+    actor.Unparent();
+    parentA.Unparent();
+    parentB.Unparent();
+  }
+
+  {
+    Actor parentA = Actor::New();
+    parentA.SetProperty(Actor::Property::SIZE, parentSize);
+    parentA.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+    application.GetScene().Add(parentA);
+
+    Actor parentB = Actor::New();
+    parentB.SetProperty(Actor::Property::SIZE, parentSize);
+    parentB.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+    application.GetScene().Add(parentB);
+
+    Actor actor = Actor::New();
+    actor.SetProperty(Actor::Property::SIZE, actorSize);
+    actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+    parentA.Add(actor);
+
+    Vector3 size = actor.GetProperty(Actor::Property::SIZE).Get<Vector3>();
+    DALI_TEST_EQUALS(size, actorSize, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+
+    size = actor.GetProperty(Actor::Property::SIZE).Get<Vector3>();
+    DALI_TEST_EQUALS(size, actorSize, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+    Vector3 currentSize = actor.GetCurrentProperty(Actor::Property::SIZE).Get<Vector3>();
+    DALI_TEST_EQUALS(currentSize, actorSize, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+    Vector3 targetValue(200.0f, 200.0f, 0.0f);
+
+    // Make an animation
+    Animation animation = Animation::New(1.0f);
+    animation.AnimateTo(Property(actor, Actor::Property::SIZE), targetValue);
+    animation.Play();
+
+    size = actor.GetProperty(Actor::Property::SIZE).Get<Vector3>();
+    DALI_TEST_EQUALS(size, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render(1100); // After the animation
+
+    // Size and current size should be updated.
+    size = actor.GetProperty(Actor::Property::SIZE).Get<Vector3>();
+    DALI_TEST_EQUALS(size, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+    currentSize = actor.GetCurrentProperty(Actor::Property::SIZE).Get<Vector3>();
+    DALI_TEST_EQUALS(currentSize, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+    // Trigger relayout
+    parentB.Add(actor);
+
+    application.SendNotification();
+    application.Render();
+
+    // Size and current size should be same.
+    size = actor.GetProperty(Actor::Property::SIZE).Get<Vector3>();
+    DALI_TEST_EQUALS(size, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+    currentSize = actor.GetCurrentProperty(Actor::Property::SIZE).Get<Vector3>();
+    DALI_TEST_EQUALS(currentSize, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+    actor.Unparent();
+    parentA.Unparent();
+    parentB.Unparent();
+  }
+
+  END_TEST;
+}
+
 int utcDaliActorPartialUpdate(void)
 {
   TestApplication application(
