@@ -2114,6 +2114,15 @@ int UtcDaliTouchEventIntercept(void)
   SignalData        parentData;
   TouchEventFunctor parentFunctor(parentData, false /* Do not consume */);
   parent.TouchedSignal().Connect(&application, parentFunctor);
+
+  // Emit a down signal
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::DOWN, data.receivedTouch.points[0].state, TEST_LOCATION);
+
+  data.Reset();
+  parentData.Reset();
+
   // Connect to parent's intercept touched signal
   SignalData        interceptData;
   TouchEventFunctor interceptFunctor(interceptData, true /* Do intercept */);
@@ -2121,8 +2130,10 @@ int UtcDaliTouchEventIntercept(void)
 
   // Emit a down signal
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
-  // The actor touched signal is not called because the touch is intercepted in the parent.
-  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+
+  // The actor gets interrupted. Because touch is intercepted by parent.
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::INTERRUPTED, data.receivedTouch.points[0].state, TEST_LOCATION);
   DALI_TEST_EQUALS(true, interceptData.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(PointState::DOWN, interceptData.receivedTouch.points[0].state, TEST_LOCATION);
   DALI_TEST_CHECK(actor == interceptData.receivedTouch.points[0].hitActor);

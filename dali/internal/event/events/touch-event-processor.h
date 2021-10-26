@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/actor-observer.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
+#include <dali/public-api/events/point-state.h>
 
 namespace Dali
 {
@@ -90,11 +91,12 @@ private:
    */
   void OnObservedActorDisconnected( Actor* actor );
 
-  ActorObserver mLastPrimaryHitActor; ///< Stores the last primary point hit actor
-  ActorObserver mLastConsumedActor; ///< Stores the last consumed actor
-  ActorObserver mCapturingTouchActor; ///< Stored the actor that captures touch
-  ActorObserver mTouchDownConsumedActor; ///< Stores the touch-down consumed actor
-  RenderTaskPtr mLastRenderTask; ///< The RenderTask used for the last hit actor
+  ActorObserver    mLastPrimaryHitActor;    ///< Stores the last primary point hit actor
+  ActorObserver    mLastConsumedActor;      ///< Stores the last consumed actor
+  ActorObserver    mCapturingTouchActor;    ///< Stored the actor that captures touch
+  ActorObserver    mTouchDownConsumedActor; ///< Stores the touch-down consumed actor
+  RenderTaskPtr    mLastRenderTask;         ///< The RenderTask used for the last hit actor
+  PointState::Type mLastPrimaryPointState;  ///< Stores the last primary point state
 };
 
 } // namespace Internal
