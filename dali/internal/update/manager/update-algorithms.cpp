@@ -109,7 +109,7 @@ inline NodePropertyFlags UpdateNodes(Node&             node,
   ConstrainPropertyOwner(node, updateBufferIndex);
 
   // Some dirty flags are inherited from parent
-  NodePropertyFlags nodeDirtyFlags = node.GetInheritedDirtyFlags(parentFlags);
+  NodePropertyFlags nodeDirtyFlags = node.GetDirtyFlags() | node.GetInheritedDirtyFlags(parentFlags);
 
   NodePropertyFlags cumulativeDirtyFlags = nodeDirtyFlags;
 
