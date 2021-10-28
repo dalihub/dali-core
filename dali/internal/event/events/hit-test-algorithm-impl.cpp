@@ -192,7 +192,13 @@ HitActor HitTestWithinLayer(Actor&                                     actor,
       // Finally, perform a more accurate ray test to see if our ray actually hits the actor.
       if(rayTest.ActorTest(actor, rayOrigin, rayDir, hitPointLocal, distance))
       {
-        if(distance >= nearClippingPlane && distance <= farClippingPlane)
+        // Calculate z coordinate value in Camera Space.
+        const Matrix&  viewMatrix = renderTask.GetCameraActor()->GetViewMatrix();
+        const Vector4& hitDir = Vector4(rayDir.x * distance, rayDir.y * distance, rayDir.z * distance, 0.0f);
+        const float    cameraDepthDistance = (viewMatrix * hitDir).z;
+
+        // Check if cameraDepthDistance is between clipping plane
+        if(cameraDepthDistance >= nearClippingPlane && cameraDepthDistance <= farClippingPlane)
         {
           // If the hit has happened on a clipping actor, then add this clipping depth to the mask of hit clipping depths.
           // This mask shows all the actors that have been hit at different clipping depths.
