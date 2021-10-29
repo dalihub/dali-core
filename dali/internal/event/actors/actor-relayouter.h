@@ -50,6 +50,9 @@ struct Actor::Relayouter
   /// @copydoc Actor::SetPadding
   void SetPadding(const Vector2& padding, Dimension::Type dimension);
 
+  /// @copydoc Actor::GetPadding
+  Vector2 GetPadding(Dimension::Type dimension);
+
   /// @copydoc Actor::SetLayoutNegotiated
   void SetLayoutNegotiated(bool negotiated, Dimension::Type dimension);
 
@@ -80,6 +83,15 @@ struct Actor::Relayouter
   /// @copydoc Actor::SetResizePolicy
   void SetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension, Vector3& targetSize);
 
+  /// @copydoc Actor::GetRelayoutDependentOnParent
+  bool GetRelayoutDependentOnParent(Dimension::Type dimension);
+
+  /// @copydoc Actor::GetRelayoutDependentOnChildren
+  bool GetRelayoutDependentOnChildren(Dimension::Type dimension);
+
+  /// @copydoc Actor::GetRelayoutDependentOnDimension
+  bool GetRelayoutDependentOnDimension(Dimension::Type dimension, Dimension::Type dependency);
+
   /// @copydoc Actor::SetDimensionDependency
   void SetDimensionDependency(Dimension::Type dimension, Dimension::Type dependency);
 
@@ -105,6 +117,12 @@ struct Actor::Relayouter
    * @return Return the clamped size
    */
   static float ClampDimension(const Internal::Actor& actor, float size, Dimension::Type dimension);
+
+  /// @copydoc Actor::SetNegotiatedDimension
+  void SetNegotiatedDimension(float negotiatedDimension, Dimension::Type dimension);
+
+  /// @copydoc Actor::GetNegotiatedDimension
+  float GetNegotiatedDimension(Dimension::Type dimension);
 
   /**
    * Negotiate size for a specific dimension

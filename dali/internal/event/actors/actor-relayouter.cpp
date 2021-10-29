@@ -90,6 +90,20 @@ void Actor::Relayouter::SetPadding(const Vector2& padding, Dimension::Type dimen
   }
 }
 
+Vector2 Actor::Relayouter::GetPadding(Dimension::Type dimension)
+{
+  // If more than one dimension is requested, just return the first one found
+  for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
+  {
+    if((dimension & (1 << i)))
+    {
+      return dimensionPadding[i];
+    }
+  }
+
+  return DEFAULT_DIMENSION_PADDING;
+}
+
 void Actor::Relayouter::SetLayoutNegotiated(bool negotiated, Dimension::Type dimension)
 {
   for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
@@ -321,6 +335,56 @@ void Actor::Relayouter::SetResizePolicy(ResizePolicy::Type policy, Dimension::Ty
   }
 }
 
+bool Actor::Relayouter::GetRelayoutDependentOnParent(Dimension::Type dimension)
+{
+  // Check if actor is dependent on parent
+  for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
+  {
+    if((dimension & (1 << i)))
+    {
+      const ResizePolicy::Type resizePolicy = GetResizePolicy(static_cast<Dimension::Type>(1 << i));
+      if(resizePolicy == ResizePolicy::FILL_TO_PARENT || resizePolicy == ResizePolicy::SIZE_RELATIVE_TO_PARENT || resizePolicy == ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT)
+      {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+bool Actor::Relayouter::GetRelayoutDependentOnChildren(Dimension::Type dimension)
+{
+  // Check if actor is dependent on children
+  for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
+  {
+    if((dimension & (1 << i)))
+    {
+      const ResizePolicy::Type resizePolicy = GetResizePolicy(static_cast<Dimension::Type>(1 << i));
+      if(resizePolicy == ResizePolicy::FIT_TO_CHILDREN || resizePolicy == ResizePolicy::USE_NATURAL_SIZE)
+      {
+        return true;
+      }
+      break;
+    }
+  }
+
+  return false;
+}
+
+bool Actor::Relayouter::GetRelayoutDependentOnDimension(Dimension::Type dimension, Dimension::Type dependency)
+{
+  // Check each possible dimension and see if it is dependent on the input one
+  for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
+  {
+    if(dimension & (1 << i))
+    {
+      return resizePolicies[i] == ResizePolicy::DIMENSION_DEPENDENCY && dimensionDependencies[i] == dependency;
+    }
+  }
+
+  return false;
+}
+
 void Actor::Relayouter::SetDimensionDependency(Dimension::Type dimension, Dimension::Type dependency)
 {
   for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
@@ -399,6 +463,31 @@ float Actor::Relayouter::ClampDimension(const Internal::Actor& actor, float size
   const float maxSize = actor.GetMaximumSize(dimension);
 
   return std::max(minSize, std::min(size, maxSize));
+}
+
+void Actor::Relayouter::SetNegotiatedDimension(float negotiatedDimension, Dimension::Type dimension)
+{
+  for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
+  {
+    if(dimension & (1 << i))
+    {
+      negotiatedDimensions[i] = negotiatedDimension;
+    }
+  }
+}
+
+float Actor::Relayouter::GetNegotiatedDimension(Dimension::Type dimension)
+{
+  // If more than one dimension is requested, just return the first one found
+  for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
+  {
+    if((dimension & (1 << i)))
+    {
+      return negotiatedDimensions[i];
+    }
+  }
+
+  return 0.0f; // Default
 }
 
 void Actor::Relayouter::NegotiateDimension(Actor& actor, Dimension::Type dimension, const Vector2& allocatedSize, Actor::ActorDimensionStack& recursionStack)

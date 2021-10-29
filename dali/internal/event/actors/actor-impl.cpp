@@ -822,12 +822,7 @@ void Actor::SetSizeModeFactor(const Vector3& factor)
 
 const Vector3& Actor::GetSizeModeFactor() const
 {
-  if(mRelayoutData)
-  {
-    return mRelayoutData->sizeModeFactor;
-  }
-
-  return Relayouter::DEFAULT_SIZE_MODE_FACTOR;
+  return mRelayoutData ? mRelayoutData->sizeModeFactor : Relayouter::DEFAULT_SIZE_MODE_FACTOR;
 }
 
 void Actor::SetColorMode(ColorMode colorMode)
@@ -1027,12 +1022,7 @@ void Actor::SetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension
 
 ResizePolicy::Type Actor::GetResizePolicy(Dimension::Type dimension) const
 {
-  if(mRelayoutData)
-  {
-    return mRelayoutData->GetResizePolicy(dimension);
-  }
-
-  return ResizePolicy::DEFAULT;
+  return mRelayoutData ? mRelayoutData->GetResizePolicy(dimension) : ResizePolicy::DEFAULT;
 }
 
 void Actor::SetSizeScalePolicy(SizeScalePolicy::Type policy)
@@ -1047,12 +1037,7 @@ void Actor::SetSizeScalePolicy(SizeScalePolicy::Type policy)
 
 SizeScalePolicy::Type Actor::GetSizeScalePolicy() const
 {
-  if(mRelayoutData)
-  {
-    return mRelayoutData->sizeSetPolicy;
-  }
-
-  return Relayouter::DEFAULT_SIZE_SCALE_POLICY;
+  return mRelayoutData ? mRelayoutData->sizeSetPolicy : Relayouter::DEFAULT_SIZE_SCALE_POLICY;
 }
 
 void Actor::SetDimensionDependency(Dimension::Type dimension, Dimension::Type dependency)
@@ -1062,12 +1047,7 @@ void Actor::SetDimensionDependency(Dimension::Type dimension, Dimension::Type de
 
 Dimension::Type Actor::GetDimensionDependency(Dimension::Type dimension) const
 {
-  if(mRelayoutData)
-  {
-    return mRelayoutData->GetDimensionDependency(dimension);
-  }
-
-  return Dimension::ALL_DIMENSIONS; // Default
+  return mRelayoutData ? mRelayoutData->GetDimensionDependency(dimension) : Dimension::ALL_DIMENSIONS;
 }
 
 void Actor::SetRelayoutEnabled(bool relayoutEnabled)
@@ -1756,47 +1736,12 @@ Actor::Relayouter& Actor::EnsureRelayouter()
 
 bool Actor::RelayoutDependentOnParent(Dimension::Type dimension)
 {
-  // Check if actor is dependent on parent
-  for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
-  {
-    if((dimension & (1 << i)))
-    {
-      const ResizePolicy::Type resizePolicy = GetResizePolicy(static_cast<Dimension::Type>(1 << i));
-      if(resizePolicy == ResizePolicy::FILL_TO_PARENT || resizePolicy == ResizePolicy::SIZE_RELATIVE_TO_PARENT || resizePolicy == ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT)
-      {
-        return true;
-      }
-    }
-  }
-
-  return false;
+  return mRelayoutData && mRelayoutData->GetRelayoutDependentOnParent(dimension);
 }
 
 bool Actor::RelayoutDependentOnChildren(Dimension::Type dimension)
 {
-  // Check if actor is dependent on children
-  for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
-  {
-    if((dimension & (1 << i)))
-    {
-      const ResizePolicy::Type resizePolicy = GetResizePolicy(static_cast<Dimension::Type>(1 << i));
-      switch(resizePolicy)
-      {
-        case ResizePolicy::FIT_TO_CHILDREN:
-        case ResizePolicy::USE_NATURAL_SIZE: // i.e. For things that calculate their size based on children
-        {
-          return true;
-        }
-
-        default:
-        {
-          break;
-        }
-      }
-    }
-  }
-
-  return false;
+  return mRelayoutData && mRelayoutData->GetRelayoutDependentOnChildren(dimension);
 }
 
 bool Actor::RelayoutDependentOnChildrenBase(Dimension::Type dimension)
@@ -1806,41 +1751,20 @@ bool Actor::RelayoutDependentOnChildrenBase(Dimension::Type dimension)
 
 bool Actor::RelayoutDependentOnDimension(Dimension::Type dimension, Dimension::Type dependentDimension)
 {
-  // Check each possible dimension and see if it is dependent on the input one
-  for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
-  {
-    if(dimension & (1 << i))
-    {
-      return mRelayoutData->resizePolicies[i] == ResizePolicy::DIMENSION_DEPENDENCY && mRelayoutData->dimensionDependencies[i] == dependentDimension;
-    }
-  }
-
-  return false;
+  return mRelayoutData && mRelayoutData->GetRelayoutDependentOnDimension(dimension, dependentDimension);
 }
 
 void Actor::SetNegotiatedDimension(float negotiatedDimension, Dimension::Type dimension)
 {
-  for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
+  if(mRelayoutData)
   {
-    if(dimension & (1 << i))
-    {
-      mRelayoutData->negotiatedDimensions[i] = negotiatedDimension;
-    }
+    mRelayoutData->SetNegotiatedDimension(negotiatedDimension, dimension);
   }
 }
 
 float Actor::GetNegotiatedDimension(Dimension::Type dimension) const
 {
-  // If more than one dimension is requested, just return the first one found
-  for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
-  {
-    if((dimension & (1 << i)))
-    {
-      return mRelayoutData->negotiatedDimensions[i];
-    }
-  }
-
-  return 0.0f; // Default
+  return mRelayoutData ? mRelayoutData->GetNegotiatedDimension(dimension) : 0.0f;
 }
 
 void Actor::SetPadding(const Vector2& padding, Dimension::Type dimension)
@@ -1850,19 +1774,7 @@ void Actor::SetPadding(const Vector2& padding, Dimension::Type dimension)
 
 Vector2 Actor::GetPadding(Dimension::Type dimension) const
 {
-  if(mRelayoutData)
-  {
-    // If more than one dimension is requested, just return the first one found
-    for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
-    {
-      if((dimension & (1 << i)))
-      {
-        return mRelayoutData->dimensionPadding[i];
-      }
-    }
-  }
-
-  return Relayouter::DEFAULT_DIMENSION_PADDING;
+  return mRelayoutData ? mRelayoutData->GetPadding(dimension) : Relayouter::DEFAULT_DIMENSION_PADDING;
 }
 
 void Actor::SetLayoutNegotiated(bool negotiated, Dimension::Type dimension)
