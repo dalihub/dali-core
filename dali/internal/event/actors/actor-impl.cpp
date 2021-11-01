@@ -758,6 +758,18 @@ void Actor::SetSizeInternal(const Vector3& size)
   {
     mTargetSize = size;
 
+    // Update the preferred size after relayoutting
+    // It should be used in the next relayoutting
+    if(mUseAnimatedSize & AnimatedSizeFlag::WIDTH && mRelayoutData)
+    {
+      mRelayoutData->preferredSize.width = mAnimatedSize.width;
+    }
+
+    if(mUseAnimatedSize & AnimatedSizeFlag::HEIGHT && mRelayoutData)
+    {
+      mRelayoutData->preferredSize.height = mAnimatedSize.height;
+    }
+
     // node is being used in a separate thread; queue a message to set the value & base value
     SceneGraph::NodeTransformPropertyMessage<Vector3>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mSize, &SceneGraph::TransformManagerPropertyHandler<Vector3>::Bake, mTargetSize);
 
@@ -2064,6 +2076,8 @@ void Actor::SetNegotiatedSize(RelayoutContainer& container)
     Dali::Actor handle(this);
     mOnRelayoutSignal.Emit(handle);
   }
+
+  mRelayoutData->relayoutRequested = false;
 }
 
 void Actor::NegotiateSize(const Vector2& allocatedSize, RelayoutContainer& container)
@@ -2091,6 +2105,11 @@ void Actor::RelayoutRequest(Dimension::Type dimension)
   {
     Dali::Actor self(this);
     relayoutController->RequestRelayout(self, dimension);
+
+    if(mRelayoutData)
+    {
+      mRelayoutData->relayoutRequested = true;
+    }
   }
 }
 

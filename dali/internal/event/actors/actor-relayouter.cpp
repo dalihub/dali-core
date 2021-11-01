@@ -40,7 +40,8 @@ Actor::Relayouter::Relayouter()
   preferredSize(DEFAULT_PREFERRED_SIZE),
   sizeSetPolicy(DEFAULT_SIZE_SCALE_POLICY),
   relayoutEnabled(false),
-  insideRelayout(false)
+  insideRelayout(false),
+  relayoutRequested(false)
 {
   // Set size negotiation defaults
   for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
