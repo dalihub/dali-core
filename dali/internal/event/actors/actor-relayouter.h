@@ -167,8 +167,9 @@ public:
 
   SizeScalePolicy::Type sizeSetPolicy : 3; ///< Policy to apply when setting size. Enough room for the enum
 
-  bool relayoutEnabled : 1; ///< Flag to specify if this actor should be included in size negotiation or not (defaults to true)
-  bool insideRelayout : 1;  ///< Locking flag to prevent recursive relayouts on size set
+  bool relayoutEnabled : 1;   ///< Flag to specify if this actor should be included in size negotiation or not (defaults to true)
+  bool insideRelayout : 1;    ///< Locking flag to prevent recursive relayouts on size set
+  bool relayoutRequested : 1; ///< Whether the relayout is requested.
 };
 
 } // namespace Internal

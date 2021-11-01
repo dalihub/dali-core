@@ -24,6 +24,7 @@
 #include <list>
 #include <sstream>
 #include <string>
+#include <cstring>
 
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/property-map.h>
@@ -84,11 +85,34 @@ enum DebugPriority
 };
 
 /**
- * Used by logging macros to log a message along with function/class name
+ * Used by logging macros to log a message
  * @param level debug level
  * @param format string format
  */
 DALI_CORE_API void LogMessage(enum DebugPriority level, const char* format, ...);
+
+/**
+ * Prefix macros to sync with dlog logger format
+ * __MODULE__ macro also defined at dlog-internal.h
+ */
+#ifndef DALI_LOG_FORMAT_PREFIX
+#ifndef __MODULE__
+#define __MODULE__ (std::strrchr(__FILE__, '/') ? std::strrchr(__FILE__, '/') + 1 : __FILE__)
+#endif
+#define DALI_LOG_FORMAT_PREFIX "%s: %s(%d) > "
+#define DALI_LOG_FORMAT_PREFIX_ARGS __MODULE__,__func__,__LINE__
+#endif
+
+/**
+ * Global logging macros to log a message along with function/class name and line
+ * @param level debug level
+ * @param format string format
+ */
+#define LogMessageWithFunctionLine(level, format, ...)                 \
+  LogMessage(level,                                                    \
+  (std::string(DALI_LOG_FORMAT_PREFIX) + std::string(format)).c_str(), \
+  DALI_LOG_FORMAT_PREFIX_ARGS,                                         \
+  ##__VA_ARGS__)
 
 /**
  * typedef for the logging function.
@@ -117,7 +141,7 @@ DALI_CORE_API void UninstallLogFunction();
 /**
  * Provides unfiltered logging for global error level messages
  */
-#define DALI_LOG_ERROR(format, ...) Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugError, "%s " format, __FUNCTION__, ##__VA_ARGS__)
+#define DALI_LOG_ERROR(format, ...) Dali::Integration::Log::LogMessageWithFunctionLine(Dali::Integration::Log::DebugError, format, ##__VA_ARGS__)
 
 #define DALI_LOG_ERROR_NOFN(format, ...) Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugError, format, ##__VA_ARGS__)
 
@@ -141,14 +165,14 @@ DALI_CORE_API void UninstallLogFunction();
 /**
  * Provides unfiltered logging for release
  */
-#define DALI_LOG_RELEASE_INFO(format, ...) Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugInfo, format, ##__VA_ARGS__)
+#define DALI_LOG_RELEASE_INFO(format, ...) Dali::Integration::Log::LogMessageWithFunctionLine(Dali::Integration::Log::DebugInfo, format, ##__VA_ARGS__)
 
 #ifdef DEBUG_ENABLED
 
 /**
  * Provides unfiltered logging for global warning level messages
  */
-#define DALI_LOG_WARNING(format, ...) Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugWarning, "%s " format, ASSERT_LOCATION, ##__VA_ARGS__)
+#define DALI_LOG_WARNING(format, ...) Dali::Integration::Log::LogMessageWithFunctionLine(Dali::Integration::Log::DebugWarning, "%s " format, ASSERT_LOCATION, ##__VA_ARGS__)
 
 #else // DEBUG_ENABLED
 
@@ -339,10 +363,13 @@ public:
 
 #ifdef DEBUG_ENABLED
 
-#define DALI_LOG_INFO(filter, level, format, ...) \
-  if(filter && filter->IsEnabledFor(level))       \
-  {                                               \
-    filter->Log(level, format, ##__VA_ARGS__);    \
+#define DALI_LOG_INFO(filter, level, format, ...)                        \
+  if(filter && filter->IsEnabledFor(level))                              \
+  {                                                                      \
+    filter->Log(level,                                                   \
+    (std::string(DALI_LOG_FORMAT_PREFIX) + std::string(format)).c_str(), \
+    DALI_LOG_FORMAT_PREFIX_ARGS,                                         \
+    ##__VA_ARGS__);                                                      \
   }
 
 #define DALI_LOG_STREAM(filter, level, stream) \

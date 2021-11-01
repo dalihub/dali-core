@@ -18,6 +18,7 @@
 #include <dali/internal/event/actors/actor-parent.h>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/actors/layer-devel.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/public-api/common/vector-wrapper.h>
@@ -100,7 +101,7 @@ void ActorParentImpl::Add(Actor& child, bool notify)
         EmitChildAddedSignal(child);
       }
 
-      child.InheritLayoutDirectionRecursively(mOwner.GetLayoutDirection());
+      child.mParentImpl.InheritLayoutDirectionRecursively(mOwner.GetLayoutDirection());
 
       // Only put in a relayout request if there is a suitable dependency
       if(mOwner.RelayoutDependentOnChildren())
@@ -411,6 +412,107 @@ void ActorParentImpl::LowerChildBelow(Actor& child, Actor& target)
   if(lowered)
   {
     EmitOrderChangedAndRebuild(child);
+  }
+}
+
+void ActorParentImpl::DepthTraverseActorTree(OwnerPointer<SceneGraph::NodeDepths>& sceneGraphNodeDepths,
+                                             int32_t&                              depthIndex)
+{
+  uint32_t sortedDepth = depthIndex * DevelLayer::SIBLING_ORDER_MULTIPLIER;
+  mOwner.SetSortingDepth(sortedDepth);
+  sceneGraphNodeDepths->Add(const_cast<SceneGraph::Node*>(&mOwner.GetNode()), sortedDepth);
+
+  // Create/add to children of this node
+  if(mChildren)
+  {
+    for(const auto& actor : *mChildren)
+    {
+      ++depthIndex;
+      actor->mParentImpl.DepthTraverseActorTree(sceneGraphNodeDepths, depthIndex);
+    }
+  }
+}
+
+void ActorParentImpl::RecursiveConnectToScene(ActorContainer& connectionList, uint32_t depth)
+{
+  DALI_ASSERT_ALWAYS(!mOwner.OnScene());
+
+  mOwner.mIsOnScene = true;
+  mOwner.mDepth     = static_cast<uint16_t>(depth); // overflow ignored, not expected in practice
+  mOwner.ConnectToSceneGraph();
+
+  // Notification for internal derived classes
+  mOwner.OnSceneConnectionInternal();
+
+  // This stage is atomic; avoid emitting callbacks until all Actors are connected
+  connectionList.push_back(ActorPtr(&mOwner));
+
+  // Recursively connect children
+  if(mChildren)
+  {
+    for(const auto& actor : *mChildren)
+    {
+      actor->SetScene(*mOwner.mScene);
+      actor->mParentImpl.RecursiveConnectToScene(connectionList, depth + 1);
+    }
+  }
+}
+
+void ActorParentImpl::RecursiveDisconnectFromScene(ActorContainer& disconnectionList)
+{
+  // need to change state first so that internals relying on IsOnScene() inside OnSceneDisconnectionInternal() get the correct value
+  mOwner.mIsOnScene = false;
+
+  // Recursively disconnect children
+  if(mChildren)
+  {
+    for(const auto& actor : *mChildren)
+    {
+      actor->mParentImpl.RecursiveDisconnectFromScene(disconnectionList);
+    }
+  }
+
+  // This stage is atomic; avoid emitting callbacks until all Actors are disconnected
+  disconnectionList.push_back(ActorPtr(&mOwner));
+
+  // Notification for internal derived classes
+  mOwner.OnSceneDisconnectionInternal();
+  mOwner.DisconnectFromSceneGraph();
+}
+
+void ActorParentImpl::InheritLayoutDirectionRecursively(Dali::LayoutDirection::Type direction, bool set)
+{
+  if(mOwner.mInheritLayoutDirection || set)
+  {
+    if(mOwner.mLayoutDirection != direction)
+    {
+      mOwner.mLayoutDirection = direction;
+      mOwner.EmitLayoutDirectionChangedSignal(direction);
+      mOwner.RelayoutRequest();
+    }
+
+    if(mChildren)
+    {
+      for(const auto& child : *mChildren)
+      {
+        child->mParentImpl.InheritLayoutDirectionRecursively(direction);
+      }
+    }
+  }
+}
+
+void ActorParentImpl::EmitVisibilityChangedSignalRecursively(
+  bool                               visible,
+  DevelActor::VisibilityChange::Type type)
+{
+  mOwner.EmitVisibilityChangedSignal(visible, type);
+
+  if(mChildren)
+  {
+    for(const auto& child : *mChildren)
+    {
+      child->mParentImpl.EmitVisibilityChangedSignalRecursively(visible, DevelActor::VisibilityChange::PARENT);
+    }
   }
 }
 

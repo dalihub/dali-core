@@ -8065,6 +8065,139 @@ int utcDaliActorGetSizeAfterAnimation(void)
   END_TEST;
 }
 
+int utcDaliActorRelayoutAndAnimation(void)
+{
+  TestApplication application;
+  tet_infoline("Check the actor size when relayoutting and playing animation");
+
+  Vector3 parentSize(300.0f, 300.0f, 0.0f);
+  Vector3 actorSize(100.0f, 100.0f, 0.0f);
+
+  {
+    Actor parentA = Actor::New();
+    parentA.SetProperty(Actor::Property::SIZE, parentSize);
+    parentA.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+    application.GetScene().Add(parentA);
+
+    Actor parentB = Actor::New();
+    parentB.SetProperty(Actor::Property::SIZE, parentSize);
+    parentB.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+    application.GetScene().Add(parentB);
+
+    Actor actor = Actor::New();
+    actor.SetProperty(Actor::Property::SIZE, actorSize);
+    actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+    parentA.Add(actor);
+
+    Vector3 size = actor.GetProperty(Actor::Property::SIZE).Get<Vector3>();
+    DALI_TEST_EQUALS(size, actorSize, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+    Vector3 targetValue(200.0f, 200.0f, 0.0f);
+
+    Animation animation = Animation::New(1.0f);
+    animation.AnimateTo(Property(actor, Actor::Property::SIZE), targetValue);
+    animation.Play();
+
+    size = actor.GetProperty(Actor::Property::SIZE).Get<Vector3>();
+    DALI_TEST_EQUALS(size, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render(1100); // After the animation
+
+    // Size and current size should be updated.
+    size = actor.GetProperty(Actor::Property::SIZE).Get<Vector3>();
+    DALI_TEST_EQUALS(size, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+    Vector3 currentSize = actor.GetCurrentProperty(Actor::Property::SIZE).Get<Vector3>();
+    DALI_TEST_EQUALS(currentSize, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+    // Trigger relayout
+    parentB.Add(actor);
+
+    application.SendNotification();
+    application.Render();
+
+    // Size and current size should be same.
+    size = actor.GetProperty(Actor::Property::SIZE).Get<Vector3>();
+    DALI_TEST_EQUALS(size, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+    currentSize = actor.GetCurrentProperty(Actor::Property::SIZE).Get<Vector3>();
+    DALI_TEST_EQUALS(currentSize, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+    actor.Unparent();
+    parentA.Unparent();
+    parentB.Unparent();
+  }
+
+  {
+    Actor parentA = Actor::New();
+    parentA.SetProperty(Actor::Property::SIZE, parentSize);
+    parentA.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+    application.GetScene().Add(parentA);
+
+    Actor parentB = Actor::New();
+    parentB.SetProperty(Actor::Property::SIZE, parentSize);
+    parentB.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+    application.GetScene().Add(parentB);
+
+    Actor actor = Actor::New();
+    actor.SetProperty(Actor::Property::SIZE, actorSize);
+    actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+    parentA.Add(actor);
+
+    Vector3 size = actor.GetProperty(Actor::Property::SIZE).Get<Vector3>();
+    DALI_TEST_EQUALS(size, actorSize, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+
+    size = actor.GetProperty(Actor::Property::SIZE).Get<Vector3>();
+    DALI_TEST_EQUALS(size, actorSize, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+    Vector3 currentSize = actor.GetCurrentProperty(Actor::Property::SIZE).Get<Vector3>();
+    DALI_TEST_EQUALS(currentSize, actorSize, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+    Vector3 targetValue(200.0f, 200.0f, 0.0f);
+
+    // Make an animation
+    Animation animation = Animation::New(1.0f);
+    animation.AnimateTo(Property(actor, Actor::Property::SIZE), targetValue);
+    animation.Play();
+
+    size = actor.GetProperty(Actor::Property::SIZE).Get<Vector3>();
+    DALI_TEST_EQUALS(size, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render(1100); // After the animation
+
+    // Size and current size should be updated.
+    size = actor.GetProperty(Actor::Property::SIZE).Get<Vector3>();
+    DALI_TEST_EQUALS(size, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+    currentSize = actor.GetCurrentProperty(Actor::Property::SIZE).Get<Vector3>();
+    DALI_TEST_EQUALS(currentSize, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+    // Trigger relayout
+    parentB.Add(actor);
+
+    application.SendNotification();
+    application.Render();
+
+    // Size and current size should be same.
+    size = actor.GetProperty(Actor::Property::SIZE).Get<Vector3>();
+    DALI_TEST_EQUALS(size, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+    currentSize = actor.GetCurrentProperty(Actor::Property::SIZE).Get<Vector3>();
+    DALI_TEST_EQUALS(currentSize, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+    actor.Unparent();
+    parentA.Unparent();
+    parentB.Unparent();
+  }
+
+  END_TEST;
+}
+
 int utcDaliActorPartialUpdate(void)
 {
   TestApplication application(
@@ -8086,6 +8219,8 @@ int utcDaliActorPartialUpdate(void)
 
   // First render pass, nothing to render, adaptor would just do swap buffer.
   DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+
+  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   Actor actor = CreateRenderableActor();
@@ -8191,6 +8326,8 @@ int utcDaliActorPartialUpdateSetColor(void)
 
   // First render pass, nothing to render, adaptor would just do swap buffer.
   DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+
+  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   Actor actor = CreateRenderableActor();
@@ -8286,6 +8423,8 @@ int utcDaliActorPartialUpdateSetProperty(void)
 
   // First render pass, nothing to render, adaptor would just do swap buffer.
   DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+
+  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   Texture image = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 4u, 4u);
@@ -8482,9 +8621,11 @@ int utcDaliActorPartialUpdateAnimation(void)
   DALI_TEST_EQUALS<Rect<int>>(expectedRect1, damagedRects[0], TEST_LOCATION);
   DALI_TEST_EQUALS<Rect<int>>(expectedRect2, damagedRects[1], TEST_LOCATION);
 
+  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   damagedRects.clear();
+  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
@@ -8496,6 +8637,7 @@ int utcDaliActorPartialUpdateAnimation(void)
   application.SendNotification();
 
   damagedRects.clear();
+  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
@@ -8503,6 +8645,7 @@ int utcDaliActorPartialUpdateAnimation(void)
   damagedRects.clear();
 
   // In animation deley time
+  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
@@ -8513,6 +8656,7 @@ int utcDaliActorPartialUpdateAnimation(void)
   damagedRects.clear();
 
   // Also in animation deley time
+  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
   application.PreRenderWithPartialUpdate(100, nullptr, damagedRects);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
@@ -8540,15 +8684,17 @@ int utcDaliActorPartialUpdateAnimation(void)
   DALI_TEST_EQUALS<Rect<int>>(expectedRect2, damagedRects[0], TEST_LOCATION);
   DALI_TEST_EQUALS<Rect<int>>(expectedRect1, damagedRects[1], TEST_LOCATION);
 
+  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
-  // Finished animation, but the actior was already unparented
+  // Finished animation, but the actor was already unparented
   damagedRects.clear();
   application.PreRenderWithPartialUpdate(500, nullptr, damagedRects);
 
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
   DALI_TEST_EQUALS<Rect<int>>(expectedRect2, damagedRects[0], TEST_LOCATION);
 
+  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   END_TEST;
@@ -8716,6 +8862,179 @@ int utcDaliActorPartialUpdateOnOffScene(void)
   DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
   DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
   DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int utcDaliActorPartialUpdateSkipRendering(void)
+{
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  tet_infoline("Check to skip rendering in case of the empty damaged rect");
+
+  TraceCallStack& drawTrace = application.GetGlAbstraction().GetDrawTrace();
+  drawTrace.Enable(true);
+  drawTrace.Reset();
+
+  Actor actor1 = CreateRenderableActor();
+  actor1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor1.SetProperty(Actor::Property::SIZE, Vector3(80.0f, 80.0f, 0.0f));
+  application.GetScene().Add(actor1);
+
+  std::vector<Rect<int>> damagedRects;
+  Rect<int>              clippingRect;
+  Rect<int>              expectedRect1;
+
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  // Aligned by 16
+  expectedRect1 = Rect<int>(0, 720, 96, 96); // in screen coordinates, includes 3 last frames updates
+  DALI_TEST_EQUALS<Rect<int>>(expectedRect1, damagedRects[0], TEST_LOCATION);
+
+  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION);
+
+  damagedRects.clear();
+  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Remove the actor
+  actor1.Unparent();
+
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  DALI_TEST_EQUALS<Rect<int>>(expectedRect1, damagedRects[0], TEST_LOCATION);
+
+  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Render again without any change
+  damagedRects.clear();
+  drawTrace.Reset();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+
+  clippingRect = Rect<int>();
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Skip rendering
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 0, TEST_LOCATION);
+
+  // Add the actor again
+  application.GetScene().Add(actor1);
+
+  application.SendNotification();
+
+  damagedRects.clear();
+  drawTrace.Reset();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  DALI_TEST_EQUALS<Rect<int>>(expectedRect1, damagedRects[0], TEST_LOCATION);
+
+  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int utcDaliActorPartialUpdate3DNode(void)
+{
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  tet_infoline("Partial update should be ignored in case of 3d layer of 3d node");
+
+  TraceCallStack& drawTrace = application.GetGlAbstraction().GetDrawTrace();
+  drawTrace.Enable(true);
+  drawTrace.Reset();
+
+  Actor actor1 = CreateRenderableActor();
+  actor1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor1.SetProperty(Actor::Property::SIZE, Vector3(80.0f, 80.0f, 0.0f));
+  application.GetScene().Add(actor1);
+
+  std::vector<Rect<int>> damagedRects;
+  Rect<int>              clippingRect;
+
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION);
+
+  // Change the layer to 3D
+  application.GetScene().GetRootLayer().SetProperty(Layer::Property::BEHAVIOR, Layer::LAYER_3D);
+
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+  DALI_TEST_EQUALS<Rect<int>>(TestApplication::DEFAULT_SURFACE_RECT, damagedRects[0], TEST_LOCATION);
+
+  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
+  drawTrace.Reset();
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION);
+
+  // Change the layer to 2D
+  application.GetScene().GetRootLayer().SetProperty(Layer::Property::BEHAVIOR, Layer::LAYER_UI);
+
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Make 3D transform
+  actor1.SetProperty(Actor::Property::ORIENTATION, Quaternion(Degree(90.0f), Vector3::YAXIS));
+
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+  DALI_TEST_EQUALS<Rect<int>>(TestApplication::DEFAULT_SURFACE_RECT, damagedRects[0], TEST_LOCATION);
+
+  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
+  drawTrace.Reset();
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION);
 
   END_TEST;
 }

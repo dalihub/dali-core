@@ -245,6 +245,16 @@ public:
   void SurfaceRotated(float width, float height, int32_t orientation);
 
   /**
+   * @copydoc Dali::Integration::Scene::SetRotationCompletedAcknowledgement
+   */
+  void SetRotationCompletedAcknowledgement();
+
+  /**
+   * @copydoc Dali::Integration::Scene::IsRotationCompletedAcknowledgementSet
+   */
+  bool IsRotationCompletedAcknowledgementSet() const;
+
+  /**
    * @copydoc Dali::Integration::Scene::GetCurrentSurfaceOrientation
    */
   int32_t GetCurrentSurfaceOrientation() const;

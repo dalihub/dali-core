@@ -25,6 +25,7 @@
 #include <dali/devel-api/actors/actor-devel.h>
 
 #include <dali/internal/event/actors/actor-impl.h>
+#include <dali/internal/event/actors/actor-relayouter.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/update/nodes/node-declarations.h>
 #include <dali/internal/update/nodes/node-messages.h>
@@ -536,7 +537,7 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
 
       if(Scripting::GetEnumerationProperty<LayoutDirection::Type>(property, LAYOUT_DIRECTION_TABLE, LAYOUT_DIRECTION_TABLE_COUNT, direction))
       {
-        actor.InheritLayoutDirectionRecursively(direction, true);
+        actor.mParentImpl.InheritLayoutDirectionRecursively(direction, true);
       }
       break;
     }
@@ -801,6 +802,12 @@ void Actor::PropertyHandler::OnNotifyDefaultPropertyAnimation(Internal::Actor& a
             actor.mAnimatedSize    = actor.mTargetSize;
             actor.mUseAnimatedSize = AnimatedSizeFlag::WIDTH | AnimatedSizeFlag::HEIGHT | AnimatedSizeFlag::DEPTH;
 
+            if(actor.mRelayoutData && !actor.mRelayoutData->relayoutRequested)
+            {
+              actor.mRelayoutData->preferredSize.width  = actor.mAnimatedSize.width;
+              actor.mRelayoutData->preferredSize.height = actor.mAnimatedSize.height;
+            }
+
             // Notify deriving classes
             actor.OnSizeAnimation(animation, actor.mTargetSize);
           }
@@ -814,6 +821,11 @@ void Actor::PropertyHandler::OnNotifyDefaultPropertyAnimation(Internal::Actor& a
             actor.mAnimatedSize.width = actor.mTargetSize.width;
             actor.mUseAnimatedSize |= AnimatedSizeFlag::WIDTH;
 
+            if(actor.mRelayoutData && !actor.mRelayoutData->relayoutRequested)
+            {
+              actor.mRelayoutData->preferredSize.width = actor.mAnimatedSize.width;
+            }
+
             // Notify deriving classes
             actor.OnSizeAnimation(animation, actor.mTargetSize);
           }
@@ -826,6 +838,11 @@ void Actor::PropertyHandler::OnNotifyDefaultPropertyAnimation(Internal::Actor& a
           {
             actor.mAnimatedSize.height = actor.mTargetSize.height;
             actor.mUseAnimatedSize |= AnimatedSizeFlag::HEIGHT;
+
+            if(actor.mRelayoutData && !actor.mRelayoutData->relayoutRequested)
+            {
+              actor.mRelayoutData->preferredSize.height = actor.mAnimatedSize.height;
+            }
 
             // Notify deriving classes
             actor.OnSizeAnimation(animation, actor.mTargetSize);
@@ -957,6 +974,12 @@ void Actor::PropertyHandler::OnNotifyDefaultPropertyAnimation(Internal::Actor& a
             actor.mAnimatedSize    = actor.mTargetSize;
             actor.mUseAnimatedSize = AnimatedSizeFlag::WIDTH | AnimatedSizeFlag::HEIGHT | AnimatedSizeFlag::DEPTH;
 
+            if(actor.mRelayoutData && !actor.mRelayoutData->relayoutRequested)
+            {
+              actor.mRelayoutData->preferredSize.width  = actor.mAnimatedSize.width;
+              actor.mRelayoutData->preferredSize.height = actor.mAnimatedSize.height;
+            }
+
             // Notify deriving classes
             actor.OnSizeAnimation(animation, actor.mTargetSize);
           }
@@ -970,6 +993,11 @@ void Actor::PropertyHandler::OnNotifyDefaultPropertyAnimation(Internal::Actor& a
             actor.mAnimatedSize.width = actor.mTargetSize.width;
             actor.mUseAnimatedSize |= AnimatedSizeFlag::WIDTH;
 
+            if(actor.mRelayoutData && !actor.mRelayoutData->relayoutRequested)
+            {
+              actor.mRelayoutData->preferredSize.width = actor.mAnimatedSize.width;
+            }
+
             // Notify deriving classes
             actor.OnSizeAnimation(animation, actor.mTargetSize);
           }
@@ -982,6 +1010,11 @@ void Actor::PropertyHandler::OnNotifyDefaultPropertyAnimation(Internal::Actor& a
           {
             actor.mAnimatedSize.height = actor.mTargetSize.height;
             actor.mUseAnimatedSize |= AnimatedSizeFlag::HEIGHT;
+
+            if(actor.mRelayoutData && !actor.mRelayoutData->relayoutRequested)
+            {
+              actor.mRelayoutData->preferredSize.height = actor.mAnimatedSize.height;
+            }
 
             // Notify deriving classes
             actor.OnSizeAnimation(animation, actor.mTargetSize);

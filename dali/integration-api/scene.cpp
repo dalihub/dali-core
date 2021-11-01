@@ -184,6 +184,16 @@ bool Scene::IsSurfaceRectChanged() const
   return GetImplementation(*this).IsSurfaceRectChanged();
 }
 
+void Scene::SetRotationCompletedAcknowledgement()
+{
+  GetImplementation(*this).SetRotationCompletedAcknowledgement();
+}
+
+bool Scene::IsRotationCompletedAcknowledgementSet() const
+{
+  return GetImplementation(*this).IsRotationCompletedAcknowledgementSet();
+}
+
 Scene::EventProcessingFinishedSignalType& Scene::EventProcessingFinishedSignal()
 {
   return GetImplementation(*this).EventProcessingFinishedSignal();
