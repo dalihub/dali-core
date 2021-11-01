@@ -18,10 +18,10 @@
 #include <dali/internal/render/renderers/pipeline-cache.h>
 
 // INTERNAL INCLUDES
-#include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/graphics-api/graphics-types.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/render/common/render-instruction.h>
+#include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/renderers/render-vertex-buffer.h>
 #include <dali/internal/render/shaders/program.h>
 
@@ -34,7 +34,7 @@ Dali::Graphics::VertexInputFormat GetPropertyVertexFormat(Property::Type propert
 {
   Dali::Graphics::VertexInputFormat type{};
 
-  switch (propertyType)
+  switch(propertyType)
   {
     case Property::BOOLEAN:
     {
@@ -77,7 +77,7 @@ Dali::Graphics::VertexInputFormat GetPropertyVertexFormat(Property::Type propert
 
 constexpr Graphics::CullMode ConvertCullFace(Dali::FaceCullingMode::Type mode)
 {
-  switch (mode)
+  switch(mode)
   {
     case Dali::FaceCullingMode::NONE:
     {
@@ -104,7 +104,7 @@ constexpr Graphics::CullMode ConvertCullFace(Dali::FaceCullingMode::Type mode)
 
 constexpr Graphics::BlendFactor ConvertBlendFactor(BlendFactor::Type blendFactor)
 {
-  switch (blendFactor)
+  switch(blendFactor)
   {
     case BlendFactor::ZERO:
       return Graphics::BlendFactor::ZERO;
@@ -143,7 +143,7 @@ constexpr Graphics::BlendFactor ConvertBlendFactor(BlendFactor::Type blendFactor
 
 constexpr Graphics::BlendOp ConvertBlendEquation(DevelBlendEquation::Type blendEquation)
 {
-  switch (blendEquation)
+  switch(blendEquation)
   {
     case DevelBlendEquation::ADD:
       return Graphics::BlendOp::ADD;
@@ -152,74 +152,88 @@ constexpr Graphics::BlendOp ConvertBlendEquation(DevelBlendEquation::Type blendE
     case DevelBlendEquation::REVERSE_SUBTRACT:
       return Graphics::BlendOp::REVERSE_SUBTRACT;
     case DevelBlendEquation::COLOR:
+      return Graphics::BlendOp::COLOR;
     case DevelBlendEquation::COLOR_BURN:
+      return Graphics::BlendOp::COLOR_BURN;
     case DevelBlendEquation::COLOR_DODGE:
+      return Graphics::BlendOp::COLOR_DODGE;
     case DevelBlendEquation::DARKEN:
+      return Graphics::BlendOp::DARKEN;
     case DevelBlendEquation::DIFFERENCE:
+      return Graphics::BlendOp::DIFFERENCE;
     case DevelBlendEquation::EXCLUSION:
+      return Graphics::BlendOp::EXCLUSION;
     case DevelBlendEquation::HARD_LIGHT:
+      return Graphics::BlendOp::HARD_LIGHT;
     case DevelBlendEquation::HUE:
+      return Graphics::BlendOp::HUE;
     case DevelBlendEquation::LIGHTEN:
+      return Graphics::BlendOp::LIGHTEN;
     case DevelBlendEquation::LUMINOSITY:
+      return Graphics::BlendOp::LUMINOSITY;
     case DevelBlendEquation::MAX:
+      return Graphics::BlendOp::MAX;
     case DevelBlendEquation::MIN:
+      return Graphics::BlendOp::MIN;
     case DevelBlendEquation::MULTIPLY:
+      return Graphics::BlendOp::MULTIPLY;
     case DevelBlendEquation::OVERLAY:
+      return Graphics::BlendOp::OVERLAY;
     case DevelBlendEquation::SATURATION:
+      return Graphics::BlendOp::SATURATION;
     case DevelBlendEquation::SCREEN:
+      return Graphics::BlendOp::SCREEN;
     case DevelBlendEquation::SOFT_LIGHT:
-      return Graphics::BlendOp{};
+      return Graphics::BlendOp::SOFT_LIGHT;
   }
   return Graphics::BlendOp{};
 }
-}
+} // namespace
 
-
-PipelineCacheL0 *PipelineCache::GetPipelineCacheL0(Program *program, Render::Geometry *geometry)
+PipelineCacheL0* PipelineCache::GetPipelineCacheL0(Program* program, Render::Geometry* geometry)
 {
-  auto it = std::find_if(level0nodes.begin(), level0nodes.end(), [program, geometry](
-    PipelineCacheL0 &item)
-  {
+  auto it = std::find_if(level0nodes.begin(), level0nodes.end(), [program, geometry](PipelineCacheL0& item) {
     return ((item.program == program && item.geometry == geometry));
   });
 
-  std::vector<int32_t> attributeLocations;
-
   // Add new node to cache
-  if (it == level0nodes.end())
+  if(it == level0nodes.end())
   {
     uint32_t bindingIndex{0u};
-    auto     &reflection            = graphicsController->GetProgramReflection(program->GetGraphicsProgram());
+    auto&    reflection = graphicsController->GetProgramReflection(program->GetGraphicsProgram());
 
     Graphics::VertexInputState vertexInputState{};
     uint32_t                   base = 0;
 
-    for (auto &&vertexBuffer : geometry->GetVertexBuffers())
+    for(auto&& vertexBuffer : geometry->GetVertexBuffers())
     {
-      const VertexBuffer::Format &vertexFormat = *vertexBuffer->GetFormat();
+      const VertexBuffer::Format& vertexFormat = *vertexBuffer->GetFormat();
 
       vertexInputState.bufferBindings.emplace_back(vertexFormat.size, // stride
                                                    Graphics::VertexInputRate::PER_VERTEX);
 
-      const uint32_t attributeCount = vertexBuffer->GetAttributeCount();
-      for (uint32_t  i              = 0; i < attributeCount; ++i)
+      const uint32_t attributeCount          = vertexBuffer->GetAttributeCount();
+      uint32_t       lastBoundAttributeIndex = 0;
+      for(uint32_t i = 0; i < attributeCount; ++i)
       {
         auto    attributeName = vertexBuffer->GetAttributeName(i);
         int32_t pLocation     = reflection.GetVertexAttributeLocation(std::string(attributeName.GetStringView()));
-        if (-1 == pLocation)
+        if(-1 != pLocation)
+        {
+          auto location = static_cast<uint32_t>(pLocation);
+          vertexInputState.attributes.emplace_back(location,
+                                                   bindingIndex,
+                                                   vertexFormat.components[i].offset,
+                                                   GetPropertyVertexFormat(vertexFormat.components[i].type));
+          ++lastBoundAttributeIndex;
+        }
+        else
         {
           DALI_LOG_WARNING("Attribute not found in the shader: %s\n", attributeName.GetCString());
+          // Don't bind unused attributes.
         }
-        attributeLocations.emplace_back(pLocation);
-
-        auto location = static_cast<uint32_t>(attributeLocations[base + i]);
-
-        vertexInputState.attributes.emplace_back(location,
-                                                 bindingIndex,
-                                                 vertexFormat.components[i].offset,
-                                                 GetPropertyVertexFormat(vertexFormat.components[i].type));
       }
-      base += attributeCount;
+      base += lastBoundAttributeIndex;
       ++bindingIndex;
     }
     PipelineCacheL0 level0;
@@ -233,7 +247,7 @@ PipelineCacheL0 *PipelineCache::GetPipelineCacheL0(Program *program, Render::Geo
   return &*it;
 }
 
-PipelineCacheL1 *PipelineCacheL0::GetPipelineCacheL1(Render::Renderer *renderer, bool usingReflection)
+PipelineCacheL1* PipelineCacheL0::GetPipelineCacheL1(Render::Renderer* renderer, bool usingReflection)
 {
   // hash must be collision free
   uint32_t hash = 0;
@@ -247,47 +261,43 @@ PipelineCacheL1 *PipelineCacheL0::GetPipelineCacheL1(Render::Renderer *renderer,
     Graphics::PolygonMode::LINE,
     Graphics::PolygonMode::FILL,
     Graphics::PolygonMode::FILL,
-    Graphics::PolygonMode::FILL
-  };
+    Graphics::PolygonMode::FILL};
 
   auto poly = polyTable[topo];
 
   static const FaceCullingMode::Type adjFaceCullingMode[4] =
-                                       {
-                                         FaceCullingMode::NONE,
-                                         FaceCullingMode::BACK,
-                                         FaceCullingMode::FRONT,
-                                         FaceCullingMode::FRONT_AND_BACK,
-                                       };
+    {
+      FaceCullingMode::NONE,
+      FaceCullingMode::BACK,
+      FaceCullingMode::FRONT,
+      FaceCullingMode::FRONT_AND_BACK,
+    };
 
   static const FaceCullingMode::Type normalFaceCullingMode[4] =
-                                       {
-                                         FaceCullingMode::NONE,
-                                         FaceCullingMode::FRONT,
-                                         FaceCullingMode::BACK,
-                                         FaceCullingMode::FRONT_AND_BACK,
-                                       };
+    {
+      FaceCullingMode::NONE,
+      FaceCullingMode::FRONT,
+      FaceCullingMode::BACK,
+      FaceCullingMode::FRONT_AND_BACK,
+    };
 
-  static const FaceCullingMode::Type *cullModeTable[2] = {
+  static const FaceCullingMode::Type* cullModeTable[2] = {
     normalFaceCullingMode,
-    adjFaceCullingMode
-  };
+    adjFaceCullingMode};
 
   // Retrieve cull mode
   auto cullModeTableIndex = uint32_t(usingReflection) & 1u;
-  cull = cullModeTable[cullModeTableIndex][renderer->GetFaceCullMode()];
+  cull                    = cullModeTable[cullModeTableIndex][renderer->GetFaceCullMode()];
 
   hash = (topo & 0xffu) | ((cull << 8u) & 0xff00u) | ((uint32_t(poly) << 16u) & 0xff0000u);
 
   // If L1 not found by hash, create rasterization state describing pipeline and store it
-  auto it = std::find_if(level1nodes.begin(), level1nodes.end(),
-                         [hash](PipelineCacheL1 &item)
-                         {
-                           return item.hashCode == hash;
-                         });
+  auto it = std::find_if(level1nodes.begin(), level1nodes.end(), [hash](PipelineCacheL1& item) {
+    return item.hashCode == hash;
+  });
 
-  PipelineCacheL1 *retval = nullptr;
-  if (it == level1nodes.end())
+  PipelineCacheL1* retval = nullptr;
+  if(it == level1nodes.end())
   {
     PipelineCacheL1 item;
     item.hashCode       = hash;
@@ -305,12 +315,12 @@ PipelineCacheL1 *PipelineCacheL0::GetPipelineCacheL1(Render::Renderer *renderer,
   return retval;
 }
 
-PipelineCacheL2 *PipelineCacheL1::GetPipelineCacheL2(bool blend, bool premul, BlendingOptions &blendingOptions)
+PipelineCacheL2* PipelineCacheL1::GetPipelineCacheL2(bool blend, bool premul, BlendingOptions& blendingOptions)
 {
   // early out
-  if (!blend)
+  if(!blend)
   {
-    if (noBlend.pipeline == nullptr)
+    if(noBlend.pipeline == nullptr)
     {
       // reset all before returning if pipeline has never been created for that case
       noBlend.hash = 0;
@@ -322,20 +332,19 @@ PipelineCacheL2 *PipelineCacheL1::GetPipelineCacheL2(bool blend, bool premul, Bl
   auto bitmask = uint32_t(blendingOptions.GetBitmask());
 
   // Find by bitmask (L2 entries must be sorted by bitmask)
-  auto it = std::find_if(level2nodes.begin(), level2nodes.end(), [bitmask](PipelineCacheL2 &item)
-  {
+  auto it = std::find_if(level2nodes.begin(), level2nodes.end(), [bitmask](PipelineCacheL2& item) {
     return item.hash == bitmask;
   });
 
   // TODO: find better way of blend constants lookup
-  PipelineCacheL2 *retval = nullptr;
-  if (it != level2nodes.end())
+  PipelineCacheL2* retval = nullptr;
+  if(it != level2nodes.end())
   {
     bool hasBlendColor = blendingOptions.GetBlendColor();
     while(hasBlendColor && it != level2nodes.end() && (*it).hash == bitmask)
     {
-      Vector4 v( it->colorBlendState.blendConstants );
-      if( v == *blendingOptions.GetBlendColor() )
+      Vector4 v(it->colorBlendState.blendConstants);
+      if(v == *blendingOptions.GetBlendColor())
       {
         retval = &*it;
       }
@@ -347,18 +356,18 @@ PipelineCacheL2 *PipelineCacheL1::GetPipelineCacheL2(bool blend, bool premul, Bl
     }
   }
 
-  if (!retval)
+  if(!retval)
   {
     // create new entry and return it with null pipeline
     PipelineCacheL2 l2;
-    l2.pipeline = nullptr;
-    auto &colorBlendState = l2.colorBlendState;
+    l2.pipeline           = nullptr;
+    auto& colorBlendState = l2.colorBlendState;
     colorBlendState.SetBlendEnable(true);
     Graphics::BlendOp rgbOp   = ConvertBlendEquation(blendingOptions.GetBlendEquationRgb());
     Graphics::BlendOp alphaOp = ConvertBlendEquation(blendingOptions.GetBlendEquationRgb());
-    if (blendingOptions.IsAdvancedBlendEquationApplied() && premul)
+    if(blendingOptions.IsAdvancedBlendEquationApplied() && premul)
     {
-      if (rgbOp != alphaOp)
+      if(rgbOp != alphaOp)
       {
         DALI_LOG_ERROR("Advanced Blend Equation MUST be applied by using BlendEquation.\n");
         alphaOp = rgbOp;
@@ -374,8 +383,8 @@ PipelineCacheL2 *PipelineCacheL1::GetPipelineCacheL2(bool blend, bool premul, Bl
       .SetAlphaBlendOp(alphaOp);
 
     // Blend color is optional and rarely used
-    auto *blendColor = const_cast<Vector4 *>(blendingOptions.GetBlendColor());
-    if (blendColor)
+    auto* blendColor = const_cast<Vector4*>(blendingOptions.GetBlendColor());
+    if(blendColor)
     {
       colorBlendState.SetBlendConstants(blendColor->AsFloat());
     }
@@ -383,8 +392,7 @@ PipelineCacheL2 *PipelineCacheL1::GetPipelineCacheL2(bool blend, bool premul, Bl
     l2.hash = blendingOptions.GetBitmask();
     level2nodes.emplace_back(std::move(l2));
 
-    std::sort(level2nodes.begin(), level2nodes.end(), [](PipelineCacheL2 &lhs, PipelineCacheL2 &rhs)
-    {
+    std::sort(level2nodes.begin(), level2nodes.end(), [](PipelineCacheL2& lhs, PipelineCacheL2& rhs) {
       return lhs.hash < rhs.hash;
     });
 
@@ -395,19 +403,19 @@ PipelineCacheL2 *PipelineCacheL1::GetPipelineCacheL2(bool blend, bool premul, Bl
   return retval;
 }
 
-PipelineCache::PipelineCache(Graphics::Controller& controller) :
-graphicsController(&controller)
+PipelineCache::PipelineCache(Graphics::Controller& controller)
+: graphicsController(&controller)
 {
 }
 
-PipelineResult PipelineCache::GetPipeline(const PipelineCacheQueryInfo &queryInfo, bool createNewIfNotFound)
+PipelineResult PipelineCache::GetPipeline(const PipelineCacheQueryInfo& queryInfo, bool createNewIfNotFound)
 {
-  auto *level0 = GetPipelineCacheL0(queryInfo.program, queryInfo.geometry);
-  auto *level1 = level0->GetPipelineCacheL1(queryInfo.renderer, queryInfo.cameraUsingReflection);
-  auto *level2 = level1->GetPipelineCacheL2(queryInfo.blendingEnabled, queryInfo.alphaPremultiplied, *queryInfo.blendingOptions);
+  auto* level0 = GetPipelineCacheL0(queryInfo.program, queryInfo.geometry);
+  auto* level1 = level0->GetPipelineCacheL1(queryInfo.renderer, queryInfo.cameraUsingReflection);
+  auto* level2 = level1->GetPipelineCacheL2(queryInfo.blendingEnabled, queryInfo.alphaPremultiplied, *queryInfo.blendingOptions);
 
   // Create new pipeline at level2 if requested
-  if (level2->pipeline == nullptr && createNewIfNotFound)
+  if(level2->pipeline == nullptr && createNewIfNotFound)
   {
     Graphics::ProgramState programState{};
     programState.program = &queryInfo.program->GetGraphicsProgram();
@@ -422,9 +430,6 @@ PipelineResult PipelineCache::GetPipeline(const PipelineCacheQueryInfo &queryInf
 
     // Store a pipeline per renderer per render (renderer can be owned by multiple nodes,
     // and re-drawn in multiple instructions).
-    // @todo This is only needed because ColorBlend state can change. Fixme!
-    // This is ameliorated by the fact that implementation caches pipelines, and we're only storing
-    // handles.
     level2->pipeline = graphicsController->CreatePipeline(createInfo, nullptr);
   }
 
@@ -438,4 +443,4 @@ PipelineResult PipelineCache::GetPipeline(const PipelineCacheQueryInfo &queryInf
   return result;
 }
 
-}
+} // namespace Dali::Internal::Render

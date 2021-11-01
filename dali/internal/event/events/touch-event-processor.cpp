@@ -218,7 +218,8 @@ TouchEventProcessor::TouchEventProcessor(Scene& scene)
   mLastConsumedActor(),
   mCapturingTouchActor(),
   mTouchDownConsumedActor(),
-  mLastRenderTask()
+  mLastRenderTask(),
+  mLastPrimaryPointState(PointState::FINISHED)
 {
   DALI_LOG_TRACE_METHOD(gLogFilter);
 }
@@ -281,6 +282,7 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
     mCapturingTouchActor.SetActor(nullptr);
     mTouchDownConsumedActor.SetActor(nullptr);
     mLastRenderTask.Reset();
+    mLastPrimaryPointState = PointState::FINISHED;
 
     currentPoint.SetHitActor(Dali::Actor());
 
@@ -334,24 +336,34 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
 
   // Emit the touch signal
   Dali::Actor consumedActor;
-  if(currentRenderTask)
-  {
-    // Emit the intercept touch signal
-    Dali::Actor interceptedActor = EmitInterceptTouchSignals(touchEventImpl->GetPoint(0).GetHitActor(), touchEventHandle);
-    if(interceptedActor)
-    {
-      consumedActor = EmitTouchSignals(interceptedActor, touchEventHandle);
-    }
-    else
-    {
-      consumedActor = EmitTouchSignals(touchEventImpl->GetPoint(0).GetHitActor(), touchEventHandle);
-    }
-    consumed = consumedActor ? true : false;
-  }
 
   Integration::Point& primaryPoint      = touchEventImpl->GetPoint(0);
   Dali::Actor         primaryHitActor   = primaryPoint.GetHitActor();
   PointState::Type    primaryPointState = primaryPoint.GetState();
+
+  if(currentRenderTask)
+  {
+    // Emit the intercept touch signal
+    Dali::Actor interceptedActor = EmitInterceptTouchSignals(primaryHitActor, touchEventHandle);
+    if(interceptedActor)
+    {
+      // If the child is being touched, INTERRUPTED is sent.
+      if(mLastPrimaryHitActor.GetActor() &&
+         mLastPrimaryHitActor.GetActor() != interceptedActor &&
+         mLastRenderTask &&
+         mLastPrimaryPointState != PointState::FINISHED)
+      {
+        EmitTouchSignals(mLastPrimaryHitActor.GetActor(), *mLastRenderTask.Get(), touchEventImpl, PointState::INTERRUPTED);
+      }
+
+      consumedActor = EmitTouchSignals(interceptedActor, touchEventHandle);
+    }
+    else
+    {
+      consumedActor = EmitTouchSignals(primaryHitActor, touchEventHandle);
+    }
+    consumed = consumedActor ? true : false;
+  }
 
   DALI_LOG_INFO(gLogFilter, Debug::Concise, "PrimaryHitActor:     (%p) %s\n", primaryHitActor ? reinterpret_cast<void*>(&primaryHitActor.GetBaseObject()) : NULL, primaryHitActor ? primaryHitActor.GetProperty<std::string>(Dali::Actor::Property::NAME).c_str() : "");
   DALI_LOG_INFO(gLogFilter, Debug::Concise, "ConsumedActor:       (%p) %s\n", consumedActor ? reinterpret_cast<void*>(&consumedActor.GetBaseObject()) : NULL, consumedActor ? consumedActor.GetProperty<std::string>(Dali::Actor::Property::NAME).c_str() : "");
@@ -428,13 +440,13 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
 
   // 5) If our primary point is an Up event, then the primary point (in multi-touch) will change next
   //    time so set our last primary actor to NULL.  Do the same to the last consumed actor as well.
-
   if(primaryPointState == PointState::UP)
   {
     mLastPrimaryHitActor.SetActor(nullptr);
     mLastConsumedActor.SetActor(nullptr);
     mCapturingTouchActor.SetActor(nullptr);
     mLastRenderTask.Reset();
+    mLastPrimaryPointState = PointState::FINISHED;
   }
   else
   {
@@ -453,7 +465,8 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
         mLastConsumedActor.SetActor(nullptr);
       }
 
-      mLastRenderTask = currentRenderTask;
+      mLastRenderTask        = currentRenderTask;
+      mLastPrimaryPointState = primaryPointState;
     }
     else
     {
@@ -461,6 +474,7 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
       mLastConsumedActor.SetActor(nullptr);
       mCapturingTouchActor.SetActor(nullptr);
       mLastRenderTask.Reset();
+      mLastPrimaryPointState = PointState::FINISHED;
     }
   }
 
@@ -538,6 +552,7 @@ void TouchEventProcessor::OnObservedActorDisconnected(Actor* actor)
 
     mLastConsumedActor.SetActor(nullptr);
     mLastRenderTask.Reset();
+    mLastPrimaryPointState = PointState::FINISHED;
   }
 }
 

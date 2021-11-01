@@ -379,8 +379,81 @@ GLenum GetBlendOp(Graphics::BlendOp blendOp)
     case Graphics::BlendOp::MAX:
       op = GL_MAX;
       break;
-
-      // @todo Add advanced blend equations
+    case Graphics::BlendOp::MULTIPLY:
+    {
+      op = GL_MULTIPLY;
+      break;
+    }
+    case Graphics::BlendOp::SCREEN:
+    {
+      op = GL_SCREEN;
+      break;
+    }
+    case Graphics::BlendOp::OVERLAY:
+    {
+      op = GL_OVERLAY;
+      break;
+    }
+    case Graphics::BlendOp::DARKEN:
+    {
+      op = GL_DARKEN;
+      break;
+    }
+    case Graphics::BlendOp::LIGHTEN:
+    {
+      op = GL_LIGHTEN;
+      break;
+    }
+    case Graphics::BlendOp::COLOR_DODGE:
+    {
+      op = GL_COLORDODGE;
+      break;
+    }
+    case Graphics::BlendOp::COLOR_BURN:
+    {
+      op = GL_COLORBURN;
+      break;
+    }
+    case Graphics::BlendOp::HARD_LIGHT:
+    {
+      op = GL_HARDLIGHT;
+      break;
+    }
+    case Graphics::BlendOp::SOFT_LIGHT:
+    {
+      op = GL_SOFTLIGHT;
+      break;
+    }
+    case Graphics::BlendOp::DIFFERENCE:
+    {
+      op = GL_DIFFERENCE;
+      break;
+    }
+    case Graphics::BlendOp::EXCLUSION:
+    {
+      op = GL_EXCLUSION;
+      break;
+    }
+    case Graphics::BlendOp::HUE:
+    {
+      op = GL_HSL_HUE;
+      break;
+    }
+    case Graphics::BlendOp::SATURATION:
+    {
+      op = GL_HSL_SATURATION;
+      break;
+    }
+    case Graphics::BlendOp::COLOR:
+    {
+      op = GL_HSL_COLOR;
+      break;
+    }
+    case Graphics::BlendOp::LUMINOSITY:
+    {
+      op = GL_HSL_LUMINOSITY;
+      break;
+    }
   }
   return op;
 }

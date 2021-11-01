@@ -30,6 +30,7 @@
 #include <dali/internal/event/actors/actor-declarations.h>
 #include <dali/internal/event/actors/actor-parent-impl.h>
 #include <dali/internal/event/actors/actor-parent.h>
+#include <dali/internal/event/actors/actor-renderer-container.h>
 #include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/common/stage-def.h>
 #include <dali/internal/update/nodes/node-declarations.h>
@@ -56,10 +57,6 @@ class Animation;
 class RenderTask;
 class Renderer;
 class Scene;
-
-using RendererPtr       = IntrusivePtr<Renderer>;
-using RendererContainer = std::vector<RendererPtr>;
-using RendererIter      = RendererContainer::iterator;
 
 class ActorDepthTreeNode;
 using DepthNodeMemoryPool = Dali::Internal::MemoryPoolObjectAllocator<ActorDepthTreeNode>;
@@ -170,7 +167,7 @@ public:
   bool IsRenderable() const
   {
     // inlined as this is called a lot in hit testing
-    return mRenderers && !mRenderers->empty();
+    return mRenderers && !mRenderers->IsEmpty();
   }
 
   /**
@@ -770,9 +767,18 @@ public:
    *
    * @return The depth used for hit-testing and renderer sorting
    */
-  uint32_t GetSortingDepth()
+  inline uint32_t GetSortingDepth()
   {
     return mSortedDepth;
+  }
+
+  /**
+   * Set the actor's sorted depth. Used during recreation of depth tree
+   * @param[in] sortedDepth the new sorted depth
+   */
+  inline void SetSortingDepth(uint32_t sortedDepth)
+  {
+    mSortedDepth = sortedDepth;
   }
 
 public:
@@ -1659,14 +1665,6 @@ protected:
   void ConnectToScene(uint32_t parentDepth, bool notify);
 
   /**
-   * Helper for ConnectToScene, to recursively connect a tree of actors.
-   * This is atomic i.e. not interrupted by user callbacks.
-   * @param[in]  depth The depth in the hierarchy of the actor
-   * @param[out] connectionList On return, the list of connected actors which require notification.
-   */
-  void RecursiveConnectToScene(ActorContainer& connectionList, uint32_t depth);
-
-  /**
    * Connect the Node associated with this Actor to the scene-graph.
    */
   void ConnectToSceneGraph();
@@ -1682,13 +1680,6 @@ protected:
    * @param[in] notify Emits notification if set to true.
    */
   void DisconnectFromStage(bool notify);
-
-  /**
-   * Helper for DisconnectFromStage, to recursively disconnect a tree of actors.
-   * This is atomic i.e. not interrupted by user callbacks.
-   * @param[out] disconnectionList On return, the list of disconnected actors which require notification.
-   */
-  void RecursiveDisconnectFromStage(ActorContainer& disconnectionList);
 
   /**
    * Disconnect the Node associated with this Actor from the scene-graph.
@@ -1714,14 +1705,6 @@ public:
    * The mSortedDepth of each actor is set appropriately.
    */
   void RebuildDepthTree();
-
-protected:
-  /**
-   * Traverse the actor tree, inserting actors into the depth tree in sibling order.
-   * @param[in] sceneGraphNodeDepths A vector capturing the nodes and their depth index
-   * @param[in,out] depthIndex The current depth index (traversal index)
-   */
-  void DepthTraverseActorTree(OwnerPointer<SceneGraph::NodeDepths>& sceneGraphNodeDepths, int32_t& depthIndex);
 
 public:
   // Default property extensions from Object
@@ -2042,25 +2025,10 @@ private:
   }
 
   /**
-   * @brief Propagates layout direction recursively.
-   * @param[in] direction New layout direction.
-   */
-  void InheritLayoutDirectionRecursively(Dali::LayoutDirection::Type direction, bool set = false);
-
-  /**
    * @brief Sets the update size hint of an actor.
    * @param [in] updateSizeHint The update size hint.
    */
   void SetUpdateSizeHint(const Vector2& updateSizeHint);
-
-  /**
-   * @brief Recursively emits the visibility-changed-signal on the actor tree.
-   *
-   * @param[in] visible The new visibility of the actor
-   * @param[in] type Whether the actor's visible property has changed or a parent's
-   */
-  void EmitVisibilityChangedSignalRecursively(bool                               visible,
-                                              DevelActor::VisibilityChange::Type type);
 
 protected:
   ActorParentImpl    mParentImpl;   ///< Implementation of ActorParent;

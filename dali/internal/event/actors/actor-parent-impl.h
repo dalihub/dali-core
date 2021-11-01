@@ -19,8 +19,10 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/internal/common/const-string.h>
+#include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/event/actors/actor-declarations.h>
 #include <dali/internal/event/actors/actor-parent.h>
+#include <dali/internal/update/nodes/node-declarations.h>
 
 // EXTERNAL INCLUDES
 #include <string>
@@ -191,6 +193,43 @@ public:
   {
     return mChildOrderChangedSignal;
   }
+
+  /**
+   * Traverse the actor tree, inserting actors into the depth tree in sibling order.
+   * @param[in] sceneGraphNodeDepths A vector capturing the nodes and their depth index
+   * @param[in,out] depthIndex The current depth index (traversal index)
+   */
+  void DepthTraverseActorTree(OwnerPointer<SceneGraph::NodeDepths>& sceneGraphNodeDepths, int32_t& depthIndex);
+
+  /**
+   * Helper to recursively connect a tree of actors.
+   * This is not interrupted by user callbacks
+   * @param[in]  depth The depth in the hierarchy of the actor
+   * @param[out] connectionList On return, the list of connected actors which require notification.
+   */
+  void RecursiveConnectToScene(ActorContainer& connectionList, uint32_t depth);
+
+  /**
+   * Helper to recursively disconnect a tree of actors.
+   * This is not interrupted by user callbacks.
+   * @param[out] disconnectionList On return, the list of disconnected actors which require notification.
+   */
+  void RecursiveDisconnectFromScene(ActorContainer& disconnectionList);
+
+  /**
+   * @brief Propagates layout direction recursively.
+   * @param[in] direction New layout direction.
+   */
+  void InheritLayoutDirectionRecursively(Dali::LayoutDirection::Type direction, bool set = false);
+
+  /**
+   * @brief Recursively emits the visibility-changed-signal on the actor tree.
+   *
+   * @param[in] visible The new visibility of the actor
+   * @param[in] type Whether the actor's visible property has changed or a parent's
+   */
+  void EmitVisibilityChangedSignalRecursively(bool                               visible,
+                                              DevelActor::VisibilityChange::Type type);
 
 private:
   /**

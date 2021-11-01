@@ -165,7 +165,24 @@ enum class BlendOp
   REVERSE_SUBTRACT = 2,
   MIN              = 3,
   MAX              = 4,
+  MULTIPLY         = 5,
+  SCREEN           = 6,
+  OVERLAY          = 7,
+  DARKEN           = 8,
+  LIGHTEN          = 9,
+  COLOR_DODGE      = 10,
+  COLOR_BURN       = 11,
+  HARD_LIGHT       = 12,
+  SOFT_LIGHT       = 13,
+  DIFFERENCE       = 14,
+  EXCLUSION        = 15,
+  HUE              = 16,
+  SATURATION       = 17,
+  COLOR            = 18,
+  LUMINOSITY       = 19,
 };
+
+const BlendOp ADVANCED_BLEND_OPTIONS_START(BlendOp::MULTIPLY);
 
 /**
  * @brief Compare operators

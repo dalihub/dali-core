@@ -33,7 +33,8 @@ Scene::Scene()
   mSkipRendering(false),
   mSurfaceRect(),
   mSurfaceOrientation(0),
-  mSurfaceRectChanged(false)
+  mSurfaceRectChanged(false),
+  mRotationCompletedAcknowledgement(false)
 {
 }
 
@@ -167,6 +168,18 @@ bool Scene::IsSurfaceRectChanged()
   mSurfaceRectChanged     = false;
 
   return surfaceRectChanged;
+}
+
+void Scene::SetRotationCompletedAcknowledgement()
+{
+  mRotationCompletedAcknowledgement = true;
+}
+
+bool Scene::IsRotationCompletedAcknowledgementSet()
+{
+  bool setRotationCompletedAcknowledgement = mRotationCompletedAcknowledgement;
+  mRotationCompletedAcknowledgement     = false;
+  return setRotationCompletedAcknowledgement;
 }
 
 } // namespace SceneGraph

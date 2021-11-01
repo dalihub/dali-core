@@ -38,6 +38,8 @@ public:
   static const uint32_t DEFAULT_SURFACE_WIDTH  = 480;
   static const uint32_t DEFAULT_SURFACE_HEIGHT = 800;
 
+  static const Rect<int> DEFAULT_SURFACE_RECT;
+
   static constexpr uint32_t DEFAULT_HORIZONTAL_DPI = 220;
   static constexpr uint32_t DEFAULT_VERTICAL_DPI   = 217;
 
