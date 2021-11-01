@@ -19,7 +19,6 @@
  */
 
 // EXTERNAL INCLUDES
-#include <assert.h>
 #include <algorithm>
 #include <cstddef>
 #include <cstdint> // uint32_t
@@ -550,10 +549,6 @@ public: // API
   {
     DALI_ASSERT_VECTOR(VectorBase::mData && "Vector is empty");
     DALI_ASSERT_VECTOR(index < VectorBase::Count() && "Index out of bounds");
-    if(index >= VectorBase::Count())
-    {
-      assert(0);
-    }
     ItemType* address = reinterpret_cast<ItemType*>(VectorBase::mData);
     address += index;
     return *address;
