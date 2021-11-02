@@ -42,13 +42,7 @@ FrameCallback::~FrameCallback()
     mUpdateProxy->GetRootNode().RemoveObserver(*this);
   }
 
-  {
-    Mutex::ScopedLock lock(mMutex);
-    if(mFrameCallbackInterface)
-    {
-      FrameCallbackInterface::Impl::Get(*mFrameCallbackInterface).DisconnectFromSceneGraphObject();
-    }
-  }
+  Invalidate();
 }
 
 void FrameCallback::ConnectToSceneGraph(UpdateManager& updateManager, TransformManager& transformManager, Node& rootNode)
@@ -70,7 +64,7 @@ bool FrameCallback::Update(BufferIndex bufferIndex, float elapsedSeconds, bool n
     }
 
     Mutex::ScopedLock lock(mMutex);
-    if(mFrameCallbackInterface)
+    if(mFrameCallbackInterface && mValid)
     {
       Dali::UpdateProxy updateProxy(*mUpdateProxy);
       mFrameCallbackInterface->Update(updateProxy, elapsedSeconds);
@@ -83,10 +77,11 @@ bool FrameCallback::Update(BufferIndex bufferIndex, float elapsedSeconds, bool n
 void FrameCallback::Invalidate()
 {
   Mutex::ScopedLock lock(mMutex);
-  if(mFrameCallbackInterface)
+  if(mFrameCallbackInterface && mValid)
   {
     FrameCallbackInterface::Impl::Get(*mFrameCallbackInterface).DisconnectFromSceneGraphObject();
-    mFrameCallbackInterface = nullptr;
+    mValid = false;
+    // Do not set mFrameCallbackInterface to nullptr as it is used for comparison checks by the comparison operator
   }
 }
 
