@@ -174,21 +174,121 @@ BaseHandle CreateActor()
   return Dali::Actor::New();
 }
 
+/**
+ * Connects a callback function with the object's signals.
+ * @param[in] object The object providing the signal.
+ * @param[in] tracker Used to disconnect the signal.
+ * @param[in] signalName The signal to connect to.
+ * @param[in] functor A newly allocated FunctorDelegate.
+ * @return True if the signal was connected.
+ * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
+ */
+static bool DoConnectSignal(BaseObject*                 object,
+                            ConnectionTrackerInterface* tracker,
+                            const std::string&          signalName,
+                            FunctorDelegate*            functor)
+{
+  bool   connected(true);
+  Actor* actor = static_cast<Actor*>(object); // TypeRegistry guarantees that this is the correct type.
+
+  std::string_view name(signalName);
+
+  if(name == SIGNAL_HOVERED)
+  {
+    actor->HoveredSignal().Connect(tracker, functor);
+  }
+  else if(signalName == SIGNAL_WHEEL_EVENT)
+  {
+    actor->WheelEventSignal().Connect(tracker, functor);
+  }
+  else if(name == SIGNAL_ON_SCENE)
+  {
+    actor->OnSceneSignal().Connect(tracker, functor);
+  }
+  else if(name == SIGNAL_OFF_SCENE)
+  {
+    actor->OffSceneSignal().Connect(tracker, functor);
+  }
+  else if(name == SIGNAL_ON_RELAYOUT)
+  {
+    actor->OnRelayoutSignal().Connect(tracker, functor);
+  }
+  else if(name == SIGNAL_TOUCHED)
+  {
+    actor->TouchedSignal().Connect(tracker, functor);
+  }
+  else if(name == SIGNAL_VISIBILITY_CHANGED)
+  {
+    actor->VisibilityChangedSignal().Connect(tracker, functor);
+  }
+  else if(name == SIGNAL_LAYOUT_DIRECTION_CHANGED)
+  {
+    actor->LayoutDirectionChangedSignal().Connect(tracker, functor);
+  }
+  else if(name == SIGNAL_CHILD_ADDED)
+  {
+    actor->ChildAddedSignal().Connect(tracker, functor);
+  }
+  else if(name == SIGNAL_CHILD_REMOVED)
+  {
+    actor->ChildRemovedSignal().Connect(tracker, functor);
+  }
+  else
+  {
+    // signalName does not match any signal
+    connected = false;
+  }
+
+  return connected;
+}
+
+/**
+ * Performs actions as requested using the action name.
+ * @param[in] object The object on which to perform the action.
+ * @param[in] actionName The action to perform.
+ * @param[in] attributes The attributes with which to perfrom this action.
+ * @return true if the action was done.
+ */
+bool DoAction(BaseObject*          object,
+              const std::string&   actionName,
+              const Property::Map& attributes)
+{
+  bool   done  = false;
+  Actor* actor = dynamic_cast<Actor*>(object);
+
+  if(actor)
+  {
+    std::string_view name(actionName);
+    if(name == ACTION_SHOW)
+    {
+      actor->SetVisible(true);
+      done = true;
+    }
+    else if(name == ACTION_HIDE)
+    {
+      actor->SetVisible(false);
+      done = true;
+    }
+  }
+
+  return done;
+}
+
 TypeRegistration mType(typeid(Dali::Actor), typeid(Dali::Handle), CreateActor, ActorDefaultProperties);
 
-SignalConnectorType signalConnector2(mType, std::string(SIGNAL_HOVERED), &Actor::DoConnectSignal);
-SignalConnectorType signalConnector3(mType, std::string(SIGNAL_WHEEL_EVENT), &Actor::DoConnectSignal);
-SignalConnectorType signalConnector4(mType, std::string(SIGNAL_ON_SCENE), &Actor::DoConnectSignal);
-SignalConnectorType signalConnector5(mType, std::string(SIGNAL_OFF_SCENE), &Actor::DoConnectSignal);
-SignalConnectorType signalConnector6(mType, std::string(SIGNAL_ON_RELAYOUT), &Actor::DoConnectSignal);
-SignalConnectorType signalConnector7(mType, std::string(SIGNAL_TOUCHED), &Actor::DoConnectSignal);
-SignalConnectorType signalConnector8(mType, std::string(SIGNAL_VISIBILITY_CHANGED), &Actor::DoConnectSignal);
-SignalConnectorType signalConnector9(mType, std::string(SIGNAL_LAYOUT_DIRECTION_CHANGED), &Actor::DoConnectSignal);
-SignalConnectorType signalConnector10(mType, std::string(SIGNAL_CHILD_ADDED), &Actor::DoConnectSignal);
-SignalConnectorType signalConnector11(mType, std::string(SIGNAL_CHILD_REMOVED), &Actor::DoConnectSignal);
+SignalConnectorType signalConnector2(mType, std::string(SIGNAL_HOVERED), &DoConnectSignal);
+SignalConnectorType signalConnector3(mType, std::string(SIGNAL_WHEEL_EVENT), &DoConnectSignal);
+SignalConnectorType signalConnector4(mType, std::string(SIGNAL_ON_SCENE), &DoConnectSignal);
+SignalConnectorType signalConnector5(mType, std::string(SIGNAL_OFF_SCENE), &DoConnectSignal);
+SignalConnectorType signalConnector6(mType, std::string(SIGNAL_ON_RELAYOUT), &DoConnectSignal);
+SignalConnectorType signalConnector7(mType, std::string(SIGNAL_TOUCHED), &DoConnectSignal);
+SignalConnectorType signalConnector8(mType, std::string(SIGNAL_VISIBILITY_CHANGED), &DoConnectSignal);
+SignalConnectorType signalConnector9(mType, std::string(SIGNAL_LAYOUT_DIRECTION_CHANGED), &DoConnectSignal);
+SignalConnectorType signalConnector10(mType, std::string(SIGNAL_CHILD_ADDED), &DoConnectSignal);
+SignalConnectorType signalConnector11(mType, std::string(SIGNAL_CHILD_REMOVED), &DoConnectSignal);
 
-TypeAction a1(mType, std::string(ACTION_SHOW), &Actor::DoAction);
-TypeAction a2(mType, std::string(ACTION_HIDE), &Actor::DoAction);
+TypeAction a1(mType, std::string(ACTION_SHOW), &DoAction);
+TypeAction a2(mType, std::string(ACTION_HIDE), &DoAction);
 
 /**
  * @brief Extract a given dimension from a Vector2
@@ -252,6 +352,35 @@ void EmitSignal(Actor& actor, Signal& signal, Param... params)
   {
     Dali::Actor handle(&actor);
     signal.Emit(handle, params...);
+  }
+}
+
+using ActorParentSiblingOrderMethod = void (ActorParent::*)(Actor&);
+using ActorParentSiblingOrderMethodWithTarget = void (ActorParent::*)(Actor&, Actor&);
+
+/// Helper to check and call actor sibling methods in ActorParent
+void CheckParentAndCall(ActorParent* parent, Actor& actor, ActorParentSiblingOrderMethod memberFunction)
+{
+  if(parent)
+  {
+    (parent->*memberFunction)(actor);
+  }
+  else
+  {
+    DALI_LOG_WARNING("Actor must have a parent, Sibling order not changed.\n");
+  }
+}
+
+/// Helper to check and call actor sibling methods with a target parameter in ActorParent
+void CheckParentAndCall(ActorParent* parent, Actor& actor, Actor& target, ActorParentSiblingOrderMethodWithTarget memberFunction)
+{
+  if(parent)
+  {
+    (parent->*memberFunction)(actor, target);
+  }
+  else
+  {
+    DALI_LOG_WARNING("Actor must have a parent, Sibling order not changed.\n");
   }
 }
 
@@ -1137,62 +1266,6 @@ DevelActor::ChildOrderChangedSignalType& Actor::ChildOrderChangedSignal()
   return mParentImpl.ChildOrderChangedSignal();
 }
 
-bool Actor::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
-{
-  bool   connected(true);
-  Actor* actor = static_cast<Actor*>(object); // TypeRegistry guarantees that this is the correct type.
-
-  std::string_view name(signalName);
-
-  if(name == SIGNAL_HOVERED)
-  {
-    actor->HoveredSignal().Connect(tracker, functor);
-  }
-  else if(signalName == SIGNAL_WHEEL_EVENT)
-  {
-    actor->WheelEventSignal().Connect(tracker, functor);
-  }
-  else if(name == SIGNAL_ON_SCENE)
-  {
-    actor->OnSceneSignal().Connect(tracker, functor);
-  }
-  else if(name == SIGNAL_OFF_SCENE)
-  {
-    actor->OffSceneSignal().Connect(tracker, functor);
-  }
-  else if(name == SIGNAL_ON_RELAYOUT)
-  {
-    actor->OnRelayoutSignal().Connect(tracker, functor);
-  }
-  else if(name == SIGNAL_TOUCHED)
-  {
-    actor->TouchedSignal().Connect(tracker, functor);
-  }
-  else if(name == SIGNAL_VISIBILITY_CHANGED)
-  {
-    actor->VisibilityChangedSignal().Connect(tracker, functor);
-  }
-  else if(name == SIGNAL_LAYOUT_DIRECTION_CHANGED)
-  {
-    actor->LayoutDirectionChangedSignal().Connect(tracker, functor);
-  }
-  else if(name == SIGNAL_CHILD_ADDED)
-  {
-    actor->ChildAddedSignal().Connect(tracker, functor);
-  }
-  else if(name == SIGNAL_CHILD_REMOVED)
-  {
-    actor->ChildRemovedSignal().Connect(tracker, functor);
-  }
-  else
-  {
-    // signalName does not match any signal
-    connected = false;
-  }
-
-  return connected;
-}
-
 Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
 : Object(&node),
   mParentImpl(*this),
@@ -1583,74 +1656,32 @@ const SceneGraph::Node& Actor::GetNode() const
 
 void Actor::Raise()
 {
-  if(mParent)
-  {
-    mParent->RaiseChild(*this);
-  }
-  else
-  {
-    DALI_LOG_WARNING("Actor must have a parent, Sibling order not changed.\n");
-  }
+  CheckParentAndCall(mParent, *this, &ActorParent::RaiseChild);
 }
 
 void Actor::Lower()
 {
-  if(mParent)
-  {
-    mParent->LowerChild(*this);
-  }
-  else
-  {
-    DALI_LOG_WARNING("Actor must have a parent, Sibling order not changed.\n");
-  }
+  CheckParentAndCall(mParent, *this, &ActorParent::LowerChild);
 }
 
 void Actor::RaiseToTop()
 {
-  if(mParent)
-  {
-    mParent->RaiseChildToTop(*this);
-  }
-  else
-  {
-    DALI_LOG_WARNING("Actor must have a parent, Sibling order not changed.\n");
-  }
+  CheckParentAndCall(mParent, *this, &ActorParent::RaiseChildToTop);
 }
 
 void Actor::LowerToBottom()
 {
-  if(mParent)
-  {
-    mParent->LowerChildToBottom(*this);
-  }
-  else
-  {
-    DALI_LOG_WARNING("Actor must have a parent, Sibling order not changed.\n");
-  }
+  CheckParentAndCall(mParent, *this, &ActorParent::LowerChildToBottom);
 }
 
 void Actor::RaiseAbove(Internal::Actor& target)
 {
-  if(mParent)
-  {
-    mParent->RaiseChildAbove(*this, target);
-  }
-  else
-  {
-    DALI_LOG_WARNING("Actor must have a parent, Sibling order not changed.\n");
-  }
+  CheckParentAndCall(mParent, *this, target, &ActorParent::RaiseChildAbove);
 }
 
 void Actor::LowerBelow(Internal::Actor& target)
 {
-  if(mParent)
-  {
-    mParent->LowerChildBelow(*this, target);
-  }
-  else
-  {
-    DALI_LOG_WARNING("Actor must have a parent, Sibling order not changed.\n");
-  }
+  CheckParentAndCall(mParent, *this, target, &ActorParent::LowerChildBelow);
 }
 
 void Actor::SetParent(ActorParent* parent, bool notify)
@@ -1693,29 +1724,6 @@ void Actor::SetParent(ActorParent* parent, bool notify)
   }
 }
 
-bool Actor::DoAction(BaseObject* object, const std::string& actionName, const Property::Map& /* attributes */)
-{
-  bool   done  = false;
-  Actor* actor = dynamic_cast<Actor*>(object);
-
-  if(actor)
-  {
-    std::string_view name(actionName);
-    if(name == ACTION_SHOW)
-    {
-      actor->SetVisible(true);
-      done = true;
-    }
-    else if(name == ACTION_HIDE)
-    {
-      actor->SetVisible(false);
-      done = true;
-    }
-  }
-
-  return done;
-}
-
 Rect<> Actor::CalculateScreenExtents() const
 {
   auto    screenPosition    = GetCurrentScreenPosition();
@@ -1723,16 +1731,6 @@ Rect<> Actor::CalculateScreenExtents() const
   Vector3 anchorPointOffSet = size * (mPositionUsesAnchorPoint ? GetCurrentAnchorPoint() : AnchorPoint::TOP_LEFT);
   Vector2 position          = Vector2(screenPosition.x - anchorPointOffSet.x, screenPosition.y - anchorPointOffSet.y);
   return {position.x, position.y, size.x, size.y};
-}
-
-void Actor::SetNeedGesturePropagation(bool propagation)
-{
-  mNeedGesturePropagation = propagation;
-}
-
-bool Actor::NeedGesturePropagation()
-{
-  return mNeedGesturePropagation;
 }
 
 bool Actor::GetCachedPropertyValue(Property::Index index, Property::Value& value) const
