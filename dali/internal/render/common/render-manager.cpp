@@ -256,15 +256,13 @@ void RenderManager::RemoveTexture(Render::Texture* texture)
 {
   DALI_ASSERT_DEBUG(NULL != texture);
 
-  // Find the texture, use reference to pointer so we can do the erase safely
-  for(auto&& iter : mImpl->textureContainer)
+  // Find the texture, use std::find so we can do the erase safely
+  auto iter = std::find(mImpl->textureContainer.begin(), mImpl->textureContainer.end(), texture);
+
+  if(iter != mImpl->textureContainer.end())
   {
-    if(iter == texture)
-    {
-      texture->Destroy();
-      mImpl->textureContainer.Erase(&iter); // Texture found; now destroy it
-      return;
-    }
+    texture->Destroy();
+    mImpl->textureContainer.Erase(iter); // Texture found; now destroy it
   }
 }
 
@@ -302,16 +300,13 @@ void RenderManager::RemoveFrameBuffer(Render::FrameBuffer* frameBuffer)
 {
   DALI_ASSERT_DEBUG(nullptr != frameBuffer);
 
-  // Find the sampler, use reference so we can safely do the erase
-  for(auto&& iter : mImpl->frameBufferContainer)
-  {
-    if(iter == frameBuffer)
-    {
-      frameBuffer->Destroy();
-      mImpl->frameBufferContainer.Erase(&iter); // frameBuffer found; now destroy it
+  // Find the framebuffer, use std:find so we can safely do the erase
+  auto iter = std::find(mImpl->frameBufferContainer.begin(), mImpl->frameBufferContainer.end(), frameBuffer);
 
-      break;
-    }
+  if(iter != mImpl->frameBufferContainer.end())
+  {
+    frameBuffer->Destroy();
+    mImpl->frameBufferContainer.Erase(iter); // frameBuffer found; now destroy it
   }
 }
 
@@ -382,13 +377,11 @@ void RenderManager::AddGeometry(OwnerPointer<Render::Geometry>& geometry)
 
 void RenderManager::RemoveGeometry(Render::Geometry* geometry)
 {
-  auto it = std::find_if(mImpl->geometryContainer.begin(), mImpl->geometryContainer.end(), [geometry](auto& item) {
-    return geometry == item;
-  });
+  auto iter = std::find(mImpl->geometryContainer.begin(), mImpl->geometryContainer.end(), geometry);
 
-  if(it != mImpl->geometryContainer.end())
+  if(iter != mImpl->geometryContainer.end())
   {
-    mImpl->geometryContainer.Erase(it);
+    mImpl->geometryContainer.Erase(iter);
   }
 }
 
