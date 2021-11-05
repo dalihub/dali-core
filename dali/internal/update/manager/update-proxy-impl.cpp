@@ -55,6 +55,7 @@ SceneGraph::Node* FindNodeInSceneGraph(uint32_t id, SceneGraph::Node& node)
 UpdateProxy::UpdateProxy(SceneGraph::UpdateManager& updateManager, SceneGraph::TransformManager& transformManager, SceneGraph::Node& rootNode)
 : mNodeContainer(),
   mLastCachedIdNodePair({0u, nullptr}),
+  mDirtyNodes(),
   mCurrentBufferIndex(0u),
   mUpdateManager(updateManager),
   mTransformManager(transformManager),
@@ -212,6 +213,7 @@ bool UpdateProxy::SetColor(uint32_t id, const Vector4& color)
   {
     node->mColor.Set(mCurrentBufferIndex, color);
     node->SetDirtyFlag(SceneGraph::NodePropertyFlags::COLOR);
+    mDirtyNodes.push_back(id);
     AddResetter(*node, node->mColor);
     success = true;
   }
@@ -281,6 +283,18 @@ void UpdateProxy::AddResetter(SceneGraph::Node& node, SceneGraph::PropertyBase& 
     mPropertyModifier = PropertyModifierPtr(new PropertyModifier(mUpdateManager));
   }
   mPropertyModifier->AddResetter(node, propertyBase);
+}
+
+void UpdateProxy::AddNodeResetters()
+{
+  for(auto&& id : mDirtyNodes)
+  {
+    SceneGraph::Node* node = FindNodeInSceneGraph(id, mRootNode);
+    if(node)
+    {
+      mUpdateManager.AddNodeResetter(*node);
+    }
+  }
 }
 
 } // namespace Internal

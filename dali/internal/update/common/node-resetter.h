@@ -80,15 +80,10 @@ public:
       // Start aging the node properties.
       // We need to reset the node properties for two frames to ensure both
       // property values are set appropriately.
-      //      if(mDisconnected)
-      {
-        --mActive;
-      }
+      --mActive;
 
       mNode->mVisible.ResetToBaseValue(updateBufferIndex);
-      mNode->mCulled.ResetToBaseValue(updateBufferIndex);
       mNode->mColor.ResetToBaseValue(updateBufferIndex);
-      mNode->mUpdateSizeHint.ResetToBaseValue(updateBufferIndex);
     }
   };
 
@@ -104,6 +99,9 @@ public:
   {
     mDisconnected = false;
     mActive       = ACTIVE;
+
+    mNode->mVisible.MarkAsDirty();
+    mNode->mColor.MarkAsDirty();
   }
 
   /**
@@ -157,6 +155,8 @@ protected:
     mActive(ACTIVE),
     mDisconnected(false)
   {
+    mNode->mVisible.MarkAsDirty();
+    mNode->mColor.MarkAsDirty();
   }
 
   Node*  mNode;         ///< The node that owns the properties

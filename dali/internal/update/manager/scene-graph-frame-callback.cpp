@@ -40,6 +40,7 @@ FrameCallback::~FrameCallback()
   if(mUpdateProxy)
   {
     mUpdateProxy->GetRootNode().RemoveObserver(*this);
+    mUpdateProxy->AddNodeResetters();
   }
 
   Invalidate();

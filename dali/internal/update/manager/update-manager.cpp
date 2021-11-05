@@ -341,8 +341,7 @@ void UpdateManager::InstallRoot(OwnerPointer<Layer>& layer)
   rootLayer->CreateTransform(&mImpl->transformManager);
   rootLayer->SetRoot(true);
 
-  OwnerPointer<SceneGraph::NodeResetter> nodeResetter = SceneGraph::NodeResetter::New(*rootLayer);
-  AddNodeResetter(nodeResetter);
+  AddNodeResetter(*rootLayer);
 
   mImpl->scenes.emplace_back(new Impl::SceneInfo(rootLayer));
 }
@@ -388,8 +387,7 @@ void UpdateManager::ConnectNode(Node* parent, Node* node)
 
   parent->ConnectChild(node);
 
-  OwnerPointer<SceneGraph::NodeResetter> nodeResetter = SceneGraph::NodeResetter::New(*node);
-  AddNodeResetter(nodeResetter);
+  AddNodeResetter(*node);
 
   // Inform the frame-callback-processor, if set, about the node-hierarchy changing
   if(mImpl->frameCallbackProcessor)
@@ -562,8 +560,9 @@ void UpdateManager::AddPropertyResetter(OwnerPointer<PropertyResetterBase>& prop
   mImpl->propertyResetters.PushBack(propertyResetter.Release());
 }
 
-void UpdateManager::AddNodeResetter(OwnerPointer<NodeResetter>& nodeResetter)
+void UpdateManager::AddNodeResetter(const Node& node)
 {
+  OwnerPointer<SceneGraph::NodeResetter> nodeResetter = SceneGraph::NodeResetter::New(node);
   nodeResetter->Initialize();
   mImpl->nodeResetters.PushBack(nodeResetter.Release());
 }

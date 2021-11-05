@@ -157,6 +157,11 @@ public:
    */
   void NodeHierarchyChanged();
 
+  /**
+   * @brief Adds node resetter for each dirty node whose animatable properties have been changed.
+   */
+  void AddNodeResetters();
+
 private:
   /**
    * @brief Retrieves the node with the specified ID.
@@ -188,6 +193,7 @@ private:
 
   mutable std::vector<IdNodePair> mNodeContainer;        ///< Used to store cached pointers to already searched for Nodes.
   mutable IdNodePair              mLastCachedIdNodePair; ///< Used to cache the last retrieved id-node pair.
+  mutable std::vector<uint32_t>   mDirtyNodes;           ///< Used to store the ID of the dirty nodes with non-transform property modifications.
   BufferIndex                     mCurrentBufferIndex;
 
   SceneGraph::UpdateManager&    mUpdateManager;    ///< Reference to the Update Manager.

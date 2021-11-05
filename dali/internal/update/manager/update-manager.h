@@ -265,7 +265,7 @@ public:
    * It will be killed by UpdateManager when the node is disconnected from the scene graph;
    * or when the node is destroyed.
    */
-  void AddNodeResetter(OwnerPointer<NodeResetter>& nodeResetter);
+  void AddNodeResetter(const Node& node);
 
   // Property Notification
 
