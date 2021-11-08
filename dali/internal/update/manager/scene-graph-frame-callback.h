@@ -132,6 +132,7 @@ private:
   Mutex                        mMutex;
   std::unique_ptr<UpdateProxy> mUpdateProxy{nullptr}; ///< A unique pointer to the implementation of the UpdateProxy.
   FrameCallbackInterface*      mFrameCallbackInterface;
+  bool                         mValid{true}; ///< Set to false when Invalidate() is called.
 };
 
 /**

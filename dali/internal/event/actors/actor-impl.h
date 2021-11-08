@@ -258,13 +258,19 @@ public:
   /**
    * @copydoc DevelActor::SetNeedGesturePropagation.
    */
-  void SetNeedGesturePropagation(bool propagation);
+  void SetNeedGesturePropagation(bool propagation)
+  {
+    mNeedGesturePropagation = propagation;
+  }
 
   /**
    * Retrieve need gesture propagation value
    * @return The actor's need gesture propagation value.
    */
-  bool NeedGesturePropagation();
+  bool NeedGesturePropagation() const
+  {
+    return mNeedGesturePropagation;
+  }
 
   /**
    * Sets the size of an actor.
@@ -1594,31 +1600,6 @@ public:
    * @copydoc DevelActor::ChildOrderChangedSignal
    */
   DevelActor::ChildOrderChangedSignalType& ChildOrderChangedSignal();
-
-  /**
-   * Connects a callback function with the object's signals.
-   * @param[in] object The object providing the signal.
-   * @param[in] tracker Used to disconnect the signal.
-   * @param[in] signalName The signal to connect to.
-   * @param[in] functor A newly allocated FunctorDelegate.
-   * @return True if the signal was connected.
-   * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
-   */
-  static bool DoConnectSignal(BaseObject*                 object,
-                              ConnectionTrackerInterface* tracker,
-                              const std::string&          signalName,
-                              FunctorDelegate*            functor);
-
-  /**
-   * Performs actions as requested using the action name.
-   * @param[in] object The object on which to perform the action.
-   * @param[in] actionName The action to perform.
-   * @param[in] attributes The attributes with which to perfrom this action.
-   * @return true if the action was done.
-   */
-  static bool DoAction(BaseObject*          object,
-                       const std::string&   actionName,
-                       const Property::Map& attributes);
 
 public:
   // For Animation
