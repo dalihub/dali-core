@@ -125,6 +125,22 @@ struct Actor::Relayouter
   float GetNegotiatedDimension(Dimension::Type dimension);
 
   /**
+   * Negotiate a dimension based on the size of the parent
+   *
+   * @param[in] dimension The dimension to negotiate on
+   * @return Return the negotiated size
+   */
+  static float NegotiateDimensionFromParent(Actor& actor, Dimension::Type dimension);
+
+  /**
+   * @brief Negotiate a dimension based on the size of the children
+   *
+   * @param[in] dimension The dimension to negotiate on
+   * @return Return the negotiated size
+   */
+  static float NegotiateDimensionFromChildren(Actor& actor, Dimension::Type dimension);
+
+  /**
    * Negotiate size for a specific dimension
    *
    * The algorithm adopts a recursive dependency checking approach. Meaning, that wherever dependencies
@@ -162,6 +178,21 @@ struct Actor::Relayouter
    *                            RelayoutController algorithm.
    */
   static void NegotiateSize(Actor& actor, const Vector2& allocatedSize, RelayoutContainer& container);
+
+  /**
+   * Get the value for the given dimension
+   *
+   * @param[in] values The vector to get values from
+   * @param[in] dimension The dimension to fetch
+   * @return the value of the given dimension
+   */
+  static float GetDimensionValue(const Vector3& values, const Dimension::Type dimension);
+
+  /// @copydoc Actor::CalculateSize
+  static float CalculateSize(Actor& actor, Dimension::Type dimension, const Vector2& maximumSize);
+
+  /// @copydoc Actor::CalculateChildSizeBase
+  static float CalculateChildSize(Actor& actor, const Actor& child, Dimension::Type dimension);
 
 public:
   ResizePolicy::Type resizePolicies[Dimension::DIMENSION_COUNT];  ///< Resize policies

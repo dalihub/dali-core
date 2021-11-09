@@ -135,7 +135,7 @@ public:
    * From RenderTaskDefaults; retrieve the default camera actor.
    * @return The default camera actor.
    */
-  CameraActor& GetDefaultCameraActor() override;
+  CameraActor& GetDefaultCameraActor() const override;
 
   // Layers
 

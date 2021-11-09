@@ -290,45 +290,6 @@ SignalConnectorType signalConnector11(mType, std::string(SIGNAL_CHILD_REMOVED), 
 TypeAction a1(mType, std::string(ACTION_SHOW), &DoAction);
 TypeAction a2(mType, std::string(ACTION_HIDE), &DoAction);
 
-/**
- * @brief Extract a given dimension from a Vector2
- *
- * @param[in] values The values to extract from
- * @param[in] dimension The dimension to extract
- * @return Return the value for the dimension
- */
-constexpr float GetDimensionValue(const Vector2& values, Dimension::Type dimension)
-{
-  switch(dimension)
-  {
-    case Dimension::WIDTH:
-    {
-      return values.width;
-    }
-    case Dimension::HEIGHT:
-    {
-      return values.height;
-    }
-    default:
-    {
-      break;
-    }
-  }
-  return 0.0f;
-}
-
-/**
- * @brief Extract a given dimension from a Vector3
- *
- * @param[in] values The values to extract from
- * @param[in] dimension The dimension to extract
- * @return Return the value for the dimension
- */
-float GetDimensionValue(const Vector3& values, Dimension::Type dimension)
-{
-  return GetDimensionValue(values.GetVectorXY(), dimension);
-}
-
 /// Helper for emitting a signal
 template<typename Signal, typename Event>
 bool EmitConsumingSignal(Actor& actor, Signal& signal, const Event& event)
@@ -355,7 +316,7 @@ void EmitSignal(Actor& actor, Signal& signal, Param... params)
   }
 }
 
-using ActorParentSiblingOrderMethod = void (ActorParent::*)(Actor&);
+using ActorParentSiblingOrderMethod           = void (ActorParent::*)(Actor&);
 using ActorParentSiblingOrderMethodWithTarget = void (ActorParent::*)(Actor&, Actor&);
 
 /// Helper to check and call actor sibling methods in ActorParent
@@ -575,21 +536,11 @@ const Vector3& Actor::GetCurrentWorldPosition() const
 
 const Vector2 Actor::GetCurrentScreenPosition() const
 {
-  if(mScene && OnScene())
+  if(mScene)
   {
-    Vector3 worldPosition  = GetNode().GetWorldPosition(GetEventThreadServices().GetEventBufferIndex());
-    Vector3 cameraPosition = mScene->GetDefaultCameraActor().GetNode().GetWorldPosition(GetEventThreadServices().GetEventBufferIndex());
-    worldPosition -= cameraPosition;
-
-    Vector3 actorSize = GetCurrentSize() * GetCurrentWorldScale();
-    Vector2 halfSceneSize(mScene->GetSize() * 0.5f); // World position origin is center of scene
-    Vector3 halfActorSize(actorSize * 0.5f);
-    Vector3 anchorPointOffSet = halfActorSize - actorSize * (mPositionUsesAnchorPoint ? GetCurrentAnchorPoint() : AnchorPoint::TOP_LEFT);
-
-    return Vector2(halfSceneSize.width + worldPosition.x - anchorPointOffSet.x,
-                   halfSceneSize.height + worldPosition.y - anchorPointOffSet.y);
+    BufferIndex bufferIndex = GetEventThreadServices().GetEventBufferIndex();
+    return CalculateActorScreenPosition(*this, bufferIndex);
   }
-
   return Vector2::ZERO;
 }
 
@@ -1706,11 +1657,14 @@ void Actor::SetParent(ActorParent* parent, bool notify)
 
 Rect<> Actor::CalculateScreenExtents() const
 {
-  auto    screenPosition    = GetCurrentScreenPosition();
-  Vector3 size              = GetCurrentSize() * GetCurrentWorldScale();
-  Vector3 anchorPointOffSet = size * (mPositionUsesAnchorPoint ? GetCurrentAnchorPoint() : AnchorPoint::TOP_LEFT);
-  Vector2 position          = Vector2(screenPosition.x - anchorPointOffSet.x, screenPosition.y - anchorPointOffSet.y);
-  return {position.x, position.y, size.x, size.y};
+  auto        screenPosition = GetCurrentScreenPosition();
+  BufferIndex bufferIndex    = GetEventThreadServices().GetEventBufferIndex();
+  return CalculateActorScreenExtents(*this, screenPosition, bufferIndex);
+}
+
+Vector3 Actor::GetAnchorPointForPosition() const
+{
+  return (mPositionUsesAnchorPoint ? GetCurrentAnchorPoint() : AnchorPoint::TOP_LEFT);
 }
 
 bool Actor::GetCachedPropertyValue(Property::Index index, Property::Value& value) const
@@ -1801,29 +1755,7 @@ float Actor::GetWidthForHeightBase(float height)
 
 float Actor::CalculateChildSizeBase(const Dali::Actor& child, Dimension::Type dimension)
 {
-  // Fill to parent, taking size mode factor into account
-  switch(child.GetResizePolicy(dimension))
-  {
-    case ResizePolicy::FILL_TO_PARENT:
-    {
-      return GetLatestSize(dimension);
-    }
-
-    case ResizePolicy::SIZE_RELATIVE_TO_PARENT:
-    {
-      return GetLatestSize(dimension) * GetDimensionValue(child.GetProperty<Vector3>(Dali::Actor::Property::SIZE_MODE_FACTOR), dimension);
-    }
-
-    case ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT:
-    {
-      return GetLatestSize(dimension) + GetDimensionValue(child.GetProperty<Vector3>(Dali::Actor::Property::SIZE_MODE_FACTOR), dimension);
-    }
-
-    default:
-    {
-      return GetLatestSize(dimension);
-    }
-  }
+  return Actor::Relayouter::CalculateChildSize(*this, GetImplementation(child), dimension);
 }
 
 float Actor::CalculateChildSize(const Dali::Actor& child, Dimension::Type dimension)
@@ -1858,103 +1790,27 @@ float Actor::GetRelayoutSize(Dimension::Type dimension) const
 
 float Actor::NegotiateFromParent(Dimension::Type dimension)
 {
-  Actor* parent = GetParent();
-  if(parent)
-  {
-    Vector2 padding(GetPadding(dimension));
-    Vector2 parentPadding(parent->GetPadding(dimension));
-    return parent->CalculateChildSize(Dali::Actor(this), dimension) - parentPadding.x - parentPadding.y - padding.x - padding.y;
-  }
-
-  return 0.0f;
+  return Relayouter::NegotiateDimensionFromParent(*this, dimension);
 }
 
 float Actor::NegotiateFromChildren(Dimension::Type dimension)
 {
-  float maxDimensionPoint = 0.0f;
-
-  for(uint32_t i = 0, count = GetChildCount(); i < count; ++i)
-  {
-    ActorPtr child = GetChildAt(i);
-
-    if(!child->RelayoutDependentOnParent(dimension))
-    {
-      // Calculate the min and max points that the children range across
-      float childPosition = GetDimensionValue(child->GetTargetPosition(), dimension);
-      float dimensionSize = child->GetRelayoutSize(dimension);
-      maxDimensionPoint   = std::max(maxDimensionPoint, childPosition + dimensionSize);
-    }
-  }
-
-  return maxDimensionPoint;
+  return Relayouter::NegotiateDimensionFromChildren(*this, dimension);
 }
 
 float Actor::GetSize(Dimension::Type dimension) const
 {
-  return GetDimensionValue(mTargetSize, dimension);
+  return Relayouter::GetDimensionValue(mTargetSize, dimension);
 }
 
 float Actor::GetNaturalSize(Dimension::Type dimension) const
 {
-  return GetDimensionValue(GetNaturalSize(), dimension);
+  return Relayouter::GetDimensionValue(GetNaturalSize(), dimension);
 }
 
 float Actor::CalculateSize(Dimension::Type dimension, const Vector2& maximumSize)
 {
-  switch(GetResizePolicy(dimension))
-  {
-    case ResizePolicy::USE_NATURAL_SIZE:
-    {
-      return GetNaturalSize(dimension);
-    }
-
-    case ResizePolicy::FIXED:
-    {
-      return GetDimensionValue(GetPreferredSize(), dimension);
-    }
-
-    case ResizePolicy::USE_ASSIGNED_SIZE:
-    {
-      return GetDimensionValue(maximumSize, dimension);
-    }
-
-    case ResizePolicy::FILL_TO_PARENT:
-    case ResizePolicy::SIZE_RELATIVE_TO_PARENT:
-    case ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT:
-    {
-      return NegotiateFromParent(dimension);
-    }
-
-    case ResizePolicy::FIT_TO_CHILDREN:
-    {
-      return NegotiateFromChildren(dimension);
-    }
-
-    case ResizePolicy::DIMENSION_DEPENDENCY:
-    {
-      const Dimension::Type dimensionDependency = GetDimensionDependency(dimension);
-
-      // Custom rules
-      if(dimension == Dimension::WIDTH && dimensionDependency == Dimension::HEIGHT)
-      {
-        return GetWidthForHeight(GetNegotiatedDimension(Dimension::HEIGHT));
-      }
-
-      if(dimension == Dimension::HEIGHT && dimensionDependency == Dimension::WIDTH)
-      {
-        return GetHeightForWidth(GetNegotiatedDimension(Dimension::WIDTH));
-      }
-
-      break;
-    }
-
-    default:
-    {
-      break;
-    }
-  }
-
-  return 0.0f; // Default
+  return Relayouter::CalculateSize(*this, dimension, maximumSize);
 }
 
 Vector2 Actor::ApplySizeSetPolicy(const Vector2& size)

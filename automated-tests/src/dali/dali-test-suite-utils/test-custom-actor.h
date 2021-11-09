@@ -126,20 +126,29 @@ public:
   TestCustomActor();
   TestCustomActor(bool nego);
   virtual ~TestCustomActor();
-  void                         Initialize(const char* name = NULL);
-  virtual void                 OnInitialize(const char* name);
-  void                         ResetCallStack();
-  void                         AddToCallStacks(const char* method);
-  void                         OnSceneConnection(int depth) override;
-  void                         OnSceneDisconnection() override;
-  void                         OnChildAdd(Dali::Actor& child) override;
-  void                         OnChildRemove(Dali::Actor& child) override;
-  void                         OnPropertySet(Dali::Property::Index index, const Dali::Property::Value& propertyValue) override;
-  void                         OnSizeSet(const Dali::Vector3& targetSize) override;
-  void                         OnSizeAnimation(Dali::Animation& animation, const Dali::Vector3& targetSize) override;
-  virtual void                 OnKeyInputFocusGained();
-  virtual void                 OnKeyInputFocusLost();
-  Dali::Vector3                GetNaturalSize() override;
+  void          Initialize(const char* name = NULL);
+  virtual void  OnInitialize(const char* name);
+  void          ResetCallStack();
+  void          AddToCallStacks(const char* method);
+  void          OnSceneConnection(int depth) override;
+  void          OnSceneDisconnection() override;
+  void          OnChildAdd(Dali::Actor& child) override;
+  void          OnChildRemove(Dali::Actor& child) override;
+  void          OnPropertySet(Dali::Property::Index index, const Dali::Property::Value& propertyValue) override;
+  void          OnSizeSet(const Dali::Vector3& targetSize) override;
+  void          OnSizeAnimation(Dali::Animation& animation, const Dali::Vector3& targetSize) override;
+  virtual void  OnKeyInputFocusGained();
+  virtual void  OnKeyInputFocusLost();
+  Dali::Vector3 GetNaturalSize() override;
+  void          SetNaturalSize(const Dali::Vector3& size);
+  void          SetHeightForWidthFactor(float factor)
+  {
+    mH4Wfactor = factor;
+  }
+  void SetWidthForHeightFactor(float factor)
+  {
+    mW4Hfactor = factor;
+  }
   float                        GetHeightForWidth(float width) override;
   float                        GetWidthForHeight(float height) override;
   void                         OnRelayout(const Dali::Vector2& size, Dali::RelayoutContainer& container) override;
@@ -163,8 +172,11 @@ public:
 public:
   Dali::Property::Index    mDaliProperty;
   std::vector<std::string> mMethodsCalled;
+  Dali::Vector3            mNaturalSize;
   Dali::Vector3            mSizeSet;
   Dali::Vector3            mTargetSize;
+  float                    mW4Hfactor;
+  float                    mH4Wfactor;
   bool                     mNego;
   uint32_t                 mDepth;
 

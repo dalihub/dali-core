@@ -20,15 +20,45 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
-#include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
+#include <dali/public-api/actors/actor.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>
+
+#include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
 
 namespace
 {
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogRelayoutFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_RELAYOUT_TIMER");
 #endif
+
+/**
+ * @brief Extract a given dimension from a Vector2
+ *
+ * @param[in] values The values to extract from
+ * @param[in] dimension The dimension to extract
+ * @return Return the value for the dimension
+ */
+constexpr float GetDimensionValue(const Dali::Vector2& values, const Dali::Dimension::Type dimension)
+{
+  switch(dimension)
+  {
+    case Dali::Dimension::WIDTH:
+    {
+      return values.width;
+    }
+    case Dali::Dimension::HEIGHT:
+    {
+      return values.height;
+    }
+    default:
+    {
+      break;
+    }
+  }
+  return 0.0f;
+}
+
 } // unnamed namespace
 
 namespace Dali
@@ -490,6 +520,41 @@ float Actor::Relayouter::GetNegotiatedDimension(Dimension::Type dimension)
   return 0.0f; // Default
 }
 
+float Actor::Relayouter::NegotiateDimensionFromParent(Actor& actor, Dimension::Type dimension)
+{
+  Actor* parent = actor.GetParent();
+  if(parent)
+  {
+    Vector2 padding(actor.GetPadding(dimension));
+    Vector2 parentPadding(parent->GetPadding(dimension));
+
+    // Need to use actor API here to allow deriving actors to layout their children
+    return parent->CalculateChildSize(Dali::Actor(&actor), dimension) - parentPadding.x - parentPadding.y - padding.x - padding.y;
+  }
+
+  return 0.0f;
+}
+
+float Actor::Relayouter::NegotiateDimensionFromChildren(Actor& actor, Dimension::Type dimension)
+{
+  float maxDimensionPoint = 0.0f;
+
+  for(uint32_t i = 0, count = actor.GetChildCount(); i < count; ++i)
+  {
+    ActorPtr child = actor.GetChildAt(i);
+
+    if(!child->RelayoutDependentOnParent(dimension))
+    {
+      // Calculate the min and max points that the children range across
+      float childPosition = GetDimensionValue(child->GetTargetPosition(), dimension);
+      float dimensionSize = child->GetRelayoutSize(dimension);
+      maxDimensionPoint   = std::max(maxDimensionPoint, childPosition + dimensionSize);
+    }
+  }
+
+  return maxDimensionPoint;
+}
+
 void Actor::Relayouter::NegotiateDimension(Actor& actor, Dimension::Type dimension, const Vector2& allocatedSize, Actor::ActorDimensionStack& recursionStack)
 {
   // Check if it needs to be negotiated
@@ -634,6 +699,107 @@ void Actor::Relayouter::NegotiateSize(Actor& actor, const Vector2& allocatedSize
     }
   }
   DALI_LOG_TIMER_END(NegSizeTimer1, gLogRelayoutFilter, Debug::Concise, "NegotiateSize() took: ");
+}
+
+/**
+ * @brief Extract a given dimension from a Vector3
+ *
+ * @param[in] values The values to extract from
+ * @param[in] dimension The dimension to extract
+ * @return Return the value for the dimension
+ */
+float Actor::Relayouter::GetDimensionValue(const Vector3& values, const Dimension::Type dimension)
+{
+  return ::GetDimensionValue(values.GetVectorXY(), dimension);
+}
+
+float Actor::Relayouter::CalculateSize(Actor& actor, Dimension::Type dimension, const Vector2& maximumSize)
+{
+  switch(actor.GetResizePolicy(dimension))
+  {
+    case ResizePolicy::USE_NATURAL_SIZE:
+    {
+      return actor.GetNaturalSize(dimension);
+    }
+
+    case ResizePolicy::FIXED:
+    {
+      return ::GetDimensionValue(actor.GetPreferredSize(), dimension);
+    }
+
+    case ResizePolicy::USE_ASSIGNED_SIZE:
+    {
+      return ::GetDimensionValue(maximumSize, dimension);
+    }
+
+    case ResizePolicy::FILL_TO_PARENT:
+    case ResizePolicy::SIZE_RELATIVE_TO_PARENT:
+    case ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT:
+    {
+      return NegotiateDimensionFromParent(actor, dimension);
+    }
+
+    case ResizePolicy::FIT_TO_CHILDREN:
+    {
+      return NegotiateDimensionFromChildren(actor, dimension);
+    }
+
+    case ResizePolicy::DIMENSION_DEPENDENCY:
+    {
+      const Dimension::Type dimensionDependency = actor.GetDimensionDependency(dimension);
+
+      // Custom rules
+      if(dimension == Dimension::WIDTH && dimensionDependency == Dimension::HEIGHT)
+      {
+        return actor.GetWidthForHeight(actor.GetNegotiatedDimension(Dimension::HEIGHT));
+      }
+
+      if(dimension == Dimension::HEIGHT && dimensionDependency == Dimension::WIDTH)
+      {
+        return actor.GetHeightForWidth(actor.GetNegotiatedDimension(Dimension::WIDTH));
+      }
+
+      break;
+    }
+
+    default:
+    {
+      break;
+    }
+  }
+
+  return 0.0f; // Default
+}
+
+float Actor::Relayouter::CalculateChildSize(Actor& actor, const Actor& child, Dimension::Type dimension)
+{
+  // Fill to parent, taking size mode factor into account
+  switch(child.GetResizePolicy(dimension))
+  {
+    case ResizePolicy::FILL_TO_PARENT:
+    {
+      return actor.GetLatestSize(dimension);
+    }
+
+    case ResizePolicy::SIZE_RELATIVE_TO_PARENT:
+    {
+      Property::Value value               = child.GetProperty(Dali::Actor::Property::SIZE_MODE_FACTOR);
+      Vector3         childSizeModeFactor = value.Get<Vector3>();
+      return actor.GetLatestSize(dimension) * GetDimensionValue(childSizeModeFactor, dimension);
+    }
+
+    case ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT:
+    {
+      Property::Value value               = child.GetProperty(Dali::Actor::Property::SIZE_MODE_FACTOR);
+      Vector3         childSizeModeFactor = value.Get<Vector3>();
+      return actor.GetLatestSize(dimension) + GetDimensionValue(childSizeModeFactor, dimension);
+    }
+
+    default:
+    {
+      return actor.GetLatestSize(dimension);
+    }
+  }
 }
 
 } // namespace Internal
