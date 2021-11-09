@@ -548,7 +548,7 @@ public: // API
   const ItemType& operator[](SizeType index) const
   {
     DALI_ASSERT_VECTOR(VectorBase::mData && "Vector is empty");
-    if(index < VectorBase::Count())
+    if(index >= VectorBase::Count())
     {
       std::abort();
     }
