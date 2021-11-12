@@ -101,8 +101,6 @@ inline NodePropertyFlags UpdateNodes(Node&             node,
                                      NodePropertyFlags parentFlags,
                                      BufferIndex       updateBufferIndex,
                                      RenderQueue&      renderQueue,
-                                     Layer&            currentLayer,
-                                     uint32_t          inheritedDrawMode,
                                      bool              updated)
 {
   // Apply constraints to the node
@@ -113,34 +111,10 @@ inline NodePropertyFlags UpdateNodes(Node&             node,
 
   NodePropertyFlags cumulativeDirtyFlags = nodeDirtyFlags;
 
-  Layer* layer = &currentLayer;
-  Layer* nodeIsLayer(node.GetLayer());
-  if(nodeIsLayer)
-  {
-    // all childs go to this layer
-    layer = nodeIsLayer;
-
-    // assume layer is clean to begin with
-    layer->SetReuseRenderers(updateBufferIndex, true);
-
-    // Layers do not inherit the DrawMode from their parents
-    inheritedDrawMode = DrawMode::NORMAL;
-  }
-  DALI_ASSERT_DEBUG(NULL != layer);
-
   UpdateNodeOpacity(node, nodeDirtyFlags, updateBufferIndex);
 
-  // Draw mode inheritance is treated as or-ing the modes together (as they are a bit-mask).
-  inheritedDrawMode |= node.GetDrawMode();
-
+  // Collect uniform maps
   node.PrepareRender(updateBufferIndex);
-
-  // if any child node has moved or had its sort modifier changed, layer is not clean and old frame cannot be reused
-  // also if node has been deleted, dont reuse old render items
-  if(nodeDirtyFlags & RenderableUpdateFlags)
-  {
-    layer->SetReuseRenderers(updateBufferIndex, false);
-  }
 
   // For partial update, mark all children of an animating node as updated.
   if(updated) // Only set to updated if parent was updated.
@@ -162,8 +136,6 @@ inline NodePropertyFlags UpdateNodes(Node&             node,
                                         nodeDirtyFlags,
                                         updateBufferIndex,
                                         renderQueue,
-                                        *layer,
-                                        inheritedDrawMode,
                                         updated);
   }
 
@@ -199,8 +171,6 @@ NodePropertyFlags UpdateNodeTree(Layer&       rootNode,
 
   UpdateRootNodeOpacity(rootNode, nodeDirtyFlags, updateBufferIndex);
 
-  DrawMode::Type drawMode(rootNode.GetDrawMode());
-
   bool updated = rootNode.Updated();
 
   // recurse children
@@ -213,12 +183,60 @@ NodePropertyFlags UpdateNodeTree(Layer&       rootNode,
                                         nodeDirtyFlags,
                                         updateBufferIndex,
                                         renderQueue,
-                                        rootNode,
-                                        drawMode,
                                         updated);
   }
 
   return cumulativeDirtyFlags;
+}
+
+inline void UpdateLayers(Node&             node,
+                         NodePropertyFlags parentFlags,
+                         BufferIndex       updateBufferIndex,
+                         Layer&            currentLayer)
+{
+  // Some dirty flags are inherited from parent
+  NodePropertyFlags nodeDirtyFlags = node.GetDirtyFlags() | node.GetInheritedDirtyFlags(parentFlags);
+  nodeDirtyFlags |= (node.IsLocalMatrixDirty() ? NodePropertyFlags::TRANSFORM : NodePropertyFlags::NOTHING);
+
+  Layer* nodeIsLayer(node.GetLayer());
+  Layer* layer = nodeIsLayer ? nodeIsLayer : &currentLayer;
+  if(nodeIsLayer)
+  {
+    layer->SetReuseRenderers(updateBufferIndex, true);
+  }
+  DALI_ASSERT_DEBUG(nullptr != layer);
+
+  // if any child node has moved or had its sort modifier changed, layer is not clean and old frame cannot be reused
+  // also if node has been deleted, dont reuse old render items
+  if(nodeDirtyFlags != NodePropertyFlags::NOTHING)
+  {
+    layer->SetReuseRenderers(updateBufferIndex, false);
+  }
+
+  // recurse children
+  NodeContainer& children = node.GetChildren();
+  const NodeIter endIter  = children.End();
+  for(NodeIter iter = children.Begin(); iter != endIter; ++iter)
+  {
+    Node& child = **iter;
+    UpdateLayers(child, nodeDirtyFlags, updateBufferIndex, *layer);
+  }
+}
+
+void UpdateLayerTree(Layer&      layer,
+                     BufferIndex updateBufferIndex)
+{
+  NodePropertyFlags nodeDirtyFlags = layer.GetDirtyFlags();
+  nodeDirtyFlags |= (layer.IsLocalMatrixDirty() ? NodePropertyFlags::TRANSFORM : NodePropertyFlags::NOTHING);
+
+  // recurse children
+  NodeContainer& children = layer.GetChildren();
+  const NodeIter endIter  = children.End();
+  for(NodeIter iter = children.Begin(); iter != endIter; ++iter)
+  {
+    Node& child = **iter;
+    UpdateLayers(child, nodeDirtyFlags, updateBufferIndex, layer);
+  }
 }
 
 } // namespace SceneGraph

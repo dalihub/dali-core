@@ -731,6 +731,12 @@ private:
   void UpdateNodes(BufferIndex bufferIndex);
 
   /**
+   * initialize layer renderables
+   * @param[in] bufferIndex
+   */
+  void UpdateLayers(BufferIndex bufferIndex);
+
+  /**
    * Update Renderers
    * @param[in] bufferIndex to use
    */

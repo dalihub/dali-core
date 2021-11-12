@@ -880,6 +880,17 @@ void UpdateManager::UpdateNodes(BufferIndex bufferIndex)
   }
 }
 
+void UpdateManager::UpdateLayers(BufferIndex bufferIndex)
+{
+  for(auto&& scene : mImpl->scenes)
+  {
+    if(scene && scene->root)
+    {
+      SceneGraph::UpdateLayerTree(*scene->root, bufferIndex);
+    }
+  }
+}
+
 uint32_t UpdateManager::Update(float    elapsedSeconds,
                                uint32_t lastVSyncTimeMilliseconds,
                                uint32_t nextVSyncTimeMilliseconds,
@@ -955,8 +966,7 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
       mImpl->frameCallbackProcessor->Update(bufferIndex, elapsedSeconds);
     }
 
-    //Update node hierarchy, apply constraints and perform sorting / culling.
-    //This will populate each Layer with a list of renderers which are ready.
+    //Update node hierarchy, apply constraints,
     UpdateNodes(bufferIndex);
 
     //Apply constraints to RenderTasks, shaders
@@ -971,6 +981,9 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
     {
       mImpl->nodeDirtyFlags |= NodePropertyFlags::TRANSFORM;
     }
+
+    //Initialise layer renderable reuse
+    UpdateLayers(bufferIndex);
 
     //Process Property Notifications
     ProcessPropertyNotifications(bufferIndex);
