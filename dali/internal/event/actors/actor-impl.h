@@ -22,18 +22,6 @@
 #include <string>
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/rendering/renderer-devel.h>
-#include <dali/internal/common/const-string.h>
-#include <dali/internal/common/internal-constants.h>
-#include <dali/internal/common/memory-pool-object-allocator.h>
-#include <dali/internal/event/actors/actor-declarations.h>
-#include <dali/internal/event/actors/actor-parent-impl.h>
-#include <dali/internal/event/actors/actor-parent.h>
-#include <dali/internal/event/actors/actor-renderer-container.h>
-#include <dali/internal/event/common/object-impl.h>
-#include <dali/internal/event/common/stage-def.h>
-#include <dali/internal/update/nodes/node-declarations.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/vector-wrapper.h>
@@ -41,6 +29,21 @@
 #include <dali/public-api/math/viewport.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
+
+#include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/rendering/renderer-devel.h>
+
+#include <dali/internal/common/const-string.h>
+#include <dali/internal/common/internal-constants.h>
+#include <dali/internal/common/memory-pool-object-allocator.h>
+#include <dali/internal/event/actors/actor-declarations.h>
+#include <dali/internal/event/actors/actor-parent-impl.h>
+#include <dali/internal/event/actors/actor-parent.h>
+#include <dali/internal/event/actors/actor-renderer-container.h>
+#include <dali/internal/event/actors/actor-sizer.h>
+#include <dali/internal/event/common/object-impl.h>
+#include <dali/internal/event/common/stage-def.h>
+#include <dali/internal/update/nodes/node-declarations.h>
 
 namespace Dali
 {
@@ -73,41 +76,6 @@ using DepthNodeMemoryPool = Dali::Internal::MemoryPoolObjectAllocator<ActorDepth
  */
 class Actor : public Object, public ActorParent
 {
-public:
-  /**
-   * @brief Struct to hold an actor and a dimension
-   */
-  struct ActorDimensionPair
-  {
-    /**
-     * @brief Constructor
-     *
-     * @param[in] newActor The actor to assign
-     * @param[in] newDimension The dimension to assign
-     */
-    ActorDimensionPair(Actor* newActor, Dimension::Type newDimension)
-    : actor(newActor),
-      dimension(newDimension)
-    {
-    }
-
-    /**
-     * @brief Equality operator
-     *
-     * @param[in] lhs The left hand side argument
-     * @param[in] rhs The right hand side argument
-     */
-    bool operator==(const ActorDimensionPair& rhs)
-    {
-      return (actor == rhs.actor) && (dimension == rhs.dimension);
-    }
-
-    Actor*          actor;     ///< The actor to hold
-    Dimension::Type dimension; ///< The dimension to hold
-  };
-
-  using ActorDimensionStack = std::vector<ActorDimensionPair>;
-
 public:
   /**
    * Create a new actor.
@@ -297,25 +265,11 @@ public:
   void SetSize(const Vector2& size);
 
   /**
-   * Sets the update size for an actor.
-   *
-   * @param[in] size The size to set.
-   */
-  void SetSizeInternal(const Vector2& size);
-
-  /**
    * Sets the size of an actor.
    * This does not interfere with the actors scale factor.
    * @param [in] size The new size.
    */
   void SetSize(const Vector3& size);
-
-  /**
-   * Sets the update size for an actor.
-   *
-   * @param[in] size The size to set.
-   */
-  void SetSizeInternal(const Vector3& size);
 
   /**
    * Set the width component of the Actor's size.
@@ -857,16 +811,6 @@ public:
   virtual bool RelayoutDependentOnChildren(Dimension::Type dimension = Dimension::ALL_DIMENSIONS);
 
   /**
-   * @brief Determine if this actor is dependent on it's children for relayout.
-   *
-   * Called from deriving classes
-   *
-   * @param dimension The dimension(s) to check for
-   * @return Return if the actor is dependent on it's children
-   */
-  virtual bool RelayoutDependentOnChildrenBase(Dimension::Type dimension = Dimension::ALL_DIMENSIONS);
-
-  /**
    * @brief Calculate the size for a child
    *
    * @param[in] child The child actor to calculate the size for
@@ -913,24 +857,6 @@ public:
   void NegotiateSize(const Vector2& size, RelayoutContainer& container);
 
   /**
-   * @brief Set whether size negotiation should use the assigned size of the actor
-   * during relayout for the given dimension(s)
-   *
-   * @param[in] use Whether the assigned size of the actor should be used
-   * @param[in] dimension The dimension(s) to set. Can be a bitfield of multiple dimensions
-   */
-  void SetUseAssignedSize(bool use, Dimension::Type dimension = Dimension::ALL_DIMENSIONS);
-
-  /**
-   * @brief Returns whether size negotiation should use the assigned size of the actor
-   * during relayout for a single dimension
-   *
-   * @param[in] dimension The dimension to get
-   * @return Return whether the assigned size of the actor should be used. If more than one dimension is requested, just return the first one found
-   */
-  bool GetUseAssignedSize(Dimension::Type dimension) const;
-
-  /**
    * @copydoc Dali::Actor::SetResizePolicy()
    */
   void SetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension = Dimension::ALL_DIMENSIONS);
@@ -939,26 +865,6 @@ public:
    * @copydoc Dali::Actor::GetResizePolicy()
    */
   ResizePolicy::Type GetResizePolicy(Dimension::Type dimension) const;
-
-  /**
-   * @copydoc Dali::Actor::SetSizeScalePolicy()
-   */
-  void SetSizeScalePolicy(SizeScalePolicy::Type policy);
-
-  /**
-   * @copydoc Dali::Actor::GetSizeScalePolicy()
-   */
-  SizeScalePolicy::Type GetSizeScalePolicy() const;
-
-  /**
-   * @copydoc Dali::Actor::SetDimensionDependency()
-   */
-  void SetDimensionDependency(Dimension::Type dimension, Dimension::Type dependency);
-
-  /**
-   * @copydoc Dali::Actor::GetDimensionDependency()
-   */
-  Dimension::Type GetDimensionDependency(Dimension::Type dimension) const;
 
   /**
    * @brief Set the size negotiation relayout enabled on this actor
@@ -976,6 +882,7 @@ public:
 
   /**
    * @brief Mark an actor as having it's layout dirty
+   * @note Only called from RelayoutController
    *
    * @param dirty Whether to mark actor as dirty or not
    * @param dimension The dimension(s) to mark as dirty
@@ -984,6 +891,7 @@ public:
 
   /**
    * @brief Return if any of an actor's dimensions are marked as dirty
+   * @note Only called from RelayoutController
    *
    * @param dimension The dimension(s) to check
    * @return Return if any of the requested dimensions are dirty
@@ -992,6 +900,7 @@ public:
 
   /**
    * @brief Returns if relayout is enabled and the actor is not dirty
+   * @note Only called from RelayoutController
    *
    * @return Return if it is possible to relayout the actor
    */
@@ -999,6 +908,7 @@ public:
 
   /**
    * @brief Returns if relayout is enabled and the actor is dirty
+   * @note Only called from RelayoutController
    *
    * @return Return if it is required to relayout the actor
    */
@@ -1021,6 +931,7 @@ public:
 
   /**
    * @brief Determine if this actor is dependent on it's parent for relayout
+   * @note Only called from RelayoutController
    *
    * @param dimension The dimension(s) to check for
    * @return Return if the actor is dependent on it's parent
@@ -1029,53 +940,13 @@ public:
 
   /**
    * @brief Determine if this actor has another dimension depedent on the specified one
+   * @note Only called from RelayoutController
    *
    * @param dimension The dimension to check for
    * @param dependentDimension The dimension to check for dependency with
    * @return Return if the actor is dependent on this dimension
    */
   bool RelayoutDependentOnDimension(Dimension::Type dimension, Dimension::Type dependentDimension);
-
-  /**
-   * @brief Calculate the size of a dimension
-   *
-   * @param[in] dimension The dimension to calculate the size for
-   * @param[in] maximumSize The upper bounds on the size
-   * @return Return the calculated size for the dimension
-   */
-  float CalculateSize(Dimension::Type dimension, const Vector2& maximumSize);
-
-  /**
-   * Negotiate a dimension based on the size of the parent
-   *
-   * @param[in] dimension The dimension to negotiate on
-   * @return Return the negotiated size
-   */
-  float NegotiateFromParent(Dimension::Type dimension);
-
-  /**
-   * @brief Negotiate a dimension based on the size of the children
-   *
-   * @param[in] dimension The dimension to negotiate on
-   * @return Return the negotiated size
-   */
-  float NegotiateFromChildren(Dimension::Type dimension);
-
-  /**
-   * Set the negotiated dimension value for the given dimension(s)
-   *
-   * @param negotiatedDimension The value to set
-   * @param dimension The dimension(s) to set the value for
-   */
-  void SetNegotiatedDimension(float negotiatedDimension, Dimension::Type dimension = Dimension::ALL_DIMENSIONS);
-
-  /**
-   * Return the value of negotiated dimension for the given dimension
-   *
-   * @param dimension The dimension to retrieve
-   * @return Return the value of the negotiated dimension
-   */
-  float GetNegotiatedDimension(Dimension::Type dimension) const;
 
   /**
    * @brief Set the padding for a dimension
@@ -1094,22 +965,6 @@ public:
   Vector2 GetPadding(Dimension::Type dimension) const;
 
   /**
-   * Return the actor size for a given dimension
-   *
-   * @param[in] dimension The dimension to retrieve the size for
-   * @return Return the size for the given dimension
-   */
-  float GetSize(Dimension::Type dimension) const;
-
-  /**
-   * Return the natural size of the actor for a given dimension
-   *
-   * @param[in] dimension The dimension to retrieve the size for
-   * @return Return the natural size for the given dimension
-   */
-  float GetNaturalSize(Dimension::Type dimension) const;
-
-  /**
    * @brief Return the amount of size allocated for relayout
    *
    * May include padding
@@ -1118,21 +973,6 @@ public:
    * @return Return the size
    */
   float GetRelayoutSize(Dimension::Type dimension) const;
-
-  /**
-   * @brief If the size has been negotiated return that else return normal size
-   *
-   * @param[in] dimension The dimension to retrieve
-   * @return Return the size
-   */
-  float GetLatestSize(Dimension::Type dimension) const;
-
-  /**
-   * Apply the negotiated size to the actor
-   *
-   * @param[in] container The container to fill with actors that require further relayout
-   */
-  void SetNegotiatedSize(RelayoutContainer& container);
 
   /**
    * @brief Flag the actor as having it's layout dimension negotiated.
@@ -1165,7 +1005,7 @@ public:
   float GetWidthForHeightBase(float height);
 
   /**
-   * @brief Calculate the size for a child
+   * @brief provides the Actor implementation of CalculateChildSize
    *
    * @param[in] child The child actor to calculate the size for
    * @param[in] dimension The dimension to calculate the size for. E.g. width or height.
@@ -1174,18 +1014,12 @@ public:
   float CalculateChildSizeBase(const Dali::Actor& child, Dimension::Type dimension);
 
   /**
-   * @brief Set the preferred size for size negotiation
+   * @brief Determine if this actor is dependent on it's children for relayout.
    *
-   * @param[in] size The preferred size to set
+   * @param dimension The dimension(s) to check for
+   * @return Return if the actor is dependent on it's children
    */
-  void SetPreferredSize(const Vector2& size);
-
-  /**
-   * @brief Return the preferred size used for size negotiation
-   *
-   * @return Return the preferred size
-   */
-  Vector2 GetPreferredSize() const;
+  bool RelayoutDependentOnChildrenBase(Dimension::Type dimension = Dimension::ALL_DIMENSIONS);
 
   /**
    * @copydoc Dali::Actor::SetMinimumSize
@@ -1799,19 +1633,6 @@ private:
     };
   };
 
-  struct AnimatedSizeFlag
-  {
-    enum Type
-    {
-      CLEAR  = 0,
-      WIDTH  = 1,
-      HEIGHT = 2,
-      DEPTH  = 4
-    };
-  };
-
-  struct Relayouter;
-
   // Remove default constructor and copy constructor
   Actor()             = delete;
   Actor(const Actor&) = delete;
@@ -1906,19 +1727,6 @@ private:
   bool GetCurrentPropertyValue(Property::Index index, Property::Value& value) const;
 
   /**
-   * @brief Ensure the relayouter is allocated
-   */
-  Relayouter& EnsureRelayouter();
-
-  /**
-   * @brief Apply the size set policy to the input size
-   *
-   * @param[in] size The size to apply the policy to
-   * @return Return the adjusted size
-   */
-  Vector2 ApplySizeSetPolicy(const Vector2& size);
-
-  /**
    * Retrieve the parent object of an Actor.
    * @return The parent object, or NULL if the Actor does not have a parent.
    */
@@ -2004,12 +1812,12 @@ private:
 
 protected:
   ActorParentImpl    mParentImpl;   ///< Implementation of ActorParent;
+  ActorSizer         mSizer;        ///< Implementation for managing actor size
   ActorParent*       mParent;       ///< Each actor (except the root) can have one parent
   Scene*             mScene;        ///< The scene the actor is added to
   RendererContainer* mRenderers;    ///< Renderer container
   Vector3*           mParentOrigin; ///< NULL means ParentOrigin::DEFAULT. ParentOrigin is non-animatable
   Vector3*           mAnchorPoint;  ///< NULL means AnchorPoint::DEFAULT. AnchorPoint is non-animatable
-  Relayouter*        mRelayoutData; ///< Struct to hold optional collection of relayout variables
   ActorGestureData*  mGestureData;  ///< Optional Gesture data. Only created when actor requires gestures
 
   // Signals
@@ -2025,16 +1833,13 @@ protected:
 
   Quaternion mTargetOrientation; ///< Event-side storage for orientation
   Vector4    mTargetColor;       ///< Event-side storage for color
-  Vector3    mTargetSize;        ///< Event-side storage for size (not a pointer as most actors will have a size)
   Vector3    mTargetPosition;    ///< Event-side storage for position (not a pointer as most actors will have a position)
   Vector3    mTargetScale;       ///< Event-side storage for scale
-  Vector3    mAnimatedSize;      ///< Event-side storage for size animation
   Rect<int>  mTouchAreaOffset;   ///< touch area offset (left, right, bottom, top)
 
-  ConstString mName;            ///< Name of the actor
-  uint32_t    mSortedDepth;     ///< The sorted depth index. A combination of tree traversal and sibling order.
-  int16_t     mDepth;           ///< The depth in the hierarchy of the actor. Only 32,767 levels of depth are supported
-  uint16_t    mUseAnimatedSize; ///< Whether the size is animated.
+  ConstString mName;        ///< Name of the actor
+  uint32_t    mSortedDepth; ///< The sorted depth index. A combination of tree traversal and sibling order.
+  int16_t     mDepth;       ///< The depth in the hierarchy of the actor. Only 32,767 levels of depth are supported
 
   const bool               mIsRoot : 1;                    ///< Flag to identify the root actor
   const bool               mIsLayer : 1;                   ///< Flag to identify that this is a layer
@@ -2068,6 +1873,7 @@ private:
   struct SiblingHandler;
 
   friend class ActorParentImpl; // Allow impl to call private methods on actor
+  friend class ActorSizer;      // Allow sizer to call private methods on actor
 };
 
 } // namespace Internal

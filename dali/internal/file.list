@@ -18,6 +18,7 @@ SET( internal_src_files
   ${internal_src_dir}/event/actors/actor-renderer-container.cpp
   ${internal_src_dir}/event/actors/actor-relayouter.cpp
   ${internal_src_dir}/event/actors/actor-parent-impl.cpp
+  ${internal_src_dir}/event/actors/actor-sizer.cpp
   ${internal_src_dir}/event/actors/custom-actor-internal.cpp
   ${internal_src_dir}/event/actors/layer-impl.cpp
   ${internal_src_dir}/event/actors/layer-list.cpp
