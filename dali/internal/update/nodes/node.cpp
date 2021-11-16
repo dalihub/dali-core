@@ -139,7 +139,7 @@ void Node::CreateTransform(SceneGraph::TransformManager* transformManager)
 {
   //Create a new transform
   mTransformManagerData.mManager = transformManager;
-  mTransformManagerData.mId      = transformManager->CreateTransform();
+  TransformId createdTransformId = transformManager->CreateTransform();
 
   //Initialize all the animatable properties
   mPosition.Initialize(&mTransformManagerData);
@@ -156,7 +156,10 @@ void Node::CreateTransform(SceneGraph::TransformManager* transformManager)
   mWorldMatrix.Initialize(&mTransformManagerData);
 
   //Set whether the position should use the anchor point
-  transformManager->SetPositionUsesAnchorPoint(mTransformManagerData.Id(), mPositionUsesAnchorPoint);
+  transformManager->SetPositionUsesAnchorPoint(createdTransformId, mPositionUsesAnchorPoint);
+
+  //Set TransformId after initialize done.
+  mTransformManagerData.mId = createdTransformId;
 }
 
 void Node::SetRoot(bool isRoot)
