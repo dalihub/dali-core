@@ -28,6 +28,7 @@
 #include <dali/internal/event/common/scene-impl.h>
 
 #include <dali/internal/update/common/scene-graph-scene.h>
+#include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/internal/update/render-tasks/scene-graph-camera.h>
 
 #include <dali/internal/render/common/render-algorithms.h>
@@ -614,7 +615,6 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
                 (item.mNode->Updated() || (item.mRenderer && item.mRenderer->Updated(mImpl->renderBufferIndex, item.mNode)))))
             {
               item.mIsUpdated = false;
-              item.mNode->SetUpdatedTree(false);
 
               rect = RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, item.mUpdateSize, viewportRect.width, viewportRect.height);
               if(rect.IsValid() && rect.Intersect(viewportRect) && !rect.IsEmpty())
@@ -677,6 +677,9 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
             }
           }
         }
+
+        // Reset updated flag from the root
+        renderList->GetSourceLayer()->SetUpdatedTree(false);
       }
     }
   }
