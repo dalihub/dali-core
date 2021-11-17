@@ -360,7 +360,7 @@ public:
    */
   const Vector3& GetParentOrigin() const
   {
-    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID && mParentOrigin.mTxManagerData)
+    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
     {
       return mParentOrigin.Get(0);
     }
@@ -383,7 +383,7 @@ public:
    */
   const Vector3& GetAnchorPoint() const
   {
-    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID && mAnchorPoint.mTxManagerData)
+    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
     {
       return mAnchorPoint.Get(0);
     }
@@ -407,7 +407,7 @@ public:
    */
   const Vector3& GetPosition(BufferIndex bufferIndex) const
   {
-    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID && mPosition.mTxManagerData)
+    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
     {
       return mPosition.Get(bufferIndex);
     }
@@ -421,7 +421,11 @@ public:
    */
   const Vector3& GetWorldPosition(BufferIndex bufferIndex) const
   {
-    return mWorldPosition.Get(bufferIndex);
+    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
+    {
+      return mWorldPosition.Get(bufferIndex);
+    }
+    return Vector3::ZERO;
   }
 
   /**
@@ -443,7 +447,7 @@ public:
    */
   const Quaternion& GetOrientation(BufferIndex bufferIndex) const
   {
-    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID && mOrientation.mTxManagerData)
+    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
     {
       return mOrientation.Get(0);
     }
@@ -458,7 +462,11 @@ public:
    */
   const Quaternion& GetWorldOrientation(BufferIndex bufferIndex) const
   {
-    return mWorldOrientation.Get(0);
+    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
+    {
+      return mWorldOrientation.Get(0);
+    }
+    return Quaternion::IDENTITY;
   }
 
   /**
@@ -480,7 +488,7 @@ public:
    */
   const Vector3& GetScale(BufferIndex bufferIndex) const
   {
-    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID && mScale.mTxManagerData)
+    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
     {
       return mScale.Get(0);
     }
@@ -495,7 +503,11 @@ public:
    */
   const Vector3& GetWorldScale(BufferIndex bufferIndex) const
   {
-    return mWorldScale.Get(0);
+    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
+    {
+      return mWorldScale.Get(0);
+    }
+    return Vector3::ONE;
   }
 
   /**
@@ -630,7 +642,7 @@ public:
    */
   const Vector3& GetSize(BufferIndex bufferIndex) const
   {
-    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID && mSize.mTxManagerData)
+    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
     {
       return mSize.Get(0);
     }
@@ -696,7 +708,12 @@ public:
    */
   const Matrix& GetWorldMatrix(BufferIndex bufferIndex) const
   {
-    return mWorldMatrix.Get(bufferIndex);
+    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
+    {
+      return mWorldMatrix.Get(bufferIndex);
+    }
+
+    return Matrix::IDENTITY;
   }
 
   /**

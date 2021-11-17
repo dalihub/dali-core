@@ -50,6 +50,9 @@ struct Actor::Relayouter
   /// @copydoc Actor::SetPadding
   void SetPadding(const Vector2& padding, Dimension::Type dimension);
 
+  /// @copydoc Actor::GetPadding
+  Vector2 GetPadding(Dimension::Type dimension);
+
   /// @copydoc Actor::SetLayoutNegotiated
   void SetLayoutNegotiated(bool negotiated, Dimension::Type dimension);
 
@@ -80,6 +83,15 @@ struct Actor::Relayouter
   /// @copydoc Actor::SetResizePolicy
   void SetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension, Vector3& targetSize);
 
+  /// @copydoc Actor::GetRelayoutDependentOnParent
+  bool GetRelayoutDependentOnParent(Dimension::Type dimension);
+
+  /// @copydoc Actor::GetRelayoutDependentOnChildren
+  bool GetRelayoutDependentOnChildren(Dimension::Type dimension);
+
+  /// @copydoc Actor::GetRelayoutDependentOnDimension
+  bool GetRelayoutDependentOnDimension(Dimension::Type dimension, Dimension::Type dependency);
+
   /// @copydoc Actor::SetDimensionDependency
   void SetDimensionDependency(Dimension::Type dimension, Dimension::Type dependency);
 
@@ -105,6 +117,28 @@ struct Actor::Relayouter
    * @return Return the clamped size
    */
   static float ClampDimension(const Internal::Actor& actor, float size, Dimension::Type dimension);
+
+  /// @copydoc Actor::SetNegotiatedDimension
+  void SetNegotiatedDimension(float negotiatedDimension, Dimension::Type dimension);
+
+  /// @copydoc Actor::GetNegotiatedDimension
+  float GetNegotiatedDimension(Dimension::Type dimension);
+
+  /**
+   * Negotiate a dimension based on the size of the parent
+   *
+   * @param[in] dimension The dimension to negotiate on
+   * @return Return the negotiated size
+   */
+  static float NegotiateDimensionFromParent(Actor& actor, Dimension::Type dimension);
+
+  /**
+   * @brief Negotiate a dimension based on the size of the children
+   *
+   * @param[in] dimension The dimension to negotiate on
+   * @return Return the negotiated size
+   */
+  static float NegotiateDimensionFromChildren(Actor& actor, Dimension::Type dimension);
 
   /**
    * Negotiate size for a specific dimension
@@ -144,6 +178,21 @@ struct Actor::Relayouter
    *                            RelayoutController algorithm.
    */
   static void NegotiateSize(Actor& actor, const Vector2& allocatedSize, RelayoutContainer& container);
+
+  /**
+   * Get the value for the given dimension
+   *
+   * @param[in] values The vector to get values from
+   * @param[in] dimension The dimension to fetch
+   * @return the value of the given dimension
+   */
+  static float GetDimensionValue(const Vector3& values, const Dimension::Type dimension);
+
+  /// @copydoc Actor::CalculateSize
+  static float CalculateSize(Actor& actor, Dimension::Type dimension, const Vector2& maximumSize);
+
+  /// @copydoc Actor::CalculateChildSizeBase
+  static float CalculateChildSize(Actor& actor, const Actor& child, Dimension::Type dimension);
 
 public:
   ResizePolicy::Type resizePolicies[Dimension::DIMENSION_COUNT];  ///< Resize policies

@@ -41,7 +41,7 @@ public:
    * Retrieve the default camera actor.
    * @return The default camera actor.
    */
-  virtual CameraActor& GetDefaultCameraActor() = 0;
+  virtual CameraActor& GetDefaultCameraActor() const = 0;
 
 protected:
   /**

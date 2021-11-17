@@ -2,7 +2,7 @@
 #define DALI_ACTOR_ENUMERATIONS_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,8 +84,8 @@ enum Type
   FIXED,                         ///< Size is fixed as set by SetSize @SINCE_1_0.0
   USE_NATURAL_SIZE,              ///< Size is to use the actor's natural size @SINCE_1_0.0 @see Actor::GetNaturalSize()
   FILL_TO_PARENT,                ///< Size is to fill up to the actor's parent's bounds. Aspect ratio is not maintained. @SINCE_1_0.0
-  SIZE_RELATIVE_TO_PARENT,       ///< The actors size will be ( ParentSize * SizeRelativeToParentFactor ). @SINCE_1_0.0
-  SIZE_FIXED_OFFSET_FROM_PARENT, ///< The actors size will be ( ParentSize + SizeRelativeToParentFactor ). @SINCE_1_0.0
+  SIZE_RELATIVE_TO_PARENT,       ///< The actor's size will be ( ParentSize * SizeModeFactor ). @SINCE_1_0.0
+  SIZE_FIXED_OFFSET_FROM_PARENT, ///< The actor's size will be ( ParentSize + SizeModeFactor ). @SINCE_1_0.0
   FIT_TO_CHILDREN,               ///< Size will adjust to wrap around all children @SINCE_1_0.0
   DIMENSION_DEPENDENCY,          ///< One dimension is dependent on the other @SINCE_1_0.0
   USE_ASSIGNED_SIZE              ///< The size will be assigned to the actor @SINCE_1_0.0

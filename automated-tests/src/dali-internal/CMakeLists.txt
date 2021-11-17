@@ -7,6 +7,7 @@ SET(CAPI_LIB "dali-internal")
 
 SET(TC_SOURCES
         utc-Dali-Internal-ActorObserver.cpp
+        utc-Dali-Internal-ActorRelayout.cpp
         utc-Dali-Internal-Core.cpp
         utc-Dali-Internal-FixedSizeMemoryPool.cpp
         utc-Dali-Internal-FrustumCulling.cpp
@@ -27,6 +28,7 @@ SET(TC_SOURCES
 
 LIST(APPEND TC_SOURCES
         ../dali/dali-test-suite-utils/mesh-builder.cpp
+        ../dali/dali-test-suite-utils/test-custom-actor.cpp
         ../dali/dali-test-suite-utils/test-harness.cpp
         ../dali/dali-test-suite-utils/test-actor-utils.cpp
         ../dali/dali-test-suite-utils/dali-test-suite-utils.cpp

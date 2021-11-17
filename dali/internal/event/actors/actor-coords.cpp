@@ -15,7 +15,10 @@
  */
 
 #include <dali/internal/event/actors/actor-coords.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/projection.h>
+#include <dali/internal/event/common/scene-impl.h>
+#include <dali/internal/update/nodes/node.h>
 
 namespace Dali::Internal
 {
@@ -121,5 +124,34 @@ bool ConvertScreenToLocalRenderTaskList(
   }
   return false;
 };
+
+const Vector2 CalculateActorScreenPosition(const Actor& actor, BufferIndex bufferIndex)
+{
+  Scene& scene = actor.GetScene();
+  if(actor.OnScene())
+  {
+    const auto& node           = actor.GetNode();
+    Vector3     worldPosition  = node.GetWorldPosition(bufferIndex);
+    Vector3     cameraPosition = scene.GetDefaultCameraActor().GetNode().GetWorldPosition(bufferIndex);
+    worldPosition -= cameraPosition;
+
+    Vector3 actorSize = node.GetSize(bufferIndex) * node.GetWorldScale(bufferIndex);
+    Vector2 halfSceneSize(scene.GetSize() * 0.5f); // World position origin is center of scene
+    Vector3 halfActorSize(actorSize * 0.5f);
+    Vector3 anchorPointOffSet = halfActorSize - actorSize * actor.GetAnchorPointForPosition();
+    return Vector2(halfSceneSize.width + worldPosition.x - anchorPointOffSet.x,
+                   halfSceneSize.height + worldPosition.y - anchorPointOffSet.y);
+  }
+  return Vector2::ZERO;
+}
+
+Rect<> CalculateActorScreenExtents(const Actor& actor, const Vector2& screenPosition, BufferIndex bufferIndex)
+{
+  const auto& node              = actor.GetNode();
+  Vector3     size              = node.GetSize(bufferIndex) * node.GetWorldScale(bufferIndex);
+  Vector3     anchorPointOffSet = size * actor.GetAnchorPointForPosition();
+  Vector2     position          = Vector2(screenPosition.x - anchorPointOffSet.x, screenPosition.y - anchorPointOffSet.y);
+  return {position.x, position.y, size.x, size.y};
+}
 
 } // namespace Dali::Internal

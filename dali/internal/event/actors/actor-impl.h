@@ -389,6 +389,13 @@ public:
   const Vector3& GetCurrentAnchorPoint() const;
 
   /**
+   * If the position uses the anchor point, return the anchor point, otherwise
+   * return top left.
+   * @return The anchor point for positioning.
+   */
+  Vector3 GetAnchorPointForPosition() const;
+
+  /**
    * Sets the position of the Actor.
    * The coordinates are relative to the Actor's parent.
    * The Actor's z position will be set to 0.0f.
@@ -1045,22 +1052,6 @@ public:
    * @return Return the negotiated size
    */
   float NegotiateFromParent(Dimension::Type dimension);
-
-  /**
-   * Negotiate a dimension based on the size of the parent. Fitting inside.
-   *
-   * @param[in] dimension The dimension to negotiate on
-   * @return Return the negotiated size
-   */
-  float NegotiateFromParentFit(Dimension::Type dimension);
-
-  /**
-   * Negotiate a dimension based on the size of the parent. Flooding the whole space.
-   *
-   * @param[in] dimension The dimension to negotiate on
-   * @return Return the negotiated size
-   */
-  float NegotiateFromParentFlood(Dimension::Type dimension);
 
   /**
    * @brief Negotiate a dimension based on the size of the children

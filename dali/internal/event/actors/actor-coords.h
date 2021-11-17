@@ -93,6 +93,25 @@ bool ConvertScreenToLocalRenderTaskList(
   float                 screenX,
   float                 screenY);
 
+/**
+ * Calculate the screen position of the actor from it's node transform and anchor point
+ *
+ * @param[in] actor The actor to calculate the screen position for
+ * @param[in] bufferIndex The current event buffer index
+ * @return the screen position
+ */
+const Vector2 CalculateActorScreenPosition(const Actor& actor, BufferIndex bufferIndex);
+
+/**
+ * Calculate the screen extents of the actor from its node transform, anchor point and size
+ *
+ * @param[in] actor The actor
+ * @param[in] screenPosition The actor's screen position
+ * @param[in] bufferIndex The current event buffer index
+ * @return the screen extents of the actor
+ */
+Rect<> CalculateActorScreenExtents(const Actor& actor, const Vector2& screenPosition, BufferIndex bufferIndex);
+
 } // namespace Dali::Internal
 
 #endif // DALI_INTERNAL_EVENT_ACTORS_ACTOR_COORDS_H
