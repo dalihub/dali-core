@@ -1196,10 +1196,6 @@ int UtcDaliCustomActorImplRelayoutDependentOnChildrenBase(void)
   v = custom.TestRelayoutDependentOnChildrenBase(Dali::Dimension::WIDTH);
   DALI_TEST_CHECK(v == false);
 
-  // why is this here?
-  application.SendNotification();
-  application.Render();
-
   END_TEST;
 }
 

@@ -188,7 +188,7 @@ Dali::Layer Scene::GetLayer(uint32_t depth) const
   return Dali::Layer(mLayerList->GetLayer(depth));
 }
 
-CameraActor& Scene::GetDefaultCameraActor()
+CameraActor& Scene::GetDefaultCameraActor() const
 {
   return *mDefaultCamera;
 }

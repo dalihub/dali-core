@@ -149,17 +149,17 @@ Vector3 TestCustomActor::GetTargetSize()
 
 Vector3 TestCustomActor::GetNaturalSize()
 {
-  return Vector3(0.0f, 0.0f, 0.0f);
+  return GetImpl().GetNaturalSize();
 }
 
 float TestCustomActor::GetHeightForWidth(float width)
 {
-  return 0.0f;
+  return GetImpl().GetHeightForWidth(width);
 }
 
 float TestCustomActor::GetWidthForHeight(float height)
 {
-  return 0.0f;
+  return GetImpl().GetWidthForHeight(height);
 }
 
 void TestCustomActor::OnRelayout(const Vector2& size, RelayoutContainer& container)
@@ -356,17 +356,21 @@ void TestCustomActor::OnKeyInputFocusLost()
 }
 Vector3 TestCustomActor::GetNaturalSize()
 {
-  return Vector3(0.0f, 0.0f, 0.0f);
+  return mNaturalSize;
+}
+void TestCustomActor::SetNaturalSize(const Vector3& size)
+{
+  mNaturalSize = size;
 }
 
 float TestCustomActor::GetHeightForWidth(float width)
 {
-  return 0.0f;
+  return mH4Wfactor * width;
 }
 
 float TestCustomActor::GetWidthForHeight(float height)
 {
-  return 0.0f;
+  return mW4Hfactor * height;
 }
 
 void TestCustomActor::OnRelayout(const Vector2& size, RelayoutContainer& container)
@@ -384,7 +388,7 @@ void TestCustomActor::OnCalculateRelayoutSize(Dimension::Type dimension)
 
 float TestCustomActor::CalculateChildSize(const Dali::Actor& child, Dimension::Type dimension)
 {
-  return 0.0f;
+  return CustomActorImpl::CalculateChildSizeBase(child, dimension);
 }
 
 void TestCustomActor::OnLayoutNegotiated(float size, Dimension::Type dimension)

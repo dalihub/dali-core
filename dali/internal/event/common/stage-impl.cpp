@@ -148,7 +148,7 @@ Actor& Stage::GetDefaultRootActor()
   return mScene->GetDefaultRootActor();
 }
 
-CameraActor& Stage::GetDefaultCameraActor()
+CameraActor& Stage::GetDefaultCameraActor() const
 {
   return mScene->GetDefaultCameraActor();
 }
