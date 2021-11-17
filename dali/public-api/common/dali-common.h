@@ -2,7 +2,7 @@
 #define DALI_COMMON_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -117,6 +117,14 @@ namespace Dali
  * @param[in] condition The assertion condition
  */
 DALI_CORE_API void DaliAssertMessage(const char* location, const char* condition);
+
+/**
+ * @brief Print backtrace log if required.
+ * @note Do nothing if ENABLE_BACKTRACE option off.
+ *
+ * @SINCE_2_3.2
+ */
+DALI_CORE_API void DaliPrintBackTrace();
 
 /**
  * @brief Exception class for Dali Core library - Raised by assertions in codebase.
