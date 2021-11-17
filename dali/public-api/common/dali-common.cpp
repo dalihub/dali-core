@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -124,6 +124,21 @@ DALI_CORE_API DaliException::DaliException(const char* location, const char* con
   free(symbols);
 }
 
+DALI_CORE_API void DaliPrintBackTrace()
+{
+  DALI_LOG_ERROR_NOFN("Backtrace:\n");
+
+  void*   frameArray[MAX_NUM_STACK_FRAMES];
+  int32_t nSize   = backtrace(frameArray, MAX_NUM_STACK_FRAMES);
+  char**  symbols = backtrace_symbols(frameArray, nSize);
+  for(int32_t i = 1; i < nSize; i++)
+  {
+    std::string demangled_symbol = Demangle(symbols[i]);
+    DALI_LOG_ERROR_NOFN("[%02d]   %s\n", i, demangled_symbol.c_str());
+  }
+  free(symbols);
+}
+
 #else // BACKTRACE_ENABLED
 
 DALI_CORE_API DaliException::DaliException(const char* location, const char* condition)
@@ -135,6 +150,10 @@ DALI_CORE_API DaliException::DaliException(const char* location, const char* con
 #else
   printf("Exception: \n%s\n thrown\n", condition);
 #endif
+}
+
+DALI_CORE_API void DaliPrintBackTrace()
+{
 }
 
 #endif // BACKTRACE_ENABLED
