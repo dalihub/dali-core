@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <assert.h>
 #include <algorithm>
 #include <cstddef>
 #include <cstdint> // uint32_t
@@ -548,10 +549,7 @@ public: // API
   const ItemType& operator[](SizeType index) const
   {
     DALI_ASSERT_VECTOR(VectorBase::mData && "Vector is empty");
-    if(index < VectorBase::Count())
-    {
-      std::abort();
-    }
+    assert(index < VectorBase::Count());
 
     ItemType* address = reinterpret_cast<ItemType*>(VectorBase::mData);
     address += index;
