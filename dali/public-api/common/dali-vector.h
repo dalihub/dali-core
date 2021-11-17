@@ -190,6 +190,17 @@ protected: // for Derived classes
    */
   void CopyMemory(char* destination, const char* source, size_t numberOfBytes);
 
+  /**
+   * @brief Replace the data as new data address.
+   * After replace, release the old data.
+   *
+   * It will be used when we want to keep the mData integrity.
+   *
+   * Does not call destructors on objects held.
+   * @param[in] newData new data address to be replaced
+   */
+  void Replace(void* newData);
+
 private:
   // not copyable as it does not know the size of elements
   VectorBase(const VectorBase&) = delete;            ///< Deleted copy constructor. @SINCE_1_0.0
@@ -472,12 +483,8 @@ public: // API
   {
     if(this != &vector)
     {
-      if(VectorBase::mData)
-      {
-        Release();
-      }
-      VectorBase::mData = vector.mData;
-      vector.mData      = nullptr;
+      VectorAlgorithms<BaseType>::Replace(vector.mData);
+      vector.mData = nullptr;
     }
     return *this;
   }
