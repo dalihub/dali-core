@@ -194,7 +194,7 @@ inline void AddRendererToRenderList(BufferIndex         updateBufferIndex,
   Matrix  nodeModelViewMatrix(false);
   bool    nodeModelViewMatrixSet(false);
 
-  if(cull && renderable.mRenderer && !renderable.mRenderer->GetShader().HintEnabled(Dali::Shader::Hint::MODIFIES_GEOMETRY) && node->GetClippingMode() == ClippingMode::DISABLED)
+  if(cull && renderable.mRenderer && !renderable.mRenderer->GetShader().HintEnabled(Dali::Shader::Hint::MODIFIES_GEOMETRY))
   {
     const Vector4& boundingSphere = node->GetBoundingSphere();
     inside                        = (boundingSphere.w > Math::MACHINE_EPSILON_1000) &&
