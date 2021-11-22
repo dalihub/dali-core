@@ -41,14 +41,15 @@ using NodeConstIter = NodeContainer::ConstIterator;
  * Flag whether property has changed, during the Update phase.
  */
 enum class NodePropertyFlags : uint8_t
-// 8 bits is enough for 4 flags (compiler will check it)
+// 8 bits is enough for 5 flags (compiler will check it)
 {
   NOTHING       = 0x000,
   TRANSFORM     = 0x001,
   VISIBLE       = 0x002,
   COLOR         = 0x004,
   CHILD_DELETED = 0x008,
-  ALL           = (CHILD_DELETED << 1) - 1 // all the flags
+  DEPTH_INDEX   = 0x010,
+  ALL           = (DEPTH_INDEX << 1) - 1 // all the flags
 };
 
 struct NodeDepthPair

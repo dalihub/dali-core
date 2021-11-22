@@ -39,7 +39,7 @@ void utc_dali_internal_actor_relayouter_cleanup()
   test_return_value = TET_PASS;
 }
 
-int UtcDaliActorRelayouter_CalculateSize(void)
+int UtcDaliActorSizer_CalculateSize(void)
 {
   TestApplication application;
 
@@ -48,62 +48,78 @@ int UtcDaliActorRelayouter_CalculateSize(void)
   auto& testActorImpl = Test::Impl::GetImpl(actor);
   auto& actorImpl     = GetImplementation(actor);
 
+  DALI_TEST_EQUALS(testActorImpl.IsRelayoutEnabled(), false, TEST_LOCATION);
+  DALI_TEST_CHECK(true);
+
+  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  actor[Dali::Actor::Property::SIZE] = Vector2(150.0f, 100.0f); // Should automatically set preferred size
   scene.Add(actor);
-  actorImpl.SetSize(Vector2(100.0f, 100.0f));
-  actorImpl.SetPreferredSize(Vector2(200.0f, 350.0f));
 
-  Vector2 maxSize(400.0f, 500.0f);
-
-  DALI_TEST_EQUALS(actorImpl.CalculateSize(Dimension::WIDTH, maxSize), 200.0f, 0.00001f, TEST_LOCATION);
-  DALI_TEST_EQUALS(actorImpl.CalculateSize(Dimension::HEIGHT, maxSize), 350.0f, 0.00001f, TEST_LOCATION);
-
-  actor.SetResizePolicy(ResizePolicy::USE_ASSIGNED_SIZE, Dimension::HEIGHT);
-  DALI_TEST_EQUALS(actorImpl.CalculateSize(Dimension::WIDTH, maxSize), 200.0f, 0.00001f, TEST_LOCATION);
-  DALI_TEST_EQUALS(actorImpl.CalculateSize(Dimension::HEIGHT, maxSize), maxSize.y, 0.00001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(actorImpl.IsRelayoutEnabled(), true, TEST_LOCATION);
 
   testActorImpl.SetNaturalSize(Vector3(150.0f, 180.0f, 150.0f));
   actor.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
-
-  DALI_TEST_EQUALS(actorImpl.CalculateSize(Dimension::WIDTH, maxSize), 150.0f, 0.00001f, TEST_LOCATION);
-  DALI_TEST_EQUALS(actorImpl.CalculateSize(Dimension::HEIGHT, maxSize), 180.0f, 0.00001f, TEST_LOCATION);
-
-  actor.SetResizePolicy(ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS);
-  auto child = Test::TestCustomActor::New();
-  child.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
-  child.SetProperty(Dali::Actor::Property::SIZE, Vector2(20.0f, 40.0f));
-  auto& childImpl = GetImplementation(child);
-  actor.Add(child);
-
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(actorImpl.CalculateSize(Dimension::WIDTH, maxSize), 20.0f, 0.00001f, TEST_LOCATION);
-  DALI_TEST_EQUALS(actorImpl.CalculateSize(Dimension::HEIGHT, maxSize), 40.0f, 0.00001f, TEST_LOCATION);
+  Vector3 size = actor[Dali::Actor::Property::SIZE];
+  DALI_TEST_EQUALS(size.width, 150.0f, 0.00001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(size.height, 180.0f, 0.00001f, TEST_LOCATION);
 
   testActorImpl.SetWidthForHeightFactor(3.5f);
   testActorImpl.SetHeightForWidthFactor(1.7f);
   actor.SetResizePolicy(ResizePolicy::DIMENSION_DEPENDENCY, Dimension::WIDTH);
-  DALI_TEST_EQUALS(actorImpl.CalculateSize(Dimension::WIDTH, maxSize), 140.0f, 0.00001f, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  size = Vector3(actor[Dali::Actor::Property::SIZE]);
+  DALI_TEST_EQUALS(size.width, 3.5f * 180.0f, 0.00001f, TEST_LOCATION);
 
   actor.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::WIDTH);
   actor.SetResizePolicy(ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT);
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(actorImpl.CalculateSize(Dimension::HEIGHT, maxSize), 255.0f, 0.00001f, TEST_LOCATION);
+  size = Vector3(actor[Dali::Actor::Property::SIZE]);
+  DALI_TEST_EQUALS(size.height, 1.7f * 150.0f, 0.00001f, TEST_LOCATION);
 
+  auto child = Test::TestCustomActor::New();
+  child.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  child.SetProperty(Dali::Actor::Property::SIZE, Vector2(20.0f, 40.0f));
+  auto& childImpl = GetImplementation(child);
+  actor.Add(child);
+  actor.TestRelayoutRequest();
+
+  tet_infoline("Test actor takes child size");
+  actor.SetResizePolicy(ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS);
+  application.SendNotification();
+  application.Render();
+  Vector3 parentSize = actor[Dali::Actor::Property::SIZE];
+  DALI_TEST_EQUALS(parentSize.width, 20.0f, 0.00001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(parentSize.height, 40.0f, 0.00001f, TEST_LOCATION);
+
+  tet_infoline("Test child actor is the right factor of the parent");
+  actor[Dali::Actor::Property::SIZE] = Vector2(150.0f, 100.0f); // Should automatically set preferred size
   child.SetResizePolicy(ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS);
   child[Dali::Actor::Property::SIZE_MODE_FACTOR] = Vector3(0.5f, 1.0f, 1.0f);
+
+  childImpl.RelayoutRequest();
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(childImpl.CalculateSize(Dimension::WIDTH, maxSize), 75.0f, 0.00001f, TEST_LOCATION);
-  DALI_TEST_EQUALS(childImpl.CalculateSize(Dimension::HEIGHT, maxSize), 255.0f, 0.00001f, TEST_LOCATION);
 
+  Vector3 childSize = child[Dali::Actor::Property::SIZE];
+  DALI_TEST_EQUALS(childSize.width, 75.0f, 0.00001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(childSize.height, 100.0f, 0.00001f, TEST_LOCATION);
+
+  tet_infoline("Test child actor is the right delta of the parent");
   child.SetResizePolicy(ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT, Dimension::ALL_DIMENSIONS);
   child[Dali::Actor::Property::SIZE_MODE_FACTOR] = Vector3(-40.0f, -20.0f, 1.0f);
+  child.TestRelayoutRequest();
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(childImpl.CalculateSize(Dimension::WIDTH, maxSize), 110.0f, 0.00001f, TEST_LOCATION);
-  DALI_TEST_EQUALS(childImpl.CalculateSize(Dimension::HEIGHT, maxSize), 235.0f, 0.00001f, TEST_LOCATION);
+
+  Vector3 size2 = child[Dali::Actor::Property::SIZE];
+  DALI_TEST_EQUALS(size2.width, 110.0f, 0.00001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(size2.height, 80.0f, 0.00001f, TEST_LOCATION);
 
   END_TEST;
 }

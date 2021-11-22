@@ -24,48 +24,18 @@
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>
 
+#include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
 
-namespace
-{
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogRelayoutFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_RELAYOUT_TIMER");
 #endif
-
-/**
- * @brief Extract a given dimension from a Vector2
- *
- * @param[in] values The values to extract from
- * @param[in] dimension The dimension to extract
- * @return Return the value for the dimension
- */
-constexpr float GetDimensionValue(const Dali::Vector2& values, const Dali::Dimension::Type dimension)
-{
-  switch(dimension)
-  {
-    case Dali::Dimension::WIDTH:
-    {
-      return values.width;
-    }
-    case Dali::Dimension::HEIGHT:
-    {
-      return values.height;
-    }
-    default:
-    {
-      break;
-    }
-  }
-  return 0.0f;
-}
-
-} // unnamed namespace
 
 namespace Dali
 {
 namespace Internal
 {
-Actor::Relayouter::Relayouter()
+ActorSizer::Relayouter::Relayouter()
 : sizeModeFactor(DEFAULT_SIZE_MODE_FACTOR),
   preferredSize(DEFAULT_PREFERRED_SIZE),
   sizeSetPolicy(DEFAULT_SIZE_SCALE_POLICY),
@@ -88,7 +58,7 @@ Actor::Relayouter::Relayouter()
   }
 }
 
-ResizePolicy::Type Actor::Relayouter::GetResizePolicy(Dimension::Type dimension) const
+ResizePolicy::Type ActorSizer::Relayouter::GetResizePolicy(Dimension::Type dimension) const
 {
   // If more than one dimension is requested, just return the first one found
   for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
@@ -109,55 +79,7 @@ ResizePolicy::Type Actor::Relayouter::GetResizePolicy(Dimension::Type dimension)
   return ResizePolicy::DEFAULT;
 }
 
-void Actor::Relayouter::SetPadding(const Vector2& padding, Dimension::Type dimension)
-{
-  for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
-  {
-    if(dimension & (1 << i))
-    {
-      dimensionPadding[i] = padding;
-    }
-  }
-}
-
-Vector2 Actor::Relayouter::GetPadding(Dimension::Type dimension)
-{
-  // If more than one dimension is requested, just return the first one found
-  for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
-  {
-    if((dimension & (1 << i)))
-    {
-      return dimensionPadding[i];
-    }
-  }
-
-  return DEFAULT_DIMENSION_PADDING;
-}
-
-void Actor::Relayouter::SetLayoutNegotiated(bool negotiated, Dimension::Type dimension)
-{
-  for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
-  {
-    if(dimension & (1 << i))
-    {
-      dimensionNegotiated[i] = negotiated;
-    }
-  }
-}
-
-bool Actor::Relayouter::IsLayoutNegotiated(Dimension::Type dimension) const
-{
-  for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
-  {
-    if((dimension & (1 << i)) && dimensionNegotiated[i])
-    {
-      return true;
-    }
-  }
-  return false;
-}
-
-Vector2 Actor::Relayouter::ApplySizeSetPolicy(Internal::Actor& actor, const Vector2& size)
+Vector2 ActorSizer::Relayouter::ApplySizeSetPolicy(Internal::Actor& actor, const Vector2& size)
 {
   switch(sizeSetPolicy)
   {
@@ -226,7 +148,7 @@ Vector2 Actor::Relayouter::ApplySizeSetPolicy(Internal::Actor& actor, const Vect
   return size;
 }
 
-void Actor::Relayouter::SetUseAssignedSize(bool use, Dimension::Type dimension)
+void ActorSizer::Relayouter::SetUseAssignedSize(bool use, Dimension::Type dimension)
 {
   for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
   {
@@ -237,7 +159,7 @@ void Actor::Relayouter::SetUseAssignedSize(bool use, Dimension::Type dimension)
   }
 }
 
-bool Actor::Relayouter::GetUseAssignedSize(Dimension::Type dimension) const
+bool ActorSizer::Relayouter::GetUseAssignedSize(Dimension::Type dimension) const
 {
   // If more than one dimension is requested, just return the first one found
   for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
@@ -251,7 +173,7 @@ bool Actor::Relayouter::GetUseAssignedSize(Dimension::Type dimension) const
   return false;
 }
 
-void Actor::Relayouter::SetMinimumSize(float size, Dimension::Type dimension)
+void ActorSizer::Relayouter::SetMinimumSize(float size, Dimension::Type dimension)
 {
   for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
   {
@@ -262,7 +184,7 @@ void Actor::Relayouter::SetMinimumSize(float size, Dimension::Type dimension)
   }
 }
 
-float Actor::Relayouter::GetMinimumSize(Dimension::Type dimension) const
+float ActorSizer::Relayouter::GetMinimumSize(Dimension::Type dimension) const
 {
   for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
   {
@@ -275,7 +197,7 @@ float Actor::Relayouter::GetMinimumSize(Dimension::Type dimension) const
   return 0.0f; // Default
 }
 
-void Actor::Relayouter::SetMaximumSize(float size, Dimension::Type dimension)
+void ActorSizer::Relayouter::SetMaximumSize(float size, Dimension::Type dimension)
 {
   for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
   {
@@ -286,7 +208,7 @@ void Actor::Relayouter::SetMaximumSize(float size, Dimension::Type dimension)
   }
 }
 
-float Actor::Relayouter::GetMaximumSize(Dimension::Type dimension) const
+float ActorSizer::Relayouter::GetMaximumSize(Dimension::Type dimension) const
 {
   for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
   {
@@ -299,7 +221,7 @@ float Actor::Relayouter::GetMaximumSize(Dimension::Type dimension) const
   return FLT_MAX; // Default
 }
 
-void Actor::Relayouter::SetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension, Vector3& targetSize)
+void ActorSizer::Relayouter::SetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension, Vector3& targetSize)
 {
   ResizePolicy::Type originalWidthPolicy  = GetResizePolicy(Dimension::WIDTH);
   ResizePolicy::Type originalHeightPolicy = GetResizePolicy(Dimension::HEIGHT);
@@ -365,7 +287,7 @@ void Actor::Relayouter::SetResizePolicy(ResizePolicy::Type policy, Dimension::Ty
   }
 }
 
-bool Actor::Relayouter::GetRelayoutDependentOnParent(Dimension::Type dimension)
+bool ActorSizer::Relayouter::GetRelayoutDependentOnParent(Dimension::Type dimension)
 {
   // Check if actor is dependent on parent
   for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
@@ -382,7 +304,7 @@ bool Actor::Relayouter::GetRelayoutDependentOnParent(Dimension::Type dimension)
   return false;
 }
 
-bool Actor::Relayouter::GetRelayoutDependentOnChildren(Dimension::Type dimension)
+bool ActorSizer::Relayouter::GetRelayoutDependentOnChildren(Dimension::Type dimension)
 {
   // Check if actor is dependent on children
   for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
@@ -401,7 +323,7 @@ bool Actor::Relayouter::GetRelayoutDependentOnChildren(Dimension::Type dimension
   return false;
 }
 
-bool Actor::Relayouter::GetRelayoutDependentOnDimension(Dimension::Type dimension, Dimension::Type dependency)
+bool ActorSizer::Relayouter::GetRelayoutDependentOnDimension(Dimension::Type dimension, Dimension::Type dependency)
 {
   // Check each possible dimension and see if it is dependent on the input one
   for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
@@ -415,7 +337,7 @@ bool Actor::Relayouter::GetRelayoutDependentOnDimension(Dimension::Type dimensio
   return false;
 }
 
-void Actor::Relayouter::SetDimensionDependency(Dimension::Type dimension, Dimension::Type dependency)
+void ActorSizer::Relayouter::SetDimensionDependency(Dimension::Type dimension, Dimension::Type dependency)
 {
   for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
   {
@@ -426,7 +348,7 @@ void Actor::Relayouter::SetDimensionDependency(Dimension::Type dimension, Dimens
   }
 }
 
-Dimension::Type Actor::Relayouter::GetDimensionDependency(Dimension::Type dimension) const
+Dimension::Type ActorSizer::Relayouter::GetDimensionDependency(Dimension::Type dimension) const
 {
   // If more than one dimension is requested, just return the first one found
   for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
@@ -440,7 +362,7 @@ Dimension::Type Actor::Relayouter::GetDimensionDependency(Dimension::Type dimens
   return Dimension::ALL_DIMENSIONS; // Default
 }
 
-void Actor::Relayouter::SetLayoutDirty(bool dirty, Dimension::Type dimension)
+void ActorSizer::Relayouter::SetLayoutDirty(bool dirty, Dimension::Type dimension)
 {
   for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
   {
@@ -451,7 +373,7 @@ void Actor::Relayouter::SetLayoutDirty(bool dirty, Dimension::Type dimension)
   }
 }
 
-bool Actor::Relayouter::IsLayoutDirty(Dimension::Type dimension) const
+bool ActorSizer::Relayouter::IsLayoutDirty(Dimension::Type dimension) const
 {
   for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
   {
@@ -464,38 +386,7 @@ bool Actor::Relayouter::IsLayoutDirty(Dimension::Type dimension) const
   return false;
 }
 
-void Actor::Relayouter::SetPreferredSize(Actor& actor, const Vector2& size)
-{
-  // If valid width or height, then set the resize policy to FIXED
-  // A 0 width or height may also be required so if the resize policy has not been changed, i.e. is still set to DEFAULT,
-  // then change to FIXED as well
-
-  if(size.width > 0.0f || GetResizePolicy(Dimension::WIDTH) == ResizePolicy::DEFAULT)
-  {
-    actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::WIDTH);
-  }
-
-  if(size.height > 0.0f || GetResizePolicy(Dimension::HEIGHT) == ResizePolicy::DEFAULT)
-  {
-    actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::HEIGHT);
-  }
-
-  actor.mRelayoutData->preferredSize = size;
-
-  actor.mUseAnimatedSize = AnimatedSizeFlag::CLEAR;
-
-  actor.RelayoutRequest();
-}
-
-float Actor::Relayouter::ClampDimension(const Internal::Actor& actor, float size, Dimension::Type dimension)
-{
-  const float minSize = actor.GetMinimumSize(dimension);
-  const float maxSize = actor.GetMaximumSize(dimension);
-
-  return std::max(minSize, std::min(size, maxSize));
-}
-
-void Actor::Relayouter::SetNegotiatedDimension(float negotiatedDimension, Dimension::Type dimension)
+void ActorSizer::Relayouter::SetNegotiatedDimension(float negotiatedDimension, Dimension::Type dimension)
 {
   for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
   {
@@ -506,7 +397,7 @@ void Actor::Relayouter::SetNegotiatedDimension(float negotiatedDimension, Dimens
   }
 }
 
-float Actor::Relayouter::GetNegotiatedDimension(Dimension::Type dimension)
+float ActorSizer::Relayouter::GetNegotiatedDimension(Dimension::Type dimension)
 {
   // If more than one dimension is requested, just return the first one found
   for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
@@ -520,286 +411,52 @@ float Actor::Relayouter::GetNegotiatedDimension(Dimension::Type dimension)
   return 0.0f; // Default
 }
 
-float Actor::Relayouter::NegotiateDimensionFromParent(Actor& actor, Dimension::Type dimension)
+void ActorSizer::Relayouter::SetPadding(const Vector2& padding, Dimension::Type dimension)
 {
-  Actor* parent = actor.GetParent();
-  if(parent)
-  {
-    Vector2 padding(actor.GetPadding(dimension));
-    Vector2 parentPadding(parent->GetPadding(dimension));
-
-    // Need to use actor API here to allow deriving actors to layout their children
-    return parent->CalculateChildSize(Dali::Actor(&actor), dimension) - parentPadding.x - parentPadding.y - padding.x - padding.y;
-  }
-
-  return 0.0f;
-}
-
-float Actor::Relayouter::NegotiateDimensionFromChildren(Actor& actor, Dimension::Type dimension)
-{
-  float maxDimensionPoint = 0.0f;
-
-  for(uint32_t i = 0, count = actor.GetChildCount(); i < count; ++i)
-  {
-    ActorPtr child = actor.GetChildAt(i);
-
-    if(!child->RelayoutDependentOnParent(dimension))
-    {
-      // Calculate the min and max points that the children range across
-      float childPosition = GetDimensionValue(child->GetTargetPosition(), dimension);
-      float dimensionSize = child->GetRelayoutSize(dimension);
-      maxDimensionPoint   = std::max(maxDimensionPoint, childPosition + dimensionSize);
-    }
-  }
-
-  return maxDimensionPoint;
-}
-
-void Actor::Relayouter::NegotiateDimension(Actor& actor, Dimension::Type dimension, const Vector2& allocatedSize, Actor::ActorDimensionStack& recursionStack)
-{
-  // Check if it needs to be negotiated
-  if(actor.IsLayoutDirty(dimension) && !actor.IsLayoutNegotiated(dimension))
-  {
-    // Check that we havn't gotten into an infinite loop
-    Actor::ActorDimensionPair searchActor    = Actor::ActorDimensionPair(&actor, dimension);
-    bool                      recursionFound = false;
-    for(auto& element : recursionStack)
-    {
-      if(element == searchActor)
-      {
-        recursionFound = true;
-        break;
-      }
-    }
-
-    if(!recursionFound)
-    {
-      // Record the path that we have taken
-      recursionStack.push_back(Actor::ActorDimensionPair(&actor, dimension));
-
-      // Dimension dependency check
-      for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
-      {
-        Dimension::Type dimensionToCheck = static_cast<Dimension::Type>(1 << i);
-
-        if(actor.RelayoutDependentOnDimension(dimension, dimensionToCheck))
-        {
-          NegotiateDimension(actor, dimensionToCheck, allocatedSize, recursionStack);
-        }
-      }
-
-      // Parent dependency check
-      Actor* parent = actor.GetParent();
-      if(parent && actor.RelayoutDependentOnParent(dimension))
-      {
-        NegotiateDimension(*parent, dimension, allocatedSize, recursionStack);
-      }
-
-      // Children dependency check
-      if(actor.RelayoutDependentOnChildren(dimension))
-      {
-        for(uint32_t i = 0, count = actor.GetChildCount(); i < count; ++i)
-        {
-          ActorPtr child = actor.GetChildAt(i);
-
-          // Only relayout child first if it is not dependent on this actor
-          if(!child->RelayoutDependentOnParent(dimension))
-          {
-            NegotiateDimension(*child, dimension, allocatedSize, recursionStack);
-          }
-        }
-      }
-
-      // For deriving classes
-      actor.OnCalculateRelayoutSize(dimension);
-
-      // All dependencies checked, calculate the size and set negotiated flag
-      const float newSize = ClampDimension(actor, actor.CalculateSize(dimension, allocatedSize), dimension);
-
-      actor.SetNegotiatedDimension(newSize, dimension);
-      actor.SetLayoutNegotiated(true, dimension);
-
-      // For deriving classes
-      actor.OnLayoutNegotiated(newSize, dimension);
-
-      // This actor has been successfully processed, pop it off the recursion stack
-      recursionStack.pop_back();
-    }
-    else
-    {
-      // TODO: Break infinite loop
-      actor.SetLayoutNegotiated(true, dimension);
-    }
-  }
-}
-
-void Actor::Relayouter::NegotiateDimensions(Actor& actor, const Vector2& allocatedSize)
-{
-  // Negotiate all dimensions that require it
-  ActorDimensionStack recursionStack;
-
   for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
   {
-    const Dimension::Type dimension = static_cast<Dimension::Type>(1 << i);
-
-    // Negotiate
-    NegotiateDimension(actor, dimension, allocatedSize, recursionStack);
+    if(dimension & (1 << i))
+    {
+      dimensionPadding[i] = padding;
+    }
   }
 }
 
-void Actor::Relayouter::NegotiateSize(Actor& actor, const Vector2& allocatedSize, RelayoutContainer& container)
+Vector2 ActorSizer::Relayouter::GetPadding(Dimension::Type dimension)
 {
-  // Force a size negotiation for actors that has assigned size during relayout
-  // This is required as otherwise the flags that force a relayout will not
-  // necessarilly be set. This will occur if the actor has already been laid out.
-  // The dirty flags are then cleared. Then if the actor is added back into the
-  // relayout container afterwards, the dirty flags would still be clear...
-  // causing a relayout to be skipped. Here we force any actors added to the
-  // container to be relayed out.
-  DALI_LOG_TIMER_START(NegSizeTimer1);
-
-  if(actor.GetUseAssignedSize(Dimension::WIDTH))
+  // If more than one dimension is requested, just return the first one found
+  for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
   {
-    actor.SetLayoutNegotiated(false, Dimension::WIDTH);
-  }
-  if(actor.GetUseAssignedSize(Dimension::HEIGHT))
-  {
-    actor.SetLayoutNegotiated(false, Dimension::HEIGHT);
-  }
-
-  // Do the negotiation
-  NegotiateDimensions(actor, allocatedSize);
-
-  // Set the actor size
-  actor.SetNegotiatedSize(container);
-
-  // Negotiate down to children
-  for(uint32_t i = 0, count = actor.GetChildCount(); i < count; ++i)
-  {
-    ActorPtr child = actor.GetChildAt(i);
-
-    // Forces children that have already been laid out to be relayed out
-    // if they have assigned size during relayout.
-    if(child->GetUseAssignedSize(Dimension::WIDTH))
+    if((dimension & (1 << i)))
     {
-      child->SetLayoutNegotiated(false, Dimension::WIDTH);
-      child->SetLayoutDirty(true, Dimension::WIDTH);
-    }
-
-    if(child->GetUseAssignedSize(Dimension::HEIGHT))
-    {
-      child->SetLayoutNegotiated(false, Dimension::HEIGHT);
-      child->SetLayoutDirty(true, Dimension::HEIGHT);
-    }
-
-    // Only relayout if required
-    if(child->RelayoutRequired())
-    {
-      container.Add(Dali::Actor(child.Get()), actor.mTargetSize.GetVectorXY());
+      return dimensionPadding[i];
     }
   }
-  DALI_LOG_TIMER_END(NegSizeTimer1, gLogRelayoutFilter, Debug::Concise, "NegotiateSize() took: ");
+
+  return DEFAULT_DIMENSION_PADDING;
 }
 
-/**
- * @brief Extract a given dimension from a Vector3
- *
- * @param[in] values The values to extract from
- * @param[in] dimension The dimension to extract
- * @return Return the value for the dimension
- */
-float Actor::Relayouter::GetDimensionValue(const Vector3& values, const Dimension::Type dimension)
+void ActorSizer::Relayouter::SetLayoutNegotiated(bool negotiated, Dimension::Type dimension)
 {
-  return ::GetDimensionValue(values.GetVectorXY(), dimension);
-}
-
-float Actor::Relayouter::CalculateSize(Actor& actor, Dimension::Type dimension, const Vector2& maximumSize)
-{
-  switch(actor.GetResizePolicy(dimension))
+  for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
   {
-    case ResizePolicy::USE_NATURAL_SIZE:
+    if(dimension & (1 << i))
     {
-      return actor.GetNaturalSize(dimension);
-    }
-
-    case ResizePolicy::FIXED:
-    {
-      return ::GetDimensionValue(actor.GetPreferredSize(), dimension);
-    }
-
-    case ResizePolicy::USE_ASSIGNED_SIZE:
-    {
-      return ::GetDimensionValue(maximumSize, dimension);
-    }
-
-    case ResizePolicy::FILL_TO_PARENT:
-    case ResizePolicy::SIZE_RELATIVE_TO_PARENT:
-    case ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT:
-    {
-      return NegotiateDimensionFromParent(actor, dimension);
-    }
-
-    case ResizePolicy::FIT_TO_CHILDREN:
-    {
-      return NegotiateDimensionFromChildren(actor, dimension);
-    }
-
-    case ResizePolicy::DIMENSION_DEPENDENCY:
-    {
-      const Dimension::Type dimensionDependency = actor.GetDimensionDependency(dimension);
-
-      // Custom rules
-      if(dimension == Dimension::WIDTH && dimensionDependency == Dimension::HEIGHT)
-      {
-        return actor.GetWidthForHeight(actor.GetNegotiatedDimension(Dimension::HEIGHT));
-      }
-
-      if(dimension == Dimension::HEIGHT && dimensionDependency == Dimension::WIDTH)
-      {
-        return actor.GetHeightForWidth(actor.GetNegotiatedDimension(Dimension::WIDTH));
-      }
-
-      break;
-    }
-
-    default:
-    {
-      break;
+      dimensionNegotiated[i] = negotiated;
     }
   }
-
-  return 0.0f; // Default
 }
 
-float Actor::Relayouter::CalculateChildSize(Actor& actor, const Actor& child, Dimension::Type dimension)
+bool ActorSizer::Relayouter::IsLayoutNegotiated(Dimension::Type dimension) const
 {
-  // Fill to parent, taking size mode factor into account
-  switch(child.GetResizePolicy(dimension))
+  for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
   {
-    case ResizePolicy::FILL_TO_PARENT:
+    if((dimension & (1 << i)) && dimensionNegotiated[i])
     {
-      return actor.GetLatestSize(dimension);
-    }
-
-    case ResizePolicy::SIZE_RELATIVE_TO_PARENT:
-    {
-      Property::Value value               = child.GetProperty(Dali::Actor::Property::SIZE_MODE_FACTOR);
-      Vector3         childSizeModeFactor = value.Get<Vector3>();
-      return actor.GetLatestSize(dimension) * GetDimensionValue(childSizeModeFactor, dimension);
-    }
-
-    case ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT:
-    {
-      Property::Value value               = child.GetProperty(Dali::Actor::Property::SIZE_MODE_FACTOR);
-      Vector3         childSizeModeFactor = value.Get<Vector3>();
-      return actor.GetLatestSize(dimension) + GetDimensionValue(childSizeModeFactor, dimension);
-    }
-
-    default:
-    {
-      return actor.GetLatestSize(dimension);
+      return true;
     }
   }
+  return false;
 }
 
 } // namespace Internal

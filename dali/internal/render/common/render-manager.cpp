@@ -28,6 +28,7 @@
 #include <dali/internal/event/common/scene-impl.h>
 
 #include <dali/internal/update/common/scene-graph-scene.h>
+#include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/internal/update/render-tasks/scene-graph-camera.h>
 
 #include <dali/internal/render/common/render-algorithms.h>
@@ -255,15 +256,13 @@ void RenderManager::RemoveTexture(Render::Texture* texture)
 {
   DALI_ASSERT_DEBUG(NULL != texture);
 
-  // Find the texture, use reference to pointer so we can do the erase safely
-  for(auto&& iter : mImpl->textureContainer)
+  // Find the texture, use std::find so we can do the erase safely
+  auto iter = std::find(mImpl->textureContainer.begin(), mImpl->textureContainer.end(), texture);
+
+  if(iter != mImpl->textureContainer.end())
   {
-    if(iter == texture)
-    {
-      texture->Destroy();
-      mImpl->textureContainer.Erase(&iter); // Texture found; now destroy it
-      return;
-    }
+    texture->Destroy();
+    mImpl->textureContainer.Erase(iter); // Texture found; now destroy it
   }
 }
 
@@ -301,16 +300,13 @@ void RenderManager::RemoveFrameBuffer(Render::FrameBuffer* frameBuffer)
 {
   DALI_ASSERT_DEBUG(nullptr != frameBuffer);
 
-  // Find the sampler, use reference so we can safely do the erase
-  for(auto&& iter : mImpl->frameBufferContainer)
-  {
-    if(iter == frameBuffer)
-    {
-      frameBuffer->Destroy();
-      mImpl->frameBufferContainer.Erase(&iter); // frameBuffer found; now destroy it
+  // Find the framebuffer, use std:find so we can safely do the erase
+  auto iter = std::find(mImpl->frameBufferContainer.begin(), mImpl->frameBufferContainer.end(), frameBuffer);
 
-      break;
-    }
+  if(iter != mImpl->frameBufferContainer.end())
+  {
+    frameBuffer->Destroy();
+    mImpl->frameBufferContainer.Erase(iter); // frameBuffer found; now destroy it
   }
 }
 
@@ -381,13 +377,11 @@ void RenderManager::AddGeometry(OwnerPointer<Render::Geometry>& geometry)
 
 void RenderManager::RemoveGeometry(Render::Geometry* geometry)
 {
-  auto it = std::find_if(mImpl->geometryContainer.begin(), mImpl->geometryContainer.end(), [geometry](auto& item) {
-    return geometry == item;
-  });
+  auto iter = std::find(mImpl->geometryContainer.begin(), mImpl->geometryContainer.end(), geometry);
 
-  if(it != mImpl->geometryContainer.end())
+  if(iter != mImpl->geometryContainer.end())
   {
-    mImpl->geometryContainer.Erase(it);
+    mImpl->geometryContainer.Erase(iter);
   }
 }
 
@@ -594,50 +588,78 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
       for(RenderListContainer::SizeType index = 0u; index < count; ++index)
       {
         const RenderList* renderList = instruction.GetRenderList(index);
-        if(renderList && !renderList->IsEmpty())
+        if(renderList)
         {
-          const std::size_t listCount = renderList->Count();
-          for(uint32_t listIndex = 0u; listIndex < listCount; ++listIndex)
+          if(!renderList->IsEmpty())
           {
-            RenderItem& item = renderList->GetItem(listIndex);
-            // If the item does 3D transformation, do early exit and clean the damaged rect array
-            if(item.mUpdateSize == Vector3::ZERO)
+            const std::size_t listCount = renderList->Count();
+            for(uint32_t listIndex = 0u; listIndex < listCount; ++listIndex)
             {
-              return;
-            }
-
-            Rect<int> rect;
-            DirtyRect dirtyRect(item.mNode, item.mRenderer, mImpl->frameCount, rect);
-            // If the item refers to updated node or renderer.
-            if(item.mIsUpdated ||
-               (item.mNode &&
-                (item.mNode->Updated() || (item.mRenderer && item.mRenderer->Updated(mImpl->renderBufferIndex, item.mNode)))))
-            {
-              item.mIsUpdated = false;
-              item.mNode->SetUpdatedTree(false);
-
-              rect = RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, item.mUpdateSize, viewportRect.width, viewportRect.height);
-              if(rect.IsValid() && rect.Intersect(viewportRect) && !rect.IsEmpty())
+              RenderItem& item = renderList->GetItem(listIndex);
+              // If the item does 3D transformation, do early exit and clean the damaged rect array
+              if(item.mUpdateSize == Vector3::ZERO)
               {
-                const int left   = rect.x;
-                const int top    = rect.y;
-                const int right  = rect.x + rect.width;
-                const int bottom = rect.y + rect.height;
-                rect.x           = (left / 16) * 16;
-                rect.y           = (top / 16) * 16;
-                rect.width       = ((right + 16) / 16) * 16 - rect.x;
-                rect.height      = ((bottom + 16) / 16) * 16 - rect.y;
+                return;
+              }
 
-                // Found valid dirty rect.
-                // 1. Insert it in the sorted array of the dirty rects.
+              Rect<int> rect;
+              DirtyRect dirtyRect(item.mNode, item.mRenderer, mImpl->frameCount, rect);
+              // If the item refers to updated node or renderer.
+              if(item.mIsUpdated ||
+                 (item.mNode &&
+                  (item.mNode->Updated() || (item.mRenderer && item.mRenderer->Updated(mImpl->renderBufferIndex, item.mNode)))))
+              {
+                item.mIsUpdated = false;
+
+                rect = RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, item.mUpdateSize, viewportRect.width, viewportRect.height);
+                if(rect.IsValid() && rect.Intersect(viewportRect) && !rect.IsEmpty())
+                {
+                  const int left   = rect.x;
+                  const int top    = rect.y;
+                  const int right  = rect.x + rect.width;
+                  const int bottom = rect.y + rect.height;
+                  rect.x           = (left / 16) * 16;
+                  rect.y           = (top / 16) * 16;
+                  rect.width       = ((right + 16) / 16) * 16 - rect.x;
+                  rect.height      = ((bottom + 16) / 16) * 16 - rect.y;
+
+                  // Found valid dirty rect.
+                  // 1. Insert it in the sorted array of the dirty rects.
+                  // 2. Mark the related dirty rects as visited so they will not be removed below.
+                  // 3. Keep only last 3 dirty rects for the same node and renderer (Tizen uses 3 back buffers, Ubuntu 1).
+                  dirtyRect.rect    = rect;
+                  auto dirtyRectPos = std::lower_bound(itemsDirtyRects.begin(), itemsDirtyRects.end(), dirtyRect);
+                  dirtyRectPos      = itemsDirtyRects.insert(dirtyRectPos, dirtyRect);
+
+                  int c = 1;
+                  while(++dirtyRectPos != itemsDirtyRects.end())
+                  {
+                    if(dirtyRectPos->node != item.mNode || dirtyRectPos->renderer != item.mRenderer)
+                    {
+                      break;
+                    }
+
+                    dirtyRectPos->visited = true;
+                    Rect<int>& dirtRect   = dirtyRectPos->rect;
+                    rect.Merge(dirtRect);
+
+                    c++;
+                    if(c > 3) // no more then 3 previous rects
+                    {
+                      itemsDirtyRects.erase(dirtyRectPos);
+                      break;
+                    }
+                  }
+
+                  damagedRects.push_back(rect);
+                }
+              }
+              else
+              {
+                // 1. The item is not dirty, the node and renderer referenced by the item are still exist.
                 // 2. Mark the related dirty rects as visited so they will not be removed below.
-                // 3. Keep only last 3 dirty rects for the same node and renderer (Tizen uses 3 back buffers, Ubuntu 1).
-                dirtyRect.rect    = rect;
                 auto dirtyRectPos = std::lower_bound(itemsDirtyRects.begin(), itemsDirtyRects.end(), dirtyRect);
-                dirtyRectPos      = itemsDirtyRects.insert(dirtyRectPos, dirtyRect);
-
-                int c = 1;
-                while(++dirtyRectPos != itemsDirtyRects.end())
+                while(dirtyRectPos != itemsDirtyRects.end())
                 {
                   if(dirtyRectPos->node != item.mNode || dirtyRectPos->renderer != item.mRenderer)
                   {
@@ -645,36 +667,17 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
                   }
 
                   dirtyRectPos->visited = true;
-                  Rect<int>& dirtRect   = dirtyRectPos->rect;
-                  rect.Merge(dirtRect);
-
-                  c++;
-                  if(c > 3) // no more then 3 previous rects
-                  {
-                    itemsDirtyRects.erase(dirtyRectPos);
-                    break;
-                  }
+                  dirtyRectPos++;
                 }
-
-                damagedRects.push_back(rect);
               }
             }
-            else
-            {
-              // 1. The item is not dirty, the node and renderer referenced by the item are still exist.
-              // 2. Mark the related dirty rects as visited so they will not be removed below.
-              auto dirtyRectPos = std::lower_bound(itemsDirtyRects.begin(), itemsDirtyRects.end(), dirtyRect);
-              while(dirtyRectPos != itemsDirtyRects.end())
-              {
-                if(dirtyRectPos->node != item.mNode || dirtyRectPos->renderer != item.mRenderer)
-                {
-                  break;
-                }
+          }
 
-                dirtyRectPos->visited = true;
-                dirtyRectPos++;
-              }
-            }
+          // Reset updated flag from the root
+          Layer* sourceLayer = renderList->GetSourceLayer();
+          if(sourceLayer)
+          {
+            sourceLayer->SetUpdatedTree(false);
           }
         }
       }

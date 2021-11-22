@@ -397,7 +397,7 @@ void TestCustomActor::OnLayoutNegotiated(float size, Dimension::Type dimension)
 
 bool TestCustomActor::RelayoutDependentOnChildren(Dimension::Type dimension)
 {
-  return false;
+  return CustomActorImpl::RelayoutDependentOnChildrenBase(dimension);
 }
 
 void TestCustomActor::SetTransparent(bool transparent)

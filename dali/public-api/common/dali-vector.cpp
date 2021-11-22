@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,26 @@ void VectorBase::Release()
   }
 }
 
+void VectorBase::Replace(void* newData)
+{
+  if(mData)
+  {
+    // adjust pointer to real beginning
+    SizeType* metadata = reinterpret_cast<SizeType*>(mData);
+
+    // Cause timming issue, we set new data before metadata delete.
+    mData = newData;
+
+    // delete metadata address after mData setup safety.
+    delete[](metadata - 2u);
+  }
+  else
+  {
+    // mData was nullptr. Just copy data address
+    mData = newData;
+  }
+}
+
 void VectorBase::SetCount(SizeType count)
 {
   // someone can call Resize( 0u ) before ever populating the vector
@@ -84,10 +104,9 @@ void VectorBase::Reserve(SizeType capacity, SizeType elementSize)
     {
       // copy over the old data
       memcpy(metaData, mData, oldCount * elementSize);
-      // release old buffer
-      Release();
     }
-    mData = metaData;
+    // release old buffer and set new data as mData
+    Replace(reinterpret_cast<void*>(metaData));
   }
 }
 

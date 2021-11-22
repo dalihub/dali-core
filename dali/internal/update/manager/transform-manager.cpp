@@ -285,6 +285,8 @@ bool TransformManager::Update()
           localOrientation = parentOrientation * mTxComponentAnimatable[i].mOrientation;
         }
 
+        Matrix localMatrix = mLocal[i];
+
         if((mInheritanceMode[i] & INHERIT_POSITION) == 0)
         {
           //Don't inherit position
@@ -301,16 +303,17 @@ bool TransformManager::Update()
           Matrix::Multiply(mWorld[i], mLocal[i], parentMatrix);
         }
 
-        mLocalMatrixDirty[i] = true;
+        mLocalMatrixDirty[i] = (localMatrix != mLocal[i]);
       }
     }
     else //Component has no parent or doesn't inherit transform
     {
+      Matrix localMatrix = mLocal[i];
       CalculateCenterPosition(centerPosition, mTxComponentStatic[i], mTxComponentAnimatable[i], mSize[i], half, topLeft);
       localPosition = mTxComponentAnimatable[i].mPosition + centerPosition;
       mLocal[i].SetTransformComponents(mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, localPosition);
       mWorld[i]            = mLocal[i];
-      mLocalMatrixDirty[i] = true;
+      mLocalMatrixDirty[i] = (localMatrix != mLocal[i]);
     }
 
     //Update the bounding sphere
