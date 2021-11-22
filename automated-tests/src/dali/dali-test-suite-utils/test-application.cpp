@@ -220,7 +220,7 @@ bool TestApplication::PreRenderWithPartialUpdate(uint32_t intervalMilliseconds, 
   DoUpdate(intervalMilliseconds, location);
 
   mCore->PreRender(mRenderStatus, false /*do not force clear*/, false /*do not skip rendering*/);
-  mCore->PreRender(mRenderStatus, mScene, damagedRects);
+  mCore->PreRender(mScene, damagedRects);
 
   return mStatus.KeepUpdating() || mRenderStatus.NeedsUpdate();
 }
