@@ -50,6 +50,14 @@ void ConstrainPropertyOwner(PropertyOwner& propertyOwner, BufferIndex updateBuff
 NodePropertyFlags UpdateNodeTree(Layer&       rootNode,
                                  BufferIndex  updateBufferIndex,
                                  RenderQueue& renderQueue);
+/**
+ * This updates all the sub-layer's reusability flags without affecting
+ * the root layer.
+ *
+ * @param layer The root layer
+ * @param updateBufferIndex The current buffer index
+ */
+void UpdateLayerTree(Layer& layer, BufferIndex updateBufferIndex);
 
 } // namespace SceneGraph
 

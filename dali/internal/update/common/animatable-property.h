@@ -52,6 +52,7 @@ namespace SceneGraph
 static const uint32_t CLEAN_FLAG = 0x00; ///< Indicates that the value did not change in this, or the previous frame
 static const uint32_t BAKED_FLAG = 0x01; ///< Indicates that the value was Baked during the previous frame
 static const uint32_t SET_FLAG   = 0x02; ///< Indicates that the value was Set during the previous frame
+static const uint32_t RESET_FLAG = 0x02; ///< Indicates that the value should be reset to the base value in the next two frames
 
 template<class T>
 class AnimatableProperty;
@@ -91,6 +92,16 @@ protected: // for derived classes
   void OnBake()
   {
     mDirtyFlags = BAKED_FLAG;
+  }
+
+public:
+
+  /**
+   * Mark the property as dirty so that it will be reset to the base value in the next two frames.
+   */
+  void MarkAsDirty()
+  {
+    mDirtyFlags = RESET_FLAG;
   }
 
 public: // From PropertyBase

@@ -4967,6 +4967,64 @@ int UtcDaliActorPropertyClippingActorWithRendererOverride(void)
   END_TEST;
 }
 
+int UtcDaliActorPropertyClippingActorCulled(void)
+{
+  // This test checks that child actors are clipped by an culled parent actor.
+  tet_infoline("Testing child actors are clipped by an culled parent actor");
+  TestApplication application;
+
+  TestGlAbstraction& glAbstraction       = application.GetGlAbstraction();
+  TraceCallStack&    scissorTrace        = glAbstraction.GetScissorTrace();
+  TraceCallStack&    enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
+
+  const Vector2 actorSize(160.0f, 160.0f);
+
+  // Create a clipping actor.
+  Actor clippingActorA                  = CreateRenderableActor();
+  clippingActorA[Actor::Property::SIZE] = actorSize;
+
+  // Note: Scissor coords are have flipped Y values compared with DALi's coordinate system.
+  // We choose BOTTOM_LEFT to give us x=0, y=0 starting coordinates for the first test.
+  clippingActorA[Actor::Property::PARENT_ORIGIN] = ParentOrigin::BOTTOM_LEFT;
+  clippingActorA[Actor::Property::ANCHOR_POINT]  = AnchorPoint::BOTTOM_LEFT;
+  clippingActorA[Actor::Property::CLIPPING_MODE] = ClippingMode::CLIP_TO_BOUNDING_BOX;
+  application.GetScene().Add(clippingActorA);
+
+  // Create a child actor
+  Actor childActor                              = CreateRenderableActor();
+  childActor[Actor::Property::PARENT_ORIGIN]    = ParentOrigin::BOTTOM_LEFT;
+  childActor[Actor::Property::ANCHOR_POINT]     = AnchorPoint::BOTTOM_LEFT;
+  childActor[Actor::Property::SIZE]             = Vector2(50.0f, 50.0f);
+  childActor[Actor::Property::INHERIT_POSITION] = false;
+
+  // Gather the call trace.
+  GenerateTrace(application, enabledDisableTrace, scissorTrace);
+
+  // Check scissor test was enabled.
+  std::ostringstream scissor;
+  scissor << std::hex << GL_SCISSOR_TEST;
+  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Enable", scissor.str()));
+
+  // Check the scissor was set, and the coordinates are correct.
+  std::stringstream compareParametersString;
+  compareParametersString << "0, 0, " << actorSize.x << ", " << actorSize.y;
+  DALI_TEST_CHECK(scissorTrace.FindMethodAndParams("Scissor", compareParametersString.str())); // Compare with 0, 0, 16, 16
+
+  // Move the clipping actor out of screen
+  clippingActorA[Actor::Property::POSITION] = Vector2(2000.0f, 2000.0f);
+
+  // Gather the call trace.
+  GenerateTrace(application, enabledDisableTrace, scissorTrace);
+
+  // Check the scissor was set, and the coordinates are correct.
+  compareParametersString.str(std::string());
+  compareParametersString.clear();
+  compareParametersString << 2000 << ", " << 0 << ", " << 0 << ", " << 0;
+  DALI_TEST_CHECK(scissorTrace.FindMethodAndParams("Scissor", compareParametersString.str())); // Clipping area should be empty.
+
+  END_TEST;
+}
+
 int UtcDaliGetPropertyN(void)
 {
   tet_infoline("Testing Actor::GetProperty returns a non valid value if property index is out of range");
@@ -9035,6 +9093,65 @@ int utcDaliActorPartialUpdate3DNode(void)
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int utcDaliActorPartialUpdateNotRenderableActor(void)
+{
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  tet_infoline("Check the damaged rect with not renderable parent actor");
+
+  const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
+
+  Actor parent                          = Actor::New();
+  parent[Actor::Property::ANCHOR_POINT] = AnchorPoint::TOP_LEFT;
+  parent[Actor::Property::POSITION]     = Vector3(16.0f, 16.0f, 0.0f);
+  parent[Actor::Property::SIZE]         = Vector3(16.0f, 16.0f, 0.0f);
+  parent.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  application.GetScene().Add(parent);
+
+  Actor child                          = CreateRenderableActor();
+  child[Actor::Property::ANCHOR_POINT] = AnchorPoint::TOP_LEFT;
+  child[Actor::Property::SIZE]         = Vector3(16.0f, 16.0f, 0.0f);
+  child.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  parent.Add(child);
+
+  application.SendNotification();
+
+  std::vector<Rect<int>> damagedRects;
+
+  // 1. Actor added, damaged rect is added size of actor
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  // Aligned by 16
+  Rect<int> clippingRect = Rect<int>(16, 768, 32, 32); // in screen coordinates, includes 3 last frames updates
+  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Ensure the damaged rect is empty
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
 
   END_TEST;
 }

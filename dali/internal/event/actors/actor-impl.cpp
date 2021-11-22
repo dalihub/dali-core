@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <algorithm>
-#include <cfloat>
 #include <cmath>
 
 // INTERNAL INCLUDES
@@ -39,7 +38,6 @@
 #include <dali/internal/event/actors/actor-coords.h>
 #include <dali/internal/event/actors/actor-parent.h>
 #include <dali/internal/event/actors/actor-property-handler.h>
-#include <dali/internal/event/actors/actor-relayouter.h>
 #include <dali/internal/event/actors/camera-actor-impl.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/property-helper.h>
@@ -51,9 +49,9 @@
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/internal/event/render-tasks/render-task-list-impl.h>
 #include <dali/internal/event/rendering/renderer-impl.h>
-#include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/nodes/node-messages.h>
+#include <dali/public-api/size-negotiation/relayout-container.h>
 
 using Dali::Internal::SceneGraph::AnimatableProperty;
 using Dali::Internal::SceneGraph::Node;
@@ -766,14 +764,12 @@ void Actor::SetInheritOrientation(bool inherit)
 
 void Actor::SetSizeModeFactor(const Vector3& factor)
 {
-  EnsureRelayouter();
-
-  mRelayoutData->sizeModeFactor = factor;
+  mSizer.SetSizeModeFactor(factor);
 }
 
 const Vector3& Actor::GetSizeModeFactor() const
 {
-  return mRelayoutData ? mRelayoutData->sizeModeFactor : Relayouter::DEFAULT_SIZE_MODE_FACTOR;
+  return mSizer.GetSizeModeFactor();
 }
 
 void Actor::SetColorMode(ColorMode colorMode)
@@ -799,154 +795,31 @@ void Actor::SetSize(const Vector2& size)
   SetSize(Vector3(size.width, size.height, 0.f));
 }
 
-void Actor::SetSizeInternal(const Vector2& size)
-{
-  SetSizeInternal(Vector3(size.width, size.height, 0.f));
-}
-
 void Actor::SetSize(const Vector3& size)
 {
-  if(IsRelayoutEnabled() && !mRelayoutData->insideRelayout)
-  {
-    // TODO we cannot just ignore the given Z but that means rewrite the size negotiation!!
-    SetPreferredSize(size.GetVectorXY());
-  }
-  else
-  {
-    SetSizeInternal(size);
-  }
-}
-
-void Actor::SetSizeInternal(const Vector3& size)
-{
-  // dont allow recursive loop
-  DALI_ASSERT_ALWAYS(!mInsideOnSizeSet && "Cannot call SetSize from OnSizeSet");
-  // check that we have a node AND the new size width, height or depth is at least a little bit different from the old one
-  Vector3 currentSize = GetCurrentSize();
-
-  if((fabsf(mTargetSize.width - size.width) > Math::MACHINE_EPSILON_1) ||
-     (fabsf(mTargetSize.height - size.height) > Math::MACHINE_EPSILON_1) ||
-     (fabsf(mTargetSize.depth - size.depth) > Math::MACHINE_EPSILON_1) ||
-     (fabsf(mTargetSize.width - currentSize.width) > Math::MACHINE_EPSILON_1) ||
-     (fabsf(mTargetSize.height - currentSize.height) > Math::MACHINE_EPSILON_1) ||
-     (fabsf(mTargetSize.depth - currentSize.depth) > Math::MACHINE_EPSILON_1))
-  {
-    mTargetSize = size;
-
-    // Update the preferred size after relayoutting
-    // It should be used in the next relayoutting
-    if(mUseAnimatedSize & AnimatedSizeFlag::WIDTH && mRelayoutData)
-    {
-      mRelayoutData->preferredSize.width = mAnimatedSize.width;
-    }
-
-    if(mUseAnimatedSize & AnimatedSizeFlag::HEIGHT && mRelayoutData)
-    {
-      mRelayoutData->preferredSize.height = mAnimatedSize.height;
-    }
-
-    // node is being used in a separate thread; queue a message to set the value & base value
-    SceneGraph::NodeTransformPropertyMessage<Vector3>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mSize, &SceneGraph::TransformManagerPropertyHandler<Vector3>::Bake, mTargetSize);
-
-    // Notification for derived classes
-    mInsideOnSizeSet = true;
-    OnSizeSet(mTargetSize);
-    mInsideOnSizeSet = false;
-
-    // Raise a relayout request if the flag is not locked
-    if(mRelayoutData && !mRelayoutData->insideRelayout)
-    {
-      RelayoutRequest();
-    }
-  }
+  mSizer.SetSize(size);
 }
 
 void Actor::SetWidth(float width)
 {
-  if(IsRelayoutEnabled() && !mRelayoutData->insideRelayout)
-  {
-    SetResizePolicy(ResizePolicy::FIXED, Dimension::WIDTH);
-    mRelayoutData->preferredSize.width = width;
-  }
-  else
-  {
-    mTargetSize.width = width;
-
-    // node is being used in a separate thread; queue a message to set the value & base value
-    SceneGraph::NodeTransformComponentMessage<Vector3>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mSize, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeX, width);
-  }
-
-  mUseAnimatedSize &= ~AnimatedSizeFlag::WIDTH;
-
-  RelayoutRequest();
+  mSizer.SetWidth(width);
 }
 
 void Actor::SetHeight(float height)
 {
-  if(IsRelayoutEnabled() && !mRelayoutData->insideRelayout)
-  {
-    SetResizePolicy(ResizePolicy::FIXED, Dimension::HEIGHT);
-    mRelayoutData->preferredSize.height = height;
-  }
-  else
-  {
-    mTargetSize.height = height;
-
-    // node is being used in a separate thread; queue a message to set the value & base value
-    SceneGraph::NodeTransformComponentMessage<Vector3>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mSize, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeY, height);
-  }
-
-  mUseAnimatedSize &= ~AnimatedSizeFlag::HEIGHT;
-
-  RelayoutRequest();
+  mSizer.SetHeight(height);
 }
 
 void Actor::SetDepth(float depth)
 {
-  mTargetSize.depth = depth;
-
-  mUseAnimatedSize &= ~AnimatedSizeFlag::DEPTH;
-
+  mSizer.SetDepth(depth);
   // node is being used in a separate thread; queue a message to set the value & base value
   SceneGraph::NodeTransformComponentMessage<Vector3>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mSize, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeZ, depth);
 }
 
 Vector3 Actor::GetTargetSize() const
 {
-  Vector3 size = mTargetSize;
-
-  if(mUseAnimatedSize & AnimatedSizeFlag::WIDTH)
-  {
-    // Should return animated size if size is animated
-    size.width = mAnimatedSize.width;
-  }
-  else
-  {
-    // Should return preferred size if size is fixed as set by SetSize
-    if(GetResizePolicy(Dimension::WIDTH) == ResizePolicy::FIXED)
-    {
-      size.width = GetPreferredSize().width;
-    }
-  }
-
-  if(mUseAnimatedSize & AnimatedSizeFlag::HEIGHT)
-  {
-    size.height = mAnimatedSize.height;
-  }
-  else
-  {
-    if(GetResizePolicy(Dimension::HEIGHT) == ResizePolicy::FIXED)
-    {
-      size.height = GetPreferredSize().height;
-    }
-  }
-
-  if(mUseAnimatedSize & AnimatedSizeFlag::DEPTH)
-  {
-    size.depth = mAnimatedSize.depth;
-  }
-
-  return size;
+  return mSizer.GetTargetSize();
 }
 
 const Vector3& Actor::GetCurrentSize() const
@@ -963,83 +836,42 @@ Vector3 Actor::GetNaturalSize() const
 
 void Actor::SetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension)
 {
-  EnsureRelayouter().SetResizePolicy(policy, dimension, mTargetSize);
-
-  OnSetResizePolicy(policy, dimension);
-
-  // Trigger relayout on this control
-  RelayoutRequest();
+  mSizer.SetResizePolicy(policy, dimension);
 }
 
 ResizePolicy::Type Actor::GetResizePolicy(Dimension::Type dimension) const
 {
-  return mRelayoutData ? mRelayoutData->GetResizePolicy(dimension) : ResizePolicy::DEFAULT;
-}
-
-void Actor::SetSizeScalePolicy(SizeScalePolicy::Type policy)
-{
-  EnsureRelayouter();
-
-  mRelayoutData->sizeSetPolicy = policy;
-
-  // Trigger relayout on this control
-  RelayoutRequest();
-}
-
-SizeScalePolicy::Type Actor::GetSizeScalePolicy() const
-{
-  return mRelayoutData ? mRelayoutData->sizeSetPolicy : Relayouter::DEFAULT_SIZE_SCALE_POLICY;
-}
-
-void Actor::SetDimensionDependency(Dimension::Type dimension, Dimension::Type dependency)
-{
-  EnsureRelayouter().SetDimensionDependency(dimension, dependency);
-}
-
-Dimension::Type Actor::GetDimensionDependency(Dimension::Type dimension) const
-{
-  return mRelayoutData ? mRelayoutData->GetDimensionDependency(dimension) : Dimension::ALL_DIMENSIONS;
+  return mSizer.GetResizePolicy(dimension);
 }
 
 void Actor::SetRelayoutEnabled(bool relayoutEnabled)
 {
-  // If relayout data has not been allocated yet and the client is requesting
-  // to disable it, do nothing
-  if(mRelayoutData || relayoutEnabled)
-  {
-    EnsureRelayouter();
-
-    DALI_ASSERT_DEBUG(mRelayoutData && "mRelayoutData not created");
-
-    mRelayoutData->relayoutEnabled = relayoutEnabled;
-  }
+  mSizer.SetRelayoutEnabled(relayoutEnabled);
 }
 
 bool Actor::IsRelayoutEnabled() const
 {
-  // Assume that if relayout data has not been allocated yet then
-  // relayout is disabled
-  return mRelayoutData && mRelayoutData->relayoutEnabled;
+  return mSizer.IsRelayoutEnabled();
 }
 
 void Actor::SetLayoutDirty(bool dirty, Dimension::Type dimension)
 {
-  EnsureRelayouter().SetLayoutDirty(dirty, dimension);
+  mSizer.SetLayoutDirty(dirty, dimension);
 }
 
 bool Actor::IsLayoutDirty(Dimension::Type dimension) const
 {
-  return mRelayoutData && mRelayoutData->IsLayoutDirty(dimension);
+  return mSizer.IsLayoutDirty(dimension);
 }
 
 bool Actor::RelayoutPossible(Dimension::Type dimension) const
 {
-  return mRelayoutData && mRelayoutData->relayoutEnabled && !IsLayoutDirty(dimension);
+  return mSizer.RelayoutPossible(dimension);
 }
 
 bool Actor::RelayoutRequired(Dimension::Type dimension) const
 {
-  return mRelayoutData && mRelayoutData->relayoutEnabled && IsLayoutDirty(dimension);
+  return mSizer.RelayoutRequired(dimension);
 }
 
 uint32_t Actor::AddRenderer(Renderer& renderer)
@@ -1200,12 +1032,12 @@ DevelActor::ChildOrderChangedSignalType& Actor::ChildOrderChangedSignal()
 Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
 : Object(&node),
   mParentImpl(*this),
+  mSizer(*this),
   mParent(nullptr),
   mScene(nullptr),
   mRenderers(nullptr),
   mParentOrigin(nullptr),
   mAnchorPoint(nullptr),
-  mRelayoutData(nullptr),
   mGestureData(nullptr),
   mInterceptTouchedSignal(),
   mTouchedSignal(),
@@ -1218,15 +1050,12 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mLayoutDirectionChangedSignal(),
   mTargetOrientation(Quaternion::IDENTITY),
   mTargetColor(Color::WHITE),
-  mTargetSize(Vector3::ZERO),
   mTargetPosition(Vector3::ZERO),
   mTargetScale(Vector3::ONE),
-  mAnimatedSize(Vector3::ZERO),
   mTouchAreaOffset(0, 0, 0, 0),
   mName(),
   mSortedDepth(0u),
   mDepth(0u),
-  mUseAnimatedSize(AnimatedSizeFlag::CLEAR),
   mIsRoot(ROOT_LAYER == derivedType),
   mIsLayer(LAYER == derivedType || ROOT_LAYER == derivedType),
   mIsOnScene(false),
@@ -1236,7 +1065,6 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mKeyboardFocusableChildren(true),
   mTouchFocusable(false),
   mOnSceneSignalled(false),
-  mInsideOnSizeSet(false),
   mInheritPosition(true),
   mInheritOrientation(true),
   mInheritScale(true),
@@ -1286,9 +1114,6 @@ Actor::~Actor()
   // Cleanup optional parent origin and anchor
   delete mParentOrigin;
   delete mAnchorPoint;
-
-  // Delete optional relayout data
-  delete mRelayoutData;
 }
 
 void Actor::Add(Actor& child, bool notify)
@@ -1677,238 +1502,115 @@ bool Actor::GetCurrentPropertyValue(Property::Index index, Property::Value& valu
   return PropertyHandler::GetCurrentPropertyValue(*this, index, value);
 }
 
-Actor::Relayouter& Actor::EnsureRelayouter()
-{
-  // Assign relayouter
-  if(!mRelayoutData)
-  {
-    mRelayoutData = new Relayouter();
-  }
-
-  return *mRelayoutData;
-}
-
 bool Actor::RelayoutDependentOnParent(Dimension::Type dimension)
 {
-  return mRelayoutData && mRelayoutData->GetRelayoutDependentOnParent(dimension);
+  return mSizer.RelayoutDependentOnParent(dimension);
 }
 
 bool Actor::RelayoutDependentOnChildren(Dimension::Type dimension)
 {
-  return mRelayoutData && mRelayoutData->GetRelayoutDependentOnChildren(dimension);
-}
-
-bool Actor::RelayoutDependentOnChildrenBase(Dimension::Type dimension)
-{
-  return Actor::RelayoutDependentOnChildren(dimension);
+  return mSizer.RelayoutDependentOnChildrenBase(dimension);
 }
 
 bool Actor::RelayoutDependentOnDimension(Dimension::Type dimension, Dimension::Type dependentDimension)
 {
-  return mRelayoutData && mRelayoutData->GetRelayoutDependentOnDimension(dimension, dependentDimension);
-}
-
-void Actor::SetNegotiatedDimension(float negotiatedDimension, Dimension::Type dimension)
-{
-  if(mRelayoutData)
-  {
-    mRelayoutData->SetNegotiatedDimension(negotiatedDimension, dimension);
-  }
-}
-
-float Actor::GetNegotiatedDimension(Dimension::Type dimension) const
-{
-  return mRelayoutData ? mRelayoutData->GetNegotiatedDimension(dimension) : 0.0f;
+  return mSizer.RelayoutDependentOnDimension(dimension, dependentDimension);
 }
 
 void Actor::SetPadding(const Vector2& padding, Dimension::Type dimension)
 {
-  EnsureRelayouter().SetPadding(padding, dimension);
+  mSizer.SetPadding(padding, dimension);
 }
 
 Vector2 Actor::GetPadding(Dimension::Type dimension) const
 {
-  return mRelayoutData ? mRelayoutData->GetPadding(dimension) : Relayouter::DEFAULT_DIMENSION_PADDING;
+  return mSizer.GetPadding(dimension);
 }
 
 void Actor::SetLayoutNegotiated(bool negotiated, Dimension::Type dimension)
 {
-  EnsureRelayouter().SetLayoutNegotiated(negotiated, dimension);
+  mSizer.SetLayoutNegotiated(negotiated, dimension);
 }
 
 bool Actor::IsLayoutNegotiated(Dimension::Type dimension) const
 {
-  return mRelayoutData && mRelayoutData->IsLayoutNegotiated(dimension);
+  return mSizer.IsLayoutNegotiated(dimension);
 }
 
 float Actor::GetHeightForWidthBase(float width)
 {
-  const Vector3 naturalSize = GetNaturalSize();
-  return naturalSize.width > 0.0f ? naturalSize.height * width / naturalSize.width : width;
+  // Can be overridden in derived class
+  return mSizer.GetHeightForWidthBase(width);
 }
 
 float Actor::GetWidthForHeightBase(float height)
 {
-  const Vector3 naturalSize = GetNaturalSize();
-  return naturalSize.height > 0.0f ? naturalSize.width * height / naturalSize.height : height;
+  // Can be overridden in derived class
+  return mSizer.GetWidthForHeightBase(height);
 }
 
 float Actor::CalculateChildSizeBase(const Dali::Actor& child, Dimension::Type dimension)
 {
-  return Actor::Relayouter::CalculateChildSize(*this, GetImplementation(child), dimension);
+  // Can be overridden in derived class
+  return mSizer.CalculateChildSizeBase(child, dimension);
+}
+
+bool Actor::RelayoutDependentOnChildrenBase(Dimension::Type dimension)
+{
+  return mSizer.RelayoutDependentOnChildrenBase(dimension);
 }
 
 float Actor::CalculateChildSize(const Dali::Actor& child, Dimension::Type dimension)
 {
   // Can be overridden in derived class
-  return CalculateChildSizeBase(child, dimension);
+  return mSizer.CalculateChildSizeBase(child, dimension);
 }
 
 float Actor::GetHeightForWidth(float width)
 {
   // Can be overridden in derived class
-  return GetHeightForWidthBase(width);
+  return mSizer.GetHeightForWidthBase(width);
 }
 
 float Actor::GetWidthForHeight(float height)
 {
   // Can be overridden in derived class
-  return GetWidthForHeightBase(height);
-}
-
-float Actor::GetLatestSize(Dimension::Type dimension) const
-{
-  return IsLayoutNegotiated(dimension) ? GetNegotiatedDimension(dimension) : GetSize(dimension);
+  return mSizer.GetWidthForHeightBase(height);
 }
 
 float Actor::GetRelayoutSize(Dimension::Type dimension) const
 {
-  Vector2 padding = GetPadding(dimension);
-
-  return GetLatestSize(dimension) + padding.x + padding.y;
-}
-
-float Actor::NegotiateFromParent(Dimension::Type dimension)
-{
-  return Relayouter::NegotiateDimensionFromParent(*this, dimension);
-}
-
-float Actor::NegotiateFromChildren(Dimension::Type dimension)
-{
-  return Relayouter::NegotiateDimensionFromChildren(*this, dimension);
-}
-
-float Actor::GetSize(Dimension::Type dimension) const
-{
-  return Relayouter::GetDimensionValue(mTargetSize, dimension);
-}
-
-float Actor::GetNaturalSize(Dimension::Type dimension) const
-{
-  return Relayouter::GetDimensionValue(GetNaturalSize(), dimension);
-}
-
-float Actor::CalculateSize(Dimension::Type dimension, const Vector2& maximumSize)
-{
-  return Relayouter::CalculateSize(*this, dimension, maximumSize);
-}
-
-Vector2 Actor::ApplySizeSetPolicy(const Vector2& size)
-{
-  return mRelayoutData->ApplySizeSetPolicy(*this, size);
-}
-
-void Actor::SetNegotiatedSize(RelayoutContainer& container)
-{
-  // Do the set actor size
-  Vector2 negotiatedSize(GetLatestSize(Dimension::WIDTH), GetLatestSize(Dimension::HEIGHT));
-
-  // Adjust for size set policy
-  negotiatedSize = ApplySizeSetPolicy(negotiatedSize);
-
-  // Lock the flag to stop recursive relayouts on set size
-  mRelayoutData->insideRelayout = true;
-  SetSize(negotiatedSize);
-  mRelayoutData->insideRelayout = false;
-
-  // Clear flags for all dimensions
-  SetLayoutDirty(false);
-
-  // Give deriving classes a chance to respond
-  OnRelayout(negotiatedSize, container);
-
-  if(!mOnRelayoutSignal.Empty())
-  {
-    Dali::Actor handle(this);
-    mOnRelayoutSignal.Emit(handle);
-  }
-
-  mRelayoutData->relayoutRequested = false;
+  return mSizer.GetRelayoutSize(dimension);
 }
 
 void Actor::NegotiateSize(const Vector2& allocatedSize, RelayoutContainer& container)
 {
-  Relayouter::NegotiateSize(*this, allocatedSize, container);
-}
-
-void Actor::SetUseAssignedSize(bool use, Dimension::Type dimension)
-{
-  if(mRelayoutData)
-  {
-    mRelayoutData->SetUseAssignedSize(use, dimension);
-  }
-}
-
-bool Actor::GetUseAssignedSize(Dimension::Type dimension) const
-{
-  return mRelayoutData && mRelayoutData->GetUseAssignedSize(dimension);
+  mSizer.NegotiateSize(allocatedSize, container);
 }
 
 void Actor::RelayoutRequest(Dimension::Type dimension)
 {
-  Internal::RelayoutController* relayoutController = Internal::RelayoutController::Get();
-  if(relayoutController)
-  {
-    Dali::Actor self(this);
-    relayoutController->RequestRelayout(self, dimension);
-
-    if(mRelayoutData)
-    {
-      mRelayoutData->relayoutRequested = true;
-    }
-  }
-}
-
-void Actor::SetPreferredSize(const Vector2& size)
-{
-  EnsureRelayouter().SetPreferredSize(*this, size);
-}
-
-Vector2 Actor::GetPreferredSize() const
-{
-  return mRelayoutData ? Vector2(mRelayoutData->preferredSize) : Relayouter::DEFAULT_PREFERRED_SIZE;
+  mSizer.RelayoutRequest(dimension);
 }
 
 void Actor::SetMinimumSize(float size, Dimension::Type dimension)
 {
-  EnsureRelayouter().SetMinimumSize(size, dimension);
-  RelayoutRequest();
+  mSizer.SetMinimumSize(size, dimension);
 }
 
 float Actor::GetMinimumSize(Dimension::Type dimension) const
 {
-  return mRelayoutData ? mRelayoutData->GetMinimumSize(dimension) : 0.0f;
+  return mSizer.GetMinimumSize(dimension);
 }
 
 void Actor::SetMaximumSize(float size, Dimension::Type dimension)
 {
-  EnsureRelayouter().SetMaximumSize(size, dimension);
-  RelayoutRequest();
+  mSizer.SetMaximumSize(size, dimension);
 }
 
 float Actor::GetMaximumSize(Dimension::Type dimension) const
 {
-  return mRelayoutData ? mRelayoutData->GetMaximumSize(dimension) : FLT_MAX;
+  return mSizer.GetMaximumSize(dimension);
 }
 
 void Actor::SetVisibleInternal(bool visible, SendMessage::Type sendMessage)

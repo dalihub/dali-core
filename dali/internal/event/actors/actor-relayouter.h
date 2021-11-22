@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/actors/actor-impl.h>
+
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>
 
@@ -30,7 +31,7 @@ namespace Internal
 /**
  * Struct to do some actor specific relayouting and store related variables
  */
-struct Actor::Relayouter
+struct ActorSizer::Relayouter
 {
   // Defaults
   static constexpr Vector3               DEFAULT_SIZE_MODE_FACTOR{1.0f, 1.0f, 1.0f};
@@ -46,18 +47,6 @@ struct Actor::Relayouter
 
   /// @copydoc Actor::GetResizePolicy
   ResizePolicy::Type GetResizePolicy(Dimension::Type dimension) const;
-
-  /// @copydoc Actor::SetPadding
-  void SetPadding(const Vector2& padding, Dimension::Type dimension);
-
-  /// @copydoc Actor::GetPadding
-  Vector2 GetPadding(Dimension::Type dimension);
-
-  /// @copydoc Actor::SetLayoutNegotiated
-  void SetLayoutNegotiated(bool negotiated, Dimension::Type dimension);
-
-  /// @copydoc Actor::IsLayoutNegotiated
-  bool IsLayoutNegotiated(Dimension::Type dimension) const;
 
   /// @copydoc Actor::ApplySizeSetPolicy
   Vector2 ApplySizeSetPolicy(Internal::Actor& actor, const Vector2& size);
@@ -104,95 +93,23 @@ struct Actor::Relayouter
   /// @copydoc Actor::IsLayoutDirty
   bool IsLayoutDirty(Dimension::Type dimension) const;
 
-  /// @copydoc Actor::SetPreferredSize
-  /// @actor[in] actor The Actor whose preferred size we wish to set
-  void SetPreferredSize(Actor& actor, const Vector2& size);
-
-  /**
-   * @brief Clamp a dimension given the relayout constraints on given actor
-   *
-   * @param[in] actor The actor to clamp
-   * @param[in] size The size to constrain
-   * @param[in] dimension The dimension the size exists in
-   * @return Return the clamped size
-   */
-  static float ClampDimension(const Internal::Actor& actor, float size, Dimension::Type dimension);
-
   /// @copydoc Actor::SetNegotiatedDimension
   void SetNegotiatedDimension(float negotiatedDimension, Dimension::Type dimension);
 
   /// @copydoc Actor::GetNegotiatedDimension
   float GetNegotiatedDimension(Dimension::Type dimension);
 
-  /**
-   * Negotiate a dimension based on the size of the parent
-   *
-   * @param[in] dimension The dimension to negotiate on
-   * @return Return the negotiated size
-   */
-  static float NegotiateDimensionFromParent(Actor& actor, Dimension::Type dimension);
+  /// @copydoc Actor::SetPadding
+  void SetPadding(const Vector2& padding, Dimension::Type dimension);
 
-  /**
-   * @brief Negotiate a dimension based on the size of the children
-   *
-   * @param[in] dimension The dimension to negotiate on
-   * @return Return the negotiated size
-   */
-  static float NegotiateDimensionFromChildren(Actor& actor, Dimension::Type dimension);
+  /// @copydoc Actor::GetPadding
+  Vector2 GetPadding(Dimension::Type dimension);
 
-  /**
-   * Negotiate size for a specific dimension
-   *
-   * The algorithm adopts a recursive dependency checking approach. Meaning, that wherever dependencies
-   * are found, e.g. an actor dependent on its parent, the dependency will be calculated first with NegotiatedDimension and
-   * LayoutDimensionNegotiated flags being filled in on the actor.
-   *
-   * @post All actors that exist in the dependency chain connected to the given actor will have had their NegotiatedDimensions
-   * calculated and set as well as the LayoutDimensionNegotiated flags.
-   *
-   * @param[in] actor The actor whose dimension we are negotiating
-   * @param[in] dimension The dimension to negotiate on
-   * @param[in] allocatedSize The size constraint that the actor must respect
-   */
-  static void NegotiateDimension(Actor& actor, Dimension::Type dimension, const Vector2& allocatedSize, Actor::ActorDimensionStack& recursionStack);
+  /// @copydoc Actor::SetLayoutNegotiated
+  void SetLayoutNegotiated(bool negotiated, Dimension::Type dimension);
 
-  /**
-   * Negotiate sizes for a control in all dimensions
-   *
-   * @param[in] actor The actor whose dimensions we are negotiating
-   * @param[in] allocatedSize The size constraint that the control must respect
-   */
-  static void NegotiateDimensions(Actor& actor, const Vector2& allocatedSize);
-
-  /**
-   * @brief Called by the RelayoutController to negotiate the size of an actor.
-   *
-   * The size allocated by the the algorithm is passed in which the
-   * actor must adhere to.  A container is passed in as well which
-   * the actor should populate with actors it has not / or does not
-   * need to handle in its size negotiation.
-   *
-   * @param[in] actor The actor whose size we are negotiating
-   * @param[in]      size       The allocated size.
-   * @param[in,out]  container  The container that holds actors that are fed back into the
-   *                            RelayoutController algorithm.
-   */
-  static void NegotiateSize(Actor& actor, const Vector2& allocatedSize, RelayoutContainer& container);
-
-  /**
-   * Get the value for the given dimension
-   *
-   * @param[in] values The vector to get values from
-   * @param[in] dimension The dimension to fetch
-   * @return the value of the given dimension
-   */
-  static float GetDimensionValue(const Vector3& values, const Dimension::Type dimension);
-
-  /// @copydoc Actor::CalculateSize
-  static float CalculateSize(Actor& actor, Dimension::Type dimension, const Vector2& maximumSize);
-
-  /// @copydoc Actor::CalculateChildSizeBase
-  static float CalculateChildSize(Actor& actor, const Actor& child, Dimension::Type dimension);
+  /// @copydoc Actor::IsLayoutNegotiated
+  bool IsLayoutNegotiated(Dimension::Type dimension) const;
 
 public:
   ResizePolicy::Type resizePolicies[Dimension::DIMENSION_COUNT];  ///< Resize policies

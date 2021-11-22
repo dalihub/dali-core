@@ -26,6 +26,7 @@
 
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/actor-relayouter.h>
+#include <dali/internal/event/actors/actor-sizer.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/update/nodes/node-declarations.h>
 #include <dali/internal/update/nodes/node-messages.h>
@@ -423,30 +424,30 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
 
     case Dali::Actor::Property::WIDTH_RESIZE_POLICY:
     {
-      ResizePolicy::Type type = actor.GetResizePolicy(Dimension::WIDTH);
+      ResizePolicy::Type type = actor.mSizer.GetResizePolicy(Dimension::WIDTH);
       if(Scripting::GetEnumerationProperty<ResizePolicy::Type>(property, RESIZE_POLICY_TABLE, RESIZE_POLICY_TABLE_COUNT, type))
       {
-        actor.SetResizePolicy(type, Dimension::WIDTH);
+        actor.mSizer.SetResizePolicy(type, Dimension::WIDTH);
       }
       break;
     }
 
     case Dali::Actor::Property::HEIGHT_RESIZE_POLICY:
     {
-      ResizePolicy::Type type = actor.GetResizePolicy(Dimension::HEIGHT);
+      ResizePolicy::Type type = actor.mSizer.GetResizePolicy(Dimension::HEIGHT);
       if(Scripting::GetEnumerationProperty<ResizePolicy::Type>(property, RESIZE_POLICY_TABLE, RESIZE_POLICY_TABLE_COUNT, type))
       {
-        actor.SetResizePolicy(type, Dimension::HEIGHT);
+        actor.mSizer.SetResizePolicy(type, Dimension::HEIGHT);
       }
       break;
     }
 
     case Dali::Actor::Property::SIZE_SCALE_POLICY:
     {
-      SizeScalePolicy::Type type = actor.GetSizeScalePolicy();
+      SizeScalePolicy::Type type = actor.mSizer.GetSizeScalePolicy();
       if(Scripting::GetEnumerationProperty<SizeScalePolicy::Type>(property, SIZE_SCALE_POLICY_TABLE, SIZE_SCALE_POLICY_TABLE_COUNT, type))
       {
-        actor.SetSizeScalePolicy(type);
+        actor.mSizer.SetSizeScalePolicy(type);
       }
       break;
     }
@@ -455,7 +456,7 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
     {
       if(property.Get<bool>())
       {
-        actor.SetResizePolicy(ResizePolicy::DIMENSION_DEPENDENCY, Dimension::WIDTH);
+        actor.mSizer.SetResizePolicy(ResizePolicy::DIMENSION_DEPENDENCY, Dimension::WIDTH);
       }
       break;
     }
@@ -464,7 +465,7 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
     {
       if(property.Get<bool>())
       {
-        actor.SetResizePolicy(ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT);
+        actor.mSizer.SetResizePolicy(ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT);
       }
       break;
     }
@@ -797,68 +798,40 @@ void Actor::PropertyHandler::OnNotifyDefaultPropertyAnimation(Internal::Actor& a
       {
         case Dali::Actor::Property::SIZE:
         {
-          if(value.Get(actor.mTargetSize))
+          Vector3 targetSize;
+          if(value.Get(targetSize))
           {
-            actor.mAnimatedSize    = actor.mTargetSize;
-            actor.mUseAnimatedSize = AnimatedSizeFlag::WIDTH | AnimatedSizeFlag::HEIGHT | AnimatedSizeFlag::DEPTH;
-
-            if(actor.mRelayoutData && !actor.mRelayoutData->relayoutRequested)
-            {
-              actor.mRelayoutData->preferredSize.width  = actor.mAnimatedSize.width;
-              actor.mRelayoutData->preferredSize.height = actor.mAnimatedSize.height;
-            }
-
-            // Notify deriving classes
-            actor.OnSizeAnimation(animation, actor.mTargetSize);
+            actor.mSizer.OnAnimateSize(animation, targetSize, false);
           }
           break;
         }
 
         case Dali::Actor::Property::SIZE_WIDTH:
         {
-          if(value.Get(actor.mTargetSize.width))
+          float width;
+          if(value.Get(width))
           {
-            actor.mAnimatedSize.width = actor.mTargetSize.width;
-            actor.mUseAnimatedSize |= AnimatedSizeFlag::WIDTH;
-
-            if(actor.mRelayoutData && !actor.mRelayoutData->relayoutRequested)
-            {
-              actor.mRelayoutData->preferredSize.width = actor.mAnimatedSize.width;
-            }
-
-            // Notify deriving classes
-            actor.OnSizeAnimation(animation, actor.mTargetSize);
+            actor.mSizer.OnAnimateWidth(animation, width, false);
           }
           break;
         }
 
         case Dali::Actor::Property::SIZE_HEIGHT:
         {
-          if(value.Get(actor.mTargetSize.height))
+          float height;
+          if(value.Get(height))
           {
-            actor.mAnimatedSize.height = actor.mTargetSize.height;
-            actor.mUseAnimatedSize |= AnimatedSizeFlag::HEIGHT;
-
-            if(actor.mRelayoutData && !actor.mRelayoutData->relayoutRequested)
-            {
-              actor.mRelayoutData->preferredSize.height = actor.mAnimatedSize.height;
-            }
-
-            // Notify deriving classes
-            actor.OnSizeAnimation(animation, actor.mTargetSize);
+            actor.mSizer.OnAnimateHeight(animation, height, false);
           }
           break;
         }
 
         case Dali::Actor::Property::SIZE_DEPTH:
         {
-          if(value.Get(actor.mTargetSize.depth))
+          float depth;
+          if(value.Get(depth))
           {
-            actor.mAnimatedSize.depth = actor.mTargetSize.depth;
-            actor.mUseAnimatedSize |= AnimatedSizeFlag::DEPTH;
-
-            // Notify deriving classes
-            actor.OnSizeAnimation(animation, actor.mTargetSize);
+            actor.mSizer.OnAnimateDepth(animation, depth, false);
           }
           break;
         }
@@ -969,68 +942,40 @@ void Actor::PropertyHandler::OnNotifyDefaultPropertyAnimation(Internal::Actor& a
       {
         case Dali::Actor::Property::SIZE:
         {
-          if(AdjustValue<Vector3>(actor.mTargetSize, value))
+          Vector3 targetSize;
+          if(value.Get(targetSize))
           {
-            actor.mAnimatedSize    = actor.mTargetSize;
-            actor.mUseAnimatedSize = AnimatedSizeFlag::WIDTH | AnimatedSizeFlag::HEIGHT | AnimatedSizeFlag::DEPTH;
-
-            if(actor.mRelayoutData && !actor.mRelayoutData->relayoutRequested)
-            {
-              actor.mRelayoutData->preferredSize.width  = actor.mAnimatedSize.width;
-              actor.mRelayoutData->preferredSize.height = actor.mAnimatedSize.height;
-            }
-
-            // Notify deriving classes
-            actor.OnSizeAnimation(animation, actor.mTargetSize);
+            actor.mSizer.OnAnimateSize(animation, targetSize, true);
           }
           break;
         }
 
         case Dali::Actor::Property::SIZE_WIDTH:
         {
-          if(AdjustValue<float>(actor.mTargetSize.width, value))
+          float width;
+          if(value.Get(width))
           {
-            actor.mAnimatedSize.width = actor.mTargetSize.width;
-            actor.mUseAnimatedSize |= AnimatedSizeFlag::WIDTH;
-
-            if(actor.mRelayoutData && !actor.mRelayoutData->relayoutRequested)
-            {
-              actor.mRelayoutData->preferredSize.width = actor.mAnimatedSize.width;
-            }
-
-            // Notify deriving classes
-            actor.OnSizeAnimation(animation, actor.mTargetSize);
+            actor.mSizer.OnAnimateWidth(animation, width, true);
           }
           break;
         }
 
         case Dali::Actor::Property::SIZE_HEIGHT:
         {
-          if(AdjustValue<float>(actor.mTargetSize.height, value))
+          float height;
+          if(value.Get(height))
           {
-            actor.mAnimatedSize.height = actor.mTargetSize.height;
-            actor.mUseAnimatedSize |= AnimatedSizeFlag::HEIGHT;
-
-            if(actor.mRelayoutData && !actor.mRelayoutData->relayoutRequested)
-            {
-              actor.mRelayoutData->preferredSize.height = actor.mAnimatedSize.height;
-            }
-
-            // Notify deriving classes
-            actor.OnSizeAnimation(animation, actor.mTargetSize);
+            actor.mSizer.OnAnimateHeight(animation, height, true);
           }
           break;
         }
 
         case Dali::Actor::Property::SIZE_DEPTH:
         {
-          if(AdjustValue<float>(actor.mTargetSize.depth, value))
+          float depth;
+          if(value.Get(depth))
           {
-            actor.mAnimatedSize.depth = actor.mTargetSize.depth;
-            actor.mUseAnimatedSize |= AnimatedSizeFlag::DEPTH;
-
-            // Notify deriving classes
-            actor.OnSizeAnimation(animation, actor.mTargetSize);
+            actor.mSizer.OnAnimateDepth(animation, depth, true);
           }
           break;
         }
@@ -1553,31 +1498,31 @@ bool Actor::PropertyHandler::GetCachedPropertyValue(const Internal::Actor& actor
 
     case Dali::Actor::Property::WIDTH_RESIZE_POLICY:
     {
-      value = Scripting::GetLinearEnumerationName<ResizePolicy::Type>(actor.GetResizePolicy(Dimension::WIDTH), RESIZE_POLICY_TABLE, RESIZE_POLICY_TABLE_COUNT);
+      value = Scripting::GetLinearEnumerationName<ResizePolicy::Type>(actor.mSizer.GetResizePolicy(Dimension::WIDTH), RESIZE_POLICY_TABLE, RESIZE_POLICY_TABLE_COUNT);
       break;
     }
 
     case Dali::Actor::Property::HEIGHT_RESIZE_POLICY:
     {
-      value = Scripting::GetLinearEnumerationName<ResizePolicy::Type>(actor.GetResizePolicy(Dimension::HEIGHT), RESIZE_POLICY_TABLE, RESIZE_POLICY_TABLE_COUNT);
+      value = Scripting::GetLinearEnumerationName<ResizePolicy::Type>(actor.mSizer.GetResizePolicy(Dimension::HEIGHT), RESIZE_POLICY_TABLE, RESIZE_POLICY_TABLE_COUNT);
       break;
     }
 
     case Dali::Actor::Property::SIZE_SCALE_POLICY:
     {
-      value = actor.GetSizeScalePolicy();
+      value = actor.mSizer.GetSizeScalePolicy();
       break;
     }
 
     case Dali::Actor::Property::WIDTH_FOR_HEIGHT:
     {
-      value = (actor.GetResizePolicy(Dimension::WIDTH) == ResizePolicy::DIMENSION_DEPENDENCY) && (actor.GetDimensionDependency(Dimension::WIDTH) == Dimension::HEIGHT);
+      value = (actor.mSizer.GetResizePolicy(Dimension::WIDTH) == ResizePolicy::DIMENSION_DEPENDENCY) && (actor.mSizer.GetDimensionDependency(Dimension::WIDTH) == Dimension::HEIGHT);
       break;
     }
 
     case Dali::Actor::Property::HEIGHT_FOR_WIDTH:
     {
-      value = (actor.GetResizePolicy(Dimension::HEIGHT) == ResizePolicy::DIMENSION_DEPENDENCY) && (actor.GetDimensionDependency(Dimension::HEIGHT) == Dimension::WIDTH);
+      value = (actor.mSizer.GetResizePolicy(Dimension::HEIGHT) == ResizePolicy::DIMENSION_DEPENDENCY) && (actor.mSizer.GetDimensionDependency(Dimension::HEIGHT) == Dimension::WIDTH);
       break;
     }
 

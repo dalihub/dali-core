@@ -786,7 +786,11 @@ public:
    */
   void SetDepthIndex(uint32_t depthIndex)
   {
-    mDepthIndex = depthIndex;
+    if(depthIndex != mDepthIndex)
+    {
+      SetDirtyFlag(NodePropertyFlags::DEPTH_INDEX);
+      mDepthIndex = depthIndex;
+    }
   }
 
   /**

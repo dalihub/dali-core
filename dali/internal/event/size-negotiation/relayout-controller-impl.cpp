@@ -444,11 +444,7 @@ void RelayoutController::Relayout()
 
           // 3. Negotiate the size with the current actor. Pass it an empty container which the actor
           //    has to fill with all the actors it has not done any size negotiation for.
-
           actorImpl.NegotiateSize(size, *mRelayoutStack);
-
-          // Reset the flag so that size negotiation will respect the actor's original resize policy
-          actorImpl.SetUseAssignedSize(false);
         }
       }
 
