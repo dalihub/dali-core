@@ -49,7 +49,12 @@ int UtcDaliActorSizer_CalculateSize(void)
   auto& actorImpl     = GetImplementation(actor);
 
   DALI_TEST_EQUALS(testActorImpl.IsRelayoutEnabled(), false, TEST_LOCATION);
-  DALI_TEST_CHECK(true);
+
+  // Check default relayout dependent without any relayout setup.
+  // Dali::ResizePolicy::DEFAULT is Dali::ResizePolicy::USE_NATURAL_SIZE and in this case,
+  // RelayoutDependentOnChildren should be 'true'. and RelayoutDependentOnParent should be 'false'.
+  DALI_TEST_EQUALS(actorImpl.RelayoutDependentOnParent(Dimension::ALL_DIMENSIONS), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(testActorImpl.RelayoutDependentOnChildren(Dimension::ALL_DIMENSIONS), true, TEST_LOCATION);
 
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   actor[Dali::Actor::Property::SIZE] = Vector2(150.0f, 100.0f); // Should automatically set preferred size
