@@ -287,42 +287,6 @@ void ActorSizer::Relayouter::SetResizePolicy(ResizePolicy::Type policy, Dimensio
   }
 }
 
-bool ActorSizer::Relayouter::GetRelayoutDependentOnParent(Dimension::Type dimension)
-{
-  // Check if actor is dependent on parent
-  for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
-  {
-    if((dimension & (1 << i)))
-    {
-      const ResizePolicy::Type resizePolicy = GetResizePolicy(static_cast<Dimension::Type>(1 << i));
-      if(resizePolicy == ResizePolicy::FILL_TO_PARENT || resizePolicy == ResizePolicy::SIZE_RELATIVE_TO_PARENT || resizePolicy == ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT)
-      {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
-bool ActorSizer::Relayouter::GetRelayoutDependentOnChildren(Dimension::Type dimension)
-{
-  // Check if actor is dependent on children
-  for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
-  {
-    if((dimension & (1 << i)))
-    {
-      const ResizePolicy::Type resizePolicy = GetResizePolicy(static_cast<Dimension::Type>(1 << i));
-      if(resizePolicy == ResizePolicy::FIT_TO_CHILDREN || resizePolicy == ResizePolicy::USE_NATURAL_SIZE)
-      {
-        return true;
-      }
-      break;
-    }
-  }
-
-  return false;
-}
-
 bool ActorSizer::Relayouter::GetRelayoutDependentOnDimension(Dimension::Type dimension, Dimension::Type dependency)
 {
   // Check each possible dimension and see if it is dependent on the input one

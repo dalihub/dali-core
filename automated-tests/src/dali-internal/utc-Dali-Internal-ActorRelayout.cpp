@@ -50,10 +50,10 @@ int UtcDaliActorSizer_CalculateSize(void)
 
   DALI_TEST_EQUALS(testActorImpl.IsRelayoutEnabled(), false, TEST_LOCATION);
 
-  // Check default relayout dependent without any relayout setup.
-  // Dali::ResizePolicy::DEFAULT is Dali::ResizePolicy::USE_NATURAL_SIZE and in this case,
-  // RelayoutDependentOnChildren should be 'true'. and RelayoutDependentOnParent should be 'false'.
+  // With no relayouting, there are no default dependencies
   DALI_TEST_EQUALS(actorImpl.RelayoutDependentOnParent(Dimension::ALL_DIMENSIONS), false, TEST_LOCATION);
+
+  // But, current broken behaviour is to depend on children. Retain this behaviour for now.
   DALI_TEST_EQUALS(testActorImpl.RelayoutDependentOnChildren(Dimension::ALL_DIMENSIONS), true, TEST_LOCATION);
 
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
