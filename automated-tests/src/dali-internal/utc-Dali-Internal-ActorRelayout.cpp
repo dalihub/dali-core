@@ -49,7 +49,12 @@ int UtcDaliActorSizer_CalculateSize(void)
   auto& actorImpl     = GetImplementation(actor);
 
   DALI_TEST_EQUALS(testActorImpl.IsRelayoutEnabled(), false, TEST_LOCATION);
-  DALI_TEST_CHECK(true);
+
+  // With no relayouting, there are no default dependencies
+  DALI_TEST_EQUALS(actorImpl.RelayoutDependentOnParent(Dimension::ALL_DIMENSIONS), false, TEST_LOCATION);
+
+  // But, current broken behaviour is to depend on children. Retain this behaviour for now.
+  DALI_TEST_EQUALS(testActorImpl.RelayoutDependentOnChildren(Dimension::ALL_DIMENSIONS), true, TEST_LOCATION);
 
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   actor[Dali::Actor::Property::SIZE] = Vector2(150.0f, 100.0f); // Should automatically set preferred size

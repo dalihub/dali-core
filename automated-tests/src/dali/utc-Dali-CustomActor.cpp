@@ -1183,18 +1183,56 @@ int UtcDaliCustomActorImplCalculateChildSizeBase(void)
 int UtcDaliCustomActorImplRelayoutDependentOnChildrenBase(void)
 {
   TestApplication       application;
-  Test::TestCustomActor custom = Test::TestCustomActor::NewNegoSize();
-  custom.SetResizePolicy(Dali::ResizePolicy::FIT_TO_CHILDREN, Dali::Dimension::ALL_DIMENSIONS);
+  Test::TestCustomActor customNego    = Test::TestCustomActor::NewNegoSize();
+  Test::TestCustomActor customNotNego = Test::TestCustomActor::New();
 
-  bool v = custom.TestRelayoutDependentOnChildrenBase(Dali::Dimension::ALL_DIMENSIONS);
+  // A custom actor with default flags has relayouting enabled on initialization,
+  // and the default resize policy is USE_NATURAL_SIZE.
+  bool v = customNego.TestRelayoutDependentOnChildrenBase(Dali::Dimension::ALL_DIMENSIONS);
+  DALI_TEST_CHECK(v == true);
+
+  // A custom actor with size negotiation explicitly switched off has no relayouting,
+  // and will not have any relayout dependencies. However, default resize policy when
+  // there is no relayouting is to return USE_NATURAL_SIZE, so this will actually return true,
+  // and is consistent.
+  v = customNotNego.TestRelayoutDependentOnChildrenBase(Dali::Dimension::ALL_DIMENSIONS);
+  DALI_TEST_CHECK(v == true);
+
+  customNego.SetResizePolicy(Dali::ResizePolicy::FIT_TO_CHILDREN, Dali::Dimension::ALL_DIMENSIONS);
+  customNotNego.SetResizePolicy(Dali::ResizePolicy::FIT_TO_CHILDREN, Dali::Dimension::ALL_DIMENSIONS);
+
+  v = customNego.TestRelayoutDependentOnChildrenBase(Dali::Dimension::ALL_DIMENSIONS);
+  DALI_TEST_CHECK(v == true);
+  v = customNotNego.TestRelayoutDependentOnChildrenBase(Dali::Dimension::ALL_DIMENSIONS);
   DALI_TEST_CHECK(v == true);
 
   application.SendNotification();
   application.Render();
 
-  custom.SetResizePolicy(Dali::ResizePolicy::FIXED, Dali::Dimension::ALL_DIMENSIONS);
-  v = custom.TestRelayoutDependentOnChildrenBase(Dali::Dimension::WIDTH);
+  customNego.SetResizePolicy(Dali::ResizePolicy::FIXED, Dali::Dimension::ALL_DIMENSIONS);
+  customNotNego.SetResizePolicy(Dali::ResizePolicy::FIXED, Dali::Dimension::ALL_DIMENSIONS);
+  v = customNego.TestRelayoutDependentOnChildrenBase(Dali::Dimension::WIDTH);
   DALI_TEST_CHECK(v == false);
+  v = customNego.TestRelayoutDependentOnChildrenBase(Dali::Dimension::HEIGHT);
+  DALI_TEST_CHECK(v == false);
+  v = customNotNego.TestRelayoutDependentOnChildrenBase(Dali::Dimension::WIDTH);
+  DALI_TEST_CHECK(v == false);
+  v = customNotNego.TestRelayoutDependentOnChildrenBase(Dali::Dimension::HEIGHT);
+  DALI_TEST_CHECK(v == false);
+
+  application.SendNotification();
+  application.Render();
+
+  customNego.SetResizePolicy(Dali::ResizePolicy::USE_NATURAL_SIZE, Dali::Dimension::WIDTH);
+  customNotNego.SetResizePolicy(Dali::ResizePolicy::USE_NATURAL_SIZE, Dali::Dimension::HEIGHT);
+  v = customNego.TestRelayoutDependentOnChildrenBase(Dali::Dimension::WIDTH);
+  DALI_TEST_CHECK(v == true);
+  v = customNego.TestRelayoutDependentOnChildrenBase(Dali::Dimension::HEIGHT);
+  DALI_TEST_CHECK(v == false);
+  v = customNotNego.TestRelayoutDependentOnChildrenBase(Dali::Dimension::WIDTH);
+  DALI_TEST_CHECK(v == false);
+  v = customNotNego.TestRelayoutDependentOnChildrenBase(Dali::Dimension::HEIGHT);
+  DALI_TEST_CHECK(v == true);
 
   END_TEST;
 }
