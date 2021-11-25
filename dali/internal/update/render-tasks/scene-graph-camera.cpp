@@ -609,7 +609,7 @@ uint32_t Camera::UpdateProjection(BufferIndex updateBufferIndex)
       // The projection matrix was updated in the previous frame; copy it
       mProjectionMatrix.CopyPrevious(updateBufferIndex);
 
-      finalProjection = mProjectionMatrix[updateBufferIndex];
+      finalProjection = mFinalProjection[updateBufferIndex ? 0 : 1];
     }
     else // UPDATE_COUNT == mUpdateProjectionFlag
     {
