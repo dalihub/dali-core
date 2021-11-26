@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_SCENE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/render/common/render-instruction-container.h>
+#include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/public-api/common/vector-wrapper.h>
 
 namespace Dali
@@ -256,6 +257,26 @@ public:
   }
 
   /**
+   * @brief Set a root of the Scene
+   *
+   * @param layer The root layer
+   */
+  void SetRoot(SceneGraph::Layer* layer)
+  {
+    mRoot = layer;
+  }
+
+  /**
+   * @brief Get a root of the Scene
+   *
+   * @return The root layer
+   */
+  SceneGraph::Layer* GetRoot() const
+  {
+    return mRoot;
+  }
+
+  /**
    * @brief Get ItemsDirtyRects
    *
    * @return the ItemsDirtyRects
@@ -292,6 +313,8 @@ private:
   Graphics::UniquePtr<Graphics::RenderPass>   mRenderPass{nullptr};        ///< The render pass created to render the surface
   Graphics::UniquePtr<Graphics::RenderPass>   mRenderPassNoClear{nullptr}; ///< The render pass created to render the surface without clearing color
   Graphics::UniquePtr<Graphics::RenderTarget> mRenderTarget{nullptr};      ///< This is created in Update/Render thread when surface is created/resized/replaced
+
+  SceneGraph::Layer* mRoot{nullptr}; ///< Root node
 
   std::vector<Graphics::ClearValue>                  mClearValues{};     ///< Clear colors
   std::vector<Dali::Internal::SceneGraph::DirtyRect> mItemsDirtyRects{}; ///< Dirty rect list

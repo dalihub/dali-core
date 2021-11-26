@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -480,7 +480,11 @@ void UpdateManager::RemoveRenderTaskList(RenderTaskList* taskList)
 
 void UpdateManager::AddScene(OwnerPointer<Scene>& scene)
 {
-  mImpl->scenes.back()->scene = scene.Release();
+  auto& sceneInfo  = mImpl->scenes.back();
+  sceneInfo->scene = scene.Release();
+
+  // Set root to the Scene
+  sceneInfo->scene->SetRoot(sceneInfo->root);
 
   // Initialize the context from render manager
   typedef MessageValue1<RenderManager, SceneGraph::Scene*> DerivedType;
@@ -489,7 +493,7 @@ void UpdateManager::AddScene(OwnerPointer<Scene>& scene)
   uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot(mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof(DerivedType));
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
-  SceneGraph::Scene& sceneObject = *mImpl->scenes.back()->scene;
+  SceneGraph::Scene& sceneObject = *sceneInfo->scene;
   new(slot) DerivedType(&mImpl->renderManager, &RenderManager::InitializeScene, &sceneObject);
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -672,13 +672,6 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
               }
             }
           }
-
-          // Reset updated flag from the root
-          Layer* sourceLayer = renderList->GetSourceLayer();
-          if(sourceLayer)
-          {
-            sourceLayer->SetUpdatedTree(false);
-          }
         }
       }
     }
@@ -703,6 +696,13 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
 
   itemsDirtyRects.resize(j - itemsDirtyRects.begin());
   damagedRectCleaner.SetCleanOnReturn(false);
+
+  // Reset updated flag from the root
+  Layer* root = sceneObject->GetRoot();
+  if(root)
+  {
+    root->SetUpdatedTree(false);
+  }
 }
 
 void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo)
