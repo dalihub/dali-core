@@ -482,6 +482,9 @@ void UpdateManager::AddScene(OwnerPointer<Scene>& scene)
 {
   mImpl->scenes.back()->scene = scene.Release();
 
+  // Set root to the Scene
+  mImpl->scenes.back()->scene->SetRoot(mImpl->scenes.back()->root);
+
   // Initialize the context from render manager
   typedef MessageValue1<RenderManager, SceneGraph::Scene*> DerivedType;
 

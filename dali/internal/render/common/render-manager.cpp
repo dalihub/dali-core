@@ -675,13 +675,6 @@ void RenderManager::PreRender(Integration::RenderStatus& status, Integration::Sc
               }
             }
           }
-
-          // Reset updated flag from the root
-          Layer* sourceLayer = renderList->GetSourceLayer();
-          if(sourceLayer)
-          {
-            sourceLayer->SetUpdatedTree(false);
-          }
         }
       }
     }
@@ -706,6 +699,13 @@ void RenderManager::PreRender(Integration::RenderStatus& status, Integration::Sc
 
   itemsDirtyRects.resize(j - itemsDirtyRects.begin());
   damagedRectCleaner.SetCleanOnReturn(false);
+
+  // Reset updated flag from the root
+  Layer* root = sceneObject->GetRoot();
+  if(root)
+  {
+    root->SetUpdatedTree(false);
+  }
 }
 
 void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo)

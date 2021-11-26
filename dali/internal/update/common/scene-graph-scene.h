@@ -24,6 +24,7 @@
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/render/common/render-instruction-container.h>
+#include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/public-api/common/vector-wrapper.h>
 
 namespace Dali
@@ -213,6 +214,25 @@ public:
     return mClearValues;
   }
 
+  /**
+   * @brief Set a root of the Scene
+   *
+   * @param layer The root layer
+   */
+  void SetRoot(SceneGraph::Layer* layer)
+  {
+    mRoot = layer;
+  }
+
+  /**
+   * @brief Get a root of the Scene
+   * @return The root layer
+   */
+  SceneGraph::Layer* GetRoot() const
+  {
+    return mRoot;
+  }
+
 private:
   // Render instructions describe what should be rendered during RenderManager::RenderScene()
   // Update manager updates instructions for the next frame while we render the current one
@@ -224,9 +244,9 @@ private:
 
   bool mSkipRendering; ///< A flag to skip rendering
 
-  Rect<int32_t> mSurfaceRect;        ///< The rectangle of surface which is related ot this scene.
-  int32_t       mSurfaceOrientation; ///< The orientation of surface which is related of this scene
-  bool          mSurfaceRectChanged; ///< The flag of surface's rectangle is changed when is resized, moved or rotated.
+  Rect<int32_t> mSurfaceRect;                      ///< The rectangle of surface which is related ot this scene.
+  int32_t       mSurfaceOrientation;               ///< The orientation of surface which is related of this scene
+  bool          mSurfaceRectChanged;               ///< The flag of surface's rectangle is changed when is resized, moved or rotated.
   bool          mRotationCompletedAcknowledgement; ///< The flag of sending the acknowledgement to complete window rotation.
 
   // Render pass and render target
@@ -242,6 +262,8 @@ private:
 
   // clear colors
   std::vector<Graphics::ClearValue> mClearValues{};
+
+  SceneGraph::Layer* mRoot{nullptr}; ///< Root node (root is a layer). The layer is not stored in the node memory pool.
 };
 
 /// Messages
