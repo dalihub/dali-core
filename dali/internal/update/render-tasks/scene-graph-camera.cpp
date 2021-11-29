@@ -328,8 +328,8 @@ void Camera::SetReflectByPlane(const Vector4& plane)
 
 void Camera::RotateProjection(int rotationAngle)
 {
-  mProjectionRotation = rotationAngle;
-  mUpdateViewFlag     = UPDATE_COUNT;
+  mProjectionRotation   = rotationAngle;
+  mUpdateProjectionFlag = UPDATE_COUNT;
 }
 
 const Matrix& Camera::GetProjectionMatrix(BufferIndex bufferIndex) const
@@ -609,7 +609,7 @@ uint32_t Camera::UpdateProjection(BufferIndex updateBufferIndex)
       // The projection matrix was updated in the previous frame; copy it
       mProjectionMatrix.CopyPrevious(updateBufferIndex);
 
-      finalProjection = mProjectionMatrix[updateBufferIndex];
+      finalProjection = mFinalProjection[updateBufferIndex ? 0 : 1];
     }
     else // UPDATE_COUNT == mUpdateProjectionFlag
     {

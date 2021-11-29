@@ -707,7 +707,9 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
 
 void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo)
 {
-  Rect<int> clippingRect;
+  SceneGraph::Scene* sceneObject  = GetImplementation(scene).GetSceneObject();
+  Rect<int>          clippingRect = sceneObject->GetSurfaceRect();
+
   RenderScene(status, scene, renderToFbo, clippingRect);
 }
 
