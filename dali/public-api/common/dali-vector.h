@@ -555,11 +555,7 @@ public: // API
   const ItemType& operator[](SizeType index) const
   {
     DALI_ASSERT_VECTOR(VectorBase::mData && "Vector is empty");
-    if(index >= VectorBase::Count())
-    {
-      // Prevent accessing invalid index
-      index = 0;
-    }
+    DALI_ASSERT_VECTOR(index < VectorBase::Count() && "Index out of bounds");
     ItemType* address = reinterpret_cast<ItemType*>(VectorBase::mData);
     address += index;
     return *address;
