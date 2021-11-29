@@ -1850,7 +1850,6 @@ protected:
   bool                     mKeyboardFocusableChildren : 1; ///< Whether the children of this actor can be focusable by keyboard navigation.
   bool                     mTouchFocusable : 1;            ///< Whether the actor should be focusable by touch
   bool                     mOnSceneSignalled : 1;          ///< Set to true before OnSceneConnection signal is emitted, and false before OnSceneDisconnection
-  bool                     mInsideOnSizeSet : 1;           ///< Whether we are inside OnSizeSet
   bool                     mInheritPosition : 1;           ///< Cached: Whether the parent's position should be inherited.
   bool                     mInheritOrientation : 1;        ///< Cached: Whether the parent's orientation should be inherited.
   bool                     mInheritScale : 1;              ///< Cached: Whether the parent's scale should be inherited.

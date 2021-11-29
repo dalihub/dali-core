@@ -62,6 +62,7 @@ constexpr float GetDimensionValue(const Dali::Vector2& values, const Dali::Dimen
   }
   return 0.0f;
 }
+
 } // namespace
 
 namespace Dali::Internal
@@ -322,12 +323,54 @@ ActorSizer::Relayouter& ActorSizer::EnsureRelayouter()
 
 bool ActorSizer::RelayoutDependentOnParent(Dimension::Type dimension)
 {
-  return mRelayoutData && mRelayoutData->GetRelayoutDependentOnParent(dimension);
+  // If there is no relayouting, GetResizePolicy returns Default, which is USE_NATURAL_SIZE. This
+  // will keep the existing behaviour, and return false.
+
+  // Check if actor is dependent on parent
+  for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
+  {
+    if((dimension & (1 << i)))
+    {
+      const ResizePolicy::Type resizePolicy = GetResizePolicy(static_cast<Dimension::Type>(1 << i));
+      if(resizePolicy == ResizePolicy::FILL_TO_PARENT || resizePolicy == ResizePolicy::SIZE_RELATIVE_TO_PARENT || resizePolicy == ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT)
+      {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
 
 bool ActorSizer::RelayoutDependentOnChildrenBase(Dimension::Type dimension)
 {
-  return mRelayoutData && mRelayoutData->GetRelayoutDependentOnChildren(dimension);
+  // If there is no relayouting, GetResizePolicy returns Default, which is USE_NATURAL_SIZE.
+  // This means this will return true when there is no relayouting, but that seems
+  // counter-intuitive. Will keep current behaviour for now, as it is consistent.
+
+  // Check if actor is dependent on children
+  for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
+  {
+    if((dimension & (1 << i)))
+    {
+      const ResizePolicy::Type resizePolicy = GetResizePolicy(static_cast<Dimension::Type>(1 << i));
+      switch(resizePolicy)
+      {
+        case ResizePolicy::FIT_TO_CHILDREN:
+        case ResizePolicy::USE_NATURAL_SIZE: // i.e. For things that calculate their size based on children
+        {
+          return true;
+        }
+
+        default:
+        {
+          break;
+        }
+      }
+    }
+  }
+
+  return false;
 }
 
 bool ActorSizer::RelayoutDependentOnDimension(Dimension::Type dimension, Dimension::Type dependentDimension)

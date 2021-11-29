@@ -72,12 +72,6 @@ struct ActorSizer::Relayouter
   /// @copydoc Actor::SetResizePolicy
   void SetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension, Vector3& targetSize);
 
-  /// @copydoc Actor::GetRelayoutDependentOnParent
-  bool GetRelayoutDependentOnParent(Dimension::Type dimension);
-
-  /// @copydoc Actor::GetRelayoutDependentOnChildren
-  bool GetRelayoutDependentOnChildren(Dimension::Type dimension);
-
   /// @copydoc Actor::GetRelayoutDependentOnDimension
   bool GetRelayoutDependentOnDimension(Dimension::Type dimension, Dimension::Type dependency);
 
