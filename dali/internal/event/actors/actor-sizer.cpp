@@ -62,20 +62,6 @@ constexpr float GetDimensionValue(const Dali::Vector2& values, const Dali::Dimen
   }
   return 0.0f;
 }
-
-/**
- * @brief Default relayout dependent on parent when relayout is not setuped before.
- */
-static constexpr bool DEFAULT_RELAYOUT_DEPENDENT_ON_PARENT = ((Dali::ResizePolicy::DEFAULT == Dali::ResizePolicy::FILL_TO_PARENT) ||
-                                                              (Dali::ResizePolicy::DEFAULT == Dali::ResizePolicy::SIZE_RELATIVE_TO_PARENT) ||
-                                                              (Dali::ResizePolicy::DEFAULT == Dali::ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT));
-
-/**
- * @brief Default relayout dependent on child when relayout is not setuped before.
- */
-static constexpr bool DEFAULT_RELAYOUT_DEPENDENT_ON_CHILD = ((Dali::ResizePolicy::DEFAULT == Dali::ResizePolicy::FIT_TO_CHILDREN) ||
-                                                             (Dali::ResizePolicy::DEFAULT == Dali::ResizePolicy::USE_NATURAL_SIZE));
-
 } // namespace
 
 namespace Dali::Internal
@@ -336,12 +322,12 @@ ActorSizer::Relayouter& ActorSizer::EnsureRelayouter()
 
 bool ActorSizer::RelayoutDependentOnParent(Dimension::Type dimension)
 {
-  return mRelayoutData ? mRelayoutData->GetRelayoutDependentOnParent(dimension) : DEFAULT_RELAYOUT_DEPENDENT_ON_PARENT;
+  return mRelayoutData && mRelayoutData->GetRelayoutDependentOnParent(dimension);
 }
 
 bool ActorSizer::RelayoutDependentOnChildrenBase(Dimension::Type dimension)
 {
-  return mRelayoutData ? mRelayoutData->GetRelayoutDependentOnChildren(dimension) : DEFAULT_RELAYOUT_DEPENDENT_ON_CHILD;
+  return mRelayoutData && mRelayoutData->GetRelayoutDependentOnChildren(dimension);
 }
 
 bool ActorSizer::RelayoutDependentOnDimension(Dimension::Type dimension, Dimension::Type dependentDimension)
