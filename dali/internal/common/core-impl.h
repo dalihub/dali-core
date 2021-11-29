@@ -135,7 +135,7 @@ public:
   /**
    * @copydoc Dali::Integration::Core::PreRender()
    */
-  void PreRender(Integration::Scene& scene, std::vector<Rect<int>>& damagedRects);
+  void PreRender(Integration::RenderStatus& status, Integration::Scene& scene, std::vector<Rect<int>>& damagedRects);
 
   /**
    * @copydoc Dali::Integration::Core::RenderScene()
