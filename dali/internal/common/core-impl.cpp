@@ -211,9 +211,9 @@ void Core::PreRender(RenderStatus& status, bool forceClear, bool uploadOnly)
   mRenderManager->PreRender(status, forceClear, uploadOnly);
 }
 
-void Core::PreRender(RenderStatus& status, Integration::Scene& scene, std::vector<Rect<int>>& damagedRects)
+void Core::PreRender(Integration::Scene& scene, std::vector<Rect<int>>& damagedRects)
 {
-  mRenderManager->PreRender(status, scene, damagedRects);
+  mRenderManager->PreRender(scene, damagedRects);
 }
 
 void Core::RenderScene(RenderStatus& status, Integration::Scene& scene, bool renderToFbo)

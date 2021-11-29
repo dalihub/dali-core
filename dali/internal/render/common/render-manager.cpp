@@ -466,7 +466,7 @@ void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear
   }
 }
 
-void RenderManager::PreRender(Integration::RenderStatus& status, Integration::Scene& scene, std::vector<Rect<int>>& damagedRects)
+void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>& damagedRects)
 {
   if(mImpl->partialUpdateAvailable != Integration::PartialUpdateAvailable::TRUE)
   {
@@ -479,11 +479,8 @@ void RenderManager::PreRender(Integration::RenderStatus& status, Integration::Sc
   if(sceneObject->IsRenderingSkipped())
   {
     // We don't need to calculate dirty rects
-    status.SetNeedsUpdate(false);
     return;
   }
-
-  status.SetNeedsUpdate(true);
 
   class DamagedRectsCleaner
   {
