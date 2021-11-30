@@ -292,6 +292,13 @@ inline void AddRendererToRenderList(BufferIndex         updateBufferIndex,
       item.mIsUpdated = partialRenderingData.IsUpdated() || item.mIsUpdated;
       partialRenderingData.SwapBuffers();
     }
+    else
+    {
+      // Mark as invisible
+      auto& partialRenderingData    = node->GetPartialRenderingData();
+      partialRenderingData.mVisible = false;
+    }
+
     node->SetCulled(updateBufferIndex, false);
   }
   else
