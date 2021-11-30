@@ -290,19 +290,26 @@ inline void AddRendererToRenderList(BufferIndex         updateBufferIndex,
       partialRenderingCacheInfo.updatedSize = item.mUpdateSize;
 
       item.mIsUpdated = partialRenderingData.IsUpdated() || item.mIsUpdated;
+
+      partialRenderingData.mRendered = true;
+
       partialRenderingData.SwapBuffers();
     }
     else
     {
-      // Mark as invisible
-      auto& partialRenderingData    = node->GetPartialRenderingData();
-      partialRenderingData.mVisible = false;
+      // Mark as not rendered
+      auto& partialRenderingData     = node->GetPartialRenderingData();
+      partialRenderingData.mRendered = false;
     }
 
     node->SetCulled(updateBufferIndex, false);
   }
   else
   {
+    // Mark as not rendered
+    auto& partialRenderingData     = node->GetPartialRenderingData();
+    partialRenderingData.mRendered = false;
+
     node->SetCulled(updateBufferIndex, true);
   }
 }
