@@ -242,7 +242,7 @@ inline void AddRendererToRenderList(BufferIndex         updateBufferIndex,
       partialRenderingCacheInfo.color      = node->GetColor(updateBufferIndex);
       partialRenderingCacheInfo.depthIndex = node->GetDepthIndex();
 
-      if(renderable.mRenderer)
+      if(DALI_LIKELY(renderable.mRenderer))
       {
         partialRenderingCacheInfo.textureSet = renderable.mRenderer->GetTextureSet();
       }
@@ -362,9 +362,15 @@ inline bool TryReuseCachedRenderers(Layer&               layer,
     size_t checkSumOld = 0;
     for(uint32_t index = 0; index < renderableCount; ++index)
     {
-      const Render::Renderer& renderer = renderables[index].mRenderer->GetRenderer();
-      checkSumNew += reinterpret_cast<std::size_t>(&renderer);
-      checkSumOld += reinterpret_cast<std::size_t>(&renderList.GetRenderer(index));
+      if(DALI_LIKELY(renderables[index].mRenderer))
+      {
+        const Render::Renderer& renderer = renderables[index].mRenderer->GetRenderer();
+        checkSumNew += reinterpret_cast<std::size_t>(&renderer);
+      }
+      if(DALI_LIKELY(renderList.GetItem(index).mRenderer))
+      {
+        checkSumOld += reinterpret_cast<std::size_t>(&renderList.GetRenderer(index));
+      }
     }
     if(checkSumNew == checkSumOld)
     {
@@ -433,7 +439,7 @@ inline void RenderInstructionProcessor::SortRenderItems(BufferIndex bufferIndex,
     {
       RenderItem& item = renderList.GetItem(index);
 
-      if(item.mRenderer)
+      if(DALI_LIKELY(item.mRenderer))
       {
         item.mRenderer->SetSortAttributes(mSortingHelper[index]);
       }
@@ -455,7 +461,10 @@ inline void RenderInstructionProcessor::SortRenderItems(BufferIndex bufferIndex,
     {
       RenderItem& item = renderList.GetItem(index);
 
-      item.mRenderer->SetSortAttributes(mSortingHelper[index]);
+      if(DALI_LIKELY(item.mRenderer))
+      {
+        item.mRenderer->SetSortAttributes(mSortingHelper[index]);
+      }
 
       // texture set
       mSortingHelper[index].textureSet = item.mTextureSet;
