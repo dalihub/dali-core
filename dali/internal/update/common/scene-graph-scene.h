@@ -31,9 +31,62 @@ namespace Dali
 {
 namespace Internal
 {
+namespace Render
+{
+class Renderer;
+}
+
 namespace SceneGraph
 {
 class RenderInstructionContainer;
+class Node;
+
+struct DirtyRect
+{
+  DirtyRect(Node* node, Render::Renderer* renderer, int32_t frame, Rect<int>& rect)
+  : node(node),
+    renderer(renderer),
+    frame(frame),
+    rect(rect),
+    visited(true)
+  {
+  }
+
+  DirtyRect()
+  : node(nullptr),
+    renderer(nullptr),
+    frame(0),
+    rect(),
+    visited(true)
+  {
+  }
+
+  bool operator<(const DirtyRect& rhs) const
+  {
+    if(node == rhs.node)
+    {
+      if(renderer == rhs.renderer)
+      {
+        return frame > rhs.frame; // Most recent rects come first
+      }
+      else
+      {
+        return renderer < rhs.renderer;
+      }
+    }
+    else
+    {
+      return node < rhs.node;
+    }
+  }
+
+  Node*             node;
+  Render::Renderer* renderer;
+  int32_t           frame;
+
+  Rect<int32_t> rect;
+  bool          visited;
+};
 
 class Scene
 {
@@ -233,6 +286,13 @@ public:
     return mRoot;
   }
 
+  /**
+   * @brief Get ItemsDirtyRects
+   *
+   * @return the ItemsDirtyRects
+   */
+  std::vector<DirtyRect>& GetItemsDirtyRects();
+
 private:
   // Render instructions describe what should be rendered during RenderManager::RenderScene()
   // Update manager updates instructions for the next frame while we render the current one
@@ -260,8 +320,8 @@ private:
   Graphics::UniquePtr<Graphics::RenderPass> mRenderPassNoClear{nullptr}; ///< The render pass created to render the surface without clearing color
   Graphics::RenderTarget*                   mRenderTarget{nullptr};      ///< This is created in the event thread when surface is created/resized/replaced
 
-  // clear colors
-  std::vector<Graphics::ClearValue> mClearValues{};
+  std::vector<Graphics::ClearValue>                  mClearValues{};     ///< Clear colors
+  std::vector<Dali::Internal::SceneGraph::DirtyRect> mItemsDirtyRects{}; ///< Dirty rect list
 
   SceneGraph::Layer* mRoot{nullptr}; ///< Root node (root is a layer). The layer is not stored in the node memory pool.
 };

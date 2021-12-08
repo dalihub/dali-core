@@ -178,8 +178,13 @@ void Scene::SetRotationCompletedAcknowledgement()
 bool Scene::IsRotationCompletedAcknowledgementSet()
 {
   bool setRotationCompletedAcknowledgement = mRotationCompletedAcknowledgement;
-  mRotationCompletedAcknowledgement     = false;
+  mRotationCompletedAcknowledgement        = false;
   return setRotationCompletedAcknowledgement;
+}
+
+std::vector<DirtyRect>& Scene::GetItemsDirtyRects()
+{
+  return mItemsDirtyRects;
 }
 
 } // namespace SceneGraph
