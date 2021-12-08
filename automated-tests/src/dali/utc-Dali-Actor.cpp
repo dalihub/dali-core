@@ -8595,6 +8595,31 @@ int utcDaliActorPartialUpdateTwoActors(void)
   DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
   DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
 
+  // Change a Renderer of actor1
+  Geometry geometry    = CreateQuadGeometry();
+  Shader   shader      = CreateShader();
+  Renderer newRenderer = Renderer::New(geometry, shader);
+  Renderer renderer    = actor.GetRendererAt(0);
+
+  actor.RemoveRenderer(renderer);
+  actor.AddRenderer(newRenderer);
+
+  damagedRects.clear();
+
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::DEFAULT_RENDER_INTERVAL, nullptr, damagedRects);
+
+  DALI_TEST_CHECK(damagedRects.size() > 0);
+  DALI_TEST_EQUALS<Rect<int>>(Rect<int>(64, 672, 64, 64), damagedRects[0], TEST_LOCATION);
+
+  // in screen coordinates, adaptor would calculate it using previous frames information
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
   END_TEST;
 }
 

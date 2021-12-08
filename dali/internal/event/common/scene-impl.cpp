@@ -420,11 +420,6 @@ Integration::Scene::WheelEventSignalType& Scene::WheelEventSignal()
   return mWheelEventSignal;
 }
 
-std::vector<Dali::Internal::SceneGraph::DirtyRect>& Scene::GetItemsDirtyRects()
-{
-  return mItemsDirtyRects;
-}
-
 } // namespace Internal
 
 } // namespace Dali

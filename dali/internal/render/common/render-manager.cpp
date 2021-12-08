@@ -519,7 +519,7 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
 
   // Mark previous dirty rects in the sorted array. The array is already sorted by node and renderer, frame number.
   // so you don't need to sort: std::stable_sort(itemsDirtyRects.begin(), itemsDirtyRects.end());
-  std::vector<DirtyRect>& itemsDirtyRects = sceneInternal.GetItemsDirtyRects();
+  std::vector<DirtyRect>& itemsDirtyRects = sceneObject->GetItemsDirtyRects();
   for(DirtyRect& dirtyRect : itemsDirtyRects)
   {
     dirtyRect.visited = false;
