@@ -351,7 +351,7 @@ public:
    * @param[in] scene The scene to be rendered.
    * @param[out] damagedRects containing damaged render items rects for this pass.
    */
-  void PreRender(Integration::Scene& scene, std::vector<Rect<int>>& damagedRects);
+  void PreRender(RenderStatus& status, Integration::Scene& scene, std::vector<Rect<int>>& damagedRects);
 
   /**
    * Render a scene in the next frame. This method should be preceded by a call up PreRender.
