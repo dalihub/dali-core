@@ -337,7 +337,7 @@ public:
    * @param[in] scene The scene to be rendered.
    * @param[out] damagedRects The list of damaged rects for the current render pass.
    */
-  void PreRender(Integration::RenderStatus& status, Integration::Scene& scene, std::vector<Rect<int>>& damagedRects);
+  void PreRender(Integration::Scene& scene, std::vector<Rect<int>>& damagedRects);
 
   // This method should be called from Core::RenderScene()
 
