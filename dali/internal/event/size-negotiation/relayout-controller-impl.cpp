@@ -125,7 +125,15 @@ RelayoutController::~RelayoutController()
 
 RelayoutController* RelayoutController::Get()
 {
-  return &ThreadLocalStorage::Get().GetRelayoutController();
+  // There was crash when destroying actors and the ResizePolicy is USE_NATURAL_SIZE
+  // The ThreadLocalStorage::Get() only retrieve STL without checking if it exists.
+  // The caller of RelayoutController::Get() should check if RelayoutController is not null.
+  if(ThreadLocalStorage::Created())
+  {
+    return &ThreadLocalStorage::Get().GetRelayoutController();
+  }
+
+  return nullptr;
 }
 
 void RelayoutController::QueueActor(Internal::Actor* actor, RelayoutContainer& actors, Vector2 size)
