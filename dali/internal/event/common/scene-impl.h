@@ -38,63 +38,9 @@ struct Event;
 
 namespace Internal
 {
-//@todo Break this dependence somehow.
-namespace Render
-{
-class Renderer;
-}
-
 namespace SceneGraph
 {
 class Scene;
-
-struct DirtyRect
-{
-  DirtyRect(Node* node, Render::Renderer* renderer, int32_t frame, Rect<int>& rect)
-  : node(node),
-    renderer(renderer),
-    frame(frame),
-    rect(rect),
-    visited(true)
-  {
-  }
-
-  DirtyRect()
-  : node(nullptr),
-    renderer(nullptr),
-    frame(0),
-    rect(),
-    visited(true)
-  {
-  }
-
-  bool operator<(const DirtyRect& rhs) const
-  {
-    if(node == rhs.node)
-    {
-      if(renderer == rhs.renderer)
-      {
-        return frame > rhs.frame; // Most recent rects come first
-      }
-      else
-      {
-        return renderer < rhs.renderer;
-      }
-    }
-    else
-    {
-      return node < rhs.node;
-    }
-  }
-
-  Node*             node;
-  Render::Renderer* renderer;
-  int32_t           frame;
-
-  Rect<int32_t> rect;
-  bool          visited;
-};
-
 } // namespace SceneGraph
 
 class EventProcessor;
@@ -351,13 +297,6 @@ public:
    */
   Integration::Scene::WheelEventSignalType& WheelEventSignal();
 
-  /**
-   * @brief Get ItemsDirtyRects
-   *
-   * @return the ItemsDirtyRects
-   */
-  std::vector<Dali::Internal::SceneGraph::DirtyRect>& GetItemsDirtyRects();
-
 public:
   /**
    * From RenderTaskDefaults; retrieve the default root actor.
@@ -436,8 +375,6 @@ private:
 
   // The wheel event signal
   Integration::Scene::WheelEventSignalType mWheelEventSignal;
-
-  std::vector<Dali::Internal::SceneGraph::DirtyRect> mItemsDirtyRects;
 };
 
 } // namespace Internal
