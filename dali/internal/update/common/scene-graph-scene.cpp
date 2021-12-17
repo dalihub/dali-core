@@ -46,6 +46,11 @@ Scene::~Scene()
 
 void Scene::Initialize(Graphics::Controller& graphicsController, Integration::DepthBufferAvailable depthBufferAvailable, Integration::StencilBufferAvailable stencilBufferAvailable)
 {
+  mGraphicsController = &graphicsController;
+
+  // Create the render target for the surface. It should already have been sent via message.
+  mRenderTarget = mGraphicsController->CreateRenderTarget(mRenderTargetCreateInfo, std::move(mRenderTarget));
+
   // Create the render pass for the surface
   std::vector<Graphics::AttachmentDescription> attachmentDescriptions;
 
@@ -185,6 +190,22 @@ bool Scene::IsRotationCompletedAcknowledgementSet()
 std::vector<DirtyRect>& Scene::GetItemsDirtyRects()
 {
   return mItemsDirtyRects;
+}
+
+void Scene::SetSurfaceRenderTargetCreateInfo(const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo)
+{
+  if(mRenderTarget != nullptr &&
+     mRenderTargetCreateInfo.surface != renderTargetCreateInfo.surface)
+  {
+    // Only recreate if the surface has changed.
+    mRenderTargetCreateInfo = renderTargetCreateInfo;
+    mRenderTarget           = mGraphicsController->CreateRenderTarget(renderTargetCreateInfo, std::move(mRenderTarget));
+  }
+  else
+  {
+    // 2nd Stage initialization happens in RenderManager, not UpdateManager, so is delayed.
+    mRenderTargetCreateInfo = renderTargetCreateInfo;
+  }
 }
 
 } // namespace SceneGraph

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1028,9 +1028,11 @@ void TestGraphicsController::BindPipeline(TestGraphicsPipeline* pipeline)
  */
 void TestGraphicsController::PresentRenderTarget(Graphics::RenderTarget* renderTarget)
 {
+  auto*                       rt = static_cast<const TestGraphicsRenderTarget*>(renderTarget);
   TraceCallStack::NamedParams namedParams;
   namedParams["renderTarget"] << std::hex << renderTarget;
-  mCallStack.PushCall("PresentRenderTarget", "", namedParams);
+  namedParams["surface"] << std::hex << rt->mCreateInfo.surface;
+  mCallStack.PushCall("PresentRenderTarget", namedParams.str(), namedParams);
 }
 
 /**
@@ -1237,7 +1239,10 @@ Graphics::UniquePtr<Graphics::Sampler> TestGraphicsController::CreateSampler(con
 
 Graphics::UniquePtr<Graphics::RenderTarget> TestGraphicsController::CreateRenderTarget(const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo, Graphics::UniquePtr<Graphics::RenderTarget>&& oldRenderTarget)
 {
-  mCallStack.PushCall("CreateRenderTarget", "");
+  TraceCallStack::NamedParams namedParams;
+  namedParams["surface"] << std::hex << renderTargetCreateInfo.surface;
+  mCallStack.PushCall("CreateRenderTarget", namedParams.str(), namedParams);
+
   return Graphics::MakeUnique<TestGraphicsRenderTarget>(mGl, renderTargetCreateInfo);
 }
 
