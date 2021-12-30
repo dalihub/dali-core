@@ -2087,7 +2087,38 @@ int UtcDaliTouchEventIntegNewTouchEvent(void)
   END_TEST;
 }
 
-int UtcDaliTouchEventIntercept(void)
+int UtcDaliTouchEventIntercept01(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's intercept touched signal
+  SignalData        data;
+  TouchEventFunctor functor(data, false /* Do not consume */);
+  Dali::DevelActor::InterceptTouchedSignal(actor).Connect(&application, functor);
+
+  // Emit a down signal
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+
+  // It should be able to receive touch events by registering only InterceptTouchEvent.
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::DOWN, data.receivedTouch.points[0].state, TEST_LOCATION);
+  DALI_TEST_CHECK(actor == data.receivedTouch.points[0].hitActor);
+  DALI_TEST_CHECK(actor == data.touchedActor);
+  data.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliTouchEventIntercept02(void)
 {
   TestApplication application;
 
