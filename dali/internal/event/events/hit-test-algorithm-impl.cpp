@@ -100,8 +100,8 @@ struct ActorTouchableCheck : public HitTestInterface
 {
   bool IsActorHittable(Actor* actor) override
   {
-    return (actor->GetTouchRequired() || actor->IsTouchFocusable()) && // Does the Application or derived actor type require a touch event? or focusable by touch?
-           actor->IsHittable();                                        // Is actor sensitive, visible and on the scene?
+    return (actor->GetTouchRequired() || actor->GetInterceptTouchRequired() || actor->IsTouchFocusable()) && // Does the Application or derived actor type require a touch event or a intercept touch event? or focusable by touch?
+           actor->IsHittable();                                                                              // Is actor sensitive, visible and on the scene?
   }
 
   bool DescendActorHierarchy(Actor* actor) override
@@ -194,8 +194,8 @@ HitActor HitTestWithinLayer(Actor&                                     actor,
       if(rayTest.ActorTest(actor, rayOrigin, rayDir, hitPointLocal, distance))
       {
         // Calculate z coordinate value in Camera Space.
-        const Matrix&  viewMatrix = renderTask.GetCameraActor()->GetViewMatrix();
-        const Vector4& hitDir = Vector4(rayDir.x * distance, rayDir.y * distance, rayDir.z * distance, 0.0f);
+        const Matrix&  viewMatrix          = renderTask.GetCameraActor()->GetViewMatrix();
+        const Vector4& hitDir              = Vector4(rayDir.x * distance, rayDir.y * distance, rayDir.z * distance, 0.0f);
         const float    cameraDepthDistance = (viewMatrix * hitDir).z;
 
         // Check if cameraDepthDistance is between clipping plane
