@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,16 +112,19 @@ void VectorBase::Reserve(SizeType capacity, SizeType elementSize)
 
 void VectorBase::Copy(const VectorBase& vector, SizeType elementSize)
 {
-  // release old data
-  Release();
   // reserve space based on source capacity
-  const SizeType capacity = vector.Capacity();
-  Reserve(capacity, elementSize);
-  // copy over whole data
+  const SizeType capacity        = vector.Capacity();
   const SizeType wholeAllocation = sizeof(SizeType) * 2u + capacity * elementSize;
-  SizeType*      srcData         = reinterpret_cast<SizeType*>(vector.mData);
-  SizeType*      dstData         = reinterpret_cast<SizeType*>(mData);
+  void*          wholeData       = reinterpret_cast<void*>(new uint8_t[wholeAllocation]);
+  DALI_ASSERT_ALWAYS(wholeData && "VectorBase::Copy - Memory allocation failed");
+
+  // copy over whole data
+  SizeType* srcData = reinterpret_cast<SizeType*>(vector.mData);
+  SizeType* dstData = reinterpret_cast<SizeType*>(wholeData) + 2u;
   memcpy(dstData - 2u, srcData - 2u, wholeAllocation);
+
+  // release old buffer and set new data as mData
+  Replace(reinterpret_cast<void*>(dstData));
 }
 
 void VectorBase::Swap(VectorBase& vector)
