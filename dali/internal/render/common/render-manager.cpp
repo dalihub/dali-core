@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -468,11 +468,6 @@ void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear
 
 void RenderManager::PreRender(Integration::RenderStatus& status, Integration::Scene& scene, std::vector<Rect<int>>& damagedRects)
 {
-  if(mImpl->partialUpdateAvailable != Integration::PartialUpdateAvailable::TRUE)
-  {
-    return;
-  }
-
   Internal::Scene&   sceneInternal = GetImplementation(scene);
   SceneGraph::Scene* sceneObject   = sceneInternal.GetSceneObject();
 
@@ -484,6 +479,11 @@ void RenderManager::PreRender(Integration::RenderStatus& status, Integration::Sc
   }
 
   status.SetNeedsUpdate(true);
+
+  if(mImpl->partialUpdateAvailable != Integration::PartialUpdateAvailable::TRUE)
+  {
+    return;
+  }
 
   class DamagedRectsCleaner
   {
