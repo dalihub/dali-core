@@ -273,7 +273,7 @@ void Texture::CreateWithData(Graphics::TextureUsageFlags usage, uint8_t* data, u
 
 void Texture::Upload(PixelDataPtr pixelData, const Internal::Texture::UploadParams& params)
 {
-  DALI_ASSERT_ALWAYS(mNativeImage == nullptr);
+  DALI_ASSERT_ALWAYS(!mNativeImage);
 
   if(!mGraphicsTexture)
   {

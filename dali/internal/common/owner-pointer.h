@@ -215,30 +215,18 @@ public:
     }
   }
 
-  // Handle comparisons - This is a variation of the safe bool idiom
+  // Handle comparisons
 
   /**
-   * Pointer-to-member type. Objects can be implicitly converted to this for validity checks.
-   */
-  using BooleanType = void (OwnerPointer<T>::*)() const;
-
-  /**
-   * Converts an object handle to a BooleanType.
+   * Converts an object handle to a bool.
    * This is useful for checking whether the handle is NULL.
    */
-  operator BooleanType() const
+  explicit operator bool() const
   {
-    return (mObject != nullptr) ? &OwnerPointer::ThisIsSaferThanReturningVoidStar : nullptr;
+    return mObject != nullptr;
   }
 
 private:
-  /**
-   * Used by the safe bool idiom.
-   */
-  void ThisIsSaferThanReturningVoidStar() const
-  {
-  }
-
   // data
   T* mObject; ///< Raw pointer to the object
 };

@@ -59,7 +59,7 @@ void RenderTaskList::SetRenderMessageDispatcher(RenderMessageDispatcher* renderM
 
 void RenderTaskList::AddTask(OwnerPointer<RenderTask>& newTask)
 {
-  DALI_ASSERT_DEBUG(newTask != NULL && "SceneGraph RenderTask is null");
+  DALI_ASSERT_DEBUG(newTask && "SceneGraph RenderTask is null");
   DALI_ASSERT_DEBUG(mRenderMessageDispatcher != NULL && "RenderMessageDispatcher is null");
 
   newTask->Initialize(*mRenderMessageDispatcher);

@@ -211,21 +211,15 @@ public:
    */
   void Reset();
 
-  // BaseHandle comparisons - This is a variation of the safe bool idiom
+  // BaseHandle comparisons
 
   /**
-   * @brief Pointer-to-member type.
-   * Objects can be implicitly converted to this for validity checks.
-   */
-  using BooleanType = void (BaseHandle::*)() const;
-
-  /**
-   * @brief Converts an handle to a BooleanType.
+   * @brief Converts an handle to a bool.
    *
    * This is useful for checking whether the handle is empty.
    * @SINCE_1_0.0
    */
-  operator BooleanType() const;
+  explicit operator bool() const;
 
   /**
    * @brief Equality operator overload.
@@ -265,18 +259,6 @@ private:
    */
   bool DoConnectSignal(ConnectionTrackerInterface* connectionTracker, const std::string& signalName, FunctorDelegate* functorDelegate);
 
-protected:
-  /**
-   * @brief Used by the safe bool idiom.
-   *
-   * The safe bool idiom basically provides a Boolean test for classes. It validates objects
-   * in a boolean context without the usual harmful side effects.
-   * @SINCE_1_0.0
-   */
-  void ThisIsSaferThanReturningVoidStar() const
-  {
-  }
-
 private:
   IntrusivePtr<Dali::RefObject> mObjectHandle; ///< Object this handle points at.
 };
@@ -295,8 +277,6 @@ inline T DownCast(BaseHandle handle)
   return T::DownCast(handle);
 }
 
-// See also BaseHandle::BooleanType() conversion
-
 /**
  * @brief Equality operator.
  * @SINCE_1_0.0
@@ -307,7 +287,6 @@ inline T DownCast(BaseHandle handle)
 template<typename T>
 inline bool operator==(const BaseHandle& lhs, const T& rhs)
 {
-  // We depart from the safe bool idiom to allow Dali::BaseHandle derived classes to be compared
   return lhs == static_cast<const BaseHandle&>(rhs);
 }
 
@@ -321,7 +300,6 @@ inline bool operator==(const BaseHandle& lhs, const T& rhs)
 template<typename T>
 inline bool operator!=(const BaseHandle& lhs, const T& rhs)
 {
-  // We depart from the safe bool idiom to allow Dali::BaseHandle derived classes to be compared
   return lhs != static_cast<const BaseHandle&>(rhs);
 }
 

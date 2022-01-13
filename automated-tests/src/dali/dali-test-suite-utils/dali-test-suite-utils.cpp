@@ -78,6 +78,11 @@ std::ostream& operator<<(std::ostream& ostream, Degree angle)
   return ostream;
 }
 
+std::ostream& operator<<(std::ostream& ostream, BaseHandle handle)
+{
+  return ostream << static_cast<void*>(handle.GetObjectPtr());
+}
+
 void DALI_TEST_EQUALS(const BaseHandle& baseHandle1, const BaseHandle& baseHandle2, const char* location)
 {
   DALI_TEST_EQUALS<const BaseHandle&>(baseHandle1, baseHandle2, location);

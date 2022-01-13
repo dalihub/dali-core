@@ -251,24 +251,17 @@ public:
     IntrusivePtr(rhs).Swap(*this);
   }
 
-  // IntrusivePtr comparisons - This is a variation of the safe bool idiom
+  // IntrusivePtr comparisons
 
   /**
-   * @brief Pointer-to-member type.
-   *
-   * Objects can be implicitly converted to this for validity checks.
-   */
-  using BooleanType = void (IntrusivePtr<T>::*)() const;
-
-  /**
-   * @brief Converts an object handle to a BooleanType.
+   * @brief Converts an object handle to a bool.
    *
    * This is useful for checking whether the handle is NULL.
    * @SINCE_1_0.0
    */
-  operator BooleanType() const
+  explicit operator bool() const
   {
-    return mPtr ? &IntrusivePtr::ThisIsSaferThanReturningVoidStar : nullptr;
+    return mPtr != nullptr;
   }
 
   /**
@@ -286,14 +279,6 @@ public:
   }
 
 private:
-  /**
-   * @brief Used by the safe bool idiom.
-   * @SINCE_1_0.0
-   */
-  void ThisIsSaferThanReturningVoidStar() const
-  {
-  }
-
   /**
    * @brief Internal swap function.
    * @SINCE_1_0.0
