@@ -363,30 +363,26 @@ int UtcDaliIntrusivePtrResetTN(void)
   END_TEST;
 }
 
-int UtcDaliIntrusivePtrOperatorBooleanTypeP(void)
+int UtcDaliIntrusivePtrOperatorBoolP(void)
 {
-  tet_infoline("Positive Test for Dali::IntrusivePtr::operator Booleantype()");
+  tet_infoline("Positive Test for Dali::IntrusivePtr::operator bool()");
 
   IntrusivePtr<Counted> counted(new Counted);
-  DALI_TEST_CHECK(counted.operator BooleanType() != 0);
+  DALI_TEST_CHECK(counted.operator bool() == true);
   DALI_TEST_CHECK(counted);
 
-  typedef void (IntrusivePtr<Counted>::*BoolIdiomFunc)() const;
-  BoolIdiomFunc func = static_cast<BoolIdiomFunc>(counted.operator BooleanType());
-  ((counted).*func)(); // purely for test coverage
-
   counted.Reset();
-  DALI_TEST_CHECK(counted.operator BooleanType() == 0);
+  DALI_TEST_CHECK(counted.operator bool() == false);
 
   END_TEST;
 }
 
-int UtcDaliIntrusivePtrOperatorBooleanTypeN(void)
+int UtcDaliIntrusivePtrOperatorBoolN(void)
 {
-  tet_infoline("Negative Test for Dali::IntrusivePtr::operator Booleantype()");
+  tet_infoline("Negative Test for Dali::IntrusivePtr::operator bool()");
 
   IntrusivePtr<Counted> counted;
-  DALI_TEST_CHECK(counted.operator BooleanType() == 0);
+  DALI_TEST_CHECK(counted.operator bool() == false);
   DALI_TEST_CHECK(!counted);
   END_TEST;
 }

@@ -197,13 +197,13 @@ unsigned int Texture::GetHeight() const
 
 bool Texture::IsNative() const
 {
-  return mNativeImage != nullptr;
+  return static_cast<bool>(mNativeImage);
 }
 
 bool Texture::ApplyNativeFragmentShader(std::string& shader)
 {
   bool modified = false;
-  if(mNativeImage != nullptr && !shader.empty())
+  if(mNativeImage && !shader.empty())
   {
     modified = mNativeImage->ApplyNativeFragmentShader(shader);
   }

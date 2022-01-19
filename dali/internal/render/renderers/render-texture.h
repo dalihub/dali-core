@@ -128,7 +128,7 @@ public:
    */
   [[nodiscard]] bool IsNativeImage() const
   {
-    return mNativeImage;
+    return static_cast<bool>(mNativeImage);
   }
 
 private:

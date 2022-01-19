@@ -78,7 +78,7 @@ std::ostream& operator<<(std::ostream& o, const Graphics::TextureCreateInfo& cre
     << " usageFlags:" << std::hex << createInfo.usageFlags
     << " data:" << std::hex << createInfo.data
     << " dataSize:" << std::dec << createInfo.dataSize
-    << " nativeImagePtr:" << std::hex << createInfo.nativeImagePtr;
+    << " nativeImagePtr:" << std::hex << createInfo.nativeImagePtr.Get();
   return o;
 }
 

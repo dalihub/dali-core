@@ -75,9 +75,9 @@ void BaseHandle::Reset()
   mObjectHandle = nullptr;
 }
 
-BaseHandle::operator BaseHandle::BooleanType() const
+BaseHandle::operator bool() const
 {
-  return mObjectHandle ? &BaseHandle::ThisIsSaferThanReturningVoidStar : nullptr;
+  return static_cast<bool>(mObjectHandle);
 }
 
 bool BaseHandle::operator==(const BaseHandle& rhs) const

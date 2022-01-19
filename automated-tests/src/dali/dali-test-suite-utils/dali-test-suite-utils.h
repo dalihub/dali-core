@@ -99,6 +99,7 @@ bool          operator==(TimePeriod a, TimePeriod b);
 std::ostream& operator<<(std::ostream& ostream, TimePeriod value);
 std::ostream& operator<<(std::ostream& ostream, Radian angle);
 std::ostream& operator<<(std::ostream& ostream, Degree angle);
+std::ostream& operator<<(std::ostream& ostream, BaseHandle handle);
 
 /**
  * Test whether two values are equal.
