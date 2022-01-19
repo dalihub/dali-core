@@ -2,7 +2,7 @@
 #define DALI_HANDLE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -292,6 +292,36 @@ public:
   Property::Index RegisterProperty(std::string_view name, Property::Value propertyValue);
 
   /**
+   * @brief Registers a new animatable property.
+   *
+   * @SINCE_2_1.6
+   * @param[in] name The name of the property
+   * @param[in] propertyValue The new value of the property
+   * @return The index of the property or Property::INVALID_INDEX if registration failed
+   * @pre The object supports dynamic properties i.e. Supports(Handle::DYNAMIC_PROPERTIES) returns true.
+   * Property names are expected to be unique, but this is DEFINITELY not enforced. It is up to the
+   * caller to enforce uniqueness.
+   *
+   * Property indices are unique to each registered custom property in a given object.
+   * returns Property::INVALID_INDEX if registration failed. This can happen if you try to register
+   * animatable property on an object that does not have scene graph object.
+   * @note Only the following types can be animated:
+   *       - Property::BOOLEAN
+   *       - Property::FLOAT
+   *       - Property::INTEGER
+   *       - Property::VECTOR2
+   *       - Property::VECTOR3
+   *       - Property::VECTOR4
+   *       - Property::MATRIX3
+   *       - Property::MATRIX
+   *       - Property::ROTATION
+   * @note If a property with the desired name already exists, then this creates a secondary
+   * entry to a different scene graph property; Access by index works as expected, but uniform
+   * values will use the last registered version, not the existing version, so things may break.
+   */
+  Property::Index RegisterUniqueProperty(std::string_view name, Property::Value propertyValue);
+
+  /**
    * @brief Register a new animatable property with an integer key.
    *
    * @SINCE_1_9.27
@@ -305,6 +335,7 @@ public:
    * i.e. Supports(Handle::DYNAMIC_PROPERTIES) returns true.  Property names and keys
    * are expected to be unique, but this is not enforced.  Property indices are unique
    * to each registered custom property in a given object.
+   * @todo CHECK THIS!
    *
    * @note Returns Property::INVALID_INDEX if registration failed. This can happen if
    * you try to register animatable property on an object that does not have scene graph
@@ -332,6 +363,55 @@ public:
   Property::Index RegisterProperty(Property::Index  key,
                                    std::string_view name,
                                    Property::Value  propertyValue);
+
+  /**
+   * @brief Register a new animatable property with an integer key.
+   *
+   * @SINCE_2_1.6
+   * @param[in] key  The integer key of the property.
+   * @param[in] name The text key of the property.
+   * @param[in] propertyValue The new value of the property.
+   *
+   * @return The index of the property or Property::INVALID_INDEX if registration failed
+   * It is up to the caller to guarantee that the property is unique. This allows many
+   * checks to be skipped.
+   *
+   * @pre The object supports dynamic properties
+   * i.e. Supports(Handle::DYNAMIC_PROPERTIES) returns true.  Property names and keys
+   * are expected to be unique, and are therefore just added without any checks.
+   * Property indices are unique to each registered custom property in a given object.
+   *
+   * @note Returns Property::INVALID_INDEX if registration failed. This can happen if
+   * you try to register animatable property on an object that does not have scene graph
+   * object.
+   *
+   * @note The returned property index is not the same as the integer key (though it
+   * shares a type)
+   *
+   * This version of RegisterProperty associates both an integer key and the text key
+   * with the property, allowing for lookup of the property index by either key or name
+   * ( which is useful when other classes know the key but not the name )
+   *
+   * @note Only the following types can be animated:
+   *       - Property::BOOLEAN
+   *       - Property::FLOAT
+   *       - Property::INTEGER
+   *       - Property::VECTOR2
+   *       - Property::VECTOR3
+   *       - Property::VECTOR4
+   *       - Property::MATRIX3
+   *       - Property::MATRIX
+   *       - Property::ROTATION
+   *
+   * @note If a property with the desired name already exists, then this will create a second entry with
+   * the same name, and may cause problems. It is up to the caller to prevent this happening. Possible side
+   * effects are: lookup by name always finds the first such property, not the second; whereas, writing
+   * uniform value to shader will use the second, not the first;
+   * Using the returned Property::Index for future reference will always access the correct property.
+   */
+  Property::Index RegisterUniqueProperty(Property::Index  key,
+                                         std::string_view name,
+                                         Property::Value  propertyValue);
 
   /**
    * @brief Registers a new property.

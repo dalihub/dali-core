@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_OBJECT_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -222,16 +222,6 @@ public:
   void GetPropertyIndices(Property::IndexContainer& indices) const;
 
   /**
-   * @copydoc Dali::Handle::RegisterProperty()
-   */
-  Property::Index RegisterProperty(std::string_view name, Property::Value propertyValue);
-
-  /**
-   * @copydoc Dali::Handle::RegisterProperty()
-   */
-  Property::Index RegisterProperty(std::string_view name, Property::Index key, Property::Value propertyValue);
-
-  /**
    * @copydoc Dali::DevelHandle::SetProperties()
    */
   void SetProperties(const Property::Map& properties);
@@ -240,6 +230,16 @@ public:
    * @copydoc Dali::DevelHandle::GetProperties()
    */
   void GetProperties(Property::Map& properties);
+
+  /**
+   * @copydoc Dali::Handle::RegisterProperty()
+   */
+  Property::Index RegisterProperty(std::string_view name, Property::Value propertyValue);
+
+  /**
+   * @copydoc Dali::Handle::RegisterProperty()
+   */
+  Property::Index RegisterProperty(std::string_view name, Property::Index key, Property::Value propertyValue, bool checkForUniqueName);
 
   /**
    * @copydoc Dali::Handle::RegisterProperty(std::string name, Property::Value propertyValue, Property::AccessMode accessMode)
@@ -252,7 +252,8 @@ public:
   Property::Index RegisterProperty(std::string_view     name,
                                    Property::Index      key,
                                    Property::Value      propertyValue,
-                                   Property::AccessMode accessMode);
+                                   Property::AccessMode accessMode,
+                                   bool                 checkForUniqueName);
 
   /**
    * @brief returns true if the custom property exists on this object.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -107,12 +107,22 @@ Property::Index Handle::RegisterProperty(std::string_view name, Property::Value 
 
 Property::Index Handle::RegisterProperty(Property::Index key, std::string_view name, Property::Value propertyValue)
 {
-  return GetImplementation(*this).RegisterProperty(name, key, std::move(propertyValue));
+  return GetImplementation(*this).RegisterProperty(name, key, std::move(propertyValue), true);
 }
 
 Property::Index Handle::RegisterProperty(std::string_view name, Property::Value propertyValue, Property::AccessMode accessMode)
 {
   return GetImplementation(*this).RegisterProperty(name, std::move(propertyValue), accessMode);
+}
+
+Property::Index Handle::RegisterUniqueProperty(std::string_view name, Property::Value propertyValue)
+{
+  return GetImplementation(*this).RegisterProperty(name, Property::INVALID_KEY, std::move(propertyValue), false);
+}
+
+Property::Index Handle::RegisterUniqueProperty(Property::Index key, std::string_view name, Property::Value propertyValue)
+{
+  return GetImplementation(*this).RegisterProperty(name, key, std::move(propertyValue), false);
 }
 
 Property::Value Handle::GetProperty(Property::Index index) const
