@@ -218,7 +218,7 @@ public:
   /**
    * @copydoc Dali::Integration::Scene::SetSurfaceRenderTarget
    */
-  void SetSurfaceRenderTarget(Graphics::RenderTarget* renderTarget);
+  void SetSurfaceRenderTarget(const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo);
 
   /**
    * Used by the EventProcessor to emit key event signals.

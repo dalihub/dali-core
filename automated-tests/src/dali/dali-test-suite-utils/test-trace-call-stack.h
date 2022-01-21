@@ -2,7 +2,7 @@
 #define TEST_TRACE_CALL_STACK_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -119,6 +119,25 @@ public:
         mParams.push_back(NameValue(name, ""));
         return mParams.back().value;
       }
+    }
+
+    const std::ostringstream& operator[](std::string name) const
+    {
+      static std::ostringstream empty;
+      auto                      iter = mParams.begin();
+      for(; iter != mParams.end(); ++iter)
+      {
+        if(!iter->parameterName.compare(name))
+        {
+          break;
+        }
+      }
+
+      if(iter != mParams.end())
+      {
+        return iter->value;
+      }
+      return empty;
     }
 
     std::string str() const

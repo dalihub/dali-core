@@ -124,9 +124,9 @@ void Scene::Discard()
   GetImplementation(*this).Discard();
 }
 
-void Scene::SetSurfaceRenderTarget(Graphics::RenderTarget* renderTarget)
+void Scene::SetSurfaceRenderTarget(const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo)
 {
-  GetImplementation(*this).SetSurfaceRenderTarget(renderTarget);
+  GetImplementation(*this).SetSurfaceRenderTarget(renderTargetCreateInfo);
 }
 
 Integration::Scene Scene::Get(Actor actor)

@@ -332,11 +332,11 @@ void Scene::SetRotationCompletedAcknowledgement()
   SetRotationCompletedAcknowledgementMessage(tls->GetEventThreadServices(), *mSceneObject);
 }
 
-void Scene::SetSurfaceRenderTarget(Graphics::RenderTarget* renderTarget)
+void Scene::SetSurfaceRenderTarget(const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo)
 {
   // Send the surface render target to SceneGraph::Scene
   ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
-  SetSurfaceRenderTargetMessage(tls->GetEventThreadServices(), *mSceneObject, renderTarget);
+  SetSurfaceRenderTargetCreateInfoMessage(tls->GetEventThreadServices(), *mSceneObject, renderTargetCreateInfo);
 }
 
 bool Scene::EmitKeyEventGeneratedSignal(const Dali::KeyEvent& event)
