@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ void Scene::Initialize(Graphics::Controller& graphicsController, Integration::De
   mGraphicsController = &graphicsController;
 
   // Create the render target for the surface. It should already have been sent via message.
-  mRenderTarget = mGraphicsController->CreateRenderTarget(mRenderTargetCreateInfo, std::move(mRenderTarget));
+  mRenderTarget = graphicsController.CreateRenderTarget(mRenderTargetCreateInfo, std::move(mRenderTarget));
 
   // Create the render pass for the surface
   std::vector<Graphics::AttachmentDescription> attachmentDescriptions;
@@ -199,7 +199,10 @@ void Scene::SetSurfaceRenderTargetCreateInfo(const Graphics::RenderTargetCreateI
   {
     // Only recreate if the surface has changed.
     mRenderTargetCreateInfo = renderTargetCreateInfo;
-    mRenderTarget           = mGraphicsController->CreateRenderTarget(renderTargetCreateInfo, std::move(mRenderTarget));
+    if(mGraphicsController) // shouldn't be null, as we can't have already set mRenderTarget unless graphics controller exists.
+    {
+      mRenderTarget = mGraphicsController->CreateRenderTarget(renderTargetCreateInfo, std::move(mRenderTarget));
+    }
   }
   else
   {
