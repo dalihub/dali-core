@@ -567,6 +567,13 @@ void Object::GetProperties(Property::Map& properties)
   }
 }
 
+void Object::ReserveCustomProperties(int propertyCount)
+{
+  mCustomProperties.Reserve(propertyCount);
+  const SceneGraph::PropertyOwner& sceneObject = GetSceneObject();
+  ReservePropertiesMessage(const_cast<EventThreadServices&>(GetEventThreadServices()), sceneObject, propertyCount);
+}
+
 Property::Index Object::RegisterProperty(std::string_view name, Property::Value propertyValue)
 {
   return RegisterProperty(name, Property::INVALID_KEY, std::move(propertyValue), Property::ANIMATABLE, true);
