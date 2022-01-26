@@ -72,7 +72,7 @@ struct PartialRenderingNodeData
    */
   bool IsUpdated()
   {
-    return 0 != memcmp(&mData[0], &mData[1], sizeof(PartialRenderingCacheInfo));
+    return (0 != memcmp(&mData[0], &mData[1], sizeof(PartialRenderingCacheInfo)) || !mRendered);
   }
 
   /**
@@ -86,6 +86,7 @@ struct PartialRenderingNodeData
   PartialRenderingCacheInfo mData[2u];         /// Double-buffered data
   uint8_t                   mCurrentIndex{0u}; /// Current buffer index
   bool                      mVisible{true};    /// Visible state
+  bool                      mRendered{false};  /// Rendering state
 };
 
 /**

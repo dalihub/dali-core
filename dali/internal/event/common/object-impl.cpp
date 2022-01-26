@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -535,16 +535,6 @@ void Object::GetPropertyIndices(Property::IndexContainer& indices) const
   }
 }
 
-Property::Index Object::RegisterProperty(std::string_view name, Property::Value propertyValue)
-{
-  return RegisterProperty(name, Property::INVALID_KEY, std::move(propertyValue), Property::ANIMATABLE);
-}
-
-Property::Index Object::RegisterProperty(std::string_view name, Property::Index key, Property::Value propertyValue)
-{
-  return RegisterProperty(name, key, std::move(propertyValue), Property::ANIMATABLE);
-}
-
 void Object::SetProperties(const Property::Map& properties)
 {
   const auto count = properties.Count();
@@ -577,26 +567,39 @@ void Object::GetProperties(Property::Map& properties)
   }
 }
 
+Property::Index Object::RegisterProperty(std::string_view name, Property::Value propertyValue)
+{
+  return RegisterProperty(name, Property::INVALID_KEY, std::move(propertyValue), Property::ANIMATABLE, true);
+}
+
+Property::Index Object::RegisterProperty(std::string_view name, Property::Index key, Property::Value propertyValue, bool checkForUniqueName)
+{
+  return RegisterProperty(name, key, std::move(propertyValue), Property::ANIMATABLE, checkForUniqueName);
+}
+
 Property::Index Object::RegisterProperty(std::string_view     name,
                                          Property::Value      propertyValue,
                                          Property::AccessMode accessMode)
 {
-  return RegisterProperty(name, Property::INVALID_KEY, std::move(propertyValue), accessMode);
+  return RegisterProperty(name, Property::INVALID_KEY, std::move(propertyValue), accessMode, true);
 }
 
 Property::Index Object::RegisterProperty(std::string_view     name,
                                          Property::Index      key,
                                          Property::Value      propertyValue,
-                                         Property::AccessMode accessMode)
+                                         Property::AccessMode accessMode,
+                                         bool                 checkForUniqueName)
 {
   auto constString = ConstString(name);
+
   // If property with the required key already exists, then just set it.
+  // Don't search names if checkForUniqueName is false.
   Property::Index index = Property::INVALID_INDEX;
   if(key != Property::INVALID_KEY) // Try integer key first if it's valid
   {
     index = GetPropertyIndex(key);
   }
-  if(index == Property::INVALID_INDEX) // If it wasn't valid, or doesn't exist, try name
+  if(index == Property::INVALID_INDEX && checkForUniqueName) // try name search if requested
   {
     index = GetPropertyIndex(constString);
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -768,6 +768,165 @@ int UtcDaliHandleRegisterProperty02(void)
   DALI_TEST_EQUALS(actor.GetPropertyCount(), defaultPropertyCount + 3, TEST_LOCATION); // Property count should be the same
   DALI_TEST_EQUALS(actor.GetProperty<Vector4>(index2), Color::BLACK, TEST_LOCATION);   // Value should be what we sent on second RegisterProperty call
   DALI_TEST_EQUALS(actor.GetProperty<float>(index3), 2200.f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliHandleRegisterProperty03(void)
+{
+  tet_infoline("Test Dali::Handle::RegisterUniqueProperty() int key against default property");
+  TestApplication application;
+
+  Integration::Scene stage = application.GetScene();
+
+  Actor actor = Actor::New();
+  stage.Add(actor);
+
+  const unsigned int defaultPropertyCount = actor.GetPropertyCount();
+
+  application.SendNotification();
+  application.Render();
+
+  const Vector4 testColor(0.5f, 0.2f, 0.9f, 1.0f);
+  actor.SetProperty(Actor::Property::COLOR, testColor);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetPropertyCount(), defaultPropertyCount, TEST_LOCATION);
+
+  // No uniqueness tests are done on the properties. Check that the indices are different
+
+  Property::Index key       = CORE_PROPERTY_MAX_INDEX + 1;
+  Property::Index testIndex = actor.RegisterUniqueProperty(key, "color", Color::BLACK);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(testIndex != Actor::Property::COLOR, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetPropertyCount(), defaultPropertyCount + 1, TEST_LOCATION); // Property count should be different
+
+  DALI_TEST_EQUALS(actor.GetProperty<Vector4>(Actor::Property::COLOR), testColor, TEST_LOCATION); // Value should not have changed
+  DALI_TEST_EQUALS(actor.GetProperty<Vector4>(testIndex), Color::BLACK, TEST_LOCATION);           // Value should not have changed
+
+  // Check that name lookup returns the default property
+  DALI_TEST_EQUALS((int)actor.GetPropertyIndex(Property::Key("color")), (int)Actor::Property::COLOR, TEST_LOCATION);
+
+  // Check that they have different scene graph properties
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::COLOR), Property::Value(testColor), 0.0001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(testIndex), Property::Value(Color::BLACK), 0.0001f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliHandleRegisterProperty04(void)
+{
+  tet_infoline("Negative Test Dali::Handle::RegisterUniqueProperty() same int key against custom property");
+  TestApplication application;
+
+  Integration::Scene stage = application.GetScene();
+
+  Actor actor = Actor::New();
+  stage.Add(actor);
+
+  const unsigned int defaultPropertyCount = actor.GetPropertyCount();
+
+  application.SendNotification();
+  application.Render();
+
+  Property::Index key1 = CORE_PROPERTY_MAX_INDEX + 1;
+  Property::Index key2 = CORE_PROPERTY_MAX_INDEX + 2;
+
+  const Vector4 testColor(0.5f, 0.2f, 0.9f, 1.0f);
+  const float   withFlake(99.f);
+
+  Property::Index index1 = actor.RegisterProperty("MyPropertyOne", Vector3::ONE);
+  Property::Index index2 = actor.RegisterUniqueProperty(key1, "sideColor", testColor);
+  Property::Index index3 = actor.RegisterUniqueProperty(key2, "iceCream", withFlake);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetPropertyCount(), defaultPropertyCount + 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty<Vector3>(index1), Vector3::ONE, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty<Vector4>(index2), testColor, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty<float>(index3), withFlake, TEST_LOCATION);
+
+  // If property key matches, ignore new name.
+  Property::Index testIndex2 = actor.RegisterUniqueProperty(key1, "sideColor", Color::BLACK);
+  Property::Index testIndex3 = actor.RegisterUniqueProperty(key2, "iceCream", 2200.f);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(index2 == testIndex2, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index3 == testIndex3, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetPropertyCount(), defaultPropertyCount + 3, TEST_LOCATION); // Property count should be same
+  // Test that the value has actually been updated
+  DALI_TEST_EQUALS(actor.GetProperty<Vector4>(index2), Color::BLACK, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty<float>(index3), 2200.f, TEST_LOCATION);
+
+  // Check that name lookup returns the first registered property
+  DALI_TEST_EQUALS(actor.GetPropertyIndex(Property::Key("sideColor")), index2, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetPropertyIndex(Property::Key("iceCream")), index3, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliHandleRegisterProperty05(void)
+{
+  tet_infoline("Positive Test Dali::Handle::RegisterUniqueProperty() different int key against custom property");
+  TestApplication application;
+
+  Integration::Scene stage = application.GetScene();
+
+  Actor actor = Actor::New();
+  stage.Add(actor);
+
+  const unsigned int defaultPropertyCount = actor.GetPropertyCount();
+
+  application.SendNotification();
+  application.Render();
+
+  Property::Index key1 = CORE_PROPERTY_MAX_INDEX + 1;
+  Property::Index key2 = CORE_PROPERTY_MAX_INDEX + 2;
+
+  const Vector4 testColor(0.5f, 0.2f, 0.9f, 1.0f);
+  const float   withFlake(99.f);
+
+  Property::Index index1 = actor.RegisterProperty("MyPropertyOne", Vector3::ONE);
+  Property::Index index2 = actor.RegisterUniqueProperty(key1, "sideColor", testColor);
+  Property::Index index3 = actor.RegisterUniqueProperty(key2, "iceCream", withFlake);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetPropertyCount(), defaultPropertyCount + 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty<Vector3>(index1), Vector3::ONE, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty<Vector4>(index2), testColor, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty<float>(index3), withFlake, TEST_LOCATION);
+
+  // No uniqueness tests are done on the names. Check that the indices are different if the keys are different
+  Property::Index newKey1 = key2 + 1;
+  Property::Index newKey2 = key2 + 2;
+
+  Property::Index testIndex2 = actor.RegisterUniqueProperty(newKey1, "sideColor", Color::BLACK);
+  Property::Index testIndex3 = actor.RegisterUniqueProperty(newKey2, "iceCream", 2200.f);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(index2 == testIndex2, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(index3 == testIndex3, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetPropertyCount(), defaultPropertyCount + 5, TEST_LOCATION); // Property count should be different
+
+  DALI_TEST_EQUALS(actor.GetProperty<Vector4>(index2), testColor, TEST_LOCATION); // Value should not have changed
+  DALI_TEST_EQUALS(actor.GetProperty<float>(index3), withFlake, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(actor.GetProperty<Vector4>(testIndex2), Color::BLACK, TEST_LOCATION); // Value should not have changed
+  DALI_TEST_EQUALS(actor.GetProperty<float>(testIndex3), 2200.f, TEST_LOCATION);
+
+  // Check that name lookup returns the first registered property
+  DALI_TEST_EQUALS(actor.GetPropertyIndex(Property::Key("sideColor")), index2, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetPropertyIndex(Property::Key("iceCream")), index3, TEST_LOCATION);
 
   END_TEST;
 }

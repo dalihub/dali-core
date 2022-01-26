@@ -22,6 +22,8 @@
 #include <memory>
 
 // INTERNAL INCLUDES
+#include <dali/graphics-api/graphics-controller.h>
+#include <dali/graphics-api/graphics-render-target-create-info.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
@@ -225,9 +227,9 @@ public:
   /**
    * @brief Sets the render target for the surface.
    *
-   * @param[in] renderTarget The render target for the surface
+   * @param[in] renderTarget The render target create info for the surface
    */
-  void SetSurfaceRenderTarget(Graphics::RenderTarget* renderTarget);
+  void SetSurfaceRenderTarget(const Graphics::RenderTargetCreateInfo& createInfo);
 
   /**
    * @brief Retrieve the Scene that the given actor belongs to.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -239,7 +239,7 @@ inline void AddRendererToRenderList(BufferIndex         updateBufferIndex,
       partialRenderingCacheInfo.node       = node;
       partialRenderingCacheInfo.isOpaque   = (opacityType == Renderer::OPAQUE);
       partialRenderingCacheInfo.renderer   = renderable.mRenderer;
-      partialRenderingCacheInfo.color      = node->GetColor(updateBufferIndex);
+      partialRenderingCacheInfo.color      = node->GetWorldColor(updateBufferIndex);
       partialRenderingCacheInfo.depthIndex = node->GetDepthIndex();
 
       if(DALI_LIKELY(renderable.mRenderer))
@@ -290,12 +290,26 @@ inline void AddRendererToRenderList(BufferIndex         updateBufferIndex,
       partialRenderingCacheInfo.updatedSize = item.mUpdateSize;
 
       item.mIsUpdated = partialRenderingData.IsUpdated() || item.mIsUpdated;
+
+      partialRenderingData.mRendered = true;
+
       partialRenderingData.SwapBuffers();
     }
+    else
+    {
+      // Mark as not rendered
+      auto& partialRenderingData     = node->GetPartialRenderingData();
+      partialRenderingData.mRendered = false;
+    }
+
     node->SetCulled(updateBufferIndex, false);
   }
   else
   {
+    // Mark as not rendered
+    auto& partialRenderingData     = node->GetPartialRenderingData();
+    partialRenderingData.mRendered = false;
+
     node->SetCulled(updateBufferIndex, true);
   }
 }

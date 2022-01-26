@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_SCENE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/render/common/render-instruction-container.h>
+#include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/public-api/common/vector-wrapper.h>
 
 namespace Dali
@@ -216,10 +217,7 @@ public:
    *
    * @param[in] renderTarget The render target.
    */
-  void SetSurfaceRenderTarget(Graphics::RenderTarget* renderTarget)
-  {
-    mRenderTarget = renderTarget;
-  }
+  void SetSurfaceRenderTargetCreateInfo(const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo);
 
   /**
    * Get the render target created for the scene
@@ -228,7 +226,7 @@ public:
    */
   [[nodiscard]] Graphics::RenderTarget* GetSurfaceRenderTarget() const
   {
-    return mRenderTarget;
+    return mRenderTarget.get();
   }
 
   /**
@@ -259,6 +257,26 @@ public:
   }
 
   /**
+   * @brief Set a root of the Scene
+   *
+   * @param layer The root layer
+   */
+  void SetRoot(SceneGraph::Layer* layer)
+  {
+    mRoot = layer;
+  }
+
+  /**
+   * @brief Get a root of the Scene
+   *
+   * @return The root layer
+   */
+  SceneGraph::Layer* GetRoot() const
+  {
+    return mRoot;
+  }
+
+  /**
    * @brief Get ItemsDirtyRects
    *
    * @return the ItemsDirtyRects
@@ -270,6 +288,8 @@ private:
   // Update manager updates instructions for the next frame while we render the current one
 
   RenderInstructionContainer mInstructions; ///< Render instructions for the scene
+
+  Graphics::Controller* mGraphicsController{nullptr}; ///< Graphics controller
 
   Dali::Integration::Scene::FrameCallbackContainer mFrameRenderedCallbacks;  ///< Frame rendered callbacks
   Dali::Integration::Scene::FrameCallbackContainer mFramePresentedCallbacks; ///< Frame presented callbacks
@@ -283,14 +303,18 @@ private:
 
   // Render pass and render target
 
+  Graphics::RenderTargetCreateInfo mRenderTargetCreateInfo; // Passed in by message before 2nd stage Initialization happens.
+
   /**
    * Render pass is created on fly depending on Load and Store operations
    * The default render pass (most likely to be used) is the load = CLEAR
    * and store = STORE for color attachment.
    */
-  Graphics::UniquePtr<Graphics::RenderPass> mRenderPass{nullptr};        ///< The render pass created to render the surface
-  Graphics::UniquePtr<Graphics::RenderPass> mRenderPassNoClear{nullptr}; ///< The render pass created to render the surface without clearing color
-  Graphics::RenderTarget*                   mRenderTarget{nullptr};      ///< This is created in the event thread when surface is created/resized/replaced
+  Graphics::UniquePtr<Graphics::RenderPass>   mRenderPass{nullptr};        ///< The render pass created to render the surface
+  Graphics::UniquePtr<Graphics::RenderPass>   mRenderPassNoClear{nullptr}; ///< The render pass created to render the surface without clearing color
+  Graphics::UniquePtr<Graphics::RenderTarget> mRenderTarget{nullptr};      ///< This is created in Update/Render thread when surface is created/resized/replaced
+
+  SceneGraph::Layer* mRoot{nullptr}; ///< Root node
 
   std::vector<Graphics::ClearValue>                  mClearValues{};     ///< Clear colors
   std::vector<Dali::Internal::SceneGraph::DirtyRect> mItemsDirtyRects{}; ///< Dirty rect list
@@ -352,15 +376,15 @@ inline void SetRotationCompletedAcknowledgementMessage(EventThreadServices& even
   new(slot) LocalType(&scene, &Scene::SetRotationCompletedAcknowledgement);
 }
 
-inline void SetSurfaceRenderTargetMessage(EventThreadServices& eventThreadServices, const Scene& scene, Graphics::RenderTarget* renderTarget)
+inline void SetSurfaceRenderTargetCreateInfoMessage(EventThreadServices& eventThreadServices, const Scene& scene, const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo)
 {
-  using LocalType = MessageValue1<Scene, Graphics::RenderTarget*>;
+  using LocalType = MessageValue1<Scene, Graphics::RenderTargetCreateInfo>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&scene, &Scene::SetSurfaceRenderTarget, renderTarget);
+  new(slot) LocalType(&scene, &Scene::SetSurfaceRenderTargetCreateInfo, renderTargetCreateInfo);
 }
 
 } // namespace SceneGraph

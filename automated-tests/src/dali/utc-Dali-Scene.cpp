@@ -33,27 +33,6 @@ namespace
 {
 const std::string DEFAULT_DEVICE_NAME("hwKeyboard");
 
-const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
-  attribute mediump vec2     aPosition;\n
-    uniform mediump mat4     uModelView;\n
-      uniform mediump mat4   uProjection;\n
-        uniform mediump vec3 uSize;\n void main()\n {
-          \n
-            mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);
-          \n
-            vertexPosition.xyz *= uSize;
-          \n
-            gl_Position = uProjection * uModelView * vertexPosition;
-          \n
-        }\n);
-
-const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
-  uniform lowp vec4 uColor;\n void main()\n {
-    \n
-      gl_FragColor = uColor;
-    \n
-  }\n);
-
 // Functor for EventProcessingFinished signal
 struct EventProcessingFinishedFunctor
 {
@@ -1128,8 +1107,7 @@ int UtcDaliSceneSurfaceRotatedWithAngle0(void)
   clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
-  Texture image = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 4u, 4u);
-  Actor   actor = CreateRenderableActor(image, VERTEX_SHADER, FRAGMENT_SHADER);
+  Actor actor = CreateRenderableActor();
   actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
@@ -1137,11 +1115,6 @@ int UtcDaliSceneSurfaceRotatedWithAngle0(void)
   application.GetScene().Add(actor);
 
   application.SendNotification();
-  application.Render(0);
-
-  Matrix      projection;
-  CameraActor camera = application.GetScene().GetRenderTaskList().GetTask(0u).GetCameraActor();
-  camera.GetProperty(CameraActor::CameraActor::Property::PROJECTION_MATRIX).Get(projection);
 
   damagedRects.clear();
   application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
@@ -1173,24 +1146,6 @@ int UtcDaliSceneSurfaceRotatedWithAngle0(void)
   // It should be changed.
   DALI_TEST_EQUALS(orientation, 0, TEST_LOCATION);
 
-  // Check uniform
-  Quaternion rotationAngle(Dali::ANGLE_0, Vector3::ZAXIS);
-  Matrix     rotation, newProjection;
-  rotation.SetIdentity();
-  rotation.SetTransformComponents(Vector3(1.0f, 1.0f, 1.0f), rotationAngle, Vector3(0.0f, 0.0f, 0.0f));
-  Matrix::Multiply(newProjection, projection, rotation);
-
-  DALI_TEST_CHECK(application.GetGlAbstraction().CheckUniformValue("uProjection", newProjection));
-
-  // Change actor size to trigger rendering
-  actor.SetProperty(Actor::Property::SIZE, Vector3(32.0f, 32.0f, 0.0f));
-
-  // Render again
-  application.SendNotification();
-  application.Render(0);
-
-  DALI_TEST_CHECK(application.GetGlAbstraction().CheckUniformValue("uProjection", newProjection));
-
   END_TEST;
 }
 
@@ -1218,8 +1173,7 @@ int UtcDaliSceneSurfaceRotatedWithAngle90(void)
   clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
-  Texture image = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 4u, 4u);
-  Actor   actor = CreateRenderableActor(image, VERTEX_SHADER, FRAGMENT_SHADER);
+  Actor actor = CreateRenderableActor();
   actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
@@ -1227,11 +1181,6 @@ int UtcDaliSceneSurfaceRotatedWithAngle90(void)
   application.GetScene().Add(actor);
 
   application.SendNotification();
-  application.Render(0);
-
-  Matrix      projection;
-  CameraActor camera = application.GetScene().GetRenderTaskList().GetTask(0u).GetCameraActor();
-  camera.GetProperty(CameraActor::CameraActor::Property::PROJECTION_MATRIX).Get(projection);
 
   damagedRects.clear();
   application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
@@ -1270,24 +1219,6 @@ int UtcDaliSceneSurfaceRotatedWithAngle90(void)
   // It should be changed.
   DALI_TEST_EQUALS(orientation, 90, TEST_LOCATION);
 
-  // Check uniform
-  Quaternion rotationAngle(Dali::ANGLE_90, Vector3::ZAXIS);
-  Matrix     rotation, newProjection;
-  rotation.SetIdentity();
-  rotation.SetTransformComponents(Vector3(1.0f, 1.0f, 1.0f), rotationAngle, Vector3(0.0f, 0.0f, 0.0f));
-  Matrix::Multiply(newProjection, projection, rotation);
-
-  DALI_TEST_CHECK(application.GetGlAbstraction().CheckUniformValue("uProjection", newProjection));
-
-  // Change actor size to trigger rendering
-  actor.SetProperty(Actor::Property::SIZE, Vector3(32.0f, 32.0f, 0.0f));
-
-  // Render again
-  application.SendNotification();
-  application.Render(0);
-
-  DALI_TEST_CHECK(application.GetGlAbstraction().CheckUniformValue("uProjection", newProjection));
-
   END_TEST;
 }
 
@@ -1315,8 +1246,7 @@ int UtcDaliSceneSurfaceRotatedWithAngle180(void)
   clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
-  Texture image = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 4u, 4u);
-  Actor   actor = CreateRenderableActor(image, VERTEX_SHADER, FRAGMENT_SHADER);
+  Actor actor = CreateRenderableActor();
   actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
@@ -1324,11 +1254,6 @@ int UtcDaliSceneSurfaceRotatedWithAngle180(void)
   application.GetScene().Add(actor);
 
   application.SendNotification();
-  application.Render(0);
-
-  Matrix      projection;
-  CameraActor camera = application.GetScene().GetRenderTaskList().GetTask(0u).GetCameraActor();
-  camera.GetProperty(CameraActor::CameraActor::Property::PROJECTION_MATRIX).Get(projection);
 
   damagedRects.clear();
   application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
@@ -1367,24 +1292,6 @@ int UtcDaliSceneSurfaceRotatedWithAngle180(void)
   // It should be changed.
   DALI_TEST_EQUALS(orientation, 180, TEST_LOCATION);
 
-  // Check uniform
-  Quaternion rotationAngle(Dali::ANGLE_180, Vector3::ZAXIS);
-  Matrix     rotation, newProjection;
-  rotation.SetIdentity();
-  rotation.SetTransformComponents(Vector3(1.0f, 1.0f, 1.0f), rotationAngle, Vector3(0.0f, 0.0f, 0.0f));
-  Matrix::Multiply(newProjection, projection, rotation);
-
-  DALI_TEST_CHECK(application.GetGlAbstraction().CheckUniformValue("uProjection", newProjection));
-
-  // Change actor size to trigger rendering
-  actor.SetProperty(Actor::Property::SIZE, Vector3(32.0f, 32.0f, 0.0f));
-
-  // Render again
-  application.SendNotification();
-  application.Render(0);
-
-  DALI_TEST_CHECK(application.GetGlAbstraction().CheckUniformValue("uProjection", newProjection));
-
   END_TEST;
 }
 
@@ -1412,8 +1319,7 @@ int UtcDaliSceneSurfaceRotatedWithAngle270(void)
   clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
-  Texture image = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 4u, 4u);
-  Actor   actor = CreateRenderableActor(image, VERTEX_SHADER, FRAGMENT_SHADER);
+  Actor actor = CreateRenderableActor();
   actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
@@ -1421,11 +1327,6 @@ int UtcDaliSceneSurfaceRotatedWithAngle270(void)
   application.GetScene().Add(actor);
 
   application.SendNotification();
-  application.Render(0);
-
-  Matrix      projection;
-  CameraActor camera = application.GetScene().GetRenderTaskList().GetTask(0u).GetCameraActor();
-  camera.GetProperty(CameraActor::CameraActor::Property::PROJECTION_MATRIX).Get(projection);
 
   damagedRects.clear();
   application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
@@ -1463,24 +1364,6 @@ int UtcDaliSceneSurfaceRotatedWithAngle270(void)
 
   // It should be changed.
   DALI_TEST_EQUALS(orientation, 270, TEST_LOCATION);
-
-  // Check uniform
-  Quaternion rotationAngle(Dali::ANGLE_270, Vector3::ZAXIS);
-  Matrix     rotation, newProjection;
-  rotation.SetIdentity();
-  rotation.SetTransformComponents(Vector3(1.0f, 1.0f, 1.0f), rotationAngle, Vector3(0.0f, 0.0f, 0.0f));
-  Matrix::Multiply(newProjection, projection, rotation);
-
-  DALI_TEST_CHECK(application.GetGlAbstraction().CheckUniformValue("uProjection", newProjection));
-
-  // Change actor size to trigger rendering
-  actor.SetProperty(Actor::Property::SIZE, Vector3(32.0f, 32.0f, 0.0f));
-
-  // Render again
-  application.SendNotification();
-  application.Render(0);
-
-  DALI_TEST_CHECK(application.GetGlAbstraction().CheckUniformValue("uProjection", newProjection));
 
   END_TEST;
 }
@@ -1672,6 +1555,51 @@ int UtcDaliSceneEnsureReplacedSurfaceKeepsClearColor(void)
 
   enabledDisableTrace.Enable(false);
   enabledDisableTrace.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliSceneEnsureRenderTargetRecreated(void)
+{
+  tet_infoline("Ensure render target is re-created when surface replaced ");
+
+  TestApplication application;
+
+  // Create a new scene and set the background color of the main scene
+  auto defaultScene = application.GetScene();
+  defaultScene.SetBackgroundColor(Color::BLUE);
+
+  auto actor = CreateRenderableActor();
+  defaultScene.Add(actor);
+
+  auto& graphicsController = application.GetGraphicsController();
+
+  application.SendNotification();
+  application.Render();
+
+  TraceCallStack&                    graphicsCallStack = graphicsController.mCallStack;
+  TraceCallStack::NamedParams        empty{};
+  const TraceCallStack::NamedParams* matching = graphicsCallStack.FindLastMatch("PresentRenderTarget", empty);
+  DALI_TEST_CHECK(matching != nullptr);
+
+  graphicsCallStack.Reset();
+
+  int                              fakeSurface1;
+  Graphics::RenderTargetCreateInfo createInfo{};
+  createInfo.SetSurface(&fakeSurface1).SetExtent(Graphics::Extent2D{480u, 800u});
+  defaultScene.SetSurfaceRenderTarget(createInfo);
+
+  application.SendNotification();
+  application.Render();
+
+  TraceCallStack::NamedParams query1;
+  query1["surface"] << std::hex << &fakeSurface1;
+  const TraceCallStack::NamedParams* matching2 = graphicsCallStack.FindLastMatch("CreateRenderTarget", query1);
+  DALI_TEST_CHECK(matching2 != nullptr);
+
+  const TraceCallStack::NamedParams* matching3 = graphicsCallStack.FindLastMatch("PresentRenderTarget", empty);
+  DALI_TEST_CHECK(matching3 != nullptr);
+  DALI_TEST_EQUALS((*matching3)["surface"].str(), query1["surface"].str(), TEST_LOCATION);
 
   END_TEST;
 }
