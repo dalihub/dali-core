@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -253,6 +253,13 @@ public:
   void EmitWheelEventSignal(const Dali::WheelEvent& event);
 
   /**
+   * Used by the WheelEventProcessor to emit WheelEventGenerated signals.
+   * @param[in] event The wheel event.
+   * @return The return is true if WheelEvent is consumed, otherwise false.
+   */
+  bool EmitWheelEventGeneratedSignal(const Dali::WheelEvent& event);
+
+  /**
    * @copydoc Dali::Integration::Scene::AddFrameRenderedCallback
    */
   void AddFrameRenderedCallback(std::unique_ptr<CallbackBase> callback, int32_t frameId);
@@ -296,6 +303,11 @@ public:
    * @copydoc Integration::Scene::sWheelEventSignal()
    */
   Integration::Scene::WheelEventSignalType& WheelEventSignal();
+
+  /**
+   * @copydoc Integration::Scene::WheelEventGeneratedSignal()
+   */
+  Integration::Scene::WheelEventGeneratedSignalType& WheelEventGeneratedSignal();
 
 public:
   /**
@@ -374,7 +386,8 @@ private:
   Integration::Scene::TouchEventSignalType mTouchedSignal;
 
   // The wheel event signal
-  Integration::Scene::WheelEventSignalType mWheelEventSignal;
+  Integration::Scene::WheelEventSignalType          mWheelEventSignal;
+  Integration::Scene::WheelEventGeneratedSignalType mWheelEventGeneratedSignal;
 };
 
 } // namespace Internal

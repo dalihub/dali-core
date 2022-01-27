@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -148,7 +148,11 @@ void WheelEventProcessor::ProcessWheelEvent(const Integration::WheelEvent& event
   else
   {
     // if CUSTOM_WHEEL, emit the wheel event signal from the scene.
-    mScene.EmitWheelEventSignal(wheelEventHandle);
+    bool consumed = mScene.EmitWheelEventGeneratedSignal(wheelEventHandle);
+    if(!consumed)
+    {
+      mScene.EmitWheelEventSignal(wheelEventHandle);
+    }
   }
 }
 

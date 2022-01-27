@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -373,6 +373,13 @@ void Scene::EmitWheelEventSignal(const Dali::WheelEvent& event)
   }
 }
 
+bool Scene::EmitWheelEventGeneratedSignal(const Dali::WheelEvent& event)
+{
+  // Emit the WheelEventGenerated signal when WheelEvent is generated
+  Dali::Integration::Scene handle(this);
+  return mWheelEventGeneratedSignal.Emit(event);
+}
+
 void Scene::AddFrameRenderedCallback(std::unique_ptr<CallbackBase> callback, int32_t frameId)
 {
   ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
@@ -418,6 +425,11 @@ Integration::Scene::TouchEventSignalType& Scene::TouchedSignal()
 Integration::Scene::WheelEventSignalType& Scene::WheelEventSignal()
 {
   return mWheelEventSignal;
+}
+
+Integration::Scene::WheelEventGeneratedSignalType& Scene::WheelEventGeneratedSignal()
+{
+  return mWheelEventGeneratedSignal;
 }
 
 } // namespace Internal

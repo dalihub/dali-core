@@ -2,7 +2,7 @@
 #define DALI_SCENE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,6 +66,7 @@ public:
   using KeyEventGeneratedSignalType       = Signal<bool(const Dali::KeyEvent&)>;   ///< key event generated signal type
   using TouchEventSignalType              = Signal<void(const Dali::TouchEvent&)>; ///< Touch signal type
   using WheelEventSignalType              = Signal<void(const Dali::WheelEvent&)>; ///< WheelEvent signal type
+  using WheelEventGeneratedSignalType     = Signal<bool(const Dali::WheelEvent&)>; ///< WheelEvent generated signal type
 
   using FrameCallbackContainer = std::vector<std::pair<std::unique_ptr<CallbackBase>, int32_t> >;
 
@@ -412,6 +413,23 @@ public:
    * @return The signal to connect to
    */
   WheelEventSignalType& WheelEventSignal();
+
+  /**
+   * @brief When a custom wheel event occurs, it need to process the focused actor first.
+   *
+   * Therefore, KeyboardFocusManager first checks whether WheelEvent is generated as WheelEventGeneratedSignal.
+   * After that wheelEventProcessor must invoke WheelEvent only if wheelEventGeneratedSignal () is not consumed.
+   *
+   * This is only valid for custom wheel events.
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   bool YourCallbackName(const WheelEvent& event);
+   * @endcode
+   *
+   * @return The return is true if WheelEvent is consumed, otherwise false.
+   */
+  WheelEventGeneratedSignalType& WheelEventGeneratedSignal();
 
 public: // Not intended for application developers
   /**
