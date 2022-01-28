@@ -232,6 +232,11 @@ public:
   void GetProperties(Property::Map& properties);
 
   /**
+   * @copydoc Dali::Handle::ReserveCustomProperties()
+   */
+  void ReserveCustomProperties(int propertyCount);
+
+  /**
    * @copydoc Dali::Handle::RegisterProperty()
    */
   Property::Index RegisterProperty(std::string_view name, Property::Value propertyValue);

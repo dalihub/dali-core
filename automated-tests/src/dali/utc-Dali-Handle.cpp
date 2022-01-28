@@ -2030,6 +2030,46 @@ int UtcDaliHandleGetProperties(void)
   END_TEST;
 }
 
+int UtcDaliHandleReserveProperties(void)
+{
+  TestApplication application;
+  Dali::Handle    instance = Handle::New();
+  DALI_TEST_EQUALS(instance.GetPropertyCount(), 0, TEST_LOCATION);
+
+  instance.ReserveCustomProperties(0);
+  DALI_TEST_EQUALS(instance.GetPropertyCount(), 0, TEST_LOCATION);
+
+  instance.ReserveCustomProperties(20);
+  DALI_TEST_EQUALS(instance.GetPropertyCount(), 0, TEST_LOCATION);
+
+  instance.RegisterProperty("testProperty", 22.0f);
+  DALI_TEST_EQUALS(instance.GetPropertyCount(), 1, TEST_LOCATION);
+
+  // Test that reserving actor properties doesn't change property count
+  Dali::Actor actor = Actor::New();
+  auto        count = actor.GetPropertyCount();
+
+  actor.ReserveCustomProperties(15);
+  DALI_TEST_EQUALS(actor.GetPropertyCount(), count, TEST_LOCATION);
+
+  // Test that reserving renderer properties doesn't change property count
+  Geometry       geom     = Geometry::New();
+  Shader         shader   = Shader::New("vertex", "frag");
+  Dali::Renderer renderer = Renderer::New(geom, shader);
+  count                   = renderer.GetPropertyCount();
+  renderer.ReserveCustomProperties(22);
+  DALI_TEST_EQUALS(renderer.GetPropertyCount(), count, TEST_LOCATION);
+
+  count = shader.GetPropertyCount();
+  shader.ReserveCustomProperties(5);
+  DALI_TEST_EQUALS(shader.GetPropertyCount(), count, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
 int UtcDaliHandleSetPropertyNegative(void)
 {
   TestApplication application;

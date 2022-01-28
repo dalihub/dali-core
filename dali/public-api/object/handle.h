@@ -266,6 +266,16 @@ public:
   void SetProperty(Property::Index index, Property::Value propertyValue);
 
   /**
+   * @brief Reserves a number of custom properties
+   *
+   * Saves automatic re-allocation of vectors for properties when we know in advance how many there
+   * will be.
+   *
+   * @param[in] propertyCount The total number of initial properties.
+   */
+  void ReserveCustomProperties(int propertyCount);
+
+  /**
    * @brief Registers a new animatable property.
    *
    * @SINCE_1_0.0

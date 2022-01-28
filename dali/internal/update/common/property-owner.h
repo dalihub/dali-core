@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_PROPERTY_OWNER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -127,6 +127,11 @@ public:
    * @param[in] currentBufferIndex The current update buffer.
    */
   void DisconnectFromSceneGraph(BufferIndex updateBufferIndex);
+
+  /**
+   * Reserve the given number of properties
+   */
+  void ReserveProperties(int propertyCount);
 
   /**
    * Install a custom property.

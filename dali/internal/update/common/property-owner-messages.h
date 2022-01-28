@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_PROPERTY_OWNER_MESSAGES_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -266,6 +266,16 @@ inline void RemoveUniformMapMessage(EventThreadServices& eventThreadServices, co
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   new(slot) LocalType(&owner, &PropertyOwner::RemoveUniformMapping, uniformName);
+}
+
+inline void ReservePropertiesMessage(EventThreadServices& eventThreadServices, const PropertyOwner& owner, int propertyCount)
+{
+  using LocalType = MessageValue1<PropertyOwner, int>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
+
+  new(slot) LocalType(&owner, &PropertyOwner::ReserveProperties, propertyCount);
 }
 
 } // namespace SceneGraph
