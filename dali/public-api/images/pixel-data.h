@@ -2,7 +2,7 @@
 #define DALI_PIXEL_DATA_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,6 +77,25 @@ public:
                        ReleaseFunction releaseFunction);
 
   /**
+   * @brief Creates a PixelData object.
+   *
+   * @param[in] buffer          The raw pixel data
+   * @param[in] bufferSize      The size of the buffer in bytes
+   * @param[in] width           Buffer width in pixels
+   * @param[in] height          Buffer height in pixels
+   * @param[in] stride          Buffer stride in pixels, 0 means the buffer is tightly packed
+   * @param[in] pixelFormat     The pixel format
+   * @param[in] releaseFunction The function used to release the memory
+   * @return A handle to the PixelData
+   */
+  static PixelData New(uint8_t*        buffer,
+                       uint32_t        bufferSize,
+                       uint32_t        width,
+                       uint32_t        height,
+                       uint32_t        stride,
+                       Pixel::Format   pixelFormat,
+                       ReleaseFunction releaseFunction);
+  /**
    * @brief Creates an empty handle.
    * Use PixelData::New() to create an initialized object.
    *
@@ -148,6 +167,13 @@ public:
    * @return The pixel format
    */
   Pixel::Format GetPixelFormat() const;
+
+  /**
+   * @brief Gets the stride of the buffer in pixels.
+   *
+   * @return The stride of the buffer in pixels. 0 means the buffer is tightly packed.
+   */
+  uint32_t GetStride() const;
 
 public:
   /**

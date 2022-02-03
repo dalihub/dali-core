@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_API_TYPES
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -943,6 +943,7 @@ struct TextureUpdateInfo
   Extent2D srcExtent2D{};
   uint32_t srcOffset{};
   uint32_t srcSize{};
+  uint32_t srcStride{};
   Format   srcFormat{}; ///< Should match dstTexture's format, otherwise conversion may occur
 };
 

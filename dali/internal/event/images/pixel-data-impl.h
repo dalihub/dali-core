@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PIXEL_DATA_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ public:
    * @param [in] bufferSize       The size of the buffer in bytes
    * @param [in] width            Buffer width in pixels
    * @param [in] height           Buffer height in pixels
+   * @param [in] stride           Buffer stride in pixels, 0 means the buffer is tightly packed
    * @param [in] pixelFormat      The pixel format
    * @param [in] releaseFunction  The function used to release the memory.
    */
@@ -47,6 +48,7 @@ public:
                           uint32_t                         bufferSize,
                           uint32_t                         width,
                           uint32_t                         height,
+                          uint32_t                         stride,
                           Pixel::Format                    pixelFormat,
                           Dali::PixelData::ReleaseFunction releaseFunction);
 
@@ -57,6 +59,7 @@ public:
    * @param [in] bufferSize       The size of the buffer in bytes
    * @param [in] width            Buffer width in pixels
    * @param [in] height           Buffer height in pixels
+   * @param [in] stride           Buffer stride in pixels, 0 means the buffer is tightly packed
    * @param [in] pixelFormat      The pixel format
    * @param [in] releaseFunction  The function used to release the memory.
    */
@@ -64,6 +67,7 @@ public:
             uint32_t                         bufferSize,
             uint32_t                         width,
             uint32_t                         height,
+            uint32_t                         stride,
             Pixel::Format                    pixelFormat,
             Dali::PixelData::ReleaseFunction releaseFunction);
 
@@ -112,6 +116,11 @@ public:
    */
   DevelPixelData::PixelDataBuffer ReleaseBuffer();
 
+  /**
+   * @copydoc PixelData::GetStride()
+   */
+  uint32_t GetStride() const;
+
 private:
   /*
    * Undefined copy constructor.
@@ -125,9 +134,10 @@ private:
 
 private:
   uint8_t*                         mBuffer;          ///< The raw pixel data
-  uint32_t                         mBufferSize;      ///< Buffer sized in bytes
+  uint32_t                         mBufferSize;      ///< Buffer size in bytes
   uint32_t                         mWidth;           ///< Buffer width in pixels
   uint32_t                         mHeight;          ///< Buffer height in pixels
+  uint32_t                         mStride;          ///< Buffer stride in pixels, 0 means the buffer is tightly packed
   Pixel::Format                    mPixelFormat;     ///< Pixel format
   Dali::PixelData::ReleaseFunction mReleaseFunction; ///< Function for releasing memory
 };
