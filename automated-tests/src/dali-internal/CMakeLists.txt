@@ -8,11 +8,14 @@ SET(CAPI_LIB "dali-internal")
 SET(TC_SOURCES
         utc-Dali-Internal-ActorObserver.cpp
         utc-Dali-Internal-ActorRelayout.cpp
+        utc-Dali-Internal-ConstString.cpp
         utc-Dali-Internal-Core.cpp
         utc-Dali-Internal-FixedSizeMemoryPool.cpp
         utc-Dali-Internal-FrustumCulling.cpp
         utc-Dali-Internal-Gesture.cpp
         utc-Dali-Internal-Handles.cpp
+        utc-Dali-Internal-IndexedConstStringMap.cpp
+        utc-Dali-Internal-IndexedIntegerMap.cpp
         utc-Dali-Internal-LongPressGesture.cpp
         utc-Dali-Internal-MemoryPoolObjectAllocator.cpp
         utc-Dali-Internal-OwnerPointer.cpp
@@ -22,7 +25,6 @@ SET(TC_SOURCES
         utc-Dali-Internal-RotationGesture.cpp
         utc-Dali-Internal-TapGesture.cpp
         utc-Dali-Internal-TapGestureProcessor.cpp
-        utc-Dali-Internal-ConstString.cpp
         utc-Dali-Internal-TransformManagerProperty.cpp
 )
 
