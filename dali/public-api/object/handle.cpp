@@ -100,6 +100,11 @@ void Handle::SetProperty(Property::Index index, Property::Value propertyValue)
   GetImplementation(*this).SetProperty(index, std::move(propertyValue));
 }
 
+void Handle::ReserveCustomProperties(int propertyCount)
+{
+  GetImplementation(*this).ReserveCustomProperties(propertyCount);
+}
+
 Property::Index Handle::RegisterProperty(std::string_view name, Property::Value propertyValue)
 {
   return GetImplementation(*this).RegisterProperty(name, std::move(propertyValue));
