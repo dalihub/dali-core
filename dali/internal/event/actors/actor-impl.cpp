@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@
 #include <dali/devel-api/common/capabilities.h>
 
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/events/touch-integ.h>
 
 #include <dali/internal/event/actors/actor-coords.h>
 #include <dali/internal/event/actors/actor-parent.h>
@@ -1014,6 +1015,22 @@ void Actor::EmitLayoutDirectionChangedSignal(LayoutDirection::Type type)
   EmitSignal(*this, mLayoutDirectionChangedSignal, type);
 }
 
+bool Actor::EmitHitTestResultSignal(Integration::Point point, Vector2 hitPointLocal, uint32_t timeStamp)
+{
+  bool hit = true;
+
+  if(IsHitTestResultRequired())
+  {
+    Dali::Actor        handle(this);
+    Integration::Point newPoint(point);
+    newPoint.SetHitActor(handle);
+    newPoint.SetLocalPosition(hitPointLocal);
+    Dali::TouchEvent touchEvent = Dali::Integration::NewTouchEvent(timeStamp, newPoint);
+    hit                         = mHitTestResultSignal.Emit(handle, touchEvent);
+  }
+  return hit;
+}
+
 DevelActor::ChildChangedSignalType& Actor::ChildAddedSignal()
 {
   return mParentImpl.ChildAddedSignal();
@@ -1048,6 +1065,7 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mOnRelayoutSignal(),
   mVisibilityChangedSignal(),
   mLayoutDirectionChangedSignal(),
+  mHitTestResultSignal(),
   mTargetOrientation(Quaternion::IDENTITY),
   mTargetColor(Color::WHITE),
   mTargetPosition(Vector3::ZERO),

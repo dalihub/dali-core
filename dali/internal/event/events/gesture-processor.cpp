@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,6 +61,11 @@ struct GestureHitTestCheck : public HitTestAlgorithm::HitTestInterface
     return layer->IsTouchConsumed();
   }
 
+  bool ActorRequiresHitResultCheck(Actor* actor, Integration::Point point, Vector2 hitPointLocal, uint32_t timeStamp) override
+  {
+    return actor->EmitHitTestResultSignal(point, hitPointLocal, timeStamp);
+  }
+
   GestureType::Value mType;
 };
 
@@ -71,6 +76,8 @@ GestureProcessor::GestureProcessor(GestureType::Value type)
   mNeedsUpdate(false),
   mType(type),
   mCurrentGesturedActor(nullptr),
+  mPoint(),
+  mEventTime(0u),
   mGesturedActorDisconnected(false)
 {
 }
@@ -84,6 +91,11 @@ void GestureProcessor::ProcessTouch(Scene& scene, const Integration::TouchEvent&
 {
   if(mGestureRecognizer)
   {
+    if(!event.points.empty())
+    {
+      mPoint     = event.points[0];
+      mEventTime = event.time;
+    }
     mGestureRecognizer->SendEvent(scene, event);
   }
 }
@@ -192,6 +204,8 @@ void GestureProcessor::ProcessAndEmit(HitTestAlgorithm::Results& hitTestResults)
 bool GestureProcessor::HitTest(Scene& scene, Vector2 screenCoordinates, HitTestAlgorithm::Results& hitTestResults)
 {
   GestureHitTestCheck hitCheck(mType);
+  hitTestResults.point     = mPoint;
+  hitTestResults.eventTime = mEventTime;
   HitTestAlgorithm::HitTest(scene.GetSize(), scene.GetRenderTaskList(), scene.GetLayerList(), screenCoordinates, hitTestResults, hitCheck);
   return hitTestResults.renderTask && hitTestResults.actor;
 }

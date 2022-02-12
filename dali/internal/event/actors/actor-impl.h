@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ACTOR_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,8 @@
 
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
+
+#include <dali/integration-api/events/touch-event-integ.h>
 
 #include <dali/internal/common/const-string.h>
 #include <dali/internal/common/internal-constants.h>
@@ -1205,6 +1207,15 @@ public:
   }
 
   /**
+   * Query whether the application or derived actor type requires hit-test result events.
+   * @return True if hit-test result events are required.
+   */
+  bool IsHitTestResultRequired() const
+  {
+    return !mHitTestResultSignal.Empty();
+  }
+
+  /**
    * Query whether the application or derived actor type requires intercept touch events.
    * @return True if intercept touch events are required.
    */
@@ -1338,6 +1349,23 @@ public:
    * @param[in] type Whether the actor's layout direction property has changed or a parent's.
    */
   void EmitLayoutDirectionChangedSignal(LayoutDirection::Type type);
+
+  /**
+   * Used by the EventProcessor to emit hit-test result touch event signals.
+   * @param[in] point The point of event touched.
+   * @param[in] hitPointLocal The hit point in the Actor's local reference system.
+   * @param[in] timeStamp The time the event occurred.
+   * @return True if the event was consumed.
+   */
+  bool EmitHitTestResultSignal(Integration::Point point, Vector2 hitPointLocal, uint32_t timeStamp);
+
+  /**
+   * @copydoc DevelActor::HitTestResultSignal()
+   */
+  Dali::Actor::TouchEventSignalType& HitTestResultSignal()
+  {
+    return mHitTestResultSignal;
+  }
 
   /**
    * @copydoc DevelActor::InterceptTouchedSignal()
@@ -1830,6 +1858,7 @@ protected:
   Dali::Actor::OnRelayoutSignalType             mOnRelayoutSignal;
   DevelActor::VisibilityChangedSignalType       mVisibilityChangedSignal;
   Dali::Actor::LayoutDirectionChangedSignalType mLayoutDirectionChangedSignal;
+  Dali::Actor::TouchEventSignalType             mHitTestResultSignal;
 
   Quaternion mTargetOrientation; ///< Event-side storage for orientation
   Vector4    mTargetColor;       ///< Event-side storage for color

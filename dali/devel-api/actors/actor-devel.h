@@ -2,7 +2,7 @@
 #define DALI_ACTOR_DEVEL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -347,6 +347,39 @@ DALI_CORE_API void SetNeedGesturePropagation(Actor actor, bool propagation);
  * @param [in] newParent An actor to be a new parent of this actor.
  */
 DALI_CORE_API void SwitchParent(Actor actor, Actor newParent);
+
+/**
+ * @brief This signal is emitted when an actor is hit through hit-test.
+ *
+ * A callback of the following type may be connected:
+ * @code
+ *   void MyCallbackName( Actor actor );
+ * @endcode
+ * actor The actor to intercept
+ *
+ * @note This callback is called when the actor is hit.
+ * If true is returned, TouchEvent is called from the this actor.
+ * If false is returned, the hit test starts again from the next lower actor.
+ *
+ * @note example
+ *   Actor topActor = Actor::New();
+ *   Actor bottomActor = Actor::New();
+ *   topActor.TouchedSignal().Connect(&application, topActorFunctor);
+ *   bottomActor.TouchedSignal().Connect(&application, bottomActorFunctor);
+ * The two actors have no relationship.
+ * So when the topActor is touched, the event cannot be propagated to the bottomActor.
+ *
+ * If you connect HitTestResultSignal to topActor.
+ *   Dali::DevelActor::HitTestResultSignal(topActor).Connect(&application, hitTestResultFunctor);
+ *
+ * If the hitTestResult Functor returns false, it passes the hit-test and starts the hit-test again from the next lower actor.
+ * So the bottomActor can be hit and receive touch events.
+ * If hitTestResult returns true, it means that it has been hit. So it receives a TouchEvent from itself.
+ *
+ * @return The signal to connect to
+ * @pre The Actor has been initialized
+ */
+DALI_CORE_API Actor::TouchEventSignalType& HitTestResultSignal(Actor actor);
 
 } // namespace DevelActor
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
  */
 
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/events/hit-test-algorithm.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/public-api/dali-core.h>
@@ -27,6 +28,14 @@ using namespace Dali;
 
 namespace
 {
+bool        gHitTestTouchCallBackCalled = false;
+static bool TestHitTestTouchCallback(Actor, const TouchEvent&)
+{
+  gHitTestTouchCallBackCalled = true;
+  return false;
+  END_TEST;
+}
+
 /**
  * The functor to be used in the hit-test algorithm to check whether the actor is hittable.
  */
@@ -370,5 +379,59 @@ int UtcDaliHitTestAlgorithmOverlay(void)
   HitTest(stage, stageSize * 2.0f / 3.0f, results, &DefaultIsActorTouchableFunction);
   DALI_TEST_CHECK(results.actor == green);
   DALI_TEST_EQUALS(results.actorCoordinates, actorSize * 0.5f, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliHitTestAlgorithmDoesWantedHitTest(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::HitTestAlgorithm with does wanted to HitTest");
+
+  Stage             stage             = Stage::GetCurrent();
+  RenderTaskList    renderTaskList    = stage.GetRenderTaskList();
+  RenderTask        defaultRenderTask = renderTaskList.GetTask(0u);
+  Dali::CameraActor cameraActor       = defaultRenderTask.GetCameraActor();
+
+  Vector2 stageSize(stage.GetSize());
+  cameraActor.SetOrthographicProjection(stageSize);
+  cameraActor.SetProperty(Actor::Property::POSITION, Vector3(0.0f, 0.0f, 1600.0f));
+
+  Vector2 actorSize(stageSize * 0.5f);
+  // Create two actors with half the size of the stage and set them to be overlapping
+  Actor blue = Actor::New();
+  blue.SetProperty(Actor::Property::NAME, "Blue");
+  blue.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  blue.SetProperty(Actor::Property::PARENT_ORIGIN, AnchorPoint::CENTER);
+  blue.SetProperty(Actor::Property::SIZE, actorSize);
+
+  Actor green = Actor::New();
+  green.SetProperty(Actor::Property::NAME, "Green");
+  green.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  green.SetProperty(Actor::Property::PARENT_ORIGIN, AnchorPoint::CENTER);
+  green.SetProperty(Actor::Property::SIZE, actorSize);
+
+  // Add the actors to the view
+  stage.Add(blue);
+  stage.Add(green);
+
+  // connect to its hit-test signal
+  Dali::DevelActor::HitTestResultSignal(green).Connect(TestHitTestTouchCallback);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render(0);
+  application.Render(10);
+
+  gHitTestTouchCallBackCalled = false;
+
+  HitTestAlgorithm::Results results;
+  HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
+
+  // check hit-test events
+  // The green actor received an event that the green actor was hit.
+  DALI_TEST_CHECK(gHitTestTouchCallBackCalled == true);
+  // The green actor passed the hit-test. So blue was the final hit.
+  DALI_TEST_CHECK(results.actor == blue);
+
   END_TEST;
 }

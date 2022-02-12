@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_HIT_TEST_ALGORITHM_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/events/hit-test-algorithm.h>
+#include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/public-api/actors/actor.h>
 
@@ -37,11 +38,13 @@ namespace HitTestAlgorithm
 {
 struct Results
 {
-  RenderTaskPtr renderTask;       ///< The render-task displaying the actor.
-  Dali::Actor   actor;            ///< The hit actor.
-  Vector2       actorCoordinates; ///< The actor coordinates.
-  Vector4       rayOrigin;        ///< The point of origin of the ray.
-  Vector4       rayDirection;     ///< The direction vector of the ray.
+  RenderTaskPtr      renderTask;       ///< The render-task displaying the actor.
+  Dali::Actor        actor;            ///< The hit actor.
+  Vector2            actorCoordinates; ///< The actor coordinates.
+  Vector4            rayOrigin;        ///< The point of origin of the ray.
+  Vector4            rayDirection;     ///< The direction vector of the ray.
+  Integration::Point point;            ///< The point of event touched.
+  uint32_t           eventTime;        ///< The time the event occurred.
 };
 
 /**
@@ -80,6 +83,21 @@ struct HitTestInterface
    * @return true if the layer should consume the hit, false otherwise.
    */
   virtual bool DoesLayerConsumeHit(Layer* layer) = 0;
+
+  /**
+   * Called by the hit-test algorithm to determine whether the actor will be hit or not.
+   *
+   * @note If true is returned, then this actor will be hit.
+   *       If false is returend, then this actor passes the hit-test and the next actor performs the hit-test.
+   *
+   * @param[in] actor The hit actor.
+   * @param[in] point The point of event touched.
+   * @param[in] hitPointLocal The hit point in the Actor's local reference system.
+   * @param[in] timeStamp The time the event occurred.
+   *
+   * @return true if the actor should be the hit, false otherwise.
+   */
+  virtual bool ActorRequiresHitResultCheck(Actor* actor, Integration::Point point, Vector2 hitPointLocal, uint32_t timeStamp) = 0;
 
 protected:
   /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,13 @@ void utc_dali_tap_gesture_detector_cleanup(void)
 ///////////////////////////////////////////////////////////////////////////////
 namespace
 {
+bool        gHitTestTouchCallBackCalled = false;
+static bool TestHitTestTouchCallback(Actor, const TouchEvent&)
+{
+  gHitTestTouchCallBackCalled = true;
+  return false;
+  END_TEST;
+}
 // Stores data that is populated in the callback and will be read by the TET cases
 struct SignalData
 {
@@ -1142,6 +1149,62 @@ int UtcDaliTapGestureReceiveAllTapEvents(void)
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliTapGestureDoesWantedHitTest(void)
+{
+  TestApplication application;
+
+  Actor blue = Actor::New();
+  blue.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  blue.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  Actor green = Actor::New();
+  green.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  green.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  application.GetScene().Add(blue);
+  application.GetScene().Add(green);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  SignalData             blueData;
+  GestureReceivedFunctor blueFunctor(blueData);
+
+  TapGestureDetector blueDetector = TapGestureDetector::New();
+  blueDetector.Attach(blue);
+  blueDetector.DetectedSignal().Connect(&application, blueFunctor);
+
+  SignalData             greenData;
+  GestureReceivedFunctor greenFunctor(greenData);
+
+  TapGestureDetector greenDetector = TapGestureDetector::New();
+  greenDetector.Attach(green);
+  greenDetector.DetectedSignal().Connect(&application, greenFunctor);
+
+  // connect to its hit-test signal
+  gHitTestTouchCallBackCalled = false;
+  Dali::DevelActor::HitTestResultSignal(green).Connect(TestHitTestTouchCallback);
+
+  // Emit a down signal
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 0, 100));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 0, 120));
+  application.SendNotification();
+
+  // check hit-test events
+  // The green actor received an event that the green actor was hit.
+  DALI_TEST_EQUALS(true, gHitTestTouchCallBackCalled, TEST_LOCATION);
+
+  // The green actor passed the hit-test. So blue was the final hit.
+  DALI_TEST_EQUALS(false, greenData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, blueData.functorCalled, TEST_LOCATION);
+
+  blueData.Reset();
+  greenData.Reset();
 
   END_TEST;
 }
