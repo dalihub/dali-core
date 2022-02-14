@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -229,9 +229,9 @@ void OutputStatistics(const char* processName, int32_t numPasses, int32_t numFai
             basename(processName),
             numPasses + numFailures,
             numPasses,
-            (float)numPasses * 100.0f / (numPasses + numFailures),
+            numPasses > 0 ? (float)numPasses * 100.0f / (numPasses + numFailures) : 0.0f,
             numFailures,
-            (float)numFailures * 100.0f / (numPasses + numFailures));
+            numPasses > 0 ? (float)numFailures * 100.0f / (numPasses + numFailures) : 0.0f);
     fclose(fp);
   }
 }
@@ -362,7 +362,7 @@ int32_t RunTestCaseInChildProcess(TestCase& testCase, bool redirect)
   return testResult;
 }
 
-int32_t RunAll(const char* processName, ::testcase tc_array[], bool quiet)
+int32_t RunAll(const char* processName, ::testcase tc_array[], std::string match, bool quiet)
 {
   int32_t       numFailures = 0;
   int32_t       numPasses   = 0;
@@ -381,23 +381,35 @@ int32_t RunAll(const char* processName, ::testcase tc_array[], bool quiet)
     std::string startTime(buffer);
 
     TestCase testCase(i, &tc_array[i]);
-    testCase.result = RunTestCaseInChildProcess(testCase, quiet);
-
-    tt = system_clock::to_time_t(system_clock::now());
-    strftime(buffer, BUFSIZE, "%c", localtime(&tt));
-    std::string endTime(buffer);
-
-    if(testCase.result == 0)
+    bool     run = true;
+    if(!match.empty())
     {
-      numPasses++;
+      if(match.compare(0, match.size(), testCase.name, match.size()))
+      {
+        run = false;
+      }
     }
-    else
+
+    if(run)
     {
-      numFailures++;
-    }
-    if(!quiet)
-    {
-      OutputTestResult(ofs, processName, moduleName, testCase, startTime, endTime);
+      testCase.result = RunTestCaseInChildProcess(testCase, quiet);
+
+      tt = system_clock::to_time_t(system_clock::now());
+      strftime(buffer, BUFSIZE, "%c", localtime(&tt));
+      std::string endTime(buffer);
+
+      if(testCase.result == 0)
+      {
+        numPasses++;
+      }
+      else
+      {
+        numFailures++;
+      }
+      if(!quiet)
+      {
+        OutputTestResult(ofs, processName, moduleName, testCase, startTime, endTime);
+      }
     }
   }
   ofs.close();
@@ -408,7 +420,7 @@ int32_t RunAll(const char* processName, ::testcase tc_array[], bool quiet)
 }
 
 // Constantly runs up to MAX_NUM_CHILDREN processes
-int32_t RunAllInParallel(const char* processName, ::testcase tc_array[], bool reRunFailed, bool quiet)
+int32_t RunAllInParallel(const char* processName, ::testcase tc_array[], std::string match, bool reRunFailed, bool quiet)
 {
   int32_t numFailures = 0;
   int32_t numPasses   = 0;
@@ -427,34 +439,54 @@ int32_t RunAllInParallel(const char* processName, ::testcase tc_array[], bool re
     // Create more children (up to the max number or til the end of the array)
     while(numRunningChildren < MAX_NUM_CHILDREN && tc_array[nextTestCase].name)
     {
-      int32_t pid = fork();
-      if(pid == 0) // Child process
+      bool run = true;
+      if(!match.empty())
       {
-        TestCase testCase(nextTestCase, &tc_array[nextTestCase]);
-        int      status = RunTestCaseRedirectOutput(testCase, quiet);
-        exit(status);
+        if(match.compare(0, match.size(), tc_array[nextTestCase].name, match.size()))
+        {
+          run = false;
+        }
       }
-      else if(pid == -1)
+      if(run)
       {
-        perror("fork");
-        exit(EXIT_STATUS_FORK_FAILED);
-      }
-      else // Parent process
-      {
-        TestCase tc(nextTestCase, tc_array[nextTestCase].name);
-        tc.startTime       = steady_clock::now();
-        tc.startSystemTime = system_clock::now();
-        tc.childPid        = pid;
+        int32_t pid = fork();
+        if(pid == 0) // Child process
+        {
+          TestCase testCase(nextTestCase, &tc_array[nextTestCase]);
+          int      status = RunTestCaseRedirectOutput(testCase, quiet);
+          exit(status);
+        }
+        else if(pid == -1)
+        {
+          perror("fork");
+          exit(EXIT_STATUS_FORK_FAILED);
+        }
+        else // Parent process
+        {
+          TestCase tc(nextTestCase, tc_array[nextTestCase].name);
+          tc.startTime       = steady_clock::now();
+          tc.startSystemTime = system_clock::now();
+          tc.childPid        = pid;
 
-        children[pid] = tc;
+          children[pid] = tc;
+          nextTestCase++;
+          numRunningChildren++;
+        }
+      }
+      else
+      {
         nextTestCase++;
-        numRunningChildren++;
       }
     }
 
-    // Check to see if any children have finished yet
     int32_t status   = 0;
-    int32_t childPid = waitpid(-1, &status, WNOHANG);
+    int32_t childPid = 0;
+    if(numRunningChildren > 0) // Only wait if there are running children.
+    {
+      // Check to see if any children have finished yet
+      childPid = waitpid(-1, &status, WNOHANG);
+    }
+
     if(childPid == 0)
     {
       // No children have finished.
@@ -581,10 +613,11 @@ void Usage(const char* program)
 int RunTests(int argc, char* const argv[], ::testcase tc_array[])
 {
   int         result    = TestHarness::EXIT_STATUS_BAD_ARGUMENT;
-  const char* optString = "sfq";
+  const char* optString = "sfqm:";
   bool        optRerunFailed(true);
   bool        optRunSerially(false);
   bool        optQuiet(false);
+  std::string optMatch;
 
   int nextOpt = 0;
   do
@@ -601,6 +634,9 @@ int RunTests(int argc, char* const argv[], ::testcase tc_array[])
       case 'q':
         optQuiet = true;
         break;
+      case 'm':
+        optMatch = optarg;
+        break;
       case '?':
         TestHarness::Usage(argv[0]);
         exit(TestHarness::EXIT_STATUS_BAD_ARGUMENT);
@@ -612,11 +648,11 @@ int RunTests(int argc, char* const argv[], ::testcase tc_array[])
   {
     if(optRunSerially)
     {
-      result = TestHarness::RunAll(argv[0], tc_array, optQuiet);
+      result = TestHarness::RunAll(argv[0], tc_array, optMatch, optQuiet);
     }
     else
     {
-      result = TestHarness::RunAllInParallel(argv[0], tc_array, optRerunFailed, optQuiet);
+      result = TestHarness::RunAllInParallel(argv[0], tc_array, optMatch, optRerunFailed, optQuiet);
     }
   }
   else

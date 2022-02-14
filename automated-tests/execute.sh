@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TEMP=`getopt -o dhsSmfq --long debug,help,failnorerun,quiet,serial,tct,modules -n 'execute.sh' -- "$@"`
+TEMP=`getopt -o dhsSmfqp: --long debug,help,failnorerun,quiet,serial,tct,modules,prefix: -n 'execute.sh' -- "$@"`
 
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 
@@ -13,6 +13,7 @@ function usage
     echo -e "       execute.sh\t\tExecute test cases from all modules in parallel"
     echo -e "       execute.sh -f \tExecute test cases from all modules in parallel without rerunning failed test cases"
     echo -e "       execute.sh -d <testcase>\tDebug testcase"
+    echo -e "       execute.sh -p <prefix>\tExecute all testcases named with <prefix>"
     echo -e "       execute.sh [module]\tExecute test cases from the given module in parallel"
     echo -e "       execute.sh -s [module]\t\tExecute test cases in serial using Testkit-Lite"
     echo -e "       execute.sh -S [module]\t\tExecute test cases in serial"
@@ -27,6 +28,7 @@ opt_modules=0
 opt_debug=0
 opt_noFailedRerun="";
 opt_quiet="";
+opt_match="";
 while true ; do
     case "$1" in
         -h|--help)     usage ;;
@@ -35,6 +37,7 @@ while true ; do
         -f|--nofailedrerun) opt_noFailedRerun="-f" ; shift ;;
         -S|--serial)   opt_serial="-s" ; shift ;;
         -q|--quiet)    opt_quiet="-q" ; shift ;;
+        -p|--prefix)   opt_match="-m $2" ; shift 2;;
         -m|--modules)  opt_modules=1 ; shift ;;
         --) shift; break;;
         *) echo "Internal error $1!" ; exit 1 ;;
@@ -147,7 +150,7 @@ else
             echo -e "$ASCII_BOLD"
             echo -e "Executing $mod$ASCII_RESET"
             output_start $mod
-            dbus-launch build/src/$mod/tct-$mod-core $opt_serial $opt_noFailedRerun $opt_quiet
+            dbus-launch build/src/$mod/tct-$mod-core $opt_serial $opt_noFailedRerun $opt_quiet $opt_match
             output_end $mod
         done
         summary_end
@@ -159,7 +162,7 @@ else
         module=$1
         shift;
         output_start ${module}
-        dbus-launch build/src/$module/tct-$module-core $opt_serial $opt_noFailedRerun $opt_quiet $*
+        dbus-launch build/src/$module/tct-$module-core $opt_serial $opt_noFailedRerun $opt_quiet $opt_match $*
         output_end ${module}
         summary_end
 
