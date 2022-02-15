@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -146,7 +146,26 @@ bool TraceCallStack::FindMethodAndGetParameters(std::string method, std::string&
   }
   if(!found)
   {
-    fprintf(stderr, "Search for %s(%s) failed\n", method.c_str(), params.c_str());
+    fprintf(stderr, "Search for %s() failed\n", method.c_str());
+  }
+  return found;
+}
+
+bool TraceCallStack::FindMethodAndGetParameters(std::string method, NamedParams& params) const
+{
+  bool found = false;
+  for(size_t i = 0; i < mCallStack.size(); i++)
+  {
+    if(0 == mCallStack[i].method.compare(method))
+    {
+      found  = true;
+      params = mCallStack[i].namedParams;
+      break;
+    }
+  }
+  if(!found)
+  {
+    fprintf(stderr, "Search for %s() failed\n", method.c_str());
   }
   return found;
 }

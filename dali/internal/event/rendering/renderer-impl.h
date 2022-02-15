@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDERER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -211,7 +211,7 @@ public: // Default property extensions from Object
    */
   void AddDrawCommand(const Dali::DevelRenderer::DrawCommand& command);
 
-private: // implementation
+protected: // implementation
   /**
    * @brief Constructor.
    *
@@ -220,16 +220,13 @@ private: // implementation
   Renderer(const SceneGraph::Renderer* sceneObject);
 
   /**
-   * @brief Sets the blend color.
-   * @param[in] blendColor The blend color to set.
+   * A reference counted object may only be deleted by calling Unreference()
    */
-  void SetBlendColor(const Vector4& blendColor);
+  ~Renderer() override;
 
-  /**
-   * @brief Retrieves the blend-color.
-   * @return A const reference to the blend-color
-   */
-  const Vector4& GetBlendColor() const;
+private:
+  Renderer(const Renderer&) = delete;            ///< Deleted copy constructor
+  Renderer& operator=(const Renderer&) = delete; ///< Deleted assignment operator
 
   /**
    * @brief Retrieves the cached event side value of a default property.
@@ -247,17 +244,19 @@ private: // implementation
    */
   bool GetCurrentPropertyValue(Property::Index index, Property::Value& value) const;
 
-protected:
   /**
-   * A reference counted object may only be deleted by calling Unreference()
+   * @brief Sets the blend color.
+   * @param[in] blendColor The blend color to set.
    */
-  ~Renderer() override;
+  void SetBlendColor(const Vector4& blendColor);
 
-private: // unimplemented methods
-  Renderer(const Renderer&);
-  Renderer& operator=(const Renderer&);
+  /**
+   * @brief Retrieves the blend-color.
+   * @return A const reference to the blend-color
+   */
+  const Vector4& GetBlendColor() const;
 
-private:                     // data
+protected:
   GeometryPtr   mGeometry;   ///< Intrusive pointer to the geometry used by this renderer
   TextureSetPtr mTextureSet; ///< Intrusive pointer to the texture set used by this renderer
   ShaderPtr     mShader;     ///< Intrusive pointer to the shader used by this renderer
@@ -279,6 +278,7 @@ private:                     // data
   DevelRenderer::Rendering::Type mRenderingBehavior : 2;        ///< The rendering behavior
   bool                           mPremultipledAlphaEnabled : 1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 
+private:
   std::vector<Dali::DevelRenderer::DrawCommand> mDrawCommands; ///< list of draw commands
 };
 

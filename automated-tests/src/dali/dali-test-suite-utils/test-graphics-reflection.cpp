@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,6 +50,8 @@ static const std::vector<UniformData> UNIFORMS =
     UniformData("uViewMatrix", Property::Type::MATRIX),
     UniformData("uLightCameraProjectionMatrix", Property::Type::MATRIX),
     UniformData("uLightCameraViewMatrix", Property::Type::MATRIX),
+
+    // WARNING: IF YOU CHANGE THIS LIST, ALSO CHANGE mActiveUniforms IN test-gl-abstraction, Initialize
 };
 }
 
