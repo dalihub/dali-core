@@ -619,6 +619,16 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
       break;
     }
 
+    case Dali::DevelActor::Property::USER_INTERACTION_ENABLED:
+    {
+      bool value = false;
+      if(property.Get(value))
+      {
+        actor.SetUserInteractionEnabled(value);
+      }
+      break;
+    }
+
     default:
     {
       // this can happen in the case of a non-animatable default property so just do nothing
@@ -1653,6 +1663,12 @@ bool Actor::PropertyHandler::GetCachedPropertyValue(const Internal::Actor& actor
     case Dali::DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN:
     {
       value = actor.AreChildrenKeyBoardFocusable();
+      break;
+    }
+
+    case Dali::DevelActor::Property::USER_INTERACTION_ENABLED:
+    {
+      value = actor.IsUserInteractionEnabled();
       break;
     }
 

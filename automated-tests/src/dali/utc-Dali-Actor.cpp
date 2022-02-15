@@ -2598,6 +2598,29 @@ int UtcDaliActorIsTouchFocusable(void)
   END_TEST;
 }
 
+int UtcDaliActorSetUserInteractionEnabled(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+
+  bool enabled = !actor.GetProperty<bool>(DevelActor::Property::USER_INTERACTION_ENABLED);
+
+  actor.SetProperty(DevelActor::Property::USER_INTERACTION_ENABLED, enabled);
+
+  DALI_TEST_CHECK(enabled == actor.GetProperty<bool>(DevelActor::Property::USER_INTERACTION_ENABLED));
+  END_TEST;
+}
+
+int UtcDaliActorIsUserInteractionEnabled(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  actor.SetProperty(DevelActor::Property::USER_INTERACTION_ENABLED, true);
+
+  DALI_TEST_CHECK(true == actor.GetProperty<bool>(DevelActor::Property::USER_INTERACTION_ENABLED));
+  END_TEST;
+}
+
 int UtcDaliActorRemoveConstraints(void)
 {
   tet_infoline(" UtcDaliActorRemoveConstraints");
