@@ -71,7 +71,7 @@ foreach $module (keys(%modules))
     my $numFailures = $modules{$module}->{"fail"};
     $totalFailures += $numFailures;
     print( "$ASCII_BOLD$module results:$ASCII_RESET\n" );
-    printf("Number of test passes:   %s%4d (%5.2f%%)%s\n", $ASCII_BOLD, $numPasses, 100.0 * $numPasses / ($numPasses+$numFailures),  $ASCII_RESET);
+    printf("Number of test passes:   %s%4d (%5.2f%%)%s\n", $ASCII_BOLD, $numPasses, $numPasses>0?100.0 * $numPasses / ($numPasses+$numFailures):0,  $ASCII_RESET);
     printf("%sNumber of test failures:%s %s%4d%s\n\n", $result_colour, $ASCII_RESET, $ASCII_BOLD, $numFailures, $ASCII_RESET);
 }
 

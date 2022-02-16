@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -137,7 +137,8 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
           // This is a possible multiple tap, so has it been quick enough?
           uint32_t timeDelta                    = event.time - mLastTapTime;
           uint32_t deltaBetweenTouchDownTouchUp = event.time - mTouchTime;
-          if(timeDelta > mMaximumAllowedTime) // If exceeded time between taps then just a single tap
+          if(timeDelta > mMaximumAllowedTime || // If exceeded time between taps then just a single tap
+             mMaximumTapsRequired == 1u)        // If MaximumTapsRequired is 1, it is not waiting for a multi-tap, so a Tap gesture send a single tap.
           {
             mLastTapTime = event.time;
             EmitSingleTap(event.time, point);

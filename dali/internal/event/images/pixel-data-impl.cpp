@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,12 +26,14 @@ PixelData::PixelData(uint8_t*                         buffer,
                      uint32_t                         bufferSize,
                      uint32_t                         width,
                      uint32_t                         height,
+                     uint32_t                         stride,
                      Pixel::Format                    pixelFormat,
                      Dali::PixelData::ReleaseFunction releaseFunction)
 : mBuffer(buffer),
   mBufferSize(bufferSize),
   mWidth(width),
   mHeight(height),
+  mStride(stride),
   mPixelFormat(pixelFormat),
   mReleaseFunction(releaseFunction)
 {
@@ -56,10 +58,11 @@ PixelDataPtr PixelData::New(uint8_t*                         buffer,
                             uint32_t                         bufferSize,
                             uint32_t                         width,
                             uint32_t                         height,
+                            uint32_t                         stride,
                             Pixel::Format                    pixelFormat,
                             Dali::PixelData::ReleaseFunction releaseFunction)
 {
-  return new PixelData(buffer, bufferSize, width, height, pixelFormat, releaseFunction);
+  return new PixelData(buffer, bufferSize, width, height, stride, pixelFormat, releaseFunction);
 }
 
 uint32_t PixelData::GetWidth() const
@@ -92,6 +95,11 @@ DevelPixelData::PixelDataBuffer PixelData::ReleaseBuffer()
   DevelPixelData::PixelDataBuffer pixelDataBuffer(mBuffer, mBufferSize, mReleaseFunction);
   mBuffer = nullptr;
   return pixelDataBuffer;
+}
+
+uint32_t PixelData::GetStride() const
+{
+  return mStride;
 }
 
 } // namespace Internal
