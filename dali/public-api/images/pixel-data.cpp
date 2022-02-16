@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,19 @@ PixelData PixelData::New(uint8_t*        buffer,
                          Pixel::Format   pixelFormat,
                          ReleaseFunction releaseFunction)
 {
-  IntrusivePtr<Internal::PixelData> internal = Internal::PixelData::New(buffer, bufferSize, width, height, pixelFormat, releaseFunction);
+  IntrusivePtr<Internal::PixelData> internal = Internal::PixelData::New(buffer, bufferSize, width, height, 0, pixelFormat, releaseFunction);
+  return PixelData(internal.Get());
+}
+
+PixelData PixelData::New(uint8_t*        buffer,
+                         uint32_t        bufferSize,
+                         uint32_t        width,
+                         uint32_t        height,
+                         uint32_t        stride,
+                         Pixel::Format   pixelFormat,
+                         ReleaseFunction releaseFunction)
+{
+  IntrusivePtr<Internal::PixelData> internal = Internal::PixelData::New(buffer, bufferSize, width, height, stride, pixelFormat, releaseFunction);
   return PixelData(internal.Get());
 }
 
@@ -64,6 +76,11 @@ uint32_t PixelData::GetHeight() const
 Pixel::Format PixelData::GetPixelFormat() const
 {
   return GetImplementation(*this).GetPixelFormat();
+}
+
+uint32_t PixelData::GetStride() const
+{
+  return GetImplementation(*this).GetStride();
 }
 
 } // namespace Dali

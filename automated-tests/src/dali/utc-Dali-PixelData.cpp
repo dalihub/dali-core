@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,6 +58,50 @@ int UtcDaliPixelData02(void)
   DALI_TEST_CHECK(pixelData);
   DALI_TEST_CHECK(pixelData.GetWidth() == width);
   DALI_TEST_CHECK(pixelData.GetHeight() == height);
+  DALI_TEST_CHECK(pixelData.GetStride() == 0);
+  DALI_TEST_CHECK(pixelData.GetPixelFormat() == Pixel::L8);
+
+  END_TEST;
+}
+
+int UtcDaliPixelData03(void)
+{
+  TestApplication application;
+
+  uint32_t width      = 10u;
+  uint32_t height     = 10u;
+  uint32_t stride     = 12u;
+  uint32_t bufferSize = stride * height * Pixel::GetBytesPerPixel(Pixel::RGB888);
+
+  uint8_t*  buffer    = reinterpret_cast<uint8_t*>(malloc(bufferSize));
+  PixelData pixelData = PixelData::New(buffer, bufferSize, width, height, stride, Pixel::RGB888, PixelData::FREE);
+
+  DALI_TEST_CHECK(pixelData);
+  DALI_TEST_CHECK(pixelData.GetWidth() == width);
+  DALI_TEST_CHECK(pixelData.GetHeight() == height);
+  DALI_TEST_CHECK(pixelData.GetStride() == stride);
+  DALI_TEST_CHECK(pixelData.GetPixelFormat() == Pixel::RGB888);
+
+  END_TEST;
+}
+
+int UtcDaliPixelData04(void)
+{
+  TestApplication application;
+
+  uint32_t width      = 10u;
+  uint32_t height     = 10u;
+  uint32_t stride     = 12u;
+  uint32_t bufferSize = stride * height * Pixel::GetBytesPerPixel(Pixel::L8);
+  uint8_t* buffer     = new uint8_t[bufferSize];
+  buffer[0]           = 'a';
+
+  PixelData pixelData = PixelData::New(buffer, bufferSize, width, height, stride, Pixel::L8, PixelData::DELETE_ARRAY);
+
+  DALI_TEST_CHECK(pixelData);
+  DALI_TEST_CHECK(pixelData.GetWidth() == width);
+  DALI_TEST_CHECK(pixelData.GetHeight() == height);
+  DALI_TEST_CHECK(pixelData.GetStride() == stride);
   DALI_TEST_CHECK(pixelData.GetPixelFormat() == Pixel::L8);
 
   END_TEST;
