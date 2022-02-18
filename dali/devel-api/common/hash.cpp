@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,14 @@ inline void HashString(const char* string, std::size_t& hash, char terminator)
   }
 }
 
+inline void HashBuffer(const std::vector<std::uint8_t>& buffer, std::size_t& hash)
+{
+  for(const auto& c : buffer)
+  {
+    hash = hash * 33 + c;
+  }
+}
+
 } // unnamed namespace
 
 std::size_t CalculateHash(const std::string& toHash)
@@ -69,6 +77,15 @@ std::size_t CalculateHash(const std::string& string1, const std::string& string2
 
   HashString(string1.c_str(), hash);
   HashString(string2.c_str(), hash);
+
+  return hash;
+}
+
+std::size_t CalculateHash(const std::vector<std::uint8_t>& toHash)
+{
+  std::size_t hash(INITIAL_HASH_VALUE);
+
+  HashBuffer(toHash, hash);
 
   return hash;
 }

@@ -2,7 +2,7 @@
 #define DALI_HASH
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <string>
+#include <vector>
 
 //INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -54,6 +55,13 @@ DALI_CORE_API std::size_t CalculateHash(const std::string& string1, const std::s
  * @return hash code
  */
 DALI_CORE_API std::size_t CalculateHash(const std::string& toHash, char terminator);
+
+/**
+ * @brief Create a hash code for a std::vector<std::uint8_t>
+ * @param toHash list of std::uint8_t to hash
+ * @return hash code
+ */
+DALI_CORE_API std::size_t CalculateHash(const std::vector<std::uint8_t>& toHash);
 
 } // namespace Dali
 
