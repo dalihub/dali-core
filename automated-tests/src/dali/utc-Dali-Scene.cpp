@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -222,6 +222,50 @@ struct KeyEventGeneratedReceivedFunctor
   }
 
   KeyEventGeneratedSignalData& signalData;
+};
+
+// Stores data that is populated in the WheelEventGeneratedSignal callback and will be read by the TET cases
+struct WheelEventGeneratedSignalData
+{
+  WheelEventGeneratedSignalData()
+  : functorCalled(false)
+  {
+  }
+
+  void Reset()
+  {
+    functorCalled = false;
+
+    receivedWheelEvent.Reset();
+  }
+
+  bool       functorCalled;
+  WheelEvent receivedWheelEvent;
+};
+
+// Functor that sets the data when called
+struct WheelEventGeneratedReceivedFunctor
+{
+  WheelEventGeneratedReceivedFunctor(WheelEventGeneratedSignalData& data)
+  : signalData(data)
+  {
+  }
+
+  bool operator()(const WheelEvent& wheelEvent)
+  {
+    signalData.functorCalled      = true;
+    signalData.receivedWheelEvent = wheelEvent;
+
+    return true;
+  }
+
+  bool operator()()
+  {
+    signalData.functorCalled = true;
+    return true;
+  }
+
+  WheelEventGeneratedSignalData& signalData;
 };
 
 void GenerateTouch(TestApplication& application, PointState::Type state, const Vector2& screenPosition)
@@ -1700,5 +1744,40 @@ int UtcDaliSceneFrameRenderedPresentedCallback(void)
   DALI_TEST_EQUALS(callbackContainer.size(), 1, TEST_LOCATION);
   DALI_TEST_EQUALS(callbackContainer[0].second, frameId, TEST_LOCATION);
 
+  END_TEST;
+}
+
+int UtcDaliSceneWheelEventGeneratedSignalP(void)
+{
+  TestApplication          application;
+  Dali::Integration::Scene scene = application.GetScene();
+
+  WheelEventGeneratedSignalData      data;
+  WheelEventGeneratedReceivedFunctor functor(data);
+  scene.WheelEventGeneratedSignal().Connect(&application, functor);
+
+  Integration::WheelEvent event(Integration::WheelEvent::CUSTOM_WHEEL, 0, 0u, Vector2(0.0f, 0.0f), 1, 1000u);
+  application.ProcessEvent(event);
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_CHECK(static_cast<WheelEvent::Type>(event.type) == data.receivedWheelEvent.GetType());
+  DALI_TEST_CHECK(event.direction == data.receivedWheelEvent.GetDirection());
+  DALI_TEST_CHECK(event.modifiers == data.receivedWheelEvent.GetModifiers());
+  DALI_TEST_CHECK(event.point == data.receivedWheelEvent.GetPoint());
+  DALI_TEST_CHECK(event.delta == data.receivedWheelEvent.GetDelta());
+  DALI_TEST_CHECK(event.timeStamp == data.receivedWheelEvent.GetTime());
+
+  data.Reset();
+
+  Integration::WheelEvent event2(Integration::WheelEvent::CUSTOM_WHEEL, 0, 0u, Vector2(0.0f, 0.0f), -1, 1000u);
+  application.ProcessEvent(event2);
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_CHECK(static_cast<WheelEvent::Type>(event2.type) == data.receivedWheelEvent.GetType());
+  DALI_TEST_CHECK(event2.direction == data.receivedWheelEvent.GetDirection());
+  DALI_TEST_CHECK(event2.modifiers == data.receivedWheelEvent.GetModifiers());
+  DALI_TEST_CHECK(event2.point == data.receivedWheelEvent.GetPoint());
+  DALI_TEST_CHECK(event2.delta == data.receivedWheelEvent.GetDelta());
+  DALI_TEST_CHECK(event2.timeStamp == data.receivedWheelEvent.GetTime());
   END_TEST;
 }
