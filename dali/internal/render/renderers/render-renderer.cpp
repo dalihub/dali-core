@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -229,10 +229,14 @@ void Renderer::BindTextures(Graphics::CommandBuffer& commandBuffer, Vector<Graph
 
   if(textures != nullptr)
   {
-    for(uint32_t i = 0; i < static_cast<uint32_t>(textures->Count()); ++i) // not expecting more than uint32_t of textures
+    const std::uint32_t texturesCount(static_cast<std::uint32_t>(textures->Count()));
+    textureBindings.reserve(texturesCount);
+
+    for(uint32_t i = 0; i < texturesCount; ++i) // not expecting more than uint32_t of textures
     {
       if((*textures)[i] && (*textures)[i]->GetGraphicsObject())
       {
+        Graphics::Texture* graphicsTexture = (*textures)[i]->GetGraphicsObject();
         // if the sampler exists,
         //   if it's default, delete the graphics object
         //   otherwise re-initialize it if dirty
@@ -241,8 +245,8 @@ void Renderer::BindTextures(Graphics::CommandBuffer& commandBuffer, Vector<Graph
                                                                               : nullptr)
                                                             : nullptr;
 
-        boundTextures.PushBack((*textures)[i]->GetGraphicsObject());
-        const Graphics::TextureBinding textureBinding{(*textures)[i]->GetGraphicsObject(), graphicsSampler, textureUnit};
+        boundTextures.PushBack(graphicsTexture);
+        const Graphics::TextureBinding textureBinding{graphicsTexture, graphicsSampler, textureUnit};
         textureBindings.push_back(textureBinding);
 
         ++textureUnit;

@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_COMMAND_BUFFER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -111,9 +111,9 @@ public:
    * @param[in] buffers List of buffers to bind
    * @param[in] offsets List of offsets for each buffer
    */
-  virtual void BindVertexBuffers(uint32_t                   firstBinding,
-                                 std::vector<const Buffer*> buffers,
-                                 std::vector<uint32_t>      offsets) = 0;
+  virtual void BindVertexBuffers(uint32_t                          firstBinding,
+                                 const std::vector<const Buffer*>& buffers,
+                                 const std::vector<uint32_t>&      offsets) = 0;
 
   /**
    * @brief Binds uniform buffers
@@ -134,14 +134,14 @@ public:
    *
    * @param[in] textureBindings List of texture bindings
    */
-  virtual void BindTextures(std::vector<TextureBinding>& textureBindings) = 0;
+  virtual void BindTextures(const std::vector<TextureBinding>& textureBindings) = 0;
 
   /**
    * @brief Binds samplers
    *
    * @param[in] samplerBindings List of sampler bindings
    */
-  virtual void BindSamplers(std::vector<SamplerBinding>& samplerBindings) = 0;
+  virtual void BindSamplers(const std::vector<SamplerBinding>& samplerBindings) = 0;
 
   /**
    * @brief Binds buffer containing push constants
@@ -183,10 +183,10 @@ public:
    * @param[in] clearValues clear values (compatible with renderpass spec)
    */
   virtual void BeginRenderPass(
-    RenderPass*             renderPass,
-    RenderTarget*           renderTarget,
-    Rect2D                  renderArea,
-    std::vector<ClearValue> clearValues) = 0;
+    RenderPass*                    renderPass,
+    RenderTarget*                  renderTarget,
+    Rect2D                         renderArea,
+    const std::vector<ClearValue>& clearValues) = 0;
 
   /**
    * @brief Ends current render pass
