@@ -2,7 +2,7 @@
 #define DALI_INTRUSIVE_PTR_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@
  * limitations under the License.
  *
  */
+
+// EXTERNAL INCLUDES
+#include <cstddef> // for std::nullptr_t
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -375,6 +378,62 @@ template<typename T, typename U>
 inline bool operator!=(T* lhs, IntrusivePtr<U> const& rhs)
 {
   return lhs != rhs.Get();
+}
+
+/**
+ * @brief Comparison overrides of objects with nullptr_t.
+ *
+ * @SINCE_2_1.11
+ * @param[in] lhs Intrusive pointer to compare with
+ * @param[in] rhs nullptr
+ * @return True if the pointers is nullptr
+ */
+template<typename T>
+inline bool operator==(IntrusivePtr<T> const& lhs, std::nullptr_t rhs)
+{
+  return lhs.Get() == nullptr;
+}
+
+/**
+ * @brief Comparison overrides of objects with nullptr_t.
+ *
+ * @SINCE_2_1.11
+ * @param[in] lhs Intrusive pointer to compare with
+ * @param[in] rhs nullptr
+ * @return True if the pointers is not nullptr
+ */
+template<typename T>
+inline bool operator!=(IntrusivePtr<T> const& lhs, std::nullptr_t rhs)
+{
+  return lhs.Get() != nullptr;
+}
+
+/**
+ * @brief Comparison overrides of objects with nullptr_t.
+ *
+ * @SINCE_2_1.11
+ * @param[in] lhs nullptr
+ * @param[in] rhs Intrusive pointer to compare against
+ * @return True if the pointers is nullptr
+ */
+template<typename T>
+inline bool operator==(std::nullptr_t lhs, IntrusivePtr<T> const& rhs)
+{
+  return nullptr == rhs.Get();
+}
+
+/**
+ * @brief Comparison overrides of objects with nullptr_t.
+ *
+ * @SINCE_2_1.11
+ * @param[in] lhs nullptr
+ * @param[in] rhs Intrusive pointer to compare against
+ * @return True if the pointers is not nullptr
+ */
+template<typename T>
+inline bool operator!=(std::nullptr_t lhs, IntrusivePtr<T> const& rhs)
+{
+  return nullptr != rhs.Get();
 }
 
 /**
