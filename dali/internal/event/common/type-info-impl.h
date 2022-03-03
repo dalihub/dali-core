@@ -1,8 +1,9 @@
 #ifndef DALI_INTERNAL_TYPE_INFO_H
 #define DALI_INTERNAL_TYPE_INFO_H
+#define USE_INDEXED_MAP_CONTAINER_AT_TYPE_INFO /// For safety. If some problem occured, just remove this define.
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +23,11 @@
 #include <string>
 
 // INTERNAL INCLUDES
+#ifdef USE_INDEXED_MAP_CONTAINER_AT_TYPE_INFO
+#include <dali/internal/common/indexed-const-string-map.h>
+#include <dali/internal/common/indexed-integer-map.h>
+#endif
+
 #include <dali/devel-api/object/csharp-type-info.h>
 #include <dali/internal/common/const-string.h>
 #include <dali/internal/event/object/default-property-metadata.h>
@@ -380,15 +386,27 @@ private:
     int32_t         componentIndex    = Property::INVALID_COMPONENT_INDEX;
   };
 
-  using ConnectionPair           = std::pair<std::string, Dali::TypeInfo::SignalConnectorFunction>;
-  using ActionPair               = std::pair<std::string, Dali::TypeInfo::ActionFunction>;
-  using RegisteredPropertyPair   = std::pair<Property::Index, RegisteredProperty>;
-  using PropertyDefaultValuePair = std::pair<Property::Index, Property::Value>;
+  using ActionPair     = std::pair<std::string, Dali::TypeInfo::ActionFunction>;
+  using ConnectionPair = std::pair<std::string, Dali::TypeInfo::SignalConnectorFunction>;
+#ifdef USE_INDEXED_MAP_CONTAINER_AT_TYPE_INFO
+  using RegisteredPropertyPair   = std::pair<std::uint32_t, RegisteredProperty>;
+  using PropertyDefaultValuePair = std::pair<std::uint32_t, Property::Value>;
+#else
+  using RegisteredPropertyPair        = std::pair<Property::Index, RegisteredProperty>;
+  using PropertyDefaultValuePair      = std::pair<Property::Index, Property::Value>;
+#endif
 
+#ifdef USE_INDEXED_MAP_CONTAINER_AT_TYPE_INFO
+  using ActionContainer               = Dali::Internal::IndexedConstStringMap<Dali::TypeInfo::ActionFunction>;
+  using ConnectorContainer            = Dali::Internal::IndexedConstStringMap<Dali::TypeInfo::SignalConnectorFunction>;
+  using RegisteredPropertyContainer   = Dali::Internal::IndexedIntegerMap<RegisteredProperty>;
+  using PropertyDefaultValueContainer = Dali::Internal::IndexedIntegerMap<Property::Value>;
+#else
   using ActionContainer               = std::vector<ActionPair>;
   using ConnectorContainer            = std::vector<ConnectionPair>;
   using RegisteredPropertyContainer   = std::vector<RegisteredPropertyPair>;
   using PropertyDefaultValueContainer = std::vector<PropertyDefaultValuePair>;
+#endif
 
   /**
    * Append properties from registeredProperties onto indices.

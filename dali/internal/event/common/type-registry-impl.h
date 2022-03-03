@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TYPE_REGISTRY_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/object/csharp-type-info.h>
+#include <dali/internal/common/indexed-const-string-map.h>
 #include <dali/internal/event/common/type-info-impl.h>
 #include <dali/internal/event/object/default-property-metadata.h>
 #include <dali/public-api/object/base-handle.h>
@@ -235,7 +236,7 @@ private:
   /*
    * Mapping from type name to TypeInfo
    */
-  std::vector<TypeInfoPointer> mRegistryLut;
+  Dali::Internal::IndexedConstStringMap<TypeInfoPointer> mRegistryLut;
 
   std::vector<Dali::TypeInfo::CreateFunction> mInitFunctions;
 

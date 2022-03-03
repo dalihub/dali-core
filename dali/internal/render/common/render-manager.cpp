@@ -95,6 +95,12 @@ inline Graphics::Rect2D RecalculateScissorArea(Graphics::Rect2D scissorArea, int
   }
   return newScissorArea;
 }
+
+/**
+ * @brief The number of dirty rects per renderer in itemDirtyRects list.
+ * If this value is 3, keep only last 3 dirty rects for the same node and renderer.
+ */
+constexpr int MAX_DIRTY_RECT_PER_RENDERER = 3;
 } // namespace
 /**
  * Structure to contain internal data
@@ -624,15 +630,16 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
                   rect.height      = ((bottom + 16) / 16) * 16 - rect.y;
 
                   // Found valid dirty rect.
-                  // 1. Insert it in the sorted array of the dirty rects.
-                  // 2. Mark the related dirty rects as visited so they will not be removed below.
-                  // 3. Keep only last 3 dirty rects for the same node and renderer (Tizen uses 3 back buffers, Ubuntu 1).
+                  // 1. Mark the related dirty rects as visited so they will not be removed below.
+                  // 2. Keep only last "MAX_DIRTY_RECT_PER_RENDERER" dirty rects for the same node and renderer (Tizen uses 3 back buffers, Ubuntu 1).
+                  // 3-1. If itemDirtyRect hold MAX_DIRTY_RECT_PER_RENDERER rects, remove oldest one and insert it in the sorted array of the dirty rects.
+                  // 3-2. Else, Insert it in the sorted array of the dirty rects.
                   dirtyRect.rect    = rect;
                   auto dirtyRectPos = std::lower_bound(itemsDirtyRects.begin(), itemsDirtyRects.end(), dirtyRect);
-                  dirtyRectPos      = itemsDirtyRects.insert(dirtyRectPos, dirtyRect);
 
-                  int c = 1;
-                  while(++dirtyRectPos != itemsDirtyRects.end())
+                  auto originDirtyRectPos = dirtyRectPos;
+                  bool hasMaxDirtyRect    = false;
+                  while(dirtyRectPos != itemsDirtyRects.end())
                   {
                     if(dirtyRectPos->node != item.mNode || dirtyRectPos->renderer != item.mRenderer)
                     {
@@ -640,15 +647,34 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
                     }
 
                     dirtyRectPos->visited = true;
-                    Rect<int>& dirtRect   = dirtyRectPos->rect;
-                    rect.Merge(dirtRect);
+                    rect.Merge(dirtyRectPos->rect);
 
-                    c++;
-                    if(c > 3) // no more then 3 previous rects
+                    ++dirtyRectPos;
+
+                    if((dirtyRectPos - originDirtyRectPos) == MAX_DIRTY_RECT_PER_RENDERER) // no more than MAX_DIRTY_RECT_PER_RENDERER previous rects
                     {
-                      itemsDirtyRects.erase(dirtyRectPos);
+                      hasMaxDirtyRect = true;
                       break;
                     }
+                  }
+
+                  if(hasMaxDirtyRect)
+                  {
+                    // If we have already MAX_DIRTY_RECT_PER_RENDERER for the same item, just copy it.
+                    // Remove the oldest rect (at pos + MAX_DIRTY_RECT_PER_RENDERER - 1)
+                    // and move other rects one step.
+                    // and insert new dirtyRect at originDirtyRectPos.
+                    auto pos = originDirtyRectPos - itemsDirtyRects.begin();
+                    for(auto i = MAX_DIRTY_RECT_PER_RENDERER - 1; i > 0; i--)
+                    {
+                      itemsDirtyRects[pos + i] = itemsDirtyRects[pos + i - 1];
+                    }
+                    itemsDirtyRects[pos] = dirtyRect;
+                  }
+                  else
+                  {
+                    // Else, just insert the new dirtyrect in the correct position
+                    itemsDirtyRects.insert(originDirtyRectPos, dirtyRect);
                   }
 
                   damagedRects.push_back(rect);
