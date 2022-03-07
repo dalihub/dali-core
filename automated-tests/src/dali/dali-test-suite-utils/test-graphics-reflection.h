@@ -2,7 +2,7 @@
 #define DALI_TEST_GRAPHICS_REFLECTION_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ namespace Dali
 class TestGraphicsReflection : public Graphics::Reflection
 {
 public:
-  TestGraphicsReflection(TestGlAbstraction& gl, Property::Array& vertexFormats, const Graphics::ProgramCreateInfo& createInfo, std::vector<UniformData>& customUniforms);
+  TestGraphicsReflection(TestGlAbstraction& gl, uint32_t program_id, Property::Array& vertexFormats, const Graphics::ProgramCreateInfo& createInfo, std::vector<UniformData>& customUniforms);
 
   uint32_t                                        GetVertexAttributeLocation(const std::string& name) const override;
   Dali::Graphics::VertexInputAttributeFormat      GetVertexAttributeFormat(uint32_t location) const override;
@@ -46,6 +46,27 @@ public:
   Graphics::ShaderLanguage                        GetLanguage() const override;
 
 public: // Test methods
+  struct TestUniformInfo
+  {
+    std::string            name{""}; // baseName in the case of arrays
+    Graphics::UniformClass uniformClass{Graphics::UniformClass::UNDEFINED};
+    uint32_t               binding{0u};
+    uint32_t               bufferIndex{0u};
+    std::vector<uint32_t>  offsets{};
+    std::vector<uint32_t>  locations{};
+    uint32_t               numElements{0u}; // 0 elements means this isn't an array; 1 element means this is an array of size 1
+    Property::Type         type;
+  };
+
+  struct TestUniformBlockInfo
+  {
+    std::string                  name{""};
+    uint32_t                     descriptorSet{0u};
+    uint32_t                     binding{0u};
+    uint32_t                     size{0u};
+    std::vector<TestUniformInfo> members{};
+  };
+
   void SetAttributes(std::vector<std::string> locations)
   {
     mAttributes.clear();
@@ -56,14 +77,17 @@ public: // Test methods
     }
   }
 
-  Dali::Property::Type GetMemberType(int blockIndex, int location) const;
+  const TestUniformBlockInfo& GetTestUniformBlock(uint32_t index) const
+  {
+    return mUniformBlocks[index];
+  }
 
   TestGlAbstraction&               mGl;
   mutable std::vector<std::string> mAttributes;
   std::vector<UniformData>         mCustomUniforms;
 
-  Graphics::UniformBlockInfo              mDefaultUniformBlock{}; ///< The emulated UBO containing all the standalone uniforms
-  std::vector<Graphics::UniformBlockInfo> mUniformBlocks{};       ///< List of uniform blocks
+  TestUniformBlockInfo              mDefaultUniformBlock{}; ///< The emulated UBO containing all the standalone uniforms
+  std::vector<TestUniformBlockInfo> mUniformBlocks{};       ///< List of uniform blocks
 };
 
 } // namespace Dali
