@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -305,30 +305,6 @@ int UtcDaliBaseHandleInequalityOperator02(void)
   BaseHandle theSameBaseHandle = object;
 
   DALI_TEST_CHECK(!(object != theSameBaseHandle));
-  END_TEST;
-}
-
-int UtcDaliBaseHandleInequalityWithNullptr(void)
-{
-  TestApplication application;
-  tet_infoline("Test for Dali::BaseHandle::operator == nullptr");
-
-  BaseHandle object;
-
-  // object is nullptr.
-  DALI_TEST_CHECK(object == nullptr);
-  DALI_TEST_CHECK(nullptr == object);
-  DALI_TEST_CHECK(!(object != nullptr));
-  DALI_TEST_CHECK(!(nullptr != object));
-
-  object = Actor::New();
-
-  // object is not nullptr.
-  DALI_TEST_CHECK(!(object == nullptr));
-  DALI_TEST_CHECK(!(nullptr == object));
-  DALI_TEST_CHECK(object != nullptr);
-  DALI_TEST_CHECK(nullptr != object);
-
   END_TEST;
 }
 
