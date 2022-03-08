@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -605,6 +605,30 @@ int UtcDaliIntrusivePtrMoveAssignment(void)
   countedMovePtr = std::move(countedSubclassPtr);
   DALI_TEST_EQUALS(countedMovePtr->ReferenceCount(), 1, TEST_LOCATION);
   DALI_TEST_CHECK(!countedSubclassPtr);
+
+  END_TEST;
+}
+
+/** Equality with nullptr */
+int UtcDaliIntrusivePtrOperatorEqualWithNullptr(void)
+{
+  tet_infoline("Test for Dali::IntrusivePtr::operator == nullptr");
+
+  IntrusivePtr<Counted> counted1(new Counted);
+
+  // counted1 is not nullptr.
+  DALI_TEST_CHECK(!(counted1 == nullptr));
+  DALI_TEST_CHECK(!(nullptr == counted1));
+  DALI_TEST_CHECK(counted1 != nullptr);
+  DALI_TEST_CHECK(nullptr != counted1);
+
+  counted1 = nullptr;
+
+  // counted1 is nullptr.
+  DALI_TEST_CHECK(counted1 == nullptr);
+  DALI_TEST_CHECK(nullptr == counted1);
+  DALI_TEST_CHECK(!(counted1 != nullptr));
+  DALI_TEST_CHECK(!(nullptr != counted1));
 
   END_TEST;
 }
