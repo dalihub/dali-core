@@ -95,6 +95,7 @@ SET( internal_src_files
   ${internal_src_dir}/event/rendering/texture-impl.cpp
   ${internal_src_dir}/event/rendering/texture-set-impl.cpp
   ${internal_src_dir}/event/rendering/renderer-impl.cpp
+  ${internal_src_dir}/event/rendering/visual-renderer-impl.cpp
   ${internal_src_dir}/event/rendering/sampler-impl.cpp
   ${internal_src_dir}/event/rendering/shader-impl.cpp
   ${internal_src_dir}/event/rendering/vertex-buffer-impl.cpp

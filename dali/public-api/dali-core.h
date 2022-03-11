@@ -2,7 +2,7 @@
 #define DALI_CORE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,6 +112,7 @@
 #include <dali/public-api/rendering/texture-set.h>
 #include <dali/public-api/rendering/texture.h>
 #include <dali/public-api/rendering/vertex-buffer.h>
+#include <dali/public-api/rendering/visual-renderer.h>
 
 #include <dali/public-api/signals/base-signal.h>
 #include <dali/public-api/signals/callback.h>

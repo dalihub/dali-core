@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDERER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/event/common/event-thread-services.h>
+#include <dali/internal/event/rendering/visual-renderer-impl.h>
 #include <dali/internal/render/data-providers/render-data-provider.h>
 #include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/update/common/animatable-property.h>
@@ -435,6 +436,23 @@ public: // From UniformMapDataProvider
 
   void SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, uint32_t size);
 
+public: // For VisualProperties
+  /**
+   * To be used only for 1st stage initialization in event thread.
+   */
+  void SetVisualProperties(Internal::VisualRenderer::AnimatableVisualProperties* visualProperties)
+  {
+    mVisualProperties = visualProperties;
+  }
+
+  /**
+   * May be accessed from event thread
+   */
+  const Internal::VisualRenderer::AnimatableVisualProperties* GetVisualProperties() const
+  {
+    return mVisualProperties;
+  }
+
 private:
   /**
    * Protected constructor; See also Renderer::New()
@@ -444,12 +462,13 @@ private:
 private:
   CollectedUniformMap mCollectedUniformMap[2]; ///< Uniform maps collected by the renderer
 
-  SceneController*      mSceneController; ///< Used for initializing renderers
-  Render::Renderer*     mRenderer;        ///< Raw pointer to the renderer (that's owned by RenderManager)
-  TextureSet*           mTextureSet;      ///< The texture set this renderer uses. (Not owned)
-  Render::Geometry*     mGeometry;        ///< The geometry this renderer uses. (Not owned)
-  Shader*               mShader;          ///< The shader this renderer uses. (Not owned)
-  OwnerPointer<Vector4> mBlendColor;      ///< The blend color for blending operation
+  SceneController*                            mSceneController;           ///< Used for initializing renderers
+  Render::Renderer*                           mRenderer;                  ///< Raw pointer to the renderer (that's owned by RenderManager)
+  TextureSet*                                 mTextureSet;                ///< The texture set this renderer uses. (Not owned)
+  Render::Geometry*                           mGeometry;                  ///< The geometry this renderer uses. (Not owned)
+  Shader*                                     mShader;                    ///< The shader this renderer uses. (Not owned)
+  VisualRenderer::AnimatableVisualProperties* mVisualProperties{nullptr}; ///< VisualProperties (optional/owned)
+  OwnerPointer<Vector4>                       mBlendColor;                ///< The blend color for blending operation
 
   Dali::Internal::Render::Renderer::StencilParameters mStencilParameters; ///< Struct containing all stencil related options
 

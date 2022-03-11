@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -140,6 +140,8 @@ void TestGlAbstraction::Initialize()
     {"uViewMatrix", GL_FLOAT_MAT4, 1},
     {"uLightCameraProjectionMatrix", GL_FLOAT_MAT4, 1},
     {"uLightCameraViewMatrix", GL_FLOAT_MAT4, 1}};
+
+  // WARNING: IF YOU CHANGE THIS LIST, ALSO CHANGE UNIFORMS IN test-graphics-reflection.cpp
 }
 
 void TestGlAbstraction::PreRender()

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -763,6 +763,23 @@ const PropertyInputImpl* Renderer::GetSceneObjectInputProperty(Property::Index i
   return GetSceneObjectAnimatableProperty(index);
 }
 
+void Renderer::AddDrawCommand(const Dali::DevelRenderer::DrawCommand& command)
+{
+  if(!mDrawCommands.capacity())
+  {
+    mDrawCommands.reserve(8);
+  }
+
+  mDrawCommands.emplace_back(command);
+
+  Dali::Internal::SceneGraph::SetDrawCommandsMessage(GetEventThreadServices(),
+                                                     GetRendererSceneObject(),
+                                                     mDrawCommands.data(),
+                                                     uint32_t(mDrawCommands.size())
+
+  );
+}
+
 Renderer::Renderer(const SceneGraph::Renderer* sceneObject)
 : Object(sceneObject),
   mDepthIndex(0),
@@ -779,22 +796,6 @@ Renderer::Renderer(const SceneGraph::Renderer* sceneObject)
   mRenderingBehavior(DevelRenderer::Rendering::IF_REQUIRED),
   mPremultipledAlphaEnabled(false)
 {
-}
-
-void Renderer::SetBlendColor(const Vector4& blendColor)
-{
-  mBlendingOptions.SetBlendColor(blendColor);
-  SetBlendColorMessage(GetEventThreadServices(), GetRendererSceneObject(), GetBlendColor());
-}
-
-const Vector4& Renderer::GetBlendColor() const
-{
-  const Vector4* blendColor = mBlendingOptions.GetBlendColor();
-  if(blendColor)
-  {
-    return *blendColor;
-  }
-  return Color::TRANSPARENT; // GL default
 }
 
 Renderer::~Renderer()
@@ -1163,21 +1164,20 @@ bool Renderer::GetCurrentPropertyValue(Property::Index index, Property::Value& v
   return valueSet;
 }
 
-void Renderer::AddDrawCommand(const Dali::DevelRenderer::DrawCommand& command)
+void Renderer::SetBlendColor(const Vector4& blendColor)
 {
-  if(!mDrawCommands.capacity())
+  mBlendingOptions.SetBlendColor(blendColor);
+  SetBlendColorMessage(GetEventThreadServices(), GetRendererSceneObject(), GetBlendColor());
+}
+
+const Vector4& Renderer::GetBlendColor() const
+{
+  const Vector4* blendColor = mBlendingOptions.GetBlendColor();
+  if(blendColor)
   {
-    mDrawCommands.reserve(8);
+    return *blendColor;
   }
-
-  mDrawCommands.emplace_back(command);
-
-  Dali::Internal::SceneGraph::SetDrawCommandsMessage(GetEventThreadServices(),
-                                                     GetRendererSceneObject(),
-                                                     mDrawCommands.data(),
-                                                     uint32_t(mDrawCommands.size())
-
-  );
+  return Color::TRANSPARENT; // GL default
 }
 
 } // namespace Internal
