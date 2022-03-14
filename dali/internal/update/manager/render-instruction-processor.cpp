@@ -208,19 +208,25 @@ inline void AddRendererToRenderList(BufferIndex         updateBufferIndex,
       SetNodeUpdateSize(node, isLayer3d, nodeWorldMatrix, nodeSize, nodeUpdateSize);
       nodeUpdateSizeSet = true;
 
-      const Vector3& scale    = node->GetWorldScale(updateBufferIndex);
-      const Vector3& halfSize = nodeUpdateSize * scale * 0.5f;
-      float          radius(halfSize.Length());
+      const Vector3& scale = node->GetWorldScale(updateBufferIndex);
+      const Vector3& size  = nodeUpdateSize * scale;
 
-      if(radius > Math::MACHINE_EPSILON_1000)
+      if(size.LengthSquared() > Math::MACHINE_EPSILON_1000)
       {
         Matrix::Multiply(nodeModelViewMatrix, nodeWorldMatrix, viewMatrix);
         nodeModelViewMatrixSet = true;
 
-        ClippingBox clippingBox = RenderItem::CalculateViewportSpaceAABB(nodeModelViewMatrix, nodeUpdateSize, viewport.width, viewport.height);
-        inside                  = clippingBox.Intersects(viewport);
+        // Assume actors are at z=0, compute AABB in view space & test rect intersection
+        // against z=0 plane boundaries for frustum. (NOT viewport). This should take into account
+        // magnification due to FOV etc.
+        ClippingBox boundingBox = RenderItem::CalculateTransformSpaceAABB(nodeModelViewMatrix, nodeUpdateSize);
+        ClippingBox clippingBox(camera.mLeftClippingPlane, camera.mBottomClippingPlane, camera.mRightClippingPlane - camera.mLeftClippingPlane, fabsf(camera.mBottomClippingPlane - camera.mTopClippingPlane));
+        inside = clippingBox.Intersects(boundingBox);
       }
     }
+    /*
+     * Note, the API Camera::CheckAABBInFrustum() can be used to test if a bounding box is (partially/fully) inside the view frustum.
+     */
   }
 
   if(inside)
