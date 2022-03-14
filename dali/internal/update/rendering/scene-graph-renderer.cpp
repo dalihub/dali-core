@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,7 +116,8 @@ enum Flags
   RESEND_STENCIL_OPERATION_ON_Z_PASS = 1 << 17,
   RESEND_WRITE_TO_COLOR_BUFFER       = 1 << 18,
   RESEND_SHADER                      = 1 << 19,
-  RESEND_DRAW_COMMANDS               = 1 << 20
+  RESEND_DRAW_COMMANDS               = 1 << 20,
+  RESEND_SET_RENDER_CALLBACK         = 1 << 21
 };
 
 } // Anonymous namespace
@@ -367,6 +368,13 @@ bool Renderer::PrepareRender(BufferIndex updateBufferIndex)
       new(slot) DerivedType(mRenderer, &Render::Renderer::SetShaderChanged, true);
     }
 
+    if(mResendFlag & RESEND_SET_RENDER_CALLBACK)
+    {
+      using DerivedType = MessageValue1<Render::Renderer, Dali::RenderCallback*>;
+      uint32_t* slot    = mSceneController->GetRenderQueue().ReserveMessageSlot(updateBufferIndex, sizeof(DerivedType));
+      new(slot) DerivedType(mRenderer, &Render::Renderer::SetRenderCallback, mRenderCallback);
+    }
+
     mResendFlag = 0;
   }
 
@@ -599,6 +607,12 @@ void Renderer::SetStencilOperationOnZPass(StencilOperation::Type stencilOperatio
 {
   mStencilParameters.stencilOperationOnZPass = stencilOperationOnZPass;
   mResendFlag |= RESEND_STENCIL_OPERATION_ON_Z_PASS;
+}
+
+void Renderer::SetRenderCallback(RenderCallback* callback)
+{
+  mRenderCallback = callback;
+  mResendFlag |= RESEND_SET_RENDER_CALLBACK;
 }
 
 const Render::Renderer::StencilParameters& Renderer::GetStencilParameters() const

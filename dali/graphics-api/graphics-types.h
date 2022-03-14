@@ -24,6 +24,8 @@
 #include <utility>
 #include <vector>
 
+#include <dali/public-api/signals/callback.h>
+
 namespace Dali
 {
 namespace Graphics

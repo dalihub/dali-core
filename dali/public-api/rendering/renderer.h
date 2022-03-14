@@ -26,6 +26,8 @@
 
 namespace Dali
 {
+class RenderCallback;
+
 /**
  * @addtogroup dali_core_rendering_effects
  * @{
@@ -543,6 +545,14 @@ public:
    * @return The shader used by the renderer
    */
   Shader GetShader() const;
+
+  /**
+   * @brief Sets RenderCallback to be used for native rendering
+   *
+   * @SINCE_2_1.15
+   * @param[in] callback Pointer to a valid RenderCallback object
+   */
+  void SetRenderCallback(RenderCallback* callback);
 
 public:
   /// @cond internal

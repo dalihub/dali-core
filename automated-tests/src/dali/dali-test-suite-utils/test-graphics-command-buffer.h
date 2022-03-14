@@ -65,6 +65,7 @@ enum class CommandType
   SET_DEPTH_COMPARE_OP    = 1 << 24,
   SET_DEPTH_TEST_ENABLE   = 1 << 25,
   SET_DEPTH_WRITE_ENABLE  = 1 << 26,
+  DRAW_NATIVE             = 1 << 27,
 };
 
 std::ostream& operator<<(std::ostream& os, Graphics::StencilOp op);
@@ -123,7 +124,8 @@ struct DrawCallDescriptor
   {
     DRAW,
     DRAW_INDEXED,
-    DRAW_INDEXED_INDIRECT
+    DRAW_INDEXED_INDIRECT,
+    DRAW_NATIVE
   };
 
   Type type{}; ///< Type of the draw call
@@ -166,6 +168,11 @@ struct DrawCallDescriptor
       uint32_t                  drawCount;
       uint32_t                  stride;
     } drawIndexedIndirect;
+
+    struct
+    {
+      Graphics::DrawNativeInfo drawNativeInfo;
+    } drawNative;
   };
 };
 
@@ -263,6 +270,12 @@ struct Command
       case CommandType::BIND_UNIFORM_BUFFER:
       {
         data.bindUniformBuffers = rhs.data.bindUniformBuffers;
+        break;
+      }
+      case CommandType::DRAW_NATIVE:
+      {
+        data.draw.type       = rhs.data.draw.type;
+        data.draw.drawNative = rhs.data.draw.drawNative;
         break;
       }
       case CommandType::DRAW:
@@ -416,6 +429,12 @@ struct Command
       case CommandType::BIND_PIPELINE:
       {
         data.bindPipeline = rhs.data.bindPipeline;
+        break;
+      }
+      case CommandType::DRAW_NATIVE:
+      {
+        data.draw.type       = rhs.data.draw.type;
+        data.draw.drawNative = rhs.data.draw.drawNative;
         break;
       }
       case CommandType::DRAW:
@@ -798,6 +817,16 @@ public:
       cmd.data.executeCommandBuffers.buffers.emplace_back(static_cast<const TestGraphicsCommandBuffer*>(item));
     }
     mCallStack.PushCall("ExecuteCommandBuffers", "");
+  }
+
+  void DrawNative(const Graphics::DrawNativeInfo* drawInfo)
+  {
+    mCommands.emplace_back();
+    mCommands.back().type         = CommandType::DRAW_NATIVE;
+    auto& cmd                     = mCommands.back().data.draw;
+    cmd.type                      = DrawCallDescriptor::Type::DRAW_NATIVE;
+    cmd.drawNative.drawNativeInfo = *drawInfo;
+    mCallStack.PushCall("DrawNative", "");
   }
 
   void Draw(

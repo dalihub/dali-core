@@ -35,6 +35,7 @@
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/shaders/render-shader.h>
 #include <dali/internal/update/common/uniform-map.h>
+#include <dali/public-api/signals/render-callback.h>
 
 namespace Dali::Internal
 {
@@ -441,6 +442,25 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
     return false;
   }
 
+  // Check if there is render callback
+  if(mRenderCallback)
+  {
+    Graphics::DrawNativeInfo info{};
+    info.api      = Graphics::DrawNativeAPI::GLES;
+    info.callback = &static_cast<Dali::CallbackBase&>(*mRenderCallback);
+    info.userData = &mRenderCallbackInput;
+    info.reserved = nullptr;
+
+    // pass render callback input
+    mRenderCallbackInput.size       = size;
+    mRenderCallbackInput.projection = projectionMatrix;
+    Matrix::Multiply(mRenderCallbackInput.mvp, modelViewMatrix, projectionMatrix);
+
+    // submit draw
+    commandBuffer.DrawNative(&info);
+    return true;
+  }
+
   // Prepare commands
   std::vector<DevelRenderer::DrawCommand*> commands;
   for(auto& cmd : mDrawCommands)
@@ -800,7 +820,7 @@ bool Renderer::Updated(BufferIndex bufferIndex, const SceneGraph::NodeDataProvid
     return true;
   }
 
-  if(mShaderChanged || mGeometry->AttributesChanged())
+  if(mRenderCallback || mShaderChanged || mGeometry->AttributesChanged())
   {
     return true;
   }
@@ -866,6 +886,11 @@ Graphics::Pipeline& Renderer::PrepareGraphicsPipeline(
 
   // should be never null?
   return *pipelineResult.pipeline;
+}
+
+void Renderer::SetRenderCallback(RenderCallback* callback)
+{
+  mRenderCallback = callback;
 }
 
 } // namespace Render

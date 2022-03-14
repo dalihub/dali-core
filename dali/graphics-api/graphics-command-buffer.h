@@ -88,6 +88,22 @@ struct ClearValue
   };
 };
 
+// Native rendering (using native APIs)
+
+enum class DrawNativeAPI
+{
+  GLES,
+  UNDEFINED
+};
+
+struct DrawNativeInfo
+{
+  DrawNativeAPI       api;      //< API used by the callback
+  Dali::CallbackBase* callback; //< Callback pointer
+  void*               userData; //< Data passed into the callback (unspecified type, callback should decode it)
+  void*               reserved; //< Reserved for internal use
+};
+
 /**
  * @brief CommandBuffer contains a stream of commands to be executed
  * by the controller.
@@ -264,6 +280,21 @@ public:
     uint32_t offset,
     uint32_t drawCount,
     uint32_t stride) = 0;
+
+  /**
+   * @brief Draws using native API (via callback)
+   *
+   * DrawNative should be use in order to acquire direct access to the
+   * graphics API like GL. Upon command execution, the backend will
+   * invoke given callback and pass API-specific arguments (for example,
+   * the GL callback will receive EGL context used for rendering).
+   *
+   * The client side must make sure the callback is valid for the
+   * time of execution.
+   *
+   * @param[in] drawInfo NativeDrawInfo structure
+   */
+  virtual void DrawNative(const DrawNativeInfo* drawInfo) = 0;
 
   /**
    * @brief Resets CommandBuffer
