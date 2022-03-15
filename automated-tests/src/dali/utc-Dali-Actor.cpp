@@ -53,6 +53,7 @@ namespace
 bool gTouchCallBackCalled  = false;
 bool gTouchCallBackCalled2 = false;
 bool gTouchCallBackCalled3 = false;
+bool gHitTestTouchCallBackCalled = false;
 
 bool gHoverCallBackCalled = false;
 
@@ -109,6 +110,13 @@ static bool TestTouchCallback3(Actor, const TouchEvent&)
 {
   gTouchCallBackCalled3 = true;
   return true;
+  END_TEST;
+}
+
+static bool TestHitTestTouchCallback(Actor, const TouchEvent&)
+{
+  gHitTestTouchCallBackCalled = true;
+  return false;
   END_TEST;
 }
 
@@ -4945,8 +4953,6 @@ int UtcDaliActorPropertyClippingActorWithRendererOverride(void)
 
   // Check stencil functions are not called.
   DALI_TEST_CHECK(!stencilTrace.FindMethod("StencilFunc"));
-  // TODO: Temporarily commented out the line below when caching is disabled. Will need to add it back.
-  //  DALI_TEST_CHECK(!stencilTrace.FindMethod("StencilMask"));
   DALI_TEST_CHECK(!stencilTrace.FindMethod("StencilOp"));
 
   // Check that scissor clipping is overriden by the renderer properties.
@@ -10279,5 +10285,110 @@ int UtcDaliActorRegisterProperty(void)
   DALI_TEST_CHECK(callStack.FindMethodAndGetParameters("uCustom", params));
   DALI_TEST_EQUALS(out.str(), params, TEST_LOCATION);
 
+  END_TEST;
+}
+
+int UtcDaliActorDoesWantedHitTest(void)
+{
+  struct HitTestData
+  {
+  public:
+    HitTestData(const Vector3& scale, const Vector2& touchPoint, bool result)
+    : mScale(scale),
+      mTouchPoint(touchPoint),
+      mResult(result)
+    {
+    }
+
+    Vector3 mScale;
+    Vector2 mTouchPoint;
+    bool    mResult;
+  };
+
+  TestApplication application;
+  tet_infoline(" UtcDaliActorDoesWantedHitTest");
+
+  // Fill a vector with different hit tests.
+  struct HitTestData* hitTestData[] = {
+    //                    scale                     touch point           result
+    new HitTestData(Vector3(100.f, 100.f, 1.f), Vector2(289.f, 400.f), true),  // touch point close to the right edge (inside)
+    new HitTestData(Vector3(100.f, 100.f, 1.f), Vector2(291.f, 400.f), false), // touch point close to the right edge (outside)
+    new HitTestData(Vector3(110.f, 100.f, 1.f), Vector2(291.f, 400.f), true),  // same point as above with a wider scale. Should be inside.
+    new HitTestData(Vector3(100.f, 100.f, 1.f), Vector2(200.f, 451.f), false), // touch point close to the down edge (outside)
+    new HitTestData(Vector3(100.f, 110.f, 1.f), Vector2(200.f, 451.f), true),  // same point as above with a wider scale. Should be inside.
+    NULL,
+  };
+
+  // get the root layer
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+
+  Actor lowerActor = Actor::New();
+  lowerActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  lowerActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+
+  // actor and lowerActor have no relationship.
+  application.GetScene().Add(lowerActor);
+  application.GetScene().Add(actor);
+
+  ResetTouchCallbacks();
+  gHitTestTouchCallBackCalled = false;
+
+  unsigned int index = 0;
+  while(NULL != hitTestData[index])
+  {
+    actor.SetProperty(Actor::Property::SIZE, Vector2(1.f, 1.f));
+    actor.SetProperty(Actor::Property::SCALE, Vector3(hitTestData[index]->mScale.x, hitTestData[index]->mScale.y, hitTestData[index]->mScale.z));
+
+    lowerActor.SetProperty(Actor::Property::SIZE, Vector2(1.f, 1.f));
+    lowerActor.SetProperty(Actor::Property::SCALE, Vector3(hitTestData[index]->mScale.x, hitTestData[index]->mScale.y, hitTestData[index]->mScale.z));
+
+    // flush the queue and render once
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_CHECK(!gTouchCallBackCalled);
+    DALI_TEST_CHECK(!gTouchCallBackCalled2);
+    DALI_TEST_CHECK(!gHitTestTouchCallBackCalled);
+
+    // connect to its touch signal
+    actor.TouchedSignal().Connect(TestTouchCallback);
+    lowerActor.TouchedSignal().Connect(TestTouchCallback2);
+
+    // connect to its hit-test signal
+    Dali::DevelActor::HitTestResultSignal(actor).Connect(TestHitTestTouchCallback);
+
+    Dali::Integration::Point point;
+    point.SetState(PointState::DOWN);
+    point.SetScreenPosition(Vector2(hitTestData[index]->mTouchPoint.x, hitTestData[index]->mTouchPoint.y));
+    Dali::Integration::TouchEvent event;
+    event.AddPoint(point);
+
+    // flush the queue and render once
+    application.SendNotification();
+    application.Render();
+    application.ProcessEvent(event);
+
+    // check hit-test events
+    DALI_TEST_CHECK(gHitTestTouchCallBackCalled == hitTestData[index]->mResult);
+    // Passed all hit-tests of actor.
+    DALI_TEST_CHECK(gTouchCallBackCalled == false);
+    // The lowerActor was hit-tested.
+    DALI_TEST_CHECK(gTouchCallBackCalled2 == hitTestData[index]->mResult);
+
+    if(gTouchCallBackCalled2 != hitTestData[index]->mResult)
+      tet_printf("Test failed:\nScale %f %f %f\nTouchPoint %f, %f\nResult %d\n",
+                 hitTestData[index]->mScale.x,
+                 hitTestData[index]->mScale.y,
+                 hitTestData[index]->mScale.z,
+                 hitTestData[index]->mTouchPoint.x,
+                 hitTestData[index]->mTouchPoint.y,
+                 hitTestData[index]->mResult);
+
+    ResetTouchCallbacks();
+    gHitTestTouchCallBackCalled = false;
+    ++index;
+  }
   END_TEST;
 }

@@ -22,7 +22,6 @@ SET(TC_SOURCES
         utc-Dali-ConstraintFunction.cpp
         utc-Dali-Constraints.cpp
         utc-Dali-ConstraintSource.cpp
-        utc-Dali-Context.cpp
         utc-Dali-Core.cpp
         utc-Dali-CustomActor.cpp
         utc-Dali-Degree.cpp

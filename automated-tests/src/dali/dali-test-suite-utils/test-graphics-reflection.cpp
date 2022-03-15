@@ -53,9 +53,57 @@ static const std::vector<UniformData> UNIFORMS =
 
     // WARNING: IF YOU CHANGE THIS LIST, ALSO CHANGE mActiveUniforms IN test-gl-abstraction, Initialize
 };
+
+/**
+ * Helper function that returns size of uniform datatypes based
+ * on property type.
+ */
+constexpr int GetSizeForType(Property::Type type)
+{
+  switch(type)
+  {
+    case Property::Type::BOOLEAN:
+    {
+      return sizeof(bool);
+    }
+    case Property::Type::FLOAT:
+    {
+      return sizeof(float);
+    }
+    case Property::Type::INTEGER:
+    {
+      return sizeof(int);
+    }
+    case Property::Type::VECTOR2:
+    {
+      return sizeof(Vector2);
+    }
+    case Property::Type::VECTOR3:
+    {
+      return sizeof(Vector3);
+    }
+    case Property::Type::VECTOR4:
+    {
+      return sizeof(Vector4);
+    }
+    case Property::Type::MATRIX3:
+    {
+      return sizeof(Matrix3);
+    }
+    case Property::Type::MATRIX:
+    {
+      return sizeof(Matrix);
+    }
+    default:
+    {
+      return 0;
+    }
+  };
 }
 
-TestGraphicsReflection::TestGraphicsReflection(TestGlAbstraction& gl, Property::Array& vfs, const Graphics::ProgramCreateInfo& createInfo, std::vector<UniformData>& customUniforms)
+} // namespace
+
+TestGraphicsReflection::TestGraphicsReflection(TestGlAbstraction& gl, uint32_t programId, Property::Array& vfs, const Graphics::ProgramCreateInfo& createInfo, std::vector<UniformData>& customUniforms)
 : mGl(gl),
   mCustomUniforms(customUniforms)
 {
@@ -78,34 +126,72 @@ TestGraphicsReflection::TestGraphicsReflection(TestGlAbstraction& gl, Property::
   mDefaultUniformBlock.name          = "";
   mDefaultUniformBlock.members       = {};
   mDefaultUniformBlock.binding       = 0;
-  mDefaultUniformBlock.size          = 64 * (UNIFORMS.size() + mCustomUniforms.size());
   mDefaultUniformBlock.descriptorSet = 0;
   mDefaultUniformBlock.members.clear();
-  int loc = 0;
+
+  int offset = 0;
   for(const auto& data : UNIFORMS)
   {
     mDefaultUniformBlock.members.emplace_back();
-    auto& item        = mDefaultUniformBlock.members.back();
-    item.name         = data.name;
-    item.binding      = 0;
-    item.offset       = loc * 64;
-    item.location     = loc++;
+    auto& item   = mDefaultUniformBlock.members.back();
+    item.name    = data.name;
+    item.binding = 0;
+    item.offsets.push_back(offset);
+    item.locations.push_back(gl.GetUniformLocation(programId, data.name.c_str()));
     item.bufferIndex  = 0;
     item.uniformClass = Graphics::UniformClass::UNIFORM;
+    item.type         = data.type;
+    offset += GetSizeForType(data.type);
   }
 
   for(const auto& data : mCustomUniforms)
   {
     fprintf(stderr, "\ncustom uniforms: %s\n", data.name.c_str());
     mDefaultUniformBlock.members.emplace_back();
-    auto& item        = mDefaultUniformBlock.members.back();
-    item.name         = data.name;
-    item.binding      = 0;
-    item.offset       = loc * 64;
-    item.location     = loc++;
-    item.bufferIndex  = 0;
-    item.uniformClass = Graphics::UniformClass::UNIFORM;
+    auto& item = mDefaultUniformBlock.members.back();
+
+    auto iter        = data.name.find("[", 0);
+    int  numElements = 1;
+    if(iter != std::string::npos)
+    {
+      auto baseName = data.name.substr(0, iter);
+      iter++;
+      numElements = std::stoi(data.name.substr(iter));
+      if(numElements == 0)
+      {
+        numElements = 1;
+      }
+
+      item.name         = baseName;
+      item.binding      = 0;
+      item.bufferIndex  = 0;
+      item.uniformClass = Graphics::UniformClass::UNIFORM;
+      item.type         = data.type;
+      item.numElements  = numElements;
+
+      for(int i = 0; i < numElements; ++i)
+      {
+        std::stringstream elementNameStream;
+        elementNameStream << baseName << "[" << i << "]";
+
+        item.locations.push_back(gl.GetUniformLocation(programId, elementNameStream.str().c_str()));
+        item.offsets.push_back(offset);
+        offset += GetSizeForType(data.type);
+      }
+    }
+    else
+    {
+      item.name    = data.name;
+      item.binding = 0;
+      item.offsets.push_back(offset);
+      item.locations.push_back(gl.GetUniformLocation(programId, item.name.c_str()));
+      item.bufferIndex  = 0;
+      item.uniformClass = Graphics::UniformClass::UNIFORM;
+      item.type         = data.type;
+      offset += GetSizeForType(data.type);
+    }
   }
+  mDefaultUniformBlock.size = offset;
 
   mUniformBlocks.push_back(mDefaultUniformBlock);
 }
@@ -159,9 +245,13 @@ uint32_t TestGraphicsReflection::GetUniformBlockBinding(uint32_t index) const
 
 uint32_t TestGraphicsReflection::GetUniformBlockSize(uint32_t index) const
 {
-  // 64 bytes per uniform (64 = 4x4 matrix)
-  // TODO: fix if array will be used
-  return 64 * (UNIFORMS.size() + mCustomUniforms.size());
+  if(index >= mUniformBlocks.size())
+  {
+    return 0;
+  }
+
+  const auto& block = mUniformBlocks[index];
+  return block.size;
 }
 
 bool TestGraphicsReflection::GetUniformBlock(uint32_t index, Dali::Graphics::UniformBlockInfo& out) const
@@ -185,8 +275,8 @@ bool TestGraphicsReflection::GetUniformBlock(uint32_t index, Dali::Graphics::Uni
     out.members[i].name         = memberUniform.name;
     out.members[i].binding      = block.binding;
     out.members[i].uniformClass = Graphics::UniformClass::UNIFORM;
-    out.members[i].offset       = memberUniform.offset;
-    out.members[i].location     = memberUniform.location;
+    out.members[i].offset       = memberUniform.offsets[0];
+    out.members[i].location     = memberUniform.locations[0];
   }
 
   return true;
@@ -230,7 +320,7 @@ uint32_t TestGraphicsReflection::GetUniformBlockMemberOffset(uint32_t blockIndex
 {
   if(blockIndex < mUniformBlocks.size() && memberLocation < mUniformBlocks[blockIndex].members.size())
   {
-    return mUniformBlocks[blockIndex].members[memberLocation].offset;
+    return mUniformBlocks[blockIndex].members[memberLocation].offsets[0];
   }
   else
   {
@@ -252,11 +342,6 @@ const std::vector<Dali::Graphics::UniformInfo>& TestGraphicsReflection::GetSampl
 Graphics::ShaderLanguage TestGraphicsReflection::GetLanguage() const
 {
   return Graphics::ShaderLanguage::GLSL_3_1;
-}
-
-Dali::Property::Type TestGraphicsReflection::GetMemberType(int blockIndex, int location) const
-{
-  return location < static_cast<int>(UNIFORMS.size()) ? UNIFORMS[location].type : mCustomUniforms[location - UNIFORMS.size()].type;
 }
 
 } // namespace Dali

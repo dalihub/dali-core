@@ -186,6 +186,8 @@ protected:                                 //Data
 private:                                             // Data
   GestureType::Value mType;                          ///< Type of GestureProcessor
   Actor*             mCurrentGesturedActor;          ///< The current actor that has been gestured.
+  Integration::Point mPoint;                         ///< The point of event touched.
+  uint32_t           mEventTime;                     ///< The time the event occurred.
   bool               mGesturedActorDisconnected : 1; ///< Indicates whether the gestured actor has been disconnected from the scene
 };
 

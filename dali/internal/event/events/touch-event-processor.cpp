@@ -308,6 +308,8 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
   for(auto&& currentPoint : event.points)
   {
     HitTestAlgorithm::Results hitTestResults;
+    hitTestResults.point = currentPoint;
+    hitTestResults.eventTime = event.time;
     if(!firstPointParsed)
     {
       firstPointParsed = true;

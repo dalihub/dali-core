@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,6 +89,11 @@ struct HitTestFunctionWrapper : public HitTestInterface
     return false;
   }
 
+  bool ActorRequiresHitResultCheck(Actor* actor, Integration::Point point, Vector2 hitPointLocal, uint32_t timeStamp) override
+  {
+    return actor->EmitHitTestResultSignal(point, hitPointLocal, timeStamp);
+  }
+
   Dali::HitTestAlgorithm::HitTestFunction mFunc;
 };
 
@@ -113,6 +118,11 @@ struct ActorTouchableCheck : public HitTestInterface
   bool DoesLayerConsumeHit(Layer* layer) override
   {
     return layer->IsTouchConsumed();
+  }
+
+  bool ActorRequiresHitResultCheck(Actor* actor, Integration::Point point, Vector2 hitPointLocal, uint32_t timeStamp) override
+  {
+    return actor->EmitHitTestResultSignal(point, hitPointLocal, timeStamp);
   }
 };
 
@@ -158,7 +168,9 @@ HitActor HitTestWithinLayer(Actor&                                     actor,
                             bool                                       layerIs3d,
                             uint32_t                                   clippingDepth,
                             uint32_t                                   clippingBitPlaneMask,
-                            const RayTest&                             rayTest)
+                            const RayTest&                             rayTest,
+                            const Integration::Point&                  point,
+                            const uint32_t                             eventTime)
 {
   HitActor hit;
 
@@ -245,7 +257,8 @@ HitActor HitTestWithinLayer(Actor&                                     actor,
               }
             }
 
-            if(haveHitActor)
+            // If the hit actor does not want to hit, the hit-test continues.
+            if(haveHitActor && hitCheck.ActorRequiresHitResultCheck(&actor, point, hitPointLocal, eventTime))
             {
               hit.actor       = &actor;
               hit.hitPosition = hitPointLocal;
@@ -302,12 +315,14 @@ HitActor HitTestWithinLayer(Actor&                                     actor,
                                                layerIs3d,
                                                newClippingDepth,
                                                clippingBitPlaneMask,
-                                               rayTest));
+                                               rayTest,
+                                               point,
+                                               eventTime));
 
         // Make sure the set hit actor is actually hittable. This is usually required when we have some
         // clipping as we need to hit-test all actors as we descend the tree regardless of whether they
         // are hittable or not.
-        if(currentHit.actor && !hitCheck.IsActorHittable(currentHit.actor))
+        if(currentHit.actor && (!hitCheck.IsActorHittable(currentHit.actor)))
         {
           continue;
         }
@@ -488,7 +503,9 @@ bool HitTestRenderTask(const RenderTaskList::ExclusivesContainer& exclusives,
                                        layer->GetBehavior() == Dali::Layer::LAYER_3D,
                                        0u,
                                        0u,
-                                       rayTest);
+                                       rayTest,
+                                       results.point,
+                                       results.eventTime);
             }
             else if(IsWithinSourceActors(*sourceActor, *layer))
             {
@@ -505,7 +522,9 @@ bool HitTestRenderTask(const RenderTaskList::ExclusivesContainer& exclusives,
                                        layer->GetBehavior() == Dali::Layer::LAYER_3D,
                                        0u,
                                        0u,
-                                       rayTest);
+                                       rayTest,
+                                       results.point,
+                                       results.eventTime);
             }
 
             // If this layer is set to consume the hit, then do not check any layers behind it
@@ -569,7 +588,6 @@ bool HitTestRenderTaskList(const Vector2&    sceneSize,
       // Skip to next task
       continue;
     }
-
     if(HitTestRenderTask(exclusives, sceneSize, layers, renderTask, screenCoordinates, results, hitCheck, rayTest))
     {
       // Return true when an actor is hit (or layer in our render-task consumes the hit)
