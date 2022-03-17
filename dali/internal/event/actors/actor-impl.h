@@ -646,6 +646,41 @@ public:
   }
 
   /**
+   * Sets whether an actor should be enabled all user interaction including touch, focus and activation.
+   * This value have higher priority over the sensitve and focusable in negative action,
+   * which means IsSensitive() or IsFocusable() and enable is false, actor will not emits touch or focus event.
+   * An actor is enabled by default.
+   *
+   * If the application wishes to temporarily disable user interaction:
+   * @code
+   * actor.SetUserInteractionEnabled(false);
+   * @endcode
+   *
+   * Then, to re-enable user interaction, the application should call:
+   * @code
+   * actor.SetUserInteractionEnabled(true);
+   * @endcode
+   *
+   * @see IsSensitive(), IsHittable(), IsKeyboardFocusable() and IsTouchFocusable().
+   * @note If an actor's disabled, child still can be enabled.
+   * @param[in]  enabled  true to enable user interaction, false otherwise.
+   */
+  void SetUserInteractionEnabled(bool enabled)
+  {
+    mUserInteractionEnabled = enabled;
+  }
+
+  /**
+   * Query whether an actor is enabled user interaction.
+   * @see SetSensitive(bool)
+   * @return true, if user interaction is enabled, false otherwise.
+   */
+  bool IsUserInteractionEnabled() const
+  {
+    return mUserInteractionEnabled;
+  }
+
+  /**
    * @copydoc Dali::Actor::SetDrawMode
    */
   void SetDrawMode(DrawMode::Type drawMode);
@@ -1258,7 +1293,7 @@ public:
    */
   bool IsHittable() const
   {
-    return IsSensitive() && IsVisible() && (GetCurrentWorldColor().a > FULLY_TRANSPARENT) && IsNodeConnected();
+    return (IsUserInteractionEnabled()) && IsSensitive() && IsVisible() && (GetCurrentWorldColor().a > FULLY_TRANSPARENT) && IsNodeConnected();
   }
 
   /**
@@ -1888,6 +1923,7 @@ protected:
   bool                     mCaptureAllTouchAfterStart : 1; ///< Whether the actor should capture all touch after touch starts even if the motion moves outside of the actor area.
   bool                     mIsBlendEquationSet : 1;        ///< Flag to identify whether the Blend equation is set
   bool                     mNeedGesturePropagation : 1;    ///< Whether the parent listens for gesture events or not
+  bool                     mUserInteractionEnabled : 1;    ///< Whether the actor should be enabled user interaction.
   LayoutDirection::Type    mLayoutDirection : 2;           ///< Layout direction, Left to Right or Right to Left.
   DrawMode::Type           mDrawMode : 3;                  ///< Cached: How the actor and its children should be drawn
   ColorMode                mColorMode : 3;                 ///< Cached: Determines whether mWorldColor is inherited
