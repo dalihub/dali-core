@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -578,6 +578,28 @@ int UtcDaliPropertyMapAnonymousAddChainP(void)
   value = mapTest.mMap.Find(100);
   DALI_TEST_CHECK(value);
   DALI_TEST_CHECK(value->Get<int>() == 9);
+
+  END_TEST;
+}
+
+int UtcDaliPropertyMapRemove(void)
+{
+  Property::Map map;
+  map["hello"] = 1;
+  map[10]      = "DALi";
+  map["world"] = 2;
+
+  DALI_TEST_CHECK(map.Count() == 3);
+  DALI_TEST_CHECK(!map.Remove(0));
+  DALI_TEST_CHECK(map.Count() == 3);
+  DALI_TEST_CHECK(!map.Remove("doesnotexist"));
+  DALI_TEST_CHECK(map.Count() == 3);
+  DALI_TEST_CHECK(map.Remove(10));
+  DALI_TEST_CHECK(map.Count() == 2);
+  DALI_TEST_CHECK(map.Remove("hello"));
+  DALI_TEST_CHECK(map.Count() == 1);
+  DALI_TEST_CHECK(map.Remove("world"));
+  DALI_TEST_CHECK(map.Count() == 0);
 
   END_TEST;
 }

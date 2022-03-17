@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -264,6 +264,32 @@ void Property::Map::Clear()
 
   mImpl->mStringValueContainer.clear();
   mImpl->mIndexValueContainer.clear();
+}
+
+bool Property::Map::Remove(Property::Index key)
+{
+  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
+
+  auto iter = std::find_if(mImpl->mIndexValueContainer.begin(), mImpl->mIndexValueContainer.end(), [key](const IndexValuePair& element) { return element.first == key; });
+  if(iter != mImpl->mIndexValueContainer.end())
+  {
+    mImpl->mIndexValueContainer.erase(iter);
+    return true;
+  }
+  return false;
+}
+
+bool Property::Map::Remove(std::string_view key)
+{
+  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
+
+  auto iter = std::find_if(mImpl->mStringValueContainer.begin(), mImpl->mStringValueContainer.end(), [key](const StringValuePair& element) { return element.first == key; });
+  if(iter != mImpl->mStringValueContainer.end())
+  {
+    mImpl->mStringValueContainer.erase(iter);
+    return true;
+  }
+  return false;
 }
 
 void Property::Map::Merge(const Property::Map& from)
