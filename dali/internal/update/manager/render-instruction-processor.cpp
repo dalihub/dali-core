@@ -194,7 +194,10 @@ inline void AddRendererToRenderList(BufferIndex         updateBufferIndex,
   Matrix  nodeModelViewMatrix(false);
   bool    nodeModelViewMatrixSet(false);
 
-  if(cull && renderable.mRenderer && !renderable.mRenderer->GetShader().HintEnabled(Dali::Shader::Hint::MODIFIES_GEOMETRY) && node->GetClippingMode() == ClippingMode::DISABLED)
+  // Don't cull items which have render callback
+  bool hasRenderCallback = (renderable.mRenderer && renderable.mRenderer->GetRenderCallback());
+
+  if(cull && renderable.mRenderer && (hasRenderCallback || (!renderable.mRenderer->GetShader().HintEnabled(Dali::Shader::Hint::MODIFIES_GEOMETRY) && node->GetClippingMode() == ClippingMode::DISABLED)))
   {
     const Vector4& boundingSphere = node->GetBoundingSphere();
     inside                        = (boundingSphere.w > Math::MACHINE_EPSILON_1000) &&
@@ -222,10 +225,18 @@ inline void AddRendererToRenderList(BufferIndex         updateBufferIndex,
 
   if(inside)
   {
-    Renderer::OpacityType opacityType = renderable.mRenderer ? renderable.mRenderer->GetOpacityType(updateBufferIndex, *node) : Renderer::OPAQUE;
+    bool skipRender(false);
+    bool isOpaque = true;
+    if(!hasRenderCallback)
+    {
+      Renderer::OpacityType opacityType = renderable.mRenderer ? renderable.mRenderer->GetOpacityType(updateBufferIndex, *node) : Renderer::OPAQUE;
 
-    // We can skip render when node is not clipping and transparent
-    const bool skipRender(opacityType == Renderer::TRANSPARENT && node->GetClippingMode() == ClippingMode::DISABLED);
+      // We can skip render when node is not clipping and transparent
+      skipRender = (opacityType == Renderer::TRANSPARENT && node->GetClippingMode() == ClippingMode::DISABLED);
+
+      isOpaque = (opacityType == Renderer::OPAQUE);
+    }
+
     if(!skipRender)
     {
       // Get the next free RenderItem.
@@ -237,7 +248,7 @@ inline void AddRendererToRenderList(BufferIndex         updateBufferIndex,
       auto& partialRenderingCacheInfo = node->GetPartialRenderingData().GetCurrentCacheInfo();
 
       partialRenderingCacheInfo.node       = node;
-      partialRenderingCacheInfo.isOpaque   = (opacityType == Renderer::OPAQUE);
+      partialRenderingCacheInfo.isOpaque   = isOpaque;
       partialRenderingCacheInfo.renderer   = renderable.mRenderer;
       partialRenderingCacheInfo.color      = node->GetWorldColor(updateBufferIndex);
       partialRenderingCacheInfo.depthIndex = node->GetDepthIndex();
@@ -248,7 +259,7 @@ inline void AddRendererToRenderList(BufferIndex         updateBufferIndex,
       }
 
       item.mNode     = node;
-      item.mIsOpaque = (opacityType == Renderer::OPAQUE);
+      item.mIsOpaque = isOpaque;
       item.mColor    = node->GetColor(updateBufferIndex);
 
       item.mDepthIndex = 0;

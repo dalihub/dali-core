@@ -693,6 +693,12 @@ void TestGraphicsController::ProcessCommandBuffer(TestGraphicsCommandBuffer& com
         BindPipeline(currentPipeline);
         break;
       }
+      case CommandType::DRAW_NATIVE:
+      {
+        auto info = &cmd.data.draw.drawNative.drawNativeInfo;
+        CallbackBase::ExecuteReturn<bool>(*info->callback, info->userData);
+        break;
+      }
       case CommandType::DRAW:
       {
         if(currentPipeline)

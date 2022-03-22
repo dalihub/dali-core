@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_RENDERER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/rendering/texture-set.h>
+#include <dali/public-api/signals/render-callback.h>
 
 #include <dali/graphics-api/graphics-controller.h>
 #include <dali/integration-api/debug.h>
@@ -381,6 +382,23 @@ public:
               uint32_t                                             queueIndex);
 
   /**
+   * Sets RenderCallback object
+   *
+   * @param[in] callback Valid pointer to RenderCallback object
+   */
+  void SetRenderCallback(RenderCallback* callback);
+
+  /**
+   * Returns currently set RenderCallback object
+   *
+   * @return Valid pointer to RenderCallback object or nullptr
+   */
+  RenderCallback* GetRenderCallback()
+  {
+    return mRenderCallback;
+  }
+
+  /**
    * Write the renderer's sort attributes to the passed in reference
    *
    * @param[out] sortAttributes
@@ -563,6 +581,8 @@ private:
   bool                  mUpdated : 1;
 
   std::vector<Dali::DevelRenderer::DrawCommand> mDrawCommands; // Devel stuff
+  RenderCallback*                               mRenderCallback{nullptr};
+  RenderCallbackInput                           mRenderCallbackInput{};
 };
 
 } // namespace Render

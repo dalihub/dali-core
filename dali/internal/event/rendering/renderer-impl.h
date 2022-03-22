@@ -211,6 +211,11 @@ public: // Default property extensions from Object
    */
   void AddDrawCommand(const Dali::DevelRenderer::DrawCommand& command);
 
+  /**
+   * @copydoc Dali::Renderer::SetRenderCallback()
+   */
+  void SetRenderCallback(RenderCallback* callback);
+
 protected: // implementation
   /**
    * @brief Constructor.

@@ -177,7 +177,14 @@ enum Type
    * @details Name "keyboardFocusableChildren", type Property::BOOLEAN.
    * @note Default value is true.
    */
-  KEYBOARD_FOCUSABLE_CHILDREN
+  KEYBOARD_FOCUSABLE_CHILDREN,
+
+  /**
+  * @brief The flag whether the actor should be enabled all user interaction including touch, focus and activation. this value have higher priority over the sensitve and focusable in negative action.
+  * @details Name "userInteractionEnabled", type Property::BOOLEAN.
+  * @note Default value is true.
+  */
+  USER_INTERACTION_ENABLED,
 };
 
 } // namespace Property

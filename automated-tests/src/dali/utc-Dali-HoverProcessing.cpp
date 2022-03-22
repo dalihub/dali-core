@@ -16,6 +16,7 @@
  */
 
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/events/hover-event-devel.h>
 #include <dali/integration-api/events/hover-event-integ.h>
 #include <dali/integration-api/render-task-list-integ.h>
@@ -753,6 +754,41 @@ int UtcDaliHoverActorBecomesInsensitiveParentConsumer(void)
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, rootData.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(PointState::INTERRUPTED, rootData.hoverEvent.GetState(0), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliHoverActorBecomesUserInteractionDisabled(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's hovered signal
+  SignalData        data;
+  HoverEventFunctor functor(data);
+  actor.HoveredSignal().Connect(&application, functor);
+
+  // Emit a started signal
+  application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(10.0f, 10.0f)));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::STARTED, data.hoverEvent.GetState(0), TEST_LOCATION);
+  data.Reset();
+
+  // Change actor to disable user interaction.
+  actor.SetProperty(DevelActor::Property::USER_INTERACTION_ENABLED, false);
+
+  // Emit a motion signal, signalled with an interrupted
+  application.ProcessEvent(GenerateSingleHover(PointState::MOTION, Vector2(200.0f, 200.0f)));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::INTERRUPTED, data.hoverEvent.GetState(0), TEST_LOCATION);
+  data.Reset();
   END_TEST;
 }
 

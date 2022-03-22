@@ -1180,6 +1180,13 @@ const Vector4& Renderer::GetBlendColor() const
   return Color::TRANSPARENT; // GL default
 }
 
+void Renderer::SetRenderCallback(RenderCallback* callback)
+{
+  Dali::Internal::SceneGraph::SetRenderCallbackMessage(GetEventThreadServices(),
+                                                       GetRendererSceneObject(),
+                                                       callback);
+}
+
 } // namespace Internal
 
 } // namespace Dali

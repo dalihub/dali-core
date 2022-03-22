@@ -381,6 +381,23 @@ public:
     return *this;
   };
 
+  /**
+   * Sets RenderCallback object
+   *
+   * @param[in] callback Valid pointer to RenderCallback object
+   */
+  void SetRenderCallback(RenderCallback* callback);
+
+  /**
+   * Returns currently set RenderCallback pointer
+   *
+   * @return RenderCallback pointer or nullptr
+   */
+  RenderCallback* GetRenderCallback()
+  {
+    return mRenderCallback;
+  }
+
 public: // Implementation of ConnectionChangePropagator
   /**
    * @copydoc ConnectionChangePropagator::AddObserver
@@ -488,6 +505,7 @@ private:
   bool                           mPremultipledAlphaEnabled : 1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 
   std::vector<Dali::DevelRenderer::DrawCommand> mDrawCommands;
+  Dali::RenderCallback*                         mRenderCallback{nullptr};
 
 public:
   AnimatableProperty<float> mOpacity;    ///< The opacity value
@@ -747,6 +765,16 @@ inline void SetDrawCommandsMessage(EventThreadServices& eventThreadServices, con
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   new(slot) LocalType(&renderer, &Renderer::SetDrawCommands, pDrawCommands, size);
+}
+
+inline void SetRenderCallbackMessage(EventThreadServices& eventThreadServices, const Renderer& renderer, Dali::RenderCallback* callback)
+{
+  using LocalType = MessageValue1<Renderer, Dali::RenderCallback*>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
+
+  new(slot) LocalType(&renderer, &Renderer::SetRenderCallback, callback);
 }
 
 } // namespace SceneGraph
