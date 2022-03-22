@@ -428,6 +428,15 @@ public:
   static Renderer New(Geometry& geometry, Shader& shader);
 
   /**
+   * @brief Creates a new Renderer object with RenderCallback.
+   *
+   * @SINCE_2_1.18
+   * @param[in] renderCallback Valid RenderCallback
+   * @return A handle to the Renderer
+   */
+  static Renderer New(RenderCallback& renderCallback);
+
+  /**
    * @brief Default constructor, creates an empty handle
    *
    * @SINCE_1_1.43
