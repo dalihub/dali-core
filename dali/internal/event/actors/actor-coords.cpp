@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -136,7 +136,8 @@ const Vector2 CalculateActorScreenPosition(const Actor& actor, BufferIndex buffe
     worldPosition -= cameraPosition;
 
     Vector3 actorSize = node.GetSize(bufferIndex) * node.GetWorldScale(bufferIndex);
-    Vector2 halfSceneSize(scene.GetSize() * 0.5f); // World position origin is center of scene
+    auto    sceneSize = scene.GetCurrentSurfaceRect();                      // Use the update object's size
+    Vector2 halfSceneSize(sceneSize.width * 0.5f, sceneSize.height * 0.5f); // World position origin is center of scene
     Vector3 halfActorSize(actorSize * 0.5f);
     Vector3 anchorPointOffSet = halfActorSize - actorSize * actor.GetAnchorPointForPosition();
     return Vector2(halfSceneSize.width + worldPosition.x - anchorPointOffSet.x,
