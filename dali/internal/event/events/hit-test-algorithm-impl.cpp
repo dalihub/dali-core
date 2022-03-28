@@ -257,6 +257,13 @@ HitActor HitTestWithinLayer(Actor&                                     actor,
               }
             }
 
+            // If CapturesAllTouchAfterStart() is true, it should be hit only after touchdown.
+            // If the touch moves after another actor has been touched so that the current actor is hit, it should behave as if it didn't hit.
+            if(actor.CapturesAllTouchAfterStart() && point.GetState() != PointState::STARTED)
+            {
+              haveHitActor = false;
+            }
+
             // If the hit actor does not want to hit, the hit-test continues.
             if(haveHitActor && hitCheck.ActorRequiresHitResultCheck(&actor, point, hitPointLocal, eventTime))
             {
