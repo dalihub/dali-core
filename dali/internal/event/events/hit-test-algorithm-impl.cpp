@@ -161,9 +161,10 @@ HitActor HitTestWithinLayer(Actor&                                     actor,
                             const RenderTaskList::ExclusivesContainer& exclusives,
                             const Vector4&                             rayOrigin,
                             const Vector4&                             rayDir,
-                            float&                                     nearClippingPlane,
-                            float&                                     farClippingPlane,
+                            const float&                               nearClippingPlane,
+                            const float&                               farClippingPlane,
                             HitTestInterface&                          hitCheck,
+                            const bool&                                overlayed,
                             bool&                                      overlayHit,
                             bool                                       layerIs3d,
                             uint32_t                                   clippingDepth,
@@ -185,6 +186,7 @@ HitActor HitTestWithinLayer(Actor&                                     actor,
   // all clipping actors also for them to be counted as hit.
   uint32_t newClippingDepth = clippingDepth;
   bool     clippingActor    = actor.GetClippingMode() != ClippingMode::DISABLED;
+  bool     overlayedActor   = overlayed || actor.IsOverlay();
   if(clippingActor)
   {
     ++newClippingDepth;
@@ -220,13 +222,13 @@ HitActor HitTestWithinLayer(Actor&                                     actor,
             clippingBitPlaneMask |= 1u << clippingDepth;
           }
 
-          if(overlayHit && !actor.IsOverlay())
+          if(overlayHit && !overlayedActor)
           {
             // If we have already hit an overlay and current actor is not an overlay ignore current actor.
           }
           else
           {
-            if(actor.IsOverlay())
+            if(overlayedActor)
             {
               overlayHit = true;
             }
@@ -318,6 +320,7 @@ HitActor HitTestWithinLayer(Actor&                                     actor,
                                                nearClippingPlane,
                                                farClippingPlane,
                                                hitCheck,
+                                               overlayedActor,
                                                overlayHit,
                                                layerIs3d,
                                                newClippingDepth,
@@ -507,6 +510,7 @@ bool HitTestRenderTask(const RenderTaskList::ExclusivesContainer& exclusives,
                                        farClippingPlane,
                                        hitCheck,
                                        overlayHit,
+                                       overlayHit,
                                        layer->GetBehavior() == Dali::Layer::LAYER_3D,
                                        0u,
                                        0u,
@@ -525,6 +529,7 @@ bool HitTestRenderTask(const RenderTaskList::ExclusivesContainer& exclusives,
                                        nearClippingPlane,
                                        farClippingPlane,
                                        hitCheck,
+                                       overlayHit,
                                        overlayHit,
                                        layer->GetBehavior() == Dali::Layer::LAYER_3D,
                                        0u,

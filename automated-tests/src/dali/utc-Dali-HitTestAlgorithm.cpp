@@ -379,6 +379,77 @@ int UtcDaliHitTestAlgorithmOverlay(void)
   HitTest(stage, stageSize * 2.0f / 3.0f, results, &DefaultIsActorTouchableFunction);
   DALI_TEST_CHECK(results.actor == green);
   DALI_TEST_EQUALS(results.actorCoordinates, actorSize * 0.5f, TEST_LOCATION);
+
+  // Create new actor child as blue. It will be shown over the blue, and green.
+  Actor red = Actor::New();
+  red.SetProperty(Actor::Property::NAME, "Red");
+  red.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  red.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  red.SetProperty(Actor::Property::POSITION, Vector2(actorSize.x * 5.0f / 6.0f, -actorSize.y * 1.0f / 6.0f));
+  red.SetProperty(Actor::Property::SIZE, actorSize);
+
+  blue.Add(red);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render(0);
+  application.Render(10);
+
+  //Hit in the intersection red, green, blue. Should pick the red actor since it is an child of overlay.
+  HitTest(stage, Vector2(stageSize.x * 13.0f / 24.0f, stageSize.y * 11.0f / 24.0f), results, &DefaultIsActorTouchableFunction);
+  tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
+  DALI_TEST_CHECK(results.actor == red);
+  DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 1.0f / 12.0f, actorSize.y * 11.0f / 12.0f), TEST_LOCATION);
+
+  //Hit in the intersection red, blue. Should pick the red actor since it is an child of blue.
+  HitTest(stage, Vector2(stageSize.x * 13.0f / 24.0f, stageSize.y * 9.0f / 24.0f), results, &DefaultIsActorTouchableFunction);
+  tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
+  DALI_TEST_CHECK(results.actor == red);
+  DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 1.0f / 12.0f, actorSize.y * 9.0f / 12.0f), TEST_LOCATION);
+
+  //Hit in the intersection red, green. Should pick the red actor since it is an child of overlay.
+  HitTest(stage, Vector2(stageSize.x * 15.0f / 24.0f, stageSize.y * 11.0f / 24.0f), results, &DefaultIsActorTouchableFunction);
+  tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
+  DALI_TEST_CHECK(results.actor == red);
+  DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 3.0f / 12.0f, actorSize.y * 11.0f / 12.0f), TEST_LOCATION);
+
+  //Hit in the intersection blue, green. Should pick the blue actor since it is an overlay.
+  HitTest(stage, Vector2(stageSize.x * 11.0f / 24.0f, stageSize.y * 13.0f / 24.0f), results, &DefaultIsActorTouchableFunction);
+  tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
+  DALI_TEST_CHECK(results.actor == blue);
+  DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 9.0f / 12.0f, actorSize.y * 11.0f / 12.0f), TEST_LOCATION);
+
+  // Change blue's draw mode as normal. now blue < red < green
+  blue.SetProperty(Actor::Property::DRAW_MODE, DrawMode::NORMAL);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render(0);
+  application.Render(10);
+
+  //Hit in the intersection red, green, blue. Should pick the green actor since it is latest ordered actor.
+  HitTest(stage, Vector2(stageSize.x * 13.0f / 24.0f, stageSize.y * 11.0f / 24.0f), results, &DefaultIsActorTouchableFunction);
+  tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
+  DALI_TEST_CHECK(results.actor == green);
+  DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 3.0f / 12.0f, actorSize.y * 1.0f / 12.0f), TEST_LOCATION);
+
+  //Hit in the intersection red, blue. Should pick the red actor since it is an child of blue.
+  HitTest(stage, Vector2(stageSize.x * 13.0f / 24.0f, stageSize.y * 9.0f / 24.0f), results, &DefaultIsActorTouchableFunction);
+  tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
+  DALI_TEST_CHECK(results.actor == red);
+  DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 1.0f / 12.0f, actorSize.y * 9.0f / 12.0f), TEST_LOCATION);
+
+  //Hit in the intersection red, green. Should pick the green actor since it is latest ordered actor.
+  HitTest(stage, Vector2(stageSize.x * 15.0f / 24.0f, stageSize.y * 11.0f / 24.0f), results, &DefaultIsActorTouchableFunction);
+  tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
+  DALI_TEST_CHECK(results.actor == green);
+  DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 5.0f / 12.0f, actorSize.y * 1.0f / 12.0f), TEST_LOCATION);
+
+  //Hit in the intersection blue, green. Should pick the green actor since it is latest ordered actor.
+  HitTest(stage, Vector2(stageSize.x * 11.0f / 24.0f, stageSize.y * 13.0f / 24.0f), results, &DefaultIsActorTouchableFunction);
+  tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
+  DALI_TEST_CHECK(results.actor == green);
+  DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 1.0f / 12.0f, actorSize.y * 3.0f / 12.0f), TEST_LOCATION);
   END_TEST;
 }
 
