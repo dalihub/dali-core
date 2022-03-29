@@ -2,7 +2,7 @@
 #define DALI_PROPERTY_MAP_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -271,6 +271,24 @@ public:
    * @SINCE_1_0.0
    */
   void Clear();
+
+  /**
+   * @brief Removes the item by the specified key.
+   *
+   * @SINCE_2_1.15
+   * @param[in] key  The key to remove
+   * @return @c true if succeeded, @c false otherwise
+   */
+  bool Remove(Property::Index key);
+
+  /**
+   * @brief Removes the item by the specified key.
+   *
+   * @SINCE_2_1.15
+   * @param[in] key  The key to remove
+   * @return @c true if succeeded, @c false otherwise
+   */
+  bool Remove(std::string_view key);
 
   /**
    * @brief Merges values from the map 'from' to the current.
