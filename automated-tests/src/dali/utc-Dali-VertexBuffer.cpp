@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -241,9 +241,14 @@ int UtcDaliVertexBufferSetData02(void)
   application.Render();
 
   {
+    const TestGlAbstraction::BufferSubDataCalls& bufferSubDataCalls =
+      application.GetGlAbstraction().GetBufferSubDataCalls();
+
     const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
       application.GetGlAbstraction().GetBufferDataCalls();
 
+    // Should be 1 (Flush standalone uniform buffer per each RenderScene)
+    DALI_TEST_EQUALS(bufferSubDataCalls.size(), 1u, TEST_LOCATION);
     DALI_TEST_EQUALS(bufferDataCalls.size(), 2u, TEST_LOCATION);
 
     DALI_TEST_EQUALS(bufferDataCalls[0], sizeof(texturedQuadVertexData), TEST_LOCATION);
@@ -262,13 +267,13 @@ int UtcDaliVertexBufferSetData02(void)
     const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
       application.GetGlAbstraction().GetBufferDataCalls();
 
-    // Should be 17 (using single uniform buffer now)
-    DALI_TEST_EQUALS(bufferSubDataCalls.size(), 17u, TEST_LOCATION);
+    // Should be 3 (2 Render + 1 vertexBuffer reload)
+    DALI_TEST_EQUALS(bufferSubDataCalls.size(), 3u, TEST_LOCATION);
     DALI_TEST_EQUALS(bufferDataCalls.size(), 3u, TEST_LOCATION);
 
-    if(bufferSubDataCalls.size())
+    if(bufferSubDataCalls.size() >= 2)
     {
-      DALI_TEST_EQUALS(bufferSubDataCalls[0], sizeof(texturedQuadVertexData), TEST_LOCATION);
+      DALI_TEST_EQUALS(bufferSubDataCalls[1], sizeof(texturedQuadVertexData), TEST_LOCATION);
     }
   }
 

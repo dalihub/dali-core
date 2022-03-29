@@ -190,7 +190,7 @@ void Program::SetGraphicsProgram(Graphics::UniquePtr<Graphics::Program>&& progra
   BuildReflection(mGfxController.GetProgramReflection(*mGfxProgram.get()));
 }
 
-bool Program::GetUniform(const std::string& name, Hash hashedName, Hash hashedNameNoArray, Graphics::UniformInfo& out) const
+bool Program::GetUniform(const std::string_view& name, Hash hashedName, Hash hashedNameNoArray, Graphics::UniformInfo& out) const
 {
   if(mReflection.empty())
   {
@@ -204,23 +204,21 @@ bool Program::GetUniform(const std::string& name, Hash hashedName, Hash hashedNa
 
   // If the name contains a "]" anywhere but the end, it's a structure element. The reflection
   // does contain such elements, so use normal hash.
-  Hash               hash  = hashedName;
-  const std::string* match = &name;
+  Hash             hash  = hashedName;
+  std::string_view match = name;
 
-  std::string baseName;
   if(!name.empty() && name.back() == ']')
   {
     hash     = hashedNameNoArray;
     auto pos = name.rfind("[");
-    baseName = name.substr(0, pos - 1); // Remove subscript
-    match    = &baseName;
+    match    = name.substr(0, pos - 1); // Remove subscript
   }
 
   for(const ReflectionUniformInfo& item : mReflection)
   {
     if(item.hashValue == hash)
     {
-      if(!item.hasCollision || item.uniformInfo.name == *match)
+      if(!item.hasCollision || item.uniformInfo.name == match)
       {
         out = item.uniformInfo;
         return true;

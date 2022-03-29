@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@
 #include <dali/internal/render/renderers/uniform-buffer-manager.h>
 
 // INTERNAL INCLUDES
-#include <dali/internal/render/renderers/uniform-buffer.h>
-#include <dali/internal/render/renderers/uniform-buffer-view.h>
 #include <dali/internal/render/renderers/uniform-buffer-view-pool.h>
+#include <dali/internal/render/renderers/uniform-buffer-view.h>
+#include <dali/internal/render/renderers/uniform-buffer.h>
 
 #include <dali/graphics-api/graphics-buffer-create-info.h>
 #include <dali/graphics-api/graphics-buffer.h>
@@ -31,7 +31,6 @@
 
 namespace Dali::Internal::Render
 {
-
 UniformBufferManager::UniformBufferManager(Dali::Graphics::Controller* controller)
 : mController(controller)
 {
@@ -41,24 +40,28 @@ UniformBufferManager::~UniformBufferManager() = default;
 
 Graphics::UniquePtr<UniformBuffer> UniformBufferManager::AllocateUniformBuffer(uint32_t size, uint32_t alignment)
 {
+  // TODO : Current code only assume CPU_ALLOCATED uniform buffer now
   return Graphics::UniquePtr<UniformBuffer>(
-    new UniformBuffer(mController, size, alignment, true, Dali::Graphics::BufferUsageFlags{0u} | Dali::Graphics::BufferUsage::TRANSFER_DST | Dali::Graphics::BufferUsage::UNIFORM_BUFFER));
+    new UniformBuffer(mController,
+                      size,
+                      alignment,
+                      Dali::Graphics::BufferUsageFlags{0u} | Dali::Graphics::BufferUsage::TRANSFER_DST | Dali::Graphics::BufferUsage::UNIFORM_BUFFER,
+                      Dali::Graphics::BufferPropertiesFlags{0u} | Dali::Graphics::BufferPropertiesFlagBit::CPU_ALLOCATED));
 }
 
-Graphics::UniquePtr<UniformBufferView> UniformBufferManager::CreateUniformBufferView( UniformBuffer* uniformBuffer, uint32_t offset, uint32_t size )
+Graphics::UniquePtr<UniformBufferView> UniformBufferManager::CreateUniformBufferView(UniformBuffer* uniformBuffer, uint32_t offset, uint32_t size)
 {
   // Allocate offset of given UBO (allocation strategy may reuse memory)
-  return Graphics::UniquePtr<UniformBufferView>( new UniformBufferView(*uniformBuffer, offset, size) );
+  return Graphics::UniquePtr<UniformBufferView>(new UniformBufferView(*uniformBuffer, offset, size));
 }
 
 Graphics::UniquePtr<UniformBufferViewPool> UniformBufferManager::CreateUniformBufferViewPool()
 {
   return Graphics::UniquePtr<UniformBufferViewPool>(
-    new UniformBufferViewPool( *this, 1 )
-    );
+    new UniformBufferViewPool(*this, 1));
 }
 
-[[nodiscard]] UniformBufferViewPool* UniformBufferManager::GetUniformBufferViewPool( uint32_t bufferIndex )
+[[nodiscard]] UniformBufferViewPool* UniformBufferManager::GetUniformBufferViewPool(uint32_t bufferIndex)
 {
   if(!mUniformBufferPoolStorage[bufferIndex])
   {
@@ -66,6 +69,16 @@ Graphics::UniquePtr<UniformBufferViewPool> UniformBufferManager::CreateUniformBu
     mUniformBufferPoolStorage[bufferIndex] = CreateUniformBufferViewPool();
   }
   return mUniformBufferPoolStorage[bufferIndex].get();
+}
+
+void UniformBufferManager::ReadyToLockUniformBuffer(uint32_t bufferIndex)
+{
+  GetUniformBufferViewPool(bufferIndex)->ReadyToLockUniformBuffer();
+}
+
+void UniformBufferManager::UnlockUniformBuffer(uint32_t bufferIndex)
+{
+  GetUniformBufferViewPool(bufferIndex)->UnlockUniformBuffer();
 }
 
 } // namespace Dali::Internal::Render
