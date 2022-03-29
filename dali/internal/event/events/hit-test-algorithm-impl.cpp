@@ -167,8 +167,6 @@ HitActor HitTestWithinLayer(Actor&                                     actor,
                             const bool&                                overlayed,
                             bool&                                      overlayHit,
                             bool                                       layerIs3d,
-                            uint32_t                                   clippingDepth,
-                            uint32_t                                   clippingBitPlaneMask,
                             const RayTest&                             rayTest,
                             const Integration::Point&                  point,
                             const uint32_t                             eventTime)
@@ -180,17 +178,11 @@ HitActor HitTestWithinLayer(Actor&                                     actor,
     return hit;
   }
 
-  // For clipping, regardless of whether we have hit this actor or not,
-  // we increase the clipping depth if we have hit a clipping actor.
+  // For clipping, regardless of whether we have hit this actor or not.
   // This is used later to ensure all nested clipped children have hit
   // all clipping actors also for them to be counted as hit.
-  uint32_t newClippingDepth = clippingDepth;
-  bool     clippingActor    = actor.GetClippingMode() != ClippingMode::DISABLED;
-  bool     overlayedActor   = overlayed || actor.IsOverlay();
-  if(clippingActor)
-  {
-    ++newClippingDepth;
-  }
+  bool clippingActor  = actor.GetClippingMode() != ClippingMode::DISABLED;
+  bool overlayedActor = overlayed || actor.IsOverlay();
 
   // If we are a clipping actor or hittable...
   if(clippingActor || hitCheck.IsActorHittable(&actor))
@@ -215,13 +207,6 @@ HitActor HitTestWithinLayer(Actor&                                     actor,
         // Check if cameraDepthDistance is between clipping plane
         if(cameraDepthDistance >= nearClippingPlane && cameraDepthDistance <= farClippingPlane)
         {
-          // If the hit has happened on a clipping actor, then add this clipping depth to the mask of hit clipping depths.
-          // This mask shows all the actors that have been hit at different clipping depths.
-          if(clippingActor)
-          {
-            clippingBitPlaneMask |= 1u << clippingDepth;
-          }
-
           if(overlayHit && !overlayedActor)
           {
             // If we have already hit an overlay and current actor is not an overlay ignore current actor.
@@ -233,34 +218,8 @@ HitActor HitTestWithinLayer(Actor&                                     actor,
               overlayHit = true;
             }
 
-            // At this point we have hit an actor.
-            // Now perform checks for clipping.
-            // Assume we have hit the actor first as if it is not clipped this would be the case.
-            bool haveHitActor = true;
-
-            // Check if we are performing clipping. IE. if any actors so far have clipping enabled - not necessarily this one.
-            // We can do this by checking the clipping depth has a value 1 or above.
-            if(newClippingDepth >= 1u)
-            {
-              // Now for us to count this actor as hit, we must have also hit
-              // all CLIPPING actors up to this point in the hierarchy as well.
-              // This information is stored in the clippingBitPlaneMask we updated above.
-              // Here we calculate a comparison mask by setting all the bits up to the current depth value.
-              // EG. a depth of 4 (10000 binary) = a mask of 1111 binary.
-              // This allows us a fast way of comparing all bits are set up to this depth.
-              // Note: If the current Actor has clipping, that is included in the depth mask too.
-              uint32_t clippingDepthMask = (1u << newClippingDepth) - 1u;
-
-              // The two masks must be equal to be a hit, as we are already assuming a hit
-              // (for non-clipping mode) then they must be not-equal to disqualify the hit.
-              if(clippingBitPlaneMask != clippingDepthMask)
-              {
-                haveHitActor = false;
-              }
-            }
-
             // If the hit actor does not want to hit, the hit-test continues.
-            if(haveHitActor && hitCheck.ActorRequiresHitResultCheck(&actor, point, hitPointLocal, eventTime))
+            if(hitCheck.ActorRequiresHitResultCheck(&actor, point, hitPointLocal, eventTime))
             {
               hit.actor       = &actor;
               hit.hitPosition = hitPointLocal;
@@ -286,6 +245,12 @@ HitActor HitTestWithinLayer(Actor&                                     actor,
         }
       }
     }
+  }
+
+  // If current actor is clipping, and hit failed, We should not checkup child actors. Fast return
+  if(clippingActor && !(hit.actor))
+  {
+    return hit;
   }
 
   // Find a child hit, until we run out of actors in the current layer.
@@ -316,8 +281,6 @@ HitActor HitTestWithinLayer(Actor&                                     actor,
                                                overlayedActor,
                                                overlayHit,
                                                layerIs3d,
-                                               newClippingDepth,
-                                               clippingBitPlaneMask,
                                                rayTest,
                                                point,
                                                eventTime));
@@ -505,8 +468,6 @@ bool HitTestRenderTask(const RenderTaskList::ExclusivesContainer& exclusives,
                                        overlayHit,
                                        overlayHit,
                                        layer->GetBehavior() == Dali::Layer::LAYER_3D,
-                                       0u,
-                                       0u,
                                        rayTest,
                                        results.point,
                                        results.eventTime);
@@ -525,8 +486,6 @@ bool HitTestRenderTask(const RenderTaskList::ExclusivesContainer& exclusives,
                                        overlayHit,
                                        overlayHit,
                                        layer->GetBehavior() == Dali::Layer::LAYER_3D,
-                                       0u,
-                                       0u,
                                        rayTest,
                                        results.point,
                                        results.eventTime);
