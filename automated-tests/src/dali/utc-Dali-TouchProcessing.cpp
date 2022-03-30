@@ -2104,22 +2104,6 @@ int UtcDaliTouchEventCapturePropertySet(void)
   application.ProcessEvent(GenerateSingleTouch(PointState::FINISHED, Vector2(110.0f, 110.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(data.receivedTouch.GetPoint(0).state, PointState::FINISHED, TEST_LOCATION);
-  data.Reset();
-
-  // Emit a down outside of actor, we should not receive the event
-  application.ProcessEvent(GenerateSingleTouch(PointState::STARTED, Vector2(110.0f, 110.0f)));
-  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
-  data.Reset();
-
-  // Now motion inside of actor, we should not receive the event, Because the touchdown didn't happen inside the actor.
-  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(10.0f, 10.0f)));
-  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
-  data.Reset();
-
-  // Up event, we should not receive the event,  Because the touchdown didn't happen inside the actor.
-  application.ProcessEvent(GenerateSingleTouch(PointState::FINISHED, Vector2(110.0f, 110.0f)));
-  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
-  data.Reset();
 
   END_TEST;
 }
