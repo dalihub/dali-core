@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -144,7 +144,7 @@ const Dali::Camera::Type           Camera::DEFAULT_TYPE(Dali::Camera::FREE_LOOK)
 const Dali::Camera::ProjectionMode Camera::DEFAULT_MODE(Dali::Camera::PERSPECTIVE_PROJECTION);
 const bool                         Camera::DEFAULT_INVERT_Y_AXIS(false);
 const float                        Camera::DEFAULT_FIELD_OF_VIEW(45.0f * (Math::PI / 180.0f));
-const float                        Camera::DEFAULT_ASPECT_RATIO(4.0f / 3.0f);
+const float                        Camera::DEFAULT_ASPECT_RATIO(800.0f / 480.0f);
 const float                        Camera::DEFAULT_LEFT_CLIPPING_PLANE(-240.0f);
 const float                        Camera::DEFAULT_RIGHT_CLIPPING_PLANE(240.0f);
 const float                        Camera::DEFAULT_TOP_CLIPPING_PLANE(-400.0f);
