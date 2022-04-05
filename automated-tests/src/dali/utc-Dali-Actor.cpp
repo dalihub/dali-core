@@ -50,9 +50,9 @@ void utc_dali_actor_cleanup(void)
 
 namespace
 {
-bool gTouchCallBackCalled  = false;
-bool gTouchCallBackCalled2 = false;
-bool gTouchCallBackCalled3 = false;
+bool gTouchCallBackCalled        = false;
+bool gTouchCallBackCalled2       = false;
+bool gTouchCallBackCalled3       = false;
 bool gHitTestTouchCallBackCalled = false;
 
 bool gHoverCallBackCalled = false;
@@ -7039,6 +7039,51 @@ int UtcDaliActorGetScreenPositionPositionUsesAnchorPointFalse(void)
   DALI_TEST_EQUALS(actorA.GetProperty(Actor::Property::SCREEN_POSITION).Get<Vector2>(), center /* TOP_LEFT Anchor */, TEST_LOCATION);
   DALI_TEST_EQUALS(actorB.GetProperty(Actor::Property::SCREEN_POSITION).Get<Vector2>(), center - actorBSize /* BOTTOM_RIGHT Anchor */, TEST_LOCATION);
   DALI_TEST_EQUALS(actorC.GetProperty(Actor::Property::SCREEN_POSITION).Get<Vector2>(), center - actorCSize * 0.5f /* CENTER Anchor*/, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorGetScreenPositionResizeScene(void)
+{
+  tet_infoline("UtcDaliActorGetScreenPositionResizeScene Check screen position after resizing the scene size");
+
+  TestApplication    application;
+  Integration::Scene scene = application.GetScene();
+
+  Actor actorA = Actor::New();
+  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  actorA.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+
+  scene.Add(actorA);
+
+  application.SendNotification();
+  application.Render();
+
+  Vector2 sceneSize           = scene.GetSize();
+  Vector2 actorScreenPosition = actorA.GetProperty(Actor::Property::SCREEN_POSITION).Get<Vector2>();
+
+  DALI_TEST_EQUALS(actorScreenPosition, sceneSize / 2, TEST_LOCATION);
+
+  // Resize the scene
+  Vector2 newSize(1000.0f, 2000.0f);
+  DALI_TEST_CHECK(scene.GetSize() != newSize);
+
+  scene.SurfaceResized(newSize.width, newSize.height);
+
+  actorScreenPosition = actorA.GetProperty(Actor::Property::SCREEN_POSITION).Get<Vector2>();
+
+  // The screen position should not be updated yet
+  DALI_TEST_EQUALS(actorScreenPosition, sceneSize / 2, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  actorScreenPosition = actorA.GetProperty(Actor::Property::SCREEN_POSITION).Get<Vector2>();
+
+  // The screen position should be updated
+  sceneSize = scene.GetSize();
+  DALI_TEST_EQUALS(actorScreenPosition, sceneSize / 2, TEST_LOCATION);
 
   END_TEST;
 }
