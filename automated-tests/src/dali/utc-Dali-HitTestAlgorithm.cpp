@@ -324,6 +324,70 @@ int UtcDaliHitTestAlgorithmClippingActor(void)
   END_TEST;
 }
 
+int UtcDaliHitTestAlgorithmClippingActorStress(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::HitTestAlgorithm with many many stencil");
+
+  Stage stage     = Stage::GetCurrent();
+  Actor rootLayer = stage.GetRootLayer();
+  rootLayer.SetProperty(Actor::Property::NAME, "RootLayer");
+
+  // Create a layer
+  Layer layer = Layer::New();
+  layer.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  layer.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  layer.SetProperty(Actor::Property::NAME, "layer");
+  stage.Add(layer);
+
+  // Create a clipping actor and add it to the layer.
+  Actor clippingActor = CreateRenderableActor();
+  clippingActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  clippingActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  clippingActor.SetProperty(Actor::Property::SIZE, Vector2(220.0f, 220.0f));
+  clippingActor.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
+  clippingActor.SetProperty(Actor::Property::NAME, "clippingActor");
+  layer.Add(clippingActor);
+
+  // Create a renderable actor and add it to the clipping actor.
+  Actor     latestActor = clippingActor;
+  const int depthMax    = 100;
+  for(int i = 0; i < depthMax; i++)
+  {
+    char tmp[29];
+    sprintf(tmp, "depth%03d", i);
+
+    Actor childActor = CreateRenderableActor();
+    childActor.SetProperty(Actor::Property::SIZE, Vector2(220.0f, 220.0f));
+    childActor.SetProperty(Actor::Property::POSITION, Vector2(200.0f / depthMax, 200.0f / depthMax));
+    childActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+    childActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+    childActor.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
+    childActor.SetProperty(Actor::Property::NAME, tmp);
+
+    latestActor.Add(childActor);
+    latestActor = childActor;
+  }
+  // NOTE : latestActor's TOP_LEFT position become 200.f, 200.0f
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Hit within clippingActor and latestActor.
+  HitTestAlgorithm::Results results;
+  HitTest(stage, Vector2(201.0f, 201.0f), results, &DefaultIsActorTouchableFunction);
+  tet_printf("Hit: %s\n", (results.actor ? results.actor.GetProperty<std::string>(Actor::Property::NAME).c_str() : "NULL"));
+  DALI_TEST_CHECK(results.actor == latestActor);
+
+  // Hit within childActor but outside of clippingActor, should hit the root-layer instead.
+  HitTest(stage, Vector2(221.0f, 221.0f), results, &DefaultIsActorTouchableFunction);
+  tet_printf("Hit: %s\n", (results.actor ? results.actor.GetProperty<std::string>(Actor::Property::NAME).c_str() : "NULL"));
+  DALI_TEST_CHECK(results.actor == rootLayer);
+
+  END_TEST;
+}
+
 int UtcDaliHitTestAlgorithmOverlay(void)
 {
   TestApplication application;
