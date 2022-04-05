@@ -1,8 +1,8 @@
-#ifndef FREE_LIST_H_
-#define FREE_LIST_H_
+#ifndef DALI_FREE_LIST_H
+#define DALI_FREE_LIST_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,8 @@
 
 namespace Dali
 {
-namespace Internal
-{
 /**
- * FreeList operates by connecting unused elements of a vector together in a linked list using the
+ * @brief FreeList operates by connecting unused elements of a vector together in a linked list using the
  * value of each unused cell as a pointer to the next. When a new element is added, it will be added
  * to the first free index of the vector and the new free index will be the value which was on that
  * cell
@@ -37,7 +35,7 @@ namespace Internal
 struct FreeList
 {
   /**
-   * Constructor
+   * @brief Constructor
    */
   FreeList()
   : mData(),
@@ -46,12 +44,12 @@ struct FreeList
   }
 
   /**
-   * Destructor
+   * @brief Destructor
    */
   ~FreeList() = default;
 
   /**
-   * Adds a new item to the list. If there is no more space in the vector it will
+   * @brief Adds a new item to the list. If there is no more space in the vector it will
    * allocate more space, otherwise, it will use the first free cell to store the
    * new value and will update the first free index.
    *
@@ -77,7 +75,7 @@ struct FreeList
   }
 
   /**
-   * Removes the item at position "index" from the list and
+   * @brief Removes the item at position "index" from the list and
    * updates the first free index
    *
    * @param[in] index The index of the element to remove
@@ -89,7 +87,7 @@ struct FreeList
   }
 
   /**
-   * Subscript operator.
+   * @brief Subscript operator.
    *
    * @param[in]  index Index of the element.
    * @return Reference to the element for given index.
@@ -100,7 +98,7 @@ struct FreeList
   }
 
   /**
-   * Subscript operator (const).
+   * @brief Subscript operator (const).
    *
    * @param[in]  index Index of the element.
    * @return Reference to the element for given index.
@@ -115,7 +113,6 @@ private:
   uint32_t               mFirstFreeIndex; ///< Index where a new element will be added
 };
 
-} // namespace Internal
 } // namespace Dali
 
-#endif /* FREE_LIST_H_ */
+#endif /* DALI_FREE_LIST_H */
