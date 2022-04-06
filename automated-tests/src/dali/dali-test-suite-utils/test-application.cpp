@@ -179,7 +179,7 @@ void TestApplication::DoUpdate(uint32_t intervalMilliseconds, const char* locati
   uint32_t nextVSyncTime  = mLastVSyncTime + intervalMilliseconds;
   float    elapsedSeconds = static_cast<float>(intervalMilliseconds) * 0.001f;
 
-  mCore->Update(elapsedSeconds, mLastVSyncTime, nextVSyncTime, mStatus, false, false);
+  mCore->Update(elapsedSeconds, mLastVSyncTime, nextVSyncTime, mStatus, false, false, false);
 
   GetRenderController().Initialize();
 

@@ -106,9 +106,9 @@ uint32_t Core::GetMaximumUpdateCount() const
   return mImpl->GetMaximumUpdateCount();
 }
 
-void Core::Update(float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uint32_t nextVSyncTimeMilliseconds, UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo)
+void Core::Update(float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uint32_t nextVSyncTimeMilliseconds, UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo, bool uploadOnly)
 {
-  mImpl->Update(elapsedSeconds, lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds, status, renderToFboEnabled, isRenderingToFbo);
+  mImpl->Update(elapsedSeconds, lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds, status, renderToFboEnabled, isRenderingToFbo, uploadOnly);
 }
 
 void Core::PreRender(RenderStatus& status, bool forceClear, bool uploadOnly)

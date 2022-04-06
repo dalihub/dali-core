@@ -877,7 +877,8 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
                                 uint32_t lastVSyncTimeMilliseconds,
                                 uint32_t nextVSyncTimeMilliseconds,
                                 bool renderToFboEnabled,
-                                bool isRenderingToFbo )
+                                bool isRenderingToFbo,
+                                bool uploadOnly )
 {
   const BufferIndex bufferIndex = mSceneGraphBuffers.GetUpdateBufferIndex();
 
@@ -982,7 +983,6 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
         }
       }
 
-
       std::size_t numberOfRenderInstructions = 0;
       for ( auto&& scene : mImpl->scenes )
       {
@@ -1009,35 +1009,38 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
     }
   }
 
-  for ( auto&& scene : mImpl->scenes )
+  if(!uploadOnly)
   {
-    if ( scene && scene->root && scene->taskList )
+    for(auto&& scene : mImpl->scenes)
     {
-      RenderTaskList::RenderTaskContainer& tasks = scene->taskList->GetTasks();
-
-      // check the countdown and notify
-      bool doRenderOnceNotify = false;
-      mImpl->renderTaskWaiting = false;
-      for ( auto&& renderTask : tasks )
+      if(scene && scene->root && scene->taskList)
       {
-        renderTask->UpdateState();
+        RenderTaskList::RenderTaskContainer& tasks = scene->taskList->GetTasks();
 
-        if( renderTask->IsWaitingToRender() &&
-            renderTask->ReadyToRender( bufferIndex ) /*avoid updating forever when source actor is off-stage*/ )
+        // check the countdown and notify
+        bool doRenderOnceNotify  = false;
+        mImpl->renderTaskWaiting = false;
+        for(auto&& renderTask : tasks)
         {
-          mImpl->renderTaskWaiting = true; // keep update/render threads alive
+          renderTask->UpdateState();
+
+          if(renderTask->IsWaitingToRender() &&
+             renderTask->ReadyToRender(bufferIndex) /*avoid updating forever when source actor is off-stage*/)
+          {
+            mImpl->renderTaskWaiting = true; // keep update/render threads alive
+          }
+
+          if(renderTask->HasRendered())
+          {
+            doRenderOnceNotify = true;
+          }
         }
 
-        if( renderTask->HasRendered() )
+        if(doRenderOnceNotify)
         {
-          doRenderOnceNotify = true;
+          DALI_LOG_INFO(gRenderTaskLogFilter, Debug::General, "Notify a render task has finished\n");
+          mImpl->notificationManager.QueueCompleteNotification(scene->taskList->GetCompleteNotificationInterface());
         }
-      }
-
-      if( doRenderOnceNotify )
-      {
-        DALI_LOG_INFO(gRenderTaskLogFilter, Debug::General, "Notify a render task has finished\n");
-        mImpl->notificationManager.QueueCompleteNotification( scene->taskList->GetCompleteNotificationInterface() );
       }
     }
   }

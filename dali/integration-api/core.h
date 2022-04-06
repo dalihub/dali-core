@@ -337,13 +337,15 @@ public:
    * whether a Notification event should be sent, regardless of whether the multi-threading is used.
    * @param[in] renderToFboEnabled Whether rendering into the Frame Buffer Object is enabled.
    * @param[in] isRenderingToFbo Whether this frame is being rendered into the Frame Buffer Object.
+   * @param[in] uploadOnly uploadOnly Upload the resource only without rendering.
    */
   void Update(float         elapsedSeconds,
               uint32_t      lastVSyncTimeMilliseconds,
               uint32_t      nextVSyncTimeMilliseconds,
               UpdateStatus& status,
               bool          renderToFboEnabled,
-              bool          isRenderingToFbo);
+              bool          isRenderingToFbo,
+              bool          uploadOnly);
 
   /**
    * This is called before rendering any scene in the next frame. This method should be preceded

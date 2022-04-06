@@ -193,7 +193,7 @@ void Core::ContextDestroyed()
   mRenderManager->ContextDestroyed();
 }
 
-void Core::Update( float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uint32_t nextVSyncTimeMilliseconds, Integration::UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo )
+void Core::Update( float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uint32_t nextVSyncTimeMilliseconds, Integration::UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo, bool uploadOnly )
 {
   // set the time delta so adaptor can easily print FPS with a release build with 0 as
   // it is cached by frametime
@@ -205,7 +205,8 @@ void Core::Update( float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uin
                                                 lastVSyncTimeMilliseconds,
                                                 nextVSyncTimeMilliseconds,
                                                 renderToFboEnabled,
-                                                isRenderingToFbo );
+                                                isRenderingToFbo,
+                                                uploadOnly );
 
   // Check the Notification Manager message queue to set needsNotification
   status.needsNotification = mNotificationManager->MessagesToProcess();

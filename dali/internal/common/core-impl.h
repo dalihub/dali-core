@@ -127,7 +127,7 @@ public:
   /**
    * @copydoc Dali::Integration::Core::Update()
    */
-  void Update( float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uint32_t nextVSyncTimeMilliseconds, Integration::UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo );
+  void Update( float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uint32_t nextVSyncTimeMilliseconds, Integration::UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo, bool uploadOnly );
 
   /**
    * @copydoc Dali::Integration::Core::PreRender()
