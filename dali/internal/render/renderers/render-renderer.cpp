@@ -759,8 +759,8 @@ void Renderer::FillUniformBuffer(Program&                                      p
       {
         auto uniformInfo  = Graphics::UniformInfo{};
         auto uniformFound = program.GetUniform(uniform.uniformName.GetCString(),
-                                               uniform.uniformNameHashNoArray ? uniform.uniformNameHashNoArray
-                                                                              : uniform.uniformNameHash,
+                                               uniform.uniformNameHash,
+                                               uniform.uniformNameHashNoArray,
                                                uniformInfo);
 
         uniform.uniformOffset   = uniformInfo.offset;

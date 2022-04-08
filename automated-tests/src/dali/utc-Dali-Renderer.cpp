@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -3784,6 +3784,120 @@ int UtcDaliRendererPreparePipeline(void)
                      Graphics::VertexInputFormat::FVECTOR3,
                      TEST_LOCATION);
   }
+
+  END_TEST;
+}
+
+int UtcDaliRendererUniformArrayOfStruct(void)
+{
+  TestApplication application;
+  tet_infoline("Test that uniforms that are elements of arrays of structs can be accessed");
+
+  std::vector<UniformData> customUniforms{{"arrayof[10].color", Property::VECTOR4},
+                                          {"arrayof[10].position", Property::VECTOR2},
+                                          {"arrayof[10].normal", Property::VECTOR3}};
+
+  application.GetGraphicsController().AddCustomUniforms(customUniforms);
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader   shader   = Shader::New("vertexSrc", "fragmentSrc");
+  Renderer renderer = Renderer::New(geometry, shader);
+  Actor    actor    = Actor::New();
+  actor.AddRenderer(renderer);
+  actor[Actor::Property::SIZE] = Vector2(120, 120);
+  application.GetScene().Add(actor);
+
+  // Define some properties to match the custom uniforms.
+  // Ensure they can be written & read back from the abstraction.
+
+  struct UniformIndexPair
+  {
+    Property::Index index;
+    std::string     name;
+    UniformIndexPair(Property::Index index, std::string name)
+    : index(index),
+      name(name)
+    {
+    }
+  };
+  std::vector<UniformIndexPair> uniformIndices;
+
+  std::ostringstream oss;
+  for(int i = 0; i < 10; ++i)
+  {
+    Property::Index index;
+    oss << "arrayof[" << i << "].color";
+    Vector4 color = Color::WHITE;
+    color.r       = 25.5f * i;
+    index         = renderer.RegisterProperty(oss.str(), color);
+    uniformIndices.emplace_back(index, oss.str());
+
+    oss.str("");
+    oss.clear();
+    oss << "arrayof[" << i << "].position";
+    Vector2 pos(i, 10 + i * 5);
+    index = renderer.RegisterProperty(oss.str(), pos);
+    uniformIndices.emplace_back(index, oss.str());
+
+    oss.str("");
+    oss.clear();
+    oss << "arrayof[" << i << "].normal";
+    Vector3 normal(i, i * 10, i * 100);
+    index = renderer.RegisterProperty(oss.str(), normal);
+    uniformIndices.emplace_back(index, oss.str());
+    oss.str("");
+    oss.clear();
+  }
+  auto&           gl        = application.GetGlAbstraction();
+  TraceCallStack& callStack = gl.GetSetUniformTrace();
+  gl.EnableSetUniformCallTrace(true);
+
+  application.SendNotification();
+  application.Render();
+
+  // Check that the uniforms match.
+  TraceCallStack::NamedParams params;
+  for(auto& uniformInfo : uniformIndices)
+  {
+    Property::Value value = renderer.GetProperty(uniformInfo.index);
+    switch(value.GetType())
+    {
+      case Property::VECTOR2:
+      {
+        DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniformInfo.name, params));
+        Vector2 setValue;
+        DALI_TEST_CHECK(gl.GetUniformValue<Vector2>(uniformInfo.name.c_str(), setValue));
+        DALI_TEST_EQUALS(value.Get<Vector2>(), setValue, 0.001f, TEST_LOCATION);
+        break;
+      }
+      case Property::VECTOR3:
+      {
+        DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniformInfo.name, params));
+        Vector3 setValue;
+        DALI_TEST_CHECK(gl.GetUniformValue<Vector3>(uniformInfo.name.c_str(), setValue));
+        DALI_TEST_EQUALS(value.Get<Vector3>(), setValue, 0.001f, TEST_LOCATION);
+        break;
+      }
+      case Property::VECTOR4:
+      {
+        DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniformInfo.name, params));
+        Vector4 setValue;
+        DALI_TEST_CHECK(gl.GetUniformValue<Vector4>(uniformInfo.name.c_str(), setValue));
+        DALI_TEST_EQUALS(value.Get<Vector4>(), setValue, 0.001f, TEST_LOCATION);
+        break;
+      }
+      default:
+        break;
+    }
+  }
+
+  // There is a hash in the property name's uniform map: check this in debugger
+  // There is a hash in the reflection. Check this in the debugger.
+
+  // Check that the reflection contains individual locs for each array entry's struct element
+  // and that it hashes the whole string
+
+  // Ensure that the property name's hash is also for the whole string.
 
   END_TEST;
 }

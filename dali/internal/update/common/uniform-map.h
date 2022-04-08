@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_UNIFORM_MAP_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,13 +53,17 @@ public:
     arrayIndex(0u)
   {
     // Look for array index closing bracket
-    auto pos = theUniformName.GetStringView().rfind("]");
+    auto nameStringView = theUniformName.GetStringView();
+    auto pos            = nameStringView.rfind("]");
 
-    // If found, extract the array index and store it
+    // If found, extract the array index and store it, if it's an element in an array of basic types.
     if(pos != std::string::npos)
     {
-      auto pos0  = theUniformName.GetStringView().rfind("[", pos);
-      arrayIndex = atoi(theUniformName.GetCString() + pos0 + 1);
+      auto pos0 = theUniformName.GetStringView().rfind("[", pos);
+      if(pos == nameStringView.length() - 1) // if element is in struct, don't set array index.
+      {
+        arrayIndex = atoi(theUniformName.GetCString() + pos0 + 1);
+      }
       // Calculate hash from name without array index
       uniformNameHashNoArray = Dali::CalculateHash(theUniformName.GetStringView().substr(0, pos0).data(), '[');
     }
