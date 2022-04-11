@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -117,6 +117,13 @@ void Program::BuildReflection(const Graphics::Reflection& graphicsReflection)
     // for each member store data
     for(const auto& item : uboInfo.members)
     {
+      // Add a hash for the whole name.
+      //
+      // If the name represents an array of basic types, it won't contain an index
+      // operator "[",NN,"]".
+      //
+      // If the name represents an element in an array of structs, it will contain an
+      // index operator, but should be hashed in full.
       auto hashValue = CalculateHash(item.name);
       mReflection.emplace_back(ReflectionUniformInfo{hashValue, false, item});
 
@@ -169,35 +176,51 @@ void Program::BuildReflection(const Graphics::Reflection& graphicsReflection)
 
   // Calculate size of memory for uniform blocks
   mUniformBlockRequirements.totalSizeRequired = 0;
-  mUniformBlockRequirements.blockCount = graphicsReflection.GetUniformBlockCount();
-  for (auto i = 0u; i < mUniformBlockRequirements.blockCount; ++i)
+  mUniformBlockRequirements.blockCount        = graphicsReflection.GetUniformBlockCount();
+  for(auto i = 0u; i < mUniformBlockRequirements.blockCount; ++i)
   {
     auto blockSize = GetUniformBufferDataAlignment(graphicsReflection.GetUniformBlockSize(i));
     mUniformBlockRequirements.totalSizeRequired += blockSize;
   }
 }
 
-void Program::SetGraphicsProgram( Graphics::UniquePtr<Graphics::Program>&& program )
+void Program::SetGraphicsProgram(Graphics::UniquePtr<Graphics::Program>&& program)
 {
   mGfxProgram = std::move(program);
   BuildReflection(mGfxController.GetProgramReflection(*mGfxProgram.get()));
 }
 
-
-bool Program::GetUniform(const std::string& name, size_t hashedName, Graphics::UniformInfo& out) const
+bool Program::GetUniform(const std::string& name, Hash hashedName, Hash hashedNameNoArray, Graphics::UniformInfo& out) const
 {
   if(mReflection.empty())
   {
     return false;
   }
+  DALI_ASSERT_DEBUG(hashedName != 0 && "GetUniform() hash is not set");
 
-  hashedName = !hashedName ? CalculateHash(name, '[') : hashedName;
+  // If name contains a "]", but has nothing after, it's an element in an array,
+  // The reflection doesn't contain such elements, it only contains the name without square brackets
+  // Use the hash without array subscript.
+
+  // If the name contains a "]" anywhere but the end, it's a structure element. The reflection
+  // does contain such elements, so use normal hash.
+  Hash               hash  = hashedName;
+  const std::string* match = &name;
+
+  std::string baseName;
+  if(!name.empty() && name.back() == ']')
+  {
+    hash     = hashedNameNoArray;
+    auto pos = name.rfind("[");
+    baseName = name.substr(0, pos - 1); // Remove subscript
+    match    = &baseName;
+  }
 
   for(const ReflectionUniformInfo& item : mReflection)
   {
-    if(item.hashValue == hashedName)
+    if(item.hashValue == hash)
     {
-      if(!item.hasCollision || item.uniformInfo.name == name)
+      if(!item.hasCollision || item.uniformInfo.name == *match)
       {
         out = item.uniformInfo;
         return true;

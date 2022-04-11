@@ -147,8 +147,6 @@ TestGraphicsReflection::TestGraphicsReflection(TestGlAbstraction& gl, uint32_t p
   for(const auto& data : mCustomUniforms)
   {
     fprintf(stderr, "\ncustom uniforms: %s\n", data.name.c_str());
-    mDefaultUniformBlock.members.emplace_back();
-    auto& item = mDefaultUniformBlock.members.back();
 
     auto iter        = data.name.find("[", 0);
     int  numElements = 1;
@@ -161,26 +159,60 @@ TestGraphicsReflection::TestGraphicsReflection(TestGlAbstraction& gl, uint32_t p
       {
         numElements = 1;
       }
-
-      item.name         = baseName;
-      item.binding      = 0;
-      item.bufferIndex  = 0;
-      item.uniformClass = Graphics::UniformClass::UNIFORM;
-      item.type         = data.type;
-      item.numElements  = numElements;
-
-      for(int i = 0; i < numElements; ++i)
+      iter = data.name.find("]");
+      std::string suffix;
+      if(iter != std::string::npos && iter + 1 != data.name.length())
       {
-        std::stringstream elementNameStream;
-        elementNameStream << baseName << "[" << i << "]";
+        suffix = data.name.substr(iter + 1); // If there is a suffix, it means it is an element of an array of struct
+      }
 
-        item.locations.push_back(gl.GetUniformLocation(programId, elementNameStream.str().c_str()));
-        item.offsets.push_back(offset);
-        offset += GetSizeForType(data.type);
+      if(!suffix.empty())
+      {
+        // Write multiple items
+        for(int i = 0; i < numElements; ++i)
+        {
+          std::stringstream elementNameStream;
+          elementNameStream << baseName << "[" << i << "]" << suffix;
+          mDefaultUniformBlock.members.emplace_back();
+          auto& item   = mDefaultUniformBlock.members.back();
+          item.name    = elementNameStream.str();
+          item.binding = 0;
+          item.offsets.push_back(offset);
+          item.locations.push_back(gl.GetUniformLocation(programId, elementNameStream.str().c_str()));
+          item.bufferIndex  = 0;
+          item.uniformClass = Graphics::UniformClass::UNIFORM;
+          item.type         = data.type;
+          offset += GetSizeForType(data.type);
+        }
+      }
+      else
+      {
+        // Write 1 item with multiple elements
+        mDefaultUniformBlock.members.emplace_back();
+        auto& item = mDefaultUniformBlock.members.back();
+
+        item.name         = baseName;
+        item.binding      = 0;
+        item.bufferIndex  = 0;
+        item.uniformClass = Graphics::UniformClass::UNIFORM;
+        item.type         = data.type;
+        item.numElements  = numElements;
+
+        for(int i = 0; i < numElements; ++i)
+        {
+          std::stringstream elementNameStream;
+          elementNameStream << baseName << "[" << i << "]";
+          item.locations.push_back(gl.GetUniformLocation(programId, elementNameStream.str().c_str()));
+          item.offsets.push_back(offset);
+          offset += GetSizeForType(data.type);
+        }
       }
     }
     else
     {
+      // Write 1 item with 1 element
+      mDefaultUniformBlock.members.emplace_back();
+      auto& item   = mDefaultUniformBlock.members.back();
       item.name    = data.name;
       item.binding = 0;
       item.offsets.push_back(offset);

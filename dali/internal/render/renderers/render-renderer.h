@@ -533,7 +533,7 @@ private:
 
   Render::PipelineCache* mPipelineCache{nullptr};
 
-  using Hash = unsigned long;
+  using Hash = std::size_t;
 
   typedef const float& (PropertyInputImpl::*FuncGetter)(BufferIndex) const;
 

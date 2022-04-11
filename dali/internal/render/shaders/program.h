@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PROGRAM_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,6 +50,8 @@ class ProgramCache;
 class Program
 {
 public:
+  using Hash = std::size_t;
+
   /**
    * Indices of default uniforms
    */
@@ -77,7 +79,7 @@ public:
    * @param[in]  gfxController Reference to valid graphics Controller object
    * @return pointer to the program
    */
- static Program* New(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& gfxController);
+  static Program* New(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& gfxController);
 
   /**
    * Set the projection matrix that has currently been sent
@@ -125,7 +127,7 @@ public:
     return mGfxProgram.get();
   }
 
-  void SetGraphicsProgram( Graphics::UniquePtr<Graphics::Program>&& program );
+  void SetGraphicsProgram(Graphics::UniquePtr<Graphics::Program>&& program);
 
   /**
    * Retrieves uniform data.
@@ -134,11 +136,12 @@ public:
    *
    * @param name Name of uniform
    * @param hashedName Hash value from name or 0 if unknown
+   * @param hashedNameNoArray Hash value from name without array index & trailing string, or 0 if unknown
    * @param out Reference to output structure
    *
    * @return False when uniform is not found or due to hash collision the result is ambiguous
    */
-  bool GetUniform(const std::string& name, size_t hashedName, Graphics::UniformInfo& out) const;
+  bool GetUniform(const std::string& name, Hash hashedName, Hash hashedNameNoArray, Graphics::UniformInfo& out) const;
 
   /**
    * Retrieves default uniform
@@ -218,9 +221,9 @@ private:                           // Data
 
   using UniformReflectionContainer = std::vector<ReflectionUniformInfo>;
 
-  UniformReflectionContainer mReflection{};                ///< Contains reflection build per program
-  UniformReflectionContainer mReflectionDefaultUniforms{}; ///< Contains default uniforms
-  UniformBlockMemoryRequirements mUniformBlockRequirements{}; ///< Memory requirements for uniform blocks
+  UniformReflectionContainer     mReflection{};                ///< Contains reflection build per program
+  UniformReflectionContainer     mReflectionDefaultUniforms{}; ///< Contains default uniforms
+  UniformBlockMemoryRequirements mUniformBlockRequirements{};  ///< Memory requirements for uniform blocks
 };
 
 } // namespace Internal
