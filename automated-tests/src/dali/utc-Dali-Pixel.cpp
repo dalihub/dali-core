@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ int UtcDaliPixelHasAlpha(void)
 
   tet_infoline("UtcDaliPixelHasAlpha");
 
-  TestPixelEnumSize(60);
+  TestPixelEnumSize(62);
 
   DALI_TEST_CHECK(Pixel::HasAlpha(Pixel::INVALID) == false); // For completeness
 
@@ -119,6 +119,9 @@ int UtcDaliPixelHasAlpha(void)
 
   DALI_TEST_CHECK(Pixel::HasAlpha(Pixel::R11G11B10F) == false);
 
+  DALI_TEST_CHECK(Pixel::HasAlpha(Pixel::CHROMINANCE_U) == false);
+  DALI_TEST_CHECK(Pixel::HasAlpha(Pixel::CHROMINANCE_V) == false);
+
   END_TEST;
 }
 
@@ -135,7 +138,7 @@ int UtcDaliPixelGetBytesPerPixel(void)
   tet_infoline("UtcDaliPixelGetBytesPerPixel");
 
   // Be sure that the number of cases tested below is correct:
-  TestPixelEnumSize(60);
+  TestPixelEnumSize(62);
 
   DALI_TEST_CHECK(Pixel::GetBytesPerPixel(Pixel::INVALID) == 0); // For completeness
 
@@ -208,6 +211,10 @@ int UtcDaliPixelGetBytesPerPixel(void)
   DALI_TEST_CHECK(Pixel::GetBytesPerPixel(Pixel::DEPTH_FLOAT) == 4);
   DALI_TEST_CHECK(Pixel::GetBytesPerPixel(Pixel::DEPTH_STENCIL) == 4);
   DALI_TEST_CHECK(Pixel::GetBytesPerPixel(Pixel::R11G11B10F) == 4);
+
+  DALI_TEST_CHECK(Pixel::GetBytesPerPixel(Pixel::CHROMINANCE_U) == 1);
+  DALI_TEST_CHECK(Pixel::GetBytesPerPixel(Pixel::CHROMINANCE_V) == 1);
+
   END_TEST;
 }
 
@@ -227,7 +234,7 @@ int UtcDaliPixelGetAlphaOffsetAndMaskP(void)
   int bitMask    = 0;
 
   // Be sure that the number of cases tested below is correct:
-  TestPixelEnumSize(60);
+  TestPixelEnumSize(62);
 
   Pixel::GetAlphaOffsetAndMask(Pixel::INVALID, byteOffset, bitMask); // For completeness
   DALI_TEST_CHECK(byteOffset == 0 && bitMask == 0);
@@ -357,6 +364,11 @@ int UtcDaliPixelGetAlphaOffsetAndMaskP(void)
   Pixel::GetAlphaOffsetAndMask(Pixel::R11G11B10F, byteOffset, bitMask);
   DALI_TEST_CHECK(byteOffset == 0 && bitMask == 0);
 
+  Pixel::GetAlphaOffsetAndMask(Pixel::CHROMINANCE_U, byteOffset, bitMask);
+  DALI_TEST_CHECK(byteOffset == 0 && bitMask == 0);
+  Pixel::GetAlphaOffsetAndMask(Pixel::CHROMINANCE_V, byteOffset, bitMask);
+  DALI_TEST_CHECK(byteOffset == 0 && bitMask == 0);
+
   END_TEST;
 }
 
@@ -380,6 +392,15 @@ int UtcDaliPixelConvertGlFormat(void)
   Dali::Integration::ConvertToGlFormat(Pixel::Format::R11G11B10F, pixelDataType, internalFormat);
   DALI_TEST_CHECK(pixelDataType == GL_FLOAT);
   DALI_TEST_CHECK(internalFormat == GL_R11F_G11F_B10F);
+
+  Dali::Integration::ConvertToGlFormat(Pixel::Format::CHROMINANCE_U, pixelDataType, internalFormat);
+  DALI_TEST_CHECK(pixelDataType == GL_UNSIGNED_BYTE);
+  DALI_TEST_CHECK(internalFormat == GL_LUMINANCE);
+
+  Dali::Integration::ConvertToGlFormat(Pixel::Format::CHROMINANCE_V, pixelDataType, internalFormat);
+  DALI_TEST_CHECK(pixelDataType == GL_UNSIGNED_BYTE);
+  DALI_TEST_CHECK(internalFormat == GL_LUMINANCE);
+
   END_TEST;
 }
 

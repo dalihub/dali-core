@@ -148,7 +148,6 @@ constexpr Graphics::Format ConvertPixelFormat(Pixel::Format format)
     case Pixel::COMPRESSED_RGBA_ASTC_12x12_KHR:
       return Graphics::Format::ASTC_12x12_UNORM_BLOCK;
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR:
-
       return Graphics::Format::ASTC_4x4_SRGB_BLOCK; // not type with alpha, but likely to use SRGB
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR:
       return Graphics::Format::ASTC_5x4_SRGB_BLOCK;
@@ -176,12 +175,18 @@ constexpr Graphics::Format ConvertPixelFormat(Pixel::Format format)
       return Graphics::Format::ASTC_12x10_SRGB_BLOCK;
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR:
       return Graphics::Format::ASTC_12x12_SRGB_BLOCK;
+
     case Pixel::RGB16F:
       return Graphics::Format::R16G16B16_SFLOAT;
     case Pixel::RGB32F:
       return Graphics::Format::R32G32B32_SFLOAT;
     case Pixel::R11G11B10F:
       return Graphics::Format::R11G11B10_UFLOAT_PACK32;
+
+    case Pixel::CHROMINANCE_U:
+      return Graphics::Format::L8;
+    case Pixel::CHROMINANCE_V:
+      return Graphics::Format::L8;
   }
   return Graphics::Format::UNDEFINED;
 }
