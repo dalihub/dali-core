@@ -3480,3 +3480,48 @@ int UtcDaliRenderTaskClippingMode02(void)
 
   END_TEST;
 }
+
+int UtcDaliRenderTaskUploadOnly(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask Render Once GlSync, using loaded image");
+
+  // SETUP AN OFFSCREEN RENDER TASK
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+  auto&           sync      = application.GetGraphicsSyncImpl();
+  TraceCallStack& drawTrace = application.GetGlAbstraction().GetDrawTrace();
+  drawTrace.Enable(true);
+
+  Actor rootActor = Actor::New();
+  application.GetScene().Add(rootActor);
+
+  CameraActor offscreenCameraActor = CameraActor::New(Size(TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT));
+  application.GetScene().Add(offscreenCameraActor);
+  Actor secondRootActor = CreateRenderableActorSuccess(application, "aFile.jpg");
+
+  application.GetScene().Add(secondRootActor);
+
+  RenderTask         newTask  = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ONCE, true);
+  bool               finished = false;
+  RenderTaskFinished renderTaskFinished(finished);
+  newTask.FinishedSignal().Connect(&application, renderTaskFinished);
+  application.SendNotification();
+
+  DALI_TEST_CHECK(UpdateRender(application, drawTrace, true, finished, false, true, __LINE__));
+
+  Integration::GraphicsSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
+  DALI_TEST_CHECK(lastSyncObj != NULL);
+  sync.SetObjectSynced(lastSyncObj, true);
+
+  application.SendNotification();
+  application.Render(16, nullptr, true);
+
+  DALI_TEST_CHECK(!finished);
+
+  application.Render(16, nullptr, true);
+  application.SendNotification();
+
+  DALI_TEST_CHECK(!finished);
+  END_TEST;
+}
