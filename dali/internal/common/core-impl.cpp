@@ -185,7 +185,7 @@ void Core::ContextDestroyed()
 {
 }
 
-void Core::Update(float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uint32_t nextVSyncTimeMilliseconds, Integration::UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo)
+void Core::Update(float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uint32_t nextVSyncTimeMilliseconds, Integration::UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo, bool uploadOnly)
 {
   // set the time delta so adaptor can easily print FPS with a release build with 0 as
   // it is cached by frametime
@@ -197,7 +197,8 @@ void Core::Update(float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uint
                                                lastVSyncTimeMilliseconds,
                                                nextVSyncTimeMilliseconds,
                                                renderToFboEnabled,
-                                               isRenderingToFbo);
+                                               isRenderingToFbo,
+                                               uploadOnly);
 
   // Check the Notification Manager message queue to set needsNotification
   status.needsNotification = mNotificationManager->MessagesToProcess();
@@ -206,9 +207,9 @@ void Core::Update(float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uint
   // Any message to update will wake it up anyways
 }
 
-void Core::PreRender(RenderStatus& status, bool forceClear, bool uploadOnly)
+void Core::PreRender(RenderStatus& status, bool forceClear)
 {
-  mRenderManager->PreRender(status, forceClear, uploadOnly);
+  mRenderManager->PreRender(status, forceClear);
 }
 
 void Core::PreRender(RenderStatus& status, Integration::Scene& scene, std::vector<Rect<int>>& damagedRects)
@@ -226,9 +227,9 @@ void Core::RenderScene(RenderStatus& status, Integration::Scene& scene, bool ren
   mRenderManager->RenderScene(status, scene, renderToFbo, clippingRect);
 }
 
-void Core::PostRender(bool uploadOnly)
+void Core::PostRender()
 {
-  mRenderManager->PostRender(uploadOnly);
+  mRenderManager->PostRender();
 }
 
 void Core::SceneCreated()

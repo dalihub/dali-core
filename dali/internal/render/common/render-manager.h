@@ -323,9 +323,8 @@ public:
    * @pre The graphics implementation must be initialized
    * @param[out] status showing whether update is required to run.
    * @param[in] forceClear force the Clear on the framebuffer even if nothing is rendered.
-   * @param[in] uploadOnly uploadOnly Upload the resource only without rendering.
    */
-  void PreRender(Integration::RenderStatus& status, bool forceClear, bool uploadOnly);
+  void PreRender(Integration::RenderStatus& status, bool forceClear);
 
   // This method should be called from Core::PreRender()
 
@@ -373,9 +372,8 @@ public:
    * followed by a call up RenderScene.
    * Multi-threading note: this method should be called from a dedicated rendering thread.
    * @pre The graphics implementation must be initialized
-   * @param[in] uploadOnly uploadOnly Upload the resource only without rendering.
    */
-  void PostRender(bool uploadOnly);
+  void PostRender();
 
 private:
   /**

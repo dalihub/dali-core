@@ -324,13 +324,15 @@ public:
    * whether a Notification event should be sent, regardless of whether the multi-threading is used.
    * @param[in] renderToFboEnabled Whether rendering into the Frame Buffer Object is enabled.
    * @param[in] isRenderingToFbo Whether this frame is being rendered into the Frame Buffer Object.
+   * @param[in] uploadOnly uploadOnly Upload the resource only without rendering.
    */
   void Update(float         elapsedSeconds,
               uint32_t      lastVSyncTimeMilliseconds,
               uint32_t      nextVSyncTimeMilliseconds,
               UpdateStatus& status,
               bool          renderToFboEnabled,
-              bool          isRenderingToFbo);
+              bool          isRenderingToFbo,
+              bool          uploadOnly);
 
   /**
    * This is called before rendering any scene in the next frame. This method should be preceded
@@ -339,9 +341,8 @@ public:
    * @pre The GL context must have been created, and made current.
    * @param[out] status showing whether update is required to run.
    * @param[in] forceClear force the Clear on the framebuffer even if nothing is rendered.
-   * @param[in] uploadOnly uploadOnly Upload the resource only without rendering.
    */
-  void PreRender(RenderStatus& status, bool forceClear, bool uploadOnly);
+  void PreRender(RenderStatus& status, bool forceClear);
 
   /**
    * This is called before rendering any scene in the next frame. This method should be preceded
@@ -383,9 +384,8 @@ public:
    * followed by a call up RenderScene.
    * Multi-threading note: this method should be called from a dedicated rendering thread.
    * @pre The GL context must have been created, and made current.
-   * @param[in] uploadOnly uploadOnly Upload the resource only without rendering.
    */
-  void PostRender(bool uploadOnly);
+  void PostRender();
 
   /**
    * @brief Register a processor
