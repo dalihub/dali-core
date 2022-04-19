@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,6 +95,8 @@ bool Pixel::HasAlpha(Format pixelformat)
     case DEPTH_STENCIL:
     case R11G11B10F:
     case INVALID:
+    case CHROMINANCE_U:
+    case CHROMINANCE_V:
     {
       return false;
     }
@@ -108,6 +110,8 @@ uint32_t Pixel::GetBytesPerPixel(Format pixelFormat)
   {
     case L8:
     case A8:
+    case CHROMINANCE_U:
+    case CHROMINANCE_V:
     {
       return 1;
     }
@@ -299,6 +303,8 @@ void Pixel::GetAlphaOffsetAndMask(Format pixelFormat, int& byteOffset, int& bitM
     case DEPTH_FLOAT:
     case DEPTH_STENCIL:
     case R11G11B10F:
+    case CHROMINANCE_U:
+    case CHROMINANCE_V:
     case INVALID:
     {
       DALI_LOG_ERROR("Pixel formats are not compatible with simple masking-out of per-pixel alpha.\n");
