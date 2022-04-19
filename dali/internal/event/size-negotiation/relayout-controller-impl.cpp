@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -446,7 +446,7 @@ void RelayoutController::Relayout()
         Actor& actorImpl = GetImplementation(actor);
         mRelayoutStack->PopBack();
 
-        if(actorImpl.RelayoutRequired())
+        if(actorImpl.RelayoutRequired() && actorImpl.OnScene())
         {
           DALI_LOG_INFO(gLogFilter, Debug::General, "[Internal::RelayoutController::Relayout] Negotiating %p %s %s (%.2f, %.2f)\n", &actorImpl, actor.GetTypeName().c_str(), actor.GetProperty<std::string>(Dali::Actor::Property::NAME).c_str(), size.width, size.height);
 
