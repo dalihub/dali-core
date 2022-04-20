@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_CAMERA_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -459,6 +459,17 @@ inline void SetFarClippingPlaneMessage(EventThreadServices& eventThreadServices,
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&camera, &Camera::SetFarClippingPlane, parameter);
+}
+
+inline void SetReflectByPlaneMessage(EventThreadServices& eventThreadServices, const Camera& camera, const Vector4& plane)
+{
+  using LocalType = MessageValue1<Camera, Vector4>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new(slot) LocalType(&camera, &Camera::SetReflectByPlane, plane);
 }
 
 inline void SetTargetPositionMessage(EventThreadServices& eventThreadServices, const Camera& camera, const Vector3& parameter)

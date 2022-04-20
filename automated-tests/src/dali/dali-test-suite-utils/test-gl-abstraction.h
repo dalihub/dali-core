@@ -997,10 +997,17 @@ public:
       {
         name            = uniform.name.substr(0, iter);
         auto arrayCount = std::stoi(uniform.name.substr(iter + 1));
+        iter            = uniform.name.find("]");
+        std::string suffix;
+        if(iter != std::string::npos && iter + 1 != uniform.name.length())
+        {
+          suffix = uniform.name.substr(iter + 1); // If there is a suffix, it means its an element of an array of struct
+        }
+
         for(int i = 0; i < arrayCount; ++i)
         {
           std::stringstream nss;
-          nss << name << "[" << i << "]";
+          nss << name << "[" << i << "]" << suffix;
           GetUniformLocation(program, nss.str().c_str()); // Generate a GL loc per element
         }
       }

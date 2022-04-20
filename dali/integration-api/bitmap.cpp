@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -447,6 +447,20 @@ void ConvertToGlFormat(Format pixelformat, unsigned& pixelDataType, unsigned& in
     {
       pixelDataType  = GL_UNSIGNED_INT_24_8;
       internalFormat = GL_DEPTH_STENCIL;
+      break;
+    }
+
+    // Chrominance formats
+    case Pixel::CHROMINANCE_U:
+    {
+      pixelDataType  = GL_UNSIGNED_BYTE;
+      internalFormat = GL_LUMINANCE; // GL doesn't support chrominance format. We should convert it in the shader.
+      break;
+    }
+    case Pixel::CHROMINANCE_V:
+    {
+      pixelDataType  = GL_UNSIGNED_BYTE;
+      internalFormat = GL_LUMINANCE; // GL doesn't support chrominance format. We should convert it in the shader.
       break;
     }
 

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_ITEM_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,6 +52,15 @@ struct RenderItem
   ~RenderItem();
 
   /**
+   * Produce a 2D AABB in transformed space
+   * See below for caveats.
+   *
+   * @param[in]    transformMatrix   The matrix for converting to a different space
+   * @param[in]    size              The size of the render item
+   */
+  static ClippingBox CalculateTransformSpaceAABB(const Matrix& transformMatrix, const Vector3& size);
+
+  /**
    * @brief This method is an optimized calculation of a viewport-space AABB (Axis-Aligned-Bounding-Box).
    *
    * We use the model-view-matrix, but we do not use projection. Therefore we assume Z = 0.
@@ -59,6 +68,8 @@ struct RenderItem
    * Rotations on X & Y axis will resize the AABB, but it will not handle the projection error due to the new coordinates having non-zero Z values.
    *
    * Note: We pass in the viewport dimensions rather than allow the caller to modify the raw AABB in order to optimally generate the final result.
+   *
+   * Note: ASSUMES THAT THE VIEWPORT COVERS THE SCREEN AND THAT THE CANVAS SIZE AND VIEWPORT SIZE ARE THE SAME!!!!!  (Not the case for magnifier)
    *
    * @param[in]    modelViewMatrix   The model view matrix
    * @param[in]    size              The size of the render item

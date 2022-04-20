@@ -31,6 +31,13 @@ Renderer Renderer::New(Geometry& geometry, Shader& shader)
   return Renderer(renderer.Get());
 }
 
+Renderer Renderer::New(RenderCallback& renderCallback)
+{
+  Internal::RendererPtr renderer = Internal::Renderer::New();
+  renderer->SetRenderCallback(&renderCallback);
+  return Renderer(renderer.Get());
+}
+
 Renderer::Renderer() = default;
 
 Renderer::~Renderer() = default;

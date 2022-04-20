@@ -28,8 +28,36 @@ struct DrawableObject
     return false;
   }
 
-  Size size;
+  Size size{};
 };
+
+int UtcDaliRendererSetRenderCallbackP(void)
+{
+  tet_infoline("Testing Renderer:LSetRenderCallback()");
+  TestApplication application;
+
+  DrawableObject drawable{};
+
+  auto callback = RenderCallback::New<DrawableObject>(&drawable, &DrawableObject::Render);
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
+
+  auto renderer = Renderer::New(*callback);
+  actor.AddRenderer(renderer);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  // Check the size (whether callback has been called)
+  auto size(drawable.size);
+  DALI_TEST_EQUALS(drawable.size, Size(100, 100), TEST_LOCATION);
+
+  END_TEST;
+}
 
 int UtcDaliDrawableActor1P(void)
 {

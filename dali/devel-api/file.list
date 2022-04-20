@@ -70,6 +70,7 @@ SET( devel_api_core_common_header_files
   ${devel_api_src_dir}/common/capabilities.h
   ${devel_api_src_dir}/common/circular-queue.h
   ${devel_api_src_dir}/common/hash.h
+  ${devel_api_src_dir}/common/free-list.h
   ${devel_api_src_dir}/common/singleton-service.h
   ${devel_api_src_dir}/common/map-wrapper.h
   ${devel_api_src_dir}/common/owner-container.h

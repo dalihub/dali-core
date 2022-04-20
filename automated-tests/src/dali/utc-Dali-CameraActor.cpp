@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -186,7 +186,7 @@ int UtcDaliCameraActorNewDefaultPerspectiveProjection(void)
 
   // All the properties should still be the default values
   // Defaults taken from scene-graph-camera.cpp
-  DALI_TEST_EQUALS(4.0f / 3.0f, actor.GetProperty(CameraActor::Property::ASPECT_RATIO).Get<float>(), FLOAT_EPSILON, TEST_LOCATION);
+  DALI_TEST_EQUALS(800.0f / 480.0f, actor.GetProperty(CameraActor::Property::ASPECT_RATIO).Get<float>(), FLOAT_EPSILON, TEST_LOCATION);
   DALI_TEST_EQUALS(45.0f * (Math::PI / 180.0f), actor.GetProperty(CameraActor::Property::FIELD_OF_VIEW).Get<float>(), FLOAT_EPSILON, TEST_LOCATION);
   DALI_TEST_EQUALS(800.0f, actor.GetProperty(CameraActor::Property::NEAR_PLANE_DISTANCE).Get<float>(), FLOAT_EPSILON, TEST_LOCATION);
   DALI_TEST_EQUALS(3.0f * 800.0f, actor.GetProperty(CameraActor::Property::FAR_PLANE_DISTANCE).Get<float>(), FLOAT_EPSILON, TEST_LOCATION);
@@ -2116,5 +2116,120 @@ int UtcDaliCameraActorGetTypeNegative(void)
   {
     DALI_TEST_CHECK(true); // We expect an assert
   }
+  END_TEST;
+}
+
+int UtcDaliCameraActorNewDefaultOrthogonalProjection01(void)
+{
+  TestApplication application;
+  tet_infoline("Test that changing to orthogonal projection and then adding to scene calculates the right defaults");
+
+  CameraActor actor = CameraActor::New();
+  DALI_TEST_CHECK(actor);
+
+  actor.SetProjectionMode(Camera::ORTHOGRAPHIC_PROJECTION);
+  application.GetScene().Add(actor);
+
+  // Test application screen size is 480x800
+  // Check that the properties match to that screen size
+  float value;
+  actor.GetProperty(CameraActor::Property::ASPECT_RATIO).Get(value);
+  DALI_TEST_EQUALS(800.0f / 480.0f, value, FLOAT_EPSILON, TEST_LOCATION);
+
+  actor.GetProperty(CameraActor::Property::NEAR_PLANE_DISTANCE).Get(value);
+  DALI_TEST_EQUALS(800.0f, value, FLOAT_EPSILON, TEST_LOCATION);
+
+  actor.GetProperty(CameraActor::Property::FAR_PLANE_DISTANCE).Get(value);
+  DALI_TEST_EQUALS(4895.0f, value, FLOAT_EPSILON, TEST_LOCATION);
+
+  actor.GetProperty(CameraActor::Property::LEFT_PLANE_DISTANCE).Get(value);
+  DALI_TEST_EQUALS(-240.0f, value, FLOAT_EPSILON, TEST_LOCATION);
+  actor.GetProperty(CameraActor::Property::RIGHT_PLANE_DISTANCE).Get(value);
+  DALI_TEST_EQUALS(240.0f, value, FLOAT_EPSILON, TEST_LOCATION);
+
+  actor.GetProperty(CameraActor::Property::TOP_PLANE_DISTANCE).Get(value);
+  DALI_TEST_EQUALS(400.0f, value, FLOAT_EPSILON, TEST_LOCATION);
+  actor.GetProperty(CameraActor::Property::BOTTOM_PLANE_DISTANCE).Get(value);
+  DALI_TEST_EQUALS(-400.0f, value, FLOAT_EPSILON, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(1600.0f, actor.GetProperty(Actor::Property::POSITION_Z).Get<float>(), TEST_LOCATION);
+
+  DALI_TEST_EQUALS(actor.GetProjectionMode(), Dali::Camera::ORTHOGRAPHIC_PROJECTION, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliCameraActorNewDefaultOrthogonalProjection02(void)
+{
+  TestApplication application;
+  tet_infoline("Test that changing to orthogonal projection and then adding to scene calculates the right defaults");
+
+  CameraActor actor = CameraActor::New();
+  DALI_TEST_CHECK(actor);
+
+  actor.SetOrthographicProjection(Vector2::ZERO);
+  DALI_TEST_EQUALS(actor.GetProjectionMode(), Dali::Camera::ORTHOGRAPHIC_PROJECTION, TEST_LOCATION);
+  application.GetScene().Add(actor);
+
+  // Test application screen size is 480x800
+  // Check that the properties match to that screen size
+  float value;
+  actor.GetProperty(CameraActor::Property::ASPECT_RATIO).Get(value);
+  DALI_TEST_EQUALS(800.0f / 480.0f, value, FLOAT_EPSILON, TEST_LOCATION);
+
+  actor.GetProperty(CameraActor::Property::NEAR_PLANE_DISTANCE).Get(value);
+  DALI_TEST_EQUALS(800.0f, value, FLOAT_EPSILON, TEST_LOCATION);
+
+  actor.GetProperty(CameraActor::Property::FAR_PLANE_DISTANCE).Get(value);
+  DALI_TEST_EQUALS(4895.0f, value, FLOAT_EPSILON, TEST_LOCATION);
+
+  actor.GetProperty(CameraActor::Property::LEFT_PLANE_DISTANCE).Get(value);
+  DALI_TEST_EQUALS(-240.0f, value, FLOAT_EPSILON, TEST_LOCATION);
+  actor.GetProperty(CameraActor::Property::RIGHT_PLANE_DISTANCE).Get(value);
+  DALI_TEST_EQUALS(240.0f, value, FLOAT_EPSILON, TEST_LOCATION);
+
+  actor.GetProperty(CameraActor::Property::TOP_PLANE_DISTANCE).Get(value);
+  DALI_TEST_EQUALS(400.0f, value, FLOAT_EPSILON, TEST_LOCATION);
+  actor.GetProperty(CameraActor::Property::BOTTOM_PLANE_DISTANCE).Get(value);
+  DALI_TEST_EQUALS(-400.0f, value, FLOAT_EPSILON, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(1600.0f, actor.GetProperty(Actor::Property::POSITION_Z).Get<float>(), TEST_LOCATION);
+
+  DALI_TEST_EQUALS(actor.GetProjectionMode(), Dali::Camera::ORTHOGRAPHIC_PROJECTION, TEST_LOCATION);
+  END_TEST;
+}
+
+// Add tests for culling:
+//   add large actor just outside canvas, & rotate it 45% - should still be rendered
+//   Rotate back to 0, should be culled.
+
+int UtcDaliCameraActorCulling01(void)
+{
+  TestApplication application;
+  auto&           gfx = application.GetGraphicsController();
+
+  tet_infoline("Create a renderable actor and position it slightly to the left of the scene");
+  tet_infoline("The actor should not be rendered");
+
+  Actor a = CreateRenderableActor(CreateTexture(TextureType::TEXTURE_2D, Pixel::Format::RGBA8888, 200, 200));
+
+  a[Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER_LEFT;
+  a[Actor::Property::ANCHOR_POINT]  = ParentOrigin::CENTER_RIGHT;
+  a[Actor::Property::POSITION]      = Vector3(-10.0f, 0.0f, 0.0f);
+
+  application.GetScene().Add(a);
+
+  application.SendNotification();
+  application.Render();
+
+  auto& cmdStack = gfx.mCommandBufferCallStack;
+  DALI_TEST_CHECK(!cmdStack.FindMethod("Draw") && !cmdStack.FindMethod("DrawIndexed"));
+
+  tet_infoline("Rotate the actor 45 degrees, the actor should now be rendered");
+  a[Actor::Property::ORIENTATION] = Quaternion(Dali::ANGLE_45, Vector3::ZAXIS);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(cmdStack.FindMethod("Draw") || cmdStack.FindMethod("DrawIndexed"));
+
   END_TEST;
 }

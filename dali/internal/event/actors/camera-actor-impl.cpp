@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -197,19 +197,26 @@ void CameraActor::OnInitialize()
 
 void CameraActor::OnSceneConnectionInternal()
 {
-  // If the canvas size has not been set, then use the size of the scene we've been added to to set up the perspective projection
+  // If the canvas size has not been set, then use the size of the scene to which we've been added
+  // in order to set up the current projection
   if((mCanvasSize.width < Math::MACHINE_EPSILON_1000) || (mCanvasSize.height < Math::MACHINE_EPSILON_1000))
   {
-    SetPerspectiveProjection(GetScene().GetSize());
+    if(mProjectionMode == Dali::Camera::ORTHOGRAPHIC_PROJECTION)
+    {
+      SetOrthographicProjection(GetScene().GetSize());
+    }
+    else //if(mProjectionMode == Dali::Camera::PERSPECTIVE_PROJECTION)
+    {
+      SetPerspectiveProjection(GetScene().GetSize());
+    }
   }
 }
 
 void CameraActor::SetReflectByPlane(const Vector4& plane)
 {
-  SceneGraph::Camera* cam = const_cast<SceneGraph::Camera*>(GetCamera());
-  if(cam)
+  if(mSceneObject)
   {
-    cam->SetReflectByPlane(plane);
+    SetReflectByPlaneMessage(GetEventThreadServices(), *mSceneObject, plane);
   }
 }
 
@@ -386,6 +393,7 @@ bool CameraActor::GetInvertYAxis() const
 
 void CameraActor::SetPerspectiveProjection(const Size& size)
 {
+  SetProjectionMode(Dali::Camera::PERSPECTIVE_PROJECTION);
   mCanvasSize = size;
 
   if((size.width < Math::MACHINE_EPSILON_1000) || (size.height < Math::MACHINE_EPSILON_1000))
@@ -425,34 +433,56 @@ void CameraActor::SetPerspectiveProjection(const Size& size)
   const float aspectRatio = width / height;
 
   // sceneObject is being used in a separate thread; queue a message to set
-  SetProjectionMode(Dali::Camera::PERSPECTIVE_PROJECTION);
   SetFieldOfView(fieldOfView);
   SetNearClippingPlane(nearClippingPlane);
   SetFarClippingPlane(farClippingPlane);
+  SetLeftClippingPlane(width * -0.5f);
+  SetRightClippingPlane(width * 0.5f);
+  SetTopClippingPlane(height * 0.5f);     // Top is +ve to keep consistency with orthographic values
+  SetBottomClippingPlane(height * -0.5f); // Bottom is -ve to keep consistency with orthographic values
   SetAspectRatio(aspectRatio);
   SetZ(cameraZ);
 }
 
 void CameraActor::SetOrthographicProjection(const Vector2& size)
 {
+  SetProjectionMode(Dali::Camera::ORTHOGRAPHIC_PROJECTION);
+  mCanvasSize = size;
+
+  if((size.width < Math::MACHINE_EPSILON_1000) || (size.height < Math::MACHINE_EPSILON_1000))
+  {
+    // If the size given is invalid, i.e. ZERO, then check if we've been added to a scene
+    if(OnScene())
+    {
+      // We've been added to a scene already, set the canvas size to the scene's size
+      mCanvasSize = GetScene().GetSize();
+    }
+    else
+    {
+      // We've not been added to a scene yet, so just return.
+      // We'll set the canvas size when we get added to a scene later
+      return;
+    }
+  }
+
   // Choose near, far and Z parameters to match the SetPerspectiveProjection above.
   float nearClippingPlane;
   float farClippingPlane;
   float cameraZ;
   CalculateClippingAndZ(size.width, size.height, nearClippingPlane, farClippingPlane, cameraZ);
-  SetOrthographicProjection(-size.x * 0.5f, size.x * 0.5f, size.y * 0.5f, -size.y * 0.5f, nearClippingPlane, farClippingPlane);
+  SetOrthographicProjection(-size.x * 0.5f, size.x * 0.5f, size.y * 0.5f, size.y * -0.5f, nearClippingPlane, farClippingPlane);
   SetZ(cameraZ);
 }
 
 void CameraActor::SetOrthographicProjection(float left, float right, float top, float bottom, float near, float far)
 {
+  SetProjectionMode(Dali::Camera::ORTHOGRAPHIC_PROJECTION);
   SetLeftClippingPlane(left);
   SetRightClippingPlane(right);
   SetTopClippingPlane(top);
   SetBottomClippingPlane(bottom);
   SetNearClippingPlane(near);
   SetFarClippingPlane(far);
-  SetProjectionMode(Dali::Camera::ORTHOGRAPHIC_PROJECTION);
 }
 
 bool CameraActor::BuildPickingRay(const Vector2&  screenCoordinates,

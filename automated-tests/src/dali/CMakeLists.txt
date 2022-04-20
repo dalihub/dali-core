@@ -30,6 +30,7 @@ SET(TC_SOURCES
         utc-Dali-Extents.cpp
         utc-Dali-FrameBuffer.cpp
         utc-Dali-FrameCallbackInterface.cpp
+        utc-Dali-FreeList.cpp
         utc-Dali-Geometry.cpp
         utc-Dali-GestureDetector.cpp
         utc-Dali-Handle.cpp
