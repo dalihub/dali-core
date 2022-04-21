@@ -436,7 +436,7 @@ void RenderManager::RemoveRenderTracker(Render::RenderTracker* renderTracker)
   mImpl->RemoveRenderTracker(renderTracker);
 }
 
-void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear, bool uploadOnly)
+void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear)
 {
   DALI_PRINT_RENDER_START(mImpl->renderBufferIndex);
 
@@ -994,7 +994,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
   }
 }
 
-void RenderManager::PostRender(bool uploadOnly)
+void RenderManager::PostRender()
 {
   // Notify RenderGeometries that rendering has finished
   for(auto&& iter : mImpl->geometryContainer)

@@ -125,12 +125,12 @@ public:
   /**
    * @copydoc Dali::Integration::Core::Update()
    */
-  void Update(float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uint32_t nextVSyncTimeMilliseconds, Integration::UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo);
+  void Update(float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uint32_t nextVSyncTimeMilliseconds, Integration::UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo, bool uploadOnly);
 
   /**
    * @copydoc Dali::Integration::Core::PreRender()
    */
-  void PreRender(Integration::RenderStatus& status, bool forceClear, bool uploadOnly);
+  void PreRender(Integration::RenderStatus& status, bool forceClear);
 
   /**
    * @copydoc Dali::Integration::Core::PreRender()
@@ -150,7 +150,7 @@ public:
   /**
    * @copydoc Dali::Integration::Core::Render()
    */
-  void PostRender(bool uploadOnly);
+  void PostRender();
 
   /**
    * @copydoc Dali::Integration::Core::SceneCreated()

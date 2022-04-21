@@ -72,7 +72,7 @@ public:
 
   void        ProcessEvent(const Integration::Event& event);
   void        SendNotification();
-  bool        Render(uint32_t intervalMilliseconds = DEFAULT_RENDER_INTERVAL, const char* location = NULL);
+  bool        Render(uint32_t intervalMilliseconds = DEFAULT_RENDER_INTERVAL, const char* location = NULL, bool uploadOnly = false);
   bool        PreRenderWithPartialUpdate(uint32_t intervalMilliseconds, const char* location, std::vector<Rect<int>>& damagedRects);
   bool        RenderWithPartialUpdate(std::vector<Rect<int>>& damagedRects, Rect<int>& clippingRect);
   uint32_t    GetUpdateStatus();
@@ -93,7 +93,7 @@ public:
   }
 
 private:
-  void DoUpdate(uint32_t intervalMilliseconds, const char* location = NULL);
+  void DoUpdate(uint32_t intervalMilliseconds, const char* location = NULL, bool uploadOnly = false);
 
 protected:
   TestPlatformAbstraction mPlatformAbstraction;

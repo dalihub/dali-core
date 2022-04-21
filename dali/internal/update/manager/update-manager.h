@@ -606,13 +606,15 @@ public:
    * @param[in] nextVSyncTimeMilliseconds The estimated time, in milliseconds, of the next VSync.
    * @param[in] renderToFboEnabled Whether rendering into the Frame Buffer Object is enabled.
    * @param[in] isRenderingToFbo   Whether this frame is being rendered into the Frame Buffer Object.
+   * @param[in] uploadOnly uploadOnly Upload the resource only without rendering.
    * @return True if further updates are required e.g. during animations.
    */
   uint32_t Update(float    elapsedSeconds,
                   uint32_t lastVSyncTimeMilliseconds,
                   uint32_t nextVSyncTimeMilliseconds,
                   bool     renderToFboEnabled,
-                  bool     isRenderingToFbo);
+                  bool     isRenderingToFbo,
+                  bool     uploadOnly);
 
   /**
    * @copydoc Dali::Stage::KeepRendering()
