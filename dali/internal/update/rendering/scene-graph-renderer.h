@@ -445,6 +445,16 @@ public: // For VisualProperties
     return mVisualProperties.Get();
   }
 
+  /**
+   * @brief Recalculate size after visual properties applied.
+   *
+   * @param[in] updateBufferIndex The current update buffer index.
+   * @param[in] originalSize The original size before apply the visual properties.
+   *
+   * @return The recalculated size after visual properties applied.
+   */
+  Vector3 CalculateVisualTransformedUpdateSize(BufferIndex updateBufferIndex, const Vector3& originalSize);
+
 private:
   /**
    * Protected constructor; See also Renderer::New()
@@ -491,6 +501,25 @@ private:
   bool                                          mPremultipledAlphaEnabled : 1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
   std::vector<Dali::DevelRenderer::DrawCommand> mDrawCommands;
   Dali::RenderCallback*                         mRenderCallback{nullptr};
+
+  /**
+   * @brief Cached coefficient value when we calculate visual transformed update size.
+   * It can reduce complexity of calculate the vertex position.
+   *
+   * Vector2 vertexPosition = (XA * aPosition + XB) * originalSize + (CA * aPosition + CB) + Vector2(D, D) * aPosition
+   */
+  struct VisualTransformedUpdateSizeCoefficientCache
+  {
+    Vector2 coefXA{Vector2::ZERO};
+    Vector2 coefXB{Vector2::ZERO};
+    Vector2 coefCA{Vector2::ZERO};
+    Vector2 coefCB{Vector2::ZERO};
+    float   coefD{0.0f};
+
+    uint64_t hash{0u};
+    uint64_t decoratedHash{0u};
+  };
+  VisualTransformedUpdateSizeCoefficientCache mVisualPropertiesCoefficient; ///< Coefficient value to calculate visual transformed update size by VisualProperties more faster.
 
 public:
   AnimatableProperty<float> mOpacity;    ///< The opacity value

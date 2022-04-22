@@ -300,24 +300,26 @@ struct VisualProperties
 {
   VisualProperties() = default;
 
-  VisualProperties(Vector2 offset, Vector2 size, Vector2 origin, Vector2 pivot, Vector4 modes, Vector2 extraSize, Vector3 mixColor)
+  VisualProperties(Vector2 offset, Vector2 size, Vector2 origin, Vector2 pivot, Vector4 modes, Vector2 extraSize, Vector3 mixColor, float preMultipliedAlpha)
   : mTransformOffset(offset),
     mTransformSize(size),
     mTransformOrigin(origin),
     mTransformAnchorPoint(pivot),
     mTransformOffsetSizeMode(modes),
     mExtraSize(extraSize),
-    mMixColor(mixColor)
+    mMixColor(mixColor),
+    mPreMultipliedAlpha(preMultipliedAlpha)
   {
   }
 
   Vector2 mTransformOffset{Vector2::ZERO};
-  Vector2 mTransformSize{Vector2::ZERO};
+  Vector2 mTransformSize{Vector2::ONE};
   Vector2 mTransformOrigin{Vector2::ZERO};
   Vector2 mTransformAnchorPoint{Vector2::ZERO};
   Vector4 mTransformOffsetSizeMode{Vector2::ZERO};
   Vector2 mExtraSize{Vector2::ZERO};
   Vector3 mMixColor{Vector3::ONE};
+  float   mPreMultipliedAlpha{0.0f};
 
   static VisualProperties GetPropsAt(float alpha, const VisualProperties& start, const VisualProperties& end)
   {
@@ -329,6 +331,7 @@ struct VisualProperties
     progress.mTransformOffsetSizeMode = end.mTransformOffsetSizeMode;
     progress.mTransformOrigin         = end.mTransformOrigin;
     progress.mTransformAnchorPoint    = end.mTransformAnchorPoint;
+    progress.mPreMultipliedAlpha      = end.mPreMultipliedAlpha;
     return progress;
   }
 };
@@ -342,37 +345,41 @@ void PrintVisualProperties(const VisualProperties& props, const std::string& pre
     "%*c anchorPoint:(%5.3f, %5.3f)\n"
     "%*c offsetSizeMode:(%5.3f, %5.3f, %5.3f, %5.3f)\n"
     "%*c extraSize:(%5.3f, %5.3f)\n"
-    "%*c mixColor:(%5.3f, %5.3f, %5.3f, %5.3f)\n",
+    "%*c mixColor:(%5.3f, %5.3f, %5.3f)\n"
+    "%*c preMultipliedAlpha:(%5.3f)\n",
     prefix.c_str(),
     props.mTransformOffset.x,
     props.mTransformOffset.y,
-    prefix.length(),
+    prefix.length() + 1,
     ' ',
     props.mTransformSize.x,
     props.mTransformSize.y,
-    prefix.length(),
+    prefix.length() + 1,
     ' ',
     props.mTransformOrigin.x,
     props.mTransformOrigin.y,
-    prefix.length(),
+    prefix.length() + 1,
     ' ',
     props.mTransformAnchorPoint.x,
     props.mTransformAnchorPoint.y,
-    prefix.length(),
+    prefix.length() + 1,
     ' ',
     props.mTransformOffsetSizeMode.x,
     props.mTransformOffsetSizeMode.y,
     props.mTransformOffsetSizeMode.z,
     props.mTransformOffsetSizeMode.w,
-    prefix.length(),
+    prefix.length() + 1,
     ' ',
     props.mExtraSize.x,
     props.mExtraSize.y,
-    prefix.length(),
+    prefix.length() + 1,
     ' ',
     props.mMixColor.x,
     props.mMixColor.y,
-    props.mMixColor.z);
+    props.mMixColor.z,
+    prefix.length() + 1,
+    ' ',
+    props.mPreMultipliedAlpha);
 }
 
 void SetVisualProperties(VisualRenderer renderer, VisualProperties props)
@@ -384,6 +391,7 @@ void SetVisualProperties(VisualRenderer renderer, VisualProperties props)
   renderer.SetProperty(VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE, props.mTransformOffsetSizeMode);
   renderer.SetProperty(VisualRenderer::Property::EXTRA_SIZE, props.mExtraSize);
   renderer.SetProperty(VisualRenderer::Property::VISUAL_MIX_COLOR, props.mMixColor);
+  renderer.SetProperty(VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA, props.mPreMultipliedAlpha);
 }
 
 void CheckEventVisualProperties(VisualRenderer renderer, VisualProperties expectedProps)
@@ -398,6 +406,7 @@ void CheckEventVisualProperties(VisualRenderer renderer, VisualProperties expect
   actualProps.mTransformOffsetSizeMode = renderer.GetProperty<Vector4>(VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE);
   actualProps.mExtraSize               = renderer.GetProperty<Vector2>(VisualRenderer::Property::EXTRA_SIZE);
   actualProps.mMixColor                = renderer.GetProperty<Vector3>(VisualRenderer::Property::VISUAL_MIX_COLOR);
+  actualProps.mPreMultipliedAlpha      = renderer.GetProperty<float>(VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA);
 
   PrintVisualProperties(actualProps, "Actual event props");
 
@@ -408,6 +417,7 @@ void CheckEventVisualProperties(VisualRenderer renderer, VisualProperties expect
   DALI_TEST_EQUALS(actualProps.mTransformOffsetSizeMode, expectedProps.mTransformOffsetSizeMode, TEST_LOCATION);
   DALI_TEST_EQUALS(actualProps.mExtraSize, expectedProps.mExtraSize, TEST_LOCATION);
   DALI_TEST_EQUALS(actualProps.mMixColor, expectedProps.mMixColor, TEST_LOCATION);
+  DALI_TEST_EQUALS(actualProps.mPreMultipliedAlpha, expectedProps.mPreMultipliedAlpha, TEST_LOCATION);
 }
 
 void CheckSceneGraphVisualProperties(VisualRenderer renderer, VisualProperties expectedProps)
@@ -423,6 +433,7 @@ void CheckSceneGraphVisualProperties(VisualRenderer renderer, VisualProperties e
   actualProps.mTransformOffsetSizeMode = renderer.GetCurrentProperty<Vector4>(VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE);
   actualProps.mExtraSize               = renderer.GetCurrentProperty<Vector2>(VisualRenderer::Property::EXTRA_SIZE);
   actualProps.mMixColor                = renderer.GetCurrentProperty<Vector3>(VisualRenderer::Property::VISUAL_MIX_COLOR);
+  actualProps.mPreMultipliedAlpha      = renderer.GetProperty<float>(VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA);
 
   PrintVisualProperties(actualProps, "Actual update props");
 
@@ -433,6 +444,7 @@ void CheckSceneGraphVisualProperties(VisualRenderer renderer, VisualProperties e
   DALI_TEST_EQUALS(actualProps.mTransformOffsetSizeMode, expectedProps.mTransformOffsetSizeMode, TEST_LOCATION);
   DALI_TEST_EQUALS(actualProps.mExtraSize, expectedProps.mExtraSize, TEST_LOCATION);
   DALI_TEST_EQUALS(actualProps.mMixColor, expectedProps.mMixColor, TEST_LOCATION);
+  DALI_TEST_EQUALS(actualProps.mPreMultipliedAlpha, expectedProps.mPreMultipliedAlpha, TEST_LOCATION);
 }
 
 void CheckUniforms(VisualRenderer renderer, VisualProperties props, std::vector<UniformData>& uniforms, TraceCallStack& callStack, TestGlAbstraction& gl)
@@ -463,6 +475,9 @@ void CheckUniforms(VisualRenderer renderer, VisualProperties props, std::vector<
 
   DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[6].name, params));
   DALI_TEST_CHECK(gl.GetUniformValue<Vector3>(uniforms[6].name.c_str(), props.mMixColor));
+
+  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[7].name, params));
+  DALI_TEST_CHECK(gl.GetUniformValue<float>(uniforms[7].name.c_str(), props.mPreMultipliedAlpha));
 }
 
 int UtcDaliVisualRendererAnimatedProperty03(void)
@@ -480,7 +495,8 @@ int UtcDaliVisualRendererAnimatedProperty03(void)
                                           {"anchorPoint", Property::VECTOR2},
                                           {"offsetSizeMode", Property::VECTOR4},
                                           {"extraSize", Property::VECTOR2},
-                                          {"mixColor", Property::VECTOR3}};
+                                          {"mixColor", Property::VECTOR3},
+                                          {"preMultipliedAlpha", Property::FLOAT}};
 
   application.GetGraphicsController().AddCustomUniforms(customUniforms);
 
@@ -493,8 +509,8 @@ int UtcDaliVisualRendererAnimatedProperty03(void)
   actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
   application.GetScene().Add(actor);
 
-  VisualProperties props{Vector2(10.f, 10.f), Vector2(200.f, 100.f), Vector2(0.5f, 0.5f), Vector2(0.5f, 0.5f), Vector4::ZERO, Vector2(0.0f, 0.0f), Vector3(Color::SEA_GREEN)};
-  VisualProperties targetProps{Vector2(40.f, 40.f), Vector2(100.f, 200.f), Vector2(0.5f, 0.5f), Vector2(0.5f, 0.5f), Vector4::ZERO, Vector2(25.0f, 25.0f), Vector3(Color::MEDIUM_PURPLE)};
+  VisualProperties props{Vector2(10.f, 10.f), Vector2(200.f, 100.f), Vector2(0.5f, 0.5f), Vector2(0.5f, 0.5f), Vector4::ZERO, Vector2(0.0f, 0.0f), Vector3(Color::SEA_GREEN), 0.0f};
+  VisualProperties targetProps{Vector2(40.f, 40.f), Vector2(100.f, 200.f), Vector2(0.5f, 0.5f), Vector2(0.5f, 0.5f), Vector4::ZERO, Vector2(25.0f, 25.0f), Vector3(Color::MEDIUM_PURPLE), 0.0f};
 
   SetVisualProperties(renderer, props);
   CheckEventVisualProperties(renderer, props);
@@ -669,5 +685,233 @@ int UtcDaliVisualRendererAnimatedProperty06(void)
   DALI_TEST_EQUALS(renderer.GetCurrentProperty<float>(index), 0.0f, 0.0001f, TEST_LOCATION);
   DALI_TEST_EQUALS(renderer.GetCurrentProperty<float>(DevelRenderer::Property::OPACITY), 0.0f, 0.0001f, TEST_LOCATION);
   DALI_TEST_EQUALS(renderer.GetProperty<float>(DevelRenderer::Property::OPACITY), 0.0f, 0.0001f, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliVisualRendererPartialUpdate(void)
+{
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  tet_infoline("Test that partial update works well when we set visual renderer's animated properties");
+
+  const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
+
+  Shader         shader   = Shader::New("VertexSource", "FragmentSource");
+  Geometry       geometry = CreateQuadGeometry();
+  VisualRenderer renderer = VisualRenderer::New(geometry, shader);
+
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor[Actor::Property::ANCHOR_POINT] = AnchorPoint::TOP_LEFT;
+  actor[Actor::Property::POSITION]     = Vector3(64.0f, 64.0f, 0.0f);
+  actor[Actor::Property::SIZE]         = Vector3(64.0f, 64.0f, 0.0f);
+  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+
+  std::vector<Rect<int>> damagedRects;
+
+  // Actor added, damaged rect is added size of actor
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  // Aligned by 16
+  Rect<int> clippingRect = Rect<int>(64, 672, 80, 80); // in screen coordinates, includes 3 last frames updates
+  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Set clippingRect as full surface now. TODO : Set valid rect if we can.
+  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
+
+  Property::Index index = VisualRenderer::Property::TRANSFORM_SIZE;
+  renderer.SetProperty(index, Vector2(2.0f, 0.5f));
+
+  // Now current actor show as 128x32 rectangle, with center position (96, 96).
+  // So, rectangle's top left position is (32, 80), and bottom right position is (160, 112).
+  // NOTE : VisualTransform's anchor point is not relative with actor's anchor point
+
+  application.SendNotification();
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+  // Aligned by 16
+  // Note, this damagedRect is combine of previous rect and current rect
+  DALI_TEST_EQUALS<Rect<int>>(Rect<int>(32, 672, 144, 80), damagedRects[0], TEST_LOCATION);
+
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  application.SendNotification();
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Update dummy property to damangeRect buffer aging
+  actor.SetProperty(Actor::Property::COLOR, Color::RED);
+
+  application.SendNotification();
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  // Update dummy property to damangeRect buffer aging
+  actor.SetProperty(Actor::Property::COLOR, Color::BLUE);
+
+  application.SendNotification();
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  // Aligned by 16
+  // Note, this damagedRect don't contain previous rect now.
+  // Current rectangle's top left position is (32, 80), and bottom right position is (160, 112).
+  DALI_TEST_EQUALS<Rect<int>>(Rect<int>(32, 688, 144, 48), damagedRects[0], TEST_LOCATION);
+
+  application.SendNotification();
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  application.SendNotification();
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  application.SendNotification();
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // 3 frame spended after change actor property. Ensure the damaged rect is empty
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(renderer.GetProperty<Vector2>(index), Vector2(2.0f, 0.5f), 0.001f, TEST_LOCATION);
+
+  // Make flickered animation from Vector2(2.0f, 0.5f) --> Vector2(1.0f, 1.0f) --> Vector2(0.5f, 2.0f)
+  // After finish the animation,actor show as 32x128 rectangle, with center position (96, 96).
+  // So, rectangle's top left position is (80, 32), and bottom right position is (112, 160).
+  Animation animation = Animation::New(1.0f);
+  KeyFrames keyFrames = KeyFrames::New();
+  keyFrames.Add(0.0f, Vector2(2.0f, 0.5f));
+  keyFrames.Add(0.299f, Vector2(2.0f, 0.5f));
+  keyFrames.Add(0.301f, Vector2(1.0f, 1.0f));
+  keyFrames.Add(0.699f, Vector2(1.0f, 1.0f));
+  keyFrames.Add(0.701f, Vector2(0.5f, 2.0f));
+  keyFrames.Add(1.0f, Vector2(0.5f, 2.0f));
+  animation.AnimateBetween(Property(renderer, index), keyFrames);
+  animation.Play();
+
+  application.SendNotification();
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(200, nullptr, damagedRects); // 200 ms
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector2>(index), Vector2(2.0f, 0.5f), TEST_LOCATION);
+
+  // 302 ~ 600. TransformSize become Vector2(1.0f, 1.0f)
+  application.SendNotification();
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(102, nullptr, damagedRects); // 302 ms
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector2>(index), Vector2(1.0f, 1.0f), TEST_LOCATION);
+
+  // Update dummy property to damangeRect buffer aging
+  actor.SetProperty(Actor::Property::COLOR, Color::RED);
+
+  application.SendNotification();
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(16, nullptr, damagedRects); // 318 ms
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Update dummy property to damangeRect buffer aging
+  actor.SetProperty(Actor::Property::COLOR, Color::GREEN);
+
+  application.SendNotification();
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(16, nullptr, damagedRects); // 334 ms
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Update dummy property to damangeRect buffer aging
+  actor.SetProperty(Actor::Property::COLOR, Color::RED);
+
+  application.SendNotification();
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(16, nullptr, damagedRects); // 350 ms
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+  // Aligned by 16
+  DALI_TEST_EQUALS<Rect<int>>(Rect<int>(64, 672, 80, 80), damagedRects[0], TEST_LOCATION);
+
+  application.SendNotification();
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(250, nullptr, damagedRects); // 600 ms
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // 702 ~ 1000. TransformSize become Vector2(0.5f, 2.0f)
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(102, nullptr, damagedRects); // 702 ms
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector2>(index), Vector2(0.5f, 2.0f), TEST_LOCATION);
+
+  // Update dummy property to damangeRect buffer aging
+  actor.SetProperty(Actor::Property::COLOR, Color::GREEN);
+
+  application.SendNotification();
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(16, nullptr, damagedRects); // 718 ms
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Update dummy property to damangeRect buffer aging
+  actor.SetProperty(Actor::Property::COLOR, Color::BLUE);
+
+  application.SendNotification();
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(16, nullptr, damagedRects); // 734 ms
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Update dummy property to damangeRect buffer aging
+  actor.SetProperty(Actor::Property::COLOR, Color::RED);
+
+  application.SendNotification();
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(16, nullptr, damagedRects); // 750 ms
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+  // Aligned by 16
+  DALI_TEST_EQUALS<Rect<int>>(Rect<int>(80, 640, 48, 144), damagedRects[0], TEST_LOCATION);
+
+  application.SendNotification();
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(52, nullptr, damagedRects); // 1002 ms. animation finished.
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Check finished value bake.
+  DALI_TEST_EQUALS(renderer.GetProperty<Vector2>(index), Vector2(0.5f, 2.0f), TEST_LOCATION);
+
   END_TEST;
 }
