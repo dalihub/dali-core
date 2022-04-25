@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,6 +56,11 @@ bool UpdateProxy::BakeSize(uint32_t id, const Vector3& size)
 bool UpdateProxy::GetPositionAndSize(uint32_t id, Vector3& position, Vector3& size) const
 {
   return mImpl.GetPositionAndSize(id, position, size);
+}
+
+bool UpdateProxy::GetWorldPositionScaleAndSize(uint32_t id, Vector3& position, Vector3& scale, Vector3& size) const
+{
+  return mImpl.GetWorldPositionScaleAndSize(id, position, scale, size);
 }
 
 bool UpdateProxy::GetScale(uint32_t id, Vector3& scale) const

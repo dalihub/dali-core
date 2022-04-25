@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_UPDATE_PROXY_IMPL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,6 +103,11 @@ public:
    * @copydoc Dali::UpdateProxy::GetPositionAndSize()
    */
   bool GetPositionAndSize(uint32_t id, Vector3& position, Vector3& size) const;
+
+  /**
+   * @copydoc Dali::UpdateProxy::GetWorldPositionScaleAndSize()
+   */
+  bool GetWorldPositionScaleAndSize(uint32_t id, Vector3& position, Vector3& scale, Vector3& size) const;
 
   /**
    * @copydoc Dali::UpdateProxy::GetScale()
