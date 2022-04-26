@@ -572,13 +572,15 @@ void Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::N
     const SceneGraph::CollectedUniformMap& uniformMap     = uniformMapDataProvider.GetUniformMap(bufferIndex);
     const SceneGraph::CollectedUniformMap& uniformMapNode = node.GetUniformMap(bufferIndex);
 
-    auto maxMaps = static_cast<uint32_t>(uniformMap.Count() + uniformMapNode.Count()); // 4,294,967,295 maps should be enough
-    mUniformIndexMap.Clear();                                                          // Clear contents, but keep memory if we don't change size
-    mUniformIndexMap.Resize(maxMaps);
+    const uint32_t mapCount     = uniformMap.Count();
+    const uint32_t mapNodeCount = uniformMapNode.Count();
+
+    mUniformIndexMap.Clear(); // Clear contents, but keep memory if we don't change size
+    mUniformIndexMap.Resize(mapCount + mapNodeCount);
 
     // Copy uniform map into mUniformIndexMap
     uint32_t mapIndex = 0;
-    for(; mapIndex < uniformMap.Count(); ++mapIndex)
+    for(; mapIndex < mapCount; ++mapIndex)
     {
       mUniformIndexMap[mapIndex].propertyValue          = uniformMap[mapIndex].propertyPtr;
       mUniformIndexMap[mapIndex].uniformName            = uniformMap[mapIndex].uniformName;
@@ -587,12 +589,12 @@ void Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::N
       mUniformIndexMap[mapIndex].arrayIndex             = uniformMap[mapIndex].arrayIndex;
     }
 
-    for(uint32_t nodeMapIndex = 0; nodeMapIndex < uniformMapNode.Count(); ++nodeMapIndex)
+    for(uint32_t nodeMapIndex = 0; nodeMapIndex < mapNodeCount; ++nodeMapIndex)
     {
       auto  hash = uniformMapNode[nodeMapIndex].uniformNameHash;
       auto& name = uniformMapNode[nodeMapIndex].uniformName;
       bool  found(false);
-      for(uint32_t i = 0; i < uniformMap.Count(); ++i)
+      for(uint32_t i = 0; i < mapCount; ++i)
       {
         if(mUniformIndexMap[i].uniformNameHash == hash &&
            mUniformIndexMap[i].uniformName == name)
@@ -642,8 +644,7 @@ void Renderer::WriteUniformBuffer(
   if(uniformBlockAllocationBytes)
   {
     auto uboPoolView = mUniformBufferManager->GetUniformBufferViewPool(bufferIndex);
-
-    uboView = uboPoolView->CreateUniformBufferView(uniformBlockAllocationBytes);
+    uboView          = uboPoolView->CreateUniformBufferView(uniformBlockAllocationBytes);
   }
 
   // update the uniform buffer
@@ -758,7 +759,7 @@ void Renderer::FillUniformBuffer(Program&                                      p
       if(!uniform.uniformFunc)
       {
         auto uniformInfo  = Graphics::UniformInfo{};
-        auto uniformFound = program.GetUniform(uniform.uniformName.GetCString(),
+        auto uniformFound = program.GetUniform(uniform.uniformName.GetStringView(),
                                                uniform.uniformNameHash,
                                                uniform.uniformNameHashNoArray,
                                                uniformInfo);

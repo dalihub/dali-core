@@ -768,6 +768,9 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     clippingRect = Rect<int>();
   }
 
+  // Prepare to lock and map standalone uniform buffer.
+  mImpl->uniformBufferManager->ReadyToLockUniformBuffer(mImpl->renderBufferIndex);
+
   for(uint32_t i = 0; i < count; ++i)
   {
     RenderInstruction& instruction = sceneObject->GetRenderInstructions().At(mImpl->renderBufferIndex, i);
@@ -979,6 +982,10 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     }
     mainCommandBuffer->EndRenderPass(syncObject);
   }
+
+  // Unlock standalone uniform buffer.
+  mImpl->uniformBufferManager->UnlockUniformBuffer(mImpl->renderBufferIndex);
+
   mImpl->renderAlgorithms.SubmitCommandBuffer();
 
   std::sort(targetstoPresent.begin(), targetstoPresent.end());

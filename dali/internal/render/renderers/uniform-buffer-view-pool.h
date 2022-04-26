@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_UNIFORM_BUFFER_VIEW_POOL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@
 
 namespace Dali::Internal::Render
 {
-
 class UniformBufferManager;
 class UniformBufferView;
 class UniformBuffer;
@@ -53,26 +52,33 @@ class UniformBufferViewPool
   friend class UniformBufferManager;
 
 private:
-
-  UniformBufferViewPool( UniformBufferManager& manager, uint32_t alignment );
+  UniformBufferViewPool(UniformBufferManager& manager, uint32_t alignment);
 
 public:
-
   ~UniformBufferViewPool();
 
   /**
-   * Rolls back allocation to the beginning of pool
+   * @brief Rolls back allocation to the beginning of pool
    */
   void Rollback();
 
   /**
-   * Creates view for next free chunk of UBO memory of specified size.
+   * @brief Creates view for next free chunk of UBO memory of specified size.
    */
-  Graphics::UniquePtr<UniformBufferView> CreateUniformBufferView( size_t size );
+  Graphics::UniquePtr<UniformBufferView> CreateUniformBufferView(size_t size);
+
+  /**
+   * @copydoc Dali::Internal::Render::UniformBufferManager::ReadyToLockUniformBuffer
+   */
+  void ReadyToLockUniformBuffer();
+
+  /**
+   * @copydoc Dali::Internal::Render::UniformBufferManager::UnlockUniformBuffer
+   */
+  void UnlockUniformBuffer();
 
 private:
-
-  UniformBufferManager& mUboManager;
+  UniformBufferManager&              mUboManager;
   Graphics::UniquePtr<UniformBuffer> mUniformBufferStorage;
 
   uint32_t mAlignment; // 1 for tightly packed emulated UBO

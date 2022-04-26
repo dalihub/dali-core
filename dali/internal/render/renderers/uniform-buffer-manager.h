@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_UNIFORM_BUFFER_MANAGER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,13 +36,12 @@ class UniformBufferViewPool;
 class UniformBufferManager
 {
 public:
-
   explicit UniformBufferManager(Dali::Graphics::Controller* controller);
 
   ~UniformBufferManager();
 
   /**
-   * Allocates uniform buffer with given size and alignment
+   * @brief Allocates uniform buffer with given size and alignment
    * @param size Size of uniform buffer
    * @param alignment Alignment
    * @return new UniformBuffer
@@ -50,23 +49,23 @@ public:
   Graphics::UniquePtr<UniformBuffer> AllocateUniformBuffer(uint32_t size, uint32_t alignment = 256);
 
   /**
-   * Creates a view on UniformBuffer
+   * @brief Creates a view on UniformBuffer
    *
    * @param uniformBuffer
    * @param size
    * @return Uniform buffer view
    */
-  Graphics::UniquePtr<UniformBufferView> CreateUniformBufferView( UniformBuffer* uniformBuffer, uint32_t offset, uint32_t size);
+  Graphics::UniquePtr<UniformBufferView> CreateUniformBufferView(UniformBuffer* uniformBuffer, uint32_t offset, uint32_t size);
 
   /**
-   * Creates uniform buffer pool view
+   * @brief Creates uniform buffer pool view
    * @param size
    * @return
    */
   Graphics::UniquePtr<UniformBufferViewPool> CreateUniformBufferViewPool();
 
   /**
-   * Returns Controller object
+   * @brief Returns Controller object
    * @return controller object
    */
   [[nodiscard]] Graphics::Controller& GetController() const
@@ -75,18 +74,34 @@ public:
   }
 
   /**
-   * Returns embedded uniform buffer pool view for specified DAli buffer index
+   * @brief Returns embedded uniform buffer pool view for specified DAli buffer index
    * @return Pointer to valid uniform buffer pool view
    */
-  [[nodiscard]] UniformBufferViewPool* GetUniformBufferViewPool( uint32_t bufferIndex );
+  [[nodiscard]] UniformBufferViewPool* GetUniformBufferViewPool(uint32_t bufferIndex);
+
+  /**
+   * @brief Prepare to lock the uniform buffer so we can write to the standalone uniform map directly.
+   * Uniform buffer will be locked at the first call of UniformBuffer::Write after call this API.
+   * @note After all write done, We should call UnlockUniformBuffer.
+   *
+   * @param bufferIndex current update/render buffer index
+   */
+  void ReadyToLockUniformBuffer(uint32_t bufferIndex);
+
+  /**
+   * @brief Unlock the uniform buffer.
+   * @note We should call ReadyToLockUniformBuffer before call this.
+   *
+   * @param bufferIndex current update/render buffer index
+   */
+  void UnlockUniformBuffer(uint32_t bufferIndex);
 
 private:
-
   Dali::Graphics::Controller* mController;
 
   Graphics::UniquePtr<UniformBufferViewPool> mUniformBufferPoolStorage[2u]; ///< The pool view into UniformBuffer (double buffered)
 };
 
-} // namespace Dali
+} // namespace Dali::Internal::Render
 
 #endif // DALI_INTERNAL_UNIFORM_BUFFER_MANAGER_H

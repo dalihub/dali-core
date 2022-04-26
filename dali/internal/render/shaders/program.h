@@ -141,7 +141,7 @@ public:
    *
    * @return False when uniform is not found or due to hash collision the result is ambiguous
    */
-  bool GetUniform(const std::string& name, Hash hashedName, Hash hashedNameNoArray, Graphics::UniformInfo& out) const;
+  bool GetUniform(const std::string_view& name, Hash hashedName, Hash hashedNameNoArray, Graphics::UniformInfo& out) const;
 
   /**
    * Retrieves default uniform
