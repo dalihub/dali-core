@@ -142,6 +142,7 @@ public:
       mPreMultipliedAlpha(0.0f)
     {
     }
+
     SceneGraph::AnimatableProperty<Vector2> mTransformOffset;
     SceneGraph::AnimatableProperty<Vector2> mTransformSize;
     SceneGraph::AnimatableProperty<Vector2> mTransformOrigin;
@@ -150,7 +151,8 @@ public:
     SceneGraph::AnimatableProperty<Vector2> mExtraSize;
     SceneGraph::AnimatableProperty<Vector3> mMixColor;
     SceneGraph::AnimatableProperty<float>   mPreMultipliedAlpha;
-    void*                                   mExtendedProperties{nullptr}; // Enable derived class to extend properties further
+
+    void* mExtendedProperties{nullptr}; // Enable derived class to extend properties further
   };
 
 private:

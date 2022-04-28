@@ -467,7 +467,7 @@ public: // For VisualProperties
    */
   const Internal::VisualRenderer::AnimatableVisualProperties* GetVisualProperties() const
   {
-    return mVisualProperties;
+    return mVisualProperties.Get();
   }
 
 private:
@@ -479,13 +479,14 @@ private:
 private:
   CollectedUniformMap mCollectedUniformMap[2]; ///< Uniform maps collected by the renderer
 
-  SceneController*                            mSceneController;           ///< Used for initializing renderers
-  Render::Renderer*                           mRenderer;                  ///< Raw pointer to the renderer (that's owned by RenderManager)
-  TextureSet*                                 mTextureSet;                ///< The texture set this renderer uses. (Not owned)
-  Render::Geometry*                           mGeometry;                  ///< The geometry this renderer uses. (Not owned)
-  Shader*                                     mShader;                    ///< The shader this renderer uses. (Not owned)
-  VisualRenderer::AnimatableVisualProperties* mVisualProperties{nullptr}; ///< VisualProperties (optional/owned)
-  OwnerPointer<Vector4>                       mBlendColor;                ///< The blend color for blending operation
+  SceneController*  mSceneController; ///< Used for initializing renderers
+  Render::Renderer* mRenderer;        ///< Raw pointer to the renderer (that's owned by RenderManager)
+  TextureSet*       mTextureSet;      ///< The texture set this renderer uses. (Not owned)
+  Render::Geometry* mGeometry;        ///< The geometry this renderer uses. (Not owned)
+  Shader*           mShader;          ///< The shader this renderer uses. (Not owned)
+
+  OwnerPointer<VisualRenderer::AnimatableVisualProperties> mVisualProperties{nullptr}; ///< VisualProperties (optional/owned)
+  OwnerPointer<Vector4>                                    mBlendColor;                ///< The blend color for blending operation
 
   Dali::Internal::Render::Renderer::StencilParameters mStencilParameters; ///< Struct containing all stencil related options
 
