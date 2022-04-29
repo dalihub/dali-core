@@ -17,8 +17,8 @@
  * limitations under the License.
  */
 #include <dali/internal/common/buffer-index.h>
-#include <dali/internal/update/common/uniform-map.h>
-#include <dali/public-api/common/dali-vector.h>
+#include <dali/internal/update/common/collected-uniform-map.h>
+#include <dali/public-api/common/vector-wrapper.h>
 
 namespace Dali
 {
@@ -26,11 +26,6 @@ namespace Internal
 {
 namespace SceneGraph
 {
-class UniformMap;
-class UniformPropertyMapping;
-
-using CollectedUniformMap = Dali::Vector<UniformPropertyMapping>;
-
 /**
  * This class maps uniform names to property value pointers.
  */
@@ -43,23 +38,11 @@ public:
   UniformMapDataProvider() = default;
 
   /**
-   * Return true if the uniform map has been changed this frame
-   * Note, this only informs if the uniform mappings have changed,
-   * not if any actual property value has changed.
+   * Get the collected map of uniforms to property value addresses
    *
-   * @param[in] bufferIndex The buffer index
-   * @return true if the uniform map has changed
-   */
-  [[nodiscard]] virtual bool GetUniformMapChanged(BufferIndex bufferIndex) const = 0;
-
-  /**
-   * Get the complete map of uniforms to property value addresses
-   * (The map is double buffered - it can be retrieved through this interface)
-   *
-   * @param[in] bufferIndex The bufferIndex
    * @return the uniform map
    */
-  [[nodiscard]] virtual const CollectedUniformMap& GetUniformMap(BufferIndex bufferIndex) const = 0;
+  [[nodiscard]] virtual const CollectedUniformMap& GetCollectedUniformMap() const = 0;
 
 protected:
   /**

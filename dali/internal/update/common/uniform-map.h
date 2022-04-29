@@ -22,8 +22,10 @@
 #include <string>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/dali-vector.h>
+
 #include <dali/devel-api/common/hash.h>
-#include <dali/devel-api/common/owner-container.h>
+
 #include <dali/internal/common/const-string.h>
 
 namespace Dali
@@ -82,8 +84,7 @@ public:
 
 /**
  * The UniformMap class is used to map uniform names to property values. It is available
- * in all of the classes responsible for rendering:
- * Actor, Renderer, Geometry, TextureSet, Shader.
+ * in the following rendering classes: Node, Renderer, Shader.
  *
  * It can be observed for changes to the mapping table.
  */
@@ -147,6 +148,14 @@ public:
    */
   const UniformPropertyMapping& operator[](SizeType index) const;
 
+  /**
+   * Return the change counter
+   */
+  inline std::size_t GetChangeCounter() const
+  {
+    return mChangeCounter;
+  }
+
 private:
   /**
    * Helper to call the observers when the mappings have changed
@@ -159,9 +168,9 @@ private:
   using Observers           = Dali::Vector<Observer*>;
   using ObserversIter       = Observers::Iterator;
 
-  UniformMapContainer mUniformMaps; // Owner container of uniform maps
-
-  Observers mObservers;
+  UniformMapContainer mUniformMaps; ///< container of uniform maps
+  Observers           mObservers;
+  std::size_t         mChangeCounter{0u}; ///< Counter that is incremented when the map changes
 };
 
 } // namespace SceneGraph

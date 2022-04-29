@@ -95,7 +95,6 @@ Node::Node()
   mScissorDepth(0u),
   mDepthIndex(0u),
   mDirtyFlags(NodePropertyFlags::ALL),
-  mRegenerateUniformMap(0),
   mDrawMode(DrawMode::NORMAL),
   mColorMode(DEFAULT_COLOR_MODE),
   mClippingMode(ClippingMode::DISABLED),
@@ -104,9 +103,6 @@ Node::Node()
   mPositionUsesAnchorPoint(true),
   mTransparent(false)
 {
-  mUniformMapChanged[0] = 0u;
-  mUniformMapChanged[1] = 0u;
-
 #ifdef DEBUG_ENABLED
   gNodeCount++;
 #endif
@@ -169,53 +165,9 @@ void Node::SetRoot(bool isRoot)
   mIsRoot = isRoot;
 }
 
-void Node::AddUniformMapping(const UniformPropertyMapping& map)
-{
-  PropertyOwner::AddUniformMapping(map);
-  mRegenerateUniformMap = 2;
-}
-
-void Node::RemoveUniformMapping(const ConstString& uniformName)
-{
-  PropertyOwner::RemoveUniformMapping(uniformName);
-  mRegenerateUniformMap = 2;
-}
-
 bool Node::IsAnimationPossible() const
 {
   return mIsConnectedToSceneGraph;
-}
-
-void Node::PrepareRender(BufferIndex bufferIndex)
-{
-  if(mRegenerateUniformMap != 0)
-  {
-    if(mRegenerateUniformMap == 2)
-    {
-      CollectedUniformMap& localMap = mCollectedUniformMap[bufferIndex];
-      localMap.Resize(0);
-
-      for(UniformMap::SizeType i = 0, count = mUniformMaps.Count(); i < count; ++i)
-      {
-        localMap.PushBack(mUniformMaps[i]);
-      }
-    }
-    else if(mRegenerateUniformMap == 1)
-    {
-      CollectedUniformMap& localMap = mCollectedUniformMap[bufferIndex];
-      CollectedUniformMap& oldMap   = mCollectedUniformMap[1 - bufferIndex];
-
-      localMap.Resize(oldMap.Count());
-
-      CollectedUniformMap::SizeType index = 0;
-      for(CollectedUniformMap::Iterator iter = oldMap.Begin(), end = oldMap.End(); iter != end; ++iter, ++index)
-      {
-        localMap[index] = *iter;
-      }
-    }
-    --mRegenerateUniformMap;
-    mUniformMapChanged[bufferIndex] = 1u;
-  }
 }
 
 void Node::ConnectChild(Node* childNode)

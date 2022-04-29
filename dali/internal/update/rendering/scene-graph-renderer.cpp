@@ -40,58 +40,8 @@ namespace SceneGraph
 {
 namespace // unnamed namespace
 {
-const uint32_t UNIFORM_MAP_READY      = 0;
-const uint32_t COPY_UNIFORM_MAP       = 1;
-const uint32_t REGENERATE_UNIFORM_MAP = 2;
-
 //Memory pool used to allocate new renderers. Memory used by this pool will be released when shutting down DALi
 MemoryPoolObjectAllocator<Renderer> gRendererMemoryPool;
-
-void AddMappings(CollectedUniformMap& localMap, const UniformMap& uniformMap)
-{
-  // Iterate thru uniformMap.
-  // Any maps that aren't in localMap should be added in a single step
-
-  // keep a static vector to avoid temporary heap allocation.
-  // As this function gets called only from update thread we don't have to
-  // make it thread safe (so no need to keep a thread_local variable).
-  static CollectedUniformMap newUniformMappings;
-
-  newUniformMappings.Clear();
-
-  for(UniformMap::SizeType i = 0, count = uniformMap.Count(); i < count; ++i)
-  {
-    bool found = false;
-
-    for(CollectedUniformMap::Iterator iter = localMap.Begin(); iter != localMap.End(); ++iter)
-    {
-      const UniformPropertyMapping& map = (*iter);
-      if(map.uniformName == uniformMap[i].uniformName)
-      {
-        found = true;
-        break;
-      }
-    }
-    if(!found)
-    {
-      newUniformMappings.PushBack(uniformMap[i]);
-    }
-  }
-
-  if(newUniformMappings.Count() > 0)
-  {
-    localMap.Reserve(localMap.Count() + newUniformMappings.Count());
-
-    for(CollectedUniformMap::Iterator iter = newUniformMappings.Begin(),
-                                      end  = newUniformMappings.End();
-        iter != end;
-        ++iter)
-    {
-      const UniformPropertyMapping& map = (*iter);
-      localMap.PushBack(map);
-    }
-  }
-}
 
 // Flags for re-sending data to renderer.
 enum Flags
@@ -138,7 +88,6 @@ Renderer::Renderer()
   mIndexedDrawFirstElement(0u),
   mIndexedDrawElementsCount(0u),
   mBlendBitmask(0u),
-  mRegenerateUniformMap(0u),
   mResendFlag(0u),
   mDepthFunction(DepthFunction::LESS),
   mFaceCullingMode(FaceCullingMode::NONE),
@@ -146,26 +95,21 @@ Renderer::Renderer()
   mDepthWriteMode(DepthWriteMode::AUTO),
   mDepthTestMode(DepthTestMode::AUTO),
   mRenderingBehavior(DevelRenderer::Rendering::IF_REQUIRED),
+  mUpdateDecay(Renderer::Decay::INITIAL),
+  mRegenerateUniformMap(false),
   mPremultipledAlphaEnabled(false),
   mOpacity(1.0f),
   mDepthIndex(0)
 {
-  mUniformMapChanged[0] = false;
-  mUniformMapChanged[1] = false;
-
-  // Observe our own PropertyOwner's uniform map
+  // Observe our own PropertyOwner's uniform map.
   AddUniformMapObserver(*this);
 }
 
 Renderer::~Renderer()
 {
-  if(mTextureSet)
-  {
-    mTextureSet = nullptr;
-  }
   if(mShader)
   {
-    mShader->RemoveConnectionObserver(*this);
+    mShader->RemoveUniformMapObserver(*this);
     mShader = nullptr;
   }
 }
@@ -177,54 +121,20 @@ void Renderer::operator delete(void* ptr)
 
 bool Renderer::PrepareRender(BufferIndex updateBufferIndex)
 {
-  if(mRegenerateUniformMap == UNIFORM_MAP_READY)
+  bool rendererUpdated = mResendFlag || mRenderingBehavior == DevelRenderer::Rendering::CONTINUOUSLY || mUpdateDecay > 0;
+
+  if(mUniformMapChangeCounter != mUniformMaps.GetChangeCounter())
   {
-    mUniformMapChanged[updateBufferIndex] = false;
+    // The map has changed since the last time we checked.
+    rendererUpdated          = true;
+    mRegenerateUniformMap    = true;
+    mUpdateDecay             = Renderer::Decay::INITIAL; // Render at least twice if the map has changed/actor has been added
+    mUniformMapChangeCounter = mUniformMaps.GetChangeCounter();
   }
-  else
+  if(mUpdateDecay > 0)
   {
-    if(mRegenerateUniformMap == REGENERATE_UNIFORM_MAP)
-    {
-      CollectedUniformMap& localMap = mCollectedUniformMap[updateBufferIndex];
-      localMap.Clear();
-
-      const UniformMap& rendererUniformMap = PropertyOwner::GetUniformMap();
-
-      auto size = rendererUniformMap.Count();
-      if(mShader)
-      {
-        size += mShader->GetUniformMap().Count();
-      }
-
-      localMap.Reserve(size);
-
-      AddMappings(localMap, rendererUniformMap);
-
-      if(mShader)
-      {
-        AddMappings(localMap, mShader->GetUniformMap());
-      }
-    }
-    else if(mRegenerateUniformMap == COPY_UNIFORM_MAP)
-    {
-      // Copy old map into current map
-      CollectedUniformMap& localMap = mCollectedUniformMap[updateBufferIndex];
-      CollectedUniformMap& oldMap   = mCollectedUniformMap[1 - updateBufferIndex];
-
-      localMap.Resize(oldMap.Count());
-
-      uint32_t index = 0;
-      for(CollectedUniformMap::Iterator iter = oldMap.Begin(), end = oldMap.End(); iter != end; ++iter, ++index)
-      {
-        localMap[index] = *iter;
-      }
-    }
-
-    mUniformMapChanged[updateBufferIndex] = true;
-    mRegenerateUniformMap--;
+    mUpdateDecay = static_cast<Renderer::Decay>(static_cast<int>(mUpdateDecay) - 1);
   }
-
-  bool rendererUpdated = mUniformMapChanged[updateBufferIndex] || mResendFlag || mRenderingBehavior == DevelRenderer::Rendering::CONTINUOUSLY;
 
   if(mResendFlag != 0)
   {
@@ -385,8 +295,7 @@ void Renderer::SetTextures(TextureSet* textureSet)
 {
   DALI_ASSERT_DEBUG(textureSet != NULL && "Texture set pointer is NULL");
 
-  mTextureSet           = textureSet;
-  mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
+  mTextureSet = textureSet;
 }
 
 const Vector<Render::Texture*>* Renderer::GetTextures() const
@@ -405,12 +314,12 @@ void Renderer::SetShader(Shader* shader)
 
   if(mShader)
   {
-    mShader->RemoveConnectionObserver(*this);
+    mShader->RemoveUniformMapObserver(*this);
   }
 
   mShader = shader;
-  mShader->AddConnectionObserver(*this);
-  mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
+  mShader->AddUniformMapObserver(*this);
+  mRegenerateUniformMap = true;
   mResendFlag |= RESEND_GEOMETRY | RESEND_SHADER;
 }
 
@@ -643,7 +552,7 @@ DevelRenderer::Rendering::Type Renderer::GetRenderingBehavior() const
 //Called when SceneGraph::Renderer is added to update manager ( that happens when an "event-thread renderer" is created )
 void Renderer::ConnectToSceneGraph(SceneController& sceneController, BufferIndex bufferIndex)
 {
-  mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
+  mRegenerateUniformMap = true;
   mSceneController      = &sceneController;
 
   mRenderer = Render::Renderer::New(this, mGeometry, mBlendBitmask, GetBlendColor(), static_cast<FaceCullingMode::Type>(mFaceCullingMode), mPremultipledAlphaEnabled, mDepthWriteMode, mDepthTestMode, mDepthFunction, mStencilParameters);
@@ -667,11 +576,6 @@ void Renderer::DisconnectFromSceneGraph(SceneController& sceneController, Buffer
 Render::Renderer& Renderer::GetRenderer()
 {
   return *mRenderer;
-}
-
-const CollectedUniformMap& Renderer::GetUniformMap(BufferIndex bufferIndex) const
-{
-  return mCollectedUniformMap[bufferIndex];
 }
 
 Renderer::OpacityType Renderer::GetOpacityType(BufferIndex updateBufferIndex, const Node& node) const
@@ -741,30 +645,34 @@ Renderer::OpacityType Renderer::GetOpacityType(BufferIndex updateBufferIndex, co
   return opacityType;
 }
 
-void Renderer::ConnectionsChanged(PropertyOwner& object)
+bool Renderer::UpdateUniformMap()
 {
-  // One of our child objects has changed it's connections. Ensure the uniform
-  // map gets regenerated during PrepareRender
-  mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
-}
+  bool updated = false;
 
-void Renderer::ConnectedUniformMapChanged()
-{
-  mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
-}
-
-void Renderer::UniformMappingsChanged(const UniformMap& mappings)
-{
-  // The mappings are either from PropertyOwner base class, or the Actor
-  mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
-}
-
-void Renderer::ObservedObjectDestroyed(PropertyOwner& owner)
-{
-  if(reinterpret_cast<PropertyOwner*>(mShader) == &owner)
+  if(mRegenerateUniformMap)
   {
-    mShader = nullptr;
+    CollectedUniformMap& localMap = mCollectedUniformMap;
+    localMap.Clear();
+
+    const UniformMap& rendererUniformMap = PropertyOwner::GetUniformMap();
+
+    auto size = rendererUniformMap.Count();
+    if(mShader)
+    {
+      size += mShader->GetUniformMap().Count();
+    }
+
+    localMap.Reserve(size);
+    localMap.AddMappings(rendererUniformMap);
+    if(mShader)
+    {
+      localMap.AddMappings(mShader->GetUniformMap());
+    }
+    localMap.UpdateChangeCounter();
+    mRegenerateUniformMap = false;
+    updated               = true;
   }
+  return updated;
 }
 
 void Renderer::SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, uint32_t size)
@@ -772,6 +680,17 @@ void Renderer::SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, 
   mDrawCommands.clear();
   mDrawCommands.insert(mDrawCommands.end(), pDrawCommands, pDrawCommands + size);
   mResendFlag |= RESEND_DRAW_COMMANDS;
+}
+
+void Renderer::UniformMappingsChanged(const UniformMap& mappings)
+{
+  // The mappings are either from PropertyOwner base class, or the Shader
+  mRegenerateUniformMap = true; // Should remain true until this renderer is added to a RenderList.
+}
+
+const CollectedUniformMap& Renderer::GetCollectedUniformMap() const
+{
+  return mCollectedUniformMap;
 }
 
 } // namespace SceneGraph

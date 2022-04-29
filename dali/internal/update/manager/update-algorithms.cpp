@@ -113,8 +113,7 @@ inline NodePropertyFlags UpdateNodes(Node&             node,
 
   UpdateNodeOpacity(node, nodeDirtyFlags, updateBufferIndex);
 
-  // Collect uniform maps
-  node.PrepareRender(updateBufferIndex);
+
 
   // For partial update, mark all children of an animating node as updated.
   if(updated) // Only set to updated if parent was updated.

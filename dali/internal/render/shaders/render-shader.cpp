@@ -32,15 +32,12 @@ namespace Internal
 namespace SceneGraph
 {
 Shader::Shader(Dali::Shader::Hint::Value& hints)
-: mHints(hints),
-  mConnectionObservers()
+: mHints(hints)
 {
-  AddUniformMapObserver(*this);
 }
 
 Shader::~Shader()
 {
-  mConnectionObservers.Destroy(*this);
 }
 
 void Shader::SetShaderData(ShaderDataPtr shaderData)
@@ -48,30 +45,11 @@ void Shader::SetShaderData(ShaderDataPtr shaderData)
   DALI_LOG_TRACE_METHOD_FMT(Debug::Filter::gShader, "%d\n", shaderData->GetHashValue());
 
   mShaderData = shaderData;
-
-  mConnectionObservers.ConnectionsChanged(*this);
 }
 
 ShaderDataPtr Shader::GetShaderData() const
 {
   return mShaderData;
-}
-
-void Shader::AddConnectionObserver(ConnectionChangePropagator::Observer& observer)
-{
-  mConnectionObservers.Add(observer);
-}
-
-void Shader::RemoveConnectionObserver(ConnectionChangePropagator::Observer& observer)
-{
-  mConnectionObservers.Remove(observer);
-}
-
-void Shader::UniformMappingsChanged(const UniformMap& mappings)
-{
-  // Our uniform map, or that of one of the watched children has changed.
-  // Inform connected observers.
-  mConnectionObservers.ConnectedUniformMapChanged();
 }
 
 } // namespace SceneGraph
