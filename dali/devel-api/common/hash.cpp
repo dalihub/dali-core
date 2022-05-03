@@ -51,6 +51,14 @@ inline void HashBuffer(const std::vector<std::uint8_t>& buffer, std::size_t& has
   }
 }
 
+inline void HashBuffer(const Dali::Vector<std::uint8_t>& buffer, std::size_t& hash)
+{
+  for(const auto& c : buffer)
+  {
+    hash = hash * 33 + c;
+  }
+}
+
 } // unnamed namespace
 
 std::size_t CalculateHash(const std::string& toHash)
@@ -82,6 +90,15 @@ std::size_t CalculateHash(const std::string& string1, const std::string& string2
 }
 
 std::size_t CalculateHash(const std::vector<std::uint8_t>& toHash)
+{
+  std::size_t hash(INITIAL_HASH_VALUE);
+
+  HashBuffer(toHash, hash);
+
+  return hash;
+}
+
+std::size_t CalculateHash(const Dali::Vector<std::uint8_t>& toHash)
 {
   std::size_t hash(INITIAL_HASH_VALUE);
 

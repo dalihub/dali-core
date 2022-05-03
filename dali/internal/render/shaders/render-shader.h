@@ -22,7 +22,6 @@
 #include <dali/internal/common/shader-data.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/common/property-owner.h>
-#include <dali/internal/update/common/scene-graph-connection-change-propagator.h>
 
 namespace Dali
 {
@@ -36,9 +35,19 @@ namespace SceneGraph
 class SceneController;
 
 /**
- * A holder class for Program; also enables sharing of uniform properties
+ * This PropertyOwner enables registration of properties as uniforms.
+ * It holds a ShaderData, which can be read from Render side.
+ *
+ * Any renderer that uses this shader also registers to it's UniformMap
+ * observer, so that it can be notified when properties are registered
+ * after being linked. (DALi public API allows Renderer to be created
+ * with a shader, or a shader to be set on a renderer _before_ uniform
+ * properties are defined on a shader. This connection ensures that
+ * all the uniforms are loaded into GPU at render time).
+ *
+ * //@todo Move back to scene graph
  */
-class Shader : public PropertyOwner, public UniformMap::Observer
+class Shader : public PropertyOwner
 {
 public:
   /**
@@ -78,29 +87,10 @@ public:
    */
   [[nodiscard]] ShaderDataPtr GetShaderData() const;
 
-public:
-  /**
-   * @copydoc ConnectionChangePropagator::AddObserver
-   */
-  void AddConnectionObserver(ConnectionChangePropagator::Observer& observer);
-
-  /**
-   * @copydoc ConnectionChangePropagator::RemoveObserver
-   */
-  void RemoveConnectionObserver(ConnectionChangePropagator::Observer& observer);
-
-public: // UniformMap::Observer
-  /**
-   * @copydoc UniformMap::Observer::UniformMappingsChanged
-   */
-  void UniformMappingsChanged(const UniformMap& mappings) override;
-
 private: // Data
   Dali::Shader::Hint::Value mHints;
 
   ShaderDataPtr mShaderData;
-
-  ConnectionChangePropagator mConnectionObservers;
 };
 
 inline void SetShaderDataMessage(EventThreadServices& eventThreadServices, const Shader& shader, ShaderDataPtr shaderData)

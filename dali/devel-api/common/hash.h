@@ -24,6 +24,7 @@
 
 //INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/dali-vector.h>
 
 namespace Dali
 {
@@ -62,6 +63,13 @@ DALI_CORE_API std::size_t CalculateHash(const std::string& toHash, char terminat
  * @return hash code
  */
 DALI_CORE_API std::size_t CalculateHash(const std::vector<std::uint8_t>& toHash);
+
+/**
+ * @brief Create a hash code for a Dali::Vector<std::uint8_t>
+ * @param toHash list of std::uint8_t to hash
+ * @return hash code
+ */
+DALI_CORE_API std::size_t CalculateHash(const Dali::Vector<std::uint8_t>& toHash);
 
 } // namespace Dali
 

@@ -837,26 +837,9 @@ public:
 
 public:
   /**
-   * @copydoc UniformMap::Add
-   */
-  void AddUniformMapping(const UniformPropertyMapping& map) override;
-
-  /**
-   * @copydoc UniformMap::Remove
-   */
-  void RemoveUniformMapping(const ConstString& uniformName) override;
-
-  /**
    * @copydoc Dali::Internal::SceneGraph::PropertyOwner::IsAnimationPossible
    */
   bool IsAnimationPossible() const override;
-
-  /**
-   * Prepare the node for rendering.
-   * This is called by the UpdateManager when an object is due to be rendered in the current frame.
-   * @param[in] updateBufferIndex The current update buffer index.
-   */
-  void PrepareRender(BufferIndex bufferIndex);
 
   /**
    * Called by UpdateManager when the node is added.
@@ -907,21 +890,12 @@ private: // from NodeDataProvider
     return GetWorldColor(bufferIndex);
   }
 
-public: // From UniformMapDataProvider
   /**
-   * @copydoc UniformMapDataProvider::GetUniformMapChanged
+   * @copydoc NodeDataProvider::GetNodeUniformMap
    */
-  bool GetUniformMapChanged(BufferIndex bufferIndex) const override
+  const UniformMap& GetNodeUniformMap() const override
   {
-    return mUniformMapChanged[bufferIndex];
-  }
-
-  /**
-   * @copydoc UniformMapDataProvider::GetUniformMap
-   */
-  const CollectedUniformMap& GetUniformMap(BufferIndex bufferIndex) const override
-  {
-    return mCollectedUniformMap[bufferIndex];
+    return GetUniformMap();
   }
 
 private:
@@ -979,16 +953,13 @@ protected:
 
   NodeContainer mChildren; ///< Container of children; not owned
 
-  CollectedUniformMap mCollectedUniformMap[2]; ///< Uniform maps of the node
-  uint32_t            mUniformMapChanged[2];   ///< Records if the uniform map has been altered this frame
-  uint32_t            mClippingDepth;          ///< The number of stencil clipping nodes deep this node is
-  uint32_t            mScissorDepth;           ///< The number of scissor clipping nodes deep this node is
+  uint32_t mClippingDepth; ///< The number of stencil clipping nodes deep this node is
+  uint32_t mScissorDepth;  ///< The number of scissor clipping nodes deep this node is
 
   uint32_t mDepthIndex; ///< Depth index of the node
 
   // flags, compressed to bitfield
   NodePropertyFlags  mDirtyFlags;                  ///< Dirty flags for each of the Node properties
-  uint32_t           mRegenerateUniformMap : 2;    ///< Indicate if the uniform map has to be regenerated this frame
   DrawMode::Type     mDrawMode : 3;                ///< How the Node and its children should be drawn
   ColorMode          mColorMode : 3;               ///< Determines whether mWorldColor is inherited, 2 bits is enough
   ClippingMode::Type mClippingMode : 3;            ///< The clipping mode of this node
