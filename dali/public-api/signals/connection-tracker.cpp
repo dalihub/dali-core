@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,56 +18,68 @@
 // CLASS HEADER
 #include <dali/public-api/signals/connection-tracker.h>
 
+// EXTERNAL INCLUDES
+#include <unordered_map>
+
+// INTERNAL INCLUDES
 #include <dali/public-api/signals/callback.h>
-#include <dali/public-api/signals/signal-slot-connections.h>
 #include <dali/public-api/signals/signal-slot-observers.h>
 
 namespace Dali
 {
-ConnectionTracker::ConnectionTracker() = default;
+/**
+ * @brief Extra struct for callback base cache.
+ */
+struct ConnectionTracker::Impl
+{
+  Impl()  = default;
+  ~Impl() = default;
+
+  std::unordered_map<CallbackBase*, SlotObserver*> mCallbackCache;
+};
+
+ConnectionTracker::ConnectionTracker()
+: mCacheImpl(new ConnectionTracker::Impl())
+{
+}
 
 ConnectionTracker::~ConnectionTracker()
 {
   DisconnectAll();
+  delete mCacheImpl;
 }
 
 void ConnectionTracker::DisconnectAll()
 {
-  std::size_t size = mConnections.Size();
-
-  for(std::size_t i = 0; i < size; ++i)
+  // Iterate unordered list of CallbackBase / SlotObserver.
+  // Note that we don't need to keep order of ConnectionTracker::SignalConnected
+  for(auto iter = mCacheImpl->mCallbackCache.begin(), iterEnd = mCacheImpl->mCallbackCache.end(); iter != iterEnd; ++iter)
   {
-    auto& connection = mConnections[i];
+    auto& callbackBase = iter->first;
+    auto& slotObserver = iter->second;
 
     // Tell the signal that the slot is disconnected
-    connection.GetSlotObserver()->SlotDisconnected(connection.GetCallback());
+    slotObserver->SlotDisconnected(callbackBase);
   }
 
-  mConnections.Clear();
+  mCacheImpl->mCallbackCache.clear();
+  mCacheImpl->mCallbackCache.rehash(0); ///< Note : unordered_map.clear() didn't deallocate memory.
 }
 
 void ConnectionTracker::SignalConnected(SlotObserver* slotObserver, CallbackBase* callback)
 {
-  mConnections.PushBack(SlotConnection(slotObserver, callback));
+  // We can assume that there is no duplicated callback come here
+  mCacheImpl->mCallbackCache[callback] = slotObserver;
 }
 
-void ConnectionTracker::SignalDisconnected(SlotObserver* signal, CallbackBase* callback)
+void ConnectionTracker::SignalDisconnected(SlotObserver* slotObserver, CallbackBase* callback)
 {
-  std::size_t size = mConnections.Size();
-
-  for(std::size_t i = 0; i < size; ++i)
+  // Remove from CallbackBase / SlotObserver list
+  const bool isRemoved = mCacheImpl->mCallbackCache.erase(callback);
+  if(DALI_LIKELY(isRemoved))
   {
-    auto& connection = mConnections[i];
-
-    // Pointer comparison i.e. SignalConnection contains pointer to same callback instance
-    if(connection.GetCallback() == callback)
-    {
-      // Remove from connection list
-      mConnections.Erase(mConnections.Begin() + i);
-
-      // Disconnection complete
-      return;
-    }
+    // Disconnection complete
+    return;
   }
 
   DALI_ABORT("Callback lost in SignalDisconnected()");
@@ -75,7 +87,7 @@ void ConnectionTracker::SignalDisconnected(SlotObserver* signal, CallbackBase* c
 
 std::size_t ConnectionTracker::GetConnectionCount() const
 {
-  return mConnections.Size();
+  return mCacheImpl->mCallbackCache.size();
 }
 
 } // namespace Dali
