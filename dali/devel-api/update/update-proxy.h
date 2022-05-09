@@ -2,7 +2,7 @@
 #define DALI_UPDATE_PROXY_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -105,6 +105,16 @@ public:
    * @return Whether the method call was successful or not.
    */
   bool GetPositionAndSize(uint32_t id, Vector3& position, Vector3& size) const;
+
+  /**
+   * @brief Given the Actor ID, this retrieves that Actor's world position and size.
+   * @param[in]   id        The Actor ID
+   * @param[out]  position  Set to the Actor's current world position, if Actor ID is valid
+   * @param[out]  scale     Set to the Actor's current world scale, if Actor ID is valid
+   * @param[out]  size      Set to the Actor's current size, if Actor ID is valid
+   * @return Whether the method call was successful or not.
+   */
+  bool GetWorldPositionScaleAndSize(uint32_t id, Vector3& position, Vector3& scale, Vector3& size) const;
 
   /**
    * @brief Given the Actor ID, this retrieves that Actor's local scale.
