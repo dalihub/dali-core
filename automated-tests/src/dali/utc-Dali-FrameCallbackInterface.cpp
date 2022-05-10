@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,6 +72,7 @@ public:
     updateProxy.GetSize(mActorId, mSizeGetSizeCall);
     updateProxy.GetPosition(mActorId, mPositionGetPositionCall);
     updateProxy.GetPositionAndSize(mActorId, mPositionGetPositionAndSizeCall, mSizeGetPositionAndSizeCall);
+    updateProxy.GetWorldPositionScaleAndSize(mActorId, mWorldPosition, mWorldScale, mSizeGetWorldPositionScaleAndSizeCall);
     updateProxy.GetColor(mActorId, mColor);
     updateProxy.GetScale(mActorId, mScale);
   }
@@ -82,6 +83,9 @@ public:
   Vector3 mPositionGetPositionCall;
   Vector3 mPositionGetPositionAndSizeCall;
   Vector3 mSizeGetPositionAndSizeCall;
+  Vector3 mWorldPosition;
+  Vector3 mWorldScale;
+  Vector3 mSizeGetWorldPositionScaleAndSizeCall;
   Vector4 mColor;
   Vector3 mScale;
 };
@@ -105,6 +109,7 @@ public:
 
   virtual void Update(Dali::UpdateProxy& updateProxy, float elapsedSeconds) override
   {
+    Vector3 size;
     FrameCallbackBasic::Update(updateProxy, elapsedSeconds);
     updateProxy.SetSize(mActorId, mSizeToSet);
     updateProxy.SetPosition(mActorId, mPositionToSet);
@@ -147,6 +152,7 @@ public:
 
   virtual void Update(Dali::UpdateProxy& updateProxy, float elapsedSeconds) override
   {
+    Vector3 size;
     FrameCallbackBasic::Update(updateProxy, elapsedSeconds);
     updateProxy.BakeSize(mActorId, mSizeToSet);
     updateProxy.BakePosition(mActorId, mPositionToSet);
@@ -210,19 +216,20 @@ public:
     Vector3 vec3;
     Vector4 vec4;
 
-    mGetSizeCallSuccess            = updateProxy.GetSize(mActorId, vec3);
-    mGetPositionCallSuccess        = updateProxy.GetPosition(mActorId, vec3);
-    mGetColorCallSuccess           = updateProxy.GetColor(mActorId, vec4);
-    mGetScaleCallSuccess           = updateProxy.GetScale(mActorId, vec3);
-    mGetPositionAndSizeCallSuccess = updateProxy.GetPositionAndSize(mActorId, vec3, vec3);
-    mSetSizeCallSuccess            = updateProxy.SetSize(mActorId, vec3);
-    mSetPositionCallSuccess        = updateProxy.SetPosition(mActorId, vec3);
-    mSetColorCallSuccess           = updateProxy.SetColor(mActorId, vec4);
-    mSetScaleCallSuccess           = updateProxy.SetScale(mActorId, vec3);
-    mBakeSizeCallSuccess           = updateProxy.BakeSize(mActorId, vec3);
-    mBakePositionCallSuccess       = updateProxy.BakePosition(mActorId, vec3);
-    mBakeColorCallSuccess          = updateProxy.BakeColor(mActorId, vec4);
-    mBakeScaleCallSuccess          = updateProxy.BakeScale(mActorId, vec3);
+    mGetSizeCallSuccess                      = updateProxy.GetSize(mActorId, vec3);
+    mGetPositionCallSuccess                  = updateProxy.GetPosition(mActorId, vec3);
+    mGetColorCallSuccess                     = updateProxy.GetColor(mActorId, vec4);
+    mGetScaleCallSuccess                     = updateProxy.GetScale(mActorId, vec3);
+    mGetPositionAndSizeCallSuccess           = updateProxy.GetPositionAndSize(mActorId, vec3, vec3);
+    mGetWorldPositionScaleAndSizeCallSuccess = updateProxy.GetWorldPositionScaleAndSize(mActorId, vec3, vec3, vec3);
+    mSetSizeCallSuccess                      = updateProxy.SetSize(mActorId, vec3);
+    mSetPositionCallSuccess                  = updateProxy.SetPosition(mActorId, vec3);
+    mSetColorCallSuccess                     = updateProxy.SetColor(mActorId, vec4);
+    mSetScaleCallSuccess                     = updateProxy.SetScale(mActorId, vec3);
+    mBakeSizeCallSuccess                     = updateProxy.BakeSize(mActorId, vec3);
+    mBakePositionCallSuccess                 = updateProxy.BakePosition(mActorId, vec3);
+    mBakeColorCallSuccess                    = updateProxy.BakeColor(mActorId, vec4);
+    mBakeScaleCallSuccess                    = updateProxy.BakeScale(mActorId, vec3);
   }
 
   virtual void Reset() override
@@ -230,19 +237,20 @@ public:
     // Up-call
     FrameCallbackBasic::Reset();
 
-    mGetSizeCallSuccess            = false;
-    mGetPositionCallSuccess        = false;
-    mGetColorCallSuccess           = false;
-    mGetScaleCallSuccess           = false;
-    mGetPositionAndSizeCallSuccess = false;
-    mSetSizeCallSuccess            = false;
-    mSetPositionCallSuccess        = false;
-    mSetColorCallSuccess           = false;
-    mSetScaleCallSuccess           = false;
-    mBakeSizeCallSuccess           = false;
-    mBakePositionCallSuccess       = false;
-    mBakeColorCallSuccess          = false;
-    mBakeScaleCallSuccess          = false;
+    mGetSizeCallSuccess                      = false;
+    mGetPositionCallSuccess                  = false;
+    mGetColorCallSuccess                     = false;
+    mGetScaleCallSuccess                     = false;
+    mGetPositionAndSizeCallSuccess           = false;
+    mGetWorldPositionScaleAndSizeCallSuccess = false;
+    mSetSizeCallSuccess                      = false;
+    mSetPositionCallSuccess                  = false;
+    mSetColorCallSuccess                     = false;
+    mSetScaleCallSuccess                     = false;
+    mBakeSizeCallSuccess                     = false;
+    mBakePositionCallSuccess                 = false;
+    mBakeColorCallSuccess                    = false;
+    mBakeScaleCallSuccess                    = false;
   }
 
   const uint32_t mActorId;
@@ -251,6 +259,7 @@ public:
   bool           mGetColorCallSuccess{false};
   bool           mGetScaleCallSuccess{false};
   bool           mGetPositionAndSizeCallSuccess{false};
+  bool           mGetWorldPositionScaleAndSizeCallSuccess{false};
   bool           mSetSizeCallSuccess{false};
   bool           mSetPositionCallSuccess{false};
   bool           mSetColorCallSuccess{false};
@@ -327,6 +336,22 @@ int UtcDaliFrameCallbackGetters(void)
   DALI_TEST_EQUALS(frameCallback.mSizeGetPositionAndSizeCall, Vector3(actorSize.width, actorSize.height, 0.0f), TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mColor, color, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mScale, scale, TEST_LOCATION);
+
+  frameCallback.Reset();
+
+  application.SendNotification();
+  application.Render();
+
+  Vector2 halfSceneSize(application.GetScene().GetSize() * 0.5f);
+  Vector3 halfActorSize(actorSize * 0.5f);
+  Vector3 worldPosition = position - Vector3(halfSceneSize) + halfActorSize * scale;
+
+  // World position and scale values are updated after FrameCallbackInterface::Update()
+  // So test them after the second rendering
+  DALI_TEST_EQUALS(frameCallback.mCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mWorldPosition, worldPosition, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mWorldScale, scale, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSizeGetWorldPositionScaleAndSizeCall, Vector3(actorSize.width, actorSize.height, 0.0f), TEST_LOCATION);
 
   END_TEST;
 }
@@ -618,9 +643,11 @@ int UtcDaliFrameCallbackCheckActorNotAdded(void)
   // All should be default constructed objects
   DALI_TEST_EQUALS(frameCallback.mCalled, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mPositionGetPositionCall, Vector3::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mWorldPosition, Vector3::ZERO, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mSizeGetSizeCall, Vector3::ZERO, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mColor, Vector4::ZERO, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mScale, Vector3::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mWorldScale, Vector3::ZERO, TEST_LOCATION);
 
   END_TEST;
 }
@@ -646,6 +673,7 @@ int UtcDaliFrameCallbackInvalidActorId(void)
   DALI_TEST_EQUALS(frameCallback.mGetColorCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mGetScaleCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mGetPositionAndSizeCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetWorldPositionScaleAndSizeCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mSetSizeCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mSetPositionCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mSetColorCallSuccess, false, TEST_LOCATION);
@@ -683,6 +711,7 @@ int UtcDaliFrameCallbackActorRemovedAndAdded(void)
   DALI_TEST_EQUALS(frameCallback.mGetColorCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mGetScaleCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mGetPositionAndSizeCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetWorldPositionScaleAndSizeCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mSetSizeCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mSetPositionCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mSetColorCallSuccess, true, TEST_LOCATION);
@@ -706,6 +735,7 @@ int UtcDaliFrameCallbackActorRemovedAndAdded(void)
   DALI_TEST_EQUALS(frameCallback.mGetColorCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mGetScaleCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mGetPositionAndSizeCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetWorldPositionScaleAndSizeCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mSetSizeCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mSetPositionCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mSetColorCallSuccess, false, TEST_LOCATION);
@@ -729,6 +759,7 @@ int UtcDaliFrameCallbackActorRemovedAndAdded(void)
   DALI_TEST_EQUALS(frameCallback.mGetColorCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mGetScaleCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mGetPositionAndSizeCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetWorldPositionScaleAndSizeCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mSetSizeCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mSetPositionCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mSetColorCallSuccess, true, TEST_LOCATION);

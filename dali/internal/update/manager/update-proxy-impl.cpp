@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -150,6 +150,24 @@ bool UpdateProxy::GetPositionAndSize(uint32_t id, Vector3& position, Vector3& si
     position                                             = transformManager.GetVector3PropertyValue(node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_POSITION);
     size                                                 = transformManager.GetVector3PropertyValue(node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_SIZE);
     success                                              = true;
+  }
+  return success;
+}
+
+bool UpdateProxy::GetWorldPositionScaleAndSize(uint32_t id, Vector3& position, Vector3& scale, Vector3& size) const
+{
+  bool                    success = false;
+  const SceneGraph::Node* node    = GetNodeWithId(id);
+  if(node)
+  {
+    const SceneGraph::TransformManager& transformManager = mTransformManager; // To ensure we call the const getter
+    const Matrix&                       worldMatrix      = transformManager.GetWorldMatrix(node->GetTransformId());
+
+    Quaternion orientation;
+    worldMatrix.GetTransformComponents(position, orientation, scale);
+
+    size    = transformManager.GetVector3PropertyValue(node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_SIZE);
+    success = true;
   }
   return success;
 }
