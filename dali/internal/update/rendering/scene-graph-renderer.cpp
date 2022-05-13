@@ -21,6 +21,7 @@
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/common/internal-constants.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
+#include <dali/internal/event/rendering/decorated-visual-renderer-impl.h> // For DecoratedVisualRenderer::AnimatableDecoratedVisualProperties
 #include <dali/internal/render/data-providers/node-data-provider.h>
 #include <dali/internal/render/data-providers/render-data-provider.h>
 #include <dali/internal/render/queue/render-queue.h>
@@ -32,6 +33,8 @@
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/rendering/scene-graph-texture-set.h>
 
+#include <dali/integration-api/debug.h>
+
 namespace Dali
 {
 namespace Internal
@@ -40,6 +43,10 @@ namespace SceneGraph
 {
 namespace // unnamed namespace
 {
+#ifdef DEBUG_ENABLED
+Debug::Filter* gSceneGraphRendererLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_SG_RENDERER");
+#endif
+
 //Memory pool used to allocate new renderers. Memory used by this pool will be released when shutting down DALi
 MemoryPoolObjectAllocator<Renderer> gRendererMemoryPool;
 
@@ -691,6 +698,139 @@ void Renderer::UniformMappingsChanged(const UniformMap& mappings)
 const CollectedUniformMap& Renderer::GetCollectedUniformMap() const
 {
   return mCollectedUniformMap;
+}
+
+Vector3 Renderer::CalculateVisualTransformedUpdateSize(BufferIndex updateBufferIndex, const Vector3& originalSize)
+{
+  if(mVisualProperties)
+  {
+    // TODO : We may need to get some method that visual properties changed, without hash.
+    // Or, need to call this API in PreRender side.
+
+    uint64_t hash = 0xc70f6907UL;
+
+    hash = mVisualProperties->mTransformOffset.Hash(updateBufferIndex, hash);
+    hash = mVisualProperties->mTransformOffsetSizeMode.Hash(updateBufferIndex, hash);
+    hash = mVisualProperties->mTransformSize.Hash(updateBufferIndex, hash);
+    hash = mVisualProperties->mTransformOrigin.Hash(updateBufferIndex, hash);
+    hash = mVisualProperties->mTransformAnchorPoint.Hash(updateBufferIndex, hash);
+    hash = mVisualProperties->mExtraSize.Hash(updateBufferIndex, hash);
+
+    if(mVisualPropertiesCoefficient.hash != hash)
+    {
+      mVisualPropertiesCoefficient.hash = hash;
+
+      // VisualProperty
+      const Vector2 transformOffset         = mVisualProperties->mTransformOffset.Get(updateBufferIndex);
+      const Vector4 transformOffsetSizeMode = mVisualProperties->mTransformOffsetSizeMode.Get(updateBufferIndex);
+      const Vector2 transformSize           = mVisualProperties->mTransformSize.Get(updateBufferIndex);
+      const Vector2 transformOrigin         = mVisualProperties->mTransformOrigin.Get(updateBufferIndex);
+      const Vector2 transformAnchorPoint    = mVisualProperties->mTransformAnchorPoint.Get(updateBufferIndex);
+      const Vector2 extraSize               = mVisualProperties->mExtraSize.Get(updateBufferIndex);
+
+      DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "transform size   %5.3f %5.3f\n", transformSize.x, transformSize.y);
+      DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "transform offset %5.3f %5.3f\n", transformOffset.x, transformOffset.y);
+      DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "transform origin %5.3f %5.3f\n", transformOrigin.x, transformOrigin.y);
+      DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "transform anchor %5.3f %5.3f\n", transformAnchorPoint.x, transformAnchorPoint.y);
+      DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "extra size       %5.3f %5.3f\n", extraSize.x, extraSize.y);
+
+      // const Vector2 visualSize = Vector2(Dali::Lerp(transformOffsetSizeMode.z, originalSize.x * transformSize.x, transformSize.x),
+      //                                    Dali::Lerp(transformOffsetSizeMode.w, originalSize.y * transformSize.y, transformSize.y)) +
+      //                            extraSize;
+      // const Vector2 visualOffset = Vector2(Dali::Lerp(transformOffsetSizeMode.x, originalSize.x * transformOffset.x, transformOffset.x),
+      //                                      Dali::Lerp(transformOffsetSizeMode.y, originalSize.y * transformOffset.y, transformOffset.y));
+
+      // const float decoratedBorderlineWidth = std::max((1.0f + Dali::Clamp(borderlineOffset, -1.0f, 1.0f)) * borderlineWidth, 2.0f * blurRadius);
+      // const Vector2 decoratedVisualSize    = visualSize + Vector2(decoratedBorderlineWidth, decoratedBorderlineWidth);
+
+      // Note : vertexPositoin.xy = aPosition * decoratedVisualSize
+      //                          + anchorPoint * visualSize
+      //                          + origin * uSize.xy
+      //                          + visualOffset;
+
+      // Calculate same logic of visual's vertex shader transform.
+      // minVertexPosition = -0.5f * decoratedVisualSize + transformAnchorPoint * visualSize + transformOrigin * originalSize.xy + visualOffset
+      // maxVertexPosition =  0.5f * decoratedVisualSize + transformAnchorPoint * visualSize + transformOrigin * originalSize.xy + visualOffset
+
+      // Update cached VisualTransformedUpdateSizeCoefficientCache
+
+      // Note : vertexPosition = (XA * aPosition + XB) * originalSize + (CA * aPosition + CB) + Vector2(D, D) * aPosition
+
+      // XA = transformSize * (1.0 - transformOffsetSizeMode.zw)
+      // XB = transformSize * (1.0 - transformOffsetSizeMode.zw) * transformAnchorPoint
+      //    + transformOffset * (1.0 - transformOffsetSizeMode.xy)
+      //    + transformOrigin
+      // CA = transformSize * transformOffsetSizeMode.zw + extraSize
+      // CB = (transformSize * transformOffsetSizeMode.zw + extraSize) * transformAnchorPoint
+      //    + transformOffset * transformOffsetSizeMode.xy
+      // D = max((1.0 + clamp(borderlineOffset, -1.0, 1.0)) * borderlineWidth, 2.0 * blurRadius)
+
+      mVisualPropertiesCoefficient.coefXA = transformSize * Vector2(1.0f - transformOffsetSizeMode.z, 1.0f - transformOffsetSizeMode.w);
+      mVisualPropertiesCoefficient.coefXB = mVisualPropertiesCoefficient.coefXA * transformAnchorPoint + transformOffset * Vector2(1.0f - transformOffsetSizeMode.x, 1.0f - transformOffsetSizeMode.y) + transformOrigin;
+      mVisualPropertiesCoefficient.coefCA = transformSize * Vector2(transformOffsetSizeMode.z, transformOffsetSizeMode.w) + extraSize;
+      mVisualPropertiesCoefficient.coefCB = mVisualPropertiesCoefficient.coefCA * transformAnchorPoint + transformOffset * Vector2(transformOffsetSizeMode.x, transformOffsetSizeMode.y);
+    }
+    if(mVisualProperties->mExtendedProperties)
+    {
+      const auto decoratedVisualProperties = static_cast<DecoratedVisualRenderer::AnimatableDecoratedVisualProperties*>(mVisualProperties->mExtendedProperties);
+
+      uint64_t decoratedHash = 0xc70f6907UL;
+
+      decoratedHash = decoratedVisualProperties->mBorderlineWidth.Hash(updateBufferIndex, decoratedHash);
+      decoratedHash = decoratedVisualProperties->mBorderlineOffset.Hash(updateBufferIndex, decoratedHash);
+      decoratedHash = decoratedVisualProperties->mBlurRadius.Hash(updateBufferIndex, decoratedHash);
+
+      if(mVisualPropertiesCoefficient.decoratedHash != decoratedHash)
+      {
+        mVisualPropertiesCoefficient.decoratedHash = decoratedHash;
+
+        // DecoratedVisualProperty
+        const float borderlineWidth  = decoratedVisualProperties->mBorderlineWidth.Get(updateBufferIndex);
+        const float borderlineOffset = decoratedVisualProperties->mBorderlineOffset.Get(updateBufferIndex);
+        const float blurRadius       = decoratedVisualProperties->mBlurRadius.Get(updateBufferIndex);
+
+        DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "borderline width  %5.3f\n", borderlineWidth);
+        DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "borderline offset %5.3f\n", borderlineOffset);
+        DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "blur radius       %5.3f\n", blurRadius);
+
+        // D coefficients be used only decoratedVisual.
+        // It can be calculated parallely with transform.
+
+        mVisualPropertiesCoefficient.coefD = std::max((1.0f + Dali::Clamp(borderlineOffset, -1.0f, 1.0f)) * borderlineWidth, 2.0f * blurRadius);
+      }
+    }
+
+    // Calculate vertex position by coefficient
+    // It will reduce the number of operations
+
+    // const Vector2 minVertexPosition = (XA * -0.5 + XB) * originalSize + (CA * -0.5 + CB) + Vector2(D, D) * -0.5;
+    // const Vector2 maxVertexPosition = (XA * +0.5 + XB) * originalSize + (CA * +0.5 + CB) + Vector2(D, D) * +0.5;
+
+    // When we set
+    // basicVertexPosition = XB * originalSize + CB
+    // scaleVertexPosition = XA * originalSize + CA + D
+
+    // --> minVertexPosition = basicVertexPosition + scaleVertexPosition * -0.5
+    //     maxVertexPosition = basicVertexPosition + scaleVertexPosition * +0.5
+
+    // Then, resultSize = 2.0f * max(-minVertexPosition, maxVertexPosition);
+    //                  = 2.0f * max(scaleVertexPosition * 0.5 - basicVertexPosition, scaleVertexPosition * 0.5 + basicVertexPosition)
+    //                  = scaleVertexPosition + 2.0f * abs(basicVertexPosition)
+    // Cause transform matrix will think center of vertex is (0, 0)
+
+    const Vector2 basicVertexPosition = mVisualPropertiesCoefficient.coefXB * originalSize.GetVectorXY() + mVisualPropertiesCoefficient.coefCB;
+    const Vector2 scaleVertexPosition = mVisualPropertiesCoefficient.coefXA * originalSize.GetVectorXY() + mVisualPropertiesCoefficient.coefCA;
+
+    // VisualTransform don't set z value. Just copy from original z size
+    const Vector3 resultSize = Vector3(scaleVertexPosition.x + 2.0f * abs(basicVertexPosition.x) + mVisualPropertiesCoefficient.coefD,
+                                       scaleVertexPosition.y + 2.0f * abs(basicVertexPosition.y) + mVisualPropertiesCoefficient.coefD,
+                                       originalSize.z);
+
+    DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "%f %f --> %f %f\n", originalSize.x, originalSize.y, resultSize.x, resultSize.y);
+
+    return resultSize;
+  }
+  return originalSize;
 }
 
 } // namespace SceneGraph

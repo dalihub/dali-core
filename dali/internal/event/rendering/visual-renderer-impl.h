@@ -85,7 +85,7 @@ public: // Default property extensions from Object
    */
   const PropertyInputImpl* GetSceneObjectInputProperty(Property::Index index) const override;
 
-private: // implementation
+protected: // implementation
   /**
    * @brief Constructor.
    *
@@ -101,6 +101,11 @@ private: // implementation
    */
   bool GetCurrentPropertyValue(Property::Index index, Property::Value& value) const;
 
+  /**
+   * @brief Ensure that properties are mapped to uniforms
+   */
+  void AddUniformMappings();
+
 protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -111,16 +116,11 @@ private:
   VisualRenderer(const VisualRenderer&) = delete;
   VisualRenderer& operator=(const VisualRenderer&) = delete;
 
-  /**
-   * @brief Ensure that properties are mapped to uniforms
-   */
-  void AddUniformMappings();
-
 public:
   struct VisualPropertyCache
   {
     Vector2 mTransformOffset{Vector2::ZERO};
-    Vector2 mTransformSize{Vector2::ZERO};
+    Vector2 mTransformSize{Vector2::ONE};
     Vector2 mTransformOrigin{Vector2::ZERO};
     Vector2 mTransformAnchorPoint{Vector2::ZERO};
     Vector4 mTransformOffsetSizeMode{Vector2::ZERO};
@@ -133,14 +133,23 @@ public:
   {
     AnimatableVisualProperties()
     : mTransformOffset(Vector2::ZERO),
-      mTransformSize(Vector2::ZERO),
+      mTransformSize(Vector2::ONE),
       mTransformOrigin(Vector2::ZERO),
       mTransformAnchorPoint(Vector2::ZERO),
       mTransformOffsetSizeMode(Vector4::ZERO),
       mExtraSize(Vector2::ZERO),
       mMixColor(Vector3::ONE),
-      mPreMultipliedAlpha(0.0f)
+      mPreMultipliedAlpha(0.0f),
+      mExtendedPropertiesDeleteFunction(nullptr)
     {
+    }
+
+    ~AnimatableVisualProperties()
+    {
+      if(mExtendedProperties && mExtendedPropertiesDeleteFunction)
+      {
+        mExtendedPropertiesDeleteFunction(mExtendedProperties);
+      }
     }
 
     SceneGraph::AnimatableProperty<Vector2> mTransformOffset;
@@ -152,7 +161,8 @@ public:
     SceneGraph::AnimatableProperty<Vector3> mMixColor;
     SceneGraph::AnimatableProperty<float>   mPreMultipliedAlpha;
 
-    void* mExtendedProperties{nullptr}; // Enable derived class to extend properties further
+    void* mExtendedProperties{nullptr};                        // Enable derived class to extend properties further
+    void (*mExtendedPropertiesDeleteFunction)(void*){nullptr}; // Derived class's custom delete functor
   };
 
 private:
@@ -182,4 +192,4 @@ inline const Internal::VisualRenderer& GetImplementation(const Dali::VisualRende
 
 } // namespace Dali
 
-#endif // DALI_INTERNAL_RENDERER_H
+#endif // DALI_INTERNAL_VISUAL_RENDERER_H

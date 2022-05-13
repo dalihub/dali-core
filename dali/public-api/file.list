@@ -65,6 +65,7 @@ SET( public_api_src_files
   ${public_api_src_dir}/object/ref-object.cpp
   ${public_api_src_dir}/render-tasks/render-task.cpp
   ${public_api_src_dir}/render-tasks/render-task-list.cpp
+  ${public_api_src_dir}/rendering/decorated-visual-renderer.cpp
   ${public_api_src_dir}/rendering/frame-buffer.cpp
   ${public_api_src_dir}/rendering/geometry.cpp
   ${public_api_src_dir}/rendering/vertex-buffer.cpp
@@ -217,6 +218,7 @@ SET( public_api_core_render_tasks_header_files
 
 
 SET( public_api_core_rendering_header_files
+  ${public_api_src_dir}/rendering/decorated-visual-renderer.h
   ${public_api_src_dir}/rendering/frame-buffer.h
   ${public_api_src_dir}/rendering/geometry.h
   ${public_api_src_dir}/rendering/vertex-buffer.h
