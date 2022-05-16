@@ -566,7 +566,7 @@ private:
   /** Struct to map node to index into mNodeMapCounters and mUniformIndexMaps */
   struct RenderItemLookup
   {
-    const SceneGraph::NodeDataProvider* node{nullptr}; ///<Node key
+    const SceneGraph::NodeDataProvider* node{nullptr}; ///<Node key. It can be nullptr if this NodeIndex don't need node uniform
 
     std::size_t index{0};                       ///<Index into mUniformIndexMap
     std::size_t nodeChangeCounter{0};           ///<The last known change counter for this node's uniform map
