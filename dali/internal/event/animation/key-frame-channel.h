@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_KEY_FRAME_CHANNEL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,9 @@ struct KeyFrameChannel
     }
     else
     {
-      auto end   = std::find_if(mValues.begin(), mValues.end(), [=](const auto& element) { return element.GetProgress() > progress; });
+      // Find lowest element s.t. progress is greater than progress.
+      // So start->GetProgress() <= progress < end->GetProgress() is satisfied.
+      auto end   = std::lower_bound(mValues.begin(), mValues.end(), progress, [](const auto& element, const float& progress) { return element.GetProgress() <= progress; });
       auto start = end - 1;
 
       const bool validInterval = (end != mValues.end()) && (start->GetProgress() <= progress);
