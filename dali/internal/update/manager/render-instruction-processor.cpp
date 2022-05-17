@@ -287,8 +287,8 @@ inline void AddRendererToRenderList(BufferIndex         updateBufferIndex,
         item.mTextureSet = renderable.mRenderer->GetTextureSet();
         item.mDepthIndex += renderable.mRenderer->GetDepthIndex();
 
-        // Ensure collected map is up to date
-        item.mIsUpdated |= renderable.mRenderer->UpdateUniformMap();
+        // Get whether collected map is up to date
+        item.mIsUpdated |= renderable.mRenderer->UniformMapUpdated();
       }
       else
       {

@@ -400,10 +400,23 @@ public:
    * Merge shader uniform map into renderer uniform map if any of the
    * maps have changed.  Only update uniform map if added to render
    * instructions.
-   *
-   * @return true if map has been updated, false otherwise
    */
-  bool UpdateUniformMap();
+  void UpdateUniformMap();
+
+  /**
+   * @brief CHeck if the uniformMap regenerated
+   * @return True if the uniformMap changed after latest checkup.
+   * @note The uniform map updated flag is reset after calling this.
+   */
+  [[nodiscard]] inline bool UniformMapUpdated() noexcept
+  {
+    if(mUniformMapUpdated)
+    {
+      mUniformMapUpdated = false;
+      return true;
+    }
+    return false;
+  }
 
   /**
    * Set the given external draw commands on this renderer.
@@ -498,6 +511,7 @@ private:
   Decay                          mUpdateDecay : 2;       ///< Update decay (aging)
 
   bool                                          mRegenerateUniformMap : 1;     ///< true if the map should be regenerated
+  bool                                          mUniformMapUpdated : 1;        ///< true if the map regenerated recently.
   bool                                          mPremultipledAlphaEnabled : 1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
   std::vector<Dali::DevelRenderer::DrawCommand> mDrawCommands;
   Dali::RenderCallback*                         mRenderCallback{nullptr};

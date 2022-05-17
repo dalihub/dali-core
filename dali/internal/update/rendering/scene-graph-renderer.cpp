@@ -104,6 +104,7 @@ Renderer::Renderer()
   mRenderingBehavior(DevelRenderer::Rendering::IF_REQUIRED),
   mUpdateDecay(Renderer::Decay::INITIAL),
   mRegenerateUniformMap(false),
+  mUniformMapUpdated(false),
   mPremultipledAlphaEnabled(false),
   mOpacity(1.0f),
   mDepthIndex(0)
@@ -294,6 +295,9 @@ bool Renderer::PrepareRender(BufferIndex updateBufferIndex)
 
     mResendFlag = 0;
   }
+
+  // Ensure collected map is up to date
+  UpdateUniformMap();
 
   return rendererUpdated;
 }
@@ -652,10 +656,8 @@ Renderer::OpacityType Renderer::GetOpacityType(BufferIndex updateBufferIndex, co
   return opacityType;
 }
 
-bool Renderer::UpdateUniformMap()
+void Renderer::UpdateUniformMap()
 {
-  bool updated = false;
-
   if(mRegenerateUniformMap)
   {
     CollectedUniformMap& localMap = mCollectedUniformMap;
@@ -677,9 +679,8 @@ bool Renderer::UpdateUniformMap()
     }
     localMap.UpdateChangeCounter();
     mRegenerateUniformMap = false;
-    updated               = true;
+    mUniformMapUpdated    = true;
   }
-  return updated;
 }
 
 void Renderer::SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, uint32_t size)
