@@ -2,7 +2,7 @@
 #define DALI_CONNECTION_TRACKER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,13 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstddef> // for std::size_t
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/signals/connection-tracker-interface.h>
-#include <dali/public-api/signals/signal-slot-connections.h>
+#include <dali/public-api/signals/signal-slot-observers.h>
 
 namespace Dali
 {
@@ -33,7 +35,6 @@ namespace Dali
 
 class CallbackBase;
 class SlotObserver;
-class SlotConnection;
 
 /**
  * @brief Connection tracker concrete implementation.
@@ -84,7 +85,8 @@ private:
   ConnectionTracker& operator=(ConnectionTracker&&) = delete;      ///< Deleted move assignment operator. @SINCE_1_9.25
 
 private:
-  Dali::Vector<SlotConnection> mConnections; ///< Vector of connection
+  struct DALI_INTERNAL Impl;
+  Impl*                mCacheImpl; ///< Private internal extra data.
 };
 
 /**

@@ -2,7 +2,7 @@
 #define DALI_BASE_SIGNAL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@
  */
 
 // EXTERNAL INCLUDES
-#include <vector>
+#include <stdint.h> // for uint32_t
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/common/list-wrapper.h>
 #include <dali/public-api/signals/callback.h>
 #include <dali/public-api/signals/connection-tracker-interface.h>
 #include <dali/public-api/signals/signal-slot-connections.h>
@@ -175,14 +175,12 @@ public:
 
     // If more connections are added by callbacks, these are ignore until the next Emit()
     // Note that count cannot be reduced while iterating
-    const std::size_t initialCount(mSignalConnections.size());
-
-    for(std::size_t i = 0; i < initialCount; ++i)
+    auto count = mSignalConnections.size();
+    auto iter  = mSignalConnections.begin();
+    while(count--)
     {
-      CallbackBase* callback(GetCallback(i));
-
-      // Note that connections will be set to NULL when disconnected
-      // This is preferable to reducing the connection count while iterating
+      CallbackBase* callback((*iter) ? iter->GetCallback() : nullptr);
+      ++iter;
       if(callback)
       {
         returnVal = CallbackBase::ExecuteReturn<Ret, Args...>(*callback, args...);
@@ -222,14 +220,12 @@ public:
 
     // If more connections are added by callbacks, these are ignore until the next Emit()
     // Note that count cannot be reduced while iterating
-    const std::size_t initialCount(mSignalConnections.size());
-
-    for(std::size_t i = 0; i < initialCount; ++i)
+    auto count = mSignalConnections.size();
+    auto iter  = mSignalConnections.begin();
+    while(count--)
     {
-      CallbackBase* callback(GetCallback(i));
-
-      // Note that connections will be set to NULL when disconnected
-      // This is preferable to reducing the connection count while iterating
+      CallbackBase* callback((*iter) ? iter->GetCallback() : nullptr);
+      ++iter;
       if(callback)
       {
         CallbackBase::Execute<Args...>(*callback, args...);
@@ -288,33 +284,21 @@ private: // SlotObserver interface, to be told when a slot disconnects
 
 private:
   /**
-   * @brief Returns a callback given an index in to the connection array.
-   *
-   * @SINCE_1_0.0
-   * @param[in] connectionIndex The index of the callback
-   * @return The callback, or NULL if the connection has been deleted
-   */
-  CallbackBase* GetCallback(std::size_t connectionIndex) const noexcept
-  {
-    return mSignalConnections[connectionIndex].GetCallback();
-  }
-
-  /**
    * @brief Helper to find whether a callback is connected.
    *
-   * @SINCE_1_0.0
+   * @SINCE_2_1.22
    * @param[in] callback The call back object
    * @return A valid index if the callback is connected
    */
-  int32_t FindCallback(CallbackBase* callback) const noexcept;
+  std::list<SignalConnection>::iterator FindCallback(CallbackBase* callback) noexcept;
 
   /**
    * @brief Deletes a connection object from the list of connections.
    *
-   * @SINCE_1_0.0
-   * @param[in] connectionIndex The index of the callback
+   * @SINCE_2_1.22
+   * @param[in] iter The index of the callback
    */
-  void DeleteConnection(std::size_t connectionIndex);
+  void DeleteConnection(std::list<SignalConnection>::iterator iter);
 
   /**
    * @brief Helper to remove NULL items from mSignalConnections, which is only safe at the end of Emit()
@@ -329,10 +313,14 @@ private:
   BaseSignal& operator=(BaseSignal&&) = delete;      ///< Deleted move assignment operator. @SINCE_1_9.25
 
 private:
-  std::vector<SignalConnection> mSignalConnections;      ///< Array of connections
-  uint32_t                      mNullConnections{0};     ///< Empty Connections in the array.
-  bool                          mEmittingFlag{false};    ///< Used to guard against nested Emit() calls.
-  bool*                         mSignalDeleted{nullptr}; ///< Used to guard against deletion during Emit() calls.
+  struct DALI_INTERNAL Impl;
+  Impl*                mCacheImpl; ///< Private internal extra data.
+
+private:
+  std::list<SignalConnection> mSignalConnections{};    ///< List of connections
+  uint32_t                    mNullConnections{0};     ///< Empty Connections in the array.
+  bool                        mEmittingFlag{false};    ///< Used to guard against nested Emit() calls.
+  bool*                       mSignalDeleted{nullptr}; ///< Used to guard against deletion during Emit() calls.
 };
 
 /**
