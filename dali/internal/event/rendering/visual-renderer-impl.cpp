@@ -92,7 +92,14 @@ VisualRenderer::VisualRenderer(const SceneGraph::Renderer* sceneObject)
 
 VisualRenderer::~VisualRenderer()
 {
-  // The scene object will be deleted by ~Renderer
+  if(EventThreadServices::IsCoreRunning())
+  {
+    EventThreadServices&       eventThreadServices = GetEventThreadServices();
+    SceneGraph::UpdateManager& updateManager       = eventThreadServices.GetUpdateManager();
+    RemoveRendererMessage(updateManager, GetVisualRendererSceneObject());
+
+    eventThreadServices.UnregisterObject(this);
+  }
 }
 
 const SceneGraph::Renderer& VisualRenderer::GetVisualRendererSceneObject() const
