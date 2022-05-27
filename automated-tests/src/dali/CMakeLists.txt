@@ -24,6 +24,7 @@ SET(TC_SOURCES
         utc-Dali-ConstraintSource.cpp
         utc-Dali-Core.cpp
         utc-Dali-CustomActor.cpp
+        utc-Dali-DecoratedVisualRenderer.cpp
         utc-Dali-Degree.cpp
         utc-Dali-DistanceField.cpp
         utc-Dali-DrawableActor.cpp
@@ -69,7 +70,6 @@ SET(TC_SOURCES
         utc-Dali-Random.cpp
         utc-Dali-Rect.cpp
         utc-Dali-Renderer.cpp
-        utc-Dali-VisualRenderer.cpp
         utc-Dali-RenderTask.cpp
         utc-Dali-RenderTaskList.cpp
         utc-Dali-RotationGestureDetector.cpp
@@ -100,6 +100,7 @@ SET(TC_SOURCES
         utc-Dali-Vector3.cpp
         utc-Dali-Vector4.cpp
         utc-Dali-VertexBuffer.cpp
+        utc-Dali-VisualRenderer.cpp
         utc-Dali-WeakHandle.cpp
         utc-Dali-WheelEvent.cpp
 )

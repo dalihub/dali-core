@@ -3521,6 +3521,85 @@ int UtcDaliRendererRegenerateUniformMap(void)
   END_TEST;
 }
 
+int UtcDaliRendererRenderAfterAddShader(void)
+{
+  TestApplication    application;
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+
+  tet_infoline("Test regenerating uniform map when shader changed");
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader   shader1  = Shader::New("vertexSrc1", "fragmentSrc1");
+  Shader   shader2  = Shader::New("vertexSrc2", "fragmentSrc2");
+  Renderer renderer = Renderer::New(geometry, shader1);
+
+  // Register each shader1 and shader2 only had
+  shader1.RegisterProperty("uUniform1", Color::CRIMSON);
+  shader2.RegisterProperty("uShader2Only", Color::AQUA_MARINE);
+
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+  actor.SetProperty(Actor::Property::COLOR, Vector4(1.0f, 0.0f, 1.0f, 1.0f));
+  application.GetScene().Add(actor);
+
+  Property::Value value = renderer.GetProperty(DevelRenderer::Property::RENDERING_BEHAVIOR);
+  int             renderingBehavior;
+  DALI_TEST_CHECK(value.Get(renderingBehavior));
+  DALI_TEST_EQUALS(static_cast<DevelRenderer::Rendering::Type>(renderingBehavior), DevelRenderer::Rendering::IF_REQUIRED, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(0);
+
+  // Check uUniform1 rendered and uUniform2 not rendered before
+  Vector4 actualValue(Vector4::ZERO);
+  DALI_TEST_CHECK(glAbstraction.GetUniformValue<Vector4>("uUniform1", actualValue));
+  DALI_TEST_EQUALS(actualValue, Color::CRIMSON, TEST_LOCATION);
+
+  uint32_t updateStatus = application.GetUpdateStatus();
+
+  DALI_TEST_CHECK(!(updateStatus & Integration::KeepUpdating::STAGE_KEEP_RENDERING));
+
+  // Update for several frames
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
+  drawTrace.Enable(true);
+  drawTrace.Reset();
+
+  std::vector<UniformData> customUniforms{{"uShader2Only", Property::VECTOR4}};
+
+  application.GetGraphicsController().AddCustomUniforms(customUniforms);
+
+  // Change shader.
+  renderer.SetShader(shader2);
+
+  // Render and check the update status
+  application.SendNotification();
+  application.Render(0);
+
+  updateStatus = application.GetUpdateStatus();
+
+  DALI_TEST_CHECK(!(updateStatus & Integration::KeepUpdating::STAGE_KEEP_RENDERING));
+
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION);
+
+  // Check uUniform2 rendered now
+  DALI_TEST_CHECK(glAbstraction.GetUniformValue<Vector4>("uShader2Only", actualValue));
+  DALI_TEST_EQUALS(actualValue, Color::AQUA_MARINE, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliRendererAddDrawCommands(void)
 {
   TestApplication application;

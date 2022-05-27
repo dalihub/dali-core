@@ -566,18 +566,24 @@ int Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::No
   // Usual case is to only have 1 node, however we do allow multiple nodes to reuse the same
   // renderer, so we have to cache uniform map per render item (node / renderer pair).
 
-  const void* nodePtr = static_cast<const void*>(&node);
-  auto        iter    = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [nodePtr](RenderItemLookup& element) { return element.node == nodePtr; });
+  // Specially, if node don't have uniformMap, we mark nodePtr as nullptr.
+  // So, all nodes without uniformMap will share same UniformIndexMap, contains only render data providers.
+  const auto nodePtr = uniformMapNode.Count() ? &node : nullptr;
+
+  const auto nodeChangeCounter          = nodePtr ? uniformMapNode.GetChangeCounter() : 0;
+  const auto renderItemMapChangeCounter = uniformMap.GetChangeCounter();
+
+  auto iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [nodePtr](RenderItemLookup& element) { return element.node == nodePtr; });
 
   int renderItemMapIndex;
   if(iter == mNodeIndexMap.end())
   {
     renderItemMapIndex = mUniformIndexMaps.size();
     RenderItemLookup renderItemLookup;
-    renderItemLookup.node                       = &node;
+    renderItemLookup.node                       = nodePtr;
     renderItemLookup.index                      = renderItemMapIndex;
-    renderItemLookup.nodeChangeCounter          = uniformMapNode.GetChangeCounter();
-    renderItemLookup.renderItemMapChangeCounter = uniformMap.GetChangeCounter();
+    renderItemLookup.nodeChangeCounter          = nodeChangeCounter;
+    renderItemLookup.renderItemMapChangeCounter = renderItemMapChangeCounter;
     mNodeIndexMap.emplace_back(renderItemLookup);
 
     updateMaps = true;
@@ -587,12 +593,12 @@ int Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::No
   {
     renderItemMapIndex = iter->index;
 
-    updateMaps = (uniformMapNode.GetChangeCounter() != iter->nodeChangeCounter) ||
-                 (uniformMap.GetChangeCounter() != iter->renderItemMapChangeCounter) ||
+    updateMaps = (nodeChangeCounter != iter->nodeChangeCounter) ||
+                 (renderItemMapChangeCounter != iter->renderItemMapChangeCounter) ||
                  (mUniformIndexMaps[renderItemMapIndex].size() == 0);
 
-    iter->nodeChangeCounter          = uniformMapNode.GetChangeCounter();
-    iter->renderItemMapChangeCounter = uniformMap.GetChangeCounter();
+    iter->nodeChangeCounter          = nodeChangeCounter;
+    iter->renderItemMapChangeCounter = renderItemMapChangeCounter;
   }
 
   if(updateMaps || mShaderChanged)

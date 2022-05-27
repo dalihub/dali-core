@@ -143,8 +143,10 @@ bool CompareItems3DWithClipping(const RenderInstructionProcessor::SortAttributes
  * @param[in,out] nodeWorldMatrix The world matrix of the node
  * @param[in,out] nodeSize The size of the node
  * @param[in,out] nodeUpdateSize The update size of the node
+ *
+ * @return True if node use it's own UpdateSizeHint, or z transform occured. False if we use nodeUpdateSize equal with nodeSize.
  */
-inline void SetNodeUpdateSize(Node* node, bool isLayer3d, Matrix& nodeWorldMatrix, Vector3& nodeSize, Vector3& nodeUpdateSize)
+inline bool SetNodeUpdateSize(Node* node, bool isLayer3d, Matrix& nodeWorldMatrix, Vector3& nodeSize, Vector3& nodeUpdateSize)
 {
   node->GetWorldMatrixAndSize(nodeWorldMatrix, nodeSize);
 
@@ -155,11 +157,15 @@ inline void SetNodeUpdateSize(Node* node, bool isLayer3d, Matrix& nodeWorldMatri
     if(!isLayer3d && nodeWorldMatrix.GetZAxis() == Vector3(0.0f, 0.0f, 1.0f))
     {
       nodeUpdateSize = nodeSize;
+      return false;
     }
+    // Keep nodeUpdateSize as Vector3::ZERO, and return true.
+    return true;
   }
   else
   {
     nodeUpdateSize = node->GetUpdateSizeHint();
+    return true;
   }
 }
 
@@ -191,6 +197,7 @@ inline void AddRendererToRenderList(BufferIndex         updateBufferIndex,
   Vector3 nodeSize;
   Vector3 nodeUpdateSize;
   bool    nodeUpdateSizeSet(false);
+  bool    nodeUpdateSizeUseHint(false);
   Matrix  nodeModelViewMatrix(false);
   bool    nodeModelViewMatrixSet(false);
 
@@ -205,8 +212,8 @@ inline void AddRendererToRenderList(BufferIndex         updateBufferIndex,
 
     if(inside && !isLayer3d && viewportSet)
     {
-      SetNodeUpdateSize(node, isLayer3d, nodeWorldMatrix, nodeSize, nodeUpdateSize);
-      nodeUpdateSizeSet = true;
+      nodeUpdateSizeUseHint = SetNodeUpdateSize(node, isLayer3d, nodeWorldMatrix, nodeSize, nodeUpdateSize);
+      nodeUpdateSizeSet     = true;
 
       const Vector3& scale = node->GetWorldScale(updateBufferIndex);
       const Vector3& size  = nodeUpdateSize * scale;
@@ -280,8 +287,8 @@ inline void AddRendererToRenderList(BufferIndex         updateBufferIndex,
         item.mTextureSet = renderable.mRenderer->GetTextureSet();
         item.mDepthIndex += renderable.mRenderer->GetDepthIndex();
 
-        // Ensure collected map is up to date
-        item.mIsUpdated |= renderable.mRenderer->UpdateUniformMap();
+        // Get whether collected map is up to date
+        item.mIsUpdated |= renderable.mRenderer->UniformMapUpdated();
       }
       else
       {
@@ -292,12 +299,18 @@ inline void AddRendererToRenderList(BufferIndex         updateBufferIndex,
 
       if(!nodeUpdateSizeSet)
       {
-        SetNodeUpdateSize(node, isLayer3d, nodeWorldMatrix, nodeSize, nodeUpdateSize);
+        nodeUpdateSizeUseHint = SetNodeUpdateSize(node, isLayer3d, nodeWorldMatrix, nodeSize, nodeUpdateSize);
       }
 
       item.mSize        = nodeSize;
       item.mUpdateSize  = nodeUpdateSize;
       item.mModelMatrix = nodeWorldMatrix;
+
+      // Apply transform informations if node doesn't have update size hint and use VisualRenderer.
+      if(!nodeUpdateSizeUseHint && renderable.mRenderer && renderable.mRenderer->GetVisualProperties())
+      {
+        item.mUpdateSize = renderable.mRenderer->CalculateVisualTransformedUpdateSize(updateBufferIndex, item.mUpdateSize);
+      }
 
       if(!nodeModelViewMatrixSet)
       {

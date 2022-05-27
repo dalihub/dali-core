@@ -91,6 +91,7 @@ SET( internal_src_files
   ${internal_src_dir}/event/images/pixel-data-impl.cpp
   ${internal_src_dir}/event/render-tasks/render-task-impl.cpp
   ${internal_src_dir}/event/render-tasks/render-task-list-impl.cpp
+  ${internal_src_dir}/event/rendering/decorated-visual-renderer-impl.cpp
   ${internal_src_dir}/event/rendering/frame-buffer-impl.cpp
   ${internal_src_dir}/event/rendering/geometry-impl.cpp
   ${internal_src_dir}/event/rendering/texture-impl.cpp

@@ -104,6 +104,7 @@
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/render-tasks/render-task.h>
 
+#include <dali/public-api/rendering/decorated-visual-renderer.h>
 #include <dali/public-api/rendering/frame-buffer.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/renderer.h>

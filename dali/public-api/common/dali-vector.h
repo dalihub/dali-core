@@ -2,7 +2,7 @@
 #define DALI_VECTOR_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,21 @@
 #include <dali/public-api/common/type-traits.h>
 #include <dali/public-api/math/math-utils.h>
 
+/**
+ * @brief For DALi internal use, asserts are enabled in debug builds.
+ *
+ * For Application use, asserts can be enabled manually.
+ * @SINCE_2_1.23
+ */
+#if defined(DEBUG_ENABLED)
+#define ENABLE_VECTOR_ASSERTS
+#endif
+
+#if defined(ENABLE_VECTOR_ASSERTS)
 #define DALI_ASSERT_VECTOR(cond) DALI_ASSERT_ALWAYS(cond)
+#else
+#define DALI_ASSERT_VECTOR(cond)
+#endif
 
 namespace Dali
 {
