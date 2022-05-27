@@ -228,10 +228,6 @@ struct UpdateManager::Impl
     scenes.clear();
 
     delete sceneController;
-
-    // Ensure to clear renderers
-    renderers.Clear();
-    shaders.Clear();
   }
 
   /**

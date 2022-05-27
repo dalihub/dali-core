@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,8 +95,8 @@ void DiscardQueue::Clear(BufferIndex updateBufferIndex)
 {
   // Destroy some discarded objects; these should no longer own any GL resources
   mNodeQueue[updateBufferIndex].Clear();
-  mRendererQueue[updateBufferIndex].Clear();
   mShaderQueue[updateBufferIndex].Clear();
+  mRendererQueue[updateBufferIndex].Clear();
   mCameraQueue[updateBufferIndex].Clear();
   mSceneQueue[updateBufferIndex].Clear();
 }
