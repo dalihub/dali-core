@@ -28,7 +28,7 @@ namespace SceneGraph
 void UniformMap::AddObserver(Observer& observer)
 {
   bool foundObserver = false;
-  for(ObserversIter iter = mObservers.Begin(); iter != mObservers.End(); ++iter)
+  for(ObserversIter iter = mObservers.Begin(), endIter = mObservers.End(); iter != endIter; ++iter)
   {
     if(*iter == &observer)
     {
@@ -44,7 +44,7 @@ void UniformMap::AddObserver(Observer& observer)
 
 void UniformMap::RemoveObserver(Observer& observer)
 {
-  for(ObserversIter iter = mObservers.Begin(); iter != mObservers.End(); ++iter)
+  for(ObserversIter iter = mObservers.Begin(), endIter = mObservers.End(); iter != endIter; ++iter)
   {
     if(*iter == &observer)
     {
@@ -57,7 +57,7 @@ void UniformMap::RemoveObserver(Observer& observer)
 void UniformMap::MappingChanged()
 {
   ++mChangeCounter;
-  for(ObserversIter iter = mObservers.Begin(); iter != mObservers.End(); ++iter)
+  for(ObserversIter iter = mObservers.Begin(), endIter = mObservers.End(); iter != endIter; ++iter)
   {
     Observer* observer = (*iter);
     observer->UniformMappingsChanged(*this);
