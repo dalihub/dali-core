@@ -429,12 +429,26 @@ int UtcDaliSceneGet(void)
 
   Dali::Integration::Scene scene = application.GetScene();
 
-  Actor actor = Actor::New();
-  DALI_TEST_CHECK(Dali::Integration::Scene() == Dali::Integration::Scene::Get(actor));
+  Actor parent = Actor::New();
+  Actor child  = Actor::New();
 
-  scene.Add(actor);
+  parent.Add(child);
 
-  DALI_TEST_CHECK(scene == Dali::Integration::Scene::Get(actor));
+  // Should be empty scene
+  DALI_TEST_CHECK(Dali::Integration::Scene() == Dali::Integration::Scene::Get(parent));
+  DALI_TEST_CHECK(Dali::Integration::Scene() == Dali::Integration::Scene::Get(child));
+
+  scene.Add(parent);
+
+  // Should return the valid scene
+  DALI_TEST_CHECK(scene == Dali::Integration::Scene::Get(parent));
+  DALI_TEST_CHECK(scene == Dali::Integration::Scene::Get(child));
+
+  parent.Unparent();
+
+  // Should be empty scene
+  DALI_TEST_CHECK(Dali::Integration::Scene() == Dali::Integration::Scene::Get(parent));
+  DALI_TEST_CHECK(Dali::Integration::Scene() == Dali::Integration::Scene::Get(child));
 
   END_TEST;
 }
