@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_GESTURE_REQUESTS_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,9 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/events/gesture.h>
+
+// EXTERNAL INCLUDES
+#include <limits> // for numeric_limits::max();
 
 namespace Dali
 {
@@ -64,7 +67,8 @@ struct PanGestureRequest : public GestureRequest
   PanGestureRequest()
   : GestureRequest(GestureType::PAN),
     minTouches(1),
-    maxTouches(1)
+    maxTouches(1),
+    maxMotionEventAge(std::numeric_limits<uint32_t>::max())
   {
   }
 
@@ -75,8 +79,9 @@ struct PanGestureRequest : public GestureRequest
 
   // Data Members
 
-  unsigned int minTouches; ///< The minimum number of touch points required for a pan gesture.
-  unsigned int maxTouches; ///< The maximum number of touch points required for a pan gesture.
+  uint32_t minTouches;        ///< The minimum number of touch points required for a pan gesture.
+  uint32_t maxTouches;        ///< The maximum number of touch points required for a pan gesture.
+  uint32_t maxMotionEventAge; ///< The maximum age of motion events as milliseconds.
 };
 
 /**

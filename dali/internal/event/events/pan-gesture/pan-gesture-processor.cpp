@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -279,10 +279,12 @@ void PanGestureProcessor::AddGestureDetector(PanGestureDetector* gestureDetector
   {
     mMinTouchesRequired = gestureDetector->GetMinimumTouchesRequired();
     mMaxTouchesRequired = gestureDetector->GetMaximumTouchesRequired();
+    mMaxMotionEventAge  = gestureDetector->GetMaximumMotionEventAge();
 
     PanGestureRequest request;
-    request.minTouches = mMinTouchesRequired;
-    request.maxTouches = mMaxTouchesRequired;
+    request.minTouches        = mMinTouchesRequired;
+    request.maxTouches        = mMaxTouchesRequired;
+    request.maxMotionEventAge = mMaxMotionEventAge;
 
     Size size          = scene.GetSize();
     mGestureRecognizer = new PanGestureRecognizer(*this, Vector2(size.width, size.height), static_cast<const PanGestureRequest&>(request), minDistance, minPanEvents);
@@ -451,8 +453,9 @@ void PanGestureProcessor::UpdateDetection()
 {
   DALI_ASSERT_DEBUG(!mPanGestureDetectors.empty());
 
-  unsigned int minimumRequired = UINT_MAX;
-  unsigned int maximumRequired = 0;
+  uint32_t minimumRequired       = std::numeric_limits<uint32_t>::max();
+  uint32_t maximumRequired       = 0;
+  uint32_t maximumMotionEventAge = std::numeric_limits<uint32_t>::max();
 
   for(PanGestureDetectorContainer::iterator iter = mPanGestureDetectors.begin(), endIter = mPanGestureDetectors.end(); iter != endIter; ++iter)
   {
@@ -460,28 +463,36 @@ void PanGestureProcessor::UpdateDetection()
 
     if(detector)
     {
-      unsigned int minimum = detector->GetMinimumTouchesRequired();
+      uint32_t minimum = detector->GetMinimumTouchesRequired();
       if(minimum < minimumRequired)
       {
         minimumRequired = minimum;
       }
 
-      unsigned int maximum = detector->GetMaximumTouchesRequired();
+      uint32_t maximum = detector->GetMaximumTouchesRequired();
       if(maximum > maximumRequired)
       {
         maximumRequired = maximum;
       }
+
+      uint32_t maximumAge = detector->GetMaximumMotionEventAge();
+      if(maximumAge > maximumMotionEventAge)
+      {
+        maximumMotionEventAge = maximumAge;
+      }
     }
   }
 
-  if((minimumRequired != mMinTouchesRequired) || (maximumRequired != mMaxTouchesRequired))
+  if((minimumRequired != mMinTouchesRequired) || (maximumRequired != mMaxTouchesRequired) || (maximumMotionEventAge != mMaxMotionEventAge))
   {
     mMinTouchesRequired = minimumRequired;
     mMaxTouchesRequired = maximumRequired;
+    mMaxMotionEventAge  = maximumMotionEventAge;
 
     PanGestureRequest request;
-    request.minTouches = mMinTouchesRequired;
-    request.maxTouches = mMaxTouchesRequired;
+    request.minTouches        = mMinTouchesRequired;
+    request.maxTouches        = mMaxTouchesRequired;
+    request.maxMotionEventAge = mMaxMotionEventAge;
     mGestureRecognizer->Update(request);
   }
 }

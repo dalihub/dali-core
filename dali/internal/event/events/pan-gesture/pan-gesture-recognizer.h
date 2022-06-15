@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_EVENT_PAN_GESTURE_RECOGNIZER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,8 +49,10 @@ public:
 
   /**
    * Constructor
-   * @param[in]  screenSize  The size of the screen.
-   * @param[in]  request     The details of the request.
+   * @param[in] screenSize       The size of the screen.
+   * @param[in] request          The details of the request.
+   * @param[in] minimumDistance  The minimum required motion distance to start pan gesture. If this value is less than 0, we use default setuped distance.
+   * @param[in] minimumPanEvents The minimum required motion event number to start pan gesture. If this value is less than 1, we use default setuped number.
    */
   PanGestureRecognizer(Observer& observer, Vector2 screenSize, const PanGestureRequest& request, int32_t minimumDistance, int32_t minimumPanEvents);
 
@@ -101,16 +103,18 @@ private:
   Vector2 mThresholdAdjustmentPerFrame; ///< The adjustment per frame at the start of a slow pan.
   Vector2 mPreviousPosition;            ///< The previous position.
 
-  unsigned int mThresholdAdjustmentsRemaining; ///< No. of threshold adjustments still to apply (for a slow-pan).
-  unsigned int mThresholdTotalAdjustments;     ///< The total number of adjustments required.
+  uint32_t mThresholdAdjustmentsRemaining; ///< No. of threshold adjustments still to apply (for a slow-pan).
+  uint32_t mThresholdTotalAdjustments;     ///< The total number of adjustments required.
 
-  uint32_t     mPrimaryTouchDownTime;   ///< The initial touch down time.
-  unsigned int mMinimumTouchesRequired; ///< The minimum touches required before a pan should be emitted.
-  unsigned int mMaximumTouchesRequired; ///< The maximum touches after which a pan should not be emitted.
+  uint32_t mPrimaryTouchDownTime;   ///< The initial touch down time.
+  uint32_t mMinimumTouchesRequired; ///< The minimum touches required before a pan should be emitted.
+  uint32_t mMaximumTouchesRequired; ///< The maximum touches after which a pan should not be emitted.
 
-  unsigned int mMinimumDistanceSquared; ///< The minimum distance squared before pan should start.
-  unsigned int mMinimumMotionEvents;    ///< The minimum motion events before pan should start.
-  unsigned int mMotionEvents;           ///< The motion events received so far (before pan is emitted).
+  uint32_t mMinimumDistanceSquared; ///< The minimum distance squared before pan should start.
+  uint32_t mMinimumMotionEvents;    ///< The minimum motion events before pan should start.
+  uint32_t mMotionEvents;           ///< The motion events received so far (before pan is emitted).
+
+  uint32_t mMaximumMotionEventAge; ///< The maximum acceptable motion event age as Milliseconds.
 };
 
 } // namespace Internal

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_EVENT_PAN_GESTURE_EVENT_PROCESSOR_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,7 +74,10 @@ public: // To be called by GestureEventProcessor
    * Adds a gesture detector to this gesture processor.
    * If this is the first gesture detector being added, then this method registers the required
    * gesture with the adaptor.
-   * @param[in]  gestureDetector  The gesture detector being added.
+   * @param[in] gestureDetector The gesture detector being added.
+   * @param[in] scene           The scene the pan gesture event occurs in.
+   * @param[in] minDistance     The minimum required motion distance to start pan gesture. If this value is less than 0, we use default setuped distance.
+   * @param[in] minPanEvents    The minimum required motion event number to start pan gesture. If this value is less than 1, we use default setuped number.
    */
   void AddGestureDetector(PanGestureDetector* gestureDetector, Scene& scene, int32_t minDistance, int32_t minPanEvents);
 
@@ -276,6 +279,7 @@ private:
 
   uint32_t mMinTouchesRequired;
   uint32_t mMaxTouchesRequired;
+  uint32_t mMaxMotionEventAge;
 
   Vector2 mLastVelocity;       ///< The last recorded velocity in local actor coordinates.
   Vector2 mLastScreenVelocity; ///< The last recorded velocity in screen coordinates.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,13 +95,13 @@ PanGestureDetectorPtr PanGestureDetector::New()
   return new PanGestureDetector(sceneObject);
 }
 
-void PanGestureDetector::SetMinimumTouchesRequired(unsigned int minimum)
+void PanGestureDetector::SetMinimumTouchesRequired(uint32_t minimum)
 {
   DALI_ASSERT_ALWAYS(minimum > 0 && "Can only set a positive number of required touches");
 
   if(mMinimumTouches != minimum)
   {
-    DALI_LOG_INFO(gLogFilter, Debug::Concise, "Minimum Touches Set: %d\n", minimum);
+    DALI_LOG_INFO(gLogFilter, Debug::Concise, "Minimum Touches Set: %u\n", minimum);
 
     mMinimumTouches = minimum;
 
@@ -114,15 +114,32 @@ void PanGestureDetector::SetMinimumTouchesRequired(unsigned int minimum)
   }
 }
 
-void PanGestureDetector::SetMaximumTouchesRequired(unsigned int maximum)
+void PanGestureDetector::SetMaximumTouchesRequired(uint32_t maximum)
 {
   DALI_ASSERT_ALWAYS(maximum > 0 && "Can only set a positive number of maximum touches");
 
   if(mMaximumTouches != maximum)
   {
-    DALI_LOG_INFO(gLogFilter, Debug::Concise, "Maximum Touches Set: %d\n", maximum);
+    DALI_LOG_INFO(gLogFilter, Debug::Concise, "Maximum Touches Set: %u\n", maximum);
 
     mMaximumTouches = maximum;
+
+    if(!mAttachedActors.empty())
+    {
+      DALI_LOG_INFO(gLogFilter, Debug::General, "Updating Gesture Detector\n");
+
+      mGestureEventProcessor.GestureDetectorUpdated(this);
+    }
+  }
+}
+
+void PanGestureDetector::SetMaximumMotionEventAge(uint32_t maximumAge)
+{
+  if(mMaximumMotionEventAge != maximumAge)
+  {
+    DALI_LOG_INFO(gLogFilter, Debug::Concise, "Maximum Motion Age Set: %u ms\n", maximumAge);
+
+    mMaximumMotionEventAge = maximumAge;
 
     if(!mAttachedActors.empty())
     {
@@ -141,6 +158,11 @@ uint32_t PanGestureDetector::GetMinimumTouchesRequired() const
 uint32_t PanGestureDetector::GetMaximumTouchesRequired() const
 {
   return mMaximumTouches;
+}
+
+uint32_t PanGestureDetector::GetMaximumMotionEventAge() const
+{
+  return mMaximumMotionEventAge;
 }
 
 void PanGestureDetector::AddAngle(Radian angle, Radian threshold)
@@ -292,7 +314,8 @@ void PanGestureDetector::SetPanGestureProperties(const Dali::PanGesture& pan)
 PanGestureDetector::PanGestureDetector(const SceneGraph::PanGesture& sceneObject)
 : GestureDetector(GestureType::PAN, &sceneObject),
   mMinimumTouches(1),
-  mMaximumTouches(1)
+  mMaximumTouches(1),
+  mMaximumMotionEventAge(std::numeric_limits<uint32_t>::max())
 {
 }
 
