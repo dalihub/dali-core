@@ -408,9 +408,9 @@ int UtcDaliPanGestureSetMaximumMotionEventAge(void)
   detector.Attach(actor);
   detector.DetectedSignal().Connect(&application, functor);
 
-  detector.SetMaximumMotionEventAge(minTime / 2);
+  detector.SetMaximumMotionEventAge(minTime * 2);
 
-  DALI_TEST_EQUALS(minTime / 2, detector.GetMaximumMotionEventAge(), TEST_LOCATION);
+  DALI_TEST_EQUALS(minTime * 2, detector.GetMaximumMotionEventAge(), TEST_LOCATION);
 
   END_TEST;
 }

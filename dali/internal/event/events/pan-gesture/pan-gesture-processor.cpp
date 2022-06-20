@@ -476,7 +476,7 @@ void PanGestureProcessor::UpdateDetection()
       }
 
       uint32_t maximumAge = detector->GetMaximumMotionEventAge();
-      if(maximumAge > maximumMotionEventAge)
+      if(maximumAge < maximumMotionEventAge)
       {
         maximumMotionEventAge = maximumAge;
       }
