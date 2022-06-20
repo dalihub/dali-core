@@ -128,6 +128,7 @@ PanGestureProcessor::PanGestureProcessor(SceneGraph::UpdateManager& updateManage
   mPossiblePanPosition(),
   mMinTouchesRequired(1),
   mMaxTouchesRequired(1),
+  mMaxMotionEventAge(std::numeric_limits<uint32_t>::max()),
   mCurrentPanEvent(nullptr),
   mSceneObject(SceneGraph::PanGesture::New()) // Create scene object to store pan information.
 {
