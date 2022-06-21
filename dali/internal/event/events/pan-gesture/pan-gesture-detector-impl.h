@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PAN_GESTURE_DETECTOR_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,14 +59,19 @@ public: // Creation
 
 public:
   /**
-   * @copydoc Dali::PanGestureDetector::SetMinimumTouchesRequired(unsigned int)
+   * @copydoc Dali::PanGestureDetector::SetMinimumTouchesRequired(uint32_t)
    */
-  void SetMinimumTouchesRequired(unsigned int minimum);
+  void SetMinimumTouchesRequired(uint32_t minimum);
 
   /**
-   * @copydoc Dali::PanGestureDetector::SetMaximumTouchesRequired(unsigned int)
+   * @copydoc Dali::PanGestureDetector::SetMaximumTouchesRequired(uint32_t)
    */
-  void SetMaximumTouchesRequired(unsigned int maximum);
+  void SetMaximumTouchesRequired(uint32_t maximum);
+
+  /**
+   * @copydoc Dali::PanGestureDetector::SetMaximumMotionEventAge(uint32_t)
+   */
+  void SetMaximumMotionEventAge(uint32_t maximumAge);
 
   /**
    * @copydoc Dali::PanGestureDetector::GetMinimumTouchesRequired() const
@@ -77,6 +82,11 @@ public:
    * @copydoc Dali::PanGestureDetector::GetMaximumTouchesRequired() const
    */
   uint32_t GetMaximumTouchesRequired() const;
+
+  /**
+   * @copydoc Dali::PanGestureDetector::GetMaximumMotionEventAge() const
+   */
+  uint32_t GetMaximumMotionEventAge() const;
 
   /**
    * @copydoc Dali::PanGestureDetector::AddAngle()
@@ -225,8 +235,9 @@ private:
 private:
   Dali::PanGestureDetector::DetectedSignalType mDetectedSignal;
 
-  unsigned int mMinimumTouches; ///< The minimum number of fingers required to be touching for pan.
-  unsigned int mMaximumTouches; ///< The maximum number of fingers required to be touching for pan.
+  uint32_t mMinimumTouches;        ///< The minimum number of fingers required to be touching for pan.
+  uint32_t mMaximumTouches;        ///< The maximum number of fingers required to be touching for pan.
+  uint32_t mMaximumMotionEventAge; ///< The maximum age of motion events as milliseconds.
 
   AngleContainer mAngleContainer; ///< A container of all angles allowed for pan to occur.
 };

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,6 +70,11 @@ void PanGestureDetector::SetMaximumTouchesRequired(uint32_t maximum)
   GetImplementation(*this).SetMaximumTouchesRequired(maximum);
 }
 
+void PanGestureDetector::SetMaximumMotionEventAge(uint32_t maximumAge)
+{
+  GetImplementation(*this).SetMaximumMotionEventAge(maximumAge);
+}
+
 uint32_t PanGestureDetector::GetMinimumTouchesRequired() const
 {
   return GetImplementation(*this).GetMinimumTouchesRequired();
@@ -78,6 +83,11 @@ uint32_t PanGestureDetector::GetMinimumTouchesRequired() const
 uint32_t PanGestureDetector::GetMaximumTouchesRequired() const
 {
   return GetImplementation(*this).GetMaximumTouchesRequired();
+}
+
+uint32_t PanGestureDetector::GetMaximumMotionEventAge() const
+{
+  return GetImplementation(*this).GetMaximumMotionEventAge();
 }
 
 void PanGestureDetector::AddAngle(Radian angle, Radian threshold)

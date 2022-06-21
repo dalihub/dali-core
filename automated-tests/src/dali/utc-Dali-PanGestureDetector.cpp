@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -249,6 +249,7 @@ int UtcDaliPanGestureDetectorNew(void)
 
   DALI_TEST_EQUALS(1u, detector.GetMinimumTouchesRequired(), TEST_LOCATION);
   DALI_TEST_EQUALS(1u, detector.GetMaximumTouchesRequired(), TEST_LOCATION);
+  DALI_TEST_EQUALS(std::numeric_limits<uint32_t>::max(), detector.GetMaximumMotionEventAge(), TEST_LOCATION);
 
   // Attach an actor and emit a touch event on the actor to ensure complete line coverage
   Actor actor = Actor::New();
@@ -376,6 +377,44 @@ int UtcDaliPanGestureSetMaximumTouchesRequired(void)
   END_TEST;
 }
 
+int UtcDaliPanGestureSetMaximumMotionEventAge(void)
+{
+  TestApplication application;
+
+  PanGestureDetector detector = PanGestureDetector::New();
+
+  uint32_t minTime = 20;
+
+  DALI_TEST_CHECK(minTime != detector.GetMaximumMotionEventAge());
+
+  detector.SetMaximumMotionEventAge(minTime);
+
+  DALI_TEST_EQUALS(minTime, detector.GetMaximumMotionEventAge(), TEST_LOCATION);
+
+  // Attach an actor and change the maximum touches
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+
+  detector.Attach(actor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  detector.SetMaximumMotionEventAge(minTime * 2);
+
+  DALI_TEST_EQUALS(minTime * 2, detector.GetMaximumMotionEventAge(), TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliPanGestureGetMinimumTouchesRequired(void)
 {
   TestApplication application;
@@ -391,6 +430,15 @@ int UtcDaliPanGestureGetMaximumTouchesRequired(void)
 
   PanGestureDetector detector = PanGestureDetector::New();
   DALI_TEST_EQUALS(1u, detector.GetMaximumTouchesRequired(), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliPanGestureGetMaximumMotionEventAge(void)
+{
+  TestApplication application;
+
+  PanGestureDetector detector = PanGestureDetector::New();
+  DALI_TEST_EQUALS(std::numeric_limits<uint32_t>::max(), detector.GetMaximumMotionEventAge(), TEST_LOCATION);
   END_TEST;
 }
 

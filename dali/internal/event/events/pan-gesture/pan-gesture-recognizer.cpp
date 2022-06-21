@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <dali/internal/event/events/pan-gesture/pan-gesture-recognizer.h>
 
 // EXTERNAL INCLUDES
+#include <chrono>
 #include <cmath>
 
 #include <dali/devel-api/events/touch-point.h>
@@ -35,11 +36,21 @@ namespace Internal
 {
 namespace
 {
-const float         MINIMUM_MOTION_DISTANCE_BEFORE_PAN(15.0f);
-const float         MINIMUM_MOTION_DISTANCE_BEFORE_PAN_SQUARED(MINIMUM_MOTION_DISTANCE_BEFORE_PAN* MINIMUM_MOTION_DISTANCE_BEFORE_PAN);
-const float         MINIMUM_MOTION_DISTANCE_TO_THRESHOLD_ADJUSTMENTS_RATIO(2.0f / 3.0f);
-const unsigned long MINIMUM_TIME_BEFORE_THRESHOLD_ADJUSTMENTS(100);
-const unsigned int  MINIMUM_MOTION_EVENTS_BEFORE_PAN(2);
+constexpr float         MINIMUM_MOTION_DISTANCE_BEFORE_PAN(15.0f);
+constexpr float         MINIMUM_MOTION_DISTANCE_BEFORE_PAN_SQUARED(MINIMUM_MOTION_DISTANCE_BEFORE_PAN* MINIMUM_MOTION_DISTANCE_BEFORE_PAN);
+constexpr float         MINIMUM_MOTION_DISTANCE_TO_THRESHOLD_ADJUSTMENTS_RATIO(2.0f / 3.0f);
+constexpr unsigned long MINIMUM_TIME_BEFORE_THRESHOLD_ADJUSTMENTS(100);
+constexpr unsigned int  MINIMUM_MOTION_EVENTS_BEFORE_PAN(2);
+
+uint32_t GetMilliSeconds()
+{
+  // Get the time of a monotonic clock since its epoch.
+  auto epoch = std::chrono::steady_clock::now().time_since_epoch();
+
+  auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(epoch);
+
+  return static_cast<uint32_t>(duration.count());
+}
 } // unnamed namespace
 
 PanGestureRecognizer::PanGestureRecognizer(Observer& observer, Vector2 screenSize, const PanGestureRequest& request, int32_t minimumDistance, int32_t minimumPanEvents)
@@ -53,7 +64,8 @@ PanGestureRecognizer::PanGestureRecognizer(Observer& observer, Vector2 screenSiz
   mMaximumTouchesRequired(request.maxTouches),
   mMinimumDistanceSquared(static_cast<unsigned int>(MINIMUM_MOTION_DISTANCE_BEFORE_PAN_SQUARED)),
   mMinimumMotionEvents(MINIMUM_MOTION_EVENTS_BEFORE_PAN),
-  mMotionEvents(0)
+  mMotionEvents(0),
+  mMaximumMotionEventAge(request.maxMotionEventAge)
 {
   if(minimumDistance >= 0)
   {
@@ -180,9 +192,21 @@ void PanGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
           switch(primaryPointState)
           {
             case PointState::MOTION:
-              // Pan is continuing, tell Core.
-              SendPan(GestureState::CONTINUING, event);
+            {
+              // Check whether this motion event is acceptable or not.
+              // If event time is too old, we should skip this event.
+              if(GetMilliSeconds() - event.time > mMaximumMotionEventAge)
+              {
+                // Too old event. Skip it.
+                mTouchEvents.pop_back();
+              }
+              else
+              {
+                // Pan is continuing, tell Core.
+                SendPan(GestureState::CONTINUING, event);
+              }
               break;
+            }
 
             case PointState::UP:
               // Pan is finally finished when our primary point is lifted, tell Core and change our state to CLEAR.
@@ -253,6 +277,7 @@ void PanGestureRecognizer::Update(const GestureRequest& request)
 
   mMinimumTouchesRequired = pan.minTouches;
   mMaximumTouchesRequired = pan.maxTouches;
+  mMaximumMotionEventAge  = pan.maxMotionEventAge;
 }
 
 void PanGestureRecognizer::SendPan(GestureState state, const Integration::TouchEvent& currentEvent)

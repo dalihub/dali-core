@@ -2,7 +2,7 @@
 #define DALI_PAN_GESTURE_DETECTOR_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -178,6 +178,17 @@ public: // Setters
    */
   void SetMaximumTouchesRequired(uint32_t maximum);
 
+  /**
+   * @brief This value is a maximum duration of motion can live on the pan gesture event queue.
+   * If duration exceed it, the motion event is discarded.
+   *
+   * @SINCE_2_1.28
+   * @param[in] maximumAge Maximum age of motion events as milliseconds
+   * @pre The gesture detector has been initialized.
+   * @note The default maximumAge is 'std::numeric_limits<uint32_t>::max()'.
+   */
+  void SetMaximumMotionEventAge(uint32_t maximumAge);
+
 public: // Getters
   /**
    * @brief Retrieves the minimum number of touches required for the pan gesture to be detected.
@@ -196,6 +207,15 @@ public: // Getters
    * @pre The gesture detector has been initialized.
    */
   uint32_t GetMaximumTouchesRequired() const;
+
+  /**
+   * @brief Retrieves the maximum age for the pan gesture motion as milliseconds.
+   *
+   * @SINCE_2_1.28
+   * @return The maximum age of motion events as milliseconds
+   * @pre The gesture detector has been initialized.
+   */
+  uint32_t GetMaximumMotionEventAge() const;
 
 public: // Directional Panning
   /**
