@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -625,6 +625,16 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
       if(property.Get(value))
       {
         actor.SetUserInteractionEnabled(value);
+      }
+      break;
+    }
+
+    case Dali::DevelActor::Property::ALLOW_ONLY_OWN_TOUCH:
+    {
+      bool boolValue = false;
+      if(property.Get(boolValue))
+      {
+        actor.mAllowOnlyOwnTouch = boolValue;
       }
       break;
     }
@@ -1669,6 +1679,12 @@ bool Actor::PropertyHandler::GetCachedPropertyValue(const Internal::Actor& actor
     case Dali::DevelActor::Property::USER_INTERACTION_ENABLED:
     {
       value = actor.IsUserInteractionEnabled();
+      break;
+    }
+
+    case Dali::DevelActor::Property::ALLOW_ONLY_OWN_TOUCH:
+    {
+      value = actor.mAllowOnlyOwnTouch;
       break;
     }
 

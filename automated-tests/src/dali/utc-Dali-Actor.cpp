@@ -10460,3 +10460,43 @@ int UtcDaliActorDoesWantedHitTest(void)
   }
   END_TEST;
 }
+
+int UtcDaliActorAllowOnlyOwnTouchPropertyP(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  DALI_TEST_EQUALS(actor.GetProperty(DevelActor::Property::ALLOW_ONLY_OWN_TOUCH).Get<bool>(), false, TEST_LOCATION);
+  actor.SetProperty(DevelActor::Property::ALLOW_ONLY_OWN_TOUCH, true);
+  DALI_TEST_EQUALS(actor.GetProperty(DevelActor::Property::ALLOW_ONLY_OWN_TOUCH).Get<bool>(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetPropertyType(DevelActor::Property::ALLOW_ONLY_OWN_TOUCH), Property::BOOLEAN, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyWritable(DevelActor::Property::ALLOW_ONLY_OWN_TOUCH), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyAnimatable(DevelActor::Property::ALLOW_ONLY_OWN_TOUCH), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyAConstraintInput(DevelActor::Property::ALLOW_ONLY_OWN_TOUCH), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetPropertyName(DevelActor::Property::ALLOW_ONLY_OWN_TOUCH), "allowOnlyOwnTouch", TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliActorAllowOnlyOwnTouchPropertyN(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  // Make sure setting invalid types does not cause a crash
+  try
+  {
+    actor.SetProperty(DevelActor::Property::ALLOW_ONLY_OWN_TOUCH, 1.0f);
+    actor.SetProperty(DevelActor::Property::ALLOW_ONLY_OWN_TOUCH, Vector2::ONE);
+    actor.SetProperty(DevelActor::Property::ALLOW_ONLY_OWN_TOUCH, Vector3::ONE);
+    actor.SetProperty(DevelActor::Property::ALLOW_ONLY_OWN_TOUCH, Vector4::ONE);
+    actor.SetProperty(DevelActor::Property::ALLOW_ONLY_OWN_TOUCH, Property::Map());
+    actor.SetProperty(DevelActor::Property::ALLOW_ONLY_OWN_TOUCH, Property::Array());
+    tet_result(TET_PASS);
+  }
+  catch(...)
+  {
+    tet_result(TET_FAIL);
+  }
+  END_TEST;
+}

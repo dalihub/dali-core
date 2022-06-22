@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2288,6 +2288,81 @@ int UtcDaliTouchAreaOffset(void)
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(PointState::DOWN, data.receivedTouch.points[0].state, TEST_LOCATION);
   DALI_TEST_CHECK(actor == data.receivedTouch.points[0].hitActor);
+  data.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliTouchEventAllowOnlyOwnTouchPropertySet(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's touched signal
+  SignalData        data;
+  TouchEventFunctor functor(data);
+  actor.TouchedSignal().Connect(&application, functor);
+
+  // Emit a down signal outside of actor, we should not receive the event
+  application.ProcessEvent(GenerateSingleTouch(PointState::STARTED, Vector2(110.0f, 110.0f)));
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Now motion inside of actor, we should receive the event
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(80.0f, 80.0f)));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Up event, should not receive the event
+  application.ProcessEvent(GenerateSingleTouch(PointState::FINISHED, Vector2(110.0f, 110.0f)));
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Now set the only allow own touch property
+  actor.SetProperty(DevelActor::Property::ALLOW_ONLY_OWN_TOUCH, true);
+
+  // Emit a down signal outside of actor, we should not receive the event
+  application.ProcessEvent(GenerateSingleTouch(PointState::STARTED, Vector2(110.0f, 110.0f)));
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Now motion inside of actor, we should NOT receive the event
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(80.0f, 80.0f)));
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Up event, should not receive the event
+  application.ProcessEvent(GenerateSingleTouch(PointState::FINISHED, Vector2(110.0f, 110.0f)));
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Emit a down signal inside of actor, we should receive the event
+  application.ProcessEvent(GenerateSingleTouch(PointState::STARTED, Vector2(10.0f, 10.0f)));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Now motion inside of actor, we should receive the event
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(80.0f, 80.0f)));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Now motion outsize of actor, we should receive the event
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(110.0f, 110.0f)));
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Up event, should receive an interrupted
+  application.ProcessEvent(GenerateSingleTouch(PointState::FINISHED, Vector2(110.0f, 110.0f)));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedTouch.GetPoint(0).state, PointState::INTERRUPTED, TEST_LOCATION);
   data.Reset();
 
   END_TEST;

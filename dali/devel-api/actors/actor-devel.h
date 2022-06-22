@@ -185,6 +185,13 @@ enum Type
   * @note Default value is true.
   */
   USER_INTERACTION_ENABLED,
+
+  /**
+  * @brief It only receive for touch events that started from itself.
+  * @details Name "allowOnlyOwnTouch", type Property::BOOLEAN
+  * @note Default is false.
+  */
+  ALLOW_ONLY_OWN_TOUCH,
 };
 
 } // namespace Property
