@@ -234,6 +234,13 @@ public:
   bool EmitKeyEventGeneratedSignal(const Dali::KeyEvent& event);
 
   /**
+   * Used by the KeyEventProcessor to emit InterceptKeyEventSignal signals.
+   * @param[in] event The key event.
+   * @return The return is true if KeyEvent is consumed, otherwise false.
+   */
+  bool EmitInterceptKeyEventSignal(const Dali::KeyEvent& event);
+
+  /**
    * Emits the event processing finished signal.
    *
    * @see Dali::Scene::SignalEventProcessingFinished()
@@ -288,6 +295,11 @@ public:
    * @copydoc Integration::Scene::KeyEventGeneratedSignal()
    */
   Integration::Scene::KeyEventGeneratedSignalType& KeyEventGeneratedSignal();
+
+  /**
+   * @copydoc Integration::Scene::InterceptKeyEventSignal()
+   */
+  Integration::Scene::KeyEventGeneratedSignalType& InterceptKeyEventSignal();
 
   /**
    * @copydoc Integration::Scene::SignalEventProcessingFinished()
@@ -378,6 +390,7 @@ private:
   // The key event signal
   Integration::Scene::KeyEventSignalType          mKeyEventSignal;
   Integration::Scene::KeyEventGeneratedSignalType mKeyEventGeneratedSignal;
+  Integration::Scene::KeyEventGeneratedSignalType mInterceptKeyEventSignal;
 
   // The event processing finished signal
   Integration::Scene::EventProcessingFinishedSignalType mEventProcessingFinishedSignal;

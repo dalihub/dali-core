@@ -346,6 +346,13 @@ bool Scene::EmitKeyEventGeneratedSignal(const Dali::KeyEvent& event)
   return mKeyEventGeneratedSignal.Emit(event);
 }
 
+bool Scene::EmitInterceptKeyEventSignal(const Dali::KeyEvent& event)
+{
+  // Emit the InterceptKeyEvent signal
+  Dali::Integration::Scene handle(this);
+  return mInterceptKeyEventSignal.Emit(event);
+}
+
 void Scene::EmitEventProcessingFinishedSignal()
 {
   if(!mEventProcessingFinishedSignal.Empty())
@@ -410,6 +417,11 @@ Integration::Scene::KeyEventSignalType& Scene::KeyEventSignal()
 Integration::Scene::KeyEventGeneratedSignalType& Scene::KeyEventGeneratedSignal()
 {
   return mKeyEventGeneratedSignal;
+}
+
+Integration::Scene::KeyEventGeneratedSignalType& Scene::InterceptKeyEventSignal()
+{
+  return mInterceptKeyEventSignal;
 }
 
 Integration::Scene::EventProcessingFinishedSignalType& Scene::EventProcessingFinishedSignal()

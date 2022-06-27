@@ -41,7 +41,11 @@ void KeyEventProcessor::ProcessKeyEvent(const Integration::KeyEvent& event)
   Dali::KeyEvent keyEventHandle(keyEvent.Get());
 
   // Emit the key event signal from the scene.
-  bool consumed = mScene.EmitKeyEventGeneratedSignal(keyEventHandle);
+  bool consumed = mScene.EmitInterceptKeyEventSignal(keyEventHandle);
+  if(!consumed)
+  {
+    consumed = mScene.EmitKeyEventGeneratedSignal(keyEventHandle);
+  }
   if(!consumed)
   {
     mScene.EmitKeyEventSignal(keyEventHandle);

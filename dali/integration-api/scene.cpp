@@ -209,6 +209,11 @@ Scene::KeyEventGeneratedSignalType& Scene::KeyEventGeneratedSignal()
   return GetImplementation(*this).KeyEventGeneratedSignal();
 }
 
+Scene::KeyEventGeneratedSignalType& Scene::InterceptKeyEventSignal()
+{
+  return GetImplementation(*this).InterceptKeyEventSignal();
+}
+
 Scene::TouchEventSignalType& Scene::TouchedSignal()
 {
   return GetImplementation(*this).TouchedSignal();
