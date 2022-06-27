@@ -44,7 +44,11 @@ void KeyEventProcessor::ProcessKeyEvent(const Integration::KeyEvent& event)
   DALI_LOG_RELEASE_INFO("Start processing key event [%s, %d]\n", event.keyName.c_str(), event.state);
 
   // Emit the key event signal from the scene.
-  bool consumed = mScene.EmitKeyEventGeneratedSignal(keyEventHandle);
+  bool consumed = mScene.EmitInterceptKeyEventSignal(keyEventHandle);
+  if(!consumed)
+  {
+    consumed = mScene.EmitKeyEventGeneratedSignal(keyEventHandle);
+  }
   if(!consumed)
   {
     mScene.EmitKeyEventSignal(keyEventHandle);
