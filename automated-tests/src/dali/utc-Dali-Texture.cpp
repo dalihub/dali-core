@@ -1116,3 +1116,24 @@ int UtcDaliTextureApplyFragShaderN2(void)
   DALI_TEST_CHECK(!baseFragShader.compare(fragShader));
   END_TEST;
 }
+
+int UtcDaliTextureGetPixelFormat(void)
+{
+  TestApplication application;
+  uint32_t        width(64);
+  uint32_t        height(64);
+
+  Texture texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  DALI_TEST_EQUALS(texture.GetPixelFormat(), Pixel::RGBA8888, TEST_LOCATION);
+
+  texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGB888, width, height);
+  DALI_TEST_EQUALS(texture.GetPixelFormat(), Pixel::RGB888, TEST_LOCATION);
+
+  texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::L8, width, height);
+  DALI_TEST_EQUALS(texture.GetPixelFormat(), Pixel::L8, TEST_LOCATION);
+
+  texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::CHROMINANCE_U, width, height);
+  DALI_TEST_EQUALS(texture.GetPixelFormat(), Pixel::CHROMINANCE_U, TEST_LOCATION);
+
+  END_TEST;
+}

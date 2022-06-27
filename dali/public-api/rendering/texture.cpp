@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use *this file except in compliance with the License.
@@ -84,6 +84,11 @@ uint32_t Texture::GetWidth() const
 uint32_t Texture::GetHeight() const
 {
   return GetImplementation(*this).GetHeight();
+}
+
+Pixel::Format Texture::GetPixelFormat() const
+{
+  return GetImplementation(*this).GetPixelFormat();
 }
 
 Texture::Texture(Internal::Texture* pointer)
