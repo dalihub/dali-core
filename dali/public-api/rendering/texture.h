@@ -2,7 +2,7 @@
 #define DALI_TEXTURE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -208,6 +208,14 @@ public:
    * @return The height, in pixels, of the texture
    */
   uint32_t GetHeight() const;
+
+  /**
+   * @brief Returns the pixel format of the texture.
+   *
+   * @SINCE_2_1.29
+   * @return The pixel format of the texture
+   */
+  Pixel::Format GetPixelFormat() const;
 
 public:
   /**

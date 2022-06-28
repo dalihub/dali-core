@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_NEW_TEXTURE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ public:
    * @param[in] height The height of the texture
    * @return A smart-pointer to the newly allocated Texture.
    */
-  static TexturePtr New(TextureType::Type type, Pixel::Format format, unsigned int width, unsigned int height);
+  static TexturePtr New(TextureType::Type type, Pixel::Format format, uint32_t width, uint32_t height);
 
   /**
    * @brief Creates a new Texture from a native image
@@ -90,12 +90,12 @@ public:
    * @copydoc Dali::Texture::Upload()
    */
   bool Upload(PixelDataPtr pixelData,
-              unsigned int layer,
-              unsigned int mipmap,
-              unsigned int xOffset,
-              unsigned int yOffset,
-              unsigned int width,
-              unsigned int height);
+              uint32_t     layer,
+              uint32_t     mipmap,
+              uint32_t     xOffset,
+              uint32_t     yOffset,
+              uint32_t     width,
+              uint32_t     height);
 
   /**
    * @copydoc Dali::Texture::GenerateMipmaps()
@@ -105,12 +105,17 @@ public:
   /**
    * @copydoc Dali::Texture::GetWidth()
    */
-  unsigned int GetWidth() const;
+  uint32_t GetWidth() const;
 
   /**
    * @copydoc Dali::Texture::GetHeight()
    */
-  unsigned int GetHeight() const;
+  uint32_t GetHeight() const;
+
+  /**
+   * @copydoc Dali::Texture::GetPixelFormat()
+   */
+  Pixel::Format GetPixelFormat() const;
 
   /**
    * @brief Determine if the texture is a native image

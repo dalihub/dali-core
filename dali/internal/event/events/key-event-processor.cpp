@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <dali/internal/event/events/key-event-processor.h>
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/events/key-event-impl.h>
@@ -40,12 +41,16 @@ void KeyEventProcessor::ProcessKeyEvent(const Integration::KeyEvent& event)
   KeyEventPtr    keyEvent(new KeyEvent(event.keyName, event.logicalKey, event.keyString, event.keyCode, event.keyModifier, event.time, static_cast<Dali::KeyEvent::State>(event.state), event.compose, event.deviceName, event.deviceClass, event.deviceSubclass));
   Dali::KeyEvent keyEventHandle(keyEvent.Get());
 
+  DALI_LOG_RELEASE_INFO("Start processing key event [%s, %d]\n", event.keyName.c_str(), event.state);
+
   // Emit the key event signal from the scene.
   bool consumed = mScene.EmitKeyEventGeneratedSignal(keyEventHandle);
   if(!consumed)
   {
     mScene.EmitKeyEventSignal(keyEventHandle);
   }
+
+  DALI_LOG_RELEASE_INFO("End processing key event [consumed = %d]\n", consumed);
 }
 
 } // namespace Internal
