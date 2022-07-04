@@ -1795,3 +1795,82 @@ int UtcDaliSceneWheelEventGeneratedSignalP(void)
   DALI_TEST_CHECK(event2.timeStamp == data.receivedWheelEvent.GetTime());
   END_TEST;
 }
+
+int UtcDaliSceneSignalInterceptKeyEventP(void)
+{
+  TestApplication          application;
+  Dali::Integration::Scene scene = application.GetScene();
+
+  KeyEventSignalData      data;
+  KeyEventReceivedFunctor functor(data);
+  scene.KeyEventSignal().Connect(&application, functor);
+
+  KeyEventGeneratedSignalData      interceptData;
+  KeyEventGeneratedReceivedFunctor interceptFunctor(interceptData);
+  scene.InterceptKeyEventSignal().Connect(&application, interceptFunctor);
+
+  Integration::KeyEvent event("i", "", "i", 0, 0, 0, Integration::KeyEvent::DOWN, "i", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  application.ProcessEvent(event);
+
+  DALI_TEST_EQUALS(true, interceptData.functorCalled, TEST_LOCATION);
+  DALI_TEST_CHECK(event.keyModifier == interceptData.receivedKeyEvent.GetKeyModifier());
+  DALI_TEST_CHECK(event.keyName == interceptData.receivedKeyEvent.GetKeyName());
+  DALI_TEST_CHECK(event.keyString == interceptData.receivedKeyEvent.GetKeyString());
+  DALI_TEST_CHECK(event.state == static_cast<Integration::KeyEvent::State>(interceptData.receivedKeyEvent.GetState()));
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+
+  data.Reset();
+  interceptData.Reset();
+
+  Integration::KeyEvent event2("i", "", "i", 0, 0, 0, Integration::KeyEvent::UP, "i", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  application.ProcessEvent(event2);
+
+  DALI_TEST_EQUALS(true, interceptData.functorCalled, TEST_LOCATION);
+  DALI_TEST_CHECK(event2.keyModifier == interceptData.receivedKeyEvent.GetKeyModifier());
+  DALI_TEST_CHECK(event2.keyName == interceptData.receivedKeyEvent.GetKeyName());
+  DALI_TEST_CHECK(event2.keyString == interceptData.receivedKeyEvent.GetKeyString());
+  DALI_TEST_CHECK(event2.state == static_cast<Integration::KeyEvent::State>(interceptData.receivedKeyEvent.GetState()));
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+
+  data.Reset();
+  interceptData.Reset();
+
+  Integration::KeyEvent event3("a", "", "a", 0, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  application.ProcessEvent(event3);
+
+  DALI_TEST_EQUALS(true, interceptData.functorCalled, TEST_LOCATION);
+  DALI_TEST_CHECK(event3.keyModifier == interceptData.receivedKeyEvent.GetKeyModifier());
+  DALI_TEST_CHECK(event3.keyName == interceptData.receivedKeyEvent.GetKeyName());
+  DALI_TEST_CHECK(event3.keyString == interceptData.receivedKeyEvent.GetKeyString());
+  DALI_TEST_CHECK(event3.state == static_cast<Integration::KeyEvent::State>(interceptData.receivedKeyEvent.GetState()));
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+
+  data.Reset();
+  interceptData.Reset();
+
+  Integration::KeyEvent event4("a", "", "a", 0, 0, 0, Integration::KeyEvent::UP, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  application.ProcessEvent(event4);
+
+  DALI_TEST_EQUALS(true, interceptData.functorCalled, TEST_LOCATION);
+  DALI_TEST_CHECK(event4.keyModifier == interceptData.receivedKeyEvent.GetKeyModifier());
+  DALI_TEST_CHECK(event4.keyName == interceptData.receivedKeyEvent.GetKeyName());
+  DALI_TEST_CHECK(event4.keyString == interceptData.receivedKeyEvent.GetKeyString());
+  DALI_TEST_CHECK(event4.state == static_cast<Integration::KeyEvent::State>(interceptData.receivedKeyEvent.GetState()));
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliSceneSignalInterceptKeyEventN(void)
+{
+  TestApplication          application;
+  Dali::Integration::Scene scene = application.GetScene();
+
+  KeyEventGeneratedSignalData      data;
+  KeyEventGeneratedReceivedFunctor functor(data);
+  scene.InterceptKeyEventSignal().Connect(&application, functor);
+
+  // Check that a non-pressed key events data is not modified.
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+
+  END_TEST;
+}
