@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -312,8 +312,7 @@ bool TapGestureProcessor::CheckGestureDetector(GestureDetector* detector, Actor*
 
   TapGestureDetector* tapDetector(static_cast<TapGestureDetector*>(detector));
 
-  return ((tapDetector->GetMinimumTapsRequired() <= mCurrentTapEvent->numberOfTaps) && (tapDetector->GetMaximumTapsRequired() >= mCurrentTapEvent->numberOfTaps)) &&
-         (tapDetector->GetTouchesRequired() == mCurrentTapEvent->numberOfTouches);
+  return (tapDetector->GetMinimumTapsRequired() <= mCurrentTapEvent->numberOfTaps) && (tapDetector->GetTouchesRequired() == mCurrentTapEvent->numberOfTouches);
 }
 
 void TapGestureProcessor::EmitGestureSignal(Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates)
