@@ -82,7 +82,6 @@ SET( public_api_src_files
   ${public_api_src_dir}/signals/signal-slot-observers.cpp
   ${public_api_src_dir}/signals/base-signal.cpp
   ${public_api_src_dir}/signals/functor-delegate.cpp
-  ${public_api_src_dir}/signals/render-callback.cpp
   ${public_api_src_dir}/object/type-info.cpp
   ${public_api_src_dir}/object/type-registry.cpp
   ${public_api_src_dir}/object/weak-handle.cpp

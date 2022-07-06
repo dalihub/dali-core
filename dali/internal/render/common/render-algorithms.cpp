@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -461,6 +461,17 @@ inline void RenderAlgorithms::SetupScissorClipping(
 
       Graphics::Viewport graphicsViewport = ViewportFromClippingBox(mViewportRectangle, 0);
       commandBuffer.SetScissor(Rect2DFromClippingBox(useScissorBox, orientation, graphicsViewport));
+    }
+  }
+  else
+  {
+    // If there is render callback on the Renderer we need to calculate the scissor box and provide it to the
+    // callback so it may be clipped
+    if(item.mRenderer->GetRenderCallback())
+    {
+      // store clipping box inside the render callback input structure
+      auto& input       = item.mRenderer->GetRenderCallbackInput();
+      input.clippingBox = ClippingBox(RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, item.mSize, mViewportRectangle.width, mViewportRectangle.height));
     }
   }
 }

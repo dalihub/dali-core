@@ -994,6 +994,7 @@ struct TextureProperties
   bool     packed;                   ///< Texture is packed
   Extent2D extent2D;                 ///< Size of texture
   bool     directWriteAccessEnabled; ///< Direct write access (mappable textures)
+  uint32_t nativeHandle;             ///< Native texture handle
 };
 
 /**
