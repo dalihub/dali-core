@@ -2,7 +2,7 @@
 #define DALI_TEST_COMPARE_TYPES_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,111 +109,6 @@ inline bool CompareType<Extents>(Extents extents1, Extents extents2, float epsil
          (extents1.end == extents2.end) &&
          (extents1.top == extents2.top) &&
          (extents1.bottom == extents2.bottom);
-}
-
-template<>
-inline bool CompareType<Property::Value>(Property::Value q1, Property::Value q2, float epsilon)
-{
-  Property::Type type = q1.GetType();
-  if(type != q2.GetType())
-  {
-    return false;
-  }
-
-  bool result = false;
-  switch(type)
-  {
-    case Property::BOOLEAN:
-    {
-      bool a, b;
-      q1.Get(a);
-      q2.Get(b);
-      result = a == b;
-      break;
-    }
-    case Property::INTEGER:
-    {
-      int a, b;
-      q1.Get(a);
-      q2.Get(b);
-      result = a == b;
-      break;
-    }
-    case Property::FLOAT:
-    {
-      float a, b;
-      q1.Get(a);
-      q2.Get(b);
-      result = CompareType<float>(a, b, epsilon);
-      break;
-    }
-    case Property::VECTOR2:
-    {
-      Vector2 a, b;
-      q1.Get(a);
-      q2.Get(b);
-      result = CompareType<Vector2>(a, b, epsilon);
-      break;
-    }
-    case Property::VECTOR3:
-    {
-      Vector3 a, b;
-      q1.Get(a);
-      q2.Get(b);
-      result = CompareType<Vector3>(a, b, epsilon);
-      break;
-    }
-    case Property::RECTANGLE:
-    case Property::VECTOR4:
-    {
-      Vector4 a, b;
-      q1.Get(a);
-      q2.Get(b);
-      result = CompareType<Vector4>(a, b, epsilon);
-      break;
-    }
-    case Property::ROTATION:
-    {
-      Quaternion a, b;
-      q1.Get(a);
-      q2.Get(b);
-      result = CompareType<Quaternion>(a, b, epsilon);
-      break;
-    }
-    case Property::STRING:
-    {
-      std::string a, b;
-      q1.Get(a);
-      q2.Get(b);
-      result = (a.compare(b) == 0);
-      break;
-    }
-    case Property::MATRIX:
-    case Property::MATRIX3:
-    case Property::ARRAY:
-    case Property::MAP:
-    {
-      //TODO: Implement this?
-      DALI_ASSERT_ALWAYS(0 && "Not implemented");
-      result = false;
-      break;
-    }
-    case Property::EXTENTS:
-    {
-      Extents a, b;
-      q1.Get(a);
-      q2.Get(b);
-      result = CompareType<Extents>(a, b, epsilon);
-      break;
-    }
-    case Property::NONE:
-    {
-      result = false;
-      break;
-    }
-  }
-
-  return result;
 }
 
 #endif
