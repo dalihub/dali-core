@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -164,27 +164,32 @@ void TapGestureDetector::EmitTapGestureSignal(Dali::Actor tappedActor, const Dal
     platformAbstraction.CancelTimer(mTimerId);
     mTimerId = 0;
   }
-  if(mMaximumTapsRequired > tap.GetNumberOfTaps() && !mReceiveAllTapEvents)
+
+  if(mMaximumTapsRequired == 0u)
   {
-    mTappedActor = tappedActor;
-
-    Internal::TapGesturePtr internalTap(new Internal::TapGesture(tap.GetState()));
-    internalTap->SetTime(tap.GetTime());
-    internalTap->SetNumberOfTaps(tap.GetNumberOfTaps());
-    internalTap->SetNumberOfTouches(tap.GetNumberOfTouches());
-    internalTap->SetScreenPoint(tap.GetScreenPoint());
-    internalTap->SetLocalPoint(tap.GetLocalPoint());
-    internalTap->SetGestureSourceType(tap.GetSourceType());
-    mTap = Dali::TapGesture(internalTap.Get());
-
-    mTimerId = platformAbstraction.StartTimer(DEFAULT_TAP_WAIT_TIME, MakeCallback(this, &TapGestureDetector::TimerCallback));
+    return;
   }
-  else
+
+  uint32_t                numberOfTaps = tap.GetNumberOfTaps() % mMaximumTapsRequired;
+  Internal::TapGesturePtr internalTap(new Internal::TapGesture(tap.GetState()));
+  internalTap->SetTime(tap.GetTime());
+  internalTap->SetNumberOfTouches(tap.GetNumberOfTouches());
+  internalTap->SetScreenPoint(tap.GetScreenPoint());
+  internalTap->SetLocalPoint(tap.GetLocalPoint());
+  internalTap->SetGestureSourceType(tap.GetSourceType());
+  internalTap->SetNumberOfTaps(numberOfTaps == 0u ? mMaximumTapsRequired : numberOfTaps);
+  mTap = Dali::TapGesture(internalTap.Get());
+  if(numberOfTaps == 0u || mReceiveAllTapEvents)
   {
     // Guard against destruction during signal emission
     Dali::TapGestureDetector handle(this);
 
-    mDetectedSignal.Emit(tappedActor, tap);
+    mDetectedSignal.Emit(tappedActor, mTap);
+  }
+  else
+  {
+    mTappedActor = tappedActor;
+    mTimerId     = platformAbstraction.StartTimer(DEFAULT_TAP_WAIT_TIME, MakeCallback(this, &TapGestureDetector::TimerCallback));
   }
 }
 
