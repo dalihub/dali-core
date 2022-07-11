@@ -122,8 +122,18 @@ struct ActorTouchableCheck : public HitTestInterface
 
   bool ActorRequiresHitResultCheck(Actor* actor, Integration::Point point, Vector2 hitPointLocal, uint32_t timeStamp) override
   {
+    if(point.GetState() != PointState::STARTED && actor->IsAllowedOnlyOwnTouch() && ownActor != actor)
+    {
+      return false;
+    }
     return actor->EmitHitTestResultSignal(point, hitPointLocal, timeStamp);
   }
+
+  void SetOwnActor(const Actor* actor)
+  {
+    ownActor = actor;
+  }
+  const Actor* ownActor;
 };
 
 /**
@@ -625,9 +635,10 @@ bool HitTest(const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList
   return wasHit;
 }
 
-bool HitTest(const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList& layerList, const Vector2& screenCoordinates, Results& results)
+bool HitTest(const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList& layerList, const Vector2& screenCoordinates, Results& results, const Actor* ownActor)
 {
   ActorTouchableCheck actorTouchableCheck;
+  actorTouchableCheck.SetOwnActor(ownActor);
   return HitTest(sceneSize, renderTaskList, layerList, screenCoordinates, results, actorTouchableCheck);
 }
 

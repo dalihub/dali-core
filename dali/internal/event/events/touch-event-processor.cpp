@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -180,6 +180,7 @@ Dali::Actor EmitTouchSignals(Actor* actor, RenderTask& renderTask, const TouchEv
 void ParsePrimaryTouchPoint(
   HitTestAlgorithm::Results& hitTestResults,
   ActorObserver&             capturingTouchActorObserver,
+  ActorObserver&             ownTouchActorObserver,
   const RenderTaskPtr&       lastRenderTask,
   const Integration::Point&  currentPoint,
   const Internal::Scene&     scene)
@@ -196,7 +197,8 @@ void ParsePrimaryTouchPoint(
   }
   else
   {
-    HitTestAlgorithm::HitTest(scene.GetSize(), scene.GetRenderTaskList(), scene.GetLayerList(), currentPoint.GetScreenPosition(), hitTestResults);
+    Actor* ownTouchActor = ownTouchActorObserver.GetActor();
+    HitTestAlgorithm::HitTest(scene.GetSize(), scene.GetRenderTaskList(), scene.GetLayerList(), currentPoint.GetScreenPosition(), hitTestResults, ownTouchActor);
 
     if(currentPoint.GetState() == PointState::STARTED && hitTestResults.actor)
     {
@@ -205,6 +207,10 @@ void ParsePrimaryTouchPoint(
       if(hitActor->CapturesAllTouchAfterStart())
       {
         capturingTouchActorObserver.SetActor(hitActor);
+      }
+      if(hitActor->IsAllowedOnlyOwnTouch())
+      {
+        ownTouchActorObserver.SetActor(hitActor);
       }
     }
   }
@@ -217,6 +223,7 @@ TouchEventProcessor::TouchEventProcessor(Scene& scene)
   mLastPrimaryHitActor(MakeCallback(this, &TouchEventProcessor::OnObservedActorDisconnected)),
   mLastConsumedActor(),
   mCapturingTouchActor(),
+  mOwnTouchActor(),
   mTouchDownConsumedActor(),
   mLastRenderTask(),
   mLastPrimaryPointState(PointState::FINISHED)
@@ -227,6 +234,16 @@ TouchEventProcessor::TouchEventProcessor(Scene& scene)
 TouchEventProcessor::~TouchEventProcessor()
 {
   DALI_LOG_TRACE_METHOD(gLogFilter);
+}
+
+void TouchEventProcessor::Clear()
+{
+  mLastPrimaryHitActor.SetActor(nullptr);
+  mLastConsumedActor.SetActor(nullptr);
+  mCapturingTouchActor.SetActor(nullptr);
+  mOwnTouchActor.SetActor(nullptr);
+  mLastRenderTask.Reset();
+  mLastPrimaryPointState = PointState::FINISHED;
 }
 
 bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event)
@@ -277,12 +294,8 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
       AllocAndEmitTouchSignals(event.time, touchDownConsumedActorHandle, currentPoint);
     }
 
-    mLastPrimaryHitActor.SetActor(nullptr);
-    mLastConsumedActor.SetActor(nullptr);
-    mCapturingTouchActor.SetActor(nullptr);
+    Clear();
     mTouchDownConsumedActor.SetActor(nullptr);
-    mLastRenderTask.Reset();
-    mLastPrimaryPointState = PointState::FINISHED;
 
     currentPoint.SetHitActor(Dali::Actor());
 
@@ -308,12 +321,12 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
   for(auto&& currentPoint : event.points)
   {
     HitTestAlgorithm::Results hitTestResults;
-    hitTestResults.point = currentPoint;
+    hitTestResults.point     = currentPoint;
     hitTestResults.eventTime = event.time;
     if(!firstPointParsed)
     {
       firstPointParsed = true;
-      ParsePrimaryTouchPoint(hitTestResults, mCapturingTouchActor, mLastRenderTask, currentPoint, mScene);
+      ParsePrimaryTouchPoint(hitTestResults, mCapturingTouchActor, mOwnTouchActor, mLastRenderTask, currentPoint, mScene);
 
       // Only set the currentRenderTask for the primary hit actor.
       currentRenderTask = hitTestResults.renderTask;
@@ -444,11 +457,7 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
   //    time so set our last primary actor to NULL.  Do the same to the last consumed actor as well.
   if(primaryPointState == PointState::UP)
   {
-    mLastPrimaryHitActor.SetActor(nullptr);
-    mLastConsumedActor.SetActor(nullptr);
-    mCapturingTouchActor.SetActor(nullptr);
-    mLastRenderTask.Reset();
-    mLastPrimaryPointState = PointState::FINISHED;
+    Clear();
   }
   else
   {
@@ -472,11 +481,7 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
     }
     else
     {
-      mLastPrimaryHitActor.SetActor(nullptr);
-      mLastConsumedActor.SetActor(nullptr);
-      mCapturingTouchActor.SetActor(nullptr);
-      mLastRenderTask.Reset();
-      mLastPrimaryPointState = PointState::FINISHED;
+      Clear();
     }
   }
 

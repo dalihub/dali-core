@@ -22,6 +22,7 @@
 #include <dali/graphics-api/graphics-types.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/common/image-sampler.h>
+#include <dali/internal/event/rendering/texture-impl.h>
 #include <dali/internal/render/common/render-instruction.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>
 #include <dali/internal/render/data-providers/uniform-map-data-provider.h>
@@ -447,11 +448,36 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
     info.api      = Graphics::DrawNativeAPI::GLES;
     info.callback = &static_cast<Dali::CallbackBase&>(*mRenderCallback);
     info.userData = &mRenderCallbackInput;
-    info.reserved = nullptr;
+
+    // Set storage for the context to be used
+    info.glesNativeInfo.eglSharedContextStoragePointer = &mRenderCallbackInput.eglContext;
+    info.reserved                                      = nullptr;
+
+    auto& textureResources = mRenderCallback->GetTextureResources();
+
+    if(!textureResources.empty())
+    {
+      mRenderCallbackTextureBindings.clear();
+      mRenderCallbackInput.textureBindings.resize(textureResources.size());
+      auto i = 0u;
+      for(auto& texture : textureResources)
+      {
+        auto& textureImpl     = GetImplementation(texture);
+        auto  graphicsTexture = textureImpl.GetRenderObject()->GetGraphicsObject();
+
+        const auto& properties = mGraphicsController->GetTextureProperties(*graphicsTexture);
+
+        mRenderCallbackTextureBindings.emplace_back(graphicsTexture);
+        mRenderCallbackInput.textureBindings[i] = properties.nativeHandle;
+      }
+      info.textureCount = mRenderCallbackTextureBindings.size();
+      info.textureList  = mRenderCallbackTextureBindings.data();
+    }
 
     // pass render callback input
     mRenderCallbackInput.size       = size;
     mRenderCallbackInput.projection = projectionMatrix;
+
     Matrix::Multiply(mRenderCallbackInput.mvp, modelViewMatrix, projectionMatrix);
 
     // submit draw

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TOUCH_EVENT_PROCESSOR_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,9 +86,15 @@ private:
    */
   void OnObservedActorDisconnected(Actor* actor);
 
+  /**
+   * Clears the value.
+   */
+  void Clear();
+
   ActorObserver    mLastPrimaryHitActor;    ///< Stores the last primary point hit actor
   ActorObserver    mLastConsumedActor;      ///< Stores the last consumed actor
   ActorObserver    mCapturingTouchActor;    ///< Stored the actor that captures touch
+  ActorObserver    mOwnTouchActor;          ///< Stored the actor that own touch
   ActorObserver    mTouchDownConsumedActor; ///< Stores the touch-down consumed actor
   RenderTaskPtr    mLastRenderTask;         ///< The RenderTask used for the last hit actor
   PointState::Type mLastPrimaryPointState;  ///< Stores the last primary point state

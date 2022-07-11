@@ -28,6 +28,19 @@ struct DrawableObject
     return false;
   }
 
+  bool RenderWithTextures(const RenderCallbackInput& inputData)
+  {
+    // Store the size of rendered area
+    size = inputData.size;
+
+    auto count = inputData.textureBindings.size();
+
+    // test whether number of textures matches 1
+    DALI_TEST_EQUALS(count, 1, TEST_LOCATION);
+
+    return false;
+  }
+
   Size size{};
 };
 
@@ -78,7 +91,40 @@ int UtcDaliDrawableActor1P(void)
   application.Render();
 
   // Check the size (whether callback has been called)
-  auto size(drawable.size);
+  DALI_TEST_EQUALS(drawable.size, Size(100, 100), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcRenderCallbackTextureBindingP(void)
+{
+  tet_infoline("Testing RenderCallback texture bindings");
+  TestApplication application;
+
+  DrawableObject drawable{};
+
+  auto callback = RenderCallback::New<DrawableObject>(&drawable, &DrawableObject::RenderWithTextures);
+
+  // Prepare texture
+  Texture   texture   = Texture::New(Dali::TextureType::TEXTURE_2D, Pixel::Format::RGBA8888, 512, 512);
+  auto*     data      = reinterpret_cast<uint8_t*>(malloc(512 * 512 * 4));
+  PixelData pixelData = PixelData::New(data, 512 * 512 * 4, 512, 512, Pixel::Format::RGBA8888, PixelData::ReleaseFunction::FREE);
+  texture.Upload(pixelData);
+
+  std::vector<Texture> texturesToBind;
+  texturesToBind.push_back(texture);
+  callback->BindTextureResources(texturesToBind);
+
+  DrawableActor drawableActor = DrawableActor::New(*callback);
+  application.GetScene().Add(drawableActor);
+
+  drawableActor.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  // Check the size (whether callback has been called)
   DALI_TEST_EQUALS(drawable.size, Size(100, 100), TEST_LOCATION);
 
   END_TEST;

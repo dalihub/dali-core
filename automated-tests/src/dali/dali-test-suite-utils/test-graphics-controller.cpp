@@ -32,6 +32,8 @@
 #include <iostream>
 #include <sstream>
 
+#include <any>
+
 namespace Dali
 {
 std::ostream& operator<<(std::ostream& o, const Graphics::BufferCreateInfo& bufferCreateInfo)
@@ -696,6 +698,13 @@ void TestGraphicsController::ProcessCommandBuffer(TestGraphicsCommandBuffer& com
       case CommandType::DRAW_NATIVE:
       {
         auto info = &cmd.data.draw.drawNative.drawNativeInfo;
+
+        if(info->glesNativeInfo.eglSharedContextStoragePointer)
+        {
+          auto* anyContext = reinterpret_cast<std::any*>(info->glesNativeInfo.eglSharedContextStoragePointer);
+          *anyContext      = reinterpret_cast<void*>(0x12345678u);
+        }
+
         CallbackBase::ExecuteReturn<bool>(*info->callback, info->userData);
         break;
       }

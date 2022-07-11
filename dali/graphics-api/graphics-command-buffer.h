@@ -98,10 +98,30 @@ enum class DrawNativeAPI
 
 struct DrawNativeInfo
 {
-  DrawNativeAPI       api;      //< API used by the callback
-  Dali::CallbackBase* callback; //< Callback pointer
-  void*               userData; //< Data passed into the callback (unspecified type, callback should decode it)
-  void*               reserved; //< Reserved for internal use
+  DrawNativeAPI       api;      ///< API used by the callback
+  Dali::CallbackBase* callback; ///< Callback pointer
+
+  /**
+   * The call allows binding the resource so they can be passed into the callback
+   * Each resource will pass API specific data (for example GL texture and buffer ids)
+   */
+  Graphics::Texture** textureList;  ///< Textures to be used by the call
+  uint32_t            textureCount; ///< Number of texture used by the callback
+  Graphics::Buffer**  bufferList;   ///< Buffers to be used by the call
+  uint32_t            bufferCount;  ///< Number of buffers used by the callback
+
+  /**
+   * The GLES api specific structure that stores pointers to objects to be filled when requested
+   * by caller. The structure cointains void* to avoid creating any complex constructors and keep
+   * the class trivial.
+   */
+  struct GLESNativeInfo
+  {
+    void* eglSharedContextStoragePointer; ///< Indicates the storage object to pass the shared context, must be null if not in use
+  } glesNativeInfo;
+
+  void* userData; ///< Data passed into the callback (unspecified type, callback should decode it)
+  void* reserved; ///< Reserved for internal use
 };
 
 /**

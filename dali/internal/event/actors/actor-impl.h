@@ -1323,6 +1323,15 @@ public:
     return mTouchAreaOffset;
   }
 
+  /**
+   * Query whether the actor will only receive own touch.
+   * @return true, if it only receives touches that started from itself.
+   */
+  bool IsAllowedOnlyOwnTouch() const
+  {
+    return mAllowOnlyOwnTouch;
+  }
+
   // Gestures
 
   /**
@@ -1924,6 +1933,7 @@ protected:
   bool                     mIsBlendEquationSet : 1;        ///< Flag to identify whether the Blend equation is set
   bool                     mNeedGesturePropagation : 1;    ///< Whether the parent listens for gesture events or not
   bool                     mUserInteractionEnabled : 1;    ///< Whether the actor should be enabled user interaction.
+  bool                     mAllowOnlyOwnTouch : 1;         ///< whether the actor will only receive own touch. it only receives touches that started from itself.
   LayoutDirection::Type    mLayoutDirection : 2;           ///< Layout direction, Left to Right or Right to Left.
   DrawMode::Type           mDrawMode : 3;                  ///< Cached: How the actor and its children should be drawn
   ColorMode                mColorMode : 3;                 ///< Cached: Determines whether mWorldColor is inherited

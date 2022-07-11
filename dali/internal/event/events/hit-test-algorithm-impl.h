@@ -155,11 +155,12 @@ bool HitTest(const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList
  * @param[in] layerList The layer list of the scene.
  * @param[in] screenCoordinates The screen coordinates.
  * @param[out] results The results of the hit-test.
+ * @param[in] ownActor The actor from which the touch down was started.
  * @return true if something was hit
  *
  * @see HitTest(Stage&, const Vector2&, Results&, HitTestInterface&)
  */
-bool HitTest(const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList& layerList, const Vector2& screenCoordinates, Results& results);
+bool HitTest(const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList& layerList, const Vector2& screenCoordinates, Results& results, const Actor* ownActor = nullptr);
 
 } // namespace HitTestAlgorithm
 

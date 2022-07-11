@@ -1208,3 +1208,54 @@ int UtcDaliTapGestureDoesWantedHitTest(void)
 
   END_TEST;
 }
+
+int UtcDaliTapGestureDetectorCheck(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  Actor actor2 = Actor::New();
+  actor2.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor2.SetProperty(Actor::Property::POSITION, Vector2(100.0f, 100.0f));
+  actor2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor2);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+  TapGestureDetector     detector1 = TapGestureDetector::New();
+  detector1.SetMaximumTapsRequired(1u);
+  detector1.Attach(actor);
+  detector1.DetectedSignal().Connect(&application, functor);
+
+  TapGestureDetector detector2 = TapGestureDetector::New();
+  detector2.SetMaximumTapsRequired(2u);
+  detector2.Attach(actor2);
+
+  // Emit signals, Send the single tab.
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(50.0f, 50.0f), 0, 100));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(50.0f, 50.0f), 0, 120));
+  application.SendNotification();
+
+  // The detector1 get the tap event.
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Emit signals, Send the second tab.
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(50.0f, 50.0f), 0, 130));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(50.0f, 50.0f), 0, 150));
+  application.SendNotification();
+
+  // The detector1 must get the tap event. SetMaximumTapsRequired(2u) of detector2 should not affect detector1.
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  END_TEST;
+}

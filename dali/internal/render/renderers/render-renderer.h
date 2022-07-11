@@ -400,6 +400,15 @@ public:
   }
 
   /**
+   * Returns internal RenderCallbackInput structure
+   * @return Valid reference to the RenderCallbackInput
+   */
+  RenderCallbackInput& GetRenderCallbackInput()
+  {
+    return mRenderCallbackInput;
+  }
+
+  /**
    * Write the renderer's sort attributes to the passed in reference
    *
    * @param[out] sortAttributes
@@ -589,6 +598,7 @@ private:
   std::vector<Dali::DevelRenderer::DrawCommand> mDrawCommands; // Devel stuff
   RenderCallback*                               mRenderCallback{nullptr};
   RenderCallbackInput                           mRenderCallbackInput{};
+  std::vector<Graphics::Texture*>               mRenderCallbackTextureBindings{};
 };
 
 } // namespace Render
