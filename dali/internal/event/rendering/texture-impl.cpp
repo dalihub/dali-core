@@ -100,7 +100,7 @@ Texture::~Texture()
 
 bool Texture::Upload(PixelDataPtr pixelData)
 {
-  return Upload(pixelData, 0u, 0u, 0u, 0u, pixelData->GetWidth(), pixelData->GetHeight());
+  return UploadSubPixelData(pixelData, 0u, 0u, pixelData->GetWidth(), pixelData->GetHeight(), 0u, 0u, 0u, 0u, pixelData->GetWidth(), pixelData->GetHeight());
 }
 
 bool Texture::Upload(PixelDataPtr pixelData,
@@ -111,6 +111,30 @@ bool Texture::Upload(PixelDataPtr pixelData,
                      uint32_t     width,
                      uint32_t     height)
 {
+  return UploadSubPixelData(pixelData, 0u, 0u, pixelData->GetWidth(), pixelData->GetHeight(), layer, mipmap, xOffset, yOffset, width, height);
+}
+
+bool Texture::UploadSubPixelData(PixelDataPtr pixelData,
+                                 uint32_t     dataXOffset,
+                                 uint32_t     dataYOffset,
+                                 uint32_t     dataWidth,
+                                 uint32_t     dataHeight)
+{
+  return UploadSubPixelData(pixelData, dataXOffset, dataYOffset, dataWidth, dataHeight, 0u, 0u, 0u, 0u, dataWidth, dataHeight);
+}
+
+bool Texture::UploadSubPixelData(PixelDataPtr pixelData,
+                                 uint32_t     dataXOffset,
+                                 uint32_t     dataYOffset,
+                                 uint32_t     dataWidth,
+                                 uint32_t     dataHeight,
+                                 uint32_t     layer,
+                                 uint32_t     mipmap,
+                                 uint32_t     xOffset,
+                                 uint32_t     yOffset,
+                                 uint32_t     width,
+                                 uint32_t     height)
+{
   constexpr auto max_value = std::numeric_limits<uint16_t>::max();
   DALI_ASSERT_ALWAYS(layer < max_value &&
                      mipmap < max_value &&
@@ -118,6 +142,8 @@ bool Texture::Upload(PixelDataPtr pixelData,
                      yOffset < max_value &&
                      width < max_value &&
                      height < max_value &&
+                     dataWidth < max_value &&
+                     dataHeight < max_value &&
                      "Parameter value out of range");
 
   bool result(false);
@@ -129,7 +155,7 @@ bool Texture::Upload(PixelDataPtr pixelData,
     }
     else
     {
-      uint32_t pixelDataSize = pixelData->GetWidth() * pixelData->GetHeight();
+      uint32_t pixelDataSize = dataWidth * dataHeight;
       if(pixelData->GetBuffer() == nullptr || pixelDataSize == 0)
       {
         DALI_LOG_ERROR("PixelData is empty\n");
@@ -143,6 +169,19 @@ bool Texture::Upload(PixelDataPtr pixelData,
           {
             DALI_LOG_ERROR("PixelData of an incorrect size when trying to update texture\n");
           }
+          else if(Pixel::IsCompressed(mFormat) &&
+                  ((dataXOffset != 0) ||
+                   (dataYOffset != 0) ||
+                   (dataWidth != pixelData->GetWidth()) ||
+                   (dataHeight != pixelData->GetHeight())))
+          {
+            DALI_LOG_ERROR("Compressed pixel format don't support SubPixelData upload\n");
+          }
+          else if((dataXOffset + dataWidth > pixelData->GetWidth()) ||
+                  (dataYOffset + dataHeight > pixelData->GetHeight()))
+          {
+            DALI_LOG_ERROR("PixelData of an incorrect subsize when trying to update texture\n");
+          }
           else if((xOffset + width > (mSize.GetWidth() / (1u << mipmap))) ||
                   (yOffset + height > (mSize.GetHeight() / (1u << mipmap))))
           {
@@ -151,7 +190,11 @@ bool Texture::Upload(PixelDataPtr pixelData,
           else
           {
             //Parameters are correct. Send message to upload data to the texture
-            UploadParams params = {static_cast<uint16_t>(layer),
+            UploadParams params = {static_cast<uint32_t>(dataXOffset),
+                                   static_cast<uint32_t>(dataYOffset),
+                                   static_cast<uint16_t>(dataWidth),
+                                   static_cast<uint16_t>(dataHeight),
+                                   static_cast<uint16_t>(layer),
                                    static_cast<uint16_t>(mipmap),
                                    static_cast<uint16_t>(xOffset),
                                    static_cast<uint16_t>(yOffset),

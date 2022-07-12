@@ -141,6 +141,15 @@ const Format FIRST_VALID_PIXEL_FORMAT = A8;
 const Format LAST_VALID_PIXEL_FORMAT = CHROMINANCE_V;
 
 /**
+ * @brief Whether specified pixel format is compressed or not.
+ *
+ * @SINCE_2_1.33
+ * @param[in] pixelFormat The pixel format
+ * @return True if pixel format is compressed type. False otherwise.
+ */
+DALI_CORE_API bool IsCompressed(Format pixelFormat);
+
+/**
  * @brief Whether specified pixel format contains an alpha value.
  *
  * @SINCE_1_0.0

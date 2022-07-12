@@ -43,6 +43,94 @@ static void TestPixelEnumSize(const int size)
                   "The Pixel::Format enum may have had new formats added. Expand the test cases to include them.");
 }
 
+int UtcDaliPixelIsCompressed(void)
+{
+  TestApplication application;
+
+  tet_infoline("UtcDaliPixelIsCompressed");
+
+  TestPixelEnumSize(62);
+
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::INVALID) == false); // For completeness
+
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::L8) == false);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::RGB565) == false);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::RGB888) == false);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::RGB8888) == false);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::BGR8888) == false);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::BGR565) == false);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_R11_EAC) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_SIGNED_R11_EAC) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_RG11_EAC) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_SIGNED_RG11_EAC) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_RGB8_ETC2) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_SRGB8_ETC2) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_RGB8_ETC1) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_RGB_PVRTC_4BPPV1) == true);
+
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::A8) == false);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::LA88) == false);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::RGBA5551) == false);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::RGBA4444) == false);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::RGBA8888) == false);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::BGRA8888) == false);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::BGRA5551) == false);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::BGRA4444) == false);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_RGBA8_ETC2_EAC) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_SRGB8_ALPHA8_ETC2_EAC) == true);
+
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_RGBA_ASTC_4x4_KHR) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_RGBA_ASTC_5x4_KHR) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_RGBA_ASTC_5x5_KHR) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_RGBA_ASTC_6x5_KHR) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_RGBA_ASTC_6x6_KHR) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_RGBA_ASTC_8x5_KHR) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_RGBA_ASTC_8x6_KHR) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_RGBA_ASTC_8x8_KHR) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_RGBA_ASTC_10x5_KHR) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_RGBA_ASTC_10x6_KHR) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_RGBA_ASTC_10x8_KHR) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_RGBA_ASTC_10x10_KHR) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_RGBA_ASTC_12x10_KHR) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_RGBA_ASTC_12x12_KHR) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR) == true);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR) == true);
+
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::RGB16F) == false);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::RGB32F) == false);
+
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::DEPTH_UNSIGNED_INT) == false);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::DEPTH_FLOAT) == false);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::DEPTH_STENCIL) == false);
+
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::R11G11B10F) == false);
+
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::CHROMINANCE_U) == false);
+  DALI_TEST_CHECK(Pixel::IsCompressed(Pixel::CHROMINANCE_V) == false);
+
+  END_TEST;
+}
+
+int UtcDaliPixelIsCompressedN(void)
+{
+  DALI_TEST_EQUALS(Pixel::IsCompressed(Pixel::Format(123123123123)), false, TEST_LOCATION);
+  END_TEST;
+}
+
 int UtcDaliPixelHasAlpha(void)
 {
   TestApplication application;

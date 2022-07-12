@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,34 @@ bool ApplyNativeFragmentShader(Dali::Texture texture, std::string& shader)
 {
   auto& impl = GetImplementation(texture);
   return impl.ApplyNativeFragmentShader(shader);
+}
+
+bool UploadSubPixelData(Texture   texture,
+                        PixelData pixelData,
+                        uint32_t  dataXOffset,
+                        uint32_t  dataYOffset,
+                        uint32_t  dataWidth,
+                        uint32_t  dataHeight)
+{
+  Internal::PixelData& internalPixelData = GetImplementation(pixelData);
+  return GetImplementation(texture).UploadSubPixelData(&internalPixelData, dataXOffset, dataYOffset, dataWidth, dataHeight);
+}
+
+bool UploadSubPixelData(Texture   texture,
+                        PixelData pixelData,
+                        uint32_t  dataXOffset,
+                        uint32_t  dataYOffset,
+                        uint32_t  dataWidth,
+                        uint32_t  dataHeight,
+                        uint32_t  layer,
+                        uint32_t  mipmap,
+                        uint32_t  xOffset,
+                        uint32_t  yOffset,
+                        uint32_t  width,
+                        uint32_t  height)
+{
+  Internal::PixelData& internalPixelData = GetImplementation(pixelData);
+  return GetImplementation(texture).UploadSubPixelData(&internalPixelData, dataXOffset, dataYOffset, dataWidth, dataHeight, layer, mipmap, xOffset, yOffset, width, height);
 }
 
 } // namespace DevelTexture
