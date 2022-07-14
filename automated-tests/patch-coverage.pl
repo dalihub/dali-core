@@ -985,7 +985,7 @@ sub parse_diff
     $files{$file}->{"patch"} = [@checklines];
     $files{$file}->{"b_lines"} = {%b_lines};
 
-    my %filter = map { $_ => $files{$_} } grep {m!^dali(-toolkit|-scene-loader)?/!} (keys(%files));
+    my %filter = map { $_ => $files{$_} } grep {m!^dali(-toolkit|-scene3d)?/!} (keys(%files));
 
     if($pd_debug)
     {
