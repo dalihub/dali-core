@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_EVENT_EVENTS_TAP_GESTURE_RECOGNIZER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -149,6 +149,7 @@ private:
   Vector2  mTouchPosition; ///< The initial touch down position.
   uint32_t mTouchTime;     ///< The initial touch down time.
   uint32_t mLastTapTime;   ///< Time last tap gesture was registered
+  uint32_t mLastTouchTime; ///< The last touch down time.
 
   GestureSourceType mGestureSourceType;  /// < Gesture input source type value.
   uint32_t          mMaximumAllowedTime; ///< The maximum allowed time required to be recognized as a multi tap gesture (millisecond)
