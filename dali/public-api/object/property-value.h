@@ -2,7 +2,7 @@
 #define DALI_PROPERTY_VALUE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -259,6 +259,29 @@ public:
    * @return a reference to this
    */
   Value& operator=(Value&& value) noexcept;
+
+  /**
+   * @brief Equality operator.
+   *
+   * @SINCE_2_1.31
+   * @param[in] rhs A reference for comparison
+   * @return True if equal type and equal value.
+   * @note Property::ARRAY and Property::MAP don't support equality operator now. Always return false.
+   */
+  bool operator==(const Value& rhs) const;
+
+  /**
+   * @brief Inequality operator.
+   *
+   * @SINCE_2_1.31
+   * @param[in] rhs A reference for comparison
+   * @return True if not equal
+   * @note Property::ARRAY and Property::MAP don't support equality operator now. Always return true.
+   */
+  bool operator!=(const Value& rhs) const
+  {
+    return !(*this == rhs);
+  }
 
   /**
    * @brief Non-virtual destructor.

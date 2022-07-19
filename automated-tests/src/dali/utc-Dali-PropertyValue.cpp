@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1284,6 +1284,194 @@ int UtcDaliPropertyValueEnum(void)
   int result2;
   DALI_TEST_EQUALS(true, value.Get(result2), TEST_LOCATION);
   DALI_TEST_EQUALS(static_cast<int>(E::e), result2, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliPropertyValueEqualSameType(void)
+{
+  float           a[] = {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f};
+  float           b[] = {16.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 1.0f};
+  Property::Value valueList[] =
+    {
+      Property::Value(static_cast<bool>(true)),
+      Property::Value(static_cast<float>(7.0f)),
+      Property::Value(static_cast<int32_t>(32)),
+      Property::Value(Vector2(1.0f, 2.0f)),
+      Property::Value(Vector3(1.1f, 2.2f, 3.3f)),
+      Property::Value(Vector4(1.2f, 2.1f, 3.4f, 4.3f)),
+      Property::Value(Matrix3(1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f)),
+      Property::Value(Matrix(a)),
+      Property::Value(Rect<int32_t>(3, 2, 5, 4)),
+      Property::Value(AngleAxis(Radian(2.0f), Vector3(0.0f, 1.0f, 0.0f))),
+      Property::Value(std::string("Hello, World!")),
+      Property::Value(Extents(8, 4, 2, 5)),
+    };
+  Property::Value otherValueList[] =
+    {
+      Property::Value(static_cast<bool>(false)),
+      Property::Value(static_cast<float>(1.0f)),
+      Property::Value(static_cast<int32_t>(4)),
+      Property::Value(Vector2(2.0f, 1.0f)),
+      Property::Value(Vector3(2.2f, 1.1f, 3.3f)),
+      Property::Value(Vector4(2.1f, 1.2f, 3.4f, 4.3f)),
+      Property::Value(Matrix3(7.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f)),
+      Property::Value(Matrix(b)),
+      Property::Value(Rect<int32_t>(2, 3, 4, 5)),
+      Property::Value(AngleAxis(Radian(20.0f), Vector3(0.0f, 1.0f, 0.0f))),
+      Property::Value(std::string("Hell, o, World!")),
+      Property::Value(Extents(4, 8, 5, 2)),
+    };
+  const int valueCount = sizeof(valueList) / sizeof(valueList[0]);
+
+  // Compare
+  for(int i = 0; i < valueCount; ++i)
+  {
+    // Check self comparision
+    DALI_TEST_EQUALS(valueList[i], valueList[i], TEST_LOCATION);
+    // Check same value comparision
+    Property::Value copiedValue = valueList[i];
+    DALI_TEST_EQUALS(valueList[i], copiedValue, TEST_LOCATION);
+    // Check not equal value comparision
+    DALI_TEST_NOT_EQUALS(valueList[i], otherValueList[i], Math::MACHINE_EPSILON_100, TEST_LOCATION);
+    // Check empty type value
+    DALI_TEST_NOT_EQUALS(valueList[i], Property::Value(), Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  }
+
+  // Compare with empty type.
+  DALI_TEST_EQUALS(Property::Value(), Property::Value(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliPropertyValueEqualArrayType(void)
+{
+  tet_infoline("Check Property::Array type equality.");
+  Property::Array array1;
+  Property::Array array2;
+  Property::Array array3;
+  Property::Array array4;
+  Property::Array array5;
+  Property::Array array6;
+
+  array1.PushBack(Property::Value(30));
+  array1.PushBack(Property::Value(20.0f));
+  array1.PushBack(Property::Value("string"));
+
+  // Construct same array
+  array2.PushBack(Property::Value(30));
+  array2.PushBack(Property::Value(20.0f));
+  array2.PushBack(Property::Value("string"));
+
+  // Construct same value, but different order
+  array3.PushBack(Property::Value(20.0f));
+  array3.PushBack(Property::Value(30));
+  array3.PushBack(Property::Value("string"));
+
+  // Construct same type, but different value
+  array4.PushBack(Property::Value(30));
+  array4.PushBack(Property::Value(20.0f));
+  array4.PushBack(Property::Value("not equal string"));
+
+  // Construct same prefix value, but different length
+  array5.PushBack(Property::Value(30));
+  array5.PushBack(Property::Value(20.0f));
+  array5.PushBack(Property::Value("string"));
+  array5.PushBack(Property::Value("string2"));
+
+  // Construct same length, but different type
+  array6.PushBack(Property::Value(static_cast<bool>(true)));
+  array6.PushBack(Property::Value("string"));
+  array6.PushBack(Property::Value(22));
+
+  Property::Value value1(array1);
+  Property::Value value2(array2);
+  Property::Value value3(array3);
+  Property::Value value4(array4);
+  Property::Value value5(array5);
+  Property::Value value6(array6);
+
+  DALI_TEST_NOT_EQUALS(value1, value3, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(value1, value4, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(value1, value5, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(value1, value6, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(value3, value4, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(value3, value5, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(value3, value6, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(value4, value5, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(value4, value6, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(value5, value6, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+
+  // TODO : Currently array comparision not implemented.
+  // If we impelemnt array comparision, replace below line.
+  // DALI_TEST_EQUALS(value1, value2, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(value1, value2, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliPropertyValueEqualMapType(void)
+{
+  tet_infoline("Check Property::Map type equality.");
+  Property::Map map1;
+  Property::Map map2;
+  Property::Map map3;
+  Property::Map map4;
+  Property::Map map5;
+  Property::Map map6;
+
+  map1.Insert(10, Property::Value(30));
+  map1.Insert("20", Property::Value(20.0f));
+  map1.Insert(30, Property::Value("string"));
+
+  // Construct same map
+  map2.Insert(30, Property::Value("string"));
+  map2.Insert(10, Property::Value(30));
+  map2.Insert("20", Property::Value(20.0f));
+
+  // Construct same type, but different value
+  map3.Insert(10, Property::Value(30));
+  map3.Insert("20", Property::Value(20.0f));
+  map3.Insert(30, Property::Value("not equal string"));
+
+  // Construct same value, but different key
+  map4.Insert(10, Property::Value(30));
+  map4.Insert(20, Property::Value(20.0f));
+  map4.Insert("30", Property::Value("string"));
+
+  // Construct same prefix value, but different length
+  map5.Insert(10, Property::Value(30));
+  map5.Insert("20", Property::Value(20.0f));
+  map5.Insert(30, Property::Value("string"));
+  map5.Insert(40, Property::Value("string2"));
+
+  // Construct same length, same key, but different type
+  map6.Insert(10, Property::Value(static_cast<bool>(true)));
+  map6.Insert("20", Property::Value("string"));
+  map6.Insert(30, Property::Value(22));
+
+  Property::Value value1(map1);
+  Property::Value value2(map2);
+  Property::Value value3(map3);
+  Property::Value value4(map4);
+  Property::Value value5(map5);
+  Property::Value value6(map6);
+
+  DALI_TEST_NOT_EQUALS(value1, value3, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(value1, value4, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(value1, value5, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(value1, value6, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(value3, value4, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(value3, value5, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(value3, value6, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(value4, value5, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(value4, value6, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(value5, value6, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+
+  // TODO : Currently map comparision not implemented.
+  // If we impelemnt map comparision, replace below line.
+  // DALI_TEST_EQUALS(value1, value2, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(value1, value2, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+
   END_TEST;
 }
 

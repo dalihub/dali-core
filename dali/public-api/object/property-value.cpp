@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -421,6 +421,80 @@ struct Property::Value::Impl
     return *this;
   }
 
+  bool operator==(const Impl& other) const
+  {
+    const bool isSameType = GetType() == other.GetType();
+
+    if(!isSameType)
+    {
+      // We don't support to compare with different type.
+      return false;
+    }
+
+    switch(GetType())
+    {
+      case Property::NONE:
+      {
+        return true;
+      }
+      case Property::BOOLEAN:
+      {
+        return mData.mBool.member == other.mData.mBool.member;
+      }
+      case Property::FLOAT:
+      {
+        return Equals(mData.mFloat.member, other.mData.mFloat.member);
+      }
+      case Property::INTEGER:
+      {
+        return mData.mInt.member == other.mData.mInt.member;
+      }
+      case Property::VECTOR2:
+      {
+        return mData.mVector2.member == other.mData.mVector2.member;
+      }
+      case Property::VECTOR3:
+      {
+        return mData.mVector3.member == other.mData.mVector3.member;
+      }
+      case Property::VECTOR4:
+      {
+        return *mData.mVector4.member == *other.mData.mVector4.member;
+      }
+      case Property::MATRIX3:
+      {
+        return *mData.mMatrix3.member == *other.mData.mMatrix3.member;
+      }
+      case Property::MATRIX:
+      {
+        return *mData.mMatrix.member == *other.mData.mMatrix.member;
+      }
+      case Property::RECTANGLE:
+      {
+        return *mData.mRect.member == *other.mData.mRect.member;
+      }
+      case Property::ROTATION:
+      {
+        return *mData.mAngleAxis.member == *other.mData.mAngleAxis.member;
+      }
+      case Property::STRING:
+      {
+        return *mData.mString.member == *other.mData.mString.member;
+      }
+      case Property::EXTENTS:
+      {
+        return mData.mExtents.member == other.mData.mExtents.member;
+      }
+      case Property::ARRAY:
+      case Property::MAP:
+      {
+        // TODO : Need to support this case
+        return false;
+      }
+    }
+    return false;
+  }
+
   void SetType(Type typeValue)
   {
     mData.mType.type = typeValue;
@@ -825,6 +899,12 @@ Property::Value& Property::Value::operator=(Property::Value&& value) noexcept
   }
 
   return *this;
+}
+
+bool Property::Value::operator==(const Property::Value& rhs) const
+{
+  // this will call the Impl operator==()
+  return Read() == rhs.Read();
 }
 
 Property::Value::~Value()

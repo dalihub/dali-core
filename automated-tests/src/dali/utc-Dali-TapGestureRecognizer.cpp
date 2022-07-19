@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -428,21 +428,29 @@ int UtcDaliTapGestureRecognizerDoubleTapWaitTooLong(void)
 
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
-  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 650));
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 750));
 
-  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 750));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 850));
 
   application.SendNotification();
 
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
-  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(50.0f, 50.0f), 950));
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 900));
 
-  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(50.0f, 50.0f), 1000));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 1450));
 
-  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(50.0f, 50.0f), 1050));
+  application.SendNotification();
 
-  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(50.0f, 50.0f), 1000));
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(50.0f, 50.0f), 1500));
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(50.0f, 50.0f), 1550));
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(50.0f, 50.0f), 1600));
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(50.0f, 50.0f), 1650));
 
   application.SendNotification();
 
@@ -606,9 +614,9 @@ int UtcDaliTapGestureSetMaximumAllowedTime(void)
 
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
-  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 250));
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 300));
 
-  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 300));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 350));
 
   application.SendNotification();
 
