@@ -52,6 +52,23 @@ BaseHandle Create()
 
 TypeRegistration mType(typeid(Dali::DecoratedVisualRenderer), typeid(Dali::VisualRenderer), Create, DecoratedVisualRendererDefaultProperties);
 
+/**
+ * Sets both the cached value of a property and sends a message to set the animatable property in the Update thread.
+ * @tparam T The property type
+ * @param eventThreadServices The event thread services
+ * @param propertyValue The new property value given
+ * @param cachedValue The local cached value of the property
+ * @param animatableProperty The animatable property to set on the update-thread
+ */
+template<typename T>
+void SetValue(EventThreadServices& eventThreadServices, const Property::Value& propertyValue, T& cachedValue, const SceneGraph::AnimatableProperty<T>& animatableProperty)
+{
+  if(propertyValue.Get(cachedValue))
+  {
+    BakeMessage<T>(eventThreadServices, animatableProperty, cachedValue);
+  }
+}
+
 } // unnamed namespace
 
 DecoratedVisualRendererPtr DecoratedVisualRenderer::New()
@@ -90,10 +107,7 @@ DecoratedVisualRenderer::DecoratedVisualRenderer(const SceneGraph::Renderer* sce
 {
 }
 
-DecoratedVisualRenderer::~DecoratedVisualRenderer()
-{
-  // The scene object will be deleted by ~VisualRenderer
-}
+DecoratedVisualRenderer::~DecoratedVisualRenderer() = default; // The scene object will be deleted by ~VisualRenderer
 
 void DecoratedVisualRenderer::SetDefaultProperty(Property::Index        index,
                                                  const Property::Value& propertyValue)
@@ -104,120 +118,55 @@ void DecoratedVisualRenderer::SetDefaultProperty(Property::Index        index,
   }
   else
   {
-    switch(index)
+    const SceneGraph::Renderer& sceneObject = GetVisualRendererSceneObject();
+    auto visualProperties = sceneObject.GetVisualProperties();
+
+    if(visualProperties)
     {
-      case Dali::DecoratedVisualRenderer::Property::CORNER_RADIUS:
-      {
-        if(propertyValue.Get(mDecoratedPropertyCache.mCornerRadius))
-        {
-          const SceneGraph::Renderer& sceneObject      = GetVisualRendererSceneObject();
-          auto                        visualProperties = sceneObject.GetVisualProperties();
+      auto decoratedVisualProperties = static_cast<AnimatableDecoratedVisualProperties*>(visualProperties->mExtendedProperties);
 
-          if(visualProperties)
+      if(decoratedVisualProperties)
+      {
+        EventThreadServices& eventThreadServices = GetEventThreadServices();
+
+        switch(index)
+        {
+          case Dali::DecoratedVisualRenderer::Property::CORNER_RADIUS:
           {
-            auto decoratedVisualProperties = static_cast<AnimatableDecoratedVisualProperties*>(visualProperties->mExtendedProperties);
-            if(decoratedVisualProperties)
-            {
-              BakeMessage<Vector4>(GetEventThreadServices(), decoratedVisualProperties->mCornerRadius, mDecoratedPropertyCache.mCornerRadius);
-            }
+            SetValue(eventThreadServices, propertyValue, mDecoratedPropertyCache.mCornerRadius, decoratedVisualProperties->mCornerRadius);
+            break;
+          }
+
+          case Dali::DecoratedVisualRenderer::Property::CORNER_RADIUS_POLICY:
+          {
+            SetValue(eventThreadServices, propertyValue, mDecoratedPropertyCache.mCornerRadiusPolicy, decoratedVisualProperties->mCornerRadiusPolicy);
+            break;
+          }
+
+          case Dali::DecoratedVisualRenderer::Property::BORDERLINE_WIDTH:
+          {
+            SetValue(eventThreadServices, propertyValue, mDecoratedPropertyCache.mBorderlineWidth, decoratedVisualProperties->mBorderlineWidth);
+            break;
+          }
+
+          case Dali::DecoratedVisualRenderer::Property::BORDERLINE_COLOR:
+          {
+            SetValue(eventThreadServices, propertyValue,mDecoratedPropertyCache.mBorderlineColor, decoratedVisualProperties->mBorderlineColor);
+            break;
+          }
+
+          case Dali::DecoratedVisualRenderer::Property::BORDERLINE_OFFSET:
+          {
+            SetValue(eventThreadServices, propertyValue,mDecoratedPropertyCache.mBorderlineOffset, decoratedVisualProperties->mBorderlineOffset);
+            break;
+          }
+
+          case Dali::DecoratedVisualRenderer::Property::BLUR_RADIUS:
+          {
+            SetValue(eventThreadServices, propertyValue,mDecoratedPropertyCache.mBlurRadius, decoratedVisualProperties->mBlurRadius);
+            break;
           }
         }
-        break;
-      }
-
-      case Dali::DecoratedVisualRenderer::Property::CORNER_RADIUS_POLICY:
-      {
-        if(propertyValue.Get(mDecoratedPropertyCache.mCornerRadiusPolicy))
-        {
-          const SceneGraph::Renderer& sceneObject      = GetVisualRendererSceneObject();
-          auto                        visualProperties = sceneObject.GetVisualProperties();
-
-          if(visualProperties)
-          {
-            auto decoratedVisualProperties = static_cast<AnimatableDecoratedVisualProperties*>(visualProperties->mExtendedProperties);
-            if(decoratedVisualProperties)
-            {
-              BakeMessage<float>(GetEventThreadServices(), decoratedVisualProperties->mCornerRadiusPolicy, mDecoratedPropertyCache.mCornerRadiusPolicy);
-            }
-          }
-        }
-        break;
-      }
-
-      case Dali::DecoratedVisualRenderer::Property::BORDERLINE_WIDTH:
-      {
-        if(propertyValue.Get(mDecoratedPropertyCache.mBorderlineWidth))
-        {
-          const SceneGraph::Renderer& sceneObject      = GetVisualRendererSceneObject();
-          auto                        visualProperties = sceneObject.GetVisualProperties();
-
-          if(visualProperties)
-          {
-            auto decoratedVisualProperties = static_cast<AnimatableDecoratedVisualProperties*>(visualProperties->mExtendedProperties);
-            if(decoratedVisualProperties)
-            {
-              BakeMessage<float>(GetEventThreadServices(), decoratedVisualProperties->mBorderlineWidth, mDecoratedPropertyCache.mBorderlineWidth);
-            }
-          }
-        }
-        break;
-      }
-
-      case Dali::DecoratedVisualRenderer::Property::BORDERLINE_COLOR:
-      {
-        if(propertyValue.Get(mDecoratedPropertyCache.mBorderlineColor))
-        {
-          const SceneGraph::Renderer& sceneObject      = GetVisualRendererSceneObject();
-          auto                        visualProperties = sceneObject.GetVisualProperties();
-
-          if(visualProperties)
-          {
-            auto decoratedVisualProperties = static_cast<AnimatableDecoratedVisualProperties*>(visualProperties->mExtendedProperties);
-            if(decoratedVisualProperties)
-            {
-              BakeMessage<Vector4>(GetEventThreadServices(), decoratedVisualProperties->mBorderlineColor, mDecoratedPropertyCache.mBorderlineColor);
-            }
-          }
-        }
-        break;
-      }
-
-      case Dali::DecoratedVisualRenderer::Property::BORDERLINE_OFFSET:
-      {
-        if(propertyValue.Get(mDecoratedPropertyCache.mBorderlineOffset))
-        {
-          const SceneGraph::Renderer& sceneObject      = GetVisualRendererSceneObject();
-          auto                        visualProperties = sceneObject.GetVisualProperties();
-
-          if(visualProperties)
-          {
-            auto decoratedVisualProperties = static_cast<AnimatableDecoratedVisualProperties*>(visualProperties->mExtendedProperties);
-            if(decoratedVisualProperties)
-            {
-              BakeMessage<float>(GetEventThreadServices(), decoratedVisualProperties->mBorderlineOffset, mDecoratedPropertyCache.mBorderlineOffset);
-            }
-          }
-        }
-        break;
-      }
-
-      case Dali::DecoratedVisualRenderer::Property::BLUR_RADIUS:
-      {
-        if(propertyValue.Get(mDecoratedPropertyCache.mBlurRadius))
-        {
-          const SceneGraph::Renderer& sceneObject      = GetVisualRendererSceneObject();
-          auto                        visualProperties = sceneObject.GetVisualProperties();
-
-          if(visualProperties)
-          {
-            auto decoratedVisualProperties = static_cast<AnimatableDecoratedVisualProperties*>(visualProperties->mExtendedProperties);
-            if(decoratedVisualProperties)
-            {
-              BakeMessage<float>(GetEventThreadServices(), decoratedVisualProperties->mBlurRadius, mDecoratedPropertyCache.mBlurRadius);
-            }
-          }
-        }
-        break;
       }
     }
   }
