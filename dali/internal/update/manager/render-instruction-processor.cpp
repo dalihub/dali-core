@@ -268,6 +268,7 @@ inline void AddRendererToRenderList(BufferIndex         updateBufferIndex,
 
       if(DALI_LIKELY(renderable.mRenderer))
       {
+        partialRenderingCacheInfo.color.a *= renderable.mRenderer->GetOpacity(updateBufferIndex);
         partialRenderingCacheInfo.textureSet = renderable.mRenderer->GetTextureSet();
       }
 
