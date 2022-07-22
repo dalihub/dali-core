@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,26 @@ inline void AdjustProperty(Property::Value& currentPropertyValue, const Property
   }
 }
 
+/// Helper to convert and then assign the property value
+template<typename PropertyType, typename Value>
+inline void SetValue(const Property::Value& propertyValue, Value& value)
+{
+  PropertyType convertedValue;
+  if(propertyValue.Get(convertedValue))
+  {
+    value = convertedValue;
+  }
+}
+
+/// Helper to check container property type and set appropriately
+template<typename ContainerType>
+inline void SetContainerValue(const ContainerType* containerPtr, Property::Value& value)
+{
+  if(containerPtr)
+  {
+    value = *containerPtr;
+  }
+}
 } // unnamed namespace
 
 void PropertyMetadata::SetPropertyValue(const Property::Value& propertyValue)
@@ -63,111 +83,67 @@ void PropertyMetadata::SetPropertyValue(const Property::Value& propertyValue)
 
     case Property::RECTANGLE:
     {
-      Rect<int32_t> convertedValue;
-      if(propertyValue.Get(convertedValue))
-      {
-        value = convertedValue;
-      }
+      SetValue<Rect<int32_t>>(propertyValue, value);
       break;
     }
 
     case Property::STRING:
     {
-      std::string convertedValue;
-      if(propertyValue.Get(convertedValue))
-      {
-        value = convertedValue;
-      }
+      SetValue<std::string>(propertyValue, value);
       break;
     }
 
     case Property::ARRAY:
     {
-      const Property::Array* array = propertyValue.GetArray();
-      if(array)
-      {
-        value = *array;
-      }
+      SetContainerValue(propertyValue.GetArray(), value);
       break;
     }
 
     case Property::MAP:
     {
-      const Property::Map* map = propertyValue.GetMap();
-      if(map)
-      {
-        value = *map;
-      }
+      SetContainerValue(propertyValue.GetMap(), value);
       break;
     }
 
     case Property::EXTENTS:
     {
-      Extents convertedValue;
-      if(propertyValue.Get(convertedValue))
-      {
-        value = convertedValue;
-      }
+      SetValue<Extents>(propertyValue, value);
       break;
     }
 
     case Property::BOOLEAN:
     {
-      bool convertedValue;
-      if(propertyValue.Get(convertedValue))
-      {
-        value = convertedValue;
-      }
+      SetValue<bool>(propertyValue, value);
       break;
     }
 
     case Property::INTEGER:
     {
-      int32_t convertedValue;
-      if(propertyValue.Get(convertedValue))
-      {
-        value = convertedValue;
-      }
+      SetValue<int32_t>(propertyValue, value);
       break;
     }
 
     case Property::FLOAT:
     {
-      float convertedValue;
-      if(propertyValue.Get(convertedValue))
-      {
-        value = convertedValue;
-      }
+      SetValue<float>(propertyValue, value);
       break;
     }
 
     case Property::ROTATION:
     {
-      Quaternion convertedValue;
-      if(propertyValue.Get(convertedValue))
-      {
-        value = convertedValue;
-      }
+      SetValue<Quaternion>(propertyValue, value);
       break;
     }
 
     case Property::MATRIX:
     {
-      Matrix convertedValue;
-      if(propertyValue.Get(convertedValue))
-      {
-        value = convertedValue;
-      }
+      SetValue<Matrix>(propertyValue, value);
       break;
     }
 
     case Property::MATRIX3:
     {
-      Matrix3 convertedValue;
-      if(propertyValue.Get(convertedValue))
-      {
-        value = convertedValue;
-      }
+      SetValue<Matrix3>(propertyValue, value);
       break;
     }
 
@@ -176,17 +152,25 @@ void PropertyMetadata::SetPropertyValue(const Property::Value& propertyValue)
       Vector2 vector2Value;
       value.Get(vector2Value);
 
-      if(componentIndex == 0)
+      switch(componentIndex)
       {
-        vector2Value.x = propertyValue.Get<float>();
-      }
-      else if(componentIndex == 1)
-      {
-        vector2Value.y = propertyValue.Get<float>();
-      }
-      else
-      {
-        propertyValue.Get(vector2Value);
+        case 0:
+        {
+          SetValue<float>(propertyValue, vector2Value.x);
+          break;
+        }
+
+        case 1:
+        {
+          SetValue<float>(propertyValue, vector2Value.y);
+          break;
+        }
+
+        default:
+        {
+          SetValue<Vector2>(propertyValue, vector2Value);
+          break;
+        }
       }
 
       value = vector2Value;
@@ -198,21 +182,31 @@ void PropertyMetadata::SetPropertyValue(const Property::Value& propertyValue)
       Vector3 vector3Value;
       value.Get(vector3Value);
 
-      if(componentIndex == 0)
+      switch(componentIndex)
       {
-        vector3Value.x = propertyValue.Get<float>();
-      }
-      else if(componentIndex == 1)
-      {
-        vector3Value.y = propertyValue.Get<float>();
-      }
-      else if(componentIndex == 2)
-      {
-        vector3Value.z = propertyValue.Get<float>();
-      }
-      else
-      {
-        propertyValue.Get(vector3Value);
+        case 0:
+        {
+          SetValue<float>(propertyValue, vector3Value.x);
+          break;
+        }
+
+        case 1:
+        {
+          SetValue<float>(propertyValue, vector3Value.y);
+          break;
+        }
+
+        case 2:
+        {
+          SetValue<float>(propertyValue, vector3Value.z);
+          break;
+        }
+
+        default:
+        {
+          SetValue<Vector3>(propertyValue, vector3Value);
+          break;
+        }
       }
 
       value = vector3Value;
@@ -224,25 +218,37 @@ void PropertyMetadata::SetPropertyValue(const Property::Value& propertyValue)
       Vector4 vector4Value;
       value.Get(vector4Value);
 
-      if(componentIndex == 0)
+      switch(componentIndex)
       {
-        vector4Value.x = propertyValue.Get<float>();
-      }
-      else if(componentIndex == 1)
-      {
-        vector4Value.y = propertyValue.Get<float>();
-      }
-      else if(componentIndex == 2)
-      {
-        vector4Value.z = propertyValue.Get<float>();
-      }
-      else if(componentIndex == 3)
-      {
-        vector4Value.w = propertyValue.Get<float>();
-      }
-      else
-      {
-        propertyValue.Get(vector4Value);
+        case 0:
+        {
+          SetValue<float>(propertyValue, vector4Value.x);
+          break;
+        }
+
+        case 1:
+        {
+          SetValue<float>(propertyValue, vector4Value.y);
+          break;
+        }
+
+        case 2:
+        {
+          SetValue<float>(propertyValue, vector4Value.z);
+          break;
+        }
+
+        case 3:
+        {
+          SetValue<float>(propertyValue, vector4Value.w);
+          break;
+        }
+
+        default:
+        {
+          SetValue<Vector4>(propertyValue, vector4Value);
+          break;
+        }
       }
 
       value = vector4Value;

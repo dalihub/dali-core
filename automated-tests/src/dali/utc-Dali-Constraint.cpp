@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -259,6 +259,7 @@ int UtcDaliConstraintNewFunctorN(void)
 
   END_TEST;
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1557,5 +1558,74 @@ int UtcDaliConstraintGetTagNegative(void)
   {
     DALI_TEST_CHECK(true); // We expect an assert
   }
+  END_TEST;
+}
+
+namespace ComponentTest
+{
+void CheckComponentProperty(TestApplication& application, Actor& actor, Property::Index property)
+{
+  float value = actor.GetCurrentProperty<float>(property);
+
+  // Add a component 0 constraint
+  RelativeToConstraintFloat relativeConstraint(2.0f);
+  Constraint                constraint = Constraint::New<float>(actor, property, relativeConstraint);
+  constraint.AddSource(Source{actor, property});
+  DALI_TEST_CHECK(constraint);
+  constraint.SetRemoveAction(Constraint::RemoveAction::DISCARD);
+  constraint.Apply();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<float>(property), value * 2.0f, TEST_LOCATION);
+
+  constraint.Remove();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<float>(property), value, TEST_LOCATION);
+}
+} // namespace ComponentTest
+
+int UtcDaliConstraintComponentTransformPropertyConstraintP(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::POSITION, Vector3(100.0f, 100.0f, 100.0f));
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), Vector3(100.0f, 100.0f, 100.0f), TEST_LOCATION);
+
+  ComponentTest::CheckComponentProperty(application, actor, Actor::Property::POSITION_X); // Component 0
+  ComponentTest::CheckComponentProperty(application, actor, Actor::Property::POSITION_Y); // Component 1
+  ComponentTest::CheckComponentProperty(application, actor, Actor::Property::POSITION_Z); // Component 2
+
+  END_TEST;
+}
+
+int UtcDaliConstraintComponentNonTransformPropertyConstraintP(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::COLOR, Vector4(0.25f, 0.25f, 0.25f, 0.25f));
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR), Vector4(0.25f, 0.25f, 0.25f, 0.25f), TEST_LOCATION);
+
+  ComponentTest::CheckComponentProperty(application, actor, Actor::Property::COLOR_RED);   // Component 0
+  ComponentTest::CheckComponentProperty(application, actor, Actor::Property::COLOR_GREEN); // Component 1
+  ComponentTest::CheckComponentProperty(application, actor, Actor::Property::COLOR_BLUE);  // Component 2
+  ComponentTest::CheckComponentProperty(application, actor, Actor::Property::COLOR_ALPHA); // Component 3
+
   END_TEST;
 }

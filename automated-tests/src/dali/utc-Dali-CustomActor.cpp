@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,14 @@
 #include "test-custom-actor.h"
 
 using namespace Dali;
+
+namespace Test
+{
+void Doubler(float& current, const PropertyInputContainer& inputs)
+{
+  current = 2.0f * inputs[0]->GetFloat();
+}
+} // namespace Test
 
 void custom_actor_test_startup(void)
 {
@@ -1606,6 +1614,98 @@ int UtcDaliCustomActorPropertyRegistrationDefaultValue(void)
   DALI_TEST_EQUALS(UnregisteredCustomActor::New().GetProperty(ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX).Get<float>(), 10.f, TEST_LOCATION);
   // check that the default value is set for the derived instance as well
   DALI_TEST_EQUALS(derived.GetProperty(ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX).Get<float>(), 10.f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliCustomActorComponentPropertyConstraintsP(void)
+{
+  TestApplication application; // Need the type registry
+
+  // register our base and add a property with default value for it
+  Dali::TypeRegistration typeRegistration(typeid(UnregisteredCustomActor), typeid(Dali::CustomActor), nullptr);
+
+  auto derived = DerivedCustomActor::New();
+  application.GetScene().Add(derived);
+
+  // should have all actor properties
+  auto actorHandle = Actor::New();
+  DALI_TEST_EQUALS(derived.GetPropertyCount(), actorHandle.GetPropertyCount(), TEST_LOCATION);
+
+  // add a property in base class
+  const Property::Index foobarIndex = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX;
+  const Property::Index fooIndex    = foobarIndex + 1;
+  const Property::Index barIndex    = foobarIndex + 2;
+
+  AnimatablePropertyRegistration(typeRegistration, "Foobar", foobarIndex, Vector2(10.0f, 20.0f));
+  AnimatablePropertyComponentRegistration(typeRegistration, "Foobar.x", fooIndex, foobarIndex, 0);
+  AnimatablePropertyComponentRegistration(typeRegistration, "Foobar.y", barIndex, foobarIndex, 1);
+
+  tet_infoline("Test the default values of the registered property");
+  // should be more properties now
+  DALI_TEST_EQUALS(derived.GetPropertyCount(), actorHandle.GetPropertyCount() + 3, TEST_LOCATION);
+  // check that the default value is set for base class
+  DALI_TEST_EQUALS(UnregisteredCustomActor::New().GetProperty(foobarIndex).Get<Vector2>(), Vector2(10.f, 20.0f), 0.0001f, TEST_LOCATION);
+  // check that the default value is set for the derived instance as well
+  DALI_TEST_EQUALS(derived.GetProperty(foobarIndex).Get<Vector2>(), Vector2(10.f, 20.0f), 0.0001f, TEST_LOCATION);
+
+  tet_infoline("Test that the components of the registered property can be constrained");
+
+  // Try constraining the properties
+  Constraint fooCons = Constraint::New<float>(derived, fooIndex, &Test::Doubler);
+  fooCons.AddSource(LocalSource(Actor::Property::POSITION_X));
+  fooCons.Apply();
+  Constraint barCons = Constraint::New<float>(derived, barIndex, &Test::Doubler);
+  barCons.AddSource(LocalSource(fooIndex));
+  barCons.Apply();
+
+  for(int i = 1; i < 10; ++i)
+  {
+    derived[Actor::Property::POSITION_X] = i * 1.0f;
+    application.SendNotification();
+    application.Render();
+    DALI_TEST_EQUALS(derived.GetCurrentProperty(foobarIndex).Get<Vector2>(), Vector2(i * 2.0f, i * 4.0f), 0.0001f, TEST_LOCATION);
+  }
+
+  // Add a Vector3 property and its components for completeness
+  const Property::Index vec3PropIndex  = barIndex + 1;
+  const Property::Index vec3xPropIndex = vec3PropIndex + 1;
+  const Property::Index vec3yPropIndex = vec3PropIndex + 2;
+  const Property::Index vec3zPropIndex = vec3PropIndex + 3;
+
+  AnimatablePropertyRegistration(typeRegistration, "vec3Prop", vec3PropIndex, Vector3(10.0f, 20.0f, 30.0f));
+  AnimatablePropertyComponentRegistration(typeRegistration, "vec3Prop.x", vec3xPropIndex, vec3PropIndex, 0);
+  AnimatablePropertyComponentRegistration(typeRegistration, "vec3Prop.y", vec3yPropIndex, vec3PropIndex, 1);
+  AnimatablePropertyComponentRegistration(typeRegistration, "vec3Prop.z", vec3zPropIndex, vec3PropIndex, 2);
+
+  tet_infoline("Test the default values of the registered vec3 property");
+  // should be more properties now
+  DALI_TEST_EQUALS(derived.GetPropertyCount(), actorHandle.GetPropertyCount() + 7, TEST_LOCATION);
+  // check that the default value is set for base class
+  DALI_TEST_EQUALS(UnregisteredCustomActor::New().GetProperty(vec3PropIndex).Get<Vector3>(), Vector3(10.f, 20.0f, 30.0f), 0.0001f, TEST_LOCATION);
+  // check that the default value is set for the derived instance as well
+  DALI_TEST_EQUALS(derived.GetProperty(vec3PropIndex).Get<Vector3>(), Vector3(10.f, 20.0f, 30.0f), 0.0001f, TEST_LOCATION);
+
+  tet_infoline("Test that the components of the registered property can be constrained");
+
+  // Try constraining the properties
+  Constraint vec3xConstraint = Constraint::New<float>(derived, vec3xPropIndex, &Test::Doubler);
+  vec3xConstraint.AddSource(LocalSource(Actor::Property::POSITION_X));
+  vec3xConstraint.Apply();
+  Constraint vec3yConstraint = Constraint::New<float>(derived, vec3yPropIndex, &Test::Doubler);
+  vec3yConstraint.AddSource(LocalSource(vec3xPropIndex));
+  vec3yConstraint.Apply();
+  Constraint vec3zConstraint = Constraint::New<float>(derived, vec3zPropIndex, &Test::Doubler);
+  vec3zConstraint.AddSource(LocalSource(vec3yPropIndex));
+  vec3zConstraint.Apply();
+
+  for(int i = 1; i < 10; ++i)
+  {
+    derived[Actor::Property::POSITION_X] = i * 1.0f;
+    application.SendNotification();
+    application.Render();
+    DALI_TEST_EQUALS(derived.GetCurrentProperty(vec3PropIndex).Get<Vector3>(), Vector3(i * 2.0f, i * 4.0f, i * 8.0f), 0.0001f, TEST_LOCATION);
+  }
 
   END_TEST;
 }
