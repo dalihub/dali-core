@@ -95,6 +95,7 @@ enum Type
   IS_LAYER                   = Dali::Actor::Property::IS_LAYER,
   CONNECTED_TO_SCENE         = Dali::Actor::Property::CONNECTED_TO_SCENE,
   KEYBOARD_FOCUSABLE         = Dali::Actor::Property::KEYBOARD_FOCUSABLE,
+  UPDATE_AREA_HINT           = Dali::Actor::Property::UPDATE_AREA_HINT,
 
   /**
    * @brief Sets the sibling order of the actor so depth position can be defined within the same parent.
@@ -104,13 +105,6 @@ enum Type
    * sibling order. The values set by this Property will likely change.
    */
   SIBLING_ORDER,
-
-  /**
-   * @brief Sets the update size hint of the actor.
-   * @details Name "updateSizeHint", type Property::VECTOR2.
-   * @note Overrides the size used for the actor damaged area calculation. Affected by the actor model view matrix.
-   */
-  UPDATE_SIZE_HINT,
 
   /**
     * @brief If this actor receives a touch-start event, then all following touch events are sent to this actor until a touch-end.

@@ -603,7 +603,7 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
             {
               RenderItem& item = renderList->GetItem(listIndex);
               // If the item does 3D transformation, do early exit and clean the damaged rect array
-              if(item.mUpdateSize == Vector3::ZERO)
+              if(item.mUpdateArea == Vector4::ZERO)
               {
                 return;
               }
@@ -617,7 +617,7 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
               {
                 item.mIsUpdated = false;
 
-                rect = RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, item.mUpdateSize, viewportRect.width, viewportRect.height);
+                rect = RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, Vector3(item.mUpdateArea.x, item.mUpdateArea.y, 0.0f), Vector3(item.mUpdateArea.z, item.mUpdateArea.w, 0.0f), viewportRect.width, viewportRect.height);
                 if(rect.IsValid() && rect.Intersect(viewportRect) && !rect.IsEmpty())
                 {
                   const int left   = rect.x;

@@ -80,7 +80,7 @@ Node::Node()
   mVisible(true),
   mCulled(false),
   mColor(Color::WHITE),
-  mUpdateSizeHint(Vector3::ZERO),
+  mUpdateAreaHint(Vector4::ZERO),
   mWorldPosition(TRANSFORM_PROPERTY_WORLD_POSITION, Vector3(0.0f, 0.0f, 0.0f)), // Zero initialized by default
   mWorldScale(TRANSFORM_PROPERTY_WORLD_SCALE, Vector3(1.0f, 1.0f, 1.0f)),
   mWorldOrientation(), // Initialized to identity by default

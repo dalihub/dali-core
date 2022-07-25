@@ -2,7 +2,7 @@
 #define DALI_ACTOR_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -724,6 +724,15 @@ public:
        * @SINCE_1_9.17
        */
       KEYBOARD_FOCUSABLE,
+
+      /**
+       * @brief Sets the update area hint of the actor.
+       * @details Name "updateAreaHint", type Property::VECTOR4 (x, y, width, height).
+       * @note Overrides the area - the position and the size - used for the actor damaged area calculation. Affected by the actor model view matrix.
+       * The position is relative to the center of the actor and it is also the center of the damaged area.
+       * @SINCE_2_1.33
+       */
+      UPDATE_AREA_HINT
     };
   };
 
