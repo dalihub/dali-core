@@ -2,7 +2,7 @@
 #define DALI_TEXTURE_DEVEL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,60 @@ bool DALI_CORE_API IsNative(Dali::Texture texture);
  * @return True if the shader code was modified
  */
 bool DALI_CORE_API ApplyNativeFragmentShader(Dali::Texture texture, std::string& shader);
+
+/**
+ * @brief Uploads data to the texture from a PixelData object.
+ * @note Compressed type doesn't support this API.
+ * @note Upload does not upsample or downsample pixel data to fit the specified rectangular area in the texture.
+ *
+ * @SINCE_2_1.33
+ * @param[in] texture The texture will be uploaded
+ * @param[in] pixelData The pixelData object
+ * @param[in] dataXOffset Specifies an horizontal offset of the rectangular area in the pixelData that will be updated
+ * @param[in] dataYOffset Specifies a vertical offset of the rectangular area in the pixelData that will be updated
+ * @param[in] dataWidth Specifies the width of the rectangular area in the pixelData that will be updated
+ * @param[in] dataHeight Specifies the height of the rectangular area in the pixelData that will be updated
+ * @return True if the PixelData object has compatible pixel format and fits within the texture, false otherwise
+ */
+bool DALI_CORE_API UploadSubPixelData(Dali::Texture   texture,
+                                      Dali::PixelData pixelData,
+                                      uint32_t        dataXOffset,
+                                      uint32_t        dataYOffset,
+                                      uint32_t        dataWidth,
+                                      uint32_t        dataHeight);
+
+/**
+ * @brief Uploads data to the texture from a PixelData object.
+ * @note Compressed type doesn't support this API.
+ * @note Upload does not upsample or downsample pixel data to fit the specified rectangular area in the texture.
+ *
+ * @SINCE_2_1.33
+ * @param[in] texture The texture will be uploaded
+ * @param[in] pixelData The pixelData object
+ * @param[in] dataXOffset Specifies an horizontal offset of the rectangular area in the pixelData that will be updated
+ * @param[in] dataYOffset Specifies a vertical offset of the rectangular area in the pixelData that will be updated
+ * @param[in] dataWidth Specifies the width of the rectangular area in the pixelData that will be updated
+ * @param[in] dataHeight Specifies the height of the rectangular area in the pixelData that will be updated
+ * @param[in] layer Specifies the layer of a cube map or array texture (Unused for 2D textures). @see CubeMapLayer
+ * @param[in] mipmap Specifies the level-of-detail number. Level 0 is the base image level. Level n is the nth mipmap reduction image
+ * @param[in] xOffset Specifies an horizontal offset of the rectangular area in the texture that will be updated
+ * @param[in] yOffset Specifies a vertical offset of the rectangular area in the texture that will be updated
+ * @param[in] width Specifies the width of the rectangular area in the texture that will be updated
+ * @param[in] height Specifies the height of the rectangular area in the texture that will be updated
+ * @return True if the PixelData object has compatible pixel format and fits within the texture, false otherwise
+ */
+bool DALI_CORE_API UploadSubPixelData(Dali::Texture   texture,
+                                      Dali::PixelData pixelData,
+                                      uint32_t        dataXOffset,
+                                      uint32_t        dataYOffset,
+                                      uint32_t        dataWidth,
+                                      uint32_t        dataHeight,
+                                      uint32_t        layer,
+                                      uint32_t        mipmap,
+                                      uint32_t        xOffset,
+                                      uint32_t        yOffset,
+                                      uint32_t        width,
+                                      uint32_t        height);
 
 } // namespace DevelTexture
 } // namespace Dali

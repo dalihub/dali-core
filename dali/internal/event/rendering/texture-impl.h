@@ -48,12 +48,16 @@ public:
    */
   struct UploadParams
   {
-    uint16_t layer;   ///< Specifies the layer of a cube map or array texture
-    uint16_t mipmap;  ///< Specifies the level-of-detail number. Level 0 is the base image level. Level n is the nth mipmap reduction image.
-    uint16_t xOffset; ///< Specifies a texel offset in the x direction within the texture array.
-    uint16_t yOffset; ///< Specifies a texel offset in the y direction within the texture array.
-    uint16_t width;   ///< Specifies the width of the texture subimage
-    uint16_t height;  ///< Specifies the height of the texture subimage.
+    uint32_t dataXOffset; ///< Specifies a pixeldata offset in the x direction within the pixeldata buffer.
+    uint32_t dataYOffset; ///< Specifies a pixeldata offset in the y direction within the pixeldata buffer.
+    uint16_t dataWidth;   ///< Specifies the width of the pixeldata subimage.
+    uint16_t dataHeight;  ///< Specifies the height of the pixeldata subimage.
+    uint16_t layer;       ///< Specifies the layer of a cube map or array texture
+    uint16_t mipmap;      ///< Specifies the level-of-detail number. Level 0 is the base image level. Level n is the nth mipmap reduction image.
+    uint16_t xOffset;     ///< Specifies a texel offset in the x direction within the texture array.
+    uint16_t yOffset;     ///< Specifies a texel offset in the y direction within the texture array.
+    uint16_t width;       ///< Specifies the width of the texture subimage
+    uint16_t height;      ///< Specifies the height of the texture subimage.
   };
 
   /**
@@ -96,6 +100,30 @@ public:
               uint32_t     yOffset,
               uint32_t     width,
               uint32_t     height);
+
+  /**
+   * @copydoc Dali::Texture::UploadSubPixelData()
+   */
+  bool UploadSubPixelData(PixelDataPtr pixelData,
+                          uint32_t     dataXOffset,
+                          uint32_t     dataYOffset,
+                          uint32_t     dataWidth,
+                          uint32_t     dataHeight);
+
+  /**
+   * @copydoc Dali::Texture::UploadSubPixelData()
+   */
+  bool UploadSubPixelData(PixelDataPtr pixelData,
+                          uint32_t     dataXOffset,
+                          uint32_t     dataYOffset,
+                          uint32_t     dataWidth,
+                          uint32_t     dataHeight,
+                          uint32_t     layer,
+                          uint32_t     mipmap,
+                          uint32_t     xOffset,
+                          uint32_t     yOffset,
+                          uint32_t     width,
+                          uint32_t     height);
 
   /**
    * @copydoc Dali::Texture::GenerateMipmaps()

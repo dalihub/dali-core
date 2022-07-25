@@ -286,15 +286,58 @@ void Texture::Upload(PixelDataPtr pixelData, const Internal::Texture::UploadPara
   }
 
   Graphics::TextureUpdateInfo info{};
+
+  const uint32_t bytePerPixel = Pixel::GetBytesPerPixel(pixelData->GetPixelFormat());
+  const uint32_t srcStride    = pixelData->GetStride();
+  uint32_t       srcOffset    = 0u;
+  uint32_t       srcSize      = pixelData->GetBufferSize();
+
+  const bool requiredSubPixelData = (!Pixel::IsCompressed(pixelData->GetPixelFormat())) &&
+                                    ((params.dataXOffset != 0) ||
+                                     (params.dataYOffset != 0) ||
+                                     (params.dataWidth != pixelData->GetWidth()) ||
+                                     (params.dataHeight != pixelData->GetHeight()));
+
+  if(requiredSubPixelData)
+  {
+    /**
+     * TextureUpdateInfo use byte scaled offset / size.
+     *
+     * To make we only use sub-data of inputed PixelData, make srcOffset as 'start of SubPixelData.
+     *
+     *   |---- dataStrideByte -----|
+     *   |-----| <-- dataXOffsetByte
+     *   ...........................
+     *   ......A-----------+........
+     *   ......|           |........
+     *   ......|           |........
+     *   ......+-----------+C.......
+     *   ......B....................
+     *
+     * A) Start of SubPixelData. offsetByte = dataStrideByte * dataYOffset + dataXOffsetByte.
+     * B) offsetByte = A).offsetByte + dataStrideByte * dataHeight. Note, It can be out of original PixelData boundary.
+     * C) End of SubPixelData. offsetByte = B).offsetByte - dataStrideByte + dataWidthByte.
+     *
+     * srcOffset = A).offsetByte;
+     * srcSize = ( C).offsetByte - A).offsetByte );
+     */
+    const uint32_t dataStrideByte  = (srcStride ? srcStride : static_cast<uint32_t>(params.dataWidth)) * bytePerPixel;
+    const uint32_t dataXOffsetByte = params.dataXOffset * bytePerPixel;
+    const uint32_t dataWidthByte   = static_cast<uint32_t>(params.dataWidth) * bytePerPixel;
+
+    srcOffset = params.dataYOffset * dataStrideByte + dataXOffsetByte;
+    srcSize   = static_cast<uint32_t>(params.dataHeight) * dataStrideByte - (dataStrideByte - dataWidthByte);
+  }
+
   info.dstTexture   = mGraphicsTexture.get();
   info.dstOffset2D  = {params.xOffset, params.yOffset};
   info.layer        = params.layer;
   info.level        = params.mipmap;
   info.srcReference = 0;
-  info.srcExtent2D  = {params.width, params.height};
-  info.srcOffset    = 0;
-  info.srcSize      = pixelData->GetBufferSize();
-  info.srcStride    = pixelData->GetStride();
+  info.srcExtent2D  = {params.dataWidth, params.dataHeight};
+  info.srcOffset    = srcOffset;
+  info.srcSize      = srcSize;
+  info.srcStride    = srcStride;
   info.srcFormat    = ConvertPixelFormat(pixelData->GetPixelFormat());
 
   Graphics::TextureUpdateSourceInfo updateSourceInfo{};

@@ -158,43 +158,23 @@ bool IsActorExclusiveToAnotherRenderTask(const Actor&                           
 }
 
 /**
- * Recursively hit test all the actors, without crossing into other layers.
- * This algorithm performs a Depth-First-Search (DFS) on all Actors within Layer.
- * Hit-Testing each Actor, noting the distance from the Ray-Origin (3D origin
- * of touch vector). The closest Hit-Tested Actor is that which is returned.
- * Exceptions to this rule are:
- * - When comparing against renderable parents, if Actor is the same distance
- * or closer than it's renderable parent, then it takes priority.
+ * Hit tests the given actor and updates the in/out variables appropriately
  */
-HitActor HitTestWithinLayer(Actor&                                     actor,
-                            const RenderTask&                          renderTask,
-                            const RenderTaskList::ExclusivesContainer& exclusives,
-                            const Vector4&                             rayOrigin,
-                            const Vector4&                             rayDir,
-                            const float&                               nearClippingPlane,
-                            const float&                               farClippingPlane,
-                            HitTestInterface&                          hitCheck,
-                            const bool&                                overlayed,
-                            bool&                                      overlayHit,
-                            bool                                       layerIs3d,
-                            const RayTest&                             rayTest,
-                            const Integration::Point&                  point,
-                            const uint32_t                             eventTime)
+void HitTestActor(const RenderTask&         renderTask,
+                  const Vector4&            rayOrigin,
+                  const Vector4&            rayDir,
+                  const float&              nearClippingPlane,
+                  const float&              farClippingPlane,
+                  HitTestInterface&         hitCheck,
+                  const RayTest&            rayTest,
+                  const Integration::Point& point,
+                  const uint32_t            eventTime,
+                  bool                      clippingActor,
+                  bool                      overlayedActor,
+                  Actor&                    actor,
+                  bool&                     overlayHit,
+                  HitActor&                 hit)
 {
-  HitActor hit;
-
-  if(IsActorExclusiveToAnotherRenderTask(actor, renderTask, exclusives))
-  {
-    return hit;
-  }
-
-  // For clipping, regardless of whether we have hit this actor or not.
-  // This is used later to ensure all nested clipped children have hit
-  // all clipping actors also for them to be counted as hit.
-  bool clippingActor  = actor.GetClippingMode() != ClippingMode::DISABLED;
-  bool overlayedActor = overlayed || actor.IsOverlay();
-
-  // If we are a clipping actor or hittable...
   if(clippingActor || hitCheck.IsActorHittable(&actor))
   {
     Vector3 size(actor.GetCurrentSize());
@@ -256,6 +236,76 @@ HitActor HitTestWithinLayer(Actor&                                     actor,
       }
     }
   }
+}
+
+/**
+ * When iterating through the children of an actor, this method updates the child-hit-data.
+ */
+void UpdateChildHitData(const HitActor& hit, const HitActor& currentHit, const bool layerIs3d, const bool parentIsRenderable, HitActor& childHit)
+{
+  bool updateChildHit = false;
+  if(currentHit.distance >= 0.0f)
+  {
+    if(layerIs3d)
+    {
+      updateChildHit = ((currentHit.depth > childHit.depth) ||
+                        ((currentHit.depth == childHit.depth) && (currentHit.distance < childHit.distance)));
+    }
+    else
+    {
+      updateChildHit = currentHit.depth >= childHit.depth;
+    }
+  }
+
+  if(updateChildHit)
+  {
+    if(!parentIsRenderable || currentHit.depth > hit.depth ||
+       (layerIs3d && (currentHit.depth == hit.depth && currentHit.distance < hit.distance)))
+    {
+      childHit = currentHit;
+    }
+  }
+}
+
+/**
+ * Recursively hit test all the actors, without crossing into other layers.
+ * This algorithm performs a Depth-First-Search (DFS) on all Actors within Layer.
+ * Hit-Testing each Actor, noting the distance from the Ray-Origin (3D origin
+ * of touch vector). The closest Hit-Tested Actor is that which is returned.
+ * Exceptions to this rule are:
+ * - When comparing against renderable parents, if Actor is the same distance
+ * or closer than it's renderable parent, then it takes priority.
+ */
+HitActor HitTestWithinLayer(Actor&                                     actor,
+                            const RenderTask&                          renderTask,
+                            const RenderTaskList::ExclusivesContainer& exclusives,
+                            const Vector4&                             rayOrigin,
+                            const Vector4&                             rayDir,
+                            const float&                               nearClippingPlane,
+                            const float&                               farClippingPlane,
+                            HitTestInterface&                          hitCheck,
+                            const bool&                                overlayed,
+                            bool&                                      overlayHit,
+                            bool                                       layerIs3d,
+                            const RayTest&                             rayTest,
+                            const Integration::Point&                  point,
+                            const uint32_t                             eventTime)
+{
+  HitActor hit;
+
+  if(IsActorExclusiveToAnotherRenderTask(actor, renderTask, exclusives))
+  {
+    return hit;
+  }
+
+  // For clipping, regardless of whether we have hit this actor or not.
+  // This is used later to ensure all nested clipped children have hit
+  // all clipping actors also for them to be counted as hit.
+  bool clippingActor  = actor.GetClippingMode() != ClippingMode::DISABLED;
+  bool overlayedActor = overlayed || actor.IsOverlay();
+
+  // If we are a clipping actor or hittable...
+  HitTestActor(renderTask, rayOrigin, rayDir, nearClippingPlane, farClippingPlane, hitCheck, rayTest, point, eventTime, clippingActor, overlayedActor, actor, overlayHit, hit);
 
   // If current actor is clipping, and hit failed, We should not checkup child actors. Fast return
   if(clippingActor && !(hit.actor))
@@ -303,28 +353,7 @@ HitActor HitTestWithinLayer(Actor&                                     actor,
           continue;
         }
 
-        bool updateChildHit = false;
-        if(currentHit.distance >= 0.0f)
-        {
-          if(layerIs3d)
-          {
-            updateChildHit = ((currentHit.depth > childHit.depth) ||
-                              ((currentHit.depth == childHit.depth) && (currentHit.distance < childHit.distance)));
-          }
-          else
-          {
-            updateChildHit = currentHit.depth >= childHit.depth;
-          }
-        }
-
-        if(updateChildHit)
-        {
-          if(!parentIsRenderable || currentHit.depth > hit.depth ||
-             (layerIs3d && (currentHit.depth == hit.depth && currentHit.distance < hit.distance)))
-          {
-            childHit = currentHit;
-          }
-        }
+        UpdateChildHitData(hit, currentHit, layerIs3d, parentIsRenderable, childHit);
       }
     }
   }
