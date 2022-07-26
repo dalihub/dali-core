@@ -57,7 +57,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/signals/base-signal.h>
 #include <dali/public-api/signals/callback.h>
 #include <dali/public-api/signals/signal-slot-connections.h>
