@@ -2,7 +2,7 @@
 #define DALI_MATRIX3_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -259,6 +259,17 @@ public:
    * @param[in] rhs Matrix, this cannot be same matrix as result
    */
   static void Multiply(Matrix3& result, const Matrix3& lhs, const Matrix3& rhs);
+
+  /**
+   * @brief The multiplication operator.
+   *
+   * Returned Vector = This Matrix * rhs
+   *
+   * @SINCE_2_1.34
+   * @param[in] rhs The Vector3 to multiply this by
+   * @return A Vector3 containing the result
+   */
+  Vector3 operator*(const Vector3& rhs) const;
 
 private:
   float mElements[9]; ///< The elements of the matrix
