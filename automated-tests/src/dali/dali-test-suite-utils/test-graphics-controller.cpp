@@ -1302,7 +1302,7 @@ Graphics::MemoryRequirements TestGraphicsController::GetBufferMemoryRequirements
   return Graphics::MemoryRequirements{};
 }
 
-const Graphics::TextureProperties& TestGraphicsController::GetTextureProperties(const Graphics::Texture& texture)
+Graphics::TextureProperties TestGraphicsController::GetTextureProperties(const Graphics::Texture& texture)
 {
   static Graphics::TextureProperties textureProperties{};
   mCallStack.PushCall("GetTextureProperties", "");
