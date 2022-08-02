@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_NODE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -651,17 +651,17 @@ public:
   }
 
   /**
-   * Retrieve the update size hint of the node.
-   * @return The update size hint.
+   * Retrieve the update area hint of the node.
+   * @return The update area hint.
    */
-  const Vector3& GetUpdateSizeHint() const
+  const Vector4& GetUpdateAreaHint() const
   {
     if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
     {
-      return mUpdateSizeHint.Get(0);
+      return mUpdateAreaHint.Get(0);
     }
 
-    return Vector3::ZERO;
+    return Vector4::ZERO;
   }
 
   /**
@@ -930,7 +930,8 @@ public: // Default properties
   AnimatableProperty<bool>    mVisible;        ///< Visibility can be inherited from the Node hierachy
   AnimatableProperty<bool>    mCulled;         ///< True if the node is culled. This is not animatable. It is just double-buffered.
   AnimatableProperty<Vector4> mColor;          ///< Color can be inherited from the Node hierarchy
-  AnimatableProperty<Vector3> mUpdateSizeHint; ///< Update size hint is provided for damaged area calculation. This is not animatable. It is just double-buffered. (Because all these bloody properties are).
+  AnimatableProperty<Vector4> mUpdateAreaHint; ///< Update area hint is provided for damaged area calculation. (x, y, width, height)
+                                               ///< This is not animatable. It is just double-buffered. (Because all these bloody properties are).
 
   // Inherited properties; read-only from public API
 

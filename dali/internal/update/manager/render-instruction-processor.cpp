@@ -137,34 +137,34 @@ bool CompareItems3DWithClipping(const RenderInstructionProcessor::SortAttributes
 }
 
 /**
- * Set the update size of the node
+ * Set the update area of the node
  * @param[in] node The node of the renderer
  * @param[in] isLayer3d Whether we are processing a 3D layer or not
  * @param[in,out] nodeWorldMatrix The world matrix of the node
  * @param[in,out] nodeSize The size of the node
- * @param[in,out] nodeUpdateSize The update size of the node
+ * @param[in,out] nodeUpdateArea The update area of the node
  *
- * @return True if node use it's own UpdateSizeHint, or z transform occured. False if we use nodeUpdateSize equal with nodeSize.
+ * @return True if node use it's own UpdateAreaHint, or z transform occured. False if we use nodeUpdateArea equal with Vector4(0, 0, nodeSize.width, nodeSize.height).
  */
-inline bool SetNodeUpdateSize(Node* node, bool isLayer3d, Matrix& nodeWorldMatrix, Vector3& nodeSize, Vector3& nodeUpdateSize)
+inline bool SetNodeUpdateArea(Node* node, bool isLayer3d, Matrix& nodeWorldMatrix, Vector3& nodeSize, Vector4& nodeUpdateArea)
 {
   node->GetWorldMatrixAndSize(nodeWorldMatrix, nodeSize);
 
-  if(node->GetUpdateSizeHint() == Vector3::ZERO)
+  if(node->GetUpdateAreaHint() == Vector4::ZERO)
   {
     // RenderItem::CalculateViewportSpaceAABB cannot cope with z transform
     // I don't use item.mModelMatrix.GetTransformComponents() for z transform, would be too slow
     if(!isLayer3d && nodeWorldMatrix.GetZAxis() == Vector3(0.0f, 0.0f, 1.0f))
     {
-      nodeUpdateSize = nodeSize;
+      nodeUpdateArea = Vector4(0.0f, 0.0f, nodeSize.width, nodeSize.height);
       return false;
     }
-    // Keep nodeUpdateSize as Vector3::ZERO, and return true.
+    // Keep nodeUpdateArea as Vector4::ZERO, and return true.
     return true;
   }
   else
   {
-    nodeUpdateSize = node->GetUpdateSizeHint();
+    nodeUpdateArea = node->GetUpdateAreaHint();
     return true;
   }
 }
@@ -195,9 +195,9 @@ inline void AddRendererToRenderList(BufferIndex         updateBufferIndex,
   Node*   node = renderable.mNode;
   Matrix  nodeWorldMatrix(false);
   Vector3 nodeSize;
-  Vector3 nodeUpdateSize;
-  bool    nodeUpdateSizeSet(false);
-  bool    nodeUpdateSizeUseHint(false);
+  Vector4 nodeUpdateArea;
+  bool    nodeUpdateAreaSet(false);
+  bool    nodeUpdateAreaUseHint(false);
   Matrix  nodeModelViewMatrix(false);
   bool    nodeModelViewMatrixSet(false);
 
@@ -212,11 +212,11 @@ inline void AddRendererToRenderList(BufferIndex         updateBufferIndex,
 
     if(inside && !isLayer3d && viewportSet)
     {
-      nodeUpdateSizeUseHint = SetNodeUpdateSize(node, isLayer3d, nodeWorldMatrix, nodeSize, nodeUpdateSize);
-      nodeUpdateSizeSet     = true;
+      nodeUpdateAreaUseHint = SetNodeUpdateArea(node, isLayer3d, nodeWorldMatrix, nodeSize, nodeUpdateArea);
+      nodeUpdateAreaSet     = true;
 
       const Vector3& scale = node->GetWorldScale(updateBufferIndex);
-      const Vector3& size  = nodeUpdateSize * scale;
+      const Vector3& size  = Vector3(nodeUpdateArea.z, nodeUpdateArea.w, 1.0f) * scale;
 
       if(size.LengthSquared() > Math::MACHINE_EPSILON_1000)
       {
@@ -226,7 +226,7 @@ inline void AddRendererToRenderList(BufferIndex         updateBufferIndex,
         // Assume actors are at z=0, compute AABB in view space & test rect intersection
         // against z=0 plane boundaries for frustum. (NOT viewport). This should take into account
         // magnification due to FOV etc.
-        ClippingBox boundingBox = RenderItem::CalculateTransformSpaceAABB(nodeModelViewMatrix, nodeUpdateSize);
+        ClippingBox boundingBox = RenderItem::CalculateTransformSpaceAABB(nodeModelViewMatrix, Vector3(nodeUpdateArea.x, nodeUpdateArea.y, 0.0f), Vector3(nodeUpdateArea.z, nodeUpdateArea.w, 0.0f));
         ClippingBox clippingBox(camera.mLeftClippingPlane, camera.mBottomClippingPlane, camera.mRightClippingPlane - camera.mLeftClippingPlane, fabsf(camera.mBottomClippingPlane - camera.mTopClippingPlane));
         inside = clippingBox.Intersects(boundingBox);
       }
@@ -298,19 +298,21 @@ inline void AddRendererToRenderList(BufferIndex         updateBufferIndex,
 
       item.mIsUpdated |= isLayer3d;
 
-      if(!nodeUpdateSizeSet)
+      if(!nodeUpdateAreaSet)
       {
-        nodeUpdateSizeUseHint = SetNodeUpdateSize(node, isLayer3d, nodeWorldMatrix, nodeSize, nodeUpdateSize);
+        nodeUpdateAreaUseHint = SetNodeUpdateArea(node, isLayer3d, nodeWorldMatrix, nodeSize, nodeUpdateArea);
       }
 
       item.mSize        = nodeSize;
-      item.mUpdateSize  = nodeUpdateSize;
+      item.mUpdateArea  = nodeUpdateArea;
       item.mModelMatrix = nodeWorldMatrix;
 
       // Apply transform informations if node doesn't have update size hint and use VisualRenderer.
-      if(!nodeUpdateSizeUseHint && renderable.mRenderer && renderable.mRenderer->GetVisualProperties())
+      if(!nodeUpdateAreaUseHint && renderable.mRenderer && renderable.mRenderer->GetVisualProperties())
       {
-        item.mUpdateSize = renderable.mRenderer->CalculateVisualTransformedUpdateSize(updateBufferIndex, item.mUpdateSize);
+        Vector3 updateSize = renderable.mRenderer->CalculateVisualTransformedUpdateSize(updateBufferIndex, Vector3(item.mUpdateArea.z, item.mUpdateArea.w, 0.0f));
+        item.mUpdateArea.z = updateSize.x;
+        item.mUpdateArea.w = updateSize.y;
       }
 
       if(!nodeModelViewMatrixSet)
@@ -319,9 +321,9 @@ inline void AddRendererToRenderList(BufferIndex         updateBufferIndex,
       }
       item.mModelViewMatrix = nodeModelViewMatrix;
 
-      partialRenderingCacheInfo.matrix      = item.mModelViewMatrix;
-      partialRenderingCacheInfo.size        = item.mSize;
-      partialRenderingCacheInfo.updatedSize = item.mUpdateSize;
+      partialRenderingCacheInfo.matrix              = item.mModelViewMatrix;
+      partialRenderingCacheInfo.size                = item.mSize;
+      partialRenderingCacheInfo.updatedPositionSize = item.mUpdateArea;
 
       item.mIsUpdated = partialRenderingData.IsUpdated() || item.mIsUpdated;
 

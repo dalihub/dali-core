@@ -429,7 +429,7 @@ inline void RenderAlgorithms::SetupScissorClipping(
       // This is a clipping node. We generate the AABB for this node and intersect it with the previous intersection further up the tree.
 
       // Get the AABB bounding box for the current render item.
-      const ClippingBox scissorBox(RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, item.mSize, mViewportRectangle.width, mViewportRectangle.height));
+      const ClippingBox scissorBox(RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, Vector3::ZERO, item.mSize, mViewportRectangle.width, mViewportRectangle.height));
 
       // Get the AABB for the parent item that we must intersect with.
       const ClippingBox& parentBox(mScissorStack.back());
@@ -471,7 +471,7 @@ inline void RenderAlgorithms::SetupScissorClipping(
     {
       // store clipping box inside the render callback input structure
       auto& input       = item.mRenderer->GetRenderCallbackInput();
-      input.clippingBox = ClippingBox(RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, item.mSize, mViewportRectangle.width, mViewportRectangle.height));
+      input.clippingBox = ClippingBox(RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, Vector3::ZERO, item.mSize, mViewportRectangle.width, mViewportRectangle.height));
     }
   }
 }
@@ -636,7 +636,7 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
     bool skip = true;
     if(!rootClippingRect.IsEmpty())
     {
-      auto rect = RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, item.mUpdateSize, mViewportRectangle.width, mViewportRectangle.height);
+      auto rect = RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, Vector3(item.mUpdateArea.x, item.mUpdateArea.y, 0.0f), Vector3(item.mUpdateArea.z, item.mUpdateArea.w, 0.0f), mViewportRectangle.width, mViewportRectangle.height);
 
       if(rect.Intersect(rootClippingRect))
       {

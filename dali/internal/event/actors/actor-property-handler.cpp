@@ -563,9 +563,9 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
       break;
     }
 
-    case Dali::DevelActor::Property::UPDATE_SIZE_HINT:
+    case Dali::Actor::Property::UPDATE_AREA_HINT:
     {
-      actor.SetUpdateSizeHint(property.Get<Vector2>());
+      actor.SetUpdateAreaHint(property.Get<Vector4>());
       break;
     }
 
@@ -1874,10 +1874,10 @@ bool Actor::PropertyHandler::GetCurrentPropertyValue(const Internal::Actor& acto
       break;
     }
 
-    case Dali::DevelActor::Property::UPDATE_SIZE_HINT:
+    case Dali::Actor::Property::UPDATE_AREA_HINT:
     {
       // node is being used in a separate thread, the value from the previous update is the same, set by user
-      value = Vector2(actor.GetNode().GetUpdateSizeHint());
+      value = Vector4(actor.GetNode().GetUpdateAreaHint());
       break;
     }
 

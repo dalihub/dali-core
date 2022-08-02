@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -310,6 +310,26 @@ int UtcDaliMatrix3Multiply(void)
   Matrix3::Multiply(result, m1, m2);
 
   DALI_TEST_EQUALS(m3, result, 0.01f, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliMatrix3OperatorMultiply01P(void)
+{
+  Vector3 v1(2.0f, 5.0f, 4.0f);
+
+  Vector3 v2 = m1 * v1;
+  Vector3 r1(-37.2f, 118.8f, 13.2f);
+  DALI_TEST_EQUALS(v2, r1, 0.01f, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliMatrix3OperatorMultiply02P(void)
+{
+  Vector3 v1(2.0f, 5.0f, 4.0f);
+
+  Vector3 v2 = m6 * v1;
+  Vector3 r1(88.668f, 35.2f, -340.65f);
+  DALI_TEST_EQUALS(v2, r1, 0.01f, TEST_LOCATION);
   END_TEST;
 }
 

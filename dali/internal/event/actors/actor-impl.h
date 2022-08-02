@@ -1877,10 +1877,10 @@ private:
   }
 
   /**
-   * @brief Sets the update size hint of an actor.
-   * @param [in] updateSizeHint The update size hint.
+   * @brief Sets the update area hint of an actor.
+   * @param [in] updateAreaHint The update area hint.
    */
-  void SetUpdateSizeHint(const Vector2& updateSizeHint);
+  void SetUpdateAreaHint(const Vector4& updateAreaHint);
 
 protected:
   ActorParentImpl    mParentImpl;   ///< Implementation of ActorParent;

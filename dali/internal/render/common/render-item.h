@@ -56,9 +56,10 @@ struct RenderItem
    * See below for caveats.
    *
    * @param[in]    transformMatrix   The matrix for converting to a different space
+   * @param[in]    position          The center position of the render item
    * @param[in]    size              The size of the render item
    */
-  static ClippingBox CalculateTransformSpaceAABB(const Matrix& transformMatrix, const Vector3& size);
+  static ClippingBox CalculateTransformSpaceAABB(const Matrix& transformMatrix, const Vector3& position, const Vector3& size);
 
   /**
    * @brief This method is an optimized calculation of a viewport-space AABB (Axis-Aligned-Bounding-Box).
@@ -72,12 +73,13 @@ struct RenderItem
    * Note: ASSUMES THAT THE VIEWPORT COVERS THE SCREEN AND THAT THE CANVAS SIZE AND VIEWPORT SIZE ARE THE SAME!!!!!  (Not the case for magnifier)
    *
    * @param[in]    modelViewMatrix   The model view matrix
+   * @param[in]    position          The center position of the render item
    * @param[in]    size              The size of the render item
    * @param[in]    viewportWidth     The width of the viewport to calculate for
    * @param[in]    viewportHeight    The height of the viewport to calculate for
    * @return                         The AABB coordinates in viewport-space (x, y, width, height)
    */
-  static ClippingBox CalculateViewportSpaceAABB(const Matrix& modelViewMatrix, const Vector3& size, const int viewportWidth, const int viewportHeight);
+  static ClippingBox CalculateViewportSpaceAABB(const Matrix& modelViewMatrix, const Vector3& position, const Vector3& size, const int viewportWidth, const int viewportHeight);
 
   /**
    * Overriden delete operator.
@@ -90,10 +92,10 @@ struct RenderItem
   Matrix            mModelViewMatrix;
   Vector4           mColor;
   Vector3           mSize;
-  Vector3           mUpdateSize;
+  Vector4           mUpdateArea; ///< Update area hint is provided for damaged area calculation. (x, y, width, height)
   Render::Renderer* mRenderer;
   Node*             mNode;
-  const void*       mTextureSet; //< Used for sorting only
+  const void*       mTextureSet; ///< Used for sorting only
   int               mDepthIndex;
   bool              mIsOpaque : 1;
   bool              mIsUpdated : 1;

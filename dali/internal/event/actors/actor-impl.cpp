@@ -141,8 +141,8 @@ DALI_PROPERTY("isRoot", BOOLEAN, false, false, false, Dali::Actor::Property::IS_
 DALI_PROPERTY("isLayer", BOOLEAN, false, false, false, Dali::Actor::Property::IS_LAYER)
 DALI_PROPERTY("connectedToScene", BOOLEAN, false, false, false, Dali::Actor::Property::CONNECTED_TO_SCENE)
 DALI_PROPERTY("keyboardFocusable", BOOLEAN, true, false, false, Dali::Actor::Property::KEYBOARD_FOCUSABLE)
+DALI_PROPERTY("updateAreaHint", VECTOR4, true, false, false, Dali::Actor::Property::UPDATE_AREA_HINT)
 DALI_PROPERTY("siblingOrder", INTEGER, true, false, false, Dali::DevelActor::Property::SIBLING_ORDER)
-DALI_PROPERTY("updateSizeHint", VECTOR2, true, false, false, Dali::DevelActor::Property::UPDATE_SIZE_HINT)
 DALI_PROPERTY("captureAllTouchAfterStart", BOOLEAN, true, false, false, Dali::DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START)
 DALI_PROPERTY("touchAreaOffset", RECTANGLE, true, false, false, Dali::DevelActor::Property::TOUCH_AREA_OFFSET)
 DALI_PROPERTY("blendEquation", INTEGER, true, false, false, Dali::DevelActor::Property::BLEND_EQUATION)
@@ -1707,10 +1707,10 @@ void Actor::SetInheritLayoutDirection(bool inherit)
   }
 }
 
-void Actor::SetUpdateSizeHint(const Vector2& updateSizeHint)
+void Actor::SetUpdateAreaHint(const Vector4& updateAreaHint)
 {
   // node is being used in a separate thread; queue a message to set the value & base value
-  SceneGraph::NodePropertyMessage<Vector3>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mUpdateSizeHint, &AnimatableProperty<Vector3>::Bake, Vector3(updateSizeHint.width, updateSizeHint.height, 0.f));
+  SceneGraph::NodePropertyMessage<Vector4>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mUpdateAreaHint, &AnimatableProperty<Vector4>::Bake, updateAreaHint);
 }
 
 } // namespace Internal

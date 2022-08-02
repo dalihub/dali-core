@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_NODE_DATA_PROVIDER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,15 +40,15 @@ class TextureSet;
  */
 struct PartialRenderingCacheInfo
 {
-  Node*             node{nullptr};       /// Node associated with the entry
-  const Renderer*   renderer{nullptr};   /// Renderer object
-  const TextureSet* textureSet{nullptr}; /// TextureSet object
-  Matrix            matrix{};            /// Model-view matrix
-  Vector4           color{};             /// Color
-  Vector3           size{};              /// Size
-  Vector3           updatedSize{};       /// Updated size
-  bool              isOpaque{};          /// Opacity state
-  uint32_t          depthIndex{0u};      /// Depth index
+  Node*             node{nullptr};         /// Node associated with the entry
+  const Renderer*   renderer{nullptr};     /// Renderer object
+  const TextureSet* textureSet{nullptr};   /// TextureSet object
+  Matrix            matrix{};              /// Model-view matrix
+  Vector4           color{};               /// Color
+  Vector3           size{};                /// Size
+  Vector4           updatedPositionSize{}; /// Updated position/size (x, y, width, height)
+  bool              isOpaque{};            /// Opacity state
+  uint32_t          depthIndex{0u};        /// Depth index
 };
 
 /**

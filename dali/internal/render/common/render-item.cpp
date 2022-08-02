@@ -55,7 +55,7 @@ RenderItem::RenderItem()
 
 RenderItem::~RenderItem() = default;
 
-ClippingBox RenderItem::CalculateTransformSpaceAABB(const Matrix& transformMatrix, const Vector3& size)
+ClippingBox RenderItem::CalculateTransformSpaceAABB(const Matrix& transformMatrix, const Vector3& position, const Vector3& size)
 {
   // Calculate extent vector of the AABB:
   const float halfActorX = size.x * 0.5f;
@@ -68,9 +68,9 @@ ClippingBox RenderItem::CalculateTransformSpaceAABB(const Matrix& transformMatri
   // We place the coords into the array in clockwise order, so we know opposite corners are always i + 2 from corner i.
   // We skip the 4th corner here as we can calculate that from the other 3, bypassing matrix multiplication.
   // Note: The below transform methods use a fast (2D) matrix multiply (only 4 multiplications are done).
-  Vector2 corners[4]{Transform2D(transformMatrix, -halfActorX, -halfActorY),
-                     Transform2D(transformMatrix, halfActorX, -halfActorY),
-                     Transform2D(transformMatrix, halfActorX, halfActorY)};
+  Vector2 corners[4]{Transform2D(transformMatrix, -halfActorX + position.x, -halfActorY + position.y),
+                     Transform2D(transformMatrix, halfActorX + position.x, -halfActorY + position.y),
+                     Transform2D(transformMatrix, halfActorX + position.x, halfActorY + position.y)};
 
   // As we are dealing with a rectangle, we can do a fast calculation to get the 4th corner from knowing the other 3 (even if rotated).
   corners[3] = Vector2(corners[0] + (corners[2] - corners[1]));
@@ -106,7 +106,7 @@ ClippingBox RenderItem::CalculateTransformSpaceAABB(const Matrix& transformMatri
   return ClippingBox(x, y, z - x, fabsf(w - y));
 }
 
-ClippingBox RenderItem::CalculateViewportSpaceAABB(const Matrix& modelViewMatrix, const Vector3& size, const int viewportWidth, const int viewportHeight)
+ClippingBox RenderItem::CalculateViewportSpaceAABB(const Matrix& modelViewMatrix, const Vector3& position, const Vector3& size, const int viewportWidth, const int viewportHeight)
 {
   // Calculate extent vector of the AABB:
   const float halfActorX = size.x * 0.5f;
@@ -119,9 +119,9 @@ ClippingBox RenderItem::CalculateViewportSpaceAABB(const Matrix& modelViewMatrix
   // We place the coords into the array in clockwise order, so we know opposite corners are always i + 2 from corner i.
   // We skip the 4th corner here as we can calculate that from the other 3, bypassing matrix multiplication.
   // Note: The below transform methods use a fast (2D) matrix multiply (only 4 multiplications are done).
-  Vector2 corners[4]{Transform2D(modelViewMatrix, -halfActorX, -halfActorY),
-                     Transform2D(modelViewMatrix, halfActorX, -halfActorY),
-                     Transform2D(modelViewMatrix, halfActorX, halfActorY)};
+  Vector2 corners[4]{Transform2D(modelViewMatrix, -halfActorX + position.x, -halfActorY + position.y),
+                     Transform2D(modelViewMatrix, halfActorX + position.x, -halfActorY + position.y),
+                     Transform2D(modelViewMatrix, halfActorX + position.x, halfActorY + position.y)};
 
   // As we are dealing with a rectangle, we can do a fast calculation to get the 4th corner from knowing the other 3 (even if rotated).
   corners[3] = Vector2(corners[0] + (corners[2] - corners[1]));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -274,6 +274,13 @@ void Matrix3::Multiply(Matrix3& result, const Matrix3& lhs, const Matrix3& rhs)
                  (value1 * rhsPtr[5]) +
                  (value2 * rhsPtr[8]);
   }
+}
+
+Vector3 Matrix3::operator*(const Vector3& rhs) const
+{
+  return Vector3(rhs.x * mElements[S00] + rhs.y * mElements[S10] + rhs.z * mElements[S20],
+                 rhs.x * mElements[S01] + rhs.y * mElements[S11] + rhs.z * mElements[S21],
+                 rhs.x * mElements[S02] + rhs.y * mElements[S12] + rhs.z * mElements[S22]);
 }
 
 bool Matrix3::operator==(const Matrix3& rhs) const
