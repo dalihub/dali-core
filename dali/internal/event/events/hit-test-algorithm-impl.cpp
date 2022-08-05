@@ -566,7 +566,6 @@ bool HitTestRenderTask(const RenderTaskList::ExclusivesContainer& exclusives,
  * @param[in] taskList The list of render tasks
  * @param[out] results Ray information calculated by the camera
  * @param[in] hitCheck The hit testing interface object to use
- * @param[in] onScreen True to test on-screen, false to test off-screen
  * @return True if we have a hit, false otherwise
  */
 bool HitTestRenderTaskList(const Vector2&    sceneSize,
@@ -574,27 +573,21 @@ bool HitTestRenderTaskList(const Vector2&    sceneSize,
                            RenderTaskList&   taskList,
                            const Vector2&    screenCoordinates,
                            Results&          results,
-                           HitTestInterface& hitCheck,
-                           bool              onScreen)
+                           HitTestInterface& hitCheck)
 {
   RenderTaskList::RenderTaskContainer&                  tasks      = taskList.GetTasks();
   RenderTaskList::RenderTaskContainer::reverse_iterator endIter    = tasks.rend();
   const auto&                                           exclusives = taskList.GetExclusivesList();
   RayTest                                               rayTest;
 
+  // Hit test order should be reverse of draw order
   for(RenderTaskList::RenderTaskContainer::reverse_iterator iter = tasks.rbegin(); endIter != iter; ++iter)
   {
     RenderTask& renderTask            = *iter->Get();
-    const bool  isOffscreenRenderTask = renderTask.GetFrameBuffer();
-    if((onScreen && isOffscreenRenderTask) || (!onScreen && !isOffscreenRenderTask))
-    {
-      // Skip to next task
-      continue;
-    }
     if(HitTestRenderTask(exclusives, sceneSize, layers, renderTask, screenCoordinates, results, hitCheck, rayTest))
     {
       // Return true when an actor is hit (or layer in our render-task consumes the hit)
-      return true; // don't bother checking off screen tasks
+      return true;
     }
   }
 
@@ -609,7 +602,6 @@ bool HitTestRenderTaskList(const Vector2&    sceneSize,
  * @param[in] taskList The list of render tasks
  * @param[out] results Ray information calculated by the camera
  * @param[in] hitCheck The hit testing interface object to use
- * @param[in] onScreen True to test on-screen, false to test off-screen
  * @return True if we have a hit, false otherwise
  */
 bool HitTestForEachRenderTask(const Vector2&    sceneSize,
@@ -621,10 +613,7 @@ bool HitTestForEachRenderTask(const Vector2&    sceneSize,
 {
   bool result = false;
 
-  // Check on-screen tasks before off-screen ones.
-  // Hit test order should be reverse of draw order (see ProcessRenderTasks() where off-screen tasks are drawn first).
-  if(HitTestRenderTaskList(sceneSize, layers, taskList, screenCoordinates, results, hitCheck, true) ||
-     HitTestRenderTaskList(sceneSize, layers, taskList, screenCoordinates, results, hitCheck, false))
+  if(HitTestRenderTaskList(sceneSize, layers, taskList, screenCoordinates, results, hitCheck))
   {
     // Found hit.
     result = true;
