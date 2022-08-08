@@ -352,6 +352,30 @@ public:
   Actor GetScreenToFrameBufferMappingActor() const;
 
   /**
+   * @brief Sets the actor to compute viewport of this render task.
+   * Actor should be added on Scene.
+   * @SINCE_2_1.36
+   * @param[in] actor This actor is used to compute viewport of the render task.
+   * @note If window default camera is rotated and the actor is no longer a rectangle on the screen, Viewport may be computed incorrectly.
+   * The Viewport properties VIEWPORT_POSITION and VIEWPORT_SIZE is kept during using ViewportGuideActor, but only current value is changed.
+   */
+  void SetViewportGuideActor(Actor actor);
+
+  /**
+   * @brief Retrieves the actor to compute viewport of this render task.
+   * @SINCE_2_1.36
+   * @return This actor is used to compute viewport of the render task.
+   */
+  Actor GetViewportGuideActor() const;
+
+  /**
+   * @brief Resets the actor to compute viewport of this render task.
+   * @SINCE_2_1.36
+   * @note The Viewport properties VIEWPORT_POSITION and VIEWPORT_SIZE is still kept.
+   */
+  void ResetViewportGuideActor();
+
+  /**
    * @brief Sets the GL viewport position used when rendering.
    *
    * This specifies the transformation between normalized device coordinates and target window (or frame-buffer) coordinates.

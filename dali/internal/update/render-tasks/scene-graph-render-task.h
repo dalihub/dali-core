@@ -88,6 +88,18 @@ public:
   Node* GetSourceNode() const;
 
   /**
+   * Set the ViewportGuideNode.
+   * @param[in] node This node is used to compute viewport of the render task.
+   */
+  void SetViewportGuideNode(Node* node);
+
+  /**
+   * Retrieve the ViewportGuideNode.
+   * @return This node is used to compute viewport of the render task.
+   */
+  Node* GetViewportGuideNode() const;
+
+  /**
    * Set whether the RenderTask has exclusive access to the source nodes.
    * @param[in] exclusive True if the source nodes will only be rendered by this render-task.
    */
@@ -117,6 +129,14 @@ public:
    * @return The resource ID, or zero if not rendering off-screen.
    */
   Render::FrameBuffer* GetFrameBuffer();
+
+  /**
+   * Update viewport by using viewport guide node
+   * @param[in] updateBufferIndex The current update buffer index.
+   * @param[in] sceneSize The size of scene.
+   * @param[in] cameraPosition The position of default camera of the scene.
+   */
+  void UpdateViewport(BufferIndex updateBufferIndex, Vector2 sceneSize, Vector3 cameraPosition);
 
   /**
    * Set the value of property viewportPosition
@@ -372,6 +392,7 @@ private:
   Render::RenderTracker*   mRenderSyncTracker;
   Node*                    mSourceNode;
   Node*                    mCameraNode;
+  Node*                    mViewportGuideNode;
   SceneGraph::Camera*      mCamera;
   Render::FrameBuffer*     mFrameBuffer;
 
@@ -484,6 +505,20 @@ inline void SetCameraMessage(EventThreadServices& eventThreadServices, const Ren
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&task, &RenderTask::SetCamera, node, camera);
+}
+
+inline void SetViewportGuideNodeMessage(EventThreadServices& eventThreadServices, const RenderTask& task, const Node* constNode)
+{
+  // Scene graph thread can destroy this object.
+  Node* node = const_cast<Node*>(constNode);
+
+  using LocalType = MessageValue1<RenderTask, Node*>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new(slot) LocalType(&task, &RenderTask::SetViewportGuideNode, node);
 }
 
 inline void SetExclusiveMessage(EventThreadServices& eventThreadServices, const RenderTask& task, bool exclusive)

@@ -93,6 +93,16 @@ Node* RenderTask::GetSourceNode() const
   return mSourceNode;
 }
 
+void RenderTask::SetViewportGuideNode(Node* node)
+{
+  mViewportGuideNode = node;
+}
+
+Node* RenderTask::GetViewportGuideNode() const
+{
+  return mViewportGuideNode;
+}
+
 void RenderTask::SetExclusive(bool exclusive)
 {
   mExclusive = exclusive;
@@ -403,6 +413,23 @@ bool RenderTask::ViewMatrixUpdated()
   return retval;
 }
 
+void RenderTask::UpdateViewport(BufferIndex updateBufferIndex, Vector2 sceneSize, Vector3 cameraPosition)
+{
+  if(GetViewportGuideNode() && GetViewportGuideNode()->ConnectedToScene())
+  {
+    Vector3 worldPosition  = GetViewportGuideNode()->GetWorldPosition(updateBufferIndex);
+    worldPosition -= cameraPosition;
+
+    Vector3 nodeSize = GetViewportGuideNode()->GetSize(updateBufferIndex) * GetViewportGuideNode()->GetWorldScale(updateBufferIndex);
+    Vector2 halfSceneSize(sceneSize.width * 0.5f, sceneSize.height * 0.5f); // World position origin is center of scene
+    Vector3 halfNodeSize(nodeSize * 0.5f);
+    Vector2 screenPosition(halfSceneSize.width + worldPosition.x - halfNodeSize.x,
+                           halfSceneSize.height + worldPosition.y - halfNodeSize.y);
+    SetViewportPosition(updateBufferIndex, screenPosition);
+    SetViewportSize(updateBufferIndex, Vector2(nodeSize));
+  }
+}
+
 void RenderTask::SetViewportPosition(BufferIndex updateBufferIndex, const Vector2& value)
 {
   mViewportPosition.Set(updateBufferIndex, value);
@@ -482,6 +509,7 @@ RenderTask::RenderTask()
   mRenderSyncTracker(nullptr),
   mSourceNode(nullptr),
   mCameraNode(nullptr),
+  mViewportGuideNode(nullptr),
   mCamera(nullptr),
   mFrameBuffer(nullptr),
   mRefreshRate(Dali::RenderTask::DEFAULT_REFRESH_RATE),

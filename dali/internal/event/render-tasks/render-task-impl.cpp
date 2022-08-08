@@ -199,6 +199,32 @@ Dali::Actor RenderTask::GetScreenToFrameBufferMappingActor() const
   return mInputMappingActor.GetHandle();
 }
 
+void RenderTask::SetViewportGuideActor(Actor* actor)
+{
+  mViewportGuideActor.SetActor(actor);
+  if(actor)
+  {
+    SetViewportGuideNodeMessage(GetEventThreadServices(), GetRenderTaskSceneObject(), &actor->GetNode());
+  }
+  else
+  {
+    SetViewportGuideNodeMessage(GetEventThreadServices(), GetRenderTaskSceneObject(), nullptr);
+  }
+}
+
+Actor* RenderTask::GetViewportGuideActor() const
+{
+  return mViewportGuideActor.GetActor();
+}
+
+void RenderTask::ResetViewportGuideActor()
+{
+  SetViewportGuideActor(nullptr);
+
+  BakeViewportPositionMessage(GetEventThreadServices(), GetRenderTaskSceneObject(), mViewportPosition);
+  BakeViewportSizeMessage(GetEventThreadServices(), GetRenderTaskSceneObject(), mViewportSize);
+}
+
 void RenderTask::SetViewportPosition(const Vector2& value)
 {
   mViewportPosition = value;
@@ -742,6 +768,7 @@ RenderTask::RenderTask(const SceneGraph::RenderTask* sceneObject, RenderTaskList
 : Object(sceneObject),
   mSourceActor(),
   mCameraActor(),
+  mViewportGuideActor(),
   mInputMappingActor(),
   mRenderTaskList(renderTaskList),
   mClearColor(Dali::RenderTask::DEFAULT_CLEAR_COLOR),

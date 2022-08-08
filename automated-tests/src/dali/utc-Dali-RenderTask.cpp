@@ -3525,3 +3525,85 @@ int UtcDaliRenderTaskUploadOnly(void)
   DALI_TEST_CHECK(!finished);
   END_TEST;
 }
+
+int UtcDaliRenderTaskSetGetViewportGuideActor(void)
+{
+  TestApplication application;
+  tet_infoline("Testing RenderTask with Set/Get ViewportGuideActor");
+
+  Stage   stage = Stage::GetCurrent();
+  Vector2 stageSize(stage.GetSize());
+
+  Actor blue                                 = Actor::New();
+  blue[Dali::Actor::Property::NAME]          = "Blue";
+  blue[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  blue[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+  blue[Dali::Actor::Property::SIZE]          = Vector2(300, 300);
+  blue[Dali::Actor::Property::POSITION]      = Vector2(0, 0);
+
+  stage.Add(blue);
+
+  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTask     renderTask     = renderTaskList.CreateTask();
+
+  renderTask.SetViewportGuideActor(blue);
+
+  Actor actor = renderTask.GetViewportGuideActor();
+  DALI_TEST_EQUALS(actor, blue, TEST_LOCATION);
+
+  renderTask.ResetViewportGuideActor();
+  actor = renderTask.GetViewportGuideActor();
+
+  DALI_TEST_CHECK(!actor);
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskViewportGuideActor(void)
+{
+  TestApplication application;
+  tet_infoline("Testing RenderTask with ViewportGuideActor");
+
+  Stage   stage = Stage::GetCurrent();
+  Vector2 stageSize(stage.GetSize());
+
+  Actor blue                                 = Actor::New();
+  blue[Dali::Actor::Property::NAME]          = "Blue";
+  blue[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  blue[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+  blue[Dali::Actor::Property::SIZE]          = Vector2(300, 300);
+  blue[Dali::Actor::Property::POSITION]      = Vector2(0, 0);
+
+  Geometry geometry = Geometry::New();
+  Shader   shader   = Shader::New("vertexSrc", "fragmentSrc");
+  Renderer renderer = Renderer::New(geometry, shader);
+  blue.AddRenderer(renderer);
+
+  stage.Add(blue);
+
+  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTask     renderTask     = renderTaskList.CreateTask();
+
+  Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
+  cameraActor[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+  stage.Add(cameraActor);
+
+  renderTask.SetExclusive(true);
+  renderTask.SetInputEnabled(true);
+  renderTask.SetCameraActor(cameraActor);
+  renderTask.SetSourceActor(blue);
+  renderTask.SetViewportGuideActor(blue);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render(16);
+
+  Vector2 viewportPosition = renderTask.GetCurrentViewportPosition();
+  Vector2 viewportSize     = renderTask.GetCurrentViewportSize();
+
+  DALI_TEST_EQUALS(viewportSize, Vector2(300, 300), TEST_LOCATION);
+  DALI_TEST_EQUALS(viewportPosition, Vector2(90, 250), TEST_LOCATION);
+
+  END_TEST;
+}
