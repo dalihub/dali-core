@@ -8415,18 +8415,15 @@ int utcDaliActorPartialUpdate(void)
   application.GetScene().Remove(actor);
   application.SendNotification();
 
-  // Actor removed, last 3 dirty rects are reported. Adaptor would merge them together.
+  // Actor removed, last a dirty rect is reported.
   damagedRects.clear();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
-  DALI_TEST_EQUALS(damagedRects.size(), 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   clippingRect = damagedRects[0];
-  clippingRect.Merge(damagedRects[1]);
-  clippingRect.Merge(damagedRects[2]);
 
-  DALI_TEST_EQUALS(clippingRect.IsEmpty(), false, TEST_LOCATION);
   DALI_TEST_EQUALS(clippingRect.IsValid(), true, TEST_LOCATION);
-  DALI_TEST_EQUALS<Rect<int>>(clippingRect, Rect<int>(16, 736, 64, 64), TEST_LOCATION);
+  DALI_TEST_EQUALS<Rect<int>>(clippingRect, Rect<int>(32, 736, 48, 48), TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
@@ -8918,7 +8915,7 @@ int utcDaliActorPartialUpdateAnimation(void)
   // Started animation
   damagedRects.clear();
   application.PreRenderWithPartialUpdate(500, nullptr, damagedRects);
-  DALI_TEST_EQUALS(damagedRects.size(), 5, TEST_LOCATION);
+  DALI_TEST_EQUALS(damagedRects.size(), 3, TEST_LOCATION);
 
   // The first dirty rect is actor3's.
   // We don't know the exact dirty rect of actor2

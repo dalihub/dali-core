@@ -43,10 +43,9 @@ class Node;
 
 struct DirtyRect
 {
-  DirtyRect(Node* node, Render::Renderer* renderer, int32_t frame, Rect<int>& rect)
+  DirtyRect(Node* node, Render::Renderer* renderer, Rect<int>& rect)
   : node(node),
     renderer(renderer),
-    frame(frame),
     rect(rect),
     visited(true)
   {
@@ -58,14 +57,7 @@ struct DirtyRect
   {
     if(node == rhs.node)
     {
-      if(renderer == rhs.renderer)
-      {
-        return frame > rhs.frame; // Most recent rects come first
-      }
-      else
-      {
-        return renderer < rhs.renderer;
-      }
+      return renderer < rhs.renderer;
     }
     else
     {
@@ -75,7 +67,6 @@ struct DirtyRect
 
   Node*             node{nullptr};
   Render::Renderer* renderer{nullptr};
-  int32_t           frame{0};
   Rect<int32_t>     rect{};
   bool              visited{true};
 };
