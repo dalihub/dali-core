@@ -122,14 +122,29 @@ public:
   ScreenToFrameBufferFunction GetScreenToFrameBufferFunction() const;
 
   /**
-   * copydoc Dali::RenderTask::SetScreenToFrameBufferMappingActor
+   * @copydoc Dali::RenderTask::SetScreenToFrameBufferMappingActor
    */
   void SetScreenToFrameBufferMappingActor(Dali::Actor& mappingActor);
 
   /**
-   * copydoc Dali::RenderTask::GetScreenToFrameBufferMAppingActor
+   * @copydoc Dali::RenderTask::GetScreenToFrameBufferMAppingActor
    */
   Dali::Actor GetScreenToFrameBufferMappingActor() const;
+
+  /**
+   * @copydoc Dali::RenderTask::SetViewportGuideActor
+   */
+  void SetViewportGuideActor(Actor* actor);
+
+  /**
+   * @copydoc Dali::RenderTask::GetViewportGuideActor
+   */
+  Actor* GetViewportGuideActor() const;
+
+  /**
+   * @copydoc Dali::RenderTask::ResetViewportGuideActor
+   */
+  void ResetViewportGuideActor();
 
   /**
    * @copydoc Dali::RenderTask::SetViewportPosition
@@ -332,10 +347,11 @@ private: // not copyable
   RenderTask& operator=(const RenderTask&) = delete;
 
 private:
-  ActorObserver           mSourceActor;       ///< Source actor
-  ActorObserver           mCameraActor;       ///< Camera actor
-  WeakHandle<Dali::Actor> mInputMappingActor; /// used to mapping screen to frame buffer coordinate, not kept alive by rendertask
-  RenderTaskList&         mRenderTaskList;    ///< The render task list
+  ActorObserver           mSourceActor;        ///< Source actor
+  ActorObserver           mCameraActor;        ///< Camera actor
+  ActorObserver           mViewportGuideActor; ///< Actor to matching viewport of this render task to this Actor.
+  WeakHandle<Dali::Actor> mInputMappingActor;  /// used to mapping screen to frame buffer coordinate, not kept alive by rendertask
+  RenderTaskList&         mRenderTaskList;     ///< The render task list
 
   Vector4 mClearColor; ///< Optional clear color
 

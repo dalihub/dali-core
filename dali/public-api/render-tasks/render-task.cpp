@@ -146,6 +146,28 @@ Dali::Actor RenderTask::GetScreenToFrameBufferMappingActor() const
   return GetImplementation(*this).GetScreenToFrameBufferMappingActor();
 }
 
+void RenderTask::SetViewportGuideActor(Actor actor)
+{
+  // NULL handle is allowed
+  Internal::Actor* actorImpl(nullptr);
+  if(actor)
+  {
+    actorImpl = &GetImplementation(actor);
+  }
+
+  GetImplementation(*this).SetViewportGuideActor(actorImpl);
+}
+
+Actor RenderTask::GetViewportGuideActor() const
+{
+  return Dali::Actor(GetImplementation(*this).GetViewportGuideActor());
+}
+
+void RenderTask::ResetViewportGuideActor()
+{
+  GetImplementation(*this).ResetViewportGuideActor();
+}
+
 void RenderTask::SetViewportPosition(Vector2 position)
 {
   GetImplementation(*this).SetViewportPosition(position);

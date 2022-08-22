@@ -222,6 +222,20 @@ bool ProcessTasks(BufferIndex                          updateBufferIndex,
 
   bool isFirstRenderTask = true;
   bool keepRendering     = false;
+
+  // Retrieve size of Scene and default camera position to update viewport of each RenderTask if the RenderTask uses ViewportGuideNode.
+  RenderTaskList::RenderTaskContainer::Iterator iter                  = taskContainer.Begin();
+  RenderTask&                                   defaultRenderTask     = **iter;
+  auto                                          defaultCamera         = defaultRenderTask.GetCamera().GetNode();
+  auto                                          defaultRootNode       = defaultRenderTask.GetSourceNode();
+  Vector3                                       defaultCameraPosition = Vector3::ZERO;
+  Vector2                                       sceneSize             = Vector2::ZERO;
+  if(defaultCamera && defaultRootNode)
+  {
+    defaultCameraPosition = defaultCamera->GetWorldPosition(updateBufferIndex);
+    sceneSize             = Vector2(defaultRootNode->GetSize(updateBufferIndex) * defaultRootNode->GetWorldScale(updateBufferIndex));
+  }
+
   for(RenderTaskList::RenderTaskContainer::Iterator iter = taskContainer.Begin(), endIter = taskContainer.End(); endIter != iter; ++iter)
   {
     RenderTask& renderTask = **iter;
@@ -256,6 +270,8 @@ bool ProcessTasks(BufferIndex                          updateBufferIndex,
       // Skip to next task as no layer.
       continue;
     }
+
+    renderTask.UpdateViewport(updateBufferIndex, sceneSize, defaultCameraPosition);
 
     const uint32_t currentNumberOfInstructions = instructions.Count(updateBufferIndex);
 
