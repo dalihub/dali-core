@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -145,6 +145,11 @@ void Scene::SetSurfaceRect(const Rect<int32_t>& rect)
 {
   mSurfaceRect        = rect;
   mSurfaceRectChanged = true;
+
+  if(mRoot)
+  {
+    mRoot->SetUpdated(true);
+  }
 }
 
 const Rect<int32_t>& Scene::GetSurfaceRect() const
@@ -155,6 +160,11 @@ const Rect<int32_t>& Scene::GetSurfaceRect() const
 void Scene::SetSurfaceOrientation(int32_t orientation)
 {
   mSurfaceOrientation = orientation;
+
+  if(mRoot)
+  {
+    mRoot->SetUpdated(true);
+  }
 }
 
 int32_t Scene::GetSurfaceOrientation() const
