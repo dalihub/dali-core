@@ -1354,10 +1354,12 @@ int UtcDaliActorCalculateScreenExtents(void)
   actor.SetProperty(Actor::Property::POSITION, Vector3(2.0f, 2.0f, 16.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3{1.0f, 1.0f, 1.0f});
 
+  application.GetScene().Add(actor);
+
   application.SendNotification();
   application.Render();
 
-  auto expectedExtent = Rect<>{-0.5f, -0.5f, 1.0f, 1.0f};
+  auto expectedExtent = Rect<>{1.5f, 1.5f, 1.0f, 1.0f};
   auto actualExtent   = DevelActor::CalculateScreenExtents(actor);
   DALI_TEST_EQUALS(expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
@@ -1365,6 +1367,240 @@ int UtcDaliActorCalculateScreenExtents(void)
   DALI_TEST_EQUALS(expectedExtent.height, actualExtent.height, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
 
   application.GetScene().Remove(actor);
+  END_TEST;
+}
+
+int UtcDaliActorCalculateScreenExtentsInCustomCameraAndLayer3D(void)
+{
+  TestApplication    application;
+  Integration::Scene scene = application.GetScene();
+
+  // Make 3D Layer
+  Layer layer = Layer::New();
+  layer.SetProperty(Layer::Property::BEHAVIOR, Layer::Behavior::LAYER_3D);
+  layer.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  layer.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+
+  scene.Add(layer);
+
+  // Build custom camera with top-view
+  CameraActor cameraActor = scene.GetRenderTaskList().GetTask(0).GetCameraActor();
+  {
+    // Default camera position at +z and looking -z axis. (orientation is [ Axis: [0, 1, 0], Angle: 180 degrees ])
+    Vector3    cameraPos    = cameraActor.GetProperty<Vector3>(Actor::Property::POSITION);
+    Quaternion cameraOrient = cameraActor.GetProperty<Quaternion>(Actor::Property::ORIENTATION);
+
+    {
+      std::ostringstream oss;
+      oss << cameraPos << "\n";
+      oss << cameraOrient << "\n";
+      tet_printf("%s\n", oss.str().c_str());
+    }
+
+    cameraActor.SetProperty(Actor::Property::POSITION, Vector3(0.0f, -cameraPos.z, 0.0f));
+    cameraActor.SetProperty(Actor::Property::ORIENTATION, Quaternion(Degree(90.0f), Vector3::XAXIS) * cameraOrient);
+
+    // Now, upside : -Z, leftside : -X, foward : +Y
+
+    cameraPos    = cameraActor.GetProperty<Vector3>(Actor::Property::POSITION);
+    cameraOrient = cameraActor.GetProperty<Quaternion>(Actor::Property::ORIENTATION);
+    {
+      std::ostringstream oss;
+      oss << cameraPos << "\n";
+      oss << cameraOrient << "\n";
+      tet_printf("%s\n", oss.str().c_str());
+    }
+  }
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  actor.SetProperty(Actor::Property::POSITION, Vector3(2.0f, 0.0f, 16.0f));
+  actor.SetProperty(Actor::Property::SIZE, Vector3{1.0f, 0.0f, 3.0f});
+
+  layer.Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  Vector2 sceneSize = scene.GetSize();
+
+  auto expectedExtent = Rect<>{sceneSize.x * 0.5f + 1.5f, sceneSize.y * 0.5f + 14.5f, 1.0f, 3.0f};
+  auto actualExtent   = DevelActor::CalculateScreenExtents(actor);
+  {
+    std::ostringstream oss;
+    oss << expectedExtent << "\n";
+    oss << actualExtent << "\n";
+    tet_printf("%s\n", oss.str().c_str());
+  }
+
+  DALI_TEST_EQUALS(expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedExtent.width, actualExtent.width, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedExtent.height, actualExtent.height, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorCalculateScreenInCustomCameraAndOffscreenLayer3D(void)
+{
+  // TODO : Need to make it works well
+  TestApplication    application;
+  Integration::Scene scene     = application.GetScene();
+  Vector2            sceneSize = scene.GetSize();
+
+  // Make 3D Layer
+  Layer layer = Layer::New();
+  layer.SetProperty(Layer::Property::BEHAVIOR, Layer::Behavior::LAYER_3D);
+  layer.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  layer.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  layer.SetProperty(Actor::Property::POSITION, Vector3(0.0f, 0.0f, 0.0f));
+  layer.SetProperty(Actor::Property::SIZE, sceneSize);
+
+  scene.Add(layer);
+
+  // Build custom camera with top-view
+  CameraActor offscreenCameraActor = CameraActor::New(Size(TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT));
+
+  offscreenCameraActor.SetPerspectiveProjection(sceneSize);
+  offscreenCameraActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  offscreenCameraActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+
+  scene.Add(offscreenCameraActor);
+  {
+    // Default camera position at +z and looking -z axis. (orientation is [ Axis: [0, 1, 0], Angle: 180 degrees ])
+    Vector3    cameraPos    = offscreenCameraActor.GetProperty<Vector3>(Actor::Property::POSITION);
+    Quaternion cameraOrient = offscreenCameraActor.GetProperty<Quaternion>(Actor::Property::ORIENTATION);
+
+    {
+      std::ostringstream oss;
+      oss << cameraPos << "\n";
+      oss << cameraOrient << "\n";
+      tet_printf("%s\n", oss.str().c_str());
+    }
+
+    offscreenCameraActor.SetProperty(Actor::Property::POSITION, Vector3(0.0f, -cameraPos.z, 0.0f));
+    offscreenCameraActor.SetProperty(Actor::Property::ORIENTATION, Quaternion(Degree(90.0f), Vector3::XAXIS) * cameraOrient);
+
+    // Now, upside : -Z, leftside : -X, foward : +Y
+
+    cameraPos    = offscreenCameraActor.GetProperty<Vector3>(Actor::Property::POSITION);
+    cameraOrient = offscreenCameraActor.GetProperty<Quaternion>(Actor::Property::ORIENTATION);
+    {
+      std::ostringstream oss;
+      oss << cameraPos << "\n";
+      oss << cameraOrient << "\n";
+      tet_printf("%s\n", oss.str().c_str());
+    }
+  }
+  Vector3 sourcePosition{2.0f, 0.0f, 16.0f};
+  Vector3 sourceSize{1.0f, 0.0f, 3.0f};
+
+  Actor sourceActor = Actor::New();
+  sourceActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  sourceActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  sourceActor.SetProperty(Actor::Property::POSITION, sourcePosition);
+  sourceActor.SetProperty(Actor::Property::SIZE, sourceSize);
+
+  layer.Add(sourceActor);
+
+  // Create framebuffer
+  unsigned int width(64);
+  unsigned int height(64);
+  Texture      texture     = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  FrameBuffer  frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::DEPTH_STENCIL);
+  frameBuffer.AttachColorTexture(texture);
+
+  Actor rootActor = Actor::New();
+  rootActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  rootActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  rootActor.SetProperty(Actor::Property::POSITION, Vector3(0.0f, 0.0f, 0.0f));
+  rootActor.SetProperty(Actor::Property::SIZE, sceneSize);
+  scene.Add(rootActor);
+
+  RenderTaskList taskList = scene.GetRenderTaskList();
+  RenderTask     newTask  = taskList.CreateTask();
+  newTask.SetCameraActor(offscreenCameraActor);
+  newTask.SetSourceActor(layer);
+  newTask.SetInputEnabled(false);
+  newTask.SetClearColor(Vector4(0.f, 0.f, 0.f, 0.f));
+  newTask.SetClearEnabled(true);
+  newTask.SetExclusive(true);
+  newTask.SetFrameBuffer(frameBuffer);
+  newTask.SetScreenToFrameBufferMappingActor(rootActor);
+
+  application.SendNotification();
+  application.Render(16u);
+
+  auto expectedExtent = Rect<>{sceneSize.x * 0.5f + sourcePosition.x - sourceSize.x * 0.5f,
+                               sceneSize.y * 0.5f + sourcePosition.z - sourceSize.z * 0.5f,
+                               sourceSize.x,
+                               sourceSize.z};
+  auto actualExtent   = DevelActor::CalculateScreenExtents(sourceActor);
+  {
+    std::ostringstream oss;
+    oss << expectedExtent << "\n";
+    oss << actualExtent << "\n";
+    tet_printf("%s\n", oss.str().c_str());
+  }
+
+  auto expectedScreen = Vector2{sceneSize.x * 0.5f + sourcePosition.x, sceneSize.y * 0.5f + sourcePosition.z};
+  auto actualScreen   = sourceActor.GetProperty<Vector2>(Actor::Property::SCREEN_POSITION);
+  {
+    std::ostringstream oss;
+    oss << expectedScreen << "\n";
+    oss << actualScreen << "\n";
+    tet_printf("%s\n", oss.str().c_str());
+  }
+
+  DALI_TEST_EQUALS(expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedExtent.width, actualExtent.width, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedExtent.height, actualExtent.height, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(expectedScreen.x, actualScreen.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedScreen.y, actualScreen.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+
+  // Change rootActor's size and position
+
+  Vector3 rootPosition{100.0f, 200.0f, 0.0f};
+  Vector3 rootSize{200.0f, 100.0f, 0.0f};
+
+  rootActor.SetProperty(Actor::Property::POSITION, rootPosition);
+  rootActor.SetProperty(Actor::Property::SIZE, rootSize);
+
+  application.SendNotification();
+  application.Render(16u);
+
+  expectedExtent = Rect<>{sceneSize.x * 0.5f + rootPosition.x + (sourcePosition.x - sourceSize.x * 0.5f) * rootSize.x / sceneSize.x,
+                          sceneSize.y * 0.5f + rootPosition.y + (sourcePosition.z - sourceSize.z * 0.5f) * rootSize.y / sceneSize.y,
+                          sourceSize.x * rootSize.x / sceneSize.x,
+                          sourceSize.z * rootSize.y / sceneSize.y};
+  actualExtent   = DevelActor::CalculateScreenExtents(sourceActor);
+  {
+    std::ostringstream oss;
+    oss << expectedExtent << "\n";
+    oss << actualExtent << "\n";
+    tet_printf("%s\n", oss.str().c_str());
+  }
+
+  expectedScreen = Vector2{sceneSize.x * 0.5f + rootPosition.x + sourcePosition.x * rootSize.x / sceneSize.x, sceneSize.y * 0.5f + rootPosition.y + sourcePosition.z * rootSize.y / sceneSize.y};
+  actualScreen   = sourceActor.GetProperty<Vector2>(Actor::Property::SCREEN_POSITION);
+  {
+    std::ostringstream oss;
+    oss << expectedScreen << "\n";
+    oss << actualScreen << "\n";
+    tet_printf("%s\n", oss.str().c_str());
+  }
+
+  DALI_TEST_EQUALS(expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedExtent.width, actualExtent.width, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedExtent.height, actualExtent.height, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(expectedScreen.x, actualScreen.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedScreen.y, actualScreen.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+
   END_TEST;
 }
 
@@ -7084,6 +7320,76 @@ int UtcDaliActorGetScreenPositionResizeScene(void)
   // The screen position should be updated
   sceneSize = scene.GetSize();
   DALI_TEST_EQUALS(actorScreenPosition, sceneSize / 2, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorGetScreenPositionInCustomCameraAndLayer3D(void)
+{
+  tet_infoline("UtcDaliActorGetScreenPositionInCustomCameraAndLayer3D Check screen position under LAYER_3D and custom camera");
+
+  TestApplication    application;
+  Integration::Scene scene = application.GetScene();
+
+  // Make 3D Layer
+  Layer layer = scene.GetRootLayer();
+  layer.SetProperty(Layer::Property::BEHAVIOR, Layer::Behavior::LAYER_3D);
+
+  // Build custom camera with top-view
+  CameraActor cameraActor = scene.GetRenderTaskList().GetTask(0).GetCameraActor();
+  {
+    // Default camera position at +z and looking -z axis. (orientation is [ Axis: [0, 1, 0], Angle: 180 degrees ])
+    Vector3    cameraPos    = cameraActor.GetProperty<Vector3>(Actor::Property::POSITION);
+    Quaternion cameraOrient = cameraActor.GetProperty<Quaternion>(Actor::Property::ORIENTATION);
+
+    {
+      std::ostringstream oss;
+      oss << cameraPos << "\n";
+      oss << cameraOrient << "\n";
+      tet_printf("%s\n", oss.str().c_str());
+    }
+
+    cameraActor.SetProperty(Actor::Property::POSITION, Vector3(0.0f, -cameraPos.z, 0.0f));
+    cameraActor.SetProperty(Actor::Property::ORIENTATION, Quaternion(Degree(90.0f), Vector3::XAXIS) * cameraOrient);
+
+    // Now, upside : -Z, leftside : -X, foward : +Y
+
+    cameraPos    = cameraActor.GetProperty<Vector3>(Actor::Property::POSITION);
+    cameraOrient = cameraActor.GetProperty<Quaternion>(Actor::Property::ORIENTATION);
+    {
+      std::ostringstream oss;
+      oss << cameraPos << "\n";
+      oss << cameraOrient << "\n";
+      tet_printf("%s\n", oss.str().c_str());
+    }
+  }
+
+  Actor actorA = Actor::New();
+  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  actorA.SetProperty(Actor::Property::SIZE, Vector3(10.0f, 10.0f, 10.0f));
+  actorA.SetProperty(Actor::Property::POSITION, Vector3(20.0f, 0.0f, 10.0f));
+
+  Actor actorB = Actor::New();
+  actorB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  actorB.SetProperty(Actor::Property::SIZE, Vector3(10.0f, 10.0f, 10.0f));
+  actorB.SetProperty(Actor::Property::POSITION, Vector3(-20.0f, 0.0f, -10.0f));
+
+  scene.Add(actorA);
+  scene.Add(actorB);
+
+  application.SendNotification();
+  application.Render();
+
+  Vector2 sceneSize           = scene.GetSize();
+  Vector2 actorScreenPosition = actorA.GetProperty(Actor::Property::SCREEN_POSITION).Get<Vector2>();
+
+  DALI_TEST_EQUALS(actorScreenPosition, sceneSize / 2 + Vector2(20.0f, 10.0f), TEST_LOCATION);
+
+  actorScreenPosition = actorB.GetProperty(Actor::Property::SCREEN_POSITION).Get<Vector2>();
+
+  DALI_TEST_EQUALS(actorScreenPosition, sceneSize / 2 - Vector2(20.0f, 10.0f), TEST_LOCATION);
 
   END_TEST;
 }

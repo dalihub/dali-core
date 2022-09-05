@@ -433,12 +433,22 @@ void ActorParentImpl::DepthTraverseActorTree(OwnerPointer<SceneGraph::NodeDepths
   }
 }
 
-void ActorParentImpl::RecursiveConnectToScene(ActorContainer& connectionList, uint32_t depth)
+void ActorParentImpl::RecursiveConnectToScene(ActorContainer& connectionList, uint32_t layer3DParentsCount, uint32_t depth)
 {
   DALI_ASSERT_ALWAYS(!mOwner.OnScene());
 
-  mOwner.mIsOnScene = true;
-  mOwner.mDepth     = static_cast<uint16_t>(depth); // overflow ignored, not expected in practice
+  if(mOwner.mIsLayer)
+  {
+    if(static_cast<Dali::Internal::Layer*>(&mOwner)->GetBehavior() == Dali::Layer::Behavior::LAYER_3D)
+    {
+      // This is 3d layer. Propagate it to all children.
+      ++layer3DParentsCount;
+    }
+  }
+
+  mOwner.mIsOnScene           = true;
+  mOwner.mDepth               = static_cast<uint16_t>(depth);               // overflow ignored, not expected in practice
+  mOwner.mLayer3DParentsCount = static_cast<uint16_t>(layer3DParentsCount); // overflow ignored, not expected in practice
   mOwner.ConnectToSceneGraph();
 
   // Notification for internal derived classes
@@ -453,7 +463,7 @@ void ActorParentImpl::RecursiveConnectToScene(ActorContainer& connectionList, ui
     for(const auto& actor : *mChildren)
     {
       actor->SetScene(*mOwner.mScene);
-      actor->mParentImpl.RecursiveConnectToScene(connectionList, depth + 1);
+      actor->mParentImpl.RecursiveConnectToScene(connectionList, layer3DParentsCount, depth + 1);
     }
   }
 }
@@ -461,8 +471,9 @@ void ActorParentImpl::RecursiveConnectToScene(ActorContainer& connectionList, ui
 void ActorParentImpl::RecursiveDisconnectFromScene(ActorContainer& disconnectionList)
 {
   // need to change state first so that internals relying on IsOnScene() inside OnSceneDisconnectionInternal() get the correct value
-  mOwner.mIsOnScene = false;
-  mOwner.mScene     = nullptr;
+  mOwner.mIsOnScene           = false;
+  mOwner.mScene               = nullptr;
+  mOwner.mLayer3DParentsCount = 0;
 
   // Recursively disconnect children
   if(mChildren)
@@ -479,6 +490,20 @@ void ActorParentImpl::RecursiveDisconnectFromScene(ActorContainer& disconnection
   // Notification for internal derived classes
   mOwner.OnSceneDisconnectionInternal();
   mOwner.DisconnectFromSceneGraph();
+}
+
+void ActorParentImpl::RecursiveChangeLayer3dCount(int32_t layer3DParentsCountDiff)
+{
+  mOwner.mLayer3DParentsCount += layer3DParentsCountDiff; // overflow ignored, not expected in practice
+
+  // Recursively change the value
+  if(mChildren)
+  {
+    for(const auto& actor : *mChildren)
+    {
+      actor->mParentImpl.RecursiveChangeLayer3dCount(layer3DParentsCountDiff);
+    }
+  }
 }
 
 void ActorParentImpl::InheritLayoutDirectionRecursively(Dali::LayoutDirection::Type direction, bool set)
