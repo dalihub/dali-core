@@ -47,7 +47,7 @@ namespace
 // clang-format off
 DALI_PROPERTY_TABLE_BEGIN
 DALI_PROPERTY( "type",                   STRING,   true,    false,   true,   Dali::CameraActor::Property::TYPE                  )
-DALI_PROPERTY( "projectionMode",         STRING,   true,    false,   true,   Dali::CameraActor::Property::PROJECTION_MODE       )
+DALI_PROPERTY( "projectionMode",         INTEGER,  true,    false,   true,   Dali::CameraActor::Property::PROJECTION_MODE       )
 DALI_PROPERTY( "fieldOfView",            FLOAT,    true,    false,   true,   Dali::CameraActor::Property::FIELD_OF_VIEW         )
 DALI_PROPERTY( "aspectRatio",            FLOAT,    true,    false,   true,   Dali::CameraActor::Property::ASPECT_RATIO          )
 DALI_PROPERTY( "nearPlaneDistance",      FLOAT,    true,    false,   true,   Dali::CameraActor::Property::NEAR_PLANE_DISTANCE   )
@@ -199,7 +199,7 @@ void CameraActor::OnSceneConnectionInternal()
 {
   // If the canvas size has not been set, then use the size of the scene to which we've been added
   // in order to set up the current projection
-  if((mCanvasSize.width < Math::MACHINE_EPSILON_1000) || (mCanvasSize.height < Math::MACHINE_EPSILON_1000))
+  if(!mPropertyChanged && ((mCanvasSize.width < Math::MACHINE_EPSILON_1000) || (mCanvasSize.height < Math::MACHINE_EPSILON_1000)))
   {
     if(mProjectionMode == Dali::Camera::ORTHOGRAPHIC_PROJECTION)
     {
@@ -287,6 +287,10 @@ void CameraActor::SetAspectRatio(float aspectRatio)
 {
   if(!Equals(aspectRatio, mAspectRatio))
   {
+    {
+      // This will be removed after CameraActor refactoring.
+      mPropertyChanged = true;
+    }
     mAspectRatio = aspectRatio;
 
     // sceneObject is being used in a separate thread; queue a message to set
@@ -588,15 +592,8 @@ void CameraActor::SetDefaultProperty(Property::Index index, const Property::Valu
       }
       case Dali::CameraActor::Property::PROJECTION_MODE:
       {
-        std::string s(propertyValue.Get<std::string>());
-        if(s == "PERSPECTIVE_PROJECTION")
-        {
-          SetProjectionMode(Dali::Camera::PERSPECTIVE_PROJECTION);
-        }
-        else if(s == "ORTHOGRAPHIC_PROJECTION")
-        {
-          SetProjectionMode(Dali::Camera::ORTHOGRAPHIC_PROJECTION);
-        }
+        Dali::Camera::ProjectionMode projectionMode = Dali::Camera::ProjectionMode(propertyValue.Get<int>());
+        SetProjectionMode(projectionMode);
         break;
       }
       case Dali::CameraActor::Property::FIELD_OF_VIEW:
@@ -700,14 +697,7 @@ Property::Value CameraActor::GetDefaultProperty(Property::Index index) const
       }
       case Dali::CameraActor::Property::PROJECTION_MODE:
       {
-        if(Dali::Camera::PERSPECTIVE_PROJECTION == mProjectionMode)
-        {
-          ret = "PERSPECTIVE_PROJECTION";
-        }
-        else if(Dali::Camera::ORTHOGRAPHIC_PROJECTION == mProjectionMode)
-        {
-          ret = "ORTHOGRAPHIC_PROJECTION";
-        }
+        ret = mProjectionMode;
         break;
       }
       case Dali::CameraActor::Property::FIELD_OF_VIEW:
