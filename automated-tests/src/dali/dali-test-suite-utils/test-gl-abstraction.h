@@ -299,6 +299,21 @@ public:
     return mFramebufferColorAttachmentCount;
   }
 
+  inline GLuint CheckFramebufferDepthAttachmentCount()
+  {
+    return mFramebufferDepthAttachmentCount;
+  }
+
+  inline GLuint CheckFramebufferStencilAttachmentCount()
+  {
+    return mFramebufferStencilAttachmentCount;
+  }
+
+  inline GLuint CheckFramebufferDepthStencilAttachmentCount()
+  {
+    return mFramebufferDepthStencilAttachmentCount;
+  }
+
   inline GLenum CheckFramebufferDepthAttachment()
   {
     return mFramebufferDepthAttached;
@@ -307,6 +322,11 @@ public:
   inline GLenum CheckFramebufferStencilAttachment()
   {
     return mFramebufferStencilAttached;
+  }
+
+  inline GLenum CheckFramebufferDepthStencilAttachment()
+  {
+    return mFramebufferDepthStencilAttached;
   }
 
   inline void Clear(GLbitfield mask) override
@@ -630,8 +650,9 @@ public:
     }
     else if(attachment == GL_DEPTH_STENCIL_ATTACHMENT)
     {
-      mFramebufferStencilAttached = true;
-      mFramebufferDepthAttached   = true;
+      mFramebufferStencilAttached      = true;
+      mFramebufferDepthAttached        = true;
+      mFramebufferDepthStencilAttached = true;
     }
   }
 
@@ -649,6 +670,20 @@ public:
         mFrameBufferColorStatus |= mask;
         ++mFramebufferColorAttachmentCount;
       }
+    }
+    else if(attachment == GL_DEPTH_ATTACHMENT)
+    {
+      ++mFramebufferDepthAttachmentCount;
+    }
+    else if(attachment == GL_STENCIL_ATTACHMENT)
+    {
+      ++mFramebufferStencilAttachmentCount;
+    }
+    else if(attachment == GL_DEPTH_STENCIL_ATTACHMENT)
+    {
+      ++mFramebufferDepthAttachmentCount;
+      ++mFramebufferStencilAttachmentCount;
+      ++mFramebufferDepthStencilAttachmentCount;
     }
   }
 
@@ -2491,8 +2526,12 @@ public:
   GLint                                 mFramebufferStatus;
   GLenum                                mFramebufferDepthAttached;
   GLenum                                mFramebufferStencilAttached;
+  GLenum                                mFramebufferDepthStencilAttached;
   GLuint                                mFramebufferColorAttachmentCount;
   GLuint                                mFrameBufferColorStatus;
+  GLuint                                mFramebufferDepthAttachmentCount;
+  GLuint                                mFramebufferStencilAttachmentCount;
+  GLuint                                mFramebufferDepthStencilAttachmentCount;
   GLint                                 mNumBinaryFormats;
   GLint                                 mBinaryFormats;
   GLint                                 mProgramBinaryLength;

@@ -46,28 +46,32 @@ TestGlAbstraction::~TestGlAbstraction()
 
 void TestGlAbstraction::Initialize()
 {
-  mCurrentProgram                  = 0;
-  mCompileStatus                   = GL_TRUE;
-  mLinkStatus                      = GL_TRUE;
-  mGetErrorResult                  = 0;
-  mGetStringResult                 = NULL;
-  mIsBufferResult                  = 0;
-  mIsEnabledResult                 = 0;
-  mIsFramebufferResult             = 0;
-  mIsProgramResult                 = 0;
-  mIsRenderbufferResult            = 0;
-  mIsShaderResult                  = 0;
-  mIsTextureResult                 = 0;
-  mActiveTextureUnit               = 0;
-  mCheckFramebufferStatusResult    = 0;
-  mFramebufferStatus               = 0;
-  mFramebufferDepthAttached        = 0;
-  mFramebufferStencilAttached      = 0;
-  mFramebufferColorAttachmentCount = 0;
-  mFrameBufferColorStatus          = 0;
-  mNumBinaryFormats                = 0;
-  mBinaryFormats                   = 0;
-  mProgramBinaryLength             = 0;
+  mCurrentProgram                         = 0;
+  mCompileStatus                          = GL_TRUE;
+  mLinkStatus                             = GL_TRUE;
+  mGetErrorResult                         = 0;
+  mGetStringResult                        = NULL;
+  mIsBufferResult                         = 0;
+  mIsEnabledResult                        = 0;
+  mIsFramebufferResult                    = 0;
+  mIsProgramResult                        = 0;
+  mIsRenderbufferResult                   = 0;
+  mIsShaderResult                         = 0;
+  mIsTextureResult                        = 0;
+  mActiveTextureUnit                      = 0;
+  mCheckFramebufferStatusResult           = 0;
+  mFramebufferStatus                      = 0;
+  mFramebufferDepthAttached               = 0;
+  mFramebufferStencilAttached             = 0;
+  mFramebufferDepthStencilAttached        = 0;
+  mFramebufferColorAttachmentCount        = 0;
+  mFrameBufferColorStatus                 = 0;
+  mFramebufferDepthAttachmentCount        = 0;
+  mFramebufferStencilAttachmentCount      = 0;
+  mFramebufferDepthStencilAttachmentCount = 0;
+  mNumBinaryFormats                       = 0;
+  mBinaryFormats                          = 0;
+  mProgramBinaryLength                    = 0;
 
   mVertexAttribArrayChanged = false;
   mGetProgramBinaryCalled   = false;
