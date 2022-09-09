@@ -35,6 +35,7 @@ OPTION(ENABLE_PKG_CONFIGURE  "Use pkgconfig" ON)
 OPTION(ENABLE_LINK_TEST      "Enable the link test" ON)
 
 IF( WIN32 ) # WIN32 includes x64 as well according to the cmake doc.
+  SET(dali-windows-dependencies_DIR "${CMAKE_INSTALL_PREFIX}/share/dali-windows-dependencies")
   FIND_PACKAGE( dali-windows-dependencies REQUIRED )
 ENDIF()
 
