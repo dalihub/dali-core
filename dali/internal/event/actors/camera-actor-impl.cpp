@@ -46,8 +46,8 @@ namespace
  */
 // clang-format off
 DALI_PROPERTY_TABLE_BEGIN
-DALI_PROPERTY( "type",                   STRING,   true,    false,   true,   Dali::CameraActor::Property::TYPE                  )
-DALI_PROPERTY( "projectionMode",         STRING,   true,    false,   true,   Dali::CameraActor::Property::PROJECTION_MODE       )
+DALI_PROPERTY( "type",                   INTEGER,  true,    false,   true,   Dali::CameraActor::Property::TYPE                  )
+DALI_PROPERTY( "projectionMode",         INTEGER,  true,    false,   true,   Dali::CameraActor::Property::PROJECTION_MODE       )
 DALI_PROPERTY( "fieldOfView",            FLOAT,    true,    false,   true,   Dali::CameraActor::Property::FIELD_OF_VIEW         )
 DALI_PROPERTY( "aspectRatio",            FLOAT,    true,    false,   true,   Dali::CameraActor::Property::ASPECT_RATIO          )
 DALI_PROPERTY( "nearPlaneDistance",      FLOAT,    true,    false,   true,   Dali::CameraActor::Property::NEAR_PLANE_DISTANCE   )
@@ -167,7 +167,8 @@ CameraActor::CameraActor(const SceneGraph::Node& node)
   mRightClippingPlane(SceneGraph::Camera::DEFAULT_RIGHT_CLIPPING_PLANE),
   mTopClippingPlane(SceneGraph::Camera::DEFAULT_TOP_CLIPPING_PLANE),
   mBottomClippingPlane(SceneGraph::Camera::DEFAULT_BOTTOM_CLIPPING_PLANE),
-  mInvertYAxis(SceneGraph::Camera::DEFAULT_INVERT_Y_AXIS)
+  mInvertYAxis(SceneGraph::Camera::DEFAULT_INVERT_Y_AXIS),
+  mPropertyChanged(false)
 {
 }
 
@@ -199,7 +200,7 @@ void CameraActor::OnSceneConnectionInternal()
 {
   // If the canvas size has not been set, then use the size of the scene to which we've been added
   // in order to set up the current projection
-  if((mCanvasSize.width < Math::MACHINE_EPSILON_1000) || (mCanvasSize.height < Math::MACHINE_EPSILON_1000))
+  if(!mPropertyChanged && ((mCanvasSize.width < Math::MACHINE_EPSILON_1000) || (mCanvasSize.height < Math::MACHINE_EPSILON_1000)))
   {
     if(mProjectionMode == Dali::Camera::ORTHOGRAPHIC_PROJECTION)
     {
@@ -222,6 +223,7 @@ void CameraActor::SetReflectByPlane(const Vector4& plane)
 
 void CameraActor::SetTarget(const Vector3& target)
 {
+  mPropertyChanged = true;
   if(target != mTarget) // using range epsilon
   {
     mTarget = target;
@@ -269,6 +271,7 @@ Dali::Camera::ProjectionMode CameraActor::GetProjectionMode() const
 
 void CameraActor::SetFieldOfView(float fieldOfView)
 {
+  mPropertyChanged = true;
   if(!Equals(fieldOfView, mFieldOfView))
   {
     mFieldOfView = fieldOfView;
@@ -285,6 +288,7 @@ float CameraActor::GetFieldOfView() const
 
 void CameraActor::SetAspectRatio(float aspectRatio)
 {
+  mPropertyChanged = true;
   if(!Equals(aspectRatio, mAspectRatio))
   {
     mAspectRatio = aspectRatio;
@@ -301,6 +305,7 @@ float CameraActor::GetAspectRatio() const
 
 void CameraActor::SetNearClippingPlane(float nearClippingPlane)
 {
+  mPropertyChanged = true;
   if(!Equals(nearClippingPlane, mNearClippingPlane))
   {
     mNearClippingPlane = nearClippingPlane;
@@ -317,6 +322,7 @@ float CameraActor::GetNearClippingPlane() const
 
 void CameraActor::SetFarClippingPlane(float farClippingPlane)
 {
+  mPropertyChanged = true;
   if(!Equals(farClippingPlane, mFarClippingPlane))
   {
     mFarClippingPlane = farClippingPlane;
@@ -333,6 +339,7 @@ float CameraActor::GetFarClippingPlane() const
 
 void CameraActor::SetLeftClippingPlane(float leftClippingPlane)
 {
+  mPropertyChanged = true;
   if(!Equals(leftClippingPlane, mLeftClippingPlane))
   {
     mLeftClippingPlane = leftClippingPlane;
@@ -344,6 +351,7 @@ void CameraActor::SetLeftClippingPlane(float leftClippingPlane)
 
 void CameraActor::SetRightClippingPlane(float rightClippingPlane)
 {
+  mPropertyChanged = true;
   if(!Equals(rightClippingPlane, mRightClippingPlane))
   {
     mRightClippingPlane = rightClippingPlane;
@@ -355,6 +363,7 @@ void CameraActor::SetRightClippingPlane(float rightClippingPlane)
 
 void CameraActor::SetTopClippingPlane(float topClippingPlane)
 {
+  mPropertyChanged = true;
   if(!Equals(topClippingPlane, mTopClippingPlane))
   {
     mTopClippingPlane = topClippingPlane;
@@ -366,6 +375,7 @@ void CameraActor::SetTopClippingPlane(float topClippingPlane)
 
 void CameraActor::SetBottomClippingPlane(float bottomClippingPlane)
 {
+  mPropertyChanged = true;
   if(!Equals(bottomClippingPlane, mBottomClippingPlane))
   {
     mBottomClippingPlane = bottomClippingPlane;
@@ -575,28 +585,14 @@ void CameraActor::SetDefaultProperty(Property::Index index, const Property::Valu
     {
       case Dali::CameraActor::Property::TYPE:
       {
-        std::string s(propertyValue.Get<std::string>());
-        if(s == "LOOK_AT_TARGET")
-        {
-          SetType(Dali::Camera::LOOK_AT_TARGET);
-        }
-        else if(s == "FREE_LOOK")
-        {
-          SetType(Dali::Camera::FREE_LOOK);
-        }
+        Dali::Camera::Type cameraType = Dali::Camera::Type(propertyValue.Get<int>());
+        SetType(cameraType);
         break;
       }
       case Dali::CameraActor::Property::PROJECTION_MODE:
       {
-        std::string s(propertyValue.Get<std::string>());
-        if(s == "PERSPECTIVE_PROJECTION")
-        {
-          SetProjectionMode(Dali::Camera::PERSPECTIVE_PROJECTION);
-        }
-        else if(s == "ORTHOGRAPHIC_PROJECTION")
-        {
-          SetProjectionMode(Dali::Camera::ORTHOGRAPHIC_PROJECTION);
-        }
+        Dali::Camera::ProjectionMode projectionMode = Dali::Camera::ProjectionMode(propertyValue.Get<int>());
+        SetProjectionMode(projectionMode);
         break;
       }
       case Dali::CameraActor::Property::FIELD_OF_VIEW:
@@ -688,26 +684,12 @@ Property::Value CameraActor::GetDefaultProperty(Property::Index index) const
     {
       case Dali::CameraActor::Property::TYPE:
       {
-        if(Dali::Camera::LOOK_AT_TARGET == mType)
-        {
-          ret = "LOOK_AT_TARGET";
-        }
-        else if(Dali::Camera::FREE_LOOK == mType)
-        {
-          ret = "FREE_LOOK";
-        }
+        ret = mType;
         break;
       }
       case Dali::CameraActor::Property::PROJECTION_MODE:
       {
-        if(Dali::Camera::PERSPECTIVE_PROJECTION == mProjectionMode)
-        {
-          ret = "PERSPECTIVE_PROJECTION";
-        }
-        else if(Dali::Camera::ORTHOGRAPHIC_PROJECTION == mProjectionMode)
-        {
-          ret = "ORTHOGRAPHIC_PROJECTION";
-        }
+        ret = mProjectionMode;
         break;
       }
       case Dali::CameraActor::Property::FIELD_OF_VIEW:
@@ -815,6 +797,19 @@ const PropertyInputImpl* CameraActor::GetSceneObjectInputProperty(Property::Inde
   }
 
   return property;
+}
+
+void CameraActor::OnPropertySet(Property::Index index, const Property::Value& propertyValue)
+{
+  // If Position or Orientation are explicitly set, make mPropertyChanged flag true.
+  if(index == Dali::Actor::Property::POSITION ||
+     index == Dali::Actor::Property::POSITION_X ||
+     index == Dali::Actor::Property::POSITION_Y ||
+     index == Dali::Actor::Property::POSITION_Z ||
+     index == Dali::Actor::Property::ORIENTATION)
+  {
+    mPropertyChanged = true;
+  }
 }
 
 } // namespace Internal

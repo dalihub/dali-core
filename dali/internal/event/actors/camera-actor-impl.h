@@ -251,6 +251,11 @@ private:
    */
   void OnSceneConnectionInternal() override;
 
+  /**
+   * @copydoc Internal::Object::OnPropertySet
+   */
+  void OnPropertySet(Property::Index index, const Property::Value& propertyValue) override;
+
 private:                                  // Data
   const SceneGraph::Camera* mSceneObject; ///< Not owned
 
@@ -267,6 +272,7 @@ private:                                  // Data
   float                        mTopClippingPlane;
   float                        mBottomClippingPlane;
   bool                         mInvertYAxis;
+  bool                         mPropertyChanged;
 };
 
 } // namespace Internal

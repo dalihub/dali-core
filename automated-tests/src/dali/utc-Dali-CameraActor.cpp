@@ -275,8 +275,10 @@ int UtcDaliCameraActorSetGetTypeP(void)
   actor.SetType(Dali::Camera::LOOK_AT_TARGET);
   DALI_TEST_EQUALS(actor.GetType(), Dali::Camera::LOOK_AT_TARGET, TEST_LOCATION);
 
-  DALI_TEST_EQUALS("LOOK_AT_TARGET", actor.GetProperty<std::string>(CameraActor::Property::TYPE), TEST_LOCATION);
-  DALI_TEST_EQUALS("LOOK_AT_TARGET", actor.GetCurrentProperty<std::string>(CameraActor::Property::TYPE), TEST_LOCATION);
+  Dali::Camera::Type cameraType = actor.GetProperty<Dali::Camera::Type>(CameraActor::Property::TYPE);
+  Dali::Camera::Type currentCameraType = actor.GetCurrentProperty<Dali::Camera::Type>(CameraActor::Property::TYPE);
+  DALI_TEST_EQUALS(Camera::LOOK_AT_TARGET, cameraType, TEST_LOCATION);
+  DALI_TEST_EQUALS(Camera::LOOK_AT_TARGET, currentCameraType, TEST_LOCATION);
   END_TEST;
 }
 
@@ -1055,9 +1057,9 @@ int UtcDaliCameraActorSetOrthographicProjectionP3(void)
   DALI_TEST_EQUALS(500.0f, value, FLOAT_EPSILON, TEST_LOCATION);
 
   DALI_TEST_EQUALS(actor.GetProjectionMode(), Dali::Camera::ORTHOGRAPHIC_PROJECTION, TEST_LOCATION);
-  std::string stringValue;
-  actor.GetProperty(CameraActor::Property::PROJECTION_MODE).Get(stringValue);
-  DALI_TEST_EQUALS(stringValue, "ORTHOGRAPHIC_PROJECTION", TEST_LOCATION);
+
+  Dali::Camera::ProjectionMode projectionMode = actor.GetProperty<Dali::Camera::ProjectionMode>(CameraActor::Property::PROJECTION_MODE);
+  DALI_TEST_EQUALS(projectionMode, Dali::Camera::ORTHOGRAPHIC_PROJECTION, TEST_LOCATION);
   END_TEST;
 }
 
@@ -1085,7 +1087,7 @@ int UtcDaliCameraActorSetProjectionModeP(void)
   DALI_TEST_EQUALS(actor.GetFarClippingPlane(), 400.0f, FLOAT_EPSILON, TEST_LOCATION);
 
   // Check setting the property.
-  Property::Value setValue = "PERSPECTIVE_PROJECTION";
+  Property::Value setValue = Dali::Camera::PERSPECTIVE_PROJECTION;
   actor.SetProperty(CameraActor::Property::PROJECTION_MODE, setValue);
   DALI_TEST_EQUALS(actor.GetProjectionMode(), Dali::Camera::PERSPECTIVE_PROJECTION, TEST_LOCATION);
   END_TEST;
@@ -1127,9 +1129,8 @@ int UtcDaliCameraActorGetProjectionModeP(void)
   DALI_TEST_EQUALS(actor.GetProjectionMode(), Dali::Camera::PERSPECTIVE_PROJECTION, TEST_LOCATION);
 
   // Check getting the property.
-  std::string stringValue;
-  actor.GetProperty(CameraActor::Property::PROJECTION_MODE).Get(stringValue);
-  DALI_TEST_EQUALS(stringValue, "PERSPECTIVE_PROJECTION", TEST_LOCATION);
+  Dali::Camera::ProjectionMode projectionMode = actor.GetProperty<Dali::Camera::ProjectionMode>(CameraActor::Property::PROJECTION_MODE);
+  DALI_TEST_EQUALS(projectionMode, Dali::Camera::PERSPECTIVE_PROJECTION, TEST_LOCATION);
   END_TEST;
 }
 
@@ -1188,8 +1189,9 @@ int UtcDaliCameraActorSetCameraOffScene(void)
   DALI_TEST_EQUALS(TEST_NEAR_PLANE_DISTANCE, value, FLOAT_EPSILON, TEST_LOCATION);
   actor.GetProperty(CameraActor::Property::FAR_PLANE_DISTANCE).Get(value);
   DALI_TEST_EQUALS(TEST_FAR_PLANE_DISTANCE, value, FLOAT_EPSILON, TEST_LOCATION);
-  actor.GetProperty(CameraActor::Property::PROJECTION_MODE).Get(sValue);
-  DALI_TEST_EQUALS("PERSPECTIVE_PROJECTION", sValue, TEST_LOCATION);
+
+  Dali::Camera::ProjectionMode projectionMode = actor.GetProperty<Dali::Camera::ProjectionMode>(CameraActor::Property::PROJECTION_MODE);
+  DALI_TEST_EQUALS(Dali::Camera::PERSPECTIVE_PROJECTION, projectionMode, TEST_LOCATION);
   bool bValue;
   actor.GetProperty(CameraActor::Property::INVERT_Y_AXIS).Get(bValue);
   DALI_TEST_EQUALS(false, bValue, TEST_LOCATION);
@@ -1227,9 +1229,9 @@ int UtcDaliCameraActorSetCameraOnScene(void)
   DALI_TEST_EQUALS(TEST_FAR_PLANE_DISTANCE, actor.GetFarClippingPlane(), FLOAT_EPSILON, TEST_LOCATION);
   DALI_TEST_EQUALS(false, actor.GetInvertYAxis(), TEST_LOCATION);
 
-  std::string sValue;
-  actor.GetProperty(CameraActor::Property::TYPE).Get(sValue);
-  DALI_TEST_EQUALS(sValue, "LOOK_AT_TARGET", TEST_LOCATION);
+
+  Dali::Camera::Type cameraType = actor.GetProperty<Dali::Camera::Type>(CameraActor::Property::TYPE);
+  DALI_TEST_EQUALS(cameraType, Camera::LOOK_AT_TARGET, TEST_LOCATION);
 
   float value;
   actor.GetProperty(CameraActor::Property::ASPECT_RATIO).Get(value);
@@ -1258,7 +1260,7 @@ int UtcDaliCameraActorGetCamera(void)
 
   DALI_TEST_EQUALS(actor.GetAspectRatio(), TEST_ASPECT_RATIO, FLOAT_EPSILON, TEST_LOCATION);
 
-  actor.SetProperty(CameraActor::Property::TYPE, "FREE_LOOK");
+  actor.SetProperty(CameraActor::Property::TYPE, Camera::FREE_LOOK);
   actor.SetProperty(CameraActor::Property::ASPECT_RATIO, TEST_ASPECT_RATIO);
   actor.SetProperty(CameraActor::Property::FIELD_OF_VIEW, TEST_FIELD_OF_VIEW);
   actor.SetProperty(CameraActor::Property::NEAR_PLANE_DISTANCE, TEST_NEAR_PLANE_DISTANCE);
@@ -1432,8 +1434,8 @@ int UtcDaliCameraActorDefaultPropertiesInherited(void)
       {"keyboardFocusable", Property::BOOLEAN, true, false, false, Dali::Actor::Property::KEYBOARD_FOCUSABLE},
       {"siblingOrder", Property::INTEGER, true, false, false, Dali::DevelActor::Property::SIBLING_ORDER},
       // camera own
-      {"type", Property::STRING, true, false, true, Dali::CameraActor::Property::TYPE},
-      {"projectionMode", Property::STRING, true, false, true, Dali::CameraActor::Property::PROJECTION_MODE},
+      {"type", Property::INTEGER, true, false, true, Dali::CameraActor::Property::TYPE},
+      {"projectionMode", Property::INTEGER, true, false, true, Dali::CameraActor::Property::PROJECTION_MODE},
       {"fieldOfView", Property::FLOAT, true, false, true, Dali::CameraActor::Property::FIELD_OF_VIEW},
       {"aspectRatio", Property::FLOAT, true, false, true, Dali::CameraActor::Property::ASPECT_RATIO},
       {"nearPlaneDistance", Property::FLOAT, true, false, true, Dali::CameraActor::Property::NEAR_PLANE_DISTANCE},
@@ -2230,6 +2232,107 @@ int UtcDaliCameraActorCulling01(void)
   application.Render();
 
   DALI_TEST_CHECK(cmdStack.FindMethod("Draw") || cmdStack.FindMethod("DrawIndexed"));
+
+  END_TEST;
+}
+
+
+int UtcDaliCameraActorSetProperty(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test the CameraActor reset properties when On Scene, if user set property explicitly.");
+
+  CameraActor camera = CameraActor::New();
+  camera.SetFieldOfView(1.0f);
+  application.GetScene().Add(camera);
+  DALI_TEST_EQUALS(1.0f, camera.GetFieldOfView(), TEST_LOCATION);
+  camera.Unparent();
+  camera.Reset();
+
+  camera = CameraActor::New();
+  camera.SetAspectRatio(1.0f);
+  application.GetScene().Add(camera);
+  DALI_TEST_EQUALS(1.0f, camera.GetAspectRatio(), TEST_LOCATION);
+  camera.Unparent();
+  camera.Reset();
+
+  camera = CameraActor::New();
+  camera.SetNearClippingPlane(1.0f);
+  application.GetScene().Add(camera);
+  DALI_TEST_EQUALS(1.0f, camera.GetNearClippingPlane(), TEST_LOCATION);
+  camera.Unparent();
+  camera.Reset();
+
+  camera = CameraActor::New();
+  camera.SetFarClippingPlane(1.0f);
+  application.GetScene().Add(camera);
+  DALI_TEST_EQUALS(1.0f, camera.GetFarClippingPlane(), TEST_LOCATION);
+  camera.Unparent();
+  camera.Reset();
+
+  camera = CameraActor::New();
+  camera.SetProperty(Dali::CameraActor::Property::LEFT_PLANE_DISTANCE, 1.0f);
+  application.GetScene().Add(camera);
+  DALI_TEST_EQUALS(1.0f, camera.GetProperty<float>(Dali::CameraActor::Property::LEFT_PLANE_DISTANCE), TEST_LOCATION);
+  camera.Unparent();
+  camera.Reset();
+
+  camera = CameraActor::New();
+  camera.SetProperty(Dali::CameraActor::Property::RIGHT_PLANE_DISTANCE, 1.0f);
+  application.GetScene().Add(camera);
+  DALI_TEST_EQUALS(1.0f, camera.GetProperty<float>(Dali::CameraActor::Property::RIGHT_PLANE_DISTANCE), TEST_LOCATION);
+  camera.Unparent();
+  camera.Reset();
+
+  camera = CameraActor::New();
+  camera.SetProperty(Dali::CameraActor::Property::TOP_PLANE_DISTANCE, 1.0f);
+  application.GetScene().Add(camera);
+  DALI_TEST_EQUALS(1.0f, camera.GetProperty<float>(Dali::CameraActor::Property::TOP_PLANE_DISTANCE), TEST_LOCATION);
+  camera.Unparent();
+  camera.Reset();
+
+  camera = CameraActor::New();
+  camera.SetProperty(Dali::CameraActor::Property::BOTTOM_PLANE_DISTANCE, 1.0f);
+  application.GetScene().Add(camera);
+  DALI_TEST_EQUALS(1.0f, camera.GetProperty<float>(Dali::CameraActor::Property::BOTTOM_PLANE_DISTANCE), TEST_LOCATION);
+  camera.Unparent();
+  camera.Reset();
+
+  camera = CameraActor::New();
+  camera.SetProperty(Dali::Actor::Property::POSITION, Vector3(100.0f, 100.0f, 100.0f));
+  application.GetScene().Add(camera);
+  DALI_TEST_EQUALS(Vector3(100.0f, 100.0f, 100.0f), camera.GetProperty<Vector3>(Dali::Actor::Property::POSITION), TEST_LOCATION);
+  camera.Unparent();
+  camera.Reset();
+
+  camera = CameraActor::New();
+  camera.SetProperty(Dali::Actor::Property::POSITION_X, 1.0f);
+  application.GetScene().Add(camera);
+  DALI_TEST_EQUALS(1.0f, camera.GetProperty<float>(Dali::Actor::Property::POSITION_X), TEST_LOCATION);
+  camera.Unparent();
+  camera.Reset();
+
+  camera = CameraActor::New();
+  camera.SetProperty(Dali::Actor::Property::POSITION_Y, 1.0f);
+  application.GetScene().Add(camera);
+  DALI_TEST_EQUALS(1.0f, camera.GetProperty<float>(Dali::Actor::Property::POSITION_Y), TEST_LOCATION);
+  camera.Unparent();
+  camera.Reset();
+
+  camera = CameraActor::New();
+  camera.SetProperty(Dali::Actor::Property::POSITION_Z, 1.0f);
+  application.GetScene().Add(camera);
+  DALI_TEST_EQUALS(1.0f, camera.GetProperty<float>(Dali::Actor::Property::POSITION_Z), TEST_LOCATION);
+  camera.Unparent();
+  camera.Reset();
+
+  camera = CameraActor::New();
+  camera.SetProperty(Dali::Actor::Property::ORIENTATION, Quaternion(Radian(Degree(90.0f)), Vector3::XAXIS));
+  application.GetScene().Add(camera);
+  DALI_TEST_EQUALS(Quaternion(Radian(Degree(90.0f)), Vector3::XAXIS), camera.GetProperty<Quaternion>(Dali::Actor::Property::ORIENTATION), TEST_LOCATION);
+  camera.Unparent();
+  camera.Reset();
 
   END_TEST;
 }
