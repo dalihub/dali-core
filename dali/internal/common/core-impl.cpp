@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -368,7 +368,13 @@ void Core::RunProcessors()
   {
     if(processor)
     {
-      processor->Process(false);
+      // Run processor if the processor is still in the list.
+      // It may be removed during the loop.
+      auto iter = std::find(mProcessors.Begin(), mProcessors.End(), processor);
+      if(iter != mProcessors.End())
+      {
+        processor->Process(false);
+      }
     }
   }
 }
@@ -382,7 +388,13 @@ void Core::RunPostProcessors()
   {
     if(processor)
     {
-      processor->Process(true);
+      // Run processor if the processor is still in the list.
+      // It may be removed during the loop.
+      auto iter = std::find(mPostProcessors.Begin(), mPostProcessors.End(), processor);
+      if(iter != mPostProcessors.End())
+      {
+        processor->Process(true);
+      }
     }
   }
 }
