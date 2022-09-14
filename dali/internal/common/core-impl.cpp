@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,7 +87,9 @@ Core::Core(RenderController&                   renderController,
   mPlatform(platform),
   mGraphicsController(graphicsController),
   mProcessingEvent(false),
-  mForceNextUpdate(false)
+  mForceNextUpdate(false),
+  mProcessorUnregistered(false),
+  mPostProcessorUnregistered(false)
 {
   // Create the thread local storage
   CreateThreadLocalStorage();
@@ -347,6 +349,7 @@ void Core::UnregisterProcessor(Integration::Processor& processor, bool postProce
     if(iter != mPostProcessors.End())
     {
       mPostProcessors.Erase(iter);
+      mPostProcessorUnregistered = true;
     }
   }
   else
@@ -355,6 +358,7 @@ void Core::UnregisterProcessor(Integration::Processor& processor, bool postProce
     if(iter != mProcessors.End())
     {
       mProcessors.Erase(iter);
+      mProcessorUnregistered = true;
     }
   }
 }
@@ -364,11 +368,27 @@ void Core::RunProcessors()
   // Copy processor pointers to prevent changes to vector affecting loop iterator.
   Dali::Vector<Integration::Processor*> processors(mProcessors);
 
+  // To prevent accessing processor unregistered during the loop
+  mProcessorUnregistered = false;
+
   for(auto processor : processors)
   {
     if(processor)
     {
-      processor->Process(false);
+      if(!mProcessorUnregistered)
+      {
+        processor->Process(false);
+      }
+      else
+      {
+        // Run processor if the processor is still in the list.
+        // It may be removed during the loop.
+        auto iter = std::find(mProcessors.Begin(), mProcessors.End(), processor);
+        if(iter != mProcessors.End())
+        {
+          processor->Process(false);
+        }
+      }
     }
   }
 }
@@ -378,11 +398,27 @@ void Core::RunPostProcessors()
   // Copy processor pointers to prevent changes to vector affecting loop iterator.
   Dali::Vector<Integration::Processor*> processors(mPostProcessors);
 
+  // To prevent accessing processor unregistered during the loop
+  mPostProcessorUnregistered = false;
+
   for(auto processor : processors)
   {
     if(processor)
     {
-      processor->Process(true);
+      if(!mPostProcessorUnregistered)
+      {
+        processor->Process(true);
+      }
+      else
+      {
+        // Run processor if the processor is still in the list.
+        // It may be removed during the loop.
+        auto iter = std::find(mPostProcessors.Begin(), mPostProcessors.End(), processor);
+        if(iter != mPostProcessors.End())
+        {
+          processor->Process(true);
+        }
+      }
     }
   }
 }
