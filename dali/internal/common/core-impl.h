@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_CORE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -358,8 +358,10 @@ private:
 
   Graphics::Controller& mGraphicsController;
 
-  bool mProcessingEvent : 1; ///< True during ProcessEvents()
-  bool mForceNextUpdate : 1; ///< True if the next rendering is really required.
+  bool mProcessingEvent : 1;           ///< True during ProcessEvents()
+  bool mForceNextUpdate : 1;           ///< True if the next rendering is really required.
+  bool mProcessorUnregistered : 1;     ///< True if the processor is unregistered during RunProcessors()
+  bool mPostProcessorUnregistered : 1; ///< True if the post-processor is unregistered during RunPostProcessors()
 
   friend class ThreadLocalStorage;
 };
