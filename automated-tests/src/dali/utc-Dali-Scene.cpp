@@ -1502,6 +1502,81 @@ int UtcDaliSceneSetRotationCompletedAcknowledgementWithAngle90(void)
   END_TEST;
 }
 
+int UtcDaliSceneSurfaceRotatedPartialUpdate(void)
+{
+  tet_infoline("Ensure rotation of the surface and partial update are handled properly");
+
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
+
+  std::vector<Rect<int>> damagedRects;
+  Rect<int>              clippingRect;
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+
+  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  Actor actor = CreateRenderableActor();
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  actor.SetProperty(Actor::Property::SIZE, Vector3(32.0f, 32.0f, 0.0f));
+  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  clippingRect = Rect<int>(224, 384, 48, 48); // in screen coordinates
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Ensure the damaged rect is empty
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+
+  // Rotate surface
+  application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_HEIGHT,
+                                        TestApplication::DEFAULT_SURFACE_WIDTH,
+                                        90);
+
+  damagedRects.clear();
+
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  clippingRect = Rect<int>(224, 224, 208, 208); // in screen coordinates, merged value with the previous rect
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  END_TEST;
+}
+
 int UtcDaliSceneKeyEventGeneratedSignalP(void)
 {
   TestApplication          application;

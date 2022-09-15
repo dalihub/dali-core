@@ -150,6 +150,11 @@ void Scene::SetSurfaceRect(const Rect<int32_t>& rect)
 {
   mSurfaceRect        = rect;
   mSurfaceRectChanged = true;
+
+  if(mRoot)
+  {
+    mRoot->SetUpdated(true);
+  }
 }
 
 const Rect<int32_t>& Scene::GetSurfaceRect() const
@@ -160,6 +165,11 @@ const Rect<int32_t>& Scene::GetSurfaceRect() const
 void Scene::SetSurfaceOrientation(int32_t orientation)
 {
   mSurfaceOrientation = orientation;
+
+  if(mRoot)
+  {
+    mRoot->SetUpdated(true);
+  }
 }
 
 int32_t Scene::GetSurfaceOrientation() const
