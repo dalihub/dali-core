@@ -267,7 +267,6 @@ private:                                  // Data
   float                        mTopClippingPlane;
   float                        mBottomClippingPlane;
   bool                         mInvertYAxis;
-  bool                         mPropertyChanged{false}; // This variable will be removed after CameraActor refactoring.
 };
 
 } // namespace Internal
