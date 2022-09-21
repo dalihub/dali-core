@@ -189,6 +189,8 @@ struct RenderManager::Impl
   std::unique_ptr<Dali::ThreadPool> threadPool;            ///< The thread pool
   Vector<Graphics::Texture*>        boundTextures;         ///< The textures bound for rendering
   Vector<Graphics::Texture*>        textureDependencyList; ///< The dependency list of bound textures
+
+  bool commandBufferSubmitted{false};
 };
 
 RenderManager* RenderManager::New(Graphics::Controller&               graphicsController,
@@ -465,6 +467,8 @@ void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear
       geom->Upload(mImpl->graphicsController);
     }
   }
+
+  mImpl->commandBufferSubmitted = false;
 }
 
 void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>& damagedRects)
@@ -947,6 +951,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
   mImpl->uniformBufferManager->UnlockUniformBuffer(mImpl->renderBufferIndex);
 
   mImpl->renderAlgorithms.SubmitCommandBuffer();
+  mImpl->commandBufferSubmitted = true;
 
   std::sort(targetstoPresent.begin(), targetstoPresent.end());
 
@@ -963,6 +968,14 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
 void RenderManager::PostRender()
 {
+  if(!mImpl->commandBufferSubmitted)
+  {
+    // Rendering is skipped but there may be pending commands
+    // Submit command buffers
+    mImpl->renderAlgorithms.SubmitCommandBuffer();
+    mImpl->commandBufferSubmitted = true;
+  }
+
   // Notify RenderGeometries that rendering has finished
   for(auto&& iter : mImpl->geometryContainer)
   {
