@@ -376,19 +376,11 @@ private:
   {
     bool operator<(const SOrderItem& item) const
     {
-      if(sceneId != item.sceneId)
-      {
-        return sceneId < item.sceneId;
-      }
-      else
-      {
-        return level < item.level;
-      }
+      return level < item.level;
     }
 
     TransformId id;
-    uint16_t    sceneId;
-    uint16_t    level;
+    uint32_t    level;
   };
 
   /**
@@ -400,8 +392,7 @@ private:
 
   /**
    * Reorders components in hierarchical order so update can iterate sequentially
-   * updating the world transforms. The components are sorted in the breadth first
-   * order for each scene and grouped per scene.
+   * updating the world transforms
    */
   void ReorderComponents();
 

@@ -354,8 +354,6 @@ void TransformManager::ReorderComponents()
 {
   mOrderedComponents.Resize(mComponentCount);
 
-  unsigned int sceneId = 0;
-
   TransformId parentId;
   for(TransformId i = 0; i < mComponentCount; ++i)
   {
@@ -363,16 +361,10 @@ void TransformManager::ReorderComponents()
     mOrderedComponents[i].level = 0u;
 
     parentId = mParent[i];
-    if(parentId == INVALID_TRANSFORM_ID)
-    {
-      mOrderedComponents[i].sceneId = sceneId++;
-    }
-
     while(parentId != INVALID_TRANSFORM_ID)
     {
       mOrderedComponents[i].level++;
-      parentId                      = mParent[mIds[parentId]];
-      mOrderedComponents[i].sceneId = mOrderedComponents[mIds[mParent[i]]].sceneId;
+      parentId = mParent[mIds[parentId]];
     }
   }
 
