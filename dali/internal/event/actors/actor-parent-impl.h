@@ -1,7 +1,7 @@
 #ifndef DALI_INTERNAL_ACTOR_PARENT_IMPL_H
 #define DALI_INTERNAL_ACTOR_PARENT_IMPL_H
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use actor file except in compliance with the License.
@@ -205,10 +205,9 @@ public:
    * Helper to recursively connect a tree of actors.
    * This is not interrupted by user callbacks
    * @param[in]  depth The depth in the hierarchy of the actor
-   * @param[in]  layer3DParentsCount The number of 3d layers in the hierarchy.
    * @param[out] connectionList On return, the list of connected actors which require notification.
    */
-  void RecursiveConnectToScene(ActorContainer& connectionList, uint32_t layer3DParentsCount, uint32_t depth);
+  void RecursiveConnectToScene(ActorContainer& connectionList, uint32_t depth);
 
   /**
    * Helper to recursively disconnect a tree of actors.
@@ -216,13 +215,6 @@ public:
    * @param[out] disconnectionList On return, the list of disconnected actors which require notification.
    */
   void RecursiveDisconnectFromScene(ActorContainer& disconnectionList);
-
-  /**
-   * Helper to recursively change the number of 3d layers in a tree of actors.
-   * This is not interrupted by user callbacks.
-   * @param[in] layer3DParentsCountDiff Difference valaue of 3d layers count.
-   */
-  void RecursiveChangeLayer3dCount(int32_t layer3DParentsCountDiff);
 
   /**
    * @brief Propagates layout direction recursively.

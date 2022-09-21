@@ -767,21 +767,6 @@ public:
   }
 
   /**
-   * @brief Get the number of layer with 3D behaviour in ancestors include this. It will be 0 if actor is not on scene.
-   *
-   * @return currently the number of layer with 3D behaviour in ancestors.
-   */
-  inline int32_t GetLayer3DParentCount() const
-  {
-    if(mIsOnScene)
-    {
-      return mLayer3DParentsCount;
-    }
-
-    return 0;
-  }
-
-  /**
    * Get the actor's sorting depth
    *
    * @return The depth used for hit-testing and renderer sorting
@@ -1553,10 +1538,9 @@ protected:
   /**
    * Called on a child during Add() when the parent actor is connected to the Scene.
    * @param[in] parentDepth The depth of the parent in the hierarchy.
-   * @param[in] layer3DParentsCount The number of 3d layers in the hierarchy.
    * @param[in] notify Emits notification if set to true.
    */
-  void ConnectToScene(uint32_t parentDepth, uint32_t layer3DParentsCount, bool notify);
+  void ConnectToScene(uint32_t parentDepth, bool notify);
 
   /**
    * Connect the Node associated with this Actor to the scene-graph.
@@ -1929,8 +1913,6 @@ protected:
   ConstString mName;        ///< Name of the actor
   uint32_t    mSortedDepth; ///< The sorted depth index. A combination of tree traversal and sibling order.
   int16_t     mDepth;       ///< The depth in the hierarchy of the actor. Only 32,767 levels of depth are supported
-
-  int16_t mLayer3DParentsCount; ///< The number of layer with 3D behaviour in ancestors include this. It will be 0 if actor is not on scene.
 
   const bool               mIsRoot : 1;                    ///< Flag to identify the root actor
   const bool               mIsLayer : 1;                   ///< Flag to identify that this is a layer
