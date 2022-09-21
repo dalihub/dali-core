@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,32 +37,6 @@ public:
   }
 
   bool processRun;
-};
-
-class NewTestProcessor : public TestProcessor
-{
-public:
-  NewTestProcessor(Integration::Core& core)
-  : core(core)
-  {
-  }
-
-  virtual void Process(bool postProcessor)
-  {
-    processRun = true;
-    if(unregisterProcessor)
-    {
-      core.UnregisterProcessor(*unregisterProcessor, postProcessor);
-    }
-  }
-
-  void SetProcessorToUnregister(Integration::Processor* processor)
-  {
-    unregisterProcessor = processor;
-  }
-
-  Integration::Processor* unregisterProcessor{nullptr};
-  Integration::Core&      core;
 };
 
 int UtcDaliCoreProcessorP(void)
@@ -173,90 +147,6 @@ int UtcDaliCorePostProcessorP(void)
   application.SendNotification();
   tet_infoline("Test that the processor has not been executed again:");
   DALI_TEST_CHECK(testProcessor.processRun == false);
-
-  END_TEST;
-}
-
-int UtcDaliCoreProcessorUnregisterDuringCallback01(void)
-{
-  // Test pre-processor
-  TestApplication    application;
-  Integration::Core& core = application.GetCore();
-
-  NewTestProcessor testProcessor1(core);
-  TestProcessor    testProcessor2;
-  TestProcessor    testProcessor3;
-
-  core.RegisterProcessor(testProcessor1);
-  core.RegisterProcessor(testProcessor2);
-  core.RegisterProcessor(testProcessor3);
-
-  DALI_TEST_CHECK(testProcessor1.processRun == false);
-  DALI_TEST_CHECK(testProcessor2.processRun == false);
-  DALI_TEST_CHECK(testProcessor3.processRun == false);
-
-  application.SendNotification();
-
-  tet_infoline("Test that the processors have been executed:");
-  DALI_TEST_CHECK(testProcessor1.processRun);
-  DALI_TEST_CHECK(testProcessor2.processRun);
-  DALI_TEST_CHECK(testProcessor3.processRun);
-
-  // Clear down for next part of test
-  testProcessor1.processRun = false;
-  testProcessor2.processRun = false;
-  testProcessor3.processRun = false;
-
-  testProcessor1.SetProcessorToUnregister(&testProcessor3);
-
-  tet_infoline("Test that the processor unregistered during the callback has not been executed");
-  application.SendNotification();
-
-  DALI_TEST_CHECK(testProcessor1.processRun);
-  DALI_TEST_CHECK(testProcessor2.processRun);
-  DALI_TEST_CHECK(!testProcessor3.processRun);
-
-  END_TEST;
-}
-
-int UtcDaliCoreProcessorUnregisterDuringCallback02(void)
-{
-  // Test post-processor
-  TestApplication    application;
-  Integration::Core& core = application.GetCore();
-
-  NewTestProcessor testProcessor1(core);
-  TestProcessor    testProcessor2;
-  TestProcessor    testProcessor3;
-
-  core.RegisterProcessor(testProcessor1, true);
-  core.RegisterProcessor(testProcessor2, true);
-  core.RegisterProcessor(testProcessor3, true);
-
-  DALI_TEST_CHECK(testProcessor1.processRun == false);
-  DALI_TEST_CHECK(testProcessor2.processRun == false);
-  DALI_TEST_CHECK(testProcessor3.processRun == false);
-
-  application.SendNotification();
-
-  tet_infoline("Test that the processors have been executed:");
-  DALI_TEST_CHECK(testProcessor1.processRun);
-  DALI_TEST_CHECK(testProcessor2.processRun);
-  DALI_TEST_CHECK(testProcessor3.processRun);
-
-  // Clear down for next part of test
-  testProcessor1.processRun = false;
-  testProcessor2.processRun = false;
-  testProcessor3.processRun = false;
-
-  testProcessor1.SetProcessorToUnregister(&testProcessor3);
-
-  tet_infoline("Test that the processor unregistered during the callback has not been executed");
-  application.SendNotification();
-
-  DALI_TEST_CHECK(testProcessor1.processRun);
-  DALI_TEST_CHECK(testProcessor2.processRun);
-  DALI_TEST_CHECK(!testProcessor3.processRun);
 
   END_TEST;
 }
