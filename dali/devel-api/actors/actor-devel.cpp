@@ -17,6 +17,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/internal/event/actors/actor-coords.h>
 #include <dali/internal/event/actors/actor-impl.h>
 
 namespace Dali
@@ -66,6 +67,16 @@ void SwitchParent(Actor actor, Actor newParent)
 Actor::TouchEventSignalType& HitTestResultSignal(Actor actor)
 {
   return GetImplementation(actor).HitTestResultSignal();
+}
+
+Matrix GetWorldTransform(Actor actor)
+{
+  return CalculateActorWorldTransform(GetImplementation(actor));
+}
+
+Vector4 GetWorldColor(Actor actor)
+{
+  return CalculateActorWorldColor(GetImplementation(actor));
 }
 
 } // namespace DevelActor
