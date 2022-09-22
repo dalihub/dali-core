@@ -168,6 +168,11 @@ void RenderItem::operator delete(void* ptr)
   gRenderItemPool.Free(static_cast<RenderItem*>(ptr));
 }
 
+uint32_t RenderItem::GetMemoryPoolCapacity()
+{
+  return gRenderItemPool.GetCapacity();
+}
+
 } // namespace SceneGraph
 
 } // namespace Internal

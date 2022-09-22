@@ -850,6 +850,14 @@ public:
   }
 
   /**
+   * @brief Get the total capacity of the memory pools
+   * @return The capacity of the memory pools
+   *
+   * @note This is different to the node count.
+   */
+  static uint32_t GetMemoryPoolCapacity();
+
+  /**
    * @brief Returns partial rendering data associated with the node.
    * @return The partial rendering data
    */
@@ -921,10 +929,10 @@ private: // from NodeDataProvider
 
 private:
   // Delete copy and move
-  Node(const Node&) = delete;
-  Node(Node&&)      = delete;
+  Node(const Node&)                = delete;
+  Node(Node&&)                     = delete;
   Node& operator=(const Node& rhs) = delete;
-  Node& operator=(Node&& rhs) = delete;
+  Node& operator=(Node&& rhs)      = delete;
 
   /**
    * Recursive helper to disconnect a Node and its children.

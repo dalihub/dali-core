@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,6 +80,9 @@ uint32_t* RenderQueue::ReserveMessageSlot(BufferIndex updateBufferIndex, std::si
 
 void RenderQueue::ProcessMessages(BufferIndex bufferIndex)
 {
+  std::size_t capacity = container0->GetCapacity() + container1->GetCapacity();
+  mCapacity            = capacity; // write is atomic.
+
   MessageBuffer* container = GetCurrentContainer(bufferIndex);
 
   for(MessageBuffer::Iterator iter = container->Begin(); iter.IsValid(); iter.Next())

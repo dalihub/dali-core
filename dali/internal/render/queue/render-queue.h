@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_QUEUE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@
 // INTERNAL INCLUDES
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/message-buffer.h>
+#include <atomic>
+#include <cstddef>
 
 namespace Dali
 {
@@ -63,6 +65,14 @@ public:
    */
   void ProcessMessages(BufferIndex bufferIndex);
 
+  /**
+   * Return the current capacity total of both buffers.
+   */
+  std::size_t GetCapacity() const
+  {
+    return mCapacity;
+  }
+
 private:
   /**
    * Helper to retrieve the current container.
@@ -87,6 +97,8 @@ private:
 private:
   MessageBuffer* container0; ///< Messages are queued here when the update buffer index == 0
   MessageBuffer* container1; ///< Messages are queued here when the update buffer index == 1
+
+  std::atomic<std::size_t> mCapacity{0u}; // Current total capacity of both buffers.
 };
 
 } // namespace SceneGraph

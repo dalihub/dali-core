@@ -47,6 +47,9 @@
 #include <dali/internal/update/rendering/scene-graph-renderer.h>    // for OwnerPointer< Renderer >
 #include <dali/internal/update/rendering/scene-graph-texture-set.h> // for OwnerPointer< TextureSet >
 
+// EXTERNAL INCLUDES
+#include <cstddef>
+
 namespace Dali
 {
 class FrameCallbackInterface;
@@ -659,6 +662,21 @@ public:
    * @param[in] frameCallback A pointer to the implementation of the FrameCallbackInterface to remove.
    */
   void RemoveFrameCallback(FrameCallbackInterface* frameCallback);
+
+  /**
+   * Get the update message queue capacity (mutex locked)
+   */
+  std::size_t GetUpdateMessageQueueCapacity() const;
+
+  /**
+   * Get the render message queue capacity
+   */
+  std::size_t GetRenderMessageQueueCapacity() const;
+
+  /**
+   * Get the render instruction capacity
+   */
+  std::size_t GetRenderInstructionCapacity() const;
 
 private:
   // Undefined

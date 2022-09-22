@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_MEMORY_POOL_OBJECT_ALLOCATOR_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -152,6 +152,14 @@ public:
     delete mPool;
 
     mPool = new FixedSizeMemoryPool(TypeSizeWithAlignment<T>::size);
+  }
+
+  /**
+   * @brief Get the capacity of the memory pool
+   */
+  uint32_t GetCapacity() const
+  {
+    return mPool->GetCapacity();
   }
 
 private:

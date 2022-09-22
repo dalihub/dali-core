@@ -435,6 +435,12 @@ public:
    */
   void ResetDirtyFlag();
 
+  /**
+   * Get the capacity of the memory pools
+   * @return the capacity of the memory pools
+   */
+  static uint32_t GetMemoryPoolCapacity();
+
 public: // UniformMap::Observer
   /**
    * @copydoc UniformMap::Observer::UniformMappingsChanged
