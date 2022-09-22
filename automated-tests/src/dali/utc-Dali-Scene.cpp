@@ -1172,18 +1172,21 @@ int UtcDaliSceneSurfaceRotatedWithAngle0(void)
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
+  // consume the orientating changing flag by first rendering
   application.SendNotification();
 
   damagedRects.clear();
   application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
                                         TestApplication::DEFAULT_SURFACE_HEIGHT,
-                                        0);
+                                        0, 0);
 
-  // Check current surface orientation
+  // Check current orientations
   int32_t orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  int32_t screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should not be changed yet.
   DALI_TEST_EQUALS(orientation, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(screenOrientation, 0, TEST_LOCATION);
 
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
@@ -1198,11 +1201,13 @@ int UtcDaliSceneSurfaceRotatedWithAngle0(void)
   DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
   DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
 
-  // Check current surface orientation
+  // Check current orientations
   orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should be changed.
   DALI_TEST_EQUALS(orientation, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(screenOrientation, 0, TEST_LOCATION);
 
   END_TEST;
 }
@@ -1243,13 +1248,15 @@ int UtcDaliSceneSurfaceRotatedWithAngle90(void)
   damagedRects.clear();
   application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
                                         TestApplication::DEFAULT_SURFACE_HEIGHT,
-                                        90);
+                                        90, 90);
 
   // Check current surface orientation
   int32_t orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  int32_t screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should not be changed yet.
   DALI_TEST_EQUALS(orientation, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(screenOrientation, 0, TEST_LOCATION);
 
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
@@ -1271,11 +1278,13 @@ int UtcDaliSceneSurfaceRotatedWithAngle90(void)
   DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
   DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
 
-  // Check current surface orientation
+  // Check current orientations
   orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should be changed.
   DALI_TEST_EQUALS(orientation, 90, TEST_LOCATION);
+  DALI_TEST_EQUALS(screenOrientation, 90, TEST_LOCATION);
 
   END_TEST;
 }
@@ -1316,13 +1325,15 @@ int UtcDaliSceneSurfaceRotatedWithAngle180(void)
   damagedRects.clear();
   application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
                                         TestApplication::DEFAULT_SURFACE_HEIGHT,
-                                        180);
+                                        180, 180);
 
   // Check current surface orientation
   int32_t orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  int32_t screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should not be changed yet.
   DALI_TEST_EQUALS(orientation, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(screenOrientation, 0, TEST_LOCATION);
 
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
@@ -1344,11 +1355,13 @@ int UtcDaliSceneSurfaceRotatedWithAngle180(void)
   DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
   DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
 
-  // Check current surface orientation
+  // Check current orientations
   orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should be changed.
   DALI_TEST_EQUALS(orientation, 180, TEST_LOCATION);
+DALI_TEST_EQUALS(screenOrientation, 180, TEST_LOCATION);
 
   END_TEST;
 }
@@ -1389,13 +1402,15 @@ int UtcDaliSceneSurfaceRotatedWithAngle270(void)
   damagedRects.clear();
   application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
                                         TestApplication::DEFAULT_SURFACE_HEIGHT,
-                                        270);
+                                        270, 270);
 
   // Check current surface orientation
   int32_t orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  int32_t screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should not be changed yet.
   DALI_TEST_EQUALS(orientation, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(screenOrientation, 0, TEST_LOCATION);
 
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
@@ -1417,11 +1432,13 @@ int UtcDaliSceneSurfaceRotatedWithAngle270(void)
   DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
   DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
 
-  // Check current surface orientation
+  // Check current orientations
   orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should be changed.
   DALI_TEST_EQUALS(orientation, 270, TEST_LOCATION);
+  DALI_TEST_EQUALS(screenOrientation, 270, TEST_LOCATION);
 
   END_TEST;
 }
@@ -1460,13 +1477,15 @@ int UtcDaliSceneSetRotationCompletedAcknowledgementWithAngle90(void)
   damagedRects.clear();
   application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
                                         TestApplication::DEFAULT_SURFACE_HEIGHT,
-                                        90);
+                                        90, 90);
 
   // Check current surface orientation
   int32_t orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  int32_t screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should not be changed yet.
   DALI_TEST_EQUALS(orientation, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(screenOrientation, 0, TEST_LOCATION);
 
   application.GetScene().SetRotationCompletedAcknowledgement();
 
@@ -1490,11 +1509,13 @@ int UtcDaliSceneSetRotationCompletedAcknowledgementWithAngle90(void)
   DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
   DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
 
-  // Check current surface orientation
+  // Check current orientations
   orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should be changed.
   DALI_TEST_EQUALS(orientation, 90, TEST_LOCATION);
+  DALI_TEST_EQUALS(screenOrientation, 90, TEST_LOCATION);
 
   bool isSetRotationCompletedAcknowledgementSet = application.GetScene().IsRotationCompletedAcknowledgementSet();
   DALI_TEST_EQUALS(isSetRotationCompletedAcknowledgementSet, true, TEST_LOCATION);
@@ -1561,7 +1582,7 @@ int UtcDaliSceneSurfaceRotatedPartialUpdate(void)
   // Rotate surface
   application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_HEIGHT,
                                         TestApplication::DEFAULT_SURFACE_WIDTH,
-                                        90);
+                                        90, 0);
 
   damagedRects.clear();
 

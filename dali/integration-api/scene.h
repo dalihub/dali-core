@@ -74,11 +74,12 @@ public:
    * @brief Create an initialized Scene handle.
    *
    * @param[in] size The size of the set surface for this scene
-   * @param[in] orientation The rotated angle of the set surface for this scene
+   * @param[in] windowOrientation The rotated angle of the set surface for this scene
+   * @param[in] screenOrientation The rotated angle of the screen
    *
    * @return a handle to a newly allocated Dali resource.
    */
-  static Scene New(Size size, int32_t orientation = 0);
+  static Scene New(Size size, int32_t windowOrientation = 0, int32_t screenOrientation = 0);
 
   /**
    * @brief Downcast an Object handle to Scene handle.
@@ -304,9 +305,10 @@ public:
    *
    * @param[in] width The width of rotated surface
    * @param[in] height The height of rotated surface
-   * @param[in] orientation The orientation of rotated surface
+   * @param[in] windowOrientation the current window orientation
+   * @param[in] screenOrientation the current screen orientation
    */
-  void SurfaceRotated(float width, float height, int32_t orientation);
+  void SurfaceRotated(float width, float height, int32_t windowOrientation, int32_t screenOrientation);
 
   /**
    * @brief Gets the current surface orientation. It gets the value from the scene object.
@@ -314,6 +316,13 @@ public:
    * @return The current surface orientation.
    */
   int32_t GetCurrentSurfaceOrientation() const;
+
+  /**
+   * @brief Gets the current screen orientation. It gets the value from the scene object.
+   *
+   * @return The current screen orientation.
+   */
+  int32_t GetCurrentScreenOrientation() const;
 
   /**
    * @brief Gets the current surface rectangle. It gets the value from the scene object.
