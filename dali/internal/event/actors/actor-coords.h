@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_EVENT_ACTORS_ACTOR_COORDS_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,8 +32,8 @@ namespace Dali::Internal
  * @param[in] viewMatrix The view matrix used to display this entity
  * @param[in] projectionMatrix The projection matrix used to display this entity
  * @param[in] worldMatrix The world matrix of this entity
- * @param[in] currentSize The 2d bounding box for this entity
  * @param[in] viewport The viewport used for drawing
+ * @param[in] currentSize The 2d bounding box for this entity
  * @param[out] localX The local X coordinate
  * @param[out] localY The local Y coordinate
  * @param[in] screenX The screen X coordinate
@@ -111,119 +111,6 @@ const Vector2 CalculateActorScreenPosition(const Actor& actor, BufferIndex buffe
  * @return the screen extents of the actor
  */
 Rect<> CalculateActorScreenExtents(const Actor& actor, const Vector2& screenPosition, BufferIndex bufferIndex);
-
-/**
- * Convert local coordinates to screen coordinates
- *
- * @param[in] viewMatrix The view matrix used to display this entity
- * @param[in] projectionMatrix The projection matrix used to display this entity
- * @param[in] worldMatrix The world matrix of this entity
- * @param[in] viewport The viewport used for drawing
- * @param[in] localPosition The local position
- * @param[out] screenX The screen X coordinate
- * @param[out] screenY The screen Y coordinate
- * @return true if the conversion was successful
- */
-bool ConvertLocalToScreen(const Matrix&   viewMatrix,
-                          const Matrix&   projectionMatrix,
-                          const Matrix&   worldMatrix,
-                          const Viewport& viewport,
-                          const Vector3&  localPosition,
-                          float&          screenX,
-                          float&          screenY);
-
-/**
- * Convert local coordinates to screen coordinates
- *
- * @param[in] renderTask The render task used to display this entity
- * @param[in] actor The actor of this entity
- * @param[in] worldMatrix The world matrix of this entity
- * @param[in] localPosition The local position
- * @param[out] screenX The screen X coordinate
- * @param[out] screenY The screen Y coordinate
- * @return true if the conversion was successful
- */
-bool ConvertLocalToScreenRenderTask(
-  const RenderTask& renderTask,
-  const Actor&      actor,
-  const Matrix&     worldMatrix,
-  const Vector3&    localPosition,
-  float&            screenX,
-  float&            screenY);
-
-/**
- * Convert local coordinates to screen coordinates
- * Search through the given renderTaskList to check if this entity can be converted
- *
- * @param[in] renderTaskList The render task list to search
- * @param[in] actor The actor of this entity
- * @param[in] worldMatrix The world matrix of this entity
- * @param[in] localPosition The local position
- * @param[out] screenX The screen X coordinate
- * @param[out] screenY The screen Y coordinate
- * @return true if the conversion was successful
- */
-bool ConvertLocalToScreenRenderTaskList(
-  const RenderTaskList& renderTaskList,
-  const Actor&          actor,
-  const Matrix&         worldMatrix,
-  const Vector3&        localPosition,
-  float&                screenX,
-  float&                screenY);
-
-/**
- * Calculate the screen position of the actor from it's node transform and anchor point.
- * It will consider rendertasklist.
- *
- * @param[in] actor The actor
- * @param[in] bufferIndex The current event buffer index
- * @return the screen extents of the actor consider camera.
- */
-const Vector2 CalculateActorScreenPositionRenderTaskList(const Actor& actor, BufferIndex bufferIndex);
-
-/**
- * Convert local coordinates to screen coordinates extent
- *
- * @param[in] renderTask The render task used to display this entity
- * @param[in] actor The actor of this entity
- * @param[in] worldMatrix The world matrix of this entity
- * @param[in] localPosition The local position
- * @param[out] screenExtent The screen Extent
- * @return true if the conversion was successful
- */
-bool ConvertLocalToScreenExtentRenderTask(
-  const RenderTask& renderTask,
-  const Actor&      actor,
-  const Matrix&     worldMatrix,
-  const Vector3&    currentSize,
-  Rect<>&           screenExtent);
-
-/**
- * Convert local coordinates to screen coordinates extent
- * Search through the given renderTaskList to check if this entity can be converted
- *
- * @param[in] renderTaskList The render task list to search
- * @param[in] actor The actor of this entity
- * @param[in] worldMatrix The world matrix of this entity
- * @param[in] localPosition The local position
- * @param[out] screenExtent The screen Extent
- * @return true if the conversion was successful
- */
-bool ConvertLocalToScreenExtentRenderTaskList(
-  const RenderTaskList& renderTaskList,
-  const Actor&          actor,
-  const Matrix&         worldMatrix,
-  const Vector3&        currentSize,
-  Rect<>&               screenExtent);
-/**
- * Calculate the screen extents of the actor from its node transform, anchor point and size.
- * It will consider rendertasklist.
- *
- * @param[in] actor The actor
- * @param[in] bufferIndex The current event buffer index
- * @return the screen extents of the actor consider camera.
- */
-Rect<> CalculateActorScreenExtentsRenderTaskList(const Actor& actor, BufferIndex bufferIndex);
 
 } // namespace Dali::Internal
 

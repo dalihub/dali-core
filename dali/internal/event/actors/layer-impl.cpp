@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -239,22 +239,12 @@ void Layer::MoveBelow(const Internal::Layer& target)
 
 void Layer::SetBehavior(Dali::Layer::Behavior behavior)
 {
-  if(mBehavior != behavior)
-  {
-    mBehavior = behavior;
+  mBehavior = behavior;
 
-    if(mIsOnScene)
-    {
-      // If current layer is on scene, and it's behavior changed,
-      // Change the mLayer3DParentsCount value recursively.
-      mParentImpl.RecursiveChangeLayer3dCount(mBehavior == Dali::Layer::LAYER_3D ? 1 : -1);
-    }
-
-    // Notify update side object.
-    SetBehaviorMessage(GetEventThreadServices(), GetSceneGraphLayer(), behavior);
-    // By default, disable depth test for LAYER_UI, and enable for LAYER_3D.
-    SetDepthTestDisabled(mBehavior == Dali::Layer::LAYER_UI);
-  }
+  // Notify update side object.
+  SetBehaviorMessage(GetEventThreadServices(), GetSceneGraphLayer(), behavior);
+  // By default, disable depth test for LAYER_UI, and enable for LAYER_3D.
+  SetDepthTestDisabled(mBehavior == Dali::Layer::LAYER_UI);
 }
 
 void Layer::SetClipping(bool enabled)
