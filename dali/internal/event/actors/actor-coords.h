@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_EVENT_ACTORS_ACTOR_COORDS_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -111,6 +111,30 @@ const Vector2 CalculateActorScreenPosition(const Actor& actor, BufferIndex buffe
  * @return the screen extents of the actor
  */
 Rect<> CalculateActorScreenExtents(const Actor& actor, const Vector2& screenPosition, BufferIndex bufferIndex);
+
+/**
+ * Get the world transform of the actor.
+ *
+ * This calculates the world transform from scratch using only event
+ * side properties - it does not rely on the update thread to have
+ * already calculated the transform.
+ *
+ * @param[in] actor The actor to calculate the world matrix for
+ * @return The world transform matrix
+ */
+Matrix CalculateActorWorldTransform(const Actor& actor);
+
+/**
+ * Get the world color of the actor.
+ *
+ * This calcualtes the world color of the actor from scratch using
+ * only event side properties. It does not rely on the update thread
+ * to have already calculated the color.
+ *
+ * @param[in] actor The actor to calculate the world color for
+ * @return the world color
+ */
+Vector4 CalculateActorWorldColor(const Actor& actor);
 
 } // namespace Dali::Internal
 
