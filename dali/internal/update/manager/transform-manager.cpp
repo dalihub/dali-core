@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -354,9 +354,10 @@ void TransformManager::ReorderComponents()
 {
   mOrderedComponents.Resize(mComponentCount);
 
-  unsigned int sceneId = 0;
-
+  uint16_t    sceneId = 0u;
   TransformId parentId;
+
+  // Create sceneId first
   for(TransformId i = 0; i < mComponentCount; ++i)
   {
     mOrderedComponents[i].id    = mComponentId[i];
@@ -367,12 +368,17 @@ void TransformManager::ReorderComponents()
     {
       mOrderedComponents[i].sceneId = sceneId++;
     }
+  }
 
+  // Propagate sceneId
+  for(TransformId i = 0; i < mComponentCount; ++i)
+  {
+    parentId = mParent[i];
     while(parentId != INVALID_TRANSFORM_ID)
     {
       mOrderedComponents[i].level++;
+      mOrderedComponents[i].sceneId = mOrderedComponents[mIds[parentId]].sceneId;
       parentId                      = mParent[mIds[parentId]];
-      mOrderedComponents[i].sceneId = mOrderedComponents[mIds[mParent[i]]].sceneId;
     }
   }
 
