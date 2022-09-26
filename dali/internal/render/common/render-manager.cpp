@@ -970,9 +970,12 @@ void RenderManager::PostRender()
 {
   if(!mImpl->commandBufferSubmitted)
   {
-    // Rendering is skipped but there may be pending commands
-    // Submit command buffers
-    mImpl->renderAlgorithms.SubmitCommandBuffer();
+    // Rendering is skipped but there may be pending tasks. Flush them.
+    Graphics::SubmitInfo submitInfo;
+    submitInfo.cmdBuffer.clear(); // Only flush
+    submitInfo.flags = 0 | Graphics::SubmitFlagBits::FLUSH;
+    mImpl->graphicsController.SubmitCommandBuffers(submitInfo);
+
     mImpl->commandBufferSubmitted = true;
   }
 
