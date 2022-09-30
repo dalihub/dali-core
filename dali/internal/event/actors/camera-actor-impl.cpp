@@ -159,6 +159,7 @@ CameraActor::CameraActor(const SceneGraph::Node& node)
   mTarget(SceneGraph::Camera::DEFAULT_TARGET_POSITION),
   mType(SceneGraph::Camera::DEFAULT_TYPE),
   mProjectionMode(SceneGraph::Camera::DEFAULT_MODE),
+  mProjectionDirection(SceneGraph::Camera::DEFAULT_PROJECTION_DIRECTION),
   mFieldOfView(SceneGraph::Camera::DEFAULT_FIELD_OF_VIEW),
   mAspectRatio(SceneGraph::Camera::DEFAULT_ASPECT_RATIO),
   mNearClippingPlane(SceneGraph::Camera::DEFAULT_NEAR_CLIPPING_PLANE),
@@ -267,6 +268,18 @@ void CameraActor::SetProjectionMode(Dali::Camera::ProjectionMode mode)
 Dali::Camera::ProjectionMode CameraActor::GetProjectionMode() const
 {
   return mProjectionMode;
+}
+
+void CameraActor::SetProjectionDirection(Dali::DevelCameraActor::ProjectionDirection direction)
+{
+  mPropertyChanged = true;
+  if(direction != mProjectionDirection)
+  {
+    mProjectionDirection = direction;
+
+    // sceneObject is being used in a separate thread; queue a message to set
+    SetProjectionDirectionMessage(GetEventThreadServices(), *mSceneObject, mProjectionDirection);
+  }
 }
 
 void CameraActor::SetFieldOfView(float fieldOfView)
@@ -431,7 +444,7 @@ void CameraActor::SetPerspectiveProjection(const Size& size)
   CalculateClippingAndZ(width, height, nearClippingPlane, farClippingPlane, cameraZ);
 
   // calculate the position of the camera to have the desired aspect ratio
-  const float fieldOfView = 2.0f * std::atan(height * 0.5f / cameraZ);
+  const float fieldOfView = 2.0f * std::atan((mProjectionDirection == DevelCameraActor::ProjectionDirection::VERTICAL ? height : width) * 0.5f / cameraZ);
 
   // unless it is too small, we want at least as much space to the back as we have torwards the front
   const float minClippingFarPlane = 2.f * nearClippingPlane;
@@ -660,6 +673,12 @@ void CameraActor::SetDefaultProperty(Property::Index index, const Property::Valu
         SetReflectByPlane(propertyValue.Get<Vector4>());
         break;
       }
+      case Dali::DevelCameraActor::Property::PROJECTION_DIRECTION:
+      {
+        Dali::DevelCameraActor::ProjectionDirection projectionDirection = Dali::DevelCameraActor::ProjectionDirection(propertyValue.Get<int>());
+        SetProjectionDirection(projectionDirection);
+        break;
+      }
 
       default:
       {
@@ -750,6 +769,11 @@ Property::Value CameraActor::GetDefaultProperty(Property::Index index) const
       case Dali::CameraActor::Property::INVERT_Y_AXIS:
       {
         ret = mInvertYAxis;
+        break;
+      }
+      case Dali::DevelCameraActor::Property::PROJECTION_DIRECTION:
+      {
+        ret = mProjectionDirection;
         break;
       }
     } // switch(index)

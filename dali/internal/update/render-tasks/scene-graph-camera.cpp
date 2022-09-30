@@ -96,10 +96,20 @@ void Frustum(Matrix& result, float left, float right, float bottom, float top, f
   m[12] = m[13] = m[15] = 0.0f;
 }
 
-void Perspective(Matrix& result, float fovy, float aspect, float near, float far, bool invertYAxis)
+void Perspective(Matrix& result, Dali::DevelCameraActor::ProjectionDirection fovDir, float fov, float aspect, float near, float far, bool invertYAxis)
 {
-  float frustumH = tanf(fovy * 0.5f) * near;
-  float frustumW = frustumH * aspect;
+  float frustumH;
+  float frustumW;
+  if(fovDir == Dali::DevelCameraActor::ProjectionDirection::VERTICAL)
+  {
+    frustumH = tanf(fov * 0.5f) * near;
+    frustumW = frustumH * aspect;
+  }
+  else
+  {
+    frustumW = tanf(fov * 0.5f) * near;
+    frustumH = frustumW / aspect;
+  }
 
   Frustum(result, -frustumW, frustumW, -frustumH, frustumH, near, far, invertYAxis);
 }
@@ -140,18 +150,19 @@ void Orthographic(Matrix& result, float left, float right, float bottom, float t
 
 } // unnamed namespace
 
-const Dali::Camera::Type           Camera::DEFAULT_TYPE(Dali::Camera::FREE_LOOK);
-const Dali::Camera::ProjectionMode Camera::DEFAULT_MODE(Dali::Camera::PERSPECTIVE_PROJECTION);
-const bool                         Camera::DEFAULT_INVERT_Y_AXIS(false);
-const float                        Camera::DEFAULT_FIELD_OF_VIEW(45.0f * (Math::PI / 180.0f));
-const float                        Camera::DEFAULT_ASPECT_RATIO(800.0f / 480.0f);
-const float                        Camera::DEFAULT_LEFT_CLIPPING_PLANE(-240.0f);
-const float                        Camera::DEFAULT_RIGHT_CLIPPING_PLANE(240.0f);
-const float                        Camera::DEFAULT_TOP_CLIPPING_PLANE(-400.0f);
-const float                        Camera::DEFAULT_BOTTOM_CLIPPING_PLANE(400.0f);
-const float                        Camera::DEFAULT_NEAR_CLIPPING_PLANE(800.0f); // default height of the screen
-const float                        Camera::DEFAULT_FAR_CLIPPING_PLANE(DEFAULT_NEAR_CLIPPING_PLANE + 2.f * DEFAULT_NEAR_CLIPPING_PLANE);
-const Vector3                      Camera::DEFAULT_TARGET_POSITION(0.0f, 0.0f, 0.0f);
+const Dali::Camera::Type                          Camera::DEFAULT_TYPE(Dali::Camera::FREE_LOOK);
+const Dali::Camera::ProjectionMode                Camera::DEFAULT_MODE(Dali::Camera::PERSPECTIVE_PROJECTION);
+const Dali::DevelCameraActor::ProjectionDirection Camera::DEFAULT_PROJECTION_DIRECTION(Dali::DevelCameraActor::VERTICAL);
+const bool                                        Camera::DEFAULT_INVERT_Y_AXIS(false);
+const float                                       Camera::DEFAULT_FIELD_OF_VIEW(45.0f * (Math::PI / 180.0f));
+const float                                       Camera::DEFAULT_ASPECT_RATIO(800.0f / 480.0f);
+const float                                       Camera::DEFAULT_LEFT_CLIPPING_PLANE(-240.0f);
+const float                                       Camera::DEFAULT_RIGHT_CLIPPING_PLANE(240.0f);
+const float                                       Camera::DEFAULT_TOP_CLIPPING_PLANE(-400.0f);
+const float                                       Camera::DEFAULT_BOTTOM_CLIPPING_PLANE(400.0f);
+const float                                       Camera::DEFAULT_NEAR_CLIPPING_PLANE(800.0f); // default height of the screen
+const float                                       Camera::DEFAULT_FAR_CLIPPING_PLANE(DEFAULT_NEAR_CLIPPING_PLANE + 2.f * DEFAULT_NEAR_CLIPPING_PLANE);
+const Vector3                                     Camera::DEFAULT_TARGET_POSITION(0.0f, 0.0f, 0.0f);
 
 Camera::Camera()
 : mUpdateViewFlag(UPDATE_COUNT),
@@ -160,6 +171,7 @@ Camera::Camera()
   mNode(nullptr),
   mType(DEFAULT_TYPE),
   mProjectionMode(DEFAULT_MODE),
+  mProjectionDirection(DEFAULT_PROJECTION_DIRECTION),
   mInvertYAxis(DEFAULT_INVERT_Y_AXIS),
   mFieldOfView(DEFAULT_FIELD_OF_VIEW),
   mAspectRatio(DEFAULT_ASPECT_RATIO),
@@ -202,6 +214,12 @@ void Camera::SetType(Dali::Camera::Type type)
 void Camera::SetProjectionMode(Dali::Camera::ProjectionMode mode)
 {
   mProjectionMode       = mode;
+  mUpdateProjectionFlag = UPDATE_COUNT;
+}
+
+void Camera::SetProjectionDirection(Dali::DevelCameraActor::ProjectionDirection direction)
+{
+  mProjectionDirection  = direction;
   mUpdateProjectionFlag = UPDATE_COUNT;
 }
 
@@ -619,6 +637,7 @@ uint32_t Camera::UpdateProjection(BufferIndex updateBufferIndex)
         {
           Matrix& projectionMatrix = mProjectionMatrix.Get(updateBufferIndex);
           Perspective(projectionMatrix,
+                      mProjectionDirection,
                       mFieldOfView,
                       mAspectRatio,
                       mNearClippingPlane,
