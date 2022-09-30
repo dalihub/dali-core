@@ -143,14 +143,29 @@ struct GraphicsStencilOp
   Graphics::StencilOp op{Graphics::StencilOp::KEEP};
 };
 
-inline Graphics::Viewport ViewportFromClippingBox(ClippingBox clippingBox, int orientation)
+inline Graphics::Viewport ViewportFromClippingBox(const Uint16Pair& sceneSize, ClippingBox clippingBox, int orientation)
 {
   Graphics::Viewport viewport{static_cast<float>(clippingBox.x), static_cast<float>(clippingBox.y), static_cast<float>(clippingBox.width), static_cast<float>(clippingBox.height), 0.0f, 0.0f};
 
   if(orientation == 90 || orientation == 270)
   {
+    if(orientation == 90)
+    {
+      viewport.x = sceneSize.GetY() - (clippingBox.y + clippingBox.height);
+      viewport.y = clippingBox.x;
+    }
+    else // orientation == 270
+    {
+      viewport.x = clippingBox.y;
+      viewport.y = sceneSize.GetX() - (clippingBox.x + clippingBox.width);
+    }
     viewport.width  = static_cast<float>(clippingBox.height);
     viewport.height = static_cast<float>(clippingBox.width);
+  }
+  else if(orientation == 180)
+  {
+    viewport.x = sceneSize.GetX() - (clippingBox.x + clippingBox.width);
+    viewport.y = sceneSize.GetY() - (clippingBox.y + clippingBox.height);
   }
   return viewport;
 }
@@ -459,7 +474,7 @@ inline void RenderAlgorithms::SetupScissorClipping(
         useScissorBox.y = (instruction.mFrameBuffer->GetHeight() - useScissorBox.height) - useScissorBox.y;
       }
 
-      Graphics::Viewport graphicsViewport = ViewportFromClippingBox(mViewportRectangle, 0);
+      Graphics::Viewport graphicsViewport{static_cast<float>(mViewportRectangle.x), static_cast<float>(mViewportRectangle.y), static_cast<float>(mViewportRectangle.width), static_cast<float>(mViewportRectangle.height), 0.0f, 0.0f};
       commandBuffer.SetScissor(Rect2DFromClippingBox(useScissorBox, orientation, graphicsViewport));
     }
   }
@@ -574,7 +589,8 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
                                                 const RenderInstruction&            instruction,
                                                 const Rect<int32_t>&                viewport,
                                                 const Rect<int>&                    rootClippingRect,
-                                                int                                 orientation)
+                                                int                                 orientation,
+                                                const Uint16Pair&                   sceneSize)
 {
   DALI_PRINT_RENDER_LIST(renderList);
 
@@ -594,8 +610,7 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
   auto* mutableRenderList      = const_cast<RenderList*>(&renderList);
   auto& secondaryCommandBuffer = mutableRenderList->GetCommandBuffer(mGraphicsController);
   secondaryCommandBuffer.Reset();
-
-  secondaryCommandBuffer.SetViewport(ViewportFromClippingBox(mViewportRectangle, orientation));
+  secondaryCommandBuffer.SetViewport(ViewportFromClippingBox(sceneSize, mViewportRectangle, orientation));
   mHasLayerScissor = false;
 
   // Setup Scissor testing (for both viewport and per-node scissor)
@@ -605,7 +620,7 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
   // on the bottom of the stack
   if(!rootClippingRect.IsEmpty())
   {
-    Graphics::Viewport graphicsViewport = ViewportFromClippingBox(mViewportRectangle, 0);
+    Graphics::Viewport graphicsViewport{static_cast<float>(mViewportRectangle.x), static_cast<float>(mViewportRectangle.y), static_cast<float>(mViewportRectangle.width), static_cast<float>(mViewportRectangle.height), 0.0f, 0.0f};
     secondaryCommandBuffer.SetScissorTestEnable(true);
     secondaryCommandBuffer.SetScissor(Rect2DFromRect(rootClippingRect, orientation, graphicsViewport));
     mScissorStack.push_back(rootClippingRect);
@@ -619,7 +634,7 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
 
   if(renderList.IsClipping())
   {
-    Graphics::Viewport graphicsViewport = ViewportFromClippingBox(mViewportRectangle, 0);
+    Graphics::Viewport graphicsViewport{static_cast<float>(mViewportRectangle.x), static_cast<float>(mViewportRectangle.y), static_cast<float>(mViewportRectangle.width), static_cast<float>(mViewportRectangle.height), 0.0f, 0.0f};
     secondaryCommandBuffer.SetScissorTestEnable(true);
     const ClippingBox& layerScissorBox = renderList.GetClippingBox();
     secondaryCommandBuffer.SetScissor(Rect2DFromClippingBox(layerScissorBox, orientation, graphicsViewport));
@@ -723,7 +738,8 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
                                                 Vector<Graphics::Texture*>&         boundTextures,
                                                 const Rect<int32_t>&                viewport,
                                                 const Rect<int>&                    rootClippingRect,
-                                                int                                 orientation)
+                                                int                                 orientation,
+                                                const Uint16Pair&                   sceneSize)
 {
   DALI_PRINT_RENDER_INSTRUCTION(instruction, bufferIndex);
 
@@ -756,7 +772,8 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
                           instruction, //added for reflection effect
                           viewport,
                           rootClippingRect,
-                          orientation);
+                          orientation,
+                          sceneSize);
 
         // Execute command buffer
         auto* commandBuffer = renderList->GetCommandBuffer();

@@ -37,6 +37,14 @@ enum
 };
 
 } // Namespace Property
+
+/**
+ * @brief Request to rotate window after MVP matrix is multiplied.
+ * It is used in case that the target buffer direction is different from the window direction.
+ * @param [in] camera Dali::CameraActor that will be rotated.
+ * @param [in] rotationAngle The rotation angle (0, 90, 180, and 270. Note Dali::WindowOrientation.)
+ */
+DALI_CORE_API void RotateProjection(Dali::CameraActor camera, int32_t rotationAngle);
 } // namespace DevelCameraActor
 } // Namespace Dali
 
