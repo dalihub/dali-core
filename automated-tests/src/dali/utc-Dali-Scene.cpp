@@ -1016,7 +1016,7 @@ int UtcDaliSceneSurfaceResizedDefaultSceneViewport(void)
   DALI_TEST_EQUALS(surfaceResized, true, TEST_LOCATION);
 
   // Check that the viewport is handled properly
-  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters("Viewport", viewportParams));
+  DALI_TEST_CHECK(callStack.FindIndexFromMethodAndParams("Viewport", viewportParams) >= 0);
 
   // Check current surface rect
   newSurfaceRect = defaultScene.GetCurrentSurfaceRect();

@@ -3607,3 +3607,79 @@ int UtcDaliRenderTaskViewportGuideActor(void)
 
   END_TEST;
 }
+
+int UtcDaliRenderTaskViewportGuideActor02(void)
+{
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  TraceCallStack&    callStack     = glAbstraction.GetViewportTrace();
+  glAbstraction.EnableViewportCallTrace(true);
+  tet_infoline("Testing RenderTask with ViewportGuideActor02");
+
+  Stage   stage = Stage::GetCurrent();
+  Vector2 stageSize(stage.GetSize());
+
+  // Render and notify
+  application.SendNotification();
+  application.Render(16);
+  glAbstraction.ResetViewportCallStack();
+
+  Geometry geometry = Geometry::New();
+  Shader   shader   = Shader::New("vertexSrc", "fragmentSrc");
+  Renderer renderer = Renderer::New(geometry, shader);
+
+  Actor blue                                 = Actor::New();
+  blue[Dali::Actor::Property::NAME]          = "Blue";
+  blue[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::TOP_LEFT;
+  blue[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::TOP_LEFT;
+  blue[Dali::Actor::Property::SIZE]          = Vector2(400, 300);
+  blue[Dali::Actor::Property::POSITION]      = Vector2(100, 50);
+  blue.AddRenderer(renderer);
+  stage.Add(blue);
+
+  Actor green                                 = Actor::New();
+  green[Dali::Actor::Property::NAME]          = "Green";
+  green[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::TOP_LEFT;
+  green[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::TOP_LEFT;
+  green[Dali::Actor::Property::SIZE]          = Vector2(400, 300);
+  green[Dali::Actor::Property::POSITION]      = Vector2(100, 50);
+  green.AddRenderer(renderer);
+  stage.Add(green);
+
+  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTask     renderTask     = renderTaskList.CreateTask();
+
+  Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
+  cameraActor[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+  stage.Add(cameraActor);
+
+  renderTask.SetExclusive(true);
+  renderTask.SetInputEnabled(true);
+  renderTask.SetCameraActor(cameraActor);
+  renderTask.SetSourceActor(blue);
+  renderTask.SetViewportGuideActor(blue);
+
+  application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_HEIGHT,
+                                        TestApplication::DEFAULT_SURFACE_WIDTH,
+                                        90);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render(16);
+
+  std::string viewportParams1("50, 100, 300, 400"); // to match newSize
+  std::string viewportParams2("0, 0, 480, 800"); // to match newSize
+
+  // Check that the viewport is handled properly
+  DALI_TEST_CHECK(callStack.FindIndexFromMethodAndParams("Viewport", viewportParams1) >= 0);
+  DALI_TEST_CHECK(callStack.FindIndexFromMethodAndParams("Viewport", viewportParams2) >= 0);
+
+  END_TEST;
+}
