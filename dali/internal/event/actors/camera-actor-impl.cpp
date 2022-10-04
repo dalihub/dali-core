@@ -134,6 +134,30 @@ void BuildOrthoPickingRay(const Matrix&   viewMatrix,
   rayDir.w = 1.0f;
 }
 
+/**
+ * @brief Convert from vertical FoV to horizontal FoV
+ *
+ * @param aspectRatio aspect ratio.
+ * @param verticalFov Vertical field of view by radian.
+ * @return Horizontal field of view by radian.
+ */
+inline float ConvertFovFromVerticalToHorizontal(float aspectRatio, float verticalFov)
+{
+  return 2.0f * std::atan(std::tan(verticalFov * 0.5f) * aspectRatio);
+}
+
+/**
+ * @brief Convert from horizontal FoV to vertical FoV
+ *
+ * @param aspectRatio aspect ratio.
+ * @param horizontalFov Horizontal field of view by radian.
+ * @return Vertical field of view by radian.
+ */
+inline float ConvertFovFromHorizontalToVertical(float aspectRatio, float horizontalFov)
+{
+  return 2.0f * std::atan(std::tan(horizontalFov * 0.5f) / aspectRatio);
+}
+
 } // namespace
 
 CameraActorPtr CameraActor::New(const Size& size)
@@ -159,6 +183,7 @@ CameraActor::CameraActor(const SceneGraph::Node& node)
   mTarget(SceneGraph::Camera::DEFAULT_TARGET_POSITION),
   mType(SceneGraph::Camera::DEFAULT_TYPE),
   mProjectionMode(SceneGraph::Camera::DEFAULT_MODE),
+  mProjectionDirection(Dali::DevelCameraActor::ProjectionDirection::VERTICAL),
   mFieldOfView(SceneGraph::Camera::DEFAULT_FIELD_OF_VIEW),
   mAspectRatio(SceneGraph::Camera::DEFAULT_ASPECT_RATIO),
   mNearClippingPlane(SceneGraph::Camera::DEFAULT_NEAR_CLIPPING_PLANE),
@@ -269,6 +294,25 @@ Dali::Camera::ProjectionMode CameraActor::GetProjectionMode() const
   return mProjectionMode;
 }
 
+void CameraActor::SetProjectionDirection(Dali::DevelCameraActor::ProjectionDirection direction)
+{
+  mPropertyChanged = true;
+  if(direction != mProjectionDirection)
+  {
+    mProjectionDirection = direction;
+
+    // Update update side FoV value.
+    float verticalFieldOfView = mFieldOfView;
+    if(DALI_UNLIKELY(mProjectionDirection == DevelCameraActor::HORIZONTAL))
+    {
+      verticalFieldOfView = ConvertFovFromHorizontalToVertical(mAspectRatio, mFieldOfView);
+    }
+
+    // sceneObject is being used in a separate thread; queue a message to set
+    SetFieldOfViewMessage(GetEventThreadServices(), *mSceneObject, verticalFieldOfView);
+  }
+}
+
 void CameraActor::SetFieldOfView(float fieldOfView)
 {
   mPropertyChanged = true;
@@ -276,8 +320,14 @@ void CameraActor::SetFieldOfView(float fieldOfView)
   {
     mFieldOfView = fieldOfView;
 
+    float verticalFieldOfView = mFieldOfView;
+    if(DALI_UNLIKELY(mProjectionDirection == DevelCameraActor::HORIZONTAL))
+    {
+      verticalFieldOfView = ConvertFovFromHorizontalToVertical(mAspectRatio, mFieldOfView);
+    }
+
     // sceneObject is being used in a separate thread; queue a message to set
-    SetFieldOfViewMessage(GetEventThreadServices(), *mSceneObject, mFieldOfView);
+    SetFieldOfViewMessage(GetEventThreadServices(), *mSceneObject, verticalFieldOfView);
   }
 }
 
@@ -295,6 +345,14 @@ void CameraActor::SetAspectRatio(float aspectRatio)
 
     // sceneObject is being used in a separate thread; queue a message to set
     SetAspectRatioMessage(GetEventThreadServices(), *mSceneObject, mAspectRatio);
+
+    if(DALI_UNLIKELY(mProjectionDirection == DevelCameraActor::HORIZONTAL))
+    {
+      float verticalFieldOfView = ConvertFovFromHorizontalToVertical(mAspectRatio, mFieldOfView);
+
+      // sceneObject is being used in a separate thread; queue a message to set
+      SetFieldOfViewMessage(GetEventThreadServices(), *mSceneObject, verticalFieldOfView);
+    }
   }
 }
 
@@ -660,6 +718,12 @@ void CameraActor::SetDefaultProperty(Property::Index index, const Property::Valu
         SetReflectByPlane(propertyValue.Get<Vector4>());
         break;
       }
+      case Dali::DevelCameraActor::Property::PROJECTION_DIRECTION:
+      {
+        Dali::DevelCameraActor::ProjectionDirection projectionDirection = Dali::DevelCameraActor::ProjectionDirection(propertyValue.Get<int>());
+        SetProjectionDirection(projectionDirection);
+        break;
+      }
 
       default:
       {
@@ -750,6 +814,11 @@ Property::Value CameraActor::GetDefaultProperty(Property::Index index) const
       case Dali::CameraActor::Property::INVERT_Y_AXIS:
       {
         ret = mInvertYAxis;
+        break;
+      }
+      case Dali::DevelCameraActor::Property::PROJECTION_DIRECTION:
+      {
+        ret = mProjectionDirection;
         break;
       }
     } // switch(index)
