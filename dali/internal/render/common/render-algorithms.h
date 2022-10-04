@@ -61,7 +61,6 @@ public:
    * @param[in] viewport               The viewport for drawing
    * @param[in] rootClippingRect       The clipping rectangle
    * @param[in] orientation            The Scene's surface orientation.
-   * @param[in] sceneSize              The Scene's surface size.
    */
   void ProcessRenderInstruction(const SceneGraph::RenderInstruction& instruction,
                                 BufferIndex                          bufferIndex,
@@ -70,8 +69,7 @@ public:
                                 Vector<Graphics::Texture*>&          boundTextures,
                                 const Rect<int32_t>&                 viewport,
                                 const Rect<int>&                     rootClippingRect,
-                                int                                  orientation,
-                                const Uint16Pair&                    sceneSize);
+                                int                                  orientation);
 
   /**
    * Resets main command buffer (per scene)
@@ -157,7 +155,6 @@ private:
    * @param[in] viewport               The Viewport
    * @param[in] rootClippingRect       The root clipping rectangle
    * @param[in] orientation            The Scene's surface orientation
-   * @param[in] sceneSize              The Scene's surface size.
    */
   inline void ProcessRenderList(const Dali::Internal::SceneGraph::RenderList&        renderList,
                                 BufferIndex                                          bufferIndex,
@@ -169,8 +166,7 @@ private:
                                 const Dali::Internal::SceneGraph::RenderInstruction& instruction, // in the case of reflection, things like CullFace need to be adjusted for reflection world
                                 const Rect<int32_t>&                                 viewport,
                                 const Rect<int>&                                     rootClippingRect,
-                                int                                                  orientation,
-                                const Uint16Pair&                                    sceneSize);
+                                int                                                  orientation);
 
   // Member variables:
 

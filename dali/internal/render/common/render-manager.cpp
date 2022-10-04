@@ -908,7 +908,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     // Scissor's value should be set based on the default system coordinates.
     // When the surface is rotated, the input values already were set with the rotated angle.
     // So, re-calculation is needed.
-    scissorArea = RecalculateScissorArea(scissorArea, surfaceOrientation, surfaceRect);
+    scissorArea = RecalculateScissorArea(scissorArea, surfaceOrientation, viewportRect);
 
     // Begin render pass
     mainCommandBuffer->BeginRenderPass(
@@ -933,8 +933,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       mImpl->boundTextures,
       viewportRect,
       clippingRect,
-      surfaceOrientation,
-      Uint16Pair(surfaceRect.width, surfaceRect.height));
+      surfaceOrientation);
 
     Graphics::SyncObject* syncObject{nullptr};
     // If the render instruction has an associated render tracker (owned separately)
