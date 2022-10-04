@@ -540,15 +540,7 @@ const Vector2 Actor::GetCurrentScreenPosition() const
   if(mScene)
   {
     BufferIndex bufferIndex = GetEventThreadServices().GetEventBufferIndex();
-    if(mLayer3DParentsCount == 0)
-    {
-      // We can assume that this actor is under 2d layer. Use faster, but imprecise algorithm
-      return CalculateActorScreenPosition(*this, bufferIndex);
-    }
-    else
-    {
-      return CalculateActorScreenPositionRenderTaskList(*this, bufferIndex);
-    }
+    return CalculateActorScreenPosition(*this, bufferIndex);
   }
   return Vector2::ZERO;
 }
@@ -1084,7 +1076,6 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mName(),
   mSortedDepth(0u),
   mDepth(0u),
-  mLayer3DParentsCount(0),
   mIsRoot(ROOT_LAYER == derivedType),
   mIsLayer(LAYER == derivedType || ROOT_LAYER == derivedType),
   mIsOnScene(false),
@@ -1204,7 +1195,7 @@ void Actor::UnparentChildren()
   mParentImpl.UnparentChildren();
 }
 
-void Actor::ConnectToScene(uint32_t parentDepth, uint32_t layer3DParentsCount, bool notify)
+void Actor::ConnectToScene(uint32_t parentDepth, bool notify)
 {
   // This container is used instead of walking the Actor hierarchy.
   // It protects us when the Actor hierarchy is modified during OnSceneConnectionExternal callbacks.
@@ -1216,7 +1207,7 @@ void Actor::ConnectToScene(uint32_t parentDepth, uint32_t layer3DParentsCount, b
   }
 
   // This stage is not interrupted by user callbacks.
-  mParentImpl.RecursiveConnectToScene(connectionList, layer3DParentsCount, parentDepth + 1);
+  mParentImpl.RecursiveConnectToScene(connectionList, parentDepth + 1);
 
   // Notify applications about the newly connected actors.
   for(const auto& actor : connectionList)
@@ -1485,7 +1476,7 @@ void Actor::SetParent(ActorParent* parent, bool notify)
        parentActor->OnScene())
     {
       // Instruct each actor to create a corresponding node in the scene graph
-      ConnectToScene(parentActor->GetHierarchyDepth(), parentActor->GetLayer3DParentCount(), notify);
+      ConnectToScene(parentActor->GetHierarchyDepth(), notify);
     }
 
     // Resolve the name and index for the child properties if any
@@ -1513,18 +1504,9 @@ void Actor::SetParent(ActorParent* parent, bool notify)
 
 Rect<> Actor::CalculateScreenExtents() const
 {
-  if(mLayer3DParentsCount == 0)
-  {
-    // We can assume that this actor is under 2d layer. Use faster, but imprecise algorithm
-    auto        screenPosition = GetCurrentScreenPosition();
-    BufferIndex bufferIndex    = GetEventThreadServices().GetEventBufferIndex();
-    return CalculateActorScreenExtents(*this, screenPosition, bufferIndex);
-  }
-  else
-  {
-    BufferIndex bufferIndex = GetEventThreadServices().GetEventBufferIndex();
-    return CalculateActorScreenExtentsRenderTaskList(*this, bufferIndex);
-  }
+  auto        screenPosition = GetCurrentScreenPosition();
+  BufferIndex bufferIndex    = GetEventThreadServices().GetEventBufferIndex();
+  return CalculateActorScreenExtents(*this, screenPosition, bufferIndex);
 }
 
 Vector3 Actor::GetAnchorPointForPosition() const
