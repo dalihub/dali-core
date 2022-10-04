@@ -370,15 +370,25 @@ void TransformManager::ReorderComponents()
     }
   }
 
-  // Propagate sceneId
+  // Propagate sceneId and level
   for(TransformId i = 0; i < mComponentCount; ++i)
   {
     parentId = mParent[i];
     while(parentId != INVALID_TRANSFORM_ID)
     {
-      mOrderedComponents[i].level++;
-      mOrderedComponents[i].sceneId = mOrderedComponents[mIds[parentId]].sceneId;
-      parentId                      = mParent[mIds[parentId]];
+      const uint32_t parentIndex = mIds[parentId];
+      ++mOrderedComponents[i].level;
+      mOrderedComponents[i].sceneId = mOrderedComponents[parentIndex].sceneId;
+      if(parentIndex < i)
+      {
+        // Parent information update done. We can reuse it.
+        mOrderedComponents[i].level += mOrderedComponents[parentIndex].level;
+        break;
+      }
+      else
+      {
+        parentId = mParent[parentIndex];
+      }
     }
   }
 

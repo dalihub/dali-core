@@ -389,6 +389,30 @@ DALI_CORE_API void SwitchParent(Actor actor, Actor newParent);
  */
 DALI_CORE_API Actor::TouchEventSignalType& HitTestResultSignal(Actor actor);
 
+/**
+ * Get the world transform of the actor.
+ *
+ * This calculates the world transform from scratch using only event
+ * side properties - it does not rely on the update thread to have
+ * already calculated the transform.
+ *
+ * @param[in] actor The actor for which to calculate the world transform
+ * @return The world transform matrix
+ */
+DALI_CORE_API Matrix GetWorldTransform(Actor actor);
+
+/**
+ * Get the world color of the actor.
+ *
+ * This calcualtes the world color of the actor from scratch using
+ * only event side properties. It does not rely on the update thread
+ * to have already calculated the color.
+ *
+ * @param[in] actor The actor to calculate the world color for
+ * @return the world color
+ */
+DALI_CORE_API Vector4 GetWorldColor(Actor actor);
+
 } // namespace DevelActor
 
 } // namespace Dali
