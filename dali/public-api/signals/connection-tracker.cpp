@@ -19,7 +19,7 @@
 #include <dali/public-api/signals/connection-tracker.h>
 
 // EXTERNAL INCLUDES
-#include <unordered_map>
+#include <map>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/signals/callback.h>
@@ -35,7 +35,7 @@ struct ConnectionTracker::Impl
   Impl()  = default;
   ~Impl() = default;
 
-  std::unordered_map<CallbackBase*, SlotObserver*> mCallbackCache;
+  std::map<CallbackBase*, SlotObserver*> mCallbackCache;
 };
 
 ConnectionTracker::ConnectionTracker()
@@ -63,7 +63,6 @@ void ConnectionTracker::DisconnectAll()
   }
 
   mCacheImpl->mCallbackCache.clear();
-  mCacheImpl->mCallbackCache.rehash(0); ///< Note : unordered_map.clear() didn't deallocate memory.
 }
 
 void ConnectionTracker::SignalConnected(SlotObserver* slotObserver, CallbackBase* callback)
