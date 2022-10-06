@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -150,7 +150,6 @@ int UtcDaliLongPressGestureDetectorCopyConstructorP(void)
   TestApplication application;
 
   LongPressGestureDetector detector = LongPressGestureDetector::New();
-  ;
 
   LongPressGestureDetector copy(detector);
   DALI_TEST_CHECK(detector);
@@ -163,13 +162,40 @@ int UtcDaliLongPressGestureDetectorAssignmentOperatorP(void)
 
   LongPressGestureDetector detector;
   detector = LongPressGestureDetector::New();
-  ;
 
   LongPressGestureDetector copy;
   copy = detector;
   DALI_TEST_CHECK(detector);
 
   DALI_TEST_CHECK(detector == copy);
+  END_TEST;
+}
+
+int UtcDaliLongPressGestureDetectorMoveConstructorP(void)
+{
+  TestApplication application;
+
+  LongPressGestureDetector detector = LongPressGestureDetector::New();
+  DALI_TEST_CHECK(detector);
+
+  LongPressGestureDetector moved = std::move(detector);
+  DALI_TEST_CHECK(moved);
+  DALI_TEST_CHECK(!detector);
+  END_TEST;
+}
+
+int UtcDaliLongPressGestureDetectorMoveAssignmentOperatorP(void)
+{
+  TestApplication application;
+
+  LongPressGestureDetector detector;
+  detector = LongPressGestureDetector::New();
+  DALI_TEST_CHECK(detector);
+
+  LongPressGestureDetector moved;
+  moved = std::move(detector);
+  DALI_TEST_CHECK(moved);
+  DALI_TEST_CHECK(!detector);
   END_TEST;
 }
 

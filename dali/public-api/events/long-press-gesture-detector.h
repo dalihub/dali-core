@@ -2,7 +2,7 @@
 #define DALI_LONG_PRESS_GESTURE_DETECTOR_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -142,6 +142,23 @@ public: // Creation & Destruction
    * @return A reference to this
    */
   LongPressGestureDetector& operator=(const LongPressGestureDetector& rhs);
+
+  /**
+   * @brief This move constructor is required for (smart) pointer semantics.
+   *
+   * @SINCE_2_2.4
+   * @param[in] handle A reference to the moved handle
+   */
+  LongPressGestureDetector(LongPressGestureDetector&& handle);
+
+  /**
+   * @brief This move assignment operator is required for (smart) pointer semantics.
+   *
+   * @SINCE_2_2.4
+   * @param[in] rhs A reference to the moved handle
+   * @return A reference to this
+   */
+  LongPressGestureDetector& operator=(LongPressGestureDetector&& rhs);
 
 public: // Setters
   /**

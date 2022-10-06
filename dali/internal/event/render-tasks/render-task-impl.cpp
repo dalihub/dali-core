@@ -29,6 +29,7 @@
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/event/render-tasks/render-task-list-impl.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
 #include <dali/public-api/common/dali-common.h>

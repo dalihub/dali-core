@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,11 +46,11 @@ PinchGestureDetector::~PinchGestureDetector() = default;
 
 PinchGestureDetector::PinchGestureDetector(const PinchGestureDetector& handle) = default;
 
-PinchGestureDetector& PinchGestureDetector::operator=(const PinchGestureDetector& rhs)
-{
-  BaseHandle::operator=(rhs);
-  return *this;
-}
+PinchGestureDetector& PinchGestureDetector::operator=(const PinchGestureDetector& rhs) = default;
+
+PinchGestureDetector::PinchGestureDetector(PinchGestureDetector&& handle) = default;
+
+PinchGestureDetector& PinchGestureDetector::operator=(PinchGestureDetector&& rhs) = default;
 
 PinchGestureDetector::DetectedSignalType& PinchGestureDetector::DetectedSignal()
 {

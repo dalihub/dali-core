@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,6 +73,11 @@ int UtcDaliGestureDetectorConstructorP(void)
     DALI_TEST_PRINT_ASSERT(e);
     tet_result(TET_FAIL);
   }
+
+  GestureDetector moved = std::move(detector);
+  DALI_TEST_CHECK(moved);
+  DALI_TEST_CHECK(!detector);
+
   END_TEST;
 }
 
@@ -98,6 +103,12 @@ int UtcDaliGestureDetectorAssignP(void)
     DALI_TEST_PRINT_ASSERT(e);
     tet_result(TET_FAIL);
   }
+
+  GestureDetector moved;
+  moved = std::move(detector2);
+  DALI_TEST_CHECK(moved);
+  DALI_TEST_CHECK(detector);
+  DALI_TEST_CHECK(!detector2);
   END_TEST;
 }
 

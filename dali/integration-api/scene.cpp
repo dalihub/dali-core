@@ -47,12 +47,16 @@ Scene::~Scene() = default;
 
 Scene::Scene(const Scene& handle) = default;
 
+Scene& Scene::operator=(const Scene& rhs) = default;
+
+Scene::Scene(Scene&& handle) = default;
+
+Scene& Scene::operator=(Scene&& rhs) = default;
+
 Scene::Scene(Internal::Scene* internal)
 : BaseHandle(internal)
 {
 }
-
-Scene& Scene::operator=(const Scene& rhs) = default;
 
 void Scene::Add(Actor actor)
 {

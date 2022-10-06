@@ -372,3 +372,32 @@ int UtcDaliIndexedIntegerMapStressTest(void)
 
   END_TEST;
 }
+
+int UtcDaliIndexedIntegerMapMoveTest(void)
+{
+  IndexedIntegerMap<std::string> indexedMap;
+
+  std::string expectString = "wahaha";
+
+  std::string p = expectString; // copy string;
+  DALI_TEST_CHECK(indexedMap.Register(111, p));
+  DALI_TEST_CHECK(!indexedMap.Register(111, p));
+
+  DALI_TEST_EQUALS(p, expectString, TEST_LOCATION);
+  DALI_TEST_EQUALS(indexedMap[111], expectString, TEST_LOCATION);
+
+  // Change expect string
+  expectString = "wehihi";
+  p            = expectString;
+
+  DALI_TEST_CHECK(indexedMap.Register(222, std::move(p)));
+
+  DALI_TEST_CHECK(p.empty()); // string moved.
+  DALI_TEST_EQUALS(indexedMap[222], expectString, TEST_LOCATION);
+
+  p = expectString;
+
+  DALI_TEST_CHECK(!indexedMap.Register(222, std::move(p)));
+
+  END_TEST;
+}

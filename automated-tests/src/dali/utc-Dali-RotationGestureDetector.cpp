@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -131,7 +131,6 @@ int UtcDaliRotationGestureDetectorCopyConstructorP(void)
   TestApplication application;
 
   RotationGestureDetector detector = RotationGestureDetector::New();
-  ;
 
   RotationGestureDetector copy(detector);
   DALI_TEST_CHECK(detector);
@@ -143,13 +142,40 @@ int UtcDaliRotationGestureDetectorAssignmentOperatorP(void)
   TestApplication application;
 
   RotationGestureDetector detector = RotationGestureDetector::New();
-  ;
 
   RotationGestureDetector assign;
   assign = detector;
   DALI_TEST_CHECK(detector);
 
   DALI_TEST_CHECK(detector == assign);
+  END_TEST;
+}
+
+int UtcDaliRotationGestureDetectorMoveConstructorP(void)
+{
+  TestApplication application;
+
+  RotationGestureDetector detector = RotationGestureDetector::New();
+  DALI_TEST_CHECK(detector);
+
+  RotationGestureDetector moved = std::move(detector);
+  DALI_TEST_CHECK(moved);
+  DALI_TEST_CHECK(!detector);
+  END_TEST;
+}
+
+int UtcDaliRotationGestureDetectorMoveAssignmentOperatorP(void)
+{
+  TestApplication application;
+
+  RotationGestureDetector detector;
+  detector = RotationGestureDetector::New();
+  DALI_TEST_CHECK(detector);
+
+  RotationGestureDetector moved;
+  moved = std::move(detector);
+  DALI_TEST_CHECK(moved);
+  DALI_TEST_CHECK(!detector);
   END_TEST;
 }
 

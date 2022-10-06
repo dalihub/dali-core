@@ -238,6 +238,34 @@ int UtcDaliPanGestureDetectorAssignmentOperatorP(void)
   END_TEST;
 }
 
+int UtcDaliPanGestureDetectorMoveConstructorP(void)
+{
+  TestApplication application;
+
+  PanGestureDetector detector = PanGestureDetector::New();
+  DALI_TEST_CHECK(detector);
+
+  PanGestureDetector moved = std::move(detector);
+  DALI_TEST_CHECK(moved);
+  DALI_TEST_CHECK(!detector);
+  END_TEST;
+}
+
+int UtcDaliPanGestureDetectorMoveAssignmentOperatorP(void)
+{
+  TestApplication application;
+
+  PanGestureDetector detector;
+  detector = PanGestureDetector::New();
+  DALI_TEST_CHECK(detector);
+
+  PanGestureDetector moved;
+  moved = std::move(detector);
+  DALI_TEST_CHECK(moved);
+  DALI_TEST_CHECK(!detector);
+  END_TEST;
+}
+
 // Negative test case for a method
 int UtcDaliPanGestureDetectorNew(void)
 {

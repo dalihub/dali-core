@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -131,7 +131,6 @@ int UtcDaliPinchGestureDetectorCopyConstructorP(void)
   TestApplication application;
 
   PinchGestureDetector detector = PinchGestureDetector::New();
-  ;
 
   PinchGestureDetector copy(detector);
   DALI_TEST_CHECK(detector);
@@ -143,13 +142,40 @@ int UtcDaliPinchGestureDetectorAssignmentOperatorP(void)
   TestApplication application;
 
   PinchGestureDetector detector = PinchGestureDetector::New();
-  ;
 
   PinchGestureDetector assign;
   assign = detector;
   DALI_TEST_CHECK(detector);
 
   DALI_TEST_CHECK(detector == assign);
+  END_TEST;
+}
+
+int UtcDaliPinchGestureDetectorMoveConstructorP(void)
+{
+  TestApplication application;
+
+  PinchGestureDetector detector = PinchGestureDetector::New();
+  DALI_TEST_CHECK(detector);
+
+  PinchGestureDetector moved = std::move(detector);
+  DALI_TEST_CHECK(moved);
+  DALI_TEST_CHECK(!detector);
+  END_TEST;
+}
+
+int UtcDaliPinchGestureDetectorMoveAssignmentOperatorP(void)
+{
+  TestApplication application;
+
+  PinchGestureDetector detector;
+  detector = PinchGestureDetector::New();
+  DALI_TEST_CHECK(detector);
+
+  PinchGestureDetector moved;
+  moved = std::move(detector);
+  DALI_TEST_CHECK(moved);
+  DALI_TEST_CHECK(!detector);
   END_TEST;
 }
 
