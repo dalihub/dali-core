@@ -137,12 +137,12 @@ Matrix& Matrix::operator=(const Matrix& matrix)
   return *this;
 }
 
-Matrix::Matrix(Matrix&& matrix)
+Matrix::Matrix(Matrix&& matrix) noexcept
 {
   memcpy(mMatrix, matrix.mMatrix, NUM_BYTES_IN_MATRIX);
 }
 
-Matrix& Matrix::operator=(Matrix&& matrix)
+Matrix& Matrix::operator=(Matrix&& matrix) noexcept
 {
   if(this != &matrix)
   {

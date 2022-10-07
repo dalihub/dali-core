@@ -75,7 +75,7 @@ Property::Map::Map(const Property::Map& other)
   mImpl->mIndexValueContainer  = other.mImpl->mIndexValueContainer;
 }
 
-Property::Map::Map(Property::Map&& other)
+Property::Map::Map(Property::Map&& other) noexcept
 : mImpl(other.mImpl)
 {
   other.mImpl = nullptr;
@@ -395,7 +395,7 @@ Property::Map& Property::Map::operator=(const Property::Map& other)
   return *this;
 }
 
-Property::Map& Property::Map::operator=(Property::Map&& other)
+Property::Map& Property::Map::operator=(Property::Map&& other) noexcept
 {
   if(this != &other)
   {

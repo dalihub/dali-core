@@ -2,7 +2,7 @@
 #define DALI_REF_OBJECT_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,6 +100,11 @@ protected:
    * @return A reference to this
    */
   RefObject& operator=(const RefObject& rhs);
+
+  // Not movable
+
+  RefObject(RefObject&& rhs) = delete;            ///< Deleted move constructor
+  RefObject& operator=(RefObject&& rhs) = delete; ///< Deleted move assignment operator
 
 private:
   std::atomic_uint32_t mCount{0u}; ///< Reference count

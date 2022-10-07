@@ -91,7 +91,7 @@ private:
    * Making this private to prevent construction of auto type or IndirectValue type.
    * @param[in] rhs The object to move
    */
-  DALI_INTERNAL IndirectValue(IndirectValue&& rhs);
+  DALI_INTERNAL IndirectValue(IndirectValue&& rhs) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -100,7 +100,7 @@ private:
    * Making this private to prevent assignment to auto type or IndirectValue type.
    * @param[in] rhs The object to move
    */
-  DALI_INTERNAL IndirectValue& operator=(IndirectValue&& rhs);
+  DALI_INTERNAL IndirectValue& operator=(IndirectValue&& rhs) noexcept;
 
   /**
    * @brief Accessor for handle property.

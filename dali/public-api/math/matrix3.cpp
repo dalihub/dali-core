@@ -92,12 +92,12 @@ void Matrix3::SetIdentity()
   mElements[S22] = 1.0f;
 }
 
-Matrix3::Matrix3(Matrix3&& matrix)
+Matrix3::Matrix3(Matrix3&& matrix) noexcept
 {
   memcpy(mElements, matrix.mElements, NUM_BYTES_IN_MATRIX);
 }
 
-Matrix3& Matrix3::operator=(Matrix3&& matrix)
+Matrix3& Matrix3::operator=(Matrix3&& matrix) noexcept
 {
   if(this != &matrix)
   {

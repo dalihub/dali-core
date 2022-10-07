@@ -123,7 +123,7 @@ public:
    * @SINCE_1_9.21
    * @param[in] matrix A reference to the moved matrix
    */
-  Matrix(Matrix&& matrix);
+  Matrix(Matrix&& matrix) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -132,7 +132,7 @@ public:
    * @param[in] matrix A reference to the moved matrix
    * @return A reference to this
    */
-  Matrix& operator=(Matrix&& matrix);
+  Matrix& operator=(Matrix&& matrix) noexcept;
 
   /**
    * @brief The identity matrix.

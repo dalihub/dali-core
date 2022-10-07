@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,9 +41,9 @@ BaseHandle::BaseHandle(const BaseHandle& handle) = default;
 
 BaseHandle& BaseHandle::operator=(const BaseHandle& rhs) = default;
 
-BaseHandle::BaseHandle(BaseHandle&& rhs) = default;
+BaseHandle::BaseHandle(BaseHandle&& rhs) noexcept = default;
 
-BaseHandle& BaseHandle::operator=(BaseHandle&& rhs) = default;
+BaseHandle& BaseHandle::operator=(BaseHandle&& rhs) noexcept = default;
 
 bool BaseHandle::DoAction(const std::string& command, const Property::Map& attributes)
 {

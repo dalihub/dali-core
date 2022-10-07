@@ -78,7 +78,7 @@ public:
    * @param[in] other The Map to move from
    * @note After the @a other array is used, it becomes invalid and is no longer usable.
    */
-  Map(Map&& other);
+  Map(Map&& other) noexcept;
 
   /**
    * @brief Non-virtual destructor.
@@ -368,7 +368,7 @@ public:
    *
    * @note The other array is an r-value so becomes invalid and is no longer usable.
    */
-  Map& operator=(Map&& other);
+  Map& operator=(Map&& other) noexcept;
 
   /**
    * @brief Output to stream.

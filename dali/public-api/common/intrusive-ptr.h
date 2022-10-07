@@ -103,7 +103,7 @@ public:
    * @param[in] rhs Reference to an IntrusivePtr
    */
   template<typename U>
-  IntrusivePtr(IntrusivePtr<U>&& rhs)
+  IntrusivePtr(IntrusivePtr<U>&& rhs) noexcept
   : mPtr(rhs.Detach())
   {
   }
@@ -113,7 +113,7 @@ public:
    * @SINCE_1_9.23
    * @param[in] rhs Reference to an IntrusivePtr
    */
-  IntrusivePtr(IntrusivePtr&& rhs)
+  IntrusivePtr(IntrusivePtr&& rhs) noexcept
   : mPtr(rhs.Detach())
   {
   }
@@ -198,7 +198,7 @@ public:
    * @param rhs Reference to intrusive pointer
    * @return Reference to moved intrusive pointer
    */
-  IntrusivePtr& operator=(IntrusivePtr&& rhs)
+  IntrusivePtr& operator=(IntrusivePtr&& rhs) noexcept
   {
     if(this != &rhs)
     {
@@ -220,7 +220,7 @@ public:
    * @return Reference to moved intrusive pointer
    */
   template<typename U>
-  IntrusivePtr& operator=(IntrusivePtr<U>&& rhs)
+  IntrusivePtr& operator=(IntrusivePtr<U>&& rhs) noexcept
   {
     if(this != reinterpret_cast<IntrusivePtr<T>*>(&rhs))
     {

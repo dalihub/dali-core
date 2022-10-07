@@ -106,7 +106,7 @@ public:
    * @SINCE_1_9.21
    * @param[in] matrix A reference to the moved matrix
    */
-  Matrix3(Matrix3&& matrix);
+  Matrix3(Matrix3&& matrix) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -115,7 +115,7 @@ public:
    * @param[in] matrix A reference to the moved matrix
    * @return A reference to this
    */
-  Matrix3& operator=(Matrix3&& matrix);
+  Matrix3& operator=(Matrix3&& matrix) noexcept;
 
   /**
    * @brief Assignment Operator.

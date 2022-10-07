@@ -2,7 +2,7 @@
 #define DALI_PROPERTY_ARRAY_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,7 +73,7 @@ public:
    * @param[in] other The Array to move from
    * @note After the @a other array is used, it becomes invalid and is no longer usable.
    */
-  Array(Array&& other);
+  Array(Array&& other) noexcept;
 
   /**
    * @brief Non-virtual destructor.
@@ -224,7 +224,7 @@ public:
    *
    * @note After the @a other array is used, it becomes invalid and is no longer usable.
    */
-  Array& operator=(Array&& other);
+  Array& operator=(Array&& other) noexcept;
 
   /**
    * @brief Output to stream.

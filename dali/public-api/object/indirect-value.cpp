@@ -37,8 +37,8 @@ Property::Value IndirectValue::GetProperty()
   return Handle(static_cast<Dali::Internal::Object*>(mHandle.Get())).GetProperty(mIndex);
 }
 
-IndirectValue& IndirectValue::operator=(IndirectValue&&) = default;
+IndirectValue& IndirectValue::operator=(IndirectValue&&) noexcept = default;
 
-IndirectValue::IndirectValue(IndirectValue&&) = default;
+IndirectValue::IndirectValue(IndirectValue&&) noexcept = default;
 
 } // namespace Dali
