@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -559,6 +559,27 @@ int UtcDaliMatrixOperatorMultiply02P(void)
 
   output.w = 0.0f;
   DALI_TEST_EQUALS(output, Vector4::ZERO, 0.01f, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliMatrixOperatorMultiply03P(void)
+{
+  const float ll[16] = {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
+  const float rr[16] = {1.0f, 5.0f, 0.0f, 0.0f, 2.0f, 6.0f, 0.0f, 0.0f, 3.0f, 7.0f, 0.0f, 0.0f, 4.0f, 8.0f, 0.0f, 0.0f};
+  Matrix      left(ll);
+  Matrix      right(rr);
+
+  const float els[16] = {26.0f, 32.0f, 38.0f, 44.0f, 32.0f, 40.0f, 48.0f, 56.0f, 38.0f, 48.0f, 58.0f, 68.0f, 44.0f, 56.0f, 68.0f, 80.0f};
+  Matrix      result(els);
+
+  // Get result by operator*
+  Matrix multResult = left * right;
+  DALI_TEST_EQUALS(multResult, result, 0.01f, TEST_LOCATION);
+
+  // Get result by Multiply API
+  Matrix::Multiply(multResult, right, left);
+  DALI_TEST_EQUALS(multResult, result, 0.01f, TEST_LOCATION);
+
   END_TEST;
 }
 

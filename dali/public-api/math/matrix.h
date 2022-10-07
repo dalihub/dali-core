@@ -346,6 +346,25 @@ public:
   static void Multiply(Matrix& result, const Matrix& lhs, const Quaternion& rhs);
 
   /**
+   * @brief Multiplication operator.
+   *
+   * Returned Matrix = This Matrix * rhs
+   *
+   * @note It makes some memory allocate & copy internally.
+   * Use Matrix::Multiply API for time critical path.
+   *
+   * @SINCE_2_1.44
+   * @param[in] rhs The Matrix to multiply this by
+   * @return A Matrix containing the result
+   */
+  Matrix operator*(const Matrix& rhs) const
+  {
+    Matrix result(false);
+    Multiply(result, rhs, *this);
+    return result;
+  }
+
+  /**
    * @brief The multiplication operator.
    *
    * Returned Vector = This Matrix * rhs
