@@ -2,7 +2,7 @@
 #define DALI_UINT_16_PAIR_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,8 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <stdint.h>
-
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/common/type-traits.h>
+#include <dali/public-api/math/int-pair.h>
 
 namespace Dali
 {
@@ -42,161 +38,26 @@ namespace Dali
  * common architectures.
  * @SINCE_1_0.0
  */
-class Uint16Pair
+class Uint16Pair : public IntPair<16, false>
 {
 public:
   /**
    * @brief Default constructor for the (0, 0) tuple.
    * @SINCE_1_0.0
    */
-  Uint16Pair()
-  : mData(0)
-  {
-  }
+  constexpr Uint16Pair() = default;
 
   /**
    * @brief Constructor taking separate x and y (width and height) parameters.
    * @SINCE_1_0.0
-   * @param[in] width The width or X dimension of the tuple. Make sure it is less than 65536
-   * @param[in] height The height or Y dimension of the tuple. Make sure it is less than 65536
+   * @param[in] width The width or X dimension of the tuple. Make sure it is less than 65536.
+   * @param[in] height The height or Y dimension of the tuple. Make sure it is less than 65536.
    */
-  Uint16Pair(uint32_t width, uint32_t height)
+  constexpr Uint16Pair(uint32_t width, uint32_t height)
+  : IntPair(static_cast<uint16_t>(width), static_cast<uint16_t>(height))
   {
     DALI_ASSERT_DEBUG(width < (1u << 16) && "Width parameter not representable.");
     DALI_ASSERT_DEBUG(height < (1u << 16) && "Height parameter not representable.");
-
-    /* Do equivalent of the code below with one aligned memory access:
-     * mComponents[0] = width;
-     * mComponents[1] = height;
-     * Unit tests make sure this is equivalent.
-     **/
-    mData = (height << 16u) + width;
-  }
-
-  /**
-   * @brief Sets the width.
-   * @SINCE_1_1.13
-   * @param[in] width The x dimension to be stored in this 2-tuple
-   */
-  void SetWidth(uint16_t width)
-  {
-    mComponents[0] = width;
-  }
-
-  /**
-   * @brief Get the width.
-   * @SINCE_1_0.0
-   * @return the x dimension stored in this 2-tuple
-   */
-  uint16_t GetWidth() const
-  {
-    return mComponents[0];
-  }
-
-  /**
-   * @brief Sets the height.
-   * @SINCE_1_1.13
-   * @param[in] height The y dimension to be stored in this 2-tuple
-   */
-  void SetHeight(uint16_t height)
-  {
-    mComponents[1] = height;
-  }
-
-  /**
-   * @brief Returns the y dimension stored in this 2-tuple.
-   * @SINCE_1_0.0
-   * @return Height
-   */
-  uint16_t GetHeight() const
-  {
-    return mComponents[1];
-  }
-
-  /**
-   * @brief Sets the x dimension (same as width).
-   * @SINCE_1_1.14
-   * @param[in] x The x dimension to be stored in this 2-tuple
-   */
-  void SetX(uint16_t x)
-  {
-    mComponents[0] = x;
-  }
-
-  /**
-   * @brief Returns the x dimension stored in this 2-tuple.
-   * @SINCE_1_0.0
-   * @return X
-   */
-  uint16_t GetX() const
-  {
-    return mComponents[0];
-  }
-
-  /**
-   * @brief Sets the y dimension (same as height).
-   * @SINCE_1_1.14
-   * @param[in] y The y dimension to be stored in this 2-tuple
-   */
-  void SetY(uint16_t y)
-  {
-    mComponents[1] = y;
-  }
-
-  /**
-   * @brief Returns the y dimension stored in this 2-tuple.
-   * @SINCE_1_0.0
-   * @return Y
-   */
-  uint16_t GetY() const
-  {
-    return mComponents[1];
-  }
-
-  /**
-   * @brief Equality operator.
-   * @SINCE_1_0.0
-   * @param[in] rhs A reference for comparison
-   * @return True if same
-   */
-  bool operator==(const Uint16Pair& rhs) const
-  {
-    return mData == rhs.mData;
-  }
-
-  /**
-   * @brief Inequality operator.
-   * @SINCE_1_0.0
-   * @param[in] rhs A reference for comparison
-   * @return True if different
-   */
-  bool operator!=(const Uint16Pair& rhs) const
-  {
-    return mData != rhs.mData;
-  }
-
-  /**
-   * @brief Less than comparison operator for storing in collections (not geometrically
-   * meaningful).
-   * @SINCE_1_0.0
-   * @param[in] rhs A reference for comparison
-   * @return True if less
-   */
-  bool operator<(const Uint16Pair& rhs) const
-  {
-    return mData < rhs.mData;
-  }
-
-  /**
-   * @brief Greater than comparison operator for storing in collections (not
-   * geometrically meaningful).
-   * @SINCE_1_0.0
-   * @param[in] rhs A reference for comparison
-   * @return True if greater
-   */
-  bool operator>(const Uint16Pair& rhs) const
-  {
-    return mData > rhs.mData;
   }
 
   /**
@@ -236,19 +97,10 @@ public:
   }
 
 public:
-  Uint16Pair(const Uint16Pair&) = default;            ///< Default copy constructor
-  Uint16Pair(Uint16Pair&&)      = default;            ///< Default move constructor
-  Uint16Pair& operator=(const Uint16Pair&) = default; ///< Default copy assignment operator
-  Uint16Pair& operator=(Uint16Pair&&) = default;      ///< Default move assignment operator
-
-private:
-  union
-  {
-    // Addressable view of X and Y:
-    uint16_t mComponents[2];
-    // Packed view of X and Y to force alignment and allow a faster copy:
-    uint32_t mData;
-  };
+  Uint16Pair(const Uint16Pair&)     = default;            ///< Default copy constructor
+  Uint16Pair(Uint16Pair&&) noexcept = default;            ///< Default move constructor
+  Uint16Pair& operator=(const Uint16Pair&) = default;     ///< Default copy assignment operator
+  Uint16Pair& operator=(Uint16Pair&&) noexcept = default; ///< Default move assignment operator
 };
 
 // Allow Uint16Pair to be treated as a POD type
