@@ -26,24 +26,33 @@
 
 namespace
 {
+static int gRefCount;
 struct MyStruct
 {
   MyStruct()
   : mFloatValue(0.f),
     mIntValue(0)
   {
+    ++gRefCount;
   }
 
   MyStruct(float fValue, int iValue)
   : mFloatValue(fValue),
     mIntValue(iValue)
   {
+    ++gRefCount;
   }
 
   MyStruct(const MyStruct& myStruct)
   : mFloatValue(myStruct.mFloatValue),
     mIntValue(myStruct.mIntValue)
   {
+    ++gRefCount;
+  }
+
+  ~MyStruct()
+  {
+    --gRefCount;
   }
 
   MyStruct& operator=(const MyStruct& myStruct)
@@ -77,6 +86,8 @@ int UtcDaliAnyConstructors(void)
 
   tet_infoline("Test Any constructors.");
 
+  gRefCount = 0;
+
   // Test default constructor.
   Any value;
 
@@ -91,9 +102,21 @@ int UtcDaliAnyConstructors(void)
   // Test constructor Any( const Any& ) with a non initialized Any
   Any value3 = value;
 
+  // Test constructor Any( Any&& ) with a non initialized Any
+  Any value4(Any(MyStruct(1.0f, 2)));
+
   DALI_TEST_CHECK(typeid(unsigned int) == value1.GetType());
   DALI_TEST_CHECK(typeid(unsigned int) == value2.GetType());
   DALI_TEST_CHECK(typeid(void) == value3.GetType());
+  DALI_TEST_CHECK(typeid(MyStruct) == value4.GetType());
+  DALI_TEST_CHECK(gRefCount == 1);
+
+  // Test std::move operation result.
+  Any value5(std::move(value4));
+
+  DALI_TEST_CHECK(value4.Empty());
+  DALI_TEST_CHECK(typeid(MyStruct) == value5.GetType());
+  DALI_TEST_CHECK(gRefCount == 1);
 
   unsigned int uiValue1 = 0u;
   unsigned int uiValue2 = 0u;
@@ -101,6 +124,13 @@ int UtcDaliAnyConstructors(void)
   value2.Get(uiValue2);
 
   DALI_TEST_EQUALS(uiValue1, uiValue2, TEST_LOCATION);
+
+  MyStruct myValue;
+  value5.Get(myValue);
+
+  DALI_TEST_EQUALS(myValue.mFloatValue, 1.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+  DALI_TEST_EQUALS(myValue.mIntValue, 2, TEST_LOCATION);
+
   END_TEST;
 }
 
@@ -162,10 +192,44 @@ int UtcDaliAnyAssignmentOperators(void)
   value6.Get(fValue);
   DALI_TEST_EQUALS(fValue, 3.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
 
-  // test assignment for  non-empty Any = empty Any
+  // test assignment for non-empty Any = empty Any
   Any value7;
   value6 = value7;
   DALI_TEST_CHECK(value6.Empty());
+
+  // Due to value6 is reference of value5, value5 also become empty
+  DALI_TEST_CHECK(value5.Empty());
+
+  gRefCount = 0;
+
+  // Do something to above compiler optimize out
+  Any value8 = value3;
+
+  DALI_TEST_CHECK(typeid(float) == value8.GetType());
+
+  // Test operator=( Any&& ).
+  value8 = Any(MyStruct(3.0f, 4));
+
+  DALI_TEST_CHECK(typeid(MyStruct) == value8.GetType());
+  DALI_TEST_CHECK(gRefCount == 1);
+
+  // Do something to above compiler optimize out
+  Any value9 = value3;
+
+  DALI_TEST_CHECK(typeid(float) == value9.GetType());
+
+  // Test std::move operation result.
+  value9 = std::move(value8);
+
+  DALI_TEST_CHECK(value8.Empty());
+  DALI_TEST_CHECK(typeid(MyStruct) == value9.GetType());
+  DALI_TEST_CHECK(gRefCount == 1);
+
+  MyStruct myValue;
+  value9.Get(myValue);
+
+  DALI_TEST_EQUALS(myValue.mFloatValue, 3.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+  DALI_TEST_EQUALS(myValue.mIntValue, 4, TEST_LOCATION);
 
   END_TEST;
 }
@@ -353,5 +417,42 @@ int UtcDaliAnyNegativeGet(void)
     tet_result(TET_FAIL);
   }
   uiValue++; // supresss warning from unused variable
+  END_TEST;
+}
+
+int UtcDaliAnyReferenceCheck(void)
+{
+  gRefCount = 0;
+
+  {
+    Dali::Any any[10]; // Create local 10 empty Any
+
+    DALI_TEST_EQUALS(gRefCount, 0, TEST_LOCATION);
+
+    // Create [0 5)
+    for(int i = 0; i < 5; i++)
+    {
+      any[i] = MyStruct(1.0f, i);
+    }
+    DALI_TEST_EQUALS(gRefCount, 5, TEST_LOCATION);
+
+    // Move from [0 5) to [5 10)
+    for(int i = 0; i < 5; i++)
+    {
+      any[i + 5] = std::move(any[i]);
+    }
+    DALI_TEST_EQUALS(gRefCount, 5, TEST_LOCATION);
+
+    // Copy from [5 10) to [0 5)
+    for(int i = 0; i < 5; i++)
+    {
+      any[i] = any[i + 5];
+    }
+    DALI_TEST_EQUALS(gRefCount, 10, TEST_LOCATION);
+  }
+
+  // Check whether all Dali::Any are released
+  DALI_TEST_EQUALS(gRefCount, 0, TEST_LOCATION);
+
   END_TEST;
 }

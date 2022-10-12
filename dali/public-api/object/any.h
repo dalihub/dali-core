@@ -2,7 +2,7 @@
 #define DALI_ANY_TYPE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,13 +101,25 @@ public:
   }
 
   /**
+   * @brief Move Constructor.
+   * @SINCE_2_1.44
+   * @param[in] any Any to be moved
+   */
+  Any(Any&& any) noexcept
+  {
+    mContainer = any.mContainer;
+
+    // Remove input value's container.
+    any.mContainer = nullptr;
+  }
+
+  /**
    * @brief Assigns a given value to the Any type.
    *
    * @SINCE_1_0.0
    * @param[in] value The given value
    * @return A reference to this
    * @note If the types are different, then the current container will be re-created.
-   *
    */
   template<typename Type>
   Any& operator=(const Type& value)
@@ -142,9 +154,17 @@ public:
    * @param[in] any Any to be assigned which contains a value of identical type to current contents.
    * @return A reference to this
    * @exception DaliException If parameter any is of a different type.
-   *
    */
   DALI_CORE_API Any& operator=(const Any& any);
+
+  /**
+   * @brief Move assignment operator.
+   *
+   * @SINCE_2_1.44
+   * @param[in] any Any to be moved which contains a value of identical type to current contents.
+   * @return A reference to this
+   */
+  DALI_CORE_API Any& operator=(Any&& any) noexcept;
 
   /**
    * @brief Gets a value of type Type from container.
@@ -398,6 +418,7 @@ public:
     Type mValue;
   };
 
+private:
   AnyContainerBase* mContainer;
 };
 

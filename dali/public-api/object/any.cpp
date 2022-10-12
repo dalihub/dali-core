@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,8 +45,11 @@ Any& Any::operator=(const Any& any)
   {
     if(nullptr == any.mContainer)
     {
-      delete mContainer;
-      mContainer = nullptr;
+      if(mContainer)
+      {
+        mContainer->mDeleteFunc(mContainer);
+        mContainer = nullptr;
+      }
     }
     else
     {
@@ -65,8 +68,31 @@ Any& Any::operator=(const Any& any)
       mContainer = any.mContainer->mCloneFunc(*any.mContainer);
 
       // Deletes previous container.
-      delete tmp;
+      if(tmp)
+      {
+        tmp->mDeleteFunc(tmp);
+      }
     }
+  }
+
+  return *this;
+}
+
+Any& Any::operator=(Any&& any) noexcept
+{
+  if(&any != this)
+  {
+    // Deletes previous container.
+    if(mContainer)
+    {
+      mContainer->mDeleteFunc(mContainer);
+    }
+
+    // Move the correct templated object
+    mContainer = any.mContainer;
+
+    // Remove input value's container.
+    any.mContainer = nullptr;
   }
 
   return *this;
