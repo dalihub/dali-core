@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_DISCARD_QUEUE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,6 @@ class DiscardQueue
 public:
   using ShaderQueue   = OwnerContainer<Shader*>;
   using RendererQueue = OwnerContainer<Renderer*>;
-  using CameraQueue   = OwnerContainer<Camera*>;
   using SceneQueue    = OwnerContainer<Scene*>;
 
   /**
@@ -90,14 +89,6 @@ public:
   void Add(BufferIndex updateBufferIndex, Renderer* renderer);
 
   /**
-   * Adds an unwanted Camera to the discard queue.
-   * This is done because Render thread may use Matrices from the camera
-   * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] camera The discarded renderer; DiscardQueue takes ownership.
-   */
-  void Add(BufferIndex updateBufferIndex, Camera* camera);
-
-  /**
    * Adds an unwanted Scene to the discard queue.
    * A message will be sent to clean up GL resources in the next Render.
    * @param[in] updateBufferIndex The current update buffer index.
@@ -126,7 +117,6 @@ private:
   OwnerContainer<Node*> mNodeQueue[2];
   ShaderQueue           mShaderQueue[2];
   RendererQueue         mRendererQueue[2];
-  CameraQueue           mCameraQueue[2];
   SceneQueue            mSceneQueue[2];
 };
 

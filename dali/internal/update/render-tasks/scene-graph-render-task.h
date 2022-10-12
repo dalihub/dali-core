@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -311,7 +311,7 @@ public:
    *
    * @return The camera.
    */
-  SceneGraph::Camera& GetCamera() const;
+  const SceneGraph::Camera& GetCamera() const;
 
   /**
    * Retrieve the projection-matrix; this is double buffered for input handling.

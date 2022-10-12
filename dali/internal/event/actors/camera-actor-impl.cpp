@@ -29,6 +29,7 @@
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/public-api/object/type-registry.h>
 
+#include <dali/internal/update/common/property-base.h>
 #include <dali/internal/update/manager/update-manager.h>
 
 namespace Dali
@@ -48,7 +49,7 @@ namespace
 DALI_PROPERTY_TABLE_BEGIN
 DALI_PROPERTY( "type",                   INTEGER,  true,    false,   true,   Dali::CameraActor::Property::TYPE                  )
 DALI_PROPERTY( "projectionMode",         INTEGER,  true,    false,   true,   Dali::CameraActor::Property::PROJECTION_MODE       )
-DALI_PROPERTY( "fieldOfView",            FLOAT,    true,    false,   true,   Dali::CameraActor::Property::FIELD_OF_VIEW         )
+DALI_PROPERTY( "fieldOfView",            FLOAT,    true,    true,    true,   Dali::CameraActor::Property::FIELD_OF_VIEW         )
 DALI_PROPERTY( "aspectRatio",            FLOAT,    true,    false,   true,   Dali::CameraActor::Property::ASPECT_RATIO          )
 DALI_PROPERTY( "nearPlaneDistance",      FLOAT,    true,    false,   true,   Dali::CameraActor::Property::NEAR_PLANE_DISTANCE   )
 DALI_PROPERTY( "farPlaneDistance",       FLOAT,    true,    false,   true,   Dali::CameraActor::Property::FAR_PLANE_DISTANCE    )
@@ -138,7 +139,17 @@ void BuildOrthoPickingRay(const Matrix&   viewMatrix,
 
 CameraActorPtr CameraActor::New(const Size& size)
 {
-  CameraActorPtr actor(new CameraActor(*CreateNode()));
+  // create camera. Cameras are owned by the update manager
+  SceneGraph::Camera*            camera = SceneGraph::Camera::New();
+  OwnerPointer<SceneGraph::Node> transferOwnership(camera);
+  Internal::ThreadLocalStorage*  tls = Internal::ThreadLocalStorage::GetInternal();
+
+  DALI_ASSERT_ALWAYS(tls && "ThreadLocalStorage is null");
+
+  // Send ownership of camera.
+  AddNodeMessage(tls->GetUpdateManager(), transferOwnership);
+
+  CameraActorPtr actor(new CameraActor(*camera));
 
   // Second-phase construction
   actor->Initialize();
@@ -155,7 +166,6 @@ CameraActorPtr CameraActor::New(const Size& size)
 
 CameraActor::CameraActor(const SceneGraph::Node& node)
 : Actor(Actor::BASIC, node),
-  mSceneObject(nullptr),
   mTarget(SceneGraph::Camera::DEFAULT_TARGET_POSITION),
   mType(SceneGraph::Camera::DEFAULT_TYPE),
   mProjectionMode(SceneGraph::Camera::DEFAULT_MODE),
@@ -175,26 +185,6 @@ CameraActor::CameraActor(const SceneGraph::Node& node)
 
 CameraActor::~CameraActor()
 {
-  if(EventThreadServices::IsCoreRunning())
-  {
-    // Create scene-object and transfer ownership through message
-    RemoveCameraMessage(GetEventThreadServices().GetUpdateManager(), mSceneObject);
-  }
-}
-
-void CameraActor::OnInitialize()
-{
-  // Create scene-object and keep raw pointer for message passing.
-  SceneGraph::Camera* sceneGraphCamera = SceneGraph::Camera::New();
-
-  // Store a pointer to this camera node inside the scene-graph camera.
-  sceneGraphCamera->SetNode(&GetNode());
-
-  mSceneObject = sceneGraphCamera;
-  OwnerPointer<SceneGraph::Camera> sceneGraphCameraOwner(sceneGraphCamera);
-
-  // Send message to inform update of this camera (and move ownership).
-  AddCameraMessage(GetEventThreadServices().GetUpdateManager(), sceneGraphCameraOwner);
 }
 
 void CameraActor::OnSceneConnectionInternal()
@@ -216,10 +206,7 @@ void CameraActor::OnSceneConnectionInternal()
 
 void CameraActor::SetReflectByPlane(const Vector4& plane)
 {
-  if(mSceneObject)
-  {
-    SetReflectByPlaneMessage(GetEventThreadServices(), *mSceneObject, plane);
-  }
+  SetReflectByPlaneMessage(GetEventThreadServices(), GetCameraSceneObject(), plane);
 }
 
 void CameraActor::SetTarget(const Vector3& target)
@@ -229,7 +216,7 @@ void CameraActor::SetTarget(const Vector3& target)
   {
     mTarget = target;
 
-    SetTargetPositionMessage(GetEventThreadServices(), *mSceneObject, mTarget);
+    SetTargetPositionMessage(GetEventThreadServices(), GetCameraSceneObject(), mTarget);
   }
 }
 
@@ -245,7 +232,7 @@ void CameraActor::SetType(Dali::Camera::Type type)
     mType = type;
 
     // sceneObject is being used in a separate thread; queue a message to set
-    SetTypeMessage(GetEventThreadServices(), *mSceneObject, mType);
+    SetTypeMessage(GetEventThreadServices(), GetCameraSceneObject(), mType);
   }
 }
 
@@ -261,7 +248,7 @@ void CameraActor::SetProjectionMode(Dali::Camera::ProjectionMode mode)
     mProjectionMode = mode;
 
     // sceneObject is being used in a separate thread; queue a message to set
-    SetProjectionModeMessage(GetEventThreadServices(), *mSceneObject, mProjectionMode);
+    SetProjectionModeMessage(GetEventThreadServices(), GetCameraSceneObject(), mProjectionMode);
   }
 }
 
@@ -278,7 +265,7 @@ void CameraActor::SetProjectionDirection(Dali::DevelCameraActor::ProjectionDirec
     mProjectionDirection = direction;
 
     // sceneObject is being used in a separate thread; queue a message to set
-    SetProjectionDirectionMessage(GetEventThreadServices(), *mSceneObject, mProjectionDirection);
+    SetProjectionDirectionMessage(GetEventThreadServices(), GetCameraSceneObject(), mProjectionDirection);
   }
 }
 
@@ -290,13 +277,19 @@ void CameraActor::SetFieldOfView(float fieldOfView)
     mFieldOfView = fieldOfView;
 
     // sceneObject is being used in a separate thread; queue a message to set
-    SetFieldOfViewMessage(GetEventThreadServices(), *mSceneObject, mFieldOfView);
+    BakeFieldOfViewMessage(GetEventThreadServices(), GetCameraSceneObject(), mFieldOfView);
   }
 }
 
 float CameraActor::GetFieldOfView() const
 {
   return mFieldOfView;
+}
+
+float CameraActor::GetCurrentFieldOfView() const
+{
+  // node is being used in a separate thread; copy the value from the previous update
+  return GetCameraSceneObject().GetFieldOfView(GetEventThreadServices().GetEventBufferIndex());
 }
 
 void CameraActor::SetAspectRatio(float aspectRatio)
@@ -307,7 +300,7 @@ void CameraActor::SetAspectRatio(float aspectRatio)
     mAspectRatio = aspectRatio;
 
     // sceneObject is being used in a separate thread; queue a message to set
-    SetAspectRatioMessage(GetEventThreadServices(), *mSceneObject, mAspectRatio);
+    SetAspectRatioMessage(GetEventThreadServices(), GetCameraSceneObject(), mAspectRatio);
   }
 }
 
@@ -324,7 +317,7 @@ void CameraActor::SetNearClippingPlane(float nearClippingPlane)
     mNearClippingPlane = nearClippingPlane;
 
     // sceneObject is being used in a separate thread; queue a message to set
-    SetNearClippingPlaneMessage(GetEventThreadServices(), *mSceneObject, mNearClippingPlane);
+    SetNearClippingPlaneMessage(GetEventThreadServices(), GetCameraSceneObject(), mNearClippingPlane);
   }
 }
 
@@ -341,7 +334,7 @@ void CameraActor::SetFarClippingPlane(float farClippingPlane)
     mFarClippingPlane = farClippingPlane;
 
     // sceneObject is being used in a separate thread; queue a message to set
-    SetFarClippingPlaneMessage(GetEventThreadServices(), *mSceneObject, mFarClippingPlane);
+    SetFarClippingPlaneMessage(GetEventThreadServices(), GetCameraSceneObject(), mFarClippingPlane);
   }
 }
 
@@ -358,7 +351,7 @@ void CameraActor::SetLeftClippingPlane(float leftClippingPlane)
     mLeftClippingPlane = leftClippingPlane;
 
     // sceneObject is being used in a separate thread; queue a message to set
-    SetLeftClippingPlaneMessage(GetEventThreadServices(), *mSceneObject, mLeftClippingPlane);
+    SetLeftClippingPlaneMessage(GetEventThreadServices(), GetCameraSceneObject(), mLeftClippingPlane);
   }
 }
 
@@ -370,7 +363,7 @@ void CameraActor::SetRightClippingPlane(float rightClippingPlane)
     mRightClippingPlane = rightClippingPlane;
 
     // sceneObject is being used in a separate thread; queue a message to set
-    SetRightClippingPlaneMessage(GetEventThreadServices(), *mSceneObject, mRightClippingPlane);
+    SetRightClippingPlaneMessage(GetEventThreadServices(), GetCameraSceneObject(), mRightClippingPlane);
   }
 }
 
@@ -382,7 +375,7 @@ void CameraActor::SetTopClippingPlane(float topClippingPlane)
     mTopClippingPlane = topClippingPlane;
 
     // sceneObject is being used in a separate thread; queue a message to set
-    SetTopClippingPlaneMessage(GetEventThreadServices(), *mSceneObject, mTopClippingPlane);
+    SetTopClippingPlaneMessage(GetEventThreadServices(), GetCameraSceneObject(), mTopClippingPlane);
   }
 }
 
@@ -394,7 +387,7 @@ void CameraActor::SetBottomClippingPlane(float bottomClippingPlane)
     mBottomClippingPlane = bottomClippingPlane;
 
     // sceneObject is being used in a separate thread; queue a message to set
-    SetBottomClippingPlaneMessage(GetEventThreadServices(), *mSceneObject, mBottomClippingPlane);
+    SetBottomClippingPlaneMessage(GetEventThreadServices(), GetCameraSceneObject(), mBottomClippingPlane);
   }
 }
 
@@ -405,7 +398,7 @@ void CameraActor::SetInvertYAxis(bool invertYAxis)
     mInvertYAxis = invertYAxis;
 
     // sceneObject is being used in a separate thread; queue a message to set
-    SetInvertYAxisMessage(GetEventThreadServices(), *mSceneObject, mInvertYAxis);
+    SetInvertYAxisMessage(GetEventThreadServices(), GetCameraSceneObject(), mInvertYAxis);
   }
 }
 
@@ -526,7 +519,7 @@ bool CameraActor::BuildPickingRay(const Vector2&  screenCoordinates,
                  static_cast<float>(viewport.height) - (screenCoordinates.y - static_cast<float>(viewport.y)),
                  0.f,
                  1.f);
-    const Matrix& inverseViewProjection = mSceneObject->GetInverseViewProjectionMatrix(GetEventThreadServices().GetEventBufferIndex());
+    const Matrix& inverseViewProjection = GetCameraSceneObject().GetInverseViewProjectionMatrix(GetEventThreadServices().GetEventBufferIndex());
     success                             = Unproject(near, inverseViewProjection, static_cast<float>(viewport.width), static_cast<float>(viewport.height), near);
 
     // Compute the ray's director vector.
@@ -556,7 +549,7 @@ const Matrix& CameraActor::GetViewMatrix() const
 {
   if(OnScene())
   {
-    return mSceneObject->GetViewMatrix(GetEventThreadServices().GetEventBufferIndex());
+    return GetCameraSceneObject().GetViewMatrix(GetEventThreadServices().GetEventBufferIndex());
   }
   else
   {
@@ -568,22 +561,22 @@ const Matrix& CameraActor::GetProjectionMatrix() const
 {
   if(OnScene())
   {
-    return mSceneObject->GetProjectionMatrix(GetEventThreadServices().GetEventBufferIndex());
+    return GetCameraSceneObject().GetProjectionMatrix(GetEventThreadServices().GetEventBufferIndex());
   }
   else
   {
     return Matrix::IDENTITY;
   }
 }
-const SceneGraph::Camera* CameraActor::GetCamera() const
+const SceneGraph::Camera& CameraActor::GetCameraSceneObject() const
 {
-  return mSceneObject;
+  return static_cast<const SceneGraph::Camera&>(GetNode());
 }
 
 void CameraActor::RotateProjection(int rotationAngle)
 {
   // sceneObject is being used in a separate thread; queue a message to set
-  RotateProjectionMessage(GetEventThreadServices(), *mSceneObject, rotationAngle);
+  RotateProjectionMessage(GetEventThreadServices(), GetCameraSceneObject(), rotationAngle);
 }
 
 void CameraActor::SetDefaultProperty(Property::Index index, const Property::Value& propertyValue)
@@ -791,26 +784,101 @@ Property::Value CameraActor::GetDefaultPropertyCurrentValue(Property::Index inde
   }
   else
   {
-    ret = GetDefaultProperty(index); // Most are event-side properties, the scene-graph properties are only on the scene-graph
+    switch(index)
+    {
+      case Dali::CameraActor::Property::FIELD_OF_VIEW:
+      {
+        ret = GetCurrentFieldOfView();
+        break;
+      }
+      default:
+      {
+        ret = GetDefaultProperty(index); // Most are event-side properties, the scene-graph properties are only on the scene-graph
+      }
+    } // switch(index)
   }
 
   return ret;
 }
 
+void CameraActor::OnNotifyDefaultPropertyAnimation(Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType)
+{
+  if(index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT)
+  {
+    Actor::OnNotifyDefaultPropertyAnimation(animation, index, value, animationType);
+  }
+  else
+  {
+    switch(animationType)
+    {
+      case Animation::TO:
+      case Animation::BETWEEN:
+      {
+        switch(index)
+        {
+          case Dali::CameraActor::Property::FIELD_OF_VIEW:
+          {
+            value.Get(mFieldOfView);
+            break;
+          }
+        }
+        break;
+      }
+      case Animation::BY:
+      {
+        switch(index)
+        {
+          case Dali::CameraActor::Property::FIELD_OF_VIEW:
+          {
+            AdjustValue<float>(mFieldOfView, value);
+            break;
+          }
+        }
+        break;
+      }
+    }
+  }
+}
+
+const SceneGraph::PropertyBase* CameraActor::GetSceneObjectAnimatableProperty(Property::Index index) const
+{
+  const SceneGraph::PropertyBase* property(nullptr);
+  switch(index)
+  {
+    case Dali::CameraActor::Property::FIELD_OF_VIEW:
+    {
+      property = GetCameraSceneObject().GetFieldOfView();
+      break;
+    }
+      // no default on purpose as we chain method up to actor
+  }
+  if(!property)
+  {
+    // not our property, ask base
+    property = Actor::GetSceneObjectAnimatableProperty(index);
+  }
+
+  return property;
+}
 const PropertyInputImpl* CameraActor::GetSceneObjectInputProperty(Property::Index index) const
 {
   const PropertyInputImpl* property(nullptr);
 
   switch(index)
   {
+    case Dali::CameraActor::Property::FIELD_OF_VIEW:
+    {
+      property = GetCameraSceneObject().GetFieldOfView();
+      break;
+    }
     case Dali::CameraActor::Property::PROJECTION_MATRIX:
     {
-      property = mSceneObject->GetProjectionMatrix();
+      property = GetCameraSceneObject().GetProjectionMatrix();
       break;
     }
     case Dali::CameraActor::Property::VIEW_MATRIX:
     {
-      property = mSceneObject->GetViewMatrix();
+      property = GetCameraSceneObject().GetViewMatrix();
       break;
     }
       // no default on purpose as we chain method up to actor

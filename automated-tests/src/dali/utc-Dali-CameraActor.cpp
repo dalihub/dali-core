@@ -1312,7 +1312,15 @@ int UtcDaliCameraActorDefaultProperties(void)
   for(std::vector<Property::Index>::iterator iter = indices.begin(); iter != indices.end(); ++iter)
   {
     DALI_TEST_EQUALS(*iter, actor.GetPropertyIndex(actor.GetPropertyName(*iter)), TEST_LOCATION);
-    DALI_TEST_CHECK(!actor.IsPropertyAnimatable(*iter));
+
+    if(*iter == CameraActor::Property::FIELD_OF_VIEW)
+    {
+      DALI_TEST_CHECK(actor.IsPropertyAnimatable(*iter));
+    }
+    else
+    {
+      DALI_TEST_CHECK(!actor.IsPropertyAnimatable(*iter));
+    }
 
     if((*iter == CameraActor::Property::PROJECTION_MATRIX) ||
        (*iter == CameraActor::Property::VIEW_MATRIX))
@@ -1435,7 +1443,7 @@ int UtcDaliCameraActorDefaultPropertiesInherited(void)
       // camera own
       {"type", Property::INTEGER, true, false, true, Dali::CameraActor::Property::TYPE},
       {"projectionMode", Property::INTEGER, true, false, true, Dali::CameraActor::Property::PROJECTION_MODE},
-      {"fieldOfView", Property::FLOAT, true, false, true, Dali::CameraActor::Property::FIELD_OF_VIEW},
+      {"fieldOfView", Property::FLOAT, true, true, true, Dali::CameraActor::Property::FIELD_OF_VIEW},
       {"aspectRatio", Property::FLOAT, true, false, true, Dali::CameraActor::Property::ASPECT_RATIO},
       {"nearPlaneDistance", Property::FLOAT, true, false, true, Dali::CameraActor::Property::NEAR_PLANE_DISTANCE},
       {"farPlaneDistance", Property::FLOAT, true, false, true, Dali::CameraActor::Property::FAR_PLANE_DISTANCE},
@@ -1537,7 +1545,7 @@ int UtcDaliCameraActorReadProjectionMatrix(void)
   END_TEST;
 }
 
-int UtcDaliCameraActorAnimatedProperties(void)
+int UtcDaliCameraActorAnimatedProperties01(void)
 {
   TestApplication application;
   tet_infoline("Testing Dali::Internal::CameraActor::GetSceneObjectAnimatableProperty()");
@@ -1556,6 +1564,151 @@ int UtcDaliCameraActorAnimatedProperties(void)
   application.Render();
 
   DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), Vector3(100.0f, 200.0f, 300.0f), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliCameraActorAnimatedProperties02(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::Internal::CameraActor::GetSceneObjectAnimatableProperty()");
+
+  CameraActor camera = application.GetScene().GetRenderTaskList().GetTask(0u).GetCameraActor();
+  Actor       actor  = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::POSITION, Vector2(0.1f, 0.0f));
+  application.GetScene().Add(actor);
+
+  camera.SetFieldOfView(0.1f);
+
+  Constraint constraint = Constraint::New<float>(actor, Actor::Property::POSITION_X, EqualToConstraint());
+  constraint.AddSource(Source(camera, CameraActor::Property::FIELD_OF_VIEW));
+  constraint.Apply();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<float>(Actor::Property::POSITION_X), 0.1f, TEST_LOCATION);
+
+  camera.SetFieldOfView(0.5f);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<float>(Actor::Property::POSITION_X), 0.5f, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliCameraActorAnimatedProperties03(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::Internal::CameraActor::GetSceneObjectAnimatableProperty()");
+
+  CameraActor camera = application.GetScene().GetRenderTaskList().GetTask(0u).GetCameraActor();
+
+  // Add dummy actor
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::POSITION, Vector2(0.1f, 0.0f));
+  application.GetScene().Add(actor);
+
+  Radian sourceFoV = Radian(0.6f);
+  Radian targetFoV = Radian(0.1f);
+
+  Matrix expectedProjectionMatrix1;
+  Matrix expectedProjectionMatrix2;
+  Matrix expectedProjectionMatrix3;
+
+  // Reduce near-far value for projection matrix epsilon
+  camera.SetNearClippingPlane(1.0f);
+  camera.SetFarClippingPlane(3.0f);
+
+  // Build expect projection matrix
+  camera.SetFieldOfView(sourceFoV.radian);
+  application.SendNotification();
+  application.Render();
+  camera.GetProperty(CameraActor::Property::PROJECTION_MATRIX).Get(expectedProjectionMatrix1);
+
+  camera.SetFieldOfView(sourceFoV.radian * 0.6f + targetFoV.radian * 0.4f);
+  application.SendNotification();
+  application.Render();
+  camera.GetProperty(CameraActor::Property::PROJECTION_MATRIX).Get(expectedProjectionMatrix2);
+
+  camera.SetFieldOfView(targetFoV.radian);
+  application.SendNotification();
+  application.Render();
+  camera.GetProperty(CameraActor::Property::PROJECTION_MATRIX).Get(expectedProjectionMatrix3);
+
+  auto TestAnimationProgress = [&]() {
+    Matrix projectionMatrix;
+
+    application.SendNotification();
+    application.Render(0);
+
+    // progress 0.0
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::FIELD_OF_VIEW), sourceFoV.radian, TEST_LOCATION);
+
+    camera.GetProperty(CameraActor::Property::PROJECTION_MATRIX).Get(projectionMatrix);
+    DALI_TEST_EQUALS(projectionMatrix, expectedProjectionMatrix1, Epsilon<100000>::value, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render(400);
+
+    // progress 0.4
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::FIELD_OF_VIEW), sourceFoV.radian * 0.6f + targetFoV.radian * 0.4f, TEST_LOCATION);
+
+    camera.GetProperty(CameraActor::Property::PROJECTION_MATRIX).Get(projectionMatrix);
+    DALI_TEST_EQUALS(projectionMatrix, expectedProjectionMatrix2, Epsilon<100000>::value, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render(600);
+
+    // progress 1.0
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::FIELD_OF_VIEW), targetFoV.radian, TEST_LOCATION);
+
+    camera.GetProperty(CameraActor::Property::PROJECTION_MATRIX).Get(projectionMatrix);
+    DALI_TEST_EQUALS(projectionMatrix, expectedProjectionMatrix3, Epsilon<100000>::value, TEST_LOCATION);
+
+    // Ensure Animate finished.
+    application.SendNotification();
+    application.Render(16);
+  };
+
+  // AnimateTo
+  {
+    tet_printf("AnimateTo\n");
+    camera.SetProperty(CameraActor::Property::FIELD_OF_VIEW, sourceFoV.radian);
+    Animation animation = Animation::New(1.0f);
+    animation.AnimateTo(Property(camera, CameraActor::Property::FIELD_OF_VIEW), targetFoV.radian);
+    animation.AnimateTo(Property(camera, Actor::Property::POSITION_X), 0.0f); ///< For line coverage.
+    animation.Play();
+
+    TestAnimationProgress();
+  }
+
+  // AnimateBetween
+  {
+    tet_printf("AnimateBetween\n");
+    Animation animation = Animation::New(1.0f);
+    KeyFrames keyFrames = KeyFrames::New();
+    keyFrames.Add(0.0f, sourceFoV.radian);
+    keyFrames.Add(1.0f, targetFoV.radian);
+    animation.AnimateBetween(Property(camera, CameraActor::Property::FIELD_OF_VIEW), keyFrames);
+    animation.Play();
+
+    TestAnimationProgress();
+  }
+
+  // AnimateBy
+  {
+    tet_printf("AnimateBy\n");
+    camera.SetProperty(CameraActor::Property::FIELD_OF_VIEW, sourceFoV.radian);
+    Animation animation = Animation::New(1.0f);
+    animation.AnimateBy(Property(camera, CameraActor::Property::FIELD_OF_VIEW), targetFoV.radian - sourceFoV.radian);
+    animation.Play();
+
+    TestAnimationProgress();
+  }
+
   END_TEST;
 }
 

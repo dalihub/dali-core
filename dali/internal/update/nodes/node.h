@@ -103,7 +103,7 @@ public:
    * Query whether the node is a layer.
    * @return True if the node is a layer.
    */
-  bool IsLayer()
+  bool IsLayer() const
   {
     return mIsLayer;
   }
@@ -115,6 +115,17 @@ public:
   virtual Layer* GetLayer()
   {
     return nullptr;
+  }
+
+  // Camera interface
+
+  /**
+   * Query whether the node is a camera.
+   * @return True if the node is a camera.
+   */
+  bool IsCamera() const
+  {
+    return mIsCamera;
   }
 
   /**
@@ -899,11 +910,11 @@ private: // from NodeDataProvider
   }
 
 private:
-  // Undefined
-  Node(const Node&);
-
-  // Undefined
-  Node& operator=(const Node& rhs);
+  // Delete copy and move
+  Node(const Node&) = delete;
+  Node(Node&&)      = delete;
+  Node& operator=(const Node& rhs) = delete;
+  Node& operator=(Node&& rhs) = delete;
 
   /**
    * Recursive helper to disconnect a Node and its children.
@@ -966,6 +977,7 @@ protected:
   ClippingMode::Type mClippingMode : 3;            ///< The clipping mode of this node
   bool               mIsRoot : 1;                  ///< True if the node cannot have a parent
   bool               mIsLayer : 1;                 ///< True if the node is a layer
+  bool               mIsCamera : 1;                ///< True if the node is a camera
   bool               mPositionUsesAnchorPoint : 1; ///< True if the node should use the anchor-point when calculating the position
   bool               mTransparent : 1;             ///< True if this node is transparent. This value do not affect children.
 

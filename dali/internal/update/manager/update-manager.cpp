@@ -268,7 +268,8 @@ struct UpdateManager::Impl
 
   Vector<Node*> nodes; ///< A container of all instantiated nodes
 
-  OwnerContainer<Camera*>        cameras;       ///< A container of cameras
+  Vector<Camera*> cameras; ///< A container of cameras. Note : these cameras are owned by Impl::nodes.
+
   OwnerContainer<PropertyOwner*> customObjects; ///< A container of owned objects (with custom properties)
 
   OwnerContainer<PropertyResetterBase*> propertyResetters;     ///< A container of property resetters
@@ -377,6 +378,12 @@ void UpdateManager::AddNode(OwnerPointer<Node>& node)
   Node* rawNode = node.Release();
   DALI_LOG_INFO(gLogFilter, Debug::General, "[%x] AddNode\n", rawNode);
 
+  // Add camera nodes occured rarely.
+  if(DALI_UNLIKELY(rawNode->IsCamera()))
+  {
+    AddCamera(static_cast<Camera*>(rawNode));
+  }
+
   mImpl->nodes.PushBack(rawNode);
   rawNode->CreateTransform(&mImpl->transformManager);
 }
@@ -435,21 +442,40 @@ void UpdateManager::DestroyNode(Node* node)
     }
   }
 
+  // Remove camera nodes occured rarely.
+  if(DALI_UNLIKELY(node->IsCamera()))
+  {
+    RemoveCamera(static_cast<Camera*>(node));
+  }
+
   mImpl->discardQueue.Add(mSceneGraphBuffers.GetUpdateBufferIndex(), node);
 
   // Notify the Node about impending destruction
   node->OnDestroy();
 }
 
-void UpdateManager::AddCamera(OwnerPointer<Camera>& camera)
+void UpdateManager::AddCamera(Camera* camera)
 {
-  mImpl->cameras.PushBack(camera.Release()); // takes ownership
+  DALI_LOG_INFO(gLogFilter, Debug::General, "[%x] AddCamera\n", camera);
+
+  mImpl->cameras.PushBack(camera);
 }
 
 void UpdateManager::RemoveCamera(Camera* camera)
 {
-  // Find the camera and destroy it
-  EraseUsingDiscardQueue(mImpl->cameras, camera, mImpl->discardQueue, mSceneGraphBuffers.GetUpdateBufferIndex());
+  DALI_LOG_INFO(gLogFilter, Debug::General, "[%x] RemoveCamera\n", camera);
+
+  // Find the camera and remove it from list of cameras
+  Vector<Camera*>::Iterator iter    = mImpl->cameras.Begin();
+  Vector<Camera*>::Iterator endIter = mImpl->cameras.End();
+  for(; iter != endIter; ++iter)
+  {
+    if((*iter) == camera)
+    {
+      mImpl->cameras.Erase(iter);
+      break;
+    }
+  }
 }
 
 void UpdateManager::AddObject(OwnerPointer<PropertyOwner>& object)

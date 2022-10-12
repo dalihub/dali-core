@@ -542,28 +542,24 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
     }
 
     const Camera* camera = instruction.GetCamera();
-    if(camera->mType == Camera::DEFAULT_TYPE && camera->mTargetPosition == Camera::DEFAULT_TARGET_POSITION)
+    if(camera && camera->mType == Camera::DEFAULT_TYPE && camera->mTargetPosition == Camera::DEFAULT_TARGET_POSITION)
     {
-      const Node* node = instruction.GetCamera()->GetNode();
-      if(node)
+      Vector3    position;
+      Vector3    scale;
+      Quaternion orientation;
+      camera->GetWorldMatrix(mImpl->renderBufferIndex).GetTransformComponents(position, orientation, scale);
+
+      Vector3 orientationAxis;
+      Radian  orientationAngle;
+      orientation.ToAxisAngle(orientationAxis, orientationAngle);
+
+      if(position.x > Math::MACHINE_EPSILON_10000 ||
+         position.y > Math::MACHINE_EPSILON_10000 ||
+         orientationAxis != Vector3(0.0f, 1.0f, 0.0f) ||
+         orientationAngle != ANGLE_180 ||
+         scale != Vector3(1.0f, 1.0f, 1.0f))
       {
-        Vector3    position;
-        Vector3    scale;
-        Quaternion orientation;
-        node->GetWorldMatrix(mImpl->renderBufferIndex).GetTransformComponents(position, orientation, scale);
-
-        Vector3 orientationAxis;
-        Radian  orientationAngle;
-        orientation.ToAxisAngle(orientationAxis, orientationAngle);
-
-        if(position.x > Math::MACHINE_EPSILON_10000 ||
-           position.y > Math::MACHINE_EPSILON_10000 ||
-           orientationAxis != Vector3(0.0f, 1.0f, 0.0f) ||
-           orientationAngle != ANGLE_180 ||
-           scale != Vector3(1.0f, 1.0f, 1.0f))
-        {
-          return;
-        }
+        return;
       }
     }
     else

@@ -107,6 +107,13 @@ public:
   float GetFieldOfView() const;
 
   /**
+   * @brief Retrieve the CameraActor's field of view from update side.
+   * This field of view will be the fov set or animating but will be a frame behind.
+   * @return The field of view.
+   */
+  float GetCurrentFieldOfView() const;
+
+  /**
    * @copydoc Dali::CameraActor::SetAspectRatio
    */
   void SetAspectRatio(float aspectRatio);
@@ -204,10 +211,10 @@ public:
   const Matrix& GetProjectionMatrix() const;
 
   /**
-   * Return the scene graph camera (for RenderTask)
+   * Return the scene graph camera
    * @return The scene graph camera.
    */
-  const SceneGraph::Camera* GetCamera() const;
+  const SceneGraph::Camera& GetCameraSceneObject() const;
 
   /**
    * Rotate the projection.
@@ -233,6 +240,16 @@ public: // properties
   Property::Value GetDefaultPropertyCurrentValue(Property::Index index) const override;
 
   /**
+   * @copydoc Dali::Internal::Object::OnNotifyDefaultPropertyAnimation()
+   */
+  void OnNotifyDefaultPropertyAnimation(Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType) override;
+
+  /**
+   * @copydoc Dali::Internal::Object::GetSceneObjectAnimatableProperty()
+   */
+  const SceneGraph::PropertyBase* GetSceneObjectAnimatableProperty(Property::Index index) const override;
+
+  /**
    * @copydoc Dali::Internal::Object::GetSceneObjectInputProperty()
    */
   const PropertyInputImpl* GetSceneObjectInputProperty(Property::Index index) const override;
@@ -250,11 +267,6 @@ private:
   ~CameraActor() override;
 
   /**
-   * @copydoc Dali::Internal::Actor::OnInitialize()
-   */
-  void OnInitialize() override;
-
-  /**
    * @copydoc Dali::Internal::Actor::OnSceneConnectionInternal()
    */
   void OnSceneConnectionInternal() override;
@@ -264,9 +276,7 @@ private:
    */
   void OnPropertySet(Property::Index index, const Property::Value& propertyValue) override;
 
-private:                                  // Data
-  const SceneGraph::Camera* mSceneObject; ///< Not owned
-
+private: // Data
   Vector3                                     mTarget;
   Vector2                                     mCanvasSize;
   Dali::Camera::Type                          mType;

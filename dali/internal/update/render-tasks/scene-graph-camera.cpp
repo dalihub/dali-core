@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/math-utils.h>
@@ -45,6 +46,9 @@ namespace SceneGraph
 {
 namespace
 {
+//Memory pool used to allocate new camera. Memory used by this pool will be released when shutting down DALi
+MemoryPoolObjectAllocator<Camera> gCameraMemoryPool;
+
 template<typename T>
 T Sign(T value)
 {
@@ -165,10 +169,10 @@ const float                                       Camera::DEFAULT_FAR_CLIPPING_P
 const Vector3                                     Camera::DEFAULT_TARGET_POSITION(0.0f, 0.0f, 0.0f);
 
 Camera::Camera()
-: mUpdateViewFlag(UPDATE_COUNT),
+: Node(),
+  mUpdateViewFlag(UPDATE_COUNT),
   mUpdateProjectionFlag(UPDATE_COUNT),
   mProjectionRotation(0),
-  mNode(nullptr),
   mType(DEFAULT_TYPE),
   mProjectionMode(DEFAULT_MODE),
   mProjectionDirection(DEFAULT_PROJECTION_DIRECTION),
@@ -187,23 +191,20 @@ Camera::Camera()
   mInverseViewProjection(Matrix::IDENTITY),
   mFinalProjection(Matrix::IDENTITY)
 {
+  // set a flag the node to say this is a camera
+  mIsCamera = true;
 }
 
 Camera* Camera::New()
 {
-  return new Camera();
+  return new(gCameraMemoryPool.AllocateRawThreadSafe()) Camera();
 }
 
 Camera::~Camera() = default;
 
-void Camera::SetNode(const Node* node)
+void Camera::operator delete(void* ptr)
 {
-  mNode = node;
-}
-
-const Node* Camera::GetNode() const
-{
-  return mNode;
+  gCameraMemoryPool.FreeThreadSafe(static_cast<Camera*>(ptr));
 }
 
 void Camera::SetType(Dali::Camera::Type type)
@@ -229,9 +230,9 @@ void Camera::SetInvertYAxis(bool invertYAxis)
   mUpdateProjectionFlag = UPDATE_COUNT;
 }
 
-void Camera::SetFieldOfView(float fieldOfView)
+void Camera::BakeFieldOfView(BufferIndex updateBufferIndex, float fieldOfView)
 {
-  mFieldOfView          = fieldOfView;
+  mFieldOfView.Bake(updateBufferIndex, fieldOfView);
   mUpdateProjectionFlag = UPDATE_COUNT;
 }
 
@@ -370,6 +371,11 @@ const Matrix& Camera::GetFinalProjectionMatrix(BufferIndex bufferIndex) const
   return mFinalProjection[bufferIndex];
 }
 
+const PropertyBase* Camera::GetFieldOfView() const
+{
+  return &mFieldOfView;
+}
+
 const PropertyInputImpl* Camera::GetProjectionMatrix() const
 {
   return &mProjectionMatrix;
@@ -382,17 +388,23 @@ const PropertyInputImpl* Camera::GetViewMatrix() const
 
 void Camera::Update(BufferIndex updateBufferIndex)
 {
-  // if owning node has changes in world position we need to update camera for next 2 frames
-  if(mNode->IsLocalMatrixDirty())
+  // if this has changes in world position we need to update camera for next 2 frames
+  if(IsLocalMatrixDirty())
   {
     mUpdateViewFlag = UPDATE_COUNT;
   }
-  if(mNode->GetDirtyFlags() & NodePropertyFlags::VISIBLE)
+  if(GetDirtyFlags() & NodePropertyFlags::VISIBLE)
   {
     // If the visibility changes, the projection matrix needs to be re-calculated.
     // It may happen the first time an actor is rendered it's rendered only once and becomes invisible,
     // in the following update the node will be skipped leaving the projection matrix (double buffered)
     // with the Identity.
+    mUpdateProjectionFlag = UPDATE_COUNT;
+  }
+
+  // If projection matrix relative properties are animated now, flag change.
+  if(IsProjectionMatrixAnimated())
+  {
     mUpdateProjectionFlag = UPDATE_COUNT;
   }
 
@@ -419,9 +431,14 @@ void Camera::Update(BufferIndex updateBufferIndex)
   }
 }
 
-bool Camera::ViewMatrixUpdated()
+bool Camera::ViewMatrixUpdated() const
 {
   return 0u != mUpdateViewFlag;
+}
+
+bool Camera::IsProjectionMatrixAnimated() const
+{
+  return !mFieldOfView.IsClean();
 }
 
 uint32_t Camera::UpdateViewMatrix(BufferIndex updateBufferIndex)
@@ -442,11 +459,11 @@ uint32_t Camera::UpdateViewMatrix(BufferIndex updateBufferIndex)
         case Dali::Camera::FREE_LOOK:
         {
           Matrix& viewMatrix = mViewMatrix.Get(updateBufferIndex);
-          viewMatrix         = mNode->GetWorldMatrix(updateBufferIndex);
+          viewMatrix         = GetWorldMatrix(updateBufferIndex);
 
           if(mUseReflection)
           {
-            const Matrix& owningNodeMatrix(mNode->GetWorldMatrix(updateBufferIndex));
+            const Matrix& owningNodeMatrix(GetWorldMatrix(updateBufferIndex));
             Vector3       position{}, scale{};
             Quaternion    orientation{};
             owningNodeMatrix.GetTransformComponents(position, orientation, scale);
@@ -466,7 +483,7 @@ uint32_t Camera::UpdateViewMatrix(BufferIndex updateBufferIndex)
         // camera orientation constrained to look at a target
         case Dali::Camera::LOOK_AT_TARGET:
         {
-          const Matrix& owningNodeMatrix(mNode->GetWorldMatrix(updateBufferIndex));
+          const Matrix& owningNodeMatrix(GetWorldMatrix(updateBufferIndex));
           Vector3       position, scale;
           Quaternion    orientation;
           owningNodeMatrix.GetTransformComponents(position, orientation, scale);
@@ -585,7 +602,7 @@ void Camera::UpdateFrustum(BufferIndex updateBufferIndex, bool normalize)
   mFrustum[updateBufferIndex ? 0 : 1] = planes;
 }
 
-bool Camera::CheckSphereInFrustum(BufferIndex bufferIndex, const Vector3& origin, float radius)
+bool Camera::CheckSphereInFrustum(BufferIndex bufferIndex, const Vector3& origin, float radius) const
 {
   const FrustumPlanes& planes = mFrustum[bufferIndex];
   for(uint32_t i = 0; i < 6; ++i)
@@ -598,7 +615,7 @@ bool Camera::CheckSphereInFrustum(BufferIndex bufferIndex, const Vector3& origin
   return true;
 }
 
-bool Camera::CheckAABBInFrustum(BufferIndex bufferIndex, const Vector3& origin, const Vector3& halfExtents)
+bool Camera::CheckAABBInFrustum(BufferIndex bufferIndex, const Vector3& origin, const Vector3& halfExtents) const
 {
   const FrustumPlanes& planes = mFrustum[bufferIndex];
   for(uint32_t i = 0; i < 6; ++i)
@@ -638,7 +655,7 @@ uint32_t Camera::UpdateProjection(BufferIndex updateBufferIndex)
           Matrix& projectionMatrix = mProjectionMatrix.Get(updateBufferIndex);
           Perspective(projectionMatrix,
                       mProjectionDirection,
-                      mFieldOfView,
+                      mFieldOfView[updateBufferIndex],
                       mAspectRatio,
                       mNearClippingPlane,
                       mFarClippingPlane,
