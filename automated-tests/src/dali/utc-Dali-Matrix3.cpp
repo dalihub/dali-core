@@ -333,6 +333,27 @@ int UtcDaliMatrix3OperatorMultiply02P(void)
   END_TEST;
 }
 
+int UtcDaliMatrix3OperatorMultiply03P(void)
+{
+  Matrix3 left(
+    1.0f, 2.0f, 3.0f, 5.0f, 6.0f, 7.0f, 0.0f, 0.0f, 0.0f);
+  Matrix3 right(
+    1.0f, 5.0f, 0.0f, 2.0f, 6.0f, 0.0f, 3.0f, 7.0f, 0.0f);
+
+  Matrix3 result(
+    26.0f, 32.0f, 38.0f, 32.0f, 40.0f, 48.0f, 38.0f, 48.0f, 58.0f);
+
+  // Get result by operator*
+  Matrix3 multResult = left * right;
+  DALI_TEST_EQUALS(multResult, result, 0.01f, TEST_LOCATION);
+
+  // Get result by Multiply API
+  Matrix3::Multiply(multResult, right, left);
+  DALI_TEST_EQUALS(multResult, result, 0.01f, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliMatrix3EqualityOperator(void)
 {
   Matrix3 m1(0.0f, 3.0f, 6.0f, 12.0f, 15.0f, 18.0f, 24.0f, 27.0f, 30.0f);

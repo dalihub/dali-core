@@ -261,6 +261,25 @@ public:
   static void Multiply(Matrix3& result, const Matrix3& lhs, const Matrix3& rhs);
 
   /**
+   * @brief Multiplication operator.
+   *
+   * Returned Matrix = This Matrix * rhs
+   *
+   * @note It makes some memory allocate & copy internally.
+   * Use Matrix3::Multiply API for time critical path.
+   *
+   * @SINCE_2_1.44
+   * @param[in] rhs The Matrix to multiply this by
+   * @return A Matrix containing the result
+   */
+  Matrix3 operator*(const Matrix3& rhs) const
+  {
+    Matrix3 result;
+    Multiply(result, rhs, *this);
+    return result;
+  }
+
+  /**
    * @brief The multiplication operator.
    *
    * Returned Vector = This Matrix * rhs
