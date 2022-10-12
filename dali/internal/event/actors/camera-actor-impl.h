@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_CAMERA_ACTOR_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUES
+#include <dali/devel-api/actors/camera-actor-devel.h>
 #include <dali/internal/event/actors/actor-declarations.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/public-api/actors/camera-actor.h>
@@ -87,6 +88,13 @@ public:
    * @copydoc Dali::CameraActor::GetProjectionMode
    */
   Dali::Camera::ProjectionMode GetProjectionMode() const;
+
+  /**
+   * @brief Set the projection direction
+   *
+   * @param[in] direction Direction of projection
+   */
+  void SetProjectionDirection(Dali::DevelCameraActor::ProjectionDirection direction);
 
   /**
    * @copydoc Dali::CameraActor::SetFieldOfView
@@ -259,20 +267,21 @@ private:
 private:                                  // Data
   const SceneGraph::Camera* mSceneObject; ///< Not owned
 
-  Vector3                      mTarget;
-  Vector2                      mCanvasSize;
-  Dali::Camera::Type           mType;
-  Dali::Camera::ProjectionMode mProjectionMode;
-  float                        mFieldOfView;
-  float                        mAspectRatio;
-  float                        mNearClippingPlane;
-  float                        mFarClippingPlane;
-  float                        mLeftClippingPlane;
-  float                        mRightClippingPlane;
-  float                        mTopClippingPlane;
-  float                        mBottomClippingPlane;
-  bool                         mInvertYAxis;
-  bool                         mPropertyChanged;
+  Vector3                                     mTarget;
+  Vector2                                     mCanvasSize;
+  Dali::Camera::Type                          mType;
+  Dali::Camera::ProjectionMode                mProjectionMode;
+  Dali::DevelCameraActor::ProjectionDirection mProjectionDirection;
+  float                                       mFieldOfView;
+  float                                       mAspectRatio;
+  float                                       mNearClippingPlane;
+  float                                       mFarClippingPlane;
+  float                                       mLeftClippingPlane;
+  float                                       mRightClippingPlane;
+  float                                       mTopClippingPlane;
+  float                                       mBottomClippingPlane;
+  bool                                        mInvertYAxis;
+  bool                                        mPropertyChanged;
 };
 
 } // namespace Internal

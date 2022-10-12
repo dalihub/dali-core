@@ -19,7 +19,9 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/actors/camera-actor-devel.h>
 #include <dali/internal/common/message.h>
+#include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/common/double-buffered.h>
 #include <dali/internal/update/common/inherited-property.h>
@@ -53,19 +55,20 @@ class SceneController;
 class Camera
 {
 public:
-  static const Dali::Camera::Type           DEFAULT_TYPE;
-  static const Dali::Camera::ProjectionMode DEFAULT_MODE;
-  static const bool                         DEFAULT_INVERT_Y_AXIS;
-  static const float                        DEFAULT_FIELD_OF_VIEW;
-  static const float                        DEFAULT_ASPECT_RATIO;
-  static const float                        DEFAULT_LEFT_CLIPPING_PLANE;
-  static const float                        DEFAULT_RIGHT_CLIPPING_PLANE;
-  static const float                        DEFAULT_TOP_CLIPPING_PLANE;
-  static const float                        DEFAULT_BOTTOM_CLIPPING_PLANE;
-  static const float                        DEFAULT_NEAR_CLIPPING_PLANE;
-  static const float                        DEFAULT_FAR_CLIPPING_PLANE;
-  static const Vector2                      DEFAULT_STEREO_BIAS;
-  static const Vector3                      DEFAULT_TARGET_POSITION;
+  static const Dali::Camera::Type                          DEFAULT_TYPE;
+  static const Dali::Camera::ProjectionMode                DEFAULT_MODE;
+  static const Dali::DevelCameraActor::ProjectionDirection DEFAULT_PROJECTION_DIRECTION;
+  static const bool                                        DEFAULT_INVERT_Y_AXIS;
+  static const float                                       DEFAULT_FIELD_OF_VIEW;
+  static const float                                       DEFAULT_ASPECT_RATIO;
+  static const float                                       DEFAULT_LEFT_CLIPPING_PLANE;
+  static const float                                       DEFAULT_RIGHT_CLIPPING_PLANE;
+  static const float                                       DEFAULT_TOP_CLIPPING_PLANE;
+  static const float                                       DEFAULT_BOTTOM_CLIPPING_PLANE;
+  static const float                                       DEFAULT_NEAR_CLIPPING_PLANE;
+  static const float                                       DEFAULT_FAR_CLIPPING_PLANE;
+  static const Vector2                                     DEFAULT_STEREO_BIAS;
+  static const Vector3                                     DEFAULT_TARGET_POSITION;
 
   /**
    * Plane equation container for a plane of the view frustum
@@ -131,6 +134,11 @@ public:
    * @copydoc Dali::Internal::CameraActor::SetProjectionMode
    */
   void SetProjectionMode(Dali::Camera::ProjectionMode projectionMode);
+
+  /**
+   * @copydoc Dali::Internal::CameraActor::SetProjectionDirection
+   */
+  void SetProjectionDirection(Dali::DevelCameraActor::ProjectionDirection direction);
 
   /**
    * @copydoc Dali::Internal::CameraActor::SetFieldOfView
@@ -320,10 +328,11 @@ private:
   int         mProjectionRotation;   ///< The rotaion angle of the projection
   const Node* mNode;                 ///< The node this scene graph camera belongs to
 
-public:                                         // PROPERTIES
-  Dali::Camera::Type           mType;           // Non-animatable
-  Dali::Camera::ProjectionMode mProjectionMode; // Non-animatable
-  bool                         mInvertYAxis;    // Non-animatable
+public:                                                             // PROPERTIES
+  Dali::Camera::Type                          mType;                // Non-animatable
+  Dali::Camera::ProjectionMode                mProjectionMode;      // Non-animatable
+  Dali::DevelCameraActor::ProjectionDirection mProjectionDirection; // Non-animatable
+  bool                                        mInvertYAxis;         // Non-animatable
 
   float   mFieldOfView;
   float   mAspectRatio;
@@ -371,6 +380,17 @@ inline void SetProjectionModeMessage(EventThreadServices& eventThreadServices, c
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalProjectionMode(&camera, &Camera::SetProjectionMode, parameter);
+}
+
+inline void SetProjectionDirectionMessage(EventThreadServices& eventThreadServices, const Camera& camera, Dali::DevelCameraActor::ProjectionDirection parameter)
+{
+  using LocalProjectionDirection = MessageValue1<Camera, Dali::DevelCameraActor::ProjectionDirection>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalProjectionDirection));
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new(slot) LocalProjectionDirection(&camera, &Camera::SetProjectionDirection, parameter);
 }
 
 inline void SetFieldOfViewMessage(EventThreadServices& eventThreadServices, const Camera& camera, float parameter)
