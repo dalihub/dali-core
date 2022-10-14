@@ -521,6 +521,7 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
 
   // Clean collected dirty/damaged rects on exit if 3d layer or 3d node or other conditions.
   DamagedRectsCleaner damagedRectCleaner(damagedRects, surfaceRect);
+  bool                cleanDamagedRect = false;
 
   // Mark previous dirty rects in the sorted array. The array is already sorted by node and renderer, frame number.
   // so you don't need to sort: std::stable_sort(itemsDirtyRects.begin(), itemsDirtyRects.end());
@@ -604,7 +605,8 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
               // If the item does 3D transformation, do early exit and clean the damaged rect array
               if(item.mUpdateArea == Vector4::ZERO)
               {
-                return;
+                cleanDamagedRect = true;
+                continue;
               }
 
               Rect<int> rect;
@@ -659,6 +661,12 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
                 {
                   dirtyRectPos->visited = true;
                 }
+                else
+                {
+                  // The item is not in the list for some reason. Add it!
+                  dirtyRectPos->visited = true;
+                  itemsDirtyRects.insert(dirtyRectPos, dirtyRect);
+                }
               }
             }
           }
@@ -685,7 +693,11 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
   }
 
   itemsDirtyRects.resize(j - itemsDirtyRects.begin());
-  damagedRectCleaner.SetCleanOnReturn(false);
+
+  if(!cleanDamagedRect)
+  {
+    damagedRectCleaner.SetCleanOnReturn(false);
+  }
 
   // Reset updated flag from the root
   Layer* root = sceneObject->GetRoot();
