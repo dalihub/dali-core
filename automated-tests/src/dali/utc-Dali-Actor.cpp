@@ -9885,7 +9885,7 @@ int utcDaliActorPartialUpdateChangeParentOpacity(void)
   END_TEST;
 }
 
-int utcDaliActorPartialAddRemoveRenderer(void)
+int utcDaliActorPartialUpdateAddRemoveRenderer(void)
 {
   TestApplication application(
     TestApplication::DEFAULT_SURFACE_WIDTH,
@@ -9963,6 +9963,155 @@ int utcDaliActorPartialAddRemoveRenderer(void)
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
   DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+
+  END_TEST;
+}
+
+int utcDaliActorPartialUpdate3DTransform(void)
+{
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  tet_infoline("Check the damaged rect with 3D transformed actors");
+
+  const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
+
+  Actor actor1                          = CreateRenderableActor();
+  actor1[Actor::Property::ANCHOR_POINT] = AnchorPoint::TOP_LEFT;
+  actor1[Actor::Property::POSITION]     = Vector3(16.0f, 16.0f, 0.0f);
+  actor1[Actor::Property::SIZE]         = Vector3(16.0f, 16.0f, 0.0f);
+  actor1.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  application.GetScene().Add(actor1);
+
+  // Add a new actor
+  Actor actor2                          = CreateRenderableActor();
+  actor2[Actor::Property::ANCHOR_POINT] = AnchorPoint::TOP_LEFT;
+  actor2[Actor::Property::POSITION]     = Vector3(160.0f, 160.0f, 0.0f);
+  actor2[Actor::Property::SIZE]         = Vector3(16.0f, 16.0f, 0.0f);
+  actor2.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  application.GetScene().Add(actor2);
+
+  application.SendNotification();
+
+  std::vector<Rect<int>> damagedRects;
+
+  // Actor added, damaged rect is added size of actor
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 2, TEST_LOCATION);
+
+  // Aligned by 16
+  Rect<int> clippingRect1 = Rect<int>(16, 768, 32, 32); // in screen coordinates
+  Rect<int> clippingRect2 = Rect<int>(160, 624, 32, 32);
+  DALI_TEST_EQUALS<Rect<int>>(clippingRect1, damagedRects[0], TEST_LOCATION);
+  DALI_TEST_EQUALS<Rect<int>>(clippingRect2, damagedRects[1], TEST_LOCATION);
+
+  Rect<int> surfaceRect = Rect<int>(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+  application.RenderWithPartialUpdate(damagedRects, surfaceRect);
+
+  damagedRects.clear();
+  surfaceRect = Rect<int>(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, surfaceRect);
+
+  damagedRects.clear();
+  surfaceRect = Rect<int>(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, surfaceRect);
+
+  // Rotate actor1 on y axis
+  actor1[Actor::Property::ORIENTATION] = Quaternion(Radian(Degree(90.0)), Vector3::YAXIS);
+
+  // Remove actor2
+  actor2.Unparent();
+
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  // Should update full area
+  surfaceRect = Rect<int>(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+  DALI_TEST_EQUALS<Rect<int>>(surfaceRect, damagedRects[0], TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, surfaceRect);
+
+  // Add actor2 again
+  application.GetScene().Add(actor2);
+
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  // Should update full area
+  surfaceRect = Rect<int>(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+  DALI_TEST_EQUALS<Rect<int>>(surfaceRect, damagedRects[0], TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, surfaceRect);
+
+  // Reset the orientation of actor1
+  actor1[Actor::Property::ORIENTATION] = Quaternion::IDENTITY;
+
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  // Should update full area
+  surfaceRect = Rect<int>(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+  DALI_TEST_EQUALS<Rect<int>>(surfaceRect, damagedRects[0], TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, surfaceRect);
+
+  // Make actor2 dirty
+  actor2[Actor::Property::SIZE] = Vector3(32.0f, 32.0f, 0.0f);
+
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  clippingRect2 = Rect<int>(160, 608, 48, 48);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+  DALI_TEST_EQUALS<Rect<int>>(clippingRect2, damagedRects[0], TEST_LOCATION);
+
+  application.RenderWithPartialUpdate(damagedRects, clippingRect2);
+  DALI_TEST_EQUALS(clippingRect2.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect2.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect2.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect2.height, glScissorParams.height, TEST_LOCATION);
+
+  // Remove actor1
+  actor1.Unparent();
+
+  application.SendNotification();
+
+  damagedRects.clear();
+  surfaceRect = Rect<int>(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, surfaceRect);
+
+  // Rotate actor1 on y axis
+  actor1[Actor::Property::ORIENTATION] = Quaternion(Radian(Degree(90.0)), Vector3::YAXIS);
+
+  // Add actor1 again
+  application.GetScene().Add(actor1);
+
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  // Should update full area
+  surfaceRect = Rect<int>(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+  DALI_TEST_EQUALS<Rect<int>>(surfaceRect, damagedRects[0], TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, surfaceRect);
 
   END_TEST;
 }
