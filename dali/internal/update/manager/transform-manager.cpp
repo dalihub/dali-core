@@ -25,6 +25,7 @@
 
 //INTERNAL INCLUDES
 #include <dali/internal/common/math.h>
+#include <dali/internal/common/matrix-utils.h>
 #include <dali/public-api/common/constants.h>
 
 namespace Dali
@@ -260,7 +261,7 @@ bool TransformManager::Update()
         }
 
         //Update the world matrix
-        Matrix::Multiply(mWorld[i], mLocal[i], mWorld[parentIndex]);
+        MatrixUtils::Multiply(mWorld[i], mLocal[i], mWorld[parentIndex]);
       }
       else
       {
@@ -292,7 +293,7 @@ bool TransformManager::Update()
           //Don't inherit position
           CalculateCenterPosition(centerPosition, mTxComponentStatic[i], mTxComponentAnimatable[i], mSize[i], half, topLeft);
           mLocal[i].SetTransformComponents(localScale, localOrientation, Vector3::ZERO);
-          Matrix::Multiply(mWorld[i], mLocal[i], parentMatrix);
+          MatrixUtils::Multiply(mWorld[i], mLocal[i], parentMatrix);
           mWorld[i].SetTranslation(mTxComponentAnimatable[i].mPosition + centerPosition);
         }
         else
@@ -300,7 +301,7 @@ bool TransformManager::Update()
           CalculateCenterPosition(centerPosition, mTxComponentStatic[i], mTxComponentAnimatable[i], mSize[i], half, topLeft);
           localPosition = mTxComponentAnimatable[i].mPosition + centerPosition + (mTxComponentStatic[i].mParentOrigin - half) * mSize[parentIndex];
           mLocal[i].SetTransformComponents(localScale, localOrientation, localPosition);
-          Matrix::Multiply(mWorld[i], mLocal[i], parentMatrix);
+          MatrixUtils::Multiply(mWorld[i], mLocal[i], parentMatrix);
         }
 
         mLocalMatrixDirty[i] = mComponentDirty[i] || (localMatrix != mLocal[i]);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/internal/common/matrix-utils.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/rect.h>
@@ -72,7 +73,7 @@ bool UnprojectFull(const Vector4& windowPos,
                    Vector4&       objectPos)
 {
   Matrix invertedMvp(false); // Don't initialize.
-  Matrix::Multiply(invertedMvp, modelView, projection);
+  MatrixUtils::Multiply(invertedMvp, modelView, projection);
 
   if(invertedMvp.Invert())
   {
@@ -123,7 +124,7 @@ bool ProjectFull(const Vector4& position,
   bool ok = false;
 
   Matrix Mvp(false); // Don't initialize.
-  Matrix::Multiply(Mvp, modelView, projection);
+  MatrixUtils::Multiply(Mvp, modelView, projection);
 
   Vector4 p = Mvp * position;
 

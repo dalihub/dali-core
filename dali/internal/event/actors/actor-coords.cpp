@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#include <dali/internal/common/matrix-utils.h>
 #include <dali/internal/event/actors/actor-coords.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/projection.h>
@@ -78,11 +79,11 @@ bool ConvertScreenToLocal(
 {
   // Get the ModelView matrix
   Matrix modelView;
-  Matrix::Multiply(modelView, worldMatrix, viewMatrix);
+  MatrixUtils::Multiply(modelView, worldMatrix, viewMatrix);
 
   // Calculate the inverted ModelViewProjection matrix; this will be used for 2 unprojects
   Matrix invertedMvp(false /*don't init*/);
-  Matrix::Multiply(invertedMvp, modelView, projectionMatrix);
+  MatrixUtils::Multiply(invertedMvp, modelView, projectionMatrix);
   bool success = invertedMvp.Invert();
 
   // Convert to GL coordinates
@@ -524,7 +525,7 @@ Matrix CalculateActorWorldTransform(const Actor& actor)
 
         //Update the world matrix
         Matrix tempMatrix;
-        Matrix::Multiply(tempMatrix, localMatrix, worldMatrix);
+        MatrixUtils::Multiply(tempMatrix, localMatrix, worldMatrix);
         worldMatrix = tempMatrix;
       }
       else
@@ -550,7 +551,7 @@ Matrix CalculateActorWorldTransform(const Actor& actor)
         {
           localMatrix.SetTransformComponents(localScale, localOrientation, Vector3::ZERO);
           Matrix tempMatrix;
-          Matrix::Multiply(tempMatrix, localMatrix, worldMatrix);
+          MatrixUtils::Multiply(tempMatrix, localMatrix, worldMatrix);
           worldMatrix = tempMatrix;
           worldMatrix.SetTranslation(actorPosition + centerPosition);
         }
@@ -559,7 +560,7 @@ Matrix CalculateActorWorldTransform(const Actor& actor)
           localPosition = actorPosition + centerPosition + (parentOrigin - Vector3(0.5f, 0.5f, 0.5f)) * parentSize;
           localMatrix.SetTransformComponents(localScale, localOrientation, localPosition);
           Matrix tempMatrix;
-          Matrix::Multiply(tempMatrix, localMatrix, worldMatrix);
+          MatrixUtils::Multiply(tempMatrix, localMatrix, worldMatrix);
           worldMatrix = tempMatrix;
         }
       }

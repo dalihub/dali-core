@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/internal/common/matrix-utils.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/public-api/common/dali-common.h>
@@ -416,7 +417,7 @@ void Camera::Update(BufferIndex updateBufferIndex)
   if(viewUpdateCount > COPY_PREVIOUS_MATRIX || projectionUpdateCount > COPY_PREVIOUS_MATRIX)
   {
     // either has actually changed so recalculate
-    Matrix::Multiply(mInverseViewProjection[updateBufferIndex], mViewMatrix[updateBufferIndex], mProjectionMatrix[updateBufferIndex]);
+    MatrixUtils::Multiply(mInverseViewProjection[updateBufferIndex], mViewMatrix[updateBufferIndex], mProjectionMatrix[updateBufferIndex]);
     UpdateFrustum(updateBufferIndex);
 
     // ignore the error, if the view projection is incorrect (non inversible) then you will have tough times anyways
@@ -472,7 +473,7 @@ uint32_t Camera::UpdateViewMatrix(BufferIndex updateBufferIndex)
 
             Matrix& viewMatrix = mViewMatrix.Get(updateBufferIndex);
             Matrix  oldViewMatrix(viewMatrix);
-            Matrix::Multiply(viewMatrix, oldViewMatrix, mReflectionMtx);
+            MatrixUtils::Multiply(viewMatrix, oldViewMatrix, mReflectionMtx);
           }
 
           viewMatrix.Invert();
@@ -515,7 +516,7 @@ uint32_t Camera::UpdateViewMatrix(BufferIndex updateBufferIndex)
             Matrix oldViewMatrix(viewMatrix);
             Matrix tmp;
             tmp.SetIdentityAndScale(Vector3(-1.0, 1.0, 1.0));
-            Matrix::Multiply(viewMatrix, oldViewMatrix, tmp);
+            MatrixUtils::Multiply(viewMatrix, oldViewMatrix, tmp);
 
             mReflectionEye     = positionNew;
             mUseReflectionClip = true;
@@ -538,7 +539,7 @@ void Camera::UpdateFrustum(BufferIndex updateBufferIndex, bool normalize)
 {
   // Extract the clip matrix planes
   Matrix clipMatrix;
-  Matrix::Multiply(clipMatrix, mViewMatrix[updateBufferIndex], mProjectionMatrix[updateBufferIndex]);
+  MatrixUtils::Multiply(clipMatrix, mViewMatrix[updateBufferIndex], mProjectionMatrix[updateBufferIndex]);
 
   const float*   cm     = clipMatrix.AsFloat();
   FrustumPlanes& planes = mFrustum[updateBufferIndex];
@@ -684,7 +685,7 @@ uint32_t Camera::UpdateProjection(BufferIndex updateBufferIndex)
             matZ.SetIdentity();
             float* vZ = matZ.AsFloat();
             vZ[10]    = -vZ[10];
-            Matrix::Multiply(projectionMatrix, projectionMatrix, matZ);
+            MatrixUtils::Multiply(projectionMatrix, projectionMatrix, matZ);
           }
           break;
         }
@@ -732,7 +733,7 @@ uint32_t Camera::UpdateProjection(BufferIndex updateBufferIndex)
       rotation.SetIdentity();
       rotation.SetTransformComponents(Vector3(1.0f, 1.0f, 1.0f), rotationAngle, Vector3(0.0f, 0.0f, 0.0f));
 
-      Matrix::Multiply(finalProjection, mProjectionMatrix.Get(updateBufferIndex), rotation);
+      MatrixUtils::Multiply(finalProjection, mProjectionMatrix.Get(updateBufferIndex), rotation);
     }
     --mUpdateProjectionFlag;
   }

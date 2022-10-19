@@ -2,7 +2,7 @@
 #define DALI_MATRIX_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -319,7 +319,6 @@ public:
   {
     return mMatrix;
   }
-
   /**
    * @brief Function to multiply two matrices and store the result onto third.
    *
@@ -357,12 +356,20 @@ public:
    * @param[in] rhs The Matrix to multiply this by
    * @return A Matrix containing the result
    */
-  Matrix operator*(const Matrix& rhs) const
-  {
-    Matrix result(false);
-    Multiply(result, rhs, *this);
-    return result;
-  }
+  Matrix operator*(const Matrix& rhs) const;
+
+  /**
+   * @brief Multiplication assignment operator.
+   *
+   * This Matrix *= rhs
+   *
+   * @note It makes some memory allocate & copy internally.
+   *
+   * @SINCE_2_1.46
+   * @param[in] rhs The Matrix to multiply this by
+   * @return Itself
+   */
+  Matrix& operator*=(const Matrix& rhs);
 
   /**
    * @brief The multiplication operator.
