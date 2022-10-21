@@ -228,21 +228,21 @@ public:
    * Add a renderer to the node
    * @param[in] renderer The renderer added to the node
    */
-  void AddRenderer(Renderer* renderer);
+  void AddRenderer(RendererIndex renderer);
 
   /**
    * Remove a renderer from the node
    * @param[in] renderer The renderer to be removed
    */
-  void RemoveRenderer(const Renderer* renderer);
+  void RemoveRenderer(const RendererIndex renderer);
 
   /*
    * Get the renderer at the given index
    * @param[in] index
    */
-  Renderer* GetRendererAt(uint32_t index) const
+  RendererIndex GetRendererAt(uint32_t index) const
   {
-    return mRenderer[index];
+    return mRenderers[index];
   }
 
   /**
@@ -250,7 +250,7 @@ public:
    */
   uint32_t GetRendererCount() const
   {
-    return static_cast<uint32_t>(mRenderer.Size());
+    return static_cast<uint32_t>(mRenderers.Size());
   }
 
   // Containment methods
@@ -988,7 +988,7 @@ protected:
   Node*       mParent;              ///< Pointer to parent node (a child is owned by its parent)
   RenderTask* mExclusiveRenderTask; ///< Nodes can be marked as exclusive to a single RenderTask
 
-  RendererContainer mRenderer; ///< Container of renderers; not owned
+  RendererContainer mRenderers; ///< Container of renderers; not owned
 
   NodeContainer mChildren; ///< Container of children; not owned
 
@@ -1103,13 +1103,13 @@ inline void SetTransparentMessage(EventThreadServices& eventThreadServices, cons
 
 inline void DetachRendererMessage(EventThreadServices& eventThreadServices, const Node& node, const Renderer& renderer)
 {
-  using LocalType = MessageValue1<Node, const Renderer*>;
+  using LocalType = MessageValue1<Node, RendererIndex>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&node, &Node::RemoveRenderer, &renderer);
+  new(slot) LocalType(&node, &Node::RemoveRenderer, Renderer::GetIndex(renderer));
 }
 
 inline void SetDepthIndexMessage(EventThreadServices& eventThreadServices, const Node& node, uint32_t depthIndex)

@@ -83,6 +83,16 @@ Renderer* Renderer::New()
   return new(gRendererMemoryPool.AllocateRawThreadSafe()) Renderer();
 }
 
+// Becomes
+
+RendererIndex Renderer::NewKey()
+{
+  void* ptr = gRendererMemoryPool.AllocateRawThreadSafe();
+  auto  key = gRendererMemoryPool.GetIndexOfObject(static_cast<Renderer*>(ptr));
+  new(ptr) Renderer();
+  return key;
+}
+
 Renderer::Renderer()
 : mSceneController(nullptr),
   mRenderer(nullptr),
@@ -117,6 +127,21 @@ Renderer::~Renderer()
 void Renderer::operator delete(void* ptr)
 {
   gRendererMemoryPool.FreeThreadSafe(static_cast<Renderer*>(ptr));
+}
+
+Renderer* Renderer::Get(RendererIndex rendererIndex)
+{
+  return gRendererMemoryPool.GetPtrToObject(rendererIndex);
+}
+
+RendererIndex Renderer::GetIndex(const Renderer& renderer)
+{
+  return gRendererMemoryPool.GetIndexOfObject(const_cast<Renderer*>(&renderer));
+}
+
+RendererIndex Renderer::GetIndex(Renderer* renderer)
+{
+  return gRendererMemoryPool.GetIndexOfObject(renderer);
 }
 
 bool Renderer::PrepareRender(BufferIndex updateBufferIndex)

@@ -199,18 +199,18 @@ void Node::DisconnectChild(BufferIndex updateBufferIndex, Node& childNode)
   found->RecursiveDisconnectFromSceneGraph(updateBufferIndex);
 }
 
-void Node::AddRenderer(Renderer* renderer)
+void Node::AddRenderer(RendererIndex renderer)
 {
   // If it is the first renderer added, make sure the world transform will be calculated
   // in the next update as world transform is not computed if node has no renderers.
-  if(mRenderer.Empty())
+  if(mRenderers.Empty())
   {
     mDirtyFlags |= NodePropertyFlags::TRANSFORM;
   }
   else
   {
     // Check that it has not been already added.
-    for(auto&& existingRenderer : mRenderer)
+    for(auto&& existingRenderer : mRenderers)
     {
       if(existingRenderer == renderer)
       {
@@ -222,18 +222,18 @@ void Node::AddRenderer(Renderer* renderer)
 
   SetUpdated(true);
 
-  mRenderer.PushBack(renderer);
+  mRenderers.PushBack(renderer);
 }
 
-void Node::RemoveRenderer(const Renderer* renderer)
+void Node::RemoveRenderer(const RendererIndex renderer)
 {
-  RendererContainer::SizeType rendererCount(mRenderer.Size());
+  RendererContainer::SizeType rendererCount(mRenderers.Size());
   for(RendererContainer::SizeType i = 0; i < rendererCount; ++i)
   {
-    if(mRenderer[i] == renderer)
+    if(mRenderers[i] == renderer)
     {
       SetUpdated(true);
-      mRenderer.Erase(mRenderer.Begin() + i);
+      mRenderers.Erase(mRenderers.Begin() + i);
       return;
     }
   }

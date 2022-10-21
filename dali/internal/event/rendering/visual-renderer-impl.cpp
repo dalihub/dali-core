@@ -66,11 +66,11 @@ TypeRegistration mType(typeid(Dali::VisualRenderer), typeid(Dali::Renderer), Cre
 VisualRendererPtr VisualRenderer::New()
 {
   // create scene object first so it's guaranteed to exist for the event side
-  auto sceneObject = SceneGraph::Renderer::New();
+  auto sceneObjectIndex = SceneGraph::Renderer::NewKey();
+  auto sceneObject      = SceneGraph::Renderer::Get(sceneObjectIndex);
 
-  sceneObject->SetVisualProperties(new SceneGraph::VisualRenderer::AnimatableVisualProperties());
+  sceneObjectKey->SetVisualProperties(new SceneGraph::VisualRenderer::AnimatableVisualProperties());
 
-  OwnerPointer<SceneGraph::Renderer> transferOwnership(sceneObject);
   // pass the pointer to base for message passing
   VisualRendererPtr rendererPtr(new VisualRenderer(sceneObject));
 
@@ -79,7 +79,7 @@ VisualRendererPtr VisualRenderer::New()
   // transfer scene object ownership to update manager
   EventThreadServices&       eventThreadServices = rendererPtr->GetEventThreadServices();
   SceneGraph::UpdateManager& updateManager       = eventThreadServices.GetUpdateManager();
-  AddRendererMessage(updateManager, transferOwnership);
+  AddRendererMessage(updateManager, sceneObjectIndex);
 
   eventThreadServices.RegisterObject(rendererPtr.Get());
   return rendererPtr;

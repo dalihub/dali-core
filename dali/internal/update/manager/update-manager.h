@@ -320,13 +320,13 @@ public:
    * Add a new renderer to scene
    * @param renderer to add
    */
-  void AddRenderer(OwnerPointer<Renderer>& renderer);
+  void AddRenderer(RendererIndex renderer);
 
   /**
    * Add a renderer from scene
    * @param renderer to remove
    */
-  void RemoveRenderer(Renderer* renderer);
+  void RemoveRenderer(RendererIndex renderer);
 
   /**
    * Attach a renderer to node
@@ -1104,24 +1104,24 @@ inline void SetLayerDepthsMessage(UpdateManager& manager, const std::vector<Laye
   new(slot) LocalType(&manager, &UpdateManager::SetLayerDepths, layers, rootLayer);
 }
 
-inline void AddRendererMessage(UpdateManager& manager, OwnerPointer<Renderer>& object)
+inline void AddRendererMessage(UpdateManager& manager, RendererIndex rendererIndex)
 {
-  using LocalType = MessageValue1<UpdateManager, OwnerPointer<Renderer>>;
+  using LocalType = MessageValue1<UpdateManager, RendererIndex>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &UpdateManager::AddRenderer, object);
+  new(slot) LocalType(&manager, &UpdateManager::AddRenderer, rendererIndex);
 }
 
-inline void RemoveRendererMessage(UpdateManager& manager, const Renderer& object)
+inline void RemoveRendererMessage(UpdateManager& manager, RendererIndex rendererIndex)
 {
-  using LocalType = MessageValue1<UpdateManager, Renderer*>;
+  using LocalType = MessageValue1<UpdateManager, RendererIndex>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &UpdateManager::RemoveRenderer, const_cast<Renderer*>(&object));
+  new(slot) LocalType(&manager, &UpdateManager::RemoveRenderer, rendererIndex);
 }
 
 inline void AttachRendererMessage(UpdateManager& manager, const Node& node, const Renderer& renderer)

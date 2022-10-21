@@ -30,6 +30,7 @@
 #include <dali/internal/update/controllers/render-message-dispatcher.h>
 #include <dali/internal/update/controllers/scene-controller-impl.h>
 #include <dali/internal/update/manager/frame-callback-processor.h>
+#include <dali/internal/update/manager/owner-key-container.h>
 #include <dali/internal/update/manager/render-task-processor.h>
 #include <dali/internal/update/manager/transform-manager.h>
 #include <dali/internal/update/manager/update-algorithms.h>
@@ -101,6 +102,31 @@ inline void EraseUsingDiscardQueue(OwnerContainer<Type*>& container, Type* objec
       // Transfer ownership to the discard queue, this keeps the object alive, until the render-thread has finished with it
       discardQueue.Add(updateBufferIndex, container.Release(&iter)); // take the address of the reference to a pointer (iter)
       return;                                                        // return as we only ever remove one object. Iterators to container are now invalidated as well so cannot continue
+    }
+  }
+}
+
+/**
+ * Helper to Erase an object from std::vector using discard queue
+ * @param container to remove from
+ * @param object to remove
+ * @param discardQueue to put the object to
+ * @param updateBufferIndex to use
+ */
+template<class Type>
+inline void EraseUsingDiscardQueue(OwnerKeyContainer<Type>& container, Type* object, DiscardQueue<uint32_t, OwnerKeyContainer<Type>>& discardQueue, BufferIndex updateBufferIndex)
+{
+  DALI_ASSERT_DEBUG(object && "NULL object not allowed");
+
+  auto key = Type::GetIndex(object);
+
+  for(auto iter = container.begin(), end = container.end(); iter != end; ++iter)
+  {
+    if(*iter == key)
+    {
+      // Transfer ownership to the discard queue, this keeps the object alive, until the render-thread has finished with it
+      discardQueue.Add(updateBufferIndex, container.Release(iter));
+      return; // return as we only ever remove one object. Iterators to container are now invalidated as well so cannot continue
     }
   }
 }
@@ -274,14 +300,14 @@ struct UpdateManager::Impl
   OwnerContainer<NodeResetter*>         nodeResetters;         ///< A container of node resetters
   OwnerContainer<Animation*>            animations;            ///< A container of owned animations
   PropertyNotificationContainer         propertyNotifications; ///< A container of owner property notifications.
-  OwnerContainer<Renderer*>             renderers;             ///< A container of owned renderers
+  OwnerKeyContainer<Renderer>           renderers;             ///< A container of owned renderers
   OwnerContainer<TextureSet*>           textureSets;           ///< A container of owned texture sets
   OwnerContainer<Shader*>               shaders;               ///< A container of owned shaders
 
-  DiscardQueue<Node*, OwnerContainer<Node*>>         nodeDiscardQueue; ///< Nodes are added here when disconnected from the scene-graph.
-  DiscardQueue<Shader*, OwnerContainer<Shader*>>     shaderDiscardQueue;
-  DiscardQueue<Renderer*, OwnerContainer<Renderer*>> rendererDiscardQueue;
-  DiscardQueue<Scene*, OwnerContainer<Scene*>>       sceneDiscardQueue;
+  DiscardQueue<Node*, OwnerContainer<Node*>>          nodeDiscardQueue; ///< Nodes are added here when disconnected from the scene-graph.
+  DiscardQueue<Shader*, OwnerContainer<Shader*>>      shaderDiscardQueue;
+  DiscardQueue<uint32_t, OwnerKeyContainer<Renderer>> rendererDiscardQueue;
+  DiscardQueue<Scene*, OwnerContainer<Scene*>>        sceneDiscardQueue;
 
   OwnerPointer<PanGesture> panGestureProcessor; ///< Owned pan gesture processor; it lives for the lifecycle of UpdateManager
 
@@ -645,16 +671,19 @@ void UpdateManager::SetShaderSaver(ShaderSaver& upstream)
   mImpl->shaderSaver = &upstream;
 }
 
-void UpdateManager::AddRenderer(OwnerPointer<Renderer>& renderer)
+void UpdateManager::AddRenderer(RendererIndex rendererKey)
 {
-  DALI_LOG_INFO(gLogFilter, Debug::General, "[%x] AddRenderer\n", renderer.Get());
+  SceneGraph::Renderer* renderer = SceneGraph::Renderer::Get(rendererKey);
+
+  DALI_LOG_INFO(gLogFilter, Debug::General, "[%x] AddRenderer\n", renderer);
 
   renderer->ConnectToSceneGraph(*mImpl->sceneController, mSceneGraphBuffers.GetUpdateBufferIndex());
-  mImpl->renderers.PushBack(renderer.Release());
+  mImpl->renderers.PushBack(rendererKey);
 }
 
-void UpdateManager::RemoveRenderer(Renderer* renderer)
+void UpdateManager::RemoveRenderer(RendererIndex rendererKey)
 {
+  SceneGraph::Renderer* renderer = SceneGraph::Renderer::Get(rendererKey);
   DALI_LOG_INFO(gLogFilter, Debug::General, "[%x] RemoveRenderer\n", renderer);
 
   // Find the renderer and destroy it
@@ -665,7 +694,7 @@ void UpdateManager::RemoveRenderer(Renderer* renderer)
 
 void UpdateManager::AttachRenderer(Node* node, Renderer* renderer)
 {
-  node->AddRenderer(renderer);
+  node->AddRenderer(Renderer::GetIndex(renderer));
   mImpl->renderersAdded = true;
 }
 
@@ -904,9 +933,10 @@ void UpdateManager::ForwardCompiledShadersToEventThread()
 
 void UpdateManager::UpdateRenderers(BufferIndex bufferIndex)
 {
-  for(auto&& renderer : mImpl->renderers)
+  for(auto rendererKey : mImpl->renderers)
   {
     // Apply constraints
+    auto renderer = Renderer::Get(rendererKey);
     ConstrainPropertyOwner(*renderer, bufferIndex);
 
     mImpl->renderingRequired = renderer->PrepareRender(bufferIndex) || mImpl->renderingRequired;
@@ -1164,8 +1194,9 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
 void UpdateManager::PostRender()
 {
   // Reset dirty flag
-  for(auto&& renderer : mImpl->renderers)
+  for(auto&& rendererIndex : mImpl->renderers)
   {
+    Renderer* renderer = Renderer::Get(rendererIndex);
     renderer->ResetDirtyFlag();
   }
 

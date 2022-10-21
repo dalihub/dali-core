@@ -217,7 +217,8 @@ inline void UpdateLayers(Node&             node,
     const uint32_t count = node.GetRendererCount();
     for(uint32_t i = 0; i < count; ++i)
     {
-      SceneGraph::Renderer* renderer = node.GetRendererAt(i);
+      auto rendererIndex = node.GetRendererAt(i);
+      Renderer* renderer = Renderer::Get(rendererIndex);
       if(renderer->IsDirty())
       {
         layer->SetReuseRenderers(updateBufferIndex, false);

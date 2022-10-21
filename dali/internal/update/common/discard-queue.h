@@ -37,17 +37,9 @@ public:
   {
     mDiscardQueue[updateBufferIndex].PushBack(object);
   }
-  void add(BufferIndex updateBufferIndex, Type object)
-  {
-    mDiscardQueue[updateBufferIndex].push_back(object);
-  }
   void Clear(BufferIndex updateBufferIndex)
   {
     mDiscardQueue[updateBufferIndex].Clear();
-  }
-  void clear(BufferIndex updateBufferIndex)
-  {
-    mDiscardQueue[updateBufferIndex].clear();
   }
 
 private:

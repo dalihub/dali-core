@@ -74,7 +74,7 @@ void SetValue(EventThreadServices& eventThreadServices, const Property::Value& p
 DecoratedVisualRendererPtr DecoratedVisualRenderer::New()
 {
   // create scene object first so it's guaranteed to exist for the event side
-  auto sceneObject = SceneGraph::Renderer::New();
+  auto sceneObjectIndex = SceneGraph::Renderer::NewKey();
 
   auto animatableVisualProperties          = new SceneGraph::VisualRenderer::AnimatableVisualProperties();
   auto animatableDecoratedVisualProperties = new SceneGraph::VisualRenderer::AnimatableDecoratedVisualProperties();
@@ -83,18 +83,17 @@ DecoratedVisualRendererPtr DecoratedVisualRenderer::New()
   animatableVisualProperties->mExtendedProperties               = animatableDecoratedVisualProperties;
   animatableVisualProperties->mExtendedPropertiesDeleteFunction = SceneGraph::VisualRenderer::AnimatableDecoratedVisualProperties::DeleteFunction;
 
+  auto sceneObject = SceneGraph::Renderer::Get(sceneObjectIndex);
   sceneObject->SetVisualProperties(animatableVisualProperties);
 
-  OwnerPointer<SceneGraph::Renderer> transferOwnership(sceneObject);
   // pass the pointer to base for message passing
   DecoratedVisualRendererPtr rendererPtr(new DecoratedVisualRenderer(sceneObject));
 
   rendererPtr->AddUniformMappings(); // Ensure properties are mapped to uniforms
 
-  // transfer scene object ownership to update manager
   EventThreadServices&       eventThreadServices = rendererPtr->GetEventThreadServices();
   SceneGraph::UpdateManager& updateManager       = eventThreadServices.GetUpdateManager();
-  AddRendererMessage(updateManager, transferOwnership);
+  AddRendererMessage(updateManager, sceneObjectIndex);
 
   eventThreadServices.RegisterObject(rendererPtr.Get());
   return rendererPtr;

@@ -26,6 +26,10 @@ namespace Dali
 {
 namespace Internal
 {
+const uint32_t POOL_KEY_BLOCK_ID_MASK  = 0xF8000000;
+const uint32_t POOL_KEY_BLOCK_ID_SHIFT = 27;
+const uint32_t POOL_KEY_INDEX_MASK     = 0x07FFFFFF;
+
 /**
  * @brief Private implementation class
  */
@@ -231,6 +235,50 @@ void FixedSizeMemoryPool::FreeThreadSafe(void* memory)
   }
 }
 
+void* FixedSizeMemoryPool::GetPtrToObject(uint32_t key)
+{
+  uint32_t blockId = (key & POOL_KEY_BLOCK_ID_MASK) >> POOL_KEY_BLOCK_ID_SHIFT;
+  uint32_t index   = key & POOL_KEY_INDEX_MASK;
+  auto*    block   = &mImpl->mMemoryBlocks;
+  while(block && blockId > 0)
+  {
+    block = block->nextBlock;
+    --blockId;
+  }
+  if(block != nullptr)
+  {
+    return static_cast<uint8_t*>(block->blockMemory) + mImpl->mFixedSize * index;
+  }
+  return nullptr;
+}
+
+uint32_t FixedSizeMemoryPool::GetIndexOfObject(void* ptr)
+{
+  uint32_t blockId = 0;
+  uint32_t index   = 0;
+  auto*    block   = &mImpl->mMemoryBlocks;
+  bool     found   = false;
+
+  while(block)
+  {
+    const void* const endOfBlock = reinterpret_cast<char*>(block->blockMemory) + block->mBlockSize;
+    if(block->blockMemory <= ptr && ptr <= endOfBlock)
+    {
+      index = (static_cast<uint8_t*>(ptr) - static_cast<uint8_t*>(block->blockMemory)) / mImpl->mFixedSize;
+      found = true;
+      break;
+    }
+
+    block = block->nextBlock;
+    ++blockId;
+  }
+  if(found)
+  {
+    return blockId << POOL_KEY_BLOCK_ID_SHIFT | (index & POOL_KEY_INDEX_MASK);
+  }
+  return 0u;
+}
+
 uint32_t FixedSizeMemoryPool::GetCapacity() const
 {
   // Ignores deleted objects list, just returns currently allocated size
@@ -246,6 +294,21 @@ uint32_t FixedSizeMemoryPool::GetCapacity() const
 #endif
   return totalAllocation;
 }
+
+/*
+ *
+ * Or, don't use index, create a key, which combines block id & offset in block...
+ * e.g. use top 5 bits for block id, lower 27 bits for offset.  (can address 150m entries)
+ *
+ * FixedMemoryPool is a linked list, so still have to loop to find base block address.
+ * (Or cache in struct - Only need to cache 23 ptrs...)
+ *
+ *
+ * Algorithm to find index from address...
+ * Currently, we return a ptr from the allocation alg so that it can run a placement new...
+ * could store off the index in the allocated memory, so it can be retrieved before doing
+ * placement new...
+ */
 
 } // namespace Internal
 

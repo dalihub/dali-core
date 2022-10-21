@@ -97,6 +97,10 @@ public:
    */
   void FreeThreadSafe(void* memory);
 
+  void* GetPtrToObject(uint32_t key);
+
+  uint32_t GetIndexOfObject(void* ptr);
+  
   /**
    * Get the current capacity of the memory pool
    *

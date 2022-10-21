@@ -174,9 +174,10 @@ bool AddRenderablesForTask(BufferIndex updateBufferIndex,
   RenderableContainer& target = DALI_LIKELY(inheritedDrawMode == DrawMode::NORMAL) ? layer->colorRenderables : layer->overlayRenderables;
   for(uint32_t i = 0; i < count; ++i)
   {
-    SceneGraph::Renderer* renderer = node.GetRendererAt(i);
-    target.PushBack(Renderable(&node, renderer));
+    SceneGraph::RendererIndex rendererIndex = node.GetRendererAt(i);
+    SceneGraph::Renderer*     renderer      = Renderer::Get(rendererIndex);
 
+    target.PushBack(Renderable(&node, renderer));
     keepRendering = keepRendering || (renderer->GetRenderingBehavior() == DevelRenderer::Rendering::CONTINUOUSLY);
   }
 

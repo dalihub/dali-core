@@ -44,7 +44,8 @@ namespace SceneGraph
 class SceneController;
 
 class Renderer;
-using RendererContainer = Dali::Vector<Renderer*>;
+using RendererIndex     = uint32_t;
+using RendererContainer = Dali::Vector<RendererIndex>;
 using RendererIter      = RendererContainer::Iterator;
 using RendererConstIter = RendererContainer::ConstIterator;
 
@@ -155,6 +156,8 @@ public:
    */
   static Renderer* New();
 
+  static RendererIndex NewKey();
+
   /**
    * Destructor
    */
@@ -165,6 +168,16 @@ public:
    * Deletes the renderer from its global memory pool
    */
   void operator delete(void* ptr);
+
+  /**
+   * Get pointer to a renderer at the given index.
+   * @param[in] rendererIndex Index of renderer to retrieve object
+   * @return The object's address, or nullptr if not found
+   */
+  static Renderer* Get(RendererIndex rendererIndex);
+
+  static RendererIndex GetIndex(const Renderer& renderer);
+  static RendererIndex GetIndex(Renderer* renderer);
 
   /**
    * Set the texture set for the renderer

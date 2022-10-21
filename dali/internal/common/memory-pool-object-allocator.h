@@ -155,6 +155,20 @@ public:
   }
 
   /**
+   * Get a pointer to the indexed item
+   * index must be valid.
+   */
+  T* GetPtrToObject(uint32_t index)
+  {
+    return static_cast<T*>(mPool->GetPtrToObject(index));
+  }
+
+  uint32_t GetIndexOfObject(T* object)
+  {
+    return mPool->GetIndexOfObject(object);
+  }
+  
+  /**
    * @brief Get the capacity of the memory pool
    */
   uint32_t GetCapacity() const
