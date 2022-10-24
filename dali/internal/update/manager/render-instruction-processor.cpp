@@ -227,9 +227,13 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
         // Assume actors are at z=0, compute AABB in view space & test rect intersection
         // against z=0 plane boundaries for frustum. (NOT viewport). This should take into account
         // magnification due to FOV etc.
+
+        // TODO : Below logic might need to refactor it.
+        // If camera is Perspective, we need to calculate clipping box by FoV. Currently, we just believe default camera setup OrthographicSize well.
+        //  - If then, It must use math calculate like tan(fov) internally. So, we might need calculate it only one times, and cache.
         ClippingBox boundingBox = RenderItem::CalculateTransformSpaceAABB(nodeModelViewMatrix, Vector3(nodeUpdateArea.x, nodeUpdateArea.y, 0.0f), Vector3(nodeUpdateArea.z, nodeUpdateArea.w, 0.0f));
-        ClippingBox clippingBox(camera.mLeftClippingPlane, camera.mBottomClippingPlane, camera.mRightClippingPlane - camera.mLeftClippingPlane, fabsf(camera.mBottomClippingPlane - camera.mTopClippingPlane));
-        inside = clippingBox.Intersects(boundingBox);
+        ClippingBox clippingBox = camera.GetOrthographicClippingBox(updateBufferIndex);
+        inside                  = clippingBox.Intersects(boundingBox);
       }
     }
     /*
