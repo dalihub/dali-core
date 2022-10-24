@@ -48,20 +48,22 @@ namespace
  */
 // clang-format off
 DALI_PROPERTY_TABLE_BEGIN
-DALI_PROPERTY( "type",                   INTEGER,  true,    false,   true,   Dali::CameraActor::Property::TYPE                  )
-DALI_PROPERTY( "projectionMode",         INTEGER,  true,    false,   true,   Dali::CameraActor::Property::PROJECTION_MODE       )
-DALI_PROPERTY( "fieldOfView",            FLOAT,    true,    true,    true,   Dali::CameraActor::Property::FIELD_OF_VIEW         )
-DALI_PROPERTY( "aspectRatio",            FLOAT,    true,    false,   true,   Dali::CameraActor::Property::ASPECT_RATIO          )
-DALI_PROPERTY( "nearPlaneDistance",      FLOAT,    true,    false,   true,   Dali::CameraActor::Property::NEAR_PLANE_DISTANCE   )
-DALI_PROPERTY( "farPlaneDistance",       FLOAT,    true,    false,   true,   Dali::CameraActor::Property::FAR_PLANE_DISTANCE    )
-DALI_PROPERTY( "leftPlaneDistance",      FLOAT,    true,    false,   true,   Dali::CameraActor::Property::LEFT_PLANE_DISTANCE   )
-DALI_PROPERTY( "rightPlaneDistance",     FLOAT,    true,    false,   true,   Dali::CameraActor::Property::RIGHT_PLANE_DISTANCE  )
-DALI_PROPERTY( "topPlaneDistance",       FLOAT,    true,    false,   true,   Dali::CameraActor::Property::TOP_PLANE_DISTANCE    )
-DALI_PROPERTY( "bottomPlaneDistance",    FLOAT,    true,    false,   true,   Dali::CameraActor::Property::BOTTOM_PLANE_DISTANCE )
-DALI_PROPERTY( "targetPosition",         VECTOR3,  true,    false,   true,   Dali::CameraActor::Property::TARGET_POSITION       )
-DALI_PROPERTY( "projectionMatrix",       MATRIX,   false,   false,   true,   Dali::CameraActor::Property::PROJECTION_MATRIX     )
-DALI_PROPERTY( "viewMatrix",             MATRIX,   false,   false,   true,   Dali::CameraActor::Property::VIEW_MATRIX           )
-DALI_PROPERTY( "invertYAxis",            BOOLEAN,  true,    false,   true,   Dali::CameraActor::Property::INVERT_Y_AXIS         )
+DALI_PROPERTY( "type",                   INTEGER,  true,    false,   true,   Dali::CameraActor::Property::TYPE                      )
+DALI_PROPERTY( "projectionMode",         INTEGER,  true,    false,   true,   Dali::CameraActor::Property::PROJECTION_MODE           )
+DALI_PROPERTY( "fieldOfView",            FLOAT,    true,    true,    true,   Dali::CameraActor::Property::FIELD_OF_VIEW             )
+DALI_PROPERTY( "aspectRatio",            FLOAT,    true,    true,    true,   Dali::CameraActor::Property::ASPECT_RATIO              )
+DALI_PROPERTY( "nearPlaneDistance",      FLOAT,    true,    false,   true,   Dali::CameraActor::Property::NEAR_PLANE_DISTANCE       )
+DALI_PROPERTY( "farPlaneDistance",       FLOAT,    true,    false,   true,   Dali::CameraActor::Property::FAR_PLANE_DISTANCE        )
+DALI_PROPERTY( "leftPlaneDistance",      FLOAT,    false,   false,   true,   Dali::CameraActor::Property::LEFT_PLANE_DISTANCE       )
+DALI_PROPERTY( "rightPlaneDistance",     FLOAT,    false,   false,   true,   Dali::CameraActor::Property::RIGHT_PLANE_DISTANCE      )
+DALI_PROPERTY( "topPlaneDistance",       FLOAT,    false,   false,   true,   Dali::CameraActor::Property::TOP_PLANE_DISTANCE        )
+DALI_PROPERTY( "bottomPlaneDistance",    FLOAT,    false,   false,   true,   Dali::CameraActor::Property::BOTTOM_PLANE_DISTANCE     )
+DALI_PROPERTY( "targetPosition",         VECTOR3,  true,    false,   true,   Dali::CameraActor::Property::TARGET_POSITION           )
+DALI_PROPERTY( "projectionMatrix",       MATRIX,   false,   false,   true,   Dali::CameraActor::Property::PROJECTION_MATRIX         )
+DALI_PROPERTY( "viewMatrix",             MATRIX,   false,   false,   true,   Dali::CameraActor::Property::VIEW_MATRIX               )
+DALI_PROPERTY( "invertYAxis",            BOOLEAN,  true,    false,   true,   Dali::CameraActor::Property::INVERT_Y_AXIS             )
+DALI_PROPERTY( "orthographicSize",       FLOAT,    true,    true,    true,   Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE    )
+DALI_PROPERTY( "projectionDirection",    INTEGER,  true,    false,   true,   Dali::DevelCameraActor::Property::PROJECTION_DIRECTION )
 DALI_PROPERTY_TABLE_END( DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, CameraDefaultProperties )
 // clang-format on
 
@@ -136,6 +138,45 @@ void BuildOrthoPickingRay(const Matrix&   viewMatrix,
   rayDir.w = 1.0f;
 }
 
+/**
+ * @brief Helper class to calculate left/right/top/bottom plane distance by orthographicSize and something other info.
+ * It will resolve some confuse case of plane distance value.
+ * (Something like, Is top plane distance is positive or negative? is aspect ratio is width/height or height/width?)
+ */
+struct OrthographicSizeConverter
+{
+  constexpr OrthographicSizeConverter(float orthographicSize, float aspectRatio, Dali::DevelCameraActor::ProjectionDirection projectionDirection)
+  : mOrthographicSize(orthographicSize),
+    mAspectRatio(aspectRatio),
+    mProjectionDirection(projectionDirection)
+  {
+  }
+
+  inline float LeftPlaneDistance() const
+  {
+    return -(mProjectionDirection == DevelCameraActor::ProjectionDirection::VERTICAL ? mOrthographicSize * mAspectRatio : mOrthographicSize);
+  }
+
+  inline float RightPlaneDistance() const
+  {
+    return (mProjectionDirection == DevelCameraActor::ProjectionDirection::VERTICAL ? mOrthographicSize * mAspectRatio : mOrthographicSize);
+  }
+
+  inline float TopPlaneDistance() const
+  {
+    return (mProjectionDirection == DevelCameraActor::ProjectionDirection::VERTICAL ? mOrthographicSize : mOrthographicSize / mAspectRatio);
+  }
+
+  inline float BottomPlaneDistance() const
+  {
+    return -(mProjectionDirection == DevelCameraActor::ProjectionDirection::VERTICAL ? mOrthographicSize : mOrthographicSize / mAspectRatio);
+  }
+
+  float                                       mOrthographicSize;
+  float                                       mAspectRatio;
+  Dali::DevelCameraActor::ProjectionDirection mProjectionDirection;
+};
+
 } // namespace
 
 CameraActorPtr CameraActor::New(const Size& size)
@@ -172,13 +213,10 @@ CameraActor::CameraActor(const SceneGraph::Node& node)
   mProjectionMode(SceneGraph::Camera::DEFAULT_MODE),
   mProjectionDirection(SceneGraph::Camera::DEFAULT_PROJECTION_DIRECTION),
   mFieldOfView(SceneGraph::Camera::DEFAULT_FIELD_OF_VIEW),
+  mOrthographicSize(SceneGraph::Camera::DEFAULT_ORTHOGRAPHIC_SIZE),
   mAspectRatio(SceneGraph::Camera::DEFAULT_ASPECT_RATIO),
   mNearClippingPlane(SceneGraph::Camera::DEFAULT_NEAR_CLIPPING_PLANE),
   mFarClippingPlane(SceneGraph::Camera::DEFAULT_FAR_CLIPPING_PLANE),
-  mLeftClippingPlane(SceneGraph::Camera::DEFAULT_LEFT_CLIPPING_PLANE),
-  mRightClippingPlane(SceneGraph::Camera::DEFAULT_RIGHT_CLIPPING_PLANE),
-  mTopClippingPlane(SceneGraph::Camera::DEFAULT_TOP_CLIPPING_PLANE),
-  mBottomClippingPlane(SceneGraph::Camera::DEFAULT_BOTTOM_CLIPPING_PLANE),
   mInvertYAxis(SceneGraph::Camera::DEFAULT_INVERT_Y_AXIS),
   mPropertyChanged(false)
 {
@@ -293,6 +331,29 @@ float CameraActor::GetCurrentFieldOfView() const
   return GetCameraSceneObject().GetFieldOfView(GetEventThreadServices().GetEventBufferIndex());
 }
 
+void CameraActor::SetOrthographicSize(float orthographicSize)
+{
+  mPropertyChanged = true;
+  if(!Equals(orthographicSize, mOrthographicSize))
+  {
+    mOrthographicSize = orthographicSize;
+
+    // sceneObject is being used in a separate thread; queue a message to set
+    BakeOrthographicSizeMessage(GetEventThreadServices(), GetCameraSceneObject(), mOrthographicSize);
+  }
+}
+
+float CameraActor::GetOrthographicSize() const
+{
+  return mOrthographicSize;
+}
+
+float CameraActor::GetCurrentOrthographicSize() const
+{
+  // node is being used in a separate thread; copy the value from the previous update
+  return GetCameraSceneObject().GetOrthographicSize(GetEventThreadServices().GetEventBufferIndex());
+}
+
 void CameraActor::SetAspectRatio(float aspectRatio)
 {
   mPropertyChanged = true;
@@ -301,13 +362,19 @@ void CameraActor::SetAspectRatio(float aspectRatio)
     mAspectRatio = aspectRatio;
 
     // sceneObject is being used in a separate thread; queue a message to set
-    SetAspectRatioMessage(GetEventThreadServices(), GetCameraSceneObject(), mAspectRatio);
+    BakeAspectRatioMessage(GetEventThreadServices(), GetCameraSceneObject(), mAspectRatio);
   }
 }
 
 float CameraActor::GetAspectRatio() const
 {
   return mAspectRatio;
+}
+
+float CameraActor::GetCurrentAspectRatio() const
+{
+  // node is being used in a separate thread; copy the value from the previous update
+  return GetCameraSceneObject().GetAspectRatio(GetEventThreadServices().GetEventBufferIndex());
 }
 
 void CameraActor::SetNearClippingPlane(float nearClippingPlane)
@@ -344,54 +411,6 @@ float CameraActor::GetFarClippingPlane() const
   return mFarClippingPlane;
 }
 
-void CameraActor::SetLeftClippingPlane(float leftClippingPlane)
-{
-  mPropertyChanged = true;
-  if(!Equals(leftClippingPlane, mLeftClippingPlane))
-  {
-    mLeftClippingPlane = leftClippingPlane;
-
-    // sceneObject is being used in a separate thread; queue a message to set
-    SetLeftClippingPlaneMessage(GetEventThreadServices(), GetCameraSceneObject(), mLeftClippingPlane);
-  }
-}
-
-void CameraActor::SetRightClippingPlane(float rightClippingPlane)
-{
-  mPropertyChanged = true;
-  if(!Equals(rightClippingPlane, mRightClippingPlane))
-  {
-    mRightClippingPlane = rightClippingPlane;
-
-    // sceneObject is being used in a separate thread; queue a message to set
-    SetRightClippingPlaneMessage(GetEventThreadServices(), GetCameraSceneObject(), mRightClippingPlane);
-  }
-}
-
-void CameraActor::SetTopClippingPlane(float topClippingPlane)
-{
-  mPropertyChanged = true;
-  if(!Equals(topClippingPlane, mTopClippingPlane))
-  {
-    mTopClippingPlane = topClippingPlane;
-
-    // sceneObject is being used in a separate thread; queue a message to set
-    SetTopClippingPlaneMessage(GetEventThreadServices(), GetCameraSceneObject(), mTopClippingPlane);
-  }
-}
-
-void CameraActor::SetBottomClippingPlane(float bottomClippingPlane)
-{
-  mPropertyChanged = true;
-  if(!Equals(bottomClippingPlane, mBottomClippingPlane))
-  {
-    mBottomClippingPlane = bottomClippingPlane;
-
-    // sceneObject is being used in a separate thread; queue a message to set
-    SetBottomClippingPlaneMessage(GetEventThreadServices(), GetCameraSceneObject(), mBottomClippingPlane);
-  }
-}
-
 void CameraActor::SetInvertYAxis(bool invertYAxis)
 {
   if(invertYAxis != mInvertYAxis)
@@ -411,7 +430,30 @@ bool CameraActor::GetInvertYAxis() const
 void CameraActor::SetPerspectiveProjection(const Size& size)
 {
   SetProjectionMode(Dali::Camera::PERSPECTIVE_PROJECTION);
-  mCanvasSize = size;
+  mCanvasSize = static_cast<const Vector2>(size);
+
+  if((size.width < Math::MACHINE_EPSILON_1000) || (size.height < Math::MACHINE_EPSILON_1000))
+  {
+    // If the size given is invalid, i.e. ZERO, then check if we've been added to a scene
+    if(OnScene())
+    {
+      // We've been added to a scene already, set the canvas size to the scene's size
+      mCanvasSize = GetScene().GetSize();
+    }
+    else
+    {
+      // We've not been added to a scene yet, so just return.
+      // We'll set the canvas size when we get added to a scene later
+      return;
+    }
+  }
+  ApplyDefaultProjection();
+}
+
+void CameraActor::SetOrthographicProjection(const Size& size)
+{
+  SetProjectionMode(Dali::Camera::ORTHOGRAPHIC_PROJECTION);
+  mCanvasSize = static_cast<const Vector2>(size);
 
   if((size.width < Math::MACHINE_EPSILON_1000) || (size.height < Math::MACHINE_EPSILON_1000))
   {
@@ -429,16 +471,25 @@ void CameraActor::SetPerspectiveProjection(const Size& size)
     }
   }
 
-  float width  = mCanvasSize.width;
-  float height = mCanvasSize.height;
+  ApplyDefaultProjection();
+}
 
+void CameraActor::ApplyDefaultProjection()
+{
+  const float width  = mCanvasSize.width;
+  const float height = mCanvasSize.height;
+
+  // Choose near, far and Z parameters to match the SetPerspectiveProjection above.
   float nearClippingPlane;
   float farClippingPlane;
   float cameraZ;
   CalculateClippingAndZ(width, height, nearClippingPlane, farClippingPlane, cameraZ);
 
+  // calculate orthographic size.
+  const float orthographicSize = (mProjectionDirection == DevelCameraActor::ProjectionDirection::VERTICAL ? height : width) * 0.5f;
+
   // calculate the position of the camera to have the desired aspect ratio
-  const float fieldOfView = 2.0f * std::atan((mProjectionDirection == DevelCameraActor::ProjectionDirection::VERTICAL ? height : width) * 0.5f / cameraZ);
+  const float fieldOfView = 2.0f * std::atan(orthographicSize / cameraZ);
 
   // unless it is too small, we want at least as much space to the back as we have torwards the front
   const float minClippingFarPlane = 2.f * nearClippingPlane;
@@ -453,53 +504,9 @@ void CameraActor::SetPerspectiveProjection(const Size& size)
   SetFieldOfView(fieldOfView);
   SetNearClippingPlane(nearClippingPlane);
   SetFarClippingPlane(farClippingPlane);
-  SetLeftClippingPlane(width * -0.5f);
-  SetRightClippingPlane(width * 0.5f);
-  SetTopClippingPlane(height * 0.5f);     // Top is +ve to keep consistency with orthographic values
-  SetBottomClippingPlane(height * -0.5f); // Bottom is -ve to keep consistency with orthographic values
   SetAspectRatio(aspectRatio);
+  SetOrthographicSize(orthographicSize);
   SetZ(cameraZ);
-}
-
-void CameraActor::SetOrthographicProjection(const Vector2& size)
-{
-  SetProjectionMode(Dali::Camera::ORTHOGRAPHIC_PROJECTION);
-  mCanvasSize = size;
-
-  if((size.width < Math::MACHINE_EPSILON_1000) || (size.height < Math::MACHINE_EPSILON_1000))
-  {
-    // If the size given is invalid, i.e. ZERO, then check if we've been added to a scene
-    if(OnScene())
-    {
-      // We've been added to a scene already, set the canvas size to the scene's size
-      mCanvasSize = GetScene().GetSize();
-    }
-    else
-    {
-      // We've not been added to a scene yet, so just return.
-      // We'll set the canvas size when we get added to a scene later
-      return;
-    }
-  }
-
-  // Choose near, far and Z parameters to match the SetPerspectiveProjection above.
-  float nearClippingPlane;
-  float farClippingPlane;
-  float cameraZ;
-  CalculateClippingAndZ(size.width, size.height, nearClippingPlane, farClippingPlane, cameraZ);
-  SetOrthographicProjection(-size.x * 0.5f, size.x * 0.5f, size.y * 0.5f, size.y * -0.5f, nearClippingPlane, farClippingPlane);
-  SetZ(cameraZ);
-}
-
-void CameraActor::SetOrthographicProjection(float left, float right, float top, float bottom, float near, float far)
-{
-  SetProjectionMode(Dali::Camera::ORTHOGRAPHIC_PROJECTION);
-  SetLeftClippingPlane(left);
-  SetRightClippingPlane(right);
-  SetTopClippingPlane(top);
-  SetBottomClippingPlane(bottom);
-  SetNearClippingPlane(near);
-  SetFarClippingPlane(far);
 }
 
 bool CameraActor::BuildPickingRay(const Vector2&  screenCoordinates,
@@ -607,6 +614,11 @@ void CameraActor::SetDefaultProperty(Property::Index index, const Property::Valu
         SetFieldOfView(propertyValue.Get<float>()); // set to 0 in case property is not float
         break;
       }
+      case Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE:
+      {
+        SetOrthographicSize(propertyValue.Get<float>()); // set to 0 in case property is not float
+        break;
+      }
       case Dali::CameraActor::Property::ASPECT_RATIO:
       {
         SetAspectRatio(propertyValue.Get<float>()); // set to 0 in case property is not float
@@ -624,22 +636,22 @@ void CameraActor::SetDefaultProperty(Property::Index index, const Property::Valu
       }
       case Dali::CameraActor::Property::LEFT_PLANE_DISTANCE:
       {
-        SetLeftClippingPlane(propertyValue.Get<float>()); // set to 0 in case property is not float
+        DALI_LOG_WARNING("LEFT_PLANE_DISTANCE is read-only\n");
         break;
       }
       case Dali::CameraActor::Property::RIGHT_PLANE_DISTANCE:
       {
-        SetRightClippingPlane(propertyValue.Get<float>()); // set to 0 in case property is not float
+        DALI_LOG_WARNING("RIGHT_PLANE_DISTANCE is read-only\n");
         break;
       }
       case Dali::CameraActor::Property::TOP_PLANE_DISTANCE:
       {
-        SetTopClippingPlane(propertyValue.Get<float>()); // set to 0 in case property is not float
+        DALI_LOG_WARNING("TOP_PLANE_DISTANCE is read-only\n");
         break;
       }
       case Dali::CameraActor::Property::BOTTOM_PLANE_DISTANCE:
       {
-        SetBottomClippingPlane(propertyValue.Get<float>()); // set to 0 in case property is not float
+        DALI_LOG_WARNING("BOTTOM_PLANE_DISTANCE is read-only\n");
         break;
       }
       case Dali::CameraActor::Property::TARGET_POSITION:
@@ -710,6 +722,11 @@ Property::Value CameraActor::GetDefaultProperty(Property::Index index) const
         ret = mFieldOfView;
         break;
       }
+      case Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE:
+      {
+        ret = mOrthographicSize;
+        break;
+      }
       case Dali::CameraActor::Property::ASPECT_RATIO:
       {
         ret = mAspectRatio;
@@ -727,22 +744,22 @@ Property::Value CameraActor::GetDefaultProperty(Property::Index index) const
       }
       case Dali::CameraActor::Property::LEFT_PLANE_DISTANCE:
       {
-        ret = mLeftClippingPlane;
+        ret = OrthographicSizeConverter(mOrthographicSize, mAspectRatio, mProjectionDirection).LeftPlaneDistance();
         break;
       }
       case Dali::CameraActor::Property::RIGHT_PLANE_DISTANCE:
       {
-        ret = mRightClippingPlane;
+        ret = OrthographicSizeConverter(mOrthographicSize, mAspectRatio, mProjectionDirection).RightPlaneDistance();
         break;
       }
       case Dali::CameraActor::Property::TOP_PLANE_DISTANCE:
       {
-        ret = mTopClippingPlane;
+        ret = OrthographicSizeConverter(mOrthographicSize, mAspectRatio, mProjectionDirection).TopPlaneDistance();
         break;
       }
       case Dali::CameraActor::Property::BOTTOM_PLANE_DISTANCE:
       {
-        ret = mBottomClippingPlane;
+        ret = OrthographicSizeConverter(mOrthographicSize, mAspectRatio, mProjectionDirection).BottomPlaneDistance();
         break;
       }
       case Dali::CameraActor::Property::TARGET_POSITION:
@@ -792,6 +809,36 @@ Property::Value CameraActor::GetDefaultPropertyCurrentValue(Property::Index inde
         ret = GetCurrentFieldOfView();
         break;
       }
+      case Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE:
+      {
+        ret = GetCurrentOrthographicSize();
+        break;
+      }
+      case Dali::CameraActor::Property::ASPECT_RATIO:
+      {
+        ret = GetCurrentAspectRatio();
+        break;
+      }
+      case Dali::CameraActor::Property::LEFT_PLANE_DISTANCE:
+      {
+        ret = OrthographicSizeConverter(GetCurrentOrthographicSize(), GetCurrentAspectRatio(), mProjectionDirection).LeftPlaneDistance();
+        break;
+      }
+      case Dali::CameraActor::Property::RIGHT_PLANE_DISTANCE:
+      {
+        ret = OrthographicSizeConverter(GetCurrentOrthographicSize(), GetCurrentAspectRatio(), mProjectionDirection).RightPlaneDistance();
+        break;
+      }
+      case Dali::CameraActor::Property::TOP_PLANE_DISTANCE:
+      {
+        ret = OrthographicSizeConverter(GetCurrentOrthographicSize(), GetCurrentAspectRatio(), mProjectionDirection).TopPlaneDistance();
+        break;
+      }
+      case Dali::CameraActor::Property::BOTTOM_PLANE_DISTANCE:
+      {
+        ret = OrthographicSizeConverter(GetCurrentOrthographicSize(), GetCurrentAspectRatio(), mProjectionDirection).BottomPlaneDistance();
+        break;
+      }
       default:
       {
         ret = GetDefaultProperty(index); // Most are event-side properties, the scene-graph properties are only on the scene-graph
@@ -822,6 +869,16 @@ void CameraActor::OnNotifyDefaultPropertyAnimation(Animation& animation, Propert
             value.Get(mFieldOfView);
             break;
           }
+          case Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE:
+          {
+            value.Get(mOrthographicSize);
+            break;
+          }
+          case Dali::CameraActor::Property::ASPECT_RATIO:
+          {
+            value.Get(mAspectRatio);
+            break;
+          }
         }
         break;
       }
@@ -832,6 +889,16 @@ void CameraActor::OnNotifyDefaultPropertyAnimation(Animation& animation, Propert
           case Dali::CameraActor::Property::FIELD_OF_VIEW:
           {
             AdjustValue<float>(mFieldOfView, value);
+            break;
+          }
+          case Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE:
+          {
+            AdjustValue<float>(mOrthographicSize, value);
+            break;
+          }
+          case Dali::CameraActor::Property::ASPECT_RATIO:
+          {
+            AdjustValue<float>(mAspectRatio, value);
             break;
           }
         }
@@ -851,6 +918,16 @@ const SceneGraph::PropertyBase* CameraActor::GetSceneObjectAnimatableProperty(Pr
       property = GetCameraSceneObject().GetFieldOfView();
       break;
     }
+    case Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE:
+    {
+      property = GetCameraSceneObject().GetOrthographicSize();
+      break;
+    }
+    case Dali::CameraActor::Property::ASPECT_RATIO:
+    {
+      property = GetCameraSceneObject().GetAspectRatio();
+      break;
+    }
       // no default on purpose as we chain method up to actor
   }
   if(!property)
@@ -861,6 +938,7 @@ const SceneGraph::PropertyBase* CameraActor::GetSceneObjectAnimatableProperty(Pr
 
   return property;
 }
+
 const PropertyInputImpl* CameraActor::GetSceneObjectInputProperty(Property::Index index) const
 {
   const PropertyInputImpl* property(nullptr);
@@ -870,6 +948,16 @@ const PropertyInputImpl* CameraActor::GetSceneObjectInputProperty(Property::Inde
     case Dali::CameraActor::Property::FIELD_OF_VIEW:
     {
       property = GetCameraSceneObject().GetFieldOfView();
+      break;
+    }
+    case Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE:
+    {
+      property = GetCameraSceneObject().GetOrthographicSize();
+      break;
+    }
+    case Dali::CameraActor::Property::ASPECT_RATIO:
+    {
+      property = GetCameraSceneObject().GetAspectRatio();
       break;
     }
     case Dali::CameraActor::Property::PROJECTION_MATRIX:
