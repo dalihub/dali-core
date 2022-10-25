@@ -556,7 +556,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
 
   BindTextures(commandBuffer, boundTextures);
 
-  int nodeIndex = BuildUniformIndexMap(bufferIndex, node, size, *program);
+  std::size_t nodeIndex = BuildUniformIndexMap(bufferIndex, node, size, *program);
 
   WriteUniformBuffer(bufferIndex, commandBuffer, program, instruction, node, modelMatrix, modelViewMatrix, viewMatrix, projectionMatrix, size, nodeIndex);
 
@@ -579,7 +579,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
   return drawn;
 }
 
-int Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider& node, const Vector3& size, Program& program)
+std::size_t Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider& node, const Vector3& size, Program& program)
 {
   // Check if the map has changed
   DALI_ASSERT_DEBUG(mRenderDataProvider && "No Uniform map data provider available");
@@ -602,7 +602,7 @@ int Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::No
 
   auto iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [nodePtr](RenderItemLookup& element) { return element.node == nodePtr; });
 
-  int renderItemMapIndex;
+  std::size_t renderItemMapIndex;
   if(iter == mNodeIndexMap.end())
   {
     renderItemMapIndex = mUniformIndexMaps.size();
@@ -693,7 +693,7 @@ void Renderer::WriteUniformBuffer(
   const Matrix&                        viewMatrix,
   const Matrix&                        projectionMatrix,
   const Vector3&                       size,
-  int                                  nodeIndex)
+  std::size_t                          nodeIndex)
 {
   // Create the UBO
   uint32_t uboOffset{0u};
@@ -797,7 +797,7 @@ void Renderer::FillUniformBuffer(Program&                                      p
                                  std::vector<Graphics::UniformBufferBinding>*& outBindings,
                                  uint32_t&                                     offset,
                                  BufferIndex                                   updateBufferIndex,
-                                 int                                           nodeIndex)
+                                 std::size_t                                   nodeIndex)
 {
   auto& reflection = mGraphicsController->GetProgramReflection(program.GetGraphicsProgram());
   auto  uboCount   = reflection.GetUniformBlockCount();

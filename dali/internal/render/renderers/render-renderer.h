@@ -468,7 +468,7 @@ private:
    *
    * @return the index of the node in change counters store / uniform maps store.
    */
-  int BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider& node, const Vector3& size, Program& program);
+  std::size_t BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider& node, const Vector3& size, Program& program);
 
   /**
    * Bind the textures and setup the samplers
@@ -515,7 +515,7 @@ private:
                           const Matrix&                        viewMatrix,
                           const Matrix&                        projectionMatrix,
                           const Vector3&                       size,
-                          int                                  nodeIndex);
+                          std::size_t                          nodeIndex);
 
   /**
    * @brief Fill uniform buffer at index. Writes uniforms into given memory address
@@ -532,7 +532,7 @@ private:
                          std::vector<Graphics::UniformBufferBinding>*& outBindings,
                          uint32_t&                                     offset,
                          BufferIndex                                   updateBufferIndex,
-                         int                                           nodeIndex);
+                         std::size_t                                   nodeIndex);
 
 private:
   Graphics::Controller*           mGraphicsController;
