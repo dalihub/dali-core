@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_EVENT_GESTURE_EVENT_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,6 +55,16 @@ struct GestureEvent
    * The time the gesture took place.
    */
   uint32_t time;
+
+  /**
+   * This is the value of which source the gesture was started with. (ex : mouse)
+   */
+  GestureSourceType sourceType;
+
+  /**
+   * The data of the source type.
+   */
+  GestureSourceData sourceData;
 
 protected: // Constructors only to be used by derived structures.
   /**

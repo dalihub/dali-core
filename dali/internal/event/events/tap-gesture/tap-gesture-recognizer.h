@@ -151,8 +151,7 @@ private:
   uint32_t mLastTapTime;   ///< Time last tap gesture was registered
   uint32_t mLastTouchTime; ///< The last touch down time.
 
-  GestureSourceType mGestureSourceType;  /// < Gesture input source type value.
-  uint32_t          mMaximumAllowedTime; ///< The maximum allowed time required to be recognized as a multi tap gesture (millisecond)
+  uint32_t mMaximumAllowedTime; ///< The maximum allowed time required to be recognized as a multi tap gesture (millisecond)
 };
 
 } // namespace Internal

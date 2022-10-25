@@ -2,7 +2,7 @@
 #define DALI_TAP_GESTURE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -119,12 +119,6 @@ public:
    * @return The point where tap has occurred (in local actor coordinates)
    */
   const Vector2& GetLocalPoint() const;
-
-  /**
-   * @brief This is the input type of which was tapped.
-   * @return The input type which was tapped.
-   */
-  const GestureSourceType& GetSourceType() const;
 
 public: // Not intended for application developers
   /// @cond internal
