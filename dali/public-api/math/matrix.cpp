@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <ostream>
 
 // INTERNAL INCLUDES
+#include <dali/internal/common/matrix-utils.h>
 #include <dali/internal/render/common/performance-monitor.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/math-utils.h>
@@ -42,44 +43,6 @@ const uint32_t NUM_BYTES_IN_MATRIX(16 * sizeof(float));
 const uint32_t ROW1_OFFSET(4);
 const uint32_t ROW2_OFFSET(8);
 const uint32_t ROW3_OFFSET(12);
-
-/**
- * Helper to convert to Quaternion to float16 array
- */
-void Convert(float*& m, const Dali::Quaternion& rotation)
-{
-  const float xx = rotation.mVector.x * rotation.mVector.x;
-  const float yy = rotation.mVector.y * rotation.mVector.y;
-  const float zz = rotation.mVector.z * rotation.mVector.z;
-  const float xy = rotation.mVector.x * rotation.mVector.y;
-  const float xz = rotation.mVector.x * rotation.mVector.z;
-  const float wx = rotation.mVector.w * rotation.mVector.x;
-  const float wy = rotation.mVector.w * rotation.mVector.y;
-  const float wz = rotation.mVector.w * rotation.mVector.z;
-  const float yz = rotation.mVector.y * rotation.mVector.z;
-
-  // clang-format off
-  m[0] = 1.0f - 2.0f * (yy + zz);
-  m[1] =        2.0f * (xy + wz);
-  m[2] =        2.0f * (xz - wy);
-  m[3] = 0.0f;
-
-  m[4] =        2.0f * (xy - wz);
-  m[5] = 1.0f - 2.0f * (xx + zz);
-  m[6] =        2.0f * (yz + wx);
-  m[7] = 0.0f;
-
-  m[8] =        2.0f * (xz + wy);
-  m[9] =        2.0f * (yz - wx);
-  m[10]= 1.0f - 2.0f * (xx + yy);
-  m[11]= 0.0f;
-
-  m[12]= 0.0f;
-  m[13]= 0.0f;
-  m[14]= 0.0f;
-  m[15]= 1.0f;
-  // clang-format on
-}
 } // namespace
 
 namespace Dali
@@ -119,7 +82,7 @@ Matrix::Matrix(const Quaternion& rotation)
   MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY, 18);
 
   float* matrixPtr = &mMatrix[0];
-  Convert(matrixPtr, rotation);
+  Internal::MatrixUtils::ConvertQuaternion(matrixPtr, rotation);
 }
 
 Matrix::Matrix(const Matrix& matrix)
@@ -284,168 +247,25 @@ void Matrix::SetTranslation(const Vector3& other)
 
 void Matrix::Multiply(Matrix& result, const Matrix& lhs, const Matrix& rhs)
 {
-  MATH_INCREASE_COUNTER(PerformanceMonitor::MATRIX_MULTIPLYS);
-  MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY, 64); // 64 = 16*4
-
-  float*       temp   = result.AsFloat();
-  const float* rhsPtr = rhs.AsFloat();
-  const float* lhsPtr = lhs.AsFloat();
-
-#ifndef __ARM_NEON__
-
-  for(int32_t i = 0; i < 4; i++)
-  {
-    // i<<2 gives the first vector / column
-    int32_t loc    = i << 2;
-    int32_t loc1   = loc + 1;
-    int32_t loc2   = loc + 2;
-    int32_t loc3   = loc + 3;
-    float   value0 = lhsPtr[loc];
-    float   value1 = lhsPtr[loc1];
-    float   value2 = lhsPtr[loc2];
-    float   value3 = lhsPtr[loc3];
-
-    temp[loc] = (value0 * rhsPtr[0]) +
-                (value1 * rhsPtr[4]) +
-                (value2 * rhsPtr[8]) +
-                (value3 * rhsPtr[12]);
-
-    temp[loc1] = (value0 * rhsPtr[1]) +
-                 (value1 * rhsPtr[5]) +
-                 (value2 * rhsPtr[9]) +
-                 (value3 * rhsPtr[13]);
-
-    temp[loc2] = (value0 * rhsPtr[2]) +
-                 (value1 * rhsPtr[6]) +
-                 (value2 * rhsPtr[10]) +
-                 (value3 * rhsPtr[14]);
-
-    temp[loc3] = (value0 * rhsPtr[3]) +
-                 (value1 * rhsPtr[7]) +
-                 (value2 * rhsPtr[11]) +
-                 (value3 * rhsPtr[15]);
-  }
-
-#else
-
-  // 64 32bit registers,
-  // aliased to
-  // d = 64 bit double-word d0 -d31
-  // q =128 bit quad-word   q0 -q15  (enough to handle a column of 4 floats in a matrix)
-  // e.g. q0 = d0 and d1
-
-  // load and stores interleaved as NEON can load and store while calculating
-  asm volatile(
-    "VLDM         %1,  {q0-q3}        \n\t" // load matrix 1 (lhsPtr) q[0..q3]
-    "VLDM         %0,  {q8-q11}       \n\t" // load matrix 2 (rhsPtr) q[q8-q11]
-    "VMUL.F32     q12, q8, d0[0]      \n\t" // column 0 = rhsPtr[0..3] * lhsPtr[0..3]
-    "VMUL.F32     q13, q8, d2[0]      \n\t" // column 1 = rhsPtr[0..3] * lhsPtr[4..7]
-    "VMUL.F32     q14, q8, d4[0]      \n\t" // column 2 = rhsPtr[0..3] * lhsPtr[8..11]
-    "VMUL.F32     q15, q8, d6[0]      \n\t" // column 3 = rhsPtr[0..3] * lhsPtr[12..15]
-
-    "VMLA.F32     q12, q9, d0[1]      \n\t" // column 0 += rhsPtr[4..7] * lhsPtr[0..3]
-    "VMLA.F32     q13, q9, d2[1]      \n\t" // column 1 += rhsPtr[4..7] * lhsPtr[4..7]
-    "VMLA.F32     q14, q9, d4[1]      \n\t" // column 2 += rhsPtr[4..7] * lhsPtr[8..11]
-    "VMLA.F32     q15, q9, d6[1]      \n\t" // column 3 += rhsPtr[4..7] * lhsPtr[12..15]
-
-    "VMLA.F32     q12, q10, d1[0]     \n\t" // column 0 += rhsPtr[8..11] * lhsPtr[0..3]
-    "VMLA.F32     q13, q10, d3[0]     \n\t" // column 1 += rhsPtr[8..11] * lhsPtr[4..7]
-    "VMLA.F32     q14, q10, d5[0]     \n\t" // column 2 += rhsPtr[8..11] * lhsPtr[8..11]
-    "VMLA.F32     q15, q10, d7[0]     \n\t" // column 3 += rhsPtr[8..11] * lhsPtr[12..15]
-
-    "VMLA.F32     q12, q11, d1[1]     \n\t" // column 0 += rhsPtr[12..15] * lhsPtr[0..3]
-    "VMLA.F32     q13, q11, d3[1]     \n\t" // column 1 += rhsPtr[12..15] * lhsPtr[4..7]
-    "VMLA.F32     q14, q11, d5[1]     \n\t" // column 2 += rhsPtr[12..15] * lhsPtr[8..11]
-    "VMLA.F32     q15, q11, d7[1]     \n\t" // column 3 += rhsPtr[12..15] * lhsPtr[12..15]
-    "VSTM         %2,  {q12-q15}      \n\t" // store entire output matrix.
-    : "+r"(rhsPtr), "+r"(lhsPtr), "+r"(temp)
-    :
-    : "q0", "q1", "q2", "q3", "q8", "q9", "q10", "q11", "q12", "q13", "q14", "q15", "memory");
-
-#endif
+  Internal::MatrixUtils::Multiply(result, lhs, rhs);
 }
 
 void Matrix::Multiply(Matrix& result, const Matrix& lhs, const Quaternion& rhs)
 {
-  MATH_INCREASE_COUNTER(PerformanceMonitor::MATRIX_MULTIPLYS);
-  MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY, 54); // 54 = 36+18
+  Internal::MatrixUtils::Multiply(result, lhs, rhs);
+}
 
-  float  matrix[16];
-  float* rhsPtr = &matrix[0];
-  Convert(rhsPtr, rhs);
+Matrix Matrix::operator*(const Matrix& rhs) const
+{
+  Matrix result(false);
+  Internal::MatrixUtils::Multiply(result, rhs, *this);
+  return result;
+}
 
-  // quaternion contains just rotation so it really only needs 3x3 matrix
-
-  float*       temp   = result.AsFloat();
-  const float* lhsPtr = lhs.AsFloat();
-
-#ifndef __ARM_NEON__
-
-  for(int32_t i = 0; i < 4; i++)
-  {
-    // i<<2 gives the first vector / column
-    int32_t loc    = i << 2;
-    int32_t loc1   = loc + 1;
-    int32_t loc2   = loc + 2;
-    int32_t loc3   = loc + 3;
-    float   value0 = lhsPtr[loc];
-    float   value1 = lhsPtr[loc1];
-    float   value2 = lhsPtr[loc2];
-    float   value3 = lhsPtr[loc3];
-
-    temp[loc] = (value0 * rhsPtr[0]) +
-                (value1 * rhsPtr[4]) +
-                (value2 * rhsPtr[8]) +
-                (0.0f); //value3 * rhsPtr[12] is 0.0f
-
-    temp[loc1] = (value0 * rhsPtr[1]) +
-                 (value1 * rhsPtr[5]) +
-                 (value2 * rhsPtr[9]) +
-                 (0.0f); //value3 * rhsPtr[13] is 0.0f
-
-    temp[loc2] = (value0 * rhsPtr[2]) +
-                 (value1 * rhsPtr[6]) +
-                 (value2 * rhsPtr[10]) +
-                 (0.0f); //value3 * rhsPtr[14] is 0.0f
-
-    temp[loc3] = (0.0f) +  //value0 * rhsPtr[3] is 0.0f
-                 (0.0f) +  //value1 * rhsPtr[7] is 0.0f
-                 (0.0f) +  //value2 * rhsPtr[11] is 0.0f
-                 (value3); // rhsPtr[15] is 1.0f
-  }
-
-#else
-
-  // 64 32bit registers,
-  // aliased to
-  // d = 64 bit double-word d0 -d31
-  // q =128 bit quad-word   q0 -q15  (enough to handle a column of 4 floats in a matrix)
-  // e.g. q0 = d0 and d1
-  // load and stores interleaved as NEON can load and store while calculating
-  asm volatile(
-    "VLDM         %1,   {q4-q6}       \n\t" // load matrix 1 (lhsPtr)
-    "VLD1.F32     {q7}, [%2]!         \n\t" // load matrix 2 (rhsPtr) [0..3]
-    "VMUL.F32     q0,   q7,   d8[0]   \n\t" // column 0 = rhsPtr[0..3] * lhsPtr[0..3]
-    "VMUL.F32     q1,   q7,   d10[0]  \n\t" // column 1 = rhsPtr[0..3] * lhsPtr[4..7]
-    "VMUL.F32     q2,   q7,   d12[0]  \n\t" // column 2 = rhsPtr[0..3] * lhsPtr[8..11]
-    "VLD1.F32     {q7}, [%2]!         \n\t" // load matrix 2 (rhsPtr) [4..7]
-    "VMLA.F32     q0,   q7,   d8[1]   \n\t" // column 0+= rhsPtr[4..7] * lhsPtr[0..3]
-    "VMLA.F32     q1,   q7,   d10[1]  \n\t" // column 1+= rhsPtr[4..7] * lhsPtr[4..7]
-    "VMLA.F32     q2,   q7,   d12[1]  \n\t" // column 2+= rhsPtr[4..7] * lhsPtr[8..11]
-    "VLD1.F32     {q7}, [%2]!         \n\t" // load matrix 2 (rhsPtr) [8..11]
-    "VMLA.F32     q0,   q7,   d9[0]   \n\t" // column 0+= rhsPtr[8..11] * lhsPtr[0..3]
-    "VMLA.F32     q1,   q7,   d11[0]  \n\t" // column 1+= rhsPtr[8..11] * lhsPtr[4..7]
-    "VMLA.F32     q2,   q7,   d13[0]  \n\t" // column 2+= rhsPtr[8..11] * lhsPtr[8..11]
-    "VSTM         %0,   {q0-q2}       \n\t" // store entire output matrix.
-    :
-    : "r"(temp), "r"(lhsPtr), "r"(rhsPtr)
-    : "%r0", "%q0", "%q1", "%q2", "%q4", "%q5", "%q6", "%q7", "memory");
-
-  temp[12] = 0.0f;
-  temp[13] = 0.0f;
-  temp[14] = 0.0f;
-  temp[15] = 1.0f;
-#endif
+Matrix& Matrix::operator*=(const Matrix& rhs)
+{
+  Internal::MatrixUtils::MultiplyAssign(*this, rhs);
+  return *this;
 }
 
 Vector4 Matrix::operator*(const Vector4& rhs) const

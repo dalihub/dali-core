@@ -17,6 +17,7 @@ SET(TC_SOURCES
         utc-Dali-Internal-IndexedConstStringMap.cpp
         utc-Dali-Internal-IndexedIntegerMap.cpp
         utc-Dali-Internal-LongPressGesture.cpp
+        utc-Dali-Internal-MatrixUtils.cpp
         utc-Dali-Internal-MemoryPoolObjectAllocator.cpp
         utc-Dali-Internal-OwnerPointer.cpp
         utc-Dali-Internal-PinchGesture.cpp

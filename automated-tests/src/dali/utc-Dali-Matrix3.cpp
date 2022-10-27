@@ -354,6 +354,48 @@ int UtcDaliMatrix3OperatorMultiply03P(void)
   END_TEST;
 }
 
+int UtcDaliMatrix3OperatorMultiplyAssign01P(void)
+{
+  tet_infoline("Multiplication Assign operator\n");
+  Matrix3 left(
+    1.0f, 2.0f, 3.0f, 5.0f, 6.0f, 7.0f, 9.0f, 10.0f, 0.0f);
+  Matrix3 right(
+    1.0f, 5.0f, 9.0f, 2.0f, 6.0f, 11.0f, 3.0f, 7.0f, 0.0f);
+  Matrix3 copiedLeft(left);
+
+  Matrix3 result(
+    107.0f, 122.0f, 38.0f, 131.0f, 150.0f, 48.0f, 38.0f, 48.0f, 58.0f);
+
+  // Get result by operator*
+  Matrix3 multResult = left * right;
+  DALI_TEST_EQUALS(multResult, result, 0.01f, TEST_LOCATION);
+
+  // Get result by operator*=
+  left *= right;
+  DALI_TEST_EQUALS(left, result, 0.01f, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliMatrix3OperatorMultiplyAssign02P(void)
+{
+  tet_infoline("Multiplication Assign operator with self matrix\n");
+  Matrix3 left(
+    1.0f, 2.0f, 3.0f, 5.0f, 6.0f, 7.0f, 9.0f, 10.0f, 0.0f);
+  Matrix3 copiedLeft(left);
+
+  Matrix3 result(
+    38.0f, 44.0f, 17.0f, 98.0f, 116.0f, 57.0f, 59.0f, 78.0f, 97.0f);
+
+  // Get result by operator*
+  Matrix3 multResult = left * copiedLeft;
+  DALI_TEST_EQUALS(multResult, result, 0.01f, TEST_LOCATION);
+
+  // Get result by operator*=
+  left *= left;
+  DALI_TEST_EQUALS(left, result, 0.01f, TEST_LOCATION);
+  END_TEST;
+}
+
 int UtcDaliMatrix3EqualityOperator(void)
 {
   Matrix3 m1(0.0f, 3.0f, 6.0f, 12.0f, 15.0f, 18.0f, 24.0f, 27.0f, 30.0f);

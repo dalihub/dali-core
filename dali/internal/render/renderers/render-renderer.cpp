@@ -22,6 +22,7 @@
 #include <dali/graphics-api/graphics-types.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/common/image-sampler.h>
+#include <dali/internal/common/matrix-utils.h>
 #include <dali/internal/event/rendering/texture-impl.h>
 #include <dali/internal/render/common/render-instruction.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>
@@ -478,7 +479,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
     mRenderCallbackInput.size       = size;
     mRenderCallbackInput.projection = projectionMatrix;
 
-    Matrix::Multiply(mRenderCallbackInput.mvp, modelViewMatrix, projectionMatrix);
+    MatrixUtils::Multiply(mRenderCallbackInput.mvp, modelViewMatrix, projectionMatrix);
 
     // submit draw
     commandBuffer.DrawNative(&info);
@@ -731,7 +732,7 @@ void Renderer::WriteUniformBuffer(
     if(mvpUniformInfo && !mvpUniformInfo->name.empty())
     {
       Matrix modelViewProjectionMatrix(false);
-      Matrix::Multiply(modelViewProjectionMatrix, modelViewMatrix, projectionMatrix);
+      MatrixUtils::Multiply(modelViewProjectionMatrix, modelViewMatrix, projectionMatrix);
       WriteDefaultUniform(mvpUniformInfo, *uboView, modelViewProjectionMatrix);
     }
 

@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/internal/common/matrix-utils.h>
 #include <dali/internal/event/actors/layer-impl.h> // for the default sorting function
 #include <dali/internal/render/common/render-instruction-container.h>
 #include <dali/internal/render/common/render-instruction.h>
@@ -220,7 +221,7 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
 
       if(size.LengthSquared() > Math::MACHINE_EPSILON_1000)
       {
-        Matrix::Multiply(nodeModelViewMatrix, nodeWorldMatrix, viewMatrix);
+        MatrixUtils::Multiply(nodeModelViewMatrix, nodeWorldMatrix, viewMatrix);
         nodeModelViewMatrixSet = true;
 
         // Assume actors are at z=0, compute AABB in view space & test rect intersection
@@ -317,7 +318,7 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
 
       if(!nodeModelViewMatrixSet)
       {
-        Matrix::Multiply(nodeModelViewMatrix, nodeWorldMatrix, viewMatrix);
+        MatrixUtils::Multiply(nodeModelViewMatrix, nodeWorldMatrix, viewMatrix);
       }
       item.mModelViewMatrix = nodeModelViewMatrix;
 

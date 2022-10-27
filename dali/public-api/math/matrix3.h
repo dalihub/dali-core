@@ -272,12 +272,20 @@ public:
    * @param[in] rhs The Matrix to multiply this by
    * @return A Matrix containing the result
    */
-  Matrix3 operator*(const Matrix3& rhs) const
-  {
-    Matrix3 result;
-    Multiply(result, rhs, *this);
-    return result;
-  }
+  Matrix3 operator*(const Matrix3& rhs) const;
+
+  /**
+   * @brief Multiplication assignment operator.
+   *
+   * This Matrix *= rhs
+   *
+   * @note It makes some memory allocate & copy internally.
+   *
+   * @SINCE_2_1.46
+   * @param[in] rhs The Matrix to multiply this by
+   * @return Itself
+   */
+  Matrix3& operator*=(const Matrix3& rhs);
 
   /**
    * @brief The multiplication operator.
