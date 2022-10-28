@@ -3666,9 +3666,9 @@ int UtcDaliRenderTaskViewportGuideActor02(void)
   renderTask.SetSourceActor(blue);
   renderTask.SetViewportGuideActor(blue);
 
-  application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_HEIGHT,
-                                        TestApplication::DEFAULT_SURFACE_WIDTH,
-                                        90);
+  application.GetScene().SurfaceRotated(static_cast<float>(TestApplication::DEFAULT_SURFACE_HEIGHT),
+                                        static_cast<float>(TestApplication::DEFAULT_SURFACE_WIDTH),
+                                        90, 0);
 
   // Render and notify
   application.SendNotification();

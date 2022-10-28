@@ -30,9 +30,9 @@ namespace Dali
 {
 namespace Integration
 {
-Scene Scene::New(Size size, int32_t orientation)
+Scene Scene::New(Size size, int32_t windowOrientation, int32_t screenOrientation)
 {
-  Internal::ScenePtr internal = Internal::Scene::New(size, orientation);
+  Internal::ScenePtr internal = Internal::Scene::New(size, windowOrientation, screenOrientation);
   return Scene(internal.Get());
 }
 
@@ -164,14 +164,19 @@ void Scene::GetFramePresentedCallback(FrameCallbackContainer& callbacks)
   GetImplementation(*this).GetFramePresentedCallback(callbacks);
 }
 
-void Scene::SurfaceRotated(float width, float height, int32_t orientation)
+void Scene::SurfaceRotated(float width, float height, int32_t windowOrientation, int32_t screenOrientation)
 {
-  GetImplementation(*this).SurfaceRotated(width, height, orientation);
+  GetImplementation(*this).SurfaceRotated(width, height, windowOrientation, screenOrientation);
 }
 
 int32_t Scene::GetCurrentSurfaceOrientation() const
 {
   return GetImplementation(*this).GetCurrentSurfaceOrientation();
+}
+
+int32_t Scene::GetCurrentScreenOrientation() const
+{
+  return GetImplementation(*this).GetCurrentScreenOrientation();
 }
 
 const Rect<int32_t>& Scene::GetCurrentSurfaceRect() const
