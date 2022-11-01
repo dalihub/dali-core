@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_GESTURE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,6 +85,42 @@ public:
     return mTime;
   }
 
+  /**
+   * @brief Sets the value of which source the gesture was started with. (ex : mouse)
+   * @param[in] source The gesture source type.
+   */
+  inline void SetSourceType(GestureSourceType source)
+  {
+    mSourceType = source;
+  }
+
+  /**
+   * @brief Gets the value of which source the gesture was started with.
+   * @return The gesture source type.
+   */
+  inline GestureSourceType GetSourceType() const
+  {
+    return mSourceType;
+  }
+
+  /**
+   * @brief Sets the value of source data.
+   * @param[in] data The gesture source data.
+   */
+  inline void SetSourceData(GestureSourceData data)
+  {
+    mSourceData = data;
+  }
+
+  /**
+   * @brief Gets the data of source type.
+   * @return The gesture source data.
+   */
+  inline GestureSourceData GetSourceData() const
+  {
+    return mSourceData;
+  }
+
   Gesture(const Gesture&) = delete;            ///< Deleted copy constructor
   Gesture(Gesture&&)      = delete;            ///< Deleted move constructor
   Gesture& operator=(const Gesture&) = delete; ///< Deleted copy assignment operator
@@ -98,7 +134,9 @@ protected:
    */
   Gesture(GestureType::Value gestureType, GestureState gestureState)
   : mGestureType(gestureType),
-    mState(gestureState)
+    mState(gestureState),
+    mSourceType(GestureSourceType::INVALID),
+    mSourceData(GestureSourceData::INVALID)
   {
   }
 
@@ -113,6 +151,8 @@ private:
   GestureType::Value mGestureType;
   GestureState       mState;
   uint32_t           mTime{0u};
+  GestureSourceType  mSourceType;
+  GestureSourceData  mSourceData;
 };
 
 } // namespace Internal

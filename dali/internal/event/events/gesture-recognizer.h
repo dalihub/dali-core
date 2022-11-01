@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_GESTURE_RECOGNIZER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/internal/event/events/gesture-event.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/events/gesture.h>
@@ -86,6 +87,38 @@ public:
   void SendEvent(Scene& scene, const Integration::TouchEvent& event)
   {
     mScene = &scene;
+    if(event.GetPointCount() > 0)
+    {
+      const Integration::Point& point       = event.points[0];
+      MouseButton::Type         mouseButton = point.GetMouseButton();
+      if(mouseButton != MouseButton::INVALID)
+      {
+        mSourceType = GestureSourceType::MOUSE;
+        switch(mouseButton)
+        {
+          case MouseButton::PRIMARY:
+          {
+            mSourceData = GestureSourceData::MOUSE_PRIMARY;
+            break;
+          }
+          case MouseButton::SECONDARY:
+          {
+            mSourceData = GestureSourceData::MOUSE_SECONDARY;
+            break;
+          }
+          case MouseButton::TERTIARY:
+          {
+            mSourceData = GestureSourceData::MOUSE_TERTIARY;
+            break;
+          }
+          default:
+          {
+            mSourceData = GestureSourceData::INVALID;
+            break;
+          }
+        }
+      }
+    }
     SendEvent(event);
   }
 
@@ -98,7 +131,9 @@ protected:
   GestureRecognizer(Vector2 screenSize, GestureType::Value detectorType)
   : mScreenSize(screenSize),
     mType(detectorType),
-    mScene(nullptr)
+    mScene(nullptr),
+    mSourceType(GestureSourceType::INVALID),
+    mSourceData(GestureSourceData::INVALID)
   {
   }
 
@@ -122,6 +157,8 @@ protected:
   Vector2            mScreenSize;
   GestureType::Value mType;
   Scene*             mScene;
+  GestureSourceType  mSourceType; /// < Gesture input source type.
+  GestureSourceData  mSourceData; /// < Gesture input source data.
 };
 
 using GestureRecognizerPtr = IntrusivePtr<GestureRecognizer>;

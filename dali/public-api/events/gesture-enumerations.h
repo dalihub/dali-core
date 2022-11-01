@@ -2,7 +2,7 @@
 #define DALI_GESTURE_ENUMERATIONS_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,13 +55,24 @@ enum class GestureState : uint8_t
 
 /**
  * @brief Enumeration for gesture input source type.
+ * @SINCE_2_2.0
  */
 enum class GestureSourceType : int8_t
 {
-  INVALID   = -1, ///< invalid data
-  PRIMARY   = 1,  ///< Primary
-  SECONDARY = 3,  ///< Secondary
-  TERTIARY  = 2,  ///< Third (tertiary)
+  INVALID, ///< invalid data
+  MOUSE,   ///< mouse
+};
+
+/**
+ * @brief Enumeration for data of gesture input source type.
+ * @SINCE_2_2.0
+ */
+enum class GestureSourceData : int8_t
+{
+  INVALID         = -1, ///< invalid data
+  MOUSE_PRIMARY   = 1,  /**< Primary(Left) mouse button */
+  MOUSE_SECONDARY = 3,  /**< Secondary(Right) mouse button */
+  MOUSE_TERTIARY  = 2,  /**< Center(Wheel) mouse button */
 };
 
 } // namespace Dali

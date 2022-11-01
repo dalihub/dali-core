@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TAP_GESTURE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,23 +118,6 @@ public:
     return mLocalPoint;
   }
 
-  /**
-   * @brief This is the value of which input was tapped.
-   * @param[in] source This is the value of which input was tapped to set.
-   */
-  inline void SetGestureSourceType(const GestureSourceType sourceType)
-  {
-    mGestureSourceType = sourceType;
-  }
-
-  /**
-   * @copydoc Dali::TapGesture::GetSourceType()
-   */
-  inline const GestureSourceType& GetSourceType() const
-  {
-    return mGestureSourceType;
-  }
-
 private:
   /**
    * @brief Virtual destructor
@@ -144,11 +127,10 @@ private:
   ~TapGesture() override = default;
 
 private:
-  Vector2           mScreenPoint;
-  Vector2           mLocalPoint;
-  uint32_t          mNumberOfTaps{1u};
-  uint32_t          mNumberOfTouches{1u};
-  GestureSourceType mGestureSourceType{GestureSourceType::INVALID};
+  Vector2  mScreenPoint;
+  Vector2  mLocalPoint;
+  uint32_t mNumberOfTaps{1u};
+  uint32_t mNumberOfTouches{1u};
 };
 
 } // namespace Internal
