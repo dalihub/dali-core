@@ -27,6 +27,7 @@
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/integration-api/processor-interface.h>
 #include <dali/integration-api/render-controller.h>
+#include <dali/integration-api/trace.h>
 
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/animation/animation-playlist.h>
@@ -58,6 +59,8 @@ namespace
 {
 // The Update for frame N+1 may be processed whilst frame N is being rendered.
 const uint32_t MAXIMUM_UPDATE_COUNT = 2u;
+
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
 
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gCoreFilter = Debug::Filter::New(Debug::Concise, false, "LOG_CORE");
@@ -365,61 +368,73 @@ void Core::UnregisterProcessor(Integration::Processor& processor, bool postProce
 
 void Core::RunProcessors()
 {
-  // Copy processor pointers to prevent changes to vector affecting loop iterator.
-  Dali::Vector<Integration::Processor*> processors(mProcessors);
-
-  // To prevent accessing processor unregistered during the loop
-  mProcessorUnregistered = false;
-
-  for(auto processor : processors)
+  if(mProcessors.Count() != 0)
   {
-    if(processor)
+    DALI_TRACE_BEGIN(gTraceFilter, "DALI_CORE_RUN_PROCESSORS");
+
+    // Copy processor pointers to prevent changes to vector affecting loop iterator.
+    Dali::Vector<Integration::Processor*> processors(mProcessors);
+
+    // To prevent accessing processor unregistered during the loop
+    mProcessorUnregistered = false;
+
+    for(auto processor : processors)
     {
-      if(!mProcessorUnregistered)
+      if(processor)
       {
-        processor->Process(false);
-      }
-      else
-      {
-        // Run processor if the processor is still in the list.
-        // It may be removed during the loop.
-        auto iter = std::find(mProcessors.Begin(), mProcessors.End(), processor);
-        if(iter != mProcessors.End())
+        if(!mProcessorUnregistered)
         {
           processor->Process(false);
         }
+        else
+        {
+          // Run processor if the processor is still in the list.
+          // It may be removed during the loop.
+          auto iter = std::find(mProcessors.Begin(), mProcessors.End(), processor);
+          if(iter != mProcessors.End())
+          {
+            processor->Process(false);
+          }
+        }
       }
     }
+    DALI_TRACE_END(gTraceFilter, "DALI_CORE_RUN_PROCESSORS");
   }
 }
 
 void Core::RunPostProcessors()
 {
-  // Copy processor pointers to prevent changes to vector affecting loop iterator.
-  Dali::Vector<Integration::Processor*> processors(mPostProcessors);
-
-  // To prevent accessing processor unregistered during the loop
-  mPostProcessorUnregistered = false;
-
-  for(auto processor : processors)
+  if(mPostProcessors.Count() != 0)
   {
-    if(processor)
+    DALI_TRACE_BEGIN(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSORS");
+
+    // Copy processor pointers to prevent changes to vector affecting loop iterator.
+    Dali::Vector<Integration::Processor*> processors(mPostProcessors);
+
+    // To prevent accessing processor unregistered during the loop
+    mPostProcessorUnregistered = false;
+
+    for(auto processor : processors)
     {
-      if(!mPostProcessorUnregistered)
+      if(processor)
       {
-        processor->Process(true);
-      }
-      else
-      {
-        // Run processor if the processor is still in the list.
-        // It may be removed during the loop.
-        auto iter = std::find(mPostProcessors.Begin(), mPostProcessors.End(), processor);
-        if(iter != mPostProcessors.End())
+        if(!mPostProcessorUnregistered)
         {
           processor->Process(true);
         }
+        else
+        {
+          // Run processor if the processor is still in the list.
+          // It may be removed during the loop.
+          auto iter = std::find(mPostProcessors.Begin(), mPostProcessors.End(), processor);
+          if(iter != mPostProcessors.End())
+          {
+            processor->Process(true);
+          }
+        }
       }
     }
+    DALI_TRACE_END(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSORS");
   }
 }
 

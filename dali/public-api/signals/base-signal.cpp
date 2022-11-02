@@ -19,27 +19,36 @@
 #include <dali/public-api/signals/base-signal.h>
 
 // EXTERNAL INCLUDES
-#include <unordered_map>
+#include <map>
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 
 namespace
 {
-struct CallbackBasePtrHash
-{
-  std::size_t operator()(const Dali::CallbackBase* callback) const noexcept
-  {
-    std::size_t functionHash = reinterpret_cast<std::size_t>(reinterpret_cast<void*>(callback->mFunction));
-    std::size_t objectHash   = reinterpret_cast<std::size_t>(reinterpret_cast<void*>(callback->mImpl.mObjectPointer));
-    return functionHash ^ objectHash;
-  }
-};
-struct CallbackBasePtrEqual
+struct CallbackBasePtrCompare
 {
   bool operator()(const Dali::CallbackBase* lhs, const Dali::CallbackBase* rhs) const noexcept
   {
-    return (*lhs) == (*rhs);
+    const void* lhsFunctionPtr = reinterpret_cast<void*>(lhs->mFunction);
+    const void* rhsFunctionPtr = reinterpret_cast<void*>(rhs->mFunction);
+    if(lhsFunctionPtr < rhsFunctionPtr)
+    {
+      return true;
+    }
+    else if(lhsFunctionPtr > rhsFunctionPtr)
+    {
+      return false;
+    }
+
+    if(lhs->mImpl.mObjectPointer < rhs->mImpl.mObjectPointer)
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
   }
 };
 } // unnamed namespace
@@ -57,9 +66,9 @@ struct BaseSignal::Impl
   /**
    * @brief Get the iterator of connections list by the callback base pointer.
    * Note that we should compare the 'value' of callback, not pointer.
-   * So, we need to define custom hash & compare functor of callback base pointer.
+   * So, we need to define custom compare functor of callback base pointer.
    */
-  std::unordered_map<const CallbackBase*, std::list<SignalConnection>::iterator, CallbackBasePtrHash, CallbackBasePtrEqual> mCallbackCache;
+  std::map<const CallbackBase*, std::list<SignalConnection>::iterator, CallbackBasePtrCompare> mCallbackCache;
 };
 
 BaseSignal::BaseSignal()

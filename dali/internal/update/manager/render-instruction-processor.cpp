@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/internal/common/matrix-utils.h>
 #include <dali/internal/event/actors/layer-impl.h> // for the default sorting function
 #include <dali/internal/render/common/render-instruction-container.h>
 #include <dali/internal/render/common/render-instruction.h>
@@ -181,15 +182,15 @@ inline bool SetNodeUpdateArea(Node* node, bool isLayer3d, Matrix& nodeWorldMatri
  * @param viewport The viewport
  * @param cull Whether frustum culling is enabled or not
  */
-inline void AddRendererToRenderList(BufferIndex         updateBufferIndex,
-                                    RenderList&         renderList,
-                                    Renderable&         renderable,
-                                    const Matrix&       viewMatrix,
-                                    SceneGraph::Camera& camera,
-                                    bool                isLayer3d,
-                                    bool                viewportSet,
-                                    const Viewport&     viewport,
-                                    bool                cull)
+inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
+                                    RenderList&               renderList,
+                                    Renderable&               renderable,
+                                    const Matrix&             viewMatrix,
+                                    const SceneGraph::Camera& camera,
+                                    bool                      isLayer3d,
+                                    bool                      viewportSet,
+                                    const Viewport&           viewport,
+                                    bool                      cull)
 {
   bool    inside(true);
   Node*   node = renderable.mNode;
@@ -220,7 +221,7 @@ inline void AddRendererToRenderList(BufferIndex         updateBufferIndex,
 
       if(size.LengthSquared() > Math::MACHINE_EPSILON_1000)
       {
-        Matrix::Multiply(nodeModelViewMatrix, nodeWorldMatrix, viewMatrix);
+        MatrixUtils::Multiply(nodeModelViewMatrix, nodeWorldMatrix, viewMatrix);
         nodeModelViewMatrixSet = true;
 
         // Assume actors are at z=0, compute AABB in view space & test rect intersection
@@ -317,7 +318,7 @@ inline void AddRendererToRenderList(BufferIndex         updateBufferIndex,
 
       if(!nodeModelViewMatrixSet)
       {
-        Matrix::Multiply(nodeModelViewMatrix, nodeWorldMatrix, viewMatrix);
+        MatrixUtils::Multiply(nodeModelViewMatrix, nodeWorldMatrix, viewMatrix);
       }
       item.mModelViewMatrix = nodeModelViewMatrix;
 
@@ -361,15 +362,15 @@ inline void AddRendererToRenderList(BufferIndex         updateBufferIndex,
  * @param isLayer3d Whether we are processing a 3D layer or not
  * @param cull Whether frustum culling is enabled or not
  */
-inline void AddRenderersToRenderList(BufferIndex          updateBufferIndex,
-                                     RenderList&          renderList,
-                                     RenderableContainer& renderers,
-                                     const Matrix&        viewMatrix,
-                                     SceneGraph::Camera&  camera,
-                                     bool                 isLayer3d,
-                                     bool                 viewportSet,
-                                     const Viewport&      viewport,
-                                     bool                 cull)
+inline void AddRenderersToRenderList(BufferIndex               updateBufferIndex,
+                                     RenderList&               renderList,
+                                     RenderableContainer&      renderers,
+                                     const Matrix&             viewMatrix,
+                                     const SceneGraph::Camera& camera,
+                                     bool                      isLayer3d,
+                                     bool                      viewportSet,
+                                     const Viewport&           viewport,
+                                     bool                      cull)
 {
   DALI_LOG_INFO(gRenderListLogFilter, Debug::Verbose, "AddRenderersToRenderList()\n");
 
@@ -558,8 +559,8 @@ void RenderInstructionProcessor::Prepare(BufferIndex                 updateBuffe
   bool               isRenderListAdded       = false;
   bool               isRootLayerDirty        = false;
 
-  const Matrix&       viewMatrix = renderTask.GetViewMatrix(updateBufferIndex);
-  SceneGraph::Camera& camera     = renderTask.GetCamera();
+  const Matrix&             viewMatrix = renderTask.GetViewMatrix(updateBufferIndex);
+  const SceneGraph::Camera& camera     = renderTask.GetCamera();
 
   Viewport viewport;
   bool     viewportSet = renderTask.QueryViewport(updateBufferIndex, viewport);
@@ -568,7 +569,7 @@ void RenderInstructionProcessor::Prepare(BufferIndex                 updateBuffe
   for(SortedLayersIter iter = sortedLayers.begin(); iter != endIter; ++iter)
   {
     Layer&      layer = **iter;
-    const bool  tryReuseRenderList(viewMatrixHasNotChanged && layer.CanReuseRenderers(&renderTask.GetCamera()));
+    const bool  tryReuseRenderList(viewMatrixHasNotChanged && layer.CanReuseRenderers(&camera));
     const bool  isLayer3D  = layer.GetBehavior() == Dali::Layer::LAYER_3D;
     RenderList* renderList = nullptr;
 

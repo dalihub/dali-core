@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_ANIMATABLE_PROPERTY_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <limits>
 
 // INTERNAL INCLUDES
+#include <dali/internal/common/matrix-utils.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/property-input-impl.h>
@@ -95,7 +96,6 @@ protected: // for derived classes
   }
 
 public:
-
   /**
    * Mark the property as dirty so that it will be reset to the base value in the next two frames.
    */
@@ -1832,7 +1832,7 @@ public:
   void SetRelative(BufferIndex bufferIndex, const Matrix& delta)
   {
     Matrix temp;
-    Matrix::Multiply(temp, mValue[bufferIndex], delta);
+    MatrixUtils::Multiply(temp, mValue[bufferIndex], delta);
     mValue[bufferIndex] = temp;
 
     OnSet();
@@ -1898,7 +1898,7 @@ public:
   void BakeRelative(BufferIndex bufferIndex, const Matrix& delta)
   {
     Matrix temp;
-    Matrix::Multiply(temp, mValue[bufferIndex], delta);
+    MatrixUtils::Multiply(temp, mValue[bufferIndex], delta);
     mValue[bufferIndex] = temp;
     mBaseValue          = temp;
 
@@ -1988,7 +1988,7 @@ public:
   void SetRelative(BufferIndex bufferIndex, const Matrix3& delta)
   {
     Matrix3 temp;
-    Matrix3::Multiply(temp, mValue[bufferIndex], delta);
+    MatrixUtils::Multiply(temp, mValue[bufferIndex], delta);
     mValue[bufferIndex] = temp;
     OnSet();
   }
@@ -2053,7 +2053,7 @@ public:
   void BakeRelative(BufferIndex bufferIndex, const Matrix3& delta)
   {
     Matrix3 temp;
-    Matrix3::Multiply(temp, mValue[bufferIndex], delta);
+    MatrixUtils::Multiply(temp, mValue[bufferIndex], delta);
     mValue[bufferIndex] = temp;
     mBaseValue          = temp;
 

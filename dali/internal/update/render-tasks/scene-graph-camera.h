@@ -19,10 +19,14 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/actors/camera-actor-devel.h>
 #include <dali/internal/common/message.h>
+#include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/event/common/event-thread-services.h>
+#include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/double-buffered.h>
 #include <dali/internal/update/common/inherited-property.h>
+#include <dali/internal/update/nodes/node.h>
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/math/rect.h>
 
@@ -44,28 +48,28 @@ struct ParameterType<Dali::Camera::ProjectionMode>
 
 namespace SceneGraph
 {
-class Node;
 class SceneController;
 
 /**
  * Scene-graph camera object
  */
-class Camera
+class Camera : public Node
 {
 public:
-  static const Dali::Camera::Type           DEFAULT_TYPE;
-  static const Dali::Camera::ProjectionMode DEFAULT_MODE;
-  static const bool                         DEFAULT_INVERT_Y_AXIS;
-  static const float                        DEFAULT_FIELD_OF_VIEW;
-  static const float                        DEFAULT_ASPECT_RATIO;
-  static const float                        DEFAULT_LEFT_CLIPPING_PLANE;
-  static const float                        DEFAULT_RIGHT_CLIPPING_PLANE;
-  static const float                        DEFAULT_TOP_CLIPPING_PLANE;
-  static const float                        DEFAULT_BOTTOM_CLIPPING_PLANE;
-  static const float                        DEFAULT_NEAR_CLIPPING_PLANE;
-  static const float                        DEFAULT_FAR_CLIPPING_PLANE;
-  static const Vector2                      DEFAULT_STEREO_BIAS;
-  static const Vector3                      DEFAULT_TARGET_POSITION;
+  static const Dali::Camera::Type                          DEFAULT_TYPE;
+  static const Dali::Camera::ProjectionMode                DEFAULT_MODE;
+  static const Dali::DevelCameraActor::ProjectionDirection DEFAULT_PROJECTION_DIRECTION;
+  static const bool                                        DEFAULT_INVERT_Y_AXIS;
+  static const float                                       DEFAULT_FIELD_OF_VIEW;
+  static const float                                       DEFAULT_ASPECT_RATIO;
+  static const float                                       DEFAULT_LEFT_CLIPPING_PLANE;
+  static const float                                       DEFAULT_RIGHT_CLIPPING_PLANE;
+  static const float                                       DEFAULT_TOP_CLIPPING_PLANE;
+  static const float                                       DEFAULT_BOTTOM_CLIPPING_PLANE;
+  static const float                                       DEFAULT_NEAR_CLIPPING_PLANE;
+  static const float                                       DEFAULT_FAR_CLIPPING_PLANE;
+  static const Vector2                                     DEFAULT_STEREO_BIAS;
+  static const Vector3                                     DEFAULT_TARGET_POSITION;
 
   /**
    * Plane equation container for a plane of the view frustum
@@ -92,21 +96,15 @@ public:
   static Camera* New();
 
   /**
-   * Destructor
+   * Virtual destructor
    */
-  ~Camera();
+  ~Camera() override;
 
   /**
-   * Set the node this scene graph camera belongs to.
-   * @param[in] node The owning node.
+   * Overriden delete operator
+   * Deletes the camera from its global memory pool
    */
-  void SetNode(const Node* node);
-
-  /**
-   * Get the node this scene graph camera belongs to.
-   * @return node The owning node.
-   */
-  const Node* GetNode() const;
+  void operator delete(void* ptr);
 
   /**
    * @copydoc Dali::Internal::CameraActor::SetType
@@ -133,9 +131,9 @@ public:
   void SetProjectionMode(Dali::Camera::ProjectionMode projectionMode);
 
   /**
-   * @copydoc Dali::Internal::CameraActor::SetFieldOfView
+   * @copydoc Dali::Internal::CameraActor::SetProjectionDirection
    */
-  void SetFieldOfView(float fieldOfView);
+  void SetProjectionDirection(Dali::DevelCameraActor::ProjectionDirection direction);
 
   /**
    * @copydoc Dali::Internal::CameraActor::SetAspectRatio
@@ -183,6 +181,23 @@ public:
   void SetTargetPosition(const Vector3& targetPosition);
 
   /**
+   * @brief Bakes the field of view.
+   * @param[in] updateBufferIndex The current update buffer index.
+   * @param[in] opacity The field of view.
+   */
+  void BakeFieldOfView(BufferIndex updateBufferIndex, float fieldOfView);
+
+  /**
+   * @brief Retrieve the field of view.
+   * @param[in] bufferIndex The buffer to read from.
+   * @return The field of view.
+   */
+  float GetFieldOfView(BufferIndex bufferIndex) const
+  {
+    return mFieldOfView[bufferIndex];
+  }
+
+  /**
    * Sets the reflection plane
    * @param[in] plane reflection plane
    */
@@ -213,7 +228,7 @@ public:
    *
    * @return false if the sphere lies outside of the frustum.
    */
-  bool CheckSphereInFrustum(BufferIndex bufferIndex, const Vector3& origin, float radius);
+  bool CheckSphereInFrustum(BufferIndex bufferIndex, const Vector3& origin, float radius) const;
 
   /**
    * @brief Check to see if a bounding box lies within the view frustum.
@@ -224,7 +239,7 @@ public:
    *
    * @return false if the cubeoid lies completely outside of the frustum, true otherwise
    */
-  bool CheckAABBInFrustum(BufferIndex bufferIndex, const Vector3& origin, const Vector3& halfExtents);
+  bool CheckAABBInFrustum(BufferIndex bufferIndex, const Vector3& origin, const Vector3& halfExtents) const;
 
   /**
    * Retrieve the projection-matrix; this is double buffered for input handling.
@@ -246,6 +261,13 @@ public:
    * @return The projection-matrix that should be used to render.
    */
   const Matrix& GetFinalProjectionMatrix(BufferIndex bufferIndex) const;
+
+  /**
+   * Retrieve the field of view property querying interface.
+   * @pre The camera is on-stage.
+   * @return The field of view property querying interface.
+   */
+  const PropertyBase* GetFieldOfView() const;
 
   /**
    * Retrieve the projection-matrix property querying interface.
@@ -271,7 +293,12 @@ public:
   /**
    * @return true if the view matrix of camera is updated this or the previous frame
    */
-  bool ViewMatrixUpdated();
+  bool ViewMatrixUpdated() const;
+
+  /**
+   * @return true if the projection matrix projection matrix relative properties are animated this or the previous frame
+   */
+  bool IsProjectionMatrixAnimated() const;
 
 private:
   /**
@@ -279,11 +306,11 @@ private:
    */
   Camera();
 
-  // Non copyable
-  // Undefined
-  Camera(const Camera&);
-  // Undefined
-  Camera& operator=(const Camera& rhs);
+  // Delete copy and move
+  Camera(const Camera&) = delete;
+  Camera(Camera&&)      = delete;
+  Camera& operator=(const Camera& rhs) = delete;
+  Camera& operator=(Camera&& rhs) = delete;
 
   /**
    * Recalculates the view matrix.
@@ -315,17 +342,18 @@ private:
    */
   void AdjustNearPlaneForPerspective(Matrix& perspective, const Vector4& clipPlane);
 
-  uint32_t    mUpdateViewFlag;       ///< This is non-zero if the view matrix requires an update
-  uint32_t    mUpdateProjectionFlag; ///< This is non-zero if the projection matrix requires an update
-  int         mProjectionRotation;   ///< The rotaion angle of the projection
-  const Node* mNode;                 ///< The node this scene graph camera belongs to
+  uint32_t mUpdateViewFlag;       ///< This is non-zero if the view matrix requires an update
+  uint32_t mUpdateProjectionFlag; ///< This is non-zero if the projection matrix requires an update
+  int      mProjectionRotation;   ///< The rotaion angle of the projection
 
-public:                                         // PROPERTIES
-  Dali::Camera::Type           mType;           // Non-animatable
-  Dali::Camera::ProjectionMode mProjectionMode; // Non-animatable
-  bool                         mInvertYAxis;    // Non-animatable
+public:                                                             // PROPERTIES
+  Dali::Camera::Type                          mType;                // Non-animatable
+  Dali::Camera::ProjectionMode                mProjectionMode;      // Non-animatable
+  Dali::DevelCameraActor::ProjectionDirection mProjectionDirection; // Non-animatable
+  bool                                        mInvertYAxis;         // Non-animatable
 
-  float   mFieldOfView;
+  AnimatableProperty<float> mFieldOfView; // Animatable
+
   float   mAspectRatio;
   float   mLeftClippingPlane;
   float   mRightClippingPlane;
@@ -373,15 +401,26 @@ inline void SetProjectionModeMessage(EventThreadServices& eventThreadServices, c
   new(slot) LocalProjectionMode(&camera, &Camera::SetProjectionMode, parameter);
 }
 
-inline void SetFieldOfViewMessage(EventThreadServices& eventThreadServices, const Camera& camera, float parameter)
+inline void SetProjectionDirectionMessage(EventThreadServices& eventThreadServices, const Camera& camera, Dali::DevelCameraActor::ProjectionDirection parameter)
 {
-  using LocalType = MessageValue1<Camera, float>;
+  using LocalProjectionDirection = MessageValue1<Camera, Dali::DevelCameraActor::ProjectionDirection>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalProjectionDirection));
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new(slot) LocalProjectionDirection(&camera, &Camera::SetProjectionDirection, parameter);
+}
+
+inline void BakeFieldOfViewMessage(EventThreadServices& eventThreadServices, const Camera& camera, float parameter)
+{
+  using LocalType = MessageDoubleBuffered1<Camera, float>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&camera, &Camera::SetFieldOfView, parameter);
+  new(slot) LocalType(&camera, &Camera::BakeFieldOfView, parameter);
 }
 
 inline void SetAspectRatioMessage(EventThreadServices& eventThreadServices, const Camera& camera, float parameter)

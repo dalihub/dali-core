@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_CAMERA_ACTOR_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUES
+#include <dali/devel-api/actors/camera-actor-devel.h>
 #include <dali/internal/event/actors/actor-declarations.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/public-api/actors/camera-actor.h>
@@ -89,6 +90,13 @@ public:
   Dali::Camera::ProjectionMode GetProjectionMode() const;
 
   /**
+   * @brief Set the projection direction
+   *
+   * @param[in] direction Direction of projection
+   */
+  void SetProjectionDirection(Dali::DevelCameraActor::ProjectionDirection direction);
+
+  /**
    * @copydoc Dali::CameraActor::SetFieldOfView
    */
   void SetFieldOfView(float fieldOfView);
@@ -97,6 +105,13 @@ public:
    * @copydoc Dali::CameraActor::GetFieldOfView
    */
   float GetFieldOfView() const;
+
+  /**
+   * @brief Retrieve the CameraActor's field of view from update side.
+   * This field of view will be the fov set or animating but will be a frame behind.
+   * @return The field of view.
+   */
+  float GetCurrentFieldOfView() const;
 
   /**
    * @copydoc Dali::CameraActor::SetAspectRatio
@@ -196,10 +211,10 @@ public:
   const Matrix& GetProjectionMatrix() const;
 
   /**
-   * Return the scene graph camera (for RenderTask)
+   * Return the scene graph camera
    * @return The scene graph camera.
    */
-  const SceneGraph::Camera* GetCamera() const;
+  const SceneGraph::Camera& GetCameraSceneObject() const;
 
   /**
    * Rotate the projection.
@@ -225,6 +240,16 @@ public: // properties
   Property::Value GetDefaultPropertyCurrentValue(Property::Index index) const override;
 
   /**
+   * @copydoc Dali::Internal::Object::OnNotifyDefaultPropertyAnimation()
+   */
+  void OnNotifyDefaultPropertyAnimation(Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType) override;
+
+  /**
+   * @copydoc Dali::Internal::Object::GetSceneObjectAnimatableProperty()
+   */
+  const SceneGraph::PropertyBase* GetSceneObjectAnimatableProperty(Property::Index index) const override;
+
+  /**
    * @copydoc Dali::Internal::Object::GetSceneObjectInputProperty()
    */
   const PropertyInputImpl* GetSceneObjectInputProperty(Property::Index index) const override;
@@ -242,11 +267,6 @@ private:
   ~CameraActor() override;
 
   /**
-   * @copydoc Dali::Internal::Actor::OnInitialize()
-   */
-  void OnInitialize() override;
-
-  /**
    * @copydoc Dali::Internal::Actor::OnSceneConnectionInternal()
    */
   void OnSceneConnectionInternal() override;
@@ -256,23 +276,22 @@ private:
    */
   void OnPropertySet(Property::Index index, const Property::Value& propertyValue) override;
 
-private:                                  // Data
-  const SceneGraph::Camera* mSceneObject; ///< Not owned
-
-  Vector3                      mTarget;
-  Vector2                      mCanvasSize;
-  Dali::Camera::Type           mType;
-  Dali::Camera::ProjectionMode mProjectionMode;
-  float                        mFieldOfView;
-  float                        mAspectRatio;
-  float                        mNearClippingPlane;
-  float                        mFarClippingPlane;
-  float                        mLeftClippingPlane;
-  float                        mRightClippingPlane;
-  float                        mTopClippingPlane;
-  float                        mBottomClippingPlane;
-  bool                         mInvertYAxis;
-  bool                         mPropertyChanged;
+private: // Data
+  Vector3                                     mTarget;
+  Vector2                                     mCanvasSize;
+  Dali::Camera::Type                          mType;
+  Dali::Camera::ProjectionMode                mProjectionMode;
+  Dali::DevelCameraActor::ProjectionDirection mProjectionDirection;
+  float                                       mFieldOfView;
+  float                                       mAspectRatio;
+  float                                       mNearClippingPlane;
+  float                                       mFarClippingPlane;
+  float                                       mLeftClippingPlane;
+  float                                       mRightClippingPlane;
+  float                                       mTopClippingPlane;
+  float                                       mBottomClippingPlane;
+  bool                                        mInvertYAxis;
+  bool                                        mPropertyChanged;
 };
 
 } // namespace Internal

@@ -59,8 +59,8 @@ Node* Node::New()
 
 void Node::Delete(Node* node)
 {
-  // check we have a node not a layer
-  if(!node->mIsLayer)
+  // check we have a node not a derived node
+  if(!node->mIsLayer && !node->mIsCamera)
   {
     // Manually call the destructor
     node->~Node();
@@ -100,6 +100,7 @@ Node::Node()
   mClippingMode(ClippingMode::DISABLED),
   mIsRoot(false),
   mIsLayer(false),
+  mIsCamera(false),
   mPositionUsesAnchorPoint(true),
   mTransparent(false)
 {

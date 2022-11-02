@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -356,7 +356,7 @@ const Matrix& RenderTask::GetViewMatrix(BufferIndex bufferIndex) const
   return mCamera->GetViewMatrix(bufferIndex);
 }
 
-SceneGraph::Camera& RenderTask::GetCamera() const
+const SceneGraph::Camera& RenderTask::GetCamera() const
 {
   DALI_ASSERT_DEBUG(nullptr != mCamera);
   return *mCamera;
@@ -417,7 +417,7 @@ void RenderTask::UpdateViewport(BufferIndex updateBufferIndex, Vector2 sceneSize
 {
   if(GetViewportGuideNode() && GetViewportGuideNode()->ConnectedToScene())
   {
-    Vector3 worldPosition  = GetViewportGuideNode()->GetWorldPosition(updateBufferIndex);
+    Vector3 worldPosition = GetViewportGuideNode()->GetWorldPosition(updateBufferIndex);
     worldPosition -= cameraPosition;
 
     Vector3 nodeSize = GetViewportGuideNode()->GetSize(updateBufferIndex) * GetViewportGuideNode()->GetWorldScale(updateBufferIndex);

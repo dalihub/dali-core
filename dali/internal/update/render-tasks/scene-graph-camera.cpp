@@ -23,6 +23,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/internal/common/matrix-utils.h>
+#include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/math-utils.h>
@@ -45,6 +47,9 @@ namespace SceneGraph
 {
 namespace
 {
+//Memory pool used to allocate new camera. Memory used by this pool will be released when shutting down DALi
+MemoryPoolObjectAllocator<Camera> gCameraMemoryPool;
+
 template<typename T>
 T Sign(T value)
 {
@@ -96,10 +101,20 @@ void Frustum(Matrix& result, float left, float right, float bottom, float top, f
   m[12] = m[13] = m[15] = 0.0f;
 }
 
-void Perspective(Matrix& result, float fovy, float aspect, float near, float far, bool invertYAxis)
+void Perspective(Matrix& result, Dali::DevelCameraActor::ProjectionDirection fovDir, float fov, float aspect, float near, float far, bool invertYAxis)
 {
-  float frustumH = tanf(fovy * 0.5f) * near;
-  float frustumW = frustumH * aspect;
+  float frustumH;
+  float frustumW;
+  if(fovDir == Dali::DevelCameraActor::ProjectionDirection::VERTICAL)
+  {
+    frustumH = tanf(fov * 0.5f) * near;
+    frustumW = frustumH * aspect;
+  }
+  else
+  {
+    frustumW = tanf(fov * 0.5f) * near;
+    frustumH = frustumW / aspect;
+  }
 
   Frustum(result, -frustumW, frustumW, -frustumH, frustumH, near, far, invertYAxis);
 }
@@ -140,26 +155,28 @@ void Orthographic(Matrix& result, float left, float right, float bottom, float t
 
 } // unnamed namespace
 
-const Dali::Camera::Type           Camera::DEFAULT_TYPE(Dali::Camera::FREE_LOOK);
-const Dali::Camera::ProjectionMode Camera::DEFAULT_MODE(Dali::Camera::PERSPECTIVE_PROJECTION);
-const bool                         Camera::DEFAULT_INVERT_Y_AXIS(false);
-const float                        Camera::DEFAULT_FIELD_OF_VIEW(45.0f * (Math::PI / 180.0f));
-const float                        Camera::DEFAULT_ASPECT_RATIO(800.0f / 480.0f);
-const float                        Camera::DEFAULT_LEFT_CLIPPING_PLANE(-240.0f);
-const float                        Camera::DEFAULT_RIGHT_CLIPPING_PLANE(240.0f);
-const float                        Camera::DEFAULT_TOP_CLIPPING_PLANE(-400.0f);
-const float                        Camera::DEFAULT_BOTTOM_CLIPPING_PLANE(400.0f);
-const float                        Camera::DEFAULT_NEAR_CLIPPING_PLANE(800.0f); // default height of the screen
-const float                        Camera::DEFAULT_FAR_CLIPPING_PLANE(DEFAULT_NEAR_CLIPPING_PLANE + 2.f * DEFAULT_NEAR_CLIPPING_PLANE);
-const Vector3                      Camera::DEFAULT_TARGET_POSITION(0.0f, 0.0f, 0.0f);
+const Dali::Camera::Type                          Camera::DEFAULT_TYPE(Dali::Camera::FREE_LOOK);
+const Dali::Camera::ProjectionMode                Camera::DEFAULT_MODE(Dali::Camera::PERSPECTIVE_PROJECTION);
+const Dali::DevelCameraActor::ProjectionDirection Camera::DEFAULT_PROJECTION_DIRECTION(Dali::DevelCameraActor::VERTICAL);
+const bool                                        Camera::DEFAULT_INVERT_Y_AXIS(false);
+const float                                       Camera::DEFAULT_FIELD_OF_VIEW(45.0f * (Math::PI / 180.0f));
+const float                                       Camera::DEFAULT_ASPECT_RATIO(800.0f / 480.0f);
+const float                                       Camera::DEFAULT_LEFT_CLIPPING_PLANE(-240.0f);
+const float                                       Camera::DEFAULT_RIGHT_CLIPPING_PLANE(240.0f);
+const float                                       Camera::DEFAULT_TOP_CLIPPING_PLANE(-400.0f);
+const float                                       Camera::DEFAULT_BOTTOM_CLIPPING_PLANE(400.0f);
+const float                                       Camera::DEFAULT_NEAR_CLIPPING_PLANE(800.0f); // default height of the screen
+const float                                       Camera::DEFAULT_FAR_CLIPPING_PLANE(DEFAULT_NEAR_CLIPPING_PLANE + 2.f * DEFAULT_NEAR_CLIPPING_PLANE);
+const Vector3                                     Camera::DEFAULT_TARGET_POSITION(0.0f, 0.0f, 0.0f);
 
 Camera::Camera()
-: mUpdateViewFlag(UPDATE_COUNT),
+: Node(),
+  mUpdateViewFlag(UPDATE_COUNT),
   mUpdateProjectionFlag(UPDATE_COUNT),
   mProjectionRotation(0),
-  mNode(nullptr),
   mType(DEFAULT_TYPE),
   mProjectionMode(DEFAULT_MODE),
+  mProjectionDirection(DEFAULT_PROJECTION_DIRECTION),
   mInvertYAxis(DEFAULT_INVERT_Y_AXIS),
   mFieldOfView(DEFAULT_FIELD_OF_VIEW),
   mAspectRatio(DEFAULT_ASPECT_RATIO),
@@ -175,23 +192,20 @@ Camera::Camera()
   mInverseViewProjection(Matrix::IDENTITY),
   mFinalProjection(Matrix::IDENTITY)
 {
+  // set a flag the node to say this is a camera
+  mIsCamera = true;
 }
 
 Camera* Camera::New()
 {
-  return new Camera();
+  return new(gCameraMemoryPool.AllocateRawThreadSafe()) Camera();
 }
 
 Camera::~Camera() = default;
 
-void Camera::SetNode(const Node* node)
+void Camera::operator delete(void* ptr)
 {
-  mNode = node;
-}
-
-const Node* Camera::GetNode() const
-{
-  return mNode;
+  gCameraMemoryPool.FreeThreadSafe(static_cast<Camera*>(ptr));
 }
 
 void Camera::SetType(Dali::Camera::Type type)
@@ -205,15 +219,21 @@ void Camera::SetProjectionMode(Dali::Camera::ProjectionMode mode)
   mUpdateProjectionFlag = UPDATE_COUNT;
 }
 
+void Camera::SetProjectionDirection(Dali::DevelCameraActor::ProjectionDirection direction)
+{
+  mProjectionDirection  = direction;
+  mUpdateProjectionFlag = UPDATE_COUNT;
+}
+
 void Camera::SetInvertYAxis(bool invertYAxis)
 {
   mInvertYAxis          = invertYAxis;
   mUpdateProjectionFlag = UPDATE_COUNT;
 }
 
-void Camera::SetFieldOfView(float fieldOfView)
+void Camera::BakeFieldOfView(BufferIndex updateBufferIndex, float fieldOfView)
 {
-  mFieldOfView          = fieldOfView;
+  mFieldOfView.Bake(updateBufferIndex, fieldOfView);
   mUpdateProjectionFlag = UPDATE_COUNT;
 }
 
@@ -352,6 +372,11 @@ const Matrix& Camera::GetFinalProjectionMatrix(BufferIndex bufferIndex) const
   return mFinalProjection[bufferIndex];
 }
 
+const PropertyBase* Camera::GetFieldOfView() const
+{
+  return &mFieldOfView;
+}
+
 const PropertyInputImpl* Camera::GetProjectionMatrix() const
 {
   return &mProjectionMatrix;
@@ -364,17 +389,23 @@ const PropertyInputImpl* Camera::GetViewMatrix() const
 
 void Camera::Update(BufferIndex updateBufferIndex)
 {
-  // if owning node has changes in world position we need to update camera for next 2 frames
-  if(mNode->IsLocalMatrixDirty())
+  // if this has changes in world position we need to update camera for next 2 frames
+  if(IsLocalMatrixDirty())
   {
     mUpdateViewFlag = UPDATE_COUNT;
   }
-  if(mNode->GetDirtyFlags() & NodePropertyFlags::VISIBLE)
+  if(GetDirtyFlags() & NodePropertyFlags::VISIBLE)
   {
     // If the visibility changes, the projection matrix needs to be re-calculated.
     // It may happen the first time an actor is rendered it's rendered only once and becomes invisible,
     // in the following update the node will be skipped leaving the projection matrix (double buffered)
     // with the Identity.
+    mUpdateProjectionFlag = UPDATE_COUNT;
+  }
+
+  // If projection matrix relative properties are animated now, flag change.
+  if(IsProjectionMatrixAnimated())
+  {
     mUpdateProjectionFlag = UPDATE_COUNT;
   }
 
@@ -386,7 +417,7 @@ void Camera::Update(BufferIndex updateBufferIndex)
   if(viewUpdateCount > COPY_PREVIOUS_MATRIX || projectionUpdateCount > COPY_PREVIOUS_MATRIX)
   {
     // either has actually changed so recalculate
-    Matrix::Multiply(mInverseViewProjection[updateBufferIndex], mViewMatrix[updateBufferIndex], mProjectionMatrix[updateBufferIndex]);
+    MatrixUtils::Multiply(mInverseViewProjection[updateBufferIndex], mViewMatrix[updateBufferIndex], mProjectionMatrix[updateBufferIndex]);
     UpdateFrustum(updateBufferIndex);
 
     // ignore the error, if the view projection is incorrect (non inversible) then you will have tough times anyways
@@ -401,9 +432,14 @@ void Camera::Update(BufferIndex updateBufferIndex)
   }
 }
 
-bool Camera::ViewMatrixUpdated()
+bool Camera::ViewMatrixUpdated() const
 {
   return 0u != mUpdateViewFlag;
+}
+
+bool Camera::IsProjectionMatrixAnimated() const
+{
+  return !mFieldOfView.IsClean();
 }
 
 uint32_t Camera::UpdateViewMatrix(BufferIndex updateBufferIndex)
@@ -424,11 +460,11 @@ uint32_t Camera::UpdateViewMatrix(BufferIndex updateBufferIndex)
         case Dali::Camera::FREE_LOOK:
         {
           Matrix& viewMatrix = mViewMatrix.Get(updateBufferIndex);
-          viewMatrix         = mNode->GetWorldMatrix(updateBufferIndex);
+          viewMatrix         = GetWorldMatrix(updateBufferIndex);
 
           if(mUseReflection)
           {
-            const Matrix& owningNodeMatrix(mNode->GetWorldMatrix(updateBufferIndex));
+            const Matrix& owningNodeMatrix(GetWorldMatrix(updateBufferIndex));
             Vector3       position{}, scale{};
             Quaternion    orientation{};
             owningNodeMatrix.GetTransformComponents(position, orientation, scale);
@@ -437,7 +473,7 @@ uint32_t Camera::UpdateViewMatrix(BufferIndex updateBufferIndex)
 
             Matrix& viewMatrix = mViewMatrix.Get(updateBufferIndex);
             Matrix  oldViewMatrix(viewMatrix);
-            Matrix::Multiply(viewMatrix, oldViewMatrix, mReflectionMtx);
+            MatrixUtils::Multiply(viewMatrix, oldViewMatrix, mReflectionMtx);
           }
 
           viewMatrix.Invert();
@@ -448,7 +484,7 @@ uint32_t Camera::UpdateViewMatrix(BufferIndex updateBufferIndex)
         // camera orientation constrained to look at a target
         case Dali::Camera::LOOK_AT_TARGET:
         {
-          const Matrix& owningNodeMatrix(mNode->GetWorldMatrix(updateBufferIndex));
+          const Matrix& owningNodeMatrix(GetWorldMatrix(updateBufferIndex));
           Vector3       position, scale;
           Quaternion    orientation;
           owningNodeMatrix.GetTransformComponents(position, orientation, scale);
@@ -480,7 +516,7 @@ uint32_t Camera::UpdateViewMatrix(BufferIndex updateBufferIndex)
             Matrix oldViewMatrix(viewMatrix);
             Matrix tmp;
             tmp.SetIdentityAndScale(Vector3(-1.0, 1.0, 1.0));
-            Matrix::Multiply(viewMatrix, oldViewMatrix, tmp);
+            MatrixUtils::Multiply(viewMatrix, oldViewMatrix, tmp);
 
             mReflectionEye     = positionNew;
             mUseReflectionClip = true;
@@ -503,7 +539,7 @@ void Camera::UpdateFrustum(BufferIndex updateBufferIndex, bool normalize)
 {
   // Extract the clip matrix planes
   Matrix clipMatrix;
-  Matrix::Multiply(clipMatrix, mViewMatrix[updateBufferIndex], mProjectionMatrix[updateBufferIndex]);
+  MatrixUtils::Multiply(clipMatrix, mViewMatrix[updateBufferIndex], mProjectionMatrix[updateBufferIndex]);
 
   const float*   cm     = clipMatrix.AsFloat();
   FrustumPlanes& planes = mFrustum[updateBufferIndex];
@@ -567,7 +603,7 @@ void Camera::UpdateFrustum(BufferIndex updateBufferIndex, bool normalize)
   mFrustum[updateBufferIndex ? 0 : 1] = planes;
 }
 
-bool Camera::CheckSphereInFrustum(BufferIndex bufferIndex, const Vector3& origin, float radius)
+bool Camera::CheckSphereInFrustum(BufferIndex bufferIndex, const Vector3& origin, float radius) const
 {
   const FrustumPlanes& planes = mFrustum[bufferIndex];
   for(uint32_t i = 0; i < 6; ++i)
@@ -580,7 +616,7 @@ bool Camera::CheckSphereInFrustum(BufferIndex bufferIndex, const Vector3& origin
   return true;
 }
 
-bool Camera::CheckAABBInFrustum(BufferIndex bufferIndex, const Vector3& origin, const Vector3& halfExtents)
+bool Camera::CheckAABBInFrustum(BufferIndex bufferIndex, const Vector3& origin, const Vector3& halfExtents) const
 {
   const FrustumPlanes& planes = mFrustum[bufferIndex];
   for(uint32_t i = 0; i < 6; ++i)
@@ -619,7 +655,8 @@ uint32_t Camera::UpdateProjection(BufferIndex updateBufferIndex)
         {
           Matrix& projectionMatrix = mProjectionMatrix.Get(updateBufferIndex);
           Perspective(projectionMatrix,
-                      mFieldOfView,
+                      mProjectionDirection,
+                      mFieldOfView[updateBufferIndex],
                       mAspectRatio,
                       mNearClippingPlane,
                       mFarClippingPlane,
@@ -648,7 +685,7 @@ uint32_t Camera::UpdateProjection(BufferIndex updateBufferIndex)
             matZ.SetIdentity();
             float* vZ = matZ.AsFloat();
             vZ[10]    = -vZ[10];
-            Matrix::Multiply(projectionMatrix, projectionMatrix, matZ);
+            MatrixUtils::Multiply(projectionMatrix, projectionMatrix, matZ);
           }
           break;
         }
@@ -696,7 +733,7 @@ uint32_t Camera::UpdateProjection(BufferIndex updateBufferIndex)
       rotation.SetIdentity();
       rotation.SetTransformComponents(Vector3(1.0f, 1.0f, 1.0f), rotationAngle, Vector3(0.0f, 0.0f, 0.0f));
 
-      Matrix::Multiply(finalProjection, mProjectionMatrix.Get(updateBufferIndex), rotation);
+      MatrixUtils::Multiply(finalProjection, mProjectionMatrix.Get(updateBufferIndex), rotation);
     }
     --mUpdateProjectionFlag;
   }

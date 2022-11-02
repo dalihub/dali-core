@@ -26,6 +26,7 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/render-controller.h>
+#include <dali/integration-api/trace.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/thread-local-storage.h>
@@ -38,6 +39,8 @@ namespace Internal
 {
 namespace
 {
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
+
 #if defined(DEBUG_ENABLED)
 
 Integration::Log::Filter* gLogFilter(Integration::Log::Filter::New(Debug::NoLogging, false, "LOG_RELAYOUT_CONTROLLER"));
@@ -436,6 +439,7 @@ void RelayoutController::Relayout()
     // 2. Iterate through the stack until it's empty.
     if(mRelayoutStack->Size() > 0)
     {
+      DALI_TRACE_BEGIN(gTraceFilter, "DALI_RELAYOUT");
       PRINT_HIERARCHY;
 
       while(mRelayoutStack->Size() > 0)
@@ -460,6 +464,7 @@ void RelayoutController::Relayout()
       mRelayoutInfoAllocator.ResetMemoryPool();
 
       PRINT_HIERARCHY;
+      DALI_TRACE_END(gTraceFilter, "DALI_RELAYOUT");
     }
 
     mPerformingRelayout = false;

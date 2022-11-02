@@ -21,6 +21,8 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/devel-api/threading/mutex.h>
+#include <dali/integration-api/debug.h>
+#include <dali/integration-api/trace.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/complete-notification-interface.h>
 #include <dali/internal/event/common/property-notification-impl.h>
@@ -33,6 +35,8 @@ namespace Internal
 namespace
 {
 typedef Dali::Vector<CompleteNotificationInterface*> InterfaceContainer;
+
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
 
 /**
  * helper to move elements from one container to another
@@ -164,9 +168,14 @@ void NotificationManager::ProcessMessages()
 
   MessageContainer::Iterator       iter = mImpl->eventMessageQueue.Begin();
   const MessageContainer::Iterator end  = mImpl->eventMessageQueue.End();
-  for(; iter != end; ++iter)
+  if(iter != end)
   {
-    (*iter)->Process(0u /*ignored*/);
+    DALI_TRACE_BEGIN(gTraceFilter, "DALI_PROCESS_NOTIFICATION_MESSAGE");
+    for(; iter != end; ++iter)
+    {
+      (*iter)->Process(0u /*ignored*/);
+    }
+    DALI_TRACE_END(gTraceFilter, "DALI_PROCESS_NOTIFICATION_MESSAGE");
   }
   // release the processed messages from event side queue
   mImpl->eventMessageQueue.Clear();

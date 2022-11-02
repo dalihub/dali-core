@@ -176,7 +176,8 @@ void TapGestureDetector::EmitTapGestureSignal(Dali::Actor tappedActor, const Dal
   internalTap->SetNumberOfTouches(tap.GetNumberOfTouches());
   internalTap->SetScreenPoint(tap.GetScreenPoint());
   internalTap->SetLocalPoint(tap.GetLocalPoint());
-  internalTap->SetGestureSourceType(tap.GetSourceType());
+  internalTap->SetSourceType(tap.GetSourceType());
+  internalTap->SetSourceData(tap.GetSourceData());
   internalTap->SetNumberOfTaps(numberOfTaps == 0u ? mMaximumTapsRequired : numberOfTaps);
   mTap = Dali::TapGesture(internalTap.Get());
   if(numberOfTaps == 0u || mReceiveAllTapEvents)

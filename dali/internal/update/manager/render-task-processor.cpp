@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -226,13 +226,13 @@ bool ProcessTasks(BufferIndex                          updateBufferIndex,
   // Retrieve size of Scene and default camera position to update viewport of each RenderTask if the RenderTask uses ViewportGuideNode.
   RenderTaskList::RenderTaskContainer::Iterator iter                  = taskContainer.Begin();
   RenderTask&                                   defaultRenderTask     = **iter;
-  auto                                          defaultCamera         = defaultRenderTask.GetCamera().GetNode();
+  const Camera&                                 defaultCamera         = defaultRenderTask.GetCamera();
   auto                                          defaultRootNode       = defaultRenderTask.GetSourceNode();
   Vector3                                       defaultCameraPosition = Vector3::ZERO;
   Vector2                                       sceneSize             = Vector2::ZERO;
-  if(defaultCamera && defaultRootNode)
+  if(defaultRootNode)
   {
-    defaultCameraPosition = defaultCamera->GetWorldPosition(updateBufferIndex);
+    defaultCameraPosition = defaultCamera.GetWorldPosition(updateBufferIndex);
     sceneSize             = Vector2(defaultRootNode->GetSize(updateBufferIndex) * defaultRootNode->GetWorldScale(updateBufferIndex));
   }
 

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_LAYER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -190,7 +190,7 @@ public:
    * to use is the same than the one used before ( Otherwise View transform will be different )
    *
    */
-  bool CanReuseRenderers(Camera* camera)
+  bool CanReuseRenderers(const Camera* camera)
   {
     bool bReturn(mAllChildTransformsClean[0] && mAllChildTransformsClean[1] && camera == mLastCamera);
     mLastCamera = camera;
@@ -218,11 +218,11 @@ private:
    */
   Layer();
 
-  // Undefined
-  Layer(const Layer&);
-
-  // Undefined
-  Layer& operator=(const Layer& rhs);
+  // Delete copy and move
+  Layer(const Layer&) = delete;
+  Layer(Layer&&)      = delete;
+  Layer& operator=(const Layer& rhs) = delete;
+  Layer& operator=(Layer&& rhs) = delete;
 
 public: // For update-algorithms
   RenderableContainer colorRenderables;
@@ -231,8 +231,8 @@ public: // For update-algorithms
 private:
   SortFunctionType mSortFunction; ///< Used to sort semi-transparent geometry
 
-  ClippingBox mClippingBox; ///< The clipping box, in window coordinates
-  Camera*     mLastCamera;  ///< Pointer to the last camera that has rendered the layer
+  ClippingBox   mClippingBox; ///< The clipping box, in window coordinates
+  const Camera* mLastCamera;  ///< Pointer to the last camera that has rendered the layer
 
   Dali::Layer::Behavior mBehavior; ///< The behavior of the layer
 

@@ -24,6 +24,7 @@
 #include <ostream>
 
 // INTERNAL INCLUDES
+#include <dali/internal/common/matrix-utils.h>
 #include <dali/public-api/math/math-utils.h>
 
 #define S00 0
@@ -92,12 +93,12 @@ void Matrix3::SetIdentity()
   mElements[S22] = 1.0f;
 }
 
-Matrix3::Matrix3(Matrix3&& matrix)
+Matrix3::Matrix3(Matrix3&& matrix) noexcept
 {
   memcpy(mElements, matrix.mElements, NUM_BYTES_IN_MATRIX);
 }
 
-Matrix3& Matrix3::operator=(Matrix3&& matrix)
+Matrix3& Matrix3::operator=(Matrix3&& matrix) noexcept
 {
   if(this != &matrix)
   {
@@ -249,31 +250,20 @@ float Matrix3::Magnitude() const
 
 void Matrix3::Multiply(Matrix3& result, const Matrix3& lhs, const Matrix3& rhs)
 {
-  float*       temp   = result.AsFloat();
-  const float* rhsPtr = rhs.AsFloat();
-  const float* lhsPtr = lhs.AsFloat();
+  Internal::MatrixUtils::Multiply(result, lhs, rhs);
+}
 
-  for(int32_t i = 0; i < 3; i++)
-  {
-    int32_t loc  = i * 3;
-    int32_t loc1 = loc + 1;
-    int32_t loc2 = loc + 2;
+Matrix3 Matrix3::operator*(const Matrix3& rhs) const
+{
+  Matrix3 result;
+  Internal::MatrixUtils::Multiply(result, rhs, *this);
+  return result;
+}
 
-    float value0 = lhsPtr[loc];
-    float value1 = lhsPtr[loc1];
-    float value2 = lhsPtr[loc2];
-    temp[loc]    = (value0 * rhsPtr[0]) +
-                (value1 * rhsPtr[3]) +
-                (value2 * rhsPtr[6]);
-
-    temp[loc1] = (value0 * rhsPtr[1]) +
-                 (value1 * rhsPtr[4]) +
-                 (value2 * rhsPtr[7]);
-
-    temp[loc2] = (value0 * rhsPtr[2]) +
-                 (value1 * rhsPtr[5]) +
-                 (value2 * rhsPtr[8]);
-  }
+Matrix3& Matrix3::operator*=(const Matrix3& rhs)
+{
+  Internal::MatrixUtils::MultiplyAssign(*this, rhs);
+  return *this;
 }
 
 Vector3 Matrix3::operator*(const Vector3& rhs) const

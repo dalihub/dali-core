@@ -62,7 +62,7 @@ public:
   /**
    * @copydoc Dali::Integration::Scene::New
    */
-  static ScenePtr New(Size size, int32_t orientation = 0);
+  static ScenePtr New(Size size, int32_t windowOrientation = 0, int32_t screenOrientation = 0);
 
   /**
    * virtual destructor
@@ -186,9 +186,10 @@ public:
    *
    * @param[in] width The width of rotated surface
    * @param[in] height The height of rotated surface
-   * @param[in] orientation The orientation of rotated surface
+   * @param[in] windowOrientation the current window orientation
+   * @param[in] screenOrientation the current screen orientation
    */
-  void SurfaceRotated(float width, float height, int32_t orientation);
+  void SurfaceRotated(float width, float height, int32_t windowOrientation, int32_t screenOrientation);
 
   /**
    * @copydoc Dali::Integration::Scene::SetRotationCompletedAcknowledgement
@@ -204,6 +205,11 @@ public:
    * @copydoc Dali::Integration::Scene::GetCurrentSurfaceOrientation
    */
   int32_t GetCurrentSurfaceOrientation() const;
+
+  /**
+   * @copydoc Dali::Integration::Scene::GetCurrentScreenOrientation
+   */
+  int32_t GetCurrentScreenOrientation() const;
 
   /**
    * @copydoc Dali::Integration::Scene::GetCurrentSurfaceRect
@@ -342,9 +348,10 @@ private:
    * Second-phase constructor.
    *
    * @param[in] size The size of the set surface
-   * @param[in] orientation The orientation of the set surface for this scene
+   * @param[in] windowOrientation The rotated angle of the set surface for this scene
+   * @param[in] screenOrientation The rotated angle of the screen
    */
-  void Initialize(Size size, int32_t orientation);
+  void Initialize(Size size, int32_t windowOrientation, int32_t screenOrientation);
 
   // Undefined
   Scene(const Scene&) = delete;
@@ -357,9 +364,10 @@ private:
    *
    * @param[in] width The width of rotated surface
    * @param[in] height The height of rotated surface
-   * @param[in] orientation The orientation of rotated surface
+   * @param[in] windowOrientation the current window orientation
+   * @param[in] screenOrientation the current screen orientation
    */
-  void ChangedSurface(float width, float height, int32_t orientation);
+  void ChangedSurface(float width, float height, int32_t windowOrientation, int32_t screenOrientation);
 
 private:
   Internal::SceneGraph::Scene* mSceneObject;
@@ -386,6 +394,9 @@ private:
 
   // The Surface's orientation
   int32_t mSurfaceOrientation;
+
+  // The Screen's orientation
+  int32_t mScreenOrientation;
 
   // The key event signal
   Integration::Scene::KeyEventSignalType          mKeyEventSignal;

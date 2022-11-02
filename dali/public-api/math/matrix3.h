@@ -106,7 +106,7 @@ public:
    * @SINCE_1_9.21
    * @param[in] matrix A reference to the moved matrix
    */
-  Matrix3(Matrix3&& matrix);
+  Matrix3(Matrix3&& matrix) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -115,7 +115,7 @@ public:
    * @param[in] matrix A reference to the moved matrix
    * @return A reference to this
    */
-  Matrix3& operator=(Matrix3&& matrix);
+  Matrix3& operator=(Matrix3&& matrix) noexcept;
 
   /**
    * @brief Assignment Operator.
@@ -259,6 +259,33 @@ public:
    * @param[in] rhs Matrix, this cannot be same matrix as result
    */
   static void Multiply(Matrix3& result, const Matrix3& lhs, const Matrix3& rhs);
+
+  /**
+   * @brief Multiplication operator.
+   *
+   * Returned Matrix = This Matrix * rhs
+   *
+   * @note It makes some memory allocate & copy internally.
+   * Use Matrix3::Multiply API for time critical path.
+   *
+   * @SINCE_2_1.44
+   * @param[in] rhs The Matrix to multiply this by
+   * @return A Matrix containing the result
+   */
+  Matrix3 operator*(const Matrix3& rhs) const;
+
+  /**
+   * @brief Multiplication assignment operator.
+   *
+   * This Matrix *= rhs
+   *
+   * @note It makes some memory allocate & copy internally.
+   *
+   * @SINCE_2_1.46
+   * @param[in] rhs The Matrix to multiply this by
+   * @return Itself
+   */
+  Matrix3& operator*=(const Matrix3& rhs);
 
   /**
    * @brief The multiplication operator.

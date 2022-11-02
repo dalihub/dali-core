@@ -2,7 +2,7 @@
 #define DALI_MATRIX_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -123,7 +123,7 @@ public:
    * @SINCE_1_9.21
    * @param[in] matrix A reference to the moved matrix
    */
-  Matrix(Matrix&& matrix);
+  Matrix(Matrix&& matrix) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -132,7 +132,7 @@ public:
    * @param[in] matrix A reference to the moved matrix
    * @return A reference to this
    */
-  Matrix& operator=(Matrix&& matrix);
+  Matrix& operator=(Matrix&& matrix) noexcept;
 
   /**
    * @brief The identity matrix.
@@ -319,7 +319,6 @@ public:
   {
     return mMatrix;
   }
-
   /**
    * @brief Function to multiply two matrices and store the result onto third.
    *
@@ -344,6 +343,33 @@ public:
    * @param[in] rhs Quaternion
    */
   static void Multiply(Matrix& result, const Matrix& lhs, const Quaternion& rhs);
+
+  /**
+   * @brief Multiplication operator.
+   *
+   * Returned Matrix = This Matrix * rhs
+   *
+   * @note It makes some memory allocate & copy internally.
+   * Use Matrix::Multiply API for time critical path.
+   *
+   * @SINCE_2_1.44
+   * @param[in] rhs The Matrix to multiply this by
+   * @return A Matrix containing the result
+   */
+  Matrix operator*(const Matrix& rhs) const;
+
+  /**
+   * @brief Multiplication assignment operator.
+   *
+   * This Matrix *= rhs
+   *
+   * @note It makes some memory allocate & copy internally.
+   *
+   * @SINCE_2_1.46
+   * @param[in] rhs The Matrix to multiply this by
+   * @return Itself
+   */
+  Matrix& operator*=(const Matrix& rhs);
 
   /**
    * @brief The multiplication operator.

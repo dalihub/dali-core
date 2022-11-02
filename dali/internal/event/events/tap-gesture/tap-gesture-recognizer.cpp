@@ -50,7 +50,6 @@ TapGestureRecognizer::TapGestureRecognizer(Observer& observer, Vector2 screenSiz
   mTouchTime(0u),
   mLastTapTime(0u),
   mLastTouchTime(0u),
-  mGestureSourceType(GestureSourceType::INVALID),
   mMaximumAllowedTime(maximumAllowedTime)
 {
 }
@@ -65,36 +64,6 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
   {
     const Integration::Point& point      = event.points[0];
     PointState::Type          pointState = point.GetState();
-
-    MouseButton::Type mouseButton = point.GetMouseButton();
-    switch(mouseButton)
-    {
-      case MouseButton::INVALID:
-      {
-        mGestureSourceType = GestureSourceType::INVALID;
-        break;
-      }
-      case MouseButton::PRIMARY:
-      {
-        mGestureSourceType = GestureSourceType::PRIMARY;
-        break;
-      }
-      case MouseButton::SECONDARY:
-      {
-        mGestureSourceType = GestureSourceType::SECONDARY;
-        break;
-      }
-      case MouseButton::TERTIARY:
-      {
-        mGestureSourceType = GestureSourceType::TERTIARY;
-        break;
-      }
-      default:
-      {
-        mGestureSourceType = GestureSourceType::INVALID;
-        break;
-      }
-    }
 
     switch(mState)
     {
@@ -206,9 +175,8 @@ void TapGestureRecognizer::SetupForTouchDown(const Integration::TouchEvent& even
 void TapGestureRecognizer::EmitPossibleState(const Integration::TouchEvent& event)
 {
   TapGestureEvent tapEvent(GestureState::POSSIBLE);
-  tapEvent.point             = mTouchPosition;
-  tapEvent.time              = event.time;
-  tapEvent.gestureSourceType = mGestureSourceType;
+  tapEvent.point = mTouchPosition;
+  tapEvent.time  = event.time;
 
   ProcessEvent(tapEvent);
 }
@@ -255,16 +223,17 @@ void TapGestureRecognizer::EmitSingleTap(uint32_t time, const Integration::Point
 
 void TapGestureRecognizer::EmitTap(uint32_t time, TapGestureEvent& event)
 {
-  event.numberOfTaps      = mTapsRegistered;
-  event.point             = mTouchPosition;
-  event.time              = time;
-  event.gestureSourceType = mGestureSourceType;
+  event.numberOfTaps = mTapsRegistered;
+  event.point        = mTouchPosition;
+  event.time         = time;
 
   ProcessEvent(event);
 }
 
 void TapGestureRecognizer::ProcessEvent(TapGestureEvent& event)
 {
+  event.sourceType = mSourceType;
+  event.sourceData = mSourceData;
   if(mScene)
   {
     // Create another handle so the recognizer cannot be destroyed during process function

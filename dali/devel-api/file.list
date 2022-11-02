@@ -4,6 +4,7 @@ SET( devel_api_src_dir ${ROOT_SRC_DIR}/dali/devel-api )
 # Add devel source files here for DALi internal developer files used by Adaptor & Toolkit
 SET( devel_api_src_files
   ${devel_api_src_dir}/actors/actor-devel.cpp
+  ${devel_api_src_dir}/actors/camera-actor-devel.cpp
   ${devel_api_src_dir}/actors/custom-actor-devel.cpp
   ${devel_api_src_dir}/animation/animation-data.cpp
   ${devel_api_src_dir}/animation/animation-devel.cpp

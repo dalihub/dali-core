@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,9 @@ GestureEvent::~GestureEvent() = default;
 GestureEvent::GestureEvent(GestureType::Value gesture, GestureState gestureState)
 : gestureType(gesture),
   state(gestureState),
-  time(0)
+  time(0),
+  sourceType(GestureSourceType::INVALID),
+  sourceData(GestureSourceData::INVALID)
 {
 }
 } // namespace Internal

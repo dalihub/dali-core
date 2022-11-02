@@ -38,6 +38,7 @@ SET(TC_SOURCES
         utc-Dali-Hash.cpp
         utc-Dali-HitTestAlgorithm.cpp
         utc-Dali-HoverProcessing.cpp
+        utc-Dali-IntPair.cpp
         utc-Dali-IntrusivePtr.cpp
         utc-Dali-KeyEvent.cpp
         utc-Dali-Layer.cpp
@@ -94,7 +95,6 @@ SET(TC_SOURCES
         utc-Dali-TouchProcessing.cpp
         utc-Dali-TypeRegistry.cpp
         utc-Dali-CSharp-TypeRegistry.cpp
-        utc-Dali-Uint16Pair.cpp
         utc-Dali-Vector.cpp
         utc-Dali-Vector2.cpp
         utc-Dali-Vector3.cpp

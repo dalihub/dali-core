@@ -2,7 +2,7 @@
 #define DALI_VECTOR_3_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -569,10 +569,10 @@ struct DALI_CORE_API Vector3
   };
 
 public:
-  Vector3(const Vector3&) = default;            ///< Default copy constructor
-  Vector3(Vector3&&)      = default;            ///< Default move constructor
-  Vector3& operator=(const Vector3&) = default; ///< Default copy assignment operator
-  Vector3& operator=(Vector3&&) = default;      ///< Default move assignment operator
+  Vector3(const Vector3&)     = default;            ///< Default copy constructor
+  Vector3(Vector3&&) noexcept = default;            ///< Default move constructor
+  Vector3& operator=(const Vector3&) = default;     ///< Default copy assignment operator
+  Vector3& operator=(Vector3&&) noexcept = default; ///< Default move assignment operator
 };
 
 /**

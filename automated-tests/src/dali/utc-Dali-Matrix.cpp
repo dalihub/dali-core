@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -559,6 +559,71 @@ int UtcDaliMatrixOperatorMultiply02P(void)
 
   output.w = 0.0f;
   DALI_TEST_EQUALS(output, Vector4::ZERO, 0.01f, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliMatrixOperatorMultiply03P(void)
+{
+  const float ll[16] = {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
+  const float rr[16] = {1.0f, 5.0f, 0.0f, 0.0f, 2.0f, 6.0f, 0.0f, 0.0f, 3.0f, 7.0f, 0.0f, 0.0f, 4.0f, 8.0f, 0.0f, 0.0f};
+  Matrix      left(ll);
+  Matrix      right(rr);
+
+  const float els[16] = {26.0f, 32.0f, 38.0f, 44.0f, 32.0f, 40.0f, 48.0f, 56.0f, 38.0f, 48.0f, 58.0f, 68.0f, 44.0f, 56.0f, 68.0f, 80.0f};
+  Matrix      result(els);
+
+  // Get result by operator*
+  Matrix multResult = left * right;
+  DALI_TEST_EQUALS(multResult, result, 0.01f, TEST_LOCATION);
+
+  // Get result by Multiply API
+  Matrix::Multiply(multResult, right, left);
+  DALI_TEST_EQUALS(multResult, result, 0.01f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliMatrixOperatorMultiplyAssign01P(void)
+{
+  tet_infoline("Multiplication Assign operator\n");
+  const float ll[16] = {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 0.0f, 0.0f, 11.0f, 12.0f, 0.0f, 0.0f};
+  const float rr[16] = {1.0f, 5.0f, 9.0f, 10.0f, 2.0f, 6.0f, 11.0f, 12.0f, 3.0f, 7.0f, 0.0f, 0.0f, 4.0f, 8.0f, 0.0f, 0.0f};
+  Matrix      left(ll);
+  Matrix      right(rr);
+  Matrix      copyedLeft(ll);
+
+  const float els[16] = {217.0f, 242.0f, 38.0f, 44.0f, 263.0f, 294.0f, 48.0f, 56.0f, 38.0f, 48.0f, 58.0f, 68.0f, 44.0f, 56.0f, 68.0f, 80.0f};
+  Matrix      result(els);
+
+  // Get result by operator*
+  Matrix multResult = left * right;
+  DALI_TEST_EQUALS(multResult, result, 0.01f, TEST_LOCATION);
+
+  // Get result by operator*=
+  left *= right;
+  DALI_TEST_EQUALS(left, result, 0.01f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliMatrixOperatorMultiplyAssign02P(void)
+{
+  tet_infoline("Multiplication Assign operator with self matrix\n");
+  const float ll[16] = {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 0.0f, 0.0f, 11.0f, 12.0f, 0.0f, 0.0f};
+  Matrix      left(ll);
+  Matrix      copyedLeft(ll);
+
+  const float els[16] = {82.0f, 92.0f, 17.0f, 20.0f, 186.0f, 212.0f, 57.0f, 68.0f, 59.0f, 78.0f, 97.0f, 116.0f, 71.0f, 94.0f, 117.0f, 140.0f};
+  Matrix      result(els);
+
+  // Get result by operator*
+  Matrix multResult = left * copyedLeft;
+  DALI_TEST_EQUALS(multResult, result, 0.01f, TEST_LOCATION);
+
+  // Get result by operator*=
+  left *= left;
+  DALI_TEST_EQUALS(left, result, 0.01f, TEST_LOCATION);
+
   END_TEST;
 }
 

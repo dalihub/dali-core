@@ -2,7 +2,7 @@
 #define DALI_GESTURE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -123,6 +123,20 @@ public:
    * @return The time the gesture took place
    */
   uint32_t GetTime() const;
+
+  /**
+   * @brief Gets the value of which source the gesture was started with. (ex : mouse)
+   * @SINCE_2_2.0
+   * @return The gesture input source.
+   */
+  GestureSourceType GetSourceType() const;
+
+  /**
+   * @brief Gets the data of the source type.
+   * @SINCE_2_2.0
+   * @return The gesture source data.
+   */
+  GestureSourceData GetSourceData() const;
 
 public: // Not intended for application developers
   /// @cond internal

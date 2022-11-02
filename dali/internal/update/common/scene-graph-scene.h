@@ -173,11 +173,12 @@ public:
   const Rect<int32_t>& GetSurfaceRect() const;
 
   /**
-   * Set the surface orientation when surface is rotated.
+   * Set the surface orientations when surface or screen is rotated.
    *
-   * @param[in] orientation The orientation value representing the surface.
+   * @param[in] windowOrientation The orientations value representing surface.
+   * @param[in] screenOrienation The orientations value representing screen.
    */
-  void SetSurfaceOrientation(int32_t orientation);
+  void SetSurfaceOrientations(int32_t windowOrientation, int32_t screenOrienation);
 
   /**
    * Get the surface orientation.
@@ -185,6 +186,13 @@ public:
    * @return the current surface orientation
    */
   int32_t GetSurfaceOrientation() const;
+
+  /**
+   * Get the screen orientation.
+   *
+   * @return the current screen orientation
+   */
+  int32_t GetScreenOrientation() const;
 
   /**
    * Query wheter the surface rect is changed or not.
@@ -289,7 +297,8 @@ private:
 
   Rect<int32_t> mSurfaceRect;                      ///< The rectangle of surface which is related ot this scene.
   int32_t       mSurfaceOrientation;               ///< The orientation of surface which is related of this scene
-  bool          mSurfaceRectChanged;               ///< The flag of surface's rectangle is changed when is resized, moved or rotated.
+  int32_t       mScreenOrientation;                ///< The orientation of screen
+  bool          mSurfaceRectChanged;               ///< The flag of surface's rectangle is changed when is resized or moved.
   bool          mRotationCompletedAcknowledgement; ///< The flag of sending the acknowledgement to complete window rotation.
 
   // Render pass and render target
@@ -345,15 +354,15 @@ inline void SetSurfaceRectMessage(EventThreadServices& eventThreadServices, cons
   new(slot) LocalType(&scene, &Scene::SetSurfaceRect, rect);
 }
 
-inline void SetSurfaceOrientationMessage(EventThreadServices& eventThreadServices, const Scene& scene, int32_t orientation)
+inline void SetSurfaceOrientationsMessage(EventThreadServices& eventThreadServices, const Scene& scene, const int32_t windowOrientation, const int32_t screenOrientation)
 {
-  using LocalType = MessageValue1<Scene, int32_t>;
+  using LocalType = MessageValue2<Scene, int32_t, int32_t>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&scene, &Scene::SetSurfaceOrientation, orientation);
+  new(slot) LocalType(&scene, &Scene::SetSurfaceOrientations, windowOrientation, screenOrientation);
 }
 
 inline void SetRotationCompletedAcknowledgementMessage(EventThreadServices& eventThreadServices, const Scene& scene)

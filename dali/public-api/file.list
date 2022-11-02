@@ -169,6 +169,7 @@ SET( public_api_core_math_header_files
   ${public_api_src_dir}/math/angle-axis.h
   ${public_api_src_dir}/math/compile-time-math.h
   ${public_api_src_dir}/math/degree.h
+  ${public_api_src_dir}/math/int-pair.h
   ${public_api_src_dir}/math/math-utils.h
   ${public_api_src_dir}/math/matrix.h
   ${public_api_src_dir}/math/matrix3.h

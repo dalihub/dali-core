@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -133,23 +133,6 @@ int UtcDaliTapGestureSetGetLocalPointP(void)
 
   GetImplementation(gesture).SetLocalPoint(Vector2(123.0f, 321.0f));
   DALI_TEST_EQUALS(gesture.GetLocalPoint(), Vector2(123.0f, 321.0f), TEST_LOCATION);
-
-  END_TEST;
-}
-
-int UtcDaliTapGestureSetGetSourceTypeP(void)
-{
-  TapGesture gesture = DevelTapGesture::New(GestureState::STARTED);
-  DALI_TEST_EQUALS(gesture.GetSourceType(), GestureSourceType::INVALID, TEST_LOCATION);
-
-  GetImplementation(gesture).SetGestureSourceType(GestureSourceType::PRIMARY);
-  DALI_TEST_EQUALS(gesture.GetSourceType(), GestureSourceType::PRIMARY, TEST_LOCATION);
-
-  GetImplementation(gesture).SetGestureSourceType(GestureSourceType::SECONDARY);
-  DALI_TEST_EQUALS(gesture.GetSourceType(), GestureSourceType::SECONDARY, TEST_LOCATION);
-
-  GetImplementation(gesture).SetGestureSourceType(GestureSourceType::TERTIARY);
-  DALI_TEST_EQUALS(gesture.GetSourceType(), GestureSourceType::TERTIARY, TEST_LOCATION);
 
   END_TEST;
 }

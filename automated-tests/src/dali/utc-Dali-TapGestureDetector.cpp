@@ -1050,22 +1050,13 @@ int UtcDaliTapGestureGetSourceType(void)
   detector.DetectedSignal().Connect(&application, functor);
 
   // Emit a down signal with MouseButton
-  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 0, 100));
-  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 0, 120));
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 1, 100));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 1, 120));
   application.SendNotification();
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(data.receivedGesture.GetSourceType(), GestureSourceType::INVALID, TEST_LOCATION);
-
-  data.Reset();
-
-  // Emit a down signal with MouseButton
-  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 1, 700));
-  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 1, 720));
-  application.SendNotification();
-
-  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(data.receivedGesture.GetSourceType(), GestureSourceType::PRIMARY, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetSourceType(), GestureSourceType::MOUSE, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetSourceData(), GestureSourceData::MOUSE_PRIMARY, TEST_LOCATION);
 
   data.Reset();
 
@@ -1075,7 +1066,8 @@ int UtcDaliTapGestureGetSourceType(void)
   application.SendNotification();
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(data.receivedGesture.GetSourceType(), GestureSourceType::SECONDARY, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetSourceType(), GestureSourceType::MOUSE, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetSourceData(), GestureSourceData::MOUSE_SECONDARY, TEST_LOCATION);
 
   data.Reset();
 
@@ -1085,7 +1077,8 @@ int UtcDaliTapGestureGetSourceType(void)
   application.SendNotification();
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(data.receivedGesture.GetSourceType(), GestureSourceType::TERTIARY, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetSourceType(), GestureSourceType::MOUSE, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetSourceData(), GestureSourceData::MOUSE_TERTIARY, TEST_LOCATION);
 
   END_TEST;
 }

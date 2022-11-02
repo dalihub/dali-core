@@ -332,7 +332,9 @@ void PanGestureRecognizer::SendPan(GestureState state, const Integration::TouchE
     gesture.timeDelta        = 0;
   }
 
-  gesture.time = currentEvent.time;
+  gesture.time       = currentEvent.time;
+  gesture.sourceType = mSourceType;
+  gesture.sourceData = mSourceData;
 
   if(mScene)
   {

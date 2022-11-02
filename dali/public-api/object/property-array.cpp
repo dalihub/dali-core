@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ Property::Array::Array(const Property::Array& other)
   mImpl->mArray = other.mImpl->mArray;
 }
 
-Property::Array::Array(Property::Array&& other)
+Property::Array::Array(Property::Array&& other) noexcept
 : mImpl(other.mImpl)
 {
   other.mImpl = nullptr;
@@ -128,7 +128,7 @@ Property::Array& Property::Array::operator=(const Property::Array& other)
   return *this;
 }
 
-Property::Array& Property::Array::operator=(Property::Array&& other)
+Property::Array& Property::Array::operator=(Property::Array&& other) noexcept
 {
   if(this != &other)
   {

@@ -275,7 +275,7 @@ int UtcDaliCameraActorSetGetTypeP(void)
   actor.SetType(Dali::Camera::LOOK_AT_TARGET);
   DALI_TEST_EQUALS(actor.GetType(), Dali::Camera::LOOK_AT_TARGET, TEST_LOCATION);
 
-  Dali::Camera::Type cameraType = actor.GetProperty<Dali::Camera::Type>(CameraActor::Property::TYPE);
+  Dali::Camera::Type cameraType        = actor.GetProperty<Dali::Camera::Type>(CameraActor::Property::TYPE);
   Dali::Camera::Type currentCameraType = actor.GetCurrentProperty<Dali::Camera::Type>(CameraActor::Property::TYPE);
   DALI_TEST_EQUALS(Camera::LOOK_AT_TARGET, cameraType, TEST_LOCATION);
   DALI_TEST_EQUALS(Camera::LOOK_AT_TARGET, currentCameraType, TEST_LOCATION);
@@ -1229,7 +1229,6 @@ int UtcDaliCameraActorSetCameraOnScene(void)
   DALI_TEST_EQUALS(TEST_FAR_PLANE_DISTANCE, actor.GetFarClippingPlane(), FLOAT_EPSILON, TEST_LOCATION);
   DALI_TEST_EQUALS(false, actor.GetInvertYAxis(), TEST_LOCATION);
 
-
   Dali::Camera::Type cameraType = actor.GetProperty<Dali::Camera::Type>(CameraActor::Property::TYPE);
   DALI_TEST_EQUALS(cameraType, Camera::LOOK_AT_TARGET, TEST_LOCATION);
 
@@ -1313,7 +1312,15 @@ int UtcDaliCameraActorDefaultProperties(void)
   for(std::vector<Property::Index>::iterator iter = indices.begin(); iter != indices.end(); ++iter)
   {
     DALI_TEST_EQUALS(*iter, actor.GetPropertyIndex(actor.GetPropertyName(*iter)), TEST_LOCATION);
-    DALI_TEST_CHECK(!actor.IsPropertyAnimatable(*iter));
+
+    if(*iter == CameraActor::Property::FIELD_OF_VIEW)
+    {
+      DALI_TEST_CHECK(actor.IsPropertyAnimatable(*iter));
+    }
+    else
+    {
+      DALI_TEST_CHECK(!actor.IsPropertyAnimatable(*iter));
+    }
 
     if((*iter == CameraActor::Property::PROJECTION_MATRIX) ||
        (*iter == CameraActor::Property::VIEW_MATRIX))
@@ -1436,7 +1443,7 @@ int UtcDaliCameraActorDefaultPropertiesInherited(void)
       // camera own
       {"type", Property::INTEGER, true, false, true, Dali::CameraActor::Property::TYPE},
       {"projectionMode", Property::INTEGER, true, false, true, Dali::CameraActor::Property::PROJECTION_MODE},
-      {"fieldOfView", Property::FLOAT, true, false, true, Dali::CameraActor::Property::FIELD_OF_VIEW},
+      {"fieldOfView", Property::FLOAT, true, true, true, Dali::CameraActor::Property::FIELD_OF_VIEW},
       {"aspectRatio", Property::FLOAT, true, false, true, Dali::CameraActor::Property::ASPECT_RATIO},
       {"nearPlaneDistance", Property::FLOAT, true, false, true, Dali::CameraActor::Property::NEAR_PLANE_DISTANCE},
       {"farPlaneDistance", Property::FLOAT, true, false, true, Dali::CameraActor::Property::FAR_PLANE_DISTANCE},
@@ -1538,7 +1545,7 @@ int UtcDaliCameraActorReadProjectionMatrix(void)
   END_TEST;
 }
 
-int UtcDaliCameraActorAnimatedProperties(void)
+int UtcDaliCameraActorAnimatedProperties01(void)
 {
   TestApplication application;
   tet_infoline("Testing Dali::Internal::CameraActor::GetSceneObjectAnimatableProperty()");
@@ -1557,6 +1564,151 @@ int UtcDaliCameraActorAnimatedProperties(void)
   application.Render();
 
   DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), Vector3(100.0f, 200.0f, 300.0f), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliCameraActorAnimatedProperties02(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::Internal::CameraActor::GetSceneObjectAnimatableProperty()");
+
+  CameraActor camera = application.GetScene().GetRenderTaskList().GetTask(0u).GetCameraActor();
+  Actor       actor  = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::POSITION, Vector2(0.1f, 0.0f));
+  application.GetScene().Add(actor);
+
+  camera.SetFieldOfView(0.1f);
+
+  Constraint constraint = Constraint::New<float>(actor, Actor::Property::POSITION_X, EqualToConstraint());
+  constraint.AddSource(Source(camera, CameraActor::Property::FIELD_OF_VIEW));
+  constraint.Apply();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<float>(Actor::Property::POSITION_X), 0.1f, TEST_LOCATION);
+
+  camera.SetFieldOfView(0.5f);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<float>(Actor::Property::POSITION_X), 0.5f, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliCameraActorAnimatedProperties03(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::Internal::CameraActor::GetSceneObjectAnimatableProperty()");
+
+  CameraActor camera = application.GetScene().GetRenderTaskList().GetTask(0u).GetCameraActor();
+
+  // Add dummy actor
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::POSITION, Vector2(0.1f, 0.0f));
+  application.GetScene().Add(actor);
+
+  Radian sourceFoV = Radian(0.6f);
+  Radian targetFoV = Radian(0.1f);
+
+  Matrix expectedProjectionMatrix1;
+  Matrix expectedProjectionMatrix2;
+  Matrix expectedProjectionMatrix3;
+
+  // Reduce near-far value for projection matrix epsilon
+  camera.SetNearClippingPlane(1.0f);
+  camera.SetFarClippingPlane(3.0f);
+
+  // Build expect projection matrix
+  camera.SetFieldOfView(sourceFoV.radian);
+  application.SendNotification();
+  application.Render();
+  camera.GetProperty(CameraActor::Property::PROJECTION_MATRIX).Get(expectedProjectionMatrix1);
+
+  camera.SetFieldOfView(sourceFoV.radian * 0.6f + targetFoV.radian * 0.4f);
+  application.SendNotification();
+  application.Render();
+  camera.GetProperty(CameraActor::Property::PROJECTION_MATRIX).Get(expectedProjectionMatrix2);
+
+  camera.SetFieldOfView(targetFoV.radian);
+  application.SendNotification();
+  application.Render();
+  camera.GetProperty(CameraActor::Property::PROJECTION_MATRIX).Get(expectedProjectionMatrix3);
+
+  auto TestAnimationProgress = [&]() {
+    Matrix projectionMatrix;
+
+    application.SendNotification();
+    application.Render(0);
+
+    // progress 0.0
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::FIELD_OF_VIEW), sourceFoV.radian, TEST_LOCATION);
+
+    camera.GetProperty(CameraActor::Property::PROJECTION_MATRIX).Get(projectionMatrix);
+    DALI_TEST_EQUALS(projectionMatrix, expectedProjectionMatrix1, Epsilon<100000>::value, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render(400);
+
+    // progress 0.4
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::FIELD_OF_VIEW), sourceFoV.radian * 0.6f + targetFoV.radian * 0.4f, TEST_LOCATION);
+
+    camera.GetProperty(CameraActor::Property::PROJECTION_MATRIX).Get(projectionMatrix);
+    DALI_TEST_EQUALS(projectionMatrix, expectedProjectionMatrix2, Epsilon<100000>::value, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render(600);
+
+    // progress 1.0
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::FIELD_OF_VIEW), targetFoV.radian, TEST_LOCATION);
+
+    camera.GetProperty(CameraActor::Property::PROJECTION_MATRIX).Get(projectionMatrix);
+    DALI_TEST_EQUALS(projectionMatrix, expectedProjectionMatrix3, Epsilon<100000>::value, TEST_LOCATION);
+
+    // Ensure Animate finished.
+    application.SendNotification();
+    application.Render(16);
+  };
+
+  // AnimateTo
+  {
+    tet_printf("AnimateTo\n");
+    camera.SetProperty(CameraActor::Property::FIELD_OF_VIEW, sourceFoV.radian);
+    Animation animation = Animation::New(1.0f);
+    animation.AnimateTo(Property(camera, CameraActor::Property::FIELD_OF_VIEW), targetFoV.radian);
+    animation.AnimateTo(Property(camera, Actor::Property::POSITION_X), 0.0f); ///< For line coverage.
+    animation.Play();
+
+    TestAnimationProgress();
+  }
+
+  // AnimateBetween
+  {
+    tet_printf("AnimateBetween\n");
+    Animation animation = Animation::New(1.0f);
+    KeyFrames keyFrames = KeyFrames::New();
+    keyFrames.Add(0.0f, sourceFoV.radian);
+    keyFrames.Add(1.0f, targetFoV.radian);
+    animation.AnimateBetween(Property(camera, CameraActor::Property::FIELD_OF_VIEW), keyFrames);
+    animation.Play();
+
+    TestAnimationProgress();
+  }
+
+  // AnimateBy
+  {
+    tet_printf("AnimateBy\n");
+    camera.SetProperty(CameraActor::Property::FIELD_OF_VIEW, sourceFoV.radian);
+    Animation animation = Animation::New(1.0f);
+    animation.AnimateBy(Property(camera, CameraActor::Property::FIELD_OF_VIEW), targetFoV.radian - sourceFoV.radian);
+    animation.Play();
+
+    TestAnimationProgress();
+  }
+
   END_TEST;
 }
 
@@ -1797,6 +1949,125 @@ int UtcDaliCameraActorReflectionByPlane(void)
   // Nothing should change despite of different camera type
   matrixAfter.GetTransformComponents(position, rotation, scale);
   DALI_TEST_EQUALS(reflected, rotation, 0.01f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliCameraActorProjectionDirection(void)
+{
+  TestApplication application;
+
+  Integration::Scene stage     = application.GetScene();
+  Vector2            stageSize = stage.GetSize();
+
+  CameraActor defaultCameraActor = stage.GetRenderTaskList().GetTask(0).GetCameraActor();
+  CameraActor expectCameraActor1 = CameraActor::New(stageSize);
+  CameraActor expectCameraActor2 = CameraActor::New(stageSize);
+  CameraActor expectCameraActor3 = CameraActor::New(stageSize);
+
+  float fieldOfView = defaultCameraActor.GetFieldOfView();
+  float aspectRatio = defaultCameraActor.GetAspectRatio();
+
+  // Calculate expect camera 1's fov.
+  float anotherFieldOfView = 2.0f * std::atan(std::tan(fieldOfView * 0.5f) / aspectRatio);
+  expectCameraActor1.SetFieldOfView(anotherFieldOfView);
+
+  // Calculate expect camera 2's fov and aspect ratio.
+  float anotherFieldOfView2 = 2.0f * std::atan(std::tan(fieldOfView * 0.5f) * aspectRatio);
+  float anotherAspectRatio  = 1.0f / aspectRatio;
+  expectCameraActor2.SetFieldOfView(anotherFieldOfView2);
+  expectCameraActor2.SetAspectRatio(anotherAspectRatio);
+
+  // Calculate expect camera 3's aspect raio
+  expectCameraActor3.SetAspectRatio(anotherAspectRatio);
+
+  stage.Add(expectCameraActor1);
+  stage.Add(expectCameraActor2);
+  stage.Add(expectCameraActor3);
+
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  // Test default projection direction is VERTICAL
+  DALI_TEST_EQUALS(defaultCameraActor.GetProperty<int>(Dali::DevelCameraActor::Property::PROJECTION_DIRECTION), static_cast<int>(Dali::DevelCameraActor::ProjectionDirection::VERTICAL), TEST_LOCATION);
+
+  Matrix matrixBefore, matrixAfter;
+  Matrix matrixExpect1, matrixExpect2, matrixExpect3;
+
+  defaultCameraActor.GetProperty(CameraActor::CameraActor::Property::PROJECTION_MATRIX).Get(matrixBefore);
+  expectCameraActor1.GetProperty(CameraActor::CameraActor::Property::PROJECTION_MATRIX).Get(matrixExpect1);
+  expectCameraActor2.GetProperty(CameraActor::CameraActor::Property::PROJECTION_MATRIX).Get(matrixExpect2);
+  expectCameraActor3.GetProperty(CameraActor::CameraActor::Property::PROJECTION_MATRIX).Get(matrixExpect3);
+
+  tet_printf("Check ProjectionDirection::HORIZONTAL\n");
+
+  defaultCameraActor.SetProperty(Dali::DevelCameraActor::Property::PROJECTION_DIRECTION, Dali::DevelCameraActor::ProjectionDirection::HORIZONTAL);
+  DALI_TEST_EQUALS(defaultCameraActor.GetProperty<int>(Dali::DevelCameraActor::Property::PROJECTION_DIRECTION), static_cast<int>(Dali::DevelCameraActor::ProjectionDirection::HORIZONTAL), TEST_LOCATION);
+  // NOTE : ProjectionDirection doesn't change camera actor's FieldOfView and AspectRatio value.)
+  DALI_TEST_EQUALS(defaultCameraActor.GetFieldOfView(), fieldOfView, TEST_LOCATION);
+  DALI_TEST_EQUALS(defaultCameraActor.GetAspectRatio(), aspectRatio, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  defaultCameraActor.GetProperty(CameraActor::CameraActor::Property::PROJECTION_MATRIX).Get(matrixAfter);
+
+  // Check camera's ProjectionMatrix same as expect camera 1's ProjectionMatrix.
+  DALI_TEST_EQUALS(matrixAfter, matrixExpect1, Dali::Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+
+  tet_printf("Check ProjectionDirection::HORIZONTAL + Change aspect ratio\n");
+
+  defaultCameraActor.SetAspectRatio(anotherAspectRatio);
+  DALI_TEST_EQUALS(defaultCameraActor.GetAspectRatio(), anotherAspectRatio, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  defaultCameraActor.GetProperty(CameraActor::CameraActor::Property::PROJECTION_MATRIX).Get(matrixAfter);
+
+  // Check camera's ProjectionMatrix same as expect camera 2's ProjectionMatrix.
+  DALI_TEST_EQUALS(matrixAfter, matrixExpect2, Dali::Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+
+  tet_printf("Check ProjectionDirection::HORIZONTAL + Change aspect ratio + Change fov\n");
+
+  defaultCameraActor.SetFieldOfView(anotherFieldOfView);
+  DALI_TEST_EQUALS(defaultCameraActor.GetFieldOfView(), anotherFieldOfView, TEST_LOCATION);
+  DALI_TEST_EQUALS(defaultCameraActor.GetAspectRatio(), anotherAspectRatio, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  defaultCameraActor.GetProperty(CameraActor::CameraActor::Property::PROJECTION_MATRIX).Get(matrixAfter);
+
+  // Check camera's ProjectionMatrix same as expect camera 3's ProjectionMatrix.
+  DALI_TEST_EQUALS(matrixAfter, matrixExpect3, Dali::Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+
+  tet_printf("Check ProjectionDirection::VERTICAL, the original camera\n");
+
+  defaultCameraActor.SetProperty(Dali::DevelCameraActor::Property::PROJECTION_DIRECTION, Dali::DevelCameraActor::ProjectionDirection::VERTICAL);
+  defaultCameraActor.SetFieldOfView(fieldOfView);
+  defaultCameraActor.SetAspectRatio(aspectRatio);
+  DALI_TEST_EQUALS(defaultCameraActor.GetProperty<int>(Dali::DevelCameraActor::Property::PROJECTION_DIRECTION), static_cast<int>(Dali::DevelCameraActor::ProjectionDirection::VERTICAL), TEST_LOCATION);
+  DALI_TEST_EQUALS(defaultCameraActor.GetFieldOfView(), fieldOfView, TEST_LOCATION);
+  DALI_TEST_EQUALS(defaultCameraActor.GetAspectRatio(), aspectRatio, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  defaultCameraActor.GetProperty(CameraActor::CameraActor::Property::PROJECTION_MATRIX).Get(matrixAfter);
+
+  // Check vertical camera's ProjectionMatrix same as original ProjectionMatrix.
+  DALI_TEST_EQUALS(matrixAfter, matrixBefore, Dali::Math::MACHINE_EPSILON_10000, TEST_LOCATION);
 
   END_TEST;
 }
@@ -2235,7 +2506,6 @@ int UtcDaliCameraActorCulling01(void)
 
   END_TEST;
 }
-
 
 int UtcDaliCameraActorSetProperty(void)
 {

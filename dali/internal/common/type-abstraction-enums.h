@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TYPE_ABSTRACTION_ENUMS_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/actors/camera-actor-devel.h>
 #include <dali/devel-api/common/stage-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/internal/common/type-abstraction.h>
@@ -66,6 +67,10 @@ struct ParameterType<Dali::DevelStage::Rendering> : public BasicType<Dali::Devel
 };
 template<>
 struct ParameterType<Dali::DevelRenderer::Rendering::Type> : public BasicType<Dali::DevelRenderer::Rendering::Type>
+{
+};
+template<>
+struct ParameterType<Dali::DevelCameraActor::ProjectionDirection> : public BasicType<Dali::DevelCameraActor::ProjectionDirection>
 {
 };
 

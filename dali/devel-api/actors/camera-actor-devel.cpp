@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,22 +15,20 @@
  *
  */
 
-// CLASS HEADER
-#include <dali/internal/event/events/tap-gesture/tap-gesture-event.h>
+// INTERNAL INCLUDES
+#include <dali/devel-api/actors/camera-actor-devel.h>
+#include <dali/internal/event/actors/camera-actor-impl.h>
 
 namespace Dali
 {
-namespace Internal
+namespace DevelCameraActor
 {
-TapGestureEvent::TapGestureEvent(GestureState state)
-: GestureEvent(GestureType::TAP, state),
-  numberOfTaps(1),
-  numberOfTouches(1)
+
+void RotateProjection(Dali::CameraActor camera, int32_t rotationAngle)
 {
+  Dali::GetImplementation(camera).RotateProjection(rotationAngle);
 }
 
-TapGestureEvent::~TapGestureEvent() = default;
-
-} // namespace Internal
+} // namespace DevelCustomActor
 
 } // namespace Dali

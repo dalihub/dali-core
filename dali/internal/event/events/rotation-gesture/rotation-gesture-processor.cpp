@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,6 +60,8 @@ void EmitRotationSignal(
   rotation->SetRotation(rotationEvent.rotation);
   rotation->SetScreenCenterPoint(rotationEvent.centerPoint);
   rotation->SetLocalCenterPoint(localCenter);
+  rotation->SetSourceType(rotationEvent.sourceType);
+  rotation->SetSourceData(rotationEvent.sourceData);
 
   Dali::Actor                                    actorHandle(actor);
   const GestureDetectorContainer::const_iterator endIter = gestureDetectors.end();

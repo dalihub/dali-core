@@ -2,7 +2,7 @@
 #define DALI_QUATERNION_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -466,10 +466,10 @@ private:
   /// @endcond
 
 public:
-  Quaternion(const Quaternion&) = default;            ///< Default copy constructor
-  Quaternion(Quaternion&&)      = default;            ///< Default move constructor
-  Quaternion& operator=(const Quaternion&) = default; ///< Default copy assignment operator
-  Quaternion& operator=(Quaternion&&) = default;      ///< Default move assignment operator
+  Quaternion(const Quaternion&)     = default;            ///< Default copy constructor
+  Quaternion(Quaternion&&) noexcept = default;            ///< Default move constructor
+  Quaternion& operator=(const Quaternion&) = default;     ///< Default copy assignment operator
+  Quaternion& operator=(Quaternion&&) noexcept = default; ///< Default move assignment operator
 
 public:
   Vector4 mVector; ///< w component is s ( = cos(theta/2.0) )

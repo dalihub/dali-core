@@ -521,6 +521,7 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
 
   // Clean collected dirty/damaged rects on exit if 3d layer or 3d node or other conditions.
   DamagedRectsCleaner damagedRectCleaner(damagedRects, surfaceRect);
+  bool                cleanDamagedRect = false;
 
   // Mark previous dirty rects in the sorted array. The array is already sorted by node and renderer, frame number.
   // so you don't need to sort: std::stable_sort(itemsDirtyRects.begin(), itemsDirtyRects.end());
@@ -541,28 +542,24 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
     }
 
     const Camera* camera = instruction.GetCamera();
-    if(camera->mType == Camera::DEFAULT_TYPE && camera->mTargetPosition == Camera::DEFAULT_TARGET_POSITION)
+    if(camera && camera->mType == Camera::DEFAULT_TYPE && camera->mTargetPosition == Camera::DEFAULT_TARGET_POSITION)
     {
-      const Node* node = instruction.GetCamera()->GetNode();
-      if(node)
+      Vector3    position;
+      Vector3    scale;
+      Quaternion orientation;
+      camera->GetWorldMatrix(mImpl->renderBufferIndex).GetTransformComponents(position, orientation, scale);
+
+      Vector3 orientationAxis;
+      Radian  orientationAngle;
+      orientation.ToAxisAngle(orientationAxis, orientationAngle);
+
+      if(position.x > Math::MACHINE_EPSILON_10000 ||
+         position.y > Math::MACHINE_EPSILON_10000 ||
+         orientationAxis != Vector3(0.0f, 1.0f, 0.0f) ||
+         orientationAngle != ANGLE_180 ||
+         scale != Vector3(1.0f, 1.0f, 1.0f))
       {
-        Vector3    position;
-        Vector3    scale;
-        Quaternion orientation;
-        node->GetWorldMatrix(mImpl->renderBufferIndex).GetTransformComponents(position, orientation, scale);
-
-        Vector3 orientationAxis;
-        Radian  orientationAngle;
-        orientation.ToAxisAngle(orientationAxis, orientationAngle);
-
-        if(position.x > Math::MACHINE_EPSILON_10000 ||
-           position.y > Math::MACHINE_EPSILON_10000 ||
-           orientationAxis != Vector3(0.0f, 1.0f, 0.0f) ||
-           orientationAngle != ANGLE_180 ||
-           scale != Vector3(1.0f, 1.0f, 1.0f))
-        {
-          return;
-        }
+        return;
       }
     }
     else
@@ -601,10 +598,26 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
             for(uint32_t listIndex = 0u; listIndex < listCount; ++listIndex)
             {
               RenderItem& item = renderList->GetItem(listIndex);
-              // If the item does 3D transformation, do early exit and clean the damaged rect array
+              // If the item does 3D transformation, make full update
               if(item.mUpdateArea == Vector4::ZERO)
               {
-                return;
+                cleanDamagedRect = true;
+
+                // Save the full rect in the damaged list. We need it when this item is removed
+                DirtyRect dirtyRect(item.mNode, item.mRenderer, surfaceRect);
+                auto      dirtyRectPos = std::lower_bound(itemsDirtyRects.begin(), itemsDirtyRects.end(), dirtyRect);
+                if(dirtyRectPos != itemsDirtyRects.end() && dirtyRectPos->node == item.mNode && dirtyRectPos->renderer == item.mRenderer)
+                {
+                  // Replace the rect
+                  dirtyRectPos->visited = true;
+                  dirtyRectPos->rect    = dirtyRect.rect;
+                }
+                else
+                {
+                  // Else, just insert the new dirtyrect in the correct position
+                  itemsDirtyRects.insert(dirtyRectPos, dirtyRect);
+                }
+                continue;
               }
 
               Rect<int> rect;
@@ -659,6 +672,11 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
                 {
                   dirtyRectPos->visited = true;
                 }
+                else
+                {
+                  // The item is not in the list for some reason. Add it!
+                  itemsDirtyRects.insert(dirtyRectPos, dirtyRect);
+                }
               }
             }
           }
@@ -685,7 +703,11 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
   }
 
   itemsDirtyRects.resize(j - itemsDirtyRects.begin());
-  damagedRectCleaner.SetCleanOnReturn(false);
+
+  if(!cleanDamagedRect)
+  {
+    damagedRectCleaner.SetCleanOnReturn(false);
+  }
 
   // Reset updated flag from the root
   Layer* root = sceneObject->GetRoot();
@@ -908,7 +930,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     // Scissor's value should be set based on the default system coordinates.
     // When the surface is rotated, the input values already were set with the rotated angle.
     // So, re-calculation is needed.
-    scissorArea = RecalculateScissorArea(scissorArea, surfaceOrientation, viewportRect);
+    scissorArea = RecalculateScissorArea(scissorArea, surfaceOrientation, surfaceRect);
 
     // Begin render pass
     mainCommandBuffer->BeginRenderPass(
@@ -933,7 +955,8 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       mImpl->boundTextures,
       viewportRect,
       clippingRect,
-      surfaceOrientation);
+      surfaceOrientation,
+      Uint16Pair(surfaceRect.width, surfaceRect.height));
 
     Graphics::SyncObject* syncObject{nullptr};
     // If the render instruction has an associated render tracker (owned separately)

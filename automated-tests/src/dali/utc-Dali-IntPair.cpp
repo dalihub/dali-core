@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,8 @@ void DALI_TEST_EQUALS(uint16_t value1, unsigned int value2, const char* location
   ::DALI_TEST_EQUALS<uint16_t>(value1, static_cast<uint16_t>(value2), location);
 }
 } // unnamed namespace
+
+// class Uint16Pair
 
 int UtcDaliUint16PairConstructor01P(void)
 {
@@ -249,6 +251,138 @@ int UtcDaliUint16PairFromFloatArrayP(void)
   Uint16Pair u = Uint16Pair::FromFloatArray(array);
   DALI_TEST_EQUALS(u.GetX(), 5u, TEST_LOCATION);
   DALI_TEST_EQUALS(u.GetY(), 5u, TEST_LOCATION);
+
+  END_TEST;
+}
+
+// class Int32Pair
+
+int UtcDaliInt32PairConstructor01P(void)
+{
+  Int32Pair v;
+
+  DALI_TEST_EQUALS(v.GetX(), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(v.GetY(), 0, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliInt32PairConstructor02P(void)
+{
+  Int32Pair v(-10, 20);
+
+  DALI_TEST_EQUALS(v.GetX(), -10, TEST_LOCATION);
+  DALI_TEST_EQUALS(v.GetY(), 20, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliInt32PairCopyConstructor(void)
+{
+  Int32Pair u(-5, -10);
+  Int32Pair v(u);
+  DALI_TEST_EQUALS(v.GetX(), -5, TEST_LOCATION);
+  DALI_TEST_EQUALS(v.GetY(), -10, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliInt32PairMoveConstructor(void)
+{
+  Int32Pair u(5, -10);
+  Int32Pair v = std::move(u);
+  DALI_TEST_EQUALS(v.GetX(), 5, TEST_LOCATION);
+  DALI_TEST_EQUALS(v.GetY(), -10, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliInt32PairCopyAssignment(void)
+{
+  Int32Pair u(5, 10);
+  Int32Pair v;
+  v = u;
+  DALI_TEST_EQUALS(v.GetX(), 5, TEST_LOCATION);
+  DALI_TEST_EQUALS(v.GetY(), 10, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliInt32PairMoveAssignment(void)
+{
+  Int32Pair u(5, 10);
+  Int32Pair v;
+  v = std::move(u);
+  DALI_TEST_EQUALS(v.GetX(), 5, TEST_LOCATION);
+  DALI_TEST_EQUALS(v.GetY(), 10, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliInt32PairGetXP(void)
+{
+  Int32Pair v(5, 10);
+  DALI_TEST_EQUALS(v.GetX(), 5, TEST_LOCATION);
+  DALI_TEST_EQUALS(v.GetWidth(), 5, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliInt32PairGetYP(void)
+{
+  Int32Pair v(5, 10);
+  DALI_TEST_EQUALS(v.GetY(), 10, TEST_LOCATION);
+  DALI_TEST_EQUALS(v.GetHeight(), 10, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliInt32PairSetXP(void)
+{
+  Int32Pair v(5, 10);
+  DALI_TEST_EQUALS(v.GetX(), 5, TEST_LOCATION);
+  v.SetX(10);
+  DALI_TEST_EQUALS(v.GetX(), 10, TEST_LOCATION);
+  v.SetWidth(65539);
+  DALI_TEST_EQUALS(v.GetWidth(), 65539, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliInt32PairSetYP(void)
+{
+  Int32Pair v(5, 10);
+  DALI_TEST_EQUALS(v.GetY(), 10, TEST_LOCATION);
+  v.SetY(-5);
+  DALI_TEST_EQUALS(v.GetY(), -5, TEST_LOCATION);
+  v.SetHeight(65537);
+  DALI_TEST_EQUALS(v.GetHeight(), 65537, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliInt32PairEqualsP(void)
+{
+  Int32Pair v(5, 5);
+  Int32Pair u(5, 5);
+  DALI_TEST_EQUALS(v == u, true, TEST_LOCATION);
+
+  v = Int32Pair(5, 4);
+  u = Int32Pair(5, 5);
+  DALI_TEST_EQUALS(v == u, false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliInt32PairNotEqualsP(void)
+{
+  Int32Pair v(5, 5);
+  Int32Pair u(5, 5);
+  DALI_TEST_EQUALS(v != u, false, TEST_LOCATION);
+
+  v = Int32Pair(5, 4);
+  u = Int32Pair(5, 5);
+  DALI_TEST_EQUALS(v != u, true, TEST_LOCATION);
 
   END_TEST;
 }

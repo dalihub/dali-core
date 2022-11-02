@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -142,7 +142,7 @@ void RenderTask::SetCameraActor(CameraActor* cameraActor)
   mCameraActor.SetActor(cameraActor);
   if(cameraActor)
   {
-    SetCameraMessage(GetEventThreadServices(), GetRenderTaskSceneObject(), &cameraActor->GetNode(), cameraActor->GetCamera());
+    SetCameraMessage(GetEventThreadServices(), GetRenderTaskSceneObject(), &cameraActor->GetNode(), &cameraActor->GetCameraSceneObject());
   }
   else
   {

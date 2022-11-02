@@ -25,7 +25,6 @@
 #include <dali/internal/render/shaders/render-shader.h>
 #include <dali/internal/update/common/scene-graph-scene.h>
 #include <dali/internal/update/nodes/node.h>
-#include <dali/internal/update/render-tasks/scene-graph-camera.h>
 
 namespace Dali
 {
@@ -38,7 +37,6 @@ DiscardQueue::DiscardQueue(RenderQueue& renderQueue)
   mNodeQueue(),
   mShaderQueue(),
   mRendererQueue(),
-  mCameraQueue(),
   mSceneQueue()
 {
 }
@@ -77,13 +75,6 @@ void DiscardQueue::Add(BufferIndex updateBufferIndex, Renderer* renderer)
   mRendererQueue[updateBufferIndex].PushBack(renderer);
 }
 
-void DiscardQueue::Add(BufferIndex updateBufferIndex, Camera* camera)
-{
-  DALI_ASSERT_DEBUG(NULL != camera);
-
-  mCameraQueue[updateBufferIndex].PushBack(camera);
-}
-
 void DiscardQueue::Add(BufferIndex updateBufferIndex, Scene* scene)
 {
   DALI_ASSERT_DEBUG(NULL != scene);
@@ -97,7 +88,6 @@ void DiscardQueue::Clear(BufferIndex updateBufferIndex)
   mNodeQueue[updateBufferIndex].Clear();
   mRendererQueue[updateBufferIndex].Clear();
   mShaderQueue[updateBufferIndex].Clear();
-  mCameraQueue[updateBufferIndex].Clear();
   mSceneQueue[updateBufferIndex].Clear();
 }
 

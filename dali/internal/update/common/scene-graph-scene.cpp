@@ -33,6 +33,7 @@ Scene::Scene()
   mSkipRendering(false),
   mSurfaceRect(),
   mSurfaceOrientation(0),
+  mScreenOrientation(0),
   mSurfaceRectChanged(false),
   mRotationCompletedAcknowledgement(false)
 {
@@ -151,6 +152,8 @@ void Scene::SetSurfaceRect(const Rect<int32_t>& rect)
   mSurfaceRect        = rect;
   mSurfaceRectChanged = true;
 
+  DALI_LOG_RELEASE_INFO("update surfce rect in scene-graph, width[%d], height[%d]\n", mSurfaceRect.width, mSurfaceRect.height);
+
   if(mRoot)
   {
     mRoot->SetUpdated(true);
@@ -162,14 +165,25 @@ const Rect<int32_t>& Scene::GetSurfaceRect() const
   return mSurfaceRect;
 }
 
-void Scene::SetSurfaceOrientation(int32_t orientation)
+bool Scene::IsSurfaceRectChanged()
 {
-  mSurfaceOrientation = orientation;
+  bool surfaceRectChanged = mSurfaceRectChanged;
+  mSurfaceRectChanged     = false;
+
+  return surfaceRectChanged;
+}
+
+void Scene::SetSurfaceOrientations(int32_t windowOrientation, int32_t screenOrienation)
+{
+  mSurfaceOrientation = windowOrientation;
+  mScreenOrientation = screenOrienation;
 
   if(mRoot)
   {
     mRoot->SetUpdated(true);
   }
+
+  DALI_LOG_RELEASE_INFO("update orientation in scene-graph, surface [%d], screen[%d]\n", mSurfaceOrientation, mScreenOrientation);
 }
 
 int32_t Scene::GetSurfaceOrientation() const
@@ -177,12 +191,9 @@ int32_t Scene::GetSurfaceOrientation() const
   return mSurfaceOrientation;
 }
 
-bool Scene::IsSurfaceRectChanged()
+int32_t Scene::GetScreenOrientation() const
 {
-  bool surfaceRectChanged = mSurfaceRectChanged;
-  mSurfaceRectChanged     = false;
-
-  return surfaceRectChanged;
+  return mScreenOrientation;
 }
 
 void Scene::SetRotationCompletedAcknowledgement()
