@@ -21,7 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/devel-api/threading/mutex.h>
-#include <dali/integration-api/debug.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/complete-notification-interface.h>
 #include <dali/internal/event/common/property-notification-impl.h>
@@ -165,14 +164,9 @@ void NotificationManager::ProcessMessages()
 
   MessageContainer::Iterator       iter = mImpl->eventMessageQueue.Begin();
   const MessageContainer::Iterator end  = mImpl->eventMessageQueue.End();
-  if(iter != end)
+  for(; iter != end; ++iter)
   {
-    DALI_LOG_RELEASE_INFO("Start ProcessMessages\n");
-    for(; iter != end; ++iter)
-    {
-      (*iter)->Process(0u /*ignored*/);
-    }
-    DALI_LOG_RELEASE_INFO("End ProcessMessages\n");
+    (*iter)->Process(0u /*ignored*/);
   }
   // release the processed messages from event side queue
   mImpl->eventMessageQueue.Clear();

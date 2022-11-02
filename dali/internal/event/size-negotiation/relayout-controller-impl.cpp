@@ -436,10 +436,8 @@ void RelayoutController::Relayout()
     // 2. Iterate through the stack until it's empty.
     if(mRelayoutStack->Size() > 0)
     {
-      DALI_LOG_RELEASE_INFO("Start Relayout\n");
       PRINT_HIERARCHY;
 
-      int count = 0;
       while(mRelayoutStack->Size() > 0)
       {
         Dali::Actor actor;
@@ -447,7 +445,6 @@ void RelayoutController::Relayout()
         mRelayoutStack->Get(mRelayoutStack->Size() - 1, actor, size);
         Actor& actorImpl = GetImplementation(actor);
         mRelayoutStack->PopBack();
-        count++;
 
         if(actorImpl.RelayoutRequired() && actorImpl.OnScene())
         {
@@ -463,7 +460,6 @@ void RelayoutController::Relayout()
       mRelayoutInfoAllocator.ResetMemoryPool();
 
       PRINT_HIERARCHY;
-      DALI_LOG_RELEASE_INFO("End Relayout [%d]\n", count);
     }
 
     mPerformingRelayout = false;
