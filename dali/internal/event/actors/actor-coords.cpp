@@ -502,9 +502,12 @@ Matrix CalculateActorWorldTransform(const Actor& actor)
 
   Matrix  worldMatrix;
   Vector3 localPosition;
+
   // descentList is leaf first, so traverse from root (end) to leaf (beginning)
-  for(unsigned int i(descentList.size() - 1); i < descentList.size(); --i)
+  const size_t descentCount = descentList.size();
+  for(size_t iter = 0u; iter < descentCount; ++iter)
   {
+    auto       i                       = descentCount - iter - 1u;
     Vector3    anchorPoint             = descentList[i].GetProperty<Vector3>(Dali::Actor::Property::ANCHOR_POINT);
     Vector3    parentOrigin            = descentList[i].GetProperty<Vector3>(Dali::Actor::Property::PARENT_ORIGIN);
     bool       positionUsesAnchorPoint = descentList[i].GetProperty<bool>(Dali::Actor::Property::POSITION_USES_ANCHOR_POINT);
@@ -589,9 +592,11 @@ Vector4 CalculateActorWorldColor(const Actor& actor)
     currentActor = currentActor.GetParent();
   } while(inheritance != Dali::ColorMode::USE_OWN_COLOR && currentActor);
 
-  Vector4 worldColor;
-  for(unsigned int i(descentList.size() - 1); i < descentList.size(); --i)
+  Vector4      worldColor;
+  const size_t descentCount = descentList.size();
+  for(size_t iter = 0u; iter < descentCount; ++iter)
   {
+    auto i = descentCount - iter - 1u;
     if(inheritanceModeList[i] == USE_OWN_COLOR || i == descentList.size() - 1)
     {
       worldColor = descentList[i].GetProperty<Vector4>(Dali::Actor::Property::COLOR);
