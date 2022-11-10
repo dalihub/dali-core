@@ -82,7 +82,6 @@ struct ParameterType<PropertyNotification::NotifyMode>
 namespace SceneGraph
 {
 class Animation;
-class DiscardQueue;
 class RenderManager;
 class RenderTaskList;
 class RenderTaskProcessor;
@@ -105,7 +104,6 @@ public:
    * @param[in] notificationManager This should be notified when animations have finished.
    * @param[in] animationPlaylist The CompleteNotificationInterface that handles the animations
    * @param[in] propertyNotifier The PropertyNotifier
-   * @param[in] discardQueue Nodes are added here when disconnected from the scene-graph.
    * @param[in] controller After messages are flushed, we request a render from the RenderController.
    * @param[in] renderManager This is responsible for rendering the results of each "update".
    * @param[in] renderQueue Used to queue messages for the next render.
@@ -114,7 +112,6 @@ public:
   UpdateManager(NotificationManager&           notificationManager,
                 CompleteNotificationInterface& animationPlaylist,
                 PropertyNotifier&              propertyNotifier,
-                DiscardQueue&                  discardQueue,
                 Integration::RenderController& controller,
                 RenderManager&                 renderManager,
                 RenderQueue&                   renderQueue,

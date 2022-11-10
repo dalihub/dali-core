@@ -55,7 +55,6 @@ struct ParameterType<ClippingMode::Type> : public BasicType<ClippingMode::Type>
 
 namespace SceneGraph
 {
-class DiscardQueue;
 class Layer;
 class RenderTask;
 class UpdateManager;

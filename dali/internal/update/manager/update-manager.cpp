@@ -88,8 +88,8 @@ namespace
  * @param discardQueue to put the object to
  * @param updateBufferIndex to use
  */
-template<class T>
-inline void EraseUsingDiscardQueue(OwnerContainer<T*>& container, T* object, DiscardQueue& discardQueue, BufferIndex updateBufferIndex)
+template<class Type>
+inline void EraseUsingDiscardQueue(OwnerContainer<Type*>& container, Type* object, DiscardQueue<Type*, OwnerContainer<Type*>>& discardQueue, BufferIndex updateBufferIndex)
 {
   DALI_ASSERT_DEBUG(object && "NULL object not allowed");
 
@@ -152,7 +152,6 @@ struct UpdateManager::Impl
   Impl(NotificationManager&           notificationManager,
        CompleteNotificationInterface& animationPlaylist,
        PropertyNotifier&              propertyNotifier,
-       DiscardQueue&                  discardQueue,
        RenderController&              renderController,
        RenderManager&                 renderManager,
        RenderQueue&                   renderQueue,
@@ -164,7 +163,6 @@ struct UpdateManager::Impl
     animationPlaylist(animationPlaylist),
     propertyNotifier(propertyNotifier),
     shaderSaver(nullptr),
-    discardQueue(discardQueue),
     renderController(renderController),
     sceneController(nullptr),
     renderManager(renderManager),
@@ -187,7 +185,7 @@ struct UpdateManager::Impl
     renderersAdded(false),
     renderingRequired(false)
   {
-    sceneController = new SceneControllerImpl(renderMessageDispatcher, renderQueue, discardQueue);
+    sceneController = new SceneControllerImpl(renderMessageDispatcher, renderQueue);
 
     // create first 'dummy' node
     nodes.PushBack(nullptr);
@@ -255,7 +253,6 @@ struct UpdateManager::Impl
   CompleteNotificationInterface& animationPlaylist;       ///< Holds handles to all the animations
   PropertyNotifier&              propertyNotifier;        ///< Provides notification to applications when properties are modified.
   ShaderSaver*                   shaderSaver;             ///< Saves shader binaries.
-  DiscardQueue&                  discardQueue;            ///< Nodes are added here when disconnected from the scene-graph.
   RenderController&              renderController;        ///< render controller
   SceneControllerImpl*           sceneController;         ///< scene controller
   RenderManager&                 renderManager;           ///< This is responsible for rendering the results of each "update"
@@ -280,7 +277,13 @@ struct UpdateManager::Impl
   OwnerContainer<Renderer*>             renderers;             ///< A container of owned renderers
   OwnerContainer<TextureSet*>           textureSets;           ///< A container of owned texture sets
   OwnerContainer<Shader*>               shaders;               ///< A container of owned shaders
-  OwnerPointer<PanGesture>              panGestureProcessor;   ///< Owned pan gesture processor; it lives for the lifecycle of UpdateManager
+
+  DiscardQueue<Node*, OwnerContainer<Node*>>         nodeDiscardQueue; ///< Nodes are added here when disconnected from the scene-graph.
+  DiscardQueue<Shader*, OwnerContainer<Shader*>>     shaderDiscardQueue;
+  DiscardQueue<Renderer*, OwnerContainer<Renderer*>> rendererDiscardQueue;
+  DiscardQueue<Scene*, OwnerContainer<Scene*>>       sceneDiscardQueue;
+
+  OwnerPointer<PanGesture> panGestureProcessor; ///< Owned pan gesture processor; it lives for the lifecycle of UpdateManager
 
   MessageQueue                         messageQueue;          ///< The messages queued from the event-thread
   std::vector<Internal::ShaderDataPtr> renderCompiledShaders; ///< Shaders compiled on Render thread are inserted here for update thread to pass on to event thread.
@@ -309,7 +312,6 @@ private:
 UpdateManager::UpdateManager(NotificationManager&           notificationManager,
                              CompleteNotificationInterface& animationFinishedNotifier,
                              PropertyNotifier&              propertyNotifier,
-                             DiscardQueue&                  discardQueue,
                              RenderController&              controller,
                              RenderManager&                 renderManager,
                              RenderQueue&                   renderQueue,
@@ -319,7 +321,6 @@ UpdateManager::UpdateManager(NotificationManager&           notificationManager,
   mImpl = new Impl(notificationManager,
                    animationFinishedNotifier,
                    propertyNotifier,
-                   discardQueue,
                    controller,
                    renderManager,
                    renderQueue,
@@ -365,7 +366,7 @@ void UpdateManager::UninstallRoot(Layer* layer)
     }
   }
 
-  mImpl->discardQueue.Add(mSceneGraphBuffers.GetUpdateBufferIndex(), layer);
+  mImpl->nodeDiscardQueue.Add(mSceneGraphBuffers.GetUpdateBufferIndex(), layer);
 
   // Notify the layer about impending destruction
   layer->OnDestroy();
@@ -448,7 +449,7 @@ void UpdateManager::DestroyNode(Node* node)
     RemoveCamera(static_cast<Camera*>(node));
   }
 
-  mImpl->discardQueue.Add(mSceneGraphBuffers.GetUpdateBufferIndex(), node);
+  mImpl->nodeDiscardQueue.Add(mSceneGraphBuffers.GetUpdateBufferIndex(), node);
 
   // Notify the Node about impending destruction
   node->OnDestroy();
@@ -542,7 +543,7 @@ void UpdateManager::RemoveScene(Scene* scene)
   {
     if(sceneInfo && sceneInfo->scene && sceneInfo->scene.Get() == scene)
     {
-      mImpl->discardQueue.Add(mSceneGraphBuffers.GetUpdateBufferIndex(), sceneInfo->scene.Release()); // take the address of the reference to a pointer
+      mImpl->sceneDiscardQueue.Add(mSceneGraphBuffers.GetUpdateBufferIndex(), sceneInfo->scene.Release()); // take the address of the reference to a pointer
       break;
     }
   }
@@ -625,7 +626,7 @@ void UpdateManager::AddShader(OwnerPointer<Shader>& shader)
 void UpdateManager::RemoveShader(Shader* shader)
 {
   // Find the shader and destroy it
-  EraseUsingDiscardQueue(mImpl->shaders, shader, mImpl->discardQueue, mSceneGraphBuffers.GetUpdateBufferIndex());
+  EraseUsingDiscardQueue(mImpl->shaders, shader, mImpl->shaderDiscardQueue, mSceneGraphBuffers.GetUpdateBufferIndex());
 }
 
 void UpdateManager::SaveBinary(Internal::ShaderDataPtr shaderData)
@@ -657,7 +658,7 @@ void UpdateManager::RemoveRenderer(Renderer* renderer)
   DALI_LOG_INFO(gLogFilter, Debug::General, "[%x] RemoveRenderer\n", renderer);
 
   // Find the renderer and destroy it
-  EraseUsingDiscardQueue(mImpl->renderers, renderer, mImpl->discardQueue, mSceneGraphBuffers.GetUpdateBufferIndex());
+  EraseUsingDiscardQueue(mImpl->renderers, renderer, mImpl->rendererDiscardQueue, mSceneGraphBuffers.GetUpdateBufferIndex());
   // Need to remove the render object as well
   renderer->DisconnectFromSceneGraph(*mImpl->sceneController, mSceneGraphBuffers.GetUpdateBufferIndex());
 }
@@ -950,7 +951,10 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
   const BufferIndex bufferIndex = mSceneGraphBuffers.GetUpdateBufferIndex();
 
   // Clear nodes/resources which were previously discarded
-  mImpl->discardQueue.Clear(bufferIndex);
+  mImpl->nodeDiscardQueue.Clear(bufferIndex);
+  mImpl->shaderDiscardQueue.Clear(bufferIndex);
+  mImpl->rendererDiscardQueue.Clear(bufferIndex);
+  mImpl->sceneDiscardQueue.Clear(bufferIndex);
 
   bool isAnimationRunning = IsAnimationRunning();
 
@@ -1278,7 +1282,7 @@ void UpdateManager::RemoveFrameCallback(FrameCallbackInterface* frameCallback)
 void UpdateManager::AddSampler(OwnerPointer<Render::Sampler>& sampler)
 {
   // Message has ownership of Sampler while in transit from update to render
-  using DerivedType = MessageValue1<RenderManager, OwnerPointer<Render::Sampler> >;
+  using DerivedType = MessageValue1<RenderManager, OwnerPointer<Render::Sampler>>;
 
   // Reserve some memory inside the render queue
   uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot(mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof(DerivedType));
@@ -1323,7 +1327,7 @@ void UpdateManager::SetWrapMode(Render::Sampler* sampler, uint32_t rWrapMode, ui
 void UpdateManager::AddVertexBuffer(OwnerPointer<Render::VertexBuffer>& vertexBuffer)
 {
   // Message has ownership of format while in transit from update -> render
-  using DerivedType = MessageValue1<RenderManager, OwnerPointer<Render::VertexBuffer> >;
+  using DerivedType = MessageValue1<RenderManager, OwnerPointer<Render::VertexBuffer>>;
 
   // Reserve some memory inside the render queue
   uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot(mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof(DerivedType));
@@ -1346,7 +1350,7 @@ void UpdateManager::RemoveVertexBuffer(Render::VertexBuffer* vertexBuffer)
 void UpdateManager::SetVertexBufferFormat(Render::VertexBuffer* vertexBuffer, OwnerPointer<Render::VertexBuffer::Format>& format)
 {
   // Message has ownership of format while in transit from update -> render
-  using DerivedType = MessageValue2<RenderManager, Render::VertexBuffer*, OwnerPointer<Render::VertexBuffer::Format> >;
+  using DerivedType = MessageValue2<RenderManager, Render::VertexBuffer*, OwnerPointer<Render::VertexBuffer::Format>>;
 
   // Reserve some memory inside the render queue
   uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot(mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof(DerivedType));
@@ -1355,10 +1359,10 @@ void UpdateManager::SetVertexBufferFormat(Render::VertexBuffer* vertexBuffer, Ow
   new(slot) DerivedType(&mImpl->renderManager, &RenderManager::SetVertexBufferFormat, vertexBuffer, format);
 }
 
-void UpdateManager::SetVertexBufferData(Render::VertexBuffer* vertexBuffer, OwnerPointer<Vector<uint8_t> >& data, uint32_t size)
+void UpdateManager::SetVertexBufferData(Render::VertexBuffer* vertexBuffer, OwnerPointer<Vector<uint8_t>>& data, uint32_t size)
 {
   // Message has ownership of format while in transit from update -> render
-  using DerivedType = MessageValue3<RenderManager, Render::VertexBuffer*, OwnerPointer<Dali::Vector<uint8_t> >, uint32_t>;
+  using DerivedType = MessageValue3<RenderManager, Render::VertexBuffer*, OwnerPointer<Dali::Vector<uint8_t>>, uint32_t>;
 
   // Reserve some memory inside the render queue
   uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot(mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof(DerivedType));
@@ -1370,7 +1374,7 @@ void UpdateManager::SetVertexBufferData(Render::VertexBuffer* vertexBuffer, Owne
 void UpdateManager::AddGeometry(OwnerPointer<Render::Geometry>& geometry)
 {
   // Message has ownership of format while in transit from update -> render
-  using DerivedType = MessageValue1<RenderManager, OwnerPointer<Render::Geometry> >;
+  using DerivedType = MessageValue1<RenderManager, OwnerPointer<Render::Geometry>>;
 
   // Reserve some memory inside the render queue
   uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot(mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof(DerivedType));
@@ -1437,7 +1441,7 @@ void UpdateManager::AttachVertexBuffer(Render::Geometry* geometry, Render::Verte
 void UpdateManager::AddTexture(OwnerPointer<Render::Texture>& texture)
 {
   // Message has ownership of Texture while in transit from update -> render
-  using DerivedType = MessageValue1<RenderManager, OwnerPointer<Render::Texture> >;
+  using DerivedType = MessageValue1<RenderManager, OwnerPointer<Render::Texture>>;
 
   // Reserve some memory inside the render queue
   uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot(mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof(DerivedType));
@@ -1481,7 +1485,7 @@ void UpdateManager::GenerateMipmaps(Render::Texture* texture)
 
 void UpdateManager::AddFrameBuffer(OwnerPointer<Render::FrameBuffer>& frameBuffer)
 {
-  using DerivedType = MessageValue1<RenderManager, OwnerPointer<Render::FrameBuffer> >;
+  using DerivedType = MessageValue1<RenderManager, OwnerPointer<Render::FrameBuffer>>;
 
   // Reserve some memory inside the render queue
   uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot(mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof(DerivedType));
