@@ -2,7 +2,7 @@
 #define DALI_FRAME_BUFFER_DEVEL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,6 +75,16 @@ DALI_CORE_API void AttachDepthStencilTexture(FrameBuffer frameBuffer, Texture& t
  * Otherwise, it won't be attached.
  */
 DALI_CORE_API void AttachDepthStencilTexture(FrameBuffer frameBuffer, Texture& texture, uint32_t mipmapLevel);
+
+/**
+ * @brief Sets the level of multisampling in the frame buffer.
+ * @note This API must be called before the frame buffer is attached to render task. (Since multi sample level is immutable)
+ * Otherwise, no effects.
+ *
+ * @param[in] frameBuffer The FrameBuffer handle
+ * @param[in] multiSamplingLevel The level of samples
+ */
+DALI_CORE_API void SetMultiSamplingLevel(FrameBuffer frameBuffer, uint8_t multiSamplingLevel);
 
 /**
  * @brief Gets the color texture at the given @a index used as output in the frame buffer.

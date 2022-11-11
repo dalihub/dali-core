@@ -581,6 +581,13 @@ public:
   void AttachDepthStencilTextureToFrameBuffer(Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel);
 
   /**
+   * Set a multisampling level value as texture output to the existing FrameBuffer
+   * @param[in] frameBuffer The FrameBuffer
+   * @param[in] multiSamplingLevel The level of multisampling
+   */
+  void SetMultiSamplingLevelToFrameBuffer(Render::FrameBuffer* frameBuffer, uint8_t multiSamplingLevel);
+
+  /**
    * This is called when the surface of the scene has been replaced.
    * @param[in] scene The scene.
    */
@@ -1424,6 +1431,17 @@ inline void AttachDepthStencilTextureToFrameBuffer(UpdateManager& manager, Rende
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&manager, &UpdateManager::AttachDepthStencilTextureToFrameBuffer, &frameBuffer, texture, mipmapLevel);
+}
+
+inline void SetMultiSamplingLevelToFrameBuffer(UpdateManager& manager, Render::FrameBuffer& frameBuffer, uint8_t multiSamplingLevel)
+{
+  using LocalType = MessageValue2<UpdateManager, Render::FrameBuffer*, uint8_t>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new(slot) LocalType(&manager, &UpdateManager::SetMultiSamplingLevelToFrameBuffer, &frameBuffer, multiSamplingLevel);
 }
 
 inline void SetDepthIndicesMessage(UpdateManager& manager, OwnerPointer<NodeDepths>& nodeDepths)

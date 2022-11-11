@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_FRAME_BUFFER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,8 +62,8 @@ public:
    * Doesn't re-create them if they are already generated, also doesn't
    * check for new attachments.
    *
-   * Creates the framebuffer, attaches color and depth textures, generates
-   * render target and render passes.
+   * Creates the framebuffer, attaches color and depth textures, set multi sampling level,
+   * generates render target and render passes.
    *
    * @return true if there are attachments and the graphics objects have been created.
    */
@@ -103,6 +103,12 @@ public:
    * @param[in] mipmapLevel The mipmap of the texture to be attached
    */
   void AttachDepthStencilTexture(Render::Texture* texture, uint32_t mipmapLevel);
+
+  /**
+   * @brief Sets the level of multisampling in the frame buffer. This API is valid only GL_EXT_multisampled_render_to_texture supported.
+   * @param[in] multiSamplingLevel The level of multisampling
+   */
+  void SetMultiSamplingLevel(uint8_t multiSamplingLevel);
 
   /**
    * @brief Get the number of textures bound to this frame buffer as color attachments.

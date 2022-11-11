@@ -72,6 +72,8 @@ public:
 
   bool IsAdvancedBlendEquationSupported() override;
 
+  bool IsMultisampledRenderToTextureSupported() override;
+
   bool IsBlendEquationSupported(DevelBlendEquation::Type blendEquation) override;
 
   std::string GetShaderVersionPrefix();
@@ -1700,6 +1702,12 @@ public:
 
   inline void RenderbufferStorageMultisample(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height) override
   {
+  }
+
+  inline void FramebufferTexture2DMultisample(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level, GLsizei samples) override
+  {
+    // TODO : Check it if need
+    FramebufferTexture2D(target, attachment, textarget, texture, level);
   }
 
   inline void FramebufferTextureLayer(GLenum target, GLenum attachment, GLuint texture, GLint level, GLint layer) override
