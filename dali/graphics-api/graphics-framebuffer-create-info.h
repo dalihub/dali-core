@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_FRAMEBUFFER_CREATE_INFO_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,6 +97,18 @@ struct FramebufferCreateInfo
   }
 
   /**
+   * @brief Sets multisampling level of framebuffer
+   *
+   * @param[in] value multisampling level of framebuffer
+   * @return reference to this structure
+   */
+  auto& SetMultiSamplingLevel(uint8_t value)
+  {
+    multiSamplingLevel = value;
+    return *this;
+  }
+
+  /**
    * @brief Sets allocation callbacks which will be used when object is created
    * and destroyed.
    *
@@ -114,6 +126,7 @@ struct FramebufferCreateInfo
   std::vector<ColorAttachment> colorAttachments{};
   DepthStencilAttachment       depthStencilAttachment{};
   Extent2D                     size{};
+  uint8_t                      multiSamplingLevel{0u};
 
   const AllocationCallbacks* allocationCallbacks{nullptr};
 };

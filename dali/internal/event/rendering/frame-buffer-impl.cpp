@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -105,6 +105,11 @@ void FrameBuffer::AttachDepthStencilTexture(TexturePtr texture, unsigned int mip
     mStencil = texture;
     AttachDepthStencilTextureToFrameBuffer(mEventThreadServices.GetUpdateManager(), *mRenderObject, texture->GetRenderObject(), mipmapLevel);
   }
+}
+
+void FrameBuffer::SetMultiSamplingLevel(uint8_t multiSamplingLevel)
+{
+  SetMultiSamplingLevelToFrameBuffer(mEventThreadServices.GetUpdateManager(), *mRenderObject, multiSamplingLevel);
 }
 
 Texture* FrameBuffer::GetColorTexture(uint8_t index) const

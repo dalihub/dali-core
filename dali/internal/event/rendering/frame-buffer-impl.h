@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_FRAME_BUFFER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,6 +82,11 @@ public:
    * @copydoc Dali::DevelFrameBuffer::AttachDepthStencilTexture()
    */
   void AttachDepthStencilTexture(TexturePtr texture, uint32_t mipmapLevel);
+
+  /**
+   * @copydoc Dali::DevelFrameBuffer::SetMultiSamplingLevel()
+   */
+  void SetMultiSamplingLevel(uint8_t multiSamplingLevel);
 
   /**
    * @copydoc Dali::FrameBuffer::GetColorTexture()

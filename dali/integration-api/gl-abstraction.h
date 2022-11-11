@@ -130,6 +130,12 @@ public:
   virtual bool IsAdvancedBlendEquationSupported() = 0;
 
   /**
+   * Returns current gles can support multisampled render to texture
+   * @Return true current gles support multisampled render to texture
+   */
+  virtual bool IsMultisampledRenderToTextureSupported() = 0;
+
+  /**
    * Returns current gles can support the blend equation
    * @Return true current gles support the blend equation
    */
@@ -339,6 +345,7 @@ public:
   virtual void           UniformMatrix4x3fv (GLint location, GLsizei count, GLboolean transpose, const GLfloat* value) = 0;
   virtual void           BlitFramebuffer (GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter) = 0;
   virtual void           RenderbufferStorageMultisample (GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height) = 0;
+  virtual void           FramebufferTexture2DMultisample(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level, GLsizei samples) = 0;
   virtual void           FramebufferTextureLayer (GLenum target, GLenum attachment, GLuint texture, GLint level, GLint layer) = 0;
   virtual GLvoid*        MapBufferRange (GLenum target, GLintptr offset, GLsizeiptr length, GLbitfield access) = 0;
   virtual void           FlushMappedBufferRange (GLenum target, GLintptr offset, GLsizeiptr length) = 0;

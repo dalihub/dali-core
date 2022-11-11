@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TYPE_ABSTRACTION_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,6 +101,21 @@ template<>
 struct ParameterType<short int> : public BasicType<short int>
 {
 };
+template<>
+struct ParameterType<unsigned short int> : public BasicType<unsigned short int>
+{
+};
+
+#if SCHAR_MAX != SHRT_MAX
+template<>
+struct ParameterType<char> : public BasicType<char>
+{
+};
+template<>
+struct ParameterType<unsigned char> : public BasicType<unsigned char>
+{
+};
+#endif
 
 #if INT_MAX != LONG_MAX
 template<>
