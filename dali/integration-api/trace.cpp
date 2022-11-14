@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,11 +67,11 @@ Filter* Filter::New(bool trace, const char* environmentVariableName)
     sscanf(environmentVariableValue, "%c", &envTraceString);
 
     // Just use 'f' and 't' as it's faster than doing full string comparisons
-    if(envTraceString == 't')
+    if(envTraceString == '1' || envTraceString == 't')
     {
       trace = true;
     }
-    else if(envTraceString == 'f')
+    else if(envTraceString == '0' || envTraceString == 'f')
     {
       trace = false;
     }

@@ -50,7 +50,7 @@ void KeyEventProcessor::ProcessKeyEvent(const Integration::KeyEvent& event)
   std::ostringstream stream;
   if(gTraceFilter->IsTraceEnabled())
   {
-    stream << "DALI_PROCESS_KEY_EVENT [" << event.keyName << ", " << event.state << "]\n";
+    stream << "DALI_PROCESS_KEY_EVENT [" << event.keyName << ", " << event.state << "]";
     DALI_TRACE_BEGIN(gTraceFilter, stream.str().c_str());
   }
 #endif
