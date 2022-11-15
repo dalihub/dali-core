@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_INSTRUCTION_PROCESSOR_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -117,8 +117,9 @@ private:
    * @param renderList to sort
    * @param layer where the Renderers are from
    * @param respectClippingOrder Sort with the correct clipping hierarchy.
+   * @param isOrthographicCamera Whether the camera is orthographic or not.
    */
-  inline void SortRenderItems(BufferIndex bufferIndex, RenderList& renderList, Layer& layer, bool respectClippingOrder);
+  inline void SortRenderItems(BufferIndex bufferIndex, RenderList& renderList, Layer& layer, bool respectClippingOrder, bool isOrthographicCamera);
 
   /// Sort comparitor function pointer type.
   using ComparitorPointer = bool (*)(const SortAttributes&, const SortAttributes&);

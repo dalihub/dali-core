@@ -463,7 +463,7 @@ RenderInstructionProcessor::RenderInstructionProcessor()
 
 RenderInstructionProcessor::~RenderInstructionProcessor() = default;
 
-inline void RenderInstructionProcessor::SortRenderItems(BufferIndex bufferIndex, RenderList& renderList, Layer& layer, bool respectClippingOrder)
+inline void RenderInstructionProcessor::SortRenderItems(BufferIndex bufferIndex, RenderList& renderList, Layer& layer, bool respectClippingOrder, bool isOrthographicCamera)
 {
   const uint32_t renderableCount = static_cast<uint32_t>(renderList.Count());
   // Reserve space if needed.
@@ -484,47 +484,40 @@ inline void RenderInstructionProcessor::SortRenderItems(BufferIndex bufferIndex,
 
   // Calculate the sorting value, once per item by calling the layers sort function.
   // Using an if and two for-loops rather than if inside for as its better for branch prediction.
-  if(layer.UsesDefaultSortFunction())
+
+  // List of zValue calculating functions.
+  const Dali::Layer::SortFunctionType zValueFunctionFromVector3[] = {
+    [](const Vector3& position) { return position.z; },
+    [](const Vector3& position) { return position.LengthSquared(); },
+    layer.GetSortFunction(),
+  };
+
+  // Determine whether we need to use zValue as Euclidean distance or translatoin's z value.
+  // If layer is LAYER_UI or camera is OrthographicProjection mode, we don't need to calculate
+  // renderItem's distance from camera.
+
+  // Here we determine which zValue SortFunctionType (of the 3) to use.
+  //   0 is position z value : Default LAYER_UI or Orthographic camera
+  //   1 is distance square value : Default LAYER_3D and Perspective camera
+  //   2 is user defined function.
+  const int zValueFunctionIndex = layer.UsesDefaultSortFunction() ? ((layer.GetBehavior() == Dali::Layer::LAYER_UI || isOrthographicCamera) ? 0 : 1) : 2;
+
+  for(uint32_t index = 0; index < renderableCount; ++index)
   {
-    for(uint32_t index = 0; index < renderableCount; ++index)
+    RenderItem& item = renderList.GetItem(index);
+
+    if(DALI_LIKELY(item.mRenderer))
     {
-      RenderItem& item = renderList.GetItem(index);
-
-      if(DALI_LIKELY(item.mRenderer))
-      {
-        item.mRenderer->SetSortAttributes(mSortingHelper[index]);
-      }
-
-      // texture set
-      mSortingHelper[index].textureSet = item.mTextureSet;
-
-      // The default sorting function should get inlined here.
-      mSortingHelper[index].zValue = Internal::Layer::ZValue(item.mModelViewMatrix.GetTranslation3()) - static_cast<float>(item.mDepthIndex);
-
-      // Keep the renderitem pointer in the helper so we can quickly reorder items after sort.
-      mSortingHelper[index].renderItem = &item;
+      item.mRenderer->SetSortAttributes(mSortingHelper[index]);
     }
-  }
-  else
-  {
-    const Dali::Layer::SortFunctionType sortFunction = layer.GetSortFunction();
-    for(uint32_t index = 0; index < renderableCount; ++index)
-    {
-      RenderItem& item = renderList.GetItem(index);
 
-      if(DALI_LIKELY(item.mRenderer))
-      {
-        item.mRenderer->SetSortAttributes(mSortingHelper[index]);
-      }
+    // texture set
+    mSortingHelper[index].textureSet = item.mTextureSet;
 
-      // texture set
-      mSortingHelper[index].textureSet = item.mTextureSet;
+    mSortingHelper[index].zValue = zValueFunctionFromVector3[zValueFunctionIndex](item.mModelViewMatrix.GetTranslation3()) - static_cast<float>(item.mDepthIndex);
 
-      mSortingHelper[index].zValue = (*sortFunction)(item.mModelViewMatrix.GetTranslation3()) - static_cast<float>(item.mDepthIndex);
-
-      // Keep the RenderItem pointer in the helper so we can quickly reorder items after sort.
-      mSortingHelper[index].renderItem = &item;
-    }
+    // Keep the renderitem pointer in the helper so we can quickly reorder items after sort.
+    mSortingHelper[index].renderItem = &item;
   }
 
   // Here we determine which comparitor (of the 3) to use.
@@ -559,8 +552,9 @@ void RenderInstructionProcessor::Prepare(BufferIndex                 updateBuffe
   bool               isRenderListAdded       = false;
   bool               isRootLayerDirty        = false;
 
-  const Matrix&             viewMatrix = renderTask.GetViewMatrix(updateBufferIndex);
-  const SceneGraph::Camera& camera     = renderTask.GetCamera();
+  const Matrix&             viewMatrix           = renderTask.GetViewMatrix(updateBufferIndex);
+  const SceneGraph::Camera& camera               = renderTask.GetCamera();
+  const bool                isOrthographicCamera = camera.mProjectionMode == Dali::Camera::ProjectionMode::ORTHOGRAPHIC_PROJECTION;
 
   Viewport viewport;
   bool     viewportSet = renderTask.QueryViewport(updateBufferIndex, viewport);
@@ -597,7 +591,7 @@ void RenderInstructionProcessor::Prepare(BufferIndex                 updateBuffe
                                  cull);
 
         // We only use the clipping version of the sort comparitor if any clipping nodes exist within the RenderList.
-        SortRenderItems(updateBufferIndex, *renderList, layer, hasClippingNodes);
+        SortRenderItems(updateBufferIndex, *renderList, layer, hasClippingNodes, isOrthographicCamera);
       }
 
       isRenderListAdded = true;
@@ -621,7 +615,7 @@ void RenderInstructionProcessor::Prepare(BufferIndex                 updateBuffe
                                  cull);
 
         // Clipping hierarchy is irrelevant when sorting overlay items, so we specify using the non-clipping version of the sort comparitor.
-        SortRenderItems(updateBufferIndex, *renderList, layer, false);
+        SortRenderItems(updateBufferIndex, *renderList, layer, false, isOrthographicCamera);
       }
 
       isRenderListAdded = true;
