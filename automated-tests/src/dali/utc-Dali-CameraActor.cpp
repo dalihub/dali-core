@@ -186,10 +186,11 @@ int UtcDaliCameraActorNewDefaultPerspectiveProjection(void)
 
   // All the properties should still be the default values
   // Defaults taken from scene-graph-camera.cpp
-  DALI_TEST_EQUALS(800.0f / 480.0f, actor.GetProperty(CameraActor::Property::ASPECT_RATIO).Get<float>(), FLOAT_EPSILON, TEST_LOCATION);
+  DALI_TEST_EQUALS(480.0f / 800.0f, actor.GetProperty(CameraActor::Property::ASPECT_RATIO).Get<float>(), FLOAT_EPSILON, TEST_LOCATION);
   DALI_TEST_EQUALS(45.0f * (Math::PI / 180.0f), actor.GetProperty(CameraActor::Property::FIELD_OF_VIEW).Get<float>(), FLOAT_EPSILON, TEST_LOCATION);
   DALI_TEST_EQUALS(800.0f, actor.GetProperty(CameraActor::Property::NEAR_PLANE_DISTANCE).Get<float>(), FLOAT_EPSILON, TEST_LOCATION);
   DALI_TEST_EQUALS(3.0f * 800.0f, actor.GetProperty(CameraActor::Property::FAR_PLANE_DISTANCE).Get<float>(), FLOAT_EPSILON, TEST_LOCATION);
+  DALI_TEST_EQUALS(400.0f, actor.GetProperty(DevelCameraActor::Property::ORTHOGRAPHIC_SIZE).Get<float>(), FLOAT_EPSILON, TEST_LOCATION);
   DALI_TEST_EQUALS(0.0f, actor.GetProperty(Actor::Property::POSITION_Z).Get<float>(), TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetProjectionMode(), Dali::Camera::PERSPECTIVE_PROJECTION, TEST_LOCATION);
 
@@ -200,6 +201,7 @@ int UtcDaliCameraActorNewDefaultPerspectiveProjection(void)
   DALI_TEST_EQUALS(0.489957f, actor.GetProperty(CameraActor::Property::FIELD_OF_VIEW).Get<float>(), FLOAT_EPSILON, TEST_LOCATION);
   DALI_TEST_EQUALS(800.0f, actor.GetProperty(CameraActor::Property::NEAR_PLANE_DISTANCE).Get<float>(), FLOAT_EPSILON, TEST_LOCATION);
   DALI_TEST_EQUALS(4895.0f, actor.GetProperty(CameraActor::Property::FAR_PLANE_DISTANCE).Get<float>(), FLOAT_EPSILON, TEST_LOCATION);
+  DALI_TEST_EQUALS(400.0f, actor.GetProperty(DevelCameraActor::Property::ORTHOGRAPHIC_SIZE).Get<float>(), FLOAT_EPSILON, TEST_LOCATION);
   DALI_TEST_EQUALS(1600.0f, actor.GetProperty(Actor::Property::POSITION_Z).Get<float>(), TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetProjectionMode(), Dali::Camera::PERSPECTIVE_PROJECTION, TEST_LOCATION);
 
@@ -211,6 +213,7 @@ int UtcDaliCameraActorNewDefaultPerspectiveProjection(void)
   DALI_TEST_EQUALS(0.489957f, actor.GetProperty(CameraActor::Property::FIELD_OF_VIEW).Get<float>(), FLOAT_EPSILON, TEST_LOCATION);
   DALI_TEST_EQUALS(800.0f, actor.GetProperty(CameraActor::Property::NEAR_PLANE_DISTANCE).Get<float>(), FLOAT_EPSILON, TEST_LOCATION);
   DALI_TEST_EQUALS(4895.0f, actor.GetProperty(CameraActor::Property::FAR_PLANE_DISTANCE).Get<float>(), FLOAT_EPSILON, TEST_LOCATION);
+  DALI_TEST_EQUALS(400.0f, actor.GetProperty(DevelCameraActor::Property::ORTHOGRAPHIC_SIZE).Get<float>(), FLOAT_EPSILON, TEST_LOCATION);
   DALI_TEST_EQUALS(1600.0f, actor.GetProperty(Actor::Property::POSITION_Z).Get<float>(), TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetProjectionMode(), Dali::Camera::PERSPECTIVE_PROJECTION, TEST_LOCATION);
 
@@ -817,6 +820,46 @@ int UtcDaliCameraActorGetInvertYAxisN(void)
   END_TEST;
 }
 
+int UtcDaliCameraActorSetGetOthographicSizeP(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::CameraActor Set Orthographic Size (P)");
+
+  CameraActor actor = CameraActor::New(Size(TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT));
+  actor.SetProjectionMode(Dali::Camera::ORTHOGRAPHIC_PROJECTION);
+
+  // Get default orthographic size by inputed size
+  DALI_TEST_EQUALS(actor.GetProperty(Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE).Get<float>(), static_cast<float>(TestApplication::DEFAULT_SURFACE_HEIGHT) * 0.5f, TEST_LOCATION);
+
+  float value = 0.0f;
+
+  // Set an initial value to confirm a further set changes it.
+  float size = 300.0f;
+  actor.SetProperty(Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE, size);
+
+  value = 0.0f;
+  DALI_TEST_CHECK(actor.GetProperty(DevelCameraActor::Property::ORTHOGRAPHIC_SIZE).Get(value));
+  DALI_TEST_EQUALS(value, size, TEST_LOCATION);
+
+  size = 1600.0f;
+  actor.SetProperty(DevelCameraActor::Property::ORTHOGRAPHIC_SIZE, size);
+
+  value = 0.0f;
+  DALI_TEST_CHECK(actor.GetProperty(DevelCameraActor::Property::ORTHOGRAPHIC_SIZE).Get(value));
+  DALI_TEST_EQUALS(value, size, TEST_LOCATION);
+
+  actor.SetProperty(DevelCameraActor::Property::PROJECTION_DIRECTION, DevelCameraActor::ProjectionDirection::HORIZONTAL);
+
+  size = 600.0f;
+  actor.SetProperty(DevelCameraActor::Property::ORTHOGRAPHIC_SIZE, size);
+
+  value = 0.0f;
+  DALI_TEST_CHECK(actor.GetProperty(DevelCameraActor::Property::ORTHOGRAPHIC_SIZE).Get(value));
+  DALI_TEST_EQUALS(value, size, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliCameraActorSetPerspectiveProjectionP(void)
 {
   TestApplication application;
@@ -898,51 +941,57 @@ int UtcDaliCameraActorSetOrthographicProjectionP1(void)
   application.GetScene().Add(actor);
 
   actor.SetOrthographicProjection(Size(1080.0f, 1920.0f));
+
   application.SendNotification();
   application.Render(0);
   application.Render();
   application.SendNotification();
 
   float defaultAspectRatio;
-  float defaultFieldOfView;
   float defaultNearPlaneDistance;
   float defaultFarPlaneDistance;
   actor.GetProperty(CameraActor::Property::ASPECT_RATIO).Get(defaultAspectRatio);
-  actor.GetProperty(CameraActor::Property::FIELD_OF_VIEW).Get(defaultFieldOfView);
   actor.GetProperty(CameraActor::Property::NEAR_PLANE_DISTANCE).Get(defaultNearPlaneDistance);
   actor.GetProperty(CameraActor::Property::FAR_PLANE_DISTANCE).Get(defaultFarPlaneDistance);
   Vector3 defaultPos = actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION);
 
-  actor.SetOrthographicProjection(Size(1080.0f, 1920.0f));
+  auto TestOrthographicPlaneDistance = [&](float width, float height, float expectOrthographicSize) {
+    actor.SetOrthographicProjection(Size(width, height));
 
-  application.SendNotification();
-  application.Render(0);
-  application.Render();
-  application.SendNotification();
+    DALI_TEST_EQUALS(expectOrthographicSize, actor.GetProperty(Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE).Get<float>(), TEST_LOCATION);
 
-  float value;
-  actor.GetProperty(CameraActor::Property::ASPECT_RATIO).Get(value);
-  DALI_TEST_EQUALS(defaultAspectRatio, value, FLOAT_EPSILON, TEST_LOCATION);
-  actor.GetProperty(CameraActor::Property::FIELD_OF_VIEW).Get(value);
-  DALI_TEST_EQUALS(defaultFieldOfView, value, FLOAT_EPSILON, TEST_LOCATION);
-  actor.GetProperty(CameraActor::Property::NEAR_PLANE_DISTANCE).Get(value);
-  DALI_TEST_EQUALS(defaultNearPlaneDistance, value, FLOAT_EPSILON, TEST_LOCATION);
-  actor.GetProperty(CameraActor::Property::FAR_PLANE_DISTANCE).Get(value);
-  DALI_TEST_EQUALS(defaultFarPlaneDistance, value, FLOAT_EPSILON, TEST_LOCATION);
+    application.SendNotification();
+    application.Render(0);
+    application.Render();
+    application.SendNotification();
 
-  actor.GetProperty(CameraActor::Property::LEFT_PLANE_DISTANCE).Get(value);
-  DALI_TEST_EQUALS(-540.0f, value, FLOAT_EPSILON, TEST_LOCATION);
-  actor.GetProperty(CameraActor::Property::RIGHT_PLANE_DISTANCE).Get(value);
-  DALI_TEST_EQUALS(540.0f, value, FLOAT_EPSILON, TEST_LOCATION);
-  actor.GetProperty(CameraActor::Property::TOP_PLANE_DISTANCE).Get(value);
-  DALI_TEST_EQUALS(960.0f, value, FLOAT_EPSILON, TEST_LOCATION);
-  actor.GetProperty(CameraActor::Property::BOTTOM_PLANE_DISTANCE).Get(value);
-  DALI_TEST_EQUALS(-960.0f, value, FLOAT_EPSILON, TEST_LOCATION);
+    float value;
+    actor.GetProperty(CameraActor::Property::ASPECT_RATIO).Get(value);
+    DALI_TEST_EQUALS(defaultAspectRatio, value, FLOAT_EPSILON, TEST_LOCATION);
+    actor.GetProperty(CameraActor::Property::NEAR_PLANE_DISTANCE).Get(value);
+    DALI_TEST_EQUALS(defaultNearPlaneDistance, value, FLOAT_EPSILON, TEST_LOCATION);
+    actor.GetProperty(CameraActor::Property::FAR_PLANE_DISTANCE).Get(value);
+    DALI_TEST_EQUALS(defaultFarPlaneDistance, value, FLOAT_EPSILON, TEST_LOCATION);
 
-  Vector3 pos = actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION);
-  DALI_TEST_EQUALS(defaultPos.z, pos.z, 0.001f, TEST_LOCATION);
+    actor.GetProperty(CameraActor::Property::LEFT_PLANE_DISTANCE).Get(value);
+    DALI_TEST_EQUALS(-540.0f, value, FLOAT_EPSILON, TEST_LOCATION);
+    actor.GetProperty(CameraActor::Property::RIGHT_PLANE_DISTANCE).Get(value);
+    DALI_TEST_EQUALS(540.0f, value, FLOAT_EPSILON, TEST_LOCATION);
+    actor.GetProperty(CameraActor::Property::TOP_PLANE_DISTANCE).Get(value);
+    DALI_TEST_EQUALS(960.0f, value, FLOAT_EPSILON, TEST_LOCATION);
+    actor.GetProperty(CameraActor::Property::BOTTOM_PLANE_DISTANCE).Get(value);
+    DALI_TEST_EQUALS(-960.0f, value, FLOAT_EPSILON, TEST_LOCATION);
 
-  DALI_TEST_EQUALS(actor.GetProjectionMode(), Dali::Camera::ORTHOGRAPHIC_PROJECTION, TEST_LOCATION);
+    Vector3 pos = actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION);
+    DALI_TEST_EQUALS(defaultPos.z, pos.z, 0.001f, TEST_LOCATION);
+
+    DALI_TEST_EQUALS(actor.GetProjectionMode(), Dali::Camera::ORTHOGRAPHIC_PROJECTION, TEST_LOCATION);
+  };
+
+  TestOrthographicPlaneDistance(1080.0f, 1920.0f, 960.0f);
+  // Change projection direction
+  actor.SetProperty(DevelCameraActor::Property::PROJECTION_DIRECTION, DevelCameraActor::ProjectionDirection::HORIZONTAL);
+  TestOrthographicPlaneDistance(1080.0f, 1920.0f, 540.0f);
   END_TEST;
 }
 
@@ -964,102 +1013,6 @@ int UtcDaliCameraActorSetOrthographicProjectionN(void)
     asserted = true;
   }
   DALI_TEST_CHECK(asserted);
-  END_TEST;
-}
-
-int UtcDaliCameraActorSetOrthographicProjectionP2(void)
-{
-  TestApplication application;
-  tet_infoline("Testing Dali::CameraActor::SetOrthographicProjection (P,2)");
-
-  CameraActor actor = CameraActor::New();
-  DALI_TEST_CHECK(actor);
-
-  float defaultAspectRatio;
-  float defaultFieldOfView;
-  float defaultNearPlaneDistance;
-  float defaultFarPlaneDistance;
-  actor.GetProperty(CameraActor::Property::ASPECT_RATIO).Get(defaultAspectRatio);
-  actor.GetProperty(CameraActor::Property::FIELD_OF_VIEW).Get(defaultFieldOfView);
-  actor.GetProperty(CameraActor::Property::NEAR_PLANE_DISTANCE).Get(defaultNearPlaneDistance);
-  actor.GetProperty(CameraActor::Property::FAR_PLANE_DISTANCE).Get(defaultFarPlaneDistance);
-
-  // Check setting with specific near and far plane distances.
-  actor.SetOrthographicProjection(-100.0f, 200.0f, -300.0f, 500.0f, 400.0f, 4000.0f);
-
-  float value;
-  actor.GetProperty(CameraActor::Property::ASPECT_RATIO).Get(value);
-  DALI_TEST_EQUALS(defaultAspectRatio, value, FLOAT_EPSILON, TEST_LOCATION);
-  actor.GetProperty(CameraActor::Property::FIELD_OF_VIEW).Get(value);
-  DALI_TEST_EQUALS(defaultFieldOfView, value, FLOAT_EPSILON, TEST_LOCATION);
-  actor.GetProperty(CameraActor::Property::NEAR_PLANE_DISTANCE).Get(value);
-  DALI_TEST_EQUALS(400.0f, value, FLOAT_EPSILON, TEST_LOCATION);
-  actor.GetProperty(CameraActor::Property::FAR_PLANE_DISTANCE).Get(value);
-  DALI_TEST_EQUALS(4000.0f, value, FLOAT_EPSILON, TEST_LOCATION);
-
-  actor.GetProperty(CameraActor::Property::LEFT_PLANE_DISTANCE).Get(value);
-  DALI_TEST_EQUALS(-100.0f, value, FLOAT_EPSILON, TEST_LOCATION);
-  actor.GetProperty(CameraActor::Property::RIGHT_PLANE_DISTANCE).Get(value);
-  DALI_TEST_EQUALS(200.0f, value, FLOAT_EPSILON, TEST_LOCATION);
-  actor.GetProperty(CameraActor::Property::TOP_PLANE_DISTANCE).Get(value);
-  DALI_TEST_EQUALS(-300.0f, value, FLOAT_EPSILON, TEST_LOCATION);
-  actor.GetProperty(CameraActor::Property::BOTTOM_PLANE_DISTANCE).Get(value);
-  DALI_TEST_EQUALS(500.0f, value, FLOAT_EPSILON, TEST_LOCATION);
-
-  DALI_TEST_EQUALS(actor.GetProjectionMode(), Dali::Camera::ORTHOGRAPHIC_PROJECTION, TEST_LOCATION);
-
-  END_TEST;
-}
-
-int UtcDaliCameraActorSetOrthographicProjectionP3(void)
-{
-  TestApplication application;
-  tet_infoline("Testing Dali::CameraActor::SetOrthographicProjection (P,3)");
-
-  CameraActor actor = CameraActor::New();
-  DALI_TEST_CHECK(actor);
-
-  float defaultAspectRatio;
-  float defaultFieldOfView;
-  float defaultNearPlaneDistance;
-  float defaultFarPlaneDistance;
-  actor.GetProperty(CameraActor::Property::ASPECT_RATIO).Get(defaultAspectRatio);
-  actor.GetProperty(CameraActor::Property::FIELD_OF_VIEW).Get(defaultFieldOfView);
-  actor.GetProperty(CameraActor::Property::NEAR_PLANE_DISTANCE).Get(defaultNearPlaneDistance);
-  actor.GetProperty(CameraActor::Property::FAR_PLANE_DISTANCE).Get(defaultFarPlaneDistance);
-
-  actor.SetProjectionMode(Dali::Camera::ORTHOGRAPHIC_PROJECTION);
-
-  actor.SetProperty(CameraActor::Property::LEFT_PLANE_DISTANCE, -100.0f);
-  actor.SetProperty(CameraActor::Property::RIGHT_PLANE_DISTANCE, 200.0f);
-  actor.SetProperty(CameraActor::Property::TOP_PLANE_DISTANCE, -300.0f);
-  actor.SetProperty(CameraActor::Property::BOTTOM_PLANE_DISTANCE, 500.0f);
-  actor.SetNearClippingPlane(400.0f);
-  actor.SetFarClippingPlane(4000.0f);
-
-  float value;
-  actor.GetProperty(CameraActor::Property::ASPECT_RATIO).Get(value);
-  DALI_TEST_EQUALS(defaultAspectRatio, value, FLOAT_EPSILON, TEST_LOCATION);
-  actor.GetProperty(CameraActor::Property::FIELD_OF_VIEW).Get(value);
-  DALI_TEST_EQUALS(defaultFieldOfView, value, FLOAT_EPSILON, TEST_LOCATION);
-  actor.GetProperty(CameraActor::Property::NEAR_PLANE_DISTANCE).Get(value);
-  DALI_TEST_EQUALS(400.0f, value, FLOAT_EPSILON, TEST_LOCATION);
-  actor.GetProperty(CameraActor::Property::FAR_PLANE_DISTANCE).Get(value);
-  DALI_TEST_EQUALS(4000.0f, value, FLOAT_EPSILON, TEST_LOCATION);
-
-  actor.GetProperty(CameraActor::Property::LEFT_PLANE_DISTANCE).Get(value);
-  DALI_TEST_EQUALS(-100.0f, value, FLOAT_EPSILON, TEST_LOCATION);
-  actor.GetProperty(CameraActor::Property::RIGHT_PLANE_DISTANCE).Get(value);
-  DALI_TEST_EQUALS(200.0f, value, FLOAT_EPSILON, TEST_LOCATION);
-  actor.GetProperty(CameraActor::Property::TOP_PLANE_DISTANCE).Get(value);
-  DALI_TEST_EQUALS(-300.0f, value, FLOAT_EPSILON, TEST_LOCATION);
-  actor.GetProperty(CameraActor::Property::BOTTOM_PLANE_DISTANCE).Get(value);
-  DALI_TEST_EQUALS(500.0f, value, FLOAT_EPSILON, TEST_LOCATION);
-
-  DALI_TEST_EQUALS(actor.GetProjectionMode(), Dali::Camera::ORTHOGRAPHIC_PROJECTION, TEST_LOCATION);
-
-  Dali::Camera::ProjectionMode projectionMode = actor.GetProperty<Dali::Camera::ProjectionMode>(CameraActor::Property::PROJECTION_MODE);
-  DALI_TEST_EQUALS(projectionMode, Dali::Camera::ORTHOGRAPHIC_PROJECTION, TEST_LOCATION);
   END_TEST;
 }
 
@@ -1306,6 +1259,8 @@ int UtcDaliCameraActorDefaultProperties(void)
   indices.push_back(CameraActor::Property::PROJECTION_MATRIX);
   indices.push_back(CameraActor::Property::VIEW_MATRIX);
   indices.push_back(CameraActor::Property::INVERT_Y_AXIS);
+  indices.push_back(DevelCameraActor::Property::ORTHOGRAPHIC_SIZE);
+  indices.push_back(DevelCameraActor::Property::PROJECTION_DIRECTION);
 
   DALI_TEST_CHECK(actor.GetPropertyCount() == (Actor::New().GetPropertyCount() + indices.size()));
 
@@ -1313,7 +1268,7 @@ int UtcDaliCameraActorDefaultProperties(void)
   {
     DALI_TEST_EQUALS(*iter, actor.GetPropertyIndex(actor.GetPropertyName(*iter)), TEST_LOCATION);
 
-    if(*iter == CameraActor::Property::FIELD_OF_VIEW)
+    if(*iter == CameraActor::Property::FIELD_OF_VIEW || *iter == CameraActor::Property::ASPECT_RATIO || *iter == DevelCameraActor::Property::ORTHOGRAPHIC_SIZE)
     {
       DALI_TEST_CHECK(actor.IsPropertyAnimatable(*iter));
     }
@@ -1322,7 +1277,11 @@ int UtcDaliCameraActorDefaultProperties(void)
       DALI_TEST_CHECK(!actor.IsPropertyAnimatable(*iter));
     }
 
-    if((*iter == CameraActor::Property::PROJECTION_MATRIX) ||
+    if((*iter == CameraActor::Property::LEFT_PLANE_DISTANCE) ||
+       (*iter == CameraActor::Property::RIGHT_PLANE_DISTANCE) ||
+       (*iter == CameraActor::Property::TOP_PLANE_DISTANCE) ||
+       (*iter == CameraActor::Property::BOTTOM_PLANE_DISTANCE) ||
+       (*iter == CameraActor::Property::PROJECTION_MATRIX) ||
        (*iter == CameraActor::Property::VIEW_MATRIX))
     {
       DALI_TEST_CHECK(!actor.IsPropertyWritable(*iter));
@@ -1444,17 +1403,19 @@ int UtcDaliCameraActorDefaultPropertiesInherited(void)
       {"type", Property::INTEGER, true, false, true, Dali::CameraActor::Property::TYPE},
       {"projectionMode", Property::INTEGER, true, false, true, Dali::CameraActor::Property::PROJECTION_MODE},
       {"fieldOfView", Property::FLOAT, true, true, true, Dali::CameraActor::Property::FIELD_OF_VIEW},
-      {"aspectRatio", Property::FLOAT, true, false, true, Dali::CameraActor::Property::ASPECT_RATIO},
+      {"aspectRatio", Property::FLOAT, true, true, true, Dali::CameraActor::Property::ASPECT_RATIO},
       {"nearPlaneDistance", Property::FLOAT, true, false, true, Dali::CameraActor::Property::NEAR_PLANE_DISTANCE},
       {"farPlaneDistance", Property::FLOAT, true, false, true, Dali::CameraActor::Property::FAR_PLANE_DISTANCE},
-      {"leftPlaneDistance", Property::FLOAT, true, false, true, Dali::CameraActor::Property::LEFT_PLANE_DISTANCE},
-      {"rightPlaneDistance", Property::FLOAT, true, false, true, Dali::CameraActor::Property::RIGHT_PLANE_DISTANCE},
-      {"topPlaneDistance", Property::FLOAT, true, false, true, Dali::CameraActor::Property::TOP_PLANE_DISTANCE},
-      {"bottomPlaneDistance", Property::FLOAT, true, false, true, Dali::CameraActor::Property::BOTTOM_PLANE_DISTANCE},
+      {"leftPlaneDistance", Property::FLOAT, false, false, true, Dali::CameraActor::Property::LEFT_PLANE_DISTANCE},
+      {"rightPlaneDistance", Property::FLOAT, false, false, true, Dali::CameraActor::Property::RIGHT_PLANE_DISTANCE},
+      {"topPlaneDistance", Property::FLOAT, false, false, true, Dali::CameraActor::Property::TOP_PLANE_DISTANCE},
+      {"bottomPlaneDistance", Property::FLOAT, false, false, true, Dali::CameraActor::Property::BOTTOM_PLANE_DISTANCE},
       {"targetPosition", Property::VECTOR3, true, false, true, Dali::CameraActor::Property::TARGET_POSITION},
       {"projectionMatrix", Property::MATRIX, false, false, true, Dali::CameraActor::Property::PROJECTION_MATRIX},
       {"viewMatrix", Property::MATRIX, false, false, true, Dali::CameraActor::Property::VIEW_MATRIX},
-      {"invertYAxis", Property::BOOLEAN, true, false, true, Dali::CameraActor::Property::INVERT_Y_AXIS}};
+      {"invertYAxis", Property::BOOLEAN, true, false, true, Dali::CameraActor::Property::INVERT_Y_AXIS},
+      {"orthographicSize", Property::FLOAT, true, true, true, Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE},
+      {"projectionDirection", Property::INTEGER, true, false, true, Dali::DevelCameraActor::Property::PROJECTION_DIRECTION}};
 
   for(uint32_t index = 0; index < (sizeof(CAMERA_DEFAULT_PROPERTY) / sizeof(PropertyDetails)); ++index)
   {
@@ -1579,22 +1540,38 @@ int UtcDaliCameraActorAnimatedProperties02(void)
   application.GetScene().Add(actor);
 
   camera.SetFieldOfView(0.1f);
+  camera.SetAspectRatio(0.5f);
+  camera.SetProperty(Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE, 200.0f);
 
-  Constraint constraint = Constraint::New<float>(actor, Actor::Property::POSITION_X, EqualToConstraint());
-  constraint.AddSource(Source(camera, CameraActor::Property::FIELD_OF_VIEW));
-  constraint.Apply();
+  Constraint constraintX = Constraint::New<float>(actor, Actor::Property::POSITION_X, EqualToConstraint());
+  constraintX.AddSource(Source(camera, CameraActor::Property::FIELD_OF_VIEW));
+  constraintX.Apply();
+
+  Constraint constraintY = Constraint::New<float>(actor, Actor::Property::POSITION_Y, EqualToConstraint());
+  constraintY.AddSource(Source(camera, CameraActor::Property::ASPECT_RATIO));
+  constraintY.Apply();
+
+  Constraint constraintZ = Constraint::New<float>(actor, Actor::Property::POSITION_Z, EqualToConstraint());
+  constraintZ.AddSource(Source(camera, DevelCameraActor::Property::ORTHOGRAPHIC_SIZE));
+  constraintZ.Apply();
 
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS(actor.GetCurrentProperty<float>(Actor::Property::POSITION_X), 0.1f, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<float>(Actor::Property::POSITION_Y), 0.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<float>(Actor::Property::POSITION_Z), 200.0f, TEST_LOCATION);
 
   camera.SetFieldOfView(0.5f);
+  camera.SetAspectRatio(0.2f);
+  camera.SetProperty(Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE, 100.0f);
 
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS(actor.GetCurrentProperty<float>(Actor::Property::POSITION_X), 0.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<float>(Actor::Property::POSITION_Y), 0.2f, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<float>(Actor::Property::POSITION_Z), 100.0f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -1611,8 +1588,11 @@ int UtcDaliCameraActorAnimatedProperties03(void)
   actor.SetProperty(Actor::Property::POSITION, Vector2(0.1f, 0.0f));
   application.GetScene().Add(actor);
 
-  Radian sourceFoV = Radian(0.6f);
-  Radian targetFoV = Radian(0.1f);
+  Radian sourceFoV    = Radian(0.6f);
+  float  sourceAspect = 0.7f;
+
+  Radian targetFoV    = Radian(0.1f);
+  float  targetAspect = 1.3f;
 
   Matrix expectedProjectionMatrix1;
   Matrix expectedProjectionMatrix2;
@@ -1624,16 +1604,19 @@ int UtcDaliCameraActorAnimatedProperties03(void)
 
   // Build expect projection matrix
   camera.SetFieldOfView(sourceFoV.radian);
+  camera.SetAspectRatio(sourceAspect);
   application.SendNotification();
   application.Render();
   camera.GetProperty(CameraActor::Property::PROJECTION_MATRIX).Get(expectedProjectionMatrix1);
 
   camera.SetFieldOfView(sourceFoV.radian * 0.6f + targetFoV.radian * 0.4f);
+  camera.SetAspectRatio(sourceAspect * 0.6f + targetAspect * 0.4f);
   application.SendNotification();
   application.Render();
   camera.GetProperty(CameraActor::Property::PROJECTION_MATRIX).Get(expectedProjectionMatrix2);
 
   camera.SetFieldOfView(targetFoV.radian);
+  camera.SetAspectRatio(targetAspect);
   application.SendNotification();
   application.Render();
   camera.GetProperty(CameraActor::Property::PROJECTION_MATRIX).Get(expectedProjectionMatrix3);
@@ -1646,6 +1629,7 @@ int UtcDaliCameraActorAnimatedProperties03(void)
 
     // progress 0.0
     DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::FIELD_OF_VIEW), sourceFoV.radian, TEST_LOCATION);
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::ASPECT_RATIO), sourceAspect, TEST_LOCATION);
 
     camera.GetProperty(CameraActor::Property::PROJECTION_MATRIX).Get(projectionMatrix);
     DALI_TEST_EQUALS(projectionMatrix, expectedProjectionMatrix1, Epsilon<100000>::value, TEST_LOCATION);
@@ -1655,6 +1639,7 @@ int UtcDaliCameraActorAnimatedProperties03(void)
 
     // progress 0.4
     DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::FIELD_OF_VIEW), sourceFoV.radian * 0.6f + targetFoV.radian * 0.4f, TEST_LOCATION);
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::ASPECT_RATIO), sourceAspect * 0.6f + targetAspect * 0.4f, TEST_LOCATION);
 
     camera.GetProperty(CameraActor::Property::PROJECTION_MATRIX).Get(projectionMatrix);
     DALI_TEST_EQUALS(projectionMatrix, expectedProjectionMatrix2, Epsilon<100000>::value, TEST_LOCATION);
@@ -1664,6 +1649,7 @@ int UtcDaliCameraActorAnimatedProperties03(void)
 
     // progress 1.0
     DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::FIELD_OF_VIEW), targetFoV.radian, TEST_LOCATION);
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::ASPECT_RATIO), targetAspect, TEST_LOCATION);
 
     camera.GetProperty(CameraActor::Property::PROJECTION_MATRIX).Get(projectionMatrix);
     DALI_TEST_EQUALS(projectionMatrix, expectedProjectionMatrix3, Epsilon<100000>::value, TEST_LOCATION);
@@ -1677,8 +1663,10 @@ int UtcDaliCameraActorAnimatedProperties03(void)
   {
     tet_printf("AnimateTo\n");
     camera.SetProperty(CameraActor::Property::FIELD_OF_VIEW, sourceFoV.radian);
+    camera.SetProperty(CameraActor::Property::ASPECT_RATIO, sourceAspect);
     Animation animation = Animation::New(1.0f);
     animation.AnimateTo(Property(camera, CameraActor::Property::FIELD_OF_VIEW), targetFoV.radian);
+    animation.AnimateTo(Property(camera, CameraActor::Property::ASPECT_RATIO), targetAspect);
     animation.AnimateTo(Property(camera, Actor::Property::POSITION_X), 0.0f); ///< For line coverage.
     animation.Play();
 
@@ -1689,10 +1677,18 @@ int UtcDaliCameraActorAnimatedProperties03(void)
   {
     tet_printf("AnimateBetween\n");
     Animation animation = Animation::New(1.0f);
-    KeyFrames keyFrames = KeyFrames::New();
-    keyFrames.Add(0.0f, sourceFoV.radian);
-    keyFrames.Add(1.0f, targetFoV.radian);
-    animation.AnimateBetween(Property(camera, CameraActor::Property::FIELD_OF_VIEW), keyFrames);
+
+    KeyFrames keyFrames1 = KeyFrames::New();
+    keyFrames1.Add(0.0f, sourceFoV.radian);
+    keyFrames1.Add(1.0f, targetFoV.radian);
+
+    KeyFrames keyFrames2 = KeyFrames::New();
+    keyFrames2.Add(0.0f, sourceAspect);
+    keyFrames2.Add(1.0f, targetAspect);
+
+    animation.AnimateBetween(Property(camera, CameraActor::Property::FIELD_OF_VIEW), keyFrames1);
+    animation.AnimateBetween(Property(camera, CameraActor::Property::ASPECT_RATIO), keyFrames2);
+
     animation.Play();
 
     TestAnimationProgress();
@@ -1702,10 +1698,353 @@ int UtcDaliCameraActorAnimatedProperties03(void)
   {
     tet_printf("AnimateBy\n");
     camera.SetProperty(CameraActor::Property::FIELD_OF_VIEW, sourceFoV.radian);
+    camera.SetProperty(CameraActor::Property::ASPECT_RATIO, sourceAspect);
     Animation animation = Animation::New(1.0f);
     animation.AnimateBy(Property(camera, CameraActor::Property::FIELD_OF_VIEW), targetFoV.radian - sourceFoV.radian);
+    animation.AnimateBy(Property(camera, CameraActor::Property::ASPECT_RATIO), targetAspect - sourceAspect);
     animation.Play();
 
+    TestAnimationProgress();
+  }
+
+  END_TEST;
+}
+
+int UtcDaliCameraActorAnimatedProperties04(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::Internal::CameraActor::GetSceneObjectAnimatableProperty()");
+
+  CameraActor camera = application.GetScene().GetRenderTaskList().GetTask(0u).GetCameraActor();
+
+  // Make camera as orthographic mode
+  camera.SetProjectionMode(Dali::Camera::ORTHOGRAPHIC_PROJECTION);
+
+  // Add dummy actor
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::POSITION, Vector2(0.1f, 0.0f));
+  application.GetScene().Add(actor);
+
+  float sourceOrthographic = 2.0f;
+  float sourceAspect       = 0.7f;
+
+  float targetOrthographic = 4.0f;
+  float targetAspect       = 1.3f;
+
+  Matrix expectedProjectionMatrix1;
+  Matrix expectedProjectionMatrix2;
+  Matrix expectedProjectionMatrix3;
+
+  // Reduce near-far value for projection matrix epsilon
+  camera.SetNearClippingPlane(1.0f);
+  camera.SetFarClippingPlane(3.0f);
+
+  // Build expect projection matrix
+  camera.SetProperty(Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE, sourceOrthographic);
+  camera.SetAspectRatio(sourceAspect);
+  application.SendNotification();
+  application.Render();
+  camera.GetProperty(CameraActor::Property::PROJECTION_MATRIX).Get(expectedProjectionMatrix1);
+
+  camera.SetProperty(Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE, sourceOrthographic * 0.6f + targetOrthographic * 0.4f);
+  camera.SetAspectRatio(sourceAspect * 0.6f + targetAspect * 0.4f);
+  application.SendNotification();
+  application.Render();
+  camera.GetProperty(CameraActor::Property::PROJECTION_MATRIX).Get(expectedProjectionMatrix2);
+
+  camera.SetProperty(Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE, targetOrthographic);
+  camera.SetAspectRatio(targetAspect);
+  application.SendNotification();
+  application.Render();
+  camera.GetProperty(CameraActor::Property::PROJECTION_MATRIX).Get(expectedProjectionMatrix3);
+
+  auto TestAnimationProgress = [&]() {
+    Matrix projectionMatrix;
+
+    application.SendNotification();
+    application.Render(0);
+
+    float expectOrthographic;
+    float expectAspect;
+    float expectLeft;
+    float expectRight;
+    float expectTop;
+    float expectBottom;
+
+    auto UpdateExpectPlaneDistance = [&]() {
+      bool isVertical = camera.GetProperty<int>(DevelCameraActor::Property::PROJECTION_DIRECTION) == static_cast<int>(DevelCameraActor::ProjectionDirection::VERTICAL);
+      expectLeft      = -(isVertical ? expectOrthographic * expectAspect : expectOrthographic);
+      expectRight     = (isVertical ? expectOrthographic * expectAspect : expectOrthographic);
+      expectTop       = (isVertical ? expectOrthographic : expectOrthographic / expectAspect);
+      expectBottom    = -(isVertical ? expectOrthographic : expectOrthographic / expectAspect);
+    };
+
+    // progress 0.0
+    expectOrthographic = sourceOrthographic;
+    expectAspect       = sourceAspect;
+    UpdateExpectPlaneDistance();
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(DevelCameraActor::Property::ORTHOGRAPHIC_SIZE), expectOrthographic, TEST_LOCATION);
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::ASPECT_RATIO), expectAspect, TEST_LOCATION);
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::LEFT_PLANE_DISTANCE), expectLeft, TEST_LOCATION);
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::RIGHT_PLANE_DISTANCE), expectRight, TEST_LOCATION);
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::TOP_PLANE_DISTANCE), expectTop, TEST_LOCATION);
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::BOTTOM_PLANE_DISTANCE), expectBottom, TEST_LOCATION);
+
+    camera.GetProperty(CameraActor::Property::PROJECTION_MATRIX).Get(projectionMatrix);
+    DALI_TEST_EQUALS(projectionMatrix, expectedProjectionMatrix1, Epsilon<100000>::value, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render(400);
+
+    // progress 0.4
+    expectOrthographic = sourceOrthographic * 0.6f + targetOrthographic * 0.4f;
+    expectAspect       = sourceAspect * 0.6f + targetAspect * 0.4f;
+    UpdateExpectPlaneDistance();
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(DevelCameraActor::Property::ORTHOGRAPHIC_SIZE), expectOrthographic, TEST_LOCATION);
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::ASPECT_RATIO), expectAspect, TEST_LOCATION);
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::LEFT_PLANE_DISTANCE), expectLeft, TEST_LOCATION);
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::RIGHT_PLANE_DISTANCE), expectRight, TEST_LOCATION);
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::TOP_PLANE_DISTANCE), expectTop, TEST_LOCATION);
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::BOTTOM_PLANE_DISTANCE), expectBottom, TEST_LOCATION);
+
+    camera.GetProperty(CameraActor::Property::PROJECTION_MATRIX).Get(projectionMatrix);
+    DALI_TEST_EQUALS(projectionMatrix, expectedProjectionMatrix2, Epsilon<100000>::value, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render(600);
+
+    // progress 1.0
+    expectOrthographic = targetOrthographic;
+    expectAspect       = targetAspect;
+    UpdateExpectPlaneDistance();
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(DevelCameraActor::Property::ORTHOGRAPHIC_SIZE), expectOrthographic, TEST_LOCATION);
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::ASPECT_RATIO), expectAspect, TEST_LOCATION);
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::LEFT_PLANE_DISTANCE), expectLeft, TEST_LOCATION);
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::RIGHT_PLANE_DISTANCE), expectRight, TEST_LOCATION);
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::TOP_PLANE_DISTANCE), expectTop, TEST_LOCATION);
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::BOTTOM_PLANE_DISTANCE), expectBottom, TEST_LOCATION);
+
+    camera.GetProperty(CameraActor::Property::PROJECTION_MATRIX).Get(projectionMatrix);
+    DALI_TEST_EQUALS(projectionMatrix, expectedProjectionMatrix3, Epsilon<100000>::value, TEST_LOCATION);
+
+    // Ensure Animate finished.
+    application.SendNotification();
+    application.Render(16);
+  };
+
+  // AnimateTo
+  {
+    tet_printf("AnimateTo - vertical\n");
+    camera.SetProperty(Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE, sourceOrthographic);
+    camera.SetProperty(CameraActor::Property::ASPECT_RATIO, sourceAspect);
+    Animation animation = Animation::New(1.0f);
+    animation.AnimateTo(Property(camera, DevelCameraActor::Property::ORTHOGRAPHIC_SIZE), targetOrthographic);
+    animation.AnimateTo(Property(camera, CameraActor::Property::ASPECT_RATIO), targetAspect);
+    animation.Play();
+    TestAnimationProgress();
+  }
+
+  // AnimateBetween
+  {
+    tet_printf("AnimateBetween - vertical\n");
+    Animation animation = Animation::New(1.0f);
+
+    KeyFrames keyFrames1 = KeyFrames::New();
+    keyFrames1.Add(0.0f, sourceOrthographic);
+    keyFrames1.Add(1.0f, targetOrthographic);
+
+    KeyFrames keyFrames2 = KeyFrames::New();
+    keyFrames2.Add(0.0f, sourceAspect);
+    keyFrames2.Add(1.0f, targetAspect);
+
+    animation.AnimateBetween(Property(camera, DevelCameraActor::Property::ORTHOGRAPHIC_SIZE), keyFrames1);
+    animation.AnimateBetween(Property(camera, CameraActor::Property::ASPECT_RATIO), keyFrames2);
+
+    animation.Play();
+    TestAnimationProgress();
+  }
+
+  // AnimateBy
+  {
+    tet_printf("AnimateBy - vertical\n");
+    camera.SetProperty(Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE, sourceOrthographic);
+    camera.SetProperty(CameraActor::Property::ASPECT_RATIO, sourceAspect);
+    Animation animation = Animation::New(1.0f);
+    animation.AnimateBy(Property(camera, DevelCameraActor::Property::ORTHOGRAPHIC_SIZE), targetOrthographic - sourceOrthographic);
+    animation.AnimateBy(Property(camera, CameraActor::Property::ASPECT_RATIO), targetAspect - sourceAspect);
+    animation.Play();
+    TestAnimationProgress();
+  }
+
+  END_TEST;
+}
+
+int UtcDaliCameraActorAnimatedProperties05(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::Internal::CameraActor::GetSceneObjectAnimatableProperty()");
+
+  CameraActor camera = application.GetScene().GetRenderTaskList().GetTask(0u).GetCameraActor();
+
+  // Make camera as orthographic mode and horizontal
+  camera.SetProjectionMode(Dali::Camera::ORTHOGRAPHIC_PROJECTION);
+  camera.SetProperty(DevelCameraActor::Property::PROJECTION_DIRECTION, DevelCameraActor::ProjectionDirection::HORIZONTAL);
+
+  // Add dummy actor
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::POSITION, Vector2(0.1f, 0.0f));
+  application.GetScene().Add(actor);
+
+  float sourceOrthographic = 2.0f;
+  float sourceAspect       = 0.7f;
+
+  float targetOrthographic = 4.0f;
+  float targetAspect       = 1.3f;
+
+  Matrix expectedProjectionMatrix1;
+  Matrix expectedProjectionMatrix2;
+  Matrix expectedProjectionMatrix3;
+
+  // Reduce near-far value for projection matrix epsilon
+  camera.SetNearClippingPlane(1.0f);
+  camera.SetFarClippingPlane(3.0f);
+
+  // Build expect projection matrix
+  camera.SetProperty(Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE, sourceOrthographic);
+  camera.SetAspectRatio(sourceAspect);
+  application.SendNotification();
+  application.Render();
+  camera.GetProperty(CameraActor::Property::PROJECTION_MATRIX).Get(expectedProjectionMatrix1);
+
+  camera.SetProperty(Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE, sourceOrthographic * 0.6f + targetOrthographic * 0.4f);
+  camera.SetAspectRatio(sourceAspect * 0.6f + targetAspect * 0.4f);
+  application.SendNotification();
+  application.Render();
+  camera.GetProperty(CameraActor::Property::PROJECTION_MATRIX).Get(expectedProjectionMatrix2);
+
+  camera.SetProperty(Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE, targetOrthographic);
+  camera.SetAspectRatio(targetAspect);
+  application.SendNotification();
+  application.Render();
+  camera.GetProperty(CameraActor::Property::PROJECTION_MATRIX).Get(expectedProjectionMatrix3);
+
+  auto TestAnimationProgress = [&]() {
+    Matrix projectionMatrix;
+
+    application.SendNotification();
+    application.Render(0);
+
+    float expectOrthographic;
+    float expectAspect;
+    float expectLeft;
+    float expectRight;
+    float expectTop;
+    float expectBottom;
+
+    auto UpdateExpectPlaneDistance = [&]() {
+      bool isVertical = camera.GetProperty<int>(DevelCameraActor::Property::PROJECTION_DIRECTION) == static_cast<int>(DevelCameraActor::ProjectionDirection::VERTICAL);
+      expectLeft      = -(isVertical ? expectOrthographic * expectAspect : expectOrthographic);
+      expectRight     = (isVertical ? expectOrthographic * expectAspect : expectOrthographic);
+      expectTop       = (isVertical ? expectOrthographic : expectOrthographic / expectAspect);
+      expectBottom    = -(isVertical ? expectOrthographic : expectOrthographic / expectAspect);
+    };
+
+    // progress 0.0
+    expectOrthographic = sourceOrthographic;
+    expectAspect       = sourceAspect;
+    UpdateExpectPlaneDistance();
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(DevelCameraActor::Property::ORTHOGRAPHIC_SIZE), expectOrthographic, TEST_LOCATION);
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::ASPECT_RATIO), expectAspect, TEST_LOCATION);
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::LEFT_PLANE_DISTANCE), expectLeft, TEST_LOCATION);
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::RIGHT_PLANE_DISTANCE), expectRight, TEST_LOCATION);
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::TOP_PLANE_DISTANCE), expectTop, TEST_LOCATION);
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::BOTTOM_PLANE_DISTANCE), expectBottom, TEST_LOCATION);
+
+    camera.GetProperty(CameraActor::Property::PROJECTION_MATRIX).Get(projectionMatrix);
+    DALI_TEST_EQUALS(projectionMatrix, expectedProjectionMatrix1, Epsilon<100000>::value, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render(400);
+
+    // progress 0.4
+    expectOrthographic = sourceOrthographic * 0.6f + targetOrthographic * 0.4f;
+    expectAspect       = sourceAspect * 0.6f + targetAspect * 0.4f;
+    UpdateExpectPlaneDistance();
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(DevelCameraActor::Property::ORTHOGRAPHIC_SIZE), expectOrthographic, TEST_LOCATION);
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::ASPECT_RATIO), expectAspect, TEST_LOCATION);
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::LEFT_PLANE_DISTANCE), expectLeft, TEST_LOCATION);
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::RIGHT_PLANE_DISTANCE), expectRight, TEST_LOCATION);
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::TOP_PLANE_DISTANCE), expectTop, TEST_LOCATION);
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::BOTTOM_PLANE_DISTANCE), expectBottom, TEST_LOCATION);
+
+    camera.GetProperty(CameraActor::Property::PROJECTION_MATRIX).Get(projectionMatrix);
+    DALI_TEST_EQUALS(projectionMatrix, expectedProjectionMatrix2, Epsilon<100000>::value, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render(600);
+
+    // progress 1.0
+    expectOrthographic = targetOrthographic;
+    expectAspect       = targetAspect;
+    UpdateExpectPlaneDistance();
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(DevelCameraActor::Property::ORTHOGRAPHIC_SIZE), expectOrthographic, TEST_LOCATION);
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::ASPECT_RATIO), expectAspect, TEST_LOCATION);
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::LEFT_PLANE_DISTANCE), expectLeft, TEST_LOCATION);
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::RIGHT_PLANE_DISTANCE), expectRight, TEST_LOCATION);
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::TOP_PLANE_DISTANCE), expectTop, TEST_LOCATION);
+    DALI_TEST_EQUALS(camera.GetCurrentProperty<float>(CameraActor::Property::BOTTOM_PLANE_DISTANCE), expectBottom, TEST_LOCATION);
+
+    camera.GetProperty(CameraActor::Property::PROJECTION_MATRIX).Get(projectionMatrix);
+    DALI_TEST_EQUALS(projectionMatrix, expectedProjectionMatrix3, Epsilon<100000>::value, TEST_LOCATION);
+
+    // Ensure Animate finished.
+    application.SendNotification();
+    application.Render(16);
+  };
+
+  // AnimateTo
+  {
+    tet_printf("AnimateTo - horizontal\n");
+    camera.SetProperty(Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE, sourceOrthographic);
+    camera.SetProperty(CameraActor::Property::ASPECT_RATIO, sourceAspect);
+    Animation animation = Animation::New(1.0f);
+    animation.AnimateTo(Property(camera, DevelCameraActor::Property::ORTHOGRAPHIC_SIZE), targetOrthographic);
+    animation.AnimateTo(Property(camera, CameraActor::Property::ASPECT_RATIO), targetAspect);
+    animation.Play();
+    TestAnimationProgress();
+  }
+
+  // AnimateBetween
+  {
+    tet_printf("AnimateBetween - horizontal\n");
+    Animation animation = Animation::New(1.0f);
+
+    KeyFrames keyFrames1 = KeyFrames::New();
+    keyFrames1.Add(0.0f, sourceOrthographic);
+    keyFrames1.Add(1.0f, targetOrthographic);
+
+    KeyFrames keyFrames2 = KeyFrames::New();
+    keyFrames2.Add(0.0f, sourceAspect);
+    keyFrames2.Add(1.0f, targetAspect);
+
+    animation.AnimateBetween(Property(camera, DevelCameraActor::Property::ORTHOGRAPHIC_SIZE), keyFrames1);
+    animation.AnimateBetween(Property(camera, CameraActor::Property::ASPECT_RATIO), keyFrames2);
+
+    animation.Play();
+    TestAnimationProgress();
+  }
+
+  // AnimateBy
+  {
+    tet_printf("AnimateBy - horizontal\n");
+    camera.SetProperty(Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE, sourceOrthographic);
+    camera.SetProperty(CameraActor::Property::ASPECT_RATIO, sourceAspect);
+    Animation animation = Animation::New(1.0f);
+    animation.AnimateBy(Property(camera, DevelCameraActor::Property::ORTHOGRAPHIC_SIZE), targetOrthographic - sourceOrthographic);
+    animation.AnimateBy(Property(camera, CameraActor::Property::ASPECT_RATIO), targetAspect - sourceAspect);
+    animation.Play();
     TestAnimationProgress();
   }
 
@@ -2288,28 +2627,6 @@ int UtcDaliCameraActorSetPerspectiveProjectionNegative(void)
   END_TEST;
 }
 
-int UtcDaliCameraActorSetOrthographicProjectionNegative01(void)
-{
-  TestApplication   application;
-  Dali::CameraActor instance;
-  try
-  {
-    float arg1(0.0f);
-    float arg2(0.0f);
-    float arg3(0.0f);
-    float arg4(0.0f);
-    float arg5(0.0f);
-    float arg6(0.0f);
-    instance.SetOrthographicProjection(arg1, arg2, arg3, arg4, arg5, arg6);
-    DALI_TEST_CHECK(false); // Should not get here
-  }
-  catch(...)
-  {
-    DALI_TEST_CHECK(true); // We expect an assert
-  }
-  END_TEST;
-}
-
 int UtcDaliCameraActorSetOrthographicProjectionNegative02(void)
 {
   TestApplication   application;
@@ -2407,7 +2724,7 @@ int UtcDaliCameraActorNewDefaultOrthogonalProjection01(void)
   // Check that the properties match to that screen size
   float value;
   actor.GetProperty(CameraActor::Property::ASPECT_RATIO).Get(value);
-  DALI_TEST_EQUALS(800.0f / 480.0f, value, FLOAT_EPSILON, TEST_LOCATION);
+  DALI_TEST_EQUALS(480.0f / 800.0f, value, FLOAT_EPSILON, TEST_LOCATION);
 
   actor.GetProperty(CameraActor::Property::NEAR_PLANE_DISTANCE).Get(value);
   DALI_TEST_EQUALS(800.0f, value, FLOAT_EPSILON, TEST_LOCATION);
@@ -2447,7 +2764,7 @@ int UtcDaliCameraActorNewDefaultOrthogonalProjection02(void)
   // Check that the properties match to that screen size
   float value;
   actor.GetProperty(CameraActor::Property::ASPECT_RATIO).Get(value);
-  DALI_TEST_EQUALS(800.0f / 480.0f, value, FLOAT_EPSILON, TEST_LOCATION);
+  DALI_TEST_EQUALS(480.0f / 800.0f, value, FLOAT_EPSILON, TEST_LOCATION);
 
   actor.GetProperty(CameraActor::Property::NEAR_PLANE_DISTANCE).Get(value);
   DALI_TEST_EQUALS(800.0f, value, FLOAT_EPSILON, TEST_LOCATION);
@@ -2538,34 +2855,6 @@ int UtcDaliCameraActorSetProperty(void)
   camera.SetFarClippingPlane(1.0f);
   application.GetScene().Add(camera);
   DALI_TEST_EQUALS(1.0f, camera.GetFarClippingPlane(), TEST_LOCATION);
-  camera.Unparent();
-  camera.Reset();
-
-  camera = CameraActor::New();
-  camera.SetProperty(Dali::CameraActor::Property::LEFT_PLANE_DISTANCE, 1.0f);
-  application.GetScene().Add(camera);
-  DALI_TEST_EQUALS(1.0f, camera.GetProperty<float>(Dali::CameraActor::Property::LEFT_PLANE_DISTANCE), TEST_LOCATION);
-  camera.Unparent();
-  camera.Reset();
-
-  camera = CameraActor::New();
-  camera.SetProperty(Dali::CameraActor::Property::RIGHT_PLANE_DISTANCE, 1.0f);
-  application.GetScene().Add(camera);
-  DALI_TEST_EQUALS(1.0f, camera.GetProperty<float>(Dali::CameraActor::Property::RIGHT_PLANE_DISTANCE), TEST_LOCATION);
-  camera.Unparent();
-  camera.Reset();
-
-  camera = CameraActor::New();
-  camera.SetProperty(Dali::CameraActor::Property::TOP_PLANE_DISTANCE, 1.0f);
-  application.GetScene().Add(camera);
-  DALI_TEST_EQUALS(1.0f, camera.GetProperty<float>(Dali::CameraActor::Property::TOP_PLANE_DISTANCE), TEST_LOCATION);
-  camera.Unparent();
-  camera.Reset();
-
-  camera = CameraActor::New();
-  camera.SetProperty(Dali::CameraActor::Property::BOTTOM_PLANE_DISTANCE, 1.0f);
-  application.GetScene().Add(camera);
-  DALI_TEST_EQUALS(1.0f, camera.GetProperty<float>(Dali::CameraActor::Property::BOTTOM_PLANE_DISTANCE), TEST_LOCATION);
   camera.Unparent();
   camera.Reset();
 

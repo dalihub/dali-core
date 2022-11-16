@@ -214,8 +214,12 @@ int UtcDaliHitTestAlgorithmOrtho02(void)
   Dali::CameraActor cameraActor       = defaultRenderTask.GetCameraActor();
 
   Vector2 stageSize(stage.GetSize());
-  cameraActor.SetOrthographicProjection(-stageSize.x * 0.3f, stageSize.x * 0.7f, stageSize.y * 0.3f, -stageSize.y * 0.7f, 800.0f, 4895.0f);
-  cameraActor.SetProperty(Actor::Property::POSITION, Vector3(0.0f, 0.0f, 1600.0f));
+  cameraActor.SetOrthographicProjection(stageSize);
+  cameraActor.SetNearClippingPlane(800.0f);
+  cameraActor.SetFarClippingPlane(4895.0f);
+
+  // Move camera not centered position.
+  cameraActor.SetProperty(Actor::Property::POSITION, Vector3(stageSize.x * 0.2f, stageSize.y * 0.2f, 1600.0f));
 
   Vector2 actorSize(stageSize * 0.5f);
   // Create two actors with half the size of the stage and set them to be partially overlapping
@@ -579,18 +583,18 @@ int UtcDaliHitTestAlgorithmOrder(void)
   Stage   stage = Stage::GetCurrent();
   Vector2 stageSize(stage.GetSize());
 
-  Actor blue = Actor::New();
-  blue[Dali::Actor::Property::NAME] = "Blue";
-  blue[Dali::Actor::Property::ANCHOR_POINT] = AnchorPoint::CENTER;
-  blue[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
-  blue[Dali::Actor::Property::WIDTH_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+  Actor blue                                        = Actor::New();
+  blue[Dali::Actor::Property::NAME]                 = "Blue";
+  blue[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  blue[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
+  blue[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   blue[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
-  Actor green = Actor::New();
-  green[Dali::Actor::Property::NAME] = "Green";
-  green[Dali::Actor::Property::ANCHOR_POINT] = AnchorPoint::CENTER;
-  green[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
-  green[Dali::Actor::Property::WIDTH_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+  Actor green                                        = Actor::New();
+  green[Dali::Actor::Property::NAME]                 = "Green";
+  green[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  green[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
+  green[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   green[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   stage.Add(blue);
@@ -599,8 +603,8 @@ int UtcDaliHitTestAlgorithmOrder(void)
   RenderTaskList renderTaskList = stage.GetRenderTaskList();
   RenderTask     offRenderTask  = renderTaskList.CreateTask();
 
-  Dali::CameraActor cameraActor = Dali::CameraActor::New(stageSize);
-  cameraActor[Dali::Actor::Property::ANCHOR_POINT] = AnchorPoint::CENTER;
+  Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
+  cameraActor[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
   cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
   stage.Add(cameraActor);
 
@@ -610,8 +614,8 @@ int UtcDaliHitTestAlgorithmOrder(void)
   offRenderTask.SetSourceActor(green);
   offRenderTask.SetScreenToFrameBufferMappingActor(green);
 
-  Dali::Texture texture = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGB888, unsigned(stageSize.width), unsigned(stageSize.height));
-  FrameBuffer renderTarget         = FrameBuffer::New(stageSize.width, stageSize.height, FrameBuffer::Attachment::DEPTH);
+  Dali::Texture texture      = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGB888, unsigned(stageSize.width), unsigned(stageSize.height));
+  FrameBuffer   renderTarget = FrameBuffer::New(stageSize.width, stageSize.height, FrameBuffer::Attachment::DEPTH);
   renderTarget.AttachColorTexture(texture);
   offRenderTask.SetFrameBuffer(renderTarget);
 

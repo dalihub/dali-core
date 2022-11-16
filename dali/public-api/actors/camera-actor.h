@@ -2,7 +2,7 @@
 #define DALI_CAMERA_ACTOR_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -223,6 +223,7 @@ public:
 
   /**
    * @brief Sets the field of view.
+   * Field of view will be used when ProjectionMode is PERSPECTIVE_PROJECTION.
    *
    * @SINCE_1_0.0
    * @param[in] fieldOfView The field of view in radians
@@ -332,6 +333,7 @@ public:
    * Sets the near and far clipping planes, the field of view, the aspect ratio,
    * and the Z position of the actor based on the canvas size so that 1 unit in
    * XY (z=0) plane is 1 pixel on screen.
+   * Also, It will set orthographic size be fitted as XY plane.
    *
    * @SINCE_1_0.0
    * @param[in] size The canvas size
@@ -356,21 +358,6 @@ public:
    * @param[in] size Size of XY plane (normal to camera axis)
    */
   void SetOrthographicProjection(const Size& size);
-
-  /**
-   * @brief Sets the camera projection to use orthographic projection with the given clip planes.
-   *
-   * This does not change the Z value of the camera actor.
-   *
-   * @SINCE_1_0.0
-   * @param[in] left Distance to left clip plane (normal to camera axis)
-   * @param[in] right Distance to right clip plane (normal to camera axis)
-   * @param[in] top Distance to top clip plane (normal to camera axis)
-   * @param[in] bottom Distance to bottom clip plane (normal to camera axis)
-   * @param[in] near Distance to the near clip plane (along camera axis)
-   * @param[in] far Distance to the far clip plane (along camera axis)
-   */
-  void SetOrthographicProjection(float left, float right, float top, float bottom, float near, float far);
 
 public: // Not intended for use by Application developers
   /// @cond internal

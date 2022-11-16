@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -144,14 +144,9 @@ void CameraActor::SetPerspectiveProjection(const Size& size)
   GetImplementation(*this).SetPerspectiveProjection(size);
 }
 
-void CameraActor::SetOrthographicProjection(const Vector2& size)
+void CameraActor::SetOrthographicProjection(const Size& size)
 {
   GetImplementation(*this).SetOrthographicProjection(size);
-}
-
-void CameraActor::SetOrthographicProjection(float left, float right, float top, float bottom, float near, float far)
-{
-  GetImplementation(*this).SetOrthographicProjection(left, right, top, bottom, near, far);
 }
 
 } // namespace Dali
