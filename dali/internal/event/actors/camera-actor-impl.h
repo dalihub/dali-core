@@ -107,11 +107,20 @@ public:
   float GetFieldOfView() const;
 
   /**
-   * @brief Retrieve the CameraActor's field of view from update side.
-   * This field of view will be the fov set or animating but will be a frame behind.
-   * @return The field of view.
+   * @brief Sets the orthographic size.
+   * Orthographic size will be used when ProjectoinMode is ORTHOGRAPHIC_PROJECTION.
+   *
+   * @param[in] orthographicSize The orthographic size.
    */
-  float GetCurrentFieldOfView() const;
+  void SetOrthographicSize(float orthographicSize);
+
+  /**
+   * @brief Gets the orthographic size.
+   *
+   * The default orthographic size is 400.0f.
+   * @return The orthographic size.
+   */
+  float GetOrthographicSize() const;
 
   /**
    * @copydoc Dali::CameraActor::SetAspectRatio
@@ -144,26 +153,6 @@ public:
   float GetFarClippingPlane() const;
 
   /**
-   * @param leftClippingPlane to use
-   */
-  void SetLeftClippingPlane(float leftClippingPlane);
-
-  /**
-   * @param rightClippingPlane to use
-   */
-  void SetRightClippingPlane(float rightClippingPlane);
-
-  /**
-   * @param topClippingPlane to use
-   */
-  void SetTopClippingPlane(float topClippingPlane);
-
-  /**
-   * @param bottomClippingPlane to use
-   */
-  void SetBottomClippingPlane(float bottomClippingPlane);
-
-  /**
    * @copydoc Dali::CameraActor::SetInvertYAxis
    */
   void SetInvertYAxis(bool invertYAxis);
@@ -179,14 +168,9 @@ public:
   void SetPerspectiveProjection(const Size& size);
 
   /**
-   * @copydoc Dali::CameraActor::SetOrthographicProjection(const Vector2& size);
+   * @copydoc Dali::CameraActor::SetOrthographicProjection(const Size& size);
    */
-  void SetOrthographicProjection(const Vector2& size);
-
-  /**
-   * @copydoc Dali::CameraActor::SetOrthographicProjection(float left, float right, float top, float bottom, float near, float far);
-   */
-  void SetOrthographicProjection(float left, float right, float top, float bottom, float near, float far);
+  void SetOrthographicProjection(const Size& size);
 
   /**
    * Build a picking ray with this camera and given screen coordinates
@@ -276,6 +260,36 @@ private:
    */
   void OnPropertySet(Property::Index index, const Property::Value& propertyValue) override;
 
+  /**
+   * @brief Set the camera projection values with mCanvasSize
+   */
+  void ApplyDefaultProjection();
+
+private:
+  /**
+   * @brief Retrieve the CameraActor's field of view from update side.
+   * This is either the last value set, or the currently animating value.
+   * It may be defferent to GetFieldOfView() if the set message hasn't been processed yet.
+   * @return The field of view.
+   */
+  float GetCurrentFieldOfView() const;
+
+  /**
+   * @brief Retrieve the CameraActor's orthographic size from update side.
+   * This is either the last value set, or the currently animating value.
+   * It may be defferent to GetOrthographicSize() if the set message hasn't been processed yet.
+   * @return The orthographic size.
+   */
+  float GetCurrentOrthographicSize() const;
+
+  /**
+   * @brief Retrieve the CameraActor's aspect ratio from update side.
+   * This is either the last value set, or the currently animating value.
+   * It may be defferent to GetAspectRatio() if the set message hasn't been processed yet.
+   * @return The aspect ratio.
+   */
+  float GetCurrentAspectRatio() const;
+
 private: // Data
   Vector3                                     mTarget;
   Vector2                                     mCanvasSize;
@@ -283,13 +297,10 @@ private: // Data
   Dali::Camera::ProjectionMode                mProjectionMode;
   Dali::DevelCameraActor::ProjectionDirection mProjectionDirection;
   float                                       mFieldOfView;
+  float                                       mOrthographicSize;
   float                                       mAspectRatio;
   float                                       mNearClippingPlane;
   float                                       mFarClippingPlane;
-  float                                       mLeftClippingPlane;
-  float                                       mRightClippingPlane;
-  float                                       mTopClippingPlane;
-  float                                       mBottomClippingPlane;
   bool                                        mInvertYAxis;
   bool                                        mPropertyChanged;
 };

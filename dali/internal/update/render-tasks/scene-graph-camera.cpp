@@ -119,27 +119,39 @@ void Perspective(Matrix& result, Dali::DevelCameraActor::ProjectionDirection fov
   Frustum(result, -frustumW, frustumW, -frustumH, frustumH, near, far, invertYAxis);
 }
 
-void Orthographic(Matrix& result, float left, float right, float bottom, float top, float near, float far, bool invertYAxis)
+void Orthographic(Matrix& result, Dali::DevelCameraActor::ProjectionDirection orthographicDir, float orthographicSize, float aspect, float near, float far, bool invertYAxis)
 {
-  if(Equals(right, left) || Equals(top, bottom) || Equals(far, near))
+  if(EqualsZero(orthographicSize) || EqualsZero(aspect) || Equals(far, near))
   {
     DALI_LOG_ERROR("Cannot create orthographic projection matrix with a zero dimension.\n");
     DALI_ASSERT_DEBUG("Cannot create orthographic projection matrix with a zero dimension.");
     return;
   }
 
-  float deltaX = right - left;
-  float deltaY = invertYAxis ? bottom - top : top - bottom;
+  float halfDeltaX;
+  float halfDeltaY;
+  if(orthographicDir == Dali::DevelCameraActor::ProjectionDirection::VERTICAL)
+  {
+    halfDeltaY = orthographicSize;
+    halfDeltaX = halfDeltaY * aspect;
+  }
+  else
+  {
+    halfDeltaX = orthographicSize;
+    halfDeltaY = halfDeltaX / aspect;
+  }
+
   float deltaZ = far - near;
 
   float* m = result.AsFloat();
-  m[0]     = -2.0f / deltaX;
-  m[1]     = 0.0f;
-  m[2]     = 0.0f;
-  m[3]     = 0.0f;
+
+  m[0] = -1.0f / halfDeltaX;
+  m[1] = 0.0f;
+  m[2] = 0.0f;
+  m[3] = 0.0f;
 
   m[4] = 0.0f;
-  m[5] = -2.0f / deltaY;
+  m[5] = (invertYAxis ? 1.0f : -1.0f) / halfDeltaY;
   m[6] = 0.0f;
   m[7] = 0.0f;
 
@@ -147,8 +159,9 @@ void Orthographic(Matrix& result, float left, float right, float bottom, float t
   m[9]  = 0.0f;
   m[10] = 2.0f / deltaZ;
   m[11] = 0.0f;
-  m[12] = -(right + left) / deltaX;
-  m[13] = -(top + bottom) / deltaY;
+
+  m[12] = 0.0f;
+  m[13] = 0.0f;
   m[14] = -(near + far) / deltaZ;
   m[15] = 1.0f;
 }
@@ -160,12 +173,9 @@ const Dali::Camera::ProjectionMode                Camera::DEFAULT_MODE(Dali::Cam
 const Dali::DevelCameraActor::ProjectionDirection Camera::DEFAULT_PROJECTION_DIRECTION(Dali::DevelCameraActor::VERTICAL);
 const bool                                        Camera::DEFAULT_INVERT_Y_AXIS(false);
 const float                                       Camera::DEFAULT_FIELD_OF_VIEW(45.0f * (Math::PI / 180.0f));
-const float                                       Camera::DEFAULT_ASPECT_RATIO(800.0f / 480.0f);
-const float                                       Camera::DEFAULT_LEFT_CLIPPING_PLANE(-240.0f);
-const float                                       Camera::DEFAULT_RIGHT_CLIPPING_PLANE(240.0f);
-const float                                       Camera::DEFAULT_TOP_CLIPPING_PLANE(-400.0f);
-const float                                       Camera::DEFAULT_BOTTOM_CLIPPING_PLANE(400.0f);
-const float                                       Camera::DEFAULT_NEAR_CLIPPING_PLANE(800.0f); // default height of the screen
+const float                                       Camera::DEFAULT_ORTHOGRAPHIC_SIZE(400.0f);     // half of default height of the screen
+const float                                       Camera::DEFAULT_ASPECT_RATIO(480.0f / 800.0f); // default width / default height of the screen
+const float                                       Camera::DEFAULT_NEAR_CLIPPING_PLANE(800.0f);   // default height of the screen
 const float                                       Camera::DEFAULT_FAR_CLIPPING_PLANE(DEFAULT_NEAR_CLIPPING_PLANE + 2.f * DEFAULT_NEAR_CLIPPING_PLANE);
 const Vector3                                     Camera::DEFAULT_TARGET_POSITION(0.0f, 0.0f, 0.0f);
 
@@ -179,11 +189,8 @@ Camera::Camera()
   mProjectionDirection(DEFAULT_PROJECTION_DIRECTION),
   mInvertYAxis(DEFAULT_INVERT_Y_AXIS),
   mFieldOfView(DEFAULT_FIELD_OF_VIEW),
+  mOrthographicSize(DEFAULT_ORTHOGRAPHIC_SIZE),
   mAspectRatio(DEFAULT_ASPECT_RATIO),
-  mLeftClippingPlane(DEFAULT_LEFT_CLIPPING_PLANE),
-  mRightClippingPlane(DEFAULT_RIGHT_CLIPPING_PLANE),
-  mTopClippingPlane(DEFAULT_TOP_CLIPPING_PLANE),
-  mBottomClippingPlane(DEFAULT_BOTTOM_CLIPPING_PLANE),
   mNearClippingPlane(DEFAULT_NEAR_CLIPPING_PLANE),
   mFarClippingPlane(DEFAULT_FAR_CLIPPING_PLANE),
   mTargetPosition(DEFAULT_TARGET_POSITION),
@@ -237,33 +244,15 @@ void Camera::BakeFieldOfView(BufferIndex updateBufferIndex, float fieldOfView)
   mUpdateProjectionFlag = UPDATE_COUNT;
 }
 
-void Camera::SetAspectRatio(float aspectRatio)
+void Camera::BakeOrthographicSize(BufferIndex updateBufferIndex, float orthographicSize)
 {
-  mAspectRatio          = aspectRatio;
+  mOrthographicSize.Bake(updateBufferIndex, orthographicSize);
   mUpdateProjectionFlag = UPDATE_COUNT;
 }
 
-void Camera::SetLeftClippingPlane(float leftClippingPlane)
+void Camera::BakeAspectRatio(BufferIndex updateBufferIndex, float aspectRatio)
 {
-  mLeftClippingPlane    = leftClippingPlane;
-  mUpdateProjectionFlag = UPDATE_COUNT;
-}
-
-void Camera::SetRightClippingPlane(float rightClippingPlane)
-{
-  mRightClippingPlane   = rightClippingPlane;
-  mUpdateProjectionFlag = UPDATE_COUNT;
-}
-
-void Camera::SetTopClippingPlane(float topClippingPlane)
-{
-  mTopClippingPlane     = topClippingPlane;
-  mUpdateProjectionFlag = UPDATE_COUNT;
-}
-
-void Camera::SetBottomClippingPlane(float bottomClippingPlane)
-{
-  mBottomClippingPlane  = bottomClippingPlane;
+  mAspectRatio.Bake(updateBufferIndex, aspectRatio);
   mUpdateProjectionFlag = UPDATE_COUNT;
 }
 
@@ -377,6 +366,16 @@ const PropertyBase* Camera::GetFieldOfView() const
   return &mFieldOfView;
 }
 
+const PropertyBase* Camera::GetOrthographicSize() const
+{
+  return &mOrthographicSize;
+}
+
+const PropertyBase* Camera::GetAspectRatio() const
+{
+  return &mAspectRatio;
+}
+
 const PropertyInputImpl* Camera::GetProjectionMatrix() const
 {
   return &mProjectionMatrix;
@@ -439,7 +438,9 @@ bool Camera::ViewMatrixUpdated() const
 
 bool Camera::IsProjectionMatrixAnimated() const
 {
-  return !mFieldOfView.IsClean();
+  return !mFieldOfView.IsClean() ||
+         !mOrthographicSize.IsClean() ||
+         !mAspectRatio.IsClean();
 }
 
 uint32_t Camera::UpdateViewMatrix(BufferIndex updateBufferIndex)
@@ -630,6 +631,16 @@ bool Camera::CheckAABBInFrustum(BufferIndex bufferIndex, const Vector3& origin, 
   }
   return true;
 }
+Dali::Rect<int32_t> Camera::GetOrthographicClippingBox(BufferIndex bufferIndex) const
+{
+  const float orthographicSize = mOrthographicSize[bufferIndex];
+  const float aspect           = mAspectRatio[bufferIndex];
+
+  const float halfWidth  = mProjectionDirection == DevelCameraActor::ProjectionDirection::VERTICAL ? orthographicSize * aspect : orthographicSize;
+  const float halfHeight = mProjectionDirection == DevelCameraActor::ProjectionDirection::VERTICAL ? orthographicSize : orthographicSize / aspect;
+
+  return Dali::Rect<int32_t>(-halfWidth, -halfHeight, halfWidth * 2.0f, halfHeight * 2.0f);
+}
 
 uint32_t Camera::UpdateProjection(BufferIndex updateBufferIndex)
 {
@@ -657,7 +668,7 @@ uint32_t Camera::UpdateProjection(BufferIndex updateBufferIndex)
           Perspective(projectionMatrix,
                       mProjectionDirection,
                       mFieldOfView[updateBufferIndex],
-                      mAspectRatio,
+                      mAspectRatio[updateBufferIndex],
                       mNearClippingPlane,
                       mFarClippingPlane,
                       mInvertYAxis);
@@ -693,10 +704,9 @@ uint32_t Camera::UpdateProjection(BufferIndex updateBufferIndex)
         {
           Matrix& projectionMatrix = mProjectionMatrix.Get(updateBufferIndex);
           Orthographic(projectionMatrix,
-                       mLeftClippingPlane,
-                       mRightClippingPlane,
-                       mBottomClippingPlane,
-                       mTopClippingPlane,
+                       mProjectionDirection,
+                       mOrthographicSize[updateBufferIndex],
+                       mAspectRatio[updateBufferIndex],
                        mNearClippingPlane,
                        mFarClippingPlane,
                        mInvertYAxis);

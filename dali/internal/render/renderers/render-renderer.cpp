@@ -466,10 +466,10 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
         auto& textureImpl     = GetImplementation(texture);
         auto  graphicsTexture = textureImpl.GetRenderObject()->GetGraphicsObject();
 
-        const auto& properties = mGraphicsController->GetTextureProperties(*graphicsTexture);
+        auto properties = mGraphicsController->GetTextureProperties(*graphicsTexture);
 
         mRenderCallbackTextureBindings.emplace_back(graphicsTexture);
-        mRenderCallbackInput.textureBindings[i] = properties.nativeHandle;
+        mRenderCallbackInput.textureBindings[i++] = properties.nativeHandle;
       }
       info.textureCount = mRenderCallbackTextureBindings.size();
       info.textureList  = mRenderCallbackTextureBindings.data();

@@ -61,6 +61,7 @@ public:
   static const Dali::DevelCameraActor::ProjectionDirection DEFAULT_PROJECTION_DIRECTION;
   static const bool                                        DEFAULT_INVERT_Y_AXIS;
   static const float                                       DEFAULT_FIELD_OF_VIEW;
+  static const float                                       DEFAULT_ORTHOGRAPHIC_SIZE;
   static const float                                       DEFAULT_ASPECT_RATIO;
   static const float                                       DEFAULT_LEFT_CLIPPING_PLANE;
   static const float                                       DEFAULT_RIGHT_CLIPPING_PLANE;
@@ -136,11 +137,6 @@ public:
   void SetProjectionDirection(Dali::DevelCameraActor::ProjectionDirection direction);
 
   /**
-   * @copydoc Dali::Internal::CameraActor::SetAspectRatio
-   */
-  void SetAspectRatio(float aspectRatio);
-
-  /**
    * @copydoc Dali::Internal::CameraActor::SetLeftClippingPlane
    */
   void SetLeftClippingPlane(float leftClippingPlane);
@@ -183,7 +179,7 @@ public:
   /**
    * @brief Bakes the field of view.
    * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] opacity The field of view.
+   * @param[in] fieldOfView The field of view.
    */
   void BakeFieldOfView(BufferIndex updateBufferIndex, float fieldOfView);
 
@@ -195,6 +191,40 @@ public:
   float GetFieldOfView(BufferIndex bufferIndex) const
   {
     return mFieldOfView[bufferIndex];
+  }
+
+  /**
+   * @brief Bakes the orthographic size.
+   * @param[in] updateBufferIndex The current update buffer index.
+   * @param[in] orthographicSize The orthographic size.
+   */
+  void BakeOrthographicSize(BufferIndex updateBufferIndex, float orthographicSize);
+
+  /**
+   * @brief Retrieve the orthographic size.
+   * @param[in] bufferIndex The buffer to read from.
+   * @return The orthographic size.
+   */
+  float GetOrthographicSize(BufferIndex bufferIndex) const
+  {
+    return mOrthographicSize[bufferIndex];
+  }
+
+  /**
+   * @brief Bakes the aspect ratio.
+   * @param[in] updateBufferIndex The current update buffer index.
+   * @param[in] aspectRatio The aspect ratio.
+   */
+  void BakeAspectRatio(BufferIndex updateBufferIndex, float aspectRatio);
+
+  /**
+   * @brief Retrieve the aspect ratio.
+   * @param[in] bufferIndex The buffer to read from.
+   * @return The aspect ratio.
+   */
+  float GetAspectRatio(BufferIndex bufferIndex) const
+  {
+    return mAspectRatio[bufferIndex];
   }
 
   /**
@@ -242,6 +272,11 @@ public:
   bool CheckAABBInFrustum(BufferIndex bufferIndex, const Vector3& origin, const Vector3& halfExtents) const;
 
   /**
+   * @brief Calculate orthographic clipping box by this camera's orthographic size.
+   */
+  Dali::Rect<int32_t> GetOrthographicClippingBox(BufferIndex bufferIndex) const;
+
+  /**
    * Retrieve the projection-matrix; this is double buffered for input handling.
    * @param[in] bufferIndex The buffer to read from.
    * @return The projection-matrix.
@@ -268,6 +303,20 @@ public:
    * @return The field of view property querying interface.
    */
   const PropertyBase* GetFieldOfView() const;
+
+  /**
+   * Retrieve the orthographic size property querying interface.
+   * @pre The camera is on-stage.
+   * @return The orthographic size property querying interface.
+   */
+  const PropertyBase* GetOrthographicSize() const;
+
+  /**
+   * Retrieve the aspect ratio property querying interface.
+   * @pre The camera is on-stage.
+   * @return The aspect ratio property querying interface.
+   */
+  const PropertyBase* GetAspectRatio() const;
 
   /**
    * Retrieve the projection-matrix property querying interface.
@@ -352,13 +401,10 @@ public:                                                             // PROPERTIE
   Dali::DevelCameraActor::ProjectionDirection mProjectionDirection; // Non-animatable
   bool                                        mInvertYAxis;         // Non-animatable
 
-  AnimatableProperty<float> mFieldOfView; // Animatable
+  AnimatableProperty<float> mFieldOfView;      // Animatable
+  AnimatableProperty<float> mOrthographicSize; // Animatable
+  AnimatableProperty<float> mAspectRatio;      // Animatable
 
-  float   mAspectRatio;
-  float   mLeftClippingPlane;
-  float   mRightClippingPlane;
-  float   mTopClippingPlane;
-  float   mBottomClippingPlane;
   float   mNearClippingPlane;
   float   mFarClippingPlane;
   Vector3 mTargetPosition;
@@ -423,59 +469,26 @@ inline void BakeFieldOfViewMessage(EventThreadServices& eventThreadServices, con
   new(slot) LocalType(&camera, &Camera::BakeFieldOfView, parameter);
 }
 
-inline void SetAspectRatioMessage(EventThreadServices& eventThreadServices, const Camera& camera, float parameter)
+inline void BakeOrthographicSizeMessage(EventThreadServices& eventThreadServices, const Camera& camera, float parameter)
 {
-  using LocalType = MessageValue1<Camera, float>;
+  using LocalType = MessageDoubleBuffered1<Camera, float>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&camera, &Camera::SetAspectRatio, parameter);
+  new(slot) LocalType(&camera, &Camera::BakeOrthographicSize, parameter);
 }
 
-inline void SetLeftClippingPlaneMessage(EventThreadServices& eventThreadServices, const Camera& camera, float parameter)
+inline void BakeAspectRatioMessage(EventThreadServices& eventThreadServices, const Camera& camera, float parameter)
 {
-  using LocalType = MessageValue1<Camera, float>;
+  using LocalType = MessageDoubleBuffered1<Camera, float>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&camera, &Camera::SetLeftClippingPlane, parameter);
-}
-
-inline void SetRightClippingPlaneMessage(EventThreadServices& eventThreadServices, const Camera& camera, float parameter)
-{
-  using LocalType = MessageValue1<Camera, float>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&camera, &Camera::SetRightClippingPlane, parameter);
-}
-
-inline void SetTopClippingPlaneMessage(EventThreadServices& eventThreadServices, const Camera& camera, float parameter)
-{
-  using LocalType = MessageValue1<Camera, float>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&camera, &Camera::SetTopClippingPlane, parameter);
-}
-
-inline void SetBottomClippingPlaneMessage(EventThreadServices& eventThreadServices, const Camera& camera, float parameter)
-{
-  using LocalType = MessageValue1<Camera, float>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&camera, &Camera::SetBottomClippingPlane, parameter);
+  new(slot) LocalType(&camera, &Camera::BakeAspectRatio, parameter);
 }
 
 inline void SetNearClippingPlaneMessage(EventThreadServices& eventThreadServices, const Camera& camera, float parameter)

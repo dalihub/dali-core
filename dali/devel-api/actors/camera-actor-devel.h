@@ -38,25 +38,40 @@ namespace Property
 enum
 {
   /**
-   * @brief Defines reflection plane for the camera
-   * @details Type Property::VECTOR4
-   * @note Optional
+   * @brief Orthographic Size of this camera.
+   * If ProjectionDirection is Vertical, OrthographicSize is height/2 of viewing cube of Orthographic projection.
+   * If ProjectionDirection is Horizontal, OrthographicSize is width/2 of viewing cube of Orthographic projection.
+   * Remained Width or Height of viewing cube is internally computed by using aspect ratio.
+   *
+   * @details Name "orthographicSize", type Property::FLOAT, animatable, constraint-input
+   * @note Default is 400.0f
    */
-  REFLECTION_PLANE = CameraActor::Property::INVERT_Y_AXIS + 1,
+  ORTHOGRAPHIC_SIZE = CameraActor::Property::INVERT_Y_AXIS + 1,
 
   /**
    * @brief Determine basic direction of projection relative properties.
    * It will be used when we need to calculate some values relative with aspect ratio automatically.
    *
    * For example, if aspect ratio is 4:3 and set fieldOfView as 60 degree.
-   * If ProjectionDirection::VERTICAL, basic direction is vertical. so, FoV of horizontal direction become ~75.2 degree
-   * If ProjectionDirection::HORIZONTAL, basic direction is horizontal. so, FoV of vertical direction become ~46.8 degree
+   *  - ProjectionDirection::VERTICAL : basic direction is vertical. so, FoV of horizontal direction become ~75.2 degree
+   *  - ProjectionDirection::HORIZONTAL : basic direction is horizontal. so, FoV of vertical direction become ~46.8 degree
+   *
+   * Another example, if aspect ratio is 4:3 and set orthographicSize as 400.0f.
+   *  - ProjectionDirection::VERTICAL : basic direction is vertical. so, topPlaneDistance become 400.0f, rightPlaneDistance value become 533.3f.
+   *  - ProjectionDirection::HORIZONTAL : basic direction is horizontal. so, topPlaneDistance become 300.0f, rightPlaneDistance value become 400.0f.
    *
    * @details Type Property::INT
-   * @note This property doesn't change FieldOfView value automatically. So result scene might be changed.
+   * @note This property doesn't change FieldOfView and OrthographicSize value automatically. So result scene might be changed.
    * @note Default is ProjectionDirection::VERTICAL.
    */
   PROJECTION_DIRECTION,
+
+  /**
+   * @brief Defines reflection plane for the camera
+   * @details Type Property::VECTOR4
+   * @note Optional
+   */
+  REFLECTION_PLANE,
 };
 
 } // Namespace Property
@@ -68,6 +83,7 @@ enum
  * @param [in] rotationAngle The rotation angle (0, 90, 180, and 270. See Dali::WindowOrientation.)
  */
 DALI_CORE_API void RotateProjection(Dali::CameraActor camera, int32_t rotationAngle);
+
 } // namespace DevelCameraActor
 } // Namespace Dali
 
