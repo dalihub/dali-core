@@ -33,16 +33,12 @@ class TextureSet;
  */
 struct PartialRenderingData
 {
-  Node*             node{nullptr};                  /// Node associated with the entry
-  Renderer*         renderer{nullptr};              /// Renderer object
-  const TextureSet* textureSet{nullptr};            /// TextureSet object
-  Matrix            matrix{};                       /// Model-view matrix
-  Vector4           color{};                        /// Color
-  Vector4           updatedPositionSize{};          /// Updated position/size (x, y, width, height)
-  Vector3           size{};                         /// Size
-  uint32_t          depthIndex{0u};                 /// Depth index
-  uint32_t          hash;                           /// Last frame's hash
-  bool              isOpaque{};                     /// Opacity state
+  Matrix   matrix{};              /// Model-view matrix
+  Vector4  color{};               /// Color
+  Vector4  updatedPositionSize{}; /// Updated position/size (x, y, width, height)
+  Vector3  size{};                /// Size
+  uint32_t depthIndex{0u};        /// Depth index
+  uint32_t hash;                  /// Last frame's hash
 
   bool mVisible{true};   /// Visible state (Not hashed)
   bool mRendered{false}; /// Rendering state (Not hashed)
@@ -53,15 +49,11 @@ struct PartialRenderingData
   void CalculateHash()
   {
     hash = Dali::INITIAL_HASH_VALUE;
-    AddToHash(hash, &node, sizeof(decltype(node)));
-    AddToHash(hash, &renderer, sizeof(decltype(renderer)));
-    AddToHash(hash, &textureSet, sizeof(decltype(textureSet)));
     AddToHash(hash, &matrix, sizeof(decltype(matrix)));
     AddToHash(hash, &color, sizeof(decltype(color)));
     AddToHash(hash, &updatedPositionSize, sizeof(decltype(updatedPositionSize)));
     AddToHash(hash, &size, sizeof(decltype(size)));
     AddToHash(hash, &depthIndex, sizeof(decltype(depthIndex)));
-    AddToHash(hash, &isOpaque, sizeof(decltype(isOpaque)));
   }
 
   /**
@@ -73,30 +65,21 @@ struct PartialRenderingData
     frameCache.CalculateHash();
 
     return hash != frameCache.hash ||
-           node != frameCache.node ||
-           renderer != frameCache.renderer ||
-           textureSet != frameCache.textureSet ||
            matrix != frameCache.matrix ||
            color != frameCache.color ||
            updatedPositionSize != frameCache.updatedPositionSize ||
            size != frameCache.size ||
            depthIndex != frameCache.depthIndex ||
-           isOpaque != frameCache.isOpaque ||
-
            !mRendered; // If everything is the same, check if we didn't render last frame.
   }
 
   void Update(const PartialRenderingData& frameCache)
   {
-    node                = frameCache.node;
-    renderer            = frameCache.renderer;
-    textureSet          = frameCache.textureSet;
     matrix              = frameCache.matrix;
     color               = frameCache.color;
     updatedPositionSize = frameCache.updatedPositionSize;
     size                = frameCache.size;
     depthIndex          = frameCache.depthIndex;
-    isOpaque            = frameCache.isOpaque;
     hash                = frameCache.hash;
 
     mRendered = true;

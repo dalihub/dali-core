@@ -186,8 +186,7 @@ Renderer::Renderer(SceneGraph::RenderDataProvider* dataProvider,
   mDepthWriteMode(depthWriteMode),
   mDepthTestMode(depthTestMode),
   mPremultipliedAlphaEnabled(preMultipliedAlphaEnabled),
-  mShaderChanged(false),
-  mUpdated(true)
+  mShaderChanged(false)
 {
   if(blendingBitmask != 0u)
   {
@@ -211,7 +210,6 @@ Renderer::~Renderer() = default;
 void Renderer::SetGeometry(Render::Geometry* geometry)
 {
   mGeometry = geometry;
-  mUpdated  = true;
 }
 void Renderer::SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, uint32_t size)
 {
@@ -264,49 +262,41 @@ void Renderer::BindTextures(Graphics::CommandBuffer& commandBuffer, Vector<Graph
 void Renderer::SetFaceCullingMode(FaceCullingMode::Type mode)
 {
   mFaceCullingMode = mode;
-  mUpdated         = true;
 }
 
 void Renderer::SetBlendingBitMask(uint32_t bitmask)
 {
   mBlendingOptions.SetBitmask(bitmask);
-  mUpdated = true;
 }
 
 void Renderer::SetBlendColor(const Vector4& color)
 {
   mBlendingOptions.SetBlendColor(color);
-  mUpdated = true;
 }
 
 void Renderer::SetIndexedDrawFirstElement(uint32_t firstElement)
 {
   mIndexedDrawFirstElement = firstElement;
-  mUpdated                 = true;
 }
 
 void Renderer::SetIndexedDrawElementsCount(uint32_t elementsCount)
 {
   mIndexedDrawElementsCount = elementsCount;
-  mUpdated                  = true;
 }
 
 void Renderer::EnablePreMultipliedAlpha(bool enable)
 {
   mPremultipliedAlphaEnabled = enable;
-  mUpdated                   = true;
 }
 
 void Renderer::SetDepthWriteMode(DepthWriteMode::Type depthWriteMode)
 {
   mDepthWriteMode = depthWriteMode;
-  mUpdated        = true;
 }
 
 void Renderer::SetDepthTestMode(DepthTestMode::Type depthTestMode)
 {
   mDepthTestMode = depthTestMode;
-  mUpdated       = true;
 }
 
 DepthWriteMode::Type Renderer::GetDepthWriteMode() const
@@ -322,7 +312,6 @@ DepthTestMode::Type Renderer::GetDepthTestMode() const
 void Renderer::SetDepthFunction(DepthFunction::Type depthFunction)
 {
   mDepthFunction = depthFunction;
-  mUpdated       = true;
 }
 
 DepthFunction::Type Renderer::GetDepthFunction() const
@@ -333,7 +322,6 @@ DepthFunction::Type Renderer::GetDepthFunction() const
 void Renderer::SetRenderMode(RenderMode::Type renderMode)
 {
   mStencilParameters.renderMode = renderMode;
-  mUpdated                      = true;
 }
 
 RenderMode::Type Renderer::GetRenderMode() const
@@ -344,7 +332,6 @@ RenderMode::Type Renderer::GetRenderMode() const
 void Renderer::SetStencilFunction(StencilFunction::Type stencilFunction)
 {
   mStencilParameters.stencilFunction = stencilFunction;
-  mUpdated                           = true;
 }
 
 StencilFunction::Type Renderer::GetStencilFunction() const
@@ -355,7 +342,6 @@ StencilFunction::Type Renderer::GetStencilFunction() const
 void Renderer::SetStencilFunctionMask(int stencilFunctionMask)
 {
   mStencilParameters.stencilFunctionMask = stencilFunctionMask;
-  mUpdated                               = true;
 }
 
 int Renderer::GetStencilFunctionMask() const
@@ -366,7 +352,6 @@ int Renderer::GetStencilFunctionMask() const
 void Renderer::SetStencilFunctionReference(int stencilFunctionReference)
 {
   mStencilParameters.stencilFunctionReference = stencilFunctionReference;
-  mUpdated                                    = true;
 }
 
 int Renderer::GetStencilFunctionReference() const
@@ -377,7 +362,6 @@ int Renderer::GetStencilFunctionReference() const
 void Renderer::SetStencilMask(int stencilMask)
 {
   mStencilParameters.stencilMask = stencilMask;
-  mUpdated                       = true;
 }
 
 int Renderer::GetStencilMask() const
@@ -388,7 +372,6 @@ int Renderer::GetStencilMask() const
 void Renderer::SetStencilOperationOnFail(StencilOperation::Type stencilOperationOnFail)
 {
   mStencilParameters.stencilOperationOnFail = stencilOperationOnFail;
-  mUpdated                                  = true;
 }
 
 StencilOperation::Type Renderer::GetStencilOperationOnFail() const
@@ -399,7 +382,6 @@ StencilOperation::Type Renderer::GetStencilOperationOnFail() const
 void Renderer::SetStencilOperationOnZFail(StencilOperation::Type stencilOperationOnZFail)
 {
   mStencilParameters.stencilOperationOnZFail = stencilOperationOnZFail;
-  mUpdated                                   = true;
 }
 
 StencilOperation::Type Renderer::GetStencilOperationOnZFail() const
@@ -410,7 +392,6 @@ StencilOperation::Type Renderer::GetStencilOperationOnZFail() const
 void Renderer::SetStencilOperationOnZPass(StencilOperation::Type stencilOperationOnZPass)
 {
   mStencilParameters.stencilOperationOnZPass = stencilOperationOnZPass;
-  mUpdated                                   = true;
 }
 
 StencilOperation::Type Renderer::GetStencilOperationOnZPass() const
@@ -575,7 +556,6 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
     }
   }
 
-  mUpdated = false;
   return drawn;
 }
 
@@ -877,15 +857,9 @@ void Renderer::SetShaderChanged(bool value)
   mShaderChanged = value;
 }
 
-bool Renderer::Updated(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider* node)
+bool Renderer::Updated(BufferIndex bufferIndex)
 {
-  if(mUpdated)
-  {
-    mUpdated = false;
-    return true;
-  }
-
-  if(mRenderCallback || mShaderChanged || mGeometry->AttributesChanged())
+  if(mRenderCallback || mShaderChanged || mGeometry->AttributesChanged() || mRenderDataProvider->IsUpdated())
   {
     return true;
   }
@@ -896,35 +870,18 @@ bool Renderer::Updated(BufferIndex bufferIndex, const SceneGraph::NodeDataProvid
     for(auto iter = textures->Begin(), end = textures->End(); iter < end; ++iter)
     {
       auto texture = *iter;
-      if(texture && texture->IsNativeImage())
+      if(texture && texture->Updated())
       {
         return true;
       }
     }
   }
-
-  // Hash the property values. If the values are different, then rendering is required.
-  uint64_t                      hash           = 0xc70f6907UL;
-  const SceneGraph::UniformMap& uniformMapNode = node->GetNodeUniformMap();
-  for(uint32_t i = 0u, count = uniformMapNode.Count(); i < count; ++i)
-  {
-    hash = uniformMapNode[i].propertyPtr->Hash(bufferIndex, hash);
-  }
-
-  const SceneGraph::UniformMapDataProvider& uniformMapDataProvider = mRenderDataProvider->GetUniformMapDataProvider();
-  const SceneGraph::CollectedUniformMap&    collectedUniformMap    = uniformMapDataProvider.GetCollectedUniformMap();
-  for(uint32_t i = 0u, count = collectedUniformMap.Count(); i < count; ++i)
-  {
-    hash = collectedUniformMap.mUniformMap[i].propertyPtr->Hash(bufferIndex, hash);
-  }
-
-  if(mUniformsHash != hash)
-  {
-    mUniformsHash = hash;
-    return true;
-  }
-
   return false;
+}
+
+Vector4 Renderer::GetVisualTransformedUpdateArea(BufferIndex bufferIndex, const Vector4& originalUpdateArea) const noexcept
+{
+  return mRenderDataProvider->GetVisualTransformedUpdateArea(bufferIndex, originalUpdateArea);
 }
 
 Graphics::Pipeline& Renderer::PrepareGraphicsPipeline(
@@ -933,11 +890,6 @@ Graphics::Pipeline& Renderer::PrepareGraphicsPipeline(
   const SceneGraph::NodeDataProvider&                  node,
   bool                                                 blend)
 {
-  if(mGeometry->AttributesChanged())
-  {
-    mUpdated = true;
-  }
-
   // Prepare query info
   PipelineCacheQueryInfo queryInfo{};
   queryInfo.program               = &program;

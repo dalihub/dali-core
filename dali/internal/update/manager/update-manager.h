@@ -612,6 +612,11 @@ public:
                   bool     uploadOnly);
 
   /**
+   * This is called after rendering all the scenes in the next frame.
+   */
+  void PostRender();
+
+  /**
    * @copydoc Dali::Stage::KeepRendering()
    */
   void KeepRendering(float durationSeconds);

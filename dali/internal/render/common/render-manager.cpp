@@ -630,11 +630,13 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
               // If the item refers to updated node or renderer.
               if(item.mIsUpdated ||
                  (item.mNode &&
-                  (item.mNode->Updated() || (item.mRenderer && item.mRenderer->Updated(mImpl->renderBufferIndex, item.mNode)))))
+                  (item.mNode->Updated() || (item.mRenderer && item.mRenderer->Updated(mImpl->renderBufferIndex)))))
               {
                 item.mIsUpdated = false;
 
-                rect = RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, Vector3(item.mUpdateArea.x, item.mUpdateArea.y, 0.0f), Vector3(item.mUpdateArea.z, item.mUpdateArea.w, 0.0f), viewportRect.width, viewportRect.height);
+                Vector4 updateArea = item.mRenderer ? item.mRenderer->GetVisualTransformedUpdateArea(mImpl->renderBufferIndex, item.mUpdateArea) : item.mUpdateArea;
+
+                rect = RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, Vector3(updateArea.x, updateArea.y, 0.0f), Vector3(updateArea.z, updateArea.w, 0.0f), viewportRect.width, viewportRect.height);
                 if(rect.IsValid() && rect.Intersect(viewportRect) && !rect.IsEmpty())
                 {
                   const int left   = rect.x;
@@ -712,13 +714,6 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
   if(!cleanDamagedRect)
   {
     damagedRectCleaner.SetCleanOnReturn(false);
-  }
-
-  // Reset updated flag from the root
-  Layer* root = sceneObject->GetRoot();
-  if(root)
-  {
-    root->SetUpdatedTree(false);
   }
 }
 
@@ -1009,6 +1004,12 @@ void RenderManager::PostRender()
 
   // Notify RenderGeometries that rendering has finished
   for(auto&& iter : mImpl->geometryContainer)
+  {
+    iter->OnRenderFinished();
+  }
+
+  // Notify RenderTexture that rendering has finished
+  for(auto&& iter : mImpl->textureContainer)
   {
     iter->OnRenderFinished();
   }

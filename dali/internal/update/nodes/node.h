@@ -212,6 +212,7 @@ public:
   void SetClippingMode(const ClippingMode::Type clippingMode)
   {
     mClippingMode = clippingMode;
+    SetDirtyFlag(NodePropertyFlags::TRANSFORM);
   }
 
   /**
@@ -876,6 +877,12 @@ public:
    */
   void ResetDirtyFlags(BufferIndex updateBufferIndex);
 
+  /**
+   * Update uniform hash
+   * @param[in] bufferIndex The buffer to read from.
+   */
+  void UpdateUniformHash(BufferIndex bufferIndex);
+
 protected:
   /**
    * Set the parent of a Node.
@@ -914,10 +921,10 @@ private: // from NodeDataProvider
 
 private:
   // Delete copy and move
-  Node(const Node&)                = delete;
-  Node(Node&&)                     = delete;
+  Node(const Node&) = delete;
+  Node(Node&&)      = delete;
   Node& operator=(const Node& rhs) = delete;
-  Node& operator=(Node&& rhs)      = delete;
+  Node& operator=(Node&& rhs) = delete;
 
   /**
    * Recursive helper to disconnect a Node and its children.
@@ -955,6 +962,7 @@ public: // Default properties
   TransformManagerMatrixInput     mWorldMatrix;      ///< Full inherited world matrix
   InheritedColor                  mWorldColor;       ///< Full inherited color
 
+  uint64_t       mUniformsHash{0u};     ///< Hash of uniform map property values
   uint32_t       mClippingSortModifier; ///< Contains bit-packed clipping information for quick access when sorting
   const uint32_t mId;                   ///< The Unique ID of the node.
 

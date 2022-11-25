@@ -426,9 +426,8 @@ public:
    * Check if the renderer attributes/uniforms are updated and returns the flag
    *
    * @param[in] bufferIndex The current update buffer index.
-   * @param[in] node The node using this renderer
    */
-  bool Updated(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider* node);
+  bool Updated(BufferIndex bufferIndex);
 
   template<class T>
   bool WriteDefaultUniform(const Graphics::UniformInfo* uniformInfo,
@@ -449,6 +448,16 @@ public:
   {
     return mFaceCullingMode;
   }
+
+  /**
+   * @brief Gets update area after visual properties applied.
+   *
+   * @param[in] bufferIndex The index of the previous update buffer.
+   * @param[in] originalUpdateArea The original update area before apply the visual properties.
+   *
+   * @return The recalculated update area after visual properties applied.
+   */
+  Vector4 GetVisualTransformedUpdateArea(BufferIndex bufferIndex, const Vector4& originalUpdateArea) const noexcept;
 
 private:
   struct UniformIndexMap;
@@ -585,15 +594,12 @@ private:
   using UniformIndexMappings = std::vector<UniformIndexMap>;
   std::vector<UniformIndexMappings> mUniformIndexMaps; ///< Cached map per node/renderer/shader.
 
-  uint64_t mUniformsHash{0}; ///< Hash of uniform map property values
-
   DepthFunction::Type   mDepthFunction : 4;             ///< The depth function
   FaceCullingMode::Type mFaceCullingMode : 3;           ///< The mode of face culling
   DepthWriteMode::Type  mDepthWriteMode : 3;            ///< The depth write mode
   DepthTestMode::Type   mDepthTestMode : 3;             ///< The depth test mode
   bool                  mPremultipliedAlphaEnabled : 1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
   bool                  mShaderChanged : 1;             ///< Flag indicating the shader changed and uniform maps have to be updated
-  bool                  mUpdated : 1;
 
   std::vector<Dali::DevelRenderer::DrawCommand> mDrawCommands; // Devel stuff
   RenderCallback*                               mRenderCallback{nullptr};

@@ -1140,6 +1140,20 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
   return keepUpdating;
 }
 
+void UpdateManager::PostRender()
+{
+  // Reset dirty flag
+  for(auto&& renderer : mImpl->renderers)
+  {
+    renderer->ResetDirtyFlag();
+  }
+
+  for(auto&& scene : mImpl->scenes)
+  {
+    scene->root->SetUpdatedTree(false);
+  }
+}
+
 uint32_t UpdateManager::KeepUpdatingCheck(float elapsedSeconds) const
 {
   // Update the duration set via Stage::KeepRendering()

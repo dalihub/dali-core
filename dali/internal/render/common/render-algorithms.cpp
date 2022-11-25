@@ -651,7 +651,8 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
     bool skip = true;
     if(!rootClippingRect.IsEmpty())
     {
-      auto rect = RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, Vector3(item.mUpdateArea.x, item.mUpdateArea.y, 0.0f), Vector3(item.mUpdateArea.z, item.mUpdateArea.w, 0.0f), mViewportRectangle.width, mViewportRectangle.height);
+      Vector4 updateArea = item.mRenderer ? item.mRenderer->GetVisualTransformedUpdateArea(bufferIndex, item.mUpdateArea) : item.mUpdateArea;
+      auto    rect       = RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, Vector3(updateArea.x, updateArea.y, 0.0f), Vector3(updateArea.z, updateArea.w, 0.0f), mViewportRectangle.width, mViewportRectangle.height);
 
       if(rect.Intersect(rootClippingRect))
       {

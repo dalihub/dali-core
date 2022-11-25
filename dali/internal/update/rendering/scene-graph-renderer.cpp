@@ -104,8 +104,8 @@ Renderer::Renderer()
   mRenderingBehavior(DevelRenderer::Rendering::IF_REQUIRED),
   mUpdateDecay(Renderer::Decay::INITIAL),
   mRegenerateUniformMap(false),
-  mUniformMapUpdated(false),
   mPremultipledAlphaEnabled(false),
+  mDirtyFlag(true),
   mOpacity(1.0f),
   mDepthIndex(0)
 {
@@ -293,11 +293,13 @@ bool Renderer::PrepareRender(BufferIndex updateBufferIndex)
       new(slot) DerivedType(mRenderer, &Render::Renderer::SetRenderCallback, mRenderCallback);
     }
 
+    SetUpdated(true);
+
     mResendFlag = 0;
   }
 
   // Ensure collected map is up to date
-  UpdateUniformMap();
+  UpdateUniformMap(updateBufferIndex);
 
   return rendererUpdated;
 }
@@ -307,6 +309,9 @@ void Renderer::SetTextures(TextureSet* textureSet)
   DALI_ASSERT_DEBUG(textureSet != NULL && "Texture set pointer is NULL");
 
   mTextureSet = textureSet;
+
+  mDirtyFlag = true;
+  SetUpdated(true);
 }
 
 const Vector<Render::Texture*>* Renderer::GetTextures() const
@@ -332,6 +337,7 @@ void Renderer::SetShader(Shader* shader)
   mShader->AddUniformMapObserver(*this);
   mRegenerateUniformMap = true;
   mResendFlag |= RESEND_GEOMETRY | RESEND_SHADER;
+  mDirtyFlag = true;
 }
 
 void Renderer::SetGeometry(Render::Geometry* geometry)
@@ -348,6 +354,9 @@ void Renderer::SetGeometry(Render::Geometry* geometry)
 void Renderer::SetDepthIndex(int depthIndex)
 {
   mDepthIndex = depthIndex;
+
+  mDirtyFlag = true;
+  SetUpdated(true);
 }
 
 void Renderer::SetFaceCullingMode(FaceCullingMode::Type faceCullingMode)
@@ -364,6 +373,9 @@ FaceCullingMode::Type Renderer::GetFaceCullingMode() const
 void Renderer::SetBlendMode(BlendMode::Type blendingMode)
 {
   mBlendMode = blendingMode;
+
+  mDirtyFlag = true;
+  SetUpdated(true);
 }
 
 BlendMode::Type Renderer::GetBlendMode() const
@@ -377,6 +389,7 @@ void Renderer::SetBlendingOptions(uint32_t options)
   {
     mBlendBitmask = options;
     mResendFlag |= RESEND_BLEND_BIT_MASK;
+    mDirtyFlag = true;
   }
 }
 
@@ -533,6 +546,7 @@ void Renderer::SetRenderCallback(RenderCallback* callback)
 {
   mRenderCallback = callback;
   mResendFlag |= RESEND_SET_RENDER_CALLBACK;
+  mDirtyFlag = true;
 }
 
 const Render::Renderer::StencilParameters& Renderer::GetStencilParameters() const
@@ -543,6 +557,9 @@ const Render::Renderer::StencilParameters& Renderer::GetStencilParameters() cons
 void Renderer::BakeOpacity(BufferIndex updateBufferIndex, float opacity)
 {
   mOpacity.Bake(updateBufferIndex, opacity);
+
+  mDirtyFlag = true;
+  SetUpdated(true);
 }
 
 float Renderer::GetOpacity(BufferIndex updateBufferIndex) const
@@ -553,6 +570,7 @@ float Renderer::GetOpacity(BufferIndex updateBufferIndex) const
 void Renderer::SetRenderingBehavior(DevelRenderer::Rendering::Type renderingBehavior)
 {
   mRenderingBehavior = renderingBehavior;
+  SetUpdated(true);
 }
 
 DevelRenderer::Rendering::Type Renderer::GetRenderingBehavior() const
@@ -656,7 +674,7 @@ Renderer::OpacityType Renderer::GetOpacityType(BufferIndex updateBufferIndex, co
   return opacityType;
 }
 
-void Renderer::UpdateUniformMap()
+void Renderer::UpdateUniformMap(BufferIndex updateBufferIndex)
 {
   if(mRegenerateUniformMap)
   {
@@ -679,7 +697,20 @@ void Renderer::UpdateUniformMap()
     }
     localMap.UpdateChangeCounter();
     mRegenerateUniformMap = false;
-    mUniformMapUpdated    = true;
+    SetUpdated(true);
+  }
+
+  uint64_t                                  hash                   = 0xc70f6907UL;
+  const SceneGraph::UniformMapDataProvider& uniformMapDataProvider = GetUniformMapDataProvider();
+  const SceneGraph::CollectedUniformMap&    collectedUniformMap    = uniformMapDataProvider.GetCollectedUniformMap();
+  for(uint32_t i = 0u, count = collectedUniformMap.Count(); i < count; ++i)
+  {
+    hash = collectedUniformMap.mUniformMap[i].propertyPtr->Hash(updateBufferIndex, hash);
+  }
+  if(mUniformsHash != hash)
+  {
+    mUniformsHash = hash;
+    SetUpdated(true);
   }
 }
 
@@ -688,6 +719,19 @@ void Renderer::SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, 
   mDrawCommands.clear();
   mDrawCommands.insert(mDrawCommands.end(), pDrawCommands, pDrawCommands + size);
   mResendFlag |= RESEND_DRAW_COMMANDS;
+}
+
+bool Renderer::IsDirty() const
+{
+  // Check whether the opacity property has changed
+  return (mDirtyFlag || !mOpacity.IsClean());
+}
+
+void Renderer::ResetDirtyFlag()
+{
+  mDirtyFlag = false;
+
+  SetUpdated(false);
 }
 
 void Renderer::UniformMappingsChanged(const UniformMap& mappings)
@@ -701,7 +745,7 @@ const CollectedUniformMap& Renderer::GetCollectedUniformMap() const
   return mCollectedUniformMap;
 }
 
-Vector3 Renderer::CalculateVisualTransformedUpdateSize(BufferIndex updateBufferIndex, const Vector3& originalSize)
+Vector4 Renderer::GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, const Vector4& originalUpdateArea) noexcept
 {
   if(mVisualProperties)
   {
@@ -819,19 +863,23 @@ Vector3 Renderer::CalculateVisualTransformedUpdateSize(BufferIndex updateBufferI
     //                  = scaleVertexPosition + 2.0f * abs(basicVertexPosition)
     // Cause transform matrix will think center of vertex is (0, 0)
 
-    const Vector2 basicVertexPosition = mVisualPropertiesCoefficient.coefXB * originalSize.GetVectorXY() + mVisualPropertiesCoefficient.coefCB;
-    const Vector2 scaleVertexPosition = mVisualPropertiesCoefficient.coefXA * originalSize.GetVectorXY() + mVisualPropertiesCoefficient.coefCA;
+    const Vector2 originalXY = Vector2(originalUpdateArea.x, originalUpdateArea.y);
+    const Vector2 originalWH = Vector2(originalUpdateArea.z, originalUpdateArea.w);
 
-    // VisualTransform don't set z value. Just copy from original z size
-    const Vector3 resultSize = Vector3(scaleVertexPosition.x + 2.0f * abs(basicVertexPosition.x) + mVisualPropertiesCoefficient.coefD,
-                                       scaleVertexPosition.y + 2.0f * abs(basicVertexPosition.y) + mVisualPropertiesCoefficient.coefD,
-                                       originalSize.z);
+    const Vector2 basicVertexPosition = mVisualPropertiesCoefficient.coefXB * originalWH + mVisualPropertiesCoefficient.coefCB;
+    const Vector2 scaleVertexPosition = mVisualPropertiesCoefficient.coefXA * originalWH + mVisualPropertiesCoefficient.coefCA;
 
-    DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "%f %f --> %f %f\n", originalSize.x, originalSize.y, resultSize.x, resultSize.y);
+    // TODO : We need to re-generate coefficient to consitder area width/height
+    const Vector4 resultArea = Vector4(originalXY.x,
+                                       originalXY.y,
+                                       scaleVertexPosition.x + 2.0f * abs(basicVertexPosition.x) + mVisualPropertiesCoefficient.coefD,
+                                       scaleVertexPosition.y + 2.0f * abs(basicVertexPosition.y) + mVisualPropertiesCoefficient.coefD);
 
-    return resultSize;
+    DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "%f %f %f %f--> %f %f %f %f\n", originalUpdateArea.x, originalUpdateArea.y, originalUpdateArea.z, originalUpdateArea.w, resultArea.x, resultArea.y, resultArea.z, resultArea.w);
+
+    return resultArea;
   }
-  return originalSize;
+  return originalUpdateArea;
 }
 
 } // namespace SceneGraph

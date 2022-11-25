@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,6 +68,11 @@ void TextureSet::SetSampler(uint32_t index, Render::Sampler* sampler)
   }
 
   mSamplers[index] = sampler;
+
+  if(index < static_cast<uint32_t>(mTextures.Size()))
+  {
+    mTextures[index]->SetUpdated(true);
+  }
 }
 
 void TextureSet::SetTexture(uint32_t index, Render::Texture* texture)
@@ -99,6 +104,7 @@ void TextureSet::SetTexture(uint32_t index, Render::Texture* texture)
   if(texture)
   {
     mHasAlpha |= texture->HasAlphaChannel();
+    texture->SetUpdated(true);
   }
 }
 

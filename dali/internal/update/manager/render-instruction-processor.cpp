@@ -199,14 +199,13 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
   Vector3 nodeSize;
   Vector4 nodeUpdateArea;
   bool    nodeUpdateAreaSet(false);
-  bool    nodeUpdateAreaUseHint(false);
   Matrix  nodeModelViewMatrix(false);
   bool    nodeModelViewMatrixSet(false);
 
   // Don't cull items which have render callback
   bool hasRenderCallback = (renderable.mRenderer && renderable.mRenderer->GetRenderCallback());
 
-  if(cull && renderable.mRenderer && (hasRenderCallback || (!renderable.mRenderer->GetShader().HintEnabled(Dali::Shader::Hint::MODIFIES_GEOMETRY) && node->GetClippingMode() == ClippingMode::DISABLED)))
+  if(cull && renderable.mRenderer && !hasRenderCallback && !renderable.mRenderer->GetShader().HintEnabled(Dali::Shader::Hint::MODIFIES_GEOMETRY) && node->GetClippingMode() == ClippingMode::DISABLED)
   {
     const Vector4& boundingSphere = node->GetBoundingSphere();
     inside                        = (boundingSphere.w > Math::MACHINE_EPSILON_1000) &&
@@ -214,8 +213,8 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
 
     if(inside && !isLayer3d && viewportSet)
     {
-      nodeUpdateAreaUseHint = SetNodeUpdateArea(node, isLayer3d, nodeWorldMatrix, nodeSize, nodeUpdateArea);
-      nodeUpdateAreaSet     = true;
+      SetNodeUpdateArea(node, isLayer3d, nodeWorldMatrix, nodeSize, nodeUpdateArea);
+      nodeUpdateAreaSet = true;
 
       const Vector3& scale = node->GetWorldScale(updateBufferIndex);
       const Vector3& size  = Vector3(nodeUpdateArea.z, nodeUpdateArea.w, 1.0f) * scale;
@@ -261,21 +260,6 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
       // Get the next free RenderItem.
       RenderItem& item = renderList.GetNextFreeItem();
 
-      PartialRenderingData partialRenderingData;
-
-      partialRenderingData.node       = node;
-      partialRenderingData.renderer   = renderable.mRenderer;
-      partialRenderingData.color      = node->GetWorldColor(updateBufferIndex);
-      partialRenderingData.depthIndex = node->GetDepthIndex();
-      partialRenderingData.isOpaque   = isOpaque;
-
-      partialRenderingData.textureSet = nullptr;
-      if(DALI_LIKELY(renderable.mRenderer))
-      {
-        partialRenderingData.color.a *= renderable.mRenderer->GetOpacity(updateBufferIndex);
-        partialRenderingData.textureSet = renderable.mRenderer->GetTextureSet();
-      }
-
       item.mNode     = node;
       item.mIsOpaque = isOpaque;
       item.mColor    = node->GetColor(updateBufferIndex);
@@ -291,9 +275,6 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
         item.mRenderer   = &renderable.mRenderer->GetRenderer();
         item.mTextureSet = renderable.mRenderer->GetTextureSet();
         item.mDepthIndex += renderable.mRenderer->GetDepthIndex();
-
-        // Get whether collected map is up to date
-        item.mIsUpdated |= renderable.mRenderer->UniformMapUpdated();
       }
       else
       {
@@ -304,20 +285,12 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
 
       if(!nodeUpdateAreaSet)
       {
-        nodeUpdateAreaUseHint = SetNodeUpdateArea(node, isLayer3d, nodeWorldMatrix, nodeSize, nodeUpdateArea);
+        SetNodeUpdateArea(node, isLayer3d, nodeWorldMatrix, nodeSize, nodeUpdateArea);
       }
 
       item.mSize        = nodeSize;
       item.mUpdateArea  = nodeUpdateArea;
       item.mModelMatrix = nodeWorldMatrix;
-
-      // Apply transform informations if node doesn't have update size hint and use VisualRenderer.
-      if(!nodeUpdateAreaUseHint && renderable.mRenderer && renderable.mRenderer->GetVisualProperties())
-      {
-        Vector3 updateSize = renderable.mRenderer->CalculateVisualTransformedUpdateSize(updateBufferIndex, Vector3(item.mUpdateArea.z, item.mUpdateArea.w, 0.0f));
-        item.mUpdateArea.z = updateSize.x;
-        item.mUpdateArea.w = updateSize.y;
-      }
 
       if(!nodeModelViewMatrixSet)
       {
@@ -325,6 +298,9 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
       }
       item.mModelViewMatrix = nodeModelViewMatrix;
 
+      PartialRenderingData partialRenderingData;
+      partialRenderingData.color               = node->GetWorldColor(updateBufferIndex);
+      partialRenderingData.depthIndex          = node->GetDepthIndex();
       partialRenderingData.matrix              = item.mModelViewMatrix;
       partialRenderingData.updatedPositionSize = item.mUpdateArea;
       partialRenderingData.size                = item.mSize;
@@ -489,10 +465,8 @@ inline void RenderInstructionProcessor::SortRenderItems(BufferIndex bufferIndex,
 
   // List of zValue calculating functions.
   const Dali::Layer::SortFunctionType zValueFunctionFromVector3[] = {
-    [](const Vector3& position)
-    { return position.z; },
-    [](const Vector3& position)
-    { return position.LengthSquared(); },
+    [](const Vector3& position) { return position.z; },
+    [](const Vector3& position) { return position.LengthSquared(); },
     layer.GetSortFunction(),
   };
 

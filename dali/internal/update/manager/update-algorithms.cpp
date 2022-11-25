@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -113,7 +113,7 @@ inline NodePropertyFlags UpdateNodes(Node&             node,
 
   UpdateNodeOpacity(node, nodeDirtyFlags, updateBufferIndex);
 
-
+  node.UpdateUniformHash(updateBufferIndex);
 
   // For partial update, mark all children of an animating node as updated.
   if(updated) // Only set to updated if parent was updated.
@@ -211,6 +211,20 @@ inline void UpdateLayers(Node&             node,
   {
     layer->SetReuseRenderers(updateBufferIndex, false);
   }
+  else
+  {
+    // If the node is not dirty, then check renderers
+    const uint32_t count = node.GetRendererCount();
+    for(uint32_t i = 0; i < count; ++i)
+    {
+      SceneGraph::Renderer* renderer = node.GetRendererAt(i);
+      if(renderer->IsDirty())
+      {
+        layer->SetReuseRenderers(updateBufferIndex, false);
+        break;
+      }
+    }
+  }
 
   // recurse children
   NodeContainer& children = node.GetChildren();
@@ -227,6 +241,8 @@ void UpdateLayerTree(Layer&      layer,
 {
   NodePropertyFlags nodeDirtyFlags = layer.GetDirtyFlags();
   nodeDirtyFlags |= (layer.IsLocalMatrixDirty() ? NodePropertyFlags::TRANSFORM : NodePropertyFlags::NOTHING);
+
+  layer.SetReuseRenderers(updateBufferIndex, nodeDirtyFlags == NodePropertyFlags::NOTHING);
 
   // recurse children
   NodeContainer& children = layer.GetChildren();
