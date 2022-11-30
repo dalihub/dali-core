@@ -19,6 +19,7 @@
 
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/internal/common/blending-options.h>
+#include <dali/internal/common/memory-pool-key.h>
 #include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/render/data-providers/render-data-provider.h>
@@ -44,13 +45,32 @@ namespace SceneGraph
 class SceneController;
 
 class Renderer;
-using RendererIndex     = uint32_t;
-using RendererContainer = Dali::Vector<RendererIndex>;
-using RendererIter      = RendererContainer::Iterator;
-using RendererConstIter = RendererContainer::ConstIterator;
-
 class TextureSet;
 class Geometry;
+
+using RendererKey = MemoryPoolKey<SceneGraph::Renderer>;
+
+} // namespace SceneGraph
+} // namespace Internal
+
+// Ensure RendererKey can be used in Dali::Vector
+template<>
+struct TypeTraits<Internal::SceneGraph::RendererKey> : public BasicTypes<Internal::SceneGraph::RendererKey>
+{
+  enum
+  {
+    IS_TRIVIAL_TYPE = true
+  };
+};
+
+namespace Internal
+{
+namespace SceneGraph
+{
+
+using RendererContainer = Dali::Vector<RendererKey>;
+using RendererIter      = RendererContainer::Iterator;
+using RendererConstIter = RendererContainer::ConstIterator;
 
 namespace VisualRenderer
 {
@@ -156,7 +176,7 @@ public:
    */
   static Renderer* New();
 
-  static RendererIndex NewKey();
+  static RendererKey NewKey();
 
   /**
    * Destructor
@@ -169,15 +189,22 @@ public:
    */
   void operator delete(void* ptr);
 
-  /**
-   * Get pointer to a renderer at the given index.
-   * @param[in] rendererIndex Index of renderer to retrieve object
-   * @return The object's address, or nullptr if not found
-   */
-  static Renderer* Get(RendererIndex rendererIndex);
+  static Renderer* Get(RendererKey::KeyType);
 
-  static RendererIndex GetIndex(const Renderer& renderer);
-  static RendererIndex GetIndex(Renderer* renderer);
+  /**
+   * Get the key of the given renderer in the associated memory pool.
+   * @param[in] renderer the given renderer
+   * @return The key in the associated memory pool.
+   */
+  static RendererKey GetKey(const SceneGraph::Renderer& renderer);
+
+  /**
+   * Get the key of the given renderer in the associated memory pool.
+   * @param[in] renderer the given renderer
+   * @return The key in the associated memory pool, or -1 if not
+   * found.
+   */
+  static RendererKey GetKey(SceneGraph::Renderer* renderer);
 
   /**
    * Set the texture set for the renderer
@@ -185,6 +212,10 @@ public:
    */
   void SetTextures(TextureSet* textureSet);
 
+  /**
+   * Get the associated texture set
+   * @return the texture set.
+   */
   const SceneGraph::TextureSet* GetTextureSet() const
   {
     return mTextureSet;
@@ -899,4 +930,4 @@ inline void SetRenderCallbackMessage(EventThreadServices& eventThreadServices, c
 } // namespace Internal
 } // namespace Dali
 
-#endif //  DALI_INTERNAL_SCENE_GRAPH_RENDERER_H
+#endif // DALI_INTERNAL_SCENE_GRAPH_RENDERER_H

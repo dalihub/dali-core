@@ -197,7 +197,7 @@ RendererPtr Renderer::New()
   auto sceneObjectKey = SceneGraph::Renderer::NewKey();
 
   // pass the pointer to base for message passing
-  RendererPtr rendererPtr(new Renderer(SceneGraph::Renderer::Get(sceneObjectKey)));
+  RendererPtr rendererPtr(new Renderer(sceneObjectKey.Get()));
 
   EventThreadServices&       eventThreadServices = rendererPtr->GetEventThreadServices();
   SceneGraph::UpdateManager& updateManager       = eventThreadServices.GetUpdateManager();
@@ -805,7 +805,7 @@ Renderer::~Renderer()
   {
     EventThreadServices&       eventThreadServices = GetEventThreadServices();
     SceneGraph::UpdateManager& updateManager       = eventThreadServices.GetUpdateManager();
-    RemoveRendererMessage(updateManager, SceneGraph::Renderer::GetIndex(GetRendererSceneObject()));
+    RemoveRendererMessage(updateManager, SceneGraph::Renderer::GetKey(GetRendererSceneObject())); //@todo Use key throughtout
 
     eventThreadServices.UnregisterObject(this);
   }

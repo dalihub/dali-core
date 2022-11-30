@@ -226,21 +226,21 @@ public:
 
   /**
    * Add a renderer to the node
-   * @param[in] renderer The renderer added to the node
+   * @param[in] renderer The renderer to add to the node
    */
-  void AddRenderer(RendererIndex renderer);
+  void AddRenderer(const RendererKey& renderer);
 
   /**
    * Remove a renderer from the node
    * @param[in] renderer The renderer to be removed
    */
-  void RemoveRenderer(const RendererIndex renderer);
+  void RemoveRenderer(const RendererKey& renderer);
 
   /*
    * Get the renderer at the given index
-   * @param[in] index
+   * @param[in] index The index of the renderer in the node's renderer container
    */
-  RendererIndex GetRendererAt(uint32_t index) const
+  RendererKey GetRendererAt(uint32_t index) const
   {
     return mRenderers[index];
   }
@@ -1103,13 +1103,13 @@ inline void SetTransparentMessage(EventThreadServices& eventThreadServices, cons
 
 inline void DetachRendererMessage(EventThreadServices& eventThreadServices, const Node& node, const Renderer& renderer)
 {
-  using LocalType = MessageValue1<Node, RendererIndex>;
+  using LocalType = MessageValue1<Node, RendererKey>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&node, &Node::RemoveRenderer, Renderer::GetIndex(renderer));
+  new(slot) LocalType(&node, &Node::RemoveRenderer, Renderer::GetKey(renderer));
 }
 
 inline void SetDepthIndexMessage(EventThreadServices& eventThreadServices, const Node& node, uint32_t depthIndex)

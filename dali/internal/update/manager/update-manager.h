@@ -320,13 +320,13 @@ public:
    * Add a new renderer to scene
    * @param renderer to add
    */
-  void AddRenderer(RendererIndex renderer);
+  void AddRenderer(const RendererKey& renderer);
 
   /**
-   * Add a renderer from scene
+   * Remove a renderer from scene
    * @param renderer to remove
    */
-  void RemoveRenderer(RendererIndex renderer);
+  void RemoveRenderer(const RendererKey& renderer);
 
   /**
    * Attach a renderer to node
@@ -1104,24 +1104,24 @@ inline void SetLayerDepthsMessage(UpdateManager& manager, const std::vector<Laye
   new(slot) LocalType(&manager, &UpdateManager::SetLayerDepths, layers, rootLayer);
 }
 
-inline void AddRendererMessage(UpdateManager& manager, RendererIndex rendererIndex)
+inline void AddRendererMessage(UpdateManager& manager, const RendererKey& rendererKey)
 {
-  using LocalType = MessageValue1<UpdateManager, RendererIndex>;
+  using LocalType = MessageValue1<UpdateManager, RendererKey>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &UpdateManager::AddRenderer, rendererIndex);
+  new(slot) LocalType(&manager, &UpdateManager::AddRenderer, rendererKey);
 }
 
-inline void RemoveRendererMessage(UpdateManager& manager, RendererIndex rendererIndex)
+inline void RemoveRendererMessage(UpdateManager& manager, const RendererKey& rendererKey)
 {
-  using LocalType = MessageValue1<UpdateManager, RendererIndex>;
+  using LocalType = MessageValue1<UpdateManager, RendererKey>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &UpdateManager::RemoveRenderer, rendererIndex);
+  new(slot) LocalType(&manager, &UpdateManager::RemoveRenderer, rendererKey);
 }
 
 inline void AttachRendererMessage(UpdateManager& manager, const Node& node, const Renderer& renderer)

@@ -6,7 +6,7 @@ INCLUDE(FindPkgConfig)
 SET(BIN_DIR "/opt/usr/bin")
 
 INCLUDE_DIRECTORIES(
-	src/common
+  src/common
 )
 
 ADD_SUBDIRECTORY(src)

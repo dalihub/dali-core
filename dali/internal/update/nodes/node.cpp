@@ -199,7 +199,7 @@ void Node::DisconnectChild(BufferIndex updateBufferIndex, Node& childNode)
   found->RecursiveDisconnectFromSceneGraph(updateBufferIndex);
 }
 
-void Node::AddRenderer(RendererIndex renderer)
+void Node::AddRenderer(const RendererKey& renderer)
 {
   // If it is the first renderer added, make sure the world transform will be calculated
   // in the next update as world transform is not computed if node has no renderers.
@@ -225,7 +225,7 @@ void Node::AddRenderer(RendererIndex renderer)
   mRenderers.PushBack(renderer);
 }
 
-void Node::RemoveRenderer(const RendererIndex renderer)
+void Node::RemoveRenderer(const RendererKey& renderer)
 {
   RendererContainer::SizeType rendererCount(mRenderers.Size());
   for(RendererContainer::SizeType i = 0; i < rendererCount; ++i)

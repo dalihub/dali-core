@@ -114,11 +114,9 @@ inline void EraseUsingDiscardQueue(OwnerContainer<Type*>& container, Type* objec
  * @param updateBufferIndex to use
  */
 template<class Type>
-inline void EraseUsingDiscardQueue(OwnerKeyContainer<Type>& container, Type* object, DiscardQueue<uint32_t, OwnerKeyContainer<Type>>& discardQueue, BufferIndex updateBufferIndex)
+inline void EraseUsingDiscardQueue(OwnerKeyContainer<Type>& container, const MemoryPoolKey<Type>& key, DiscardQueue<MemoryPoolKey<Type>, OwnerKeyContainer<Type>>& discardQueue, BufferIndex updateBufferIndex)
 {
-  DALI_ASSERT_DEBUG(object && "NULL object not allowed");
-
-  auto key = Type::GetIndex(object);
+  DALI_ASSERT_DEBUG(key && "INVALID Key not allowed");
 
   for(auto iter = container.begin(), end = container.end(); iter != end; ++iter)
   {
@@ -304,10 +302,10 @@ struct UpdateManager::Impl
   OwnerContainer<TextureSet*>           textureSets;           ///< A container of owned texture sets
   OwnerContainer<Shader*>               shaders;               ///< A container of owned shaders
 
-  DiscardQueue<Node*, OwnerContainer<Node*>>          nodeDiscardQueue; ///< Nodes are added here when disconnected from the scene-graph.
-  DiscardQueue<Shader*, OwnerContainer<Shader*>>      shaderDiscardQueue;
-  DiscardQueue<uint32_t, OwnerKeyContainer<Renderer>> rendererDiscardQueue;
-  DiscardQueue<Scene*, OwnerContainer<Scene*>>        sceneDiscardQueue;
+  DiscardQueue<Node*, OwnerContainer<Node*>>                         nodeDiscardQueue; ///< Nodes are added here when disconnected from the scene-graph.
+  DiscardQueue<Shader*, OwnerContainer<Shader*>>                     shaderDiscardQueue;
+  DiscardQueue<MemoryPoolKey<Renderer>, OwnerKeyContainer<Renderer>> rendererDiscardQueue;
+  DiscardQueue<Scene*, OwnerContainer<Scene*>>                       sceneDiscardQueue;
 
   OwnerPointer<PanGesture> panGestureProcessor; ///< Owned pan gesture processor; it lives for the lifecycle of UpdateManager
 
@@ -671,9 +669,9 @@ void UpdateManager::SetShaderSaver(ShaderSaver& upstream)
   mImpl->shaderSaver = &upstream;
 }
 
-void UpdateManager::AddRenderer(RendererIndex rendererKey)
+void UpdateManager::AddRenderer(const RendererKey& rendererKey)
 {
-  SceneGraph::Renderer* renderer = SceneGraph::Renderer::Get(rendererKey);
+  SceneGraph::Renderer* renderer = rendererKey.Get();
 
   DALI_LOG_INFO(gLogFilter, Debug::General, "[%x] AddRenderer\n", renderer);
 
@@ -681,20 +679,19 @@ void UpdateManager::AddRenderer(RendererIndex rendererKey)
   mImpl->renderers.PushBack(rendererKey);
 }
 
-void UpdateManager::RemoveRenderer(RendererIndex rendererKey)
+void UpdateManager::RemoveRenderer(const RendererKey& rendererKey)
 {
-  SceneGraph::Renderer* renderer = SceneGraph::Renderer::Get(rendererKey);
-  DALI_LOG_INFO(gLogFilter, Debug::General, "[%x] RemoveRenderer\n", renderer);
+  DALI_LOG_INFO(gLogFilter, Debug::General, "[%x] RemoveRenderer\n", rendererKey.Get());
 
   // Find the renderer and destroy it
-  EraseUsingDiscardQueue(mImpl->renderers, renderer, mImpl->rendererDiscardQueue, mSceneGraphBuffers.GetUpdateBufferIndex());
+  EraseUsingDiscardQueue(mImpl->renderers, rendererKey, mImpl->rendererDiscardQueue, mSceneGraphBuffers.GetUpdateBufferIndex());
   // Need to remove the render object as well
-  renderer->DisconnectFromSceneGraph(*mImpl->sceneController, mSceneGraphBuffers.GetUpdateBufferIndex());
+  rendererKey->DisconnectFromSceneGraph(*mImpl->sceneController, mSceneGraphBuffers.GetUpdateBufferIndex());
 }
 
 void UpdateManager::AttachRenderer(Node* node, Renderer* renderer)
 {
-  node->AddRenderer(Renderer::GetIndex(renderer));
+  node->AddRenderer(Renderer::GetKey(renderer));
   mImpl->renderersAdded = true;
 }
 
@@ -936,7 +933,7 @@ void UpdateManager::UpdateRenderers(BufferIndex bufferIndex)
   for(auto rendererKey : mImpl->renderers)
   {
     // Apply constraints
-    auto renderer = Renderer::Get(rendererKey);
+    auto renderer = rendererKey.Get();
     ConstrainPropertyOwner(*renderer, bufferIndex);
 
     mImpl->renderingRequired = renderer->PrepareRender(bufferIndex) || mImpl->renderingRequired;
@@ -1194,9 +1191,8 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
 void UpdateManager::PostRender()
 {
   // Reset dirty flag
-  for(auto&& rendererIndex : mImpl->renderers)
+  for(auto&& renderer : mImpl->renderers)
   {
-    Renderer* renderer = Renderer::Get(rendererIndex);
     renderer->ResetDirtyFlag();
   }
 

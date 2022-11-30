@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_MEMORY_POOL_OBJECT_ALLOCATOR_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,13 @@ template<typename T>
 class MemoryPoolObjectAllocator
 {
 public:
+  /**
+   * Constant for use with FixedSizePool. We allow the fixed size pools to grow from 32
+   * to 1M entries per block, but maxing the blocks at 27 allows for many millions of
+   * elements to be quickly indexed using a 32 bit key.
+   */
+  const uint32_t POOL_MAX_BLOCK_COUNT = 27;
+
   /**
    * @brief Constructor
    */
@@ -151,23 +158,30 @@ public:
   {
     delete mPool;
 
-    mPool = new FixedSizeMemoryPool(TypeSizeWithAlignment<T>::size);
+    mPool = new FixedSizeMemoryPool(TypeSizeWithAlignment<T>::size, 32, 1024 * 1024, POOL_MAX_BLOCK_COUNT);
   }
 
   /**
-   * Get a pointer to the indexed item
-   * index must be valid.
+   * Get a pointer to the keyed item
+   * Key must be valid.
+   * @param[in] key 32 bit value indexing block/entry
+   * @return ptr to the memory of item, or nullptr if key is invalid
    */
-  T* GetPtrToObject(uint32_t index)
+  T* GetPtrFromKey(uint32_t key)
   {
-    return static_cast<T*>(mPool->GetPtrToObject(index));
+    return static_cast<T*>(mPool->GetPtrFromKey(key));
   }
 
-  uint32_t GetIndexOfObject(T* object)
+  /**
+   * Get a key to the pointed at item
+   * @param[in] ptr Pointer to an item in the memory pool
+   * @return key of the item, or -1 if not found.
+   */
+  uint32_t GetKeyFromPtr(T* ptr)
   {
-    return mPool->GetIndexOfObject(object);
+    return mPool->GetKeyFromPtr(ptr);
   }
-  
+
   /**
    * @brief Get the capacity of the memory pool
    */

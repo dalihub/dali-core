@@ -18,11 +18,8 @@
  *
  */
 
-#include <dali/internal/render/data-providers/node-data-provider.h>
 #include <dali/internal/render/data-providers/uniform-map-data-provider.h>
-#include <dali/internal/update/common/animatable-property.h>
-#include <dali/public-api/common/vector-wrapper.h>
-#include <dali/public-api/rendering/renderer.h>
+#include <dali/public-api/common/dali-vector.h>
 
 namespace Dali
 {

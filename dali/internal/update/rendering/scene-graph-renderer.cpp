@@ -46,7 +46,7 @@ namespace // unnamed namespace
 Debug::Filter* gSceneGraphRendererLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_SG_RENDERER");
 #endif
 
-//Memory pool used to allocate new renderers. Memory used by this pool will be released when shutting down DALi
+// Memory pool used to allocate new renderers. Memory used by this pool will be released when shutting down DALi
 MemoryPoolObjectAllocator<Renderer> gRendererMemoryPool;
 
 // Flags for re-sending data to renderer.
@@ -85,12 +85,12 @@ Renderer* Renderer::New()
 
 // Becomes
 
-RendererIndex Renderer::NewKey()
+RendererKey Renderer::NewKey()
 {
   void* ptr = gRendererMemoryPool.AllocateRawThreadSafe();
-  auto  key = gRendererMemoryPool.GetIndexOfObject(static_cast<Renderer*>(ptr));
+  auto  key = gRendererMemoryPool.GetKeyFromPtr(static_cast<Renderer*>(ptr));
   new(ptr) Renderer();
-  return key;
+  return RendererKey(key);
 }
 
 Renderer::Renderer()
@@ -129,19 +129,19 @@ void Renderer::operator delete(void* ptr)
   gRendererMemoryPool.FreeThreadSafe(static_cast<Renderer*>(ptr));
 }
 
-Renderer* Renderer::Get(RendererIndex rendererIndex)
+Renderer* Renderer::Get(RendererKey::KeyType rendererKey)
 {
-  return gRendererMemoryPool.GetPtrToObject(rendererIndex);
+  return gRendererMemoryPool.GetPtrFromKey(rendererKey);
 }
 
-RendererIndex Renderer::GetIndex(const Renderer& renderer)
+RendererKey Renderer::GetKey(const Renderer& renderer)
 {
-  return gRendererMemoryPool.GetIndexOfObject(const_cast<Renderer*>(&renderer));
+  return RendererKey(gRendererMemoryPool.GetKeyFromPtr(const_cast<Renderer*>(&renderer)));
 }
 
-RendererIndex Renderer::GetIndex(Renderer* renderer)
+RendererKey Renderer::GetKey(Renderer* renderer)
 {
-  return gRendererMemoryPool.GetIndexOfObject(renderer);
+  return RendererKey(gRendererMemoryPool.GetKeyFromPtr(renderer));
 }
 
 bool Renderer::PrepareRender(BufferIndex updateBufferIndex)
@@ -599,7 +599,7 @@ DevelRenderer::Rendering::Type Renderer::GetRenderingBehavior() const
   return mRenderingBehavior;
 }
 
-//Called when SceneGraph::Renderer is added to update manager ( that happens when an "event-thread renderer" is created )
+// Called when SceneGraph::Renderer is added to update manager ( that happens when an "event-thread renderer" is created )
 void Renderer::ConnectToSceneGraph(SceneController& sceneController, BufferIndex bufferIndex)
 {
   mRegenerateUniformMap = true;
@@ -611,10 +611,10 @@ void Renderer::ConnectToSceneGraph(SceneController& sceneController, BufferIndex
   mSceneController->GetRenderMessageDispatcher().AddRenderer(transferOwnership);
 }
 
-//Called just before destroying the scene-graph renderer ( when the "event-thread renderer" is no longer referenced )
+// Called just before destroying the scene-graph renderer ( when the "event-thread renderer" is no longer referenced )
 void Renderer::DisconnectFromSceneGraph(SceneController& sceneController, BufferIndex bufferIndex)
 {
-  //Remove renderer from RenderManager
+  // Remove renderer from RenderManager
   if(mRenderer)
   {
     mSceneController->GetRenderMessageDispatcher().RemoveRenderer(*mRenderer);

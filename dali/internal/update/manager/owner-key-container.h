@@ -19,25 +19,25 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/internal/common/memory-pool-key.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/dali-vector.h>
 
 namespace Dali::Internal
 {
 /**
- * OwnerKeyContainer is a vector which "owns" memory-pool allocated objects.
+ * OwnerKeyContainer is a vector which is responsible for killing memory-pool allocated objects.
  * Unlike vector this will call delete on the stored objects during destruction.
- *
- * @endcode
  */
 template<class ObjectType>
-class OwnerKeyContainer : public Dali::Vector<uint32_t>
+class OwnerKeyContainer : public Dali::Vector<MemoryPoolKey<ObjectType>>
 {
 public:
-  using KeyType       = uint32_t;
-  using SizeType      = typename Dali::Vector<KeyType>::SizeType;
-  using Iterator      = typename Vector<KeyType>::Iterator;
-  using ConstIterator = typename Vector<KeyType>::ConstIterator;
+  using KeyType       = MemoryPoolKey<ObjectType>;
+  using BaseType      = Vector<KeyType>;
+  using SizeType      = typename BaseType::SizeType;
+  using Iterator      = typename BaseType::Iterator;
+  using ConstIterator = typename BaseType::ConstIterator;
 
   /**
    * Create a pointer-container.
@@ -54,10 +54,10 @@ public:
   }
 
   // Not copyable or movable
-  OwnerKeyContainer(const OwnerKeyContainer&) = delete;            ///< Deleted copy constructor
-  OwnerKeyContainer(OwnerKeyContainer&&)      = delete;            ///< Deleted move constructor
+  OwnerKeyContainer(const OwnerKeyContainer&)            = delete; ///< Deleted copy constructor
+  OwnerKeyContainer(OwnerKeyContainer&&)                 = delete; ///< Deleted move constructor
   OwnerKeyContainer& operator=(const OwnerKeyContainer&) = delete; ///< Deleted copy assignment operator
-  OwnerKeyContainer& operator=(OwnerKeyContainer&&) = delete;      ///< Deleted move assignment operator
+  OwnerKeyContainer& operator=(OwnerKeyContainer&&)      = delete; ///< Deleted move assignment operator
 
   /**
    * Test whether the container is empty.
@@ -76,7 +76,7 @@ public:
   Iterator Erase(Iterator position)
   {
     Delete(*position);
-    return Vector<KeyType>::Erase(position);
+    return BaseType::Erase(position);
   }
 
   /**
@@ -87,13 +87,14 @@ public:
   template<class Predicate>
   void EraseIf(Predicate predicate)
   {
-    auto begin = Vector<KeyType>::Begin();
-    auto end   = Vector<KeyType>::End();
+    auto begin = BaseType::Begin();
+    auto end   = BaseType::End();
 
-    auto function = [predicate](auto& key) {
-      if(predicate(ObjectType::Get(key)))
+    auto function = [predicate](auto& key)
+    {
+      if(predicate(key.Get()))
       {
-        delete ObjectType::Get(key);
+        delete key.Get();
         return true;
       }
       else
@@ -102,7 +103,7 @@ public:
       }
     };
 
-    Vector<KeyType>::Erase(std::remove_if(begin, end, function), end);
+    BaseType::Erase(std::remove_if(begin, end, function), end);
   }
 
   /**
@@ -117,21 +118,21 @@ public:
       ++itr;
     }
 
-    return Vector<KeyType>::Erase(first, last);
+    return BaseType::Erase(first, last);
   }
 
   /**
    * Erase an object from OwnerKeyContainer
-   * @param object to remove
+   * @param[in] object to remove
    */
   inline void EraseObject(ObjectType* object)
   {
     DALI_ASSERT_DEBUG(object && "NULL object not allowed");
 
-    KeyType key = ObjectType::GetIndex(object);
+    KeyType key = ObjectType::GetKey(object);
 
-    Iterator            iter    = Vector<KeyType>::Begin();
-    const ConstIterator endIter = Vector<KeyType>::End();
+    Iterator            iter    = BaseType::Begin();
+    const ConstIterator endIter = BaseType::End();
     for(; iter != endIter; ++iter)
     {
       if(*iter == key)
@@ -146,12 +147,12 @@ public:
    * Release the ownership of an object, without deleting it.
    * @param[in] position A dereferencable iterator to an element in mContainer.
    * @post iterators are invalidated by this method.
-   * @return pointer to the released item
+   * @return key of the released item
    */
   KeyType Release(Iterator position)
   {
     KeyType key = *position;
-    Vector<KeyType>::Erase(position);
+    BaseType::Erase(position);
     return key;
   }
 
@@ -160,12 +161,12 @@ public:
    */
   void Clear()
   {
-    ConstIterator end = Vector<KeyType>::End();
-    for(Iterator iter = Vector<KeyType>::Begin(); iter != end; ++iter)
+    ConstIterator end = BaseType::End();
+    for(Iterator iter = BaseType::Begin(); iter != end; ++iter)
     {
       Delete(*iter);
     }
-    Vector<KeyType>::Clear();
+    BaseType::Clear();
   }
 
   /**
@@ -177,13 +178,13 @@ public:
     if(size < VectorBase::Count())
     {
       // OwnerKeyContainer owns these heap-allocated objects
-      ConstIterator end = Vector<KeyType>::End();
-      for(Iterator iter = Vector<KeyType>::Begin() + size; iter != end; ++iter)
+      ConstIterator end = BaseType::End();
+      for(Iterator iter = BaseType::Begin() + size; iter != end; ++iter)
       {
         Delete(*iter);
       }
     }
-    Vector<KeyType>::Resize(size);
+    BaseType::Resize(size);
   }
 
   /**
@@ -193,7 +194,7 @@ public:
    */
   void MoveFrom(OwnerKeyContainer& source)
   {
-    typename Vector<KeyType>::SizeType sourceCount = source.Count();
+    typename BaseType::SizeType sourceCount = source.Count();
     // if source is empty, nothing to move
     if(sourceCount > 0u)
     {
@@ -205,16 +206,16 @@ public:
       else
       {
         // make space for new items
-        Vector<KeyType>::Reserve(VectorBase::Count() + sourceCount);
+        BaseType::Reserve(VectorBase::Count() + sourceCount);
         Iterator      iter = source.Begin();
         ConstIterator end  = source.End();
         for(; iter != end; ++iter)
         {
           KeyType key = *iter;
-          Vector<KeyType>::PushBack(key);
+          BaseType::PushBack(key);
         }
         // cannot call Clear on OwnerKeyContainer as that deletes the elements
-        source.Vector<KeyType>::Clear();
+        source.BaseType::Clear();
       }
     }
   }
@@ -227,10 +228,10 @@ private:
    */
   void Delete(KeyType key)
   {
-    delete ObjectType::Get(key);
+    delete key.Get();
   }
 };
 
 } // namespace Dali::Internal
 
-#endif //DALI_INTERNAL_OWNER_KEY_CONTAINER_H
+#endif // DALI_INTERNAL_OWNER_KEY_CONTAINER_H

@@ -382,9 +382,10 @@ inline bool TryReuseCachedRenderers(Layer&               layer,
     // Therefore we check a combined sum of all renderer addresses.
     size_t checkSumNew = 0;
     size_t checkSumOld = 0;
+    //@todo just use keys, don't deref.
     for(uint32_t index = 0; index < renderableCount; ++index)
     {
-      if(DALI_LIKELY(renderables[index].mRenderer))
+      if(DALI_LIKELY(renderables[index].mRenderer != RendererKey::INVALID))
       {
         const Render::Renderer& renderer = renderables[index].mRenderer->GetRenderer();
         checkSumNew += reinterpret_cast<std::size_t>(&renderer);
@@ -458,8 +459,10 @@ inline void RenderInstructionProcessor::SortRenderItems(BufferIndex bufferIndex,
 
   // List of zValue calculating functions.
   const Dali::Layer::SortFunctionType zValueFunctionFromVector3[] = {
-    [](const Vector3& position) { return position.z; },
-    [](const Vector3& position) { return position.LengthSquared(); },
+    [](const Vector3& position)
+    { return position.z; },
+    [](const Vector3& position)
+    { return position.LengthSquared(); },
     layer.GetSortFunction(),
   };
 

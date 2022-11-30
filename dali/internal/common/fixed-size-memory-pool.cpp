@@ -21,15 +21,13 @@
 // INTERNAL HEADERS
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/vector-wrapper.h>
+#include <cmath>
 
 namespace Dali
 {
 namespace Internal
 {
-const uint32_t POOL_KEY_BLOCK_ID_MASK  = 0xF8000000;
-const uint32_t POOL_KEY_BLOCK_ID_SHIFT = 27;
-const uint32_t POOL_KEY_INDEX_MASK     = 0x07FFFFFF;
-
 /**
  * @brief Private implementation class
  */
@@ -42,22 +40,18 @@ struct FixedSizeMemoryPool::Impl
    */
   struct Block
   {
-    void*  blockMemory; ///< The allocated memory from which allocations can be made
-    Block* nextBlock;   ///< The next block in the linked list
-#ifdef DEBUG_ENABLED
-    SizeType mBlockSize; ///< Size of the block in bytes
-#endif
+    void*    blockMemory; ///< The allocated memory from which allocations can be made
+    Block*   nextBlock;   ///< The next block in the linked list
+    SizeType mBlockSize;  ///< Size of the block in bytes
+
     /**
      * @brief Construct a new block with given size
      *
      * @param size The size of the memory block to allocate in bytes. Must be non-zero.
      */
     Block(SizeType size)
-    : nextBlock(nullptr)
-#ifdef DEBUG_ENABLED
-      ,
+    : nextBlock(nullptr),
       mBlockSize(size)
-#endif
     {
       blockMemory = ::operator new(size);
       DALI_ASSERT_ALWAYS(blockMemory && "Out of memory");
@@ -82,7 +76,7 @@ struct FixedSizeMemoryPool::Impl
   /**
    * @brief Constructor
    */
-  Impl(SizeType fixedSize, SizeType initialCapacity, SizeType maximumBlockCapacity)
+  Impl(SizeType fixedSize, SizeType initialCapacity, SizeType maximumBlockCapacity, SizeType maximumBlockCount)
   : mMutex(),
     mFixedSize(fixedSize),
     mMemoryBlocks(initialCapacity * mFixedSize),
@@ -90,10 +84,24 @@ struct FixedSizeMemoryPool::Impl
     mCurrentBlock(&mMemoryBlocks),
     mCurrentBlockCapacity(initialCapacity),
     mCurrentBlockSize(0),
+    mMaximumBlockCount(maximumBlockCount),
     mDeletedObjects(nullptr)
   {
     // We need enough room to store the deleted list in the data
     DALI_ASSERT_DEBUG(mFixedSize >= sizeof(void*));
+
+    if(mMaximumBlockCount < 0xffffffff)
+    {
+      // Only use mBlocks for key/ptr conversion with max number of blocks
+      mBlocks.reserve(32);
+      mBlocks.push_back(&mMemoryBlocks);
+
+      // Compute masks and shifts
+      int bitCount = (logf(mMaximumBlockCount) / logf(2.0f)) + 1;
+      mBlockShift  = 32 - bitCount;
+      mBlockIdMask = ((0x01 << bitCount) - 1) << mBlockShift;
+      mIndexMask   = ~mBlockIdMask;
+    }
   }
 
   /**
@@ -131,6 +139,12 @@ struct FixedSizeMemoryPool::Impl
     mCurrentBlock            = block;
 
     mCurrentBlockSize = 0;
+
+    // Add to main list of blocks
+    if(mBlockShift)
+    {
+      mBlocks.push_back(block);
+    }
   }
 #ifdef DEBUG_ENABLED
 
@@ -165,16 +179,27 @@ struct FixedSizeMemoryPool::Impl
   Block    mMemoryBlocks;         ///< Linked list of allocated memory blocks
   SizeType mMaximumBlockCapacity; ///< The maximum allowed capacity of allocations in a new memory block
 
+  std::vector<Block*> mBlocks; ///< Address of each allocated block
+
   Block*   mCurrentBlock;         ///< Pointer to the active block
   SizeType mCurrentBlockCapacity; ///< The maximum number of allocations that can be allocated for the current block
   SizeType mCurrentBlockSize;     ///< The number of allocations allocated to the current block
 
+  SizeType mMaximumBlockCount{0xffffffff}; ///< Maximum number of blocks (or unlimited)
+  SizeType mBlockShift{0x0};               ///< number of bits to shift block id in key
+  SizeType mBlockIdMask{0x0};              ///< mask for key conversion
+  SizeType mIndexMask{0xffffffff};         ///< mask for key conversion
+
   void* mDeletedObjects; ///< Pointer to the head of the list of deleted objects. The addresses are stored in the allocated memory blocks.
 };
 
-FixedSizeMemoryPool::FixedSizeMemoryPool(SizeType fixedSize, SizeType initialCapacity, SizeType maximumBlockCapacity)
+FixedSizeMemoryPool::FixedSizeMemoryPool(
+  SizeType fixedSize,
+  SizeType initialCapacity,
+  SizeType maximumBlockCapacity,
+  SizeType maximumBlockCount)
 {
-  mImpl = new Impl(fixedSize, initialCapacity, maximumBlockCapacity);
+  mImpl = new Impl(fixedSize, initialCapacity, maximumBlockCapacity, maximumBlockCount);
 }
 
 FixedSizeMemoryPool::~FixedSizeMemoryPool()
@@ -235,48 +260,84 @@ void FixedSizeMemoryPool::FreeThreadSafe(void* memory)
   }
 }
 
-void* FixedSizeMemoryPool::GetPtrToObject(uint32_t key)
+void* FixedSizeMemoryPool::GetPtrFromKey(uint32_t key)
 {
-  uint32_t blockId = (key & POOL_KEY_BLOCK_ID_MASK) >> POOL_KEY_BLOCK_ID_SHIFT;
-  uint32_t index   = key & POOL_KEY_INDEX_MASK;
-  auto*    block   = &mImpl->mMemoryBlocks;
-  while(block && blockId > 0)
+  uint32_t blockId{0u};
+  uint32_t index = key & mImpl->mIndexMask;
+
+  if(DALI_LIKELY(mImpl->mBlockShift)) // Key contains block id & index within block
   {
-    block = block->nextBlock;
-    --blockId;
+    blockId = (key & mImpl->mBlockIdMask) >> mImpl->mBlockShift;
+    if(blockId < mImpl->mBlocks.size())
+    {
+      return static_cast<uint8_t*>(mImpl->mBlocks[blockId]->blockMemory) + mImpl->mFixedSize * index;
+    }
+    return nullptr;
   }
-  if(block != nullptr)
+  else
   {
-    return static_cast<uint8_t*>(block->blockMemory) + mImpl->mFixedSize * index;
+    // Treat as having no block id, and search for Nth item
+    Impl::Block* block = &mImpl->mMemoryBlocks;
+    while(block != nullptr)
+    {
+      const SizeType numberOfItems = (block->mBlockSize) / mImpl->mFixedSize;
+      if(index < numberOfItems)
+      {
+        return static_cast<uint8_t*>(block->blockMemory) + mImpl->mFixedSize * index;
+      }
+      index -= numberOfItems;
+      block = block->nextBlock;
+    }
   }
   return nullptr;
 }
 
-uint32_t FixedSizeMemoryPool::GetIndexOfObject(void* ptr)
+uint32_t FixedSizeMemoryPool::GetKeyFromPtr(void* ptr)
 {
   uint32_t blockId = 0;
   uint32_t index   = 0;
-  auto*    block   = &mImpl->mMemoryBlocks;
   bool     found   = false;
 
-  while(block)
+  // If block count is limited, the bit shift is non-zero.
+  if(DALI_LIKELY(mImpl->mBlockShift))
   {
-    const void* const endOfBlock = reinterpret_cast<char*>(block->blockMemory) + block->mBlockSize;
-    if(block->blockMemory <= ptr && ptr <= endOfBlock)
+    for(auto block : mImpl->mBlocks)
     {
-      index = (static_cast<uint8_t*>(ptr) - static_cast<uint8_t*>(block->blockMemory)) / mImpl->mFixedSize;
-      found = true;
-      break;
-    }
+      const void* const endOfBlock = reinterpret_cast<char*>(block->blockMemory) + block->mBlockSize;
 
-    block = block->nextBlock;
-    ++blockId;
+      if(block->blockMemory <= ptr && ptr < endOfBlock)
+      {
+        index = (static_cast<uint8_t*>(ptr) - static_cast<uint8_t*>(block->blockMemory)) / mImpl->mFixedSize;
+        found = true;
+        break;
+      }
+      ++blockId;
+    }
+  }
+  else
+  {
+    // Block count is unlimited, key is item count. But, potentially have to iterate through many blocks.
+    Impl::Block* block = &mImpl->mMemoryBlocks;
+    while(block != nullptr && !found)
+    {
+      const void* const endOfBlock = reinterpret_cast<char*>(block->blockMemory) + block->mBlockSize;
+
+      if(block->blockMemory <= ptr && ptr < endOfBlock)
+      {
+        index += (static_cast<uint8_t*>(ptr) - static_cast<uint8_t*>(block->blockMemory)) / mImpl->mFixedSize;
+        found = true;
+        break;
+      }
+      index += block->mBlockSize / mImpl->mFixedSize;
+      block = block->nextBlock;
+    }
   }
   if(found)
   {
-    return blockId << POOL_KEY_BLOCK_ID_SHIFT | (index & POOL_KEY_INDEX_MASK);
+    return blockId << mImpl->mBlockShift | (index & mImpl->mIndexMask);
   }
-  return 0u;
+
+  return -1;
 }
 
 uint32_t FixedSizeMemoryPool::GetCapacity() const
@@ -294,21 +355,6 @@ uint32_t FixedSizeMemoryPool::GetCapacity() const
 #endif
   return totalAllocation;
 }
-
-/*
- *
- * Or, don't use index, create a key, which combines block id & offset in block...
- * e.g. use top 5 bits for block id, lower 27 bits for offset.  (can address 150m entries)
- *
- * FixedMemoryPool is a linked list, so still have to loop to find base block address.
- * (Or cache in struct - Only need to cache 23 ptrs...)
- *
- *
- * Algorithm to find index from address...
- * Currently, we return a ptr from the allocation alg so that it can run a placement new...
- * could store off the index in the allocated memory, so it can be retrieved before doing
- * placement new...
- */
 
 } // namespace Internal
 
