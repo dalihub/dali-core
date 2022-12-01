@@ -53,11 +53,11 @@ CameraActor::~CameraActor() = default;
 
 CameraActor::CameraActor(const CameraActor& copy) = default;
 
-CameraActor& CameraActor::operator=(const CameraActor& rhs)
-{
-  BaseHandle::operator=(rhs);
-  return *this;
-}
+CameraActor& CameraActor::operator=(const CameraActor& rhs) = default;
+
+CameraActor::CameraActor(CameraActor&& rhs) = default;
+
+CameraActor& CameraActor::operator=(CameraActor&& rhs) = default;
 
 void CameraActor::SetType(Dali::Camera::Type type)
 {

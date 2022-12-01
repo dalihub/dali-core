@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_TASK_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@
 
 #include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/events/actor-observer.h>
-#include <dali/internal/event/render-tasks/render-task-list-impl.h>
 #include <dali/internal/event/rendering/frame-buffer-impl.h>
 
 namespace Dali

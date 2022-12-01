@@ -100,6 +100,15 @@ public: // Virtual API
   virtual bool Register(const SearchKeyType& key, const ElementType& element) = 0;
 
   /**
+   * @brief Register moved element by the key.
+   *
+   * @param[in] key The key that this container will hold. Duplicated key doesn't allow.
+   * @param[in] element The element pairwise with key.
+   * @return True if Register success. Otherwise, return false.
+   */
+  virtual bool Register(const SearchKeyType& key, ElementType&& element) = 0;
+
+  /**
    * @brief Get element by the key.
    *
    * @param[in] key The key that this container will hold.
@@ -121,7 +130,6 @@ public:
    */
   IndexedMapBase()
   {
-    Clear();
   }
 
   /**
@@ -129,7 +137,6 @@ public:
    */
   virtual ~IndexedMapBase()
   {
-    mKeyElementPool.clear();
   }
 
   /**
@@ -388,7 +395,7 @@ public: // API for C++11 std style functions.
   }
 
 protected:
-  std::vector<KeyElementPairType> mKeyElementPool;
+  std::vector<KeyElementPairType> mKeyElementPool{};
 };
 
 } // namespace Internal

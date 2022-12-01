@@ -157,6 +157,23 @@ public: // Creation & Destruction
    */
   PanGestureDetector& operator=(const PanGestureDetector& rhs);
 
+  /**
+   * @brief This move constructor is required for (smart) pointer semantics.
+   *
+   * @SINCE_2_2.4
+   * @param[in] handle A reference to the moved handle
+   */
+  PanGestureDetector(PanGestureDetector&& handle);
+
+  /**
+   * @brief This move assignment operator is required for (smart) pointer semantics.
+   *
+   * @SINCE_2_2.4
+   * @param[in] rhs A reference to the moved handle
+   * @return A reference to this
+   */
+  PanGestureDetector& operator=(PanGestureDetector&& rhs);
+
 public: // Setters
   /**
    * @brief This is the minimum number of touches required for the pan gesture to be detected.

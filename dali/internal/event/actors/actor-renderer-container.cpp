@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,7 +74,7 @@ RendererPtr RendererContainer::GetRendererAt(uint32_t index) const
 
 void RendererContainer::SetBlending(DevelBlendEquation::Type blendEquation)
 {
-  for(auto renderer : mRenderers)
+  for(const auto& renderer : mRenderers)
   {
     renderer->SetBlendEquation(static_cast<DevelBlendEquation::Type>(blendEquation));
   }

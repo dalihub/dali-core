@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,11 +60,11 @@ LongPressGestureDetector::~LongPressGestureDetector() = default;
 
 LongPressGestureDetector::LongPressGestureDetector(const LongPressGestureDetector& handle) = default;
 
-LongPressGestureDetector& LongPressGestureDetector::operator=(const LongPressGestureDetector& rhs)
-{
-  BaseHandle::operator=(rhs);
-  return *this;
-}
+LongPressGestureDetector& LongPressGestureDetector::operator=(const LongPressGestureDetector& rhs) = default;
+
+LongPressGestureDetector::LongPressGestureDetector(LongPressGestureDetector&& handle) = default;
+
+LongPressGestureDetector& LongPressGestureDetector::operator=(LongPressGestureDetector&& rhs) = default;
 
 void LongPressGestureDetector::SetTouchesRequired(uint32_t touches)
 {

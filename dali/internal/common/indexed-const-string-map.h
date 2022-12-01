@@ -109,6 +109,41 @@ public: // Main API
   }
 
   /**
+   * @brief Register moved element by the ConstString key.
+   *
+   * @param[in] key The ConstString key that this container will hold. Duplicated key doesn't allow.
+   * @param[in] element The element pairwise with key.
+   * @return True if Register success. Otherwise, return false.
+   */
+  bool Register(const ConstString& key, ElementType&& element) override
+  {
+    // Let's make key as compareable type.
+    const char* comparableKey = key.GetCString();
+
+    // Find key with binary search.
+    // We can do binary search cause mCharPtrIndexList is sorted.
+    const auto& iter = std::lower_bound(mCharPtrIndexList.cbegin(), mCharPtrIndexList.cend(), std::pair<const char*, std::uint32_t>(comparableKey, 0u));
+
+    if(iter == mCharPtrIndexList.cend() || iter->first != comparableKey)
+    {
+      // Emplace new element back.
+      std::uint32_t newElementIndex = mKeyElementPool.size();
+      mKeyElementPool.emplace_back(key, std::move(element));
+
+      // Add new index into mCharPtrIndexList.
+      mCharPtrIndexList.insert(iter, std::pair<const char*, std::uint32_t>(comparableKey, newElementIndex));
+
+      // Append element as child
+      return true;
+    }
+    else
+    {
+      // Else, duplicated key!
+      return false;
+    }
+  }
+
+  /**
    * @brief Get element by the ConstString key.
    *
    * @param[in] key The ConstString key that this container will hold.

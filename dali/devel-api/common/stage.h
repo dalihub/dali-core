@@ -2,7 +2,7 @@
 #define DALI_STAGE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -134,6 +134,21 @@ public:
    * @return A reference to this
    */
   Stage& operator=(const Stage& rhs);
+
+  /**
+   * @brief This move constructor is required for (smart) pointer semantics.
+   *
+   * @param[in] handle A reference to the moved handle
+   */
+  Stage(Stage&& handle);
+
+  /**
+   * @brief This move assignment operator is required for (smart) pointer semantics.
+   *
+   * @param[in] rhs A reference to the moved handle
+   * @return A reference to this
+   */
+  Stage& operator=(Stage&& rhs);
 
   // Containment
 
