@@ -29,6 +29,7 @@
 #include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/shaders/render-shader.h>
 #include <dali/internal/update/manager/sorted-layers.h>
+#include <dali/internal/update/nodes/partial-rendering-data.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
 #include <dali/internal/update/rendering/scene-graph-texture-set.h>
@@ -260,21 +261,19 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
       // Get the next free RenderItem.
       RenderItem& item = renderList.GetNextFreeItem();
 
-      // Get cached values
-      auto& partialRenderingData = node->GetPartialRenderingData();
+      PartialRenderingData partialRenderingData;
 
-      auto& partialRenderingCacheInfo = node->GetPartialRenderingData().GetCurrentCacheInfo();
+      partialRenderingData.node       = node;
+      partialRenderingData.renderer   = renderable.mRenderer;
+      partialRenderingData.color      = node->GetWorldColor(updateBufferIndex);
+      partialRenderingData.depthIndex = node->GetDepthIndex();
+      partialRenderingData.isOpaque   = isOpaque;
 
-      partialRenderingCacheInfo.node       = node;
-      partialRenderingCacheInfo.isOpaque   = isOpaque;
-      partialRenderingCacheInfo.renderer   = renderable.mRenderer;
-      partialRenderingCacheInfo.color      = node->GetWorldColor(updateBufferIndex);
-      partialRenderingCacheInfo.depthIndex = node->GetDepthIndex();
-
+      partialRenderingData.textureSet = nullptr;
       if(DALI_LIKELY(renderable.mRenderer))
       {
-        partialRenderingCacheInfo.color.a *= renderable.mRenderer->GetOpacity(updateBufferIndex);
-        partialRenderingCacheInfo.textureSet = renderable.mRenderer->GetTextureSet();
+        partialRenderingData.color.a *= renderable.mRenderer->GetOpacity(updateBufferIndex);
+        partialRenderingData.textureSet = renderable.mRenderer->GetTextureSet();
       }
 
       item.mNode     = node;
@@ -326,21 +325,20 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
       }
       item.mModelViewMatrix = nodeModelViewMatrix;
 
-      partialRenderingCacheInfo.matrix              = item.mModelViewMatrix;
-      partialRenderingCacheInfo.size                = item.mSize;
-      partialRenderingCacheInfo.updatedPositionSize = item.mUpdateArea;
+      partialRenderingData.matrix              = item.mModelViewMatrix;
+      partialRenderingData.updatedPositionSize = item.mUpdateArea;
+      partialRenderingData.size                = item.mSize;
 
-      item.mIsUpdated = partialRenderingData.IsUpdated() || item.mIsUpdated;
+      auto& nodePartialRenderingData = node->GetPartialRenderingData();
+      item.mIsUpdated                = nodePartialRenderingData.IsUpdated(partialRenderingData) || item.mIsUpdated;
 
-      partialRenderingData.mRendered = true;
-
-      partialRenderingData.SwapBuffers();
+      nodePartialRenderingData.Update(partialRenderingData);
     }
     else
     {
       // Mark as not rendered
-      auto& partialRenderingData     = node->GetPartialRenderingData();
-      partialRenderingData.mRendered = false;
+      auto& nodePartialRenderingData     = node->GetPartialRenderingData();
+      nodePartialRenderingData.mRendered = false;
     }
 
     node->SetCulled(updateBufferIndex, false);
@@ -348,8 +346,8 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
   else
   {
     // Mark as not rendered
-    auto& partialRenderingData     = node->GetPartialRenderingData();
-    partialRenderingData.mRendered = false;
+    auto& nodePartialRenderingData     = node->GetPartialRenderingData();
+    nodePartialRenderingData.mRendered = false;
 
     node->SetCulled(updateBufferIndex, true);
   }
@@ -491,8 +489,10 @@ inline void RenderInstructionProcessor::SortRenderItems(BufferIndex bufferIndex,
 
   // List of zValue calculating functions.
   const Dali::Layer::SortFunctionType zValueFunctionFromVector3[] = {
-    [](const Vector3& position) { return position.z; },
-    [](const Vector3& position) { return position.LengthSquared(); },
+    [](const Vector3& position)
+    { return position.z; },
+    [](const Vector3& position)
+    { return position.LengthSquared(); },
     layer.GetSortFunction(),
   };
 
