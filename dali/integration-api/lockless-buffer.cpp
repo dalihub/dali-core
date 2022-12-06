@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,7 +76,7 @@ const uint8_t* LocklessBuffer::Read()
     // This will set mState to 1 if readbuffer 0 was updated, 0 if readbuffer 1 was updated and fail if WRITING is set
     if(__sync_bool_compare_and_swap(&mState,
                                     static_cast<BufferState>(currentWriteBuf | UPDATED),
-                                    static_cast<BufferState>(!currentWriteBuf)))
+                                    static_cast<BufferState>((currentWriteBuf == R1W0) ? R0W1 : R1W0)))
     {
       // swap successful
       return mBuffer[currentWriteBuf];
@@ -85,7 +85,7 @@ const uint8_t* LocklessBuffer::Read()
 
   // UPDATE bit wasn't set or WRITING bit was set in other thread
   // swap failed, read from current readbuffer
-  return mBuffer[!currentWriteBuf];
+  return mBuffer[(currentWriteBuf == R1W0) ? R0W1 : R1W0];
 }
 
 uint32_t LocklessBuffer::GetSize() const

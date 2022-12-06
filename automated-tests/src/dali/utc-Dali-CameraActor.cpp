@@ -161,6 +161,41 @@ int UtcDaliCameraActorAssignmentOperatorN(void)
   END_TEST;
 }
 
+int UtcDaliCameraActorMoveConstructor(void)
+{
+  TestApplication application;
+
+  CameraActor actor = CameraActor::New();
+  DALI_TEST_CHECK(actor);
+
+  int id = actor.GetProperty<int>(Actor::Property::ID);
+
+  CameraActor moved = std::move(actor);
+  DALI_TEST_CHECK(moved);
+  DALI_TEST_EQUALS(id, moved.GetProperty<int>(Actor::Property::ID), TEST_LOCATION);
+  DALI_TEST_CHECK(!actor);
+
+  END_TEST;
+}
+
+int UtcDaliCameraActorMoveAssignment(void)
+{
+  TestApplication application;
+
+  CameraActor actor = CameraActor::New();
+  DALI_TEST_CHECK(actor);
+
+  int id = actor.GetProperty<int>(Actor::Property::ID);
+
+  CameraActor moved;
+  moved = std::move(actor);
+  DALI_TEST_CHECK(moved);
+  DALI_TEST_EQUALS(id, moved.GetProperty<int>(Actor::Property::ID), TEST_LOCATION);
+  DALI_TEST_CHECK(!actor);
+
+  END_TEST;
+}
+
 int UtcDaliCameraActorNewP(void)
 {
   TestApplication application;

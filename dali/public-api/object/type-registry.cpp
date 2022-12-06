@@ -154,7 +154,7 @@ ChildPropertyRegistration::ChildPropertyRegistration(std::string registered, std
 {
   DALI_ASSERT_ALWAYS((index >= CHILD_PROPERTY_REGISTRATION_START_INDEX) && (index <= CHILD_PROPERTY_REGISTRATION_MAX_INDEX));
 
-  Internal::TypeRegistry::Get()->RegisterChildProperty(std::move(registered), std::move(name), index, type);
+  Internal::TypeRegistry::Get()->RegisterChildProperty(registered, std::move(name), index, type);
 }
 
 } // namespace Dali

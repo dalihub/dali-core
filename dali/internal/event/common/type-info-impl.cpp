@@ -1047,7 +1047,7 @@ void TypeInfo::SetProperty(BaseObject* object, Property::Index index, Property::
       }
       else
       {
-        iter->second.setFunc(object, index, std::move(value));
+        iter->second.setFunc(object, index, value);
       }
     }
   }
@@ -1077,7 +1077,7 @@ void TypeInfo::SetProperty(BaseObject* object, const std::string& name, Property
     }
     else
     {
-      iter->second.setFunc(object, iter->first, std::move(value));
+      iter->second.setFunc(object, iter->first, value);
     }
   }
   else if(GetBaseType(mBaseType, mTypeRegistry, mBaseTypeName))

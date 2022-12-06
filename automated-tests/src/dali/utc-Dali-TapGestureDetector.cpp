@@ -173,13 +173,40 @@ int UtcDaliTapGestureDetectorAssignmentOperatorP(void)
   TestApplication application;
 
   TapGestureDetector detector = TapGestureDetector::New();
-  ;
 
   TapGestureDetector assign;
   assign = detector;
   DALI_TEST_CHECK(detector);
 
   DALI_TEST_CHECK(detector == assign);
+  END_TEST;
+}
+
+int UtcDaliRTapGestureDetectorMoveConstructorP(void)
+{
+  TestApplication application;
+
+  TapGestureDetector detector = TapGestureDetector::New();
+  DALI_TEST_CHECK(detector);
+
+  TapGestureDetector moved = std::move(detector);
+  DALI_TEST_CHECK(moved);
+  DALI_TEST_CHECK(!detector);
+  END_TEST;
+}
+
+int UtcDaliTapGestureDetectorMoveAssignmentOperatorP(void)
+{
+  TestApplication application;
+
+  TapGestureDetector detector;
+  detector = TapGestureDetector::New();
+  DALI_TEST_CHECK(detector);
+
+  TapGestureDetector moved;
+  moved = std::move(detector);
+  DALI_TEST_CHECK(moved);
+  DALI_TEST_CHECK(!detector);
   END_TEST;
 }
 

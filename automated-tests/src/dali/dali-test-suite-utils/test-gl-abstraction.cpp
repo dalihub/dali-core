@@ -166,6 +166,11 @@ bool TestGlAbstraction::IsAdvancedBlendEquationSupported()
   return true;
 }
 
+bool TestGlAbstraction::IsMultisampledRenderToTextureSupported()
+{
+  return true;
+}
+
 bool TestGlAbstraction::IsBlendEquationSupported(DevelBlendEquation::Type blendEquation)
 {
   return true;

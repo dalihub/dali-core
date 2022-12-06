@@ -348,6 +348,11 @@ void RenderManager::AttachDepthStencilTextureToFrameBuffer(Render::FrameBuffer* 
   frameBuffer->AttachDepthStencilTexture(texture, mipmapLevel);
 }
 
+void RenderManager::SetMultiSamplingLevelToFrameBuffer(Render::FrameBuffer* frameBuffer, uint8_t multiSamplingLevel)
+{
+  frameBuffer->SetMultiSamplingLevel(multiSamplingLevel);
+}
+
 void RenderManager::AddVertexBuffer(OwnerPointer<Render::VertexBuffer>& vertexBuffer)
 {
   mImpl->vertexBufferContainer.PushBack(vertexBuffer.Release());

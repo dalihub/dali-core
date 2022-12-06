@@ -190,6 +190,23 @@ public:
   CameraActor& operator=(const CameraActor& rhs);
 
   /**
+   * @brief Move constructor.
+   *
+   * @SINCE_2_2.4
+   * @param[in] rhs A reference to the actor to move
+   */
+  CameraActor(CameraActor&& rhs);
+
+  /**
+   * @brief Move assignment operator.
+   *
+   * @SINCE_2_2.4
+   * @param[in] rhs A reference to the actor to move
+   * @return A reference to this
+   */
+  CameraActor& operator=(CameraActor&& rhs);
+
+  /**
    * @brief Sets the camera type.
    * The default type is Dali::Camera::FREE_LOOK
    * @SINCE_1_0.0

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -547,6 +547,31 @@ int UtcDaliFrameBufferAttachDepthStencilTexture01(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 1u, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliFrameBufferSetMultiSampingLevel(void)
+{
+  TestApplication application;
+
+  unsigned int width(64);
+  unsigned int height(64);
+  FrameBuffer  frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::DEPTH_STENCIL);
+  Texture      texture     = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  frameBuffer.AttachColorTexture(texture);
+
+  DevelFrameBuffer::SetMultiSamplingLevel(frameBuffer, 4u);
+
+  CreateRenderTask(application, frameBuffer);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
+
+  // We don't have getter API for multisampling level. No testing.
 
   END_TEST;
 }

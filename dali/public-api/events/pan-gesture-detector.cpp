@@ -54,11 +54,11 @@ PanGestureDetector::~PanGestureDetector() = default;
 
 PanGestureDetector::PanGestureDetector(const PanGestureDetector& handle) = default;
 
-PanGestureDetector& PanGestureDetector::operator=(const PanGestureDetector& rhs)
-{
-  BaseHandle::operator=(rhs);
-  return *this;
-}
+PanGestureDetector& PanGestureDetector::operator=(const PanGestureDetector& rhs) = default;
+
+PanGestureDetector::PanGestureDetector(PanGestureDetector&& handle) = default;
+
+PanGestureDetector& PanGestureDetector::operator=(PanGestureDetector&& rhs) = default;
 
 void PanGestureDetector::SetMinimumTouchesRequired(uint32_t minimum)
 {

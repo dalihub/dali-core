@@ -98,6 +98,69 @@ int UtcDaliLocklessBufferMultipleWrites01(void)
   END_TEST;
 }
 
+// test one writes, multiple read
+int UtcDaliLocklessBufferMultipleWrites02(void)
+{
+  Integration::LocklessBuffer buf(10);
+  unsigned char               data[10];
+
+  for(unsigned char i = 0; i < 10; ++i)
+  {
+    data[i] = i;
+  }
+
+  // Write to a buffer
+  buf.Write(&data[0], 10);
+
+  if(ReadTest(buf, data, 10))
+  {
+    tet_result(TET_PASS);
+  }
+  else
+  {
+    tet_result(TET_FAIL);
+  }
+
+  // ReadTest one more time. for coverity.
+  if(ReadTest(buf, data, 10))
+  {
+    tet_result(TET_PASS);
+  }
+  else
+  {
+    tet_result(TET_FAIL);
+  }
+
+  for(unsigned char i = 0; i < 10; ++i)
+  {
+    data[i] = i + 4;
+  }
+
+  // No reads from buffer, so will overwrite contents of same buffer
+  buf.Write(&data[0], 10);
+
+  if(ReadTest(buf, data, 10))
+  {
+    tet_result(TET_PASS);
+  }
+  else
+  {
+    tet_result(TET_FAIL);
+  }
+
+  // ReadTest one more time. for coverity.
+  if(ReadTest(buf, data, 10))
+  {
+    tet_result(TET_PASS);
+  }
+  else
+  {
+    tet_result(TET_FAIL);
+  }
+
+  END_TEST;
+}
+
 // Simple API test
 int UtcDaliLocklessBufferGetSize01(void)
 {

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PROPERTY_METADATA_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -194,9 +194,9 @@ public:
    * @note The base animatable property MUST be created before the component animatable property.
    */
   AnimatablePropertyMetadata(Property::Index                 propertyIndex,
-                             const Property::Value&          propertyValue,
+                             Property::Value                 propertyValue,
                              const SceneGraph::PropertyBase* sceneGraphProperty)
-  : PropertyMetadata(propertyValue, sceneGraphProperty, true),
+  : PropertyMetadata(std::move(propertyValue), sceneGraphProperty, true),
     index(propertyIndex)
   {
     DALI_ASSERT_DEBUG(sceneGraphProperty && "Uninitialized scene-graph property");

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,11 @@ void AttachDepthStencilTexture(FrameBuffer frameBuffer, Texture& texture, uint32
     Internal::TexturePtr texturePtr(&GetImplementation(texture));
     GetImplementation(frameBuffer).AttachDepthStencilTexture(texturePtr, mipmapLevel);
   }
+}
+
+void SetMultiSamplingLevel(FrameBuffer frameBuffer, uint8_t multiSamplingLevel)
+{
+  GetImplementation(frameBuffer).SetMultiSamplingLevel(multiSamplingLevel);
 }
 
 Texture GetColorTexture(const FrameBuffer frameBuffer, uint8_t index)

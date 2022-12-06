@@ -102,6 +102,38 @@ public: // Main API
   }
 
   /**
+   * @brief Register moved element by the integer key.
+   *
+   * @param[in] key The integer key that this container will hold. Duplicated key doesn't allow.
+   * @param[in] element The element pairwise with key.
+   * @return True if Register success. Otherwise, return false.
+   */
+  bool Register(const std::uint32_t& key, ElementType&& element) override
+  {
+    // Find key with binary search.
+    // We can do binary search cause mKeyIndexList is sorted.
+    const auto& iter = std::lower_bound(mKeyIndexList.cbegin(), mKeyIndexList.cend(), std::pair<std::uint32_t, std::uint32_t>(key, 0u));
+
+    if(iter == mKeyIndexList.cend() || iter->first != key)
+    {
+      // Emplace new element back.
+      std::uint32_t newElementIndex = mKeyElementPool.size();
+      mKeyElementPool.emplace_back(key, std::move(element));
+
+      // Add new index into mKeyIndexList list.
+      mKeyIndexList.insert(iter, std::pair<std::uint32_t, std::uint32_t>(key, newElementIndex));
+
+      // Append element as child
+      return true;
+    }
+    else
+    {
+      // Else, duplicated key!
+      return false;
+    }
+  }
+
+  /**
    * @brief Get element by the integer key.
    *
    * @param[in] key The integer key that this container will hold.
