@@ -11662,6 +11662,76 @@ int UtcDaliActorCalculateWorldTransform07(void)
   END_TEST;
 }
 
+int UtcDaliActorCalculateWorldTransform08(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test that actor inheritance of scale produces right transform matrix");
+
+  Vector3 solutions[] = {Vector3(250, 0, 0), Vector3(0, 250, 0), Vector3(650, 0, 0), Vector3(0, 250, 0), Vector3(650, 0, 0), Vector3(400, 250, 0), Vector3(200, -50, 0), Vector3(500, 200, 0)};
+
+  struct TestCase
+  {
+    bool translation;
+    bool rotation;
+    bool scaling;
+  };
+  TestCase testCases[] = {
+    {false, false, true},
+    {false, true, false},
+    {true, false, false},
+    {false, true, true},
+    {true, false, true},
+    {true, true, false},
+    {false, false, false},
+    {true, true, true},
+  };
+
+  Actor rootActor = Actor::New();
+  Actor leafActor = Actor::New();
+
+  rootActor[Actor::Property::POSITION]      = Vector3(0.0f, 0.0f, 0.0f);
+  rootActor[Actor::Property::SCALE]         = Vector3(1.0f, 2.0f, 1.0f);
+  rootActor[Actor::Property::ORIENTATION]   = AngleAxis(Degree(90.0f), Vector3::ZAXIS);
+  rootActor[Actor::Property::SIZE]          = Vector2(200, 400);
+  rootActor[Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  rootActor[Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+
+  leafActor[Actor::Property::POSITION]                   = Vector3(0.0f, -50.0f, 0.0f);
+  leafActor[Actor::Property::SCALE]                      = Vector3(1.0f, 1.0f, 1.0f);
+  leafActor[Actor::Property::ORIENTATION]                = AngleAxis(Degree(90.0f), Vector3::ZAXIS);
+  leafActor[Actor::Property::SIZE]                       = Vector2(200, 400);
+  leafActor[Actor::Property::ANCHOR_POINT]               = AnchorPoint::BOTTOM_CENTER;
+  leafActor[Actor::Property::PARENT_ORIGIN]              = ParentOrigin::TOP_CENTER;
+  leafActor[Actor::Property::POSITION_USES_ANCHOR_POINT] = true;
+
+  application.GetScene().Add(rootActor);
+  rootActor.Add(leafActor);
+
+  for(uint32_t i = 0; i< 8; ++i)
+  {
+    leafActor[Actor::Property::INHERIT_POSITION]    = testCases[i].translation;
+    leafActor[Actor::Property::INHERIT_ORIENTATION] = testCases[i].rotation;
+    leafActor[Actor::Property::INHERIT_SCALE]       = testCases[i].scaling;
+
+    application.SendNotification();
+    application.Render(0);
+    application.SendNotification();
+    application.Render(0);
+
+    Matrix m            = DevelActor::GetWorldTransform(leafActor);
+    Matrix actualMatrix = leafActor.GetCurrentProperty<Matrix>(Actor::Property::WORLD_MATRIX);
+
+    Vector3 worldPosition1 = Vector3(m.GetTranslation());
+    Vector3 worldPosition2 = Vector3(actualMatrix.GetTranslation());
+
+    DALI_TEST_EQUALS(solutions[i], worldPosition1, 0.001f, TEST_LOCATION);
+    DALI_TEST_EQUALS(solutions[i], worldPosition2, 0.001f, TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
 int UtcDaliActorCalculateWorldColor01(void)
 {
   TestApplication application;

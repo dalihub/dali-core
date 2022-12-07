@@ -533,39 +533,60 @@ Matrix CalculateActorWorldTransform(const Actor& actor)
       }
       else
       {
-        Vector3    parentPosition, parentScale;
-        Quaternion parentOrientation;
-        worldMatrix.GetTransformComponents(parentPosition, parentOrientation, parentScale);
+        // Get Parent information.
+        Vector3       parentPosition, parentScale;
+        Quaternion    parentOrientation;
+        const Matrix& parentMatrix = worldMatrix;
+        parentMatrix.GetTransformComponents(parentPosition, parentOrientation, parentScale);
 
+        // Compute intermediate Local information
+        centerPosition = CalculateCenterPosition(anchorPoint, positionUsesAnchorPoint, size, localScale, localOrientation);
+        Vector3 intermediateLocalPosition = actorPosition + centerPosition + (parentOrigin - Vector3(0.5f, 0.5f, 0.5f)) * parentSize;
+        Matrix intermediateLocalMatrix;
+        intermediateLocalMatrix.SetTransformComponents(localScale, localOrientation, intermediateLocalPosition);
+
+        // Compute intermediate world information
+        Matrix intermediateWorldMatrix;
+        MatrixUtils::Multiply(intermediateWorldMatrix, intermediateLocalMatrix, parentMatrix);
+
+        Vector3       intermediateWorldPosition, intermediateWorldScale;
+        Quaternion    intermediateWorldOrientation;
+        intermediateWorldMatrix.GetTransformComponents(intermediateWorldPosition, intermediateWorldOrientation, intermediateWorldScale);
+
+        // Compute final world information
+        Vector3    finalWorldPosition    = intermediateWorldPosition;
+        Vector3    finalWorldScale       = intermediateWorldScale;
+        Quaternion finalWorldOrientation = intermediateWorldOrientation;
+        // worldScale includes the influence of local scale, local rotation, and parent scale.
+        // So, for the final world matrix, if this node inherits its parent scale, use worldScale.
+        // If not, use local scale for the final world matrix.
         if((inheritanceModeList[i] & INHERIT_SCALE) == 0)
         {
-          //Don't inherit scale
-          localScale /= parentScale;
+          finalWorldScale = localScale;
         }
 
+        // For the final world matrix, if this node inherits its parent orientation, use worldOrientation.
+        // If not, use local orientation for the final world matrix.
         if((inheritanceModeList[i] & INHERIT_ORIENTATION) == 0)
         {
-          //Don't inherit orientation
-          parentOrientation.Invert();
-          localOrientation = parentOrientation * localOrientation;
+          finalWorldOrientation = localOrientation;
         }
 
-        if((inheritanceModeList[i] & INHERIT_POSITION) == 0)
+        // The final world position of this node is computed as a sum of
+        // parent origin position in world space and relative position of center from parent origin.
+        // If this node doesn't inherit its parent position, simply use the relative position as a final world position.
+        Vector3 localCenterPosition = CalculateCenterPosition(anchorPoint, positionUsesAnchorPoint, size, finalWorldScale, finalWorldOrientation);
+        finalWorldPosition = actorPosition * finalWorldScale;
+        finalWorldPosition *= finalWorldOrientation;
+        finalWorldPosition += localCenterPosition;
+        if((inheritanceModeList[i] & INHERIT_POSITION) != 0)
         {
-          localMatrix.SetTransformComponents(localScale, localOrientation, Vector3::ZERO);
-          Matrix tempMatrix;
-          MatrixUtils::Multiply(tempMatrix, localMatrix, worldMatrix);
-          worldMatrix = tempMatrix;
-          worldMatrix.SetTranslation(actorPosition + centerPosition);
+          Vector4 parentOriginPosition((parentOrigin - Vector3(0.5f, 0.5f, 0.5f)) * parentSize);
+          parentOriginPosition.w = 1.0f;
+          finalWorldPosition += Vector3(parentMatrix * parentOriginPosition);
         }
-        else
-        {
-          localPosition = actorPosition + centerPosition + (parentOrigin - Vector3(0.5f, 0.5f, 0.5f)) * parentSize;
-          localMatrix.SetTransformComponents(localScale, localOrientation, localPosition);
-          Matrix tempMatrix;
-          MatrixUtils::Multiply(tempMatrix, localMatrix, worldMatrix);
-          worldMatrix = tempMatrix;
-        }
+
+        worldMatrix.SetTransformComponents(finalWorldScale, finalWorldOrientation, finalWorldPosition);
       }
     }
     else

@@ -28,6 +28,8 @@
 #include <dali/internal/common/matrix-utils.h>
 #include <dali/public-api/common/constants.h>
 
+#include <dali/integration-api/debug.h>
+
 namespace Dali
 {
 namespace Internal
@@ -49,22 +51,24 @@ static_assert(sizeof(gDefaultTransformComponentStaticData) == sizeof(TransformCo
  * @brief Calculates the center position for the transform component
  * @param[out] centerPosition The calculated center-position of the transform component
  * @param[in] transformComponentStatic A const reference to the static component transform struct
- * @param[in] transformComponentAnimatable A const reference to the animatable component transform struct
+ * @param[in] scale scale factor to be applied to the center position.
+ * @param[in] orientation orientation factor to be applied to the center position.
  * @param[in] size The size of the current transform component
  * @param[in] half Halfway point of the transform
  * @param[in] topLeft The top-left coords of the transform
  */
 inline void CalculateCenterPosition(
-  Vector3&                            centerPosition,
-  const TransformComponentStatic&     transformComponentStatic,
-  const TransformComponentAnimatable& transformComponentAnimatable,
-  const Vector3&                      size,
-  const Vector3&                      half,
-  const Vector3&                      topLeft)
+  Vector3&                        centerPosition,
+  const TransformComponentStatic& transformComponentStatic,
+  const Vector3&                  scale,
+  const Quaternion&               orientation,
+  const Vector3&                  size,
+  const Vector3&                  half,
+  const Vector3&                  topLeft)
 {
   // Calculate the center-point by applying the scale and rotation on the anchor point.
-  centerPosition = (half - transformComponentStatic.mAnchorPoint) * size * transformComponentAnimatable.mScale;
-  centerPosition *= transformComponentAnimatable.mOrientation;
+  centerPosition = (half - transformComponentStatic.mAnchorPoint) * size * scale;
+  centerPosition *= orientation;
 
   // If the position is ignoring the anchor-point, then remove the anchor-point shift from the position.
   if(!transformComponentStatic.mPositionUsesAnchorPoint)
@@ -255,7 +259,7 @@ bool TransformManager::Update()
         {
           //Full transform inherited
           mLocalMatrixDirty[i] = true;
-          CalculateCenterPosition(centerPosition, mTxComponentStatic[i], mTxComponentAnimatable[i], mSize[i], half, topLeft);
+          CalculateCenterPosition(centerPosition, mTxComponentStatic[i], mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, mSize[i], half, topLeft);
           localPosition = mTxComponentAnimatable[i].mPosition + centerPosition + (mTxComponentStatic[i].mParentOrigin - half) * mSize[parentIndex];
           mLocal[i].SetTransformComponents(mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, localPosition);
         }
@@ -265,52 +269,76 @@ bool TransformManager::Update()
       }
       else
       {
-        //Some components are not inherited
+        // Keep previous localMatrix for comparison.
+        Matrix previousLocalMatrix = mLocal[i];
+
+        // Get Parent information.
         Vector3       parentPosition, parentScale;
         Quaternion    parentOrientation;
         const Matrix& parentMatrix = mWorld[parentIndex];
         parentMatrix.GetTransformComponents(parentPosition, parentOrientation, parentScale);
 
-        Vector3 localScale = mTxComponentAnimatable[i].mScale;
+        // Compute intermediate Local information
+        CalculateCenterPosition(centerPosition, mTxComponentStatic[i], mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, mSize[i], half, topLeft);
+        Vector3 intermediateLocalPosition = mTxComponentAnimatable[i].mPosition + centerPosition + (mTxComponentStatic[i].mParentOrigin - half) * mSize[parentIndex];
+        Matrix intermediateLocalMatrix;
+        intermediateLocalMatrix.SetTransformComponents(mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, intermediateLocalPosition);
+
+        // Compute intermediate world information
+        Matrix intermediateWorldMatrix;
+        MatrixUtils::Multiply(intermediateWorldMatrix, intermediateLocalMatrix, mWorld[parentIndex]);
+
+        Vector3       intermediateWorldPosition, intermediateWorldScale;
+        Quaternion    intermediateWorldOrientation;
+        intermediateWorldMatrix.GetTransformComponents(intermediateWorldPosition, intermediateWorldOrientation, intermediateWorldScale);
+
+        // Compute final world information
+        Vector3    finalWorldPosition    = intermediateWorldPosition;
+        Vector3    finalWorldScale       = intermediateWorldScale;
+        Quaternion finalWorldOrientation = intermediateWorldOrientation;
+        // worldScale includes the influence of local scale, local rotation, and parent scale.
+        // So, for the final world matrix, if this node inherits its parent scale, use worldScale.
+        // If not, use local scale for the final world matrix.
         if((mInheritanceMode[i] & INHERIT_SCALE) == 0)
         {
-          //Don't inherit scale
-          localScale /= parentScale;
+          finalWorldScale = mTxComponentAnimatable[i].mScale;
         }
 
-        Quaternion localOrientation(mTxComponentAnimatable[i].mOrientation);
+        // For the final world matrix, if this node inherits its parent orientation, use worldOrientation.
+        // If not, use local orientation for the final world matrix.
         if((mInheritanceMode[i] & INHERIT_ORIENTATION) == 0)
         {
-          //Don't inherit orientation
-          parentOrientation.Invert();
-          localOrientation = parentOrientation * mTxComponentAnimatable[i].mOrientation;
+          finalWorldOrientation = mTxComponentAnimatable[i].mOrientation;
         }
 
-        Matrix localMatrix = mLocal[i];
-
-        if((mInheritanceMode[i] & INHERIT_POSITION) == 0)
+        // The final world position of this node is computed as a sum of
+        // parent origin position in world space and relative position of center from parent origin.
+        // If this node doesn't inherit its parent position, simply use the relative position as a final world position.
+        Vector3 localCenterPosition;
+        CalculateCenterPosition(localCenterPosition, mTxComponentStatic[i], finalWorldScale, finalWorldOrientation, mSize[i], half, topLeft);
+        finalWorldPosition = mTxComponentAnimatable[i].mPosition * finalWorldScale;
+        finalWorldPosition *= finalWorldOrientation;
+        finalWorldPosition += localCenterPosition;
+        if((mInheritanceMode[i] & INHERIT_POSITION) != 0)
         {
-          //Don't inherit position
-          CalculateCenterPosition(centerPosition, mTxComponentStatic[i], mTxComponentAnimatable[i], mSize[i], half, topLeft);
-          mLocal[i].SetTransformComponents(localScale, localOrientation, Vector3::ZERO);
-          MatrixUtils::Multiply(mWorld[i], mLocal[i], parentMatrix);
-          mWorld[i].SetTranslation(mTxComponentAnimatable[i].mPosition + centerPosition);
-        }
-        else
-        {
-          CalculateCenterPosition(centerPosition, mTxComponentStatic[i], mTxComponentAnimatable[i], mSize[i], half, topLeft);
-          localPosition = mTxComponentAnimatable[i].mPosition + centerPosition + (mTxComponentStatic[i].mParentOrigin - half) * mSize[parentIndex];
-          mLocal[i].SetTransformComponents(localScale, localOrientation, localPosition);
-          MatrixUtils::Multiply(mWorld[i], mLocal[i], parentMatrix);
+          Vector4 parentOriginPosition((mTxComponentStatic[i].mParentOrigin - half) * mSize[parentIndex]);
+          parentOriginPosition.w = 1.0f;
+          finalWorldPosition += Vector3(parentMatrix * parentOriginPosition);
         }
 
-        mLocalMatrixDirty[i] = mComponentDirty[i] || (localMatrix != mLocal[i]);
+        mWorld[i].SetTransformComponents(finalWorldScale, finalWorldOrientation, finalWorldPosition);
+
+        Matrix inverseParentMatrix;
+        inverseParentMatrix.SetInverseTransformComponents(parentScale, parentOrientation, parentPosition);
+        mLocal[i] = inverseParentMatrix * mWorld[i];
+
+        mLocalMatrixDirty[i] = mComponentDirty[i] || (previousLocalMatrix != mLocal[i]);
       }
     }
     else //Component has no parent or doesn't inherit transform
     {
       Matrix localMatrix = mLocal[i];
-      CalculateCenterPosition(centerPosition, mTxComponentStatic[i], mTxComponentAnimatable[i], mSize[i], half, topLeft);
+      CalculateCenterPosition(centerPosition, mTxComponentStatic[i], mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, mSize[i], half, topLeft);
       localPosition = mTxComponentAnimatable[i].mPosition + centerPosition;
       mLocal[i].SetTransformComponents(mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, localPosition);
       mWorld[i]            = mLocal[i];
