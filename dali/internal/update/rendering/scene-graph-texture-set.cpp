@@ -26,7 +26,11 @@
 namespace //Unnamed namespace
 {
 //Memory pool used to allocate new texture sets. Memory used by this pool will be released when shutting down DALi
-Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::TextureSet> gTextureSetMemoryPool;
+Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::TextureSet>& GetTextureSetMemoryPool()
+{
+  static Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::TextureSet> gTextureSetMemoryPool;
+  return gTextureSetMemoryPool;
+}
 } // namespace
 
 namespace Dali
@@ -37,7 +41,7 @@ namespace SceneGraph
 {
 TextureSet* TextureSet::New()
 {
-  return new(gTextureSetMemoryPool.AllocateRawThreadSafe()) TextureSet();
+  return new(GetTextureSetMemoryPool().AllocateRawThreadSafe()) TextureSet();
 }
 
 TextureSet::TextureSet()
@@ -52,7 +56,7 @@ TextureSet::~TextureSet()
 
 void TextureSet::operator delete(void* ptr)
 {
-  gTextureSetMemoryPool.FreeThreadSafe(static_cast<TextureSet*>(ptr));
+  GetTextureSetMemoryPool().FreeThreadSafe(static_cast<TextureSet*>(ptr));
 }
 
 void TextureSet::SetSampler(uint32_t index, Render::Sampler* sampler)
@@ -115,7 +119,7 @@ bool TextureSet::HasAlpha() const
 
 uint32_t TextureSet::GetMemoryPoolCapacity()
 {
-  return gTextureSetMemoryPool.GetCapacity();
+  return GetTextureSetMemoryPool().GetCapacity();
 }
 
 } // namespace SceneGraph

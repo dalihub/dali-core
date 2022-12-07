@@ -47,7 +47,11 @@ Debug::Filter* gSceneGraphRendererLogFilter = Debug::Filter::New(Debug::NoLoggin
 #endif
 
 // Memory pool used to allocate new renderers. Memory used by this pool will be released when shutting down DALi
-MemoryPoolObjectAllocator<Renderer> gRendererMemoryPool;
+MemoryPoolObjectAllocator<Renderer>& GetRendererMemoryPool()
+{
+  static MemoryPoolObjectAllocator<Renderer> gRendererMemoryPool;
+  return gRendererMemoryPool;
+}
 
 // Flags for re-sending data to renderer.
 enum Flags
@@ -80,8 +84,8 @@ enum Flags
 
 RendererKey Renderer::NewKey()
 {
-  void* ptr = gRendererMemoryPool.AllocateRawThreadSafe();
-  auto  key = gRendererMemoryPool.GetKeyFromPtr(static_cast<Renderer*>(ptr));
+  void* ptr = GetRendererMemoryPool().AllocateRawThreadSafe();
+  auto  key = GetRendererMemoryPool().GetKeyFromPtr(static_cast<Renderer*>(ptr));
   new(ptr) Renderer();
   return RendererKey(key);
 }
@@ -119,22 +123,22 @@ Renderer::~Renderer()
 
 void Renderer::operator delete(void* ptr)
 {
-  gRendererMemoryPool.FreeThreadSafe(static_cast<Renderer*>(ptr));
+  GetRendererMemoryPool().FreeThreadSafe(static_cast<Renderer*>(ptr));
 }
 
 Renderer* Renderer::Get(RendererKey::KeyType rendererKey)
 {
-  return gRendererMemoryPool.GetPtrFromKey(rendererKey);
+  return GetRendererMemoryPool().GetPtrFromKey(rendererKey);
 }
 
 RendererKey Renderer::GetKey(const Renderer& renderer)
 {
-  return RendererKey(gRendererMemoryPool.GetKeyFromPtr(const_cast<Renderer*>(&renderer)));
+  return RendererKey(GetRendererMemoryPool().GetKeyFromPtr(const_cast<Renderer*>(&renderer)));
 }
 
 RendererKey Renderer::GetKey(Renderer* renderer)
 {
-  return RendererKey(gRendererMemoryPool.GetKeyFromPtr(renderer));
+  return RendererKey(GetRendererMemoryPool().GetKeyFromPtr(renderer));
 }
 
 bool Renderer::PrepareRender(BufferIndex updateBufferIndex)
@@ -769,7 +773,7 @@ void Renderer::ResetDirtyFlag()
 
 uint32_t Renderer::GetMemoryPoolCapacity()
 {
-  return gRendererMemoryPool.GetCapacity();
+  return GetRendererMemoryPool().GetCapacity();
 }
 
 void Renderer::OnMappingChanged()

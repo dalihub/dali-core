@@ -26,7 +26,11 @@
 namespace
 {
 //Memory pool used to allocate new RenderItems. Memory used by this pool will be released when shutting down DALi
-Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::RenderItem> gRenderItemPool;
+Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::RenderItem>& GetRenderItemPool()
+{
+  static Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::RenderItem> gRenderItemPool;
+  return gRenderItemPool;
+}
 } // namespace
 
 namespace Dali
@@ -37,13 +41,13 @@ namespace SceneGraph
 {
 RenderItem* RenderItem::New()
 {
-  return new(gRenderItemPool.AllocateRaw()) RenderItem();
+  return new(GetRenderItemPool().AllocateRaw()) RenderItem();
 }
 
 RenderItemKey RenderItem::NewKey()
 {
-  void* ptr = gRenderItemPool.AllocateRaw();
-  auto  key = gRenderItemPool.GetKeyFromPtr(static_cast<RenderItem*>(ptr));
+  void* ptr = GetRenderItemPool().AllocateRaw();
+  auto  key = GetRenderItemPool().GetKeyFromPtr(static_cast<RenderItem*>(ptr));
   new(ptr) RenderItem();
   return RenderItemKey(key);
 }
@@ -65,17 +69,17 @@ RenderItem::~RenderItem() = default;
 
 RenderItem* RenderItem::Get(RenderItemKey::KeyType key)
 {
-  return gRenderItemPool.GetPtrFromKey(key);
+  return GetRenderItemPool().GetPtrFromKey(key);
 }
 
 RenderItemKey RenderItem::GetKey(const RenderItem& renderItem)
 {
-  return RenderItemKey(gRenderItemPool.GetKeyFromPtr(const_cast<RenderItem*>(&renderItem)));
+  return RenderItemKey(GetRenderItemPool().GetKeyFromPtr(const_cast<RenderItem*>(&renderItem)));
 }
 
 RenderItemKey RenderItem::GetKey(RenderItem* renderItem)
 {
-  return RenderItemKey(gRenderItemPool.GetKeyFromPtr(renderItem));
+  return RenderItemKey(GetRenderItemPool().GetKeyFromPtr(renderItem));
 }
 
 ClippingBox RenderItem::CalculateTransformSpaceAABB(const Matrix& transformMatrix, const Vector3& position, const Vector3& size)
@@ -188,12 +192,12 @@ ClippingBox RenderItem::CalculateViewportSpaceAABB(const Matrix& modelViewMatrix
 
 void RenderItem::operator delete(void* ptr)
 {
-  gRenderItemPool.Free(static_cast<RenderItem*>(ptr));
+  GetRenderItemPool().Free(static_cast<RenderItem*>(ptr));
 }
 
 uint32_t RenderItem::GetMemoryPoolCapacity()
 {
-  return gRenderItemPool.GetCapacity();
+  return GetRenderItemPool().GetCapacity();
 }
 
 } // namespace SceneGraph

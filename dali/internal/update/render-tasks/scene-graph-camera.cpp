@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,11 @@ namespace SceneGraph
 namespace
 {
 //Memory pool used to allocate new camera. Memory used by this pool will be released when shutting down DALi
-MemoryPoolObjectAllocator<Camera> gCameraMemoryPool;
+MemoryPoolObjectAllocator<Camera>& GetCameraMemoryPool()
+{
+  static MemoryPoolObjectAllocator<Camera> gCameraMemoryPool;
+  return gCameraMemoryPool;
+}
 
 template<typename T>
 T Sign(T value)
@@ -205,14 +209,14 @@ Camera::Camera()
 
 Camera* Camera::New()
 {
-  return new(gCameraMemoryPool.AllocateRawThreadSafe()) Camera();
+  return new(GetCameraMemoryPool().AllocateRawThreadSafe()) Camera();
 }
 
 Camera::~Camera() = default;
 
 void Camera::operator delete(void* ptr)
 {
-  gCameraMemoryPool.FreeThreadSafe(static_cast<Camera*>(ptr));
+  GetCameraMemoryPool().FreeThreadSafe(static_cast<Camera*>(ptr));
 }
 
 void Camera::SetType(Dali::Camera::Type type)
