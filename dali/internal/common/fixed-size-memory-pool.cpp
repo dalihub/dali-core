@@ -260,8 +260,9 @@ void FixedSizeMemoryPool::FreeThreadSafe(void* memory)
   }
 }
 
-void* FixedSizeMemoryPool::GetPtrFromKey(uint32_t key)
+void* FixedSizeMemoryPool::GetPtrFromKey(FixedSizeMemoryPool::KeyType key)
 {
+#if defined(__LP64__)
   uint32_t blockId{0u};
   uint32_t index = key & mImpl->mIndexMask;
 
@@ -290,10 +291,15 @@ void* FixedSizeMemoryPool::GetPtrFromKey(uint32_t key)
     }
   }
   return nullptr;
+#else
+  // Treat ptrs as keys
+  return static_cast<void*>(key);
+#endif
 }
 
-uint32_t FixedSizeMemoryPool::GetKeyFromPtr(void* ptr)
+FixedSizeMemoryPool::KeyType FixedSizeMemoryPool::GetKeyFromPtr(void* ptr)
 {
+#if defined(__LP64__)
   uint32_t blockId = 0;
   uint32_t index   = 0;
   bool     found   = false;
@@ -338,6 +344,9 @@ uint32_t FixedSizeMemoryPool::GetKeyFromPtr(void* ptr)
   }
 
   return -1;
+#else
+  return static_cast<FixedSizeMemoryPool::KeyType>(ptr);
+#endif
 }
 
 uint32_t FixedSizeMemoryPool::GetCapacity() const

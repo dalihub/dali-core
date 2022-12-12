@@ -52,6 +52,12 @@ class FixedSizeMemoryPool
 public:
   using SizeType = uint32_t;
 
+#if defined(__LP64__)
+  using KeyType = uint32_t;
+#else
+  using KeyType = void*;
+#endif
+
 public:
   /**
    * @brief Constructor.
@@ -104,7 +110,7 @@ public:
    * @param[in] key The key to convert
    * @return A valid ptr to the memory or nullptr if not found
    */
-  void* GetPtrFromKey(uint32_t key);
+  void* GetPtrFromKey(KeyType key);
 
   /**
    * @brief Given a ptr to some memory in the pool, return it's key
@@ -112,7 +118,7 @@ public:
    * @param[in] ptr The ptr to convert
    * @return A key to the valid memory, or -1 if not found
    */
-  uint32_t GetKeyFromPtr(void* ptr);
+  KeyType GetKeyFromPtr(void* ptr);
 
   /**
    * Get the current capacity of the memory pool

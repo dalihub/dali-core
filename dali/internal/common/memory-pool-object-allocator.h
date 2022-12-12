@@ -61,26 +61,6 @@ public:
   }
 
   /**
-   * @brief Allocate from the memory pool
-   *
-   * @return Return the allocated object
-   */
-  T* Allocate()
-  {
-    return new(mPool->Allocate()) T();
-  }
-
-  /**
-   * @brief Thread-safe version of Allocate()
-   *
-   * @return Return the allocated object
-   */
-  T* AllocateThreadSafe()
-  {
-    return new(mPool->AllocateThreadSafe()) T();
-  }
-
-  /**
    * @brief Allocate a block of memory from the memory pool of the appropriate size to
    *        store an object of type T. This is usually so the memory can be used in a
    *        placement new for an object of type T with a constructor that takes multiple
@@ -162,12 +142,16 @@ public:
   }
 
   /**
-   * Get a pointer to the keyed item
+   * Get a pointer to the keyed item.
+   *
    * Key must be valid.
    * @param[in] key 32 bit value indexing block/entry
    * @return ptr to the memory of item, or nullptr if key is invalid
+   *
+   * @note on 32 bit systems, there is zero overhead, key is a raw ptr,
+   * and this method will return it's argument.
    */
-  T* GetPtrFromKey(uint32_t key)
+  T* GetPtrFromKey(FixedSizeMemoryPool::KeyType key)
   {
     return static_cast<T*>(mPool->GetPtrFromKey(key));
   }
@@ -176,8 +160,11 @@ public:
    * Get a key to the pointed at item
    * @param[in] ptr Pointer to an item in the memory pool
    * @return key of the item, or -1 if not found.
+   *
+   * @note on 32 bit systems, there is zero overhead, key is a raw ptr,
+   * and this method will return it's argument.
    */
-  uint32_t GetKeyFromPtr(T* ptr)
+  FixedSizeMemoryPool::KeyType GetKeyFromPtr(T* ptr)
   {
     return mPool->GetKeyFromPtr(ptr);
   }

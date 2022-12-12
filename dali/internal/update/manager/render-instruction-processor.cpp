@@ -385,7 +385,7 @@ inline bool TryReuseCachedRenderers(Layer&               layer,
     //@todo just use keys, don't deref.
     for(uint32_t index = 0; index < renderableCount; ++index)
     {
-      if(DALI_LIKELY(renderables[index].mRenderer != RendererKey::INVALID))
+      if(DALI_LIKELY(renderables[index].mRenderer != nullptr))
       {
         const Render::Renderer& renderer = renderables[index].mRenderer->GetRenderer();
         checkSumNew += reinterpret_cast<std::size_t>(&renderer);

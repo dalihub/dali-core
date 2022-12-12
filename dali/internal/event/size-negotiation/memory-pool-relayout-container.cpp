@@ -48,7 +48,8 @@ void MemoryPoolRelayoutContainer::Add(const Dali::Actor& actor, const Vector2& s
 {
   if(!Contains(actor))
   {
-    RelayoutInfo* info = mAllocator.Allocate();
+    void*         ptr  = mAllocator.AllocateRaw();
+    RelayoutInfo* info = new(ptr) RelayoutInfo();
     info->actor        = actor;
     info->size         = size;
 

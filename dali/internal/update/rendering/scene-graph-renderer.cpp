@@ -83,8 +83,6 @@ Renderer* Renderer::New()
   return new(gRendererMemoryPool.AllocateRawThreadSafe()) Renderer();
 }
 
-// Becomes
-
 RendererKey Renderer::NewKey()
 {
   void* ptr = gRendererMemoryPool.AllocateRawThreadSafe();

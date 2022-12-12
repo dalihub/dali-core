@@ -48,11 +48,7 @@ class Camera;
  */
 struct Renderable
 {
-  Renderable()
-  : mNode(nullptr),
-    mRenderer(RendererKey::INVALID)
-  {
-  }
+  Renderable() = default;
 
   Renderable(Node* node, RendererKey renderer)
   : mNode(node),
@@ -61,7 +57,7 @@ struct Renderable
   }
 
   Node*       mNode{nullptr};
-  RendererKey mRenderer{RendererKey::INVALID};
+  RendererKey mRenderer{};
 };
 
 } // namespace SceneGraph

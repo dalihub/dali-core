@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_MEMORY_POOL_KEY_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,18 +17,18 @@
  * limitations under the License.
  */
 
+#include <dali/internal/common/fixed-size-memory-pool.h>
+
 namespace Dali::Internal
 {
-
 /**
  * MemoryPoolKey is a 32bit replacement for pointers to objects stored
- * within MemoryPools.
+ * within MemoryPools. In a 32 bit environment, it is an actual ptr.
  *
  * @tparam Class The class of object stored within a memory pool. The
  * class grants limited access to the actual memory pool.
  *
- * The key has pointer semantics. Please note that 0 is a valid key value,
- * so be sure to test against INVALID instead.
+ * The key has pointer semantics.
  *
  * As this has a copy constructor, it's not a trivial type, however because
  * it encapsulates an integer, specialized types can use Dali::Vector by
@@ -47,7 +47,7 @@ template<typename Class>
 class MemoryPoolKey
 {
 public:
-  using KeyType = uint32_t;
+  using KeyType = FixedSizeMemoryPool::KeyType;
 
   /**
    * Default Constructor - generates an empty key.
@@ -61,7 +61,7 @@ public:
    * Constructor - Construct a key object from an int key.
    * @param[in] aKey A key of an object in the pool
    */
-  explicit MemoryPoolKey(uint32_t aKey)
+  explicit MemoryPoolKey(KeyType aKey)
   : key(aKey)
   {
   }
@@ -101,7 +101,11 @@ public:
    */
   Class* operator->() const
   {
+#if defined(__LP64__)
     return Class::Get(key);
+#else
+    return static_cast<Class*>(key);
+#endif
   }
 
   /**
@@ -110,7 +114,11 @@ public:
    */
   Class* Get() const
   {
+#if defined(__LP64__)
     return Class::Get(key);
+#else
+    return static_cast<Class*>(key);
+#endif
   }
 
   /**
@@ -143,26 +151,37 @@ public:
   }
 
   /**
-   * Equality Operator against int
-   * @param[in] match The key to test against
-   * @return true if the keys match
+   * Equality operator for nullptr
+   * @param[in] np nullptr
+   * @return true if the key is invalid
    */
-  bool operator==(KeyType match) const
+  bool operator==(std::nullptr_t np) const
   {
-    return key == match;
+    return key == INVALID;
   }
 
   /**
-   * Inequality operator against int
-   * @param[in] match The key to test against
-   * @return true if the keys don't match
+   * Inequality operator for nullptr
+   * @param[in] np nullptr
+   * @return true if the keys is valid
    */
-  bool operator!=(KeyType match) const
+  bool operator!=(std::nullptr_t np) const
   {
-    return key != match;
+    return key != INVALID;
   }
 
+  uint32_t Value() const
+  {
+    return reinterpret_cast<uint32_t>(key);
+  }
+
+private:
+  // Ensure that INVALID constant can't be used directly.
+#if defined(__LP64__)
   static const KeyType INVALID{0xffffffff}; ///< Null or Invalid constant.
+#else
+  static constexpr KeyType INVALID{nullptr};
+#endif
 
   KeyType key{INVALID}; ///< The actual key.
 };

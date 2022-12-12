@@ -156,7 +156,7 @@ bool AddRenderablesForTask(BufferIndex updateBufferIndex,
       // If we do not have any renderers, create one to house the scissor operation.
       if(count == 0u)
       {
-        layer->colorRenderables.PushBack(Renderable(&node, RendererKey(RendererKey::INVALID)));
+        layer->colorRenderables.PushBack(Renderable(&node, RendererKey{}));
       }
     }
     else
