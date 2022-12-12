@@ -645,6 +645,24 @@ Renderer::OpacityType Renderer::GetOpacityType(BufferIndex updateBufferIndex, co
 
       break;
     }
+    case BlendMode::OFF_ONLY_OPAQUE: // the renderer should never use blending
+    {
+      // renderer should determine opacity using the actor color
+      float alpha = node.GetWorldColor(updateBufferIndex).a;
+      if(alpha <= FULLY_TRANSPARENT)
+      {
+        opacityType = Renderer::TRANSPARENT;
+      }
+      else if(alpha < FULLY_OPAQUE)
+      {
+        opacityType = Renderer::TRANSLUCENT;
+      }
+      else
+      {
+        opacityType = Renderer::OPAQUE;
+      }
+      break;
+    }
     case BlendMode::OFF: // the renderer should never use blending
     default:
     {
