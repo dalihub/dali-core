@@ -2818,6 +2818,63 @@ int UtcDaliRendererSetDepthWriteMode(void)
   END_TEST;
 }
 
+int UtcDaliRendererBlendModeUseActorOpacity(void)
+{
+  TestApplication application;
+  tet_infoline("Test setting the UseActorOpacity");
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader   shader   = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
+
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+  Integration::Scene scene = application.GetScene();
+  scene.GetRootLayer().SetProperty(Layer::Property::BEHAVIOR, Layer::LAYER_3D);
+  scene.Add(actor);
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  renderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::USE_ACTOR_OPACITY);
+  actor.AddRenderer(renderer);
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  // Check the default depth-write status first.
+  DALI_TEST_CHECK(glAbstraction.GetLastDepthMask());
+
+  // Turn off depth-writing.
+  actor.SetProperty(Dali::Actor::Property::COLOR, Vector4(1, 1, 1, 0.5));
+
+  application.SendNotification();
+  application.Render();
+
+  // Check depth-write is now disabled.
+  DALI_TEST_CHECK(!glAbstraction.GetLastDepthMask());
+
+  // Turn on depth-writing.
+  actor.SetProperty(Dali::Actor::Property::COLOR, Vector4(1, 1, 1, 1));
+
+  application.SendNotification();
+  application.Render();
+
+  // Check depth-write is now enabled.
+  DALI_TEST_CHECK(glAbstraction.GetLastDepthMask());
+
+  // Turn off depth-writing.
+  actor.SetProperty(Dali::Actor::Property::COLOR, Vector4(1, 1, 1, 0.0));
+
+  application.SendNotification();
+  application.Render();
+
+  // if actor alpha is 0, SetDepthWriteEnable is not called so GetLastDepthMask returns default value true;
+  DALI_TEST_CHECK(glAbstraction.GetLastDepthMask());
+
+  END_TEST;
+}
+
 int UtcDaliRendererCheckStencilDefaults(void)
 {
   TestApplication application;

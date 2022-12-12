@@ -62,10 +62,11 @@ namespace BlendMode
  */
 enum Type
 {
-  OFF,            ///< Blending is disabled.                                                    @SINCE_1_1.43
-  AUTO,           ///< Blending is enabled if there is alpha channel. This is the default mode. @SINCE_1_1.43
-  ON,             ///< Blending is enabled.                                                     @SINCE_1_1.43
-  ON_WITHOUT_CULL ///< Blending is enabled, and don't cull the renderer                         @SINCE_2_0.43
+  OFF,               ///< Blending is disabled.                                                    @SINCE_1_1.43
+  AUTO,              ///< Blending is enabled if there is alpha channel. This is the default mode. @SINCE_1_1.43
+  ON,                ///< Blending is enabled.                                                     @SINCE_1_1.43
+  ON_WITHOUT_CULL,   ///< Blending is enabled, and don't cull the renderer                         @SINCE_2_0.43
+  USE_ACTOR_OPACITY  ///< Blending is enabled when the actor is not opaque                         @SINCE_2_2.7
 };
 
 } // namespace BlendMode
