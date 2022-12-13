@@ -543,7 +543,8 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
 
     if(instruction.mFrameBuffer)
     {
-      return; // TODO: reset, we don't deal with render tasks with framebuffers (for now)
+      cleanDamagedRect = true;
+      continue; // TODO: reset, we don't deal with render tasks with framebuffers (for now)
     }
 
     const Camera* camera = instruction.GetCamera();
@@ -564,12 +565,14 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
          orientationAngle != ANGLE_180 ||
          scale != Vector3(1.0f, 1.0f, 1.0f))
       {
-        return;
+        cleanDamagedRect = true;
+        continue;
       }
     }
     else
     {
-      return;
+      cleanDamagedRect = true;
+      continue;
     }
 
     Rect<int32_t> viewportRect;
@@ -579,7 +582,8 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
       viewportRect.Set(instruction.mViewport.x, y, instruction.mViewport.width, instruction.mViewport.height);
       if(viewportRect.IsEmpty() || !viewportRect.IsValid())
       {
-        return; // just skip funny use cases for now, empty viewport means it is set somewhere else
+        cleanDamagedRect = true;
+        continue; // just skip funny use cases for now, empty viewport means it is set somewhere else
       }
     }
     else
@@ -682,7 +686,9 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
                 else
                 {
                   // The item is not in the list for some reason. Add it!
+                  dirtyRect.rect = surfaceRect;
                   itemsDirtyRects.insert(dirtyRectPos, dirtyRect);
+                  cleanDamagedRect = true; // And make full update at this frame
                 }
               }
             }

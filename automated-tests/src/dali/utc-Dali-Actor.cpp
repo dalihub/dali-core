@@ -9353,17 +9353,13 @@ int utcDaliActorPartialUpdateChangeVisibility(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int>(16, 768, 32, 32); // in screen coordinates, includes 3 last frames updates
+  clippingRect = Rect<int>(16, 768, 32, 32); // in screen coordinates
   DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
   DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
   DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
   DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
-
-  damagedRects.clear();
-  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
-  application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   damagedRects.clear();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
