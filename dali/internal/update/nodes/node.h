@@ -30,6 +30,7 @@
 #include <dali/internal/update/manager/transform-manager-property.h>
 #include <dali/internal/update/manager/transform-manager.h>
 #include <dali/internal/update/nodes/node-declarations.h>
+#include <dali/internal/update/nodes/partial-rendering-data.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
 #include <dali/public-api/actors/actor-enumerations.h>
 #include <dali/public-api/actors/draw-mode.h>
@@ -57,6 +58,7 @@ class DiscardQueue;
 class Layer;
 class RenderTask;
 class UpdateManager;
+class Node;
 
 // Flags which require the scene renderable lists to be updated
 static NodePropertyFlags RenderableUpdateFlags = NodePropertyFlags::TRANSFORM | NodePropertyFlags::CHILD_DELETED;
@@ -210,6 +212,7 @@ public:
   void SetClippingMode(const ClippingMode::Type clippingMode)
   {
     mClippingMode = clippingMode;
+    SetDirtyFlag(NodePropertyFlags::TRANSFORM);
   }
 
   /**
@@ -846,6 +849,15 @@ public:
     return mCulled[bufferIndex];
   }
 
+  /**
+   * @brief Returns partial rendering data associated with the node.
+   * @return The partial rendering data
+   */
+  PartialRenderingData& GetPartialRenderingData()
+  {
+    return mPartialRenderingData;
+  }
+
 public:
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyOwner::IsAnimationPossible
@@ -864,6 +876,12 @@ public:
    * Reset dirty flags
    */
   void ResetDirtyFlags(BufferIndex updateBufferIndex);
+
+  /**
+   * Update uniform hash
+   * @param[in] bufferIndex The buffer to read from.
+   */
+  void UpdateUniformHash(BufferIndex bufferIndex);
 
 protected:
   /**
@@ -885,14 +903,6 @@ protected:
   ~Node() override;
 
 private: // from NodeDataProvider
-  /**
-   * @copydoc NodeDataProvider::GetModelMatrix
-   */
-  const Matrix& GetModelMatrix(BufferIndex bufferIndex) const override
-  {
-    return GetWorldMatrix(bufferIndex);
-  }
-
   /**
    * @copydoc NodeDataProvider::GetRenderColor
    */
@@ -952,11 +962,14 @@ public: // Default properties
   TransformManagerMatrixInput     mWorldMatrix;      ///< Full inherited world matrix
   InheritedColor                  mWorldColor;       ///< Full inherited color
 
+  uint64_t       mUniformsHash{0u};     ///< Hash of uniform map property values
   uint32_t       mClippingSortModifier; ///< Contains bit-packed clipping information for quick access when sorting
   const uint32_t mId;                   ///< The Unique ID of the node.
 
 protected:
   static uint32_t mNodeCounter; ///< count of total nodes, used for unique ids
+
+  PartialRenderingData mPartialRenderingData; ///< Cache to determine if this should be rendered again
 
   Node*       mParent;              ///< Pointer to parent node (a child is owned by its parent)
   RenderTask* mExclusiveRenderTask; ///< Nodes can be marked as exclusive to a single RenderTask

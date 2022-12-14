@@ -848,9 +848,8 @@ int UtcDaliDecoratedVisualRendererPartialUpdate(void)
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
-  damagedRects.clear();
-  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
-  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  // Ensure the damaged rect is empty
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
 
   // Set clippingRect as full surface now. TODO : Set valid rect if we can.
   clippingRect = TestApplication::DEFAULT_SURFACE_RECT;

@@ -63,9 +63,6 @@ class RenderTask;
 class Renderer;
 class Scene;
 
-class ActorDepthTreeNode;
-using DepthNodeMemoryPool = Dali::Internal::MemoryPoolObjectAllocator<ActorDepthTreeNode>;
-
 /**
  * Actor is the primary object with which Dali applications interact.
  * UI controls can be built by combining multiple actors.
@@ -1722,8 +1719,8 @@ private:
   };
 
   // Remove default constructor and copy constructor
-  Actor()             = delete;
-  Actor(const Actor&) = delete;
+  Actor()                            = delete;
+  Actor(const Actor&)                = delete;
   Actor& operator=(const Actor& rhs) = delete;
 
   /**

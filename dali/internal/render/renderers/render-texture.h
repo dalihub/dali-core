@@ -131,6 +131,33 @@ public:
     return static_cast<bool>(mNativeImage);
   }
 
+  /**
+   * Called from RenderManager to notify the texture that current rendering pass has finished.
+   */
+  void OnRenderFinished();
+
+  /**
+   * Set the updated flag.
+   * @param[in] updated The updated flag
+   */
+  void SetUpdated(bool updated)
+  {
+    mUpdated = updated;
+  }
+
+  /**
+   * Check if the texture is updated
+   * @return True if the texture is updated
+   */
+  [[nodiscard]] bool Updated()
+  {
+    if(mUpdated || IsNativeImage())
+    {
+      return true;
+    }
+    return false;
+  }
+
 private:
   /**
    * Helper method to apply a sampler to the texture
@@ -150,6 +177,7 @@ private:
   uint16_t      mHeight;       ///< Height of the texture
   Type          mType : 3;     ///< Type of the texture
   bool          mHasAlpha : 1; ///< Whether the format has an alpha channel
+  bool          mUpdated : 1;  ///< Whether the texture is updated
 };
 
 } // namespace Render

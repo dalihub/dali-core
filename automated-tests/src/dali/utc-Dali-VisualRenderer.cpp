@@ -723,7 +723,7 @@ int UtcDaliVisualRendererPartialUpdate(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  Rect<int> clippingRect = Rect<int>(64, 672, 80, 80); // in screen coordinates, includes 3 last frames updates
+  Rect<int> clippingRect = Rect<int>(64, 672, 80, 80); // in screen coordinates
   DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
@@ -736,9 +736,8 @@ int UtcDaliVisualRendererPartialUpdate(void)
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
-  damagedRects.clear();
-  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
-  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  // Ensure the damaged rect is empty
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
 
   // Set clippingRect as full surface now. TODO : Set valid rect if we can.
   clippingRect = TestApplication::DEFAULT_SURFACE_RECT;

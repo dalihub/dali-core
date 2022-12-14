@@ -29,6 +29,7 @@
 #include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/shaders/render-shader.h>
 #include <dali/internal/update/manager/sorted-layers.h>
+#include <dali/internal/update/nodes/partial-rendering-data.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
 #include <dali/internal/update/rendering/scene-graph-texture-set.h>
@@ -198,14 +199,13 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
   Vector3 nodeSize;
   Vector4 nodeUpdateArea;
   bool    nodeUpdateAreaSet(false);
-  bool    nodeUpdateAreaUseHint(false);
   Matrix  nodeModelViewMatrix(false);
   bool    nodeModelViewMatrixSet(false);
 
   // Don't cull items which have render callback
   bool hasRenderCallback = (renderable.mRenderer && renderable.mRenderer->GetRenderCallback());
 
-  if(cull && renderable.mRenderer && (hasRenderCallback || (!renderable.mRenderer->GetShader().HintEnabled(Dali::Shader::Hint::MODIFIES_GEOMETRY) && node->GetClippingMode() == ClippingMode::DISABLED)))
+  if(cull && renderable.mRenderer && !hasRenderCallback && !renderable.mRenderer->GetShader().HintEnabled(Dali::Shader::Hint::MODIFIES_GEOMETRY) && node->GetClippingMode() == ClippingMode::DISABLED)
   {
     const Vector4& boundingSphere = node->GetBoundingSphere();
     inside                        = (boundingSphere.w > Math::MACHINE_EPSILON_1000) &&
@@ -213,8 +213,8 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
 
     if(inside && !isLayer3d && viewportSet)
     {
-      nodeUpdateAreaUseHint = SetNodeUpdateArea(node, isLayer3d, nodeWorldMatrix, nodeSize, nodeUpdateArea);
-      nodeUpdateAreaSet     = true;
+      SetNodeUpdateArea(node, isLayer3d, nodeWorldMatrix, nodeSize, nodeUpdateArea);
+      nodeUpdateAreaSet = true;
 
       const Vector3& scale = node->GetWorldScale(updateBufferIndex);
       const Vector3& size  = Vector3(nodeUpdateArea.z, nodeUpdateArea.w, 1.0f) * scale;
@@ -260,23 +260,6 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
       // Get the next free RenderItem.
       RenderItem& item = renderList.GetNextFreeItem();
 
-      // Get cached values
-      auto& partialRenderingData = node->GetPartialRenderingData();
-
-      auto& partialRenderingCacheInfo = node->GetPartialRenderingData().GetCurrentCacheInfo();
-
-      partialRenderingCacheInfo.node       = node;
-      partialRenderingCacheInfo.isOpaque   = isOpaque;
-      partialRenderingCacheInfo.renderer   = renderable.mRenderer;
-      partialRenderingCacheInfo.color      = node->GetWorldColor(updateBufferIndex);
-      partialRenderingCacheInfo.depthIndex = node->GetDepthIndex();
-
-      if(DALI_LIKELY(renderable.mRenderer))
-      {
-        partialRenderingCacheInfo.color.a *= renderable.mRenderer->GetOpacity(updateBufferIndex);
-        partialRenderingCacheInfo.textureSet = renderable.mRenderer->GetTextureSet();
-      }
-
       item.mNode     = node;
       item.mIsOpaque = isOpaque;
       item.mColor    = node->GetColor(updateBufferIndex);
@@ -292,9 +275,6 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
         item.mRenderer   = &renderable.mRenderer->GetRenderer();
         item.mTextureSet = renderable.mRenderer->GetTextureSet();
         item.mDepthIndex += renderable.mRenderer->GetDepthIndex();
-
-        // Get whether collected map is up to date
-        item.mIsUpdated |= renderable.mRenderer->UniformMapUpdated();
       }
       else
       {
@@ -305,20 +285,12 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
 
       if(!nodeUpdateAreaSet)
       {
-        nodeUpdateAreaUseHint = SetNodeUpdateArea(node, isLayer3d, nodeWorldMatrix, nodeSize, nodeUpdateArea);
+        SetNodeUpdateArea(node, isLayer3d, nodeWorldMatrix, nodeSize, nodeUpdateArea);
       }
 
       item.mSize        = nodeSize;
       item.mUpdateArea  = nodeUpdateArea;
       item.mModelMatrix = nodeWorldMatrix;
-
-      // Apply transform informations if node doesn't have update size hint and use VisualRenderer.
-      if(!nodeUpdateAreaUseHint && renderable.mRenderer && renderable.mRenderer->GetVisualProperties())
-      {
-        Vector3 updateSize = renderable.mRenderer->CalculateVisualTransformedUpdateSize(updateBufferIndex, Vector3(item.mUpdateArea.z, item.mUpdateArea.w, 0.0f));
-        item.mUpdateArea.z = updateSize.x;
-        item.mUpdateArea.w = updateSize.y;
-      }
 
       if(!nodeModelViewMatrixSet)
       {
@@ -326,21 +298,23 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
       }
       item.mModelViewMatrix = nodeModelViewMatrix;
 
-      partialRenderingCacheInfo.matrix              = item.mModelViewMatrix;
-      partialRenderingCacheInfo.size                = item.mSize;
-      partialRenderingCacheInfo.updatedPositionSize = item.mUpdateArea;
+      PartialRenderingData partialRenderingData;
+      partialRenderingData.color               = node->GetWorldColor(updateBufferIndex);
+      partialRenderingData.depthIndex          = node->GetDepthIndex();
+      partialRenderingData.matrix              = item.mModelViewMatrix;
+      partialRenderingData.updatedPositionSize = item.mUpdateArea;
+      partialRenderingData.size                = item.mSize;
 
-      item.mIsUpdated = partialRenderingData.IsUpdated() || item.mIsUpdated;
+      auto& nodePartialRenderingData = node->GetPartialRenderingData();
+      item.mIsUpdated                = nodePartialRenderingData.IsUpdated(partialRenderingData) || item.mIsUpdated;
 
-      partialRenderingData.mRendered = true;
-
-      partialRenderingData.SwapBuffers();
+      nodePartialRenderingData.Update(partialRenderingData);
     }
     else
     {
       // Mark as not rendered
-      auto& partialRenderingData     = node->GetPartialRenderingData();
-      partialRenderingData.mRendered = false;
+      auto& nodePartialRenderingData     = node->GetPartialRenderingData();
+      nodePartialRenderingData.mRendered = false;
     }
 
     node->SetCulled(updateBufferIndex, false);
@@ -348,8 +322,8 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
   else
   {
     // Mark as not rendered
-    auto& partialRenderingData     = node->GetPartialRenderingData();
-    partialRenderingData.mRendered = false;
+    auto& nodePartialRenderingData     = node->GetPartialRenderingData();
+    nodePartialRenderingData.mRendered = false;
 
     node->SetCulled(updateBufferIndex, true);
   }

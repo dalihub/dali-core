@@ -234,6 +234,7 @@ void Core::RenderScene(RenderStatus& status, Integration::Scene& scene, bool ren
 
 void Core::PostRender()
 {
+  mUpdateManager->PostRender();
   mRenderManager->PostRender();
 }
 

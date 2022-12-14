@@ -380,6 +380,19 @@ public:
   };
 
   /**
+   * @copydoc RenderDataProvider::IsUpdated()
+   */
+  bool IsUpdated() const override
+  {
+    return Updated();
+  }
+
+  /**
+   * @copydoc RenderDataProvider::GetVisualTransformedUpdateArea()
+   */
+  Vector4 GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, const Vector4& originalUpdateArea) noexcept override;
+
+  /**
    * Sets RenderCallback object
    *
    * @param[in] callback Valid pointer to RenderCallback object
@@ -400,28 +413,27 @@ public:
    * Merge shader uniform map into renderer uniform map if any of the
    * maps have changed.  Only update uniform map if added to render
    * instructions.
+   * @param[in] updateBufferIndex The current update buffer index.
    */
-  void UpdateUniformMap();
-
-  /**
-   * @brief CHeck if the uniformMap regenerated
-   * @return True if the uniformMap changed after latest checkup.
-   * @note The uniform map updated flag is reset after calling this.
-   */
-  [[nodiscard]] inline bool UniformMapUpdated() noexcept
-  {
-    if(mUniformMapUpdated)
-    {
-      mUniformMapUpdated = false;
-      return true;
-    }
-    return false;
-  }
+  void UpdateUniformMap(BufferIndex updateBufferIndex);
 
   /**
    * Set the given external draw commands on this renderer.
    */
   void SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, uint32_t size);
+
+  /**
+   * Query whether a renderer is dirty.
+   * @return true if the renderer is dirty.
+   * @note It is used to decide whether to reuse the RenderList. We can't reuse the RenderList if this is dirty.
+   */
+  bool IsDirty() const;
+
+  /**
+   * Reset both dirty flag and updated flag.
+   * @note This is called after rendering has completed.
+   */
+  void ResetDirtyFlag();
 
 public: // UniformMap::Observer
   /**
@@ -458,16 +470,6 @@ public: // For VisualProperties
     return mVisualProperties.Get();
   }
 
-  /**
-   * @brief Recalculate size after visual properties applied.
-   *
-   * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] originalSize The original size before apply the visual properties.
-   *
-   * @return The recalculated size after visual properties applied.
-   */
-  Vector3 CalculateVisualTransformedUpdateSize(BufferIndex updateBufferIndex, const Vector3& originalSize);
-
 private:
   /**
    * Protected constructor; See also Renderer::New()
@@ -496,6 +498,7 @@ private:
 
   Dali::Internal::Render::Renderer::StencilParameters mStencilParameters; ///< Struct containing all stencil related options
 
+  uint64_t mUniformsHash{0};             ///< Hash of uniform map property values
   uint32_t mIndexedDrawFirstElement;     ///< first element index to be drawn using indexed draw
   uint32_t mIndexedDrawElementsCount;    ///< number of elements to be drawn using indexed draw
   uint32_t mBlendBitmask;                ///< The bitmask of blending options
@@ -510,9 +513,10 @@ private:
   DevelRenderer::Rendering::Type mRenderingBehavior : 2; ///< The rendering behavior
   Decay                          mUpdateDecay : 2;       ///< Update decay (aging)
 
-  bool                                          mRegenerateUniformMap : 1;     ///< true if the map should be regenerated
-  bool                                          mUniformMapUpdated : 1;        ///< true if the map regenerated recently.
-  bool                                          mPremultipledAlphaEnabled : 1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
+  bool mRegenerateUniformMap : 1;     ///< true if the map should be regenerated
+  bool mPremultipledAlphaEnabled : 1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
+  bool mDirtyFlag : 1;                ///< Flag indicating whether the properties are changed
+
   std::vector<Dali::DevelRenderer::DrawCommand> mDrawCommands;
   Dali::RenderCallback*                         mRenderCallback{nullptr};
 
