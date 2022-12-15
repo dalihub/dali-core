@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,13 @@
 
 // Internal headers are allowed here
 
+namespace
+{
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Verbose, true, "LOG_UTC_TRANSFORM_MANAGER_PROPERTY");
+#endif
+} // namespace
+
 void utc_dali_internal_transform_manager_property_startup()
 {
   test_return_value = TET_UNDEF;
@@ -36,6 +43,9 @@ int UtcTransformManagerPropertyGetFloatComponentN(void)
 {
   TestApplication application;
 
+  // For coverage
+  DALI_LOG_TRACE_METHOD(gLogFilter);
+
   Dali::Internal::SceneGraph::TransformManagerPropertyQuaternion property;
 
   try
@@ -46,6 +56,9 @@ int UtcTransformManagerPropertyGetFloatComponentN(void)
   {
     DALI_TEST_CHECK(true);
   }
+
+  // For coverage
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Test End\n");
 
   END_TEST;
 }

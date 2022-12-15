@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ Debug::Filter* gSingletonServiceLogFilter = Debug::Filter::New(Debug::NoLogging,
   if(gSingletonServiceLogFilter && gSingletonServiceLogFilter->IsEnabledFor(level)) \
   {                                                                                 \
     std::string string(message);                                                    \
-    Dali::TizenPlatform::LogMessage(Debug::DebugInfo, string);                      \
+    Dali::TizenPlatform::LogMessage(Debug::INFO, string);                           \
   }
 
 #define DALI_LOG_SINGLETON_SERVICE(level, format, ...) DALI_LOG_INFO(gSingletonServiceLogFilter, level, format, ##__VA_ARGS__)
