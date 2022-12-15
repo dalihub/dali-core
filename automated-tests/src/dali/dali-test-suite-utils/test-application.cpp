@@ -117,13 +117,16 @@ void TestApplication::LogMessage(Dali::Integration::Log::DebugPriority level, st
   {
     switch(level)
     {
-      case Dali::Integration::Log::DebugInfo:
+      case Dali::Integration::Log::DEBUG:
+        fprintf(stderr, "DEBUG: %s", message.c_str());
+        break;
+      case Dali::Integration::Log::INFO:
         fprintf(stderr, "INFO: %s", message.c_str());
         break;
-      case Dali::Integration::Log::DebugWarning:
+      case Dali::Integration::Log::WARNING:
         fprintf(stderr, "WARN: %s", message.c_str());
         break;
-      case Dali::Integration::Log::DebugError:
+      case Dali::Integration::Log::ERROR:
         fprintf(stderr, "ERROR: %s", message.c_str());
         break;
       default:

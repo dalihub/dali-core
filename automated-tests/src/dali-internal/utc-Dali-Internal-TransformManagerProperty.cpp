@@ -22,6 +22,13 @@
 
 // Internal headers are allowed here
 
+namespace
+{
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Verbose, true, "LOG_UTC_TRANSFORM_MANAGER_PROPERTY");
+#endif
+} // namespace
+
 void utc_dali_internal_transform_manager_property_startup()
 {
   test_return_value = TET_UNDEF;
@@ -35,6 +42,9 @@ void utc_dali_internal_transform_manager_property_cleanup()
 int UtcTransformManagerPropertyGetFloatComponentN(void)
 {
   TestApplication application;
+
+  // For coverage
+  DALI_LOG_TRACE_METHOD(gLogFilter);
 
   struct S
   {
@@ -51,6 +61,9 @@ int UtcTransformManagerPropertyGetFloatComponentN(void)
   {
     DALI_TEST_ASSERT(e, "0 && \"Invalid call\"", TEST_LOCATION);
   }
+
+  // For coverage
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Test End\n");
 
   END_TEST;
 }
