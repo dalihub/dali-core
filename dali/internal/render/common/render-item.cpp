@@ -42,7 +42,6 @@ RenderItem* RenderItem::New()
 RenderItem::RenderItem()
 : mModelMatrix(false),
   mModelViewMatrix(false),
-  mColor(Vector4::ZERO),
   mSize(),
   mRenderer(nullptr),
   mNode(nullptr),

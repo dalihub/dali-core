@@ -803,6 +803,7 @@ public:
     if(depthIndex != mDepthIndex)
     {
       SetDirtyFlag(NodePropertyFlags::DEPTH_INDEX);
+      SetUpdated(true);
       mDepthIndex = depthIndex;
     }
   }
