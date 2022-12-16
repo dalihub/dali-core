@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_UPDATE_MESSAGE_QUEUE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,9 @@
 // INTERNAL INCLUDES
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
+
+// EXTERNAL INCLUDES
+#include <cstddef>
 
 namespace Dali
 {
@@ -99,6 +102,11 @@ public:
    */
   bool IsSceneUpdateRequired() const;
 
+  /**
+   * Query for the capacity of the current message queue
+   */
+  std::size_t GetCapacity() const;
+
 private:
   /**
    * Helper to call Process and destructor on each queued message
@@ -108,8 +116,8 @@ private:
 
 private:
   // Not copyable:
-  MessageQueue()                        = delete;
-  MessageQueue(const MessageQueue& rhs) = delete;
+  MessageQueue()                                   = delete;
+  MessageQueue(const MessageQueue& rhs)            = delete;
   MessageQueue& operator=(const MessageQueue& rhs) = delete;
 
 private:

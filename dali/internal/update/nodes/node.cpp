@@ -334,6 +334,11 @@ void Node::RecursiveDisconnectFromSceneGraph(BufferIndex updateBufferIndex)
   }
 }
 
+uint32_t Node::GetMemoryPoolCapacity()
+{
+  return gNodeMemoryPool.GetCapacity();
+}
+
 } // namespace SceneGraph
 
 } // namespace Internal

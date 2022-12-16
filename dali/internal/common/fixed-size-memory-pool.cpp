@@ -231,6 +231,22 @@ void FixedSizeMemoryPool::FreeThreadSafe(void* memory)
   }
 }
 
+uint32_t FixedSizeMemoryPool::GetCapacity() const
+{
+  // Ignores deleted objects list, just returns currently allocated size
+  uint32_t totalAllocation = 0;
+#ifdef DEBUG_ENABLED
+  Mutex::ScopedLock lock(mImpl->mMutex);
+  Impl::Block*      block = &mImpl->mMemoryBlocks;
+  while(block)
+  {
+    totalAllocation += block->mBlockSize;
+    block = block->nextBlock;
+  }
+#endif
+  return totalAllocation;
+}
+
 } // namespace Internal
 
 } // namespace Dali

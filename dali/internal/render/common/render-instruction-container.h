@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_INSTRUCTION_CONTAINER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/internal/common/buffer-index.h>
 #include <dali/public-api/common/vector-wrapper.h>
+#include <cstddef>
 
 namespace Dali
 {
@@ -74,6 +75,11 @@ public:
    * @param bufferIndex to use
    */
   void PushBack(BufferIndex index, RenderInstruction* renderInstruction);
+
+  /**
+   * Get the total memory used by all the render instructions
+   */
+  std::size_t GetCapacity() const;
 
 private:
   std::vector<RenderInstruction*> mInstructions;

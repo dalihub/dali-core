@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -123,6 +123,20 @@ void RenderInstruction::Reset(Camera*              camera,
     // reset the renderlist
     (*iter)->Reset();
   }
+}
+
+std::size_t RenderInstruction::GetCapacity()
+{
+  std::size_t                        capacity{0u};
+  RenderListContainer::Iterator      iter = mRenderLists.Begin();
+  RenderListContainer::ConstIterator end  = mRenderLists.End();
+  for(; iter != end; ++iter)
+  {
+    capacity += ((*iter)->GetCachedItemCount() * (sizeof(RenderItem) + sizeof(RenderItem*)));
+    capacity += sizeof(RenderList);
+  }
+  capacity += sizeof(RenderInstruction);
+  return capacity;
 }
 
 } // namespace SceneGraph

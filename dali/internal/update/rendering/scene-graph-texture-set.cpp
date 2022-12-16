@@ -113,6 +113,11 @@ bool TextureSet::HasAlpha() const
   return mHasAlpha;
 }
 
+uint32_t TextureSet::GetMemoryPoolCapacity()
+{
+  return gTextureSetMemoryPool.GetCapacity();
+}
+
 } // namespace SceneGraph
 
 } // namespace Internal

@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/images/pixel-data-devel.h>
+#include <dali/integration-api/debug.h>
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/object/base-object.h>
 
@@ -121,6 +122,18 @@ public:
    */
   uint32_t GetStride() const;
 
+  /**
+   * Class method to get the total currently allocated size of pixel buffers
+   */
+  static uint32_t GetTotalAllocatedSize()
+  {
+#if defined(DEBUG_ENABLED)
+    return gPixelDataAllocationTotal;
+#else
+    return 0;
+#endif
+  }
+
 private:
   /*
    * Undefined copy constructor.
@@ -140,6 +153,10 @@ private:
   uint32_t                         mStride;          ///< Buffer stride in pixels, 0 means the buffer is tightly packed
   Pixel::Format                    mPixelFormat;     ///< Pixel format
   Dali::PixelData::ReleaseFunction mReleaseFunction; ///< Function for releasing memory
+
+#if defined(DEBUG_ENABLED)
+  static uint32_t gPixelDataAllocationTotal;
+#endif
 };
 
 } // namespace Internal

@@ -138,6 +138,10 @@ Core::Core(RenderController&                   renderController,
   mUpdateManager->SetShaderSaver(*mShaderFactory);
 
   GetImplementation(Dali::TypeRegistry::Get()).CallInitFunctions();
+
+  DALI_LOG_RELEASE_INFO("Node size: %lu\n", sizeof(Dali::Internal::SceneGraph::Node));
+  DALI_LOG_RELEASE_INFO("Renderer size: %lu\n", sizeof(Dali::Internal::SceneGraph::Renderer));
+  DALI_LOG_RELEASE_INFO("RenderItem size: %lu\n", sizeof(Dali::Internal::SceneGraph::RenderItem));
 }
 
 Core::~Core()
@@ -482,6 +486,47 @@ RelayoutController& Core::GetRelayoutController()
 ObjectRegistry& Core::GetObjectRegistry() const
 {
   return *(mObjectRegistry.Get());
+}
+
+void Core::LogMemoryPools() const
+{
+  uint32_t animationPoolCapacity    = SceneGraph::Animation::GetMemoryPoolCapacity();
+  uint32_t renderItemPoolCapacity   = SceneGraph::RenderItem::GetMemoryPoolCapacity();
+  uint32_t relayoutItemPoolCapacity = mRelayoutController->GetMemoryPoolCapacity();
+  uint32_t rendererPoolCapacity     = SceneGraph::Renderer::GetMemoryPoolCapacity();
+  uint32_t textureSetPoolCapacity   = SceneGraph::TextureSet::GetMemoryPoolCapacity();
+  uint32_t renderTaskPoolCapacity   = SceneGraph::RenderTaskList::GetMemoryPoolCapacity();
+  uint32_t nodePoolCapacity         = SceneGraph::Node::GetMemoryPoolCapacity();
+
+  DALI_LOG_RELEASE_INFO(
+    "\nMemory Pool capacities:\n"
+    "  Animations:    %lu\n"
+    "  RenderItems:   %lu\n"
+    "  RelayoutItems: %lu\n"
+    "  Renderers:     %lu\n"
+    "  TextureSets:   %lu\n"
+    "  RenderTasks:   %lu\n"
+    "  Nodes:         %lu\n",
+    animationPoolCapacity,
+    renderItemPoolCapacity,
+    relayoutItemPoolCapacity,
+    rendererPoolCapacity,
+    textureSetPoolCapacity,
+    renderTaskPoolCapacity,
+    nodePoolCapacity);
+
+  uint32_t updateQCapacity = mUpdateManager->GetUpdateMessageQueueCapacity();
+  uint32_t renderQCapacity = mUpdateManager->GetRenderMessageQueueCapacity();
+
+  DALI_LOG_RELEASE_INFO(
+    "\nMessage Queue capacities:\n"
+    "  UpdateQueue: %lu\n"
+    "  RenderQueue: %lu\n",
+    updateQCapacity,
+    renderQCapacity);
+
+  size_t renderInstructionCapacity = mUpdateManager->GetRenderInstructionCapacity();
+  DALI_LOG_RELEASE_INFO("\nRenderInstruction capacity: %lu\n", renderInstructionCapacity);
 }
 
 EventThreadServices& Core::GetEventThreadServices()

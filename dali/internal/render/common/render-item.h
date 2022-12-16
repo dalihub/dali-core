@@ -99,6 +99,11 @@ struct RenderItem
   bool              mIsOpaque : 1;
   bool              mIsUpdated : 1;
 
+  /**
+   * Get the capacity of the global pool.
+   */
+  static uint32_t GetMemoryPoolCapacity();
+
 private:
   /**
    * Private constructor. See RenderItem::New
