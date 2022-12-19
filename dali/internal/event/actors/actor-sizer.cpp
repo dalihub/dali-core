@@ -117,14 +117,7 @@ void ActorSizer::SetSizeInternal(const Vector3& size)
   // dont allow recursive loop
   DALI_ASSERT_ALWAYS(!mInsideOnSizeSet && "Cannot call SetSize from OnSizeSet");
   // check that we have a node AND the new size width, height or depth is at least a little bit different from the old one
-  Vector3 currentSize = mOwner.GetCurrentSize();
-
-  if((fabsf(mTargetSize.width - size.width) > Math::MACHINE_EPSILON_1) ||
-     (fabsf(mTargetSize.height - size.height) > Math::MACHINE_EPSILON_1) ||
-     (fabsf(mTargetSize.depth - size.depth) > Math::MACHINE_EPSILON_1) ||
-     (fabsf(mTargetSize.width - currentSize.width) > Math::MACHINE_EPSILON_1) ||
-     (fabsf(mTargetSize.height - currentSize.height) > Math::MACHINE_EPSILON_1) ||
-     (fabsf(mTargetSize.depth - currentSize.depth) > Math::MACHINE_EPSILON_1))
+  if(mTargetSize != size || mTargetSize != mOwner.GetCurrentSize())
   {
     mTargetSize = size;
 
