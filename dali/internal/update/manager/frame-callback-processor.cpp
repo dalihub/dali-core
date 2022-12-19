@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,12 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/update/frame-callback-interface.h>
 #include <dali/devel-api/update/update-proxy.h>
+#include <dali/integration-api/trace.h>
+
+namespace
+{
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
+} // namespace
 
 namespace Dali
 {
@@ -59,12 +65,19 @@ void FrameCallbackProcessor::RemoveFrameCallback(FrameCallbackInterface* frameCa
 
 void FrameCallbackProcessor::Update(BufferIndex bufferIndex, float elapsedSeconds)
 {
-  // If any of the FrameCallback::Update calls returns false, then they are no longer required & can be removed.
-  auto iter = std::remove_if(
-    mFrameCallbacks.begin(), mFrameCallbacks.end(), [&](OwnerPointer<FrameCallback>& frameCallback) {
-      return !frameCallback->Update(bufferIndex, elapsedSeconds, mNodeHierarchyChanged);
-    });
-  mFrameCallbacks.erase(iter, mFrameCallbacks.end());
+  if(!mFrameCallbacks.empty())
+  {
+    DALI_TRACE_BEGIN(gTraceFilter, "DALI_FRAME_CALLBACK_UPDATE");
+
+    // If any of the FrameCallback::Update calls returns false, then they are no longer required & can be removed.
+    auto iter = std::remove_if(
+      mFrameCallbacks.begin(), mFrameCallbacks.end(), [&](OwnerPointer<FrameCallback>& frameCallback) {
+        return !frameCallback->Update(bufferIndex, elapsedSeconds, mNodeHierarchyChanged);
+      });
+    mFrameCallbacks.erase(iter, mFrameCallbacks.end());
+
+    DALI_TRACE_END(gTraceFilter, "DALI_FRAME_CALLBACK_UPDATE");
+  }
 
   mNodeHierarchyChanged = false;
 }
