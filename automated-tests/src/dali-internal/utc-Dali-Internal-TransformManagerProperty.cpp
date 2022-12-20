@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,13 @@
 
 // Internal headers are allowed here
 
+namespace
+{
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Verbose, true, "LOG_UTC_TRANSFORM_MANAGER_PROPERTY");
+#endif
+} // namespace
+
 void utc_dali_internal_transform_manager_property_startup()
 {
   test_return_value = TET_UNDEF;
@@ -36,16 +43,48 @@ int UtcTransformManagerPropertyGetFloatComponentN(void)
 {
   TestApplication application;
 
-  Dali::Internal::SceneGraph::TransformManagerPropertyQuaternion property;
+  // For coverage
+  DALI_LOG_TRACE_METHOD(gLogFilter);
+
+  struct S
+  {
+    Dali::Internal::SceneGraph::TransformManagerData                                  txMgrData;
+    Dali::Internal::SceneGraph::TransformManagerPropertyQuaternion<sizeof(txMgrData)> property;
+  } s;
 
   try
   {
-    property.GetFloatComponent(0u);
+    // There is no float component getter in derived class, only in base class.
+    s.property.GetFloatComponent(0u);
   }
-  catch(...)
+  catch(Dali::DaliException& e)
   {
-    DALI_TEST_CHECK(true);
+    DALI_TEST_ASSERT(e, "0 && \"Invalid call\"", TEST_LOCATION);
   }
+
+  // For coverage
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Test End\n");
+
+  END_TEST;
+}
+
+int UtcTransformManagerPropertyUninitializedMgrData(void)
+{
+  TestApplication application;
+
+  struct S
+  {
+    const Vector3 input{1.0f, 2.0f, 3.0f};
+
+    Dali::Internal::SceneGraph::TransformManagerData                            txMgrData;
+    Dali::Internal::SceneGraph::TransformManagerVector3Input<sizeof(txMgrData)> property{Dali::Internal::SceneGraph::TRANSFORM_PROPERTY_POSITION, input};
+  } s;
+
+  Vector3 output = s.property.GetVector3(0);
+
+  tet_infoline("Test that if input property's transform manager data is not initialized, that getting a value returns the initial value of the property.");
+
+  DALI_TEST_EQUALS(s.input, output, 0.001f, TEST_LOCATION);
 
   END_TEST;
 }

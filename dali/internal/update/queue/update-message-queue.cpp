@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -285,6 +285,28 @@ bool MessageQueue::WasEmpty() const
 bool MessageQueue::IsSceneUpdateRequired() const
 {
   return mImpl->sceneUpdate;
+}
+
+std::size_t MessageQueue::GetCapacity() const
+{
+  MessageQueueMutex::ScopedLock lock(mImpl->queueMutex);
+
+  uint32_t          capacity = 0u;
+  MessageBufferIter endIter  = mImpl->freeQueue.end();
+  for(MessageBufferIter iter = mImpl->freeQueue.begin(); iter != endIter; ++iter)
+  {
+    capacity += (*iter)->GetCapacity();
+  }
+  endIter = mImpl->processQueue.end();
+  for(MessageBufferIter iter = mImpl->processQueue.begin(); iter != endIter; ++iter)
+  {
+    capacity += (*iter)->GetCapacity();
+  }
+  if(mImpl->currentMessageBuffer != nullptr)
+  {
+    capacity += mImpl->currentMessageBuffer->GetCapacity();
+  }
+  return capacity;
 }
 
 } // namespace Update

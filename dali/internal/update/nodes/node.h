@@ -30,6 +30,7 @@
 #include <dali/internal/update/manager/transform-manager-property.h>
 #include <dali/internal/update/manager/transform-manager.h>
 #include <dali/internal/update/nodes/node-declarations.h>
+#include <dali/internal/update/nodes/node-helper.h>
 #include <dali/internal/update/nodes/partial-rendering-data.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
 #include <dali/public-api/actors/actor-enumerations.h>
@@ -803,6 +804,7 @@ public:
     if(depthIndex != mDepthIndex)
     {
       SetDirtyFlag(NodePropertyFlags::DEPTH_INDEX);
+      SetUpdated(true);
       mDepthIndex = depthIndex;
     }
   }
@@ -848,6 +850,14 @@ public:
   {
     return mCulled[bufferIndex];
   }
+
+  /**
+   * @brief Get the total capacity of the memory pools
+   * @return The capacity of the memory pools
+   *
+   * @note This is different to the node count.
+   */
+  static uint32_t GetMemoryPoolCapacity();
 
   /**
    * @brief Returns partial rendering data associated with the node.
@@ -921,10 +931,10 @@ private: // from NodeDataProvider
 
 private:
   // Delete copy and move
-  Node(const Node&) = delete;
-  Node(Node&&)      = delete;
+  Node(const Node&)                = delete;
+  Node(Node&&)                     = delete;
   Node& operator=(const Node& rhs) = delete;
-  Node& operator=(Node&& rhs) = delete;
+  Node& operator=(Node&& rhs)      = delete;
 
   /**
    * Recursive helper to disconnect a Node and its children.
@@ -934,33 +944,38 @@ private:
   void RecursiveDisconnectFromSceneGraph(BufferIndex updateBufferIndex);
 
 public: // Default properties
-  using TransformManagerParentsOrigin = TransformManagerPropertyVector3<TRANSFORM_PROPERTY_PARENT_ORIGIN>;
-  using TransformManagerAnchorPoint   = TransformManagerPropertyVector3<TRANSFORM_PROPERTY_ANCHOR_POINT>;
-  using TransformManagerSize          = TransformManagerPropertyVector3<TRANSFORM_PROPERTY_SIZE>;
-  using TransformManagerPosition      = TransformManagerPropertyVector3<TRANSFORM_PROPERTY_POSITION>;
-  using TransformManagerScale         = TransformManagerPropertyVector3<TRANSFORM_PROPERTY_SCALE>;
+  // Define a base offset for the following wrappers. The wrapper macros calculate offsets from the previous
+  // element such that each wrapper type generates a compile time offset to the transform manager data.
+  BASE(TransformManagerData, mTransformManagerData);
+  PROPERTY_WRAPPER(mTransformManagerData, TransformManagerPropertyVector3, TRANSFORM_PROPERTY_PARENT_ORIGIN,
+                   mParentOrigin); // Local transform; the position is relative to this. Sets the Transform flag dirty when changed
 
-  TransformManagerData               mTransformManagerData;
-  TransformManagerParentsOrigin      mParentOrigin; ///< Local transform; the position is relative to this. Sets the Transform flag dirty when changed
-  TransformManagerAnchorPoint        mAnchorPoint;  ///< Local transform; local center of rotation. Sets the Transform flag dirty when changed
-  TransformManagerSize               mSize;         ///< Size is provided for layouting
-  TransformManagerPosition           mPosition;     ///< Local transform; distance between parent-origin & anchor-point
-  TransformManagerScale              mScale;        ///< Local transform; scale relative to parent node
-  TransformManagerPropertyQuaternion mOrientation;  ///< Local transform; rotation relative to parent node
+  PROPERTY_WRAPPER(mParentOrigin, TransformManagerPropertyVector3, TRANSFORM_PROPERTY_ANCHOR_POINT,
+                   mAnchorPoint); // Local transform; local center of rotation. Sets the Transform flag dirty when changed
+
+  PROPERTY_WRAPPER(mAnchorPoint, TransformManagerPropertyVector3, TRANSFORM_PROPERTY_SIZE,
+                   mSize); // Size is provided for layouting
+
+  PROPERTY_WRAPPER(mSize, TransformManagerPropertyVector3, TRANSFORM_PROPERTY_POSITION,
+                   mPosition); // Local transform; distance between parent-origin & anchor-point
+  PROPERTY_WRAPPER(mPosition, TransformManagerPropertyVector3, TRANSFORM_PROPERTY_SCALE,
+                   mScale); // Local transform; scale relative to parent node
+
+  TEMPLATE_WRAPPER(mScale, TransformManagerPropertyQuaternion,
+                   mOrientation); // Local transform; rotation relative to parent node
+
+  // Inherited properties; read-only from public API
+  TEMPLATE_WRAPPER(mOrientation, TransformManagerVector3Input, mWorldPosition);      // Full inherited position
+  TEMPLATE_WRAPPER(mWorldPosition, TransformManagerVector3Input, mWorldScale);       // Full inherited scale
+  TEMPLATE_WRAPPER(mWorldScale, TransformManagerQuaternionInput, mWorldOrientation); // Full inherited orientation
+  TEMPLATE_WRAPPER(mWorldOrientation, TransformManagerMatrixInput, mWorldMatrix);    // Full inherited world matrix
 
   AnimatableProperty<bool>    mVisible;        ///< Visibility can be inherited from the Node hierachy
   AnimatableProperty<bool>    mCulled;         ///< True if the node is culled. This is not animatable. It is just double-buffered.
   AnimatableProperty<Vector4> mColor;          ///< Color can be inherited from the Node hierarchy
+  InheritedColor              mWorldColor;     ///< Full inherited color
   AnimatableProperty<Vector4> mUpdateAreaHint; ///< Update area hint is provided for damaged area calculation. (x, y, width, height)
                                                ///< This is not animatable. It is just double-buffered. (Because all these bloody properties are).
-
-  // Inherited properties; read-only from public API
-
-  TransformManagerVector3Input    mWorldPosition; ///< Full inherited position
-  TransformManagerVector3Input    mWorldScale;
-  TransformManagerQuaternionInput mWorldOrientation; ///< Full inherited orientation
-  TransformManagerMatrixInput     mWorldMatrix;      ///< Full inherited world matrix
-  InheritedColor                  mWorldColor;       ///< Full inherited color
 
   uint64_t       mUniformsHash{0u};     ///< Hash of uniform map property values
   uint32_t       mClippingSortModifier; ///< Contains bit-packed clipping information for quick access when sorting
@@ -980,8 +995,7 @@ protected:
 
   uint32_t mClippingDepth; ///< The number of stencil clipping nodes deep this node is
   uint32_t mScissorDepth;  ///< The number of scissor clipping nodes deep this node is
-
-  uint32_t mDepthIndex; ///< Depth index of the node
+  uint32_t mDepthIndex;    ///< Depth index of the node
 
   // flags, compressed to bitfield
   NodePropertyFlags  mDirtyFlags;                  ///< Dirty flags for each of the Node properties

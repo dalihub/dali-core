@@ -37,8 +37,7 @@ struct PartialRenderingData
   Vector4  color{};               /// Color
   Vector4  updatedPositionSize{}; /// Updated position/size (x, y, width, height)
   Vector3  size{};                /// Size
-  uint32_t depthIndex{0u};        /// Depth index
-  uint32_t hash;                  /// Last frame's hash
+  uint32_t hash{0u};              /// Last frame's hash
 
   bool mVisible{true};   /// Visible state (Not hashed)
   bool mRendered{false}; /// Rendering state (Not hashed)
@@ -53,7 +52,6 @@ struct PartialRenderingData
     AddToHash(hash, &color, sizeof(decltype(color)));
     AddToHash(hash, &updatedPositionSize, sizeof(decltype(updatedPositionSize)));
     AddToHash(hash, &size, sizeof(decltype(size)));
-    AddToHash(hash, &depthIndex, sizeof(decltype(depthIndex)));
   }
 
   /**
@@ -69,7 +67,6 @@ struct PartialRenderingData
            color != frameCache.color ||
            updatedPositionSize != frameCache.updatedPositionSize ||
            size != frameCache.size ||
-           depthIndex != frameCache.depthIndex ||
            !mRendered; // If everything is the same, check if we didn't render last frame.
   }
 
@@ -79,7 +76,6 @@ struct PartialRenderingData
     color               = frameCache.color;
     updatedPositionSize = frameCache.updatedPositionSize;
     size                = frameCache.size;
-    depthIndex          = frameCache.depthIndex;
     hash                = frameCache.hash;
 
     mRendered = true;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -143,6 +143,11 @@ void Core::UnregisterProcessor(Processor& processor, bool postProcessor)
 ObjectRegistry Core::GetObjectRegistry() const
 {
   return ObjectRegistry(&mImpl->GetObjectRegistry());
+}
+
+void Core::LogMemoryPools() const
+{
+  mImpl->LogMemoryPools();
 }
 
 Core::Core()

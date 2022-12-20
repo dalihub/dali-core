@@ -27,8 +27,8 @@
 
 namespace
 {
-//Memory pool used to allocate new nodes. Memory used by this pool will be released when process dies
-// or DALI library is unloaded
+// Memory pool used to allocate new nodes. Memory used by this pool will be released when process dies
+//  or DALI library is unloaded
 Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Node> gNodeMemoryPool;
 #ifdef DEBUG_ENABLED
 // keep track of nodes alive, to ensure we have 0 when the process exits or DALi library is unloaded
@@ -76,16 +76,16 @@ void Node::Delete(Node* node)
 }
 
 Node::Node()
-: mOrientation(), // Initialized to identity by default
-  mVisible(true),
-  mCulled(false),
-  mColor(Color::WHITE),
-  mUpdateAreaHint(Vector4::ZERO),
+: mOrientation(),                                                               // Initialized to identity by default
   mWorldPosition(TRANSFORM_PROPERTY_WORLD_POSITION, Vector3(0.0f, 0.0f, 0.0f)), // Zero initialized by default
   mWorldScale(TRANSFORM_PROPERTY_WORLD_SCALE, Vector3(1.0f, 1.0f, 1.0f)),
   mWorldOrientation(), // Initialized to identity by default
   mWorldMatrix(),
+  mVisible(true),
+  mCulled(false),
+  mColor(Color::WHITE),
   mWorldColor(Color::WHITE),
+  mUpdateAreaHint(Vector4::ZERO),
   mClippingSortModifier(0u),
   mId(++mNodeCounter),
   mParent(nullptr),
@@ -134,28 +134,14 @@ uint32_t Node::GetId() const
 
 void Node::CreateTransform(SceneGraph::TransformManager* transformManager)
 {
-  //Create a new transform
+  // Create a new transform
   mTransformManagerData.mManager = transformManager;
   TransformId createdTransformId = transformManager->CreateTransform();
 
-  //Initialize all the animatable properties
-  mPosition.Initialize(&mTransformManagerData);
-  mScale.Initialize(&mTransformManagerData);
-  mOrientation.Initialize(&mTransformManagerData);
-  mSize.Initialize(&mTransformManagerData);
-  mParentOrigin.Initialize(&mTransformManagerData);
-  mAnchorPoint.Initialize(&mTransformManagerData);
-
-  //Initialize all the input properties
-  mWorldPosition.Initialize(&mTransformManagerData);
-  mWorldScale.Initialize(&mTransformManagerData);
-  mWorldOrientation.Initialize(&mTransformManagerData);
-  mWorldMatrix.Initialize(&mTransformManagerData);
-
-  //Set whether the position should use the anchor point
+  // Set whether the position should use the anchor point
   transformManager->SetPositionUsesAnchorPoint(createdTransformId, mPositionUsesAnchorPoint);
 
-  //Set TransformId after initialize done.
+  // Set TransformId after initialize done.
   mTransformManagerData.mId = createdTransformId;
 }
 
@@ -346,6 +332,11 @@ void Node::RecursiveDisconnectFromSceneGraph(BufferIndex updateBufferIndex)
   {
     mTransformManagerData.Manager()->SetParent(mTransformManagerData.Id(), INVALID_TRANSFORM_ID);
   }
+}
+
+uint32_t Node::GetMemoryPoolCapacity()
+{
+  return gNodeMemoryPool.GetCapacity();
 }
 
 } // namespace SceneGraph

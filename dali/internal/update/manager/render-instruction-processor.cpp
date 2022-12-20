@@ -260,15 +260,9 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
       // Get the next free RenderItem.
       RenderItem& item = renderList.GetNextFreeItem();
 
-      item.mNode     = node;
-      item.mIsOpaque = isOpaque;
-      item.mColor    = node->GetColor(updateBufferIndex);
-
-      item.mDepthIndex = 0;
-      if(!isLayer3d)
-      {
-        item.mDepthIndex = node->GetDepthIndex();
-      }
+      item.mNode       = node;
+      item.mIsOpaque   = isOpaque;
+      item.mDepthIndex = isLayer3d ? 0 : node->GetDepthIndex();
 
       if(DALI_LIKELY(renderable.mRenderer))
       {
@@ -300,7 +294,6 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
 
       PartialRenderingData partialRenderingData;
       partialRenderingData.color               = node->GetWorldColor(updateBufferIndex);
-      partialRenderingData.depthIndex          = node->GetDepthIndex();
       partialRenderingData.matrix              = item.mModelViewMatrix;
       partialRenderingData.updatedPositionSize = item.mUpdateArea;
       partialRenderingData.size                = item.mSize;

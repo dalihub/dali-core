@@ -83,4 +83,9 @@ uint32_t PixelData::GetStride() const
   return GetImplementation(*this).GetStride();
 }
 
+uint32_t PixelData::GetTotalAllocatedSize()
+{
+  return Internal::PixelData::GetTotalAllocatedSize();
+}
+
 } // namespace Dali

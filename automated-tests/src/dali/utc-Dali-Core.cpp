@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,5 +48,16 @@ int UtcDaliCoreGetObjectRegistry(void)
 {
   TestApplication application;
   DALI_TEST_CHECK(application.GetCore().GetObjectRegistry());
+  END_TEST;
+}
+
+int UtcDaliCoreCheckMemoryPool(void)
+{
+  TestApplication application;
+
+  // Calling LogMemoryPools should check capacity across the board.
+  application.GetCore().LogMemoryPools();
+
+  tet_result(TET_PASS);
   END_TEST;
 }

@@ -18,10 +18,21 @@
 // CLASS HEADER
 #include <dali/internal/event/images/pixel-data-impl.h>
 
+#include <dali/integration-api/debug.h>
+
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gPixelDataLogFilter = Debug::Filter::New(Debug::NoLogging, false, "DALI_LOG_PIXEL_DATA_SIZE");
+#endif
+
 namespace Dali
 {
 namespace Internal
 {
+#if defined(DEBUG_ENABLED)
+// Only track data allocation if debug is enabled
+uint32_t PixelData::gPixelDataAllocationTotal{0};
+#endif
+
 PixelData::PixelData(uint8_t*                         buffer,
                      uint32_t                         bufferSize,
                      uint32_t                         width,
@@ -37,6 +48,10 @@ PixelData::PixelData(uint8_t*                         buffer,
   mPixelFormat(pixelFormat),
   mReleaseFunction(releaseFunction)
 {
+  DALI_LOG_INFO(gPixelDataLogFilter, Debug::Concise, "Allocated PixelData of size %u\n", bufferSize);
+#if defined(DEBUG_ENABLED)
+  gPixelDataAllocationTotal += mBufferSize;
+#endif
 }
 
 PixelData::~PixelData()
@@ -51,6 +66,9 @@ PixelData::~PixelData()
     {
       delete[] mBuffer;
     }
+#if defined(DEBUG_ENABLED)
+    gPixelDataAllocationTotal -= mBufferSize;
+#endif
   }
 }
 

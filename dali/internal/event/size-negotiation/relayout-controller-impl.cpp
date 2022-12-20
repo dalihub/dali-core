@@ -500,6 +500,11 @@ void RelayoutController::FindAndZero(const RawActorList& list, const Dali::RefOb
   }
 }
 
+uint32_t RelayoutController::GetMemoryPoolCapacity()
+{
+  return mRelayoutInfoAllocator.GetCapacity();
+}
+
 } // namespace Internal
 
 } // namespace Dali

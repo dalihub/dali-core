@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_FIXED_SIZE_MEMORY_POOL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,6 +96,13 @@ public:
    * @param memory The memory to be deleted. Must have been allocated by this memory pool
    */
   void FreeThreadSafe(void* memory);
+
+  /**
+   * Get the current capacity of the memory pool
+   *
+   * @note in release mode, this returns 0, as the block size isn't defined.
+   */
+  uint32_t GetCapacity() const;
 
 private:
   // Undefined

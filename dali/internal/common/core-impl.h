@@ -198,6 +198,11 @@ public:
    */
   ObjectRegistry& GetObjectRegistry() const;
 
+  /**
+   * Log the capacity of DALi memory pools
+   */
+  void LogMemoryPools() const;
+
 public: // Implementation of EventThreadServices
   /**
    * @copydoc EventThreadServices::RegisterObject

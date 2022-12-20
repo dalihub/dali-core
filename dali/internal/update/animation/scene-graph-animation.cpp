@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -482,6 +482,11 @@ void Animation::UpdateAnimators(BufferIndex bufferIndex, bool bake, bool animati
     //Remove animators whose PropertyOwner has been destroyed
     mAnimators.EraseIf([](auto& animator) { return animator->Orphan(); });
   }
+}
+
+uint32_t Animation::GetMemoryPoolCapacity()
+{
+  return gAnimationMemoryPool.GetCapacity();
 }
 
 } // namespace SceneGraph

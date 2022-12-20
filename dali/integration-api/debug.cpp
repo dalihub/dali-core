@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -166,14 +166,14 @@ void Filter::Log(LogLevel level, const char* format, ...)
       if(numChars >= 0) // No error
       {
         std::string message = ArgListToString(buffer, arg);
-        LogMessage(DebugInfo, message.c_str());
+        LogMessage(INFO, message.c_str());
         free(buffer);
       }
     }
     else
     {
       std::string message = ArgListToString(format, arg);
-      LogMessage(DebugInfo, message.c_str());
+      LogMessage(INFO, message.c_str());
     }
     va_end(arg);
   }
@@ -189,7 +189,7 @@ TraceObj::TraceObj(Filter* filter, const char* format, ...)
     mMessage = ArgListToString(format, arg);
     va_end(arg);
 
-    LogMessage(DebugInfo, "Entr%-*c %s\n", mFilter->mNesting, ':', mMessage.c_str());
+    LogMessage(INFO, "Entr%-*c %s\n", mFilter->mNesting, ':', mMessage.c_str());
     ++mFilter->mNesting;
   }
 }
@@ -202,7 +202,7 @@ TraceObj::~TraceObj()
     {
       --mFilter->mNesting;
     }
-    LogMessage(DebugInfo, "Exit%-*c %s\n", mFilter->mNesting, ':', mMessage.c_str());
+    LogMessage(INFO, "Exit%-*c %s\n", mFilter->mNesting, ':', mMessage.c_str());
   }
 }
 

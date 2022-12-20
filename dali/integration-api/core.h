@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_CORE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -408,6 +408,11 @@ public:
    * @return The object registry
    */
   ObjectRegistry GetObjectRegistry() const;
+
+  /**
+   * Log core's memory pool's capacities
+   */
+  void LogMemoryPools() const;
 
 private:
   /**

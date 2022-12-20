@@ -90,7 +90,6 @@ struct RenderItem
 
   Matrix            mModelMatrix;
   Matrix            mModelViewMatrix;
-  Vector4           mColor;
   Vector3           mSize;
   Vector4           mUpdateArea; ///< Update area hint is provided for damaged area calculation. (x, y, width, height)
   Render::Renderer* mRenderer;
@@ -99,6 +98,11 @@ struct RenderItem
   int               mDepthIndex;
   bool              mIsOpaque : 1;
   bool              mIsUpdated : 1;
+
+  /**
+   * Get the capacity of the global pool.
+   */
+  static uint32_t GetMemoryPoolCapacity();
 
 private:
   /**

@@ -112,7 +112,8 @@ inline void EraseUsingDiscardQueue(OwnerContainer<T*>& container, T* object, Dis
 void SortSiblingNodesRecursively(Node& node)
 {
   NodeContainer& container = node.GetChildren();
-  std::sort(container.Begin(), container.End(), [](Node* a, Node* b) { return a->GetDepthIndex() < b->GetDepthIndex(); });
+  std::sort(container.Begin(), container.End(), [](Node* a, Node* b)
+            { return a->GetDepthIndex() < b->GetDepthIndex(); });
 
   // Descend tree and sort as well
   for(auto&& iter : container)
@@ -136,11 +137,11 @@ struct UpdateManager::Impl
     {
     }
 
-    ~SceneInfo()               = default;                ///< Default non-virtual destructor
-    SceneInfo(SceneInfo&& rhs) = default;                ///< Move constructor
-    SceneInfo& operator=(SceneInfo&& rhs) = default;     ///< Move assignment operator
-    SceneInfo& operator=(const SceneInfo& rhs) = delete; ///< Assignment operator
-    SceneInfo(const SceneInfo& rhs)            = delete; ///< Copy constructor
+    ~SceneInfo()                               = default; ///< Default non-virtual destructor
+    SceneInfo(SceneInfo&& rhs)                 = default; ///< Move constructor
+    SceneInfo& operator=(SceneInfo&& rhs)      = default; ///< Move assignment operator
+    SceneInfo& operator=(const SceneInfo& rhs) = delete;  ///< Assignment operator
+    SceneInfo(const SceneInfo& rhs)            = delete;  ///< Copy constructor
 
     Layer*                       root{nullptr};   ///< Root node (root is a layer). The layer is not stored in the node memory pool.
     OwnerPointer<RenderTaskList> taskList;        ///< Scene graph render task list
@@ -288,11 +289,11 @@ struct UpdateManager::Impl
 
   OwnerPointer<FrameCallbackProcessor> frameCallbackProcessor; ///< Owned FrameCallbackProcessor, only created if required.
 
-  float             keepRenderingSeconds; ///< Set via Dali::Stage::KeepRendering
-  NodePropertyFlags nodeDirtyFlags;       ///< cumulative node dirty flags from previous frame
-  uint32_t          frameCounter;         ///< Frame counter used in debugging to choose which frame to debug and which to ignore.
-
-  DevelStage::Rendering renderingBehavior; ///< Set via DevelStage::SetRenderingBehavior
+  std::atomic<std::size_t> renderInstructionCapacity{0u};
+  float                    keepRenderingSeconds; ///< Set via Dali::Stage::KeepRendering
+  NodePropertyFlags        nodeDirtyFlags;       ///< cumulative node dirty flags from previous frame
+  uint32_t                 frameCounter;         ///< Frame counter used in debugging to choose which frame to debug and which to ignore.
+  DevelStage::Rendering    renderingBehavior;    ///< Set via DevelStage::SetRenderingBehavior
 
   bool animationFinishedDuringUpdate; ///< Flag whether any animations finished during the Update()
   bool previousUpdateScene;           ///< True if the scene was updated in the previous frame (otherwise it was optimized out)
@@ -338,9 +339,8 @@ void UpdateManager::InstallRoot(OwnerPointer<Layer>& layer)
 
   Layer* rootLayer = layer.Release();
 
-  DALI_ASSERT_DEBUG(std::find_if(mImpl->scenes.begin(), mImpl->scenes.end(), [rootLayer](Impl::SceneInfoPtr& scene) {
-                      return scene && scene->root == rootLayer;
-                    }) == mImpl->scenes.end() &&
+  DALI_ASSERT_DEBUG(std::find_if(mImpl->scenes.begin(), mImpl->scenes.end(), [rootLayer](Impl::SceneInfoPtr& scene)
+                                 { return scene && scene->root == rootLayer; }) == mImpl->scenes.end() &&
                     "Root Node already installed");
 
   rootLayer->CreateTransform(&mImpl->transformManager);
@@ -690,6 +690,21 @@ uint32_t* UpdateManager::ReserveMessageSlot(uint32_t size, bool updateScene)
   return mImpl->messageQueue.ReserveMessageSlot(size, updateScene);
 }
 
+std::size_t UpdateManager::GetUpdateMessageQueueCapacity() const
+{
+  return mImpl->messageQueue.GetCapacity();
+}
+
+std::size_t UpdateManager::GetRenderMessageQueueCapacity() const
+{
+  return mImpl->renderQueue.GetCapacity();
+}
+
+std::size_t UpdateManager::GetRenderInstructionCapacity() const
+{
+  return mImpl->renderInstructionCapacity;
+}
+
 void UpdateManager::EventProcessingStarted()
 {
   mImpl->messageQueue.EventProcessingStarted();
@@ -817,7 +832,7 @@ bool UpdateManager::Animate(BufferIndex bufferIndex, float elapsedSeconds)
 
 void UpdateManager::ConstrainCustomObjects(BufferIndex bufferIndex)
 {
-  //Constrain custom objects (in construction order)
+  // Constrain custom objects (in construction order)
   for(auto&& object : mImpl->customObjects)
   {
     ConstrainPropertyOwner(*object, bufferIndex);
@@ -890,7 +905,7 @@ void UpdateManager::UpdateRenderers(BufferIndex bufferIndex)
 {
   for(auto&& renderer : mImpl->renderers)
   {
-    //Apply constraints
+    // Apply constraints
     ConstrainPropertyOwner(*renderer, bufferIndex);
 
     mImpl->renderingRequired = renderer->PrepareRender(bufferIndex) || mImpl->renderingRequired;
@@ -934,12 +949,12 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
 {
   const BufferIndex bufferIndex = mSceneGraphBuffers.GetUpdateBufferIndex();
 
-  //Clear nodes/resources which were previously discarded
+  // Clear nodes/resources which were previously discarded
   mImpl->discardQueue.Clear(bufferIndex);
 
   bool isAnimationRunning = IsAnimationRunning();
 
-  //Process Touches & Gestures
+  // Process Touches & Gestures
   const bool gestureUpdated = ProcessGestures(bufferIndex, lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds);
 
   bool updateScene =                                   // The scene-graph requires an update if..
@@ -956,7 +971,7 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
   // values if the scene was updated in the previous frame.
   if(updateScene || mImpl->previousUpdateScene)
   {
-    //Reset properties from the previous update
+    // Reset properties from the previous update
     ResetProperties(bufferIndex);
     mImpl->transformManager.ResetToBaseValue();
   }
@@ -966,7 +981,7 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
   // be set again
   updateScene |= mImpl->messageQueue.ProcessMessages(bufferIndex);
 
-  //Forward compiled shader programs to event thread for saving
+  // Forward compiled shader programs to event thread for saving
   ForwardCompiledShadersToEventThread();
 
   // Although the scene-graph may not require an update, we still need to synchronize double-buffered
@@ -974,13 +989,13 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
   // We should not start skipping update steps or reusing lists until there has been two frames where nothing changes
   if(updateScene || mImpl->previousUpdateScene)
   {
-    //Animate
+    // Animate
     bool animationActive = Animate(bufferIndex, elapsedSeconds);
 
-    //Constraint custom objects
+    // Constraint custom objects
     ConstrainCustomObjects(bufferIndex);
 
-    //Clear the lists of renderers from the previous update
+    // Clear the lists of renderers from the previous update
     for(auto&& scene : mImpl->scenes)
     {
       if(scene)
@@ -1001,36 +1016,36 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
       mImpl->frameCallbackProcessor->Update(bufferIndex, elapsedSeconds);
     }
 
-    //Update node hierarchy, apply constraints,
+    // Update node hierarchy, apply constraints,
     UpdateNodes(bufferIndex);
 
-    //Apply constraints to RenderTasks, shaders
+    // Apply constraints to RenderTasks, shaders
     ConstrainRenderTasks(bufferIndex);
     ConstrainShaders(bufferIndex);
 
-    //Update renderers and apply constraints
+    // Update renderers and apply constraints
     UpdateRenderers(bufferIndex);
 
-    //Update the transformations of all the nodes
+    // Update the transformations of all the nodes
     if(mImpl->transformManager.Update())
     {
       mImpl->nodeDirtyFlags |= NodePropertyFlags::TRANSFORM;
     }
 
-    //Initialise layer renderable reuse
+    // Initialise layer renderable reuse
     UpdateLayers(bufferIndex);
 
-    //Process Property Notifications
+    // Process Property Notifications
     ProcessPropertyNotifications(bufferIndex);
 
-    //Update cameras
+    // Update cameras
     for(auto&& cameraIterator : mImpl->cameras)
     {
       cameraIterator->Update(bufferIndex);
     }
 
-    //Process the RenderTasks if renderers exist. This creates the instructions for rendering the next frame.
-    //reset the update buffer index and make sure there is enough room in the instruction container
+    // Process the RenderTasks if renderers exist. This creates the instructions for rendering the next frame.
+    // reset the update buffer index and make sure there is enough room in the instruction container
     if(mImpl->renderersAdded)
     {
       // Calculate how many render tasks we have in total
@@ -1044,6 +1059,7 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
       }
 
       std::size_t numberOfRenderInstructions = 0;
+      mImpl->renderInstructionCapacity       = 0u;
       for(auto&& scene : mImpl->scenes)
       {
         if(scene && scene->root && scene->taskList && scene->scene)
@@ -1063,6 +1079,7 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
                                                                         renderToFboEnabled,
                                                                         isRenderingToFbo);
 
+            mImpl->renderInstructionCapacity += scene->scene->GetRenderInstructions().GetCapacity();
             scene->scene->SetSkipRendering(false);
           }
           else

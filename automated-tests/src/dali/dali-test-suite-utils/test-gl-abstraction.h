@@ -885,6 +885,9 @@ public:
       case GL_ACTIVE_ATTRIBUTE_MAX_LENGTH:
         *params = 100;
         break;
+      case GL_ACTIVE_ATTRIBUTES:
+        *params = static_cast<GLint>(mAttribLocs.size());
+        break;
     }
   }
 

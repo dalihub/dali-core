@@ -734,6 +734,11 @@ void Renderer::ResetDirtyFlag()
   SetUpdated(false);
 }
 
+uint32_t Renderer::GetMemoryPoolCapacity()
+{
+  return gRendererMemoryPool.GetCapacity();
+}
+
 void Renderer::UniformMappingsChanged(const UniformMap& mappings)
 {
   // The mappings are either from PropertyOwner base class, or the Shader

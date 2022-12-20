@@ -177,6 +177,11 @@ public:
    */
   uint32_t GetStride() const;
 
+  /**
+   * Class method to get the total currently allocated size of pixel buffers
+   */
+  static uint32_t GetTotalAllocatedSize();
+
 public:
   /**
    * @brief The constructor.
@@ -190,6 +195,6 @@ public:
 /**
  * @}
  */
-} //namespace Dali
+} // namespace Dali
 
 #endif // DALI_PIXEL_DATA_H

@@ -42,7 +42,6 @@ RenderItem* RenderItem::New()
 RenderItem::RenderItem()
 : mModelMatrix(false),
   mModelViewMatrix(false),
-  mColor(Vector4::ZERO),
   mSize(),
   mRenderer(nullptr),
   mNode(nullptr),
@@ -166,6 +165,11 @@ ClippingBox RenderItem::CalculateViewportSpaceAABB(const Matrix& modelViewMatrix
 void RenderItem::operator delete(void* ptr)
 {
   gRenderItemPool.Free(static_cast<RenderItem*>(ptr));
+}
+
+uint32_t RenderItem::GetMemoryPoolCapacity()
+{
+  return gRenderItemPool.GetCapacity();
 }
 
 } // namespace SceneGraph
