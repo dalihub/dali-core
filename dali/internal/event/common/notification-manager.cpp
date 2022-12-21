@@ -170,25 +170,30 @@ void NotificationManager::ProcessMessages()
   const MessageContainer::Iterator end  = mImpl->eventMessageQueue.End();
   if(iter != end)
   {
-    DALI_TRACE_BEGIN(gTraceFilter, "DALI_PROCESS_NOTIFICATION_MESSAGE");
+    DALI_TRACE_BEGIN(gTraceFilter, "DALI_NOTIFICATION_PROCESS_MESSAGE");
     for(; iter != end; ++iter)
     {
       (*iter)->Process(0u /*ignored*/);
     }
-    DALI_TRACE_END(gTraceFilter, "DALI_PROCESS_NOTIFICATION_MESSAGE");
+    DALI_TRACE_END(gTraceFilter, "DALI_NOTIFICATION_PROCESS_MESSAGE");
   }
   // release the processed messages from event side queue
   mImpl->eventMessageQueue.Clear();
 
   InterfaceContainer::Iterator       iter2 = mImpl->eventInterfaceQueue.Begin();
   const InterfaceContainer::Iterator end2  = mImpl->eventInterfaceQueue.End();
-  for(; iter2 != end2; ++iter2)
+  if(iter2 != end2)
   {
-    CompleteNotificationInterface* interface = *iter2;
-    if(interface)
+    DALI_TRACE_BEGIN(gTraceFilter, "DALI_NOTIFICATION_NOTIFY_COMPLETED");
+    for(; iter2 != end2; ++iter2)
     {
-      interface->NotifyCompleted();
+      CompleteNotificationInterface* interface = *iter2;
+      if(interface)
+      {
+        interface->NotifyCompleted();
+      }
     }
+    DALI_TRACE_END(gTraceFilter, "DALI_NOTIFICATION_NOTIFY_COMPLETED");
   }
   // just clear the container, we dont own the objects
   mImpl->eventInterfaceQueue.Clear();
