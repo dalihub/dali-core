@@ -289,10 +289,9 @@ void Texture::Upload(PixelDataPtr pixelData, const Internal::Texture::UploadPara
 
   Graphics::TextureUpdateInfo info{};
 
-  const uint32_t bytePerPixel = Pixel::GetBytesPerPixel(pixelData->GetPixelFormat());
-  const uint32_t srcStride    = pixelData->GetStride();
-  uint32_t       srcOffset    = 0u;
-  uint32_t       srcSize      = pixelData->GetBufferSize();
+  const uint32_t srcStride = pixelData->GetStride();
+  uint32_t       srcOffset = 0u;
+  uint32_t       srcSize   = pixelData->GetBufferSize();
 
   const bool requiredSubPixelData = (!Pixel::IsCompressed(pixelData->GetPixelFormat())) &&
                                     ((params.dataXOffset != 0) ||
@@ -323,6 +322,7 @@ void Texture::Upload(PixelDataPtr pixelData, const Internal::Texture::UploadPara
      * srcOffset = A).offsetByte;
      * srcSize = ( C).offsetByte - A).offsetByte );
      */
+    const uint32_t bytePerPixel    = Pixel::GetBytesPerPixel(pixelData->GetPixelFormat());
     const uint32_t dataStrideByte  = (srcStride ? srcStride : static_cast<uint32_t>(params.dataWidth)) * bytePerPixel;
     const uint32_t dataXOffsetByte = params.dataXOffset * bytePerPixel;
     const uint32_t dataWidthByte   = static_cast<uint32_t>(params.dataWidth) * bytePerPixel;
