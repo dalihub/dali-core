@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ACTOR_RELAYOUTER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ struct ActorSizer::Relayouter
   float GetMaximumSize(Dimension::Type dimension) const;
 
   /// @copydoc Actor::SetResizePolicy
-  void SetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension, Vector3& targetSize);
+  void SetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension, Vector3& targetSize, bool& targetSizeDirtyFlag);
 
   /// @copydoc Actor::GetRelayoutDependentOnDimension
   bool GetRelayoutDependentOnDimension(Dimension::Type dimension, Dimension::Type dependency);

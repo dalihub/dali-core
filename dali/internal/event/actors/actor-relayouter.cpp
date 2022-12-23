@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -221,7 +221,7 @@ float ActorSizer::Relayouter::GetMaximumSize(Dimension::Type dimension) const
   return FLT_MAX; // Default
 }
 
-void ActorSizer::Relayouter::SetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension, Vector3& targetSize)
+void ActorSizer::Relayouter::SetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension, Vector3& targetSize, bool& targetSizeDirtyFlag)
 {
   ResizePolicy::Type originalWidthPolicy  = GetResizePolicy(Dimension::WIDTH);
   ResizePolicy::Type originalHeightPolicy = GetResizePolicy(Dimension::HEIGHT);
@@ -270,7 +270,8 @@ void ActorSizer::Relayouter::SetResizePolicy(ResizePolicy::Type policy, Dimensio
     }
     else if(originalWidthPolicy == ResizePolicy::FIXED && policy != ResizePolicy::FIXED)
     {
-      targetSize.width = preferredSize.width;
+      targetSize.width    = preferredSize.width;
+      targetSizeDirtyFlag = true;
     }
   }
 
@@ -282,7 +283,8 @@ void ActorSizer::Relayouter::SetResizePolicy(ResizePolicy::Type policy, Dimensio
     }
     else if(originalHeightPolicy == ResizePolicy::FIXED && policy != ResizePolicy::FIXED)
     {
-      targetSize.height = preferredSize.height;
+      targetSize.height   = preferredSize.height;
+      targetSizeDirtyFlag = true;
     }
   }
 }

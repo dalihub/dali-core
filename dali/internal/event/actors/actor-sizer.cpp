@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,6 +78,7 @@ ActorSizer::ActorSizer(Internal::Actor& owner)
   mTargetSize(Vector3::ZERO),
   mAnimatedSize(Vector3::ZERO),
   mUseAnimatedSize(AnimatedSizeFlag::CLEAR),
+  mTargetSizeDirtyFlag(false),
   mInsideOnSizeSet(false)
 {
 }
@@ -117,29 +118,10 @@ void ActorSizer::SetSizeInternal(const Vector3& size)
   // dont allow recursive loop
   DALI_ASSERT_ALWAYS(!mInsideOnSizeSet && "Cannot call SetSize from OnSizeSet");
   // check that we have a node AND the new size width, height or depth is at least a little bit different from the old one
-  bool changeTargetSize = false;
-
-  if((fabsf(mTargetSize.width - size.width) > Math::MACHINE_EPSILON_1) ||
-     (fabsf(mTargetSize.height - size.height) > Math::MACHINE_EPSILON_1) ||
-     (fabsf(mTargetSize.depth - size.depth) > Math::MACHINE_EPSILON_1))
+  if(mTargetSize != size || mTargetSizeDirtyFlag)
   {
-    changeTargetSize = true;
-  }
-  else
-  {
-    // Check if currentSize it difference with target size.
-    Vector3 currentSize = mOwner.GetCurrentSize();
-    if((fabsf(mTargetSize.width - currentSize.width) > Math::MACHINE_EPSILON_1) ||
-       (fabsf(mTargetSize.height - currentSize.height) > Math::MACHINE_EPSILON_1) ||
-       (fabsf(mTargetSize.depth - currentSize.depth) > Math::MACHINE_EPSILON_1))
-    {
-      changeTargetSize = true;
-    }
-  }
-
-  if(changeTargetSize)
-  {
-    mTargetSize = size;
+    mTargetSizeDirtyFlag = false;
+    mTargetSize          = size;
 
     // Update the preferred size after relayoutting
     // It should be used in the next relayoutting
@@ -261,7 +243,7 @@ Vector3 ActorSizer::GetTargetSize() const
 
 void ActorSizer::SetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension)
 {
-  EnsureRelayouter().SetResizePolicy(policy, dimension, mTargetSize);
+  EnsureRelayouter().SetResizePolicy(policy, dimension, mTargetSize, mTargetSizeDirtyFlag);
   mOwner.OnSetResizePolicy(policy, dimension);
   RelayoutRequest();
 }
