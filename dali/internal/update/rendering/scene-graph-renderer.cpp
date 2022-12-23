@@ -21,7 +21,6 @@
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/common/internal-constants.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
-#include <dali/internal/event/rendering/decorated-visual-renderer-impl.h> // For DecoratedVisualRenderer::AnimatableDecoratedVisualProperties
 #include <dali/internal/render/data-providers/node-data-provider.h>
 #include <dali/internal/render/data-providers/render-data-provider.h>
 #include <dali/internal/render/queue/render-queue.h>
@@ -772,6 +771,8 @@ Vector4 Renderer::GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, 
 {
   if(mVisualProperties)
   {
+    auto& coefficient = mVisualProperties->mCoefficient;
+
     // TODO : We may need to get some method that visual properties changed, without hash.
     // Or, need to call this API in PreRender side.
 
@@ -784,9 +785,9 @@ Vector4 Renderer::GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, 
     hash = mVisualProperties->mTransformAnchorPoint.Hash(updateBufferIndex, hash);
     hash = mVisualProperties->mExtraSize.Hash(updateBufferIndex, hash);
 
-    if(mVisualPropertiesCoefficient.hash != hash)
+    if(coefficient.hash != hash)
     {
-      mVisualPropertiesCoefficient.hash = hash;
+      coefficient.hash = hash;
 
       // VisualProperty
       const Vector2 transformOffset         = mVisualProperties->mTransformOffset.Get(updateBufferIndex);
@@ -833,14 +834,14 @@ Vector4 Renderer::GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, 
       //    + transformOffset * transformOffsetSizeMode.xy
       // D = max((1.0 + clamp(borderlineOffset, -1.0, 1.0)) * borderlineWidth, 2.0 * blurRadius)
 
-      mVisualPropertiesCoefficient.coefXA = transformSize * Vector2(1.0f - transformOffsetSizeMode.z, 1.0f - transformOffsetSizeMode.w);
-      mVisualPropertiesCoefficient.coefXB = mVisualPropertiesCoefficient.coefXA * transformAnchorPoint + transformOffset * Vector2(1.0f - transformOffsetSizeMode.x, 1.0f - transformOffsetSizeMode.y) + transformOrigin;
-      mVisualPropertiesCoefficient.coefCA = transformSize * Vector2(transformOffsetSizeMode.z, transformOffsetSizeMode.w) + extraSize;
-      mVisualPropertiesCoefficient.coefCB = mVisualPropertiesCoefficient.coefCA * transformAnchorPoint + transformOffset * Vector2(transformOffsetSizeMode.x, transformOffsetSizeMode.y);
+      coefficient.coefXA = transformSize * Vector2(1.0f - transformOffsetSizeMode.z, 1.0f - transformOffsetSizeMode.w);
+      coefficient.coefXB = coefficient.coefXA * transformAnchorPoint + transformOffset * Vector2(1.0f - transformOffsetSizeMode.x, 1.0f - transformOffsetSizeMode.y) + transformOrigin;
+      coefficient.coefCA = transformSize * Vector2(transformOffsetSizeMode.z, transformOffsetSizeMode.w) + extraSize;
+      coefficient.coefCB = coefficient.coefCA * transformAnchorPoint + transformOffset * Vector2(transformOffsetSizeMode.x, transformOffsetSizeMode.y);
     }
     if(mVisualProperties->mExtendedProperties)
     {
-      const auto decoratedVisualProperties = static_cast<DecoratedVisualRenderer::AnimatableDecoratedVisualProperties*>(mVisualProperties->mExtendedProperties);
+      const auto decoratedVisualProperties = static_cast<VisualRenderer::AnimatableDecoratedVisualProperties*>(mVisualProperties->mExtendedProperties);
 
       uint64_t decoratedHash = 0xc70f6907UL;
 
@@ -848,9 +849,9 @@ Vector4 Renderer::GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, 
       decoratedHash = decoratedVisualProperties->mBorderlineOffset.Hash(updateBufferIndex, decoratedHash);
       decoratedHash = decoratedVisualProperties->mBlurRadius.Hash(updateBufferIndex, decoratedHash);
 
-      if(mVisualPropertiesCoefficient.decoratedHash != decoratedHash)
+      if(coefficient.decoratedHash != decoratedHash)
       {
-        mVisualPropertiesCoefficient.decoratedHash = decoratedHash;
+        coefficient.decoratedHash = decoratedHash;
 
         // DecoratedVisualProperty
         const float borderlineWidth  = decoratedVisualProperties->mBorderlineWidth.Get(updateBufferIndex);
@@ -864,7 +865,7 @@ Vector4 Renderer::GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, 
         // D coefficients be used only decoratedVisual.
         // It can be calculated parallely with transform.
 
-        mVisualPropertiesCoefficient.coefD = std::max((1.0f + Dali::Clamp(borderlineOffset, -1.0f, 1.0f)) * borderlineWidth, 2.0f * blurRadius);
+        coefficient.coefD = std::max((1.0f + Dali::Clamp(borderlineOffset, -1.0f, 1.0f)) * borderlineWidth, 2.0f * blurRadius);
       }
     }
 
@@ -889,14 +890,14 @@ Vector4 Renderer::GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, 
     const Vector2 originalXY = Vector2(originalUpdateArea.x, originalUpdateArea.y);
     const Vector2 originalWH = Vector2(originalUpdateArea.z, originalUpdateArea.w);
 
-    const Vector2 basicVertexPosition = mVisualPropertiesCoefficient.coefXB * originalWH + mVisualPropertiesCoefficient.coefCB;
-    const Vector2 scaleVertexPosition = mVisualPropertiesCoefficient.coefXA * originalWH + mVisualPropertiesCoefficient.coefCA;
+    const Vector2 basicVertexPosition = coefficient.coefXB * originalWH + coefficient.coefCB;
+    const Vector2 scaleVertexPosition = coefficient.coefXA * originalWH + coefficient.coefCA;
 
     // TODO : We need to re-generate coefficient to consitder area width/height
     const Vector4 resultArea = Vector4(originalXY.x,
                                        originalXY.y,
-                                       scaleVertexPosition.x + 2.0f * abs(basicVertexPosition.x) + mVisualPropertiesCoefficient.coefD,
-                                       scaleVertexPosition.y + 2.0f * abs(basicVertexPosition.y) + mVisualPropertiesCoefficient.coefD);
+                                       scaleVertexPosition.x + 2.0f * abs(basicVertexPosition.x) + coefficient.coefD,
+                                       scaleVertexPosition.y + 2.0f * abs(basicVertexPosition.y) + coefficient.coefD);
 
     DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "%f %f %f %f--> %f %f %f %f\n", originalUpdateArea.x, originalUpdateArea.y, originalUpdateArea.z, originalUpdateArea.w, resultArea.x, resultArea.y, resultArea.z, resultArea.w);
 

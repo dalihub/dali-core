@@ -21,7 +21,6 @@
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/event/common/event-thread-services.h>
-#include <dali/internal/event/rendering/visual-renderer-impl.h>
 #include <dali/internal/render/data-providers/render-data-provider.h>
 #include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/update/common/animatable-property.h>
@@ -51,6 +50,93 @@ using RendererConstIter = RendererContainer::ConstIterator;
 
 class TextureSet;
 class Geometry;
+
+namespace VisualRenderer
+{
+struct AnimatableVisualProperties
+{
+  AnimatableVisualProperties()
+  : mTransformOffset(Vector2::ZERO),
+    mTransformSize(Vector2::ONE),
+    mTransformOrigin(Vector2::ZERO),
+    mTransformAnchorPoint(Vector2::ZERO),
+    mTransformOffsetSizeMode(Vector4::ZERO),
+    mExtraSize(Vector2::ZERO),
+    mMixColor(Vector3::ONE),
+    mPreMultipliedAlpha(0.0f),
+    mExtendedPropertiesDeleteFunction(nullptr)
+  {
+  }
+
+  ~AnimatableVisualProperties()
+  {
+    if(mExtendedProperties && mExtendedPropertiesDeleteFunction)
+    {
+      mExtendedPropertiesDeleteFunction(mExtendedProperties);
+    }
+  }
+
+  /**
+   * @brief Cached coefficient value when we calculate visual transformed update size.
+   * It can reduce complexity of calculate the vertex position.
+   *
+   * Vector2 vertexPosition = (XA * aPosition + XB) * originalSize + (CA * aPosition + CB) + Vector2(D, D) * aPosition
+   */
+  struct VisualTransformedUpdateSizeCoefficientCache
+  {
+    Vector2 coefXA{Vector2::ZERO};
+    Vector2 coefXB{Vector2::ZERO};
+    Vector2 coefCA{Vector2::ZERO};
+    Vector2 coefCB{Vector2::ZERO};
+    float   coefD{0.0f};
+
+    uint64_t hash{0u};
+    uint64_t decoratedHash{0u};
+  };
+  VisualTransformedUpdateSizeCoefficientCache mCoefficient; ///< Coefficient value to calculate visual transformed update size by VisualProperties more faster.
+
+  AnimatableProperty<Vector2> mTransformOffset;
+  AnimatableProperty<Vector2> mTransformSize;
+  AnimatableProperty<Vector2> mTransformOrigin;
+  AnimatableProperty<Vector2> mTransformAnchorPoint;
+  AnimatableProperty<Vector4> mTransformOffsetSizeMode;
+  AnimatableProperty<Vector2> mExtraSize;
+  AnimatableProperty<Vector3> mMixColor;
+  AnimatableProperty<float>   mPreMultipliedAlpha;
+
+  void* mExtendedProperties{nullptr};                        // Enable derived class to extend properties further
+  void (*mExtendedPropertiesDeleteFunction)(void*){nullptr}; // Derived class's custom delete functor
+};
+
+struct AnimatableDecoratedVisualProperties
+{
+  AnimatableDecoratedVisualProperties()
+  : mCornerRadius(Vector4::ZERO),
+    mCornerRadiusPolicy(1.0f),
+    mBorderlineWidth(0.0f),
+    mBorderlineColor(Color::BLACK),
+    mBorderlineOffset(0.0f),
+    mBlurRadius(0.0f)
+  {
+  }
+  ~AnimatableDecoratedVisualProperties()
+  {
+  }
+
+  // Delete function of AnimatableDecoratedVisualProperties* converted as void*
+  static void DeleteFunction(void* data)
+  {
+    delete static_cast<AnimatableDecoratedVisualProperties*>(data);
+  }
+
+  AnimatableProperty<Vector4> mCornerRadius;
+  AnimatableProperty<float>   mCornerRadiusPolicy;
+  AnimatableProperty<float>   mBorderlineWidth;
+  AnimatableProperty<Vector4> mBorderlineColor;
+  AnimatableProperty<float>   mBorderlineOffset;
+  AnimatableProperty<float>   mBlurRadius;
+};
+} // namespace VisualRenderer
 
 class Renderer : public PropertyOwner,
                  public UniformMapDataProvider,
@@ -463,7 +549,7 @@ public: // For VisualProperties
   /**
    * To be used only for 1st stage initialization in event thread.
    */
-  void SetVisualProperties(Internal::VisualRenderer::AnimatableVisualProperties* visualProperties)
+  void SetVisualProperties(VisualRenderer::AnimatableVisualProperties* visualProperties)
   {
     mVisualProperties = visualProperties;
   }
@@ -471,7 +557,7 @@ public: // For VisualProperties
   /**
    * May be accessed from event thread
    */
-  const Internal::VisualRenderer::AnimatableVisualProperties* GetVisualProperties() const
+  const VisualRenderer::AnimatableVisualProperties* GetVisualProperties() const
   {
     return mVisualProperties.Get();
   }
@@ -525,25 +611,6 @@ private:
 
   std::vector<Dali::DevelRenderer::DrawCommand> mDrawCommands;
   Dali::RenderCallback*                         mRenderCallback{nullptr};
-
-  /**
-   * @brief Cached coefficient value when we calculate visual transformed update size.
-   * It can reduce complexity of calculate the vertex position.
-   *
-   * Vector2 vertexPosition = (XA * aPosition + XB) * originalSize + (CA * aPosition + CB) + Vector2(D, D) * aPosition
-   */
-  struct VisualTransformedUpdateSizeCoefficientCache
-  {
-    Vector2 coefXA{Vector2::ZERO};
-    Vector2 coefXB{Vector2::ZERO};
-    Vector2 coefCA{Vector2::ZERO};
-    Vector2 coefCB{Vector2::ZERO};
-    float   coefD{0.0f};
-
-    uint64_t hash{0u};
-    uint64_t decoratedHash{0u};
-  };
-  VisualTransformedUpdateSizeCoefficientCache mVisualPropertiesCoefficient; ///< Coefficient value to calculate visual transformed update size by VisualProperties more faster.
 
 public:
   AnimatableProperty<float> mOpacity;    ///< The opacity value
