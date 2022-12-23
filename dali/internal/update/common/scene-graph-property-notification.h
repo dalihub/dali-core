@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_PROPERTY_NOTIFICATION_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/common/owner-container.h>
 #include <dali/internal/event/common/property-notification-impl.h>
 #include <dali/internal/update/common/property-base.h>
 #include <dali/public-api/object/property-notification.h>
@@ -35,10 +34,7 @@ namespace SceneGraph
 {
 class PropertyNotification;
 
-using PropertyNotificationContainer = OwnerContainer<PropertyNotification*>;
-using PropertyNotificationIter      = PropertyNotificationContainer::Iterator;
-using PropertyNotificationConstIter = PropertyNotificationContainer::ConstIterator;
-using ConditionFunction             = bool (*)(const Dali::PropertyInput&, Dali::Internal::PropertyNotification::RawArgumentContainer&);
+using ConditionFunction = bool (*)(const Dali::PropertyInput&, Dali::Internal::PropertyNotification::RawArgumentContainer&);
 
 /**
  * PropertyNotifications are used to inspect properties of scene graph objects, as part of a scene

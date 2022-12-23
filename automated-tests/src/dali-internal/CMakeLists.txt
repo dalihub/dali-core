@@ -19,6 +19,7 @@ SET(TC_SOURCES
         utc-Dali-Internal-LongPressGesture.cpp
         utc-Dali-Internal-MatrixUtils.cpp
         utc-Dali-Internal-MemoryPoolObjectAllocator.cpp
+        utc-Dali-Internal-OrderedSet.cpp
         utc-Dali-Internal-OwnerPointer.cpp
         utc-Dali-Internal-PinchGesture.cpp
         utc-Dali-Internal-PinchGestureProcessor.cpp
