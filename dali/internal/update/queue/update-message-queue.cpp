@@ -243,17 +243,27 @@ bool MessageQueue::ProcessMessages(BufferIndex updateBufferIndex)
 {
   PERF_MONITOR_START(PerformanceMonitor::PROCESS_MESSAGES);
 
-  // queueMutex must be locked whilst accessing queue
-  MessageQueueMutex::ScopedLock lock(mImpl->queueMutex);
-
-  const MessageBufferIter processQueueEndIter = mImpl->processQueue.end();
-  for(MessageBufferIter iter = mImpl->processQueue.begin(); iter != processQueueEndIter; ++iter)
+  MessageBufferQueue copiedProcessQueue;
+  bool               sceneUpdated = false;
   {
-    MessageBuffer* buffer = *iter;
+    // queueMutex must be locked whilst accessing queue
+    MessageQueueMutex::ScopedLock lock(mImpl->queueMutex);
+    copiedProcessQueue = mImpl->processQueue;
 
-    for(MessageBuffer::Iterator iter = buffer->Begin(); iter.IsValid(); iter.Next())
+    mImpl->sceneUpdate >>= 1;
+
+    sceneUpdated = (mImpl->sceneUpdate & 0x01); // if it was previously 2, scene graph was updated.
+
+    mImpl->queueWasEmpty = mImpl->processQueue.empty(); // Flag whether we processed anything
+
+    mImpl->processQueue.clear();
+  }
+
+  for(auto&& buffer : copiedProcessQueue)
+  {
+    for(MessageBuffer::Iterator bufferIter = buffer->Begin(); bufferIter.IsValid(); bufferIter.Next())
     {
-      MessageBase* message = reinterpret_cast<MessageBase*>(iter.Get());
+      MessageBase* message = reinterpret_cast<MessageBase*>(bufferIter.Get());
 
       message->Process(updateBufferIndex);
 
@@ -261,20 +271,19 @@ bool MessageQueue::ProcessMessages(BufferIndex updateBufferIndex)
       message->~MessageBase();
     }
     buffer->Reset();
-
-    // Pass back for use in the event-thread
-    mImpl->recycleQueue.push_back(buffer);
   }
 
-  mImpl->sceneUpdate >>= 1;
-
-  mImpl->queueWasEmpty = mImpl->processQueue.empty(); // Flag whether we processed anything
-
-  mImpl->processQueue.clear();
+  // Pass back for use in the event-thread
+  {
+    MessageQueueMutex::ScopedLock lock(mImpl->queueMutex);
+    mImpl->recycleQueue.insert(mImpl->recycleQueue.end(),
+                               std::make_move_iterator(copiedProcessQueue.begin()),
+                               std::make_move_iterator(copiedProcessQueue.end()));
+  }
 
   PERF_MONITOR_END(PerformanceMonitor::PROCESS_MESSAGES);
 
-  return (mImpl->sceneUpdate & 0x01); // if it was previously 2, scene graph was updated.
+  return sceneUpdated;
 }
 
 bool MessageQueue::WasEmpty() const
