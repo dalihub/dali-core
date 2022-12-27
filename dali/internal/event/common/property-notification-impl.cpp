@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -207,8 +207,10 @@ void PropertyNotification::CreateSceneObject()
   // this method can be called from constructor and on stage connection
   if(!mPropertyNotification)
   {
+    const PropertyInputImpl* property = mObject->GetSceneObjectInputProperty(mObjectPropertyIndex);
+
     // Create a new PropertyNotification, keep a const pointer to it
-    mPropertyNotification = SceneGraph::PropertyNotification::New(*mObject,
+    mPropertyNotification = SceneGraph::PropertyNotification::New(property,
                                                                   mObjectPropertyIndex,
                                                                   mPropertyType,
                                                                   mComponentIndex,

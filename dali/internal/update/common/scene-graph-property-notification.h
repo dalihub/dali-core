@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_PROPERTY_NOTIFICATION_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,8 +54,8 @@ public:
 
   /**
    * Construct a new PropertyNotification
-   * @param[in] object The event-object for a scene-graph object to inspect.
-   * @param[in] propertyIndex The index of a property provided by the object.
+   * @param[in] property The scene graph property to inspect.
+   * @param[in] propertyIndex The index of a property to insprect.
    * @param[in] propertyType The type of property we're inspecting.
    * @param[in] componentIndex Index to the component of a complex property such as a Vector
    * @param[in] condition The condition type (e.g. LessThan, GreaterThan...)
@@ -64,14 +64,14 @@ public:
    * @param[in] compare The flag of comparing the previous and current data.
    * @return A new PropertyNotification object.
    */
-  static PropertyNotification* New(Object&               object,
-                                   Property::Index       propertyIndex,
-                                   Property::Type        propertyType,
-                                   int                   componentIndex,
-                                   ConditionType         condition,
-                                   RawArgumentContainer& arguments,
-                                   NotifyMode            notifyMode,
-                                   bool                  compare);
+  static PropertyNotification* New(const PropertyInputImpl* property,
+                                   Property::Index          propertyIndex,
+                                   Property::Type           propertyType,
+                                   int                      componentIndex,
+                                   ConditionType            condition,
+                                   RawArgumentContainer&    arguments,
+                                   NotifyMode               notifyMode,
+                                   bool                     compare);
 
   /**
    * Virtual destructor
@@ -104,22 +104,22 @@ public:
 protected:
   /**
    * Construct the PropertyNotification
-   * @param[in] object The event-object for a scene-graph object to inspect.
-   * @param[in] propertyIndex The index of a property provided by the object.
+   * @param[in] property The scene graph property to inspect.
+   * @param[in] propertyIndex The index of a property to inspect.
    * @param[in] propertyType The type of property we're inspecting.
    * @param[in] componentIndex Index to the component of a complex property such as a Vector
    * @param[in] condition The condition type (e.g. LessThan, GreaterThan...)
    * @param[in] arguments The arguments which accompany the condition.
    * @param[in] notifyMode The notification mode setting
    */
-  PropertyNotification(Object&               object,
-                       Property::Index       propertyIndex,
-                       Property::Type        propertyType,
-                       int                   componentIndex,
-                       ConditionType         condition,
-                       RawArgumentContainer& arguments,
-                       NotifyMode            notifyMode,
-                       bool                  compare);
+  PropertyNotification(const PropertyInputImpl* property,
+                       Property::Index          propertyIndex,
+                       Property::Type           propertyType,
+                       int                      componentIndex,
+                       ConditionType            condition,
+                       RawArgumentContainer&    arguments,
+                       NotifyMode               notifyMode,
+                       bool                     compare);
 
 private:
   /**
@@ -137,7 +137,6 @@ private:
   PropertyNotification& operator=(const PropertyNotification& rhs);
 
 protected:
-  Object*                  mObject;            ///< Not owned by the property notification. Valid until ObjectDestroyed() is called.
   Property::Index          mPropertyIndex;     ///< The index of this property.
   Property::Type           mPropertyType;      ///< The type of property this is.
   const PropertyInputImpl* mProperty;          ///< The scene graph property

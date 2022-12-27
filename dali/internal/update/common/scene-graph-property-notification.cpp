@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,30 +30,29 @@ namespace Internal
 {
 namespace SceneGraph
 {
-PropertyNotification* PropertyNotification::New(Object&               object,
-                                                Property::Index       propertyIndex,
-                                                Property::Type        propertyType,
-                                                int                   componentIndex,
-                                                ConditionType         condition,
-                                                RawArgumentContainer& arguments,
-                                                NotifyMode            notifyMode,
-                                                bool                  compare)
+PropertyNotification* PropertyNotification::New(const PropertyInputImpl* property,
+                                                Property::Index          propertyIndex,
+                                                Property::Type           propertyType,
+                                                int                      componentIndex,
+                                                ConditionType            condition,
+                                                RawArgumentContainer&    arguments,
+                                                NotifyMode               notifyMode,
+                                                bool                     compare)
 {
-  return new PropertyNotification(object, propertyIndex, propertyType, componentIndex, condition, arguments, notifyMode, compare);
+  return new PropertyNotification(property, propertyIndex, propertyType, componentIndex, condition, arguments, notifyMode, compare);
 }
 
-PropertyNotification::PropertyNotification(Object&               object,
-                                           Property::Index       propertyIndex,
-                                           Property::Type        propertyType,
-                                           int                   componentIndex,
-                                           ConditionType         condition,
-                                           RawArgumentContainer& arguments,
-                                           NotifyMode            notifyMode,
-                                           bool                  compare)
-: mObject(&object),
-  mPropertyIndex(propertyIndex),
+PropertyNotification::PropertyNotification(const PropertyInputImpl* property,
+                                           Property::Index          propertyIndex,
+                                           Property::Type           propertyType,
+                                           int                      componentIndex,
+                                           ConditionType            condition,
+                                           RawArgumentContainer&    arguments,
+                                           NotifyMode               notifyMode,
+                                           bool                     compare)
+: mPropertyIndex(propertyIndex),
   mPropertyType(propertyType),
-  mProperty(nullptr),
+  mProperty(property),
   mComponentIndex(componentIndex),
   mConditionType(condition),
   mArguments(arguments),
@@ -107,14 +106,6 @@ PropertyNotification::PropertyNotification(Object&               object,
       mConditionFunction = PropertyNotification::EvalFalse;
       break;
     }
-  }
-
-  mProperty                  = mObject->GetSceneObjectInputProperty(mPropertyIndex);
-  int internalComponentIndex = mObject->GetPropertyComponentIndex(mPropertyIndex);
-  if(internalComponentIndex != Property::INVALID_COMPONENT_INDEX)
-  {
-    // override the one passed in
-    mComponentIndex = internalComponentIndex;
   }
 }
 
