@@ -17,6 +17,10 @@
  * limitations under the License.
  */
 
+// EXTERNAL INCLUDE
+#include <cstddef>
+#include <unordered_map>
+
 // INTERNAL INCLUDES
 #include <dali/graphics-api/graphics-controller.h>
 #include <dali/integration-api/core.h>
@@ -27,6 +31,7 @@
 #include <dali/internal/render/renderers/render-renderer.h> // RendererKey
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/math/compile-time-math.h>
 
 namespace Dali
 {
@@ -37,39 +42,59 @@ namespace SceneGraph
 class RenderInstructionContainer;
 class Node;
 
-struct DirtyRect
+struct DirtyRectKey
 {
-  DirtyRect(Node* node, Render::RendererKey renderer, Rect<int>& rect)
+  DirtyRectKey(Node* node, Render::RendererKey renderer)
   : node(node),
-    renderer(renderer),
-    rect(rect),
+    renderer(renderer)
+  {
+  }
+
+  DirtyRectKey() = default;
+
+  bool operator==(const DirtyRectKey& rhs) const
+  {
+    return node == rhs.node && renderer == rhs.renderer;
+  }
+
+  struct DirtyRectKeyHash
+  {
+    // Reference by : https://stackoverflow.com/a/21062236
+    std::size_t operator()(DirtyRectKey const& key) const noexcept
+    {
+      constexpr std::size_t nodeShift     = Dali::Log<1 + sizeof(Node)>::value;
+      constexpr std::size_t rendererShift = Dali::Log<1 + sizeof(Render::Renderer)>::value;
+
+      constexpr std::size_t zitterShift = sizeof(std::size_t) * 4; // zitter shift to avoid hash collision
+
+      return ((reinterpret_cast<std::size_t>(key.node) >> nodeShift) << zitterShift) ^
+             (key.renderer.Value() >> rendererShift);
+    }
+  };
+
+  Node*               node{nullptr};
+  Render::RendererKey renderer{};
+};
+
+struct DirtyRectValue
+{
+  DirtyRectValue(Rect<int>& rect)
+  : rect(rect),
     visited(true)
   {
   }
 
-  DirtyRect() = default;
+  DirtyRectValue() = default;
 
-  bool operator<(const DirtyRect& rhs) const
-  {
-    if(node == rhs.node)
-    {
-      return renderer.Value() < rhs.renderer.Value();
-    }
-    else
-    {
-      return node < rhs.node;
-    }
-  }
-
-  Node*               node{nullptr};
-  Render::RendererKey renderer{};
-  Rect<int32_t>       rect{};
-  bool                visited{true};
+  Rect<int32_t> rect{};
+  bool          visited{true};
 };
 
 class Scene
 {
 public:
+  using ItemsDirtyRectsContainer = std::unordered_map<DirtyRectKey, DirtyRectValue, DirtyRectKey::DirtyRectKeyHash>;
+
   /**
    * Constructor
    * @param[in] surface The render surface
@@ -276,7 +301,7 @@ public:
    *
    * @return the ItemsDirtyRects
    */
-  std::vector<DirtyRect>& GetItemsDirtyRects();
+  ItemsDirtyRectsContainer& GetItemsDirtyRects();
 
 private:
   // Render instructions describe what should be rendered during RenderManager::RenderScene()
@@ -312,8 +337,8 @@ private:
 
   SceneGraph::Layer* mRoot{nullptr}; ///< Root node
 
-  std::vector<Graphics::ClearValue>                  mClearValues{};     ///< Clear colors
-  std::vector<Dali::Internal::SceneGraph::DirtyRect> mItemsDirtyRects{}; ///< Dirty rect list
+  std::vector<Graphics::ClearValue> mClearValues{};     ///< Clear colors
+  ItemsDirtyRectsContainer          mItemsDirtyRects{}; ///< Dirty rect list
 };
 
 /// Messages

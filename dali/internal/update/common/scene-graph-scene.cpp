@@ -176,7 +176,7 @@ bool Scene::IsSurfaceRectChanged()
 void Scene::SetSurfaceOrientations(int32_t windowOrientation, int32_t screenOrienation)
 {
   mSurfaceOrientation = windowOrientation;
-  mScreenOrientation = screenOrienation;
+  mScreenOrientation  = screenOrienation;
 
   if(mRoot)
   {
@@ -208,7 +208,7 @@ bool Scene::IsRotationCompletedAcknowledgementSet()
   return setRotationCompletedAcknowledgement;
 }
 
-std::vector<DirtyRect>& Scene::GetItemsDirtyRects()
+Scene::ItemsDirtyRectsContainer& Scene::GetItemsDirtyRects()
 {
   return mItemsDirtyRects;
 }
