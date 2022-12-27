@@ -1481,7 +1481,7 @@ void Actor::SetParent(ActorParent* parent, bool notify)
     Actor* parentActor = static_cast<Actor*>(parent);
     mScene             = parentActor->mScene;
 
-    if(EventThreadServices::IsCoreRunning() && // Don't emit signals or send messages during Core destruction
+    if(!EventThreadServices::IsShuttingDown() && // Don't emit signals or send messages during Core destruction
        parentActor->OnScene())
     {
       // Instruct each actor to create a corresponding node in the scene graph
@@ -1497,7 +1497,7 @@ void Actor::SetParent(ActorParent* parent, bool notify)
 
     mParent = nullptr;
 
-    if(EventThreadServices::IsCoreRunning() && // Don't emit signals or send messages during Core destruction
+    if(!EventThreadServices::IsShuttingDown() && // Don't emit signals or send messages during Core destruction
        OnScene())
     {
       // Disconnect the Node & its children from the scene-graph.

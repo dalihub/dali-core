@@ -51,8 +51,9 @@ namespace Internal
 {
 namespace
 {
-thread_local ThreadLocalStorage* threadLocal = nullptr;
-}
+thread_local ThreadLocalStorage* threadLocal    = nullptr;
+thread_local bool                isShuttingDown = false;
+} // namespace
 
 ThreadLocalStorage::ThreadLocalStorage(Core* core)
 : mCore(core)
@@ -66,7 +67,8 @@ ThreadLocalStorage::~ThreadLocalStorage() = default;
 
 void ThreadLocalStorage::Remove()
 {
-  threadLocal = nullptr;
+  threadLocal    = nullptr;
+  isShuttingDown = true;
 }
 
 ThreadLocalStorage& ThreadLocalStorage::Get()
@@ -90,6 +92,11 @@ bool ThreadLocalStorage::Created()
 {
   // see if the TLS has been set yet
   return (threadLocal != nullptr);
+}
+
+bool ThreadLocalStorage::IsSuttingDown()
+{
+  return isShuttingDown;
 }
 
 ThreadLocalStorage* ThreadLocalStorage::GetInternal()

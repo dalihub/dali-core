@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_EVENT_THREAD_SERVICES_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,6 +118,13 @@ public:
    * @return true if core is still running and we can send messages
    */
   static bool IsCoreRunning();
+
+  /**
+   * @brief Check if the event thread service is shutting down.
+   *
+   * @return true if the event thread service is shutting down.
+   */
+  static bool IsShuttingDown();
 };
 
 } // namespace Internal
