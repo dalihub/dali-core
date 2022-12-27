@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_THREAD_LOCAL_STORAGE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,6 +88,13 @@ public:
    * @return if the TLS has been created
    */
   static bool Created();
+
+  /**
+   * Checks if the system is shutting down
+   * @return true if the system is shutting down
+   * @note It returns false if the core hasn't been initialised yet.
+   */
+  static bool IsShuttingDown();
 
   /**
    * Get a pointer to the TLS or NULL if not initialized
