@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_NODE_DECLARATIONS_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,13 +43,13 @@ using NodeConstIter = NodeContainer::ConstIterator;
 enum class NodePropertyFlags : uint8_t
 // 8 bits is enough for 5 flags (compiler will check it)
 {
-  NOTHING       = 0x000,
-  TRANSFORM     = 0x001,
-  VISIBLE       = 0x002,
-  COLOR         = 0x004,
-  CHILD_DELETED = 0x008,
-  DEPTH_INDEX   = 0x010,
-  ALL           = (DEPTH_INDEX << 1) - 1 // all the flags
+  NOTHING          = 0x000,
+  TRANSFORM        = 0x001,
+  VISIBLE          = 0x002,
+  COLOR            = 0x004,
+  CHILD_DELETED    = 0x008,
+  CHILDREN_REORDER = 0x010,
+  ALL              = (CHILDREN_REORDER << 1) - 1 // all the flags
 };
 
 struct NodeDepthPair
