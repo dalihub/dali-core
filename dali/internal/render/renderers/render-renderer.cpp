@@ -426,13 +426,18 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
   // Check if there is render callback
   if(mRenderCallback)
   {
+    if(!mRenderCallbackInput)
+    {
+      mRenderCallbackInput = std::unique_ptr<RenderCallbackInput>(new RenderCallbackInput);
+    }
+
     Graphics::DrawNativeInfo info{};
     info.api      = Graphics::DrawNativeAPI::GLES;
     info.callback = &static_cast<Dali::CallbackBase&>(*mRenderCallback);
-    info.userData = &mRenderCallbackInput;
+    info.userData = mRenderCallbackInput.get();
 
     // Set storage for the context to be used
-    info.glesNativeInfo.eglSharedContextStoragePointer = &mRenderCallbackInput.eglContext;
+    info.glesNativeInfo.eglSharedContextStoragePointer = &mRenderCallbackInput->eglContext;
     info.reserved                                      = nullptr;
 
     auto& textureResources = mRenderCallback->GetTextureResources();
@@ -440,7 +445,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
     if(!textureResources.empty())
     {
       mRenderCallbackTextureBindings.clear();
-      mRenderCallbackInput.textureBindings.resize(textureResources.size());
+      mRenderCallbackInput->textureBindings.resize(textureResources.size());
       auto i = 0u;
       for(auto& texture : textureResources)
       {
@@ -450,17 +455,17 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
         auto properties = mGraphicsController->GetTextureProperties(*graphicsTexture);
 
         mRenderCallbackTextureBindings.emplace_back(graphicsTexture);
-        mRenderCallbackInput.textureBindings[i++] = properties.nativeHandle;
+        mRenderCallbackInput->textureBindings[i++] = properties.nativeHandle;
       }
       info.textureCount = mRenderCallbackTextureBindings.size();
       info.textureList  = mRenderCallbackTextureBindings.data();
     }
 
     // pass render callback input
-    mRenderCallbackInput.size       = size;
-    mRenderCallbackInput.projection = projectionMatrix;
+    mRenderCallbackInput->size       = size;
+    mRenderCallbackInput->projection = projectionMatrix;
 
-    MatrixUtils::Multiply(mRenderCallbackInput.mvp, modelViewMatrix, projectionMatrix);
+    MatrixUtils::Multiply(mRenderCallbackInput->mvp, modelViewMatrix, projectionMatrix);
 
     // submit draw
     commandBuffer.DrawNative(&info);
