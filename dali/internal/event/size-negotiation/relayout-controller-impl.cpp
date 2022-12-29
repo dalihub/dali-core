@@ -439,7 +439,7 @@ void RelayoutController::Relayout()
     // 2. Iterate through the stack until it's empty.
     if(mRelayoutStack->Size() > 0)
     {
-      DALI_TRACE_BEGIN(gTraceFilter, "DALI_RELAYOUT");
+      DALI_TRACE_SCOPE(gTraceFilter, "DALI_RELAYOUT");
       PRINT_HIERARCHY;
 
       while(mRelayoutStack->Size() > 0)
@@ -464,7 +464,6 @@ void RelayoutController::Relayout()
       mRelayoutInfoAllocator.ResetMemoryPool();
 
       PRINT_HIERARCHY;
-      DALI_TRACE_END(gTraceFilter, "DALI_RELAYOUT");
     }
 
     mPerformingRelayout = false;
