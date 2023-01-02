@@ -68,7 +68,7 @@ VisualRendererPtr VisualRenderer::New()
   // create scene object first so it's guaranteed to exist for the event side
   auto sceneObject = SceneGraph::Renderer::New();
 
-  sceneObject->SetVisualProperties(new AnimatableVisualProperties());
+  sceneObject->SetVisualProperties(new SceneGraph::VisualRenderer::AnimatableVisualProperties());
 
   OwnerPointer<SceneGraph::Renderer> transferOwnership(sceneObject);
   // pass the pointer to base for message passing

@@ -145,43 +145,6 @@ public:
     float   mBlurRadius{0.0f};
   };
 
-  struct AnimatableDecoratedVisualProperties
-  {
-    AnimatableDecoratedVisualProperties()
-    : mCornerRadius(Vector4::ZERO),
-      mCornerRadiusPolicy(1.0f),
-      mBorderlineWidth(0.0f),
-      mBorderlineColor(Color::BLACK),
-      mBorderlineOffset(0.0f),
-      mBlurRadius(0.0f),
-      mExtendedPropertiesDeleteFunction(nullptr)
-    {
-    }
-    ~AnimatableDecoratedVisualProperties()
-    {
-      if(mExtendedProperties && mExtendedPropertiesDeleteFunction)
-      {
-        mExtendedPropertiesDeleteFunction(mExtendedProperties);
-      }
-    }
-
-    // Delete function of AnimatableDecoratedVisualProperties* converted as void*
-    constexpr static void DeleteFunction(void* data)
-    {
-      delete static_cast<AnimatableDecoratedVisualProperties*>(data);
-    }
-
-    SceneGraph::AnimatableProperty<Vector4> mCornerRadius;
-    SceneGraph::AnimatableProperty<float>   mCornerRadiusPolicy;
-    SceneGraph::AnimatableProperty<float>   mBorderlineWidth;
-    SceneGraph::AnimatableProperty<Vector4> mBorderlineColor;
-    SceneGraph::AnimatableProperty<float>   mBorderlineOffset;
-    SceneGraph::AnimatableProperty<float>   mBlurRadius;
-
-    void* mExtendedProperties{nullptr};                        // Enable derived class to extend properties further
-    void (*mExtendedPropertiesDeleteFunction)(void*){nullptr}; // Derived class's custom delete functor
-  };
-
 private:
   DecoratedVisualPropertyCache mDecoratedPropertyCache;
 
