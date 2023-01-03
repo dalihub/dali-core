@@ -20,8 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/rendering/renderer-impl.h> // Dali::Internal::Renderer
-#include <dali/internal/update/common/animatable-property.h>
-#include <dali/public-api/rendering/visual-renderer.h> // Dali::VisualRenderer
+#include <dali/public-api/rendering/visual-renderer.h>   // Dali::VisualRenderer
 
 namespace Dali
 {
@@ -127,42 +126,6 @@ public:
     Vector2 mExtraSize{Vector2::ZERO};
     Vector3 mMixColor{Vector3::ONE};
     float   mPreMultipliedAlpha{0.0f};
-  };
-
-  struct AnimatableVisualProperties
-  {
-    AnimatableVisualProperties()
-    : mTransformOffset(Vector2::ZERO),
-      mTransformSize(Vector2::ONE),
-      mTransformOrigin(Vector2::ZERO),
-      mTransformAnchorPoint(Vector2::ZERO),
-      mTransformOffsetSizeMode(Vector4::ZERO),
-      mExtraSize(Vector2::ZERO),
-      mMixColor(Vector3::ONE),
-      mPreMultipliedAlpha(0.0f),
-      mExtendedPropertiesDeleteFunction(nullptr)
-    {
-    }
-
-    ~AnimatableVisualProperties()
-    {
-      if(mExtendedProperties && mExtendedPropertiesDeleteFunction)
-      {
-        mExtendedPropertiesDeleteFunction(mExtendedProperties);
-      }
-    }
-
-    SceneGraph::AnimatableProperty<Vector2> mTransformOffset;
-    SceneGraph::AnimatableProperty<Vector2> mTransformSize;
-    SceneGraph::AnimatableProperty<Vector2> mTransformOrigin;
-    SceneGraph::AnimatableProperty<Vector2> mTransformAnchorPoint;
-    SceneGraph::AnimatableProperty<Vector4> mTransformOffsetSizeMode;
-    SceneGraph::AnimatableProperty<Vector2> mExtraSize;
-    SceneGraph::AnimatableProperty<Vector3> mMixColor;
-    SceneGraph::AnimatableProperty<float>   mPreMultipliedAlpha;
-
-    void* mExtendedProperties{nullptr};                        // Enable derived class to extend properties further
-    void (*mExtendedPropertiesDeleteFunction)(void*){nullptr}; // Derived class's custom delete functor
   };
 
 private:

@@ -375,7 +375,7 @@ void Core::RunProcessors()
 {
   if(mProcessors.Count() != 0)
   {
-    DALI_TRACE_BEGIN(gTraceFilter, "DALI_CORE_RUN_PROCESSORS");
+    DALI_TRACE_SCOPE(gTraceFilter, "DALI_CORE_RUN_PROCESSORS");
 
     // Copy processor pointers to prevent changes to vector affecting loop iterator.
     Dali::Vector<Integration::Processor*> processors(mProcessors);
@@ -403,7 +403,6 @@ void Core::RunProcessors()
         }
       }
     }
-    DALI_TRACE_END(gTraceFilter, "DALI_CORE_RUN_PROCESSORS");
   }
 }
 
@@ -411,7 +410,7 @@ void Core::RunPostProcessors()
 {
   if(mPostProcessors.Count() != 0)
   {
-    DALI_TRACE_BEGIN(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSORS");
+    DALI_TRACE_SCOPE(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSORS");
 
     // Copy processor pointers to prevent changes to vector affecting loop iterator.
     Dali::Vector<Integration::Processor*> processors(mPostProcessors);
@@ -439,7 +438,6 @@ void Core::RunPostProcessors()
         }
       }
     }
-    DALI_TRACE_END(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSORS");
   }
 }
 

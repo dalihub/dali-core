@@ -67,7 +67,7 @@ void FrameCallbackProcessor::Update(BufferIndex bufferIndex, float elapsedSecond
 {
   if(!mFrameCallbacks.empty())
   {
-    DALI_TRACE_BEGIN(gTraceFilter, "DALI_FRAME_CALLBACK_UPDATE");
+    DALI_TRACE_SCOPE(gTraceFilter, "DALI_FRAME_CALLBACK_UPDATE");
 
     // If any of the FrameCallback::Update calls returns false, then they are no longer required & can be removed.
     auto iter = std::remove_if(
@@ -75,8 +75,6 @@ void FrameCallbackProcessor::Update(BufferIndex bufferIndex, float elapsedSecond
         return !frameCallback->Update(bufferIndex, elapsedSeconds, mNodeHierarchyChanged);
       });
     mFrameCallbacks.erase(iter, mFrameCallbacks.end());
-
-    DALI_TRACE_END(gTraceFilter, "DALI_FRAME_CALLBACK_UPDATE");
   }
 
   mNodeHierarchyChanged = false;

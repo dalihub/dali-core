@@ -24,6 +24,7 @@
 #include <dali/internal/render/common/render-list.h>
 #include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
+#include <dali/public-api/math/uint-16-pair.h>
 
 using Dali::Internal::SceneGraph::RenderInstruction;
 using Dali::Internal::SceneGraph::RenderItem;

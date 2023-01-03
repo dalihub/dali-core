@@ -46,14 +46,7 @@ void KeyEventProcessor::ProcessKeyEvent(const Integration::KeyEvent& event)
   KeyEventPtr    keyEvent(new KeyEvent(event.keyName, event.logicalKey, event.keyString, event.keyCode, event.keyModifier, event.time, static_cast<Dali::KeyEvent::State>(event.state), event.compose, event.deviceName, event.deviceClass, event.deviceSubclass));
   Dali::KeyEvent keyEventHandle(keyEvent.Get());
 
-#ifdef TRACE_ENABLED
-  std::ostringstream stream;
-  if(gTraceFilter->IsTraceEnabled())
-  {
-    stream << "DALI_PROCESS_KEY_EVENT [" << event.keyName << ", " << event.state << "]";
-    DALI_TRACE_BEGIN(gTraceFilter, stream.str().c_str());
-  }
-#endif
+  DALI_TRACE_SCOPE(gTraceFilter, "DALI_PROCESS_KEY_EVENT");
 
   // Emit the key event signal from the scene.
   bool consumed = mScene.EmitInterceptKeyEventSignal(keyEventHandle);
@@ -65,13 +58,6 @@ void KeyEventProcessor::ProcessKeyEvent(const Integration::KeyEvent& event)
   {
     mScene.EmitKeyEventSignal(keyEventHandle);
   }
-
-#ifdef TRACE_ENABLED
-  if(gTraceFilter->IsTraceEnabled())
-  {
-    DALI_TRACE_END(gTraceFilter, stream.str().c_str());
-  }
-#endif
 }
 
 } // namespace Internal
