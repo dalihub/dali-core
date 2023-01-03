@@ -1248,6 +1248,162 @@ int UtcDaliSceneSurfaceRotatedWithAngle90(void)
   damagedRects.clear();
   application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
                                         TestApplication::DEFAULT_SURFACE_HEIGHT,
+                                        90, 0);
+
+  // Check current surface orientation
+  int32_t orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  int32_t screenOrientation = application.GetScene().GetCurrentScreenOrientation();
+
+  // It should not be changed yet.
+  DALI_TEST_EQUALS(orientation, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(screenOrientation, 0, TEST_LOCATION);
+
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  clippingRect = Rect<int>(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 3 last frames updates
+  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // It is recalculation for glScissor.
+  // Because surface is rotated and glScissor is called with recalcurated value.
+  // Total angle is 90, (90 + 0 = 90)
+  clippingRect.x      = TestApplication::DEFAULT_SURFACE_HEIGHT - (CLIPPING_RECT_Y + CLIPPING_RECT_HEIGHT);
+  clippingRect.y      = CLIPPING_RECT_X;
+  clippingRect.width  = CLIPPING_RECT_HEIGHT;
+  clippingRect.height = CLIPPING_RECT_WIDTH;
+
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  // Check current orientations
+  orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  screenOrientation = application.GetScene().GetCurrentScreenOrientation();
+
+  // It should be changed.
+  DALI_TEST_EQUALS(orientation, 90, TEST_LOCATION);
+  DALI_TEST_EQUALS(screenOrientation, 0, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliSceneScreenRotatedWithAngle90(void)
+{
+  tet_infoline("Ensure rotation of the screen is handled properly with Angle 90");
+
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
+
+  std::vector<Rect<int>> damagedRects;
+  Rect<int>              clippingRect;
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+
+  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  Actor actor = CreateRenderableActor();
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
+  actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
+  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
+                                        TestApplication::DEFAULT_SURFACE_HEIGHT,
+                                        0, 90);
+
+  // Check current surface orientation
+  int32_t orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  int32_t screenOrientation = application.GetScene().GetCurrentScreenOrientation();
+
+  // It should not be changed yet.
+  DALI_TEST_EQUALS(orientation, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(screenOrientation, 0, TEST_LOCATION);
+
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  clippingRect = Rect<int>(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 3 last frames updates
+  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // It is recalculation for glScissor.
+  // Because surface is rotated and glScissor is called with recalcurated value.
+  // Total angle is 90, (0 + 90 = 90)
+  clippingRect.x      = TestApplication::DEFAULT_SURFACE_HEIGHT - (CLIPPING_RECT_Y + CLIPPING_RECT_HEIGHT);
+  clippingRect.y      = CLIPPING_RECT_X;
+  clippingRect.width  = CLIPPING_RECT_HEIGHT;
+  clippingRect.height = CLIPPING_RECT_WIDTH;
+
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  // Check current orientations
+  orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  screenOrientation = application.GetScene().GetCurrentScreenOrientation();
+
+  // It should be changed.
+  DALI_TEST_EQUALS(orientation, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(screenOrientation, 90, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliSceneSurfaceAndScreenRotatedWithAngle90(void)
+{
+  tet_infoline("Ensure rotation of the surface and the screen is handled properly with Angle 90");
+
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
+
+  std::vector<Rect<int>> damagedRects;
+  Rect<int>              clippingRect;
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+
+  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  Actor actor = CreateRenderableActor();
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
+  actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
+  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
+                                        TestApplication::DEFAULT_SURFACE_HEIGHT,
                                         90, 90);
 
   // Check current surface orientation
@@ -1268,10 +1424,11 @@ int UtcDaliSceneSurfaceRotatedWithAngle90(void)
 
   // It is recalculation for glScissor.
   // Because surface is rotated and glScissor is called with recalcurated value.
-  clippingRect.x      = TestApplication::DEFAULT_SURFACE_HEIGHT - (CLIPPING_RECT_Y + CLIPPING_RECT_HEIGHT);
-  clippingRect.y      = CLIPPING_RECT_X;
-  clippingRect.width  = CLIPPING_RECT_HEIGHT;
-  clippingRect.height = CLIPPING_RECT_WIDTH;
+  // Total angle is 180.(90 + 90 = 180)
+  clippingRect.x      = TestApplication::DEFAULT_SURFACE_WIDTH - (CLIPPING_RECT_X + CLIPPING_RECT_WIDTH);
+  clippingRect.y      = TestApplication::DEFAULT_SURFACE_HEIGHT - (CLIPPING_RECT_Y + CLIPPING_RECT_HEIGHT);
+  clippingRect.width  = CLIPPING_RECT_WIDTH;
+  clippingRect.height = CLIPPING_RECT_HEIGHT;
 
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
   DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
@@ -1325,7 +1482,7 @@ int UtcDaliSceneSurfaceRotatedWithAngle180(void)
   damagedRects.clear();
   application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
                                         TestApplication::DEFAULT_SURFACE_HEIGHT,
-                                        180, 180);
+                                        180, 0);
 
   // Check current surface orientation
   int32_t orientation = application.GetScene().GetCurrentSurfaceOrientation();
@@ -1361,7 +1518,155 @@ int UtcDaliSceneSurfaceRotatedWithAngle180(void)
 
   // It should be changed.
   DALI_TEST_EQUALS(orientation, 180, TEST_LOCATION);
-DALI_TEST_EQUALS(screenOrientation, 180, TEST_LOCATION);
+  DALI_TEST_EQUALS(screenOrientation, 0, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliSceneScreenRotatedWithAngle180(void)
+{
+  tet_infoline("Ensure rotation of the screen is handled properly with Angle 180");
+
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
+
+  std::vector<Rect<int>> damagedRects;
+  Rect<int>              clippingRect;
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+
+  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  Actor actor = CreateRenderableActor();
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
+  actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
+  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
+                                        TestApplication::DEFAULT_SURFACE_HEIGHT,
+                                        0, 180);
+
+  // Check current surface orientation
+  int32_t orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  int32_t screenOrientation = application.GetScene().GetCurrentScreenOrientation();
+
+  // It should not be changed yet.
+  DALI_TEST_EQUALS(orientation, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(screenOrientation, 0, TEST_LOCATION);
+
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  clippingRect = Rect<int>(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 3 last frames updates
+  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // It is recalculation for glScissor.
+  // Because surface is rotated and glScissor is called with recalcurated value.
+  clippingRect.x      = TestApplication::DEFAULT_SURFACE_WIDTH - (CLIPPING_RECT_X + CLIPPING_RECT_WIDTH);
+  clippingRect.y      = TestApplication::DEFAULT_SURFACE_HEIGHT - (CLIPPING_RECT_Y + CLIPPING_RECT_HEIGHT);
+  clippingRect.width  = CLIPPING_RECT_WIDTH;
+  clippingRect.height = CLIPPING_RECT_HEIGHT;
+
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  // Check current orientations
+  orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  screenOrientation = application.GetScene().GetCurrentScreenOrientation();
+
+  // It should be changed.
+  DALI_TEST_EQUALS(orientation, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(screenOrientation, 180, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliSceneSurfaceAndScreenRotatedWithAngle180(void)
+{
+  tet_infoline("Ensure rotation of the surface and the screen is handled properly with Angle 180");
+
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
+
+  std::vector<Rect<int>> damagedRects;
+  Rect<int>              clippingRect;
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+
+  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  Actor actor = CreateRenderableActor();
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
+  actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
+  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  application.GetScene().Add(actor);
+
+  // consume the orientating changing flag by first rendering
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
+                                        TestApplication::DEFAULT_SURFACE_HEIGHT,
+                                        180, 180);
+
+  // Check current orientations
+  int32_t orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  int32_t screenOrientation = application.GetScene().GetCurrentScreenOrientation();
+
+  // It should not be changed yet.
+  DALI_TEST_EQUALS(orientation, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(screenOrientation, 0, TEST_LOCATION);
+
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  clippingRect = Rect<int>(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 3 last frames updates
+  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  // Check current orientations
+  orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  screenOrientation = application.GetScene().GetCurrentScreenOrientation();
+
+  // It should be changed.
+  DALI_TEST_EQUALS(orientation, 180, TEST_LOCATION);
+  DALI_TEST_EQUALS(screenOrientation, 180, TEST_LOCATION);
 
   END_TEST;
 }
@@ -1369,6 +1674,162 @@ DALI_TEST_EQUALS(screenOrientation, 180, TEST_LOCATION);
 int UtcDaliSceneSurfaceRotatedWithAngle270(void)
 {
   tet_infoline("Ensure rotation of the surface is handled properly with Angle 270");
+
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
+
+  std::vector<Rect<int>> damagedRects;
+  Rect<int>              clippingRect;
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+
+  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  Actor actor = CreateRenderableActor();
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
+  actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
+  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
+                                        TestApplication::DEFAULT_SURFACE_HEIGHT,
+                                        270, 0);
+
+  // Check current surface orientation
+  int32_t orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  int32_t screenOrientation = application.GetScene().GetCurrentScreenOrientation();
+
+  // It should not be changed yet.
+  DALI_TEST_EQUALS(orientation, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(screenOrientation, 0, TEST_LOCATION);
+
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  clippingRect = Rect<int>(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 3 last frames updates
+  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // It is recalculation for glScissor.
+  // Because surface is rotated and glScissor is called with recalcurated value.
+  // Total angle is 270. (270 + 0 = 270)
+  clippingRect.x      = CLIPPING_RECT_Y;
+  clippingRect.y      = TestApplication::DEFAULT_SURFACE_WIDTH - (CLIPPING_RECT_X + CLIPPING_RECT_WIDTH);
+  clippingRect.width  = CLIPPING_RECT_HEIGHT;
+  clippingRect.height = CLIPPING_RECT_WIDTH;
+
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  // Check current orientations
+  orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  screenOrientation = application.GetScene().GetCurrentScreenOrientation();
+
+  // It should be changed.
+  DALI_TEST_EQUALS(orientation, 270, TEST_LOCATION);
+  DALI_TEST_EQUALS(screenOrientation, 0, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliSceneScreenRotatedWithAngle270(void)
+{
+  tet_infoline("Ensure rotation of the screen is handled properly with Angle 270");
+
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
+
+  std::vector<Rect<int>> damagedRects;
+  Rect<int>              clippingRect;
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+
+  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  Actor actor = CreateRenderableActor();
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
+  actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
+  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
+                                        TestApplication::DEFAULT_SURFACE_HEIGHT,
+                                        0, 270);
+
+  // Check current surface orientation
+  int32_t orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  int32_t screenOrientation = application.GetScene().GetCurrentScreenOrientation();
+
+  // It should not be changed yet.
+  DALI_TEST_EQUALS(orientation, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(screenOrientation, 0, TEST_LOCATION);
+
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  clippingRect = Rect<int>(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 3 last frames updates
+  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // It is recalculation for glScissor.
+  // Because surface is rotated and glScissor is called with recalcurated value.
+  // Total angle is 270. (0 + 270 = 270)
+  clippingRect.x      = CLIPPING_RECT_Y;
+  clippingRect.y      = TestApplication::DEFAULT_SURFACE_WIDTH - (CLIPPING_RECT_X + CLIPPING_RECT_WIDTH);
+  clippingRect.width  = CLIPPING_RECT_HEIGHT;
+  clippingRect.height = CLIPPING_RECT_WIDTH;
+
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  // Check current orientations
+  orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  screenOrientation = application.GetScene().GetCurrentScreenOrientation();
+
+  // It should be changed.
+  DALI_TEST_EQUALS(orientation, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(screenOrientation, 270, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliSceneSurfaceAndScreenRotatedWithAngle270(void)
+{
+  tet_infoline("Ensure rotation of the surface and the screen is handled properly with Angle 270");
 
   TestApplication application(
     TestApplication::DEFAULT_SURFACE_WIDTH,
@@ -1422,10 +1883,11 @@ int UtcDaliSceneSurfaceRotatedWithAngle270(void)
 
   // It is recalculation for glScissor.
   // Because surface is rotated and glScissor is called with recalcurated value.
-  clippingRect.x      = CLIPPING_RECT_Y;
-  clippingRect.y      = TestApplication::DEFAULT_SURFACE_WIDTH - (CLIPPING_RECT_X + CLIPPING_RECT_WIDTH);
-  clippingRect.width  = CLIPPING_RECT_HEIGHT;
-  clippingRect.height = CLIPPING_RECT_WIDTH;
+  // Total angle is 180.(270 + 270 - 360 = 180)
+  clippingRect.x      = TestApplication::DEFAULT_SURFACE_WIDTH - (CLIPPING_RECT_X + CLIPPING_RECT_WIDTH);
+  clippingRect.y      = TestApplication::DEFAULT_SURFACE_HEIGHT - (CLIPPING_RECT_Y + CLIPPING_RECT_HEIGHT);
+  clippingRect.width  = CLIPPING_RECT_WIDTH;
+  clippingRect.height = CLIPPING_RECT_HEIGHT;
 
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
   DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
@@ -1443,9 +1905,169 @@ int UtcDaliSceneSurfaceRotatedWithAngle270(void)
   END_TEST;
 }
 
-int UtcDaliSceneSetRotationCompletedAcknowledgementWithAngle90(void)
+int UtcDaliSceneSetSurfaceRotationCompletedAcknowledgementWithAngle90(void)
 {
   tet_infoline("Ensure to acknowledge for completing surface 90 angle rotaiton");
+
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
+
+  std::vector<Rect<int>> damagedRects;
+  Rect<int>              clippingRect;
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  Actor actor = CreateRenderableActor();
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
+  actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
+  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
+                                        TestApplication::DEFAULT_SURFACE_HEIGHT,
+                                        90, 0);
+
+  // Check current surface orientation
+  int32_t orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  int32_t screenOrientation = application.GetScene().GetCurrentScreenOrientation();
+
+  // It should not be changed yet.
+  DALI_TEST_EQUALS(orientation, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(screenOrientation, 0, TEST_LOCATION);
+
+  application.GetScene().SetRotationCompletedAcknowledgement();
+
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  clippingRect = Rect<int>(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 3 last frames updates
+  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // It is recalculation for glScissor.
+  // Because surface is rotated and glScissor is called with recalcurated value.
+  clippingRect.x      = TestApplication::DEFAULT_SURFACE_HEIGHT - (CLIPPING_RECT_Y + CLIPPING_RECT_HEIGHT);
+  clippingRect.y      = CLIPPING_RECT_X;
+  clippingRect.width  = CLIPPING_RECT_HEIGHT;
+  clippingRect.height = CLIPPING_RECT_WIDTH;
+
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  // Check current orientations
+  orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  screenOrientation = application.GetScene().GetCurrentScreenOrientation();
+
+  // It should be changed.
+  DALI_TEST_EQUALS(orientation, 90, TEST_LOCATION);
+  DALI_TEST_EQUALS(screenOrientation, 0, TEST_LOCATION);
+
+  bool isSetRotationCompletedAcknowledgementSet = application.GetScene().IsRotationCompletedAcknowledgementSet();
+  DALI_TEST_EQUALS(isSetRotationCompletedAcknowledgementSet, true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliSceneSetScreenRotationCompletedAcknowledgementWithAngle90(void)
+{
+  tet_infoline("Ensure to acknowledge for completing screen 90 angle rotaiton");
+
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
+
+  std::vector<Rect<int>> damagedRects;
+  Rect<int>              clippingRect;
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  Actor actor = CreateRenderableActor();
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
+  actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
+  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
+                                        TestApplication::DEFAULT_SURFACE_HEIGHT,
+                                        0, 90);
+
+  // Check current surface orientation
+  int32_t orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  int32_t screenOrientation = application.GetScene().GetCurrentScreenOrientation();
+
+  // It should not be changed yet.
+  DALI_TEST_EQUALS(orientation, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(screenOrientation, 0, TEST_LOCATION);
+
+  application.GetScene().SetRotationCompletedAcknowledgement();
+
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  clippingRect = Rect<int>(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 3 last frames updates
+  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // It is recalculation for glScissor.
+  // Because surface is rotated and glScissor is called with recalcurated value.
+  clippingRect.x      = TestApplication::DEFAULT_SURFACE_HEIGHT - (CLIPPING_RECT_Y + CLIPPING_RECT_HEIGHT);
+  clippingRect.y      = CLIPPING_RECT_X;
+  clippingRect.width  = CLIPPING_RECT_HEIGHT;
+  clippingRect.height = CLIPPING_RECT_WIDTH;
+
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  // Check current orientations
+  orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  screenOrientation = application.GetScene().GetCurrentScreenOrientation();
+
+  // It should be changed.
+  DALI_TEST_EQUALS(orientation, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(screenOrientation, 90, TEST_LOCATION);
+
+  bool isSetRotationCompletedAcknowledgementSet = application.GetScene().IsRotationCompletedAcknowledgementSet();
+  DALI_TEST_EQUALS(isSetRotationCompletedAcknowledgementSet, true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliSceneSetSurfaceAndScreenRotationCompletedAcknowledgementWithAngle90(void)
+{
+  tet_infoline("Ensure to acknowledge for completing surface and screen 90 angle rotaiton");
 
   TestApplication application(
     TestApplication::DEFAULT_SURFACE_WIDTH,
@@ -1499,10 +2121,10 @@ int UtcDaliSceneSetRotationCompletedAcknowledgementWithAngle90(void)
 
   // It is recalculation for glScissor.
   // Because surface is rotated and glScissor is called with recalcurated value.
-  clippingRect.x      = TestApplication::DEFAULT_SURFACE_HEIGHT - (CLIPPING_RECT_Y + CLIPPING_RECT_HEIGHT);
-  clippingRect.y      = CLIPPING_RECT_X;
-  clippingRect.width  = CLIPPING_RECT_HEIGHT;
-  clippingRect.height = CLIPPING_RECT_WIDTH;
+  clippingRect.x      = TestApplication::DEFAULT_SURFACE_WIDTH - (CLIPPING_RECT_X + CLIPPING_RECT_WIDTH);
+  clippingRect.y      = TestApplication::DEFAULT_SURFACE_HEIGHT - (CLIPPING_RECT_Y + CLIPPING_RECT_HEIGHT);
+  clippingRect.width  = CLIPPING_RECT_WIDTH;
+  clippingRect.height = CLIPPING_RECT_HEIGHT;
 
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
   DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
