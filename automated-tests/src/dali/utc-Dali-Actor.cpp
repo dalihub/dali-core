@@ -1155,6 +1155,33 @@ int UtcDaliActorSetSize04(void)
   END_TEST;
 }
 
+int UtcDaliActorSetSize05(void)
+{
+  TestApplication application;
+
+  Actor   parent = Actor::New();
+  Vector2 vector(200.0f, 200.0f);
+  DALI_TEST_CHECK(vector != parent.GetCurrentProperty<Vector2>(Actor::Property::SIZE));
+
+  parent.SetProperty(Actor::Property::SIZE, vector);
+  Vector2 size = parent.GetProperty(Actor::Property::SIZE).Get<Vector2>();
+  DALI_TEST_EQUALS(size, vector, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+  Actor   child = Actor::New();
+  DALI_TEST_CHECK(vector != child.GetCurrentProperty<Vector2>(Actor::Property::SIZE));
+  child.SetProperty(Actor::Property::SIZE, vector);
+  size = parent.GetProperty(Actor::Property::SIZE).Get<Vector2>();
+  DALI_TEST_EQUALS(size, vector, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(vector == parent.GetCurrentProperty<Vector2>(Actor::Property::SIZE));
+
+  END_TEST;
+}
+
 int UtcDaliActorSetSizeIndividual(void)
 {
   TestApplication application;

@@ -78,6 +78,7 @@ ActorSizer::ActorSizer(Internal::Actor& owner)
   mTargetSize(Vector3::ZERO),
   mAnimatedSize(Vector3::ZERO),
   mUseAnimatedSize(AnimatedSizeFlag::CLEAR),
+  mTargetSizeDirtyFlag(false),
   mInsideOnSizeSet(false)
 {
 }
@@ -117,8 +118,9 @@ void ActorSizer::SetSizeInternal(const Vector3& size)
   // dont allow recursive loop
   DALI_ASSERT_ALWAYS(!mInsideOnSizeSet && "Cannot call SetSize from OnSizeSet");
   // check that we have a node AND the new size width, height or depth is at least a little bit different from the old one
-  if(mTargetSize != size || mTargetSize != mOwner.GetCurrentSize())
+  if(mTargetSize != size || mTargetSizeDirtyFlag)
   {
+    mTargetSizeDirtyFlag = false;
     mTargetSize = size;
 
     // Update the preferred size after relayoutting
@@ -241,7 +243,7 @@ Vector3 ActorSizer::GetTargetSize() const
 
 void ActorSizer::SetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension)
 {
-  EnsureRelayouter().SetResizePolicy(policy, dimension, mTargetSize);
+  EnsureRelayouter().SetResizePolicy(policy, dimension, mTargetSize, mTargetSizeDirtyFlag);
   mOwner.OnSetResizePolicy(policy, dimension);
   RelayoutRequest();
 }
