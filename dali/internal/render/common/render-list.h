@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_LIST_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,11 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/owner-container.h>
+#include <dali/public-api/math/rect.h>
+
 #include <dali/graphics-api/graphics-controller.h>
 #include <dali/internal/render/common/render-item.h>
-#include <dali/public-api/math/rect.h>
+#include <dali/internal/update/manager/owner-key-container.h>
 
 namespace Dali
 {
@@ -42,13 +44,13 @@ namespace SceneGraph
 {
 class Layer;
 
-using RenderItemContainer = OwnerContainer<RenderItem*>;
+using RenderItemContainer = OwnerKeyContainer<RenderItem>;
 
 struct RenderList;
 using RenderListContainer = OwnerContainer<RenderList*>;
 
 /**
- * The RenderList structure provides the renderer with a list of renderers.
+ * The RenderList structure provides the renderer manager with a list of renderers.
  */
 struct RenderList
 {
@@ -118,11 +120,11 @@ public:
     // check if we have enough items, we can only be one behind at worst
     if(mItems.Count() <= mNextFree)
     {
-      mItems.PushBack(RenderItem::New()); // Push a new empty render item
+      mItems.PushBack(RenderItem::NewKey()); // Push a new empty render item
     }
     // get the item mNextFree points to and increase by one
-    RenderItem& item = *mItems[mNextFree++];
-    return item;
+    RenderItem* item = mItems[mNextFree++].Get();
+    return *item;
   }
 
   /**
@@ -131,7 +133,14 @@ public:
   RenderItem& GetItem(uint32_t index) const
   {
     DALI_ASSERT_DEBUG(index < GetCachedItemCount());
-    return *mItems[index];
+    RenderItem* item = mItems[index].Get();
+    return *item;
+  }
+
+  RenderItemKey GetItemKey(uint32_t index) const
+  {
+    DALI_ASSERT_DEBUG(index < GetCachedItemCount());
+    return mItems[index];
   }
 
   /**
@@ -277,7 +286,7 @@ public:
   }
 
 private:
-  RenderItemContainer mItems;    ///< Each item is a renderer and matrix pair
+  RenderItemContainer mItems;    ///< Container of render items
   uint32_t            mNextFree; ///< index for the next free item to use
 
   mutable Graphics::UniquePtr<Graphics::CommandBuffer> mGraphicsCommandBuffer{nullptr};

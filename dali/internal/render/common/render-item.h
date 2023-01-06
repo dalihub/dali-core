@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_ITEM_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@
  */
 
 // INTERNAL INCLUDES
+
+#include <dali/internal/render/common/render-item-key.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/common/vector-wrapper.h>
@@ -47,9 +49,37 @@ struct RenderItem
   static RenderItem* New();
 
   /**
+   * Construct a new RenderItem
+   * @return A key to a new RenderItem
+   */
+  static RenderItemKey NewKey();
+
+  /**
    * Non-virtual destructor; RenderItem is not suitable as a base class.
    */
   ~RenderItem();
+
+  /**
+   * Get a pointer to the given object in the associated memory pool.
+   * @param[in] key A key to the memory pool object
+   * @return a ptr to the given object, or nullptr if not found/invalid
+   */
+  static RenderItem* Get(RenderItemKey::KeyType key);
+
+  /**
+   * Get the key of the given renderer in the associated memory pool.
+   * @param[in] renderer the given renderer
+   * @return The key in the associated memory pool.
+   */
+  static RenderItemKey GetKey(const RenderItem& renderer);
+
+  /**
+   * Get the key of the given renderer in the associated memory pool.
+   * @param[in] renderer the given renderer
+   * @return The key in the associated memory pool, or -1 if not
+   * found.
+   */
+  static RenderItemKey GetKey(RenderItem* renderer);
 
   /**
    * Produce a 2D AABB in transformed space
@@ -111,8 +141,8 @@ private:
   RenderItem();
 
   // RenderItems should not be copied as they are heavy
-  RenderItem(const RenderItem& item);
-  RenderItem& operator=(const RenderItem& item);
+  RenderItem(const RenderItem& item) = delete;
+  RenderItem& operator=(const RenderItem& item) = delete;
 };
 
 } // namespace SceneGraph

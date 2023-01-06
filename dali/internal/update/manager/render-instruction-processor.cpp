@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -459,10 +459,8 @@ inline void RenderInstructionProcessor::SortRenderItems(BufferIndex bufferIndex,
 
   // List of zValue calculating functions.
   const Dali::Layer::SortFunctionType zValueFunctionFromVector3[] = {
-    [](const Vector3& position)
-    { return position.z; },
-    [](const Vector3& position)
-    { return position.LengthSquared(); },
+    [](const Vector3& position) { return position.z; },
+    [](const Vector3& position) { return position.LengthSquared(); },
     layer.GetSortFunction(),
   };
 
@@ -478,8 +476,8 @@ inline void RenderInstructionProcessor::SortRenderItems(BufferIndex bufferIndex,
 
   for(uint32_t index = 0; index < renderableCount; ++index)
   {
-    RenderItem& item = renderList.GetItem(index);
-
+    RenderItemKey itemKey = renderList.GetItemKey(index);
+    RenderItem&   item    = *itemKey.Get();
     if(DALI_LIKELY(item.mRenderer))
     {
       item.mRenderer->SetSortAttributes(mSortingHelper[index]);
@@ -491,7 +489,7 @@ inline void RenderInstructionProcessor::SortRenderItems(BufferIndex bufferIndex,
     mSortingHelper[index].zValue = zValueFunctionFromVector3[zValueFunctionIndex](item.mModelViewMatrix.GetTranslation3()) - static_cast<float>(item.mDepthIndex);
 
     // Keep the renderitem pointer in the helper so we can quickly reorder items after sort.
-    mSortingHelper[index].renderItem = &item;
+    mSortingHelper[index].renderItem = itemKey;
   }
 
   // Here we determine which comparitor (of the 3) to use.
