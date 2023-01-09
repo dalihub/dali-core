@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_UNIFORM_MAP_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,38 +86,12 @@ public:
  * The UniformMap class is used to map uniform names to property values. It is available
  * in the following rendering classes: Node, Renderer, Shader.
  *
- * It can be observed for changes to the mapping table.
+ * They can test the ChangeCounter to see if the mapping has been updated.
  */
 class UniformMap
 {
 public:
   using SizeType = uint32_t;
-
-  class Observer
-  {
-  public:
-    /**
-     * Inform observer that uniform mappings have been changed
-     * @param mappings
-     */
-    virtual void UniformMappingsChanged(const UniformMap& mappings) = 0;
-
-  protected:
-    /**
-     * Virtual destructor, no deletion through this interface
-     */
-    virtual ~Observer() = default;
-  };
-
-  /**
-   * Add an observer that watches for changes in the mappings
-   */
-  void AddObserver(Observer& observer);
-
-  /**
-   * Remove an observer
-   */
-  void RemoveObserver(Observer& observer);
 
   /**
    * Add a map to the mappings table.
@@ -165,11 +139,8 @@ private:
 private:
   using UniformMapContainer = Dali::Vector<UniformPropertyMapping>;
   using UniformMapIter      = UniformMapContainer::Iterator;
-  using Observers           = Dali::Vector<Observer*>;
-  using ObserversIter       = Observers::Iterator;
 
-  UniformMapContainer mUniformMaps; ///< container of uniform maps
-  Observers           mObservers;
+  UniformMapContainer mUniformMaps;       ///< container of uniform maps
   std::size_t         mChangeCounter{0u}; ///< Counter that is incremented when the map changes
 };
 

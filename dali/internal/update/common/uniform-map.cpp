@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,43 +25,9 @@ namespace Internal
 {
 namespace SceneGraph
 {
-void UniformMap::AddObserver(Observer& observer)
-{
-  bool foundObserver = false;
-  for(ObserversIter iter = mObservers.Begin(), endIter = mObservers.End(); iter != endIter; ++iter)
-  {
-    if(*iter == &observer)
-    {
-      foundObserver = true;
-      break;
-    }
-  }
-  if(!foundObserver)
-  {
-    mObservers.PushBack(&observer);
-  }
-}
-
-void UniformMap::RemoveObserver(Observer& observer)
-{
-  for(ObserversIter iter = mObservers.Begin(), endIter = mObservers.End(); iter != endIter; ++iter)
-  {
-    if(*iter == &observer)
-    {
-      mObservers.Erase(iter);
-      return;
-    }
-  }
-}
-
 void UniformMap::MappingChanged()
 {
   ++mChangeCounter;
-  for(ObserversIter iter = mObservers.Begin(), endIter = mObservers.End(); iter != endIter; ++iter)
-  {
-    Observer* observer = (*iter);
-    observer->UniformMappingsChanged(*this);
-  }
 }
 
 void UniformMap::Add(UniformPropertyMapping newMap)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -158,26 +158,18 @@ PropertyOwner::PropertyOwner()
 void PropertyOwner::AddUniformMapping(const UniformPropertyMapping& map)
 {
   mUniformMaps.Add(map);
+  OnMappingChanged();
 }
 
 void PropertyOwner::RemoveUniformMapping(const ConstString& uniformName)
 {
   mUniformMaps.Remove(uniformName);
+  OnMappingChanged();
 }
 
 const UniformMap& PropertyOwner::GetUniformMap() const
 {
   return mUniformMaps;
-}
-
-void PropertyOwner::AddUniformMapObserver(UniformMap::Observer& observer)
-{
-  mUniformMaps.AddObserver(observer);
-}
-
-void PropertyOwner::RemoveUniformMapObserver(UniformMap::Observer& observer)
-{
-  mUniformMaps.RemoveObserver(observer);
 }
 
 } // namespace SceneGraph
