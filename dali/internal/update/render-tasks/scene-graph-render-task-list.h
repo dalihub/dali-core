@@ -73,6 +73,12 @@ public:
   void AddTask(OwnerPointer<RenderTask>& newTask);
 
   /**
+   * Add a overlay RenderTask to the list.
+   * @param[in] newTask The RenderTaskList takes ownership of this overlay task.
+   */
+  void AddOverlayTask(OwnerPointer<RenderTask>& newTask);
+
+  /**
    * Remove a RenderTask from the list.
    * @param[in] task The RenderTaskList will destroy this task.
    */
@@ -129,6 +135,7 @@ private:
   CompleteNotificationInterface* mNotificationObject;      ///< object to pass in to the complete notification
   RenderMessageDispatcher*       mRenderMessageDispatcher; ///< for sending messages to render thread
   RenderTaskContainer            mRenderTasks;             ///< A container of owned RenderTasks
+  RenderTask*                    mOverlayRenderTask;       ///< OverlayRenderTask.
 };
 
 // Messages for RenderTaskList

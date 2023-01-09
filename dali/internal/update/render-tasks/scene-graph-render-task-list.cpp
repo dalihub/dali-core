@@ -41,7 +41,8 @@ RenderTaskList* RenderTaskList::New()
 
 RenderTaskList::RenderTaskList()
 : mNotificationObject(nullptr),
-  mRenderMessageDispatcher(nullptr)
+  mRenderMessageDispatcher(nullptr),
+  mOverlayRenderTask(nullptr)
 {
 }
 
@@ -63,8 +64,21 @@ void RenderTaskList::AddTask(OwnerPointer<RenderTask>& newTask)
   DALI_ASSERT_DEBUG(mRenderMessageDispatcher != NULL && "RenderMessageDispatcher is null");
 
   newTask->Initialize(*mRenderMessageDispatcher);
-  // mRenderTasks container takes ownership
-  mRenderTasks.PushBack(newTask.Release());
+
+  if(mOverlayRenderTask && mRenderTasks[mRenderTasks.Size() - 1] == mOverlayRenderTask)
+  {
+    mRenderTasks.Insert(mRenderTasks.End() - 1, newTask.Release());
+  }
+  else
+  {
+    mRenderTasks.PushBack(newTask.Release());
+  }
+}
+
+void RenderTaskList::AddOverlayTask(OwnerPointer<RenderTask>& newTask)
+{
+  AddTask(newTask);
+  mOverlayRenderTask = mRenderTasks[mRenderTasks.Size() - 1];
 }
 
 void RenderTaskList::RemoveTask(RenderTask* task)

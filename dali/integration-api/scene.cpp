@@ -103,6 +103,11 @@ Layer Scene::GetRootLayer() const
   return GetImplementation(*this).GetRootLayer();
 }
 
+Layer Scene::GetOverlayLayer()
+{
+  return GetImplementation(*this).GetOverlayLayer();
+}
+
 uint32_t Scene::GetLayerCount() const
 {
   return GetImplementation(*this).GetLayerCount();
