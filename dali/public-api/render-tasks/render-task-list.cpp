@@ -63,6 +63,11 @@ RenderTask RenderTaskList::GetTask(uint32_t index) const
   return RenderTask(GetImplementation(*this).GetTask(index).Get());
 }
 
+RenderTask RenderTaskList::GetOverlayTask() const
+{
+  return RenderTask(GetImplementation(*this).GetOverlayTask().Get());
+}
+
 RenderTaskList::RenderTaskList(Internal::RenderTaskList* internal)
 : BaseHandle(internal)
 {

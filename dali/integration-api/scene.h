@@ -192,6 +192,14 @@ public:
   Layer GetRootLayer() const;
 
   /**
+   * @brief Returns the Scene's Overlay Layer.
+   * If there is no overlay layer yet, this creates the layer and an associated render task.
+   *
+   * @return The overlay layer
+   */
+  Layer GetOverlayLayer();
+
+  /**
    * @brief Queries the number of on-stage layers.
    *
    * Note that a default layer is always provided (count >= 1).

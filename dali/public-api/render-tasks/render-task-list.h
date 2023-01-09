@@ -144,6 +144,14 @@ public:
    */
   RenderTask GetTask(uint32_t index) const;
 
+  /**
+   * @brief Retrieves a RenderTask for Overlay
+   * @SINCE_2_2.10
+   * @return A handle to the overlay RenderTask.
+   * If the scene has not created an overlay render task, this returns empty handle.
+   */
+  RenderTask GetOverlayTask() const;
+
 public: // Not intended for application developers
   /// @cond internal
   /**

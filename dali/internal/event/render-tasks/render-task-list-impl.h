@@ -59,9 +59,15 @@ public:
   {
     RenderTask*   renderTaskPtr; ///< Pointer for comparison with current rendertask.
     ActorObserver actor;         ///< For comparison with current actor.
+
+    bool operator==(const Exclusive& other) const
+    {
+      return renderTaskPtr == other.renderTaskPtr;
+    }
   };
 
   using ExclusivesContainer = std::vector<Exclusive>;
+  using ExclusiveIter       = ExclusivesContainer::iterator;
 
   /**
    * Create a RenderTaskList.
@@ -86,6 +92,16 @@ public:
   RenderTaskPtr CreateTask(Actor* sourceActor, CameraActor* cameraActor);
 
   /**
+   * @brief Creates a new RenderTask for overlay.
+   * This will be appended to the end of render-task list.
+   * @param[in] sourceActor The actor and its children to be rendered for this render task.
+   * @param[in] cameraActor The actor from which the scene is viewed for this render task.
+   * @return A valid handle to a new overlay RenderTask
+   * @note The Overlay RenderTask will be rendered after all the other render tasks are rendered.
+   */
+  RenderTaskPtr CreateOverlayTask(Actor* sourceActor, CameraActor* cameraActor);
+
+  /**
    * @copydoc Dali::RenderTaskList::RemoveTask()
    */
   void RemoveTask(Internal::RenderTask& task);
@@ -99,6 +115,11 @@ public:
    * @copydoc Dali::RenderTaskList::GetTask()
    */
   RenderTaskPtr GetTask(uint32_t index) const;
+
+  /**
+   * @copydoc Dali::RenderTaskList::GetOverlayTask()
+   */
+  RenderTaskPtr GetOverlayTask() const;
 
   /**
    * Retrieve the container of render-tasks.
@@ -177,6 +198,7 @@ private:
 
   RenderTaskContainer mTasks;      ///< Reference counted render-tasks
   ExclusivesContainer mExclusives; ///< List of rendertasks with exclusively owned source actors.
+  RenderTaskPtr       mOverlayRenderTask{nullptr};
 };
 
 } // namespace Internal

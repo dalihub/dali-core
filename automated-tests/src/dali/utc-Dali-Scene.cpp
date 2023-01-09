@@ -2592,3 +2592,86 @@ int UtcDaliSceneSignalInterceptKeyEventN(void)
 
   END_TEST;
 }
+
+int UtcDaliSceneGetOverlayLayer(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::Integration::Scene::GetOverlayLayer");
+
+  Dali::Integration::Scene scene = application.GetScene();
+
+  // Check we get a valid instance.
+  RenderTaskList tasks = scene.GetRenderTaskList();
+
+  // There should be 1 task by default.
+  DALI_TEST_EQUALS(tasks.GetTaskCount(), 1u, TEST_LOCATION);
+  RenderTask defaultTask = tasks.GetTask(0u);
+  DALI_TEST_EQUALS(scene.GetRootLayer(), defaultTask.GetSourceActor(), TEST_LOCATION);
+
+  Layer layer = scene.GetOverlayLayer();
+  // There should be 2 task by default.
+  DALI_TEST_EQUALS(tasks.GetTaskCount(), 2u, TEST_LOCATION);
+  RenderTask overlayTask = tasks.GetTask(1u);
+  DALI_TEST_EQUALS(overlayTask, tasks.GetOverlayTask(), TEST_LOCATION);
+  DALI_TEST_CHECK(scene.GetRootLayer() != overlayTask.GetSourceActor());
+  DALI_TEST_CHECK(overlayTask != defaultTask);
+  DALI_TEST_EQUALS(overlayTask.GetClearEnabled(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(overlayTask.IsExclusive(), true, TEST_LOCATION);
+
+  // If new render task is created, the last task is overlayTask
+  RenderTask newTask = scene.GetRenderTaskList().CreateTask();
+  DALI_TEST_EQUALS(tasks.GetTaskCount(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(newTask, tasks.GetTask(1u), TEST_LOCATION);
+  DALI_TEST_EQUALS(overlayTask, tasks.GetTask(2u), TEST_LOCATION);
+
+  // Render
+  application.SendNotification();
+  application.Render();
+
+  tasks.RemoveTask(overlayTask);
+  DALI_TEST_EQUALS(tasks.GetTaskCount(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(tasks.GetTask(0u), defaultTask, TEST_LOCATION);
+  DALI_TEST_EQUALS(tasks.GetTask(1u), newTask, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliSceneSurfaceResizedWithOverlayLayer(void)
+{
+  tet_infoline("Ensure resizing of the surface is handled properly");
+
+  TestApplication application;
+
+  auto scene = application.GetScene();
+  DALI_TEST_CHECK(scene);
+
+  const RenderTaskList& tasks = scene.GetRenderTaskList();
+  DALI_TEST_EQUALS(tasks.GetTaskCount(), 1u, TEST_LOCATION);
+  RenderTask defaultTask = tasks.GetTask(0u);
+  DALI_TEST_EQUALS(scene.GetRootLayer(), defaultTask.GetSourceActor(), TEST_LOCATION);
+
+  // Ensure stage size matches the scene size
+  auto stage = Stage::GetCurrent();
+  Vector2 sceneSize = stage.GetSize();
+  Viewport sceneViewport(0, 0, sceneSize.x, sceneSize.y);
+  DALI_TEST_EQUALS(stage.GetSize(), scene.GetSize(), TEST_LOCATION);
+  Viewport defaultViewport = defaultTask.GetViewport();
+  DALI_TEST_EQUALS(defaultViewport, sceneViewport, TEST_LOCATION);
+
+  Layer layer = scene.GetOverlayLayer();
+  // There should be 2 task by default.
+  DALI_TEST_EQUALS(tasks.GetTaskCount(), 2u, TEST_LOCATION);
+  RenderTask overlayTask = tasks.GetTask(1u);
+  Viewport overlayViewport = defaultTask.GetViewport();
+  DALI_TEST_EQUALS(defaultViewport, overlayViewport, TEST_LOCATION);
+
+  // Resize the scene
+  Vector2 newSize(1000.0f, 2000.0f);
+  DALI_TEST_CHECK(stage.GetSize() != newSize);
+  scene.SurfaceResized(newSize.width, newSize.height);
+  Viewport newViewport(0, 0, newSize.x, newSize.y);
+  DALI_TEST_EQUALS(newViewport, defaultTask.GetViewport(), TEST_LOCATION);
+  DALI_TEST_EQUALS(newViewport, defaultTask.GetViewport(), TEST_LOCATION);
+
+  END_TEST;
+}

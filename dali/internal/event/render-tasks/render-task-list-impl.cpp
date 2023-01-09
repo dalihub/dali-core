@@ -42,6 +42,7 @@ namespace Dali
 {
 namespace Internal
 {
+
 RenderTaskListPtr RenderTaskList::New()
 {
   RenderTaskListPtr taskList = new RenderTaskList();
@@ -59,10 +60,26 @@ RenderTaskPtr RenderTaskList::CreateTask()
 RenderTaskPtr RenderTaskList::CreateTask(Actor* sourceActor, CameraActor* cameraActor)
 {
   RenderTaskPtr task = RenderTask::New(sourceActor, cameraActor, *this);
-
-  mTasks.push_back(task);
+  if(mOverlayRenderTask && mTasks.back() == mOverlayRenderTask)
+  {
+    mTasks.insert(mTasks.end() - 1, task);
+  }
+  else
+  {
+    mTasks.push_back(task);
+  }
 
   return task;
+}
+
+RenderTaskPtr RenderTaskList::CreateOverlayTask(Actor* sourceActor, CameraActor* cameraActor)
+{
+  if(!mOverlayRenderTask)
+  {
+    mOverlayRenderTask = RenderTask::New(sourceActor, cameraActor, *this, true);
+    mTasks.push_back(mOverlayRenderTask);
+  }
+  return mOverlayRenderTask;
 }
 
 void RenderTaskList::RemoveTask(Internal::RenderTask& task)
@@ -80,13 +97,11 @@ void RenderTaskList::RemoveTask(Internal::RenderTask& task)
       // send a message to remove the scene-graph RenderTask
       RemoveTaskMessage(mEventThreadServices, *mSceneObject, sceneObject);
 
-      for(auto exclusiveIt = mExclusives.begin(); exclusiveIt != mExclusives.end(); ++exclusiveIt)
+      Exclusive exclusive{ptr, ActorObserver()};
+      ExclusivesContainer::iterator exclusiveIter = find(mExclusives.begin(), mExclusives.end(), exclusive);
+      if(exclusiveIter != mExclusives.end())
       {
-        if(exclusiveIt->renderTaskPtr == ptr)
-        {
-          mExclusives.erase(exclusiveIt);
-          break;
-        }
+        mExclusives.erase(exclusiveIter);
       }
       break; // we're finished
     }
@@ -103,6 +118,16 @@ RenderTaskPtr RenderTaskList::GetTask(uint32_t index) const
   DALI_ASSERT_ALWAYS((index < mTasks.size()) && "RenderTask index out-of-range");
 
   return mTasks[index];
+}
+
+RenderTaskPtr RenderTaskList::GetOverlayTask() const
+{
+  RenderTaskPtr overlayRenderTask;
+  if(mOverlayRenderTask)
+  {
+    overlayRenderTask = mOverlayRenderTask;
+  }
+  return overlayRenderTask;
 }
 
 void RenderTaskList::SetExclusive(RenderTask* task, bool exclusive)
