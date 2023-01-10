@@ -355,11 +355,12 @@ private:
   Vector2 GetPreferredSize() const;
 
 private:
-  Internal::Actor& mOwner;           // Owner of this actor sizer
-  Relayouter*      mRelayoutData;    ///< Struct to hold optional collection of relayout variables
-  Dali::Vector3    mTargetSize;      ///< Event-side storage for size (not a pointer as most actors will have a size)
-  Dali::Vector3    mAnimatedSize;    ///< Event-side storage for size animation
-  uint16_t         mUseAnimatedSize; ///< Whether the size is animated.
+  Internal::Actor& mOwner;               // Owner of this actor sizer
+  Relayouter*      mRelayoutData;        ///< Struct to hold optional collection of relayout variables
+  Dali::Vector3    mTargetSize;          ///< Event-side storage for size (not a pointer as most actors will have a size)
+  Dali::Vector3    mAnimatedSize;        ///< Event-side storage for size animation
+  uint16_t         mUseAnimatedSize;     ///< Whether the size is animated.
+  bool             mTargetSizeDirtyFlag; ///< Whether the target size is dirty or not.
   bool             mInsideOnSizeSet : 1;
 };
 

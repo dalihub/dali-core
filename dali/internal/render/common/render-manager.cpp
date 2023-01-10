@@ -777,7 +777,11 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
     Rect<int32_t> viewportRect;
 
-    int32_t surfaceOrientation = sceneObject->GetSurfaceOrientation();
+    int32_t surfaceOrientation = sceneObject->GetSurfaceOrientation() + sceneObject->GetScreenOrientation();
+    if(surfaceOrientation >= 360)
+    {
+      surfaceOrientation -= 360;
+    }
 
     // @todo Should these be part of scene?
     Integration::DepthBufferAvailable   depthBufferAvailable   = mImpl->depthBufferAvailable;

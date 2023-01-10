@@ -405,7 +405,11 @@ public:
    */
   RenderCallbackInput& GetRenderCallbackInput()
   {
-    return mRenderCallbackInput;
+    if(!mRenderCallbackInput)
+    {
+      mRenderCallbackInput = std::unique_ptr<RenderCallbackInput>(new RenderCallbackInput);
+    }
+    return *mRenderCallbackInput;
   }
 
   /**
@@ -603,7 +607,7 @@ private:
 
   std::vector<Dali::DevelRenderer::DrawCommand> mDrawCommands; // Devel stuff
   RenderCallback*                               mRenderCallback{nullptr};
-  RenderCallbackInput                           mRenderCallbackInput{};
+  std::unique_ptr<RenderCallbackInput>          mRenderCallbackInput{nullptr};
   std::vector<Graphics::Texture*>               mRenderCallbackTextureBindings{};
 };
 
