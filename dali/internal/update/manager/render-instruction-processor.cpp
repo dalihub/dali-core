@@ -266,13 +266,13 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
 
       if(DALI_LIKELY(renderable.mRenderer))
       {
-        item.mRenderer   = &renderable.mRenderer->GetRenderer();
+        item.mRenderer   = renderable.mRenderer->GetRenderer();
         item.mTextureSet = renderable.mRenderer->GetTextureSet();
         item.mDepthIndex += renderable.mRenderer->GetDepthIndex();
       }
       else
       {
-        item.mRenderer = nullptr;
+        item.mRenderer = Render::RendererKey{};
       }
 
       item.mIsUpdated |= isLayer3d;
@@ -385,14 +385,14 @@ inline bool TryReuseCachedRenderers(Layer&               layer,
     //@todo just use keys, don't deref.
     for(uint32_t index = 0; index < renderableCount; ++index)
     {
-      if(DALI_LIKELY(renderables[index].mRenderer != nullptr))
+      if(DALI_LIKELY(renderables[index].mRenderer))
       {
-        const Render::Renderer& renderer = renderables[index].mRenderer->GetRenderer();
-        checkSumNew += reinterpret_cast<std::size_t>(&renderer);
+        Render::RendererKey renderer = renderables[index].mRenderer->GetRenderer();
+        checkSumNew += renderer.Value();
       }
       if(DALI_LIKELY(renderList.GetItem(index).mRenderer))
       {
-        checkSumOld += reinterpret_cast<std::size_t>(&renderList.GetRenderer(index));
+        checkSumOld += renderList.GetItem(index).mRenderer.Value();
       }
     }
     if(checkSumNew == checkSumOld)
@@ -506,7 +506,7 @@ inline void RenderInstructionProcessor::SortRenderItems(BufferIndex bufferIndex,
   for(uint32_t index = 0; index < renderableCount; ++index, ++renderListIter)
   {
     *renderListIter = mSortingHelper[index].renderItem;
-    DALI_LOG_INFO(gRenderListLogFilter, Debug::Verbose, "  sortedList[%d] = %p\n", index, mSortingHelper[index].renderItem->mRenderer);
+    DALI_LOG_INFO(gRenderListLogFilter, Debug::Verbose, "  sortedList[%d] = %x\n", index, mSortingHelper[index].renderItem->mRenderer);
   }
 }
 

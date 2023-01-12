@@ -23,6 +23,7 @@
 #include <dali/integration-api/core-enumerations.h>
 #include <dali/internal/common/shader-saver.h>
 #include <dali/internal/event/rendering/texture-impl.h>
+#include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/renderers/render-vertex-buffer.h>
 #include <dali/public-api/math/rect.h>
 
@@ -107,16 +108,16 @@ public:
   /**
    * Add a Renderer to the render manager.
    * @param[in] renderer The renderer to add.
-   * @post renderer is owned by RenderManager
+   * @post renderer is notionally owned by RenderManager
    */
-  void AddRenderer(OwnerPointer<Render::Renderer>& renderer);
+  void AddRenderer(const Render::RendererKey& renderer);
 
   /**
    * Remove a Renderer from the render manager.
    * @param[in] renderer The renderer to remove.
    * @post renderer is destroyed.
    */
-  void RemoveRenderer(Render::Renderer* renderer);
+  void RemoveRenderer(const Render::RendererKey& renderer);
 
   /**
    * Add a sampler to the render manager.

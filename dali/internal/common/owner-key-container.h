@@ -143,6 +143,26 @@ public:
   }
 
   /**
+   * Erase an object from OwnerKeyContainer
+   * @param[in] object to remove
+   */
+  inline void EraseKey(MemoryPoolKey<ObjectType> key)
+  {
+    DALI_ASSERT_DEBUG(key && "NULL object not allowed");
+
+    Iterator            iter    = BaseType::Begin();
+    const ConstIterator endIter = BaseType::End();
+    for(; iter != endIter; ++iter)
+    {
+      if(*iter == key)
+      {
+        Erase(iter);
+        return;
+      }
+    }
+  }
+
+  /**
    * Release the ownership of an object, without deleting it.
    * @param[in] position A dereferencable iterator to an element in mContainer.
    * @post iterators are invalidated by this method.

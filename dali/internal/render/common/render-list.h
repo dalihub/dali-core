@@ -146,10 +146,10 @@ public:
   /**
    * Get renderer from an item in the list
    */
-  const Render::Renderer& GetRenderer(uint32_t index) const
+  Render::RendererKey GetRenderer(uint32_t index) const
   {
     DALI_ASSERT_DEBUG(index < GetCachedItemCount());
-    return *mItems[index]->mRenderer;
+    return mItems[index]->mRenderer;
   }
 
   /**

@@ -173,8 +173,6 @@ public:
   /**
    * Construct a new Renderer
    */
-  static Renderer* New();
-
   static RendererKey NewKey();
 
   /**
@@ -188,6 +186,10 @@ public:
    */
   void operator delete(void* ptr);
 
+  /**
+   * Get a pointer to the object from the given key.
+   * Used by MemoryPoolKey to provide pointer semantics.
+   */
   static Renderer* Get(RendererKey::KeyType);
 
   /**
@@ -475,7 +477,7 @@ public:
    * Retrieve the Render thread renderer
    * @return The associated render thread renderer
    */
-  Render::Renderer& GetRenderer();
+  Render::RendererKey GetRenderer();
 
   /**
    * Query whether the renderer is fully opaque, fully transparent or transparent.
@@ -621,11 +623,11 @@ private:
 private:
   CollectedUniformMap mCollectedUniformMap; ///< Uniform maps collected by the renderer
 
-  SceneController*  mSceneController; ///< Used for initializing renderers
-  Render::Renderer* mRenderer;        ///< Raw pointer to the renderer (that's owned by RenderManager)
-  TextureSet*       mTextureSet;      ///< The texture set this renderer uses. (Not owned)
-  Render::Geometry* mGeometry;        ///< The geometry this renderer uses. (Not owned)
-  Shader*           mShader;          ///< The shader this renderer uses. (Not owned)
+  SceneController*    mSceneController; ///< Used for initializing renderers
+  Render::RendererKey mRenderer;        ///< Key to the renderer (that's owned by RenderManager)
+  TextureSet*         mTextureSet;      ///< The texture set this renderer uses. (Not owned)
+  Render::Geometry*   mGeometry;        ///< The geometry this renderer uses. (Not owned)
+  Shader*             mShader;          ///< The shader this renderer uses. (Not owned)
 
   OwnerPointer<VisualRenderer::AnimatableVisualProperties> mVisualProperties{nullptr}; ///< VisualProperties (optional/owned)
   OwnerPointer<Vector4>                                    mBlendColor;                ///< The blend color for blending operation

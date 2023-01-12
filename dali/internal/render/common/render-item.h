@@ -118,16 +118,16 @@ struct RenderItem
    */
   void operator delete(void* ptr);
 
-  Matrix            mModelMatrix;
-  Matrix            mModelViewMatrix;
-  Vector3           mSize;
-  Vector4           mUpdateArea; ///< Update area hint is provided for damaged area calculation. (x, y, width, height)
-  Render::Renderer* mRenderer;
-  Node*             mNode;
-  const void*       mTextureSet; ///< Used for sorting only
-  int               mDepthIndex;
-  bool              mIsOpaque : 1;
-  bool              mIsUpdated : 1;
+  Matrix              mModelMatrix;
+  Matrix              mModelViewMatrix;
+  Vector3             mSize;
+  Vector4             mUpdateArea; ///< Update area hint is provided for damaged area calculation. (x, y, width, height)
+  Render::RendererKey mRenderer;
+  Node*               mNode;
+  const void*         mTextureSet; ///< Used for sorting only
+  int                 mDepthIndex;
+  bool                mIsOpaque : 1;
+  bool                mIsUpdated : 1;
 
   /**
    * Get the capacity of the global pool.

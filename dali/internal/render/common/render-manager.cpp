@@ -154,12 +154,12 @@ struct RenderManager::Impl
   std::vector<SceneGraph::Scene*> sceneContainer;   ///< List of pointers to the scene graph objects of the scenes
   Render::RenderAlgorithms        renderAlgorithms; ///< The RenderAlgorithms object is used to action the renders required by a RenderInstruction
 
-  OwnerContainer<Render::Renderer*>      rendererContainer;     ///< List of owned renderers
   OwnerContainer<Render::Sampler*>       samplerContainer;      ///< List of owned samplers
   OwnerContainer<Render::FrameBuffer*>   frameBufferContainer;  ///< List of owned framebuffers
   OwnerContainer<Render::VertexBuffer*>  vertexBufferContainer; ///< List of owned vertex buffers
   OwnerContainer<Render::Geometry*>      geometryContainer;     ///< List of owned Geometries
   OwnerContainer<Render::RenderTracker*> mRenderTrackers;       ///< List of render trackers
+  OwnerKeyContainer<Render::Renderer>    rendererContainer;     ///< List of owned renderers
   OwnerKeyContainer<Render::Texture>     textureContainer;      ///< List of owned textures
 
   ProgramController   programController; ///< Owner of the programs
@@ -215,17 +215,17 @@ void RenderManager::SetShaderSaver(ShaderSaver& upstream)
 {
 }
 
-void RenderManager::AddRenderer(OwnerPointer<Render::Renderer>& renderer)
+void RenderManager::AddRenderer(const Render::RendererKey& renderer)
 {
   // Initialize the renderer as we are now in render thread
   renderer->Initialize(mImpl->graphicsController, mImpl->programController, mImpl->shaderCache, *(mImpl->uniformBufferManager.get()), *(mImpl->pipelineCache.get()));
 
-  mImpl->rendererContainer.PushBack(renderer.Release());
+  mImpl->rendererContainer.PushBack(renderer);
 }
 
-void RenderManager::RemoveRenderer(Render::Renderer* renderer)
+void RenderManager::RemoveRenderer(const Render::RendererKey& renderer)
 {
-  mImpl->rendererContainer.EraseObject(renderer);
+  mImpl->rendererContainer.EraseKey(renderer);
 }
 
 void RenderManager::AddSampler(OwnerPointer<Render::Sampler>& sampler)

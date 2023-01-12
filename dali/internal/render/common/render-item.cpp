@@ -52,7 +52,7 @@ RenderItem::RenderItem()
 : mModelMatrix(false),
   mModelViewMatrix(false),
   mSize(),
-  mRenderer(nullptr),
+  mRenderer{},
   mNode(nullptr),
   mTextureSet(nullptr),
   mDepthIndex(0),

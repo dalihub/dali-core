@@ -23,6 +23,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/internal/common/image-sampler.h>
 #include <dali/internal/common/matrix-utils.h>
+#include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/event/rendering/texture-impl.h>
 #include <dali/internal/render/common/render-instruction.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>
@@ -149,18 +150,28 @@ inline uint32_t GetUniformBufferDataAlignment(uint32_t dataSize)
 
 namespace Render
 {
-Renderer* Renderer::New(SceneGraph::RenderDataProvider* dataProvider,
-                        Render::Geometry*               geometry,
-                        uint32_t                        blendingBitmask,
-                        const Vector4&                  blendColor,
-                        FaceCullingMode::Type           faceCullingMode,
-                        bool                            preMultipliedAlphaEnabled,
-                        DepthWriteMode::Type            depthWriteMode,
-                        DepthTestMode::Type             depthTestMode,
-                        DepthFunction::Type             depthFunction,
-                        StencilParameters&              stencilParameters)
+namespace
 {
-  return new Renderer(dataProvider, geometry, blendingBitmask, blendColor, faceCullingMode, preMultipliedAlphaEnabled, depthWriteMode, depthTestMode, depthFunction, stencilParameters);
+MemoryPoolObjectAllocator<Renderer> gRenderRendererMemoryPool;
+}
+
+RendererKey Renderer::NewKey(SceneGraph::RenderDataProvider* dataProvider,
+                             Render::Geometry*               geometry,
+                             uint32_t                        blendingBitmask,
+                             const Vector4&                  blendColor,
+                             FaceCullingMode::Type           faceCullingMode,
+                             bool                            preMultipliedAlphaEnabled,
+                             DepthWriteMode::Type            depthWriteMode,
+                             DepthTestMode::Type             depthTestMode,
+                             DepthFunction::Type             depthFunction,
+                             StencilParameters&              stencilParameters)
+{
+  void* ptr = gRenderRendererMemoryPool.AllocateRawThreadSafe();
+  auto  key = gRenderRendererMemoryPool.GetKeyFromPtr(static_cast<Renderer*>(ptr));
+
+  // Use placement new to construct renderer.
+  new(ptr) Renderer(dataProvider, geometry, blendingBitmask, blendColor, faceCullingMode, preMultipliedAlphaEnabled, depthWriteMode, depthTestMode, depthFunction, stencilParameters);
+  return RendererKey(key);
 }
 
 Renderer::Renderer(SceneGraph::RenderDataProvider* dataProvider,
@@ -207,10 +218,21 @@ void Renderer::Initialize(Graphics::Controller& graphicsController, ProgramCache
 
 Renderer::~Renderer() = default;
 
+void Renderer::operator delete(void* ptr)
+{
+  gRenderRendererMemoryPool.FreeThreadSafe(static_cast<Renderer*>(ptr));
+}
+
+Renderer* Renderer::Get(RendererKey::KeyType rendererKey)
+{
+  return gRenderRendererMemoryPool.GetPtrFromKey(rendererKey);
+}
+
 void Renderer::SetGeometry(Render::Geometry* geometry)
 {
   mGeometry = geometry;
 }
+
 void Renderer::SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, uint32_t size)
 {
   mDrawCommands.clear();
