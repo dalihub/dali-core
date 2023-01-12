@@ -67,7 +67,6 @@ namespace Internal
 {
 namespace SceneGraph
 {
-
 using RendererContainer = Dali::Vector<RendererKey>;
 using RendererIter      = RendererContainer::Iterator;
 using RendererConstIter = RendererContainer::ConstIterator;
@@ -224,7 +223,7 @@ public:
   /**
    * @copydoc RenderDataProvider::GetTextures()
    */
-  const Vector<Render::Texture*>* GetTextures() const override;
+  const Vector<Render::TextureKey>* GetTextures() const override;
 
   /**
    * @copydoc RenderDataProvider::GetSamplers()

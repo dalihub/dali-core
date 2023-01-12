@@ -26,8 +26,8 @@
 #include <dali/public-api/math/rect.h>
 
 #include <dali/graphics-api/graphics-controller.h>
+#include <dali/internal/common/owner-key-container.h>
 #include <dali/internal/render/common/render-item.h>
-#include <dali/internal/update/manager/owner-key-container.h>
 
 namespace Dali
 {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/core.h>
 
+#include <dali/internal/common/owner-key-container.h>
+
 #include <dali/internal/event/animation/animation-playlist.h>
 #include <dali/internal/event/common/notification-manager.h>
 #include <dali/internal/event/common/property-notifier.h>
@@ -30,7 +32,6 @@
 #include <dali/internal/update/controllers/render-message-dispatcher.h>
 #include <dali/internal/update/controllers/scene-controller-impl.h>
 #include <dali/internal/update/manager/frame-callback-processor.h>
-#include <dali/internal/update/manager/owner-key-container.h>
 #include <dali/internal/update/manager/render-task-processor.h>
 #include <dali/internal/update/manager/transform-manager.h>
 #include <dali/internal/update/manager/update-algorithms.h>
@@ -136,8 +137,7 @@ inline void EraseUsingDiscardQueue(OwnerKeyContainer<Type>& container, const Mem
 void SortSiblingNodesRecursively(Node& node)
 {
   NodeContainer& container = node.GetChildren();
-  std::sort(container.Begin(), container.End(), [](Node* a, Node* b)
-            { return a->GetDepthIndex() < b->GetDepthIndex(); });
+  std::sort(container.Begin(), container.End(), [](Node* a, Node* b) { return a->GetDepthIndex() < b->GetDepthIndex(); });
 
   // Descend tree and sort as well
   for(auto&& iter : container)
@@ -161,11 +161,11 @@ struct UpdateManager::Impl
     {
     }
 
-    ~SceneInfo()                               = default; ///< Default non-virtual destructor
-    SceneInfo(SceneInfo&& rhs)                 = default; ///< Move constructor
-    SceneInfo& operator=(SceneInfo&& rhs)      = default; ///< Move assignment operator
-    SceneInfo& operator=(const SceneInfo& rhs) = delete;  ///< Assignment operator
-    SceneInfo(const SceneInfo& rhs)            = delete;  ///< Copy constructor
+    ~SceneInfo()               = default;                ///< Default non-virtual destructor
+    SceneInfo(SceneInfo&& rhs) = default;                ///< Move constructor
+    SceneInfo& operator=(SceneInfo&& rhs) = default;     ///< Move assignment operator
+    SceneInfo& operator=(const SceneInfo& rhs) = delete; ///< Assignment operator
+    SceneInfo(const SceneInfo& rhs)            = delete; ///< Copy constructor
 
     Layer*                       root{nullptr};   ///< Root node (root is a layer). The layer is not stored in the node memory pool.
     OwnerPointer<RenderTaskList> taskList;        ///< Scene graph render task list
@@ -364,8 +364,7 @@ void UpdateManager::InstallRoot(OwnerPointer<Layer>& layer)
 
   Layer* rootLayer = layer.Release();
 
-  DALI_ASSERT_DEBUG(std::find_if(mImpl->scenes.begin(), mImpl->scenes.end(), [rootLayer](Impl::SceneInfoPtr& scene)
-                                 { return scene && scene->root == rootLayer; }) == mImpl->scenes.end() &&
+  DALI_ASSERT_DEBUG(std::find_if(mImpl->scenes.begin(), mImpl->scenes.end(), [rootLayer](Impl::SceneInfoPtr& scene) { return scene && scene->root == rootLayer; }) == mImpl->scenes.end() &&
                     "Root Node already installed");
 
   rootLayer->CreateTransform(&mImpl->transformManager);
@@ -1465,10 +1464,9 @@ void UpdateManager::AttachVertexBuffer(Render::Geometry* geometry, Render::Verte
   new(slot) DerivedType(&mImpl->renderManager, &RenderManager::AttachVertexBuffer, geometry, vertexBuffer);
 }
 
-void UpdateManager::AddTexture(OwnerPointer<Render::Texture>& texture)
+void UpdateManager::AddTexture(const Render::TextureKey& texture)
 {
-  // Message has ownership of Texture while in transit from update -> render
-  using DerivedType = MessageValue1<RenderManager, OwnerPointer<Render::Texture>>;
+  using DerivedType = MessageValue1<RenderManager, Render::TextureKey>;
 
   // Reserve some memory inside the render queue
   uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot(mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof(DerivedType));
@@ -1477,9 +1475,9 @@ void UpdateManager::AddTexture(OwnerPointer<Render::Texture>& texture)
   new(slot) DerivedType(&mImpl->renderManager, &RenderManager::AddTexture, texture);
 }
 
-void UpdateManager::RemoveTexture(Render::Texture* texture)
+void UpdateManager::RemoveTexture(const Render::TextureKey& texture)
 {
-  using DerivedType = MessageValue1<RenderManager, Render::Texture*>;
+  using DerivedType = MessageValue1<RenderManager, Render::TextureKey>;
 
   // Reserve some memory inside the render queue
   uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot(mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof(DerivedType));
@@ -1488,9 +1486,9 @@ void UpdateManager::RemoveTexture(Render::Texture* texture)
   new(slot) DerivedType(&mImpl->renderManager, &RenderManager::RemoveTexture, texture);
 }
 
-void UpdateManager::UploadTexture(Render::Texture* texture, PixelDataPtr pixelData, const Texture::UploadParams& params)
+void UpdateManager::UploadTexture(const Render::TextureKey& texture, PixelDataPtr pixelData, const Texture::UploadParams& params)
 {
-  using DerivedType = MessageValue3<RenderManager, Render::Texture*, PixelDataPtr, Texture::UploadParams>;
+  using DerivedType = MessageValue3<RenderManager, Render::TextureKey, PixelDataPtr, Texture::UploadParams>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot(mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof(DerivedType));
@@ -1499,9 +1497,9 @@ void UpdateManager::UploadTexture(Render::Texture* texture, PixelDataPtr pixelDa
   new(slot) DerivedType(&mImpl->renderManager, &RenderManager::UploadTexture, texture, pixelData, params);
 }
 
-void UpdateManager::GenerateMipmaps(Render::Texture* texture)
+void UpdateManager::GenerateMipmaps(const Render::TextureKey& texture)
 {
-  using DerivedType = MessageValue1<RenderManager, Render::Texture*>;
+  using DerivedType = MessageValue1<RenderManager, Render::TextureKey>;
 
   // Reserve some memory inside the render queue
   uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot(mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof(DerivedType));

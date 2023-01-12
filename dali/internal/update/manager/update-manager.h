@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_UPDATE_MANAGER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,8 @@
 #include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/rendering/texture-impl.h>
-#include <dali/internal/render/renderers/render-texture.h> // For OwnerPointer<Render::Texture>
+#include <dali/internal/render/renderers/render-texture-key.h> // For RenderTextureKey
+#include <dali/internal/render/renderers/render-texture.h>     // For OwnerPointer<Render::Texture>
 #include <dali/internal/render/renderers/render-vertex-buffer.h>
 #include <dali/internal/render/shaders/render-shader.h> // for OwnerPointer< Shader >
 #include <dali/internal/update/animation/scene-graph-animation.h>
@@ -518,14 +519,14 @@ public:
    * @param[in] texture The texture to add
    * The texture will be owned by RenderManager
    */
-  void AddTexture(OwnerPointer<Render::Texture>& texture);
+  void AddTexture(const Render::TextureKey& texture);
 
   /**
    * Removes a texture from the render manager
    * @param[in] texture The texture to remove
    * @post The texture will be destroyed in the render thread
    */
-  void RemoveTexture(Render::Texture* texture);
+  void RemoveTexture(const Render::TextureKey& texture);
 
   /**
    * Uploads data to a texture owned by the RenderManager
@@ -533,13 +534,13 @@ public:
    * @param[in] pixelData The pixel data object
    * @param[in] params The parameters for the upload
    */
-  void UploadTexture(Render::Texture* texture, PixelDataPtr pixelData, const Texture::UploadParams& params);
+  void UploadTexture(const Render::TextureKey& texture, PixelDataPtr pixelData, const Texture::UploadParams& params);
 
   /**
    * Generates mipmaps for a texture owned by the RenderManager
    * @param[in] texture The texture
    */
-  void GenerateMipmaps(Render::Texture* texture);
+  void GenerateMipmaps(const Render::TextureKey& texture);
 
   /**
    * Adds a framebuffer to the render manager
@@ -1353,10 +1354,9 @@ inline void SetGeometryTypeMessage(UpdateManager& manager, Render::Geometry& geo
   new(slot) LocalType(&manager, &UpdateManager::SetGeometryType, &geometry, geometryType);
 }
 
-inline void AddTexture(UpdateManager& manager, OwnerPointer<Render::Texture>& texture)
+inline void AddTextureMessage(UpdateManager& manager, const Render::TextureKey& texture)
 {
-  // Message has ownership of Texture while in transit from event -> update
-  using LocalType = MessageValue1<UpdateManager, OwnerPointer<Render::Texture>>;
+  using LocalType = MessageValue1<UpdateManager, Render::TextureKey>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
@@ -1365,37 +1365,37 @@ inline void AddTexture(UpdateManager& manager, OwnerPointer<Render::Texture>& te
   new(slot) LocalType(&manager, &UpdateManager::AddTexture, texture);
 }
 
-inline void RemoveTexture(UpdateManager& manager, Render::Texture& texture)
+inline void RemoveTextureMessage(UpdateManager& manager, const Render::TextureKey& texture)
 {
-  using LocalType = MessageValue1<UpdateManager, Render::Texture*>;
+  using LocalType = MessageValue1<UpdateManager, Render::TextureKey>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &UpdateManager::RemoveTexture, &texture);
+  new(slot) LocalType(&manager, &UpdateManager::RemoveTexture, texture);
 }
 
-inline void UploadTextureMessage(UpdateManager& manager, Render::Texture& texture, PixelDataPtr pixelData, const Texture::UploadParams& params)
+inline void UploadTextureMessage(UpdateManager& manager, Render::TextureKey texture, PixelDataPtr pixelData, const Texture::UploadParams& params)
 {
-  using LocalType = MessageValue3<UpdateManager, Render::Texture*, PixelDataPtr, Texture::UploadParams>;
+  using LocalType = MessageValue3<UpdateManager, Render::TextureKey, PixelDataPtr, Texture::UploadParams>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &UpdateManager::UploadTexture, &texture, pixelData, params);
+  new(slot) LocalType(&manager, &UpdateManager::UploadTexture, texture, pixelData, params);
 }
 
-inline void GenerateMipmapsMessage(UpdateManager& manager, Render::Texture& texture)
+inline void GenerateMipmapsMessage(UpdateManager& manager, Render::TextureKey texture)
 {
-  using LocalType = MessageValue1<UpdateManager, Render::Texture*>;
+  using LocalType = MessageValue1<UpdateManager, Render::TextureKey>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &UpdateManager::GenerateMipmaps, &texture);
+  new(slot) LocalType(&manager, &UpdateManager::GenerateMipmaps, texture);
 }
 
 inline void AddFrameBuffer(UpdateManager& manager, OwnerPointer<Render::FrameBuffer>& frameBuffer)

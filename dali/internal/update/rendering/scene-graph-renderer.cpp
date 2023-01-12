@@ -338,7 +338,7 @@ void Renderer::SetTextures(TextureSet* textureSet)
   SetUpdated(true);
 }
 
-const Vector<Render::Texture*>* Renderer::GetTextures() const
+const Vector<Render::TextureKey>* Renderer::GetTextures() const
 {
   return mTextureSet ? &(mTextureSet->GetTextures()) : nullptr;
 }

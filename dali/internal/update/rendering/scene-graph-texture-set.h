@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_TEXTURE_SET_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,12 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/public-api/rendering/texture-set.h>
+
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/event-thread-services.h>
-#include <dali/public-api/rendering/texture-set.h>
+#include <dali/internal/render/renderers/render-texture-key.h>
 
 namespace Dali
 {
@@ -67,7 +69,7 @@ public:
    * @param[in] index The index of the texture
    * @param[in] texture The texture
    */
-  void SetTexture(uint32_t index, Render::Texture* texture);
+  void SetTexture(uint32_t index, const Render::TextureKey& texture);
 
   /**
    * Return whether any texture in the texture set has an alpha channel
@@ -78,7 +80,7 @@ public:
   /**
    * Accessor for textures (used by RenderDataProvider impl)
    */
-  const Vector<Render::Texture*>& GetTextures()
+  const Vector<Render::TextureKey>& GetTextures()
   {
     return mTextures;
   }
@@ -103,21 +105,21 @@ private:
    */
   TextureSet();
 
-private:                              // Data
-  Vector<Render::Sampler*> mSamplers; ///< List of samplers used by each texture. Not owned
-  Vector<Render::Texture*> mTextures; ///< List of Textures. Not owned
-  bool                     mHasAlpha; ///< if any of the textures has an alpha channel
+private:
+  Vector<Render::Sampler*>   mSamplers; ///< List of samplers used by each texture. Not owned
+  Vector<Render::TextureKey> mTextures; ///< List of Textures. Not owned
+  bool                       mHasAlpha; ///< if any of the textures has an alpha channel
 };
 
-inline void SetTextureMessage(EventThreadServices& eventThreadServices, const TextureSet& textureSet, uint32_t index, Render::Texture* texture)
+inline void SetTextureMessage(EventThreadServices& eventThreadServices, const TextureSet& textureSet, uint32_t index, const Render::TextureKey& textureKey)
 {
-  using LocalType = MessageValue2<TextureSet, uint32_t, Render::Texture*>;
+  using LocalType = MessageValue2<TextureSet, uint32_t, Render::TextureKey>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&textureSet, &TextureSet::SetTexture, index, texture);
+  new(slot) LocalType(&textureSet, &TextureSet::SetTexture, index, textureKey);
 }
 
 inline void SetSamplerMessage(EventThreadServices& eventThreadServices, const TextureSet& textureSet, uint32_t index, Render::Sampler* sampler)

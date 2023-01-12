@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -221,8 +221,8 @@ void Renderer::BindTextures(Graphics::CommandBuffer& commandBuffer, Vector<Graph
 {
   uint32_t textureUnit = 0;
 
-  const Dali::Vector<Render::Texture*>* textures(mRenderDataProvider->GetTextures());
-  const Dali::Vector<Render::Sampler*>* samplers(mRenderDataProvider->GetSamplers());
+  auto textures(mRenderDataProvider->GetTextures());
+  auto samplers(mRenderDataProvider->GetSamplers());
 
   std::vector<Graphics::TextureBinding> textureBindings;
 
@@ -450,7 +450,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
       for(auto& texture : textureResources)
       {
         auto& textureImpl     = GetImplementation(texture);
-        auto  graphicsTexture = textureImpl.GetRenderObject()->GetGraphicsObject();
+        auto  graphicsTexture = textureImpl.GetRenderTextureKey()->GetGraphicsObject();
 
         auto properties = mGraphicsController->GetTextureProperties(*graphicsTexture);
 
