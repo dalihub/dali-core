@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_PROPERTY_OWNER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -212,16 +212,6 @@ public:
   const UniformMap& GetUniformMap() const;
 
   /**
-   * @copydoc UniformMap::AddUniformMapObserver
-   */
-  void AddUniformMapObserver(UniformMap::Observer& observer);
-
-  /**
-   * @copydoc UniformMap::RemoveUniformMapObserver
-   */
-  void RemoveUniformMapObserver(UniformMap::Observer& observer);
-
-  /**
    * Query whether playing an animation is possible or not.
    * @return true if playing an animation is possible.
    */
@@ -235,6 +225,14 @@ protected:
    * Protected constructor.
    */
   PropertyOwner();
+
+  /**
+   * Method to inform derived classes when property maps have been modified.
+   */
+  virtual void OnMappingChanged()
+  {
+    // Default behaviour is to do nothing
+  }
 
 private:
   // Undefined

@@ -105,6 +105,11 @@ public:
   Dali::Layer GetRootLayer() const;
 
   /**
+   * @copydoc Dali::Integration::Scene::GetOverlayLayer
+   */
+  Dali::Layer GetOverlayLayer();
+
+  /**
    * @copydoc Dali::Integration::Scene::GetLayerCount
    */
   uint32_t GetLayerCount() const;
@@ -379,6 +384,8 @@ private:
   Vector4 mBackgroundColor;
 
   LayerPtr mRootLayer;
+
+  LayerPtr mOverlayLayer;
 
   // Ordered list of currently on-stage layers
   OwnerPointer<LayerList> mLayerList;

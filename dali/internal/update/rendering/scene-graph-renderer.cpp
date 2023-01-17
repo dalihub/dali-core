@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,17 +108,10 @@ Renderer::Renderer()
   mOpacity(1.0f),
   mDepthIndex(0)
 {
-  // Observe our own PropertyOwner's uniform map.
-  AddUniformMapObserver(*this);
 }
 
 Renderer::~Renderer()
 {
-  if(mShader)
-  {
-    mShader->RemoveUniformMapObserver(*this);
-    mShader = nullptr;
-  }
 }
 
 void Renderer::operator delete(void* ptr)
@@ -128,14 +121,23 @@ void Renderer::operator delete(void* ptr)
 
 bool Renderer::PrepareRender(BufferIndex updateBufferIndex)
 {
-  bool rendererUpdated = mResendFlag || mRenderingBehavior == DevelRenderer::Rendering::CONTINUOUSLY || mUpdateDecay > 0;
+  bool rendererUpdated        = mResendFlag || mRenderingBehavior == DevelRenderer::Rendering::CONTINUOUSLY || mUpdateDecay > 0;
+  auto shaderMapChangeCounter = mShader ? mShader->GetUniformMap().GetChangeCounter() : 0u;
+  bool shaderMapChanged       = mShader && (mShaderMapChangeCounter != shaderMapChangeCounter);
+  if(shaderMapChanged)
+  {
+    mShaderMapChangeCounter = shaderMapChangeCounter;
+  }
 
-  if(mUniformMapChangeCounter != mUniformMaps.GetChangeCounter())
+  if(mUniformMapChangeCounter != mUniformMaps.GetChangeCounter() || shaderMapChanged)
   {
     // The map has changed since the last time we checked.
-    rendererUpdated          = true;
-    mRegenerateUniformMap    = true;
-    mUpdateDecay             = Renderer::Decay::INITIAL; // Render at least twice if the map has changed/actor has been added
+    rendererUpdated       = true;
+    mRegenerateUniformMap = true;
+    mUpdateDecay          = Renderer::Decay::INITIAL; // Render at least twice if the map has changed/actor has been added
+
+    // Update local counters to identify any future changes to maps
+    // (unlikely, but allowed by API).
     mUniformMapChangeCounter = mUniformMaps.GetChangeCounter();
   }
   if(mUpdateDecay > 0)
@@ -327,14 +329,9 @@ void Renderer::SetShader(Shader* shader)
 {
   DALI_ASSERT_DEBUG(shader != NULL && "Shader pointer is NULL");
 
-  if(mShader)
-  {
-    mShader->RemoveUniformMapObserver(*this);
-  }
-
-  mShader = shader;
-  mShader->AddUniformMapObserver(*this);
-  mRegenerateUniformMap = true;
+  mShader                 = shader;
+  mShaderMapChangeCounter = 0u;
+  mRegenerateUniformMap   = true;
   mResendFlag |= RESEND_GEOMETRY | RESEND_SHADER;
   mDirtyFlag = true;
 }
@@ -713,6 +710,7 @@ void Renderer::UpdateUniformMap(BufferIndex updateBufferIndex)
       localMap.AddMappings(mShader->GetUniformMap());
     }
     localMap.UpdateChangeCounter();
+
     mRegenerateUniformMap = false;
     SetUpdated(true);
   }
@@ -756,9 +754,9 @@ uint32_t Renderer::GetMemoryPoolCapacity()
   return gRendererMemoryPool.GetCapacity();
 }
 
-void Renderer::UniformMappingsChanged(const UniformMap& mappings)
+void Renderer::OnMappingChanged()
 {
-  // The mappings are either from PropertyOwner base class, or the Shader
+  // Properties have been registered on the base class.
   mRegenerateUniformMap = true; // Should remain true until this renderer is added to a RenderList.
 }
 

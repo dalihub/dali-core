@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDERER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -140,8 +140,7 @@ struct AnimatableDecoratedVisualProperties
 
 class Renderer : public PropertyOwner,
                  public UniformMapDataProvider,
-                 public RenderDataProvider,
-                 public UniformMap::Observer
+                 public RenderDataProvider
 {
 public:
   enum OpacityType
@@ -527,11 +526,11 @@ public:
    */
   static uint32_t GetMemoryPoolCapacity();
 
-public: // UniformMap::Observer
+public: // PropertyOwner::MappingChanged
   /**
-   * @copydoc UniformMap::Observer::UniformMappingsChanged
+   * @copydoc PropertyOwner::OnMappingChanged
    */
-  void UniformMappingsChanged(const UniformMap& mappings) override;
+  void OnMappingChanged() override;
 
 public: // PropertyOwner implementation
   /**
@@ -590,12 +589,13 @@ private:
 
   Dali::Internal::Render::Renderer::StencilParameters mStencilParameters; ///< Struct containing all stencil related options
 
-  uint64_t mUniformsHash{0};             ///< Hash of uniform map property values
-  uint32_t mIndexedDrawFirstElement;     ///< first element index to be drawn using indexed draw
-  uint32_t mIndexedDrawElementsCount;    ///< number of elements to be drawn using indexed draw
-  uint32_t mBlendBitmask;                ///< The bitmask of blending options
-  uint32_t mResendFlag;                  ///< Indicate whether data should be resent to the renderer
-  uint32_t mUniformMapChangeCounter{0u}; ///< Value to check if uniform data should be updated
+  uint64_t             mUniformsHash{0};             ///< Hash of uniform map property values
+  uint32_t             mIndexedDrawFirstElement;     ///< first element index to be drawn using indexed draw
+  uint32_t             mIndexedDrawElementsCount;    ///< number of elements to be drawn using indexed draw
+  uint32_t             mBlendBitmask;                ///< The bitmask of blending options
+  uint32_t             mResendFlag;                  ///< Indicate whether data should be resent to the renderer
+  UniformMap::SizeType mUniformMapChangeCounter{0u}; ///< Value to check if uniform data should be updated
+  UniformMap::SizeType mShaderMapChangeCounter{0u};  ///< Value to check if uniform data should be updated
 
   DepthFunction::Type            mDepthFunction : 4;     ///< Local copy of the depth function
   FaceCullingMode::Type          mFaceCullingMode : 3;   ///< Local copy of the mode of face culling

@@ -85,6 +85,11 @@ Scene::~Scene()
     mRootLayer.Reset();
   }
 
+  if(mOverlayLayer)
+  {
+    mOverlayLayer.Reset();
+  }
+
   if(mRenderTaskList)
   {
     mRenderTaskList.Reset();
@@ -172,6 +177,26 @@ RenderTaskList& Scene::GetRenderTaskList() const
 Dali::Layer Scene::GetRootLayer() const
 {
   return Dali::Layer(mRootLayer.Get());
+}
+
+Dali::Layer Scene::GetOverlayLayer()
+{
+  if(!mOverlayLayer)
+  {
+    // Creates overlay layer.
+    mOverlayLayer = Layer::New();
+    mOverlayLayer->SetName("OverlayLayer");
+    mOverlayLayer->SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    mOverlayLayer->SetParentOrigin(Dali::ParentOrigin::TOP_LEFT);
+    mOverlayLayer->SetAnchorPoint(Dali::AnchorPoint::TOP_LEFT);
+    mRootLayer->Add(*mOverlayLayer);
+
+    // Create the overlay render-task and set exclusive to true.
+    RenderTaskPtr renderTask = mRenderTaskList->CreateOverlayTask(mOverlayLayer.Get(), mDefaultCamera.Get());
+    renderTask->SetExclusive(true);
+    renderTask->SetInputEnabled(true);
+  }
+  return Dali::Layer(mOverlayLayer.Get());
 }
 
 LayerList& Scene::GetLayerList() const
@@ -337,6 +362,12 @@ void Scene::ChangedSurface(float width, float height, int32_t windowOrientation,
   // set default render-task viewport parameters
   RenderTaskPtr defaultRenderTask = mRenderTaskList->GetTask(0u);
   defaultRenderTask->SetViewport(newSize);
+  // set overlay render-task viewport parameters
+  RenderTaskPtr overlayRenderTask = mRenderTaskList->GetOverlayTask();
+  if(overlayRenderTask)
+  {
+    overlayRenderTask->SetViewport(newSize);
+  }
 }
 
 bool Scene::IsSurfaceRectChanged() const

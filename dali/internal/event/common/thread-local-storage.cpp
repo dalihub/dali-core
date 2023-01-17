@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,22 +51,25 @@ namespace Internal
 {
 namespace
 {
-thread_local ThreadLocalStorage* threadLocal = nullptr;
-}
+thread_local ThreadLocalStorage* threadLocal    = nullptr;
+thread_local bool                isShuttingDown = false;
+} // namespace
 
 ThreadLocalStorage::ThreadLocalStorage(Core* core)
 : mCore(core)
 {
   DALI_ASSERT_ALWAYS(threadLocal == nullptr && "Cannot create more than one ThreadLocalStorage object");
 
-  threadLocal = this;
+  threadLocal    = this;
+  isShuttingDown = false;
 }
 
 ThreadLocalStorage::~ThreadLocalStorage() = default;
 
 void ThreadLocalStorage::Remove()
 {
-  threadLocal = nullptr;
+  threadLocal    = nullptr;
+  isShuttingDown = true;
 }
 
 ThreadLocalStorage& ThreadLocalStorage::Get()
@@ -90,6 +93,11 @@ bool ThreadLocalStorage::Created()
 {
   // see if the TLS has been set yet
   return (threadLocal != nullptr);
+}
+
+bool ThreadLocalStorage::IsShuttingDown()
+{
+  return isShuttingDown;
 }
 
 ThreadLocalStorage* ThreadLocalStorage::GetInternal()
