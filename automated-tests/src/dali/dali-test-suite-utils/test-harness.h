@@ -2,7 +2,7 @@
 #define TEST_HARNESS_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,9 +44,10 @@ struct TestCase
   const char*                           name;
   std::chrono::steady_clock::time_point startTime;
   std::chrono::system_clock::time_point startSystemTime;
-  int32_t                               result;
+  int32_t                               result{0};
   pid_t                                 childPid{0};
   testcase*                             tctPtr;
+  bool                                  finished{false};
 
   TestCase(int32_t index, testcase* testCase)
   : testCase(index),
