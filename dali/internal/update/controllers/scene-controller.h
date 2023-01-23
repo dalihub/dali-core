@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_SCENE_CONTROLLER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ namespace SceneGraph
 {
 class RenderMessageDispatcher;
 class RenderQueue;
-class DiscardQueue;
 
 /**
  * Abstract interface for the scene controller
@@ -55,12 +54,6 @@ public:
    * @return A reference to the render queue
    */
   virtual RenderQueue& GetRenderQueue() = 0;
-
-  /**
-   * Return the discard queue
-   * @return A reference to the discard queue
-   */
-  virtual DiscardQueue& GetDiscardQueue() = 0;
 
 private:
   // Undefined copy constructor.

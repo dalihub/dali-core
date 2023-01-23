@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,8 @@
 #include <dali/internal/update/common/scene-graph-scene.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/internal/update/render-tasks/scene-graph-camera.h>
+
+#include <dali/internal/common/owner-key-container.h>
 
 #include <dali/internal/render/common/render-algorithms.h>
 #include <dali/internal/render/common/render-debug.h>
@@ -107,15 +109,7 @@ struct RenderManager::Impl
        Integration::StencilBufferAvailable stencilBufferAvailableParam,
        Integration::PartialUpdateAvailable partialUpdateAvailableParam)
   : graphicsController(graphicsController),
-    renderQueue(),
     renderAlgorithms(graphicsController),
-    frameCount(0u),
-    renderBufferIndex(SceneGraphBuffers::INITIAL_UPDATE_BUFFER_INDEX),
-    rendererContainer(),
-    samplerContainer(),
-    textureContainer(),
-    frameBufferContainer(),
-    lastFrameWasRendered(false),
     programController(graphicsController),
     shaderCache(graphicsController),
     depthBufferAvailable(depthBufferAvailableParam),
@@ -155,26 +149,18 @@ struct RenderManager::Impl
   }
 
   // the order is important for destruction,
-  Graphics::Controller& graphicsController;
-  RenderQueue           renderQueue; ///< A message queue for receiving messages from the update-thread.
+  Graphics::Controller&           graphicsController;
+  RenderQueue                     renderQueue;      ///< A message queue for receiving messages from the update-thread.
+  std::vector<SceneGraph::Scene*> sceneContainer;   ///< List of pointers to the scene graph objects of the scenes
+  Render::RenderAlgorithms        renderAlgorithms; ///< The RenderAlgorithms object is used to action the renders required by a RenderInstruction
 
-  std::vector<SceneGraph::Scene*> sceneContainer; ///< List of pointers to the scene graph objects of the scenes
-
-  Render::RenderAlgorithms renderAlgorithms; ///< The RenderAlgorithms object is used to action the renders required by a RenderInstruction
-
-  uint32_t    frameCount;        ///< The current frame count
-  BufferIndex renderBufferIndex; ///< The index of the buffer to read from; this is opposite of the "update" buffer
-
-  OwnerContainer<Render::Renderer*>     rendererContainer;     ///< List of owned renderers
-  OwnerContainer<Render::Sampler*>      samplerContainer;      ///< List of owned samplers
-  OwnerContainer<Render::Texture*>      textureContainer;      ///< List of owned textures
-  OwnerContainer<Render::FrameBuffer*>  frameBufferContainer;  ///< List of owned framebuffers
-  OwnerContainer<Render::VertexBuffer*> vertexBufferContainer; ///< List of owned vertex buffers
-  OwnerContainer<Render::Geometry*>     geometryContainer;     ///< List of owned Geometries
-
-  bool lastFrameWasRendered; ///< Keeps track of the last frame being rendered due to having render instructions
-
-  OwnerContainer<Render::RenderTracker*> mRenderTrackers; ///< List of render trackers
+  OwnerContainer<Render::Sampler*>       samplerContainer;      ///< List of owned samplers
+  OwnerContainer<Render::FrameBuffer*>   frameBufferContainer;  ///< List of owned framebuffers
+  OwnerContainer<Render::VertexBuffer*>  vertexBufferContainer; ///< List of owned vertex buffers
+  OwnerContainer<Render::Geometry*>      geometryContainer;     ///< List of owned Geometries
+  OwnerContainer<Render::RenderTracker*> mRenderTrackers;       ///< List of render trackers
+  OwnerKeyContainer<Render::Renderer>    rendererContainer;     ///< List of owned renderers
+  OwnerKeyContainer<Render::Texture>     textureContainer;      ///< List of owned textures
 
   ProgramController   programController; ///< Owner of the programs
   Render::ShaderCache shaderCache;       ///< The cache for the graphics shaders
@@ -190,6 +176,10 @@ struct RenderManager::Impl
   Vector<Graphics::Texture*>        boundTextures;         ///< The textures bound for rendering
   Vector<Graphics::Texture*>        textureDependencyList; ///< The dependency list of bound textures
 
+  uint32_t    frameCount{0u};                                                    ///< The current frame count
+  BufferIndex renderBufferIndex{SceneGraphBuffers::INITIAL_UPDATE_BUFFER_INDEX}; ///< The index of the buffer to read from; this is opposite of the "update" buffer
+
+  bool lastFrameWasRendered{false}; ///< Keeps track of the last frame being rendered due to having render instructions
   bool commandBufferSubmitted{false};
 };
 
@@ -225,17 +215,17 @@ void RenderManager::SetShaderSaver(ShaderSaver& upstream)
 {
 }
 
-void RenderManager::AddRenderer(OwnerPointer<Render::Renderer>& renderer)
+void RenderManager::AddRenderer(const Render::RendererKey& renderer)
 {
   // Initialize the renderer as we are now in render thread
   renderer->Initialize(mImpl->graphicsController, mImpl->programController, mImpl->shaderCache, *(mImpl->uniformBufferManager.get()), *(mImpl->pipelineCache.get()));
 
-  mImpl->rendererContainer.PushBack(renderer.Release());
+  mImpl->rendererContainer.PushBack(renderer);
 }
 
-void RenderManager::RemoveRenderer(Render::Renderer* renderer)
+void RenderManager::RemoveRenderer(const Render::RendererKey& renderer)
 {
-  mImpl->rendererContainer.EraseObject(renderer);
+  mImpl->rendererContainer.EraseKey(renderer);
 }
 
 void RenderManager::AddSampler(OwnerPointer<Render::Sampler>& sampler)
@@ -249,34 +239,38 @@ void RenderManager::RemoveSampler(Render::Sampler* sampler)
   mImpl->samplerContainer.EraseObject(sampler);
 }
 
-void RenderManager::AddTexture(OwnerPointer<Render::Texture>& texture)
+void RenderManager::AddTexture(const Render::TextureKey& textureKey)
 {
-  texture->Initialize(mImpl->graphicsController);
-  mImpl->textureContainer.PushBack(texture.Release());
+  DALI_ASSERT_DEBUG(textureKey && "Trying to add empty texture key");
+
+  textureKey->Initialize(mImpl->graphicsController);
+  mImpl->textureContainer.PushBack(textureKey);
 }
 
-void RenderManager::RemoveTexture(Render::Texture* texture)
+void RenderManager::RemoveTexture(const Render::TextureKey& textureKey)
 {
-  DALI_ASSERT_DEBUG(NULL != texture);
+  DALI_ASSERT_DEBUG(textureKey && "Trying to remove empty texture key");
 
   // Find the texture, use std::find so we can do the erase safely
-  auto iter = std::find(mImpl->textureContainer.begin(), mImpl->textureContainer.end(), texture);
+  auto iter = std::find(mImpl->textureContainer.begin(), mImpl->textureContainer.end(), textureKey);
 
   if(iter != mImpl->textureContainer.end())
   {
-    texture->Destroy();
+    textureKey->Destroy();
     mImpl->textureContainer.Erase(iter); // Texture found; now destroy it
   }
 }
 
-void RenderManager::UploadTexture(Render::Texture* texture, PixelDataPtr pixelData, const Texture::UploadParams& params)
+void RenderManager::UploadTexture(const Render::TextureKey& textureKey, PixelDataPtr pixelData, const Texture::UploadParams& params)
 {
-  texture->Upload(pixelData, params);
+  DALI_ASSERT_DEBUG(textureKey && "Trying to upload to empty texture key");
+  textureKey->Upload(pixelData, params);
 }
 
-void RenderManager::GenerateMipmaps(Render::Texture* texture)
+void RenderManager::GenerateMipmaps(const Render::TextureKey& textureKey)
 {
-  texture->GenerateMipmaps();
+  DALI_ASSERT_DEBUG(textureKey && "Trying to generate mipmaps on empty texture key");
+  textureKey->GenerateMipmaps();
 }
 
 void RenderManager::SetFilterMode(Render::Sampler* sampler, uint32_t minFilterMode, uint32_t magFilterMode)

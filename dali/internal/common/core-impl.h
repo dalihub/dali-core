@@ -66,7 +66,6 @@ namespace SceneGraph
 {
 class UpdateManager;
 class RenderManager;
-class DiscardQueue;
 class RenderTaskProcessor;
 } // namespace SceneGraph
 
@@ -348,7 +347,6 @@ private:
   OwnerPointer<SceneGraph::RenderTaskProcessor> mRenderTaskProcessor;   ///< Handles the processing of render tasks
   OwnerPointer<SceneGraph::RenderManager>       mRenderManager;         ///< Render manager
   OwnerPointer<SceneGraph::UpdateManager>       mUpdateManager;         ///< Update manager
-  OwnerPointer<SceneGraph::DiscardQueue>        mDiscardQueue;          ///< Used to cleanup nodes & resources when no longer in use.
   OwnerPointer<ShaderFactory>                   mShaderFactory;         ///< Shader resource factory
   OwnerPointer<NotificationManager>             mNotificationManager;   ///< Notification manager
   OwnerPointer<GestureEventProcessor>           mGestureEventProcessor; ///< The gesture event processor

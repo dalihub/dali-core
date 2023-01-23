@@ -48,21 +48,35 @@ class Camera;
  */
 struct Renderable
 {
-  Renderable()
-  : mNode(nullptr),
-    mRenderer(nullptr)
-  {
-  }
+  Renderable() = default;
 
-  Renderable(Node* node, Renderer* renderer)
+  Renderable(Node* node, RendererKey renderer)
   : mNode(node),
     mRenderer(renderer)
   {
   }
 
-  Node*     mNode;
-  Renderer* mRenderer;
+  Node*       mNode{nullptr};
+  RendererKey mRenderer{};
 };
+
+} // namespace SceneGraph
+} // Namespace Internal
+
+/// Enable Renderable to be used as a trivial type in Dali::Vector.
+template<>
+struct TypeTraits<Internal::SceneGraph::Renderable> : public Dali::BasicTypes<Internal::SceneGraph::Renderable>
+{
+  enum
+  {
+    IS_TRIVIAL_TYPE = true
+  };
+};
+
+namespace Internal
+{
+namespace SceneGraph
+{
 
 using RenderableContainer = Dali::Vector<Renderable>;
 
@@ -219,10 +233,10 @@ private:
   Layer();
 
   // Delete copy and move
-  Layer(const Layer&) = delete;
-  Layer(Layer&&)      = delete;
+  Layer(const Layer&)                = delete;
+  Layer(Layer&&)                     = delete;
   Layer& operator=(const Layer& rhs) = delete;
-  Layer& operator=(Layer&& rhs) = delete;
+  Layer& operator=(Layer&& rhs)      = delete;
 
 public: // For update-algorithms
   RenderableContainer colorRenderables;

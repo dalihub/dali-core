@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_MANAGER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include <dali/integration-api/core-enumerations.h>
 #include <dali/internal/common/shader-saver.h>
 #include <dali/internal/event/rendering/texture-impl.h>
+#include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/renderers/render-vertex-buffer.h>
 #include <dali/public-api/math/rect.h>
 
@@ -107,16 +108,16 @@ public:
   /**
    * Add a Renderer to the render manager.
    * @param[in] renderer The renderer to add.
-   * @post renderer is owned by RenderManager
+   * @post renderer is notionally owned by RenderManager
    */
-  void AddRenderer(OwnerPointer<Render::Renderer>& renderer);
+  void AddRenderer(const Render::RendererKey& renderer);
 
   /**
    * Remove a Renderer from the render manager.
    * @param[in] renderer The renderer to remove.
    * @post renderer is destroyed.
    */
-  void RemoveRenderer(Render::Renderer* renderer);
+  void RemoveRenderer(const Render::RendererKey& renderer);
 
   /**
    * Add a sampler to the render manager.
@@ -223,13 +224,13 @@ public:
    * Adds a texture to the render manager
    * @param[in] texture The texture to add
    */
-  void AddTexture(OwnerPointer<Render::Texture>& texture);
+  void AddTexture(const Render::TextureKey& texture);
 
   /**
    * Removes a texture from the render manager
    * @param[in] texture The texture to remove
    */
-  void RemoveTexture(Render::Texture* texture);
+  void RemoveTexture(const Render::TextureKey& texture);
 
   /**
    * Uploads data to an existing texture
@@ -237,13 +238,13 @@ public:
    * @param[in] pixelData The pixel data object
    * @param[in] params The parameters for the upload
    */
-  void UploadTexture(Render::Texture* texture, PixelDataPtr pixelData, const Texture::UploadParams& params);
+  void UploadTexture(const Render::TextureKey& texture, PixelDataPtr pixelData, const Texture::UploadParams& params);
 
   /**
    * Generates mipmaps for a given texture
    * @param[in] texture The texture
    */
-  void GenerateMipmaps(Render::Texture* texture);
+  void GenerateMipmaps(const Render::TextureKey& texture);
 
   /**
    * Adds a framebuffer to the render manager

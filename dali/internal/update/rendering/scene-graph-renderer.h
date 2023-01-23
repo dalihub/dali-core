@@ -19,6 +19,7 @@
 
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/internal/common/blending-options.h>
+#include <dali/internal/common/memory-pool-key.h>
 #include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/render/data-providers/render-data-provider.h>
@@ -44,12 +45,31 @@ namespace SceneGraph
 class SceneController;
 
 class Renderer;
-using RendererContainer = Dali::Vector<Renderer*>;
-using RendererIter      = RendererContainer::Iterator;
-using RendererConstIter = RendererContainer::ConstIterator;
-
 class TextureSet;
 class Geometry;
+
+using RendererKey = MemoryPoolKey<SceneGraph::Renderer>;
+
+} // namespace SceneGraph
+} // namespace Internal
+
+// Ensure RendererKey can be used in Dali::Vector
+template<>
+struct TypeTraits<Internal::SceneGraph::RendererKey> : public BasicTypes<Internal::SceneGraph::RendererKey>
+{
+  enum
+  {
+    IS_TRIVIAL_TYPE = true
+  };
+};
+
+namespace Internal
+{
+namespace SceneGraph
+{
+using RendererContainer = Dali::Vector<RendererKey>;
+using RendererIter      = RendererContainer::Iterator;
+using RendererConstIter = RendererContainer::ConstIterator;
 
 namespace VisualRenderer
 {
@@ -153,7 +173,7 @@ public:
   /**
    * Construct a new Renderer
    */
-  static Renderer* New();
+  static RendererKey NewKey();
 
   /**
    * Destructor
@@ -167,11 +187,36 @@ public:
   void operator delete(void* ptr);
 
   /**
+   * Get a pointer to the object from the given key.
+   * Used by MemoryPoolKey to provide pointer semantics.
+   */
+  static Renderer* Get(RendererKey::KeyType);
+
+  /**
+   * Get the key of the given renderer in the associated memory pool.
+   * @param[in] renderer the given renderer
+   * @return The key in the associated memory pool.
+   */
+  static RendererKey GetKey(const SceneGraph::Renderer& renderer);
+
+  /**
+   * Get the key of the given renderer in the associated memory pool.
+   * @param[in] renderer the given renderer
+   * @return The key in the associated memory pool, or -1 if not
+   * found.
+   */
+  static RendererKey GetKey(SceneGraph::Renderer* renderer);
+
+  /**
    * Set the texture set for the renderer
    * @param[in] textureSet The texture set this renderer will use
    */
   void SetTextures(TextureSet* textureSet);
 
+  /**
+   * Get the associated texture set
+   * @return the texture set.
+   */
   const SceneGraph::TextureSet* GetTextureSet() const
   {
     return mTextureSet;
@@ -180,7 +225,7 @@ public:
   /**
    * @copydoc RenderDataProvider::GetTextures()
    */
-  const Vector<Render::Texture*>* GetTextures() const override;
+  const Vector<Render::TextureKey>* GetTextures() const override;
 
   /**
    * @copydoc RenderDataProvider::GetSamplers()
@@ -432,7 +477,7 @@ public:
    * Retrieve the Render thread renderer
    * @return The associated render thread renderer
    */
-  Render::Renderer& GetRenderer();
+  Render::RendererKey GetRenderer();
 
   /**
    * Query whether the renderer is fully opaque, fully transparent or transparent.
@@ -578,11 +623,11 @@ private:
 private:
   CollectedUniformMap mCollectedUniformMap; ///< Uniform maps collected by the renderer
 
-  SceneController*  mSceneController; ///< Used for initializing renderers
-  Render::Renderer* mRenderer;        ///< Raw pointer to the renderer (that's owned by RenderManager)
-  TextureSet*       mTextureSet;      ///< The texture set this renderer uses. (Not owned)
-  Render::Geometry* mGeometry;        ///< The geometry this renderer uses. (Not owned)
-  Shader*           mShader;          ///< The shader this renderer uses. (Not owned)
+  SceneController*    mSceneController; ///< Used for initializing renderers
+  Render::RendererKey mRenderer;        ///< Key to the renderer (that's owned by RenderManager)
+  TextureSet*         mTextureSet;      ///< The texture set this renderer uses. (Not owned)
+  Render::Geometry*   mGeometry;        ///< The geometry this renderer uses. (Not owned)
+  Shader*             mShader;          ///< The shader this renderer uses. (Not owned)
 
   OwnerPointer<VisualRenderer::AnimatableVisualProperties> mVisualProperties{nullptr}; ///< VisualProperties (optional/owned)
   OwnerPointer<Vector4>                                    mBlendColor;                ///< The blend color for blending operation
@@ -886,4 +931,4 @@ inline void SetRenderCallbackMessage(EventThreadServices& eventThreadServices, c
 } // namespace Internal
 } // namespace Dali
 
-#endif //  DALI_INTERNAL_SCENE_GRAPH_RENDERER_H
+#endif // DALI_INTERNAL_SCENE_GRAPH_RENDERER_H

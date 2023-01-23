@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_MESSAGE_DISPATCHER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,14 +59,14 @@ public:
    * @param[in] renderer The renderer to add.
    * @post renderer ownership is transferred.
    */
-  void AddRenderer(OwnerPointer<Render::Renderer>& renderer);
+  void AddRenderer(const Render::RendererKey& renderer);
 
   /**
    * Remove a Renderer.
    * @param[in] renderer The renderer to remove.
    * @post renderer will be destroyed in the next Render.
    */
-  void RemoveRenderer(Render::Renderer& renderer);
+  void RemoveRenderer(const Render::RendererKey& renderer);
 
   /**
    * Add a Render tracker.

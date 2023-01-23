@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_NEW_TEXTURE_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/images/pixel-data-impl.h>
+#include <dali/internal/render/renderers/render-texture-key.h>
 #include <dali/public-api/common/dali-common.h>      // DALI_ASSERT_ALWAYS
 #include <dali/public-api/common/intrusive-ptr.h>    // Dali::IntrusivePtr
 #include <dali/public-api/images/image-operations.h> // Dali::ImageDimensions
@@ -32,11 +33,6 @@ namespace Dali
 {
 namespace Internal
 {
-namespace Render
-{
-class Texture;
-}
-
 class Texture;
 using TexturePtr = IntrusivePtr<Texture>;
 
@@ -83,7 +79,7 @@ public:
    *
    * @return the texture render object
    */
-  Render::Texture* GetRenderObject() const;
+  Render::TextureKey GetRenderTextureKey() const;
 
   /**
    * @copydoc Dali::Texture::Upload()
@@ -192,7 +188,7 @@ private: // unimplemented methods
 
 private:                                               // data
   Internal::EventThreadServices& mEventThreadServices; ///<Used to send messages to the render thread via update thread
-  Internal::Render::Texture*     mRenderObject;        ///<The Render::Texture associated to this texture
+  Internal::Render::TextureKey   mTextureKey;          ///<The Render::Texture associated to this texture
 
   NativeImageInterfacePtr mNativeImage; ///< Pointer to native image
   ImageDimensions         mSize;        ///< Size of the texture

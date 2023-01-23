@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_INSTRUCTION_PROCESSOR_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,11 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/common/buffer-index.h>
-#include <dali/internal/update/manager/sorted-layers.h>
 #include <dali/public-api/common/dali-vector.h>
+
+#include <dali/internal/common/buffer-index.h>
+#include <dali/internal/render/common/render-item-key.h>
+#include <dali/internal/update/manager/sorted-layers.h>
 
 namespace Dali
 {
@@ -64,7 +66,7 @@ public:
   struct SortAttributes
   {
     SortAttributes()
-    : renderItem(nullptr),
+    : renderItem{},
       shader(nullptr),
       textureSet(nullptr),
       geometry(nullptr),
@@ -72,7 +74,7 @@ public:
     {
     }
 
-    RenderItem*             renderItem; ///< The render item that is being sorted (includes depth index)
+    RenderItemKey           renderItem; ///< The render item that is being sorted (includes depth index)
     const Shader*           shader;     ///< The shader instance
     const void*             textureSet; ///< The textureSet instance
     const Render::Geometry* geometry;   ///< The geometry instance

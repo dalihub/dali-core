@@ -19,12 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/common/owner-container.h>
 #include <dali/internal/common/buffer-index.h>
-#include <dali/internal/update/nodes/node-declarations.h>
-#include <dali/internal/update/rendering/scene-graph-renderer.h>
-#include <dali/internal/update/rendering/scene-graph-texture-set.h>
-#include <dali/public-api/object/ref-object.h>
 
 namespace Dali
 {
@@ -32,92 +27,23 @@ namespace Internal
 {
 namespace SceneGraph
 {
-class RenderQueue;
-class Shader;
-class Camera;
-class Scene;
-
-/**
- * DiscardQueue is used to cleanup nodes & resources when no longer in use.
- * Unwanted objects are added here during UpdateManager::Update().
- * When added, messages will be sent to clean-up GL resources in the next Render.
- * The Update for frame N+1 may occur in parallel with the rendering of frame N.
- * Therefore objects queued for destruction in frame N, are destroyed frame N+2.
- */
+template<class Type, class TypeContainer>
 class DiscardQueue
 {
 public:
-  using ShaderQueue   = OwnerContainer<Shader*>;
-  using RendererQueue = OwnerContainer<Renderer*>;
-  using SceneQueue    = OwnerContainer<Scene*>;
+  DiscardQueue() = default;
 
-  /**
-   * Create a new DiscardQueue.
-   * @param[in] renderQueue Used to send GL clean-up messages for the next Render.
-   */
-  DiscardQueue(RenderQueue& renderQueue);
-
-  /**
-   * Non-virtual destructor; DiscardQueue is not suitable as a base class.
-   */
-  ~DiscardQueue();
-
-  /**
-   * Adds an unwanted Node and its children to the discard queue.
-   * If necessary, a message will be sent to clean-up GL resources in the next Render.
-   * @pre This method is not thread-safe, and should only be called from the update-thread.
-   * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] node The discarded node; DiscardQueue takes ownership.
-   */
-  void Add(BufferIndex updateBufferIndex, Node* node);
-
-  /**
-   * Adds an unwanted shader to the discard queue.
-   * A message will be sent to clean-up GL resources in the next Render.
-   * @pre This method is not thread-safe, and should only be called from the update-thread.
-   * @param[in] bufferIndex The current update buffer index.
-   * @param[in] shader The shader to queue; DiscardQueue takes ownership.
-   */
-  void Add(BufferIndex bufferIndex, Shader* shader);
-
-  /**
-   * Adds an unwanted Renderer to the discard queue.
-   * A message will be sent to clean up GL resources in the next Render.
-   * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] renderer The discarded renderer; DiscardQueue takes ownership.
-   */
-  void Add(BufferIndex updateBufferIndex, Renderer* renderer);
-
-  /**
-   * Adds an unwanted Scene to the discard queue.
-   * A message will be sent to clean up GL resources in the next Render.
-   * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] scene The discarded scene; DiscardQueue takes ownership.
-   */
-  void Add(BufferIndex updateBufferIndex, Scene* scene);
-
-  /**
-   * Release the nodes which were queued in the frame N-2.
-   * @pre This method should be called (once) at the beginning of every Update.
-   * @param[in] updateBufferIndex The current update buffer index.
-   */
-  void Clear(BufferIndex updateBufferIndex);
+  void Add(BufferIndex updateBufferIndex, Type object)
+  {
+    mDiscardQueue[updateBufferIndex].PushBack(object);
+  }
+  void Clear(BufferIndex updateBufferIndex)
+  {
+    mDiscardQueue[updateBufferIndex].Clear();
+  }
 
 private:
-  // Undefined
-  DiscardQueue(const DiscardQueue&);
-
-  // Undefined
-  DiscardQueue& operator=(const DiscardQueue& rhs);
-
-private:
-  RenderQueue& mRenderQueue; ///< Used to send GL clean-up messages for the next Render.
-
-  // Messages are queued here following the current update buffer number
-  OwnerContainer<Node*> mNodeQueue[2];
-  ShaderQueue           mShaderQueue[2];
-  RendererQueue         mRendererQueue[2];
-  SceneQueue            mSceneQueue[2];
+  TypeContainer mDiscardQueue[2];
 };
 
 } // namespace SceneGraph

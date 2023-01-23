@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ namespace
 //Memory pool used to allocate new RenderItems. Memory used by this pool will be released when shutting down DALi
 Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::RenderItem> gRenderItemPool;
 } // namespace
+
 namespace Dali
 {
 namespace Internal
@@ -39,11 +40,19 @@ RenderItem* RenderItem::New()
   return new(gRenderItemPool.AllocateRaw()) RenderItem();
 }
 
+RenderItemKey RenderItem::NewKey()
+{
+  void* ptr = gRenderItemPool.AllocateRaw();
+  auto  key = gRenderItemPool.GetKeyFromPtr(static_cast<RenderItem*>(ptr));
+  new(ptr) RenderItem();
+  return RenderItemKey(key);
+}
+
 RenderItem::RenderItem()
 : mModelMatrix(false),
   mModelViewMatrix(false),
   mSize(),
-  mRenderer(nullptr),
+  mRenderer{},
   mNode(nullptr),
   mTextureSet(nullptr),
   mDepthIndex(0),
@@ -53,6 +62,21 @@ RenderItem::RenderItem()
 }
 
 RenderItem::~RenderItem() = default;
+
+RenderItem* RenderItem::Get(RenderItemKey::KeyType key)
+{
+  return gRenderItemPool.GetPtrFromKey(key);
+}
+
+RenderItemKey RenderItem::GetKey(const RenderItem& renderItem)
+{
+  return RenderItemKey(gRenderItemPool.GetKeyFromPtr(const_cast<RenderItem*>(&renderItem)));
+}
+
+RenderItemKey RenderItem::GetKey(RenderItem* renderItem)
+{
+  return RenderItemKey(gRenderItemPool.GetKeyFromPtr(renderItem));
+}
 
 ClippingBox RenderItem::CalculateTransformSpaceAABB(const Matrix& transformMatrix, const Vector3& position, const Vector3& size)
 {

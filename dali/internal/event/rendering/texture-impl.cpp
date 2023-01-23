@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,14 +47,14 @@ TexturePtr Texture::New(NativeImageInterface& nativeImageInterface)
   return texture;
 }
 
-Render::Texture* Texture::GetRenderObject() const
+Render::TextureKey Texture::GetRenderTextureKey() const
 {
-  return mRenderObject;
+  return mTextureKey;
 }
 
 Texture::Texture(TextureType::Type type, Pixel::Format format, ImageDimensions size)
 : mEventThreadServices(EventThreadServices::Get()),
-  mRenderObject(nullptr),
+  mTextureKey{},
   mNativeImage(),
   mSize(size),
   mType(type),
@@ -64,7 +64,7 @@ Texture::Texture(TextureType::Type type, Pixel::Format format, ImageDimensions s
 
 Texture::Texture(NativeImageInterfacePtr nativeImageInterface)
 : mEventThreadServices(EventThreadServices::Get()),
-  mRenderObject(nullptr),
+  mTextureKey{},
   mNativeImage(nativeImageInterface),
   mSize(nativeImageInterface->GetWidth(), nativeImageInterface->GetHeight()),
   mType(TextureType::TEXTURE_2D),
@@ -78,23 +78,22 @@ void Texture::Initialize()
   {
     if(mNativeImage)
     {
-      mRenderObject = new Render::Texture(mNativeImage);
+      mTextureKey = Render::Texture::NewKey(mNativeImage);
     }
     else
     {
-      mRenderObject = new Render::Texture(mType, mFormat, mSize);
+      mTextureKey = Render::Texture::NewKey(mType, mFormat, mSize);
     }
 
-    OwnerPointer<Render::Texture> transferOwnership(mRenderObject);
-    AddTexture(mEventThreadServices.GetUpdateManager(), transferOwnership);
+    AddTextureMessage(mEventThreadServices.GetUpdateManager(), mTextureKey);
   }
 }
 
 Texture::~Texture()
 {
-  if(EventThreadServices::IsCoreRunning() && mRenderObject)
+  if(EventThreadServices::IsCoreRunning() && mTextureKey)
   {
-    RemoveTexture(mEventThreadServices.GetUpdateManager(), *mRenderObject);
+    RemoveTextureMessage(mEventThreadServices.GetUpdateManager(), mTextureKey);
   }
 }
 
@@ -147,7 +146,7 @@ bool Texture::UploadSubPixelData(PixelDataPtr pixelData,
                      "Parameter value out of range");
 
   bool result(false);
-  if(EventThreadServices::IsCoreRunning() && mRenderObject)
+  if(EventThreadServices::IsCoreRunning() && mTextureKey)
   {
     if(mNativeImage)
     {
@@ -200,7 +199,7 @@ bool Texture::UploadSubPixelData(PixelDataPtr pixelData,
                                    static_cast<uint16_t>(yOffset),
                                    static_cast<uint16_t>(width),
                                    static_cast<uint16_t>(height)};
-            UploadTextureMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject, pixelData, params);
+            UploadTextureMessage(mEventThreadServices.GetUpdateManager(), mTextureKey, pixelData, params);
 
             // Request event processing and update forcely
             mEventThreadServices.GetRenderController().RequestProcessEventsOnIdle(true);
@@ -222,9 +221,9 @@ bool Texture::UploadSubPixelData(PixelDataPtr pixelData,
 
 void Texture::GenerateMipmaps()
 {
-  if(EventThreadServices::IsCoreRunning() && mRenderObject)
+  if(EventThreadServices::IsCoreRunning() && mTextureKey)
   {
-    GenerateMipmapsMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject);
+    GenerateMipmapsMessage(mEventThreadServices.GetUpdateManager(), mTextureKey);
   }
 }
 

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_TEXTURE_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,16 @@ public:
   using Type = Dali::TextureType::Type;
 
   /**
+   * Factory method to return a new texture accessed by key.
+   */
+  static TextureKey NewKey(Type type, Pixel::Format format, ImageDimensions size);
+
+  /**
+   * Factory method to return a new texture accessed by key.
+   */
+  static TextureKey NewKey(NativeImageInterfacePtr nativeImageInterface);
+
+  /**
    * Constructor
    * @param[in] type The type of the texture
    * @param[in] format The format of the pixel data
@@ -64,6 +74,28 @@ public:
    * Destructor
    */
   ~Texture();
+
+  /**
+   * Deletes the texture from it's global memory pool
+   */
+  void operator delete(void* ptr);
+
+  static Texture* Get(TextureKey::KeyType);
+
+  /**
+   * Get the key of the given renderer in the associated memory pool.
+   * @param[in] renderer the given renderer
+   * @return The key in the associated memory pool.
+   */
+  static TextureKey GetKey(const Render::Texture& renderer);
+
+  /**
+   * Get the key of the given renderer in the associated memory pool.
+   * @param[in] renderer the given renderer
+   * @return The key in the associated memory pool, or -1 if not
+   * found.
+   */
+  static TextureKey GetKey(Render::Texture* renderer);
 
   /**
    * Stores the graphics controller for use when required.

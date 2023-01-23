@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,7 +102,8 @@ int UtcDaliMemoryPoolObjectAllocatorObjectAllocation(void)
   Internal::MemoryPoolObjectAllocator<MemoryPoolObjectAllocatorTestObject> allocator;
 
   // Allocate an object
-  MemoryPoolObjectAllocatorTestObject* testObject1 = allocator.Allocate();
+  void*                                ptr         = allocator.AllocateRaw();
+  MemoryPoolObjectAllocatorTestObject* testObject1 = new(ptr) MemoryPoolObjectAllocatorTestObject();
   DALI_TEST_CHECK(testObject1);
 
   MemoryPoolObjectAllocatorTestObjectTracking tracking1;
@@ -120,7 +121,8 @@ int UtcDaliMemoryPoolObjectAllocatorObjectAllocation(void)
   // Reset and allocate another object
   allocator.ResetMemoryPool();
 
-  MemoryPoolObjectAllocatorTestObject* testObject2 = allocator.Allocate();
+  ptr                                              = allocator.AllocateRaw();
+  MemoryPoolObjectAllocatorTestObject* testObject2 = new(ptr) MemoryPoolObjectAllocatorTestObject();
   DALI_TEST_CHECK(testObject2);
 
   MemoryPoolObjectAllocatorTestObjectTracking tracking2;
@@ -164,14 +166,16 @@ int UtcDaliMemoryPoolObjectAllocatorObjectAllocationPOD(void)
 {
   Internal::MemoryPoolObjectAllocator<bool> allocator;
 
-  bool* testObject1 = allocator.Allocate();
+  void* ptr         = allocator.AllocateRaw();
+  bool* testObject1 = new(ptr) bool();
   DALI_TEST_CHECK(testObject1);
 
   allocator.Destroy(testObject1);
 
   allocator.ResetMemoryPool();
 
-  bool* testObject2 = allocator.Allocate();
+  ptr               = allocator.AllocateRaw();
+  bool* testObject2 = new(ptr) bool();
   DALI_TEST_CHECK(testObject2);
 
   allocator.Destroy(testObject2);
