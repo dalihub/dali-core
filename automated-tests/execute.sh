@@ -187,6 +187,19 @@ else
         done
         echo $1 not found
     fi
+
+    # Kill off any dangling or sleeping dbus sessions that we would have created
+    cgroup=$(awk -F ':' '$2 == "name=systemd" { print $3 }' /proc/self/cgroup)
+    if [ -n "$cgroup" ] ; then
+        for pid in $(cat /sys/fs/cgroup/systemd/$cgroup/tasks 2>/dev/null); do
+            comm=$(cat /proc/$pid/comm 2>/dev/null)
+            case "$comm" in
+            dbus-daemon|dbus-launch)
+                kill $pid
+                ;;
+            esac
+        done
+    fi
 fi
 
 if [ -f summary.xml ] ; then
