@@ -76,7 +76,8 @@ RenderTaskPtr RenderTaskList::CreateOverlayTask(Actor* sourceActor, CameraActor*
 {
   if(!mOverlayRenderTask)
   {
-    mOverlayRenderTask = CreateTask(sourceActor, &mDefaults.GetDefaultCameraActor());
+    mOverlayRenderTask = RenderTask::New(sourceActor, cameraActor, *this, true);
+    mTasks.push_back(mOverlayRenderTask);
   }
   return mOverlayRenderTask;
 }

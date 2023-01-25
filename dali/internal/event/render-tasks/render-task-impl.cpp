@@ -68,7 +68,7 @@ SignalConnectorType signalConnector1(mType, SIGNAL_FINISHED, &RenderTask::DoConn
 
 } // Unnamed namespace
 
-RenderTaskPtr RenderTask::New(Actor* sourceActor, CameraActor* cameraActor, RenderTaskList& renderTaskList)
+RenderTaskPtr RenderTask::New(Actor* sourceActor, CameraActor* cameraActor, RenderTaskList& renderTaskList, bool isOverlayTask)
 {
   // create scene object first so it's guaranteed to exist for the event side
   auto sceneObject = SceneGraph::RenderTask::New();
@@ -79,7 +79,14 @@ RenderTaskPtr RenderTask::New(Actor* sourceActor, CameraActor* cameraActor, Rend
   // transfer scene object ownership to update manager
   const SceneGraph::RenderTaskList&    parentSceneObject = renderTaskList.GetSceneObject();
   OwnerPointer<SceneGraph::RenderTask> transferOwnership(sceneObject);
-  AddTaskMessage(task->GetEventThreadServices(), parentSceneObject, transferOwnership);
+  if(isOverlayTask)
+  {
+    AddOverlayTaskMessage(task->GetEventThreadServices(), parentSceneObject, transferOwnership);
+  }
+  else
+  {
+    AddTaskMessage(task->GetEventThreadServices(), parentSceneObject, transferOwnership);
+  }
 
   // Set the default source & camera actors
   task->SetSourceActor(sourceActor);

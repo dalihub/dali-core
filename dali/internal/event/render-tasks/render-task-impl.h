@@ -56,9 +56,10 @@ public:
    * @param[in] sourceActor The source actor.
    * @param[in] cameraActor The camera actor.
    * @param[in] renderTaskList The render task list.
+   * @param[in] isOverlayTask True if this render task is overlay task. default is false.
    * @return The created render task
    */
-  static RenderTaskPtr New(Actor* sourceActor, CameraActor* cameraActor, RenderTaskList& renderTaskList);
+  static RenderTaskPtr New(Actor* sourceActor, CameraActor* cameraActor, RenderTaskList& renderTaskList, bool isOverlayTask = false);
 
   /**
    * @copydoc Dali::RenderTask::SetSourceActor()
