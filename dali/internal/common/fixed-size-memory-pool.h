@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_FIXED_SIZE_MEMORY_POOL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,6 +52,12 @@ class FixedSizeMemoryPool
 public:
   using SizeType = uint32_t;
 
+#if defined(__LP64__)
+  using KeyType = uint32_t;
+#else
+  using KeyType = void*;
+#endif
+
 public:
   /**
    * @brief Constructor.
@@ -61,8 +67,9 @@ public:
    *                        which the capacity will double as needed.
    * @param maximumBlockCapacity The maximum size that a new block of memory can be allocated. Defaults to
    *                             a large value (1024 * 1024 = 1048576).
+   * @param[in] maximumBlockCount The maximum number of blocks that can be allocated, or -1 for unlimited
    */
-  explicit FixedSizeMemoryPool(SizeType fixedSize, SizeType initialCapacity = 32, SizeType maximumBlockCapacity = 1048576);
+  explicit FixedSizeMemoryPool(SizeType fixedSize, SizeType initialCapacity = 32, SizeType maximumBlockCapacity = 1048576, SizeType maximumBlockCount = 0xffffffff);
 
   /**
    * @brief Destructor.
@@ -96,6 +103,22 @@ public:
    * @param memory The memory to be deleted. Must have been allocated by this memory pool
    */
   void FreeThreadSafe(void* memory);
+
+  /**
+   * @brief Given a key of some memory in the pool, return a pointer to it
+   *
+   * @param[in] key The key to convert
+   * @return A valid ptr to the memory or nullptr if not found
+   */
+  void* GetPtrFromKey(KeyType key);
+
+  /**
+   * @brief Given a ptr to some memory in the pool, return it's key
+   *
+   * @param[in] ptr The ptr to convert
+   * @return A key to the valid memory, or -1 if not found
+   */
+  KeyType GetKeyFromPtr(void* ptr);
 
   /**
    * Get the current capacity of the memory pool

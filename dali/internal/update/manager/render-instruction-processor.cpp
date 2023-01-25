@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -266,13 +266,13 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
 
       if(DALI_LIKELY(renderable.mRenderer))
       {
-        item.mRenderer   = &renderable.mRenderer->GetRenderer();
+        item.mRenderer   = renderable.mRenderer->GetRenderer();
         item.mTextureSet = renderable.mRenderer->GetTextureSet();
         item.mDepthIndex += renderable.mRenderer->GetDepthIndex();
       }
       else
       {
-        item.mRenderer = nullptr;
+        item.mRenderer = Render::RendererKey{};
       }
 
       item.mIsUpdated |= isLayer3d;
@@ -382,16 +382,17 @@ inline bool TryReuseCachedRenderers(Layer&               layer,
     // Therefore we check a combined sum of all renderer addresses.
     size_t checkSumNew = 0;
     size_t checkSumOld = 0;
+    //@todo just use keys, don't deref.
     for(uint32_t index = 0; index < renderableCount; ++index)
     {
       if(DALI_LIKELY(renderables[index].mRenderer))
       {
-        const Render::Renderer& renderer = renderables[index].mRenderer->GetRenderer();
-        checkSumNew += reinterpret_cast<std::size_t>(&renderer);
+        Render::RendererKey renderer = renderables[index].mRenderer->GetRenderer();
+        checkSumNew += renderer.Value();
       }
       if(DALI_LIKELY(renderList.GetItem(index).mRenderer))
       {
-        checkSumOld += reinterpret_cast<std::size_t>(&renderList.GetRenderer(index));
+        checkSumOld += renderList.GetItem(index).mRenderer.Value();
       }
     }
     if(checkSumNew == checkSumOld)
@@ -475,8 +476,8 @@ inline void RenderInstructionProcessor::SortRenderItems(BufferIndex bufferIndex,
 
   for(uint32_t index = 0; index < renderableCount; ++index)
   {
-    RenderItem& item = renderList.GetItem(index);
-
+    RenderItemKey itemKey = renderList.GetItemKey(index);
+    RenderItem&   item    = *itemKey.Get();
     if(DALI_LIKELY(item.mRenderer))
     {
       item.mRenderer->SetSortAttributes(mSortingHelper[index]);
@@ -488,7 +489,7 @@ inline void RenderInstructionProcessor::SortRenderItems(BufferIndex bufferIndex,
     mSortingHelper[index].zValue = zValueFunctionFromVector3[zValueFunctionIndex](item.mModelViewMatrix.GetTranslation3()) - static_cast<float>(item.mDepthIndex);
 
     // Keep the renderitem pointer in the helper so we can quickly reorder items after sort.
-    mSortingHelper[index].renderItem = &item;
+    mSortingHelper[index].renderItem = itemKey;
   }
 
   // Here we determine which comparitor (of the 3) to use.
@@ -505,7 +506,7 @@ inline void RenderInstructionProcessor::SortRenderItems(BufferIndex bufferIndex,
   for(uint32_t index = 0; index < renderableCount; ++index, ++renderListIter)
   {
     *renderListIter = mSortingHelper[index].renderItem;
-    DALI_LOG_INFO(gRenderListLogFilter, Debug::Verbose, "  sortedList[%d] = %p\n", index, mSortingHelper[index].renderItem->mRenderer);
+    DALI_LOG_INFO(gRenderListLogFilter, Debug::Verbose, "  sortedList[%d] = %x\n", index, mSortingHelper[index].renderItem->mRenderer);
   }
 }
 

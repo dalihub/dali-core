@@ -194,14 +194,14 @@ TypeRegistration mType(typeid(Dali::Renderer), typeid(Dali::Handle), Create, Ren
 RendererPtr Renderer::New()
 {
   // create scene object first so it's guaranteed to exist for the event side
-  auto                               sceneObject = SceneGraph::Renderer::New();
-  OwnerPointer<SceneGraph::Renderer> transferOwnership(sceneObject);
+  auto sceneObjectKey = SceneGraph::Renderer::NewKey();
+
   // pass the pointer to base for message passing
-  RendererPtr rendererPtr(new Renderer(sceneObject));
-  // transfer scene object ownership to update manager
+  RendererPtr rendererPtr(new Renderer(sceneObjectKey.Get()));
+
   EventThreadServices&       eventThreadServices = rendererPtr->GetEventThreadServices();
   SceneGraph::UpdateManager& updateManager       = eventThreadServices.GetUpdateManager();
-  AddRendererMessage(updateManager, transferOwnership);
+  AddRendererMessage(updateManager, sceneObjectKey);
 
   eventThreadServices.RegisterObject(rendererPtr.Get());
   return rendererPtr;
@@ -805,7 +805,7 @@ Renderer::~Renderer()
   {
     EventThreadServices&       eventThreadServices = GetEventThreadServices();
     SceneGraph::UpdateManager& updateManager       = eventThreadServices.GetUpdateManager();
-    RemoveRendererMessage(updateManager, GetRendererSceneObject());
+    RemoveRendererMessage(updateManager, SceneGraph::Renderer::GetKey(GetRendererSceneObject())); //@todo Use key throughtout
 
     eventThreadServices.UnregisterObject(this);
   }

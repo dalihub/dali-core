@@ -46,7 +46,7 @@ namespace // unnamed namespace
 Debug::Filter* gSceneGraphRendererLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_SG_RENDERER");
 #endif
 
-//Memory pool used to allocate new renderers. Memory used by this pool will be released when shutting down DALi
+// Memory pool used to allocate new renderers. Memory used by this pool will be released when shutting down DALi
 MemoryPoolObjectAllocator<Renderer> gRendererMemoryPool;
 
 // Flags for re-sending data to renderer.
@@ -78,14 +78,17 @@ enum Flags
 
 } // Anonymous namespace
 
-Renderer* Renderer::New()
+RendererKey Renderer::NewKey()
 {
-  return new(gRendererMemoryPool.AllocateRawThreadSafe()) Renderer();
+  void* ptr = gRendererMemoryPool.AllocateRawThreadSafe();
+  auto  key = gRendererMemoryPool.GetKeyFromPtr(static_cast<Renderer*>(ptr));
+  new(ptr) Renderer();
+  return RendererKey(key);
 }
 
 Renderer::Renderer()
 : mSceneController(nullptr),
-  mRenderer(nullptr),
+  mRenderer{},
   mTextureSet(nullptr),
   mGeometry(nullptr),
   mShader(nullptr),
@@ -119,6 +122,21 @@ void Renderer::operator delete(void* ptr)
   gRendererMemoryPool.FreeThreadSafe(static_cast<Renderer*>(ptr));
 }
 
+Renderer* Renderer::Get(RendererKey::KeyType rendererKey)
+{
+  return gRendererMemoryPool.GetPtrFromKey(rendererKey);
+}
+
+RendererKey Renderer::GetKey(const Renderer& renderer)
+{
+  return RendererKey(gRendererMemoryPool.GetKeyFromPtr(const_cast<Renderer*>(&renderer)));
+}
+
+RendererKey Renderer::GetKey(Renderer* renderer)
+{
+  return RendererKey(gRendererMemoryPool.GetKeyFromPtr(renderer));
+}
+
 bool Renderer::PrepareRender(BufferIndex updateBufferIndex)
 {
   bool rendererUpdated        = mResendFlag || mRenderingBehavior == DevelRenderer::Rendering::CONTINUOUSLY || mUpdateDecay > 0;
@@ -147,151 +165,152 @@ bool Renderer::PrepareRender(BufferIndex updateBufferIndex)
 
   if(mResendFlag != 0)
   {
+    Render::Renderer* rendererPtr = mRenderer.Get();
     if(mResendFlag & RESEND_GEOMETRY)
     {
       typedef MessageValue1<Render::Renderer, Render::Geometry*> DerivedType;
       uint32_t*                                                  slot = mSceneController->GetRenderQueue().ReserveMessageSlot(updateBufferIndex, sizeof(DerivedType));
-      new(slot) DerivedType(mRenderer, &Render::Renderer::SetGeometry, mGeometry);
+      new(slot) DerivedType(rendererPtr, &Render::Renderer::SetGeometry, mGeometry);
     }
 
     if(mResendFlag & RESEND_DRAW_COMMANDS)
     {
       using DerivedType = MessageValue2<Render::Renderer, Dali::DevelRenderer::DrawCommand*, uint32_t>;
       uint32_t* slot    = mSceneController->GetRenderQueue().ReserveMessageSlot(updateBufferIndex, sizeof(DerivedType));
-      new(slot) DerivedType(mRenderer, &Render::Renderer::SetDrawCommands, mDrawCommands.data(), mDrawCommands.size());
+      new(slot) DerivedType(rendererPtr, &Render::Renderer::SetDrawCommands, mDrawCommands.data(), mDrawCommands.size());
     }
 
     if(mResendFlag & RESEND_FACE_CULLING_MODE)
     {
       using DerivedType = MessageValue1<Render::Renderer, FaceCullingMode::Type>;
       uint32_t* slot    = mSceneController->GetRenderQueue().ReserveMessageSlot(updateBufferIndex, sizeof(DerivedType));
-      new(slot) DerivedType(mRenderer, &Render::Renderer::SetFaceCullingMode, mFaceCullingMode);
+      new(slot) DerivedType(rendererPtr, &Render::Renderer::SetFaceCullingMode, mFaceCullingMode);
     }
 
     if(mResendFlag & RESEND_BLEND_BIT_MASK)
     {
       using DerivedType = MessageValue1<Render::Renderer, uint32_t>;
       uint32_t* slot    = mSceneController->GetRenderQueue().ReserveMessageSlot(updateBufferIndex, sizeof(DerivedType));
-      new(slot) DerivedType(mRenderer, &Render::Renderer::SetBlendingBitMask, mBlendBitmask);
+      new(slot) DerivedType(rendererPtr, &Render::Renderer::SetBlendingBitMask, mBlendBitmask);
     }
 
     if(mResendFlag & RESEND_BLEND_COLOR)
     {
       using DerivedType = MessageValue1<Render::Renderer, Vector4>;
       uint32_t* slot    = mSceneController->GetRenderQueue().ReserveMessageSlot(updateBufferIndex, sizeof(DerivedType));
-      new(slot) DerivedType(mRenderer, &Render::Renderer::SetBlendColor, GetBlendColor());
+      new(slot) DerivedType(rendererPtr, &Render::Renderer::SetBlendColor, GetBlendColor());
     }
 
     if(mResendFlag & RESEND_PREMULTIPLIED_ALPHA)
     {
       using DerivedType = MessageValue1<Render::Renderer, bool>;
       uint32_t* slot    = mSceneController->GetRenderQueue().ReserveMessageSlot(updateBufferIndex, sizeof(DerivedType));
-      new(slot) DerivedType(mRenderer, &Render::Renderer::EnablePreMultipliedAlpha, mPremultipledAlphaEnabled);
+      new(slot) DerivedType(rendererPtr, &Render::Renderer::EnablePreMultipliedAlpha, mPremultipledAlphaEnabled);
     }
 
     if(mResendFlag & RESEND_INDEXED_DRAW_FIRST_ELEMENT)
     {
       using DerivedType = MessageValue1<Render::Renderer, uint32_t>;
       uint32_t* slot    = mSceneController->GetRenderQueue().ReserveMessageSlot(updateBufferIndex, sizeof(DerivedType));
-      new(slot) DerivedType(mRenderer, &Render::Renderer::SetIndexedDrawFirstElement, mIndexedDrawFirstElement);
+      new(slot) DerivedType(rendererPtr, &Render::Renderer::SetIndexedDrawFirstElement, mIndexedDrawFirstElement);
     }
 
     if(mResendFlag & RESEND_INDEXED_DRAW_ELEMENTS_COUNT)
     {
       using DerivedType = MessageValue1<Render::Renderer, uint32_t>;
       uint32_t* slot    = mSceneController->GetRenderQueue().ReserveMessageSlot(updateBufferIndex, sizeof(DerivedType));
-      new(slot) DerivedType(mRenderer, &Render::Renderer::SetIndexedDrawElementsCount, mIndexedDrawElementsCount);
+      new(slot) DerivedType(rendererPtr, &Render::Renderer::SetIndexedDrawElementsCount, mIndexedDrawElementsCount);
     }
 
     if(mResendFlag & RESEND_DEPTH_WRITE_MODE)
     {
       using DerivedType = MessageValue1<Render::Renderer, DepthWriteMode::Type>;
       uint32_t* slot    = mSceneController->GetRenderQueue().ReserveMessageSlot(updateBufferIndex, sizeof(DerivedType));
-      new(slot) DerivedType(mRenderer, &Render::Renderer::SetDepthWriteMode, mDepthWriteMode);
+      new(slot) DerivedType(rendererPtr, &Render::Renderer::SetDepthWriteMode, mDepthWriteMode);
     }
 
     if(mResendFlag & RESEND_DEPTH_TEST_MODE)
     {
       using DerivedType = MessageValue1<Render::Renderer, DepthTestMode::Type>;
       uint32_t* slot    = mSceneController->GetRenderQueue().ReserveMessageSlot(updateBufferIndex, sizeof(DerivedType));
-      new(slot) DerivedType(mRenderer, &Render::Renderer::SetDepthTestMode, mDepthTestMode);
+      new(slot) DerivedType(rendererPtr, &Render::Renderer::SetDepthTestMode, mDepthTestMode);
     }
 
     if(mResendFlag & RESEND_DEPTH_FUNCTION)
     {
       using DerivedType = MessageValue1<Render::Renderer, DepthFunction::Type>;
       uint32_t* slot    = mSceneController->GetRenderQueue().ReserveMessageSlot(updateBufferIndex, sizeof(DerivedType));
-      new(slot) DerivedType(mRenderer, &Render::Renderer::SetDepthFunction, mDepthFunction);
+      new(slot) DerivedType(rendererPtr, &Render::Renderer::SetDepthFunction, mDepthFunction);
     }
 
     if(mResendFlag & RESEND_RENDER_MODE)
     {
       using DerivedType = MessageValue1<Render::Renderer, RenderMode::Type>;
       uint32_t* slot    = mSceneController->GetRenderQueue().ReserveMessageSlot(updateBufferIndex, sizeof(DerivedType));
-      new(slot) DerivedType(mRenderer, &Render::Renderer::SetRenderMode, mStencilParameters.renderMode);
+      new(slot) DerivedType(rendererPtr, &Render::Renderer::SetRenderMode, mStencilParameters.renderMode);
     }
 
     if(mResendFlag & RESEND_STENCIL_FUNCTION)
     {
       using DerivedType = MessageValue1<Render::Renderer, StencilFunction::Type>;
       uint32_t* slot    = mSceneController->GetRenderQueue().ReserveMessageSlot(updateBufferIndex, sizeof(DerivedType));
-      new(slot) DerivedType(mRenderer, &Render::Renderer::SetStencilFunction, mStencilParameters.stencilFunction);
+      new(slot) DerivedType(rendererPtr, &Render::Renderer::SetStencilFunction, mStencilParameters.stencilFunction);
     }
 
     if(mResendFlag & RESEND_STENCIL_FUNCTION_MASK)
     {
       using DerivedType = MessageValue1<Render::Renderer, int>;
       uint32_t* slot    = mSceneController->GetRenderQueue().ReserveMessageSlot(updateBufferIndex, sizeof(DerivedType));
-      new(slot) DerivedType(mRenderer, &Render::Renderer::SetStencilFunctionMask, mStencilParameters.stencilFunctionMask);
+      new(slot) DerivedType(rendererPtr, &Render::Renderer::SetStencilFunctionMask, mStencilParameters.stencilFunctionMask);
     }
 
     if(mResendFlag & RESEND_STENCIL_FUNCTION_REFERENCE)
     {
       using DerivedType = MessageValue1<Render::Renderer, int>;
       uint32_t* slot    = mSceneController->GetRenderQueue().ReserveMessageSlot(updateBufferIndex, sizeof(DerivedType));
-      new(slot) DerivedType(mRenderer, &Render::Renderer::SetStencilFunctionReference, mStencilParameters.stencilFunctionReference);
+      new(slot) DerivedType(rendererPtr, &Render::Renderer::SetStencilFunctionReference, mStencilParameters.stencilFunctionReference);
     }
 
     if(mResendFlag & RESEND_STENCIL_MASK)
     {
       using DerivedType = MessageValue1<Render::Renderer, int>;
       uint32_t* slot    = mSceneController->GetRenderQueue().ReserveMessageSlot(updateBufferIndex, sizeof(DerivedType));
-      new(slot) DerivedType(mRenderer, &Render::Renderer::SetStencilMask, mStencilParameters.stencilMask);
+      new(slot) DerivedType(rendererPtr, &Render::Renderer::SetStencilMask, mStencilParameters.stencilMask);
     }
 
     if(mResendFlag & RESEND_STENCIL_OPERATION_ON_FAIL)
     {
       using DerivedType = MessageValue1<Render::Renderer, StencilOperation::Type>;
       uint32_t* slot    = mSceneController->GetRenderQueue().ReserveMessageSlot(updateBufferIndex, sizeof(DerivedType));
-      new(slot) DerivedType(mRenderer, &Render::Renderer::SetStencilOperationOnFail, mStencilParameters.stencilOperationOnFail);
+      new(slot) DerivedType(rendererPtr, &Render::Renderer::SetStencilOperationOnFail, mStencilParameters.stencilOperationOnFail);
     }
 
     if(mResendFlag & RESEND_STENCIL_OPERATION_ON_Z_FAIL)
     {
       using DerivedType = MessageValue1<Render::Renderer, StencilOperation::Type>;
       uint32_t* slot    = mSceneController->GetRenderQueue().ReserveMessageSlot(updateBufferIndex, sizeof(DerivedType));
-      new(slot) DerivedType(mRenderer, &Render::Renderer::SetStencilOperationOnZFail, mStencilParameters.stencilOperationOnZFail);
+      new(slot) DerivedType(rendererPtr, &Render::Renderer::SetStencilOperationOnZFail, mStencilParameters.stencilOperationOnZFail);
     }
 
     if(mResendFlag & RESEND_STENCIL_OPERATION_ON_Z_PASS)
     {
       using DerivedType = MessageValue1<Render::Renderer, StencilOperation::Type>;
       uint32_t* slot    = mSceneController->GetRenderQueue().ReserveMessageSlot(updateBufferIndex, sizeof(DerivedType));
-      new(slot) DerivedType(mRenderer, &Render::Renderer::SetStencilOperationOnZPass, mStencilParameters.stencilOperationOnZPass);
+      new(slot) DerivedType(rendererPtr, &Render::Renderer::SetStencilOperationOnZPass, mStencilParameters.stencilOperationOnZPass);
     }
 
     if(mResendFlag & RESEND_SHADER)
     {
       using DerivedType = MessageValue1<Render::Renderer, bool>;
       uint32_t* slot    = mSceneController->GetRenderQueue().ReserveMessageSlot(updateBufferIndex, sizeof(DerivedType));
-      new(slot) DerivedType(mRenderer, &Render::Renderer::SetShaderChanged, true);
+      new(slot) DerivedType(rendererPtr, &Render::Renderer::SetShaderChanged, true);
     }
 
     if(mResendFlag & RESEND_SET_RENDER_CALLBACK)
     {
       using DerivedType = MessageValue1<Render::Renderer, Dali::RenderCallback*>;
       uint32_t* slot    = mSceneController->GetRenderQueue().ReserveMessageSlot(updateBufferIndex, sizeof(DerivedType));
-      new(slot) DerivedType(mRenderer, &Render::Renderer::SetRenderCallback, mRenderCallback);
+      new(slot) DerivedType(rendererPtr, &Render::Renderer::SetRenderCallback, mRenderCallback);
     }
 
     SetUpdated(true);
@@ -315,7 +334,7 @@ void Renderer::SetTextures(TextureSet* textureSet)
   SetUpdated(true);
 }
 
-const Vector<Render::Texture*>* Renderer::GetTextures() const
+const Vector<Render::TextureKey>* Renderer::GetTextures() const
 {
   return mTextureSet ? &(mTextureSet->GetTextures()) : nullptr;
 }
@@ -574,33 +593,32 @@ DevelRenderer::Rendering::Type Renderer::GetRenderingBehavior() const
   return mRenderingBehavior;
 }
 
-//Called when SceneGraph::Renderer is added to update manager ( that happens when an "event-thread renderer" is created )
+// Called when SceneGraph::Renderer is added to update manager ( that happens when an "event-thread renderer" is created )
 void Renderer::ConnectToSceneGraph(SceneController& sceneController, BufferIndex bufferIndex)
 {
   mRegenerateUniformMap = true;
   mSceneController      = &sceneController;
 
-  mRenderer = Render::Renderer::New(this, mGeometry, mBlendBitmask, GetBlendColor(), static_cast<FaceCullingMode::Type>(mFaceCullingMode), mPremultipledAlphaEnabled, mDepthWriteMode, mDepthTestMode, mDepthFunction, mStencilParameters);
+  mRenderer = Render::Renderer::NewKey(this, mGeometry, mBlendBitmask, GetBlendColor(), static_cast<FaceCullingMode::Type>(mFaceCullingMode), mPremultipledAlphaEnabled, mDepthWriteMode, mDepthTestMode, mDepthFunction, mStencilParameters);
 
-  OwnerPointer<Render::Renderer> transferOwnership(mRenderer);
-  mSceneController->GetRenderMessageDispatcher().AddRenderer(transferOwnership);
+  mSceneController->GetRenderMessageDispatcher().AddRenderer(mRenderer);
 }
 
-//Called just before destroying the scene-graph renderer ( when the "event-thread renderer" is no longer referenced )
+// Called just before destroying the scene-graph renderer ( when the "event-thread renderer" is no longer referenced )
 void Renderer::DisconnectFromSceneGraph(SceneController& sceneController, BufferIndex bufferIndex)
 {
-  //Remove renderer from RenderManager
+  // Remove renderer from RenderManager
   if(mRenderer)
   {
-    mSceneController->GetRenderMessageDispatcher().RemoveRenderer(*mRenderer);
-    mRenderer = nullptr;
+    mSceneController->GetRenderMessageDispatcher().RemoveRenderer(mRenderer);
+    mRenderer = Render::RendererKey{};
   }
   mSceneController = nullptr;
 }
 
-Render::Renderer& Renderer::GetRenderer()
+Render::RendererKey Renderer::GetRenderer()
 {
-  return *mRenderer;
+  return mRenderer;
 }
 
 Renderer::OpacityType Renderer::GetOpacityType(BufferIndex updateBufferIndex, const Node& node) const

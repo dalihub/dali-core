@@ -40,7 +40,7 @@ namespace Internal
 {
 namespace SceneGraph
 {
-namespace //Unnamed namespace
+namespace // Unnamed namespace
 {
 // Return false if the node or it's parents are exclusive to another render-task.
 bool CheckExclusivity(const Node& node, const RenderTask& task)
@@ -156,7 +156,7 @@ bool AddRenderablesForTask(BufferIndex updateBufferIndex,
       // If we do not have any renderers, create one to house the scissor operation.
       if(count == 0u)
       {
-        layer->colorRenderables.PushBack(Renderable(&node, nullptr));
+        layer->colorRenderables.PushBack(Renderable(&node, RendererKey{}));
       }
     }
     else
@@ -174,10 +174,10 @@ bool AddRenderablesForTask(BufferIndex updateBufferIndex,
   RenderableContainer& target = DALI_LIKELY(inheritedDrawMode == DrawMode::NORMAL) ? layer->colorRenderables : layer->overlayRenderables;
   for(uint32_t i = 0; i < count; ++i)
   {
-    SceneGraph::Renderer* renderer = node.GetRendererAt(i);
-    target.PushBack(Renderable(&node, renderer));
+    SceneGraph::RendererKey rendererKey = node.GetRendererAt(i);
 
-    keepRendering = keepRendering || (renderer->GetRenderingBehavior() == DevelRenderer::Rendering::CONTINUOUSLY);
+    target.PushBack(Renderable(&node, rendererKey));
+    keepRendering = keepRendering || (rendererKey->GetRenderingBehavior() == DevelRenderer::Rendering::CONTINUOUSLY);
   }
 
   // Recurse children.

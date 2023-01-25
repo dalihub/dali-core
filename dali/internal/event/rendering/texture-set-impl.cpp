@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,10 +61,10 @@ void TextureSet::SetTexture(uint32_t index, TexturePtr texture)
 
   mTextures[index] = texture;
 
-  Render::Texture* renderTexture(nullptr);
+  Render::TextureKey renderTexture{};
   if(texture)
   {
-    renderTexture = texture->GetRenderObject();
+    renderTexture = texture->GetRenderTextureKey();
   }
 
   SceneGraph::SetTextureMessage(mEventThreadServices, *mSceneObject, index, renderTexture);

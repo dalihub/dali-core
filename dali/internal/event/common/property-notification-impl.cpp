@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/common/property-notification-manager.h>
-#include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/update/common/scene-graph-property-notification.h>
 #include <dali/internal/update/manager/update-manager.h>
@@ -122,7 +121,7 @@ PropertyNotification::~PropertyNotification()
   Disable();
 
   // Guard to disallow use of PropertyNotificationManager after Core has been destroyed
-  if(Stage::IsInstalled())
+  if(!EventThreadServices::IsShuttingDown())
   {
     // Disconnect from the property notification manager
     mPropertyNotificationManager.PropertyNotificationDestroyed(*this);
@@ -149,7 +148,7 @@ void PropertyNotification::Enable()
 void PropertyNotification::Disable()
 {
   // Guard to allow handle destruction after Core has been destroyed
-  if(Stage::IsInstalled())
+  if(!EventThreadServices::IsShuttingDown())
   {
     // Stop scene-graph from monitoring the target's properties.
     DestroySceneObject();
@@ -227,6 +226,8 @@ void PropertyNotification::DestroySceneObject()
 {
   if(mPropertyNotification != nullptr)
   {
+    DALI_ASSERT_ALWAYS(EventThreadServices::IsCoreRunning());
+
     // Remove PropertyNotification using a message to the update manager
     RemovePropertyNotificationMessage(mUpdateManager, *mPropertyNotification);
     mPropertyNotification = nullptr;

@@ -50,7 +50,6 @@
 #include <dali/internal/render/common/performance-monitor.h>
 #include <dali/internal/render/common/render-manager.h>
 
-using Dali::Internal::SceneGraph::DiscardQueue;
 using Dali::Internal::SceneGraph::RenderManager;
 using Dali::Internal::SceneGraph::RenderQueue;
 using Dali::Internal::SceneGraph::UpdateManager;
@@ -112,12 +111,9 @@ Core::Core(RenderController&                   renderController,
 
   RenderQueue& renderQueue = mRenderManager->GetRenderQueue();
 
-  mDiscardQueue = new DiscardQueue(renderQueue);
-
   mUpdateManager = new UpdateManager(*mNotificationManager,
                                      *mAnimationPlaylist,
                                      *mPropertyNotificationManager,
-                                     *mDiscardQueue,
                                      renderController,
                                      *mRenderManager,
                                      renderQueue,

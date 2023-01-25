@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_SCENE_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/render/common/render-instruction-container.h>
+#include <dali/internal/render/renderers/render-renderer.h> // RendererKey
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/public-api/common/vector-wrapper.h>
 
@@ -31,11 +32,6 @@ namespace Dali
 {
 namespace Internal
 {
-namespace Render
-{
-class Renderer;
-}
-
 namespace SceneGraph
 {
 class RenderInstructionContainer;
@@ -43,7 +39,7 @@ class Node;
 
 struct DirtyRect
 {
-  DirtyRect(Node* node, Render::Renderer* renderer, Rect<int>& rect)
+  DirtyRect(Node* node, Render::RendererKey renderer, Rect<int>& rect)
   : node(node),
     renderer(renderer),
     rect(rect),
@@ -57,7 +53,7 @@ struct DirtyRect
   {
     if(node == rhs.node)
     {
-      return renderer < rhs.renderer;
+      return renderer.Value() < rhs.renderer.Value();
     }
     else
     {
@@ -65,10 +61,10 @@ struct DirtyRect
     }
   }
 
-  Node*             node{nullptr};
-  Render::Renderer* renderer{nullptr};
-  Rect<int32_t>     rect{};
-  bool              visited{true};
+  Node*               node{nullptr};
+  Render::RendererKey renderer{};
+  Rect<int32_t>       rect{};
+  bool                visited{true};
 };
 
 class Scene

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_DATA_PROVIDER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,9 @@
  *
  */
 
-#include <dali/internal/render/data-providers/node-data-provider.h>
 #include <dali/internal/render/data-providers/uniform-map-data-provider.h>
-#include <dali/internal/update/common/animatable-property.h>
-#include <dali/public-api/common/vector-wrapper.h>
-#include <dali/public-api/rendering/renderer.h>
+#include <dali/internal/render/renderers/render-texture-key.h>
+#include <dali/public-api/common/dali-vector.h>
 
 namespace Dali
 {
@@ -78,7 +76,7 @@ public:
    * Returns the list of Textures
    * @return The list of Textures
    */
-  virtual const Dali::Vector<Render::Texture*>* GetTextures() const = 0;
+  virtual const Dali::Vector<Render::TextureKey>* GetTextures() const = 0;
 
   /**
    * Get the opacity

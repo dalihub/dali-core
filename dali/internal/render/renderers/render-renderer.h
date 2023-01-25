@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_RENDERER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,26 @@ struct ShaderCache;
 class PipelineCache;
 class UniformBufferManager;
 class PipelineCache;
+class Renderer;
 
+using RendererKey = MemoryPoolKey<Render::Renderer>;
+} //namespace Render
+} //namespace Internal
+
+// Ensure RendererKey can be used in Dali::Vector
+template<>
+struct TypeTraits<Internal::Render::RendererKey> : public BasicTypes<Internal::Render::RendererKey>
+{
+  enum
+  {
+    IS_TRIVIAL_TYPE = true
+  };
+};
+
+namespace Internal
+{
+namespace Render
+{
 /**
  * Renderers are used to render meshes
  * These objects are used during RenderManager::Render(), so properties modified during
@@ -108,16 +127,16 @@ public:
    * @param[in] depthFunction Depth function
    * @param[in] stencilParameters Struct containing all stencil related options
    */
-  static Renderer* New(SceneGraph::RenderDataProvider* dataProviders,
-                       Render::Geometry*               geometry,
-                       uint32_t                        blendingBitmask,
-                       const Vector4&                  blendColor,
-                       FaceCullingMode::Type           faceCullingMode,
-                       bool                            preMultipliedAlphaEnabled,
-                       DepthWriteMode::Type            depthWriteMode,
-                       DepthTestMode::Type             depthTestMode,
-                       DepthFunction::Type             depthFunction,
-                       StencilParameters&              stencilParameters);
+  static RendererKey NewKey(SceneGraph::RenderDataProvider* dataProviders,
+                            Render::Geometry*               geometry,
+                            uint32_t                        blendingBitmask,
+                            const Vector4&                  blendColor,
+                            FaceCullingMode::Type           faceCullingMode,
+                            bool                            preMultipliedAlphaEnabled,
+                            DepthWriteMode::Type            depthWriteMode,
+                            DepthTestMode::Type             depthTestMode,
+                            DepthFunction::Type             depthFunction,
+                            StencilParameters&              stencilParameters);
 
   /**
    * Constructor.
@@ -144,23 +163,6 @@ public:
            StencilParameters&              stencilParameters);
 
   /**
-   * Change the geometry used by the renderer
-   * @param[in] geometry The new geometry
-   */
-  void SetGeometry(Render::Geometry* geometry);
-
-  void SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, uint32_t size);
-
-  /**
-   * @brief Returns a reference to an array of draw commands
-   * @return Valid array of draw commands (may be empty)
-   */
-  [[nodiscard]] const std::vector<Dali::DevelRenderer::DrawCommand>& GetDrawCommands() const
-  {
-    return mDrawCommands;
-  }
-
-  /**
    * Second-phase construction.
    * This is called when the renderer is inside render thread
    * @param[in] graphicsController The graphics controller to use
@@ -179,6 +181,35 @@ public:
    * Destructor
    */
   ~Renderer();
+
+  /**
+   * Overriden delete operator
+   * Deletes the renderer from its global memory pool
+   */
+  void operator delete(void* ptr);
+
+  /**
+   * Get a pointer to the object from the given key.
+   * Used by MemoryPoolKey to provide pointer semantics.
+   */
+  static Renderer* Get(RendererKey::KeyType rendererKey);
+
+  /**
+   * Change the geometry used by the renderer
+   * @param[in] geometry The new geometry
+   */
+  void SetGeometry(Render::Geometry* geometry);
+
+  void SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, uint32_t size);
+
+  /**
+   * @brief Returns a reference to an array of draw commands
+   * @return Valid array of draw commands (may be empty)
+   */
+  [[nodiscard]] const std::vector<Dali::DevelRenderer::DrawCommand>& GetDrawCommands() const
+  {
+    return mDrawCommands;
+  }
 
   /**
    * Set the face-culling mode.

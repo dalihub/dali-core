@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,10 +39,10 @@ RenderMessageDispatcher::RenderMessageDispatcher(RenderManager& renderManager, R
 
 RenderMessageDispatcher::~RenderMessageDispatcher() = default;
 
-void RenderMessageDispatcher::AddRenderer(OwnerPointer<Render::Renderer>& renderer)
+void RenderMessageDispatcher::AddRenderer(const Render::RendererKey& renderer)
 {
   // Message has ownership of renderer while in transit from update -> render
-  typedef MessageValue1<RenderManager, OwnerPointer<Render::Renderer> > DerivedType;
+  typedef MessageValue1<RenderManager, Render::RendererKey> DerivedType;
 
   // Reserve some memory inside the render queue
   uint32_t* slot = mRenderQueue.ReserveMessageSlot(mBuffers.GetUpdateBufferIndex(), sizeof(DerivedType));
@@ -51,15 +51,15 @@ void RenderMessageDispatcher::AddRenderer(OwnerPointer<Render::Renderer>& render
   new(slot) DerivedType(&mRenderManager, &RenderManager::AddRenderer, renderer);
 }
 
-void RenderMessageDispatcher::RemoveRenderer(Render::Renderer& renderer)
+void RenderMessageDispatcher::RemoveRenderer(const Render::RendererKey& renderer)
 {
-  using DerivedType = MessageValue1<RenderManager, Render::Renderer*>;
+  using DerivedType = MessageValue1<RenderManager, Render::RendererKey>;
 
   // Reserve some memory inside the render queue
   uint32_t* slot = mRenderQueue.ReserveMessageSlot(mBuffers.GetUpdateBufferIndex(), sizeof(DerivedType));
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
-  new(slot) DerivedType(&mRenderManager, &RenderManager::RemoveRenderer, &renderer);
+  new(slot) DerivedType(&mRenderManager, &RenderManager::RemoveRenderer, renderer);
 }
 
 void RenderMessageDispatcher::AddRenderTracker(Render::RenderTracker& renderTracker)

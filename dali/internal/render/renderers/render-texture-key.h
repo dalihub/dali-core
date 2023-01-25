@@ -1,5 +1,8 @@
+#ifndef DALI_INTERNAL_RENDER_RENDER_TEXTURE_KEY_H
+#define DALI_INTERNAL_RENDER_RENDER_TEXTURE_KEY_H
+
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,31 +15,27 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 
-// CLASS HEADER
-#include <dali/internal/update/controllers/scene-controller-impl.h>
-
-// INTERNAL INCLUDES
+#include <dali/internal/common/memory-pool-key.h>
 
 namespace Dali
 {
-namespace Internal
+namespace Internal::Render
 {
-namespace SceneGraph
+class Texture;
+using TextureKey = MemoryPoolKey<Texture>;
+} // namespace Internal::Render
+
+template<>
+struct TypeTraits<Internal::Render::TextureKey> : public BasicTypes<Internal::Render::TextureKey>
 {
-SceneControllerImpl::SceneControllerImpl(RenderMessageDispatcher& renderMessageDispatcher,
-                                         RenderQueue&             renderQueue)
-: mRenderMessageDispatcher(renderMessageDispatcher),
-  mRenderQueue(renderQueue)
-{
-}
-
-SceneControllerImpl::~SceneControllerImpl() = default;
-
-} // namespace SceneGraph
-
-} // namespace Internal
+  enum
+  {
+    IS_TRIVIAL_TYPE = true
+  };
+};
 
 } // namespace Dali
+
+#endif //DALI_INTERNAL_RENDER_RENDER_TEXTURE_KEY_H

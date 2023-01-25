@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_MEMORY_POOL_OBJECT_ALLOCATOR_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,13 @@ class MemoryPoolObjectAllocator
 {
 public:
   /**
+   * Constant for use with FixedSizePool. We allow the fixed size pools to grow from 32
+   * to 1M entries per block, but maxing the blocks at 27 allows for many millions of
+   * elements to be quickly indexed using a 32 bit key.
+   */
+  const uint32_t POOL_MAX_BLOCK_COUNT = 27;
+
+  /**
    * @brief Constructor
    */
   MemoryPoolObjectAllocator()
@@ -51,26 +58,6 @@ public:
   ~MemoryPoolObjectAllocator()
   {
     delete mPool;
-  }
-
-  /**
-   * @brief Allocate from the memory pool
-   *
-   * @return Return the allocated object
-   */
-  T* Allocate()
-  {
-    return new(mPool->Allocate()) T();
-  }
-
-  /**
-   * @brief Thread-safe version of Allocate()
-   *
-   * @return Return the allocated object
-   */
-  T* AllocateThreadSafe()
-  {
-    return new(mPool->AllocateThreadSafe()) T();
   }
 
   /**
@@ -151,7 +138,35 @@ public:
   {
     delete mPool;
 
-    mPool = new FixedSizeMemoryPool(TypeSizeWithAlignment<T>::size);
+    mPool = new FixedSizeMemoryPool(TypeSizeWithAlignment<T>::size, 32, 1024 * 1024, POOL_MAX_BLOCK_COUNT);
+  }
+
+  /**
+   * Get a pointer to the keyed item.
+   *
+   * Key must be valid.
+   * @param[in] key 32 bit value indexing block/entry
+   * @return ptr to the memory of item, or nullptr if key is invalid
+   *
+   * @note on 32 bit systems, there is zero overhead, key is a raw ptr,
+   * and this method will return it's argument.
+   */
+  T* GetPtrFromKey(FixedSizeMemoryPool::KeyType key)
+  {
+    return static_cast<T*>(mPool->GetPtrFromKey(key));
+  }
+
+  /**
+   * Get a key to the pointed at item
+   * @param[in] ptr Pointer to an item in the memory pool
+   * @return key of the item, or -1 if not found.
+   *
+   * @note on 32 bit systems, there is zero overhead, key is a raw ptr,
+   * and this method will return it's argument.
+   */
+  FixedSizeMemoryPool::KeyType GetKeyFromPtr(T* ptr)
+  {
+    return mPool->GetKeyFromPtr(ptr);
   }
 
   /**

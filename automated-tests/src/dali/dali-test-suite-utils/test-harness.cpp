@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -120,6 +120,18 @@ std::string TestModuleName(const char* processName)
   }
 
   return oss.str();
+}
+
+std::string GetWChan(int pid)
+{
+  std::ostringstream procwchan;
+  procwchan << "/proc/" << pid << "/wchan";
+  std::ifstream ifs;
+  ifs.open(procwchan.str(), std::ifstream::in);
+  std::string line;
+  std::getline(ifs, line);
+  ifs.close();
+  return line;
 }
 
 std::string ReadAndEscape(std::string filename)
@@ -496,11 +508,17 @@ int32_t RunAllInParallel(const char* processName, ::testcase tc_array[], std::st
       for(auto& tc : children)
       {
         std::chrono::steady_clock::duration timeSpan = endTime - tc.second.startTime;
-        std::chrono::duration<double>       seconds  = std::chrono::duration_cast<std::chrono::duration<double>>(timeSpan);
-        if(seconds.count() > MAXIMUM_CHILD_LIFETIME)
+        double                              seconds  = double(timeSpan.count()) * std::chrono::steady_clock::period::num / std::chrono::steady_clock::period::den;
+
+        if(seconds > MAXIMUM_CHILD_LIFETIME)
         {
           // Kill the child process. A subsequent call to waitpid will process signal result below.
-          kill(tc.first, SIGKILL);
+          if(!tc.second.finished)
+          {
+            printf("Child process %s WCHAN:%s\n", tc.second.name, GetWChan(tc.first).c_str());
+            kill(tc.first, SIGKILL);
+            tc.second.finished = true; // Only send kill signal once.
+          }
         }
       }
     }
@@ -513,8 +531,9 @@ int32_t RunAllInParallel(const char* processName, ::testcase tc_array[], std::st
     {
       if(WIFEXITED(status))
       {
-        auto& testCase  = children[childPid];
-        testCase.result = WEXITSTATUS(status);
+        auto& testCase    = children[childPid];
+        testCase.result   = WEXITSTATUS(status);
+        testCase.finished = true;
         if(testCase.result)
         {
           printf("Test case %s failed: %d\n", testCase.name, testCase.result);
@@ -535,6 +554,7 @@ int32_t RunAllInParallel(const char* processName, ::testcase tc_array[], std::st
         RunningTestCases::iterator iter = children.find(childPid);
         if(iter != children.end())
         {
+          iter->second.finished = true;
           printf("Test case %s exited with signal %s\n", iter->second.name, strsignal(status));
           iter->second.result = 1;
           failedTestCases.push_back(iter->second.testCase);

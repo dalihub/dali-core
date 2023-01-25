@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,7 @@ void FrameBuffer::AttachColorTexture(TexturePtr texture, uint32_t mipmapLevel, u
     mColor[mColorAttachmentCount] = texture;
     ++mColorAttachmentCount;
 
-    AttachColorTextureToFrameBuffer(mEventThreadServices.GetUpdateManager(), *mRenderObject, texture->GetRenderObject(), mipmapLevel, layer);
+    AttachColorTextureToFrameBuffer(mEventThreadServices.GetUpdateManager(), *mRenderObject, texture->GetRenderTextureKey().Get(), mipmapLevel, layer);
   }
 }
 
@@ -89,7 +89,7 @@ void FrameBuffer::AttachDepthTexture(TexturePtr texture, uint32_t mipmapLevel)
   else
   {
     mDepth = texture;
-    AttachDepthTextureToFrameBuffer(mEventThreadServices.GetUpdateManager(), *mRenderObject, texture->GetRenderObject(), mipmapLevel);
+    AttachDepthTextureToFrameBuffer(mEventThreadServices.GetUpdateManager(), *mRenderObject, texture->GetRenderTextureKey().Get(), mipmapLevel);
   }
 }
 
@@ -103,7 +103,7 @@ void FrameBuffer::AttachDepthStencilTexture(TexturePtr texture, unsigned int mip
   else
   {
     mStencil = texture;
-    AttachDepthStencilTextureToFrameBuffer(mEventThreadServices.GetUpdateManager(), *mRenderObject, texture->GetRenderObject(), mipmapLevel);
+    AttachDepthStencilTextureToFrameBuffer(mEventThreadServices.GetUpdateManager(), *mRenderObject, texture->GetRenderTextureKey().Get(), mipmapLevel);
   }
 }
 

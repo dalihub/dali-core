@@ -37,7 +37,7 @@ using VisualRendererPtr = IntrusivePtr<VisualRenderer>;
 /**
  * VisualRenderer is a Renderer that has additional default properties for toolkit
  */
-class VisualRenderer : public Renderer
+class VisualRenderer : public Dali::Internal::Renderer
 {
 public:
   /**
@@ -70,8 +70,8 @@ public: // Default property extensions from Object
   Property::Value GetDefaultPropertyCurrentValue(Property::Index index) const override;
 
   /**
-    * @copydoc Dali::Internal::Object::OnNotifyDefaultPropertyAnimation()
-    */
+   * @copydoc Dali::Internal::Object::OnNotifyDefaultPropertyAnimation()
+   */
   void OnNotifyDefaultPropertyAnimation(Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType) override;
 
   /**
@@ -112,7 +112,7 @@ protected:
   ~VisualRenderer() override;
 
 private:
-  VisualRenderer(const VisualRenderer&) = delete;
+  VisualRenderer(const VisualRenderer&)            = delete;
   VisualRenderer& operator=(const VisualRenderer&) = delete;
 
 public:

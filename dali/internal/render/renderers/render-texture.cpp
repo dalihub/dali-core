@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/internal/common/memory-pool-object-allocator.h>
 
 namespace Dali
 {
@@ -34,6 +35,9 @@ namespace
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gTextureFilter = Debug::Filter::New(Debug::Concise, false, "LOG_TEXTURE");
 #endif
+
+// Memory pool used to allocate new textures. Memory used by this pool will be released when shutting down DALi
+MemoryPoolObjectAllocator<Texture> gTextureMemoryPool;
 
 /**
  * Converts DALi pixel format to Graphics::Format
@@ -205,6 +209,24 @@ constexpr Graphics::TextureType ConvertType(Texture::Type type)
 
 } //Unnamed namespace
 
+TextureKey Texture::NewKey(Type type, Pixel::Format format, ImageDimensions size)
+{
+  void* ptr = gTextureMemoryPool.AllocateRawThreadSafe();
+  auto  key = gTextureMemoryPool.GetKeyFromPtr(static_cast<Texture*>(ptr));
+  new(ptr) Texture(type, format, size);
+
+  return TextureKey(key);
+}
+
+TextureKey Texture::NewKey(NativeImageInterfacePtr nativeImageInterface)
+{
+  void* ptr = gTextureMemoryPool.AllocateRawThreadSafe();
+  auto  key = gTextureMemoryPool.GetKeyFromPtr(static_cast<Texture*>(ptr));
+  new(ptr) Texture(nativeImageInterface);
+
+  return TextureKey(key);
+}
+
 Texture::Texture(Type type, Pixel::Format format, ImageDimensions size)
 : mGraphicsController(nullptr),
   mGraphicsTexture(nullptr),
@@ -234,6 +256,16 @@ Texture::Texture(NativeImageInterfacePtr nativeImageInterface)
 }
 
 Texture::~Texture() = default;
+
+void Texture::operator delete(void* ptr)
+{
+  gTextureMemoryPool.FreeThreadSafe(static_cast<Texture*>(ptr));
+}
+
+Render::Texture* Texture::Get(TextureKey::KeyType key)
+{
+  return gTextureMemoryPool.GetPtrFromKey(key);
+}
 
 void Texture::Initialize(Graphics::Controller& graphicsController)
 {
