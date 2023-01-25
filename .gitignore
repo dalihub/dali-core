@@ -1,3 +1,4 @@
+# Common gitignore
 .cproject
 .project
 .settings
@@ -8,9 +9,7 @@ BROWSE
 CMakeCache.txt
 CMakeFiles/
 cmake_install.cmake
-dali.info
 install_manifest.txt
-libdali2-core.so*
 *~
 *.pc
 *.o
@@ -40,11 +39,19 @@ libdali2-core.so*
 *.creator.user
 /docs/generated/*
 /build/tizen/doc
-/build/tizen-cmake/doc
 /build/tizen/.cov
 /build/desktop
 /packaging/home*
 compile_commands.json
-file-list.cmake
-compile_commands.json
 .clangd
+/debugfiles.list
+/debuglinks.list
+/debugsources.list
+.clangd/
+*.vscode/
+*.cache/
+# dali-core only
+dali.info
+libdali2-core.so*
+/build/tizen-cmake/doc
+file-list.cmake
