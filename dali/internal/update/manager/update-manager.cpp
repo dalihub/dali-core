@@ -929,7 +929,7 @@ void UpdateManager::ForwardCompiledShadersToEventThread()
 
 void UpdateManager::UpdateRenderers(BufferIndex bufferIndex)
 {
-  for(auto rendererKey : mImpl->renderers)
+  for(const auto& rendererKey : mImpl->renderers)
   {
     // Apply constraints
     auto renderer = rendererKey.Get();
