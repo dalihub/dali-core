@@ -195,12 +195,6 @@ void ThreadLocalStorage::Register(const std::type_info& info, BaseHandle singlet
   {
     DALI_LOG_SINGLETON_SERVICE(Debug::General, "Singleton Added: %s\n", info.name());
     mSingletonContainer.push_back(SingletonPair(info.name(), singleton));
-
-    Integration::Processor* processor = dynamic_cast<Integration::Processor*>(&singleton.GetBaseObject());
-    if(processor)
-    {
-      mCore->RegisterProcessor(*processor);
-    }
   }
 }
 
