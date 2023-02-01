@@ -130,22 +130,6 @@ inline void EraseUsingDiscardQueue(OwnerKeyContainer<Type>& container, const Mem
   }
 }
 
-/**
- * Descends into node's hierarchy and sorts the children of each child according to their depth-index.
- * @param[in] node The node whose hierarchy to descend
- */
-void SortSiblingNodesRecursively(Node& node)
-{
-  NodeContainer& container = node.GetChildren();
-  std::sort(container.Begin(), container.End(), [](Node* a, Node* b) { return a->GetDepthIndex() < b->GetDepthIndex(); });
-
-  // Descend tree and sort as well
-  for(auto&& iter : container)
-  {
-    SortSiblingNodesRecursively(*iter);
-  }
-}
-
 } // unnamed namespace
 
 /**
@@ -929,7 +913,7 @@ void UpdateManager::ForwardCompiledShadersToEventThread()
 
 void UpdateManager::UpdateRenderers(BufferIndex bufferIndex)
 {
-  for(auto rendererKey : mImpl->renderers)
+  for(const auto& rendererKey : mImpl->renderers)
   {
     // Apply constraints
     auto renderer = rendererKey.Get();
@@ -1278,19 +1262,18 @@ void UpdateManager::SetLayerDepths(const SortedLayerPointers& layers, const Laye
 
 void UpdateManager::SetDepthIndices(OwnerPointer<NodeDepths>& nodeDepths)
 {
-  // note,this vector is already in depth order. It could be used as-is to
-  // remove sorting in update algorithm. However, it lacks layer boundary markers.
-  for(auto&& iter : nodeDepths->nodeDepths)
+  // note, this vector is already in depth order.
+  // So if we reverse iterate, we can assume that
+  // my descendant node's depth index are updated.
+  for(auto rIter = nodeDepths->nodeDepths.rbegin(), rEndIter = nodeDepths->nodeDepths.rend(); rIter != rEndIter; rIter++)
   {
-    iter.node->SetDepthIndex(iter.sortedDepth);
-  }
-
-  for(auto&& scene : mImpl->scenes)
-  {
-    if(scene)
+    auto* node = rIter->node;
+    node->SetDepthIndex(rIter->sortedDepth);
+    if(node->IsChildrenReorderRequired())
     {
-      // Go through node hierarchy and rearrange siblings according to depth-index
-      SortSiblingNodesRecursively(*scene->root);
+      // Reorder children container only if sibiling order changed.
+      NodeContainer& container = node->GetChildren();
+      std::sort(container.Begin(), container.End(), [](Node* a, Node* b) { return a->GetDepthIndex() < b->GetDepthIndex(); });
     }
   }
 }

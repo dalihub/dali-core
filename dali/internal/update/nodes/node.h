@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_NODE_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -802,7 +802,11 @@ public:
   {
     if(depthIndex != mDepthIndex)
     {
-      SetDirtyFlag(NodePropertyFlags::DEPTH_INDEX);
+      if(mParent)
+      {
+        // Send CHILDREN_REORDER dirty flag only if my depth index changed.
+        mParent->SetDirtyFlag(NodePropertyFlags::CHILDREN_REORDER);
+      }
       SetUpdated(true);
       mDepthIndex = depthIndex;
     }
@@ -815,6 +819,16 @@ public:
   uint32_t GetDepthIndex() const
   {
     return mDepthIndex;
+  }
+
+  /**
+   * @brief Get whether children sibiling order need to be changed. s.t. child's depth index changed.
+   * @note It will be reset when mDirtyFlag reseted.
+   * @return True if children sibiling order need to be changed.
+   */
+  uint32_t IsChildrenReorderRequired() const
+  {
+    return mDirtyFlags & NodePropertyFlags::CHILDREN_REORDER;
   }
 
   /**
@@ -930,10 +944,10 @@ private: // from NodeDataProvider
 
 private:
   // Delete copy and move
-  Node(const Node&)                = delete;
-  Node(Node&&)                     = delete;
+  Node(const Node&) = delete;
+  Node(Node&&)      = delete;
   Node& operator=(const Node& rhs) = delete;
-  Node& operator=(Node&& rhs)      = delete;
+  Node& operator=(Node&& rhs) = delete;
 
   /**
    * Recursive helper to disconnect a Node and its children.
