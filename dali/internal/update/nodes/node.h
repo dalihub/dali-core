@@ -665,17 +665,35 @@ public:
   }
 
   /**
+   * Set the update area hint of the node.
+   * @param[in] updateAreaHint The update area hint.
+   */
+  void SetUpdateAreaHint(const Vector4& updateAreaHint)
+  {
+    if(mUpdateAreaChanged)
+    {
+      // Merge area if the update area is dirty
+      float x         = std::min(updateAreaHint.x - updateAreaHint.z / 2.0f, mUpdateAreaHint.x - mUpdateAreaHint.z / 2.0f);
+      float y         = std::min(updateAreaHint.y - updateAreaHint.w / 2.0f, mUpdateAreaHint.y - mUpdateAreaHint.w / 2.0f);
+      float width     = std::max(updateAreaHint.x + updateAreaHint.z / 2.0f, mUpdateAreaHint.x + mUpdateAreaHint.z / 2.0f) - x;
+      float height    = std::max(updateAreaHint.y + updateAreaHint.w / 2.0f, mUpdateAreaHint.y + mUpdateAreaHint.w / 2.0f) - y;
+      mUpdateAreaHint = Vector4(x + width / 2, y + height / 2, width, height);
+    }
+    else
+    {
+      mUpdateAreaHint    = updateAreaHint;
+      mUpdateAreaChanged = true;
+    }
+    mDirtyFlags |= NodePropertyFlags::TRANSFORM;
+  }
+
+  /**
    * Retrieve the update area hint of the node.
    * @return The update area hint.
    */
   const Vector4& GetUpdateAreaHint() const
   {
-    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
-    {
-      return mUpdateAreaHint.Get(0);
-    }
-
-    return Vector4::ZERO;
+    return mUpdateAreaHint;
   }
 
   /**
@@ -987,8 +1005,7 @@ public: // Default properties
   AnimatableProperty<bool>    mCulled;         ///< True if the node is culled. This is not animatable. It is just double-buffered.
   AnimatableProperty<Vector4> mColor;          ///< Color can be inherited from the Node hierarchy
   InheritedColor              mWorldColor;     ///< Full inherited color
-  AnimatableProperty<Vector4> mUpdateAreaHint; ///< Update area hint is provided for damaged area calculation. (x, y, width, height)
-                                               ///< This is not animatable. It is just double-buffered. (Because all these bloody properties are).
+  Vector4                     mUpdateAreaHint; ///< Update area hint is provided for damaged area calculation. (x, y, width, height)
 
   uint64_t       mUniformsHash{0u};     ///< Hash of uniform map property values
   uint32_t       mClippingSortModifier; ///< Contains bit-packed clipping information for quick access when sorting
@@ -1020,6 +1037,7 @@ protected:
   bool               mIsCamera : 1;                ///< True if the node is a camera
   bool               mPositionUsesAnchorPoint : 1; ///< True if the node should use the anchor-point when calculating the position
   bool               mTransparent : 1;             ///< True if this node is transparent. This value do not affect children.
+  bool               mUpdateAreaChanged : 1;       ///< True if the update area of the node is changed.
 
   // Changes scope, should be at end of class
   DALI_LOG_OBJECT_STRING_DECLARATION;
@@ -1157,6 +1175,17 @@ inline void SetPositionUsesAnchorPointMessage(EventThreadServices& eventThreadSe
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&node, &Node::SetPositionUsesAnchorPoint, positionUsesAnchorPoint);
+}
+
+inline void SetUpdateAreaHintMessage(EventThreadServices& eventThreadServices, const Node& node, const Vector4& updateAreaHint)
+{
+  using LocalType = MessageValue1<Node, Vector4>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new(slot) LocalType(&node, &Node::SetUpdateAreaHint, updateAreaHint);
 }
 
 } // namespace SceneGraph
