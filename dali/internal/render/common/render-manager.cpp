@@ -522,12 +522,11 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
   DamagedRectsCleaner damagedRectCleaner(damagedRects, surfaceRect);
   bool                cleanDamagedRect = false;
 
-  // Mark previous dirty rects in the sorted array. The array is already sorted by node and renderer, frame number.
-  // so you don't need to sort: std::stable_sort(itemsDirtyRects.begin(), itemsDirtyRects.end());
-  std::vector<DirtyRect>& itemsDirtyRects = sceneObject->GetItemsDirtyRects();
-  for(DirtyRect& dirtyRect : itemsDirtyRects)
+  // Mark previous dirty rects in the std::unordered_map.
+  Scene::ItemsDirtyRectsContainer& itemsDirtyRects = sceneObject->GetItemsDirtyRects();
+  for(auto& dirtyRectPair : itemsDirtyRects)
   {
-    dirtyRect.visited = false;
+    dirtyRectPair.second.visited = false;
   }
 
   uint32_t instructionCount = sceneObject->GetRenderInstructions().Count(mImpl->renderBufferIndex);
@@ -607,24 +606,24 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
                 cleanDamagedRect = true;
 
                 // Save the full rect in the damaged list. We need it when this item is removed
-                DirtyRect dirtyRect(item.mNode, item.mRenderer, surfaceRect);
-                auto      dirtyRectPos = std::lower_bound(itemsDirtyRects.begin(), itemsDirtyRects.end(), dirtyRect);
-                if(dirtyRectPos != itemsDirtyRects.end() && dirtyRectPos->node == item.mNode && dirtyRectPos->renderer == item.mRenderer)
+                DirtyRectKey dirtyRectKey(item.mNode, item.mRenderer);
+                auto         dirtyRectPos = itemsDirtyRects.find(dirtyRectKey);
+                if(dirtyRectPos != itemsDirtyRects.end())
                 {
                   // Replace the rect
-                  dirtyRectPos->visited = true;
-                  dirtyRectPos->rect    = dirtyRect.rect;
+                  dirtyRectPos->second.visited = true;
+                  dirtyRectPos->second.rect    = surfaceRect;
                 }
                 else
                 {
-                  // Else, just insert the new dirtyrect in the correct position
-                  itemsDirtyRects.insert(dirtyRectPos, dirtyRect);
+                  // Else, just insert the new dirtyrect
+                  itemsDirtyRects.insert({dirtyRectKey, surfaceRect});
                 }
                 continue;
               }
 
-              Rect<int> rect;
-              DirtyRect dirtyRect(item.mNode, item.mRenderer, rect);
+              Rect<int>    rect;
+              DirtyRectKey dirtyRectKey(item.mNode, item.mRenderer);
               // If the item refers to updated node or renderer.
               if(item.mIsUpdated ||
                  (item.mNode &&
@@ -647,22 +646,22 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
                   rect.height      = ((bottom + 16) / 16) * 16 - rect.y;
 
                   // Found valid dirty rect.
-                  dirtyRect.rect    = rect;
-                  auto dirtyRectPos = std::lower_bound(itemsDirtyRects.begin(), itemsDirtyRects.end(), dirtyRect);
-
-                  if(dirtyRectPos != itemsDirtyRects.end() && dirtyRectPos->node == item.mNode && dirtyRectPos->renderer == item.mRenderer)
+                  auto dirtyRectPos = itemsDirtyRects.find(dirtyRectKey);
+                  if(dirtyRectPos != itemsDirtyRects.end())
                   {
-                    // Same item, merge it with the previous rect
-                    rect.Merge(dirtyRectPos->rect);
+                    Rect<int> currentRect = rect;
 
-                    // Replace the rect
-                    dirtyRectPos->visited = true;
-                    dirtyRectPos->rect    = dirtyRect.rect;
+                    // Same item, merge it with the previous rect
+                    rect.Merge(dirtyRectPos->second.rect);
+
+                    // Replace the rect as current
+                    dirtyRectPos->second.visited = true;
+                    dirtyRectPos->second.rect    = currentRect;
                   }
                   else
                   {
-                    // Else, just insert the new dirtyrect in the correct position
-                    itemsDirtyRects.insert(dirtyRectPos, dirtyRect);
+                    // Else, just insert the new dirtyrect
+                    itemsDirtyRects.insert({dirtyRectKey, rect});
                   }
 
                   damagedRects.push_back(rect);
@@ -672,16 +671,15 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
               {
                 // 1. The item is not dirty, the node and renderer referenced by the item are still exist.
                 // 2. Mark the related dirty rects as visited so they will not be removed below.
-                auto dirtyRectPos = std::lower_bound(itemsDirtyRects.begin(), itemsDirtyRects.end(), dirtyRect);
-                if(dirtyRectPos != itemsDirtyRects.end() && dirtyRectPos->node == item.mNode && dirtyRectPos->renderer == item.mRenderer)
+                auto dirtyRectPos = itemsDirtyRects.find(dirtyRectKey);
+                if(dirtyRectPos != itemsDirtyRects.end())
                 {
-                  dirtyRectPos->visited = true;
+                  dirtyRectPos->second.visited = true;
                 }
                 else
                 {
                   // The item is not in the list for some reason. Add it!
-                  dirtyRect.rect = surfaceRect;
-                  itemsDirtyRects.insert(dirtyRectPos, dirtyRect);
+                  itemsDirtyRects.insert({dirtyRectKey, surfaceRect});
                   cleanDamagedRect = true; // And make full update at this frame
                 }
               }
@@ -693,23 +691,19 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
   }
 
   // Check removed nodes or removed renderers dirty rects
-  auto i = itemsDirtyRects.begin();
-  auto j = itemsDirtyRects.begin();
-  while(i != itemsDirtyRects.end())
+  // Note, std::unordered_map end iterator is validate if we call erase.
+  for(auto iter = itemsDirtyRects.cbegin(), iterEnd = itemsDirtyRects.cend(); iter != iterEnd;)
   {
-    if(i->visited)
+    if(!iter->second.visited)
     {
-      *j++ = *i;
+      damagedRects.push_back(iter->second.rect);
+      iter = itemsDirtyRects.erase(iter);
     }
     else
     {
-      Rect<int>& dirtRect = i->rect;
-      damagedRects.push_back(dirtRect);
+      ++iter;
     }
-    i++;
   }
-
-  itemsDirtyRects.resize(j - itemsDirtyRects.begin());
 
   if(!cleanDamagedRect)
   {
