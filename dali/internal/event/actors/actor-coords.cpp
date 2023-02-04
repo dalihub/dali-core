@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,11 +79,11 @@ bool ConvertScreenToLocal(
 {
   // Get the ModelView matrix
   Matrix modelView;
-  MatrixUtils::Multiply(modelView, worldMatrix, viewMatrix);
+  MatrixUtils::MultiplyTransformMatrix(modelView, worldMatrix, viewMatrix);
 
   // Calculate the inverted ModelViewProjection matrix; this will be used for 2 unprojects
   Matrix invertedMvp(false /*don't init*/);
-  MatrixUtils::Multiply(invertedMvp, modelView, projectionMatrix);
+  MatrixUtils::MultiplyProjectionMatrix(invertedMvp, modelView, projectionMatrix);
   bool success = invertedMvp.Invert();
 
   // Convert to GL coordinates
@@ -528,7 +528,7 @@ Matrix CalculateActorWorldTransform(const Actor& actor)
 
         //Update the world matrix
         Matrix tempMatrix;
-        MatrixUtils::Multiply(tempMatrix, localMatrix, worldMatrix);
+        MatrixUtils::MultiplyTransformMatrix(tempMatrix, localMatrix, worldMatrix);
         worldMatrix = tempMatrix;
       }
       else

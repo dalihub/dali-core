@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_MATRIX_UTILS_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,14 +52,36 @@ void Multiply(Dali::Matrix& result, const Dali::Matrix& lhs, const Dali::Matrix&
 void Multiply(Dali::Matrix& result, const Dali::Matrix& lhs, const Dali::Quaternion& rhs);
 
 /**
- * @brief Function to multiply projection matrix and store the result onto third.
+ * @brief Function to multiply two transform matrix and store the result onto third.
+ *
+ * This API assume that both lhs and rhs are Transform Matrix.
+ * Scale & Rotation only has 3x3 area of matrix, and Translate only has [12,13,14] index.
+ * So, If we make Matrix for use Transform, 3, 7, 11 is always 0.0f, and 15 is always 1.0f.
+ * So we can reduce the number of multiplication.
+ *
+ * When we try to calculate WorldMatrix, It will have good efforts.
+ *
+ * Use this method in time critical path as it does not require temporaries.
+ *
+ * result = rhs * lhs
+ *
+ * @SINCE_2_2.15
+ * @param[out] result Result of the multiplication
+ * @param[in] lhs Transform Matrix, this cannot be same matrix as result
+ * @param[in] rhs Transform Matrix, this can be same matrix as result
+ */
+void MultiplyTransformMatrix(Dali::Matrix& result, const Dali::Matrix& lhs, const Dali::Matrix& rhs);
+
+/**
+ * @brief Function to multiply projection matrix x transform matrix. and store the result onto third.
  *
  * This API assume that projection is Projection Matrix which top/bottom/left/right is symmetrical.
  *
  * Perspective matrix only has 0, 5, 10, 11, 14 (14 is const value, 1.0f).
  * Orthographic matrix only has 0, 5, 10, 14, 15 (15 is const value, 1.0f).
  * If window rotated, we use 1, 4 index instead of 0, 5.
- * So we only need 8 values to multiplication.
+ * If reflect plane used, we use 2, 6 index.
+ * So we only need 10 values to multiplication.
  *
  * Use this method in time critical path as it does not require temporaries.
  *
@@ -67,7 +89,7 @@ void Multiply(Dali::Matrix& result, const Dali::Matrix& lhs, const Dali::Quatern
  *
  * @SINCE_2_1.46
  * @param[out] result Result of the multiplication
- * @param[in] lhs Matrix, this cannot be same matrix as result
+ * @param[in] lhs Transform Matrix, this cannot be same matrix as result
  * @param[in] projection Projection Matrix, this can be same matrix as result
  */
 void MultiplyProjectionMatrix(Dali::Matrix& result, const Dali::Matrix& lhs, const Dali::Matrix& projection);

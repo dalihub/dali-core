@@ -221,7 +221,7 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
 
       if(size.LengthSquared() > Math::MACHINE_EPSILON_1000)
       {
-        MatrixUtils::Multiply(nodeModelViewMatrix, nodeWorldMatrix, viewMatrix);
+        MatrixUtils::MultiplyTransformMatrix(nodeModelViewMatrix, nodeWorldMatrix, viewMatrix);
         nodeModelViewMatrixSet = true;
 
         // Assume actors are at z=0, compute AABB in view space & test rect intersection
@@ -322,7 +322,7 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
 
       if(!nodeModelViewMatrixSet)
       {
-        MatrixUtils::Multiply(nodeModelViewMatrix, nodeWorldMatrix, viewMatrix);
+        MatrixUtils::MultiplyTransformMatrix(nodeModelViewMatrix, nodeWorldMatrix, viewMatrix);
       }
       item.mModelViewMatrix = nodeModelViewMatrix;
 

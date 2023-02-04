@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,7 +73,7 @@ bool UnprojectFull(const Vector4& windowPos,
                    Vector4&       objectPos)
 {
   Matrix invertedMvp(false); // Don't initialize.
-  MatrixUtils::Multiply(invertedMvp, modelView, projection);
+  MatrixUtils::MultiplyProjectionMatrix(invertedMvp, modelView, projection);
 
   if(invertedMvp.Invert())
   {
@@ -124,7 +124,7 @@ bool ProjectFull(const Vector4& position,
   bool ok = false;
 
   Matrix Mvp(false); // Don't initialize.
-  MatrixUtils::Multiply(Mvp, modelView, projection);
+  MatrixUtils::MultiplyProjectionMatrix(Mvp, modelView, projection);
 
   Vector4 p = Mvp * position;
 

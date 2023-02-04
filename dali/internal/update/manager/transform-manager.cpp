@@ -261,7 +261,7 @@ bool TransformManager::Update()
         }
 
         //Update the world matrix
-        MatrixUtils::Multiply(mWorld[i], mLocal[i], mWorld[parentIndex]);
+        MatrixUtils::MultiplyTransformMatrix(mWorld[i], mLocal[i], mWorld[parentIndex]);
       }
       else
       {
