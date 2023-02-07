@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,11 +61,11 @@ void TestGraphicsBuffer::Upload(uint32_t offset, uint32_t size)
   if(size <= memory.size() && mCreated)
   {
     // Use subData to avoid re-allocation
-    mGl.BufferSubData(GetTarget(), offset, size, &memory[offset]);
+    mGl.BufferSubData(GetTarget(), static_cast<GLintptr>(static_cast<unsigned long>(offset)), static_cast<GLsizeiptr>(static_cast<unsigned long>(size)), &memory[offset]);
   }
   else
   {
-    mGl.BufferData(GetTarget(), GLsizeiptr(size), &memory[0], GL_STATIC_DRAW); //@todo Query - do we need other usages?
+    mGl.BufferData(GetTarget(), static_cast<GLsizeiptr>(static_cast<unsigned long>(size)), &memory[0], GL_STATIC_DRAW); //@todo Query - do we need other usages?
     mCreated = true;
   }
 }
