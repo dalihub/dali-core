@@ -11887,8 +11887,9 @@ int UtcDaliActorCalculateWorldColor01(void)
   branchActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   leafActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
-  rootActor[Actor::Property::COLOR]   = Color::WHITE;
-  branchActor[Actor::Property::COLOR] = Vector4(1.0f, 1.0f, 0.5f, 0.8f);
+  rootActor[Actor::Property::COLOR] = Color::WHITE;
+  Vector4 testColor1(1.0f, 1.0f, 0.5f, 0.8f);
+  branchActor[Actor::Property::COLOR] = testColor1;
   leafActor[Actor::Property::COLOR]   = Vector4(0.1f, 0.5f, 0.5f, 0.8f);
 
   // Default is to inherit:
@@ -11899,9 +11900,21 @@ int UtcDaliActorCalculateWorldColor01(void)
   branchActor.Add(leafActor);
 
   application.SendNotification();
-  application.Render(0);
+  application.Render(16);
+  Vector4 color = branchActor.GetCurrentProperty<Vector4>(Actor::Property::COLOR);
+  DALI_TEST_EQUALS(color, testColor1, TEST_LOCATION);
 
-  Vector4 color = DevelActor::GetWorldColor(leafActor);
+  application.SendNotification();
+  application.Render(16);
+  color = branchActor.GetCurrentProperty<Vector4>(Actor::Property::COLOR);
+  DALI_TEST_EQUALS(color, testColor1, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(16);
+  color = branchActor.GetCurrentProperty<Vector4>(Actor::Property::COLOR);
+  DALI_TEST_EQUALS(color, testColor1, TEST_LOCATION);
+
+  color = DevelActor::GetWorldColor(leafActor);
 
   Vector4 actualColor = leafActor.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR);
   DALI_TEST_EQUALS(color, actualColor, 0.001f, TEST_LOCATION);

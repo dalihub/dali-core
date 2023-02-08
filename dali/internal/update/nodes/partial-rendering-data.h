@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_PARTIAL_RENDERING_DATA_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,12 @@
  * limitations under the License.
  */
 
-#include <dali/internal/update/rendering/scene-graph-renderer.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector4.h>
 
 namespace Dali::Internal::SceneGraph
 {
-class Node;
-class TextureSet;
-
 /**
  * Structure contains partial rendering data used in order to determine
  * whether anything has changed and node has to be updated

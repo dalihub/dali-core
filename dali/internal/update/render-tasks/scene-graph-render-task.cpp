@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -167,19 +167,9 @@ bool RenderTask::QueryViewport(BufferIndex bufferIndex, Viewport& viewport) cons
   return true;
 }
 
-void RenderTask::SetClearColor(BufferIndex updateBufferIndex, const Vector4& value)
-{
-  mClearColor.Set(updateBufferIndex, value);
-}
-
 const Vector4& RenderTask::GetClearColor(BufferIndex bufferIndex) const
 {
   return mClearColor[bufferIndex];
-}
-
-void RenderTask::BakeClearColor(BufferIndex updateBufferIndex, const Vector4& value)
-{
-  mClearColor.Bake(updateBufferIndex, value);
 }
 
 void RenderTask::SetClearEnabled(bool enabled)
@@ -425,14 +415,13 @@ void RenderTask::UpdateViewport(BufferIndex updateBufferIndex, Vector2 sceneSize
     Vector3 halfNodeSize(nodeSize * 0.5f);
     Vector2 screenPosition(halfSceneSize.width + worldPosition.x - halfNodeSize.x,
                            halfSceneSize.height + worldPosition.y - halfNodeSize.y);
-    SetViewportPosition(updateBufferIndex, screenPosition);
-    SetViewportSize(updateBufferIndex, Vector2(nodeSize));
-  }
-}
 
-void RenderTask::SetViewportPosition(BufferIndex updateBufferIndex, const Vector2& value)
-{
-  mViewportPosition.Set(updateBufferIndex, value);
+    /* This is an implicit constraint - the properties will be dirty until the node
+     * is removed. (RenderTask::Impl manages this)
+     */
+    mViewportPosition.Set(updateBufferIndex, screenPosition);
+    mViewportSize.Set(updateBufferIndex, Vector2(nodeSize));
+  }
 }
 
 const Vector2& RenderTask::GetViewportPosition(BufferIndex bufferIndex) const
@@ -440,24 +429,9 @@ const Vector2& RenderTask::GetViewportPosition(BufferIndex bufferIndex) const
   return mViewportPosition[bufferIndex];
 }
 
-void RenderTask::BakeViewportPosition(BufferIndex updateBufferIndex, const Vector2& value)
-{
-  mViewportPosition.Bake(updateBufferIndex, value);
-}
-
-void RenderTask::SetViewportSize(BufferIndex updateBufferIndex, const Vector2& value)
-{
-  mViewportSize.Set(updateBufferIndex, value);
-}
-
 const Vector2& RenderTask::GetViewportSize(BufferIndex bufferIndex) const
 {
   return mViewportSize[bufferIndex];
-}
-
-void RenderTask::BakeViewportSize(BufferIndex updateBufferIndex, const Vector2& value)
-{
-  mViewportSize.Bake(updateBufferIndex, value);
 }
 
 bool RenderTask::GetViewportEnabled(BufferIndex bufferIndex) const

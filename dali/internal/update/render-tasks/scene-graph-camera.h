@@ -20,9 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/actors/camera-actor-devel.h>
-#include <dali/internal/common/message.h>
-#include <dali/internal/common/type-abstraction-enums.h>
-#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/double-buffered.h>
 #include <dali/internal/update/common/inherited-property.h>
@@ -34,18 +31,6 @@ namespace Dali
 {
 namespace Internal
 {
-// value types used by messages
-template<>
-struct ParameterType<Dali::Camera::Type>
-: public BasicType<Dali::Camera::Type>
-{
-};
-template<>
-struct ParameterType<Dali::Camera::ProjectionMode>
-: public BasicType<Dali::Camera::ProjectionMode>
-{
-};
-
 namespace SceneGraph
 {
 class SceneController;
@@ -416,144 +401,8 @@ public:                                                             // PROPERTIE
   DoubleBuffered<Matrix>        mFinalProjection;       ///< Final projection matrix; double buffered for input handling
 };
 
-// Messages for Camera
-
-inline void SetTypeMessage(EventThreadServices& eventThreadServices, const Camera& camera, Dali::Camera::Type parameter)
-{
-  using LocalType = MessageValue1<Camera, Dali::Camera::Type>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&camera, &Camera::SetType, parameter);
-}
-
-inline void SetProjectionModeMessage(EventThreadServices& eventThreadServices, const Camera& camera, Dali::Camera::ProjectionMode parameter)
-{
-  using LocalProjectionMode = MessageValue1<Camera, Dali::Camera::ProjectionMode>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalProjectionMode));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalProjectionMode(&camera, &Camera::SetProjectionMode, parameter);
-}
-
-inline void SetProjectionDirectionMessage(EventThreadServices& eventThreadServices, const Camera& camera, Dali::DevelCameraActor::ProjectionDirection parameter)
-{
-  using LocalProjectionDirection = MessageValue1<Camera, Dali::DevelCameraActor::ProjectionDirection>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalProjectionDirection));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalProjectionDirection(&camera, &Camera::SetProjectionDirection, parameter);
-}
-
-inline void BakeFieldOfViewMessage(EventThreadServices& eventThreadServices, const Camera& camera, float parameter)
-{
-  using LocalType = MessageDoubleBuffered1<Camera, float>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&camera, &Camera::BakeFieldOfView, parameter);
-}
-
-inline void BakeOrthographicSizeMessage(EventThreadServices& eventThreadServices, const Camera& camera, float parameter)
-{
-  using LocalType = MessageDoubleBuffered1<Camera, float>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&camera, &Camera::BakeOrthographicSize, parameter);
-}
-
-inline void BakeAspectRatioMessage(EventThreadServices& eventThreadServices, const Camera& camera, float parameter)
-{
-  using LocalType = MessageDoubleBuffered1<Camera, float>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&camera, &Camera::BakeAspectRatio, parameter);
-}
-
-inline void SetNearClippingPlaneMessage(EventThreadServices& eventThreadServices, const Camera& camera, float parameter)
-{
-  using LocalType = MessageValue1<Camera, float>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&camera, &Camera::SetNearClippingPlane, parameter);
-}
-
-inline void SetFarClippingPlaneMessage(EventThreadServices& eventThreadServices, const Camera& camera, float parameter)
-{
-  using LocalType = MessageValue1<Camera, float>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&camera, &Camera::SetFarClippingPlane, parameter);
-}
-
-inline void SetReflectByPlaneMessage(EventThreadServices& eventThreadServices, const Camera& camera, const Vector4& plane)
-{
-  using LocalType = MessageValue1<Camera, Vector4>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&camera, &Camera::SetReflectByPlane, plane);
-}
-
-inline void SetTargetPositionMessage(EventThreadServices& eventThreadServices, const Camera& camera, const Vector3& parameter)
-{
-  using LocalType = MessageValue1<Camera, Vector3>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&camera, &Camera::SetTargetPosition, parameter);
-}
-
-inline void SetInvertYAxisMessage(EventThreadServices& eventThreadServices, const Camera& camera, bool parameter)
-{
-  using LocalType = MessageValue1<Camera, bool>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&camera, &Camera::SetInvertYAxis, parameter);
-}
-
-inline void RotateProjectionMessage(EventThreadServices& eventThreadServices, const Camera& camera, int parameter)
-{
-  typedef MessageValue1<Camera, int> LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&camera, &Camera::RotateProjection, parameter);
-}
-
 } // namespace SceneGraph
-
 } // namespace Internal
-
 } // namespace Dali
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_CAMERA_H

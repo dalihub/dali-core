@@ -32,6 +32,7 @@
 
 #include <dali/internal/update/common/property-base.h>
 #include <dali/internal/update/manager/update-manager.h>
+#include <dali/internal/update/render-tasks/scene-graph-camera-messages.h>
 
 namespace Dali
 {

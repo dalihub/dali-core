@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_ANIMATOR_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,11 @@
 #include <functional>
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/common/owner-container.h>
-#include <dali/integration-api/debug.h>
 #include <dali/internal/event/animation/key-frames-impl.h>
 #include <dali/internal/event/animation/path-impl.h>
 #include <dali/internal/update/animation/property-accessor.h>
 #include <dali/internal/update/common/property-base.h>
-#include <dali/internal/update/nodes/node.h>
+#include <dali/internal/update/common/property-owner.h>
 #include <dali/public-api/animation/alpha-function.h>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/animation/time-period.h>
