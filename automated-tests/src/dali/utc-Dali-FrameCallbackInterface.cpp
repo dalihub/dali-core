@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
  */
 
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/common/map-wrapper.h>
 #include <dali/devel-api/common/stage-devel.h>
 #include <dali/devel-api/update/frame-callback-interface.h>
@@ -69,41 +70,53 @@ public:
   virtual void Update(Dali::UpdateProxy& updateProxy, float elapsedSeconds) override
   {
     FrameCallbackBasic::Update(updateProxy, elapsedSeconds);
-    updateProxy.GetSize(mActorId, mSizeGetSizeCall);
     updateProxy.GetPosition(mActorId, mPositionGetPositionCall);
     updateProxy.GetPositionAndSize(mActorId, mPositionGetPositionAndSizeCall, mSizeGetPositionAndSizeCall);
-    updateProxy.GetWorldPositionScaleAndSize(mActorId, mWorldPosition, mWorldScale, mSizeGetWorldPositionScaleAndSizeCall);
+    updateProxy.GetSize(mActorId, mSizeGetSizeCall);
+    updateProxy.GetOrientation(mActorId, mOrientation);
     updateProxy.GetColor(mActorId, mColor);
     updateProxy.GetScale(mActorId, mScale);
+
+    updateProxy.GetWorldPositionScaleAndSize(mActorId, mWorldPosition, mWorldScale, mSizeGetWorldPositionAndSizeCall);
+    updateProxy.GetWorldTransformAndSize(mActorId, mWorldTransformPosition, mWorldTransformScale, mWorldTransformOrientation, mSizeGetWorldTransform);
   }
 
   const unsigned int mActorId;
 
-  Vector3 mSizeGetSizeCall;
-  Vector3 mPositionGetPositionCall;
-  Vector3 mPositionGetPositionAndSizeCall;
-  Vector3 mSizeGetPositionAndSizeCall;
+  Vector3    mPositionGetPositionCall;
+  Vector3    mPositionGetPositionAndSizeCall;
+  Vector3    mSizeGetSizeCall;
+  Vector3    mSizeGetPositionAndSizeCall;
+  Vector4    mColor;
+  Vector3    mScale;
+  Quaternion mOrientation;
+
   Vector3 mWorldPosition;
   Vector3 mWorldScale;
-  Vector3 mSizeGetWorldPositionScaleAndSizeCall;
-  Vector4 mColor;
-  Vector3 mScale;
+  Vector3 mSizeGetWorldPositionAndSizeCall;
+
+  Vector3    mWorldTransformPosition;
+  Vector3    mWorldTransformScale;
+  Quaternion mWorldTransformOrientation;
+  Vector3    mSizeGetWorldTransform;
 };
 
 class FrameCallbackSetter : public FrameCallbackBasic
 {
 public:
   FrameCallbackSetter(
-    unsigned int   actorId,
-    const Vector3& sizeToSet,
-    const Vector3& positionToSet,
-    const Vector4& colorToSet,
-    const Vector3& scaleToSet)
+    unsigned int      actorId,
+    const Vector3&    sizeToSet,
+    const Vector3&    positionToSet,
+    const Vector4&    colorToSet,
+    const Vector3&    scaleToSet,
+    const Quaternion& orientationToSet)
   : mActorId(actorId),
     mSizeToSet(sizeToSet),
     mPositionToSet(positionToSet),
     mColorToSet(colorToSet),
-    mScaleToSet(scaleToSet)
+    mScaleToSet(scaleToSet),
+    mOrientationToSet(orientationToSet)
   {
   }
 
@@ -113,12 +126,14 @@ public:
     FrameCallbackBasic::Update(updateProxy, elapsedSeconds);
     updateProxy.SetSize(mActorId, mSizeToSet);
     updateProxy.SetPosition(mActorId, mPositionToSet);
+    updateProxy.SetOrientation(mActorId, mOrientationToSet);
     updateProxy.SetColor(mActorId, mColorToSet);
     updateProxy.SetScale(mActorId, mScaleToSet);
     updateProxy.GetSize(mActorId, mSizeAfterSetting);
     updateProxy.GetPosition(mActorId, mPositionAfterSetting);
     updateProxy.GetColor(mActorId, mColorAfterSetting);
     updateProxy.GetScale(mActorId, mScaleAfterSetting);
+    updateProxy.GetOrientation(mActorId, mOrientationAfterSetting);
   }
 
   const unsigned int mActorId;
@@ -126,27 +141,31 @@ public:
   const Vector3&     mPositionToSet;
   const Vector4&     mColorToSet;
   const Vector3&     mScaleToSet;
+  const Quaternion&  mOrientationToSet;
 
-  Vector3 mSizeAfterSetting;
-  Vector3 mPositionAfterSetting;
-  Vector4 mColorAfterSetting;
-  Vector3 mScaleAfterSetting;
+  Vector3    mSizeAfterSetting;
+  Vector3    mPositionAfterSetting;
+  Vector4    mColorAfterSetting;
+  Vector3    mScaleAfterSetting;
+  Quaternion mOrientationAfterSetting;
 };
 
 class FrameCallbackBaker : public FrameCallbackBasic
 {
 public:
   FrameCallbackBaker(
-    unsigned int   actorId,
-    const Vector3& sizeToSet,
-    const Vector3& positionToSet,
-    const Vector4& colorToSet,
-    const Vector3& scaleToSet)
+    unsigned int      actorId,
+    const Vector3&    sizeToSet,
+    const Vector3&    positionToSet,
+    const Vector4&    colorToSet,
+    const Vector3&    scaleToSet,
+    const Quaternion& orientationToSet)
   : mActorId(actorId),
     mSizeToSet(sizeToSet),
     mPositionToSet(positionToSet),
     mColorToSet(colorToSet),
-    mScaleToSet(scaleToSet)
+    mScaleToSet(scaleToSet),
+    mOrientationToSet(orientationToSet)
   {
   }
 
@@ -158,10 +177,12 @@ public:
     updateProxy.BakePosition(mActorId, mPositionToSet);
     updateProxy.BakeColor(mActorId, mColorToSet);
     updateProxy.BakeScale(mActorId, mScaleToSet);
+    updateProxy.BakeOrientation(mActorId, mOrientationToSet);
     updateProxy.GetSize(mActorId, mSizeAfterSetting);
     updateProxy.GetPosition(mActorId, mPositionAfterSetting);
     updateProxy.GetColor(mActorId, mColorAfterSetting);
     updateProxy.GetScale(mActorId, mScaleAfterSetting);
+    updateProxy.GetOrientation(mActorId, mOrientationAfterSetting);
   }
 
   const unsigned int mActorId;
@@ -169,11 +190,13 @@ public:
   const Vector3&     mPositionToSet;
   const Vector4&     mColorToSet;
   const Vector3&     mScaleToSet;
+  const Quaternion&  mOrientationToSet;
 
-  Vector3 mSizeAfterSetting;
-  Vector3 mPositionAfterSetting;
-  Vector4 mColorAfterSetting;
-  Vector3 mScaleAfterSetting;
+  Vector3    mSizeAfterSetting;
+  Vector3    mPositionAfterSetting;
+  Vector4    mColorAfterSetting;
+  Vector3    mScaleAfterSetting;
+  Quaternion mOrientationAfterSetting;
 };
 
 class FrameCallbackMultipleActors : public FrameCallbackBasic
@@ -213,8 +236,9 @@ public:
   virtual void Update(Dali::UpdateProxy& updateProxy, float elapsedSeconds) override
   {
     FrameCallbackBasic::Update(updateProxy, elapsedSeconds);
-    Vector3 vec3;
-    Vector4 vec4;
+    Vector3    vec3;
+    Vector4    vec4;
+    Quaternion quat;
 
     mGetSizeCallSuccess                      = updateProxy.GetSize(mActorId, vec3);
     mGetPositionCallSuccess                  = updateProxy.GetPosition(mActorId, vec3);
@@ -230,6 +254,11 @@ public:
     mBakePositionCallSuccess                 = updateProxy.BakePosition(mActorId, vec3);
     mBakeColorCallSuccess                    = updateProxy.BakeColor(mActorId, vec4);
     mBakeScaleCallSuccess                    = updateProxy.BakeScale(mActorId, vec3);
+
+    mGetOrientationCallSuccess    = updateProxy.GetOrientation(mActorId, quat);
+    mSetOrientationCallSuccess    = updateProxy.SetOrientation(mActorId, quat);
+    mBakeOrientationCallSuccess   = updateProxy.BakeOrientation(mActorId, quat);
+    mGetWorldTransformCallSuccess = updateProxy.GetWorldTransformAndSize(mActorId, vec3, vec3, quat, vec3);
   }
 
   virtual void Reset() override
@@ -251,23 +280,34 @@ public:
     mBakePositionCallSuccess                 = false;
     mBakeColorCallSuccess                    = false;
     mBakeScaleCallSuccess                    = false;
+
+    mSetOrientationCallSuccess  = false;
+    mGetOrientationCallSuccess  = false;
+    mBakeOrientationCallSuccess = false;
+
+    mGetWorldTransformCallSuccess = false;
   }
 
   const uint32_t mActorId;
-  bool           mGetSizeCallSuccess{false};
-  bool           mGetPositionCallSuccess{false};
-  bool           mGetColorCallSuccess{false};
-  bool           mGetScaleCallSuccess{false};
-  bool           mGetPositionAndSizeCallSuccess{false};
-  bool           mGetWorldPositionScaleAndSizeCallSuccess{false};
-  bool           mSetSizeCallSuccess{false};
-  bool           mSetPositionCallSuccess{false};
-  bool           mSetColorCallSuccess{false};
-  bool           mSetScaleCallSuccess{false};
-  bool           mBakeSizeCallSuccess{false};
-  bool           mBakePositionCallSuccess{false};
-  bool           mBakeColorCallSuccess{false};
-  bool           mBakeScaleCallSuccess{false};
+
+  bool mGetSizeCallSuccess{false};
+  bool mGetPositionCallSuccess{false};
+  bool mGetOrientationCallSuccess{false};
+  bool mGetColorCallSuccess{false};
+  bool mGetScaleCallSuccess{false};
+  bool mGetPositionAndSizeCallSuccess{false};
+  bool mGetWorldPositionScaleAndSizeCallSuccess{false};
+  bool mSetSizeCallSuccess{false};
+  bool mSetPositionCallSuccess{false};
+  bool mSetColorCallSuccess{false};
+  bool mSetScaleCallSuccess{false};
+  bool mSetOrientationCallSuccess{false};
+  bool mBakeSizeCallSuccess{false};
+  bool mBakePositionCallSuccess{false};
+  bool mBakeColorCallSuccess{false};
+  bool mBakeScaleCallSuccess{false};
+  bool mBakeOrientationCallSuccess{false};
+  bool mGetWorldTransformCallSuccess{false};
 };
 
 } // namespace
@@ -307,18 +347,20 @@ int UtcDaliFrameCallbackGetters(void)
   // Test to see that the Getters all return the expected values
 
   TestApplication application;
-  Vector2         actorSize(200, 300);
-  Vector4         color(0.5f, 0.6f, 0.7f, 0.8f);
-  Vector3         position(10.0f, 20.0f, 30.0f);
-  Vector3         scale(2.0f, 4.0f, 6.0f);
 
-  Actor actor = Actor::New();
+  Vector2    actorSize(200, 300);
+  Vector4    color(0.5f, 0.6f, 0.7f, 0.8f);
+  Vector3    position(10.0f, 20.0f, 30.0f);
+  Vector3    scale(2.0f, 4.0f, 6.0f);
+  Quaternion orientation; //(Radian(Math::PI_2), Vector3::ZAXIS);
+  Actor      actor = Actor::New();
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   actor.SetProperty(Actor::Property::SIZE, actorSize);
   actor.SetProperty(Actor::Property::COLOR, color);
   actor.SetProperty(Actor::Property::POSITION, position);
   actor.SetProperty(Actor::Property::SCALE, scale);
+  actor.SetProperty(Actor::Property::ORIENTATION, orientation);
 
   Stage stage = Stage::GetCurrent();
   stage.Add(actor);
@@ -334,24 +376,32 @@ int UtcDaliFrameCallbackGetters(void)
   DALI_TEST_EQUALS(frameCallback.mPositionGetPositionCall, position, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mPositionGetPositionAndSizeCall, position, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mSizeGetPositionAndSizeCall, Vector3(actorSize.width, actorSize.height, 0.0f), TEST_LOCATION);
+
   DALI_TEST_EQUALS(frameCallback.mColor, color, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mScale, scale, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mOrientation, orientation, TEST_LOCATION);
 
   frameCallback.Reset();
 
   application.SendNotification();
   application.Render();
 
-  Vector2 halfSceneSize(application.GetScene().GetSize() * 0.5f);
-  Vector3 halfActorSize(actorSize * 0.5f);
-  Vector3 worldPosition = position - Vector3(halfSceneSize) + halfActorSize * scale;
+  Vector3    worldPosition, worldScale;
+  Quaternion worldRotation;
+  Matrix     worldTransform = DevelActor::GetWorldTransform(actor);
+  worldTransform.GetTransformComponents(worldPosition, worldRotation, worldScale);
 
   // World position and scale values are updated after FrameCallbackInterface::Update()
   // So test them after the second rendering
   DALI_TEST_EQUALS(frameCallback.mCalled, true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(frameCallback.mSizeGetWorldTransform, Vector3(actorSize.width, actorSize.height, 0.0f), TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mWorldPosition, worldPosition, TEST_LOCATION);
-  DALI_TEST_EQUALS(frameCallback.mWorldScale, scale, TEST_LOCATION);
-  DALI_TEST_EQUALS(frameCallback.mSizeGetWorldPositionScaleAndSizeCall, Vector3(actorSize.width, actorSize.height, 0.0f), TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mWorldScale, worldScale, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSizeGetWorldPositionAndSizeCall, Vector3(actorSize), TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mWorldTransformPosition, worldPosition, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mWorldTransformScale, worldScale, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mWorldTransformOrientation, worldRotation, TEST_LOCATION);
 
   END_TEST;
 }
@@ -371,12 +421,13 @@ int UtcDaliFrameCallbackSetters(void)
   Stage stage = Stage::GetCurrent();
   stage.Add(actor);
 
-  Vector3 sizeToSet(1.0f, 2.0f, 3.0f);
-  Vector3 positionToSet(10.0f, 20.0f, 30.0f);
-  Vector4 colorToSet(Color::MAGENTA);
-  Vector3 scaleToSet(1.0f, 3.0f, 5.0f);
+  Vector3    sizeToSet(1.0f, 2.0f, 3.0f);
+  Vector3    positionToSet(10.0f, 20.0f, 30.0f);
+  Vector4    colorToSet(Color::MAGENTA);
+  Vector3    scaleToSet(1.0f, 3.0f, 5.0f);
+  Quaternion orientationToSet(Radian(Math::PI_2), Vector3::ZAXIS);
 
-  FrameCallbackSetter frameCallback(actor.GetProperty<int>(Actor::Property::ID), sizeToSet, positionToSet, colorToSet, scaleToSet);
+  FrameCallbackSetter frameCallback(actor.GetProperty<int>(Actor::Property::ID), sizeToSet, positionToSet, colorToSet, scaleToSet, orientationToSet);
   DevelStage::AddFrameCallback(stage, frameCallback, stage.GetRootLayer());
 
   application.SendNotification();
@@ -387,6 +438,7 @@ int UtcDaliFrameCallbackSetters(void)
   DALI_TEST_EQUALS(frameCallback.mPositionAfterSetting, positionToSet, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mColorAfterSetting, colorToSet, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mScaleAfterSetting, scaleToSet, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mOrientationAfterSetting, orientationToSet, TEST_LOCATION);
 
   // Ensure the actual actor values haven't changed as we didn't bake the values after removing the callback
   DevelStage::RemoveFrameCallback(stage, frameCallback);
@@ -398,6 +450,7 @@ int UtcDaliFrameCallbackSetters(void)
   DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::SIZE).Get<Vector3>(), Vector3(actorSize), TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::COLOR).Get<Vector4>(), Color::WHITE, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::SCALE).Get<Vector3>(), Vector3::ONE, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::ORIENTATION).Get<Quaternion>(), Quaternion(Radian(0.0f), Vector3::ZAXIS), TEST_LOCATION);
 
   // Render for a couple more frames to ensure the values are reset properly (some values are double-buffered)
 
@@ -408,6 +461,7 @@ int UtcDaliFrameCallbackSetters(void)
   DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::SIZE).Get<Vector3>(), Vector3(actorSize), TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::COLOR).Get<Vector4>(), Color::WHITE, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::SCALE).Get<Vector3>(), Vector3::ONE, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::ORIENTATION).Get<Quaternion>(), Quaternion(Radian(0.0f), Vector3::ZAXIS), TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
@@ -416,6 +470,7 @@ int UtcDaliFrameCallbackSetters(void)
   DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::SIZE).Get<Vector3>(), Vector3(actorSize), TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::COLOR).Get<Vector4>(), Color::WHITE, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::SCALE).Get<Vector3>(), Vector3::ONE, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::ORIENTATION).Get<Quaternion>(), Quaternion(Radian(0.0f), Vector3::ZAXIS), TEST_LOCATION);
 
   END_TEST;
 }
@@ -435,12 +490,13 @@ int UtcDaliFrameCallbackBake(void)
   Stage stage = Stage::GetCurrent();
   stage.Add(actor);
 
-  Vector3 sizeToSet(1.0f, 2.0f, 3.0f);
-  Vector3 positionToSet(10.0f, 20.0f, 30.0f);
-  Vector4 colorToSet(Color::MAGENTA);
-  Vector3 scaleToSet(1.0f, 3.0f, 5.0f);
+  Vector3    sizeToSet(1.0f, 2.0f, 3.0f);
+  Vector3    positionToSet(10.0f, 20.0f, 30.0f);
+  Vector4    colorToSet(Color::MAGENTA);
+  Vector3    scaleToSet(1.0f, 3.0f, 5.0f);
+  Quaternion orientationToSet(Radian(Math::PI * 0.3), Vector3::YAXIS);
 
-  FrameCallbackBaker frameCallback(actor.GetProperty<int>(Actor::Property::ID), sizeToSet, positionToSet, colorToSet, scaleToSet);
+  FrameCallbackBaker frameCallback(actor.GetProperty<int>(Actor::Property::ID), sizeToSet, positionToSet, colorToSet, scaleToSet, orientationToSet);
   DevelStage::AddFrameCallback(stage, frameCallback, stage.GetRootLayer());
 
   application.SendNotification();
@@ -451,6 +507,7 @@ int UtcDaliFrameCallbackBake(void)
   DALI_TEST_EQUALS(frameCallback.mPositionAfterSetting, positionToSet, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mColorAfterSetting, colorToSet, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mScaleAfterSetting, scaleToSet, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mOrientationAfterSetting, orientationToSet, TEST_LOCATION);
 
   // Ensure the new values are saved after removing the callback
   DevelStage::RemoveFrameCallback(stage, frameCallback);
@@ -462,6 +519,7 @@ int UtcDaliFrameCallbackBake(void)
   DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::SIZE).Get<Vector3>(), sizeToSet, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::COLOR).Get<Vector4>(), colorToSet, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::SCALE).Get<Vector3>(), scaleToSet, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::ORIENTATION).Get<Quaternion>(), orientationToSet, TEST_LOCATION);
 
   END_TEST;
 }
@@ -648,6 +706,7 @@ int UtcDaliFrameCallbackCheckActorNotAdded(void)
   DALI_TEST_EQUALS(frameCallback.mColor, Vector4::ZERO, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mScale, Vector3::ZERO, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mWorldScale, Vector3::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mOrientation, Quaternion::IDENTITY, TEST_LOCATION);
 
   END_TEST;
 }
@@ -682,6 +741,12 @@ int UtcDaliFrameCallbackInvalidActorId(void)
   DALI_TEST_EQUALS(frameCallback.mBakePositionCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeColorCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeScaleCallSuccess, false, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(frameCallback.mGetOrientationCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetOrientationCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakeOrientationCallSuccess, false, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(frameCallback.mGetWorldTransformCallSuccess, false, TEST_LOCATION);
 
   END_TEST;
 }
@@ -720,6 +785,11 @@ int UtcDaliFrameCallbackActorRemovedAndAdded(void)
   DALI_TEST_EQUALS(frameCallback.mBakePositionCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeColorCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeScaleCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetOrientationCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetOrientationCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakeOrientationCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetWorldTransformCallSuccess, true, TEST_LOCATION);
+
   frameCallback.Reset();
 
   // Remove the actor from stage, the methods should not return successfully.
@@ -744,6 +814,11 @@ int UtcDaliFrameCallbackActorRemovedAndAdded(void)
   DALI_TEST_EQUALS(frameCallback.mBakePositionCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeColorCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeScaleCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetOrientationCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetOrientationCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakeOrientationCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetWorldTransformCallSuccess, false, TEST_LOCATION);
+
   frameCallback.Reset();
 
   // Re-add the actor back to the stage, all the methods should once again, return successfully.
@@ -768,6 +843,10 @@ int UtcDaliFrameCallbackActorRemovedAndAdded(void)
   DALI_TEST_EQUALS(frameCallback.mBakePositionCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeColorCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeScaleCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetOrientationCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetOrientationCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakeOrientationCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetWorldTransformCallSuccess, true, TEST_LOCATION);
 
   END_TEST;
 }

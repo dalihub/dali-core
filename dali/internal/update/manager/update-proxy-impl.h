@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_UPDATE_PROXY_IMPL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,6 +85,21 @@ public:
   bool BakePosition(uint32_t id, const Vector3& position);
 
   /**
+   * @copydoc Dali::UpdateProxy::GetOrientation()
+   */
+  bool GetOrientation(uint32_t id, Quaternion& orientation) const;
+
+  /**
+   * @copydoc Dali::UpdateProxy::SetOrientation()
+   */
+  bool SetOrientation(uint32_t id, const Quaternion& orientation);
+
+  /**
+   * @copydoc Dali::UpdateProxy::BakeOrientation()
+   */
+  bool BakeOrientation(uint32_t id, const Quaternion& orientation);
+
+  /**
    * @copydoc Dali::UpdateProxy::GetSize()
    */
   bool GetSize(uint32_t id, Vector3& size) const;
@@ -108,6 +123,11 @@ public:
    * @copydoc Dali::UpdateProxy::GetWorldPositionScaleAndSize()
    */
   bool GetWorldPositionScaleAndSize(uint32_t id, Vector3& position, Vector3& scale, Vector3& size) const;
+
+  /**
+   * @copydoc Dali::UpdateProxy::GetWorldTransformAndSize()
+   */
+  bool GetWorldTransformAndSize(uint32_t id, Vector3& position, Vector3& scale, Quaternion& orientation, Vector3& size) const;
 
   /**
    * @copydoc Dali::UpdateProxy::GetScale()
