@@ -667,12 +667,6 @@ void Renderer::SetDefaultProperty(Property::Index        index,
           mOpacity         = opacity;
           auto sceneObject = const_cast<SceneGraph::Renderer*>(&GetRendererSceneObject());
           SceneGraph::BakeOpacityMessage(GetEventThreadServices(), *sceneObject, mOpacity);
-
-          OwnerPointer<SceneGraph::PropertyResetterBase> resetter(
-            new SceneGraph::BakerResetter(sceneObject,
-                                          &sceneObject->mOpacity,
-                                          SceneGraph::BakerResetter::Lifetime::BAKE));
-          AddResetterMessage(GetEventThreadServices().GetUpdateManager(), resetter);
         }
       }
       break;
