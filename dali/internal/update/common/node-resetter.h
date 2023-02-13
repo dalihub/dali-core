@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENEGRAPH_NODE_RESETTER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,7 +84,6 @@ public:
 
       mNode->mVisible.ResetToBaseValue(updateBufferIndex);
       mNode->mColor.ResetToBaseValue(updateBufferIndex);
-      mNode->mUpdateAreaHint.ResetToBaseValue(updateBufferIndex);
     }
   };
 
@@ -103,7 +102,6 @@ public:
 
     mNode->mVisible.MarkAsDirty();
     mNode->mColor.MarkAsDirty();
-    mNode->mUpdateAreaHint.MarkAsDirty();
   }
 
   /**
@@ -159,7 +157,6 @@ protected:
   {
     mNode->mVisible.MarkAsDirty();
     mNode->mColor.MarkAsDirty();
-    mNode->mUpdateAreaHint.MarkAsDirty();
   }
 
   Node*  mNode;         ///< The node that owns the properties
