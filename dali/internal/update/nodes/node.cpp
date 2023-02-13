@@ -29,7 +29,11 @@ namespace
 {
 // Memory pool used to allocate new nodes. Memory used by this pool will be released when process dies
 //  or DALI library is unloaded
-Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Node> gNodeMemoryPool;
+Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Node>& GetNodeMemoryPool()
+{
+  static Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Node> gNodeMemoryPool;
+  return gNodeMemoryPool;
+}
 #ifdef DEBUG_ENABLED
 // keep track of nodes alive, to ensure we have 0 when the process exits or DALi library is unloaded
 int32_t gNodeCount = 0;
@@ -54,7 +58,7 @@ uint32_t Node::mNodeCounter = 0; ///< A counter to provide unique node ids, up-t
 
 Node* Node::New()
 {
-  return new(gNodeMemoryPool.AllocateRawThreadSafe()) Node;
+  return new(GetNodeMemoryPool().AllocateRawThreadSafe()) Node;
 }
 
 void Node::Delete(Node* node)
@@ -66,7 +70,7 @@ void Node::Delete(Node* node)
     node->~Node();
 
     // Mark the memory it used as free in the memory pool
-    gNodeMemoryPool.FreeThreadSafe(node);
+    GetNodeMemoryPool().FreeThreadSafe(node);
   }
   else
   {
@@ -333,7 +337,7 @@ void Node::RecursiveDisconnectFromSceneGraph(BufferIndex updateBufferIndex)
 
 uint32_t Node::GetMemoryPoolCapacity()
 {
-  return gNodeMemoryPool.GetCapacity();
+  return GetNodeMemoryPool().GetCapacity();
 }
 
 } // namespace SceneGraph

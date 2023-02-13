@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,11 @@
 namespace //Unnamed namespace
 {
 //Memory pool used to allocate new animations. Memory used by this pool will be released when shutting down DALi
-Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Animation> gAnimationMemoryPool;
+Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Animation>& GetAnimationMemoryPool()
+{
+  static Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Animation> gAnimationMemoryPool;
+  return gAnimationMemoryPool;
+}
 
 inline void WrapInPlayRange(float& elapsed, const float& playRangeStartSeconds, const float& playRangeEndSeconds)
 {
@@ -58,7 +62,7 @@ namespace SceneGraph
 {
 Animation* Animation::New(float durationSeconds, float speedFactor, const Vector2& playRange, int32_t loopCount, EndAction endAction, EndAction disconnectAction)
 {
-  return new(gAnimationMemoryPool.AllocateRawThreadSafe()) Animation(durationSeconds, speedFactor, playRange, loopCount, endAction, disconnectAction);
+  return new(GetAnimationMemoryPool().AllocateRawThreadSafe()) Animation(durationSeconds, speedFactor, playRange, loopCount, endAction, disconnectAction);
 }
 
 Animation::Animation(float durationSeconds, float speedFactor, const Vector2& playRange, int32_t loopCount, Dali::Animation::EndAction endAction, Dali::Animation::EndAction disconnectAction)
@@ -84,7 +88,7 @@ Animation::~Animation() = default;
 
 void Animation::operator delete(void* ptr)
 {
-  gAnimationMemoryPool.FreeThreadSafe(static_cast<Animation*>(ptr));
+  GetAnimationMemoryPool().FreeThreadSafe(static_cast<Animation*>(ptr));
 }
 
 void Animation::SetDuration(float durationSeconds)
@@ -486,7 +490,7 @@ void Animation::UpdateAnimators(BufferIndex bufferIndex, bool bake, bool animati
 
 uint32_t Animation::GetMemoryPoolCapacity()
 {
-  return gAnimationMemoryPool.GetCapacity();
+  return GetAnimationMemoryPool().GetCapacity();
 }
 
 } // namespace SceneGraph
