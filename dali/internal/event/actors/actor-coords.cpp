@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,7 +83,7 @@ bool ConvertScreenToLocal(
 
   // Calculate the inverted ModelViewProjection matrix; this will be used for 2 unprojects
   Matrix invertedMvp(false /*don't init*/);
-  MatrixUtils::MultiplyProjectionMatrix(invertedMvp, modelView, projectionMatrix);
+  MatrixUtils::Multiply(invertedMvp, modelView, projectionMatrix);
   bool success = invertedMvp.Invert();
 
   // Convert to GL coordinates
@@ -540,17 +540,17 @@ Matrix CalculateActorWorldTransform(const Actor& actor)
         parentMatrix.GetTransformComponents(parentPosition, parentOrientation, parentScale);
 
         // Compute intermediate Local information
-        centerPosition                    = CalculateCenterPosition(anchorPoint, positionUsesAnchorPoint, size, localScale, localOrientation);
+        centerPosition = CalculateCenterPosition(anchorPoint, positionUsesAnchorPoint, size, localScale, localOrientation);
         Vector3 intermediateLocalPosition = actorPosition + centerPosition + (parentOrigin - Vector3(0.5f, 0.5f, 0.5f)) * parentSize;
-        Matrix  intermediateLocalMatrix;
+        Matrix intermediateLocalMatrix;
         intermediateLocalMatrix.SetTransformComponents(localScale, localOrientation, intermediateLocalPosition);
 
         // Compute intermediate world information
         Matrix intermediateWorldMatrix;
         MatrixUtils::Multiply(intermediateWorldMatrix, intermediateLocalMatrix, parentMatrix);
 
-        Vector3    intermediateWorldPosition, intermediateWorldScale;
-        Quaternion intermediateWorldOrientation;
+        Vector3       intermediateWorldPosition, intermediateWorldScale;
+        Quaternion    intermediateWorldOrientation;
         intermediateWorldMatrix.GetTransformComponents(intermediateWorldPosition, intermediateWorldOrientation, intermediateWorldScale);
 
         // Compute final world information
@@ -576,7 +576,7 @@ Matrix CalculateActorWorldTransform(const Actor& actor)
         // parent origin position in world space and relative position of center from parent origin.
         // If this node doesn't inherit its parent position, simply use the relative position as a final world position.
         Vector3 localCenterPosition = CalculateCenterPosition(anchorPoint, positionUsesAnchorPoint, size, finalWorldScale, finalWorldOrientation);
-        finalWorldPosition          = actorPosition * finalWorldScale;
+        finalWorldPosition = actorPosition * finalWorldScale;
         finalWorldPosition *= finalWorldOrientation;
         finalWorldPosition += localCenterPosition;
         if((inheritanceModeList[i] & INHERIT_POSITION) != 0)

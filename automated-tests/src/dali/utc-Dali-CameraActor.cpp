@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2311,37 +2311,6 @@ int UtcDaliCameraActorReflectionByPlane(void)
 
   // Test Free Look camera
   freeLookCameraActor.SetType(Camera::FREE_LOOK);
-
-  // Make sure the recalculation will take place
-  freeLookCameraActor.SetProperty(Dali::DevelCameraActor::Property::REFLECTION_PLANE, Vector4(0.0f, 1.0f, 0.0f, 0.0f));
-
-  application.SendNotification();
-  application.Render();
-  application.SendNotification();
-  application.Render();
-
-  // Nothing should change despite of different camera type
-  matrixAfter.GetTransformComponents(position, rotation, scale);
-  DALI_TEST_EQUALS(reflected, rotation, 0.01f, TEST_LOCATION);
-
-  // Test Orthographic camera
-  freeLookCameraActor.SetProjectionMode(Dali::Camera::ProjectionMode::ORTHOGRAPHIC_PROJECTION);
-
-  // Make sure the recalculation will take place
-  freeLookCameraActor.SetProperty(Dali::DevelCameraActor::Property::REFLECTION_PLANE, Vector4(0.0f, 1.0f, 0.0f, 0.0f));
-
-  application.SendNotification();
-  application.Render();
-  application.SendNotification();
-  application.Render();
-
-  // Nothing should change despite of different camera type
-  matrixAfter.GetTransformComponents(position, rotation, scale);
-  DALI_TEST_EQUALS(reflected, rotation, 0.01f, TEST_LOCATION);
-
-  // Test Orthographic camera + Look at target
-  freeLookCameraActor.SetType(Camera::LOOK_AT_TARGET);
-  freeLookCameraActor.SetTargetPosition(targetPosition);
 
   // Make sure the recalculation will take place
   freeLookCameraActor.SetProperty(Dali::DevelCameraActor::Property::REFLECTION_PLANE, Vector4(0.0f, 1.0f, 0.0f, 0.0f));

@@ -487,7 +487,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
     mRenderCallbackInput->size       = size;
     mRenderCallbackInput->projection = projectionMatrix;
 
-    MatrixUtils::MultiplyProjectionMatrix(mRenderCallbackInput->mvp, modelViewMatrix, projectionMatrix);
+    MatrixUtils::Multiply(mRenderCallbackInput->mvp, modelViewMatrix, projectionMatrix);
 
     // submit draw
     commandBuffer.DrawNative(&info);
@@ -739,7 +739,7 @@ void Renderer::WriteUniformBuffer(
     if(mvpUniformInfo && !mvpUniformInfo->name.empty())
     {
       Matrix modelViewProjectionMatrix(false);
-      MatrixUtils::MultiplyProjectionMatrix(modelViewProjectionMatrix, modelViewMatrix, projectionMatrix);
+      MatrixUtils::Multiply(modelViewProjectionMatrix, modelViewMatrix, projectionMatrix);
       WriteDefaultUniform(mvpUniformInfo, *uboView, modelViewProjectionMatrix);
     }
 
