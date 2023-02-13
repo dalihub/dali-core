@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -256,7 +256,7 @@ void MultiplyProjectionMatrix(Dali::Matrix& result, const Dali::Matrix& lhs, con
   // Current NEON code is copy of Multiply.
 
   MATH_INCREASE_COUNTER(PerformanceMonitor::MATRIX_MULTIPLYS);
-  MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY, 32); // 32 = 8*4
+  MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY, 40); // 40 = 10*4
 
   float*       temp   = result.AsFloat();
   const float* rhsPtr = projection.AsFloat();
@@ -264,11 +264,13 @@ void MultiplyProjectionMatrix(Dali::Matrix& result, const Dali::Matrix& lhs, con
 
 #ifndef __ARM_NEON__
 
-  // We only use rhsPtr's 0, 1, 4, 5, 10, 11, 14, 15 index.
+  // We only use rhsPtr's 0, 1, 2, 4, 5, 6, 10, 11, 14, 15 index.
   const float rhs0  = rhsPtr[0];
   const float rhs1  = rhsPtr[1];
+  const float rhs2  = rhsPtr[2];
   const float rhs4  = rhsPtr[4];
   const float rhs5  = rhsPtr[5];
+  const float rhs6  = rhsPtr[6];
   const float rhs10 = rhsPtr[10];
   const float rhs11 = rhsPtr[11];
   const float rhs14 = rhsPtr[14];
@@ -289,7 +291,7 @@ void MultiplyProjectionMatrix(Dali::Matrix& result, const Dali::Matrix& lhs, con
 
     temp[loc0] = (value0 * rhs0) + (value1 * rhs4);
     temp[loc1] = (value0 * rhs1) + (value1 * rhs5);
-    temp[loc2] = (value2 * rhs10) + (value3 * rhs14);
+    temp[loc2] = (value0 * rhs2) + (value1 * rhs6) + (value2 * rhs10) + (value3 * rhs14);
     temp[loc3] = (value2 * rhs11) + (value3 * rhs15);
   }
 
