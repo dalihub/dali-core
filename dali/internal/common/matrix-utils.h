@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_MATRIX_UTILS_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,8 @@ void Multiply(Dali::Matrix& result, const Dali::Matrix& lhs, const Dali::Quatern
  * Perspective matrix only has 0, 5, 10, 11, 14 (14 is const value, 1.0f).
  * Orthographic matrix only has 0, 5, 10, 14, 15 (15 is const value, 1.0f).
  * If window rotated, we use 1, 4 index instead of 0, 5.
- * So we only need 8 values to multiplication.
+ * If reflect plane used, we use 2, 6 index.
+ * So we only need 10 values to multiplication.
  *
  * Use this method in time critical path as it does not require temporaries.
  *

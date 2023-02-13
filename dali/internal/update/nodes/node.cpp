@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,7 +102,8 @@ Node::Node()
   mIsLayer(false),
   mIsCamera(false),
   mPositionUsesAnchorPoint(true),
-  mTransparent(false)
+  mTransparent(false),
+  mUpdateAreaChanged(false)
 {
 #ifdef DEBUG_ENABLED
   gNodeCount++;
@@ -256,12 +257,6 @@ NodePropertyFlags Node::GetDirtyFlags() const
     flags |= NodePropertyFlags::COLOR;
   }
 
-  // Check whether the update area property has changed
-  if(!mUpdateAreaHint.IsClean())
-  {
-    flags |= NodePropertyFlags::TRANSFORM;
-  }
-
   return flags;
 }
 
@@ -278,6 +273,8 @@ NodePropertyFlags Node::GetInheritedDirtyFlags(NodePropertyFlags parentFlags) co
 void Node::ResetDirtyFlags(BufferIndex updateBufferIndex)
 {
   mDirtyFlags = NodePropertyFlags::NOTHING;
+
+  mUpdateAreaChanged = false;
 }
 
 void Node::UpdateUniformHash(BufferIndex bufferIndex)

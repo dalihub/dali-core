@@ -1728,7 +1728,7 @@ void Actor::SetInheritLayoutDirection(bool inherit)
 void Actor::SetUpdateAreaHint(const Vector4& updateAreaHint)
 {
   // node is being used in a separate thread; queue a message to set the value & base value
-  SceneGraph::NodePropertyMessage<Vector4>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mUpdateAreaHint, &AnimatableProperty<Vector4>::Bake, updateAreaHint);
+  SetUpdateAreaHintMessage(GetEventThreadServices(), GetNode(), updateAreaHint);
 }
 
 } // namespace Internal

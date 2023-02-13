@@ -9086,7 +9086,7 @@ int utcDaliActorPartialUpdateActorsWithSizeHint01(void)
     true,
     true);
 
-  tet_infoline("Check the damaged rect with partial update and actor size hint");
+  tet_infoline("Check the damaged rect with partial update and update area hint");
 
   const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
 
@@ -9202,7 +9202,7 @@ int utcDaliActorPartialUpdateActorsWithSizeHint02(void)
     true,
     true);
 
-  tet_infoline("Check the damaged rect with partial update and actor size hint");
+  tet_infoline("Check the damaged rect with partial update and update area hint");
 
   const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
 
@@ -9235,7 +9235,7 @@ int utcDaliActorPartialUpdateActorsWithSizeHint02(void)
   // Ensure the damaged rect is empty
   DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
 
-  // Chnage UPDATE_AREA_HINT
+  // Change UPDATE_AREA_HINT
   actor.SetProperty(Actor::Property::UPDATE_AREA_HINT, Vector4(0.0f, 0.0f, 64.0f, 64.0f));
 
   application.SendNotification();
@@ -9270,6 +9270,75 @@ int utcDaliActorPartialUpdateActorsWithSizeHint02(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   clippingRect = Rect<int>(32, 688, 96, 96);
+  DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
+
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int utcDaliActorPartialUpdateActorsWithSizeHint03(void)
+{
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  tet_infoline("Check the damaged rect with partial update and update area hint");
+
+  const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
+
+  Actor actor = CreateRenderableActor();
+  actor.SetProperty(Actor::Property::POSITION, Vector3(64.0f, 64.0f, 0.0f));
+  actor.SetProperty(Actor::Property::SIZE, Vector3(32.0f, 32.0f, 0.0f));
+  actor.SetProperty(Actor::Property::UPDATE_AREA_HINT, Vector4(0.0f, 0.0f, 64.0f, 64.0f));
+  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  std::vector<Rect<int>> damagedRects;
+  application.PreRenderWithPartialUpdate(TestApplication::DEFAULT_RENDER_INTERVAL, nullptr, damagedRects);
+
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  Rect<int> clippingRect = Rect<int>(32, 704, 80, 80);
+  DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
+
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Ensure the damaged rect is empty
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+
+  // Set UPDATE_AREA_HINT twice before rendering
+  actor.SetProperty(Actor::Property::UPDATE_AREA_HINT, Vector4(0.0f, 0.0f, 32.0f, 32.0f));
+  application.SendNotification();
+
+  actor.SetProperty(Actor::Property::UPDATE_AREA_HINT, Vector4(32.0f, -32.0f, 32.0f, 32.0f));
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::DEFAULT_RENDER_INTERVAL, nullptr, damagedRects);
+
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  clippingRect = Rect<int>(32, 704, 96, 96);
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);

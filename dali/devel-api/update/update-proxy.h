@@ -2,7 +2,7 @@
 #define DALI_UPDATE_PROXY_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,6 +72,32 @@ public:
   bool BakePosition(uint32_t id, const Vector3& position);
 
   /**
+   * @brief Given the Actor ID, this retrieves that Actor's local orientation.
+   * @param[in]   id        The Actor ID
+   * @param[out]  orientation  Set to the Actor's current orientation, if Actor ID is valid
+   * @return Whether the method call was successful or not.
+   */
+  bool GetOrientation(uint32_t id, Quaternion& orientation) const;
+
+  /**
+   * @brief Allows setting an Actor's local orientation from the Frame callback function for the current frame only.
+   * @param[in]  id        The Actor ID
+   * @param[in]  orientation  The orientation to set
+   * @return Whether the method call was successful or not.
+   * @note This will get reset to the internally calculated or previously baked value in the next frame, so will have to be set again.
+   */
+  bool SetOrientation(uint32_t id, const Quaternion& orientation);
+
+  /**
+   * @brief Allows baking an Actor's local orientation from the Frame callback function.
+   * @param[in]  id        The Actor ID
+   * @param[in]  orientation  The orientation to bake
+   * @return Whether the method call was successful or not.
+   * @note The value is saved so will cause undesired effects if this property is being animated.
+   */
+  bool BakeOrientation(uint32_t id, const Quaternion& orientation);
+
+  /**
    * @brief Given the Actor ID, this retrieves that Actor's size.
    * @param[in]   id    The Actor ID
    * @param[out]  size  Set to the Actor's current size, if Actor ID is valid
@@ -115,6 +141,17 @@ public:
    * @return Whether the method call was successful or not.
    */
   bool GetWorldPositionScaleAndSize(uint32_t id, Vector3& position, Vector3& scale, Vector3& size) const;
+
+  /**
+   * @brief Given the Actor ID, this retrieves that Actor's world transform properties and size.
+   * @param[in]   id        The Actor ID
+   * @param[out]  position  Set to the Actor's current world position, if Actor ID is valid
+   * @param[out]  scale     Set to the Actor's current world scale, if Actor ID is valid
+   * @param[out]  orientation Set to the Actor's current world orientation, if Actor ID is valid
+   * @param[out]  size      Set to the Actor's current size, if Actor ID is valid
+   * @return Whether the method call was successful or not.
+   */
+  bool GetWorldTransformAndSize(uint32_t id, Vector3& position, Vector3& scale, Quaternion& orientation, Vector3& size) const;
 
   /**
    * @brief Given the Actor ID, this retrieves that Actor's local scale.

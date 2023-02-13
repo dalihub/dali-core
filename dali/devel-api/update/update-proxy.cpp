@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,21 @@ bool UpdateProxy::BakePosition(uint32_t id, const Vector3& position)
   return mImpl.BakePosition(id, position);
 }
 
+bool UpdateProxy::GetOrientation(uint32_t id, Quaternion& orientation) const
+{
+  return mImpl.GetOrientation(id, orientation);
+}
+
+bool UpdateProxy::SetOrientation(uint32_t id, const Quaternion& orientation)
+{
+  return mImpl.SetOrientation(id, orientation);
+}
+
+bool UpdateProxy::BakeOrientation(uint32_t id, const Quaternion& orientation)
+{
+  return mImpl.BakeOrientation(id, orientation);
+}
+
 bool UpdateProxy::GetSize(uint32_t id, Vector3& size) const
 {
   return mImpl.GetSize(id, size);
@@ -61,6 +76,11 @@ bool UpdateProxy::GetPositionAndSize(uint32_t id, Vector3& position, Vector3& si
 bool UpdateProxy::GetWorldPositionScaleAndSize(uint32_t id, Vector3& position, Vector3& scale, Vector3& size) const
 {
   return mImpl.GetWorldPositionScaleAndSize(id, position, scale, size);
+}
+
+bool UpdateProxy::GetWorldTransformAndSize(uint32_t id, Vector3& position, Vector3& scale, Quaternion& orientation, Vector3& size) const
+{
+  return mImpl.GetWorldTransformAndSize(id, position, scale, orientation, size);
 }
 
 bool UpdateProxy::GetScale(uint32_t id, Vector3& scale) const
