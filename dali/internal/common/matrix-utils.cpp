@@ -217,6 +217,11 @@ void Multiply(Dali::Matrix& result, const Dali::Matrix& lhs, const Dali::Quatern
   }
 
 #else
+  // Store 4th row values that might be overwrited.
+  const float value0 = lhsPtr[3];
+  const float value1 = lhsPtr[7];
+  const float value2 = lhsPtr[11];
+  const float value3 = lhsPtr[15];
 
   // 64 32bit registers,
   // aliased to
@@ -225,28 +230,32 @@ void Multiply(Dali::Matrix& result, const Dali::Matrix& lhs, const Dali::Quatern
   // e.g. q0 = d0 and d1
   // load and stores interleaved as NEON can load and store while calculating
   asm volatile(
-    "VLDM         %1,   {q4-q6}       \n\t" // load matrix 1 (lhsPtr)
-    "VLD1.F32     {q7}, [%2]!         \n\t" // load matrix 2 (rhsPtr) [0..3]
-    "VMUL.F32     q0,   q7,   d8[0]   \n\t" // column 0 = rhsPtr[0..3] * lhsPtr[0..3]
-    "VMUL.F32     q1,   q7,   d10[0]  \n\t" // column 1 = rhsPtr[0..3] * lhsPtr[4..7]
-    "VMUL.F32     q2,   q7,   d12[0]  \n\t" // column 2 = rhsPtr[0..3] * lhsPtr[8..11]
-    "VLD1.F32     {q7}, [%2]!         \n\t" // load matrix 2 (rhsPtr) [4..7]
-    "VMLA.F32     q0,   q7,   d8[1]   \n\t" // column 0+= rhsPtr[4..7] * lhsPtr[0..3]
-    "VMLA.F32     q1,   q7,   d10[1]  \n\t" // column 1+= rhsPtr[4..7] * lhsPtr[4..7]
-    "VMLA.F32     q2,   q7,   d12[1]  \n\t" // column 2+= rhsPtr[4..7] * lhsPtr[8..11]
-    "VLD1.F32     {q7}, [%2]!         \n\t" // load matrix 2 (rhsPtr) [8..11]
-    "VMLA.F32     q0,   q7,   d9[0]   \n\t" // column 0+= rhsPtr[8..11] * lhsPtr[0..3]
-    "VMLA.F32     q1,   q7,   d11[0]  \n\t" // column 1+= rhsPtr[8..11] * lhsPtr[4..7]
-    "VMLA.F32     q2,   q7,   d13[0]  \n\t" // column 2+= rhsPtr[8..11] * lhsPtr[8..11]
-    "VSTM         %0,   {q0-q2}       \n\t" // store entire output matrix.
+    "VLDM         %1,   {q4-q7}       \n\t" // load matrix 1 (lhsPtr)
+    "VLD1.F32     {q8}, [%2]!         \n\t" // load matrix 2 (rhsPtr) [0..3]
+    "VMUL.F32     q0,   q8,   d8[0]   \n\t" // column 0 = rhsPtr[0..3] * lhsPtr[0]
+    "VMUL.F32     q1,   q8,   d10[0]  \n\t" // column 1 = rhsPtr[0..3] * lhsPtr[4]
+    "VMUL.F32     q2,   q8,   d12[0]  \n\t" // column 2 = rhsPtr[0..3] * lhsPtr[8]
+    "VMUL.F32     q3,   q8,   d14[0]  \n\t" // column 3 = rhsPtr[0..3] * lhsPtr[12]
+    "VLD1.F32     {q8}, [%2]!         \n\t" // load matrix 2 (rhsPtr) [4..7]
+    "VMLA.F32     q0,   q8,   d8[1]   \n\t" // column 0+= rhsPtr[4..7] * lhsPtr[1]
+    "VMLA.F32     q1,   q8,   d10[1]  \n\t" // column 1+= rhsPtr[4..7] * lhsPtr[5]
+    "VMLA.F32     q2,   q8,   d12[1]  \n\t" // column 2+= rhsPtr[4..7] * lhsPtr[9]
+    "VMLA.F32     q3,   q8,   d14[1]  \n\t" // column 3+= rhsPtr[4..7] * lhsPtr[13]
+    "VLD1.F32     {q8}, [%2]!         \n\t" // load matrix 2 (rhsPtr) [8..11]
+    "VMLA.F32     q0,   q8,   d9[0]   \n\t" // column 0+= rhsPtr[8..11] * lhsPtr[2]
+    "VMLA.F32     q1,   q8,   d11[0]  \n\t" // column 1+= rhsPtr[8..11] * lhsPtr[6]
+    "VMLA.F32     q2,   q8,   d13[0]  \n\t" // column 2+= rhsPtr[8..11] * lhsPtr[10]
+    "VMLA.F32     q3,   q8,   d15[0]  \n\t" // column 3+= rhsPtr[8..11] * lhsPtr[14]
+    "VSTM         %0,   {q0-q3}       \n\t" // store entire output matrix.
     :
     : "r"(temp), "r"(lhsPtr), "r"(rhsPtr)
-    : "%r0", "%q0", "%q1", "%q2", "%q4", "%q5", "%q6", "%q7", "memory");
+    : "%r0", "%q0", "%q1", "%q2", "%q3", "%q4", "%q5", "%q6", "%q7", "%q8", "memory");
 
-  temp[12] = 0.0f;
-  temp[13] = 0.0f;
-  temp[14] = 0.0f;
-  temp[15] = 1.0f;
+  // Restore 4th row values.
+  temp[3]  = value0;
+  temp[7]  = value1;
+  temp[11] = value2;
+  temp[15] = value3;
 #endif
 }
 
