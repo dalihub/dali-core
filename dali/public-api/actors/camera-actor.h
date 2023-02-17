@@ -2,7 +2,7 @@
 #define DALI_CAMERA_ACTOR_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,7 +72,8 @@ enum ProjectionMode
  *   (configured to have the origin of the coordinate system at the top-left corner of the screen, and unit 1 as 1 pixel of the screen).
  *   This is a typical way.
  *
- * - For 3D applications, you can change the view by manipulating the camera. You can translate or rotate the camera in this case.
+ * - For 3D applications, you can change the view by manipulating the camera. If you config some camera properties,
+ *   or create camera by @see New3DCamera(), you can translate or rotate the camera whatever you want.
  *   Note that the top-left corner of the screen and unit 1 no longer are (0,0,0) and 1 pixel after manipulating the camera.
  *
  * There are two types of camera actor, FREE_LOOK and LOOK_AT_TARGET. By default,
@@ -136,6 +137,7 @@ public:
    *
    * @note Sets the default camera perspective projection for the size of the scene this is added to. @see SetPerspectiveProjection().
    * @note When this actor gets added to a scene, then it's Z position will be modified according to the required perspective projection.
+   * After modified Z position, 1-world-unit become 1-pixel.
    *
    * @SINCE_1_0.0
    * @return The newly created camera actor
@@ -152,6 +154,17 @@ public:
    * @return The newly created camera actor
    */
   static CameraActor New(const Size& size);
+
+  /**
+   * @brief Creates a CameraActor object initialize by 3D parameter.
+   *
+   * Intialize default perspective camera s.t. properties as good to be used on 3D app case.
+   * Default camera positioned at +Z axis, and fit to see 1-world-unit sized cube on world origin.
+   *
+   * @SINCE_2_2.15
+   * @return The newly created camera actor
+   */
+  static CameraActor New3DCamera();
 
   /**
    * @brief Downcasts a handle to CameraActor handle.

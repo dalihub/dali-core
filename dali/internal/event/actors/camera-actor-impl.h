@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_CAMERA_ACTOR_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,13 +42,14 @@ public:
   /**
    * Create an initialised camera actor.
    *
-   * Sets the default camera perspective projection for the given canvas size. @see SetPerspectiveProjection().
+   * If hintFor3D is false, Sets the default camera perspective projection for the given canvas size. @see SetPerspectiveProjection().
    *
    * @param[in] size The canvas size.
+   * @param[in] hintFor3D True if user set hint that this camera used for 3D. Default is false.
    *
    * @return A smart-pointer to a newly allocated camera actor.
    */
-  static CameraActorPtr New(const Size& size);
+  static CameraActorPtr New(const Size& size, bool hintFor3D = false);
 
   /**
    * Sets the reflection plane for the camera

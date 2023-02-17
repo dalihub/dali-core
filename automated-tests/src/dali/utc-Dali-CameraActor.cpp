@@ -176,6 +176,21 @@ int UtcDaliCameraActorNewP(void)
   END_TEST;
 }
 
+int UtcDaliCameraActorNew3DCameraP(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::CameraActor::New3DCamera (P)");
+
+  CameraActor actor = CameraActor::New3DCamera();
+
+  DALI_TEST_CHECK(actor);
+
+  actor.Reset();
+
+  DALI_TEST_CHECK(!actor);
+  END_TEST;
+}
+
 int UtcDaliCameraActorNewDefaultPerspectiveProjection(void)
 {
   TestApplication application;

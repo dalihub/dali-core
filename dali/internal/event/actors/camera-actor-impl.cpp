@@ -177,9 +177,41 @@ struct OrthographicSizeConverter
   Dali::DevelCameraActor::ProjectionDirection mProjectionDirection;
 };
 
+static const float DEFAULT_NEAR_CLIPPING_PLANE_FOR_3D = 0.1f;
+static const float DEFAULT_FAR_CLIPPING_PLANE_FOR_3D  = 100.0f;
+
+static const Dali::Camera::ProjectionMode                DEFAULT_MODE_FOR_3D                 = SceneGraph::Camera::DEFAULT_MODE;
+static const Dali::DevelCameraActor::ProjectionDirection DEFAULT_PROJECTION_DIRECTION_FOR_3D = SceneGraph::Camera::DEFAULT_PROJECTION_DIRECTION;
+
+static const float      DEFAULT_FIELD_OF_VIEW_FOR_3D     = SceneGraph::Camera::DEFAULT_FIELD_OF_VIEW;
+static const float      DEFAULT_POSITIN_Z_FOR_3D         = 5.0f;
+static const Quaternion DEFAULT_ORIENTATION_FOR_3D       = Quaternion(Dali::ANGLE_180, Vector3::YAXIS);
+static const float      DEFAULT_ORTHOGRAPHIC_SIZE_FOR_3D = 2.071068f; // DEFAULT_POSITIN_Z_FOR_3D * std::tan(DEFAULT_FIELD_OF_VIEW_FOR_3D * 0.5f); // Rectangle size of z=0.
+
+/**
+ * @brief Setup CameraActor's parameters  for 3D apps.
+ * Conceptually, We can must see 1 world unit cube at world origin.
+ * Detail value can be changed by UX.
+ *
+ * @param[in,out] cameraActorObject CameraActor who need to apply default camera parameters.
+ */
+void SetupDefault3DCameraProperties(Internal::CameraActor& cameraActorObject)
+{
+  cameraActorObject.SetNearClippingPlane(DEFAULT_NEAR_CLIPPING_PLANE_FOR_3D);
+  cameraActorObject.SetFarClippingPlane(DEFAULT_FAR_CLIPPING_PLANE_FOR_3D);
+
+  cameraActorObject.SetProjectionMode(DEFAULT_MODE_FOR_3D);
+  cameraActorObject.SetProjectionDirection(DEFAULT_PROJECTION_DIRECTION_FOR_3D);
+  cameraActorObject.SetFieldOfView(DEFAULT_FIELD_OF_VIEW_FOR_3D);
+  cameraActorObject.SetZ(DEFAULT_POSITIN_Z_FOR_3D);
+  cameraActorObject.SetOrientation(DEFAULT_ORIENTATION_FOR_3D);
+
+  cameraActorObject.SetOrthographicSize(DEFAULT_ORTHOGRAPHIC_SIZE_FOR_3D);
+}
+
 } // namespace
 
-CameraActorPtr CameraActor::New(const Size& size)
+CameraActorPtr CameraActor::New(const Size& size, bool hintFor3D)
 {
   // create camera. Cameras are owned by the update manager
   SceneGraph::Camera*            camera = SceneGraph::Camera::New();
@@ -197,11 +229,19 @@ CameraActorPtr CameraActor::New(const Size& size)
   actor->Initialize();
 
   actor->SetName("DefaultCamera");
-  actor->SetPerspectiveProjection(size);
+  if(hintFor3D)
+  {
+    // Initialize camera property for 3D case.
+    SetupDefault3DCameraProperties(*actor);
+  }
+  else
+  {
+    actor->SetPerspectiveProjection(size);
 
-  // By default Actors face in the positive Z direction in world space
-  // CameraActors should face in the negative Z direction, towards the other actors
-  actor->SetOrientation(Quaternion(Dali::ANGLE_180, Vector3::YAXIS));
+    // By default Actors face in the positive Z direction in world space
+    // CameraActors should face in the negative Z direction, towards the other actors
+    actor->SetOrientation(Quaternion(Dali::ANGLE_180, Vector3::YAXIS));
+  }
 
   return actor;
 }
