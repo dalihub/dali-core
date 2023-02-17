@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
 #include <dali/internal/event/common/property-input-impl.h>
+#include <dali/internal/update/common/animatable-property-messages.h>
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
 #include <dali/public-api/object/type-registry.h>
@@ -119,7 +120,7 @@ void VisualRenderer::SetDefaultProperty(Property::Index        index,
 
           if(visualProperties)
           {
-            BakeMessage<Vector2>(GetEventThreadServices(), visualProperties->mTransformOffset, mPropertyCache.mTransformOffset);
+            BakeMessage<Vector2>(GetEventThreadServices(), *mUpdateObject, visualProperties->mTransformOffset, mPropertyCache.mTransformOffset);
           }
         }
         break;
@@ -133,7 +134,7 @@ void VisualRenderer::SetDefaultProperty(Property::Index        index,
           auto                        visualProperties = sceneObject.GetVisualProperties();
           if(visualProperties)
           {
-            BakeMessage<Vector2>(GetEventThreadServices(), visualProperties->mTransformSize, mPropertyCache.mTransformSize);
+            BakeMessage<Vector2>(GetEventThreadServices(), *mUpdateObject, visualProperties->mTransformSize, mPropertyCache.mTransformSize);
           }
         }
         break;
@@ -146,7 +147,7 @@ void VisualRenderer::SetDefaultProperty(Property::Index        index,
           auto                        visualProperties = sceneObject.GetVisualProperties();
           if(visualProperties)
           {
-            BakeMessage<Vector2>(GetEventThreadServices(), visualProperties->mTransformOrigin, mPropertyCache.mTransformOrigin);
+            BakeMessage<Vector2>(GetEventThreadServices(), *mUpdateObject, visualProperties->mTransformOrigin, mPropertyCache.mTransformOrigin);
           }
         }
         break;
@@ -159,7 +160,7 @@ void VisualRenderer::SetDefaultProperty(Property::Index        index,
           auto                        visualProperties = sceneObject.GetVisualProperties();
           if(visualProperties)
           {
-            BakeMessage<Vector2>(GetEventThreadServices(), visualProperties->mTransformAnchorPoint, mPropertyCache.mTransformAnchorPoint);
+            BakeMessage<Vector2>(GetEventThreadServices(), *mUpdateObject, visualProperties->mTransformAnchorPoint, mPropertyCache.mTransformAnchorPoint);
           }
         }
         break;
@@ -172,7 +173,7 @@ void VisualRenderer::SetDefaultProperty(Property::Index        index,
           auto                        visualProperties = sceneObject.GetVisualProperties();
           if(visualProperties)
           {
-            BakeMessage<Vector4>(GetEventThreadServices(), visualProperties->mTransformOffsetSizeMode, mPropertyCache.mTransformOffsetSizeMode);
+            BakeMessage<Vector4>(GetEventThreadServices(), *mUpdateObject, visualProperties->mTransformOffsetSizeMode, mPropertyCache.mTransformOffsetSizeMode);
           }
         }
         break;
@@ -185,7 +186,7 @@ void VisualRenderer::SetDefaultProperty(Property::Index        index,
           auto                        visualProperties = sceneObject.GetVisualProperties();
           if(visualProperties)
           {
-            BakeMessage<Vector2>(GetEventThreadServices(), visualProperties->mExtraSize, mPropertyCache.mExtraSize);
+            BakeMessage<Vector2>(GetEventThreadServices(), *mUpdateObject, visualProperties->mExtraSize, mPropertyCache.mExtraSize);
           }
         }
         break;
@@ -198,7 +199,7 @@ void VisualRenderer::SetDefaultProperty(Property::Index        index,
           auto                        visualProperties = sceneObject.GetVisualProperties();
           if(visualProperties)
           {
-            BakeMessage<Vector3>(GetEventThreadServices(), visualProperties->mMixColor, mPropertyCache.mMixColor);
+            BakeMessage<Vector3>(GetEventThreadServices(), *mUpdateObject, visualProperties->mMixColor, mPropertyCache.mMixColor);
           }
         }
         break;
@@ -215,7 +216,7 @@ void VisualRenderer::SetDefaultProperty(Property::Index        index,
             if(visualProperties)
             {
               mPropertyCache.mPreMultipliedAlpha = preMultipliedAlpha;
-              BakeMessage<float>(GetEventThreadServices(), visualProperties->mPreMultipliedAlpha, preMultipliedAlpha);
+              BakeMessage<float>(GetEventThreadServices(), *mUpdateObject, visualProperties->mPreMultipliedAlpha, preMultipliedAlpha);
             }
           }
         }

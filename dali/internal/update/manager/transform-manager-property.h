@@ -1,8 +1,8 @@
-#ifndef TRANSFORM_MANAGER_PROPERTY_H_
-#define TRANSFORM_MANAGER_PROPERTY_H_
+#ifndef DALI_INTERNAL_UPDATE_TRANSFORM_MANAGER_PROPERTY_H
+#define DALI_INTERNAL_UPDATE_TRANSFORM_MANAGER_PROPERTY_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -463,7 +463,7 @@ public:
   }
 
 private:
-  TransformManagerVector3Input(const TransformManagerVector3Input& property)       = delete;
+  TransformManagerVector3Input(const TransformManagerVector3Input& property) = delete;
   TransformManagerVector3Input& operator=(const TransformManagerVector3Input& rhs) = delete;
 
 public:
@@ -603,7 +603,7 @@ public:
   }
 
 private:
-  TransformManagerQuaternionInput(const TransformManagerQuaternionInput& property)       = delete;
+  TransformManagerQuaternionInput(const TransformManagerQuaternionInput& property) = delete;
   TransformManagerQuaternionInput& operator=(const TransformManagerQuaternionInput& rhs) = delete;
 
 public:
@@ -736,7 +736,7 @@ public:
   }
 
 private:
-  TransformManagerMatrixInput(const TransformManagerMatrixInput& property)       = delete;
+  TransformManagerMatrixInput(const TransformManagerMatrixInput& property) = delete;
   TransformManagerMatrixInput& operator=(const TransformManagerMatrixInput& rhs) = delete;
 };
 
@@ -744,4 +744,4 @@ private:
 } // namespace Internal
 } // namespace Dali
 
-#endif // TRANSFORM_MANAGER_PROPERTY_H_
+#endif // DALI_INTERNAL_UPDATE_TRANSFORM_MANAGER_PROPERTY_H

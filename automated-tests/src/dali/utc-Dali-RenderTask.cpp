@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -3681,6 +3681,210 @@ int UtcDaliRenderTaskViewportGuideActor02(void)
   // Check that the viewport is handled properly
   DALI_TEST_CHECK(callStack.FindIndexFromMethodAndParams("Viewport", viewportParams1) >= 0);
   DALI_TEST_CHECK(callStack.FindIndexFromMethodAndParams("Viewport", viewportParams2) >= 0);
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskViewportGuideActor03(void)
+{
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  TraceCallStack&    callStack     = glAbstraction.GetViewportTrace();
+  glAbstraction.EnableViewportCallTrace(true);
+  tet_infoline("Testing that adding a viewport guide actor to RenderTask will change the viewport");
+
+  Stage   stage = Stage::GetCurrent();
+  Vector2 stageSize(stage.GetSize());
+
+  // Render and notify
+  application.SendNotification();
+  application.Render(16);
+  glAbstraction.ResetViewportCallStack();
+
+  Geometry geometry = Geometry::New();
+  Shader   shader   = Shader::New("vertexSrc", "fragmentSrc");
+  Renderer renderer = Renderer::New(geometry, shader);
+
+  Actor blue                                 = Actor::New();
+  blue[Dali::Actor::Property::NAME]          = "Blue";
+  blue[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::TOP_LEFT;
+  blue[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::TOP_LEFT;
+  blue[Dali::Actor::Property::SIZE]          = Vector2(400, 300);
+  blue[Dali::Actor::Property::POSITION]      = Vector2(100, 50);
+  blue.AddRenderer(renderer);
+  stage.Add(blue);
+
+  Actor green                                 = Actor::New();
+  green[Dali::Actor::Property::NAME]          = "Green";
+  green[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::TOP_LEFT;
+  green[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::TOP_LEFT;
+  green[Dali::Actor::Property::SIZE]          = Vector2(400, 300);
+  green[Dali::Actor::Property::POSITION]      = Vector2(100, 50);
+  green.AddRenderer(renderer);
+  stage.Add(green);
+
+  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTask     renderTask     = renderTaskList.CreateTask();
+
+  Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
+  cameraActor[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+  stage.Add(cameraActor);
+
+  renderTask.SetExclusive(true);
+  renderTask.SetInputEnabled(true);
+  renderTask.SetCameraActor(cameraActor);
+  renderTask.SetSourceActor(green);
+
+  Viewport viewport(75, 55, 150, 250);
+  renderTask.SetViewport(viewport);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render(16);
+
+  // Note Y pos: 800 - (250+55) = 495
+  std::string viewportParams1("75, 495, 150, 250");
+  DALI_TEST_CHECK(callStack.FindIndexFromMethodAndParams("Viewport", viewportParams1) >= 0);
+  glAbstraction.ResetViewportCallStack();
+
+  // Update to use viewport guide actor instead.
+  renderTask.SetViewportGuideActor(blue);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render(16);
+
+  // Note: Y pos: 800 - (300+50) = 450
+  std::string viewportParams2("100, 450, 400, 300");
+  DALI_TEST_CHECK(callStack.FindIndexFromMethodAndParams("Viewport", viewportParams2) >= 0);
+  tet_infoline("Testing that removing viewport guide actor from RenderTask will revert the viewport");
+  glAbstraction.ResetViewportCallStack();
+
+  // Remove guide actor, expect that the viewport is reset to its original values
+  renderTask.SetViewportGuideActor(Actor());
+  application.SendNotification();
+  application.Render(16);
+
+  // Currently, update manager does not consider that added Resetters should cause another
+  // update; this is probably right. But, we have to then force another update for the resetter to trigger, and this will register as un-necessary in the test output.
+  //
+  application.SendNotification();
+  application.Render(16);
+
+  DALI_TEST_CHECK(callStack.FindIndexFromMethodAndParams("Viewport", viewportParams1) >= 0);
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskViewportGuideActor04(void)
+{
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  TraceCallStack&    callStack     = glAbstraction.GetViewportTrace();
+  glAbstraction.EnableViewportCallTrace(true);
+  tet_infoline("Testing that adding a viewport guide actor to RenderTask will change the viewport");
+
+  Stage   stage = Stage::GetCurrent();
+  Vector2 stageSize(stage.GetSize());
+
+  // Render and notify
+  application.SendNotification();
+  application.Render(16);
+  glAbstraction.ResetViewportCallStack();
+
+  Geometry geometry = Geometry::New();
+  Shader   shader   = Shader::New("vertexSrc", "fragmentSrc");
+  Renderer renderer = Renderer::New(geometry, shader);
+
+  Actor blue                                 = Actor::New();
+  blue[Dali::Actor::Property::NAME]          = "Blue";
+  blue[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::TOP_LEFT;
+  blue[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::TOP_LEFT;
+  blue[Dali::Actor::Property::SIZE]          = Vector2(400, 300);
+  blue[Dali::Actor::Property::POSITION]      = Vector2(100, 50);
+  blue.AddRenderer(renderer);
+  stage.Add(blue);
+
+  Actor green                                 = Actor::New();
+  green[Dali::Actor::Property::NAME]          = "Green";
+  green[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::TOP_LEFT;
+  green[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::TOP_LEFT;
+  green[Dali::Actor::Property::SIZE]          = Vector2(400, 300);
+  green[Dali::Actor::Property::POSITION]      = Vector2(100, 50);
+  green.AddRenderer(renderer);
+  stage.Add(green);
+
+  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTask     renderTask     = renderTaskList.CreateTask();
+
+  Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
+  cameraActor[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+  stage.Add(cameraActor);
+
+  renderTask.SetExclusive(true);
+  renderTask.SetInputEnabled(true);
+  renderTask.SetCameraActor(cameraActor);
+  renderTask.SetSourceActor(green);
+
+  Viewport viewport(75, 55, 150, 250);
+  renderTask.SetViewport(viewport);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render(16);
+
+  // Note Y pos: 800 - (250+55) = 495
+  std::string viewportParams1("75, 495, 150, 250");
+  DALI_TEST_CHECK(callStack.FindIndexFromMethodAndParams("Viewport", viewportParams1) >= 0);
+  glAbstraction.ResetViewportCallStack();
+
+  // Update to use viewport guide actor instead.
+  renderTask.SetViewportGuideActor(blue);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render(16);
+
+  std::string viewportParams2("100, 450, 400, 300");
+  DALI_TEST_CHECK(callStack.FindIndexFromMethodAndParams("Viewport", viewportParams2) >= 0);
+  tet_infoline("Testing that removing viewport guide actor from RenderTask will revert the viewport");
+
+  glAbstraction.ResetViewportCallStack();
+
+  // Remove guide actor, expect that the viewport is reset to it's original values
+  renderTask.ResetViewportGuideActor();
+  application.SendNotification();
+  application.Render(16);
+
+  // Currently, update manager does not consider that added Resetters should cause another
+  // update; this is probably right. But, we have to then force another update for the resetter
+  // to trigger, and this will register as un-necessary in the test output.
+  application.SendNotification();
+  application.Render(16);
+
+  DALI_TEST_CHECK(callStack.FindIndexFromMethodAndParams("Viewport", viewportParams1) >= 0);
+
+  // This should remove the baking resetters, but is again going to show up
+  // as unnecessary. Also try and figure out if we can test the dirty flags
+  // here, somehow (Can at least check the property's dirty flags in the debugger).
+  application.SendNotification();
+  application.Render(16);
 
   END_TEST;
 }

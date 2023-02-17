@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_DOUBLE_BUFFERED_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/owner-pointer.h>
 
 namespace Dali

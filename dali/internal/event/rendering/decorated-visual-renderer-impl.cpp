@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
 #include <dali/internal/event/common/property-input-impl.h>
+#include <dali/internal/update/common/animatable-property-messages.h>
+#include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
 #include <dali/public-api/object/type-registry.h>
@@ -61,11 +63,11 @@ TypeRegistration mType(typeid(Dali::DecoratedVisualRenderer), typeid(Dali::Visua
  * @param animatableProperty The animatable property to set on the update-thread
  */
 template<typename T>
-void SetValue(EventThreadServices& eventThreadServices, const Property::Value& propertyValue, T& cachedValue, const SceneGraph::AnimatableProperty<T>& animatableProperty)
+void SetValue(EventThreadServices& eventThreadServices, const SceneGraph::PropertyOwner& propertyOwner, const Property::Value& propertyValue, T& cachedValue, const SceneGraph::AnimatableProperty<T>& animatableProperty)
 {
   if(propertyValue.Get(cachedValue))
   {
-    BakeMessage<T>(eventThreadServices, animatableProperty, cachedValue);
+    BakeMessage<T>(eventThreadServices, propertyOwner, animatableProperty, cachedValue);
   }
 }
 
@@ -131,37 +133,37 @@ void DecoratedVisualRenderer::SetDefaultProperty(Property::Index        index,
         {
           case Dali::DecoratedVisualRenderer::Property::CORNER_RADIUS:
           {
-            SetValue(eventThreadServices, propertyValue, mDecoratedPropertyCache.mCornerRadius, decoratedVisualProperties->mCornerRadius);
+            SetValue(eventThreadServices, *mUpdateObject, propertyValue, mDecoratedPropertyCache.mCornerRadius, decoratedVisualProperties->mCornerRadius);
             break;
           }
 
           case Dali::DecoratedVisualRenderer::Property::CORNER_RADIUS_POLICY:
           {
-            SetValue(eventThreadServices, propertyValue, mDecoratedPropertyCache.mCornerRadiusPolicy, decoratedVisualProperties->mCornerRadiusPolicy);
+            SetValue(eventThreadServices, *mUpdateObject, propertyValue, mDecoratedPropertyCache.mCornerRadiusPolicy, decoratedVisualProperties->mCornerRadiusPolicy);
             break;
           }
 
           case Dali::DecoratedVisualRenderer::Property::BORDERLINE_WIDTH:
           {
-            SetValue(eventThreadServices, propertyValue, mDecoratedPropertyCache.mBorderlineWidth, decoratedVisualProperties->mBorderlineWidth);
+            SetValue(eventThreadServices, *mUpdateObject, propertyValue, mDecoratedPropertyCache.mBorderlineWidth, decoratedVisualProperties->mBorderlineWidth);
             break;
           }
 
           case Dali::DecoratedVisualRenderer::Property::BORDERLINE_COLOR:
           {
-            SetValue(eventThreadServices, propertyValue, mDecoratedPropertyCache.mBorderlineColor, decoratedVisualProperties->mBorderlineColor);
+            SetValue(eventThreadServices, *mUpdateObject, propertyValue, mDecoratedPropertyCache.mBorderlineColor, decoratedVisualProperties->mBorderlineColor);
             break;
           }
 
           case Dali::DecoratedVisualRenderer::Property::BORDERLINE_OFFSET:
           {
-            SetValue(eventThreadServices, propertyValue, mDecoratedPropertyCache.mBorderlineOffset, decoratedVisualProperties->mBorderlineOffset);
+            SetValue(eventThreadServices, *mUpdateObject, propertyValue, mDecoratedPropertyCache.mBorderlineOffset, decoratedVisualProperties->mBorderlineOffset);
             break;
           }
 
           case Dali::DecoratedVisualRenderer::Property::BLUR_RADIUS:
           {
-            SetValue(eventThreadServices, propertyValue, mDecoratedPropertyCache.mBlurRadius, decoratedVisualProperties->mBlurRadius);
+            SetValue(eventThreadServices, *mUpdateObject, propertyValue, mDecoratedPropertyCache.mBlurRadius, decoratedVisualProperties->mBlurRadius);
             break;
           }
         }

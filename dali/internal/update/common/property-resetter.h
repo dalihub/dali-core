@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENEGRAPH_PROPERTY_RESETTER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ public:
    * Reset the property to it's base value if the property owner is still alive and on stage
    * @param[in] updateBufferIndex the current buffer index
    */
-  void ResetToBaseValue(BufferIndex updateBufferIndex)
+  virtual void ResetToBaseValue(BufferIndex updateBufferIndex)
   {
     if(mPropertyOwner != nullptr && mActive)
     {
@@ -131,15 +131,9 @@ public:
    */
   virtual bool IsFinished()
   {
-    bool finished = mRunning <= STOPPED;
-    if(mRunning == AGING)
-    {
-      mRunning = STOPPED;
-    }
-    return finished;
+    return mRunning <= STOPPED;
   }
 
-protected:
   enum
   {
     STOPPED = 0,
@@ -147,6 +141,7 @@ protected:
     ACTIVE  = 2,
   };
 
+protected:
   /**
    * Constructor
    *
@@ -168,6 +163,65 @@ protected:
   int8_t         mRunning;       ///< Used to determine if we should finish or not, 2 if running, 1 if aging, 0 if stopped
   int8_t         mActive;        ///< 2 if active, 1 if aging, 0 if stopped
   bool           mDisconnected;  ///< True if the property owner has been disconnected
+};
+
+class BakerResetter : public PropertyResetterBase
+{
+public:
+  enum class Lifetime
+  {
+    BAKE,
+    SET
+  };
+
+  /**
+   * New method.
+   * @param[in] propertyOwner  The owner of the property
+   * @param[in] baseProperty   The property being animated
+   * @param[in] lifetime       How long this resetter stays alive (1 or 2 frames)
+   * @return the new property resetter
+   */
+  static PropertyResetterBase* New(const PropertyOwner& propertyOwner,
+                                   const PropertyBase&  baseProperty,
+                                   Lifetime             lifetime)
+  {
+    return new BakerResetter(const_cast<PropertyOwner*>(&propertyOwner),
+                             const_cast<PropertyBase*>(&baseProperty),
+                             lifetime);
+  }
+
+  /**
+   * Constructor
+   * @param[in] propertyOwner The owner of the property
+   * @param[in] baseProperty  The property being animated
+   * @param[in] lifetime      How many frames this stays alive for
+   */
+  BakerResetter(PropertyOwner* propertyOwner,
+                PropertyBase*  baseProperty,
+                Lifetime       lifetime)
+  : PropertyResetterBase(propertyOwner, baseProperty)
+  {
+    mRunning = lifetime == Lifetime::BAKE ? ACTIVE : AGING;
+  }
+
+  /**
+   * Virtual destructor.
+   */
+  ~BakerResetter() override = default;
+
+  /**
+   * @param updateBufferIndex
+   */
+  void ResetToBaseValue(BufferIndex updateBufferIndex) override
+  {
+    if(mPropertyOwner && mRunning > 0)
+    {
+      mRunning--;
+      mBaseProperty->ResetToBaseValue(updateBufferIndex);
+
+      // @todo Consider adding mPropertyOwner->SetUpdated(true) here.
+    }
+  }
 };
 
 /**

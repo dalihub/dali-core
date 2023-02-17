@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,9 @@
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/render-tasks/render-task-list-impl.h>
+#include <dali/internal/update/common/animatable-property-messages.h>
 #include <dali/internal/update/nodes/node.h>
+#include <dali/internal/update/render-tasks/scene-graph-render-task-messages.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/type-registry.h>
@@ -210,13 +212,32 @@ Dali::Actor RenderTask::GetScreenToFrameBufferMappingActor() const
 void RenderTask::SetViewportGuideActor(Actor* actor)
 {
   mViewportGuideActor.SetActor(actor);
+
+  auto& sceneObject         = GetRenderTaskSceneObject();
+  auto& eventThreadServices = GetEventThreadServices();
+  auto& updateManager       = eventThreadServices.GetUpdateManager();
+
   if(actor)
   {
-    SetViewportGuideNodeMessage(GetEventThreadServices(), GetRenderTaskSceneObject(), &actor->GetNode());
+    SetViewportGuideNodeMessage(eventThreadServices, sceneObject, &actor->GetNode());
   }
   else
   {
-    SetViewportGuideNodeMessage(GetEventThreadServices(), GetRenderTaskSceneObject(), nullptr);
+    // Ensure that if the node is removed through this API, that the
+    // viewport values are set back to their base value and that their dirty
+    // flags are cleared after 1 frame.
+    SetViewportGuideNodeMessage(eventThreadServices, sceneObject, nullptr);
+
+    auto renderTask               = const_cast<SceneGraph::RenderTask*>(&sceneObject);
+    auto viewportPositionProperty = const_cast<SceneGraph::AnimatableProperty<Vector2>*>(&renderTask->mViewportPosition);
+    auto viewportSizeProperty     = const_cast<SceneGraph::AnimatableProperty<Vector2>*>(&renderTask->mViewportSize);
+
+    OwnerPointer<SceneGraph::PropertyResetterBase> resetter1(
+      new SceneGraph::BakerResetter(renderTask, viewportPositionProperty, SceneGraph::BakerResetter::Lifetime::SET));
+    OwnerPointer<SceneGraph::PropertyResetterBase> resetter2(
+      new SceneGraph::BakerResetter(renderTask, viewportSizeProperty, SceneGraph::BakerResetter::Lifetime::SET));
+    AddResetterMessage(updateManager, resetter1);
+    AddResetterMessage(updateManager, resetter2);
   }
 }
 
@@ -227,17 +248,26 @@ Actor* RenderTask::GetViewportGuideActor() const
 
 void RenderTask::ResetViewportGuideActor()
 {
-  SetViewportGuideActor(nullptr);
+  // Don't re-use the SetViewportGuideActor method for this task - the bake messages below will create their own resetters.
+  mViewportGuideActor.SetActor(nullptr);
+  SetViewportGuideNodeMessage(GetEventThreadServices(), GetRenderTaskSceneObject(), nullptr);
 
-  BakeViewportPositionMessage(GetEventThreadServices(), GetRenderTaskSceneObject(), mViewportPosition);
-  BakeViewportSizeMessage(GetEventThreadServices(), GetRenderTaskSceneObject(), mViewportSize);
+  EventThreadServices& eventThreadServices      = GetEventThreadServices();
+  auto                 renderTask               = const_cast<SceneGraph::RenderTask*>(&GetRenderTaskSceneObject());
+  auto                 viewportPositionProperty = const_cast<SceneGraph::AnimatableProperty<Vector2>*>(&renderTask->mViewportPosition);
+  auto                 viewportSizeProperty     = const_cast<SceneGraph::AnimatableProperty<Vector2>*>(&renderTask->mViewportSize);
+  BakeMessage<Vector2>(eventThreadServices, *renderTask, *viewportPositionProperty, mViewportPosition);
+  BakeMessage<Vector2>(eventThreadServices, *renderTask, *viewportSizeProperty, mViewportSize);
 }
 
 void RenderTask::SetViewportPosition(const Vector2& value)
 {
   mViewportPosition = value;
 
-  BakeViewportPositionMessage(GetEventThreadServices(), GetRenderTaskSceneObject(), value);
+  EventThreadServices& eventThreadServices      = GetEventThreadServices();
+  auto                 renderTask               = const_cast<SceneGraph::RenderTask*>(&GetRenderTaskSceneObject());
+  auto                 viewportPositionProperty = const_cast<SceneGraph::AnimatableProperty<Vector2>*>(&renderTask->mViewportPosition);
+  BakeMessage<Vector2>(eventThreadServices, *renderTask, *viewportPositionProperty, mViewportPosition);
 }
 
 Vector2 RenderTask::GetCurrentViewportPosition() const
@@ -249,7 +279,10 @@ void RenderTask::SetViewportSize(const Vector2& value)
 {
   mViewportSize = value;
 
-  BakeViewportSizeMessage(GetEventThreadServices(), GetRenderTaskSceneObject(), value);
+  EventThreadServices& eventThreadServices  = GetEventThreadServices();
+  auto                 renderTask           = const_cast<SceneGraph::RenderTask*>(&GetRenderTaskSceneObject());
+  auto                 viewportSizeProperty = const_cast<SceneGraph::AnimatableProperty<Vector2>*>(&renderTask->mViewportSize);
+  BakeMessage<Vector2>(eventThreadServices, *renderTask, *viewportSizeProperty, mViewportSize);
 }
 
 Vector2 RenderTask::GetCurrentViewportSize() const
@@ -303,7 +336,10 @@ void RenderTask::SetClearColor(const Vector4& color)
     mClearColor = color;
 
     // scene object is being used in a separate thread; queue a message to set the value
-    BakeClearColorMessage(GetEventThreadServices(), GetRenderTaskSceneObject(), color);
+    EventThreadServices& eventThreadServices = GetEventThreadServices();
+    auto                 renderTask          = const_cast<SceneGraph::RenderTask*>(&GetRenderTaskSceneObject());
+    auto                 clearColorProperty  = const_cast<SceneGraph::AnimatableProperty<Vector4>*>(&renderTask->mClearColor);
+    BakeMessage<Vector4>(eventThreadServices, *renderTask, *clearColorProperty, mClearColor);
   }
 }
 
