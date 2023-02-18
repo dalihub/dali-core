@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_GEOMETRY_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/graphics-api/graphics-controller.h>
+#include <dali/graphics-api/graphics-types.h>
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/public-api/common/dali-vector.h>
@@ -44,7 +45,11 @@ class VertexBuffer;
 class Geometry
 {
 public:
-  using Type = Dali::Geometry::Type;
+  using Type      = Dali::Geometry::Type;
+  using IndexType = Dali::Graphics::Format;
+
+  using Uint16ContainerType = Dali::Vector<uint16_t>;
+  using Uint32ContainerType = Dali::Vector<uint32_t>;
 
   Geometry();
 
@@ -63,7 +68,13 @@ public:
    * Set the data for the index buffer to be used by the geometry
    * @param[in] indices A vector containing the indices
    */
-  void SetIndexBuffer(Dali::Vector<uint16_t>& indices);
+  void SetIndexBuffer(Uint16ContainerType& indices);
+
+  /**
+   * Set the data for the index buffer to be used by the geometry
+   * @param[in] indices A vector containing the indices
+   */
+  void SetIndexBuffer(Uint32ContainerType& indices);
 
   /**
    * Removes a VertexBuffer from the geometry
@@ -128,8 +139,9 @@ private:
   // VertexBuffers
   Vector<Render::VertexBuffer*> mVertexBuffers;
 
-  Dali::Vector<uint16_t>  mIndices;
+  Uint16ContainerType     mIndices;
   OwnerPointer<GpuBuffer> mIndexBuffer;
+  IndexType               mIndexType;
   Type                    mGeometryType;
 
   // Booleans

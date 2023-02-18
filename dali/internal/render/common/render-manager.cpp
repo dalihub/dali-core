@@ -373,7 +373,12 @@ void RenderManager::SetVertexBufferData(Render::VertexBuffer* vertexBuffer, Owne
   vertexBuffer->SetData(data.Release(), size);
 }
 
-void RenderManager::SetIndexBuffer(Render::Geometry* geometry, Dali::Vector<uint16_t>& indices)
+void RenderManager::SetIndexBuffer(Render::Geometry* geometry, Render::Geometry::Uint16ContainerType& indices)
+{
+  geometry->SetIndexBuffer(indices);
+}
+
+void RenderManager::SetIndexBuffer(Render::Geometry* geometry, Render::Geometry::Uint32ContainerType& indices)
 {
   geometry->SetIndexBuffer(indices);
 }

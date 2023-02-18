@@ -155,7 +155,7 @@ void VertexBuffer::SetData(const void* data, uint32_t size)
   // create a new DALi vector to store the buffer data
   // the heap allocated vector will end up being owned by Render::VertexBuffer
   OwnerPointer<Vector<uint8_t> > bufferCopy = new Dali::Vector<uint8_t>();
-  bufferCopy->Resize(bufferSize);
+  bufferCopy->ResizeUninitialized(bufferSize);
 
   // copy the data
   const uint8_t* source      = static_cast<const uint8_t*>(data);

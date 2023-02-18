@@ -23,6 +23,7 @@
 #include <dali/integration-api/core-enumerations.h>
 #include <dali/internal/common/shader-saver.h>
 #include <dali/internal/event/rendering/texture-impl.h>
+#include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/renderers/render-vertex-buffer.h>
 #include <dali/public-api/math/rect.h>
 
@@ -210,7 +211,14 @@ public:
    * @param[in] geometry The geometry
    * @param[in] data A vector containing the indices
    */
-  void SetIndexBuffer(Render::Geometry* geometry, Dali::Vector<uint16_t>& data);
+  void SetIndexBuffer(Render::Geometry* geometry, Render::Geometry::Uint16ContainerType& data);
+
+  /**
+   * Sets the data for the index buffer of an existing geometry
+   * @param[in] geometry The geometry
+   * @param[in] data A vector containing the indices
+   */
+  void SetIndexBuffer(Render::Geometry* geometry, Render::Geometry::Uint32ContainerType& data);
 
   /**
    * Set the geometry type of an existing render geometry

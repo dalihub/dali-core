@@ -76,6 +76,11 @@ public:
   void SetIndexBuffer(const uint16_t* indices, uint32_t count);
 
   /**
+   * @copydoc Dali::Geometry::SetIndexBuffer()
+   */
+  void SetIndexBuffer(const uint32_t* indices, uint32_t count);
+
+  /**
    * @copydoc Dali::Geometry::SetType()
    */
   void SetType(Dali::Geometry::Type geometryType);
