@@ -1390,9 +1390,20 @@ void UpdateManager::SetGeometryType(Render::Geometry* geometry, uint32_t geometr
   new(slot) DerivedType(&mImpl->renderManager, &RenderManager::SetGeometryType, geometry, geometryType);
 }
 
-void UpdateManager::SetIndexBuffer(Render::Geometry* geometry, Dali::Vector<uint16_t>& indices)
+void UpdateManager::SetIndexBuffer(Render::Geometry* geometry, Render::Geometry::Uint16ContainerType& indices)
 {
-  using DerivedType = IndexBufferMessage<RenderManager>;
+  using DerivedType = IndexBufferMessage<RenderManager, Render::Geometry::Uint16ContainerType>;
+
+  // Reserve some memory inside the render queue
+  uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot(mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof(DerivedType));
+
+  // Construct message in the render queue memory; note that delete should not be called on the return value
+  new(slot) DerivedType(&mImpl->renderManager, geometry, indices);
+}
+
+void UpdateManager::SetIndexBuffer(Render::Geometry* geometry, Render::Geometry::Uint32ContainerType& indices)
+{
+  using DerivedType = IndexBufferMessage<RenderManager, Render::Geometry::Uint32ContainerType>;
 
   // Reserve some memory inside the render queue
   uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot(mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof(DerivedType));

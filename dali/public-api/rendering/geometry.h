@@ -2,7 +2,7 @@
 #define DALI_GEOMETRY_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -156,7 +156,7 @@ public:
   void RemoveVertexBuffer(std::size_t index);
 
   /**
-   * @brief Sets a the index data to be used as a source of indices for the geometry
+   * @brief Sets the index data to be used as a source of indices for the geometry
    * Setting this buffer will cause the geometry to be rendered using indices.
    * To unset call SetIndexBuffer with a null pointer or count 0.
    *
@@ -165,6 +165,17 @@ public:
    * @param[in] count Number of indices in the array
    */
   void SetIndexBuffer(const uint16_t* indices, size_t count);
+
+  /**
+   * @brief Sets the 32bits index data to be used as a source of indices for the geometry
+   * Setting this buffer will cause the geometry to be rendered using indices.
+   * To unset call SetIndexBuffer with a null pointer or count 0.
+   *
+   * @SINCE_2_2.16
+   * @param[in] indices Array of indices with uint32_t elements.
+   * @param[in] count Number of indices in the array
+   */
+  void SetIndexBuffer(const uint32_t* indices, size_t count);
 
   /**
    * @brief Sets the type of primitives this geometry contains.

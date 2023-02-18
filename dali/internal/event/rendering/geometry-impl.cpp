@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,10 +56,22 @@ void Geometry::RemoveVertexBuffer(uint32_t index)
 
 void Geometry::SetIndexBuffer(const uint16_t* indices, uint32_t count)
 {
-  Dali::Vector<uint16_t> indexData;
+  Render::Geometry::Uint16ContainerType indexData;
   if(indices && count)
   {
-    indexData.Resize(count);
+    indexData.ResizeUninitialized(count);
+    std::copy(indices, indices + count, indexData.Begin());
+  }
+
+  SceneGraph::SetIndexBufferMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject, indexData);
+}
+
+void Geometry::SetIndexBuffer(const uint32_t* indices, uint32_t count)
+{
+  Render::Geometry::Uint32ContainerType indexData;
+  if(indices && count)
+  {
+    indexData.ResizeUninitialized(count);
     std::copy(indices, indices + count, indexData.Begin());
   }
 

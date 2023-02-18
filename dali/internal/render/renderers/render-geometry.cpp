@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,32 @@ namespace Internal
 {
 namespace Render
 {
+namespace
+{
+inline constexpr size_t GetSizeOfIndexFromIndexType(Dali::Graphics::Format graphicsFormat)
+{
+  switch(graphicsFormat)
+  {
+    case Dali::Graphics::Format::R16_UINT:
+    {
+      return sizeof(uint16_t);
+    }
+    case Dali::Graphics::Format::R32_UINT:
+    {
+      return sizeof(uint32_t);
+    }
+    default:
+    {
+      // TODO : Not implmeneted.
+      return sizeof(uint16_t);
+    }
+  }
+}
+} // unnamed namespace
 Geometry::Geometry()
 : mIndices(),
   mIndexBuffer(nullptr),
+  mIndexType(Dali::Graphics::Format::R16_UINT),
   mGeometryType(Dali::Geometry::TRIANGLES),
   mIndicesChanged(false),
   mHasBeenUpdated(false),
@@ -51,10 +74,20 @@ const Vector<Render::VertexBuffer*>& Geometry::GetVertexBuffers() const
   return mVertexBuffers;
 }
 
-void Geometry::SetIndexBuffer(Dali::Vector<uint16_t>& indices)
+void Geometry::SetIndexBuffer(Uint16ContainerType& indices)
 {
   mIndices.Swap(indices);
   mIndicesChanged = true;
+  mIndexType      = Graphics::Format::R16_UINT;
+}
+
+void Geometry::SetIndexBuffer(Uint32ContainerType& indices)
+{
+  // mIndices type is not matched with indices. Copy memory hardly.
+  mIndices.ResizeUninitialized(indices.Count() * 2);
+  memcpy(mIndices.Begin(), indices.Begin(), indices.Count() * sizeof(uint32_t));
+  mIndicesChanged = true;
+  mIndexType      = Graphics::Format::R32_UINT;
 }
 
 void Geometry::RemoveVertexBuffer(const Render::VertexBuffer* vertexBuffer)
@@ -154,12 +187,14 @@ bool Geometry::Draw(
   intptr_t firstIndexOffset(0u);
   if(mIndexBuffer)
   {
-    numIndices = static_cast<uint32_t>(mIndices.Size());
+    std::size_t sizeOfIndex = GetSizeOfIndexFromIndexType(mIndexType);
+
+    numIndices = static_cast<uint32_t>(mIndices.Size() * sizeof(uint16_t) / sizeOfIndex);
 
     if(elementBufferOffset != 0u)
     {
       elementBufferOffset = (elementBufferOffset >= numIndices) ? numIndices - 1 : elementBufferOffset;
-      firstIndexOffset    = intptr_t(elementBufferOffset * sizeof(uint16_t));
+      firstIndexOffset    = intptr_t(elementBufferOffset * sizeOfIndex);
       numIndices -= elementBufferOffset;
     }
 
@@ -176,7 +211,7 @@ bool Geometry::Draw(
     const Graphics::Buffer* ibo = mIndexBuffer->GetGraphicsObject();
     if(ibo)
     {
-      commandBuffer.BindIndexBuffer(*ibo, 0, Graphics::Format::R16_UINT);
+      commandBuffer.BindIndexBuffer(*ibo, 0, mIndexType);
     }
 
     commandBuffer.DrawIndexed(numIndices, 1, firstIndexOffset, 0, 0);

@@ -498,7 +498,14 @@ public:
    * @param[in] geometry The geometry
    * @param[in] indices A vector containing the indices for the geometry
    */
-  void SetIndexBuffer(Render::Geometry* geometry, Dali::Vector<uint16_t>& indices);
+  void SetIndexBuffer(Render::Geometry* geometry, Render::Geometry::Uint16ContainerType& indices);
+
+  /**
+   * Sets the index buffer to be used by a geometry
+   * @param[in] geometry The geometry
+   * @param[in] indices A vector containing the indices for the geometry
+   */
+  void SetIndexBuffer(Render::Geometry* geometry, Render::Geometry::Uint32ContainerType& indices);
 
   /**
    * Adds a vertex buffer to a geometry
@@ -1297,14 +1304,14 @@ inline void RemoveVertexBufferMessage(UpdateManager& manager, Render::Geometry& 
 }
 
 // Custom message type for SetIndexBuffer() used to move data with Vector::Swap()
-template<typename T>
+template<typename T, typename IndexContainerType>
 class IndexBufferMessage : public MessageBase
 {
 public:
   /**
    * Constructor which does a Vector::Swap()
    */
-  IndexBufferMessage(T* manager, Render::Geometry* geometry, Dali::Vector<uint16_t>& indices)
+  IndexBufferMessage(T* manager, Render::Geometry* geometry, IndexContainerType& indices)
   : MessageBase(),
     mManager(manager),
     mRenderGeometry(geometry)
@@ -1327,14 +1334,25 @@ public:
   }
 
 private:
-  T*                     mManager;
-  Render::Geometry*      mRenderGeometry;
-  Dali::Vector<uint16_t> mIndices;
+  T*                 mManager;
+  Render::Geometry*  mRenderGeometry;
+  IndexContainerType mIndices;
 };
 
-inline void SetIndexBufferMessage(UpdateManager& manager, Render::Geometry& geometry, Dali::Vector<uint16_t>& indices)
+inline void SetIndexBufferMessage(UpdateManager& manager, Render::Geometry& geometry, Render::Geometry::Uint16ContainerType& indices)
 {
-  using LocalType = IndexBufferMessage<UpdateManager>;
+  using LocalType = IndexBufferMessage<UpdateManager, Render::Geometry::Uint16ContainerType>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new(slot) LocalType(&manager, &geometry, indices);
+}
+
+inline void SetIndexBufferMessage(UpdateManager& manager, Render::Geometry& geometry, Render::Geometry::Uint32ContainerType& indices)
+{
+  using LocalType = IndexBufferMessage<UpdateManager, Render::Geometry::Uint32ContainerType>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
