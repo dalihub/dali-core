@@ -608,7 +608,7 @@ uint32_t Camera::UpdateViewMatrix(BufferIndex updateBufferIndex)
 
             Matrix& viewMatrix = mViewMatrix.Get(updateBufferIndex);
             Matrix  oldViewMatrix(viewMatrix);
-            MatrixUtils::Multiply(viewMatrix, oldViewMatrix, mReflectionMtx);
+            MatrixUtils::MultiplyTransformMatrix(viewMatrix, oldViewMatrix, mReflectionMtx);
           }
 
           viewMatrix.Invert();

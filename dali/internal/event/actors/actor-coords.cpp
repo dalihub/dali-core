@@ -79,7 +79,7 @@ bool ConvertScreenToLocal(
 {
   // Get the ModelView matrix
   Matrix modelView;
-  MatrixUtils::Multiply(modelView, worldMatrix, viewMatrix);
+  MatrixUtils::MultiplyTransformMatrix(modelView, worldMatrix, viewMatrix);
 
   // Calculate the inverted ModelViewProjection matrix; this will be used for 2 unprojects
   Matrix invertedMvp(false /*don't init*/);
@@ -528,7 +528,7 @@ Matrix CalculateActorWorldTransform(const Actor& actor)
 
         //Update the world matrix
         Matrix tempMatrix;
-        MatrixUtils::Multiply(tempMatrix, localMatrix, worldMatrix);
+        MatrixUtils::MultiplyTransformMatrix(tempMatrix, localMatrix, worldMatrix);
         worldMatrix = tempMatrix;
       }
       else
@@ -547,7 +547,7 @@ Matrix CalculateActorWorldTransform(const Actor& actor)
 
         // Compute intermediate world information
         Matrix intermediateWorldMatrix;
-        MatrixUtils::Multiply(intermediateWorldMatrix, intermediateLocalMatrix, parentMatrix);
+        MatrixUtils::MultiplyTransformMatrix(intermediateWorldMatrix, intermediateLocalMatrix, parentMatrix);
 
         Vector3    intermediateWorldPosition, intermediateWorldScale;
         Quaternion intermediateWorldOrientation;
