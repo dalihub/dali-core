@@ -970,6 +970,10 @@ Object::~Object()
   {
     item->ObjectDestroyed(*this);
   }
+
+  // Disable property notifications in scene graph
+  DisablePropertyNotifications();
+
   delete mConstraints;
   delete mPropertyNotifications;
 
