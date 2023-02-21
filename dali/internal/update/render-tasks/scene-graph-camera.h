@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_CAMERA_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -383,13 +383,6 @@ private:
    * @param[in] normalize will normalize plane equation coefficients by default.
    */
   void UpdateFrustum(BufferIndex updateBufferIndex, bool normalize = true);
-
-  /**
-   * Adjust near plane for reflection
-   * @param perspective Perspective matrix
-   * @param clipPlane Clipping plane
-   */
-  void AdjustNearPlaneForPerspective(Matrix& perspective, const Vector4& clipPlane);
 
   uint32_t mUpdateViewFlag;       ///< This is non-zero if the view matrix requires an update
   uint32_t mUpdateProjectionFlag; ///< This is non-zero if the projection matrix requires an update
