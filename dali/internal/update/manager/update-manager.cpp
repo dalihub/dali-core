@@ -33,6 +33,7 @@
 #include <dali/internal/update/controllers/scene-controller-impl.h>
 #include <dali/internal/update/manager/frame-callback-processor.h>
 #include <dali/internal/update/manager/render-task-processor.h>
+#include <dali/internal/update/manager/resetter-container.h>
 #include <dali/internal/update/manager/transform-manager.h>
 #include <dali/internal/update/manager/update-algorithms.h>
 #include <dali/internal/update/manager/update-manager-debug.h>
@@ -145,11 +146,11 @@ struct UpdateManager::Impl
     {
     }
 
-    ~SceneInfo()               = default;                ///< Default non-virtual destructor
-    SceneInfo(SceneInfo&& rhs) = default;                ///< Move constructor
-    SceneInfo& operator=(SceneInfo&& rhs) = default;     ///< Move assignment operator
-    SceneInfo& operator=(const SceneInfo& rhs) = delete; ///< Assignment operator
-    SceneInfo(const SceneInfo& rhs)            = delete; ///< Copy constructor
+    ~SceneInfo()                               = default; ///< Default non-virtual destructor
+    SceneInfo(SceneInfo&& rhs)                 = default; ///< Move constructor
+    SceneInfo& operator=(SceneInfo&& rhs)      = default; ///< Move assignment operator
+    SceneInfo& operator=(const SceneInfo& rhs) = delete;  ///< Assignment operator
+    SceneInfo(const SceneInfo& rhs)            = delete;  ///< Copy constructor
 
     Layer*                       root{nullptr};   ///< Root node (root is a layer). The layer is not stored in the node memory pool.
     OwnerPointer<RenderTaskList> taskList;        ///< Scene graph render task list
@@ -278,13 +279,14 @@ struct UpdateManager::Impl
 
   OwnerContainer<PropertyOwner*> customObjects; ///< A container of owned objects (with custom properties)
 
-  OwnerContainer<PropertyResetterBase*> propertyResetters;     ///< A container of property resetters
-  OwnerContainer<NodeResetter*>         nodeResetters;         ///< A container of node resetters
-  OwnerContainer<Animation*>            animations;            ///< A container of owned animations
-  PropertyNotificationContainer         propertyNotifications; ///< A container of owner property notifications.
-  OwnerKeyContainer<Renderer>           renderers;             ///< A container of owned renderers
-  OwnerContainer<TextureSet*>           textureSets;           ///< A container of owned texture sets
-  OwnerContainer<Shader*>               shaders;               ///< A container of owned shaders
+  ResetterContainer<PropertyResetterBase> propertyResetters; ///< A container of property resetters
+  ResetterContainer<NodeResetter>         nodeResetters;     ///< A container of node resetters
+
+  OwnerContainer<Animation*>    animations;            ///< A container of owned animations
+  PropertyNotificationContainer propertyNotifications; ///< A container of owner property notifications.
+  OwnerKeyContainer<Renderer>   renderers;             ///< A container of owned renderers
+  OwnerContainer<TextureSet*>   textureSets;           ///< A container of owned texture sets
+  OwnerContainer<Shader*>       shaders;               ///< A container of owned shaders
 
   DiscardQueue<Node*, OwnerContainer<Node*>>                         nodeDiscardQueue; ///< Nodes are added here when disconnected from the scene-graph.
   DiscardQueue<Shader*, OwnerContainer<Shader*>>                     shaderDiscardQueue;
@@ -348,7 +350,8 @@ void UpdateManager::InstallRoot(OwnerPointer<Layer>& layer)
 
   Layer* rootLayer = layer.Release();
 
-  DALI_ASSERT_DEBUG(std::find_if(mImpl->scenes.begin(), mImpl->scenes.end(), [rootLayer](Impl::SceneInfoPtr& scene) { return scene && scene->root == rootLayer; }) == mImpl->scenes.end() &&
+  DALI_ASSERT_DEBUG(std::find_if(mImpl->scenes.begin(), mImpl->scenes.end(), [rootLayer](Impl::SceneInfoPtr& scene)
+                                 { return scene && scene->root == rootLayer; }) == mImpl->scenes.end() &&
                     "Root Node already installed");
 
   rootLayer->CreateTransform(&mImpl->transformManager);
@@ -731,38 +734,10 @@ void UpdateManager::ResetProperties(BufferIndex bufferIndex)
   mImpl->animationFinishedDuringUpdate = false;
 
   // Reset node properties
-  std::vector<NodeResetter*> nodeResetterToDelete;
-  for(auto&& element : mImpl->nodeResetters)
-  {
-    element->ResetToBaseValue(bufferIndex);
-    if(element->IsFinished())
-    {
-      nodeResetterToDelete.push_back(element);
-    }
-  }
-
-  // If a node resetter is no longer required, delete it.
-  for(auto&& elementPtr : nodeResetterToDelete)
-  {
-    mImpl->nodeResetters.EraseObject(elementPtr);
-  }
+  mImpl->nodeResetters.ResetToBaseValues(bufferIndex);
 
   // Reset all animating / constrained properties
-  std::vector<PropertyResetterBase*> propertyResettertoDelete;
-  for(auto&& element : mImpl->propertyResetters)
-  {
-    element->ResetToBaseValue(bufferIndex);
-    if(element->IsFinished())
-    {
-      propertyResettertoDelete.push_back(element);
-    }
-  }
-
-  // If a property resetter is no longer required (the animator or constraint has been removed), delete it.
-  for(auto&& elementPtr : propertyResettertoDelete)
-  {
-    mImpl->propertyResetters.EraseObject(elementPtr);
-  }
+  mImpl->propertyResetters.ResetToBaseValues(bufferIndex);
 
   // Clear all root nodes dirty flags
   for(auto& scene : mImpl->scenes)
@@ -1273,7 +1248,8 @@ void UpdateManager::SetDepthIndices(OwnerPointer<NodeDepths>& nodeDepths)
     {
       // Reorder children container only if sibiling order changed.
       NodeContainer& container = node->GetChildren();
-      std::sort(container.Begin(), container.End(), [](Node* a, Node* b) { return a->GetDepthIndex() < b->GetDepthIndex(); });
+      std::sort(container.Begin(), container.End(), [](Node* a, Node* b)
+                { return a->GetDepthIndex() < b->GetDepthIndex(); });
     }
   }
 }

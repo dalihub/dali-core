@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,11 @@
 namespace //Unnamed namespace
 {
 //Memory pool used to allocate new RenderTaskLists. Memory used by this pool will be released when shutting down DALi
-Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::RenderTaskList> gRenderTaskListMemoryPool;
-
+Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::RenderTaskList>& GetRenderTaskListMemoryPool()
+{
+  static Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::RenderTaskList> gRenderTaskListMemoryPool;
+  return gRenderTaskListMemoryPool;
+}
 } // unnamed namespace
 
 namespace Dali
@@ -36,7 +39,7 @@ namespace SceneGraph
 {
 RenderTaskList* RenderTaskList::New()
 {
-  return new(gRenderTaskListMemoryPool.AllocateRawThreadSafe()) RenderTaskList();
+  return new(GetRenderTaskListMemoryPool().AllocateRawThreadSafe()) RenderTaskList();
 }
 
 RenderTaskList::RenderTaskList()
@@ -50,7 +53,7 @@ RenderTaskList::~RenderTaskList() = default;
 
 void RenderTaskList::operator delete(void* ptr)
 {
-  gRenderTaskListMemoryPool.FreeThreadSafe(static_cast<RenderTaskList*>(ptr));
+  GetRenderTaskListMemoryPool().FreeThreadSafe(static_cast<RenderTaskList*>(ptr));
 }
 
 void RenderTaskList::SetRenderMessageDispatcher(RenderMessageDispatcher* renderMessageDispatcher)
@@ -123,7 +126,7 @@ CompleteNotificationInterface* RenderTaskList::GetCompleteNotificationInterface(
 
 uint32_t RenderTaskList::GetMemoryPoolCapacity()
 {
-  return gRenderTaskListMemoryPool.GetCapacity();
+  return GetRenderTaskListMemoryPool().GetCapacity();
 }
 
 } // namespace SceneGraph

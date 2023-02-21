@@ -265,7 +265,7 @@ bool TransformManager::Update()
         }
 
         //Update the world matrix
-        MatrixUtils::Multiply(mWorld[i], mLocal[i], mWorld[parentIndex]);
+        MatrixUtils::MultiplyTransformMatrix(mWorld[i], mLocal[i], mWorld[parentIndex]);
       }
       else
       {
@@ -286,7 +286,7 @@ bool TransformManager::Update()
 
         // Compute intermediate world information
         Matrix intermediateWorldMatrix;
-        MatrixUtils::Multiply(intermediateWorldMatrix, intermediateLocalMatrix, mWorld[parentIndex]);
+        MatrixUtils::MultiplyTransformMatrix(intermediateWorldMatrix, intermediateLocalMatrix, mWorld[parentIndex]);
 
         Vector3       intermediateWorldPosition, intermediateWorldScale;
         Quaternion    intermediateWorldOrientation;

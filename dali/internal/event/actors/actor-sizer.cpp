@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,8 +66,11 @@ constexpr float GetDimensionValue(const Dali::Vector2& values, const Dali::Dimen
 /**
  * @brief Keep a static recursionstack vector to avoid creating temporary vectors every Relayout().
  */
-static Dali::Internal::ActorSizer::ActorDimensionStack gRecursionStack{};
-
+Dali::Internal::ActorSizer::ActorDimensionStack& GetRecursionStack()
+{
+  static Dali::Internal::ActorSizer::ActorDimensionStack gRecursionStack{};
+  return gRecursionStack;
+}
 } // namespace
 
 namespace Dali::Internal
@@ -121,7 +124,7 @@ void ActorSizer::SetSizeInternal(const Vector3& size)
   if(mTargetSize != size || mTargetSizeDirtyFlag)
   {
     mTargetSizeDirtyFlag = false;
-    mTargetSize = size;
+    mTargetSize          = size;
 
     // Update the preferred size after relayoutting
     // It should be used in the next relayoutting
@@ -837,14 +840,14 @@ void ActorSizer::NegotiateDimension(Dimension::Type dimension, const Vector2& al
 void ActorSizer::NegotiateDimensions(const Vector2& allocatedSize)
 {
   // Negotiate all dimensions that require it
-  gRecursionStack.clear();
+  GetRecursionStack().clear();
 
   for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
   {
     const Dimension::Type dimension = static_cast<Dimension::Type>(1 << i);
 
     // Negotiate
-    NegotiateDimension(dimension, allocatedSize, gRecursionStack);
+    NegotiateDimension(dimension, allocatedSize, GetRecursionStack());
   }
 }
 

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_NODE_MESSAGES_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,8 +82,17 @@ public:
     // Reserve some memory inside the message queue
     uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(NodePropertyMessage));
 
+    auto& updateManager = eventThreadServices.GetUpdateManager();
+
     // Construct message in the message queue memory; note that delete should not be called on the return value
-    new(slot) NodePropertyMessage(eventThreadServices.GetUpdateManager(), node, property, member, value);
+    new(slot) NodePropertyMessage(updateManager, node, property, member, value);
+
+    // Non-transform property doesn't get reset. Add a resetter.
+    OwnerPointer<SceneGraph::PropertyResetterBase> resetter(
+      new SceneGraph::BakerResetter(const_cast<Node*>(node),
+                                    const_cast<AnimatableProperty<P>*>(property),
+                                    BakerResetter::Lifetime::BAKE));
+    AddResetterMessage(updateManager, resetter);
   }
 
   /**
@@ -158,8 +167,17 @@ public:
     // Reserve some memory inside the message queue
     uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(NodePropertyComponentMessage));
 
+    auto& updateManager = eventThreadServices.GetUpdateManager();
+
     // Construct message in the message queue memory; note that delete should not be called on the return value
-    new(slot) NodePropertyComponentMessage(eventThreadServices.GetUpdateManager(), node, property, member, value);
+    new(slot) NodePropertyComponentMessage(updateManager, node, property, member, value);
+
+    // Non-transform property doesn't get reset. Add a resetter.
+    OwnerPointer<SceneGraph::PropertyResetterBase> resetter(
+      new SceneGraph::BakerResetter(const_cast<Node*>(node),
+                                    const_cast<AnimatableProperty<P>*>(property),
+                                    BakerResetter::Lifetime::BAKE));
+    AddResetterMessage(updateManager, resetter);
   }
 
   /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,8 @@
 #include <dali/internal/update/common/property-owner-messages.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/uniform-map.h>
+
+#include <dali/internal/update/common/animatable-property-messages.h>
 
 using Dali::Internal::SceneGraph::AnimatableProperty;
 using Dali::Internal::SceneGraph::PropertyBase;
@@ -1464,7 +1466,7 @@ void Object::SetSceneGraphProperty(Property::Index index, const PropertyMetadata
       DALI_ASSERT_DEBUG(property);
 
       // property is being used in a separate thread; queue a message to set the property
-      BakeMessage<bool>(GetEventThreadServices(), *property, value.Get<bool>());
+      BakeMessage<bool>(GetEventThreadServices(), *mUpdateObject, *property, value.Get<bool>());
       break;
     }
 
@@ -1474,7 +1476,7 @@ void Object::SetSceneGraphProperty(Property::Index index, const PropertyMetadata
       DALI_ASSERT_DEBUG(property);
 
       // property is being used in a separate thread; queue a message to set the property
-      BakeMessage<int32_t>(GetEventThreadServices(), *property, value.Get<int32_t>());
+      BakeMessage<int32_t>(GetEventThreadServices(), *mUpdateObject, *property, value.Get<int32_t>());
       break;
     }
 
@@ -1484,7 +1486,7 @@ void Object::SetSceneGraphProperty(Property::Index index, const PropertyMetadata
       DALI_ASSERT_DEBUG(property);
 
       // property is being used in a separate thread; queue a message to set the property
-      BakeMessage<float>(GetEventThreadServices(), *property, value.Get<float>());
+      BakeMessage<float>(GetEventThreadServices(), *mUpdateObject, *property, value.Get<float>());
       break;
     }
 
@@ -1496,15 +1498,15 @@ void Object::SetSceneGraphProperty(Property::Index index, const PropertyMetadata
       // property is being used in a separate thread; queue a message to set the property
       if(entry.componentIndex == 0)
       {
-        SetXComponentMessage<Vector2>(GetEventThreadServices(), *property, value.Get<float>());
+        SetXComponentMessage<Vector2>(GetEventThreadServices(), *mUpdateObject, *property, value.Get<float>());
       }
       else if(entry.componentIndex == 1)
       {
-        SetYComponentMessage<Vector2>(GetEventThreadServices(), *property, value.Get<float>());
+        SetYComponentMessage<Vector2>(GetEventThreadServices(), *mUpdateObject, *property, value.Get<float>());
       }
       else
       {
-        BakeMessage<Vector2>(GetEventThreadServices(), *property, value.Get<Vector2>());
+        BakeMessage<Vector2>(GetEventThreadServices(), *mUpdateObject, *property, value.Get<Vector2>());
       }
       break;
     }
@@ -1517,19 +1519,19 @@ void Object::SetSceneGraphProperty(Property::Index index, const PropertyMetadata
       // property is being used in a separate thread; queue a message to set the property
       if(entry.componentIndex == 0)
       {
-        SetXComponentMessage<Vector3>(GetEventThreadServices(), *property, value.Get<float>());
+        SetXComponentMessage<Vector3>(GetEventThreadServices(), *mUpdateObject, *property, value.Get<float>());
       }
       else if(entry.componentIndex == 1)
       {
-        SetYComponentMessage<Vector3>(GetEventThreadServices(), *property, value.Get<float>());
+        SetYComponentMessage<Vector3>(GetEventThreadServices(), *mUpdateObject, *property, value.Get<float>());
       }
       else if(entry.componentIndex == 2)
       {
-        SetZComponentMessage<Vector3>(GetEventThreadServices(), *property, value.Get<float>());
+        SetZComponentMessage<Vector3>(GetEventThreadServices(), *mUpdateObject, *property, value.Get<float>());
       }
       else
       {
-        BakeMessage<Vector3>(GetEventThreadServices(), *property, value.Get<Vector3>());
+        BakeMessage<Vector3>(GetEventThreadServices(), *mUpdateObject, *property, value.Get<Vector3>());
       }
 
       break;
@@ -1543,23 +1545,23 @@ void Object::SetSceneGraphProperty(Property::Index index, const PropertyMetadata
       // property is being used in a separate thread; queue a message to set the property
       if(entry.componentIndex == 0)
       {
-        SetXComponentMessage<Vector4>(GetEventThreadServices(), *property, value.Get<float>());
+        SetXComponentMessage<Vector4>(GetEventThreadServices(), *mUpdateObject, *property, value.Get<float>());
       }
       else if(entry.componentIndex == 1)
       {
-        SetYComponentMessage<Vector4>(GetEventThreadServices(), *property, value.Get<float>());
+        SetYComponentMessage<Vector4>(GetEventThreadServices(), *mUpdateObject, *property, value.Get<float>());
       }
       else if(entry.componentIndex == 2)
       {
-        SetZComponentMessage<Vector4>(GetEventThreadServices(), *property, value.Get<float>());
+        SetZComponentMessage<Vector4>(GetEventThreadServices(), *mUpdateObject, *property, value.Get<float>());
       }
       else if(entry.componentIndex == 3)
       {
-        SetWComponentMessage<Vector4>(GetEventThreadServices(), *property, value.Get<float>());
+        SetWComponentMessage<Vector4>(GetEventThreadServices(), *mUpdateObject, *property, value.Get<float>());
       }
       else
       {
-        BakeMessage<Vector4>(GetEventThreadServices(), *property, value.Get<Vector4>());
+        BakeMessage<Vector4>(GetEventThreadServices(), *mUpdateObject, *property, value.Get<Vector4>());
       }
       break;
     }
@@ -1570,7 +1572,7 @@ void Object::SetSceneGraphProperty(Property::Index index, const PropertyMetadata
       DALI_ASSERT_DEBUG(property);
 
       // property is being used in a separate thread; queue a message to set the property
-      BakeMessage<Quaternion>(GetEventThreadServices(), *property, value.Get<Quaternion>());
+      BakeMessage<Quaternion>(GetEventThreadServices(), *mUpdateObject, *property, value.Get<Quaternion>());
       break;
     }
 
@@ -1580,7 +1582,7 @@ void Object::SetSceneGraphProperty(Property::Index index, const PropertyMetadata
       DALI_ASSERT_DEBUG(property);
 
       // property is being used in a separate thread; queue a message to set the property
-      BakeMessage<Matrix>(GetEventThreadServices(), *property, value.Get<Matrix>());
+      BakeMessage<Matrix>(GetEventThreadServices(), *mUpdateObject, *property, value.Get<Matrix>());
       break;
     }
 
@@ -1590,7 +1592,7 @@ void Object::SetSceneGraphProperty(Property::Index index, const PropertyMetadata
       DALI_ASSERT_DEBUG(property);
 
       // property is being used in a separate thread; queue a message to set the property
-      BakeMessage<Matrix3>(GetEventThreadServices(), *property, value.Get<Matrix3>());
+      BakeMessage<Matrix3>(GetEventThreadServices(), *mUpdateObject, *property, value.Get<Matrix3>());
       break;
     }
 

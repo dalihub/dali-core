@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/render/renderers/render-geometry.h>
 #include <dali/internal/update/manager/update-manager.h>
+#include <dali/internal/update/rendering/scene-graph-renderer-messages.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
 #include <dali/public-api/object/type-registry.h>
 
@@ -663,8 +664,9 @@ void Renderer::SetDefaultProperty(Property::Index        index,
       {
         if(!Equals(mOpacity, opacity))
         {
-          mOpacity = opacity;
-          BakeOpacityMessage(GetEventThreadServices(), GetRendererSceneObject(), mOpacity);
+          mOpacity         = opacity;
+          auto sceneObject = const_cast<SceneGraph::Renderer*>(&GetRendererSceneObject());
+          SceneGraph::BakeOpacityMessage(GetEventThreadServices(), *sceneObject, mOpacity);
         }
       }
       break;

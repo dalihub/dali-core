@@ -112,9 +112,61 @@ int UtcDaliMatrixUtilsMultiplyMatrixQuaternionP(void)
   END_TEST;
 }
 
+int UtcDaliMatrixUtilsMultiplyTransformMatrix(void)
+{
+  tet_infoline("Multiplication two transform matrixs\n");
+
+  Matrix expectMatrix;
+  Matrix resultMatrix;
+  for(int32_t repeatCount = 0; repeatCount < 10; repeatCount++)
+  {
+    Vector3    lpos         = Vector3(Dali::Random::Range(-50.0f, 50.0f), Dali::Random::Range(-50.0f, 50.0f), Dali::Random::Range(-50.0f, 50.0f));
+    Vector3    laxis        = Vector3(Dali::Random::Range(1.0f, 50.0f), Dali::Random::Range(-50.0f, 50.0f), Dali::Random::Range(-50.0f, 50.0f));
+    float      lradian      = Dali::Random::Range(0.0f, 5.0f);
+    Quaternion lorientation = Quaternion(Radian(lradian), laxis);
+    Vector3    lscale       = Vector3(Dali::Random::Range(-50.0f, 50.0f), Dali::Random::Range(-50.0f, 50.0f), Dali::Random::Range(-50.0f, 50.0f));
+
+    Vector3    rpos         = Vector3(Dali::Random::Range(-50.0f, 50.0f), Dali::Random::Range(-50.0f, 50.0f), Dali::Random::Range(-50.0f, 50.0f));
+    Vector3    raxis        = Vector3(Dali::Random::Range(1.0f, 50.0f), Dali::Random::Range(-50.0f, 50.0f), Dali::Random::Range(-50.0f, 50.0f));
+    float      rradian      = Dali::Random::Range(0.0f, 5.0f);
+    Quaternion rorientation = Quaternion(Radian(rradian), raxis);
+    Vector3    rscale       = Vector3(Dali::Random::Range(-50.0f, 50.0f), Dali::Random::Range(-50.0f, 50.0f), Dali::Random::Range(-50.0f, 50.0f));
+
+    Matrix lhs, rhs;
+    lhs.SetTransformComponents(lscale, lorientation, lpos);
+    rhs.SetTransformComponents(rscale, rorientation, rpos);
+
+    // Get result by Multiply API
+    Internal::MatrixUtils::Multiply(expectMatrix, lhs, rhs);
+    // Get result by MultiplyTransformMatrix API
+    Internal::MatrixUtils::MultiplyTransformMatrix(resultMatrix, lhs, rhs);
+
+    {
+      std::ostringstream oss;
+      oss << "lhs          : " << lhs << "\n";
+      oss << "lpos         : " << lpos << "\n";
+      oss << "lorientation : " << lorientation << "\n";
+      oss << "lscale       : " << lscale << "\n";
+
+      oss << "rhs          : " << rhs << "\n";
+      oss << "rpos         : " << rpos << "\n";
+      oss << "rorientation : " << rorientation << "\n";
+      oss << "rscale       : " << rscale << "\n";
+
+      oss << "expect     : " << expectMatrix << "\n";
+      oss << "result     : " << resultMatrix << "\n";
+      tet_printf("test result : \n%s\n", oss.str().c_str());
+    }
+
+    DALI_TEST_EQUALS(expectMatrix, resultMatrix, 0.01f, TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
 int UtcDaliMatrixUtilsMultiplyProjectionMatrix(void)
 {
-  tet_infoline("Multiplication Assign operator with self matrix\n");
+  tet_infoline("Multiplication projection matrix and random matrix\n");
 
   Matrix viewMatrix;
   Matrix projectionMatrix;
