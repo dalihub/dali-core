@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -248,15 +248,13 @@ bool MessageQueue::ProcessMessages(BufferIndex updateBufferIndex)
   {
     // queueMutex must be locked whilst accessing queue
     MessageQueueMutex::ScopedLock lock(mImpl->queueMutex);
-    copiedProcessQueue = mImpl->processQueue;
 
     mImpl->sceneUpdate >>= 1;
-
     sceneUpdated = (mImpl->sceneUpdate & 0x01); // if it was previously 2, scene graph was updated.
 
     mImpl->queueWasEmpty = mImpl->processQueue.empty(); // Flag whether we processed anything
 
-    mImpl->processQueue.clear();
+    copiedProcessQueue = std::move(mImpl->processQueue); // Move message queue
   }
 
   for(auto&& buffer : copiedProcessQueue)
