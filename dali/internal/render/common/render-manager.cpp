@@ -486,7 +486,7 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
   Internal::Scene&   sceneInternal = GetImplementation(scene);
   SceneGraph::Scene* sceneObject   = sceneInternal.GetSceneObject();
 
-  if(sceneObject->IsRenderingSkipped())
+  if(!sceneObject || sceneObject->IsRenderingSkipped())
   {
     // We don't need to calculate dirty rects
     return;
@@ -729,9 +729,13 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
 
 void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo)
 {
-  SceneGraph::Scene* sceneObject  = GetImplementation(scene).GetSceneObject();
-  Rect<int>          clippingRect = sceneObject->GetSurfaceRect();
+  SceneGraph::Scene* sceneObject = GetImplementation(scene).GetSceneObject();
+  if(!sceneObject)
+  {
+    return;
+  }
 
+  Rect<int> clippingRect = sceneObject->GetSurfaceRect();
   RenderScene(status, scene, renderToFbo, clippingRect);
 }
 
@@ -750,6 +754,10 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
   Internal::Scene&   sceneInternal = GetImplementation(scene);
   SceneGraph::Scene* sceneObject   = sceneInternal.GetSceneObject();
+  if(!sceneObject)
+  {
+    return;
+  }
 
   uint32_t count = sceneObject->GetRenderInstructions().Count(mImpl->renderBufferIndex);
 

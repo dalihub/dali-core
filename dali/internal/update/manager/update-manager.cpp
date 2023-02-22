@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -537,6 +537,8 @@ void UpdateManager::RemoveScene(Scene* scene)
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
   new(slot) DerivedType(&mImpl->renderManager, &RenderManager::UninitializeScene, scene);
+
+  scene->RemoveSurfaceRenderTarget();
 
   for(auto&& sceneInfo : mImpl->scenes)
   {

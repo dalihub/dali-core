@@ -229,6 +229,14 @@ public:
   }
 
   /**
+   * Remove the render target of the surface
+   */
+  void RemoveSurfaceRenderTarget()
+  {
+    mRenderTarget.reset();
+  }
+
+  /**
    * Get the graphics render pass created for the scene
    *
    * @return the graphics render pass

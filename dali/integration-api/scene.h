@@ -2,7 +2,7 @@
 #define DALI_SCENE_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -228,6 +228,11 @@ public:
    * @brief Informs the scene that the surface has been replaced.
    */
   void SurfaceReplaced();
+
+  /**
+   * @brief Removes the scene graph object.
+   */
+  void RemoveSceneObject();
 
   /**
    * @brief Discards this Scene from the Core.
