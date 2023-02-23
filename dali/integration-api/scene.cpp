@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -126,6 +126,11 @@ void Scene::SurfaceResized(float width, float height)
 void Scene::SurfaceReplaced()
 {
   GetImplementation(*this).SurfaceReplaced();
+}
+
+void Scene::RemoveSceneObject()
+{
+  GetImplementation(*this).RemoveSceneObject();
 }
 
 void Scene::Discard()

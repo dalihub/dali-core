@@ -146,11 +146,11 @@ struct UpdateManager::Impl
     {
     }
 
-    ~SceneInfo()                               = default; ///< Default non-virtual destructor
-    SceneInfo(SceneInfo&& rhs)                 = default; ///< Move constructor
-    SceneInfo& operator=(SceneInfo&& rhs)      = default; ///< Move assignment operator
-    SceneInfo& operator=(const SceneInfo& rhs) = delete;  ///< Assignment operator
-    SceneInfo(const SceneInfo& rhs)            = delete;  ///< Copy constructor
+    ~SceneInfo()               = default;                ///< Default non-virtual destructor
+    SceneInfo(SceneInfo&& rhs) = default;                ///< Move constructor
+    SceneInfo& operator=(SceneInfo&& rhs) = default;     ///< Move assignment operator
+    SceneInfo& operator=(const SceneInfo& rhs) = delete; ///< Assignment operator
+    SceneInfo(const SceneInfo& rhs)            = delete; ///< Copy constructor
 
     Layer*                       root{nullptr};   ///< Root node (root is a layer). The layer is not stored in the node memory pool.
     OwnerPointer<RenderTaskList> taskList;        ///< Scene graph render task list
@@ -350,8 +350,7 @@ void UpdateManager::InstallRoot(OwnerPointer<Layer>& layer)
 
   Layer* rootLayer = layer.Release();
 
-  DALI_ASSERT_DEBUG(std::find_if(mImpl->scenes.begin(), mImpl->scenes.end(), [rootLayer](Impl::SceneInfoPtr& scene)
-                                 { return scene && scene->root == rootLayer; }) == mImpl->scenes.end() &&
+  DALI_ASSERT_DEBUG(std::find_if(mImpl->scenes.begin(), mImpl->scenes.end(), [rootLayer](Impl::SceneInfoPtr& scene) { return scene && scene->root == rootLayer; }) == mImpl->scenes.end() &&
                     "Root Node already installed");
 
   rootLayer->CreateTransform(&mImpl->transformManager);
@@ -548,6 +547,8 @@ void UpdateManager::RemoveScene(Scene* scene)
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
   new(slot) DerivedType(&mImpl->renderManager, &RenderManager::UninitializeScene, scene);
+
+  scene->RemoveSurfaceRenderTarget();
 
   for(auto&& sceneInfo : mImpl->scenes)
   {
@@ -1248,8 +1249,7 @@ void UpdateManager::SetDepthIndices(OwnerPointer<NodeDepths>& nodeDepths)
     {
       // Reorder children container only if sibiling order changed.
       NodeContainer& container = node->GetChildren();
-      std::sort(container.Begin(), container.End(), [](Node* a, Node* b)
-                { return a->GetDepthIndex() < b->GetDepthIndex(); });
+      std::sort(container.Begin(), container.End(), [](Node* a, Node* b) { return a->GetDepthIndex() < b->GetDepthIndex(); });
     }
   }
 }
