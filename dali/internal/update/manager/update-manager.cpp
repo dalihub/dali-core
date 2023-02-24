@@ -282,11 +282,11 @@ struct UpdateManager::Impl
   ResetterContainer<PropertyResetterBase> propertyResetters; ///< A container of property resetters
   ResetterContainer<NodeResetter>         nodeResetters;     ///< A container of node resetters
 
-  OwnerContainer<Animation*>    animations;            ///< A container of owned animations
-  PropertyNotificationContainer propertyNotifications; ///< A container of owner property notifications.
-  OwnerKeyContainer<Renderer>   renderers;             ///< A container of owned renderers
-  OwnerContainer<TextureSet*>   textureSets;           ///< A container of owned texture sets
-  OwnerContainer<Shader*>       shaders;               ///< A container of owned shaders
+  OwnerContainer<Animation*>            animations;            ///< A container of owned animations
+  OwnerContainer<PropertyNotification*> propertyNotifications; ///< A container of owner property notifications.
+  OwnerKeyContainer<Renderer>           renderers;             ///< A container of owned renderers
+  OwnerContainer<TextureSet*>           textureSets;           ///< A container of owned texture sets
+  OwnerContainer<Shader*>               shaders;               ///< A container of owned shaders
 
   DiscardQueue<Node*, OwnerContainer<Node*>>                         nodeDiscardQueue; ///< Nodes are added here when disconnected from the scene-graph.
   DiscardQueue<Shader*, OwnerContainer<Shader*>>                     shaderDiscardQueue;

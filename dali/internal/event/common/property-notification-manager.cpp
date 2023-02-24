@@ -40,28 +40,38 @@ void PropertyNotificationManager::PropertyNotificationCreated(PropertyNotificati
 
 void PropertyNotificationManager::PropertyNotificationDestroyed(PropertyNotification& propertyNotification)
 {
-  Dali::Vector<PropertyNotification*>::Iterator iter = std::find(mPropertyNotifications.Begin(), mPropertyNotifications.End(), &propertyNotification);
+  auto iter = mPropertyNotifications.Find(&propertyNotification);
   DALI_ASSERT_ALWAYS(iter != mPropertyNotifications.End() && "PropertyNotification not found");
 
-  mPropertyNotifications.Remove(iter);
+  mPropertyNotifications.Erase(iter);
 }
 
-void PropertyNotificationManager::NotifyProperty(SceneGraph::PropertyNotification* propertyNotification, bool validity)
+void PropertyNotificationManager::PropertyNotificationSceneObjectMapping(const SceneGraph::PropertyNotification* sceneGraphPropertyNotification, PropertyNotification& propertyNotification)
 {
-  Dali::Vector<PropertyNotification*>::Iterator       iter    = mPropertyNotifications.Begin();
-  const Dali::Vector<PropertyNotification*>::Iterator endIter = mPropertyNotifications.End();
+  mSceneGraphObjectMap.insert({sceneGraphPropertyNotification, &propertyNotification});
+}
 
-  // walk the collection of PropertyNotifications
-  for(; iter != endIter; ++iter)
+void PropertyNotificationManager::PropertyNotificationSceneObjectUnmapping(const SceneGraph::PropertyNotification* sceneGraphPropertyNotification)
+{
+  auto iter = mSceneGraphObjectMap.find(sceneGraphPropertyNotification);
+  DALI_ASSERT_DEBUG(iter != mSceneGraphObjectMap.end());
+
+  mSceneGraphObjectMap.erase(iter);
+}
+
+void PropertyNotificationManager::NotifyProperty(SceneGraph::PropertyNotification* sceneGraphPropertyNotification, bool validity)
+{
+  const auto iter = mSceneGraphObjectMap.find(sceneGraphPropertyNotification);
+  if(iter != mSceneGraphObjectMap.end())
   {
-    // found one with the matching SceneGraph::PropertyNotification?
-    if((*iter)->CompareSceneObject(propertyNotification))
+    // Check if this notification hold inputed scenegraph property notification.
+    auto* propertyNotification = iter->second;
+    if(propertyNotification->CompareSceneObject(sceneGraphPropertyNotification))
     {
       // allow application to access the value that triggered this emit incase of NOTIFY_ON_CHANGED mode
-      (*iter)->SetNotifyResult(validity);
+      propertyNotification->SetNotifyResult(validity);
       // yes..emit signal
-      (*iter)->EmitSignalNotify();
-      break;
+      propertyNotification->EmitSignalNotify();
     }
   }
 }

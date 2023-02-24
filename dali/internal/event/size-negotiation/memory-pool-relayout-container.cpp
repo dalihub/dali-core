@@ -25,23 +25,22 @@ namespace Internal
 MemoryPoolRelayoutContainer::MemoryPoolRelayoutContainer(MemoryPoolObjectAllocator<RelayoutInfo>& objectAllocator)
 : mAllocator(objectAllocator)
 {
+  mDummyRelayoutInfo.reset(new RelayoutInfo());
 }
 
 MemoryPoolRelayoutContainer::~MemoryPoolRelayoutContainer() = default;
 
 bool MemoryPoolRelayoutContainer::Contains(const Dali::Actor& actor)
 {
-  for(RelayoutInfoContainer::Iterator it = mRelayoutInfos.Begin(), itEnd = mRelayoutInfos.End(); it != itEnd; ++it)
-  {
-    RelayoutInfo* info = *it;
+  // Store actor into dummy info.
+  // It will be used for check comparision.
+  mDummyRelayoutInfo->actor = actor;
 
-    if(info->actor == actor)
-    {
-      return true;
-    }
-  }
+  bool ret = (mRelayoutInfos.Find(mDummyRelayoutInfo.get()) != mRelayoutInfos.End());
 
-  return false;
+  // Reset empty handle for deference.
+  mDummyRelayoutInfo->actor = Dali::Actor();
+  return ret;
 }
 
 void MemoryPoolRelayoutContainer::Add(const Dali::Actor& actor, const Vector2& size)
@@ -59,28 +58,33 @@ void MemoryPoolRelayoutContainer::Add(const Dali::Actor& actor, const Vector2& s
 
 void MemoryPoolRelayoutContainer::PopBack()
 {
-  if(mRelayoutInfos.Size() > 0)
+  if(mRelayoutInfos.Count() > 0)
   {
     RelayoutInfoContainer::Iterator back = mRelayoutInfos.End();
     back--;
     RelayoutInfo* info = *back;
-    mAllocator.Destroy(info);
     mRelayoutInfos.Erase(back);
+
+    // Need to be destroyed after mRelayoutInfos erased.
+    mAllocator.Destroy(info);
   }
 }
 
-void MemoryPoolRelayoutContainer::Get(size_t index, Dali::Actor& actorOut, Vector2& sizeOut) const
+void MemoryPoolRelayoutContainer::GetBack(Dali::Actor& actorOut, Vector2& sizeOut) const
 {
-  DALI_ASSERT_DEBUG(index < Size());
-
-  RelayoutInfo* info = mRelayoutInfos[index];
-  actorOut           = info->actor;
-  sizeOut            = info->size;
+  if(mRelayoutInfos.Count() > 0)
+  {
+    RelayoutInfoContainer::ConstIterator back = mRelayoutInfos.End();
+    back--;
+    RelayoutInfo* info = *back;
+    actorOut           = info->actor;
+    sizeOut            = info->size;
+  }
 }
 
 size_t MemoryPoolRelayoutContainer::Size() const
 {
-  return mRelayoutInfos.Size();
+  return mRelayoutInfos.Count();
 }
 
 void MemoryPoolRelayoutContainer::Reserve(size_t capacity)
@@ -90,9 +94,8 @@ void MemoryPoolRelayoutContainer::Reserve(size_t capacity)
 
 void MemoryPoolRelayoutContainer::Clear()
 {
-  for(size_t i = 0; i < Size(); ++i)
+  for(auto& info : mRelayoutInfos)
   {
-    RelayoutInfo* info = mRelayoutInfos[i];
     mAllocator.Destroy(info);
   }
 

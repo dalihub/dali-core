@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ANIMATION_PLAYLIST_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,9 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/map-wrapper.h>
 #include <dali/internal/common/message.h>
+#include <dali/internal/common/ordered-set.h>
 #include <dali/internal/event/common/complete-notification-interface.h>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/common/dali-vector.h>
@@ -116,8 +118,8 @@ private: // from CompleteNotificationInterface
   void NotifyCompleted() override;
 
 private:
-  Dali::Vector<Animation*>     mAnimations; ///< All existing animations (not owned)
-  std::vector<Dali::Animation> mPlaylist;   ///< The currently playing animations (owned through handle)
+  OrderedSet<Animation, false>        mAnimations; ///< All existing animations (not owned)
+  std::map<Dali::Animation, uint32_t> mPlaylist;   ///< The currently playing animations (owned through handle). Note we can hold same handles multiple.
 };
 
 /**
