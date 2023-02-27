@@ -8578,6 +8578,83 @@ int utcDaliActorGetSizeAfterAnimation(void)
   END_TEST;
 }
 
+int utcDaliActorGetSizeAfterAnimation2(void)
+{
+  TestApplication application;
+  tet_infoline("Check the actor size before / after an animation is finished if before size is equal to animation target size");
+
+  Vector3 actorSize(100.0f, 100.0f, 0.0f);
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, actorSize);
+  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  application.GetScene().Add(actor);
+
+  // Size should be updated without rendering.
+  Vector3 size = actor.GetProperty(Actor::Property::SIZE).Get<Vector3>();
+  DALI_TEST_EQUALS(size, actorSize, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  // Size and current size should be updated.
+  size = actor.GetProperty(Actor::Property::SIZE).Get<Vector3>();
+  DALI_TEST_EQUALS(size, actorSize, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+  DALI_TEST_EQUALS(actorSize.width, actor.GetProperty<float>(Actor::Property::SIZE_WIDTH), TEST_LOCATION);
+  DALI_TEST_EQUALS(actorSize.height, actor.GetProperty<float>(Actor::Property::SIZE_HEIGHT), TEST_LOCATION);
+  DALI_TEST_EQUALS(actorSize.depth, actor.GetProperty<float>(Actor::Property::SIZE_DEPTH), TEST_LOCATION);
+
+  Vector3 currentSize = actor.GetCurrentProperty(Actor::Property::SIZE).Get<Vector3>();
+  DALI_TEST_EQUALS(currentSize, actorSize, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+  DALI_TEST_EQUALS(actorSize.width, actor.GetCurrentProperty<float>(Actor::Property::SIZE_WIDTH), TEST_LOCATION);
+  DALI_TEST_EQUALS(actorSize.height, actor.GetCurrentProperty<float>(Actor::Property::SIZE_HEIGHT), TEST_LOCATION);
+  DALI_TEST_EQUALS(actorSize.depth, actor.GetCurrentProperty<float>(Actor::Property::SIZE_DEPTH), TEST_LOCATION);
+
+  // Set size again
+  actorSize = Vector3(200.0f, 200.0f, 0.0f);
+  actor.SetProperty(Actor::Property::SIZE, actorSize);
+
+  size = actor.GetProperty(Actor::Property::SIZE).Get<Vector3>();
+  DALI_TEST_EQUALS(size, actorSize, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+  Vector3 targetValue(actorSize);
+
+  Animation animation = Animation::New(1.0f);
+  animation.AnimateTo(Property(actor, Actor::Property::SIZE), targetValue);
+  animation.Play();
+
+  // Size should be updated without rendering.
+  size = actor.GetProperty(Actor::Property::SIZE).Get<Vector3>();
+  DALI_TEST_EQUALS(size, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(100); // During the animation
+
+  size = actor.GetProperty(Actor::Property::SIZE).Get<Vector3>();
+  DALI_TEST_EQUALS(size, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+  DALI_TEST_EQUALS(targetValue.width, actor.GetProperty<float>(Actor::Property::SIZE_WIDTH), TEST_LOCATION);
+  DALI_TEST_EQUALS(targetValue.height, actor.GetProperty<float>(Actor::Property::SIZE_HEIGHT), TEST_LOCATION);
+  DALI_TEST_EQUALS(targetValue.depth, actor.GetProperty<float>(Actor::Property::SIZE_DEPTH), TEST_LOCATION);
+
+  // We should get target value because targetValue is equal to current actor size.
+  currentSize = actor.GetCurrentProperty(Actor::Property::SIZE).Get<Vector3>();
+  DALI_TEST_EQUALS(currentSize, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+  DALI_TEST_EQUALS(targetValue.width, actor.GetCurrentProperty<float>(Actor::Property::SIZE_WIDTH), TEST_LOCATION);
+  DALI_TEST_EQUALS(targetValue.height, actor.GetCurrentProperty<float>(Actor::Property::SIZE_HEIGHT), TEST_LOCATION);
+  DALI_TEST_EQUALS(targetValue.depth, actor.GetCurrentProperty<float>(Actor::Property::SIZE_DEPTH), TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(1000); // After animation finished
+
+  size = actor.GetProperty(Actor::Property::SIZE).Get<Vector3>();
+  DALI_TEST_EQUALS(size, actorSize, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+  currentSize = actor.GetCurrentProperty(Actor::Property::SIZE).Get<Vector3>();
+  DALI_TEST_EQUALS(currentSize, actorSize, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int utcDaliActorRelayoutAndAnimation(void)
 {
   TestApplication application;
