@@ -685,7 +685,13 @@ float ActorSizer::GetMaximumSize(Dimension::Type dimension) const
 
 void ActorSizer::OnAnimateSize(Animation& animation, Vector3 targetSize, bool relative)
 {
+  Vector3 originalTargetSize = mTargetSize;
   mTargetSize      = targetSize + mTargetSize * float(relative);
+  if(originalTargetSize != mTargetSize)
+  {
+    mTargetSizeDirtyFlag = true;
+  }
+
   mAnimatedSize    = mTargetSize;
   mUseAnimatedSize = AnimatedSizeFlag::WIDTH | AnimatedSizeFlag::HEIGHT | AnimatedSizeFlag::DEPTH;
 
@@ -701,7 +707,12 @@ void ActorSizer::OnAnimateSize(Animation& animation, Vector3 targetSize, bool re
 
 void ActorSizer::OnAnimateWidth(Animation& animation, float width, bool relative)
 {
+  const float originalWidth = mTargetSize.width;
   mTargetSize.width   = width + float(relative) * mTargetSize.width;
+  if(!Equals(originalWidth,mTargetSize.width))
+  {
+    mTargetSizeDirtyFlag = true;
+  }
   mAnimatedSize.width = mTargetSize.width;
   mUseAnimatedSize |= AnimatedSizeFlag::WIDTH;
 
@@ -716,7 +727,12 @@ void ActorSizer::OnAnimateWidth(Animation& animation, float width, bool relative
 
 void ActorSizer::OnAnimateHeight(Animation& animation, float height, bool relative)
 {
+  const float originalHeight = mTargetSize.height;
   mTargetSize.height   = height + float(relative) * mTargetSize.height;
+  if(!Equals(originalHeight, mTargetSize.height))
+  {
+    mTargetSizeDirtyFlag = true;
+  }
   mAnimatedSize.height = mTargetSize.height;
   mUseAnimatedSize |= AnimatedSizeFlag::HEIGHT;
 
@@ -731,7 +747,12 @@ void ActorSizer::OnAnimateHeight(Animation& animation, float height, bool relati
 
 void ActorSizer::OnAnimateDepth(Animation& animation, float depth, bool relative)
 {
+  const float originalDepth = mTargetSize.depth;
   mTargetSize.depth   = depth + float(relative) * mTargetSize.depth;
+  if(!Equals(originalDepth, mTargetSize.depth))
+  {
+    mTargetSizeDirtyFlag = true;
+  }
   mAnimatedSize.depth = mTargetSize.depth;
   mUseAnimatedSize |= AnimatedSizeFlag::DEPTH;
 
