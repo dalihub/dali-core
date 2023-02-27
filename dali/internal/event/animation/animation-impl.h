@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ANIMATION_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -479,6 +479,24 @@ private:
     {
     }
 
+    // Move operations
+    ConnectorTargetValues(ConnectorTargetValues&& rhs) noexcept
+    : targetValue(std::move(rhs.targetValue)),
+      timePeriod(std::move(rhs.timePeriod)),
+      connectorIndex(rhs.connectorIndex),
+      animatorType(rhs.animatorType)
+    {
+    }
+
+    ConnectorTargetValues& operator=(ConnectorTargetValues&& rhs) noexcept
+    {
+      targetValue    = std::move(rhs.targetValue);
+      timePeriod     = std::move(rhs.timePeriod);
+      connectorIndex = rhs.connectorIndex;
+      animatorType   = rhs.animatorType;
+      return *this;
+    }
+
     Property::Value targetValue;
     TimePeriod      timePeriod{0.f};
     std::size_t     connectorIndex{0};
@@ -512,6 +530,13 @@ private:
    */
   void SendFinalProgressNotificationMessage();
 
+  /**
+   * @brief Append ConnectorTargetValues into the container.
+   *
+   * @param[in] connectorTargetValues moved ConnectorTargetValues that will be append end of container
+   */
+  void AppendConnectorTargetValues(ConnectorTargetValues&& connectorTargetValues);
+
 private:
   using AnimatorConnectorContainer     = OwnerContainer<AnimatorConnectorBase*>;
   using ConnectorTargetValuesContainer = std::vector<ConnectorTargetValues>;
@@ -539,7 +564,8 @@ private:
   EndAction              mEndAction;
   EndAction              mDisconnectAction;
   Dali::Animation::State mState{Dali::Animation::STOPPED};
-  bool                   mAutoReverseEnabled{false}; ///< Flag to identify that the looping mode is auto reverse.
+  bool                   mAutoReverseEnabled{false};                ///< Flag to identify that the looping mode is auto reverse.
+  bool                   mConnectorTargetValuesSortRequired{false}; ///< Flag to whether we need to sort mConnectorTargetValues or not
 };
 
 } // namespace Internal

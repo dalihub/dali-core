@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_ANIMATION_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -352,6 +352,7 @@ protected:
 
   bool mProgressReachedSignalRequired; // Flag to indicate the progress marker was hit
   bool mAutoReverseEnabled;            // Flag to identify that the looping mode is auto reverse.
+  bool mAnimatorSortRequired;          // Flag to whether we need to sort animator or not.
   bool mIsActive[2];                   // Flag to indicate whether the animation is active in the current frame (which is double buffered)
 };
 

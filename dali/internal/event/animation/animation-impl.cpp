@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -393,6 +393,7 @@ void Animation::Clear()
 
   // Reset the connector target values
   mConnectorTargetValues.clear();
+  mConnectorTargetValuesSortRequired = false;
 
   // Replace the old scene-object with a new one
   DestroySceneObject();
@@ -523,8 +524,8 @@ void Animation::AnimateBy(Property& target, Property::Value relativeValue, Alpha
       DALI_ASSERT_DEBUG(false && "Property  not supported");
     }
   }
-  // Store data to later notify the object that its property is being animated
-  mConnectorTargetValues.push_back({std::move(relativeValue), period, connectorIndex, Animation::BY});
+
+  AppendConnectorTargetValues({std::move(relativeValue), period, connectorIndex, Animation::BY});
 }
 
 void Animation::AnimateTo(Property& target, Property::Value destinationValue)
@@ -643,8 +644,8 @@ void Animation::AnimateTo(Property& target, Property::Value destinationValue, Al
       DALI_ASSERT_DEBUG(false && "Property  not supported");
     }
   }
-  // Store data to later notify the object that its property is being animated
-  mConnectorTargetValues.push_back({std::move(destinationValue), period, connectorIndex, Animation::TO});
+
+  AppendConnectorTargetValues({std::move(destinationValue), period, connectorIndex, Animation::TO});
 }
 
 void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames)
@@ -695,8 +696,7 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
 
   ExtendDuration(period);
 
-  // Store data to later notify the object that its property is being animated
-  mConnectorTargetValues.push_back({keyFrames.GetLastKeyFrameValue(), period, mConnectors.Count(), BETWEEN});
+  AppendConnectorTargetValues({keyFrames.GetLastKeyFrameValue(), period, mConnectors.Count(), BETWEEN});
 
   // using destination type so component animation gets correct type
   switch(destinationType)
@@ -1058,9 +1058,12 @@ void Animation::NotifyObjects(Animation::Notify notifyValueType)
   {
     // Sort according to end time with earlier end times coming first, if the end time is the same, then the connectors are not moved
     // Only do this if we're using the target value
-    if(notifyValueType == Notify::USE_TARGET_VALUE)
+    if(mConnectorTargetValuesSortRequired && notifyValueType == Notify::USE_TARGET_VALUE)
     {
       std::stable_sort(mConnectorTargetValues.begin(), mConnectorTargetValues.end(), CompareConnectorEndTimes);
+
+      // Now mConnectorTargetValues sorted. Reset flag.
+      mConnectorTargetValuesSortRequired = false;
     }
 
     // Loop through all connector target values sorted by increasing end time
@@ -1091,6 +1094,22 @@ void Animation::SendFinalProgressNotificationMessage()
     float progressMarkerSeconds = mDurationSeconds * mProgressReachedMarker;
     SetProgressNotificationMessage(mEventThreadServices, *mAnimation, progressMarkerSeconds);
   }
+}
+
+void Animation::AppendConnectorTargetValues(ConnectorTargetValues&& connectorTargetValues)
+{
+  // Check whether we need to sort mConnectorTargetValues or not.
+  // Sort will be required only if new item is smaller than last value of container.
+  if(!mConnectorTargetValuesSortRequired && !mConnectorTargetValues.empty())
+  {
+    if(CompareConnectorEndTimes(connectorTargetValues, mConnectorTargetValues.back()))
+    {
+      mConnectorTargetValuesSortRequired = true;
+    }
+  }
+
+  // Store data to later notify the object that its property is being animated
+  mConnectorTargetValues.push_back(std::move(connectorTargetValues));
 }
 
 } // namespace Internal
