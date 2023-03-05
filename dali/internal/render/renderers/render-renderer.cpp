@@ -146,6 +146,23 @@ inline uint32_t GetUniformBufferDataAlignment(uint32_t dataSize)
   return ((dataSize / 256u) + ((dataSize % 256u) ? 1u : 0u)) * 256u;
 }
 
+/**
+ * @brief Store latest binded RenderGeometry, and help that we can skip duplicated vertex attributes bind.
+ *
+ * @param[in] geometry Current geometry to be used, or nullptr if render finished
+ * @return True if we can reuse latest binded vertex attributes. False otherwise.
+ */
+inline bool ReuseLatestBindedVertexAttributes(const Render::Geometry* geometry)
+{
+  static const Render::Geometry* gLatestVertexBindedGeometry = nullptr;
+  if(gLatestVertexBindedGeometry == geometry)
+  {
+    return true;
+  }
+  gLatestVertexBindedGeometry = geometry;
+  return false;
+}
+
 } // namespace
 
 namespace Render
@@ -153,6 +170,14 @@ namespace Render
 namespace
 {
 MemoryPoolObjectAllocator<Renderer> gRenderRendererMemoryPool;
+}
+
+void Renderer::PrepareCommandBuffer()
+{
+  // Reset latest geometry informations, So we can bind the first of geometry.
+  ReuseLatestBindedVertexAttributes(nullptr);
+
+  // todo : Fill here as many caches as we can store for reduce the number of command buffers
 }
 
 RendererKey Renderer::NewKey(SceneGraph::RenderDataProvider* dataProvider,
@@ -571,16 +596,25 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
   bool drawn = false; // Draw can fail if there are no vertex buffers or they haven't been uploaded yet
                       // @todo We should detect this case much earlier to prevent unnecessary work
 
-  if(mDrawCommands.empty())
+  // Reuse latest binded vertex attributes location, or Bind buffers to attribute locations.
+  if(ReuseLatestBindedVertexAttributes(mGeometry) || mGeometry->BindVertexAttributes(commandBuffer))
   {
-    drawn = mGeometry->Draw(*mGraphicsController, commandBuffer, mIndexedDrawFirstElement, mIndexedDrawElementsCount);
+    if(mDrawCommands.empty())
+    {
+      drawn = mGeometry->Draw(*mGraphicsController, commandBuffer, mIndexedDrawFirstElement, mIndexedDrawElementsCount);
+    }
+    else
+    {
+      for(auto& cmd : commands)
+      {
+        drawn |= mGeometry->Draw(*mGraphicsController, commandBuffer, cmd->firstIndex, cmd->elementCount);
+      }
+    }
   }
   else
   {
-    for(auto& cmd : commands)
-    {
-      mGeometry->Draw(*mGraphicsController, commandBuffer, cmd->firstIndex, cmd->elementCount);
-    }
+    // BindVertexAttributes failed. Reset cached geometry.
+    ReuseLatestBindedVertexAttributes(nullptr);
   }
 
   return drawn;

@@ -125,7 +125,7 @@ public:
    * Set up the attributes and perform the Draw call corresponding to the geometry type.
    *
    * @param[in] graphicsController The graphics controller
-   * @param[in] bufferIndex The current buffer index
+   * @param[in,out] commandBuffer The current command buffer queue
    * @param[in] elementBufferOffset The index of first element to draw if index buffer bound
    * @param[in] elementBufferCount Number of elements to draw if index buffer bound, uses whole buffer when 0
    * @return true if the draw command was issued, false otherwise
@@ -134,6 +134,14 @@ public:
             Graphics::CommandBuffer& commandBuffer,
             uint32_t                 elementBufferOffset,
             uint32_t                 elementBufferCount);
+
+  /**
+   * @brief Set up the attributes bind commaneds
+   *
+   * @param[in,out] commandBuffer The current command buffer queue
+   * @return true if the bind command was issued, false otherwise
+   */
+  bool BindVertexAttributes(Graphics::CommandBuffer& commandBuffer);
 
 private:
   // VertexBuffers

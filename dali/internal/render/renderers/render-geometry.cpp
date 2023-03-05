@@ -149,11 +149,7 @@ void Geometry::Upload(Graphics::Controller& graphicsController)
   }
 }
 
-bool Geometry::Draw(
-  Graphics::Controller&    graphicsController,
-  Graphics::CommandBuffer& commandBuffer,
-  uint32_t                 elementBufferOffset,
-  uint32_t                 elementBufferCount)
+bool Geometry::BindVertexAttributes(Graphics::CommandBuffer& commandBuffer)
 {
   //Bind buffers to attribute locations
   const auto vertexBufferCount = static_cast<uint32_t>(mVertexBuffers.Count());
@@ -183,6 +179,15 @@ bool Geometry::Draw(
 
   commandBuffer.BindVertexBuffers(0, buffers, offsets);
 
+  return true;
+}
+
+bool Geometry::Draw(
+  Graphics::Controller&    graphicsController,
+  Graphics::CommandBuffer& commandBuffer,
+  uint32_t                 elementBufferOffset,
+  uint32_t                 elementBufferCount)
+{
   uint32_t numIndices(0u);
   intptr_t firstIndexOffset(0u);
   if(mIndexBuffer)
@@ -220,7 +225,8 @@ bool Geometry::Draw(
   {
     // Un-indexed draw call
     uint32_t numVertices(0u);
-    if(vertexBufferCount > 0)
+
+    if(mVertexBuffers.Count() > 0)
     {
       // truncated, no value loss happening in practice
       numVertices = static_cast<uint32_t>(mVertexBuffers[0]->GetElementCount());
