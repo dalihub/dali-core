@@ -219,6 +219,9 @@ void PropertyNotification::CreateSceneObject()
                                                                   mCompare);
     OwnerPointer<SceneGraph::PropertyNotification> transferOwnership(const_cast<SceneGraph::PropertyNotification*>(mPropertyNotification));
     AddPropertyNotificationMessage(mUpdateManager, transferOwnership);
+
+    // Setup mapping infomations between scenegraph property notification
+    mPropertyNotificationManager.PropertyNotificationSceneObjectMapping(mPropertyNotification, *this);
   }
 }
 
@@ -227,6 +230,9 @@ void PropertyNotification::DestroySceneObject()
   if(mPropertyNotification != nullptr)
   {
     DALI_ASSERT_ALWAYS(EventThreadServices::IsCoreRunning());
+
+    // Remove mapping infomations
+    mPropertyNotificationManager.PropertyNotificationSceneObjectUnmapping(mPropertyNotification);
 
     // Remove PropertyNotification using a message to the update manager
     RemovePropertyNotificationMessage(mUpdateManager, *mPropertyNotification);

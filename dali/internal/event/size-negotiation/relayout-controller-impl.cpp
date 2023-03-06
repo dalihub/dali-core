@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -121,10 +121,7 @@ RelayoutController::RelayoutController(Integration::RenderController& controller
   mRelayoutStack->Reserve(32);
 }
 
-RelayoutController::~RelayoutController()
-{
-  delete mRelayoutStack;
-}
+RelayoutController::~RelayoutController() = default;
 
 RelayoutController* RelayoutController::Get()
 {
@@ -372,9 +369,9 @@ void RelayoutController::AddRequest(Dali::Actor& actor)
   Internal::Actor* actorPtr = &GetImplementation(actor);
 
   // Only add the rootActor if it is not already recorded
-  auto itr = std::find(mDirtyLayoutSubTrees.begin(), mDirtyLayoutSubTrees.end(), actorPtr);
+  auto iter = mDirtyLayoutSubTrees.Find(actorPtr);
 
-  if(itr == mDirtyLayoutSubTrees.end())
+  if(iter == mDirtyLayoutSubTrees.End())
   {
     mDirtyLayoutSubTrees.PushBack(actorPtr);
   }
@@ -383,11 +380,7 @@ void RelayoutController::AddRequest(Dali::Actor& actor)
 void RelayoutController::RemoveRequest(Dali::Actor& actor)
 {
   Internal::Actor* actorPtr = &GetImplementation(actor);
-
-  mDirtyLayoutSubTrees.Erase(std::remove(mDirtyLayoutSubTrees.begin(),
-                                         mDirtyLayoutSubTrees.end(),
-                                         actorPtr),
-                             mDirtyLayoutSubTrees.end());
+  mDirtyLayoutSubTrees.EraseObject(actorPtr);
 }
 
 void RelayoutController::Request()
@@ -404,8 +397,7 @@ void RelayoutController::Request()
 
 void RelayoutController::OnObjectDestroyed(const Dali::RefObject* object)
 {
-  // Search for and null the object if found in the following lists
-  FindAndZero(mDirtyLayoutSubTrees, object);
+  mDirtyLayoutSubTrees.EraseObject(static_cast<const Dali::Internal::Actor*>(object));
 }
 
 void RelayoutController::Relayout()
@@ -446,7 +438,8 @@ void RelayoutController::Relayout()
       {
         Dali::Actor actor;
         Vector2     size;
-        mRelayoutStack->Get(mRelayoutStack->Size() - 1, actor, size);
+
+        mRelayoutStack->GetBack(actor, size);
         Actor& actorImpl = GetImplementation(actor);
         mRelayoutStack->PopBack();
 
@@ -485,18 +478,6 @@ bool RelayoutController::IsPerformingRelayout() const
 void RelayoutController::SetProcessingCoreEvents(bool processingEvents)
 {
   mProcessingCoreEvents = processingEvents;
-}
-
-void RelayoutController::FindAndZero(const RawActorList& list, const Dali::RefObject* object)
-{
-  // Object has been destroyed so clear it from this list
-  for(auto& actor : list)
-  {
-    if(actor && (actor == object))
-    {
-      actor = nullptr; // Reset the pointer in the list. We don't want to remove it in case something is iterating over the list.
-    }
-  }
 }
 
 uint32_t RelayoutController::GetMemoryPoolCapacity()

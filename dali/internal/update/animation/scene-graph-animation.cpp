@@ -80,6 +80,7 @@ Animation::Animation(float durationSeconds, float speedFactor, const Vector2& pl
   mState(Stopped),
   mProgressReachedSignalRequired(false),
   mAutoReverseEnabled(false),
+  mAnimatorSortRequired(false),
   mIsActive{false}
 {
 }
@@ -151,8 +152,12 @@ void Animation::SetPlayRange(const Vector2& range)
 
 void Animation::Play()
 {
-  // Sort according to end time with earlier end times coming first, if the end time is the same, then the animators are not moved
-  std::stable_sort(mAnimators.Begin(), mAnimators.End(), CompareAnimatorEndTimes);
+  if(mAnimatorSortRequired)
+  {
+    // Sort according to end time with earlier end times coming first, if the end time is the same, then the animators are not moved
+    std::stable_sort(mAnimators.Begin(), mAnimators.End(), CompareAnimatorEndTimes);
+    mAnimatorSortRequired = false;
+  }
 
   mState = Playing;
 
@@ -298,6 +303,16 @@ void Animation::AddAnimator(OwnerPointer<AnimatorBase>& animator)
 {
   animator->ConnectToSceneGraph();
   animator->SetDisconnectAction(mDisconnectAction);
+
+  // Check whether we need to sort mAnimators or not.
+  // Sort will be required only if new item is smaller than last value of container.
+  if(!mAnimatorSortRequired && !mAnimators.Empty())
+  {
+    if(CompareAnimatorEndTimes(animator.Get(), *(mAnimators.End() - 1u)))
+    {
+      mAnimatorSortRequired = true;
+    }
+  }
 
   mAnimators.PushBack(animator.Release());
 }
@@ -485,6 +500,10 @@ void Animation::UpdateAnimators(BufferIndex bufferIndex, bool bake, bool animati
   {
     //Remove animators whose PropertyOwner has been destroyed
     mAnimators.EraseIf([](auto& animator) { return animator->Orphan(); });
+
+    // Need to be re-sort if remained animators size is bigger than one.
+    // Note that if animator contains only zero or one items, It is already sorted case.
+    mAnimatorSortRequired = (mAnimators.Count() >= 2);
   }
 }
 

@@ -67,6 +67,11 @@ void Geometry::SetIndexBuffer(const uint16_t* indices, size_t count)
   GetImplementation(*this).SetIndexBuffer(indices, static_cast<uint32_t>(count));
 }
 
+void Geometry::SetIndexBuffer(const uint32_t* indices, size_t count)
+{
+  GetImplementation(*this).SetIndexBuffer(indices, static_cast<uint32_t>(count));
+}
+
 void Geometry::SetType(Type geometryType)
 {
   GetImplementation(*this).SetType(geometryType);

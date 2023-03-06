@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,26 +43,40 @@ void AnimationPlaylist::AnimationCreated(Animation& animation)
 
 void AnimationPlaylist::AnimationDestroyed(Animation& animation)
 {
-  Dali::Vector<Animation*>::Iterator iter = std::find(mAnimations.Begin(), mAnimations.End(), &animation);
+  auto iter = mAnimations.Find(&animation);
   DALI_ASSERT_ALWAYS(iter != mAnimations.End() && "Animation not found");
 
-  mAnimations.Remove(iter);
+  mAnimations.Erase(iter);
 }
 
 void AnimationPlaylist::OnPlay(Animation& animation)
 {
-  mPlaylist.push_back(Dali::Animation(&animation));
+  Dali::Animation handle = Dali::Animation(&animation);
+  auto            iter   = mPlaylist.lower_bound(handle);
+  if(iter != mPlaylist.end() && (*iter).first == handle)
+  {
+    // Just increase reference count.
+    ++(iter->second);
+  }
+  else
+  {
+    mPlaylist.insert(iter, {handle, 1u});
+  }
 }
 
 void AnimationPlaylist::OnClear(Animation& animation)
 {
-  std::vector<Dali::Animation>::iterator iter = std::find(mPlaylist.begin(), mPlaylist.end(), Dali::Animation(&animation));
-  std::vector<Dali::Animation>::iterator last = mPlaylist.end();
-  if(iter != last)
+  Dali::Animation handle = Dali::Animation(&animation);
+  auto            iter   = mPlaylist.find(handle);
+
+  // Animation might be removed when NotifyCompleted called.
+  if(DALI_LIKELY(iter != mPlaylist.end()))
   {
-    --last;                  // move to real last
-    std::swap(*iter, *last); // swap
-    mPlaylist.resize(mPlaylist.size() - 1u);
+    // Just decrease reference count. But if reference count is zero, remove it.
+    if(--(iter->second) == 0u)
+    {
+      mPlaylist.erase(iter);
+    }
   }
 }
 
@@ -72,24 +86,21 @@ void AnimationPlaylist::NotifyCompleted()
 
   // Since animations can be unreferenced during the signal emissions, iterators into animationPointers may be invalidated.
   // First copy and reference the finished animations, then emit signals
-  for(Dali::Vector<Animation*>::Iterator iter = mAnimations.Begin(); iter != mAnimations.End(); ++iter)
+  for(auto* animation : mAnimations)
   {
-    Animation* animation = *iter;
-
     if(animation->HasFinished())
     {
-      finishedAnimations.push_back(Dali::Animation(animation));
+      Dali::Animation handle = Dali::Animation(animation);
+      finishedAnimations.push_back(handle);
 
       // The animation may be present in mPlaylist - remove if necessary
       // Note that the animation "Finish" signal is emitted after Stop() has been called
-      std::vector<Dali::Animation>::iterator iter = std::find(mPlaylist.begin(), mPlaylist.end(), Dali::Animation(animation));
-      DALI_ASSERT_DEBUG(iter != mPlaylist.end());
-      mPlaylist.erase(iter);
+      OnClear(*animation);
     }
   }
 
   // Now it's safe to emit the signals
-  for(std::vector<Dali::Animation>::iterator iter = finishedAnimations.begin(); iter != finishedAnimations.end(); ++iter)
+  for(auto iter = finishedAnimations.begin(); iter != finishedAnimations.end(); ++iter)
   {
     Dali::Animation& handle = *iter;
 
@@ -101,10 +112,8 @@ void AnimationPlaylist::NotifyProgressReached(const SceneGraph::Animation* scene
 {
   std::vector<Dali::Animation> notifyProgressAnimations; // Will own animations until all emits have been done
 
-  for(Dali::Vector<Animation*>::Iterator iter = mAnimations.Begin(); iter != mAnimations.End(); ++iter)
+  for(auto* animation : mAnimations)
   {
-    Animation* animation = *iter;
-
     if((animation->GetSceneObject()) == sceneGraphAnimation)
     {
       // Store handles to animations that need signals emitted in the case of an animation being cleared in-between emits
@@ -122,17 +131,30 @@ void AnimationPlaylist::NotifyProgressReached(const SceneGraph::Animation* scene
 
 uint32_t AnimationPlaylist::GetAnimationCount()
 {
-  return mAnimations.Size();
+  return mAnimations.Count();
 }
 
 Dali::Animation AnimationPlaylist::GetAnimationAt(uint32_t index)
 {
-  if(index >= mAnimations.Size())
+  if(index >= mAnimations.Count())
   {
     DALI_LOG_ERROR("Animation index is out of bounds.\n");
     return Dali::Animation();
   }
-  return Dali::Animation(mAnimations[index]);
+
+  // This will spend a lot of time. But GetAnimationAt API will be called very rarely.
+  Animation* ret = nullptr;
+  for(auto iter : mAnimations)
+  {
+    if(index == 0u)
+    {
+      ret = iter;
+      break;
+    }
+    --index;
+  }
+  DALI_ASSERT_DEBUG(ret != nullptr);
+  return Dali::Animation(ret);
 }
 
 } // namespace Internal

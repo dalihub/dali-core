@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RELAYOUT_CONTROLLER_IMPL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,11 @@
 
 // EXTERNAL INCLUDES
 #include <cstdint>
+#include <memory> // for unique_ptr
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/memory-pool-object-allocator.h>
+#include <dali/internal/common/ordered-set.h>
 #include <dali/internal/event/size-negotiation/memory-pool-relayout-container.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-object.h>
@@ -144,7 +146,7 @@ public: // CALLBACKS
   void OnObjectDestroyed(const Dali::RefObject* object);
 
 private:
-  using RawActorList = Dali::Vector<Dali::Internal::Actor*>;
+  using RawActorList = Dali::Internal::OrderedSet<Dali::Internal::Actor, false>;
 
   /**
    * @brief Request for relayout. Relays out whole scene.
@@ -190,14 +192,6 @@ private:
    */
   void QueueActor(Internal::Actor* actor, RelayoutContainer& actors, Vector2 size);
 
-  /**
-   * @brief Find the given object in the list and null it out
-   *
-   * @param[in] list The list to search
-   * @param[in] object The object to search for
-   */
-  void FindAndZero(const RawActorList& list, const Dali::RefObject* object);
-
   // Undefined
   RelayoutController(const RelayoutController&) = delete;
   RelayoutController& operator=(const RelayoutController&) = delete;
@@ -208,8 +202,9 @@ private:
 
   SlotDelegate<RelayoutController> mSlotDelegate;
 
-  RawActorList                 mDirtyLayoutSubTrees; ///< List of roots of sub trees that are dirty
-  MemoryPoolRelayoutContainer* mRelayoutStack;       ///< Stack for relayouting
+  RawActorList mDirtyLayoutSubTrees; ///< List of roots of sub trees that are dirty
+
+  std::unique_ptr<MemoryPoolRelayoutContainer> mRelayoutStack; ///< Stack for relayouting
 
   bool mRelayoutConnection : 1;   ///< Whether EventProcessingFinishedSignal signal is connected.
   bool mRelayoutFlag : 1;         ///< Relayout flag to avoid unnecessary calls

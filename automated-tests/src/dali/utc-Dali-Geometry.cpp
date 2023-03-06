@@ -351,6 +351,65 @@ int UtcDaliGeometrySetIndexBuffer(void)
   END_TEST;
 }
 
+int UtcDaliGeometrySetIndexBuffer32Bits(void)
+{
+  TestApplication application;
+  auto&           bufferTrace = application.GetGlAbstraction().GetBufferTrace();
+  bufferTrace.Enable(true);
+  bufferTrace.EnableLogging(true);
+
+  tet_infoline("Test SetIndexBuffer 32Bits");
+
+  VertexBuffer vertexBuffer = CreateVertexBuffer("aPosition", "aTexCoord");
+
+  Geometry geometry = Geometry::New();
+  geometry.AddVertexBuffer(vertexBuffer);
+
+  Shader   shader   = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
+  Actor    actor    = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector3::ONE * 100.f);
+  actor.AddRenderer(renderer);
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render(0);
+  application.Render();
+  application.SendNotification();
+
+  {
+    const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
+      application.GetGlAbstraction().GetBufferDataCalls();
+
+    DALI_TEST_EQUALS(bufferDataCalls.size(), 3u, TEST_LOCATION);
+
+    DALI_TEST_EQUALS(bufferDataCalls[0], 4 * sizeof(TexturedQuadVertex), TEST_LOCATION);
+  }
+
+  // Set index buffer
+  application.GetGlAbstraction().ResetBufferDataCalls();
+
+  const uint32_t indexData32Bits[6] = {0, 3, 1, 0, 2, 3};
+  geometry.SetIndexBuffer(indexData32Bits, sizeof(indexData32Bits) / sizeof(indexData32Bits[0]));
+  application.SendNotification();
+  application.Render(0);
+  application.Render();
+  application.SendNotification();
+
+  {
+    const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
+      application.GetGlAbstraction().GetBufferDataCalls();
+
+    //Only the index buffer should be uploaded
+    DALI_TEST_EQUALS(bufferDataCalls.size(), 1u, TEST_LOCATION);
+
+    // should be unsigned int instead of unsigned short
+    DALI_TEST_EQUALS(bufferDataCalls[0], 6 * sizeof(uint32_t), TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
 int UtcDaliGeometrySetGetGeometryType01(void)
 {
   TestApplication application;

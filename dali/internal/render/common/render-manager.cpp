@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/threading/thread-pool.h>
 #include <dali/integration-api/core.h>
+#include <dali/internal/common/ordered-set.h>
 
 #include <dali/internal/event/common/scene-impl.h>
 
@@ -154,13 +155,14 @@ struct RenderManager::Impl
   std::vector<SceneGraph::Scene*> sceneContainer;   ///< List of pointers to the scene graph objects of the scenes
   Render::RenderAlgorithms        renderAlgorithms; ///< The RenderAlgorithms object is used to action the renders required by a RenderInstruction
 
-  OwnerContainer<Render::Sampler*>       samplerContainer;      ///< List of owned samplers
-  OwnerContainer<Render::FrameBuffer*>   frameBufferContainer;  ///< List of owned framebuffers
-  OwnerContainer<Render::VertexBuffer*>  vertexBufferContainer; ///< List of owned vertex buffers
-  OwnerContainer<Render::Geometry*>      geometryContainer;     ///< List of owned Geometries
-  OwnerContainer<Render::RenderTracker*> mRenderTrackers;       ///< List of render trackers
-  OwnerKeyContainer<Render::Renderer>    rendererContainer;     ///< List of owned renderers
-  OwnerKeyContainer<Render::Texture>     textureContainer;      ///< List of owned textures
+  OrderedSet<Render::Sampler>         samplerContainer;      ///< List of owned samplers
+  OrderedSet<Render::FrameBuffer>     frameBufferContainer;  ///< List of owned framebuffers
+  OrderedSet<Render::VertexBuffer>    vertexBufferContainer; ///< List of owned vertex buffers
+  OrderedSet<Render::Geometry>        geometryContainer;     ///< List of owned Geometries
+  OwnerKeyContainer<Render::Renderer> rendererContainer;     ///< List of owned renderers
+  OwnerKeyContainer<Render::Texture>  textureContainer;      ///< List of owned textures
+
+  OrderedSet<Render::RenderTracker> mRenderTrackers; ///< List of owned render trackers
 
   ProgramController   programController; ///< Owner of the programs
   Render::ShaderCache shaderCache;       ///< The cache for the graphics shaders
@@ -251,10 +253,10 @@ void RenderManager::RemoveTexture(const Render::TextureKey& textureKey)
 {
   DALI_ASSERT_DEBUG(textureKey && "Trying to remove empty texture key");
 
-  // Find the texture, use std::find so we can do the erase safely
-  auto iter = std::find(mImpl->textureContainer.begin(), mImpl->textureContainer.end(), textureKey);
+  // Find the texture, use std::find so we can do the erase by iterator safely
+  auto iter = std::find(mImpl->textureContainer.Begin(), mImpl->textureContainer.End(), textureKey);
 
-  if(iter != mImpl->textureContainer.end())
+  if(iter != mImpl->textureContainer.End())
   {
     textureKey->Destroy();
     mImpl->textureContainer.Erase(iter); // Texture found; now destroy it
@@ -297,10 +299,10 @@ void RenderManager::RemoveFrameBuffer(Render::FrameBuffer* frameBuffer)
 {
   DALI_ASSERT_DEBUG(nullptr != frameBuffer);
 
-  // Find the framebuffer, use std:find so we can safely do the erase
-  auto iter = std::find(mImpl->frameBufferContainer.begin(), mImpl->frameBufferContainer.end(), frameBuffer);
+  // Find the framebuffer, use OrderedSet.Find so we can safely do the erase
+  auto iter = mImpl->frameBufferContainer.Find(frameBuffer);
 
-  if(iter != mImpl->frameBufferContainer.end())
+  if(iter != mImpl->frameBufferContainer.End())
   {
     frameBuffer->Destroy();
     mImpl->frameBufferContainer.Erase(iter); // frameBuffer found; now destroy it
@@ -367,7 +369,12 @@ void RenderManager::SetVertexBufferData(Render::VertexBuffer* vertexBuffer, Owne
   vertexBuffer->SetData(data.Release(), size);
 }
 
-void RenderManager::SetIndexBuffer(Render::Geometry* geometry, Dali::Vector<uint16_t>& indices)
+void RenderManager::SetIndexBuffer(Render::Geometry* geometry, Render::Geometry::Uint16ContainerType& indices)
+{
+  geometry->SetIndexBuffer(indices);
+}
+
+void RenderManager::SetIndexBuffer(Render::Geometry* geometry, Render::Geometry::Uint32ContainerType& indices)
 {
   geometry->SetIndexBuffer(indices);
 }
@@ -379,42 +386,17 @@ void RenderManager::AddGeometry(OwnerPointer<Render::Geometry>& geometry)
 
 void RenderManager::RemoveGeometry(Render::Geometry* geometry)
 {
-  auto iter = std::find(mImpl->geometryContainer.begin(), mImpl->geometryContainer.end(), geometry);
-
-  if(iter != mImpl->geometryContainer.end())
-  {
-    mImpl->geometryContainer.Erase(iter);
-  }
+  mImpl->geometryContainer.EraseObject(geometry);
 }
 
 void RenderManager::AttachVertexBuffer(Render::Geometry* geometry, Render::VertexBuffer* vertexBuffer)
 {
-  DALI_ASSERT_DEBUG(nullptr != geometry);
-
-  // Find the geometry
-  for(auto&& iter : mImpl->geometryContainer)
-  {
-    if(iter == geometry)
-    {
-      iter->AddVertexBuffer(vertexBuffer);
-      break;
-    }
-  }
+  geometry->AddVertexBuffer(vertexBuffer);
 }
 
 void RenderManager::RemoveVertexBuffer(Render::Geometry* geometry, Render::VertexBuffer* vertexBuffer)
 {
-  DALI_ASSERT_DEBUG(nullptr != geometry);
-
-  // Find the geometry
-  for(auto&& iter : mImpl->geometryContainer)
-  {
-    if(iter == geometry)
-    {
-      iter->RemoveVertexBuffer(vertexBuffer);
-      break;
-    }
-  }
+  geometry->RemoveVertexBuffer(vertexBuffer);
 }
 
 void RenderManager::SetGeometryType(Render::Geometry* geometry, uint32_t geometryType)
@@ -480,7 +462,7 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
   Internal::Scene&   sceneInternal = GetImplementation(scene);
   SceneGraph::Scene* sceneObject   = sceneInternal.GetSceneObject();
 
-  if(sceneObject->IsRenderingSkipped())
+  if(!sceneObject || sceneObject->IsRenderingSkipped())
   {
     // We don't need to calculate dirty rects
     return;
@@ -713,9 +695,13 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
 
 void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo)
 {
-  SceneGraph::Scene* sceneObject  = GetImplementation(scene).GetSceneObject();
-  Rect<int>          clippingRect = sceneObject->GetSurfaceRect();
+  SceneGraph::Scene* sceneObject = GetImplementation(scene).GetSceneObject();
+  if(!sceneObject)
+  {
+    return;
+  }
 
+  Rect<int> clippingRect = sceneObject->GetSurfaceRect();
   RenderScene(status, scene, renderToFbo, clippingRect);
 }
 
@@ -734,6 +720,10 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
   Internal::Scene&   sceneInternal = GetImplementation(scene);
   SceneGraph::Scene* sceneObject   = sceneInternal.GetSceneObject();
+  if(!sceneObject)
+  {
+    return;
+  }
 
   uint32_t count = sceneObject->GetRenderInstructions().Count(mImpl->renderBufferIndex);
 

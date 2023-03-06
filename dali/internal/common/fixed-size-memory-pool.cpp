@@ -40,9 +40,12 @@ struct FixedSizeMemoryPool::Impl
    */
   struct Block
   {
-    void*    blockMemory; ///< The allocated memory from which allocations can be made
-    Block*   nextBlock;   ///< The next block in the linked list
-    SizeType mBlockSize;  ///< Size of the block in bytes
+    void*  blockMemory; ///< The allocated memory from which allocations can be made
+    Block* nextBlock;   ///< The next block in the linked list
+#if defined(__LP64__)
+    KeyType mIndexOffset; ///< The Offset of this block's index
+#endif
+    SizeType mBlockSize; ///< Size of the block in bytes
 
     /**
      * @brief Construct a new block with given size
@@ -51,6 +54,9 @@ struct FixedSizeMemoryPool::Impl
      */
     Block(SizeType size)
     : nextBlock(nullptr),
+#if defined(__LP64__)
+      mIndexOffset(0),
+#endif
       mBlockSize(size)
     {
       blockMemory = ::operator new(size);
@@ -90,6 +96,7 @@ struct FixedSizeMemoryPool::Impl
     // We need enough room to store the deleted list in the data
     DALI_ASSERT_DEBUG(mFixedSize >= sizeof(void*));
 
+#if defined(__LP64__)
     if(mMaximumBlockCount < 0xffffffff)
     {
       // Only use mBlocks for key/ptr conversion with max number of blocks
@@ -102,6 +109,7 @@ struct FixedSizeMemoryPool::Impl
       mBlockIdMask = ((0x01 << bitCount) - 1) << mBlockShift;
       mIndexMask   = ~mBlockIdMask;
     }
+#endif
   }
 
   /**
@@ -134,17 +142,48 @@ struct FixedSizeMemoryPool::Impl
     mCurrentBlockCapacity = size;
 
     // Allocate
-    Block* block             = new Block(mCurrentBlockCapacity * mFixedSize);
-    mCurrentBlock->nextBlock = block; // Add to end of linked list
-    mCurrentBlock            = block;
+    Block* block = new Block(mCurrentBlockCapacity * mFixedSize);
+
+#if defined(__LP64__)
+    if(mBlockShift) // Key contains block id & index within block
+    {
+      // Add to main list of blocks
+      mBlocks.push_back(block);
+#endif
+      mCurrentBlock->nextBlock = block; // Add end of linked list
+      mCurrentBlock            = block;
+#if defined(__LP64__)
+    }
+    else
+    {
+      // Heuristic optimization. Make bigger block positioned at front, instead of header.
+      // (Since change the Block value might be heavy)
+      if(mCurrentBlock == &mMemoryBlocks)
+      {
+        block->mIndexOffset = mMemoryBlocks.mBlockSize / mFixedSize;
+
+        // Add to end of linked list.
+        // Now mCurrentBlock is next block of header.
+        mCurrentBlock->nextBlock = block;
+        mCurrentBlock            = block;
+      }
+      else
+      {
+        block->mIndexOffset = mCurrentBlock->mIndexOffset + (mCurrentBlock->mBlockSize / mFixedSize);
+
+        // Add new block as next of header.
+        mMemoryBlocks.nextBlock = block;
+
+        // Make previous mCurrentBlock as next of new block.
+        block->nextBlock = mCurrentBlock;
+
+        // Keep mCurrentBlock is next block of mMemoryBlocks.
+        mCurrentBlock = block;
+      }
+    }
+#endif
 
     mCurrentBlockSize = 0;
-
-    // Add to main list of blocks
-    if(mBlockShift)
-    {
-      mBlocks.push_back(block);
-    }
   }
 #ifdef DEBUG_ENABLED
 
@@ -179,16 +218,20 @@ struct FixedSizeMemoryPool::Impl
   Block    mMemoryBlocks;         ///< Linked list of allocated memory blocks
   SizeType mMaximumBlockCapacity; ///< The maximum allowed capacity of allocations in a new memory block
 
+#if defined(__LP64__)
   std::vector<Block*> mBlocks; ///< Address of each allocated block
+#endif
 
   Block*   mCurrentBlock;         ///< Pointer to the active block
   SizeType mCurrentBlockCapacity; ///< The maximum number of allocations that can be allocated for the current block
   SizeType mCurrentBlockSize;     ///< The number of allocations allocated to the current block
 
   SizeType mMaximumBlockCount{0xffffffff}; ///< Maximum number of blocks (or unlimited)
-  SizeType mBlockShift{0x0};               ///< number of bits to shift block id in key
-  SizeType mBlockIdMask{0x0};              ///< mask for key conversion
-  SizeType mIndexMask{0xffffffff};         ///< mask for key conversion
+#if defined(__LP64__)
+  SizeType mBlockShift{0x0};       ///< number of bits to shift block id in key
+  SizeType mBlockIdMask{0x0};      ///< mask for key conversion
+  SizeType mIndexMask{0xffffffff}; ///< mask for key conversion
+#endif
 
   void* mDeletedObjects; ///< Pointer to the head of the list of deleted objects. The addresses are stored in the allocated memory blocks.
 };
@@ -281,12 +324,12 @@ void* FixedSizeMemoryPool::GetPtrFromKey(FixedSizeMemoryPool::KeyType key)
     Impl::Block* block = &mImpl->mMemoryBlocks;
     while(block != nullptr)
     {
+      const uint32_t indexOffset   = block->mIndexOffset;
       const SizeType numberOfItems = (block->mBlockSize) / mImpl->mFixedSize;
-      if(index < numberOfItems)
+      if(indexOffset <= index && index < indexOffset + numberOfItems)
       {
-        return static_cast<uint8_t*>(block->blockMemory) + mImpl->mFixedSize * index;
+        return static_cast<uint8_t*>(block->blockMemory) + mImpl->mFixedSize * (index - indexOffset);
       }
-      index -= numberOfItems;
       block = block->nextBlock;
     }
   }
@@ -307,8 +350,13 @@ FixedSizeMemoryPool::KeyType FixedSizeMemoryPool::GetKeyFromPtr(void* ptr)
   // If block count is limited, the bit shift is non-zero.
   if(DALI_LIKELY(mImpl->mBlockShift))
   {
-    for(auto block : mImpl->mBlocks)
+    // Iterate backward so we can search at bigger blocks first.
+    blockId = mImpl->mBlocks.size();
+    for(auto iter = mImpl->mBlocks.rbegin(), iterEnd = mImpl->mBlocks.rend(); iter != iterEnd; ++iter)
     {
+      --blockId;
+      auto* block = *iter;
+
       const void* const endOfBlock = reinterpret_cast<char*>(block->blockMemory) + block->mBlockSize;
 
       if(block->blockMemory <= ptr && ptr < endOfBlock)
@@ -317,7 +365,6 @@ FixedSizeMemoryPool::KeyType FixedSizeMemoryPool::GetKeyFromPtr(void* ptr)
         found = true;
         break;
       }
-      ++blockId;
     }
   }
   else
@@ -330,11 +377,10 @@ FixedSizeMemoryPool::KeyType FixedSizeMemoryPool::GetKeyFromPtr(void* ptr)
 
       if(block->blockMemory <= ptr && ptr < endOfBlock)
       {
-        index += (static_cast<uint8_t*>(ptr) - static_cast<uint8_t*>(block->blockMemory)) / mImpl->mFixedSize;
+        index = block->mIndexOffset + (static_cast<uint8_t*>(ptr) - static_cast<uint8_t*>(block->blockMemory)) / mImpl->mFixedSize;
         found = true;
         break;
       }
-      index += block->mBlockSize / mImpl->mFixedSize;
       block = block->nextBlock;
     }
   }

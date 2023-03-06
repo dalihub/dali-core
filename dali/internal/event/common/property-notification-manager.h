@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PROPERTY_NOTIFICATION_MANAGER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,11 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <unordered_map>
+
 // INTERNAL INCLUDES
+#include <dali/internal/common/ordered-set.h>
 #include <dali/internal/event/common/property-notifier.h>
 #include <dali/public-api/common/dali-vector.h>
 
@@ -58,11 +62,21 @@ public:
    */
   void PropertyNotificationDestroyed(PropertyNotification& propertyNotification);
 
+  /**
+   * Called when a SceneGraph::PropertyNotification is mapping by PropertyNotification.
+   */
+  void PropertyNotificationSceneObjectMapping(const SceneGraph::PropertyNotification* sceneGraphPropertyNotification, PropertyNotification& propertyNotification);
+
+  /**
+   * Called when a SceneGraph::PropertyNotification is unmaped from PropertyNotification.
+   */
+  void PropertyNotificationSceneObjectUnmapping(const SceneGraph::PropertyNotification* sceneGraphPropertyNotification);
+
 private: // private virtual overrides
   /**
    * @copydoc PropertyNotifier::NotifyProperty
    */
-  void NotifyProperty(SceneGraph::PropertyNotification* propertyNotification, bool validity) override;
+  void NotifyProperty(SceneGraph::PropertyNotification* sceneGraphPropertyNotification, bool validity) override;
 
 private:
   /**
@@ -77,7 +91,9 @@ private:
   PropertyNotificationManager& operator=(const PropertyNotificationManager& rhs);
 
 private:
-  Dali::Vector<PropertyNotification*> mPropertyNotifications; ///< All existing PropertyNotifications (not owned)
+  OrderedSet<PropertyNotification, false> mPropertyNotifications; ///< All existing PropertyNotifications (not owned)
+
+  std::unordered_map<const SceneGraph::PropertyNotification*, PropertyNotification*> mSceneGraphObjectMap; ///< Converter from SceneGraph object pointer to Event object.
 };
 
 } // namespace Internal

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,12 +65,6 @@ Scene::Scene()
 
 Scene::~Scene()
 {
-  if(EventThreadServices::IsCoreRunning() && mSceneObject)
-  {
-    ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
-    RemoveSceneMessage(tls->GetUpdateManager(), *mSceneObject);
-  }
-
   if(mDefaultCamera)
   {
     // its enough to release the handle so the object is released
@@ -241,9 +235,19 @@ void Scene::SurfaceReplaced()
   }
 }
 
+void Scene::RemoveSceneObject()
+{
+  if(EventThreadServices::IsCoreRunning() && mSceneObject)
+  {
+    ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
+    RemoveSceneMessage(tls->GetUpdateManager(), *mSceneObject);
+    mSceneObject = nullptr;
+  }
+}
+
 void Scene::Discard()
 {
-  if(ThreadLocalStorage::Created())
+  if(EventThreadServices::IsCoreRunning())
   {
     ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
     tls->RemoveScene(this);
@@ -310,22 +314,23 @@ void Scene::SurfaceRotated(float width, float height, int32_t windowOrientation,
 
 int32_t Scene::GetCurrentSurfaceOrientation() const
 {
-  return mSceneObject->GetSurfaceOrientation();
+  return mSceneObject ? mSceneObject->GetSurfaceOrientation() : 0;
 }
 
 int32_t Scene::GetCurrentScreenOrientation() const
 {
-  return mSceneObject->GetScreenOrientation();
+  return mSceneObject ? mSceneObject->GetScreenOrientation() : 0;
 }
 
 const Rect<int32_t>& Scene::GetCurrentSurfaceRect() const
 {
-  return mSceneObject->GetSurfaceRect();
+  static Rect<int32_t> emptyRect{};
+  return mSceneObject ? mSceneObject->GetSurfaceRect() : emptyRect;
 }
 
 void Scene::ChangedSurface(float width, float height, int32_t windowOrientation, int32_t screenOrientation)
 {
-  bool changedOrientation = false;
+  bool          changedOrientation = false;
   Rect<int32_t> newSize(0, 0, static_cast<int32_t>(width), static_cast<int32_t>(height)); // truncated
   mSize.width  = width;
   mSize.height = height;
@@ -336,7 +341,7 @@ void Scene::ChangedSurface(float width, float height, int32_t windowOrientation,
   }
 
   mSurfaceOrientation = windowOrientation;
-  mScreenOrientation = screenOrientation;
+  mScreenOrientation  = screenOrientation;
 
   // Calculates the aspect ratio, near and far clipping planes, field of view and camera Z position.
   mDefaultCamera->SetPerspectiveProjection(mSize);
@@ -372,12 +377,12 @@ void Scene::ChangedSurface(float width, float height, int32_t windowOrientation,
 
 bool Scene::IsSurfaceRectChanged() const
 {
-  return mSceneObject->IsSurfaceRectChanged();
+  return mSceneObject ? mSceneObject->IsSurfaceRectChanged() : false;
 }
 
 bool Scene::IsRotationCompletedAcknowledgementSet() const
 {
-  return mSceneObject->IsRotationCompletedAcknowledgementSet();
+  return mSceneObject ? mSceneObject->IsRotationCompletedAcknowledgementSet() : false;
 }
 
 void Scene::SetRotationCompletedAcknowledgement()
@@ -455,12 +460,18 @@ void Scene::AddFramePresentedCallback(std::unique_ptr<CallbackBase> callback, in
 
 void Scene::GetFrameRenderedCallback(Dali::Integration::Scene::FrameCallbackContainer& callbacks)
 {
-  mSceneObject->GetFrameRenderedCallback(callbacks);
+  if(mSceneObject)
+  {
+    mSceneObject->GetFrameRenderedCallback(callbacks);
+  }
 }
 
 void Scene::GetFramePresentedCallback(Dali::Integration::Scene::FrameCallbackContainer& callbacks)
 {
-  mSceneObject->GetFramePresentedCallback(callbacks);
+  if(mSceneObject)
+  {
+    mSceneObject->GetFramePresentedCallback(callbacks);
+  }
 }
 
 Integration::Scene::KeyEventSignalType& Scene::KeyEventSignal()

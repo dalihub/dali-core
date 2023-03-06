@@ -146,11 +146,11 @@ struct UpdateManager::Impl
     {
     }
 
-    ~SceneInfo()                               = default; ///< Default non-virtual destructor
-    SceneInfo(SceneInfo&& rhs)                 = default; ///< Move constructor
-    SceneInfo& operator=(SceneInfo&& rhs)      = default; ///< Move assignment operator
-    SceneInfo& operator=(const SceneInfo& rhs) = delete;  ///< Assignment operator
-    SceneInfo(const SceneInfo& rhs)            = delete;  ///< Copy constructor
+    ~SceneInfo()               = default;                ///< Default non-virtual destructor
+    SceneInfo(SceneInfo&& rhs) = default;                ///< Move constructor
+    SceneInfo& operator=(SceneInfo&& rhs) = default;     ///< Move assignment operator
+    SceneInfo& operator=(const SceneInfo& rhs) = delete; ///< Assignment operator
+    SceneInfo(const SceneInfo& rhs)            = delete; ///< Copy constructor
 
     Layer*                       root{nullptr};   ///< Root node (root is a layer). The layer is not stored in the node memory pool.
     OwnerPointer<RenderTaskList> taskList;        ///< Scene graph render task list
@@ -282,11 +282,11 @@ struct UpdateManager::Impl
   ResetterContainer<PropertyResetterBase> propertyResetters; ///< A container of property resetters
   ResetterContainer<NodeResetter>         nodeResetters;     ///< A container of node resetters
 
-  OwnerContainer<Animation*>    animations;            ///< A container of owned animations
-  PropertyNotificationContainer propertyNotifications; ///< A container of owner property notifications.
-  OwnerKeyContainer<Renderer>   renderers;             ///< A container of owned renderers
-  OwnerContainer<TextureSet*>   textureSets;           ///< A container of owned texture sets
-  OwnerContainer<Shader*>       shaders;               ///< A container of owned shaders
+  OwnerContainer<Animation*>            animations;            ///< A container of owned animations
+  OwnerContainer<PropertyNotification*> propertyNotifications; ///< A container of owner property notifications.
+  OwnerKeyContainer<Renderer>           renderers;             ///< A container of owned renderers
+  OwnerContainer<TextureSet*>           textureSets;           ///< A container of owned texture sets
+  OwnerContainer<Shader*>               shaders;               ///< A container of owned shaders
 
   DiscardQueue<Node*, OwnerContainer<Node*>>                         nodeDiscardQueue; ///< Nodes are added here when disconnected from the scene-graph.
   DiscardQueue<Shader*, OwnerContainer<Shader*>>                     shaderDiscardQueue;
@@ -350,8 +350,7 @@ void UpdateManager::InstallRoot(OwnerPointer<Layer>& layer)
 
   Layer* rootLayer = layer.Release();
 
-  DALI_ASSERT_DEBUG(std::find_if(mImpl->scenes.begin(), mImpl->scenes.end(), [rootLayer](Impl::SceneInfoPtr& scene)
-                                 { return scene && scene->root == rootLayer; }) == mImpl->scenes.end() &&
+  DALI_ASSERT_DEBUG(std::find_if(mImpl->scenes.begin(), mImpl->scenes.end(), [rootLayer](Impl::SceneInfoPtr& scene) { return scene && scene->root == rootLayer; }) == mImpl->scenes.end() &&
                     "Root Node already installed");
 
   rootLayer->CreateTransform(&mImpl->transformManager);
@@ -548,6 +547,8 @@ void UpdateManager::RemoveScene(Scene* scene)
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
   new(slot) DerivedType(&mImpl->renderManager, &RenderManager::UninitializeScene, scene);
+
+  scene->RemoveSurfaceRenderTarget();
 
   for(auto&& sceneInfo : mImpl->scenes)
   {
@@ -1248,8 +1249,7 @@ void UpdateManager::SetDepthIndices(OwnerPointer<NodeDepths>& nodeDepths)
     {
       // Reorder children container only if sibiling order changed.
       NodeContainer& container = node->GetChildren();
-      std::sort(container.Begin(), container.End(), [](Node* a, Node* b)
-                { return a->GetDepthIndex() < b->GetDepthIndex(); });
+      std::sort(container.Begin(), container.End(), [](Node* a, Node* b) { return a->GetDepthIndex() < b->GetDepthIndex(); });
     }
   }
 }
@@ -1390,9 +1390,20 @@ void UpdateManager::SetGeometryType(Render::Geometry* geometry, uint32_t geometr
   new(slot) DerivedType(&mImpl->renderManager, &RenderManager::SetGeometryType, geometry, geometryType);
 }
 
-void UpdateManager::SetIndexBuffer(Render::Geometry* geometry, Dali::Vector<uint16_t>& indices)
+void UpdateManager::SetIndexBuffer(Render::Geometry* geometry, Render::Geometry::Uint16ContainerType& indices)
 {
-  using DerivedType = IndexBufferMessage<RenderManager>;
+  using DerivedType = IndexBufferMessage<RenderManager, Render::Geometry::Uint16ContainerType>;
+
+  // Reserve some memory inside the render queue
+  uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot(mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof(DerivedType));
+
+  // Construct message in the render queue memory; note that delete should not be called on the return value
+  new(slot) DerivedType(&mImpl->renderManager, geometry, indices);
+}
+
+void UpdateManager::SetIndexBuffer(Render::Geometry* geometry, Render::Geometry::Uint32ContainerType& indices)
+{
+  using DerivedType = IndexBufferMessage<RenderManager, Render::Geometry::Uint32ContainerType>;
 
   // Reserve some memory inside the render queue
   uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot(mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof(DerivedType));

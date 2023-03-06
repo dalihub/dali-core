@@ -211,7 +211,14 @@ public:
    * @param[in] geometry The geometry
    * @param[in] data A vector containing the indices
    */
-  void SetIndexBuffer(Render::Geometry* geometry, Dali::Vector<uint16_t>& data);
+  void SetIndexBuffer(Render::Geometry* geometry, Render::Geometry::Uint16ContainerType& data);
+
+  /**
+   * Sets the data for the index buffer of an existing geometry
+   * @param[in] geometry The geometry
+   * @param[in] data A vector containing the indices
+   */
+  void SetIndexBuffer(Render::Geometry* geometry, Render::Geometry::Uint32ContainerType& data);
 
   /**
    * Set the geometry type of an existing render geometry
