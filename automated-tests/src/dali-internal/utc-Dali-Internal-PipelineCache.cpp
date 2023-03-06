@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,28 +27,26 @@
 
 using namespace Dali;
 
-
-
 template<class Object, class... Args>
-void InvokeNext(Object *obj, Args... args)
+void InvokeNext(Object* obj, Args... args)
 {
-  auto addr = __builtin_return_address(0);
+  auto    addr = __builtin_return_address(0);
   Dl_info info;
   dladdr(addr, &info);
   auto func = dlsym(RTLD_NEXT, info.dli_sname);
-  typedef void(*FuncPtr)(void*, Args...);
+  typedef void (*FuncPtr)(void*, Args...);
   auto memb = FuncPtr(func);
   memb(obj, args...);
 }
 
 template<class Ret, class Object, class... Args>
-Ret InvokeReturnNext(Object *obj, Args... args)
+Ret InvokeReturnNext(Object* obj, Args... args)
 {
-  auto addr = __builtin_return_address(0);
+  auto    addr = __builtin_return_address(0);
   Dl_info info;
   dladdr(addr, &info);
   auto func = dlsym(RTLD_NEXT, info.dli_sname);
-  typedef Ret(*FuncPtr)(void*, Args...);
+  typedef Ret (*FuncPtr)(void*, Args...);
   auto memb = FuncPtr(func);
   return memb(obj, args...);
 }
@@ -60,18 +58,17 @@ namespace Internal
 {
 namespace Render
 {
-
 // Store internal PipelineCache as singleton
 
 PipelineCache::PipelineCache(Dali::Graphics::Controller& controller)
 {
   gPipelineCache = this;
-  InvokeNext( this, &controller );
+  InvokeNext(this, &controller);
 }
 
-}
-}
-}
+} // namespace Render
+} // namespace Internal
+} // namespace Dali
 
 int UtcDaliCorePipelineCacheTest(void)
 {
@@ -82,10 +79,10 @@ int UtcDaliCorePipelineCacheTest(void)
 
   // PipelineCache* cache = PipelineCache::GetPipelineCacheWithController( &application.GetGraphicsController() );
   // Pipeline cache must be initialized
-  DALI_TEST_EQUALS( gPipelineCache != 0, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gPipelineCache != 0, true, TEST_LOCATION);
 
   // Test size of level0 nodes (should be 0, nothing added yet)
-  DALI_TEST_EQUALS( (gPipelineCache->level0nodes.size() == 0), true, TEST_LOCATION);
+  DALI_TEST_EQUALS((gPipelineCache->level0nodes.size() == 0), true, TEST_LOCATION);
 
   // Create something to render
   Geometry   geometry   = CreateQuadGeometry();
@@ -107,11 +104,11 @@ int UtcDaliCorePipelineCacheTest(void)
   application.Render();
 
   // 1 pipeline should be added
-  DALI_TEST_EQUALS( (gPipelineCache->level0nodes.size() == 1), true, TEST_LOCATION);
+  DALI_TEST_EQUALS((gPipelineCache->level0nodes.size() == 1), true, TEST_LOCATION);
 
   // Add another actor, new pipeline will be created
-  Shader shader1    = Shader::New("newVertexSrc", "newFragmentSrc");
-  Actor actor1 = Actor::New();
+  Shader   shader1   = Shader::New("newVertexSrc", "newFragmentSrc");
+  Actor    actor1    = Actor::New();
   Renderer renderer1 = Renderer::New(geometry, shader1);
   renderer1.SetProperty(Dali::Renderer::Property::BLEND_MODE, Dali::BlendMode::ON);
   actor1.AddRenderer(renderer1);
@@ -121,11 +118,11 @@ int UtcDaliCorePipelineCacheTest(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( (gPipelineCache->level0nodes.size() == 2), true, TEST_LOCATION);
+  DALI_TEST_EQUALS((gPipelineCache->level0nodes.size() == 2), true, TEST_LOCATION);
 
   // Now add 3rd actor reusing first pipeline
   {
-    Actor actor2 = Actor::New();
+    Actor    actor2    = Actor::New();
     Renderer renderer2 = Renderer::New(geometry, shader);
     renderer2.SetProperty(Dali::Renderer::Property::BLEND_MODE, Dali::BlendMode::ON);
     actor2.AddRenderer(renderer);
@@ -136,11 +133,11 @@ int UtcDaliCorePipelineCacheTest(void)
   application.Render();
 
   // Number of pipelines shouldn't change
-  DALI_TEST_EQUALS( (gPipelineCache->level0nodes.size() == 2), true, TEST_LOCATION);
+  DALI_TEST_EQUALS((gPipelineCache->level0nodes.size() == 2), true, TEST_LOCATION);
 
   // Test final 'noBlend' path on first pipeline
   {
-    Actor actor3 = Actor::New();
+    Actor    actor3    = Actor::New();
     Renderer renderer3 = Renderer::New(geometry, shader);
     renderer3.SetProperty(Dali::Renderer::Property::BLEND_MODE, Dali::BlendMode::OFF);
     actor3.AddRenderer(renderer3);
@@ -151,7 +148,18 @@ int UtcDaliCorePipelineCacheTest(void)
   application.Render();
 
   // Test whether noBlend pipeline is set in cache
-  DALI_TEST_EQUALS( gPipelineCache->level0nodes[0].level1nodes[0].noBlend.pipeline != nullptr, true, TEST_LOCATION);
+  uint32_t noBlendFoundCount = 0u;
+  for(auto& iterLevel0 : gPipelineCache->level0nodes)
+  {
+    for(auto& iterLevel1 : iterLevel0.level1nodes)
+    {
+      if(iterLevel1.noBlend.pipeline != nullptr)
+      {
+        noBlendFoundCount++;
+      }
+    }
+  }
+  DALI_TEST_EQUALS(noBlendFoundCount, 1u, TEST_LOCATION);
 
   END_TEST;
 }
