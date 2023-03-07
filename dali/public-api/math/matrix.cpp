@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -561,26 +561,29 @@ void Matrix::SetInverseTransformComponents(const Vector3& xAxis,
   SetTranslation(inverseTranslation);
 }
 
+Vector3 Matrix::GetScale() const
+{
+  // Derive scale from axis lengths.
+  return Vector3(GetXAxis().Length(), GetYAxis().Length(), GetZAxis().Length());
+}
+
 void Matrix::GetTransformComponents(Vector3&    position,
                                     Quaternion& rotation,
                                     Vector3&    scale) const
 {
   position = GetTranslation3();
+  scale    = GetScale();
 
-  // Derive scale from axis lengths.
-  Vector3 theScale(GetXAxis().Length(), GetYAxis().Length(), GetZAxis().Length());
-  scale = theScale;
-
-  if(!(fabs(theScale.x - Vector3::ONE.x) < ROTATION_EPSILON &&
-       fabs(theScale.y - Vector3::ONE.y) < ROTATION_EPSILON &&
-       fabs(theScale.z - Vector3::ONE.z) < ROTATION_EPSILON))
+  if(!(fabs(scale.x - Vector3::ONE.x) < ROTATION_EPSILON &&
+       fabs(scale.y - Vector3::ONE.y) < ROTATION_EPSILON &&
+       fabs(scale.z - Vector3::ONE.z) < ROTATION_EPSILON))
   {
     MATH_INCREASE_COUNTER(PerformanceMonitor::MATRIX_MULTIPLYS);
     MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY, 9);
 
     // Non-identity scale is embedded into rotation matrix. Remove it first:
     Matrix  m(*this);
-    Vector3 inverseScale(1.0f / theScale.x, 1.0f / theScale.y, 1.0f / theScale.z);
+    Vector3 inverseScale(1.0f / scale.x, 1.0f / scale.y, 1.0f / scale.z);
     m.mMatrix[0] *= inverseScale.x;
     m.mMatrix[1] *= inverseScale.x;
     m.mMatrix[2] *= inverseScale.x;
