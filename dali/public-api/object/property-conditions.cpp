@@ -35,9 +35,9 @@ PropertyCondition::PropertyCondition(const PropertyCondition& handle) = default;
 
 PropertyCondition& PropertyCondition::operator=(const PropertyCondition& rhs) = default;
 
-PropertyCondition::PropertyCondition(PropertyCondition&& rhs) = default;
+PropertyCondition::PropertyCondition(PropertyCondition&& rhs) noexcept = default;
 
-PropertyCondition& PropertyCondition::operator=(PropertyCondition&& rhs) = default;
+PropertyCondition& PropertyCondition::operator=(PropertyCondition&& rhs) noexcept = default;
 
 std::size_t PropertyCondition::GetArgumentCount() const
 {

@@ -42,9 +42,9 @@ Sampler Sampler::DownCast(BaseHandle handle)
 
 Sampler& Sampler::operator=(const Sampler& handle) = default;
 
-Sampler::Sampler(Sampler&& rhs) = default;
+Sampler::Sampler(Sampler&& rhs) noexcept = default;
 
-Sampler& Sampler::operator=(Sampler&& rhs) = default;
+Sampler& Sampler::operator=(Sampler&& rhs) noexcept = default;
 
 void Sampler::SetFilterMode(FilterMode::Type minFilter, FilterMode::Type magFilter)
 {

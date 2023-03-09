@@ -156,7 +156,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  Handle(Handle&& rhs);
+  Handle(Handle&& rhs) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -165,7 +165,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  Handle& operator=(Handle&& rhs);
+  Handle& operator=(Handle&& rhs) noexcept;
 
   /**
    * @brief Downcasts to a handle.

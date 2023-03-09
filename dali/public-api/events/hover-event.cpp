@@ -31,13 +31,13 @@ HoverEvent::HoverEvent()
 
 HoverEvent::HoverEvent(const HoverEvent& rhs) = default;
 
-HoverEvent::HoverEvent(HoverEvent&& rhs) = default;
+HoverEvent::HoverEvent(HoverEvent&& rhs) noexcept = default;
 
 HoverEvent::~HoverEvent() = default;
 
 HoverEvent& HoverEvent::operator=(const HoverEvent& rhs) = default;
 
-HoverEvent& HoverEvent::operator=(HoverEvent&& rhs) = default;
+HoverEvent& HoverEvent::operator=(HoverEvent&& rhs) noexcept = default;
 
 unsigned long HoverEvent::GetTime() const
 {

@@ -73,7 +73,7 @@ public:
    * @SINCE_1_9.28
    * @param[in] rhs A reference to the moved handle
    */
-  PanGesture(PanGesture&& rhs);
+  PanGesture(PanGesture&& rhs) noexcept;
 
   /**
    * @brief Assignment operator.
@@ -89,7 +89,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  PanGesture& operator=(PanGesture&& rhs);
+  PanGesture& operator=(PanGesture&& rhs) noexcept;
 
   /**
    * @brief Non virtual destructor.

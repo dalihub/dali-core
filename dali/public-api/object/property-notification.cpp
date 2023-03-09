@@ -47,9 +47,9 @@ PropertyNotification::PropertyNotification(const PropertyNotification& copy) = d
 
 PropertyNotification& PropertyNotification::operator=(const PropertyNotification& rhs) = default;
 
-PropertyNotification::PropertyNotification(PropertyNotification&& rhs) = default;
+PropertyNotification::PropertyNotification(PropertyNotification&& rhs) noexcept = default;
 
-PropertyNotification& PropertyNotification::operator=(PropertyNotification&& rhs) = default;
+PropertyNotification& PropertyNotification::operator=(PropertyNotification&& rhs) noexcept = default;
 
 PropertyCondition PropertyNotification::GetCondition()
 {

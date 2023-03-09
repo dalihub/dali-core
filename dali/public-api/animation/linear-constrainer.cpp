@@ -47,9 +47,9 @@ LinearConstrainer::LinearConstrainer(Internal::LinearConstrainer* internal)
 
 LinearConstrainer& LinearConstrainer::operator=(const LinearConstrainer& rhs) = default;
 
-LinearConstrainer::LinearConstrainer(LinearConstrainer&& rhs) = default;
+LinearConstrainer::LinearConstrainer(LinearConstrainer&& rhs) noexcept = default;
 
-LinearConstrainer& LinearConstrainer::operator=(LinearConstrainer&& rhs) = default;
+LinearConstrainer& LinearConstrainer::operator=(LinearConstrainer&& rhs) noexcept = default;
 
 void LinearConstrainer::Apply(Dali::Property target, Dali::Property source, const Vector2& range, const Vector2& wrap)
 {

@@ -237,7 +237,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  Animation(Animation&& rhs);
+  Animation(Animation&& rhs) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -246,7 +246,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  Animation& operator=(Animation&& rhs);
+  Animation& operator=(Animation&& rhs) noexcept;
 
   /**
    * @brief Sets the duration of an animation.

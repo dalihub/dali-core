@@ -33,9 +33,9 @@ TypeInfo::TypeInfo(const TypeInfo& copy) = default;
 
 TypeInfo& TypeInfo::operator=(const TypeInfo& rhs) = default;
 
-TypeInfo::TypeInfo(TypeInfo&& rhs) = default;
+TypeInfo::TypeInfo(TypeInfo&& rhs) noexcept = default;
 
-TypeInfo& TypeInfo::operator=(TypeInfo&& rhs) = default;
+TypeInfo& TypeInfo::operator=(TypeInfo&& rhs) noexcept = default;
 
 const std::string& TypeInfo::GetName() const
 {

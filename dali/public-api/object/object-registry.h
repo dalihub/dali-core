@@ -113,7 +113,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  ObjectRegistry(ObjectRegistry&& rhs);
+  ObjectRegistry(ObjectRegistry&& rhs) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -122,7 +122,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  ObjectRegistry& operator=(ObjectRegistry&& rhs);
+  ObjectRegistry& operator=(ObjectRegistry&& rhs) noexcept;
 
 public: // Signals
   /**

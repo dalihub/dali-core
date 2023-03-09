@@ -69,9 +69,9 @@ struct AngleAxis
 
 public:
   AngleAxis(const AngleAxis&) = default;            ///< Default copy constructor
-  AngleAxis(AngleAxis&&)      = default;            ///< Default move constructor
+  AngleAxis(AngleAxis&&) noexcept = default;            ///< Default move constructor
   AngleAxis& operator=(const AngleAxis&) = default; ///< Default copy assignment operator
-  AngleAxis& operator=(AngleAxis&&) = default;      ///< Default move assignment operator
+  AngleAxis& operator=(AngleAxis&&) noexcept = default;      ///< Default move assignment operator
 
 public:
   Radian  angle; ///< The angle in radians

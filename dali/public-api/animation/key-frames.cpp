@@ -45,9 +45,9 @@ KeyFrames::KeyFrames(const KeyFrames& handle) = default;
 
 KeyFrames& KeyFrames::operator=(const KeyFrames& rhs) = default;
 
-KeyFrames::KeyFrames(KeyFrames&& rhs) = default;
+KeyFrames::KeyFrames(KeyFrames&& rhs) noexcept = default;
 
-KeyFrames& KeyFrames::operator=(KeyFrames&& rhs) = default;
+KeyFrames& KeyFrames::operator=(KeyFrames&& rhs) noexcept = default;
 
 Property::Type KeyFrames::GetType() const
 {

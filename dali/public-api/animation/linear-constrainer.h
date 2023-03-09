@@ -133,7 +133,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  LinearConstrainer(LinearConstrainer&& rhs);
+  LinearConstrainer(LinearConstrainer&& rhs) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -142,7 +142,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  LinearConstrainer& operator=(LinearConstrainer&& rhs);
+  LinearConstrainer& operator=(LinearConstrainer&& rhs) noexcept;
 
   /**
    * @brief Applies the linear constraint to the target property.

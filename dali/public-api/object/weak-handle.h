@@ -84,7 +84,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  WeakHandleBase(WeakHandleBase&& rhs);
+  WeakHandleBase(WeakHandleBase&& rhs) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -93,7 +93,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  WeakHandleBase& operator=(WeakHandleBase&& rhs);
+  WeakHandleBase& operator=(WeakHandleBase&& rhs) noexcept;
 
   /**
    * @brief Equality operator overload.

@@ -111,7 +111,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  PropertyNotification(PropertyNotification&& rhs);
+  PropertyNotification(PropertyNotification&& rhs) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -120,7 +120,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  PropertyNotification& operator=(PropertyNotification&& rhs);
+  PropertyNotification& operator=(PropertyNotification&& rhs) noexcept;
 
   /**
    * @brief Gets the condition of this notification.

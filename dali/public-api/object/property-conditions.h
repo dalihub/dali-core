@@ -77,7 +77,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  PropertyCondition(PropertyCondition&& rhs);
+  PropertyCondition(PropertyCondition&& rhs) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -86,7 +86,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  PropertyCondition& operator=(PropertyCondition&& rhs);
+  PropertyCondition& operator=(PropertyCondition&& rhs) noexcept;
 
 public:
   /**

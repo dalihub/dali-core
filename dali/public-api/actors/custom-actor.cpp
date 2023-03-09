@@ -51,9 +51,9 @@ CustomActor::CustomActor(const CustomActor& copy) = default;
 
 CustomActor& CustomActor::operator=(const CustomActor& rhs) = default;
 
-CustomActor::CustomActor(CustomActor&& rhs) = default;
+CustomActor::CustomActor(CustomActor&& rhs) noexcept = default;
 
-CustomActor& CustomActor::operator=(CustomActor&& rhs) = default;
+CustomActor& CustomActor::operator=(CustomActor&& rhs) noexcept = default;
 
 CustomActorImpl& CustomActor::GetImplementation()
 {

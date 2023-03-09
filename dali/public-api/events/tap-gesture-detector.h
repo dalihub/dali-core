@@ -145,7 +145,7 @@ public: // Creation & Destruction
    * @SINCE_2_2.4
    * @param[in] handle A reference to the moved handle
    */
-  TapGestureDetector(TapGestureDetector&& handle);
+  TapGestureDetector(TapGestureDetector&& handle) noexcept;
 
   /**
    * @brief This move assignment operator is required for (smart) pointer semantics.
@@ -154,7 +154,7 @@ public: // Creation & Destruction
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  TapGestureDetector& operator=(TapGestureDetector&& rhs);
+  TapGestureDetector& operator=(TapGestureDetector&& rhs) noexcept;
 
 public: // Setters
   /**

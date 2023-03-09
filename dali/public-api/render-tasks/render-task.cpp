@@ -61,9 +61,9 @@ RenderTask::RenderTask(const RenderTask& handle) = default;
 
 RenderTask& RenderTask::operator=(const RenderTask& rhs) = default;
 
-RenderTask::RenderTask(RenderTask&& rhs) = default;
+RenderTask::RenderTask(RenderTask&& rhs) noexcept = default;
 
-RenderTask& RenderTask::operator=(RenderTask&& rhs) = default;
+RenderTask& RenderTask::operator=(RenderTask&& rhs) noexcept = default;
 
 void RenderTask::SetSourceActor(Actor actor)
 {

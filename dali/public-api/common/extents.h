@@ -52,6 +52,13 @@ struct DALI_CORE_API Extents
   Extents(const Extents& copy) = default;
 
   /**
+   * @brief Move constructor.
+   * @SINCE_2_2.17
+   * @param[in] move A reference to the moved Extents
+   */
+  Extents(Extents&& move) = default;
+
+  /**
    * @brief Constructor.
    *
    * @SINCE_1_2.62
@@ -69,6 +76,14 @@ struct DALI_CORE_API Extents
    * @return Itself
    */
   Extents& operator=(const Extents& copy) = default;
+
+  /**
+   * @brief Move Assignment operator.
+   * @SINCE_2_2.17
+   * @param[in] move A reference to the moved Extents
+   * @return Itself
+   */
+  Extents& operator=(Extents&& move) = default;
 
   /**
    * @brief Assignment operator.

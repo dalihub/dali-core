@@ -48,9 +48,9 @@ PinchGestureDetector::PinchGestureDetector(const PinchGestureDetector& handle) =
 
 PinchGestureDetector& PinchGestureDetector::operator=(const PinchGestureDetector& rhs) = default;
 
-PinchGestureDetector::PinchGestureDetector(PinchGestureDetector&& handle) = default;
+PinchGestureDetector::PinchGestureDetector(PinchGestureDetector&& handle) noexcept = default;
 
-PinchGestureDetector& PinchGestureDetector::operator=(PinchGestureDetector&& rhs) = default;
+PinchGestureDetector& PinchGestureDetector::operator=(PinchGestureDetector&& rhs) noexcept = default;
 
 PinchGestureDetector::DetectedSignalType& PinchGestureDetector::DetectedSignal()
 {

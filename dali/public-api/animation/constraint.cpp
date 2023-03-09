@@ -51,9 +51,9 @@ Constraint::Constraint(const Constraint& constraint) = default;
 
 Constraint& Constraint::operator=(const Constraint& rhs) = default;
 
-Constraint::Constraint(Constraint&& rhs) = default;
+Constraint::Constraint(Constraint&& rhs) noexcept = default;
 
-Constraint& Constraint::operator=(Constraint&& rhs) = default;
+Constraint& Constraint::operator=(Constraint&& rhs) noexcept = default;
 
 Constraint Constraint::DownCast(BaseHandle baseHandle)
 {

@@ -49,9 +49,9 @@ Texture Texture::DownCast(BaseHandle handle)
 
 Texture& Texture::operator=(const Texture& handle) = default;
 
-Texture::Texture(Texture&& rhs) = default;
+Texture::Texture(Texture&& rhs) noexcept = default;
 
-Texture& Texture::operator=(Texture&& rhs) = default;
+Texture& Texture::operator=(Texture&& rhs) noexcept = default;
 
 bool Texture::Upload(PixelData pixelData)
 {

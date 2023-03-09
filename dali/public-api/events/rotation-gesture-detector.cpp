@@ -48,9 +48,9 @@ RotationGestureDetector::RotationGestureDetector(const RotationGestureDetector& 
 
 RotationGestureDetector& RotationGestureDetector::operator=(const RotationGestureDetector& rhs) = default;
 
-RotationGestureDetector::RotationGestureDetector(RotationGestureDetector&& handle) = default;
+RotationGestureDetector::RotationGestureDetector(RotationGestureDetector&& handle) noexcept = default;
 
-RotationGestureDetector& RotationGestureDetector::operator=(RotationGestureDetector&& rhs) = default;
+RotationGestureDetector& RotationGestureDetector::operator=(RotationGestureDetector&& rhs) noexcept = default;
 
 RotationGestureDetector::DetectedSignalType& RotationGestureDetector::DetectedSignal()
 {

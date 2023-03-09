@@ -49,9 +49,9 @@ Scene::Scene(const Scene& handle) = default;
 
 Scene& Scene::operator=(const Scene& rhs) = default;
 
-Scene::Scene(Scene&& handle) = default;
+Scene::Scene(Scene&& handle) noexcept = default;
 
-Scene& Scene::operator=(Scene&& rhs) = default;
+Scene& Scene::operator=(Scene&& rhs) noexcept = default;
 
 Scene::Scene(Internal::Scene* internal)
 : BaseHandle(internal)

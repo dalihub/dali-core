@@ -47,9 +47,9 @@ Path::Path(Internal::Path* internal)
 
 Path& Path::operator=(const Path& rhs) = default;
 
-Path::Path(Path&& rhs) = default;
+Path::Path(Path&& rhs) noexcept = default;
 
-Path& Path::operator=(Path&& rhs) = default;
+Path& Path::operator=(Path&& rhs) noexcept = default;
 
 void Path::AddPoint(const Vector3& point)
 {

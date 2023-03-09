@@ -51,9 +51,9 @@ Renderer Renderer::DownCast(BaseHandle handle)
 
 Renderer& Renderer::operator=(const Renderer& handle) = default;
 
-Renderer::Renderer(Renderer&& rhs) = default;
+Renderer::Renderer(Renderer&& rhs) noexcept = default;
 
-Renderer& Renderer::operator=(Renderer&& rhs) = default;
+Renderer& Renderer::operator=(Renderer&& rhs) noexcept = default;
 
 void Renderer::SetGeometry(Geometry& geometry)
 {

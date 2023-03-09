@@ -208,7 +208,7 @@ public:
    * @SINCE_2_2.4
    * @param[in] rhs A reference to the actor to move
    */
-  CameraActor(CameraActor&& rhs);
+  CameraActor(CameraActor&& rhs) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -217,7 +217,7 @@ public:
    * @param[in] rhs A reference to the actor to move
    * @return A reference to this
    */
-  CameraActor& operator=(CameraActor&& rhs);
+  CameraActor& operator=(CameraActor&& rhs) noexcept;
 
   /**
    * @brief Sets the camera type.

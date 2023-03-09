@@ -66,7 +66,7 @@ public:
   /**
    * @brief Move construct
    */
-  OrderedSet(OrderedSet&& rhs)
+  OrderedSet(OrderedSet&& rhs) noexcept
   : mMap(std::move(rhs.mMap)),
     mList(std::move(rhs.mList))
   {
@@ -78,7 +78,7 @@ public:
   /**
    * @brief Move assign
    */
-  OrderedSet& operator=(OrderedSet&& rhs)
+  OrderedSet& operator=(OrderedSet&& rhs) noexcept
   {
     Clear();
     mMap  = std::move(rhs.mMap);

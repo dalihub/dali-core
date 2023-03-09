@@ -44,9 +44,9 @@ Shader Shader::DownCast(BaseHandle handle)
 
 Shader& Shader::operator=(const Shader& handle) = default;
 
-Shader::Shader(Shader&& rhs) = default;
+Shader::Shader(Shader&& rhs) noexcept = default;
 
-Shader& Shader::operator=(Shader&& rhs) = default;
+Shader& Shader::operator=(Shader&& rhs) noexcept = default;
 
 Shader::Shader(Internal::Shader* pointer)
 : Handle(pointer)
