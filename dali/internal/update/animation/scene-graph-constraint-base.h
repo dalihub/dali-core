@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_CONSTRAINT_BASE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -232,9 +232,10 @@ protected:
   bool mFirstApply : 1;
   bool mDisconnected : 1;
 
+  PropertyOwnerContainer mObservedOwners; ///< A set of pointers to each observed object. Not owned.
+
 private:
-  PropertyOwnerContainer mObservedOwners;    ///< A set of pointers to each observed object. Not owned.
-  LifecycleObserver*     mLifecycleObserver; ///< Resetter observers this object
+  LifecycleObserver* mLifecycleObserver; ///< Resetter observers this object
 
 #ifdef DEBUG_ENABLED
   static uint32_t mCurrentInstanceCount; ///< The current number of Constraint instances in existence.

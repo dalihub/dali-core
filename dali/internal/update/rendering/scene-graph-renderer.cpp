@@ -736,19 +736,6 @@ void Renderer::UpdateUniformMap(BufferIndex updateBufferIndex)
     mRegenerateUniformMap = false;
     SetUpdated(true);
   }
-
-  uint64_t                                  hash                   = 0xc70f6907UL;
-  const SceneGraph::UniformMapDataProvider& uniformMapDataProvider = GetUniformMapDataProvider();
-  const SceneGraph::CollectedUniformMap&    collectedUniformMap    = uniformMapDataProvider.GetCollectedUniformMap();
-  for(uint32_t i = 0u, count = collectedUniformMap.Count(); i < count; ++i)
-  {
-    hash = collectedUniformMap.mUniformMap[i].propertyPtr->Hash(updateBufferIndex, hash);
-  }
-  if(mUniformsHash != hash)
-  {
-    mUniformsHash = hash;
-    SetUpdated(true);
-  }
 }
 
 void Renderer::SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, uint32_t size)
@@ -785,6 +772,15 @@ void Renderer::OnMappingChanged()
 const CollectedUniformMap& Renderer::GetCollectedUniformMap() const
 {
   return mCollectedUniformMap;
+}
+
+bool Renderer::IsUpdated() const
+{
+  if(Updated() || (mShader && mShader->Updated()))
+  {
+    return true;
+  }
+  return false;
 }
 
 Vector4 Renderer::GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, const Vector4& originalUpdateArea) noexcept

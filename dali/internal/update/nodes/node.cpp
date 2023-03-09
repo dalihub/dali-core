@@ -281,20 +281,6 @@ void Node::ResetDirtyFlags(BufferIndex updateBufferIndex)
   mUpdateAreaChanged = false;
 }
 
-void Node::UpdateUniformHash(BufferIndex bufferIndex)
-{
-  uint64_t hash = 0xc70f6907UL;
-  for(uint32_t i = 0u, count = mUniformMaps.Count(); i < count; ++i)
-  {
-    hash = mUniformMaps[i].propertyPtr->Hash(bufferIndex, hash);
-  }
-  if(mUniformsHash != hash)
-  {
-    mUniformsHash = hash;
-    SetUpdated(true);
-  }
-}
-
 void Node::SetParent(Node& parentNode)
 {
   DALI_ASSERT_ALWAYS(this != &parentNode);

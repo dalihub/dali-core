@@ -918,12 +918,6 @@ public:
    */
   void ResetDirtyFlags(BufferIndex updateBufferIndex);
 
-  /**
-   * Update uniform hash
-   * @param[in] bufferIndex The buffer to read from.
-   */
-  void UpdateUniformHash(BufferIndex bufferIndex);
-
 protected:
   /**
    * Set the parent of a Node.
@@ -1007,7 +1001,6 @@ public: // Default properties
   InheritedColor              mWorldColor;     ///< Full inherited color
   Vector4                     mUpdateAreaHint; ///< Update area hint is provided for damaged area calculation. (x, y, width, height)
 
-  uint64_t       mUniformsHash{0u};     ///< Hash of uniform map property values
   uint32_t       mClippingSortModifier; ///< Contains bit-packed clipping information for quick access when sorting
   const uint32_t mId;                   ///< The Unique ID of the node.
 
