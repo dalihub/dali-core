@@ -35,9 +35,9 @@ TypeRegistry::TypeRegistry(const TypeRegistry& copy) = default;
 
 TypeRegistry& TypeRegistry::operator=(const TypeRegistry& rhs) = default;
 
-TypeRegistry::TypeRegistry(TypeRegistry&& rhs) = default;
+TypeRegistry::TypeRegistry(TypeRegistry&& rhs) noexcept = default;
 
-TypeRegistry& TypeRegistry::operator=(TypeRegistry&& rhs) = default;
+TypeRegistry& TypeRegistry::operator=(TypeRegistry&& rhs) noexcept = default;
 
 TypeRegistry TypeRegistry::Get()
 {

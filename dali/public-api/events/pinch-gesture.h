@@ -69,7 +69,7 @@ public:
    * @SINCE_1_9.28
    * @param[in] rhs A reference to the moved handle
    */
-  PinchGesture(PinchGesture&& rhs);
+  PinchGesture(PinchGesture&& rhs) noexcept;
 
   /**
    * @brief Assignment operator.
@@ -85,7 +85,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  PinchGesture& operator=(PinchGesture&& rhs);
+  PinchGesture& operator=(PinchGesture&& rhs) noexcept;
 
   /**
    * @brief Non virtual destructor.

@@ -97,7 +97,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  Sampler(Sampler&& rhs);
+  Sampler(Sampler&& rhs) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -106,7 +106,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  Sampler& operator=(Sampler&& rhs);
+  Sampler& operator=(Sampler&& rhs) noexcept;
 
   /**
    * @brief Sets the filter modes for this sampler.

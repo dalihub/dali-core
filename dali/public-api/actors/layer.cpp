@@ -43,9 +43,9 @@ Layer::Layer(const Layer& copy) = default;
 
 Layer& Layer::operator=(const Layer& rhs) = default;
 
-Layer::Layer(Layer&& rhs) = default;
+Layer::Layer(Layer&& rhs) noexcept = default;
 
-Layer& Layer::operator=(Layer&& rhs) = default;
+Layer& Layer::operator=(Layer&& rhs) noexcept = default;
 
 void Layer::Raise()
 {

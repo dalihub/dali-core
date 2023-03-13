@@ -108,13 +108,13 @@ WeakHandleBase& WeakHandleBase::operator=(const WeakHandleBase& rhs)
   return *this;
 }
 
-WeakHandleBase::WeakHandleBase(WeakHandleBase&& rhs)
+WeakHandleBase::WeakHandleBase(WeakHandleBase&& rhs) noexcept
 : mImpl(rhs.mImpl)
 {
   rhs.mImpl = nullptr;
 }
 
-WeakHandleBase& WeakHandleBase::operator=(WeakHandleBase&& rhs)
+WeakHandleBase& WeakHandleBase::operator=(WeakHandleBase&& rhs) noexcept
 {
   if(this != &rhs)
   {

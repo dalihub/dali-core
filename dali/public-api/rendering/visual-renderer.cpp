@@ -44,9 +44,9 @@ VisualRenderer VisualRenderer::DownCast(BaseHandle handle)
 
 VisualRenderer& VisualRenderer::operator=(const VisualRenderer& handle) = default;
 
-VisualRenderer::VisualRenderer(VisualRenderer&& rhs) = default;
+VisualRenderer::VisualRenderer(VisualRenderer&& rhs) noexcept = default;
 
-VisualRenderer& VisualRenderer::operator=(VisualRenderer&& rhs) = default;
+VisualRenderer& VisualRenderer::operator=(VisualRenderer&& rhs) noexcept = default;
 
 VisualRenderer::VisualRenderer(Internal::VisualRenderer* pointer)
 : Dali::Renderer(pointer)

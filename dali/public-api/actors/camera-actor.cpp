@@ -62,9 +62,9 @@ CameraActor::CameraActor(const CameraActor& copy) = default;
 
 CameraActor& CameraActor::operator=(const CameraActor& rhs) = default;
 
-CameraActor::CameraActor(CameraActor&& rhs) = default;
+CameraActor::CameraActor(CameraActor&& rhs) noexcept = default;
 
-CameraActor& CameraActor::operator=(CameraActor&& rhs) = default;
+CameraActor& CameraActor::operator=(CameraActor&& rhs) noexcept = default;
 
 void CameraActor::SetType(Dali::Camera::Type type)
 {

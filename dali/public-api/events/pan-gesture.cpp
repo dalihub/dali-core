@@ -33,11 +33,11 @@ PanGesture::PanGesture() = default;
 
 PanGesture::PanGesture(const PanGesture& rhs) = default;
 
-PanGesture::PanGesture(PanGesture&& rhs) = default;
+PanGesture::PanGesture(PanGesture&& rhs) noexcept = default;
 
 PanGesture& PanGesture::operator=(const PanGesture& rhs) = default;
 
-PanGesture& PanGesture::operator=(PanGesture&& rhs) = default;
+PanGesture& PanGesture::operator=(PanGesture&& rhs) noexcept = default;
 
 PanGesture::~PanGesture() = default;
 

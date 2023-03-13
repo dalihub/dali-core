@@ -126,7 +126,7 @@ public:
    *
    * @param [in] handle A reference to the moved handle
    */
-  Scene(Scene&& handle);
+  Scene(Scene&& handle) noexcept;
 
   /**
    * @brief This move assignment operator is required for (smart) pointer semantics.
@@ -134,7 +134,7 @@ public:
    * @param [in] rhs  A reference to the moved handle
    * @return A reference to this
    */
-  Scene& operator=(Scene&& rhs);
+  Scene& operator=(Scene&& rhs) noexcept;
 
   /**
    * @brief Adds a child Actor to the Scene.

@@ -33,11 +33,11 @@ TapGesture::TapGesture() = default;
 
 TapGesture::TapGesture(const TapGesture& rhs) = default;
 
-TapGesture::TapGesture(TapGesture&& rhs) = default;
+TapGesture::TapGesture(TapGesture&& rhs) noexcept = default;
 
 TapGesture& TapGesture::operator=(const TapGesture& rhs) = default;
 
-TapGesture& TapGesture::operator=(TapGesture&& rhs) = default;
+TapGesture& TapGesture::operator=(TapGesture&& rhs) noexcept = default;
 
 TapGesture::~TapGesture() = default;
 

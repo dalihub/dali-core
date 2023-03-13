@@ -807,7 +807,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the actor to move
    */
-  Actor(Actor&& rhs);
+  Actor(Actor&& rhs) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -816,7 +816,7 @@ public:
    * @param[in] rhs A reference to the actor to move
    * @return A reference to this
    */
-  Actor& operator=(Actor&& rhs);
+  Actor& operator=(Actor&& rhs) noexcept;
 
   // Containment
 

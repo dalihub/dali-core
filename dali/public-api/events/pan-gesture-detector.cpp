@@ -56,9 +56,9 @@ PanGestureDetector::PanGestureDetector(const PanGestureDetector& handle) = defau
 
 PanGestureDetector& PanGestureDetector::operator=(const PanGestureDetector& rhs) = default;
 
-PanGestureDetector::PanGestureDetector(PanGestureDetector&& handle) = default;
+PanGestureDetector::PanGestureDetector(PanGestureDetector&& handle) noexcept = default;
 
-PanGestureDetector& PanGestureDetector::operator=(PanGestureDetector&& rhs) = default;
+PanGestureDetector& PanGestureDetector::operator=(PanGestureDetector&& rhs) noexcept = default;
 
 void PanGestureDetector::SetMinimumTouchesRequired(uint32_t minimum)
 {

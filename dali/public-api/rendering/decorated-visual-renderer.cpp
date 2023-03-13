@@ -44,9 +44,9 @@ DecoratedVisualRenderer DecoratedVisualRenderer::DownCast(BaseHandle handle)
 
 DecoratedVisualRenderer& DecoratedVisualRenderer::operator=(const DecoratedVisualRenderer& handle) = default;
 
-DecoratedVisualRenderer::DecoratedVisualRenderer(DecoratedVisualRenderer&& rhs) = default;
+DecoratedVisualRenderer::DecoratedVisualRenderer(DecoratedVisualRenderer&& rhs) noexcept = default;
 
-DecoratedVisualRenderer& DecoratedVisualRenderer::operator=(DecoratedVisualRenderer&& rhs) = default;
+DecoratedVisualRenderer& DecoratedVisualRenderer::operator=(DecoratedVisualRenderer&& rhs) noexcept = default;
 
 void DecoratedVisualRenderer::RegisterCornerRadiusUniform()
 {

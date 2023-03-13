@@ -138,7 +138,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  FrameBuffer(FrameBuffer&& rhs);
+  FrameBuffer(FrameBuffer&& rhs) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -147,7 +147,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  FrameBuffer& operator=(FrameBuffer&& rhs);
+  FrameBuffer& operator=(FrameBuffer&& rhs) noexcept;
 
   /**
    * @brief Attach the base LOD of a 2D texture to the framebuffer for color rendering.

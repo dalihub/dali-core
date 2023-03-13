@@ -42,9 +42,9 @@ Geometry Geometry::DownCast(BaseHandle handle)
 
 Geometry& Geometry::operator=(const Geometry& handle) = default;
 
-Geometry::Geometry(Geometry&& rhs) = default;
+Geometry::Geometry(Geometry&& rhs) noexcept = default;
 
-Geometry& Geometry::operator=(Geometry&& rhs) = default;
+Geometry& Geometry::operator=(Geometry&& rhs) noexcept = default;
 
 std::size_t Geometry::AddVertexBuffer(VertexBuffer& vertexBuffer)
 {

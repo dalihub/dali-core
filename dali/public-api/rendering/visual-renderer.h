@@ -204,7 +204,7 @@ public:
    * @SINCE_2_1.13
    * @param[in] rhs A reference to the moved handle
    */
-  VisualRenderer(VisualRenderer&& rhs);
+  VisualRenderer(VisualRenderer&& rhs) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -213,7 +213,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  VisualRenderer& operator=(VisualRenderer&& rhs);
+  VisualRenderer& operator=(VisualRenderer&& rhs) noexcept;
 
 public:
   /// @cond internal

@@ -85,7 +85,7 @@ public:
    * @SINCE_1_9.28
    * @param[in] other The TouchEvent to move
    */
-  TouchEvent(TouchEvent&& other);
+  TouchEvent(TouchEvent&& other) noexcept;
 
   /**
    * @brief Destructor.
@@ -112,7 +112,7 @@ public:
    * @param[in] other The TouchEvent to move
    * @return A reference to this
    */
-  TouchEvent& operator=(TouchEvent&& other);
+  TouchEvent& operator=(TouchEvent&& other) noexcept;
 
   // Getters
 

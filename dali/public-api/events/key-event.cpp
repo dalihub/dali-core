@@ -30,13 +30,13 @@ KeyEvent::KeyEvent()
 
 KeyEvent::KeyEvent(const KeyEvent& rhs) = default;
 
-KeyEvent::KeyEvent(KeyEvent&& rhs) = default;
+KeyEvent::KeyEvent(KeyEvent&& rhs) noexcept = default;
 
 KeyEvent::~KeyEvent() = default;
 
 KeyEvent& KeyEvent::operator=(const KeyEvent& rhs) = default;
 
-KeyEvent& KeyEvent::operator=(KeyEvent&& rhs) = default;
+KeyEvent& KeyEvent::operator=(KeyEvent&& rhs) noexcept = default;
 
 bool KeyEvent::IsShiftModifier() const
 {

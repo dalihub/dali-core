@@ -107,7 +107,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  KeyFrames(KeyFrames&& rhs);
+  KeyFrames(KeyFrames&& rhs) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -116,7 +116,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  KeyFrames& operator=(KeyFrames&& rhs);
+  KeyFrames& operator=(KeyFrames&& rhs) noexcept;
 
   /**
    * @brief Gets the type of the key frame.

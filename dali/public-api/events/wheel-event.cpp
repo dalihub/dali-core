@@ -30,13 +30,13 @@ WheelEvent::WheelEvent()
 
 WheelEvent::WheelEvent(const WheelEvent& rhs) = default;
 
-WheelEvent::WheelEvent(WheelEvent&& rhs) = default;
+WheelEvent::WheelEvent(WheelEvent&& rhs) noexcept = default;
 
 WheelEvent::~WheelEvent() = default;
 
 WheelEvent& WheelEvent::operator=(const WheelEvent& rhs) = default;
 
-WheelEvent& WheelEvent::operator=(WheelEvent&& rhs) = default;
+WheelEvent& WheelEvent::operator=(WheelEvent&& rhs) noexcept = default;
 
 bool WheelEvent::IsShiftModifier() const
 {

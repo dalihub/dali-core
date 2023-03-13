@@ -30,13 +30,13 @@ TouchEvent::TouchEvent() = default;
 
 TouchEvent::TouchEvent(const TouchEvent& other) = default;
 
-TouchEvent::TouchEvent(TouchEvent&& other) = default;
+TouchEvent::TouchEvent(TouchEvent&& other) noexcept = default;
 
 TouchEvent::~TouchEvent() = default;
 
 TouchEvent& TouchEvent::operator=(const TouchEvent& other) = default;
 
-TouchEvent& TouchEvent::operator=(TouchEvent&& other) = default;
+TouchEvent& TouchEvent::operator=(TouchEvent&& other) noexcept = default;
 
 unsigned long TouchEvent::GetTime() const
 {

@@ -66,7 +66,7 @@ public:
    * @SINCE_1_9.28
    * @param[in] rhs A reference to the moved handle
    */
-  RotationGesture(RotationGesture&& rhs);
+  RotationGesture(RotationGesture&& rhs) noexcept;
 
   /**
    * @brief Assignment operator.
@@ -82,7 +82,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  RotationGesture& operator=(RotationGesture&& rhs);
+  RotationGesture& operator=(RotationGesture&& rhs) noexcept;
 
   /**
    * @brief Non virtual destructor.

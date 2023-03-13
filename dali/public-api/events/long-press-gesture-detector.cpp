@@ -62,9 +62,9 @@ LongPressGestureDetector::LongPressGestureDetector(const LongPressGestureDetecto
 
 LongPressGestureDetector& LongPressGestureDetector::operator=(const LongPressGestureDetector& rhs) = default;
 
-LongPressGestureDetector::LongPressGestureDetector(LongPressGestureDetector&& handle) = default;
+LongPressGestureDetector::LongPressGestureDetector(LongPressGestureDetector&& handle) noexcept = default;
 
-LongPressGestureDetector& LongPressGestureDetector::operator=(LongPressGestureDetector&& rhs) = default;
+LongPressGestureDetector& LongPressGestureDetector::operator=(LongPressGestureDetector&& rhs) noexcept = default;
 
 void LongPressGestureDetector::SetTouchesRequired(uint32_t touches)
 {

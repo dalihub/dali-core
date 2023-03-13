@@ -88,7 +88,7 @@ public:
    * @SINCE_1_9.26
    * @param[in] rhs A reference to the moved WheelEvent
    */
-  WheelEvent(WheelEvent&& rhs);
+  WheelEvent(WheelEvent&& rhs) noexcept;
 
   /**
    * @brief Destructor.
@@ -112,7 +112,7 @@ public:
    * @param[in] rhs A reference to the moved WheelEvent
    * @return A reference to this
    */
-  WheelEvent& operator=(WheelEvent&& rhs);
+  WheelEvent& operator=(WheelEvent&& rhs) noexcept;
 
   /**
    * @brief Checks to see if Shift key modifier has been supplied.

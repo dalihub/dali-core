@@ -176,7 +176,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  Shader(Shader&& rhs);
+  Shader(Shader&& rhs) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -185,7 +185,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  Shader& operator=(Shader&& rhs);
+  Shader& operator=(Shader&& rhs) noexcept;
 
   /**
    * @brief Get shader preprocessor of shading language version.

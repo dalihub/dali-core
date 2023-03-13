@@ -59,9 +59,9 @@ PixelData::PixelData(const PixelData& handle) = default;
 
 PixelData& PixelData::operator=(const PixelData& rhs) = default;
 
-PixelData::PixelData(PixelData&& rhs) = default;
+PixelData::PixelData(PixelData&& rhs) noexcept = default;
 
-PixelData& PixelData::operator=(PixelData&& rhs) = default;
+PixelData& PixelData::operator=(PixelData&& rhs) noexcept = default;
 
 uint32_t PixelData::GetWidth() const
 {

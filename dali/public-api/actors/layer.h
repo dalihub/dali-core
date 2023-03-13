@@ -277,7 +277,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs The layer to move
    */
-  Layer(Layer&& rhs);
+  Layer(Layer&& rhs) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -286,7 +286,7 @@ public:
    * @param[in] rhs The layer to move
    * @return A reference to this
    */
-  Layer& operator=(Layer&& rhs);
+  Layer& operator=(Layer&& rhs) noexcept;
 
   /**
    * @brief Increments the depth of the layer.

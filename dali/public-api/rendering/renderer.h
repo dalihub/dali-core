@@ -484,7 +484,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  Renderer(Renderer&& rhs);
+  Renderer(Renderer&& rhs) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -493,7 +493,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  Renderer& operator=(Renderer&& rhs);
+  Renderer& operator=(Renderer&& rhs) noexcept;
 
   /**
    * @brief Sets the geometry to be used by this renderer.

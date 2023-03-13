@@ -75,7 +75,7 @@ public:
    * @SINCE_1_9.25
    * @param[in] rhs A reference to the moved HoverEvent
    */
-  HoverEvent(HoverEvent&& rhs);
+  HoverEvent(HoverEvent&& rhs) noexcept;
 
   /**
    * @brief Destructor.
@@ -101,7 +101,7 @@ public:
    * @param[in] rhs A reference to the moved HoverEvent
    * @return A reference to this
    */
-  HoverEvent& operator=(HoverEvent&& rhs);
+  HoverEvent& operator=(HoverEvent&& rhs) noexcept;
 
   // Getters
 

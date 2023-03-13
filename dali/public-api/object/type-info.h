@@ -126,7 +126,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  TypeInfo(TypeInfo&& rhs);
+  TypeInfo(TypeInfo&& rhs) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -135,7 +135,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  TypeInfo& operator=(TypeInfo&& rhs);
+  TypeInfo& operator=(TypeInfo&& rhs) noexcept;
 
   /**
    * @brief Retrieves the type name for this type.

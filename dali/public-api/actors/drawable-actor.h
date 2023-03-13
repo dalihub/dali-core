@@ -60,6 +60,39 @@ public:
    */
   DrawableActor() = default;
 
+  /**
+   * @brief Copy constructor.
+   *
+   * @SINCE_2_2.17
+   * @param[in] copy The actor to copy
+   */
+  DrawableActor(const DrawableActor& copy) = default;
+
+  /**
+   * @brief Assignment operator.
+   *
+   * @SINCE_2_2.17
+   * @param[in] rhs The actor to copy
+   * @return A reference to this
+   */
+  DrawableActor& operator=(const DrawableActor& rhs) = default;
+
+  /**
+   * @brief Move constructor.
+   *
+   * @SINCE_2_2.17
+   * @param[in] rhs The actor to move
+   */
+  DrawableActor(DrawableActor&& rhs) noexcept = default;
+
+  /**
+   * @brief Move assignment operator.
+   *
+   * @SINCE_2_2.17
+   * @param[in] rhs The actor to move
+   * @return A reference to this
+   */
+  DrawableActor& operator=(DrawableActor&& rhs) noexcept = default;
 private:
   explicit DrawableActor(Internal::DrawableActor* internal);
 };

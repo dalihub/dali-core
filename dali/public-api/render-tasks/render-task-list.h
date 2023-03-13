@@ -98,7 +98,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  RenderTaskList(RenderTaskList&& rhs);
+  RenderTaskList(RenderTaskList&& rhs) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -107,7 +107,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  RenderTaskList& operator=(RenderTaskList&& rhs);
+  RenderTaskList& operator=(RenderTaskList&& rhs) noexcept;
 
   /**
    * @brief Creates a new RenderTask.
