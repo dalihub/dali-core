@@ -506,7 +506,7 @@ inline void RenderInstructionProcessor::SortRenderItems(BufferIndex bufferIndex,
   for(uint32_t index = 0; index < renderableCount; ++index, ++renderListIter)
   {
     *renderListIter = mSortingHelper[index].renderItem;
-    DALI_LOG_INFO(gRenderListLogFilter, Debug::Verbose, "  sortedList[%d] = %x\n", index, mSortingHelper[index].renderItem->mRenderer);
+    DALI_LOG_INFO(gRenderListLogFilter, Debug::Verbose, "  sortedList[%d] = node : %x renderer : %x\n", index, mSortingHelper[index].renderItem->mNode, mSortingHelper[index].renderItem->mRenderer.Get());
   }
 }
 
@@ -565,6 +565,10 @@ void RenderInstructionProcessor::Prepare(BufferIndex                 updateBuffe
         // We only use the clipping version of the sort comparitor if any clipping nodes exist within the RenderList.
         SortRenderItems(updateBufferIndex, *renderList, layer, hasClippingNodes, isOrthographicCamera);
       }
+      else
+      {
+        renderList->SetHasColorRenderItems(true);
+      }
 
       isRenderListAdded = true;
     }
@@ -588,6 +592,10 @@ void RenderInstructionProcessor::Prepare(BufferIndex                 updateBuffe
 
         // Clipping hierarchy is irrelevant when sorting overlay items, so we specify using the non-clipping version of the sort comparitor.
         SortRenderItems(updateBufferIndex, *renderList, layer, false, isOrthographicCamera);
+      }
+      else
+      {
+        renderList->SetHasColorRenderItems(false);
       }
 
       isRenderListAdded = true;

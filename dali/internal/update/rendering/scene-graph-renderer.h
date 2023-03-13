@@ -476,6 +476,18 @@ public:
   void ResetDirtyFlag();
 
   /**
+   * @brief Reset to base values of all animatable properties.
+   *
+   * @param[in] updateBufferIndex the current buffer index
+   */
+  void ResetToBaseValues(BufferIndex updateBufferIndex);
+
+  /**
+   * @brief Mark all animatable properties as dirty.
+   */
+  void MarkAsDirty();
+
+  /**
    * Get the capacity of the memory pools
    * @return the capacity of the memory pools
    */
@@ -492,6 +504,11 @@ public: // PropertyOwner implementation
    * @copydoc Dali::Internal::SceneGraph::PropertyOwner::ResetDefaultProperties()
    */
   virtual void ResetDefaultProperties(BufferIndex updateBufferIndex){};
+
+  /**
+   * @copydoc Dali::Internal::SceneGraph::PropertyOwner::AddInitializeResetter
+   */
+  void AddInitializeResetter(ResetterManager& manager) const override;
 
 public: // From UniformMapDataProvider
   /**

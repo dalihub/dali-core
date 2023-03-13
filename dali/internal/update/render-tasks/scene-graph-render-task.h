@@ -41,6 +41,7 @@ class Node;
 class Camera;
 class RenderInstruction;
 class RenderMessageDispatcher;
+class ResetterManager;
 
 /**
  * RenderTasks describe how the Dali scene should be rendered.
@@ -68,9 +69,10 @@ public:
 
   /**
    * Initialize the render task. Called in update thread
+   * @param[in] resetterManager to send resetter
    * @param[in] renderMessageDispatcher to send messages to render thread
    */
-  void Initialize(RenderMessageDispatcher& renderMessageDispatcher);
+  void Initialize(ResetterManager& resetterManager, RenderMessageDispatcher& renderMessageDispatcher);
 
   /**
    * Set the nodes to be rendered.
@@ -367,6 +369,12 @@ private: // from PropertyOwner::Observer
    */
   void PropertyOwnerDestroyed(PropertyOwner& owner) override;
 
+public:
+  /**
+   * @copydoc Dali::Internal::SceneGraph::PropertyOwner::AddInitializeResetter
+   */
+  void AddInitializeResetter(ResetterManager& manager) const override;
+
 private:
   void SetActiveStatus();
 
@@ -385,6 +393,7 @@ public:                                          // Animatable Properties
   AnimatableProperty<Vector4> mClearColor;       ///< clearColor
 
 private:
+  ResetterManager*         mResetterManager;
   RenderMessageDispatcher* mRenderMessageDispatcher;
   Render::RenderTracker*   mRenderSyncTracker;
   Node*                    mSourceNode;

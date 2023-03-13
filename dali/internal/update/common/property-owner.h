@@ -35,6 +35,7 @@ namespace Internal
 namespace SceneGraph
 {
 class PropertyOwner;
+class ResetterManager;
 
 using OwnedPropertyContainer = OwnerContainer<PropertyBase*>;
 using OwnedPropertyIter      = OwnedPropertyContainer::Iterator;
@@ -218,6 +219,17 @@ public:
   virtual bool IsAnimationPossible() const
   {
     return true;
+  }
+
+  /**
+   * @brief Install custom resetter messages to resetter manager.
+   * @pre ConnectToSceneGraph() Should be called before this API.
+   *
+   * @param[in] manager ResetterManager to add resetter.
+   */
+  virtual void AddInitializeResetter(ResetterManager& manager) const
+  {
+    // Do nothing
   }
 
 protected:

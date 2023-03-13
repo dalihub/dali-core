@@ -29,6 +29,9 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/math-utils.h>
 
+#include <dali/internal/update/common/property-resetter.h>
+#include <dali/internal/update/common/resetter-manager.h> ///< For AddInitializeResetter
+
 namespace // unnamed namespace
 {
 const uint32_t UPDATE_COUNT         = 2u; // Update projection or view matrix this many frames after a change
@@ -575,6 +578,19 @@ bool Camera::IsProjectionMatrixAnimated() const
   return !mFieldOfView.IsClean() ||
          !mOrthographicSize.IsClean() ||
          !mAspectRatio.IsClean();
+}
+
+void Camera::AddInitializeResetter(ResetterManager& manager) const
+{
+  // Call base class initialize resetter
+  Node::AddInitializeResetter(manager);
+
+  OwnerPointer<SceneGraph::PropertyResetterBase> resetterFieldOvView      = SceneGraph::BakerResetter::New(*this, mFieldOfView, SceneGraph::BakerResetter::Lifetime::BAKE);
+  OwnerPointer<SceneGraph::PropertyResetterBase> resetterOrthographicSize = SceneGraph::BakerResetter::New(*this, mOrthographicSize, SceneGraph::BakerResetter::Lifetime::BAKE);
+  OwnerPointer<SceneGraph::PropertyResetterBase> resetterAspectRatio      = SceneGraph::BakerResetter::New(*this, mAspectRatio, SceneGraph::BakerResetter::Lifetime::BAKE);
+  manager.AddPropertyResetter(resetterFieldOvView);
+  manager.AddPropertyResetter(resetterOrthographicSize);
+  manager.AddPropertyResetter(resetterAspectRatio);
 }
 
 uint32_t Camera::UpdateViewMatrix(BufferIndex updateBufferIndex)

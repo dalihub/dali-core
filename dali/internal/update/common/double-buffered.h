@@ -132,8 +132,8 @@ public:
   };
 
   DoubleBuffered()
-  : mValue1(NULL),
-    mValue2(NULL)
+  : mValue1(nullptr),
+    mValue2(nullptr)
   {
   }
 
