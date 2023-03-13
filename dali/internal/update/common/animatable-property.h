@@ -79,7 +79,7 @@ protected: // for derived classes
   /**
    * Flag that the property has been Set during the current frame.
    */
-  void OnSet()
+  virtual void OnSet()
   {
     mDirtyFlags = SET_FLAG;
   }
@@ -87,7 +87,7 @@ protected: // for derived classes
   /**
    * Flag that the property has been Baked during the current frame.
    */
-  void OnBake()
+  virtual void OnBake()
   {
     mDirtyFlags = BAKED_FLAG;
   }

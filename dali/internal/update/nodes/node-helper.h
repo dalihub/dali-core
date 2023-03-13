@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENEGRAPH_NODE_HELPER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,12 +43,12 @@
  * It is assumed that successive elements are aligned, and that no padding
  * is inserted by the compiler.
  */
-#define PROPERTY_WRAPPER(_BASE_ELEMENT, _TEMPLATE, _PROPERTY, _ELEMENT)       \
-  using _TEMPLATE##_PROPERTY = _TEMPLATE<_PROPERTY, OFFSET_##_BASE_ELEMENT>;  \
-  _TEMPLATE##_PROPERTY _ELEMENT;                                              \
-  enum                                                                        \
-  {                                                                           \
-    OFFSET_##_ELEMENT = sizeof(_TEMPLATE##_PROPERTY) + OFFSET_##_BASE_ELEMENT \
+#define PROPERTY_WRAPPER(_BASE_ELEMENT, _TEMPLATE, _PROPERTY, _ELEMENT)      \
+  using _TEMPLATE##_ELEMENT = _TEMPLATE<_PROPERTY, OFFSET_##_BASE_ELEMENT>;  \
+  _TEMPLATE##_ELEMENT _ELEMENT;                                              \
+  enum                                                                       \
+  {                                                                          \
+    OFFSET_##_ELEMENT = sizeof(_TEMPLATE##_ELEMENT) + OFFSET_##_BASE_ELEMENT \
   };
 
 /*
