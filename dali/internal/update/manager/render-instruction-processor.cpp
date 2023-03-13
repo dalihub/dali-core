@@ -216,7 +216,7 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
       SetNodeUpdateArea(node, isLayer3d, nodeWorldMatrix, nodeSize, nodeUpdateArea);
       nodeUpdateAreaSet = true;
 
-      const Vector3& scale = node->GetWorldScale(updateBufferIndex);
+      const Vector3& scale = nodeWorldMatrix.GetScale();
       const Vector3& size  = Vector3(nodeUpdateArea.z, nodeUpdateArea.w, 1.0f) * scale;
 
       if(size.LengthSquared() > Math::MACHINE_EPSILON_1000)

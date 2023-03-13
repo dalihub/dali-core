@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -402,6 +402,38 @@ int UtcDaliMatrixGetTranslation3P(void)
   Matrix m(els);
 
   DALI_TEST_EQUALS(m.GetTranslation3(), Vector3(12.0f, 13.0f, 14.0f), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliMatrixGetScale(void)
+{
+  // Create an arbitrary vector
+  for(float x = 0.0f; x <= 2.0f; x += 0.1f)
+  {
+    for(float y = 0.0f; y < 2.0f; y += 0.1f)
+    {
+      for(float z = 0.0f; z < 2.0f; z += 0.1f)
+      {
+        Vector3 vScale(x, y, z);
+
+        for(float angle = 5.0f; angle <= 360.0f; angle += 15.0f)
+        {
+          Vector3 forward(1.0f, 1.3f, 2.0f);
+          forward.Normalize();
+
+          Quaternion rotation1(Radian(Degree(angle)), forward);
+          Vector3    position1(1.0f, 2.0f, 3.0f);
+
+          Matrix m1(false);
+          m1.SetTransformComponents(vScale, rotation1, position1);
+
+          Vector3 scale2 = m1.GetScale();
+
+          DALI_TEST_EQUALS(vScale, scale2, 0.001, TEST_LOCATION);
+        }
+      }
+    }
+  }
   END_TEST;
 }
 

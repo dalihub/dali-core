@@ -115,6 +115,11 @@ public:
   };
 
   /**
+   * @brief Global static initialize for Render::Renderer before new CommandBuffer's Render fill start.
+   */
+  static void PrepareCommandBuffer();
+
+  /**
    * Create a new renderer instance
    * @param[in] dataProviders The data providers for the renderer
    * @param[in] geometry The geometry for the renderer

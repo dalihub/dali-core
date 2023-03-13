@@ -400,9 +400,7 @@ public:
       }
       else if(mProperty == TRANSFORM_PROPERTY_WORLD_SCALE)
       {
-        Vector3    position;
-        Quaternion orientation;
-        worldMatrix.GetTransformComponents(position, orientation, mValue);
+        mValue = worldMatrix.GetScale();
       }
     }
   }

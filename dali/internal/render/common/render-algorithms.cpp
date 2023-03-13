@@ -643,6 +643,9 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
     mHasLayerScissor = true;
   }
 
+  // Prepare Render::Renderer Render for this secondary command buffer.
+  Renderer::PrepareCommandBuffer();
+
   // Loop through all RenderItems in the RenderList, set up any prerequisites to render them, then perform the render.
   for(uint32_t index = 0u; index < count; ++index)
   {
