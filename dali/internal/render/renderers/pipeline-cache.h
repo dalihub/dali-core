@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_PIPELINE_CACHE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/common/blending-options.h>
-#include <dali/graphics-api/graphics-types.h>
 #include <dali/graphics-api/graphics-controller.h>
 #include <dali/graphics-api/graphics-pipeline.h>
+#include <dali/graphics-api/graphics-types.h>
+#include <dali/internal/common/blending-options.h>
 
 // EXTERNAL INCLUDES
 #include <vector>
@@ -49,8 +49,7 @@ struct PipelineCacheL2
  */
 struct PipelineCacheL1
 {
-
-  PipelineCacheL2 *GetPipelineCacheL2(bool blend, bool premul, BlendingOptions &blendingOptions);
+  PipelineCacheL2* GetPipelineCacheL2(bool blend, bool premul, BlendingOptions& blendingOptions);
 
   uint32_t                     hashCode{}; // 1byte cull, 1byte poly, 1byte frontface
   Graphics::RasterizationState rs{};
@@ -61,14 +60,15 @@ struct PipelineCacheL1
 };
 
 /**
- * Cache Level 0 : Stores geometry, program amd vertex input state
+ * Cache Level 0 : Stores hash, geometry, program amd vertex input state
  */
 struct PipelineCacheL0 // L0 cache
 {
-  PipelineCacheL1 *GetPipelineCacheL1(Render::Renderer *renderer, bool usingReflection);
+  PipelineCacheL1* GetPipelineCacheL1(Render::Renderer* renderer, bool usingReflection);
 
-  Geometry                   *geometry{};
-  Program                    *program{};
+  std::size_t                hash{};
+  Geometry*                  geometry{};
+  Program*                   program{};
   Graphics::VertexInputState inputState;
 
   std::vector<PipelineCacheL1> level1nodes;
@@ -77,17 +77,25 @@ struct PipelineCacheL0 // L0 cache
 struct PipelineCacheQueryInfo
 {
   // Program/Geometry
-  Renderer *renderer;
-  Program  *program;
-  Geometry *geometry;
+  Renderer* renderer;
+  Program*  program;
+  Geometry* geometry;
 
   bool cameraUsingReflection;
 
   // Blending
-  bool blendingEnabled;
-  bool alphaPremultiplied;
-  BlendingOptions *blendingOptions;
+  bool             blendingEnabled;
+  bool             alphaPremultiplied;
+  BlendingOptions* blendingOptions;
 
+  // Lightweight hash value before compare each query.
+  std::size_t hash{0u};
+
+  // Generate hash value for this query.
+  void GenerateHash();
+
+  // Value comparision between two query info.
+  static bool Equal(const PipelineCacheQueryInfo& lhs, const PipelineCacheQueryInfo& rhs) noexcept;
 };
 
 /**
@@ -117,22 +125,47 @@ public:
   /**
    * Retrieves next cache level
    */
-  PipelineCacheL0* GetPipelineCacheL0( Program *program, Render::Geometry *geometry);
+  PipelineCacheL0* GetPipelineCacheL0(std::size_t hash, Program* program, Render::Geometry* geometry);
 
   /**
    * Retrieves pipeline matching queryInfo struct
    *
    * May retrieve existing pipeline or create one or return nullptr.
    */
-  PipelineResult GetPipeline( const PipelineCacheQueryInfo& queryInfo, bool createNewIfNotFound );
+  PipelineResult GetPipeline(const PipelineCacheQueryInfo& queryInfo, bool createNewIfNotFound);
+
+  /**
+   * @brief Check whether we can reuse latest found PipelineResult.
+   * We can reuse latest pipeline only if query info is equal with latest query
+   * and we don't call CleanLatestUsedCache() before.
+   *
+   * @param[in] latestUsedCacheIndex Index of cache we want to compare.
+   * @param[in] queryInfo Query for current pipeline.
+   * @return True if we can reuse latest pipeline result. False otherwise
+   */
+  bool ReuseLatestBoundPipeline(const int latestUsedCacheIndex, const PipelineCacheQueryInfo& queryInfo) const;
+
+  /**
+   * @brief Clear latest bound result.
+   */
+  void CleanLatestUsedCache()
+  {
+    // Set pipeline as nullptr is enough.
+    mLatestResult[0].pipeline = nullptr;
+    mLatestResult[1].pipeline = nullptr;
+  }
 
 private:
-
-  Graphics::Controller* graphicsController{nullptr};
+  Graphics::Controller*        graphicsController{nullptr};
   std::vector<PipelineCacheL0> level0nodes;
+
+  // Cache latest queries whether blend enabled or not.
+  // (Since most UI case (like Text and Image) enable blend, and most 3D case disable blend.)
+  PipelineCacheQueryInfo mLatestQuery[2];  ///< Latest requested query info. It will be invalidate after query's renderer / geometry / blendingOptions value changed.
+  PipelineResult         mLatestResult[2]; ///< Latest used result. It will be invalidate when we call CleanLatestUsedCache() or some cache changed.
 };
 
-}
-}
+} // namespace Render
+} // namespace Dali::Internal
 
 #endif // DALI_INTERNAL_RENDER_PIPELINE_CACHE_H

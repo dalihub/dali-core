@@ -449,6 +449,9 @@ void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear
     }
   }
 
+  // Clean latest used pipeline
+  mImpl->pipelineCache->CleanLatestUsedCache();
+
   mImpl->commandBufferSubmitted = false;
 }
 

@@ -147,19 +147,19 @@ inline uint32_t GetUniformBufferDataAlignment(uint32_t dataSize)
 }
 
 /**
- * @brief Store latest binded RenderGeometry, and help that we can skip duplicated vertex attributes bind.
+ * @brief Store latest bound RenderGeometry, and help that we can skip duplicated vertex attributes bind.
  *
  * @param[in] geometry Current geometry to be used, or nullptr if render finished
- * @return True if we can reuse latest binded vertex attributes. False otherwise.
+ * @return True if we can reuse latest bound vertex attributes. False otherwise.
  */
-inline bool ReuseLatestBindedVertexAttributes(const Render::Geometry* geometry)
+inline bool ReuseLatestBoundVertexAttributes(const Render::Geometry* geometry)
 {
-  static const Render::Geometry* gLatestVertexBindedGeometry = nullptr;
-  if(gLatestVertexBindedGeometry == geometry)
+  static const Render::Geometry* gLatestVertexBoundGeometry = nullptr;
+  if(gLatestVertexBoundGeometry == geometry)
   {
     return true;
   }
-  gLatestVertexBindedGeometry = geometry;
+  gLatestVertexBoundGeometry = geometry;
   return false;
 }
 
@@ -175,7 +175,7 @@ MemoryPoolObjectAllocator<Renderer> gRenderRendererMemoryPool;
 void Renderer::PrepareCommandBuffer()
 {
   // Reset latest geometry informations, So we can bind the first of geometry.
-  ReuseLatestBindedVertexAttributes(nullptr);
+  ReuseLatestBoundVertexAttributes(nullptr);
 
   // todo : Fill here as many caches as we can store for reduce the number of command buffers
 }
@@ -596,8 +596,8 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
   bool drawn = false; // Draw can fail if there are no vertex buffers or they haven't been uploaded yet
                       // @todo We should detect this case much earlier to prevent unnecessary work
 
-  // Reuse latest binded vertex attributes location, or Bind buffers to attribute locations.
-  if(ReuseLatestBindedVertexAttributes(mGeometry) || mGeometry->BindVertexAttributes(commandBuffer))
+  // Reuse latest bound vertex attributes location, or Bind buffers to attribute locations.
+  if(ReuseLatestBoundVertexAttributes(mGeometry) || mGeometry->BindVertexAttributes(commandBuffer))
   {
     if(mDrawCommands.empty())
     {
@@ -614,7 +614,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
   else
   {
     // BindVertexAttributes failed. Reset cached geometry.
-    ReuseLatestBindedVertexAttributes(nullptr);
+    ReuseLatestBoundVertexAttributes(nullptr);
   }
 
   return drawn;
@@ -961,6 +961,9 @@ Graphics::Pipeline& Renderer::PrepareGraphicsPipeline(
   queryInfo.alphaPremultiplied    = mPremultipliedAlphaEnabled;
   queryInfo.cameraUsingReflection = instruction.GetCamera()->GetReflectionUsed();
 
+  queryInfo.GenerateHash();
+
+  // Find or generate new pipeline.
   auto pipelineResult = mPipelineCache->GetPipeline(queryInfo, true);
 
   // should be never null?
