@@ -206,6 +206,9 @@ private:
 
   std::unique_ptr<MemoryPoolRelayoutContainer> mRelayoutStack; ///< Stack for relayouting
 
+  std::vector<Dali::Actor> mPotentialRedundantSubRoots; ///< Stack of Actor when RequestLayout comes. Keep it as member to avoid vector size reserving.
+  std::vector<Dali::Actor> mTopOfSubTreeStack;
+
   bool mRelayoutConnection : 1;   ///< Whether EventProcessingFinishedSignal signal is connected.
   bool mRelayoutFlag : 1;         ///< Relayout flag to avoid unnecessary calls
   bool mEnabled : 1;              ///< Initially disabled. Must be enabled at some point.
