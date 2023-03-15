@@ -425,10 +425,7 @@ public:
   /**
    * @copydoc RenderDataProvider::IsUpdated()
    */
-  bool IsUpdated() const override
-  {
-    return Updated();
-  }
+  bool IsUpdated() const override;
 
   /**
    * @copydoc RenderDataProvider::GetVisualTransformedUpdateArea()
@@ -547,7 +544,6 @@ private:
 
   Dali::Internal::Render::Renderer::StencilParameters mStencilParameters; ///< Struct containing all stencil related options
 
-  uint64_t             mUniformsHash{0};             ///< Hash of uniform map property values
   uint32_t             mIndexedDrawFirstElement;     ///< first element index to be drawn using indexed draw
   uint32_t             mIndexedDrawElementsCount;    ///< number of elements to be drawn using indexed draw
   uint32_t             mBlendBitmask;                ///< The bitmask of blending options

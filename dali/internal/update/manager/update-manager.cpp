@@ -1155,6 +1155,11 @@ void UpdateManager::PostRender()
     renderer->ResetDirtyFlag();
   }
 
+  for(auto&& shader : mImpl->shaders)
+  {
+    shader->SetUpdated(false);
+  }
+
   for(auto&& scene : mImpl->scenes)
   {
     scene->root->SetUpdatedTree(false);

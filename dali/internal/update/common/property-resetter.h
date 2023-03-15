@@ -60,6 +60,7 @@ public:
   void Initialize()
   {
     mPropertyOwner->AddObserver(*this);
+    mPropertyOwner->SetUpdated(true);
   }
 
   /**
@@ -201,7 +202,7 @@ public:
                 Lifetime       lifetime)
   : PropertyResetterBase(propertyOwner, baseProperty)
   {
-    mRunning = lifetime == Lifetime::BAKE ? ACTIVE : AGING;
+    mRunning = lifetime == Lifetime::BAKE ? AGING : ACTIVE;
   }
 
   /**
@@ -219,7 +220,10 @@ public:
       mRunning--;
       mBaseProperty->ResetToBaseValue(updateBufferIndex);
 
-      // @todo Consider adding mPropertyOwner->SetUpdated(true) here.
+      if(mRunning > 0)
+      {
+        mPropertyOwner->SetUpdated(true);
+      }
     }
   }
 };

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_CONSTRAINT_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,7 +80,33 @@ public:
       if(mFunc->InputsInitialized())
       {
         PropertyType current = mTargetProperty.Get(updateBufferIndex);
+        PropertyType old     = mTargetProperty.Get(!updateBufferIndex);
+
         mFunc->Apply(updateBufferIndex, current);
+
+        // Compare with value of the previous frame
+        if constexpr(std::is_same_v<PropertyType, float>)
+        {
+          if(!Equals(old, current))
+          {
+            if(!mObservedOwners.Empty())
+            {
+              // The first observer is the target of the constraint
+              mObservedOwners[0]->SetUpdated(true);
+            }
+          }
+        }
+        else
+        {
+          if(old != current)
+          {
+            if(!mObservedOwners.Empty())
+            {
+              // The first observer is the target of the constraint
+              mObservedOwners[0]->SetUpdated(true);
+            }
+          }
+        }
 
         // Optionally bake the final value
         if(Dali::Constraint::BAKE == mRemoveAction)
