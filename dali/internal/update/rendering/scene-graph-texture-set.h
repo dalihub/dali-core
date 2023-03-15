@@ -37,6 +37,7 @@ class Texture;
 namespace SceneGraph
 {
 class Renderer;
+class RenderMessageDispatcher;
 
 class TextureSet
 {
@@ -94,6 +95,12 @@ public:
   }
 
   /**
+   * Set the renderMessageDispatcher to send message.
+   * @param[in] renderMessageDispatcher The renderMessageDispatcher to send messages.
+   */
+  void SetRenderMessageDispatcher(RenderMessageDispatcher* renderMessageDispatcher);
+
+  /**
    * Get the capacity of the memory pools
    * @return the capacity of the memory pools
    */
@@ -106,9 +113,10 @@ private:
   TextureSet();
 
 private:
-  Vector<Render::Sampler*>   mSamplers; ///< List of samplers used by each texture. Not owned
-  Vector<Render::TextureKey> mTextures; ///< List of Textures. Not owned
-  bool                       mHasAlpha; ///< if any of the textures has an alpha channel
+  Vector<Render::Sampler*>   mSamplers;                         ///< List of samplers used by each texture. Not owned
+  Vector<Render::TextureKey> mTextures;                         ///< List of Textures. Not owned
+  RenderMessageDispatcher*   mRenderMessageDispatcher{nullptr}; ///< for sending messages to render thread. Not owned
+  bool                       mHasAlpha;                         ///< if any of the textures has an alpha channel
 };
 
 inline void SetTextureMessage(EventThreadServices& eventThreadServices, const TextureSet& textureSet, uint32_t index, const Render::TextureKey& textureKey)

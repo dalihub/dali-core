@@ -82,6 +82,19 @@ public:
    */
   void RemoveRenderTracker(Render::RenderTracker& renderTracker);
 
+  /**
+   * Return the render manager.
+   * @return A reference to the render manager.
+   */
+  RenderManager& GetRenderManager();
+
+  /**
+   * Reserve space for another message in the queue.
+   * @param[in] size The message size with respect to the size of type "char".
+   * @return A pointer to the first char allocated for the message.
+   */
+  uint32_t* ReserveMessageSlot(std::size_t size);
+
 private:
   RenderManager& mRenderManager;
   RenderQueue&   mRenderQueue;

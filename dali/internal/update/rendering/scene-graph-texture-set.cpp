@@ -20,7 +20,9 @@
 // INTERNAL HEADERS
 #include <dali/internal/common/internal-constants.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
+#include <dali/internal/render/common/render-manager.h>
 #include <dali/internal/render/renderers/render-texture.h>
+#include <dali/internal/update/controllers/render-message-dispatcher.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
 
 namespace //Unnamed namespace
@@ -75,7 +77,14 @@ void TextureSet::SetSampler(uint32_t index, Render::Sampler* sampler)
 
   if(index < static_cast<uint32_t>(mTextures.Size()))
   {
-    mTextures[index]->SetUpdated(true);
+    // Send a message to the RenderManagerReserveMessageSlot
+    using DerivedType = MessageValue1<RenderManager, Render::TextureKey>;
+
+    // Reserve some memory inside the render queue
+    uint32_t* slot = mRenderMessageDispatcher->ReserveMessageSlot(sizeof(DerivedType));
+
+    // Construct message in the render queue memory; note that delete should not be called on the return value
+    new(slot) DerivedType(&mRenderMessageDispatcher->GetRenderManager(), &RenderManager::SetTextureUpdated, mTextures[index]);
   }
 }
 
@@ -108,13 +117,26 @@ void TextureSet::SetTexture(uint32_t index, const Render::TextureKey& texture)
   if(texture)
   {
     mHasAlpha |= texture->HasAlphaChannel();
-    texture->SetUpdated(true);
+
+    // Send a message to the RenderManagerReserveMessageSlot
+    using DerivedType = MessageValue1<RenderManager, Render::TextureKey>;
+
+    // Reserve some memory inside the render queue
+    uint32_t* slot = mRenderMessageDispatcher->ReserveMessageSlot(sizeof(DerivedType));
+
+    // Construct message in the render queue memory; note that delete should not be called on the return value
+    new(slot) DerivedType(&mRenderMessageDispatcher->GetRenderManager(), &RenderManager::SetTextureUpdated, texture);
   }
 }
 
 bool TextureSet::HasAlpha() const
 {
   return mHasAlpha;
+}
+
+void TextureSet::SetRenderMessageDispatcher(RenderMessageDispatcher* renderMessageDispatcher)
+{
+  mRenderMessageDispatcher = renderMessageDispatcher;
 }
 
 uint32_t TextureSet::GetMemoryPoolCapacity()

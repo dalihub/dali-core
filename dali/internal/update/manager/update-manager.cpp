@@ -691,6 +691,7 @@ void UpdateManager::SetPanGestureProcessor(PanGesture* panGestureProcessor)
 
 void UpdateManager::AddTextureSet(OwnerPointer<TextureSet>& textureSet)
 {
+  textureSet->SetRenderMessageDispatcher(&mImpl->renderMessageDispatcher);
   mImpl->textureSets.PushBack(textureSet.Release());
 }
 
