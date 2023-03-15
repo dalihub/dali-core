@@ -140,7 +140,7 @@ public:
    *
    * @param[in] handle A reference to the moved handle
    */
-  Stage(Stage&& handle);
+  Stage(Stage&& handle) noexcept;
 
   /**
    * @brief This move assignment operator is required for (smart) pointer semantics.
@@ -148,7 +148,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  Stage& operator=(Stage&& rhs);
+  Stage& operator=(Stage&& rhs) noexcept;
 
   // Containment
 
