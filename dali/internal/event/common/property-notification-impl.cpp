@@ -196,9 +196,9 @@ bool PropertyNotification::GetNotifyResult() const
   return mNotifyResult;
 }
 
-bool PropertyNotification::CompareSceneObject(const SceneGraph::PropertyNotification* sceneObject)
+bool PropertyNotification::CompareSceneObjectNotifyId(NotifierInterface::NotifyId notifyId) const
 {
-  return sceneObject && sceneObject == mPropertyNotification;
+  return mPropertyNotification && mPropertyNotification->GetNotifyId() == notifyId;
 }
 
 void PropertyNotification::CreateSceneObject()
@@ -221,7 +221,7 @@ void PropertyNotification::CreateSceneObject()
     AddPropertyNotificationMessage(mUpdateManager, transferOwnership);
 
     // Setup mapping infomations between scenegraph property notification
-    mPropertyNotificationManager.PropertyNotificationSceneObjectMapping(mPropertyNotification, *this);
+    mPropertyNotificationManager.MapNotifier(mPropertyNotification, *this);
   }
 }
 
@@ -232,7 +232,7 @@ void PropertyNotification::DestroySceneObject()
     DALI_ASSERT_ALWAYS(EventThreadServices::IsCoreRunning());
 
     // Remove mapping infomations
-    mPropertyNotificationManager.PropertyNotificationSceneObjectUnmapping(mPropertyNotification);
+    mPropertyNotificationManager.UnmapNotifier(mPropertyNotification);
 
     // Remove PropertyNotification using a message to the update manager
     RemovePropertyNotificationMessage(mUpdateManager, *mPropertyNotification);

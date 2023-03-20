@@ -259,6 +259,7 @@ public:
    * @brief Release and move ownership of object.
    * This API do not remove memory.
    *
+   * @post iterators are invalidated by this method.
    * @param[in] iter The iterator what we want to release.
    */
   T* Release(Iterator iter)

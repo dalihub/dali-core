@@ -3171,6 +3171,174 @@ int UtcDaliAnimationStopSetPositionP(void)
   END_TEST;
 }
 
+int UtcDaliAnimationStopEmitFinishedSignalImmediateP(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  // Build the animation
+  float     durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  Vector3   targetPosition(100.0f, 100.0f, 100.0f);
+  animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
+
+  bool                 signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  // Play
+  {
+    tet_printf("Play and Stop immediately\n");
+    // Start the animation, and stop immediately.
+    animation.Play();
+    animation.Stop();
+
+    finishCheck.CheckSignalNotReceived();
+
+    application.SendNotification();
+    application.Render(0);
+
+    // expect finished signal recieved due to Stop API.
+    application.SendNotification();
+    finishCheck.CheckSignalReceived();
+    finishCheck.Reset();
+
+    application.SendNotification();
+    application.Render(0);
+  }
+  // Play multiple times
+  {
+    tet_printf("Play and Stop immediately 2\n");
+    // Start the animation, and stop immediately.
+    animation.Play();
+    animation.Stop();
+    animation.Play();
+    animation.Stop();
+    animation.Play();
+    animation.Play();
+    animation.Stop();
+
+    finishCheck.CheckSignalNotReceived();
+
+    application.SendNotification();
+    application.Render(0);
+
+    // expect finished signal recieved due to Stop API.
+    application.SendNotification();
+    finishCheck.CheckSignalReceived();
+    finishCheck.Reset();
+
+    application.SendNotification();
+    application.Render(0);
+  }
+  // PlayAfter
+  {
+    tet_printf("PlayAfter and Stop immediately\n");
+    // Start the animation, and stop immediately.
+    animation.PlayAfter(1.0f);
+    animation.Stop();
+
+    finishCheck.CheckSignalNotReceived();
+
+    application.SendNotification();
+    application.Render(0);
+
+    // expect finished signal recieved due to Stop API.
+    application.SendNotification();
+    finishCheck.CheckSignalReceived();
+    finishCheck.Reset();
+
+    application.SendNotification();
+    application.Render(0);
+  }
+  // PlayFrom
+  {
+    tet_printf("PlayFrom and Stop immediately\n");
+    // Start the animation, and stop immediately.
+    animation.PlayFrom(0.5f);
+    animation.Stop();
+
+    finishCheck.CheckSignalNotReceived();
+
+    application.SendNotification();
+    application.Render(0);
+
+    // expect finished signal recieved due to Stop API.
+    application.SendNotification();
+    finishCheck.CheckSignalReceived();
+    finishCheck.Reset();
+
+    application.SendNotification();
+    application.Render(0);
+  }
+  // Play and Pause
+  {
+    tet_printf("Play and Pause and Stop immediately\n");
+    // Pause the animation, and stop immediately.
+    animation.Play();
+    animation.Pause();
+    animation.Stop();
+
+    finishCheck.CheckSignalNotReceived();
+
+    application.SendNotification();
+    application.Render(0);
+
+    // expect finished signal recieved due to Stop API.
+    application.SendNotification();
+    finishCheck.CheckSignalReceived();
+    finishCheck.Reset();
+
+    application.SendNotification();
+    application.Render(0);
+  }
+
+  // Check finished signal not emmited if animation was not play state.
+  {
+    tet_printf("Check whether stop-only case didnt send finished signal\n");
+    // Stop only.
+    animation.Stop();
+    animation.Stop();
+    animation.Stop();
+
+    finishCheck.CheckSignalNotReceived();
+
+    application.SendNotification();
+    application.Render(0);
+
+    // expect finished signal recieved due to Stop API.
+    application.SendNotification();
+    finishCheck.CheckSignalNotReceived();
+    finishCheck.Reset();
+
+    application.SendNotification();
+    application.Render(0);
+  }
+  {
+    tet_printf("Check whether pause-stop case didnt send finished signal\n");
+    // Pause and Stop.
+    animation.Pause();
+    animation.Stop();
+
+    finishCheck.CheckSignalNotReceived();
+
+    application.SendNotification();
+    application.Render(0);
+
+    // expect finished signal recieved due to Stop API.
+    application.SendNotification();
+    finishCheck.CheckSignalNotReceived();
+    finishCheck.Reset();
+
+    application.SendNotification();
+    application.Render(0);
+  }
+
+  END_TEST;
+}
+
 int UtcDaliAnimationClearP(void)
 {
   TestApplication application;
@@ -12639,6 +12807,7 @@ int UtcDaliAnimationProgressSignalConnectionWithoutProgressMarkerP(void)
   application.SendNotification();
 
   tet_infoline("Ensure after animation has started playing that ProgressReachedSignal not emitted");
+  finishCheck.CheckSignalNotReceived();
   progressCheck.CheckSignalNotReceived();
 
   application.Render(static_cast<unsigned int>(durationSeconds * 900.0f) + 1u /*just beyond the animation duration*/);
@@ -13031,7 +13200,9 @@ int UtcDaliAnimationProgressCallbackWithLoopingP(void)
   for(int count = 0; count < loopCount; count++)
   {
     application.SendNotification();
-    application.Render(0);                                // start animation
+    application.Render(0); // start animation
+    finishCheck.CheckSignalNotReceived();
+
     application.Render(durationSeconds * 0.25 * 1000.0f); // 25% progress
     DALI_TEST_EQUALS(0.25f, animation.GetCurrentProgress(), TEST_LOCATION);
 
@@ -13258,14 +13429,19 @@ int UtcDaliAnimationProgressCallbackNegativeSpeed(void)
   animation.SetLooping(false);
   animation.SetLoopCount(4);
   animation.Play();
-  application.Render(0u);
-  application.SendNotification();
+  application.SendNotification(); // Send Stop event into update thread
+  application.Render(0u);         // Send Notification into event thread
+  application.SendNotification(); // Execute finished signal.
+
+  finishCheck.CheckSignalReceived(); // Due to stop called.
+  finishCheck.Reset();
 
   for(int count = 0; count < 4; count++)
   {
     application.SendNotification();
     application.Render(0); // start animation
     progressCheck.CheckSignalNotReceived();
+    finishCheck.CheckSignalNotReceived();
 
     application.SendNotification();
     application.Render(durationSeconds * 0.25 * 1000.0f); // 25% progress
@@ -14926,7 +15102,6 @@ int UtcDaliAnimationSetGetBlendPoint(void)
 {
   TestApplication application;
 
-
   Animation animation = Animation::New(1.0f);
   DALI_TEST_EQUALS(animation.GetBlendPoint(), 0.0f, 0.01f, TEST_LOCATION);
 
@@ -15337,8 +15512,8 @@ int UtcDaliAnimationPlayBlendQuaternion(void)
   application.SendNotification();
   application.Render(250);
 
-  Quaternion value = actor.GetCurrentProperty<Quaternion>(index);
-  Vector3 axis;
+  Quaternion   value = actor.GetCurrentProperty<Quaternion>(index);
+  Vector3      axis;
   Dali::Radian angle;
   DALI_TEST_EQUALS(value.ToAxisAngle(axis, angle), true, TEST_LOCATION);
   DALI_TEST_EQUALS(angle.radian, 1.0f, 0.05f, TEST_LOCATION);

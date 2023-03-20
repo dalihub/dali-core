@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_COMPLETE_NOTIFICATION_INTERFACE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/internal/event/common/notifier-interface.h>
+#include <dali/public-api/common/dali-vector.h>
 
 namespace Dali
 {
@@ -42,10 +44,12 @@ protected:
   virtual ~CompleteNotificationInterface() = default;
 
 public:
+  using ParameterList = typename Dali::Vector<NotifierInterface::NotifyId>;
+
   /**
    * This method is called by Notification Manager
    */
-  virtual void NotifyCompleted() = 0;
+  virtual void NotifyCompleted(ParameterList notifierList) = 0;
 };
 
 } // namespace Internal

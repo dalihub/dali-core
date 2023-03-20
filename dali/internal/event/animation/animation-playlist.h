@@ -23,6 +23,7 @@
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/ordered-set.h>
 #include <dali/internal/event/common/complete-notification-interface.h>
+#include <dali/internal/event/common/scene-graph-notifier-interface-mapper.h>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/vector-wrapper.h>
@@ -42,7 +43,7 @@ class Animation;
  * AnimationPlaylist provides notifications to applications when animations are finished.
  * It reference-counts playing animations, to allow "fire and forget" behaviour.
  */
-class AnimationPlaylist : public CompleteNotificationInterface
+class AnimationPlaylist : public CompleteNotificationInterface, public SceneGraphNotifierInterfaceMapper<Animation>
 {
 public:
   /**
@@ -80,9 +81,9 @@ public:
 
   /**
    * @brief Notify that an animation has reached a progress marker
-   * @param[in] sceneGraphAnimation scene graph animation that has reached progress
+   * @param[in] notifyId scene graph animation's notifyId that has reached progress
    */
-  void NotifyProgressReached(const SceneGraph::Animation* sceneGraphAnimation);
+  void NotifyProgressReached(NotifierInterface::NotifyId notifyId);
 
   /**
    * @brief Retrive the number of Animations.
@@ -115,11 +116,12 @@ private: // from CompleteNotificationInterface
   /**
    * @copydoc CompleteNotificationInterface::NotifyCompleted()
    */
-  void NotifyCompleted() override;
+  void NotifyCompleted(CompleteNotificationInterface::ParameterList notifierList) override;
 
 private:
   OrderedSet<Animation, false>        mAnimations; ///< All existing animations (not owned)
-  std::map<Dali::Animation, uint32_t> mPlaylist;   ///< The currently playing animations (owned through handle). Note we can hold same handles multiple.
+  std::map<Dali::Animation, uint32_t> mPlaylist;   ///< The currently playing animations (owned through handle).
+                                                   ///< Note we can hold same handles multiple, since OnClear can be called after NotifyCompleted.
 };
 
 /**
@@ -127,9 +129,9 @@ private:
  *
  * Note animationPlaylist is of type CompleteNotificationInterface because of updateManager only knowing about the interface not actual playlist
  */
-inline MessageBase* NotifyProgressReachedMessage(CompleteNotificationInterface& animationPlaylist, const SceneGraph::Animation* animation)
+inline MessageBase* NotifyProgressReachedMessage(CompleteNotificationInterface& animationPlaylist, NotifierInterface::NotifyId notifyId)
 {
-  return new MessageValue1<AnimationPlaylist, const SceneGraph::Animation*>(static_cast<AnimationPlaylist*>(&animationPlaylist), &AnimationPlaylist::NotifyProgressReached, animation);
+  return new MessageValue1<AnimationPlaylist, NotifierInterface::NotifyId>(static_cast<AnimationPlaylist*>(&animationPlaylist), &AnimationPlaylist::NotifyProgressReached, notifyId);
 }
 
 } // namespace Internal

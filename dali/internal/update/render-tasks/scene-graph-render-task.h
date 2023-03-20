@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/internal/event/common/notifier-interface.h>
 #include <dali/internal/render/common/render-instruction.h>
 #include <dali/internal/render/renderers/render-frame-buffer.h>
 #include <dali/internal/update/common/animatable-property.h>
@@ -46,7 +47,7 @@ class ResetterManager;
 /**
  * RenderTasks describe how the Dali scene should be rendered.
  */
-class RenderTask : public PropertyOwner, public PropertyOwner::Observer
+class RenderTask : public PropertyOwner, public PropertyOwner::Observer, public NotifierInterface
 {
 public:
   enum State : uint8_t

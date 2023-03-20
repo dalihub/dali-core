@@ -25,8 +25,10 @@
 #include <dali/integration-api/trace.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/complete-notification-interface.h>
+#include <dali/internal/event/common/notifier-interface.h>
 #include <dali/internal/event/common/property-notification-impl.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/vector-wrapper.h>
 
 namespace Dali
 {
@@ -34,7 +36,7 @@ namespace Internal
 {
 namespace
 {
-typedef Dali::Vector<CompleteNotificationInterface*> InterfaceContainer;
+typedef std::vector<std::pair<CompleteNotificationInterface*, CompleteNotificationInterface::ParameterList>> InterfaceContainer;
 
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
 
@@ -45,27 +47,10 @@ DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
  */
 void MoveElements(InterfaceContainer& from, InterfaceContainer& to)
 {
-  // check if there's something in from
-  const InterfaceContainer::SizeType fromCount = from.Count();
-  if(fromCount > 0u)
-  {
-    // check if to has some elements
-    const InterfaceContainer::SizeType toCount = to.Count();
-    if(toCount == 0u)
-    {
-      // to is empty so we can swap with from
-      to.Swap(from);
-    }
-    else
-    {
-      to.Reserve(toCount + fromCount);
-      for(InterfaceContainer::SizeType i = 0; i < fromCount; ++i)
-      {
-        to.PushBack(from[i]);
-      }
-      from.Clear();
-    }
-  }
+  to.insert(to.end(),
+            std::make_move_iterator(from.begin()),
+            std::make_move_iterator(from.end()));
+  from.clear();
 }
 } // namespace
 
@@ -83,9 +68,9 @@ struct NotificationManager::Impl
     eventMessageQueue.Reserve(32);
 
     // only a few manager objects get complete notifications (animation, render list, property notifications, ...)
-    updateCompletedInterfaceQueue.Reserve(4);
-    updateWorkingInterfaceQueue.Reserve(4);
-    eventInterfaceQueue.Reserve(4);
+    updateCompletedInterfaceQueue.reserve(4);
+    updateWorkingInterfaceQueue.reserve(4);
+    eventInterfaceQueue.reserve(4);
   }
 
   ~Impl() = default;
@@ -112,12 +97,12 @@ NotificationManager::~NotificationManager()
   delete mImpl;
 }
 
-void NotificationManager::QueueCompleteNotification(CompleteNotificationInterface* instance)
+void NotificationManager::QueueNotification(CompleteNotificationInterface* instance, NotificationParameterList&& parameter)
 {
   // queueMutex must be locked whilst accessing queues
   MessageQueueMutex::ScopedLock lock(mImpl->queueMutex);
 
-  mImpl->updateWorkingInterfaceQueue.PushBack(instance);
+  mImpl->updateWorkingInterfaceQueue.emplace_back(instance, std::move(parameter));
 }
 
 void NotificationManager::QueueMessage(MessageBase* message)
@@ -138,8 +123,10 @@ void NotificationManager::UpdateCompleted()
   // note that in theory its possible for update completed to have last frames
   // events as well still hanging around. we need to keep them as well
   mImpl->updateCompletedMessageQueue.MoveFrom(mImpl->updateWorkingMessageQueue);
+
   // move pointers from interface queue
   MoveElements(mImpl->updateWorkingInterfaceQueue, mImpl->updateCompletedInterfaceQueue);
+
   // finally the lock is released
 }
 
@@ -148,8 +135,8 @@ bool NotificationManager::MessagesToProcess()
   // queueMutex must be locked whilst accessing queues
   MessageQueueMutex::ScopedLock lock(mImpl->queueMutex);
 
-  return (0u < mImpl->updateCompletedMessageQueue.Count() ||
-          (0u < mImpl->updateCompletedInterfaceQueue.Count()));
+  return ((0u < mImpl->updateCompletedMessageQueue.Count()) ||
+          (0u < mImpl->updateCompletedInterfaceQueue.size()));
 }
 
 void NotificationManager::ProcessMessages()
@@ -179,22 +166,22 @@ void NotificationManager::ProcessMessages()
   // release the processed messages from event side queue
   mImpl->eventMessageQueue.Clear();
 
-  InterfaceContainer::Iterator       iter2 = mImpl->eventInterfaceQueue.Begin();
-  const InterfaceContainer::Iterator end2  = mImpl->eventInterfaceQueue.End();
+  InterfaceContainer::iterator       iter2 = mImpl->eventInterfaceQueue.begin();
+  const InterfaceContainer::iterator end2  = mImpl->eventInterfaceQueue.end();
   if(iter2 != end2)
   {
     DALI_TRACE_SCOPE(gTraceFilter, "DALI_NOTIFICATION_NOTIFY_COMPLETED");
     for(; iter2 != end2; ++iter2)
     {
-      CompleteNotificationInterface* interface = *iter2;
+      CompleteNotificationInterface* interface = iter2->first;
       if(interface)
       {
-        interface->NotifyCompleted();
+        interface->NotifyCompleted(std::move(iter2->second));
       }
     }
   }
   // just clear the container, we dont own the objects
-  mImpl->eventInterfaceQueue.Clear();
+  mImpl->eventInterfaceQueue.clear();
 }
 
 } // namespace Internal

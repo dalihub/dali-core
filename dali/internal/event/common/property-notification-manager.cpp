@@ -46,33 +46,22 @@ void PropertyNotificationManager::PropertyNotificationDestroyed(PropertyNotifica
   mPropertyNotifications.Erase(iter);
 }
 
-void PropertyNotificationManager::PropertyNotificationSceneObjectMapping(const SceneGraph::PropertyNotification* sceneGraphPropertyNotification, PropertyNotification& propertyNotification)
+void PropertyNotificationManager::NotifyProperty(NotifierInterface::NotifyId notifyId, bool validity)
 {
-  mSceneGraphObjectMap.insert({sceneGraphPropertyNotification, &propertyNotification});
-}
+  Dali::PropertyNotification handle; // Will own handle until all emits have been done.
 
-void PropertyNotificationManager::PropertyNotificationSceneObjectUnmapping(const SceneGraph::PropertyNotification* sceneGraphPropertyNotification)
-{
-  auto iter = mSceneGraphObjectMap.find(sceneGraphPropertyNotification);
-  DALI_ASSERT_DEBUG(iter != mSceneGraphObjectMap.end());
-
-  mSceneGraphObjectMap.erase(iter);
-}
-
-void PropertyNotificationManager::NotifyProperty(SceneGraph::PropertyNotification* sceneGraphPropertyNotification, bool validity)
-{
-  const auto iter = mSceneGraphObjectMap.find(sceneGraphPropertyNotification);
-  if(iter != mSceneGraphObjectMap.end())
+  auto* propertyNotification = GetEventObject(notifyId);
+  if(DALI_LIKELY(propertyNotification))
   {
     // Check if this notification hold inputed scenegraph property notification.
-    auto* propertyNotification = iter->second;
-    if(propertyNotification->CompareSceneObject(sceneGraphPropertyNotification))
-    {
-      // allow application to access the value that triggered this emit incase of NOTIFY_ON_CHANGED mode
-      propertyNotification->SetNotifyResult(validity);
-      // yes..emit signal
-      propertyNotification->EmitSignalNotify();
-    }
+    DALI_ASSERT_DEBUG(propertyNotification->CompareSceneObjectNotifyId(notifyId));
+
+    handle = Dali::PropertyNotification(propertyNotification);
+
+    // allow application to access the value that triggered this emit incase of NOTIFY_ON_CHANGED mode
+    propertyNotification->SetNotifyResult(validity);
+    // yes..emit signal
+    propertyNotification->EmitSignalNotify();
   }
 }
 

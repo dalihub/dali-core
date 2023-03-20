@@ -24,7 +24,6 @@
 #include <dali/integration-api/core-enumerations.h>
 #include <dali/integration-api/resource-policies.h>
 #include <dali/internal/common/owner-pointer.h>
-#include <dali/internal/event/animation/animation-playlist-declarations.h>
 #include <dali/internal/event/common/object-registry-impl.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/common/stage-def.h>
@@ -330,7 +329,7 @@ private:
   Integration::PlatformAbstraction& mPlatform;         ///< The interface providing platform specific services.
 
   IntrusivePtr<Stage>                       mStage;                       ///< The current stage
-  AnimationPlaylistOwner                    mAnimationPlaylist;           ///< For 'Fire and forget' animation support
+  OwnerPointer<AnimationPlaylist>           mAnimationPlaylist;           ///< For 'Fire and forget' animation support
   OwnerPointer<PropertyNotificationManager> mPropertyNotificationManager; ///< For safe signal emmision of property changed notifications
   IntrusivePtr<RelayoutController>          mRelayoutController;          ///< Size negotiation relayout controller
 

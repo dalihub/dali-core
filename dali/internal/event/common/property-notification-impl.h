@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PROPERTY_NOTIFICATION_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/internal/event/common/notifier-interface.h> ///< for NotifierInterface::NotifyId
 #include <dali/internal/event/common/property-conditions-impl.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/property-notification.h>
@@ -129,11 +130,11 @@ public:
   bool GetNotifyResult() const;
 
   /**
-   * Compare the passed sceneObject to the one created by this instance
-   * @param[in] sceneObject The SceneGraph::PropertyNotification pointer to compare
-   * @return true if sceneObject is the same as the one created by this instance
+   * Compare the passed NotifyId to the one created by this instance
+   * @param[in] notifyId The SceneGraph::PropertyNotification's notify id to compare
+   * @return true if notifyId is the same as the one created by this instance
    */
-  bool CompareSceneObject(const SceneGraph::PropertyNotification* sceneObject);
+  bool CompareSceneObjectNotifyId(NotifierInterface::NotifyId notifyId) const;
 
 protected:
   /**

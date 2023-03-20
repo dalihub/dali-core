@@ -294,6 +294,8 @@ struct UpdateManager::Impl
   DiscardQueue<MemoryPoolKey<Renderer>, OwnerKeyContainer<Renderer>> rendererDiscardQueue;
   DiscardQueue<Scene*, OwnerContainer<Scene*>>                       sceneDiscardQueue;
 
+  CompleteNotificationInterface::ParameterList notifyRequiredAnimations; ///< A temperal container of complete notify required animations, like animation finished, stopped, or loop completed.
+
   OwnerPointer<PanGesture> panGestureProcessor; ///< Owned pan gesture processor; it lives for the lifecycle of UpdateManager
 
   MessageQueue                         messageQueue;          ///< The messages queued from the event-thread
@@ -571,6 +573,9 @@ void UpdateManager::StopAnimation(Animation* animation)
 
   bool animationFinished = animation->Stop(mSceneGraphBuffers.GetUpdateBufferIndex());
 
+  // Queue this animation into notify required animations. Since we need to send Finished signal
+  mImpl->notifyRequiredAnimations.PushBack(animation->GetNotifyId());
+
   mImpl->animationFinishedDuringUpdate = mImpl->animationFinishedDuringUpdate || animationFinished;
 }
 
@@ -581,6 +586,8 @@ void UpdateManager::RemoveAnimation(Animation* animation)
   animation->OnDestroy(mSceneGraphBuffers.GetUpdateBufferIndex());
 
   DALI_ASSERT_DEBUG(animation->GetState() == Animation::Destroyed);
+
+  // Do not remove from container now. Destroyed animation will be removed at Animate.
 }
 
 bool UpdateManager::IsAnimationRunning() const
@@ -627,7 +634,11 @@ void UpdateManager::AddPropertyNotification(OwnerPointer<PropertyNotification>& 
 
 void UpdateManager::RemovePropertyNotification(PropertyNotification* propertyNotification)
 {
-  mImpl->propertyNotifications.EraseObject(propertyNotification);
+  auto iter = std::find(mImpl->propertyNotifications.Begin(), mImpl->propertyNotifications.End(), propertyNotification);
+  if(iter != mImpl->propertyNotifications.End())
+  {
+    mImpl->propertyNotifications.Erase(iter);
+  }
 }
 
 void UpdateManager::PropertyNotificationSetNotify(PropertyNotification* propertyNotification, PropertyNotification::NotifyMode notifyMode)
@@ -786,9 +797,9 @@ bool UpdateManager::ProcessGestures(BufferIndex bufferIndex, uint32_t lastVSyncT
 bool UpdateManager::Animate(BufferIndex bufferIndex, float elapsedSeconds)
 {
   bool animationActive = false;
+  bool animationLooped = false;
 
-  auto&& iter            = mImpl->animations.Begin();
-  bool   animationLooped = false;
+  auto&& iter = mImpl->animations.Begin();
 
   while(iter != mImpl->animations.End())
   {
@@ -802,11 +813,17 @@ bool UpdateManager::Animate(BufferIndex bufferIndex, float elapsedSeconds)
 
     if(progressMarkerReached)
     {
-      mImpl->notificationManager.QueueMessage(Internal::NotifyProgressReachedMessage(mImpl->animationPlaylist, animation));
+      mImpl->notificationManager.QueueMessage(Internal::NotifyProgressReachedMessage(mImpl->animationPlaylist, animation->GetNotifyId()));
     }
 
     mImpl->animationFinishedDuringUpdate = mImpl->animationFinishedDuringUpdate || finished;
     animationLooped                      = animationLooped || looped;
+
+    // queue the notification on finished or stoped or looped (to update loop count)
+    if(finished || looped)
+    {
+      mImpl->notifyRequiredAnimations.PushBack(animation->GetNotifyId());
+    }
 
     // Remove animations that had been destroyed but were still waiting for an update
     if(animation->GetState() == Animation::Destroyed)
@@ -819,11 +836,10 @@ bool UpdateManager::Animate(BufferIndex bufferIndex, float elapsedSeconds)
     }
   }
 
-  // queue the notification on finished or looped (to update loop count)
-  if(mImpl->animationFinishedDuringUpdate || animationLooped)
+  // The application should be notified by NotificationManager, in another thread
+  if(!mImpl->notifyRequiredAnimations.Empty())
   {
-    // The application should be notified by NotificationManager, in another thread
-    mImpl->notificationManager.QueueCompleteNotification(&mImpl->animationPlaylist);
+    mImpl->notificationManager.QueueNotification(&mImpl->animationPlaylist, std::move(mImpl->notifyRequiredAnimations));
   }
 
   return animationActive;
@@ -882,7 +898,7 @@ void UpdateManager::ProcessPropertyNotifications(BufferIndex bufferIndex)
     bool valid = notification->Check(bufferIndex);
     if(valid)
     {
-      mImpl->notificationManager.QueueMessage(PropertyChangedMessage(mImpl->propertyNotifier, notification, notification->GetValidity()));
+      mImpl->notificationManager.QueueMessage(PropertyChangedMessage(mImpl->propertyNotifier, notification->GetNotifyId(), notification->GetValidity()));
     }
   }
 }
@@ -1132,15 +1148,17 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
 
   if(!uploadOnly)
   {
+    // check the countdown and notify
+    mImpl->renderTaskWaiting = false;
+
     for(auto&& scene : mImpl->scenes)
     {
       if(scene && scene->root && scene->taskList)
       {
         RenderTaskList::RenderTaskContainer& tasks = scene->taskList->GetTasks();
 
-        // check the countdown and notify
-        bool doRenderOnceNotify  = false;
-        mImpl->renderTaskWaiting = false;
+        CompleteNotificationInterface::ParameterList notifyRequiredRenderTasks;
+
         for(auto&& renderTask : tasks)
         {
           renderTask->UpdateState();
@@ -1153,14 +1171,14 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
 
           if(renderTask->HasRendered())
           {
-            doRenderOnceNotify = true;
+            notifyRequiredRenderTasks.PushBack(renderTask->GetNotifyId());
           }
         }
 
-        if(doRenderOnceNotify)
+        if(!notifyRequiredRenderTasks.Empty())
         {
           DALI_LOG_INFO(gRenderTaskLogFilter, Debug::General, "Notify a render task has finished\n");
-          mImpl->notificationManager.QueueCompleteNotification(scene->taskList->GetCompleteNotificationInterface());
+          mImpl->notificationManager.QueueNotification(scene->taskList->GetCompleteNotificationInterface(), std::move(notifyRequiredRenderTasks));
         }
       }
     }
