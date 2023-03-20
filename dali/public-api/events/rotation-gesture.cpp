@@ -33,11 +33,11 @@ RotationGesture::RotationGesture() = default;
 
 RotationGesture::RotationGesture(const RotationGesture& rhs) = default;
 
-RotationGesture::RotationGesture(RotationGesture&& rhs) = default;
+RotationGesture::RotationGesture(RotationGesture&& rhs) noexcept = default;
 
 RotationGesture& RotationGesture::operator=(const RotationGesture& rhs) = default;
 
-RotationGesture& RotationGesture::operator=(RotationGesture&& rhs) = default;
+RotationGesture& RotationGesture::operator=(RotationGesture&& rhs) noexcept = default;
 
 RotationGesture::~RotationGesture() = default;
 

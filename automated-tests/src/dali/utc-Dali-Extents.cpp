@@ -112,6 +112,37 @@ int UtcDaliExtentsCopyAssignment(void)
   END_TEST;
 }
 
+int UtcDaliExtentsMoveConstructor(void)
+{
+  TestApplication application;
+
+  Extents extent(10u, 20u, 400u, 200u);
+
+  Extents extent2(std::move(extent));
+
+  DALI_TEST_EQUALS(extent2.start, 10u, TEST_LOCATION);
+  DALI_TEST_EQUALS(extent2.end, 20u, TEST_LOCATION);
+  DALI_TEST_EQUALS(extent2.top, 400u, TEST_LOCATION);
+  DALI_TEST_EQUALS(extent2.bottom, 200u, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliExtentsMoveAssignment(void)
+{
+  TestApplication application;
+
+  Extents extent;
+
+  Extents extent2(10u, 20u, 400u, 200u);
+  extent = std::move(extent2);
+
+  DALI_TEST_EQUALS(extent.start, 10u, TEST_LOCATION);
+  DALI_TEST_EQUALS(extent.end, 20u, TEST_LOCATION);
+  DALI_TEST_EQUALS(extent.top, 400u, TEST_LOCATION);
+  DALI_TEST_EQUALS(extent.bottom, 200u, TEST_LOCATION);
+  END_TEST;
+}
+
 int UtcDaliExtentsAssignP(void)
 {
   Extents        extent;

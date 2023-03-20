@@ -90,7 +90,7 @@ public:
    * @SINCE_1_9.27
    * @param[in] rhs A reference to the moved handle
    */
-  KeyEvent(KeyEvent&& rhs);
+  KeyEvent(KeyEvent&& rhs) noexcept;
 
   /**
    * @brief Copy assignment operator.
@@ -107,7 +107,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  KeyEvent& operator=(KeyEvent&& rhs);
+  KeyEvent& operator=(KeyEvent&& rhs) noexcept;
 
   /**
    * @brief Destructor.

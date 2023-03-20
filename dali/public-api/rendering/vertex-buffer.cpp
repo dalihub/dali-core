@@ -44,9 +44,9 @@ VertexBuffer VertexBuffer::DownCast(BaseHandle handle)
 
 VertexBuffer& VertexBuffer::operator=(const VertexBuffer& handle) = default;
 
-VertexBuffer::VertexBuffer(VertexBuffer&& rhs) = default;
+VertexBuffer::VertexBuffer(VertexBuffer&& rhs) noexcept = default;
 
-VertexBuffer& VertexBuffer::operator=(VertexBuffer&& rhs) = default;
+VertexBuffer& VertexBuffer::operator=(VertexBuffer&& rhs) noexcept = default;
 
 void VertexBuffer::SetData(const void* data, std::size_t size)
 {

@@ -423,7 +423,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  Constraint(Constraint&& rhs);
+  Constraint(Constraint&& rhs) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -432,7 +432,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  Constraint& operator=(Constraint&& rhs);
+  Constraint& operator=(Constraint&& rhs) noexcept;
 
   /**
    * @brief Downcasts a handle to Constraint handle.

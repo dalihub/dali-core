@@ -64,7 +64,7 @@ public:
    * @SINCE_1_9.28
    * @param rhs The handle to move.
    */
-  TapGesture(TapGesture&& rhs);
+  TapGesture(TapGesture&& rhs) noexcept;
 
   /**
    * @brief Assignment operator.
@@ -79,7 +79,7 @@ public:
    * @SINCE_1_9.28
    * @param rhs The handle to move.
    */
-  TapGesture& operator=(TapGesture&& rhs);
+  TapGesture& operator=(TapGesture&& rhs) noexcept;
 
   /**
    * @brief Non virtual destructor.

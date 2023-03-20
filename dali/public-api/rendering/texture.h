@@ -143,7 +143,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  Texture(Texture&& rhs);
+  Texture(Texture&& rhs) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -152,7 +152,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  Texture& operator=(Texture&& rhs);
+  Texture& operator=(Texture&& rhs) noexcept;
 
   /**
    * @brief Uploads data to the texture from a PixelData object.

@@ -119,7 +119,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs The actor to move
    */
-  CustomActor(CustomActor&& rhs);
+  CustomActor(CustomActor&& rhs) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -128,7 +128,7 @@ public:
    * @param[in] rhs The actor to move
    * @return A reference to this
    */
-  CustomActor& operator=(CustomActor&& rhs);
+  CustomActor& operator=(CustomActor&& rhs) noexcept;
 
 public: // Not intended for application developers
   /**

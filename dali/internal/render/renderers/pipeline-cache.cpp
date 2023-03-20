@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -190,10 +190,10 @@ constexpr Graphics::BlendOp ConvertBlendEquation(DevelBlendEquation::Type blendE
 }
 } // namespace
 
-PipelineCacheL0* PipelineCache::GetPipelineCacheL0(Program* program, Render::Geometry* geometry)
+PipelineCacheL0* PipelineCache::GetPipelineCacheL0(std::size_t hash, Program* program, Render::Geometry* geometry)
 {
-  auto it = std::find_if(level0nodes.begin(), level0nodes.end(), [program, geometry](PipelineCacheL0& item) {
-    return ((item.program == program && item.geometry == geometry));
+  auto it = std::find_if(level0nodes.begin(), level0nodes.end(), [hash, program, geometry](PipelineCacheL0& item) {
+    return ((item.hash == hash && item.program == program && item.geometry == geometry));
   });
 
   // Add new node to cache
@@ -237,6 +237,7 @@ PipelineCacheL0* PipelineCache::GetPipelineCacheL0(Program* program, Render::Geo
       ++bindingIndex;
     }
     PipelineCacheL0 level0;
+    level0.hash       = hash;
     level0.program    = program;
     level0.geometry   = geometry;
     level0.inputState = vertexInputState;
@@ -403,14 +404,59 @@ PipelineCacheL2* PipelineCacheL1::GetPipelineCacheL2(bool blend, bool premul, Bl
   return retval;
 }
 
+void PipelineCacheQueryInfo::GenerateHash()
+{
+  // Lightweight hash value generation.
+  hash = (reinterpret_cast<std::size_t>(program) >> Dali::Log<sizeof(decltype(*program))>::value) ^
+         (reinterpret_cast<std::size_t>(geometry) >> Dali::Log<sizeof(decltype(*geometry))>::value) ^
+         ((blendingEnabled ? 1u : 0u) << 0u) ^
+         ((alphaPremultiplied ? 1u : 0u) << 1u) ^
+         (static_cast<std::size_t>(geometry->GetTopology()) << 2u) ^
+         (static_cast<std::size_t>(renderer->GetFaceCullMode()) << 5u) ^
+         ((cameraUsingReflection ? 1u : 0u) << 8u) ^
+         (blendingEnabled ? static_cast<std::size_t>(blendingOptions->GetBitmask()) : 0xDA11u);
+}
+
+bool PipelineCacheQueryInfo::Equal(const PipelineCacheQueryInfo& lhs, const PipelineCacheQueryInfo& rhs) noexcept
+{
+  // Naive equal check.
+  const bool ret = (lhs.hash == rhs.hash) && // Check hash value first
+                   (lhs.program == rhs.program) &&
+                   (lhs.geometry == rhs.geometry) &&
+                   (lhs.blendingEnabled == rhs.blendingEnabled) &&
+                   (lhs.alphaPremultiplied == rhs.alphaPremultiplied) &&
+                   (lhs.geometry->GetTopology() == rhs.geometry->GetTopology()) &&
+                   (lhs.renderer->GetFaceCullMode() == rhs.renderer->GetFaceCullMode()) &&
+                   (lhs.cameraUsingReflection == rhs.cameraUsingReflection) &&
+                   (!lhs.blendingEnabled ||
+                    (lhs.blendingOptions->GetBitmask() == rhs.blendingOptions->GetBitmask() &&
+                     ((lhs.blendingOptions->GetBlendColor() == nullptr && rhs.blendingOptions->GetBlendColor() == nullptr) ||
+                      (lhs.blendingOptions->GetBlendColor() &&
+                       rhs.blendingOptions->GetBlendColor() &&
+                       (*lhs.blendingOptions->GetBlendColor() == *rhs.blendingOptions->GetBlendColor())))));
+
+  return ret;
+}
+
 PipelineCache::PipelineCache(Graphics::Controller& controller)
 : graphicsController(&controller)
 {
+  // Clean up cache first
+  CleanLatestUsedCache();
 }
 
 PipelineResult PipelineCache::GetPipeline(const PipelineCacheQueryInfo& queryInfo, bool createNewIfNotFound)
 {
-  auto* level0 = GetPipelineCacheL0(queryInfo.program, queryInfo.geometry);
+  // Seperate branch whether query use blending or not.
+  const int latestUsedCacheIndex = queryInfo.blendingEnabled ? 0 : 1;
+
+  // If we can reuse latest bound pipeline, Fast return.
+  if(ReuseLatestBoundPipeline(latestUsedCacheIndex, queryInfo))
+  {
+    return mLatestResult[latestUsedCacheIndex];
+  }
+
+  auto* level0 = GetPipelineCacheL0(queryInfo.hash, queryInfo.program, queryInfo.geometry);
   auto* level1 = level0->GetPipelineCacheL1(queryInfo.renderer, queryInfo.cameraUsingReflection);
   auto* level2 = level1->GetPipelineCacheL2(queryInfo.blendingEnabled, queryInfo.alphaPremultiplied, *queryInfo.blendingOptions);
 
@@ -440,7 +486,16 @@ PipelineResult PipelineCache::GetPipeline(const PipelineCacheQueryInfo& queryInf
   result.level1   = level1;
   result.level2   = level2;
 
+  // Copy query and result
+  mLatestQuery[latestUsedCacheIndex]  = queryInfo;
+  mLatestResult[latestUsedCacheIndex] = result;
+
   return result;
+}
+
+bool PipelineCache::ReuseLatestBoundPipeline(const int latestUsedCacheIndex, const PipelineCacheQueryInfo& queryInfo) const
+{
+  return mLatestResult[latestUsedCacheIndex].pipeline != nullptr && PipelineCacheQueryInfo::Equal(queryInfo, mLatestQuery[latestUsedCacheIndex]);
 }
 
 } // namespace Dali::Internal::Render

@@ -46,9 +46,9 @@ Handle::Handle(const Handle& handle) = default;
 
 Handle& Handle::operator=(const Handle& rhs) = default;
 
-Handle::Handle(Handle&& rhs) = default;
+Handle::Handle(Handle&& rhs) noexcept = default;
 
-Handle& Handle::operator=(Handle&& rhs) = default;
+Handle& Handle::operator=(Handle&& rhs) noexcept = default;
 
 Handle Handle::DownCast(BaseHandle handle)
 {

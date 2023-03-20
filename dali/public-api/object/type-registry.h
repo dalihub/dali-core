@@ -140,7 +140,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  TypeRegistry(TypeRegistry&& rhs);
+  TypeRegistry(TypeRegistry&& rhs) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -149,7 +149,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  TypeRegistry& operator=(TypeRegistry&& rhs);
+  TypeRegistry& operator=(TypeRegistry&& rhs) noexcept;
 
   /**
    * @brief Gets TypeInfo for a registered type.

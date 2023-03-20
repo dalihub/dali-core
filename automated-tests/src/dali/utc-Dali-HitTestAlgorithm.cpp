@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -626,6 +626,77 @@ int UtcDaliHitTestAlgorithmOrder(void)
   HitTestAlgorithm::Results results;
   HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
   DALI_TEST_CHECK(results.actor == green);
+
+  END_TEST;
+}
+
+int UtcDaliHitTestAlgorithmBuildPickingRay01(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::HitTestAlgorithm::BuildPickingRay positive test");
+
+  Stage             stage             = Stage::GetCurrent();
+  RenderTaskList    renderTaskList    = stage.GetRenderTaskList();
+  RenderTask        defaultRenderTask = renderTaskList.GetTask(0u);
+  Dali::CameraActor cameraActor       = defaultRenderTask.GetCameraActor();
+
+  Vector2 stageSize(stage.GetSize());
+
+  Vector2 actorSize(stageSize * 0.5f);
+  // Create two actors with half the size of the stage and set them to be overlapping
+  Actor blue = Actor::New();
+  blue.SetProperty(Actor::Property::NAME, "Blue");
+  blue.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  blue.SetProperty(Actor::Property::PARENT_ORIGIN, AnchorPoint::CENTER);
+  blue.SetProperty(Actor::Property::SIZE, actorSize);
+
+  Actor green = Actor::New();
+  green.SetProperty(Actor::Property::NAME, "Green");
+  green.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  green.SetProperty(Actor::Property::PARENT_ORIGIN, AnchorPoint::CENTER);
+  green.SetProperty(Actor::Property::SIZE, actorSize);
+
+  // Add the actors to the view
+  stage.Add(blue);
+  stage.Add(green);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render(0);
+
+  Vector2 screenCoords(stageSize * 0.5f); // touch center of screen
+  Vector3 origin;
+  Vector3 direction;
+  bool    built = HitTestAlgorithm::BuildPickingRay(defaultRenderTask, screenCoords, origin, direction);
+
+  Vector3 camPos = cameraActor[Actor::Property::POSITION];
+  DALI_TEST_EQUALS(built, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(camPos, origin, TEST_LOCATION);
+  direction.Normalize();
+  DALI_TEST_EQUALS(direction, -Vector3::ZAXIS, 0.01f, TEST_LOCATION);
+
+  screenCoords.x = stageSize.width * 0.75f;
+  built          = HitTestAlgorithm::BuildPickingRay(defaultRenderTask, screenCoords, origin, direction);
+  DALI_TEST_EQUALS(built, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(camPos, origin, TEST_LOCATION);
+  direction.Normalize();
+  DALI_TEST_EQUALS(direction, Vector3(0.075f, 0.0f, -1.0f), 0.01f, TEST_LOCATION);
+
+  screenCoords.x = 0.0f;
+  screenCoords.y = 0.0f;
+  built          = HitTestAlgorithm::BuildPickingRay(defaultRenderTask, screenCoords, origin, direction);
+  DALI_TEST_EQUALS(built, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(camPos, origin, TEST_LOCATION);
+  direction.Normalize();
+  DALI_TEST_EQUALS(direction, Vector3(-0.144f, -0.24f, -0.96f), 0.01f, TEST_LOCATION);
+
+  screenCoords.x = stageSize.width;
+  screenCoords.y = stageSize.height;
+  built          = HitTestAlgorithm::BuildPickingRay(defaultRenderTask, screenCoords, origin, direction);
+  DALI_TEST_EQUALS(built, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(camPos, origin, TEST_LOCATION);
+  direction.Normalize();
+  DALI_TEST_EQUALS(direction, Vector3(0.144f, 0.24f, -0.96f), 0.01f, TEST_LOCATION);
 
   END_TEST;
 }

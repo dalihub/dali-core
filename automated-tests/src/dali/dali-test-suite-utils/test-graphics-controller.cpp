@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1214,7 +1214,7 @@ Graphics::UniquePtr<Graphics::Program> TestGraphicsController::CreateProgram(con
       source.resize(graphicsShader->mCreateInfo.sourceSize);
       memcpy(&source[0], graphicsShader->mCreateInfo.sourceData, graphicsShader->mCreateInfo.sourceSize);
 
-      if(!std::equal(source.begin(), source.end(), cacheEntry.shaders[shader.pipelineStage].begin()))
+      if(!std::equal(source.begin(), source.end(), cacheEntry.shaders[shader.pipelineStage].begin(), cacheEntry.shaders[shader.pipelineStage].end()))
       {
         found = false;
         break;

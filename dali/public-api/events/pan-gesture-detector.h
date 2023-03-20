@@ -163,7 +163,7 @@ public: // Creation & Destruction
    * @SINCE_2_2.4
    * @param[in] handle A reference to the moved handle
    */
-  PanGestureDetector(PanGestureDetector&& handle);
+  PanGestureDetector(PanGestureDetector&& handle) noexcept;
 
   /**
    * @brief This move assignment operator is required for (smart) pointer semantics.
@@ -172,7 +172,7 @@ public: // Creation & Destruction
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  PanGestureDetector& operator=(PanGestureDetector&& rhs);
+  PanGestureDetector& operator=(PanGestureDetector&& rhs) noexcept;
 
 public: // Setters
   /**

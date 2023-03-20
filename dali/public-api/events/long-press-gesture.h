@@ -68,7 +68,7 @@ public:
    * @SINCE_1_9.28
    * @param[in] rhs A reference to the handle to move
    */
-  LongPressGesture(LongPressGesture&& rhs);
+  LongPressGesture(LongPressGesture&& rhs) noexcept;
 
   /**
    * @brief Assignment operator.
@@ -84,7 +84,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  LongPressGesture& operator=(LongPressGesture&& rhs);
+  LongPressGesture& operator=(LongPressGesture&& rhs) noexcept;
 
   /**
    * @brief Non virtual destructor.

@@ -41,9 +41,9 @@ GestureDetector::GestureDetector(const GestureDetector& handle) = default;
 
 GestureDetector& GestureDetector::operator=(const GestureDetector& rhs) = default;
 
-GestureDetector::GestureDetector(GestureDetector&& handle) = default;
+GestureDetector::GestureDetector(GestureDetector&& handle) noexcept = default;
 
-GestureDetector& GestureDetector::operator=(GestureDetector&& rhs) = default;
+GestureDetector& GestureDetector::operator=(GestureDetector&& rhs) noexcept = default;
 
 void GestureDetector::Attach(Actor actor)
 {

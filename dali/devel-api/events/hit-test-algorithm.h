@@ -2,7 +2,7 @@
 #define __DALI_HIT_TEST_ALGORITHM_H__
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -142,6 +142,17 @@ using HitTestFunction = bool (*)(Actor, TraverseType);
  * @return true if something was hit
  */
 DALI_CORE_API bool HitTest(Stage stage, const Vector2& screenCoordinates, Results& results, HitTestFunction func);
+
+/**
+ * @brief Given screen coordinates, this method returns the camera origin in world coordinates and the direction of the picking ray in world-space.
+ *
+ * @param[in] renderTask The render task owning a camera.
+ * @param[in] screenCoordinates The screen coordinates.
+ * @param[out] origin The camera origin in world coordinates
+ * @param[out] direction The direction of the picking ray in world-space
+ * @return true if the screen coordinates are inside the render task's viewport
+ */
+DALI_CORE_API bool BuildPickingRay(RenderTask renderTask, const Vector2& screenCoordinates, Vector3& origin, Vector3& direction);
 
 } // namespace HitTestAlgorithm
 

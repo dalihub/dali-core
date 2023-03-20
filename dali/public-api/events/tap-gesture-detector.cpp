@@ -55,9 +55,9 @@ TapGestureDetector::TapGestureDetector(const TapGestureDetector& handle) = defau
 
 TapGestureDetector& TapGestureDetector::operator=(const TapGestureDetector& rhs) = default;
 
-TapGestureDetector::TapGestureDetector(TapGestureDetector&& handle) = default;
+TapGestureDetector::TapGestureDetector(TapGestureDetector&& handle) noexcept = default;
 
-TapGestureDetector& TapGestureDetector::operator=(TapGestureDetector&& rhs) = default;
+TapGestureDetector& TapGestureDetector::operator=(TapGestureDetector&& rhs) noexcept = default;
 
 void TapGestureDetector::SetMinimumTapsRequired(uint32_t taps)
 {

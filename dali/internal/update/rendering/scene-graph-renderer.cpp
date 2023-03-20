@@ -736,19 +736,6 @@ void Renderer::UpdateUniformMap(BufferIndex updateBufferIndex)
     mRegenerateUniformMap = false;
     SetUpdated(true);
   }
-
-  uint64_t                                  hash                   = 0xc70f6907UL;
-  const SceneGraph::UniformMapDataProvider& uniformMapDataProvider = GetUniformMapDataProvider();
-  const SceneGraph::CollectedUniformMap&    collectedUniformMap    = uniformMapDataProvider.GetCollectedUniformMap();
-  for(uint32_t i = 0u, count = collectedUniformMap.Count(); i < count; ++i)
-  {
-    hash = collectedUniformMap.mUniformMap[i].propertyPtr->Hash(updateBufferIndex, hash);
-  }
-  if(mUniformsHash != hash)
-  {
-    mUniformsHash = hash;
-    SetUpdated(true);
-  }
 }
 
 void Renderer::SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, uint32_t size)
@@ -787,28 +774,24 @@ const CollectedUniformMap& Renderer::GetCollectedUniformMap() const
   return mCollectedUniformMap;
 }
 
+bool Renderer::IsUpdated() const
+{
+  if(Updated() || (mShader && mShader->Updated()))
+  {
+    return true;
+  }
+  return false;
+}
+
 Vector4 Renderer::GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, const Vector4& originalUpdateArea) noexcept
 {
   if(mVisualProperties)
   {
     auto& coefficient = mVisualProperties->mCoefficient;
 
-    // TODO : We may need to get some method that visual properties changed, without hash.
-    // Or, need to call this API in PreRender side.
-
-    uint64_t hash = 0xc70f6907UL;
-
-    hash = mVisualProperties->mTransformOffset.Hash(updateBufferIndex, hash);
-    hash = mVisualProperties->mTransformOffsetSizeMode.Hash(updateBufferIndex, hash);
-    hash = mVisualProperties->mTransformSize.Hash(updateBufferIndex, hash);
-    hash = mVisualProperties->mTransformOrigin.Hash(updateBufferIndex, hash);
-    hash = mVisualProperties->mTransformAnchorPoint.Hash(updateBufferIndex, hash);
-    hash = mVisualProperties->mExtraSize.Hash(updateBufferIndex, hash);
-
-    if(coefficient.hash != hash)
+    // Recalculate only if coefficient need to be updated.
+    if(coefficient.IsUpdated())
     {
-      coefficient.hash = hash;
-
       // VisualProperty
       const Vector2 transformOffset         = mVisualProperties->mTransformOffset.Get(updateBufferIndex);
       const Vector4 transformOffsetSizeMode = mVisualProperties->mTransformOffsetSizeMode.Get(updateBufferIndex);
@@ -859,20 +842,18 @@ Vector4 Renderer::GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, 
       coefficient.coefCA = transformSize * Vector2(transformOffsetSizeMode.z, transformOffsetSizeMode.w) + extraSize;
       coefficient.coefCB = coefficient.coefCA * transformAnchorPoint + transformOffset * Vector2(transformOffsetSizeMode.x, transformOffsetSizeMode.y);
     }
+
+    float coefD = 0.0f; ///< Default as 0.0f when we don't use decorated renderer.
+
     if(mVisualProperties->mExtendedProperties)
     {
       const auto decoratedVisualProperties = static_cast<VisualRenderer::AnimatableDecoratedVisualProperties*>(mVisualProperties->mExtendedProperties);
 
-      uint64_t decoratedHash = 0xc70f6907UL;
+      auto& decoratedCoefficient = decoratedVisualProperties->mCoefficient;
 
-      decoratedHash = decoratedVisualProperties->mBorderlineWidth.Hash(updateBufferIndex, decoratedHash);
-      decoratedHash = decoratedVisualProperties->mBorderlineOffset.Hash(updateBufferIndex, decoratedHash);
-      decoratedHash = decoratedVisualProperties->mBlurRadius.Hash(updateBufferIndex, decoratedHash);
-
-      if(coefficient.decoratedHash != decoratedHash)
+      // Recalculate only if coefficient need to be updated.
+      if(decoratedCoefficient.IsUpdated())
       {
-        coefficient.decoratedHash = decoratedHash;
-
         // DecoratedVisualProperty
         const float borderlineWidth  = decoratedVisualProperties->mBorderlineWidth.Get(updateBufferIndex);
         const float borderlineOffset = decoratedVisualProperties->mBorderlineOffset.Get(updateBufferIndex);
@@ -883,10 +864,12 @@ Vector4 Renderer::GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, 
         DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "blur radius       %5.3f\n", blurRadius);
 
         // D coefficients be used only decoratedVisual.
-        // It can be calculated parallely with transform.
-
-        coefficient.coefD = std::max((1.0f + Dali::Clamp(borderlineOffset, -1.0f, 1.0f)) * borderlineWidth, 2.0f * blurRadius);
+        // It can be calculated parallely with visual transform.
+        decoratedCoefficient.coefD = std::max((1.0f + Dali::Clamp(borderlineOffset, -1.0f, 1.0f)) * borderlineWidth, 2.0f * blurRadius);
       }
+
+      // Update coefD so we can use this value out of this scope.
+      coefD = decoratedCoefficient.coefD;
     }
 
     // Calculate vertex position by coefficient
@@ -916,8 +899,8 @@ Vector4 Renderer::GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, 
     // TODO : We need to re-generate coefficient to consitder area width/height
     const Vector4 resultArea = Vector4(originalXY.x,
                                        originalXY.y,
-                                       scaleVertexPosition.x + 2.0f * abs(basicVertexPosition.x) + coefficient.coefD,
-                                       scaleVertexPosition.y + 2.0f * abs(basicVertexPosition.y) + coefficient.coefD);
+                                       scaleVertexPosition.x + 2.0f * abs(basicVertexPosition.x) + coefD,
+                                       scaleVertexPosition.y + 2.0f * abs(basicVertexPosition.y) + coefD);
 
     DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "%f %f %f %f--> %f %f %f %f\n", originalUpdateArea.x, originalUpdateArea.y, originalUpdateArea.z, originalUpdateArea.w, resultArea.x, resultArea.y, resultArea.z, resultArea.w);
 

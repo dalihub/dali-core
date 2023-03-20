@@ -33,11 +33,11 @@ PinchGesture::PinchGesture() = default;
 
 PinchGesture::PinchGesture(const PinchGesture& rhs) = default;
 
-PinchGesture::PinchGesture(PinchGesture&& rhs) = default;
+PinchGesture::PinchGesture(PinchGesture&& rhs) noexcept = default;
 
 PinchGesture& PinchGesture::operator=(const PinchGesture& rhs) = default;
 
-PinchGesture& PinchGesture::operator=(PinchGesture&& rhs) = default;
+PinchGesture& PinchGesture::operator=(PinchGesture&& rhs) noexcept = default;
 
 PinchGesture::~PinchGesture() = default;
 

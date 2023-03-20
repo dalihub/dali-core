@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include "relayout-controller-impl.h"
+#include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
 
 // EXTERNAL INCLUDES
 #if defined(DEBUG_ENABLED)
@@ -119,6 +119,8 @@ RelayoutController::RelayoutController(Integration::RenderController& controller
 {
   // Make space for 32 controls to avoid having to copy construct a lot in the beginning
   mRelayoutStack->Reserve(32);
+  mPotentialRedundantSubRoots.reserve(32);
+  mTopOfSubTreeStack.reserve(32);
 }
 
 RelayoutController::~RelayoutController() = default;
@@ -152,8 +154,11 @@ void RelayoutController::RequestRelayout(Dali::Actor& actor, Dimension::Type dim
     return;
   }
 
-  std::vector<Dali::Actor> potentialRedundantSubRoots;
-  std::vector<Dali::Actor> topOfSubTreeStack;
+  std::vector<Dali::Actor>& potentialRedundantSubRoots = mPotentialRedundantSubRoots;
+  std::vector<Dali::Actor>& topOfSubTreeStack          = mTopOfSubTreeStack;
+
+  DALI_ASSERT_ALWAYS(potentialRedundantSubRoots.empty() && "potentialRedundantSubRoots must be empty before RequestRelayout!");
+  DALI_ASSERT_ALWAYS(topOfSubTreeStack.empty() && "topOfSubTreeStack must be empty before RequestRelayout!");
 
   topOfSubTreeStack.push_back(actor);
 
@@ -193,6 +198,8 @@ void RelayoutController::RequestRelayout(Dali::Actor& actor, Dimension::Type dim
   {
     RemoveRequest(subRoot);
   }
+
+  potentialRedundantSubRoots.clear();
 
   if(!mProcessingCoreEvents)
   {

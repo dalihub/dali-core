@@ -32,11 +32,11 @@ LongPressGesture::LongPressGesture() = default;
 
 LongPressGesture::LongPressGesture(const LongPressGesture& rhs) = default;
 
-LongPressGesture::LongPressGesture(LongPressGesture&& rhs) = default;
+LongPressGesture::LongPressGesture(LongPressGesture&& rhs) noexcept = default;
 
 LongPressGesture& LongPressGesture::operator=(const LongPressGesture& rhs) = default;
 
-LongPressGesture& LongPressGesture::operator=(LongPressGesture&& rhs) = default;
+LongPressGesture& LongPressGesture::operator=(LongPressGesture&& rhs) noexcept = default;
 
 LongPressGesture::~LongPressGesture() = default;
 

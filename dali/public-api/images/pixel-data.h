@@ -134,7 +134,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  PixelData(PixelData&& rhs);
+  PixelData(PixelData&& rhs) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -143,7 +143,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  PixelData& operator=(PixelData&& rhs);
+  PixelData& operator=(PixelData&& rhs) noexcept;
 
   /**
    * @brief Gets the width of the buffer in pixels.

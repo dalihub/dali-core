@@ -26,6 +26,7 @@
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/uniform-map.h>
+#include <dali/internal/update/rendering/scene-graph-visual-renderer.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/renderer.h> // Dali::Renderer
 
@@ -69,93 +70,6 @@ namespace SceneGraph
 using RendererContainer = Dali::Vector<RendererKey>;
 using RendererIter      = RendererContainer::Iterator;
 using RendererConstIter = RendererContainer::ConstIterator;
-
-namespace VisualRenderer
-{
-struct AnimatableVisualProperties
-{
-  AnimatableVisualProperties()
-  : mTransformOffset(Vector2::ZERO),
-    mTransformSize(Vector2::ONE),
-    mTransformOrigin(Vector2::ZERO),
-    mTransformAnchorPoint(Vector2::ZERO),
-    mTransformOffsetSizeMode(Vector4::ZERO),
-    mExtraSize(Vector2::ZERO),
-    mMixColor(Vector3::ONE),
-    mPreMultipliedAlpha(0.0f),
-    mExtendedPropertiesDeleteFunction(nullptr)
-  {
-  }
-
-  ~AnimatableVisualProperties()
-  {
-    if(mExtendedProperties && mExtendedPropertiesDeleteFunction)
-    {
-      mExtendedPropertiesDeleteFunction(mExtendedProperties);
-    }
-  }
-
-  /**
-   * @brief Cached coefficient value when we calculate visual transformed update size.
-   * It can reduce complexity of calculate the vertex position.
-   *
-   * Vector2 vertexPosition = (XA * aPosition + XB) * originalSize + (CA * aPosition + CB) + Vector2(D, D) * aPosition
-   */
-  struct VisualTransformedUpdateSizeCoefficientCache
-  {
-    Vector2 coefXA{Vector2::ZERO};
-    Vector2 coefXB{Vector2::ZERO};
-    Vector2 coefCA{Vector2::ZERO};
-    Vector2 coefCB{Vector2::ZERO};
-    float   coefD{0.0f};
-
-    uint64_t hash{0u};
-    uint64_t decoratedHash{0u};
-  };
-  VisualTransformedUpdateSizeCoefficientCache mCoefficient; ///< Coefficient value to calculate visual transformed update size by VisualProperties more faster.
-
-  AnimatableProperty<Vector2> mTransformOffset;
-  AnimatableProperty<Vector2> mTransformSize;
-  AnimatableProperty<Vector2> mTransformOrigin;
-  AnimatableProperty<Vector2> mTransformAnchorPoint;
-  AnimatableProperty<Vector4> mTransformOffsetSizeMode;
-  AnimatableProperty<Vector2> mExtraSize;
-  AnimatableProperty<Vector3> mMixColor;
-  AnimatableProperty<float>   mPreMultipliedAlpha;
-
-  void* mExtendedProperties{nullptr};                        // Enable derived class to extend properties further
-  void (*mExtendedPropertiesDeleteFunction)(void*){nullptr}; // Derived class's custom delete functor
-};
-
-struct AnimatableDecoratedVisualProperties
-{
-  AnimatableDecoratedVisualProperties()
-  : mCornerRadius(Vector4::ZERO),
-    mCornerRadiusPolicy(1.0f),
-    mBorderlineWidth(0.0f),
-    mBorderlineColor(Color::BLACK),
-    mBorderlineOffset(0.0f),
-    mBlurRadius(0.0f)
-  {
-  }
-  ~AnimatableDecoratedVisualProperties()
-  {
-  }
-
-  // Delete function of AnimatableDecoratedVisualProperties* converted as void*
-  static void DeleteFunction(void* data)
-  {
-    delete static_cast<AnimatableDecoratedVisualProperties*>(data);
-  }
-
-  AnimatableProperty<Vector4> mCornerRadius;
-  AnimatableProperty<float>   mCornerRadiusPolicy;
-  AnimatableProperty<float>   mBorderlineWidth;
-  AnimatableProperty<Vector4> mBorderlineColor;
-  AnimatableProperty<float>   mBorderlineOffset;
-  AnimatableProperty<float>   mBlurRadius;
-};
-} // namespace VisualRenderer
 
 class Renderer : public PropertyOwner,
                  public UniformMapDataProvider,
@@ -511,10 +425,7 @@ public:
   /**
    * @copydoc RenderDataProvider::IsUpdated()
    */
-  bool IsUpdated() const override
-  {
-    return Updated();
-  }
+  bool IsUpdated() const override;
 
   /**
    * @copydoc RenderDataProvider::GetVisualTransformedUpdateArea()
@@ -633,7 +544,6 @@ private:
 
   Dali::Internal::Render::Renderer::StencilParameters mStencilParameters; ///< Struct containing all stencil related options
 
-  uint64_t             mUniformsHash{0};             ///< Hash of uniform map property values
   uint32_t             mIndexedDrawFirstElement;     ///< first element index to be drawn using indexed draw
   uint32_t             mIndexedDrawElementsCount;    ///< number of elements to be drawn using indexed draw
   uint32_t             mBlendBitmask;                ///< The bitmask of blending options

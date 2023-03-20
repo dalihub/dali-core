@@ -117,7 +117,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  Geometry(Geometry&& rhs);
+  Geometry(Geometry&& rhs) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -126,7 +126,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  Geometry& operator=(Geometry&& rhs);
+  Geometry& operator=(Geometry&& rhs) noexcept;
 
   /**
    * @brief Adds a VertexBuffer to be used as source of geometry vertices.

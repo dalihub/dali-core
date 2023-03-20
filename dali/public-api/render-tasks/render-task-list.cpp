@@ -36,9 +36,9 @@ RenderTaskList::RenderTaskList(const RenderTaskList& handle) = default;
 
 RenderTaskList& RenderTaskList::operator=(const RenderTaskList& rhs) = default;
 
-RenderTaskList::RenderTaskList(RenderTaskList&& rhs) = default;
+RenderTaskList::RenderTaskList(RenderTaskList&& rhs) noexcept = default;
 
-RenderTaskList& RenderTaskList::operator=(RenderTaskList&& rhs) = default;
+RenderTaskList& RenderTaskList::operator=(RenderTaskList&& rhs) noexcept = default;
 
 RenderTask RenderTaskList::CreateTask()
 {

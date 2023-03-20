@@ -54,9 +54,9 @@ Actor::Actor(const Actor& copy) = default;
 
 Actor& Actor::operator=(const Actor& rhs) = default;
 
-Actor::Actor(Actor&& rhs) = default;
+Actor::Actor(Actor&& rhs) noexcept = default;
 
-Actor& Actor::operator=(Actor&& rhs) = default;
+Actor& Actor::operator=(Actor&& rhs) noexcept = default;
 
 Layer Actor::GetLayer()
 {

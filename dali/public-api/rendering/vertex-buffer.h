@@ -128,7 +128,7 @@ public:
    * @SINCE_1_9.27
    * @param[in] rhs A reference to the moved handle
    */
-  VertexBuffer(VertexBuffer&& rhs);
+  VertexBuffer(VertexBuffer&& rhs) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -137,7 +137,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  VertexBuffer& operator=(VertexBuffer&& rhs);
+  VertexBuffer& operator=(VertexBuffer&& rhs) noexcept;
 
   /**
    * @brief Updates the whole buffer information.

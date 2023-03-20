@@ -44,9 +44,9 @@ TextureSet TextureSet::DownCast(BaseHandle handle)
 
 TextureSet& TextureSet::operator=(const TextureSet& handle) = default;
 
-TextureSet::TextureSet(TextureSet&& rhs) = default;
+TextureSet::TextureSet(TextureSet&& rhs) noexcept = default;
 
-TextureSet& TextureSet::operator=(TextureSet&& rhs) = default;
+TextureSet& TextureSet::operator=(TextureSet&& rhs) noexcept = default;
 
 void TextureSet::SetTexture(size_t index, Texture texture)
 {

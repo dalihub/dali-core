@@ -74,9 +74,9 @@ FrameBuffer::FrameBuffer(Internal::FrameBuffer* pointer)
 {
 }
 
-FrameBuffer::FrameBuffer(FrameBuffer&& rhs) = default;
+FrameBuffer::FrameBuffer(FrameBuffer&& rhs) noexcept = default;
 
-FrameBuffer& FrameBuffer::operator=(FrameBuffer&& rhs) = default;
+FrameBuffer& FrameBuffer::operator=(FrameBuffer&& rhs) noexcept = default;
 
 void FrameBuffer::AttachColorTexture(Texture& texture)
 {

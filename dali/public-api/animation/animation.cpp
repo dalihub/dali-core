@@ -52,9 +52,9 @@ Animation::Animation(const Animation& handle) = default;
 
 Animation& Animation::operator=(const Animation& rhs) = default;
 
-Animation::Animation(Animation&& rhs) = default;
+Animation::Animation(Animation&& rhs) noexcept = default;
 
-Animation& Animation::operator=(Animation&& rhs) = default;
+Animation& Animation::operator=(Animation&& rhs) noexcept = default;
 
 void Animation::SetDuration(float durationSeconds)
 {

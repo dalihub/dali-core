@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,8 +112,6 @@ inline NodePropertyFlags UpdateNodes(Node&             node,
   NodePropertyFlags cumulativeDirtyFlags = nodeDirtyFlags;
 
   UpdateNodeOpacity(node, nodeDirtyFlags, updateBufferIndex);
-
-  node.UpdateUniformHash(updateBufferIndex);
 
   // For partial update, mark all children of an animating node as updated.
   if(updated) // Only set to updated if parent was updated.
