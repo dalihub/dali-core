@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_API_TYPES
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <utility>
 #include <vector>
 
+#include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/signals/callback.h>
 
 namespace Dali
@@ -961,6 +962,7 @@ struct TextureUpdateSourceInfo
   {
     BUFFER,
     MEMORY,
+    PIXEL_DATA,
     TEXTURE
   };
 
@@ -975,6 +977,11 @@ struct TextureUpdateSourceInfo
   {
     void* memory;
   } memorySource;
+
+  struct PixelDataSource
+  {
+    Dali::PixelData pixelData;
+  } pixelDataSource;
 
   struct TextureSource
   {

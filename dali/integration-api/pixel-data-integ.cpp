@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,25 @@
  */
 
 // FILE HEADER
-#include <dali/devel-api/images/pixel-data-devel.h>
+#include <dali/integration-api/pixel-data-integ.h>
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/images/pixel-data-impl.h>
 
-namespace Dali
+namespace Dali::Integration
 {
-namespace DevelPixelData
-{
-PixelDataBuffer ReleasePixelDataBuffer(PixelData& pixelData)
+PixelDataBuffer ReleasePixelDataBuffer(Dali::PixelData& pixelData)
 {
   Internal::PixelData& pixelDataImpl   = GetImplementation(pixelData);
-  PixelDataBuffer      pixelDataBuffer = pixelDataImpl.ReleaseBuffer();
+  PixelDataBuffer      pixelDataBuffer = pixelDataImpl.ReleasePixelDataBuffer();
   pixelData.Reset();
   return pixelDataBuffer;
 }
 
-} // namespace DevelPixelData
-
-} // namespace Dali
+PixelDataBuffer GetPixelDataBuffer(const Dali::PixelData& pixelData)
+{
+  const Internal::PixelData& pixelDataImpl   = GetImplementation(pixelData);
+  PixelDataBuffer            pixelDataBuffer = pixelDataImpl.GetPixelDataBuffer();
+  return pixelDataBuffer;
+}
+} // namespace Dali::Integration

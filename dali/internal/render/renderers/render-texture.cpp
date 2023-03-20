@@ -375,8 +375,8 @@ void Texture::Upload(PixelDataPtr pixelData, const Internal::Texture::UploadPara
   info.srcFormat    = ConvertPixelFormat(pixelData->GetPixelFormat());
 
   Graphics::TextureUpdateSourceInfo updateSourceInfo{};
-  updateSourceInfo.sourceType          = Graphics::TextureUpdateSourceInfo::Type::MEMORY;
-  updateSourceInfo.memorySource.memory = pixelData->GetBuffer();
+  updateSourceInfo.sourceType                = Graphics::TextureUpdateSourceInfo::Type::PIXEL_DATA;
+  updateSourceInfo.pixelDataSource.pixelData = Dali::PixelData(pixelData.Get());
 
   mGraphicsController->UpdateTextures({info}, {updateSourceInfo});
 

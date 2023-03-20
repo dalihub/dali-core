@@ -28,7 +28,6 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/events/touch-point.cpp
   ${devel_api_src_dir}/events/wheel-event-devel.cpp
   ${devel_api_src_dir}/images/distance-field.cpp
-  ${devel_api_src_dir}/images/pixel-data-devel.cpp
   ${devel_api_src_dir}/object/handle-devel.cpp
   ${devel_api_src_dir}/object/csharp-type-registry.cpp
   ${devel_api_src_dir}/rendering/frame-buffer-devel.cpp
@@ -99,7 +98,6 @@ SET( devel_api_core_events_header_files
 
 SET( devel_api_core_images_header_files
   ${devel_api_src_dir}/images/distance-field.h
-  ${devel_api_src_dir}/images/pixel-data-devel.h
 )
 
 

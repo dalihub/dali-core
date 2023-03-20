@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PIXEL_DATA_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/images/pixel-data-devel.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/pixel-data-integ.h>
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/object/base-object.h>
 
@@ -115,7 +115,13 @@ public:
    * Return the buffer pointer and reset the internal buffer to zero.
    * @return The buffer pointer and associated data.
    */
-  DevelPixelData::PixelDataBuffer ReleaseBuffer();
+  Dali::Integration::PixelDataBuffer ReleasePixelDataBuffer();
+
+  /**
+   * Return the buffer pointer.
+   * @return The buffer pointer.
+   */
+  Dali::Integration::PixelDataBuffer GetPixelDataBuffer() const;
 
   /**
    * @copydoc PixelData::GetStride()

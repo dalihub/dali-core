@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/images/pixel.h>
+
+#include <dali/integration-api/pixel-data-integ.h>
 
 #include <cstdlib>
 
@@ -234,5 +236,66 @@ int UtcDaliPixelDataGetHeightNegative(void)
   {
     DALI_TEST_CHECK(true); // We expect an assert
   }
+  END_TEST;
+}
+
+int UtcDaliPixelDataReleasePixelDataBuffer(void)
+{
+  TestApplication application;
+
+  uint32_t width      = 10u;
+  uint32_t height     = 10u;
+  uint32_t stride     = 12u;
+  uint32_t bufferSize = stride * height * Pixel::GetBytesPerPixel(Pixel::L8);
+  uint8_t* buffer     = new uint8_t[bufferSize];
+  buffer[0]           = 'a';
+
+  PixelData pixelData = PixelData::New(buffer, bufferSize, width, height, stride, Pixel::L8, PixelData::DELETE_ARRAY);
+
+  DALI_TEST_CHECK(pixelData);
+  DALI_TEST_CHECK(pixelData.GetWidth() == width);
+  DALI_TEST_CHECK(pixelData.GetHeight() == height);
+  DALI_TEST_CHECK(pixelData.GetStride() == stride);
+  DALI_TEST_CHECK(pixelData.GetPixelFormat() == Pixel::L8);
+
+  Dali::Integration::PixelDataBuffer pixelDataBuffer = Dali::Integration::ReleasePixelDataBuffer(pixelData);
+
+  DALI_TEST_CHECK(!pixelData);
+
+  DALI_TEST_EQUALS(pixelDataBuffer.bufferSize, bufferSize, TEST_LOCATION);
+  DALI_TEST_EQUALS(pixelDataBuffer.buffer[0], static_cast<uint8_t>('a'), TEST_LOCATION);
+
+  // Release memory by our self.
+  delete[] pixelDataBuffer.buffer;
+
+  END_TEST;
+}
+
+int UtcDaliPixelDataGetPixelDataBuffer(void)
+{
+  TestApplication application;
+
+  uint32_t width      = 10u;
+  uint32_t height     = 10u;
+  uint32_t stride     = 12u;
+  uint32_t bufferSize = stride * height * Pixel::GetBytesPerPixel(Pixel::L8);
+  uint8_t* buffer     = new uint8_t[bufferSize];
+  buffer[0]           = 'a';
+
+  PixelData pixelData = PixelData::New(buffer, bufferSize, width, height, stride, Pixel::L8, PixelData::DELETE_ARRAY);
+
+  DALI_TEST_CHECK(pixelData);
+  DALI_TEST_CHECK(pixelData.GetWidth() == width);
+  DALI_TEST_CHECK(pixelData.GetHeight() == height);
+  DALI_TEST_CHECK(pixelData.GetStride() == stride);
+  DALI_TEST_CHECK(pixelData.GetPixelFormat() == Pixel::L8);
+
+  Dali::Integration::PixelDataBuffer pixelDataBuffer = Dali::Integration::GetPixelDataBuffer(pixelData);
+
+  DALI_TEST_CHECK(pixelData);
+
+  DALI_TEST_EQUALS(pixelDataBuffer.bufferSize, bufferSize, TEST_LOCATION);
+  DALI_TEST_EQUALS(pixelDataBuffer.buffer[0], static_cast<uint8_t>('a'), TEST_LOCATION);
+
   END_TEST;
 }

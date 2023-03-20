@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,10 +108,16 @@ uint32_t PixelData::GetBufferSize() const
   return mBufferSize;
 }
 
-DevelPixelData::PixelDataBuffer PixelData::ReleaseBuffer()
+Dali::Integration::PixelDataBuffer PixelData::ReleasePixelDataBuffer()
 {
-  DevelPixelData::PixelDataBuffer pixelDataBuffer(mBuffer, mBufferSize, mReleaseFunction);
+  Dali::Integration::PixelDataBuffer pixelDataBuffer(mBuffer, mBufferSize, mReleaseFunction);
   mBuffer = nullptr;
+  return pixelDataBuffer;
+}
+
+Dali::Integration::PixelDataBuffer PixelData::GetPixelDataBuffer() const
+{
+  Dali::Integration::PixelDataBuffer pixelDataBuffer(mBuffer, mBufferSize, mReleaseFunction);
   return pixelDataBuffer;
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
  */
 
 #include <dali-test-suite-utils.h>
-#include <dali/devel-api/images/pixel-data-devel.h>
 #include <dali/devel-api/rendering/texture-devel.h>
 #include <dali/public-api/dali-core.h>
 #include <test-native-image.h>
