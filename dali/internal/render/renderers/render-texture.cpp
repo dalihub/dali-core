@@ -37,7 +37,11 @@ Debug::Filter* gTextureFilter = Debug::Filter::New(Debug::Concise, false, "LOG_T
 #endif
 
 // Memory pool used to allocate new textures. Memory used by this pool will be released when shutting down DALi
-MemoryPoolObjectAllocator<Texture> gTextureMemoryPool;
+MemoryPoolObjectAllocator<Texture>& GetTextureMemoryPool()
+{
+  static MemoryPoolObjectAllocator<Texture> gTextureMemoryPool;
+  return gTextureMemoryPool;
+}
 
 /**
  * Converts DALi pixel format to Graphics::Format
@@ -211,8 +215,8 @@ constexpr Graphics::TextureType ConvertType(Texture::Type type)
 
 TextureKey Texture::NewKey(Type type, Pixel::Format format, ImageDimensions size)
 {
-  void* ptr = gTextureMemoryPool.AllocateRawThreadSafe();
-  auto  key = gTextureMemoryPool.GetKeyFromPtr(static_cast<Texture*>(ptr));
+  void* ptr = GetTextureMemoryPool().AllocateRawThreadSafe();
+  auto  key = GetTextureMemoryPool().GetKeyFromPtr(static_cast<Texture*>(ptr));
   new(ptr) Texture(type, format, size);
 
   return TextureKey(key);
@@ -220,8 +224,8 @@ TextureKey Texture::NewKey(Type type, Pixel::Format format, ImageDimensions size
 
 TextureKey Texture::NewKey(NativeImageInterfacePtr nativeImageInterface)
 {
-  void* ptr = gTextureMemoryPool.AllocateRawThreadSafe();
-  auto  key = gTextureMemoryPool.GetKeyFromPtr(static_cast<Texture*>(ptr));
+  void* ptr = GetTextureMemoryPool().AllocateRawThreadSafe();
+  auto  key = GetTextureMemoryPool().GetKeyFromPtr(static_cast<Texture*>(ptr));
   new(ptr) Texture(nativeImageInterface);
 
   return TextureKey(key);
@@ -259,12 +263,12 @@ Texture::~Texture() = default;
 
 void Texture::operator delete(void* ptr)
 {
-  gTextureMemoryPool.FreeThreadSafe(static_cast<Texture*>(ptr));
+  GetTextureMemoryPool().FreeThreadSafe(static_cast<Texture*>(ptr));
 }
 
 Render::Texture* Texture::Get(TextureKey::KeyType key)
 {
-  return gTextureMemoryPool.GetPtrFromKey(key);
+  return GetTextureMemoryPool().GetPtrFromKey(key);
 }
 
 void Texture::Initialize(Graphics::Controller& graphicsController)
