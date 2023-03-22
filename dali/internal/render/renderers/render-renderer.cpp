@@ -169,7 +169,11 @@ namespace Render
 {
 namespace
 {
-MemoryPoolObjectAllocator<Renderer> gRenderRendererMemoryPool;
+MemoryPoolObjectAllocator<Renderer>& GetRenderRendererMemoryPool()
+{
+  static MemoryPoolObjectAllocator<Renderer> gRenderRendererMemoryPool;
+  return gRenderRendererMemoryPool;
+}
 }
 
 void Renderer::PrepareCommandBuffer()
@@ -191,8 +195,8 @@ RendererKey Renderer::NewKey(SceneGraph::RenderDataProvider* dataProvider,
                              DepthFunction::Type             depthFunction,
                              StencilParameters&              stencilParameters)
 {
-  void* ptr = gRenderRendererMemoryPool.AllocateRawThreadSafe();
-  auto  key = gRenderRendererMemoryPool.GetKeyFromPtr(static_cast<Renderer*>(ptr));
+  void* ptr = GetRenderRendererMemoryPool().AllocateRawThreadSafe();
+  auto  key = GetRenderRendererMemoryPool().GetKeyFromPtr(static_cast<Renderer*>(ptr));
 
   // Use placement new to construct renderer.
   new(ptr) Renderer(dataProvider, geometry, blendingBitmask, blendColor, faceCullingMode, preMultipliedAlphaEnabled, depthWriteMode, depthTestMode, depthFunction, stencilParameters);
@@ -245,12 +249,12 @@ Renderer::~Renderer() = default;
 
 void Renderer::operator delete(void* ptr)
 {
-  gRenderRendererMemoryPool.FreeThreadSafe(static_cast<Renderer*>(ptr));
+  GetRenderRendererMemoryPool().FreeThreadSafe(static_cast<Renderer*>(ptr));
 }
 
 Renderer* Renderer::Get(RendererKey::KeyType rendererKey)
 {
-  return gRenderRendererMemoryPool.GetPtrFromKey(rendererKey);
+  return GetRenderRendererMemoryPool().GetPtrFromKey(rendererKey);
 }
 
 void Renderer::SetGeometry(Render::Geometry* geometry)
