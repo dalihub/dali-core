@@ -4255,3 +4255,56 @@ int utcDaliRendererPartialUpdateAddRemoveRenderer(void)
 
   END_TEST;
 }
+
+int utcDaliRendererDoNotSkipRenderIfTextureSetChanged(void)
+{
+  TestApplication application;
+  tet_infoline("Check to not skip rendering in case of the TextureSet Changed");
+
+  TraceCallStack& drawTrace = application.GetGlAbstraction().GetDrawTrace();
+  drawTrace.Enable(true);
+  drawTrace.Reset();
+
+  Actor actor = CreateRenderableActor();
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector3(80.0f, 80.0f, 0.0f));
+  application.GetScene().Add(actor);
+
+  // Make any animation to skip rendering.
+  // Delay duration must be bigger than 0.0f
+  Animation animation = Animation::New(2.0f);
+  animation.AnimateTo(Property(actor, Actor::Property::POSITION_X), 1.0f, TimePeriod(1.0f, 1.0f));
+  animation.Play();
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+  Renderer renderer = actor.GetRendererAt(0u);
+
+  Texture    image      = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGB888, 64, 64);
+  TextureSet textureSet = CreateTextureSet(image);
+
+  // Render at least 2 frames
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  drawTrace.Reset();
+
+  application.SendNotification();
+  application.Render();
+
+  // Skip rendering
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 0, TEST_LOCATION);
+
+  // Change TextureSet
+  renderer.SetTextures(textureSet);
+
+  application.SendNotification();
+  application.Render(16u);
+
+  // Should not Skip rendering!
+  DALI_TEST_GREATER(drawTrace.CountMethod("DrawElements"), 0, TEST_LOCATION);
+
+  END_TEST;
+}

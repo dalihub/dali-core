@@ -143,7 +143,7 @@ RendererKey Renderer::GetKey(Renderer* renderer)
 
 bool Renderer::PrepareRender(BufferIndex updateBufferIndex)
 {
-  bool rendererUpdated        = mResendFlag || mRenderingBehavior == DevelRenderer::Rendering::CONTINUOUSLY || mUpdateDecay > 0;
+  bool rendererUpdated        = mDirtyFlag || mResendFlag || mRenderingBehavior == DevelRenderer::Rendering::CONTINUOUSLY || mUpdateDecay > 0;
   auto shaderMapChangeCounter = mShader ? mShader->GetUniformMap().GetChangeCounter() : 0u;
   bool shaderMapChanged       = mShader && (mShaderMapChangeCounter != shaderMapChangeCounter);
   if(shaderMapChanged)
@@ -364,6 +364,7 @@ void Renderer::SetGeometry(Render::Geometry* geometry)
   DALI_ASSERT_DEBUG(geometry != NULL && "Geometry pointer is NULL");
   mGeometry = geometry;
 
+  mDirtyFlag = true;
   if(mRenderer)
   {
     mResendFlag |= RESEND_GEOMETRY;
@@ -589,6 +590,8 @@ float Renderer::GetOpacity(BufferIndex updateBufferIndex) const
 void Renderer::SetRenderingBehavior(DevelRenderer::Rendering::Type renderingBehavior)
 {
   mRenderingBehavior = renderingBehavior;
+
+  mDirtyFlag = true;
   SetUpdated(true);
 }
 
