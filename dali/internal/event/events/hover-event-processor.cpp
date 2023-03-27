@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -271,7 +271,19 @@ void HoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent& event
   Dali::Actor consumedActor;
   if(currentRenderTask)
   {
-    consumedActor = EmitHoverSignals(hoverEvent->GetHitActor(0), hoverEventHandle);
+    Dali::Actor hitActor = hoverEvent->GetHitActor(0);
+    // If the actor is hit first, the hover is started.
+    if(hitActor &&
+       mLastPrimaryHitActor.GetActor() != hitActor &&
+       state == PointState::MOTION)
+    {
+      Actor* hitActorImpl = &GetImplementation(hitActor);
+      if(hitActorImpl->GetLeaveRequired())
+      {
+        hoverEvent->GetPoint(0).SetState(PointState::STARTED);
+      }
+    }
+    consumedActor = EmitHoverSignals(hitActor, hoverEventHandle);
   }
 
   Integration::Point primaryPoint      = hoverEvent->GetPoint(0);
@@ -293,7 +305,7 @@ void HoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent& event
 
   Actor* lastPrimaryHitActor(mLastPrimaryHitActor.GetActor());
   Actor* lastConsumedActor(mLastConsumedActor.GetActor());
-  if((primaryPointState == PointState::MOTION) || (primaryPointState == PointState::FINISHED) || (primaryPointState == PointState::STATIONARY))
+  if((primaryPointState == PointState::STARTED) || (primaryPointState == PointState::MOTION) || (primaryPointState == PointState::FINISHED) || (primaryPointState == PointState::STATIONARY))
   {
     if(mLastRenderTask)
     {
@@ -312,7 +324,7 @@ void HoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent& event
             leaveEventConsumer = EmitHoverSignals(mLastPrimaryHitActor.GetActor(), lastRenderTaskImpl, hoverEvent, PointState::LEAVE);
           }
         }
-        else
+        else if(primaryPointState != PointState::STARTED)
         {
           // At this point mLastPrimaryHitActor was touchable and sensitive in the previous touch event process but is not in the current one.
           // An interrupted event is send to allow some actors to go back to their original state (i.e. Button controls)
@@ -338,7 +350,7 @@ void HoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent& event
             EmitHoverSignals(lastConsumedActor, lastRenderTaskImpl, hoverEvent, PointState::LEAVE);
           }
         }
-        else
+        else if(primaryPointState != PointState::STARTED)
         {
           // At this point mLastConsumedActor was touchable and sensitive in the previous touch event process but is not in the current one.
           // An interrupted event is send to allow some actors to go back to their original state (i.e. Button controls)
