@@ -177,6 +177,7 @@ struct RenderManager::Impl
   std::unique_ptr<Dali::ThreadPool> threadPool;            ///< The thread pool
   Vector<Graphics::Texture*>        boundTextures;         ///< The textures bound for rendering
   Vector<Graphics::Texture*>        textureDependencyList; ///< The dependency list of bound textures
+  Vector<Render::TextureKey>        updatedTextures{};     ///< The updated texture list
 
   uint32_t    frameCount{0u};                                                    ///< The current frame count
   BufferIndex renderBufferIndex{SceneGraphBuffers::INITIAL_UPDATE_BUFFER_INDEX}; ///< The index of the buffer to read from; this is opposite of the "update" buffer
@@ -247,6 +248,7 @@ void RenderManager::AddTexture(const Render::TextureKey& textureKey)
 
   textureKey->Initialize(mImpl->graphicsController);
   mImpl->textureContainer.PushBack(textureKey);
+  mImpl->updatedTextures.PushBack(textureKey);
 }
 
 void RenderManager::RemoveTexture(const Render::TextureKey& textureKey)
@@ -267,12 +269,24 @@ void RenderManager::UploadTexture(const Render::TextureKey& textureKey, PixelDat
 {
   DALI_ASSERT_DEBUG(textureKey && "Trying to upload to empty texture key");
   textureKey->Upload(pixelData, params);
+
+  mImpl->updatedTextures.PushBack(textureKey);
 }
 
 void RenderManager::GenerateMipmaps(const Render::TextureKey& textureKey)
 {
   DALI_ASSERT_DEBUG(textureKey && "Trying to generate mipmaps on empty texture key");
   textureKey->GenerateMipmaps();
+
+  mImpl->updatedTextures.PushBack(textureKey);
+}
+
+void RenderManager::SetTextureUpdated(const Render::TextureKey& textureKey)
+{
+  DALI_ASSERT_DEBUG(textureKey && "Trying to set updated on empty texture key");
+  textureKey->SetUpdated(true);
+
+  mImpl->updatedTextures.PushBack(textureKey);
 }
 
 void RenderManager::SetFilterMode(Render::Sampler* sampler, uint32_t minFilterMode, uint32_t magFilterMode)
@@ -999,11 +1013,12 @@ void RenderManager::PostRender()
     iter->OnRenderFinished();
   }
 
-  // Notify RenderTexture that rendering has finished
-  for(auto&& iter : mImpl->textureContainer)
+  // Notify updated RenderTexture that rendering has finished
+  for(auto&& iter : mImpl->updatedTextures)
   {
     iter->OnRenderFinished();
   }
+  mImpl->updatedTextures.Clear();
 
   mImpl->UpdateTrackers();
 

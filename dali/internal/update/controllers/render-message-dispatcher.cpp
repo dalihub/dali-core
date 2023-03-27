@@ -84,6 +84,16 @@ void RenderMessageDispatcher::RemoveRenderTracker(Render::RenderTracker& renderT
   new(slot) DerivedType(&mRenderManager, &RenderManager::RemoveRenderTracker, &renderTracker);
 }
 
+RenderManager& RenderMessageDispatcher::GetRenderManager()
+{
+  return mRenderManager;
+}
+
+uint32_t* RenderMessageDispatcher::ReserveMessageSlot(std::size_t size)
+{
+  return mRenderQueue.ReserveMessageSlot(mBuffers.GetUpdateBufferIndex(), size);
+}
+
 } // namespace SceneGraph
 
 } // namespace Internal
