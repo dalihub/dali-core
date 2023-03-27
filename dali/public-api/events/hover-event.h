@@ -2,7 +2,7 @@
 #define DALI_HOVER_EVENT_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -141,6 +141,9 @@ public:
    * @param[in] point The point required
    * @return The state of the point specified
    * @note If point is greater than GetPointCount() then this method will return PointState::FINISHED.
+   * If you set Actor::Property::LEAVE_REQUIRED to true, when the hover event enters the actor, it will receive STARTED state.
+   * an actor that received a hover PointState::MOTION event will receive PointState::INTERRUPTED event when Actor::Property::SENSITIVE is changed to false.
+   * However, an actor that received a hover PointState::STARTED event will not receive any event when Actor::Property::SENSITIVE is changed to false.
    * @see State
    */
   PointState::Type GetState(std::size_t point) const;

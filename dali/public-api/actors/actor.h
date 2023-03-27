@@ -2,7 +2,7 @@
 #define DALI_ACTOR_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -515,6 +515,7 @@ public:
 
       /**
        * @brief The flag whether an actor should receive a notification when touch or hover motion events leave.
+       * In the case of the hover event, when the hover event enters the actor, it will receive started state.
        * @details Name "leaveRequired", type Property::BOOLEAN
        * @SINCE_1_0.0
        */

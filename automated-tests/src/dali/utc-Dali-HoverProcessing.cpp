@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -571,10 +571,10 @@ int UtcDaliHoverLeave(void)
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   data.Reset();
 
-  // Another motion event inside actor, signalled with motion
+  // Another motion event inside actor, signalled with start. This is because a new hover event was started on that actor.
   application.ProcessEvent(GenerateSingleHover(PointState::MOTION, Vector2(10.0f, 10.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(PointState::MOTION, data.hoverEvent.GetState(0), TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::STARTED, data.hoverEvent.GetState(0), TEST_LOCATION);
   data.Reset();
 
   // We do not want to listen to leave events anymore
@@ -646,12 +646,12 @@ int UtcDaliHoverLeaveParentConsumer(void)
   data.Reset();
   rootData.Reset();
 
-  // Another motion event inside actor, signalled with motion
+  // Another motion event inside actor, signalled with start. This is because a new hover event was started on that actor.
   application.ProcessEvent(GenerateSingleHover(PointState::MOTION, Vector2(10.0f, 10.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, rootData.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(PointState::MOTION, data.hoverEvent.GetState(0), TEST_LOCATION);
-  DALI_TEST_EQUALS(PointState::MOTION, rootData.hoverEvent.GetState(0), TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::STARTED, data.hoverEvent.GetState(0), TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::STARTED, rootData.hoverEvent.GetState(0), TEST_LOCATION);
   DALI_TEST_CHECK(actor == data.hoverEvent.GetHitActor(0));
   DALI_TEST_CHECK(actor == rootData.hoverEvent.GetHitActor(0));
   data.Reset();
