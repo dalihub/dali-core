@@ -25,6 +25,8 @@
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
 
+#include <dali/internal/update/common/resetter-manager.h> ///< For AddInitializeResetter
+
 namespace
 {
 // Memory pool used to allocate new nodes. Memory used by this pool will be released when process dies
@@ -160,6 +162,11 @@ void Node::SetRoot(bool isRoot)
 bool Node::IsAnimationPossible() const
 {
   return mIsConnectedToSceneGraph;
+}
+
+void Node::AddInitializeResetter(ResetterManager& manager) const
+{
+  manager.AddNodeResetter(*this);
 }
 
 void Node::ConnectChild(Node* childNode)

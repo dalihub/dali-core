@@ -58,6 +58,7 @@ namespace SceneGraph
 class Layer;
 class RenderTask;
 class UpdateManager;
+class ResetterManager;
 class Node;
 
 // Flags which require the scene renderable lists to be updated
@@ -904,6 +905,11 @@ public:
    * @copydoc Dali::Internal::SceneGraph::PropertyOwner::IsAnimationPossible
    */
   bool IsAnimationPossible() const override;
+
+  /**
+   * @copydoc Dali::Internal::SceneGraph::PropertyOwner::AddInitializeResetter
+   */
+  void AddInitializeResetter(ResetterManager& manager) const override;
 
   /**
    * Called by UpdateManager when the node is added.

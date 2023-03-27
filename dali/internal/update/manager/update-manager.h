@@ -36,6 +36,8 @@
 #include <dali/internal/update/animation/scene-graph-animation.h>
 #include <dali/internal/update/common/node-resetter.h>
 #include <dali/internal/update/common/property-resetter.h>
+#include <dali/internal/update/common/renderer-resetter.h>
+#include <dali/internal/update/common/resetter-manager.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/update/common/scene-graph-property-notification.h>
 #include <dali/internal/update/common/scene-graph-scene.h>
@@ -97,7 +99,7 @@ class VertexBuffer;
  * It also maintains the lifecycle of nodes and other property owners that are
  * disconnected from the scene graph.
  */
-class UpdateManager : public ShaderSaver
+class UpdateManager : public ShaderSaver, public ResetterManager
 {
 public:
   /**
@@ -242,19 +244,22 @@ public:
    */
   bool IsAnimationRunning() const;
 
-  /**
-   * Add a property resetter. UpdateManager takes ownership of the object.
-   * It will be killed by UpdateManager when the associated animator or
-   * constraint has finished; or the property owner of the property is destroyed.
-   */
-  void AddPropertyResetter(OwnerPointer<PropertyResetterBase>& propertyResetter);
+  // ResetterManager
 
   /**
-   * Add a node resetter. UpdateManager takes ownership of the object.
-   * It will be killed by UpdateManager when the node is disconnected from the scene graph;
-   * or when the node is destroyed.
+   * @copydoc Dali::Internal::SceneGraph::ResetterManager::AddPropertyResetter()
    */
-  void AddNodeResetter(const Node& node);
+  void AddPropertyResetter(OwnerPointer<PropertyResetterBase>& propertyResetter) override;
+
+  /**
+   * @copydoc Dali::Internal::SceneGraph::ResetterManager::AddNodeResetter()
+   */
+  void AddNodeResetter(const Node& node) override;
+
+  /**
+   * @copydoc Dali::Internal::SceneGraph::ResetterManager::AddRendererResetter()
+   */
+  void AddRendererResetter(const Renderer& renderer) override;
 
   // Property Notification
 

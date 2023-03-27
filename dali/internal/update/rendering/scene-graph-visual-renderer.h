@@ -49,6 +49,18 @@ struct AnimatableVisualProperties
     }
   }
 
+public: // Public API
+  /**
+   * @copydoc Dali::Internal::SceneGraph::Renderer::ResetToBaseValues
+   */
+  void ResetToBaseValues(BufferIndex updateBufferIndex);
+
+  /**
+   * @copydoc Dali::Internal::SceneGraph::Renderer::MarkAsDirty
+   */
+  void MarkAsDirty();
+
+public:
   /**
    * @brief Cached coefficient value when we calculate visual transformed update size.
    * It can reduce complexity of calculate the vertex position.
@@ -110,12 +122,24 @@ struct AnimatableDecoratedVisualProperties
   {
   }
 
+public: // Public API
   // Delete function of AnimatableDecoratedVisualProperties* converted as void*
   static void DeleteFunction(void* data)
   {
     delete static_cast<AnimatableDecoratedVisualProperties*>(data);
   }
 
+  /**
+   * @copydoc Dali::Internal::SceneGraph::Renderer::ResetToBaseValues
+   */
+  void ResetToBaseValues(BufferIndex updateBufferIndex);
+
+  /**
+   * @copydoc Dali::Internal::SceneGraph::Renderer::MarkAsDirty
+   */
+  void MarkAsDirty();
+
+public:
   /**
    * @brief Cached coefficient value when we calculate visual transformed update size.
    * It can reduce complexity of calculate the vertex position.

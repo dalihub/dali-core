@@ -281,6 +281,7 @@ struct UpdateManager::Impl
 
   ResetterContainer<PropertyResetterBase> propertyResetters; ///< A container of property resetters
   ResetterContainer<NodeResetter>         nodeResetters;     ///< A container of node resetters
+  ResetterContainer<RendererResetter>     rendererResetters; ///< A container of renderer resetters
 
   OwnerContainer<Animation*>            animations;            ///< A container of owned animations
   OwnerContainer<PropertyNotification*> propertyNotifications; ///< A container of owner property notifications.
@@ -356,7 +357,7 @@ void UpdateManager::InstallRoot(OwnerPointer<Layer>& layer)
   rootLayer->CreateTransform(&mImpl->transformManager);
   rootLayer->SetRoot(true);
 
-  AddNodeResetter(*rootLayer);
+  rootLayer->AddInitializeResetter(*this);
 
   mImpl->scenes.emplace_back(new Impl::SceneInfo(rootLayer));
 }
@@ -408,7 +409,7 @@ void UpdateManager::ConnectNode(Node* parent, Node* node)
 
   parent->ConnectChild(node);
 
-  AddNodeResetter(*node);
+  node->AddInitializeResetter(*this);
 
   // Inform the frame-callback-processor, if set, about the node-hierarchy changing
   if(mImpl->frameCallbackProcessor)
@@ -501,7 +502,7 @@ void UpdateManager::RemoveObject(PropertyOwner* object)
 void UpdateManager::AddRenderTaskList(OwnerPointer<RenderTaskList>& taskList)
 {
   RenderTaskList* taskListPointer = taskList.Release();
-  taskListPointer->SetRenderMessageDispatcher(&mImpl->renderMessageDispatcher);
+  taskListPointer->Initialize(*this, mImpl->renderMessageDispatcher);
 
   mImpl->scenes.back()->taskList = taskListPointer;
 }
@@ -613,6 +614,13 @@ void UpdateManager::AddNodeResetter(const Node& node)
   mImpl->nodeResetters.PushBack(nodeResetter.Release());
 }
 
+void UpdateManager::AddRendererResetter(const Renderer& renderer)
+{
+  OwnerPointer<SceneGraph::RendererResetter> rendererResetter = SceneGraph::RendererResetter::New(renderer);
+  rendererResetter->Initialize();
+  mImpl->rendererResetters.PushBack(rendererResetter.Release());
+}
+
 void UpdateManager::AddPropertyNotification(OwnerPointer<PropertyNotification>& propertyNotification)
 {
   mImpl->propertyNotifications.PushBack(propertyNotification.Release());
@@ -663,6 +671,8 @@ void UpdateManager::AddRenderer(const RendererKey& rendererKey)
   DALI_LOG_INFO(gLogFilter, Debug::General, "[%x] AddRenderer\n", renderer);
 
   renderer->ConnectToSceneGraph(*mImpl->sceneController, mSceneGraphBuffers.GetUpdateBufferIndex());
+  renderer->AddInitializeResetter(*this);
+
   mImpl->renderers.PushBack(rendererKey);
 }
 
@@ -737,6 +747,9 @@ void UpdateManager::ResetProperties(BufferIndex bufferIndex)
 
   // Reset node properties
   mImpl->nodeResetters.ResetToBaseValues(bufferIndex);
+
+  // Reset renderer properties
+  mImpl->rendererResetters.ResetToBaseValues(bufferIndex);
 
   // Reset all animating / constrained properties
   mImpl->propertyResetters.ResetToBaseValues(bufferIndex);

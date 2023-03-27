@@ -166,6 +166,7 @@ SET( internal_src_files
   ${internal_src_dir}/update/render-tasks/scene-graph-render-task-list.cpp
   ${internal_src_dir}/update/rendering/scene-graph-texture-set.cpp
   ${internal_src_dir}/update/rendering/scene-graph-renderer.cpp
+  ${internal_src_dir}/update/rendering/scene-graph-visual-renderer.cpp
 )
 
 SET( SOURCES ${SOURCES}
