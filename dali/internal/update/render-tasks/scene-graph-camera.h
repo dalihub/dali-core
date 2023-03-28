@@ -334,6 +334,12 @@ public:
    */
   bool IsProjectionMatrixAnimated() const;
 
+public:
+  /**
+   * @copydoc Dali::Internal::SceneGraph::PropertyOwner::AddInitializeResetter
+   */
+  void AddInitializeResetter(ResetterManager& manager) const override;
+
 private:
   /**
    * Constructor

@@ -52,13 +52,13 @@ ActorObserver::~ActorObserver()
   delete mRemoveCallback;
 }
 
-ActorObserver::ActorObserver(ActorObserver&& other)
+ActorObserver::ActorObserver(ActorObserver&& other) noexcept
 : ActorObserver(nullptr)
 {
   operator=(std::move(other));
 }
 
-ActorObserver& ActorObserver::operator=(ActorObserver&& other)
+ActorObserver& ActorObserver::operator=(ActorObserver&& other) noexcept
 {
   if(this != &other)
   {

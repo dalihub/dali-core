@@ -1,8 +1,8 @@
-#ifndef DALI_PIXEL_DATA_DEVEL_H
-#define DALI_PIXEL_DATA_DEVEL_H
+#ifndef DALI_PIXEL_DATA_INTEG_H
+#define DALI_PIXEL_DATA_INTEG_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,7 @@
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/images/pixel.h>
 
-namespace Dali
-{
-namespace DevelPixelData
+namespace Dali::Integration
 {
 /**
  * Struct to keep the buffer pointer and the allocation method.
@@ -38,13 +36,13 @@ namespace DevelPixelData
  */
 struct PixelDataBuffer
 {
-  uint8_t*                   buffer;
-  uint32_t                   bufferSize;
-  PixelData::ReleaseFunction releaseFunction;
+  uint8_t*                         buffer;
+  uint32_t                         bufferSize;
+  Dali::PixelData::ReleaseFunction releaseFunction;
 
-  PixelDataBuffer(uint8_t*                   buffer,
-                  uint32_t                   bufferSize,
-                  PixelData::ReleaseFunction releaseFunction)
+  PixelDataBuffer(uint8_t*                         buffer,
+                  uint32_t                         bufferSize,
+                  Dali::PixelData::ReleaseFunction releaseFunction)
   : buffer(buffer),
     bufferSize(bufferSize),
     releaseFunction(releaseFunction)
@@ -58,10 +56,15 @@ struct PixelDataBuffer
  * @param[in,out] pixelData The pixel data object to take the buffer from
  * @return the buffer and the data release mechanism
  */
-DALI_CORE_API PixelDataBuffer ReleasePixelDataBuffer(PixelData& pixelData);
+DALI_CORE_API PixelDataBuffer ReleasePixelDataBuffer(Dali::PixelData& pixelData);
 
-} // namespace DevelPixelData
+/**
+ * Get the buffer from a pixel data object.
+ * @param[in] pixelData The pixel data object to get the buffer from
+ * @return the buffer of pixelData.
+ */
+DALI_CORE_API PixelDataBuffer GetPixelDataBuffer(const Dali::PixelData& pixelData);
 
-} // namespace Dali
+} // namespace Dali::Integration
 
-#endif // DALI_PIXEL_DATA_DEVEL_H
+#endif // DALI_PIXEL_DATA_INTEG_H

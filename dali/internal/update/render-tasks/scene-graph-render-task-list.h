@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_LIST_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ namespace SceneGraph
 {
 class RenderMessageDispatcher;
 class RenderTask;
+class ResetterManager;
 
 /**
  * An ordered list of render-tasks.
@@ -61,10 +62,11 @@ public:
   void operator delete(void* ptr);
 
   /**
-   * Set the renderMessageDispatcher to send message.
+   * Set the resetterManager and renderMessageDispatcher to send message.
+   * @param[in] resetterManager to send resetter
    * @param[in] renderMessageDispatcher The renderMessageDispatcher to send messages.
    */
-  void SetRenderMessageDispatcher(RenderMessageDispatcher* renderMessageDispatcher);
+  void Initialize(ResetterManager& resetterManager, RenderMessageDispatcher& renderMessageDispatcher);
 
   /**
    * Add a new RenderTask to the list.
@@ -133,6 +135,7 @@ private:
 
 private:
   CompleteNotificationInterface* mNotificationObject;      ///< object to pass in to the complete notification
+  ResetterManager*               mResetterManager;         ///< for sending bake resetter if rendertask initalized
   RenderMessageDispatcher*       mRenderMessageDispatcher; ///< for sending messages to render thread
   RenderTaskContainer            mRenderTasks;             ///< A container of owned RenderTasks
   RenderTask*                    mOverlayRenderTask;       ///< OverlayRenderTask.

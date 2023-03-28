@@ -38,9 +38,9 @@ Stage::Stage(const Stage& handle) = default;
 
 Stage& Stage::operator=(const Stage& rhs) = default;
 
-Stage::Stage(Stage&& handle) = default;
+Stage::Stage(Stage&& handle) noexcept = default;
 
-Stage& Stage::operator=(Stage&& rhs) = default;
+Stage& Stage::operator=(Stage&& rhs) noexcept = default;
 
 Stage::Stage(Internal::Stage* internal)
 : BaseHandle(internal)

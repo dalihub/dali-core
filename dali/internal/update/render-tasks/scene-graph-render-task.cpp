@@ -25,6 +25,9 @@
 #include <dali/internal/update/nodes/node.h>
 #include <dali/public-api/math/matrix.h>
 
+#include <dali/internal/update/common/property-resetter.h>
+#include <dali/internal/update/common/resetter-manager.h> ///< For AddInitializeResetter
+
 #include <dali/internal/update/render-tasks/scene-graph-render-task-debug.h>
 
 namespace Dali
@@ -58,8 +61,9 @@ RenderTask::~RenderTask()
   }
 }
 
-void RenderTask::Initialize(RenderMessageDispatcher& renderMessageDispatcher)
+void RenderTask::Initialize(ResetterManager& resetterManager, RenderMessageDispatcher& renderMessageDispatcher)
 {
+  mResetterManager         = &resetterManager;
   mRenderMessageDispatcher = &renderMessageDispatcher;
 }
 
@@ -475,10 +479,21 @@ void RenderTask::PropertyOwnerDestroyed(PropertyOwner& owner)
   }
 }
 
+void RenderTask::AddInitializeResetter(ResetterManager& manager) const
+{
+  OwnerPointer<SceneGraph::PropertyResetterBase> resetterViewportPosition = SceneGraph::BakerResetter::New(*this, mViewportPosition, SceneGraph::BakerResetter::Lifetime::BAKE);
+  OwnerPointer<SceneGraph::PropertyResetterBase> resetterViewportSize     = SceneGraph::BakerResetter::New(*this, mViewportSize, SceneGraph::BakerResetter::Lifetime::BAKE);
+  OwnerPointer<SceneGraph::PropertyResetterBase> resetterClearColor       = SceneGraph::BakerResetter::New(*this, mClearColor, SceneGraph::BakerResetter::Lifetime::BAKE);
+  manager.AddPropertyResetter(resetterViewportPosition);
+  manager.AddPropertyResetter(resetterViewportSize);
+  manager.AddPropertyResetter(resetterClearColor);
+}
+
 RenderTask::RenderTask()
 : mViewportPosition(Vector2::ZERO),
   mViewportSize(Vector2::ZERO),
   mClearColor(Dali::RenderTask::DEFAULT_CLEAR_COLOR),
+  mResetterManager(nullptr),
   mRenderMessageDispatcher(nullptr),
   mRenderSyncTracker(nullptr),
   mSourceNode(nullptr),
@@ -504,11 +519,19 @@ RenderTask::RenderTask()
 
 void RenderTask::SetActiveStatus()
 {
+  bool oldActive = mActive;
+
   // must have a source and camera both connected to scene
   mActive = (mSourceNode && mSourceNode->ConnectedToScene() &&
              mCameraNode && mCameraNode->ConnectedToScene() && mCamera);
   TASK_LOG_FMT(Debug::General, " Source node(%x) active %d.  Frame counter: %d\n", mSourceNode, mSourceNode && mSourceNode->ConnectedToScene(), mFrameCounter);
   TASK_LOG_FMT(Debug::General, " Camera node(%x) active %d\n", mCameraNode, mCameraNode && mCameraNode->ConnectedToScene());
+
+  if(!oldActive && mActive)
+  {
+    // Send resetter only if newly activated
+    AddInitializeResetter(*mResetterManager);
+  }
 }
 
 } // namespace SceneGraph

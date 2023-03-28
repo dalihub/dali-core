@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SHADER_DATA_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,8 +36,6 @@ using ShaderDataPtr = IntrusivePtr<ShaderData>;
 
 namespace
 {
-static const std::vector<char> emptyShader;
-
 inline std::vector<char> StringToVector(const std::string& str)
 {
   auto retval = std::vector<char>{};
@@ -150,6 +148,7 @@ public: // API
     else
     {
       //      DALI_LOG_ERROR("Unsupported shader stage\n");
+      static const std::vector<char> emptyShader;
       return emptyShader;
     }
   }

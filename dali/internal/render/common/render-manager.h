@@ -254,6 +254,12 @@ public:
   void GenerateMipmaps(const Render::TextureKey& texture);
 
   /**
+   * Sets the updated flag of a texture
+   * @param[in] texture The updated texture
+   */
+  void SetTextureUpdated(const Render::TextureKey& textureKey);
+
+  /**
    * Adds a framebuffer to the render manager
    * @param[in] frameBuffer The framebuffer to add
    */

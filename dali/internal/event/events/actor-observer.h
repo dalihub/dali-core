@@ -71,7 +71,7 @@ public:
    * @note The other's actor is appropriately disconnected.
    * @note Ownership of callback is passed onto this class.
    */
-  ActorObserver(ActorObserver&& other);
+  ActorObserver(ActorObserver&& other) noexcept;
 
   /**
    * Move assignment operator.
@@ -81,7 +81,7 @@ public:
    * @note The other's actor is appropriately disconnected.
    * @note Ownership of callback is passed onto this class.
    */
-  ActorObserver& operator=(ActorObserver&& other);
+  ActorObserver& operator=(ActorObserver&& other) noexcept;
 
   // Not copyable
 

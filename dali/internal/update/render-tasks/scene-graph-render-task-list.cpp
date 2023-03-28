@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/memory-pool-object-allocator.h>
+#include <dali/internal/update/common/resetter-manager.h> ///< For AddInitializeResetter
 
 namespace //Unnamed namespace
 {
@@ -44,6 +45,7 @@ RenderTaskList* RenderTaskList::New()
 
 RenderTaskList::RenderTaskList()
 : mNotificationObject(nullptr),
+  mResetterManager(nullptr),
   mRenderMessageDispatcher(nullptr),
   mOverlayRenderTask(nullptr)
 {
@@ -56,9 +58,10 @@ void RenderTaskList::operator delete(void* ptr)
   GetRenderTaskListMemoryPool().FreeThreadSafe(static_cast<RenderTaskList*>(ptr));
 }
 
-void RenderTaskList::SetRenderMessageDispatcher(RenderMessageDispatcher* renderMessageDispatcher)
+void RenderTaskList::Initialize(ResetterManager& resetterManager, RenderMessageDispatcher& renderMessageDispatcher)
 {
-  mRenderMessageDispatcher = renderMessageDispatcher;
+  mResetterManager         = &resetterManager;
+  mRenderMessageDispatcher = &renderMessageDispatcher;
 }
 
 void RenderTaskList::AddTask(OwnerPointer<RenderTask>& newTask)
@@ -66,7 +69,7 @@ void RenderTaskList::AddTask(OwnerPointer<RenderTask>& newTask)
   DALI_ASSERT_DEBUG(newTask && "SceneGraph RenderTask is null");
   DALI_ASSERT_DEBUG(mRenderMessageDispatcher != NULL && "RenderMessageDispatcher is null");
 
-  newTask->Initialize(*mRenderMessageDispatcher);
+  newTask->Initialize(*mResetterManager, *mRenderMessageDispatcher);
 
   if(mOverlayRenderTask && mRenderTasks[mRenderTasks.Size() - 1] == mOverlayRenderTask)
   {

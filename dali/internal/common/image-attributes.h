@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_IMAGE_ATTRIBUTES_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,8 +90,6 @@ public:
    * `<=` the raw dimensions of the image file.
    */
   using FilterMode = Dali::SamplingMode::Type;
-
-  static const ImageAttributes DEFAULT_ATTRIBUTES; ///< Default attributes have no size
 
   /**
    * @brief Default constructor, initializes to default values.

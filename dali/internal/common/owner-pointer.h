@@ -64,7 +64,7 @@ public:
    * Move constructor. Passes the ownership of a pointer to another.
    * @param[in] other The pointer that gives away the ownership.
    */
-  OwnerPointer(OwnerPointer&& other)
+  OwnerPointer(OwnerPointer&& other) noexcept
   : mObject(nullptr)
   {
     Swap(other);
@@ -91,7 +91,7 @@ public:
    * Move assignment operator. Passes the ownership of a pointer to another.
    * @param[in] other The pointer that gives away the ownership.
    */
-  OwnerPointer& operator=(OwnerPointer&& other)
+  OwnerPointer& operator=(OwnerPointer&& other) noexcept
   {
     // Reuse operator=
     return operator=(other);
