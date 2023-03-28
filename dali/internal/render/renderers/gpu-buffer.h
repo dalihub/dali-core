@@ -23,6 +23,8 @@
 
 namespace Dali
 {
+class VertexBufferUpdateCallback;
+
 namespace Internal
 {
 /**
@@ -70,13 +72,23 @@ public:
   ~GpuBuffer() = default;
 
   /**
-   *
    * Creates or updates a buffer object and binds it to the target.
    * @param graphicsController The graphics controller
    * @param size Specifies the size in bytes of the buffer object's new data store.
    * @param data pointer to the data to load
    */
   void UpdateDataBuffer(Graphics::Controller& graphicsController, uint32_t size, const void* data);
+
+  /**
+   * Updates existing buffer by calling associated VertexBufferUpdateCallback
+   *
+   * bytesUpdatedCount limits next draw call to that amount of data.
+   *
+   * @param[in] graphicsController Valid controller
+   * @param[in] callback  Valid pointer to the VertexBufferUpdateCallback
+   * @param[out] bytesUpdatedCount Number of bytes updated
+   */
+  void UpdateDataBufferWithCallback(Graphics::Controller& graphicsController, Dali::VertexBufferUpdateCallback* callback, uint32_t& bytesUpdatedCount);
 
   /**
    * Get the size of the buffer

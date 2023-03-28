@@ -182,6 +182,11 @@ uint32_t VertexBuffer::GetDivisor() const
   return mDivisor;
 }
 
+void VertexBuffer::SetVertexBufferUpdateCallback(VertexBufferUpdateCallback& callback)
+{
+  SceneGraph::SetVertexBufferUpdateCallback(mEventThreadServices.GetUpdateManager(), *mRenderObject, &callback);
+}
+
 const Render::VertexBuffer* VertexBuffer::GetRenderObject() const
 {
   return mRenderObject;

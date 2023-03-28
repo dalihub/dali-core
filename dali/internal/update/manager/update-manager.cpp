@@ -1407,6 +1407,18 @@ void UpdateManager::SetVertexBufferDivisor(Render::VertexBuffer* vertexBuffer, u
   new(slot) LocalType(vertexBuffer, &Render::VertexBuffer::SetDivisor, divisor);
 }
 
+void UpdateManager::SetVertexBufferUpdateCallback(Render::VertexBuffer* vertexBuffer, Dali::VertexBufferUpdateCallback* callback)
+{
+  // Message has ownership of format while in transit from update -> render
+  using DerivedType = MessageValue2<RenderManager, Render::VertexBuffer*, Dali::VertexBufferUpdateCallback*>;
+
+  // Reserve some memory inside the render queue
+  uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot(mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof(DerivedType));
+
+  // Construct message in the render queue memory; note that delete should not be called on the return value
+  new(slot) DerivedType(&mImpl->renderManager, &RenderManager::SetVertexBufferUpdateCallback, vertexBuffer, callback);
+}
+
 void UpdateManager::AddGeometry(OwnerPointer<Render::Geometry>& geometry)
 {
   // Message has ownership of format while in transit from update -> render

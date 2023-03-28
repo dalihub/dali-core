@@ -24,6 +24,45 @@
 
 namespace Dali
 {
+struct VertexBufferUpdateCallback::Impl
+{
+  Impl(CallbackBase* callback)
+  : mCallback(callback)
+  {
+  }
+
+  uint32_t Invoke(void* data, size_t size)
+  {
+    return CallbackBase::ExecuteReturn<uint32_t>(*mCallback, data, size);
+  }
+
+  std::unique_ptr<CallbackBase> mCallback;
+};
+
+VertexBufferUpdateCallback::~VertexBufferUpdateCallback() = default;
+
+std::unique_ptr<VertexBufferUpdateCallback> VertexBufferUpdateCallback::New(CallbackBase* callbackBase)
+{
+  std::unique_ptr<VertexBufferUpdateCallback> retval;
+  auto                                        impl = std::make_unique<Impl>(callbackBase);
+  retval.reset(new VertexBufferUpdateCallback(std::move(impl)));
+  return retval;
+}
+
+VertexBufferUpdateCallback::VertexBufferUpdateCallback(std::unique_ptr<VertexBufferUpdateCallback::Impl>&& impl)
+: mImpl(std::move(impl))
+{
+}
+
+uint32_t VertexBufferUpdateCallback::Invoke(void* data, size_t size)
+{
+  return mImpl->Invoke(data, size);
+}
+
+} // namespace Dali
+
+namespace Dali
+{
 VertexBuffer VertexBuffer::New(Dali::Property::Map& bufferFormat)
 {
   Internal::VertexBufferPtr vertexBuffer = Internal::VertexBuffer::New(bufferFormat);
@@ -66,6 +105,11 @@ void VertexBuffer::SetDivisor(uint32_t divisor)
 uint32_t VertexBuffer::GetDivisor() const
 {
   return GetImplementation(*this).GetDivisor();
+}
+
+void VertexBuffer::SetVertexBufferUpdateCallback(std::unique_ptr<VertexBufferUpdateCallback>&& updateCallback)
+{
+  GetImplementation(*this).SetVertexBufferUpdateCallback(*updateCallback.release());
 }
 
 VertexBuffer::VertexBuffer(Internal::VertexBuffer* pointer)
