@@ -45,6 +45,7 @@ RenderTaskList* RenderTaskList::New()
 
 RenderTaskList::RenderTaskList()
 : mNotificationObject(nullptr),
+  mResetterManager(nullptr),
   mRenderMessageDispatcher(nullptr),
   mOverlayRenderTask(nullptr)
 {
