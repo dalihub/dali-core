@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_EVENT_ACTORS_ACTOR_COORDS_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -248,6 +248,18 @@ Matrix CalculateActorWorldTransform(const Actor& actor);
  * @return the world color
  */
 Vector4 CalculateActorWorldColor(const Actor& actor);
+
+/**
+ * @brief Get the rotate of the actor look at specific position.
+ *
+ * @param[in] actor The actor for which to calculate the look at orientation.
+ * @param[in] target The target world position to look at.
+ * @param[in] up The up vector after target look at.
+ * @param[in] localForward The forward vector of actor when it's orientation is not applied.
+ * @param[in] localUp The up vector of actor when it's orientation is not applied.
+ * @return The orientation result of this lookAt result.
+ */
+Quaternion CalculateActorLookAtOrientation(const Actor& actor, Vector3 target, Vector3 up, Vector3 localForward, Vector3 localUp);
 
 } // namespace Dali::Internal
 

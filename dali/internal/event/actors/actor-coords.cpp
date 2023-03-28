@@ -65,6 +65,36 @@ bool GetViewportExtentsFromRenderTask(const RenderTask& renderTask, Rect<float>&
   }
   return true;
 }
+
+/**
+ * @brief Get the Orientation from Forward vector and Up vector
+ * If vectors are valid, return Quaternion to make forward direction as +Z, and up direction near as -Y axis.
+ * If some invalid vector inputed (like Zero length, or parallel vector), return identity quaternion
+ *
+ * @param[in] forward The vector that want to be +Z axis.
+ * @param[in] up The vector that want to be -Y axis.
+ * @return Quaternion to make forward direction as +Z, and up direction near as -Y axis.
+ */
+Quaternion GetOrientationFromForwardAndUpVector(Vector3 forward, Vector3 up)
+{
+  Vector3 vZ = forward;
+  vZ.Normalize();
+
+  Vector3 vX = up.Cross(vZ);
+  vX.Normalize();
+
+  // If something invalid input comes, vX length become zero.
+  if(DALI_UNLIKELY(Dali::EqualsZero(vX.Length())))
+  {
+    DALI_LOG_ERROR("Invalid value inputed, forward : %f %f %f ,  up : %f %f %f\n", forward.x, forward.y, forward.z, up.x, up.y, up.z);
+    return Quaternion();
+  }
+
+  Vector3 vY = vZ.Cross(vX);
+  vY.Normalize();
+
+  return Quaternion(vX, vY, vZ);
+}
 } // namespace
 bool ConvertScreenToLocal(
   const Matrix&   viewMatrix,
@@ -635,6 +665,31 @@ Vector4 CalculateActorWorldColor(const Actor& actor)
   }
 
   return worldColor;
+}
+
+Quaternion CalculateActorLookAtOrientation(const Actor& actor, Vector3 target, Vector3 up, Vector3 localForward, Vector3 localUp)
+{
+  Vector3 currentWorldPosition = CalculateActorWorldTransform(actor).GetTranslation3();
+
+  Quaternion worldToTarget = GetOrientationFromForwardAndUpVector(target - currentWorldPosition, up);
+  Quaternion worldToLocal  = GetOrientationFromForwardAndUpVector(localForward, localUp);
+
+  // Rotate by this order : Local --> World --> Target
+  Quaternion ret = worldToTarget / worldToLocal;
+
+  // If we inherit orientation, get parent's world orientation, and revert it.
+  if(actor.IsOrientationInherited() && actor.GetParent())
+  {
+    // Get Parent information.
+    Vector3       parentPosition, parentScale;
+    Quaternion    parentOrientation;
+    const Matrix& parentMatrix = CalculateActorWorldTransform(*actor.GetParent());
+    parentMatrix.GetTransformComponents(parentPosition, parentOrientation, parentScale);
+
+    ret = ret / parentOrientation;
+  }
+
+  return ret;
 }
 
 } // namespace Dali::Internal

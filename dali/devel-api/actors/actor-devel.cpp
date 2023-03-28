@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,6 +77,12 @@ Matrix GetWorldTransform(Actor actor)
 Vector4 GetWorldColor(Actor actor)
 {
   return CalculateActorWorldColor(GetImplementation(actor));
+}
+
+void LookAt(Actor actor, Vector3 target, Vector3 up, Vector3 localForward, Vector3 localUp)
+{
+  auto orientation = CalculateActorLookAtOrientation(GetImplementation(actor), target, up, localForward, localUp);
+  GetImplementation(actor).SetOrientation(orientation);
 }
 
 } // namespace DevelActor
