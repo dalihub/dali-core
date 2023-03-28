@@ -11687,3 +11687,68 @@ int UtcDaliActorCalculateWorldColor04(void)
 
   END_TEST;
 }
+
+int UtcDaliActorCalculateLookAt(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test that actor rotate right value of orientation");
+
+  Actor actor = Actor::New();
+
+  actor[Actor::Property::POSITION]      = Vector3(100.0f, 0.0f, 0.0f);
+  actor[Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  actor[Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render(0);
+
+  Quaternion actorQuaternion;
+
+  tet_printf("Test with target only\n");
+  Dali::DevelActor::LookAt(actor, Vector3::ZERO);
+  actorQuaternion = actor.GetProperty<Quaternion>(Actor::Property::ORIENTATION);
+  DALI_TEST_EQUALS(actorQuaternion, Quaternion(Radian(Degree(90.0f)), Vector3::NEGATIVE_YAXIS), TEST_LOCATION);
+
+  tet_printf("Test with target + up\n");
+  Dali::DevelActor::LookAt(actor, Vector3::ZERO, Vector3::ZAXIS);
+  actorQuaternion = actor.GetProperty<Quaternion>(Actor::Property::ORIENTATION);
+  DALI_TEST_EQUALS(actorQuaternion, Quaternion(Radian(Degree(90.0f)), Vector3::XAXIS) * Quaternion(Radian(Degree(90.0f)), Vector3::NEGATIVE_YAXIS), TEST_LOCATION);
+
+  tet_printf("Test with target + up + localForward\n");
+  Dali::DevelActor::LookAt(actor, Vector3::ZERO, Vector3::NEGATIVE_YAXIS, Vector3::NEGATIVE_XAXIS);
+  actorQuaternion = actor.GetProperty<Quaternion>(Actor::Property::ORIENTATION);
+  DALI_TEST_EQUALS(actorQuaternion, Quaternion(Radian(Degree(180.0f)), Vector3::XAXIS), TEST_LOCATION);
+
+  tet_printf("Test with target + up + localForward + localUp\n");
+  Dali::DevelActor::LookAt(actor, Vector3::ZERO, Vector3::NEGATIVE_YAXIS, Vector3::NEGATIVE_YAXIS, Vector3::XAXIS);
+  actorQuaternion = actor.GetProperty<Quaternion>(Actor::Property::ORIENTATION);
+  DALI_TEST_EQUALS(actorQuaternion, Quaternion(Radian(Degree(90.0f)), Vector3::NEGATIVE_ZAXIS), TEST_LOCATION);
+
+  // Reset quaternion
+  actor[Actor::Property::ORIENTATION] = Quaternion();
+
+  Actor actor2                           = Actor::New();
+  actor2[Actor::Property::POSITION]      = Vector3(0.0f, 50.0f, -10.0f);
+  actor2[Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  actor2[Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+  actor.Add(actor2);
+
+  tet_printf("Test whether lookat calculate well by using event side values only\n");
+  Dali::DevelActor::LookAt(actor2, Vector3(100.0f, 50.0f, 1.0f));
+  actorQuaternion = actor2.GetProperty<Quaternion>(Actor::Property::ORIENTATION);
+  DALI_TEST_EQUALS(actorQuaternion, Quaternion(), TEST_LOCATION);
+
+  actor[Actor::Property::ORIENTATION] = Quaternion(Radian(Degree(90.0f)), Vector3::ZAXIS);
+
+  DALI_TEST_EQUALS(Dali::DevelActor::GetWorldTransform(actor2).GetTranslation3(), Vector3(50.0f, 0.0f, -10.0f), TEST_LOCATION);
+
+  tet_printf("Test whether lookat calculate well inherit by parent orientation\n");
+  Dali::DevelActor::LookAt(actor2, Vector3(50.0f, 0.0f, 1.0f), Vector3::NEGATIVE_XAXIS);
+  actorQuaternion = actor2.GetProperty<Quaternion>(Actor::Property::ORIENTATION);
+  DALI_TEST_EQUALS(actorQuaternion, Quaternion(), TEST_LOCATION);
+
+  END_TEST;
+}
