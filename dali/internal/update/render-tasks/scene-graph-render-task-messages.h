@@ -91,17 +91,16 @@ inline void SetSourceNodeMessage(EventThreadServices& eventThreadServices, const
   new(slot) LocalType(&task, &RenderTask::SetSourceNode, node);
 }
 
-inline void SetCameraMessage(EventThreadServices& eventThreadServices, const RenderTask& task, const Node* constNode, const Camera* constCamera)
+inline void SetCameraMessage(EventThreadServices& eventThreadServices, const RenderTask& task, const Camera* constCamera)
 {
-  using LocalType = MessageValue2<RenderTask, Node*, Camera*>;
+  using LocalType = MessageValue1<RenderTask, Camera*>;
 
-  Node*   node   = const_cast<Node*>(constNode);
-  Camera* camera = const_cast<Camera*>(constCamera);
+  Camera* cameraNode = const_cast<Camera*>(constCamera);
   // Reserve memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&task, &RenderTask::SetCamera, node, camera);
+  new(slot) LocalType(&task, &RenderTask::SetCamera, cameraNode);
 }
 
 inline void SetViewportGuideNodeMessage(EventThreadServices& eventThreadServices, const RenderTask& task, const Node* constNode)

@@ -94,6 +94,11 @@ void RenderTaskList::RemoveTask(RenderTask* task)
   {
     if(*iter == task)
     {
+      if(mOverlayRenderTask == task)
+      {
+        mOverlayRenderTask = nullptr;
+      }
+
       // Destroy the task
       mRenderTasks.Erase(iter);
 

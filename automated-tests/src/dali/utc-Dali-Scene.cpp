@@ -2633,6 +2633,12 @@ int UtcDaliSceneGetOverlayLayer(void)
   DALI_TEST_EQUALS(tasks.GetTask(0u), defaultTask, TEST_LOCATION);
   DALI_TEST_EQUALS(tasks.GetTask(1u), newTask, TEST_LOCATION);
 
+  // Check overlay task removed well
+  DALI_TEST_EQUALS(nullptr, tasks.GetOverlayTask(), TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
   END_TEST;
 }
 
@@ -2662,7 +2668,7 @@ int UtcDaliSceneSurfaceResizedWithOverlayLayer(void)
   // There should be 2 task by default.
   DALI_TEST_EQUALS(tasks.GetTaskCount(), 2u, TEST_LOCATION);
   RenderTask overlayTask = tasks.GetTask(1u);
-  Viewport overlayViewport = defaultTask.GetViewport();
+  Viewport overlayViewport = overlayTask.GetViewport();
   DALI_TEST_EQUALS(defaultViewport, overlayViewport, TEST_LOCATION);
 
   // Resize the scene
@@ -2671,7 +2677,7 @@ int UtcDaliSceneSurfaceResizedWithOverlayLayer(void)
   scene.SurfaceResized(newSize.width, newSize.height);
   Viewport newViewport(0, 0, newSize.x, newSize.y);
   DALI_TEST_EQUALS(newViewport, defaultTask.GetViewport(), TEST_LOCATION);
-  DALI_TEST_EQUALS(newViewport, defaultTask.GetViewport(), TEST_LOCATION);
+  DALI_TEST_EQUALS(newViewport, overlayTask.GetViewport(), TEST_LOCATION);
 
   END_TEST;
 }
