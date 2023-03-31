@@ -60,6 +60,11 @@ public: // Public API
    */
   void MarkAsDirty();
 
+  /**
+   * @copydoc RenderDataProvider::GetVisualTransformedUpdateArea()
+   */
+  Vector4 GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, const Vector4& originalUpdateArea) noexcept;
+
 public:
   /**
    * @brief Cached coefficient value when we calculate visual transformed update size.

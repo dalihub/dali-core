@@ -43,12 +43,12 @@ namespace Internal
 {
 namespace SceneGraph
 {
-namespace // unnamed namespace
-{
 #ifdef DEBUG_ENABLED
 Debug::Filter* gSceneGraphRendererLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_SG_RENDERER");
 #endif
 
+namespace // unnamed namespace
+{
 // Memory pool used to allocate new renderers. Memory used by this pool will be released when shutting down DALi
 MemoryPoolObjectAllocator<Renderer>& GetRendererMemoryPool()
 {
@@ -816,124 +816,7 @@ Vector4 Renderer::GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, 
 {
   if(mVisualProperties)
   {
-    auto& coefficient = mVisualProperties->mCoefficient;
-
-    // Recalculate only if coefficient need to be updated.
-    if(coefficient.IsUpdated())
-    {
-      // VisualProperty
-      const Vector2 transformOffset         = mVisualProperties->mTransformOffset.Get(updateBufferIndex);
-      const Vector4 transformOffsetSizeMode = mVisualProperties->mTransformOffsetSizeMode.Get(updateBufferIndex);
-      const Vector2 transformSize           = mVisualProperties->mTransformSize.Get(updateBufferIndex);
-      const Vector2 transformOrigin         = mVisualProperties->mTransformOrigin.Get(updateBufferIndex);
-      const Vector2 transformAnchorPoint    = mVisualProperties->mTransformAnchorPoint.Get(updateBufferIndex);
-      const Vector2 extraSize               = mVisualProperties->mExtraSize.Get(updateBufferIndex);
-
-      DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "transform size   %5.3f %5.3f\n", transformSize.x, transformSize.y);
-      DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "transform offset %5.3f %5.3f\n", transformOffset.x, transformOffset.y);
-      DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "transform origin %5.3f %5.3f\n", transformOrigin.x, transformOrigin.y);
-      DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "transform anchor %5.3f %5.3f\n", transformAnchorPoint.x, transformAnchorPoint.y);
-      DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "extra size       %5.3f %5.3f\n", extraSize.x, extraSize.y);
-
-      // const Vector2 visualSize = Vector2(Dali::Lerp(transformOffsetSizeMode.z, originalSize.x * transformSize.x, transformSize.x),
-      //                                    Dali::Lerp(transformOffsetSizeMode.w, originalSize.y * transformSize.y, transformSize.y)) +
-      //                            extraSize;
-      // const Vector2 visualOffset = Vector2(Dali::Lerp(transformOffsetSizeMode.x, originalSize.x * transformOffset.x, transformOffset.x),
-      //                                      Dali::Lerp(transformOffsetSizeMode.y, originalSize.y * transformOffset.y, transformOffset.y));
-
-      // const float decoratedBorderlineWidth = std::max((1.0f + Dali::Clamp(borderlineOffset, -1.0f, 1.0f)) * borderlineWidth, 2.0f * blurRadius);
-      // const Vector2 decoratedVisualSize    = visualSize + Vector2(decoratedBorderlineWidth, decoratedBorderlineWidth);
-
-      // Note : vertexPositoin.xy = aPosition * decoratedVisualSize
-      //                          + anchorPoint * visualSize
-      //                          + origin * uSize.xy
-      //                          + visualOffset;
-
-      // Calculate same logic of visual's vertex shader transform.
-      // minVertexPosition = -0.5f * decoratedVisualSize + transformAnchorPoint * visualSize + transformOrigin * originalSize.xy + visualOffset
-      // maxVertexPosition =  0.5f * decoratedVisualSize + transformAnchorPoint * visualSize + transformOrigin * originalSize.xy + visualOffset
-
-      // Update cached VisualTransformedUpdateSizeCoefficientCache
-
-      // Note : vertexPosition = (XA * aPosition + XB) * originalSize + (CA * aPosition + CB) + Vector2(D, D) * aPosition
-
-      // XA = transformSize * (1.0 - transformOffsetSizeMode.zw)
-      // XB = transformSize * (1.0 - transformOffsetSizeMode.zw) * transformAnchorPoint
-      //    + transformOffset * (1.0 - transformOffsetSizeMode.xy)
-      //    + transformOrigin
-      // CA = transformSize * transformOffsetSizeMode.zw + extraSize
-      // CB = (transformSize * transformOffsetSizeMode.zw + extraSize) * transformAnchorPoint
-      //    + transformOffset * transformOffsetSizeMode.xy
-      // D = max((1.0 + clamp(borderlineOffset, -1.0, 1.0)) * borderlineWidth, 2.0 * blurRadius)
-
-      coefficient.coefXA = transformSize * Vector2(1.0f - transformOffsetSizeMode.z, 1.0f - transformOffsetSizeMode.w);
-      coefficient.coefXB = coefficient.coefXA * transformAnchorPoint + transformOffset * Vector2(1.0f - transformOffsetSizeMode.x, 1.0f - transformOffsetSizeMode.y) + transformOrigin;
-      coefficient.coefCA = transformSize * Vector2(transformOffsetSizeMode.z, transformOffsetSizeMode.w) + extraSize;
-      coefficient.coefCB = coefficient.coefCA * transformAnchorPoint + transformOffset * Vector2(transformOffsetSizeMode.x, transformOffsetSizeMode.y);
-    }
-
-    float coefD = 0.0f; ///< Default as 0.0f when we don't use decorated renderer.
-
-    if(mVisualProperties->mExtendedProperties)
-    {
-      const auto decoratedVisualProperties = static_cast<VisualRenderer::AnimatableDecoratedVisualProperties*>(mVisualProperties->mExtendedProperties);
-
-      auto& decoratedCoefficient = decoratedVisualProperties->mCoefficient;
-
-      // Recalculate only if coefficient need to be updated.
-      if(decoratedCoefficient.IsUpdated())
-      {
-        // DecoratedVisualProperty
-        const float borderlineWidth  = decoratedVisualProperties->mBorderlineWidth.Get(updateBufferIndex);
-        const float borderlineOffset = decoratedVisualProperties->mBorderlineOffset.Get(updateBufferIndex);
-        const float blurRadius       = decoratedVisualProperties->mBlurRadius.Get(updateBufferIndex);
-
-        DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "borderline width  %5.3f\n", borderlineWidth);
-        DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "borderline offset %5.3f\n", borderlineOffset);
-        DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "blur radius       %5.3f\n", blurRadius);
-
-        // D coefficients be used only decoratedVisual.
-        // It can be calculated parallely with visual transform.
-        decoratedCoefficient.coefD = std::max((1.0f + Dali::Clamp(borderlineOffset, -1.0f, 1.0f)) * borderlineWidth, 2.0f * blurRadius);
-      }
-
-      // Update coefD so we can use this value out of this scope.
-      coefD = decoratedCoefficient.coefD;
-    }
-
-    // Calculate vertex position by coefficient
-    // It will reduce the number of operations
-
-    // const Vector2 minVertexPosition = (XA * -0.5 + XB) * originalSize + (CA * -0.5 + CB) + Vector2(D, D) * -0.5;
-    // const Vector2 maxVertexPosition = (XA * +0.5 + XB) * originalSize + (CA * +0.5 + CB) + Vector2(D, D) * +0.5;
-
-    // When we set
-    // basicVertexPosition = XB * originalSize + CB
-    // scaleVertexPosition = XA * originalSize + CA + D
-
-    // --> minVertexPosition = basicVertexPosition + scaleVertexPosition * -0.5
-    //     maxVertexPosition = basicVertexPosition + scaleVertexPosition * +0.5
-
-    // Then, resultSize = 2.0f * max(-minVertexPosition, maxVertexPosition);
-    //                  = 2.0f * max(scaleVertexPosition * 0.5 - basicVertexPosition, scaleVertexPosition * 0.5 + basicVertexPosition)
-    //                  = scaleVertexPosition + 2.0f * abs(basicVertexPosition)
-    // Cause transform matrix will think center of vertex is (0, 0)
-
-    const Vector2 originalXY = Vector2(originalUpdateArea.x, originalUpdateArea.y);
-    const Vector2 originalWH = Vector2(originalUpdateArea.z, originalUpdateArea.w);
-
-    const Vector2 basicVertexPosition = coefficient.coefXB * originalWH + coefficient.coefCB;
-    const Vector2 scaleVertexPosition = coefficient.coefXA * originalWH + coefficient.coefCA;
-
-    // TODO : We need to re-generate coefficient to consitder area width/height
-    const Vector4 resultArea = Vector4(originalXY.x,
-                                       originalXY.y,
-                                       scaleVertexPosition.x + 2.0f * abs(basicVertexPosition.x) + coefD,
-                                       scaleVertexPosition.y + 2.0f * abs(basicVertexPosition.y) + coefD);
-
-    DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "%f %f %f %f--> %f %f %f %f\n", originalUpdateArea.x, originalUpdateArea.y, originalUpdateArea.z, originalUpdateArea.w, resultArea.x, resultArea.y, resultArea.z, resultArea.w);
-
-    return resultArea;
+    return mVisualProperties->GetVisualTransformedUpdateArea(updateBufferIndex, originalUpdateArea);
   }
   return originalUpdateArea;
 }

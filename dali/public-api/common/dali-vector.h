@@ -2,7 +2,7 @@
 #define DALI_VECTOR_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -213,7 +213,7 @@ protected: // for Derived classes
    * Does not call destructors on objects held.
    * @param[in] newData new data address to be replaced
    */
-  void Replace(void* newData);
+  void Replace(void* newData) noexcept;
 
 private:
   // not copyable as it does not know the size of elements
@@ -465,7 +465,7 @@ public: // API
    * @SINCE_1_9.25
    * @param[in] vector Vector to move
    */
-  Vector(Vector&& vector)
+  Vector(Vector&& vector) noexcept
   {
     // reuse move assignment
     operator=(std::move(vector));
@@ -493,7 +493,7 @@ public: // API
    * @SINCE_1_9.25
    * @param[in] vector Vector to move
    */
-  Vector& operator=(Vector&& vector)
+  Vector& operator=(Vector&& vector) noexcept
   {
     if(this != &vector)
     {
