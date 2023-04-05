@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/trace.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/events/gesture-requests.h>
@@ -39,6 +40,7 @@ namespace Internal
 {
 namespace
 {
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
 const unsigned long DEFAULT_MINIMUM_HOLDING_TIME = 500u;
 
 /**
@@ -116,6 +118,7 @@ LongPressGestureProcessor::~LongPressGestureProcessor() = default;
 
 void LongPressGestureProcessor::Process(Scene& scene, const LongPressGestureEvent& longPressEvent)
 {
+  DALI_TRACE_SCOPE(gTraceFilter, "DALI_PROCESS_LONG_PRESS_GESTURE");
   switch(longPressEvent.state)
   {
     case GestureState::POSSIBLE:

@@ -2,7 +2,7 @@
 #define DALI_ACTOR_DEVEL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -412,6 +412,26 @@ DALI_CORE_API Matrix GetWorldTransform(Actor actor);
  * @return the world color
  */
 DALI_CORE_API Vector4 GetWorldColor(Actor actor);
+
+/**
+ * Rotate the actor look at specific position.
+ * It will change the actor's orientation property.
+ *
+ * This calculates the world transform from scratch using only event
+ * side properties - it does not rely on the update thread to have
+ * already calculated the transform.
+ *
+ * @note Target position should be setup by world coordinates.
+ * @note The result of invalid input is not determined.
+ *       (ex : forward vector or actor-to-target vector has same direction with up, One of them is ZERO)
+ *
+ * @param[in] actor The actor for which to calculate the look at orientation.
+ * @param[in] target The target world position to look at.
+ * @param[in] up The up vector after target look at. Default is +Y axis.
+ * @param[in] localForward The forward vector of actor when it's orientation is not applied. Default is +Z axis.
+ * @param[in] localUp The up vector of actor when it's orientation is not applied. Default is +Y axis.
+ */
+DALI_CORE_API void LookAt(Actor actor, Vector3 target, Vector3 up = Vector3::YAXIS, Vector3 localForward = Vector3::ZAXIS, Vector3 localUp = Vector3::YAXIS);
 
 } // namespace DevelActor
 

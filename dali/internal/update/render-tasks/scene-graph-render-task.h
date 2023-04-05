@@ -113,9 +113,8 @@ public:
   /**
    * Set the camera from which the scene is viewed.
    * @param[in] cameraNode that camera is connected with
-   * @param[in] camera to use.
    */
-  void SetCamera(Node* cameraNode, Camera* camera);
+  void SetCamera(Camera* cameraNode);
 
   /**
    * Set the frame-buffer used as a render target.
@@ -397,9 +396,8 @@ private:
   RenderMessageDispatcher* mRenderMessageDispatcher;
   Render::RenderTracker*   mRenderSyncTracker;
   Node*                    mSourceNode;
-  Node*                    mCameraNode;
+  SceneGraph::Camera*      mCameraNode;
   Node*                    mViewportGuideNode;
-  SceneGraph::Camera*      mCamera;
   Render::FrameBuffer*     mFrameBuffer;
 
   RenderInstruction mRenderInstruction[2]; ///< Owned double buffered render instruction. (Double buffered because this owns render commands for the currently drawn frame)

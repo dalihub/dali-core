@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/events/hover-event-integ.h>
+#include <dali/integration-api/trace.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/layer-impl.h>
 #include <dali/internal/event/common/scene-impl.h>
@@ -40,6 +41,7 @@ namespace Internal
 {
 namespace
 {
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_HOVER_PROCESSOR");
 
@@ -73,6 +75,7 @@ Dali::Actor EmitHoverSignals(Dali::Actor actor, const Dali::HoverEvent& event)
     // Only emit the signal if the actor's hover signal has connections (or derived actor implementation requires hover).
     if(actorImpl.GetHoverRequired())
     {
+      DALI_TRACE_SCOPE(gTraceFilter, "DALI_EMIT_HOVER_EVENT_SIGNAL");
       consumed = actorImpl.EmitHoverEventSignal(event);
     }
 
@@ -183,6 +186,8 @@ void HoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent& event
 
   PRINT_HIERARCHY(gLogFilter);
 
+  DALI_TRACE_SCOPE(gTraceFilter, "DALI_PROCESS_HOVER_EVENT");
+
   // Copy so we can add the results of a hit-test.
   HoverEventPtr hoverEvent(new HoverEvent(event.time));
 
@@ -271,7 +276,19 @@ void HoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent& event
   Dali::Actor consumedActor;
   if(currentRenderTask)
   {
-    consumedActor = EmitHoverSignals(hoverEvent->GetHitActor(0), hoverEventHandle);
+    Dali::Actor hitActor = hoverEvent->GetHitActor(0);
+    // If the actor is hit first, the hover is started.
+    if(hitActor &&
+       mLastPrimaryHitActor.GetActor() != hitActor &&
+       state == PointState::MOTION)
+    {
+      Actor* hitActorImpl = &GetImplementation(hitActor);
+      if(hitActorImpl->GetLeaveRequired())
+      {
+        hoverEvent->GetPoint(0).SetState(PointState::STARTED);
+      }
+    }
+    consumedActor = EmitHoverSignals(hitActor, hoverEventHandle);
   }
 
   Integration::Point primaryPoint      = hoverEvent->GetPoint(0);
@@ -293,7 +310,7 @@ void HoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent& event
 
   Actor* lastPrimaryHitActor(mLastPrimaryHitActor.GetActor());
   Actor* lastConsumedActor(mLastConsumedActor.GetActor());
-  if((primaryPointState == PointState::MOTION) || (primaryPointState == PointState::FINISHED) || (primaryPointState == PointState::STATIONARY))
+  if((primaryPointState == PointState::STARTED) || (primaryPointState == PointState::MOTION) || (primaryPointState == PointState::FINISHED) || (primaryPointState == PointState::STATIONARY))
   {
     if(mLastRenderTask)
     {
@@ -312,7 +329,7 @@ void HoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent& event
             leaveEventConsumer = EmitHoverSignals(mLastPrimaryHitActor.GetActor(), lastRenderTaskImpl, hoverEvent, PointState::LEAVE);
           }
         }
-        else
+        else if(primaryPointState != PointState::STARTED)
         {
           // At this point mLastPrimaryHitActor was touchable and sensitive in the previous touch event process but is not in the current one.
           // An interrupted event is send to allow some actors to go back to their original state (i.e. Button controls)
@@ -338,7 +355,7 @@ void HoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent& event
             EmitHoverSignals(lastConsumedActor, lastRenderTaskImpl, hoverEvent, PointState::LEAVE);
           }
         }
-        else
+        else if(primaryPointState != PointState::STARTED)
         {
           // At this point mLastConsumedActor was touchable and sensitive in the previous touch event process but is not in the current one.
           // An interrupted event is send to allow some actors to go back to their original state (i.e. Button controls)

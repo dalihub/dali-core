@@ -129,7 +129,7 @@ bool RenderTask::IsExclusive() const
   return mExclusive;
 }
 
-void RenderTask::SetCamera(Node* cameraNode, Camera* camera)
+void RenderTask::SetCamera(Camera* cameraNode)
 {
   if(mCameraNode)
   {
@@ -137,7 +137,6 @@ void RenderTask::SetCamera(Node* cameraNode, Camera* camera)
   }
 
   mCameraNode = cameraNode;
-  mCamera     = camera;
 
   if(mCameraNode)
   {
@@ -345,34 +344,34 @@ uint32_t RenderTask::GetRenderedOnceCounter() const
 
 const Matrix& RenderTask::GetViewMatrix(BufferIndex bufferIndex) const
 {
-  DALI_ASSERT_DEBUG(nullptr != mCamera);
+  DALI_ASSERT_DEBUG(nullptr != mCameraNode);
 
-  return mCamera->GetViewMatrix(bufferIndex);
+  return mCameraNode->GetViewMatrix(bufferIndex);
 }
 
 const SceneGraph::Camera& RenderTask::GetCamera() const
 {
-  DALI_ASSERT_DEBUG(nullptr != mCamera);
-  return *mCamera;
+  DALI_ASSERT_DEBUG(nullptr != mCameraNode);
+  return *mCameraNode;
 }
 
 const Matrix& RenderTask::GetProjectionMatrix(BufferIndex bufferIndex) const
 {
-  DALI_ASSERT_DEBUG(nullptr != mCamera);
+  DALI_ASSERT_DEBUG(nullptr != mCameraNode);
 
-  return mCamera->GetProjectionMatrix(bufferIndex);
+  return mCameraNode->GetProjectionMatrix(bufferIndex);
 }
 
 RenderInstruction& RenderTask::PrepareRenderInstruction(BufferIndex updateBufferIndex)
 {
-  DALI_ASSERT_DEBUG(nullptr != mCamera);
+  DALI_ASSERT_DEBUG(nullptr != mCameraNode);
 
   TASK_LOG(Debug::General);
 
   Viewport viewport;
   bool     viewportSet = QueryViewport(updateBufferIndex, viewport);
 
-  mRenderInstruction[updateBufferIndex].Reset(mCamera,
+  mRenderInstruction[updateBufferIndex].Reset(mCameraNode,
                                               GetFrameBuffer(),
                                               viewportSet ? &viewport : nullptr,
                                               mClearEnabled ? &GetClearColor(updateBufferIndex) : nullptr);
@@ -400,9 +399,9 @@ RenderInstruction& RenderTask::PrepareRenderInstruction(BufferIndex updateBuffer
 bool RenderTask::ViewMatrixUpdated()
 {
   bool retval = false;
-  if(mCamera)
+  if(mCameraNode)
   {
-    retval = mCamera->ViewMatrixUpdated();
+    retval = mCameraNode->ViewMatrixUpdated();
   }
   return retval;
 }
@@ -477,6 +476,8 @@ void RenderTask::PropertyOwnerDestroyed(PropertyOwner& owner)
   {
     mCameraNode = nullptr;
   }
+
+  mActive = false; // if either source or camera destroyed, we're no longer active
 }
 
 void RenderTask::AddInitializeResetter(ResetterManager& manager) const
@@ -499,7 +500,6 @@ RenderTask::RenderTask()
   mSourceNode(nullptr),
   mCameraNode(nullptr),
   mViewportGuideNode(nullptr),
-  mCamera(nullptr),
   mFrameBuffer(nullptr),
   mRefreshRate(Dali::RenderTask::DEFAULT_REFRESH_RATE),
   mFrameCounter(0u),
@@ -523,7 +523,7 @@ void RenderTask::SetActiveStatus()
 
   // must have a source and camera both connected to scene
   mActive = (mSourceNode && mSourceNode->ConnectedToScene() &&
-             mCameraNode && mCameraNode->ConnectedToScene() && mCamera);
+             mCameraNode && mCameraNode->ConnectedToScene());
   TASK_LOG_FMT(Debug::General, " Source node(%x) active %d.  Frame counter: %d\n", mSourceNode, mSourceNode && mSourceNode->ConnectedToScene(), mFrameCounter);
   TASK_LOG_FMT(Debug::General, " Camera node(%x) active %d\n", mCameraNode, mCameraNode && mCameraNode->ConnectedToScene());
 

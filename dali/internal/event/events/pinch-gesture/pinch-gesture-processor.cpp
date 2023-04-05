@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/trace.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/events/gesture-requests.h>
 #include <dali/internal/event/events/pinch-gesture/pinch-gesture-event.h>
@@ -39,6 +40,7 @@ namespace Internal
 {
 namespace
 {
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
 const uint32_t MINIMUM_TOUCH_EVENTS_REQUIRED             = 4u;
 const uint32_t MINIMUM_TOUCH_EVENTS_REQUIRED_AFTER_START = 4u;
 
@@ -167,6 +169,7 @@ void PinchGestureProcessor::SetMinimumTouchEventsAfterStart(uint32_t value)
 
 void PinchGestureProcessor::Process(Scene& scene, const PinchGestureEvent& pinchEvent)
 {
+  DALI_TRACE_SCOPE(gTraceFilter, "DALI_PROCESS_PINCH_GESTURE");
   switch(pinchEvent.state)
   {
     case GestureState::STARTED:

@@ -90,6 +90,11 @@ void RenderTaskList::RemoveTask(Internal::RenderTask& task)
 
     if(ptr == &task)
     {
+      if(mOverlayRenderTask == &task)
+      {
+        mOverlayRenderTask.Reset();
+      }
+
       const SceneGraph::RenderTask& sceneObject = task.GetRenderTaskSceneObject();
 
       // delete the task

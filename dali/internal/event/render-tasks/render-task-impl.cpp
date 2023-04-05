@@ -152,11 +152,11 @@ void RenderTask::SetCameraActor(CameraActor* cameraActor)
   mCameraActor.SetActor(cameraActor);
   if(cameraActor)
   {
-    SetCameraMessage(GetEventThreadServices(), GetRenderTaskSceneObject(), &cameraActor->GetNode(), &cameraActor->GetCameraSceneObject());
+    SetCameraMessage(GetEventThreadServices(), GetRenderTaskSceneObject(), &cameraActor->GetCameraSceneObject());
   }
   else
   {
-    SetCameraMessage(GetEventThreadServices(), GetRenderTaskSceneObject(), nullptr, nullptr);
+    SetCameraMessage(GetEventThreadServices(), GetRenderTaskSceneObject(), nullptr);
   }
 
   // set the actor on exclusive container for hit testing

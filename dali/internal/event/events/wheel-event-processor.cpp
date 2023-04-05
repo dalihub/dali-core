@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/events/wheel-event-integ.h>
+#include <dali/integration-api/trace.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/events/hit-test-algorithm-impl.h>
@@ -35,6 +36,7 @@ namespace Internal
 {
 namespace
 {
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_WHEEL_PROCESSOR");
 #endif
@@ -131,6 +133,8 @@ void WheelEventProcessor::ProcessWheelEvent(const Integration::WheelEvent& event
 {
   WheelEventPtr    wheelEvent = WheelEvent::New(static_cast<Dali::WheelEvent::Type>(event.type), event.direction, event.modifiers, event.point, event.delta, event.timeStamp);
   Dali::WheelEvent wheelEventHandle(wheelEvent.Get());
+
+  DALI_TRACE_SCOPE(gTraceFilter, "DALI_PROCESS_WHEEL_EVENT");
 
   if(wheelEvent->GetType() == Dali::WheelEvent::MOUSE_WHEEL)
   {
