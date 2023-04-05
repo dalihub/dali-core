@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/trace.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/events/gesture-requests.h>
@@ -41,6 +42,7 @@ namespace Internal
 {
 namespace
 {
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
 constexpr uint32_t DEFAULT_MAXIMUM_ALLOWED_TIME = 500u;
 
 /**
@@ -92,6 +94,7 @@ TapGestureProcessor::~TapGestureProcessor() = default;
 
 void TapGestureProcessor::Process(Scene& scene, const TapGestureEvent& tapEvent)
 {
+  DALI_TRACE_SCOPE(gTraceFilter, "DALI_PROCESS_TAP_GESTURE");
   switch(tapEvent.state)
   {
     case GestureState::POSSIBLE:

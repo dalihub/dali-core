@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/integration-api/trace.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/layer-impl.h>
 #include <dali/internal/event/common/scene-impl.h>
@@ -42,6 +43,7 @@ namespace Internal
 {
 namespace
 {
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_TOUCH_PROCESSOR");
 
@@ -66,6 +68,7 @@ Dali::Actor EmitInterceptTouchSignals(Dali::Actor actor, const Dali::TouchEvent&
     Dali::Actor parent = actor.GetParent();
     if(parent)
     {
+      DALI_TRACE_SCOPE(gTraceFilter, "DALI_EMIT_INTERCEPT_TOUCH_EVENT_SIGNAL");
       // Recursively deliver events to the actor and its parents for intercept touch event.
       interceptedActor = EmitInterceptTouchSignals(parent, touchEvent);
     }
@@ -106,6 +109,7 @@ Dali::Actor EmitTouchSignals(Dali::Actor actor, const Dali::TouchEvent& touchEve
     // Only emit the signal if the actor's touch signal has connections (or derived actor implementation requires touch).
     if(actorImpl.GetTouchRequired())
     {
+      DALI_TRACE_SCOPE(gTraceFilter, "DALI_EMIT_TOUCH_EVENT_SIGNAL");
       consumed = actorImpl.EmitTouchEventSignal(touchEvent);
     }
 
@@ -252,6 +256,8 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
   DALI_ASSERT_ALWAYS(!event.points.empty() && "Empty TouchEvent sent from Integration\n");
 
   PRINT_HIERARCHY(gLogFilter);
+
+  DALI_TRACE_SCOPE(gTraceFilter, "DALI_PROCESS_TOUCH_EVENT");
 
   // 1) Check if it is an interrupted event - we should inform our last primary hit actor about this
   //    and emit the stage signal as well.
