@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -280,13 +280,54 @@ int UtcDaliVertexBufferSetData02(void)
   END_TEST;
 }
 
-int UtcDaliVertexBufferInvalidTypeN(void)
+int UtcDaliVertexBufferMapInitializerList(void)
+{
+  TestApplication application;
+
+  Property::Map texturedQuadVertexFormat = Property::Map{{"aPosition", Property::VECTOR2},
+                                                         {"aTexCoord", Property::VECTOR2},
+                                                         {"aColor", Property::VECTOR4}};
+
+  try
+  {
+    VertexBuffer vertexBuffer = VertexBuffer::New(texturedQuadVertexFormat);
+    tet_result(TET_PASS);
+  }
+  catch(Dali::DaliException& e)
+  {
+    // Shouldn't assert any more
+    tet_result(TET_FAIL);
+  }
+  END_TEST;
+}
+
+int UtcDaliVertexBufferInvalidTypeN01(void)
 {
   TestApplication application;
 
   Property::Map texturedQuadVertexFormat;
   texturedQuadVertexFormat["aPosition"]    = Property::MAP;
   texturedQuadVertexFormat["aVertexCoord"] = Property::STRING;
+
+  try
+  {
+    VertexBuffer vertexBuffer = VertexBuffer::New(texturedQuadVertexFormat);
+    tet_result(TET_FAIL);
+  }
+  catch(Dali::DaliException& e)
+  {
+    DALI_TEST_ASSERT(e, "Property::Type not supported in VertexBuffer", TEST_LOCATION);
+  }
+  END_TEST;
+}
+
+int UtcDaliVertexBufferInvalidTypeN02(void)
+{
+  TestApplication application;
+
+  Property::Map texturedQuadVertexFormat = Property::Map{{"aPosition", Property::MAP},
+                                                         {"aTexCoord", Property::STRING},
+                                                         {"aColor", Property::VECTOR4}};
 
   try
   {

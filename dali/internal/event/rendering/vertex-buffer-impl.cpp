@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -222,6 +222,15 @@ void VertexBuffer::Initialize(Dali::Property::Map& formatMap)
     Property::Type type = Property::Type(component.second.Get<int>());
 
     // Get the size and alignment
+    if(type == Property::NONE)
+    {
+      /* Note, Property::Value() has an explicit constructor using Property::Type enum,
+       * which will generate a property value of that type. This constructor is used when
+       * using C++ initializer lists.
+       */
+      type = component.second.GetType();
+    }
+
     if((type == Property::NONE) ||
        (type == Property::STRING) ||
        (type == Property::ARRAY) ||
@@ -229,6 +238,7 @@ void VertexBuffer::Initialize(Dali::Property::Map& formatMap)
     {
       DALI_ABORT("Property::Type not supported in VertexBuffer");
     }
+
     uint32_t elementSize      = GetPropertyImplementationSize(type);
     uint32_t elementAlignment = GetPropertyImplementationAlignment(type);
 
