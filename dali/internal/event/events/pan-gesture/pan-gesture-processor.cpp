@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/trace.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/events/gesture-requests.h>
 #include <dali/internal/event/events/multi-point-event-util.h>
@@ -47,6 +48,7 @@ namespace Internal
 {
 namespace // unnamed namespace
 {
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_PAN_PROCESSOR");
 
@@ -150,6 +152,8 @@ void PanGestureProcessor::Process(Scene& scene, const PanGestureEvent& panEvent)
   DALI_LOG_INFO(gLogFilter, Debug::General, "      State: %s  Touches: %d  Time: %d  TimeDelta: %d\n", GESTURE_STATES[static_cast<uint8_t>(panEvent.state)], panEvent.numberOfTouches, panEvent.time, panEvent.timeDelta);
   DALI_LOG_INFO(gLogFilter, Debug::General, "      Positions: Current: (%.0f, %.0f), Previous: (%.0f, %.0f)\n", panEvent.currentPosition.x, panEvent.currentPosition.y, panEvent.previousPosition.x, panEvent.previousPosition.y);
 #endif
+
+  DALI_TRACE_SCOPE(gTraceFilter, "DALI_PROCESS_PAN_GESTURE");
 
   switch(panEvent.state)
   {

@@ -25,6 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/events/hover-event-integ.h>
+#include <dali/integration-api/trace.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/layer-impl.h>
 #include <dali/internal/event/common/scene-impl.h>
@@ -40,6 +41,7 @@ namespace Internal
 {
 namespace
 {
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_HOVER_PROCESSOR");
 
@@ -73,6 +75,7 @@ Dali::Actor EmitHoverSignals(Dali::Actor actor, const Dali::HoverEvent& event)
     // Only emit the signal if the actor's hover signal has connections (or derived actor implementation requires hover).
     if(actorImpl.GetHoverRequired())
     {
+      DALI_TRACE_SCOPE(gTraceFilter, "DALI_EMIT_HOVER_EVENT_SIGNAL");
       consumed = actorImpl.EmitHoverEventSignal(event);
     }
 
@@ -182,6 +185,8 @@ void HoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent& event
   PointState::Type state = static_cast<PointState::Type>(event.points[0].GetState());
 
   PRINT_HIERARCHY(gLogFilter);
+
+  DALI_TRACE_SCOPE(gTraceFilter, "DALI_PROCESS_HOVER_EVENT");
 
   // Copy so we can add the results of a hit-test.
   HoverEventPtr hoverEvent(new HoverEvent(event.time));
