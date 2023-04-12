@@ -75,7 +75,7 @@ void TextureSet::SetSampler(uint32_t index, Render::Sampler* sampler)
 
   mSamplers[index] = sampler;
 
-  if(index < static_cast<uint32_t>(mTextures.Size()))
+  if(index < static_cast<uint32_t>(mTextures.Size()) && mTextures[index])
   {
     // Send a message to the RenderManagerReserveMessageSlot
     using DerivedType = MessageValue1<RenderManager, Render::TextureKey>;
