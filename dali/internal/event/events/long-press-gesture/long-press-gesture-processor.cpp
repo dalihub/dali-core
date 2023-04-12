@@ -64,6 +64,8 @@ void EmitLongPressSignal(
   longPress->SetSourceType(longPressEvent.sourceType);
   longPress->SetSourceData(longPressEvent.sourceData);
 
+  DALI_TRACE_SCOPE(gTraceFilter, "DALI_EMIT_LONG_PRESS_GESTURE_SIGNAL");
+
   Dali::Actor                                    actorHandle(actor);
   const GestureDetectorContainer::const_iterator endIter = gestureDetectors.end();
   for(GestureDetectorContainer::const_iterator iter = gestureDetectors.begin(); iter != endIter; ++iter)

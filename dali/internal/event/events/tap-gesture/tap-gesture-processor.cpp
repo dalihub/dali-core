@@ -67,6 +67,8 @@ void EmitTapSignal(
   tap->SetSourceType(tapEvent.sourceType);
   tap->SetSourceData(tapEvent.sourceData);
 
+  DALI_TRACE_SCOPE(gTraceFilter, "DALI_EMIT_TAP_GESTURE_SIGNAL");
+
   Dali::Actor                                    actorHandle(actor);
   const GestureDetectorContainer::const_iterator endIter = gestureDetectors.end();
   for(GestureDetectorContainer::const_iterator iter = gestureDetectors.begin(); iter != endIter; ++iter)
