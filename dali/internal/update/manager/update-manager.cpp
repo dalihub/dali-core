@@ -42,6 +42,7 @@
 
 #include <dali/internal/render/common/render-manager.h>
 #include <dali/internal/render/queue/render-queue.h>
+#include <dali/internal/render/renderers/render-vertex-buffer.h>
 
 // Un-comment to enable node tree debug logging
 //#define NODE_TREE_LOGGING 1
@@ -1373,6 +1374,13 @@ void UpdateManager::SetVertexBufferData(Render::VertexBuffer* vertexBuffer, Owne
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
   new(slot) DerivedType(&mImpl->renderManager, &RenderManager::SetVertexBufferData, vertexBuffer, data, size);
+}
+
+void UpdateManager::SetVertexBufferDivisor(Render::VertexBuffer* vertexBuffer, uint32_t divisor)
+{
+  using LocalType = MessageValue1<Render::VertexBuffer, uint32_t>;
+  uint32_t* slot  = mImpl->renderQueue.ReserveMessageSlot(mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof(LocalType));
+  new(slot) LocalType(vertexBuffer, &Render::VertexBuffer::SetDivisor, divisor);
 }
 
 void UpdateManager::AddGeometry(OwnerPointer<Render::Geometry>& geometry)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,6 +56,16 @@ void VertexBuffer::SetData(const void* data, std::size_t size)
 std::size_t VertexBuffer::GetSize() const
 {
   return GetImplementation(*this).GetSize();
+}
+
+void VertexBuffer::SetDivisor(uint32_t divisor)
+{
+  GetImplementation(*this).SetDivisor(divisor);
+}
+
+uint32_t VertexBuffer::GetDivisor() const
+{
+  return GetImplementation(*this).GetDivisor();
 }
 
 VertexBuffer::VertexBuffer(Internal::VertexBuffer* pointer)

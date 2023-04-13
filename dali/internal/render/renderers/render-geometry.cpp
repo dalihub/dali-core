@@ -93,6 +93,7 @@ void Geometry::SetIndexBuffer(Uint32ContainerType& indices)
 void Geometry::RemoveVertexBuffer(const Render::VertexBuffer* vertexBuffer)
 {
   const auto&& end = mVertexBuffers.End();
+  // @todo if this buffer is the only instance buffer, reduce instance count to 1.
   for(auto&& iter = mVertexBuffers.Begin(); iter != end; ++iter)
   {
     if(*iter == vertexBuffer)
@@ -159,6 +160,11 @@ bool Geometry::BindVertexAttributes(Graphics::CommandBuffer& commandBuffer)
 
   for(uint32_t i = 0; i < vertexBufferCount; ++i)
   {
+    if(mVertexBuffers[i]->GetDivisor() > 0)
+    {
+      mInstanceCount = mVertexBuffers[i]->GetElementCount();
+    }
+
     const GpuBuffer* gpuBuffer = mVertexBuffers[i]->GetGpuBuffer();
     if(gpuBuffer)
     {
@@ -219,7 +225,7 @@ bool Geometry::Draw(
       commandBuffer.BindIndexBuffer(*ibo, 0, mIndexType);
     }
 
-    commandBuffer.DrawIndexed(numIndices, 1, firstIndexOffset, 0, 0);
+    commandBuffer.DrawIndexed(numIndices, mInstanceCount, firstIndexOffset, 0, 0);
   }
   else
   {
@@ -232,7 +238,7 @@ bool Geometry::Draw(
       numVertices = static_cast<uint32_t>(mVertexBuffers[0]->GetElementCount());
     }
 
-    commandBuffer.Draw(numVertices, 1, 0, 0);
+    commandBuffer.Draw(numVertices, mInstanceCount, 0, 0);
   }
   return true;
 }

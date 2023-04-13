@@ -630,6 +630,7 @@ struct VertexInputState
     }
     uint32_t        stride;
     VertexInputRate inputRate;
+    //@todo Add actual rate...
   };
 
   /**

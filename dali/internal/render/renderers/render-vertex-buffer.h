@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_VERTEX_BUFFER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,6 +87,17 @@ public:
   bool Update(Graphics::Controller& graphicsController);
 
   /**
+   * @brief Set the divisor of the buffer for instanced drawing
+   * @param[in] divisor The divisor (0 = not instanced, >=1 = instanced)
+   */
+  void SetDivisor(uint32_t divisor);
+
+  /**
+   * Get the divisor for the vertex buffer
+   */
+  [[nodiscard]] uint32_t GetDivisor();
+
+  /**
    * Get the number of attributes present in the buffer
    * @return The number of attributes stored in this buffer
    */
@@ -152,6 +163,7 @@ private:
   OwnerPointer<GpuBuffer>              mGpuBuffer; ///< Pointer to the GpuBuffer associated with this RenderVertexBuffer
 
   uint32_t mSize;        ///< Number of Elements in the buffer
+  uint32_t mDivisor{0};  ///< The divisor (0:not instanced, >=1:instanced)
   bool     mDataChanged; ///< Flag to know if data has changed in a frame
 };
 

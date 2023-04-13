@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,6 +76,16 @@ bool VertexBuffer::Update(Graphics::Controller& graphicsController)
   }
 
   return true;
+}
+
+void VertexBuffer::SetDivisor(uint32_t divisor)
+{
+  mDivisor = divisor;
+}
+
+uint32_t VertexBuffer::GetDivisor()
+{
+  return mDivisor;
 }
 
 } // namespace Render

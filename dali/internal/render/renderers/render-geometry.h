@@ -151,6 +151,7 @@ private:
   OwnerPointer<GpuBuffer> mIndexBuffer;
   IndexType               mIndexType;
   Type                    mGeometryType;
+  uint32_t                mInstanceCount{0};
 
   // Booleans
   bool mIndicesChanged : 1;

@@ -209,8 +209,14 @@ PipelineCacheL0* PipelineCache::GetPipelineCacheL0(std::size_t hash, Program* pr
     {
       const VertexBuffer::Format& vertexFormat = *vertexBuffer->GetFormat();
 
+      uint32_t                  divisor         = vertexBuffer->GetDivisor();
+      Graphics::VertexInputRate vertexInputRate = (divisor == 0
+                                                     ? Graphics::VertexInputRate::PER_VERTEX
+                                                     : Graphics::VertexInputRate::PER_INSTANCE);
+
       vertexInputState.bufferBindings.emplace_back(vertexFormat.size, // stride
-                                                   Graphics::VertexInputRate::PER_VERTEX);
+                                                   vertexInputRate);
+      //@todo Add the actual rate to the graphics struct
 
       const uint32_t attributeCount          = vertexBuffer->GetAttributeCount();
       uint32_t       lastBoundAttributeIndex = 0;

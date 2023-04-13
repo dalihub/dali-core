@@ -477,6 +477,14 @@ public:
   void SetVertexBufferData(Render::VertexBuffer* vertexBuffer, OwnerPointer<Vector<uint8_t>>& data, uint32_t size);
 
   /**
+   * Sets the divisor of a vertex buffer. This is used by the GPU to provide
+   * instanced drawing.
+   * @param[in] vertexBuffer The property buffer.
+   * @param[in] divisor The instance divisor. 0 to turn instancing off.
+   */
+  void SetVertexBufferDivisor(Render::VertexBuffer* vertexBuffer, uint32_t divisor);
+
+  /**
    * Adds a geometry to the RenderManager
    * @param[in] geometry The geometry to add
    * @post Sends a message to RenderManager to add the Geometry
@@ -1261,6 +1269,13 @@ inline void SetVertexBufferData(UpdateManager& manager, Render::VertexBuffer& ve
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&manager, &UpdateManager::SetVertexBufferData, &vertexBuffer, data, size);
+}
+
+inline void SetVertexBufferDivisorMessage(UpdateManager& manager, Render::VertexBuffer& vertexBuffer, uint32_t divisor)
+{
+  using LocalType = MessageValue2<UpdateManager, Render::VertexBuffer*, uint32_t>;
+  uint32_t* slot  = manager.ReserveMessageSlot(sizeof(LocalType));
+  new(slot) LocalType(&manager, &UpdateManager::SetVertexBufferDivisor, &vertexBuffer, divisor);
 }
 
 inline void AddGeometry(UpdateManager& manager, OwnerPointer<Render::Geometry>& geometry)
