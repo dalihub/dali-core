@@ -106,7 +106,7 @@ private:
   /**
    * @copydoc ConstraintBase::ConnectConstraint()
    */
-  void ConnectConstraint() final
+  void ConnectConstraint(bool isPreConstraint) final
   {
     // Should not come here if target object has been destroyed
     DALI_ASSERT_DEBUG(nullptr != mTargetObject);
@@ -148,7 +148,14 @@ private:
         resetter              = SceneGraph::ConstraintResetter::New(targetObject, *targetProperty, *mSceneGraphConstraint);
       }
       OwnerPointer<SceneGraph::ConstraintBase> transferOwnership(const_cast<SceneGraph::ConstraintBase*>(mSceneGraphConstraint));
-      ApplyConstraintMessage(GetEventThreadServices(), targetObject, transferOwnership);
+      if(isPreConstraint)
+      {
+        ApplyConstraintMessage(GetEventThreadServices(), targetObject, transferOwnership);
+      }
+      else
+      {
+        ApplyPostConstraintMessage(GetEventThreadServices(), targetObject, transferOwnership);
+      }
       if(resetter)
       {
         AddResetterMessage(GetEventThreadServices().GetUpdateManager(), resetter);
@@ -256,7 +263,7 @@ private:
   /**
    * @copydoc ConstraintBase::ConnectConstraint()
    */
-  void ConnectConstraint() final
+  void ConnectConstraint(bool isPreConstraint) final
   {
     // Should not come here if target object has been destroyed
     DALI_ASSERT_DEBUG(nullptr != mTargetObject);
@@ -295,7 +302,14 @@ private:
       if(mSceneGraphConstraint)
       {
         OwnerPointer<SceneGraph::ConstraintBase> transferOwnership(const_cast<SceneGraph::ConstraintBase*>(mSceneGraphConstraint));
-        ApplyConstraintMessage(GetEventThreadServices(), targetObject, transferOwnership);
+        if(isPreConstraint)
+        {
+          ApplyConstraintMessage(GetEventThreadServices(), targetObject, transferOwnership);
+        }
+        else
+        {
+          ApplyPostConstraintMessage(GetEventThreadServices(), targetObject, transferOwnership);
+        }
         if(resetterRequired)
         {
           OwnerPointer<SceneGraph::PropertyResetterBase> resetter = SceneGraph::ConstraintResetter::New(targetObject, *targetProperty, *mSceneGraphConstraint);

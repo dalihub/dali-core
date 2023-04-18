@@ -62,7 +62,8 @@ ConstraintBase::ConstraintBase(Object& object, Property::Index targetPropertyInd
   mRemoveAction(Dali::Constraint::DEFAULT_REMOVE_ACTION),
   mTag(0),
   mApplied(false),
-  mSourceDestroyed(false)
+  mSourceDestroyed(false),
+  mIsPreConstraint(true)
 {
   ObserveObject(object);
 }
@@ -103,15 +104,25 @@ void ConstraintBase::AddSource(Source source)
   }
 }
 
-void ConstraintBase::Apply()
+void ConstraintBase::Apply(bool isPreConstraint)
 {
   if(mTargetObject && !mApplied && !mSourceDestroyed)
   {
     mApplied = true;
-    ConnectConstraint();
+    mIsPreConstraint = isPreConstraint;
+    ConnectConstraint(mIsPreConstraint);
 
     mTargetObject->ApplyConstraint(*this);
   }
+  else
+  {
+    DALI_LOG_ERROR("Fail to apply constraint\n");
+  }
+}
+
+void ConstraintBase::ApplyPost()
+{
+  Apply(false);
 }
 
 void ConstraintBase::Remove()
@@ -122,6 +133,7 @@ void ConstraintBase::Remove()
   {
     mTargetObject->RemoveConstraint(*this);
   }
+  mIsPreConstraint = true;
 }
 
 void ConstraintBase::RemoveInternal()
@@ -137,7 +149,14 @@ void ConstraintBase::RemoveInternal()
       {
         const SceneGraph::PropertyOwner& propertyOwner = mTargetObject->GetSceneObject();
         // Remove from scene-graph
-        RemoveConstraintMessage(GetEventThreadServices(), propertyOwner, *(mSceneGraphConstraint));
+        if(mIsPreConstraint)
+        {
+          RemoveConstraintMessage(GetEventThreadServices(), propertyOwner, *(mSceneGraphConstraint));
+        }
+        else
+        {
+          RemovePostConstraintMessage(GetEventThreadServices(), propertyOwner, *(mSceneGraphConstraint));
+        }
         // mSceneGraphConstraint will be deleted in update-thread, remove dangling pointer
         mSceneGraphConstraint = nullptr;
       }
@@ -186,7 +205,7 @@ void ConstraintBase::SceneObjectAdded(Object& object)
      (nullptr == mSceneGraphConstraint) &&
      mTargetObject)
   {
-    ConnectConstraint();
+    ConnectConstraint(mIsPreConstraint);
   }
 }
 

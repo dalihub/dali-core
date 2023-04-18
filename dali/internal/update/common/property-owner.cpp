@@ -83,6 +83,7 @@ void PropertyOwner::Destroy()
 
   // Remove all constraints when disconnected from scene-graph
   mConstraints.Clear();
+  mPostConstraints.Clear();
 }
 
 void PropertyOwner::ConnectToSceneGraph()
@@ -111,6 +112,7 @@ void PropertyOwner::DisconnectFromSceneGraph(BufferIndex updateBufferIndex)
 
   // Remove all constraints when disconnected from scene-graph
   mConstraints.Clear();
+  mPostConstraints.Clear();
 }
 
 void PropertyOwner::ReserveProperties(int propertyCount)
@@ -142,6 +144,32 @@ void PropertyOwner::RemoveConstraint(ConstraintBase* constraint)
     if(*iter == constraint)
     {
       mConstraints.Erase(iter);
+      return; // We're finished
+    }
+  }
+
+  //it may be that the constraint has already been removed e.g. from disconnection from scene graph, so nothing needs to be done
+}
+
+ConstraintOwnerContainer& PropertyOwner::GetPostConstraints()
+{
+  return mPostConstraints;
+}
+
+void PropertyOwner::ApplyPostConstraint(OwnerPointer<ConstraintBase>& constraint)
+{
+  constraint->OnConnect();
+  mPostConstraints.PushBack(constraint.Release());
+}
+
+void PropertyOwner::RemovePostConstraint(ConstraintBase* constraint)
+{
+  const ConstraintIter constraintEndIter = mPostConstraints.End();
+  for(ConstraintIter iter = mPostConstraints.Begin(); constraintEndIter != iter; ++iter)
+  {
+    if(*iter == constraint)
+    {
+      mPostConstraints.Erase(iter);
       return; // We're finished
     }
   }

@@ -82,7 +82,12 @@ public:
   /**
    * @copydoc Dali::Constraint::Apply()
    */
-  void Apply();
+  void Apply(bool isPreConstraint = true);
+
+  /**
+   * @copydoc Dali::Constraint::ApplyPost()
+   */
+  void ApplyPost();
 
   /**
    * @copydoc Dali::Constraint::Remove()
@@ -172,7 +177,7 @@ private:
   /**
    * Connect the constraint
    */
-  virtual void ConnectConstraint() = 0;
+  virtual void ConnectConstraint(bool isPreConstraint = true) = 0;
 
 protected:
   /**
@@ -221,6 +226,7 @@ protected:
   uint32_t                          mTag;
   bool                              mApplied : 1;         ///< Whether the constraint has been applied
   bool                              mSourceDestroyed : 1; ///< Is set to true if any of our input source objects are destroyed
+  bool                              mIsPreConstraint : 1; ///< Is set to true if this constraint is run before transform.
 };
 
 } // namespace Internal

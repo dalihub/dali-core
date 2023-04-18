@@ -17,6 +17,7 @@
 
 #include <dali-test-suite-utils.h>
 #include <dali/public-api/dali-core.h>
+#include <mesh-builder.h>
 #include <stdlib.h>
 
 #include <iostream>
@@ -1626,6 +1627,69 @@ int UtcDaliConstraintComponentNonTransformPropertyConstraintP(void)
   ComponentTest::CheckComponentProperty(application, actor, Actor::Property::COLOR_GREEN); // Component 1
   ComponentTest::CheckComponentProperty(application, actor, Actor::Property::COLOR_BLUE);  // Component 2
   ComponentTest::CheckComponentProperty(application, actor, Actor::Property::COLOR_ALPHA); // Component 3
+
+  END_TEST;
+}
+
+
+namespace PostConstraintTest
+{
+void CheckComponentProperty(TestApplication& application, Actor& actor, Handle target)
+{
+  actor.SetProperty(Actor::Property::POSITION, Vector3::ONE);
+  DALI_TEST_EQUALS(actor.GetProperty<Vector3>(Actor::Property::POSITION), Vector3::ONE, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  actor.SetProperty(Actor::Property::POSITION, Vector3::ONE * 2.0f);
+
+  DALI_TEST_EQUALS(actor.GetProperty<Vector3>(Actor::Property::POSITION), Vector3::ONE * 2.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), Vector3::ONE, TEST_LOCATION);
+
+  Property::Index prePropertyIndex = target.RegisterProperty("testPreProperty", Vector3::ZERO);
+  Constraint preConstraint = Constraint::New<Vector3>(target, prePropertyIndex, [](Vector3& output, const PropertyInputContainer& inputs) {
+    output = inputs[0]->GetVector3();
+  });
+  preConstraint.AddSource(Source{actor, Actor::Property::WORLD_POSITION});
+  preConstraint.Apply();
+
+  Property::Index postPropertyIndex = target.RegisterProperty("testPostProperty", Vector3::ZERO);
+  Constraint postConstraint = Constraint::New<Vector3>(target, postPropertyIndex, [](Vector3& output, const PropertyInputContainer& inputs) {
+    output = inputs[0]->GetVector3();
+  });
+  postConstraint.AddSource(Source{actor, Actor::Property::WORLD_POSITION});
+  postConstraint.ApplyPost();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(target.GetCurrentProperty<Vector3>(prePropertyIndex), Vector3(-239.0, -399.0, 1.0), TEST_LOCATION);
+  DALI_TEST_EQUALS(target.GetCurrentProperty<Vector3>(postPropertyIndex), Vector3(-238.0, -398.0, 2.0), TEST_LOCATION);
+
+  preConstraint.Remove();
+  postConstraint.Remove();
+}
+}
+
+int UtcDaliConstraintApplyPost(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  Geometry       targetGeometry = CreateQuadGeometry();
+  Shader         targetShader   = CreateShader();
+  Renderer       targetRenderer = Renderer::New(targetGeometry, targetShader);
+  Actor          targetActor    = Actor::New();
+  RenderTaskList taskList       = application.GetScene().GetRenderTaskList();
+
+  application.GetScene().Add(targetActor);
+  PostConstraintTest::CheckComponentProperty(application, actor, targetShader);         // Shader
+  PostConstraintTest::CheckComponentProperty(application, actor, targetRenderer);       // Renderer
+  PostConstraintTest::CheckComponentProperty(application, actor, targetActor);          // Actor(Node)
+  PostConstraintTest::CheckComponentProperty(application, actor, taskList.GetTask(0u)); // RenderTask
 
   END_TEST;
 }

@@ -454,14 +454,28 @@ public:
   void AddSource(ConstraintSource source);
 
   /**
-   * @brief Applies this constraint.
+   * @brief Applies this constraint to be computed before transform.
    *
    * @SINCE_1_0.0
    * @pre The constraint must be initialized.
    * @pre The target object must still be alive.
    * @pre The source inputs should not have been destroyed.
+   *
+   * @note This method cannot be called with ApplyPost at the same time.
    */
   void Apply();
+
+  /**
+   * @brief Applies this constraint to be computed after transform.
+   *
+   * @SINCE_2_2.23
+   * @pre The constraint must be initialized.
+   * @pre The target object must still be alive.
+   * @pre The source inputs should not have been destroyed.
+   *
+   * @note This method cannot be called with Apply at the same time.
+   */
+  void ApplyPost();
 
   /**
    * @brief Removes this constraint.

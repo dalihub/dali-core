@@ -739,21 +739,24 @@ private:
 
   /**
    * Applies constraints to CustomObjects
+   * @param[out] postPropertyOwner property owners those have post constraint.
    * @param[in] bufferIndex to use
    */
-  void ConstrainCustomObjects(BufferIndex bufferIndex);
+  void ConstrainCustomObjects(PropertyOwnerContainer& postPropertyOwners, BufferIndex bufferIndex);
 
   /**
    * Applies constraints to RenderTasks
+   * @param[out] postPropertyOwner property owners those have post constraint.
    * @param[in] bufferIndex to use
    */
-  void ConstrainRenderTasks(BufferIndex bufferIndex);
+  void ConstrainRenderTasks(PropertyOwnerContainer& postPropertyOwners, BufferIndex bufferIndex);
 
   /**
    * Applies constraints to Shaders
+   * @param[out] postPropertyOwner property owners those have post constraint.
    * @param[in] bufferIndex to use
    */
-  void ConstrainShaders(BufferIndex bufferIndex);
+  void ConstrainShaders(PropertyOwnerContainer& postPropertyOwners, BufferIndex bufferIndex);
 
   /**
    * Perform property notification updates
@@ -768,9 +771,10 @@ private:
 
   /**
    * Update node shaders, opacity, geometry etc.
+   * @param[out] postPropertyOwner property owners those have post constraint.
    * @param[in] bufferIndex to use
    */
-  void UpdateNodes(BufferIndex bufferIndex);
+  void UpdateNodes(PropertyOwnerContainer& postPropertyOwners, BufferIndex bufferIndex);
 
   /**
    * initialize layer renderables
@@ -780,9 +784,10 @@ private:
 
   /**
    * Update Renderers
+   * @param[out] postPropertyOwner property owners those have post constraint.
    * @param[in] bufferIndex to use
    */
-  void UpdateRenderers(BufferIndex bufferIndex);
+  void UpdateRenderers(PropertyOwnerContainer& postPropertyOwners, BufferIndex bufferIndex);
 
 private:
   // needs to be direct member so that getter for event buffer can be inlined
