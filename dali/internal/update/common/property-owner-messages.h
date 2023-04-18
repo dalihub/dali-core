@@ -248,6 +248,31 @@ inline void RemoveConstraintMessage(EventThreadServices& eventThreadServices, co
   new(slot) LocalType(&owner, &PropertyOwner::RemoveConstraint, &constraint);
 }
 
+inline void ApplyPostConstraintMessage(EventThreadServices& eventThreadServices, const PropertyOwner& owner, OwnerPointer<ConstraintBase>& constraint)
+{
+  using LocalType = MessageValue1<PropertyOwner, OwnerPointer<ConstraintBase> >;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new(slot) LocalType(&owner, &PropertyOwner::ApplyPostConstraint, constraint);
+}
+
+inline void RemovePostConstraintMessage(EventThreadServices& eventThreadServices, const PropertyOwner& owner, const ConstraintBase& constConstraint)
+{
+  // The update-thread can modify this object.
+  ConstraintBase& constraint = const_cast<ConstraintBase&>(constConstraint);
+
+  using LocalType = MessageValue1<PropertyOwner, ConstraintBase*>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new(slot) LocalType(&owner, &PropertyOwner::RemovePostConstraint, &constraint);
+}
+
 inline void AddUniformMapMessage(EventThreadServices& eventThreadServices, const PropertyOwner& owner, UniformPropertyMapping map)
 {
   using LocalType = MessageValue1<PropertyOwner, UniformPropertyMapping>;

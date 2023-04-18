@@ -32,12 +32,15 @@ class Layer;
 class PropertyOwner;
 class RenderQueue;
 
+using PropertyOwnerContainer = Dali::Vector<PropertyOwner*>;
+
 /**
  * Constrain the local properties of the PropertyOwner.
  * @param[in] propertyOwner The PropertyOwner to constrain
  * @param[in] updateBufferIndex The current update buffer index.
+ * @param[in] isPreConstraint True if the constraint is performed before transform.
  */
-void ConstrainPropertyOwner(PropertyOwner& propertyOwner, BufferIndex updateBufferIndex);
+void ConstrainPropertyOwner(PropertyOwner& propertyOwner, BufferIndex updateBufferIndex, bool isPreConstraint = true);
 
 /**
  * Update a tree of nodes
@@ -45,11 +48,13 @@ void ConstrainPropertyOwner(PropertyOwner& propertyOwner, BufferIndex updateBuff
  * @param[in] rootNode The root of a tree of nodes.
  * @param[in] updateBufferIndex The current update buffer index.
  * @param[in] renderQueue Used to query messages for the next Render.
+ * @param[out] postPropertyOwner property owners those have post constraint.
  * @return The cumulative (ORed) dirty flags for the updated nodes
  */
-NodePropertyFlags UpdateNodeTree(Layer&       rootNode,
-                                 BufferIndex  updateBufferIndex,
-                                 RenderQueue& renderQueue);
+NodePropertyFlags UpdateNodeTree(Layer&                  rootNode,
+                                 BufferIndex             updateBufferIndex,
+                                 RenderQueue&            renderQueue,
+                                 PropertyOwnerContainer& postPropertyOwners);
 /**
  * This updates all the sub-layer's reusability flags without affecting
  * the root layer.

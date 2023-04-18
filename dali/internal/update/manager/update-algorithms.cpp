@@ -51,9 +51,9 @@ Debug::Filter* gUpdateFilter = Debug::Filter::New(Debug::Concise, false, "LOG_UP
  * @param propertyOwner to constrain
  * @param updateBufferIndex buffer index to use
  */
-void ConstrainPropertyOwner(PropertyOwner& propertyOwner, BufferIndex updateBufferIndex)
+void ConstrainPropertyOwner(PropertyOwner& propertyOwner, BufferIndex updateBufferIndex, bool isPreConstraint)
 {
-  ConstraintOwnerContainer& constraints = propertyOwner.GetConstraints();
+  ConstraintOwnerContainer& constraints = (isPreConstraint) ? propertyOwner.GetConstraints() : propertyOwner.GetPostConstraints();
 
   const ConstraintIter endIter = constraints.End();
   for(ConstraintIter iter = constraints.Begin(); iter != endIter; ++iter)
@@ -97,14 +97,19 @@ inline void UpdateNodeOpacity(Node& node, NodePropertyFlags nodeDirtyFlags, Buff
 /**
  * This is called recursively for all children of the root Node
  */
-inline NodePropertyFlags UpdateNodes(Node&             node,
-                                     NodePropertyFlags parentFlags,
-                                     BufferIndex       updateBufferIndex,
-                                     RenderQueue&      renderQueue,
-                                     bool              updated)
+inline NodePropertyFlags UpdateNodes(Node&                   node,
+                                     NodePropertyFlags       parentFlags,
+                                     BufferIndex             updateBufferIndex,
+                                     RenderQueue&            renderQueue,
+                                     PropertyOwnerContainer& postPropertyOwners,
+                                     bool                    updated)
 {
   // Apply constraints to the node
   ConstrainPropertyOwner(node, updateBufferIndex);
+  if(!node.GetPostConstraints().Empty())
+  {
+    postPropertyOwners.PushBack(&node);
+  }
 
   // Some dirty flags are inherited from parent
   NodePropertyFlags nodeDirtyFlags = node.GetDirtyFlags() | node.GetInheritedDirtyFlags(parentFlags);
@@ -135,6 +140,7 @@ inline NodePropertyFlags UpdateNodes(Node&             node,
                                         nodeDirtyFlags,
                                         updateBufferIndex,
                                         renderQueue,
+                                        postPropertyOwners,
                                         updated);
   }
 
@@ -144,9 +150,10 @@ inline NodePropertyFlags UpdateNodes(Node&             node,
 /**
  * The root node is treated separately; it cannot inherit values since it has no parent
  */
-NodePropertyFlags UpdateNodeTree(Layer&       rootNode,
-                                 BufferIndex  updateBufferIndex,
-                                 RenderQueue& renderQueue)
+NodePropertyFlags UpdateNodeTree(Layer&                  rootNode,
+                                 BufferIndex             updateBufferIndex,
+                                 RenderQueue&            renderQueue,
+                                 PropertyOwnerContainer& postPropertyOwners)
 {
   DALI_ASSERT_DEBUG(rootNode.IsRoot());
 
@@ -182,6 +189,7 @@ NodePropertyFlags UpdateNodeTree(Layer&       rootNode,
                                         nodeDirtyFlags,
                                         updateBufferIndex,
                                         renderQueue,
+                                        postPropertyOwners,
                                         updated);
   }
 
