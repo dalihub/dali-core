@@ -68,7 +68,6 @@ Dali::Actor EmitInterceptTouchSignals(Dali::Actor actor, const Dali::TouchEvent&
     Dali::Actor parent = actor.GetParent();
     if(parent)
     {
-      DALI_TRACE_SCOPE(gTraceFilter, "DALI_EMIT_INTERCEPT_TOUCH_EVENT_SIGNAL");
       // Recursively deliver events to the actor and its parents for intercept touch event.
       interceptedActor = EmitInterceptTouchSignals(parent, touchEvent);
     }
@@ -79,6 +78,7 @@ Dali::Actor EmitInterceptTouchSignals(Dali::Actor actor, const Dali::TouchEvent&
       Actor& actorImpl(GetImplementation(actor));
       if(actorImpl.GetInterceptTouchRequired())
       {
+        DALI_TRACE_SCOPE(gTraceFilter, "DALI_EMIT_INTERCEPT_TOUCH_EVENT_SIGNAL");
         intercepted = actorImpl.EmitInterceptTouchEventSignal(touchEvent);
         if(intercepted)
         {

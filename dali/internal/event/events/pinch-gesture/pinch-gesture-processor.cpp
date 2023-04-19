@@ -68,6 +68,8 @@ void EmitPinchSignal(
   pinch->SetSourceType(pinchEvent.sourceType);
   pinch->SetSourceData(pinchEvent.sourceData);
 
+  DALI_TRACE_SCOPE(gTraceFilter, "DALI_EMIT_PINCH_GESTURE_SIGNAL");
+
   Dali::Actor                                    actorHandle(actor);
   const GestureDetectorContainer::const_iterator endIter = gestureDetectors.end();
   for(GestureDetectorContainer::const_iterator iter = gestureDetectors.begin(); iter != endIter; ++iter)

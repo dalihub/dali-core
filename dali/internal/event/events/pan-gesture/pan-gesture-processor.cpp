@@ -571,6 +571,8 @@ void PanGestureProcessor::EmitPanSignal(Actor*                          actor,
       mSceneObject->AddGesture(*pan.Get());
     }
 
+    DALI_TRACE_SCOPE(gTraceFilter, "DALI_EMIT_PAN_GESTURE_SIGNAL");
+
     Dali::Actor actorHandle(actor);
 
     const GestureDetectorContainer::const_iterator endIter = gestureDetectors.end();
