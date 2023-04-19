@@ -70,6 +70,11 @@ void Constraint::Apply()
   GetImplementation(*this).Apply();
 }
 
+void Constraint::ApplyPost()
+{
+  GetImplementation(*this).ApplyPost();
+}
+
 void Constraint::Remove()
 {
   GetImplementation(*this).Remove();

@@ -831,16 +831,20 @@ bool UpdateManager::Animate(BufferIndex bufferIndex, float elapsedSeconds)
   return animationActive;
 }
 
-void UpdateManager::ConstrainCustomObjects(BufferIndex bufferIndex)
+void UpdateManager::ConstrainCustomObjects(PropertyOwnerContainer& postPropertyOwners, BufferIndex bufferIndex)
 {
   // Constrain custom objects (in construction order)
   for(auto&& object : mImpl->customObjects)
   {
     ConstrainPropertyOwner(*object, bufferIndex);
+    if(!object->GetPostConstraints().Empty())
+    {
+      postPropertyOwners.PushBack(object);
+    }
   }
 }
 
-void UpdateManager::ConstrainRenderTasks(BufferIndex bufferIndex)
+void UpdateManager::ConstrainRenderTasks(PropertyOwnerContainer& postPropertyOwners, BufferIndex bufferIndex)
 {
   // Constrain render-tasks
   for(auto&& scene : mImpl->scenes)
@@ -851,17 +855,25 @@ void UpdateManager::ConstrainRenderTasks(BufferIndex bufferIndex)
       for(auto&& task : tasks)
       {
         ConstrainPropertyOwner(*task, bufferIndex);
+        if(!task->GetPostConstraints().Empty())
+        {
+          postPropertyOwners.PushBack(task);
+        }
       }
     }
   }
 }
 
-void UpdateManager::ConstrainShaders(BufferIndex bufferIndex)
+void UpdateManager::ConstrainShaders(PropertyOwnerContainer& postPropertyOwners, BufferIndex bufferIndex)
 {
   // constrain shaders... (in construction order)
   for(auto&& shader : mImpl->shaders)
   {
     ConstrainPropertyOwner(*shader, bufferIndex);
+    if(!shader->GetPostConstraints().Empty())
+    {
+      postPropertyOwners.PushBack(shader);
+    }
   }
 }
 
@@ -902,19 +914,23 @@ void UpdateManager::ForwardCompiledShadersToEventThread()
   }
 }
 
-void UpdateManager::UpdateRenderers(BufferIndex bufferIndex)
+void UpdateManager::UpdateRenderers(PropertyOwnerContainer& postPropertyOwners, BufferIndex bufferIndex)
 {
   for(const auto& rendererKey : mImpl->renderers)
   {
     // Apply constraints
     auto renderer = rendererKey.Get();
     ConstrainPropertyOwner(*renderer, bufferIndex);
+    if(!renderer->GetPostConstraints().Empty())
+    {
+      postPropertyOwners.PushBack(renderer);
+    }
 
     mImpl->renderingRequired = renderer->PrepareRender(bufferIndex) || mImpl->renderingRequired;
   }
 }
 
-void UpdateManager::UpdateNodes(BufferIndex bufferIndex)
+void UpdateManager::UpdateNodes(PropertyOwnerContainer& postPropertyOwners, BufferIndex bufferIndex)
 {
   mImpl->nodeDirtyFlags = NodePropertyFlags::NOTHING;
 
@@ -926,7 +942,8 @@ void UpdateManager::UpdateNodes(BufferIndex bufferIndex)
       // And add the renderers to the sorted layers. Start from root, which is also a layer
       mImpl->nodeDirtyFlags |= UpdateNodeTree(*scene->root,
                                               bufferIndex,
-                                              mImpl->renderQueue);
+                                              mImpl->renderQueue,
+                                              postPropertyOwners);
     }
   }
 }
@@ -997,8 +1014,9 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
     // Animate
     bool animationActive = Animate(bufferIndex, elapsedSeconds);
 
+    PropertyOwnerContainer postPropertyOwners;
     // Constraint custom objects
-    ConstrainCustomObjects(bufferIndex);
+    ConstrainCustomObjects(postPropertyOwners, bufferIndex);
 
     // Clear the lists of renderers from the previous update
     for(auto&& scene : mImpl->scenes)
@@ -1022,19 +1040,25 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
     }
 
     // Update node hierarchy, apply constraints,
-    UpdateNodes(bufferIndex);
+    UpdateNodes(postPropertyOwners, bufferIndex);
 
     // Apply constraints to RenderTasks, shaders
-    ConstrainRenderTasks(bufferIndex);
-    ConstrainShaders(bufferIndex);
+    ConstrainRenderTasks(postPropertyOwners, bufferIndex);
+    ConstrainShaders(postPropertyOwners, bufferIndex);
 
     // Update renderers and apply constraints
-    UpdateRenderers(bufferIndex);
+    UpdateRenderers(postPropertyOwners, bufferIndex);
 
     // Update the transformations of all the nodes
     if(mImpl->transformManager.Update())
     {
       mImpl->nodeDirtyFlags |= NodePropertyFlags::TRANSFORM;
+    }
+
+    // Constraint applied after transform manager updated. Only required property owner processed.
+    for(auto&& propertyOwner : postPropertyOwners)
+    {
+      ConstrainPropertyOwner(*propertyOwner, bufferIndex, false);
     }
 
     // Initialise layer renderable reuse

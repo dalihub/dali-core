@@ -192,10 +192,28 @@ public:
   void RemoveConstraint(ConstraintBase* constraint);
 
   /**
+   * Apply a post constraint.
+   * @param[in] constraint The constraint to apply.
+   */
+  void ApplyPostConstraint(OwnerPointer<ConstraintBase>& constraint);
+
+  /**
+   * Begin removal of post constraints.
+   * @param[in] constraint The constraint to remove.
+   */
+  void RemovePostConstraint(ConstraintBase* constraint);
+
+  /**
    * Retrieve the constraints that are currently applied.
    * @return A container of constraints.
    */
   ConstraintOwnerContainer& GetConstraints();
+
+  /**
+   * Retrieve the post constraints that are currently applied.
+   * @return A container of post constraints.
+   */
+  ConstraintOwnerContainer& GetPostConstraints();
 
   /**
    * @copydoc UniformMap::Add
@@ -267,6 +285,7 @@ private:
   ObserverContainer mObservers; ///< Container of observer raw-pointers (not owned)
 
   ConstraintOwnerContainer mConstraints; ///< Container of owned constraints
+  ConstraintOwnerContainer mPostConstraints; ///< Container of owned constraints
 };
 
 } // namespace SceneGraph
