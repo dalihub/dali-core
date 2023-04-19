@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -143,7 +143,7 @@ void Program::BuildReflection(const Graphics::Reflection& graphicsReflection)
   }
 
   // add samplers
-  auto samplers = graphicsReflection.GetSamplers();
+  auto samplers = graphicsReflection.GetSamplers(); // Only holds first element of arrays without [].
   for(const auto& sampler : samplers)
   {
     mReflection.emplace_back(ReflectionUniformInfo{CalculateHash(sampler.name), false, sampler});

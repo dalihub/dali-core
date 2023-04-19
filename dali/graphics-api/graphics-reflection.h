@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_REFLECTION_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -166,7 +166,9 @@ public:
   // Sampler
 
   /**
-   * @brief Gets all the sampler uniforms
+   * @brief Gets all the sampler uniforms. In the case of arrays of samplers,
+   * it contains only the name of the sampler array without the [N] size, but,
+   * the element count is set to N.
    *
    * @return A vector of the sampler uniforms
    */
