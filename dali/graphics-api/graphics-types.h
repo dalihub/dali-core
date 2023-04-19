@@ -1150,6 +1150,7 @@ struct UniformInfo
   uint32_t     bufferIndex{0u};
   uint32_t     offset{0u};
   uint32_t     location{0u};
+  uint32_t     elementCount{0u};
 
   bool operator==(const UniformInfo& rhs)
   {
@@ -1158,7 +1159,8 @@ struct UniformInfo
            binding == rhs.binding &&
            bufferIndex == rhs.bufferIndex &&
            offset == rhs.offset &&
-           location == rhs.location;
+           location == rhs.location &&
+           elementCount == rhs.elementCount;
   }
 };
 
