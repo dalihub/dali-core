@@ -31,8 +31,9 @@ namespace
 {
 } // namespace
 
-GpuBuffer::GpuBuffer(Graphics::Controller& graphicsController, Graphics::BufferUsageFlags usage)
-: mUsage(usage)
+GpuBuffer::GpuBuffer(Graphics::Controller& graphicsController, Graphics::BufferUsageFlags usage, GpuBuffer::WritePolicy writePolicy)
+: mUsage(usage),
+  mWritePolicy(writePolicy)
 {
 }
 
@@ -41,7 +42,18 @@ void GpuBuffer::UpdateDataBuffer(Graphics::Controller& graphicsController, uint3
   DALI_ASSERT_DEBUG(size > 0);
   mSize = size;
 
-  if(!mGraphicsObject || size > mCapacity)
+  /**
+   *  We will create a new buffer in following cases:
+   *  1. The buffer doesn't exist
+   *  2. The spec changes (size of new buffer changes)
+   *  3. The policy is to discard on write
+   *
+   *  Third option will try to recycle existing buffer when its spec stays unchanged.
+   *  It will allow the GPU driver to release the underlying memory and attach new memory
+   *  to the GPU buffer object. It will prevent memory locking during writes in case the
+   *  buffer is in use by the GPU.
+   */
+  if(!mGraphicsObject || size > mCapacity || mWritePolicy == WritePolicy::DISCARD)
   {
     Graphics::BufferCreateInfo createInfo{};
     createInfo.SetUsage(mUsage).SetSize(size);

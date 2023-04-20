@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDERERS_GPU_BUFFER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,11 +39,30 @@ class GpuBuffer
 {
 public:
   /**
+   * When writing into the buffer, the WritePolicy
+   * determines whether the current content would be preserved
+   * or discarded.
+   *
+   * RETAIN - buffer content is retained
+   *
+   * DISCARD - buffer content is discarded. In this case, writing into
+   *           a part of buffer will result with undefined content outside
+   *           the specified area. The client should rewrite whole area
+   *           in order to have coherent and valid data.
+   */
+  enum class WritePolicy
+  {
+    RETAIN, ///< Buffer content is preserved
+    DISCARD ///< Buffer content is invalidated and discarded
+  };
+
+  /**
    * constructor
    * @param[in] graphicsController the graphics controller
    * @param[in] usage The type of buffer
+   * @param[in] writePolicy The buffer data write policy to be used, default is WritePolicy::RETAIN
    */
-  GpuBuffer(Graphics::Controller& graphicsController, Graphics::BufferUsageFlags usage);
+  GpuBuffer(Graphics::Controller& graphicsController, Graphics::BufferUsageFlags usage, GpuBuffer::WritePolicy writePolicy);
 
   /**
    * Destructor, non virtual as no virtual methods or inheritance
@@ -61,7 +80,7 @@ public:
 
   /**
    * Get the size of the buffer
-   * @return size
+   * @return size Size of the buffer in bytes
    */
   [[nodiscard]] uint32_t GetBufferSize() const
   {
@@ -83,6 +102,7 @@ private:
   uint32_t                              mCapacity{0}; ///< buffer capacity
   uint32_t                              mSize{0};     ///< buffer size
   Graphics::BufferUsageFlags            mUsage;
+  WritePolicy                           mWritePolicy{WritePolicy::RETAIN}; ///< data write policy for the buffer
 };
 
 } // namespace Internal

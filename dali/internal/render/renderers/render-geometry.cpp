@@ -127,7 +127,8 @@ void Geometry::Upload(Graphics::Controller& graphicsController)
       {
         if(mIndexBuffer == nullptr)
         {
-          mIndexBuffer = new GpuBuffer(graphicsController, 0 | Graphics::BufferUsage::INDEX_BUFFER);
+          // Currently we are unable to reuse index buffer so the write policy is to preserve current content
+          mIndexBuffer = new GpuBuffer(graphicsController, 0 | Graphics::BufferUsage::INDEX_BUFFER, GpuBuffer::WritePolicy::RETAIN);
         }
 
         uint32_t bufferSize = static_cast<uint32_t>(sizeof(uint16_t) * mIndices.Size());

@@ -62,7 +62,7 @@ bool VertexBuffer::Update(Graphics::Controller& graphicsController)
   {
     if(!mGpuBuffer)
     {
-      mGpuBuffer = new GpuBuffer(graphicsController, 0 | Graphics::BufferUsage::VERTEX_BUFFER);
+      mGpuBuffer = new GpuBuffer(graphicsController, 0 | Graphics::BufferUsage::VERTEX_BUFFER, GpuBuffer::WritePolicy::DISCARD);
     }
 
     // Update the GpuBuffer
