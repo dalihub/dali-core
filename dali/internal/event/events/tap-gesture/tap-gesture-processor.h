@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TAP_GESTURE_EVENT_PROCESSOR_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,6 +91,15 @@ public: // To be called by GestureEventProcessor
    */
   void SetMaximumAllowedTime(uint32_t time);
 
+  /**
+   * @brief This method sets the recognizer time required to be recognized as a tap gesture (millisecond)
+   *
+   * This time is from touch down to touch up to recognize the tap gesture.
+   *
+   * @param[in] time The time value in milliseconds
+   */
+  void SetRecognizerTime(uint32_t time);
+
 private:
   // Undefined
   TapGestureProcessor(const TapGestureProcessor&);
@@ -135,6 +144,7 @@ private:
   bool                   mPossibleProcessed; ///< Indication of whether we've processed a touch down for this gestuee
 
   uint32_t mMaximumAllowedTime; ///< The maximum allowed time required to be recognized as a multi tap gesture (millisecond)
+  uint32_t mRecognizerTime;     ///< The recognizer time required to be recognized as a tap gesture (millisecond)
 };
 
 } // namespace Internal

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_EVENT_EVENTS_TAP_GESTURE_RECOGNIZER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,8 +52,9 @@ public:
    * @param[in]  screenSize  The size of the screen.
    * @param[in]  request     The tap gesture request.
    * @param[in]  maximumAllowedTime    The maximum allowed time required in milliseconds.
+   * @param[in]  recognizerTime    This recognizer time required in milliseconds.
    */
-  TapGestureRecognizer(Observer& observer, Vector2 screenSize, const TapGestureRequest& request, uint32_t maximumAllowedTime);
+  TapGestureRecognizer(Observer& observer, Vector2 screenSize, const TapGestureRequest& request, uint32_t maximumAllowedTime, uint32_t recognizerTime);
 
   /**
    * Virtual destructor.
@@ -77,6 +78,13 @@ public:
    * @param[in] time The time value in milliseconds
    */
   void SetMaximumAllowedTime(uint32_t time);
+
+  /**
+   * @brief This method sets the recognizer time required to be recognized as a tap gesture (millisecond)
+   *
+   * @param[in] time The time value in milliseconds
+   */
+  void SetRecognizerTime(uint32_t time);
 
 private:
   /**
@@ -152,6 +160,7 @@ private:
   uint32_t mLastTouchTime; ///< The last touch down time.
 
   uint32_t mMaximumAllowedTime; ///< The maximum allowed time required to be recognized as a multi tap gesture (millisecond)
+  uint32_t mRecognizerTime;     ///< The recognizer time required to be recognized as a tap gesture (millisecond)
 };
 
 } // namespace Internal
