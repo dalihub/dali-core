@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_INPUT_OPTIONS_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -201,9 +201,33 @@ DALI_CORE_API void SetLongPressMinimumHoldingTime(unsigned int value);
 /**
  * @brief Sets the maximum allowed time required to be recognized as a multi tap gesture (millisecond)
  *
+ * Recognizes how many tap gestures occurred within the maximum allowed time interval.
+ * If there are two tap gestures within this time, it is a double tap gesture.
+ *
+ * @note If it's a double tap, it's like this:
+ * |<---                                           maximumAllowedTime                                           --->|
+ * |(touch down <--recognizerTime--> touch up) <-- maximumAllowedTime --> (touch down <--recognizerTime--> touch up)|
+ *
+ * @see SetTapRecognizerTime()
+ *
  * @param[in] time The time value in milliseconds
  */
 DALI_CORE_API void SetTapMaximumAllowedTime(uint32_t time);
+
+/**
+ * @brief Sets the recognizer time required to be recognized as a tap gesture (millisecond)
+ *
+ * This time is from touch down to touch up to recognize the tap gesture.
+ *
+ * @note The tab is like below:
+ * touch down <--recognizerTime--> touch up
+ * If the time between touch down and touch up is longer than recognizer time, it is not recognized as a tap gesture.
+ *
+ * @see SetTapMaximumAllowedTime()
+ *
+ * @param[in] time The time value in milliseconds
+ */
+DALI_CORE_API void SetTapRecognizerTime(uint32_t time);
 
 } // namespace Integration
 

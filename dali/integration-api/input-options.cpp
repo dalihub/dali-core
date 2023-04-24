@@ -154,6 +154,12 @@ void SetTapMaximumAllowedTime(uint32_t time)
   eventProcessor.SetTapMaximumAllowedTime(time);
 }
 
+void SetTapRecognizerTime(uint32_t time)
+{
+  GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
+  eventProcessor.SetTapRecognizerTime(time);
+}
+
 } // namespace Integration
 
 } // namespace Dali

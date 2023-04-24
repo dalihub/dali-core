@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_GESTURE_EVENT_PROCESSOR_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -290,6 +290,15 @@ public: // Called by Core
    * @param[in] time The time value in milliseconds
    */
   void SetTapMaximumAllowedTime(uint32_t time);
+
+  /**
+   * @brief Sets the recognizer time required to be recognized as a tap gesture (millisecond)
+   *
+   * This time is from touch down to touch up to recognize the tap gesture.
+   *
+   * @param[in] time The time value in milliseconds
+   */
+  void SetTapRecognizerTime(uint32_t time);
 
 public: // needed for PanGesture
   /**
