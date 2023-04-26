@@ -193,6 +193,15 @@ public:
   void SetPlayRange(const Vector2& range);
 
   /**
+   * @brief Sets the blend point to interpolate animate property
+   *
+   * @param[in] blendPoint A value between [0,1], If the value of the keyframe whose progress is 0 is different from the current value,
+   * the property is animated as it smoothly blends until the progress reaches the blendPoint.
+   * @note The blendPoint only affects animation registered with AnimateBetween. Other animations operate the same as when Play() is called.
+   */
+  void SetBlendPoint(float blendPoint);
+
+  /**
    * Play the animation.
    */
   void Play();
@@ -337,6 +346,7 @@ protected:
   float mElapsedSeconds;
   float mSpeedFactor;
   float mProgressMarker; // Progress marker to trigger a notification
+  float mBlendPoint;
 
   int32_t mPlayedCount; // Incremented at end of animation or completion of all loops
                         // Never incremented when looping forever. Event thread tracks to signal end.
@@ -352,9 +362,10 @@ protected:
   bool mAutoReverseEnabled;            // Flag to identify that the looping mode is auto reverse.
   bool mAnimatorSortRequired;          // Flag to whether we need to sort animator or not.
   bool mIsActive[2];                   // Flag to indicate whether the animation is active in the current frame (which is double buffered)
+  bool mIsFirstLoop;
 };
 
-}; //namespace SceneGraph
+}; // namespace SceneGraph
 
 // value types used by messages
 template<>
@@ -454,6 +465,17 @@ inline void SetPlayRangeMessage(EventThreadServices& eventThreadServices, const 
   new(slot) LocalType(&animation, &Animation::SetPlayRange, range);
 }
 
+inline void SetBlendPointMessage(EventThreadServices& eventThreadServices, const Animation& animation, float blendPoint)
+{
+  using LocalType = MessageValue1<Animation, float>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new(slot) LocalType(&animation, &Animation::SetBlendPoint, blendPoint);
+}
+
 inline void PlayAnimationMessage(EventThreadServices& eventThreadServices, const Animation& animation)
 {
   using LocalType = Message<Animation>;
@@ -464,7 +486,6 @@ inline void PlayAnimationMessage(EventThreadServices& eventThreadServices, const
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&animation, &Animation::Play);
 }
-
 inline void PlayAnimationFromMessage(EventThreadServices& eventThreadServices, const Animation& animation, float progress)
 {
   using LocalType = MessageValue1<Animation, float>;

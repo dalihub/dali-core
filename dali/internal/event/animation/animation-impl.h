@@ -382,6 +382,16 @@ public:
   Vector2 GetPlayRange() const;
 
   /**
+   * @copydoc Dali::Animation::SetBlendPoint()
+   */
+  void SetBlendPoint(float blendPoint);
+
+  /**
+   * @copydoc Dali::Animation::GetBlendPoint()
+   */
+  float GetBlendPoint() const;
+
+  /**
    * @copydoc Dali::Animation::SetLoopingMode()
    */
   void SetLoopingMode(Dali::Animation::LoopingMode loopingMode);
@@ -554,6 +564,7 @@ private:
 
   AlphaFunction          mDefaultAlpha;
   Vector2                mPlayRange{0.0f, 1.0f};
+  float                  mBlendPoint{0.0f};
   float                  mDurationSeconds;
   float                  mSpeedFactor{1.0f};
   int32_t                mNotificationCount{0}; ///< Keep track of how many Finished signals have been emitted.

@@ -137,7 +137,7 @@ private: // From PropertyOwner::Observer
     if(mAnimationPlaying && mDisconnectAction != Dali::Animation::DISCARD)
     {
       // Bake to target-value if BakeFinal, otherwise bake current value
-      Update(bufferIndex, (mDisconnectAction == Dali::Animation::BAKE ? mCurrentProgress : 1.0f), true);
+      Update(bufferIndex, (mDisconnectAction == Dali::Animation::BAKE ? mCurrentProgress : 1.0f), 0.0f, true);
     }
 
     mEnabled = false;
@@ -353,15 +353,15 @@ public:
     }
     else
     {
-      //If progress is very close to 0 or very close to 1 we don't need to evaluate the curve as the result will
-      //be almost 0 or almost 1 respectively
+      // If progress is very close to 0 or very close to 1 we don't need to evaluate the curve as the result will
+      // be almost 0 or almost 1 respectively
       if((progress > Math::MACHINE_EPSILON_1) && ((1.0f - progress) > Math::MACHINE_EPSILON_1))
       {
         Dali::Vector4 controlPoints = mAlphaFunction.GetBezierControlPoints();
 
-        static const float tolerance = 0.001f; //10 iteration max
+        static const float tolerance = 0.001f; // 10 iteration max
 
-        //Perform a binary search on the curve
+        // Perform a binary search on the curve
         float lowerBound(0.0f);
         float upperBound(1.0f);
         float currentT(0.5f);
@@ -449,9 +449,10 @@ public:
    * Update the scene object attached to the animator.
    * @param[in] bufferIndex The buffer to animate.
    * @param[in] progress A value from 0 to 1, where 0 is the start of the animation, and 1 is the end point.
+   * @param[in] blendPoint A value between [0,1], The Animated property is animated as it blends until the progress reaches the blendPoint.
    * @param[in] bake Bake.
    */
-  void Update(BufferIndex bufferIndex, float progress, bool bake)
+  void Update(BufferIndex bufferIndex, float progress, float blendPoint, bool bake)
   {
     if(mLoopCount >= 0)
     {
@@ -467,7 +468,7 @@ public:
     float alpha = ApplyAlphaFunction(progress);
 
     // PropertyType specific part
-    DoUpdate(bufferIndex, bake, alpha);
+    DoUpdate(bufferIndex, bake, alpha, blendPoint);
 
     mCurrentProgress = progress;
   }
@@ -477,8 +478,9 @@ public:
    * @param bufferIndex index to use
    * @param bake whether to bake or not
    * @param alpha value from alpha based on progress
+   * @param blendPoint A value between [0,1], The Animated property is animated as it blends until the progress reaches the blendPoint.
    */
-  virtual void DoUpdate(BufferIndex bufferIndex, bool bake, float alpha) = 0;
+  virtual void DoUpdate(BufferIndex bufferIndex, bool bake, float alpha, float blendPoint) = 0;
 
 protected:
   /**
@@ -518,7 +520,7 @@ protected:
 template<typename PropertyType, typename PropertyAccessorType>
 class Animator final : public AnimatorBase
 {
-  using AnimatorFunction = std::function<PropertyType(float, const PropertyType&)>;
+  using AnimatorFunction = std::function<PropertyType(float, float, const PropertyType&)>;
 
   AnimatorFunction mAnimatorFunction;
 
@@ -548,12 +550,12 @@ public:
   /**
    * @copydoc AnimatorBase::DoUpdate( BufferIndex bufferIndex, bool bake, float alpha )
    */
-  void DoUpdate(BufferIndex bufferIndex, bool bake, float alpha) final
+  void DoUpdate(BufferIndex bufferIndex, bool bake, float alpha, float blendPoint) final
   {
     const PropertyType& current = mPropertyAccessor.Get(bufferIndex);
 
     // need to cast the return value in case property is integer
-    const PropertyType result = static_cast<PropertyType>(mAnimatorFunction(alpha, current));
+    const PropertyType result = static_cast<PropertyType>(mAnimatorFunction(alpha, blendPoint, current));
 
     if(bake)
     {
@@ -598,7 +600,7 @@ protected:
 template<typename PropertyType, typename PropertyAccessorType>
 class AnimatorTransformProperty final : public AnimatorBase
 {
-  using AnimatorFunction = std::function<PropertyType(float, const PropertyType&)>;
+  using AnimatorFunction = std::function<PropertyType(float, float, const PropertyType&)>;
 
   AnimatorFunction mAnimatorFunction;
 
@@ -628,12 +630,12 @@ public:
   /**
    * @copydoc AnimatorBase::DoUpdate( BufferIndex bufferIndex, bool bake, float alpha )
    */
-  void DoUpdate(BufferIndex bufferIndex, bool bake, float alpha) final
+  void DoUpdate(BufferIndex bufferIndex, bool bake, float alpha, float blendPoint) final
   {
     const PropertyType& current = mPropertyAccessor.Get(bufferIndex);
 
     // need to cast the return value in case property is integer
-    const PropertyType result = static_cast<PropertyType>(mAnimatorFunction(alpha, current));
+    const PropertyType result = static_cast<PropertyType>(mAnimatorFunction(alpha, blendPoint, current));
 
     if(bake)
     {
@@ -663,8 +665,8 @@ private:
   }
 
   // Undefined
-  AnimatorTransformProperty()                                 = delete;
-  AnimatorTransformProperty(const AnimatorTransformProperty&) = delete;
+  AnimatorTransformProperty()                                            = delete;
+  AnimatorTransformProperty(const AnimatorTransformProperty&)            = delete;
   AnimatorTransformProperty& operator=(const AnimatorTransformProperty&) = delete;
 
 protected:
@@ -682,7 +684,7 @@ struct AnimateByInteger
   {
   }
 
-  float operator()(float alpha, const int32_t& property)
+  float operator()(float alpha, float blendPoint, const int32_t& property)
   {
     // integers need to be correctly rounded
     return roundf(static_cast<float>(property) + static_cast<float>(mRelative) * alpha);
@@ -698,7 +700,7 @@ struct AnimateToInteger
   {
   }
 
-  float operator()(float alpha, const int32_t& property)
+  float operator()(float alpha, float blendPoint, const int32_t& property)
   {
     // integers need to be correctly rounded
     return roundf(static_cast<float>(property) + (static_cast<float>(mTarget - property) * alpha));
@@ -714,7 +716,7 @@ struct AnimateByFloat
   {
   }
 
-  float operator()(float alpha, const float& property)
+  float operator()(float alpha, float blendPoint, const float& property)
   {
     return float(property + mRelative * alpha);
   }
@@ -729,7 +731,7 @@ struct AnimateToFloat
   {
   }
 
-  float operator()(float alpha, const float& property)
+  float operator()(float alpha, float blendPoint, const float& property)
   {
     return float(property + ((mTarget - property) * alpha));
   }
@@ -744,7 +746,7 @@ struct AnimateByVector2
   {
   }
 
-  Vector2 operator()(float alpha, const Vector2& property)
+  Vector2 operator()(float alpha, float blendPoint, const Vector2& property)
   {
     return Vector2(property + mRelative * alpha);
   }
@@ -759,7 +761,7 @@ struct AnimateToVector2
   {
   }
 
-  Vector2 operator()(float alpha, const Vector2& property)
+  Vector2 operator()(float alpha, float blendPoint, const Vector2& property)
   {
     return Vector2(property + ((mTarget - property) * alpha));
   }
@@ -774,7 +776,7 @@ struct AnimateByVector3
   {
   }
 
-  Vector3 operator()(float alpha, const Vector3& property)
+  Vector3 operator()(float alpha, float blendPoint, const Vector3& property)
   {
     return Vector3(property + mRelative * alpha);
   }
@@ -789,7 +791,7 @@ struct AnimateToVector3
   {
   }
 
-  Vector3 operator()(float alpha, const Vector3& property)
+  Vector3 operator()(float alpha, float blendPoint, const Vector3& property)
   {
     return Vector3(property + ((mTarget - property) * alpha));
   }
@@ -804,7 +806,7 @@ struct AnimateByVector4
   {
   }
 
-  Vector4 operator()(float alpha, const Vector4& property)
+  Vector4 operator()(float alpha, float blendPoint, const Vector4& property)
   {
     return Vector4(property + mRelative * alpha);
   }
@@ -819,7 +821,7 @@ struct AnimateToVector4
   {
   }
 
-  Vector4 operator()(float alpha, const Vector4& property)
+  Vector4 operator()(float alpha, float blendPoint, const Vector4& property)
   {
     return Vector4(property + ((mTarget - property) * alpha));
   }
@@ -834,7 +836,7 @@ struct AnimateByOpacity
   {
   }
 
-  Vector4 operator()(float alpha, const Vector4& property)
+  Vector4 operator()(float alpha, float blendPoint, const Vector4& property)
   {
     Vector4 result(property);
     result.a += mRelative * alpha;
@@ -852,7 +854,7 @@ struct AnimateToOpacity
   {
   }
 
-  Vector4 operator()(float alpha, const Vector4& property)
+  Vector4 operator()(float alpha, float blendPoint, const Vector4& property)
   {
     Vector4 result(property);
     result.a = property.a + ((mTarget - property.a) * alpha);
@@ -870,7 +872,7 @@ struct AnimateByBoolean
   {
   }
 
-  bool operator()(float alpha, const bool& property)
+  bool operator()(float alpha, float blendPoint, const bool& property)
   {
     // Alpha is not useful here, just keeping to the same template as other update functors
     return bool(alpha >= 1.0f ? (property || mRelative) : property);
@@ -886,7 +888,7 @@ struct AnimateToBoolean
   {
   }
 
-  bool operator()(float alpha, const bool& property)
+  bool operator()(float alpha, float blendPoint, const bool& property)
   {
     // Alpha is not useful here, just keeping to the same template as other update functors
     return bool(alpha >= 1.0f ? mTarget : property);
@@ -903,7 +905,7 @@ struct RotateByAngleAxis
   {
   }
 
-  Quaternion operator()(float alpha, const Quaternion& rotation)
+  Quaternion operator()(float alpha, float blendPoint, const Quaternion& rotation)
   {
     if(alpha > 0.0f)
     {
@@ -924,7 +926,7 @@ struct RotateToQuaternion
   {
   }
 
-  Quaternion operator()(float alpha, const Quaternion& rotation)
+  Quaternion operator()(float alpha, float blendPoint, const Quaternion& rotation)
   {
     return Quaternion::Slerp(rotation, mTarget, alpha);
   }
@@ -939,7 +941,7 @@ struct KeyFrameBooleanFunctor
   {
   }
 
-  bool operator()(float progress, const bool& property)
+  bool operator()(float progress, float blendPoint, const bool& property)
   {
     if(mKeyFrames.IsActive(progress))
     {
@@ -959,13 +961,23 @@ struct KeyFrameIntegerFunctor
   {
   }
 
-  float operator()(float progress, const int32_t& property)
+  int32_t operator()(float progress, float blendPoint, const int32_t& property)
   {
     if(mKeyFrames.IsActive(progress))
     {
-      return static_cast<float>(mKeyFrames.GetValue(progress, mInterpolation));
+      if(progress < blendPoint)
+      {
+        float subProgress = progress / blendPoint;
+        float original    = static_cast<float>(mKeyFrames.GetValue(progress, mInterpolation));
+        float base        = Dali::Lerp(subProgress, static_cast<float>(property), static_cast<float>(mKeyFrames.GetValue(blendPoint, mInterpolation)));
+        return static_cast<int32_t>(Dali::Lerp(subProgress, base, original));
+      }
+      else
+      {
+        return static_cast<int32_t>(mKeyFrames.GetValue(progress, mInterpolation));
+      }
     }
-    return static_cast<float>(property);
+    return static_cast<int32_t>(property);
   }
 
   KeyFrameInteger mKeyFrames;
@@ -980,11 +992,21 @@ struct KeyFrameNumberFunctor
   {
   }
 
-  float operator()(float progress, const float& property)
+  float operator()(float progress, float blendPoint, const float& property)
   {
     if(mKeyFrames.IsActive(progress))
     {
-      return mKeyFrames.GetValue(progress, mInterpolation);
+      if(progress < blendPoint)
+      {
+        float subProgress = progress / blendPoint;
+        float original    = mKeyFrames.GetValue(progress, mInterpolation);
+        float base        = Dali::Lerp(subProgress, property, mKeyFrames.GetValue(blendPoint, mInterpolation));
+        return Dali::Lerp(subProgress, base, original);
+      }
+      else
+      {
+        return mKeyFrames.GetValue(progress, mInterpolation);
+      }
     }
     return property;
   }
@@ -1001,11 +1023,21 @@ struct KeyFrameVector2Functor
   {
   }
 
-  Vector2 operator()(float progress, const Vector2& property)
+  Vector2 operator()(float progress, float blendPoint, const Vector2& property)
   {
     if(mKeyFrames.IsActive(progress))
     {
-      return mKeyFrames.GetValue(progress, mInterpolation);
+      if(progress < blendPoint)
+      {
+        float   subProgress = progress / blendPoint;
+        Vector2 original    = mKeyFrames.GetValue(progress, mInterpolation);
+        Vector2 base        = Dali::Lerp(subProgress, property, mKeyFrames.GetValue(blendPoint, mInterpolation));
+        return Dali::Lerp(subProgress, base, original);
+      }
+      else
+      {
+        return mKeyFrames.GetValue(progress, mInterpolation);
+      }
     }
     return property;
   }
@@ -1022,11 +1054,21 @@ struct KeyFrameVector3Functor
   {
   }
 
-  Vector3 operator()(float progress, const Vector3& property)
+  Vector3 operator()(float progress, float blendPoint, const Vector3& property)
   {
     if(mKeyFrames.IsActive(progress))
     {
-      return mKeyFrames.GetValue(progress, mInterpolation);
+      if(progress < blendPoint)
+      {
+        float   subProgress = progress / blendPoint;
+        Vector3 original    = mKeyFrames.GetValue(progress, mInterpolation);
+        Vector3 base        = Dali::Lerp(subProgress, property, mKeyFrames.GetValue(blendPoint, mInterpolation));
+        return Dali::Lerp(subProgress, base, original);
+      }
+      else
+      {
+        return mKeyFrames.GetValue(progress, mInterpolation);
+      }
     }
     return property;
   }
@@ -1043,11 +1085,21 @@ struct KeyFrameVector4Functor
   {
   }
 
-  Vector4 operator()(float progress, const Vector4& property)
+  Vector4 operator()(float progress, float blendPoint, const Vector4& property)
   {
     if(mKeyFrames.IsActive(progress))
     {
-      return mKeyFrames.GetValue(progress, mInterpolation);
+      if(progress < blendPoint)
+      {
+        float   subProgress = progress / blendPoint;
+        Vector4 original    = mKeyFrames.GetValue(progress, mInterpolation);
+        Vector4 base        = Dali::Lerp(subProgress, property, mKeyFrames.GetValue(blendPoint, mInterpolation));
+        return Dali::Lerp(subProgress, base, original);
+      }
+      else
+      {
+        return mKeyFrames.GetValue(progress, mInterpolation);
+      }
     }
     return property;
   }
@@ -1063,11 +1115,21 @@ struct KeyFrameQuaternionFunctor
   {
   }
 
-  Quaternion operator()(float progress, const Quaternion& property)
+  Quaternion operator()(float progress, float blendPoint, const Quaternion& property)
   {
     if(mKeyFrames.IsActive(progress))
     {
-      return mKeyFrames.GetValue(progress, Dali::Animation::LINEAR);
+      if(progress < blendPoint)
+      {
+        float      subProgress = progress / blendPoint;
+        Quaternion original    = mKeyFrames.GetValue(progress, Dali::Animation::LINEAR);
+        Quaternion base        = Quaternion::Slerp(property, mKeyFrames.GetValue(blendPoint, Dali::Animation::LINEAR), subProgress);
+        return Quaternion::Slerp(base, original, subProgress);
+      }
+      else
+      {
+        return mKeyFrames.GetValue(progress, Dali::Animation::LINEAR);
+      }
     }
     return property;
   }
@@ -1082,7 +1144,7 @@ struct PathPositionFunctor
   {
   }
 
-  Vector3 operator()(float progress, const Vector3& property)
+  Vector3 operator()(float progress, float blendPoint, const Vector3& property)
   {
     Vector3 position(property);
     static_cast<void>(mPath->SamplePosition(progress, position));
@@ -1101,7 +1163,7 @@ struct PathRotationFunctor
     mForward.Normalize();
   }
 
-  Quaternion operator()(float progress, const Quaternion& property)
+  Quaternion operator()(float progress, float blendPoint, const Quaternion& property)
   {
     Vector3 tangent;
     if(mPath->SampleTangent(progress, tangent))
