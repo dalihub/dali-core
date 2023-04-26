@@ -216,7 +216,7 @@ public:
 
 using KeyFrameNumber     = KeyFrameBaseSpec<float>;
 using KeyFrameBoolean    = KeyFrameBaseSpec<bool>;
-using KeyFrameInteger    = KeyFrameBaseSpec<int>;
+using KeyFrameInteger    = KeyFrameBaseSpec<int32_t>;
 using KeyFrameVector2    = KeyFrameBaseSpec<Vector2>;
 using KeyFrameVector3    = KeyFrameBaseSpec<Vector3>;
 using KeyFrameVector4    = KeyFrameBaseSpec<Vector4>;

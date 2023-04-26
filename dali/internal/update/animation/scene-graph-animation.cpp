@@ -25,9 +25,9 @@
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/render/common/performance-monitor.h>
 #include <dali/public-api/math/math-utils.h>
-namespace //Unnamed namespace
+namespace // Unnamed namespace
 {
-//Memory pool used to allocate new animations. Memory used by this pool will be released when shutting down DALi
+// Memory pool used to allocate new animations. Memory used by this pool will be released when shutting down DALi
 Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Animation>& GetAnimationMemoryPool()
 {
   static Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Animation> gAnimationMemoryPool;
@@ -72,6 +72,7 @@ Animation::Animation(float durationSeconds, float speedFactor, const Vector2& pl
   mElapsedSeconds(playRange.x * mDurationSeconds),
   mSpeedFactor(speedFactor),
   mProgressMarker(0.0f),
+  mBlendPoint(0.0f),
   mPlayedCount(0),
   mLoopCount(loopCount),
   mCurrentLoop(0),
@@ -81,7 +82,8 @@ Animation::Animation(float durationSeconds, float speedFactor, const Vector2& pl
   mProgressReachedSignalRequired(false),
   mAutoReverseEnabled(false),
   mAnimatorSortRequired(false),
-  mIsActive{false}
+  mIsActive{false},
+  mIsFirstLoop{true}
 {
 }
 
@@ -148,6 +150,11 @@ void Animation::SetPlayRange(const Vector2& range)
     // If not yet at the start of the range, clamping will jump to the start
     mElapsedSeconds = Dali::Clamp(mElapsedSeconds, mPlayRange.x * mDurationSeconds, mPlayRange.y * mDurationSeconds);
   }
+}
+
+void Animation::SetBlendPoint(float blendPoint)
+{
+  mBlendPoint = blendPoint;
 }
 
 void Animation::Play()
@@ -222,7 +229,7 @@ void Animation::Bake(BufferIndex bufferIndex, EndAction action)
     }
     else
     {
-      mElapsedSeconds = mPlayRange.x * mDurationSeconds - Math::MACHINE_EPSILON_1; //Force animation to reach it's beginning
+      mElapsedSeconds = mPlayRange.x * mDurationSeconds - Math::MACHINE_EPSILON_1; // Force animation to reach it's beginning
     }
   }
 
@@ -263,6 +270,7 @@ bool Animation::Stop(BufferIndex bufferIndex)
 
   mElapsedSeconds = mPlayRange.x * mDurationSeconds;
   mState          = Stopped;
+  mIsFirstLoop    = true;
 
   return animationFinished;
 }
@@ -379,6 +387,7 @@ void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& loop
       // Recalculate elapsedFactor here
       elapsedFactor = signSpeedFactor * mElapsedSeconds;
 
+      mIsFirstLoop = false;
       if(mLoopCount != 0)
       {
         // Check If this animation is finished
@@ -398,6 +407,7 @@ void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& loop
           // After update animation, mElapsedSeconds must be begin of value
           mElapsedSeconds = playRangeStartSeconds + playRangeEndSeconds - edgeRangeSeconds;
           mState          = Stopped;
+          mIsFirstLoop    = true;
         }
       }
 
@@ -448,7 +458,7 @@ void Animation::UpdateAnimators(BufferIndex bufferIndex, bool bake, bool animati
 
   bool cleanup = false;
 
-  //Loop through all animators
+  // Loop through all animators
   for(auto& animator : mAnimators)
   {
     if(animator->Orphan())
@@ -471,7 +481,7 @@ void Animation::UpdateAnimators(BufferIndex bufferIndex, bool bake, bool animati
         {
           progress = Clamp((elapsedSecondsClamped - intervalDelay) / animatorDuration, 0.0f, 1.0f);
         }
-        animator->Update(bufferIndex, progress, bake);
+        animator->Update(bufferIndex, progress, mIsFirstLoop ? mBlendPoint : 0.0f, bake);
 
         if(animatorDuration > 0.0f && (elapsedSecondsClamped - intervalDelay) <= animatorDuration)
         {
@@ -498,8 +508,9 @@ void Animation::UpdateAnimators(BufferIndex bufferIndex, bool bake, bool animati
 
   if(cleanup)
   {
-    //Remove animators whose PropertyOwner has been destroyed
-    mAnimators.EraseIf([](auto& animator) { return animator->Orphan(); });
+    // Remove animators whose PropertyOwner has been destroyed
+    mAnimators.EraseIf([](auto& animator)
+                       { return animator->Orphan(); });
 
     // Need to be re-sort if remained animators size is bigger than one.
     // Note that if animator contains only zero or one items, It is already sorted case.
