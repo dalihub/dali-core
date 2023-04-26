@@ -2,7 +2,7 @@
 #define TEST_GL_ABSTRACTION_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1893,10 +1893,26 @@ public:
 
   inline void DrawArraysInstanced(GLenum mode, GLint first, GLsizei count, GLsizei instanceCount) override
   {
+    std::stringstream out;
+    out << mode << ", " << first << ", " << count << ", " << instanceCount;
+    TraceCallStack::NamedParams namedParams;
+    namedParams["mode"] << std::hex << mode;
+    namedParams["first"] << first;
+    namedParams["count"] << count;
+    namedParams["instanceCount"] << instanceCount;
+    mDrawTrace.PushCall("DrawArraysInstanced", out.str(), namedParams);
   }
 
   inline void DrawElementsInstanced(GLenum mode, GLsizei count, GLenum type, const GLvoid* indices, GLsizei instanceCount) override
   {
+    std::stringstream out;
+    out << mode << ", " << count << ", " << type << ", " << instanceCount;
+    TraceCallStack::NamedParams namedParams;
+    namedParams["mode"] << std::hex << mode;
+    namedParams["count"] << count;
+    namedParams["type"] << std::hex << type;
+    namedParams["indexCount"] << instanceCount;
+    mDrawTrace.PushCall("DrawElementsInstanced", out.str(), namedParams);
   }
 
   inline GLsync FenceSync(GLenum condition, GLbitfield flags) override
@@ -1981,6 +1997,12 @@ public:
 
   inline void VertexAttribDivisor(GLuint index, GLuint divisor) override
   {
+    std::stringstream out;
+    out << index << ", " << divisor;
+    TraceCallStack::NamedParams namedParams;
+    namedParams["index"] << index;
+    namedParams["divisor"] << divisor;
+    mBufferTrace.PushCall("VertexAttribDivisor", out.str(), namedParams);
   }
 
   inline void BindTransformFeedback(GLenum target, GLuint id) override

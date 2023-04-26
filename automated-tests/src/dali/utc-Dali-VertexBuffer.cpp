@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -183,6 +183,9 @@ int UtcDaliVertexBufferSetData01(void)
     actor.AddRenderer(renderer);
     application.GetScene().Add(actor);
 
+    auto& drawTrace = application.GetGlAbstraction().GetDrawTrace();
+    drawTrace.Enable(true);
+
     application.SendNotification();
     application.Render(0);
     application.Render();
@@ -190,6 +193,8 @@ int UtcDaliVertexBufferSetData01(void)
 
     const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
       application.GetGlAbstraction().GetBufferDataCalls();
+
+    DALI_TEST_CHECK(drawTrace.FindMethod("DrawArrays"));
 
     DALI_TEST_EQUALS(bufferDataCalls.size(), 3u, TEST_LOCATION);
 
@@ -260,33 +265,57 @@ int UtcDaliVertexBufferSetData02(void)
   application.SendNotification();
   application.Render(0);
 
-  {
-    const TestGlAbstraction::BufferSubDataCalls& bufferSubDataCalls =
-      application.GetGlAbstraction().GetBufferSubDataCalls();
-
-    const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
-      application.GetGlAbstraction().GetBufferDataCalls();
-
-    // Should be 3 (2 Render + 1 vertexBuffer reload)
-    DALI_TEST_EQUALS(bufferSubDataCalls.size(), 3u, TEST_LOCATION);
-    DALI_TEST_EQUALS(bufferDataCalls.size(), 3u, TEST_LOCATION);
-
-    if(bufferSubDataCalls.size() >= 2)
-    {
-      DALI_TEST_EQUALS(bufferSubDataCalls[1], sizeof(texturedQuadVertexData), TEST_LOCATION);
-    }
-  }
-
   END_TEST;
 }
 
-int UtcDaliVertexBufferInvalidTypeN(void)
+int UtcDaliVertexBufferMapInitializerList(void)
+{
+  TestApplication application;
+
+  Property::Map texturedQuadVertexFormat = Property::Map{{"aPosition", Property::VECTOR2},
+                                                         {"aTexCoord", Property::VECTOR2},
+                                                         {"aColor", Property::VECTOR4}};
+
+  try
+  {
+    VertexBuffer vertexBuffer = VertexBuffer::New(texturedQuadVertexFormat);
+    tet_result(TET_PASS);
+  }
+  catch(Dali::DaliException& e)
+  {
+    // Shouldn't assert any more
+    tet_result(TET_FAIL);
+  }
+  END_TEST;
+}
+
+int UtcDaliVertexBufferInvalidTypeN01(void)
 {
   TestApplication application;
 
   Property::Map texturedQuadVertexFormat;
   texturedQuadVertexFormat["aPosition"]    = Property::MAP;
   texturedQuadVertexFormat["aVertexCoord"] = Property::STRING;
+
+  try
+  {
+    VertexBuffer vertexBuffer = VertexBuffer::New(texturedQuadVertexFormat);
+    tet_result(TET_FAIL);
+  }
+  catch(Dali::DaliException& e)
+  {
+    DALI_TEST_ASSERT(e, "Property::Type not supported in VertexBuffer", TEST_LOCATION);
+  }
+  END_TEST;
+}
+
+int UtcDaliVertexBufferInvalidTypeN02(void)
+{
+  TestApplication application;
+
+  Property::Map texturedQuadVertexFormat = Property::Map{{"aPosition", Property::MAP},
+                                                         {"aTexCoord", Property::STRING},
+                                                         {"aColor", Property::VECTOR4}};
 
   try
   {
@@ -331,5 +360,89 @@ int UtcDaliVertexBufferGetSizeNegative(void)
   {
     DALI_TEST_CHECK(true); // We expect an assert
   }
+  END_TEST;
+}
+
+int UtcDaliVertexBufferSetDivisor(void)
+{
+  TestApplication application;
+
+  Property::Map texturedQuadVertexFormat;
+  texturedQuadVertexFormat["aPosition"] = Property::VECTOR2;
+  texturedQuadVertexFormat["aTexCoord"] = Property::VECTOR2;
+
+  Property::Map instanceFormat{{"aTranslate", Property::VECTOR2}, {"aColor", Property::VECTOR4}};
+
+  VertexBuffer vertexBuffer = VertexBuffer::New(texturedQuadVertexFormat);
+  DALI_TEST_EQUALS((bool)vertexBuffer, true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(0, vertexBuffer.GetDivisor(), TEST_LOCATION);
+
+  VertexBuffer instanceBuffer = VertexBuffer::New(instanceFormat);
+  DALI_TEST_EQUALS((bool)instanceBuffer, true, TEST_LOCATION);
+
+  const float halfQuadSize = .5f;
+  struct TexturedQuadVertex
+  {
+    Vector2 position;
+    Vector2 textureCoordinates;
+  };
+  TexturedQuadVertex texturedQuadVertexData[4] = {
+    {Vector2(-halfQuadSize, -halfQuadSize), Vector2(0.f, 0.f)},
+    {Vector2(halfQuadSize, -halfQuadSize), Vector2(1.f, 0.f)},
+    {Vector2(-halfQuadSize, halfQuadSize), Vector2(0.f, 1.f)},
+    {Vector2(halfQuadSize, halfQuadSize), Vector2(1.f, 1.f)}};
+
+  vertexBuffer.SetData(texturedQuadVertexData, 4);
+
+  struct InstanceData
+  {
+    Vector2 translate;
+    Vector4 color;
+  };
+
+  InstanceData instanceData[] = {{Vector2(12, 33), Color::WHITE},
+                                 {Vector2(-2000, 43), Color::BLUE},
+                                 {Vector2(200, 43), Color::GREEN},
+                                 {Vector2(-243, 43), Color::TURQUOISE},
+                                 {Vector2(192, 43), Color::CYAN},
+                                 {Vector2(-2000, 43), Color::MAGENTA},
+                                 {Vector2(-292, 393), Color::BLUE},
+                                 {Vector2(-499, 128), Color::BLUE},
+                                 {Vector2(328, 43), Color::BLUE},
+                                 {Vector2(726, 43), Color::BLUE}};
+  instanceBuffer.SetData(instanceData, sizeof(instanceData) / sizeof(InstanceData));
+  instanceBuffer.SetDivisor(1);
+  DALI_TEST_EQUALS(1, instanceBuffer.GetDivisor(), TEST_LOCATION);
+
+  Geometry geometry = Geometry::New();
+  geometry.AddVertexBuffer(vertexBuffer);
+  geometry.AddVertexBuffer(instanceBuffer);
+
+  Shader   shader   = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
+  Actor    actor    = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector3::ONE * 100.f);
+  actor.AddRenderer(renderer);
+  application.GetScene().Add(actor);
+
+  TestGlAbstraction& gl          = application.GetGlAbstraction();
+  auto&              bufferTrace = gl.GetBufferTrace();
+  auto&              drawTrace   = gl.GetDrawTrace();
+  bufferTrace.Enable(true);
+  drawTrace.Enable(true);
+
+  application.SendNotification();
+  application.Render();
+
+  TraceCallStack::NamedParams params;
+  params["divisor"] << "1";
+  DALI_TEST_CHECK(bufferTrace.FindMethodAndParams("VertexAttribDivisor", params));
+
+  TraceCallStack::NamedParams params2;
+  DALI_TEST_CHECK(drawTrace.FindMethodAndGetParameters("DrawArraysInstanced", params2));
+  std::ostringstream oss;
+  oss << sizeof(instanceData) / sizeof(InstanceData);
+  DALI_TEST_EQUALS(params2["instanceCount"].str(), oss.str(), TEST_LOCATION);
   END_TEST;
 }

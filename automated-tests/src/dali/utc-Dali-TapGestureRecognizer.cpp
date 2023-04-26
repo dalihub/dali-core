@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -625,6 +625,63 @@ int UtcDaliTapGestureSetMaximumAllowedTime(void)
 
   // reset maximum allowed time
   Integration::SetTapMaximumAllowedTime(500);
+
+  END_TEST;
+}
+
+int UtcDaliTapGestureSetRecognizerTime(void)
+{
+  TestApplication application;
+
+  TapGestureDetector detector = TapGestureDetector::New();
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  detector.Attach(actor);
+
+  try
+  {
+    Integration::SetTapRecognizerTime(0);
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+
+  // Reduce the recognizer time. 500 -> 100
+  Integration::SetTapRecognizerTime(100);
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 200));
+
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 300));
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 450));
+
+  application.SendNotification();
+
+  // The tap fails because the recognizer time has been exceeded
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+
+  // reset recognizer time
+  Integration::SetTapRecognizerTime(500);
 
   END_TEST;
 }

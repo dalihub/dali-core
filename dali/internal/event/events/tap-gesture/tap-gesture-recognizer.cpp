@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ namespace
 constexpr float MAXIMUM_MOTION_ALLOWED = 20.0f;
 } // unnamed namespace
 
-TapGestureRecognizer::TapGestureRecognizer(Observer& observer, Vector2 screenSize, const TapGestureRequest& request, uint32_t maximumAllowedTime)
+TapGestureRecognizer::TapGestureRecognizer(Observer& observer, Vector2 screenSize, const TapGestureRequest& request, uint32_t maximumAllowedTime, uint32_t recognizerTime)
 : GestureRecognizer(screenSize, GestureType::TAP),
   mObserver(observer),
   mState(CLEAR),
@@ -50,7 +50,8 @@ TapGestureRecognizer::TapGestureRecognizer(Observer& observer, Vector2 screenSiz
   mTouchTime(0u),
   mLastTapTime(0u),
   mLastTouchTime(0u),
-  mMaximumAllowedTime(maximumAllowedTime)
+  mMaximumAllowedTime(maximumAllowedTime),
+  mRecognizerTime(recognizerTime)
 {
 }
 
@@ -83,7 +84,7 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
 
         if(pointState == PointState::UP)
         {
-          if(deltaBetweenTouchDownTouchUp < mMaximumAllowedTime)
+          if(deltaBetweenTouchDownTouchUp < mRecognizerTime)
           {
             mLastTapTime = event.time;
             EmitSingleTap(event.time, point);
@@ -107,7 +108,7 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
         {
           uint32_t deltaBetweenLastTouchDownTouchUp = event.time - mLastTouchTime;
           // Clear if the time between touch down and touch up is long.
-          if(deltaBetweenLastTouchDownTouchUp > mMaximumAllowedTime)
+          if(deltaBetweenLastTouchDownTouchUp > mRecognizerTime)
           {
             mState = CLEAR;
           }
@@ -192,6 +193,11 @@ void TapGestureRecognizer::Update(const GestureRequest& request)
 void TapGestureRecognizer::SetMaximumAllowedTime(uint32_t time)
 {
   mMaximumAllowedTime = time;
+}
+
+void TapGestureRecognizer::SetRecognizerTime(uint32_t time)
+{
+  mRecognizerTime = time;
 }
 
 void TapGestureRecognizer::EmitGesture(GestureState state, uint32_t time)

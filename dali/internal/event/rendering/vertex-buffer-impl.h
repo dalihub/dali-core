@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_VERTEX_BUFFER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,19 +44,29 @@ class VertexBuffer : public BaseObject
 {
 public:
   /**
-   * @copydoc PropertBuffer::New()
+   * @copydoc Dali::VertexBuffer::New()
    */
   static VertexBufferPtr New(Dali::Property::Map& format);
 
   /**
-   * @copydoc PropertBuffer::SetData()
+   * @copydoc Dali::VertexBuffer::SetData()
    */
   void SetData(const void* data, uint32_t size);
 
   /**
-   * @copydoc PropertBuffer::GetSize()
+   * @copydoc Dali::VertexBuffer::GetSize()
    */
   uint32_t GetSize() const;
+
+  /**
+   * @copydoc Dali::VertexBuffer::SetDivisor()
+   */
+  void SetDivisor(uint32_t divisor);
+
+  /**
+   * @copydoc Dali::VertexBuffer::GetDivisor()
+   */
+  uint32_t GetDivisor() const;
 
 public: // Default property extensions from Object
   /**
@@ -87,11 +97,12 @@ private: // unimplemented methods
   VertexBuffer(const VertexBuffer&);
   VertexBuffer& operator=(const VertexBuffer&);
 
-private:                                      // data
-  EventThreadServices&  mEventThreadServices; ///<Used to send messages to the render thread via update thread
-  Render::VertexBuffer* mRenderObject;        ///<Render side object
-  uint32_t              mBufferFormatSize;
-  uint32_t              mSize; ///< Number of elements in the buffer
+private:                                        // data
+  EventThreadServices&  mEventThreadServices;   ///<Used to send messages to the render thread via update thread
+  Render::VertexBuffer* mRenderObject{nullptr}; ///<Render side object
+  uint32_t              mBufferFormatSize{0};
+  uint32_t              mSize{0};    ///< Number of elements in the buffer
+  uint32_t              mDivisor{0}; ///< How many elements to skip in instanced draw
 };
 
 /**

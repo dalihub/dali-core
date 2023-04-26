@@ -477,6 +477,14 @@ public:
   void SetVertexBufferData(Render::VertexBuffer* vertexBuffer, OwnerPointer<Vector<uint8_t>>& data, uint32_t size);
 
   /**
+   * Sets the divisor of a vertex buffer. This is used by the GPU to provide
+   * instanced drawing.
+   * @param[in] vertexBuffer The property buffer.
+   * @param[in] divisor The instance divisor. 0 to turn instancing off.
+   */
+  void SetVertexBufferDivisor(Render::VertexBuffer* vertexBuffer, uint32_t divisor);
+
+  /**
    * Adds a geometry to the RenderManager
    * @param[in] geometry The geometry to add
    * @post Sends a message to RenderManager to add the Geometry
@@ -739,21 +747,24 @@ private:
 
   /**
    * Applies constraints to CustomObjects
+   * @param[out] postPropertyOwner property owners those have post constraint.
    * @param[in] bufferIndex to use
    */
-  void ConstrainCustomObjects(BufferIndex bufferIndex);
+  void ConstrainCustomObjects(PropertyOwnerContainer& postPropertyOwners, BufferIndex bufferIndex);
 
   /**
    * Applies constraints to RenderTasks
+   * @param[out] postPropertyOwner property owners those have post constraint.
    * @param[in] bufferIndex to use
    */
-  void ConstrainRenderTasks(BufferIndex bufferIndex);
+  void ConstrainRenderTasks(PropertyOwnerContainer& postPropertyOwners, BufferIndex bufferIndex);
 
   /**
    * Applies constraints to Shaders
+   * @param[out] postPropertyOwner property owners those have post constraint.
    * @param[in] bufferIndex to use
    */
-  void ConstrainShaders(BufferIndex bufferIndex);
+  void ConstrainShaders(PropertyOwnerContainer& postPropertyOwners, BufferIndex bufferIndex);
 
   /**
    * Perform property notification updates
@@ -768,9 +779,10 @@ private:
 
   /**
    * Update node shaders, opacity, geometry etc.
+   * @param[out] postPropertyOwner property owners those have post constraint.
    * @param[in] bufferIndex to use
    */
-  void UpdateNodes(BufferIndex bufferIndex);
+  void UpdateNodes(PropertyOwnerContainer& postPropertyOwners, BufferIndex bufferIndex);
 
   /**
    * initialize layer renderables
@@ -780,9 +792,10 @@ private:
 
   /**
    * Update Renderers
+   * @param[out] postPropertyOwner property owners those have post constraint.
    * @param[in] bufferIndex to use
    */
-  void UpdateRenderers(BufferIndex bufferIndex);
+  void UpdateRenderers(PropertyOwnerContainer& postPropertyOwners, BufferIndex bufferIndex);
 
 private:
   // needs to be direct member so that getter for event buffer can be inlined
@@ -1261,6 +1274,13 @@ inline void SetVertexBufferData(UpdateManager& manager, Render::VertexBuffer& ve
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&manager, &UpdateManager::SetVertexBufferData, &vertexBuffer, data, size);
+}
+
+inline void SetVertexBufferDivisorMessage(UpdateManager& manager, Render::VertexBuffer& vertexBuffer, uint32_t divisor)
+{
+  using LocalType = MessageValue2<UpdateManager, Render::VertexBuffer*, uint32_t>;
+  uint32_t* slot  = manager.ReserveMessageSlot(sizeof(LocalType));
+  new(slot) LocalType(&manager, &UpdateManager::SetVertexBufferDivisor, &vertexBuffer, divisor);
 }
 
 inline void AddGeometry(UpdateManager& manager, OwnerPointer<Render::Geometry>& geometry)

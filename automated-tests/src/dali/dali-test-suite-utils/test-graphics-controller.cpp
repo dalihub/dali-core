@@ -712,9 +712,19 @@ void TestGraphicsController::ProcessCommandBuffer(TestGraphicsCommandBuffer& com
       {
         if(currentPipeline)
         {
-          mGl.DrawArrays(GetTopology(currentPipeline->inputAssemblyState.topology),
-                         0,
-                         cmd.data.draw.draw.vertexCount);
+          if(cmd.data.draw.draw.instanceCount == 0)
+          {
+            mGl.DrawArrays(GetTopology(currentPipeline->inputAssemblyState.topology),
+                           0,
+                           cmd.data.draw.draw.vertexCount);
+          }
+          else
+          {
+            mGl.DrawArraysInstanced(GetTopology(currentPipeline->inputAssemblyState.topology),
+                                    0,
+                                    cmd.data.draw.draw.vertexCount,
+                                    cmd.data.draw.draw.instanceCount);
+          }
         }
         break;
       }
@@ -722,10 +732,21 @@ void TestGraphicsController::ProcessCommandBuffer(TestGraphicsCommandBuffer& com
       {
         if(currentPipeline)
         {
-          mGl.DrawElements(GetTopology(currentPipeline->inputAssemblyState.topology),
-                           static_cast<GLsizei>(cmd.data.draw.drawIndexed.indexCount),
-                           GL_UNSIGNED_SHORT,
-                           reinterpret_cast<void*>(cmd.data.draw.drawIndexed.firstIndex));
+          if(cmd.data.draw.draw.instanceCount == 0)
+          {
+            mGl.DrawElements(GetTopology(currentPipeline->inputAssemblyState.topology),
+                             static_cast<GLsizei>(cmd.data.draw.drawIndexed.indexCount),
+                             GL_UNSIGNED_SHORT,
+                             reinterpret_cast<void*>(cmd.data.draw.drawIndexed.firstIndex));
+          }
+          else
+          {
+            mGl.DrawElementsInstanced(GetTopology(currentPipeline->inputAssemblyState.topology),
+                                      static_cast<GLsizei>(cmd.data.draw.drawIndexed.indexCount),
+                                      GL_UNSIGNED_SHORT,
+                                      reinterpret_cast<void*>(cmd.data.draw.drawIndexed.firstIndex),
+                                      cmd.data.draw.drawIndexed.instanceCount);
+          }
         }
         break;
       }
@@ -983,12 +1004,22 @@ void TestGraphicsController::BindPipeline(TestGraphicsPipeline* pipeline)
     uint32_t attributeOffset = attribute.offset;
     GLsizei  stride          = vi.bufferBindings[attribute.binding].stride;
 
+    auto rate = vi.bufferBindings[attribute.binding].inputRate;
+
     mGl.VertexAttribPointer(attribute.location,
                             GetNumComponents(attribute.format),
                             GetGlType(attribute.format),
                             GL_FALSE, // Not normalized
                             stride,
                             reinterpret_cast<void*>(attributeOffset));
+    if(rate == Graphics::VertexInputRate::PER_VERTEX)
+    {
+      mGl.VertexAttribDivisor(attribute.location, 0);
+    }
+    else if(rate == Graphics::VertexInputRate::PER_INSTANCE)
+    {
+      mGl.VertexAttribDivisor(attribute.location, 1);
+    }
   }
 
   // Cull face setup

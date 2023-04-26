@@ -2,7 +2,7 @@
 #define DALI_VERTEX_BUFFER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -170,6 +170,27 @@ public:
    * @return Number of elements to expand or contract the buffer
    */
   std::size_t GetSize() const;
+
+  /**
+   * @brief Sets vertex divisor for all attributes
+   *
+   * If instancing isn't supported, the function has no effect.
+   * It's responsibility of developer to make sure the feature is supported.
+   * A divisor of 0 will turn off instanced drawing.
+   * Currently, a divisor > 1 will turn on instanced draw, but will have an
+   * actual rate of 1.
+   *
+   * @param[in] divisor Sets vertex buffer divisor for an instanced draw
+   */
+  void SetDivisor(uint32_t divisor);
+
+  /**
+   * @brief Get the divisor for the given attribute. A return value of 0 means that
+   * instancing is turned off.
+   *
+   * @return either 0 (not instanced), or > 0 (instanced)
+   */
+  uint32_t GetDivisor() const;
 
 public:
   /**
