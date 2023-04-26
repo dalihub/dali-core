@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDERER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -270,6 +270,7 @@ protected:
 
   uint32_t mIndexedDrawFirstElement; ///< Offset of first element to draw from bound index buffer
   uint32_t mIndexedDrawElementCount; ///< Number of elements to draw
+  uint32_t mInstanceCount{0};        ///< Number of instances to draw
 
   Render::Renderer::StencilParameters mStencilParameters; ///< Struct containing all stencil related options
   BlendingOptions                     mBlendingOptions;   ///< Local copy of blending options bitmask

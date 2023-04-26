@@ -2,7 +2,7 @@
 #define DALI_TEST_GRAPHICS_COMMAND_BUFFER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -843,7 +843,12 @@ public:
     cmd.draw.instanceCount = instanceCount;
     cmd.draw.firstInstance = firstInstance;
     cmd.draw.firstVertex   = firstVertex;
-    mCallStack.PushCall("Draw", "");
+    TraceCallStack::NamedParams namedParams;
+    namedParams["vertexCount"] << vertexCount;
+    namedParams["instanceCount"] << instanceCount;
+    namedParams["firstInstance"] << firstInstance;
+    namedParams["firstVertex"] << firstVertex;
+    mCallStack.PushCall("Draw", namedParams.str(), namedParams);
   }
 
   void DrawIndexed(
@@ -862,7 +867,13 @@ public:
     cmd.drawIndexed.indexCount    = indexCount;
     cmd.drawIndexed.vertexOffset  = vertexOffset;
     cmd.drawIndexed.instanceCount = instanceCount;
-    mCallStack.PushCall("DrawIndexed", "");
+    TraceCallStack::NamedParams namedParams;
+    namedParams["firstIndex"] << firstIndex;
+    namedParams["firstInstance"] << firstInstance;
+    namedParams["indexCount"] << indexCount;
+    namedParams["vertexOffset"] << vertexOffset;
+    namedParams["instanceCount"] << instanceCount;
+    mCallStack.PushCall("DrawIndexed", namedParams.str(), namedParams);
   }
 
   void DrawIndexedIndirect(
@@ -879,7 +890,11 @@ public:
     cmd.drawIndexedIndirect.offset    = offset;
     cmd.drawIndexedIndirect.drawCount = drawCount;
     cmd.drawIndexedIndirect.stride    = stride;
-    mCallStack.PushCall("DrawIndexedIndirect", "");
+    TraceCallStack::NamedParams namedParams;
+    namedParams["offset"] << offset;
+    namedParams["drawCount"] << drawCount;
+    namedParams["stride"] << stride;
+    mCallStack.PushCall("DrawIndexedIndirect", namedParams.str(), namedParams);
   }
 
   void Reset() override

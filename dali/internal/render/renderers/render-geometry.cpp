@@ -93,7 +93,7 @@ void Geometry::SetIndexBuffer(Uint32ContainerType& indices)
 void Geometry::RemoveVertexBuffer(const Render::VertexBuffer* vertexBuffer)
 {
   const auto&& end = mVertexBuffers.End();
-  // @todo if this buffer is the only instance buffer, reduce instance count to 1.
+
   for(auto&& iter = mVertexBuffers.Begin(); iter != end; ++iter)
   {
     if(*iter == vertexBuffer)
@@ -161,11 +161,6 @@ bool Geometry::BindVertexAttributes(Graphics::CommandBuffer& commandBuffer)
 
   for(uint32_t i = 0; i < vertexBufferCount; ++i)
   {
-    if(mVertexBuffers[i]->GetDivisor() > 0)
-    {
-      mInstanceCount = mVertexBuffers[i]->GetElementCount();
-    }
-
     const GpuBuffer* gpuBuffer = mVertexBuffers[i]->GetGpuBuffer();
     if(gpuBuffer)
     {
@@ -193,7 +188,8 @@ bool Geometry::Draw(
   Graphics::Controller&    graphicsController,
   Graphics::CommandBuffer& commandBuffer,
   uint32_t                 elementBufferOffset,
-  uint32_t                 elementBufferCount)
+  uint32_t                 elementBufferCount,
+  uint32_t                 instanceCount)
 {
   uint32_t numIndices(0u);
   intptr_t firstIndexOffset(0u);
@@ -226,17 +222,19 @@ bool Geometry::Draw(
       commandBuffer.BindIndexBuffer(*ibo, 0, mIndexType);
     }
 
-    commandBuffer.DrawIndexed(numIndices, mInstanceCount, firstIndexOffset, 0, 0);
+    commandBuffer.DrawIndexed(numIndices, instanceCount, firstIndexOffset, 0, 0);
   }
   else
   {
     // Un-indexed draw call
     uint32_t numVertices(0u);
+    uint32_t firstVertex(0u);
 
     // Use element buffer count for drawing arrays (needs changing API, for workaround)
     if(elementBufferCount)
     {
       numVertices = elementBufferCount;
+      firstVertex = elementBufferOffset;
     }
     else if(mVertexBuffers.Count() > 0)
     {
@@ -254,10 +252,11 @@ bool Geometry::Draw(
       }
       numVertices = elementsCount;
     }
+
     // Issue draw call only if there's non-zero numVertices
     if(numVertices)
     {
-      commandBuffer.Draw(numVertices, mInstanceCount, 0, 0);
+      commandBuffer.Draw(numVertices, instanceCount, firstVertex, 0);
     }
   }
   return true;

@@ -288,7 +288,7 @@ int UtcDaliRendererDefaultProperties(void)
   Geometry geometry = CreateQuadGeometry();
   Shader   shader   = CreateShader();
   Renderer renderer = Renderer::New(geometry, shader);
-  DALI_TEST_EQUALS(renderer.GetPropertyCount(), 27, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetPropertyCount(), 28, TEST_LOCATION);
 
   TEST_RENDERER_PROPERTY(renderer, "depthIndex", Property::INTEGER, true, false, false, Renderer::Property::DEPTH_INDEX, TEST_LOCATION);
   TEST_RENDERER_PROPERTY(renderer, "faceCullingMode", Property::INTEGER, true, false, false, Renderer::Property::FACE_CULLING_MODE, TEST_LOCATION);
@@ -317,6 +317,7 @@ int UtcDaliRendererDefaultProperties(void)
   TEST_RENDERER_PROPERTY(renderer, "opacity", Property::FLOAT, true, true, true, DevelRenderer::Property::OPACITY, TEST_LOCATION);
   TEST_RENDERER_PROPERTY(renderer, "renderingBehavior", Property::INTEGER, true, false, false, DevelRenderer::Property::RENDERING_BEHAVIOR, TEST_LOCATION);
   TEST_RENDERER_PROPERTY(renderer, "blendEquation", Property::INTEGER, true, false, false, DevelRenderer::Property::BLEND_EQUATION, TEST_LOCATION);
+  TEST_RENDERER_PROPERTY(renderer, "instanceCount", Property::INTEGER, true, false, false, Dali::DevelRenderer::Property::INSTANCE_COUNT, TEST_LOCATION);
 
   END_TEST;
 }
@@ -4382,5 +4383,216 @@ int utcDaliRendererDoNotSkipRenderIfTextureSetChanged(void)
   // Should not Skip rendering!
   DALI_TEST_GREATER(drawTrace.CountMethod("DrawElements"), 0, TEST_LOCATION);
 
+  END_TEST;
+}
+
+int UtcDaliRendererSetInstanceCount(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test setting the instance count results in instanced draw");
+
+  Property::Map vertexFormat{{"aPosition", Property::VECTOR2}, {"aTexCoord", Property::VECTOR2}};
+  Property::Map instanceFormat{{"aTranslation", Property::VECTOR2}, {"aSize", Property::VECTOR2}};
+
+  const float halfQuadSize = .5f;
+  struct TexturedQuadVertex
+  {
+    Vector2 aPosition;
+    Vector2 aTexCoord;
+  };
+  TexturedQuadVertex texturedQuadVertexData[4] = {
+    {Vector2(-halfQuadSize, -halfQuadSize), Vector2(0.f, 0.f)},
+    {Vector2(halfQuadSize, -halfQuadSize), Vector2(1.f, 0.f)},
+    {Vector2(-halfQuadSize, halfQuadSize), Vector2(0.f, 1.f)},
+    {Vector2(halfQuadSize, halfQuadSize), Vector2(1.f, 1.f)}};
+
+  VertexBuffer vertexBuffer = VertexBuffer::New(vertexFormat);
+  vertexBuffer.SetData(texturedQuadVertexData, 4);
+
+  VertexBuffer instanceBuffer = VertexBuffer::New(instanceFormat);
+  instanceBuffer.SetDivisor(1);
+
+  struct Instance
+  {
+    Vector2 aTranslation;
+    Vector2 aSize;
+  };
+  std::vector<Instance> instanceData = {{Vector2{111.f, 222.f}, Vector2{32, 32}}, {Vector2{-112.f, 342.f}, Vector2{32, 32}}, {Vector2{124.f, 294.f}, Vector2{32, 32}}, {Vector2{459.f, -392.f}, Vector2{32, 32}}};
+
+  Dali::Geometry geometry = Dali::Geometry::New();
+  geometry.AddVertexBuffer(vertexBuffer);
+  geometry.AddVertexBuffer(instanceBuffer);
+  geometry.SetType(Geometry::TRIANGLE_STRIP);
+
+  Shader shader = CreateShader();
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+  application.GetScene().Add(actor);
+
+  Renderer renderer = Renderer::New(geometry, shader);
+  actor.AddRenderer(renderer);
+
+  auto& graphicsController = application.GetGraphicsController();
+  graphicsController.mCallStack.EnableLogging(true);
+  graphicsController.mCommandBufferCallStack.EnableLogging(true);
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  auto&              drawTrace     = glAbstraction.GetDrawTrace();
+  drawTrace.Enable(true);
+  drawTrace.EnableLogging(true);
+
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline("Without instance buffer loaded, should not draw");
+  DALI_TEST_CHECK(!drawTrace.FindMethod("DrawArrays"));
+  DALI_TEST_CHECK(!drawTrace.FindMethod("DrawArraysInstanced"));
+
+  instanceBuffer.SetData(&instanceData[0], 4);
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline("With no instance count set, should not draw instanced.");
+  DALI_TEST_CHECK(drawTrace.FindMethod("DrawArrays"));
+  DALI_TEST_CHECK(!drawTrace.FindMethod("DrawArraysInstanced"));
+
+  renderer[DevelRenderer::Property::INSTANCE_COUNT] = 4;
+
+  Property::Value v = renderer["instanceCount"];
+  DALI_TEST_EQUALS(v, Property::Value(4), TEST_LOCATION);
+
+  drawTrace.Reset();
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline("With instance count set to 4, should draw 4 instances.");
+  TraceCallStack::NamedParams params;
+  params["instanceCount"] << 4;
+  DALI_TEST_CHECK(!drawTrace.FindMethod("DrawArrays"));
+  DALI_TEST_CHECK(drawTrace.FindMethodAndParams("DrawArraysInstanced", params));
+
+  renderer[DevelRenderer::Property::INSTANCE_COUNT] = 1;
+  drawTrace.Reset();
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline("With instance count set to 1, should draw 1 instance.");
+  TraceCallStack::NamedParams params2;
+  params["instanceCount"] << 1;
+  DALI_TEST_CHECK(!drawTrace.FindMethod("DrawArrays"));
+  DALI_TEST_CHECK(drawTrace.FindMethodAndParams("DrawArraysInstanced", params2));
+
+  renderer[DevelRenderer::Property::INSTANCE_COUNT] = 0;
+  drawTrace.Reset();
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline("With instance count set to 0, should revert to DrawArrays.");
+  DALI_TEST_CHECK(drawTrace.FindMethod("DrawArrays"));
+  DALI_TEST_CHECK(!drawTrace.FindMethod("DrawArraysInstanced"));
+
+  END_TEST;
+}
+
+int UtcDaliRendererVertexRange(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test setting the instance count results in instanced draw");
+
+  Property::Map vertexFormat{{"aPosition", Property::VECTOR2}, {"aTexCoord", Property::VECTOR2}};
+  Property::Map instanceFormat{{"aTranslation", Property::VECTOR2}, {"aSize", Property::VECTOR2}};
+
+  const float halfQuadSize = .5f;
+  struct TexturedQuadVertex
+  {
+    Vector2 aPosition;
+    Vector2 aTexCoord;
+  };
+  TexturedQuadVertex texturedQuadVertexData[4] = {
+    {Vector2(-halfQuadSize, -halfQuadSize), Vector2(0.f, 0.f)},
+    {Vector2(halfQuadSize, -halfQuadSize), Vector2(1.f, 0.f)},
+    {Vector2(-halfQuadSize, halfQuadSize), Vector2(0.f, 1.f)},
+    {Vector2(halfQuadSize, halfQuadSize), Vector2(1.f, 1.f)}};
+
+  const int                       VERTEX_SET_COUNT(10);
+  std::vector<TexturedQuadVertex> vertexData;
+  vertexData.resize(VERTEX_SET_COUNT * 4);
+  for(int i = 0; i < VERTEX_SET_COUNT; ++i)
+  {
+    for(int j = 0; j < 4; ++j)
+    {
+      vertexData.push_back({texturedQuadVertexData[j].aPosition * (20.0f * i), texturedQuadVertexData[j].aTexCoord});
+    }
+  }
+
+  VertexBuffer vertexBuffer = VertexBuffer::New(vertexFormat);
+  vertexBuffer.SetData(&vertexData[0], VERTEX_SET_COUNT * 4);
+
+  Dali::Geometry geometry = Dali::Geometry::New();
+  geometry.AddVertexBuffer(vertexBuffer);
+  geometry.SetType(Geometry::TRIANGLE_STRIP);
+
+  Shader shader = CreateShader();
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+  application.GetScene().Add(actor);
+
+  for(int i = 0; i < VERTEX_SET_COUNT; ++i)
+  {
+    Renderer renderer                                     = Renderer::New(geometry, shader);
+    renderer[DevelRenderer::Property::VERTEX_RANGE_FIRST] = i * 4;
+    renderer[DevelRenderer::Property::VERTEX_RANGE_COUNT] = 4;
+    actor.AddRenderer(renderer);
+  }
+
+  for(uint32_t i = 0; i < actor.GetRendererCount(); ++i)
+  {
+    auto renderer = actor.GetRendererAt(i);
+    DALI_TEST_EQUALS(renderer.GetProperty<int>(DevelRenderer::Property::VERTEX_RANGE_FIRST), i * 4, TEST_LOCATION);
+    DALI_TEST_EQUALS(renderer.GetProperty<int>(DevelRenderer::Property::VERTEX_RANGE_COUNT), 4, TEST_LOCATION);
+  }
+
+  auto& graphicsController = application.GetGraphicsController();
+  graphicsController.mCallStack.EnableLogging(true);
+  graphicsController.mCommandBufferCallStack.EnableLogging(true);
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  auto&              drawTrace     = glAbstraction.GetDrawTrace();
+  drawTrace.Enable(true);
+  drawTrace.EnableLogging(true);
+
+  application.SendNotification();
+  application.Render();
+
+  TraceCallStack::NamedParams namedParams;
+  namedParams["first"] << 0;
+  namedParams["count"] << 4;
+  DALI_TEST_CHECK(drawTrace.FindMethodAndParams("DrawArrays", namedParams));
+
+  namedParams["first"].str("");
+  namedParams["first"].clear();
+  namedParams["first"] << 4;
+  DALI_TEST_CHECK(drawTrace.FindMethodAndParams("DrawArrays", namedParams));
+
+  namedParams["first"].str("");
+  namedParams["first"].clear();
+  namedParams["first"] << 8;
+  DALI_TEST_CHECK(drawTrace.FindMethodAndParams("DrawArrays", namedParams));
+
+  namedParams["first"].str("");
+  namedParams["first"].clear();
+  namedParams["first"] << 12;
+  DALI_TEST_CHECK(drawTrace.FindMethodAndParams("DrawArrays", namedParams));
+
+  namedParams["first"].str("");
+  namedParams["first"].clear();
+  namedParams["first"] << 16;
+  DALI_TEST_CHECK(drawTrace.FindMethodAndParams("DrawArrays", namedParams));
+
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawArrays"), 10, TEST_LOCATION);
   END_TEST;
 }

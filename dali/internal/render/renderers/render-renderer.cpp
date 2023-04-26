@@ -612,15 +612,17 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
   // Reuse latest bound vertex attributes location, or Bind buffers to attribute locations.
   if(ReuseLatestBoundVertexAttributes(mGeometry) || mGeometry->BindVertexAttributes(commandBuffer))
   {
+    uint32_t instanceCount = mRenderDataProvider->GetInstanceCount();
+
     if(mDrawCommands.empty())
     {
-      drawn = mGeometry->Draw(*mGraphicsController, commandBuffer, mIndexedDrawFirstElement, mIndexedDrawElementsCount);
+      drawn = mGeometry->Draw(*mGraphicsController, commandBuffer, mIndexedDrawFirstElement, mIndexedDrawElementsCount, instanceCount);
     }
     else
     {
       for(auto& cmd : commands)
       {
-        drawn |= mGeometry->Draw(*mGraphicsController, commandBuffer, cmd->firstIndex, cmd->elementCount);
+        drawn |= mGeometry->Draw(*mGraphicsController, commandBuffer, cmd->firstIndex, cmd->elementCount, instanceCount);
       }
     }
   }
