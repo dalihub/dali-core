@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_KEY_FRAMES_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,6 +92,11 @@ public:
    */
   void GetKeyFrame(std::size_t index, float& time, Property::Value& value) const;
 
+  /**
+   * @copydoc Dali::DevelKeyFrames::SetKeyFrameValue()
+   */
+  void SetKeyFrameValue(std::size_t index, const Property::Value& value);
+
 private:
   Dali::Property::Type          mType{Property::NONE}; // Type of the specialization
   std::unique_ptr<KeyFrameSpec> mKeyFrames;            // Pointer to the specialized key frame object
@@ -115,6 +120,13 @@ public:
    * @param[out] value The value of the given key frame
    */
   virtual void GetKeyFrameAsValue(std::size_t index, float& time, Property::Value& value) const = 0;
+
+  /**
+   * Set the key frame value as a Property::Value.
+   * @param[in] index The index of the key frame to set
+   * @param[in] value The value of the given key frame
+   */
+  virtual void SetKeyFrameValue(std::size_t index, const Property::Value& value) = 0;
 };
 
 /**
@@ -169,6 +181,15 @@ public:
     const auto& element = mChannel.mValues[index];
     time                = element.mProgress;
     value               = element.mValue;
+  }
+
+  /**
+   * @copydoc KeyFrameSpec::SetKeyFrameValue()
+   */
+  void SetKeyFrameValue(std::size_t index, const Property::Value& value) override
+  {
+    auto& element  = mChannel.mValues[index];
+    element.mValue = value.Get<V>();
   }
 
   /**
