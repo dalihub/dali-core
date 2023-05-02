@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -9226,6 +9226,44 @@ int UtcDaliAnimationKeyFramesGetKeyFrameP(void)
   DALI_TEST_EQUALS(outputTime, inputTime, TEST_LOCATION);
   DALI_TEST_EQUALS(outputValue.GetType(), Property::Type::VECTOR4, TEST_LOCATION);
   DALI_TEST_EQUALS(outputValue.Get<Vector4>(), inputValue, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimationKeyFramesSetKeyFrameP(void)
+{
+  TestApplication application;
+
+  float   inputTime  = 0.6f;
+  Vector4 inputValue = Vector4(0.0f, 0.0f, 0.0f, 0.3f);
+
+  KeyFrames keyFrames = KeyFrames::New();
+  keyFrames.Add(0.0f, Vector4(0.0f, 0.0f, 0.0f, 0.6f));
+  keyFrames.Add(inputTime, inputValue);
+  keyFrames.Add(1.0f, Vector4(0.0f, 0.0f, 0.0f, 0.8f));
+
+  float           outputTime;
+  Property::Value outputValue;
+
+  DevelKeyFrames::GetKeyFrame(keyFrames, 3, outputTime, outputValue);
+
+  DALI_TEST_EQUALS(outputValue.GetType(), Property::Type::NONE, TEST_LOCATION);
+
+  DevelKeyFrames::GetKeyFrame(keyFrames, 1, outputTime, outputValue);
+
+  DALI_TEST_EQUALS(outputTime, inputTime, TEST_LOCATION);
+  DALI_TEST_EQUALS(outputValue.GetType(), Property::Type::VECTOR4, TEST_LOCATION);
+  DALI_TEST_EQUALS(outputValue.Get<Vector4>(), inputValue, TEST_LOCATION);
+
+  Vector4 newValue = Vector4(1.0f, 0.2f, 0.6f, 0.9f);
+
+  DevelKeyFrames::SetKeyFrameValue(keyFrames, 1, newValue);
+
+  DevelKeyFrames::GetKeyFrame(keyFrames, 1, outputTime, outputValue);
+
+  DALI_TEST_EQUALS(outputTime, inputTime, TEST_LOCATION);
+  DALI_TEST_EQUALS(outputValue.GetType(), Property::Type::VECTOR4, TEST_LOCATION);
+  DALI_TEST_EQUALS(outputValue.Get<Vector4>(), newValue, TEST_LOCATION);
 
   END_TEST;
 }

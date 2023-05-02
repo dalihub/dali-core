@@ -2,7 +2,7 @@
 #define DALI_KEY_FRAMES_DEVEL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,14 @@ DALI_CORE_API std::size_t GetKeyFrameCount(KeyFrames keyFrames);
  * @param[out] value The value of the given key frame
  */
 DALI_CORE_API void GetKeyFrame(KeyFrames keyFrames, std::size_t index, float& time, Property::Value& value);
+
+/**
+ * Set a key frame.
+ * @param[in] keyFrames The KeyFrames object to perform this operation on
+ * @param[in] index The index of the key frame to set
+ * @param[in] value The value of the given key frame
+ */
+DALI_CORE_API void SetKeyFrameValue(KeyFrames keyFrames, std::size_t index, const Property::Value& value);
 
 } // namespace DevelKeyFrames
 
