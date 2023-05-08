@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_RENDERER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,8 +57,8 @@ namespace Render
 {
 struct ShaderCache;
 class PipelineCache;
+class PipelineCacheL2;
 class UniformBufferManager;
-class PipelineCache;
 
 /**
  * Renderers are used to render meshes
@@ -547,6 +547,7 @@ private:
   std::vector<Graphics::UniformBufferBinding> mUniformBufferBindings{};
 
   Render::PipelineCache* mPipelineCache{nullptr};
+  PipelineCacheL2*       mPipeline{nullptr};
 
   using Hash = std::size_t;
 

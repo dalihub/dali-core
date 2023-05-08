@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -206,7 +206,11 @@ void Renderer::Initialize(Graphics::Controller& graphicsController, ProgramCache
   mPipelineCache        = &pipelineCache;
 }
 
-Renderer::~Renderer() = default;
+Renderer::~Renderer()
+{
+  // Reset old pipeline
+  mPipelineCache->ResetPipeline(mPipeline);
+}
 
 void Renderer::SetGeometry(Render::Geometry* geometry)
 {
@@ -948,7 +952,13 @@ Graphics::Pipeline& Renderer::PrepareGraphicsPipeline(
   queryInfo.alphaPremultiplied    = mPremultipliedAlphaEnabled;
   queryInfo.cameraUsingReflection = instruction.GetCamera()->GetReflectionUsed();
 
+  // Reset old pipeline
+  mPipelineCache->ResetPipeline(mPipeline);
+
+  // Find or generate new pipeline.
   auto pipelineResult = mPipelineCache->GetPipeline(queryInfo, true);
+
+  mPipeline = pipelineResult.level2;
 
   // should be never null?
   return *pipelineResult.pipeline;

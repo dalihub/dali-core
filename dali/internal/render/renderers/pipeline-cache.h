@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_PIPELINE_CACHE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/common/blending-options.h>
-#include <dali/graphics-api/graphics-types.h>
 #include <dali/graphics-api/graphics-controller.h>
 #include <dali/graphics-api/graphics-pipeline.h>
+#include <dali/graphics-api/graphics-types.h>
+#include <dali/internal/common/blending-options.h>
 
 // EXTERNAL INCLUDES
 #include <vector>
@@ -40,6 +40,7 @@ class Geometry;
 struct PipelineCacheL2
 {
   uint32_t                                hash{};
+  uint32_t                                referenceCount{0u};
   Graphics::ColorBlendState               colorBlendState;
   Graphics::UniquePtr<Graphics::Pipeline> pipeline;
 };
@@ -49,8 +50,12 @@ struct PipelineCacheL2
  */
 struct PipelineCacheL1
 {
+  PipelineCacheL2* GetPipelineCacheL2(bool blend, bool premul, BlendingOptions& blendingOptions);
 
-  PipelineCacheL2 *GetPipelineCacheL2(bool blend, bool premul, BlendingOptions &blendingOptions);
+  /**
+   * @brief Clear unused caches.
+   */
+  bool ClearUnusedCache();
 
   uint32_t                     hashCode{}; // 1byte cull, 1byte poly, 1byte frontface
   Graphics::RasterizationState rs{};
@@ -65,10 +70,15 @@ struct PipelineCacheL1
  */
 struct PipelineCacheL0 // L0 cache
 {
-  PipelineCacheL1 *GetPipelineCacheL1(Render::Renderer *renderer, bool usingReflection);
+  PipelineCacheL1* GetPipelineCacheL1(Render::Renderer* renderer, bool usingReflection);
 
-  Geometry                   *geometry{};
-  Program                    *program{};
+  /**
+   * @brief Clear unused caches.
+   */
+  void ClearUnusedCache();
+
+  Geometry*                  geometry{};
+  Program*                   program{};
   Graphics::VertexInputState inputState;
 
   std::vector<PipelineCacheL1> level1nodes;
@@ -77,17 +87,16 @@ struct PipelineCacheL0 // L0 cache
 struct PipelineCacheQueryInfo
 {
   // Program/Geometry
-  Renderer *renderer;
-  Program  *program;
-  Geometry *geometry;
+  Renderer* renderer;
+  Program*  program;
+  Geometry* geometry;
 
   bool cameraUsingReflection;
 
   // Blending
-  bool blendingEnabled;
-  bool alphaPremultiplied;
-  BlendingOptions *blendingOptions;
-
+  bool             blendingEnabled;
+  bool             alphaPremultiplied;
+  BlendingOptions* blendingOptions;
 };
 
 /**
@@ -96,10 +105,7 @@ struct PipelineCacheQueryInfo
 struct PipelineResult
 {
   Graphics::Pipeline* pipeline;
-
-  PipelineCacheL0* level0;
-  PipelineCacheL1* level1;
-  PipelineCacheL2* level2;
+  PipelineCacheL2*    level2;
 };
 
 /**
@@ -117,22 +123,40 @@ public:
   /**
    * Retrieves next cache level
    */
-  PipelineCacheL0* GetPipelineCacheL0( Program *program, Render::Geometry *geometry);
+  PipelineCacheL0* GetPipelineCacheL0(Program* program, Render::Geometry* geometry);
 
   /**
    * Retrieves pipeline matching queryInfo struct
    *
    * May retrieve existing pipeline or create one or return nullptr.
    */
-  PipelineResult GetPipeline( const PipelineCacheQueryInfo& queryInfo, bool createNewIfNotFound );
+  PipelineResult GetPipeline(const PipelineCacheQueryInfo& queryInfo, bool createNewIfNotFound);
+
+  /**
+   * @brief This is called before rendering every frame.
+   */
+  void PreRender();
+
+  /**
+   * @brief Decrease the reference count of the pipeline cache.
+   * @param pipelineCache The pipeline cache to decrease the reference count
+   */
+  void ResetPipeline(PipelineCacheL2* pipelineCache);
 
 private:
+  /**
+   * @brief Clear unused caches.
+   */
+  void ClearUnusedCache();
 
-  Graphics::Controller* graphicsController{nullptr};
+private:
+  Graphics::Controller*        graphicsController{nullptr};
   std::vector<PipelineCacheL0> level0nodes;
+
+  uint32_t mFrameCount{0u};
 };
 
-}
-}
+} // namespace Render
+} // namespace Dali::Internal
 
 #endif // DALI_INTERNAL_RENDER_PIPELINE_CACHE_H

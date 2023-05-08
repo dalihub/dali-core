@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -133,6 +133,7 @@ struct RenderManager::Impl
   ~Impl()
   {
     threadPool.reset(nullptr); // reset now to maintain correct destruction order
+    rendererContainer.Clear(); // clear now before the pipeline cache is deleted
   }
 
   void AddRenderTracker(Render::RenderTracker* renderTracker)
@@ -477,6 +478,9 @@ void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear
       geom->Upload(mImpl->graphicsController);
     }
   }
+
+  // Reset pipeline cache before rendering
+  mImpl->pipelineCache->PreRender();
 
   mImpl->commandBufferSubmitted = false;
 }
