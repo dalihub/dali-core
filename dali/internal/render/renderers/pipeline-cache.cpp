@@ -29,6 +29,8 @@ namespace Dali::Internal::Render
 {
 namespace
 {
+constexpr uint32_t CACHE_CLEAN_FRAME_COUNT = 600; // 60fps * 10sec
+
 // Helper to get the vertex input format
 Dali::Graphics::VertexInputFormat GetPropertyVertexFormat(Property::Type propertyType)
 {
@@ -322,6 +324,21 @@ PipelineCacheL1* PipelineCacheL0::GetPipelineCacheL1(Render::Renderer* renderer,
   return retval;
 }
 
+void PipelineCacheL0::ClearUnusedCache()
+{
+  for(auto iter = level1nodes.begin(); iter != level1nodes.end();)
+  {
+    if(iter->ClearUnusedCache())
+    {
+      iter = level1nodes.erase(iter);
+    }
+    else
+    {
+      iter++;
+    }
+  }
+}
+
 PipelineCacheL2* PipelineCacheL1::GetPipelineCacheL2(bool blend, bool premul, BlendingOptions& blendingOptions)
 {
   // early out
@@ -410,6 +427,28 @@ PipelineCacheL2* PipelineCacheL1::GetPipelineCacheL2(bool blend, bool premul, Bl
   return retval;
 }
 
+bool PipelineCacheL1::ClearUnusedCache()
+{
+  if(noBlend.referenceCount > 0)
+  {
+    return false;
+  }
+
+  for(auto iter = level2nodes.begin(); iter != level2nodes.end();)
+  {
+    if(iter->referenceCount == 0)
+    {
+      iter = level2nodes.erase(iter);
+    }
+    else
+    {
+      iter++;
+    }
+  }
+
+  return level2nodes.empty();
+}
+
 void PipelineCacheQueryInfo::GenerateHash()
 {
   // Lightweight hash value generation.
@@ -459,6 +498,7 @@ PipelineResult PipelineCache::GetPipeline(const PipelineCacheQueryInfo& queryInf
   // If we can reuse latest bound pipeline, Fast return.
   if(ReuseLatestBoundPipeline(latestUsedCacheIndex, queryInfo))
   {
+    mLatestResult[latestUsedCacheIndex].level2->referenceCount++;
     return mLatestResult[latestUsedCacheIndex];
   }
 
@@ -488,9 +528,9 @@ PipelineResult PipelineCache::GetPipeline(const PipelineCacheQueryInfo& queryInf
   PipelineResult result{};
 
   result.pipeline = level2->pipeline.get();
-  result.level0   = level0;
-  result.level1   = level1;
   result.level2   = level2;
+
+  level2->referenceCount++;
 
   // Copy query and result
   mLatestQuery[latestUsedCacheIndex]  = queryInfo;
@@ -502,6 +542,43 @@ PipelineResult PipelineCache::GetPipeline(const PipelineCacheQueryInfo& queryInf
 bool PipelineCache::ReuseLatestBoundPipeline(const int latestUsedCacheIndex, const PipelineCacheQueryInfo& queryInfo) const
 {
   return mLatestResult[latestUsedCacheIndex].pipeline != nullptr && PipelineCacheQueryInfo::Equal(queryInfo, mLatestQuery[latestUsedCacheIndex]);
+}
+
+void PipelineCache::PreRender()
+{
+  CleanLatestUsedCache();
+
+  // We don't need to check this every frame
+  if(++mFrameCount >= CACHE_CLEAN_FRAME_COUNT)
+  {
+    mFrameCount = 0u;
+    ClearUnusedCache();
+  }
+}
+
+void PipelineCache::ClearUnusedCache()
+{
+  for(auto iter = level0nodes.begin(); iter != level0nodes.end();)
+  {
+    iter->ClearUnusedCache();
+
+    if(iter->level1nodes.empty())
+    {
+      iter = level0nodes.erase(iter);
+    }
+    else
+    {
+      iter++;
+    }
+  }
+}
+
+void PipelineCache::ResetPipeline(PipelineCacheL2* pipelineCache)
+{
+  if(pipelineCache)
+  {
+    pipelineCache->referenceCount--;
+  }
 }
 
 } // namespace Dali::Internal::Render

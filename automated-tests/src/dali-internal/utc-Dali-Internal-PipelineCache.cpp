@@ -159,7 +159,22 @@ int UtcDaliCorePipelineCacheTest(void)
       }
     }
   }
+
+  DALI_TEST_EQUALS(gPipelineCache->level0nodes.size(), 3, TEST_LOCATION);
   DALI_TEST_EQUALS(noBlendFoundCount, 1u, TEST_LOCATION);
+
+  // Remove renderer to test whether old pipeline is removed
+  application.GetScene().Remove(actor1);
+  actor1.RemoveRenderer(renderer1);
+  renderer1.Reset();
+
+  // Make the frame count of the pipeline cache large to clean cache
+  gPipelineCache->mFrameCount = 1000;
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gPipelineCache->level0nodes.size(), 2, TEST_LOCATION);
 
   END_TEST;
 }

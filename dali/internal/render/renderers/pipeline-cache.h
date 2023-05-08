@@ -40,6 +40,7 @@ class Geometry;
 struct PipelineCacheL2
 {
   uint32_t                                hash{};
+  uint32_t                                referenceCount{0u};
   Graphics::ColorBlendState               colorBlendState;
   Graphics::UniquePtr<Graphics::Pipeline> pipeline;
 };
@@ -50,6 +51,11 @@ struct PipelineCacheL2
 struct PipelineCacheL1
 {
   PipelineCacheL2* GetPipelineCacheL2(bool blend, bool premul, BlendingOptions& blendingOptions);
+
+  /**
+   * @brief Clear unused caches.
+   */
+  bool ClearUnusedCache();
 
   uint32_t                     hashCode{}; // 1byte cull, 1byte poly, 1byte frontface
   Graphics::RasterizationState rs{};
@@ -65,6 +71,11 @@ struct PipelineCacheL1
 struct PipelineCacheL0 // L0 cache
 {
   PipelineCacheL1* GetPipelineCacheL1(Render::Renderer* renderer, bool usingReflection);
+
+  /**
+   * @brief Clear unused caches.
+   */
+  void ClearUnusedCache();
 
   std::size_t                hash{};
   Geometry*                  geometry{};
@@ -104,10 +115,7 @@ struct PipelineCacheQueryInfo
 struct PipelineResult
 {
   Graphics::Pipeline* pipeline;
-
-  PipelineCacheL0* level0;
-  PipelineCacheL1* level1;
-  PipelineCacheL2* level2;
+  PipelineCacheL2*    level2;
 };
 
 /**
@@ -146,6 +154,18 @@ public:
   bool ReuseLatestBoundPipeline(const int latestUsedCacheIndex, const PipelineCacheQueryInfo& queryInfo) const;
 
   /**
+   * @brief This is called before rendering every frame.
+   */
+  void PreRender();
+
+  /**
+   * @brief Decrease the reference count of the pipeline cache.
+   * @param pipelineCache The pipeline cache to decrease the reference count
+   */
+  void ResetPipeline(PipelineCacheL2* pipelineCache);
+
+private:
+  /**
    * @brief Clear latest bound result.
    */
   void CleanLatestUsedCache()
@@ -155,6 +175,11 @@ public:
     mLatestResult[1].pipeline = nullptr;
   }
 
+  /**
+   * @brief Clear unused caches.
+   */
+  void ClearUnusedCache();
+
 private:
   Graphics::Controller*        graphicsController{nullptr};
   std::vector<PipelineCacheL0> level0nodes;
@@ -163,6 +188,8 @@ private:
   // (Since most UI case (like Text and Image) enable blend, and most 3D case disable blend.)
   PipelineCacheQueryInfo mLatestQuery[2];  ///< Latest requested query info. It will be invalidate after query's renderer / geometry / blendingOptions value changed.
   PipelineResult         mLatestResult[2]; ///< Latest used result. It will be invalidate when we call CleanLatestUsedCache() or some cache changed.
+
+  uint32_t mFrameCount{0u};
 };
 
 } // namespace Render

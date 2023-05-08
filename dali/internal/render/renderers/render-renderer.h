@@ -57,8 +57,8 @@ namespace Render
 {
 struct ShaderCache;
 class PipelineCache;
+class PipelineCacheL2;
 class UniformBufferManager;
-class PipelineCache;
 class Renderer;
 
 using RendererKey = MemoryPoolKey<Render::Renderer>;
@@ -596,6 +596,7 @@ private:
   std::vector<Graphics::UniformBufferBinding> mUniformBufferBindings{};
 
   Render::PipelineCache* mPipelineCache{nullptr};
+  PipelineCacheL2*       mPipeline{nullptr};
 
   using Hash = std::size_t;
 
