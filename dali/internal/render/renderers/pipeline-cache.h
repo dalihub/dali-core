@@ -87,7 +87,6 @@ struct PipelineCacheL0 // L0 cache
    */
   void ClearUnusedCache();
 
-  std::size_t                hash{};
   Geometry*                  geometry{};
   Program*                   program{};
   Graphics::VertexInputState inputState;
@@ -143,7 +142,7 @@ public:
   /**
    * Retrieves next cache level
    */
-  PipelineCacheL0Ptr GetPipelineCacheL0(std::size_t hash, Program* program, Render::Geometry* geometry);
+  PipelineCacheL0Ptr GetPipelineCacheL0(Program* program, Render::Geometry* geometry);
 
   /**
    * Retrieves pipeline matching queryInfo struct

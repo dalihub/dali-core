@@ -192,9 +192,11 @@ constexpr Graphics::BlendOp ConvertBlendEquation(DevelBlendEquation::Type blendE
 }
 } // namespace
 
-PipelineCacheL0Ptr PipelineCache::GetPipelineCacheL0(std::size_t hash, Program* program, Render::Geometry* geometry)
+PipelineCacheL0Ptr PipelineCache::GetPipelineCacheL0(Program* program, Render::Geometry* geometry)
 {
-  auto it = std::find_if(level0nodes.begin(), level0nodes.end(), [hash, program, geometry](PipelineCacheL0& item) { return ((item.hash == hash && item.program == program && item.geometry == geometry)); });
+  auto it = std::find_if(level0nodes.begin(), level0nodes.end(), [program, geometry](PipelineCacheL0& item) {
+    return ((item.program == program && item.geometry == geometry));
+  });
 
   // Add new node to cache
   if(it == level0nodes.end())
@@ -243,7 +245,6 @@ PipelineCacheL0Ptr PipelineCache::GetPipelineCacheL0(std::size_t hash, Program* 
       ++bindingIndex;
     }
     PipelineCacheL0 level0;
-    level0.hash       = hash;
     level0.program    = program;
     level0.geometry   = geometry;
     level0.inputState = vertexInputState;
@@ -498,7 +499,7 @@ PipelineResult PipelineCache::GetPipeline(const PipelineCacheQueryInfo& queryInf
     return mLatestResult[latestUsedCacheIndex];
   }
 
-  auto level0 = GetPipelineCacheL0(queryInfo.hash, queryInfo.program, queryInfo.geometry);
+  auto level0 = GetPipelineCacheL0(queryInfo.program, queryInfo.geometry);
   auto level1 = level0->GetPipelineCacheL1(queryInfo.renderer, queryInfo.cameraUsingReflection);
 
   PipelineCachePtr level2 = level1->GetPipelineCacheL2(queryInfo.blendingEnabled, queryInfo.alphaPremultiplied, *queryInfo.blendingOptions);
