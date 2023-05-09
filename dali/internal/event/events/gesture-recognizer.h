@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_GESTURE_RECOGNIZER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,7 +93,15 @@ public:
       MouseButton::Type         mouseButton = point.GetMouseButton();
       if(mouseButton != MouseButton::INVALID)
       {
-        mSourceType = GestureSourceType::MOUSE;
+        Device::Class::Type type = point.GetDeviceClass();
+        if(type == Device::Class::Type::MOUSE)
+        {
+          mSourceType = GestureSourceType::MOUSE;
+        }
+        else if(type == Device::Class::Type::TOUCH)
+        {
+          mSourceType = GestureSourceType::TOUCH;
+        }
         switch(mouseButton)
         {
           case MouseButton::PRIMARY:
