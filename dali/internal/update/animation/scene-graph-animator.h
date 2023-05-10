@@ -359,7 +359,7 @@ public:
       {
         Dali::Vector4 controlPoints = mAlphaFunction.GetBezierControlPoints();
 
-        static const float tolerance = 0.001f; // 10 iteration max
+        static const float tolerance = 0.00005f; // 15 iteration max
 
         // Perform a binary search on the curve
         float lowerBound(0.0f);
