@@ -128,6 +128,7 @@ struct RenderManager::Impl
   ~Impl()
   {
     threadPool.reset(nullptr); // reset now to maintain correct destruction order
+    rendererContainer.Clear(); // clear now before the pipeline cache is deleted
   }
 
   void AddRenderTracker(Render::RenderTracker* renderTracker)
@@ -463,8 +464,8 @@ void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear
     }
   }
 
-  // Clean latest used pipeline
-  mImpl->pipelineCache->CleanLatestUsedCache();
+  // Reset pipeline cache before rendering
+  mImpl->pipelineCache->PreRender();
 
   mImpl->commandBufferSubmitted = false;
 }

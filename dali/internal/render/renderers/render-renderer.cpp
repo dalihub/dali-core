@@ -174,7 +174,7 @@ MemoryPoolObjectAllocator<Renderer>& GetRenderRendererMemoryPool()
   static MemoryPoolObjectAllocator<Renderer> gRenderRendererMemoryPool;
   return gRenderRendererMemoryPool;
 }
-}
+} // namespace
 
 void Renderer::PrepareCommandBuffer()
 {
@@ -245,7 +245,11 @@ void Renderer::Initialize(Graphics::Controller& graphicsController, ProgramCache
   mPipelineCache        = &pipelineCache;
 }
 
-Renderer::~Renderer() = default;
+Renderer::~Renderer()
+{
+  // Reset old pipeline
+  mPipelineCache->ResetPipeline(mPipeline);
+}
 
 void Renderer::operator delete(void* ptr)
 {
@@ -967,8 +971,13 @@ Graphics::Pipeline& Renderer::PrepareGraphicsPipeline(
 
   queryInfo.GenerateHash();
 
+  // Reset old pipeline
+  mPipelineCache->ResetPipeline(mPipeline);
+
   // Find or generate new pipeline.
   auto pipelineResult = mPipelineCache->GetPipeline(queryInfo, true);
+
+  mPipeline = pipelineResult.level2;
 
   // should be never null?
   return *pipelineResult.pipeline;
