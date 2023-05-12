@@ -153,7 +153,7 @@ int UtcDaliCorePipelineCacheTest(void)
   {
     for(auto& iterLevel1 : iterLevel0.level1nodes)
     {
-      if(iterLevel1.noBlend.pipeline != nullptr)
+      if(!iterLevel1.noBlends.empty() && iterLevel1.noBlends.begin()->pipeline != nullptr)
       {
         noBlendFoundCount++;
       }

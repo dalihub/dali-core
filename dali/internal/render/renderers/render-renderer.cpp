@@ -226,7 +226,8 @@ Renderer::Renderer(SceneGraph::RenderDataProvider* dataProvider,
   mDepthWriteMode(depthWriteMode),
   mDepthTestMode(depthTestMode),
   mPremultipliedAlphaEnabled(preMultipliedAlphaEnabled),
-  mShaderChanged(false)
+  mShaderChanged(false),
+  mPipelineCached(false)
 {
   if(blendingBitmask != 0u)
   {
@@ -248,7 +249,11 @@ void Renderer::Initialize(Graphics::Controller& graphicsController, ProgramCache
 Renderer::~Renderer()
 {
   // Reset old pipeline
-  mPipelineCache->ResetPipeline(mPipeline);
+  if(DALI_LIKELY(mPipelineCached))
+  {
+    mPipelineCache->ResetPipeline(mPipeline);
+    mPipelineCached = false;
+  }
 }
 
 void Renderer::operator delete(void* ptr)
@@ -972,12 +977,17 @@ Graphics::Pipeline& Renderer::PrepareGraphicsPipeline(
   queryInfo.GenerateHash();
 
   // Reset old pipeline
-  mPipelineCache->ResetPipeline(mPipeline);
+  if(DALI_LIKELY(mPipelineCached))
+  {
+    mPipelineCache->ResetPipeline(mPipeline);
+    mPipelineCached = false;
+  }
 
   // Find or generate new pipeline.
   auto pipelineResult = mPipelineCache->GetPipeline(queryInfo, true);
 
-  mPipeline = pipelineResult.level2;
+  mPipeline       = pipelineResult.level2;
+  mPipelineCached = true;
 
   // should be never null?
   return *pipelineResult.pipeline;

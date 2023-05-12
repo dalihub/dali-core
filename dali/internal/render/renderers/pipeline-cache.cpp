@@ -192,11 +192,9 @@ constexpr Graphics::BlendOp ConvertBlendEquation(DevelBlendEquation::Type blendE
 }
 } // namespace
 
-PipelineCacheL0* PipelineCache::GetPipelineCacheL0(std::size_t hash, Program* program, Render::Geometry* geometry)
+PipelineCacheL0Ptr PipelineCache::GetPipelineCacheL0(std::size_t hash, Program* program, Render::Geometry* geometry)
 {
-  auto it = std::find_if(level0nodes.begin(), level0nodes.end(), [hash, program, geometry](PipelineCacheL0& item) {
-    return ((item.hash == hash && item.program == program && item.geometry == geometry));
-  });
+  auto it = std::find_if(level0nodes.begin(), level0nodes.end(), [hash, program, geometry](PipelineCacheL0& item) { return ((item.hash == hash && item.program == program && item.geometry == geometry)); });
 
   // Add new node to cache
   if(it == level0nodes.end())
@@ -249,14 +247,14 @@ PipelineCacheL0* PipelineCache::GetPipelineCacheL0(std::size_t hash, Program* pr
     level0.program    = program;
     level0.geometry   = geometry;
     level0.inputState = vertexInputState;
-    level0nodes.emplace_back(std::move(level0));
-    it = level0nodes.end() - 1;
+
+    it = level0nodes.insert(level0nodes.end(), std::move(level0));
   }
 
-  return &*it;
+  return it;
 }
 
-PipelineCacheL1* PipelineCacheL0::GetPipelineCacheL1(Render::Renderer* renderer, bool usingReflection)
+PipelineCacheL1Ptr PipelineCacheL0::GetPipelineCacheL1(Render::Renderer* renderer, bool usingReflection)
 {
   // hash must be collision free
   uint32_t hash = 0;
@@ -301,11 +299,8 @@ PipelineCacheL1* PipelineCacheL0::GetPipelineCacheL1(Render::Renderer* renderer,
   hash = (topo & 0xffu) | ((cull << 8u) & 0xff00u) | ((uint32_t(poly) << 16u) & 0xff0000u);
 
   // If L1 not found by hash, create rasterization state describing pipeline and store it
-  auto it = std::find_if(level1nodes.begin(), level1nodes.end(), [hash](PipelineCacheL1& item) {
-    return item.hashCode == hash;
-  });
+  auto it = std::find_if(level1nodes.begin(), level1nodes.end(), [hash](PipelineCacheL1& item) { return item.hashCode == hash; });
 
-  PipelineCacheL1* retval = nullptr;
   if(it == level1nodes.end())
   {
     PipelineCacheL1 item;
@@ -314,14 +309,11 @@ PipelineCacheL1* PipelineCacheL0::GetPipelineCacheL1(Render::Renderer* renderer,
     item.rs.frontFace   = Graphics::FrontFace::COUNTER_CLOCKWISE;
     item.rs.polygonMode = poly; // not in use
     item.ia.topology    = geometry->GetTopology();
-    level1nodes.emplace_back(std::move(item));
-    retval = &level1nodes.back();
+
+    it = level1nodes.insert(level1nodes.end(), std::move(item));
   }
-  else
-  {
-    retval = &*it;
-  }
-  return retval;
+
+  return it;
 }
 
 void PipelineCacheL0::ClearUnusedCache()
@@ -339,29 +331,34 @@ void PipelineCacheL0::ClearUnusedCache()
   }
 }
 
-PipelineCacheL2* PipelineCacheL1::GetPipelineCacheL2(bool blend, bool premul, BlendingOptions& blendingOptions)
+PipelineCacheL2Ptr PipelineCacheL1::GetPipelineCacheL2(bool blend, bool premul, BlendingOptions& blendingOptions)
 {
   // early out
   if(!blend)
   {
+    if(DALI_UNLIKELY(noBlends.empty()))
+    {
+      noBlends.emplace_back(PipelineCacheL2{});
+    }
+
+    auto& noBlend = *noBlends.begin();
+
     if(noBlend.pipeline == nullptr)
     {
       // reset all before returning if pipeline has never been created for that case
       noBlend.hash = 0;
       memset(&noBlend.colorBlendState, 0, sizeof(Graphics::ColorBlendState));
     }
-    return &noBlend;
+    return noBlends.begin();
   }
 
   auto bitmask = uint32_t(blendingOptions.GetBitmask());
 
   // Find by bitmask (L2 entries must be sorted by bitmask)
-  auto it = std::find_if(level2nodes.begin(), level2nodes.end(), [bitmask](PipelineCacheL2& item) {
-    return item.hash == bitmask;
-  });
+  auto it = std::find_if(level2nodes.begin(), level2nodes.end(), [bitmask](PipelineCacheL2& item) { return item.hash == bitmask; });
 
   // TODO: find better way of blend constants lookup
-  PipelineCacheL2* retval = nullptr;
+  PipelineCacheL2Ptr retval = level2nodes.end();
   if(it != level2nodes.end())
   {
     bool hasBlendColor = blendingOptions.GetBlendColor();
@@ -370,20 +367,20 @@ PipelineCacheL2* PipelineCacheL1::GetPipelineCacheL2(bool blend, bool premul, Bl
       Vector4 v(it->colorBlendState.blendConstants);
       if(v == *blendingOptions.GetBlendColor())
       {
-        retval = &*it;
+        retval = it;
       }
       ++it;
     }
     if(!hasBlendColor)
     {
-      retval = &*it;
+      retval = it;
     }
   }
 
-  if(!retval)
+  if(retval == level2nodes.end())
   {
     // create new entry and return it with null pipeline
-    PipelineCacheL2 l2;
+    PipelineCacheL2 l2{};
     l2.pipeline           = nullptr;
     auto& colorBlendState = l2.colorBlendState;
     colorBlendState.SetBlendEnable(true);
@@ -414,11 +411,10 @@ PipelineCacheL2* PipelineCacheL1::GetPipelineCacheL2(bool blend, bool premul, Bl
     }
 
     l2.hash = blendingOptions.GetBitmask();
-    level2nodes.emplace_back(std::move(l2));
 
-    std::sort(level2nodes.begin(), level2nodes.end(), [](PipelineCacheL2& lhs, PipelineCacheL2& rhs) {
-      return lhs.hash < rhs.hash;
-    });
+    auto upperBound = std::upper_bound(level2nodes.begin(), level2nodes.end(), l2, [](const PipelineCacheL2& lhs, const PipelineCacheL2& rhs) { return lhs.hash < rhs.hash; });
+
+    level2nodes.insert(upperBound, std::move(l2));
 
     // run same function to retrieve retval
     retval = GetPipelineCacheL2(blend, premul, blendingOptions);
@@ -429,11 +425,6 @@ PipelineCacheL2* PipelineCacheL1::GetPipelineCacheL2(bool blend, bool premul, Bl
 
 bool PipelineCacheL1::ClearUnusedCache()
 {
-  if(noBlend.referenceCount > 0)
-  {
-    return false;
-  }
-
   for(auto iter = level2nodes.begin(); iter != level2nodes.end();)
   {
     if(iter->referenceCount == 0)
@@ -444,6 +435,11 @@ bool PipelineCacheL1::ClearUnusedCache()
     {
       iter++;
     }
+  }
+
+  if(!noBlends.empty() && noBlends.begin()->referenceCount > 0)
+  {
+    return false;
   }
 
   return level2nodes.empty();
@@ -502,9 +498,10 @@ PipelineResult PipelineCache::GetPipeline(const PipelineCacheQueryInfo& queryInf
     return mLatestResult[latestUsedCacheIndex];
   }
 
-  auto* level0 = GetPipelineCacheL0(queryInfo.hash, queryInfo.program, queryInfo.geometry);
-  auto* level1 = level0->GetPipelineCacheL1(queryInfo.renderer, queryInfo.cameraUsingReflection);
-  auto* level2 = level1->GetPipelineCacheL2(queryInfo.blendingEnabled, queryInfo.alphaPremultiplied, *queryInfo.blendingOptions);
+  auto level0 = GetPipelineCacheL0(queryInfo.hash, queryInfo.program, queryInfo.geometry);
+  auto level1 = level0->GetPipelineCacheL1(queryInfo.renderer, queryInfo.cameraUsingReflection);
+
+  PipelineCachePtr level2 = level1->GetPipelineCacheL2(queryInfo.blendingEnabled, queryInfo.alphaPremultiplied, *queryInfo.blendingOptions);
 
   // Create new pipeline at level2 if requested
   if(level2->pipeline == nullptr && createNewIfNotFound)
@@ -573,12 +570,10 @@ void PipelineCache::ClearUnusedCache()
   }
 }
 
-void PipelineCache::ResetPipeline(PipelineCacheL2* pipelineCache)
+void PipelineCache::ResetPipeline(PipelineCachePtr pipelineCache)
 {
-  if(pipelineCache)
-  {
-    pipelineCache->referenceCount--;
-  }
+  // TODO : Can we always assume that pipelineCache input is valid iterator?
+  pipelineCache->referenceCount--;
 }
 
 } // namespace Dali::Internal::Render
