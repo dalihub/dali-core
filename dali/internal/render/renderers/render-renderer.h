@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/list-wrapper.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/vector4.h>
@@ -60,6 +61,9 @@ class PipelineCache;
 class PipelineCacheL2;
 class UniformBufferManager;
 class Renderer;
+
+using PipelineCacheL2Container = std::list<PipelineCacheL2>;
+using PipelineCachePtr         = PipelineCacheL2Container::iterator;
 
 using RendererKey = MemoryPoolKey<Render::Renderer>;
 } //namespace Render
@@ -596,7 +600,7 @@ private:
   std::vector<Graphics::UniformBufferBinding> mUniformBufferBindings{};
 
   Render::PipelineCache* mPipelineCache{nullptr};
-  PipelineCacheL2*       mPipeline{nullptr};
+  PipelineCachePtr       mPipeline{};
 
   using Hash = std::size_t;
 
@@ -641,6 +645,7 @@ private:
   DepthTestMode::Type   mDepthTestMode : 3;             ///< The depth test mode
   bool                  mPremultipliedAlphaEnabled : 1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
   bool                  mShaderChanged : 1;             ///< Flag indicating the shader changed and uniform maps have to be updated
+  bool                  mPipelineCached : 1;            ///< Flag indicating whether renderer cache valid pipeline or not.
 
   std::vector<Dali::DevelRenderer::DrawCommand> mDrawCommands; // Devel stuff
   RenderCallback*                               mRenderCallback{nullptr};
