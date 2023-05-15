@@ -216,11 +216,25 @@ public:
   }
 
   /**
-   * Calculates screen position and size.
+   * @brief Calculate the current position of the actor in screen coordinates using event-side properties.
+   *
+   * @return Returns the screen position of actor
+   */
+  const Vector2 CalculateScreenPosition() const;
+
+  /**
+   * Calculates screen position and size using event-side properties.
    *
    * @return pair of two values, position of top-left corner on screen and size respectively.
    */
   Rect<> CalculateScreenExtents() const;
+
+  /**
+   * Calculates screen position and size from current values.
+   *
+   * @return pair of two values, position of top-left corner on screen and size respectively.
+   */
+  Rect<> CalculateCurrentScreenExtents() const;
 
   /**
    * @copydoc DevelActor::SetNeedGesturePropagation.

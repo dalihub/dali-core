@@ -94,23 +94,46 @@ bool ConvertScreenToLocalRenderTaskList(
   float                 screenY);
 
 /**
+ * Calculate the screen position of the actor from it's transform and anchor point
+ *
+ * This calculates the world transform from scratch using only event
+ * side properties - it does not rely on the update thread to have
+ * already calculated the transform.
+ *
+ * @param[in] actor The actor to calculate the screen position for
+ * @return the screen position
+ */
+const Vector2 CalculateActorScreenPosition(const Actor& actor);
+
+/**
  * Calculate the screen position of the actor from it's node transform and anchor point
  *
  * @param[in] actor The actor to calculate the screen position for
  * @param[in] bufferIndex The current event buffer index
  * @return the screen position
  */
-const Vector2 CalculateActorScreenPosition(const Actor& actor, BufferIndex bufferIndex);
+const Vector2 CalculateCurrentActorScreenPosition(const Actor& actor, BufferIndex bufferIndex);
 
 /**
- * Calculate the screen extents of the actor from its node transform, anchor point and size
+ * Calculate the screen extents of the actor from it's transform, anchor point and size
+ *
+ * This calculates the world transform from scratch using only event
+ * side properties - it does not rely on the update thread to have
+ * already calculated the transform.
  *
  * @param[in] actor The actor
- * @param[in] screenPosition The actor's screen position
+ * @return the screen extents of the actor
+ */
+Rect<> CalculateActorScreenExtents(const Actor& actor);
+
+/**
+ * Calculate the screen extents of the actor from it's node transform, anchor point and size
+ *
+ * @param[in] actor The actor
  * @param[in] bufferIndex The current event buffer index
  * @return the screen extents of the actor
  */
-Rect<> CalculateActorScreenExtents(const Actor& actor, const Vector2& screenPosition, BufferIndex bufferIndex);
+Rect<> CalculateCurrentActorScreenExtents(const Actor& actor, BufferIndex bufferIndex);
 
 /**
  * Convert local coordinates to screen coordinates
@@ -172,14 +195,23 @@ bool ConvertLocalToScreenRenderTaskList(
   float&                screenY);
 
 /**
+ * Calculate the screen position of the actor from it's transform and anchor point.
+ * It will consider rendertasklist.
+ *
+ * @param[in] actor The actor
+ * @return the screen position of the actor consider camera.
+ */
+const Vector2 CalculateActorScreenPositionRenderTaskList(const Actor& actor);
+
+/**
  * Calculate the screen position of the actor from it's node transform and anchor point.
  * It will consider rendertasklist.
  *
  * @param[in] actor The actor
  * @param[in] bufferIndex The current event buffer index
- * @return the screen extents of the actor consider camera.
+ * @return the screen position of the actor consider camera.
  */
-const Vector2 CalculateActorScreenPositionRenderTaskList(const Actor& actor, BufferIndex bufferIndex);
+const Vector2 CalculateCurrentActorScreenPositionRenderTaskList(const Actor& actor, BufferIndex bufferIndex);
 
 /**
  * Convert local coordinates to screen coordinates extent
@@ -215,15 +247,25 @@ bool ConvertLocalToScreenExtentRenderTaskList(
   const Matrix&         worldMatrix,
   const Vector3&        currentSize,
   Rect<>&               screenExtent);
+
 /**
- * Calculate the screen extents of the actor from its node transform, anchor point and size.
+ * Calculate the screen extents of the actor from it's transform, anchor point and size.
+ * It will consider rendertasklist.
+ *
+ * @param[in] actor The actor
+ * @return the screen extents of the actor consider camera.
+ */
+Rect<> CalculateActorScreenExtentsRenderTaskList(const Actor& actor);
+
+/**
+ * Calculate the screen extents of the actor from it's node transform, anchor point and size.
  * It will consider rendertasklist.
  *
  * @param[in] actor The actor
  * @param[in] bufferIndex The current event buffer index
  * @return the screen extents of the actor consider camera.
  */
-Rect<> CalculateActorScreenExtentsRenderTaskList(const Actor& actor, BufferIndex bufferIndex);
+Rect<> CalculateCurrentActorScreenExtentsRenderTaskList(const Actor& actor, BufferIndex bufferIndex);
 
 /**
  * Get the world transform of the actor.

@@ -199,11 +199,38 @@ bool ConvertScreenToLocalRenderTaskList(
   return false;
 };
 
-const Vector2 CalculateActorScreenPosition(const Actor& actor, BufferIndex bufferIndex)
+const Vector2 CalculateActorScreenPosition(const Actor& actor)
 {
-  Scene& scene = actor.GetScene();
+  Vector2 result;
+  Scene&  scene = actor.GetScene();
   if(actor.OnScene())
   {
+    // TODO : Need to find way that we don't increase duplicated code, and did the same job.
+    auto worldTransformMatrix = Dali::Internal::CalculateActorWorldTransform(actor);
+
+    Vector3 worldPosition  = worldTransformMatrix.GetTranslation3();
+    Vector3 cameraPosition = Dali::Internal::CalculateActorWorldTransform(scene.GetDefaultCameraActor()).GetTranslation3();
+    worldPosition -= cameraPosition;
+
+    Vector3 actorSize = actor.GetTargetSize() * worldTransformMatrix.GetScale();
+    auto    sceneSize = scene.GetSize();
+    Vector2 halfSceneSize(sceneSize.width * 0.5f, sceneSize.height * 0.5f); // World position origin is center of scene
+    Vector3 halfActorSize(actorSize * 0.5f);
+    Vector3 anchorPointOffSet = halfActorSize - actorSize * actor.GetAnchorPointForPosition();
+
+    result = Vector2(halfSceneSize.width + worldPosition.x - anchorPointOffSet.x,
+                     halfSceneSize.height + worldPosition.y - anchorPointOffSet.y);
+  }
+  return result;
+}
+
+const Vector2 CalculateCurrentActorScreenPosition(const Actor& actor, BufferIndex bufferIndex)
+{
+  Vector2 result;
+  Scene&  scene = actor.GetScene();
+  if(actor.OnScene())
+  {
+    // TODO : Need to find way that we don't increase duplicated code, and did the same job.
     const auto& node           = actor.GetNode();
     Vector3     worldPosition  = node.GetWorldPosition(bufferIndex);
     Vector3     cameraPosition = scene.GetDefaultCameraActor().GetNode().GetWorldPosition(bufferIndex);
@@ -214,14 +241,31 @@ const Vector2 CalculateActorScreenPosition(const Actor& actor, BufferIndex buffe
     Vector2 halfSceneSize(sceneSize.width * 0.5f, sceneSize.height * 0.5f); // World position origin is center of scene
     Vector3 halfActorSize(actorSize * 0.5f);
     Vector3 anchorPointOffSet = halfActorSize - actorSize * actor.GetAnchorPointForPosition();
-    return Vector2(halfSceneSize.width + worldPosition.x - anchorPointOffSet.x,
-                   halfSceneSize.height + worldPosition.y - anchorPointOffSet.y);
+
+    result = Vector2(halfSceneSize.width + worldPosition.x - anchorPointOffSet.x,
+                     halfSceneSize.height + worldPosition.y - anchorPointOffSet.y);
   }
-  return Vector2::ZERO;
+  return result;
 }
 
-Rect<> CalculateActorScreenExtents(const Actor& actor, const Vector2& screenPosition, BufferIndex bufferIndex)
+Rect<> CalculateActorScreenExtents(const Actor& actor)
 {
+  // TODO : Need to find way that we don't increase duplicated code, and did the same job.
+  const Vector2 screenPosition = CalculateActorScreenPosition(actor);
+
+  auto worldTransformMatrix = Dali::Internal::CalculateActorWorldTransform(actor);
+
+  Vector3 size              = actor.GetTargetSize() * worldTransformMatrix.GetScale();
+  Vector3 anchorPointOffSet = size * actor.GetAnchorPointForPosition();
+  Vector2 position          = Vector2(screenPosition.x - anchorPointOffSet.x, screenPosition.y - anchorPointOffSet.y);
+  return {position.x, position.y, size.x, size.y};
+}
+
+Rect<> CalculateCurrentActorScreenExtents(const Actor& actor, BufferIndex bufferIndex)
+{
+  // TODO : Need to find way that we don't increase duplicated code, and did the same job.
+  const Vector2 screenPosition = CalculateCurrentActorScreenPosition(actor, bufferIndex);
+
   const auto& node              = actor.GetNode();
   Vector3     size              = node.GetSize(bufferIndex) * node.GetWorldScale(bufferIndex);
   Vector3     anchorPointOffSet = size * actor.GetAnchorPointForPosition();
@@ -328,22 +372,35 @@ bool ConvertLocalToScreenRenderTaskList(
   return false;
 }
 
-const Vector2 CalculateActorScreenPositionRenderTaskList(const Actor& actor, BufferIndex bufferIndex)
+const Vector2 CalculateActorScreenPositionRenderTaskList(const Actor& actor)
 {
+  Vector2 result;
   if(actor.OnScene())
   {
+    Scene& scene = actor.GetScene();
+
+    // TODO : Need to find way that we don't increase duplicated code, and did the same job.
+    auto        worldMatrix = Dali::Internal::CalculateActorWorldTransform(actor);
+    const auto& renderTaskList = scene.GetRenderTaskList();
+    ConvertLocalToScreenRenderTaskList(renderTaskList, actor, worldMatrix, actor.GetTargetSize() * (actor.GetAnchorPointForPosition() - Vector3(0.5f, 0.5f, 0.5f)), result.x, result.y);
+  }
+  return result;
+}
+
+const Vector2 CalculateCurrentActorScreenPositionRenderTaskList(const Actor& actor, BufferIndex bufferIndex)
+{
+  Vector2 result;
+  if(actor.OnScene())
+  {
+    // TODO : Need to find way that we don't increase duplicated code, and did the same job.
     const auto& node  = actor.GetNode();
     Scene&      scene = actor.GetScene();
-
-    Vector2 result;
 
     auto        worldMatrix    = node.GetWorldMatrix(bufferIndex);
     const auto& renderTaskList = scene.GetRenderTaskList();
     ConvertLocalToScreenRenderTaskList(renderTaskList, actor, worldMatrix, node.GetSize(bufferIndex) * (actor.GetAnchorPointForPosition() - Vector3(0.5f, 0.5f, 0.5f)), result.x, result.y);
-
-    return result;
   }
-  return Vector2::ZERO;
+  return result;
 }
 
 bool ConvertLocalToScreenExtentRenderTask(
@@ -459,7 +516,22 @@ bool ConvertLocalToScreenExtentRenderTaskList(
   return false;
 }
 
-Rect<> CalculateActorScreenExtentsRenderTaskList(const Actor& actor, BufferIndex bufferIndex)
+Rect<> CalculateActorScreenExtentsRenderTaskList(const Actor& actor)
+{
+  Rect<> result = {0.0f, 0.0f, 0.0f, 0.0f};
+
+  if(actor.OnScene())
+  {
+    Scene& scene = actor.GetScene();
+
+    auto        worldMatrix    = Dali::Internal::CalculateActorWorldTransform(actor);
+    const auto& renderTaskList = scene.GetRenderTaskList();
+    ConvertLocalToScreenExtentRenderTaskList(renderTaskList, actor, worldMatrix, actor.GetTargetSize(), result);
+  }
+  return result;
+}
+
+Rect<> CalculateCurrentActorScreenExtentsRenderTaskList(const Actor& actor, BufferIndex bufferIndex)
 {
   Rect<> result = {0.0f, 0.0f, 0.0f, 0.0f};
 
@@ -669,7 +741,7 @@ Vector4 CalculateActorWorldColor(const Actor& actor)
 
 Quaternion CalculateActorLookAtOrientation(const Actor& actor, Vector3 target, Vector3 up, Vector3 localForward, Vector3 localUp)
 {
-  Vector3 currentWorldPosition = CalculateActorWorldTransform(actor).GetTranslation3();
+  Vector3 currentWorldPosition = Dali::Internal::CalculateActorWorldTransform(actor).GetTranslation3();
 
   Quaternion worldToTarget = GetOrientationFromForwardAndUpVector(target - currentWorldPosition, up);
   Quaternion worldToLocal  = GetOrientationFromForwardAndUpVector(localForward, localUp);
@@ -683,7 +755,7 @@ Quaternion CalculateActorLookAtOrientation(const Actor& actor, Vector3 target, V
     // Get Parent information.
     Vector3       parentPosition, parentScale;
     Quaternion    parentOrientation;
-    const Matrix& parentMatrix = CalculateActorWorldTransform(*actor.GetParent());
+    const Matrix& parentMatrix = Dali::Internal::CalculateActorWorldTransform(*actor.GetParent());
     parentMatrix.GetTransformComponents(parentPosition, parentOrientation, parentScale);
 
     ret = ret / parentOrientation;

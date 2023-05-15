@@ -24,9 +24,24 @@ namespace Dali
 {
 namespace DevelActor
 {
-Rect<> CalculateScreenExtents(Actor actor)
+Vector2 CalculateScreenPosition(Actor actor)
+{
+  return GetImplementation(actor).CalculateScreenPosition();
+}
+
+Rect<> CalculateScreenExtentsAtEvent(Actor actor) ///< TODO : Change API name
 {
   return GetImplementation(actor).CalculateScreenExtents();
+}
+
+Rect<> CalculateScreenExtents(Actor actor) ///< TODO : Remove this API
+{
+  return CalculateCurrentScreenExtents(actor);
+}
+
+Rect<> CalculateCurrentScreenExtents(Actor actor)
+{
+  return GetImplementation(actor).CalculateCurrentScreenExtents();
 }
 
 VisibilityChangedSignalType& VisibilityChangedSignal(Actor actor)
