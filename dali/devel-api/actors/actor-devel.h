@@ -209,12 +209,13 @@ using VisibilityChangedSignalType = Signal<void(Actor, bool, VisibilityChange::T
  * @code
  *   void YourCallbackName( Actor actor, bool visible, VisibilityChange::Type& type );
  * @endcode
- * actor: The actor, or child of actor, whose visibility has changed
- * visible: Whether the actor is now visible or not
+ * actor: The actor, or child of actor, whose visibility has changed.
+ * visible: If type is SELF, then this is true if this actor's VISIBILITY property is true. If Type is PARENT, this is true if a parent's VISIBILITY property has changed to true.
  * type: Whether the actor's visible property has changed or a parent's.
  * @return The signal to connect to
  * @pre The Actor has been initialized.
- * @note This signal is NOT emitted if the actor becomes transparent (or the reverse), it's only linked with Actor::Property::VISIBLE.
+ * @note This signal is NOT emitted if the actor becomes transparent (or the reverse), it's ONLY linked with Actor::Property::VISIBLE.
+ * @note For reference, an actor is only shown if it and it's parents (up to the root actor) are also visible, are not transparent, and this actor has a non-zero size.
  */
 DALI_CORE_API VisibilityChangedSignalType& VisibilityChangedSignal(Actor actor);
 
