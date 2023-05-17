@@ -150,17 +150,13 @@ private:
 
   State mState; ///< Current state of the detector.
 
-  int mMinimumTapsRequired; ///< Minimum number of taps required.
-  int mMaximumTapsRequired; ///< Maximum number of taps required.
-  int mTapsRegistered;      ///< In current detection, the number of taps registered.
-
-  Vector2  mTouchPosition; ///< The initial touch down position.
-  uint32_t mTouchTime;     ///< The initial touch down time.
-  uint32_t mLastTapTime;   ///< Time last tap gesture was registered
-  uint32_t mLastTouchTime; ///< The last touch down time.
-
-  uint32_t mMaximumAllowedTime; ///< The maximum allowed time required to be recognized as a multi tap gesture (millisecond)
-  uint32_t mRecognizerTime;     ///< The recognizer time required to be recognized as a tap gesture (millisecond)
+  Vector2  mTouchPosition;                ///< The initial touch down position.
+  uint32_t mTapsRegistered;               ///< In current detection, the number of taps registered.
+  uint32_t mTouchTime;                    ///< The touch down time.
+  uint32_t mLastTapTime;                  ///< Time last tap gesture was registered
+  uint32_t mDeltaBetweenTouchDownTouchUp; ///< Time from touchdown to touchup
+  uint32_t mMaximumAllowedTime;           ///< The maximum allowed time required to be recognized as a multi tap gesture (millisecond)
+  uint32_t mRecognizerTime;               ///< The recognizer time required to be recognized as a tap gesture (millisecond)
 };
 
 } // namespace Internal

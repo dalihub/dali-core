@@ -201,12 +201,11 @@ DALI_CORE_API void SetLongPressMinimumHoldingTime(unsigned int value);
 /**
  * @brief Sets the maximum allowed time required to be recognized as a multi tap gesture (millisecond)
  *
- * Recognizes how many tap gestures occurred within the maximum allowed time interval.
- * If there are two tap gestures within this time, it is a double tap gesture.
- *
+ * This is the maximum allowable time interval to recognize as multi-tap.
+ * If taps come in within this time, they are recognized as multi-tap.
+  *
  * @note If it's a double tap, it's like this:
- * |<---                                           maximumAllowedTime                                           --->|
- * |(touch down <--recognizerTime--> touch up) <-- maximumAllowedTime --> (touch down <--recognizerTime--> touch up)|
+ * |(touch down <--recognizerTime--> touch up) <--  wihtin maximumAllowedTime --> (touch down <--recognizerTime--> touch up)|
  *
  * @see SetTapRecognizerTime()
  *

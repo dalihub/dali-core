@@ -306,6 +306,11 @@ public: // needed for PanGesture
    */
   const PanGestureProcessor& GetPanGestureProcessor();
 
+  /**
+   * @return the tap gesture processor
+   */
+  const TapGestureProcessor& GetTapGestureProcessor();
+
 private:
   // Undefined
   GestureEventProcessor(const GestureEventProcessor&);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,32 +56,21 @@ SignalConnectorType signalConnector1(mType, SIGNAL_TAP_DETECTED, &TapGestureDete
 
 TapGestureDetectorPtr TapGestureDetector::New()
 {
-  return new TapGestureDetector;
+  return new TapGestureDetector(DEFAULT_TAPS_REQUIRED);
 }
 
-TapGestureDetectorPtr TapGestureDetector::New(unsigned int tapsRequired)
+TapGestureDetectorPtr TapGestureDetector::New(uint32_t tapsRequired)
 {
   return new TapGestureDetector(tapsRequired);
 }
 
-TapGestureDetector::TapGestureDetector()
-: GestureDetector(GestureType::TAP),
-  mMinimumTapsRequired(DEFAULT_TAPS_REQUIRED),
-  mMaximumTapsRequired(DEFAULT_TAPS_REQUIRED),
-  mTouchesRequired(DEFAULT_TOUCHES_REQUIRED),
-  mTimerId(0),
-  mTappedActor(),
-  mTap(),
-  mReceiveAllTapEvents(false)
-{
-}
-
-TapGestureDetector::TapGestureDetector(unsigned int tapsRequired)
+TapGestureDetector::TapGestureDetector(uint32_t tapsRequired)
 : GestureDetector(GestureType::TAP),
   mMinimumTapsRequired(tapsRequired),
   mMaximumTapsRequired(tapsRequired),
   mTouchesRequired(DEFAULT_TOUCHES_REQUIRED),
-  mTimerId(0),
+  mTimerId(0u),
+  mWaitTime(DEFAULT_TAP_WAIT_TIME),
   mTappedActor(),
   mTap(),
   mReceiveAllTapEvents(false)
@@ -97,7 +86,21 @@ TapGestureDetector::~TapGestureDetector()
   }
 }
 
-void TapGestureDetector::SetMinimumTapsRequired(unsigned int taps)
+bool TapGestureDetector::CheckMinMaxTapsRequired()
+{
+  if(mMinimumTapsRequired > mMaximumTapsRequired)
+  {
+    DALI_LOG_ERROR("Minimum taps requested is greater than the maximum requested. minimumTapsRequired(%d) maximumTapsRequired(%d)\n", mMinimumTapsRequired, mMaximumTapsRequired);
+    return false;
+  }
+  else
+  {
+    return true;
+  }
+
+}
+
+void TapGestureDetector::SetMinimumTapsRequired(uint32_t taps)
 {
   if(mMinimumTapsRequired != taps)
   {
@@ -105,12 +108,12 @@ void TapGestureDetector::SetMinimumTapsRequired(unsigned int taps)
 
     if(!mAttachedActors.empty())
     {
-      mGestureEventProcessor.GestureDetectorUpdated(this);
+      CheckMinMaxTapsRequired();
     }
   }
 }
 
-void TapGestureDetector::SetMaximumTapsRequired(unsigned int taps)
+void TapGestureDetector::SetMaximumTapsRequired(uint32_t taps)
 {
   if(mMaximumTapsRequired != taps)
   {
@@ -118,12 +121,12 @@ void TapGestureDetector::SetMaximumTapsRequired(unsigned int taps)
 
     if(!mAttachedActors.empty())
     {
-      mGestureEventProcessor.GestureDetectorUpdated(this);
+      CheckMinMaxTapsRequired();
     }
   }
 }
 
-void TapGestureDetector::SetTouchesRequired(unsigned int touches)
+void TapGestureDetector::SetTouchesRequired(uint32_t touches)
 {
   if(mTouchesRequired != touches)
   {
@@ -136,17 +139,17 @@ void TapGestureDetector::SetTouchesRequired(unsigned int touches)
   }
 }
 
-unsigned int TapGestureDetector::GetMinimumTapsRequired() const
+uint32_t TapGestureDetector::GetMinimumTapsRequired() const
 {
   return mMinimumTapsRequired;
 }
 
-unsigned int TapGestureDetector::GetMaximumTapsRequired() const
+uint32_t TapGestureDetector::GetMaximumTapsRequired() const
 {
   return mMaximumTapsRequired;
 }
 
-unsigned int TapGestureDetector::GetTouchesRequired() const
+uint32_t TapGestureDetector::GetTouchesRequired() const
 {
   return mTouchesRequired;
 }
@@ -158,6 +161,11 @@ void TapGestureDetector::ReceiveAllTapEvents(bool receive)
 
 void TapGestureDetector::EmitTapGestureSignal(Dali::Actor tappedActor, const Dali::TapGesture& tap)
 {
+  if(!CheckMinMaxTapsRequired())
+  {
+    return;
+  }
+
   Dali::Integration::PlatformAbstraction& platformAbstraction = ThreadLocalStorage::Get().GetPlatformAbstraction();
   if(mTimerId != 0)
   {
@@ -165,32 +173,35 @@ void TapGestureDetector::EmitTapGestureSignal(Dali::Actor tappedActor, const Dal
     mTimerId = 0;
   }
 
-  if(mMaximumTapsRequired == 0u)
+  uint32_t numberOfTaps = 0u;
+  if(mMaximumTapsRequired > 0u)
   {
-    return;
-  }
+    numberOfTaps = tap.GetNumberOfTaps() % mMaximumTapsRequired;
+    numberOfTaps = numberOfTaps == 0u ? mMaximumTapsRequired : numberOfTaps;
+    if (numberOfTaps >= mMinimumTapsRequired)
+    {
+      Internal::TapGesturePtr internalTap(new Internal::TapGesture(tap.GetState()));
+      internalTap->SetTime(tap.GetTime());
+      internalTap->SetNumberOfTouches(tap.GetNumberOfTouches());
+      internalTap->SetScreenPoint(tap.GetScreenPoint());
+      internalTap->SetLocalPoint(tap.GetLocalPoint());
+      internalTap->SetSourceType(tap.GetSourceType());
+      internalTap->SetSourceData(tap.GetSourceData());
+      internalTap->SetNumberOfTaps(numberOfTaps);
+      mTap = Dali::TapGesture(internalTap.Get());
+      if(numberOfTaps == mMaximumTapsRequired || mReceiveAllTapEvents)
+      {
+        // Guard against destruction during signal emission
+        Dali::TapGestureDetector handle(this);
 
-  uint32_t                numberOfTaps = tap.GetNumberOfTaps() % mMaximumTapsRequired;
-  Internal::TapGesturePtr internalTap(new Internal::TapGesture(tap.GetState()));
-  internalTap->SetTime(tap.GetTime());
-  internalTap->SetNumberOfTouches(tap.GetNumberOfTouches());
-  internalTap->SetScreenPoint(tap.GetScreenPoint());
-  internalTap->SetLocalPoint(tap.GetLocalPoint());
-  internalTap->SetSourceType(tap.GetSourceType());
-  internalTap->SetSourceData(tap.GetSourceData());
-  internalTap->SetNumberOfTaps(numberOfTaps == 0u ? mMaximumTapsRequired : numberOfTaps);
-  mTap = Dali::TapGesture(internalTap.Get());
-  if(numberOfTaps == 0u || mReceiveAllTapEvents)
-  {
-    // Guard against destruction during signal emission
-    Dali::TapGestureDetector handle(this);
-
-    mDetectedSignal.Emit(tappedActor, mTap);
-  }
-  else
-  {
-    mTappedActor = tappedActor;
-    mTimerId     = platformAbstraction.StartTimer(DEFAULT_TAP_WAIT_TIME, MakeCallback(this, &TapGestureDetector::TimerCallback));
+        mDetectedSignal.Emit(tappedActor, mTap);
+      }
+      else
+      {
+        mTappedActor = tappedActor;
+        mTimerId     = platformAbstraction.StartTimer(mWaitTime, MakeCallback(this, &TapGestureDetector::TimerCallback));
+      }
+    }
   }
 }
 
@@ -225,7 +236,8 @@ bool TapGestureDetector::DoConnectSignal(BaseObject* object, ConnectionTrackerIn
 
 void TapGestureDetector::OnActorAttach(Actor& actor)
 {
-  // Do nothing
+  CheckMinMaxTapsRequired();
+  mWaitTime = mGestureEventProcessor.GetTapGestureProcessor().GetMaximumAllowedTime();
 }
 
 void TapGestureDetector::OnActorDetach(Actor& actor)

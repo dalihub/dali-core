@@ -92,6 +92,13 @@ public: // To be called by GestureEventProcessor
   void SetMaximumAllowedTime(uint32_t time);
 
   /**
+   * @brief This method gets the maximum allowed time (millisecond)
+   *
+   * @return The time value in milliseconds
+   */
+  uint32_t GetMaximumAllowedTime() const;
+
+  /**
    * @brief This method sets the recognizer time required to be recognized as a tap gesture (millisecond)
    *
    * This time is from touch down to touch up to recognize the tap gesture.
@@ -134,8 +141,6 @@ private:
 private:
   TapGestureDetectorContainer mTapGestureDetectors;
 
-  unsigned int mMinTapsRequired;
-  unsigned int mMaxTapsRequired;
   unsigned int mMinTouchesRequired;
   unsigned int mMaxTouchesRequired;
 
