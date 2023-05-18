@@ -40,10 +40,6 @@ TexturePtr Texture::New(NativeImageInterface& nativeImageInterface)
 {
   TexturePtr texture(new Texture(&nativeImageInterface));
   texture->Initialize();
-
-  // Request event processing and update forcely.
-  texture->mEventThreadServices.GetRenderController().RequestProcessEventsOnIdle(true);
-  texture->mEventThreadServices.ForceNextUpdate();
   return texture;
 }
 
@@ -201,10 +197,6 @@ bool Texture::UploadSubPixelData(PixelDataPtr pixelData,
                                    static_cast<uint16_t>(width),
                                    static_cast<uint16_t>(height)};
             UploadTextureMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject, pixelData, params);
-
-            // Request event processing and update forcely
-            mEventThreadServices.GetRenderController().RequestProcessEventsOnIdle(true);
-            mEventThreadServices.ForceNextUpdate();
 
             result = true;
           }

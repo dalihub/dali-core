@@ -189,7 +189,7 @@ uint32_t* MessageQueue::ReserveMessageSlot(uint32_t requestedSize, bool updateSc
   // If we are outside, then we have to request a call to Core::ProcessEvents() on idle.
   if(false == mImpl->processingEvents)
   {
-    mImpl->renderController.RequestProcessEventsOnIdle(false);
+    mImpl->renderController.RequestProcessEventsOnIdle();
   }
 
   return mImpl->currentMessageBuffer->ReserveMessageSlot(requestedSize);
