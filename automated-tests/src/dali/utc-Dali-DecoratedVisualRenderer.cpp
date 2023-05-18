@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -821,8 +821,8 @@ int UtcDaliDecoratedVisualRendererPartialUpdate(void)
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
   actor[Actor::Property::ANCHOR_POINT] = AnchorPoint::TOP_LEFT;
-  actor[Actor::Property::POSITION]     = Vector3(64.0f, 64.0f, 0.0f);
-  actor[Actor::Property::SIZE]         = Vector3(64.0f, 64.0f, 0.0f);
+  actor[Actor::Property::POSITION]     = Vector3(66.0f, 66.0f, 0.0f);
+  actor[Actor::Property::SIZE]         = Vector3(60.0f, 60.0f, 0.0f);
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
@@ -835,7 +835,7 @@ int UtcDaliDecoratedVisualRendererPartialUpdate(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  Rect<int> clippingRect = Rect<int>(64, 672, 80, 80); // in screen coordinates, includes 3 last frames updates
+  Rect<int> clippingRect = Rect<int>(64, 672, 64, 64); // in screen coordinates, includes 3 last frames updates
   DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
@@ -861,15 +861,15 @@ int UtcDaliDecoratedVisualRendererPartialUpdate(void)
   Property::Index index = DecoratedVisualRenderer::Property::BORDERLINE_OFFSET;
   renderer.SetProperty(index, 1.0f);
 
-  // Now current actor show as 128x128 rectangle, with center position (96, 96).
-  // So, rectangle's top left position is (32, 32), and bottom right position is (160, 160).
+  // Now current actor show as 124x124 rectangle, with center position (96, 96).
+  // So, rectangle's top left position is (34, 34), and bottom right position is (158, 158).
 
   application.SendNotification();
   damagedRects.clear();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
   // Aligned by 16
-  DALI_TEST_EQUALS<Rect<int>>(Rect<int>(32, 640, 144, 144), damagedRects[0], TEST_LOCATION);
+  DALI_TEST_EQUALS<Rect<int>>(Rect<int>(32, 640, 128, 128), damagedRects[0], TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
@@ -896,7 +896,7 @@ int UtcDaliDecoratedVisualRendererPartialUpdate(void)
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
   // Aligned by 16
-  DALI_TEST_EQUALS<Rect<int>>(Rect<int>(32, 640, 144, 144), damagedRects[0], TEST_LOCATION);
+  DALI_TEST_EQUALS<Rect<int>>(Rect<int>(32, 640, 128, 128), damagedRects[0], TEST_LOCATION);
 
   application.SendNotification();
   damagedRects.clear();
@@ -973,8 +973,8 @@ int UtcDaliDecoratedVisualRendererPartialUpdate(void)
 
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
   // Aligned by 16
-  // Now current actor show as 96x96 rectangle, with center position (96, 96).
-  DALI_TEST_EQUALS<Rect<int>>(Rect<int>(48, 656, 112, 112), damagedRects[0], TEST_LOCATION);
+  // Now current actor show as 92x92 rectangle, with center position (96, 96).
+  DALI_TEST_EQUALS<Rect<int>>(Rect<int>(48, 656, 96, 96), damagedRects[0], TEST_LOCATION);
 
   application.SendNotification();
   damagedRects.clear();
@@ -1014,8 +1014,8 @@ int UtcDaliDecoratedVisualRendererPartialUpdate(void)
 
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
   // Aligned by 16
-  // Now current actor show as 64x64 rectangle, with center position (96, 96).
-  DALI_TEST_EQUALS<Rect<int>>(Rect<int>(64, 672, 80, 80), damagedRects[0], TEST_LOCATION);
+  // Now current actor show as 60x60 rectangle, with center position (96, 96).
+  DALI_TEST_EQUALS<Rect<int>>(Rect<int>(64, 672, 64, 64), damagedRects[0], TEST_LOCATION);
 
   application.SendNotification();
   damagedRects.clear();
