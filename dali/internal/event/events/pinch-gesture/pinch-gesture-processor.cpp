@@ -264,7 +264,7 @@ void PinchGestureProcessor::AddGestureDetector(PinchGestureDetector* gestureDete
   if(createRecognizer)
   {
     Size size          = scene.GetSize();
-    mGestureRecognizer = new PinchGestureRecognizer(*this, Vector2(size.width, size.height), scene.GetDpi(), mMinimumPinchDistance, mMinimumTouchEventsAfterStart, mMinimumTouchEventsAfterStart);
+    mGestureRecognizer = new PinchGestureRecognizer(*this, Vector2(size.width, size.height), scene.GetDpi(), mMinimumPinchDistance, mMinimumTouchEvents, mMinimumTouchEventsAfterStart);
   }
 }
 
