@@ -603,6 +603,20 @@ DevelRenderer::Rendering::Type Renderer::GetRenderingBehavior() const
   return mRenderingBehavior;
 }
 
+void Renderer::DetachFromNodeDataProvider(const NodeDataProvider& node)
+{
+  // TODO : Can we send this by Resend flag, or message?
+  // Currently, we call DetachFromNodeDataProvider function even if Renderer is destroyed case.
+  // We don't need to call that function if mRenderer is destroyed.
+  //
+  // But also, there is no way to validate node's lifecycle. So just detach synchronously.
+  if(mRenderer)
+  {
+    Render::Renderer* rendererPtr = mRenderer.Get();
+    rendererPtr->DetachFromNodeDataProvider(node);
+  }
+}
+
 // Called when SceneGraph::Renderer is added to update manager ( that happens when an "event-thread renderer" is created )
 void Renderer::ConnectToSceneGraph(SceneController& sceneController, BufferIndex bufferIndex)
 {

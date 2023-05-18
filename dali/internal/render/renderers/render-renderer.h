@@ -503,6 +503,12 @@ public:
    */
   Vector4 GetVisualTransformedUpdateArea(BufferIndex bufferIndex, const Vector4& originalUpdateArea) const noexcept;
 
+  /**
+   * Detach a Renderer from the node provider.
+   * @param[in] node The node data provider to be detached renderer.
+   */
+  void DetachFromNodeDataProvider(const SceneGraph::NodeDataProvider& node);
+
 private:
   struct UniformIndexMap;
 

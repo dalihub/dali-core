@@ -958,6 +958,46 @@ Vector4 Renderer::GetVisualTransformedUpdateArea(BufferIndex bufferIndex, const 
   return mRenderDataProvider->GetVisualTransformedUpdateArea(bufferIndex, originalUpdateArea);
 }
 
+void Renderer::DetachFromNodeDataProvider(const SceneGraph::NodeDataProvider& node)
+{
+  // All nodes without uniformMap will share same UniformIndexMap, contains only render data providers.
+  // It is special case so we don't need to remove index map in this case. Fast out.
+  if(node.GetNodeUniformMap().Count() == 0u)
+  {
+    return;
+  }
+
+  // Remove mNodeIndexMap and mUniformIndexMaps.
+  auto iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [&node](RenderItemLookup& element) { return element.node == &node; });
+
+  if(iter != mNodeIndexMap.end())
+  {
+    // Swap between end of mUniformIndexMaps and removed.
+    auto nodeIndex           = iter->index;
+    auto uniformIndexMapSize = mUniformIndexMaps.size();
+
+    // Remove node index map.
+    mNodeIndexMap.erase(iter);
+
+    if(nodeIndex + 1 != uniformIndexMapSize)
+    {
+      std::swap(mUniformIndexMaps[nodeIndex], mUniformIndexMaps[uniformIndexMapSize - 1u]);
+      // Change node index map.
+      for(auto&& renderItemLookup : mNodeIndexMap)
+      {
+        if(renderItemLookup.index == uniformIndexMapSize - 1u)
+        {
+          renderItemLookup.index = nodeIndex;
+          break;
+        }
+      }
+    }
+
+    // Remove uniform index maps.
+    mUniformIndexMaps.pop_back();
+  }
+}
+
 Graphics::Pipeline& Renderer::PrepareGraphicsPipeline(
   Program&                                             program,
   const Dali::Internal::SceneGraph::RenderInstruction& instruction,

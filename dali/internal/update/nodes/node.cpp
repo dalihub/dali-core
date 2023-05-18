@@ -244,6 +244,8 @@ void Node::RemoveRenderer(const RendererKey& renderer)
   {
     if(mRenderers[i] == renderer)
     {
+      renderer->DetachFromNodeDataProvider(*this);
+
       SetUpdated(true);
       mRenderers.Erase(mRenderers.Begin() + i);
       return;

@@ -69,6 +69,12 @@ public:
   void Remove(const SceneGraph::Node& node, uint32_t index);
 
   /**
+   * Remove all renderers
+   * @param[in] node The node to remove these renderer's scene graph object from
+   */
+  void RemoveAll(const SceneGraph::Node& node);
+
+  /**
    * Return the number of renderers
    * @return the number of renderers
    */

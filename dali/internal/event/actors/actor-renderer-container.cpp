@@ -62,6 +62,15 @@ void RendererContainer::Remove(const SceneGraph::Node& node, uint32_t index)
   }
 }
 
+void RendererContainer::RemoveAll(const SceneGraph::Node& node)
+{
+  for(auto&& renderer : mRenderers)
+  {
+    DetachRendererMessage(mEventThreadServices, node, renderer->GetRendererSceneObject());
+  }
+  mRenderers.clear();
+}
+
 uint32_t RendererContainer::GetCount() const
 {
   return static_cast<uint32_t>(mRenderers.size());
