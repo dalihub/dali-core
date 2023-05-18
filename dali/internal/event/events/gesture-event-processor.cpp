@@ -187,7 +187,7 @@ void GestureEventProcessor::SetGestureProperties(const Dali::Gesture& gesture)
   if(mPanGestureProcessor.SetPanGestureProperties(pan))
   {
     // We may not be updating so we need to ask the render controller for an update.
-    mRenderController.RequestUpdate(false);
+    mRenderController.RequestUpdate();
   }
 }
 

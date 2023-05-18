@@ -203,7 +203,7 @@ void RelayoutController::RequestRelayout(Dali::Actor& actor, Dimension::Type dim
 
   if(!mProcessingCoreEvents)
   {
-    mRenderController.RequestProcessEventsOnIdle(false);
+    mRenderController.RequestProcessEventsOnIdle();
   }
 }
 

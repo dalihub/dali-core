@@ -103,18 +103,6 @@ public:
   virtual BufferIndex GetEventBufferIndex() const = 0;
 
   /**
-   * @brief Indicate that the next rendering is really required.
-   */
-  virtual void ForceNextUpdate() = 0;
-
-  /**
-   * @brief Check if the next rendering is really required.
-   *
-   * @return true if the next rendering is really required.
-   */
-  virtual bool IsNextUpdateForced() = 0;
-
-  /**
    * @return true if core is still running and we can send messages
    * @note It returns false if it is called from a thread other than the main thread.
    */

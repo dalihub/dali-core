@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_RENDER_CONTROLLER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,14 +41,14 @@ public:
    * Multi-threading note: this method will be called from the main thread only.
    * @param[in] forceUpdate true to update forcely.
    */
-  virtual void RequestUpdate(bool forceUpdate) = 0;
+  virtual void RequestUpdate() = 0;
 
   /**
    * Requests a future call to Dali::Integration::Core::ProcessEvents(), when the application is idle.
    * Multi-threading note: this method will be called from the main thread only.
    * @param[in] forceProcess true to process events forcely.
    */
-  virtual void RequestProcessEventsOnIdle(bool forceProcess) = 0;
+  virtual void RequestProcessEventsOnIdle() = 0;
 };
 
 } // namespace Integration
