@@ -137,13 +137,16 @@ Vector4 AnimatableVisualProperties::GetVisualTransformedUpdateArea(BufferIndex u
       const float borderlineOffset = decoratedVisualProperties->mBorderlineOffset.Get(updateBufferIndex);
       const float blurRadius       = decoratedVisualProperties->mBlurRadius.Get(updateBufferIndex);
 
+      // Extra padding information for anti-alias
+      const float extraPadding = 2.0f;
+
       DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "borderline width  %5.3f\n", borderlineWidth);
       DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "borderline offset %5.3f\n", borderlineOffset);
       DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "blur radius       %5.3f\n", blurRadius);
 
       // D coefficients be used only decoratedVisual.
       // It can be calculated parallely with visual transform.
-      decoratedCoefficient.coefD = std::max((1.0f + Dali::Clamp(borderlineOffset, -1.0f, 1.0f)) * borderlineWidth, 2.0f * blurRadius);
+      decoratedCoefficient.coefD = std::max((1.0f + Dali::Clamp(borderlineOffset, -1.0f, 1.0f)) * borderlineWidth, 2.0f * blurRadius) + extraPadding;
     }
 
     // Update coefD so we can use this value out of this scope.
