@@ -617,12 +617,30 @@ bool HitTestRenderTaskList(const Vector2&    sceneSize,
   const auto&                                           exclusives = taskList.GetExclusivesList();
   RayTest                                               rayTest;
 
+  std::vector<std::pair<Dali::Actor, Results>> hitResults;
   // Hit test order should be reverse of draw order
   for(RenderTaskList::RenderTaskContainer::reverse_iterator iter = tasks.rbegin(); endIter != iter; ++iter)
   {
     RenderTask& renderTask = *iter->Get();
     if(HitTestRenderTask(exclusives, sceneSize, layers, renderTask, screenCoordinates, results, hitCheck, rayTest))
     {
+      if(renderTask.GetFrameBuffer())
+      {
+        Results result = results;
+        hitResults.push_back(std::make_pair(renderTask.GetScreenToFrameBufferMappingActor(), result));
+        continue;
+      }
+      else
+      {
+        for(auto && pair : hitResults)
+        {
+          if(pair.first == results.actor)
+          {
+            results = pair.second;
+            break;
+          }
+        }
+      }
       // Return true when an actor is hit (or layer in our render-task consumes the hit)
       return true;
     }
