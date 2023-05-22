@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -463,10 +463,10 @@ bool HitTestRenderTask(const RenderTaskList::ExclusivesContainer& exclusives,
     Actor* sourceActor(renderTask.GetSourceActor());
     if(sourceActor)
     {
-      Dali::Layer layer(sourceActor->GetLayer());
-      if(layer)
+      Dali::Layer sourceLayer(sourceActor->GetLayer());
+      if(sourceLayer)
       {
-        const uint32_t sourceActorDepth(layer.GetProperty<bool>(Dali::Layer::Property::DEPTH));
+        const uint32_t sourceActorDepth(sourceLayer.GetProperty<bool>(Dali::Layer::Property::DEPTH));
 
         CameraActor* cameraActor     = renderTask.GetCameraActor();
         bool         pickingPossible = cameraActor->BuildPickingRay(
@@ -533,7 +533,8 @@ bool HitTestRenderTask(const RenderTaskList::ExclusivesContainer& exclusives,
             // If this layer is set to consume the hit, then do not check any layers behind it
             if(hitCheck.DoesLayerConsumeHit(layer))
             {
-              layerConsumesHit = true;
+              // Consume the hit if this layer is same as SourceActor's layer
+              layerConsumesHit = (sourceLayer == Dali::Layer(layer));
               break;
             }
           }
@@ -583,7 +584,7 @@ bool HitTestRenderTaskList(const Vector2&    sceneSize,
   // Hit test order should be reverse of draw order
   for(RenderTaskList::RenderTaskContainer::reverse_iterator iter = tasks.rbegin(); endIter != iter; ++iter)
   {
-    RenderTask& renderTask            = *iter->Get();
+    RenderTask& renderTask = *iter->Get();
     if(HitTestRenderTask(exclusives, sceneSize, layers, renderTask, screenCoordinates, results, hitCheck, rayTest))
     {
       // Return true when an actor is hit (or layer in our render-task consumes the hit)
