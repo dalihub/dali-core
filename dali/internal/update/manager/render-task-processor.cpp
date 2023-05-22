@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -156,7 +156,8 @@ bool AddRenderablesForTask(BufferIndex updateBufferIndex,
       // If we do not have any renderers, create one to house the scissor operation.
       if(count == 0u)
       {
-        layer->colorRenderables.PushBack(Renderable(&node, RendererKey{}));
+        RenderableContainer& target = (inheritedDrawMode == DrawMode::NORMAL) ? layer->colorRenderables : layer->overlayRenderables;
+        target.PushBack(Renderable(&node, RendererKey{}));
       }
     }
     else
