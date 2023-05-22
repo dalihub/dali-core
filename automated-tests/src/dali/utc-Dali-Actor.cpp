@@ -345,6 +345,52 @@ void DirtyRectChecker(const std::vector<Rect<int>>& damagedRects, std::multiset<
   DALI_TEST_EQUALS(expectedRectList.empty(), true, testLocation);
 }
 
+// Clipping test helper functions:
+Actor CreateActorWithContent(uint32_t width, uint32_t height)
+{
+  Texture image = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  Actor   actor = CreateRenderableActor(image);
+
+  // Setup dimensions and position so actor is not skipped by culling.
+  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(width, height));
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+
+  return actor;
+}
+
+Actor CreateActorWithContent16x16()
+{
+  return CreateActorWithContent(16, 16);
+}
+
+void GenerateTrace(TestApplication& application, TraceCallStack& enabledDisableTrace, TraceCallStack& callTrace)
+{
+  enabledDisableTrace.Reset();
+  callTrace.Reset();
+  enabledDisableTrace.Enable(true);
+  callTrace.Enable(true);
+
+  application.SendNotification();
+  application.Render();
+
+  enabledDisableTrace.Enable(false);
+  callTrace.Enable(false);
+}
+
+void CheckColorMask(TestGlAbstraction& glAbstraction, bool maskValue)
+{
+  const TestGlAbstraction::ColorMaskParams& colorMaskParams = glAbstraction.GetColorMaskParams();
+
+  DALI_TEST_EQUALS<bool>(colorMaskParams.red, maskValue, TEST_LOCATION);
+  DALI_TEST_EQUALS<bool>(colorMaskParams.green, maskValue, TEST_LOCATION);
+  DALI_TEST_EQUALS<bool>(colorMaskParams.blue, maskValue, TEST_LOCATION);
+
+  // @todo only test alpha if the framebuffer has an alpha channel
+  //DALI_TEST_EQUALS<bool>(colorMaskParams.alpha, maskValue, TEST_LOCATION);
+}
+
 } // anonymous namespace
 
 //& purpose: Testing New API
@@ -3437,6 +3483,95 @@ int UtcDaliActorSetDrawModeOverlayRender(void)
   END_TEST;
 }
 
+int UtcDaliActorSetDrawModeOverlayWithClipping(void)
+{
+  TestApplication application;
+  tet_infoline(" UtcDaliActorSetDrawModeOverlayWithClipping");
+
+  TestGlAbstraction& glAbstraction       = application.GetGlAbstraction();
+  TraceCallStack&    scissorTrace        = glAbstraction.GetScissorTrace();
+  TraceCallStack&    enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
+
+  const Vector2 surfaceSize(TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+  const Vector2 imageSize(16.0f, 16.0f);
+
+  std::vector<GLuint> ids;
+  ids.push_back(8);  // first rendered actor
+  ids.push_back(9);  // second rendered actor
+  ids.push_back(10); // third rendered actor
+  ids.push_back(11); // forth rendered actor
+  application.GetGlAbstraction().SetNextTextureIds(ids);
+
+  Actor a = CreateActorWithContent16x16();
+  Actor b = CreateActorWithContent16x16();
+  Actor c = CreateActorWithContent16x16();
+  Actor d = CreateActorWithContent16x16();
+
+  application.SendNotification();
+  application.Render();
+
+  //Textures are bound when first created. Clear bound textures vector
+  application.GetGlAbstraction().ClearBoundTextures();
+
+  b[Actor::Property::PARENT_ORIGIN] = ParentOrigin::BOTTOM_LEFT;
+  b[Actor::Property::ANCHOR_POINT]  = AnchorPoint::BOTTOM_LEFT;
+  b[Actor::Property::DRAW_MODE]     = DrawMode::OVERLAY_2D;
+  b[Actor::Property::CLIPPING_MODE] = ClippingMode::CLIP_TO_BOUNDING_BOX;
+
+  c[Actor::Property::PARENT_ORIGIN] = ParentOrigin::BOTTOM_LEFT;
+  c[Actor::Property::ANCHOR_POINT]  = AnchorPoint::BOTTOM_LEFT;
+  c[Actor::Property::CLIPPING_MODE] = ClippingMode::CLIP_TO_BOUNDING_BOX;
+  c[Actor::Property::POSITION]      = Vector2(100.0f, -100.0f);
+
+  application.GetScene().Add(a);
+  application.GetScene().Add(b);
+  application.GetScene().Add(c);
+  b.Add(d);
+
+  GenerateTrace(application, enabledDisableTrace, scissorTrace);
+
+  const std::vector<GLuint>&             boundTextures = application.GetGlAbstraction().GetBoundTextures(GL_TEXTURE0);
+  typedef std::vector<GLuint>::size_type TextureSize;
+  DALI_TEST_EQUALS(boundTextures.size(), static_cast<TextureSize>(4), TEST_LOCATION);
+  if(boundTextures.size() == 4)
+  {
+    DALI_TEST_CHECK(boundTextures[0] == 8u);
+    DALI_TEST_CHECK(boundTextures[1] == 10u);
+    DALI_TEST_CHECK(boundTextures[2] == 9u);
+    DALI_TEST_CHECK(boundTextures[3] == 11u);
+  }
+
+  // Check scissor test was enabled.
+  std::ostringstream scissor;
+  scissor << std::hex << GL_SCISSOR_TEST;
+  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Enable", scissor.str()));
+
+  // Check the scissor was set, and the coordinates are correct.
+  DALI_TEST_CHECK(scissorTrace.TestMethodAndParams(0, "Scissor", "100, 100, 16, 16")); // First compare with c area
+  DALI_TEST_CHECK(scissorTrace.TestMethodAndParams(1, "Scissor", "0, 0, 16, 16"));     // Second compare with b area
+
+  application.GetGlAbstraction().ClearBoundTextures();
+
+  // Remove a Renderer of overlay actor
+  Renderer renderer = b.GetRendererAt(0);
+  b.RemoveRenderer(renderer);
+
+  GenerateTrace(application, enabledDisableTrace, scissorTrace);
+
+  DALI_TEST_EQUALS(boundTextures.size(), static_cast<TextureSize>(3), TEST_LOCATION);
+  if(boundTextures.size() == 3)
+  {
+    DALI_TEST_CHECK(boundTextures[0] == 8u);
+    DALI_TEST_CHECK(boundTextures[1] == 10u);
+    DALI_TEST_CHECK(boundTextures[2] == 11u);
+  }
+
+  DALI_TEST_CHECK(scissorTrace.TestMethodAndParams(0, "Scissor", "100, 100, 16, 16")); // First compare with c area
+  DALI_TEST_CHECK(scissorTrace.TestMethodAndParams(1, "Scissor", "0, 0, 16, 16"));     // Second compare with b area
+
+  END_TEST;
+}
+
 int UtcDaliActorGetCurrentWorldMatrix(void)
 {
   TestApplication application;
@@ -4521,8 +4656,8 @@ int UtcDaliActorRemoveRendererP3(void)
   DALI_TEST_EQUALS(actor2.GetRendererCount(), 0u, TEST_LOCATION);
   DALI_TEST_EQUALS(actor3.GetRendererCount(), 0u, TEST_LOCATION);
 
-  Geometry geometry = CreateQuadGeometry();
-  Shader   shader   = CreateShader();
+  Geometry geometry  = CreateQuadGeometry();
+  Shader   shader    = CreateShader();
   Renderer renderer1 = Renderer::New(geometry, shader);
   Renderer renderer2 = Renderer::New(geometry, shader);
 
@@ -4586,52 +4721,6 @@ int UtcDaliActorRemoveRendererN(void)
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
 
   END_TEST;
-}
-
-// Clipping test helper functions:
-Actor CreateActorWithContent(uint32_t width, uint32_t height)
-{
-  Texture image = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
-  Actor   actor = CreateRenderableActor(image);
-
-  // Setup dimensions and position so actor is not skipped by culling.
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
-  actor.SetProperty(Actor::Property::SIZE, Vector2(width, height));
-  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
-
-  return actor;
-}
-
-Actor CreateActorWithContent16x16()
-{
-  return CreateActorWithContent(16, 16);
-}
-
-void GenerateTrace(TestApplication& application, TraceCallStack& enabledDisableTrace, TraceCallStack& stencilTrace)
-{
-  enabledDisableTrace.Reset();
-  stencilTrace.Reset();
-  enabledDisableTrace.Enable(true);
-  stencilTrace.Enable(true);
-
-  application.SendNotification();
-  application.Render();
-
-  enabledDisableTrace.Enable(false);
-  stencilTrace.Enable(false);
-}
-
-void CheckColorMask(TestGlAbstraction& glAbstraction, bool maskValue)
-{
-  const TestGlAbstraction::ColorMaskParams& colorMaskParams = glAbstraction.GetColorMaskParams();
-
-  DALI_TEST_EQUALS<bool>(colorMaskParams.red, maskValue, TEST_LOCATION);
-  DALI_TEST_EQUALS<bool>(colorMaskParams.green, maskValue, TEST_LOCATION);
-  DALI_TEST_EQUALS<bool>(colorMaskParams.blue, maskValue, TEST_LOCATION);
-
-  // @todo only test alpha if the framebuffer has an alpha channel
-  //DALI_TEST_EQUALS<bool>(colorMaskParams.alpha, maskValue, TEST_LOCATION);
 }
 
 int UtcDaliActorPropertyClippingP(void)
