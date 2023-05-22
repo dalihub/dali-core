@@ -313,4 +313,14 @@ Vector2 Animation::GetPlayRange() const
   return GetImplementation(*this).GetPlayRange();
 }
 
+void Animation::SetBlendPoint(float blendPoint)
+{
+  GetImplementation(*this).SetBlendPoint(blendPoint);
+}
+
+float Animation::GetBlendPoint() const
+{
+  return GetImplementation(*this).GetBlendPoint();
+}
+
 } // namespace Dali

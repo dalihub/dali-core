@@ -483,6 +483,12 @@ public:
    * @param[in] divisor The instance divisor. 0 to turn instancing off.
    */
   void SetVertexBufferDivisor(Render::VertexBuffer* vertexBuffer, uint32_t divisor);
+  /**
+   * Sets vertex buffer update callback
+   * @param[in] vertexBuffer
+   * @param[in] callback
+   */
+  void SetVertexBufferUpdateCallback(Render::VertexBuffer* vertexBuffer, Dali::VertexBufferUpdateCallback* callback);
 
   /**
    * Adds a geometry to the RenderManager
@@ -1281,6 +1287,18 @@ inline void SetVertexBufferDivisorMessage(UpdateManager& manager, Render::Vertex
   using LocalType = MessageValue2<UpdateManager, Render::VertexBuffer*, uint32_t>;
   uint32_t* slot  = manager.ReserveMessageSlot(sizeof(LocalType));
   new(slot) LocalType(&manager, &UpdateManager::SetVertexBufferDivisor, &vertexBuffer, divisor);
+}
+
+inline void SetVertexBufferUpdateCallback(UpdateManager& manager, Render::VertexBuffer& vertexBuffer, Dali::VertexBufferUpdateCallback* callback)
+{
+  // Message has ownership of VertexBuffer data while in transit from event -> update
+  using LocalType = MessageValue2<UpdateManager, Render::VertexBuffer*, Dali::VertexBufferUpdateCallback*>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new(slot) LocalType(&manager, &UpdateManager::SetVertexBufferUpdateCallback, &vertexBuffer, callback);
 }
 
 inline void AddGeometry(UpdateManager& manager, OwnerPointer<Render::Geometry>& geometry)

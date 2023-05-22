@@ -127,7 +127,8 @@ void Geometry::Upload(Graphics::Controller& graphicsController)
       {
         if(mIndexBuffer == nullptr)
         {
-          mIndexBuffer = new GpuBuffer(graphicsController, 0 | Graphics::BufferUsage::INDEX_BUFFER);
+          // Currently we are unable to reuse index buffer so the write policy is to preserve current content
+          mIndexBuffer = new GpuBuffer(graphicsController, 0 | Graphics::BufferUsage::INDEX_BUFFER, GpuBuffer::WritePolicy::RETAIN);
         }
 
         uint32_t bufferSize = static_cast<uint32_t>(sizeof(uint16_t) * mIndices.Size());
@@ -178,7 +179,7 @@ bool Geometry::BindVertexAttributes(Graphics::CommandBuffer& commandBuffer)
     }
     //@todo Figure out why this is being drawn without geometry having been uploaded
   }
-  if(buffers.empty())
+  if(buffers.empty() || buffers.size() != vertexBufferCount)
   {
     return false;
   }
@@ -232,13 +233,32 @@ bool Geometry::Draw(
     // Un-indexed draw call
     uint32_t numVertices(0u);
 
-    if(mVertexBuffers.Count() > 0)
+    // Use element buffer count for drawing arrays (needs changing API, for workaround)
+    if(elementBufferCount)
+    {
+      numVertices = elementBufferCount;
+    }
+    else if(mVertexBuffers.Count() > 0)
     {
       // truncated, no value loss happening in practice
-      numVertices = static_cast<uint32_t>(mVertexBuffers[0]->GetElementCount());
+      numVertices = static_cast<uint32_t>(mVertexBuffers[0]->GetRenderableElementCount());
     }
-
-    commandBuffer.Draw(numVertices, mInstanceCount, 0, 0);
+    // In case we have more buffers, we select buffer with less elements to render
+    // TODO: we may eventually support wrapping around buffers????
+    else if(mVertexBuffers.Count() > 1)
+    {
+      auto elementsCount = mVertexBuffers[0]->GetRenderableElementCount();
+      for(auto& vertexBuffer : mVertexBuffers)
+      {
+        elementsCount = std::min(elementsCount, vertexBuffer->GetRenderableElementCount());
+      }
+      numVertices = elementsCount;
+    }
+    // Issue draw call only if there's non-zero numVertices
+    if(numVertices)
+    {
+      commandBuffer.Draw(numVertices, mInstanceCount, 0, 0);
+    }
   }
   return true;
 }

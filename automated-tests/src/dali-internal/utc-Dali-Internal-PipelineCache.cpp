@@ -148,18 +148,22 @@ int UtcDaliCorePipelineCacheTest(void)
   application.Render();
 
   // Test whether noBlend pipeline is set in cache
-  uint32_t noBlendFoundCount = 0u;
-  for(auto& iterLevel0 : gPipelineCache->level0nodes)
-  {
-    for(auto& iterLevel1 : iterLevel0.level1nodes)
-    {
-      if(iterLevel1.noBlend.pipeline != nullptr)
-      {
-        noBlendFoundCount++;
-      }
-    }
-  }
-  DALI_TEST_EQUALS(noBlendFoundCount, 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS((gPipelineCache->level0nodes.size() == 2), true, TEST_LOCATION);
+  DALI_TEST_CHECK(!gPipelineCache->level0nodes.front().level1nodes.front().noBlends.empty());
+  DALI_TEST_EQUALS(gPipelineCache->level0nodes.front().level1nodes.front().noBlends.front().pipeline != nullptr, true, TEST_LOCATION);
+
+  // Remove renderer to test whether old pipeline is removed
+  application.GetScene().Remove(actor1);
+  actor1.RemoveRenderer(renderer1);
+  renderer1.Reset();
+
+  // Make the frame count of the pipeline cache large to clean cache
+  gPipelineCache->mFrameCount = 1000;
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gPipelineCache->level0nodes.size(), 1, TEST_LOCATION);
 
   END_TEST;
 }

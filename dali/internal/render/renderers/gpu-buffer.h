@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDERERS_GPU_BUFFER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@
 
 namespace Dali
 {
+class VertexBufferUpdateCallback;
+
 namespace Internal
 {
 /**
@@ -39,11 +41,30 @@ class GpuBuffer
 {
 public:
   /**
+   * When writing into the buffer, the WritePolicy
+   * determines whether the current content would be preserved
+   * or discarded.
+   *
+   * RETAIN - buffer content is retained
+   *
+   * DISCARD - buffer content is discarded. In this case, writing into
+   *           a part of buffer will result with undefined content outside
+   *           the specified area. The client should rewrite whole area
+   *           in order to have coherent and valid data.
+   */
+  enum class WritePolicy
+  {
+    RETAIN, ///< Buffer content is preserved
+    DISCARD ///< Buffer content is invalidated and discarded
+  };
+
+  /**
    * constructor
    * @param[in] graphicsController the graphics controller
    * @param[in] usage The type of buffer
+   * @param[in] writePolicy The buffer data write policy to be used, default is WritePolicy::RETAIN
    */
-  GpuBuffer(Graphics::Controller& graphicsController, Graphics::BufferUsageFlags usage);
+  GpuBuffer(Graphics::Controller& graphicsController, Graphics::BufferUsageFlags usage, GpuBuffer::WritePolicy writePolicy);
 
   /**
    * Destructor, non virtual as no virtual methods or inheritance
@@ -51,7 +72,6 @@ public:
   ~GpuBuffer() = default;
 
   /**
-   *
    * Creates or updates a buffer object and binds it to the target.
    * @param graphicsController The graphics controller
    * @param size Specifies the size in bytes of the buffer object's new data store.
@@ -60,8 +80,19 @@ public:
   void UpdateDataBuffer(Graphics::Controller& graphicsController, uint32_t size, const void* data);
 
   /**
+   * Updates existing buffer by calling associated VertexBufferUpdateCallback
+   *
+   * bytesUpdatedCount limits next draw call to that amount of data.
+   *
+   * @param[in] graphicsController Valid controller
+   * @param[in] callback  Valid pointer to the VertexBufferUpdateCallback
+   * @param[out] bytesUpdatedCount Number of bytes updated
+   */
+  void UpdateDataBufferWithCallback(Graphics::Controller& graphicsController, Dali::VertexBufferUpdateCallback* callback, uint32_t& bytesUpdatedCount);
+
+  /**
    * Get the size of the buffer
-   * @return size
+   * @return size Size of the buffer in bytes
    */
   [[nodiscard]] uint32_t GetBufferSize() const
   {
@@ -83,6 +114,7 @@ private:
   uint32_t                              mCapacity{0}; ///< buffer capacity
   uint32_t                              mSize{0};     ///< buffer size
   Graphics::BufferUsageFlags            mUsage;
+  WritePolicy                           mWritePolicy{WritePolicy::RETAIN}; ///< data write policy for the buffer
 };
 
 } // namespace Internal

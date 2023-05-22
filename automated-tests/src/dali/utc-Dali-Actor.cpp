@@ -4494,6 +4494,76 @@ int UtcDaliActorRemoveRendererP2(void)
   END_TEST;
 }
 
+int UtcDaliActorRemoveRendererP3(void)
+{
+  tet_infoline("Testing Actor::RemoveRenderer");
+  TestApplication application;
+
+  Actor actor1 = Actor::New();
+  Actor actor2 = Actor::New();
+  Actor actor3 = Actor::New();
+
+  application.GetScene().Add(actor1);
+  application.GetScene().Add(actor2);
+  application.GetScene().Add(actor3);
+
+  // Make each actors size bigger than zero, so we can assuem that actor is rendered
+  actor1.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+  actor2.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+  actor3.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+
+  // Register some dummy property to seperate actor1 and actor2 in Render::Renderer
+  actor1.RegisterProperty("dummy1", 1);
+  actor2.RegisterProperty("dummy2", 2.0f);
+  actor3.RegisterProperty("dummy3", Vector2(3.0f, 4.0f));
+
+  DALI_TEST_EQUALS(actor1.GetRendererCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor2.GetRendererCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor3.GetRendererCount(), 0u, TEST_LOCATION);
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader   shader   = CreateShader();
+  Renderer renderer1 = Renderer::New(geometry, shader);
+  Renderer renderer2 = Renderer::New(geometry, shader);
+
+  actor1.AddRenderer(renderer1);
+  actor1.AddRenderer(renderer2);
+  actor2.AddRenderer(renderer1);
+  actor2.AddRenderer(renderer2);
+  actor3.AddRenderer(renderer1);
+  actor3.AddRenderer(renderer2);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor1.GetRendererCount(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor1.GetRendererAt(0), renderer1, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor1.GetRendererAt(1), renderer2, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(actor2.GetRendererCount(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor2.GetRendererAt(0), renderer1, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor2.GetRendererAt(1), renderer2, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(actor3.GetRendererCount(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor3.GetRendererAt(0), renderer1, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor3.GetRendererAt(1), renderer2, TEST_LOCATION);
+
+  actor1.RemoveRenderer(0);
+  actor2.RemoveRenderer(1);
+  actor3.RemoveRenderer(0);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor1.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor1.GetRendererAt(0), renderer2, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor2.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor2.GetRendererAt(0), renderer1, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor3.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor3.GetRendererAt(0), renderer2, TEST_LOCATION);
+
+  // Shut down whilst holding onto the renderer handle.
+  END_TEST;
+}
+
 int UtcDaliActorRemoveRendererN(void)
 {
   tet_infoline("Testing Actor::RemoveRenderer");

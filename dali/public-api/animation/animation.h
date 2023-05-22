@@ -125,7 +125,7 @@ class DALI_CORE_API Animation : public BaseHandle
 public:
   using AnimationSignalType = Signal<void(Animation&)>; ///< Animation finished signal type @SINCE_1_0.0
 
-  using AnyFunction = Any; ///< Interpolation function @SINCE_1_0.0
+  using AnyFunction = Any;                              ///< Interpolation function @SINCE_1_0.0
 
   /**
    * @brief Enumeration for what to do when the animation ends, is stopped, or is destroyed.
@@ -384,11 +384,11 @@ public:
   void SetCurrentProgress(float progress);
 
   /**
-  * @brief Retrieves the current progress of the animation.
-  *
-  * @SINCE_1_0.0
-  * @return The current progress as a normalized value between [0,1]
-  */
+   * @brief Retrieves the current progress of the animation.
+   *
+   * @SINCE_1_0.0
+   * @return The current progress as a normalized value between [0,1]
+   */
   float GetCurrentProgress();
 
   /**
@@ -430,6 +430,26 @@ public:
    * @return The play range defined for the animation
    */
   Vector2 GetPlayRange() const;
+
+  /**
+   * @brief Sets the blend point to interpolate animate property
+   *
+   * @SINCE_2_2.26
+   * @param[in] blendPoint A value between [0,1], If the value of the keyframe whose progress is 0 is different from the current value,
+   * the property is animated as it smoothly blends until the progress reaches the blendPoint.
+   * @note The blend point only affects animation registered with AnimateBetween. Other animations operate the same as when Play() is called.
+   * And the blend point needs to be set before this animation plays. If the blend point changes after playback, animation continuity cannot be guaranteed.
+   * @note In the case of a looping animation, the animation is blended only in the first loop.
+   */
+  void SetBlendPoint(float blendPoint);
+
+  /**
+   * @brief Gets the Blend Point
+   *
+   * @SINCE_2_2.26
+   * @return The blend point to interpolate animate property
+   */
+  float GetBlendPoint() const;
 
   /**
    * @brief Play the animation.

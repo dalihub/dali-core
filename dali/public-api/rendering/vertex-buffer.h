@@ -39,6 +39,69 @@ class VertexBuffer;
 }
 
 /**
+ * @class VertexBufferUpdateCallback
+ *
+ * The class defines a callback that VertexBuffer object may call
+ * to obtain new data. The callback runs before draw call is issued
+ * and it will run on update/render thread (developers must synchronize
+ * explicitly).
+ *
+ * Callback returns number of bytes written. This will limit next draw call
+ * to number of elements that have been written by the callback.
+ *
+ * Using callback invalidates current vertex buffer data. Unchanged data
+ * stays undefined.
+ */
+class DALI_CORE_API VertexBufferUpdateCallback
+{
+public:
+  /**
+   * @brief Destructor
+   */
+  ~VertexBufferUpdateCallback();
+
+  /**
+   * @brief Callback functor signature:
+   *
+   * uint32_t T::*(void* pointer, size_t dataSizeInBytes)
+   */
+  template<class T>
+  using FuncType = uint32_t (T::*)(void*, size_t);
+
+  /**
+   * @brief Creates a new instance of VertexBufferUpdateCallback
+   *
+   * @tparam T class the functor is a member of
+   * @param[in] object Object associated with callback
+   * @param[in] functor Member function to be executed
+   *
+   * @return Returns valid VertexBufferUpdateCallback object
+   */
+  template<class T>
+  static std::unique_ptr<VertexBufferUpdateCallback> New(T* object, FuncType<T> functor)
+  {
+    auto callback = Dali::MakeCallback(object, functor);
+    return New(callback);
+  }
+
+  /**
+   * @brief Invokes callback directly
+   * @param[in] data pointer to write into
+   * @param[in] size size of region in bytes
+   *
+   * @return Number of bytes written
+   */
+  uint32_t Invoke(void* data, size_t size);
+
+private:
+  static std::unique_ptr<VertexBufferUpdateCallback> New(CallbackBase* callbackBase);
+
+  struct Impl;
+  explicit VertexBufferUpdateCallback(std::unique_ptr<VertexBufferUpdateCallback::Impl>&& impl);
+  std::unique_ptr<Impl> mImpl;
+};
+
+/**
  * @brief VertexBuffer is a handle to an object that contains a buffer of structured data.
  *
  * VertexBuffers can be used to provide data to Geometry objects.
@@ -191,6 +254,18 @@ public:
    * @return either 0 (not instanced), or > 0 (instanced)
    */
   uint32_t GetDivisor() const;
+
+  /**
+   * @brief Sets VertexBufferUpdateCallback
+   *
+   * Function takes over the ownership over the callback.
+   *
+   * Developers must make sure the lifetime of used objects within the callback
+   * will remain valid as long as the callback exists.
+   *
+   * @param[in] updateCallback Valid VertexBufferUpdateCallback object
+   */
+  void SetVertexBufferUpdateCallback(std::unique_ptr<VertexBufferUpdateCallback>&& updateCallback);
 
 public:
   /**

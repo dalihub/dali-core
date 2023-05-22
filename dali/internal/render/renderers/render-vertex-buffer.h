@@ -28,6 +28,7 @@
 
 namespace Dali
 {
+class VertexBufferUpdateCallback;
 namespace Internal
 {
 namespace Render
@@ -79,6 +80,16 @@ public:
    * @param[in] size The new size of the buffer
    */
   void SetData(Dali::Vector<uint8_t>* data, uint32_t size);
+
+  /**
+   * @brief Sets vertex buffer update callback
+   *
+   * This function takes ownership over the callback object.
+   *
+   * The callback will run during rendering on the update/render thread.
+   * @param[in] callback Valid update callback
+   */
+  void SetVertexBufferUpdateCallback(Dali::VertexBufferUpdateCallback* callback);
 
   /**
    * Perform the upload of the buffer only when required
@@ -147,6 +158,16 @@ public:
     return mSize;
   }
 
+  /**
+   * Retrieves number of renderable elements when vertex update callback
+   * is used. If there is no callback set the total number of elements
+   * is returned.
+   */
+  [[nodiscard]] inline uint32_t GetRenderableElementCount() const
+  {
+    return mVertexBufferUpdateCallback ? mElementCount : mSize;
+  }
+
   [[nodiscard]] inline const VertexBuffer::Format* GetFormat() const
   {
     return mFormat.Get();
@@ -162,9 +183,12 @@ private:
   OwnerPointer<Dali::Vector<uint8_t> > mData;      ///< Data
   OwnerPointer<GpuBuffer>              mGpuBuffer; ///< Pointer to the GpuBuffer associated with this RenderVertexBuffer
 
-  uint32_t mSize;        ///< Number of Elements in the buffer
-  uint32_t mDivisor{0};  ///< The divisor (0:not instanced, >=1:instanced)
-  bool     mDataChanged; ///< Flag to know if data has changed in a frame
+  uint32_t                                          mSize;         ///< Number of Elements in the buffer
+  uint32_t                                          mDivisor{0};   ///< The divisor (0:not instanced, >=1:instanced)
+  uint32_t                                          mElementCount; ///< Number of valid elements in the buffer
+  std::unique_ptr<Dali::VertexBufferUpdateCallback> mVertexBufferUpdateCallback;
+
+  bool mDataChanged; ///< Flag to know if data has changed in a frame
 };
 
 } // namespace Render

@@ -22,9 +22,7 @@
 #include <dali/graphics-api/graphics-pipeline.h>
 #include <dali/graphics-api/graphics-types.h>
 #include <dali/internal/common/blending-options.h>
-
-// EXTERNAL INCLUDES
-#include <vector>
+#include <dali/public-api/common/list-wrapper.h>
 
 namespace Dali::Internal
 {
@@ -34,14 +32,27 @@ namespace Render
 class Renderer;
 class Geometry;
 
+struct PipelineCacheL2;
+struct PipelineCacheL1;
+struct PipelineCacheL0;
+using PipelineCacheL2Container = std::list<PipelineCacheL2>;
+using PipelineCacheL1Container = std::list<PipelineCacheL1>;
+using PipelineCacheL0Container = std::list<PipelineCacheL0>;
+using PipelineCacheL2Ptr       = PipelineCacheL2Container::iterator;
+using PipelineCacheL1Ptr       = PipelineCacheL1Container::iterator;
+using PipelineCacheL0Ptr       = PipelineCacheL0Container::iterator;
+
+using PipelineCachePtr = PipelineCacheL2Ptr;
+
 /**
  * Cache Level 2 : Last level of cache, stores actual pipeline
  */
 struct PipelineCacheL2
 {
   uint32_t                                hash{};
-  Graphics::ColorBlendState               colorBlendState;
-  Graphics::UniquePtr<Graphics::Pipeline> pipeline;
+  uint32_t                                referenceCount{0u};
+  Graphics::ColorBlendState               colorBlendState{};
+  Graphics::UniquePtr<Graphics::Pipeline> pipeline{};
 };
 
 /**
@@ -49,14 +60,19 @@ struct PipelineCacheL2
  */
 struct PipelineCacheL1
 {
-  PipelineCacheL2* GetPipelineCacheL2(bool blend, bool premul, BlendingOptions& blendingOptions);
+  PipelineCacheL2Ptr GetPipelineCacheL2(bool blend, bool premul, BlendingOptions& blendingOptions);
+
+  /**
+   * @brief Clear unused caches.
+   */
+  bool ClearUnusedCache();
 
   uint32_t                     hashCode{}; // 1byte cull, 1byte poly, 1byte frontface
   Graphics::RasterizationState rs{};
   Graphics::InputAssemblyState ia{};
 
-  PipelineCacheL2              noBlend; // special case
-  std::vector<PipelineCacheL2> level2nodes;
+  PipelineCacheL2Container noBlends; // special case
+  PipelineCacheL2Container level2nodes;
 };
 
 /**
@@ -64,14 +80,18 @@ struct PipelineCacheL1
  */
 struct PipelineCacheL0 // L0 cache
 {
-  PipelineCacheL1* GetPipelineCacheL1(Render::Renderer* renderer, bool usingReflection);
+  PipelineCacheL1Ptr GetPipelineCacheL1(Render::Renderer* renderer, bool usingReflection);
 
-  std::size_t                hash{};
+  /**
+   * @brief Clear unused caches.
+   */
+  void ClearUnusedCache();
+
   Geometry*                  geometry{};
   Program*                   program{};
   Graphics::VertexInputState inputState;
 
-  std::vector<PipelineCacheL1> level1nodes;
+  PipelineCacheL1Container level1nodes;
 };
 
 struct PipelineCacheQueryInfo
@@ -104,10 +124,7 @@ struct PipelineCacheQueryInfo
 struct PipelineResult
 {
   Graphics::Pipeline* pipeline;
-
-  PipelineCacheL0* level0;
-  PipelineCacheL1* level1;
-  PipelineCacheL2* level2;
+  PipelineCachePtr    level2;
 };
 
 /**
@@ -125,7 +142,7 @@ public:
   /**
    * Retrieves next cache level
    */
-  PipelineCacheL0* GetPipelineCacheL0(std::size_t hash, Program* program, Render::Geometry* geometry);
+  PipelineCacheL0Ptr GetPipelineCacheL0(Program* program, Render::Geometry* geometry);
 
   /**
    * Retrieves pipeline matching queryInfo struct
@@ -146,6 +163,18 @@ public:
   bool ReuseLatestBoundPipeline(const int latestUsedCacheIndex, const PipelineCacheQueryInfo& queryInfo) const;
 
   /**
+   * @brief This is called before rendering every frame.
+   */
+  void PreRender();
+
+  /**
+   * @brief Decrease the reference count of the pipeline cache.
+   * @param pipelineCache The pipeline cache to decrease the reference count
+   */
+  void ResetPipeline(PipelineCachePtr pipelineCache);
+
+private:
+  /**
    * @brief Clear latest bound result.
    */
   void CleanLatestUsedCache()
@@ -155,14 +184,21 @@ public:
     mLatestResult[1].pipeline = nullptr;
   }
 
+  /**
+   * @brief Clear unused caches.
+   */
+  void ClearUnusedCache();
+
 private:
-  Graphics::Controller*        graphicsController{nullptr};
-  std::vector<PipelineCacheL0> level0nodes;
+  Graphics::Controller*    graphicsController{nullptr};
+  PipelineCacheL0Container level0nodes;
 
   // Cache latest queries whether blend enabled or not.
   // (Since most UI case (like Text and Image) enable blend, and most 3D case disable blend.)
   PipelineCacheQueryInfo mLatestQuery[2];  ///< Latest requested query info. It will be invalidate after query's renderer / geometry / blendingOptions value changed.
   PipelineResult         mLatestResult[2]; ///< Latest used result. It will be invalidate when we call CleanLatestUsedCache() or some cache changed.
+
+  uint32_t mFrameCount{0u};
 };
 
 } // namespace Render

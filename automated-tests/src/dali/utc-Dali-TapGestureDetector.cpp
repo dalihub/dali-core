@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -136,6 +136,21 @@ Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector
   point.SetDeviceId(4);
   point.SetScreenPosition(screenPosition);
   point.SetDeviceClass(Device::Class::TOUCH);
+  point.SetDeviceSubclass(Device::Subclass::NONE);
+  point.SetMouseButton(static_cast<MouseButton::Type>(source));
+  touchEvent.points.push_back(point);
+  touchEvent.time = time;
+  return touchEvent;
+}
+
+Integration::TouchEvent GenerateSingleMouse(PointState::Type state, const Vector2& screenPosition, int source, uint32_t time)
+{
+  Integration::TouchEvent touchEvent;
+  Integration::Point      point;
+  point.SetState(state);
+  point.SetDeviceId(4);
+  point.SetScreenPosition(screenPosition);
+  point.SetDeviceClass(Device::Class::MOUSE);
   point.SetDeviceSubclass(Device::Subclass::NONE);
   point.SetMouseButton(static_cast<MouseButton::Type>(source));
   touchEvent.points.push_back(point);
@@ -1056,7 +1071,7 @@ int UtcDaliTapGestureWhenGesturePropargation(void)
   END_TEST;
 }
 
-int UtcDaliTapGestureGetSourceType(void)
+int UtcDaliTapGestureGetSourceTypeWithMouse(void)
 {
   TestApplication application;
 
@@ -1077,8 +1092,8 @@ int UtcDaliTapGestureGetSourceType(void)
   detector.DetectedSignal().Connect(&application, functor);
 
   // Emit a down signal with MouseButton
-  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 1, 100));
-  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 1, 120));
+  application.ProcessEvent(GenerateSingleMouse(PointState::DOWN, Vector2(20.0f, 20.0f), 1, 100));
+  application.ProcessEvent(GenerateSingleMouse(PointState::UP, Vector2(20.0f, 20.0f), 1, 120));
   application.SendNotification();
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
@@ -1088,8 +1103,8 @@ int UtcDaliTapGestureGetSourceType(void)
   data.Reset();
 
   // Emit a down signal with MouseButton
-  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 3, 1300));
-  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 3, 1320));
+  application.ProcessEvent(GenerateSingleMouse(PointState::DOWN, Vector2(20.0f, 20.0f), 3, 1300));
+  application.ProcessEvent(GenerateSingleMouse(PointState::UP, Vector2(20.0f, 20.0f), 3, 1320));
   application.SendNotification();
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
@@ -1099,13 +1114,46 @@ int UtcDaliTapGestureGetSourceType(void)
   data.Reset();
 
   // Emit a down signal with MouseButton
-  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 2, 1900));
-  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 2, 1920));
+  application.ProcessEvent(GenerateSingleMouse(PointState::DOWN, Vector2(20.0f, 20.0f), 2, 1900));
+  application.ProcessEvent(GenerateSingleMouse(PointState::UP, Vector2(20.0f, 20.0f), 2, 1920));
   application.SendNotification();
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(data.receivedGesture.GetSourceType(), GestureSourceType::MOUSE, TEST_LOCATION);
   DALI_TEST_EQUALS(data.receivedGesture.GetSourceData(), GestureSourceData::MOUSE_TERTIARY, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTapGestureGetSourceTypeWithTouch(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+
+  TapGestureDetector detector = TapGestureDetector::New();
+  detector.Attach(actor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  // Emit a down signal with touch
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 1, 100));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 1, 120));
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetSourceType(), GestureSourceType::TOUCH, TEST_LOCATION);
+
+  data.Reset();
 
   END_TEST;
 }

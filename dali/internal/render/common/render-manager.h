@@ -207,6 +207,13 @@ public:
   void SetVertexBufferData(Render::VertexBuffer* vertexBuffer, OwnerPointer<Vector<uint8_t>>& data, uint32_t size);
 
   /**
+   * Sets vertex buffer update callback
+   * @param vertexBuffer
+   * @param callback
+   */
+  void SetVertexBufferUpdateCallback(Render::VertexBuffer* vertexBuffer, Dali::VertexBufferUpdateCallback* callback);
+
+  /**
    * Sets the data for the index buffer of an existing geometry
    * @param[in] geometry The geometry
    * @param[in] data A vector containing the indices

@@ -128,6 +128,7 @@ struct RenderManager::Impl
   ~Impl()
   {
     threadPool.reset(nullptr); // reset now to maintain correct destruction order
+    rendererContainer.Clear(); // clear now before the pipeline cache is deleted
   }
 
   void AddRenderTracker(Render::RenderTracker* renderTracker)
@@ -383,6 +384,11 @@ void RenderManager::SetVertexBufferData(Render::VertexBuffer* vertexBuffer, Owne
   vertexBuffer->SetData(data.Release(), size);
 }
 
+void RenderManager::SetVertexBufferUpdateCallback(Render::VertexBuffer* vertexBuffer, Dali::VertexBufferUpdateCallback* callback)
+{
+  vertexBuffer->SetVertexBufferUpdateCallback(callback);
+}
+
 void RenderManager::SetIndexBuffer(Render::Geometry* geometry, Render::Geometry::Uint16ContainerType& indices)
 {
   geometry->SetIndexBuffer(indices);
@@ -463,8 +469,8 @@ void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear
     }
   }
 
-  // Clean latest used pipeline
-  mImpl->pipelineCache->CleanLatestUsedCache();
+  // Reset pipeline cache before rendering
+  mImpl->pipelineCache->PreRender();
 
   mImpl->commandBufferSubmitted = false;
 }

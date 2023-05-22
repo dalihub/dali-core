@@ -67,6 +67,7 @@ namespace Internal
 {
 namespace SceneGraph
 {
+class NodeDataProvider;
 using RendererContainer = Dali::Vector<RendererKey>;
 using RendererIter      = RendererContainer::Iterator;
 using RendererConstIter = RendererContainer::ConstIterator;
@@ -413,6 +414,12 @@ public:
    * @param[in] bufferIndex The current buffer index - used for sending messages to render thread
    */
   void DisconnectFromSceneGraph(SceneController& sceneController, BufferIndex bufferIndex);
+
+  /**
+   * Detached from the scene graph object.
+   * @param[in] node node who detach this renderer.
+   */
+  void DetachFromNodeDataProvider(const NodeDataProvider& node);
 
   /**
    * @copydoc RenderDataProvider::GetUniformMapDataProvider()

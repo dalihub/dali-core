@@ -42,7 +42,7 @@ namespace Internal
 template<typename PropertyType>
 class AnimatorConnector : public AnimatorConnectorBase
 {
-  using AnimatorFunction = std::function<PropertyType(float, const PropertyType&)>;
+  using AnimatorFunction = std::function<PropertyType(float, float, const PropertyType&)>;
 
   AnimatorFunction mAnimatorFunction;
 
@@ -150,7 +150,7 @@ private:
 template<>
 class AnimatorConnector<float> : public AnimatorConnectorBase
 {
-  using AnimatorFunction = std::function<float(float, const float&)>;
+  using AnimatorFunction = std::function<float(float, float, const float&)>;
 
   AnimatorFunction mAnimatorFunction;
 

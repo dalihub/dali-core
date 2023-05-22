@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -9230,6 +9230,44 @@ int UtcDaliAnimationKeyFramesGetKeyFrameP(void)
   END_TEST;
 }
 
+int UtcDaliAnimationKeyFramesSetKeyFrameP(void)
+{
+  TestApplication application;
+
+  float   inputTime  = 0.6f;
+  Vector4 inputValue = Vector4(0.0f, 0.0f, 0.0f, 0.3f);
+
+  KeyFrames keyFrames = KeyFrames::New();
+  keyFrames.Add(0.0f, Vector4(0.0f, 0.0f, 0.0f, 0.6f));
+  keyFrames.Add(inputTime, inputValue);
+  keyFrames.Add(1.0f, Vector4(0.0f, 0.0f, 0.0f, 0.8f));
+
+  float           outputTime;
+  Property::Value outputValue;
+
+  DevelKeyFrames::GetKeyFrame(keyFrames, 3, outputTime, outputValue);
+
+  DALI_TEST_EQUALS(outputValue.GetType(), Property::Type::NONE, TEST_LOCATION);
+
+  DevelKeyFrames::GetKeyFrame(keyFrames, 1, outputTime, outputValue);
+
+  DALI_TEST_EQUALS(outputTime, inputTime, TEST_LOCATION);
+  DALI_TEST_EQUALS(outputValue.GetType(), Property::Type::VECTOR4, TEST_LOCATION);
+  DALI_TEST_EQUALS(outputValue.Get<Vector4>(), inputValue, TEST_LOCATION);
+
+  Vector4 newValue = Vector4(1.0f, 0.2f, 0.6f, 0.9f);
+
+  DevelKeyFrames::SetKeyFrameValue(keyFrames, 1, newValue);
+
+  DevelKeyFrames::GetKeyFrame(keyFrames, 1, outputTime, outputValue);
+
+  DALI_TEST_EQUALS(outputTime, inputTime, TEST_LOCATION);
+  DALI_TEST_EQUALS(outputValue.GetType(), Property::Type::VECTOR4, TEST_LOCATION);
+  DALI_TEST_EQUALS(outputValue.Get<Vector4>(), newValue, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliAnimationAnimateBetweenActorColorAlphaP(void)
 {
   TestApplication application;
@@ -14881,5 +14919,436 @@ int UtcDaliKeyFramesGetTypeNegative(void)
   {
     DALI_TEST_CHECK(true); // We expect an assert
   }
+  END_TEST;
+}
+
+int UtcDaliAnimationSetGetBlendPoint(void)
+{
+  TestApplication application;
+
+
+  Animation animation = Animation::New(1.0f);
+  DALI_TEST_EQUALS(animation.GetBlendPoint(), 0.0f, 0.01f, TEST_LOCATION);
+
+  animation.SetBlendPoint(0.5f);
+
+  DALI_TEST_EQUALS(animation.GetBlendPoint(), 0.5f, 0.01f, TEST_LOCATION);
+
+  animation.SetBlendPoint(-0.5f);
+
+  DALI_TEST_EQUALS(animation.GetBlendPoint(), 0.5f, 0.01f, TEST_LOCATION);
+
+  animation.SetBlendPoint(1.5f);
+
+  DALI_TEST_EQUALS(animation.GetBlendPoint(), 0.5f, 0.01f, TEST_LOCATION);
+
+  animation.SetBlendPoint(0.7f);
+
+  DALI_TEST_EQUALS(animation.GetBlendPoint(), 0.7f, 0.01f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimationPlayBlendFloatCubic(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+  Property::Index index = actor.RegisterProperty("property", 0.0f);
+
+  Animation animation = Animation::New(1.0f);
+  KeyFrames keyframes = KeyFrames::New();
+  keyframes.Add(0.0f, 3.0f);
+  keyframes.Add(0.4f, 1.0f);
+  keyframes.Add(0.6f, 1.0f);
+  keyframes.Add(1.0f, 3.0f);
+  animation.AnimateBetween(Property(actor, index), keyframes, AlphaFunction::LINEAR, Animation::Interpolation::CUBIC);
+
+  application.SendNotification();
+  application.Render(20);
+
+  animation.SetBlendPoint(0.5f);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(250);
+
+  float value = actor.GetCurrentProperty<float>(index);
+  DALI_TEST_EQUALS(value, 0.989258f, 0.05f, TEST_LOCATION); // original value : 1.603516 (Same value as when progress is 0.75.)
+                                                            // current value : 0.0f
+                                                            // value when progress is 0.5 : 0.75
+
+  application.SendNotification();
+  application.Render(250);
+
+  value = actor.GetCurrentProperty<float>(index);
+  DALI_TEST_EQUALS(value, 0.750000f, 0.05f, TEST_LOCATION); // value is less than 1.0f
+
+  application.SendNotification();
+  application.Render(250);
+
+  value = actor.GetCurrentProperty<float>(index);
+  DALI_TEST_EQUALS(value, 1.603516f, 0.05f, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(250);
+
+  value = actor.GetCurrentProperty<float>(index);
+  DALI_TEST_EQUALS(value, 3.0f, 0.05f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimationPlayBlendFloat1(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+  Property::Index index = actor.RegisterProperty("property", 0.0f);
+
+  Animation animation = Animation::New(1.0f);
+  KeyFrames keyframes = KeyFrames::New();
+  keyframes.Add(0.0f, 1.0f);
+  keyframes.Add(0.2f, 2.0f);
+  keyframes.Add(0.4f, 3.0f);
+  keyframes.Add(0.6f, 4.0f);
+  keyframes.Add(0.8f, 5.0f);
+  keyframes.Add(1.0f, 6.0f);
+  animation.AnimateBetween(Property(actor, index), keyframes, AlphaFunction::LINEAR);
+
+  application.SendNotification();
+  application.Render(20);
+
+  animation.SetBlendPoint(0.9f);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(250);
+
+  float value = actor.GetCurrentProperty<float>(index);
+  DALI_TEST_EQUALS(value, 1.728395f, 0.05f, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(250);
+
+  value = actor.GetCurrentProperty<float>(index);
+  DALI_TEST_EQUALS(value, 3.302469f, 0.05f, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(250);
+
+  value = actor.GetCurrentProperty<float>(index);
+  DALI_TEST_EQUALS(value, 4.722222f, 0.05f, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(250);
+
+  value = actor.GetCurrentProperty<float>(index);
+  DALI_TEST_EQUALS(value, 6.0f, 0.05f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimationPlayBlendFloat2(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+  Property::Index index = actor.RegisterProperty("property", 0.0f);
+
+  Animation animation = Animation::New(1.0f);
+  KeyFrames keyframes = KeyFrames::New();
+  keyframes.Add(0.0f, 0.0f);
+  keyframes.Add(1.0f, 1.0f);
+  animation.AnimateBetween(Property(actor, index), keyframes, AlphaFunction::LINEAR);
+
+  application.SendNotification();
+  application.Render(20);
+
+  animation.SetBlendPoint(0.5f);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(250);
+
+  float value = actor.GetCurrentProperty<float>(index);
+  DALI_TEST_EQUALS(value, 0.25f, 0.05f, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(250);
+
+  value = actor.GetCurrentProperty<float>(index);
+  DALI_TEST_EQUALS(value, 0.5f, 0.05f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimationPlayBlendFloat3(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+  Property::Index index = actor.RegisterProperty("property", 0.0f);
+
+  Animation animation = Animation::New(1.0f);
+  KeyFrames keyframes = KeyFrames::New();
+  keyframes.Add(0.0f, 1.0f);
+  keyframes.Add(1.0f, 2.0f);
+  animation.AnimateBetween(Property(actor, index), keyframes, AlphaFunction::LINEAR);
+
+  application.SendNotification();
+  application.Render(20);
+
+  animation.SetBlendPoint(0.5f);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(250);
+
+  float value = actor.GetCurrentProperty<float>(index);
+  DALI_TEST_EQUALS(value, 1.0f, 0.05f, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(250);
+
+  value = actor.GetCurrentProperty<float>(index);
+  DALI_TEST_EQUALS(value, 1.5f, 0.05f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimationPlayBlendFloat4(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+  Property::Index index = actor.RegisterProperty("property", 0.0f);
+
+  Animation animation = Animation::New(1.0f);
+  KeyFrames keyframes = KeyFrames::New();
+  keyframes.Add(0.0f, 1.0f);
+  keyframes.Add(1.0f, 2.0f);
+  animation.AnimateBetween(Property(actor, index), keyframes, AlphaFunction::LINEAR);
+
+  application.SendNotification();
+  application.Render(20);
+
+  animation.SetBlendPoint(0.5f);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(250);
+
+  float value = actor.GetCurrentProperty<float>(index);
+  DALI_TEST_EQUALS(value, 1.0f, 0.05f, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(250);
+
+  value = actor.GetCurrentProperty<float>(index);
+  DALI_TEST_EQUALS(value, 1.5f, 0.05f, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(550);
+
+  actor.SetProperty(index, 0.0f);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(250);
+
+  value = actor.GetCurrentProperty<float>(index);
+  DALI_TEST_EQUALS(value, 1.0f, 0.05f, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(250);
+
+  value = actor.GetCurrentProperty<float>(index);
+  DALI_TEST_EQUALS(value, 1.5f, 0.05f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimationPlayBlendInt(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+  Property::Index index = actor.RegisterProperty("property", 0);
+
+  Animation animation = Animation::New(1.0f);
+  KeyFrames keyframes = KeyFrames::New();
+  keyframes.Add(0.0f, 100);
+  keyframes.Add(1.0f, 200);
+  animation.AnimateBetween(Property(actor, index), keyframes, AlphaFunction::LINEAR);
+
+  application.SendNotification();
+  application.Render(20);
+
+  animation.SetBlendPoint(0.5f);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(250);
+
+  int32_t value = actor.GetCurrentProperty<int32_t>(index);
+  DALI_TEST_EQUALS(value, 100, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(250);
+
+  value = actor.GetCurrentProperty<int32_t>(index);
+  DALI_TEST_EQUALS(value, 150, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimationPlayBlendVector2(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+  Property::Index index = actor.RegisterProperty("property", Vector2::ZERO);
+
+  Animation animation = Animation::New(1.0f);
+  KeyFrames keyframes = KeyFrames::New();
+  keyframes.Add(0.0f, Vector2::ONE);
+  keyframes.Add(1.0f, Vector2::ONE * 2.0f);
+  animation.AnimateBetween(Property(actor, index), keyframes, AlphaFunction::LINEAR);
+
+  application.SendNotification();
+  application.Render(20);
+
+  animation.SetBlendPoint(0.5f);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(250);
+
+  Vector2 value = actor.GetCurrentProperty<Vector2>(index);
+  DALI_TEST_EQUALS(value, Vector2::ONE, 0.05f, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(250);
+
+  value = actor.GetCurrentProperty<Vector2>(index);
+  DALI_TEST_EQUALS(value, Vector2::ONE * 1.5f, 0.05f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimationPlayBlendVector3(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+  Property::Index index = actor.RegisterProperty("property", Vector3::ZERO);
+
+  Animation animation = Animation::New(1.0f);
+  KeyFrames keyframes = KeyFrames::New();
+  keyframes.Add(0.0f, Vector3::ONE);
+  keyframes.Add(1.0f, Vector3::ONE * 2.0f);
+  animation.AnimateBetween(Property(actor, index), keyframes, AlphaFunction::LINEAR);
+
+  application.SendNotification();
+  application.Render(20);
+
+  animation.SetBlendPoint(0.5f);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(250);
+
+  Vector3 value = actor.GetCurrentProperty<Vector3>(index);
+  DALI_TEST_EQUALS(value, Vector3::ONE, 0.05f, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(250);
+
+  value = actor.GetCurrentProperty<Vector3>(index);
+  DALI_TEST_EQUALS(value, Vector3::ONE * 1.5f, 0.05f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimationPlayBlendVector4(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+  Property::Index index = actor.RegisterProperty("property", Vector4::ZERO);
+
+  Animation animation = Animation::New(1.0f);
+  KeyFrames keyframes = KeyFrames::New();
+  keyframes.Add(0.0f, Vector4::ONE);
+  keyframes.Add(1.0f, Vector4::ONE * 2.0f);
+  animation.AnimateBetween(Property(actor, index), keyframes, AlphaFunction::LINEAR);
+
+  application.SendNotification();
+  application.Render(20);
+
+  animation.SetBlendPoint(0.5f);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(250);
+
+  Vector4 value = actor.GetCurrentProperty<Vector4>(index);
+  DALI_TEST_EQUALS(value, Vector4::ONE, 0.05f, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(250);
+
+  value = actor.GetCurrentProperty<Vector4>(index);
+  DALI_TEST_EQUALS(value, Vector4::ONE * 1.5f, 0.05f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimationPlayBlendQuaternion(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+  Property::Index index = actor.RegisterProperty("property", Quaternion(Dali::Radian(0.0f), Vector3::ZAXIS));
+
+  Animation animation = Animation::New(1.0f);
+  KeyFrames keyframes = KeyFrames::New();
+  keyframes.Add(0.0f, Quaternion(Dali::Radian(1.0f), Vector3::ZAXIS));
+  keyframes.Add(1.0f, Quaternion(Dali::Radian(2.0f), Vector3::ZAXIS));
+  animation.AnimateBetween(Property(actor, index), keyframes, AlphaFunction::LINEAR);
+
+  application.SendNotification();
+  application.Render(20);
+
+  animation.SetBlendPoint(0.5f);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(250);
+
+  Quaternion value = actor.GetCurrentProperty<Quaternion>(index);
+  Vector3 axis;
+  Dali::Radian angle;
+  DALI_TEST_EQUALS(value.ToAxisAngle(axis, angle), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(angle.radian, 1.0f, 0.05f, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(250);
+
+  value = actor.GetCurrentProperty<Quaternion>(index);
+  DALI_TEST_EQUALS(value.ToAxisAngle(axis, angle), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(angle.radian, 1.5f, 0.05f, TEST_LOCATION);
+
   END_TEST;
 }

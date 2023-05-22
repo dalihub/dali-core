@@ -1125,11 +1125,16 @@ Actor::~Actor()
   // Remove mParent pointers from children even if we're destroying core,
   // to guard against GetParent() & Unparent() calls from CustomActor destructors.
   UnparentChildren();
-  delete mRenderers;
 
   // Guard to allow handle destruction after Core has been destroyed
   if(EventThreadServices::IsCoreRunning())
   {
+    if(mRenderers)
+    {
+      // Detach all renderers before delete container.
+      mRenderers->RemoveAll(GetNode());
+    }
+
     // Root layer will destroy its node in its own destructor
     if(!mIsRoot)
     {
@@ -1138,6 +1143,8 @@ Actor::~Actor()
       GetEventThreadServices().UnregisterObject(this);
     }
   }
+  // Cleanup renderer list
+  delete mRenderers;
 
   // Cleanup optional gesture data
   delete mGestureData;

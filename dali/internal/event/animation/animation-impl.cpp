@@ -885,7 +885,7 @@ void Animation::Animate(Actor& actor, const Path& path, const Vector3& forward, 
 
   PathPtr pathCopy = Path::Clone(path);
 
-  //Position animation
+  // Position animation
   AddAnimatorConnector(AnimatorConnector<Vector3>::New(actor,
                                                        Dali::Actor::Property::POSITION,
                                                        Property::INVALID_COMPONENT_INDEX,
@@ -893,10 +893,10 @@ void Animation::Animate(Actor& actor, const Path& path, const Vector3& forward, 
                                                        alpha,
                                                        period));
 
-  //If forward is zero, PathRotationFunctor will always return the unit quaternion
+  // If forward is zero, PathRotationFunctor will always return the unit quaternion
   if(forward != Vector3::ZERO)
   {
-    //Rotation animation
+    // Rotation animation
     AddAnimatorConnector(AnimatorConnector<Quaternion>::New(actor,
                                                             Dali::Actor::Property::ORIENTATION,
                                                             Property::INVALID_COMPONENT_INDEX,
@@ -1010,11 +1010,11 @@ float Animation::GetSpeedFactor() const
 
 void Animation::SetPlayRange(const Vector2& range)
 {
-  //Make sure the range specified is between 0.0 and 1.0
+  // Make sure the range specified is between 0.0 and 1.0
   if(range.x >= 0.0f && range.x <= 1.0f && range.y >= 0.0f && range.y <= 1.0f)
   {
     Vector2 orderedRange(range);
-    //If the range is not in order swap values
+    // If the range is not in order swap values
     if(range.x > range.y)
     {
       orderedRange = Vector2(range.y, range.x);
@@ -1031,6 +1031,24 @@ void Animation::SetPlayRange(const Vector2& range)
 Vector2 Animation::GetPlayRange() const
 {
   return mPlayRange;
+}
+
+void Animation::SetBlendPoint(float blendPoint)
+{
+  if(blendPoint >= 0.0f && blendPoint <= 1.0f)
+  {
+    mBlendPoint = blendPoint;
+    SetBlendPointMessage(mEventThreadServices, *mAnimation, mBlendPoint);
+  }
+  else
+  {
+    DALI_LOG_ERROR("Blend Point should be a value between 0 and 1.\n");
+  }
+}
+
+float Animation::GetBlendPoint() const
+{
+  return mBlendPoint;
 }
 
 void Animation::SetLoopingMode(Dali::Animation::LoopingMode loopingMode)

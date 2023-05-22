@@ -17,10 +17,71 @@
 
 #include <dali-test-suite-utils.h>
 #include <dali/public-api/dali-core.h>
-
+#include <chrono>
+using namespace std::chrono_literals;
 using namespace Dali;
 
 #include <mesh-builder.h>
+#include <future>
+
+struct VertexBufferUpdater
+{
+  struct Diagnostics
+  {
+    uint32_t counter{0};
+    void*    lastPtr{nullptr};
+    size_t   lastSize{0};
+    size_t   lastReturned{0};
+  };
+
+  VertexBufferUpdater() = default;
+
+  uint32_t UpdateVertices(void* ptr, size_t size)
+  {
+    diagnostics.lastPtr      = ptr;
+    diagnostics.lastSize     = size;
+    diagnostics.lastReturned = returnSize;
+    diagnostics.counter++;
+
+    promise.set_value(diagnostics);
+    return returnSize;
+  }
+
+  void SetCallbackReturnValue(size_t size)
+  {
+    returnSize = size;
+  }
+
+  void Reset()
+  {
+    promise = std::promise<Diagnostics>();
+  }
+
+  std::unique_ptr<VertexBufferUpdateCallback> CreateCallback()
+  {
+    return VertexBufferUpdateCallback::New(this, &VertexBufferUpdater::UpdateVertices);
+  }
+
+  Diagnostics GetValue()
+  {
+    auto value = promise.get_future().get();
+
+    // reset promise automatically
+    promise = {};
+    return value;
+  }
+
+  bool IsValueReady()
+  {
+    // fake-wait for two frames
+    auto status = promise.get_future().wait_for(32ms);
+    return status == std::future_status::ready;
+  }
+
+  Diagnostics               diagnostics;
+  size_t                    returnSize{0u};
+  std::promise<Diagnostics> promise;
+};
 
 void vertexBuffer_test_startup(void)
 {
@@ -444,5 +505,114 @@ int UtcDaliVertexBufferSetDivisor(void)
   std::ostringstream oss;
   oss << sizeof(instanceData) / sizeof(InstanceData);
   DALI_TEST_EQUALS(params2["instanceCount"].str(), oss.str(), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliVertexBufferUpdateCallback(void)
+{
+  TestApplication application;
+
+  // Create vertex buffer
+  VertexBuffer vertexBuffer = VertexBuffer::New(Property::Map() = {
+                                                  {"aPosition", Property::Type::VECTOR2},
+                                                  {"aTexCoord", Property::Type::VECTOR2}});
+
+  // set callback
+  auto callback = std::make_unique<VertexBufferUpdater>();
+  vertexBuffer.SetVertexBufferUpdateCallback(callback->CreateCallback());
+
+  struct Vertex
+  {
+    Vector2 pos;
+    Vector2 uv;
+  };
+
+  std::vector<Vertex> vertices;
+  vertices.resize(16);
+  vertexBuffer.SetData(vertices.data(), 16);
+
+  Geometry geometry = Geometry::New();
+  geometry.AddVertexBuffer(vertexBuffer);
+  Shader   shader   = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
+  Actor    actor    = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector3::ONE * 100.f);
+  actor.AddRenderer(renderer);
+  application.GetScene().Add(actor);
+
+  auto& gl    = application.GetGlAbstraction();
+  auto& trace = gl.GetDrawTrace();
+  trace.Enable(true);
+  trace.EnableLogging(true);
+
+  callback->SetCallbackReturnValue(16 * sizeof(Vertex));
+
+  application.SendNotification();
+  application.Render();
+
+  auto value = callback->GetValue();
+
+  // Test whether callback ran
+  DALI_TEST_EQUALS(value.counter, 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(value.lastSize, 16 * sizeof(Vertex), TEST_LOCATION);
+  DALI_TEST_EQUALS(value.lastReturned, 16 * sizeof(Vertex), TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(value.lastPtr, (void*)nullptr, 0, TEST_LOCATION);
+
+  // test whether draw call has been issued (return value indicates end of array to be drawn)
+  auto result = trace.FindMethod("DrawArrays");
+  DALI_TEST_EQUALS(result, true, TEST_LOCATION);
+  result = trace.FindMethodAndParams("DrawArrays", "4, 0, 16");
+  DALI_TEST_EQUALS(result, true, TEST_LOCATION);
+
+  // Test 2. Update and render only half of vertex buffer
+  callback->SetCallbackReturnValue(8 * sizeof(Vertex));
+  trace.Reset();
+
+  application.SendNotification();
+  application.Render();
+
+  value = callback->GetValue();
+  // Test whether callback ran
+  DALI_TEST_EQUALS(value.counter, 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(value.lastSize, 16 * sizeof(Vertex), TEST_LOCATION);
+  DALI_TEST_EQUALS(value.lastReturned, 8 * sizeof(Vertex), TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(value.lastPtr, (void*)nullptr, 0, TEST_LOCATION);
+  result = trace.FindMethod("DrawArrays");
+  DALI_TEST_EQUALS(result, true, TEST_LOCATION);
+  result = trace.FindMethodAndParams("DrawArrays", "4, 0, 8");
+  DALI_TEST_EQUALS(result, true, TEST_LOCATION);
+
+  // Test 3. callback returns 0 elements to render, the draw call shouldn't happen.
+  callback->SetCallbackReturnValue(0);
+  trace.Reset();
+
+  application.SendNotification();
+  application.Render();
+
+  value = callback->GetValue();
+  // Test whether callback ran
+  DALI_TEST_EQUALS(value.counter, 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(value.lastSize, 16 * sizeof(Vertex), TEST_LOCATION);
+  DALI_TEST_EQUALS(value.lastReturned, 0, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(value.lastPtr, (void*)nullptr, 0, TEST_LOCATION);
+  result = trace.FindMethod("DrawArrays");
+  DALI_TEST_EQUALS(result, false, TEST_LOCATION);
+
+  // Test 4. removing callback, original behaviour should kick in
+  vertexBuffer.SetVertexBufferUpdateCallback(nullptr);
+  trace.Reset();
+  callback->Reset();
+
+  application.SendNotification();
+  application.Render();
+
+  auto valueReady = callback->IsValueReady();
+  DALI_TEST_EQUALS(valueReady, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(callback->diagnostics.counter, 3, TEST_LOCATION);
+  result = trace.FindMethod("DrawArrays");
+  DALI_TEST_EQUALS(result, true, TEST_LOCATION);
+  result = trace.FindMethodAndParams("DrawArrays", "4, 0, 16");
+  DALI_TEST_EQUALS(result, true, TEST_LOCATION);
+
   END_TEST;
 }

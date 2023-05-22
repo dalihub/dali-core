@@ -32,6 +32,7 @@ VertexBuffer::VertexBuffer()
   mData(nullptr),
   mGpuBuffer(nullptr),
   mSize(0),
+  mElementCount(0),
   mDataChanged(true)
 {
 }
@@ -51,9 +52,19 @@ void VertexBuffer::SetData(Dali::Vector<uint8_t>* data, uint32_t size)
   mDataChanged = true;
 }
 
+void VertexBuffer::SetVertexBufferUpdateCallback(Dali::VertexBufferUpdateCallback* callback)
+{
+  mVertexBufferUpdateCallback.reset(callback);
+}
+
 bool VertexBuffer::Update(Graphics::Controller& graphicsController)
 {
-  if(!mData || !mFormat || !mSize)
+  if(!mFormat || !mSize)
+  {
+    return false;
+  }
+
+  if(!mVertexBufferUpdateCallback && !mData)
   {
     return false;
   }
@@ -62,17 +73,29 @@ bool VertexBuffer::Update(Graphics::Controller& graphicsController)
   {
     if(!mGpuBuffer)
     {
-      mGpuBuffer = new GpuBuffer(graphicsController, 0 | Graphics::BufferUsage::VERTEX_BUFFER);
+      mGpuBuffer = new GpuBuffer(graphicsController, 0 | Graphics::BufferUsage::VERTEX_BUFFER, GpuBuffer::WritePolicy::DISCARD);
     }
 
     // Update the GpuBuffer
-    if(mGpuBuffer)
+    if(mGpuBuffer && mData)
     {
       DALI_ASSERT_DEBUG(mSize && "No data in the property buffer!");
       mGpuBuffer->UpdateDataBuffer(graphicsController, GetDataSize(), &((*mData)[0]));
     }
 
+    mElementCount = mSize;
+
     mDataChanged = false;
+  }
+
+  // To execute the callback the buffer must be already initialized.
+  if(mVertexBufferUpdateCallback && mGpuBuffer)
+  {
+    // If running callback, we may end up with less elements in the buffer
+    // of the same capacity
+    uint32_t updatedSize = mSize * mFormat->size;
+    mGpuBuffer->UpdateDataBufferWithCallback(graphicsController, mVertexBufferUpdateCallback.get(), updatedSize);
+    mElementCount = updatedSize / mFormat->size;
   }
 
   return true;

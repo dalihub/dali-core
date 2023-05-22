@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,7 +89,6 @@ Core::Core(RenderController&                   renderController,
   mPlatform(platform),
   mGraphicsController(graphicsController),
   mProcessingEvent(false),
-  mForceNextUpdate(false),
   mProcessorUnregistered(false),
   mPostProcessorUnregistered(false)
 {
@@ -265,7 +264,7 @@ void Core::ProcessEvents()
   if(mProcessingEvent)
   {
     DALI_LOG_ERROR("ProcessEvents should not be called from within ProcessEvents!\n");
-    mRenderController.RequestProcessEventsOnIdle(false);
+    mRenderController.RequestProcessEventsOnIdle();
     return;
   }
 
@@ -313,13 +312,11 @@ void Core::ProcessEvents()
 
   // Check if the touch or gestures require updates.
   const bool gestureNeedsUpdate = mGestureEventProcessor->NeedsUpdate();
-  // Check if the next update is forced.
-  const bool forceUpdate = IsNextUpdateForced();
 
-  if(messagesToProcess || gestureNeedsUpdate || forceUpdate)
+  if(messagesToProcess || gestureNeedsUpdate)
   {
     // tell the render controller to keep update thread running
-    mRenderController.RequestUpdate(forceUpdate);
+    mRenderController.RequestUpdate();
   }
 
   mRelayoutController->SetProcessingCoreEvents(false);
@@ -590,18 +587,6 @@ uint32_t* Core::ReserveMessageSlot(uint32_t size, bool updateScene)
 BufferIndex Core::GetEventBufferIndex() const
 {
   return mUpdateManager->GetEventBufferIndex();
-}
-
-void Core::ForceNextUpdate()
-{
-  mForceNextUpdate = true;
-}
-
-bool Core::IsNextUpdateForced()
-{
-  bool nextUpdateForced = mForceNextUpdate;
-  mForceNextUpdate      = false;
-  return nextUpdateForced;
 }
 
 } // namespace Internal

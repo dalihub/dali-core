@@ -68,6 +68,11 @@ public:
    */
   uint32_t GetDivisor() const;
 
+  /**
+   * @copydoc Dali::VertexBuffer::SetVertexBufferUpdateCallback()
+   */
+  void SetVertexBufferUpdateCallback(VertexBufferUpdateCallback& callback);
+
 public: // Default property extensions from Object
   /**
    * @brief Get the render thread side of the VertexBuffer

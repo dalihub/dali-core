@@ -154,9 +154,14 @@ inline bool SetNodeUpdateArea(Node* node, bool isLayer3d, Matrix& nodeWorldMatri
 
   if(node->GetUpdateAreaHint() == Vector4::ZERO)
   {
+    if(isLayer3d)
+    {
+      return true;
+    }
     // RenderItem::CalculateViewportSpaceAABB cannot cope with z transform
     // I don't use item.mModelMatrix.GetTransformComponents() for z transform, would be too slow
-    if(!isLayer3d && nodeWorldMatrix.GetZAxis() == Vector3(0.0f, 0.0f, 1.0f))
+    Vector3 zaxis = nodeWorldMatrix.GetZAxis();
+    if(EqualsZero(zaxis.x) && EqualsZero(zaxis.y))
     {
       nodeUpdateArea = Vector4(0.0f, 0.0f, nodeSize.width, nodeSize.height);
       return false;
@@ -217,7 +222,7 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
       nodeUpdateAreaSet = true;
 
       const Vector3& scale = nodeWorldMatrix.GetScale();
-      const Vector3& size  = Vector3(nodeUpdateArea.z, nodeUpdateArea.w, 1.0f) * scale;
+      const Vector3& size  = Vector3(nodeUpdateArea.z, nodeUpdateArea.w, 0.0f) * scale;
 
       if(size.LengthSquared() > Math::MACHINE_EPSILON_1000)
       {
