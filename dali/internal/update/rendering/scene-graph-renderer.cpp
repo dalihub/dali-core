@@ -170,6 +170,11 @@ bool Renderer::PrepareRender(BufferIndex updateBufferIndex)
     mUpdateDecay = static_cast<Renderer::Decay>(static_cast<int>(mUpdateDecay) - 1);
   }
 
+  if(mDirtyFlag || mResendFlag || mRenderingBehavior == DevelRenderer::Rendering::CONTINUOUSLY) // We don't check mUpdateDecay
+  {
+    SetUpdated(true);
+  }
+
   if(mResendFlag != 0)
   {
     Render::Renderer* rendererPtr = mRenderer.Get();
@@ -319,9 +324,6 @@ bool Renderer::PrepareRender(BufferIndex updateBufferIndex)
       uint32_t* slot    = mSceneController->GetRenderQueue().ReserveMessageSlot(updateBufferIndex, sizeof(DerivedType));
       new(slot) DerivedType(rendererPtr, &Render::Renderer::SetRenderCallback, mRenderCallback);
     }
-
-    SetUpdated(true);
-
     mResendFlag = 0;
   }
 
