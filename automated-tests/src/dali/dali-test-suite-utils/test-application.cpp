@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,15 +99,15 @@ TestApplication::~TestApplication()
   delete mCore;
 }
 
-void TestApplication::LogContext(bool start, const char* tag)
+void TestApplication::LogContext(bool start, const char* tag, const char* message)
 {
   if(start)
   {
-    fprintf(stderr, "INFO: Trace Start: %s\n", tag);
+    fprintf(stderr, "INFO: Trace Start: %s %s\n", tag, message ? message : "");
   }
   else
   {
-    fprintf(stderr, "INFO: Trace End: %s\n", tag);
+    fprintf(stderr, "INFO: Trace End: %s %s\n", tag, message ? message : "");
   }
 }
 
