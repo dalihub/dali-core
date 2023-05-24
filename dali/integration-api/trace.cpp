@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,13 +35,13 @@ void InstallLogContextFunction(const LogContextFunction& logContextFunction)
   gThreadLocalLogContextFunction = logContextFunction;
 }
 
-void LogContext(bool start, const char* tag)
+void LogContext(bool start, const char* tag, const char* message)
 {
   if(!gThreadLocalLogContextFunction)
   {
     return;
   }
-  gThreadLocalLogContextFunction(start, tag);
+  gThreadLocalLogContextFunction(start, tag, message);
 }
 
 #ifdef TRACE_ENABLED
@@ -109,7 +109,12 @@ void Filter::DisableGlobalTrace()
  */
 void Filter::BeginTrace(const char* tagName)
 {
-  Dali::Integration::Trace::LogContext(true, tagName);
+  Dali::Integration::Trace::LogContext(true, tagName, nullptr);
+}
+
+void Filter::BeginTrace(const char* tagName, const char* message)
+{
+  Dali::Integration::Trace::LogContext(true, tagName, message);
 }
 
 /**
@@ -117,7 +122,12 @@ void Filter::BeginTrace(const char* tagName)
  */
 void Filter::EndTrace(const char* tagName)
 {
-  Dali::Integration::Trace::LogContext(false, tagName);
+  Dali::Integration::Trace::LogContext(false, tagName, nullptr);
+}
+
+void Filter::EndTrace(const char* tagName, const char* message)
+{
+  Dali::Integration::Trace::LogContext(false, tagName, message);
 }
 
 /**
