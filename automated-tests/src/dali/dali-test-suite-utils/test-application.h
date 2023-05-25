@@ -75,6 +75,7 @@ public:
   bool        Render(uint32_t intervalMilliseconds = DEFAULT_RENDER_INTERVAL, const char* location = NULL, bool uploadOnly = false);
   bool        PreRenderWithPartialUpdate(uint32_t intervalMilliseconds, const char* location, std::vector<Rect<int>>& damagedRects);
   bool        RenderWithPartialUpdate(std::vector<Rect<int>>& damagedRects, Rect<int>& clippingRect);
+  bool        RenderWithPartialUpdate(uint32_t intervalMilliseconds, const char* location = NULL);
   uint32_t    GetUpdateStatus();
   bool        UpdateOnly(uint32_t intervalMilliseconds = DEFAULT_RENDER_INTERVAL);
   bool        RenderOnly();
@@ -92,6 +93,9 @@ public:
     return mScene;
   }
 
+  void AddScene(Integration::Scene scene);
+  void RemoveScene(Integration::Scene scene);
+
 private:
   void DoUpdate(uint32_t intervalMilliseconds, const char* location = NULL, bool uploadOnly = false);
 
@@ -103,8 +107,9 @@ protected:
   Integration::UpdateStatus mStatus;
   Integration::RenderStatus mRenderStatus;
 
-  Integration::Core*       mCore;
-  Dali::Integration::Scene mScene;
+  Integration::Core*              mCore;
+  Dali::Integration::Scene        mScene;
+  std::vector<Integration::Scene> mScenes;
 
   uint32_t mSurfaceWidth;
   uint32_t mSurfaceHeight;

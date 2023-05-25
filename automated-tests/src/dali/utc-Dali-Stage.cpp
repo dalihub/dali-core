@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -791,6 +791,9 @@ int UtcDaliStageKeepRenderingP(void)
 
   Stage stage = Stage::GetCurrent();
 
+  Actor actor = CreateRenderableActor();
+  stage.Add(actor);
+
   // Run core until it wants to sleep
   bool keepUpdating(true);
   while(keepUpdating)
@@ -804,7 +807,7 @@ int UtcDaliStageKeepRenderingP(void)
 
   application.SendNotification();
 
-  // Test that core wants to sleep after 10 seconds
+  // Test that core wants to sleep after 5 seconds
   keepUpdating = application.Render(1000.0f /*1 second*/);
   DALI_TEST_CHECK(keepUpdating);
   keepUpdating = application.Render(1000.0f /*2 seconds*/);
@@ -814,6 +817,8 @@ int UtcDaliStageKeepRenderingP(void)
   keepUpdating = application.Render(1000.0f /*4 seconds*/);
   DALI_TEST_CHECK(keepUpdating);
   keepUpdating = application.Render(1000.0f /*5 seconds*/);
+  DALI_TEST_CHECK(keepUpdating);
+  keepUpdating = application.Render(1000.0f /*6 seconds*/); // After 5 sec
   DALI_TEST_CHECK(!keepUpdating);
   END_TEST;
 }

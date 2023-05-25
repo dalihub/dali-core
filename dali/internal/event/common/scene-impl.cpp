@@ -474,6 +474,12 @@ void Scene::GetFramePresentedCallback(Dali::Integration::Scene::FrameCallbackCon
   }
 }
 
+void Scene::KeepRendering(float durationSeconds)
+{
+  ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
+  KeepRenderingMessage(tls->GetEventThreadServices(), *mSceneObject, durationSeconds);
+}
+
 Integration::Scene::KeyEventSignalType& Scene::KeyEventSignal()
 {
   return mKeyEventSignal;

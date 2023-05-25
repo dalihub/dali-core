@@ -390,6 +390,16 @@ public:
   bool IsRotationCompletedAcknowledgementSet() const;
 
   /**
+   * @brief Keep rendering for at least the given amount of time.
+   *
+   * By default, Dali will stop rendering when no Actor positions are being set, and when no animations are running etc.
+   * This method is useful to force screen refreshes.
+   *
+   * @param[in] durationSeconds Time to keep rendering, 0 means render at least one more frame
+   */
+  void KeepRendering(float durationSeconds);
+
+  /**
    * @brief This signal is emitted just after the event processing is finished.
    *
    * @return The signal to connect to

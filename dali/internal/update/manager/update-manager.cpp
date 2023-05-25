@@ -185,7 +185,6 @@ struct UpdateManager::Impl
     panGestureProcessor(nullptr),
     messageQueue(renderController, sceneGraphBuffers),
     frameCallbackProcessor(nullptr),
-    keepRenderingSeconds(0.0f),
     nodeDirtyFlags(NodePropertyFlags::TRANSFORM), // set to TransformFlag to ensure full update the first time through Update()
     frameCounter(0),
     renderingBehavior(DevelStage::Rendering::IF_REQUIRED),
@@ -305,10 +304,9 @@ struct UpdateManager::Impl
   OwnerPointer<FrameCallbackProcessor> frameCallbackProcessor; ///< Owned FrameCallbackProcessor, only created if required.
 
   std::atomic<std::size_t> renderInstructionCapacity{0u};
-  float                    keepRenderingSeconds; ///< Set via Dali::Stage::KeepRendering
-  NodePropertyFlags        nodeDirtyFlags;       ///< cumulative node dirty flags from previous frame
-  uint32_t                 frameCounter;         ///< Frame counter used in debugging to choose which frame to debug and which to ignore.
-  DevelStage::Rendering    renderingBehavior;    ///< Set via DevelStage::SetRenderingBehavior
+  NodePropertyFlags        nodeDirtyFlags;    ///< cumulative node dirty flags from previous frame
+  uint32_t                 frameCounter;      ///< Frame counter used in debugging to choose which frame to debug and which to ignore.
+  DevelStage::Rendering    renderingBehavior; ///< Set via DevelStage::SetRenderingBehavior
 
   bool animationFinishedDuringUpdate; ///< Flag whether any animations finished during the Update()
   bool previousUpdateScene;           ///< True if the scene was updated in the previous frame (otherwise it was optimized out)
@@ -986,8 +984,9 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
     mImpl->frameCallbackProcessor ||                   // ..a frame callback processor is existed OR
     gestureUpdated;                                    // ..a gesture property was updated
 
-  bool keepRendererRendering = false;
-  mImpl->renderingRequired   = false;
+  uint32_t keepUpdating          = 0;
+  bool     keepRendererRendering = false;
+  mImpl->renderingRequired       = false;
 
   // Although the scene-graph may not require an update, we still need to synchronize double-buffered
   // values if the scene was updated in the previous frame.
@@ -1096,9 +1095,16 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
           scene->scene->GetRenderInstructions().ResetAndReserve(bufferIndex,
                                                                 static_cast<uint32_t>(scene->taskList->GetTasks().Count()));
 
+          bool sceneKeepUpdating = scene->scene->KeepRenderingCheck(elapsedSeconds);
+          if(sceneKeepUpdating)
+          {
+            keepUpdating |= KeepUpdating::STAGE_KEEP_RENDERING;
+          }
+
           // If there are animations running, only add render instruction if at least one animation is currently active (i.e. not delayed)
           // or the nodes are dirty
-          if(!isAnimationRunning || animationActive || mImpl->renderingRequired || (mImpl->nodeDirtyFlags & RenderableUpdateFlags))
+          // or keep rendering is requested
+          if(!isAnimationRunning || animationActive || mImpl->renderingRequired || (mImpl->nodeDirtyFlags & RenderableUpdateFlags) || sceneKeepUpdating)
           {
             keepRendererRendering |= mImpl->renderTaskProcessor.Process(bufferIndex,
                                                                         *scene->taskList,
@@ -1167,12 +1173,15 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
   mImpl->previousUpdateScene = updateScene;
 
   // Check whether further updates are required
-  uint32_t keepUpdating = KeepUpdatingCheck(elapsedSeconds);
+  keepUpdating |= KeepUpdatingCheck(elapsedSeconds);
 
   if(keepRendererRendering)
   {
     keepUpdating |= KeepUpdating::STAGE_KEEP_RENDERING;
+  }
 
+  if(keepUpdating & KeepUpdating::STAGE_KEEP_RENDERING)
+  {
     // Set dirty flags for next frame to continue rendering
     mImpl->nodeDirtyFlags |= RenderableUpdateFlags;
   }
@@ -1207,23 +1216,15 @@ void UpdateManager::PostRender()
 
 uint32_t UpdateManager::KeepUpdatingCheck(float elapsedSeconds) const
 {
-  // Update the duration set via Stage::KeepRendering()
-  if(mImpl->keepRenderingSeconds > 0.0f)
-  {
-    mImpl->keepRenderingSeconds -= elapsedSeconds;
-  }
-
   uint32_t keepUpdatingRequest = KeepUpdating::NOT_REQUESTED;
 
   // If the rendering behavior is set to continuously render, then continue to render.
-  // If Stage::KeepRendering() has been called, then continue until the duration has elapsed.
   // Keep updating until no messages are received and no animations are running.
   // If an animation has just finished, update at least once more for Discard end-actions.
   // No need to check for renderQueue as there is always a render after update and if that
   // render needs another update it will tell the adaptor to call update again
 
-  if((mImpl->renderingBehavior == DevelStage::Rendering::CONTINUOUSLY) ||
-     (mImpl->keepRenderingSeconds > 0.0f))
+  if(mImpl->renderingBehavior == DevelStage::Rendering::CONTINUOUSLY)
   {
     keepUpdatingRequest |= KeepUpdating::STAGE_KEEP_RENDERING;
   }
@@ -1255,7 +1256,10 @@ void UpdateManager::SurfaceReplaced(Scene* scene)
 
 void UpdateManager::KeepRendering(float durationSeconds)
 {
-  mImpl->keepRenderingSeconds = std::max(mImpl->keepRenderingSeconds, durationSeconds);
+  for(auto&& scene : mImpl->scenes)
+  {
+    scene->scene->KeepRendering(durationSeconds);
+  }
 }
 
 void UpdateManager::SetRenderingBehavior(DevelStage::Rendering renderingBehavior)

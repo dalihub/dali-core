@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1178,10 +1178,11 @@ int UtcDaliSceneSurfaceRotatedWithAngle0(void)
   damagedRects.clear();
   application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
                                         TestApplication::DEFAULT_SURFACE_HEIGHT,
-                                        0, 0);
+                                        0,
+                                        0);
 
   // Check current orientations
-  int32_t orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  int32_t orientation       = application.GetScene().GetCurrentSurfaceOrientation();
   int32_t screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should not be changed yet.
@@ -1202,7 +1203,7 @@ int UtcDaliSceneSurfaceRotatedWithAngle0(void)
   DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
 
   // Check current orientations
-  orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  orientation       = application.GetScene().GetCurrentSurfaceOrientation();
   screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should be changed.
@@ -1248,10 +1249,11 @@ int UtcDaliSceneSurfaceRotatedWithAngle90(void)
   damagedRects.clear();
   application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
                                         TestApplication::DEFAULT_SURFACE_HEIGHT,
-                                        90, 0);
+                                        90,
+                                        0);
 
   // Check current surface orientation
-  int32_t orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  int32_t orientation       = application.GetScene().GetCurrentSurfaceOrientation();
   int32_t screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should not be changed yet.
@@ -1280,7 +1282,7 @@ int UtcDaliSceneSurfaceRotatedWithAngle90(void)
   DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
 
   // Check current orientations
-  orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  orientation       = application.GetScene().GetCurrentSurfaceOrientation();
   screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should be changed.
@@ -1326,10 +1328,11 @@ int UtcDaliSceneScreenRotatedWithAngle90(void)
   damagedRects.clear();
   application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
                                         TestApplication::DEFAULT_SURFACE_HEIGHT,
-                                        0, 90);
+                                        0,
+                                        90);
 
   // Check current surface orientation
-  int32_t orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  int32_t orientation       = application.GetScene().GetCurrentSurfaceOrientation();
   int32_t screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should not be changed yet.
@@ -1358,7 +1361,7 @@ int UtcDaliSceneScreenRotatedWithAngle90(void)
   DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
 
   // Check current orientations
-  orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  orientation       = application.GetScene().GetCurrentSurfaceOrientation();
   screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should be changed.
@@ -1404,10 +1407,11 @@ int UtcDaliSceneSurfaceAndScreenRotatedWithAngle90(void)
   damagedRects.clear();
   application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
                                         TestApplication::DEFAULT_SURFACE_HEIGHT,
-                                        90, 90);
+                                        90,
+                                        90);
 
   // Check current surface orientation
-  int32_t orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  int32_t orientation       = application.GetScene().GetCurrentSurfaceOrientation();
   int32_t screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should not be changed yet.
@@ -1436,7 +1440,7 @@ int UtcDaliSceneSurfaceAndScreenRotatedWithAngle90(void)
   DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
 
   // Check current orientations
-  orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  orientation       = application.GetScene().GetCurrentSurfaceOrientation();
   screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should be changed.
@@ -1482,10 +1486,11 @@ int UtcDaliSceneSurfaceRotatedWithAngle180(void)
   damagedRects.clear();
   application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
                                         TestApplication::DEFAULT_SURFACE_HEIGHT,
-                                        180, 0);
+                                        180,
+                                        0);
 
   // Check current surface orientation
-  int32_t orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  int32_t orientation       = application.GetScene().GetCurrentSurfaceOrientation();
   int32_t screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should not be changed yet.
@@ -1513,7 +1518,7 @@ int UtcDaliSceneSurfaceRotatedWithAngle180(void)
   DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
 
   // Check current orientations
-  orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  orientation       = application.GetScene().GetCurrentSurfaceOrientation();
   screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should be changed.
@@ -1559,10 +1564,11 @@ int UtcDaliSceneScreenRotatedWithAngle180(void)
   damagedRects.clear();
   application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
                                         TestApplication::DEFAULT_SURFACE_HEIGHT,
-                                        0, 180);
+                                        0,
+                                        180);
 
   // Check current surface orientation
-  int32_t orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  int32_t orientation       = application.GetScene().GetCurrentSurfaceOrientation();
   int32_t screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should not be changed yet.
@@ -1590,7 +1596,7 @@ int UtcDaliSceneScreenRotatedWithAngle180(void)
   DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
 
   // Check current orientations
-  orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  orientation       = application.GetScene().GetCurrentSurfaceOrientation();
   screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should be changed.
@@ -1637,10 +1643,11 @@ int UtcDaliSceneSurfaceAndScreenRotatedWithAngle180(void)
   damagedRects.clear();
   application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
                                         TestApplication::DEFAULT_SURFACE_HEIGHT,
-                                        180, 180);
+                                        180,
+                                        180);
 
   // Check current orientations
-  int32_t orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  int32_t orientation       = application.GetScene().GetCurrentSurfaceOrientation();
   int32_t screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should not be changed yet.
@@ -1661,7 +1668,7 @@ int UtcDaliSceneSurfaceAndScreenRotatedWithAngle180(void)
   DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
 
   // Check current orientations
-  orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  orientation       = application.GetScene().GetCurrentSurfaceOrientation();
   screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should be changed.
@@ -1707,10 +1714,11 @@ int UtcDaliSceneSurfaceRotatedWithAngle270(void)
   damagedRects.clear();
   application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
                                         TestApplication::DEFAULT_SURFACE_HEIGHT,
-                                        270, 0);
+                                        270,
+                                        0);
 
   // Check current surface orientation
-  int32_t orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  int32_t orientation       = application.GetScene().GetCurrentSurfaceOrientation();
   int32_t screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should not be changed yet.
@@ -1739,7 +1747,7 @@ int UtcDaliSceneSurfaceRotatedWithAngle270(void)
   DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
 
   // Check current orientations
-  orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  orientation       = application.GetScene().GetCurrentSurfaceOrientation();
   screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should be changed.
@@ -1785,10 +1793,11 @@ int UtcDaliSceneScreenRotatedWithAngle270(void)
   damagedRects.clear();
   application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
                                         TestApplication::DEFAULT_SURFACE_HEIGHT,
-                                        0, 270);
+                                        0,
+                                        270);
 
   // Check current surface orientation
-  int32_t orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  int32_t orientation       = application.GetScene().GetCurrentSurfaceOrientation();
   int32_t screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should not be changed yet.
@@ -1817,7 +1826,7 @@ int UtcDaliSceneScreenRotatedWithAngle270(void)
   DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
 
   // Check current orientations
-  orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  orientation       = application.GetScene().GetCurrentSurfaceOrientation();
   screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should be changed.
@@ -1863,10 +1872,11 @@ int UtcDaliSceneSurfaceAndScreenRotatedWithAngle270(void)
   damagedRects.clear();
   application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
                                         TestApplication::DEFAULT_SURFACE_HEIGHT,
-                                        270, 270);
+                                        270,
+                                        270);
 
   // Check current surface orientation
-  int32_t orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  int32_t orientation       = application.GetScene().GetCurrentSurfaceOrientation();
   int32_t screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should not be changed yet.
@@ -1895,7 +1905,7 @@ int UtcDaliSceneSurfaceAndScreenRotatedWithAngle270(void)
   DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
 
   // Check current orientations
-  orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  orientation       = application.GetScene().GetCurrentSurfaceOrientation();
   screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should be changed.
@@ -1939,10 +1949,11 @@ int UtcDaliSceneSetSurfaceRotationCompletedAcknowledgementWithAngle90(void)
   damagedRects.clear();
   application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
                                         TestApplication::DEFAULT_SURFACE_HEIGHT,
-                                        90, 0);
+                                        90,
+                                        0);
 
   // Check current surface orientation
-  int32_t orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  int32_t orientation       = application.GetScene().GetCurrentSurfaceOrientation();
   int32_t screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should not be changed yet.
@@ -1972,7 +1983,7 @@ int UtcDaliSceneSetSurfaceRotationCompletedAcknowledgementWithAngle90(void)
   DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
 
   // Check current orientations
-  orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  orientation       = application.GetScene().GetCurrentSurfaceOrientation();
   screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should be changed.
@@ -2019,10 +2030,11 @@ int UtcDaliSceneSetScreenRotationCompletedAcknowledgementWithAngle90(void)
   damagedRects.clear();
   application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
                                         TestApplication::DEFAULT_SURFACE_HEIGHT,
-                                        0, 90);
+                                        0,
+                                        90);
 
   // Check current surface orientation
-  int32_t orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  int32_t orientation       = application.GetScene().GetCurrentSurfaceOrientation();
   int32_t screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should not be changed yet.
@@ -2052,7 +2064,7 @@ int UtcDaliSceneSetScreenRotationCompletedAcknowledgementWithAngle90(void)
   DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
 
   // Check current orientations
-  orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  orientation       = application.GetScene().GetCurrentSurfaceOrientation();
   screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should be changed.
@@ -2099,10 +2111,11 @@ int UtcDaliSceneSetSurfaceAndScreenRotationCompletedAcknowledgementWithAngle90(v
   damagedRects.clear();
   application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
                                         TestApplication::DEFAULT_SURFACE_HEIGHT,
-                                        90, 90);
+                                        90,
+                                        90);
 
   // Check current surface orientation
-  int32_t orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  int32_t orientation       = application.GetScene().GetCurrentSurfaceOrientation();
   int32_t screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should not be changed yet.
@@ -2132,7 +2145,7 @@ int UtcDaliSceneSetSurfaceAndScreenRotationCompletedAcknowledgementWithAngle90(v
   DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
 
   // Check current orientations
-  orientation = application.GetScene().GetCurrentSurfaceOrientation();
+  orientation       = application.GetScene().GetCurrentSurfaceOrientation();
   screenOrientation = application.GetScene().GetCurrentScreenOrientation();
 
   // It should be changed.
@@ -2204,7 +2217,8 @@ int UtcDaliSceneSurfaceRotatedPartialUpdate(void)
   // Rotate surface
   application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_HEIGHT,
                                         TestApplication::DEFAULT_SURFACE_WIDTH,
-                                        90, 0);
+                                        90,
+                                        0);
 
   damagedRects.clear();
 
@@ -2657,8 +2671,8 @@ int UtcDaliSceneSurfaceResizedWithOverlayLayer(void)
   DALI_TEST_EQUALS(scene.GetRootLayer(), defaultTask.GetSourceActor(), TEST_LOCATION);
 
   // Ensure stage size matches the scene size
-  auto stage = Stage::GetCurrent();
-  Vector2 sceneSize = stage.GetSize();
+  auto     stage     = Stage::GetCurrent();
+  Vector2  sceneSize = stage.GetSize();
   Viewport sceneViewport(0, 0, sceneSize.x, sceneSize.y);
   DALI_TEST_EQUALS(stage.GetSize(), scene.GetSize(), TEST_LOCATION);
   Viewport defaultViewport = defaultTask.GetViewport();
@@ -2667,8 +2681,8 @@ int UtcDaliSceneSurfaceResizedWithOverlayLayer(void)
   Layer layer = scene.GetOverlayLayer();
   // There should be 2 task by default.
   DALI_TEST_EQUALS(tasks.GetTaskCount(), 2u, TEST_LOCATION);
-  RenderTask overlayTask = tasks.GetTask(1u);
-  Viewport overlayViewport = overlayTask.GetViewport();
+  RenderTask overlayTask     = tasks.GetTask(1u);
+  Viewport   overlayViewport = overlayTask.GetViewport();
   DALI_TEST_EQUALS(defaultViewport, overlayViewport, TEST_LOCATION);
 
   // Resize the scene
@@ -2678,6 +2692,133 @@ int UtcDaliSceneSurfaceResizedWithOverlayLayer(void)
   Viewport newViewport(0, 0, newSize.x, newSize.y);
   DALI_TEST_EQUALS(newViewport, defaultTask.GetViewport(), TEST_LOCATION);
   DALI_TEST_EQUALS(newViewport, overlayTask.GetViewport(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliSceneKeepRendering(void)
+{
+  tet_infoline("Test keep rendering");
+
+  TestApplication application;
+
+  auto scene = application.GetScene();
+  DALI_TEST_CHECK(scene);
+
+  Actor actor = CreateRenderableActor();
+  scene.Add(actor);
+
+  // Run core until it wants to sleep
+  bool keepUpdating(true);
+  while(keepUpdating)
+  {
+    application.SendNotification();
+    keepUpdating = application.Render(1000.0f /*1 second*/);
+  }
+
+  // Force rendering for the next 5 seconds
+  scene.KeepRendering(5.0f);
+
+  application.SendNotification();
+
+  keepUpdating = application.Render(1000.0f /*1 second*/);
+  DALI_TEST_CHECK(keepUpdating);
+  keepUpdating = application.Render(1000.0f /*2 seconds*/);
+  DALI_TEST_CHECK(keepUpdating);
+  keepUpdating = application.Render(1000.0f /*3 seconds*/);
+  DALI_TEST_CHECK(keepUpdating);
+  keepUpdating = application.Render(1000.0f /*4 seconds*/);
+  DALI_TEST_CHECK(keepUpdating);
+  keepUpdating = application.Render(1000.0f /*5 seconds*/);
+  DALI_TEST_CHECK(keepUpdating);
+  keepUpdating = application.Render(1000.0f /*6 seconds*/); // After 5 sec
+  DALI_TEST_CHECK(!keepUpdating);
+
+  END_TEST;
+}
+
+int UtcDaliSceneKeepRenderingMultipleScene(void)
+{
+  tet_infoline("Test keep rendering - multiple scene");
+
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+  TraceCallStack& drawTrace = application.GetGlAbstraction().GetDrawTrace();
+
+  auto defaultScene = application.GetScene();
+  DALI_TEST_CHECK(defaultScene);
+
+  Actor actor1 = CreateRenderableActor();
+  actor1.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  actor1.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+  defaultScene.Add(actor1);
+
+  // Create a Scene
+  Dali::Integration::Scene scene = Dali::Integration::Scene::New(Size(480.0f, 800.0f));
+  DALI_TEST_CHECK(scene);
+
+  application.AddScene(scene);
+
+  Actor actor2 = CreateRenderableActor();
+  actor2.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  actor2.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+  scene.Add(actor2);
+
+  // Run core until it wants to sleep
+  bool keepUpdating(true);
+  while(keepUpdating)
+  {
+    application.SendNotification();
+    keepUpdating = application.RenderWithPartialUpdate(1000.0f /*1 second*/);
+  }
+
+  drawTrace.Enable(true);
+
+  // Force rendering of the default scene for the next 5 seconds (0sec ~ 5sec)
+  defaultScene.KeepRendering(5.0f);
+
+  application.SendNotification();
+  keepUpdating = application.RenderWithPartialUpdate(1000.0f /*1 second*/);
+
+  DALI_TEST_CHECK(keepUpdating);
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION); // Only default scene should be drawn
+
+  drawTrace.Reset();
+
+  // Force rendering of the new scene for the next 5 seconds (1sec ~ 6sec)
+  scene.KeepRendering(5.0f);
+
+  application.SendNotification();
+  keepUpdating = application.RenderWithPartialUpdate(3000.0f /*4 second*/);
+
+  DALI_TEST_CHECK(keepUpdating);
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 2, TEST_LOCATION); // Both scenes should be drawn
+
+  drawTrace.Reset();
+
+  keepUpdating = application.RenderWithPartialUpdate(1000.0f /*5 second*/);
+
+  DALI_TEST_CHECK(keepUpdating);
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 2, TEST_LOCATION); // Still both scenes should be drawn
+
+  drawTrace.Reset();
+
+  keepUpdating = application.RenderWithPartialUpdate(1000.0f /*6 second*/);
+
+  DALI_TEST_CHECK(keepUpdating);
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION); // Only the new scenes should be drawn
+
+  drawTrace.Reset();
+
+  keepUpdating = application.RenderWithPartialUpdate(1000.0f /*7 second*/);
+
+  DALI_TEST_CHECK(!keepUpdating);
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 0, TEST_LOCATION); // Nothing drawn
 
   END_TEST;
 }

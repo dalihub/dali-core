@@ -213,6 +213,11 @@ bool Scene::IsRotationCompletedAcknowledgementSet() const
   return GetImplementation(*this).IsRotationCompletedAcknowledgementSet();
 }
 
+void Scene::KeepRendering(float durationSeconds)
+{
+  GetImplementation(*this).KeepRendering(durationSeconds);
+}
+
 Scene::EventProcessingFinishedSignalType& Scene::EventProcessingFinishedSignal()
 {
   return GetImplementation(*this).EventProcessingFinishedSignal();
