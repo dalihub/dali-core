@@ -710,6 +710,11 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
     }
   }
 
+  if(sceneObject->IsNeededFullUpdate())
+  {
+    cleanDamagedRect = true; // And make full update at this frame
+  }
+
   if(!cleanDamagedRect)
   {
     damagedRectCleaner.SetCleanOnReturn(false);

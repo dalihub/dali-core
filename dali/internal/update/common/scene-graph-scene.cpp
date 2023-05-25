@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,12 +30,13 @@ namespace SceneGraph
 Scene::Scene()
 : mFrameRenderedCallbacks(),
   mFramePresentedCallbacks(),
-  mSkipRendering(false),
   mSurfaceRect(),
   mSurfaceOrientation(0),
   mScreenOrientation(0),
   mSurfaceRectChanged(false),
-  mRotationCompletedAcknowledgement(false)
+  mRotationCompletedAcknowledgement(false),
+  mSkipRendering(false),
+  mNeedFullUpdate(false)
 {
 }
 
@@ -230,6 +231,25 @@ void Scene::SetSurfaceRenderTargetCreateInfo(const Graphics::RenderTargetCreateI
     // 2nd Stage initialization happens in RenderManager, not UpdateManager, so is delayed.
     mRenderTargetCreateInfo = renderTargetCreateInfo;
   }
+}
+
+void Scene::KeepRendering(float durationSeconds)
+{
+  mKeepRenderingSeconds = std::max(mKeepRenderingSeconds, durationSeconds);
+}
+
+bool Scene::KeepRenderingCheck(float elapsedSeconds)
+{
+  if(mKeepRenderingSeconds > 0.0f)
+  {
+    mNeedFullUpdate       = true; // Full update if KeepRendering is required
+    mKeepRenderingSeconds = std::max(0.0f, mKeepRenderingSeconds - elapsedSeconds);
+    return true;
+  }
+
+  mNeedFullUpdate       = false;
+  mKeepRenderingSeconds = 0.0f;
+  return false;
 }
 
 } // namespace SceneGraph

@@ -303,6 +303,11 @@ public:
   void GetFramePresentedCallback(Dali::Integration::Scene::FrameCallbackContainer& callbacks);
 
   /**
+   * @copydoc Dali::Integration::Scene::KeepRendering
+   */
+  void KeepRendering(float durationSeconds);
+
+  /**
    * @copydoc Integration::Scene::KeyEventSignal()
    */
   Integration::Scene::KeyEventSignalType& KeyEventSignal();

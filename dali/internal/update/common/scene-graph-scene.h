@@ -240,6 +240,30 @@ public:
   void SetSurfaceRenderTargetCreateInfo(const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo);
 
   /**
+   * @brief Keep rendering for at least the given amount of time.
+   *
+   * @param[in] durationSeconds Time to keep rendering, 0 means render at least one more frame
+   */
+  void KeepRendering(float durationSeconds);
+
+  /**
+   * @brief Check whether rendering should keep going.
+   *
+   * @param[in] elapsedSeconds The time in seconds since the previous update.
+   * @return True if rendering should keep going.
+   */
+  bool KeepRenderingCheck(float elapsedSeconds);
+
+  /**
+   * @brief Query if the scene needs full update
+   * @return True if the scene needs full update
+   */
+  bool IsNeededFullUpdate() const
+  {
+    return mNeedFullUpdate;
+  }
+
+  /**
    * Get the render target created for the scene
    *
    * @return the render target
@@ -322,13 +346,16 @@ private:
   Dali::Integration::Scene::FrameCallbackContainer mFrameRenderedCallbacks;  ///< Frame rendered callbacks
   Dali::Integration::Scene::FrameCallbackContainer mFramePresentedCallbacks; ///< Frame presented callbacks
 
-  bool mSkipRendering; ///< A flag to skip rendering
+  Rect<int32_t> mSurfaceRect;        ///< The rectangle of surface which is related ot this scene.
+  int32_t       mSurfaceOrientation; ///< The orientation of surface which is related of this scene
+  int32_t       mScreenOrientation;  ///< The orientation of screen
 
-  Rect<int32_t> mSurfaceRect;                      ///< The rectangle of surface which is related ot this scene.
-  int32_t       mSurfaceOrientation;               ///< The orientation of surface which is related of this scene
-  int32_t       mScreenOrientation;                ///< The orientation of screen
-  bool          mSurfaceRectChanged;               ///< The flag of surface's rectangle is changed when is resized or moved.
-  bool          mRotationCompletedAcknowledgement; ///< The flag of sending the acknowledgement to complete window rotation.
+  float mKeepRenderingSeconds{0.0f}; ///< Time to keep rendering
+
+  bool mSurfaceRectChanged;               ///< The flag of surface's rectangle is changed when is resized or moved.
+  bool mRotationCompletedAcknowledgement; ///< The flag of sending the acknowledgement to complete window rotation.
+  bool mSkipRendering;                    ///< A flag to skip rendering
+  bool mNeedFullUpdate;                   ///< A flag to update full area
 
   // Render pass and render target
 
@@ -414,6 +441,17 @@ inline void SetSurfaceRenderTargetCreateInfoMessage(EventThreadServices& eventTh
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&scene, &Scene::SetSurfaceRenderTargetCreateInfo, renderTargetCreateInfo);
+}
+
+inline void KeepRenderingMessage(EventThreadServices& eventThreadServices, const Scene& scene, float durationSeconds)
+{
+  using LocalType = MessageValue1<Scene, float>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new(slot) LocalType(&scene, &Scene::KeepRendering, durationSeconds);
 }
 
 } // namespace SceneGraph

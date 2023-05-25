@@ -85,6 +85,8 @@ void TestApplication::CreateScene()
   rtInfo.SetSurface(&mSurfaceWidth); // Can point to anything, really.
 
   mScene.SetSurfaceRenderTarget(rtInfo);
+
+  mScenes.push_back(mScene);
 }
 
 void TestApplication::InitializeCore()
@@ -212,8 +214,11 @@ bool TestApplication::Render(uint32_t intervalMilliseconds, const char* location
   mCore->PreRender(mRenderStatus, false /*do not force clear*/);
   if(!uploadOnly)
   {
-    mCore->RenderScene(mRenderStatus, mScene, true /*render the off-screen buffers*/);
-    mCore->RenderScene(mRenderStatus, mScene, false /*render the surface*/);
+    for(auto&& scene : mScenes)
+    {
+      mCore->RenderScene(mRenderStatus, scene, true /*render the off-screen buffers*/);
+      mCore->RenderScene(mRenderStatus, scene, false /*render the surface*/);
+    }
   }
   mCore->PostRender();
 
@@ -236,6 +241,36 @@ bool TestApplication::RenderWithPartialUpdate(std::vector<Rect<int>>& damagedRec
 {
   mCore->RenderScene(mRenderStatus, mScene, true /*render the off-screen buffers*/);
   mCore->RenderScene(mRenderStatus, mScene, false /*render the surface*/, clippingRect);
+  mCore->PostRender();
+
+  mFrame++;
+
+  return mStatus.KeepUpdating() || mRenderStatus.NeedsUpdate();
+}
+
+bool TestApplication::RenderWithPartialUpdate(uint32_t intervalMilliseconds, const char* location)
+{
+  DoUpdate(intervalMilliseconds, location);
+
+  // Reset the status
+  mRenderStatus.SetNeedsUpdate(false);
+  mRenderStatus.SetNeedsPostRender(false);
+
+  mCore->PreRender(mRenderStatus, false /*do not force clear*/);
+
+  for(auto&& scene : mScenes)
+  {
+    std::vector<Rect<int>> damagedRects;
+    Rect<int>              clippingRect{};
+
+    mCore->PreRender(scene, damagedRects);
+    mCore->RenderScene(mRenderStatus, scene, true /*render the off-screen buffers*/);
+    for(auto&& iter : damagedRects)
+    {
+      clippingRect.Merge(iter);
+    }
+    mCore->RenderScene(mRenderStatus, scene, false /*render the surface*/, clippingRect);
+  }
   mCore->PostRender();
 
   mFrame++;
@@ -295,6 +330,16 @@ uint32_t TestApplication::Wait(uint32_t durationToWait)
     time += RENDER_FRAME_INTERVAL;
   }
   return time;
+}
+
+void TestApplication::AddScene(Integration::Scene scene)
+{
+  mScenes.push_back(scene);
+}
+
+void TestApplication::RemoveScene(Integration::Scene scene)
+{
+  mScenes.erase(std::remove(mScenes.begin(), mScenes.end(), scene), mScenes.end());
 }
 
 } // namespace Dali
