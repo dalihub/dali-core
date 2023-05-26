@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -916,22 +916,6 @@ void TestGraphicsTexture::Prepare()
 {
   if(mCreateInfo.nativeImagePtr)
   {
-    /***********************************************************************************
-     * If the native image source changes, we need to re-create the texture.           *
-     * In EGL, this is done in native image implementation in PrepareTexture below.    *
-     *                                                                                 *
-     * In Vulkan impl, this was done in dali-core side. I think we should make this    *
-     * work in the graphics implementation instead.                                    *
-     ***********************************************************************************/
-    if(mCreateInfo.nativeImagePtr->SourceChanged())
-    {
-      uint32_t width  = mCreateInfo.nativeImagePtr->GetWidth();
-      uint32_t height = mCreateInfo.nativeImagePtr->GetHeight();
-      mCreateInfo.SetSize({width, height}); // Size may change
-
-      // @todo Re-initialize this texture from the new create info.
-    }
-
     // Ensure the native image is up-to-date
     mCreateInfo.nativeImagePtr->PrepareTexture();
   }

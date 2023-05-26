@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ACTOR_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1719,8 +1719,8 @@ private:
   };
 
   // Remove default constructor and copy constructor
-  Actor()                            = delete;
-  Actor(const Actor&)                = delete;
+  Actor()             = delete;
+  Actor(const Actor&) = delete;
   Actor& operator=(const Actor& rhs) = delete;
 
   /**
@@ -1948,7 +1948,8 @@ protected:
   bool                     mIsBlendEquationSet : 1;        ///< Flag to identify whether the Blend equation is set
   bool                     mNeedGesturePropagation : 1;    ///< Whether the parent listens for gesture events or not
   bool                     mUserInteractionEnabled : 1;    ///< Whether the actor should be enabled user interaction.
-  bool                     mAllowOnlyOwnTouch : 1;         ///< whether the actor will only receive own touch. it only receives touches that started from itself.
+  bool                     mAllowOnlyOwnTouch : 1;         ///< Whether the actor will only receive own touch. it only receives touches that started from itself.
+  bool                     mUseTextureUpdateArea : 1;      ///< Whether the actor uses the update area of the texture instead of its own.
   LayoutDirection::Type    mLayoutDirection : 2;           ///< Layout direction, Left to Right or Right to Left.
   DrawMode::Type           mDrawMode : 3;                  ///< Cached: How the actor and its children should be drawn
   ColorMode                mColorMode : 3;                 ///< Cached: Determines whether mWorldColor is inherited

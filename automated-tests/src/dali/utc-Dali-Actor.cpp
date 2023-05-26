@@ -27,6 +27,7 @@
 #include <dali/public-api/dali-core.h>
 #include <mesh-builder.h>
 #include <test-actor-utils.h>
+#include <test-native-image.h>
 
 #include <cfloat> // For FLT_MAX
 #include <set>    // For std::multiset
@@ -9368,7 +9369,7 @@ int utcDaliActorPartialUpdateActorsWithSizeHint01(void)
   // Ensure the damaged rect is empty
   DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
 
-  // Chnage UPDATE_AREA_HINT
+  // Change UPDATE_AREA_HINT
   actor.SetProperty(Actor::Property::UPDATE_AREA_HINT, Vector4(16.0f, 16.0f, 32.0f, 32.0f));
   application.GetScene().Add(actor);
 
@@ -9406,7 +9407,7 @@ int utcDaliActorPartialUpdateActorsWithSizeHint01(void)
   // Ensure the damaged rect is empty
   DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
 
-  // Chnage UPDATE_AREA_HINT
+  // Change UPDATE_AREA_HINT
   actor.SetProperty(Actor::Property::UPDATE_AREA_HINT, Vector4(-32.0f, -16.0f, 64.0f, 64.0f));
   application.GetScene().Add(actor);
 
@@ -9496,7 +9497,7 @@ int utcDaliActorPartialUpdateActorsWithSizeHint02(void)
   // Ensure the damaged rect is empty
   DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
 
-  // Chnage UPDATE_AREA_HINT
+  // Change UPDATE_AREA_HINT
   actor.SetProperty(Actor::Property::UPDATE_AREA_HINT, Vector4(16.0f, 16.0f, 64.0f, 64.0f));
   application.GetScene().Add(actor);
 
@@ -10732,6 +10733,248 @@ int utcDaliActorPartialUpdateMultipleActorsOneRenderer(void)
 
   // Ensure the damaged rect is empty
   DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int utcDaliActorPartialUpdateUseTextureUpdateArea01(void)
+{
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  tet_infoline("Check the damaged rect with USE_TEXTURE_UPDATE_AREA property");
+
+  const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
+
+  Actor actor                              = CreateRenderableActor();
+  actor[Actor::Property::ANCHOR_POINT]     = AnchorPoint::TOP_LEFT;
+  actor[Actor::Property::POSITION]         = Vector3(0.0f, 0.0f, 0.0f);
+  actor[Actor::Property::SIZE]             = Vector3(64.0f, 64.0f, 0.0f);
+  actor[Actor::Property::UPDATE_AREA_HINT] = Vector4(0.0f, 0.0f, 32.0f, 32.0f);
+  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+
+  // Create a native image source.
+  TestNativeImagePointer testNativeImage = TestNativeImage::New(64u, 64u);
+  Texture                texture         = Texture::New(*testNativeImage);
+  TextureSet             textureSet      = TextureSet::New();
+  textureSet.SetTexture(0u, texture);
+  actor.GetRendererAt(0).SetTextures(textureSet);
+
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+
+  std::vector<Rect<int>> damagedRects;
+
+  // Actor added, damaged rect is added size of actor
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  // Aligned by 16
+  Rect<int> clippingRect = Rect<int>(16, 752, 48, 48); // in screen coordinates
+  DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
+
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  // Set USE_TEXTURE_UPDATE_AREA
+  actor[DevelActor::Property::USE_TEXTURE_UPDATE_AREA] = true;
+
+  // Set updated area of native image
+  testNativeImage->SetUpdatedArea(Rect<uint32_t>(16, 16, 48, 48));
+
+  DALI_TEST_EQUALS(actor.GetProperty(DevelActor::Property::USE_TEXTURE_UPDATE_AREA).Get<bool>(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(DevelActor::Property::USE_TEXTURE_UPDATE_AREA).Get<bool>(), false, TEST_LOCATION);
+
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  // Aligned by 16
+  clippingRect = Rect<int>(16, 736, 64, 64); // in screen coordinates
+  DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(DevelActor::Property::USE_TEXTURE_UPDATE_AREA).Get<bool>(), true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int utcDaliActorPartialUpdateUseTextureUpdateArea02(void)
+{
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  tet_infoline("Check the damaged rect with USE_TEXTURE_UPDATE_AREA property and multiple native textures");
+
+  const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
+
+  Actor actor                              = CreateRenderableActor();
+  actor[Actor::Property::ANCHOR_POINT]     = AnchorPoint::TOP_LEFT;
+  actor[Actor::Property::POSITION]         = Vector3(0.0f, 0.0f, 0.0f);
+  actor[Actor::Property::SIZE]             = Vector3(64.0f, 64.0f, 0.0f);
+  actor[Actor::Property::UPDATE_AREA_HINT] = Vector4(0.0f, 0.0f, 32.0f, 32.0f);
+  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+
+  // Create a native image source.
+  TestNativeImagePointer testNativeImage1 = TestNativeImage::New(64u, 64u);
+  Texture                texture1         = Texture::New(*testNativeImage1);
+  TestNativeImagePointer testNativeImage2 = TestNativeImage::New(64u, 64u);
+  Texture                texture2         = Texture::New(*testNativeImage2);
+
+  TextureSet textureSet = TextureSet::New();
+  textureSet.SetTexture(0u, texture1);
+  textureSet.SetTexture(1u, texture2);
+  actor.GetRendererAt(0).SetTextures(textureSet);
+
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+
+  std::vector<Rect<int>> damagedRects;
+
+  // Actor added, damaged rect is added size of actor
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  // Aligned by 16
+  Rect<int> clippingRect = Rect<int>(16, 752, 48, 48); // in screen coordinates
+  DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
+
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  // Set USE_TEXTURE_UPDATE_AREA
+  actor[DevelActor::Property::USE_TEXTURE_UPDATE_AREA] = true;
+
+  // Set updated area of native image
+  testNativeImage1->SetUpdatedArea(Rect<uint32_t>(0, 0, 32, 32));
+  testNativeImage2->SetUpdatedArea(Rect<uint32_t>(32, 0, 32, 32));
+
+  DALI_TEST_EQUALS(actor.GetProperty(DevelActor::Property::USE_TEXTURE_UPDATE_AREA).Get<bool>(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(DevelActor::Property::USE_TEXTURE_UPDATE_AREA).Get<bool>(), false, TEST_LOCATION);
+
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  // Aligned by 16
+  clippingRect = Rect<int>(0, 752, 80, 64); // in screen coordinates
+  DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(DevelActor::Property::USE_TEXTURE_UPDATE_AREA).Get<bool>(), true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int utcDaliActorPartialUpdateUseTextureUpdateArea03(void)
+{
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  tet_infoline("Check the damaged rect with USE_TEXTURE_UPDATE_AREA property and multiple normal textures");
+
+  const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
+
+  uint32_t width = 64, height = 64;
+
+  Texture texture1 = CreateTexture(TextureType::TEXTURE_2D, Pixel::Format::RGBA8888, width, height);
+  Texture texture2 = CreateTexture(TextureType::TEXTURE_2D, Pixel::Format::RGBA8888, width, height);
+  Actor   actor    = CreateRenderableActor(texture1);
+  actor.GetRendererAt(0).GetTextures().SetTexture(1u, texture2);
+
+  actor[Actor::Property::ANCHOR_POINT]     = AnchorPoint::TOP_LEFT;
+  actor[Actor::Property::POSITION]         = Vector3(0.0f, 0.0f, 0.0f);
+  actor[Actor::Property::SIZE]             = Vector3(64.0f, 64.0f, 0.0f);
+  actor[Actor::Property::UPDATE_AREA_HINT] = Vector4(0.0f, 0.0f, 32.0f, 32.0f);
+  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+
+  std::vector<Rect<int>> damagedRects;
+
+  // Actor added, damaged rect is added size of actor
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  // Aligned by 16
+  Rect<int> clippingRect = Rect<int>(16, 752, 48, 48); // in screen coordinates
+  DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
+
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  // Set USE_TEXTURE_UPDATE_AREA
+  actor[DevelActor::Property::USE_TEXTURE_UPDATE_AREA] = true;
+
+  int       bufferSize = width * height * 4;
+  uint8_t*  buffer     = reinterpret_cast<uint8_t*>(malloc(bufferSize));
+  PixelData pixelData  = PixelData::New(buffer, bufferSize, width, height, Pixel::Format::RGBA8888, PixelData::FREE);
+
+  // Update textures
+  texture1.Upload(pixelData, 0u, 0u, 0u, 0u, 32u, 32u);
+  texture2.Upload(pixelData, 0u, 0u, 32u, 0u, 32u, 32u);
+
+  DALI_TEST_EQUALS(actor.GetProperty(DevelActor::Property::USE_TEXTURE_UPDATE_AREA).Get<bool>(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(DevelActor::Property::USE_TEXTURE_UPDATE_AREA).Get<bool>(), false, TEST_LOCATION);
+
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  // Aligned by 16
+  clippingRect = Rect<int>(0, 752, 80, 64); // in screen coordinates
+  DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(DevelActor::Property::USE_TEXTURE_UPDATE_AREA).Get<bool>(), true, TEST_LOCATION);
+
+  // Update full area of the texture
+  texture1.Upload(pixelData);
+
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  // Aligned by 16
+  clippingRect = Rect<int>(0, 736, 80, 80); // in screen coordinates
+  DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
 
   END_TEST;
 }

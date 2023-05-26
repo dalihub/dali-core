@@ -156,10 +156,10 @@ enum Type
   BLEND_EQUATION,
 
   /**
-   * @brief Sets whether this view can focus by touch. If user sets this to true, the actor will be focused when user touch it.
+   * @brief Sets whether this actor can focus by touch. If user sets this to true, the actor will be focused when user touch it.
    * @code
    * Actor actor = Actor::New();
-   * actor.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true); // whether the view can have focus or not with keyboard navigation.
+   * actor.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true); // whether the actor can have focus or not with keyboard navigation.
    * actor.SetProperty(DevelActor::Property::TOUCH_FOCUSABLE, true); // Whether the user can focus by touch, user can set focus by touching the actor.
    * @endcode
    * @details Name "touchFocusable", type Property::BOOLEAN.
@@ -174,18 +174,25 @@ enum Type
   KEYBOARD_FOCUSABLE_CHILDREN,
 
   /**
-  * @brief The flag whether the actor should be enabled all user interaction including touch, focus and activation. this value have higher priority over the sensitve and focusable in negative action.
-  * @details Name "userInteractionEnabled", type Property::BOOLEAN.
-  * @note Default value is true.
-  */
+   * @brief The flag whether the actor should be enabled all user interaction including touch, focus and activation. this value have higher priority over the sensitve and focusable in negative action.
+   * @details Name "userInteractionEnabled", type Property::BOOLEAN.
+   * @note Default value is true.
+   */
   USER_INTERACTION_ENABLED,
 
   /**
-  * @brief It only receive for touch events that started from itself.
-  * @details Name "allowOnlyOwnTouch", type Property::BOOLEAN
-  * @note Default is false.
-  */
+   * @brief It only receive for touch events that started from itself.
+   * @details Name "allowOnlyOwnTouch", type Property::BOOLEAN
+   * @note Default is false.
+   */
   ALLOW_ONLY_OWN_TOUCH,
+
+  /**
+   * @brief Whether the actor uses the update area of the texture instead of its own.
+   * @details Name "useTextureUpdateArea", type Property::BOOLEAN
+   * @note Default is false. If this set true, the value of Actor::Property::UPDATE_AREA_HINT is ignored and we assume the sizes of the actor and the texture are same.
+   */
+  USE_TEXTURE_UPDATE_AREA
 };
 
 } // namespace Property

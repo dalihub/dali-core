@@ -109,7 +109,8 @@ Node::Node()
   mIsCamera(false),
   mPositionUsesAnchorPoint(true),
   mTransparent(false),
-  mUpdateAreaChanged(false)
+  mUpdateAreaChanged(false),
+  mUseTextureUpdateArea(false)
 {
 #ifdef DEBUG_ENABLED
   gNodeCount++;
