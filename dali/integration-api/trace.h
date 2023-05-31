@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_TRACE_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,16 +32,15 @@ namespace Trace
 {
 /**
  * Used by tracing macros to log a context message
- * @param[in] start a bool to indicate start (true) or end (false) of the tracing / logging
- * @param[in] tag a unique event tag name
- * @param[in] message an additional message for this trace. Ignore if it is nullptr
+ * @param start a bool to indicate start (true) or end (false) of the tracing / logging
+ * @param tag a unique event tag name
  */
-DALI_CORE_API void LogContext(bool start, const char* tag, const char* message = nullptr);
+DALI_CORE_API void LogContext(bool start, const char* tag);
 
 /**
  * typedef for the LogContextFunction function.
  */
-using LogContextFunction = void (*)(bool, const char*, const char*);
+using LogContextFunction = void (*)(bool, const char*);
 
 /**
  * A LogContextFunction function has to be installed for every thread that wants to use tracing.
@@ -119,24 +118,10 @@ public:
   void BeginTrace(const char* tagName);
 
   /**
-   * Begin trace.
-   * @param[in] tagName - a unique event tag name.
-   * @param[in] message - an additional message for this trace if needs.
-   */
-  void BeginTrace(const char* tagName, const char* message);
-
-  /**
    * End trace.
    * @param[in] tagName - a unique event tag name.
    */
   void EndTrace(const char* tagName);
-
-  /**
-   * End trace.
-   * @param[in] tagName - a unique event tag name.
-   * @param[in] message - an additional message for this trace if needs.
-   */
-  void EndTrace(const char* tagName, const char* message);
 
   /**
    * Enable trace on all filters.
@@ -213,12 +198,6 @@ public:
     filter->BeginTrace(tag);             \
   }
 
-#define DALI_TRACE_BEGIN_WITH_MESSAGE(filter, tag, message) \
-  if(filter && filter->IsTraceEnabled())                    \
-  {                                                         \
-    filter->BeginTrace(tag, message);                       \
-  }
-
 /**
  * End of tracing
  */
@@ -226,12 +205,6 @@ public:
   if(filter && filter->IsTraceEnabled()) \
   {                                      \
     filter->EndTrace(tag);               \
-  }
-
-#define DALI_TRACE_END_WITH_MESSAGE(filter, tag, message) \
-  if(filter && filter->IsTraceEnabled())                  \
-  {                                                       \
-    filter->EndTrace(tag, message);                       \
   }
 
 /**
@@ -250,9 +223,7 @@ public:
 
 #define DALI_INIT_TRACE_FILTER(name, tag, enable)
 #define DALI_TRACE_BEGIN(filter, tag)
-#define DALI_TRACE_BEGIN_WITH_MESSAGE(filter, tag, message)
 #define DALI_TRACE_END(filter, tag)
-#define DALI_TRACE_END_WITH_MESSAGE(filter, tag, message)
 #define DALI_TRACE_FUNCTION(filter)
 #define DALI_TRACE_SCOPE(filter, tag)
 

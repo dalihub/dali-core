@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,6 @@
 // CLASS HEADER
 #include <dali/internal/event/events/key-event-processor.h>
 
-// EXTERNAL INCLUDES
-#ifdef TRACE_ENABLED
-#include <sstream> ///< for std::ostringstream
-#endif
-
 // INTERNAL INCLUDES
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/trace.h>
@@ -37,14 +32,6 @@ namespace Internal
 namespace
 {
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
-
-#ifdef TRACE_ENABLED
-const char* KEY_EVENT_STATES[Dali::KeyEvent::State::UP + 1] =
-  {
-    "DOWN",
-    "UP",
-};
-#endif
 } // namespace
 
 KeyEventProcessor::KeyEventProcessor(Scene& scene)
@@ -59,14 +46,7 @@ void KeyEventProcessor::ProcessKeyEvent(const Integration::KeyEvent& event)
   KeyEventPtr    keyEvent(new KeyEvent(event.keyName, event.logicalKey, event.keyString, event.keyCode, event.keyModifier, event.time, static_cast<Dali::KeyEvent::State>(event.state), event.compose, event.deviceName, event.deviceClass, event.deviceSubclass));
   Dali::KeyEvent keyEventHandle(keyEvent.Get());
 
-#ifdef TRACE_ENABLED
-  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-  {
-    std::ostringstream stream;
-    stream << "[name:" << event.keyName << ", code:" << event.keyCode << ", state:" << KEY_EVENT_STATES[event.state] << ", time:" << event.time << "]";
-    DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_PROCESS_KEY_EVENT", stream.str().c_str());
-  }
-#endif
+  DALI_TRACE_SCOPE(gTraceFilter, "DALI_PROCESS_KEY_EVENT");
 
   // Emit the key event signal from the scene.
   bool consumed = mScene.EmitInterceptKeyEventSignal(keyEventHandle);
@@ -78,12 +58,6 @@ void KeyEventProcessor::ProcessKeyEvent(const Integration::KeyEvent& event)
   {
     mScene.EmitKeyEventSignal(keyEventHandle);
   }
-#ifdef TRACE_ENABLED
-  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-  {
-    DALI_TRACE_END(gTraceFilter, "DALI_PROCESS_KEY_EVENT");
-  }
-#endif
 }
 
 } // namespace Internal

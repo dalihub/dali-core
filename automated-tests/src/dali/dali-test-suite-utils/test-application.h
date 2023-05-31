@@ -2,7 +2,7 @@
 #define DALI_TEST_APPLICATION_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ public:
   void InitializeCore();
   ~TestApplication() override;
   static void              LogMessage(Dali::Integration::Log::DebugPriority level, std::string& message);
-  static void              LogContext(bool start, const char* tag, const char* message);
+  static void              LogContext(bool start, const char* tag);
   Dali::Integration::Core& GetCore();
   TestPlatformAbstraction& GetPlatform();
   TestRenderController&    GetRenderController();
