@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -189,8 +189,8 @@ int UtcDaliVisualRendererDefaultProperties(void)
   VisualRenderer  renderer     = VisualRenderer::New(geometry, shader);
   Renderer        baseRenderer = Renderer::New(geometry, shader);
 
-  DALI_TEST_EQUALS(baseRenderer.GetPropertyCount(), 27, TEST_LOCATION);
-  DALI_TEST_EQUALS(renderer.GetPropertyCount(), 27 + 8, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseRenderer.GetPropertyCount(), 28, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetPropertyCount(), 28 + 8, TEST_LOCATION);
 
   TEST_RENDERER_PROPERTY(renderer, "transformOffset", Property::VECTOR2, true, true, true, VisualRenderer::Property::TRANSFORM_OFFSET, TEST_LOCATION);
   TEST_RENDERER_PROPERTY(renderer, "transformSize", Property::VECTOR2, true, true, true, VisualRenderer::Property::TRANSFORM_SIZE, TEST_LOCATION);

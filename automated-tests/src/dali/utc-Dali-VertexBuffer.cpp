@@ -500,11 +500,24 @@ int UtcDaliVertexBufferSetDivisor(void)
   params["divisor"] << "1";
   DALI_TEST_CHECK(bufferTrace.FindMethodAndParams("VertexAttribDivisor", params));
 
+  tet_infoline("Test that by default, instancing isn't used");
   TraceCallStack::NamedParams params2;
-  DALI_TEST_CHECK(drawTrace.FindMethodAndGetParameters("DrawArraysInstanced", params2));
-  std::ostringstream oss;
-  oss << sizeof(instanceData) / sizeof(InstanceData);
-  DALI_TEST_EQUALS(params2["instanceCount"].str(), oss.str(), TEST_LOCATION);
+  params2["instanceCount"] << 0;
+  DALI_TEST_CHECK(!drawTrace.FindMethodAndGetParameters("DrawArraysInstanced", params2));
+  DALI_TEST_CHECK(drawTrace.FindMethod("DrawArrays"));
+
+  tet_infoline("Test that instancing is used if Renderer requests an instance count");
+  drawTrace.Reset();
+
+  int instanceCount         = sizeof(instanceData) / sizeof(InstanceData);
+  renderer["instanceCount"] = instanceCount;
+  application.SendNotification();
+  application.Render();
+
+  TraceCallStack::NamedParams params3;
+  params3["instanceCount"] << instanceCount;
+  DALI_TEST_CHECK(drawTrace.FindMethodAndGetParameters("DrawArraysInstanced", params3));
+  DALI_TEST_CHECK(!drawTrace.FindMethod("DrawArrays"));
   END_TEST;
 }
 

@@ -642,7 +642,7 @@ void Renderer::DisconnectFromSceneGraph(SceneController& sceneController, Buffer
   mSceneController = nullptr;
 }
 
-Render::RendererKey Renderer::GetRenderer()
+Render::RendererKey Renderer::GetRenderer() const
 {
   return mRenderer;
 }

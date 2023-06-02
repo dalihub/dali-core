@@ -126,14 +126,16 @@ public:
    *
    * @param[in] graphicsController The graphics controller
    * @param[in,out] commandBuffer The current command buffer queue
-   * @param[in] elementBufferOffset The index of first element to draw if index buffer bound
-   * @param[in] elementBufferCount Number of elements to draw if index buffer bound, uses whole buffer when 0
+   * @param[in] elementBufferOffset The index of first vertex / element to draw if index buffer bound
+   * @param[in] elementBufferCount Number of vertices / elements to draw if index buffer bound, uses whole buffer when 0
+   * @param[in] instanceCount Number of instances to draw (use in conjunction with VertexBuffer divisor)
    * @return true if the draw command was issued, false otherwise
    */
   bool Draw(Graphics::Controller&    graphicsController,
             Graphics::CommandBuffer& commandBuffer,
             uint32_t                 elementBufferOffset,
-            uint32_t                 elementBufferCount);
+            uint32_t                 elementBufferCount,
+            uint32_t                 instanceCount);
 
   /**
    * @brief Set up the attributes bind commaneds
@@ -151,7 +153,6 @@ private:
   OwnerPointer<GpuBuffer> mIndexBuffer;
   IndexType               mIndexType;
   Type                    mGeometryType;
-  uint32_t                mInstanceCount{0};
 
   // Booleans
   bool mIndicesChanged : 1;

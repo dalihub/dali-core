@@ -796,6 +796,8 @@ public:
 
   inline void GetActiveAttrib(GLuint program, GLuint index, GLsizei bufsize, GLsizei* length, GLint* size, GLenum* type, char* name) override
   {
+    strncpy(name, mAttribLocs[index].c_str(), 99);
+    *type = mAttribTypes[index];
   }
 
   inline void SetActiveUniforms(const std::vector<ActiveUniform>& uniforms)
@@ -1590,6 +1592,18 @@ public:
     mBufferTrace.PushCall("VertexAttribPointer", namedParams.str(), namedParams);
   }
 
+  inline void VertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid* pointer) override
+  {
+    TraceCallStack::NamedParams namedParams;
+    namedParams["index"] << index;
+    namedParams["size"] << size;
+    namedParams["type"] << std::hex << type;
+    namedParams["stride"] << stride;
+    namedParams["offset"] << std::to_string(reinterpret_cast<unsigned long>(pointer));
+
+    mBufferTrace.PushCall("VertexAttribIPointer", namedParams.str(), namedParams);
+  }
+
   inline void Viewport(GLint x, GLint y, GLsizei width, GLsizei height) override
   {
     std::string commaString(", ");
@@ -1769,10 +1783,6 @@ public:
   }
 
   inline void GetTransformFeedbackVarying(GLuint program, GLuint index, GLsizei bufSize, GLsizei* length, GLsizei* size, GLenum* type, GLchar* name) override
-  {
-  }
-
-  inline void VertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid* pointer) override
   {
   }
 
@@ -2099,9 +2109,13 @@ public: // TEST FUNCTIONS
   {
     mLinkStatus = value;
   }
-  inline void SetAttribLocations(std::vector<std::string> locs)
+  inline void SetAttribLocations(std::vector<std::string>& locs)
   {
     mAttribLocs = locs;
+  }
+  inline void SetAttribTypes(std::vector<GLenum>& types)
+  {
+    mAttribTypes = types;
   }
   inline void SetGetErrorResult(GLenum result)
   {
@@ -2573,7 +2587,8 @@ public:
   bool                                  mGetProgramBinaryCalled;
   typedef std::map<GLuint, std::string> ShaderSourceMap;
   ShaderSourceMap                       mShaderSources;
-  std::vector<std::string>              mAttribLocs; // should be bound to shader
+  std::vector<std::string>              mAttribLocs;  // should be bound to shader
+  std::vector<GLenum>                   mAttribTypes; // should be bound to shader
   GLuint                                mLastShaderCompiled;
   GLbitfield                            mLastClearBitMask;
   Vector4                               mLastClearColor;

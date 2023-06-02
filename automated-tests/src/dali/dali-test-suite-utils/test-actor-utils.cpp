@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,6 +129,13 @@ Texture CreateTexture(TextureType::Type type, Pixel::Format format, int width, i
   PixelData pixelData  = PixelData::New(buffer, bufferSize, width, height, format, PixelData::FREE);
   texture.Upload(pixelData, 0u, 0u, 0u, 0u, width, height);
   return texture;
+}
+
+TextureSet CreateTextureSet(Pixel::Format format, int width, int height)
+{
+  TextureSet textureSet = TextureSet::New();
+  textureSet.SetTexture(0u, CreateTexture(TextureType::TEXTURE_2D, format, width, height));
+  return textureSet;
 }
 
 } // namespace Dali

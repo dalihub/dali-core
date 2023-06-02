@@ -2,7 +2,7 @@
 #define DALI_RENDERER_DEVEL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,15 +129,15 @@ enum Type
   STENCIL_OPERATION_ON_Z_PASS = Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_PASS,
 
   /**
-     * @brief The opacity of the renderer.
-     * @details Name "opacity", type Property::FLOAT.
-     */
+   * @brief The opacity of the renderer.
+   * @details Name "opacity", type Property::FLOAT.
+   */
   OPACITY = STENCIL_OPERATION_ON_Z_PASS + 1,
 
   /**
-     * @brief The rendering behavior of the renderer.
-     * @details Name "renderingBehavior", type Property::INTEGER.
-     */
+   * @brief The rendering behavior of the renderer.
+   * @details Name "renderingBehavior", type Property::INTEGER.
+   */
   RENDERING_BEHAVIOR = STENCIL_OPERATION_ON_Z_PASS + 2,
 
   /**
@@ -145,6 +145,25 @@ enum Type
    * @note The default value is BlendEquation::ADD
    */
   BLEND_EQUATION = STENCIL_OPERATION_ON_Z_PASS + 3,
+
+  /**
+   * @brief Which vertex to render first from a vertex buffer without indices
+   * @details name "vertexRangeFirst", type INTEGER
+   */
+  VERTEX_RANGE_FIRST = INDEX_RANGE_FIRST,
+
+  /**
+   * @brief How many vertices to render to render from a vertex buffer without indices
+   * @details name "vertexRangeCount", type INTEGER
+   */
+  VERTEX_RANGE_COUNT = INDEX_RANGE_COUNT,
+
+  /**
+   * @brief How many instances to render from a vertex buffer with non-zero divisor.
+   * @note Overrides computed instance count on vertex buffer.
+   * @details name "instanceCount", type INTEGER
+   */
+  INSTANCE_COUNT = STENCIL_OPERATION_ON_Z_PASS + 4,
 };
 } // namespace Property
 

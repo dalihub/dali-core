@@ -299,6 +299,13 @@ inline void SetRenderCallbackMessage(EventThreadServices& eventThreadServices, c
   new(slot) LocalType(&renderer, &Renderer::SetRenderCallback, callback);
 }
 
+inline void SetInstanceCountMessage(EventThreadServices& eventThreadServices, const Renderer& renderer, uint32_t instanceCount)
+{
+  using LocalType = MessageValue1<SceneGraph::Renderer, uint32_t>;
+  uint32_t* slot  = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
+  new(slot) LocalType(&renderer, &SceneGraph::Renderer::SetInstanceCount, instanceCount);
+}
+
 } // namespace Dali::Internal::SceneGraph
 
 #endif //DALI_INTERNAL_SCENE_GRAPH_RENDERER_MESSAGES_H

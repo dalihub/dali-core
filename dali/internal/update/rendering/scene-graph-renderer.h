@@ -391,7 +391,7 @@ public:
    * Retrieve the Render thread renderer
    * @return The associated render thread renderer
    */
-  Render::RendererKey GetRenderer();
+  Render::RendererKey GetRenderer() const;
 
   /**
    * Query whether the renderer is fully opaque, fully transparent or transparent.
@@ -438,6 +438,16 @@ public:
    * @copydoc RenderDataProvider::GetVisualTransformedUpdateArea()
    */
   Vector4 GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, const Vector4& originalUpdateArea) noexcept override;
+
+  uint32_t GetInstanceCount() const override
+  {
+    return mInstanceCount;
+  }
+
+  void SetInstanceCount(uint32_t instanceCount)
+  {
+    mInstanceCount = instanceCount;
+  }
 
   /**
    * Sets RenderCallback object
@@ -570,6 +580,7 @@ private:
 
   uint32_t             mIndexedDrawFirstElement;     ///< first element index to be drawn using indexed draw
   uint32_t             mIndexedDrawElementsCount;    ///< number of elements to be drawn using indexed draw
+  uint32_t             mInstanceCount{0};            ///< The number of instances to be drawn
   uint32_t             mBlendBitmask;                ///< The bitmask of blending options
   uint32_t             mResendFlag;                  ///< Indicate whether data should be resent to the renderer
   UniformMap::SizeType mUniformMapChangeCounter{0u}; ///< Value to check if uniform data should be updated
