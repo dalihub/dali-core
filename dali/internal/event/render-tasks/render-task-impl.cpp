@@ -101,13 +101,17 @@ RenderTaskPtr RenderTask::New(Actor* sourceActor, CameraActor* cameraActor, Rend
 void RenderTask::SetSourceActor(Actor* actor)
 {
   mSourceActor.SetActor(actor);
-  if(actor)
+
+  if(GetRenderTaskSceneObject())
   {
-    SetSourceNodeMessage(GetEventThreadServices(), GetRenderTaskSceneObject(), &actor->GetNode());
-  }
-  else
-  {
-    SetSourceNodeMessage(GetEventThreadServices(), GetRenderTaskSceneObject(), nullptr);
+    if(actor)
+    {
+      SetSourceNodeMessage(GetEventThreadServices(), *GetRenderTaskSceneObject(), &actor->GetNode());
+    }
+    else
+    {
+      SetSourceNodeMessage(GetEventThreadServices(), *GetRenderTaskSceneObject(), nullptr);
+    }
   }
 
   // set the actor on exclusive container for hit testing
@@ -127,8 +131,11 @@ void RenderTask::SetExclusive(bool exclusive)
 
     mRenderTaskList.SetExclusive(this, exclusive);
 
-    // scene object is being used in a separate thread; queue a message to set the value
-    SetExclusiveMessage(GetEventThreadServices(), GetRenderTaskSceneObject(), mExclusive);
+    if(GetRenderTaskSceneObject())
+    {
+      // scene object is being used in a separate thread; queue a message to set the value
+      SetExclusiveMessage(GetEventThreadServices(), *GetRenderTaskSceneObject(), mExclusive);
+    }
   }
 }
 
@@ -150,13 +157,17 @@ bool RenderTask::GetInputEnabled() const
 void RenderTask::SetCameraActor(CameraActor* cameraActor)
 {
   mCameraActor.SetActor(cameraActor);
-  if(cameraActor)
+
+  if(GetRenderTaskSceneObject())
   {
-    SetCameraMessage(GetEventThreadServices(), GetRenderTaskSceneObject(), &cameraActor->GetCameraSceneObject());
-  }
-  else
-  {
-    SetCameraMessage(GetEventThreadServices(), GetRenderTaskSceneObject(), nullptr);
+    if(cameraActor)
+    {
+      SetCameraMessage(GetEventThreadServices(), *GetRenderTaskSceneObject(), &cameraActor->GetCameraSceneObject());
+    }
+    else
+    {
+      SetCameraMessage(GetEventThreadServices(), *GetRenderTaskSceneObject(), nullptr);
+    }
   }
 
   // set the actor on exclusive container for hit testing
@@ -181,7 +192,10 @@ void RenderTask::SetFrameBuffer(FrameBufferPtr frameBuffer)
     renderFrameBufferPtr = mFrameBuffer->GetRenderObject();
   }
 
-  SetFrameBufferMessage(GetEventThreadServices(), GetRenderTaskSceneObject(), renderFrameBufferPtr);
+  if(GetRenderTaskSceneObject())
+  {
+    SetFrameBufferMessage(GetEventThreadServices(), *GetRenderTaskSceneObject(), renderFrameBufferPtr);
+  }
 }
 
 FrameBuffer* RenderTask::GetFrameBuffer() const
@@ -213,31 +227,34 @@ void RenderTask::SetViewportGuideActor(Actor* actor)
 {
   mViewportGuideActor.SetActor(actor);
 
-  auto& sceneObject         = GetRenderTaskSceneObject();
-  auto& eventThreadServices = GetEventThreadServices();
-  auto& updateManager       = eventThreadServices.GetUpdateManager();
-
-  if(actor)
+  auto sceneObject = GetRenderTaskSceneObject();
+  if(sceneObject)
   {
-    SetViewportGuideNodeMessage(eventThreadServices, sceneObject, &actor->GetNode());
-  }
-  else
-  {
-    // Ensure that if the node is removed through this API, that the
-    // viewport values are set back to their base value and that their dirty
-    // flags are cleared after 1 frame.
-    SetViewportGuideNodeMessage(eventThreadServices, sceneObject, nullptr);
+    auto& eventThreadServices = GetEventThreadServices();
+    auto& updateManager       = eventThreadServices.GetUpdateManager();
 
-    auto renderTask               = const_cast<SceneGraph::RenderTask*>(&sceneObject);
-    auto viewportPositionProperty = const_cast<SceneGraph::AnimatableProperty<Vector2>*>(&renderTask->mViewportPosition);
-    auto viewportSizeProperty     = const_cast<SceneGraph::AnimatableProperty<Vector2>*>(&renderTask->mViewportSize);
+    if(actor)
+    {
+      SetViewportGuideNodeMessage(eventThreadServices, *sceneObject, &actor->GetNode());
+    }
+    else
+    {
+      // Ensure that if the node is removed through this API, that the
+      // viewport values are set back to their base value and that their dirty
+      // flags are cleared after 1 frame.
+      SetViewportGuideNodeMessage(eventThreadServices, *sceneObject, nullptr);
 
-    OwnerPointer<SceneGraph::PropertyResetterBase> resetter1(
-      new SceneGraph::BakerResetter(renderTask, viewportPositionProperty, SceneGraph::BakerResetter::Lifetime::SET));
-    OwnerPointer<SceneGraph::PropertyResetterBase> resetter2(
-      new SceneGraph::BakerResetter(renderTask, viewportSizeProperty, SceneGraph::BakerResetter::Lifetime::SET));
-    AddResetterMessage(updateManager, resetter1);
-    AddResetterMessage(updateManager, resetter2);
+      auto renderTask               = const_cast<SceneGraph::RenderTask*>(sceneObject);
+      auto viewportPositionProperty = const_cast<SceneGraph::AnimatableProperty<Vector2>*>(&renderTask->mViewportPosition);
+      auto viewportSizeProperty     = const_cast<SceneGraph::AnimatableProperty<Vector2>*>(&renderTask->mViewportSize);
+
+      OwnerPointer<SceneGraph::PropertyResetterBase> resetter1(
+        new SceneGraph::BakerResetter(renderTask, viewportPositionProperty, SceneGraph::BakerResetter::Lifetime::SET));
+      OwnerPointer<SceneGraph::PropertyResetterBase> resetter2(
+        new SceneGraph::BakerResetter(renderTask, viewportSizeProperty, SceneGraph::BakerResetter::Lifetime::SET));
+      AddResetterMessage(updateManager, resetter1);
+      AddResetterMessage(updateManager, resetter2);
+    }
   }
 }
 
@@ -250,44 +267,54 @@ void RenderTask::ResetViewportGuideActor()
 {
   // Don't re-use the SetViewportGuideActor method for this task - the bake messages below will create their own resetters.
   mViewportGuideActor.SetActor(nullptr);
-  SetViewportGuideNodeMessage(GetEventThreadServices(), GetRenderTaskSceneObject(), nullptr);
 
-  EventThreadServices& eventThreadServices      = GetEventThreadServices();
-  auto                 renderTask               = const_cast<SceneGraph::RenderTask*>(&GetRenderTaskSceneObject());
-  auto                 viewportPositionProperty = const_cast<SceneGraph::AnimatableProperty<Vector2>*>(&renderTask->mViewportPosition);
-  auto                 viewportSizeProperty     = const_cast<SceneGraph::AnimatableProperty<Vector2>*>(&renderTask->mViewportSize);
-  BakeMessage<Vector2>(eventThreadServices, *renderTask, *viewportPositionProperty, mViewportPosition);
-  BakeMessage<Vector2>(eventThreadServices, *renderTask, *viewportSizeProperty, mViewportSize);
+  if(GetRenderTaskSceneObject())
+  {
+    SetViewportGuideNodeMessage(GetEventThreadServices(), *GetRenderTaskSceneObject(), nullptr);
+
+    EventThreadServices& eventThreadServices      = GetEventThreadServices();
+    auto                 renderTask               = const_cast<SceneGraph::RenderTask*>(GetRenderTaskSceneObject());
+    auto                 viewportPositionProperty = const_cast<SceneGraph::AnimatableProperty<Vector2>*>(&renderTask->mViewportPosition);
+    auto                 viewportSizeProperty     = const_cast<SceneGraph::AnimatableProperty<Vector2>*>(&renderTask->mViewportSize);
+    BakeMessage<Vector2>(eventThreadServices, *renderTask, *viewportPositionProperty, mViewportPosition);
+    BakeMessage<Vector2>(eventThreadServices, *renderTask, *viewportSizeProperty, mViewportSize);
+  }
 }
 
 void RenderTask::SetViewportPosition(const Vector2& value)
 {
   mViewportPosition = value;
 
-  EventThreadServices& eventThreadServices      = GetEventThreadServices();
-  auto                 renderTask               = const_cast<SceneGraph::RenderTask*>(&GetRenderTaskSceneObject());
-  auto                 viewportPositionProperty = const_cast<SceneGraph::AnimatableProperty<Vector2>*>(&renderTask->mViewportPosition);
-  BakeMessage<Vector2>(eventThreadServices, *renderTask, *viewportPositionProperty, mViewportPosition);
+  if(GetRenderTaskSceneObject())
+  {
+    EventThreadServices& eventThreadServices      = GetEventThreadServices();
+    auto                 renderTask               = const_cast<SceneGraph::RenderTask*>(GetRenderTaskSceneObject());
+    auto                 viewportPositionProperty = const_cast<SceneGraph::AnimatableProperty<Vector2>*>(&renderTask->mViewportPosition);
+    BakeMessage<Vector2>(eventThreadServices, *renderTask, *viewportPositionProperty, mViewportPosition);
+  }
 }
 
 Vector2 RenderTask::GetCurrentViewportPosition() const
 {
-  return GetRenderTaskSceneObject().GetViewportPosition(GetEventThreadServices().GetEventBufferIndex());
+  return GetRenderTaskSceneObject() ? GetRenderTaskSceneObject()->GetViewportPosition(GetEventThreadServices().GetEventBufferIndex()) : Vector2::ZERO;
 }
 
 void RenderTask::SetViewportSize(const Vector2& value)
 {
   mViewportSize = value;
 
-  EventThreadServices& eventThreadServices  = GetEventThreadServices();
-  auto                 renderTask           = const_cast<SceneGraph::RenderTask*>(&GetRenderTaskSceneObject());
-  auto                 viewportSizeProperty = const_cast<SceneGraph::AnimatableProperty<Vector2>*>(&renderTask->mViewportSize);
-  BakeMessage<Vector2>(eventThreadServices, *renderTask, *viewportSizeProperty, mViewportSize);
+  if(GetRenderTaskSceneObject())
+  {
+    EventThreadServices& eventThreadServices  = GetEventThreadServices();
+    auto                 renderTask           = const_cast<SceneGraph::RenderTask*>(GetRenderTaskSceneObject());
+    auto                 viewportSizeProperty = const_cast<SceneGraph::AnimatableProperty<Vector2>*>(&renderTask->mViewportSize);
+    BakeMessage<Vector2>(eventThreadServices, *renderTask, *viewportSizeProperty, mViewportSize);
+  }
 }
 
 Vector2 RenderTask::GetCurrentViewportSize() const
 {
-  return GetRenderTaskSceneObject().GetViewportSize(GetEventThreadServices().GetEventBufferIndex());
+  return GetRenderTaskSceneObject() ? GetRenderTaskSceneObject()->GetViewportSize(GetEventThreadServices().GetEventBufferIndex()) : Vector2::ZERO;
 }
 
 void RenderTask::SetViewport(const Viewport& viewport)
@@ -298,34 +325,37 @@ void RenderTask::SetViewport(const Viewport& viewport)
 
 void RenderTask::GetViewport(Viewport& viewPort) const
 {
-  BufferIndex bufferIndex = GetEventThreadServices().GetEventBufferIndex();
-
-  if(!GetRenderTaskSceneObject().GetViewportEnabled(bufferIndex))
+  if(GetRenderTaskSceneObject())
   {
-    Internal::Stage* stage = Internal::Stage::GetCurrent();
-    if(stage)
-    {
-      Vector2 size(stage->GetSize());
-      Actor*  sourceActor = mSourceActor.GetActor();
-      if(sourceActor && sourceActor->OnScene())
-      {
-        Scene& scene = sourceActor->GetScene();
-        size         = scene.GetSize();
-      }
+    BufferIndex bufferIndex = GetEventThreadServices().GetEventBufferIndex();
 
-      viewPort.x = viewPort.y = 0;
+    if(!GetRenderTaskSceneObject()->GetViewportEnabled(bufferIndex))
+    {
+      Internal::Stage* stage = Internal::Stage::GetCurrent();
+      if(stage)
+      {
+        Vector2 size(stage->GetSize());
+        Actor*  sourceActor = mSourceActor.GetActor();
+        if(sourceActor && sourceActor->OnScene())
+        {
+          Scene& scene = sourceActor->GetScene();
+          size         = scene.GetSize();
+        }
+
+        viewPort.x = viewPort.y = 0;
+        viewPort.width          = static_cast<int32_t>(size.width);  // truncated
+        viewPort.height         = static_cast<int32_t>(size.height); // truncated
+      }
+    }
+    else
+    {
+      const Vector2& position = GetRenderTaskSceneObject()->GetViewportPosition(bufferIndex);
+      const Vector2& size     = GetRenderTaskSceneObject()->GetViewportSize(bufferIndex);
+      viewPort.x              = static_cast<int32_t>(position.x);  // truncated
+      viewPort.y              = static_cast<int32_t>(position.y);  // truncated
       viewPort.width          = static_cast<int32_t>(size.width);  // truncated
       viewPort.height         = static_cast<int32_t>(size.height); // truncated
     }
-  }
-  else
-  {
-    const Vector2& position = GetRenderTaskSceneObject().GetViewportPosition(bufferIndex);
-    const Vector2& size     = GetRenderTaskSceneObject().GetViewportSize(bufferIndex);
-    viewPort.x              = static_cast<int32_t>(position.x);  // truncated
-    viewPort.y              = static_cast<int32_t>(position.y);  // truncated
-    viewPort.width          = static_cast<int32_t>(size.width);  // truncated
-    viewPort.height         = static_cast<int32_t>(size.height); // truncated
   }
 }
 
@@ -335,17 +365,20 @@ void RenderTask::SetClearColor(const Vector4& color)
   {
     mClearColor = color;
 
-    // scene object is being used in a separate thread; queue a message to set the value
-    EventThreadServices& eventThreadServices = GetEventThreadServices();
-    auto                 renderTask          = const_cast<SceneGraph::RenderTask*>(&GetRenderTaskSceneObject());
-    auto                 clearColorProperty  = const_cast<SceneGraph::AnimatableProperty<Vector4>*>(&renderTask->mClearColor);
-    BakeMessage<Vector4>(eventThreadServices, *renderTask, *clearColorProperty, mClearColor);
+    if(GetRenderTaskSceneObject())
+    {
+      // scene object is being used in a separate thread; queue a message to set the value
+      EventThreadServices& eventThreadServices = GetEventThreadServices();
+      auto                 renderTask          = const_cast<SceneGraph::RenderTask*>(GetRenderTaskSceneObject());
+      auto                 clearColorProperty  = const_cast<SceneGraph::AnimatableProperty<Vector4>*>(&renderTask->mClearColor);
+      BakeMessage<Vector4>(eventThreadServices, *renderTask, *clearColorProperty, mClearColor);
+    }
   }
 }
 
 const Vector4& RenderTask::GetClearColor() const
 {
-  return GetRenderTaskSceneObject().GetClearColor(GetEventThreadServices().GetEventBufferIndex());
+  return GetRenderTaskSceneObject() ? GetRenderTaskSceneObject()->GetClearColor(GetEventThreadServices().GetEventBufferIndex()) : Vector4::ZERO;
 }
 
 void RenderTask::SetSyncRequired(bool requiresSync)
@@ -354,8 +387,11 @@ void RenderTask::SetSyncRequired(bool requiresSync)
   {
     mRequiresSync = requiresSync;
 
-    // scene object is being used in a separate thread; queue a message to set the value
-    SetSyncRequiredMessage(GetEventThreadServices(), GetRenderTaskSceneObject(), requiresSync);
+    if(GetRenderTaskSceneObject())
+    {
+      // scene object is being used in a separate thread; queue a message to set the value
+      SetSyncRequiredMessage(GetEventThreadServices(), *GetRenderTaskSceneObject(), requiresSync);
+    }
   }
 }
 
@@ -370,8 +406,11 @@ void RenderTask::SetClearEnabled(bool enabled)
   {
     mClearEnabled = enabled;
 
-    // scene object is being used in a separate thread; queue a message to set the value
-    SetClearEnabledMessage(GetEventThreadServices(), GetRenderTaskSceneObject(), mClearEnabled);
+    if(GetRenderTaskSceneObject())
+    {
+      // scene object is being used in a separate thread; queue a message to set the value
+      SetClearEnabledMessage(GetEventThreadServices(), *GetRenderTaskSceneObject(), mClearEnabled);
+    }
   }
 }
 
@@ -386,8 +425,11 @@ void RenderTask::SetCullMode(bool mode)
   {
     mCullMode = mode;
 
-    // scene object is being used in a separate thread; queue a message to set the value
-    SetCullModeMessage(GetEventThreadServices(), GetRenderTaskSceneObject(), mCullMode);
+    if(GetRenderTaskSceneObject())
+    {
+      // scene object is being used in a separate thread; queue a message to set the value
+      SetCullModeMessage(GetEventThreadServices(), *GetRenderTaskSceneObject(), mCullMode);
+    }
   }
 }
 
@@ -405,8 +447,11 @@ void RenderTask::SetRefreshRate(uint32_t refreshRate)
 
   // Note - even when refreshRate is the same as mRefreshRate, a message should be sent
 
-  // sceneObject is being used in a separate thread; queue a message to set the value
-  SetRefreshRateMessage(GetEventThreadServices(), GetRenderTaskSceneObject(), refreshRate);
+  if(GetRenderTaskSceneObject())
+  {
+    // sceneObject is being used in a separate thread; queue a message to set the value
+    SetRefreshRateMessage(GetEventThreadServices(), *GetRenderTaskSceneObject(), refreshRate);
+  }
 }
 
 uint32_t RenderTask::GetRefreshRate() const
@@ -532,9 +577,18 @@ bool RenderTask::ViewportToLocal(Actor* actor, float viewportX, float viewportY,
   return actor->ScreenToLocal(*this, localX, localY, viewportX, viewportY);
 }
 
-const SceneGraph::RenderTask& RenderTask::GetRenderTaskSceneObject() const
+const SceneGraph::RenderTask* RenderTask::GetRenderTaskSceneObject() const
 {
-  return *static_cast<const SceneGraph::RenderTask*>(mUpdateObject);
+  return static_cast<const SceneGraph::RenderTask*>(mUpdateObject);
+}
+
+void RenderTask::RemoveRenderTaskSceneObject(RenderTaskList& renderTaskList)
+{
+  // send a message to remove the scene-graph RenderTask
+  const SceneGraph::RenderTaskList& parentSceneObject = renderTaskList.GetSceneObject();
+  RemoveTaskMessage(GetEventThreadServices(), parentSceneObject, *GetRenderTaskSceneObject());
+
+  mUpdateObject = nullptr;
 }
 
 RenderTaskList& RenderTask::GetRenderTaskList() const
@@ -719,23 +773,28 @@ void RenderTask::OnNotifyDefaultPropertyAnimation(Animation& animation, Property
 
 const SceneGraph::PropertyBase* RenderTask::GetSceneObjectAnimatableProperty(Property::Index index) const
 {
+  if(!GetRenderTaskSceneObject())
+  {
+    return nullptr;
+  }
+
   const SceneGraph::PropertyBase* property(nullptr);
 
   switch(index)
   {
     case Dali::RenderTask::Property::VIEWPORT_POSITION:
     {
-      property = &GetRenderTaskSceneObject().mViewportPosition;
+      property = &GetRenderTaskSceneObject()->mViewportPosition;
       break;
     }
     case Dali::RenderTask::Property::VIEWPORT_SIZE:
     {
-      property = &GetRenderTaskSceneObject().mViewportSize;
+      property = &GetRenderTaskSceneObject()->mViewportSize;
       break;
     }
     case Dali::RenderTask::Property::CLEAR_COLOR:
     {
-      property = &GetRenderTaskSceneObject().mClearColor;
+      property = &GetRenderTaskSceneObject()->mClearColor;
       break;
     }
     default:
@@ -760,16 +819,20 @@ const PropertyInputImpl* RenderTask::GetSceneObjectInputProperty(Property::Index
 
 bool RenderTask::HasFinished()
 {
-  bool           finished = false;
-  const uint32_t counter  = GetRenderTaskSceneObject().GetRenderedOnceCounter();
+  bool finished = false;
 
-  if(mRefreshOnceCounter < counter)
+  if(GetRenderTaskSceneObject())
   {
-    finished            = true;
-    mRefreshOnceCounter = counter;
+    const uint32_t counter = GetRenderTaskSceneObject()->GetRenderedOnceCounter();
+
+    if(mRefreshOnceCounter < counter)
+    {
+      finished            = true;
+      mRefreshOnceCounter = counter;
+    }
   }
 
-  DALI_LOG_INFO(gLogRender, Debug::General, "RenderTask::HasFinished()=%s SCRT:%p  SC\n", finished ? "T" : "F", &GetRenderTaskSceneObject());
+  DALI_LOG_INFO(gLogRender, Debug::General, "RenderTask::HasFinished()=%s SCRT:%p  SC\n", finished ? "T" : "F", GetRenderTaskSceneObject());
 
   return finished;
 }

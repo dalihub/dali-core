@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,6 @@ namespace Dali
 {
 namespace Internal
 {
-
 RenderTaskListPtr RenderTaskList::New()
 {
   RenderTaskListPtr taskList = new RenderTaskList();
@@ -95,14 +94,12 @@ void RenderTaskList::RemoveTask(Internal::RenderTask& task)
         mOverlayRenderTask.Reset();
       }
 
-      const SceneGraph::RenderTask& sceneObject = task.GetRenderTaskSceneObject();
-
       // delete the task
       mTasks.erase(iter);
-      // send a message to remove the scene-graph RenderTask
-      RemoveTaskMessage(mEventThreadServices, *mSceneObject, sceneObject);
 
-      Exclusive exclusive{ptr, ActorObserver()};
+      task.RemoveRenderTaskSceneObject(*this);
+
+      Exclusive                     exclusive{ptr, ActorObserver()};
       ExclusivesContainer::iterator exclusiveIter = find(mExclusives.begin(), mExclusives.end(), exclusive);
       if(exclusiveIter != mExclusives.end())
       {

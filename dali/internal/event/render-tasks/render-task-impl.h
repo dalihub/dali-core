@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_TASK_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -257,7 +257,13 @@ public: // Used by RenderTaskList, which owns the SceneGraph::RenderTasks
    * Retrieve the scene-graph RenderTask object.
    * @return The scene-graph object
    */
-  const SceneGraph::RenderTask& GetRenderTaskSceneObject() const;
+  const SceneGraph::RenderTask* GetRenderTaskSceneObject() const;
+
+  /**
+   * Remove the scene-graph RenderTask object.
+   * @param[in] renderTaskList The render task list.
+   */
+  void RemoveRenderTaskSceneObject(RenderTaskList& renderTaskList);
 
   /**
    * Retrieve the render task list RenderTask object belongs to.
