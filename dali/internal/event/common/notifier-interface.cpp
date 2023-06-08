@@ -1,8 +1,5 @@
-#ifndef DALI_INTERNAL_ANIMATION_PLAYLIST_DECLARATIONS_H
-#define DALI_INTERNAL_ANIMATION_PLAYLIST_DECLARATIONS_H
-
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,19 +15,27 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include <dali/internal/common/owner-pointer.h>
+// CLASS HEADER
+#include <dali/internal/event/common/notifier-interface.h>
 
-namespace Dali
+// EXTERNAL INCLUDES
+#include <atomic>
+#include <cstdint> // uint32_t
+
+namespace
 {
-namespace Internal
+Dali::Internal::NotifierInterface::NotifyId GetNextNotifyId()
 {
-class AnimationPlaylist;
+  static std::atomic_uint32_t gNotifyCount{0u};
+  return ++gNotifyCount;
+}
+} // namespace
 
-using AnimationPlaylistOwner = OwnerPointer<AnimationPlaylist>;
+namespace Dali::Internal
+{
+NotifierInterface::NotifierInterface()
+: mNotifyId(GetNextNotifyId())
+{
+}
 
-} // namespace Internal
-
-} // namespace Dali
-
-#endif // DALI_INTERNAL_ANIMATION_PLAYLIST_DECLARATIONS_H
+} // namespace Dali::Internal

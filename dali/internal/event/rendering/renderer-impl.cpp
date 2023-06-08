@@ -65,6 +65,7 @@ DALI_PROPERTY("stencilOperationOnZPass", INTEGER, true, false, false, Dali::Rend
 DALI_PROPERTY("opacity", FLOAT, true, true, true, Dali::DevelRenderer::Property::OPACITY)
 DALI_PROPERTY("renderingBehavior", INTEGER, true, false, false, Dali::DevelRenderer::Property::RENDERING_BEHAVIOR)
 DALI_PROPERTY("blendEquation", INTEGER, true, false, false, Dali::DevelRenderer::Property::BLEND_EQUATION)
+DALI_PROPERTY("instanceCount", INTEGER, true, false, false, Dali::DevelRenderer::Property::INSTANCE_COUNT)
 DALI_PROPERTY_TABLE_END(DEFAULT_RENDERER_PROPERTY_START_INDEX, RendererDefaultProperties)
 
 // Property string to enumeration tables:
@@ -681,6 +682,19 @@ void Renderer::SetDefaultProperty(Property::Index        index,
       }
       break;
     }
+    case DevelRenderer::Property::INSTANCE_COUNT:
+    {
+      int instanceCount;
+      if(propertyValue.Get(instanceCount))
+      {
+        if(instanceCount != int(mInstanceCount))
+        {
+          mInstanceCount = uint32_t(instanceCount);
+          SetInstanceCountMessage(GetEventThreadServices(), GetRendererSceneObject(), mInstanceCount);
+        }
+      }
+      break;
+    }
   }
 }
 
@@ -972,6 +986,11 @@ bool Renderer::GetCachedPropertyValue(Property::Index index, Property::Value& va
     case Dali::DevelRenderer::Property::RENDERING_BEHAVIOR:
     {
       value = mRenderingBehavior;
+      break;
+    }
+    case DevelRenderer::Property::INSTANCE_COUNT:
+    {
+      value = int(mInstanceCount);
       break;
     }
     default:

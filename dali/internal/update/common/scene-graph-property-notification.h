@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/internal/event/common/notifier-interface.h>
 #include <dali/internal/event/common/property-notification-impl.h>
 #include <dali/internal/update/common/property-base.h>
 #include <dali/public-api/object/property-notification.h>
@@ -40,7 +41,7 @@ using ConditionFunction = bool (*)(const Dali::PropertyInput&, Dali::Internal::P
  * PropertyNotifications are used to inspect properties of scene graph objects, as part of a scene
  * managers "update" phase. When a condition has been met the application receives a notification signal.
  */
-class PropertyNotification
+class PropertyNotification : public NotifierInterface
 {
 public:
   using NotifyMode           = Dali::PropertyNotification::NotifyMode;

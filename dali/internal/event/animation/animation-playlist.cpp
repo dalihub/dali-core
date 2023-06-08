@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/animation/animation-impl.h>
+#include <dali/internal/update/animation/scene-graph-animation.h>
 #include <dali/public-api/common/vector-wrapper.h>
 
 namespace Dali
@@ -80,52 +81,49 @@ void AnimationPlaylist::OnClear(Animation& animation)
   }
 }
 
-void AnimationPlaylist::NotifyCompleted()
+void AnimationPlaylist::NotifyProgressReached(NotifierInterface::NotifyId notifyId)
 {
-  std::vector<Dali::Animation> finishedAnimations;
+  Dali::Animation handle; // Will own handle until all emits have been done.
 
-  // Since animations can be unreferenced during the signal emissions, iterators into animationPointers may be invalidated.
-  // First copy and reference the finished animations, then emit signals
-  for(auto* animation : mAnimations)
+  auto* animation = GetEventObject(notifyId);
+  if(DALI_LIKELY(animation))
   {
-    if(animation->HasFinished())
-    {
-      Dali::Animation handle = Dali::Animation(animation);
-      finishedAnimations.push_back(handle);
+    // Check if this animation hold inputed scenegraph animation.
+    DALI_ASSERT_DEBUG(animation->GetSceneObject()->GetNotifyId() == notifyId);
 
-      // The animation may be present in mPlaylist - remove if necessary
-      // Note that the animation "Finish" signal is emitted after Stop() has been called
-      OnClear(*animation);
+    handle = Dali::Animation(animation);
+    animation->EmitSignalProgressReached();
+  }
+}
+
+void AnimationPlaylist::NotifyCompleted(CompleteNotificationInterface::ParameterList notifierIdList)
+{
+  std::vector<Dali::Animation> finishedAnimations; // Will own handle until all emits have been done.
+
+  for(const auto& notifierId : notifierIdList)
+  {
+    auto* animation = GetEventObject(notifierId);
+    if(DALI_LIKELY(animation))
+    {
+      // Check if this animation hold inputed scenegraph animation.
+      DALI_ASSERT_DEBUG(animation->GetSceneObject()->GetNotifyId() == notifierId);
+
+      // Update loop count. And check whether animation was finished or not.
+      if(animation->HasFinished())
+      {
+        finishedAnimations.push_back(Dali::Animation(animation));
+
+        // The animation may be present in mPlaylist - remove if necessary
+        // Note that the animation "Finish" signal is emitted after Stop() has been called
+        OnClear(*animation);
+      }
     }
   }
 
   // Now it's safe to emit the signals
-  for(auto iter = finishedAnimations.begin(); iter != finishedAnimations.end(); ++iter)
+  for(auto& animation : finishedAnimations)
   {
-    Dali::Animation& handle = *iter;
-
-    GetImplementation(handle).EmitSignalFinish();
-  }
-}
-
-void AnimationPlaylist::NotifyProgressReached(const SceneGraph::Animation* sceneGraphAnimation)
-{
-  std::vector<Dali::Animation> notifyProgressAnimations; // Will own animations until all emits have been done
-
-  for(auto* animation : mAnimations)
-  {
-    if((animation->GetSceneObject()) == sceneGraphAnimation)
-    {
-      // Store handles to animations that need signals emitted in the case of an animation being cleared in-between emits
-      notifyProgressAnimations.push_back(Dali::Animation(animation));
-    }
-  }
-
-  for(std::vector<Dali::Animation>::iterator iter = notifyProgressAnimations.begin(); iter != notifyProgressAnimations.end(); ++iter)
-  {
-    Dali::Animation& handle = *iter;
-
-    GetImplementation(handle).EmitSignalProgressReached();
+    GetImplementation(animation).EmitSignalFinish();
   }
 }
 

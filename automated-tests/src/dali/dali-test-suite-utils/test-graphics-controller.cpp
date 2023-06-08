@@ -715,13 +715,13 @@ void TestGraphicsController::ProcessCommandBuffer(TestGraphicsCommandBuffer& com
           if(cmd.data.draw.draw.instanceCount == 0)
           {
             mGl.DrawArrays(GetTopology(currentPipeline->inputAssemblyState.topology),
-                           0,
+                           cmd.data.draw.draw.firstVertex,
                            cmd.data.draw.draw.vertexCount);
           }
           else
           {
             mGl.DrawArraysInstanced(GetTopology(currentPipeline->inputAssemblyState.topology),
-                                    0,
+                                    cmd.data.draw.draw.firstVertex,
                                     cmd.data.draw.draw.vertexCount,
                                     cmd.data.draw.draw.instanceCount);
           }

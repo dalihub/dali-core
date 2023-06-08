@@ -2,7 +2,7 @@
 #define DALI_TEST_ACTOR_UTILS_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,8 @@ Actor CreateRenderableActor(Texture texture, const std::string& vertexShader, co
  */
 Actor CreateRenderableActor2(TextureSet textures, const std::string& vertexShader, const std::string& fragmentShader);
 
-Texture CreateTexture(TextureType::Type type, Pixel::Format format, int width, int height);
+Texture    CreateTexture(TextureType::Type type, Pixel::Format format, int width, int height);
+TextureSet CreateTextureSet(Pixel::Format format, int width, int height);
 
 } // namespace Dali
 

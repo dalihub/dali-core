@@ -24,6 +24,7 @@
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/event-thread-services.h>
+#include <dali/internal/event/common/notifier-interface.h>
 #include <dali/internal/update/animation/scene-graph-animator.h>
 
 namespace Dali
@@ -37,7 +38,7 @@ namespace SceneGraph
  * managers "update" phase. An animation is a container of Animator objects; the actual setting
  * of object values is done by the animators.
  */
-class Animation
+class Animation : public NotifierInterface
 {
 public:
   using EndAction = Dali::Animation::EndAction;

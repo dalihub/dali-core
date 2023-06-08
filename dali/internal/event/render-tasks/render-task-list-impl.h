@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_TASK_LIST_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <dali/public-api/render-tasks/render-task-list.h>
 
 #include <dali/internal/event/common/complete-notification-interface.h>
+#include <dali/internal/event/common/scene-graph-notifier-interface-mapper.h>
 #include <dali/internal/event/events/actor-observer.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 
@@ -50,7 +51,7 @@ class UpdateManager;
  * A proxy for the scene-graph RenderTaskList.
  * A separate LayerList is maintained for actors added via the SystemLevel::Add().
  */
-class RenderTaskList : public BaseObject, public CompleteNotificationInterface
+class RenderTaskList : public BaseObject, public CompleteNotificationInterface, public SceneGraphNotifierInterfaceMapper<RenderTask>
 {
 public:
   using RenderTaskContainer = std::vector<RenderTaskPtr>;
@@ -188,7 +189,7 @@ private: // from CompleteNotificationInterface
   /**
    * @copydoc CompleteNotificationInterface::NotifyCompleted()
    */
-  void NotifyCompleted() override;
+  void NotifyCompleted(CompleteNotificationInterface::ParameterList notifierList) override;
 
 private:
   EventThreadServices& mEventThreadServices;

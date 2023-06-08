@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PROPERTY_NOTIFIER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/message.h>
+#include <dali/internal/event/common/notifier-interface.h> ///< for NotifierInterface::NotifyId
 
 namespace Dali
 {
@@ -45,22 +46,22 @@ public:
   /**
    * Provide notification signals for a changed property.
    * This method should be called in the event-thread; the update-thread must use PropertyChangedMessage.
-   * @param[in] propertyNotification A pointer to the SceneGraph::PropertyNotification that has been mnodified.
+   * @param[in] notifyId A notifyId to the SceneGraph::PropertyNotification that has been mnodified.
    * @param[in] validity Passes in whether the notification was triggered by a true or false condition result
    */
-  virtual void NotifyProperty(SceneGraph::PropertyNotification* propertyNotification, bool validity) = 0;
+  virtual void NotifyProperty(NotifierInterface::NotifyId notifyId, bool validity) = 0;
 };
 
 /**
  * Notification message for when a property has been modified
  * @param[in] notifier This will provide the notification signal.
  */
-inline MessageBase* PropertyChangedMessage(PropertyNotifier& notifier, SceneGraph::PropertyNotification* propertyNotification, bool validity)
+inline MessageBase* PropertyChangedMessage(PropertyNotifier& notifier, NotifierInterface::NotifyId notifyId, bool validity)
 {
-  return new MessageValue2<PropertyNotifier, SceneGraph::PropertyNotification*, bool>(&notifier,
-                                                                                      &PropertyNotifier::NotifyProperty,
-                                                                                      propertyNotification,
-                                                                                      validity);
+  return new MessageValue2<PropertyNotifier, NotifierInterface::NotifyId, bool>(&notifier,
+                                                                                &PropertyNotifier::NotifyProperty,
+                                                                                notifyId,
+                                                                                validity);
 }
 
 } // namespace Internal

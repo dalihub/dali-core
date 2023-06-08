@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,9 +101,9 @@ void TestGlAbstraction::Initialize()
   mProgramUniforms3f.clear();
   mProgramUniforms4f.clear();
 
-  mAttribLocs.clear();
-  mAttribLocs.push_back("aPosition");
-  mAttribLocs.push_back("aTexCoord");
+  mAttribLocs  = {"aPosition", "aTexCoord"};
+  mAttribTypes = {GL_FLOAT, GL_FLOAT};
+
   mCullFaceTrace.Reset();
   mDepthFunctionTrace.Reset();
   mEnableDisableTrace.Reset();

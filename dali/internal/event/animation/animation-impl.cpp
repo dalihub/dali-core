@@ -193,12 +193,18 @@ void Animation::CreateSceneObject()
   mAnimation = SceneGraph::Animation::New(mDurationSeconds, mSpeedFactor, mPlayRange, mLoopCount, mEndAction, mDisconnectAction);
   OwnerPointer<SceneGraph::Animation> transferOwnership(const_cast<SceneGraph::Animation*>(mAnimation));
   AddAnimationMessage(mEventThreadServices.GetUpdateManager(), transferOwnership);
+
+  // Setup mapping infomations between scenegraph animation
+  mPlaylist.MapNotifier(mAnimation, *this);
 }
 
 void Animation::DestroySceneObject()
 {
   if(mAnimation != nullptr)
   {
+    // Remove mapping infomations
+    mPlaylist.UnmapNotifier(mAnimation);
+
     // Remove animation using a message to the update manager
     RemoveAnimationMessage(mEventThreadServices.GetUpdateManager(), *mAnimation);
     mAnimation = nullptr;

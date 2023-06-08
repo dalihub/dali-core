@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_NOTIFICATION_MANAGER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,9 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/internal/common/owner-pointer.h>
+#include <dali/internal/event/common/notifier-interface.h> ///< for NotifierInterface::NotifyId
+#include <dali/public-api/common/dali-vector.h>
 
 namespace Dali
 {
@@ -34,6 +37,9 @@ class MessageBase;
 class NotificationManager
 {
 public:
+  // TODO : Can we get this typename from complete-notification-interface.h?
+  using NotificationParameterList = typename Dali::Vector<NotifierInterface::NotifyId>;
+
   /**
    * Create an NotificationManager. Owned by Core in event thread side.
    */
@@ -49,8 +55,9 @@ public:
   /**
    * Queue a scene message to an interface. This method is thread-safe.
    * @param[in] instance to be notified about completion of the Update side event.
+   * @param[in] parameter list of notifiers as input.
    */
-  void QueueCompleteNotification(CompleteNotificationInterface* instance);
+  void QueueNotification(CompleteNotificationInterface* instance, NotificationParameterList&& parameter);
 
   /**
    * Queue a scene message. This method is thread-safe.

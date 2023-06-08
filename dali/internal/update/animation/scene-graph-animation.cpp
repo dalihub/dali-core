@@ -82,7 +82,7 @@ Animation::Animation(float durationSeconds, float speedFactor, const Vector2& pl
   mProgressReachedSignalRequired(false),
   mAutoReverseEnabled(false),
   mAnimatorSortRequired(false),
-  mIsActive{false},
+  mIsActive{false, false},
   mIsFirstLoop{true}
 {
 }
@@ -330,9 +330,9 @@ void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& loop
   looped   = false;
   finished = false;
 
+  // Short circuit when animation isn't running
   if(mState == Stopped || mState == Destroyed)
   {
-    // Short circuit when animation isn't running
     return;
   }
 
@@ -509,8 +509,7 @@ void Animation::UpdateAnimators(BufferIndex bufferIndex, bool bake, bool animati
   if(cleanup)
   {
     // Remove animators whose PropertyOwner has been destroyed
-    mAnimators.EraseIf([](auto& animator)
-                       { return animator->Orphan(); });
+    mAnimators.EraseIf([](auto& animator) { return animator->Orphan(); });
 
     // Need to be re-sort if remained animators size is bigger than one.
     // Note that if animator contains only zero or one items, It is already sorted case.

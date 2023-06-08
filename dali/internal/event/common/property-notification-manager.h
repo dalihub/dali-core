@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/common/ordered-set.h>
 #include <dali/internal/event/common/property-notifier.h>
+#include <dali/internal/event/common/scene-graph-notifier-interface-mapper.h>
 #include <dali/public-api/common/dali-vector.h>
 
 namespace Dali
@@ -38,7 +39,7 @@ class PropertyNotification;
  * It also monitors the lifetime of PropertyNotification objects and will
  * only emit signals for PropertyNotification objects which are still valid.
  */
-class PropertyNotificationManager : public PropertyNotifier
+class PropertyNotificationManager : public PropertyNotifier, public SceneGraphNotifierInterfaceMapper<PropertyNotification>
 {
 public:
   /**
@@ -62,21 +63,11 @@ public:
    */
   void PropertyNotificationDestroyed(PropertyNotification& propertyNotification);
 
-  /**
-   * Called when a SceneGraph::PropertyNotification is mapping by PropertyNotification.
-   */
-  void PropertyNotificationSceneObjectMapping(const SceneGraph::PropertyNotification* sceneGraphPropertyNotification, PropertyNotification& propertyNotification);
-
-  /**
-   * Called when a SceneGraph::PropertyNotification is unmaped from PropertyNotification.
-   */
-  void PropertyNotificationSceneObjectUnmapping(const SceneGraph::PropertyNotification* sceneGraphPropertyNotification);
-
 private: // private virtual overrides
   /**
    * @copydoc PropertyNotifier::NotifyProperty
    */
-  void NotifyProperty(SceneGraph::PropertyNotification* sceneGraphPropertyNotification, bool validity) override;
+  void NotifyProperty(NotifierInterface::NotifyId notifyId, bool validity) override;
 
 private:
   /**
@@ -92,8 +83,6 @@ private:
 
 private:
   OrderedSet<PropertyNotification, false> mPropertyNotifications; ///< All existing PropertyNotifications (not owned)
-
-  std::unordered_map<const SceneGraph::PropertyNotification*, PropertyNotification*> mSceneGraphObjectMap; ///< Converter from SceneGraph object pointer to Event object.
 };
 
 } // namespace Internal

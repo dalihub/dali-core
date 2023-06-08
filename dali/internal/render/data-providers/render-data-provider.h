@@ -98,6 +98,8 @@ public:
    * @return The recalculated size after visual properties applied.
    */
   virtual Vector4 GetVisualTransformedUpdateArea(BufferIndex bufferIndex, const Vector4& originalUpdateArea) noexcept = 0;
+
+  virtual uint32_t GetInstanceCount() const = 0;
 };
 
 } // namespace SceneGraph

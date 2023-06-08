@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,6 @@ namespace Dali
 {
 namespace Internal
 {
-
 RenderTaskListPtr RenderTaskList::New()
 {
   RenderTaskListPtr taskList = new RenderTaskList();
@@ -69,6 +68,9 @@ RenderTaskPtr RenderTaskList::CreateTask(Actor* sourceActor, CameraActor* camera
     mTasks.push_back(task);
   }
 
+  // Setup mapping infomations between scenegraph rendertask
+  this->MapNotifier(task->GetRenderTaskSceneObject(), *task);
+
   return task;
 }
 
@@ -78,6 +80,9 @@ RenderTaskPtr RenderTaskList::CreateOverlayTask(Actor* sourceActor, CameraActor*
   {
     mOverlayRenderTask = RenderTask::New(sourceActor, cameraActor, *this, true);
     mTasks.push_back(mOverlayRenderTask);
+
+    // Setup mapping infomations between scenegraph rendertask
+    this->MapNotifier(mOverlayRenderTask->GetRenderTaskSceneObject(), *mOverlayRenderTask);
   }
   return mOverlayRenderTask;
 }
@@ -95,14 +100,15 @@ void RenderTaskList::RemoveTask(Internal::RenderTask& task)
         mOverlayRenderTask.Reset();
       }
 
-      const SceneGraph::RenderTask& sceneObject = task.GetRenderTaskSceneObject();
+      // Remove mapping infomations
+      this->UnmapNotifier(task.GetRenderTaskSceneObject());
 
       // delete the task
       mTasks.erase(iter);
-      // send a message to remove the scene-graph RenderTask
-      RemoveTaskMessage(mEventThreadServices, *mSceneObject, sceneObject);
 
-      Exclusive exclusive{ptr, ActorObserver()};
+      task.RemoveRenderTaskSceneObject(*this);
+
+      Exclusive                     exclusive{ptr, ActorObserver()};
       ExclusivesContainer::iterator exclusiveIter = find(mExclusives.begin(), mExclusives.end(), exclusive);
       if(exclusiveIter != mExclusives.end())
       {
@@ -192,11 +198,14 @@ void RenderTaskList::Initialize()
   mSceneObject->SetCompleteNotificationInterface(this);
 }
 
-void RenderTaskList::NotifyCompleted()
+void RenderTaskList::NotifyCompleted(CompleteNotificationInterface::ParameterList notifierList)
 {
   DALI_LOG_TRACE_METHOD(gLogRenderList);
 
   RenderTaskContainer finishedRenderTasks;
+
+  // TODO : Optimize here if required.
+  // Note : Actually, Total number of RenderTask should be small enough so full search might not overhead for now.
 
   // Since render tasks can be unreferenced during the signal emissions, iterators into render tasks pointers may be invalidated.
   // First copy the finished render tasks, then emit signals
