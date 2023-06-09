@@ -31,25 +31,57 @@ namespace Internal
 {
 namespace SceneGraph
 {
-Shader::Shader(Dali::Shader::Hint::Value& hints)
-: mHints(hints)
+
+namespace
 {
+static constexpr uint32_t DEFAULT_RENDER_PASS = 0u;
 }
 
 Shader::~Shader()
 {
 }
 
-void Shader::SetShaderData(ShaderDataPtr shaderData)
+void Shader::UpdateShaderData(ShaderDataPtr shaderData)
 {
   DALI_LOG_TRACE_METHOD_FMT(Debug::Filter::gShader, "%d\n", shaderData->GetHashValue());
-
-  mShaderData = shaderData;
+  std::vector<Internal::ShaderDataPtr>::iterator shaderDataIterator = std::find_if(mShaderDataList.begin(), mShaderDataList.end(), [&shaderData](const Internal::ShaderDataPtr& shaderDataItem)
+                                                                                   { return shaderDataItem->GetRenderPass() == shaderData->GetRenderPass(); });
+  if(shaderDataIterator != mShaderDataList.end())
+  {
+    *shaderDataIterator = shaderData;
+  }
+  else
+  {
+    mShaderDataList.push_back(shaderData);
+  }
 }
 
-ShaderDataPtr Shader::GetShaderData() const
+ShaderDataPtr Shader::GetShaderData(uint32_t renderPass) const
 {
-  return mShaderData;
+  if(mShaderDataList.empty())
+  {
+    return nullptr;
+  }
+
+  Internal::ShaderDataPtr returnShaderData = nullptr;
+  for(auto && shaderData : mShaderDataList)
+  {
+    if(shaderData->GetRenderPass() == renderPass)
+    {
+      return shaderData;
+    }
+    if(shaderData->GetRenderPass() == DEFAULT_RENDER_PASS)
+    {
+      returnShaderData = shaderData;
+    }
+  }
+
+  if(returnShaderData)
+  {
+    return returnShaderData;
+  }
+
+  return mShaderDataList.front();
 }
 
 } // namespace SceneGraph

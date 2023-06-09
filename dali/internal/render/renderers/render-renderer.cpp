@@ -518,7 +518,12 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
   }
 
   // Create Program
-  ShaderDataPtr shaderData = mRenderDataProvider->GetShader().GetShaderData();
+  ShaderDataPtr shaderData = mRenderDataProvider->GetShader().GetShaderData(instruction.mRenderPass);
+  if(!shaderData)
+  {
+    DALI_LOG_ERROR("Failed to get shader data.\n");
+    return false;
+  }
 
   Program* program = Program::New(*mProgramCache,
                                   shaderData,

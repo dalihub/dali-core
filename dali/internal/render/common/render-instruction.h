@@ -132,13 +132,14 @@ public:
 public:                                  // Data
   Render::RenderTracker* mRenderTracker; ///< Pointer to an optional tracker object (not owned)
 
-  Viewport mViewport;              ///< Optional viewport
-  Vector4  mClearColor;            ///< Optional color to clear with
-  bool     mIsViewportSet : 1;     ///< Flag to determine whether the viewport is set
-  bool     mIsClearColorSet : 1;   ///< Flag to determine whether the clearColor is set
-  bool     mIgnoreRenderToFbo : 1; ///< Whether to ignore the render to FBO option (used to measure the performance above 60 fps)
+  Viewport mViewport;                    ///< Optional viewport
+  Vector4  mClearColor;                  ///< Optional color to clear with
+  bool     mIsViewportSet : 1;           ///< Flag to determine whether the viewport is set
+  bool     mIsClearColorSet : 1;         ///< Flag to determine whether the clearColor is set
+  bool     mIgnoreRenderToFbo : 1;       ///< Whether to ignore the render to FBO option (used to measure the performance above 60 fps)
 
   Render::FrameBuffer* mFrameBuffer;
+  uint32_t             mRenderPass{0u};
 
 private:                                             // Data
   Camera*                       mCamera;             ///< camera that is used

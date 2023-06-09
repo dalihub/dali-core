@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/handle.h>                // Dali::Handle
 #include <dali/public-api/object/property-index-ranges.h> // DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX
+#include <dali/public-api/object/property-value.h>
 
 /**
  * @brief DALI_COMPOSE_SHADER macro provides a convenient way to write shader source code.
@@ -106,12 +107,13 @@ public:
     enum
     {
       /**
-       * @brief Name: "program", Type: MAP.
+       * @brief Name: "program", Type: MAP or ARRAY.
        * @note The default value is empty.
-       * @note Format: {"vertex":"","fragment":"",hints:""}
+       * @note It is Property::Map or Property::Array of the map.
+       * @note Format: {"renderPass":"", "vertex":"", "fragment":"", "hints":""}
        * @SINCE_1_1.43
        */
-      PROGRAM = DEFAULT_OBJECT_PROPERTY_START_INDEX
+      PROGRAM = DEFAULT_OBJECT_PROPERTY_START_INDEX,
     };
   };
 
@@ -127,6 +129,17 @@ public:
   static Shader New(std::string_view vertexShader,
                     std::string_view fragmentShader,
                     Hint::Value      hints = Hint::NONE);
+
+  /**
+   * @brief Creates Shader.
+   *
+   * @SINCE_2_2.31
+   * @param[in] shaderMap Property::Map of shader data or Property::Array of Property::Map.
+   * Property::Map format is {"renderPass":"", "vertex":"", "fragment":"", "hints":""}
+   * shaderMap can be Property::Array of Property::Map for multi pass shading.
+   * @return A handle to a shader effect
+   */
+  static Shader New(Dali::Property::Value shaderMap);
 
   /**
    * @brief Default constructor, creates an empty handle.

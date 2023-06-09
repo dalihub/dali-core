@@ -273,6 +273,16 @@ bool RenderTask::ViewportToLocal(Actor actor, float viewportX, float viewportY, 
   }
 }
 
+void RenderTask::SetRenderPass(uint32_t renderPass)
+{
+  GetImplementation(*this).SetRenderPass(renderPass);
+}
+
+uint32_t RenderTask::GetRenderPass() const
+{
+  return GetImplementation(*this).GetRenderPass();
+}
+
 RenderTask::RenderTask(Internal::RenderTask* internal)
 : Handle(internal)
 {

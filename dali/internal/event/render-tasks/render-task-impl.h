@@ -103,13 +103,13 @@ public:
   CameraActor* GetCameraActor() const;
 
   /**
-    * @copydoc Dali::RenderTask::SetFrameBuffer()
-    */
+   * @copydoc Dali::RenderTask::SetFrameBuffer()
+   */
   void SetFrameBuffer(FrameBufferPtr frameBuffer);
 
   /**
-    * @copydoc Dali::RenderTask::GetFrameBuffer
-    */
+   * @copydoc Dali::RenderTask::GetFrameBuffer
+   */
   FrameBuffer* GetFrameBuffer() const;
 
   /**
@@ -253,6 +253,16 @@ public:
    */
   bool ViewportToLocal(Actor* actor, float viewportX, float viewportY, float& localX, float& localY) const;
 
+  /**
+   * @copydoc Dali::RenderTask::SetRenderPass()
+   */
+  void SetRenderPass(uint32_t renderPass);
+
+  /**
+   * @copydoc Dali::RenderTask::GetRenderPass()
+   */
+  uint32_t GetRenderPass() const;
+
 public: // Used by RenderTaskList, which owns the SceneGraph::RenderTasks
   /**
    * Retrieve the scene-graph RenderTask object.
@@ -297,7 +307,7 @@ public: // Implementation of Object
    */
   const PropertyInputImpl* GetSceneObjectInputProperty(Property::Index index) const override;
 
-public: //signals
+public: // signals
   /**
    * Query whether a Finished signal should be emitted for this render-task.
    * This should only be called by NotificationManager, before signals are emitted.
@@ -343,8 +353,8 @@ protected:
   ~RenderTask() override;
 
 private: // not copyable
-  RenderTask()                  = delete;
-  RenderTask(const RenderTask&) = delete;
+  RenderTask()                             = delete;
+  RenderTask(const RenderTask&)            = delete;
   RenderTask& operator=(const RenderTask&) = delete;
 
 private:
@@ -354,12 +364,12 @@ private:
   WeakHandle<Dali::Actor> mInputMappingActor;  /// used to mapping screen to frame buffer coordinate, not kept alive by rendertask
   RenderTaskList&         mRenderTaskList;     ///< The render task list
 
-  Vector4 mClearColor; ///< Optional clear color
+  Vector4 mClearColor;                         ///< Optional clear color
 
-  Vector2 mViewportPosition; ///< The cached viewport position
-  Vector2 mViewportSize;     ///< The cached viewport size
+  Vector2 mViewportPosition;                   ///< The cached viewport position
+  Vector2 mViewportSize;                       ///< The cached viewport size
 
-  uint32_t mRefreshRate; ///< Determines how often the task is processed.
+  uint32_t mRefreshRate;                       ///< Determines how often the task is processed.
 
   uint32_t mRefreshOnceCounter;
 
@@ -367,13 +377,15 @@ private:
 
   Dali::RenderTask::ScreenToFrameBufferFunction mScreenToFrameBufferFunction; ///< Used to convert screen to frame-buffer coordinates
 
+  uint32_t mRenderPass{0u};
+
   bool mExclusive : 1;    ///< True if the render-task has exclusive access to the source Nodes.
   bool mInputEnabled : 1; ///< True if the render-task should be considered for input handling.
   bool mClearEnabled : 1; ///< True if the render-task should be clear the color buffer.
   bool mCullMode : 1;     ///< True if the render-task's actors should be culled
   bool mRequiresSync : 1; ///< True if the GL sync is required to track the render of.
 
-  //Signals
+  // Signals
   Dali::RenderTask::RenderTaskSignalType mSignalFinished; ///< Signal emmited when the render task has been processed.
 };
 

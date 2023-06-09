@@ -495,6 +495,20 @@ bool RenderTask::ViewportToLocal(Actor* actor, float viewportX, float viewportY,
   return actor->ScreenToLocal(*this, localX, localY, viewportX, viewportY);
 }
 
+void RenderTask::SetRenderPass(uint32_t renderPass)
+{
+  if(mRenderPass != renderPass)
+  {
+    mRenderPass = renderPass;
+    SetRenderPassMessage(GetEventThreadServices(), GetRenderTaskSceneObject(), renderPass);
+  }
+}
+
+uint32_t RenderTask::GetRenderPass() const
+{
+  return mRenderPass;
+}
+
 const SceneGraph::RenderTask& RenderTask::GetRenderTaskSceneObject() const
 {
   return *static_cast<const SceneGraph::RenderTask*>(mUpdateObject);

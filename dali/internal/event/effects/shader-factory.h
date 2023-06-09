@@ -59,12 +59,13 @@ public:
    *
    * @param [in] vertexSource   The vertex shader source code
    * @param [in] fragmentSource The fragment shader source code
+   * @param [in] renderPass     RenderPass the shaders are executed
    * @param [out] shaderHash    Hash key created from vertex and fragment shader code
    * @return                    ShaderData containing the source and hash value, and additionally,
    *                            a compiled shader program binary if one could be found, else an
    *                            empty binary buffer cleared to size zero.
    */
-  Internal::ShaderDataPtr Load(std::string_view vertexSource, std::string_view fragmentSource, const Dali::Shader::Hint::Value hints, size_t& shaderHash);
+  Internal::ShaderDataPtr Load(std::string_view vertexSource, std::string_view fragmentSource, const Dali::Shader::Hint::Value hints, uint32_t renderPass, size_t& shaderHash);
 
   /**
    * @brief Saves shader to memory cache and filesystem.

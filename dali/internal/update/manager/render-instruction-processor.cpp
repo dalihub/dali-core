@@ -178,6 +178,7 @@ inline bool SetNodeUpdateArea(Node* node, bool isLayer3d, Matrix& nodeWorldMatri
 /**
  * Add a renderer to the list
  * @param updateBufferIndex to read the model matrix from
+ * @param renderPass render pass for this render instruction
  * @param renderList to add the item to
  * @param renderable Node-Renderer pair
  * @param viewMatrix used to calculate modelview matrix for the item
@@ -188,6 +189,7 @@ inline bool SetNodeUpdateArea(Node* node, bool isLayer3d, Matrix& nodeWorldMatri
  * @param cull Whether frustum culling is enabled or not
  */
 inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
+                                    uint32_t                  renderPass,
                                     RenderList&               renderList,
                                     Renderable&               renderable,
                                     const Matrix&             viewMatrix,
@@ -210,7 +212,7 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
   // Don't cull items which have render callback
   bool hasRenderCallback = (renderable.mRenderer && renderable.mRenderer->GetRenderCallback());
 
-  if(cull && renderable.mRenderer && (hasRenderCallback || (!renderable.mRenderer->GetShader().HintEnabled(Dali::Shader::Hint::MODIFIES_GEOMETRY) && node->GetClippingMode() == ClippingMode::DISABLED)))
+  if(cull && renderable.mRenderer && (hasRenderCallback || (renderable.mRenderer->GetShader().GetShaderData(renderPass) && !renderable.mRenderer->GetShader().GetShaderData(renderPass)->HintEnabled(Dali::Shader::Hint::MODIFIES_GEOMETRY) && node->GetClippingMode() == ClippingMode::DISABLED)))
   {
     const Vector4& boundingSphere = node->GetBoundingSphere();
     inside                        = (boundingSphere.w > Math::MACHINE_EPSILON_1000) &&
@@ -252,7 +254,7 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
     bool isOpaque = true;
     if(!hasRenderCallback)
     {
-      Renderer::OpacityType opacityType = renderable.mRenderer ? renderable.mRenderer->GetOpacityType(updateBufferIndex, *node) : Renderer::OPAQUE;
+      Renderer::OpacityType opacityType = renderable.mRenderer ? renderable.mRenderer->GetOpacityType(updateBufferIndex, renderPass, *node) : Renderer::OPAQUE;
 
       // We can skip render when node is not clipping and transparent
       skipRender = (opacityType == Renderer::TRANSPARENT && node->GetClippingMode() == ClippingMode::DISABLED);
@@ -363,6 +365,7 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
 /**
  * Add all renderers to the list
  * @param updateBufferIndex to read the model matrix from
+ * @param renderPass render pass for this render instruction
  * @param renderList to add the items to
  * @param renderers to render
  * NodeRendererContainer Node-Renderer pairs
@@ -372,6 +375,7 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
  * @param cull Whether frustum culling is enabled or not
  */
 inline void AddRenderersToRenderList(BufferIndex               updateBufferIndex,
+                                     uint32_t                  renderPass,
                                      RenderList&               renderList,
                                      RenderableContainer&      renderers,
                                      const Matrix&             viewMatrix,
@@ -386,6 +390,7 @@ inline void AddRenderersToRenderList(BufferIndex               updateBufferIndex
   for(auto&& renderer : renderers)
   {
     AddRendererToRenderList(updateBufferIndex,
+                            renderPass,
                             renderList,
                             renderer,
                             viewMatrix,
@@ -590,6 +595,7 @@ void RenderInstructionProcessor::Prepare(BufferIndex                 updateBuffe
       {
         renderList->SetHasColorRenderItems(true);
         AddRenderersToRenderList(updateBufferIndex,
+                                 instruction.mRenderPass,
                                  *renderList,
                                  renderables,
                                  viewMatrix,
@@ -614,6 +620,7 @@ void RenderInstructionProcessor::Prepare(BufferIndex                 updateBuffe
       {
         renderList->SetHasColorRenderItems(false);
         AddRenderersToRenderList(updateBufferIndex,
+                                 instruction.mRenderPass,
                                  *renderList,
                                  renderables,
                                  viewMatrix,

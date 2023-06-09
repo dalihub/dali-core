@@ -53,6 +53,11 @@ public:
                        Dali::Shader::Hint::Value hints);
 
   /**
+   * @copydoc Dali::Shader::New()
+   */
+  static ShaderPtr New(Dali::Property::Value shaderMap);
+
+  /**
    * Retrieve the scene-graph shader added by this object.
    * @return A pointer to the shader.
    */
@@ -83,9 +88,22 @@ private: // implementation
   Shader(const SceneGraph::Shader* sceneObject);
 
   /**
-   * Second stage initialization
+   * @brief Update Shader Data
+   * If a ShaderData of the same renderPass is already exist, it is replaced,
+   * if not, new ShaderData is added.
+   * @param[in] vertexShader Vertex shader code for the effect.
+   * @param[in] fragmentShader Fragment Shader code for the effect.
+   * @param[in] renderPass render pass of shader data
+   * @param[in] hints Hints to define the geometry of the rendered object
    */
-  void SetShader(std::string_view vertexShader, std::string_view fragmentShader, Dali::Shader::Hint::Value hints);
+  void UpdateShaderData(std::string_view vertexShader, std::string_view fragmentShader, uint32_t renderPass, Dali::Shader::Hint::Value hints);
+
+  /**
+   * @brief Sets shader data from shaderMap.
+   * The shaderMap should be Property::Map or Property::Array.
+   * @param[in] shaderMap shader property map.
+   */
+  void SetShaderProperty(const Dali::Property::Value& shaderMap);
 
 protected:
   /**
@@ -94,12 +112,12 @@ protected:
   ~Shader() override;
 
 private: // unimplemented methods
-  Shader()              = delete;
-  Shader(const Shader&) = delete;
+  Shader()                         = delete;
+  Shader(const Shader&)            = delete;
   Shader& operator=(const Shader&) = delete;
 
 private:
-  Internal::ShaderDataPtr mShaderData;
+  std::vector<Internal::ShaderDataPtr> mShaderDataList;
 
 public:
   /**

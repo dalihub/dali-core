@@ -27,8 +27,14 @@ Shader Shader::New(std::string_view vertexShader,
                    std::string_view fragmentShader,
                    Hint::Value      hints)
 {
-  Internal::ShaderPtr renderer = Internal::Shader::New(vertexShader, fragmentShader, hints);
-  return Shader(renderer.Get());
+  Internal::ShaderPtr shader = Internal::Shader::New(vertexShader, fragmentShader, hints);
+  return Shader(shader.Get());
+}
+
+Shader Shader::New(Dali::Property::Value shaderMap)
+{
+  Internal::ShaderPtr shader = Internal::Shader::New(shaderMap);
+  return Shader(shader.Get());
 }
 
 Shader::Shader() = default;

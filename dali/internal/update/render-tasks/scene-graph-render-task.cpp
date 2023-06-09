@@ -400,6 +400,7 @@ RenderInstruction& RenderTask::PrepareRenderInstruction(BufferIndex updateBuffer
     mRenderInstruction[updateBufferIndex].mRenderTracker = nullptr;
   }
 
+  mRenderInstruction[updateBufferIndex].mRenderPass = mRenderPass;
   return mRenderInstruction[updateBufferIndex];
 }
 
@@ -476,6 +477,11 @@ bool RenderTask::GetViewportEnabled(BufferIndex bufferIndex) const
 void RenderTask::SetSyncRequired(bool requiresSync)
 {
   mRequiresSync = requiresSync;
+}
+
+void RenderTask::SetRenderPass(uint32_t renderPass)
+{
+  mRenderPass = renderPass;
 }
 
 void RenderTask::PropertyOwnerConnected(PropertyOwner& owner)

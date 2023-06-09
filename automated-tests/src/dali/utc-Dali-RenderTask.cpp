@@ -78,9 +78,73 @@ void utc_dali_render_task_cleanup(void)
  * FinishedSignal                      1+ve
  */
 
-namespace // unnamed namespace
+namespace                             // unnamed namespace
 {
 const int RENDER_FRAME_INTERVAL = 16; ///< Duration of each frame in ms. (at approx 60FPS)
+
+// Test shader codes
+const std::string_view SHADER_COLOR_TEST_SHADER_VERT1{
+  R"(INPUT mediump vec2 aPosition;
+uniform highp mat4 uMvpMatrix;
+uniform highp vec3 uSize;
+
+//Visual size and offset
+uniform mediump vec2 offset;
+uniform highp vec2 size;
+uniform mediump vec4 offsetSizeMode;
+uniform mediump vec2 origin;
+uniform mediump vec2 anchorPoint;
+uniform mediump vec2 extraSize;
+
+vec4 ComputeVertexPosition()
+{
+  vec2 visualSize = mix(size * uSize.xy, size, offsetSizeMode.zw ) + extraSize;
+  vec2 visualOffset = mix(offset * uSize.xy, offset, offsetSizeMode.xy);
+  mediump vec2 vPosition = aPosition * visualSize;
+  return vec4(vPosition + anchorPoint * visualSize + visualOffset + origin * uSize.xy, 0.0, 1.0);
+}
+
+void main()
+{
+  gl_Position = uMvpMatrix * ComputeVertexPosition();
+}
+)"};
+
+// Test shader codes
+const std::string_view SHADER_COLOR_TEST_SHADER_VERT2{
+  R"(INPUT mediump vec2 aPosition;
+uniform highp mat4 uMvpMatrix;
+uniform highp vec3 uSize;
+
+//Visual size and offset
+uniform mediump vec2 offset;
+uniform highp vec2 size;
+uniform mediump vec4 offsetSizeMode;
+uniform mediump vec2 origin;
+uniform mediump vec2 anchorPoint;
+uniform mediump vec2 extraSize;
+
+vec4 ComputeVertexPosition2()
+{
+  vec2 visualSize = mix(size * uSize.xy, size, offsetSizeMode.zw ) + extraSize;
+  vec2 visualOffset = mix(offset * uSize.xy, offset, offsetSizeMode.xy);
+  mediump vec2 vPosition = aPosition * visualSize;
+  return vec4(vPosition + anchorPoint * visualSize + visualOffset + origin * uSize.xy, 0.0, 1.0);
+}
+
+void main()
+{
+  gl_Position = uMvpMatrix * ComputeVertexPosition2();
+}
+)"};
+
+const std::string_view SHADER_COLOR_TEST_SHADER_FRAG{
+  R"(
+void main()
+{
+  OUT_COLOR = vec4(0.0, 0.0, 1.0, 1.0);
+}
+)"};
 
 /*
  * Simulate time passed by.
@@ -2432,12 +2496,12 @@ int UtcDaliRenderTaskOnceChain01(void)
 
   application.SendNotification();
 
-  //Both render tasks are executed.
+  // Both render tasks are executed.
   DALI_TEST_CHECK(UpdateRender(application, drawTrace, true, firstFinished, false, true, __LINE__));
   DALI_TEST_CHECK(firstFinished == false);
   DALI_TEST_CHECK(secondFinished == false);
 
-  //Nothing else to render and both render task should have finished now
+  // Nothing else to render and both render task should have finished now
   DALI_TEST_CHECK(UpdateRender(application, drawTrace, false, firstFinished, true, false, __LINE__));
   DALI_TEST_CHECK(firstFinished == true);
   DALI_TEST_CHECK(secondFinished == true);
@@ -3680,6 +3744,456 @@ int UtcDaliRenderTaskViewportGuideActor02(void)
   // Check that the viewport is handled properly
   DALI_TEST_CHECK(callStack.FindIndexFromMethodAndParams("Viewport", viewportParams1) >= 0);
   DALI_TEST_CHECK(callStack.FindIndexFromMethodAndParams("Viewport", viewportParams2) >= 0);
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskViewportGuideActor03(void)
+{
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  TraceCallStack&    callStack     = glAbstraction.GetViewportTrace();
+  glAbstraction.EnableViewportCallTrace(true);
+  tet_infoline("Testing that adding a viewport guide actor to RenderTask will change the viewport");
+
+  Stage   stage = Stage::GetCurrent();
+  Vector2 stageSize(stage.GetSize());
+
+  // Render and notify
+  application.SendNotification();
+  application.Render(16);
+  glAbstraction.ResetViewportCallStack();
+
+  Geometry geometry = Geometry::New();
+  Shader   shader   = Shader::New("vertexSrc", "fragmentSrc");
+  Renderer renderer = Renderer::New(geometry, shader);
+
+  Actor blue                                 = Actor::New();
+  blue[Dali::Actor::Property::NAME]          = "Blue";
+  blue[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::TOP_LEFT;
+  blue[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::TOP_LEFT;
+  blue[Dali::Actor::Property::SIZE]          = Vector2(400, 300);
+  blue[Dali::Actor::Property::POSITION]      = Vector2(100, 50);
+  blue.AddRenderer(renderer);
+  stage.Add(blue);
+
+  Actor green                                 = Actor::New();
+  green[Dali::Actor::Property::NAME]          = "Green";
+  green[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::TOP_LEFT;
+  green[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::TOP_LEFT;
+  green[Dali::Actor::Property::SIZE]          = Vector2(400, 300);
+  green[Dali::Actor::Property::POSITION]      = Vector2(100, 50);
+  green.AddRenderer(renderer);
+  stage.Add(green);
+
+  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTask     renderTask     = renderTaskList.CreateTask();
+
+  Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
+  cameraActor[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+  stage.Add(cameraActor);
+
+  renderTask.SetExclusive(true);
+  renderTask.SetInputEnabled(true);
+  renderTask.SetCameraActor(cameraActor);
+  renderTask.SetSourceActor(green);
+
+  Viewport viewport(75, 55, 150, 250);
+  renderTask.SetViewport(viewport);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render(16);
+
+  // Note Y pos: 800 - (250+55) = 495
+  std::string viewportParams1("75, 495, 150, 250");
+  DALI_TEST_CHECK(callStack.FindIndexFromMethodAndParams("Viewport", viewportParams1) >= 0);
+  glAbstraction.ResetViewportCallStack();
+
+  // Update to use viewport guide actor instead.
+  renderTask.SetViewportGuideActor(blue);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render(16);
+
+  // Note: Y pos: 800 - (300+50) = 450
+  std::string viewportParams2("100, 450, 400, 300");
+  DALI_TEST_CHECK(callStack.FindIndexFromMethodAndParams("Viewport", viewportParams2) >= 0);
+  tet_infoline("Testing that removing viewport guide actor from RenderTask will revert the viewport");
+  glAbstraction.ResetViewportCallStack();
+
+  // Remove guide actor, expect that the viewport is reset to its original values
+  renderTask.SetViewportGuideActor(Actor());
+  application.SendNotification();
+  application.Render(16);
+
+  // Currently, update manager does not consider that added Resetters should cause another
+  // update; this is probably right. But, we have to then force another update for the resetter to trigger, and this will register as un-necessary in the test output.
+  //
+  application.SendNotification();
+  application.Render(16);
+
+  DALI_TEST_CHECK(callStack.FindIndexFromMethodAndParams("Viewport", viewportParams1) >= 0);
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskViewportGuideActor04(void)
+{
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  TraceCallStack&    callStack     = glAbstraction.GetViewportTrace();
+  glAbstraction.EnableViewportCallTrace(true);
+  tet_infoline("Testing that adding a viewport guide actor to RenderTask will change the viewport");
+
+  Stage   stage = Stage::GetCurrent();
+  Vector2 stageSize(stage.GetSize());
+
+  // Render and notify
+  application.SendNotification();
+  application.Render(16);
+  glAbstraction.ResetViewportCallStack();
+
+  Geometry geometry = Geometry::New();
+  Shader   shader   = Shader::New("vertexSrc", "fragmentSrc");
+  Renderer renderer = Renderer::New(geometry, shader);
+
+  Actor blue                                 = Actor::New();
+  blue[Dali::Actor::Property::NAME]          = "Blue";
+  blue[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::TOP_LEFT;
+  blue[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::TOP_LEFT;
+  blue[Dali::Actor::Property::SIZE]          = Vector2(400, 300);
+  blue[Dali::Actor::Property::POSITION]      = Vector2(100, 50);
+  blue.AddRenderer(renderer);
+  stage.Add(blue);
+
+  Actor green                                 = Actor::New();
+  green[Dali::Actor::Property::NAME]          = "Green";
+  green[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::TOP_LEFT;
+  green[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::TOP_LEFT;
+  green[Dali::Actor::Property::SIZE]          = Vector2(400, 300);
+  green[Dali::Actor::Property::POSITION]      = Vector2(100, 50);
+  green.AddRenderer(renderer);
+  stage.Add(green);
+
+  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTask     renderTask     = renderTaskList.CreateTask();
+
+  Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
+  cameraActor[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+  stage.Add(cameraActor);
+
+  renderTask.SetExclusive(true);
+  renderTask.SetInputEnabled(true);
+  renderTask.SetCameraActor(cameraActor);
+  renderTask.SetSourceActor(green);
+
+  Viewport viewport(75, 55, 150, 250);
+  renderTask.SetViewport(viewport);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render(16);
+
+  // Note Y pos: 800 - (250+55) = 495
+  std::string viewportParams1("75, 495, 150, 250");
+  DALI_TEST_CHECK(callStack.FindIndexFromMethodAndParams("Viewport", viewportParams1) >= 0);
+  glAbstraction.ResetViewportCallStack();
+
+  // Update to use viewport guide actor instead.
+  renderTask.SetViewportGuideActor(blue);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render(16);
+
+  std::string viewportParams2("100, 450, 400, 300");
+  DALI_TEST_CHECK(callStack.FindIndexFromMethodAndParams("Viewport", viewportParams2) >= 0);
+  tet_infoline("Testing that removing viewport guide actor from RenderTask will revert the viewport");
+
+  glAbstraction.ResetViewportCallStack();
+
+  // Remove guide actor, expect that the viewport is reset to it's original values
+  renderTask.ResetViewportGuideActor();
+  application.SendNotification();
+  application.Render(16);
+
+  // Currently, update manager does not consider that added Resetters should cause another
+  // update; this is probably right. But, we have to then force another update for the resetter
+  // to trigger, and this will register as un-necessary in the test output.
+  application.SendNotification();
+  application.Render(16);
+
+  DALI_TEST_CHECK(callStack.FindIndexFromMethodAndParams("Viewport", viewportParams1) >= 0);
+
+  // This should remove the baking resetters, but is again going to show up
+  // as unnecessary. Also try and figure out if we can test the dirty flags
+  // here, somehow (Can at least check the property's dirty flags in the debugger).
+  application.SendNotification();
+  application.Render(16);
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskSetPartialUpdate(void)
+{
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  tet_infoline("Check the damaged rects with render task");
+
+  const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
+
+  Actor actor = CreateRenderableActor();
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
+  actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
+  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  application.GetScene().Add(actor);
+
+  Actor rootActor = CreateRenderableActor();
+  rootActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  rootActor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
+  rootActor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
+  rootActor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  application.GetScene().Add(rootActor);
+
+  CameraActor cameraActor = CameraActor::New(Size(TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT));
+  cameraActor.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  cameraActor.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  application.GetScene().Add(cameraActor);
+
+  Texture     frameBufferTexture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGB888, 16, 16);
+  FrameBuffer frameBuffer        = FrameBuffer::New(frameBufferTexture.GetWidth(), frameBufferTexture.GetHeight());
+  frameBuffer.AttachColorTexture(frameBufferTexture);
+
+  // Create a RenderTask and set a framebuffer
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
+  RenderTask     newTask  = taskList.CreateTask();
+  newTask.SetCameraActor(cameraActor);
+  newTask.SetSourceActor(rootActor);
+  newTask.SetInputEnabled(false);
+  newTask.SetClearColor(Vector4(0.f, 0.f, 0.f, 0.f));
+  newTask.SetClearEnabled(true);
+  newTask.SetExclusive(true);
+  newTask.SetRefreshRate(RenderTask::REFRESH_ALWAYS);
+  newTask.SetFrameBuffer(frameBuffer);
+
+  application.SendNotification();
+
+  std::vector<Rect<int>> damagedRects;
+  Rect<int>              clippingRect;
+
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  // Full update if there is off-screen rendering
+  clippingRect = Rect<int>(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  // Remove framebuffer
+  newTask.SetFrameBuffer(FrameBuffer());
+
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  // Full update
+  clippingRect = Rect<int>(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Set invalid viewport of the render task
+  newTask.SetViewportSize(Vector2(-100.0f, -100.0f));
+
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  // Full update because the camera orientation is changed
+  clippingRect = Rect<int>(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  newTask.SetViewportSize(Vector2(0.0f, 0.0f));
+
+  // Change orientation of offscreen camera
+  cameraActor.SetProperty(Actor::Property::ORIENTATION, Quaternion(Degree(90.0f), Vector3::XAXIS));
+
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  // Full update because the camera orientation is changed
+  clippingRect = Rect<int>(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Change camera target
+  cameraActor.SetTargetPosition(Vector3(10.0f, 10.0f, 0.0f));
+
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  // Full update because the camera is moved
+  clippingRect = Rect<int>(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskRenderPass(void)
+{
+  TestApplication application;
+  tet_infoline("Testing RenderTask with RenderPass");
+
+  Stage   stage = Stage::GetCurrent();
+  Vector2 stageSize(stage.GetSize());
+
+  Actor blue                                 = Actor::New();
+  blue[Dali::Actor::Property::NAME]          = "Blue";
+  blue[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  blue[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+  blue[Dali::Actor::Property::SIZE]          = Vector2(300, 300);
+  blue[Dali::Actor::Property::POSITION]      = Vector2(0, 0);
+
+  Geometry geometry = Geometry::New();
+
+  Property::Map map[2];
+  map[0]["vertex"]     = SHADER_COLOR_TEST_SHADER_VERT1.data();
+  map[0]["fragment"]   = SHADER_COLOR_TEST_SHADER_FRAG.data();
+  map[0]["renderPass"] = 0;
+
+  map[1]["vertex"]     = SHADER_COLOR_TEST_SHADER_VERT2.data();
+  map[1]["fragment"]   = SHADER_COLOR_TEST_SHADER_FRAG.data();
+  map[1]["renderPass"] = 1;
+
+  Property::Array array;
+  array.PushBack(map[0]);
+  array.PushBack(map[1]);
+
+  Shader   shader   = Shader::New(array);
+  Renderer renderer = Renderer::New(geometry, shader);
+  blue.AddRenderer(renderer);
+
+  stage.Add(blue);
+
+  auto& gfx = application.GetGraphicsController();
+
+  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  DALI_TEST_EQUALS(0u, renderTaskList.GetTask(0u).GetRenderPass(), TEST_LOCATION);
+  // Render and notify
+  application.SendNotification();
+  application.Render(16);
+  DALI_TEST_CHECK(gfx.mCallStack.FindMethod("CreatePipeline"));
+  gfx.mCallStack.Reset();
+  DALI_TEST_EQUALS(0u, renderTaskList.GetTask(0u).GetRenderPass(), TEST_LOCATION);
+
+  renderTaskList.GetTask(0u).SetRenderPass(1u);
+  DALI_TEST_EQUALS(1u, renderTaskList.GetTask(0u).GetRenderPass(), TEST_LOCATION);
+  // Render and notify
+  application.SendNotification();
+  application.Render(16);
+  DALI_TEST_CHECK(gfx.mCallStack.FindMethod("CreatePipeline"));
+  gfx.mCallStack.Reset();
+  DALI_TEST_EQUALS(1u, renderTaskList.GetTask(0u).GetRenderPass(), TEST_LOCATION);
+
+  renderTaskList.GetTask(0u).SetRenderPass(0u);
+  DALI_TEST_EQUALS(0u, renderTaskList.GetTask(0u).GetRenderPass(), TEST_LOCATION);
+  // Render and notify
+  application.SendNotification();
+  application.Render(16);
+  DALI_TEST_CHECK(!gfx.mCallStack.FindMethod("CreatePipeline"));
+  gfx.mCallStack.Reset();
+  DALI_TEST_EQUALS(0u, renderTaskList.GetTask(0u).GetRenderPass(), TEST_LOCATION);
+
+  renderTaskList.GetTask(0u).SetRenderPass(1u);
+  DALI_TEST_EQUALS(1u, renderTaskList.GetTask(0u).GetRenderPass(), TEST_LOCATION);
+  // Render and notify
+  application.SendNotification();
+  application.Render(16);
+  DALI_TEST_CHECK(!gfx.mCallStack.FindMethod("CreatePipeline"));
+  gfx.mCallStack.Reset();
+  DALI_TEST_EQUALS(1u, renderTaskList.GetTask(0u).GetRenderPass(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskWithWrongShaderData(void)
+{
+  TestApplication application;
+  tet_infoline("Testing RenderTask with wrong shader data");
+
+  Stage   stage = Stage::GetCurrent();
+  Vector2 stageSize(stage.GetSize());
+
+  Actor blue                                 = Actor::New();
+  blue[Dali::Actor::Property::NAME]          = "Blue";
+  blue[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  blue[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+  blue[Dali::Actor::Property::SIZE]          = Vector2(300, 300);
+  blue[Dali::Actor::Property::POSITION]      = Vector2(0, 0);
+
+  Geometry geometry = Geometry::New();
+
+  Shader   shader   = Shader::New(Property::Value(10.0f));
+  Renderer renderer = Renderer::New(geometry, shader);
+  blue.AddRenderer(renderer);
+
+  stage.Add(blue);
+
+  auto& gfx = application.GetGraphicsController();
+
+  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  DALI_TEST_EQUALS(0u, renderTaskList.GetTask(0u).GetRenderPass(), TEST_LOCATION);
+  // Render and notify
+  application.SendNotification();
+  application.Render(16);
+  DALI_TEST_CHECK(!gfx.mCallStack.FindMethod("CreatePipeline"));
+  gfx.mCallStack.Reset();
+  DALI_TEST_EQUALS(0u, renderTaskList.GetTask(0u).GetRenderPass(), TEST_LOCATION);
 
   END_TEST;
 }
