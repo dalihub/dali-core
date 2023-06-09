@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/animation/animation-playlist.h>
 #include <dali/internal/event/animation/animator-connector.h>
+#include <dali/internal/event/animation/key-frames-impl.h>
 #include <dali/internal/event/animation/path-impl.h>
 #include <dali/internal/event/common/notification-manager.h>
 #include <dali/internal/event/common/property-helper.h>
@@ -648,46 +649,48 @@ void Animation::AnimateTo(Property& target, Property::Value destinationValue, Al
   AppendConnectorTargetValues({std::move(destinationValue), period, connectorIndex, Animation::TO});
 }
 
-void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames)
+void Animation::AnimateBetween(Property target, Dali::KeyFrames keyFrames)
 {
   AnimateBetween(target, keyFrames, mDefaultAlpha, TimePeriod(mDurationSeconds), DEFAULT_INTERPOLATION);
 }
 
-void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Interpolation interpolation)
+void Animation::AnimateBetween(Property target, Dali::KeyFrames keyFrames, Interpolation interpolation)
 {
   AnimateBetween(target, keyFrames, mDefaultAlpha, TimePeriod(mDurationSeconds), interpolation);
 }
 
-void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, TimePeriod period)
+void Animation::AnimateBetween(Property target, Dali::KeyFrames keyFrames, TimePeriod period)
 {
   AnimateBetween(target, keyFrames, mDefaultAlpha, period, DEFAULT_INTERPOLATION);
 }
 
-void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, TimePeriod period, Interpolation interpolation)
+void Animation::AnimateBetween(Property target, Dali::KeyFrames keyFrames, TimePeriod period, Interpolation interpolation)
 {
   AnimateBetween(target, keyFrames, mDefaultAlpha, period, interpolation);
 }
 
-void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, AlphaFunction alpha)
+void Animation::AnimateBetween(Property target, Dali::KeyFrames keyFrames, AlphaFunction alpha)
 {
   AnimateBetween(target, keyFrames, alpha, TimePeriod(mDurationSeconds), DEFAULT_INTERPOLATION);
 }
 
-void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, AlphaFunction alpha, Interpolation interpolation)
+void Animation::AnimateBetween(Property target, Dali::KeyFrames keyFrames, AlphaFunction alpha, Interpolation interpolation)
 {
   AnimateBetween(target, keyFrames, alpha, TimePeriod(mDurationSeconds), interpolation);
 }
 
-void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period)
+void Animation::AnimateBetween(Property target, Dali::KeyFrames keyFrames, AlphaFunction alpha, TimePeriod period)
 {
   AnimateBetween(target, keyFrames, alpha, period, DEFAULT_INTERPOLATION);
 }
 
-void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period, Interpolation interpolation)
+void Animation::AnimateBetween(Property target, Dali::KeyFrames keyFrames, AlphaFunction alpha, TimePeriod period, Interpolation interpolation)
 {
-  Object&              object          = GetImplementation(target.object);
+  Object&          object        = GetImplementation(target.object);
+  const KeyFrames& keyFramesImpl = GetImplementation(keyFrames);
+
   const Property::Type propertyType    = object.GetPropertyType(target.propertyIndex);
-  const Property::Type destinationType = keyFrames.GetType();
+  const Property::Type destinationType = keyFramesImpl.GetType();
 
   // validate animation parameters, if component index is set then use float as checked type
   ValidateParameters((target.componentIndex == Property::INVALID_COMPONENT_INDEX) ? propertyType : Property::FLOAT,
@@ -696,14 +699,14 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
 
   ExtendDuration(period);
 
-  AppendConnectorTargetValues({keyFrames.GetLastKeyFrameValue(), period, mConnectors.Count(), BETWEEN});
+  AppendConnectorTargetValues({keyFramesImpl.GetLastKeyFrameValue(), period, mConnectors.Count(), BETWEEN});
 
   // using destination type so component animation gets correct type
   switch(destinationType)
   {
     case Dali::Property::BOOLEAN:
     {
-      auto kf = GetSpecialization<const KeyFrameBoolean*>(keyFrames);
+      auto kf = GetSpecialization<const KeyFrameBoolean*>(keyFramesImpl);
       AddAnimatorConnector(AnimatorConnector<bool>::New(object,
                                                         target.propertyIndex,
                                                         target.componentIndex,
@@ -715,7 +718,7 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
 
     case Dali::Property::INTEGER:
     {
-      auto kf = GetSpecialization<const KeyFrameInteger*>(keyFrames);
+      auto kf = GetSpecialization<const KeyFrameInteger*>(keyFramesImpl);
       AddAnimatorConnector(AnimatorConnector<int32_t>::New(object,
                                                            target.propertyIndex,
                                                            target.componentIndex,
@@ -727,7 +730,7 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
 
     case Dali::Property::FLOAT:
     {
-      auto kf = GetSpecialization<const KeyFrameNumber*>(keyFrames);
+      auto kf = GetSpecialization<const KeyFrameNumber*>(keyFramesImpl);
       AddAnimatorConnector(AnimatorConnector<float>::New(object,
                                                          target.propertyIndex,
                                                          target.componentIndex,
@@ -739,7 +742,7 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
 
     case Dali::Property::VECTOR2:
     {
-      auto kf = GetSpecialization<const KeyFrameVector2*>(keyFrames);
+      auto kf = GetSpecialization<const KeyFrameVector2*>(keyFramesImpl);
       AddAnimatorConnector(AnimatorConnector<Vector2>::New(object,
                                                            target.propertyIndex,
                                                            target.componentIndex,
@@ -751,7 +754,7 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
 
     case Dali::Property::VECTOR3:
     {
-      auto kf = GetSpecialization<const KeyFrameVector3*>(keyFrames);
+      auto kf = GetSpecialization<const KeyFrameVector3*>(keyFramesImpl);
       AddAnimatorConnector(AnimatorConnector<Vector3>::New(object,
                                                            target.propertyIndex,
                                                            target.componentIndex,
@@ -763,7 +766,7 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
 
     case Dali::Property::VECTOR4:
     {
-      auto kf = GetSpecialization<const KeyFrameVector4*>(keyFrames);
+      auto kf = GetSpecialization<const KeyFrameVector4*>(keyFramesImpl);
       AddAnimatorConnector(AnimatorConnector<Vector4>::New(object,
                                                            target.propertyIndex,
                                                            target.componentIndex,
@@ -775,7 +778,7 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
 
     case Dali::Property::ROTATION:
     {
-      auto kf = GetSpecialization<const KeyFrameQuaternion*>(keyFrames);
+      auto kf = GetSpecialization<const KeyFrameQuaternion*>(keyFramesImpl);
       AddAnimatorConnector(AnimatorConnector<Quaternion>::New(object,
                                                               target.propertyIndex,
                                                               target.componentIndex,
