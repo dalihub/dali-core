@@ -353,6 +353,15 @@ public:
     return mRenderInstruction[updateBufferIndex];
   }
 
+  /**
+   * Sets Render Pass key for this RenderTask.
+   * Shader code that matches this render pass is used for rendering.
+   * If no matching shader is found, the code with a render pass of 0 is used.
+   * In other cases, operation is not guaranteed.
+   * @param[in] renderPass RenderPass value for this render task.
+   */
+  void SetRenderPass(uint32_t renderPass);
+
 private: // from PropertyOwner::Observer
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerConnected( PropertyOwner& owner )
@@ -384,7 +393,7 @@ private:
   RenderTask();
 
   // Undefined
-  RenderTask(const RenderTask&) = delete;
+  RenderTask(const RenderTask&)            = delete;
   RenderTask& operator=(const RenderTask&) = delete;
 
 public:                                          // Animatable Properties
@@ -403,11 +412,13 @@ private:
 
   RenderInstruction mRenderInstruction[2]; ///< Owned double buffered render instruction. (Double buffered because this owns render commands for the currently drawn frame)
 
-  uint32_t mRefreshRate;         ///< REFRESH_ONCE, REFRESH_ALWAYS or render every N frames
-  uint32_t mFrameCounter;        ///< counter for rendering every N frames
-  uint32_t mRenderedOnceCounter; ///< Incremented whenever state changes to RENDERED_ONCE_AND_NOTIFIED
+  uint32_t mRefreshRate;                   ///< REFRESH_ONCE, REFRESH_ALWAYS or render every N frames
+  uint32_t mFrameCounter;                  ///< counter for rendering every N frames
+  uint32_t mRenderedOnceCounter;           ///< Incremented whenever state changes to RENDERED_ONCE_AND_NOTIFIED
 
-  State mState; ///< Render state.
+  State mState;                            ///< Render state.
+
+  uint32_t mRenderPass{0u};
 
   bool mRequiresSync : 1;    ///< Whether sync is needed to track the render
   bool mActive : 1;          ///< True when the task is active, i.e. has valid source and camera

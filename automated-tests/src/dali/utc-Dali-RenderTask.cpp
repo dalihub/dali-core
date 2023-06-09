@@ -78,9 +78,73 @@ void utc_dali_render_task_cleanup(void)
  * FinishedSignal                      1+ve
  */
 
-namespace // unnamed namespace
+namespace                             // unnamed namespace
 {
 const int RENDER_FRAME_INTERVAL = 16; ///< Duration of each frame in ms. (at approx 60FPS)
+
+// Test shader codes
+const std::string_view SHADER_COLOR_TEST_SHADER_VERT1{
+  R"(INPUT mediump vec2 aPosition;
+uniform highp mat4 uMvpMatrix;
+uniform highp vec3 uSize;
+
+//Visual size and offset
+uniform mediump vec2 offset;
+uniform highp vec2 size;
+uniform mediump vec4 offsetSizeMode;
+uniform mediump vec2 origin;
+uniform mediump vec2 anchorPoint;
+uniform mediump vec2 extraSize;
+
+vec4 ComputeVertexPosition()
+{
+  vec2 visualSize = mix(size * uSize.xy, size, offsetSizeMode.zw ) + extraSize;
+  vec2 visualOffset = mix(offset * uSize.xy, offset, offsetSizeMode.xy);
+  mediump vec2 vPosition = aPosition * visualSize;
+  return vec4(vPosition + anchorPoint * visualSize + visualOffset + origin * uSize.xy, 0.0, 1.0);
+}
+
+void main()
+{
+  gl_Position = uMvpMatrix * ComputeVertexPosition();
+}
+)"};
+
+// Test shader codes
+const std::string_view SHADER_COLOR_TEST_SHADER_VERT2{
+  R"(INPUT mediump vec2 aPosition;
+uniform highp mat4 uMvpMatrix;
+uniform highp vec3 uSize;
+
+//Visual size and offset
+uniform mediump vec2 offset;
+uniform highp vec2 size;
+uniform mediump vec4 offsetSizeMode;
+uniform mediump vec2 origin;
+uniform mediump vec2 anchorPoint;
+uniform mediump vec2 extraSize;
+
+vec4 ComputeVertexPosition2()
+{
+  vec2 visualSize = mix(size * uSize.xy, size, offsetSizeMode.zw ) + extraSize;
+  vec2 visualOffset = mix(offset * uSize.xy, offset, offsetSizeMode.xy);
+  mediump vec2 vPosition = aPosition * visualSize;
+  return vec4(vPosition + anchorPoint * visualSize + visualOffset + origin * uSize.xy, 0.0, 1.0);
+}
+
+void main()
+{
+  gl_Position = uMvpMatrix * ComputeVertexPosition2();
+}
+)"};
+
+const std::string_view SHADER_COLOR_TEST_SHADER_FRAG{
+  R"(
+void main()
+{
+  OUT_COLOR = vec4(0.0, 0.0, 1.0, 1.0);
+}
+)"};
 
 /*
  * Simulate time passed by.
@@ -2432,12 +2496,12 @@ int UtcDaliRenderTaskOnceChain01(void)
 
   application.SendNotification();
 
-  //Both render tasks are executed.
+  // Both render tasks are executed.
   DALI_TEST_CHECK(UpdateRender(application, drawTrace, true, firstFinished, false, true, __LINE__));
   DALI_TEST_CHECK(firstFinished == false);
   DALI_TEST_CHECK(secondFinished == false);
 
-  //Nothing else to render and both render task should have finished now
+  // Nothing else to render and both render task should have finished now
   DALI_TEST_CHECK(UpdateRender(application, drawTrace, false, firstFinished, true, false, __LINE__));
   DALI_TEST_CHECK(firstFinished == true);
   DALI_TEST_CHECK(secondFinished == true);
@@ -4017,6 +4081,120 @@ int UtcDaliRenderTaskSetPartialUpdate(void)
   DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskRenderPass(void)
+{
+  TestApplication application;
+  tet_infoline("Testing RenderTask with RenderPass");
+
+  Stage   stage = Stage::GetCurrent();
+  Vector2 stageSize(stage.GetSize());
+
+  Actor blue                                 = Actor::New();
+  blue[Dali::Actor::Property::NAME]          = "Blue";
+  blue[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  blue[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+  blue[Dali::Actor::Property::SIZE]          = Vector2(300, 300);
+  blue[Dali::Actor::Property::POSITION]      = Vector2(0, 0);
+
+  Geometry geometry = Geometry::New();
+
+  Property::Map map[2];
+  map[0]["vertex"]     = SHADER_COLOR_TEST_SHADER_VERT1.data();
+  map[0]["fragment"]   = SHADER_COLOR_TEST_SHADER_FRAG.data();
+  map[0]["renderPass"] = 0;
+
+  map[1]["vertex"]     = SHADER_COLOR_TEST_SHADER_VERT2.data();
+  map[1]["fragment"]   = SHADER_COLOR_TEST_SHADER_FRAG.data();
+  map[1]["renderPass"] = 1;
+
+  Property::Array array;
+  array.PushBack(map[0]);
+  array.PushBack(map[1]);
+
+  Shader   shader   = Shader::New(array);
+  Renderer renderer = Renderer::New(geometry, shader);
+  blue.AddRenderer(renderer);
+
+  stage.Add(blue);
+
+  auto& gfx = application.GetGraphicsController();
+
+  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  DALI_TEST_EQUALS(0u, renderTaskList.GetTask(0u).GetRenderPass(), TEST_LOCATION);
+  // Render and notify
+  application.SendNotification();
+  application.Render(16);
+  DALI_TEST_CHECK(gfx.mCallStack.FindMethod("CreatePipeline"));
+  gfx.mCallStack.Reset();
+  DALI_TEST_EQUALS(0u, renderTaskList.GetTask(0u).GetRenderPass(), TEST_LOCATION);
+
+  renderTaskList.GetTask(0u).SetRenderPass(1u);
+  DALI_TEST_EQUALS(1u, renderTaskList.GetTask(0u).GetRenderPass(), TEST_LOCATION);
+  // Render and notify
+  application.SendNotification();
+  application.Render(16);
+  DALI_TEST_CHECK(gfx.mCallStack.FindMethod("CreatePipeline"));
+  gfx.mCallStack.Reset();
+  DALI_TEST_EQUALS(1u, renderTaskList.GetTask(0u).GetRenderPass(), TEST_LOCATION);
+
+  renderTaskList.GetTask(0u).SetRenderPass(0u);
+  DALI_TEST_EQUALS(0u, renderTaskList.GetTask(0u).GetRenderPass(), TEST_LOCATION);
+  // Render and notify
+  application.SendNotification();
+  application.Render(16);
+  DALI_TEST_CHECK(!gfx.mCallStack.FindMethod("CreatePipeline"));
+  gfx.mCallStack.Reset();
+  DALI_TEST_EQUALS(0u, renderTaskList.GetTask(0u).GetRenderPass(), TEST_LOCATION);
+
+  renderTaskList.GetTask(0u).SetRenderPass(1u);
+  DALI_TEST_EQUALS(1u, renderTaskList.GetTask(0u).GetRenderPass(), TEST_LOCATION);
+  // Render and notify
+  application.SendNotification();
+  application.Render(16);
+  DALI_TEST_CHECK(!gfx.mCallStack.FindMethod("CreatePipeline"));
+  gfx.mCallStack.Reset();
+  DALI_TEST_EQUALS(1u, renderTaskList.GetTask(0u).GetRenderPass(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskWithWrongShaderData(void)
+{
+  TestApplication application;
+  tet_infoline("Testing RenderTask with wrong shader data");
+
+  Stage   stage = Stage::GetCurrent();
+  Vector2 stageSize(stage.GetSize());
+
+  Actor blue                                 = Actor::New();
+  blue[Dali::Actor::Property::NAME]          = "Blue";
+  blue[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  blue[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+  blue[Dali::Actor::Property::SIZE]          = Vector2(300, 300);
+  blue[Dali::Actor::Property::POSITION]      = Vector2(0, 0);
+
+  Geometry geometry = Geometry::New();
+
+  Shader   shader   = Shader::New(Property::Value(10.0f));
+  Renderer renderer = Renderer::New(geometry, shader);
+  blue.AddRenderer(renderer);
+
+  stage.Add(blue);
+
+  auto& gfx = application.GetGraphicsController();
+
+  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  DALI_TEST_EQUALS(0u, renderTaskList.GetTask(0u).GetRenderPass(), TEST_LOCATION);
+  // Render and notify
+  application.SendNotification();
+  application.Render(16);
+  DALI_TEST_CHECK(!gfx.mCallStack.FindMethod("CreatePipeline"));
+  gfx.mCallStack.Reset();
+  DALI_TEST_EQUALS(0u, renderTaskList.GetTask(0u).GetRenderPass(), TEST_LOCATION);
 
   END_TEST;
 }

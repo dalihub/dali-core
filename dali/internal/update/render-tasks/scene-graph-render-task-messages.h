@@ -139,6 +139,17 @@ inline void SetSyncRequiredMessage(EventThreadServices& eventThreadServices, con
   new(slot) LocalType(&task, &RenderTask::SetSyncRequired, requiresSync);
 }
 
+inline void SetRenderPassMessage(EventThreadServices& eventThreadServices, const RenderTask& task, uint32_t renderPass)
+{
+  using LocalType = MessageValue1<RenderTask, uint32_t>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new(slot) LocalType(&task, &RenderTask::SetRenderPass, renderPass);
+}
+
 } // namespace Dali::Internal::SceneGraph
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_MESSAGES_H

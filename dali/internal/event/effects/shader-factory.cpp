@@ -71,7 +71,7 @@ ShaderFactory::~ShaderFactory()
   }
 }
 
-ShaderDataPtr ShaderFactory::Load(std::string_view vertexSource, std::string_view fragmentSource, const Dali::Shader::Hint::Value hints, size_t& shaderHash)
+ShaderDataPtr ShaderFactory::Load(std::string_view vertexSource, std::string_view fragmentSource, const Dali::Shader::Hint::Value hints, uint32_t renderPass, size_t& shaderHash)
 {
   // Work out the filename for the binary that the glsl source will be compiled and linked to:
   shaderHash = CalculateHash(vertexSource.data(), fragmentSource.data());
@@ -96,7 +96,7 @@ ShaderDataPtr ShaderFactory::Load(std::string_view vertexSource, std::string_vie
   if(shaderData.Get() == nullptr)
   {
     // Allocate the structure that returns the loaded shader:
-    shaderData = new ShaderData(std::string(vertexSource), std::string(fragmentSource), hints);
+    shaderData = new ShaderData(std::string(vertexSource), std::string(fragmentSource), hints, renderPass);
     shaderData->SetHashValue(shaderHash);
     shaderData->GetBuffer().Clear();
 
