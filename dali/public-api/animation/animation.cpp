@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -211,44 +211,44 @@ void Animation::AnimateTo(Property target, Property::Value destinationValue, Alp
   GetImplementation(*this).AnimateTo(target, std::move(destinationValue), alpha, period);
 }
 
-void Animation::AnimateBetween(Property target, KeyFrames& keyFrames)
+void Animation::AnimateBetween(Property target, KeyFrames keyFrames)
 {
-  GetImplementation(*this).AnimateBetween(target, GetImplementation(keyFrames));
+  GetImplementation(*this).AnimateBetween(target, keyFrames);
 }
 
-void Animation::AnimateBetween(Property target, KeyFrames& keyFrames, Interpolation interpolation)
+void Animation::AnimateBetween(Property target, KeyFrames keyFrames, Interpolation interpolation)
 {
-  GetImplementation(*this).AnimateBetween(target, GetImplementation(keyFrames), interpolation);
+  GetImplementation(*this).AnimateBetween(target, keyFrames, interpolation);
 }
 
-void Animation::AnimateBetween(Property target, KeyFrames& keyFrames, TimePeriod period)
+void Animation::AnimateBetween(Property target, KeyFrames keyFrames, TimePeriod period)
 {
-  GetImplementation(*this).AnimateBetween(target, GetImplementation(keyFrames), period);
+  GetImplementation(*this).AnimateBetween(target, keyFrames, period);
 }
 
-void Animation::AnimateBetween(Property target, KeyFrames& keyFrames, TimePeriod period, Interpolation interpolation)
+void Animation::AnimateBetween(Property target, KeyFrames keyFrames, TimePeriod period, Interpolation interpolation)
 {
-  GetImplementation(*this).AnimateBetween(target, GetImplementation(keyFrames), period, interpolation);
+  GetImplementation(*this).AnimateBetween(target, keyFrames, period, interpolation);
 }
 
-void Animation::AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunction alpha)
+void Animation::AnimateBetween(Property target, KeyFrames keyFrames, AlphaFunction alpha)
 {
-  GetImplementation(*this).AnimateBetween(target, GetImplementation(keyFrames), alpha);
+  GetImplementation(*this).AnimateBetween(target, keyFrames, alpha);
 }
 
-void Animation::AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunction alpha, Interpolation interpolation)
+void Animation::AnimateBetween(Property target, KeyFrames keyFrames, AlphaFunction alpha, Interpolation interpolation)
 {
-  GetImplementation(*this).AnimateBetween(target, GetImplementation(keyFrames), alpha, interpolation);
+  GetImplementation(*this).AnimateBetween(target, keyFrames, alpha, interpolation);
 }
 
-void Animation::AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period)
+void Animation::AnimateBetween(Property target, KeyFrames keyFrames, AlphaFunction alpha, TimePeriod period)
 {
-  GetImplementation(*this).AnimateBetween(target, GetImplementation(keyFrames), alpha, period);
+  GetImplementation(*this).AnimateBetween(target, keyFrames, alpha, period);
 }
 
-void Animation::AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period, Interpolation interpolation)
+void Animation::AnimateBetween(Property target, KeyFrames keyFrames, AlphaFunction alpha, TimePeriod period, Interpolation interpolation)
 {
-  GetImplementation(*this).AnimateBetween(target, GetImplementation(keyFrames), alpha, period, interpolation);
+  GetImplementation(*this).AnimateBetween(target, keyFrames, alpha, period, interpolation);
 }
 
 // Actor specific animations
