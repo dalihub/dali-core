@@ -85,6 +85,7 @@ TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent(cons
   TouchEventCombiner::EventDispatchType dispatchEvent(TouchEventCombiner::DISPATCH_NONE);
   const PointState::Type                state    = point.GetState();
   const int                             deviceId = point.GetDeviceId();
+  const Device::Class::Type             deviceType = point.GetDeviceClass();
 
   switch(state)
   {
@@ -250,7 +251,9 @@ TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent(cons
       }
 
       // Dispatch hover event if no previous down event received or the motion event comes from a new device ID
-      if(mPressedPoints.empty() || fromNewDeviceId)
+      // On touch down the MOTION -> STARTED event received at the same time. In this case, unnecessary hoverEvent may be triggered by the MOTION event.
+      // So, in case of touch device, it is ignored.
+      if((mPressedPoints.empty() || fromNewDeviceId) && deviceType != Device::Class::Type::TOUCH)
       {
         hoverEvent.time = time;
 
