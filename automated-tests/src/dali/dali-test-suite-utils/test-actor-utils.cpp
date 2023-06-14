@@ -124,7 +124,7 @@ Texture CreateTexture(TextureType::Type type, Pixel::Format format, int width, i
 {
   Texture texture = Texture::New(type, format, width, height);
 
-  int       bufferSize = width * height * 2;
+  int       bufferSize = width * height * GetBytesPerPixel(format);
   uint8_t*  buffer     = reinterpret_cast<uint8_t*>(malloc(bufferSize));
   PixelData pixelData  = PixelData::New(buffer, bufferSize, width, height, format, PixelData::FREE);
   texture.Upload(pixelData, 0u, 0u, 0u, 0u, width, height);

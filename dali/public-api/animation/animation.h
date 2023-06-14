@@ -2,7 +2,7 @@
 #define DALI_ANIMATION_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -125,7 +125,7 @@ class DALI_CORE_API Animation : public BaseHandle
 public:
   using AnimationSignalType = Signal<void(Animation&)>; ///< Animation finished signal type @SINCE_1_0.0
 
-  using AnyFunction = Any;                              ///< Interpolation function @SINCE_1_0.0
+  using AnyFunction = Any; ///< Interpolation function @SINCE_1_0.0
 
   /**
    * @brief Enumeration for what to do when the animation ends, is stopped, or is destroyed.
@@ -625,7 +625,7 @@ public:
    * @param[in] target The target object property to animate
    * @param[in] keyFrames The set of time/value pairs between which to animate
    */
-  void AnimateBetween(Property target, KeyFrames& keyFrames);
+  void AnimateBetween(Property target, KeyFrames keyFrames);
 
   /**
    * @brief Animates a property between keyframes.
@@ -635,7 +635,7 @@ public:
    * @param[in] keyFrames The set of time/value pairs between which to animate
    * @param[in] interpolation The method used to interpolate between values
    */
-  void AnimateBetween(Property target, KeyFrames& keyFrames, Interpolation interpolation);
+  void AnimateBetween(Property target, KeyFrames keyFrames, Interpolation interpolation);
 
   /**
    * @brief Animates a property between keyframes.
@@ -645,7 +645,7 @@ public:
    * @param[in] keyFrames The set of time/value pairs between which to animate
    * @param[in] alpha The alpha function to apply
    */
-  void AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunction alpha);
+  void AnimateBetween(Property target, KeyFrames keyFrames, AlphaFunction alpha);
 
   /**
    * @brief Animates a property between keyframes.
@@ -656,7 +656,7 @@ public:
    * @param[in] alpha The alpha function to apply
    * @param[in] interpolation The method used to interpolate between values
    */
-  void AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunction alpha, Interpolation interpolation);
+  void AnimateBetween(Property target, KeyFrames keyFrames, AlphaFunction alpha, Interpolation interpolation);
 
   /**
    * @brief Animates a property between keyframes.
@@ -666,7 +666,7 @@ public:
    * @param[in] keyFrames The set of time/value pairs between which to animate
    * @param[in] period The effect will occur during this time period
    */
-  void AnimateBetween(Property target, KeyFrames& keyFrames, TimePeriod period);
+  void AnimateBetween(Property target, KeyFrames keyFrames, TimePeriod period);
 
   /**
    * @brief Animates a property between keyframes.
@@ -677,7 +677,7 @@ public:
    * @param[in] period The effect will occur during this time period
    * @param[in] interpolation The method used to interpolate between values
    */
-  void AnimateBetween(Property target, KeyFrames& keyFrames, TimePeriod period, Interpolation interpolation);
+  void AnimateBetween(Property target, KeyFrames keyFrames, TimePeriod period, Interpolation interpolation);
 
   /**
    * @brief Animates a property between keyframes.
@@ -688,7 +688,7 @@ public:
    * @param[in] alpha The alpha function to apply
    * @param[in] period The effect will occur during this time period
    */
-  void AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period);
+  void AnimateBetween(Property target, KeyFrames keyFrames, AlphaFunction alpha, TimePeriod period);
 
   /**
    * @brief Animates a property between keyframes.
@@ -700,7 +700,7 @@ public:
    * @param[in] period The effect will occur during this time period
    * @param[in] interpolation The method used to interpolate between values
    */
-  void AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period, Interpolation interpolation);
+  void AnimateBetween(Property target, KeyFrames keyFrames, AlphaFunction alpha, TimePeriod period, Interpolation interpolation);
 
   // Actor-specific convenience methods
 

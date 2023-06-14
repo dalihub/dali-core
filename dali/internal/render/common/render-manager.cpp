@@ -636,7 +636,15 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
               {
                 item.mIsUpdated = false;
 
-                Vector4 updateArea = item.mRenderer ? item.mRenderer->GetVisualTransformedUpdateArea(mImpl->renderBufferIndex, item.mUpdateArea) : item.mUpdateArea;
+                Vector4 updateArea;
+                if(item.mNode->IsTextureUpdateAreaUsed() && item.mRenderer)
+                {
+                  updateArea = item.mRenderer->GetTextureUpdateArea();
+                }
+                else
+                {
+                  updateArea = item.mRenderer ? item.mRenderer->GetVisualTransformedUpdateArea(mImpl->renderBufferIndex, item.mUpdateArea) : item.mUpdateArea;
+                }
 
                 rect = RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, Vector3(updateArea.x, updateArea.y, 0.0f), Vector3(updateArea.z, updateArea.w, 0.0f), viewportRect.width, viewportRect.height);
                 if(rect.IsValid() && rect.Intersect(viewportRect) && !rect.IsEmpty())

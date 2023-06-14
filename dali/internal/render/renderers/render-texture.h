@@ -164,6 +164,24 @@ public:
   }
 
   /**
+   * Return the width of the texture
+   * @return The width of the texture
+   */
+  uint16_t GetWidth() const
+  {
+    return mWidth;
+  }
+
+  /**
+   * Return the height of the texture
+   * @return The height of the texture
+   */
+  uint32_t GetHeight() const
+  {
+    return mHeight;
+  }
+
+  /**
    * Called from RenderManager to notify the texture that current rendering pass has finished.
    */
   void OnRenderFinished();
@@ -183,12 +201,19 @@ public:
    */
   [[nodiscard]] bool Updated()
   {
-    if(mUpdated || IsNativeImage())
+    if(mUpdated || (mNativeImage && mNativeImage->SourceChanged()))
     {
       return true;
     }
     return false;
   }
+
+  /**
+   * Get the updated area
+   * @return The updated area if the texture is updated, otherwise an empty area
+   * @note The origin of the area is the top-left corner of the texture.
+   */
+  Rect<uint16_t> GetUpdatedArea();
 
 private:
   /**
@@ -204,12 +229,13 @@ private:
   NativeImageInterfacePtr mNativeImage; ///< Pointer to native image
   Render::Sampler         mSampler;     ///< The current sampler state
 
-  Pixel::Format mPixelFormat;  ///< Pixel format of the texture
-  uint16_t      mWidth;        ///< Width of the texture
-  uint16_t      mHeight;       ///< Height of the texture
-  Type          mType : 3;     ///< Type of the texture
-  bool          mHasAlpha : 1; ///< Whether the format has an alpha channel
-  bool          mUpdated : 1;  ///< Whether the texture is updated
+  Rect<uint16_t> mUpdatedArea{}; ///< Updated area of the texture
+  Pixel::Format  mPixelFormat;   ///< Pixel format of the texture
+  uint16_t       mWidth;         ///< Width of the texture
+  uint16_t       mHeight;        ///< Height of the texture
+  Type           mType : 3;      ///< Type of the texture
+  bool           mHasAlpha : 1;  ///< Whether the format has an alpha channel
+  bool           mUpdated : 1;   ///< Whether the texture is updated
 };
 
 } // namespace Render

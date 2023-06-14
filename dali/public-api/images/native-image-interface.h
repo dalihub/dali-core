@@ -2,7 +2,7 @@
 #define DALI_NATIVE_IMAGE_INTERFACE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <string>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/math/rect.h>
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/object/ref-object.h>
 
@@ -138,13 +139,21 @@ public:
   virtual Any GetNativeImageHandle() const = 0;
 
   /**
-   * @brief Determine if the source for the native image has changed characteristics.
+   * @brief Determine if the source data for the native image has changed.
    *
    * @SINCE_1_9.23
-   * @return true if the source data has modified any characteristics of the
-   * native image, for example if the size of the buffer has changed.
+   * @return true if the source data has changed.
    */
   virtual bool SourceChanged() const = 0;
+
+  /**
+   * @brief Retrieves the updated area.
+   *
+   * @SINCE_2_2.31
+   * @return The updated area
+   * @note The x and y are the offset of the top left corner of the area from the top left of the image.
+   */
+  virtual Rect<uint32_t> GetUpdatedArea() = 0;
 
   /**
    * @brief Retrieves the extension for the interface.

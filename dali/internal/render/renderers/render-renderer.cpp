@@ -1000,6 +1000,44 @@ void Renderer::DetachFromNodeDataProvider(const SceneGraph::NodeDataProvider& no
   }
 }
 
+Vector4 Renderer::GetTextureUpdateArea() const noexcept
+{
+  Vector4 result = Vector4::ZERO;
+
+  auto* textures = mRenderDataProvider->GetTextures();
+  if(textures)
+  {
+    Rect<uint16_t> updatedArea{};
+    uint16_t       width = 0, height = 0;
+    for(auto iter = textures->Begin(), end = textures->End(); iter < end; ++iter)
+    {
+      if(*iter)
+      {
+        Rect<uint16_t> area = (*iter)->GetUpdatedArea();
+        if(updatedArea.IsEmpty())
+        {
+          updatedArea = area;
+
+          // Assume all texture sizes are same
+          width  = (*iter)->GetWidth();
+          height = (*iter)->GetHeight();
+        }
+        else
+        {
+          // Merge
+          updatedArea.Merge(area);
+        }
+        if(updatedArea.width == width && updatedArea.height == height)
+        {
+          break; // full area
+        }
+      }
+    }
+    result = Vector4(updatedArea.x - width / 2.0f + updatedArea.width / 2.0f, updatedArea.y - height / 2.0f + updatedArea.height / 2.0f, updatedArea.width, updatedArea.height);
+  }
+  return result;
+}
+
 Graphics::Pipeline& Renderer::PrepareGraphicsPipeline(
   Program&                                             program,
   const Dali::Internal::SceneGraph::RenderInstruction& instruction,

@@ -697,6 +697,16 @@ public:
     return mUpdateAreaHint;
   }
 
+  void UseTextureUpdateArea(bool useTextureUpdateArea)
+  {
+    mUseTextureUpdateArea = useTextureUpdateArea;
+  }
+
+  bool IsTextureUpdateAreaUsed() const
+  {
+    return mUseTextureUpdateArea;
+  }
+
   /**
    * Retrieve the bounding sphere of the node
    * @return A vector4 describing the bounding sphere. XYZ is the center and W is the radius
@@ -1037,6 +1047,7 @@ protected:
   bool               mPositionUsesAnchorPoint : 1; ///< True if the node should use the anchor-point when calculating the position
   bool               mTransparent : 1;             ///< True if this node is transparent. This value do not affect children.
   bool               mUpdateAreaChanged : 1;       ///< True if the update area of the node is changed.
+  bool               mUseTextureUpdateArea : 1;    ///< Whether the actor uses the update area of the texture instead of its own.
 
   // Changes scope, should be at end of class
   DALI_LOG_OBJECT_STRING_DECLARATION;
@@ -1185,6 +1196,17 @@ inline void SetUpdateAreaHintMessage(EventThreadServices& eventThreadServices, c
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&node, &Node::SetUpdateAreaHint, updateAreaHint);
+}
+
+inline void UseTextureUpdateAreaMessage(EventThreadServices& eventThreadServices, const Node& node, bool useTextureUpdateArea)
+{
+  using LocalType = MessageValue1<Node, bool>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new(slot) LocalType(&node, &Node::UseTextureUpdateArea, useTextureUpdateArea);
 }
 
 } // namespace SceneGraph

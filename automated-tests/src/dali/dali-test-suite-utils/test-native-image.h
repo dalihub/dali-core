@@ -2,7 +2,7 @@
 #define TEST_NATIVE_IMAGE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -107,20 +107,31 @@ public:
   };
   inline bool SourceChanged() const override
   {
-    return false;
+    return true;
   };
+
+  inline Rect<uint32_t> GetUpdatedArea() override
+  {
+    return mUpdatedArea;
+  }
 
   inline virtual Dali::NativeImageInterface::Extension* GetExtension()
   {
     return nullptr;
   }
 
+  inline void SetUpdatedArea(const Rect<uint32_t>& updatedArea)
+  {
+    mUpdatedArea = updatedArea;
+  }
+
 private:
   TestNativeImage(uint32_t width, uint32_t height);
   virtual ~TestNativeImage();
 
-  uint32_t mWidth;
-  uint32_t mHeight;
+  uint32_t       mWidth;
+  uint32_t       mHeight;
+  Rect<uint32_t> mUpdatedArea{};
 
 public:
   int32_t                mExtensionCreateCalls;

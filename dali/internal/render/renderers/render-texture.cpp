@@ -378,6 +378,8 @@ void Texture::Upload(PixelDataPtr pixelData, const Internal::Texture::UploadPara
   info.srcStride    = srcStride;
   info.srcFormat    = ConvertPixelFormat(pixelData->GetPixelFormat());
 
+  mUpdatedArea = Rect<uint16_t>(params.xOffset, params.yOffset, params.width, params.height);
+
   Graphics::TextureUpdateSourceInfo updateSourceInfo{};
   updateSourceInfo.sourceType                = Graphics::TextureUpdateSourceInfo::Type::PIXEL_DATA;
   updateSourceInfo.pixelDataSource.pixelData = Dali::PixelData(pixelData.Get());
@@ -410,6 +412,20 @@ void Texture::GenerateMipmaps()
 void Texture::OnRenderFinished()
 {
   SetUpdated(false);
+  mUpdatedArea = Rect<uint16_t>{0, 0, 0, 0};
+}
+
+Rect<uint16_t> Texture::GetUpdatedArea()
+{
+  if(mNativeImage)
+  {
+    Rect<uint32_t> rect = mNativeImage->GetUpdatedArea();
+    mUpdatedArea.x      = static_cast<uint16_t>(rect.x);
+    mUpdatedArea.y      = static_cast<uint16_t>(rect.y);
+    mUpdatedArea.width  = static_cast<uint16_t>(rect.width);
+    mUpdatedArea.height = static_cast<uint16_t>(rect.height);
+  }
+  return mUpdatedArea;
 }
 
 } // namespace Render

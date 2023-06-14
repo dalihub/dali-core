@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -635,6 +635,17 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
       if(property.Get(boolValue))
       {
         actor.mAllowOnlyOwnTouch = boolValue;
+      }
+      break;
+    }
+
+    case Dali::DevelActor::Property::USE_TEXTURE_UPDATE_AREA:
+    {
+      bool boolValue = false;
+      if(property.Get(boolValue))
+      {
+        actor.mUseTextureUpdateArea = boolValue;
+        UseTextureUpdateAreaMessage(actor.GetEventThreadServices(), actor.GetNode(), boolValue);
       }
       break;
     }
@@ -1688,6 +1699,12 @@ bool Actor::PropertyHandler::GetCachedPropertyValue(const Internal::Actor& actor
       break;
     }
 
+    case Dali::DevelActor::Property::USE_TEXTURE_UPDATE_AREA:
+    {
+      value = actor.mUseTextureUpdateArea;
+      break;
+    }
+
     default:
     {
       // Must be a scene-graph only property
@@ -1881,6 +1898,12 @@ bool Actor::PropertyHandler::GetCurrentPropertyValue(const Internal::Actor& acto
       break;
     }
 
+    case Dali::DevelActor::Property::USE_TEXTURE_UPDATE_AREA:
+    {
+      // node is being used in a separate thread, the value from the previous update is the same, set by user
+      value = actor.GetNode().IsTextureUpdateAreaUsed();
+      break;
+    }
     default:
     {
       // Must be an event-side only property

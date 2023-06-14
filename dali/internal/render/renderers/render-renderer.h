@@ -509,6 +509,13 @@ public:
    */
   void DetachFromNodeDataProvider(const SceneGraph::NodeDataProvider& node);
 
+  /**
+   * @brief Gets the update area of textures.
+   *
+   * @return The updated area of textures
+   */
+  Vector4 GetTextureUpdateArea() const noexcept;
+
 private:
   struct UniformIndexMap;
 
