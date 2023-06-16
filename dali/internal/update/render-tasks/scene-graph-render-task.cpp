@@ -393,7 +393,7 @@ RenderInstruction& RenderTask::PrepareRenderInstruction(BufferIndex updateBuffer
     mRenderInstruction[updateBufferIndex].mRenderTracker = nullptr;
   }
 
-  mRenderInstruction[updateBufferIndex].mRenderPass = mRenderPass;
+  mRenderInstruction[updateBufferIndex].mRenderPassTag = mRenderPassTag;
   return mRenderInstruction[updateBufferIndex];
 }
 
@@ -456,9 +456,9 @@ void RenderTask::SetSyncRequired(bool requiresSync)
   mRequiresSync = requiresSync;
 }
 
-void RenderTask::SetRenderPass(uint32_t renderPass)
+void RenderTask::SetRenderPassTag(uint32_t renderPassTag)
 {
-  mRenderPass = renderPass;
+  mRenderPassTag = renderPassTag;
 }
 
 void RenderTask::PropertyOwnerConnected(PropertyOwner& owner)

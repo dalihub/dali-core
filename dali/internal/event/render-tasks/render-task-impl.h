@@ -253,14 +253,14 @@ public:
   bool ViewportToLocal(Actor* actor, float viewportX, float viewportY, float& localX, float& localY) const;
 
   /**
-   * @copydoc Dali::RenderTask::SetRenderPass()
+   * @copydoc Dali::RenderTask::SetRenderPassTag()
    */
-  void SetRenderPass(uint32_t renderPass);
+  void SetRenderPassTag(uint32_t renderPassTag);
 
   /**
-   * @copydoc Dali::RenderTask::GetRenderPass()
+   * @copydoc Dali::RenderTask::GetRenderPassTag()
    */
-  uint32_t GetRenderPass() const;
+  uint32_t GetRenderPassTag() const;
 
 public: // Used by RenderTaskList, which owns the SceneGraph::RenderTasks
   /**
@@ -382,7 +382,7 @@ private:
 
   Dali::RenderTask::ScreenToFrameBufferFunction mScreenToFrameBufferFunction; ///< Used to convert screen to frame-buffer coordinates
 
-  uint32_t mRenderPass{0u};
+  uint32_t mRenderPassTag{0u};
 
   bool mExclusive : 1;    ///< True if the render-task has exclusive access to the source Nodes.
   bool mInputEnabled : 1; ///< True if the render-task should be considered for input handling.

@@ -4085,10 +4085,10 @@ int UtcDaliRenderTaskSetPartialUpdate(void)
   END_TEST;
 }
 
-int UtcDaliRenderTaskRenderPass(void)
+int UtcDaliRenderTaskRenderPassTag(void)
 {
   TestApplication application;
-  tet_infoline("Testing RenderTask with RenderPass");
+  tet_infoline("Testing RenderTask with RenderPassTag");
 
   Stage   stage = Stage::GetCurrent();
   Vector2 stageSize(stage.GetSize());
@@ -4105,11 +4105,11 @@ int UtcDaliRenderTaskRenderPass(void)
   Property::Map map[2];
   map[0]["vertex"]     = SHADER_COLOR_TEST_SHADER_VERT1.data();
   map[0]["fragment"]   = SHADER_COLOR_TEST_SHADER_FRAG.data();
-  map[0]["renderPass"] = 0;
+  map[0]["renderPassTag"] = 0;
 
   map[1]["vertex"]     = SHADER_COLOR_TEST_SHADER_VERT2.data();
   map[1]["fragment"]   = SHADER_COLOR_TEST_SHADER_FRAG.data();
-  map[1]["renderPass"] = 1;
+  map[1]["renderPassTag"] = 1;
 
   Property::Array array;
   array.PushBack(map[0]);
@@ -4124,40 +4124,40 @@ int UtcDaliRenderTaskRenderPass(void)
   auto& gfx = application.GetGraphicsController();
 
   RenderTaskList renderTaskList = stage.GetRenderTaskList();
-  DALI_TEST_EQUALS(0u, renderTaskList.GetTask(0u).GetRenderPass(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, renderTaskList.GetTask(0u).GetRenderPassTag(), TEST_LOCATION);
   // Render and notify
   application.SendNotification();
   application.Render(16);
   DALI_TEST_CHECK(gfx.mCallStack.FindMethod("CreatePipeline"));
   gfx.mCallStack.Reset();
-  DALI_TEST_EQUALS(0u, renderTaskList.GetTask(0u).GetRenderPass(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, renderTaskList.GetTask(0u).GetRenderPassTag(), TEST_LOCATION);
 
-  renderTaskList.GetTask(0u).SetRenderPass(1u);
-  DALI_TEST_EQUALS(1u, renderTaskList.GetTask(0u).GetRenderPass(), TEST_LOCATION);
+  renderTaskList.GetTask(0u).SetRenderPassTag(1u);
+  DALI_TEST_EQUALS(1u, renderTaskList.GetTask(0u).GetRenderPassTag(), TEST_LOCATION);
   // Render and notify
   application.SendNotification();
   application.Render(16);
   DALI_TEST_CHECK(gfx.mCallStack.FindMethod("CreatePipeline"));
   gfx.mCallStack.Reset();
-  DALI_TEST_EQUALS(1u, renderTaskList.GetTask(0u).GetRenderPass(), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, renderTaskList.GetTask(0u).GetRenderPassTag(), TEST_LOCATION);
 
-  renderTaskList.GetTask(0u).SetRenderPass(0u);
-  DALI_TEST_EQUALS(0u, renderTaskList.GetTask(0u).GetRenderPass(), TEST_LOCATION);
+  renderTaskList.GetTask(0u).SetRenderPassTag(0u);
+  DALI_TEST_EQUALS(0u, renderTaskList.GetTask(0u).GetRenderPassTag(), TEST_LOCATION);
   // Render and notify
   application.SendNotification();
   application.Render(16);
   DALI_TEST_CHECK(!gfx.mCallStack.FindMethod("CreatePipeline"));
   gfx.mCallStack.Reset();
-  DALI_TEST_EQUALS(0u, renderTaskList.GetTask(0u).GetRenderPass(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, renderTaskList.GetTask(0u).GetRenderPassTag(), TEST_LOCATION);
 
-  renderTaskList.GetTask(0u).SetRenderPass(1u);
-  DALI_TEST_EQUALS(1u, renderTaskList.GetTask(0u).GetRenderPass(), TEST_LOCATION);
+  renderTaskList.GetTask(0u).SetRenderPassTag(1u);
+  DALI_TEST_EQUALS(1u, renderTaskList.GetTask(0u).GetRenderPassTag(), TEST_LOCATION);
   // Render and notify
   application.SendNotification();
   application.Render(16);
   DALI_TEST_CHECK(!gfx.mCallStack.FindMethod("CreatePipeline"));
   gfx.mCallStack.Reset();
-  DALI_TEST_EQUALS(1u, renderTaskList.GetTask(0u).GetRenderPass(), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, renderTaskList.GetTask(0u).GetRenderPassTag(), TEST_LOCATION);
 
   END_TEST;
 }
@@ -4188,13 +4188,13 @@ int UtcDaliRenderTaskWithWrongShaderData(void)
   auto& gfx = application.GetGraphicsController();
 
   RenderTaskList renderTaskList = stage.GetRenderTaskList();
-  DALI_TEST_EQUALS(0u, renderTaskList.GetTask(0u).GetRenderPass(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, renderTaskList.GetTask(0u).GetRenderPassTag(), TEST_LOCATION);
   // Render and notify
   application.SendNotification();
   application.Render(16);
   DALI_TEST_CHECK(!gfx.mCallStack.FindMethod("CreatePipeline"));
   gfx.mCallStack.Reset();
-  DALI_TEST_EQUALS(0u, renderTaskList.GetTask(0u).GetRenderPass(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, renderTaskList.GetTask(0u).GetRenderPassTag(), TEST_LOCATION);
 
   END_TEST;
 }

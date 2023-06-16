@@ -110,7 +110,7 @@ public:
        * @brief Name: "program", Type: MAP or ARRAY.
        * @note The default value is empty.
        * @note It is Property::Map or Property::Array of the map.
-       * @note Format: {"renderPass":"", "vertex":"", "fragment":"", "hints":""}
+       * @note Format: {"renderPassTag":"", "vertex":"", "fragment":"", "hints":""}
        * @SINCE_1_1.43
        */
       PROGRAM = DEFAULT_OBJECT_PROPERTY_START_INDEX,
@@ -135,7 +135,7 @@ public:
    *
    * @SINCE_2_2.31
    * @param[in] shaderMap Property::Map of shader data or Property::Array of Property::Map.
-   * Property::Map format is {"renderPass":"", "vertex":"", "fragment":"", "hints":""}
+   * Property::Map format is {"renderPassTag":"", "vertex":"", "fragment":"", "hints":""}
    * shaderMap can be Property::Array of Property::Map for multi pass shading.
    * @return A handle to a shader effect
    */
