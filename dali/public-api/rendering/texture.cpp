@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use *this file except in compliance with the License.
@@ -27,6 +27,12 @@ namespace Dali
 Texture Texture::New(TextureType::Type type, Pixel::Format format, uint32_t width, uint32_t height)
 {
   Internal::TexturePtr texture = Internal::Texture::New(type, format, width, height);
+  return Texture(texture.Get());
+}
+
+Texture Texture::New(TextureType::Type type)
+{
+  Internal::TexturePtr texture = Internal::Texture::New(type, Pixel::INVALID, 0u, 0u);
   return Texture(texture.Get());
 }
 

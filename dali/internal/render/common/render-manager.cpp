@@ -202,10 +202,9 @@ struct RenderManager::Impl
   Integration::StencilBufferAvailable stencilBufferAvailable; ///< Whether the stencil buffer is available
   Integration::PartialUpdateAvailable partialUpdateAvailable; ///< Whether the partial update is available
 
-  std::unique_ptr<Dali::ThreadPool> threadPool;            ///< The thread pool
-  Vector<Graphics::Texture*>        boundTextures;         ///< The textures bound for rendering
-  Vector<Graphics::Texture*>        textureDependencyList; ///< The dependency list of bound textures
-  Vector<Render::TextureKey>        updatedTextures{};     ///< The updated texture list
+  std::unique_ptr<Dali::ThreadPool> threadPool;        ///< The thread pool
+  Vector<Graphics::Texture*>        boundTextures;     ///< The textures bound for rendering
+  Vector<Render::TextureKey>        updatedTextures{}; ///< The updated texture list
 
   uint32_t    frameCount{0u};                                                    ///< The current frame count
   BufferIndex renderBufferIndex{SceneGraphBuffers::INITIAL_UPDATE_BUFFER_INDEX}; ///< The index of the buffer to read from;
@@ -969,15 +968,6 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     // reset the program matrices for all programs once per frame
     // this ensures we will set view and projection matrix once per program per camera
     mImpl->programController.ResetProgramMatrices();
-
-    if(instruction.mFrameBuffer)
-    {
-      // For each offscreen buffer, update the dependency list with the new texture id used by this frame buffer.
-      for(unsigned int i0 = 0, i1 = instruction.mFrameBuffer->GetColorAttachmentCount(); i0 < i1; ++i0)
-      {
-        mImpl->textureDependencyList.PushBack(instruction.mFrameBuffer->GetTexture(i0));
-      }
-    }
 
     if(!instruction.mIgnoreRenderToFbo && (instruction.mFrameBuffer != nullptr))
     {

@@ -70,6 +70,16 @@ int UtcDaliTextureNew03(void)
   END_TEST;
 }
 
+int UtcDaliTextureNew04(void)
+{
+  TestApplication application;
+
+  Texture texture = Texture::New(TextureType::TEXTURE_2D);
+
+  DALI_TEST_CHECK(texture);
+  END_TEST;
+}
+
 int UtcDaliTextureCopyConstructor(void)
 {
   TestApplication application;
@@ -649,6 +659,80 @@ int UtcDaliTextureUpload07(void)
       DALI_TEST_CHECK(callStack.FindMethodAndParams("TexImage2D", out.str().c_str()));
     }
   }
+
+  END_TEST;
+}
+
+int UtcDaliTextureUpload08(void)
+{
+  TestApplication application;
+
+  //Create the texture without pixel information
+  tet_infoline("Creating a Texure without any size/format information");
+  Texture texture = Texture::New(TextureType::TEXTURE_2D);
+
+  application.GetGlAbstraction().EnableTextureCallTrace(true);
+
+  application.SendNotification();
+  application.Render();
+
+  TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
+
+  tet_infoline("TexImage2D should not be called with a null pointer to reserve storage for the texture in the gpu");
+  DALI_TEST_CHECK(!callStack.FindMethod("GenTextures"));
+  DALI_TEST_CHECK(!callStack.FindMethod("TexImage2D"));
+
+  tet_infoline("Upload data to the texture");
+  unsigned int width(64);
+  unsigned int height(64);
+  callStack.Reset();
+
+  tet_infoline("Creating a RGB pixel buffer and adding that to the texture to ensure it is handled correctly");
+  unsigned int   bufferSize(width * height * 3);
+  unsigned char* buffer    = reinterpret_cast<unsigned char*>(malloc(bufferSize));
+  PixelData      pixelData = PixelData::New(buffer, bufferSize, width, height, Pixel::RGB888, PixelData::FREE);
+  texture.Upload(pixelData);
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline("GetWidth / GetHeight / GetPixelFormat will return uploaded value");
+  DALI_TEST_EQUALS(texture.GetWidth(), width, TEST_LOCATION);
+  DALI_TEST_EQUALS(texture.GetHeight(), height, TEST_LOCATION);
+  DALI_TEST_EQUALS(texture.GetPixelFormat(), Pixel::RGB888, TEST_LOCATION);
+
+  tet_infoline("TexImage2D should be called to upload the data");
+  DALI_TEST_CHECK(callStack.FindMethod("GenTextures"));
+  {
+    std::stringstream out;
+    out << GL_TEXTURE_2D << ", " << 0u << ", " << width << ", " << height;
+    DALI_TEST_CHECK(callStack.FindMethodAndParams("TexImage2D", out.str().c_str()));
+  }
+
+  tet_infoline("Upload another data to the texture");
+  width  = 40;
+  height = 73;
+  callStack.Reset();
+
+  tet_infoline("Creating a RGB pixel buffer and adding that to the texture to ensure it is handled correctly");
+  bufferSize = width * height * 4;
+  buffer     = reinterpret_cast<unsigned char*>(malloc(bufferSize));
+  pixelData  = PixelData::New(buffer, bufferSize, width, height, Pixel::RGBA8888, PixelData::FREE);
+  texture.Upload(pixelData);
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline("TexImage2D should be generate new graphics, and be called to upload the data");
+  DALI_TEST_CHECK(callStack.FindMethod("GenTextures"));
+  {
+    std::stringstream out;
+    out << GL_TEXTURE_2D << ", " << 0u << ", " << width << ", " << height;
+    DALI_TEST_CHECK(callStack.FindMethodAndParams("TexImage2D", out.str().c_str()));
+  }
+
+  tet_infoline("GetWidth / GetHeight / GetPixelFormat will return uploaded value");
+  DALI_TEST_EQUALS(texture.GetWidth(), width, TEST_LOCATION);
+  DALI_TEST_EQUALS(texture.GetHeight(), height, TEST_LOCATION);
+  DALI_TEST_EQUALS(texture.GetPixelFormat(), Pixel::RGBA8888, TEST_LOCATION);
 
   END_TEST;
 }

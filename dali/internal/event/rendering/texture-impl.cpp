@@ -54,7 +54,8 @@ Texture::Texture(TextureType::Type type, Pixel::Format format, ImageDimensions s
   mNativeImage(),
   mSize(size),
   mType(type),
-  mFormat(format)
+  mFormat(format),
+  mUseUploadedParameter(mSize.GetWidth() == 0u && mSize.GetHeight() == 0u && mFormat == Pixel::INVALID)
 {
 }
 
@@ -64,7 +65,8 @@ Texture::Texture(NativeImageInterfacePtr nativeImageInterface)
   mNativeImage(nativeImageInterface),
   mSize(nativeImageInterface->GetWidth(), nativeImageInterface->GetHeight()),
   mType(TextureType::TEXTURE_2D),
-  mFormat(Pixel::RGB888)
+  mFormat(Pixel::RGB888),
+  mUseUploadedParameter(false)
 {
 }
 
@@ -133,10 +135,8 @@ bool Texture::UploadSubPixelData(PixelDataPtr pixelData,
   constexpr auto max_value = std::numeric_limits<uint16_t>::max();
   DALI_ASSERT_ALWAYS(layer < max_value &&
                      mipmap < max_value &&
-                     xOffset < max_value &&
-                     yOffset < max_value &&
-                     width < max_value &&
-                     height < max_value &&
+                     xOffset + width < max_value &&
+                     yOffset + height < max_value &&
                      dataWidth < max_value &&
                      dataHeight < max_value &&
                      "Parameter value out of range");
@@ -158,7 +158,7 @@ bool Texture::UploadSubPixelData(PixelDataPtr pixelData,
       else
       {
         Pixel::Format pixelDataFormat = pixelData->GetPixelFormat();
-        if((pixelDataFormat == mFormat) || ((pixelDataFormat == Pixel::RGB888) && (mFormat == Pixel::RGBA8888)))
+        if((mUseUploadedParameter || pixelDataFormat == mFormat) || ((pixelDataFormat == Pixel::RGB888) && (mFormat == Pixel::RGBA8888)))
         {
           if(pixelDataSize < width * height)
           {
@@ -177,13 +177,20 @@ bool Texture::UploadSubPixelData(PixelDataPtr pixelData,
           {
             DALI_LOG_ERROR("PixelData of an incorrect subsize when trying to update texture\n");
           }
-          else if((xOffset + width > (mSize.GetWidth() / (1u << mipmap))) ||
-                  (yOffset + height > (mSize.GetHeight() / (1u << mipmap))))
+          else if(!mUseUploadedParameter &&
+                  ((xOffset + width > (static_cast<uint32_t>(mSize.GetWidth()) >> mipmap)) ||
+                   (yOffset + height > (static_cast<uint32_t>(mSize.GetHeight()) >> mipmap))))
           {
             DALI_LOG_ERROR("Texture update area out of bounds\n");
           }
           else
           {
+            if(mUseUploadedParameter)
+            {
+              mSize   = ImageDimensions(xOffset + width, yOffset + height);
+              mFormat = pixelDataFormat;
+            }
+
             //Parameters are correct. Send message to upload data to the texture
             UploadParams params = {static_cast<uint32_t>(dataXOffset),
                                    static_cast<uint32_t>(dataYOffset),

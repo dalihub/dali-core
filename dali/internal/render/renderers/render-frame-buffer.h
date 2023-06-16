@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_FRAME_BUFFER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,15 +118,6 @@ public:
   {
     return mCreateInfo.colorAttachments.size();
   }
-
-  /**
-   * @brief Get the texture bound to this frame buffer as color attachment @a index.
-   * @return The texture.
-   */
-  Graphics::Texture* GetTexture(uint8_t index)
-  {
-    return mCreateInfo.colorAttachments[index].texture;
-  };
 
   Graphics::Framebuffer* GetGraphicsObject()
   {

@@ -241,7 +241,8 @@ Texture::Texture(Type type, Pixel::Format format, ImageDimensions size)
   mHeight(size.GetHeight()),
   mType(type),
   mHasAlpha(HasAlpha(format)),
-  mUpdated(true)
+  mUpdated(true),
+  mUseUploadedParameter(mWidth == 0u && mHeight == 0u && mPixelFormat == Pixel::INVALID)
 {
 }
 
@@ -255,7 +256,8 @@ Texture::Texture(NativeImageInterfacePtr nativeImageInterface)
   mHeight(static_cast<uint16_t>(nativeImageInterface->GetHeight())), // ignoring overflow, not happening in practice
   mType(TextureType::TEXTURE_2D),
   mHasAlpha(nativeImageInterface->RequiresBlending()),
-  mUpdated(true)
+  mUpdated(true),
+  mUseUploadedParameter(false)
 {
 }
 
@@ -318,22 +320,20 @@ void Texture::Upload(PixelDataPtr pixelData, const Internal::Texture::UploadPara
 {
   DALI_ASSERT_ALWAYS(!mNativeImage);
 
-  if(!mGraphicsTexture)
-  {
-    Create(static_cast<Graphics::TextureUsageFlags>(Graphics::TextureUsageFlagBits::SAMPLE));
-  }
-
-  Graphics::TextureUpdateInfo info{};
-
   const uint32_t srcStride = pixelData->GetStride();
   uint32_t       srcOffset = 0u;
   uint32_t       srcSize   = pixelData->GetBufferSize();
 
-  const bool requiredSubPixelData = (!Pixel::IsCompressed(pixelData->GetPixelFormat())) &&
+  // Cache uploaded data
+  const auto uploadedDataWidth   = params.dataWidth;
+  const auto uploadedDataHeight  = params.dataHeight;
+  const auto uploadedPixelFormat = pixelData->GetPixelFormat();
+
+  const bool requiredSubPixelData = (!Pixel::IsCompressed(uploadedPixelFormat)) &&
                                     ((params.dataXOffset != 0) ||
                                      (params.dataYOffset != 0) ||
-                                     (params.dataWidth != pixelData->GetWidth()) ||
-                                     (params.dataHeight != pixelData->GetHeight()));
+                                     (uploadedDataWidth != pixelData->GetWidth()) ||
+                                     (uploadedDataHeight != pixelData->GetHeight()));
 
   if(requiredSubPixelData)
   {
@@ -358,25 +358,41 @@ void Texture::Upload(PixelDataPtr pixelData, const Internal::Texture::UploadPara
      * srcOffset = A).offsetByte;
      * srcSize = ( C).offsetByte - A).offsetByte );
      */
-    const uint32_t bytePerPixel    = Pixel::GetBytesPerPixel(pixelData->GetPixelFormat());
-    const uint32_t dataStrideByte  = (srcStride ? srcStride : static_cast<uint32_t>(params.dataWidth)) * bytePerPixel;
+    const uint32_t bytePerPixel    = Pixel::GetBytesPerPixel(uploadedPixelFormat);
+    const uint32_t dataStrideByte  = (srcStride ? srcStride : pixelData->GetWidth()) * bytePerPixel;
     const uint32_t dataXOffsetByte = params.dataXOffset * bytePerPixel;
-    const uint32_t dataWidthByte   = static_cast<uint32_t>(params.dataWidth) * bytePerPixel;
+    const uint32_t dataWidthByte   = static_cast<uint32_t>(uploadedDataWidth) * bytePerPixel;
 
     srcOffset = params.dataYOffset * dataStrideByte + dataXOffsetByte;
-    srcSize   = static_cast<uint32_t>(params.dataHeight) * dataStrideByte - (dataStrideByte - dataWidthByte);
+    srcSize   = static_cast<uint32_t>(uploadedDataHeight) * dataStrideByte - (dataStrideByte - dataWidthByte);
   }
+
+  // Update render texture value as uploaded data.
+  if(mUseUploadedParameter)
+  {
+    mWidth       = params.xOffset + uploadedDataWidth;
+    mHeight      = params.yOffset + uploadedDataHeight;
+    mPixelFormat = uploadedPixelFormat;
+  }
+
+  // Always create new graphics texture object if we use uploaded parameter as texture.
+  if(!mGraphicsTexture || mUseUploadedParameter)
+  {
+    Create(static_cast<Graphics::TextureUsageFlags>(Graphics::TextureUsageFlagBits::SAMPLE));
+  }
+
+  Graphics::TextureUpdateInfo info{};
 
   info.dstTexture   = mGraphicsTexture.get();
   info.dstOffset2D  = {params.xOffset, params.yOffset};
   info.layer        = params.layer;
   info.level        = params.mipmap;
   info.srcReference = 0;
-  info.srcExtent2D  = {params.dataWidth, params.dataHeight};
+  info.srcExtent2D  = {uploadedDataWidth, uploadedDataHeight};
   info.srcOffset    = srcOffset;
   info.srcSize      = srcSize;
   info.srcStride    = srcStride;
-  info.srcFormat    = ConvertPixelFormat(pixelData->GetPixelFormat());
+  info.srcFormat    = ConvertPixelFormat(uploadedPixelFormat);
 
   mUpdatedArea = Rect<uint16_t>(params.xOffset, params.yOffset, params.width, params.height);
 
