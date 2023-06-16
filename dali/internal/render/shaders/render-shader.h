@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_SHADER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,8 +70,6 @@ public:
   [[nodiscard]] ShaderDataPtr GetShaderData(uint32_t renderPass) const;
 
 private: // Data
-  Dali::Shader::Hint::Value mHints;
-
   std::vector<ShaderDataPtr> mShaderDataList;
 };
 
