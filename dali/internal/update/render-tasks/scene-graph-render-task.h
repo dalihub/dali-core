@@ -358,9 +358,9 @@ public:
    * Shader code that matches this render pass is used for rendering.
    * If no matching shader is found, the code with a render pass of 0 is used.
    * In other cases, operation is not guaranteed.
-   * @param[in] renderPass RenderPass value for this render task.
+   * @param[in] renderPassTag RenderPassTag value for this render task.
    */
-  void SetRenderPass(uint32_t renderPass);
+  void SetRenderPassTag(uint32_t renderPassTag);
 
 private: // from PropertyOwner::Observer
   /**
@@ -418,7 +418,7 @@ private:
 
   State mState;                            ///< Render state.
 
-  uint32_t mRenderPass{0u};
+  uint32_t mRenderPassTag{0u};
 
   bool mRequiresSync : 1;    ///< Whether sync is needed to track the render
   bool mActive : 1;          ///< True when the task is active, i.e. has valid source and camera

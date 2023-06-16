@@ -577,18 +577,18 @@ bool RenderTask::ViewportToLocal(Actor* actor, float viewportX, float viewportY,
   return actor->ScreenToLocal(*this, localX, localY, viewportX, viewportY);
 }
 
-void RenderTask::SetRenderPass(uint32_t renderPass)
+void RenderTask::SetRenderPassTag(uint32_t renderPassTag)
 {
-  if(mRenderPass != renderPass)
+  if(mRenderPassTag != renderPassTag)
   {
-    mRenderPass = renderPass;
-    SetRenderPassMessage(GetEventThreadServices(), *GetRenderTaskSceneObject(), renderPass);
+    mRenderPassTag = renderPassTag;
+    SetRenderPassTagMessage(GetEventThreadServices(), *GetRenderTaskSceneObject(), renderPassTag);
   }
 }
 
-uint32_t RenderTask::GetRenderPass() const
+uint32_t RenderTask::GetRenderPassTag() const
 {
-  return mRenderPass;
+  return mRenderPassTag;
 }
 
 const SceneGraph::RenderTask* RenderTask::GetRenderTaskSceneObject() const
