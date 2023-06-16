@@ -89,14 +89,14 @@ private: // implementation
 
   /**
    * @brief Update Shader Data
-   * If a ShaderData of the same renderPass is already exist, it is replaced,
+   * If a ShaderData of the same renderPassTag is already exist, it is replaced,
    * if not, new ShaderData is added.
    * @param[in] vertexShader Vertex shader code for the effect.
    * @param[in] fragmentShader Fragment Shader code for the effect.
-   * @param[in] renderPass render pass of shader data
+   * @param[in] renderPassTag render pass tag of this shader data
    * @param[in] hints Hints to define the geometry of the rendered object
    */
-  void UpdateShaderData(std::string_view vertexShader, std::string_view fragmentShader, uint32_t renderPass, Dali::Shader::Hint::Value hints);
+  void UpdateShaderData(std::string_view vertexShader, std::string_view fragmentShader, uint32_t renderPassTag, Dali::Shader::Hint::Value hints);
 
   /**
    * @brief Sets shader data from shaderMap.

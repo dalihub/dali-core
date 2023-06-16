@@ -67,7 +67,7 @@ public:
    * Get the shader data for this shader.
    * @return The shader data.
    */
-  [[nodiscard]] ShaderDataPtr GetShaderData(uint32_t renderPass) const;
+  [[nodiscard]] ShaderDataPtr GetShaderData(uint32_t renderPassTag) const;
 
 private: // Data
   Dali::Shader::Hint::Value mHints;

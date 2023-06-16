@@ -595,7 +595,7 @@ void RenderInstructionProcessor::Prepare(BufferIndex                 updateBuffe
       {
         renderList->SetHasColorRenderItems(true);
         AddRenderersToRenderList(updateBufferIndex,
-                                 instruction.mRenderPass,
+                                 instruction.mRenderPassTag,
                                  *renderList,
                                  renderables,
                                  viewMatrix,
@@ -620,7 +620,7 @@ void RenderInstructionProcessor::Prepare(BufferIndex                 updateBuffe
       {
         renderList->SetHasColorRenderItems(false);
         AddRenderersToRenderList(updateBufferIndex,
-                                 instruction.mRenderPass,
+                                 instruction.mRenderPassTag,
                                  *renderList,
                                  renderables,
                                  viewMatrix,

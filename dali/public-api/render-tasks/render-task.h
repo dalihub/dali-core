@@ -540,15 +540,16 @@ public:
    * Shader code that matches this render pass is used for rendering.
    * If no matching shader is found, the code with a render pass of 0 is used.
    * In other cases, operation is not guaranteed.
-   * @param[in] renderPass RenderPass value for this render task.
+   * @param[in] renderPassTag RenderPassTag value for this render task.
+   * @note RenderPassTag of default RenderTask is 0u.
    */
-  void SetRenderPass(uint32_t renderPass);
+  void SetRenderPassTag(uint32_t renderPassTag);
 
   /**
    * Gets Render Pass key for this RenderTask.
-   * @return RenderPass value for this render task.
+   * @return RenderPassTag value for this render task.
    */
-  uint32_t GetRenderPass() const;
+  uint32_t GetRenderPassTag() const;
 
 public: // Signals
   /**

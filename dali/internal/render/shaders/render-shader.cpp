@@ -34,7 +34,7 @@ namespace SceneGraph
 
 namespace
 {
-static constexpr uint32_t DEFAULT_RENDER_PASS = 0u;
+static constexpr uint32_t DEFAULT_RENDER_PASS_TAG = 0u;
 }
 
 Shader::~Shader()
@@ -45,7 +45,7 @@ void Shader::UpdateShaderData(ShaderDataPtr shaderData)
 {
   DALI_LOG_TRACE_METHOD_FMT(Debug::Filter::gShader, "%d\n", shaderData->GetHashValue());
   std::vector<Internal::ShaderDataPtr>::iterator shaderDataIterator = std::find_if(mShaderDataList.begin(), mShaderDataList.end(), [&shaderData](const Internal::ShaderDataPtr& shaderDataItem)
-                                                                                   { return shaderDataItem->GetRenderPass() == shaderData->GetRenderPass(); });
+                                                                                   { return shaderDataItem->GetRenderPassTag() == shaderData->GetRenderPassTag(); });
   if(shaderDataIterator != mShaderDataList.end())
   {
     *shaderDataIterator = shaderData;
@@ -56,7 +56,7 @@ void Shader::UpdateShaderData(ShaderDataPtr shaderData)
   }
 }
 
-ShaderDataPtr Shader::GetShaderData(uint32_t renderPass) const
+ShaderDataPtr Shader::GetShaderData(uint32_t renderPassTag) const
 {
   if(mShaderDataList.empty())
   {
@@ -66,11 +66,11 @@ ShaderDataPtr Shader::GetShaderData(uint32_t renderPass) const
   Internal::ShaderDataPtr returnShaderData = nullptr;
   for(auto && shaderData : mShaderDataList)
   {
-    if(shaderData->GetRenderPass() == renderPass)
+    if(shaderData->GetRenderPassTag() == renderPassTag)
     {
       return shaderData;
     }
-    if(shaderData->GetRenderPass() == DEFAULT_RENDER_PASS)
+    if(shaderData->GetRenderPassTag() == DEFAULT_RENDER_PASS_TAG)
     {
       returnShaderData = shaderData;
     }

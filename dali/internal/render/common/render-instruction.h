@@ -139,7 +139,7 @@ public:                                  // Data
   bool     mIgnoreRenderToFbo : 1;       ///< Whether to ignore the render to FBO option (used to measure the performance above 60 fps)
 
   Render::FrameBuffer* mFrameBuffer;
-  uint32_t             mRenderPass{0u};
+  uint32_t             mRenderPassTag{0u};
 
 private:                                             // Data
   Camera*                       mCamera;             ///< camera that is used

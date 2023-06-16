@@ -60,14 +60,15 @@ public:
    * @param[in] vertexSource   Source code for vertex program
    * @param[in] fragmentSource Source code for fragment program
    * @param[in] hints          Hints for rendering
+   * @param[in] renderPassTag  RenderPassTag to match shader data and render task.
    */
-  ShaderData(std::string vertexSource, std::string fragmentSource, const Dali::Shader::Hint::Value hints, uint32_t renderPass)
+  ShaderData(std::string vertexSource, std::string fragmentSource, const Dali::Shader::Hint::Value hints, uint32_t renderPassTag)
   : mShaderHash(-1),
     mVertexShader(StringToVector(vertexSource)),
     mFragmentShader(StringToVector(fragmentSource)),
     mHints(hints),
     mSourceMode(Graphics::ShaderSourceMode::TEXT),
-    mRenderPass(renderPass)
+    mRenderPassTag(renderPassTag)
   {
   }
 
@@ -76,14 +77,15 @@ public:
    * @param[in] vertexSource   Source code for vertex program
    * @param[in] fragmentSource Source code for fragment program
    * @param[in] hints          Hints for rendering
+   * @param[in] renderPassTag  RenderPassTag to match shader data and render task.
    */
-  ShaderData(std::vector<char>& vertexSource, std::vector<char>& fragmentSource, const Dali::Shader::Hint::Value hints, uint32_t renderPass)
+  ShaderData(std::vector<char>& vertexSource, std::vector<char>& fragmentSource, const Dali::Shader::Hint::Value hints, uint32_t renderPassTag)
   : mShaderHash(-1),
     mVertexShader(vertexSource),
     mFragmentShader(fragmentSource),
     mHints(hints),
     mSourceMode(Graphics::ShaderSourceMode::BINARY),
-    mRenderPass(renderPass)
+    mRenderPassTag(renderPassTag)
   {
   }
 
@@ -234,25 +236,25 @@ public: // API
 
   /**
    * Get Render Pass of shader data
-   * @return Render Pass of this shader data, Default value is 0.
+   * @return RenderPassTag for Render Pass of this shader data, Default value is 0.
    */
-  uint32_t GetRenderPass() const
+  uint32_t GetRenderPassTag() const
   {
-    return mRenderPass;
+    return mRenderPassTag;
   }
 
-private:                                        // Not implemented
-  ShaderData(const ShaderData& other);          ///< no copying of this object
-  ShaderData& operator=(const ShaderData& rhs); ///< no copying of this object
+private:                                         // Not implemented
+  ShaderData(const ShaderData& other);           ///< no copying of this object
+  ShaderData& operator=(const ShaderData& rhs);  ///< no copying of this object
 
-private:                                        // Data
-  std::size_t                mShaderHash;       ///< hash key created with vertex and fragment shader code
-  std::vector<char>          mVertexShader;     ///< source code for vertex program
-  std::vector<char>          mFragmentShader;   ///< source code for fragment program
-  Dali::Shader::Hint::Value  mHints;            ///< take a hint
-  Dali::Vector<uint8_t>      mBuffer;           ///< buffer containing compiled binary bytecode
-  Graphics::ShaderSourceMode mSourceMode;       ///< Source mode of shader data ( text or binary )
-  uint32_t                   mRenderPass{0u};   ///< Render Pass for this shader
+private:                                         // Data
+  std::size_t                mShaderHash;        ///< hash key created with vertex and fragment shader code
+  std::vector<char>          mVertexShader;      ///< source code for vertex program
+  std::vector<char>          mFragmentShader;    ///< source code for fragment program
+  Dali::Shader::Hint::Value  mHints;             ///< take a hint
+  Dali::Vector<uint8_t>      mBuffer;            ///< buffer containing compiled binary bytecode
+  Graphics::ShaderSourceMode mSourceMode;        ///< Source mode of shader data ( text or binary )
+  uint32_t                   mRenderPassTag{0u}; ///< Render Pass Tag for this shader
 };
 
 } // namespace Internal
