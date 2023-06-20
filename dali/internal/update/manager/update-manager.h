@@ -1289,7 +1289,7 @@ inline void SetVertexBufferDivisorMessage(UpdateManager& manager, Render::Vertex
   new(slot) LocalType(&manager, &UpdateManager::SetVertexBufferDivisor, &vertexBuffer, divisor);
 }
 
-inline void SetVertexBufferUpdateCallback(UpdateManager& manager, Render::VertexBuffer& vertexBuffer, Dali::VertexBufferUpdateCallback* callback)
+inline void SetVertexBufferUpdateCallbackMessage(UpdateManager& manager, Render::VertexBuffer& vertexBuffer, Dali::VertexBufferUpdateCallback* callback)
 {
   // Message has ownership of VertexBuffer data while in transit from event -> update
   using LocalType = MessageValue2<UpdateManager, Render::VertexBuffer*, Dali::VertexBufferUpdateCallback*>;

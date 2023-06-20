@@ -267,6 +267,13 @@ public:
    */
   void SetVertexBufferUpdateCallback(std::unique_ptr<VertexBufferUpdateCallback>&& updateCallback);
 
+  /**
+   * @brief Clears attached vertex buffer update callback
+   *
+   * This function provides implicit thread safety.
+   */
+  void ClearVertexBufferUpdateCallback();
+
 public:
   /**
    * @brief The constructor.

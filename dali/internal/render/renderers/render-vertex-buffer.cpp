@@ -54,7 +54,9 @@ void VertexBuffer::SetData(Dali::Vector<uint8_t>* data, uint32_t size)
 
 void VertexBuffer::SetVertexBufferUpdateCallback(Dali::VertexBufferUpdateCallback* callback)
 {
+  mVertexBufferStateLock.ChangeState(VertexBufferSyncState::UNLOCKED, VertexBufferSyncState::LOCKED_FOR_EVENT);
   mVertexBufferUpdateCallback.reset(callback);
+  mVertexBufferStateLock.ChangeState(VertexBufferSyncState::LOCKED_FOR_EVENT, VertexBufferSyncState::UNLOCKED);
 }
 
 bool VertexBuffer::Update(Graphics::Controller& graphicsController)
@@ -89,6 +91,7 @@ bool VertexBuffer::Update(Graphics::Controller& graphicsController)
   }
 
   // To execute the callback the buffer must be already initialized.
+  mVertexBufferStateLock.ChangeState(VertexBufferSyncState::UNLOCKED, VertexBufferSyncState::LOCKED_FOR_UPDATE);
   if(mVertexBufferUpdateCallback && mGpuBuffer)
   {
     // If running callback, we may end up with less elements in the buffer
@@ -97,7 +100,7 @@ bool VertexBuffer::Update(Graphics::Controller& graphicsController)
     mGpuBuffer->UpdateDataBufferWithCallback(graphicsController, mVertexBufferUpdateCallback.get(), updatedSize);
     mElementCount = updatedSize / mFormat->size;
   }
-
+  mVertexBufferStateLock.ChangeState(VertexBufferSyncState::LOCKED_FOR_UPDATE, VertexBufferSyncState::UNLOCKED);
   return true;
 }
 
