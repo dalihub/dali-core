@@ -31,7 +31,7 @@ struct VertexBufferUpdateCallback::Impl
   {
   }
 
-  uint32_t Invoke(void* data, size_t size)
+  uint32_t Invoke(void* data, size_t size) const
   {
     return CallbackBase::ExecuteReturn<uint32_t>(*mCallback, data, size);
   }
@@ -110,6 +110,11 @@ uint32_t VertexBuffer::GetDivisor() const
 void VertexBuffer::SetVertexBufferUpdateCallback(std::unique_ptr<VertexBufferUpdateCallback>&& updateCallback)
 {
   GetImplementation(*this).SetVertexBufferUpdateCallback(*updateCallback.release());
+}
+
+void VertexBuffer::ClearVertexBufferUpdateCallback()
+{
+  GetImplementation(*this).ClearVertexBufferUpdateCallback();
 }
 
 VertexBuffer::VertexBuffer(Internal::VertexBuffer* pointer)

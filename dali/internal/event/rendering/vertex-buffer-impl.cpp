@@ -184,7 +184,28 @@ uint32_t VertexBuffer::GetDivisor() const
 
 void VertexBuffer::SetVertexBufferUpdateCallback(VertexBufferUpdateCallback& callback)
 {
-  SceneGraph::SetVertexBufferUpdateCallback(mEventThreadServices.GetUpdateManager(), *mRenderObject, &callback);
+  if(mVertexBufferUpdateCallback)
+  {
+    ClearVertexBufferUpdateCallback();
+  }
+  mVertexBufferUpdateCallback = &callback;
+  SceneGraph::SetVertexBufferUpdateCallbackMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject, &callback);
+}
+
+void VertexBuffer::ClearVertexBufferUpdateCallback()
+{
+  if(mVertexBufferUpdateCallback)
+  {
+    if(mRenderObject)
+    {
+      // Sets nullptr as callback. This function invokes SetVertexBufferUpdateCallback() directly
+      // on the render object bypassing the message queue. The implicit synchronization provides
+      // thread-safety. The synchronization mechanism uses atomic state changes and spin-lock.
+      // Spin-lock prevents from rescheduling thread execution.
+      mRenderObject->SetVertexBufferUpdateCallback(nullptr);
+    }
+    mVertexBufferUpdateCallback = nullptr;
+  }
 }
 
 const Render::VertexBuffer* VertexBuffer::GetRenderObject() const
