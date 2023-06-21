@@ -536,6 +536,23 @@ const Vector3& Actor::GetCurrentWorldPosition() const
   return GetNode().GetWorldPosition(GetEventThreadServices().GetEventBufferIndex());
 }
 
+const Vector2 Actor::CalculateScreenPosition() const
+{
+  if(mScene)
+  {
+    if(mLayer3DParentsCount == 0)
+    {
+      // We can assume that this actor is under 2d layer. Use faster, but imprecise algorithm
+      return CalculateActorScreenPosition(*this);
+    }
+    else
+    {
+      return CalculateActorScreenPositionRenderTaskList(*this);
+    }
+  }
+  return Vector2::ZERO;
+}
+
 const Vector2 Actor::GetCurrentScreenPosition() const
 {
   if(mScene)
@@ -544,11 +561,11 @@ const Vector2 Actor::GetCurrentScreenPosition() const
     if(mLayer3DParentsCount == 0)
     {
       // We can assume that this actor is under 2d layer. Use faster, but imprecise algorithm
-      return CalculateActorScreenPosition(*this, bufferIndex);
+      return CalculateCurrentActorScreenPosition(*this, bufferIndex);
     }
     else
     {
-      return CalculateActorScreenPositionRenderTaskList(*this, bufferIndex);
+      return CalculateCurrentActorScreenPositionRenderTaskList(*this, bufferIndex);
     }
   }
   return Vector2::ZERO;
@@ -1525,14 +1542,26 @@ Rect<> Actor::CalculateScreenExtents() const
   if(mLayer3DParentsCount == 0)
   {
     // We can assume that this actor is under 2d layer. Use faster, but imprecise algorithm
-    auto        screenPosition = GetCurrentScreenPosition();
-    BufferIndex bufferIndex    = GetEventThreadServices().GetEventBufferIndex();
-    return CalculateActorScreenExtents(*this, screenPosition, bufferIndex);
+    return CalculateActorScreenExtents(*this);
+  }
+  else
+  {
+    return CalculateActorScreenExtentsRenderTaskList(*this);
+  }
+}
+
+Rect<> Actor::CalculateCurrentScreenExtents() const
+{
+  if(mLayer3DParentsCount == 0)
+  {
+    // We can assume that this actor is under 2d layer. Use faster, but imprecise algorithm
+    BufferIndex bufferIndex = GetEventThreadServices().GetEventBufferIndex();
+    return CalculateCurrentActorScreenExtents(*this, bufferIndex);
   }
   else
   {
     BufferIndex bufferIndex = GetEventThreadServices().GetEventBufferIndex();
-    return CalculateActorScreenExtentsRenderTaskList(*this, bufferIndex);
+    return CalculateCurrentActorScreenExtentsRenderTaskList(*this, bufferIndex);
   }
 }
 
