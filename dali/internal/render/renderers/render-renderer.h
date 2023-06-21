@@ -468,10 +468,8 @@ public:
 
   /**
    * Check if the renderer attributes/uniforms are updated and returns the flag
-   *
-   * @param[in] bufferIndex The current update buffer index.
    */
-  bool Updated(BufferIndex bufferIndex);
+  bool Updated();
 
   template<class T>
   bool WriteDefaultUniform(const Graphics::UniformInfo* uniformInfo,

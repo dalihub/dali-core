@@ -632,7 +632,7 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
               // If the item refers to updated node or renderer.
               if(item.mIsUpdated ||
                  (item.mNode &&
-                  (item.mNode->Updated() || (item.mRenderer && item.mRenderer->Updated(mImpl->renderBufferIndex)))))
+                  (item.mNode->Updated() || (item.mRenderer && item.mRenderer->Updated()))))
               {
                 item.mIsUpdated = false;
 
