@@ -88,7 +88,8 @@ public:
     mAnimationPlaying(false),
     mEnabled(true),
     mConnectedToSceneGraph(false),
-    mAutoReverseEnabled(false)
+    mAutoReverseEnabled(false),
+    mDelayed(false)
   {
   }
 
@@ -234,6 +235,22 @@ public:
   float GetIntervalDelay() const
   {
     return mIntervalDelaySeconds;
+  }
+
+  /**
+   * Sets whether the animator is delayed or not.
+   * @param delayed True if the animator is delayed.
+   */
+  void SetDelayed(bool delayed)
+  {
+    if(delayed != mDelayed)
+    {
+      if(mPropertyOwner)
+      {
+        mPropertyOwner->SetUpdated(true);
+      }
+      mDelayed = delayed;
+    }
   }
 
   /**
@@ -469,6 +486,7 @@ public:
     DoUpdate(bufferIndex, bake, alpha, blendPoint);
 
     mCurrentProgress = progress;
+    mDelayed         = false;
   }
 
   /**
@@ -510,6 +528,7 @@ protected:
   bool                       mEnabled : 1;               ///< Animator is "enabled" while its target object is valid and on the stage.
   bool                       mConnectedToSceneGraph : 1; ///< True if ConnectToSceneGraph() has been called in update-thread.
   bool                       mAutoReverseEnabled : 1;
+  bool                       mDelayed : 1; ///< True if the animator is in delayed state
 };
 
 /**
@@ -663,8 +682,8 @@ private:
   }
 
   // Undefined
-  AnimatorTransformProperty()                                            = delete;
-  AnimatorTransformProperty(const AnimatorTransformProperty&)            = delete;
+  AnimatorTransformProperty()                                 = delete;
+  AnimatorTransformProperty(const AnimatorTransformProperty&) = delete;
   AnimatorTransformProperty& operator=(const AnimatorTransformProperty&) = delete;
 
 protected:
