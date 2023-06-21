@@ -46,6 +46,8 @@ Dali::Scripting::StringEnum ShaderHintsTable[] =
 
 const uint32_t ShaderHintsTableSize = static_cast<uint32_t>(sizeof(ShaderHintsTable) / sizeof(ShaderHintsTable[0]));
 
+static constexpr uint32_t DEFAULT_RENDER_PASS_TAG = 0u;
+
 BaseHandle Create()
 {
   return Dali::BaseHandle();
@@ -86,6 +88,36 @@ Property::Value HintString(const Dali::Shader::Hint::Value& hints)
   return Property::Value(s);
 }
 
+void GetShaderData(const Property::Map& shaderMap, std::string& vertexShader, std::string& fragmentShader, uint32_t& renderPassTag, Dali::Shader::Hint::Value& hints)
+{
+  hints      = Dali::Shader::Hint::NONE;
+  renderPassTag = 0u;
+
+  if(Property::Value* value = shaderMap.Find("vertex"))
+  {
+    vertexShader = value->Get<std::string>();
+  }
+
+  if(Property::Value* value = shaderMap.Find("fragment"))
+  {
+    fragmentShader = value->Get<std::string>();
+  }
+
+  if(Property::Value* value = shaderMap.Find("renderPassTag"))
+  {
+    renderPassTag = static_cast<uint32_t>(value->Get<int32_t>());
+  }
+
+  if(Property::Value* value = shaderMap.Find("hints"))
+  {
+    static_cast<void>( // ignore return
+      Scripting::GetEnumeration<Dali::Shader::Hint::Value>(value->Get<std::string>().c_str(),
+                                                           ShaderHintsTable,
+                                                           ShaderHintsTableSize,
+                                                           hints));
+  }
+}
+
 } // unnamed namespace
 
 ShaderPtr Shader::New(std::string_view          vertexShader,
@@ -93,7 +125,7 @@ ShaderPtr Shader::New(std::string_view          vertexShader,
                       Dali::Shader::Hint::Value hints)
 {
   // create scene object first so it's guaranteed to exist for the event side
-  auto                             sceneObject = new SceneGraph::Shader(hints);
+  auto                             sceneObject = new SceneGraph::Shader();
   OwnerPointer<SceneGraph::Shader> transferOwnership(sceneObject);
   // pass the pointer to base for message passing
   ShaderPtr shader(new Shader(sceneObject));
@@ -103,7 +135,25 @@ ShaderPtr Shader::New(std::string_view          vertexShader,
   AddShaderMessage(updateManager, transferOwnership);
 
   services.RegisterObject(shader.Get());
-  shader->SetShader(vertexShader, fragmentShader, hints);
+  shader->UpdateShaderData(vertexShader, fragmentShader, DEFAULT_RENDER_PASS_TAG, hints);
+
+  return shader;
+}
+
+ShaderPtr Shader::New(Dali::Property::Value shaderMap)
+{
+  // create scene object first so it's guaranteed to exist for the event side
+  auto                             sceneObject = new SceneGraph::Shader();
+  OwnerPointer<SceneGraph::Shader> transferOwnership(sceneObject);
+  // pass the pointer to base for message passing
+  ShaderPtr shader(new Shader(sceneObject));
+  // transfer scene object ownership to update manager
+  auto&&                     services      = shader->GetEventThreadServices();
+  SceneGraph::UpdateManager& updateManager = services.GetUpdateManager();
+  AddShaderMessage(updateManager, transferOwnership);
+
+  services.RegisterObject(shader.Get());
+  shader->SetShaderProperty(shaderMap);
 
   return shader;
 }
@@ -119,41 +169,7 @@ void Shader::SetDefaultProperty(Property::Index index, const Property::Value& pr
   {
     case Dali::Shader::Property::PROGRAM:
     {
-      if(propertyValue.GetType() == Property::MAP)
-      {
-        const Dali::Property::Map* map = propertyValue.GetMap();
-        if(map)
-        {
-          std::string               vertex;
-          std::string               fragment;
-          Dali::Shader::Hint::Value hints(Dali::Shader::Hint::NONE);
-
-          if(Property::Value* value = map->Find("vertex"))
-          {
-            vertex = value->Get<std::string>();
-          }
-
-          if(Property::Value* value = map->Find("fragment"))
-          {
-            fragment = value->Get<std::string>();
-          }
-
-          if(Property::Value* value = map->Find("hints"))
-          {
-            static_cast<void>( // ignore return
-              Scripting::GetEnumeration<Dali::Shader::Hint::Value>(value->Get<std::string>().c_str(),
-                                                                   ShaderHintsTable,
-                                                                   ShaderHintsTableSize,
-                                                                   hints));
-          }
-
-          SetShader(vertex, fragment, hints);
-        }
-      }
-      else
-      {
-        DALI_LOG_WARNING("Shader program property should be a map\n");
-      }
+      SetShaderProperty(propertyValue);
       break;
     }
   }
@@ -167,14 +183,32 @@ Property::Value Shader::GetDefaultProperty(Property::Index index) const
   {
     case Dali::Shader::Property::PROGRAM:
     {
-      Dali::Property::Map map;
-      if(mShaderData)
+      if(mShaderDataList.size() == 1u)
       {
-        map["vertex"]   = Property::Value(mShaderData->GetVertexShader());
-        map["fragment"] = Property::Value(mShaderData->GetFragmentShader());
-        map["hints"]    = HintString(mShaderData->GetHints());
+        Dali::Property::Map map;
+        map["vertex"]     = Property::Value(mShaderDataList.front()->GetVertexShader());
+        map["fragment"]   = Property::Value(mShaderDataList.front()->GetFragmentShader());
+        map["renderPassTag"] = Property::Value(static_cast<int32_t>(mShaderDataList.front()->GetRenderPassTag()));
+        map["hints"]      = HintString(mShaderDataList.front()->GetHints());
+        value             = map;
       }
-      value = map;
+      else
+      {
+        Dali::Property::Array array;
+        for(auto&& shaderData : mShaderDataList)
+        {
+          if(shaderData)
+          {
+            Dali::Property::Map map;
+            map["vertex"]     = Property::Value(shaderData->GetVertexShader());
+            map["fragment"]   = Property::Value(shaderData->GetFragmentShader());
+            map["renderPassTag"] = Property::Value(static_cast<int32_t>(shaderData->GetRenderPassTag()));
+            map["hints"]      = HintString(shaderData->GetHints());
+            array.PushBack(map);
+          }
+        }
+        value = array;
+      }
       break;
     }
   }
@@ -188,24 +222,78 @@ Property::Value Shader::GetDefaultPropertyCurrentValue(Property::Index index) co
 }
 
 Shader::Shader(const SceneGraph::Shader* sceneObject)
-: Object(sceneObject),
-  mShaderData(nullptr)
+: Object(sceneObject)
 {
 }
 
-void Shader::SetShader(std::string_view          vertexSource,
-                       std::string_view          fragmentSource,
-                       Dali::Shader::Hint::Value hints)
+void Shader::UpdateShaderData(std::string_view          vertexSource,
+                              std::string_view          fragmentSource,
+                              uint32_t                  renderPassTag,
+                              Dali::Shader::Hint::Value hints)
 {
   // Try to load a pre-compiled shader binary for the source pair:
-  ThreadLocalStorage& tls           = ThreadLocalStorage::Get();
-  ShaderFactory&      shaderFactory = tls.GetShaderFactory();
-  size_t              shaderHash;
-  mShaderData = shaderFactory.Load(vertexSource, fragmentSource, hints, shaderHash);
+  ThreadLocalStorage&     tls           = ThreadLocalStorage::Get();
+  ShaderFactory&          shaderFactory = tls.GetShaderFactory();
+  size_t                  shaderHash;
+  Internal::ShaderDataPtr shaderData = shaderFactory.Load(vertexSource, fragmentSource, hints, renderPassTag, shaderHash);
+
+  std::vector<Internal::ShaderDataPtr>::iterator shaderDataIterator = std::find_if(mShaderDataList.begin(), mShaderDataList.end(), [&shaderData](const Internal::ShaderDataPtr& shaderDataItem)
+                                                                                   { return shaderDataItem->GetRenderPassTag() == shaderData->GetRenderPassTag(); });
+  if(shaderDataIterator != mShaderDataList.end())
+  {
+    *shaderDataIterator = shaderData;
+  }
+  else
+  {
+    mShaderDataList.push_back(shaderData);
+  }
 
   // Add shader data to scene-object
+  SceneGraph::UpdateShaderDataMessage(GetEventThreadServices(), GetShaderSceneObject(), shaderData);
+}
 
-  SceneGraph::SetShaderDataMessage(GetEventThreadServices(), GetShaderSceneObject(), mShaderData);
+void Shader::SetShaderProperty(const Dali::Property::Value& shaderMap)
+{
+  if(shaderMap.GetType() == Property::MAP)
+  {
+    const Dali::Property::Map* map = shaderMap.GetMap();
+    if(map)
+    {
+      std::string               vertex;
+      std::string               fragment;
+      uint32_t                  renderPassTag{0u};
+      Dali::Shader::Hint::Value hints(Dali::Shader::Hint::NONE);
+      GetShaderData(*map, vertex, fragment, renderPassTag, hints);
+
+      UpdateShaderData(vertex, fragment, renderPassTag, hints);
+    }
+  }
+  else if(shaderMap.GetType() == Property::ARRAY)
+  {
+    const Dali::Property::Array* array = shaderMap.GetArray();
+    if(array)
+    {
+      uint32_t arraySize = array->Count();
+      for(uint32_t i = 0; i < arraySize; ++i)
+      {
+        const Dali::Property::Map* map = array->GetElementAt(i).GetMap();
+        if(map)
+        {
+          std::string               vertex;
+          std::string               fragment;
+          uint32_t                  renderPassTag{0u};
+          Dali::Shader::Hint::Value hints(Dali::Shader::Hint::NONE);
+          GetShaderData(*map, vertex, fragment, renderPassTag, hints);
+
+          UpdateShaderData(vertex, fragment, renderPassTag, hints);
+        }
+      }
+    }
+  }
+  else
+  {
+    DALI_LOG_ERROR("Shader program property should be a map or array of map.\n");
+  }
 }
 
 Shader::~Shader()

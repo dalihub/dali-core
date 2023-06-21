@@ -393,6 +393,7 @@ RenderInstruction& RenderTask::PrepareRenderInstruction(BufferIndex updateBuffer
     mRenderInstruction[updateBufferIndex].mRenderTracker = nullptr;
   }
 
+  mRenderInstruction[updateBufferIndex].mRenderPassTag = mRenderPassTag;
   return mRenderInstruction[updateBufferIndex];
 }
 
@@ -453,6 +454,11 @@ bool RenderTask::GetViewportEnabled(BufferIndex bufferIndex) const
 void RenderTask::SetSyncRequired(bool requiresSync)
 {
   mRequiresSync = requiresSync;
+}
+
+void RenderTask::SetRenderPassTag(uint32_t renderPassTag)
+{
+  mRenderPassTag = renderPassTag;
 }
 
 void RenderTask::PropertyOwnerConnected(PropertyOwner& owner)

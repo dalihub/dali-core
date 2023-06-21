@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_SHADER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,11 +50,7 @@ class SceneController;
 class Shader : public PropertyOwner
 {
 public:
-  /**
-   * Constructor
-   * @param hints Shader hints
-   */
-  explicit Shader(Dali::Shader::Hint::Value& hints);
+  Shader() = default;
 
   /**
    * Virtual destructor
@@ -62,38 +58,22 @@ public:
   ~Shader() override;
 
   /**
-   * Query whether a shader hint is set.
-   *
-   * @warning This method is called from Update Algorithms.
-   *
-   * @pre The shader has been initialized.
-   * @param[in] hint The hint to check.
-   * @return True if the given hint is set.
-   */
-  [[nodiscard]] bool HintEnabled(Dali::Shader::Hint::Value hint) const
-  {
-    return mHints & hint;
-  }
-
-  /**
    * @brief Set the shader data for this shader.
    * @param[in] shaderData The program's vertex/fragment source and optionally pre-compiled shader binary.
    */
-  void SetShaderData(ShaderDataPtr shaderData);
+  void UpdateShaderData(ShaderDataPtr shaderData);
 
   /**
    * Get the shader data for this shader.
    * @return The shader data.
    */
-  [[nodiscard]] ShaderDataPtr GetShaderData() const;
+  [[nodiscard]] ShaderDataPtr GetShaderData(uint32_t renderPassTag) const;
 
 private: // Data
-  Dali::Shader::Hint::Value mHints;
-
-  ShaderDataPtr mShaderData;
+  std::vector<ShaderDataPtr> mShaderDataList;
 };
 
-inline void SetShaderDataMessage(EventThreadServices& eventThreadServices, const Shader& shader, ShaderDataPtr shaderData)
+inline void UpdateShaderDataMessage(EventThreadServices& eventThreadServices, const Shader& shader, ShaderDataPtr shaderData)
 {
   using LocalType = MessageValue1<Shader, ShaderDataPtr>;
 
@@ -101,7 +81,7 @@ inline void SetShaderDataMessage(EventThreadServices& eventThreadServices, const
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&shader, &Shader::SetShaderData, shaderData);
+  new(slot) LocalType(&shader, &Shader::UpdateShaderData, shaderData);
 }
 
 } // namespace SceneGraph

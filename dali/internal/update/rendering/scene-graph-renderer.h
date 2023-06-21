@@ -396,9 +396,10 @@ public:
   /**
    * Query whether the renderer is fully opaque, fully transparent or transparent.
    * @param[in] updateBufferIndex The current update buffer index.
+   * @param[in] renderPass render pass for this render instruction
    * @return OPAQUE if fully opaque, TRANSPARENT if fully transparent and TRANSLUCENT if in between
    */
-  OpacityType GetOpacityType(BufferIndex updateBufferIndex, const Node& node) const;
+  OpacityType GetOpacityType(BufferIndex updateBufferIndex, uint32_t renderPass, const Node& node) const;
 
   /**
    * Connect the object to the scene graph

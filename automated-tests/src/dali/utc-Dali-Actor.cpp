@@ -1492,6 +1492,69 @@ int UtcDaliActorCalculateScreenExtents(void)
   END_TEST;
 }
 
+int UtcDaliActorCalculateCurrentScreenExtents(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  actor.SetProperty(Actor::Property::POSITION, Vector3(2.0f, 2.0f, 16.0f));
+  actor.SetProperty(Actor::Property::SIZE, Vector3{1.0f, 1.0f, 1.0f});
+
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  auto expectedPosition = Vector2(2.0f, 2.0f);
+  auto actualPosition   = DevelActor::CalculateScreenPosition(actor);
+  DALI_TEST_EQUALS(expectedPosition.x, actualPosition.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedPosition.y, actualPosition.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+
+  auto expectedExtent = Rect<>{1.5f, 1.5f, 1.0f, 1.0f};
+  auto actualExtent   = DevelActor::CalculateScreenExtentsAtEvent(actor); ///< TODO : Change API name
+  DALI_TEST_EQUALS(expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedExtent.width, actualExtent.width, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedExtent.height, actualExtent.height, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+
+  Animation animation = Animation::New(1.0f);
+  animation.AnimateTo(Property(actor, Actor::Property::POSITION), Vector3(6.0f, 4.0f, 0.0f));
+  animation.AnimateTo(Property(actor, Actor::Property::SIZE), Vector3(3.0f, 7.0f, 1.0f));
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(500u);
+
+  // Animate 50%.
+  expectedPosition = Vector2(6.0f, 4.0f);
+  actualPosition   = DevelActor::CalculateScreenPosition(actor);
+  DALI_TEST_EQUALS(expectedPosition.x, actualPosition.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedPosition.y, actualPosition.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+
+  expectedExtent = Rect<>(4.5f, 0.5f, 3.0f, 7.0f);
+  actualExtent   = DevelActor::CalculateScreenExtentsAtEvent(actor); ///< TODO : Change API name
+  DALI_TEST_EQUALS(expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedExtent.width, actualExtent.width, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedExtent.height, actualExtent.height, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+
+  expectedPosition = Vector2(4.0f, 3.0f);
+  actualPosition   = actor.GetProperty<Vector2>(Actor::Property::SCREEN_POSITION);
+  DALI_TEST_EQUALS(expectedPosition.x, actualPosition.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedPosition.y, actualPosition.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+
+  expectedExtent = Rect<>(3.0f, 1.0f, 2.0f, 4.0f);
+  actualExtent   = DevelActor::CalculateCurrentScreenExtents(actor);
+  DALI_TEST_EQUALS(expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedExtent.width, actualExtent.width, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedExtent.height, actualExtent.height, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+
+  application.GetScene().Remove(actor);
+  END_TEST;
+}
+
 int UtcDaliActorCalculateScreenExtentsInCustomCameraAndLayer3D(void)
 {
   TestApplication    application;
@@ -1548,11 +1611,13 @@ int UtcDaliActorCalculateScreenExtentsInCustomCameraAndLayer3D(void)
   Vector2 sceneSize = scene.GetSize();
 
   auto expectedExtent = Rect<>{sceneSize.x * 0.5f + 1.5f, sceneSize.y * 0.5f + 14.5f, 1.0f, 3.0f};
-  auto actualExtent   = DevelActor::CalculateScreenExtents(actor);
+  auto actualExtent   = DevelActor::CalculateScreenExtentsAtEvent(actor); ///< TODO : Change API name
+  auto actualPosition = DevelActor::CalculateScreenPosition(actor);
   {
     std::ostringstream oss;
     oss << expectedExtent << "\n";
     oss << actualExtent << "\n";
+    oss << actualPosition << "\n";
     tet_printf("%s\n", oss.str().c_str());
   }
 
@@ -1561,12 +1626,15 @@ int UtcDaliActorCalculateScreenExtentsInCustomCameraAndLayer3D(void)
   DALI_TEST_EQUALS(expectedExtent.width, actualExtent.width, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.height, actualExtent.height, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
 
+  // Since anchor point is center, screen position is same as center of expect extents
+  DALI_TEST_EQUALS(expectedExtent.x + expectedExtent.width * 0.5f, actualPosition.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedExtent.y + expectedExtent.height * 0.5f, actualPosition.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+
   END_TEST;
 }
 
 int UtcDaliActorCalculateScreenInCustomCameraAndOffscreenLayer3D(void)
 {
-  // TODO : Need to make it works well
   TestApplication    application;
   Integration::Scene scene     = application.GetScene();
   Vector2            sceneSize = scene.GetSize();
@@ -1658,7 +1726,7 @@ int UtcDaliActorCalculateScreenInCustomCameraAndOffscreenLayer3D(void)
                                sceneSize.y * 0.5f + sourcePosition.z - sourceSize.z * 0.5f,
                                sourceSize.x,
                                sourceSize.z};
-  auto actualExtent   = DevelActor::CalculateScreenExtents(sourceActor);
+  auto actualExtent   = DevelActor::CalculateCurrentScreenExtents(sourceActor);
   {
     std::ostringstream oss;
     oss << expectedExtent << "\n";
@@ -1698,7 +1766,7 @@ int UtcDaliActorCalculateScreenInCustomCameraAndOffscreenLayer3D(void)
                           sceneSize.y * 0.5f + rootPosition.y + (sourcePosition.z - sourceSize.z * 0.5f) * rootSize.y / sceneSize.y,
                           sourceSize.x * rootSize.x / sceneSize.x,
                           sourceSize.z * rootSize.y / sceneSize.y};
-  actualExtent   = DevelActor::CalculateScreenExtents(sourceActor);
+  actualExtent   = DevelActor::CalculateCurrentScreenExtents(sourceActor);
   {
     std::ostringstream oss;
     oss << expectedExtent << "\n";

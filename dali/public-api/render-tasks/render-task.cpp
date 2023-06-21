@@ -273,6 +273,16 @@ bool RenderTask::ViewportToLocal(Actor actor, float viewportX, float viewportY, 
   }
 }
 
+void RenderTask::SetRenderPassTag(uint32_t renderPassTag)
+{
+  GetImplementation(*this).SetRenderPassTag(renderPassTag);
+}
+
+uint32_t RenderTask::GetRenderPassTag() const
+{
+  return GetImplementation(*this).GetRenderPassTag();
+}
+
 RenderTask::RenderTask(Internal::RenderTask* internal)
 : Handle(internal)
 {

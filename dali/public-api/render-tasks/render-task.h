@@ -535,6 +535,22 @@ public:
    */
   bool ViewportToLocal(Actor actor, float viewportX, float viewportY, float& localX, float& localY) const;
 
+  /**
+   * Sets Render Pass key for this RenderTask.
+   * Shader code that matches this render pass is used for rendering.
+   * If no matching shader is found, the code with a render pass of 0 is used.
+   * In other cases, operation is not guaranteed.
+   * @param[in] renderPassTag RenderPassTag value for this render task.
+   * @note RenderPassTag of default RenderTask is 0u.
+   */
+  void SetRenderPassTag(uint32_t renderPassTag);
+
+  /**
+   * Gets Render Pass key for this RenderTask.
+   * @return RenderPassTag value for this render task.
+   */
+  uint32_t GetRenderPassTag() const;
+
 public: // Signals
   /**
    * @brief If the refresh rate is REFRESH_ONCE, connect to this signal to be notified when a RenderTask has finished.

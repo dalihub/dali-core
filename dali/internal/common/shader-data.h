@@ -58,13 +58,15 @@ public:
    * @param[in] vertexSource   Source code for vertex program
    * @param[in] fragmentSource Source code for fragment program
    * @param[in] hints          Hints for rendering
+   * @param[in] renderPassTag  RenderPassTag to match shader data and render task.
    */
-  ShaderData(std::string vertexSource, std::string fragmentSource, const Dali::Shader::Hint::Value hints)
+  ShaderData(std::string vertexSource, std::string fragmentSource, const Dali::Shader::Hint::Value hints, uint32_t renderPassTag)
   : mShaderHash(-1),
     mVertexShader(StringToVector(vertexSource)),
     mFragmentShader(StringToVector(fragmentSource)),
     mHints(hints),
-    mSourceMode(Graphics::ShaderSourceMode::TEXT)
+    mSourceMode(Graphics::ShaderSourceMode::TEXT),
+    mRenderPassTag(renderPassTag)
   {
   }
 
@@ -73,14 +75,30 @@ public:
    * @param[in] vertexSource   Source code for vertex program
    * @param[in] fragmentSource Source code for fragment program
    * @param[in] hints          Hints for rendering
+   * @param[in] renderPassTag  RenderPassTag to match shader data and render task.
    */
-  ShaderData(std::vector<char>& vertexSource, std::vector<char>& fragmentSource, const Dali::Shader::Hint::Value hints)
+  ShaderData(std::vector<char>& vertexSource, std::vector<char>& fragmentSource, const Dali::Shader::Hint::Value hints, uint32_t renderPassTag)
   : mShaderHash(-1),
     mVertexShader(vertexSource),
     mFragmentShader(fragmentSource),
     mHints(hints),
-    mSourceMode(Graphics::ShaderSourceMode::BINARY)
+    mSourceMode(Graphics::ShaderSourceMode::BINARY),
+    mRenderPassTag(renderPassTag)
   {
+  }
+
+  /**
+   * Query whether a shader hint is set.
+   *
+   * @warning This method is called from Update Algorithms.
+   *
+   * @pre The shader has been initialized.
+   * @param[in] hint The hint to check.
+   * @return True if the given hint is set.
+   */
+  [[nodiscard]] bool HintEnabled(Dali::Shader::Hint::Value hint) const
+  {
+    return mHints & hint;
   }
 
 protected:
@@ -215,17 +233,27 @@ public: // API
     return mSourceMode;
   }
 
-private:                                        // Not implemented
-  ShaderData(const ShaderData& other);          ///< no copying of this object
-  ShaderData& operator=(const ShaderData& rhs); ///< no copying of this object
+  /**
+   * Get Render Pass of shader data
+   * @return RenderPassTag for Render Pass of this shader data, Default value is 0.
+   */
+  uint32_t GetRenderPassTag() const
+  {
+    return mRenderPassTag;
+  }
 
-private:                                      // Data
-  std::size_t                mShaderHash;     ///< hash key created with vertex and fragment shader code
-  std::vector<char>          mVertexShader;   ///< source code for vertex program
-  std::vector<char>          mFragmentShader; ///< source code for fragment program
-  Dali::Shader::Hint::Value  mHints;          ///< take a hint
-  Dali::Vector<uint8_t>      mBuffer;         ///< buffer containing compiled binary bytecode
-  Graphics::ShaderSourceMode mSourceMode;     ///< Source mode of shader data ( text or binary )
+private:                                         // Not implemented
+  ShaderData(const ShaderData& other);           ///< no copying of this object
+  ShaderData& operator=(const ShaderData& rhs);  ///< no copying of this object
+
+private:                                         // Data
+  std::size_t                mShaderHash;        ///< hash key created with vertex and fragment shader code
+  std::vector<char>          mVertexShader;      ///< source code for vertex program
+  std::vector<char>          mFragmentShader;    ///< source code for fragment program
+  Dali::Shader::Hint::Value  mHints;             ///< take a hint
+  Dali::Vector<uint8_t>      mBuffer;            ///< buffer containing compiled binary bytecode
+  Graphics::ShaderSourceMode mSourceMode;        ///< Source mode of shader data ( text or binary )
+  uint32_t                   mRenderPassTag{0u}; ///< Render Pass Tag for this shader
 };
 
 } // namespace Internal

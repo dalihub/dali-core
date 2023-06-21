@@ -647,7 +647,7 @@ Render::RendererKey Renderer::GetRenderer() const
   return mRenderer;
 }
 
-Renderer::OpacityType Renderer::GetOpacityType(BufferIndex updateBufferIndex, const Node& node) const
+Renderer::OpacityType Renderer::GetOpacityType(BufferIndex updateBufferIndex, uint32_t renderPass, const Node& node) const
 {
   Renderer::OpacityType opacityType = Renderer::OPAQUE;
 
@@ -684,10 +684,13 @@ Renderer::OpacityType Renderer::GetOpacityType(BufferIndex updateBufferIndex, co
         break;
       }
 
-      bool shaderRequiresBlending(mShader->HintEnabled(Dali::Shader::Hint::OUTPUT_IS_TRANSPARENT));
-      if(shaderRequiresBlending || (mTextureSet && mTextureSet->HasAlpha()))
+      if(mShader->GetShaderData(renderPass))
       {
-        opacityType = Renderer::TRANSLUCENT;
+        bool shaderRequiresBlending(mShader->GetShaderData(renderPass)->HintEnabled(Dali::Shader::Hint::OUTPUT_IS_TRANSPARENT));
+        if(shaderRequiresBlending || (mTextureSet && mTextureSet->HasAlpha()))
+        {
+          opacityType = Renderer::TRANSLUCENT;
+        }
       }
 
       // renderer should determine opacity using the actor color

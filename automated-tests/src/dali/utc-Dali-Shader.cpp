@@ -44,6 +44,14 @@ static const char* FragmentSource =
   "This is a custom fragment shader\n"
   "made on purpose to look nothing like a normal fragment shader inside dali\n";
 
+static const char* VertexSource2 =
+  "This is a custom vertex shader2\n"
+  "made on purpose to look nothing like a normal vertex shader inside dali\n";
+
+static const char* FragmentSource2 =
+  "This is a custom fragment shader2\n"
+  "made on purpose to look nothing like a normal fragment shader inside dali\n";
+
 void TestConstraintNoBlue(Vector4& current, const PropertyInputContainer& inputs)
 {
   current.b = 0.0f;
@@ -61,6 +69,26 @@ int UtcDaliShaderMethodNew01(void)
 }
 
 int UtcDaliShaderMethodNew02(void)
+{
+  TestApplication application;
+
+  Property::Map map;
+  Shader        shader = Shader::New(map);
+  DALI_TEST_EQUALS((bool)shader, true, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliShaderMethodNew03(void)
+{
+  TestApplication application;
+
+  Property::Map array;
+  Shader        shader = Shader::New(array);
+  DALI_TEST_EQUALS((bool)shader, true, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliShaderMethodNew04(void)
 {
   TestApplication application;
 
@@ -466,6 +494,154 @@ int UtcDaliShaderProgramProperty(void)
   value   = shader.GetProperty(Shader::Property::PROGRAM);
   hintGot = (*value.GetMap())["hints"].Get<std::string>();
   DALI_TEST_CHECK(hintGot == "NONE");
+
+  END_TEST;
+}
+
+int UtcDaliShaderPropertyValueConstructorMap(void)
+{
+  TestApplication application;
+
+  tet_infoline("UtcDaliShaderPropertyValueConstructorMap");
+
+  std::string   hintSet = "MODIFIES_GEOMETRY";
+  Property::Map map;
+  map["vertex"]     = VertexSource;
+  map["fragment"]   = FragmentSource;
+  map["renderPassTag"] = 0;
+  map["hints"]      = hintSet;
+
+  Shader shader = Shader::New(map);
+
+  Property::Value value = shader.GetProperty(Shader::Property::PROGRAM);
+  DALI_TEST_CHECK(value.GetType() == Property::MAP);
+
+  const Property::Map* outMap = value.GetMap();
+  std::string          v      = (*outMap)["vertex"].Get<std::string>();
+  std::string          f      = (*outMap)["fragment"].Get<std::string>();
+  std::string          h      = (*outMap)["hints"].Get<std::string>();
+  int32_t              r      = (*outMap)["renderPassTag"].Get<int32_t>();
+
+  DALI_TEST_CHECK(v == map["vertex"].Get<std::string>());
+  DALI_TEST_CHECK(f == map["fragment"].Get<std::string>());
+  DALI_TEST_CHECK(h == map["hints"].Get<std::string>());
+  DALI_TEST_CHECK(r == map["renderPassTag"].Get<int32_t>());
+
+  END_TEST;
+}
+
+int UtcDaliShaderPropertyValueConstructorArray(void)
+{
+  TestApplication application;
+
+  tet_infoline("UtcDaliShaderPropertyValueConstructorArray");
+
+  std::string   hintSet = "MODIFIES_GEOMETRY";
+  Property::Map map[2];
+  map[0]["vertex"]     = VertexSource;
+  map[0]["fragment"]   = FragmentSource;
+  map[0]["renderPassTag"] = 0;
+  map[0]["hints"]      = hintSet;
+
+  map[1]["vertex"]     = VertexSource2;
+  map[1]["fragment"]   = FragmentSource2;
+  map[1]["renderPassTag"] = 1;
+  map[1]["hints"]      = hintSet;
+
+  Property::Array array;
+  array.PushBack(map[0]);
+  array.PushBack(map[1]);
+
+  Shader shader = Shader::New(array);
+
+  Property::Value value = shader.GetProperty(Shader::Property::PROGRAM);
+  DALI_TEST_CHECK(value.GetType() == Property::ARRAY);
+
+  const Property::Array* outArray   = value.GetArray();
+  uint32_t               arrayCount = outArray->Size();
+  DALI_TEST_CHECK(arrayCount == 2u);
+
+  for(uint32_t i = 0; i < arrayCount; ++i)
+  {
+    const Property::Map* outMap = outArray->GetElementAt(i).GetMap();
+    std::string          v      = (*outMap)["vertex"].Get<std::string>();
+    std::string          f      = (*outMap)["fragment"].Get<std::string>();
+    std::string          h      = (*outMap)["hints"].Get<std::string>();
+    int32_t              r      = (*outMap)["renderPassTag"].Get<int32_t>();
+
+    DALI_TEST_CHECK(v == map[i]["vertex"].Get<std::string>());
+    DALI_TEST_CHECK(f == map[i]["fragment"].Get<std::string>());
+    DALI_TEST_CHECK(h == map[i]["hints"].Get<std::string>());
+    DALI_TEST_CHECK(r == map[i]["renderPassTag"].Get<int32_t>());
+  }
+
+  END_TEST;
+}
+
+int UtcDaliShaderProgramPropertyArray(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test get/set progam property array");
+
+  Shader      shader  = Shader::New("", "");
+  std::string hintSet = "MODIFIES_GEOMETRY";
+
+  Property::Map map[2];
+  map[0]["vertex"]     = VertexSource;
+  map[0]["fragment"]   = FragmentSource;
+  map[0]["renderPassTag"] = 0;
+  map[0]["hints"]      = hintSet;
+
+  map[1]["vertex"]     = VertexSource2;
+  map[1]["fragment"]   = FragmentSource2;
+  map[1]["renderPassTag"] = 1;
+  map[1]["hints"]      = hintSet;
+
+  Property::Array array;
+  array.PushBack(map[0]);
+  array.PushBack(map[1]);
+
+  shader.SetProperty(Shader::Property::PROGRAM, Property::Value(array));
+
+  Property::Value value = shader.GetProperty(Shader::Property::PROGRAM);
+  DALI_TEST_CHECK(value.GetType() == Property::ARRAY);
+
+  const Property::Array* outArray   = value.GetArray();
+  uint32_t               arrayCount = outArray->Size();
+  DALI_TEST_CHECK(arrayCount == 2u);
+
+  for(uint32_t i = 0; i < arrayCount; ++i)
+  {
+    const Property::Map* outMap = outArray->GetElementAt(i).GetMap();
+    std::string          v      = (*outMap)["vertex"].Get<std::string>();
+    std::string          f      = (*outMap)["fragment"].Get<std::string>();
+    std::string          h      = (*outMap)["hints"].Get<std::string>();
+    int32_t              r      = (*outMap)["renderPassTag"].Get<int32_t>();
+
+    DALI_TEST_CHECK(v == map[i]["vertex"].Get<std::string>());
+    DALI_TEST_CHECK(f == map[i]["fragment"].Get<std::string>());
+    DALI_TEST_CHECK(h == map[i]["hints"].Get<std::string>());
+    DALI_TEST_CHECK(r == map[i]["renderPassTag"].Get<int32_t>());
+  }
+
+  END_TEST;
+}
+
+int UtcDaliShaderWrongData(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test get/set wrong data");
+
+  Shader shader = Shader::New(Property::Value(1.0f));
+
+  Property::Value value = shader.GetProperty(Shader::Property::PROGRAM);
+  DALI_TEST_CHECK(value.GetType() == Property::ARRAY);
+
+  const Property::Array* outArray   = value.GetArray();
+  uint32_t               arrayCount = outArray->Size();
+  DALI_TEST_CHECK(arrayCount == 0u);
 
   END_TEST;
 }
