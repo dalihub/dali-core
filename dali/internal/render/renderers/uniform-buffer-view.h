@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_UNIFORM_BUFFER_VIEW_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <stdint.h>
 #include <stdlib.h>
+#include <memory>
 
 namespace Dali
 {
@@ -30,7 +31,7 @@ class Buffer;
 }
 namespace Internal::Render
 {
-class UniformBuffer;
+class UniformBufferV2;
 
 /**
  * Class UniformBufferView
@@ -47,7 +48,7 @@ class UniformBuffer;
 class UniformBufferView
 {
 public:
-  UniformBufferView(UniformBuffer& ubo, uint32_t offset, size_t size);
+  UniformBufferView(UniformBufferV2& ubo, uint32_t offset, size_t size);
 
   ~UniformBufferView();
 
@@ -84,19 +85,14 @@ public:
   /**
    * @brief Returns Graphics buffer associated with this View
    *
-   * If 'relativeOffset' isn't nullptr then the offset into the individual
-   * Graphics::Buffer is written.
-   *
-   * @param[out] relativeOffset the offset into individual Graphics::Buffer
-   *
    * @return Pointer to a valid Graphics::Buffer object
    */
-  [[nodiscard]] Graphics::Buffer* GetBuffer(uint32_t* relativeOffset = nullptr);
+  [[nodiscard]] Graphics::Buffer* GetBuffer() const;
 
 private:
-  UniformBuffer* mUniformBuffer{nullptr}; ///< UniformBuffer that the view views
-  uint32_t       mOffset{0u};             ///< Offset within the buffer
-  size_t         mSize{0u};               ///< Size of view
+  UniformBufferV2* mUniformBuffer{nullptr}; ///< UniformBuffer that the view views
+  uint32_t         mOffset{0u};             ///< Offset within the buffer
+  size_t           mSize{0u};               ///< Size of view
 };
 } // Namespace Internal::Render
 } // Namespace Dali

@@ -276,7 +276,7 @@ int UtcDaliVertexBufferSetData01(void)
 
     DALI_TEST_CHECK(drawTrace.FindMethod("DrawArrays"));
 
-    DALI_TEST_EQUALS(bufferDataCalls.size(), 3u, TEST_LOCATION);
+    DALI_TEST_EQUALS(bufferDataCalls.size(), 1u, TEST_LOCATION);
 
     DALI_TEST_EQUALS(bufferDataCalls[0], sizeof(texturedQuadVertexData), TEST_LOCATION);
   }
@@ -325,25 +325,26 @@ int UtcDaliVertexBufferSetData02(void)
   application.SendNotification();
   application.Render();
 
-  {
-    const TestGlAbstraction::BufferSubDataCalls& bufferSubDataCalls =
-      application.GetGlAbstraction().GetBufferSubDataCalls();
+  auto&                                        gl                 = application.GetGlAbstraction();
+  const TestGlAbstraction::BufferSubDataCalls& bufferSubDataCalls = gl.GetBufferSubDataCalls();
+  const TestGlAbstraction::BufferDataCalls&    bufferDataCalls    = gl.GetBufferDataCalls();
 
-    const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
-      application.GetGlAbstraction().GetBufferDataCalls();
+  DALI_TEST_EQUALS(bufferSubDataCalls.size(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(bufferDataCalls.size(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(bufferDataCalls[0], sizeof(texturedQuadVertexData), TEST_LOCATION);
 
-    // Should be 1 (Flush standalone uniform buffer per each RenderScene)
-    DALI_TEST_EQUALS(bufferSubDataCalls.size(), 1u, TEST_LOCATION);
-    DALI_TEST_EQUALS(bufferDataCalls.size(), 2u, TEST_LOCATION);
-
-    DALI_TEST_EQUALS(bufferDataCalls[0], sizeof(texturedQuadVertexData), TEST_LOCATION);
-  }
+  gl.ResetBufferDataCalls();
+  gl.ResetBufferSubDataCalls();
 
   // Re-upload the data on the vertexBuffer
   vertexBuffer.SetData(texturedQuadVertexData, 4);
 
   application.SendNotification();
   application.Render(0);
+
+  DALI_TEST_EQUALS(bufferSubDataCalls.size(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(bufferDataCalls.size(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(bufferDataCalls[0], sizeof(texturedQuadVertexData), TEST_LOCATION);
 
   END_TEST;
 }

@@ -920,8 +920,8 @@ inline BufferPropertiesFlags operator|(BufferPropertiesFlags flags, BufferProper
  */
 struct MemoryRequirements
 {
-  size_t size;
-  size_t alignment;
+  size_t size{0u};
+  size_t alignment{1u};
 };
 
 using TextureUpdateFlags = uint32_t;

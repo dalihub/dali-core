@@ -44,7 +44,7 @@
 #include <dali/internal/render/renderers/render-texture.h>
 #include <dali/internal/render/renderers/shader-cache.h>
 #include <dali/internal/render/renderers/uniform-buffer-manager.h>
-#include <dali/internal/render/renderers/uniform-buffer-view-pool.h>
+#include <dali/internal/render/renderers/uniform-buffer.h>
 #include <dali/internal/render/shaders/program-controller.h>
 
 #include <memory>
@@ -181,7 +181,7 @@ struct RenderManager::Impl
   Vector<Render::TextureKey>        updatedTextures{};     ///< The updated texture list
 
   uint32_t    frameCount{0u};                                                    ///< The current frame count
-  BufferIndex renderBufferIndex{SceneGraphBuffers::INITIAL_UPDATE_BUFFER_INDEX}; ///< The index of the buffer to read from; this is opposite of the "update" buffer
+  BufferIndex renderBufferIndex{SceneGraphBuffers::INITIAL_UPDATE_BUFFER_INDEX}; ///< The index of the buffer to read from;
 
   bool lastFrameWasRendered{false}; ///< Keeps track of the last frame being rendered due to having render instructions
   bool commandBufferSubmitted{false};
@@ -328,10 +328,12 @@ void RenderManager::InitializeScene(SceneGraph::Scene* scene)
 {
   scene->Initialize(mImpl->graphicsController, mImpl->depthBufferAvailable, mImpl->stencilBufferAvailable);
   mImpl->sceneContainer.push_back(scene);
+  mImpl->uniformBufferManager->RegisterScene(scene);
 }
 
 void RenderManager::UninitializeScene(SceneGraph::Scene* scene)
 {
+  mImpl->uniformBufferManager->UnregisterScene(scene);
   auto iter = std::find(mImpl->sceneContainer.begin(), mImpl->sceneContainer.end(), scene);
   if(iter != mImpl->sceneContainer.end())
   {
@@ -437,9 +439,7 @@ void RenderManager::RemoveRenderTracker(Render::RenderTracker* renderTracker)
 void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear)
 {
   DALI_PRINT_RENDER_START(mImpl->renderBufferIndex);
-
-  // Rollback
-  mImpl->uniformBufferManager->GetUniformBufferViewPool(mImpl->renderBufferIndex)->Rollback();
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "\n\nNewFrame %d\n", mImpl->frameCount);
 
   // Increment the frame count at the beginning of each frame
   ++mImpl->frameCount;
@@ -447,13 +447,13 @@ void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear
   // Process messages queued during previous update
   mImpl->renderQueue.ProcessMessages(mImpl->renderBufferIndex);
 
-  uint32_t count = 0u;
+  uint32_t totalInstructionCount = 0u;
   for(auto& i : mImpl->sceneContainer)
   {
-    count += i->GetRenderInstructions().Count(mImpl->renderBufferIndex);
+    totalInstructionCount += i->GetRenderInstructions().Count(mImpl->renderBufferIndex);
   }
 
-  const bool haveInstructions = count > 0u;
+  const bool haveInstructions = totalInstructionCount > 0u;
 
   DALI_LOG_INFO(gLogFilter, Debug::General, "Render: haveInstructions(%s) || mImpl->lastFrameWasRendered(%s) || forceClear(%s)\n", haveInstructions ? "true" : "false", mImpl->lastFrameWasRendered ? "true" : "false", forceClear ? "true" : "false");
 
@@ -761,7 +761,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     return;
   }
 
-  uint32_t count = sceneObject->GetRenderInstructions().Count(mImpl->renderBufferIndex);
+  uint32_t instructionCount = sceneObject->GetRenderInstructions().Count(mImpl->renderBufferIndex);
 
   std::vector<Graphics::RenderTarget*> targetstoPresent;
 
@@ -774,10 +774,77 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     clippingRect = Rect<int>();
   }
 
-  // Prepare to lock and map standalone uniform buffer.
-  mImpl->uniformBufferManager->ReadyToLockUniformBuffer(mImpl->renderBufferIndex);
+  // Prefetch programs before we start rendering so reflection is
+  // ready, and we can pull exact size of UBO needed (no need to resize during drawing)
+  auto totalSizeCPU = 0u;
+  auto totalSizeGPU = 0u;
 
-  for(uint32_t i = 0; i < count; ++i)
+  for(uint32_t i = 0; i < instructionCount; ++i)
+  {
+    RenderInstruction& instruction = sceneObject->GetRenderInstructions().At(mImpl->renderBufferIndex, i);
+
+    if((instruction.mFrameBuffer != nullptr && renderToFbo) ||
+       (instruction.mFrameBuffer == nullptr && !renderToFbo))
+    {
+      for(auto j = 0u; j < instruction.RenderListCount(); ++j)
+      {
+        const auto& renderList = instruction.GetRenderList(j);
+        for(auto k = 0u; k < renderList->Count(); ++k)
+        {
+          auto& item = renderList->GetItem(k);
+          if(item.mRenderer && item.mRenderer->NeedsProgram())
+          {
+            // Prepare and store used programs for further processing
+            auto program = item.mRenderer->PrepareProgram(instruction);
+            if(program)
+            {
+              auto memoryRequirements = program->GetUniformBlocksMemoryRequirements();
+
+              totalSizeCPU += memoryRequirements.totalCpuSizeRequired;
+              totalSizeGPU += memoryRequirements.totalGpuSizeRequired;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Render scene (%s), CPU:%d GPU:%d\n", renderToFbo ? "Offscreen" : "Onscreen", totalSizeCPU, totalSizeGPU);
+
+  auto& uboManager = mImpl->uniformBufferManager;
+
+  uboManager->SetCurrentSceneRenderInfo(sceneObject, renderToFbo);
+  uboManager->Rollback(sceneObject, renderToFbo);
+
+  // Respec UBOs for this frame (orphan buffers or double buffer in the GPU)
+  if(instructionCount)
+  {
+    uboManager->GetUniformBufferForScene(sceneObject, renderToFbo, true)->ReSpecify(totalSizeCPU);
+    uboManager->GetUniformBufferForScene(sceneObject, renderToFbo, false)->ReSpecify(totalSizeGPU);
+  }
+
+#if defined(DEBUG_ENABLED)
+  auto uniformBuffer1 = uboManager->GetUniformBufferForScene(sceneObject, renderToFbo, true);
+  auto uniformBuffer2 = uboManager->GetUniformBufferForScene(sceneObject, renderToFbo, false);
+  if(uniformBuffer1)
+  {
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "CPU buffer: Offset(%d), Cap(%d)\n", uniformBuffer1->GetCurrentOffset(), uniformBuffer1->GetCurrentCapacity());
+  }
+  else
+  {
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "CPU buffer: nil\n");
+  }
+  if(uniformBuffer2)
+  {
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "GPU buffer: Offset(%d), Cap(%d)\n", uniformBuffer2->GetCurrentOffset(), uniformBuffer2->GetCurrentCapacity());
+  }
+  else
+  {
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "GPU buffer: nil\n");
+  }
+#endif
+
+  for(uint32_t i = 0; i < instructionCount; ++i)
   {
     RenderInstruction& instruction = sceneObject->GetRenderInstructions().At(mImpl->renderBufferIndex, i);
 
@@ -994,8 +1061,8 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     mainCommandBuffer->EndRenderPass(syncObject);
   }
 
-  // Unlock standalone uniform buffer.
-  mImpl->uniformBufferManager->UnlockUniformBuffer(mImpl->renderBufferIndex);
+  // Flush UBOs
+  mImpl->uniformBufferManager->Flush(sceneObject, renderToFbo);
 
   mImpl->renderAlgorithms.SubmitCommandBuffer();
   mImpl->commandBufferSubmitted = true;

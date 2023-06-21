@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,10 @@
 
 namespace Dali::Internal::Render
 {
-UniformBufferView::UniformBufferView( UniformBuffer& ubo, uint32_t offset, size_t size ) :
-  mUniformBuffer(&ubo),
+UniformBufferView::UniformBufferView(UniformBufferV2& ubo, uint32_t offset, size_t size)
+: mUniformBuffer(&ubo),
   mOffset(offset),
-  mSize (size)
+  mSize(size)
 {
 }
 
@@ -35,12 +35,12 @@ UniformBufferView::~UniformBufferView() = default;
 void UniformBufferView::Write(const void* data, uint32_t size, uint32_t offset)
 {
   // Write into mapped buffer
-  mUniformBuffer->Write( data, size, offset );
+  mUniformBuffer->Write(data, size, offset);
 }
 
-Graphics::Buffer* UniformBufferView::GetBuffer( uint32_t* relativeOffset )
+Graphics::Buffer* UniformBufferView::GetBuffer() const
 {
-  auto buffer = mUniformBuffer->GetBufferByOffset( mOffset, relativeOffset, nullptr );
-  return buffer ? buffer->buffer.get() : nullptr;
+  return mUniformBuffer->GetGraphicsBuffer();
 }
+
 } // Namespace Dali::Internal::Render

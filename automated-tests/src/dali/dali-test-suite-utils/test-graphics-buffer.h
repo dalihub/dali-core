@@ -2,7 +2,7 @@
 #define DALI_TEST_GRAPHICS_BUFFER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
  * limitations under the License.
  */
 
+#include <dali/graphics-api/graphics-buffer-create-info.h>
 #include <dali/graphics-api/graphics-buffer.h>
 #include <dali/graphics-api/graphics-types.h>
 
@@ -26,11 +27,16 @@
 namespace Dali
 {
 class TestGraphicsProgram;
+class TestGraphicsController;
 class UniformBufferBindingDescriptor;
+
 class TestGraphicsBuffer : public Graphics::Buffer
 {
 public:
-  TestGraphicsBuffer(TraceCallStack& callStack, TestGlAbstraction& glAbstraction, uint32_t size, Graphics::BufferUsageFlags usage);
+  TestGraphicsBuffer(const Graphics::BufferCreateInfo& createInfo, TestGraphicsController& controller, TestGlAbstraction& glAbstraction, TraceCallStack& callStack);
+  ~TestGraphicsBuffer();
+  void DiscardResource();
+
   void   Bind();
   void   Unbind();
   void   Upload(uint32_t offset, uint32_t size);
@@ -38,17 +44,21 @@ public:
 
   bool IsCPUAllocated() const
   {
-    return true;
+    return mCpuOnly;
   }
 
   void BindAsUniformBuffer(const TestGraphicsProgram* program, const Dali::UniformBufferBindingDescriptor& uboBinding) const;
 
-  TraceCallStack&            mCallStack;
-  TestGlAbstraction&         mGl;
-  std::vector<uint8_t>       memory;
+  TraceCallStack&         mCallStack;
+  TestGraphicsController& mController;
+  TestGlAbstraction&      mGl;
+  std::vector<uint8_t>    memory;
+
+  Graphics::BufferCreateInfo mCreateInfo;
   Graphics::BufferUsageFlags mUsage;
   GLuint                     mId{0};
   bool                       mCreated{false};
+  bool                       mCpuOnly{false};
 };
 
 } // namespace Dali

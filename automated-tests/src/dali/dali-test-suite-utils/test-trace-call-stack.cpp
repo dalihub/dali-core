@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -248,11 +248,15 @@ int TraceCallStack::FindIndexFromMethodAndParams(std::string method, const Trace
 
       for(auto iter = params.mParams.begin(); iter != params.mParams.end(); ++iter)
       {
-        auto        paramIter = mCallStack[i].namedParams.find(iter->parameterName);
-        std::string value     = paramIter->value.str();
-        std::string iValue    = iter->value.str();
-
-        if(paramIter == mCallStack[i].namedParams.end() || value.compare(iValue))
+        auto paramIter = mCallStack[i].namedParams.find(iter->parameterName);
+        if(paramIter == mCallStack[i].namedParams.end())
+        {
+          match = false;
+          break;
+        }
+        std::string value  = paramIter->value.str();
+        std::string iValue = iter->value.str();
+        if(value.compare(iValue))
         {
           match = false;
           break;
