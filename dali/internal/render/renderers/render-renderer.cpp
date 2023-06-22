@@ -938,7 +938,7 @@ void Renderer::SetShaderChanged(bool value)
   mShaderChanged = value;
 }
 
-bool Renderer::Updated(BufferIndex bufferIndex)
+bool Renderer::Updated()
 {
   if(mRenderCallback || mShaderChanged || mGeometry->AttributesChanged() || mRenderDataProvider->IsUpdated())
   {
