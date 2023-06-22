@@ -400,6 +400,22 @@ public:
   void KeepRendering(float durationSeconds);
 
   /**
+   * @brief Sets whether the scene will update partial area or full area.
+   *
+   * @param[in] enabled True if the scene should update partial area
+   * @note This doesn't change the global value which is set by the environment variable.
+   * This works when partial update is enabled by the environment variable. If the partial update is disabled by the environment variable, it changes nothing.
+   */
+  void SetPartialUpdateEnabled(bool enabled);
+
+  /**
+   * @brief Queries whether the scene will update partial area.
+   *
+   * @return True if the scene should update partial area
+   */
+  bool IsPartialUpdateEnabled() const;
+
+  /**
    * @brief This signal is emitted just after the event processing is finished.
    *
    * @return The signal to connect to

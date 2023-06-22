@@ -255,6 +255,22 @@ public:
   bool KeepRenderingCheck(float elapsedSeconds);
 
   /**
+   * @brief Sets whether the scene will update partial area or full area.
+   *
+   * @param[in] enabled True if the scene should update partial area
+   * @note This doesn't change the global value which is set by the environment variable.
+   * This works when partial update is enabled by the environment variable. If the partial update is disabled by the environment variable, it changes nothing.
+   */
+  void SetPartialUpdateEnabled(bool enabled);
+
+  /**
+   * @brief Queries whether the scene will update partial area.
+   *
+   * @return True if the scene should update partial area
+   */
+  bool IsPartialUpdateEnabled() const;
+
+  /**
    * @brief Query if the scene needs full update
    * @return True if the scene needs full update
    */
@@ -356,6 +372,7 @@ private:
   bool mRotationCompletedAcknowledgement; ///< The flag of sending the acknowledgement to complete window rotation.
   bool mSkipRendering;                    ///< A flag to skip rendering
   bool mNeedFullUpdate;                   ///< A flag to update full area
+  bool mPartialUpdateEnabled;             ///< True if the partial update is enabled
 
   // Render pass and render target
 
@@ -452,6 +469,17 @@ inline void KeepRenderingMessage(EventThreadServices& eventThreadServices, const
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&scene, &Scene::KeepRendering, durationSeconds);
+}
+
+inline void SetPartialUpdateEnabledMessage(EventThreadServices& eventThreadServices, const Scene& scene, bool enabled)
+{
+  using LocalType = MessageValue1<Scene, bool>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new(slot) LocalType(&scene, &Scene::SetPartialUpdateEnabled, enabled);
 }
 
 } // namespace SceneGraph

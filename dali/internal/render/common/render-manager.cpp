@@ -64,7 +64,7 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_REN
 
 namespace
 {
-inline Graphics::Rect2D RecalculateScissorArea(Graphics::Rect2D scissorArea, int orientation, Rect<int32_t> viewportRect)
+inline Graphics::Rect2D RecalculateScissorArea(const Graphics::Rect2D& scissorArea, int orientation, const Rect<int32_t>& viewportRect)
 {
   Graphics::Rect2D newScissorArea;
 
@@ -97,6 +97,33 @@ inline Graphics::Rect2D RecalculateScissorArea(Graphics::Rect2D scissorArea, int
     newScissorArea.height = scissorArea.height;
   }
   return newScissorArea;
+}
+
+inline Rect<int32_t> CalculateUpdateArea(RenderItem& item, BufferIndex renderBufferIndex, const Rect<int32_t>& viewportRect)
+{
+  Vector4 updateArea;
+  if(item.mNode->IsTextureUpdateAreaUsed() && item.mRenderer)
+  {
+    updateArea = item.mRenderer->GetTextureUpdateArea();
+  }
+  else
+  {
+    updateArea = item.mRenderer ? item.mRenderer->GetVisualTransformedUpdateArea(renderBufferIndex, item.mUpdateArea) : item.mUpdateArea;
+  }
+
+  return RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, Vector3(updateArea.x, updateArea.y, 0.0f), Vector3(updateArea.z, updateArea.w, 0.0f), viewportRect.width, viewportRect.height);
+}
+
+inline void AlignDamagedRect(Rect<int32_t>& rect)
+{
+  const int left   = rect.x;
+  const int top    = rect.y;
+  const int right  = rect.x + rect.width;
+  const int bottom = rect.y + rect.height;
+  rect.x           = (left / 16) * 16;
+  rect.y           = (top / 16) * 16;
+  rect.width       = ((right + 16) / 16) * 16 - rect.x;
+  rect.height      = ((bottom + 16) / 16) * 16 - rect.y;
 }
 } // namespace
 
@@ -527,8 +554,17 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
   DamagedRectsCleaner damagedRectCleaner(damagedRects, surfaceRect);
   bool                cleanDamagedRect = false;
 
-  // Mark previous dirty rects in the std::unordered_map.
   Scene::ItemsDirtyRectsContainer& itemsDirtyRects = sceneObject->GetItemsDirtyRects();
+
+  if(!sceneObject->IsPartialUpdateEnabled())
+  {
+    // Clear all dirty rects
+    // The rects will be added when partial updated is enabled again
+    itemsDirtyRects.clear();
+    return;
+  }
+
+  // Mark previous dirty rects in the std::unordered_map.
   for(auto& dirtyRectPair : itemsDirtyRects)
   {
     dirtyRectPair.second.visited = false;
@@ -636,27 +672,10 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
               {
                 item.mIsUpdated = false;
 
-                Vector4 updateArea;
-                if(item.mNode->IsTextureUpdateAreaUsed() && item.mRenderer)
-                {
-                  updateArea = item.mRenderer->GetTextureUpdateArea();
-                }
-                else
-                {
-                  updateArea = item.mRenderer ? item.mRenderer->GetVisualTransformedUpdateArea(mImpl->renderBufferIndex, item.mUpdateArea) : item.mUpdateArea;
-                }
-
-                rect = RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, Vector3(updateArea.x, updateArea.y, 0.0f), Vector3(updateArea.z, updateArea.w, 0.0f), viewportRect.width, viewportRect.height);
+                rect = CalculateUpdateArea(item, mImpl->renderBufferIndex, viewportRect);
                 if(rect.IsValid() && rect.Intersect(viewportRect) && !rect.IsEmpty())
                 {
-                  const int left   = rect.x;
-                  const int top    = rect.y;
-                  const int right  = rect.x + rect.width;
-                  const int bottom = rect.y + rect.height;
-                  rect.x           = (left / 16) * 16;
-                  rect.y           = (top / 16) * 16;
-                  rect.width       = ((right + 16) / 16) * 16 - rect.x;
-                  rect.height      = ((bottom + 16) / 16) * 16 - rect.y;
+                  AlignDamagedRect(rect);
 
                   // Found valid dirty rect.
                   auto dirtyRectPos = itemsDirtyRects.find(dirtyRectKey);
@@ -691,8 +710,14 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
                 }
                 else
                 {
-                  // The item is not in the list for some reason. Add it!
-                  itemsDirtyRects.insert({dirtyRectKey, surfaceRect});
+                  // The item is not in the list for some reason. Add the current rect!
+                  rect = CalculateUpdateArea(item, mImpl->renderBufferIndex, viewportRect);
+                  if(rect.IsValid() && rect.Intersect(viewportRect) && !rect.IsEmpty())
+                  {
+                    AlignDamagedRect(rect);
+
+                    itemsDirtyRects.insert({dirtyRectKey, rect});
+                  }
                   cleanDamagedRect = true; // And make full update at this frame
                 }
               }

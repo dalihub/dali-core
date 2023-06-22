@@ -308,6 +308,16 @@ public:
   void KeepRendering(float durationSeconds);
 
   /**
+   * @copydoc Dali::Integration::Scene::SetPartialUpdateEnabled()
+   */
+  void SetPartialUpdateEnabled(bool enabled);
+
+  /**
+   * @copydoc Dali::Integration::Scene::IsPartialUpdateEnabled()
+   */
+  bool IsPartialUpdateEnabled() const;
+
+  /**
    * @copydoc Integration::Scene::KeyEventSignal()
    */
   Integration::Scene::KeyEventSignalType& KeyEventSignal();
@@ -405,7 +415,8 @@ private:
   // The list of render-tasks
   IntrusivePtr<RenderTaskList> mRenderTaskList;
 
-  bool mDepthTreeDirty : 1; ///< True if the depth tree needs recalculating
+  bool mDepthTreeDirty : 1;       ///< True if the depth tree needs recalculating
+  bool mPartialUpdateEnabled : 1; ///< True if the partial update is enabled
 
   EventProcessor mEventProcessor;
 

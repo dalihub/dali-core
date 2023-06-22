@@ -30,7 +30,6 @@
 #include <test-native-image.h>
 
 #include <cfloat> // For FLT_MAX
-#include <set>    // For std::multiset
 #include <string>
 
 #include "assert.h"
@@ -298,53 +297,6 @@ struct CulledPropertyNotificationFunctor
   bool&                 mSignalCalled;
   PropertyNotification& mPropertyNotification;
 };
-
-// Check dirtyRect is equal with expected multiset.
-// Note that the order of damagedRect is not important
-struct RectSorter
-{
-  bool operator()(const Rect<int>& lhs, const Rect<int>& rhs) const
-  {
-    if(lhs.x != rhs.x)
-    {
-      return lhs.x < rhs.x;
-    }
-    if(lhs.y != rhs.y)
-    {
-      return lhs.y < rhs.y;
-    }
-    if(lhs.width != rhs.width)
-    {
-      return lhs.width < rhs.width;
-    }
-    return lhs.height < rhs.height;
-  }
-};
-
-void DirtyRectChecker(const std::vector<Rect<int>>& damagedRects, std::multiset<Rect<int>, RectSorter> expectedRectList, bool checkRectsExact, const char* testLocation)
-{
-  // Just check damagedRect contain all expectRectList.
-  DALI_TEST_GREATER(damagedRects.size() + 1u, expectedRectList.size(), testLocation);
-
-  for(auto& rect : damagedRects)
-  {
-    auto iter = expectedRectList.find(rect);
-    if(iter != expectedRectList.end())
-    {
-      expectedRectList.erase(iter);
-    }
-    else if(checkRectsExact)
-    {
-      std::ostringstream o;
-      o << rect << " exist in expectRectList" << std::endl;
-      fprintf(stderr, "Test failed in %s, checking %s", testLocation, o.str().c_str());
-      tet_result(TET_FAIL);
-    }
-  }
-
-  // Check all rects are matched
-  DALI_TEST_EQUALS(expectedRectList.empty(), true, testLocation);
-}
 
 // Clipping test helper functions:
 Actor CreateActorWithContent(uint32_t width, uint32_t height)

@@ -57,6 +57,7 @@ Scene::Scene()
   mDpi(),
   mBackgroundColor(DEFAULT_BACKGROUND_COLOR),
   mDepthTreeDirty(false),
+  mPartialUpdateEnabled(true),
   mEventProcessor(*this, ThreadLocalStorage::GetInternal()->GetGestureEventProcessor()),
   mSurfaceOrientation(0),
   mScreenOrientation(0)
@@ -478,6 +479,19 @@ void Scene::KeepRendering(float durationSeconds)
 {
   ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
   KeepRenderingMessage(tls->GetEventThreadServices(), *mSceneObject, durationSeconds);
+}
+
+void Scene::SetPartialUpdateEnabled(bool enabled)
+{
+  mPartialUpdateEnabled = enabled;
+
+  ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
+  SetPartialUpdateEnabledMessage(tls->GetEventThreadServices(), *mSceneObject, enabled);
+}
+
+bool Scene::IsPartialUpdateEnabled() const
+{
+  return mPartialUpdateEnabled;
 }
 
 Integration::Scene::KeyEventSignalType& Scene::KeyEventSignal()
