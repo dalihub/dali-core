@@ -16,6 +16,7 @@
 
 #include "test-graphics-controller.h"
 
+#include <dali/graphics-api/graphics-types.h>
 #include "test-graphics-buffer.h"
 #include "test-graphics-command-buffer.h"
 #include "test-graphics-framebuffer.h"
@@ -28,14 +29,29 @@
 #include "test-graphics-texture.h"
 
 #include <dali/integration-api/gl-defines.h>
+#include <any>
 #include <cstdio>
 #include <iostream>
+#include <memory>
 #include <sstream>
-
-#include <any>
 
 namespace Dali
 {
+namespace
+{
+template<class T>
+struct TestGraphicsDeleter
+{
+  TestGraphicsDeleter() = default;
+  void operator()(T* object)
+  {
+    // Discard resource
+    object->DiscardResource();
+  }
+};
+
+} //namespace
+
 std::ostream& operator<<(std::ostream& o, const Graphics::BufferCreateInfo& bufferCreateInfo)
 {
   return o << "usage:" << std::hex << bufferCreateInfo.usage << ", size:" << std::dec << bufferCreateInfo.size;
@@ -1185,10 +1201,25 @@ bool TestGraphicsController::IsDrawOnResumeRequired()
 
 Graphics::UniquePtr<Graphics::Buffer> TestGraphicsController::CreateBuffer(const Graphics::BufferCreateInfo& createInfo, Graphics::UniquePtr<Graphics::Buffer>&& oldBuffer)
 {
-  std::ostringstream oss;
-  oss << "bufferCreateInfo:" << createInfo;
-  mCallStack.PushCall("CreateBuffer", oss.str());
-  return Graphics::MakeUnique<TestGraphicsBuffer>(mCallStack, mGl, createInfo.size, createInfo.usage);
+  TraceCallStack::NamedParams namedParams;
+  namedParams["usage"] << "0x" << std::hex << createInfo.usage;
+  namedParams["propertiesFlags"] << createInfo.propertiesFlags;
+  namedParams["size"] << createInfo.size;
+  mCallStack.PushCall("CreateBuffer", namedParams.str(), namedParams);
+
+  auto ptr = Graphics::MakeUnique<TestGraphicsBuffer, TestGraphicsDeleter<TestGraphicsBuffer>>(createInfo, *this, mGl, mCallStack);
+  mAllocatedBuffers.push_back(ptr.get());
+  return ptr;
+}
+
+void TestGraphicsController::DiscardBuffer(TestGraphicsBuffer* buffer)
+{
+  auto iter = std::find(mAllocatedBuffers.begin(), mAllocatedBuffers.end(), buffer);
+  if(iter != mAllocatedBuffers.end())
+  {
+    mAllocatedBuffers.erase(iter);
+  }
+  delete buffer;
 }
 
 Graphics::UniquePtr<Graphics::CommandBuffer> TestGraphicsController::CreateCommandBuffer(const Graphics::CommandBufferCreateInfo& commandBufferCreateInfo, Graphics::UniquePtr<Graphics::CommandBuffer>&& oldCommandBuffer)
@@ -1258,7 +1289,8 @@ Graphics::UniquePtr<Graphics::Program> TestGraphicsController::CreateProgram(con
   }
 
   mProgramCache.emplace_back();
-  mProgramCache.back().programImpl = new TestGraphicsProgramImpl(mGl, programCreateInfo, mVertexFormats, mCustomUniforms);
+  mProgramCache.back().programImpl = new TestGraphicsProgramImpl(mGl, programCreateInfo, mVertexFormats, mCustomUniforms, mCustomUniformBlocks);
+
   for(auto& shader : *(programCreateInfo.shaderState))
   {
     auto graphicsShader = Uncast<TestGraphicsShader>(shader.shader);
@@ -1329,8 +1361,24 @@ Graphics::MemoryRequirements TestGraphicsController::GetTextureMemoryRequirement
 
 Graphics::MemoryRequirements TestGraphicsController::GetBufferMemoryRequirements(Graphics::Buffer& buffer) const
 {
+  static GLint uniformAlign{0};
+
+  Graphics::MemoryRequirements reqs{};
   mCallStack.PushCall("GetBufferMemoryRequirements", "");
-  return Graphics::MemoryRequirements{};
+
+  auto gfxBuffer = Uncast<TestGraphicsBuffer>(&buffer);
+  if(gfxBuffer->mCreateInfo.usage & (0 | Graphics::BufferUsage::UNIFORM_BUFFER))
+  {
+    if(!uniformAlign)
+    {
+      // Throw off the shackles of constness
+      auto& gl = *const_cast<TestGlAbstraction*>(&mGl);
+      gl.GetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &uniformAlign);
+    }
+    reqs.size      = gfxBuffer->mCreateInfo.size;
+    reqs.alignment = uint32_t(uniformAlign);
+  }
+  return reqs;
 }
 
 Graphics::TextureProperties TestGraphicsController::GetTextureProperties(const Graphics::Texture& texture)

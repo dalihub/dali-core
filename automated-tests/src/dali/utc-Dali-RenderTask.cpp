@@ -78,7 +78,7 @@ void utc_dali_render_task_cleanup(void)
  * FinishedSignal                      1+ve
  */
 
-namespace                             // unnamed namespace
+namespace // unnamed namespace
 {
 const int RENDER_FRAME_INTERVAL = 16; ///< Duration of each frame in ms. (at approx 60FPS)
 
@@ -4103,12 +4103,12 @@ int UtcDaliRenderTaskRenderPassTag(void)
   Geometry geometry = Geometry::New();
 
   Property::Map map[2];
-  map[0]["vertex"]     = SHADER_COLOR_TEST_SHADER_VERT1.data();
-  map[0]["fragment"]   = SHADER_COLOR_TEST_SHADER_FRAG.data();
+  map[0]["vertex"]        = SHADER_COLOR_TEST_SHADER_VERT1.data();
+  map[0]["fragment"]      = SHADER_COLOR_TEST_SHADER_FRAG.data();
   map[0]["renderPassTag"] = 0;
 
-  map[1]["vertex"]     = SHADER_COLOR_TEST_SHADER_VERT2.data();
-  map[1]["fragment"]   = SHADER_COLOR_TEST_SHADER_FRAG.data();
+  map[1]["vertex"]        = SHADER_COLOR_TEST_SHADER_VERT2.data();
+  map[1]["fragment"]      = SHADER_COLOR_TEST_SHADER_FRAG.data();
   map[1]["renderPassTag"] = 1;
 
   Property::Array array;
@@ -4122,6 +4122,7 @@ int UtcDaliRenderTaskRenderPassTag(void)
   stage.Add(blue);
 
   auto& gfx = application.GetGraphicsController();
+  gfx.mCallStack.EnableLogging(true);
 
   RenderTaskList renderTaskList = stage.GetRenderTaskList();
   DALI_TEST_EQUALS(0u, renderTaskList.GetTask(0u).GetRenderPassTag(), TEST_LOCATION);

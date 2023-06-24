@@ -20,6 +20,7 @@
 #include <dali/devel-api/common/capabilities.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
+#include <dali/integration-api/debug.h>
 #include <dali/integration-api/render-task-list-integ.h>
 #include <dali/public-api/dali-core.h>
 #include <cstdio>
@@ -29,6 +30,7 @@
 #include <dali-test-suite-utils.h>
 #include <mesh-builder.h>
 #include <test-trace-call-stack.h>
+#include "test-actor-utils.h"
 #include "test-graphics-command-buffer.h"
 
 using namespace Dali;
@@ -4594,5 +4596,342 @@ int UtcDaliRendererVertexRange(void)
   DALI_TEST_CHECK(drawTrace.FindMethodAndParams("DrawArrays", namedParams));
 
   DALI_TEST_EQUALS(drawTrace.CountMethod("DrawArrays"), 10, TEST_LOCATION);
+  END_TEST;
+}
+
+TestGraphicsBuffer* FindUniformBuffer(int bufferIndex, TestGraphicsController& graphics)
+{
+  int counter = 0;
+  for(auto bufferPtr : graphics.mAllocatedBuffers)
+  {
+    if(((bufferPtr->mCreateInfo.usage & (0 | Graphics::BufferUsage::UNIFORM_BUFFER)) > 0) &&
+       !(bufferPtr->mCpuOnly))
+    {
+      if(counter == bufferIndex)
+      {
+        return bufferPtr;
+      }
+      ++counter;
+    }
+  }
+  return nullptr;
+}
+
+void CreateRendererProperties(Renderer renderer, const Matrix& m, const Matrix& n)
+{
+  for(int i = 0; i < 300; ++i)
+  {
+    std::ostringstream property;
+    property << "uBone[" << i << "]";
+    if(i < 299)
+      renderer.RegisterProperty(property.str(), m);
+    else
+      renderer.RegisterProperty(property.str(), n);
+  }
+  renderer.RegisterProperty("uNumberOfBlendShapes", 55.0f);
+  float weight = 0.5f;
+  for(int i = 0; i < 128; ++i)
+  {
+    std::ostringstream property;
+    property << "uBlendShapeWeight[" << i << "]";
+    renderer.RegisterProperty(property.str(), weight);
+  }
+  float w1                           = 0.01f;
+  float w2                           = 0.5f;
+  float w3                           = 0.79f;
+  renderer["uBlendShapeWeight[0]"]   = w1;
+  renderer["uBlendShapeWeight[55]"]  = w2;
+  renderer["uBlendShapeWeight[127]"] = w3;
+}
+
+int UtcDaliRendererUniformBlocks01(void)
+{
+  setenv("LOG_UNIFORM_BUFFER", "5f", 1); // Turns on buffer logging
+  TestApplication application;
+
+  tet_infoline("Test that uniforms in blocks are written to a gpu buffer");
+  auto& graphics = application.GetGraphicsController();
+  auto& gl       = application.GetGlAbstraction();
+  gl.mBufferTrace.EnableLogging(true);
+
+  gl.SetUniformBufferOffsetAlignment(1024); // Arbitrarily big to easily see it work in debug
+
+  const int MAX_BONE_COUNT{300};
+  const int skinningBlockSize = MAX_BONE_COUNT * sizeof(Matrix);
+
+  graphics.AddCustomUniformBlock(TestGraphicsReflection::TestUniformBlockInfo{"Skinning Block", 0, 0, skinningBlockSize, {{"uBone", Graphics::UniformClass::UNIFORM, 0, 0, {0}, {1}, MAX_BONE_COUNT, Property::Type::MATRIX}}});
+
+  const int MAX_MORPH_COUNT{128};
+  const int morphBlockSize = MAX_MORPH_COUNT * sizeof(float) + sizeof(float);
+  graphics.AddCustomUniformBlock(
+    TestGraphicsReflection::TestUniformBlockInfo{"MorphBlock", 0, 1, morphBlockSize, {{"uNumberOfBlendShapes", Graphics::UniformClass::UNIFORM, 0, 2, {0}, {2}, 0, Property::Type::FLOAT}, {"uBlendShapeWeight", Graphics::UniformClass::UNIFORM, 0, 2, {4}, {3}, MAX_MORPH_COUNT, Property::Type::FLOAT}}});
+
+  Actor    actor    = CreateActor(application.GetScene().GetRootLayer(), 0, TEST_LOCATION);
+  Shader   shader   = CreateShader(); // Don't care about src content
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = CreateRenderer(actor, geometry, shader, 0);
+  Matrix   m, n;
+  m.SetIdentity();
+  n.SetIdentity();
+  n.SetTransformComponents(Vector3(2.f, 2.f, 2.f), Quaternion(Radian(0.3f), Vector3::YAXIS), Vector3(200.0f, 1.0f, 20.0f));
+
+  CreateRendererProperties(renderer, m, n);
+
+  TraceCallStack& graphicsTrace = graphics.mCallStack;
+  TraceCallStack& cmdTrace      = graphics.mCommandBufferCallStack;
+  graphicsTrace.EnableLogging(true);
+  cmdTrace.EnableLogging(true);
+
+  application.SendNotification();
+  application.Render();
+
+  // We expect 1 vertex buffer, 1 index buffer and 1 uniform buffer (representing 2 blocks)
+  DALI_TEST_EQUALS(cmdTrace.CountMethod("BindUniformBuffers"), 1, TEST_LOCATION);
+
+  tet_infoline("Test that uBone[299] is written correctly");
+
+  bool found = false;
+  for(auto bufferPtr : graphics.mAllocatedBuffers)
+  {
+    if(((bufferPtr->mCreateInfo.usage & (0 | Graphics::BufferUsage::UNIFORM_BUFFER)) > 0) &&
+       !(bufferPtr->mCpuOnly))
+    {
+      // We have a GPU uniform buffer. Probably the right one.
+      // The custom uniform block above should point us to the right spot...
+      DALI_TEST_CHECK(bufferPtr->memory.size() >= skinningBlockSize);
+      found        = true;
+      Matrix* mPtr = reinterpret_cast<Dali::Matrix*>(&bufferPtr->memory[0] + sizeof(Dali::Matrix) * 299);
+      DALI_TEST_EQUALS(*mPtr, n, 0.0001, TEST_LOCATION);
+      break;
+    }
+  }
+  DALI_TEST_CHECK(found);
+
+  END_TEST;
+}
+
+int UtcDaliRendererUniformBlocks02(void)
+{
+  setenv("LOG_UNIFORM_BUFFER", "5f", 1); // Turns on buffer logging
+  TestApplication application;
+
+  tet_infoline("Test that repeated update/render cycles write into alternative buffers");
+  auto& graphics = application.GetGraphicsController();
+  auto& gl       = application.GetGlAbstraction();
+  gl.mBufferTrace.EnableLogging(true);
+
+  const uint32_t UNIFORM_BLOCK_ALIGNMENT(512);
+  gl.SetUniformBufferOffsetAlignment(UNIFORM_BLOCK_ALIGNMENT);
+
+  const int MAX_BONE_COUNT{300};
+  const int skinningBlockSize = MAX_BONE_COUNT * sizeof(Matrix);
+
+  graphics.AddCustomUniformBlock(TestGraphicsReflection::TestUniformBlockInfo{"Skinning Block", 0, 0, skinningBlockSize, {{"uBone", Graphics::UniformClass::UNIFORM, 0, 0, {0}, {1}, MAX_BONE_COUNT, Property::Type::MATRIX}}});
+
+  const int MAX_MORPH_COUNT{128};
+  const int morphBlockSize = MAX_MORPH_COUNT * sizeof(float) + sizeof(float);
+  graphics.AddCustomUniformBlock(
+    TestGraphicsReflection::TestUniformBlockInfo{"MorphBlock", 0, 1, morphBlockSize, {{"uNumberOfBlendShapes", Graphics::UniformClass::UNIFORM, 0, 2, {0}, {2}, 0, Property::Type::FLOAT}, {"uBlendShapeWeight", Graphics::UniformClass::UNIFORM, 0, 2, {4}, {3}, MAX_MORPH_COUNT, Property::Type::FLOAT}}});
+
+  Actor    actor    = CreateActor(application.GetScene().GetRootLayer(), 0, TEST_LOCATION);
+  Shader   shader   = CreateShader(); // Don't care about src content
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = CreateRenderer(actor, geometry, shader, 0);
+  Matrix   m, n;
+  m.SetIdentity();
+  n.SetIdentity();
+  n.SetTransformComponents(Vector3(2.f, 2.f, 2.f), Quaternion(Radian(0.3f), Vector3::YAXIS), Vector3(200.0f, 1.0f, 20.0f));
+
+  CreateRendererProperties(renderer, m, n);
+  float w1                           = 0.01f;
+  float w2                           = 0.5f;
+  float w3                           = 0.79f;
+  renderer["uBlendShapeWeight[0]"]   = w1;
+  renderer["uBlendShapeWeight[55]"]  = w2;
+  renderer["uBlendShapeWeight[127]"] = w3;
+
+  TraceCallStack& graphicsTrace = graphics.mCallStack;
+  TraceCallStack& cmdTrace      = graphics.mCommandBufferCallStack;
+  graphicsTrace.EnableLogging(true);
+  cmdTrace.EnableLogging(true);
+
+  application.SendNotification();
+  application.Render();
+
+  // We expect 1 vertex buffer, 1 index buffer and 1 uniform buffer (representing 2 blocks)
+  DALI_TEST_EQUALS(cmdTrace.CountMethod("BindUniformBuffers"), 1, TEST_LOCATION);
+
+  const uint32_t MORPH_BLOCK_OFFSET = (skinningBlockSize % UNIFORM_BLOCK_ALIGNMENT == 0) ? skinningBlockSize : ((skinningBlockSize / UNIFORM_BLOCK_ALIGNMENT) + 1) * UNIFORM_BLOCK_ALIGNMENT;
+
+  for(int i = 0; i < 50; ++i)
+  {
+    tet_infoline("\nTest that uBone[299] is written correctly");
+    TestGraphicsBuffer* bufferPtr = FindUniformBuffer(i % 2, graphics);
+    DALI_TEST_CHECK(graphics.mAllocatedBuffers.size() == (i == 0 ? 4 : 5));
+    DALI_TEST_CHECK(bufferPtr != nullptr);
+    Matrix* mPtr = reinterpret_cast<Dali::Matrix*>(&bufferPtr->memory[0] + sizeof(Dali::Matrix) * 299);
+    DALI_TEST_EQUALS(*mPtr, n, 0.0001, TEST_LOCATION);
+
+    float* wPtr1 = reinterpret_cast<float*>(&bufferPtr->memory[MORPH_BLOCK_OFFSET] + sizeof(float) * 1);
+    float* wPtr2 = reinterpret_cast<float*>(&bufferPtr->memory[MORPH_BLOCK_OFFSET] + sizeof(float) * 56);
+    float* wPtr3 = reinterpret_cast<float*>(&bufferPtr->memory[MORPH_BLOCK_OFFSET] + sizeof(float) * 128);
+
+    tet_printf("Test that uBlendShapeWeight[0] is written correctly as %4.2f\n", w1);
+    tet_printf("Test that uBlendShapeWeight[55] is written correctly as %4.2f\n", w2);
+    tet_printf("Test that uBlendShapeWeight[127] is written correctly as %4.2f\n", w3);
+
+    DALI_TEST_EQUALS(*wPtr1, w1, 0.0001f, TEST_LOCATION);
+    DALI_TEST_EQUALS(*wPtr2, w2, 0.0001f, TEST_LOCATION);
+    DALI_TEST_EQUALS(*wPtr3, w3, 0.0001f, TEST_LOCATION);
+
+    n.SetTransformComponents(Vector3(2.f, 2.f, 2.f), Quaternion(Radian(i * 0.3f), Vector3::YAXIS), Vector3(200.0f + i * 10.0f, -i, 20.0f));
+    renderer["uBone[299]"] = n;
+
+    w1 += 0.005f;
+    w2 += 0.005f;
+    w3 -= 0.01f;
+    renderer["uBlendShapeWeight[0]"]   = w1;
+    renderer["uBlendShapeWeight[55]"]  = w2;
+    renderer["uBlendShapeWeight[127]"] = w3;
+
+    application.SendNotification();
+    application.Render();
+  }
+
+  END_TEST;
+}
+
+int AlignSize(int size, int align)
+{
+  return (size % align == 0) ? size : ((size / align) + 1) * align;
+}
+
+int UtcDaliRendererUniformBlocks03(void)
+{
+  setenv("LOG_UNIFORM_BUFFER", "5f", 1); // Turns on buffer logging
+  TestApplication application;
+
+  tet_infoline("Test that adding actors grows the uniform buffer");
+  auto& graphics = application.GetGraphicsController();
+  auto& gl       = application.GetGlAbstraction();
+  gl.mBufferTrace.EnableLogging(true);
+
+  const uint32_t UNIFORM_BLOCK_ALIGNMENT(512);
+  gl.SetUniformBufferOffsetAlignment(UNIFORM_BLOCK_ALIGNMENT);
+
+  const int MAX_BONE_COUNT{300};
+  const int skinningBlockSize = MAX_BONE_COUNT * sizeof(Matrix);
+
+  graphics.AddCustomUniformBlock(TestGraphicsReflection::TestUniformBlockInfo{"Skinning Block", 0, 0, skinningBlockSize, {{"uBone", Graphics::UniformClass::UNIFORM, 0, 0, {0}, {1}, MAX_BONE_COUNT, Property::Type::MATRIX}}});
+
+  const int MAX_MORPH_COUNT{128};
+  const int morphBlockSize = MAX_MORPH_COUNT * sizeof(float) + sizeof(float);
+  graphics.AddCustomUniformBlock(
+    TestGraphicsReflection::TestUniformBlockInfo{"MorphBlock", 0, 1, morphBlockSize, {{"uNumberOfBlendShapes", Graphics::UniformClass::UNIFORM, 0, 2, {0}, {2}, 0, Property::Type::FLOAT}, {"uBlendShapeWeight", Graphics::UniformClass::UNIFORM, 0, 2, {4}, {3}, MAX_MORPH_COUNT, Property::Type::FLOAT}}});
+
+  Actor    actor    = CreateActor(application.GetScene().GetRootLayer(), 0, TEST_LOCATION);
+  Shader   shader   = CreateShader(); // Don't care about src content
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = CreateRenderer(actor, geometry, shader, 0);
+  Matrix   m, n;
+  m.SetIdentity();
+  n.SetIdentity();
+  n.SetTransformComponents(Vector3(2.f, 2.f, 2.f), Quaternion(Radian(0.3f), Vector3::YAXIS), Vector3(200.0f, 1.0f, 20.0f));
+
+  CreateRendererProperties(renderer, m, n);
+
+  TraceCallStack& graphicsTrace = graphics.mCallStack;
+  TraceCallStack& cmdTrace      = graphics.mCommandBufferCallStack;
+  graphicsTrace.EnableLogging(true);
+  cmdTrace.EnableLogging(true);
+
+  application.SendNotification();
+  application.Render();
+
+  // We expect 1 vertex buffer, 1 index buffer and 1 uniform buffer (representing 2 blocks)
+  DALI_TEST_EQUALS(cmdTrace.CountMethod("BindUniformBuffers"), 1, TEST_LOCATION);
+
+  unsigned int overallSize = 0;
+
+  for(int i = 0; i < 10; ++i)
+  {
+    overallSize += AlignSize(skinningBlockSize, UNIFORM_BLOCK_ALIGNMENT) + AlignSize(morphBlockSize, UNIFORM_BLOCK_ALIGNMENT);
+
+    DALI_TEST_CHECK(graphics.mAllocatedBuffers.size() == (i == 0 ? 4 : 5));
+
+    TestGraphicsBuffer* bufferPtr = graphics.mAllocatedBuffers.back();
+    tet_printf("\nTest that latest buffer is big enough(%d)>%d\n", bufferPtr->memory.size(), overallSize);
+
+    DALI_TEST_CHECK(bufferPtr->memory.size() >= overallSize);
+
+    Actor actor = CreateActor(application.GetScene().GetRootLayer(), 0, TEST_LOCATION);
+    actor.AddRenderer(renderer);
+    application.GetScene().Add(actor);
+
+    application.SendNotification();
+    application.Render();
+  }
+
+  END_TEST;
+}
+
+int UtcDaliRendererUniformBlocksUnregisterScene01(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test that uniform buffers are unregistered after a scene is destroyed\n");
+
+  auto& graphics = application.GetGraphicsController();
+  auto& gl       = application.GetGlAbstraction();
+  graphics.mCallStack.EnableLogging(true);
+  graphics.mCommandBufferCallStack.EnableLogging(true);
+  gl.mBufferTrace.EnableLogging(true);
+  gl.mBufferTrace.Enable(true);
+
+  Actor dummyActor = CreateRenderableActor(CreateTexture(TextureType::TEXTURE_2D, Pixel::RGB888, 45, 45));
+  application.GetScene().Add(dummyActor);
+  application.SendNotification();
+  application.Render();
+
+  Dali::Integration::Scene scene = Dali::Integration::Scene::New(Size(480.0f, 800.0f));
+  DALI_TEST_CHECK(scene);
+  application.AddScene(scene);
+
+  Actor    actor    = CreateActor(scene.GetRootLayer(), 0, TEST_LOCATION);
+  Shader   shader   = CreateShader(); // Don't really care...
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = CreateRenderer(actor, geometry, shader, 0);
+
+  const int MAX_BONE_COUNT{300};
+  const int skinningBlockSize = MAX_BONE_COUNT * sizeof(Matrix);
+
+  graphics.AddCustomUniformBlock(TestGraphicsReflection::TestUniformBlockInfo{"Skinning Block", 0, 0, skinningBlockSize, {{"uBone", Graphics::UniformClass::UNIFORM, 0, 0, {0}, {1}, MAX_BONE_COUNT, Property::Type::MATRIX}}});
+  Matrix m;
+  m.SetIdentity();
+  for(int i = 0; i < MAX_BONE_COUNT; ++i)
+  {
+    std::ostringstream property;
+    property << "uBone[" << i << "]";
+    renderer.RegisterProperty(property.str(), m);
+  }
+  tet_infoline("--Expect new scene's buffers to be created here");
+  application.SendNotification();
+  application.Render();
+
+  scene.RemoveSceneObject(); // Scene's scene graph lifecycle is NOT managed by scene handle
+  scene.Discard();
+  scene.Reset();
+
+  gl.mBufferTrace.Reset();
+
+  tet_infoline("--Expect UnregisterScene to happen during this render cycle");
+  dummyActor[Actor::Property::SIZE] = Vector3(100, 100, 0);
+  application.SendNotification();
+  application.Render();
+
+  TraceCallStack::NamedParams namedParams;
+  namedParams["id"] << 6;
+  DALI_TEST_CHECK(gl.mBufferTrace.FindMethodAndParams("DeleteBuffers", namedParams));
+
   END_TEST;
 }

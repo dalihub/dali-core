@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,13 @@
 #include <dali/public-api/object/property-map.h>
 #include <string>
 #include <vector>
+
+extern "C"
+{
+  void tet_infoline(const char* str);
+  void tet_printf(const char* format, ...);
+}
+
 namespace Dali
 {
 namespace
@@ -103,7 +110,7 @@ constexpr int GetSizeForType(Property::Type type)
 
 } // namespace
 
-TestGraphicsReflection::TestGraphicsReflection(TestGlAbstraction& gl, uint32_t programId, Property::Array& vfs, const Graphics::ProgramCreateInfo& createInfo, std::vector<UniformData>& customUniforms)
+TestGraphicsReflection::TestGraphicsReflection(TestGlAbstraction& gl, uint32_t programId, Property::Array& vfs, const Graphics::ProgramCreateInfo& createInfo, std::vector<UniformData>& customUniforms, std::vector<TestGraphicsReflection::TestUniformBlockInfo>& customUniformBlocks)
 : mGl(gl),
   mCustomUniforms(customUniforms)
 {
@@ -226,6 +233,10 @@ TestGraphicsReflection::TestGraphicsReflection(TestGlAbstraction& gl, uint32_t p
   mDefaultUniformBlock.size = offset;
 
   mUniformBlocks.push_back(mDefaultUniformBlock);
+  for(auto& element : customUniformBlocks)
+  {
+    mUniformBlocks.push_back(element);
+  }
 }
 
 uint32_t TestGraphicsReflection::GetVertexAttributeLocation(const std::string& name) const
@@ -247,11 +258,13 @@ uint32_t TestGraphicsReflection::GetVertexAttributeLocation(const std::string& n
 
 Dali::Graphics::VertexInputAttributeFormat TestGraphicsReflection::GetVertexAttributeFormat(uint32_t location) const
 {
+  tet_infoline("Warning, TestGraphicsReflection::GetVertexAttributeFormat is unimplemented\n");
   return Dali::Graphics::VertexInputAttributeFormat{};
 }
 
 std::string TestGraphicsReflection::GetVertexAttributeName(uint32_t location) const
 {
+  tet_infoline("Warning, TestGraphicsReflection::GetVertexAttributeName is unimplemented\n");
   return 0u;
 }
 
@@ -272,7 +285,11 @@ uint32_t TestGraphicsReflection::GetUniformBlockCount() const
 
 uint32_t TestGraphicsReflection::GetUniformBlockBinding(uint32_t index) const
 {
-  return 0u;
+  if(index >= mUniformBlocks.size())
+  {
+    return 0;
+  }
+  return mUniformBlocks[index].binding;
 }
 
 uint32_t TestGraphicsReflection::GetUniformBlockSize(uint32_t index) const
@@ -316,11 +333,13 @@ bool TestGraphicsReflection::GetUniformBlock(uint32_t index, Dali::Graphics::Uni
 
 std::vector<uint32_t> TestGraphicsReflection::GetUniformBlockLocations() const
 {
+  tet_infoline("Warning, TestGraphicsReflection::GetUniformBlockLocations is unimplemented\n");
   return std::vector<uint32_t>{};
 }
 
 std::string TestGraphicsReflection::GetUniformBlockName(uint32_t blockIndex) const
 {
+  tet_infoline("Warning, TestGraphicsReflection::GetUniformBlockName is unimplemented\n");
   return std::string{};
 }
 
@@ -362,11 +381,13 @@ uint32_t TestGraphicsReflection::GetUniformBlockMemberOffset(uint32_t blockIndex
 
 bool TestGraphicsReflection::GetNamedUniform(const std::string& name, Dali::Graphics::UniformInfo& out) const
 {
+  tet_infoline("Warning, TestGraphicsReflection::GetNamedUniform is unimplemented\n");
   return true;
 }
 
 const std::vector<Dali::Graphics::UniformInfo>& TestGraphicsReflection::GetSamplers() const
 {
+  tet_infoline("Warning, TestGraphicsReflection::GetSamplers is unimplemented\n");
   static std::vector<Dali::Graphics::UniformInfo> samplers{};
   return samplers;
 }

@@ -60,6 +60,7 @@ struct ShaderCache;
 class PipelineCache;
 class PipelineCacheL2;
 class UniformBufferManager;
+class UniformBufferV2;
 class Renderer;
 
 using PipelineCacheL2Container = std::list<PipelineCacheL2>;
@@ -423,6 +424,20 @@ public:
               uint32_t                                             queueIndex);
 
   /**
+   * Returns true if this will create a draw command with it's own geometry
+   * and shader. Some renderers don't have a shader/geometry, e.g. drawable-actor
+   * creates an empty renderer.
+   */
+  bool NeedsProgram() const;
+
+  /**
+   * If we need a program, prepare it and return it.
+   * @param[in] instruction The render instruction
+   * @return the prepared program, or nullptr.
+   */
+  Program* PrepareProgram(const SceneGraph::RenderInstruction& instruction);
+
+  /**
    * Sets RenderCallback object
    *
    * @param[in] callback Valid pointer to RenderCallback object
@@ -477,14 +492,19 @@ public:
                            const T&                     data);
 
   template<class T>
+  bool WriteDefaultUniformV2(const Graphics::UniformInfo*                                   uniformInfo,
+                             const std::vector<std::unique_ptr<Render::UniformBufferView>>& uboViews,
+                             const T&                                                       data);
+
+  template<class T>
   void WriteUniform(Render::UniformBufferView&   ubo,
                     const Graphics::UniformInfo& uniformInfo,
                     const T&                     data);
 
-  void WriteUniform(Render::UniformBufferView&   ubo,
-                    const Graphics::UniformInfo& uniformInfo,
-                    const void*                  data,
-                    uint32_t                     size);
+  static void WriteUniform(Render::UniformBufferView&   ubo,
+                           const Graphics::UniformInfo& uniformInfo,
+                           const void*                  data,
+                           uint32_t                     size);
 
   [[nodiscard]] FaceCullingMode::Type GetFaceCullMode() const
   {
@@ -585,18 +605,15 @@ private:
    * @brief Fill uniform buffer at index. Writes uniforms into given memory address
    *
    * @param[in] instruction The render instruction
-   * @param[in,out] ubo Target uniform buffer object
-   * @param[out] outBindings output bindings vector
-   * @param[out] offset output offset of the next uniform buffer memory address
+   * @param[in] uboViews Target uniform buffer object
    * @param[in] updateBufferIndex update buffer index
+   * @param[in] nodeIndex Index of node/renderer pair in mUniformIndexMaps
    */
-  void FillUniformBuffer(Program&                                      program,
-                         const SceneGraph::RenderInstruction&          instruction,
-                         Render::UniformBufferView&                    ubo,
-                         std::vector<Graphics::UniformBufferBinding>*& outBindings,
-                         uint32_t&                                     offset,
-                         BufferIndex                                   updateBufferIndex,
-                         std::size_t                                   nodeIndex);
+  void FillUniformBuffer(Program&                                                       program,
+                         const SceneGraph::RenderInstruction&                           instruction,
+                         const std::vector<std::unique_ptr<Render::UniformBufferView>>& uboViews,
+                         BufferIndex                                                    updateBufferIndex,
+                         std::size_t                                                    nodeIndex);
 
 private:
   Graphics::Controller*           mGraphicsController;
@@ -628,6 +645,7 @@ private:
     int16_t    uniformLocation{0u};
     uint16_t   uniformOffset{0u};
     uint16_t   uniformSize{0u};
+    uint16_t   uniformBlockIndex{0u};
     FuncGetter uniformFunc{0};
   };
 
@@ -662,6 +680,8 @@ private:
   RenderCallback*                               mRenderCallback{nullptr};
   std::unique_ptr<RenderCallbackInput>          mRenderCallbackInput{nullptr};
   std::vector<Graphics::Texture*>               mRenderCallbackTextureBindings{};
+
+  Program* mCurrentProgram{nullptr}; ///< Prefetched program
 };
 
 } // namespace Render

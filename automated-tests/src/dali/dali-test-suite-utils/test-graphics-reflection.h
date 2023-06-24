@@ -2,7 +2,7 @@
 #define DALI_TEST_GRAPHICS_REFLECTION_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,9 @@ namespace Dali
 class TestGraphicsReflection : public Graphics::Reflection
 {
 public:
-  TestGraphicsReflection(TestGlAbstraction& gl, uint32_t program_id, Property::Array& vertexFormats, const Graphics::ProgramCreateInfo& createInfo, std::vector<UniformData>& customUniforms);
+  class TestUniformBlockInfo;
+
+  TestGraphicsReflection(TestGlAbstraction& gl, uint32_t program_id, Property::Array& vertexFormats, const Graphics::ProgramCreateInfo& createInfo, std::vector<UniformData>& customUniforms, std::vector<TestUniformBlockInfo>& customUniformBlocks);
 
   uint32_t                                        GetVertexAttributeLocation(const std::string& name) const override;
   Dali::Graphics::VertexInputAttributeFormat      GetVertexAttributeFormat(uint32_t location) const override;

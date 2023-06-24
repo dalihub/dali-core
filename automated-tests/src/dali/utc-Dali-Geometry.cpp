@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -201,8 +201,7 @@ int UtcDaliGeometryAddVertexBuffer(void)
   {
     const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
       application.GetGlAbstraction().GetBufferDataCalls();
-
-    DALI_TEST_EQUALS(bufferDataCalls.size(), 3u, TEST_LOCATION);
+    DALI_TEST_EQUALS(bufferDataCalls.size(), 1u, TEST_LOCATION);
 
     DALI_TEST_EQUALS(bufferDataCalls[0], 4 * sizeof(TexturedQuadVertex), TEST_LOCATION);
   }
@@ -322,7 +321,7 @@ int UtcDaliGeometrySetIndexBuffer(void)
     const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
       application.GetGlAbstraction().GetBufferDataCalls();
 
-    DALI_TEST_EQUALS(bufferDataCalls.size(), 3u, TEST_LOCATION);
+    DALI_TEST_EQUALS(bufferDataCalls.size(), 1u, TEST_LOCATION);
 
     DALI_TEST_EQUALS(bufferDataCalls[0], 4 * sizeof(TexturedQuadVertex), TEST_LOCATION);
   }
@@ -381,7 +380,7 @@ int UtcDaliGeometrySetIndexBuffer32Bits(void)
     const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
       application.GetGlAbstraction().GetBufferDataCalls();
 
-    DALI_TEST_EQUALS(bufferDataCalls.size(), 3u, TEST_LOCATION);
+    DALI_TEST_EQUALS(bufferDataCalls.size(), 1u, TEST_LOCATION);
 
     DALI_TEST_EQUALS(bufferDataCalls[0], 4 * sizeof(TexturedQuadVertex), TEST_LOCATION);
   }

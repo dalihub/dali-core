@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PROGRAM_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,11 @@ class Matrix;
 namespace Internal
 {
 class ProgramCache;
+
+namespace Render
+{
+class UniformBufferManager;
+}
 
 /**
  * A program contains a vertex & fragment shader.
@@ -127,7 +132,10 @@ public:
     return mGfxProgram.get();
   }
 
-  void SetGraphicsProgram(Graphics::UniquePtr<Graphics::Program>&& program);
+  /**
+   * Setup the actual program, and ensure that it's reflection is generated.
+   */
+  void SetGraphicsProgram(Graphics::UniquePtr<Graphics::Program>&& program, Render::UniformBufferManager& uniformBufferManager);
 
   /**
    * Retrieves uniform data.
@@ -185,7 +193,7 @@ public:
    * Build optimized shader reflection of uniforms
    * @param graphicsReflection The graphics reflection
    */
-  void BuildReflection(const Graphics::Reflection& graphicsReflection);
+  void BuildReflection(const Graphics::Reflection& graphicsReflection, Render::UniformBufferManager& uniformBufferManager);
 
   /**
    * Struct UniformBlockMemoryRequirements
@@ -193,10 +201,15 @@ public:
    */
   struct UniformBlockMemoryRequirements
   {
-    uint32_t blockCount;
-    uint32_t totalSizeRequired;
-  };
+    uint32_t blockCount{0u};
+    uint32_t totalSizeRequired{0u};
+    uint32_t totalCpuSizeRequired{0u}; ///< requirements for CPU memory
+    uint32_t totalGpuSizeRequired{0u}; ///< requirements of hardware buffer
 
+    // Per block
+    std::vector<uint32_t> blockSize{};
+    std::vector<uint32_t> blockSizeAligned{};
+  };
   /**
    * Retrieves uniform blocks requirements
    *
@@ -204,7 +217,7 @@ public:
    */
   [[nodiscard]] const UniformBlockMemoryRequirements& GetUniformBlocksMemoryRequirements() const
   {
-    return mUniformBlockRequirements;
+    return mUniformBlockMemoryRequirements;
   }
 
 private:                           // Data
@@ -221,9 +234,10 @@ private:                           // Data
 
   using UniformReflectionContainer = std::vector<ReflectionUniformInfo>;
 
-  UniformReflectionContainer     mReflection{};                ///< Contains reflection build per program
-  UniformReflectionContainer     mReflectionDefaultUniforms{}; ///< Contains default uniforms
-  UniformBlockMemoryRequirements mUniformBlockRequirements{};  ///< Memory requirements for uniform blocks
+  UniformReflectionContainer mReflection{};                ///< Contains reflection build per program
+  UniformReflectionContainer mReflectionDefaultUniforms{}; ///< Contains default uniforms
+
+  UniformBlockMemoryRequirements mUniformBlockMemoryRequirements; ///< Memory requirements per each block, block 0 = standalone/emulated
 };
 
 } // namespace Internal

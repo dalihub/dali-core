@@ -30,6 +30,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/internal/common/shader-data.h>
 #include <dali/internal/render/common/performance-monitor.h>
+#include <dali/internal/render/renderers/uniform-buffer-manager.h>
 #include <dali/internal/render/shaders/program-cache.h>
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
@@ -62,11 +63,11 @@ size_t DEFAULT_UNIFORM_HASHTABLE[NUMBER_OF_DEFAULT_UNIFORMS] =
 /**
  * Helper function to calculate the correct alignment of data for uniform buffers
  * @param dataSize size of uniform buffer
- * @return aligned offset of data
+ * @return size of data aligned to given size
  */
-inline uint32_t GetUniformBufferDataAlignment(uint32_t dataSize)
+inline uint32_t AlignSize(uint32_t dataSize, uint32_t alignSize)
 {
-  return ((dataSize / 256u) + ((dataSize % 256u) ? 1u : 0u)) * 256u;
+  return ((dataSize / alignSize) + ((dataSize % alignSize) ? 1u : 0u)) * alignSize;
 }
 
 } // namespace
@@ -83,6 +84,7 @@ Program* Program::New(ProgramCache& cache, Internal::ShaderDataPtr shaderData, G
   {
     // program not found so create it
     program = new Program(cache, shaderData, gfxController);
+    DALI_LOG_RELEASE_INFO("Program::New() created a unique program\n");
     cache.AddProgram(shaderHash, program);
   }
 
@@ -101,7 +103,7 @@ Program::Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphi
 
 Program::~Program() = default;
 
-void Program::BuildReflection(const Graphics::Reflection& graphicsReflection)
+void Program::BuildReflection(const Graphics::Reflection& graphicsReflection, Render::UniformBufferManager& uniformBufferManager)
 {
   mReflectionDefaultUniforms.clear();
   mReflectionDefaultUniforms.resize(NUMBER_OF_DEFAULT_UNIFORMS);
@@ -174,20 +176,36 @@ void Program::BuildReflection(const Graphics::Reflection& graphicsReflection)
     }
   }
 
-  // Calculate size of memory for uniform blocks
-  mUniformBlockRequirements.totalSizeRequired = 0;
-  mUniformBlockRequirements.blockCount        = graphicsReflection.GetUniformBlockCount();
-  for(auto i = 0u; i < mUniformBlockRequirements.blockCount; ++i)
+  mUniformBlockMemoryRequirements.blockSize.resize(uniformBlockCount);
+  mUniformBlockMemoryRequirements.blockSizeAligned.resize(uniformBlockCount);
+  mUniformBlockMemoryRequirements.blockCount           = uniformBlockCount;
+  mUniformBlockMemoryRequirements.totalSizeRequired    = 0u;
+  mUniformBlockMemoryRequirements.totalCpuSizeRequired = 0u;
+  mUniformBlockMemoryRequirements.totalGpuSizeRequired = 0u;
+
+  for(auto i = 0u; i < uniformBlockCount; ++i)
   {
-    auto blockSize = GetUniformBufferDataAlignment(graphicsReflection.GetUniformBlockSize(i));
-    mUniformBlockRequirements.totalSizeRequired += blockSize;
+    Graphics::UniformBlockInfo uboInfo;
+    graphicsReflection.GetUniformBlock(i, uboInfo);
+    bool standaloneUniformBlock = (i == 0);
+
+    auto     blockSize        = graphicsReflection.GetUniformBlockSize(i);
+    uint32_t blockAlignment   = uniformBufferManager.GetUniformBlockAlignment(standaloneUniformBlock);
+    auto     alignedBlockSize = AlignSize(blockSize, blockAlignment);
+
+    mUniformBlockMemoryRequirements.blockSize[i]        = blockSize;
+    mUniformBlockMemoryRequirements.blockSizeAligned[i] = alignedBlockSize;
+
+    mUniformBlockMemoryRequirements.totalSizeRequired += alignedBlockSize;
+    mUniformBlockMemoryRequirements.totalCpuSizeRequired += (standaloneUniformBlock) ? alignedBlockSize : 0;
+    mUniformBlockMemoryRequirements.totalGpuSizeRequired += (standaloneUniformBlock) ? 0 : alignedBlockSize;
   }
 }
 
-void Program::SetGraphicsProgram(Graphics::UniquePtr<Graphics::Program>&& program)
+void Program::SetGraphicsProgram(Graphics::UniquePtr<Graphics::Program>&& program, Render::UniformBufferManager& uniformBufferManager)
 {
   mGfxProgram = std::move(program);
-  BuildReflection(mGfxController.GetProgramReflection(*mGfxProgram.get()));
+  BuildReflection(mGfxController.GetProgramReflection(*mGfxProgram.get()), uniformBufferManager);
 }
 
 bool Program::GetUniform(const std::string_view& name, Hash hashedName, Hash hashedNameNoArray, Graphics::UniformInfo& out) const

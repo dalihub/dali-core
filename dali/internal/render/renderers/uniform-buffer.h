@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_UNIFORM_BUFFER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,164 +36,87 @@ namespace Dali::Internal::Render
  * From the client side, the UBO memory is continuous and individual
  * Graphics::Buffer objects are not visible.
  */
-class UniformBuffer
+class UniformBufferV2
 {
-  friend class UniformBufferManager;
-  friend class UniformBufferView;
-  friend class UniformBufferViewPool;
-
-private:
-  /**
-   * Constructor of UniformBuffer
-   *
-   * @param[in] mController Pointer of the graphics controller
-   * @param[in] sizeInBytes initial size of allocated buffer
-   * @param[in] alignment memory alignment in bytes
-   * @param[in] usageFlags type of usage ( Graphics::BufferUsage )
-   * @param[in] propertiesFlags buffer properties (Gracphis::BufferPropertiesFlags)
-   */
-  UniformBuffer(Dali::Graphics::Controller*     mController,
-                uint32_t                        sizeInBytes,
-                uint32_t                        alignment,
-                Graphics::BufferUsageFlags      usageFlags,
-                Graphics::BufferPropertiesFlags propertiesFlags);
-
 public:
   /**
-   * Destructor of UniformBuffer
+   * factory constructor method.
+   * @param[in] mController Pointer to the graphics controller
+   * @param[in] emulated True if this buffer is for standalone uniforms,
+   *            false if for uniform blocks
+   * @param[in] alignment The block alignment to use
    */
-  ~UniformBuffer();
+  static Graphics::UniquePtr<UniformBufferV2> New(Dali::Graphics::Controller* mController, bool emulated, uint32_t alignment);
 
   /**
-   * @brief Writes data into the buffer
-   * @note We prefer to call ReadyToLockUniformBuffer before call Write API.
-   * And also, prefer to call UnlockUniformBuffer if current frame's all Write API action done.
-   *
-   * @param[in] data pointer to the source data
-   * @param[in] size size of source data
-   * @param[in] offset destination offset
+   * Create the memory backing this buffer and map it.
    */
+  void ReSpecify(uint32_t sizeInBytes);
+
   void Write(const void* data, uint32_t size, uint32_t offset);
 
-  /**
-   * @brief Flushes whole buffer range
-   *
-   * @param[in] bufferIndex Index of Graphics::Buffer
-   */
-  void Flush(uint32_t bufferIndex = 0);
+  void Map();
+
+  void Unmap();
+
+  void Flush(); // We aren't guaranteeing creation with this call.
+
+  void Rollback();
 
   /**
-   * @brief Returns allocated ( requested ) size
-   * @return size of buffer
+   * Align size to the current block size
    */
-  [[nodiscard]] uint32_t GetSize() const
-  {
-    return mSize;
-  }
+  uint32_t AlignSize(uint32_t size);
 
-  /**
-   * @brief Return Graphics::Buffer object at specified array index
-   *
-   * @param[in] bufferIndex index of Graphics buffer
-   *
-   * @return pointer to the buffer object
-   */
-  [[nodiscard]] Dali::Graphics::Buffer* GetBuffer(uint32_t bufferIndex) const
-  {
-    return mBuffers[bufferIndex].buffer.get();
-  }
+  uint32_t IncrementOffsetBy(uint32_t value);
 
-  /**
-   * @brief Maps individual Graphics buffer memory
-   *
-   * @param[in] bufferIndex index of Graphics buffer
-   */
-  void Map(uint32_t bufferIndex = 0);
+  bool MemoryCompare(void* data, uint32_t offset, uint32_t size);
 
-  /**
-   * Unmaps individual Graphics buffer memory
-   *
-   * @param[in] bufferIndex index of Graphics buffer
-   */
-  void Unmap(uint32_t bufferIndex = 0);
+  [[nodiscard]] uint32_t GetBlockAlignment() const;
 
-  /**
-   * @brief Resizes the buffer
-   *
-   * The resize strategy depends on 'invalidate' parameter.
-   *
-   * If 'invalidate' is true, all the content if the buffer
-   * is discarded, the individual Graphics::Buffers are deleted
-   * and a single Graphics::Buffer is allocated.
-   *
-   * If 'invalidate' is false, additional Graphics::Buffer
-   * is created and all recorded content is kept unchanged.
-   *
-   * @param[in] newSize new size of UniformBuffer
-   * @param[in] invalidate specifies whether the content should be discarded
-   *
-   */
-  void Resize(uint32_t newSize, bool invalidate);
+  [[nodiscard]] uint32_t GetCurrentOffset() const;
 
-  /**
-   * @copydoc Dali::Internal::Render::UniformBufferViewPool::ReadyToLockUniformBuffer
-   */
-  void ReadyToLockUniformBuffer();
+  [[nodiscard]] uint32_t GetCurrentCapacity() const;
 
-  /**
-   * @copydoc Dali::Internal::Render::UniformBufferViewPool::UnlockUniformBuffer
-   */
-  void UnlockUniformBuffer();
+  [[nodiscard]] Dali::Graphics::Buffer* GetGraphicsBuffer() const;
 
 private:
-  /**
-   * @brief GfxBuffer wraps single GPU buffer and encapsulates individual
-   * buffer mapping and create info details.
-   *
-   * The array of GfxBuffers makes a single UniformBuffer.
-   */
+  UniformBufferV2(Dali::Graphics::Controller* controller, bool emulated, uint32_t alignment);
+
+  void ReSpecifyCPU(uint32_t sizeInBytes);
+
+  void ReSpecifyGPU(uint32_t sizeInBytes);
+
+  void WriteCPU(const void* data, uint32_t size, uint32_t offset);
+
+  void WriteGPU(const void* data, uint32_t size, uint32_t offset);
+
+  void MapCPU();
+
+  void MapGPU();
+
+  void UnmapCPU();
+
+  void UnmapGPU();
+
+private:
+  Graphics::Controller* mController{nullptr};
+
+  uint32_t mBlockAlignment{0u};
+
   struct GfxBuffer
   {
-    GfxBuffer()            = default;
-    ~GfxBuffer()           = default;
-    GfxBuffer(GfxBuffer&&) = default;
-    GfxBuffer(Graphics::UniquePtr<Graphics::Buffer>&& b, const Graphics::BufferCreateInfo& i)
-    : buffer(std::move(b)),
-      createInfo(i)
-    {
-    }
-
-    Graphics::UniquePtr<Graphics::Buffer> buffer{};          ///< Graphics buffer
-    Graphics::UniquePtr<Graphics::Memory> memory{};          ///< Mapped memory associated with buffer
-    Graphics::BufferCreateInfo            createInfo{};      ///< create info describing the buffer
-    void*                                 mappedPtr{};       ///< Mapped pointer (if mapped)
-    bool                                  needsUpdate{true}; ///< Indicates whether the buffer needs flushing the queue
+    Graphics::UniquePtr<Graphics::Buffer> graphicsBuffer;
+    Graphics::UniquePtr<Graphics::Memory> graphicsMemory;
+    uint32_t                              capacity;
+    uint32_t                              currentOffset;
   };
 
-  /**
-   * @brief Returns GfxBuffer object by offset
-   *
-   * The memory of UniformBuffer is considered to be continuous, however,
-   * it may contain multiple graphics buffers.
-   *
-   */
-  const GfxBuffer* GetBufferByOffset(uint32_t offset, uint32_t* newOffset, uint32_t* bufferIndex) const;
-
-  std::vector<GfxBuffer> mBuffers; ///< List of GfxBuffer objects
-
-  Dali::Graphics::Controller* mController; ///< Pointer to the controller
-
-  uint32_t mSize;         ///< Current size of buffer
-  uint32_t mAlignment{0}; ///< Buffer alignment
-
-  Graphics::BufferUsageFlags      mUsageFlags;
-  Graphics::BufferPropertiesFlags mPropertiesFlags;
-
-  uint32_t mLockedBufferIndex;   ///< Current locked buffer region index.
-  uint8_t* mLockedPtr;           ///< Current locked buffer pointer.
-  bool     mReadyToBeLocked : 1; ///< True if current uniform buffer is ready to be locked.
+  // List of buffers, in case of CPU one buffer will be sufficient
+  std::vector<GfxBuffer> mBufferList;
+  void*                  mMappedPtr{nullptr};
+  uint32_t               mCurrentGraphicsBufferIndex{0u};
+  bool                   mEmulated;
 };
-
 } // namespace Dali::Internal::Render
-
 #endif //DALI_INTERNAL_UNIFORM_BUFFER_H
