@@ -194,7 +194,7 @@ uint32_t UniformBufferManager::GetUniformBlockAlignment(bool emulated)
 
 UniformBufferManager::UBOSet* UniformBufferManager::GetUBOSetForScene(SceneGraph::Scene* scene)
 {
-  if(mCurrentScene == scene && mCurrentScene == scene)
+  if(mCurrentScene == scene)
   {
     return mCurrentUBOSet;
   }
