@@ -203,7 +203,6 @@ struct RenderManager::Impl
   Integration::PartialUpdateAvailable partialUpdateAvailable; ///< Whether the partial update is available
 
   std::unique_ptr<Dali::ThreadPool> threadPool;        ///< The thread pool
-  Vector<Graphics::Texture*>        boundTextures;     ///< The textures bound for rendering
   Vector<Render::TextureKey>        updatedTextures{}; ///< The updated texture list
 
   uint32_t    frameCount{0u};                                                    ///< The current frame count
@@ -1050,15 +1049,11 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
                                     float(viewportRect.width),
                                     float(viewportRect.height)});
 
-    // Clear the list of bound textures
-    mImpl->boundTextures.Clear();
-
     mImpl->renderAlgorithms.ProcessRenderInstruction(
       instruction,
       mImpl->renderBufferIndex,
       depthBufferAvailable,
       stencilBufferAvailable,
-      mImpl->boundTextures,
       viewportRect,
       clippingRect,
       surfaceOrientation,

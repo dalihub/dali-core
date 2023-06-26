@@ -1426,7 +1426,7 @@ int utcDaliTexturePartialUpdate01(void)
 
   uint32_t   width(4);
   uint32_t   height(4);
-  Texture    texture    = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  Texture    texture    = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
   TextureSet textureSet = TextureSet::New();
   textureSet.SetTexture(0u, texture);
   renderer.SetTextures(textureSet);
@@ -1513,8 +1513,8 @@ int utcDaliTexturePartialUpdate02(void)
 
   uint32_t   width(4);
   uint32_t   height(4);
-  Texture    texture1   = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
-  Texture    texture2   = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  Texture    texture1   = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  Texture    texture2   = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
   TextureSet textureSet = TextureSet::New();
   textureSet.SetTexture(0u, texture1);
   renderer.SetTextures(textureSet);

@@ -88,7 +88,7 @@ int UtcDaliCorePipelineCacheTest(void)
   Geometry   geometry   = CreateQuadGeometry();
   Shader     shader     = Shader::New("vertexSrc", "fragmentSrc");
   TextureSet textureSet = TextureSet::New();
-  Texture    image      = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 50, 50);
+  Texture    image      = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 50, 50);
 
   textureSet.SetTexture(0u, image);
   Renderer renderer = Renderer::New(geometry, shader);

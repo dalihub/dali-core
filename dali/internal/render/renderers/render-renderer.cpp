@@ -280,7 +280,7 @@ void Renderer::SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, 
   mDrawCommands.insert(mDrawCommands.end(), pDrawCommands, pDrawCommands + size);
 }
 
-void Renderer::BindTextures(Graphics::CommandBuffer& commandBuffer, Vector<Graphics::Texture*>& boundTextures)
+bool Renderer::BindTextures(Graphics::CommandBuffer& commandBuffer)
 {
   uint32_t textureUnit = 0;
 
@@ -307,11 +307,15 @@ void Renderer::BindTextures(Graphics::CommandBuffer& commandBuffer, Vector<Graph
                                                                               : nullptr)
                                                             : nullptr;
 
-        boundTextures.PushBack(graphicsTexture);
         const Graphics::TextureBinding textureBinding{graphicsTexture, graphicsSampler, textureUnit};
         textureBindings.push_back(textureBinding);
 
         ++textureUnit;
+      }
+      else
+      {
+        // Texture is not prepared yet. We should not render now.
+        return false;
       }
     }
   }
@@ -320,6 +324,8 @@ void Renderer::BindTextures(Graphics::CommandBuffer& commandBuffer, Vector<Graph
   {
     commandBuffer.BindTextures(textureBindings);
   }
+
+  return true;
 }
 
 void Renderer::SetFaceCullingMode(FaceCullingMode::Type mode)
@@ -543,7 +549,6 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
                       const Matrix&                                        projectionMatrix,
                       const Vector3&                                       size,
                       bool                                                 blend,
-                      Vector<Graphics::Texture*>&                          boundTextures,
                       const Dali::Internal::SceneGraph::RenderInstruction& instruction,
                       uint32_t                                             queueIndex)
 {
@@ -626,6 +631,12 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
 
   bool drawn = false;
 
+  // Check all textures are prepared first.
+  if(!BindTextures(commandBuffer))
+  {
+    return drawn;
+  }
+
   // We should have a shader here (as only RenderCallback has no shader, and that's been early out)
   Program* program = PrepareProgram(instruction);
   if(program)
@@ -634,7 +645,6 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
     auto& pipeline = PrepareGraphicsPipeline(*program, instruction, node, blend);
 
     commandBuffer.BindPipeline(pipeline);
-    BindTextures(commandBuffer, boundTextures);
 
     if(queueIndex == 0)
     {

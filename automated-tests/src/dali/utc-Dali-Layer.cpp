@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -703,7 +703,7 @@ int UtcDaliLayerClippingGLCalls(void)
   layer.SetProperty(Layer::Property::CLIPPING_BOX, testBox);
 
   // Add at least one renderable actor so the GL calls are actually made
-  Texture img   = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1);
+  Texture img   = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1);
   Actor   actor = CreateRenderableActor(img);
   scene.Add(actor);
 
@@ -731,7 +731,7 @@ int UtcDaliLayerBehaviour(void)
 
 Actor CreateActor(bool withAlpha)
 {
-  Texture texture = Texture::New(TextureType::TEXTURE_2D, withAlpha ? Pixel::Format::RGBA8888 : Pixel::Format::RGB888, 1u, 1u);
+  Texture texture = CreateTexture(TextureType::TEXTURE_2D, withAlpha ? Pixel::Format::RGBA8888 : Pixel::Format::RGB888, 1u, 1u);
 
   Actor actor = CreateRenderableActor(texture);
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);

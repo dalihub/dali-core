@@ -405,7 +405,6 @@ public:
    * @param[in] projectionMatrix The projection matrix.
    * @param[in] size Size of the render item
    * @param[in] blend If true, blending is enabled
-   * @param[in] boundTextures The textures bound for rendering
    * @param[in] instruction. for use case like reflection where CullFace needs to be adjusted
    *
    * @return True if commands have been added to the command buffer
@@ -419,7 +418,6 @@ public:
               const Matrix&                                        projectionMatrix,
               const Vector3&                                       size,
               bool                                                 blend,
-              Vector<Graphics::Texture*>&                          boundTextures,
               const Dali::Internal::SceneGraph::RenderInstruction& instruction,
               uint32_t                                             queueIndex);
 
@@ -557,9 +555,10 @@ private:
   /**
    * Bind the textures and setup the samplers
    * @param[in] commandBuffer The command buffer to record binding into
-   * @param[in] boundTextures The textures bound for rendering
+   *
+   * @return True if all textures are bounded successfully. False otherwise.
    */
-  void BindTextures(Graphics::CommandBuffer& commandBuffer, Vector<Graphics::Texture*>& boundTextures);
+  bool BindTextures(Graphics::CommandBuffer& commandBuffer);
 
   /**
    * Prepare a pipeline for this renderer.

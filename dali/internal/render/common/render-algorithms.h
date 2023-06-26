@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_ALGORITHMS_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,7 +57,6 @@ public:
    * @param[in] bufferIndex            The current render buffer index (previous update buffer)
    * @param[in] depthBufferAvailable   Whether the depth buffer is available
    * @param[in] stencilBufferAvailable Whether the stencil buffer is available
-   * @param[in] boundTextures          The textures bound for rendering
    * @param[in] viewport               The viewport for drawing
    * @param[in] rootClippingRect       The clipping rectangle
    * @param[in] orientation            The Scene's surface orientation.
@@ -67,7 +66,6 @@ public:
                                 BufferIndex                          bufferIndex,
                                 Integration::DepthBufferAvailable    depthBufferAvailable,
                                 Integration::StencilBufferAvailable  stencilBufferAvailable,
-                                Vector<Graphics::Texture*>&          boundTextures,
                                 const Rect<int32_t>&                 viewport,
                                 const Rect<int>&                     rootClippingRect,
                                 int                                  orientation,
@@ -123,7 +121,7 @@ private:
     const Dali::Internal::SceneGraph::RenderItem&        item,
     Graphics::CommandBuffer&                             commandBuffer,
     const Dali::Internal::SceneGraph::RenderInstruction& instruction,
-    int orientation);
+    int                                                  orientation);
 
   /**
    * @brief Set up the clipping based on the specified clipping settings.
@@ -153,7 +151,6 @@ private:
    * @param[in] projectionMatrix       The projection matrix from the appropriate camera.
    * @param[in] depthBufferAvailable   Whether the depth buffer is available
    * @param[in] stencilBufferAvailable Whether the stencil buffer is available
-   * @param[in] boundTextures          The textures bound for rendering
    * @param[in] viewport               The Viewport
    * @param[in] rootClippingRect       The root clipping rectangle
    * @param[in] orientation            The Scene's surface orientation
@@ -165,7 +162,6 @@ private:
                                 const Matrix&                                        projectionMatrix,
                                 Integration::DepthBufferAvailable                    depthBufferAvailable,
                                 Integration::StencilBufferAvailable                  stencilBufferAvailable,
-                                Vector<Graphics::Texture*>&                          boundTextures,
                                 const Dali::Internal::SceneGraph::RenderInstruction& instruction, // in the case of reflection, things like CullFace need to be adjusted for reflection world
                                 const Rect<int32_t>&                                 viewport,
                                 const Rect<int>&                                     rootClippingRect,
