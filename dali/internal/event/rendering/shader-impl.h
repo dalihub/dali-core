@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SHADER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,9 @@
 #include <dali/internal/event/common/object-impl.h>      // Dali::Internal::Object
 #include <dali/public-api/common/dali-common.h>          // DALI_ASSERT_ALWAYS
 #include <dali/public-api/common/intrusive-ptr.h>        // Dali::IntrusivePtr
+#include <dali/public-api/common/vector-wrapper.h>       // std::vector<>
 #include <dali/public-api/rendering/shader.h>            // Dali::Shader
+#include <dali/public-api/rendering/uniform-block.h>     // Dali::UniformBlock
 
 namespace Dali
 {
@@ -34,24 +36,26 @@ namespace SceneGraph
 {
 class Shader;
 }
-
 class Shader;
+class UniformBlock;
+
 using ShaderPtr = IntrusivePtr<Shader>;
 
 /**
  * Shader is an object that contains an array of structures of values that
  * can be accessed as properties.
  */
-class Shader : public Object
+class Shader : public Object, public Object::Observer
 {
 public:
   /**
    * @copydoc Dali::Shader::New()
    */
-  static ShaderPtr New(std::string_view          vertexShader,
-                       std::string_view          fragmentShader,
-                       Dali::Shader::Hint::Value hints,
-                       std::string_view          shaderName);
+  static ShaderPtr New(std::string_view                vertexShader,
+                       std::string_view                fragmentShader,
+                       Dali::Shader::Hint::Value       hints,
+                       std::string_view                shaderName,
+                       std::vector<Dali::UniformBlock> uniformBlocks);
 
   /**
    * @copydoc Dali::Shader::New()
@@ -106,6 +110,43 @@ private: // implementation
    * @param[in] shaderMap shader property map.
    */
   void SetShaderProperty(const Dali::Property::Value& shaderMap);
+
+public:
+  /**
+   * @brief Connects to the uniform block.
+   *
+   * @param[in] uniformBlock The uniform block to connect.
+   * @param[in] programCacheCleanRequired Whether program cache clean is required or not.
+   * Could be false only if the shader never be rendered before. (e.g. shader constructor.)
+   */
+  void ConnectUniformBlock(UniformBlock& uniformBlock, bool programCacheCleanRequired = true);
+
+  /**
+   * @brief Disconnects to the uniform block.
+   *
+   * @param[in] uniformBlock The uniform block to connect.
+   */
+  void DisconnectUniformBlock(UniformBlock& uniformBlock);
+
+protected: ///< From Dali::Internal::Object::Observer
+  /**
+   * @copydoc Dali::Internal::Object::Observer::SceneObjectAdded()
+   */
+  void SceneObjectAdded(Object& object) override
+  {
+    // Do nothing
+  }
+  /**
+   * @copydoc Dali::Internal::Object::Observer::SceneObjectRemoved()
+   */
+  void SceneObjectRemoved(Object& object) override
+  {
+    // Do nothing
+  }
+  /**
+   * @copydoc Dali::Internal::Object::Observer::ObjectDestroyed()
+   */
+  void ObjectDestroyed(Object& object) override;
 
 protected:
   /**

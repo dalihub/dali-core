@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_VISUAL_RENDERER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,6 +84,12 @@ public: // Default property extensions from Object
    */
   const PropertyInputImpl* GetSceneObjectInputProperty(Property::Index index) const override;
 
+public:
+  /**
+   * @copydoc Dali::VisualRenderer::RegisterVisualTransformUniform()
+   */
+  void RegisterVisualTransformUniform();
+
 protected: // implementation
   /**
    * @brief Constructor.
@@ -99,11 +105,6 @@ protected: // implementation
    * @return True if value set, false otherwise.
    */
   bool GetCurrentPropertyValue(Property::Index index, Property::Value& value) const;
-
-  /**
-   * @brief Ensure that properties are mapped to uniforms
-   */
-  void AddUniformMappings();
 
 protected:
   /**
@@ -129,6 +130,8 @@ public:
 
 private:
   VisualPropertyCache mPropertyCache;
+
+  bool mUniformMapped : 1;
 };
 
 } // namespace Internal

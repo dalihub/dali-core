@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_DATA_PROVIDER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@
  *
  */
 
+// INTERNAL INCLUDES
+#include <dali/internal/common/hash-utils.h>
 #include <dali/internal/render/data-providers/uniform-map-data-provider.h>
 #include <dali/internal/render/renderers/render-texture-key.h>
 #include <dali/public-api/common/dali-vector.h>
@@ -32,6 +34,7 @@ namespace Render
 {
 class Texture;
 class Sampler;
+class UniformBlock;
 } // namespace Render
 
 namespace SceneGraph

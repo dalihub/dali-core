@@ -52,6 +52,7 @@
 
 #include <dali/internal/render/common/render-manager.h>
 #include <dali/internal/render/queue/render-queue.h>
+#include <dali/internal/render/renderers/render-uniform-block.h>
 #include <dali/internal/render/renderers/render-vertex-buffer.h>
 
 // Un-comment to enable node tree debug logging
@@ -113,6 +114,7 @@ enum ContainerRemovedFlagBits
   ANIMATION             = 0x10,
   PROPERTY_NOTIFICATION = 0x20,
   CUSTOM_OBJECT         = 0x40,
+  UNIFORM_BLOCKS        = 0x80,
 };
 
 /**
@@ -217,6 +219,7 @@ struct UpdateManager::Impl
     renderers(),
     textureSets(),
     shaders(),
+    uniformBlocks(),
     panGestureProcessor(nullptr),
     messageQueue(renderController, sceneGraphBuffers),
     frameCallbackProcessor(nullptr),
@@ -280,6 +283,7 @@ struct UpdateManager::Impl
     // Ensure to clear renderers
     renderers.Clear();
     shaders.Clear();
+    uniformBlocks.Clear();
   }
 
   /**
@@ -369,11 +373,13 @@ struct UpdateManager::Impl
   OwnerKeyContainer<Renderer>           renderers;             ///< A container of owned renderers
   OwnerContainer<TextureSet*>           textureSets;           ///< A container of owned texture sets
   OwnerContainer<Shader*>               shaders;               ///< A container of owned shaders
+  OwnerContainer<Render::UniformBlock*> uniformBlocks;         ///< A container of owned uniformBlocks
 
-  DiscardQueue<Node*, OwnerContainer<Node*>>                         nodeDiscardQueue; ///< Nodes are added here when disconnected from the scene-graph.
-  DiscardQueue<Shader*, OwnerContainer<Shader*>>                     shaderDiscardQueue;
-  DiscardQueue<MemoryPoolKey<Renderer>, OwnerKeyContainer<Renderer>> rendererDiscardQueue;
-  DiscardQueue<Scene*, OwnerContainer<Scene*>>                       sceneDiscardQueue;
+  DiscardQueue<Node*, OwnerContainer<Node*>>                                 nodeDiscardQueue; ///< Nodes are added here when disconnected from the scene-graph.
+  DiscardQueue<Shader*, OwnerContainer<Shader*>>                             shaderDiscardQueue;
+  DiscardQueue<Render::UniformBlock*, OwnerContainer<Render::UniformBlock*>> uniformBlockDiscardQueue;
+  DiscardQueue<MemoryPoolKey<Renderer>, OwnerKeyContainer<Renderer>>         rendererDiscardQueue;
+  DiscardQueue<Scene*, OwnerContainer<Scene*>>                               sceneDiscardQueue;
 
   CompleteNotificationInterface::ParameterList notifyRequiredAnimations; ///< A temperal container of complete notify required animations, like animation finished, stopped, or loop completed.
 
@@ -874,6 +880,19 @@ void UpdateManager::RemoveTextureSet(TextureSet* textureSet)
 #endif
 }
 
+void UpdateManager::AddUniformBlock(OwnerPointer<Render::UniformBlock>& uniformBlock)
+{
+  mImpl->uniformBlocks.PushBack(uniformBlock.Release());
+}
+
+void UpdateManager::RemoveUniformBlock(Render::UniformBlock* uniformBlock)
+{
+  EraseUsingDiscardQueue(mImpl->uniformBlocks, uniformBlock, mImpl->uniformBlockDiscardQueue, mSceneGraphBuffers.GetUpdateBufferIndex());
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+  mImpl->containerRemovedFlags |= ContainerRemovedFlagBits::UNIFORM_BLOCKS;
+#endif
+}
+
 uint32_t* UpdateManager::ReserveMessageSlot(uint32_t size, bool updateScene)
 {
   return mImpl->messageQueue.ReserveMessageSlot(size, updateScene);
@@ -1080,6 +1099,14 @@ void UpdateManager::ConstrainShaders(PropertyOwnerContainer& postPropertyOwners,
       postPropertyOwners.PushBack(shader);
     }
   }
+  for(auto&& uniformBlock : mImpl->uniformBlocks)
+  {
+    ConstrainPropertyOwner(*uniformBlock, bufferIndex);
+    if(!uniformBlock->GetPostConstraints().Empty())
+    {
+      postPropertyOwners.PushBack(uniformBlock);
+    }
+  }
 }
 
 void UpdateManager::ProcessPropertyNotifications(BufferIndex bufferIndex)
@@ -1271,7 +1298,7 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
 
     // Apply constraints to RenderTasks, shaders
     ConstrainRenderTasks(postPropertyOwners, bufferIndex);
-    ConstrainShaders(postPropertyOwners, bufferIndex);
+    ConstrainShaders(postPropertyOwners, bufferIndex); // shaders & uniform blocks
 
     // Update renderers and apply constraints
     UpdateRenderers(postPropertyOwners, bufferIndex);
@@ -1437,6 +1464,10 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
   {
     mImpl->customObjects.ShrinkToFitIfNeeded();
   }
+  if(mImpl->containerRemovedFlags & ContainerRemovedFlagBits::UNIFORM_BLOCKS)
+  {
+    mImpl->uniformBlocks.ShrinkToFitIfNeeded();
+  }
 
   // Reset flag
   mImpl->containerRemovedFlags = ContainerRemovedFlagBits::NOTHING;
@@ -1542,6 +1573,18 @@ void UpdateManager::SetRenderingBehavior(DevelStage::Rendering renderingBehavior
 void UpdateManager::RequestRendering()
 {
   mImpl->renderingRequired = true;
+}
+
+void UpdateManager::RequestClearProgramCache()
+{
+  // Message has ownership of format while in transit from update -> render
+  using DerivedType = Message<RenderManager>;
+
+  // Reserve some memory inside the render queue
+  uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot(mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof(DerivedType));
+
+  // Construct message in the render queue memory; note that delete should not be called on the return value
+  new(slot) DerivedType(&mImpl->renderManager, &RenderManager::ClearProgramCache);
 }
 
 Node* UpdateManager::GetNodePointerById(uint32_t nodeId) const

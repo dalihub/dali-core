@@ -39,11 +39,13 @@
 #include <dali/internal/render/common/render-debug.h>
 #include <dali/internal/render/common/render-instruction.h>
 #include <dali/internal/render/common/render-tracker.h>
+#include <dali/internal/render/common/shared-uniform-buffer-view-container.h>
 #include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/renderers/pipeline-cache.h>
 #include <dali/internal/render/renderers/render-frame-buffer.h>
 #include <dali/internal/render/renderers/render-texture.h>
 #include <dali/internal/render/renderers/uniform-buffer-manager.h>
+#include <dali/internal/render/renderers/uniform-buffer-view.h>
 #include <dali/internal/render/renderers/uniform-buffer.h>
 #include <dali/internal/render/shaders/program-controller.h>
 
@@ -199,6 +201,15 @@ struct RenderManager::Impl
     mRenderTrackers.EraseObject(renderTracker);
   }
 
+  void ClearProgramCache()
+  {
+    DALI_LOG_RELEASE_INFO("Clear ProgramCache! program : [%u]\n", programController.GetCachedProgramCount());
+    programController.ClearCache();
+
+    // Reset incremental cache cleanup.
+    programCacheCleanRequestedFrame = 0u;
+  }
+
   void UpdateTrackers()
   {
     for(auto&& iter : mRenderTrackers)
@@ -315,6 +326,8 @@ struct RenderManager::Impl
   std::unique_ptr<Render::UniformBufferManager> uniformBufferManager; ///< The uniform buffer manager
   std::unique_ptr<Render::PipelineCache>        pipelineCache;
 
+  SharedUniformBufferViewContainer sharedUniformBufferViewContainer; ///< Shared Uniform Buffer Views
+
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
   ContainerRemovedFlags containerRemovedFlags; ///< cumulative container removed flags during current frame
 #endif
@@ -399,7 +412,7 @@ void RenderManager::SetShaderSaver(ShaderSaver& upstream)
 void RenderManager::AddRenderer(const Render::RendererKey& renderer)
 {
   // Initialize the renderer as we are now in render thread
-  renderer->Initialize(mImpl->graphicsController, mImpl->programController, *(mImpl->uniformBufferManager.get()), *(mImpl->pipelineCache.get()));
+  renderer->Initialize(mImpl->graphicsController, mImpl->programController, *(mImpl->uniformBufferManager.get()), *(mImpl->pipelineCache.get()), mImpl->sharedUniformBufferViewContainer);
 
   mImpl->rendererContainer.PushBack(renderer);
 }
@@ -634,6 +647,11 @@ void RenderManager::AddRenderTracker(Render::RenderTracker* renderTracker)
 void RenderManager::RemoveRenderTracker(Render::RenderTracker* renderTracker)
 {
   mImpl->RemoveRenderTracker(renderTracker);
+}
+
+void RenderManager::ClearProgramCache()
+{
+  mImpl->ClearProgramCache();
 }
 
 void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear)
@@ -1056,9 +1074,25 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
               // collect how many programs we use in this frame
               auto key = &program->GetGraphicsProgram();
               auto it  = programUsageCount.find(key);
+
               if(it == programUsageCount.end())
               {
                 programUsageCount[key] = Graphics::ProgramResourceBindingInfo{.program = key, .count = 1};
+
+                if(memoryRequirements.sharedGpuSizeRequired > 0u)
+                {
+                  totalSizeGPU += memoryRequirements.sharedGpuSizeRequired; ///< Add it only 1 times.
+
+                  // TODO : Prepare to create UBOView for each UBO Blocks.
+                  for(uint32_t i = 1u; i < memoryRequirements.sharedBlock.size(); ++i)
+                  {
+                    auto* uniformBlock = memoryRequirements.sharedBlock[i];
+                    if(uniformBlock)
+                    {
+                      mImpl->sharedUniformBufferViewContainer.RegisterSharedUniformBlockAndPrograms(*program, *uniformBlock, memoryRequirements.blockSize[i]);
+                    }
+                  }
+                }
               }
               else
               {
@@ -1133,6 +1167,9 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "GPU buffer: nil\n");
   }
 #endif
+
+  // Create UniformBufferView and Write shared UBO value here.
+  mImpl->sharedUniformBufferViewContainer.Initialize(mImpl->renderBufferIndex, *uboManager);
 
   if(renderToFbo)
   {
@@ -1385,6 +1422,9 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     mImpl->graphicsController.PresentRenderTarget(renderTarget);
     DALI_TRACE_END(gTraceFilter, "DALI_RENDER_FINISHED");
   }
+
+  // RollBack Shared UBO view list to avoid leak.
+  mImpl->sharedUniformBufferViewContainer.Finalize();
 }
 
 void RenderManager::ClearScene(Integration::Scene scene)

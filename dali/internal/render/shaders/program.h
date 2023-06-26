@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PROGRAM_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <cstdint> // int32_t, uint32_t
+#include <memory>
 #include <string>
 #include <unordered_map>
 
@@ -28,6 +29,8 @@
 #include <dali/internal/common/shader-data.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/ref-object.h>
+
+#include <dali/internal/render/shaders/render-shader.h>
 
 namespace Dali
 {
@@ -46,7 +49,9 @@ class ProgramCache;
 
 namespace Render
 {
+class UniformBlock;
 class UniformBufferManager;
+class UniformBufferView;
 } // namespace Render
 
 /**
@@ -101,10 +106,11 @@ public:
    * @param[in] shaderData  A pointer to a data structure containing the program source
    *                        and optionally precompiled binary. If the binary is empty the program bytecode
    *                        is copied into it after compilation and linking)
-   * @param[in]  gfxController Reference to valid graphics Controller object
+   * @param[in] sharedUniformNamesHash Hash value for list of shared uniform buffers.
+   * @param[in] gfxController Reference to valid graphics Controller object
    * @return pointer to the program
    */
-  static Program* New(ProgramCache& cache, const Internal::ShaderDataPtr& shaderData, Graphics::Controller& gfxController);
+  static Program* New(ProgramCache& cache, const Internal::ShaderDataPtr& shaderData, std::size_t sharedUniformNamesHash, Graphics::Controller& gfxController);
 
   Internal::ShaderDataPtr GetShaderData()
   {
@@ -124,7 +130,7 @@ public:
   /**
    * Setup the actual program, and ensure that it's reflection is generated.
    */
-  void SetGraphicsProgram(Graphics::UniquePtr<Graphics::Program>&& program, Render::UniformBufferManager& uniformBufferManager);
+  void SetGraphicsProgram(Graphics::UniquePtr<Graphics::Program>&& program, Render::UniformBufferManager& uniformBufferManager, const SceneGraph::Shader::UniformBlockContainer& sharedUniformBlockContainer);
 
   /**
    * Retrieves uniform data.
@@ -221,22 +227,27 @@ public:
    * Build optimized shader reflection of uniforms
    * @param graphicsReflection The graphics reflection
    */
-  void BuildReflection(const Graphics::Reflection& graphicsReflection, Render::UniformBufferManager& uniformBufferManager);
+  void BuildRequirements(const Graphics::Reflection& graphicsReflection, Render::UniformBufferManager& uniformBufferManager, const SceneGraph::Shader::UniformBlockContainer& sharedUniformBlockContainer);
 
   /**
    * Struct UniformBlockMemoryRequirements
-   * Contains details of a uniform blocks memory requirements
+   * Contains details of the memory requirements for a RenderItem
    */
   struct UniformBlockMemoryRequirements
   {
     uint32_t blockCount{0u};
+
+    // Ignores explictly allocated blocks
     uint32_t totalSizeRequired{0u};
     uint32_t totalCpuSizeRequired{0u}; ///< requirements for CPU memory
-    uint32_t totalGpuSizeRequired{0u}; ///< requirements of hardware buffer
+    uint32_t totalGpuSizeRequired{0u}; ///< requirements of hardware buffer for RenderItem
+
+    uint32_t sharedGpuSizeRequired{0u}; ///< requirements of explicitly allocated blocks
 
     // Per block
-    std::vector<uint32_t> blockSize{};
-    std::vector<uint32_t> blockSizeAligned{};
+    std::vector<uint32_t>              blockSize{};
+    std::vector<uint32_t>              blockSizeAligned{};
+    std::vector<Render::UniformBlock*> sharedBlock{};
   };
   /**
    * Retrieves uniform blocks requirements

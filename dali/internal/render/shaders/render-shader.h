@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <unordered_map>
+
 // INTERNAL INCLUDES
 #include <dali/internal/common/shader-data.h>
 #include <dali/internal/event/common/event-thread-services.h>
@@ -28,6 +31,11 @@ namespace Dali
 namespace Internal
 {
 class Program;
+
+namespace Render
+{
+class UniformBlock;
+}
 
 namespace SceneGraph
 {
@@ -49,6 +57,8 @@ class SceneController;
 class Shader : public PropertyOwner
 {
 public:
+  using UniformBlockContainer = std::unordered_map<size_t, Render::UniformBlock*>;
+
   Shader() = default;
 
   /**
@@ -68,9 +78,35 @@ public:
    */
   [[nodiscard]] const ShaderDataPtr& GetShaderData(uint32_t renderPassTag) const;
 
+  /**
+   * @brief Connect uniform blocks.
+   * @param[in] uniformBlock Uniform block to be connected.
+   */
+  void ConnectUniformBlock(Render::UniformBlock* uniformBlock);
+
+  /**
+   * @brief Connect uniform blocks.
+   * @param[in] uniformBlock Uniform block to be disconnected.
+   */
+  void DisconnectUniformBlock(Render::UniformBlock* uniformBlock);
+
+  /**
+   * @brief Get the set of connected uniform blocks.
+   * @return The set of connected uniform blocks.
+   */
+  const UniformBlockContainer& GetConnectedUniformBlocks() const;
+
+  /**
+   * @brief Get the hash value of connected uniform blocks name.
+   * @return Hash value of all connected uniform blocks name.
+   */
+  std::size_t GetSharedUniformNamesHash() const;
+
 private: // Data
   ShaderDataPtr              mDefaultShaderData{nullptr};
   std::vector<ShaderDataPtr> mShaderDataList{};
+  UniformBlockContainer      mBlocks{};           ///< List of connected uniform blocks (not owned)
+  std::size_t                mBlockNamesHash{0u}; ///< Simple hash of all connected uniform blocks name.
 };
 
 inline void UpdateShaderDataMessage(EventThreadServices& eventThreadServices, const Shader& shader, ShaderDataPtr shaderData)

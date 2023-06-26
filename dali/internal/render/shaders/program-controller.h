@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PROGRAM_CONTROLLER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -130,9 +130,18 @@ public: // API
    * @brief Clear program incrementally who are not be used.
    *
    * @param[in] fullCollect True if we want to clear whole items.
+   * @param[in] forceClearAll True if we want to clear all items forcibly. (Default as false)
    * @return True if we need to iterate more item to check used count. False if we clear cache completely.
    */
-  bool ClearUnusedCacheIncrementally(bool fullCollect);
+  bool ClearUnusedCacheIncrementally(bool fullCollect, bool forceClearAll = false);
+
+  /**
+   * @brief Clear all program cache.
+   */
+  void ClearCache()
+  {
+    ClearUnusedCacheIncrementally(true, true);
+  }
 
   /**
    * @brief Get the number of cached program
