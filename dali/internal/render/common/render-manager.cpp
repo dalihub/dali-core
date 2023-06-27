@@ -102,7 +102,7 @@ inline Graphics::Rect2D RecalculateScissorArea(const Graphics::Rect2D& scissorAr
 inline Rect<int32_t> CalculateUpdateArea(RenderItem& item, BufferIndex renderBufferIndex, const Rect<int32_t>& viewportRect)
 {
   Vector4 updateArea;
-  if(item.mNode->IsTextureUpdateAreaUsed() && item.mRenderer)
+  if(item.mNode && item.mNode->IsTextureUpdateAreaUsed() && item.mRenderer)
   {
     updateArea = item.mRenderer->GetTextureUpdateArea();
   }
