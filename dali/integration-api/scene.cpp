@@ -218,6 +218,16 @@ void Scene::KeepRendering(float durationSeconds)
   GetImplementation(*this).KeepRendering(durationSeconds);
 }
 
+void Scene::SetPartialUpdateEnabled(bool enabled)
+{
+  GetImplementation(*this).SetPartialUpdateEnabled(enabled);
+}
+
+bool Scene::IsPartialUpdateEnabled() const
+{
+  return GetImplementation(*this).IsPartialUpdateEnabled();
+}
+
 Scene::EventProcessingFinishedSignalType& Scene::EventProcessingFinishedSignal()
 {
   return GetImplementation(*this).EventProcessingFinishedSignal();

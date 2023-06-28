@@ -31,7 +31,7 @@ class TestGraphicsTexture : public Graphics::Texture
 public:
   TestGraphicsTexture(TestGlAbstraction& glAbstraction, const Graphics::TextureCreateInfo& createInfo);
 
-  ~TestGraphicsTexture();
+  ~TestGraphicsTexture() override;
 
   /**
    * Initialize the texture: allocate gl mem, apply default samplers

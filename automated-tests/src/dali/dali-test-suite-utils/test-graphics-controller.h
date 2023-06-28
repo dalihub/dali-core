@@ -2,7 +2,7 @@
 #define TEST_GRAPHICS_CONTROLLER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -207,6 +207,8 @@ public:
    */
   Graphics::UniquePtr<Graphics::Buffer> CreateBuffer(const Graphics::BufferCreateInfo& bufferCreateInfo, Graphics::UniquePtr<Graphics::Buffer>&& oldBuffer) override;
 
+  void DiscardBuffer(TestGraphicsBuffer* buffer);
+
   /**
    * @brief Creates new CommandBuffer object
    *
@@ -384,6 +386,11 @@ public: // Test Functions
     mCustomUniforms = customUniforms;
   }
 
+  void AddCustomUniformBlock(const TestGraphicsReflection::TestUniformBlockInfo& blockInfo)
+  {
+    mCustomUniformBlocks.push_back(blockInfo);
+  }
+
   void ClearSubmitStack()
   {
     mSubmitStack.clear();
@@ -427,11 +434,14 @@ public:
   };
   std::vector<ProgramCache> mProgramCache;
 
+  std::vector<TestGraphicsBuffer*> mAllocatedBuffers;
+
   struct PipelineCache
   {
   };
 
-  std::vector<UniformData> mCustomUniforms;
+  std::vector<UniformData>                                  mCustomUniforms;
+  std::vector<TestGraphicsReflection::TestUniformBlockInfo> mCustomUniformBlocks;
 };
 
 } // namespace Dali

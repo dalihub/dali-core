@@ -22,6 +22,7 @@
 #include <dali/public-api/dali-core.h>
 
 // INTERNAL INCLUDES
+#include <dali-test-suite-utils.h>
 #include "mesh-builder.h"
 
 namespace Dali
@@ -136,6 +137,31 @@ TextureSet CreateTextureSet(Pixel::Format format, int width, int height)
   TextureSet textureSet = TextureSet::New();
   textureSet.SetTexture(0u, CreateTexture(TextureType::TEXTURE_2D, format, width, height));
   return textureSet;
+}
+
+void DirtyRectChecker(const std::vector<Rect<int>>& damagedRects, std::multiset<Rect<int>, RectSorter> expectedRectList, bool checkRectsExact, const char* testLocation)
+{
+  // Just check damagedRect contain all expectRectList.
+  DALI_TEST_GREATER(damagedRects.size() + 1u, expectedRectList.size(), testLocation);
+
+  for(auto& rect : damagedRects)
+  {
+    auto iter = expectedRectList.find(rect);
+    if(iter != expectedRectList.end())
+    {
+      expectedRectList.erase(iter);
+    }
+    else if(checkRectsExact)
+    {
+      std::ostringstream o;
+      o << rect << " exist in expectRectList" << std::endl;
+      fprintf(stderr, "Test failed in %s, checking %s", testLocation, o.str().c_str());
+      tet_result(TET_FAIL);
+    }
+  }
+
+  // Check all rects are matched
+  DALI_TEST_EQUALS(expectedRectList.empty(), true, testLocation);
 }
 
 } // namespace Dali

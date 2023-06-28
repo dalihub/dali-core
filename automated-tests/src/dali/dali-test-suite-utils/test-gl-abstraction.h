@@ -51,9 +51,10 @@ struct UniformData
 
 struct ActiveUniform
 {
-  std::string name;
-  GLenum      type;
-  GLint       size;
+  std::string name{};
+  GLenum      type{GL_FLOAT};
+  GLint       size{0};
+  GLint       offset{0};
 };
 
 class DALI_CORE_API TestGlAbstraction : public Dali::Integration::GlAbstraction
@@ -457,6 +458,10 @@ public:
 
   inline void DeleteBuffers(GLsizei n, const GLuint* buffers) override
   {
+    TraceCallStack::NamedParams namedParams;
+    namedParams["n"] << n;
+    namedParams["id"] << buffers[0];
+    mBufferTrace.PushCall("DeleteBuffers", namedParams.str(), namedParams);
   }
 
   inline void DeleteFramebuffers(GLsizei n, const GLuint* framebuffers) override
@@ -697,13 +702,21 @@ public:
   inline void GenBuffers(GLsizei n, GLuint* buffers) override
   {
     // avoids an assert in GpuBuffers
-    *buffers = 1u;
+    static GLuint id = 1;
 
-    std::ostringstream o;
-    o << n;
     TraceCallStack::NamedParams namedParams;
-    namedParams["n"] << o.str();
-    mBufferTrace.PushCall("GenBuffers", o.str(), namedParams);
+    namedParams["n"] << n;
+
+    // Allocate some buffer names
+    bool first = true;
+    while(n)
+    {
+      namedParams["buffers"] << (first ? "" : ", ") << id;
+      first      = false;
+      *buffers++ = id++;
+      --n;
+    }
+    mBufferTrace.PushCall("GenBuffers", namedParams.str(), namedParams);
   }
 
   inline void GenerateMipmap(GLenum target) override
@@ -800,10 +813,7 @@ public:
     *type = mAttribTypes[index];
   }
 
-  inline void SetActiveUniforms(const std::vector<ActiveUniform>& uniforms)
-  {
-    mActiveUniforms = uniforms;
-  }
+  void SetActiveUniforms(const std::vector<ActiveUniform>& uniforms);
 
   inline void GetActiveUniform(GLuint program, GLuint index, GLsizei bufsize, GLsizei* length, GLint* size, GLenum* type, char* name) override
   {
@@ -864,6 +874,9 @@ public:
         break;
       case GL_PROGRAM_BINARY_FORMATS_OES:
         *params = mBinaryFormats;
+        break;
+      case GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT:
+        *params = mUniformBufferOffsetAlignment;
         break;
     }
   }
@@ -1882,6 +1895,44 @@ public:
 
   inline void GetActiveUniformsiv(GLuint program, GLsizei uniformCount, const GLuint* uniformIndices, GLenum pname, GLint* params) override
   {
+    for(int i = 0; i < uniformCount; ++i)
+    {
+      if(i < int(mActiveUniforms.size()))
+      {
+        switch(pname)
+        {
+          case GL_UNIFORM_TYPE:
+          {
+            params[i] = mActiveUniforms[i].type;
+            break;
+          }
+          case GL_UNIFORM_SIZE:
+          {
+            params[i] = mActiveUniforms[i].size;
+            break;
+          }
+          case GL_UNIFORM_NAME_LENGTH:
+          {
+            params[i] = mActiveUniforms[i].name.length();
+            break;
+          }
+          case GL_UNIFORM_BLOCK_INDEX:
+          {
+            params[i] = -1;
+            break;
+          }
+          case GL_UNIFORM_OFFSET:
+          {
+            params[i] = mActiveUniforms[i].offset;
+            break;
+          }
+          case GL_UNIFORM_MATRIX_STRIDE:
+          {
+            break;
+          }
+        }
+      }
+    }
   }
 
   inline GLuint GetUniformBlockIndex(GLuint program, const GLchar* uniformBlockName) override
@@ -2169,7 +2220,10 @@ public: // TEST FUNCTIONS
   {
     mProgramBinaryLength = length;
   }
-
+  inline void SetUniformBufferOffsetAlignment(GLint align)
+  {
+    mUniformBufferOffsetAlignment = align;
+  }
   inline bool GetVertexAttribArrayState(GLuint index)
   {
     if(index >= MAX_ATTRIBUTE_CACHE_SIZE)
@@ -2582,6 +2636,7 @@ public:
   GLint                                 mNumBinaryFormats;
   GLint                                 mBinaryFormats;
   GLint                                 mProgramBinaryLength;
+  GLint                                 mUniformBufferOffsetAlignment{1};
   bool                                  mVertexAttribArrayState[MAX_ATTRIBUTE_CACHE_SIZE];
   bool                                  mVertexAttribArrayChanged; // whether the vertex attrib array has been changed
   bool                                  mGetProgramBinaryCalled;

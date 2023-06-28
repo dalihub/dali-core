@@ -30,7 +30,6 @@
 #include <test-native-image.h>
 
 #include <cfloat> // For FLT_MAX
-#include <set>    // For std::multiset
 #include <string>
 
 #include "assert.h"
@@ -298,53 +297,6 @@ struct CulledPropertyNotificationFunctor
   bool&                 mSignalCalled;
   PropertyNotification& mPropertyNotification;
 };
-
-// Check dirtyRect is equal with expected multiset.
-// Note that the order of damagedRect is not important
-struct RectSorter
-{
-  bool operator()(const Rect<int>& lhs, const Rect<int>& rhs) const
-  {
-    if(lhs.x != rhs.x)
-    {
-      return lhs.x < rhs.x;
-    }
-    if(lhs.y != rhs.y)
-    {
-      return lhs.y < rhs.y;
-    }
-    if(lhs.width != rhs.width)
-    {
-      return lhs.width < rhs.width;
-    }
-    return lhs.height < rhs.height;
-  }
-};
-
-void DirtyRectChecker(const std::vector<Rect<int>>& damagedRects, std::multiset<Rect<int>, RectSorter> expectedRectList, bool checkRectsExact, const char* testLocation)
-{
-  // Just check damagedRect contain all expectRectList.
-  DALI_TEST_GREATER(damagedRects.size() + 1u, expectedRectList.size(), testLocation);
-
-  for(auto& rect : damagedRects)
-  {
-    auto iter = expectedRectList.find(rect);
-    if(iter != expectedRectList.end())
-    {
-      expectedRectList.erase(iter);
-    }
-    else if(checkRectsExact)
-    {
-      std::ostringstream o;
-      o << rect << " exist in expectRectList" << std::endl;
-      fprintf(stderr, "Test failed in %s, checking %s", testLocation, o.str().c_str());
-      tet_result(TET_FAIL);
-    }
-  }
-
-  // Check all rects are matched
-  DALI_TEST_EQUALS(expectedRectList.empty(), true, testLocation);
-}
 
 // Clipping test helper functions:
 Actor CreateActorWithContent(uint32_t width, uint32_t height)
@@ -9656,7 +9608,7 @@ int utcDaliActorPartialUpdateActorsWithSizeHint03(void)
   END_TEST;
 }
 
-int utcDaliActorPartialUpdateAnimation(void)
+int utcDaliActorPartialUpdateAnimation01(void)
 {
   TestApplication application(
     TestApplication::DEFAULT_SURFACE_WIDTH,
@@ -9763,6 +9715,90 @@ int utcDaliActorPartialUpdateAnimation(void)
   DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
 
   clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  END_TEST;
+}
+
+int utcDaliActorPartialUpdateAnimation02(void)
+{
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  tet_infoline("Check the damaged area with partial update and animation delay");
+
+  TraceCallStack& drawTrace = application.GetGlAbstraction().GetDrawTrace();
+  drawTrace.Enable(true);
+  drawTrace.Reset();
+
+  Actor actor = CreateRenderableActor();
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
+  application.GetScene().Add(actor);
+
+  std::vector<Rect<int>> damagedRects;
+  Rect<int>              clippingRect;
+
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  // Aligned by 16
+  clippingRect = Rect<int>(0, 784, 32, 32); // in screen coordinates, includes 1 last frames updates
+  DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
+
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Make an animation
+  Renderer  renderer  = actor.GetRendererAt(0);
+  Animation animation = Animation::New(1.0f);
+  animation.AnimateTo(Property(renderer, DevelRenderer::Property::OPACITY), 0.5f, TimePeriod(0.5f, 0.5f));
+  animation.SetLoopCount(3);
+  animation.Play();
+
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Delay time
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+
+  clippingRect = Rect<int>(0, 784, 32, 32);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Started animation
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(500, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Delay time
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(500, nullptr, damagedRects);
+
+  // The property is reset to base value. Should be updated
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Next render during delay time
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(50, nullptr, damagedRects);
+
+  // Should not be updated
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   END_TEST;

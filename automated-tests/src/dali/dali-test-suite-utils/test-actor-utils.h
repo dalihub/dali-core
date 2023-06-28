@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/rendering/texture-set.h>
 #include <dali/public-api/rendering/texture.h>
+#include <set> // For std::multiset
 #include <string>
 
 namespace Dali
@@ -62,6 +63,30 @@ Actor CreateRenderableActor2(TextureSet textures, const std::string& vertexShade
 
 Texture    CreateTexture(TextureType::Type type, Pixel::Format format, int width, int height);
 TextureSet CreateTextureSet(Pixel::Format format, int width, int height);
+
+// Check dirtyRect is equal with expected multiset.
+// Note that the order of damagedRect is not important
+struct RectSorter
+{
+  bool operator()(const Rect<int>& lhs, const Rect<int>& rhs) const
+  {
+    if(lhs.x != rhs.x)
+    {
+      return lhs.x < rhs.x;
+    }
+    if(lhs.y != rhs.y)
+    {
+      return lhs.y < rhs.y;
+    }
+    if(lhs.width != rhs.width)
+    {
+      return lhs.width < rhs.width;
+    }
+    return lhs.height < rhs.height;
+  }
+};
+
+void DirtyRectChecker(const std::vector<Rect<int>>& damagedRects, std::multiset<Rect<int>, RectSorter> expectedRectList, bool checkRectsExact, const char* testLocation);
 
 } // namespace Dali
 

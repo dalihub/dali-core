@@ -2822,3 +2822,112 @@ int UtcDaliSceneKeepRenderingMultipleScene(void)
 
   END_TEST;
 }
+
+int UtcDaliSceneEnableDisablePartialUpdate(void)
+{
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  tet_infoline("Check enabling / disabling partial update");
+
+  const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
+
+  auto scene = application.GetScene();
+  DALI_TEST_CHECK(scene);
+
+  Actor actor = CreateRenderableActor();
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
+  scene.Add(actor);
+
+  std::vector<Rect<int>> damagedRects;
+
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  // Aligned by 16
+  Rect<int> clippingRect = Rect<int>(0, 784, 32, 32); // in screen coordinates, includes 1 last frames updates
+  DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
+
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Ensure the damaged rect is empty
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+
+  // Disable partial update
+  scene.SetPartialUpdateEnabled(false);
+
+  DALI_TEST_EQUALS(scene.IsPartialUpdateEnabled(), false, TEST_LOCATION);
+
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  // Update full area even though there is no change
+  Size sceneSize = scene.GetSize();
+  clippingRect   = Rect<int>(0, 0, sceneSize.width, sceneSize.height); // full area
+  DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
+
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Eable partial update again
+  scene.SetPartialUpdateEnabled(true);
+
+  DALI_TEST_EQUALS(scene.IsPartialUpdateEnabled(), true, TEST_LOCATION);
+
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  // Update full area in the first frame after partial update is enabled
+  clippingRect = Rect<int>(0, 0, sceneSize.width, sceneSize.height);
+  DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
+
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Ensure the damaged rect is empty
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+
+  // Make a change
+  actor[Actor::Property::OPACITY] = 0.5f;
+
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  // Update partial area
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  clippingRect = Rect<int>(0, 784, 32, 32); // Aligned by 16
+  DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
+
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  END_TEST;
+}

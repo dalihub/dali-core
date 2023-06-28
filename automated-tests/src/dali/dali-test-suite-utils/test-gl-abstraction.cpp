@@ -18,8 +18,34 @@
 #include "test-gl-abstraction.h"
 #include "test-trace-call-stack.h"
 
-static const bool TRACE{
-  false};
+static const bool TRACE{false};
+
+uint32_t GetGLDataTypeSize(GLenum type)
+{
+  // There are many more types than what are covered here, but
+  // they are not supported in dali.
+  switch(type)
+  {
+    case GL_FLOAT: // "float", 1 float, 4 bytes
+      return 4;
+    case GL_FLOAT_VEC2: // "vec2", 2 floats, 8 bytes
+      return 8;
+    case GL_FLOAT_VEC3: // "vec3", 3 floats, 12 bytes
+      return 12;
+    case GL_FLOAT_VEC4: // "vec4", 4 floats, 16 bytes
+      return 16;
+    case GL_INT: // "int", 1 integer, 4 bytes
+      return 4;
+    case GL_FLOAT_MAT2: // "mat2", 4 floats, 16 bytes
+      return 16;
+    case GL_FLOAT_MAT3: // "mat3", 3 vec3, 36 bytes
+      return 36;
+    case GL_FLOAT_MAT4: // "mat4", 4 vec4, 64 bytes
+      return 64;
+    default:
+      return 0;
+  }
+}
 
 namespace Dali
 {
@@ -145,6 +171,12 @@ void TestGlAbstraction::Initialize()
     {"uLightCameraProjectionMatrix", GL_FLOAT_MAT4, 1},
     {"uLightCameraViewMatrix", GL_FLOAT_MAT4, 1}};
 
+  int offset = 0;
+  for(uint32_t i = 0; i < mActiveUniforms.size(); ++i)
+  {
+    mActiveUniforms[i].offset = offset;
+    offset += mActiveUniforms[i].size * GetGLDataTypeSize(mActiveUniforms[i].type);
+  }
   // WARNING: IF YOU CHANGE THIS LIST, ALSO CHANGE UNIFORMS IN test-graphics-reflection.cpp
 }
 
@@ -194,6 +226,17 @@ std::string TestGlAbstraction::GetFragmentShaderPrefix()
 bool TestGlAbstraction::TextureRequiresConverting(const GLenum imageGlFormat, const GLenum textureGlFormat, const bool isSubImage) const
 {
   return ((imageGlFormat == GL_RGB) && (textureGlFormat == GL_RGBA));
+}
+
+void TestGlAbstraction::SetActiveUniforms(const std::vector<ActiveUniform>& uniforms)
+{
+  mActiveUniforms = uniforms;
+  int offset      = 0;
+  for(uint32_t i = 0; i < uniforms.size(); ++i)
+  {
+    mActiveUniforms[i].offset = offset;
+    offset += mActiveUniforms[i].size * GetGLDataTypeSize(mActiveUniforms[i].type);
+  }
 }
 
 } // namespace Dali

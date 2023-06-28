@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_CORE_ENUMERATIONS_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ enum class StencilBufferAvailable
 };
 
 /**
- * @brief Enumerations to specify whether the stencil buffer is available.
+ * @brief Enumerations to specify whether the partial update is available.
  */
 enum class PartialUpdateAvailable
 {

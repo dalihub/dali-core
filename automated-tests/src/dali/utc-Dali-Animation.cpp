@@ -9361,6 +9361,9 @@ int UtcDaliAnimationKeyFramesGetKeyFrameCountP(void)
   TestApplication application;
 
   KeyFrames keyFrames = KeyFrames::New();
+
+  DALI_TEST_EQUALS(DevelKeyFrames::GetKeyFrameCount(keyFrames), 0, TEST_LOCATION);
+
   keyFrames.Add(0.0f, Vector4(0.0f, 0.0f, 0.0f, 0.6f));
   keyFrames.Add(0.6f, Vector4(0.0f, 0.0f, 0.0f, 0.3f));
   keyFrames.Add(1.0f, Vector4(0.0f, 0.0f, 0.0f, 0.8f));
@@ -9377,13 +9380,17 @@ int UtcDaliAnimationKeyFramesGetKeyFrameP(void)
   float   inputTime  = 0.6f;
   Vector4 inputValue = Vector4(0.0f, 0.0f, 0.0f, 0.3f);
 
-  KeyFrames keyFrames = KeyFrames::New();
+  float           outputTime;
+  Property::Value outputValue;
+  KeyFrames       keyFrames = KeyFrames::New();
+
+  DevelKeyFrames::GetKeyFrame(keyFrames, 0, outputTime, outputValue);
+
+  DALI_TEST_EQUALS(outputValue.GetType(), Property::Type::NONE, TEST_LOCATION);
+
   keyFrames.Add(0.0f, Vector4(0.0f, 0.0f, 0.0f, 0.6f));
   keyFrames.Add(inputTime, inputValue);
   keyFrames.Add(1.0f, Vector4(0.0f, 0.0f, 0.0f, 0.8f));
-
-  float           outputTime;
-  Property::Value outputValue;
 
   DevelKeyFrames::GetKeyFrame(keyFrames, 3, outputTime, outputValue);
 
@@ -9426,6 +9433,17 @@ int UtcDaliAnimationKeyFramesSetKeyFrameP(void)
   Vector4 newValue = Vector4(1.0f, 0.2f, 0.6f, 0.9f);
 
   DevelKeyFrames::SetKeyFrameValue(keyFrames, 1, newValue);
+
+  DevelKeyFrames::GetKeyFrame(keyFrames, 1, outputTime, outputValue);
+
+  DALI_TEST_EQUALS(outputTime, inputTime, TEST_LOCATION);
+  DALI_TEST_EQUALS(outputValue.GetType(), Property::Type::VECTOR4, TEST_LOCATION);
+  DALI_TEST_EQUALS(outputValue.Get<Vector4>(), newValue, TEST_LOCATION);
+
+  Vector3 newUnmatchedValue = Vector3(0.0f, 1.0f, 0.2f);
+
+  // Check nothing happened if we set unmatched value type.
+  DevelKeyFrames::SetKeyFrameValue(keyFrames, 1, newUnmatchedValue);
 
   DevelKeyFrames::GetKeyFrame(keyFrames, 1, outputTime, outputValue);
 

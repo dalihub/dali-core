@@ -28,6 +28,7 @@ struct VertexBufferUpdater
 {
   struct Diagnostics
   {
+    bool     success{false};
     uint32_t counter{0};
     void*    lastPtr{nullptr};
     size_t   lastSize{0};
@@ -38,6 +39,7 @@ struct VertexBufferUpdater
 
   uint32_t UpdateVertices(void* ptr, size_t size)
   {
+    diagnostics.success      = true;
     diagnostics.lastPtr      = ptr;
     diagnostics.lastSize     = size;
     diagnostics.lastReturned = returnSize;
@@ -69,6 +71,23 @@ struct VertexBufferUpdater
     // reset promise automatically
     promise = {};
     return value;
+  }
+
+  Diagnostics GetValueWithTimeout()
+  {
+    auto future = promise.get_future();
+    auto status = future.wait_for(1s);
+    if(status == std::future_status::ready)
+    {
+      promise = {};
+      return promise.get_future().get();
+    }
+
+    promise = {};
+    // reset promise automatically
+    Diagnostics failure{};
+    failure.success = false;
+    return failure;
   }
 
   bool IsValueReady()
@@ -257,7 +276,7 @@ int UtcDaliVertexBufferSetData01(void)
 
     DALI_TEST_CHECK(drawTrace.FindMethod("DrawArrays"));
 
-    DALI_TEST_EQUALS(bufferDataCalls.size(), 3u, TEST_LOCATION);
+    DALI_TEST_EQUALS(bufferDataCalls.size(), 1u, TEST_LOCATION);
 
     DALI_TEST_EQUALS(bufferDataCalls[0], sizeof(texturedQuadVertexData), TEST_LOCATION);
   }
@@ -306,25 +325,26 @@ int UtcDaliVertexBufferSetData02(void)
   application.SendNotification();
   application.Render();
 
-  {
-    const TestGlAbstraction::BufferSubDataCalls& bufferSubDataCalls =
-      application.GetGlAbstraction().GetBufferSubDataCalls();
+  auto&                                        gl                 = application.GetGlAbstraction();
+  const TestGlAbstraction::BufferSubDataCalls& bufferSubDataCalls = gl.GetBufferSubDataCalls();
+  const TestGlAbstraction::BufferDataCalls&    bufferDataCalls    = gl.GetBufferDataCalls();
 
-    const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
-      application.GetGlAbstraction().GetBufferDataCalls();
+  DALI_TEST_EQUALS(bufferSubDataCalls.size(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(bufferDataCalls.size(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(bufferDataCalls[0], sizeof(texturedQuadVertexData), TEST_LOCATION);
 
-    // Should be 1 (Flush standalone uniform buffer per each RenderScene)
-    DALI_TEST_EQUALS(bufferSubDataCalls.size(), 1u, TEST_LOCATION);
-    DALI_TEST_EQUALS(bufferDataCalls.size(), 2u, TEST_LOCATION);
-
-    DALI_TEST_EQUALS(bufferDataCalls[0], sizeof(texturedQuadVertexData), TEST_LOCATION);
-  }
+  gl.ResetBufferDataCalls();
+  gl.ResetBufferSubDataCalls();
 
   // Re-upload the data on the vertexBuffer
   vertexBuffer.SetData(texturedQuadVertexData, 4);
 
   application.SendNotification();
   application.Render(0);
+
+  DALI_TEST_EQUALS(bufferSubDataCalls.size(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(bufferDataCalls.size(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(bufferDataCalls[0], sizeof(texturedQuadVertexData), TEST_LOCATION);
 
   END_TEST;
 }
@@ -626,6 +646,80 @@ int UtcDaliVertexBufferUpdateCallback(void)
   DALI_TEST_EQUALS(result, true, TEST_LOCATION);
   result = trace.FindMethodAndParams("DrawArrays", "4, 0, 16");
   DALI_TEST_EQUALS(result, true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliSetAndRemoveVertexBufferUpdateCallback(void)
+{
+  TestApplication application;
+
+  // Create vertex buffer
+  VertexBuffer vertexBuffer = VertexBuffer::New(Property::Map() = {
+                                                  {"aPosition", Property::Type::VECTOR2},
+                                                  {"aTexCoord", Property::Type::VECTOR2}});
+
+  // set callback
+  auto callback = std::make_unique<VertexBufferUpdater>();
+  vertexBuffer.SetVertexBufferUpdateCallback(callback->CreateCallback());
+
+  struct Vertex
+  {
+    Vector2 pos;
+    Vector2 uv;
+  };
+
+  std::vector<Vertex> vertices;
+  vertices.resize(16);
+  vertexBuffer.SetData(vertices.data(), 16);
+
+  Geometry geometry = Geometry::New();
+  geometry.AddVertexBuffer(vertexBuffer);
+  Shader   shader   = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
+  Actor    actor    = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector3::ONE * 100.f);
+  actor.AddRenderer(renderer);
+  application.GetScene().Add(actor);
+
+  auto& gl    = application.GetGlAbstraction();
+  auto& trace = gl.GetDrawTrace();
+  trace.Enable(true);
+  trace.EnableLogging(true);
+
+  callback->SetCallbackReturnValue(16 * sizeof(Vertex));
+
+  application.SendNotification();
+  application.Render();
+
+  auto value = callback->GetValue();
+
+  // Test whether callback ran
+  DALI_TEST_EQUALS(value.counter, 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(value.lastSize, 16 * sizeof(Vertex), TEST_LOCATION);
+  DALI_TEST_EQUALS(value.lastReturned, 16 * sizeof(Vertex), TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(value.lastPtr, (void*)nullptr, 0, TEST_LOCATION);
+
+  // test whether draw call has been issued (return value indicates end of array to be drawn)
+  auto result = trace.FindMethod("DrawArrays");
+  DALI_TEST_EQUALS(result, true, TEST_LOCATION);
+  result = trace.FindMethodAndParams("DrawArrays", "4, 0, 16");
+  DALI_TEST_EQUALS(result, true, TEST_LOCATION);
+
+  // Test 2. Update and render only half of vertex buffer
+  callback->SetCallbackReturnValue(8 * sizeof(Vertex));
+  trace.Reset();
+
+  // Remove the callback
+  vertexBuffer.ClearVertexBufferUpdateCallback();
+
+  application.SendNotification();
+  application.Render();
+
+  // Use 1sec timeout as callback won't be executed and future won't be filled
+  value = callback->GetValueWithTimeout();
+  // Test whether callback ran
+  DALI_TEST_EQUALS(value.success, false, TEST_LOCATION);
 
   END_TEST;
 }

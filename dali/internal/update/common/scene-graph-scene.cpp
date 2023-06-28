@@ -36,7 +36,8 @@ Scene::Scene()
   mSurfaceRectChanged(false),
   mRotationCompletedAcknowledgement(false),
   mSkipRendering(false),
-  mNeedFullUpdate(false)
+  mNeedFullUpdate(false),
+  mPartialUpdateEnabled(true)
 {
 }
 
@@ -250,6 +251,16 @@ bool Scene::KeepRenderingCheck(float elapsedSeconds)
   mNeedFullUpdate       = false;
   mKeepRenderingSeconds = 0.0f;
   return false;
+}
+
+void Scene::SetPartialUpdateEnabled(bool enabled)
+{
+  mPartialUpdateEnabled = enabled;
+}
+
+bool Scene::IsPartialUpdateEnabled() const
+{
+  return mPartialUpdateEnabled;
 }
 
 } // namespace SceneGraph

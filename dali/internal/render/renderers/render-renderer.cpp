@@ -33,8 +33,8 @@
 #include <dali/internal/render/renderers/render-texture.h>
 #include <dali/internal/render/renderers/render-vertex-buffer.h>
 #include <dali/internal/render/renderers/shader-cache.h>
-#include <dali/internal/render/renderers/uniform-buffer-view-pool.h>
 #include <dali/internal/render/renderers/uniform-buffer-view.h>
+#include <dali/internal/render/renderers/uniform-buffer.h>
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/shaders/render-shader.h>
 #include <dali/internal/update/common/uniform-map.h>
@@ -42,6 +42,9 @@
 
 namespace Dali::Internal
 {
+Dali::Matrix* testMVP;
+uint32_t      mvpBufferIndex;
+
 namespace
 {
 // Helper to get the property value getter by type
@@ -464,6 +467,73 @@ void Renderer::Upload()
   mGeometry->Upload(*mGraphicsController);
 }
 
+bool Renderer::NeedsProgram() const
+{
+  // Our access to shader is currently through the RenderDataProvider, which
+  // returns a reference to the shader (as at the time, we couldn't have empty
+  // renderers). We prefer to keep this as a reference. So, we don't use it
+  // here. Instead, we use the mGeometry pointer to decide if this is an empty
+  // renderer.
+  return (!mRenderCallback && mGeometry != nullptr);
+}
+
+Program* Renderer::PrepareProgram(const SceneGraph::RenderInstruction& instruction)
+{
+  // Create Program
+  const SceneGraph::Shader& shader = mRenderDataProvider->GetShader();
+
+  ShaderDataPtr shaderData = shader.GetShaderData(instruction.mRenderPassTag);
+  if(!shaderData)
+  {
+    DALI_LOG_ERROR("Failed to get shader data.\n");
+    mCurrentProgram = nullptr;
+    return nullptr;
+  }
+
+  Program* program = Program::New(*mProgramCache,
+                                  shaderData,
+                                  *mGraphicsController);
+  if(!program)
+  {
+    DALI_LOG_ERROR("Failed to create program for shader at address %p.\n", reinterpret_cast<const void*>(&shader));
+    mCurrentProgram = nullptr;
+    return nullptr;
+  }
+
+  // If program doesn't have Gfx program object assigned yet, prepare it.
+  if(!program->GetGraphicsProgramPtr())
+  {
+    const std::vector<char>& vertShader   = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::VERTEX_SHADER);
+    const std::vector<char>& fragShader   = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER);
+    Dali::Graphics::Shader&  vertexShader = mShaderCache->GetShader(
+      vertShader,
+      Graphics::PipelineStage::VERTEX_SHADER,
+      shaderData->GetSourceMode());
+
+    Dali::Graphics::Shader& fragmentShader = mShaderCache->GetShader(
+      fragShader,
+      Graphics::PipelineStage::FRAGMENT_SHADER,
+      shaderData->GetSourceMode());
+
+    std::vector<Graphics::ShaderState> shaderStates{
+      Graphics::ShaderState()
+        .SetShader(vertexShader)
+        .SetPipelineStage(Graphics::PipelineStage::VERTEX_SHADER),
+      Graphics::ShaderState()
+        .SetShader(fragmentShader)
+        .SetPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER)};
+
+    auto createInfo = Graphics::ProgramCreateInfo();
+    createInfo.SetShaderState(shaderStates);
+    auto graphicsProgram = mGraphicsController->CreateProgram(createInfo, nullptr);
+    program->SetGraphicsProgram(std::move(graphicsProgram), *mUniformBufferManager); // generates reflection
+  }
+
+  // Set prefetched program to be used during rendering
+  mCurrentProgram = program;
+  return mCurrentProgram;
+}
+
 bool Renderer::Render(Graphics::CommandBuffer&                             commandBuffer,
                       BufferIndex                                          bufferIndex,
                       const SceneGraph::NodeDataProvider&                  node,
@@ -554,87 +624,46 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
     blend = (commands[0]->queue != DevelRenderer::RENDER_QUEUE_OPAQUE) && blend;
   }
 
-  // Create Program
-  ShaderDataPtr shaderData = mRenderDataProvider->GetShader().GetShaderData(instruction.mRenderPassTag);
-  if(!shaderData)
+  bool drawn = false;
+
+  // We should have a shader here (as only RenderCallback has no shader, and that's been early out)
+  Program* program = PrepareProgram(instruction);
+  if(program)
   {
-    DALI_LOG_ERROR("Failed to get shader data.\n");
-    return false;
-  }
+    // Prepare the graphics pipeline. This may either re-use an existing pipeline or create a new one.
+    auto& pipeline = PrepareGraphicsPipeline(*program, instruction, node, blend);
 
-  Program* program = Program::New(*mProgramCache,
-                                  shaderData,
-                                  *mGraphicsController);
-  if(!program)
-  {
-    DALI_LOG_ERROR("Failed to get program for shader at address %p.\n", reinterpret_cast<const void*>(&mRenderDataProvider->GetShader()));
-    return false;
-  }
+    commandBuffer.BindPipeline(pipeline);
+    BindTextures(commandBuffer, boundTextures);
 
-  // If program doesn't have Gfx program object assigned yet, prepare it.
-  if(!program->GetGraphicsProgramPtr())
-  {
-    const std::vector<char>& vertShader   = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::VERTEX_SHADER);
-    const std::vector<char>& fragShader   = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER);
-    Dali::Graphics::Shader&  vertexShader = mShaderCache->GetShader(
-      vertShader,
-      Graphics::PipelineStage::VERTEX_SHADER,
-      shaderData->GetSourceMode());
-
-    Dali::Graphics::Shader& fragmentShader = mShaderCache->GetShader(
-      fragShader,
-      Graphics::PipelineStage::FRAGMENT_SHADER,
-      shaderData->GetSourceMode());
-
-    std::vector<Graphics::ShaderState> shaderStates{
-      Graphics::ShaderState()
-        .SetShader(vertexShader)
-        .SetPipelineStage(Graphics::PipelineStage::VERTEX_SHADER),
-      Graphics::ShaderState()
-        .SetShader(fragmentShader)
-        .SetPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER)};
-
-    auto createInfo = Graphics::ProgramCreateInfo();
-    createInfo.SetShaderState(shaderStates);
-    auto graphicsProgram = mGraphicsController->CreateProgram(createInfo, nullptr);
-    program->SetGraphicsProgram(std::move(graphicsProgram));
-  }
-
-  // Prepare the graphics pipeline. This may either re-use an existing pipeline or create a new one.
-  auto& pipeline = PrepareGraphicsPipeline(*program, instruction, node, blend);
-
-  commandBuffer.BindPipeline(pipeline);
-
-  BindTextures(commandBuffer, boundTextures);
-
-  std::size_t nodeIndex = BuildUniformIndexMap(bufferIndex, node, size, *program);
-
-  WriteUniformBuffer(bufferIndex, commandBuffer, program, instruction, node, modelMatrix, modelViewMatrix, viewMatrix, projectionMatrix, size, nodeIndex);
-
-  bool drawn = false; // Draw can fail if there are no vertex buffers or they haven't been uploaded yet
-                      // @todo We should detect this case much earlier to prevent unnecessary work
-
-  // Reuse latest bound vertex attributes location, or Bind buffers to attribute locations.
-  if(ReuseLatestBoundVertexAttributes(mGeometry) || mGeometry->BindVertexAttributes(commandBuffer))
-  {
-    uint32_t instanceCount = mRenderDataProvider->GetInstanceCount();
-
-    if(mDrawCommands.empty())
+    if(queueIndex == 0)
     {
-      drawn = mGeometry->Draw(*mGraphicsController, commandBuffer, mIndexedDrawFirstElement, mIndexedDrawElementsCount, instanceCount);
+      std::size_t nodeIndex = BuildUniformIndexMap(bufferIndex, node, size, *program);
+      WriteUniformBuffer(bufferIndex, commandBuffer, program, instruction, node, modelMatrix, modelViewMatrix, viewMatrix, projectionMatrix, size, nodeIndex);
+    }
+    // @todo We should detect this case much earlier to prevent unnecessary work
+    // Reuse latest bound vertex attributes location, or Bind buffers to attribute locations.
+    if(ReuseLatestBoundVertexAttributes(mGeometry) || mGeometry->BindVertexAttributes(commandBuffer))
+    {
+      uint32_t instanceCount = mRenderDataProvider->GetInstanceCount();
+
+      if(mDrawCommands.empty())
+      {
+        drawn = mGeometry->Draw(*mGraphicsController, commandBuffer, mIndexedDrawFirstElement, mIndexedDrawElementsCount, instanceCount);
+      }
+      else
+      {
+        for(auto& cmd : commands)
+        {
+          drawn |= mGeometry->Draw(*mGraphicsController, commandBuffer, cmd->firstIndex, cmd->elementCount, instanceCount);
+        }
+      }
     }
     else
     {
-      for(auto& cmd : commands)
-      {
-        drawn |= mGeometry->Draw(*mGraphicsController, commandBuffer, cmd->firstIndex, cmd->elementCount, instanceCount);
-      }
+      // BindVertexAttributes failed. Reset cached geometry.
+      ReuseLatestBoundVertexAttributes(nullptr);
     }
-  }
-  else
-  {
-    // BindVertexAttributes failed. Reset cached geometry.
-    ReuseLatestBoundVertexAttributes(nullptr);
   }
 
   return drawn;
@@ -756,45 +785,51 @@ void Renderer::WriteUniformBuffer(
   const Vector3&                       size,
   std::size_t                          nodeIndex)
 {
-  // Create the UBO
-  uint32_t uboOffset{0u};
-
   auto& reflection = mGraphicsController->GetProgramReflection(program->GetGraphicsProgram());
 
-  uint32_t uniformBlockAllocationBytes = program->GetUniformBlocksMemoryRequirements().totalSizeRequired;
+  const auto& programRequirements = program->GetUniformBlocksMemoryRequirements();
 
-  // Create uniform buffer view from uniform buffer
-  Graphics::UniquePtr<Render::UniformBufferView> uboView{nullptr};
-  if(uniformBlockAllocationBytes)
+  // Allocate UBO view per each block (include standalone block)
+  auto blockCount = programRequirements.blockCount;
+
+  std::vector<std::unique_ptr<UniformBufferView>> uboViews;
+  uboViews.resize(blockCount);
+
+  // Prepare bindings
+  auto uboCount = reflection.GetUniformBlockCount();
+  mUniformBufferBindings.resize(uboCount);
+
+  for(auto i = 0u; i < blockCount; ++i)
   {
-    auto uboPoolView = mUniformBufferManager->GetUniformBufferViewPool(bufferIndex);
-    uboView          = uboPoolView->CreateUniformBufferView(uniformBlockAllocationBytes);
+    bool standaloneUniforms = (i == 0);
+    if(programRequirements.blockSize[i])
+    {
+      auto uniformBufferView             = mUniformBufferManager->CreateUniformBufferView(programRequirements.blockSize[i], standaloneUniforms);
+      mUniformBufferBindings[i].buffer   = uniformBufferView->GetBuffer();
+      mUniformBufferBindings[i].offset   = uniformBufferView->GetOffset();
+      mUniformBufferBindings[i].binding  = standaloneUniforms ? 0 : i - 1;
+      mUniformBufferBindings[i].dataSize = reflection.GetUniformBlockSize(i);
+      uboViews[i].reset(uniformBufferView.release());
+    }
   }
 
   // update the uniform buffer
   // pass shared UBO and offset, return new offset for next item to be used
   // don't process bindings if there are no uniform buffers allocated
-  if(uboView)
+  if(!uboViews.empty())
   {
-    auto uboCount = reflection.GetUniformBlockCount();
-    mUniformBufferBindings.resize(uboCount);
-
-    std::vector<Graphics::UniformBufferBinding>* bindings{&mUniformBufferBindings};
-
-    mUniformBufferBindings[0].buffer = uboView->GetBuffer(&mUniformBufferBindings[0].offset);
-
     // Write default uniforms
-    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::MODEL_MATRIX), *uboView, modelMatrix);
-    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::VIEW_MATRIX), *uboView, viewMatrix);
-    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::PROJECTION_MATRIX), *uboView, projectionMatrix);
-    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::MODEL_VIEW_MATRIX), *uboView, modelViewMatrix);
+    WriteDefaultUniformV2(program->GetDefaultUniform(Program::DefaultUniformIndex::MODEL_MATRIX), uboViews, modelMatrix);
+    WriteDefaultUniformV2(program->GetDefaultUniform(Program::DefaultUniformIndex::VIEW_MATRIX), uboViews, viewMatrix);
+    WriteDefaultUniformV2(program->GetDefaultUniform(Program::DefaultUniformIndex::PROJECTION_MATRIX), uboViews, projectionMatrix);
+    WriteDefaultUniformV2(program->GetDefaultUniform(Program::DefaultUniformIndex::MODEL_VIEW_MATRIX), uboViews, modelViewMatrix);
 
     auto mvpUniformInfo = program->GetDefaultUniform(Program::DefaultUniformIndex::MVP_MATRIX);
     if(mvpUniformInfo && !mvpUniformInfo->name.empty())
     {
       Matrix modelViewProjectionMatrix(false);
       MatrixUtils::MultiplyProjectionMatrix(modelViewProjectionMatrix, modelViewMatrix, projectionMatrix);
-      WriteDefaultUniform(mvpUniformInfo, *uboView, modelViewProjectionMatrix);
+      WriteDefaultUniformV2(mvpUniformInfo, uboViews, modelViewProjectionMatrix);
     }
 
     auto normalUniformInfo = program->GetDefaultUniform(Program::DefaultUniformIndex::NORMAL_MATRIX);
@@ -803,7 +838,7 @@ void Renderer::WriteUniformBuffer(
       Matrix3 normalMatrix(modelViewMatrix);
       normalMatrix.Invert();
       normalMatrix.Transpose();
-      WriteDefaultUniform(normalUniformInfo, *uboView, normalMatrix);
+      WriteDefaultUniformV2(normalUniformInfo, uboViews, normalMatrix);
     }
 
     Vector4        finalColor;                               ///< Applied renderer's opacity color
@@ -817,16 +852,17 @@ void Renderer::WriteUniformBuffer(
     {
       finalColor = Vector4(color.r, color.g, color.b, color.a * mRenderDataProvider->GetOpacity(bufferIndex));
     }
-    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::COLOR), *uboView, finalColor);
-    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::ACTOR_COLOR), *uboView, color);
+
+    WriteDefaultUniformV2(program->GetDefaultUniform(Program::DefaultUniformIndex::COLOR), uboViews, finalColor);
+    WriteDefaultUniformV2(program->GetDefaultUniform(Program::DefaultUniformIndex::ACTOR_COLOR), uboViews, color);
 
     // Write uniforms from the uniform map
-    FillUniformBuffer(*program, instruction, *uboView, bindings, uboOffset, bufferIndex, nodeIndex);
+    FillUniformBuffer(*program, instruction, uboViews, bufferIndex, nodeIndex);
 
     // Write uSize in the end, as it shouldn't be overridable by dynamic properties.
-    WriteDefaultUniform(program->GetDefaultUniform(Program::DefaultUniformIndex::SIZE), *uboView, size);
+    WriteDefaultUniformV2(program->GetDefaultUniform(Program::DefaultUniformIndex::SIZE), uboViews, size);
 
-    commandBuffer.BindUniformBuffers(*bindings);
+    commandBuffer.BindUniformBuffers(mUniformBufferBindings);
   }
 }
 
@@ -836,6 +872,17 @@ bool Renderer::WriteDefaultUniform(const Graphics::UniformInfo* uniformInfo, Ren
   if(uniformInfo && !uniformInfo->name.empty())
   {
     WriteUniform(ubo, *uniformInfo, data);
+    return true;
+  }
+  return false;
+}
+
+template<class T>
+bool Renderer::WriteDefaultUniformV2(const Graphics::UniformInfo* uniformInfo, const std::vector<std::unique_ptr<Render::UniformBufferView>>& uboViews, const T& data)
+{
+  if(uniformInfo && !uniformInfo->name.empty())
+  {
+    WriteUniform(*uboViews[uniformInfo->bufferIndex], *uniformInfo, data);
     return true;
   }
   return false;
@@ -852,84 +899,68 @@ void Renderer::WriteUniform(Render::UniformBufferView& ubo, const Graphics::Unif
   ubo.Write(data, size, ubo.GetOffset() + uniformInfo.offset);
 }
 
-void Renderer::FillUniformBuffer(Program&                                      program,
-                                 const SceneGraph::RenderInstruction&          instruction,
-                                 Render::UniformBufferView&                    ubo,
-                                 std::vector<Graphics::UniformBufferBinding>*& outBindings,
-                                 uint32_t&                                     offset,
-                                 BufferIndex                                   updateBufferIndex,
-                                 std::size_t                                   nodeIndex)
+void Renderer::FillUniformBuffer(Program&                                                       program,
+                                 const SceneGraph::RenderInstruction&                           instruction,
+                                 const std::vector<std::unique_ptr<Render::UniformBufferView>>& uboViews,
+                                 BufferIndex                                                    updateBufferIndex,
+                                 std::size_t                                                    nodeIndex)
 {
-  auto& reflection = mGraphicsController->GetProgramReflection(program.GetGraphicsProgram());
-  auto  uboCount   = reflection.GetUniformBlockCount();
-
-  // Setup bindings
-  uint32_t dataOffset = offset;
-  for(auto i = 0u; i < uboCount; ++i)
+  for(auto& iter : mUniformIndexMaps[nodeIndex])
   {
-    mUniformBufferBindings[i].dataSize = reflection.GetUniformBlockSize(i);
-    mUniformBufferBindings[i].binding  = reflection.GetUniformBlockBinding(i);
-
-    dataOffset += GetUniformBufferDataAlignment(mUniformBufferBindings[i].dataSize);
-    mUniformBufferBindings[i].buffer = ubo.GetBuffer(&mUniformBufferBindings[i].offset);
-
-    for(auto iter = mUniformIndexMaps[nodeIndex].begin(),
-             end  = mUniformIndexMaps[nodeIndex].end();
-        iter != end;
-        ++iter)
+    auto& uniform    = iter;
+    int   arrayIndex = uniform.arrayIndex;
+    if(!uniform.uniformFunc)
     {
-      auto& uniform    = *iter;
-      int   arrayIndex = uniform.arrayIndex;
+      auto uniformInfo  = Graphics::UniformInfo{};
+      auto uniformFound = program.GetUniform(uniform.uniformName.GetStringView(),
+                                             uniform.uniformNameHash,
+                                             uniform.uniformNameHashNoArray,
+                                             uniformInfo);
 
-      if(!uniform.uniformFunc)
+      UniformBufferView* ubo = nullptr;
+      if(uniformFound)
       {
-        auto uniformInfo  = Graphics::UniformInfo{};
-        auto uniformFound = program.GetUniform(uniform.uniformName.GetStringView(),
-                                               uniform.uniformNameHash,
-                                               uniform.uniformNameHashNoArray,
-                                               uniformInfo);
-
-        uniform.uniformOffset   = uniformInfo.offset;
-        uniform.uniformLocation = uniformInfo.location;
-
-        if(uniformFound)
-        {
-          auto       dst      = ubo.GetOffset() + uniformInfo.offset;
-          const auto typeSize = GetPropertyValueSizeForUniform((*iter).propertyValue->GetType());
-          const auto dest     = dst + static_cast<uint32_t>(typeSize) * arrayIndex;
-          const auto func     = GetPropertyValueGetter((*iter).propertyValue->GetType());
-
-          ubo.Write(&((*iter).propertyValue->*func)(updateBufferIndex),
-                    typeSize,
-                    dest);
-
-          uniform.uniformSize = typeSize;
-          uniform.uniformFunc = func;
-        }
+        ubo = uboViews[uniformInfo.bufferIndex].get();
       }
       else
       {
-        auto       dst      = ubo.GetOffset() + uniform.uniformOffset;
-        const auto typeSize = uniform.uniformSize;
-        const auto dest     = dst + static_cast<uint32_t>(typeSize) * arrayIndex;
-        const auto func     = uniform.uniformFunc;
-
-        ubo.Write(&((*iter).propertyValue->*func)(updateBufferIndex),
-                  typeSize,
-                  dest);
+        continue;
       }
+
+      uniform.uniformOffset     = uniformInfo.offset;
+      uniform.uniformLocation   = uniformInfo.location;
+      uniform.uniformBlockIndex = uniformInfo.bufferIndex;
+
+      auto       dst      = ubo->GetOffset() + uniformInfo.offset;
+      const auto typeSize = GetPropertyValueSizeForUniform(iter.propertyValue->GetType());
+      const auto dest     = dst + static_cast<uint32_t>(typeSize) * arrayIndex;
+      const auto func     = GetPropertyValueGetter(iter.propertyValue->GetType());
+      uniform.uniformSize = typeSize;
+      uniform.uniformFunc = func;
+
+      ubo->Write(&(iter.propertyValue->*func)(updateBufferIndex),
+                 typeSize,
+                 dest);
+    }
+    else
+    {
+      UniformBufferView* ubo = uboViews[uniform.uniformBlockIndex].get();
+
+      auto       dst      = ubo->GetOffset() + uniform.uniformOffset;
+      const auto typeSize = uniform.uniformSize;
+      const auto dest     = dst + static_cast<uint32_t>(typeSize) * arrayIndex;
+      const auto func     = uniform.uniformFunc;
+
+      ubo->Write(&(iter.propertyValue->*func)(updateBufferIndex),
+                 typeSize,
+                 dest);
     }
   }
-  // write output bindings
-  outBindings = &mUniformBufferBindings;
-
-  // Update offset
-  offset = dataOffset;
 }
 
 void Renderer::SetSortAttributes(SceneGraph::RenderInstructionProcessor::SortAttributes& sortAttributes) const
 {
-  sortAttributes.shader   = &(mRenderDataProvider->GetShader());
+  sortAttributes.shader   = &mRenderDataProvider->GetShader();
   sortAttributes.geometry = mGeometry;
 }
 
@@ -938,7 +969,7 @@ void Renderer::SetShaderChanged(bool value)
   mShaderChanged = value;
 }
 
-bool Renderer::Updated(BufferIndex bufferIndex)
+bool Renderer::Updated()
 {
   if(mRenderCallback || mShaderChanged || mGeometry->AttributesChanged() || mRenderDataProvider->IsUpdated())
   {

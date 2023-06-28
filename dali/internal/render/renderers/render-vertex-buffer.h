@@ -33,6 +33,34 @@ namespace Internal
 {
 namespace Render
 {
+/**
+ * Helper class using atomic swaps for lockless synchronization
+ */
+template<class T>
+struct StateLock
+{
+  StateLock(T v)
+  {
+    value = v;
+  }
+
+  /**
+   * Attempts to change state 'from' to 'to' and repeats
+   * when no success
+   */
+  void ChangeState(T from, T to)
+  {
+    // using spin lock
+    T expected = from;
+    while(!value.compare_exchange_weak(expected, to, std::memory_order_release, std::memory_order_relaxed))
+    {
+      expected = from; // it's needed to revert the value of 'expected'
+    };
+  }
+
+  std::atomic<T> value{};
+};
+
 class VertexBuffer
 {
 public:
@@ -187,6 +215,22 @@ private:
   uint32_t                                          mDivisor{0};   ///< The divisor (0:not instanced, >=1:instanced)
   uint32_t                                          mElementCount; ///< Number of valid elements in the buffer
   std::unique_ptr<Dali::VertexBufferUpdateCallback> mVertexBufferUpdateCallback;
+
+  /**
+   * Enum values for locking mechanism.
+   *
+   * Locking mechanism uses synchronized state machine. From 'UNLOCKED' state
+   * it's either LOCKED_FOR_EVENT or LOCKED_FOR_UPDATE states possible.
+   * Both states can be reverted only to UNLOCKED.
+   */
+  enum class VertexBufferSyncState : int
+  {
+    UNLOCKED,          ///< Currently unlocked
+    LOCKED_FOR_EVENT,  ///< Locked for Event thread to access
+    LOCKED_FOR_UPDATE, ///< Locked for Update thread to access
+  };
+
+  StateLock<VertexBufferSyncState> mVertexBufferStateLock{VertexBufferSyncState::UNLOCKED};
 
   bool mDataChanged; ///< Flag to know if data has changed in a frame
 };

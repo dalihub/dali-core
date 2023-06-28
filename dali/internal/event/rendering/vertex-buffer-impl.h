@@ -69,9 +69,14 @@ public:
   uint32_t GetDivisor() const;
 
   /**
-   * @copydoc Dali::VertexBuffer::SetVertexBufferUpdateCallback()
+   * @copydoc Dali::VertexBuffer::SetVertexBufferUpdateCallbackMessage()
    */
   void SetVertexBufferUpdateCallback(VertexBufferUpdateCallback& callback);
+
+  /**
+   * @copydoc Dali::VertexBuffer::ClearVertexBufferUpdateCallback()
+   */
+  void ClearVertexBufferUpdateCallback();
 
 public: // Default property extensions from Object
   /**
@@ -102,12 +107,13 @@ private: // unimplemented methods
   VertexBuffer(const VertexBuffer&);
   VertexBuffer& operator=(const VertexBuffer&);
 
-private:                                        // data
-  EventThreadServices&  mEventThreadServices;   ///<Used to send messages to the render thread via update thread
-  Render::VertexBuffer* mRenderObject{nullptr}; ///<Render side object
-  uint32_t              mBufferFormatSize{0};
-  uint32_t              mSize{0};    ///< Number of elements in the buffer
-  uint32_t              mDivisor{0}; ///< How many elements to skip in instanced draw
+private:                                                            // data
+  EventThreadServices&        mEventThreadServices;                 ///<Used to send messages to the render thread via update thread
+  Render::VertexBuffer*       mRenderObject{nullptr};               ///<Render side object
+  VertexBufferUpdateCallback* mVertexBufferUpdateCallback{nullptr}; ///<Vertex buffer update callback pointer
+  uint32_t                    mBufferFormatSize{0};
+  uint32_t                    mSize{0};    ///< Number of elements in the buffer
+  uint32_t                    mDivisor{0}; ///< How many elements to skip in instanced draw
 };
 
 /**

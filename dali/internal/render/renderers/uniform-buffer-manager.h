@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_UNIFORM_BUFFER_MANAGER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,18 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/map-wrapper.h>
 #include <dali/graphics-api/graphics-controller.h>
+
+namespace Dali::Internal::SceneGraph
+{
+class Scene;
+}
 
 namespace Dali::Internal::Render
 {
-class UniformBuffer;
+class UniformBufferV2;
 class UniformBufferView;
-class UniformBufferViewPool;
 
 /**
  * Class UniformBufferManager
@@ -40,66 +45,136 @@ public:
 
   ~UniformBufferManager();
 
-  /**
-   * @brief Allocates uniform buffer with given size and alignment
-   * @param size Size of uniform buffer
-   * @param alignment Alignment
-   * @return new UniformBuffer
-   */
-  Graphics::UniquePtr<UniformBuffer> AllocateUniformBuffer(uint32_t size, uint32_t alignment = 256);
+  Graphics::UniquePtr<UniformBufferView> CreateUniformBufferView(uint32_t size, bool emulated = true);
 
   /**
-   * @brief Creates a view on UniformBuffer
+   * @brief Registers scene with the manager
+   * The manager creates a set of UBOs per scene.
    *
-   * @param uniformBuffer
-   * @param size
-   * @return Uniform buffer view
+   * @param[in] scene Valid pointer to the scene
    */
-  Graphics::UniquePtr<UniformBufferView> CreateUniformBufferView(UniformBuffer* uniformBuffer, uint32_t offset, uint32_t size);
+  void RegisterScene(SceneGraph::Scene* scene);
 
   /**
-   * @brief Creates uniform buffer pool view
-   * @param size
-   * @return
-   */
-  Graphics::UniquePtr<UniformBufferViewPool> CreateUniformBufferViewPool();
-
-  /**
-   * @brief Returns Controller object
-   * @return controller object
-   */
-  [[nodiscard]] Graphics::Controller& GetController() const
-  {
-    return *mController;
-  }
-
-  /**
-   * @brief Returns embedded uniform buffer pool view for specified DAli buffer index
-   * @return Pointer to valid uniform buffer pool view
-   */
-  [[nodiscard]] UniformBufferViewPool* GetUniformBufferViewPool(uint32_t bufferIndex);
-
-  /**
-   * @brief Prepare to lock the uniform buffer so we can write to the standalone uniform map directly.
-   * Uniform buffer will be locked at the first call of UniformBuffer::Write after call this API.
-   * @note After all write done, We should call UnlockUniformBuffer.
+   * @brief Removes association with a scene
    *
-   * @param bufferIndex current update/render buffer index
+   * @param[in] scene Valid pointer to a scene object
    */
-  void ReadyToLockUniformBuffer(uint32_t bufferIndex);
+  void UnregisterScene(SceneGraph::Scene* scene);
 
   /**
-   * @brief Unlock the uniform buffer.
-   * @note We should call ReadyToLockUniformBuffer before call this.
-   *
-   * @param bufferIndex current update/render buffer index
+   * @brief Get the uniform buffer for the given scene, if current.
    */
-  void UnlockUniformBuffer(uint32_t bufferIndex);
+  UniformBufferV2* GetUniformBufferForScene(SceneGraph::Scene* scene, bool offscreen, bool emulated);
+
+  /**
+   * @brief must be called when rendering scene starts, this way the manager knows
+   * which UBO set we are going to use.
+   */
+  void SetCurrentSceneRenderInfo(SceneGraph::Scene* scene, bool offscreen);
+
+  /**
+   * @brief Rolls back UBO set matching conditions
+   * @param[in] scene Valid scene pointer
+   * @param[in] offscreen Offscreen or onscreen
+   */
+  void Rollback(SceneGraph::Scene* scene, bool offscreen);
+
+  /**
+   * @brief Flushes current UBO set
+   */
+  void Flush(SceneGraph::Scene* scene, bool offscreen);
+
+  /**
+   * Gets the uniform block alignment.
+   * It will cache it locally, as this doesn't change during a graphics context's lifetime
+   * @param[in] emulated - True if this is to query CPU alignment, or false to query GPU
+   * alignment.
+   * @return the alignment
+   */
+  uint32_t GetUniformBlockAlignment(bool emulated);
 
 private:
   Dali::Graphics::Controller* mController;
 
-  Graphics::UniquePtr<UniformBufferViewPool> mUniformBufferPoolStorage[2u]; ///< The pool view into UniformBuffer (double buffered)
+  /**
+   * Stores pointers to uniform buffers associated with the scene
+   * There may be up to 4 UBOs created per scene:
+   * - Emulated on-screen
+   * - GPU on-screen
+   * - Emulated off-screen
+   * - GPU off-screen
+   */
+  struct UBOSet
+  {
+    UBOSet()  = default;
+    ~UBOSet() = default;
+
+    UBOSet(UBOSet&& rhs);
+
+    enum class BufferType
+    {
+      CPU_ONSCREEN  = 0,
+      GPU_ONSCREEN  = 1,
+      CPU_OFFSCREEN = 2,
+      GPU_OFFSCREEN = 3,
+    };
+
+    static BufferType GetBufferType(bool offscreen, bool emulated)
+    {
+      if(offscreen)
+      {
+        return (emulated ? BufferType::CPU_OFFSCREEN : BufferType::GPU_OFFSCREEN);
+      }
+      return (emulated ? BufferType::CPU_ONSCREEN : BufferType::GPU_ONSCREEN);
+    }
+
+    Graphics::UniquePtr<UniformBufferV2> cpuBufferOnScreen;
+    Graphics::UniquePtr<UniformBufferV2> gpuBufferOnScreen;
+    Graphics::UniquePtr<UniformBufferV2> cpuBufferOffScreen;
+    Graphics::UniquePtr<UniformBufferV2> gpuBufferOffScreen;
+
+    Graphics::UniquePtr<UniformBufferV2>& GetBuffer(BufferType bufferType)
+    {
+      switch(bufferType)
+      {
+        case BufferType::CPU_ONSCREEN:
+        {
+          return cpuBufferOnScreen;
+        }
+        case BufferType::CPU_OFFSCREEN:
+        {
+          return cpuBufferOffScreen;
+        }
+        case BufferType::GPU_ONSCREEN:
+        {
+          return gpuBufferOnScreen;
+        }
+        case BufferType::GPU_OFFSCREEN:
+        {
+          return gpuBufferOffScreen;
+        }
+      }
+      // Appease the compiler
+      return cpuBufferOnScreen;
+    }
+  };
+
+  /**
+   * Find with caching, updates current cached set
+   */
+  UBOSet* GetUBOSetForScene(SceneGraph::Scene* scene);
+
+  /**
+   * Find without caching
+   */
+  UBOSet* FindSetForScene(SceneGraph::Scene* scene);
+
+  std::map<SceneGraph::Scene*, UBOSet> mUBOMap;
+  SceneGraph::Scene*                   mCurrentScene{nullptr};
+  UBOSet*                              mCurrentUBOSet{nullptr};
+  uint32_t                             mCachedUniformBlockAlignment{0u};
+  bool                                 mCurrentSceneOffscreen{false};
 };
 
 } // namespace Dali::Internal::Render

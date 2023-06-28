@@ -22,31 +22,61 @@
 
 namespace Dali
 {
-TestGraphicsBuffer::TestGraphicsBuffer(TraceCallStack& callStack, TestGlAbstraction& glAbstraction, uint32_t size, Graphics::BufferUsageFlags usage)
+TestGraphicsBuffer::TestGraphicsBuffer(const Graphics::BufferCreateInfo& createInfo, TestGraphicsController& controller, TestGlAbstraction& glAbstraction, TraceCallStack& callStack)
 : mCallStack(callStack),
+  mController(controller),
   mGl(glAbstraction),
-  mUsage(usage)
+  mCreateInfo(createInfo),
+  mUsage(createInfo.usage)
 {
-  memory.resize(size);
-  mGl.GetBufferTrace().EnableLogging(false);
+  if(createInfo.propertiesFlags & int(Graphics::BufferPropertiesFlagBit::CPU_ALLOCATED))
+  {
+    mCpuOnly = true;
+  }
+  else
+  {
+    mGl.GenBuffers(1, &mId);
+  }
+  memory.resize(createInfo.size);
+}
+
+TestGraphicsBuffer::~TestGraphicsBuffer()
+{
+  // Not strictly parameters, but useful for testing
+  TraceCallStack::NamedParams namedParams;
+  namedParams["usage"] << "0x" << std::hex << mCreateInfo.usage;
+  namedParams["propertiesFlags"] << mCreateInfo.propertiesFlags;
+
+  mCallStack.PushCall("Buffer::~Buffer", namedParams.str(), namedParams);
+  if(!mCpuOnly && mId)
+  {
+    mGl.DeleteBuffers(1, &mId);
+  }
+}
+
+void TestGraphicsBuffer::DiscardResource()
+{
+  mController.DiscardBuffer(this);
 }
 
 void TestGraphicsBuffer::Bind()
 {
   mCallStack.PushCall("Buffer::Bind", "");
-  if(!mId)
+  if(!mCpuOnly && mId > 0)
   {
-    mGl.GenBuffers(1, &mId);
+    mGl.BindBuffer(GetTarget(), mId);
   }
-  mGl.BindBuffer(GetTarget(), mId);
 }
 
 void TestGraphicsBuffer::Unbind()
 {
   mCallStack.PushCall("Buffer::Unbind", "");
-  if(mId)
+  if(!mCpuOnly)
   {
-    mGl.BindBuffer(GetTarget(), 0);
+    if(mId)
+    {
+      mGl.BindBuffer(GetTarget(), 0);
+    }
   }
 }
 
@@ -58,15 +88,19 @@ void TestGraphicsBuffer::Upload(uint32_t offset, uint32_t size)
   namedParams["offset"] << offset;
   namedParams["size"] << size;
   mCallStack.PushCall("Buffer::Upload", o.str(), namedParams);
-  if(size <= memory.size() && mCreated)
+
+  if(!mCpuOnly)
   {
-    // Use subData to avoid re-allocation
-    mGl.BufferSubData(GetTarget(), static_cast<GLintptr>(static_cast<unsigned long>(offset)), static_cast<GLsizeiptr>(static_cast<unsigned long>(size)), &memory[offset]);
-  }
-  else
-  {
-    mGl.BufferData(GetTarget(), static_cast<GLsizeiptr>(static_cast<unsigned long>(size)), &memory[0], GL_STATIC_DRAW); //@todo Query - do we need other usages?
-    mCreated = true;
+    if(size <= memory.size() && mCreated)
+    {
+      // Use subData to avoid re-allocation
+      mGl.BufferSubData(GetTarget(), static_cast<GLintptr>(static_cast<unsigned long>(offset)), static_cast<GLsizeiptr>(static_cast<unsigned long>(size)), &memory[offset]);
+    }
+    else
+    {
+      mGl.BufferData(GetTarget(), static_cast<GLsizeiptr>(static_cast<unsigned long>(size)), &memory[0], GL_STATIC_DRAW); //@todo Query - do we need other usages?
+      mCreated = true;
+    }
   }
 }
 

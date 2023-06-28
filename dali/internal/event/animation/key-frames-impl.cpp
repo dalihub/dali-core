@@ -166,12 +166,12 @@ Property::Value KeyFrames::GetLastKeyFrameValue() const
 
 std::size_t KeyFrames::GetKeyFrameCount() const
 {
-  return mKeyFrames->GetNumberOfKeyFrames();
+  return mKeyFrames ? mKeyFrames->GetNumberOfKeyFrames() : 0u;
 }
 
 void KeyFrames::GetKeyFrame(std::size_t index, float& time, Property::Value& value) const
 {
-  if(index < mKeyFrames->GetNumberOfKeyFrames())
+  if(mKeyFrames && index < mKeyFrames->GetNumberOfKeyFrames())
   {
     mKeyFrames->GetKeyFrameAsValue(index, time, value);
   }
@@ -179,7 +179,7 @@ void KeyFrames::GetKeyFrame(std::size_t index, float& time, Property::Value& val
 
 void KeyFrames::SetKeyFrameValue(std::size_t index, const Property::Value& value)
 {
-  if(index < mKeyFrames->GetNumberOfKeyFrames())
+  if(mKeyFrames && index < mKeyFrames->GetNumberOfKeyFrames() && mType == value.GetType())
   {
     mKeyFrames->SetKeyFrameValue(index, value);
   }
