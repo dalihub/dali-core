@@ -25,7 +25,6 @@
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/render/common/performance-monitor.h>
 #include <dali/public-api/math/math-utils.h>
-
 namespace // Unnamed namespace
 {
 // Memory pool used to allocate new animations. Memory used by this pool will be released when shutting down DALi
@@ -488,10 +487,6 @@ void Animation::UpdateAnimators(BufferIndex bufferIndex, bool bake, bool animati
         {
           mIsActive[bufferIndex] = true;
         }
-      }
-      else
-      {
-        animator->SetDelayed(true);
       }
       applied = true;
     }
