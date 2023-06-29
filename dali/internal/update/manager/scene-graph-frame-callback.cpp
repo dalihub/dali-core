@@ -61,6 +61,12 @@ FrameCallback::RequestFlags FrameCallback::Update(BufferIndex bufferIndex, float
   {
     mUpdateProxy->SetCurrentBufferIndex(bufferIndex);
 
+    while(!mSyncPoints.empty())
+    {
+      mUpdateProxy->Notify(mSyncPoints.front());
+      mSyncPoints.pop_front();
+    }
+
     if(nodeHierarchyChanged)
     {
       mUpdateProxy->NodeHierarchyChanged();
@@ -76,6 +82,11 @@ FrameCallback::RequestFlags FrameCallback::Update(BufferIndex bufferIndex, float
   }
 
   return static_cast<FrameCallback::RequestFlags>(continueCalling | (keepRendering << 1));
+}
+
+void FrameCallback::Notify(Dali::UpdateProxy::NotifySyncPoint syncPoint)
+{
+  mSyncPoints.push_back(syncPoint);
 }
 
 void FrameCallback::Invalidate()

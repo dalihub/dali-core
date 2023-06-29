@@ -31,18 +31,33 @@ class UpdateProxy;
 /**
  * @brief This interface should be implemented if a callback is required on every frame.
  *
- * The Update() method is called from the update-thread after the scene has been updated, and is ready to render.
+ * The Update() method is called from the update-thread after the
+ * scene has been updated, and is ready to render.
  *
- * As this method is called from the update-thread, no event thread APIs (e.g. Actor::Get...) can be called.
- * This will invariably lead to crashes.
+ * As this method is called from the update-thread, no event thread
+ * APIs (e.g. Actor::Get...) can be called.  This will invariably lead
+ * to crashes.
  *
- * Instead, setting and retrieving the values should be done by using the UpdateProxy class returned as a parameter to
- * the Update() method.
+ * Instead, setting and retrieving the values should be done by using
+ * the UpdateProxy class returned as a parameter to the Update()
+ * method.
  *
- * Actors can be identified using Actor IDs which can be retrieved using Actor::GetId() in the event-thread.
- * However, calling Actor::GetId() will lead to problems if it is called from the update-thread.
- * Instead, the Actor IDs should be stored by the implementation of this class or passed via a thread-safe manner from
- * the event-thread.
+ * Actors can be identified using Actor IDs which can be retrieved
+ * using Actor::GetId() in the event-thread.  However, calling
+ * Actor::GetId() will lead to problems if it is called from the
+ * update-thread.
+ *
+ * Instead, the Actor IDs should be stored by the implementation of
+ * this class or passed via a thread-safe manner from the
+ * event-thread.
+ *
+ * The implementation can be notified that there is a sync point on
+ * the next update. If this frame callback has been notified with a
+ * sync point, then the UpdateProxy can be tested at the start of the
+ * update in order to check the sync point.
+ *   The sync notification is to enable the synchronization of the frame
+ * upate callback with the setting of other dali object properties,
+ * for instance, actor visibility, on the update thread.
  */
 class DALI_CORE_API FrameCallbackInterface
 {

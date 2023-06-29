@@ -104,6 +104,37 @@ public:
   Vector3    mSizeGetWorldTransform;
 };
 
+class FrameCallbackNotify : public FrameCallbackBasic
+{
+public:
+  FrameCallbackNotify()
+  {
+  }
+
+  void SetSyncTrigger(int trigger)
+  {
+    mTrigger   = trigger;
+    mTriggered = false;
+  }
+
+  virtual bool Update(Dali::UpdateProxy& updateProxy, float elapsedSeconds) override
+  {
+    FrameCallbackBasic::Update(updateProxy, elapsedSeconds);
+
+    UpdateProxy::NotifySyncPoint sync;
+    while((sync = updateProxy.PopSyncPoint()) != UpdateProxy::INVALID_SYNC)
+    {
+      mTriggered = (sync == mTrigger);
+      mSyncPoints.push_back(sync);
+    }
+    return true;
+  }
+
+  std::list<UpdateProxy::NotifySyncPoint> mSyncPoints;
+  UpdateProxy::NotifySyncPoint            mTrigger{UpdateProxy::INVALID_SYNC};
+  bool                                    mTriggered{false};
+};
+
 class FrameCallbackSetter : public FrameCallbackBasic
 {
 public:
@@ -1075,5 +1106,73 @@ int UtcDaliFrameCallbackGetExtension(void)
   FrameCallbackBasic frameCallback;
   DALI_TEST_CHECK(frameCallback.GetExtension() == nullptr);
 
+  END_TEST;
+}
+
+int UtcDaliFrameCallbackUpdateNotify01(void)
+{
+  tet_infoline("Test that the frame callback can be notified");
+
+  TestApplication application;
+  Vector2         actorSize(200, 300);
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, actorSize);
+
+  Stage stage = Stage::GetCurrent();
+  stage.Add(actor);
+
+  Vector3    sizeToSet(1.0f, 2.0f, 3.0f);
+  Vector3    positionToSet(10.0f, 20.0f, 30.0f);
+  Vector4    colorToSet(Color::MAGENTA);
+  Vector3    scaleToSet(1.0f, 3.0f, 5.0f);
+  Quaternion orientationToSet(Radian(Math::PI * 0.3), Vector3::YAXIS);
+
+  tet_infoline("Test that the frame callback was called without a notify");
+  FrameCallbackNotify frameCallback;
+  DevelStage::AddFrameCallback(stage, frameCallback, stage.GetRootLayer());
+  Stage::GetCurrent().KeepRendering(30);
+  application.SendNotification();
+  application.Render(16);
+
+  DALI_TEST_CHECK(!frameCallback.mTriggered);
+  DALI_TEST_CHECK(frameCallback.mSyncPoints.empty());
+
+  tet_infoline("Test that the frame callback was called with a notify");
+  UpdateProxy::NotifySyncPoint syncPoint = DevelStage::NotifyFrameCallback(stage, frameCallback);
+  DALI_TEST_CHECK(syncPoint != UpdateProxy::INVALID_SYNC);
+  frameCallback.SetSyncTrigger(syncPoint);
+
+  application.SendNotification();
+  application.Render(16);
+  DALI_TEST_CHECK(frameCallback.mTriggered);
+  DALI_TEST_CHECK(!frameCallback.mSyncPoints.empty());
+
+  tet_infoline("Test that the frame callback was called without a notify");
+
+  frameCallback.SetSyncTrigger(UpdateProxy::INVALID_SYNC);
+  frameCallback.mSyncPoints.clear();
+  frameCallback.mTriggered = false;
+
+  application.SendNotification();
+  application.Render(16);
+  DALI_TEST_CHECK(!frameCallback.mTriggered);
+  DALI_TEST_CHECK(frameCallback.mSyncPoints.empty());
+
+  tet_infoline("Test that adding 2 notify before next update contains both");
+
+  auto syncPoint1 = DevelStage::NotifyFrameCallback(stage, frameCallback);
+  DALI_TEST_CHECK(syncPoint1 != UpdateProxy::INVALID_SYNC);
+  auto syncPoint2 = DevelStage::NotifyFrameCallback(stage, frameCallback);
+  DALI_TEST_CHECK(syncPoint2 != UpdateProxy::INVALID_SYNC);
+  DALI_TEST_CHECK(syncPoint1 != syncPoint2);
+  application.SendNotification();
+  application.Render(16);
+
+  DALI_TEST_EQUALS(frameCallback.mSyncPoints.size(), 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSyncPoints.front(), syncPoint1, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSyncPoints.back(), syncPoint2, TEST_LOCATION);
   END_TEST;
 }

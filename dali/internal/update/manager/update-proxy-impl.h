@@ -26,6 +26,7 @@
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/update/manager/transform-manager.h>
 #include <dali/internal/update/nodes/node.h>
+#include <dali/public-api/common/list-wrapper.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/vector3.h>
@@ -183,6 +184,21 @@ public:
   void NodeHierarchyChanged();
 
   /**
+   * @brief Inform the proxy that a sync point was requested.
+   *
+   * @param[in] syncPoint The sync point to notify with.
+   */
+  void Notify(Dali::UpdateProxy::NotifySyncPoint syncPoint);
+
+  /**
+   * @brief Get the sync point from the proxy. If there was no sync point,
+   * this returns INVALID_SYNC. It is intended that this method is only called
+   * once per Update(), so clears any stored sync point.
+   * @return Valid sync point or INVALID_SYNC
+  */
+  Dali::UpdateProxy::NotifySyncPoint PopSyncPoint();
+
+  /**
    * @brief Adds node resetter for each dirty node whose animatable properties have been changed.
    */
   void AddNodeResetters();
@@ -221,11 +237,11 @@ private:
   mutable std::vector<uint32_t>   mDirtyNodes;           ///< Used to store the ID of the dirty nodes with non-transform property modifications.
   BufferIndex                     mCurrentBufferIndex;
 
-  SceneGraph::UpdateManager&    mUpdateManager;    ///< Reference to the Update Manager.
-  SceneGraph::TransformManager& mTransformManager; ///< Reference to the Transform Manager.
-  SceneGraph::Node&             mRootNode;         ///< The root node of this update proxy.
-
-  PropertyModifierPtr mPropertyModifier; ///< To ensure non-transform property modifications reset to base values.
+  SceneGraph::UpdateManager&                    mUpdateManager;    ///< Reference to the Update Manager.
+  SceneGraph::TransformManager&                 mTransformManager; ///< Reference to the Transform Manager.
+  SceneGraph::Node&                             mRootNode;         ///< The root node of this update proxy.
+  std::list<Dali::UpdateProxy::NotifySyncPoint> mSyncPoints;
+  PropertyModifierPtr                           mPropertyModifier; ///< To ensure non-transform property modifications reset to base values.
 };
 
 } // namespace Internal
