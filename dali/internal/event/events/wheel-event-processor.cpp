@@ -41,6 +41,38 @@ DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_WHEEL_PROCESSOR");
 #endif
 
+Dali::Actor EmitInterceptWheelSignals(Dali::Actor actor, const Dali::WheelEvent& wheelEvent)
+{
+  Dali::Actor interceptedActor;
+
+  if(actor)
+  {
+    Dali::Actor parent = actor.GetParent();
+    if(parent)
+    {
+      // Recursively deliver events to the actor and its parents for intercept wheel event.
+      interceptedActor = EmitInterceptWheelSignals(parent, wheelEvent);
+    }
+
+    if(!interceptedActor)
+    {
+      bool   intercepted = false;
+      Actor& actorImpl(GetImplementation(actor));
+      if(actorImpl.GetInterceptWheelRequired())
+      {
+        DALI_TRACE_SCOPE(gTraceFilter, "DALI_EMIT_INTERCEPT_WHEEL_EVENT_SIGNAL");
+        intercepted = actorImpl.EmitInterceptWheelEventSignal(wheelEvent);
+        if(intercepted)
+        {
+          interceptedActor = Dali::Actor(&actorImpl);
+        }
+      }
+    }
+  }
+
+  return interceptedActor;
+}
+
 /**
  *  Recursively deliver events to the actor and its parents, until the event is consumed or the stage is reached.
  */
@@ -60,6 +92,7 @@ Dali::Actor EmitWheelSignals(Dali::Actor actor, const Dali::WheelEvent& event)
     if(actorImpl.GetWheelEventRequired())
     {
       // Emit the signal to the parent
+      DALI_TRACE_SCOPE(gTraceFilter, "DALI_EMIT_WHEEL_EVENT_SIGNAL");
       consumed = actorImpl.EmitWheelEventSignal(event);
     }
 
@@ -96,7 +129,7 @@ bool IsActorWheelableFunction(Dali::Actor actor, Dali::HitTestAlgorithm::Travers
   {
     case Dali::HitTestAlgorithm::CHECK_ACTOR:
     {
-      if(GetImplementation(actor).GetWheelEventRequired() && // Does the Application or derived actor type require a wheel event?
+      if((GetImplementation(actor).GetWheelEventRequired() || GetImplementation(actor).GetInterceptWheelRequired()) && // Does the Application or derived actor type require a wheel event?
          GetImplementation(actor).IsHittable())
       {
         hittable = true;
@@ -144,7 +177,18 @@ void WheelEventProcessor::ProcessWheelEvent(const Integration::WheelEvent& event
     DALI_LOG_INFO(gLogFilter, Debug::General, "  Screen(%.0f, %.0f), HitActor(%p, %s), Local(%.2f, %.2f)\n", event.point.x, event.point.y, (hitTestResults.actor ? reinterpret_cast<void*>(&hitTestResults.actor.GetBaseObject()) : NULL), (hitTestResults.actor ? hitTestResults.actor.GetProperty<std::string>(Dali::Actor::Property::NAME).c_str() : ""), hitTestResults.actorCoordinates.x, hitTestResults.actorCoordinates.y);
 
     // Recursively deliver events to the actor and its parents, until the event is consumed or the stage is reached.
-    Dali::Actor consumedActor = EmitWheelSignals(hitTestResults.actor, wheelEventHandle);
+    Dali::Actor consumedActor;
+
+    // Emit the intercept wheel event signal
+    Dali::Actor interceptedActor = EmitInterceptWheelSignals(hitTestResults.actor, wheelEventHandle);
+    if(interceptedActor)
+    {
+      consumedActor = EmitWheelSignals(interceptedActor, wheelEventHandle);
+    }
+    else
+    {
+      consumedActor = EmitWheelSignals(hitTestResults.actor, wheelEventHandle);
+    }
 
     DALI_LOG_INFO(gLogFilter, Debug::Concise, "HitActor:      (%p) %s\n", hitTestResults.actor ? reinterpret_cast<void*>(&hitTestResults.actor.GetBaseObject()) : NULL, hitTestResults.actor ? hitTestResults.actor.GetProperty<std::string>(Dali::Actor::Property::NAME).c_str() : "");
     DALI_LOG_INFO(gLogFilter, Debug::Concise, "ConsumedActor: (%p) %s\n", consumedActor ? reinterpret_cast<void*>(&consumedActor.GetBaseObject()) : NULL, consumedActor ? consumedActor.GetProperty<std::string>(Dali::Actor::Property::NAME).c_str() : "");

@@ -16,6 +16,7 @@
  */
 
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/events/wheel-event-devel.h>
 #include <dali/integration-api/events/wheel-event-integ.h>
 #include <dali/public-api/dali-core.h>
@@ -57,8 +58,9 @@ struct SignalData
 // Functor that sets the data when called
 struct WheelEventReceivedFunctor
 {
-  WheelEventReceivedFunctor(SignalData& data)
-  : signalData(data)
+  WheelEventReceivedFunctor(SignalData& data, bool returnValue = true)
+  : signalData(data),
+    returnValue(returnValue)
   {
   }
 
@@ -68,10 +70,11 @@ struct WheelEventReceivedFunctor
     signalData.receivedWheelEvent = wheelEvent;
     signalData.wheeledActor       = actor;
 
-    return true;
+    return returnValue;
   }
 
   SignalData& signalData;
+  bool        returnValue;
 };
 
 } // anonymous namespace
@@ -249,6 +252,75 @@ int UtcDaliWheelEventSignalling(void)
   screenCoordinates.x = screenCoordinates.y = 300.0f;
   Integration::WheelEvent newEvent(Integration::WheelEvent::MOUSE_WHEEL, 0, SHIFT_MODIFIER, screenCoordinates, 1, 1000u);
   application.ProcessEvent(newEvent);
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, rootData.functorCalled, TEST_LOCATION);
+  DALI_TEST_CHECK(rootActor == rootData.wheeledActor);
+  DALI_TEST_EQUALS(WheelEvent::MOUSE_WHEEL, rootData.receivedWheelEvent.GetType(), TEST_LOCATION); // check type
+  DALI_TEST_EQUALS(0, rootData.receivedWheelEvent.GetDirection(), TEST_LOCATION);                  // check direction
+  DALI_TEST_EQUALS(SHIFT_MODIFIER, rootData.receivedWheelEvent.GetModifiers(), TEST_LOCATION);     // check modifier
+  DALI_TEST_EQUALS(screenCoordinates, rootData.receivedWheelEvent.GetPoint(), TEST_LOCATION);      // check modifier
+  DALI_TEST_EQUALS(1, rootData.receivedWheelEvent.GetDelta(), TEST_LOCATION);                      // check modifier
+  DALI_TEST_EQUALS(1000u, rootData.receivedWheelEvent.GetTime(), TEST_LOCATION);                   // check modifier
+
+  // Remove actor from the scene
+  application.GetScene().Remove(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Emit a move at the same point, we should not be signalled.
+  application.ProcessEvent(event);
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+  END_TEST;
+}
+
+int UtcDaliWheelEventIntercept(void)
+{
+  TestApplication application; // Reset all test adapter return codes
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's wheel event signal
+  SignalData                data;
+  WheelEventReceivedFunctor functor(data);
+  actor.WheelEventSignal().Connect(&application, functor);
+
+  Vector2                 screenCoordinates(10.0f, 10.0f);
+  Integration::WheelEvent event(Integration::WheelEvent::MOUSE_WHEEL, 0, SHIFT_MODIFIER, screenCoordinates, 1, 1000u);
+
+  // Emit a wheel signal
+  application.ProcessEvent(event);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_CHECK(actor == data.wheeledActor);
+  DALI_TEST_EQUALS(WheelEvent::MOUSE_WHEEL, data.receivedWheelEvent.GetType(), TEST_LOCATION); // check type
+  DALI_TEST_EQUALS(0, data.receivedWheelEvent.GetDirection(), TEST_LOCATION);                  // check direction
+  DALI_TEST_EQUALS(SHIFT_MODIFIER, data.receivedWheelEvent.GetModifiers(), TEST_LOCATION);     // check modifier
+  DALI_TEST_EQUALS(screenCoordinates, data.receivedWheelEvent.GetPoint(), TEST_LOCATION);      // check modifier
+  DALI_TEST_EQUALS(1, data.receivedWheelEvent.GetDelta(), TEST_LOCATION);                      // check modifier
+  DALI_TEST_EQUALS(1000u, data.receivedWheelEvent.GetTime(), TEST_LOCATION);                   // check modifier
+  data.Reset();
+
+  // Intercept wheel events on the root actor.
+  Actor rootActor(application.GetScene().GetRootLayer());
+
+  // Connect to root actor's intercept wheel event signal
+  SignalData                rootData;
+  WheelEventReceivedFunctor rootFunctor(rootData); // Consumes signal
+  Dali::DevelActor::InterceptWheelSignal(rootActor).Connect(&application, rootFunctor);
+
+  Integration::WheelEvent newEvent(Integration::WheelEvent::MOUSE_WHEEL, 0, SHIFT_MODIFIER, screenCoordinates, 1, 1000u);
+  application.ProcessEvent(newEvent);
+
+  // It should be able to receive wheel events to root actor by registering only InterceptWheelEvent.
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, rootData.functorCalled, TEST_LOCATION);
   DALI_TEST_CHECK(rootActor == rootData.wheeledActor);

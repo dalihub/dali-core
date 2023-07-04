@@ -69,6 +69,11 @@ Actor::TouchEventSignalType& InterceptTouchedSignal(Actor actor)
   return GetImplementation(actor).InterceptTouchedSignal();
 }
 
+Actor::WheelEventSignalType& InterceptWheelSignal(Actor actor)
+{
+  return GetImplementation(actor).InterceptWheelSignal();
+}
+
 void SetNeedGesturePropagation(Actor actor, bool propagation)
 {
   return GetImplementation(actor).SetNeedGesturePropagation(propagation);
