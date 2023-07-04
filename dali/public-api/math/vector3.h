@@ -569,9 +569,9 @@ struct DALI_CORE_API Vector3
   };
 
 public:
-  Vector3(const Vector3&)     = default;            ///< Default copy constructor
-  Vector3(Vector3&&) noexcept = default;            ///< Default move constructor
-  Vector3& operator=(const Vector3&) = default;     ///< Default copy assignment operator
+  Vector3(const Vector3&)                = default; ///< Default copy constructor
+  Vector3(Vector3&&) noexcept            = default; ///< Default move constructor
+  Vector3& operator=(const Vector3&)     = default; ///< Default copy assignment operator
   Vector3& operator=(Vector3&&) noexcept = default; ///< Default move assignment operator
 };
 
