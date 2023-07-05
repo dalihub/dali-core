@@ -1028,6 +1028,11 @@ bool Actor::EmitHoverEventSignal(const Dali::HoverEvent& event)
   return EmitConsumingSignal(*this, mHoveredSignal, event);
 }
 
+bool Actor::EmitInterceptWheelEventSignal(const Dali::WheelEvent& event)
+{
+  return EmitConsumingSignal(*this, mInterceptWheelSignal, event);
+}
+
 bool Actor::EmitWheelEventSignal(const Dali::WheelEvent& event)
 {
   return EmitConsumingSignal(*this, mWheelEventSignal, event);
@@ -1087,6 +1092,7 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mInterceptTouchedSignal(),
   mTouchedSignal(),
   mHoveredSignal(),
+  mInterceptWheelSignal(),
   mWheelEventSignal(),
   mOnSceneSignal(),
   mOffSceneSignal(),

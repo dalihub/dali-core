@@ -1304,6 +1304,15 @@ public:
   }
 
   /**
+   * Query whether the application or derived actor type requires intercept wheel events.
+   * @return True if intercept wheel events are required.
+   */
+  bool GetInterceptWheelRequired() const
+  {
+    return !mInterceptWheelSignal.Empty();
+  }
+
+  /**
    * Query whether the application or derived actor type requires wheel events.
    * @return True if wheel events are required.
    */
@@ -1401,6 +1410,13 @@ public:
   bool EmitHoverEventSignal(const Dali::HoverEvent& event);
 
   /**
+   * Used by the EventProcessor to emit intercept wheel event signals.
+   * @param[in] event The wheel event.
+   * @return True if the event was intercepted.
+   */
+  bool EmitInterceptWheelEventSignal(const Dali::WheelEvent& event);
+
+  /**
    * Used by the EventProcessor to emit wheel event signals.
    * @param[in] event The wheel event.
    * @return True if the event was consumed.
@@ -1459,6 +1475,14 @@ public:
   Dali::Actor::HoverSignalType& HoveredSignal()
   {
     return mHoveredSignal;
+  }
+
+  /**
+   * @copydoc DevelActor::InterceptWheelSignal()
+   */
+  Dali::Actor::WheelEventSignalType& InterceptWheelSignal()
+  {
+    return mInterceptWheelSignal;
   }
 
   /**
@@ -1923,6 +1947,7 @@ protected:
   Dali::Actor::TouchEventSignalType             mInterceptTouchedSignal;
   Dali::Actor::TouchEventSignalType             mTouchedSignal;
   Dali::Actor::HoverSignalType                  mHoveredSignal;
+  Dali::Actor::WheelEventSignalType             mInterceptWheelSignal;
   Dali::Actor::WheelEventSignalType             mWheelEventSignal;
   Dali::Actor::OnSceneSignalType                mOnSceneSignal;
   Dali::Actor::OffSceneSignalType               mOffSceneSignal;

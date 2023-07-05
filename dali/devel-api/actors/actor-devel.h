@@ -346,6 +346,40 @@ DALI_CORE_API ChildOrderChangedSignalType& ChildOrderChangedSignal(Actor actor);
 DALI_CORE_API Actor::TouchEventSignalType& InterceptTouchedSignal(Actor actor);
 
 /**
+ * @brief This signal is emitted when intercepting the actor's wheel event.
+ *
+ * A callback of the following type may be connected:
+ * @code
+ *   void MyCallbackName( Actor actor );
+ * @endcode
+ * actor The actor to intercept
+ *
+ * @note WheelEvent callbacks are called from the last child in the order of the parent's actor.
+ * The InterceptWheelEvent callback is to intercept the wheel event in the parent.
+ * So, if the parent interepts the wheel event, the child cannot receive the Wheel event.
+ *
+ * @note example
+ *   Actor parent = Actor::New();
+ *   Actor child = Actor::New();
+ *   parent.Add(child);
+ *   child.WheelEventSignal().Connect(&application, childFunctor);
+ *   parent.WheelEventSignal().Connect(&application, parentFunctor);
+ * The wheel event callbacks are called in the order childFunctor -> parentFunctor.
+ *
+ * If you connect InterceptWheelSignal to parentActor.
+ *   Dali::DevelActor::InterceptWheelSignal(parent).Connect(&application, interceptFunctor);
+ *
+ * When interceptFunctor returns false, the wheel event callbacks are called in the same order childFunctor -> parentFunctor.
+ * If interceptFunctor returns true, it means that the WheelEvent was intercepted.
+ * So the child actor will not be able to receive wheel events.
+ * Only the parentFunctor is called.
+ *
+ * @return The signal to connect to
+ * @pre The Actor has been initialized
+ */
+DALI_CORE_API Actor::WheelEventSignalType& InterceptWheelSignal(Actor actor);
+
+/**
  * @brief This is used when the parent actor wants to listen to gesture events.
  *
  * @note example The child is overlapped on the parent.
