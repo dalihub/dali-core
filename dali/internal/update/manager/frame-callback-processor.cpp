@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,8 +63,10 @@ void FrameCallbackProcessor::RemoveFrameCallback(FrameCallbackInterface* frameCa
   mFrameCallbacks.erase(iter, mFrameCallbacks.end());
 }
 
-void FrameCallbackProcessor::Update(BufferIndex bufferIndex, float elapsedSeconds)
+bool FrameCallbackProcessor::Update(BufferIndex bufferIndex, float elapsedSeconds)
 {
+  bool keepRendering = false;
+
   if(!mFrameCallbacks.empty())
   {
     DALI_TRACE_SCOPE(gTraceFilter, "DALI_FRAME_CALLBACK_UPDATE");
@@ -72,12 +74,16 @@ void FrameCallbackProcessor::Update(BufferIndex bufferIndex, float elapsedSecond
     // If any of the FrameCallback::Update calls returns false, then they are no longer required & can be removed.
     auto iter = std::remove_if(
       mFrameCallbacks.begin(), mFrameCallbacks.end(), [&](OwnerPointer<FrameCallback>& frameCallback) {
-        return !frameCallback->Update(bufferIndex, elapsedSeconds, mNodeHierarchyChanged);
+        FrameCallback::RequestFlags requests = frameCallback->Update(bufferIndex, elapsedSeconds, mNodeHierarchyChanged);
+        keepRendering |= (requests & FrameCallback::KEEP_RENDERING);
+        return (requests & FrameCallback::CONTINUE_CALLING) == 0;
       });
     mFrameCallbacks.erase(iter, mFrameCallbacks.end());
   }
 
   mNodeHierarchyChanged = false;
+
+  return keepRendering;
 }
 
 } // namespace SceneGraph

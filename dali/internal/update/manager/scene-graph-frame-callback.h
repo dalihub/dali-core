@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_FRAME_CALLBACK_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,16 @@ class FrameCallback final : public PropertyOwner::Observer
 {
 public:
   /**
+   * A set of bit mask options that, when combined, define the requests from this FrameCallback
+   * after being called from the update-thread.
+   */
+  enum RequestFlags
+  {
+    CONTINUE_CALLING = 1 << 0, ///< True if we request to continue calling this FrameCallback.
+    KEEP_RENDERING   = 1 << 1  ///< True if we request to keep rendering
+  };
+
+  /**
    * Creates a new FrameCallback.
    * @param[in]  frameCallbackInterface  A reference to the FrameCallbackInterface implementation
    * @return A new FrameCallback.
@@ -76,9 +86,9 @@ public:
    * @param[in]  bufferIndex           The bufferIndex to use
    * @param[in]  elapsedSeconds        Time elapsed time since the last frame (in seconds)
    * @param[in]  nodeHierarchyChanged  Whether the node hierarchy has changed
-   * @return Whether to continue calling this FrameCallback or not.
+   * @return The requests from this FrameCallback.
    */
-  bool Update(BufferIndex bufferIndex, float elapsedSeconds, bool nodeHierarchyChanged);
+  RequestFlags Update(BufferIndex bufferIndex, float elapsedSeconds, bool nodeHierarchyChanged);
 
   /**
    * Invalidates this FrameCallback and will no longer be associated with the FrameCallbackInterface.
