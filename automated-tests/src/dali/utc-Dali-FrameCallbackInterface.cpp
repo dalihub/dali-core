@@ -49,7 +49,7 @@ public:
   virtual bool Update(Dali::UpdateProxy& updateProxy, float elapsedSeconds)
   {
     mCalled = true;
-    return false;
+    return true;
   }
 
   virtual void Reset()
@@ -1030,6 +1030,42 @@ int UtcDaliFrameCallbackDoubleAddition(void)
   {
     DALI_TEST_CHECK(true);
   }
+
+  END_TEST;
+}
+
+int UtcDaliFrameCallbackUpdateStatus(void)
+{
+  // Ensure the update status is consistent with whether the framecallback requests to keep rendering or not
+
+  TestApplication application;
+  Stage           stage = Stage::GetCurrent();
+
+  Actor actor = Actor::New();
+  stage.Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(application.GetUpdateStatus(), 0, TEST_LOCATION);
+
+  // This framecallback doesn't request to keep rendering
+  FrameCallbackMultipleActors frameCallbackMultipleActors;
+  DevelStage::AddFrameCallback(stage, frameCallbackMultipleActors, actor);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(application.GetUpdateStatus(), 0, TEST_LOCATION);
+
+  // This framecallback requests to keep rendering
+  FrameCallbackBasic frameCallbackBasic;
+  DevelStage::AddFrameCallback(stage, frameCallbackBasic, actor);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(application.GetUpdateStatus(), Integration::KeepUpdating::STAGE_KEEP_RENDERING, TEST_LOCATION);
 
   END_TEST;
 }
