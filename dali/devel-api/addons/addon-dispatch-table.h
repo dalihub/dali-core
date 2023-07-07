@@ -2,7 +2,7 @@
 #define DALI_ADDON_DISPATCH_TABLE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include <dali/public-api/common/vector-wrapper.h>
 #include <algorithm>
 #include <string>
+#include <cstdint>
 
 namespace Dali
 {

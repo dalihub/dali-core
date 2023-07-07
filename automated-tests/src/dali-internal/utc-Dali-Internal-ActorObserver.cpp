@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -153,11 +153,19 @@ int UtcDaliActorObserverMoveConstructorAndAssignmentEmpty(void)
   DALI_TEST_EQUALS(observer1.GetActor(), nullptr, TEST_LOCATION);
   DALI_TEST_EQUALS(observer2.GetActor(), nullptr, TEST_LOCATION);
 
+  // Self std::move assignment make compile warning over gcc-13. Let we ignore the warning.
+#if (__GNUC__ >= 13)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wself-move"
+#endif
   // Ensure self assignment doesn't change anything
   observer1 = std::move(observer1);
   observer2 = std::move(observer2);
   DALI_TEST_EQUALS(observer1.GetActor(), nullptr, TEST_LOCATION);
   DALI_TEST_EQUALS(observer2.GetActor(), nullptr, TEST_LOCATION);
+#if (__GNUC__ >= 13)
+#pragma GCC diagnostic pop
+#endif
 
   END_TEST;
 }
@@ -185,11 +193,19 @@ int UtcDaliActorObserverMoveConstructorAndAssignment(void)
   DALI_TEST_EQUALS(observer1.GetActor(), &actorImpl, TEST_LOCATION);
   DALI_TEST_EQUALS(observer2.GetActor(), nullptr, TEST_LOCATION);
 
+  // Self std::move assignment make compile warning over gcc-13. Let we ignore the warning.
+#if (__GNUC__ >= 13)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wself-move"
+#endif
   // Self assignment
   observer1 = std::move(observer1);
   observer2 = std::move(observer2);
   DALI_TEST_EQUALS(observer1.GetActor(), &actorImpl, TEST_LOCATION);
   DALI_TEST_EQUALS(observer2.GetActor(), nullptr, TEST_LOCATION);
+#if (__GNUC__ >= 13)
+#pragma GCC diagnostic pop
+#endif
 
   END_TEST;
 }

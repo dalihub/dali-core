@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -162,9 +162,17 @@ int UtcDaliPropertyMapMoveAssignmentOperator(void)
   DALI_TEST_ASSERTION(const_cast<const Property::Map&>(map1)[0], exceptionMessage);
   DALI_TEST_ASSERTION(Property::Map temp; map1 = temp, exceptionMessage);
 
+  // Self std::move assignment make compile warning over gcc-13. Let we ignore the warning.
+#if (__GNUC__ >= 13)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wself-move"
+#endif
   // Self assignment
   map2 = std::move(map2);
   DALI_TEST_EQUALS(3u, map2.Count(), TEST_LOCATION); // No debug assert as nothing should happen
+#if (__GNUC__ >= 13)
+#pragma GCC diagnostic pop
+#endif
 
   END_TEST;
 }
