@@ -43,7 +43,7 @@ namespace
  * @param[in] dimension The dimension to extract
  * @return Return the value for the dimension
  */
-constexpr float GetDimensionValue(const Dali::Vector2 values, const Dali::Dimension::Type dimension)
+constexpr float GetDimensionValue(const Dali::Vector2& values, const Dali::Dimension::Type dimension)
 {
   switch(dimension)
   {
