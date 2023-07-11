@@ -2,7 +2,7 @@
 #define DALI_FRAME_CALLBACK_INTERFACE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,13 +47,26 @@ class UpdateProxy;
 class DALI_CORE_API FrameCallbackInterface
 {
 public:
+  class Extension; ///< Forward declare future extension interface
+
   /**
    * @brief Called from the update-thread after the scene has been updated, and is ready to render.
    * @param[in]  updateProxy  Use this to get/set required values for the Actor.
    * @param[in]  elapsedSeconds  Time elapsed time since the last frame (in seconds)
+   * @return Whether we should keep rendering.
    * @see FrameCallbackInterface
    */
-  virtual void Update(UpdateProxy& updateProxy, float elapsedSeconds) = 0;
+  virtual bool Update(UpdateProxy& updateProxy, float elapsedSeconds) = 0;
+
+  /**
+   * @brief Retrieves the extension for the interface.
+   *
+   * @return The extension if available, nullptr otherwise
+   */
+  virtual Extension* GetExtension()
+  {
+    return nullptr;
+  }
 
 protected:
   /**

@@ -1051,7 +1051,7 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
     // Call the frame-callback-processor if set
     if(mImpl->frameCallbackProcessor)
     {
-      mImpl->frameCallbackProcessor->Update(bufferIndex, elapsedSeconds);
+      keepRendererRendering |= mImpl->frameCallbackProcessor->Update(bufferIndex, elapsedSeconds);
     }
 
     // Update node hierarchy, apply constraints,

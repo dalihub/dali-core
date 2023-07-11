@@ -46,9 +46,10 @@ class FrameCallbackBasic : public FrameCallbackInterface
 public:
   FrameCallbackBasic() = default;
 
-  virtual void Update(Dali::UpdateProxy& updateProxy, float elapsedSeconds)
+  virtual bool Update(Dali::UpdateProxy& updateProxy, float elapsedSeconds)
   {
     mCalled = true;
+    return true;
   }
 
   virtual void Reset()
@@ -67,7 +68,7 @@ public:
   {
   }
 
-  virtual void Update(Dali::UpdateProxy& updateProxy, float elapsedSeconds) override
+  virtual bool Update(Dali::UpdateProxy& updateProxy, float elapsedSeconds) override
   {
     FrameCallbackBasic::Update(updateProxy, elapsedSeconds);
     updateProxy.GetPosition(mActorId, mPositionGetPositionCall);
@@ -79,6 +80,8 @@ public:
 
     updateProxy.GetWorldPositionScaleAndSize(mActorId, mWorldPosition, mWorldScale, mSizeGetWorldPositionAndSizeCall);
     updateProxy.GetWorldTransformAndSize(mActorId, mWorldTransformPosition, mWorldTransformScale, mWorldTransformOrientation, mSizeGetWorldTransform);
+
+    return false;
   }
 
   const unsigned int mActorId;
@@ -120,7 +123,7 @@ public:
   {
   }
 
-  virtual void Update(Dali::UpdateProxy& updateProxy, float elapsedSeconds) override
+  virtual bool Update(Dali::UpdateProxy& updateProxy, float elapsedSeconds) override
   {
     Vector3 size;
     FrameCallbackBasic::Update(updateProxy, elapsedSeconds);
@@ -134,6 +137,8 @@ public:
     updateProxy.GetColor(mActorId, mColorAfterSetting);
     updateProxy.GetScale(mActorId, mScaleAfterSetting);
     updateProxy.GetOrientation(mActorId, mOrientationAfterSetting);
+
+    return false;
   }
 
   const unsigned int mActorId;
@@ -169,7 +174,7 @@ public:
   {
   }
 
-  virtual void Update(Dali::UpdateProxy& updateProxy, float elapsedSeconds) override
+  virtual bool Update(Dali::UpdateProxy& updateProxy, float elapsedSeconds) override
   {
     Vector3 size;
     FrameCallbackBasic::Update(updateProxy, elapsedSeconds);
@@ -183,6 +188,8 @@ public:
     updateProxy.GetColor(mActorId, mColorAfterSetting);
     updateProxy.GetScale(mActorId, mScaleAfterSetting);
     updateProxy.GetOrientation(mActorId, mOrientationAfterSetting);
+
+    return false;
   }
 
   const unsigned int mActorId;
@@ -206,7 +213,7 @@ public:
   {
   }
 
-  virtual void Update(Dali::UpdateProxy& updateProxy, float elapsedSeconds) override
+  virtual bool Update(Dali::UpdateProxy& updateProxy, float elapsedSeconds) override
   {
     FrameCallbackBasic::Update(updateProxy, elapsedSeconds);
     for(auto&& i : mActorIds)
@@ -217,6 +224,8 @@ public:
       mPositions[i] = position;
       mSizes[i]     = size;
     }
+
+    return false;
   }
 
   Vector<unsigned int> mActorIds;
@@ -233,7 +242,7 @@ public:
   {
   }
 
-  virtual void Update(Dali::UpdateProxy& updateProxy, float elapsedSeconds) override
+  virtual bool Update(Dali::UpdateProxy& updateProxy, float elapsedSeconds) override
   {
     FrameCallbackBasic::Update(updateProxy, elapsedSeconds);
     Vector3    vec3;
@@ -259,6 +268,8 @@ public:
     mSetOrientationCallSuccess    = updateProxy.SetOrientation(mActorId, quat);
     mBakeOrientationCallSuccess   = updateProxy.BakeOrientation(mActorId, quat);
     mGetWorldTransformCallSuccess = updateProxy.GetWorldTransformAndSize(mActorId, vec3, vec3, quat, vec3);
+
+    return false;
   }
 
   virtual void Reset() override
@@ -1019,6 +1030,50 @@ int UtcDaliFrameCallbackDoubleAddition(void)
   {
     DALI_TEST_CHECK(true);
   }
+
+  END_TEST;
+}
+
+int UtcDaliFrameCallbackUpdateStatus(void)
+{
+  // Ensure the update status is consistent with whether the framecallback requests to keep rendering or not
+
+  TestApplication application;
+  Stage           stage = Stage::GetCurrent();
+
+  Actor actor = Actor::New();
+  stage.Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(application.GetUpdateStatus(), 0, TEST_LOCATION);
+
+  // This framecallback doesn't request to keep rendering
+  FrameCallbackMultipleActors frameCallbackMultipleActors;
+  DevelStage::AddFrameCallback(stage, frameCallbackMultipleActors, actor);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(application.GetUpdateStatus(), 0, TEST_LOCATION);
+
+  // This framecallback requests to keep rendering
+  FrameCallbackBasic frameCallbackBasic;
+  DevelStage::AddFrameCallback(stage, frameCallbackBasic, actor);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(application.GetUpdateStatus(), Integration::KeepUpdating::STAGE_KEEP_RENDERING, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliFrameCallbackGetExtension(void)
+{
+  FrameCallbackBasic frameCallback;
+  DALI_TEST_CHECK(frameCallback.GetExtension() == nullptr);
 
   END_TEST;
 }

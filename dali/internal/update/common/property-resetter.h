@@ -81,6 +81,13 @@ public:
 
       mBaseProperty->ResetToBaseValue(updateBufferIndex);
     }
+
+    if(mRunning == AGING)
+    {
+      // If this resetter is aging now, make it as stopped.
+      // Now we can assume that this PropertyResetter is finished.
+      mRunning = STOPPED;
+    }
   };
 
   /**

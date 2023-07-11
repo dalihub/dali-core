@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,9 +52,11 @@ void FrameCallback::ConnectToSceneGraph(UpdateManager& updateManager, TransformM
   rootNode.AddObserver(*this);
 }
 
-bool FrameCallback::Update(BufferIndex bufferIndex, float elapsedSeconds, bool nodeHierarchyChanged)
+FrameCallback::RequestFlags FrameCallback::Update(BufferIndex bufferIndex, float elapsedSeconds, bool nodeHierarchyChanged)
 {
   bool continueCalling = false;
+  bool keepRendering   = false;
+
   if(mUpdateProxy)
   {
     mUpdateProxy->SetCurrentBufferIndex(bufferIndex);
@@ -68,11 +70,12 @@ bool FrameCallback::Update(BufferIndex bufferIndex, float elapsedSeconds, bool n
     if(mFrameCallbackInterface && mValid)
     {
       Dali::UpdateProxy updateProxy(*mUpdateProxy);
-      mFrameCallbackInterface->Update(updateProxy, elapsedSeconds);
+      keepRendering   = mFrameCallbackInterface->Update(updateProxy, elapsedSeconds);
       continueCalling = true;
     }
   }
-  return continueCalling;
+
+  return static_cast<FrameCallback::RequestFlags>(continueCalling | (keepRendering << 1));
 }
 
 void FrameCallback::Invalidate()
