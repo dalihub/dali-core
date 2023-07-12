@@ -23,6 +23,7 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
+#include <dali/internal/render/common/render-manager.h>
 
 namespace Dali
 {
@@ -41,174 +42,6 @@ MemoryPoolObjectAllocator<Texture>& GetTextureMemoryPool()
 {
   static MemoryPoolObjectAllocator<Texture> gTextureMemoryPool;
   return gTextureMemoryPool;
-}
-
-/**
- * Converts DALi pixel format to Graphics::Format
- * @param format
- * @return
- */
-constexpr Graphics::Format ConvertPixelFormat(Pixel::Format format)
-{
-  switch(format)
-  {
-    case Pixel::INVALID:
-      return Graphics::Format::UNDEFINED;
-    case Pixel::A8:
-      return Graphics::Format::R8_UNORM;
-
-    case Pixel::L8:
-      return Graphics::Format::L8;
-    case Pixel::LA88:
-      return Graphics::Format::L8A8;
-    case Pixel::RGB565:
-      return Graphics::Format::R5G6B5_UNORM_PACK16;
-    case Pixel::BGR565:
-      return Graphics::Format::B5G6R5_UNORM_PACK16;
-    case Pixel::RGBA4444:
-      return Graphics::Format::R4G4B4A4_UNORM_PACK16;
-
-    case Pixel::BGRA4444:
-      return Graphics::Format::B4G4R4A4_UNORM_PACK16;
-    case Pixel::RGBA5551:
-      return Graphics::Format::R5G5B5A1_UNORM_PACK16;
-    case Pixel::BGRA5551:
-      return Graphics::Format::B5G5R5A1_UNORM_PACK16;
-    case Pixel::RGB888:
-      return Graphics::Format::R8G8B8_UNORM;
-    case Pixel::RGB8888:
-      return Graphics::Format::R8G8B8A8_UNORM;
-    case Pixel::BGR8888:
-      return Graphics::Format::B8G8R8A8_UNORM;
-    case Pixel::RGBA8888:
-      return Graphics::Format::R8G8B8A8_UNORM;
-    case Pixel::BGRA8888:
-      return Graphics::Format::B8G8R8A8_UNORM;
-
-    case Pixel::DEPTH_UNSIGNED_INT:
-      return Graphics::Format::D16_UNORM;
-    case Pixel::DEPTH_FLOAT:
-      return Graphics::Format::D32_SFLOAT;
-    case Pixel::DEPTH_STENCIL:
-      return Graphics::Format::D24_UNORM_S8_UINT;
-
-    // EAC
-    case Pixel::COMPRESSED_R11_EAC:
-      return Graphics::Format::EAC_R11_UNORM_BLOCK;
-    case Pixel::COMPRESSED_SIGNED_R11_EAC:
-      return Graphics::Format::EAC_R11_SNORM_BLOCK;
-    case Pixel::COMPRESSED_RG11_EAC:
-      return Graphics::Format::EAC_R11G11_UNORM_BLOCK;
-    case Pixel::COMPRESSED_SIGNED_RG11_EAC:
-      return Graphics::Format::EAC_R11G11_SNORM_BLOCK;
-
-    // ETC
-    case Pixel::COMPRESSED_RGB8_ETC2:
-      return Graphics::Format::ETC2_R8G8B8_UNORM_BLOCK;
-    case Pixel::COMPRESSED_SRGB8_ETC2:
-      return Graphics::Format::ETC2_R8G8B8_SRGB_BLOCK;
-
-    case Pixel::COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2:
-      return Graphics::Format::ETC2_R8G8B8A1_UNORM_BLOCK; // no 'punchthrough' format
-
-    case Pixel::COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2:
-      return Graphics::Format::ETC2_R8G8B8A1_SRGB_BLOCK; // no 'punchthrough' format
-
-    case Pixel::COMPRESSED_RGBA8_ETC2_EAC:
-      return Graphics::Format::ETC2_R8G8B8A8_UNORM_BLOCK;
-
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ETC2_EAC:
-      return Graphics::Format::ETC2_R8G8B8A8_SRGB_BLOCK;
-
-    case Pixel::COMPRESSED_RGB8_ETC1:
-      return Graphics::Format::ETC2_R8G8B8_UNORM_BLOCK; // doesn't seem to be supported at all
-
-    case Pixel::COMPRESSED_RGB_PVRTC_4BPPV1:
-      return Graphics::Format::PVRTC1_4BPP_UNORM_BLOCK_IMG; // or SRGB?
-
-    // ASTC
-    case Pixel::COMPRESSED_RGBA_ASTC_4x4_KHR:
-      return Graphics::Format::ASTC_4x4_UNORM_BLOCK; // or SRGB?
-    case Pixel::COMPRESSED_RGBA_ASTC_5x4_KHR:
-      return Graphics::Format::ASTC_5x4_UNORM_BLOCK;
-    case Pixel::COMPRESSED_RGBA_ASTC_5x5_KHR:
-      return Graphics::Format::ASTC_5x5_UNORM_BLOCK;
-    case Pixel::COMPRESSED_RGBA_ASTC_6x5_KHR:
-      return Graphics::Format::ASTC_6x5_UNORM_BLOCK;
-    case Pixel::COMPRESSED_RGBA_ASTC_6x6_KHR:
-      return Graphics::Format::ASTC_6x6_UNORM_BLOCK;
-    case Pixel::COMPRESSED_RGBA_ASTC_8x5_KHR:
-      return Graphics::Format::ASTC_8x5_UNORM_BLOCK;
-    case Pixel::COMPRESSED_RGBA_ASTC_8x6_KHR:
-      return Graphics::Format::ASTC_8x6_UNORM_BLOCK;
-    case Pixel::COMPRESSED_RGBA_ASTC_8x8_KHR:
-      return Graphics::Format::ASTC_8x8_UNORM_BLOCK;
-    case Pixel::COMPRESSED_RGBA_ASTC_10x5_KHR:
-      return Graphics::Format::ASTC_10x5_UNORM_BLOCK;
-    case Pixel::COMPRESSED_RGBA_ASTC_10x6_KHR:
-      return Graphics::Format::ASTC_10x6_UNORM_BLOCK;
-    case Pixel::COMPRESSED_RGBA_ASTC_10x8_KHR:
-      return Graphics::Format::ASTC_10x8_UNORM_BLOCK;
-    case Pixel::COMPRESSED_RGBA_ASTC_10x10_KHR:
-      return Graphics::Format::ASTC_10x10_UNORM_BLOCK;
-    case Pixel::COMPRESSED_RGBA_ASTC_12x10_KHR:
-      return Graphics::Format::ASTC_12x10_UNORM_BLOCK;
-    case Pixel::COMPRESSED_RGBA_ASTC_12x12_KHR:
-      return Graphics::Format::ASTC_12x12_UNORM_BLOCK;
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR:
-      return Graphics::Format::ASTC_4x4_SRGB_BLOCK; // not type with alpha, but likely to use SRGB
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR:
-      return Graphics::Format::ASTC_5x4_SRGB_BLOCK;
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR:
-      return Graphics::Format::ASTC_5x5_SRGB_BLOCK;
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR:
-      return Graphics::Format::ASTC_6x5_SRGB_BLOCK;
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR:
-      return Graphics::Format::ASTC_6x6_SRGB_BLOCK;
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR:
-      return Graphics::Format::ASTC_8x5_SRGB_BLOCK;
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR:
-      return Graphics::Format::ASTC_8x6_UNORM_BLOCK;
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR:
-      return Graphics::Format::ASTC_8x8_SRGB_BLOCK;
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR:
-      return Graphics::Format::ASTC_10x5_SRGB_BLOCK;
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR:
-      return Graphics::Format::ASTC_10x6_SRGB_BLOCK;
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR:
-      return Graphics::Format::ASTC_10x8_SRGB_BLOCK;
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR:
-      return Graphics::Format::ASTC_10x10_SRGB_BLOCK;
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR:
-      return Graphics::Format::ASTC_12x10_SRGB_BLOCK;
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR:
-      return Graphics::Format::ASTC_12x12_SRGB_BLOCK;
-
-    case Pixel::RGB16F:
-      return Graphics::Format::R16G16B16_SFLOAT;
-    case Pixel::RGB32F:
-      return Graphics::Format::R32G32B32_SFLOAT;
-    case Pixel::R11G11B10F:
-      return Graphics::Format::R11G11B10_UFLOAT_PACK32;
-
-    case Pixel::CHROMINANCE_U:
-      return Graphics::Format::L8;
-    case Pixel::CHROMINANCE_V:
-      return Graphics::Format::L8;
-  }
-  return Graphics::Format::UNDEFINED;
-}
-
-constexpr Graphics::TextureType ConvertType(Texture::Type type)
-{
-  switch(type)
-  {
-    case TextureType::TEXTURE_2D:
-      return Graphics::TextureType::TEXTURE_2D;
-    case TextureType::TEXTURE_CUBE:
-      return Graphics::TextureType::TEXTURE_CUBEMAP;
-  }
-  return Graphics::TextureType::TEXTURE_2D;
 }
 
 } //Unnamed namespace
@@ -231,14 +64,25 @@ TextureKey Texture::NewKey(NativeImageInterfacePtr nativeImageInterface)
   return TextureKey(key);
 }
 
+TextureKey Texture::NewKey(Type type, uint32_t resourceId)
+{
+  void* ptr = GetTextureMemoryPool().AllocateRawThreadSafe();
+  auto  key = GetTextureMemoryPool().GetKeyFromPtr(static_cast<Texture*>(ptr));
+  new(ptr) Texture(type, resourceId);
+
+  return TextureKey(key);
+}
+
 Texture::Texture(Type type, Pixel::Format format, ImageDimensions size)
 : mGraphicsController(nullptr),
+  mRenderManager(nullptr),
   mGraphicsTexture(nullptr),
   mNativeImage(),
   mSampler(),
   mPixelFormat(format),
   mWidth(size.GetWidth()),
   mHeight(size.GetHeight()),
+  mResourceId(0u),
   mType(type),
   mHasAlpha(HasAlpha(format)),
   mUpdated(true),
@@ -248,16 +92,35 @@ Texture::Texture(Type type, Pixel::Format format, ImageDimensions size)
 
 Texture::Texture(NativeImageInterfacePtr nativeImageInterface)
 : mGraphicsController(nullptr),
+  mRenderManager(nullptr),
   mGraphicsTexture(nullptr),
   mNativeImage(nativeImageInterface),
   mSampler(),
   mPixelFormat(Pixel::RGBA8888),
   mWidth(static_cast<uint16_t>(nativeImageInterface->GetWidth())),   // ignoring overflow, not happening in practice
   mHeight(static_cast<uint16_t>(nativeImageInterface->GetHeight())), // ignoring overflow, not happening in practice
+  mResourceId(0u),
   mType(TextureType::TEXTURE_2D),
   mHasAlpha(nativeImageInterface->RequiresBlending()),
   mUpdated(true),
   mUseUploadedParameter(false)
+{
+}
+
+Texture::Texture(Type type, uint32_t resourceId)
+: mGraphicsController(nullptr),
+  mRenderManager(nullptr),
+  mGraphicsTexture(nullptr),
+  mNativeImage(),
+  mSampler(),
+  mPixelFormat(Pixel::INVALID),
+  mWidth(0u),
+  mHeight(0u),
+  mResourceId(resourceId),
+  mType(type),
+  mHasAlpha(true), ///< Since we don't assume what kind of texture will be uploaded in this case.
+  mUpdated(true),
+  mUseUploadedParameter(true)
 {
 }
 
@@ -273,29 +136,71 @@ Render::Texture* Texture::Get(TextureKey::KeyType key)
   return GetTextureMemoryPool().GetPtrFromKey(key);
 }
 
-void Texture::Initialize(Graphics::Controller& graphicsController)
+void Texture::Initialize(Graphics::Controller& graphicsController, SceneGraph::RenderManager& renderManager)
 {
   mGraphicsController = &graphicsController;
+  mRenderManager      = &renderManager;
   if(mNativeImage)
   {
     Create(static_cast<uint32_t>(Graphics::TextureUsageFlagBits::SAMPLE));
+  }
+
+  if(mResourceId != 0u && mGraphicsController->GetTextureFromResourceId(mResourceId))
+  {
+    // Take ownership from graphics controller
+    mGraphicsTexture = std::move(mGraphicsController->ReleaseTextureFromResourceId(mResourceId));
+    // Now we take on the Graphics::Texture ownership. We don't need to keep mResourceId anymore.
+    mResourceId = 0u;
   }
 }
 
 void Texture::Destroy()
 {
+  if(mResourceId != 0u && mGraphicsTexture.get() == nullptr)
+  {
+    // We still don't take texture ownership from controller before.
+    // Discard graphics object now.
+    mGraphicsController->DiscardTextureFromResourceId(mResourceId);
+    mResourceId = 0u;
+  }
+
   mGraphicsTexture.reset();
 }
 
-Graphics::Texture* Texture::GetGraphicsObject() const
+Graphics::Texture* Texture::GetGraphicsObject()
 {
-  DALI_LOG_INFO(gTextureFilter, Debug::General, "SC::Texture(%p)::GetGraphicsObject() = %p\n", this, mGraphicsTexture.get());
+  if(mResourceId != 0u && mGraphicsTexture.get() == nullptr)
+  {
+    // The ownership of Graphics::Texture is on Graphics::Controller. Ask to controller.
+    Graphics::Texture* graphicsTexturePtr = nullptr;
+    if(mGraphicsController)
+    {
+      graphicsTexturePtr = mGraphicsController->GetTextureFromResourceId(mResourceId);
 
-  return mGraphicsTexture.get();
+      if(graphicsTexturePtr)
+      {
+        // Take ownership from graphics controller
+        mGraphicsTexture = std::move(mGraphicsController->ReleaseTextureFromResourceId(mResourceId));
+        // (Partial update) Do not make mResourceId as 0 until we update mLatestUsedGraphicsTexture.
+        NotifyTextureUpdated();
+      }
+    }
+    DALI_LOG_INFO(gTextureFilter, Debug::General, "Render::Texture(%p)::GetGraphicsObject() = %p [with resource id : %u]\n", this, graphicsTexturePtr, mResourceId);
+
+    return graphicsTexturePtr;
+  }
+  else
+  {
+    DALI_LOG_INFO(gTextureFilter, Debug::General, "Render::Texture(%p)::GetGraphicsObject() = %p\n", this, mGraphicsTexture.get());
+
+    return mGraphicsTexture.get();
+  }
 }
 
 void Texture::Create(Graphics::TextureUsageFlags usage)
 {
+  DALI_ASSERT_ALWAYS(mResourceId == 0u);
+
   Create(usage, Graphics::TextureAllocationPolicy::CREATION);
 }
 
@@ -308,9 +213,9 @@ void Texture::CreateWithData(Graphics::TextureUsageFlags usage, Graphics::Textur
 {
   auto createInfo = Graphics::TextureCreateInfo();
   createInfo
-    .SetTextureType(ConvertType(mType))
+    .SetTextureType(Dali::Graphics::ConvertTextureType(mType))
     .SetUsageFlags(usage)
-    .SetFormat(ConvertPixelFormat(mPixelFormat))
+    .SetFormat(Dali::Graphics::ConvertPixelFormat(mPixelFormat))
     .SetSize({mWidth, mHeight})
     .SetLayout(Graphics::TextureLayout::LINEAR)
     .SetAllocationPolicy(allocationPolicy)
@@ -322,9 +227,10 @@ void Texture::CreateWithData(Graphics::TextureUsageFlags usage, Graphics::Textur
   mGraphicsTexture = mGraphicsController->CreateTexture(createInfo, std::move(mGraphicsTexture));
 }
 
-void Texture::Upload(PixelDataPtr pixelData, const Internal::Texture::UploadParams& params)
+void Texture::Upload(PixelDataPtr pixelData, const Graphics::UploadParams& params)
 {
   DALI_ASSERT_ALWAYS(!mNativeImage);
+  DALI_ASSERT_ALWAYS(mResourceId == 0u);
 
   const uint32_t srcStride = pixelData->GetStride();
   uint32_t       srcOffset = 0u;
@@ -401,7 +307,7 @@ void Texture::Upload(PixelDataPtr pixelData, const Internal::Texture::UploadPara
   info.srcOffset    = srcOffset;
   info.srcSize      = srcSize;
   info.srcStride    = srcStride;
-  info.srcFormat    = ConvertPixelFormat(uploadedPixelFormat);
+  info.srcFormat    = Dali::Graphics::ConvertPixelFormat(uploadedPixelFormat);
 
   mUpdatedArea = Rect<uint16_t>(params.xOffset, params.yOffset, params.width, params.height);
 
@@ -424,8 +330,23 @@ bool Texture::HasAlphaChannel() const
   return alpha;
 }
 
+bool Texture::IsGraphicsObjectChanged()
+{
+  return mLatestUsedGraphicsTexture != GetGraphicsObject();
+}
+
+void Texture::NotifyTextureUpdated()
+{
+  if(mRenderManager)
+  {
+    mRenderManager->SetTextureUpdated(TextureKey(GetTextureMemoryPool().GetKeyFromPtr(this)));
+  }
+}
+
 void Texture::GenerateMipmaps()
 {
+  DALI_ASSERT_ALWAYS(mResourceId == 0u);
+
   if(!mGraphicsTexture)
   {
     Create(static_cast<Graphics::TextureUsageFlags>(Graphics::TextureUsageFlagBits::SAMPLE));
@@ -437,6 +358,17 @@ void Texture::GenerateMipmaps()
 void Texture::OnRenderFinished()
 {
   SetUpdated(false);
+
+  if(mResourceId != 0u)
+  {
+    mLatestUsedGraphicsTexture = GetGraphicsObject();
+    if(mLatestUsedGraphicsTexture != nullptr)
+    {
+      // We don't need to keep mResourceId anymore.
+      mResourceId = 0u;
+    }
+  }
+
   mUpdatedArea = Rect<uint16_t>{0, 0, 0, 0};
 }
 

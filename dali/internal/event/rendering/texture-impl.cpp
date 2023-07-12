@@ -43,6 +43,13 @@ TexturePtr Texture::New(NativeImageInterface& nativeImageInterface)
   return texture;
 }
 
+TexturePtr Texture::New(TextureType::Type type, uint32_t resourceId)
+{
+  TexturePtr texture(new Texture(type, resourceId));
+  texture->Initialize();
+  return texture;
+}
+
 Render::TextureKey Texture::GetRenderTextureKey() const
 {
   return mTextureKey;
@@ -55,6 +62,7 @@ Texture::Texture(TextureType::Type type, Pixel::Format format, ImageDimensions s
   mSize(size),
   mType(type),
   mFormat(format),
+  mResourceId(0u),
   mUseUploadedParameter(mSize.GetWidth() == 0u && mSize.GetHeight() == 0u && mFormat == Pixel::INVALID)
 {
 }
@@ -66,7 +74,20 @@ Texture::Texture(NativeImageInterfacePtr nativeImageInterface)
   mSize(nativeImageInterface->GetWidth(), nativeImageInterface->GetHeight()),
   mType(TextureType::TEXTURE_2D),
   mFormat(Pixel::RGB888),
+  mResourceId(0u),
   mUseUploadedParameter(false)
+{
+}
+
+Texture::Texture(TextureType::Type type, uint32_t resourceId)
+: mEventThreadServices(EventThreadServices::Get()),
+  mTextureKey{},
+  mNativeImage(),
+  mSize(),
+  mType(type),
+  mFormat(Pixel::INVALID),
+  mResourceId(resourceId),
+  mUseUploadedParameter(true)
 {
 }
 
@@ -80,7 +101,14 @@ void Texture::Initialize()
     }
     else
     {
-      mTextureKey = Render::Texture::NewKey(mType, mFormat, mSize);
+      if(mResourceId != 0u)
+      {
+        mTextureKey = Render::Texture::NewKey(mType, mResourceId);
+      }
+      else
+      {
+        mTextureKey = Render::Texture::NewKey(mType, mFormat, mSize);
+      }
     }
 
     AddTextureMessage(mEventThreadServices.GetUpdateManager(), mTextureKey);
@@ -148,6 +176,10 @@ bool Texture::UploadSubPixelData(PixelDataPtr pixelData,
     {
       DALI_LOG_ERROR("OpenGL ES does not support uploading data to native texture\n");
     }
+    else if(mResourceId != 0u)
+    {
+      DALI_LOG_ERROR("ResourceId using case does not support uploading data\n");
+    }
     else
     {
       uint32_t pixelDataSize = dataWidth * dataHeight;
@@ -192,16 +224,16 @@ bool Texture::UploadSubPixelData(PixelDataPtr pixelData,
             }
 
             //Parameters are correct. Send message to upload data to the texture
-            UploadParams params = {static_cast<uint32_t>(dataXOffset),
-                                   static_cast<uint32_t>(dataYOffset),
-                                   static_cast<uint16_t>(dataWidth),
-                                   static_cast<uint16_t>(dataHeight),
-                                   static_cast<uint16_t>(layer),
-                                   static_cast<uint16_t>(mipmap),
-                                   static_cast<uint16_t>(xOffset),
-                                   static_cast<uint16_t>(yOffset),
-                                   static_cast<uint16_t>(width),
-                                   static_cast<uint16_t>(height)};
+            Graphics::UploadParams params = {static_cast<uint32_t>(dataXOffset),
+                                             static_cast<uint32_t>(dataYOffset),
+                                             static_cast<uint16_t>(dataWidth),
+                                             static_cast<uint16_t>(dataHeight),
+                                             static_cast<uint16_t>(layer),
+                                             static_cast<uint16_t>(mipmap),
+                                             static_cast<uint16_t>(xOffset),
+                                             static_cast<uint16_t>(yOffset),
+                                             static_cast<uint16_t>(width),
+                                             static_cast<uint16_t>(height)};
             UploadTextureMessage(mEventThreadServices.GetUpdateManager(), mTextureKey, pixelData, params);
 
             result = true;
@@ -239,6 +271,34 @@ uint32_t Texture::GetHeight() const
 Pixel::Format Texture::GetPixelFormat() const
 {
   return mFormat;
+}
+
+uint32_t Texture::GetResourceId() const
+{
+  return mResourceId;
+}
+
+Dali::TextureType::Type Texture::GetTextureType() const
+{
+  return mType;
+}
+
+void Texture::SetSize(const ImageDimensions& size)
+{
+  mSize = size;
+  if(EventThreadServices::IsCoreRunning() && mTextureKey)
+  {
+    SetTextureSizeMessage(mEventThreadServices.GetUpdateManager(), mTextureKey, mSize);
+  }
+}
+
+void Texture::SetPixelFormat(Pixel::Format format)
+{
+  mFormat = format;
+  if(EventThreadServices::IsCoreRunning() && mTextureKey)
+  {
+    SetTextureFormatMessage(mEventThreadServices.GetUpdateManager(), mTextureKey, mFormat);
+  }
 }
 
 bool Texture::IsNative() const

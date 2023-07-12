@@ -1409,4 +1409,71 @@ bool TestGraphicsController::GetProgramParameter(Graphics::Program& program, uin
   return graphicsProgram->GetParameter(parameterId, outData);
 }
 
+Graphics::Texture* TestGraphicsController::CreateTextureByResourceId(uint32_t resourceId, const Graphics::TextureCreateInfo& createInfo)
+{
+  Graphics::Texture*                     ret = nullptr;
+  Graphics::UniquePtr<Graphics::Texture> texture;
+  TraceCallStack::NamedParams            namedParams;
+  namedParams["resourceId"] << resourceId;
+
+  auto iter = mTextureUploadBindMapper.find(resourceId);
+  DALI_ASSERT_ALWAYS(iter == mTextureUploadBindMapper.end());
+
+  // Create new graphics texture.
+  texture = CreateTexture(createInfo, std::move(texture));
+  ret     = texture.get();
+
+  mTextureUploadBindMapper.insert(std::make_pair(resourceId, std::move(texture)));
+
+  mCallStack.PushCall("CreateTextureByResourceId", "", namedParams);
+  return ret;
+}
+
+void TestGraphicsController::DiscardTextureFromResourceId(uint32_t resourceId)
+{
+  TraceCallStack::NamedParams namedParams;
+  namedParams["resourceId"] << resourceId;
+
+  mTextureUploadBindMapper.erase(resourceId);
+
+  mCallStack.PushCall("DiscardTextureFromResourceId", "", namedParams);
+}
+
+Graphics::Texture* TestGraphicsController::GetTextureFromResourceId(uint32_t resourceId)
+{
+  TraceCallStack::NamedParams namedParams;
+  namedParams["resourceId"] << resourceId;
+
+  Graphics::Texture* ret = nullptr;
+
+  auto iter = mTextureUploadBindMapper.find(resourceId);
+  if(iter != mTextureUploadBindMapper.end())
+  {
+    ret = iter->second.get();
+  }
+
+  mCallStack.PushCall("GetTextureFromResourceId", "", namedParams);
+
+  return ret;
+}
+
+Graphics::UniquePtr<Graphics::Texture> TestGraphicsController::ReleaseTextureFromResourceId(uint32_t resourceId)
+{
+  TraceCallStack::NamedParams namedParams;
+  namedParams["resourceId"] << resourceId;
+
+  Graphics::UniquePtr<Graphics::Texture> texture;
+
+  auto iter = mTextureUploadBindMapper.find(resourceId);
+  if(iter != mTextureUploadBindMapper.end())
+  {
+    texture = std::move(iter->second);
+    mTextureUploadBindMapper.erase(iter);
+  }
+
+  mCallStack.PushCall("ReleaseTextureFromResourceId", "", namedParams);
+
+  return texture;
+}
+
 } // namespace Dali

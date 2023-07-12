@@ -27,6 +27,8 @@
 #include <dali/internal/render/renderers/render-vertex-buffer.h>
 #include <dali/public-api/math/rect.h>
 
+#include <dali/graphics-api/graphics-texture-upload-helper.h> // for Graphics::UploadParams
+
 namespace Dali
 {
 namespace Integration
@@ -252,13 +254,27 @@ public:
    * @param[in] pixelData The pixel data object
    * @param[in] params The parameters for the upload
    */
-  void UploadTexture(const Render::TextureKey& texture, PixelDataPtr pixelData, const Texture::UploadParams& params);
+  void UploadTexture(const Render::TextureKey& texture, PixelDataPtr pixelData, const Graphics::UploadParams& params);
 
   /**
    * Generates mipmaps for a given texture
    * @param[in] texture The texture
    */
   void GenerateMipmaps(const Render::TextureKey& texture);
+
+  /**
+   * Set the texture size for a given texture
+   * @param[in] texture The texture
+   * @param[in] size The texture size
+   */
+  void SetTextureSize(const Render::TextureKey& texture, const Dali::ImageDimensions& size);
+
+  /**
+   * Set the texture pixel format for a given texture
+   * @param[in] texture The texture
+   * @param[in] pixelFormat The texture pixel format
+   */
+  void SetTextureFormat(const Render::TextureKey& texture, Dali::Pixel::Format pixelFormat);
 
   /**
    * Sets the updated flag of a texture
