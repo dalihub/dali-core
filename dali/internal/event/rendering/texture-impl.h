@@ -40,23 +40,6 @@ class Texture : public BaseObject
 {
 public:
   /**
-   * @brief Structure used to pass parameters to the Upload method
-   */
-  struct UploadParams
-  {
-    uint32_t dataXOffset; ///< Specifies a pixeldata offset in the x direction within the pixeldata buffer.
-    uint32_t dataYOffset; ///< Specifies a pixeldata offset in the y direction within the pixeldata buffer.
-    uint16_t dataWidth;   ///< Specifies the width of the pixeldata subimage.
-    uint16_t dataHeight;  ///< Specifies the height of the pixeldata subimage.
-    uint16_t layer;       ///< Specifies the layer of a cube map or array texture
-    uint16_t mipmap;      ///< Specifies the level-of-detail number. Level 0 is the base image level. Level n is the nth mipmap reduction image.
-    uint16_t xOffset;     ///< Specifies a texel offset in the x direction within the texture array.
-    uint16_t yOffset;     ///< Specifies a texel offset in the y direction within the texture array.
-    uint16_t width;       ///< Specifies the width of the texture subimage
-    uint16_t height;      ///< Specifies the height of the texture subimage.
-  };
-
-  /**
    * @brief Create a new Texture.
    *
    * @param[in] type The type of the texture
@@ -73,6 +56,15 @@ public:
    * @return A smart-pointer to the newly allocated Texture.
    */
   static TexturePtr New(NativeImageInterface& nativeImageInterface);
+
+  /**
+   * @brief Create a new Texture with resourceId.
+   *
+   * @param[in] type The type of the texture
+   * @param[in] resourceId The unique id of this texture combind with TextureUploadManager
+   * @return A smart-pointer to the newly allocated Texture.
+   */
+  static TexturePtr New(TextureType::Type type, uint32_t resourceId);
 
   /**
    * @brief Get the texture render object
@@ -142,6 +134,26 @@ public:
   Pixel::Format GetPixelFormat() const;
 
   /**
+   * @copydoc Dali::Integration::GetTextureResourceId()
+   */
+  uint32_t GetResourceId() const;
+
+  /**
+   * @copydoc Dali::Integration::GetTextureType()
+   */
+  Dali::TextureType::Type GetTextureType() const;
+
+  /**
+   * @copydoc Dali::Integration::SetTextureSize()
+   */
+  void SetSize(const ImageDimensions& size);
+
+  /**
+   * @copydoc Dali::Integration::SetTexturePixelFormat()
+   */
+  void SetPixelFormat(Pixel::Format format);
+
+  /**
    * @brief Determine if the texture is a native image
    *
    * @return true if the texture has been initialized with a native image
@@ -172,6 +184,13 @@ private: // implementation
   Texture(NativeImageInterfacePtr nativeImageInterface);
 
   /**
+   * Constructor from resource id
+   * @param[in] type The type of the texture
+   * @param[in] resourceId The resouce id for texture upload manager using
+   */
+  Texture(TextureType::Type type, uint32_t resourceId);
+
+  /**
    * Second stage initialization of the Texture
    */
   void Initialize();
@@ -194,6 +213,8 @@ private:                                               // data
   ImageDimensions         mSize;        ///< Size of the texture
   Dali::TextureType::Type mType;        ///< Texture type (cached)
   Pixel::Format           mFormat;      ///< Pixel format
+
+  uint32_t mResourceId;
 
   bool mUseUploadedParameter : 1; ///< Whether ths texture size and format depend on uploaded image or not.
 };
