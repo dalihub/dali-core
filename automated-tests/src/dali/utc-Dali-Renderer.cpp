@@ -1086,7 +1086,7 @@ int UtcDaliRendererSetBlendMode05(void)
   tet_infoline("Test setting the blend mode to auto with an opaque color and an image with an alpha channel renders with blending enabled");
 
   Geometry geometry = CreateQuadGeometry();
-  Texture  image    = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 40, 40);
+  Texture  image    = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 40, 40);
 
   Shader     shader     = CreateShader();
   TextureSet textureSet = CreateTextureSet(image);
@@ -1359,7 +1359,7 @@ int UtcDaliRendererSetBlendColor(void)
   Geometry   geometry   = CreateQuadGeometry();
   Shader     shader     = Shader::New("vertexSrc", "fragmentSrc");
   TextureSet textureSet = TextureSet::New();
-  Texture    image      = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 50, 50);
+  Texture    image      = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 50, 50);
   textureSet.SetTexture(0u, image);
   Renderer renderer = Renderer::New(geometry, shader);
   renderer.SetTextures(textureSet);
@@ -1722,7 +1722,7 @@ int UtcDaliRendererUniformMapPrecendence01(void)
 
   tet_infoline("Test the uniform map precedence is applied properly");
 
-  Texture image = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
+  Texture image = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
 
   Shader     shader     = Shader::New("VertexSource", "FragmentSource");
   TextureSet textureSet = CreateTextureSet(image);
@@ -1779,7 +1779,7 @@ int UtcDaliRendererUniformMapPrecendence02(void)
 
   tet_infoline("Test the uniform map precedence is applied properly");
 
-  Texture image = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
+  Texture image = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
 
   Shader     shader     = Shader::New("VertexSource", "FragmentSource");
   TextureSet textureSet = CreateTextureSet(image);
@@ -1836,7 +1836,7 @@ int UtcDaliRendererUniformMapPrecendence03(void)
 
   tet_infoline("Test the uniform map precedence is applied properly");
 
-  Texture image = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
+  Texture image = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
 
   Shader     shader     = Shader::New("VertexSource", "FragmentSource");
   TextureSet textureSet = CreateTextureSet(image);
@@ -1874,7 +1874,7 @@ int UtcDaliRendererUniformMapMultipleUniforms01(void)
 
   tet_infoline("Test the uniform maps are collected from all objects (same type)");
 
-  Texture image = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
+  Texture image = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
 
   Shader     shader     = Shader::New("VertexSource", "FragmentSource");
   TextureSet textureSet = CreateTextureSet(image);
@@ -1921,7 +1921,7 @@ int UtcDaliRendererUniformMapMultipleUniforms02(void)
 
   tet_infoline("Test the uniform maps are collected from all objects (different types)");
 
-  Texture image = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
+  Texture image = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
 
   Shader     shader     = Shader::New("VertexSource", "FragmentSource");
   TextureSet textureSet = CreateTextureSet(image);
@@ -3250,7 +3250,7 @@ int UtcDaliRendererWrongNumberOfTextures(void)
 
   //Create a TextureSet with 4 textures (One more texture in the texture set than active samplers)
   //@note Shaders in the test suit have 3 active samplers. See TestGlAbstraction::GetActiveUniform()
-  Texture    texture    = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64u, 64u);
+  Texture    texture    = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64u, 64u);
   TextureSet textureSet = CreateTextureSet();
   textureSet.SetTexture(0, texture);
   textureSet.SetTexture(1, texture);

@@ -1464,7 +1464,7 @@ int UtcDaliActorCalculateCurrentScreenExtents(void)
   DALI_TEST_EQUALS(expectedPosition.y, actualPosition.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
 
   auto expectedExtent = Rect<>{1.5f, 1.5f, 1.0f, 1.0f};
-  auto actualExtent   = DevelActor::CalculateScreenExtentsAtEvent(actor); ///< TODO : Change API name
+  auto actualExtent   = DevelActor::CalculateScreenExtents(actor);
   DALI_TEST_EQUALS(expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.width, actualExtent.width, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
@@ -1485,7 +1485,7 @@ int UtcDaliActorCalculateCurrentScreenExtents(void)
   DALI_TEST_EQUALS(expectedPosition.y, actualPosition.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
 
   expectedExtent = Rect<>(4.5f, 0.5f, 3.0f, 7.0f);
-  actualExtent   = DevelActor::CalculateScreenExtentsAtEvent(actor); ///< TODO : Change API name
+  actualExtent   = DevelActor::CalculateScreenExtents(actor);
   DALI_TEST_EQUALS(expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.width, actualExtent.width, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
@@ -1563,7 +1563,7 @@ int UtcDaliActorCalculateScreenExtentsInCustomCameraAndLayer3D(void)
   Vector2 sceneSize = scene.GetSize();
 
   auto expectedExtent = Rect<>{sceneSize.x * 0.5f + 1.5f, sceneSize.y * 0.5f + 14.5f, 1.0f, 3.0f};
-  auto actualExtent   = DevelActor::CalculateScreenExtentsAtEvent(actor); ///< TODO : Change API name
+  auto actualExtent   = DevelActor::CalculateScreenExtents(actor);
   auto actualPosition = DevelActor::CalculateScreenPosition(actor);
   {
     std::ostringstream oss;

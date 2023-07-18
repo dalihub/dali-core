@@ -2,7 +2,7 @@
 #define DALI_TEXTURE_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,6 +84,17 @@ public:
    * @return A handle to a newly allocated Texture
    */
   static Texture New(TextureType::Type type, Pixel::Format format, uint32_t width, uint32_t height);
+
+  /**
+   * @brief Creates a new Texture object with no informations.
+   * Texture will use Uploaded PixelData size and format.
+   * Before texture Upload is called, width, height and format return invalid values.
+   *
+   * @SINCE_2_2.34
+   * @param[in] type The type of the texture
+   * @return A handle to a newly allocated Texture
+   */
+  static Texture New(TextureType::Type type);
 
   /**
    * @brief Creates a new Texture object from a native image.

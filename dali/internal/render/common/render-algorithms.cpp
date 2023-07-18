@@ -586,7 +586,6 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
                                                 const Matrix&                       projectionMatrix,
                                                 Integration::DepthBufferAvailable   depthBufferAvailable,
                                                 Integration::StencilBufferAvailable stencilBufferAvailable,
-                                                Vector<Graphics::Texture*>&         boundTextures,
                                                 const RenderInstruction&            instruction,
                                                 const Rect<int32_t>&                viewport,
                                                 const Rect<int>&                    rootClippingRect,
@@ -697,7 +696,7 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
         for(auto queue = 0u; queue < MAX_QUEUE; ++queue)
         {
           // Render the item. It will write into the command buffer everything it has to render
-          item.mRenderer->Render(secondaryCommandBuffer, bufferIndex, *item.mNode, item.mModelMatrix, item.mModelViewMatrix, viewMatrix, projectionMatrix, item.mSize, !item.mIsOpaque, boundTextures, instruction, queue);
+          item.mRenderer->Render(secondaryCommandBuffer, bufferIndex, *item.mNode, item.mModelMatrix, item.mModelViewMatrix, viewMatrix, projectionMatrix, item.mSize, !item.mIsOpaque, instruction, queue);
         }
       }
     }
@@ -740,7 +739,6 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
                                                 BufferIndex                         bufferIndex,
                                                 Integration::DepthBufferAvailable   depthBufferAvailable,
                                                 Integration::StencilBufferAvailable stencilBufferAvailable,
-                                                Vector<Graphics::Texture*>&         boundTextures,
                                                 const Rect<int32_t>&                viewport,
                                                 const Rect<int>&                    rootClippingRect,
                                                 int                                 orientation,
@@ -773,7 +771,6 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
                           *projectionMatrix,
                           depthBufferAvailable,
                           stencilBufferAvailable,
-                          boundTextures,
                           instruction, //added for reflection effect
                           viewport,
                           rootClippingRect,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -368,9 +368,17 @@ int UtcDaliPropertyArrayMoveAssignmentOperator(void)
   DALI_TEST_ASSERTION(const_cast<const Property::Array&>(array1)[0], exceptionMessage);
   DALI_TEST_ASSERTION(Property::Array temp; array1 = temp, exceptionMessage);
 
+  // Self std::move assignment make compile warning over gcc-13. Let we ignore the warning.
+#if (__GNUC__ >= 13)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wself-move"
+#endif
   // Self assignemnt
   array2 = std::move(array2);
   DALI_TEST_EQUALS(3u, array2.Size(), TEST_LOCATION); // still works, no debug assert
+#if (__GNUC__ >= 13)
+#pragma GCC diagnostic pop
+#endif
 
   END_TEST;
 }

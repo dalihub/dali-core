@@ -194,6 +194,8 @@ private:                                               // data
   ImageDimensions         mSize;        ///< Size of the texture
   Dali::TextureType::Type mType;        ///< Texture type (cached)
   Pixel::Format           mFormat;      ///< Pixel format
+
+  bool mUseUploadedParameter : 1; ///< Whether ths texture size and format depend on uploaded image or not.
 };
 
 } // namespace Internal

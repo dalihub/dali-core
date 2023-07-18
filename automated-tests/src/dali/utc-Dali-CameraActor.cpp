@@ -1521,7 +1521,7 @@ int UtcDaliCameraActorReadProjectionMatrix(void)
   application.Render(0);
   application.Render();
   application.SendNotification();
-  Texture image = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 4u, 4u);
+  Texture image = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 4u, 4u);
   Actor   actor = CreateRenderableActor(image, RENDER_SHADOW_VERTEX_SOURCE, RENDER_SHADOW_FRAGMENT_SOURCE);
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   application.GetScene().Add(actor);

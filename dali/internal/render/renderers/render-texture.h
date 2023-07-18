@@ -111,13 +111,6 @@ public:
   void Create(Graphics::TextureUsageFlags usage);
 
   /**
-   * Create a texture with a buffer if non-null
-   * @param[in] usage How texture will be used
-   * @param[in] buffer Buffer to copy
-   */
-  void CreateWithData(Graphics::TextureUsageFlags usage, uint8_t* buffer, uint32_t bufferSize);
-
-  /**
    * Deletes the texture from the GPU
    */
   void Destroy();
@@ -161,6 +154,15 @@ public:
   [[nodiscard]] bool IsNativeImage() const
   {
     return static_cast<bool>(mNativeImage);
+  }
+
+  /**
+   * Return the pixel format of the texture
+   * @return The pixel format of the texture data.
+   */
+  Pixel::Format GetPixelFormat() const
+  {
+    return mPixelFormat;
   }
 
   /**
@@ -222,6 +224,14 @@ private:
    */
   void ApplySampler(Render::Sampler* sampler);
 
+  /**
+   * Create a texture with a buffer if non-null
+   * @param[in] usage How texture will be used
+   * @param[in] buffer Buffer to copy
+   * @param[in] bufferSize Size of buffer to copy
+   */
+  void CreateWithData(Graphics::TextureUsageFlags usage, uint8_t* buffer, uint32_t bufferSize);
+
 private:
   Graphics::Controller*                  mGraphicsController;
   Graphics::UniquePtr<Graphics::Texture> mGraphicsTexture;
@@ -230,12 +240,16 @@ private:
   Render::Sampler         mSampler;     ///< The current sampler state
 
   Rect<uint16_t> mUpdatedArea{}; ///< Updated area of the texture
-  Pixel::Format  mPixelFormat;   ///< Pixel format of the texture
-  uint16_t       mWidth;         ///< Width of the texture
-  uint16_t       mHeight;        ///< Height of the texture
-  Type           mType : 3;      ///< Type of the texture
-  bool           mHasAlpha : 1;  ///< Whether the format has an alpha channel
-  bool           mUpdated : 1;   ///< Whether the texture is updated
+
+  Pixel::Format mPixelFormat; ///< Pixel format of the texture
+  uint16_t      mWidth;       ///< Width of the texture
+  uint16_t      mHeight;      ///< Height of the texture
+
+  Type mType : 3;     ///< Type of the texture
+  bool mHasAlpha : 1; ///< Whether the format has an alpha channel
+  bool mUpdated : 1;  ///< Whether the texture is updated
+
+  bool mUseUploadedParameter : 1; ///< Whether ths texture size and format depend on uploaded image or not.
 };
 
 } // namespace Render

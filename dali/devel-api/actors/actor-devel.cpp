@@ -29,14 +29,9 @@ Vector2 CalculateScreenPosition(Actor actor)
   return GetImplementation(actor).CalculateScreenPosition();
 }
 
-Rect<> CalculateScreenExtentsAtEvent(Actor actor) ///< TODO : Change API name
+Rect<> CalculateScreenExtents(Actor actor)
 {
   return GetImplementation(actor).CalculateScreenExtents();
-}
-
-Rect<> CalculateScreenExtents(Actor actor) ///< TODO : Remove this API
-{
-  return CalculateCurrentScreenExtents(actor);
 }
 
 Rect<> CalculateCurrentScreenExtents(Actor actor)
