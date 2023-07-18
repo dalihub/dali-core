@@ -235,11 +235,10 @@ DALI_CORE_API Vector2 CalculateScreenPosition(Actor actor);
 
 /**
  * Calculates screen position and size.
- * TODO : The name of this API might be changed as "CalculateScreenExtents" after depended repo changed.
  *
  * @return pair of two values, position of top-left corner on screen and size respectively.
  */
-DALI_CORE_API Rect<> CalculateScreenExtentsAtEvent(Actor actor);
+DALI_CORE_API Rect<> CalculateScreenExtents(Actor actor);
 
 /**
  * Calculates screen position and size from the scene-graph values.
@@ -250,8 +249,6 @@ DALI_CORE_API Rect<> CalculateScreenExtentsAtEvent(Actor actor);
  * @return pair of two values, position of top-left corner on screen and size respectively.
  */
 DALI_CORE_API Rect<> CalculateCurrentScreenExtents(Actor actor);
-
-DALI_CORE_API Rect<> CalculateScreenExtents(Actor actor); ///< TODO : Remove this API
 
 using ChildChangedSignalType = Signal<void(Actor)>; ///< Called when the actor has a child added or removed
 
