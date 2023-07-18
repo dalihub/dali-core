@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,14 +49,15 @@ std::string RandomString(size_t length)
   return s;
 }
 
-} // namespace
-
-// Custom DALI_TEST_EQUALS for ConstString
-template<>
-inline void DALI_TEST_EQUALS<ConstString>(ConstString str1, ConstString str2, const char* location)
+// Custom << operator to print debugging log.
+std::basic_ostream<char>& operator<<(std::basic_ostream<char>& os, const ConstString& constString)
 {
-  DALI_TEST_EQUALS(str1.GetStringView(), str2.GetStringView(), location);
+  std::string convertedString = std::string(constString.GetStringView());
+  os << convertedString;
+  return os;
 }
+
+} // namespace
 
 void utc_dali_internal_indexed_conststring_map_startup(void)
 {

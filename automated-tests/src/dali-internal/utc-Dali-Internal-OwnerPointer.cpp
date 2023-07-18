@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -163,20 +163,12 @@ int UtcDaliOwnerPointerMove(void)
     DALI_TEST_CHECK(second.Get() == owned);
     DALI_TEST_EQUALS(deleted, false, TEST_LOCATION);
 
-    // Self std::move assignment make compile warning over gcc-13. Let we ignore the warning.
-#if (__GNUC__ >= 13)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wself-move"
-#endif
     // Self assignment, nothing should change or be deleted.
     first  = std::move(first);
     second = std::move(second);
     DALI_TEST_CHECK(first.Get() == nullptr);
     DALI_TEST_CHECK(second.Get() == owned);
     DALI_TEST_EQUALS(deleted, false, TEST_LOCATION);
-#if (__GNUC__ >= 13)
-#pragma GCC diagnostic pop
-#endif
 
     // Assign second to first, no deletion, second should have a nullptr now
     first = std::move(second);
