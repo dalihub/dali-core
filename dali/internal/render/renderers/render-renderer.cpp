@@ -610,18 +610,20 @@ int Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::No
   // Specially, if node don't have uniformMap, we mark nodePtr as nullptr.
   // So, all nodes without uniformMap will share same UniformIndexMap, contains only render data providers.
   const auto nodePtr = uniformMapNode.Count() ? &node : nullptr;
+  const auto programPtr = &program;
 
   const auto nodeChangeCounter          = nodePtr ? uniformMapNode.GetChangeCounter() : 0;
   const auto renderItemMapChangeCounter = uniformMap.GetChangeCounter();
 
-  auto iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [nodePtr](RenderItemLookup& element) { return element.node == nodePtr; });
+  auto iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [nodePtr, programPtr](RenderItemLookup& element) { return (element.node == nodePtr && element.program == programPtr); });
 
-  int renderItemMapIndex;
+  std::size_t renderItemMapIndex;
   if(iter == mNodeIndexMap.end())
   {
     renderItemMapIndex = mUniformIndexMaps.size();
     RenderItemLookup renderItemLookup;
     renderItemLookup.node                       = nodePtr;
+    renderItemLookup.program                    = programPtr;
     renderItemLookup.index                      = renderItemMapIndex;
     renderItemLookup.nodeChangeCounter          = nodeChangeCounter;
     renderItemLookup.renderItemMapChangeCounter = renderItemMapChangeCounter;
