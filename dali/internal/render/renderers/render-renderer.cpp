@@ -696,11 +696,12 @@ std::size_t Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const SceneG
   // Specially, if node don't have uniformMap, we mark nodePtr as nullptr.
   // So, all nodes without uniformMap will share same UniformIndexMap, contains only render data providers.
   const auto nodePtr = uniformMapNode.Count() ? &node : nullptr;
+  const auto programPtr = &program;
 
   const auto nodeChangeCounter          = nodePtr ? uniformMapNode.GetChangeCounter() : 0;
   const auto renderItemMapChangeCounter = uniformMap.GetChangeCounter();
 
-  auto iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [nodePtr](RenderItemLookup& element) { return element.node == nodePtr; });
+  auto iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [nodePtr, programPtr](RenderItemLookup& element) { return (element.node == nodePtr && element.program == programPtr); });
 
   std::size_t renderItemMapIndex;
   if(iter == mNodeIndexMap.end())
@@ -708,6 +709,7 @@ std::size_t Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const SceneG
     renderItemMapIndex = mUniformIndexMaps.size();
     RenderItemLookup renderItemLookup;
     renderItemLookup.node                       = nodePtr;
+    renderItemLookup.program                    = programPtr;
     renderItemLookup.index                      = renderItemMapIndex;
     renderItemLookup.nodeChangeCounter          = nodeChangeCounter;
     renderItemLookup.renderItemMapChangeCounter = renderItemMapChangeCounter;
@@ -1017,8 +1019,7 @@ void Renderer::DetachFromNodeDataProvider(const SceneGraph::NodeDataProvider& no
 
   // Remove mNodeIndexMap and mUniformIndexMaps.
   auto iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [&node](RenderItemLookup& element) { return element.node == &node; });
-
-  if(iter != mNodeIndexMap.end())
+  while(iter != mNodeIndexMap.end())
   {
     // Swap between end of mUniformIndexMaps and removed.
     auto nodeIndex           = iter->index;
@@ -1043,6 +1044,8 @@ void Renderer::DetachFromNodeDataProvider(const SceneGraph::NodeDataProvider& no
 
     // Remove uniform index maps.
     mUniformIndexMaps.pop_back();
+
+    iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [&node](RenderItemLookup& element) { return element.node == &node; });
   }
 }
 
