@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 
 #include <dali-test-suite-utils.h>
 #include <dali/internal/update/manager/transform-manager-property.h>
+#include <dali/internal/update/nodes/node-helper.h>
 
 // Internal headers are allowed here
 
@@ -85,6 +86,90 @@ int UtcTransformManagerPropertyUninitializedMgrData(void)
   tet_infoline("Test that if input property's transform manager data is not initialized, that getting a value returns the initial value of the property.");
 
   DALI_TEST_EQUALS(s.input, output, 0.001f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+using namespace Dali::Internal::SceneGraph;
+int UtcDaliInternalTransformPropertyGetValueSize(void)
+{
+  struct S
+  {
+    Dali::Internal::PropertyInputImpl* property;
+    Property::Value                    value;
+    size_t                             size;
+    S(Dali::Internal::PropertyInputImpl* p, Property::Value v, size_t s)
+    : property(p),
+      value(v),
+      size(s)
+    {
+    }
+  };
+  std::vector<S> properties;
+
+  properties.emplace_back(new TransformManagerPropertyVector3<TransformManagerProperty::TRANSFORM_PROPERTY_SCALE, 0>(), Vector3(2.3f, 4.5f, 1.9f), sizeof(Vector3));
+
+  properties.emplace_back(new TransformManagerPropertyQuaternion<0>(), Quaternion(Radian(1.619f), Vector3::ZAXIS), sizeof(Quaternion));
+
+  properties.emplace_back(new TransformManagerVector3Input<0>(TransformManagerProperty::TRANSFORM_PROPERTY_WORLD_SCALE, Vector3(2.3f, 4.5f, 1.9f)), Vector3(2.3f, 4.5f, 1.9f), sizeof(Vector3));
+
+  properties.emplace_back(new TransformManagerQuaternionInput<0>(), Quaternion(Radian(1.619f), Vector3::ZAXIS), sizeof(Quaternion));
+
+  properties.emplace_back(new TransformManagerMatrixInput<0>(), Matrix::IDENTITY, sizeof(Matrix));
+
+  for(auto& s : properties)
+  {
+    DALI_TEST_EQUALS(s.property->GetValueSize(), s.size, TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliInternalTransformPropertyGetValueAddress(void)
+{
+  struct N
+  {
+    BASE(TransformManagerData, mTransformManagerData);
+    PROPERTY_WRAPPER(mTransformManagerData, TransformManagerPropertyVector3, TRANSFORM_PROPERTY_SCALE, mScale);
+    TEMPLATE_WRAPPER(mScale, TransformManagerPropertyQuaternion, mOrientation);
+    TEMPLATE_WRAPPER(mOrientation, TransformManagerVector3Input, mWorldPosition);
+    TEMPLATE_WRAPPER(mWorldPosition, TransformManagerQuaternionInput, mWorldOrientation);
+    TEMPLATE_WRAPPER(mWorldOrientation, TransformManagerMatrixInput, mWorldMatrix);
+
+    N()
+    : mTransformManagerData(),
+      mWorldPosition(TRANSFORM_PROPERTY_WORLD_POSITION, Vector3(1.0f, 1.0f, 1.0f)),
+      mWorldOrientation(),
+      mWorldMatrix()
+    {
+    }
+  };
+
+  TransformManager testManager;
+  N                node;
+  node.mTransformManagerData.mManager = &testManager;
+  node.mTransformManagerData.mId      = testManager.CreateTransform();
+
+  const void* addr = node.mScale.GetValueAddress(0);
+  node.mScale.Set(0, Vector3(1.2f, 1.2f, 1.2f));
+
+  DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(1.2f, 1.2f, 1.2f), TEST_LOCATION);
+
+  node.mOrientation.Set(0, Quaternion(Radian(1.619f), Vector3::ZAXIS));
+  addr = node.mOrientation.GetValueAddress(0);
+  DALI_TEST_EQUALS(*reinterpret_cast<const Quaternion*>(addr), Quaternion(Radian(1.619f), Vector3::ZAXIS), TEST_LOCATION);
+
+  Matrix& m = node.mWorldMatrix.Get(0);
+  m         = Matrix::IDENTITY;
+
+  addr = node.mWorldPosition.GetValueAddress(0);
+  DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(0.f, 0.f, 0.f), TEST_LOCATION);
+
+  addr = node.mWorldOrientation.GetValueAddress(0);
+  DALI_TEST_EQUALS(*reinterpret_cast<const Quaternion*>(addr), Quaternion(Radian(0), Vector3::ZAXIS), TEST_LOCATION);
+
+  addr = node.mWorldMatrix.GetValueAddress(0);
+  DALI_TEST_EQUALS(*reinterpret_cast<const Matrix*>(addr), Matrix::IDENTITY, TEST_LOCATION);
 
   END_TEST;
 }
