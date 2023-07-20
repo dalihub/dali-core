@@ -192,6 +192,8 @@ struct RenderManager::Impl
 
   OrderedSet<Render::RenderTracker> mRenderTrackers; ///< List of owned render trackers
 
+  OwnerKeyContainer<Render::Texture> textureDiscardQueue;  ///< Discarded textures
+
   ProgramController   programController; ///< Owner of the programs
   Render::ShaderCache shaderCache;       ///< The cache for the graphics shaders
 
@@ -286,8 +288,8 @@ void RenderManager::RemoveTexture(const Render::TextureKey& textureKey)
 
   if(iter != mImpl->textureContainer.End())
   {
-    textureKey->Destroy();
-    mImpl->textureContainer.Erase(iter); // Texture found; now destroy it
+    // Transfer ownership to the discard queue, this keeps the object alive, until the render-thread has finished with it
+    mImpl->textureDiscardQueue.PushBack(mImpl->textureContainer.Release(iter));
   }
 }
 
@@ -1115,6 +1117,13 @@ void RenderManager::PostRender()
     iter->OnRenderFinished();
   }
   mImpl->updatedTextures.Clear();
+
+  // Remove discarded textures after OnRenderFinished called
+  for(auto& iter : mImpl->textureDiscardQueue)
+  {
+    iter->Destroy();
+  }
+  mImpl->textureDiscardQueue.Clear();
 
   mImpl->UpdateTrackers();
 
