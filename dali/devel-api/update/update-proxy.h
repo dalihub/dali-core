@@ -46,6 +46,12 @@ class DALI_CORE_API UpdateProxy
 {
 public:
   /**
+   * Type to define a unique sync point.
+   */
+  using NotifySyncPoint = int;
+  static constexpr NotifySyncPoint INVALID_SYNC{-1};
+
+  /**
    * @brief Given the Actor ID, this retrieves that Actor's local position.
    * @param[in]   id        The Actor ID
    * @param[out]  position  Set to the Actor's current position, if Actor ID is valid
@@ -204,6 +210,14 @@ public:
    * @note The value is saved so will cause undesired effects if this property is being animated.
    */
   bool BakeColor(uint32_t id, const Vector4& color);
+
+  /**
+   * @brief Pop a sync point off the stack.
+   *
+   * Sync points can be added from the event side using Dali::DevelStage::NotifyFrameCallback().
+   * @return INVALID_SYNC if there was no SyncPoint, or a unique value if there was a sync point.
+   */
+  NotifySyncPoint PopSyncPoint();
 
 public: // Not intended for application developers
   /// @cond internal

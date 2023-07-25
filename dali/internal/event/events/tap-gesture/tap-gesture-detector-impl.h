@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TAP_GESTURE_DETECTOR_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,49 +49,44 @@ public: // Creation
    * @param[in]  tapsRequired     The number of taps required.
    * @return A smart-pointer to the newly allocated detector.
    */
-  static TapGestureDetectorPtr New(unsigned int tapsRequired);
-
-  /**
-   * Construct a new GestureDetector.
-   */
-  TapGestureDetector();
+  static TapGestureDetectorPtr New(uint32_t tapsRequired);
 
   /**
    * Construct a new GestureDetector with the specified parameters.
    * @param[in]  tapsRequired     The number of taps required.
    */
-  TapGestureDetector(unsigned int tapsRequired);
+  TapGestureDetector(uint32_t tapsRequired);
 
 public:
   /**
-   * @copydoc Dali::TapGestureDetector::SetTouchesRequired(unsigned int)
+   * @copydoc Dali::TapGestureDetector::SetTouchesRequired(uint32_t)
    */
-  void SetTouchesRequired(unsigned int touches);
+  void SetTouchesRequired(uint32_t touches);
 
   /**
    * @copydoc Dali::TapGestureDetector::SetMinimumTapsRequired()
    */
-  void SetMinimumTapsRequired(unsigned int minTaps);
+  void SetMinimumTapsRequired(uint32_t minTaps);
 
   /**
    * @copydoc Dali::TapGestureDetector::SetMaximumTapsRequired()
    */
-  void SetMaximumTapsRequired(unsigned int maxTaps);
+  void SetMaximumTapsRequired(uint32_t maxTaps);
 
   /**
    * @copydoc Dali::TapGestureDetector::GetMinimumTapsRequired()
    */
-  unsigned int GetMinimumTapsRequired() const;
+  uint32_t GetMinimumTapsRequired() const;
 
   /**
    * @copydoc Dali::TapGestureDetector::SetMaximumTapsRequired()
    */
-  unsigned int GetMaximumTapsRequired() const;
+  uint32_t GetMaximumTapsRequired() const;
 
   /**
    * @copydoc Dali::TapGestureDetector::GetTouchesRequired()
    */
-  unsigned int GetTouchesRequired() const;
+  uint32_t GetTouchesRequired() const;
 
   /**
    * @copydoc Dali::TapGestureDetector::ReceiveAllTapEvents()
@@ -144,6 +139,12 @@ private:
    */
   bool TimerCallback();
 
+  /**
+   * @brief Checks if MinimumTapsRequired is less than or equal to MaximumTapsRequired.
+   * @return true if MinimumTapsRequired is less than or equal to MaximumTapsRequired.
+   */
+  bool CheckMinMaxTapsRequired();
+
 private: // GestureDetector overrides
   /**
    * @copydoc Dali::Internal::GestureDetector::OnActorAttach(Actor&)
@@ -163,10 +164,11 @@ private: // GestureDetector overrides
 private:
   Dali::TapGestureDetector::DetectedSignalType mDetectedSignal;
 
-  unsigned int     mMinimumTapsRequired;
-  unsigned int     mMaximumTapsRequired;
-  unsigned int     mTouchesRequired;
+  uint32_t         mMinimumTapsRequired; ///< Minimum number of taps required.
+  uint32_t         mMaximumTapsRequired; ///< Maximum number of taps required.
+  uint32_t         mTouchesRequired;
   uint32_t         mTimerId;
+  uint32_t         mWaitTime;
   Dali::Actor      mTappedActor;
   Dali::TapGesture mTap;
   bool             mReceiveAllTapEvents;

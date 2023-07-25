@@ -1330,6 +1330,11 @@ void UpdateManager::RemoveFrameCallback(FrameCallbackInterface* frameCallback)
   mImpl->GetFrameCallbackProcessor(*this).RemoveFrameCallback(frameCallback);
 }
 
+void UpdateManager::NotifyFrameCallback(FrameCallbackInterface* frameCallback, Dali::UpdateProxy::NotifySyncPoint syncPoint)
+{
+  mImpl->GetFrameCallbackProcessor(*this).NotifyFrameCallback(frameCallback, syncPoint);
+}
+
 void UpdateManager::AddSampler(OwnerPointer<Render::Sampler>& sampler)
 {
   // Message has ownership of Sampler while in transit from update to render

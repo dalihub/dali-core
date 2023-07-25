@@ -27,6 +27,7 @@
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/manager/update-proxy-impl.h>
+#include <dali/public-api/common/list-wrapper.h>
 
 namespace Dali
 {
@@ -91,6 +92,12 @@ public:
   RequestFlags Update(BufferIndex bufferIndex, float elapsedSeconds, bool nodeHierarchyChanged);
 
   /**
+   * Called from the update thread when there's a sync point to insert.
+   * @param[in] syncPoint The sync point to insert before the next update
+   */
+  void Notify(Dali::UpdateProxy::NotifySyncPoint syncPoint);
+
+  /**
    * Invalidates this FrameCallback and will no longer be associated with the FrameCallbackInterface.
    * @note This method is thread-safe.
    */
@@ -139,10 +146,11 @@ private:
   FrameCallback(FrameCallbackInterface* frameCallbackInterface);
 
 private:
-  Mutex                        mMutex;
-  std::unique_ptr<UpdateProxy> mUpdateProxy{nullptr}; ///< A unique pointer to the implementation of the UpdateProxy.
-  FrameCallbackInterface*      mFrameCallbackInterface;
-  bool                         mValid{true}; ///< Set to false when Invalidate() is called.
+  Mutex                                         mMutex;
+  std::unique_ptr<UpdateProxy>                  mUpdateProxy{nullptr}; ///< A unique pointer to the implementation of the UpdateProxy.
+  FrameCallbackInterface*                       mFrameCallbackInterface;
+  std::list<Dali::UpdateProxy::NotifySyncPoint> mSyncPoints;
+  bool                                          mValid{true}; ///< Set to false when Invalidate() is called.
 };
 
 /**

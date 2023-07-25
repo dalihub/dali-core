@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -208,6 +208,15 @@ void Stage::SetRenderingBehavior(DevelStage::Rendering renderingBehavior)
 DevelStage::Rendering Stage::GetRenderingBehavior() const
 {
   return mRenderingBehavior;
+}
+
+Dali::UpdateProxy::NotifySyncPoint Stage::NotifyFrameCallback(FrameCallbackInterface& frameCallback)
+{
+  static Dali::UpdateProxy::NotifySyncPoint sSyncPoint = 0;
+  ++sSyncPoint;
+
+  NotifyFrameCallbackMessage(mUpdateManager, &frameCallback, sSyncPoint);
+  return sSyncPoint;
 }
 
 bool Stage::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)

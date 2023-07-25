@@ -311,6 +311,23 @@ void UpdateProxy::NodeHierarchyChanged()
   mPropertyModifier.reset();
 }
 
+void UpdateProxy::Notify(Dali::UpdateProxy::NotifySyncPoint syncPoint)
+{
+  mSyncPoints.push_back(syncPoint);
+}
+
+Dali::UpdateProxy::NotifySyncPoint UpdateProxy::PopSyncPoint()
+{
+  if(!mSyncPoints.empty())
+  {
+    auto syncPoint = mSyncPoints.front();
+    mSyncPoints.pop_front();
+    return syncPoint;
+  }
+
+  return Dali::UpdateProxy::INVALID_SYNC;
+}
+
 SceneGraph::Node* UpdateProxy::GetNodeWithId(uint32_t id) const
 {
   SceneGraph::Node* node = nullptr;

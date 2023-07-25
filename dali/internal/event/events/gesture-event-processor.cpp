@@ -344,6 +344,11 @@ void GestureEventProcessor::SetTapRecognizerTime(uint32_t time)
   mTapGestureProcessor.SetRecognizerTime(time);
 }
 
+const TapGestureProcessor& GestureEventProcessor::GetTapGestureProcessor()
+{
+  return mTapGestureProcessor;
+}
+
 } // namespace Internal
 
 } // namespace Dali

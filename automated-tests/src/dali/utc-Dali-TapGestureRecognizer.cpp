@@ -614,7 +614,7 @@ int UtcDaliTapGestureSetMaximumAllowedTime(void)
 
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
-  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 300));
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 310));
 
   application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 350));
 

@@ -318,20 +318,24 @@ int UtcDaliTapGestureSetTapsRequiredMinMaxCheck(void)
   application.SendNotification();
   application.Render();
 
-  // Set the minimum to be greater than the maximum, should Assert
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
 
-  try
-  {
-    TapGestureDetector detector = TapGestureDetector::New();
-    detector.SetMinimumTapsRequired(7u);
-    detector.SetMaximumTapsRequired(3u);
-    detector.Attach(actor);
-    DALI_TEST_CHECK(false); // Should not get here
-  }
-  catch(DaliException& e)
-  {
-    DALI_TEST_CHECK(true);
-  }
+  // Set the minimum to be greater than the maximum, should not receive the tap event.
+  TapGestureDetector detector = TapGestureDetector::New();
+  detector.SetMinimumTapsRequired(2u);
+  detector.SetMaximumTapsRequired(1u);
+  detector.Attach(actor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  TestGenerateTap(application, 50.0f, 50.0f, 100);
+  // detector don't get the tap event.
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // detector don't get the tap event.
+  TestGenerateTap(application, 50.0f, 50.0f, 120);
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   END_TEST;
 }

@@ -63,6 +63,16 @@ void FrameCallbackProcessor::RemoveFrameCallback(FrameCallbackInterface* frameCa
   mFrameCallbacks.erase(iter, mFrameCallbacks.end());
 }
 
+void FrameCallbackProcessor::NotifyFrameCallback(FrameCallbackInterface* frameCallback, Dali::UpdateProxy::NotifySyncPoint syncPoint)
+{
+  // Ensure that frame callback is still valid before sending notification
+  auto iter = std::find(mFrameCallbacks.begin(), mFrameCallbacks.end(), frameCallback);
+  if(iter != mFrameCallbacks.end())
+  {
+    (*iter)->Notify(syncPoint);
+  }
+}
+
 bool FrameCallbackProcessor::Update(BufferIndex bufferIndex, float elapsedSeconds)
 {
   bool keepRendering = false;

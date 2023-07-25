@@ -43,8 +43,8 @@ namespace Internal
 namespace
 {
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
-constexpr uint32_t DEFAULT_MAXIMUM_ALLOWED_TIME = 500u;
-constexpr uint32_t DEFAULT_RECOGNIZER_TIME      = 500u;
+constexpr uint32_t DEFAULT_MAXIMUM_ALLOWED_TIME = 330u;
+constexpr uint32_t DEFAULT_RECOGNIZER_TIME      = 330u;
 
 /**
  * Creates a TapGesture and asks the specified detector to emit its detected signal.
@@ -83,8 +83,6 @@ void EmitTapSignal(
 TapGestureProcessor::TapGestureProcessor()
 : GestureProcessor(GestureType::TAP),
   mTapGestureDetectors(),
-  mMinTapsRequired(1),
-  mMaxTapsRequired(1),
   mMinTouchesRequired(1),
   mMaxTouchesRequired(1),
   mCurrentTapEvent(nullptr),
@@ -169,24 +167,16 @@ void TapGestureProcessor::AddGestureDetector(TapGestureDetector* gestureDetector
 
   mTapGestureDetectors.push_back(gestureDetector);
 
-  const unsigned int minTapsRequired = gestureDetector->GetMinimumTapsRequired();
-  const unsigned int maxTapsRequired = gestureDetector->GetMaximumTapsRequired();
   const unsigned int touchesRequired = gestureDetector->GetTouchesRequired();
-
-  DALI_ASSERT_ALWAYS(minTapsRequired <= maxTapsRequired && "Minimum taps requested is greater than the maximum requested");
 
   if(firstRegistration)
   {
     // If this is the first tap gesture detector that has been added, then our minimum and maximum
     // requirements are the same as each other.
 
-    mMinTapsRequired    = minTapsRequired;
-    mMaxTapsRequired    = maxTapsRequired;
     mMinTouchesRequired = mMaxTouchesRequired = touchesRequired;
 
     TapGestureRequest request;
-    request.minTaps    = mMinTapsRequired;
-    request.maxTaps    = mMaxTapsRequired;
     request.minTouches = mMinTouchesRequired;
     request.maxTouches = mMaxTouchesRequired;
 
@@ -201,17 +191,12 @@ void TapGestureProcessor::AddGestureDetector(TapGestureDetector* gestureDetector
 
     // This is quicker than calling UpdateDetection as there is no need to iterate through the container
 
-    unsigned int minTaps    = mMinTapsRequired < minTapsRequired ? mMinTapsRequired : minTapsRequired;
-    unsigned int maxTaps    = mMaxTapsRequired > maxTapsRequired ? mMaxTapsRequired : maxTapsRequired;
     unsigned int minTouches = mMinTouchesRequired < touchesRequired ? mMinTouchesRequired : touchesRequired;
     unsigned int maxTouches = mMaxTouchesRequired > touchesRequired ? mMaxTouchesRequired : touchesRequired;
 
-    if((minTaps != mMinTapsRequired) || (maxTaps != mMaxTapsRequired) ||
-       (minTouches != mMinTouchesRequired) || (maxTouches != mMaxTouchesRequired))
+    if((minTouches != mMinTouchesRequired) || (maxTouches != mMaxTouchesRequired))
     {
       TapGestureRequest request;
-      request.minTaps = mMinTapsRequired = minTaps;
-      request.maxTaps = mMaxTapsRequired = maxTaps;
       request.minTouches = mMinTouchesRequired = minTouches;
       request.maxTouches = mMaxTouchesRequired = maxTouches;
 
@@ -243,14 +228,7 @@ void TapGestureProcessor::RemoveGestureDetector(TapGestureDetector* gestureDetec
 
 void TapGestureProcessor::GestureDetectorUpdated(TapGestureDetector* gestureDetector)
 {
-  DALI_ASSERT_DEBUG(find(mTapGestureDetectors.begin(), mTapGestureDetectors.end(), gestureDetector) != mTapGestureDetectors.end());
-
-  const unsigned int minTapsRequired = gestureDetector->GetMinimumTapsRequired();
-  const unsigned int maxTapsRequired = gestureDetector->GetMaximumTapsRequired();
-
-  DALI_ASSERT_ALWAYS(minTapsRequired <= maxTapsRequired && "Minimum taps requested is greater than the maximum requested");
-
-  UpdateDetection();
+  // Nothing to do.
 }
 
 void TapGestureProcessor::SetMaximumAllowedTime(uint32_t time)
@@ -273,6 +251,11 @@ void TapGestureProcessor::SetMaximumAllowedTime(uint32_t time)
       }
     }
   }
+}
+
+uint32_t TapGestureProcessor::GetMaximumAllowedTime() const
+{
+  return mMaximumAllowedTime;
 }
 
 void TapGestureProcessor::SetRecognizerTime(uint32_t time)
@@ -301,8 +284,6 @@ void TapGestureProcessor::UpdateDetection()
 {
   DALI_ASSERT_DEBUG(!mTapGestureDetectors.empty());
 
-  unsigned int minTaps    = UINT_MAX;
-  unsigned int maxTaps    = 0;
   unsigned int minTouches = UINT_MAX;
   unsigned int maxTouches = 0;
 
@@ -312,23 +293,16 @@ void TapGestureProcessor::UpdateDetection()
 
     if(detector)
     {
-      const unsigned int minTapsRequired = detector->GetMinimumTapsRequired();
-      const unsigned int maxTapsRequired = detector->GetMaximumTapsRequired();
       const unsigned int touchesRequired = detector->GetTouchesRequired();
 
-      minTaps    = minTapsRequired < minTaps ? minTapsRequired : minTaps;
-      maxTaps    = maxTapsRequired > maxTaps ? maxTapsRequired : maxTaps;
       minTouches = touchesRequired < minTouches ? touchesRequired : minTouches;
       maxTouches = touchesRequired > maxTouches ? touchesRequired : maxTouches;
     }
   }
 
-  if((minTaps != mMinTapsRequired) || (maxTaps != mMaxTapsRequired) ||
-     (minTouches != mMinTouchesRequired) || (maxTouches != mMaxTouchesRequired))
+  if((minTouches != mMinTouchesRequired) || (maxTouches != mMaxTouchesRequired))
   {
     TapGestureRequest request;
-    request.minTaps = mMinTapsRequired = minTaps;
-    request.maxTaps = mMaxTapsRequired = maxTaps;
     request.minTouches = mMinTouchesRequired = minTouches;
     request.maxTouches = mMaxTouchesRequired = maxTouches;
 

@@ -2,7 +2,7 @@
 #define DALI_STAGE_DEVEL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/stage.h>
+#include <dali/devel-api/update/update-proxy.h>
 
 namespace Dali
 {
@@ -89,6 +90,19 @@ DALI_CORE_API void AddFrameCallback(Dali::Stage stage, FrameCallbackInterface& f
  * @note If the callback implementation has already been removed, then this is a no-op.
  */
 DALI_CORE_API void RemoveFrameCallback(Dali::Stage stage, FrameCallbackInterface& frameCallback);
+
+/**
+ * @brief Notify the frame callback that there is a new sync point.
+ *
+ * The sync point can be matched during a subsequent frameCallback::Update().
+ *
+ * @param[in] stage The stage to clear the FrameCallbackInterface on
+ * @param[in] frameCallback The FrameCallbackInterface implementation to notify
+ *
+ * @return NotifySyncPoint - a unique sync value that will also be sent to the
+ * UpdateProxy prior to FrameCallback::Update() being called from the update thread.
+ */
+DALI_CORE_API UpdateProxy::NotifySyncPoint NotifyFrameCallback(Dali::Stage stage, FrameCallbackInterface& frameCallback);
 
 } // namespace DevelStage
 

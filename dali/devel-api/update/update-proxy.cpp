@@ -113,6 +113,11 @@ bool UpdateProxy::BakeColor(uint32_t id, const Vector4& color)
   return mImpl.BakeColor(id, color);
 }
 
+UpdateProxy::NotifySyncPoint UpdateProxy::PopSyncPoint()
+{
+  return mImpl.PopSyncPoint();
+}
+
 UpdateProxy::UpdateProxy(Internal::UpdateProxy& impl)
 : mImpl(impl)
 {

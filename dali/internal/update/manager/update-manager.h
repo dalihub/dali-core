@@ -688,6 +688,13 @@ public:
   void RemoveFrameCallback(FrameCallbackInterface* frameCallback);
 
   /**
+   * Notify the specified implementation of FrameCallbackInterface with the given sync point.
+   * @param[in] frameCallback A pointer to the implementation of the FrameCallbackInterface to notify.
+   * @param[in] syncPoint The unique sync point to notify with.
+   */
+  void NotifyFrameCallback(FrameCallbackInterface* frameCallback, Dali::UpdateProxy::NotifySyncPoint syncPoint);
+
+  /**
    * Get the update message queue capacity (mutex locked)
    */
   std::size_t GetUpdateMessageQueueCapacity() const;
@@ -1567,6 +1574,13 @@ inline void RemoveFrameCallbackMessage(UpdateManager& manager, FrameCallbackInte
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&manager, &UpdateManager::RemoveFrameCallback, &frameCallback);
+}
+
+inline void NotifyFrameCallbackMessage(UpdateManager& manager, FrameCallbackInterface* frameCallback, Dali::UpdateProxy::NotifySyncPoint syncPoint)
+{
+  using LocalType = MessageValue2<UpdateManager, FrameCallbackInterface*, Dali::UpdateProxy::NotifySyncPoint>;
+  uint32_t* slot  = manager.ReserveMessageSlot(sizeof(LocalType));
+  new(slot) LocalType(&manager, &UpdateManager::NotifyFrameCallback, frameCallback, syncPoint);
 }
 
 } // namespace SceneGraph

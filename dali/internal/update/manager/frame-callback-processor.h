@@ -79,6 +79,13 @@ public:
   void RemoveFrameCallback(FrameCallbackInterface* frameCallback);
 
   /**
+   * Notify the specified implementation of FrameCallbackInterface.
+   * @param[in]  frameCallback  A pointer to the implementation of the FrameCallbackInterface to notify.
+   * @param[in] syncPoint The unique sync point to notify with
+   */
+  void NotifyFrameCallback(FrameCallbackInterface* frameCallback, Dali::UpdateProxy::NotifySyncPoint syncPoint);
+
+  /**
    * Called on Update by the UpdateManager.
    * @param[in]  bufferIndex     The bufferIndex to use
    * @param[in]  elapsedSeconds  Time elapsed time since the last frame (in seconds)
