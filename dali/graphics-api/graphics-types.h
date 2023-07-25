@@ -1261,6 +1261,15 @@ enum class TextureLayout
 };
 
 /**
+ * @brief Texture allocation policy defines when the GPU texture memory is allocated.
+ */
+enum class TextureAllocationPolicy
+{
+  CREATION, ///< GPU Memory will be allocated when creation.
+  UPLOAD,   ///< GPU Memory will be allocated when upload image data.
+};
+
+/**
  * @brief Level of command buffer
  */
 enum class CommandBufferLevel

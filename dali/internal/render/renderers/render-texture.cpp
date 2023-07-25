@@ -296,10 +296,15 @@ Graphics::Texture* Texture::GetGraphicsObject() const
 
 void Texture::Create(Graphics::TextureUsageFlags usage)
 {
-  CreateWithData(usage, nullptr, 0u);
+  Create(usage, Graphics::TextureAllocationPolicy::CREATION);
 }
 
-void Texture::CreateWithData(Graphics::TextureUsageFlags usage, uint8_t* data, uint32_t size)
+void Texture::Create(Graphics::TextureUsageFlags usage, Graphics::TextureAllocationPolicy allocationPolicy)
+{
+  CreateWithData(usage, allocationPolicy, nullptr, 0u);
+}
+
+void Texture::CreateWithData(Graphics::TextureUsageFlags usage, Graphics::TextureAllocationPolicy allocationPolicy, uint8_t* data, uint32_t size)
 {
   auto createInfo = Graphics::TextureCreateInfo();
   createInfo
@@ -308,6 +313,7 @@ void Texture::CreateWithData(Graphics::TextureUsageFlags usage, uint8_t* data, u
     .SetFormat(ConvertPixelFormat(mPixelFormat))
     .SetSize({mWidth, mHeight})
     .SetLayout(Graphics::TextureLayout::LINEAR)
+    .SetAllocationPolicy(allocationPolicy)
     .SetData(data)
     .SetDataSize(size)
     .SetNativeImage(mNativeImage)
@@ -378,7 +384,10 @@ void Texture::Upload(PixelDataPtr pixelData, const Internal::Texture::UploadPara
   // Always create new graphics texture object if we use uploaded parameter as texture.
   if(!mGraphicsTexture || mUseUploadedParameter)
   {
-    Create(static_cast<Graphics::TextureUsageFlags>(Graphics::TextureUsageFlagBits::SAMPLE));
+    const bool isSubImage(params.xOffset != 0u || params.yOffset != 0u ||
+                          uploadedDataWidth != (mWidth >> params.mipmap) ||
+                          uploadedDataHeight != (mHeight >> params.mipmap));
+    Create(static_cast<Graphics::TextureUsageFlags>(Graphics::TextureUsageFlagBits::SAMPLE), isSubImage ? Graphics::TextureAllocationPolicy::CREATION : Graphics::TextureAllocationPolicy::UPLOAD);
   }
 
   Graphics::TextureUpdateInfo info{};

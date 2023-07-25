@@ -225,12 +225,20 @@ private:
   void ApplySampler(Render::Sampler* sampler);
 
   /**
+   * Create the texture without a buffer
+   * @param[in] usage How texture will be used
+   * @param[in] allocationPolicy Policy of texture allocation
+   */
+  void Create(Graphics::TextureUsageFlags usage, Graphics::TextureAllocationPolicy allocationPolicy);
+
+  /**
    * Create a texture with a buffer if non-null
    * @param[in] usage How texture will be used
+   * @param[in] allocationPolicy Policy of texture allocation
    * @param[in] buffer Buffer to copy
    * @param[in] bufferSize Size of buffer to copy
    */
-  void CreateWithData(Graphics::TextureUsageFlags usage, uint8_t* buffer, uint32_t bufferSize);
+  void CreateWithData(Graphics::TextureUsageFlags usage, Graphics::TextureAllocationPolicy allocationPolicy, uint8_t* buffer, uint32_t bufferSize);
 
 private:
   Graphics::Controller*                  mGraphicsController;
