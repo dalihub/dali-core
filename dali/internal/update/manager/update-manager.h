@@ -50,8 +50,6 @@
 #include <dali/internal/update/rendering/scene-graph-renderer.h>    // for OwnerPointer< Renderer >
 #include <dali/internal/update/rendering/scene-graph-texture-set.h> // for OwnerPointer< TextureSet >
 
-#include <dali/graphics-api/graphics-texture-upload-helper.h> // for Graphics::UploadParams
-
 // EXTERNAL INCLUDES
 #include <cstddef>
 
@@ -562,27 +560,13 @@ public:
    * @param[in] pixelData The pixel data object
    * @param[in] params The parameters for the upload
    */
-  void UploadTexture(const Render::TextureKey& texture, PixelDataPtr pixelData, const Graphics::UploadParams& params);
+  void UploadTexture(const Render::TextureKey& texture, PixelDataPtr pixelData, const Texture::UploadParams& params);
 
   /**
    * Generates mipmaps for a texture owned by the RenderManager
    * @param[in] texture The texture
    */
   void GenerateMipmaps(const Render::TextureKey& texture);
-
-  /**
-   * Set the texture size owned by the RenderManager
-   * @param[in] texture The texture
-   * @param[in] size The texture size
-   */
-  void SetTextureSize(const Render::TextureKey& texture, const Dali::ImageDimensions& size);
-
-  /**
-   * Set the texture pixel format owned by the RenderManager
-   * @param[in] texture The texture
-   * @param[in] pixelFormat The texture pixel format
-   */
-  void SetTextureFormat(const Render::TextureKey& texture, Dali::Pixel::Format pixelFormat);
 
   /**
    * Adds a framebuffer to the render manager
@@ -1453,9 +1437,9 @@ inline void RemoveTextureMessage(UpdateManager& manager, const Render::TextureKe
   new(slot) LocalType(&manager, &UpdateManager::RemoveTexture, texture);
 }
 
-inline void UploadTextureMessage(UpdateManager& manager, Render::TextureKey texture, PixelDataPtr pixelData, const Graphics::UploadParams& params)
+inline void UploadTextureMessage(UpdateManager& manager, Render::TextureKey texture, PixelDataPtr pixelData, const Texture::UploadParams& params)
 {
-  using LocalType = MessageValue3<UpdateManager, Render::TextureKey, PixelDataPtr, Graphics::UploadParams>;
+  using LocalType = MessageValue3<UpdateManager, Render::TextureKey, PixelDataPtr, Texture::UploadParams>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
@@ -1473,28 +1457,6 @@ inline void GenerateMipmapsMessage(UpdateManager& manager, Render::TextureKey te
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&manager, &UpdateManager::GenerateMipmaps, texture);
-}
-
-inline void SetTextureSizeMessage(UpdateManager& manager, Render::TextureKey texture, const Dali::ImageDimensions& size)
-{
-  using LocalType = MessageValue2<UpdateManager, Render::TextureKey, Dali::ImageDimensions>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &UpdateManager::SetTextureSize, texture, size);
-}
-
-inline void SetTextureFormatMessage(UpdateManager& manager, Render::TextureKey texture, Dali::Pixel::Format pixelFormat)
-{
-  using LocalType = MessageValue2<UpdateManager, Render::TextureKey, Dali::Pixel::Format>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &UpdateManager::SetTextureFormat, texture, pixelFormat);
 }
 
 inline void AddFrameBuffer(UpdateManager& manager, OwnerPointer<Render::FrameBuffer>& frameBuffer)
