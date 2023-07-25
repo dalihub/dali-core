@@ -17,6 +17,7 @@
 
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/rendering/texture-devel.h>
+#include <dali/integration-api/texture-integ.h>
 #include <dali/public-api/dali-core.h>
 #include <test-native-image.h>
 
@@ -77,6 +78,23 @@ int UtcDaliTextureNew04(void)
   Texture texture = Texture::New(TextureType::TEXTURE_2D);
 
   DALI_TEST_CHECK(texture);
+  END_TEST;
+}
+
+int UtcDaliTextureNew05(void)
+{
+  TestApplication application;
+
+  uint32_t expectResourceId = 11u;
+
+  Texture texture = Integration::NewTextureWithResourceId(TextureType::TEXTURE_2D, expectResourceId);
+
+  DALI_TEST_CHECK(texture);
+
+  uint32_t currentResourceId = Integration::GetTextureResourceId(texture);
+
+  DALI_TEST_EQUALS(currentResourceId, expectResourceId, TEST_LOCATION);
+
   END_TEST;
 }
 
@@ -1075,6 +1093,68 @@ int UtcDaliTextureGetHeight(void)
 
   Texture texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
   DALI_TEST_EQUALS(texture.GetHeight(), height, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTextureGetTextureType(void)
+{
+  TestApplication application;
+  unsigned int    width(64);
+  unsigned int    height(64);
+
+  Texture texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  DALI_TEST_EQUALS(Integration::GetTextureType(texture), TextureType::TEXTURE_2D, TEST_LOCATION);
+
+  texture = CreateTexture(TextureType::TEXTURE_CUBE, Pixel::RGBA8888, width, height);
+  DALI_TEST_EQUALS(Integration::GetTextureType(texture), TextureType::TEXTURE_CUBE, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTextureSetSize(void)
+{
+  TestApplication application;
+  unsigned int    width(64);
+  unsigned int    height(64);
+
+  Texture texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  DALI_TEST_EQUALS(texture.GetWidth(), width, TEST_LOCATION);
+  DALI_TEST_EQUALS(texture.GetHeight(), height, TEST_LOCATION);
+  DALI_TEST_EQUALS(texture.GetPixelFormat(), Pixel::RGBA8888, TEST_LOCATION);
+
+  width += 11u;
+  height += 22u;
+
+  Integration::SetTextureSize(texture, ImageDimensions(width, height));
+  DALI_TEST_EQUALS(texture.GetWidth(), width, TEST_LOCATION);
+  DALI_TEST_EQUALS(texture.GetHeight(), height, TEST_LOCATION);
+  DALI_TEST_EQUALS(texture.GetPixelFormat(), Pixel::RGBA8888, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliTextureSetPixelFormat(void)
+{
+  TestApplication application;
+  unsigned int    width(64);
+  unsigned int    height(64);
+
+  Texture texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  DALI_TEST_EQUALS(texture.GetWidth(), width, TEST_LOCATION);
+  DALI_TEST_EQUALS(texture.GetHeight(), height, TEST_LOCATION);
+  DALI_TEST_EQUALS(texture.GetPixelFormat(), Pixel::RGBA8888, TEST_LOCATION);
+
+  Integration::SetTexturePixelFormat(texture, Pixel::BGRA5551);
+  DALI_TEST_EQUALS(texture.GetWidth(), width, TEST_LOCATION);
+  DALI_TEST_EQUALS(texture.GetHeight(), height, TEST_LOCATION);
+  DALI_TEST_EQUALS(texture.GetPixelFormat(), Pixel::BGRA5551, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }
