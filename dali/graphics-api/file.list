@@ -28,7 +28,6 @@ SET( GRAPHICS_API_HEADERS ${GRAPHICS_API_HEADERS}
    ${graphics_src_dir}/graphics-sync-object-create-info.h
    ${graphics_src_dir}/graphics-sync-object.h
    ${graphics_src_dir}/graphics-texture-create-info.h
-   ${graphics_src_dir}/graphics-texture-upload-helper.h
    ${graphics_src_dir}/graphics-texture.h
    ${graphics_src_dir}/graphics-types.h
 )

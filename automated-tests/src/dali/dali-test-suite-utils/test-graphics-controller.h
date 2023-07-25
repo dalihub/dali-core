@@ -18,7 +18,6 @@
  */
 
 #include <dali/graphics-api/graphics-controller.h>
-#include <unordered_map>
 #include "test-gl-abstraction.h"
 #include "test-gl-context-helper-abstraction.h"
 #include "test-graphics-command-buffer.h"
@@ -376,53 +375,6 @@ public:
    */
   bool PipelineEquals(const Graphics::Pipeline& pipeline0, const Graphics::Pipeline& pipeline1) const override;
 
-  /**
-   * @brief Retrieves program parameters
-   *
-   * This function can be used to retrieve data from internal implementation
-   *
-   * @param[in] program Valid program object
-   * @param[in] parameterId Integer parameter id
-   * @param[out] outData Pointer to output memory
-   * @return True on success
-   */
-  bool GetProgramParameter(Graphics::Program& program, uint32_t parameterId, void* outData) override;
-
-public: // ResourceId relative API.
-  /**
-   * @brief Create Graphics::Texture as resourceId.
-   * The ownership of Graphics::Texture will be hold on this controller.
-   * @note If some Graphics::Texture already created before, assert.
-   * @post DiscardTextureFromResourceId() or ReleaseTextureFromResourceId() should be called when we don't use resourceId texture anymore.
-   *
-   * @param[in] resourceId The unique id of resouces.
-   * @return Pointer of Graphics::Texture, or nullptr if we fail to create.
-   */
-  Graphics::Texture* CreateTextureByResourceId(uint32_t resourceId, const Graphics::TextureCreateInfo& createInfo) override;
-
-  /**
-   * @brief Discard Graphics::Texture as resourceId.
-   *
-   * @param[in] resourceId The unique id of resouces.
-   */
-  void DiscardTextureFromResourceId(uint32_t resourceId) override;
-
-  /**
-   * @brief Get the Graphics::Texture as resourceId.
-   *
-   * @param[in] resourceId The unique id of resouces.
-   * @return Pointer of Graphics::Texture, or nullptr if there is no valid objects.
-   */
-  Graphics::Texture* GetTextureFromResourceId(uint32_t resourceId) override;
-
-  /**
-   * @brief Get the ownership of Graphics::Texture as resourceId.
-   *
-   * @param[in] resourceId The unique id of resouces.
-   * @return Pointer of Graphics::Texture.
-   */
-  Graphics::UniquePtr<Graphics::Texture> ReleaseTextureFromResourceId(uint32_t resourceId) override;
-
 public: // Test Functions
   void SetVertexFormats(Property::Array& vfs)
   {
@@ -443,6 +395,18 @@ public: // Test Functions
   {
     mSubmitStack.clear();
   }
+
+  /**
+   * @brief Retrieves program parameters
+   *
+   * This function can be used to retrieve data from internal implementation
+   *
+   * @param[in] program Valid program object
+   * @param[in] parameterId Integer parameter id
+   * @param[out] outData Pointer to output memory
+   * @return True on success
+   */
+  bool GetProgramParameter(Graphics::Program& program, uint32_t parameterId, void* outData) override;
 
   void ProcessCommandBuffer(TestGraphicsCommandBuffer& commandBuffer);
 
@@ -471,8 +435,6 @@ public:
   std::vector<ProgramCache> mProgramCache;
 
   std::vector<TestGraphicsBuffer*> mAllocatedBuffers;
-
-  std::unordered_map<uint32_t, Graphics::UniquePtr<Graphics::Texture>> mTextureUploadBindMapper;
 
   struct PipelineCache
   {

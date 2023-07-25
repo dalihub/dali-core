@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_CONTROLLER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h>
 #include <memory>
+#include <vector>
 
 // INTERNAL INCLUDES
 #include "graphics-buffer-create-info.h"
@@ -36,7 +36,6 @@
 #include "graphics-shader-create-info.h"
 #include "graphics-sync-object-create-info.h"
 #include "graphics-texture-create-info.h"
-#include "graphics-texture-upload-helper.h"
 
 namespace Dali
 {
@@ -380,41 +379,6 @@ public:
    * @return True on success
    */
   virtual bool GetProgramParameter(Graphics::Program& program, uint32_t parameterId, void* outData) = 0;
-
-public: // ResourceId relative API.
-  /**
-   * @brief Create Graphics::Texture as resourceId.
-   * The ownership of Graphics::Texture will be hold on this controller.
-   * @note If some Graphics::Texture already created before, assert.
-   * @post DiscardTextureFromResourceId() or ReleaseTextureFromResourceId() should be called when we don't use resourceId texture anymore.
-   *
-   * @param[in] resourceId The unique id of resouces.
-   * @return Pointer of Graphics::Texture, or nullptr if we fail to create.
-   */
-  virtual Graphics::Texture* CreateTextureByResourceId(uint32_t resourceId, const Graphics::TextureCreateInfo& createInfo) = 0;
-
-  /**
-   * @brief Discard Graphics::Texture as resourceId.
-   *
-   * @param[in] resourceId The unique id of resouces.
-   */
-  virtual void DiscardTextureFromResourceId(uint32_t resourceId) = 0;
-
-  /**
-   * @brief Get the Graphics::Texture as resourceId.
-   *
-   * @param[in] resourceId The unique id of resouces.
-   * @return Pointer of Graphics::Texture, or nullptr if there is no valid objects.
-   */
-  virtual Graphics::Texture* GetTextureFromResourceId(uint32_t resourceId) = 0;
-
-  /**
-   * @brief Get the ownership of Graphics::Texture as resourceId.
-   *
-   * @param[in] resourceId The unique id of resouces.
-   * @return Pointer of Graphics::Texture.
-   */
-  virtual UniquePtr<Graphics::Texture> ReleaseTextureFromResourceId(uint32_t resourceId) = 0;
 
 protected:
   /**

@@ -274,7 +274,7 @@ void RenderManager::AddTexture(const Render::TextureKey& textureKey)
 {
   DALI_ASSERT_DEBUG(textureKey && "Trying to add empty texture key");
 
-  textureKey->Initialize(mImpl->graphicsController, *this);
+  textureKey->Initialize(mImpl->graphicsController);
   mImpl->textureContainer.PushBack(textureKey);
   mImpl->updatedTextures.PushBack(textureKey);
 }
@@ -293,7 +293,7 @@ void RenderManager::RemoveTexture(const Render::TextureKey& textureKey)
   }
 }
 
-void RenderManager::UploadTexture(const Render::TextureKey& textureKey, PixelDataPtr pixelData, const Graphics::UploadParams& params)
+void RenderManager::UploadTexture(const Render::TextureKey& textureKey, PixelDataPtr pixelData, const Texture::UploadParams& params)
 {
   DALI_ASSERT_DEBUG(textureKey && "Trying to upload to empty texture key");
   textureKey->Upload(pixelData, params);
@@ -305,23 +305,6 @@ void RenderManager::GenerateMipmaps(const Render::TextureKey& textureKey)
 {
   DALI_ASSERT_DEBUG(textureKey && "Trying to generate mipmaps on empty texture key");
   textureKey->GenerateMipmaps();
-
-  mImpl->updatedTextures.PushBack(textureKey);
-}
-
-void RenderManager::SetTextureSize(const Render::TextureKey& textureKey, const Dali::ImageDimensions& size)
-{
-  DALI_ASSERT_DEBUG(textureKey && "Trying to set size on empty texture key");
-  textureKey->SetWidth(size.GetWidth());
-  textureKey->SetHeight(size.GetHeight());
-
-  mImpl->updatedTextures.PushBack(textureKey);
-}
-
-void RenderManager::SetTextureFormat(const Render::TextureKey& textureKey, Dali::Pixel::Format pixelFormat)
-{
-  DALI_ASSERT_DEBUG(textureKey && "Trying to set pixel format on empty texture key");
-  textureKey->SetPixelFormat(pixelFormat);
 
   mImpl->updatedTextures.PushBack(textureKey);
 }
