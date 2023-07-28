@@ -81,13 +81,6 @@ public:
 
       mBaseProperty->ResetToBaseValue(updateBufferIndex);
     }
-
-    if(mRunning == AGING)
-    {
-      // If this resetter is aging now, make it as stopped.
-      // Now we can assume that this PropertyResetter is finished.
-      mRunning = STOPPED;
-    }
   };
 
   /**
@@ -139,7 +132,14 @@ public:
    */
   virtual bool IsFinished()
   {
-    return mRunning <= STOPPED;
+    const bool finished = mRunning <= STOPPED;
+    if(mRunning == AGING)
+    {
+      // If this resetter is aging now, make it as stopped.
+      // Now we can assume that this PropertyResetter is finished next frame.
+      mRunning = STOPPED;
+    }
+    return finished;
   }
 
   enum
