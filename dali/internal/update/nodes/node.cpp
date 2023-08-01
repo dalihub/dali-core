@@ -82,7 +82,8 @@ void Node::Delete(Node* node)
 }
 
 Node::Node()
-: mOrientation(),                                                               // Initialized to identity by default
+: mTransformManagerData(),                                                      // Initialized to use invalid id by default
+  mOrientation(),                                                               // Initialized to identity by default
   mWorldPosition(TRANSFORM_PROPERTY_WORLD_POSITION, Vector3(0.0f, 0.0f, 0.0f)), // Zero initialized by default
   mWorldScale(TRANSFORM_PROPERTY_WORLD_SCALE, Vector3(1.0f, 1.0f, 1.0f)),
   mWorldOrientation(), // Initialized to identity by default
