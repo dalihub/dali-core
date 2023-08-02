@@ -52,8 +52,8 @@ DALI_PROPERTY( "type",                   INTEGER,  true,    false,   true,   Dal
 DALI_PROPERTY( "projectionMode",         INTEGER,  true,    false,   true,   Dali::CameraActor::Property::PROJECTION_MODE           )
 DALI_PROPERTY( "fieldOfView",            FLOAT,    true,    true,    true,   Dali::CameraActor::Property::FIELD_OF_VIEW             )
 DALI_PROPERTY( "aspectRatio",            FLOAT,    true,    true,    true,   Dali::CameraActor::Property::ASPECT_RATIO              )
-DALI_PROPERTY( "nearPlaneDistance",      FLOAT,    true,    false,   true,   Dali::CameraActor::Property::NEAR_PLANE_DISTANCE       )
-DALI_PROPERTY( "farPlaneDistance",       FLOAT,    true,    false,   true,   Dali::CameraActor::Property::FAR_PLANE_DISTANCE        )
+DALI_PROPERTY( "nearPlaneDistance",      FLOAT,    true,    true,    true,   Dali::CameraActor::Property::NEAR_PLANE_DISTANCE       )
+DALI_PROPERTY( "farPlaneDistance",       FLOAT,    true,    true,    true,   Dali::CameraActor::Property::FAR_PLANE_DISTANCE        )
 DALI_PROPERTY( "leftPlaneDistance",      FLOAT,    false,   false,   true,   Dali::CameraActor::Property::LEFT_PLANE_DISTANCE       )
 DALI_PROPERTY( "rightPlaneDistance",     FLOAT,    false,   false,   true,   Dali::CameraActor::Property::RIGHT_PLANE_DISTANCE      )
 DALI_PROPERTY( "topPlaneDistance",       FLOAT,    false,   false,   true,   Dali::CameraActor::Property::TOP_PLANE_DISTANCE        )
@@ -425,13 +425,18 @@ void CameraActor::SetNearClippingPlane(float nearClippingPlane)
     mNearClippingPlane = nearClippingPlane;
 
     // sceneObject is being used in a separate thread; queue a message to set
-    SetNearClippingPlaneMessage(GetEventThreadServices(), GetCameraSceneObject(), mNearClippingPlane);
+    BakeNearClippingPlaneMessage(GetEventThreadServices(), GetCameraSceneObject(), mNearClippingPlane);
   }
 }
 
 float CameraActor::GetNearClippingPlane() const
 {
   return mNearClippingPlane;
+}
+
+float CameraActor::GetCurrentNearClippingPlane() const
+{
+  return GetCameraSceneObject().GetNearClippingPlane(GetEventThreadServices().GetEventBufferIndex());
 }
 
 void CameraActor::SetFarClippingPlane(float farClippingPlane)
@@ -442,13 +447,18 @@ void CameraActor::SetFarClippingPlane(float farClippingPlane)
     mFarClippingPlane = farClippingPlane;
 
     // sceneObject is being used in a separate thread; queue a message to set
-    SetFarClippingPlaneMessage(GetEventThreadServices(), GetCameraSceneObject(), mFarClippingPlane);
+    BakeFarClippingPlaneMessage(GetEventThreadServices(), GetCameraSceneObject(), mFarClippingPlane);
   }
 }
 
 float CameraActor::GetFarClippingPlane() const
 {
   return mFarClippingPlane;
+}
+
+float CameraActor::GetCurrentFarClippingPlane() const
+{
+  return GetCameraSceneObject().GetFarClippingPlane(GetEventThreadServices().GetEventBufferIndex());
 }
 
 void CameraActor::SetInvertYAxis(bool invertYAxis)
@@ -859,6 +869,16 @@ Property::Value CameraActor::GetDefaultPropertyCurrentValue(Property::Index inde
         ret = GetCurrentAspectRatio();
         break;
       }
+      case Dali::CameraActor::Property::NEAR_PLANE_DISTANCE:
+      {
+        ret = GetCurrentNearClippingPlane();
+        break;
+      }
+      case Dali::CameraActor::Property::FAR_PLANE_DISTANCE:
+      {
+        ret = GetCurrentFarClippingPlane();
+        break;
+      }
       case Dali::CameraActor::Property::LEFT_PLANE_DISTANCE:
       {
         ret = OrthographicSizeConverter(GetCurrentOrthographicSize(), GetCurrentAspectRatio(), mProjectionDirection).LeftPlaneDistance();
@@ -919,6 +939,16 @@ void CameraActor::OnNotifyDefaultPropertyAnimation(Animation& animation, Propert
             value.Get(mAspectRatio);
             break;
           }
+          case Dali::CameraActor::Property::NEAR_PLANE_DISTANCE:
+          {
+            value.Get(mNearClippingPlane);
+            break;
+          }
+          case Dali::CameraActor::Property::FAR_PLANE_DISTANCE:
+          {
+            value.Get(mFarClippingPlane);
+            break;
+          }
         }
         break;
       }
@@ -939,6 +969,16 @@ void CameraActor::OnNotifyDefaultPropertyAnimation(Animation& animation, Propert
           case Dali::CameraActor::Property::ASPECT_RATIO:
           {
             AdjustValue<float>(mAspectRatio, value);
+            break;
+          }
+          case Dali::CameraActor::Property::NEAR_PLANE_DISTANCE:
+          {
+            AdjustValue<float>(mNearClippingPlane, value);
+            break;
+          }
+          case Dali::CameraActor::Property::FAR_PLANE_DISTANCE:
+          {
+            AdjustValue<float>(mFarClippingPlane, value);
             break;
           }
         }
@@ -968,6 +1008,16 @@ const SceneGraph::PropertyBase* CameraActor::GetSceneObjectAnimatableProperty(Pr
       property = GetCameraSceneObject().GetAspectRatio();
       break;
     }
+    case Dali::CameraActor::Property::NEAR_PLANE_DISTANCE:
+    {
+      property = GetCameraSceneObject().GetNearPlaneDistance();
+      break;
+    }
+    case Dali::CameraActor::Property::FAR_PLANE_DISTANCE:
+    {
+      property = GetCameraSceneObject().GetFarPlaneDistance();
+      break;
+    }
       // no default on purpose as we chain method up to actor
   }
   if(!property)
@@ -985,19 +1035,29 @@ const PropertyInputImpl* CameraActor::GetSceneObjectInputProperty(Property::Inde
 
   switch(index)
   {
+    case Dali::CameraActor::Property::PROJECTION_MODE:
+    {
+      property = GetCameraSceneObject().GetProjectionMode();
+      break;
+    }
     case Dali::CameraActor::Property::FIELD_OF_VIEW:
     {
       property = GetCameraSceneObject().GetFieldOfView();
       break;
     }
-    case Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE:
-    {
-      property = GetCameraSceneObject().GetOrthographicSize();
-      break;
-    }
     case Dali::CameraActor::Property::ASPECT_RATIO:
     {
       property = GetCameraSceneObject().GetAspectRatio();
+      break;
+    }
+    case Dali::CameraActor::Property::NEAR_PLANE_DISTANCE:
+    {
+      property = GetCameraSceneObject().GetNearPlaneDistance();
+      break;
+    }
+    case Dali::CameraActor::Property::FAR_PLANE_DISTANCE:
+    {
+      property = GetCameraSceneObject().GetFarPlaneDistance();
       break;
     }
     case Dali::CameraActor::Property::PROJECTION_MATRIX:
@@ -1008,6 +1068,21 @@ const PropertyInputImpl* CameraActor::GetSceneObjectInputProperty(Property::Inde
     case Dali::CameraActor::Property::VIEW_MATRIX:
     {
       property = GetCameraSceneObject().GetViewMatrix();
+      break;
+    }
+    case Dali::CameraActor::Property::INVERT_Y_AXIS:
+    {
+      property = GetCameraSceneObject().GetInvertYAxis();
+      break;
+    }
+    case Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE:
+    {
+      property = GetCameraSceneObject().GetOrthographicSize();
+      break;
+    }
+    case Dali::DevelCameraActor::Property::PROJECTION_DIRECTION:
+    {
+      property = GetCameraSceneObject().GetProjectionDirection();
       break;
     }
       // no default on purpose as we chain method up to actor
