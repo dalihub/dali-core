@@ -161,6 +161,11 @@ public:
   void QueueEvent(const Integration::Event& event);
 
   /**
+   * @copydoc Dali::Integration::Core::ForceRelayout()
+   */
+  void ForceRelayout();
+
+  /**
    * @copydoc Dali::Integration::Core::ProcessEvents()
    */
   void ProcessEvents();
@@ -233,6 +238,8 @@ public: // Implementation of EventThreadServices
   BufferIndex GetEventBufferIndex() const override;
 
 private:
+  using SceneContainer = std::vector<ScenePtr>;
+
   /**
    * Run each registered processor
    */
@@ -242,6 +249,11 @@ private:
    * Run each registered postprocessor
    */
   void RunPostProcessors();
+
+  /**
+   * Run registered processors, and relayout, and flush messages
+   */
+  void RelayoutAndFlush(SceneContainer& scenes);
 
   // for use by ThreadLocalStorage
 
@@ -342,7 +354,6 @@ private:
   Dali::Vector<Integration::Processor*>         mProcessors;            ///< Registered processors (not owned)
   Dali::Vector<Integration::Processor*>         mPostProcessors;        ///< Registered post processors those will called after relayout(not owned)
 
-  using SceneContainer = std::vector<ScenePtr>;
   SceneContainer mScenes; ///< A container of scenes that bound to a surface for rendering, owned by Core
 
   // The object registry
@@ -353,6 +364,7 @@ private:
   bool mProcessingEvent : 1;           ///< True during ProcessEvents()
   bool mProcessorUnregistered : 1;     ///< True if the processor is unregistered during RunProcessors()
   bool mPostProcessorUnregistered : 1; ///< True if the post-processor is unregistered during RunPostProcessors()
+  bool mRelayoutFlush : 1;             ///< True during RelayoutAndFlush()
 
   friend class ThreadLocalStorage;
 };

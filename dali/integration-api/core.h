@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_CORE_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -292,6 +292,13 @@ public:
    * @param[in] event The new event.
    */
   void QueueEvent(const Event& event);
+
+  /**
+   * Relayout and flush the messages forcibly.
+   * Multi-threading note: this method should be called from the main thread.
+   * @pre ForceRelayout should not be called during ProcessEvents or ForceRelayout.
+   */
+  void ForceRelayout();
 
   /**
    * Process the events queued with QueueEvent().

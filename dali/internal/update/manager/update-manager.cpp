@@ -745,6 +745,11 @@ void UpdateManager::EventProcessingStarted()
   mImpl->messageQueue.EventProcessingStarted();
 }
 
+void UpdateManager::EventProcessingFinished()
+{
+  mImpl->messageQueue.EventProcessingFinished();
+}
+
 bool UpdateManager::FlushQueue()
 {
   return mImpl->messageQueue.FlushQueue();
