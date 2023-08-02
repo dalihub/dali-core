@@ -377,19 +377,19 @@ void Camera::SetType(Dali::Camera::Type type)
 
 void Camera::SetProjectionMode(Dali::Camera::ProjectionMode mode)
 {
-  mProjectionMode       = mode;
+  mProjectionMode.Bake(0, mode);
   mUpdateProjectionFlag = UPDATE_COUNT;
 }
 
 void Camera::SetProjectionDirection(Dali::DevelCameraActor::ProjectionDirection direction)
 {
-  mProjectionDirection  = direction;
+  mProjectionDirection.Bake(0, direction);
   mUpdateProjectionFlag = UPDATE_COUNT;
 }
 
 void Camera::SetInvertYAxis(bool invertYAxis)
 {
-  mInvertYAxis          = invertYAxis;
+  mInvertYAxis.Bake(0, invertYAxis);
   mUpdateProjectionFlag = UPDATE_COUNT;
 }
 
@@ -411,15 +411,15 @@ void Camera::BakeAspectRatio(BufferIndex updateBufferIndex, float aspectRatio)
   mUpdateProjectionFlag = UPDATE_COUNT;
 }
 
-void Camera::SetNearClippingPlane(float nearClippingPlane)
+void Camera::BakeNearClippingPlane(BufferIndex updateBufferIndex, float nearClippingPlane)
 {
-  mNearClippingPlane    = nearClippingPlane;
+  mNearClippingPlane.Bake(updateBufferIndex, nearClippingPlane);
   mUpdateProjectionFlag = UPDATE_COUNT;
 }
 
-void Camera::SetFarClippingPlane(float farClippingPlane)
+void Camera::BakeFarClippingPlane(BufferIndex updateBufferIndex, float farClippingPlane)
 {
-  mFarClippingPlane     = farClippingPlane;
+  mFarClippingPlane.Bake(updateBufferIndex, farClippingPlane);
   mUpdateProjectionFlag = UPDATE_COUNT;
 }
 
@@ -498,19 +498,29 @@ const Matrix& Camera::GetFinalProjectionMatrix(BufferIndex bufferIndex) const
   return mFinalProjection[bufferIndex];
 }
 
+const PropertyBase* Camera::GetProjectionMode() const
+{
+  return &mProjectionMode;
+}
+
 const PropertyBase* Camera::GetFieldOfView() const
 {
   return &mFieldOfView;
 }
 
-const PropertyBase* Camera::GetOrthographicSize() const
-{
-  return &mOrthographicSize;
-}
-
 const PropertyBase* Camera::GetAspectRatio() const
 {
   return &mAspectRatio;
+}
+
+const PropertyBase* Camera::GetNearPlaneDistance() const
+{
+  return &mNearClippingPlane;
+}
+
+const PropertyBase* Camera::GetFarPlaneDistance() const
+{
+  return &mFarClippingPlane;
 }
 
 const PropertyInputImpl* Camera::GetProjectionMatrix() const
@@ -521,6 +531,21 @@ const PropertyInputImpl* Camera::GetProjectionMatrix() const
 const PropertyInputImpl* Camera::GetViewMatrix() const
 {
   return &mViewMatrix;
+}
+
+const PropertyBase* Camera::GetInvertYAxis() const
+{
+  return &mInvertYAxis;
+}
+
+const PropertyBase* Camera::GetOrthographicSize() const
+{
+  return &mOrthographicSize;
+}
+
+const PropertyBase* Camera::GetProjectionDirection() const
+{
+  return &mProjectionDirection;
 }
 
 void Camera::Update(BufferIndex updateBufferIndex)
@@ -788,8 +813,8 @@ Dali::Rect<int32_t> Camera::GetOrthographicClippingBox(BufferIndex bufferIndex) 
   const float orthographicSize = mOrthographicSize[bufferIndex];
   const float aspect           = mAspectRatio[bufferIndex];
 
-  const float halfWidth  = mProjectionDirection == DevelCameraActor::ProjectionDirection::VERTICAL ? orthographicSize * aspect : orthographicSize;
-  const float halfHeight = mProjectionDirection == DevelCameraActor::ProjectionDirection::VERTICAL ? orthographicSize : orthographicSize / aspect;
+  const float halfWidth  = mProjectionDirection[0] == DevelCameraActor::ProjectionDirection::VERTICAL ? orthographicSize * aspect : orthographicSize;
+  const float halfHeight = mProjectionDirection[0] == DevelCameraActor::ProjectionDirection::VERTICAL ? orthographicSize : orthographicSize / aspect;
 
   return Dali::Rect<int32_t>(-halfWidth, -halfHeight, halfWidth * 2.0f, halfHeight * 2.0f);
 }
@@ -812,18 +837,18 @@ uint32_t Camera::UpdateProjection(BufferIndex updateBufferIndex)
     }
     else // UPDATE_COUNT == mUpdateProjectionFlag
     {
-      switch(mProjectionMode)
+      switch(mProjectionMode[0])
       {
         case Dali::Camera::PERSPECTIVE_PROJECTION:
         {
           Matrix& projectionMatrix = mProjectionMatrix.Get(updateBufferIndex);
           Perspective(projectionMatrix,
-                      mProjectionDirection,
+                      static_cast<Dali::DevelCameraActor::ProjectionDirection>(mProjectionDirection[0]),
                       mFieldOfView[updateBufferIndex],
                       mAspectRatio[updateBufferIndex],
-                      mNearClippingPlane,
-                      mFarClippingPlane,
-                      mInvertYAxis);
+                      mNearClippingPlane[updateBufferIndex],
+                      mFarClippingPlane[updateBufferIndex],
+                      mInvertYAxis[0]);
 
           //need to apply custom clipping plane
           if(mUseReflectionClip)
@@ -842,7 +867,7 @@ uint32_t Camera::UpdateProjection(BufferIndex updateBufferIndex)
             }
 
             Vector4 customClipping = viewInv * adjReflectPlane;
-            AdjustNearPlaneForPerspective(projectionMatrix, customClipping, mFarClippingPlane);
+            AdjustNearPlaneForPerspective(projectionMatrix, customClipping, mFarClippingPlane[updateBufferIndex]);
           }
           break;
         }
@@ -850,12 +875,12 @@ uint32_t Camera::UpdateProjection(BufferIndex updateBufferIndex)
         {
           Matrix& projectionMatrix = mProjectionMatrix.Get(updateBufferIndex);
           Orthographic(projectionMatrix,
-                       mProjectionDirection,
+                      static_cast<Dali::DevelCameraActor::ProjectionDirection>(mProjectionDirection[0]),
                        mOrthographicSize[updateBufferIndex],
                        mAspectRatio[updateBufferIndex],
-                       mNearClippingPlane,
-                       mFarClippingPlane,
-                       mInvertYAxis);
+                       mNearClippingPlane[updateBufferIndex],
+                       mFarClippingPlane[updateBufferIndex],
+                       mInvertYAxis[0]);
 
           //need to apply custom clipping plane
           if(mUseReflectionClip)
@@ -874,7 +899,7 @@ uint32_t Camera::UpdateProjection(BufferIndex updateBufferIndex)
             }
 
             Vector4 customClipping = viewInv * adjReflectPlane;
-            AdjustNearPlaneForOrthographic(projectionMatrix, customClipping, mFarClippingPlane);
+            AdjustNearPlaneForOrthographic(projectionMatrix, customClipping, mFarClippingPlane[updateBufferIndex]);
           }
           break;
         }

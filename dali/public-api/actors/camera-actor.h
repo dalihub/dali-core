@@ -106,8 +106,8 @@ public:
      */
     enum
     {
-      TYPE = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, ///< name "type",                  type std::string @SINCE_1_0.0
-      PROJECTION_MODE,                                   ///< name "projectionMode",        type std::string @SINCE_1_0.0
+      TYPE = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, ///< name "type",                  type int @SINCE_1_0.0
+      PROJECTION_MODE,                                   ///< name "projectionMode",        type int @SINCE_1_0.0
       FIELD_OF_VIEW,                                     ///< name "fieldOfView",           type float @SINCE_1_0.0
       ASPECT_RATIO,                                      ///< name "aspectRatio",           type float @SINCE_1_0.0
       NEAR_PLANE_DISTANCE,                               ///< name "nearPlaneDistance",     type float @SINCE_1_0.0
