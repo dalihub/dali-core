@@ -192,7 +192,7 @@ struct RenderManager::Impl
 
   OrderedSet<Render::RenderTracker> mRenderTrackers; ///< List of owned render trackers
 
-  OwnerKeyContainer<Render::Texture> textureDiscardQueue;  ///< Discarded textures
+  OwnerKeyContainer<Render::Texture> textureDiscardQueue; ///< Discarded textures
 
   ProgramController   programController; ///< Owner of the programs
   Render::ShaderCache shaderCache;       ///< The cache for the graphics shaders
@@ -274,7 +274,7 @@ void RenderManager::AddTexture(const Render::TextureKey& textureKey)
 {
   DALI_ASSERT_DEBUG(textureKey && "Trying to add empty texture key");
 
-  textureKey->Initialize(mImpl->graphicsController);
+  textureKey->Initialize(mImpl->graphicsController, *this);
   mImpl->textureContainer.PushBack(textureKey);
   mImpl->updatedTextures.PushBack(textureKey);
 }
@@ -293,7 +293,7 @@ void RenderManager::RemoveTexture(const Render::TextureKey& textureKey)
   }
 }
 
-void RenderManager::UploadTexture(const Render::TextureKey& textureKey, PixelDataPtr pixelData, const Texture::UploadParams& params)
+void RenderManager::UploadTexture(const Render::TextureKey& textureKey, PixelDataPtr pixelData, const Graphics::UploadParams& params)
 {
   DALI_ASSERT_DEBUG(textureKey && "Trying to upload to empty texture key");
   textureKey->Upload(pixelData, params);
@@ -307,6 +307,19 @@ void RenderManager::GenerateMipmaps(const Render::TextureKey& textureKey)
   textureKey->GenerateMipmaps();
 
   mImpl->updatedTextures.PushBack(textureKey);
+}
+
+void RenderManager::SetTextureSize(const Render::TextureKey& textureKey, const Dali::ImageDimensions& size)
+{
+  DALI_ASSERT_DEBUG(textureKey && "Trying to set size on empty texture key");
+  textureKey->SetWidth(size.GetWidth());
+  textureKey->SetHeight(size.GetHeight());
+}
+
+void RenderManager::SetTextureFormat(const Render::TextureKey& textureKey, Dali::Pixel::Format pixelFormat)
+{
+  DALI_ASSERT_DEBUG(textureKey && "Trying to set pixel format on empty texture key");
+  textureKey->SetPixelFormat(pixelFormat);
 }
 
 void RenderManager::SetTextureUpdated(const Render::TextureKey& textureKey)

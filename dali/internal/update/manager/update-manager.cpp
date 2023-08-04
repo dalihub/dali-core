@@ -1546,9 +1546,9 @@ void UpdateManager::RemoveTexture(const Render::TextureKey& texture)
   new(slot) DerivedType(&mImpl->renderManager, &RenderManager::RemoveTexture, texture);
 }
 
-void UpdateManager::UploadTexture(const Render::TextureKey& texture, PixelDataPtr pixelData, const Texture::UploadParams& params)
+void UpdateManager::UploadTexture(const Render::TextureKey& texture, PixelDataPtr pixelData, const Graphics::UploadParams& params)
 {
-  using DerivedType = MessageValue3<RenderManager, Render::TextureKey, PixelDataPtr, Texture::UploadParams>;
+  using DerivedType = MessageValue3<RenderManager, Render::TextureKey, PixelDataPtr, Graphics::UploadParams>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot(mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof(DerivedType));
@@ -1566,6 +1566,28 @@ void UpdateManager::GenerateMipmaps(const Render::TextureKey& texture)
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
   new(slot) DerivedType(&mImpl->renderManager, &RenderManager::GenerateMipmaps, texture);
+}
+
+void UpdateManager::SetTextureSize(const Render::TextureKey& texture, const Dali::ImageDimensions& size)
+{
+  using DerivedType = MessageValue2<RenderManager, Render::TextureKey, Dali::ImageDimensions>;
+
+  // Reserve some memory inside the render queue
+  uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot(mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof(DerivedType));
+
+  // Construct message in the render queue memory; note that delete should not be called on the return value
+  new(slot) DerivedType(&mImpl->renderManager, &RenderManager::SetTextureSize, texture, size);
+}
+
+void UpdateManager::SetTextureFormat(const Render::TextureKey& texture, Dali::Pixel::Format pixelFormat)
+{
+  using DerivedType = MessageValue2<RenderManager, Render::TextureKey, Dali::Pixel::Format>;
+
+  // Reserve some memory inside the render queue
+  uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot(mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof(DerivedType));
+
+  // Construct message in the render queue memory; note that delete should not be called on the return value
+  new(slot) DerivedType(&mImpl->renderManager, &RenderManager::SetTextureFormat, texture, pixelFormat);
 }
 
 void UpdateManager::AddFrameBuffer(OwnerPointer<Render::FrameBuffer>& frameBuffer)
