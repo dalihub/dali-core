@@ -96,6 +96,7 @@ private:
   ActorObserver    mCapturingTouchActor;    ///< Stored the actor that captures touch
   ActorObserver    mOwnTouchActor;          ///< Stored the actor that own touch
   ActorObserver    mTouchDownConsumedActor; ///< Stores the touch-down consumed actor
+  ActorObserver    mInterceptedTouchActor;  ///< Stores the intercepted actor
   RenderTaskPtr    mLastRenderTask;         ///< The RenderTask used for the last hit actor
   PointState::Type mLastPrimaryPointState;  ///< Stores the last primary point state
 };

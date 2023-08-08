@@ -2209,7 +2209,27 @@ int UtcDaliTouchEventIntercept02(void)
   DALI_TEST_CHECK(actor == parentData.receivedTouch.points[0].hitActor);
   DALI_TEST_CHECK(parent == parentData.touchedActor);
   data.Reset();
+  interceptData.Reset();
   parentData.Reset();
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Emit a move signal
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 20.0f)));
+
+  // Since InterceptTouchEvent is not called because it has already been intercepted by the parent, only the parent will receive the touchEvent.
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, interceptData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, parentData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::MOTION, parentData.receivedTouch.points[0].state, TEST_LOCATION);
+  DALI_TEST_CHECK(actor == parentData.receivedTouch.points[0].hitActor);
+  DALI_TEST_CHECK(parent == parentData.touchedActor);
+  data.Reset();
+  interceptData.Reset();
+  parentData.Reset();
+
 
   END_TEST;
 }
