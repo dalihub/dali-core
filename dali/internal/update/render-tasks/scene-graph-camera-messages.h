@@ -124,26 +124,38 @@ inline void BakeAspectRatioMessage(EventThreadServices& eventThreadServices, con
   AddResetterMessage(eventThreadServices.GetUpdateManager(), resetter);
 }
 
-inline void SetNearClippingPlaneMessage(EventThreadServices& eventThreadServices, const Camera& camera, float parameter)
+inline void BakeNearClippingPlaneMessage(EventThreadServices& eventThreadServices, const Camera& camera, float parameter)
 {
-  using LocalType = MessageValue1<Camera, float>;
+  using LocalType = MessageDoubleBuffered1<Camera, float>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&camera, &Camera::SetNearClippingPlane, parameter);
+  new(slot) LocalType(&camera, &Camera::BakeNearClippingPlane, parameter);
+
+  OwnerPointer<SceneGraph::PropertyResetterBase> resetter(
+    new SceneGraph::BakerResetter(const_cast<SceneGraph::Camera*>(&camera),
+                                  const_cast<SceneGraph::AnimatableProperty<float>*>(&camera.mNearClippingPlane),
+                                  BakerResetter::Lifetime::BAKE));
+  AddResetterMessage(eventThreadServices.GetUpdateManager(), resetter);
 }
 
-inline void SetFarClippingPlaneMessage(EventThreadServices& eventThreadServices, const Camera& camera, float parameter)
+inline void BakeFarClippingPlaneMessage(EventThreadServices& eventThreadServices, const Camera& camera, float parameter)
 {
-  using LocalType = MessageValue1<Camera, float>;
+  using LocalType = MessageDoubleBuffered1<Camera, float>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&camera, &Camera::SetFarClippingPlane, parameter);
+  new(slot) LocalType(&camera, &Camera::BakeFarClippingPlane, parameter);
+
+  OwnerPointer<SceneGraph::PropertyResetterBase> resetter(
+    new SceneGraph::BakerResetter(const_cast<SceneGraph::Camera*>(&camera),
+                                  const_cast<SceneGraph::AnimatableProperty<float>*>(&camera.mFarClippingPlane),
+                                  BakerResetter::Lifetime::BAKE));
+  AddResetterMessage(eventThreadServices.GetUpdateManager(), resetter);
 }
 
 inline void SetReflectByPlaneMessage(EventThreadServices& eventThreadServices, const Camera& camera, const Vector4& plane)

@@ -35,6 +35,25 @@ namespace SceneGraph
 {
 class SceneController;
 
+template<>
+class AnimatableProperty<Dali::Camera::ProjectionMode> : public AnimatableProperty<int>
+{
+public:
+  AnimatableProperty(Dali::Camera::ProjectionMode initialValue)
+  : AnimatableProperty<int>(static_cast<int>(initialValue))
+  {
+  }
+};
+template<>
+class AnimatableProperty<Dali::DevelCameraActor::ProjectionDirection> : public AnimatableProperty<int>
+{
+public:
+  AnimatableProperty(Dali::DevelCameraActor::ProjectionDirection initialValue)
+  : AnimatableProperty<int>(static_cast<int>(initialValue))
+  {
+  }
+};
+
 /**
  * Scene-graph camera object
  */
@@ -108,7 +127,7 @@ public:
    */
   bool IsYAxisInverted() const
   {
-    return mInvertYAxis;
+    return mInvertYAxis[0];
   }
 
   /**
@@ -140,16 +159,6 @@ public:
    * @copydoc Dali::Internal::CameraActor::SetBottomClippingPlane
    */
   void SetBottomClippingPlane(float bottomClippingPlane);
-
-  /**
-   * @copydoc Dali::Internal::CameraActor::SetNearClippingPlane
-   */
-  void SetNearClippingPlane(float nearClippingPlane);
-
-  /**
-   * @copydoc Dali::Internal::CameraActor::SetFarClippingPlane
-   */
-  void SetFarClippingPlane(float farClippingPlane);
 
   /**
    * @copydoc Dali::Internal::CameraActor::RotateProjection
@@ -210,6 +219,40 @@ public:
   float GetAspectRatio(BufferIndex bufferIndex) const
   {
     return mAspectRatio[bufferIndex];
+  }
+
+  /**
+   * @brief Bakes the near clipping plane distance.
+   * @param[in] updateBufferIndex The current update buffer index.
+   * @param[in] nearClippingPlane The near clipping plane distance.
+   */
+  void BakeNearClippingPlane(BufferIndex updateBufferIndex, float nearClippingPlane);
+
+  /**
+   * @brief Retrieve the near clipping plane distance.
+   * @param[in] bufferIndex The buffer to read from.
+   * @return The near clipping plane distance.
+   */
+  float GetNearClippingPlane(BufferIndex bufferIndex) const
+  {
+    return mNearClippingPlane[bufferIndex];
+  }
+
+  /**
+   * @brief Bakes the far clipping plane distance.
+   * @param[in] updateBufferIndex The current update buffer index.
+   * @param[in] farClippingPlane The far clipping plane distance.
+   */
+  void BakeFarClippingPlane(BufferIndex updateBufferIndex, float farClippingPlane);
+
+  /**
+   * @brief Retrieve the far clipping plane distance.
+   * @param[in] bufferIndex The buffer to read from.
+   * @return The far clipping plane distance.
+   */
+  float GetFarClippingPlane(BufferIndex bufferIndex) const
+  {
+    return mFarClippingPlane[bufferIndex];
   }
 
   /**
@@ -283,6 +326,13 @@ public:
   const Matrix& GetFinalProjectionMatrix(BufferIndex bufferIndex) const;
 
   /**
+   * Retrieve the projection mode property querying interface.
+   * @pre The camera is on-stage.
+   * @return The projection mode property querying interface.
+   */
+  const PropertyBase* GetProjectionMode() const;
+
+  /**
    * Retrieve the field of view property querying interface.
    * @pre The camera is on-stage.
    * @return The field of view property querying interface.
@@ -290,18 +340,25 @@ public:
   const PropertyBase* GetFieldOfView() const;
 
   /**
-   * Retrieve the orthographic size property querying interface.
-   * @pre The camera is on-stage.
-   * @return The orthographic size property querying interface.
-   */
-  const PropertyBase* GetOrthographicSize() const;
-
-  /**
    * Retrieve the aspect ratio property querying interface.
    * @pre The camera is on-stage.
    * @return The aspect ratio property querying interface.
    */
   const PropertyBase* GetAspectRatio() const;
+
+  /**
+   * Retrieve the near clipping plane distance property querying interface.
+   * @pre The camera is on-stage.
+   * @return The near clipping plane distance property querying interface.
+   */
+  const PropertyBase* GetNearPlaneDistance() const;
+
+  /**
+   * Retrieve the far clipping plane distance property querying interface.
+   * @pre The camera is on-stage.
+   * @return The far clipping plane distance property querying interface.
+   */
+  const PropertyBase* GetFarPlaneDistance() const;
 
   /**
    * Retrieve the projection-matrix property querying interface.
@@ -316,6 +373,27 @@ public:
    * @return The viewMatrix property querying interface.
    */
   const PropertyInputImpl* GetViewMatrix() const;
+
+  /**
+   * Retrieve the value of InvertYAxis property querying interface.
+   * @pre The camera is on-stage.
+   * @return The InvertYAxis property value querying interface.
+   */
+  const PropertyBase* GetInvertYAxis() const;
+
+  /**
+   * Retrieve the orthographic size property querying interface.
+   * @pre The camera is on-stage.
+   * @return The orthographic size property querying interface.
+   */
+  const PropertyBase* GetOrthographicSize() const;
+
+  /**
+   * Retrieve the value of Projection Direction property querying interface.
+   * @pre The camera is on-stage.
+   * @return The Projection Direction property value querying interface.
+   */
+  const PropertyBase* GetProjectionDirection() const;
 
   /**
    * Updates view and projection matrices.
@@ -379,18 +457,18 @@ private:
   uint32_t mUpdateProjectionFlag; ///< This is non-zero if the projection matrix requires an update
   int      mProjectionRotation;   ///< The rotaion angle of the projection
 
-public:                                                             // PROPERTIES
-  Dali::Camera::Type                          mType;                // Non-animatable
-  Dali::Camera::ProjectionMode                mProjectionMode;      // Non-animatable
-  Dali::DevelCameraActor::ProjectionDirection mProjectionDirection; // Non-animatable
-  bool                                        mInvertYAxis;         // Non-animatable
+public:                           // PROPERTIES
+  Dali::Camera::Type                                              mType;                // Non-animatable
+  AnimatableProperty<Dali::Camera::ProjectionMode>                mProjectionMode;      // Non-animatable, constraint_input
+  AnimatableProperty<Dali::DevelCameraActor::ProjectionDirection> mProjectionDirection; // Non-animatable, constraint_input
+  AnimatableProperty<bool>                                        mInvertYAxis;         // Non-animatable, constraint_input
 
-  AnimatableProperty<float> mFieldOfView;      // Animatable
-  AnimatableProperty<float> mOrthographicSize; // Animatable
-  AnimatableProperty<float> mAspectRatio;      // Animatable
+  AnimatableProperty<float> mFieldOfView;                                               // Animatable
+  AnimatableProperty<float> mOrthographicSize;                                          // Animatable
+  AnimatableProperty<float> mAspectRatio;                                               // Animatable
+  AnimatableProperty<float> mNearClippingPlane;                                         // Animatable
+  AnimatableProperty<float> mFarClippingPlane;                                          // Animatable
 
-  float   mNearClippingPlane;
-  float   mFarClippingPlane;
   Vector3 mTargetPosition;
 
   Dali::Matrix  mReflectionMtx;
