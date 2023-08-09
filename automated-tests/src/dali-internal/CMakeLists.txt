@@ -28,6 +28,7 @@ SET(TC_SOURCES
         utc-Dali-Internal-RotationGesture.cpp
         utc-Dali-Internal-TapGesture.cpp
         utc-Dali-Internal-TapGestureProcessor.cpp
+        utc-Dali-Internal-Texture.cpp
         utc-Dali-Internal-TransformManagerProperty.cpp
 )
 

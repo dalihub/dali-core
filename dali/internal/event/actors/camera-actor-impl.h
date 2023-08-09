@@ -291,6 +291,22 @@ private:
    */
   float GetCurrentAspectRatio() const;
 
+  /**
+   * @brief Retrieve the CameraActor's near clipping plane distance from update side.
+   * This is either the last value set, or the currently animating value.
+   * It may be defferent to GetNearClippingPlane() if the set message hasn't been processed yet.
+   * @return Near clipping plane distance.
+   */
+  float GetCurrentNearClippingPlane() const;
+
+  /**
+   * @brief Retrieve the CameraActor's far clipping plane distance from update side.
+   * This is either the last value set, or the currently animating value.
+   * It may be defferent to GetFarClippingPlane() if the set message hasn't been processed yet.
+   * @return Far clipping plane distance.
+   */
+  float GetCurrentFarClippingPlane() const;
+
 private: // Data
   Vector3                                     mTarget;
   Vector2                                     mCanvasSize;

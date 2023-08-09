@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_TEXTURE_CREATE_INFO_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -145,6 +145,22 @@ struct TextureCreateInfo
   }
 
   /**
+   * @brief Sets texture GPU data allocation policy
+   *
+   * CREATION will allocate GPU memory at creation time.
+   * UPLOAD will allocate GPU memory at creation with non-empty data,
+   * or upload data time.
+   *
+   * @param[in] value texture allocation policy
+   * @return reference to this structure
+   */
+  auto& SetAllocationPolicy(TextureAllocationPolicy value)
+  {
+    allocationPolicy = value;
+    return *this;
+  }
+
+  /**
    * @brief Sets texture usage flags
    *
    * The usage flags may affect the way the texture is
@@ -193,6 +209,7 @@ struct TextureCreateInfo
   Format                  format{};
   TextureMipMapFlag       mipMapFlag{};
   TextureLayout           layout{};
+  TextureAllocationPolicy allocationPolicy{};
   TextureUsageFlags       usageFlags{};
   void*                   data{};
   uint32_t                dataSize{0u};

@@ -28,6 +28,7 @@
 
 #include <dali/graphics-api/graphics-controller.h>
 #include <dali/graphics-api/graphics-texture-create-info.h>
+#include <dali/graphics-api/graphics-texture-upload-helper.h>
 #include <dali/graphics-api/graphics-texture.h>
 #include <dali/graphics-api/graphics-types.h>
 #include <dali/internal/event/rendering/texture-impl.h>
@@ -37,6 +38,11 @@ namespace Dali
 {
 namespace Internal
 {
+namespace SceneGraph
+{
+class RenderManager;
+} // namespace SceneGraph
+
 namespace Render
 {
 struct Sampler;
@@ -57,6 +63,11 @@ public:
   static TextureKey NewKey(NativeImageInterfacePtr nativeImageInterface);
 
   /**
+   * Factory method to return a new texture accessed by key.
+   */
+  static TextureKey NewKey(Type type, uint32_t resourceId);
+
+  /**
    * Constructor
    * @param[in] type The type of the texture
    * @param[in] format The format of the pixel data
@@ -69,6 +80,13 @@ public:
    * @param[in] nativeImageInterface The native image
    */
   explicit Texture(NativeImageInterfacePtr nativeImageInterface);
+
+  /**
+   * Constructor from resource id
+   * @param[in] type The type of the texture
+   * @param[in] resourceId The resouce id for texture upload manager using
+   */
+  explicit Texture(Type type, uint32_t resourceId);
 
   /**
    * Destructor
@@ -101,8 +119,9 @@ public:
    * Stores the graphics controller for use when required.
    *
    * @param[in] graphicsController The graphics controller to use
+   * @param[in] renderManager The render manager to be used.
    */
-  void Initialize(Graphics::Controller& graphicsController);
+  void Initialize(Graphics::Controller& graphicsController, SceneGraph::RenderManager& renderManager);
 
   /**
    * Create the texture without a buffer
@@ -120,7 +139,7 @@ public:
    * @param[in] pixelData A pixel data object
    * @param[in] params Upload parameters. See UploadParams
    */
-  void Upload(PixelDataPtr pixelData, const Internal::Texture::UploadParams& params);
+  void Upload(PixelDataPtr pixelData, const Graphics::UploadParams& params);
 
   /**
    * Auto generates mipmaps for the texture
@@ -136,7 +155,7 @@ public:
   /**
    * Get the graphics object associated with this texture
    */
-  [[nodiscard]] Graphics::Texture* GetGraphicsObject() const;
+  [[nodiscard]] Graphics::Texture* GetGraphicsObject();
 
   /**
    * Get the type of the texture
@@ -178,9 +197,36 @@ public:
    * Return the height of the texture
    * @return The height of the texture
    */
-  uint32_t GetHeight() const
+  uint16_t GetHeight() const
   {
     return mHeight;
+  }
+
+  /**
+   * Set the pixel format of the texture
+   * @param[in] pixelFormat The pixel format of the texture data.
+   */
+  void SetPixelFormat(Pixel::Format pixelFormat)
+  {
+    mPixelFormat = pixelFormat;
+  }
+
+  /**
+   * Set the width of the texture
+   * @param[in] width The width of the texture
+   */
+  void SetWidth(uint16_t width)
+  {
+    mWidth = width;
+  }
+
+  /**
+   * Set the height of the texture
+   * @param[in] height The height of the texture
+   */
+  void SetHeight(uint16_t height)
+  {
+    mHeight = height;
   }
 
   /**
@@ -203,7 +249,7 @@ public:
    */
   [[nodiscard]] bool Updated()
   {
-    if(mUpdated || (mNativeImage && mNativeImage->SourceChanged()))
+    if(mUpdated || (mNativeImage && mNativeImage->SourceChanged()) || (mResourceId != 0u && IsGraphicsObjectChanged()))
     {
       return true;
     }
@@ -225,15 +271,36 @@ private:
   void ApplySampler(Render::Sampler* sampler);
 
   /**
+   * Create the texture without a buffer
+   * @param[in] usage How texture will be used
+   * @param[in] allocationPolicy Policy of texture allocation
+   */
+  void Create(Graphics::TextureUsageFlags usage, Graphics::TextureAllocationPolicy allocationPolicy);
+
+  /**
    * Create a texture with a buffer if non-null
    * @param[in] usage How texture will be used
+   * @param[in] allocationPolicy Policy of texture allocation
    * @param[in] buffer Buffer to copy
    * @param[in] bufferSize Size of buffer to copy
    */
-  void CreateWithData(Graphics::TextureUsageFlags usage, uint8_t* buffer, uint32_t bufferSize);
+  void CreateWithData(Graphics::TextureUsageFlags usage, Graphics::TextureAllocationPolicy allocationPolicy, uint8_t* buffer, uint32_t bufferSize);
+
+  /**
+   * @brief Check whether graphics object pointer were changed what we know before.
+   *
+   * @return True if graphics object created newly. False otherwised.
+   */
+  bool IsGraphicsObjectChanged();
+
+  /**
+   * @brief Notify to RenderManager that this texture has been updated.
+   */
+  void NotifyTextureUpdated();
 
 private:
   Graphics::Controller*                  mGraphicsController;
+  SceneGraph::RenderManager*             mRenderManager;
   Graphics::UniquePtr<Graphics::Texture> mGraphicsTexture;
 
   NativeImageInterfacePtr mNativeImage; ///< Pointer to native image
@@ -244,6 +311,9 @@ private:
   Pixel::Format mPixelFormat; ///< Pixel format of the texture
   uint16_t      mWidth;       ///< Width of the texture
   uint16_t      mHeight;      ///< Height of the texture
+
+  uint32_t           mResourceId;
+  Graphics::Texture* mLatestUsedGraphicsTexture{nullptr};
 
   Type mType : 3;     ///< Type of the texture
   bool mHasAlpha : 1; ///< Whether the format has an alpha channel
