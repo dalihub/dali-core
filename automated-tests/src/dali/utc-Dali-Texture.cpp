@@ -973,6 +973,26 @@ int UtcDaliTextureGenerateMipmaps(void)
   END_TEST;
 }
 
+int UtcDaliTextureGenerateMipmapsCompressedFormat(void)
+{
+  TestApplication application;
+  unsigned int    width(64);
+  unsigned int    height(64);
+
+  Texture texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::COMPRESSED_RGBA8_ETC2_EAC, width, height);
+  texture.GenerateMipmaps();
+
+  application.GetGlAbstraction().EnableTextureCallTrace(true);
+  TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
+  application.SendNotification();
+  application.Render();
+
+  // Check generate mipmap didn't called when we use compressed pixel format.
+  DALI_TEST_CHECK(!callStack.FindMethod("GenerateMipmap"));
+
+  END_TEST;
+}
+
 int UtcDaliTextureGetWidth(void)
 {
   TestApplication application;
