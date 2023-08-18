@@ -1,7 +1,7 @@
 Testing environment   {#auto_testing}
 ===================
 
-The new test environment from Tizen is the Web-TCT test suite. This was written for testing web components, but can easily be used for testing Dali.
+The current test environment from Tizen is the Web-TCT test suite. This was written for testing web components, but can easily be used for testing Dali. The tests remain compatible with the previous TET test suite.
 
 Each of the DALi repositories, **dali-core**, **dali-adaptor** and **dali-toolkit**, have their own test suites under the `automated-tests` folder. Within the src folder are a number of secondary folders - these correspond to 'API' tests  and internal (for desktop testing only)
 
@@ -87,11 +87,19 @@ To execute tests, cd into automated-tests and run
 
     ./execute.sh
 
-This will execute dali and dali-internal test sets. Note that the output summary for the first will be printed before running the second.
+To execute a subset of tests, you can run individual test sets, e.g.
 
-By default the tests execute in parallel, which is faster but does not produce any test case output files.  Use this to execute the tests in series and log test output to stdout/err
+    ./execute.sh dali
 
-    ./execute.sh -S
+To execute a specific test, just pass it on the command line:
+
+    ./execute.sh UtcDaliActorNew
+
+To execute a matching subset of tests, use the prefix option:
+
+    ./execute.sh -p UtcDaliActor
+
+will execute all tests that start with the prefix "UtcDaliActor".
 
 To use test kit lite, (which is very slow),
 
@@ -100,10 +108,6 @@ To use test kit lite, (which is very slow),
 To see the test kit lite results, copy the style folder from web-tct_2.2.1_r1/tools/tct-mgr/style into automated-tests and run
 
     firefox --new-window summary.xml
-
-To execute a subset of tests, you can run individual test sets, e.g.
-
-    ./execute.sh dali
 
 To get full coverage output (you need to first build dali libraries with
 --coverage), run
@@ -142,19 +146,12 @@ sudo apt-get install libconfig-tiny-perl
 If you use a non-standard `GBS_ROOT` then you will need to edit the tcbuild script to match your configuration - change line 96 and add a -B option with your GBS-ROOT path (line 96 = `gbs build -A armv7l --spec core-$1-tests.spec --include-all --keep-packs` ).
 To install on device from a non-standard GBS_ROOT, also modify line 28 (`RPM_DIR="$HOME/GBS-ROOT/local/repos/$PROFILE/armv7l/RPMS"`).
 
-For core Dali cd into automated-tests, and use:
+For Dali Core, cd into automated-tests, and use:
 
 sudo ./tcbuild build dali
 
     sudo ./tcbuild build dali
     ./tcbuild install dali
-
-For Dali Adaptor, cd into automated-tests, and use:
-
-    sudo ./tcbuild build dali-adaptor
-    sudo ./tcbuild build dali-platform-abstraction
-    ./tcbuild install dali-adaptor
-    ./tcbuild install dali-platform-abstraction
 
 Ensure your handset's filesystem is writable:
 
@@ -172,11 +169,6 @@ You can find the output files under /opt/tct/manager/result/
 
 Adding tests
 ============
-
-To Managed API
---------------
-
-If you are adding test cases for new or existing managed API (CAPI), you need to add your changes to the src/dali mirror, and copy your change to the managed test suite in core-api. You need to inform HQ of your update.
 
 For internal API
 ----------------
@@ -197,7 +189,7 @@ If you are adding test cases to existing files, then all you need to do is creat
 
 Note that **the parentheses in the method signature must not be empty** (i.e., it must violate our coding convention and follow __exactly__ this pattern: `int UtcDaliMyTestcaseName(void)`), as it's parsed by an awk script to auto-generate the testcase arrays in the main header file. Neither may any comments on the same line contain empty parentheses.
 
-You can contine to use the TET api, e.g. `tet_infoline`, `tet_result` and our test check methods `DALI_TEST_CHECK`, `DALI_TEST_EQUALS`, etc.
+You can use the previous TET api, e.g. `tet_infoline`, `tet_result` and our test check methods `DALI_TEST_CHECK`, `DALI_TEST_EQUALS`, etc.
 
 If you need any non-test methods or variables, ensure they are wrapped in an anonymous namespace.
 
