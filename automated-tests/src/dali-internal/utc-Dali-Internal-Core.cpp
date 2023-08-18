@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ public:
   }
 
   // callback to be connected to RelayoutSignal
-  void RelayoutCallback(Actor actor)
+  virtual void RelayoutCallback(Actor actor)
   {
     tet_infoline("RelayoutCallback is called");
 
@@ -58,6 +58,26 @@ public:
 
   TestApplication& mApplication;
   bool             mSignalCalled;
+};
+
+class DoubleRelayoutSignalHandler : public RelayoutSignalHandler
+{
+public:
+  DoubleRelayoutSignalHandler(TestApplication& application)
+  : RelayoutSignalHandler(application)
+  {
+  }
+
+  // callback to be connected to RelayoutSignal
+  void RelayoutCallback(Actor actor) override
+  {
+    tet_infoline("DoubleRelayoutCallback is called");
+
+    auto& core = mApplication.GetCore();
+    core.ForceRelayout();
+
+    RelayoutSignalHandler::RelayoutCallback(actor);
+  }
 };
 
 } // anonymous namespace
@@ -85,6 +105,75 @@ int UtcDaliCoreProcessEvents(void)
 
   DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::SIZE).Get<Vector3>(), size, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::POSITION).Get<Vector3>(), position, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliCoreForceRelayout(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::Integration::Core::ForceRelayout");
+
+  Vector3 size(100.0f, 100.0f, 0.0f);
+  Vector3 position(100.0f, 100.0f, 0.0f);
+
+  Actor actor = Actor::New();
+  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  actor.SetProperty(Actor::Property::SIZE, size);
+  actor.SetProperty(Actor::Property::POSITION, position);
+  application.GetScene().Add(actor);
+
+  RelayoutSignalHandler relayoutSignal(application);
+  actor.OnRelayoutSignal().Connect(&relayoutSignal, &RelayoutSignalHandler::RelayoutCallback);
+
+  // Call ForceRelayout before application.SendNotification();
+  auto& core = application.GetCore();
+  core.ForceRelayout();
+
+  DALI_TEST_EQUALS(relayoutSignal.mSignalCalled, true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::SIZE).Get<Vector3>(), size, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::POSITION).Get<Vector3>(), position, TEST_LOCATION);
+
+  relayoutSignal.mSignalCalled = false;
+
+  application.SendNotification();
+
+  // Check relayout signal not emitted;
+  DALI_TEST_EQUALS(relayoutSignal.mSignalCalled, false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliCoreForceRelayout2(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::Integration::Core::ForceRelayout during force-relayout");
+
+  Vector3 size(100.0f, 100.0f, 0.0f);
+  Vector3 position(100.0f, 100.0f, 0.0f);
+
+  Actor actor = Actor::New();
+  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  actor.SetProperty(Actor::Property::SIZE, size);
+  actor.SetProperty(Actor::Property::POSITION, position);
+  application.GetScene().Add(actor);
+
+  DoubleRelayoutSignalHandler relayoutSignal(application);
+  actor.OnRelayoutSignal().Connect(&relayoutSignal, &DoubleRelayoutSignalHandler::RelayoutCallback);
+
+  // Call ForceRelayout before application.SendNotification();
+  auto& core = application.GetCore();
+  core.ForceRelayout();
+
+  DALI_TEST_EQUALS(relayoutSignal.mSignalCalled, true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::SIZE).Get<Vector3>(), size, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::POSITION).Get<Vector3>(), position, TEST_LOCATION);
+
+  relayoutSignal.mSignalCalled = false;
+
+  application.SendNotification();
 
   END_TEST;
 }

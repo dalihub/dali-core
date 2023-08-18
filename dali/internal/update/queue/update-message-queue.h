@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_UPDATE_MESSAGE_QUEUE_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,6 +68,11 @@ public:
   void EventProcessingStarted();
 
   /**
+   * Inform the queue that event processing has finished
+   */
+  void EventProcessingFinished();
+
+  /**
    * Reserve space for a message
    * @param[in] size the message size with respect to the size of type 'char'
    * @param[in] updateScene If set to true, denotes that the message will cause the scene graph node tree to require an update
@@ -116,8 +121,8 @@ private:
 
 private:
   // Not copyable:
-  MessageQueue()                                   = delete;
-  MessageQueue(const MessageQueue& rhs)            = delete;
+  MessageQueue()                        = delete;
+  MessageQueue(const MessageQueue& rhs) = delete;
   MessageQueue& operator=(const MessageQueue& rhs) = delete;
 
 private:
