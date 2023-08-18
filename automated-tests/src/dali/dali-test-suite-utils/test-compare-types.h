@@ -2,7 +2,7 @@
 #define DALI_TEST_COMPARE_TYPES_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,9 +27,9 @@ inline bool CompareType(Type value1, Type value2, float epsilon)
 }
 
 /**
- * A helper for fuzzy-comparing Vector2 objects
- * @param[in] vector1 the first object
- * @param[in] vector2 the second object
+ * A helper for matching floats
+ * @param[in] value1 the first object
+ * @param[in] value2 the second object
  * @param[in] epsilon difference threshold
  * @returns true if difference is smaller than epsilon threshold, false otherwise
  */
@@ -37,6 +37,19 @@ template<>
 inline bool CompareType<float>(float value1, float value2, float epsilon)
 {
   return fabsf(value1 - value2) < epsilon;
+}
+
+/**
+ * A helper for matching doubles
+ * @param[in] value1 the first object
+ * @param[in] value2 the second object
+ * @param[in] epsilon difference threshold
+ * @returns true if difference is smaller than epsilon threshold, false otherwise
+ */
+template<>
+inline bool CompareType<double>(double value1, double value2, float epsilon)
+{
+  return fabs(value1 - value2) < double(epsilon);
 }
 
 /**
