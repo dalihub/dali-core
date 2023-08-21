@@ -171,7 +171,7 @@ public:
   /**
    * The number of texture units an implementation supports is implementation dependent, but must be at least 8.
    */
-  static const unsigned int MIN_TEXTURE_UNIT_LIMIT = 8;
+  static const unsigned int MIN_TEXTURE_UNIT_LIMIT = 16;
 
   /* OpenGL ES 2.0 */
   // clang-format off
