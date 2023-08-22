@@ -463,27 +463,27 @@ bool RenderTask::TranslateCoordinates(Vector2& screenCoords) const
 
 void RenderTask::GetHittableViewport(Viewport& viewPort) const
 {
-  if(GetInputEnabled())
-  {
-    if(mFrameBuffer)
+    if(GetInputEnabled())
     {
-      auto mappingActor = GetScreenToFrameBufferMappingActor();
-      if(mappingActor)
+      if(mFrameBuffer)
       {
-        Actor& inputMappingActor = GetImplementation(mappingActor);
+        auto mappingActor = GetScreenToFrameBufferMappingActor();
+        if(mappingActor)
+        {
+          Actor& inputMappingActor = GetImplementation(mappingActor);
 
-        Vector3 actorSize = inputMappingActor.GetCurrentSize() * inputMappingActor.GetCurrentWorldScale();
+          Vector3 actorSize = inputMappingActor.GetCurrentSize() * inputMappingActor.GetCurrentWorldScale();
 
-        viewPort.x = viewPort.y = 0;
-        viewPort.width          = static_cast<int32_t>(actorSize.x + 0.5f); // rounded
-        viewPort.height         = static_cast<int32_t>(actorSize.y + 0.5f); // rounded
+          viewPort.x = viewPort.y = 0;
+          viewPort.width          = static_cast<int32_t>(actorSize.x + 0.5f); // rounded
+          viewPort.height         = static_cast<int32_t>(actorSize.y + 0.5f); // rounded
+        }
+      }
+      else
+      {
+        GetViewport(viewPort);
       }
     }
-    else
-    {
-      GetViewport(viewPort);
-    }
-  }
 }
 
 bool RenderTask::WorldToViewport(const Vector3& position, float& viewportX, float& viewportY) const

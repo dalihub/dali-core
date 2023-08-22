@@ -37,20 +37,30 @@ bool HitTest(Stage stage, const Vector2& screenCoordinates, Results& results, Hi
 
 bool BuildPickingRay(RenderTask renderTask, const Vector2& screenCoordinates, Vector3& origin, Vector3& direction)
 {
-  Viewport viewport = renderTask.GetViewport();
-  if(screenCoordinates.x < static_cast<float>(viewport.x) ||
-     screenCoordinates.x > static_cast<float>(viewport.x + viewport.width) ||
-     screenCoordinates.y < static_cast<float>(viewport.y) ||
-     screenCoordinates.y > static_cast<float>(viewport.y + viewport.height))
+  Internal::RenderTask& renderTaskImpl             = GetImplementation(renderTask);
+  Vector2               convertedScreenCoordinates = screenCoordinates;
+
+  if(!renderTaskImpl.IsHittable(convertedScreenCoordinates))
+  {
+    return false;
+  }
+
+  Viewport viewport;
+  renderTaskImpl.GetHittableViewport(viewport);
+  if(convertedScreenCoordinates.x < static_cast<float>(viewport.x) ||
+     convertedScreenCoordinates.x > static_cast<float>(viewport.x + viewport.width) ||
+     convertedScreenCoordinates.y < static_cast<float>(viewport.y) ||
+     convertedScreenCoordinates.y > static_cast<float>(viewport.y + viewport.height))
   {
     // The screen coordinate is outside the viewport of render task. The viewport clips all layers.
     return false;
   }
-  CameraActor            cameraActor     = renderTask.GetCameraActor();
-  Internal::CameraActor& cameraActorImpl = GetImplementation(cameraActor);
+  DALI_ASSERT_ALWAYS(renderTaskImpl.GetCameraActor());
+
+  Internal::CameraActor& cameraActorImpl = *renderTaskImpl.GetCameraActor();
   Vector4                rayOrigin;
   Vector4                rayDirection;
-  bool                   success = cameraActorImpl.BuildPickingRay(screenCoordinates, viewport, rayOrigin, rayDirection);
+  bool                   success = cameraActorImpl.BuildPickingRay(convertedScreenCoordinates, viewport, rayOrigin, rayDirection);
   if(success)
   {
     origin    = Vector3(rayOrigin.x, rayOrigin.y, rayOrigin.z);

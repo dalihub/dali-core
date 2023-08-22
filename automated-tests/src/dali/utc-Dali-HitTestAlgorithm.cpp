@@ -763,3 +763,171 @@ int UtcDaliHitTestAlgorithmBuildPickingRay01(void)
 
   END_TEST;
 }
+
+int UtcDaliHitTestAlgorithmBuildPickingRay02(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::HitTestAlgorithm::BuildPickingRay positive test for offscreen");
+
+  Stage          stage             = Stage::GetCurrent();
+  RenderTaskList renderTaskList    = stage.GetRenderTaskList();
+  RenderTask     defaultRenderTask = renderTaskList.GetTask(0u);
+  RenderTask     offRenderTask     = renderTaskList.CreateTask();
+
+  Dali::CameraActor defaultCameraActor = defaultRenderTask.GetCameraActor();
+
+  Vector2 stageSize(stage.GetSize());
+
+  Vector2 actorSize(stageSize * 0.5f);
+  Vector2 offscreenSize(1920.0f, 1080.0f); // Quit big size.
+
+  // Create two actors with half the size of the stage and set them to be partial-overlapping
+  Actor blue = Actor::New();
+  blue.SetProperty(Actor::Property::NAME, "Blue");
+  blue.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  blue.SetProperty(Actor::Property::PARENT_ORIGIN, AnchorPoint::CENTER);
+  blue.SetProperty(Actor::Property::SIZE, actorSize);
+  blue.SetProperty(Actor::Property::POSITION, -actorSize * 0.25f);
+
+  Actor green = Actor::New();
+  green.SetProperty(Actor::Property::NAME, "Green");
+  green.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  green.SetProperty(Actor::Property::PARENT_ORIGIN, AnchorPoint::CENTER);
+  green.SetProperty(Actor::Property::SIZE, actorSize);
+  green.SetProperty(Actor::Property::POSITION, actorSize * 0.25f);
+
+  Actor red = Actor::New();
+  red.SetProperty(Actor::Property::NAME, "Red");
+  red.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  red.SetProperty(Actor::Property::PARENT_ORIGIN, AnchorPoint::CENTER);
+  red.SetProperty(Actor::Property::SIZE, offscreenSize * 0.5f);
+
+  Dali::CameraActor offscreenCameraActor                     = Dali::CameraActor::New(offscreenSize);
+  offscreenCameraActor[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  offscreenCameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+  stage.Add(offscreenCameraActor);
+
+  offRenderTask.SetExclusive(true);
+  offRenderTask.SetInputEnabled(true);
+  offRenderTask.SetCameraActor(offscreenCameraActor);
+  offRenderTask.SetSourceActor(red);
+  offRenderTask.SetScreenToFrameBufferMappingActor(green);
+
+  Dali::Texture texture      = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, unsigned(actorSize.width), unsigned(actorSize.height));
+  FrameBuffer   renderTarget = FrameBuffer::New(actorSize.width, actorSize.height, FrameBuffer::Attachment::DEPTH_STENCIL);
+  renderTarget.AttachColorTexture(texture);
+  offRenderTask.SetFrameBuffer(renderTarget);
+
+  // Add the actors to the view
+  stage.Add(blue);
+  stage.Add(green);
+  stage.Add(red);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render(0);
+
+  Vector2 screenCoords(stageSize * 0.5f); // touch center of screen
+  Vector3 origin;
+  Vector3 direction;
+  bool    built = HitTestAlgorithm::BuildPickingRay(defaultRenderTask, screenCoords, origin, direction);
+
+  Vector3 camPos = defaultCameraActor[Actor::Property::POSITION];
+  DALI_TEST_EQUALS(built, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(camPos, origin, TEST_LOCATION);
+  direction.Normalize();
+  DALI_TEST_EQUALS(direction, -Vector3::ZAXIS, 0.01f, TEST_LOCATION);
+
+  screenCoords.x = stageSize.width * 0.75f;
+  built          = HitTestAlgorithm::BuildPickingRay(defaultRenderTask, screenCoords, origin, direction);
+  DALI_TEST_EQUALS(built, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(camPos, origin, TEST_LOCATION);
+  direction.Normalize();
+  DALI_TEST_EQUALS(direction, Vector3(0.075f, 0.0f, -1.0f), 0.01f, TEST_LOCATION);
+
+  screenCoords.x = 0.0f;
+  screenCoords.y = 0.0f;
+  built          = HitTestAlgorithm::BuildPickingRay(defaultRenderTask, screenCoords, origin, direction);
+  DALI_TEST_EQUALS(built, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(camPos, origin, TEST_LOCATION);
+  direction.Normalize();
+  DALI_TEST_EQUALS(direction, Vector3(-0.144f, -0.24f, -0.96f), 0.01f, TEST_LOCATION);
+
+  screenCoords.x = stageSize.width;
+  screenCoords.y = stageSize.height;
+  built          = HitTestAlgorithm::BuildPickingRay(defaultRenderTask, screenCoords, origin, direction);
+  DALI_TEST_EQUALS(built, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(camPos, origin, TEST_LOCATION);
+  direction.Normalize();
+  DALI_TEST_EQUALS(direction, Vector3(0.144f, 0.24f, -0.96f), 0.01f, TEST_LOCATION);
+
+  // For offscreen picking ray
+  camPos = Vector3(offscreenCameraActor[Actor::Property::POSITION]);
+
+  const float ELLIPSION = 0.001f; ///< tiny margin to avoid non-hitting cases
+
+  // Center of green
+  screenCoords = stageSize * 0.5f + actorSize * 0.25f;
+  built        = HitTestAlgorithm::BuildPickingRay(offRenderTask, screenCoords, origin, direction);
+
+  DALI_TEST_EQUALS(built, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(camPos, origin, TEST_LOCATION);
+  direction.Normalize();
+  DALI_TEST_EQUALS(direction, -Vector3::ZAXIS, 0.01f, TEST_LOCATION);
+
+  // Center right of green
+  screenCoords.x = stageSize.width * 0.5f + actorSize.width * 0.75f - ELLIPSION;
+  built          = HitTestAlgorithm::BuildPickingRay(offRenderTask, screenCoords, origin, direction);
+  DALI_TEST_EQUALS(built, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(camPos, origin, TEST_LOCATION);
+  direction.Normalize();
+  DALI_TEST_EQUALS(direction, Vector3(0.242533f, 0.0f, -0.970143f), 0.01f, TEST_LOCATION);
+
+  // Top left of green
+  screenCoords = stageSize * 0.5f - actorSize * 0.25f + Vector2(ELLIPSION, ELLIPSION);
+  built        = HitTestAlgorithm::BuildPickingRay(offRenderTask, screenCoords, origin, direction);
+  DALI_TEST_EQUALS(built, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(camPos, origin, TEST_LOCATION);
+  direction.Normalize();
+  DALI_TEST_EQUALS(direction, Vector3(-0.240308f, -0.135174f, -0.961239f), 0.01f, TEST_LOCATION);
+
+  // Bottom right of green
+  screenCoords = stageSize * 0.5f + actorSize * 0.75f - Vector2(ELLIPSION, ELLIPSION);
+  built        = HitTestAlgorithm::BuildPickingRay(offRenderTask, screenCoords, origin, direction);
+  DALI_TEST_EQUALS(built, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(camPos, origin, TEST_LOCATION);
+  direction.Normalize();
+  DALI_TEST_EQUALS(direction, Vector3(0.240308f, 0.135174f, -0.961239f), 0.01f, TEST_LOCATION);
+
+  // Rotate green
+  green.SetProperty(Actor::Property::ORIENTATION, Quaternion(Radian(Degree(90.0f)), Vector3::ZAXIS));
+
+  // Render and notify
+  application.SendNotification();
+  application.Render(0);
+
+  // Top left of green, but ray directoin is bottom left
+  screenCoords.x = stageSize.width * 0.5f + actorSize.width * 0.25f - actorSize.height * 0.5f + ELLIPSION;
+  screenCoords.y = stageSize.height * 0.5f + actorSize.height * 0.25f - actorSize.width * 0.5f + ELLIPSION;
+  built          = HitTestAlgorithm::BuildPickingRay(offRenderTask, screenCoords, origin, direction);
+  DALI_TEST_EQUALS(built, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(camPos, origin, TEST_LOCATION);
+  direction.Normalize();
+  DALI_TEST_EQUALS(direction, Vector3(-0.240308f, 0.135174f, -0.961239f), 0.01f, TEST_LOCATION);
+
+  // Bottom right of green, but ray direction is top right
+  screenCoords.x = stageSize.width * 0.5f + actorSize.width * 0.25f + actorSize.height * 0.5f - ELLIPSION;
+  screenCoords.y = stageSize.height * 0.5f + actorSize.height * 0.25f + actorSize.width * 0.5f - ELLIPSION;
+  built          = HitTestAlgorithm::BuildPickingRay(offRenderTask, screenCoords, origin, direction);
+  DALI_TEST_EQUALS(built, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(camPos, origin, TEST_LOCATION);
+  direction.Normalize();
+  DALI_TEST_EQUALS(direction, Vector3(0.240308f, -0.135174f, -0.961239f), 0.01f, TEST_LOCATION);
+
+  // Out of green. BuildPickingRay failed.
+  screenCoords = stageSize * 0.5f - actorSize * 0.5f;
+  built        = HitTestAlgorithm::BuildPickingRay(offRenderTask, screenCoords, origin, direction);
+  DALI_TEST_EQUALS(built, false, TEST_LOCATION);
+
+  END_TEST;
+}
