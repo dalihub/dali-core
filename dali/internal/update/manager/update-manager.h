@@ -407,6 +407,11 @@ public:
   void EventProcessingStarted();
 
   /**
+   * Called by the event-thread to signal that we need to queue messages.
+   */
+  void EventProcessingFinished();
+
+  /**
    * Flush the set of messages, which were previously stored with QueueMessage().
    * Calls to this thread-safe method should be minimized, to avoid thread blocking.
    *

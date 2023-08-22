@@ -148,6 +148,11 @@ void MessageQueue::EventProcessingStarted()
   mImpl->processingEvents = true; // called from event thread
 }
 
+void MessageQueue::EventProcessingFinished()
+{
+  mImpl->processingEvents = false; // called from event thread
+}
+
 // Called from event thread
 uint32_t* MessageQueue::ReserveMessageSlot(uint32_t requestedSize, bool updateScene)
 {
@@ -233,8 +238,6 @@ bool MessageQueue::FlushQueue()
       mImpl->sceneUpdateFlag = false;
     }
   }
-
-  mImpl->processingEvents = false;
 
   return messagesToProcess;
 }

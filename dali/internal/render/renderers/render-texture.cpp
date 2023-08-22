@@ -347,6 +347,12 @@ void Texture::GenerateMipmaps()
 {
   DALI_ASSERT_ALWAYS(mResourceId == 0u);
 
+  // Compressed pixel doesn't support mipmap generation.
+  if(Pixel::IsCompressed(mPixelFormat))
+  {
+    return;
+  }
+
   if(!mGraphicsTexture)
   {
     Create(static_cast<Graphics::TextureUsageFlags>(Graphics::TextureUsageFlagBits::SAMPLE));

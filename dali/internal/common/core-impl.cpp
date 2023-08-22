@@ -90,7 +90,8 @@ Core::Core(RenderController&                   renderController,
   mGraphicsController(graphicsController),
   mProcessingEvent(false),
   mProcessorUnregistered(false),
-  mPostProcessorUnregistered(false)
+  mPostProcessorUnregistered(false),
+  mRelayoutFlush(false)
 {
   // Create the thread local storage
   CreateThreadLocalStorage();
@@ -258,6 +259,21 @@ void Core::QueueEvent(const Integration::Event& event)
   }
 }
 
+void Core::ForceRelayout()
+{
+  if(mRelayoutFlush)
+  {
+    DALI_LOG_ERROR("ForceRelayout should not be called from within RelayoutAndFlush!\n");
+    return;
+  }
+
+  // Scene could be added or removed while processing the events
+  // Copy the Scene container locally to avoid possibly invalid iterator
+  SceneContainer scenes = mScenes;
+
+  RelayoutAndFlush(scenes);
+}
+
 void Core::ProcessEvents()
 {
   // Guard against calls to ProcessEvents() during ProcessEvents()
@@ -292,6 +308,47 @@ void Core::ProcessEvents()
     scene->EmitEventProcessingFinishedSignal();
   }
 
+  RelayoutAndFlush(scenes);
+
+  mUpdateManager->EventProcessingFinished();
+
+  // Check if the touch or gestures require updates.
+  const bool gestureNeedsUpdate = mGestureEventProcessor->NeedsUpdate();
+
+  if(gestureNeedsUpdate)
+  {
+    // tell the render controller to keep update thread running
+    mRenderController.RequestUpdate();
+  }
+
+  mRelayoutController->SetProcessingCoreEvents(false);
+
+  // ProcessEvents() may now be called again
+  mProcessingEvent = false;
+}
+
+void Core::RelayoutAndFlush(SceneContainer& scenes)
+{
+  if(mRelayoutFlush)
+  {
+    DALI_LOG_ERROR("RelayoutAndFlush should not be called from within RelayoutAndFlush!\n");
+    return;
+  }
+
+  const bool isProcessEvents = mProcessingEvent;
+
+  if(!isProcessEvents)
+  {
+    // Fake that we are in ProcessEvents()
+    mProcessingEvent = true;
+    mRelayoutController->SetProcessingCoreEvents(true);
+
+    // Signal that any messages received will be flushed soon
+    mUpdateManager->EventProcessingStarted();
+  }
+
+  mRelayoutFlush = true;
+
   // Run any registered processors
   RunProcessors();
 
@@ -302,7 +359,7 @@ void Core::ProcessEvents()
   RunPostProcessors();
 
   // Rebuild depth tree after event processing has finished
-  for(auto scene : scenes)
+  for(auto& scene : scenes)
   {
     scene->RebuildDepthTree();
   }
@@ -310,19 +367,22 @@ void Core::ProcessEvents()
   // Flush any queued messages for the update-thread
   const bool messagesToProcess = mUpdateManager->FlushQueue();
 
-  // Check if the touch or gestures require updates.
-  const bool gestureNeedsUpdate = mGestureEventProcessor->NeedsUpdate();
-
-  if(messagesToProcess || gestureNeedsUpdate)
+  if(messagesToProcess)
   {
     // tell the render controller to keep update thread running
     mRenderController.RequestUpdate();
   }
 
-  mRelayoutController->SetProcessingCoreEvents(false);
+  mRelayoutFlush = false;
 
-  // ProcessEvents() may now be called again
-  mProcessingEvent = false;
+  if(!isProcessEvents)
+  {
+    // Revert fake informations
+    mProcessingEvent = false;
+    mRelayoutController->SetProcessingCoreEvents(false);
+
+    mUpdateManager->EventProcessingFinished();
+  }
 }
 
 uint32_t Core::GetMaximumUpdateCount() const
