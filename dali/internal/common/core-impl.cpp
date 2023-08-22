@@ -359,7 +359,7 @@ void Core::RelayoutAndFlush(SceneContainer& scenes)
   RunPostProcessors();
 
   // Rebuild depth tree after event processing has finished
-  for(auto scene : scenes)
+  for(auto& scene : scenes)
   {
     scene->RebuildDepthTree();
   }
