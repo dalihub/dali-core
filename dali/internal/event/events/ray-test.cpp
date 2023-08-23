@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,37 @@
 // CLASS HEADER
 #include <dali/internal/event/events/ray-test.h>
 
+// EXTERNAL INCLUDES
+#include <algorithm> ///< for std::min, std::max
+
 // INTERNAL INCLUDES
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/nodes/node.h>
+#include <dali/public-api/math/compile-time-math.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector4.h>
 
 using Dali::Internal::SceneGraph::Node;
+
+namespace
+{
+constexpr float RAY_TEST_ABSOLUTE_EPSILON = Dali::Epsilon<10>::value;   ///< 0.0000011920928955078125
+constexpr float RAY_TEST_RELATIVE_EPSILON = Dali::Epsilon<1000>::value; ///< 0.00011920928955078125
+
+/**
+ * @brief Get the epsilon value that we allow to test.
+ * It will be used when some numeric error occured.
+ *
+ * @param targetScale Scale of target value
+ * @return The epsilon value for target scale touch case.
+ */
+constexpr float GetEpsilon(const float targetScale)
+{
+  return std::max(RAY_TEST_ABSOLUTE_EPSILON, RAY_TEST_RELATIVE_EPSILON * targetScale);
+}
+} // namespace
 
 namespace Dali
 {
@@ -119,7 +141,10 @@ bool RayTest::SphereTest(const Internal::Actor& actor, const Vector4& rayOrigin,
   const float width  = size.width * scale.width + touchAreaOffset.right - touchAreaOffset.left;
   const float height = size.height * scale.height + touchAreaOffset.bottom - touchAreaOffset.top;
 
-  float squareSphereRadius = 0.5f * (width * width + height * height);
+  // Correction numeric error.
+  const float epsilon = GetEpsilon(std::max(width, height));
+
+  float squareSphereRadius = 0.5f * (width * width + height * height) + epsilon;
 
   float a  = rayDir.Dot(rayDir);                                      // a
   float b2 = rayDir.Dot(rayOriginLocal);                              // b/2
@@ -159,8 +184,11 @@ bool RayTest::ActorTest(const Internal::Actor& actor, const Vector4& rayOrigin, 
       hitPointLocal.x                  = rayOriginLocal.x + rayDirLocal.x * distance + size.x * 0.5f;
       hitPointLocal.y                  = rayOriginLocal.y + rayDirLocal.y * distance + size.y * 0.5f;
 
+      // Correction numeric error.
+      const float epsilon = GetEpsilon(std::max(size.x, size.y));
+
       // Test with the actor's geometry.
-      hit = (hitPointLocal.x >= touchAreaOffset.left) && (hitPointLocal.x <= (size.x + touchAreaOffset.right) && (hitPointLocal.y >= touchAreaOffset.top) && (hitPointLocal.y <= (size.y + touchAreaOffset.bottom)));
+      hit = (hitPointLocal.x >= touchAreaOffset.left - epsilon) && (hitPointLocal.x <= (size.x + touchAreaOffset.right + epsilon) && (hitPointLocal.y >= touchAreaOffset.top - epsilon) && (hitPointLocal.y <= (size.y + touchAreaOffset.bottom + epsilon)));
     }
   }
 
