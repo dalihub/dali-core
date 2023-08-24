@@ -45,10 +45,9 @@ namespace // Unnamed namespace
 // Return false if the node or it's parents are exclusive to another render-task.
 bool CheckExclusivity(const Node& node, const RenderTask& task)
 {
-  const RenderTask* exclusiveTo = node.GetExclusiveRenderTask();
-  if(exclusiveTo)
+  if(node.IsExclusiveRenderTask(&task))
   {
-    return (exclusiveTo == &task);
+    return true;
   }
 
   const Node* parent = node.GetParent();
@@ -122,8 +121,7 @@ bool AddRenderablesForTask(BufferIndex updateBufferIndex,
   }
 
   // Check whether node is exclusive to a different render-task
-  const RenderTask* exclusiveTo = node.GetExclusiveRenderTask();
-  if(exclusiveTo && (exclusiveTo != &renderTask))
+  if(node.GetExclusiveRenderTaskCount() && !node.IsExclusiveRenderTask(&renderTask))
   {
     return keepRendering;
   }
