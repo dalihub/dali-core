@@ -244,13 +244,6 @@ public:
   bool TranslateCoordinates(Vector2& screenCoords) const;
 
   /**
-   * @brief Get Viewport when we need to be used with translated screen coordinated when render task is offscreen.
-   * It will be used when we hit-test.
-   * @param[out] viewPort instance to copy the values into
-   */
-  void GetHittableViewport(Viewport& viewPort) const;
-
-  /**
    * @copydoc Dali::RenderTask::WorldToViewport()
    */
   bool WorldToViewport(const Vector3& position, float& viewportX, float& viewportY) const;
@@ -360,8 +353,8 @@ protected:
   ~RenderTask() override;
 
 private: // not copyable
-  RenderTask()                  = delete;
-  RenderTask(const RenderTask&) = delete;
+  RenderTask()                             = delete;
+  RenderTask(const RenderTask&)            = delete;
   RenderTask& operator=(const RenderTask&) = delete;
 
 private:
@@ -371,12 +364,12 @@ private:
   WeakHandle<Dali::Actor> mInputMappingActor;  /// used to mapping screen to frame buffer coordinate, not kept alive by rendertask
   RenderTaskList&         mRenderTaskList;     ///< The render task list
 
-  Vector4 mClearColor; ///< Optional clear color
+  Vector4 mClearColor;                         ///< Optional clear color
 
-  Vector2 mViewportPosition; ///< The cached viewport position
-  Vector2 mViewportSize;     ///< The cached viewport size
+  Vector2 mViewportPosition;                   ///< The cached viewport position
+  Vector2 mViewportSize;                       ///< The cached viewport size
 
-  uint32_t mRefreshRate; ///< Determines how often the task is processed.
+  uint32_t mRefreshRate;                       ///< Determines how often the task is processed.
 
   uint32_t mRefreshOnceCounter;
 

@@ -446,8 +446,7 @@ bool HitTestRenderTask(const RenderTaskList::ExclusivesContainer& exclusives,
   if(renderTask.IsHittable(screenCoordinates))
   {
     Viewport viewport;
-    renderTask.GetHittableViewport(viewport);
-
+    renderTask.GetViewport(viewport);
     if(screenCoordinates.x < static_cast<float>(viewport.x) ||
        screenCoordinates.x > static_cast<float>(viewport.x + viewport.width) ||
        screenCoordinates.y < static_cast<float>(viewport.y) ||

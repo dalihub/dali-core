@@ -437,7 +437,7 @@ bool RenderTask::TranslateCoordinates(Vector2& screenCoords) const
 
         float localX, localY;
         inside            = inputMappingActor->ScreenToLocal(defaultCamera->GetViewMatrix(), defaultCamera->GetProjectionMatrix(), viewport, localX, localY, screenCoords.x, screenCoords.y);
-        Vector3 actorSize = inputMappingActor->GetCurrentSize() * inputMappingActor->GetCurrentWorldScale();
+        Vector3 actorSize = inputMappingActor->GetCurrentSize();
         if(inside && localX >= 0.f && localX <= actorSize.x && localY >= 0.f && localY <= actorSize.y)
         {
           screenCoords.x = localX;
@@ -459,34 +459,6 @@ bool RenderTask::TranslateCoordinates(Vector2& screenCoords) const
     inside = mScreenToFrameBufferFunction(screenCoords);
   }
   return inside;
-}
-
-void RenderTask::GetHittableViewport(Viewport& viewPort) const
-{
-  if(GetRenderTaskSceneObject())
-  {
-    if(GetInputEnabled())
-    {
-      if(mFrameBuffer)
-      {
-        auto mappingActor = GetScreenToFrameBufferMappingActor();
-        if(mappingActor)
-        {
-          Actor& inputMappingActor = GetImplementation(mappingActor);
-
-          Vector3 actorSize = inputMappingActor.GetCurrentSize() * inputMappingActor.GetCurrentWorldScale();
-
-          viewPort.x = viewPort.y = 0;
-          viewPort.width          = static_cast<int32_t>(actorSize.x + 0.5f); // rounded
-          viewPort.height         = static_cast<int32_t>(actorSize.y + 0.5f); // rounded
-        }
-      }
-      else
-      {
-        GetViewport(viewPort);
-      }
-    }
-  }
 }
 
 bool RenderTask::WorldToViewport(const Vector3& position, float& viewportX, float& viewportY) const
