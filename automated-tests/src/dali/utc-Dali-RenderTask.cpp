@@ -894,6 +894,68 @@ int UtcDaliRenderTaskSetExclusive02(void)
   END_TEST;
 }
 
+int UtcDaliRenderTaskSetExclusive03(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::SetExclusive() Check that changing from exclusive to not-exclusive works");
+
+  std::vector<GLuint> ids;
+  ids.push_back(8); // 8 = actor1
+  application.GetGlAbstraction().SetNextTextureIds(ids);
+
+  Texture img1   = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1);
+  Actor   actor1 = CreateRenderableActor(img1);
+  actor1.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+  application.GetScene().Add(actor1);
+
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
+  RenderTask     task     = taskList.CreateTask();
+
+  task.SetSourceActor(actor1);
+  task.SetExclusive(true); // Actor should only render once
+
+  TestGlAbstraction& gl        = application.GetGlAbstraction();
+  TraceCallStack&    drawTrace = gl.GetDrawTrace();
+  drawTrace.Enable(true);
+
+  // Update & Render actor1
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION);
+
+  // Set task to non-exclusive - actor1 should render twice:
+  drawTrace.Reset();
+
+  RenderTask task2 = taskList.CreateTask();
+  task2.SetSourceActor(actor1);
+  task2.SetExclusive(true); // Actor should only render once
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 2, TEST_LOCATION);
+
+  // Set task to non-exclusive - actor1 should render twice:
+  drawTrace.Reset();
+  task.SetExclusive(false);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION);
+
+  // Set task to non-exclusive - actor1 should render twice:
+  drawTrace.Reset();
+  task2.SetExclusive(false);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 3, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliRenderTaskSetExclusiveN(void)
 {
   TestApplication application;
