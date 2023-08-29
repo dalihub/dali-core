@@ -37,7 +37,7 @@ class Layer;
 
 using ClippingBox = Dali::ClippingBox;
 
-class Layer : public Actor
+class Layer : public Actor, public ConnectionTracker
 {
 public:
   /**
@@ -247,6 +247,15 @@ private: // From Actor
   void OnSceneDisconnectionInternal() override;
 
 private:
+  /**
+   * @brief Callback when Layer is touched
+   *
+   * @param[in] actor Layer touched
+   * @param[in] touch Touch information
+   * @return True if the touch is consummed.
+   */
+  bool OnTouched(Dali::Actor actor, const TouchEvent& touch);
+
   LayerList* mLayerList; ///< Only valid when layer is on-scene
 
   // These properties not animatable; the actor side has the most up-to-date values

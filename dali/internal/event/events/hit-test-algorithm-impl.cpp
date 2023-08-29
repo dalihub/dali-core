@@ -571,7 +571,13 @@ bool HitTestRenderTask(const RenderTaskList::ExclusivesContainer& exclusives,
         if(layerConsumesHit)
         {
           // Consumes if the hitted layer is above the SourceActor's layer.
-          return sourceLayerIndex <= consumedLayerIndex;
+          bool ret = sourceLayerIndex <= consumedLayerIndex;
+          if(ret)
+          {
+            results.renderTask = RenderTaskPtr(&renderTask);
+            results.actor      = Dali::Layer(layers.GetLayer(consumedLayerIndex));
+          }
+          return ret;
         }
       }
     }
