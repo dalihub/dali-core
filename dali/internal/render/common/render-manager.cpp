@@ -288,6 +288,9 @@ void RenderManager::RemoveTexture(const Render::TextureKey& textureKey)
 
   if(iter != mImpl->textureContainer.End())
   {
+    // Destroy texture.
+    textureKey->Destroy();
+
     // Transfer ownership to the discard queue, this keeps the object alive, until the render-thread has finished with it
     mImpl->textureDiscardQueue.PushBack(mImpl->textureContainer.Release(iter));
   }
@@ -1132,10 +1135,6 @@ void RenderManager::PostRender()
   mImpl->updatedTextures.Clear();
 
   // Remove discarded textures after OnRenderFinished called
-  for(auto& iter : mImpl->textureDiscardQueue)
-  {
-    iter->Destroy();
-  }
   mImpl->textureDiscardQueue.Clear();
 
   mImpl->UpdateTrackers();
