@@ -68,11 +68,6 @@ ConditionFunction VariableStep::GetFunction(Property::Type valueType)
       function = EvalVector4;
       break;
     }
-    case Property::ROTATION:
-    {
-      function = EvalQuaternion;
-      break;
-    }
     default:
     {
       function = EvalDefault;
@@ -176,15 +171,6 @@ bool VariableStep::EvalVector4(const Dali::PropertyInput& value, PropertyNotific
 {
   const float propertyValue = value.GetVector4().LengthSquared();
   return Evaluate(propertyValue, arg);
-}
-
-bool VariableStep::EvalQuaternion(const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg)
-{
-  Quaternion propertyValue = value.GetQuaternion();
-  // TODO : Make some meaningfule calculation here
-  Vector4 v = propertyValue.EulerAngles();
-  const float checkValue = v.LengthSquared();
-  return Evaluate(checkValue, arg);
 }
 
 bool VariableStep::EvalDefault(const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg)

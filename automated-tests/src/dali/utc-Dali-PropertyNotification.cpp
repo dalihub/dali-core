@@ -1090,6 +1090,59 @@ int UtcDaliPropertyNotificationStepVector3(void)
   END_TEST;
 }
 
+int UtcDaliPropertyNotificationStepQuaternion(void)
+{
+  TestApplication application;
+  tet_infoline(" UtcDaliPropertyNotificationStepQuaternion");
+
+  tet_printf("Note : Current implement is kind of POC. Should be complete in future.");
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  // TODO : Need to be meanful value in future.
+  const float tinyStep = 0.01f;
+
+  PropertyNotification notification = actor.AddPropertyNotification(Actor::Property::ORIENTATION, StepCondition(tinyStep));
+  notification.NotifySignal().Connect(&TestCallback);
+
+  // Rotate big angles for current case.
+  actor.SetProperty(Actor::Property::ORIENTATION, Quaternion(Radian(Degree(0.0f)), Vector3::YAXIS));
+  Wait(application, DEFAULT_WAIT_PERIOD);
+
+  for(int i = 1; i <= 10; ++i)
+  {
+    // Move x to negative position
+    gCallBackCalled = false;
+    actor.SetProperty(Actor::Property::ORIENTATION, Quaternion(Radian(Degree(i * 36.0f)), Vector3::YAXIS));
+    Wait(application, DEFAULT_WAIT_PERIOD);
+    DALI_TEST_CHECK(gCallBackCalled);
+  }
+
+  tet_printf("Test for length of EulerAngle is same, but each componets are difference.");
+  actor.SetProperty(Actor::Property::ORIENTATION, Quaternion(Radian(Degree(90.0f)), Vector3::YAXIS));
+  Wait(application, DEFAULT_WAIT_PERIOD);
+
+  gCallBackCalled = false;
+  actor.SetProperty(Actor::Property::ORIENTATION, Quaternion(Radian(Degree(90.0f)), Vector3::XAXIS));
+  Wait(application, DEFAULT_WAIT_PERIOD);
+  DALI_TEST_CHECK(gCallBackCalled);
+
+  tet_printf("Test notify should not be called");
+  gCallBackCalled = false;
+  Animation animation = Animation::New(RENDER_FRAME_INTERVAL);
+  animation.AnimateTo(Property(actor, Actor::Property::ORIENTATION), Quaternion(Radian(Degree(90.0f)), Vector3::XAXIS));
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(RENDER_FRAME_INTERVAL);
+  application.SendNotification();
+  application.Render(RENDER_FRAME_INTERVAL);
+
+  DALI_TEST_CHECK(!gCallBackCalled);
+  END_TEST;
+}
+
 int UtcDaliPropertyNotificationVariableStep(void)
 {
   TestApplication application;
