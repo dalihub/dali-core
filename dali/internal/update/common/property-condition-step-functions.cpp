@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 
 #include <dali/internal/update/common/property-condition-step-functions.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/math/quaternion.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector4.h>
@@ -36,6 +37,12 @@ const int32_t ARGINDEX_CURRENT_STEP = 2;
 const int32_t ARGINDEX_FIRST_VALUE  = 3;
 const int32_t ARGINDEX_SECOND_VALUE = 4;
 const int32_t ARGINDEX_THIRD_VALUE  = 5;
+
+inline float AngleDifference(float a1, float a2, const float angleRangeHalf)
+{
+  float diff = fabs(a1 - a2);
+  return diff < angleRangeHalf ? diff : angleRangeHalf * 2.0f - diff;
+}
 
 } // namespace
 
@@ -86,6 +93,10 @@ ConditionFunction Step::GetCompareFunction(Property::Type valueType)
   if(valueType == Property::VECTOR3)
   {
     function = EvalAndCompareVector3;
+  }
+  else if(valueType == Property::ROTATION)
+  {
+    function = EvalAndCompareQuaternion;
   }
   else
   {
@@ -159,6 +170,32 @@ bool Step::EvalVector4(const Dali::PropertyInput& value, PropertyNotification::R
 {
   const float propertyValue = value.GetVector4().Length();
   return Evaluate(propertyValue, arg);
+}
+
+bool Step::EvalAndCompareQuaternion(const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg)
+{
+  // TODO : Make some meaningfule calculation here
+
+  Quaternion propertyValue = value.GetQuaternion();
+
+  Vector4     v          = propertyValue.EulerAngles();
+  const float checkValue = v.LengthSquared();
+  bool        result     = Evaluate(checkValue, arg);
+
+  if(result == false)
+  {
+    const float step = 1.0f / arg[ARGINDEX_STEP_SIZE];
+    if((AngleDifference(arg[ARGINDEX_FIRST_VALUE], v.x, Dali::Math::PI) > step) ||
+       (AngleDifference(arg[ARGINDEX_SECOND_VALUE], v.y, Dali::Math::PI_2) > step) ||
+       (AngleDifference(arg[ARGINDEX_THIRD_VALUE], v.z, Dali::Math::PI) > step))
+    {
+      result = true;
+    }
+  }
+  arg[ARGINDEX_FIRST_VALUE]  = v.x;
+  arg[ARGINDEX_SECOND_VALUE] = v.y;
+  arg[ARGINDEX_THIRD_VALUE]  = v.z;
+  return result;
 }
 
 bool Step::EvalDefault(const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg)

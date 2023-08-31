@@ -178,6 +178,7 @@ DALI_CORE_API PropertyCondition OutsideCondition(float arg0, float arg1);
  * vector2 (the 2D length)
  * vector3 (the 3D length)
  * vector4 (the 4D length)
+ * quaternion (the 3D length of eular angle)
  * @SINCE_1_0.0
  * @param[in] stepAmount The step size required to trigger condition
  * @param[in] initialValue The initial value to step from

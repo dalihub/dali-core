@@ -99,7 +99,8 @@ PropertyNotification::PropertyNotification(UpdateManager&                 update
     }
 
     // To cover swapping components, previous and current components should be compared.
-    if(mObject->GetPropertyType(mObjectPropertyIndex) == Property::VECTOR3)
+    if(mObject->GetPropertyType(mObjectPropertyIndex) == Property::VECTOR3 ||
+       mObject->GetPropertyType(mObjectPropertyIndex) == Property::ROTATION)
     {
       mCompare = true;
       for(int i = 0; i < 3; ++i)
