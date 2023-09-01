@@ -510,7 +510,11 @@ int32_t RunAllInParallel(const char* processName, ::testcase tc_array[], std::st
         std::chrono::steady_clock::duration timeSpan = endTime - tc.second.startTime;
         double                              seconds  = double(timeSpan.count()) * std::chrono::steady_clock::period::num / std::chrono::steady_clock::period::den;
 
-        if(seconds > MAXIMUM_CHILD_LIFETIME)
+        if(4.9999 < seconds && seconds < 5 && !tc.second.finished)
+        {
+          printf("Child process %s is delayed: WCHAN:%s\n", tc.second.name, GetWChan(tc.first).c_str());
+        }
+        else if(seconds > MAXIMUM_CHILD_LIFETIME)
         {
           // Kill the child process. A subsequent call to waitpid will process signal result below.
           if(!tc.second.finished)
