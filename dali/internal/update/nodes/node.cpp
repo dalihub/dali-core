@@ -96,7 +96,6 @@ Node::Node()
   mClippingSortModifier(0u),
   mId(++mNodeCounter),
   mParent(nullptr),
-  mExclusiveRenderTask(nullptr),
   mChildren(),
   mClippingDepth(0u),
   mScissorDepth(0u),

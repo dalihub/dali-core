@@ -2234,6 +2234,55 @@ int UtcDaliTouchEventIntercept02(void)
   END_TEST;
 }
 
+int UtcDaliTouchEventIntercept03(void)
+{
+  TestApplication application;
+
+  // Add a layer to overlap the actor
+  Layer layer = Layer::New();
+  layer.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  layer.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(layer);
+  layer.RaiseToTop();
+
+  // Set layer to consume all touch
+  layer.SetProperty(Layer::Property::CONSUMES_TOUCH, true);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  layer.Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  Actor           rootActor(application.GetScene().GetRootLayer());
+
+  // Connect to root actor's intercept touched signal
+  SignalData        sceneData;
+  TouchEventFunctor sceneFunctor(sceneData);
+  Dali::DevelActor::InterceptTouchedSignal(rootActor).Connect(&application, sceneFunctor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Emit a down signal
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+
+  // Even if the layer is touch consumed, the root actor must be able to intercept touch.
+  DALI_TEST_EQUALS(true, sceneData.functorCalled, TEST_LOCATION);
+  sceneData.Reset();
+
+
+  END_TEST;
+}
+
 int UtcDaliTouchAreaOffset(void)
 {
   TestApplication application;

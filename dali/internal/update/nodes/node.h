@@ -75,6 +75,8 @@ static NodePropertyFlags RenderableUpdateFlags = NodePropertyFlags::TRANSFORM | 
 class Node : public PropertyOwner, public NodeDataProvider
 {
 public:
+  using RenderTaskContainer = std::vector<RenderTask*>;
+
   // Defaults
   static const ColorMode DEFAULT_COLOR_MODE;
 
@@ -760,21 +762,53 @@ public:
   }
 
   /**
-   * Mark the node as exclusive to a single RenderTask.
-   * @param[in] renderTask The render-task, or NULL if the Node is not exclusive to a single RenderTask.
+   * Add RenderTask that will exclusively render this node.
+   * @param[in] renderTask The render-task to render this node exclusively.
    */
-  void SetExclusiveRenderTask(RenderTask* renderTask)
+  void AddExclusiveRenderTask(RenderTask* renderTask)
   {
-    mExclusiveRenderTask = renderTask;
+    auto found = std::find(mExclusiveRenderTasks.begin(), mExclusiveRenderTasks.end(), renderTask);
+    if(found == mExclusiveRenderTasks.end())
+    {
+      mExclusiveRenderTasks.push_back(renderTask);
+    }
   }
 
   /**
-   * Query whether the node is exclusive to a single RenderTask.
-   * @return The render-task, or NULL if the Node is not exclusive to a single RenderTask.
+   * Remove a RenderTask from exclusive render task queue.
+   * The RenderTask cannot render this node if this node is exclusive to other RenderTasks.
+   * @param[in] renderTask The render-task to be removed from exclusive render task queue.
    */
-  RenderTask* GetExclusiveRenderTask() const
+  void RemoveExclusiveRenderTask(RenderTask* renderTask)
   {
-    return mExclusiveRenderTask;
+    auto found = std::find(mExclusiveRenderTasks.begin(), mExclusiveRenderTasks.end(), renderTask);
+    if(found != mExclusiveRenderTasks.end())
+    {
+      mExclusiveRenderTasks.erase(found);
+    }
+  }
+
+  /**
+   * Retrieves the number of exclusive RenderTask for this node.
+   * @return The number of exclusive RenderTask.
+   */
+  uint32_t GetExclusiveRenderTaskCount()
+  {
+    return mExclusiveRenderTasks.size();
+  }
+
+  /**
+   * Query whether the node is exclusive to the renderTask.
+   * @return true if this node is exclusive to the renderTask.
+   */
+  bool IsExclusiveRenderTask(const RenderTask* renderTask) const
+  {
+    auto found = std::find(mExclusiveRenderTasks.begin(), mExclusiveRenderTasks.end(), renderTask);
+    if(found != mExclusiveRenderTasks.end())
+    {
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -1025,8 +1059,8 @@ protected:
 
   PartialRenderingData mPartialRenderingData; ///< Cache to determine if this should be rendered again
 
-  Node*       mParent;              ///< Pointer to parent node (a child is owned by its parent)
-  RenderTask* mExclusiveRenderTask; ///< Nodes can be marked as exclusive to a single RenderTask
+  Node*               mParent;               ///< Pointer to parent node (a child is owned by its parent)
+  RenderTaskContainer mExclusiveRenderTasks; ///< Nodes can be marked as exclusive to multiple RenderTasks
 
   RendererContainer mRenderers; ///< Container of renderers; not owned
 

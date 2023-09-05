@@ -598,6 +598,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
 
     // pass render callback input
     mRenderCallbackInput->size       = size;
+    mRenderCallbackInput->view       = viewMatrix;
     mRenderCallbackInput->projection = projectionMatrix;
 
     MatrixUtils::MultiplyProjectionMatrix(mRenderCallbackInput->mvp, modelViewMatrix, projectionMatrix);

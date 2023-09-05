@@ -321,7 +321,24 @@ void Layer::SetSortFunction(Dali::Layer::SortFunctionType function)
 
 void Layer::SetTouchConsumed(bool consume)
 {
+  if(mTouchConsumed != consume)
+  {
+    if(consume)
+    {
+      this->TouchedSignal().Connect(this, &Layer::OnTouched);
+    }
+    else
+    {
+      this->TouchedSignal().Disconnect(this, &Layer::OnTouched);
+    }
+  }
   mTouchConsumed = consume;
+}
+
+bool Layer::OnTouched(Dali::Actor actor, const TouchEvent& touch)
+{
+  // This event is only called when mTouchConsumed is true. So touch always consumed.
+  return true;
 }
 
 bool Layer::IsTouchConsumed() const

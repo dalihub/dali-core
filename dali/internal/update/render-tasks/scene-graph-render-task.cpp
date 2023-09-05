@@ -48,7 +48,7 @@ RenderTask::~RenderTask()
     mSourceNode->RemoveObserver(*this);
     if(mExclusive)
     {
-      mSourceNode->SetExclusiveRenderTask(nullptr);
+      mSourceNode->RemoveExclusiveRenderTask(this);
     }
   }
   if(mCameraNode)
@@ -73,10 +73,7 @@ void RenderTask::SetSourceNode(Node* node)
   if(mSourceNode)
   {
     mSourceNode->RemoveObserver(*this);
-    if(this == mSourceNode->GetExclusiveRenderTask())
-    {
-      mSourceNode->SetExclusiveRenderTask(nullptr);
-    }
+    mSourceNode->RemoveExclusiveRenderTask(this);
   }
 
   mSourceNode = node;
@@ -86,7 +83,7 @@ void RenderTask::SetSourceNode(Node* node)
     mSourceNode->AddObserver(*this);
     if(mExclusive)
     {
-      mSourceNode->SetExclusiveRenderTask(this);
+      mSourceNode->AddExclusiveRenderTask(this);
     }
   }
   SetActiveStatus();
@@ -115,11 +112,11 @@ void RenderTask::SetExclusive(bool exclusive)
   {
     if(mExclusive)
     {
-      mSourceNode->SetExclusiveRenderTask(this);
+      mSourceNode->AddExclusiveRenderTask(this);
     }
-    else if(this == mSourceNode->GetExclusiveRenderTask())
+    else
     {
-      mSourceNode->SetExclusiveRenderTask(nullptr);
+      mSourceNode->RemoveExclusiveRenderTask(this);
     }
   }
 }
