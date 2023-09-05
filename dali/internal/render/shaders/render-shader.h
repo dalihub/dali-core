@@ -70,8 +70,6 @@ public:
   [[nodiscard]] ShaderDataPtr GetShaderData(uint32_t renderPassTag) const;
 
 private: // Data
-  Dali::Shader::Hint::Value mHints;
-
   std::vector<ShaderDataPtr> mShaderDataList;
 };
 
