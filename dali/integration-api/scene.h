@@ -416,6 +416,20 @@ public:
   bool IsPartialUpdateEnabled() const;
 
   /**
+   * @brief Sets whether the processes using geometry event propagation touch and hover events.
+   *
+   * @param[in] enabled True if the processes using geometry event propagation touch and hover events.
+   */
+  void SetGeometryHittestEnabled(bool enabled);
+
+  /**
+   * @brief Queries whether the scene using geometry event propagation touch and hover events.
+   *
+   * @return True if the scene using geometry event propagation touch and hover events.
+   */
+  bool IsGeometryHittestEnabled();
+
+  /**
    * @brief This signal is emitted just after the event processing is finished.
    *
    * @return The signal to connect to

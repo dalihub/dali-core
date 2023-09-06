@@ -1116,6 +1116,7 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mDrawMode(DrawMode::NORMAL),
   mColorMode(Node::DEFAULT_COLOR_MODE),
   mClippingMode(ClippingMode::DISABLED),
+  mHoverState(PointState::FINISHED),
   mBlendEquation(DevelBlendEquation::ADD)
 {
 }

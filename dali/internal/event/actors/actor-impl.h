@@ -1350,6 +1350,23 @@ public:
     return mDispatchHoverMotion;
   }
 
+  /**
+   * @brief Sets the hover state of actor
+   * @param state The PointState
+   */
+  void SetHoverState(PointState::Type state)
+  {
+    mHoverState = state;
+  }
+
+  /**
+   * @brief Gets the hover state of actor
+   * @return PointState::Type
+   */
+  PointState::Type GetHoverState() const
+  {
+    return mHoverState;
+  }
   // Gestures
 
   /**
@@ -1978,6 +1995,7 @@ protected:
   DrawMode::Type           mDrawMode : 3;                  ///< Cached: How the actor and its children should be drawn
   ColorMode                mColorMode : 3;                 ///< Cached: Determines whether mWorldColor is inherited
   ClippingMode::Type       mClippingMode : 3;              ///< Cached: Determines which clipping mode (if any) to use.
+  PointState::Type         mHoverState : 3;                ///< Stores the HoverEvent state of actor.
   DevelBlendEquation::Type mBlendEquation : 16;            ///< Cached: Determines which blend equation will be used to render renderers.
 
 private:

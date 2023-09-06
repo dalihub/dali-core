@@ -109,6 +109,49 @@ Dali::Actor EmitHoverSignals(Dali::Actor actor, const Dali::HoverEvent& event)
   return consumedActor;
 }
 
+/**
+ *  Recursively deliver events to the actor and its below actor, until the event is consumed or the stage is reached.
+ */
+Dali::Actor EmitGeoHoverSignals(std::list<Dali::Internal::Actor*>& actorLists, const Dali::HoverEvent& hoverEvent)
+{
+  Dali::Actor consumedActor;
+
+  std::list<Dali::Internal::Actor*>::reverse_iterator rIter = actorLists.rbegin();
+  for (; rIter != actorLists.rend(); rIter++)
+  {
+    Actor* actorImpl(*rIter);
+    // Only emit the signal if the actor's hover signal has connections (or derived actor implementation requires hover).
+    if(ShouldEmitHoverEvent(*actorImpl, hoverEvent))
+    {
+      DALI_TRACE_SCOPE(gTraceFilter, "DALI_EMIT_HOVER_EVENT_SIGNAL");
+      PointState::Type currentState = actorImpl->GetHoverState();
+      actorImpl->SetHoverState(hoverEvent.GetState(0));
+      // If hover event is newly entering the actor, update it to the started state.
+      if(hoverEvent.GetState(0) == PointState::MOTION &&
+        (currentState == PointState::FINISHED || currentState == PointState::INTERRUPTED || currentState == PointState::LEAVE))
+      {
+        HoverEventPtr newHoverEvent = HoverEvent::Clone(GetImplementation(hoverEvent));
+        newHoverEvent->GetPoint(0).SetState(PointState::STARTED);
+        actorImpl->SetHoverState(PointState::STARTED); //update state
+        if(actorImpl->EmitHoverEventSignal(Dali::HoverEvent(newHoverEvent.Get())))
+        {
+          // One of this actor's listeners has consumed the event so set this actor as the consumed actor.
+          consumedActor = Dali::Actor(actorImpl);
+          break;
+        }
+      }
+      else if(actorImpl->EmitHoverEventSignal(hoverEvent))
+      {
+        // One of this actor's listeners has consumed the event so set this actor as the consumed actor.
+        consumedActor = Dali::Actor(actorImpl);
+        break;
+      }
+    }
+  }
+  return consumedActor;
+}
+
+
 Dali::Actor AllocAndEmitHoverSignals(unsigned long time, Dali::Actor actor, const Integration::Point& point)
 {
   HoverEventPtr    hoverEvent(new HoverEvent(time));
@@ -119,14 +162,26 @@ Dali::Actor AllocAndEmitHoverSignals(unsigned long time, Dali::Actor actor, cons
   return EmitHoverSignals(actor, hoverEventHandle);
 }
 
+Dali::Actor GeoAllocAndEmitHoverSignals(std::list<Dali::Internal::Actor*>& actorLists, unsigned long time, const Integration::Point& point)
+{
+  HoverEventPtr    hoverEvent(new HoverEvent(time));
+  Dali::HoverEvent hoverEventHandle(hoverEvent.Get());
+
+  hoverEvent->AddPoint(point);
+
+  return EmitGeoHoverSignals(actorLists, hoverEventHandle);
+}
+
+
 /**
  * Changes the state of the primary point to leave and emits the hover signals
  */
-Dali::Actor EmitHoverSignals(Actor* actor, RenderTask& renderTask, const HoverEventPtr& originalEvent, PointState::Type state)
+Dali::Actor EmitHoverSignals(Actor* actor, RenderTask& renderTask, const HoverEventPtr& originalEvent, PointState::Type state, bool isGeometry)
 {
   HoverEventPtr hoverEvent = HoverEvent::Clone(*originalEvent.Get());
 
   DALI_ASSERT_DEBUG(NULL != actor && "NULL actor pointer");
+  Dali::Actor consumingActor;
   if(actor)
   {
     Integration::Point& primaryPoint = hoverEvent->GetPoint(0);
@@ -140,7 +195,17 @@ Dali::Actor EmitHoverSignals(Actor* actor, RenderTask& renderTask, const HoverEv
     primaryPoint.SetState(state);
   }
 
-  return EmitHoverSignals(Dali::Actor(actor), Dali::HoverEvent(hoverEvent.Get()));
+  if(isGeometry)
+  {
+    std::list<Dali::Internal::Actor*> actorLists;
+    actorLists.push_back(actor);
+    consumingActor = EmitGeoHoverSignals(actorLists, Dali::HoverEvent(hoverEvent.Get()));
+  }
+  else
+  {
+    consumingActor = EmitHoverSignals(Dali::Actor(actor), Dali::HoverEvent(hoverEvent.Get()));
+  }
+  return consumingActor;
 }
 
 /**
@@ -165,7 +230,7 @@ struct ActorHoverableCheck : public HitTestAlgorithm::HitTestInterface
     return layer->IsHoverConsumed();
   }
 
-  bool ActorRequiresHitResultCheck(Actor* actor, Integration::Point point, Vector2 hitPointLocal, uint32_t timeStamp) override
+  bool ActorRequiresHitResultCheck(Actor* actor, Integration::Point point, Vector2 hitPointLocal, uint32_t timeStamp, bool isGeometry) override
   {
     // Hover event is always hit.
     return true;
@@ -204,7 +269,16 @@ void HoverEventProcessor::SendInterruptedHoverEvent(Dali::Internal::Actor* actor
     Integration::Point point;
     point.SetState(PointState::INTERRUPTED);
     point.SetHitActor(Dali::Actor(actor));
-    AllocAndEmitHoverSignals(GetMilliSeconds(), point.GetHitActor(), point);
+    if(mScene.IsGeometryHittestEnabled())
+    {
+      std::list<Dali::Internal::Actor*> actorLists;
+      actorLists.push_back(actor);
+      GeoAllocAndEmitHoverSignals(actorLists, 0, point);
+    }
+    else
+    {
+      AllocAndEmitHoverSignals(GetMilliSeconds(), point.GetHitActor(), point);
+    }
     Clear();
   }
 }
@@ -219,6 +293,8 @@ void HoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent& event
   PRINT_HIERARCHY(gLogFilter);
 
   DALI_TRACE_SCOPE(gTraceFilter, "DALI_PROCESS_HOVER_EVENT");
+
+  bool isGeometry = mScene.IsGeometryHittestEnabled();
 
   // Copy so we can add the results of a hit-test.
   HoverEventPtr hoverEvent(new HoverEvent(event.time));
@@ -236,30 +312,55 @@ void HoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent& event
     {
       Dali::Actor lastPrimaryHitActorHandle(lastPrimaryHitActor);
       currentPoint.SetHitActor(lastPrimaryHitActorHandle);
-      consumingActor = AllocAndEmitHoverSignals(event.time, lastPrimaryHitActorHandle, currentPoint);
+      if(isGeometry)
+      {
+        consumingActor = GeoAllocAndEmitHoverSignals(mCandidateActorLists, event.time, currentPoint);
+      }
+      else
+      {
+        consumingActor = AllocAndEmitHoverSignals(event.time, lastPrimaryHitActorHandle, currentPoint);
+      }
     }
 
     // If the last consumed actor was different to the primary hit actor then inform it as well (if it has not already been informed).
     Actor* lastConsumedActor(mLastConsumedActor.GetActor());
     if(lastConsumedActor &&
-       lastConsumedActor != lastPrimaryHitActor &&
-       lastConsumedActor != consumingActor)
+      lastConsumedActor != lastPrimaryHitActor &&
+      lastConsumedActor != consumingActor)
     {
       Dali::Actor lastConsumedActorHandle(lastConsumedActor);
       currentPoint.SetHitActor(lastConsumedActorHandle);
-      AllocAndEmitHoverSignals(event.time, lastConsumedActorHandle, currentPoint);
+      if(isGeometry)
+      {
+        std::list<Dali::Internal::Actor*> actorLists;
+        actorLists.push_back(lastConsumedActor);
+        GeoAllocAndEmitHoverSignals(actorLists, event.time, currentPoint);
+      }
+      else
+      {
+        AllocAndEmitHoverSignals(event.time, lastConsumedActorHandle, currentPoint);
+      }
     }
 
     // Tell the hover-start consuming actor as well, if required
     Actor* hoverStartConsumedActor(mHoverStartConsumedActor.GetActor());
     if(hoverStartConsumedActor &&
-       hoverStartConsumedActor != lastPrimaryHitActor &&
-       hoverStartConsumedActor != lastConsumedActor &&
-       hoverStartConsumedActor != consumingActor)
+      hoverStartConsumedActor != lastPrimaryHitActor &&
+      hoverStartConsumedActor != lastConsumedActor &&
+      hoverStartConsumedActor != consumingActor)
     {
       Dali::Actor hoverStartConsumedActorHandle(hoverStartConsumedActor);
       currentPoint.SetHitActor(hoverStartConsumedActorHandle);
-      AllocAndEmitHoverSignals(event.time, hoverStartConsumedActorHandle, currentPoint);
+      if(isGeometry)
+      {
+        std::list<Dali::Internal::Actor*> actorLists;
+        actorLists.push_back(hoverStartConsumedActor);
+        GeoAllocAndEmitHoverSignals(actorLists, event.time, currentPoint);
+      }
+      else
+      {
+        AllocAndEmitHoverSignals(event.time, hoverStartConsumedActorHandle, currentPoint);
+      }
     }
 
     Clear();
@@ -281,7 +382,7 @@ void HoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent& event
   {
     HitTestAlgorithm::Results hitTestResults;
     ActorHoverableCheck       actorHoverableCheck;
-    HitTestAlgorithm::HitTest(mScene.GetSize(), mScene.GetRenderTaskList(), mScene.GetLayerList(), currentPoint.GetScreenPosition(), hitTestResults, actorHoverableCheck);
+    HitTestAlgorithm::HitTest(mScene.GetSize(), mScene.GetRenderTaskList(), mScene.GetLayerList(), currentPoint.GetScreenPosition(), hitTestResults, actorHoverableCheck, isGeometry);
 
     Integration::Point newPoint(currentPoint);
     newPoint.SetHitActor(hitTestResults.actor);
@@ -296,6 +397,7 @@ void HoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent& event
     {
       firstPointParsed  = true;
       currentRenderTask = hitTestResults.renderTask;
+      mCandidateActorLists = hitTestResults.actorLists;
     }
   }
 
@@ -310,18 +412,26 @@ void HoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent& event
   if(currentRenderTask)
   {
     Dali::Actor hitActor = hoverEvent->GetHitActor(0);
-    // If the actor is hit first, the hover is started.
-    if(hitActor &&
-       mLastPrimaryHitActor.GetActor() != hitActor &&
-       state == PointState::MOTION)
+
+    if(isGeometry)
     {
-      Actor* hitActorImpl = &GetImplementation(hitActor);
-      if(hitActorImpl->GetLeaveRequired())
-      {
-        hoverEvent->GetPoint(0).SetState(PointState::STARTED);
-      }
+      consumedActor = EmitGeoHoverSignals(mCandidateActorLists, hoverEventHandle);
     }
-    consumedActor = EmitHoverSignals(hitActor, hoverEventHandle);
+    else
+    {
+      // If the actor is hit first, the hover is started.
+      if(hitActor &&
+        mLastPrimaryHitActor.GetActor() != hitActor &&
+        state == PointState::MOTION)
+      {
+        Actor* hitActorImpl = &GetImplementation(hitActor);
+        if(hitActorImpl->GetLeaveRequired())
+        {
+          hoverEvent->GetPoint(0).SetState(PointState::STARTED);
+        }
+      }
+      consumedActor = EmitHoverSignals(hitActor, hoverEventHandle);
+    }
 
     if(hoverEvent->GetPoint(0).GetState() != PointState::MOTION)
     {
@@ -350,15 +460,46 @@ void HoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent& event
       RenderTask& lastRenderTaskImpl = *mLastRenderTask.Get();
 
       if(lastPrimaryHitActor &&
-         lastPrimaryHitActor != primaryHitActor &&
-         lastPrimaryHitActor != consumedActor)
+        lastPrimaryHitActor != primaryHitActor &&
+        lastPrimaryHitActor != consumedActor)
       {
         if(lastPrimaryHitActor->IsHittable() && IsActuallySensitive(lastPrimaryHitActor))
         {
-          if(lastPrimaryHitActor->GetLeaveRequired())
+          if(isGeometry)
           {
+            // This is a situation where actors who received a hover event must leave.
+            // Compare the lastActorList that received the hover event and the CandidateActorList that can receive the new hover event
+            // If the hover event can no longer be received, Leave is sent.
+            std::list<Dali::Internal::Actor*>::reverse_iterator rLastIter = mLastActorLists.rbegin();
+            for(; rLastIter != mLastActorLists.rend(); rLastIter++)
+            {
+              bool find = false;
+              std::list<Dali::Internal::Actor*>::reverse_iterator rCandidateIter = mCandidateActorLists.rbegin();
+              for(; rCandidateIter != mCandidateActorLists.rend(); rCandidateIter++)
+              {
+                if(*rCandidateIter == *rLastIter)
+                {
+                  find = true;
+                  break;
+                }
+              }
+              if(!find)
+              {
+                DALI_LOG_RELEASE_INFO("LeaveActor(Hit): (%p) %d %s\n", reinterpret_cast<void*>(*rLastIter), (*rLastIter)->GetId(), (*rLastIter)->GetName().data());
+                leaveEventConsumer = EmitHoverSignals(*rLastIter, lastRenderTaskImpl, hoverEvent, PointState::LEAVE, isGeometry);
+              }
+              // If the actor has been consumed, you do not need to proceed.
+              if(*rLastIter == lastConsumedActor)
+              {
+                break;
+              }
+            }
+          }
+          else if(lastPrimaryHitActor->GetLeaveRequired())
+          {
+            // In the case of isGeometry, it is not propagated but only sent to actors who are not hittable.
             DALI_LOG_RELEASE_INFO("LeaveActor(Hit): (%p) %d %s\n", reinterpret_cast<void*>(lastPrimaryHitActor), lastPrimaryHitActor->GetId(), lastPrimaryHitActor->GetName().data());
-            leaveEventConsumer = EmitHoverSignals(mLastPrimaryHitActor.GetActor(), lastRenderTaskImpl, hoverEvent, PointState::LEAVE);
+            leaveEventConsumer = EmitHoverSignals(mLastPrimaryHitActor.GetActor(), lastRenderTaskImpl, hoverEvent, PointState::LEAVE, isGeometry);
           }
         }
         else if(primaryPointState != PointState::STARTED)
@@ -366,7 +507,7 @@ void HoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent& event
           // At this point mLastPrimaryHitActor was touchable and sensitive in the previous touch event process but is not in the current one.
           // An interrupted event is send to allow some actors to go back to their original state (i.e. Button controls)
           DALI_LOG_RELEASE_INFO("InterruptedActor(Hit): (%p) %d %s\n", reinterpret_cast<void*>(lastPrimaryHitActor), lastPrimaryHitActor->GetId(), lastPrimaryHitActor->GetName().data());
-          leaveEventConsumer = EmitHoverSignals(mLastPrimaryHitActor.GetActor(), lastRenderTaskImpl, hoverEvent, PointState::INTERRUPTED);
+          leaveEventConsumer = EmitHoverSignals(mLastPrimaryHitActor.GetActor(), lastRenderTaskImpl, hoverEvent, PointState::INTERRUPTED, isGeometry);
         }
       }
 
@@ -374,17 +515,17 @@ void HoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent& event
       // consumed actor's listeners may need to be informed (through a leave event).
       // Further checks here to ensure we do not signal the same actor twice for the same event.
       if(lastConsumedActor &&
-         lastConsumedActor != consumedActor &&
-         lastConsumedActor != lastPrimaryHitActor &&
-         lastConsumedActor != primaryHitActor &&
-         lastConsumedActor != leaveEventConsumer)
+        lastConsumedActor != consumedActor &&
+        lastConsumedActor != lastPrimaryHitActor &&
+        lastConsumedActor != primaryHitActor &&
+        lastConsumedActor != leaveEventConsumer)
       {
         if(lastConsumedActor->IsHittable() && IsActuallySensitive(lastConsumedActor))
         {
-          if(lastConsumedActor->GetLeaveRequired())
+          if(lastConsumedActor->GetLeaveRequired() && !isGeometry) // For geometry, we have already sent leave. There is no need to send leave repeatedly.
           {
             DALI_LOG_RELEASE_INFO("LeaveActor(Consume): (%p) %d %s\n", reinterpret_cast<void*>(lastConsumedActor), lastConsumedActor->GetId(), lastConsumedActor->GetName().data());
-            EmitHoverSignals(lastConsumedActor, lastRenderTaskImpl, hoverEvent, PointState::LEAVE);
+            EmitHoverSignals(lastConsumedActor, lastRenderTaskImpl, hoverEvent, PointState::LEAVE, isGeometry);
           }
         }
         else if(primaryPointState != PointState::STARTED)
@@ -392,7 +533,7 @@ void HoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent& event
           // At this point mLastConsumedActor was touchable and sensitive in the previous touch event process but is not in the current one.
           // An interrupted event is send to allow some actors to go back to their original state (i.e. Button controls)
           DALI_LOG_RELEASE_INFO("InterruptedActor(Consume): (%p) %d %s\n", reinterpret_cast<void*>(lastConsumedActor), lastConsumedActor->GetId(), lastConsumedActor->GetName().data());
-          EmitHoverSignals(mLastConsumedActor.GetActor(), lastRenderTaskImpl, hoverEvent, PointState::INTERRUPTED);
+          EmitHoverSignals(mLastConsumedActor.GetActor(), lastRenderTaskImpl, hoverEvent, PointState::INTERRUPTED, isGeometry);
         }
       }
     }
@@ -422,6 +563,7 @@ void HoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent& event
       }
 
       mLastRenderTask = currentRenderTask;
+      mLastActorLists = mCandidateActorLists;
     }
     else
     {
@@ -447,7 +589,16 @@ void HoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent& event
           Integration::Point primaryPoint = hoverEvent->GetPoint(0);
           primaryPoint.SetHitActor(hoverStartConsumedActorHandle);
           primaryPoint.SetState(PointState::INTERRUPTED);
-          AllocAndEmitHoverSignals(event.time, hoverStartConsumedActorHandle, primaryPoint);
+          if(isGeometry)
+          {
+            std::list<Dali::Internal::Actor*> actorLists;
+            actorLists.push_back(hoverStartConsumedActor);
+            GeoAllocAndEmitHoverSignals(actorLists, event.time, primaryPoint);
+          }
+          else
+          {
+            AllocAndEmitHoverSignals(event.time, hoverStartConsumedActorHandle, primaryPoint);
+          }
 
           // Restore hover-event to original state
           primaryPoint.SetHitActor(primaryHitActor);
@@ -476,6 +627,7 @@ void HoverEventProcessor::Clear()
   mLastPrimaryHitActor.SetActor(nullptr);
   mLastConsumedActor.SetActor(nullptr);
   mLastRenderTask.Reset();
+  mLastActorLists.clear();
 }
 
 void HoverEventProcessor::OnObservedActorDisconnected(Dali::Internal::Actor* actor)

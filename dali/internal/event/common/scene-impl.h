@@ -243,6 +243,16 @@ public:
   void SetSurfaceRenderTarget(const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo);
 
   /**
+   * @copydoc Dali::Integration::Scene::SetGeometryHittestEnabled
+   */
+  void SetGeometryHittestEnabled(bool enabled);
+
+  /**
+   * @copydoc Dali::Integration::Scene::IsGeometryHittestEnabled
+   */
+  bool IsGeometryHittestEnabled() const;
+
+  /**
    * Used by the EventProcessor to emit key event signals.
    * @param[in] event The key event.
    */
@@ -423,6 +433,7 @@ private:
 
   bool mDepthTreeDirty : 1;       ///< True if the depth tree needs recalculating
   bool mPartialUpdateEnabled : 1; ///< True if the partial update is enabled
+  bool mGeometryHittest : 1;      ///< True if the geometry hittest is enabled
 
   EventProcessor mEventProcessor;
 

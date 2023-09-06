@@ -2931,3 +2931,105 @@ int UtcDaliSceneEnableDisablePartialUpdate(void)
 
   END_TEST;
 }
+
+int UtcDaliSceneGeoTouchedEnabledDisabled(void)
+{
+  TestApplication          application;
+  Dali::Integration::Scene scene = application.GetScene();
+  DALI_TEST_EQUALS(scene.IsGeometryHittestEnabled(), false, TEST_LOCATION);
+
+  TouchedSignalData data;
+  TouchFunctor      functor(data);
+  scene.TouchedSignal().Connect(&application, functor);
+
+  // Render and notify.
+  application.SendNotification();
+  application.Render();
+
+  // Confirm functor not called before there has been any touch event.
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+
+  // No actors, single touch, down, motion then up.
+  {
+    GenerateTouch(application, PointState::DOWN, Vector2(10.0f, 10.0f));
+
+    DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+    DALI_TEST_CHECK(data.receivedTouchEvent.GetPointCount() != 0u);
+    DALI_TEST_CHECK(!data.receivedTouchEvent.GetHitActor(0));
+
+    data.Reset();
+
+    // Confirm there is no signal when the touchpoint is only moved.
+    GenerateTouch(application, PointState::MOTION, Vector2(1200.0f, 10.0f)); // Some motion
+
+    DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+    data.Reset();
+
+    // Confirm a following up event generates a signal.
+    GenerateTouch(application, PointState::UP, Vector2(1200.0f, 10.0f));
+
+    DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+    DALI_TEST_CHECK(data.receivedTouchEvent.GetPointCount() != 0u);
+    DALI_TEST_CHECK(!data.receivedTouchEvent.GetHitActor(0));
+    data.Reset();
+  }
+
+  // Add an actor to the scene.
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  actor.TouchedSignal().Connect(&DummyTouchCallback);
+  scene.Add(actor);
+
+  // Render and notify.
+  application.SendNotification();
+  application.Render();
+
+  // Actor on scene, single touch, down in actor, motion, then up outside actor.
+  {
+    GenerateTouch(application, PointState::DOWN, Vector2(10.0f, 10.0f));
+
+    DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+    DALI_TEST_CHECK(data.receivedTouchEvent.GetPointCount() != 0u);
+    DALI_TEST_CHECK(data.receivedTouchEvent.GetHitActor(0) == actor);
+    data.Reset();
+
+    GenerateTouch(application, PointState::MOTION, Vector2(150.0f, 10.0f)); // Some motion
+
+    DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+    data.Reset();
+
+    GenerateTouch(application, PointState::UP, Vector2(150.0f, 10.0f)); // Some motion
+
+    DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+    DALI_TEST_CHECK(data.receivedTouchEvent.GetPointCount() != 0u);
+    DALI_TEST_CHECK(!data.receivedTouchEvent.GetHitActor(0));
+    data.Reset();
+  }
+
+  scene.SetGeometryHittestEnabled(true);
+  DALI_TEST_EQUALS(scene.IsGeometryHittestEnabled(), true, TEST_LOCATION);
+  {
+    GenerateTouch(application, PointState::DOWN, Vector2(10.0f, 10.0f));
+
+    DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+    DALI_TEST_CHECK(data.receivedTouchEvent.GetPointCount() != 0u);
+    DALI_TEST_CHECK(data.receivedTouchEvent.GetHitActor(0) == actor);
+    data.Reset();
+
+    GenerateTouch(application, PointState::MOTION, Vector2(150.0f, 10.0f)); // Some motion
+
+    DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+    data.Reset();
+
+    GenerateTouch(application, PointState::UP, Vector2(150.0f, 10.0f)); // Some motion
+
+    DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+    DALI_TEST_CHECK(data.receivedTouchEvent.GetPointCount() != 0u);
+    DALI_TEST_CHECK(data.receivedTouchEvent.GetHitActor(0) == actor);
+    data.Reset();
+  }
+
+  END_TEST;
+}

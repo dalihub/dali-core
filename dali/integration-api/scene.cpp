@@ -228,6 +228,16 @@ bool Scene::IsPartialUpdateEnabled() const
   return GetImplementation(*this).IsPartialUpdateEnabled();
 }
 
+void Scene::SetGeometryHittestEnabled(bool enabled)
+{
+  GetImplementation(*this).SetGeometryHittestEnabled(enabled);
+}
+
+bool Scene::IsGeometryHittestEnabled()
+{
+  return GetImplementation(*this).IsGeometryHittestEnabled();
+}
+
 Scene::EventProcessingFinishedSignalType& Scene::EventProcessingFinishedSignal()
 {
   return GetImplementation(*this).EventProcessingFinishedSignal();
