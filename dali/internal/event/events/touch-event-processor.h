@@ -99,6 +99,8 @@ private:
   ActorObserver    mInterceptedTouchActor;  ///< Stores the intercepted actor
   RenderTaskPtr    mLastRenderTask;         ///< The RenderTask used for the last hit actor
   PointState::Type mLastPrimaryPointState;  ///< Stores the last primary point state
+  std::list<Dali::Internal::Actor*> mInterceptedActorLists;   ///< Stores the list from root to intercepted actors.
+  std::list<Dali::Internal::Actor*> mCandidateActorLists;     ///< Stores a list of actors that can be touched, from leaf actor to root.
 };
 
 } // namespace Internal
