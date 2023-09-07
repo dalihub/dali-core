@@ -48,6 +48,7 @@ TextureSet* TextureSet::New()
 
 TextureSet::TextureSet()
 : mSamplers(),
+  mTextures(),
   mHasAlpha(false)
 {
 }
@@ -66,11 +67,7 @@ void TextureSet::SetSampler(uint32_t index, Render::Sampler* sampler)
   const uint32_t samplerCount = static_cast<uint32_t>(mSamplers.Size());
   if(samplerCount < index + 1)
   {
-    mSamplers.Resize(index + 1);
-    for(uint32_t i(samplerCount); i <= index; ++i)
-    {
-      mSamplers[i] = nullptr;
-    }
+    SetSamplerCount(index + 1);
   }
 
   mSamplers[index] = sampler;
@@ -86,6 +83,12 @@ void TextureSet::SetSampler(uint32_t index, Render::Sampler* sampler)
     // Construct message in the render queue memory; note that delete should not be called on the return value
     new(slot) DerivedType(&mRenderMessageDispatcher->GetRenderManager(), &RenderManager::SetTextureUpdated, mTextures[index]);
   }
+
+  if(!sampler)
+  {
+    // Check wheter we need to pop back sampler
+    TrimContainers();
+  }
 }
 
 void TextureSet::SetTexture(uint32_t index, const Render::TextureKey& texture)
@@ -93,24 +96,7 @@ void TextureSet::SetTexture(uint32_t index, const Render::TextureKey& texture)
   const uint32_t textureCount = static_cast<uint32_t>(mTextures.Size());
   if(textureCount < index + 1)
   {
-    mTextures.Resize(index + 1);
-
-    bool samplerExist = true;
-    if(mSamplers.Size() < index + 1)
-    {
-      mSamplers.Resize(index + 1);
-      samplerExist = false;
-    }
-
-    for(uint32_t i(textureCount); i <= index; ++i)
-    {
-      mTextures[i] = Render::TextureKey{};
-
-      if(!samplerExist)
-      {
-        mSamplers[i] = nullptr;
-      }
-    }
+    SetTextureCount(index + 1);
   }
 
   mTextures[index] = texture;
@@ -127,6 +113,58 @@ void TextureSet::SetTexture(uint32_t index, const Render::TextureKey& texture)
     // Construct message in the render queue memory; note that delete should not be called on the return value
     new(slot) DerivedType(&mRenderMessageDispatcher->GetRenderManager(), &RenderManager::SetTextureUpdated, texture);
   }
+  else
+  {
+    // Check wheter we need to pop back textures
+    TrimContainers();
+  }
+}
+
+void TextureSet::SetTextureCount(uint32_t count)
+{
+  const uint32_t textureCount = static_cast<uint32_t>(mTextures.Size());
+
+  if(textureCount != count)
+  {
+    mTextures.Resize(count, Render::TextureKey{});
+  }
+}
+
+void TextureSet::SetSamplerCount(uint32_t count)
+{
+  const uint32_t samplerCount = static_cast<uint32_t>(mSamplers.Size());
+
+  if(samplerCount != count)
+  {
+    mSamplers.Resize(count, nullptr);
+  }
+}
+
+void TextureSet::TrimContainers()
+{
+  uint32_t textureCount = static_cast<uint32_t>(mTextures.Size());
+  uint32_t samplerCount = static_cast<uint32_t>(mSamplers.Size());
+
+  while(textureCount > 0u)
+  {
+    if(mTextures[textureCount - 1u])
+    {
+      break;
+    }
+    --textureCount;
+  }
+
+  while(samplerCount > 0u)
+  {
+    if(mSamplers[samplerCount - 1u])
+    {
+      break;
+    }
+    --samplerCount;
+  }
+
+  SetTextureCount(textureCount);
+  SetSamplerCount(samplerCount);
 }
 
 bool TextureSet::HasAlpha() const
