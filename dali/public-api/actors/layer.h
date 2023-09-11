@@ -2,7 +2,7 @@
 #define DALI_LAYER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -391,14 +391,6 @@ public:
    *
   */
   void SetSortFunction(SortFunctionType function);
-
-  /**
-   * @brief Retrieves whether the layer consumes hover.
-   *
-   * @SINCE_1_0.0
-   * @return @c True if consuming hover, @c false otherwise
-   */
-  bool IsHoverConsumed() const;
 
 public: // Not intended for application developers
   /// @cond internal
