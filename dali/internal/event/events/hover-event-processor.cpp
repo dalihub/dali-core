@@ -272,6 +272,10 @@ void HoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent& event
 
   // 3) Recursively deliver events to the actor and its parents, until the event is consumed or the stage is reached.
 
+  Integration::Point primaryPoint      = hoverEvent->GetPoint(0);
+  Dali::Actor        primaryHitActor   = primaryPoint.GetHitActor();
+  PointState::Type   primaryPointState = primaryPoint.GetState();
+
   // Emit the touch signal
   Dali::Actor consumedActor;
   if(currentRenderTask)
@@ -289,14 +293,13 @@ void HoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent& event
       }
     }
     consumedActor = EmitHoverSignals(hitActor, hoverEventHandle);
+
+    if(hoverEvent->GetPoint(0).GetState() != PointState::MOTION)
+    {
+      DALI_LOG_DEBUG_INFO("PrimaryHitActor:(%p), id(%d), name(%s), state(%d)\n", primaryHitActor ? reinterpret_cast<void*>(&primaryHitActor.GetBaseObject()) : NULL, primaryHitActor ? primaryHitActor.GetProperty<int32_t>(Dali::Actor::Property::ID) : -1, primaryHitActor ? primaryHitActor.GetProperty<std::string>(Dali::Actor::Property::NAME).c_str() : "", hoverEvent->GetPoint(0).GetState());
+      DALI_LOG_DEBUG_INFO("ConsumedActor:  (%p), id(%d), name(%s), state(%d)\n", consumedActor ? reinterpret_cast<void*>(&consumedActor.GetBaseObject()) : NULL, consumedActor ? consumedActor.GetProperty<int32_t>(Dali::Actor::Property::ID) : -1, consumedActor ? consumedActor.GetProperty<std::string>(Dali::Actor::Property::NAME).c_str() : "", hoverEvent->GetPoint(0).GetState());
+    }
   }
-
-  Integration::Point primaryPoint      = hoverEvent->GetPoint(0);
-  Dali::Actor        primaryHitActor   = primaryPoint.GetHitActor();
-  PointState::Type   primaryPointState = primaryPoint.GetState();
-
-  DALI_LOG_INFO(gLogFilter, Debug::Concise, "PrimaryHitActor:     (%p) %s\n", primaryHitActor ? reinterpret_cast<void*>(&primaryHitActor.GetBaseObject()) : NULL, primaryHitActor ? primaryHitActor.GetProperty<std::string>(Dali::Actor::Property::NAME).c_str() : "");
-  DALI_LOG_INFO(gLogFilter, Debug::Concise, "ConsumedActor:       (%p) %s\n", consumedActor ? reinterpret_cast<void*>(&consumedActor.GetBaseObject()) : NULL, consumedActor ? consumedActor.GetProperty<std::string>(Dali::Actor::Property::NAME).c_str() : "");
 
   if((primaryPointState == PointState::STARTED) &&
      (hoverEvent->GetPointCount() == 1) &&
@@ -325,7 +328,7 @@ void HoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent& event
         {
           if(lastPrimaryHitActor->GetLeaveRequired())
           {
-            DALI_LOG_INFO(gLogFilter, Debug::Concise, "LeaveActor(Hit):     (%p) %s\n", reinterpret_cast<void*>(lastPrimaryHitActor), lastPrimaryHitActor->GetName().data());
+            DALI_LOG_DEBUG_INFO("LeaveActor(Hit):     (%p) %s\n", reinterpret_cast<void*>(lastPrimaryHitActor), lastPrimaryHitActor->GetName().data());
             leaveEventConsumer = EmitHoverSignals(mLastPrimaryHitActor.GetActor(), lastRenderTaskImpl, hoverEvent, PointState::LEAVE);
           }
         }
@@ -333,7 +336,7 @@ void HoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent& event
         {
           // At this point mLastPrimaryHitActor was touchable and sensitive in the previous touch event process but is not in the current one.
           // An interrupted event is send to allow some actors to go back to their original state (i.e. Button controls)
-          DALI_LOG_INFO(gLogFilter, Debug::Concise, "InterruptedActor(Hit):     (%p) %s\n", reinterpret_cast<void*>(lastPrimaryHitActor), lastPrimaryHitActor->GetName().data());
+          DALI_LOG_DEBUG_INFO("InterruptedActor(Hit):     (%p) %s\n", reinterpret_cast<void*>(lastPrimaryHitActor), lastPrimaryHitActor->GetName().data());
           leaveEventConsumer = EmitHoverSignals(mLastPrimaryHitActor.GetActor(), lastRenderTaskImpl, hoverEvent, PointState::INTERRUPTED);
         }
       }
@@ -351,7 +354,7 @@ void HoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent& event
         {
           if(lastConsumedActor->GetLeaveRequired())
           {
-            DALI_LOG_INFO(gLogFilter, Debug::Concise, "LeaveActor(Consume): (%p) %s\n", reinterpret_cast<void*>(lastConsumedActor), lastConsumedActor->GetName().data());
+            DALI_LOG_DEBUG_INFO("LeaveActor(Consume): (%p) %s\n", reinterpret_cast<void*>(lastConsumedActor), lastConsumedActor->GetName().data());
             EmitHoverSignals(lastConsumedActor, lastRenderTaskImpl, hoverEvent, PointState::LEAVE);
           }
         }
@@ -359,7 +362,7 @@ void HoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent& event
         {
           // At this point mLastConsumedActor was touchable and sensitive in the previous touch event process but is not in the current one.
           // An interrupted event is send to allow some actors to go back to their original state (i.e. Button controls)
-          DALI_LOG_INFO(gLogFilter, Debug::Concise, "InterruptedActor(Consume):     (%p) %s\n", reinterpret_cast<void*>(lastConsumedActor), lastConsumedActor->GetName().data());
+          DALI_LOG_DEBUG_INFO("InterruptedActor(Consume):     (%p) %s\n", reinterpret_cast<void*>(lastConsumedActor), lastConsumedActor->GetName().data());
           EmitHoverSignals(mLastConsumedActor.GetActor(), lastRenderTaskImpl, hoverEvent, PointState::INTERRUPTED);
         }
       }

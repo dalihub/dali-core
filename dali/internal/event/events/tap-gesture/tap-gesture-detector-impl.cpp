@@ -36,6 +36,10 @@ namespace Internal
 {
 namespace
 {
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_TAP_GESTURE_DETECTOR");
+#endif // defined(DEBUG_ENABLED)
+
 constexpr uint32_t DEFAULT_TAPS_REQUIRED    = 1u;
 constexpr uint32_t DEFAULT_TOUCHES_REQUIRED = 1u;
 constexpr uint32_t DEFAULT_TAP_WAIT_TIME    = 330u;
@@ -193,7 +197,7 @@ void TapGestureDetector::EmitTapGestureSignal(Dali::Actor tappedActor, const Dal
       {
         // Guard against destruction during signal emission
         Dali::TapGestureDetector handle(this);
-
+        DALI_LOG_DEBUG_INFO("emitting tap gesture actor id(%d)\n", tappedActor.GetProperty<int32_t>(Dali::Actor::Property::ID));
         mDetectedSignal.Emit(tappedActor, mTap);
       }
       else
@@ -209,7 +213,7 @@ bool TapGestureDetector::TimerCallback()
 {
   // Guard against destruction during signal emission
   Dali::TapGestureDetector handle(this);
-
+  DALI_LOG_DEBUG_INFO("emitting tap gesture actor id(%d)\n", mTappedActor.GetProperty<int32_t>(Dali::Actor::Property::ID));
   mDetectedSignal.Emit(mTappedActor, mTap);
 
   mTimerId = 0;
@@ -238,11 +242,12 @@ void TapGestureDetector::OnActorAttach(Actor& actor)
 {
   CheckMinMaxTapsRequired();
   mWaitTime = mGestureEventProcessor.GetTapGestureProcessor().GetMaximumAllowedTime();
+  DALI_LOG_INFO(gLogFilter, Debug::General, "TapGestureDetector attach actor(%d)\n", actor.GetId());
 }
 
 void TapGestureDetector::OnActorDetach(Actor& actor)
 {
-  // Do nothing
+  DALI_LOG_INFO(gLogFilter, Debug::General, "TapGestureDetector detector actor(%d)\n", actor.GetId());
 }
 
 void TapGestureDetector::OnActorDestroyed(Object& object)

@@ -33,6 +33,10 @@ namespace Internal
 {
 namespace
 {
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_ROTATION_GESTURE_DETECTOR");
+#endif // defined(DEBUG_ENABLED)
+
 // Signals
 
 const char* const SIGNAL_ROTATION_DETECTED = "rotationDetected";
@@ -62,7 +66,10 @@ void RotationGestureDetector::EmitRotationGestureSignal(Dali::Actor actor, const
 {
   // Guard against destruction during signal emission
   Dali::RotationGestureDetector handle(this);
-
+  if(rotation.GetState() !=  GestureState::CONTINUING)
+  {
+    DALI_LOG_DEBUG_INFO("emitting rotation gesture actor id(%d) state(%d)\n", actor.GetProperty<int32_t>(Dali::Actor::Property::ID), rotation.GetState());
+  }
   mDetectedSignal.Emit(actor, rotation);
 }
 
@@ -82,6 +89,16 @@ bool RotationGestureDetector::DoConnectSignal(BaseObject* object, ConnectionTrac
   }
 
   return connected;
+}
+
+void RotationGestureDetector::OnActorAttach(Actor& actor)
+{
+  DALI_LOG_INFO(gLogFilter, Debug::General, "RotationGestureDetector attach actor(%d)\n", actor.GetId());
+}
+
+void RotationGestureDetector::OnActorDetach(Actor& actor)
+{
+  DALI_LOG_INFO(gLogFilter, Debug::General, "RotationGestureDetector detach actor(%d)\n", actor.GetId());
 }
 
 } // namespace Internal

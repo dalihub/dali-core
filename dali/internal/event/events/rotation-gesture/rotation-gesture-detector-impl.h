@@ -93,16 +93,12 @@ private: // GestureDetector overrides
   /**
    * @copydoc Dali::Internal::GestureDetector::OnActorAttach(Actor&)
    */
-  void OnActorAttach(Actor& actor) override
-  { /* Nothing to do */
-  }
+  void OnActorAttach(Actor& actor) override;
 
   /**
    * @copydoc Dali::Internal::GestureDetector::OnActorDetach(Actor&)
    */
-  void OnActorDetach(Actor& actor) override
-  { /* Nothing to do */
-  }
+  void OnActorDetach(Actor& actor) override;
 
   /**
    * @copydoc Dali::Internal::GestureDetector::OnActorDestroyed(Object&)
