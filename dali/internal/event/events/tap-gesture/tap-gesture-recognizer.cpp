@@ -87,7 +87,7 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
           else // Clear if the time between touch down and touch up is long.
           {
             mState = CLEAR;
-            DALI_LOG_DEBUG_INFO("time between touch down and touch up is long. (%dms > %dms)\n", mDeltaBetweenTouchDownTouchUp, mRecognizerTime);
+            DALI_LOG_RELEASE_INFO("time between touch down and touch up is long. (%dms > %dms)\n", mDeltaBetweenTouchDownTouchUp, mRecognizerTime);
           }
         }
         else if(pointState == PointState::INTERRUPTED)
@@ -109,7 +109,7 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
           else // Clear if the time between touch down and touch up is long.
           {
             mState = CLEAR;
-            DALI_LOG_DEBUG_INFO("time between touch down and touch up is long. (%dms > %dms)\n", mDeltaBetweenTouchDownTouchUp, mRecognizerTime);
+            DALI_LOG_RELEASE_INFO("time between touch down and touch up is long. (%dms > %dms)\n", mDeltaBetweenTouchDownTouchUp, mRecognizerTime);
           }
         }
         else if(pointState == PointState::DOWN)

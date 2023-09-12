@@ -247,7 +247,7 @@ void TapGestureDetector::OnActorAttach(Actor& actor)
 
 void TapGestureDetector::OnActorDetach(Actor& actor)
 {
-  DALI_LOG_INFO(gLogFilter, Debug::General, "TapGestureDetector detector actor(%d)\n", actor.GetId());
+  DALI_LOG_INFO(gLogFilter, Debug::General, "TapGestureDetector detach actor(%d)\n", actor.GetId());
 }
 
 void TapGestureDetector::OnActorDestroyed(Object& object)
