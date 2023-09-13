@@ -15,6 +15,7 @@
  */
 
 #include <dali/integration-api/events/touch-integ.h>
+#include <dali/internal/event/events/hover-event-impl.h>
 #include <dali/internal/event/events/touch-event-impl.h>
 
 namespace Dali
@@ -31,6 +32,19 @@ Dali::TouchEvent NewTouchEvent(uint32_t timeStamp, const Dali::Integration::Poin
   Internal::TouchEventPtr touchEventImpl(new Internal::TouchEvent(timeStamp));
   touchEventImpl->AddPoint(point);
   Dali::TouchEvent handle(touchEventImpl.Get());
+  return handle;
+}
+
+Dali::HoverEvent NewHoverEvent(uint32_t timeStamp, const TouchPoint& point)
+{
+  return NewHoverEvent(timeStamp, Integration::Point(point));
+}
+
+Dali::HoverEvent NewHoverEvent(uint32_t timeStamp, const Dali::Integration::Point& point)
+{
+  Internal::HoverEventPtr hoverEventImpl(new Internal::HoverEvent(timeStamp));
+  hoverEventImpl->AddPoint(point);
+  Dali::HoverEvent handle(hoverEventImpl.Get());
   return handle;
 }
 
