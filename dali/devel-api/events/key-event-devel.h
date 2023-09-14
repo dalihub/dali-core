@@ -99,6 +99,15 @@ DALI_CORE_API void SetKeyCode(KeyEvent keyEvent, int32_t keyCode);
 DALI_CORE_API void SetKeyModifier(KeyEvent keyEvent, int32_t keyModifier);
 
 /**
+ * @brief Set the no-intercept key modifier.
+ *
+ * @SINCE_2_3.13
+ * @param[in] keyEvent The instance of KeyEvent
+ * @param[in] noIntercept The value of the modifier
+ */
+DALI_CORE_API void SetNoInterceptModifier(KeyEvent keyEvent, bool noIntercept);
+
+/**
  * @brief Set the time (in ms) that the key event occurred.
  *
  * @SINCE_1_9.27
