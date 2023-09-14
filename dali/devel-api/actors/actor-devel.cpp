@@ -100,6 +100,16 @@ void LookAt(Actor actor, Vector3 target, Vector3 up, Vector3 localForward, Vecto
   GetImplementation(actor).SetOrientation(orientation);
 }
 
+bool IsHittable(Actor actor)
+{
+  return GetImplementation(actor).IsHittable();
+}
+
+bool GetTouchRequired(Actor actor)
+{
+  return GetImplementation(actor).GetTouchRequired();
+}
+
 } // namespace DevelActor
 
 } // namespace Dali

@@ -1250,6 +1250,22 @@ public:
   }
 
   /**
+   * @copydoc Dali::DevelActor::IsHittable()
+   */
+  bool IsHittable() const
+  {
+    return (IsUserInteractionEnabled()) && IsSensitive() && IsVisible() && (GetCurrentWorldColor().a > FULLY_TRANSPARENT) && IsNodeConnected();
+  }
+
+  /**
+   * @copydoc Dali::DevelActor::GetTouchRequired()
+   */
+  bool GetTouchRequired() const
+  {
+    return !mTouchedSignal.Empty();
+  }
+
+  /**
    * Set whether this view can focus by touch.
    * @param[in] focusable focuable by touch.
    */
@@ -1286,15 +1302,6 @@ public:
   }
 
   /**
-   * Query whether the application or derived actor type requires touch events.
-   * @return True if touch events are required.
-   */
-  bool GetTouchRequired() const
-  {
-    return !mTouchedSignal.Empty();
-  }
-
-  /**
    * Query whether the application or derived actor type requires hover events.
    * @return True if hover events are required.
    */
@@ -1319,16 +1326,6 @@ public:
   bool GetWheelEventRequired() const
   {
     return !mWheelEventSignal.Empty();
-  }
-
-  /**
-   * Query whether the actor is actually hittable.  This method checks whether the actor is
-   * sensitive, has the visibility flag set to true and is not fully transparent.
-   * @return true, if it can be hit, false otherwise.
-   */
-  bool IsHittable() const
-  {
-    return (IsUserInteractionEnabled()) && IsSensitive() && IsVisible() && (GetCurrentWorldColor().a > FULLY_TRANSPARENT) && IsNodeConnected();
   }
 
   /**
