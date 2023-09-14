@@ -574,6 +574,7 @@ bool HitTestRenderTask(const RenderTaskList::ExclusivesContainer& exclusives,
           bool ret = sourceLayerIndex <= consumedLayerIndex;
           if(ret)
           {
+            DALI_LOG_RELEASE_INFO("layer is set to consume the hit\n");
             results.renderTask = RenderTaskPtr(&renderTask);
             results.actor      = Dali::Layer(layers.GetLayer(consumedLayerIndex));
           }
