@@ -117,6 +117,11 @@ public:
   bool IsAltModifier() const;
 
   /**
+   * @copydoc Dali::KeyEvent::IsNoInterceptModifier()
+   */
+  bool IsNoInterceptModifier() const;
+
+  /**
    * @copydoc Dali::KeyEvent::GetCompose()
    */
   const std::string& GetCompose() const;
@@ -208,6 +213,13 @@ public:
    * @param[in] keyModifier The key modifier
    */
   void SetKeyModifier(int32_t keyModifier);
+
+  /**
+   * @brief Set the no-intercept key modifier.
+   *
+   * @param[in] noIntercept The value of the modifier
+   */
+  void SetNoInterceptModifier(bool noIntercept);
 
   /**
    * @brief Set the time (in ms) that the key event occurred.
