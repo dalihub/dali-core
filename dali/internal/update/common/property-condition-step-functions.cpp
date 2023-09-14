@@ -20,6 +20,7 @@
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector4.h>
+#include <dali/public-api/math/quaternion.h>
 #include <dali/public-api/object/property-input.h>
 
 namespace Dali
@@ -68,6 +69,11 @@ ConditionFunction Step::GetFunction(Property::Type valueType)
     case Property::VECTOR4:
     {
       function = EvalVector4;
+      break;
+    }
+    case Property::ROTATION:
+    {
+      function = EvalQuaternion;
       break;
     }
     default:
@@ -159,6 +165,15 @@ bool Step::EvalVector4(const Dali::PropertyInput& value, PropertyNotification::R
 {
   const float propertyValue = value.GetVector4().Length();
   return Evaluate(propertyValue, arg);
+}
+
+bool Step::EvalQuaternion(const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg)
+{
+  Quaternion propertyValue = value.GetQuaternion();
+  // TODO : Make some meaningfule calculation here
+  Vector4 v = propertyValue.EulerAngles();
+  const float checkValue = v.LengthSquared();
+  return Evaluate(checkValue, arg);
 }
 
 bool Step::EvalDefault(const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg)
