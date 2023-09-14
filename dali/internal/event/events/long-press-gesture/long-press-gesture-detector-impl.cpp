@@ -32,6 +32,10 @@ namespace Internal
 {
 namespace
 {
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_LONG_PRESS_GESTURE_DETECTOR");
+#endif // defined(DEBUG_ENABLED)
+
 // Signals
 
 const char* const SIGNAL_LONG_PRESS_DETECTED = "longPressDetected";
@@ -130,7 +134,7 @@ void LongPressGestureDetector::EmitLongPressGestureSignal(Dali::Actor pressedAct
 {
   // Guard against destruction during signal emission
   Dali::LongPressGestureDetector handle(this);
-
+  DALI_LOG_DEBUG_INFO("emitting longPress gesture actor id(%d)\n", pressedActor.GetProperty<int32_t>(Dali::Actor::Property::ID));
   mDetectedSignal.Emit(pressedActor, longPress);
 }
 
@@ -154,12 +158,12 @@ bool LongPressGestureDetector::DoConnectSignal(BaseObject* object, ConnectionTra
 
 void LongPressGestureDetector::OnActorAttach(Actor& actor)
 {
-  // Do nothing
+  DALI_LOG_INFO(gLogFilter, Debug::General, "LongPressGestureDetector attach actor(%d)\n", actor.GetId());
 }
 
 void LongPressGestureDetector::OnActorDetach(Actor& actor)
 {
-  // Do nothing
+  DALI_LOG_INFO(gLogFilter, Debug::General, "LongPressGestureDetector detach actor(%d)\n", actor.GetId());
 }
 
 void LongPressGestureDetector::OnActorDestroyed(Object& object)

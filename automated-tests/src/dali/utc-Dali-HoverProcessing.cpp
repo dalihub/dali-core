@@ -19,6 +19,7 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/events/hover-event-devel.h>
 #include <dali/integration-api/events/hover-event-integ.h>
+#include <dali/integration-api/events/touch-integ.h>
 #include <dali/integration-api/render-task-list-integ.h>
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
@@ -1327,6 +1328,20 @@ int UtcDaliHoverEventCreate(void)
   // Emit a started signal
   DALI_TEST_EQUALS(100, hoverEvent.GetTime(), TEST_LOCATION);
   DALI_TEST_EQUALS(0, hoverEvent.GetPointCount(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliHoverEventIntegNewHoverEvent(void)
+{
+  uint32_t         timestamp = 92858u;
+  TouchPoint       tp(1, PointState::STARTED, 34.4f, 123.89f, 5.0f, 7.0f);
+  Dali::HoverEvent hoverEvent = Integration::NewHoverEvent(timestamp, tp);
+
+  DALI_TEST_EQUALS(hoverEvent.GetPointCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(hoverEvent.GetState(0), PointState::STARTED, TEST_LOCATION);
+  DALI_TEST_EQUALS(hoverEvent.GetLocalPosition(0), Vector2(5.0f, 7.0f), TEST_LOCATION);
+  DALI_TEST_EQUALS(hoverEvent.GetScreenPosition(0), Vector2(34.4f, 123.89f), TEST_LOCATION);
 
   END_TEST;
 }

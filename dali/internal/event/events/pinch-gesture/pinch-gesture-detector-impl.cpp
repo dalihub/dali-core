@@ -33,6 +33,10 @@ namespace Internal
 {
 namespace
 {
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_PINCH_GESTURE_DETECTOR");
+#endif // defined(DEBUG_ENABLED)
+
 // Signals
 
 const char* const SIGNAL_PINCH_DETECTED = "pinchDetected";
@@ -64,7 +68,10 @@ void PinchGestureDetector::EmitPinchGestureSignal(Dali::Actor actor, const Dali:
 {
   // Guard against destruction during signal emission
   Dali::PinchGestureDetector handle(this);
-
+  if(pinch.GetState() !=  GestureState::CONTINUING)
+  {
+    DALI_LOG_DEBUG_INFO("emitting pinch gesture actor id(%d) state(%d)\n", actor.GetProperty<int32_t>(Dali::Actor::Property::ID), pinch.GetState());
+  }
   mDetectedSignal.Emit(actor, pinch);
 }
 
@@ -88,12 +95,12 @@ bool PinchGestureDetector::DoConnectSignal(BaseObject* object, ConnectionTracker
 
 void PinchGestureDetector::OnActorAttach(Actor& actor)
 {
-  // Do nothing
+  DALI_LOG_INFO(gLogFilter, Debug::General, "PinchGestureDetector attach actor(%d)\n", actor.GetId());
 }
 
 void PinchGestureDetector::OnActorDetach(Actor& actor)
 {
-  // Do nothing
+  DALI_LOG_INFO(gLogFilter, Debug::General, "PinchGestureDetector detach actor(%d)\n", actor.GetId());
 }
 
 void PinchGestureDetector::OnActorDestroyed(Object& object)

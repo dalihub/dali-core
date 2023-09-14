@@ -492,6 +492,23 @@ DALI_CORE_API Vector4 GetWorldColor(Actor actor);
  */
 DALI_CORE_API void LookAt(Actor actor, Vector3 target, Vector3 up = Vector3::YAXIS, Vector3 localForward = Vector3::ZAXIS, Vector3 localUp = Vector3::YAXIS);
 
+/**
+ * Query whether the actor is actually hittable.  This method checks whether the actor is
+ * sensitive, has the visibility flag set to true and is not fully transparent.
+ *
+ * @param[in] actor The actor for whether is hittable or not
+ * @return true, if it can be hit, false otherwise.
+ */
+DALI_CORE_API bool IsHittable(Actor actor);
+
+/**
+ * Query whether the application or derived actor type requires touch events.
+ *
+ * @param[in] actor The actor for whether is required for touch event or not.
+ * @return True if touch events are required.
+ */
+DALI_CORE_API bool GetTouchRequired(Actor actor);
+
 } // namespace DevelActor
 
 } // namespace Dali

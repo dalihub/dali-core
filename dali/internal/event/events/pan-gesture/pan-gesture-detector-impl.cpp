@@ -283,7 +283,10 @@ void PanGestureDetector::EmitPanGestureSignal(Dali::Actor actor, const Dali::Pan
     Dali::PanGestureDetector handle(this);
 
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Emitting Signal (%p)\n", this);
-
+    if(pan.GetState() !=  GestureState::CONTINUING)
+    {
+      DALI_LOG_DEBUG_INFO("emitting pan gesture actor id(%d) state(%d)\n", actor.GetProperty<int32_t>(Dali::Actor::Property::ID), pan.GetState());
+    }
     mDetectedSignal.Emit(actor, pan);
   }
 }
@@ -328,12 +331,12 @@ const SceneGraph::PanGesture& PanGestureDetector::GetPanGestureSceneObject() con
 
 void PanGestureDetector::OnActorAttach(Actor& actor)
 {
-  // Do nothing
+  DALI_LOG_INFO(gLogFilter, Debug::General, "PanGestureDetector attach actor(%d)\n", actor.GetId());
 }
 
 void PanGestureDetector::OnActorDetach(Actor& actor)
 {
-  // Do nothing
+  DALI_LOG_INFO(gLogFilter, Debug::General, "PanGestureDetector detach actor(%d)\n", actor.GetId());
 }
 
 void PanGestureDetector::OnActorDestroyed(Object& object)

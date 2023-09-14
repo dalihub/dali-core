@@ -22,6 +22,7 @@
 #include <dali/integration-api/events/point.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/events/touch-event.h>
+#include <dali/public-api/events/hover-event.h>
 
 namespace Dali
 {
@@ -44,6 +45,25 @@ DALI_CORE_API Dali::TouchEvent NewTouchEvent(uint32_t timeStamp, const TouchPoin
  * @return A new touch data handle.
  */
 DALI_CORE_API Dali::TouchEvent NewTouchEvent(uint32_t timeStamp, const Dali::Integration::Point& point);
+
+/**
+ * Create a new hover data handle from timestamp and point.
+ *
+ * @param[in] timeStamp The time stamp of the hover event.
+ * @param[in] point The point on screen where the hover occurred.
+ * @return A new hover data handle.
+ */
+DALI_CORE_API Dali::HoverEvent NewHoverEvent(uint32_t timeStamp, const TouchPoint& point);
+
+/**
+ * Create a new hover data handle from timestamp and point.
+ *
+ * @param[in] timeStamp The time stamp of the hpver event.
+ * @param[in] point The point on screen where the hover occurred.
+ * @return A new hover data handle.
+ */
+DALI_CORE_API Dali::HoverEvent NewHoverEvent(uint32_t timeStamp, const Dali::Integration::Point& point);
+
 
 } // namespace Integration
 
