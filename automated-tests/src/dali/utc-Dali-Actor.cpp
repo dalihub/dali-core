@@ -11752,3 +11752,55 @@ int UtcDaliActorCalculateLookAt(void)
 
   END_TEST;
 }
+
+int UtcDaliActorIsHittable(void)
+{
+  TestApplication application;
+
+  Actor   parent = Actor::New();
+  Vector4 parentColor(1.0f, 0.5f, 0.0f, 0.8f);
+  parent.SetProperty(Actor::Property::COLOR, parentColor);
+  application.GetScene().Add(parent);
+
+  Actor   actor = Actor::New();
+  Vector4 childColor(0.5f, 0.6f, 0.5f, 1.0f);
+  actor.SetProperty(Actor::Property::COLOR, childColor);
+  parent.Add(actor);
+
+  actor.SetProperty(Actor::Property::SENSITIVE, true);
+  actor.SetProperty(DevelActor::Property::USER_INTERACTION_ENABLED, true);
+  actor.SetProperty(Actor::Property::VISIBLE, true);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(DevelActor::IsHittable(actor) == true);
+
+  actor.SetProperty(Actor::Property::SENSITIVE, false);
+  DALI_TEST_CHECK(DevelActor::IsHittable(actor) == false);
+  actor.SetProperty(Actor::Property::SENSITIVE, true);
+
+  actor.SetProperty(DevelActor::Property::USER_INTERACTION_ENABLED, false);
+  DALI_TEST_CHECK(DevelActor::IsHittable(actor) == false);
+  actor.SetProperty(DevelActor::Property::USER_INTERACTION_ENABLED, true);
+
+  actor.SetProperty(Actor::Property::VISIBLE, false);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK(DevelActor::IsHittable(actor) == false);
+
+  END_TEST;
+}
+
+int UtcDaliActorGetTouchRequired(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  DALI_TEST_CHECK(DevelActor::GetTouchRequired(actor) == false);
+
+  actor.TouchedSignal().Connect(TestTouchCallback);
+  DALI_TEST_CHECK(DevelActor::GetTouchRequired(actor) == true);
+
+  END_TEST;
+}
