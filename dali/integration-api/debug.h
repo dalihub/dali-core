@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_DEBUG_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -217,10 +217,6 @@ enum LogLevel
 class DALI_CORE_API Filter
 {
 public:
-  using FilterList = std::list<Filter*>;
-  using FilterIter = std::list<Filter*>::iterator;
-
-public:
   /**
    * Test if the filter is enabled for the given logging level
    * @param[in] level - the level to test.
@@ -324,8 +320,6 @@ private:
     mNesting(0)
   {
   }
-
-  static FilterList* GetActiveFilters();
 
 public:
   // High level filters. If these filters are too broad for your current requirement, then

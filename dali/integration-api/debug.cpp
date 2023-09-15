@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <chrono>
 #include <cstdarg>
+#include <memory>
 
 namespace Dali
 {
@@ -84,11 +85,17 @@ Filter* Filter::gElement    = nullptr;
 Filter* Filter::gActor      = Filter::New(Debug::Concise, false, "LOG_ACTOR");
 Filter* Filter::gShader     = Filter::New(Debug::Concise, false, "LOG_SHADER");
 
-Filter::FilterList* Filter::GetActiveFilters()
+typedef std::list<std::unique_ptr<Filter>>           FilterList;
+typedef std::list<std::unique_ptr<Filter>>::iterator FilterIter;
+
+namespace
 {
-  static Filter::FilterList* activeFilters = new FilterList;
+static FilterList& GetActiveFilters()
+{
+  static FilterList activeFilters;
   return activeFilters;
 }
+} // namespace
 
 Filter* Filter::New(LogLevel level, bool trace, const char* environmentVariableName)
 {
@@ -118,7 +125,7 @@ Filter* Filter::New(LogLevel level, bool trace, const char* environmentVariableN
 
   Filter* filter = new Filter(level, trace);
   filter->mNesting++;
-  GetActiveFilters()->push_back(filter);
+  GetActiveFilters().push_back(std::unique_ptr<Filter>(filter));
   return filter;
 }
 
@@ -127,7 +134,7 @@ Filter* Filter::New(LogLevel level, bool trace, const char* environmentVariableN
  */
 void Filter::EnableGlobalTrace()
 {
-  for(FilterIter iter = GetActiveFilters()->begin(); iter != GetActiveFilters()->end(); iter++)
+  for(FilterIter iter = GetActiveFilters().begin(); iter != GetActiveFilters().end(); iter++)
   {
     (*iter)->EnableTrace();
   }
@@ -138,7 +145,7 @@ void Filter::EnableGlobalTrace()
  */
 void Filter::DisableGlobalTrace()
 {
-  for(FilterIter iter = GetActiveFilters()->begin(); iter != GetActiveFilters()->end(); iter++)
+  for(FilterIter iter = GetActiveFilters().begin(); iter != GetActiveFilters().end(); iter++)
   {
     (*iter)->DisableTrace();
   }
@@ -146,7 +153,7 @@ void Filter::DisableGlobalTrace()
 
 void Filter::SetGlobalLogLevel(LogLevel level)
 {
-  for(FilterIter iter = GetActiveFilters()->begin(); iter != GetActiveFilters()->end(); iter++)
+  for(FilterIter iter = GetActiveFilters().begin(); iter != GetActiveFilters().end(); iter++)
   {
     (*iter)->SetLogLevel(level);
   }
