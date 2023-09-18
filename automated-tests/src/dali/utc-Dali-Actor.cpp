@@ -5564,6 +5564,7 @@ int UtcDaliActorRaiseLower(void)
   TestApplication application;
 
   Debug::Filter::SetGlobalLogLevel(Debug::Verbose);
+  Debug::Filter::EnableGlobalTrace();
 
   Integration::Scene stage(application.GetScene());
 
@@ -5685,6 +5686,7 @@ int UtcDaliActorRaiseLower(void)
 
   ResetTouchCallbacks();
 
+  Debug::Filter::DisableGlobalTrace();
   Debug::Filter::SetGlobalLogLevel(Debug::NoLogging);
 
   END_TEST;

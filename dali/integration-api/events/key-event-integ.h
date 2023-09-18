@@ -137,6 +137,11 @@ struct DALI_CORE_API KeyEvent : public Event
    * The subclass of device KeyEvent originated from
    */
   Device::Subclass::Type deviceSubclass;
+
+  /**
+   * Whether the key referenced by the event is a repeating key.
+   */
+  bool isRepeat;
 };
 
 } // namespace Integration

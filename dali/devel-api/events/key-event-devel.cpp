@@ -70,6 +70,11 @@ void SetState(KeyEvent keyEvent, const KeyEvent::State& state)
   GetImplementation(keyEvent).SetState(state);
 }
 
+void SetRepeat(KeyEvent keyEvent, const bool repeat)
+{
+  GetImplementation(keyEvent).SetRepeat(repeat);
+}
+
 } // namespace DevelKeyEvent
 
 } // namespace Dali

@@ -108,6 +108,15 @@ DALI_CORE_API void SetTime(KeyEvent keyEvent, unsigned long time);
  */
 DALI_CORE_API void SetState(KeyEvent keyEvent, const KeyEvent::State& state);
 
+/**
+ * @brief Set whether to repeat key event.
+ *
+ * @SINCE_2_2.44
+ * @param[in] keyEvent The instance of KeyEvent.
+ * @param[in] repeat Whether the key event is a repeating key.
+ */
+DALI_CORE_API void SetRepeat(KeyEvent keyEvent, const bool repeat);
+
 } // namespace DevelKeyEvent
 
 } // namespace Dali
