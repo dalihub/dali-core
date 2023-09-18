@@ -69,7 +69,8 @@ KeyEvent::KeyEvent(const std::string&           keyName,
   mCompose(compose),
   mDeviceName(deviceName),
   mDeviceClass(deviceClass),
-  mDeviceSubclass(deviceSubclass)
+  mDeviceSubclass(deviceSubclass),
+  mIsRepeat(false)
 {
 }
 
@@ -159,6 +160,11 @@ Dali::KeyEvent::State KeyEvent::GetState() const
   return mState;
 }
 
+bool KeyEvent::IsRepeat() const
+{
+  return mIsRepeat;
+}
+
 void KeyEvent::SetKeyName(const std::string& keyName)
 {
   mKeyName = keyName;
@@ -187,6 +193,11 @@ void KeyEvent::SetTime(unsigned long time)
 void KeyEvent::SetState(const Dali::KeyEvent::State& state)
 {
   mState = state;
+}
+
+void KeyEvent::SetRepeat(const bool repeat)
+{
+  mIsRepeat = repeat;
 }
 
 } // namespace Internal

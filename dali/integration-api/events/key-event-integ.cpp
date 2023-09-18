@@ -37,7 +37,8 @@ KeyEvent::KeyEvent()
   compose(""),
   deviceName(""),
   deviceClass(Device::Class::NONE),
-  deviceSubclass(Device::Subclass::NONE)
+  deviceSubclass(Device::Subclass::NONE),
+  isRepeat(false)
 {
 }
 
@@ -63,7 +64,8 @@ KeyEvent::KeyEvent(const std::string&           keyName,
   compose(compose),
   deviceName(deviceName),
   deviceClass(deviceClass),
-  deviceSubclass(deviceSubclass)
+  deviceSubclass(deviceSubclass),
+  isRepeat(false)
 {
 }
 

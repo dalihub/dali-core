@@ -535,3 +535,17 @@ int UtcDaliKeyEventSetState(void)
 
   END_TEST;
 }
+
+int UtcDaliKeyEventSetRepeat(void)
+{
+  TestApplication application;
+
+  Dali::KeyEvent event = DevelKeyEvent::New(TEST_STRING_1, "I", "i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE);
+
+  DALI_TEST_EQUALS(false, event.IsRepeat(), TEST_LOCATION);
+
+  DevelKeyEvent::SetRepeat(event, true);
+  DALI_TEST_EQUALS(true, event.IsRepeat(), TEST_LOCATION);
+
+  END_TEST;
+}

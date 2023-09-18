@@ -108,6 +108,11 @@ KeyEvent::State KeyEvent::GetState() const
   return GetImplementation(*this).GetState();
 }
 
+bool KeyEvent::IsRepeat() const
+{
+  return GetImplementation(*this).IsRepeat();
+}
+
 KeyEvent::KeyEvent(Internal::KeyEvent* internal)
 : BaseHandle(internal)
 {

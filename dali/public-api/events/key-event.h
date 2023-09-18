@@ -239,6 +239,14 @@ public:
    */
   State GetState() const;
 
+  /**
+   * @brief Checks to see if key event is a repeating key.
+   *
+   * @SINCE_2_2.44
+   * @return Whether the key event is a repeating key.
+   */
+  bool IsRepeat() const;
+
 public: // Not intended for application developers
   /// @cond internal
   /**

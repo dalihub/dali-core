@@ -166,6 +166,11 @@ public:
   Dali::KeyEvent::State GetState() const;
 
   /**
+   * @copydoc Dali::KeyEvent::IsRepeat()
+   */
+  bool IsRepeat() const;
+
+  /**
    * @brief Set the name given to the key pressed
    *
    * @param[in] keyName The name given to the key pressed.
@@ -207,6 +212,13 @@ public:
    */
   void SetState(const Dali::KeyEvent::State& state);
 
+  /**
+   * @brief Set whether to repeat key event.
+   *
+   * @param[in] repeat Whether the key event is a repeating key.
+   */
+  void SetRepeat(const bool repeat);
+
 private:
   /**
    * @brief Destructor.
@@ -234,6 +246,7 @@ private:
   std::string            mDeviceName;     ///< The name of device the key event originated from
   Device::Class::Type    mDeviceClass;    ///< The class of device the key event originated from
   Device::Subclass::Type mDeviceSubclass; ///< The subclass of device the key event originated from
+  bool                   mIsRepeat;       ///< Whether the key referenced by the event is a repeating key.
 };
 
 } // namespace Internal
