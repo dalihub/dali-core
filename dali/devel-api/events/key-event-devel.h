@@ -2,7 +2,7 @@
 #define DALI_KEY_EVENT_DEVEL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,14 @@ namespace Dali
 {
 namespace DevelKeyEvent
 {
+/**
+ * @brief Creates an initialized KeyEvent as default.
+ *
+ * @SINCE_2_2.45
+ * @return A handle to a newly allocated Dali resource
+ */
+DALI_CORE_API KeyEvent New();
+
 /**
  * @brief Creates an initialized KeyEvent.
  *
