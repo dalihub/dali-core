@@ -151,6 +151,8 @@ DALI_PROPERTY("keyboardFocusableChildren", BOOLEAN, true, false, false, Dali::De
 DALI_PROPERTY("userInteractionEnabled", BOOLEAN, true, false, false, Dali::DevelActor::Property::USER_INTERACTION_ENABLED)
 DALI_PROPERTY("allowOnlyOwnTouch", BOOLEAN, true, false, false, Dali::DevelActor::Property::ALLOW_ONLY_OWN_TOUCH)
 DALI_PROPERTY("useTextureUpdateArea", BOOLEAN, true, false, false, Dali::DevelActor::Property::USE_TEXTURE_UPDATE_AREA)
+DALI_PROPERTY("dispatchTouchMotion", BOOLEAN, true, false, false, Dali::DevelActor::Property::DISPATCH_TOUCH_MOTION)
+DALI_PROPERTY("dispatchHoverMotion", BOOLEAN, true, false, false, Dali::DevelActor::Property::DISPATCH_HOVER_MOTION)
 DALI_PROPERTY_TABLE_END(DEFAULT_ACTOR_PROPERTY_START_INDEX, ActorDefaultProperties)
 
 // Signals
@@ -1130,6 +1132,8 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mUserInteractionEnabled(true),
   mAllowOnlyOwnTouch(false),
   mUseTextureUpdateArea(false),
+  mDispatchTouchMotion(true),
+  mDispatchHoverMotion(true),
   mLayoutDirection(LayoutDirection::LEFT_TO_RIGHT),
   mDrawMode(DrawMode::NORMAL),
   mColorMode(Node::DEFAULT_COLOR_MODE),

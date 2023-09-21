@@ -12740,3 +12740,83 @@ int UtcDaliActorGetTouchRequired(void)
 
   END_TEST;
 }
+
+int UtcDaliActorDispatchTouchMotionPropertyP(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  DALI_TEST_EQUALS(actor.GetProperty(DevelActor::Property::DISPATCH_TOUCH_MOTION).Get<bool>(), true, TEST_LOCATION);
+  actor.SetProperty(DevelActor::Property::DISPATCH_TOUCH_MOTION, false);
+  DALI_TEST_EQUALS(actor.GetProperty(DevelActor::Property::DISPATCH_TOUCH_MOTION).Get<bool>(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetPropertyType(DevelActor::Property::DISPATCH_TOUCH_MOTION), Property::BOOLEAN, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyWritable(DevelActor::Property::DISPATCH_TOUCH_MOTION), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyAnimatable(DevelActor::Property::DISPATCH_TOUCH_MOTION), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyAConstraintInput(DevelActor::Property::DISPATCH_TOUCH_MOTION), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetPropertyName(DevelActor::Property::DISPATCH_TOUCH_MOTION), "dispatchTouchMotion", TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliActorDispatchTouchMotionPropertyN(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  // Make sure setting invalid types does not cause a crash
+  try
+  {
+    actor.SetProperty(DevelActor::Property::DISPATCH_TOUCH_MOTION, 1.0f);
+    actor.SetProperty(DevelActor::Property::DISPATCH_TOUCH_MOTION, Vector2::ONE);
+    actor.SetProperty(DevelActor::Property::DISPATCH_TOUCH_MOTION, Vector3::ONE);
+    actor.SetProperty(DevelActor::Property::DISPATCH_TOUCH_MOTION, Vector4::ONE);
+    actor.SetProperty(DevelActor::Property::DISPATCH_TOUCH_MOTION, Property::Map());
+    actor.SetProperty(DevelActor::Property::DISPATCH_TOUCH_MOTION, Property::Array());
+    tet_result(TET_PASS);
+  }
+  catch(...)
+  {
+    tet_result(TET_FAIL);
+  }
+  END_TEST;
+}
+
+int UtcDaliActorDispatchHoverMotionPropertyP(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  DALI_TEST_EQUALS(actor.GetProperty(DevelActor::Property::DISPATCH_HOVER_MOTION).Get<bool>(), true, TEST_LOCATION);
+  actor.SetProperty(DevelActor::Property::DISPATCH_HOVER_MOTION, false);
+  DALI_TEST_EQUALS(actor.GetProperty(DevelActor::Property::DISPATCH_HOVER_MOTION).Get<bool>(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetPropertyType(DevelActor::Property::DISPATCH_HOVER_MOTION), Property::BOOLEAN, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyWritable(DevelActor::Property::DISPATCH_HOVER_MOTION), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyAnimatable(DevelActor::Property::DISPATCH_HOVER_MOTION), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyAConstraintInput(DevelActor::Property::DISPATCH_HOVER_MOTION), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetPropertyName(DevelActor::Property::DISPATCH_HOVER_MOTION), "dispatchHoverMotion", TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliActorDispatchHoverMotionPropertyN(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  // Make sure setting invalid types does not cause a crash
+  try
+  {
+    actor.SetProperty(DevelActor::Property::DISPATCH_HOVER_MOTION, 1.0f);
+    actor.SetProperty(DevelActor::Property::DISPATCH_HOVER_MOTION, Vector2::ONE);
+    actor.SetProperty(DevelActor::Property::DISPATCH_HOVER_MOTION, Vector3::ONE);
+    actor.SetProperty(DevelActor::Property::DISPATCH_HOVER_MOTION, Vector4::ONE);
+    actor.SetProperty(DevelActor::Property::DISPATCH_HOVER_MOTION, Property::Map());
+    actor.SetProperty(DevelActor::Property::DISPATCH_HOVER_MOTION, Property::Array());
+    tet_result(TET_PASS);
+  }
+  catch(...)
+  {
+    tet_result(TET_FAIL);
+  }
+  END_TEST;
+}

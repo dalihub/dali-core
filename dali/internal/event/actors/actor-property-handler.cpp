@@ -650,6 +650,26 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
       break;
     }
 
+    case Dali::DevelActor::Property::DISPATCH_TOUCH_MOTION:
+    {
+      bool boolValue = false;
+      if(property.Get(boolValue))
+      {
+        actor.mDispatchTouchMotion = boolValue;
+      }
+      break;
+    }
+
+    case Dali::DevelActor::Property::DISPATCH_HOVER_MOTION:
+    {
+      bool boolValue = false;
+      if(property.Get(boolValue))
+      {
+        actor.mDispatchHoverMotion = boolValue;
+      }
+      break;
+    }
+
     default:
     {
       // this can happen in the case of a non-animatable default property so just do nothing
@@ -1702,6 +1722,18 @@ bool Actor::PropertyHandler::GetCachedPropertyValue(const Internal::Actor& actor
     case Dali::DevelActor::Property::USE_TEXTURE_UPDATE_AREA:
     {
       value = actor.mUseTextureUpdateArea;
+      break;
+    }
+
+    case Dali::DevelActor::Property::DISPATCH_TOUCH_MOTION:
+    {
+      value = actor.mDispatchTouchMotion;
+      break;
+    }
+
+    case Dali::DevelActor::Property::DISPATCH_HOVER_MOTION:
+    {
+      value = actor.mDispatchHoverMotion;
       break;
     }
 

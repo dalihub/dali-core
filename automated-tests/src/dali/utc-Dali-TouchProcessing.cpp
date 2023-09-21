@@ -2436,3 +2436,52 @@ int UtcDaliTouchEventAllowOnlyOwnTouchPropertySet(void)
 
   END_TEST;
 }
+
+int UtcDaliTouchEventDispatchTouchMotionPropertySet(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's touched signal
+  SignalData        data;
+  TouchEventFunctor functor(data);
+  actor.TouchedSignal().Connect(&application, functor);
+
+  // Emit a down signal actor, we should receive the event
+  application.ProcessEvent(GenerateSingleTouch(PointState::STARTED, Vector2(10.0f, 10.0f)));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedTouch.GetPoint(0).state, PointState::STARTED, TEST_LOCATION);
+  data.Reset();
+
+  // Emit a motion signal actor, we should receive the event
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 20.0f)));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedTouch.GetPoint(0).state, PointState::MOTION, TEST_LOCATION);
+  data.Reset();
+
+  // Now set the dispatch touch motion property
+  actor.SetProperty(DevelActor::Property::DISPATCH_TOUCH_MOTION, false);
+
+  // Emit a motion signal actor, we should not receive the event
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(30.0f, 30.0f)));
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Up event, should receive the event
+  application.ProcessEvent(GenerateSingleTouch(PointState::FINISHED, Vector2(40.0f, 40.0f)));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedTouch.GetPoint(0).state, PointState::FINISHED, TEST_LOCATION);
+  data.Reset();
+
+  data.Reset();
+
+  END_TEST;
+}
