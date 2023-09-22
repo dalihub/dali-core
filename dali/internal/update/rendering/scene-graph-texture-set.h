@@ -113,6 +113,26 @@ private:
   TextureSet();
 
 private:
+  /**
+   * @brief Change the count of texture set. It will increase count automatically if we need more textures.
+   *
+   * @param[in] count The number of textures what this texture set want to hold
+   */
+  void SetTextureCount(uint32_t count);
+
+  /**
+   * @brief Change the count of sampler set. It will increase count automatically if we need more samplers.
+   *
+   * @param[in] count The number of samplers what this texture set want to hold
+   */
+  void SetSamplerCount(uint32_t count);
+
+  /**
+   * @brief Remove empty textures and samplers at the back of container, and resize.
+   */
+  void TrimContainers();
+
+private:
   Vector<Render::Sampler*>   mSamplers;                         ///< List of samplers used by each texture. Not owned
   Vector<Render::TextureKey> mTextures;                         ///< List of Textures. Not owned
   RenderMessageDispatcher*   mRenderMessageDispatcher{nullptr}; ///< for sending messages to render thread. Not owned
