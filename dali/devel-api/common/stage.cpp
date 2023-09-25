@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,17 @@ Stage Stage::GetCurrent()
 bool Stage::IsInstalled()
 {
   return Internal::Stage::IsInstalled();
+}
+
+bool Stage::IsShuttingDown()
+{
+  return Internal::Stage::IsShuttingDown();
+}
+
+bool Stage::IsCoreThread()
+{
+  return IsInstalled() ||  ///< Check if Core is installed now,
+         IsShuttingDown(); ///< or Core is shutting down now.
 }
 
 void Stage::Add(Actor& actor)
