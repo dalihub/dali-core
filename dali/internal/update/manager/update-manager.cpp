@@ -1281,7 +1281,10 @@ void UpdateManager::KeepRendering(float durationSeconds)
 {
   for(auto&& scene : mImpl->scenes)
   {
-    scene->scene->KeepRendering(durationSeconds);
+    if(scene->scene)
+    {
+      scene->scene->KeepRendering(durationSeconds);
+    }
   }
 }
 
