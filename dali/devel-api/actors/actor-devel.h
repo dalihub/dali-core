@@ -192,7 +192,21 @@ enum Type
    * @details Name "useTextureUpdateArea", type Property::BOOLEAN
    * @note Default is false. If this set true, the value of Actor::Property::UPDATE_AREA_HINT is ignored and we assume the sizes of the actor and the texture are same.
    */
-  USE_TEXTURE_UPDATE_AREA
+  USE_TEXTURE_UPDATE_AREA,
+
+  /**
+   * @brief Whether to send touch motion events or not.
+   * @details Name "dispatchTouchMotion", type Property::BOOLEAN
+   * @note Default is true.
+   */
+  DISPATCH_TOUCH_MOTION,
+
+  /**
+   * @brief Whether to send hover motion events or not.
+   * @details Name "dispatchHoverMotion", type Property::BOOLEAN
+   * @note Default is true.
+   */
+  DISPATCH_HOVER_MOTION
 };
 
 } // namespace Property

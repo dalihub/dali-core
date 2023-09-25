@@ -37,26 +37,10 @@ TextureSetPtr TextureSet::New()
 void TextureSet::SetTexture(uint32_t index, TexturePtr texture)
 {
   uint32_t textureCount = static_cast<uint32_t>(mTextures.size());
-  if(index >= textureCount)
+
+  if(textureCount < index + 1)
   {
-    mTextures.resize(index + 1);
-
-    bool samplerExist = true;
-    if(mSamplers.size() < index + 1)
-    {
-      mSamplers.resize(index + 1);
-      samplerExist = false;
-    }
-
-    for(uint32_t i(textureCount); i <= index; ++i)
-    {
-      mTextures[i] = nullptr;
-
-      if(!samplerExist)
-      {
-        mSamplers[i] = nullptr;
-      }
-    }
+    SetTextureCount(index + 1);
   }
 
   mTextures[index] = texture;
@@ -68,6 +52,12 @@ void TextureSet::SetTexture(uint32_t index, TexturePtr texture)
   }
 
   SceneGraph::SetTextureMessage(mEventThreadServices, *mSceneObject, index, renderTexture);
+
+  if(!texture)
+  {
+    // Check wheter we need to pop back textures
+    TrimContainers();
+  }
 }
 
 Texture* TextureSet::GetTexture(uint32_t index) const
@@ -90,11 +80,7 @@ void TextureSet::SetSampler(uint32_t index, SamplerPtr sampler)
   uint32_t samplerCount = static_cast<uint32_t>(mSamplers.size());
   if(samplerCount < index + 1)
   {
-    mSamplers.resize(index + 1);
-    for(uint32_t i = samplerCount; i <= index; ++i)
-    {
-      mSamplers[i] = nullptr;
-    }
+    SetSamplerCount(index + 1);
   }
 
   mSamplers[index] = sampler;
@@ -106,6 +92,12 @@ void TextureSet::SetSampler(uint32_t index, SamplerPtr sampler)
   }
 
   SceneGraph::SetSamplerMessage(mEventThreadServices, *mSceneObject, index, renderSampler);
+
+  if(!sampler)
+  {
+    // Check wheter we need to pop back sampler
+    TrimContainers();
+  }
 }
 
 Sampler* TextureSet::GetSampler(uint32_t index) const
@@ -131,6 +123,51 @@ uint32_t TextureSet::GetTextureCount() const
 const SceneGraph::TextureSet* TextureSet::GetTextureSetSceneObject() const
 {
   return mSceneObject;
+}
+
+void TextureSet::SetTextureCount(uint32_t count)
+{
+  uint32_t textureCount = static_cast<uint32_t>(mTextures.size());
+  if(textureCount != count)
+  {
+    mTextures.resize(count, nullptr);
+  }
+}
+
+void TextureSet::SetSamplerCount(uint32_t count)
+{
+  uint32_t samplerCount = static_cast<uint32_t>(mSamplers.size());
+  if(samplerCount != count)
+  {
+    mSamplers.resize(count, nullptr);
+  }
+}
+
+void TextureSet::TrimContainers()
+{
+  uint32_t textureCount = static_cast<uint32_t>(mTextures.size());
+  uint32_t samplerCount = static_cast<uint32_t>(mSamplers.size());
+
+  while(textureCount > 0u)
+  {
+    if(mTextures[textureCount - 1u])
+    {
+      break;
+    }
+    --textureCount;
+  }
+
+  while(samplerCount > 0u)
+  {
+    if(mSamplers[samplerCount - 1u])
+    {
+      break;
+    }
+    --samplerCount;
+  }
+
+  SetTextureCount(textureCount);
+  SetSamplerCount(samplerCount);
 }
 
 TextureSet::TextureSet()

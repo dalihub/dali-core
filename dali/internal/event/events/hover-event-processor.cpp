@@ -56,6 +56,11 @@ const char* TOUCH_POINT_STATE[PointState::INTERRUPTED + 1] =
     "INTERRUPTED",
 };
 
+bool ShouldEmitHoverEvent(const Actor& actorImpl, const Dali::HoverEvent& event)
+{
+  PointState::Type state = event.GetState(0);
+  return actorImpl.GetHoverRequired() && (state!= PointState::MOTION || actorImpl.IsDispatchHoverMotion());
+}
 
 /**
  *  Recursively deliver events to the actor and its parents, until the event is consumed or the stage is reached.
@@ -73,7 +78,7 @@ Dali::Actor EmitHoverSignals(Dali::Actor actor, const Dali::HoverEvent& event)
     bool consumed(false);
 
     // Only emit the signal if the actor's hover signal has connections (or derived actor implementation requires hover).
-    if(actorImpl.GetHoverRequired())
+    if(ShouldEmitHoverEvent(actorImpl, event))
     {
       DALI_TRACE_SCOPE(gTraceFilter, "DALI_EMIT_HOVER_EVENT_SIGNAL");
       consumed = actorImpl.EmitHoverEventSignal(event);

@@ -58,6 +58,17 @@ const char* TOUCH_POINT_STATE[6] =
     "INTERRUPTED",
 };
 
+bool ShouldEmitInterceptTouchEvent(const Actor& actorImpl, const Dali::TouchEvent& event)
+{
+  PointState::Type state = event.GetState(0);
+  return actorImpl.GetInterceptTouchRequired() && (state!= PointState::MOTION || actorImpl.IsDispatchTouchMotion());
+}
+
+bool ShouldEmitTouchEvent(const Actor& actorImpl, const Dali::TouchEvent& event)
+{
+  PointState::Type state = event.GetState(0);
+  return actorImpl.GetTouchRequired() && (state!= PointState::MOTION || actorImpl.IsDispatchTouchMotion());
+}
 
 Dali::Actor EmitInterceptTouchSignals(Dali::Actor actor, const Dali::TouchEvent& touchEvent)
 {
@@ -76,7 +87,7 @@ Dali::Actor EmitInterceptTouchSignals(Dali::Actor actor, const Dali::TouchEvent&
     {
       bool   intercepted = false;
       Actor& actorImpl(GetImplementation(actor));
-      if(actorImpl.GetInterceptTouchRequired())
+      if(ShouldEmitInterceptTouchEvent(actorImpl, touchEvent))
       {
         DALI_TRACE_SCOPE(gTraceFilter, "DALI_EMIT_INTERCEPT_TOUCH_EVENT_SIGNAL");
         intercepted = actorImpl.EmitInterceptTouchEventSignal(touchEvent);
@@ -107,7 +118,7 @@ Dali::Actor EmitTouchSignals(Dali::Actor actor, const Dali::TouchEvent& touchEve
     bool consumed(false);
 
     // Only emit the signal if the actor's touch signal has connections (or derived actor implementation requires touch).
-    if(actorImpl.GetTouchRequired())
+    if(ShouldEmitTouchEvent(actorImpl, touchEvent))
     {
       DALI_TRACE_SCOPE(gTraceFilter, "DALI_EMIT_TOUCH_EVENT_SIGNAL");
       consumed = actorImpl.EmitTouchEventSignal(touchEvent);

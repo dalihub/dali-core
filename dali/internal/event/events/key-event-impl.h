@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_KEY_EVENT_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,6 +66,12 @@ public:
            const std::string&           deviceName,
            const Device::Class::Type    deviceClass,
            const Device::Subclass::Type deviceSubclass);
+
+  /**
+   * Create a new default KeyEvent.
+   * @return A smart-pointer to the newly allocated KeyEvent.
+   */
+  static KeyEventPtr New();
 
   /**
    * Create a new KeyEvent.

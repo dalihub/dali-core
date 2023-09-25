@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,8 @@ const static int ALT_MODIFIER            = 0x4;
 const static int SHIFT_AND_CTRL_MODIFIER = SHIFT_MODIFIER | CTRL_MODIFIER;
 const static int SHIFT_AND_ALT_MODIFIER  = SHIFT_MODIFIER | ALT_MODIFIER;
 const static int CTRL_AND_ALT_MODIFIER   = CTRL_MODIFIER | ALT_MODIFIER;
+
+const static int32_t KEY_INVALID_CODE = -1;
 
 const static char* TEST_STRING_1 = "alpha";
 
@@ -90,6 +92,29 @@ struct KeyEventReceivedFunctor
 };
 
 } // namespace
+
+int UtcDaliKeyEventDefaultConstructor(void)
+{
+  TestApplication application; // Reset all test adapter return codes
+
+  Dali::KeyEvent event = DevelKeyEvent::New();
+  DALI_TEST_CHECK(event);
+
+  DALI_TEST_EQUALS("", event.GetKeyName(), TEST_LOCATION);                            // check key name
+  DALI_TEST_EQUALS("", event.GetLogicalKey(), TEST_LOCATION);                         // check logical key string
+  DALI_TEST_EQUALS("", event.GetKeyString(), TEST_LOCATION);                          // check key string
+  DALI_TEST_EQUALS(KEY_INVALID_CODE, event.GetKeyCode(), TEST_LOCATION);              // check keyCode
+  DALI_TEST_EQUALS(0, event.GetKeyModifier(), TEST_LOCATION);                         // check modifier
+  DALI_TEST_EQUALS(0lu, event.GetTime(), TEST_LOCATION);                              // check time
+  DALI_TEST_EQUALS(KeyEvent::DOWN, event.GetState(), TEST_LOCATION);                  // check state
+  DALI_TEST_EQUALS("", event.GetCompose(), TEST_LOCATION);                            // check compose
+  DALI_TEST_EQUALS("", event.GetDeviceName(), TEST_LOCATION);                         // check device name
+  DALI_TEST_EQUALS(Device::Class::NONE, event.GetDeviceClass(), TEST_LOCATION);       // check device class
+  DALI_TEST_EQUALS(Device::Subclass::NONE, event.GetDeviceSubclass(), TEST_LOCATION); // check device subclass
+  DALI_TEST_EQUALS(false, event.IsRepeat(), TEST_LOCATION);                           // check repeat
+
+  END_TEST;
+}
 
 int UtcDaliKeyEventConstructor(void)
 {

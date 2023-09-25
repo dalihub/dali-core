@@ -1364,6 +1364,24 @@ public:
     return mAllowOnlyOwnTouch;
   }
 
+  /**
+   * Query whether the actor send touch motion event.
+   * @return true, it send touch motion event.
+   */
+  bool IsDispatchTouchMotion() const
+  {
+    return mDispatchTouchMotion;
+  }
+
+  /**
+   * Query whether the actor send hover motion event.
+   * @return true, it send hover motion event.
+   */
+  bool IsDispatchHoverMotion() const
+  {
+    return mDispatchHoverMotion;
+  }
+
   // Gestures
 
   /**
@@ -1986,6 +2004,8 @@ protected:
   bool                     mUserInteractionEnabled : 1;    ///< Whether the actor should be enabled user interaction.
   bool                     mAllowOnlyOwnTouch : 1;         ///< Whether the actor will only receive own touch. it only receives touches that started from itself.
   bool                     mUseTextureUpdateArea : 1;      ///< Whether the actor uses the update area of the texture instead of its own.
+  bool                     mDispatchTouchMotion : 1;       ///< Whether to send touch motion events or not.
+  bool                     mDispatchHoverMotion : 1;       ///< Whether to send hover motion events or not.
   LayoutDirection::Type    mLayoutDirection : 2;           ///< Layout direction, Left to Right or Right to Left.
   DrawMode::Type           mDrawMode : 3;                  ///< Cached: How the actor and its children should be drawn
   ColorMode                mColorMode : 3;                 ///< Cached: Determines whether mWorldColor is inherited
