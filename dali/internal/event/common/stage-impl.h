@@ -90,6 +90,11 @@ public:
   static bool IsInstalled();
 
   /**
+   * @copydoc Dali::Stage::IsShuttingDown().
+   */
+  static bool IsShuttingDown();
+
+  /**
    * @copydoc Dali::Stage::GetObjectRegistry()
    */
   ObjectRegistry& GetObjectRegistry();
