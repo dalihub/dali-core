@@ -911,3 +911,58 @@ int UtcDaliTouchEventCombinerInvalidState(void)
   }
   END_TEST;
 }
+
+int UtcDaliTouchEventCombinerHoverDownAfterTouchUp(void)
+{
+  TouchEventCombiner combiner;
+  unsigned long      time(0u);
+
+  // Motion event
+  {
+    Integration::TouchEvent touchEvent;
+    Integration::HoverEvent hoverEvent;
+    Integration::Point      point = GeneratePoint(1, PointState::MOTION, 100.0f, 100.0f);
+    point.SetDeviceClass(Device::Class::Type::MOUSE);
+
+    DALI_TEST_EQUALS(Integration::TouchEventCombiner::DISPATCH_HOVER, combiner.GetNextTouchEvent(point, time, touchEvent, hoverEvent), TEST_LOCATION);
+    DALI_TEST_EQUALS(hoverEvent.GetPointCount(), 1u, TEST_LOCATION);
+    DALI_TEST_EQUALS(hoverEvent.points[0].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION);
+    DALI_TEST_EQUALS(hoverEvent.points[0].GetState(), PointState::STARTED, TEST_LOCATION);
+    DALI_TEST_EQUALS(hoverEvent.points[0].GetScreenPosition(), point.GetScreenPosition(), TEST_LOCATION);
+  }
+
+
+  time++;
+
+  // down event
+  {
+    Integration::TouchEvent touchEvent;
+    Integration::HoverEvent hoverEvent;
+    Integration::Point      point = GeneratePoint(1, PointState::DOWN, 100.0f, 100.0f);
+    point.SetDeviceClass(Device::Class::Type::MOUSE);
+
+    DALI_TEST_EQUALS(Integration::TouchEventCombiner::DISPATCH_BOTH, combiner.GetNextTouchEvent(point, time, touchEvent, hoverEvent), TEST_LOCATION);
+    DALI_TEST_EQUALS(hoverEvent.GetPointCount(), 1u, TEST_LOCATION);
+    DALI_TEST_EQUALS(hoverEvent.points[0].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION);
+    DALI_TEST_EQUALS(hoverEvent.points[0].GetState(), PointState::FINISHED, TEST_LOCATION);
+    DALI_TEST_EQUALS(hoverEvent.points[0].GetScreenPosition(), point.GetScreenPosition(), TEST_LOCATION);
+  }
+
+  time++;
+
+  // up event
+  {
+    Integration::TouchEvent touchEvent;
+    Integration::HoverEvent hoverEvent;
+    Integration::Point      point = GeneratePoint(1, PointState::UP, 103.0f, 103.0f);
+    point.SetDeviceClass(Device::Class::Type::MOUSE);
+
+    DALI_TEST_EQUALS(Integration::TouchEventCombiner::DISPATCH_BOTH, combiner.GetNextTouchEvent(point, time, touchEvent, hoverEvent), TEST_LOCATION);
+    DALI_TEST_EQUALS(hoverEvent.GetPointCount(), 1u, TEST_LOCATION);
+    DALI_TEST_EQUALS(hoverEvent.points[0].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION);
+    DALI_TEST_EQUALS(hoverEvent.points[0].GetState(), PointState::DOWN, TEST_LOCATION);
+    DALI_TEST_EQUALS(hoverEvent.points[0].GetScreenPosition(), point.GetScreenPosition(), TEST_LOCATION);
+  }
+
+  END_TEST;
+}
