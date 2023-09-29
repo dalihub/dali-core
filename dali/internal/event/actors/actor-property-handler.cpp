@@ -98,7 +98,7 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(LAYOUT_DIRECTION)
   DALI_ENUM_TO_STRING_WITH_SCOPE(LayoutDirection, RIGHT_TO_LEFT)
 DALI_ENUM_TO_STRING_TABLE_END(LAYOUT_DIRECTION)
 
-bool GetAnchorPointConstant(const std::string& value, Vector3& anchor)
+bool GetAnchorPointParentOriginConstant(const std::string& value, Vector3& anchor)
 {
   for(uint32_t i = 0; i < ANCHOR_CONSTANT_TABLE_COUNT; ++i)
   {
@@ -112,10 +112,21 @@ bool GetAnchorPointConstant(const std::string& value, Vector3& anchor)
   return false;
 }
 
-inline bool GetParentOriginConstant(const std::string& value, Vector3& parentOrigin)
+bool GetVector3Value(const Property::Value& property, Vector3& vector3)
 {
-  // Values are the same so just use the same table as anchor-point
-  return GetAnchorPointConstant(value, parentOrigin);
+  Property::Type type = property.GetType();
+  if(type == Property::VECTOR3)
+  {
+    property.Get(vector3);
+    return true;
+  }
+  else if(type == Property::STRING)
+  {
+    std::string stringConstant;
+    property.Get(stringConstant);
+    return GetAnchorPointParentOriginConstant(stringConstant, vector3);
+  }
+  return false;
 }
 
 } // unnamed namespace
@@ -126,20 +137,10 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
   {
     case Dali::Actor::Property::PARENT_ORIGIN:
     {
-      Property::Type type = property.GetType();
-      if(type == Property::VECTOR3)
+      Vector3 parentOrigin;
+      if(GetVector3Value(property, parentOrigin))
       {
-        actor.SetParentOrigin(property.Get<Vector3>());
-      }
-      else if(type == Property::STRING)
-      {
-        std::string parentOriginString;
-        property.Get(parentOriginString);
-        Vector3 parentOrigin;
-        if(GetParentOriginConstant(parentOriginString, parentOrigin))
-        {
-          actor.SetParentOrigin(parentOrigin);
-        }
+        actor.SetParentOrigin(parentOrigin);
       }
       break;
     }
@@ -167,20 +168,10 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
 
     case Dali::Actor::Property::ANCHOR_POINT:
     {
-      Property::Type type = property.GetType();
-      if(type == Property::VECTOR3)
+      Vector3 anchorPoint;
+      if(GetVector3Value(property, anchorPoint))
       {
-        actor.SetAnchorPoint(property.Get<Vector3>());
-      }
-      else if(type == Property::STRING)
-      {
-        std::string anchorPointString;
-        property.Get(anchorPointString);
-        Vector3 anchor;
-        if(GetAnchorPointConstant(anchorPointString, anchor))
-        {
-          actor.SetAnchorPoint(anchor);
-        }
+        actor.SetAnchorPoint(anchorPoint);
       }
       break;
     }
@@ -208,14 +199,10 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
 
     case Dali::Actor::Property::SIZE:
     {
-      Property::Type type = property.GetType();
-      if(type == Property::VECTOR2)
+      Vector3 size;
+      if(property.Get(size))
       {
-        actor.SetSize(property.Get<Vector2>());
-      }
-      else if(type == Property::VECTOR3)
-      {
-        actor.SetSize(property.Get<Vector3>());
+        actor.SetSize(size);
       }
       break;
     }
@@ -240,15 +227,10 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
 
     case Dali::Actor::Property::POSITION:
     {
-      Property::Type type = property.GetType();
-      if(type == Property::VECTOR2)
+      Vector3 position;
+      if(property.Get(position))
       {
-        Vector2 position = property.Get<Vector2>();
-        actor.SetPosition(Vector3(position.x, position.y, 0.0f));
-      }
-      else if(type == Property::VECTOR3)
-      {
-        actor.SetPosition(property.Get<Vector3>());
+        actor.SetPosition(position);
       }
       break;
     }
@@ -318,15 +300,11 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
 
     case Dali::Actor::Property::COLOR:
     {
-      Property::Type type = property.GetType();
-      if(type == Property::VECTOR3)
+      Vector4 color;
+      if(property.Get(color))
       {
-        Vector3 color = property.Get<Vector3>();
-        actor.SetColor(Vector4(color.r, color.g, color.b, 1.0f));
-      }
-      else if(type == Property::VECTOR4)
-      {
-        actor.SetColor(property.Get<Vector4>());
+        color.a = (property.GetType() == Property::VECTOR4) ? color.a : 1.0f;
+        actor.SetColor(color);
       }
       break;
     }
