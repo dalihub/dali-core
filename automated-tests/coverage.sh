@@ -6,17 +6,15 @@ if [ $1 == -n ] ; then
 fi
 
 BUILD_DIR_NAME=tizen
-function MakeCovData()
-{
-    (  cd ../build/$BUILD_DIR_NAME ; make cov_data )
-}
 
-MakeCovData
-if [[ $? -ne 0 ]]
-then
-    BUILD_DIR_NAME=tizen-cmake
-    MakeCovData
+BUILDSYSTEM=make
+
+if [ -e ../build/tizen/build.ninja ] ; then
+    BUILDSYSTEM=ninja
 fi
+
+(  cd ../build/$BUILD_DIR_NAME ; $BUILDSYSTEM cov_data )
+
 
 # From lcov version 1.10 onwards, branch coverage is off by default and earlier versions do not support the rc option
 LCOV_OPTS=`if [ \`printf "\\\`lcov --version | cut -d' ' -f4\\\`\n1.10\n" | sort -V | head -n 1\` = 1.10 ] ; then echo "--rc lcov_branch_coverage=1" ; fi`
