@@ -114,21 +114,68 @@ bool GetAnchorPointParentOriginConstant(const std::string& value, Vector3& ancho
 
 bool GetVector3Value(const Property::Value& property, Vector3& vector3)
 {
-  Property::Type type = property.GetType();
-  if(type == Property::VECTOR3)
+  if(property.Get(vector3))
   {
-    property.Get(vector3);
     return true;
   }
-  else if(type == Property::STRING)
+  else
   {
     std::string stringConstant;
-    property.Get(stringConstant);
-    return GetAnchorPointParentOriginConstant(stringConstant, vector3);
+    if(property.Get(stringConstant))
+    {
+      return GetAnchorPointParentOriginConstant(stringConstant, vector3);
+    }
+    else
+    {
+      float value = 0.0f;
+      if(property.Get(value))
+      {
+        vector3.x = vector3.y = vector3.z = value;
+        return true;
+      }
+    }
   }
   return false;
 }
 
+void DetermineVector3ValueAndSet(const Property::Value& property, Actor& actor, void (Actor::*member)(const Vector3&))
+{
+  Vector3 value;
+  if(GetVector3Value(property, value))
+  {
+    (actor.*member)(value);
+  }
+}
+
+template<typename ParameterType>
+void CheckValidAndSet(const Property::Value& property, Actor& actor, void (Actor::*member)(ParameterType))
+{
+  ParameterType value;
+  if(property.Get(value))
+  {
+    (actor.*member)(value);
+  }
+}
+
+template<typename ParameterType>
+void CheckValidAndSet(const Property::Value& property, Actor& actor, void (Actor::*member)(const ParameterType&))
+{
+  ParameterType value;
+  if(property.Get(value))
+  {
+    (actor.*member)(value);
+  }
+}
+
+template<typename ParameterType, typename Function>
+void CheckValidAndSet(const Property::Value& property, Function function)
+{
+  ParameterType value;
+  if(property.Get(value))
+  {
+    function(value);
+  }
+}
 } // unnamed namespace
 
 void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property::Index index, const Property::Value& property)
@@ -137,11 +184,7 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
   {
     case Dali::Actor::Property::PARENT_ORIGIN:
     {
-      Vector3 parentOrigin;
-      if(GetVector3Value(property, parentOrigin))
-      {
-        actor.SetParentOrigin(parentOrigin);
-      }
+      DetermineVector3ValueAndSet(property, actor, &Actor::SetParentOrigin);
       break;
     }
 
@@ -168,11 +211,7 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
 
     case Dali::Actor::Property::ANCHOR_POINT:
     {
-      Vector3 anchorPoint;
-      if(GetVector3Value(property, anchorPoint))
-      {
-        actor.SetAnchorPoint(anchorPoint);
-      }
+      DetermineVector3ValueAndSet(property, actor, &Actor::SetAnchorPoint);
       break;
     }
 
@@ -199,11 +238,7 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
 
     case Dali::Actor::Property::SIZE:
     {
-      Vector3 size;
-      if(property.Get(size))
-      {
-        actor.SetSize(size);
-      }
+      DetermineVector3ValueAndSet(property, actor, &Actor::SetSize);
       break;
     }
 
@@ -227,11 +262,7 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
 
     case Dali::Actor::Property::POSITION:
     {
-      Vector3 position;
-      if(property.Get(position))
-      {
-        actor.SetPosition(position);
-      }
+      DetermineVector3ValueAndSet(property, actor, &Actor::SetPosition);
       break;
     }
 
@@ -261,16 +292,7 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
 
     case Dali::Actor::Property::SCALE:
     {
-      Property::Type type = property.GetType();
-      if(type == Property::FLOAT)
-      {
-        float scale = property.Get<float>();
-        actor.SetScale(scale, scale, scale);
-      }
-      else if(type == Property::VECTOR3)
-      {
-        actor.SetScale(property.Get<Vector3>());
-      }
+      DetermineVector3ValueAndSet(property, actor, &Actor::SetScale);
       break;
     }
 
@@ -300,12 +322,11 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
 
     case Dali::Actor::Property::COLOR:
     {
-      Vector4 color;
-      if(property.Get(color))
-      {
-        color.a = (property.GetType() == Property::VECTOR4) ? color.a : 1.0f;
-        actor.SetColor(color);
-      }
+      CheckValidAndSet<Vector4>(property,
+                                [&property, &actor](Vector4& color) {
+                                  color.a = (property.GetType() == Property::VECTOR4) ? color.a : 1.0f;
+                                  actor.SetColor(color);
+                                });
       break;
     }
 
@@ -330,11 +351,7 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
     case Dali::Actor::Property::COLOR_ALPHA:
     case Dali::Actor::Property::OPACITY:
     {
-      float value;
-      if(property.Get(value))
-      {
-        actor.SetOpacity(value);
-      }
+      CheckValidAndSet(property, actor, &Actor::SetOpacity);
       break;
     }
 
@@ -523,128 +540,83 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
 
     case Dali::Actor::Property::INHERIT_LAYOUT_DIRECTION:
     {
-      bool value = false;
-      if(property.Get(value))
-      {
-        actor.SetInheritLayoutDirection(value);
-      }
+      CheckValidAndSet(property, actor, &Actor::SetInheritLayoutDirection);
       break;
     }
 
     case Dali::Actor::Property::KEYBOARD_FOCUSABLE:
     {
-      bool value = false;
-      if(property.Get(value))
-      {
-        actor.SetKeyboardFocusable(value);
-      }
+      CheckValidAndSet(property, actor, &Actor::SetKeyboardFocusable);
       break;
     }
 
     case Dali::Actor::Property::UPDATE_AREA_HINT:
     {
-      actor.SetUpdateAreaHint(property.Get<Vector4>());
+      CheckValidAndSet(property, actor, &Actor::SetUpdateAreaHint);
       break;
     }
 
     case Dali::DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START:
     {
-      bool boolValue = false;
-      if(property.Get(boolValue))
-      {
-        actor.mCaptureAllTouchAfterStart = boolValue;
-      }
+      CheckValidAndSet<bool>(property, [&actor](bool value) { actor.mCaptureAllTouchAfterStart = value; });
       break;
     }
 
     case Dali::DevelActor::Property::TOUCH_AREA_OFFSET:
     {
-      Rect<int> rectValue;
-      if(property.Get(rectValue))
-      {
-        actor.SetTouchAreaOffset(rectValue);
-      }
+      CheckValidAndSet(property, actor, &Actor::SetTouchAreaOffset);
       break;
     }
 
     case Dali::DevelActor::Property::BLEND_EQUATION:
     {
-      int value;
-      if(property.Get(value))
-      {
-        actor.SetBlendEquation(static_cast<DevelBlendEquation::Type>(value));
-      }
+      CheckValidAndSet(property, actor, &Actor::SetBlendEquation);
       break;
     }
 
     case Dali::DevelActor::Property::TOUCH_FOCUSABLE:
     {
-      bool value = false;
-      if(property.Get(value))
-      {
-        actor.SetTouchFocusable(value);
-      }
+      CheckValidAndSet(property, actor, &Actor::SetTouchFocusable);
       break;
     }
 
     case Dali::DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN:
     {
-      bool value = false;
-      if(property.Get(value))
-      {
-        actor.SetKeyboardFocusableChildren(value);
-      }
+      CheckValidAndSet(property, actor, &Actor::SetKeyboardFocusableChildren);
       break;
     }
 
     case Dali::DevelActor::Property::USER_INTERACTION_ENABLED:
     {
-      bool value = false;
-      if(property.Get(value))
-      {
-        actor.SetUserInteractionEnabled(value);
-      }
+      CheckValidAndSet(property, actor, &Actor::SetUserInteractionEnabled);
       break;
     }
 
     case Dali::DevelActor::Property::ALLOW_ONLY_OWN_TOUCH:
     {
-      bool boolValue = false;
-      if(property.Get(boolValue))
-      {
-        actor.mAllowOnlyOwnTouch = boolValue;
-      }
+      CheckValidAndSet<bool>(property, [&actor](bool value) { actor.mAllowOnlyOwnTouch = value; });
       break;
     }
 
     case Dali::DevelActor::Property::USE_TEXTURE_UPDATE_AREA:
     {
-      bool boolValue = false;
-      if(property.Get(boolValue))
-      {
-        actor.mUseTextureUpdateArea = boolValue;
-        UseTextureUpdateAreaMessage(actor.GetEventThreadServices(), actor.GetNode(), boolValue);
-      }
+      CheckValidAndSet<bool>(property,
+                             [&actor](bool value) {
+                               actor.mUseTextureUpdateArea = value;
+                               UseTextureUpdateAreaMessage(actor.GetEventThreadServices(), actor.GetNode(), value);
+                             });
       break;
     }
 
     case Dali::DevelActor::Property::DISPATCH_TOUCH_MOTION:
     {
-      bool boolValue = false;
-      if(property.Get(boolValue))
-      {
-        actor.mDispatchTouchMotion = boolValue;
-      }
+      CheckValidAndSet<bool>(property, [&actor](bool value) { actor.mDispatchTouchMotion = value; });
       break;
     }
 
     case Dali::DevelActor::Property::DISPATCH_HOVER_MOTION:
     {
-      bool boolValue = false;
-      if(property.Get(boolValue))
-      {
-        actor.mDispatchHoverMotion = boolValue;
-      }
+      CheckValidAndSet<bool>(property, [&actor](bool value) { actor.mDispatchHoverMotion = value; });
       break;
     }
 

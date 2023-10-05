@@ -365,24 +365,6 @@ public:
   /**
    * Sets the position of the Actor.
    * The coordinates are relative to the Actor's parent.
-   * The Actor's z position will be set to 0.0f.
-   * @param [in] x The new x position
-   * @param [in] y The new y position
-   */
-  void SetPosition(float x, float y);
-
-  /**
-   * Sets the position of the Actor.
-   * The coordinates are relative to the Actor's parent.
-   * @param [in] x The new x position
-   * @param [in] y The new y position
-   * @param [in] z The new z position
-   */
-  void SetPosition(float x, float y, float z);
-
-  /**
-   * Sets the position of the Actor.
-   * The coordinates are relative to the Actor's parent.
    * @param [in] position The new position.
    */
   void SetPosition(const Vector3& position);
@@ -512,20 +494,6 @@ public:
    * @copydoc Dali::Actor::GetCurrentWorldOrientation()
    */
   const Quaternion& GetCurrentWorldOrientation() const;
-
-  /**
-   * Sets a scale factor applied to an actor.
-   * @param [in] scale The scale factor applied on all axes.
-   */
-  void SetScale(float scale);
-
-  /**
-   * Sets a scale factor applied to an actor.
-   * @param [in] scaleX The scale factor applied along the x-axis.
-   * @param [in] scaleY The scale factor applied along the y-axis.
-   * @param [in] scaleZ The scale factor applied along the z-axis.
-   */
-  void SetScale(float scaleX, float scaleY, float scaleZ);
 
   /**
    * Sets a scale factor applied to an actor.
