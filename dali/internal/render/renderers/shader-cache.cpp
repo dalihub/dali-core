@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,6 @@ Dali::Graphics::Shader& ShaderCache::GetShader(const std::vector<char>& shaderCo
   {
     if(item.shaderCode == shaderCode && item.stage == stage && item.type == type)
     {
-      ++item.refCount;
       return *item.shader.get();
     }
   }
@@ -49,29 +48,6 @@ Dali::Graphics::Shader& ShaderCache::GetShader(const std::vector<char>& shaderCo
 
   mItems.emplace_back(std::move(shader), shaderCode, stage, type);
   return *mItems.back().shader.get();
-}
-
-void ShaderCache::ResetReferenceCount()
-{
-  for(auto&& item : mItems)
-  {
-    item.refCount = 0u;
-  }
-}
-
-void ShaderCache::ClearUnusedCache()
-{
-  for(auto iter = mItems.begin(); iter != mItems.end();)
-  {
-    if(iter->refCount == 0u)
-    {
-      iter = mItems.erase(iter);
-    }
-    else
-    {
-      ++iter;
-    }
-  }
 }
 
 } // namespace Render

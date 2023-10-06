@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PROGRAM_CONTROLLER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,8 +50,7 @@ public:
      */
     ProgramPair(Program* program, size_t shaderHash)
     : mProgram(program),
-      mShaderHash(shaderHash),
-      mRefCount{1u}
+      mShaderHash(shaderHash)
     {
     }
 
@@ -81,28 +80,12 @@ public:
       return mShaderHash;
     }
 
-    [[nodiscard]] inline uint16_t GetReferenceCount() const
-    {
-      return mRefCount;
-    }
-
-    void Reference()
-    {
-      ++mRefCount;
-    }
-
-    void ClearReferenceCount()
-    {
-      mRefCount = 0u;
-    }
-
     ProgramPair(const ProgramPair&) = delete;
     ProgramPair& operator=(const ProgramPair&) = delete;
 
   private: // Data
     Program* mProgram;
     size_t   mShaderHash;
-    uint16_t mRefCount;
   };
 
   /**
@@ -124,16 +107,6 @@ public: // API
    * Resets the program matrices. Must be called at the beginning of every frame
    */
   void ResetProgramMatrices();
-
-  /**
-   * @brief Reset all program reference count as 0.
-   */
-  void ResetReferenceCount();
-
-  /**
-   * @brief Clear program who the reference count is 0.
-   */
-  void ClearUnusedCache();
 
 private: // From ProgramCache
   /**

@@ -64,8 +64,6 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_REN
 
 namespace
 {
-constexpr uint32_t CACHE_CLEAN_FRAME_COUNT = 600u; // 60fps * 10sec
-
 inline Graphics::Rect2D RecalculateScissorArea(const Graphics::Rect2D& scissorArea, int orientation, const Rect<int32_t>& viewportRect)
 {
   Graphics::Rect2D newScissorArea;
@@ -516,13 +514,6 @@ void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear
 
   // Reset pipeline cache before rendering
   mImpl->pipelineCache->PreRender();
-
-  // Let we collect reference counts during CACHE_CLEAN_FRAME_COUNT frames.
-  if(mImpl->frameCount % CACHE_CLEAN_FRAME_COUNT == 1)
-  {
-    mImpl->programController.ResetReferenceCount();
-    mImpl->shaderCache.ResetReferenceCount();
-  }
 
   mImpl->commandBufferSubmitted = false;
 }
@@ -1197,13 +1188,6 @@ void RenderManager::PostRender()
   for(auto& scene : mImpl->sceneContainer)
   {
     count += scene->GetRenderInstructions().Count(mImpl->renderBufferIndex);
-  }
-
-  // Remove unused shader and programs during CACHE_CLEAN_FRAME_COUNT frames.
-  if(mImpl->frameCount % CACHE_CLEAN_FRAME_COUNT == 0)
-  {
-    mImpl->programController.ClearUnusedCache();
-    mImpl->shaderCache.ClearUnusedCache();
   }
 
   const bool haveInstructions = count > 0u;

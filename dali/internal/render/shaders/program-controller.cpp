@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,29 +45,6 @@ void ProgramController::ResetProgramMatrices()
   }
 }
 
-void ProgramController::ResetReferenceCount()
-{
-  for(auto&& item : mProgramCache)
-  {
-    item->ClearReferenceCount();
-  }
-}
-
-void ProgramController::ClearUnusedCache()
-{
-  for(auto iter = mProgramCache.Begin(); iter != mProgramCache.End();)
-  {
-    if((*iter)->GetReferenceCount() == 0u)
-    {
-      iter = mProgramCache.Erase(iter);
-    }
-    else
-    {
-      ++iter;
-    }
-  }
-}
-
 Program* ProgramController::GetProgram(size_t shaderHash)
 {
   Program*              program = nullptr;
@@ -77,7 +54,6 @@ Program* ProgramController::GetProgram(size_t shaderHash)
     size_t hash = (*iter)->GetHash();
     if(shaderHash == hash)
     {
-      (*iter)->Reference();
       program = (*iter)->GetProgram();
       break;
     }

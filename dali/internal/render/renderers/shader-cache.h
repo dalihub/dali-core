@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SHADER_CACHE_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,8 +38,6 @@ struct ShaderCache
     Item()            = default;
     Item(const Item&) = delete;
     Item(Item&&)      = default;
-    Item& operator=(const Item&) = delete;
-    Item& operator=(Item&&) = default;
 
     Item(Graphics::UniquePtr<Dali::Graphics::Shader> shader,
          const std::vector<char>&                    shaderCode,
@@ -48,8 +46,7 @@ struct ShaderCache
     : shader(std::move(shader)),
       shaderCode(shaderCode),
       stage(stage),
-      type(type),
-      refCount{1u}
+      type(type)
     {
     }
 
@@ -59,7 +56,6 @@ struct ShaderCache
     std::vector<char>                           shaderCode;
     Graphics::PipelineStage                     stage;
     Graphics::ShaderSourceMode                  type;
-    uint16_t                                    refCount;
   };
 
   /**
@@ -71,7 +67,6 @@ struct ShaderCache
 
   /**
    * Get a shader from it's source code
-   * It will increate getted shader item reference count.
    *
    * @param[in] shaderCode The shader code
    * @param[in] stage The pipeline stage (e.g. VERTEX_SHADER or FRAGMENT_SHADER etc.)
@@ -79,16 +74,6 @@ struct ShaderCache
    * @return the graphics shader
    */
   Dali::Graphics::Shader& GetShader(const std::vector<char>& shaderCode, Graphics::PipelineStage stage, Graphics::ShaderSourceMode type);
-
-  /**
-   * @brief Reset all items reference count as 0.
-   */
-  void ResetReferenceCount();
-
-  /**
-   * @brief Clear items who the reference count is 0.
-   */
-  void ClearUnusedCache();
 
 private:
   std::vector<Item>           mItems;
