@@ -32,7 +32,13 @@ function build
         (cd src/$1; ../../scripts/tcheadgen.sh tct-$1-core.h)
         if [ $? -ne 0 ]; then echo "Aborting..."; exit 1; fi
     fi
-    (cd build ; cmake .. -DMODULE=$1 ; make -j7 )
+    BUILDSYSTEM="Unix Makefiles"
+    BUILDCMD=make
+    if [ -e ../build/tizen/build.ninja ] ; then
+        BUILDSYSTEM="Ninja"
+        BUILDCMD=ninja
+    fi
+    (cd build ; cmake .. -DMODULE=$1 -G "$BUILDSYSTEM" ; $BUILDCMD -j7 )
 }
 
 if [ -n "$1" ] ; then
