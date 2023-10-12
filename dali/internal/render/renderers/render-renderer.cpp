@@ -163,6 +163,13 @@ Renderer::~Renderer()
     mPipelineCache->ResetPipeline(mPipeline);
     mPipelineCached = false;
   }
+
+  // Stop observing
+  if(mCurrentProgram)
+  {
+    mCurrentProgram->RemoveLifecycleObserver(*this);
+    mCurrentProgram = nullptr;
+  }
 }
 
 void Renderer::operator delete(void* ptr)
@@ -398,6 +405,10 @@ Program* Renderer::PrepareProgram(const SceneGraph::RenderInstruction& instructi
   if(!shaderData)
   {
     DALI_LOG_ERROR("Failed to get shader data.\n");
+    if(mCurrentProgram)
+    {
+      mCurrentProgram->RemoveLifecycleObserver(*this);
+    }
     mCurrentProgram = nullptr;
     return nullptr;
   }
@@ -408,6 +419,10 @@ Program* Renderer::PrepareProgram(const SceneGraph::RenderInstruction& instructi
   if(!program)
   {
     DALI_LOG_ERROR("Failed to create program for shader at address %p.\n", reinterpret_cast<const void*>(&shader));
+    if(mCurrentProgram)
+    {
+      mCurrentProgram->RemoveLifecycleObserver(*this);
+    }
     mCurrentProgram = nullptr;
     return nullptr;
   }
@@ -449,7 +464,15 @@ Program* Renderer::PrepareProgram(const SceneGraph::RenderInstruction& instructi
   }
 
   // Set prefetched program to be used during rendering
-  mCurrentProgram = program;
+  if(mCurrentProgram != program)
+  {
+    if(mCurrentProgram)
+    {
+      mCurrentProgram->RemoveLifecycleObserver(*this);
+    }
+    mCurrentProgram = program;
+    mCurrentProgram->AddLifecycleObserver(*this);
+  }
   return mCurrentProgram;
 }
 
@@ -862,16 +885,16 @@ void Renderer::FillUniformBuffer(Program&                                       
         continue;
       }
 
-      uniform.uniformOffset      = uniformInfo.offset;
-      uniform.uniformLocation    = int16_t(uniformInfo.location);
-      uniform.uniformBlockIndex  = uniformInfo.bufferIndex;
-      uniform.initialized        = true;
+      uniform.uniformOffset     = uniformInfo.offset;
+      uniform.uniformLocation   = int16_t(uniformInfo.location);
+      uniform.uniformBlockIndex = uniformInfo.bufferIndex;
+      uniform.initialized       = true;
 
-      auto       dst      = ubo->GetOffset() + uniformInfo.offset;
-      const auto typeSize = iter.propertyValue->GetValueSize();
+      auto       dst             = ubo->GetOffset() + uniformInfo.offset;
+      const auto typeSize        = iter.propertyValue->GetValueSize();
       uniform.arrayElementStride = uniformInfo.elementCount > 0 ? (uniformInfo.elementStride ? uniformInfo.elementStride : typeSize) : typeSize;
 
-      const auto dest     = dst + uniform.arrayElementStride * arrayIndex;
+      const auto dest = dst + uniform.arrayElementStride * arrayIndex;
 
       ubo->Write(iter.propertyValue->GetValueAddress(updateBufferIndex),
                  typeSize,
@@ -969,6 +992,28 @@ void Renderer::DetachFromNodeDataProvider(const SceneGraph::NodeDataProvider& no
 
     iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [&node](RenderItemLookup& element) { return element.node == &node; });
   }
+}
+
+void Renderer::ProgramDestroyed(const Program* program)
+{
+  DALI_ASSERT_ALWAYS(mCurrentProgram == program && "Something wrong happend when Render::Renderer observed by program!");
+  mCurrentProgram = nullptr;
+
+  // The cached pipeline might be invalided after program destroyed.
+  // Remove current cached pipeline information.
+  // Note that reset flag is enought since mPipeline pointer will be invalidate now.
+  mPipelineCached = false;
+
+  // Destroy whole mNodeIndexMap and mUniformIndexMaps container.
+  // It will be re-created at next render time.
+  // Note : Destroy the program will be happened at RenderManager::PostRender().
+  //        We don't worry about the mNodeIndexMap and mUniformIndexMaps become invalidated after this call.
+  mNodeIndexMap.clear();
+  mUniformIndexMaps.clear();
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+  mNodeIndexMap.shrink_to_fit();
+  mUniformIndexMaps.shrink_to_fit();
+#endif
 }
 
 Vector4 Renderer::GetTextureUpdateArea() const noexcept

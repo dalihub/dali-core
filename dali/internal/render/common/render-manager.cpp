@@ -63,8 +63,15 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_REN
 
 namespace
 {
-// TODO : Cache clean logic have some problem now. Just block it until bug resolved
-// constexpr uint32_t CACHE_CLEAN_FRAME_COUNT = 600u; // 60fps * 10sec
+constexpr uint32_t PROGRAM_CACHE_CLEAN_FRAME_COUNT = 300u; // 60fps * 5sec
+
+constexpr uint32_t INITIAL_PROGRAM_CACHE_CLEAN_THRESHOLD = 64u; // Let we trigger program cache clean if the number of shader is bigger than this value
+constexpr uint32_t MAXIMUM_PROGRAM_CACHE_CLEAN_THRESHOLD = 1024u;
+
+constexpr uint32_t PROGRAM_CACHE_FORCE_CLEAN_FRAME_COUNT = PROGRAM_CACHE_CLEAN_FRAME_COUNT + MAXIMUM_PROGRAM_CACHE_CLEAN_THRESHOLD;
+
+static_assert(PROGRAM_CACHE_CLEAN_FRAME_COUNT <= PROGRAM_CACHE_FORCE_CLEAN_FRAME_COUNT);
+static_assert(MAXIMUM_PROGRAM_CACHE_CLEAN_THRESHOLD <= PROGRAM_CACHE_FORCE_CLEAN_FRAME_COUNT);
 
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
 constexpr uint32_t SHRINK_TO_FIT_FRAME_COUNT = (1u << 8); ///< 256 frames. Make this value as power of 2.
@@ -177,7 +184,8 @@ struct RenderManager::Impl
 
   ~Impl()
   {
-    rendererContainer.Clear(); // clear now before the pipeline cache is deleted
+    rendererContainer.Clear(); // clear now before the program contoller and the pipeline cache are deleted
+    pipelineCache.reset();     // clear now before the program contoller is deleted
   }
 
   void AddRenderTracker(Render::RenderTracker* renderTracker)
@@ -196,6 +204,60 @@ struct RenderManager::Impl
     for(auto&& iter : mRenderTrackers)
     {
       iter->PollSyncObject();
+    }
+  }
+
+  /**
+   * @brief Prepare to check used count of shader and program cache.
+   * It will be used when the size of shader and program cache is too big, so we need to collect garbages.
+   * Currently, we collect and remove programs only if the number of program/shader is bigger than threshold.
+   *
+   * @note Should be called at PreRender
+   */
+  void RequestProgramCacheCleanIfNeed()
+  {
+    if(programCacheCleanRequestedFrame == 0u)
+    {
+      if(DALI_UNLIKELY(programController.GetCachedProgramCount() > programCacheCleanRequiredThreshold))
+      {
+        // Mark current frame count
+        programCacheCleanRequestedFrame = frameCount;
+
+        DALI_LOG_RELEASE_INFO("Trigger ProgramCache GC. program : [%u]\n", programController.GetCachedProgramCount());
+
+        // Prepare to collect program used flag.
+        programController.ResetUsedFlag();
+      }
+    }
+  }
+
+  /**
+   * @brief Cleanup unused program and shader cache if need.
+   *
+   * @note Should be called at PostRender
+   */
+  void ClearUnusedProgramCacheIfNeed()
+  {
+    // Remove unused shader and programs during we render PROGRAM_CACHE_CLEAN_FRAME_COUNT frames.
+    if(programCacheCleanRequestedFrame != 0u && programCacheCleanRequestedFrame + PROGRAM_CACHE_CLEAN_FRAME_COUNT - 1u <= frameCount)
+    {
+      // Clean cache incrementally, or force clean if we spend too much frames to collect them.
+      if(!programController.ClearUnusedCacheIncrementally(programCacheCleanRequestedFrame + PROGRAM_CACHE_FORCE_CLEAN_FRAME_COUNT - 1u <= frameCount))
+      {
+        // Reset current frame count.
+        programCacheCleanRequestedFrame = 0u;
+
+        DALI_LOG_RELEASE_INFO("ProgramCache GC finished. program : [%u]\n", programController.GetCachedProgramCount());
+
+        // Double up threshold
+        programCacheCleanRequiredThreshold <<= 1;
+        programCacheCleanRequiredThreshold = std::max(programCacheCleanRequiredThreshold, programController.GetCachedProgramCount());
+
+        if(programCacheCleanRequiredThreshold > MAXIMUM_PROGRAM_CACHE_CLEAN_THRESHOLD)
+        {
+          programCacheCleanRequiredThreshold = MAXIMUM_PROGRAM_CACHE_CLEAN_THRESHOLD;
+        }
+      }
     }
   }
 
@@ -233,6 +295,12 @@ struct RenderManager::Impl
 
   uint32_t    frameCount{0u};                                                    ///< The current frame count
   BufferIndex renderBufferIndex{SceneGraphBuffers::INITIAL_UPDATE_BUFFER_INDEX}; ///< The index of the buffer to read from;
+
+  uint32_t programCacheCleanRequiredThreshold{INITIAL_PROGRAM_CACHE_CLEAN_THRESHOLD}; ///< The threshold to request program cache clean up operation.
+                                                                                      ///< It will be automatically increased after we request cache clean.
+
+  uint32_t programCacheCleanRequestedFrame{0u}; ///< 0 mean, we didn't request program cache clean. otherwise, we request cache clean.
+                                                ///< otherwise, we request program cache clean at that frame, and now we are checking reference.
 
   bool lastFrameWasRendered{false}; ///< Keeps track of the last frame being rendered due to having render instructions
   bool commandBufferSubmitted{false};
@@ -551,14 +619,8 @@ void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear
   // Reset pipeline cache before rendering
   mImpl->pipelineCache->PreRender();
 
-  // Let we collect reference counts during CACHE_CLEAN_FRAME_COUNT frames.
-  // TODO : Cache clean logic have some problem now. Just block it until bug resolved
-  /*
-  if(mImpl->frameCount % CACHE_CLEAN_FRAME_COUNT == 1)
-  {
-    mImpl->programController.ResetReferenceCount();
-  }
-  */
+  // Check we need to clean up program cache
+  mImpl->RequestProgramCacheCleanIfNeed();
 
   mImpl->commandBufferSubmitted = false;
 }
@@ -1146,8 +1208,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
   if(targetsToPresent.size() > 0u)
   {
-    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_FINISHED", [&](std::ostringstream& oss)
-                                            { oss << "[" << targetsToPresent.size() << "]"; });
+    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_FINISHED", [&](std::ostringstream& oss) { oss << "[" << targetsToPresent.size() << "]"; });
   }
 
   // Flush UBOs
@@ -1209,14 +1270,7 @@ void RenderManager::PostRender()
     count += scene->GetRenderInstructions().Count(mImpl->renderBufferIndex);
   }
 
-  // Remove unused shader and programs during CACHE_CLEAN_FRAME_COUNT frames.
-  // TODO : Cache clean logic have some problem now. Just block it until bug resolved
-  /*
-  if(mImpl->frameCount % CACHE_CLEAN_FRAME_COUNT == 0)
-  {
-    mImpl->programController.ClearUnusedCache();
-  }
-  */
+  mImpl->ClearUnusedProgramCacheIfNeed();
 
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
   // Shrink relevant containers if required.

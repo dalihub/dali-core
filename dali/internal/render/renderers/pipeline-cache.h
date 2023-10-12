@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_PIPELINE_CACHE_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,13 @@
 #include <dali/graphics-api/graphics-controller.h>
 #include <dali/graphics-api/graphics-pipeline.h>
 #include <dali/graphics-api/graphics-types.h>
-#include <dali/internal/common/blending-options.h>
 #include <dali/public-api/common/list-wrapper.h>
+
+#include <dali/internal/common/blending-options.h>
+#include <dali/internal/render/shaders/program.h> ///< For Program::LifecycleObserver
 
 namespace Dali::Internal
 {
-class Program;
 namespace Render
 {
 class Renderer;
@@ -76,7 +77,7 @@ struct PipelineCacheL1
 };
 
 /**
- * Cache Level 0 : Stores hash, geometry, program amd vertex input state
+ * Cache Level 0 : Stores geometry, program amd vertex input state
  */
 struct PipelineCacheL0 // L0 cache
 {
@@ -130,7 +131,7 @@ struct PipelineResult
 /**
  * Pipeline cache
  */
-class PipelineCache
+class PipelineCache : public Program::LifecycleObserver
 {
 public:
   /**
@@ -138,6 +139,11 @@ public:
    * @param[in] controller Graphics controller
    */
   explicit PipelineCache(Graphics::Controller& controller);
+
+  /**
+   * Destructor
+   */
+  ~PipelineCache();
 
   /**
    * Retrieves next cache level
@@ -172,6 +178,12 @@ public:
    * @param pipelineCache The pipeline cache to decrease the reference count
    */
   void ResetPipeline(PipelineCachePtr pipelineCache);
+
+public: // From Program::LifecycleObserver
+  /**
+   * @copydoc Dali::Internal::Program::LifecycleObserver::ProgramDestroyed()
+   */
+  void ProgramDestroyed(const Program* program);
 
 private:
   /**

@@ -88,7 +88,7 @@ namespace Render
  * These objects are used during RenderManager::Render(), so properties modified during
  * the Update must either be double-buffered, or set via a message added to the RenderQueue.
  */
-class Renderer
+class Renderer : public Program::LifecycleObserver
 {
 public:
   /**
@@ -531,6 +531,12 @@ public:
    */
   Vector4 GetTextureUpdateArea() const noexcept;
 
+public: // From Program::LifecycleObserver
+  /**
+   * @copydoc Dali::Internal::Program::LifecycleObserver::ProgramDestroyed()
+   */
+  void ProgramDestroyed(const Program* program);
+
 private:
   struct UniformIndexMap;
 
@@ -636,7 +642,7 @@ private:
     const PropertyInputImpl* propertyValue{nullptr}; ///< The property value
     Hash                     uniformNameHash{0u};
     Hash                     uniformNameHashNoArray{0u};
-    int32_t                  arrayIndex{-1}; ///< The array index
+    int32_t                  arrayIndex{-1};         ///< The array index
     uint32_t                 arrayElementStride{0u}; ///< The stride for element of an array (0 - tightly packed)
 
     int16_t  uniformLocation{0u};

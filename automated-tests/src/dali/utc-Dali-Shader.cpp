@@ -732,6 +732,169 @@ int UtcDaliShaderWrongData(void)
 
   END_TEST;
 }
+namespace
+{
+constexpr uint32_t PROGRAM_CACHE_CLEAN_FRAME_COUNT = 300u; // 60fps * 5sec
+
+constexpr uint32_t INITIAL_PROGRAM_CACHE_CLEAN_THRESHOLD = 64u; // Let we trigger program cache clean if the number of shader is bigger than this value
+constexpr uint32_t MAXIMUM_PROGRAM_CACHE_CLEAN_THRESHOLD = 1024u;
+
+constexpr uint32_t PROGRAM_CACHE_FORCE_CLEAN_FRAME_COUNT = PROGRAM_CACHE_CLEAN_FRAME_COUNT + MAXIMUM_PROGRAM_CACHE_CLEAN_THRESHOLD;
+
+static_assert(PROGRAM_CACHE_CLEAN_FRAME_COUNT <= PROGRAM_CACHE_FORCE_CLEAN_FRAME_COUNT);
+static_assert(MAXIMUM_PROGRAM_CACHE_CLEAN_THRESHOLD <= PROGRAM_CACHE_FORCE_CLEAN_FRAME_COUNT);
+} // namespace
+
+int UtcDaliShaderStressTest01(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test that use a lots of independence shaders, for line coverage of program cache removal");
+
+  const int testFrameCount = INITIAL_PROGRAM_CACHE_CLEAN_THRESHOLD /*Initial threshold*/ + 1u /*..And make over the threshold*/ + PROGRAM_CACHE_CLEAN_FRAME_COUNT /*Program GC frame count*/;
+
+  try
+  {
+    // We should keep some renderer that some Program should be 'Garbage Collected' when they are the latest program for some renderer.
+    const int referenceKeepedRendererCount = INITIAL_PROGRAM_CACHE_CLEAN_THRESHOLD;
+
+    std::vector<Renderer> rendererList; ///< To keep reference of Renderer
+    rendererList.reserve(referenceKeepedRendererCount);
+
+    for(int frameCount = 0; frameCount < testFrameCount; ++frameCount)
+    {
+      // Generate new shader code
+      std::ostringstream oss;
+      oss << VertexSource << "\n"
+          << frameCount << "\n";
+
+      Shader   shader   = Shader::New(oss.str(), FragmentSource);
+      Geometry geometry = CreateQuadGeometry();
+      Renderer renderer = Renderer::New(geometry, shader);
+
+      if(frameCount < referenceKeepedRendererCount)
+      {
+        rendererList.push_back(renderer);
+      }
+
+      Actor actor = Actor::New();
+      actor.AddRenderer(renderer);
+      actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+      application.GetScene().Add(actor);
+
+      tet_printf("start %d ~ ", frameCount);
+      application.SendNotification();
+      application.Render(0);
+      tet_printf(" ~ end %d\n", frameCount);
+
+      actor.Unparent();
+    }
+
+    tet_printf("Generate shader finished. Let's wait incremental GC");
+
+    for(uint32_t frameCount = 0u; frameCount < PROGRAM_CACHE_FORCE_CLEAN_FRAME_COUNT; ++frameCount)
+    {
+      tet_printf("start %u ~ ", frameCount);
+      application.SendNotification();
+      application.Render(0);
+      tet_printf(" ~ end %u\n", frameCount);
+    }
+    DALI_TEST_CHECK(true);
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(false);
+  }
+  END_TEST;
+}
+
+int UtcDaliShaderStressTest02(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test that use a lots of independence shaders, for line coverage of program cache removal 02");
+  tet_infoline("For this UTC, we will test a renderer that has 2 programs A and B. Use A first, and use B, and use A again. But A become GC, B is not GC.");
+
+  const int testFrameCount = INITIAL_PROGRAM_CACHE_CLEAN_THRESHOLD /*Initial threshold*/ + 1u /*..And make over the threshold*/ + PROGRAM_CACHE_CLEAN_FRAME_COUNT /*Program GC frame count*/;
+
+  try
+  {
+    // Keep first frame reference for test.
+    Renderer firstFrameRenderer;
+    for(int frameCount = 0; frameCount < testFrameCount; ++frameCount)
+    {
+      // Generate new shader code
+      std::ostringstream oss;
+      oss << VertexSource << "\n"
+          << frameCount << "\n";
+
+      Shader   shader   = Shader::New(oss.str(), FragmentSource);
+      Geometry geometry = CreateQuadGeometry();
+      Renderer renderer = Renderer::New(geometry, shader);
+
+      if(frameCount == 0u)
+      {
+        firstFrameRenderer = renderer;
+      }
+
+      Actor actor = Actor::New();
+      actor.AddRenderer(renderer);
+      actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+      application.GetScene().Add(actor);
+
+      tet_printf("start %d ~ ", frameCount);
+      application.SendNotification();
+      application.Render(0);
+      tet_printf(" ~ end %d\n", frameCount);
+
+      if(frameCount == 0u)
+      {
+        // Generate new shader for future code
+        std::ostringstream oss2;
+        oss2 << VertexSource << "\n"
+             << (frameCount + INITIAL_PROGRAM_CACHE_CLEAN_THRESHOLD + 1) << "\n";
+
+        // Create new Program that will not be GC.
+        Shader futureShader = Shader::New(oss2.str(), FragmentSource);
+        renderer.SetShader(futureShader);
+
+        // And render 1 frame.
+        tet_printf("start %d ~ ", frameCount);
+        application.SendNotification();
+        application.Render(0);
+        tet_printf(" ~ end %d\n", frameCount);
+
+        // Change back the Program that will be GC.
+        renderer.SetShader(shader);
+
+        // And render 1 frame again.
+        tet_printf("start %d ~ ", frameCount);
+        application.SendNotification();
+        application.Render(0);
+        tet_printf(" ~ end %d\n", frameCount);
+      }
+
+      actor.Unparent();
+    }
+
+    tet_printf("Generate shader finished. Let's wait incremental GC");
+
+    for(uint32_t frameCount = 0u; frameCount < PROGRAM_CACHE_FORCE_CLEAN_FRAME_COUNT; ++frameCount)
+    {
+      tet_printf("start %u ~ ", frameCount);
+      application.SendNotification();
+      application.Render(0);
+      tet_printf(" ~ end %u\n", frameCount);
+    }
+
+    DALI_TEST_CHECK(true);
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(false);
+  }
+  END_TEST;
+}
 
 int UtcDaliShaderDestructWorkerThreadN(void)
 {
