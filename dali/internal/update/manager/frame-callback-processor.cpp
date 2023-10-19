@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/update/frame-callback-interface.h>
 #include <dali/devel-api/update/update-proxy.h>
+#include <dali/integration-api/debug.h>
 #include <dali/integration-api/trace.h>
 
 namespace
@@ -41,6 +42,7 @@ FrameCallbackProcessor::FrameCallbackProcessor(UpdateManager& updateManager, Tra
 : mFrameCallbacks(),
   mUpdateManager(updateManager),
   mTransformManager(transformManager),
+  mTravelerMap{},
   mNodeHierarchyChanged(true)
 {
 }
@@ -51,7 +53,9 @@ void FrameCallbackProcessor::AddFrameCallback(OwnerPointer<FrameCallback>& frame
 {
   Node& node = const_cast<Node&>(*rootNode); // Was sent as const from event thread, we need to be able to use non-const version here.
 
-  frameCallback->ConnectToSceneGraph(mUpdateManager, mTransformManager, node);
+  SceneGraphTravelerPtr traveler = GetSceneGraphTraveler(&node);
+
+  frameCallback->ConnectToSceneGraph(mUpdateManager, mTransformManager, node, traveler);
 
   mFrameCallbacks.emplace_back(frameCallback);
 }
@@ -77,6 +81,25 @@ bool FrameCallbackProcessor::Update(BufferIndex bufferIndex, float elapsedSecond
 {
   bool keepRendering = false;
 
+  if(mNodeHierarchyChanged)
+  {
+    DALI_LOG_DEBUG_INFO("Node hierarchy changed. Update traveler map\n");
+    // Clear node traveler
+    for(auto iter = mTravelerMap.begin(); iter != mTravelerMap.end();)
+    {
+      // We don't need to erase invalidated traveler always. Just erase now.
+      // Note : ReferenceCount == 1 mean, no frame callbacks use this traveler now. We can erase it.
+      if(iter->second->IsInvalidated() || iter->second->ReferenceCount() == 1u)
+      {
+        iter = mTravelerMap.erase(iter);
+      }
+      else
+      {
+        (iter++)->second->NodeHierarchyChanged();
+      }
+    }
+  }
+
   if(!mFrameCallbacks.empty())
   {
     DALI_TRACE_SCOPE(gTraceFilter, "DALI_FRAME_CALLBACK_UPDATE");
@@ -94,6 +117,27 @@ bool FrameCallbackProcessor::Update(BufferIndex bufferIndex, float elapsedSecond
   mNodeHierarchyChanged = false;
 
   return keepRendering;
+}
+
+SceneGraphTravelerPtr FrameCallbackProcessor::GetSceneGraphTraveler(Node* rootNode)
+{
+  auto iter = mTravelerMap.find(rootNode);
+
+  if(iter != mTravelerMap.end())
+  {
+    // Check wheter traveler is invalidated or not
+    if(!iter->second->IsInvalidated())
+    {
+      return iter->second;
+    }
+    else
+    {
+      mTravelerMap.erase(iter);
+    }
+  }
+
+  // Create new traveler and keep it.
+  return (mTravelerMap.insert({rootNode, new SceneGraphTraveler(*rootNode)})).first->second;
 }
 
 } // namespace SceneGraph
