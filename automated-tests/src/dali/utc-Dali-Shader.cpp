@@ -530,6 +530,39 @@ int UtcDaliShaderPropertyValueConstructorMap(void)
   END_TEST;
 }
 
+int UtcDaliShaderPropertyValueConstructorMap2(void)
+{
+  TestApplication application;
+
+  tet_infoline("UtcDaliShaderPropertyValueConstructorMap2");
+
+  std::string   hintSet = "MODIFIES_GEOMETRY";
+  Property::Map map;
+  map["vertex"]     = VertexSource;
+  map["fragment"]   = FragmentSource;
+  map["renderPassTag"] = 0;
+  map["hints"]      = Shader::Hint::Value::MODIFIES_GEOMETRY;
+
+  Shader shader = Shader::New(map);
+
+  Property::Value value = shader.GetProperty(Shader::Property::PROGRAM);
+  DALI_TEST_CHECK(value.GetType() == Property::MAP);
+
+  const Property::Map* outMap = value.GetMap();
+  std::string          v      = (*outMap)["vertex"].Get<std::string>();
+  std::string          f      = (*outMap)["fragment"].Get<std::string>();
+  std::string          h      = (*outMap)["hints"].Get<std::string>();
+  int32_t              r      = (*outMap)["renderPassTag"].Get<int32_t>();
+
+  DALI_TEST_CHECK(v == map["vertex"].Get<std::string>());
+  DALI_TEST_CHECK(f == map["fragment"].Get<std::string>());
+  // Note : shader.GetProperty return string even we input hints as enum.
+  DALI_TEST_CHECK(h == hintSet);
+  DALI_TEST_CHECK(r == map["renderPassTag"].Get<int32_t>());
+
+  END_TEST;
+}
+
 int UtcDaliShaderPropertyValueConstructorArray(void)
 {
   TestApplication application;
