@@ -387,45 +387,6 @@ int UtcDaliStageIsInstalledN(void)
   END_TEST;
 }
 
-int UtcDaliStageIsShuttingDown(void)
-{
-  DALI_TEST_CHECK(!Stage::IsShuttingDown());
-
-  {
-    TestApplication application;
-
-    DALI_TEST_CHECK(!Stage::IsShuttingDown());
-
-    Stage::GetCurrent();
-
-    DALI_TEST_CHECK(!Stage::IsShuttingDown());
-  }
-
-  // Core destroyed
-  DALI_TEST_CHECK(Stage::IsShuttingDown());
-  END_TEST;
-}
-
-int UtcDaliStageIsCoreInstalled(void)
-{
-  DALI_TEST_CHECK(!Stage::IsCoreInstalled());
-
-  {
-    TestApplication application;
-
-    DALI_TEST_CHECK(Stage::IsCoreInstalled());
-
-    Stage::GetCurrent();
-
-    DALI_TEST_CHECK(Stage::IsCoreInstalled());
-  }
-
-  // Core destroyed
-  DALI_TEST_CHECK(Stage::IsCoreInstalled());
-  END_TEST;
-}
-
-
 int UtcDaliStageCopyConstructorP(void)
 {
   TestApplication application;

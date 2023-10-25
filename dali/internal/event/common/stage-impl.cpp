@@ -112,11 +112,6 @@ bool Stage::IsInstalled()
   return ThreadLocalStorage::Created();
 }
 
-bool Stage::IsShuttingDown()
-{
-  return ThreadLocalStorage::IsShuttingDown();
-}
-
 ObjectRegistry& Stage::GetObjectRegistry()
 {
   return ThreadLocalStorage::Get().GetObjectRegistry();
