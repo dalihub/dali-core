@@ -188,16 +188,6 @@ TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent(cons
             iter = mHoveredPoints.erase(iter);
           }
         }
-
-        if(deviceType == Device::Class::Type::MOUSE)
-        {
-          hoverEvent.time = time;
-          Point hoverPoint(point);
-          hoverPoint.SetState(PointState::STARTED); // The first hover event received
-          mHoveredPoints.push_back(PointInfo(hoverPoint, time));
-          hoverEvent.AddPoint(hoverPoint);
-          dispatchEvent = TouchEventCombiner::DISPATCH_BOTH;
-        }
       }
       break;
     }
