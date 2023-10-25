@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,139 @@ int UtcDaliCircularQueueNew(void)
   DALI_TEST_EQUALS(cQ.Count(), 0, TEST_LOCATION);
   DALI_TEST_EQUALS(cQ.IsEmpty(), true, TEST_LOCATION);
   DALI_TEST_EQUALS(cQ.IsFull(), false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliCircularQueueResize(void)
+{
+  CircularQueue<int> cQ = CircularQueue<int>(0);
+
+  DALI_TEST_EQUALS(cQ.Count(), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.IsEmpty(), true, TEST_LOCATION);
+  //DALI_TEST_EQUALS(cQ.IsFull(), false, TEST_LOCATION); ///< Not defined
+
+  cQ.Resize(20);
+
+  DALI_TEST_EQUALS(cQ.Count(), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.IsEmpty(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.IsFull(), false, TEST_LOCATION);
+
+  cQ.PushBack(1);
+  cQ.PushBack(2);
+
+  DALI_TEST_EQUALS(cQ.Count(), 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.IsEmpty(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.IsFull(), false, TEST_LOCATION);
+
+  cQ.Resize(2);
+
+  DALI_TEST_EQUALS(cQ.Count(), 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.IsEmpty(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.IsFull(), true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliCircularQueueResize2(void)
+{
+  CircularQueue<int> cQ = CircularQueue<int>(20);
+
+  DALI_TEST_EQUALS(cQ.Count(), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.IsEmpty(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.IsFull(), false, TEST_LOCATION);
+
+  cQ.PushBack(1);
+  cQ.PushBack(2);
+  cQ.PushBack(3);
+  cQ.PushBack(4);
+  cQ.PushBack(5);
+
+  DALI_TEST_EQUALS(cQ.PopFront(), 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.PopFront(), 2, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(cQ.Count(), 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.IsEmpty(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.IsFull(), false, TEST_LOCATION);
+
+  cQ.Resize(2);
+
+  DALI_TEST_EQUALS(cQ.Count(), 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.IsEmpty(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.IsFull(), true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(cQ[0], 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ[1], 4, TEST_LOCATION);
+
+  cQ.Resize(10);
+
+  DALI_TEST_EQUALS(cQ.Count(), 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.IsEmpty(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.IsFull(), false, TEST_LOCATION);
+
+  cQ.PushBack(6);
+
+  DALI_TEST_EQUALS(cQ.Count(), 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.IsEmpty(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.IsFull(), false, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(cQ.PopFront(), 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.PopFront(), 4, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.PopFront(), 6, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(cQ.Count(), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.IsEmpty(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.IsFull(), false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliCircularQueueClear(void)
+{
+  CircularQueue<int> cQ = CircularQueue<int>(3);
+
+  DALI_TEST_EQUALS(cQ.Count(), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.IsEmpty(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.IsFull(), false, TEST_LOCATION);
+
+  cQ.PushBack(1);
+  cQ.PushBack(2);
+
+  DALI_TEST_EQUALS(cQ.Count(), 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.IsEmpty(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.IsFull(), false, TEST_LOCATION);
+
+  cQ.Clear();
+
+  DALI_TEST_EQUALS(cQ.Count(), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.IsEmpty(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.IsFull(), false, TEST_LOCATION);
+
+  cQ.PushBack(1);
+  cQ.PushBack(2);
+
+  DALI_TEST_EQUALS(cQ.Count(), 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.IsEmpty(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.IsFull(), false, TEST_LOCATION);
+
+  cQ.Clear();
+
+  DALI_TEST_EQUALS(cQ.Count(), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.IsEmpty(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.IsFull(), false, TEST_LOCATION);
+
+  cQ.PushBack(1);
+  cQ.PushBack(2);
+
+  DALI_TEST_EQUALS(cQ.Count(), 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.IsEmpty(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.IsFull(), false, TEST_LOCATION);
+
+  cQ.PushBack(3);
+
+  DALI_TEST_EQUALS(cQ.Count(), 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.IsEmpty(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(cQ.IsFull(), true, TEST_LOCATION);
 
   END_TEST;
 }
