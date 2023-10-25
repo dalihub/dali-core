@@ -471,7 +471,7 @@ int UtcDaliTextureSetRemoveTextureAndGetTextureCount(void)
   // Set empty texture so we can remove it.
   textureSet.SetTexture(1u, Texture());
 
-  DALI_TEST_EQUALS(textureSet.GetTextureCount(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureSet.GetTextureCount(), 1u, TEST_LOCATION);
   DALI_TEST_EQUALS(textureSet.GetTexture(0u), image0, TEST_LOCATION);
 
   application.SendNotification();
@@ -505,7 +505,7 @@ int UtcDaliTextureSetRemoveTextureAndGetTextureCount(void)
   // Set empty texture end of textureset.
   textureSet.SetTexture(2u, Texture());
 
-  DALI_TEST_EQUALS(textureSet.GetTextureCount(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureSet.GetTextureCount(), 1u, TEST_LOCATION);
   DALI_TEST_EQUALS(textureSet.GetTexture(0u), image0, TEST_LOCATION);
 
   application.SendNotification();

@@ -52,6 +52,12 @@ void TextureSet::SetTexture(uint32_t index, TexturePtr texture)
   }
 
   SceneGraph::SetTextureMessage(mEventThreadServices, *mSceneObject, index, renderTexture);
+
+  if(!texture)
+  {
+    // Check wheter we need to pop back textures
+    TrimContainers();
+  }
 }
 
 Texture* TextureSet::GetTexture(uint32_t index) const
@@ -86,6 +92,12 @@ void TextureSet::SetSampler(uint32_t index, SamplerPtr sampler)
   }
 
   SceneGraph::SetSamplerMessage(mEventThreadServices, *mSceneObject, index, renderSampler);
+
+  if(!sampler)
+  {
+    // Check wheter we need to pop back sampler
+    TrimContainers();
+  }
 }
 
 Sampler* TextureSet::GetSampler(uint32_t index) const
