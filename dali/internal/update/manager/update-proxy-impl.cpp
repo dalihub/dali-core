@@ -25,41 +25,14 @@ namespace Dali
 {
 namespace Internal
 {
-namespace
-{
-SceneGraph::Node* FindNodeInSceneGraph(uint32_t id, SceneGraph::Node& node)
-{
-  SceneGraph::Node* matchingNode = nullptr;
-
-  if(node.mId == id)
-  {
-    matchingNode = &node;
-  }
-  else
-  {
-    for(auto&& i : node.GetChildren())
-    {
-      matchingNode = FindNodeInSceneGraph(id, *i);
-      if(matchingNode)
-      {
-        break;
-      }
-    }
-  }
-
-  return matchingNode;
-}
-
-} // unnamed namespace
-
-UpdateProxy::UpdateProxy(SceneGraph::UpdateManager& updateManager, SceneGraph::TransformManager& transformManager, SceneGraph::Node& rootNode)
-: mNodeContainer(),
-  mLastCachedIdNodePair({0u, nullptr}),
+UpdateProxy::UpdateProxy(SceneGraph::UpdateManager& updateManager, SceneGraph::TransformManager& transformManager, SceneGraph::Node& rootNode, SceneGraphTravelerPtr traveler)
+: mLastCachedIdNodePair({0u, nullptr}),
   mDirtyNodes(),
   mCurrentBufferIndex(0u),
   mUpdateManager(updateManager),
   mTransformManager(transformManager),
   mRootNode(rootNode),
+  mSceneGraphTraveler(traveler),
   mPropertyModifier(nullptr)
 {
 }
@@ -307,7 +280,6 @@ bool UpdateProxy::BakeColor(uint32_t id, const Vector4& color)
 void UpdateProxy::NodeHierarchyChanged()
 {
   mLastCachedIdNodePair = {0u, nullptr};
-  mNodeContainer.clear();
   mPropertyModifier.reset();
 }
 
@@ -339,26 +311,11 @@ SceneGraph::Node* UpdateProxy::GetNodeWithId(uint32_t id) const
   }
   else
   {
-    // Find node in vector
-    for(auto&& pair : mNodeContainer)
-    {
-      if(pair.id == id)
-      {
-        node                  = pair.node;
-        mLastCachedIdNodePair = pair;
-        break;
-      }
-    }
+    node = mSceneGraphTraveler->FindNode(id);
 
-    if(!node)
+    if(node)
     {
-      // Node not in vector, find in scene-graph
-      node = FindNodeInSceneGraph(id, mRootNode);
-      if(node)
-      {
-        mNodeContainer.push_back({id, node});
-        mLastCachedIdNodePair = *mNodeContainer.rbegin();
-      }
+      mLastCachedIdNodePair = {id, node};
     }
   }
 
@@ -378,7 +335,7 @@ void UpdateProxy::AddNodeResetters()
 {
   for(auto&& id : mDirtyNodes)
   {
-    SceneGraph::Node* node = FindNodeInSceneGraph(id, mRootNode);
+    SceneGraph::Node* node = GetNodeWithId(id);
     if(node)
     {
       mUpdateManager.AddNodeResetter(*node);

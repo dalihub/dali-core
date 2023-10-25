@@ -110,11 +110,19 @@ void GetShaderData(const Property::Map& shaderMap, std::string& vertexShader, st
 
   if(Property::Value* value = shaderMap.Find("hints"))
   {
-    static_cast<void>( // ignore return
-      Scripting::GetEnumeration<Dali::Shader::Hint::Value>(value->Get<std::string>().c_str(),
-                                                           ShaderHintsTable,
-                                                           ShaderHintsTableSize,
-                                                           hints));
+    int32_t hintInteger = 0;
+    if(value->Get(hintInteger))
+    {
+      hints = static_cast<Dali::Shader::Hint::Value>(hintInteger);
+    }
+    else
+    {
+      static_cast<void>( // ignore return
+        Scripting::GetEnumeration<Dali::Shader::Hint::Value>(value->Get<std::string>().c_str(),
+                                                             ShaderHintsTable,
+                                                             ShaderHintsTableSize,
+                                                             hints));
+    }
   }
 }
 

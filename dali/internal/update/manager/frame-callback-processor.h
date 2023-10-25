@@ -20,11 +20,13 @@
 
 // EXTERNAL INCLUDES
 #include <memory>
+#include <unordered_map>
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/update/manager/scene-graph-frame-callback.h>
+#include <dali/internal/update/manager/scene-graph-traveler.h>
 #include <dali/internal/update/manager/update-proxy-impl.h>
 #include <dali/public-api/common/vector-wrapper.h>
 
@@ -102,11 +104,17 @@ public:
   }
 
 private:
+  SceneGraphTravelerPtr GetSceneGraphTraveler(Node* rootNode);
+
+private:
   std::vector<OwnerPointer<FrameCallback> > mFrameCallbacks; ///< A container of all the frame-callbacks & accompanying update-proxies.
 
   UpdateManager& mUpdateManager;
 
   TransformManager& mTransformManager;
+
+  using TravelerContainer = std::unordered_map<const Node*, SceneGraphTravelerPtr>;
+  TravelerContainer mTravelerMap;
 
   bool mNodeHierarchyChanged; ///< Set to true if the node hierarchy changes
 };

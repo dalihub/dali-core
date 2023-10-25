@@ -835,9 +835,45 @@ int UtcDaliTouchEventCombinerSingleTouchInterrupted(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point      point = GeneratePoint(1, PointState::INTERRUPTED, 100.0f, 100.0f);
 
-    DALI_TEST_EQUALS(Integration::TouchEventCombiner::DISPATCH_BOTH, combiner.GetNextTouchEvent(point, time, touchEvent, hoverEvent), TEST_LOCATION);
+    DALI_TEST_EQUALS(Integration::TouchEventCombiner::DISPATCH_TOUCH, combiner.GetNextTouchEvent(point, time, touchEvent, hoverEvent), TEST_LOCATION);
     DALI_TEST_EQUALS(touchEvent.GetPointCount(), 1u, TEST_LOCATION);
     DALI_TEST_EQUALS(touchEvent.points[0].GetState(), point.GetState(), TEST_LOCATION);
+  }
+
+  // Send up, should not be able to send as combiner has been reset.
+  // Up event
+  {
+    Integration::TouchEvent touchEvent;
+    Integration::HoverEvent hoverEvent;
+    Integration::Point      point = GeneratePoint(1, PointState::UP, 100.0f, 100.0f);
+
+    DALI_TEST_EQUALS(Integration::TouchEventCombiner::DISPATCH_NONE, combiner.GetNextTouchEvent(point, time, touchEvent, hoverEvent), TEST_LOCATION);
+  }
+
+  // motion event for hover
+  {
+    Integration::TouchEvent touchEvent;
+    Integration::HoverEvent hoverEvent;
+    Integration::Point      point = GeneratePoint(1, PointState::MOTION, 100.0f, 100.0f);
+    point.SetDeviceClass(Device::Class::Type::MOUSE);
+
+    DALI_TEST_EQUALS(Integration::TouchEventCombiner::DISPATCH_HOVER, combiner.GetNextTouchEvent(point, time, touchEvent, hoverEvent), TEST_LOCATION);
+    DALI_TEST_EQUALS(hoverEvent.GetPointCount(), 1u, TEST_LOCATION);
+    DALI_TEST_EQUALS(hoverEvent.points[0].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION);
+    DALI_TEST_EQUALS(hoverEvent.points[0].GetState(), PointState::STARTED, TEST_LOCATION);
+    DALI_TEST_EQUALS(hoverEvent.points[0].GetScreenPosition(), point.GetScreenPosition(), TEST_LOCATION);
+  }
+
+  time++;
+
+  // Interrupted event
+  {
+    Integration::TouchEvent touchEvent;
+    Integration::HoverEvent hoverEvent;
+    Integration::Point      point = GeneratePoint(1, PointState::INTERRUPTED, 100.0f, 100.0f);
+    point.SetDeviceClass(Device::Class::Type::MOUSE);
+
+    DALI_TEST_EQUALS(Integration::TouchEventCombiner::DISPATCH_HOVER, combiner.GetNextTouchEvent(point, time, touchEvent, hoverEvent), TEST_LOCATION);
     DALI_TEST_EQUALS(hoverEvent.GetPointCount(), 1u, TEST_LOCATION);
     DALI_TEST_EQUALS(hoverEvent.points[0].GetState(), point.GetState(), TEST_LOCATION);
   }
@@ -877,9 +913,41 @@ int UtcDaliTouchEventCombinerMultiTouchInterrupted(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point      point = GeneratePoint(1, PointState::INTERRUPTED, 100.0f, 100.0f);
 
-    DALI_TEST_EQUALS(Integration::TouchEventCombiner::DISPATCH_BOTH, combiner.GetNextTouchEvent(point, time, touchEvent, hoverEvent), TEST_LOCATION);
+    DALI_TEST_EQUALS(Integration::TouchEventCombiner::DISPATCH_TOUCH, combiner.GetNextTouchEvent(point, time, touchEvent, hoverEvent), TEST_LOCATION);
     DALI_TEST_EQUALS(touchEvent.GetPointCount(), 1u, TEST_LOCATION);
     DALI_TEST_EQUALS(touchEvent.points[0].GetState(), point.GetState(), TEST_LOCATION);
+  }
+
+  // Send up, should not be able to send as combiner has been reset.
+  // Up event
+  {
+    Integration::TouchEvent touchEvent;
+    Integration::HoverEvent hoverEvent;
+    Integration::Point      point = GeneratePoint(1, PointState::UP, 100.0f, 100.0f);
+
+    DALI_TEST_EQUALS(Integration::TouchEventCombiner::DISPATCH_NONE, combiner.GetNextTouchEvent(point, time, touchEvent, hoverEvent), TEST_LOCATION);
+  }
+
+  // Several motion for hover
+  for(unsigned int pointCount = 1u; pointCount < maximum; ++pointCount)
+  {
+    Integration::TouchEvent touchEvent;
+    Integration::HoverEvent hoverEvent;
+    Integration::Point      point = GeneratePoint(pointCount, PointState::MOTION, 100.0f, 100.0f);
+    point.SetDeviceClass(Device::Class::Type::MOUSE);
+
+    DALI_TEST_EQUALS(Integration::TouchEventCombiner::DISPATCH_HOVER, combiner.GetNextTouchEvent(point, time, touchEvent, hoverEvent), TEST_LOCATION);
+    DALI_TEST_EQUALS(hoverEvent.GetPointCount(), pointCount, TEST_LOCATION);
+  }
+
+  // Interrupted event
+  {
+    Integration::TouchEvent touchEvent;
+    Integration::HoverEvent hoverEvent;
+    Integration::Point      point = GeneratePoint(1, PointState::INTERRUPTED, 100.0f, 100.0f);
+    point.SetDeviceClass(Device::Class::Type::MOUSE);
+
+    DALI_TEST_EQUALS(Integration::TouchEventCombiner::DISPATCH_HOVER, combiner.GetNextTouchEvent(point, time, touchEvent, hoverEvent), TEST_LOCATION);
     DALI_TEST_EQUALS(hoverEvent.GetPointCount(), 1u, TEST_LOCATION);
     DALI_TEST_EQUALS(hoverEvent.points[0].GetState(), point.GetState(), TEST_LOCATION);
   }
@@ -909,5 +977,60 @@ int UtcDaliTouchEventCombinerInvalidState(void)
 
     DALI_TEST_EQUALS(Integration::TouchEventCombiner::DISPATCH_NONE, combiner.GetNextTouchEvent(point, time, touchEvent, hoverEvent), TEST_LOCATION);
   }
+  END_TEST;
+}
+
+int UtcDaliTouchEventCombinerHoverDownAfterTouchUp(void)
+{
+  TouchEventCombiner combiner;
+  unsigned long      time(0u);
+
+  // Motion event
+  {
+    Integration::TouchEvent touchEvent;
+    Integration::HoverEvent hoverEvent;
+    Integration::Point      point = GeneratePoint(1, PointState::MOTION, 100.0f, 100.0f);
+    point.SetDeviceClass(Device::Class::Type::MOUSE);
+
+    DALI_TEST_EQUALS(Integration::TouchEventCombiner::DISPATCH_HOVER, combiner.GetNextTouchEvent(point, time, touchEvent, hoverEvent), TEST_LOCATION);
+    DALI_TEST_EQUALS(hoverEvent.GetPointCount(), 1u, TEST_LOCATION);
+    DALI_TEST_EQUALS(hoverEvent.points[0].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION);
+    DALI_TEST_EQUALS(hoverEvent.points[0].GetState(), PointState::STARTED, TEST_LOCATION);
+    DALI_TEST_EQUALS(hoverEvent.points[0].GetScreenPosition(), point.GetScreenPosition(), TEST_LOCATION);
+  }
+
+
+  time++;
+
+  // down event
+  {
+    Integration::TouchEvent touchEvent;
+    Integration::HoverEvent hoverEvent;
+    Integration::Point      point = GeneratePoint(1, PointState::DOWN, 100.0f, 100.0f);
+    point.SetDeviceClass(Device::Class::Type::MOUSE);
+
+    DALI_TEST_EQUALS(Integration::TouchEventCombiner::DISPATCH_BOTH, combiner.GetNextTouchEvent(point, time, touchEvent, hoverEvent), TEST_LOCATION);
+    DALI_TEST_EQUALS(hoverEvent.GetPointCount(), 1u, TEST_LOCATION);
+    DALI_TEST_EQUALS(hoverEvent.points[0].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION);
+    DALI_TEST_EQUALS(hoverEvent.points[0].GetState(), PointState::FINISHED, TEST_LOCATION);
+    DALI_TEST_EQUALS(hoverEvent.points[0].GetScreenPosition(), point.GetScreenPosition(), TEST_LOCATION);
+  }
+
+  time++;
+
+  // up event
+  {
+    Integration::TouchEvent touchEvent;
+    Integration::HoverEvent hoverEvent;
+    Integration::Point      point = GeneratePoint(1, PointState::UP, 103.0f, 103.0f);
+    point.SetDeviceClass(Device::Class::Type::MOUSE);
+
+    DALI_TEST_EQUALS(Integration::TouchEventCombiner::DISPATCH_BOTH, combiner.GetNextTouchEvent(point, time, touchEvent, hoverEvent), TEST_LOCATION);
+    DALI_TEST_EQUALS(hoverEvent.GetPointCount(), 1u, TEST_LOCATION);
+    DALI_TEST_EQUALS(hoverEvent.points[0].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION);
+    DALI_TEST_EQUALS(hoverEvent.points[0].GetState(), PointState::DOWN, TEST_LOCATION);
+    DALI_TEST_EQUALS(hoverEvent.points[0].GetScreenPosition(), point.GetScreenPosition(), TEST_LOCATION);
+  }
+
   END_TEST;
 }

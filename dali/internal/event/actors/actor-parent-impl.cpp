@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -231,7 +231,7 @@ void ActorParentImpl::SetSiblingOrderOfChild(
   Actor&   child,
   uint32_t order)
 {
-  if(mChildren)
+  if(mChildren && !mChildren->empty())
   {
     uint32_t currentOrder = GetSiblingOrderOfChild(child);
     if(order != currentOrder)
@@ -262,7 +262,7 @@ void ActorParentImpl::SetSiblingOrderOfChild(
 uint32_t ActorParentImpl::GetSiblingOrderOfChild(const Actor& child) const
 {
   uint32_t order = 0;
-  if(mChildren)
+  if(mChildren && !mChildren->empty())
   {
     for(std::size_t i = 0; i < mChildren->size(); ++i)
     {
@@ -279,16 +279,16 @@ uint32_t ActorParentImpl::GetSiblingOrderOfChild(const Actor& child) const
 void ActorParentImpl::RaiseChild(Actor& child)
 {
   bool changed = false;
-  if(mChildren && mChildren->back() != &child) // If not already at end
+  if(mChildren && !mChildren->empty() && mChildren->back() != &child) // If not already at end
   {
-    for(std::size_t i = 0; i < mChildren->size(); ++i)
+    for(std::size_t i = 0; i + 1 < mChildren->size(); ++i)
     {
       if((*mChildren)[i] == &child)
       {
         // Swap with next
-        ActorPtr next       = (*mChildren)[i + 1];
+        ActorPtr next       = std::move((*mChildren)[i + 1]);
         (*mChildren)[i + 1] = &child;
-        (*mChildren)[i]     = next;
+        (*mChildren)[i]     = std::move(next);
         changed             = true;
         break;
       }
@@ -303,16 +303,16 @@ void ActorParentImpl::RaiseChild(Actor& child)
 void ActorParentImpl::LowerChild(Actor& child)
 {
   bool changed = false;
-  if(mChildren && mChildren->front() != &child) // If not already at beginning
+  if(mChildren && !mChildren->empty() && mChildren->front() != &child) // If not already at beginning
   {
     for(std::size_t i = 1; i < mChildren->size(); ++i)
     {
       if((*mChildren)[i] == &child)
       {
         // Swap with previous
-        ActorPtr previous   = (*mChildren)[i - 1];
+        ActorPtr previous   = std::move((*mChildren)[i - 1]);
         (*mChildren)[i - 1] = &child;
-        (*mChildren)[i]     = previous;
+        (*mChildren)[i]     = std::move(previous);
         changed             = true;
         break;
       }
@@ -327,7 +327,7 @@ void ActorParentImpl::LowerChild(Actor& child)
 void ActorParentImpl::RaiseChildToTop(Actor& child)
 {
   bool changed = false;
-  if(mChildren && mChildren->back() != &child) // If not already at end
+  if(mChildren && !mChildren->empty() && mChildren->back() != &child) // If not already at end
   {
     auto iter = std::find(mChildren->begin(), mChildren->end(), &child);
     if(iter != mChildren->end())
@@ -346,7 +346,7 @@ void ActorParentImpl::RaiseChildToTop(Actor& child)
 void ActorParentImpl::LowerChildToBottom(Actor& child)
 {
   bool changed = false;
-  if(mChildren && mChildren->front() != &child) // If not already at bottom,
+  if(mChildren && !mChildren->empty() && mChildren->front() != &child) // If not already at bottom,
   {
     ActorPtr childPtr(&child); // ensure actor remains referenced.
 
@@ -367,7 +367,7 @@ void ActorParentImpl::LowerChildToBottom(Actor& child)
 void ActorParentImpl::RaiseChildAbove(Actor& child, Actor& target)
 {
   bool raised = false;
-  if(mChildren && mChildren->back() != &child && target.GetParent() == child.GetParent()) // If not already at top
+  if(mChildren && !mChildren->empty() && mChildren->back() != &child && target.GetParent() == child.GetParent()) // If not already at top
   {
     ActorPtr childPtr(&child); // ensure actor actor remains referenced.
 
@@ -395,7 +395,7 @@ void ActorParentImpl::LowerChildBelow(Actor& child, Actor& target)
   bool lowered = false;
 
   // If not already at bottom
-  if(mChildren && mChildren->front() != &child && target.GetParent() == child.GetParent())
+  if(mChildren && !mChildren->empty() && mChildren->front() != &child && target.GetParent() == child.GetParent())
   {
     ActorPtr childPtr(&child); // ensure actor actor remains referenced.
 

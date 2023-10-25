@@ -476,16 +476,6 @@ const Vector3& Actor::GetCurrentAnchorPoint() const
   return (mAnchorPoint) ? *mAnchorPoint : AnchorPoint::DEFAULT;
 }
 
-void Actor::SetPosition(float x, float y)
-{
-  SetPosition(Vector3(x, y, 0.0f));
-}
-
-void Actor::SetPosition(float x, float y, float z)
-{
-  SetPosition(Vector3(x, y, z));
-}
-
 void Actor::SetPosition(const Vector3& position)
 {
   mTargetPosition = position;
@@ -624,16 +614,6 @@ const Quaternion& Actor::GetCurrentWorldOrientation() const
 {
   // node is being used in a separate thread; copy the value from the previous update
   return GetNode().GetWorldOrientation(GetEventThreadServices().GetEventBufferIndex());
-}
-
-void Actor::SetScale(float scale)
-{
-  SetScale(Vector3(scale, scale, scale));
-}
-
-void Actor::SetScale(float x, float y, float z)
-{
-  SetScale(Vector3(x, y, z));
 }
 
 void Actor::SetScale(const Vector3& scale)

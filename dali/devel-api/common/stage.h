@@ -2,7 +2,7 @@
 #define DALI_STAGE_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,6 +112,21 @@ public:
    * @return True when it's safe to call Stage::GetCurrent()
    */
   static bool IsInstalled();
+
+  /**
+   * @brief Queries whether the Stage shutting down now; this should only return false during or before destruction of Dali core.
+   *
+   * @return True when Dali core destructor called.
+   */
+  static bool IsShuttingDown();
+
+  /**
+   * @brief Queries whether we installed Dali core before, or not.
+   * It will be useful whether you want to check we are on valid core ui thread or not, after Core initalized ensured.
+   *
+   * @return True when this API called at core ui thread. False otherwise.
+   */
+  static bool IsCoreThread();
 
   /**
    * @brief Destructor.

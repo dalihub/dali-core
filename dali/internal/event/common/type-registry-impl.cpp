@@ -97,7 +97,7 @@ std::string TypeRegistry::Register(const std::type_info&          theTypeInfo,
 {
   std::string uniqueTypeName = DemangleClassName(theTypeInfo.name());
 
-  return Register(uniqueTypeName, baseTypeInfo, createInstance, callCreateOnInit);
+  return Register(std::move(uniqueTypeName), baseTypeInfo, createInstance, callCreateOnInit);
 }
 
 std::string TypeRegistry::Register(const std::type_info&          theTypeInfo,
@@ -109,7 +109,7 @@ std::string TypeRegistry::Register(const std::type_info&          theTypeInfo,
 {
   std::string uniqueTypeName = DemangleClassName(theTypeInfo.name());
 
-  return Register(uniqueTypeName, baseTypeInfo, createInstance, callCreateOnInit, defaultProperties, defaultPropertyCount);
+  return Register(std::move(uniqueTypeName), baseTypeInfo, createInstance, callCreateOnInit, defaultProperties, defaultPropertyCount);
 }
 
 std::string TypeRegistry::Register(std::string                    uniqueTypeName,
