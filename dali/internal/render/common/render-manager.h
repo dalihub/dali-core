@@ -409,14 +409,6 @@ public:
    */
   void RenderScene(Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo, Rect<int>& clippingRect);
 
-  /**
-   * Precompile shaders for launching time
-   *
-   * @param[in] vertexShader vertexShader need to precompile
-   * @param[in] fragmentShader fragmentShader need to precompile
-  */
-  void PreCompileShader(const std::string& vertexShader, const std::string& fragmentShader);
-
   // This method should be called from Core::PostRender()
 
   /**
