@@ -15,6 +15,8 @@
  *
  */
 
+#define DEBUG_ENABLED 1
+
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/common/capabilities.h>
@@ -3922,6 +3924,59 @@ int UtcDaliRendererPreparePipeline(void)
     DALI_TEST_EQUALS(pipeline->vertexInputState.attributes[3].format, // 4th requested attr: aTexCoord2
                      Graphics::VertexInputFormat::FVECTOR3,
                      TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliRendererPreparePipelineMissingAttrs(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test that rendering an actor tries to bind the attributes locs from the reflection, but fails");
+  Debug::Filter::SetGlobalLogLevel(Debug::Verbose);
+
+  Property::Map modelVF;
+  modelVF["aPosition"] = Property::VECTOR3;
+  modelVF["aNormal"]   = Property::VECTOR3;
+  Property::Array vfs;
+  vfs.PushBack(modelVF);
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.SetAutoAttrCreation(false);
+  graphics.SetVertexFormats(vfs);
+
+  Property::Map vf            = CreateModelVertexFormat();
+  Geometry      modelGeometry = CreateModelGeometry(vf);
+  Shader        shader        = Shader::New("vertexSrc", "fragmentSrc");
+  Renderer      renderer      = Renderer::New(modelGeometry, shader);
+  Actor         actor         = Actor::New();
+
+  actor.AddRenderer(renderer);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+  actor.SetProperty(Actor::Property::COLOR, Color::WHITE);
+  application.GetScene().Add(actor);
+
+  TraceCallStack& cmdBufCallstack   = graphics.mCommandBufferCallStack;
+  TraceCallStack& graphicsCallstack = graphics.mCallStack;
+  cmdBufCallstack.Enable(true);
+  graphicsCallstack.Enable(true);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(graphicsCallstack.FindMethod("SubmitCommandBuffers"));
+  std::vector<Graphics::SubmitInfo>& submissions = graphics.mSubmitStack;
+  DALI_TEST_CHECK(submissions.size() > 0);
+
+  TestGraphicsCommandBuffer* cmdBuf = static_cast<TestGraphicsCommandBuffer*>((submissions.back().cmdBuffer[0]));
+
+  auto result   = cmdBuf->GetChildCommandsByType(0 | CommandType::BIND_PIPELINE);
+  auto pipeline = result[0]->data.bindPipeline.pipeline;
+
+  if(pipeline)
+  {
+    DALI_TEST_EQUALS(pipeline->vertexInputState.attributes.size(), 2, TEST_LOCATION);
   }
 
   END_TEST;

@@ -178,7 +178,7 @@ DALI_CORE_API void UninstallLogFunction();
 /**
  * Provides unfiltered logging for global warning level messages
  */
-#define DALI_LOG_WARNING(format, ...) Dali::Integration::Log::LogMessageWithFunctionLine(Dali::Integration::Log::WARNING, "%s " format, ASSERT_LOCATION, ##__VA_ARGS__)
+#define DALI_LOG_WARNING(format, ...) Dali::Integration::Log::LogMessageWithFunctionLine(Dali::Integration::Log::WARNING, format, ##__VA_ARGS__)
 
 #else // DEBUG_ENABLED
 

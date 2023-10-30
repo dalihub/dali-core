@@ -29,6 +29,10 @@ namespace Dali::Internal::Render
 {
 namespace
 {
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_PIPELINE_CACHE");
+#endif
+
 constexpr uint32_t CACHE_CLEAN_FRAME_COUNT = 600; // 60fps * 10sec
 
 // Helper to get the vertex input format
@@ -207,6 +211,7 @@ PipelineCacheL0Ptr PipelineCache::GetPipelineCacheL0(Program* program, Render::G
     Graphics::VertexInputState vertexInputState{};
     uint32_t                   base = 0;
 
+    bool attrNotFound = false;
     for(auto&& vertexBuffer : geometry->GetVertexBuffers())
     {
       const VertexBuffer::Format& vertexFormat = *vertexBuffer->GetFormat();
@@ -237,6 +242,7 @@ PipelineCacheL0Ptr PipelineCache::GetPipelineCacheL0(Program* program, Render::G
         }
         else
         {
+          attrNotFound = true;
           DALI_LOG_WARNING("Attribute not found in the shader: %s\n", attributeName.GetCString());
           // Don't bind unused attributes.
         }
@@ -250,6 +256,15 @@ PipelineCacheL0Ptr PipelineCache::GetPipelineCacheL0(Program* program, Render::G
     level0.inputState = vertexInputState;
 
     it = level0nodes.insert(level0nodes.end(), std::move(level0));
+
+    if(attrNotFound)
+    {
+      DALI_LOG_INFO(gLogFilter, Debug::General,
+                    "!!!!!!!  Attributes not found. !!!!!!!!\n"
+                    "Shader src: VERT:\n%s\nFRAGMENT:\n%s\n",
+                    program->GetShaderData()->GetVertexShader(),
+                    program->GetShaderData()->GetFragmentShader());
+    }
   }
 
   return it;

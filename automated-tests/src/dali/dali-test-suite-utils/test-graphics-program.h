@@ -24,10 +24,12 @@
 
 namespace Dali
 {
+class TestGraphicsController;
+
 class TestGraphicsProgramImpl
 {
 public:
-  TestGraphicsProgramImpl(TestGlAbstraction& gl, const Graphics::ProgramCreateInfo& createInfo, Property::Array& vertexFormats, std::vector<UniformData>& customUniforms, std::vector<TestGraphicsReflection::TestUniformBlockInfo>& customUniformBlocks);
+  TestGraphicsProgramImpl(TestGraphicsController& controller, TestGlAbstraction& gl, const Graphics::ProgramCreateInfo& createInfo, Property::Array& vertexFormats, std::vector<UniformData>& customUniforms, std::vector<TestGraphicsReflection::TestUniformBlockInfo>& customUniformBlocks);
 
   // For API
   const TestGraphicsReflection& GetReflection() const
@@ -45,6 +47,7 @@ public:
   bool GetParameter(uint32_t parameterId, void* outData);
 
 public:
+  TestGraphicsController&     mController;
   TestGlAbstraction&          mGl;
   uint32_t                    mId;
   Graphics::ProgramCreateInfo mCreateInfo;

@@ -1289,7 +1289,7 @@ Graphics::UniquePtr<Graphics::Program> TestGraphicsController::CreateProgram(con
   }
 
   mProgramCache.emplace_back();
-  mProgramCache.back().programImpl = new TestGraphicsProgramImpl(mGl, programCreateInfo, mVertexFormats, mCustomUniforms, mCustomUniformBlocks);
+  mProgramCache.back().programImpl = new TestGraphicsProgramImpl(*this, mGl, programCreateInfo, mVertexFormats, mCustomUniforms, mCustomUniformBlocks);
 
   for(auto& shader : *(programCreateInfo.shaderState))
   {

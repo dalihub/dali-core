@@ -23,12 +23,14 @@
 
 namespace Dali
 {
+class TestGraphicsController;
+
 class TestGraphicsReflection : public Graphics::Reflection
 {
 public:
   class TestUniformBlockInfo;
 
-  TestGraphicsReflection(TestGlAbstraction& gl, uint32_t program_id, Property::Array& vertexFormats, const Graphics::ProgramCreateInfo& createInfo, std::vector<UniformData>& customUniforms, std::vector<TestUniformBlockInfo>& customUniformBlocks);
+  TestGraphicsReflection(TestGraphicsController& controller, TestGlAbstraction& gl, uint32_t program_id, Property::Array& vertexFormats, const Graphics::ProgramCreateInfo& createInfo, std::vector<UniformData>& customUniforms, std::vector<TestUniformBlockInfo>& customUniformBlocks);
 
   uint32_t                                        GetVertexAttributeLocation(const std::string& name) const override;
   Dali::Graphics::VertexInputAttributeFormat      GetVertexAttributeFormat(uint32_t location) const override;
@@ -84,6 +86,7 @@ public: // Test methods
     return mUniformBlocks[index];
   }
 
+  TestGraphicsController&          mController;
   TestGlAbstraction&               mGl;
   mutable std::vector<std::string> mAttributes;
   std::vector<UniformData>         mCustomUniforms;

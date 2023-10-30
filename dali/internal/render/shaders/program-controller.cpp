@@ -34,17 +34,6 @@ ProgramController::ProgramController(Graphics::Controller& graphicsController)
 
 ProgramController::~ProgramController() = default;
 
-void ProgramController::ResetProgramMatrices()
-{
-  const ProgramIterator end = mProgramCache.End();
-  for(ProgramIterator iter = mProgramCache.Begin(); iter != end; ++iter)
-  {
-    Program* program = (*iter)->GetProgram();
-    program->SetProjectionMatrix(nullptr);
-    program->SetViewMatrix(nullptr);
-  }
-}
-
 void ProgramController::ResetReferenceCount()
 {
   for(auto&& item : mProgramCache)
@@ -87,7 +76,7 @@ Program* ProgramController::GetProgram(size_t shaderHash)
 
 void ProgramController::AddProgram(size_t shaderHash, Program* program)
 {
-  // we expect unique hash values so it is event thread side's job to guarantee that
+  // we expect unique hash values so it is caller's job to guarantee that
   // AddProgram is only called after program checks that GetProgram returns NULL
   mProgramCache.PushBack(new ProgramPair(program, shaderHash));
 }

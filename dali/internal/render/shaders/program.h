@@ -86,40 +86,9 @@ public:
    */
   static Program* New(ProgramCache& cache, const Internal::ShaderDataPtr& shaderData, Graphics::Controller& gfxController);
 
-  /**
-   * Set the projection matrix that has currently been sent
-   * @param matrix to set
-   */
-  void SetProjectionMatrix(const Matrix* matrix)
+  Internal::ShaderDataPtr GetShaderData()
   {
-    mProjectionMatrix = matrix;
-  }
-
-  /**
-   * Get the projection matrix that has currently been sent
-   * @return the matrix that is set
-   */
-  const Matrix* GetProjectionMatrix()
-  {
-    return mProjectionMatrix;
-  }
-
-  /**
-   * Set the projection matrix that has currently been sent
-   * @param matrix to set
-   */
-  void SetViewMatrix(const Matrix* matrix)
-  {
-    mViewMatrix = matrix;
-  }
-
-  /**
-   * Get the projection matrix that has currently been sent
-   * @return the matrix that is set
-   */
-  const Matrix* GetViewMatrix()
-  {
-    return mViewMatrix;
+    return mProgramData;
   }
 
   [[nodiscard]] Graphics::Program& GetGraphicsProgram() const
@@ -220,11 +189,8 @@ public:
     return mUniformBlockMemoryRequirements;
   }
 
-private:                           // Data
-  ProgramCache& mCache;            ///< The program cache
-  const Matrix* mProjectionMatrix; ///< currently set projection matrix
-  const Matrix* mViewMatrix;       ///< currently set view matrix
-
+private:                                                 // Data
+  ProgramCache&                          mCache;         ///< The program cache
   Graphics::UniquePtr<Graphics::Program> mGfxProgram;    ///< Gfx program
   Graphics::Controller&                  mGfxController; /// < Gfx controller
   Internal::ShaderDataPtr                mProgramData;   ///< Shader program source and binary (when compiled & linked or loaded)
