@@ -130,6 +130,11 @@ void Core::RenderScene(RenderStatus& status, Integration::Scene& scene, bool ren
   mImpl->RenderScene(status, scene, renderToFbo, clippingRect);
 }
 
+void Core::PreCompileShader(const std::string& vertexShader, const std::string& fragmentShader)
+{
+  mImpl->PreCompileShader(vertexShader, fragmentShader);
+}
+
 void Core::PostRender()
 {
   mImpl->PostRender();
