@@ -30,7 +30,7 @@ std::unique_ptr<ShaderPrecompiler> ShaderPrecompiler::mInstance = nullptr;
 std::once_flag ShaderPrecompiler::mOnceFlag;
 
 ShaderPrecompiler::ShaderPrecompiler()
-: mRawShaderData(),
+: mRawShaderList(),
   mPrecompiled(false),
   mEnabled(false)
 {
@@ -44,7 +44,7 @@ ShaderPrecompiler& ShaderPrecompiler::Get()
   return *(mInstance.get());
 }
 
-void ShaderPrecompiler::GetPrecompileShaderList(RawShaderData& shaders)
+void ShaderPrecompiler::GetPrecompileShaderList(std::vector<RawShaderData>& shaderList)
 {
   ConditionalWait::ScopedLock lock(mConditionalWait);
   if(!IsReady())
@@ -54,18 +54,14 @@ void ShaderPrecompiler::GetPrecompileShaderList(RawShaderData& shaders)
   }
 
   // move shader list
-  shaders = mRawShaderData;
+  shaderList = mRawShaderList;
 }
 
-void ShaderPrecompiler::SavePrecomipleShaderList(RawShaderData& shaders)
+void ShaderPrecompiler::SavePrecomipleShaderList(std::vector<RawShaderData>& shaderList)
 {
   ConditionalWait::ScopedLock lock(mConditionalWait);
-  mRawShaderData.vertexPrefix = shaders.vertexPrefix;
-  mRawShaderData.fragmentPrefix = shaders.fragmentPrefix;
-  mRawShaderData.vertexShader = shaders.vertexShader;
-  mRawShaderData.fragmentShader = shaders.fragmentShader;
-  mRawShaderData.shaderCount = shaders.shaderCount;
 
+  mRawShaderList = shaderList;
   mPrecompiled = true;
   mConditionalWait.Notify(lock);
 }
