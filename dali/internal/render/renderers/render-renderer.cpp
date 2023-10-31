@@ -303,8 +303,8 @@ bool Renderer::BindTextures(Graphics::CommandBuffer& commandBuffer)
         //   if it's default, delete the graphics object
         //   otherwise re-initialize it if dirty
 
-        const Graphics::Sampler* graphicsSampler = samplers ? ((*samplers)[i] ? (*samplers)[i]->GetGraphicsObject()
-                                                                              : nullptr)
+        const Graphics::Sampler* graphicsSampler = samplers ? ((i < (*samplers).Size() && (*samplers)[i]) ? (*samplers)[i]->GetGraphicsObject()
+                                                                                                          : nullptr)
                                                             : nullptr;
 
         const Graphics::TextureBinding textureBinding{graphicsTexture, graphicsSampler, textureUnit};

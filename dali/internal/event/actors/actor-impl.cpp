@@ -151,6 +151,8 @@ DALI_PROPERTY("keyboardFocusableChildren", BOOLEAN, true, false, false, Dali::De
 DALI_PROPERTY("userInteractionEnabled", BOOLEAN, true, false, false, Dali::DevelActor::Property::USER_INTERACTION_ENABLED)
 DALI_PROPERTY("allowOnlyOwnTouch", BOOLEAN, true, false, false, Dali::DevelActor::Property::ALLOW_ONLY_OWN_TOUCH)
 DALI_PROPERTY("useTextureUpdateArea", BOOLEAN, true, false, false, Dali::DevelActor::Property::USE_TEXTURE_UPDATE_AREA)
+DALI_PROPERTY("dispatchTouchMotion", BOOLEAN, true, false, false, Dali::DevelActor::Property::DISPATCH_TOUCH_MOTION)
+DALI_PROPERTY("dispatchHoverMotion", BOOLEAN, true, false, false, Dali::DevelActor::Property::DISPATCH_HOVER_MOTION)
 DALI_PROPERTY_TABLE_END(DEFAULT_ACTOR_PROPERTY_START_INDEX, ActorDefaultProperties)
 
 // Signals
@@ -474,16 +476,6 @@ const Vector3& Actor::GetCurrentAnchorPoint() const
   return (mAnchorPoint) ? *mAnchorPoint : AnchorPoint::DEFAULT;
 }
 
-void Actor::SetPosition(float x, float y)
-{
-  SetPosition(Vector3(x, y, 0.0f));
-}
-
-void Actor::SetPosition(float x, float y, float z)
-{
-  SetPosition(Vector3(x, y, z));
-}
-
 void Actor::SetPosition(const Vector3& position)
 {
   mTargetPosition = position;
@@ -622,16 +614,6 @@ const Quaternion& Actor::GetCurrentWorldOrientation() const
 {
   // node is being used in a separate thread; copy the value from the previous update
   return GetNode().GetWorldOrientation(GetEventThreadServices().GetEventBufferIndex());
-}
-
-void Actor::SetScale(float scale)
-{
-  SetScale(Vector3(scale, scale, scale));
-}
-
-void Actor::SetScale(float x, float y, float z)
-{
-  SetScale(Vector3(x, y, z));
 }
 
 void Actor::SetScale(const Vector3& scale)
@@ -1130,6 +1112,8 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mUserInteractionEnabled(true),
   mAllowOnlyOwnTouch(false),
   mUseTextureUpdateArea(false),
+  mDispatchTouchMotion(true),
+  mDispatchHoverMotion(true),
   mLayoutDirection(LayoutDirection::LEFT_TO_RIGHT),
   mDrawMode(DrawMode::NORMAL),
   mColorMode(Node::DEFAULT_COLOR_MODE),

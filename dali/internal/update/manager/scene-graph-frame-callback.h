@@ -26,6 +26,7 @@
 #include <dali/devel-api/update/frame-callback-interface.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/update/common/property-owner.h>
+#include <dali/internal/update/manager/scene-graph-traveler.h>
 #include <dali/internal/update/manager/update-proxy-impl.h>
 #include <dali/public-api/common/list-wrapper.h>
 
@@ -72,8 +73,9 @@ public:
    * @param[in]  updateManager     The Update Manager
    * @param[in]  transformManager  The Transform Manager
    * @param[in]  rootNode          The rootNode of this frame-callback
+   * @param[in]  traveler          The cache of traversal for given rootNode
    */
-  void ConnectToSceneGraph(UpdateManager& updateManager, TransformManager& transformManager, Node& rootNode);
+  void ConnectToSceneGraph(UpdateManager& updateManager, TransformManager& transformManager, Node& rootNode, SceneGraphTravelerPtr traveler);
 
   // Movable but not copyable
 

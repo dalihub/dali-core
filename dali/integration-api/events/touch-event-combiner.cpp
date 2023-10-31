@@ -188,6 +188,16 @@ TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent(cons
             iter = mHoveredPoints.erase(iter);
           }
         }
+
+        if(deviceType == Device::Class::Type::MOUSE)
+        {
+          hoverEvent.time = time;
+          Point hoverPoint(point);
+          hoverPoint.SetState(PointState::STARTED); // The first hover event received
+          mHoveredPoints.push_back(PointInfo(hoverPoint, time));
+          hoverEvent.AddPoint(hoverPoint);
+          dispatchEvent = TouchEventCombiner::DISPATCH_BOTH;
+        }
       }
       break;
     }
@@ -326,12 +336,18 @@ TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent(cons
 
     case PointState::INTERRUPTED:
     {
-      Reset();
-
       // We should still tell core about the interruption.
-      touchEvent.AddPoint(point);
-      hoverEvent.AddPoint(point);
-      dispatchEvent = TouchEventCombiner::DISPATCH_BOTH;
+      if(!mPressedPoints.empty())
+      {
+        touchEvent.AddPoint(point);
+        dispatchEvent = TouchEventCombiner::DISPATCH_TOUCH;
+      }
+      if((!mHoveredPoints.empty()))
+      {
+        hoverEvent.AddPoint(point);
+        dispatchEvent = dispatchEvent == TouchEventCombiner::DISPATCH_TOUCH ? TouchEventCombiner::DISPATCH_BOTH : TouchEventCombiner::DISPATCH_HOVER;
+      }
+      Reset();
       break;
     }
 

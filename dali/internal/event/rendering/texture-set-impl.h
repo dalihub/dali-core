@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TEXTURE_SET_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,6 +92,25 @@ private: // implementation
    * Second stage initialization
    */
   void Initialize();
+
+  /**
+   * @brief Change the count of texture and sampler. It will increase count automatically if we need more textures.
+   *
+   * @param[in] count The number of textures what this texture set want to hold
+   */
+  void SetTextureCount(uint32_t count);
+
+  /**
+   * @brief Change the count of sampler. It will increase count automatically if we need more samplers.
+   *
+   * @param[in] count The number of samplers what this texture set want to hold
+   */
+  void SetSamplerCount(uint32_t count);
+
+  /**
+   * @brief Remove empty textures and samplers at the back of container, and resize.
+   */
+  void TrimContainers();
 
 protected:
   /**

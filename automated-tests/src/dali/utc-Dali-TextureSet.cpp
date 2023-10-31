@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -448,6 +448,71 @@ int UtcDaliTextureSetGetTextureCount1(void)
   END_TEST;
 }
 
+int UtcDaliTextureSetRemoveTextureAndGetTextureCount(void)
+{
+  TestApplication application;
+
+  TextureSet textureSet = CreateTextureSet();
+  DALI_TEST_EQUALS(textureSet.GetTextureCount(), 0u, TEST_LOCATION);
+
+  Texture image0 = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
+  Texture image1 = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
+  Texture image2 = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
+
+  textureSet.SetTexture(0u, image0);
+  DALI_TEST_EQUALS(textureSet.GetTextureCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureSet.GetTexture(0u), image0, TEST_LOCATION);
+
+  textureSet.SetTexture(1u, image1);
+  DALI_TEST_EQUALS(textureSet.GetTextureCount(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureSet.GetTexture(0u), image0, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureSet.GetTexture(1u), image1, TEST_LOCATION);
+
+  // Set empty texture so we can remove it.
+  textureSet.SetTexture(1u, Texture());
+
+  DALI_TEST_EQUALS(textureSet.GetTextureCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureSet.GetTexture(0u), image0, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  textureSet.SetTexture(2u, image2);
+
+  DALI_TEST_EQUALS(textureSet.GetTextureCount(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureSet.GetTexture(0u), image0, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureSet.GetTexture(1u), Texture(), TEST_LOCATION);
+  DALI_TEST_EQUALS(textureSet.GetTexture(2u), image2, TEST_LOCATION);
+
+  textureSet.SetTexture(1u, image1);
+
+  DALI_TEST_EQUALS(textureSet.GetTextureCount(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureSet.GetTexture(0u), image0, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureSet.GetTexture(1u), image1, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureSet.GetTexture(2u), image2, TEST_LOCATION);
+
+  // Set empty texture middle of textureset.
+  textureSet.SetTexture(1u, Texture());
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(textureSet.GetTextureCount(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureSet.GetTexture(0u), image0, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureSet.GetTexture(1u), Texture(), TEST_LOCATION);
+  DALI_TEST_EQUALS(textureSet.GetTexture(2u), image2, TEST_LOCATION);
+
+  // Set empty texture end of textureset.
+  textureSet.SetTexture(2u, Texture());
+
+  DALI_TEST_EQUALS(textureSet.GetTextureCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureSet.GetTexture(0u), image0, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
 int UtcDaliTextureSetSetSamplerNegative(void)
 {
   TestApplication  application;

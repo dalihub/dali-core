@@ -365,24 +365,6 @@ public:
   /**
    * Sets the position of the Actor.
    * The coordinates are relative to the Actor's parent.
-   * The Actor's z position will be set to 0.0f.
-   * @param [in] x The new x position
-   * @param [in] y The new y position
-   */
-  void SetPosition(float x, float y);
-
-  /**
-   * Sets the position of the Actor.
-   * The coordinates are relative to the Actor's parent.
-   * @param [in] x The new x position
-   * @param [in] y The new y position
-   * @param [in] z The new z position
-   */
-  void SetPosition(float x, float y, float z);
-
-  /**
-   * Sets the position of the Actor.
-   * The coordinates are relative to the Actor's parent.
    * @param [in] position The new position.
    */
   void SetPosition(const Vector3& position);
@@ -512,20 +494,6 @@ public:
    * @copydoc Dali::Actor::GetCurrentWorldOrientation()
    */
   const Quaternion& GetCurrentWorldOrientation() const;
-
-  /**
-   * Sets a scale factor applied to an actor.
-   * @param [in] scale The scale factor applied on all axes.
-   */
-  void SetScale(float scale);
-
-  /**
-   * Sets a scale factor applied to an actor.
-   * @param [in] scaleX The scale factor applied along the x-axis.
-   * @param [in] scaleY The scale factor applied along the y-axis.
-   * @param [in] scaleZ The scale factor applied along the z-axis.
-   */
-  void SetScale(float scaleX, float scaleY, float scaleZ);
 
   /**
    * Sets a scale factor applied to an actor.
@@ -1364,6 +1332,24 @@ public:
     return mAllowOnlyOwnTouch;
   }
 
+  /**
+   * Query whether the actor send touch motion event.
+   * @return true, it send touch motion event.
+   */
+  bool IsDispatchTouchMotion() const
+  {
+    return mDispatchTouchMotion;
+  }
+
+  /**
+   * Query whether the actor send hover motion event.
+   * @return true, it send hover motion event.
+   */
+  bool IsDispatchHoverMotion() const
+  {
+    return mDispatchHoverMotion;
+  }
+
   // Gestures
 
   /**
@@ -1986,6 +1972,8 @@ protected:
   bool                     mUserInteractionEnabled : 1;    ///< Whether the actor should be enabled user interaction.
   bool                     mAllowOnlyOwnTouch : 1;         ///< Whether the actor will only receive own touch. it only receives touches that started from itself.
   bool                     mUseTextureUpdateArea : 1;      ///< Whether the actor uses the update area of the texture instead of its own.
+  bool                     mDispatchTouchMotion : 1;       ///< Whether to send touch motion events or not.
+  bool                     mDispatchHoverMotion : 1;       ///< Whether to send hover motion events or not.
   LayoutDirection::Type    mLayoutDirection : 2;           ///< Layout direction, Left to Right or Right to Left.
   DrawMode::Type           mDrawMode : 3;                  ///< Cached: How the actor and its children should be drawn
   ColorMode                mColorMode : 3;                 ///< Cached: Determines whether mWorldColor is inherited

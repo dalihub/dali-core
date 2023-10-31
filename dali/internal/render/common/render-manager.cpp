@@ -64,6 +64,9 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_REN
 
 namespace
 {
+// TODO : Cache clean logic have some problem now. Just block it until bug resolved
+//constexpr uint32_t CACHE_CLEAN_FRAME_COUNT = 600u; // 60fps * 10sec
+
 inline Graphics::Rect2D RecalculateScissorArea(const Graphics::Rect2D& scissorArea, int orientation, const Rect<int32_t>& viewportRect)
 {
   Graphics::Rect2D newScissorArea;
@@ -514,6 +517,16 @@ void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear
 
   // Reset pipeline cache before rendering
   mImpl->pipelineCache->PreRender();
+
+  // Let we collect reference counts during CACHE_CLEAN_FRAME_COUNT frames.
+  // TODO : Cache clean logic have some problem now. Just block it until bug resolved
+  /*
+  if(mImpl->frameCount % CACHE_CLEAN_FRAME_COUNT == 1)
+  {
+    mImpl->programController.ResetReferenceCount();
+    mImpl->shaderCache.ResetReferenceCount();
+  }
+  */
 
   mImpl->commandBufferSubmitted = false;
 }
@@ -1108,6 +1121,51 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
   }
 }
 
+void RenderManager::PreCompileShader(const std::string& vertexShader, const std::string& fragmentShader)
+{
+  uint32_t renderPassTag{0u};
+  Dali::Shader::Hint::Value hints = Dali::Shader::Hint::NONE;
+  auto shaderHash = CalculateHash(vertexShader.data(), fragmentShader.data());
+  auto shaderData = new ShaderData(std::string(vertexShader.data()), std::string(fragmentShader.data()), hints, renderPassTag);
+  shaderData->SetHashValue(shaderHash);
+  auto program = Program::New(mImpl->programController, shaderData, mImpl->graphicsController);
+  if(!program)
+  {
+    DALI_LOG_RELEASE_INFO("Fail to create program \n");
+  }
+  else
+  {
+    // If program doesn't have Gfx program object assigned yet, prepare it.
+    if(!program->GetGraphicsProgramPtr())
+    {
+      const std::vector<char>& vertShader   = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::VERTEX_SHADER);
+      const std::vector<char>& fragShader   = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER);
+      Dali::Graphics::Shader&  vertexShader = mImpl->shaderCache.GetShader(
+        vertShader,
+        Graphics::PipelineStage::VERTEX_SHADER,
+        shaderData->GetSourceMode());
+
+      Dali::Graphics::Shader& fragmentShader = mImpl->shaderCache.GetShader(
+        fragShader,
+        Graphics::PipelineStage::FRAGMENT_SHADER,
+        shaderData->GetSourceMode());
+
+      std::vector<Graphics::ShaderState> shaderStates{
+        Graphics::ShaderState()
+          .SetShader(vertexShader)
+          .SetPipelineStage(Graphics::PipelineStage::VERTEX_SHADER),
+        Graphics::ShaderState()
+          .SetShader(fragmentShader)
+          .SetPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER)};
+
+      auto createInfo = Graphics::ProgramCreateInfo();
+      createInfo.SetShaderState(shaderStates);
+      auto graphicsProgram = mImpl->graphicsController.CreateProgram(createInfo, nullptr);
+      program->SetGraphicsProgram(std::move(graphicsProgram), *(mImpl->uniformBufferManager.get())); // generates reflection
+    }
+  }
+}
+
 void RenderManager::PostRender()
 {
   if(!mImpl->commandBufferSubmitted)
@@ -1144,6 +1202,16 @@ void RenderManager::PostRender()
   {
     count += scene->GetRenderInstructions().Count(mImpl->renderBufferIndex);
   }
+
+  // Remove unused shader and programs during CACHE_CLEAN_FRAME_COUNT frames.
+  // TODO : Cache clean logic have some problem now. Just block it until bug resolved
+  /*
+  if(mImpl->frameCount % CACHE_CLEAN_FRAME_COUNT == 0)
+  {
+    mImpl->programController.ClearUnusedCache();
+    mImpl->shaderCache.ClearUnusedCache();
+  }
+  */
 
   const bool haveInstructions = count > 0u;
 

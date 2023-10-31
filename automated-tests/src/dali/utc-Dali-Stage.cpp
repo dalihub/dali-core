@@ -17,6 +17,7 @@
 
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/common/stage-devel.h>
+#include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/context-notifier.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
@@ -24,6 +25,7 @@
 #include <dali/public-api/dali-core.h>
 #include <dali/public-api/events/key-event.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include <iostream>
 
@@ -317,6 +319,44 @@ void GenerateTouch(TestApplication& application, PointState::Type state, const V
   application.ProcessEvent(touchEvent);
 }
 
+volatile bool gRunThreadEntryFunc = false;
+
+class TestThread : public Dali::Thread
+{
+public:
+  TestThread()
+  : mCallback(nullptr)
+  {
+  }
+  TestThread(Dali::CallbackBase* callback)
+  : mCallback(callback)
+  {
+  }
+
+  ~TestThread()
+  {
+    delete mCallback;
+  }
+
+  virtual void Run()
+  {
+    if(mCallback)
+    {
+      Dali::CallbackBase::Execute(*mCallback);
+    }
+
+    gRunThreadEntryFunc = true;
+  }
+
+private:
+  Dali::CallbackBase* mCallback{nullptr};
+};
+
+void CoreThreadCheck()
+{
+  DALI_TEST_CHECK(!Stage::IsCoreThread());
+}
+
 } // unnamed namespace
 
 int UtcDaliStageDefaultConstructorP(void)
@@ -386,6 +426,59 @@ int UtcDaliStageIsInstalledN(void)
 
   END_TEST;
 }
+
+int UtcDaliStageIsShuttingDown(void)
+{
+  DALI_TEST_CHECK(!Stage::IsShuttingDown());
+
+  {
+    TestApplication application;
+
+    DALI_TEST_CHECK(!Stage::IsShuttingDown());
+
+    Stage::GetCurrent();
+
+    DALI_TEST_CHECK(!Stage::IsShuttingDown());
+  }
+
+  // Core destroyed
+  DALI_TEST_CHECK(Stage::IsShuttingDown());
+  END_TEST;
+}
+
+int UtcDaliStageIsCoreThread(void)
+{
+  DALI_TEST_CHECK(!Stage::IsCoreThread());
+
+  {
+    TestApplication application;
+
+    DALI_TEST_CHECK(Stage::IsCoreThread());
+
+    Stage::GetCurrent();
+
+    DALI_TEST_CHECK(Stage::IsCoreThread());
+
+    TestThread thread(Dali::MakeCallback(&CoreThreadCheck));
+
+    gRunThreadEntryFunc = false;
+
+    thread.Start();
+    // wait till the thread is terminated
+    while(!gRunThreadEntryFunc)
+    {
+      usleep(1); // 1 microsecond
+    }
+    DALI_TEST_EQUALS(true, gRunThreadEntryFunc, TEST_LOCATION);
+
+    thread.Join();
+  }
+
+  // Core destroyed
+  DALI_TEST_CHECK(Stage::IsCoreThread());
+  END_TEST;
+}
+
 
 int UtcDaliStageCopyConstructorP(void)
 {

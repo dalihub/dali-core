@@ -31,6 +31,8 @@
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/vector3.h>
 
+#include <dali/internal/update/manager/scene-graph-traveler.h>
+
 namespace Dali
 {
 namespace Internal
@@ -55,8 +57,9 @@ public:
    * @param[in]  updateManager      Ref to the UpdateManager in order to add property resetters
    * @param[in]  transformManager   Ref to the TransformManager in order to set/get transform properties of nodes
    * @param[in]  rootNode           The root node for this proxy
+   * @param[in]  traveler           The cache of traversal for given rootNode
    */
-  UpdateProxy(SceneGraph::UpdateManager& updateManager, SceneGraph::TransformManager& transformManager, SceneGraph::Node& rootNode);
+  UpdateProxy(SceneGraph::UpdateManager& updateManager, SceneGraph::TransformManager& transformManager, SceneGraph::Node& rootNode, SceneGraphTravelerPtr traveler);
 
   /**
    * @brief Destructor.
@@ -232,16 +235,18 @@ private:
   class PropertyModifier;
   using PropertyModifierPtr = std::unique_ptr<PropertyModifier>;
 
-  mutable std::vector<IdNodePair> mNodeContainer;        ///< Used to store cached pointers to already searched for Nodes.
-  mutable IdNodePair              mLastCachedIdNodePair; ///< Used to cache the last retrieved id-node pair.
-  mutable std::vector<uint32_t>   mDirtyNodes;           ///< Used to store the ID of the dirty nodes with non-transform property modifications.
-  BufferIndex                     mCurrentBufferIndex;
+  mutable IdNodePair    mLastCachedIdNodePair; ///< Used to cache the last retrieved id-node pair.
+  std::vector<uint32_t> mDirtyNodes;           ///< Used to store the ID of the dirty nodes with non-transform property modifications.
+  BufferIndex           mCurrentBufferIndex;
 
-  SceneGraph::UpdateManager&                    mUpdateManager;    ///< Reference to the Update Manager.
-  SceneGraph::TransformManager&                 mTransformManager; ///< Reference to the Transform Manager.
-  SceneGraph::Node&                             mRootNode;         ///< The root node of this update proxy.
+  SceneGraph::UpdateManager&    mUpdateManager;      ///< Reference to the Update Manager.
+  SceneGraph::TransformManager& mTransformManager;   ///< Reference to the Transform Manager.
+  SceneGraph::Node&             mRootNode;           ///< The root node of this update proxy.
+  SceneGraphTravelerPtr         mSceneGraphTraveler; ///< The cache system when we travel scene graph. (Not owned)
+
   std::list<Dali::UpdateProxy::NotifySyncPoint> mSyncPoints;
-  PropertyModifierPtr                           mPropertyModifier; ///< To ensure non-transform property modifications reset to base values.
+
+  PropertyModifierPtr mPropertyModifier; ///< To ensure non-transform property modifications reset to base values.
 };
 
 } // namespace Internal

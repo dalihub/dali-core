@@ -153,6 +153,7 @@ SET( internal_src_files
   ${internal_src_dir}/update/manager/render-instruction-processor.cpp
   ${internal_src_dir}/update/manager/render-task-processor.cpp
   ${internal_src_dir}/update/manager/scene-graph-frame-callback.cpp
+  ${internal_src_dir}/update/manager/scene-graph-traveler.cpp
   ${internal_src_dir}/update/manager/transform-manager.cpp
   ${internal_src_dir}/update/manager/update-algorithms.cpp
   ${internal_src_dir}/update/manager/update-manager.cpp
