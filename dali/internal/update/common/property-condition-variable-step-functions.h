@@ -39,7 +39,6 @@ namespace SceneGraph
  * Vector2    => 2 dimensional length of vector has stepped arg1 amount from arg0.
  * Vector3    => 3 dimensional length of vector has stepped arg1 amount from arg0.
  * Vector4    => 4 dimensional length of vector has stepped arg1 amount from arg0.
- * Quaternion => sum of rotation angle and axis changes has stepped arg1 amount from arg0
  * Default    => return false.
  */
 class VariableStep
@@ -98,14 +97,6 @@ private:
    * @return Condition result (true if condition met, false if not)
    */
   static bool EvalVector4(const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg);
-
-  /**
-   * Checks if Quaternion is Outside
-   * @param[in] value The value being examined.
-   * @param[in] arg The supplied arguments for the condition.
-   * @return Condition result (true if condition met, false if not)
-   */
-  static bool EvalQuaternion(const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg);
 
   /**
    * Default check for other types.
