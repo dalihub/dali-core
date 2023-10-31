@@ -58,7 +58,7 @@ namespace Render
 {
 struct ShaderCache;
 class PipelineCache;
-class PipelineCacheL2;
+struct PipelineCacheL2;
 class UniformBufferManager;
 class UniformBufferV2;
 class Renderer;
