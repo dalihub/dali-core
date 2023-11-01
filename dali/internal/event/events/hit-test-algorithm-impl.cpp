@@ -144,17 +144,25 @@ bool IsActorExclusiveToAnotherRenderTask(const Actor&                           
                                          const RenderTaskList::ExclusivesContainer& exclusives)
 
 {
+  bool exclusiveByOtherTask = false;
   if(exclusives.size())
   {
     for(const auto& exclusive : exclusives)
     {
-      if((exclusive.renderTaskPtr != &renderTask) && (exclusive.actor.GetActor() == &actor))
+      if(exclusive.actor.GetActor() == &actor)
       {
-        return true;
+        if(exclusive.renderTaskPtr != &renderTask)
+        {
+          exclusiveByOtherTask = true;
+        }
+        else
+        {
+          return true;
+        }
       }
     }
   }
-  return false;
+  return exclusiveByOtherTask;
 }
 
 /**

@@ -625,7 +625,7 @@ int UtcDaliHitTestAlgorithmOrder(void)
 
   HitTestAlgorithm::Results results;
   HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
-  DALI_TEST_CHECK(results.actor == green);
+  DALI_TEST_CHECK(results.actor == blue);
 
   END_TEST;
 }
