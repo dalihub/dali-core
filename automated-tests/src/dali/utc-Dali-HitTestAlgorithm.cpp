@@ -629,3 +629,66 @@ int UtcDaliHitTestAlgorithmOrder(void)
 
   END_TEST;
 }
+
+int UtcDaliHitTestAlgorithmExclusiveMultiple(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::HitTestAlgorithm between On/Off render task with multiple exclusived");
+
+  Stage   stage = Stage::GetCurrent();
+  Vector2 stageSize(stage.GetSize());
+
+  Actor blue                                        = Actor::New();
+  blue[Dali::Actor::Property::NAME]                 = "Blue";
+  blue[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  blue[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
+  blue[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  blue[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+
+  Actor green                                        = Actor::New();
+  green[Dali::Actor::Property::NAME]                 = "Green";
+  green[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  green[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
+  green[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  green[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+
+  stage.Add(blue);
+  stage.Add(green);
+
+  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTask     offRenderTask  = renderTaskList.CreateTask();
+  RenderTask     offRenderTask2 = renderTaskList.CreateTask();
+
+  Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
+  cameraActor[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+  stage.Add(cameraActor);
+
+  offRenderTask.SetExclusive(true);
+  offRenderTask.SetInputEnabled(true);
+  offRenderTask.SetCameraActor(cameraActor);
+  offRenderTask.SetSourceActor(green);
+  offRenderTask.SetScreenToFrameBufferMappingActor(green);
+
+  Dali::Texture texture      = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGB888, unsigned(stageSize.width), unsigned(stageSize.height));
+  FrameBuffer   renderTarget = FrameBuffer::New(stageSize.width, stageSize.height, FrameBuffer::Attachment::DEPTH);
+  renderTarget.AttachColorTexture(texture);
+  offRenderTask.SetFrameBuffer(renderTarget);
+
+  offRenderTask2.SetExclusive(true);
+  offRenderTask2.SetInputEnabled(true);
+  offRenderTask2.SetCameraActor(cameraActor);
+  offRenderTask2.SetSourceActor(green);
+  offRenderTask2.SetScreenToFrameBufferMappingActor(green);
+  offRenderTask2.SetFrameBuffer(renderTarget);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render(10);
+
+  HitTestAlgorithm::Results results;
+  HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
+  DALI_TEST_CHECK(results.actor == green);
+
+  END_TEST;
+}

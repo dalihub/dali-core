@@ -144,17 +144,26 @@ bool IsActorExclusiveToAnotherRenderTask(const Actor&                           
                                          const RenderTaskList::ExclusivesContainer& exclusives)
 
 {
+  bool exclusiveByOtherTask = false;
   if(exclusives.size())
   {
     for(const auto& exclusive : exclusives)
     {
-      if((exclusive.renderTaskPtr != &renderTask) && (exclusive.actor.GetActor() == &actor))
+      if(exclusive.actor.GetActor() == &actor)
       {
-        return true;
+        if(exclusive.renderTaskPtr != &renderTask)
+        {
+          exclusiveByOtherTask = true;
+        }
+        else
+        {
+          // Fast-out if render task is itself
+          return false;
+        }
       }
     }
   }
-  return false;
+  return exclusiveByOtherTask;
 }
 
 /**
@@ -485,10 +494,26 @@ bool HitTestRenderTask(const RenderTaskList::ExclusivesContainer& exclusives,
         bool     overlayHit       = false;
         bool     layerConsumesHit = false;
 
+        // Be used when we decide to consume layer.
+        // We should not consume hit if sourceLayer is above on consumable layer. Otherwise, we should consume. So just initialize it as 0.
+        // sourceLayerIndex can be a relative value to calculate the relationship with the layer.
+        // If the layer is consumed first, sourceLayerIndex is not the actual index, but it must be guaranteed to have an index smaller than the layer.
+        // If there is a sourceLayer above the consumable layer, the sourceLayerIndex is determined and the index of the consumable layer is also determined.
+        // Then we can calculate the relationship between the two layers.
+        bool    IsHitTestWithinLayer = false;
+        int32_t sourceLayerIndex     = 0;
+        int32_t consumedLayerIndex   = -1;
+
         for(int32_t i = layers.GetLayerCount() - 1; i >= 0 && !(hit.actor); --i)
         {
           Layer* layer(layers.GetLayer(i));
-          overlayHit = false;
+          overlayHit           = false;
+          IsHitTestWithinLayer = false;
+
+          if(sourceLayer == layer)
+          {
+            sourceLayerIndex = i;
+          }
 
           // Ensure layer is touchable (also checks whether ancestors are also touchable)
           if(IsActuallyHittable(*layer, screenCoordinates, sceneSize, hitCheck))
@@ -496,6 +521,7 @@ bool HitTestRenderTask(const RenderTaskList::ExclusivesContainer& exclusives,
             // Always hit-test the source actor; otherwise test whether the layer is below the source actor in the hierarchy
             if(sourceActorDepth == static_cast<uint32_t>(i))
             {
+              IsHitTestWithinLayer = true;
               // Recursively hit test the source actor & children, without crossing into other layers.
               hit = HitTestWithinLayer(*sourceActor,
                                        renderTask,
@@ -514,6 +540,7 @@ bool HitTestRenderTask(const RenderTaskList::ExclusivesContainer& exclusives,
             }
             else if(IsWithinSourceActors(*sourceActor, *layer))
             {
+              IsHitTestWithinLayer = true;
               // Recursively hit test all the actors, without crossing into other layers.
               hit = HitTestWithinLayer(*layer,
                                        renderTask,
@@ -532,10 +559,10 @@ bool HitTestRenderTask(const RenderTaskList::ExclusivesContainer& exclusives,
             }
 
             // If this layer is set to consume the hit, then do not check any layers behind it
-            if(hitCheck.DoesLayerConsumeHit(layer))
+            if(IsHitTestWithinLayer && hitCheck.DoesLayerConsumeHit(layer))
             {
-              // Consume the hit if this layer is same as SourceActor's layer
-              layerConsumesHit = (sourceLayer == Dali::Layer(layer));
+              consumedLayerIndex = i;
+              layerConsumesHit   = true;
               break;
             }
           }
@@ -552,7 +579,15 @@ bool HitTestRenderTask(const RenderTaskList::ExclusivesContainer& exclusives,
 
         if(layerConsumesHit)
         {
-          return true; // Also success if layer is consuming the hit
+          // Consumes if the hitted layer is above the SourceActor's layer.
+          bool ret = sourceLayerIndex <= consumedLayerIndex;
+          if(ret)
+          {
+            DALI_LOG_RELEASE_INFO("layer is set to consume the hit\n");
+            results.renderTask = RenderTaskPtr(&renderTask);
+            results.actor      = Dali::Layer(layers.GetLayer(consumedLayerIndex));
+          }
+          return ret; // Also success if layer is consuming the hit
         }
       }
     }
