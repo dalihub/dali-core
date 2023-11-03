@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@ namespace Internal
 {
 namespace SceneGraph
 {
-
 namespace
 {
 static constexpr uint32_t DEFAULT_RENDER_PASS_TAG = 0u;
@@ -43,45 +42,38 @@ Shader::~Shader()
 
 void Shader::UpdateShaderData(ShaderDataPtr shaderData)
 {
+  if(shaderData->GetRenderPassTag() == DEFAULT_RENDER_PASS_TAG)
+  {
+    mDefaultShaderData = std::move(shaderData);
+    return;
+  }
+
   DALI_LOG_TRACE_METHOD_FMT(Debug::Filter::gShader, "%d\n", shaderData->GetHashValue());
-  std::vector<Internal::ShaderDataPtr>::iterator shaderDataIterator = std::find_if(mShaderDataList.begin(), mShaderDataList.end(), [&shaderData](const Internal::ShaderDataPtr& shaderDataItem)
-                                                                                   { return shaderDataItem->GetRenderPassTag() == shaderData->GetRenderPassTag(); });
+  std::vector<Internal::ShaderDataPtr>::iterator shaderDataIterator = std::find_if(mShaderDataList.begin(), mShaderDataList.end(), [&shaderData](const Internal::ShaderDataPtr& shaderDataItem) { return shaderDataItem->GetRenderPassTag() == shaderData->GetRenderPassTag(); });
   if(shaderDataIterator != mShaderDataList.end())
   {
-    *shaderDataIterator = shaderData;
+    *shaderDataIterator = std::move(shaderData);
   }
   else
   {
-    mShaderDataList.push_back(shaderData);
+    mShaderDataList.push_back(std::move(shaderData));
   }
 }
 
 ShaderDataPtr Shader::GetShaderData(uint32_t renderPassTag) const
 {
-  if(mShaderDataList.empty())
+  if(renderPassTag != DEFAULT_RENDER_PASS_TAG)
   {
-    return nullptr;
-  }
-
-  Internal::ShaderDataPtr returnShaderData = nullptr;
-  for(auto && shaderData : mShaderDataList)
-  {
-    if(shaderData->GetRenderPassTag() == renderPassTag)
+    for(auto&& shaderData : mShaderDataList)
     {
-      return shaderData;
-    }
-    if(shaderData->GetRenderPassTag() == DEFAULT_RENDER_PASS_TAG)
-    {
-      returnShaderData = shaderData;
+      if(shaderData->GetRenderPassTag() == renderPassTag)
+      {
+        return shaderData;
+      }
     }
   }
 
-  if(returnShaderData)
-  {
-    return returnShaderData;
-  }
-
-  return mShaderDataList.front();
+  return mDefaultShaderData;
 }
 
 } // namespace SceneGraph

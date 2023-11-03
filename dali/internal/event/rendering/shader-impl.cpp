@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,8 +90,8 @@ Property::Value HintString(const Dali::Shader::Hint::Value& hints)
 
 void GetShaderData(const Property::Map& shaderMap, std::string& vertexShader, std::string& fragmentShader, uint32_t& renderPassTag, Dali::Shader::Hint::Value& hints)
 {
-  hints      = Dali::Shader::Hint::NONE;
-  renderPassTag = 0u;
+  hints         = Dali::Shader::Hint::NONE;
+  renderPassTag = DEFAULT_RENDER_PASS_TAG;
 
   if(Property::Value* value = shaderMap.Find("vertex"))
   {
@@ -194,11 +194,11 @@ Property::Value Shader::GetDefaultProperty(Property::Index index) const
       if(mShaderDataList.size() == 1u)
       {
         Dali::Property::Map map;
-        map["vertex"]     = Property::Value(mShaderDataList.front()->GetVertexShader());
-        map["fragment"]   = Property::Value(mShaderDataList.front()->GetFragmentShader());
+        map["vertex"]        = Property::Value(mShaderDataList.front()->GetVertexShader());
+        map["fragment"]      = Property::Value(mShaderDataList.front()->GetFragmentShader());
         map["renderPassTag"] = Property::Value(static_cast<int32_t>(mShaderDataList.front()->GetRenderPassTag()));
-        map["hints"]      = HintString(mShaderDataList.front()->GetHints());
-        value             = map;
+        map["hints"]         = HintString(mShaderDataList.front()->GetHints());
+        value                = map;
       }
       else
       {
@@ -208,10 +208,10 @@ Property::Value Shader::GetDefaultProperty(Property::Index index) const
           if(shaderData)
           {
             Dali::Property::Map map;
-            map["vertex"]     = Property::Value(shaderData->GetVertexShader());
-            map["fragment"]   = Property::Value(shaderData->GetFragmentShader());
+            map["vertex"]        = Property::Value(shaderData->GetVertexShader());
+            map["fragment"]      = Property::Value(shaderData->GetFragmentShader());
             map["renderPassTag"] = Property::Value(static_cast<int32_t>(shaderData->GetRenderPassTag()));
-            map["hints"]      = HintString(shaderData->GetHints());
+            map["hints"]         = HintString(shaderData->GetHints());
             array.PushBack(map);
           }
         }
@@ -245,8 +245,7 @@ void Shader::UpdateShaderData(std::string_view          vertexSource,
   size_t                  shaderHash;
   Internal::ShaderDataPtr shaderData = shaderFactory.Load(vertexSource, fragmentSource, hints, renderPassTag, shaderHash);
 
-  std::vector<Internal::ShaderDataPtr>::iterator shaderDataIterator = std::find_if(mShaderDataList.begin(), mShaderDataList.end(), [&shaderData](const Internal::ShaderDataPtr& shaderDataItem)
-                                                                                   { return shaderDataItem->GetRenderPassTag() == shaderData->GetRenderPassTag(); });
+  std::vector<Internal::ShaderDataPtr>::iterator shaderDataIterator = std::find_if(mShaderDataList.begin(), mShaderDataList.end(), [&shaderData](const Internal::ShaderDataPtr& shaderDataItem) { return shaderDataItem->GetRenderPassTag() == shaderData->GetRenderPassTag(); });
   if(shaderDataIterator != mShaderDataList.end())
   {
     *shaderDataIterator = shaderData;
@@ -269,7 +268,7 @@ void Shader::SetShaderProperty(const Dali::Property::Value& shaderMap)
     {
       std::string               vertex;
       std::string               fragment;
-      uint32_t                  renderPassTag{0u};
+      uint32_t                  renderPassTag{DEFAULT_RENDER_PASS_TAG};
       Dali::Shader::Hint::Value hints(Dali::Shader::Hint::NONE);
       GetShaderData(*map, vertex, fragment, renderPassTag, hints);
 
@@ -289,7 +288,7 @@ void Shader::SetShaderProperty(const Dali::Property::Value& shaderMap)
         {
           std::string               vertex;
           std::string               fragment;
-          uint32_t                  renderPassTag{0u};
+          uint32_t                  renderPassTag{DEFAULT_RENDER_PASS_TAG};
           Dali::Shader::Hint::Value hints(Dali::Shader::Hint::NONE);
           GetShaderData(*map, vertex, fragment, renderPassTag, hints);
 

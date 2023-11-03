@@ -488,7 +488,7 @@ Program* Renderer::PrepareProgram(const SceneGraph::RenderInstruction& instructi
   // Create Program
   const SceneGraph::Shader& shader = mRenderDataProvider->GetShader();
 
-  ShaderDataPtr shaderData = shader.GetShaderData(instruction.mRenderPassTag);
+  const ShaderDataPtr& shaderData = shader.GetShaderData(instruction.mRenderPassTag);
   if(!shaderData)
   {
     DALI_LOG_ERROR("Failed to get shader data.\n");
@@ -696,7 +696,7 @@ std::size_t Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const SceneG
 
   // Specially, if node don't have uniformMap, we mark nodePtr as nullptr.
   // So, all nodes without uniformMap will share same UniformIndexMap, contains only render data providers.
-  const auto nodePtr = uniformMapNode.Count() ? &node : nullptr;
+  const auto nodePtr    = uniformMapNode.Count() ? &node : nullptr;
   const auto programPtr = &program;
 
   const auto nodeChangeCounter          = nodePtr ? uniformMapNode.GetChangeCounter() : 0;
