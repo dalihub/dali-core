@@ -69,7 +69,7 @@ public:
    *  @SINCE_2_2.45
    *  @param[in] shaders shader data for precompile
   */
-  void GetPrecompileShaderList(RawShaderData& shaders);
+  void GetPrecompileShaderList(std::vector<RawShaderData>& shaders);
 
   /**
    * @brief Save the precompile shader list.
@@ -77,7 +77,7 @@ public:
    * @SINCE_2_2.45
    * @param[in] shaders shader data for precompile
   */
-  void SavePrecomipleShaderList(RawShaderData& shaders);
+  void SavePrecomipleShaderList(std::vector<RawShaderData>& shaders);
 
   /**
    * @brief Check precompile list is ready or not
@@ -116,7 +116,7 @@ public:
 private:
   static std::unique_ptr<ShaderPrecompiler> mInstance;
   static std::once_flag mOnceFlag;
-  RawShaderData mRawShaderData;
+  std::vector<RawShaderData> mRawShaderList;
   ConditionalWait mConditionalWait;
   bool mPrecompiled;
   bool mEnabled;
