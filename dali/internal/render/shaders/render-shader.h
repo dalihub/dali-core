@@ -70,7 +70,8 @@ public:
   [[nodiscard]] ShaderDataPtr GetShaderData(uint32_t renderPassTag) const;
 
 private: // Data
-  std::vector<ShaderDataPtr> mShaderDataList;
+  ShaderDataPtr              mDefaultShaderData{nullptr};
+  std::vector<ShaderDataPtr> mShaderDataList{};
 };
 
 inline void UpdateShaderDataMessage(EventThreadServices& eventThreadServices, const Shader& shader, ShaderDataPtr shaderData)

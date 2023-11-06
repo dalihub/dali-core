@@ -74,7 +74,7 @@ inline uint32_t AlignSize(uint32_t dataSize, uint32_t alignSize)
 
 // IMPLEMENTATION
 
-Program* Program::New(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& gfxController)
+Program* Program::New(ProgramCache& cache, const Internal::ShaderDataPtr& shaderData, Graphics::Controller& gfxController)
 {
   size_t shaderHash = shaderData->GetHashValue();
 
@@ -97,7 +97,7 @@ Program::Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphi
   mViewMatrix(nullptr),
   mGfxProgram(nullptr),
   mGfxController(controller),
-  mProgramData(shaderData)
+  mProgramData(std::move(shaderData))
 {
 }
 

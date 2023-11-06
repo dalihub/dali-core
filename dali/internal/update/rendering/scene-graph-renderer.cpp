@@ -684,10 +684,14 @@ Renderer::OpacityType Renderer::GetOpacityType(BufferIndex updateBufferIndex, ui
         break;
       }
 
-      if(mShader->GetShaderData(renderPass))
+      if(mTextureSet && mTextureSet->HasAlpha())
       {
-        bool shaderRequiresBlending(mShader->GetShaderData(renderPass)->HintEnabled(Dali::Shader::Hint::OUTPUT_IS_TRANSPARENT));
-        if(shaderRequiresBlending || (mTextureSet && mTextureSet->HasAlpha()))
+        opacityType = Renderer::TRANSLUCENT;
+      }
+      else
+      {
+        const auto& shaderData = mShader->GetShaderData(renderPass);
+        if(shaderData && shaderData->HintEnabled(Dali::Shader::Hint::OUTPUT_IS_TRANSPARENT))
         {
           opacityType = Renderer::TRANSLUCENT;
         }
