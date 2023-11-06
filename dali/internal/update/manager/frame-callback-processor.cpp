@@ -95,7 +95,11 @@ bool FrameCallbackProcessor::Update(BufferIndex bufferIndex, float elapsedSecond
       }
       else
       {
-        (iter++)->second->NodeHierarchyChanged();
+        if(iter->first->IsDescendentHierarchyChanged())
+        {
+          iter->second->NodeHierarchyChanged();
+        }
+        ++iter;
       }
     }
   }
