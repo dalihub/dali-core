@@ -209,10 +209,24 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
   Matrix  nodeModelViewMatrix(false);
   bool    nodeModelViewMatrixSet(false);
 
-  // Don't cull items which have render callback
-  bool hasRenderCallback = (renderable.mRenderer && renderable.mRenderer->GetRenderCallback());
+  const bool rendererExist(renderable.mRenderer);
 
-  if(cull && renderable.mRenderer && !hasRenderCallback && renderable.mRenderer->GetShader().GetShaderData(renderPass) && !renderable.mRenderer->GetShader().GetShaderData(renderPass)->HintEnabled(Dali::Shader::Hint::MODIFIES_GEOMETRY) && node->GetClippingMode() == ClippingMode::DISABLED)
+  // Don't cull items which have render callback
+  bool hasRenderCallback = (rendererExist && renderable.mRenderer->GetRenderCallback());
+
+  auto requiredInsideCheck = [&]() {
+    if(cull &&
+       !hasRenderCallback &&
+       node->GetClippingMode() == ClippingMode::DISABLED &&
+       rendererExist)
+    {
+      const auto& shaderData = renderable.mRenderer->GetShader().GetShaderData(renderPass);
+      return (shaderData && !shaderData->HintEnabled(Dali::Shader::Hint::MODIFIES_GEOMETRY));
+    }
+    return false;
+  };
+
+  if(requiredInsideCheck())
   {
     const Vector4& boundingSphere = node->GetBoundingSphere();
     inside                        = (boundingSphere.w > Math::MACHINE_EPSILON_1000) &&
@@ -254,7 +268,7 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
     bool isOpaque = true;
     if(!hasRenderCallback)
     {
-      Renderer::OpacityType opacityType = renderable.mRenderer ? renderable.mRenderer->GetOpacityType(updateBufferIndex, renderPass, *node) : Renderer::OPAQUE;
+      Renderer::OpacityType opacityType = rendererExist ? renderable.mRenderer->GetOpacityType(updateBufferIndex, renderPass, *node) : Renderer::OPAQUE;
 
       // We can skip render when node is not clipping and transparent
       skipRender = (opacityType == Renderer::TRANSPARENT && node->GetClippingMode() == ClippingMode::DISABLED);
@@ -271,7 +285,7 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
       item.mIsOpaque   = isOpaque;
       item.mDepthIndex = isLayer3d ? 0 : node->GetDepthIndex();
 
-      if(DALI_LIKELY(renderable.mRenderer))
+      if(DALI_LIKELY(rendererExist))
       {
         item.mRenderer   = renderable.mRenderer->GetRenderer();
         item.mTextureSet = renderable.mRenderer->GetTextureSet();

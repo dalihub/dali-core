@@ -84,7 +84,7 @@ public:
    * @param[in]  gfxController Reference to valid graphics Controller object
    * @return pointer to the program
    */
-  static Program* New(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& gfxController);
+  static Program* New(ProgramCache& cache, const Internal::ShaderDataPtr& shaderData, Graphics::Controller& gfxController);
 
   /**
    * Set the projection matrix that has currently been sent
