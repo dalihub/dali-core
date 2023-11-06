@@ -68,7 +68,7 @@ public:
    *
    *  @SINCE_2_2.45
    *  @param[in] shaders shader data for precompile
-  */
+   */
   void GetPrecompileShaderList(std::vector<RawShaderData>& shaders);
 
   /**
@@ -76,7 +76,7 @@ public:
    *
    * @SINCE_2_2.45
    * @param[in] shaders shader data for precompile
-  */
+   */
   void SavePrecomipleShaderList(std::vector<RawShaderData>& shaders);
 
   /**
@@ -84,14 +84,14 @@ public:
    *
    * @SINCE_2_2.45
    * @return true if precompile list is ready
-  */
+   */
   bool IsReady() const;
 
   /**
    * @brief Enable the feature of precompile
    *
    * @SINCE_2_2.45
-  */
+   */
   void Enable();
 
   /**
@@ -101,6 +101,18 @@ public:
    * @return true if the feature of precompile is enabled
   */
   bool IsEnable();
+
+  /**
+   * @brief Waiting for a list of shaders to be precompiled
+   *
+   */
+  void WaitPrecompileList();
+
+  /**
+   * @brief Stop waiting for a list of shaders to be precompiled
+   *
+   */
+  void StopPrecompile();
 
   /**
    * Construct a new ShaderPrecompiler.
@@ -118,8 +130,10 @@ private:
   static std::once_flag mOnceFlag;
   std::vector<RawShaderData> mRawShaderList;
   ConditionalWait mConditionalWait;
+  Dali::Mutex mMutex;
   bool mPrecompiled;
   bool mEnabled;
+  bool mNeedsSleep{true};
 };
 
 } // namespace Integration

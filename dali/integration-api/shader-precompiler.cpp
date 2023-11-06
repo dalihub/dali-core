@@ -46,24 +46,15 @@ ShaderPrecompiler& ShaderPrecompiler::Get()
 
 void ShaderPrecompiler::GetPrecompileShaderList(std::vector<RawShaderData>& shaderList)
 {
-  ConditionalWait::ScopedLock lock(mConditionalWait);
-  if(!IsReady())
-  {
-    DALI_LOG_RELEASE_INFO("Precompiled shader list is not ready yet, need to wait \n");
-    mConditionalWait.Wait(lock);
-  }
-
   // move shader list
   shaderList = mRawShaderList;
 }
 
 void ShaderPrecompiler::SavePrecomipleShaderList(std::vector<RawShaderData>& shaderList)
 {
-  ConditionalWait::ScopedLock lock(mConditionalWait);
-
   mRawShaderList = shaderList;
   mPrecompiled = true;
-  mConditionalWait.Notify(lock);
+  StopPrecompile();
 }
 
 bool ShaderPrecompiler::IsReady() const
@@ -79,6 +70,28 @@ void ShaderPrecompiler::Enable()
 bool ShaderPrecompiler::IsEnable()
 {
   return mEnabled;
+}
+
+void ShaderPrecompiler::WaitPrecompileList()
+{
+  ConditionalWait::ScopedLock lock(mConditionalWait);
+  {
+    Dali::Mutex::ScopedLock mutexLock(mMutex);
+    if(!mNeedsSleep)
+    {
+      return;
+    }
+  }
+
+  mConditionalWait.Wait(lock);
+}
+
+void ShaderPrecompiler::StopPrecompile()
+{
+  ConditionalWait::ScopedLock lock(mConditionalWait);
+  Dali::Mutex::ScopedLock mutexLock(mMutex);
+  mNeedsSleep = false;
+  mConditionalWait.Notify(lock);
 }
 
 
