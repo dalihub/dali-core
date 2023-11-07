@@ -181,6 +181,12 @@ void EventProcessor::ProcessEvents()
   queueToProcess->Reset();
 }
 
+void EventProcessor::SendInterruptedEvents(Dali::Internal::Actor *actor)
+{
+    //TODO: Other event types should also be added if needed
+    mHoverEventProcessor.SendInterruptedHoverEvent(actor);
+}
+
 } // namespace Internal
 
 } // namespace Dali
