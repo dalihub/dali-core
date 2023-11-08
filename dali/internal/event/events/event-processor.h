@@ -72,6 +72,12 @@ public:
    */
   void ProcessEvents();
 
+  /**
+   * This function is called when sending a interrupted event to a specific actor.
+   * @param[in] actor The actor on which the event should occur.
+   */
+  void SendInterruptedEvents(Dali::Internal::Actor *actor);
+
 private:
   Scene&                 mScene;                 ///< The Scene events are processed for.
   TouchEventProcessor    mTouchEventProcessor;   ///< Processes touch events.

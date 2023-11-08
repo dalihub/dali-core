@@ -22,6 +22,9 @@
 #include <sstream>
 #endif
 
+// EXTERNAL INCLUDES
+#include <chrono>
+
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/events/hover-event-integ.h>
@@ -169,10 +172,21 @@ struct ActorHoverableCheck : public HitTestAlgorithm::HitTestInterface
   }
 };
 
+uint32_t GetMilliSeconds()
+{
+  // Get the time of a monotonic clock since its epoch.
+  auto epoch = std::chrono::steady_clock::now().time_since_epoch();
+
+  auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(epoch);
+
+  return static_cast<uint32_t>(duration.count());
+}
+
 } // unnamed namespace
 
 HoverEventProcessor::HoverEventProcessor(Scene& scene)
-: mScene(scene)
+: mScene(scene),
+  mLastPrimaryHitActor(MakeCallback(this, &HoverEventProcessor::OnObservedActorDisconnected))
 {
   DALI_LOG_TRACE_METHOD(gLogFilter);
 }
@@ -180,6 +194,19 @@ HoverEventProcessor::HoverEventProcessor(Scene& scene)
 HoverEventProcessor::~HoverEventProcessor()
 {
   DALI_LOG_TRACE_METHOD(gLogFilter);
+}
+
+void HoverEventProcessor::SendInterruptedHoverEvent(Dali::Internal::Actor* actor)
+{
+  if(actor &&
+     (mLastPrimaryHitActor.GetActor() == actor || mLastConsumedActor.GetActor() == actor))
+  {
+    Integration::Point point;
+    point.SetState(PointState::INTERRUPTED);
+    point.SetHitActor(Dali::Actor(actor));
+    AllocAndEmitHoverSignals(GetMilliSeconds(), point.GetHitActor(), point);
+    Clear();
+  }
 }
 
 void HoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent& event)
@@ -235,11 +262,8 @@ void HoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent& event
       AllocAndEmitHoverSignals(event.time, hoverStartConsumedActorHandle, currentPoint);
     }
 
-    mLastPrimaryHitActor.SetActor(nullptr);
-    mLastConsumedActor.SetActor(nullptr);
+    Clear();
     mHoverStartConsumedActor.SetActor(nullptr);
-    mLastRenderTask.Reset();
-
     return; // No need for hit testing
   }
 
@@ -379,9 +403,7 @@ void HoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent& event
 
   if(primaryPointState == PointState::FINISHED)
   {
-    mLastPrimaryHitActor.SetActor(nullptr);
-    mLastConsumedActor.SetActor(nullptr);
-    mLastRenderTask.Reset();
+    Clear();
   }
   else
   {
@@ -389,7 +411,6 @@ void HoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent& event
     if(primaryHitActor && GetImplementation(primaryHitActor).OnScene())
     {
       mLastPrimaryHitActor.SetActor(&GetImplementation(primaryHitActor));
-
       // Only observe the consumed actor if we have a primaryHitActor (check if it is still on the scene).
       if(consumedActor && GetImplementation(consumedActor).OnScene())
       {
@@ -404,9 +425,7 @@ void HoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent& event
     }
     else
     {
-      mLastPrimaryHitActor.SetActor(nullptr);
-      mLastConsumedActor.SetActor(nullptr);
-      mLastRenderTask.Reset();
+      Clear();
     }
   }
 
@@ -450,6 +469,18 @@ void HoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent& event
       }
     }
   }
+}
+
+void HoverEventProcessor::Clear()
+{
+  mLastPrimaryHitActor.SetActor(nullptr);
+  mLastConsumedActor.SetActor(nullptr);
+  mLastRenderTask.Reset();
+}
+
+void HoverEventProcessor::OnObservedActorDisconnected(Dali::Internal::Actor* actor)
+{
+  SendInterruptedHoverEvent(actor);
 }
 
 } // namespace Internal

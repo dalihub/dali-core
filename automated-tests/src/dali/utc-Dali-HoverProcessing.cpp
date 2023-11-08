@@ -513,6 +513,8 @@ int UtcDaliHoverInterruptedParentConsumer(void)
 
   // Remove actor from Stage
   application.GetScene().Remove(actor);
+  data.Reset();
+  rootData.Reset();
 
   // Render and notify
   application.SendNotification();
@@ -743,6 +745,12 @@ int UtcDaliHoverActorBecomesInsensitiveParentConsumer(void)
   // Remove actor from Stage
   application.GetScene().Remove(actor);
 
+  // Because it was removed, it gets interrupted.
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::INTERRUPTED, data.hoverEvent.GetState(0), TEST_LOCATION);
+  data.Reset();
+  rootData.Reset();
+
   // Render and notify
   application.SendNotification();
   application.Render();
@@ -750,11 +758,13 @@ int UtcDaliHoverActorBecomesInsensitiveParentConsumer(void)
   // Make root actor insensitive
   rootActor.SetProperty(Actor::Property::SENSITIVE, false);
 
-  // Emit a motion signal, signalled with an interrupted (should get interrupted even if within root actor)
+  // Because it is insensitive, it does not receive the event.
   application.ProcessEvent(GenerateSingleHover(PointState::MOTION, Vector2(200.0f, 200.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(true, rootData.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(PointState::INTERRUPTED, rootData.hoverEvent.GetState(0), TEST_LOCATION);
+  DALI_TEST_EQUALS(false, rootData.functorCalled, TEST_LOCATION);
+  data.Reset();
+  rootData.Reset();
+
   END_TEST;
 }
 
@@ -902,6 +912,12 @@ int UtcDaliHoverMultipleLayers(void)
 
   // Make rootActor invisible, render and notify
   rootActor.SetProperty(Actor::Property::VISIBLE, false);
+
+  // Because visible became false, we receive interrupted
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::INTERRUPTED, data.hoverEvent.GetState(0), TEST_LOCATION);
+  data.Reset();
+
   application.SendNotification();
   application.Render();
 
@@ -1209,6 +1225,11 @@ int UtcDaliHoverActorUnStaged(void)
   // Remove actor from stage
   application.GetScene().Remove(actor);
 
+  // Interrupted is received because the actor receiving the event removed.
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::INTERRUPTED, data.hoverEvent.GetState(0), TEST_LOCATION);
+  data.Reset();
+
   // Render and notify
   application.SendNotification();
   application.Render();
@@ -1342,6 +1363,44 @@ int UtcDaliHoverEventIntegNewHoverEvent(void)
   DALI_TEST_EQUALS(hoverEvent.GetState(0), PointState::STARTED, TEST_LOCATION);
   DALI_TEST_EQUALS(hoverEvent.GetLocalPosition(0), Vector2(5.0f, 7.0f), TEST_LOCATION);
   DALI_TEST_EQUALS(hoverEvent.GetScreenPosition(0), Vector2(34.4f, 123.89f), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliHoverActorHide(void)
+{
+  TestApplication    application;
+  Integration::Scene stage = application.GetScene();
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  stage.Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's hovered signal
+  SignalData        data;
+  HoverEventFunctor functor(data);
+  actor.HoveredSignal().Connect(&application, functor);
+
+  // Emit a started
+  application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(10.0f, 10.0f)));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  actor.SetProperty(Actor::Property::VISIBLE, false);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  // Interrupted is received because the actor receiving the event hides.
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::INTERRUPTED, data.hoverEvent.GetState(0), TEST_LOCATION);
+  data.Reset();
 
   END_TEST;
 }

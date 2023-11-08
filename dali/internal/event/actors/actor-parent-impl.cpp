@@ -531,6 +531,12 @@ void ActorParentImpl::EmitVisibilityChangedSignalRecursively(
   bool                               visible,
   DevelActor::VisibilityChange::Type type)
 {
+  if(!visible && mOwner.OnScene())
+  {
+    //The actor should receive an interrupted event when it is hidden.
+    mOwner.GetScene().SendInterruptedEvents(&mOwner);
+  }
+
   mOwner.EmitVisibilityChangedSignal(visible, type);
 
   if(mChildren)
