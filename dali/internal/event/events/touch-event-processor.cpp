@@ -415,7 +415,7 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
     }
     else
     {
-      DALI_LOG_RELEASE_INFO("PrimaryHitActor:(%p), id(%d), name(%s), state(%s)\n", primaryHitActor ? reinterpret_cast<void*>(&primaryHitActor.GetBaseObject()) : NULL, primaryHitActor ? primaryHitActor.GetProperty<int32_t>(Dali::Actor::Property::ID) : -1, primaryHitActor ? primaryHitActor.GetProperty<std::string>(Dali::Actor::Property::NAME).c_str() : "", TOUCH_POINT_STATE[primaryPointState]);
+      DALI_LOG_RELEASE_INFO("PrimaryHitActor:(%p), id(%d), name(%s), state(%s), screenPosition(%f, %f)\n", primaryHitActor ? reinterpret_cast<void*>(&primaryHitActor.GetBaseObject()) : NULL, primaryHitActor ? primaryHitActor.GetProperty<int32_t>(Dali::Actor::Property::ID) : -1, primaryHitActor ? primaryHitActor.GetProperty<std::string>(Dali::Actor::Property::NAME).c_str() : "", TOUCH_POINT_STATE[primaryPointState], primaryPoint.GetScreenPosition().x, primaryPoint.GetScreenPosition().y);
       DALI_LOG_RELEASE_INFO("ConsumedActor:  (%p), id(%d), name(%s), state(%s)\n", consumedActor ? reinterpret_cast<void*>(&consumedActor.GetBaseObject()) : NULL, consumedActor ? consumedActor.GetProperty<int32_t>(Dali::Actor::Property::ID) : -1, consumedActor ? consumedActor.GetProperty<std::string>(Dali::Actor::Property::NAME).c_str() : "", TOUCH_POINT_STATE[primaryPointState]);
     }
   }
