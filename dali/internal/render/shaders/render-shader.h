@@ -28,7 +28,6 @@ namespace Dali
 namespace Internal
 {
 class Program;
-class ProgramCache;
 
 namespace SceneGraph
 {

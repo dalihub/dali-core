@@ -18,11 +18,12 @@
 
 namespace Dali
 {
-TestGraphicsProgramImpl::TestGraphicsProgramImpl(TestGlAbstraction& gl, const Graphics::ProgramCreateInfo& createInfo, Property::Array& vertexFormats, std::vector<UniformData>& customUniforms, std::vector<TestGraphicsReflection::TestUniformBlockInfo>& customUniformBlocks)
-: mGl(gl),
+TestGraphicsProgramImpl::TestGraphicsProgramImpl(TestGraphicsController& controller, TestGlAbstraction& gl, const Graphics::ProgramCreateInfo& createInfo, Property::Array& vertexFormats, std::vector<UniformData>& customUniforms, std::vector<TestGraphicsReflection::TestUniformBlockInfo>& customUniformBlocks)
+: mController(controller),
+  mGl(gl),
   mId(gl.CreateProgram()),
   mCreateInfo(createInfo),
-  mReflection(gl, mId, vertexFormats, createInfo, customUniforms, customUniformBlocks)
+  mReflection(controller, gl, mId, vertexFormats, createInfo, customUniforms, customUniformBlocks)
 {
   // Ensure active sampler uniforms are set
   mGl.SetCustomUniforms(customUniforms);

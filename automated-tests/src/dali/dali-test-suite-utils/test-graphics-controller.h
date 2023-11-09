@@ -424,6 +424,15 @@ public: // ResourceId relative API.
   Graphics::UniquePtr<Graphics::Texture> ReleaseTextureFromResourceId(uint32_t resourceId) override;
 
 public: // Test Functions
+  void SetAutoAttrCreation(bool v)
+  {
+    mAutoAttrCreation = v;
+  }
+  bool AutoAttrCreation()
+  {
+    return mAutoAttrCreation;
+  }
+
   void SetVertexFormats(Property::Array& vfs)
   {
     mVertexFormats = vfs;
@@ -458,9 +467,9 @@ public:
   TestGraphicsSyncImplementation mGraphicsSyncImpl;
   TestGlContextHelperAbstraction mGlContextHelperAbstraction;
 
-  bool isDiscardQueueEmptyResult{true};
-  bool isDrawOnResumeRequiredResult{true};
-
+  bool            isDiscardQueueEmptyResult{true};
+  bool            isDrawOnResumeRequiredResult{true};
+  bool            mAutoAttrCreation{true};
   Property::Array mVertexFormats;
 
   struct ProgramCache

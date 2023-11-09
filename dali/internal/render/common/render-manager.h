@@ -41,7 +41,6 @@ struct Vector4;
 
 namespace Internal
 {
-class ProgramCache;
 class ShaderSaver;
 
 namespace Render
