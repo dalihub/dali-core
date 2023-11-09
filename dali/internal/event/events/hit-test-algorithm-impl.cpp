@@ -157,7 +157,8 @@ bool IsActorExclusiveToAnotherRenderTask(const Actor&                           
         }
         else
         {
-          return true;
+          // Fast-out if render task is itself
+          return false;
         }
       }
     }
@@ -490,8 +491,8 @@ bool HitTestRenderTask(const RenderTaskList::ExclusivesContainer& exclusives,
 
         // Hit test starting with the top layer, working towards the bottom layer.
         HitActor hit;
-        bool     overlayHit           = false;
-        bool     layerConsumesHit     = false;
+        bool     overlayHit       = false;
+        bool     layerConsumesHit = false;
 
         // Be used when we decide to consume layer.
         // We should not consume hit if sourceLayer is above on consumable layer. Otherwise, we should consume. So just initialize it as 0.
@@ -499,14 +500,14 @@ bool HitTestRenderTask(const RenderTaskList::ExclusivesContainer& exclusives,
         // If the layer is consumed first, sourceLayerIndex is not the actual index, but it must be guaranteed to have an index smaller than the layer.
         // If there is a sourceLayer above the consumable layer, the sourceLayerIndex is determined and the index of the consumable layer is also determined.
         // Then we can calculate the relationship between the two layers.
-        bool     IsHitTestWithinLayer = false;
-        int32_t  sourceLayerIndex     = 0;
-        int32_t  consumedLayerIndex   = -1;
+        bool    IsHitTestWithinLayer = false;
+        int32_t sourceLayerIndex     = 0;
+        int32_t consumedLayerIndex   = -1;
 
         for(int32_t i = layers.GetLayerCount() - 1; i >= 0 && !(hit.actor); --i)
         {
           Layer* layer(layers.GetLayer(i));
-          overlayHit = false;
+          overlayHit           = false;
           IsHitTestWithinLayer = false;
 
           if(sourceLayer == layer)
@@ -561,7 +562,7 @@ bool HitTestRenderTask(const RenderTaskList::ExclusivesContainer& exclusives,
             if(IsHitTestWithinLayer && hitCheck.DoesLayerConsumeHit(layer))
             {
               consumedLayerIndex = i;
-              layerConsumesHit = true;
+              layerConsumesHit   = true;
               break;
             }
           }
