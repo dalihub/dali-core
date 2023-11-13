@@ -1041,7 +1041,32 @@ public:
 
     for(const auto& uniform : mActiveUniforms)
     {
-      GetUniformLocation(program, uniform.name.c_str());
+      std::string name = uniform.name;
+      if(uniform.size <= 1)
+      {
+        GetUniformLocation(program, name.c_str());
+      }
+      else
+      {
+        // Convert single active uniform from "uBlah[0]" or "uStruct[0].element" to N versions of the same
+        std::string suffix;
+        auto        iter = name.find("["); // Search for index operator
+        if(iter != std::string::npos)
+        {
+          name = uniform.name.substr(0, iter); // Strip off index operator
+          iter = uniform.name.find("]");
+          if(iter != std::string::npos && iter + 1 != uniform.name.length())
+          {
+            suffix = uniform.name.substr(iter + 1);
+          }
+        }
+        for(int i = 0; i < uniform.size; ++i)
+        {
+          std::stringstream nss;
+          nss << name << "[" << i << "]" << suffix;
+          GetUniformLocation(program, nss.str().c_str()); // Generate N uniforms in the uniform map
+        }
+      }
     }
 
     for(const auto& uniform : mCustomUniformData)
