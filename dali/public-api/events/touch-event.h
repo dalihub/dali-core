@@ -2,7 +2,7 @@
 #define DALI_TOUCH_EVENT_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@
 #include <dali/public-api/events/point-state.h>
 #include <dali/public-api/math/degree.h>
 #include <dali/public-api/object/base-handle.h>
+#include <dali/public-api/render-tasks/render-task.h>
 
 namespace Dali
 {
@@ -265,6 +266,14 @@ public:
    * @return The mouse button value
    */
   MouseButton::Type GetMouseButton(std::size_t point) const;
+
+  /**
+   * @brief Retrieves the render-task that was used to generate this touch-event.
+   *
+   * @SINCE_2_3.0
+   * @return The render-task used to generate this touch-event.
+   */
+  RenderTask GetRenderTask() const;
 
 public: // Not intended for application developers
   /// @cond internal

@@ -39,7 +39,6 @@
 #include <dali/internal/event/actors/actor-coords.h>
 #include <dali/internal/event/actors/actor-parent.h>
 #include <dali/internal/event/actors/actor-property-handler.h>
-#include <dali/internal/event/actors/camera-actor-impl.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/common/scene-impl.h>
@@ -48,7 +47,6 @@
 #include <dali/internal/event/common/type-info-impl.h>
 #include <dali/internal/event/events/actor-gesture-data.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
-#include <dali/internal/event/render-tasks/render-task-list-impl.h>
 #include <dali/internal/event/rendering/renderer-impl.h>
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/nodes/node-messages.h>

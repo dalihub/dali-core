@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TOUCH_EVENT_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <dali/public-api/events/point-state.h>
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/object/base-object.h>
+#include <dali/public-api/render-tasks/render-task.h>
 
 namespace Dali
 {
@@ -177,6 +178,11 @@ public:
    */
   MouseButton::Type GetMouseButton(std::size_t point) const;
 
+  Dali::RenderTask GetRenderTask() const
+  {
+    return mRenderTask;
+  }
+
   // Setters
 
   /**
@@ -184,6 +190,11 @@ public:
    * @param[in]  point  The point to add to the touch event handler.
    */
   void AddPoint(const Integration::Point& point);
+
+  void SetRenderTask(Dali::RenderTask renderTask)
+  {
+    mRenderTask = renderTask;
+  }
 
 private:
   /**
@@ -194,8 +205,9 @@ private:
   ~TouchEvent() override = default;
 
 private:
-  std::vector<Integration::Point> mPoints;   ///< Container of the points for this touch event.
-  unsigned long                   mTime{0u}; ///< The time (in ms) that the touch event occurred.
+  std::vector<Integration::Point> mPoints;     ///< Container of the points for this touch event.
+  Dali::RenderTask                mRenderTask; ///< The render task used to generate this touch event.
+  unsigned long                   mTime{0u};   ///< The time (in ms) that the touch event occurred.
 };
 
 } // namespace Internal
