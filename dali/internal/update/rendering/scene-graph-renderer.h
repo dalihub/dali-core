@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDERER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -488,12 +488,6 @@ public:
   bool IsDirty() const;
 
   /**
-   * Reset both dirty flag and updated flag.
-   * @note This is called after rendering has completed.
-   */
-  void ResetDirtyFlag();
-
-  /**
    * @brief Reset to base values of all animatable properties.
    *
    * @param[in] updateBufferIndex the current buffer index
@@ -597,7 +591,6 @@ private:
 
   bool mRegenerateUniformMap : 1;     ///< true if the map should be regenerated
   bool mPremultipledAlphaEnabled : 1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
-  bool mDirtyFlag : 1;                ///< Flag indicating whether the properties are changed
 
   std::vector<Dali::DevelRenderer::DrawCommand> mDrawCommands;
   Dali::RenderCallback*                         mRenderCallback{nullptr};

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_LAYER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,7 +77,6 @@ namespace Internal
 {
 namespace SceneGraph
 {
-
 using RenderableContainer = Dali::Vector<Renderable>;
 
 /**
@@ -197,6 +196,16 @@ public:
   }
 
   /**
+   * Get the reuse of the model view matrices of all renderers for this layer is enabled.
+   * @param[in] updateBufferIndex The current update buffer index.
+   * @return Whether all child transform was clean or not.
+   */
+  bool GetReuseRenderers(BufferIndex updateBufferIndex) const
+  {
+    return mAllChildTransformsClean[updateBufferIndex];
+  }
+
+  /**
    * Checks if it is ok to reuse renderers. Renderers can be reused if ModelView transform for all the renderers
    * has not changed from previous use.
    * @param[in] camera A pointer to the camera that we want to use to render the list.
@@ -233,10 +242,10 @@ private:
   Layer();
 
   // Delete copy and move
-  Layer(const Layer&)                = delete;
-  Layer(Layer&&)                     = delete;
+  Layer(const Layer&) = delete;
+  Layer(Layer&&)      = delete;
   Layer& operator=(const Layer& rhs) = delete;
-  Layer& operator=(Layer&& rhs)      = delete;
+  Layer& operator=(Layer&& rhs) = delete;
 
 public: // For update-algorithms
   RenderableContainer colorRenderables;
