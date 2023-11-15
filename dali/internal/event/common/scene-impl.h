@@ -165,6 +165,12 @@ public:
   void ProcessEvents();
 
   /**
+   * This function is called by Core when sending a interrupted event to a specific actor.
+   * @param[in] actor The actor on which the event should occur.
+   */
+  void SendInterruptedEvents(Dali::Internal::Actor* actor);
+
+  /**
    * Rebuilds the depth tree at the end of the event frame if
    * it was requested this frame.
    */

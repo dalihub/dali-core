@@ -270,6 +270,11 @@ void Scene::ProcessEvents()
   mEventProcessor.ProcessEvents();
 }
 
+void Scene::SendInterruptedEvents(Dali::Internal::Actor* actor)
+{
+  mEventProcessor.SendInterruptedEvents(actor);
+}
+
 void Scene::RebuildDepthTree()
 {
   // If the depth tree needs rebuilding, do it in this frame only.

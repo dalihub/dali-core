@@ -15,6 +15,7 @@
  */
 
 #include "test-graphics-reflection.h"
+#include "test-graphics-controller.h"
 #include "test-graphics-shader.h"
 
 #include <dali/public-api/object/property-map.h>
@@ -110,8 +111,9 @@ constexpr int GetSizeForType(Property::Type type)
 
 } // namespace
 
-TestGraphicsReflection::TestGraphicsReflection(TestGlAbstraction& gl, uint32_t programId, Property::Array& vfs, const Graphics::ProgramCreateInfo& createInfo, std::vector<UniformData>& customUniforms, std::vector<TestGraphicsReflection::TestUniformBlockInfo>& customUniformBlocks)
-: mGl(gl),
+TestGraphicsReflection::TestGraphicsReflection(TestGraphicsController& controller, TestGlAbstraction& gl, uint32_t programId, Property::Array& vfs, const Graphics::ProgramCreateInfo& createInfo, std::vector<UniformData>& customUniforms, std::vector<TestGraphicsReflection::TestUniformBlockInfo>& customUniformBlocks)
+: mController(controller),
+  mGl(gl),
   mCustomUniforms(customUniforms)
 {
   for(Property::Array::SizeType i = 0; i < vfs.Count(); ++i)
@@ -241,19 +243,19 @@ TestGraphicsReflection::TestGraphicsReflection(TestGlAbstraction& gl, uint32_t p
 
 uint32_t TestGraphicsReflection::GetVertexAttributeLocation(const std::string& name) const
 {
-  // Automatically assign locations to named attributes when requested
   auto iter = std::find(mAttributes.begin(), mAttributes.end(), name);
   if(iter != mAttributes.end())
   {
     return iter - mAttributes.begin();
   }
-  else
+  else if(mController.AutoAttrCreation())
   {
     uint32_t location = mAttributes.size();
     mAttributes.push_back(name);
     return location;
   }
-  return 0u;
+
+  return -1;
 }
 
 Dali::Graphics::VertexInputAttributeFormat TestGraphicsReflection::GetVertexAttributeFormat(uint32_t location) const

@@ -84,7 +84,8 @@ Program* Program::New(ProgramCache& cache, const Internal::ShaderDataPtr& shader
   {
     // program not found so create it
     program = new Program(cache, shaderData, gfxController);
-    DALI_LOG_RELEASE_INFO("Program::New() created a unique program\n");
+
+    DALI_LOG_INFO(Debug::Filter::gShader, Debug::Verbose, "Program::New() created a unique program:\n  VertexShader:\n%s\n\n  FragShader:\n%s\n", shaderData->GetVertexShader(), shaderData->GetFragmentShader());
     cache.AddProgram(shaderHash, program);
   }
 
@@ -93,8 +94,6 @@ Program* Program::New(ProgramCache& cache, const Internal::ShaderDataPtr& shader
 
 Program::Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& controller)
 : mCache(cache),
-  mProjectionMatrix(nullptr),
-  mViewMatrix(nullptr),
   mGfxProgram(nullptr),
   mGfxController(controller),
   mProgramData(std::move(shaderData))

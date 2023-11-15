@@ -889,9 +889,31 @@ public:
    * @note It will be reset when mDirtyFlag reseted.
    * @return True if children sibiling order need to be changed.
    */
-  uint32_t IsChildrenReorderRequired() const
+  bool IsChildrenReorderRequired() const
   {
     return mDirtyFlags & NodePropertyFlags::CHILDREN_REORDER;
+  }
+
+  /**
+   * @brief Get whether descendent hierarchy was changed.
+   * @pre The flag will be propagate at UpdateManager::SetDepthIndices().
+   * @note It will be reset when mDirtyFlag reseted.
+   * @return True if children sibiling order need to be changed.
+   */
+  bool IsDescendentHierarchyChanged() const
+  {
+    return mDirtyFlags & NodePropertyFlags::DESCENDENT_HIERARCHY_CHANGED;
+  }
+
+  /**
+   * @brief Propagate the heirarchy changeness flag to it's parent node.
+   */
+  void PropagateDescendentFlags()
+  {
+    if(IsDescendentHierarchyChanged() && mParent)
+    {
+      mParent->SetDirtyFlag(NodePropertyFlags::DESCENDENT_HIERARCHY_CHANGED);
+    }
   }
 
   /**

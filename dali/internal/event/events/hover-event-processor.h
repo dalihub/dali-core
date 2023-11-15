@@ -66,12 +66,29 @@ public:
    */
   void ProcessHoverEvent(const Integration::HoverEvent& event);
 
+  /**
+   * This function is called when sending a interrupted hover event to a specific actor.
+   * @param[in] actor The actor on which the hover event should occur.
+   */
+  void SendInterruptedHoverEvent(Dali::Internal::Actor* actor);
+
 private:
   // Undefined
   HoverEventProcessor(const HoverEventProcessor&);
 
   // Undefined
   HoverEventProcessor& operator=(const HoverEventProcessor& rhs);
+
+  /**
+   * Clears the value.
+   */
+  void Clear();
+
+  /**
+   * Called by some actor-observers when the observed actor is disconnected.
+   * @param[in]  actor  The actor that has been disconnected.
+   */
+  void OnObservedActorDisconnected(Dali::Internal::Actor* actor);
 
   Scene&        mScene;                   ///< Reference to the scene
   ActorObserver mLastPrimaryHitActor;     ///< Stores the last primary point hit actor

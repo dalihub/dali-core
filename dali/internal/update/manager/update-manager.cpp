@@ -408,6 +408,7 @@ void UpdateManager::ConnectNode(Node* parent, Node* node)
 
   DALI_LOG_INFO(gLogFilter, Debug::General, "[%x] ConnectNode\n", node);
 
+  parent->SetDirtyFlag(NodePropertyFlags::DESCENDENT_HIERARCHY_CHANGED); // make parent dirty so that render items dont get reused
   parent->ConnectChild(node);
 
   node->AddInitializeResetter(*this);
@@ -425,7 +426,7 @@ void UpdateManager::DisconnectNode(Node* node)
 
   Node* parent = node->GetParent();
   DALI_ASSERT_ALWAYS(nullptr != parent);
-  parent->SetDirtyFlag(NodePropertyFlags::CHILD_DELETED); // make parent dirty so that render items dont get reused
+  parent->SetDirtyFlag(NodePropertyFlags::CHILD_DELETED | NodePropertyFlags::DESCENDENT_HIERARCHY_CHANGED); // make parent dirty so that render items dont get reused
 
   parent->DisconnectChild(mSceneGraphBuffers.GetUpdateBufferIndex(), *node);
 
@@ -1315,9 +1316,13 @@ void UpdateManager::SetDepthIndices(OwnerPointer<NodeDepths>& nodeDepths)
   // note, this vector is already in depth order.
   // So if we reverse iterate, we can assume that
   // my descendant node's depth index are updated.
+
+  // And also, This API is the last flushed message.
+  // We can now setup the DESCENDENT_HIERARCHY_CHANGED flag here.
   for(auto rIter = nodeDepths->nodeDepths.rbegin(), rEndIter = nodeDepths->nodeDepths.rend(); rIter != rEndIter; rIter++)
   {
     auto* node = rIter->node;
+    node->PropagateDescendentFlags();
     node->SetDepthIndex(rIter->sortedDepth);
     if(node->IsChildrenReorderRequired())
     {

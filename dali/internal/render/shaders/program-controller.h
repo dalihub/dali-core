@@ -32,7 +32,7 @@ namespace Internal
 class ShaderSaver;
 
 /**
- * This class is the owner of shader programs
+ * This class ensures that only unique programs are created.
  */
 class ProgramController : public ProgramCache
 {
@@ -120,11 +120,6 @@ public:
   ProgramController& operator=(const ProgramController& rhs) = delete;
 
 public: // API
-  /**
-   * Resets the program matrices. Must be called at the beginning of every frame
-   */
-  void ResetProgramMatrices();
-
   /**
    * @brief Reset all program reference count as 0.
    */

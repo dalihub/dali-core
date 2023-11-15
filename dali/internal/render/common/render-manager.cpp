@@ -995,10 +995,6 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
     targetstoPresent.emplace_back(currentRenderTarget);
 
-    // reset the program matrices for all programs once per frame
-    // this ensures we will set view and projection matrix once per program per camera
-    mImpl->programController.ResetProgramMatrices();
-
     if(!instruction.mIgnoreRenderToFbo && (instruction.mFrameBuffer != nullptr))
     {
       // Offscreen buffer rendering
@@ -1104,7 +1100,6 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
   // Flush UBOs
   mImpl->uniformBufferManager->Flush(sceneObject, renderToFbo);
-
   mImpl->renderAlgorithms.SubmitCommandBuffer();
   mImpl->commandBufferSubmitted = true;
 
