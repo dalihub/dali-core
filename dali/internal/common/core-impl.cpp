@@ -232,6 +232,11 @@ void Core::RenderScene(RenderStatus& status, Integration::Scene& scene, bool ren
   mRenderManager->RenderScene(status, scene, renderToFbo, clippingRect);
 }
 
+void Core::PreCompileShader(const std::string& vertexShader, const std::string& fragmentShader)
+{
+  mRenderManager->PreCompileShader(vertexShader, fragmentShader);
+}
+
 void Core::PostRender()
 {
   mUpdateManager->PostRender();
