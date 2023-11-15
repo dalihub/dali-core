@@ -20,6 +20,7 @@
 
 // INTERNAL HEADER
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/devel-api/threading/conditional-wait.h>
 #include <dali/devel-api/threading/mutex.h>
