@@ -631,8 +631,6 @@ private:
 
   using Hash = std::size_t;
 
-  typedef const float& (PropertyInputImpl::*FuncGetter)(BufferIndex) const;
-
   struct UniformIndexMap
   {
     ConstString              uniformName;            ///< The uniform name
@@ -641,11 +639,10 @@ private:
     Hash                     uniformNameHashNoArray{0u};
     int32_t                  arrayIndex{-1}; ///< The array index
 
-    int16_t    uniformLocation{0u};
-    uint16_t   uniformOffset{0u};
-    uint16_t   uniformSize{0u};
-    uint16_t   uniformBlockIndex{0u};
-    FuncGetter uniformFunc{0};
+    int16_t  uniformLocation{0u};
+    uint16_t uniformOffset{0u};
+    uint16_t uniformBlockIndex{0u};
+    bool     initialized{false};
   };
 
   StencilParameters mStencilParameters; ///< Struct containing all stencil related options

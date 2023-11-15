@@ -47,98 +47,6 @@ uint32_t      mvpBufferIndex;
 
 namespace
 {
-// Helper to get the property value getter by type
-typedef const float& (PropertyInputImpl::*FuncGetter)(BufferIndex) const;
-constexpr FuncGetter GetPropertyValueGetter(Property::Type type)
-{
-  switch(type)
-  {
-    case Property::BOOLEAN:
-    {
-      return FuncGetter(&PropertyInputImpl::GetBoolean);
-    }
-    case Property::INTEGER:
-    {
-      return FuncGetter(&PropertyInputImpl::GetInteger);
-    }
-    case Property::FLOAT:
-    {
-      return FuncGetter(&PropertyInputImpl::GetFloat);
-    }
-    case Property::VECTOR2:
-    {
-      return FuncGetter(&PropertyInputImpl::GetVector2);
-    }
-    case Property::VECTOR3:
-    {
-      return FuncGetter(&PropertyInputImpl::GetVector3);
-    }
-    case Property::VECTOR4:
-    {
-      return FuncGetter(&PropertyInputImpl::GetVector4);
-    }
-    case Property::MATRIX3:
-    {
-      return FuncGetter(&PropertyInputImpl::GetMatrix3);
-    }
-    case Property::MATRIX:
-    {
-      return FuncGetter(&PropertyInputImpl::GetMatrix);
-    }
-    default:
-    {
-      return nullptr;
-    }
-  }
-}
-
-/**
- * Helper function that returns size of uniform datatypes based
- * on property type.
- */
-constexpr int GetPropertyValueSizeForUniform(Property::Type type)
-{
-  switch(type)
-  {
-    case Property::Type::BOOLEAN:
-    {
-      return sizeof(bool);
-    }
-    case Property::Type::FLOAT:
-    {
-      return sizeof(float);
-    }
-    case Property::Type::INTEGER:
-    {
-      return sizeof(int);
-    }
-    case Property::Type::VECTOR2:
-    {
-      return sizeof(Vector2);
-    }
-    case Property::Type::VECTOR3:
-    {
-      return sizeof(Vector3);
-    }
-    case Property::Type::VECTOR4:
-    {
-      return sizeof(Vector4);
-    }
-    case Property::Type::MATRIX3:
-    {
-      return sizeof(Matrix3);
-    }
-    case Property::Type::MATRIX:
-    {
-      return sizeof(Matrix);
-    }
-    default:
-    {
-      return 0;
-    }
-  };
-}
-
 /**
  * Helper function to calculate the correct alignment of data for uniform buffers
  * @param dataSize size of uniform buffer
@@ -922,7 +830,7 @@ void Renderer::FillUniformBuffer(Program&                                       
   {
     auto& uniform    = iter;
     int   arrayIndex = uniform.arrayIndex;
-    if(!uniform.uniformFunc)
+    if(!uniform.initialized)
     {
       auto uniformInfo  = Graphics::UniformInfo{};
       auto uniformFound = program.GetUniform(uniform.uniformName.GetStringView(),
@@ -943,15 +851,13 @@ void Renderer::FillUniformBuffer(Program&                                       
       uniform.uniformOffset     = uniformInfo.offset;
       uniform.uniformLocation   = uniformInfo.location;
       uniform.uniformBlockIndex = uniformInfo.bufferIndex;
+      uniform.initialized       = true;
 
       auto       dst      = ubo->GetOffset() + uniformInfo.offset;
-      const auto typeSize = GetPropertyValueSizeForUniform(iter.propertyValue->GetType());
+      const auto typeSize = iter.propertyValue->GetValueSize();
       const auto dest     = dst + static_cast<uint32_t>(typeSize) * arrayIndex;
-      const auto func     = GetPropertyValueGetter(iter.propertyValue->GetType());
-      uniform.uniformSize = typeSize;
-      uniform.uniformFunc = func;
 
-      ubo->Write(&(iter.propertyValue->*func)(updateBufferIndex),
+      ubo->Write(iter.propertyValue->GetValueAddress(updateBufferIndex),
                  typeSize,
                  dest);
     }
@@ -960,11 +866,10 @@ void Renderer::FillUniformBuffer(Program&                                       
       UniformBufferView* ubo = uboViews[uniform.uniformBlockIndex].get();
 
       auto       dst      = ubo->GetOffset() + uniform.uniformOffset;
-      const auto typeSize = uniform.uniformSize;
+      const auto typeSize = iter.propertyValue->GetValueSize();
       const auto dest     = dst + static_cast<uint32_t>(typeSize) * arrayIndex;
-      const auto func     = uniform.uniformFunc;
 
-      ubo->Write(&(iter.propertyValue->*func)(updateBufferIndex),
+      ubo->Write(iter.propertyValue->GetValueAddress(updateBufferIndex),
                  typeSize,
                  dest);
     }
