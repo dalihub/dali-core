@@ -400,6 +400,7 @@ public:
    * @param[in] modelViewMatrix The model-view matrix.
    * @param[in] viewMatrix The view matrix.
    * @param[in] projectionMatrix The projection matrix.
+   * @param[in] scale Scale factor of the render item
    * @param[in] size Size of the render item
    * @param[in] blend If true, blending is enabled
    * @param[in] instruction. for use case like reflection where CullFace needs to be adjusted
@@ -413,6 +414,7 @@ public:
               const Matrix&                                        modelViewMatrix,
               const Matrix&                                        viewMatrix,
               const Matrix&                                        projectionMatrix,
+              const Vector3&                                       scale,
               const Vector3&                                       size,
               bool                                                 blend,
               const Dali::Internal::SceneGraph::RenderInstruction& instruction,
@@ -542,12 +544,11 @@ private:
    * Builds a uniform map based on the index of the cached location in the Program.
    * @param[in] bufferIndex The index of the previous update buffer.
    * @param[in] node The node using the renderer
-   * @param[in] size The size of the renderer
    * @param[in] program The shader program on which to set the uniforms.
    *
    * @return the index of the node in change counters store / uniform maps store.
    */
-  std::size_t BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider& node, const Vector3& size, Program& program);
+  std::size_t BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider& node, Program& program);
 
   /**
    * Bind the textures and setup the samplers
@@ -580,6 +581,7 @@ private:
    * @param[in] modelViewMatrix The model-view matrix.
    * @param[in] viewMatrix The view matrix.
    * @param[in] projectionMatrix The projection matrix.
+   * @param[in] scale Scale factor of the render item
    * @param[in] size Size of the render item
    * @param[in] blend If true, blending is enabled
    * @param[in] instruction The render instruction
@@ -594,6 +596,7 @@ private:
                           const Matrix&                        modelViewMatrix,
                           const Matrix&                        viewMatrix,
                           const Matrix&                        projectionMatrix,
+                          const Vector3&                       scale,
                           const Vector3&                       size,
                           std::size_t                          nodeIndex);
 

@@ -549,6 +549,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
                       const Matrix&                                        modelViewMatrix,
                       const Matrix&                                        viewMatrix,
                       const Matrix&                                        projectionMatrix,
+                      const Vector3&                                       scale,
                       const Vector3&                                       size,
                       bool                                                 blend,
                       const Dali::Internal::SceneGraph::RenderInstruction& instruction,
@@ -651,8 +652,8 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
 
     if(queueIndex == 0)
     {
-      std::size_t nodeIndex = BuildUniformIndexMap(bufferIndex, node, size, *program);
-      WriteUniformBuffer(bufferIndex, commandBuffer, program, instruction, node, modelMatrix, modelViewMatrix, viewMatrix, projectionMatrix, size, nodeIndex);
+      std::size_t nodeIndex = BuildUniformIndexMap(bufferIndex, node, *program);
+      WriteUniformBuffer(bufferIndex, commandBuffer, program, instruction, node, modelMatrix, modelViewMatrix, viewMatrix, projectionMatrix, scale, size, nodeIndex);
     }
     // @todo We should detect this case much earlier to prevent unnecessary work
     // Reuse latest bound vertex attributes location, or Bind buffers to attribute locations.
@@ -682,7 +683,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
   return drawn;
 }
 
-std::size_t Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider& node, const Vector3& size, Program& program)
+std::size_t Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider& node, Program& program)
 {
   // Check if the map has changed
   DALI_ASSERT_DEBUG(mRenderDataProvider && "No Uniform map data provider available");
@@ -797,6 +798,7 @@ void Renderer::WriteUniformBuffer(
   const Matrix&                        modelViewMatrix,
   const Matrix&                        viewMatrix,
   const Matrix&                        projectionMatrix,
+  const Vector3&                       scale,
   const Vector3&                       size,
   std::size_t                          nodeIndex)
 {
@@ -856,6 +858,8 @@ void Renderer::WriteUniformBuffer(
       WriteDefaultUniformV2(normalUniformInfo, uboViews, normalMatrix);
     }
 
+    WriteDefaultUniformV2(program->GetDefaultUniform(Program::DefaultUniformIndex::SCALE), uboViews, scale);
+
     Vector4        finalColor;                               ///< Applied renderer's opacity color
     const Vector4& color = node.GetRenderColor(bufferIndex); ///< Actor's original color
     if(mPremultipliedAlphaEnabled)
@@ -867,7 +871,6 @@ void Renderer::WriteUniformBuffer(
     {
       finalColor = Vector4(color.r, color.g, color.b, color.a * mRenderDataProvider->GetOpacity(bufferIndex));
     }
-
     WriteDefaultUniformV2(program->GetDefaultUniform(Program::DefaultUniformIndex::COLOR), uboViews, finalColor);
     WriteDefaultUniformV2(program->GetDefaultUniform(Program::DefaultUniformIndex::ACTOR_COLOR), uboViews, color);
 

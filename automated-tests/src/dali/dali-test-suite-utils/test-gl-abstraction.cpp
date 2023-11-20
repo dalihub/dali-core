@@ -166,6 +166,7 @@ void TestGlAbstraction::Initialize()
     {"uMvpMatrix", GL_FLOAT_MAT4, 1},
     {"uNormalMatrix", GL_FLOAT_MAT4, 1},
     {"uProjection", GL_FLOAT_MAT4, 1},
+    {"uScale", GL_FLOAT_VEC3, 1},
     {"uSize", GL_FLOAT_VEC3, 1},
     {"uViewMatrix", GL_FLOAT_MAT4, 1},
     {"uLightCameraProjectionMatrix", GL_FLOAT_MAT4, 1},

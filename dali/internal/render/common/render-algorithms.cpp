@@ -696,7 +696,7 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
         for(auto queue = 0u; queue < MAX_QUEUE; ++queue)
         {
           // Render the item. It will write into the command buffer everything it has to render
-          item.mRenderer->Render(secondaryCommandBuffer, bufferIndex, *item.mNode, item.mModelMatrix, item.mModelViewMatrix, viewMatrix, projectionMatrix, item.mSize, !item.mIsOpaque, instruction, queue);
+          item.mRenderer->Render(secondaryCommandBuffer, bufferIndex, *item.mNode, item.mModelMatrix, item.mModelViewMatrix, viewMatrix, projectionMatrix, item.mScale, item.mSize, !item.mIsOpaque, instruction, queue);
         }
       }
     }

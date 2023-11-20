@@ -68,6 +68,7 @@ public:
     MODEL_VIEW_MATRIX,
     NORMAL_MATRIX,
     PROJECTION_MATRIX,
+    SCALE,
     SIZE,
     COLOR,
     ACTOR_COLOR,
