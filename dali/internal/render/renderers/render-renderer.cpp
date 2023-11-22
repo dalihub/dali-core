@@ -32,6 +32,7 @@
 #include <dali/internal/render/renderers/render-sampler.h>
 #include <dali/internal/render/renderers/render-texture.h>
 #include <dali/internal/render/renderers/render-vertex-buffer.h>
+#include <dali/internal/render/renderers/shader-cache.h>
 #include <dali/internal/render/renderers/uniform-buffer-view.h>
 #include <dali/internal/render/renderers/uniform-buffer.h>
 #include <dali/internal/render/shaders/program.h>
@@ -147,10 +148,11 @@ Renderer::Renderer(SceneGraph::RenderDataProvider* dataProvider,
   mBlendingOptions.SetBlendColor(blendColor);
 }
 
-void Renderer::Initialize(Graphics::Controller& graphicsController, ProgramCache& programCache, Render::UniformBufferManager& uniformBufferManager, Render::PipelineCache& pipelineCache)
+void Renderer::Initialize(Graphics::Controller& graphicsController, ProgramCache& programCache, Render::ShaderCache& shaderCache, Render::UniformBufferManager& uniformBufferManager, Render::PipelineCache& pipelineCache)
 {
   mGraphicsController   = &graphicsController;
   mProgramCache         = &programCache;
+  mShaderCache          = &shaderCache;
   mUniformBufferManager = &uniformBufferManager;
   mPipelineCache        = &pipelineCache;
 }
@@ -415,28 +417,24 @@ Program* Renderer::PrepareProgram(const SceneGraph::RenderInstruction& instructi
   // If program doesn't have Gfx program object assigned yet, prepare it.
   if(!program->GetGraphicsProgramPtr())
   {
-    Graphics::ShaderCreateInfo vertexShaderCreateInfo;
-    vertexShaderCreateInfo.SetPipelineStage(Graphics::PipelineStage::VERTEX_SHADER);
-    vertexShaderCreateInfo.SetSourceMode(shaderData->GetSourceMode());
-    const std::vector<char>& vertexShaderSrc = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::VERTEX_SHADER);
-    vertexShaderCreateInfo.SetSourceSize(vertexShaderSrc.size());
-    vertexShaderCreateInfo.SetSourceData(static_cast<const void*>(vertexShaderSrc.data()));
-    auto vertexShader = mGraphicsController->CreateShader(vertexShaderCreateInfo, nullptr);
+    const std::vector<char>& vertShader   = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::VERTEX_SHADER);
+    const std::vector<char>& fragShader   = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER);
+    Dali::Graphics::Shader&  vertexShader = mShaderCache->GetShader(
+      vertShader,
+      Graphics::PipelineStage::VERTEX_SHADER,
+      shaderData->GetSourceMode());
 
-    Graphics::ShaderCreateInfo fragmentShaderCreateInfo;
-    fragmentShaderCreateInfo.SetPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER);
-    fragmentShaderCreateInfo.SetSourceMode(shaderData->GetSourceMode());
-    const std::vector<char>& fragmentShaderSrc = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER);
-    fragmentShaderCreateInfo.SetSourceSize(fragmentShaderSrc.size());
-    fragmentShaderCreateInfo.SetSourceData(static_cast<const void*>(fragmentShaderSrc.data()));
-    auto fragmentShader = mGraphicsController->CreateShader(fragmentShaderCreateInfo, nullptr);
+    Dali::Graphics::Shader& fragmentShader = mShaderCache->GetShader(
+      fragShader,
+      Graphics::PipelineStage::FRAGMENT_SHADER,
+      shaderData->GetSourceMode());
 
     std::vector<Graphics::ShaderState> shaderStates{
       Graphics::ShaderState()
-        .SetShader(*vertexShader.get())
+        .SetShader(vertexShader)
         .SetPipelineStage(Graphics::PipelineStage::VERTEX_SHADER),
       Graphics::ShaderState()
-        .SetShader(*fragmentShader.get())
+        .SetShader(fragmentShader)
         .SetPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER)};
 
     auto createInfo = Graphics::ProgramCreateInfo();
