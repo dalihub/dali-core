@@ -1112,6 +1112,51 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
   }
 }
 
+void RenderManager::PreCompileShader(const std::string& vertexShader, const std::string& fragmentShader)
+{
+  uint32_t renderPassTag{0u};
+  Dali::Shader::Hint::Value hints = Dali::Shader::Hint::NONE;
+  auto shaderHash = CalculateHash(vertexShader.data(), fragmentShader.data());
+  auto shaderData = new ShaderData(std::string(vertexShader.data()), std::string(fragmentShader.data()), hints, renderPassTag);
+  shaderData->SetHashValue(shaderHash);
+  auto program = Program::New(mImpl->programController, shaderData, mImpl->graphicsController);
+  if(!program)
+  {
+    DALI_LOG_RELEASE_INFO("Fail to create program \n");
+  }
+  else
+  {
+    // If program doesn't have Gfx program object assigned yet, prepare it.
+    if(!program->GetGraphicsProgramPtr())
+    {
+      const std::vector<char>& vertShader   = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::VERTEX_SHADER);
+      const std::vector<char>& fragShader   = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER);
+      Dali::Graphics::Shader&  vertexShader = mImpl->shaderCache.GetShader(
+        vertShader,
+        Graphics::PipelineStage::VERTEX_SHADER,
+        shaderData->GetSourceMode());
+
+      Dali::Graphics::Shader& fragmentShader = mImpl->shaderCache.GetShader(
+        fragShader,
+        Graphics::PipelineStage::FRAGMENT_SHADER,
+        shaderData->GetSourceMode());
+
+      std::vector<Graphics::ShaderState> shaderStates{
+        Graphics::ShaderState()
+          .SetShader(vertexShader)
+          .SetPipelineStage(Graphics::PipelineStage::VERTEX_SHADER),
+        Graphics::ShaderState()
+          .SetShader(fragmentShader)
+          .SetPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER)};
+
+      auto createInfo = Graphics::ProgramCreateInfo();
+      createInfo.SetShaderState(shaderStates);
+      auto graphicsProgram = mImpl->graphicsController.CreateProgram(createInfo, nullptr);
+      program->SetGraphicsProgram(std::move(graphicsProgram), *(mImpl->uniformBufferManager.get())); // generates reflection
+    }
+  }
+}
+
 void RenderManager::PostRender()
 {
   if(!mImpl->commandBufferSubmitted)
