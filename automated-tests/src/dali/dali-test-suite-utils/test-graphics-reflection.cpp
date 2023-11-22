@@ -54,6 +54,7 @@ static const std::vector<UniformData> UNIFORMS =
     UniformData("uMvpMatrix", Property::Type::MATRIX),
     UniformData("uNormalMatrix", Property::Type::MATRIX3),
     UniformData("uProjection", Property::Type::MATRIX),
+    UniformData("uScale", Property::Type::VECTOR3),
     UniformData("uSize", Property::Type::VECTOR3),
     UniformData("uViewMatrix", Property::Type::MATRIX),
     UniformData("uLightCameraProjectionMatrix", Property::Type::MATRIX),

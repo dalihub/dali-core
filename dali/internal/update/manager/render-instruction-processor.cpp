@@ -203,6 +203,7 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
   bool    inside(true);
   Node*   node = renderable.mNode;
   Matrix  nodeWorldMatrix(false);
+  Vector3 nodeScale;
   Vector3 nodeSize;
   Vector4 nodeUpdateArea;
   bool    nodeUpdateAreaSet(false);
@@ -237,8 +238,9 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
       SetNodeUpdateArea(node, isLayer3d, nodeWorldMatrix, nodeSize, nodeUpdateArea);
       nodeUpdateAreaSet = true;
 
-      const Vector3& scale = nodeWorldMatrix.GetScale();
-      const Vector3& size  = Vector3(nodeUpdateArea.z, nodeUpdateArea.w, 0.0f) * scale;
+      nodeScale = nodeWorldMatrix.GetScale();
+
+      const Vector3& size = Vector3(nodeUpdateArea.z, nodeUpdateArea.w, 0.0f) * nodeScale;
 
       if(size.LengthSquared() > Math::MACHINE_EPSILON_1000)
       {
@@ -301,8 +303,10 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
       if(!nodeUpdateAreaSet)
       {
         SetNodeUpdateArea(node, isLayer3d, nodeWorldMatrix, nodeSize, nodeUpdateArea);
+        nodeScale = nodeWorldMatrix.GetScale();
       }
 
+      item.mScale       = nodeScale;
       item.mSize        = nodeSize;
       item.mUpdateArea  = nodeUpdateArea;
       item.mModelMatrix = nodeWorldMatrix;

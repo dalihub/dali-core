@@ -61,13 +61,13 @@ const char* TOUCH_POINT_STATE[6] =
 bool ShouldEmitInterceptTouchEvent(const Actor& actorImpl, const Dali::TouchEvent& event)
 {
   PointState::Type state = event.GetState(0);
-  return actorImpl.GetInterceptTouchRequired() && (state!= PointState::MOTION || actorImpl.IsDispatchTouchMotion());
+  return actorImpl.GetInterceptTouchRequired() && (state != PointState::MOTION || actorImpl.IsDispatchTouchMotion());
 }
 
 bool ShouldEmitTouchEvent(const Actor& actorImpl, const Dali::TouchEvent& event)
 {
   PointState::Type state = event.GetState(0);
-  return actorImpl.GetTouchRequired() && (state!= PointState::MOTION || actorImpl.IsDispatchTouchMotion());
+  return actorImpl.GetTouchRequired() && (state != PointState::MOTION || actorImpl.IsDispatchTouchMotion());
 }
 
 Dali::Actor EmitInterceptTouchSignals(Dali::Actor actor, const Dali::TouchEvent& touchEvent)
@@ -146,12 +146,13 @@ Dali::Actor EmitTouchSignals(Dali::Actor actor, const Dali::TouchEvent& touchEve
   return consumedActor;
 }
 
-Dali::Actor AllocAndEmitTouchSignals(unsigned long time, Dali::Actor actor, const Integration::Point& point)
+Dali::Actor AllocAndEmitTouchSignals(unsigned long time, Dali::Actor actor, const Integration::Point& point, RenderTaskPtr renderTask)
 {
   TouchEventPtr    touchEvent(new TouchEvent(time));
   Dali::TouchEvent touchEventHandle(touchEvent.Get());
 
   touchEvent->AddPoint(point);
+  touchEvent->SetRenderTask(Dali::RenderTask(renderTask.Get()));
 
   return EmitTouchSignals(actor, touchEventHandle);
 }
@@ -166,6 +167,7 @@ Dali::Actor EmitTouchSignals(Actor* actor, RenderTask& renderTask, const TouchEv
   if(actor)
   {
     TouchEventPtr touchEventImpl = TouchEvent::Clone(*originalTouchEvent.Get());
+    touchEventImpl->SetRenderTask(Dali::RenderTask(&renderTask));
 
     Integration::Point& primaryPoint = touchEventImpl->GetPoint(0);
 
@@ -286,7 +288,7 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
       Dali::Actor lastPrimaryHitActorHandle(lastPrimaryHitActor);
       currentPoint.SetHitActor(lastPrimaryHitActorHandle);
 
-      consumingActor = AllocAndEmitTouchSignals(event.time, lastPrimaryHitActorHandle, currentPoint);
+      consumingActor = AllocAndEmitTouchSignals(event.time, lastPrimaryHitActorHandle, currentPoint, mLastRenderTask);
     }
 
     // If the last consumed actor was different to the primary hit actor then inform it as well (if it has not already been informed).
@@ -297,7 +299,7 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
     {
       Dali::Actor lastConsumedActorHandle(lastConsumedActor);
       currentPoint.SetHitActor(lastConsumedActorHandle);
-      AllocAndEmitTouchSignals(event.time, lastConsumedActorHandle, currentPoint);
+      AllocAndEmitTouchSignals(event.time, lastConsumedActorHandle, currentPoint, mLastRenderTask);
     }
 
     // Tell the touch-down consuming actor as well, if required
@@ -310,7 +312,7 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
       Dali::Actor touchDownConsumedActorHandle(touchDownConsumedActor);
 
       currentPoint.SetHitActor(touchDownConsumedActorHandle);
-      AllocAndEmitTouchSignals(event.time, touchDownConsumedActorHandle, currentPoint);
+      AllocAndEmitTouchSignals(event.time, touchDownConsumedActorHandle, currentPoint, mLastRenderTask);
     }
 
     Clear();
@@ -349,6 +351,7 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
 
       // Only set the currentRenderTask for the primary hit actor.
       currentRenderTask = hitTestResults.renderTask;
+      touchEventImpl->SetRenderTask(Dali::RenderTask(currentRenderTask.Get()));
     }
     else
     {
@@ -392,9 +395,9 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
         mInterceptedTouchActor.SetActor(&GetImplementation(interceptedActor));
         // If the child is being touched, INTERRUPTED is sent.
         if(mLastPrimaryHitActor.GetActor() &&
-          mLastPrimaryHitActor.GetActor() != interceptedActor &&
-          mLastRenderTask &&
-          mLastPrimaryPointState != PointState::FINISHED)
+           mLastPrimaryHitActor.GetActor() != interceptedActor &&
+           mLastRenderTask &&
+           mLastPrimaryPointState != PointState::FINISHED)
         {
           EmitTouchSignals(mLastPrimaryHitActor.GetActor(), *mLastRenderTask.Get(), touchEventImpl, PointState::INTERRUPTED);
           mTouchDownConsumedActor.SetActor(nullptr);
@@ -550,7 +553,7 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
           currentPoint.SetHitActor(touchDownConsumedActorHandle);
           currentPoint.SetState(PointState::INTERRUPTED);
 
-          AllocAndEmitTouchSignals(event.time, touchDownConsumedActorHandle, currentPoint);
+          AllocAndEmitTouchSignals(event.time, touchDownConsumedActorHandle, currentPoint, nullptr /* Not Required for this use case */);
         }
 
         mTouchDownConsumedActor.SetActor(nullptr);

@@ -55,6 +55,7 @@ RenderItemKey RenderItem::NewKey()
 RenderItem::RenderItem()
 : mModelMatrix(false),
   mModelViewMatrix(false),
+  mScale(),
   mSize(),
   mRenderer{},
   mNode(nullptr),

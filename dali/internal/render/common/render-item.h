@@ -120,6 +120,7 @@ struct RenderItem
 
   Matrix              mModelMatrix;
   Matrix              mModelViewMatrix;
+  Vector3             mScale;
   Vector3             mSize;
   Vector4             mUpdateArea; ///< Update area hint is provided for damaged area calculation. (x, y, width, height)
   Render::RendererKey mRenderer;

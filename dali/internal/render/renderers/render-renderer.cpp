@@ -32,7 +32,6 @@
 #include <dali/internal/render/renderers/render-sampler.h>
 #include <dali/internal/render/renderers/render-texture.h>
 #include <dali/internal/render/renderers/render-vertex-buffer.h>
-#include <dali/internal/render/renderers/shader-cache.h>
 #include <dali/internal/render/renderers/uniform-buffer-view.h>
 #include <dali/internal/render/renderers/uniform-buffer.h>
 #include <dali/internal/render/shaders/program.h>
@@ -240,11 +239,10 @@ Renderer::Renderer(SceneGraph::RenderDataProvider* dataProvider,
   mBlendingOptions.SetBlendColor(blendColor);
 }
 
-void Renderer::Initialize(Graphics::Controller& graphicsController, ProgramCache& programCache, Render::ShaderCache& shaderCache, Render::UniformBufferManager& uniformBufferManager, Render::PipelineCache& pipelineCache)
+void Renderer::Initialize(Graphics::Controller& graphicsController, ProgramCache& programCache, Render::UniformBufferManager& uniformBufferManager, Render::PipelineCache& pipelineCache)
 {
   mGraphicsController   = &graphicsController;
   mProgramCache         = &programCache;
-  mShaderCache          = &shaderCache;
   mUniformBufferManager = &uniformBufferManager;
   mPipelineCache        = &pipelineCache;
 }
@@ -509,24 +507,28 @@ Program* Renderer::PrepareProgram(const SceneGraph::RenderInstruction& instructi
   // If program doesn't have Gfx program object assigned yet, prepare it.
   if(!program->GetGraphicsProgramPtr())
   {
-    const std::vector<char>& vertShader   = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::VERTEX_SHADER);
-    const std::vector<char>& fragShader   = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER);
-    Dali::Graphics::Shader&  vertexShader = mShaderCache->GetShader(
-      vertShader,
-      Graphics::PipelineStage::VERTEX_SHADER,
-      shaderData->GetSourceMode());
+    Graphics::ShaderCreateInfo vertexShaderCreateInfo;
+    vertexShaderCreateInfo.SetPipelineStage(Graphics::PipelineStage::VERTEX_SHADER);
+    vertexShaderCreateInfo.SetSourceMode(shaderData->GetSourceMode());
+    const std::vector<char>& vertexShaderSrc = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::VERTEX_SHADER);
+    vertexShaderCreateInfo.SetSourceSize(vertexShaderSrc.size());
+    vertexShaderCreateInfo.SetSourceData(static_cast<const void*>(vertexShaderSrc.data()));
+    auto vertexShader = mGraphicsController->CreateShader(vertexShaderCreateInfo, nullptr);
 
-    Dali::Graphics::Shader& fragmentShader = mShaderCache->GetShader(
-      fragShader,
-      Graphics::PipelineStage::FRAGMENT_SHADER,
-      shaderData->GetSourceMode());
+    Graphics::ShaderCreateInfo fragmentShaderCreateInfo;
+    fragmentShaderCreateInfo.SetPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER);
+    fragmentShaderCreateInfo.SetSourceMode(shaderData->GetSourceMode());
+    const std::vector<char>& fragmentShaderSrc = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER);
+    fragmentShaderCreateInfo.SetSourceSize(fragmentShaderSrc.size());
+    fragmentShaderCreateInfo.SetSourceData(static_cast<const void*>(fragmentShaderSrc.data()));
+    auto fragmentShader = mGraphicsController->CreateShader(fragmentShaderCreateInfo, nullptr);
 
     std::vector<Graphics::ShaderState> shaderStates{
       Graphics::ShaderState()
-        .SetShader(vertexShader)
+        .SetShader(*vertexShader.get())
         .SetPipelineStage(Graphics::PipelineStage::VERTEX_SHADER),
       Graphics::ShaderState()
-        .SetShader(fragmentShader)
+        .SetShader(*fragmentShader.get())
         .SetPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER)};
 
     auto createInfo = Graphics::ProgramCreateInfo();
@@ -547,6 +549,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
                       const Matrix&                                        modelViewMatrix,
                       const Matrix&                                        viewMatrix,
                       const Matrix&                                        projectionMatrix,
+                      const Vector3&                                       scale,
                       const Vector3&                                       size,
                       bool                                                 blend,
                       const Dali::Internal::SceneGraph::RenderInstruction& instruction,
@@ -649,8 +652,8 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
 
     if(queueIndex == 0)
     {
-      std::size_t nodeIndex = BuildUniformIndexMap(bufferIndex, node, size, *program);
-      WriteUniformBuffer(bufferIndex, commandBuffer, program, instruction, node, modelMatrix, modelViewMatrix, viewMatrix, projectionMatrix, size, nodeIndex);
+      std::size_t nodeIndex = BuildUniformIndexMap(bufferIndex, node, *program);
+      WriteUniformBuffer(bufferIndex, commandBuffer, program, instruction, node, modelMatrix, modelViewMatrix, viewMatrix, projectionMatrix, scale, size, nodeIndex);
     }
     // @todo We should detect this case much earlier to prevent unnecessary work
     // Reuse latest bound vertex attributes location, or Bind buffers to attribute locations.
@@ -680,7 +683,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
   return drawn;
 }
 
-std::size_t Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider& node, const Vector3& size, Program& program)
+std::size_t Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider& node, Program& program)
 {
   // Check if the map has changed
   DALI_ASSERT_DEBUG(mRenderDataProvider && "No Uniform map data provider available");
@@ -795,6 +798,7 @@ void Renderer::WriteUniformBuffer(
   const Matrix&                        modelViewMatrix,
   const Matrix&                        viewMatrix,
   const Matrix&                        projectionMatrix,
+  const Vector3&                       scale,
   const Vector3&                       size,
   std::size_t                          nodeIndex)
 {
@@ -854,6 +858,8 @@ void Renderer::WriteUniformBuffer(
       WriteDefaultUniformV2(normalUniformInfo, uboViews, normalMatrix);
     }
 
+    WriteDefaultUniformV2(program->GetDefaultUniform(Program::DefaultUniformIndex::SCALE), uboViews, scale);
+
     Vector4        finalColor;                               ///< Applied renderer's opacity color
     const Vector4& color = node.GetRenderColor(bufferIndex); ///< Actor's original color
     if(mPremultipliedAlphaEnabled)
@@ -865,7 +871,6 @@ void Renderer::WriteUniformBuffer(
     {
       finalColor = Vector4(color.r, color.g, color.b, color.a * mRenderDataProvider->GetOpacity(bufferIndex));
     }
-
     WriteDefaultUniformV2(program->GetDefaultUniform(Program::DefaultUniformIndex::COLOR), uboViews, finalColor);
     WriteDefaultUniformV2(program->GetDefaultUniform(Program::DefaultUniformIndex::ACTOR_COLOR), uboViews, color);
 
