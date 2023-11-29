@@ -42,7 +42,6 @@
 #include <dali/internal/render/renderers/pipeline-cache.h>
 #include <dali/internal/render/renderers/render-frame-buffer.h>
 #include <dali/internal/render/renderers/render-texture.h>
-#include <dali/internal/render/renderers/shader-cache.h>
 #include <dali/internal/render/renderers/uniform-buffer-manager.h>
 #include <dali/internal/render/renderers/uniform-buffer.h>
 #include <dali/internal/render/shaders/program-controller.h>
@@ -142,7 +141,6 @@ struct RenderManager::Impl
   : graphicsController(graphicsController),
     renderAlgorithms(graphicsController),
     programController(graphicsController),
-    shaderCache(graphicsController),
     depthBufferAvailable(depthBufferAvailableParam),
     stencilBufferAvailable(stencilBufferAvailableParam),
     partialUpdateAvailable(partialUpdateAvailableParam)
@@ -197,8 +195,7 @@ struct RenderManager::Impl
 
   OwnerKeyContainer<Render::Texture> textureDiscardQueue; ///< Discarded textures
 
-  ProgramController   programController; ///< Owner of the programs
-  Render::ShaderCache shaderCache;       ///< The cache for the graphics shaders
+  ProgramController programController; ///< Owner of the programs
 
   std::unique_ptr<Render::UniformBufferManager> uniformBufferManager; ///< The uniform buffer manager
   std::unique_ptr<Render::PipelineCache>        pipelineCache;
@@ -252,7 +249,7 @@ void RenderManager::SetShaderSaver(ShaderSaver& upstream)
 void RenderManager::AddRenderer(const Render::RendererKey& renderer)
 {
   // Initialize the renderer as we are now in render thread
-  renderer->Initialize(mImpl->graphicsController, mImpl->programController, mImpl->shaderCache, *(mImpl->uniformBufferManager.get()), *(mImpl->pipelineCache.get()));
+  renderer->Initialize(mImpl->graphicsController, mImpl->programController, *(mImpl->uniformBufferManager.get()), *(mImpl->pipelineCache.get()));
 
   mImpl->rendererContainer.PushBack(renderer);
 }
@@ -524,7 +521,6 @@ void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear
   if(mImpl->frameCount % CACHE_CLEAN_FRAME_COUNT == 1)
   {
     mImpl->programController.ResetReferenceCount();
-    mImpl->shaderCache.ResetReferenceCount();
   }
   */
 
@@ -1204,7 +1200,6 @@ void RenderManager::PostRender()
   if(mImpl->frameCount % CACHE_CLEAN_FRAME_COUNT == 0)
   {
     mImpl->programController.ClearUnusedCache();
-    mImpl->shaderCache.ClearUnusedCache();
   }
   */
 

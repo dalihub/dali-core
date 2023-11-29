@@ -56,7 +56,6 @@ class RenderInstruction; //for reflection effect
 
 namespace Render
 {
-struct ShaderCache;
 class PipelineCache;
 struct PipelineCacheL2;
 class UniformBufferManager;
@@ -177,13 +176,11 @@ public:
    * This is called when the renderer is inside render thread
    * @param[in] graphicsController The graphics controller to use
    * @param[in] programCache Cache of program objects
-   * @param[in] shaderCache Cache of shaders
    * @param[in] uniformBufferManager Uniform buffer manager
    * @param[in] pipelineCache Cache of pipelines
    */
   void Initialize(Graphics::Controller&         graphicsController,
                   ProgramCache&                 programCache,
-                  Render::ShaderCache&          shaderCache,
                   Render::UniformBufferManager& uniformBufferManager,
                   Render::PipelineCache&        pipelineCache);
 
@@ -623,8 +620,7 @@ private:
 
   Render::Geometry* mGeometry;
 
-  ProgramCache*        mProgramCache{nullptr};
-  Render::ShaderCache* mShaderCache{nullptr};
+  ProgramCache* mProgramCache{nullptr};
 
   Render::UniformBufferManager*               mUniformBufferManager{};
   std::vector<Graphics::UniformBufferBinding> mUniformBufferBindings{};
