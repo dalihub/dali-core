@@ -146,11 +146,6 @@ public:
   void RenderScene(Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo, Rect<int>& clippingRect);
 
   /**
-   * @copydoc Dali::Integration::Core::PreCompileShader()
-   */
-  void PreCompileShader(const std::string& vertexShader, const std::string& fragmentShader);
-
-  /**
    * @copydoc Dali::Integration::Core::Render()
    */
   void PostRender();
