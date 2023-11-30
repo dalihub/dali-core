@@ -13,9 +13,8 @@ SET( platform_abstraction_src_files
    ${platform_abstraction_src_dir}/profiling.cpp
    ${platform_abstraction_src_dir}/render-task-list-integ.cpp
    ${platform_abstraction_src_dir}/scene.cpp
-   ${platform_abstraction_src_dir}/shader-precompiler.cpp
    ${platform_abstraction_src_dir}/texture-integ.cpp
-   ${platform_abstraction_src_dir}/trace.cpp  
+   ${platform_abstraction_src_dir}/trace.cpp
 )
 
 SET( platform_abstraction_events_src_files
@@ -52,7 +51,6 @@ SET( platform_abstraction_header_files
    ${platform_abstraction_src_dir}/resource-policies.h
    ${platform_abstraction_src_dir}/resource-types.h
    ${platform_abstraction_src_dir}/scene.h
-   ${platform_abstraction_src_dir}/shader-precompiler.h
    ${platform_abstraction_src_dir}/texture-integ.h
    ${platform_abstraction_src_dir}/trace.h
 )
