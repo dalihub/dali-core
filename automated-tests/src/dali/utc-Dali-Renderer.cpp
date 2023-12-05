@@ -2304,6 +2304,87 @@ int UtcDaliRendererRenderOrder2DLayerOverlay(void)
   END_TEST;
 }
 
+int UtcDaliRendererRenderOrder3DLayer(void)
+{
+  TestApplication application;
+  tet_infoline("Test the rendering order in a 3D layer is correct");
+
+  Shader   shader   = Shader::New("VertexSource", "FragmentSource");
+  Geometry geometry = CreateQuadGeometry();
+
+  application.GetScene().GetRootLayer().SetProperty(Layer::Property::BEHAVIOR, Layer::Behavior::LAYER_3D);
+  Actor root = application.GetScene().GetRootLayer();
+
+  Actor    actor0    = CreateActor(root, 0, TEST_LOCATION);
+  Renderer renderer0 = CreateRenderer(actor0, geometry, shader, 300);
+  actor0.SetProperty(Dali::Actor::Property::COLOR_MODE, USE_OWN_COLOR);
+
+  Actor    actor1    = CreateActor(root, 0, TEST_LOCATION);
+  Renderer renderer1 = CreateRenderer(actor1, geometry, shader, 200);
+  actor1.SetProperty(Dali::Actor::Property::OPACITY, 0.5f);
+  actor1.SetProperty(Dali::Actor::Property::COLOR_MODE, USE_OWN_COLOR);
+
+  Actor    actor2    = CreateActor(root, 0, TEST_LOCATION);
+  Renderer renderer2 = CreateRenderer(actor2, geometry, shader, 100);
+  actor2.SetProperty(Dali::Actor::Property::OPACITY, 0.5f);
+  actor2.SetProperty(Dali::Actor::Property::COLOR_MODE, USE_OWN_COLOR);
+
+  Actor    actor3    = CreateActor(root, 0, TEST_LOCATION);
+  Renderer renderer3 = CreateRenderer(actor3, geometry, shader, 0);
+  actor3.SetProperty(Dali::Actor::Property::OPACITY, 0.5f);
+  actor3.SetProperty(Dali::Actor::Property::COLOR_MODE, USE_OWN_COLOR);
+
+  application.SendNotification();
+  application.Render(0);
+
+  /*
+   * Create the following hierarchy:
+   *
+   *            actor2
+   *              /
+   *             /
+   *          actor1
+   *           /
+   *          /
+   *       actor0
+   *        /
+   *       /
+   *    actor3
+   *
+   *  Expected rendering order : actor0 - actor3 - actor2 - actor1
+   */
+  actor2.Add(actor1);
+  actor1.Add(actor0);
+  actor0.Add(actor3);
+  application.SendNotification();
+  application.Render(0);
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  gl.GetTextureTrace().Reset();
+  gl.EnableTextureCallTrace(true);
+  application.SendNotification();
+  application.Render(0);
+
+  int textureBindIndex[4];
+  for(unsigned int i(0); i < 4; ++i)
+  {
+    std::stringstream params;
+    params << std::hex << GL_TEXTURE_2D << std::dec << ", " << i + 1;
+    textureBindIndex[i] = gl.GetTextureTrace().FindIndexFromMethodAndParams("BindTexture", params.str());
+  }
+
+  //Check that actor3 has been rendered after actor0
+  DALI_TEST_GREATER(textureBindIndex[3], textureBindIndex[0], TEST_LOCATION);
+
+  //Check that actor2 has been rendered after actor3
+  DALI_TEST_GREATER(textureBindIndex[2], textureBindIndex[3], TEST_LOCATION);
+
+  //Check that actor1 has been rendered after actor2
+  DALI_TEST_GREATER(textureBindIndex[1], textureBindIndex[2], TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliRendererSetIndexRange(void)
 {
   std::string
