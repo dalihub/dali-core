@@ -270,7 +270,6 @@ public:
   /**
    * @brief Retrieves the render-task that was used to generate this touch-event.
    *
-   * @SINCE_2_3.0
    * @return The render-task used to generate this touch-event.
    */
   RenderTask GetRenderTask() const;
