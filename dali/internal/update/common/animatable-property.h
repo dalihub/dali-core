@@ -174,6 +174,22 @@ public:
   }
 
   /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
+   */
+  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  {
+    return &mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
+   */
+  size_t GetValueSize() const override
+  {
+    return sizeof(bool);
+  }
+
+  /**
    * Set the property value. This will only persist for the current frame; the property
    * will be reset with the base value, at the beginning of the next frame.
    * @param[in] bufferIndex The buffer to write.
@@ -337,6 +353,22 @@ public:
   const int& GetInteger(BufferIndex bufferIndex) const override
   {
     return mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
+   */
+  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  {
+    return &mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
+   */
+  size_t GetValueSize() const override
+  {
+    return sizeof(int);
   }
 
   /**
@@ -515,6 +547,22 @@ public:
   }
 
   /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
+   */
+  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  {
+    return &mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
+   */
+  size_t GetValueSize() const override
+  {
+    return sizeof(float);
+  }
+
+  /**
    * Set the property value. This will only persist for the current frame; the property
    * will be reset with the base value, at the beginning of the next frame.
    * @param[in] bufferIndex The buffer to write.
@@ -689,6 +737,22 @@ public:
   const Vector2& GetVector2(BufferIndex bufferIndex) const override
   {
     return mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
+   */
+  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  {
+    return &mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
+   */
+  size_t GetValueSize() const override
+  {
+    return sizeof(Vector2);
   }
 
   /**
@@ -955,6 +1019,22 @@ public:
   const Vector3& GetVector3(BufferIndex bufferIndex) const override
   {
     return mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
+   */
+  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  {
+    return &mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
+   */
+  size_t GetValueSize() const override
+  {
+    return sizeof(Vector3);
   }
 
   /**
@@ -1275,6 +1355,22 @@ public:
   const Vector4& GetVector4(BufferIndex bufferIndex) const override
   {
     return mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
+   */
+  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  {
+    return &mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
+   */
+  size_t GetValueSize() const override
+  {
+    return sizeof(Vector4);
   }
 
   /**
@@ -1670,6 +1766,22 @@ public:
   }
 
   /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
+   */
+  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  {
+    return &mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
+   */
+  size_t GetValueSize() const override
+  {
+    return sizeof(Vector4);
+  }
+
+  /**
    * Change the property value by a relative amount.
    * @param[in] bufferIndex The buffer to write.
    * @param[in] delta The property will change by this amount.
@@ -1807,6 +1919,22 @@ public:
   const Matrix& GetMatrix(BufferIndex bufferIndex) const override
   {
     return mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
+   */
+  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  {
+    return &mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
+   */
+  size_t GetValueSize() const override
+  {
+    return sizeof(Matrix);
   }
 
   /**
@@ -1963,6 +2091,22 @@ public:
   const Matrix3& GetMatrix3(BufferIndex bufferIndex) const override
   {
     return mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
+   */
+  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  {
+    return &mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
+   */
+  size_t GetValueSize() const override
+  {
+    return sizeof(Matrix3);
   }
 
   /**
