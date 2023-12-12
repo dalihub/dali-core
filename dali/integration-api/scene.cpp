@@ -198,9 +198,9 @@ const Rect<int32_t>& Scene::GetCurrentSurfaceRect() const
   return GetImplementation(*this).GetCurrentSurfaceRect();
 }
 
-bool Scene::IsSurfaceRectChanged() const
+uint32_t Scene::GetSurfaceRectChangedCount() const
 {
-  return GetImplementation(*this).IsSurfaceRectChanged();
+  return GetImplementation(*this).GetSurfaceRectChangedCount();
 }
 
 void Scene::SetRotationCompletedAcknowledgement()
