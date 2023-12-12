@@ -980,7 +980,7 @@ int UtcDaliSceneSurfaceResizedDefaultSceneViewport(void)
   DALI_TEST_CHECK(defaultScene);
 
   // consume the resize flag by first rendering
-  defaultScene.IsSurfaceRectChanged();
+  defaultScene.GetSurfaceRectChangedCount();
 
   // Ensure stage size matches the scene size
   auto stage = Stage::GetCurrent();
@@ -988,10 +988,10 @@ int UtcDaliSceneSurfaceResizedDefaultSceneViewport(void)
 
   Rect<int32_t> surfaceRect = defaultScene.GetCurrentSurfaceRect();
 
-  bool surfaceResized;
+  uint32_t surfaceResized;
   // check resized flag before surface is resized.
-  surfaceResized = defaultScene.IsSurfaceRectChanged();
-  DALI_TEST_EQUALS(surfaceResized, false, TEST_LOCATION);
+  surfaceResized = defaultScene.GetSurfaceRectChangedCount();
+  DALI_TEST_EQUALS(surfaceResized, 0u, TEST_LOCATION);
 
   // Resize the scene
   Vector2     newSize(1000.0f, 2000.0f);
@@ -1012,8 +1012,8 @@ int UtcDaliSceneSurfaceResizedDefaultSceneViewport(void)
   application.SendNotification();
   application.Render(0);
 
-  surfaceResized = defaultScene.IsSurfaceRectChanged();
-  DALI_TEST_EQUALS(surfaceResized, true, TEST_LOCATION);
+  surfaceResized = defaultScene.GetSurfaceRectChangedCount();
+  DALI_TEST_EQUALS(surfaceResized, 1u, TEST_LOCATION);
 
   // Check that the viewport is handled properly
   DALI_TEST_CHECK(callStack.FindIndexFromMethodAndParams("Viewport", viewportParams) >= 0);
@@ -1026,6 +1026,45 @@ int UtcDaliSceneSurfaceResizedDefaultSceneViewport(void)
   DALI_TEST_EQUALS(newSurfaceRect.y, 0, TEST_LOCATION);
   DALI_TEST_EQUALS(newSurfaceRect.width, 1000, TEST_LOCATION);
   DALI_TEST_EQUALS(newSurfaceRect.height, 2000, TEST_LOCATION);
+
+  // SurfaceRect should be changed.
+  surfaceRect = newSurfaceRect;
+
+  // Resize the scene multiple times
+  uint32_t resizeCount = 10u;
+
+  for(uint32_t i = 0u; i < resizeCount; ++i)
+  {
+    Vector2 newSize(1000.0f, 2100.0f + i);
+    DALI_TEST_CHECK(stage.GetSize() != newSize);
+    defaultScene.SurfaceResized(newSize.width, newSize.height);
+
+    DALI_TEST_EQUALS(stage.GetSize(), newSize, TEST_LOCATION);
+    DALI_TEST_EQUALS(defaultScene.GetSize(), newSize, TEST_LOCATION);
+
+    // Check current surface rect
+    Rect<int32_t> newSurfaceRect = defaultScene.GetCurrentSurfaceRect();
+
+    // It should not be changed yet.
+    DALI_TEST_CHECK(surfaceRect == newSurfaceRect);
+  }
+
+  // Render after resizing surface
+  application.SendNotification();
+  application.Render(0);
+
+  // Check whether the number of surface resized count get well.
+  surfaceResized = defaultScene.GetSurfaceRectChangedCount();
+  DALI_TEST_EQUALS(surfaceResized, resizeCount, TEST_LOCATION);
+
+  // Check current surface rect
+  newSurfaceRect = defaultScene.GetCurrentSurfaceRect();
+
+  // It should be changed
+  DALI_TEST_EQUALS(newSurfaceRect.x, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(newSurfaceRect.y, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(newSurfaceRect.width, 1000, TEST_LOCATION);
+  DALI_TEST_EQUALS(newSurfaceRect.height, 2100 + (resizeCount - 1), TEST_LOCATION);
 
   END_TEST;
 }

@@ -233,9 +233,9 @@ public:
   const Rect<int32_t>& GetCurrentSurfaceRect() const;
 
   /**
-   * @copydoc Dali::Integration::Scene::IsSurfaceRectChanged
+   * @copydoc Dali::Integration::Scene::GetSurfaceRectChangedCount
    */
-  bool IsSurfaceRectChanged() const;
+  uint32_t GetSurfaceRectChangedCount() const;
 
   /**
    * @copydoc Dali::Integration::Scene::SetSurfaceRenderTarget
