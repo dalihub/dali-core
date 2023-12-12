@@ -195,10 +195,11 @@ public:
   int32_t GetScreenOrientation() const;
 
   /**
-   * Query wheter the surface rect is changed or not.
-   * @return true if the surface rect is changed.
+   * Query how many times the surface rect changed.
+   * @note It will reset surface rect changed count.
+   * @return The count of the surface rect changed.
    */
-  bool IsSurfaceRectChanged();
+  uint32_t GetSurfaceRectChangedCount();
 
   /**
    * @brief Set the internal flag to acknowledge surface rotation.
@@ -306,8 +307,8 @@ private:
   Rect<int32_t> mSurfaceRect;                      ///< The rectangle of surface which is related ot this scene.
   int32_t       mSurfaceOrientation;               ///< The orientation of surface which is related of this scene
   int32_t       mScreenOrientation;                ///< The orientation of screen
-  bool          mSurfaceRectChanged;               ///< The flag of surface's rectangle is changed when is resized or moved.
   bool          mRotationCompletedAcknowledgement; ///< The flag of sending the acknowledgement to complete window rotation.
+  uint32_t mSurfaceRectChangedCount; ///< The numbero of surface's rectangle is changed when is resized or moved.
 
   // Render pass and render target
 

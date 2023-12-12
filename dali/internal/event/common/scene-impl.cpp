@@ -375,9 +375,9 @@ void Scene::ChangedSurface(float width, float height, int32_t windowOrientation,
   }
 }
 
-bool Scene::IsSurfaceRectChanged() const
+uint32_t Scene::GetSurfaceRectChangedCount() const
 {
-  return mSceneObject ? mSceneObject->IsSurfaceRectChanged() : false;
+  return mSceneObject ? mSceneObject->GetSurfaceRectChangedCount() : 0u;
 }
 
 bool Scene::IsRotationCompletedAcknowledgementSet() const

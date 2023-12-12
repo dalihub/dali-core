@@ -345,10 +345,11 @@ public:
   const Rect<int32_t>& GetCurrentSurfaceRect() const;
 
   /**
-   * Query wheter the surface rect is changed or not.
-   * @return true if the surface rect is changed.
+   * Query how many times the surface rect changed.
+   * @note It will reset surface rect changed count.
+   * @return The count of the surface rect changed.
    */
-  bool IsSurfaceRectChanged() const;
+  uint32_t GetSurfaceRectChangedCount() const;
 
   /**
    * @brief Send message to acknowledge for completing window rotation with current window orientation.
