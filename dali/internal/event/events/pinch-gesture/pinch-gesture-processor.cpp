@@ -175,7 +175,7 @@ void PinchGestureProcessor::SetMinimumTouchEventsAfterStart(uint32_t value)
   }
 }
 
-void PinchGestureProcessor::Process(Scene& scene, const PinchGestureEvent& pinchEvent)
+void PinchGestureProcessor::Process(Scene& scene, const PinchGestureEvent& pinchEvent, Actor* actor)
 {
   DALI_TRACE_SCOPE(gTraceFilter, "DALI_PROCESS_PINCH_GESTURE");
   switch(pinchEvent.state)
@@ -189,7 +189,24 @@ void PinchGestureProcessor::Process(Scene& scene, const PinchGestureEvent& pinch
       ResetActor();
 
       HitTestAlgorithm::Results hitTestResults;
-      if(HitTest(scene, pinchEvent.centerPoint, hitTestResults))
+      if(actor)
+      {
+        hitTestResults.actor = Dali::Actor(actor);
+        hitTestResults.renderTask = pinchEvent.renderTask;
+
+        // Record the current render-task for Screen->Actor coordinate conversions
+        mCurrentRenderTask = hitTestResults.renderTask;
+
+        Vector2     actorCoords;
+        actor->ScreenToLocal(*mCurrentRenderTask.Get(), actorCoords.x, actorCoords.y, pinchEvent.centerPoint.x, pinchEvent.centerPoint.y);
+        hitTestResults.actorCoordinates = actorCoords;
+
+        // Set mCurrentPinchEvent to use inside overridden methods called from ProcessAndEmit()
+        mCurrentPinchEvent = &pinchEvent;
+        ProcessAndEmitActor(hitTestResults);
+        mCurrentPinchEvent = nullptr;
+      }
+      else if(HitTest(scene, pinchEvent.centerPoint, hitTestResults))
       {
         // Record the current render-task for Screen->Actor coordinate conversions
         mCurrentRenderTask = hitTestResults.renderTask;

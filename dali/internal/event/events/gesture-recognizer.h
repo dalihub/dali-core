@@ -20,7 +20,9 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/internal/event/events/actor-observer.h>
 #include <dali/internal/event/events/gesture-event.h>
+#include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/events/gesture.h>
 #include <dali/public-api/math/vector2.h>
@@ -42,7 +44,7 @@ template<typename T>
 class RecognizerObserver
 {
 public:
-  virtual void Process(Scene& scene, const T& event) = 0;
+  virtual void Process(Scene& scene, const T& event, Actor* actor = nullptr) = 0;
 
   virtual ~RecognizerObserver() = default;
   ;
@@ -130,6 +132,20 @@ public:
     SendEvent(event);
   }
 
+  /**
+   * Called when we get a touch event.
+   * @param[in]  actor  The actor the touch event has occurred on
+   * @param[in]  renderTask  The renderTask the touch event has occurred on
+   * @param[in]  scene  The scene the touch event has occurred on
+   * @param[in]  event  The latest touch event
+   */
+  void SendEvent(Actor& actor, Dali::Internal::RenderTask& renderTask, Scene& scene, const Integration::TouchEvent& event)
+  {
+    mActor.SetActor(&actor);
+    mRenderTask = &renderTask;
+    SendEvent(scene, event);
+  }
+
 protected:
   /**
    * Protected Constructor. Should only be able to create derived class objects.
@@ -141,7 +157,9 @@ protected:
     mType(detectorType),
     mScene(nullptr),
     mSourceType(GestureSourceType::INVALID),
-    mSourceData(GestureSourceData::INVALID)
+    mSourceData(GestureSourceData::INVALID),
+    mActor(),
+    mRenderTask()
   {
   }
 
@@ -162,11 +180,13 @@ protected:
   ~GestureRecognizer() override = default;
 
 protected:
-  Vector2            mScreenSize;
-  GestureType::Value mType;
-  Scene*             mScene;
-  GestureSourceType  mSourceType; /// < Gesture input source type.
-  GestureSourceData  mSourceData; /// < Gesture input source data.
+  Vector2                     mScreenSize;
+  GestureType::Value          mType;
+  Scene*                      mScene;
+  GestureSourceType           mSourceType; /// < Gesture input source type.
+  GestureSourceData           mSourceData; /// < Gesture input source data.
+  ActorObserver               mActor;      /// < The actor used to generate this touch event.
+  RenderTaskPtr               mRenderTask; /// < The render task used to generate this touch event.
 };
 
 using GestureRecognizerPtr = IntrusivePtr<GestureRecognizer>;
