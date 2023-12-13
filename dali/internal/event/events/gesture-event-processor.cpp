@@ -57,6 +57,42 @@ void GestureEventProcessor::ProcessTouchEvent(Scene& scene, const Integration::T
   mRotationGestureProcessor.ProcessTouch(scene, event);
 }
 
+void GestureEventProcessor::ProcessTouchEvent(GestureDetector* gestureDetector, Actor& actor, Dali::Internal::RenderTask& renderTask, Scene& scene, const Integration::TouchEvent& event)
+{
+  switch(gestureDetector->GetType())
+  {
+    case GestureType::LONG_PRESS:
+    {
+      mLongPressGestureProcessor.ProcessTouch(actor, renderTask, scene, event);
+      break;
+    }
+
+    case GestureType::PAN:
+    {
+      mPanGestureProcessor.ProcessTouch(actor, renderTask, scene, event);
+      break;
+    }
+
+    case GestureType::PINCH:
+    {
+      mPinchGestureProcessor.ProcessTouch(actor, renderTask, scene, event);
+      break;
+    }
+
+    case GestureType::TAP:
+    {
+      mTapGestureProcessor.ProcessTouch(actor, renderTask, scene, event);
+      break;
+    }
+
+    case GestureType::ROTATION:
+    {
+      mRotationGestureProcessor.ProcessTouch(actor, renderTask, scene, event);
+      break;
+    }
+  }
+}
+
 void GestureEventProcessor::AddGestureDetector(GestureDetector* gestureDetector, Scene& scene)
 {
   switch(gestureDetector->GetType())
