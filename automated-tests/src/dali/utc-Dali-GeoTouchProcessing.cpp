@@ -2175,6 +2175,88 @@ int UtcDaliGeoTouchEventIntercept03(void)
   END_TEST;
 }
 
+int UtcDaliGeoTouchEventIntercept04(void)
+{
+  TestApplication application;
+
+  application.GetScene().SetGeometryHittestEnabled(true);
+
+  Actor parent = Actor::New();
+  parent.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  parent.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(parent);
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parent.Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's touched signal
+  SignalData        data;
+  TouchEventFunctor functor(data, false /* Do not consume */);
+  actor.TouchedSignal().Connect(&application, functor);
+
+  // Connect to parent's touched signal
+  SignalData        parentData;
+  TouchEventFunctor parentFunctor(parentData); // consume
+  parent.TouchedSignal().Connect(&application, parentFunctor);
+
+  // Emit a down signal
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::DOWN, data.receivedTouch.points[0].state, TEST_LOCATION);
+
+  data.Reset();
+  parentData.Reset();
+
+  // Connect to parent's intercept touched signal
+  SignalData        interceptData;
+  TouchEventFunctor interceptFunctor(interceptData, true /* Do intercept */);
+  Dali::DevelActor::InterceptTouchedSignal(parent).Connect(&application, interceptFunctor);
+
+  // Emit a down signal
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+
+  // The actor gets interrupted. Because touch is intercepted by parent.
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::INTERRUPTED, data.receivedTouch.points[0].state, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, interceptData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::DOWN, interceptData.receivedTouch.points[0].state, TEST_LOCATION);
+  DALI_TEST_CHECK(actor == interceptData.receivedTouch.points[0].hitActor);
+  DALI_TEST_CHECK(parent == interceptData.touchedActor);
+  DALI_TEST_EQUALS(true, parentData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::DOWN, parentData.receivedTouch.points[0].state, TEST_LOCATION);
+  DALI_TEST_CHECK(parent == parentData.receivedTouch.points[0].hitActor);
+  DALI_TEST_CHECK(parent == parentData.touchedActor);
+  data.Reset();
+  interceptData.Reset();
+  parentData.Reset();
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Emit a move signal
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 20.0f)));
+
+  // Since InterceptTouchEvent is not called because it has already been intercepted by the parent, only the parent will receive the touchEvent.
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, interceptData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, parentData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::MOTION, parentData.receivedTouch.points[0].state, TEST_LOCATION);
+  DALI_TEST_CHECK(parent == parentData.receivedTouch.points[0].hitActor);
+  DALI_TEST_CHECK(parent == parentData.touchedActor);
+  data.Reset();
+  interceptData.Reset();
+  parentData.Reset();
+
+  END_TEST;
+}
+
 int UtcDaliGeoTouchAreaOffset(void)
 {
   TestApplication application;
