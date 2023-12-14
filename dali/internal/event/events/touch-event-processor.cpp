@@ -493,18 +493,21 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
   {
     if(isGeometry)
     {
-      Actor* touchConsumedActor(mLastConsumedActor.GetActor());
       Actor* interceptedTouchActor(mInterceptedTouchActor.GetActor());
-      if(touchConsumedActor) // If there is a consultative actor, send events only to the consultative actor.
+      if(interceptedTouchActor)
       {
-        RenderTask& currentRenderTaskImpl = *currentRenderTask.Get();
-        consumedActor = EmitTouchSignals(touchConsumedActor, currentRenderTaskImpl, touchEventImpl, primaryPointState, isGeometry);
-      }
-      else if(interceptedTouchActor) // If there is an intercepted actor, send a touch event starting from the intercepted actor.
-      {
-        Dali::Actor interceptedTouchActorHandle(interceptedTouchActor);
-        std::list<Dali::Internal::Actor*> interceptActorLists = mInterceptedActorLists;
-        consumedActor = EmitGeoTouchSignals(interceptActorLists, touchEventHandle);
+        Actor* touchConsumedActor(mLastConsumedActor.GetActor());
+        if(touchConsumedActor) // If there is a consultative actor, send events only to the consultative actor.
+        {
+          RenderTask& currentRenderTaskImpl = *currentRenderTask.Get();
+          consumedActor = EmitTouchSignals(touchConsumedActor, currentRenderTaskImpl, touchEventImpl, primaryPointState, isGeometry);
+        }
+        else // If there is an intercepted actor, send a touch event starting from the intercepted actor.
+        {
+          Dali::Actor interceptedTouchActorHandle(interceptedTouchActor);
+          std::list<Dali::Internal::Actor*> interceptActorLists = mInterceptedActorLists;
+          consumedActor = EmitGeoTouchSignals(interceptActorLists, touchEventHandle);
+        }
       }
       else
       {
@@ -544,8 +547,17 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
           }
         }
 
-        // Let's propagate touch events from the intercepted actor or start propagating touch events from the leaf actor.
-        consumedActor = EmitGeoTouchSignals(interceptedActor ? mInterceptedActorLists : mCandidateActorLists, touchEventHandle);
+        Actor* touchConsumedActor(mLastConsumedActor.GetActor());
+        if(touchConsumedActor) // If there is a consultative actor, send events only to the consultative actor.
+        {
+          RenderTask& currentRenderTaskImpl = *currentRenderTask.Get();
+          consumedActor = EmitTouchSignals(touchConsumedActor, currentRenderTaskImpl, touchEventImpl, primaryPointState, isGeometry);
+        }
+        else
+        {
+          // Let's propagate touch events from the intercepted actor or start propagating touch events from the leaf actor.
+          consumedActor = EmitGeoTouchSignals(interceptedActor ? mInterceptedActorLists : mCandidateActorLists, touchEventHandle);
+        }
       }
     }
     else
