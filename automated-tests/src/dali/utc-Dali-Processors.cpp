@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,11 @@ public:
     processRun = true;
   }
 
+  std::string_view GetProcessorName() const override
+  {
+    return "TestProcessor";
+  }
+
   bool processRun;
 };
 
@@ -54,6 +59,11 @@ public:
     {
       core.UnregisterProcessor(*unregisterProcessor, postProcessor);
     }
+  }
+
+  std::string_view GetProcessorName() const override
+  {
+    return "NewTestProcessor";
   }
 
   void SetProcessorToUnregister(Integration::Processor* processor)
@@ -257,6 +267,21 @@ int UtcDaliCoreProcessorUnregisterDuringCallback02(void)
   DALI_TEST_CHECK(testProcessor1.processRun);
   DALI_TEST_CHECK(testProcessor2.processRun);
   DALI_TEST_CHECK(!testProcessor3.processRun);
+
+  END_TEST;
+}
+
+int UtcDaliCoreProcessorGetProcessorName(void)
+{
+  // Test post-processor
+  TestApplication    application;
+  Integration::Core& core = application.GetCore();
+
+  NewTestProcessor testProcessor1(core);
+  TestProcessor    testProcessor2;
+
+  DALI_TEST_EQUALS(std::string(testProcessor1.GetProcessorName()), "NewTestProcessor", TEST_LOCATION);
+  DALI_TEST_EQUALS(std::string(testProcessor2.GetProcessorName()), "TestProcessor", TEST_LOCATION);
 
   END_TEST;
 }
