@@ -58,6 +58,7 @@ Scene::Scene()
   mBackgroundColor(DEFAULT_BACKGROUND_COLOR),
   mDepthTreeDirty(false),
   mPartialUpdateEnabled(true),
+  mGeometryHittest(false),
   mEventProcessor(*this, ThreadLocalStorage::GetInternal()->GetGestureEventProcessor()),
   mSurfaceOrientation(0),
   mScreenOrientation(0)
@@ -381,9 +382,9 @@ void Scene::ChangedSurface(float width, float height, int32_t windowOrientation,
   }
 }
 
-bool Scene::IsSurfaceRectChanged() const
+uint32_t Scene::GetSurfaceRectChangedCount() const
 {
-  return mSceneObject ? mSceneObject->IsSurfaceRectChanged() : false;
+  return mSceneObject ? mSceneObject->GetSurfaceRectChangedCount() : 0u;
 }
 
 bool Scene::IsRotationCompletedAcknowledgementSet() const
@@ -497,6 +498,16 @@ void Scene::SetPartialUpdateEnabled(bool enabled)
 bool Scene::IsPartialUpdateEnabled() const
 {
   return mPartialUpdateEnabled;
+}
+
+void Scene::SetGeometryHittestEnabled(bool enabled)
+{
+  mGeometryHittest = enabled;
+}
+
+bool Scene::IsGeometryHittestEnabled() const
+{
+  return mGeometryHittest;
 }
 
 Integration::Scene::KeyEventSignalType& Scene::KeyEventSignal()

@@ -980,7 +980,7 @@ int UtcDaliSceneSurfaceResizedDefaultSceneViewport(void)
   DALI_TEST_CHECK(defaultScene);
 
   // consume the resize flag by first rendering
-  defaultScene.IsSurfaceRectChanged();
+  defaultScene.GetSurfaceRectChangedCount();
 
   // Ensure stage size matches the scene size
   auto stage = Stage::GetCurrent();
@@ -988,10 +988,10 @@ int UtcDaliSceneSurfaceResizedDefaultSceneViewport(void)
 
   Rect<int32_t> surfaceRect = defaultScene.GetCurrentSurfaceRect();
 
-  bool surfaceResized;
+  uint32_t surfaceResized;
   // check resized flag before surface is resized.
-  surfaceResized = defaultScene.IsSurfaceRectChanged();
-  DALI_TEST_EQUALS(surfaceResized, false, TEST_LOCATION);
+  surfaceResized = defaultScene.GetSurfaceRectChangedCount();
+  DALI_TEST_EQUALS(surfaceResized, 0u, TEST_LOCATION);
 
   // Resize the scene
   Vector2     newSize(1000.0f, 2000.0f);
@@ -1012,8 +1012,8 @@ int UtcDaliSceneSurfaceResizedDefaultSceneViewport(void)
   application.SendNotification();
   application.Render(0);
 
-  surfaceResized = defaultScene.IsSurfaceRectChanged();
-  DALI_TEST_EQUALS(surfaceResized, true, TEST_LOCATION);
+  surfaceResized = defaultScene.GetSurfaceRectChangedCount();
+  DALI_TEST_EQUALS(surfaceResized, 1u, TEST_LOCATION);
 
   // Check that the viewport is handled properly
   DALI_TEST_CHECK(callStack.FindIndexFromMethodAndParams("Viewport", viewportParams) >= 0);
@@ -1026,6 +1026,45 @@ int UtcDaliSceneSurfaceResizedDefaultSceneViewport(void)
   DALI_TEST_EQUALS(newSurfaceRect.y, 0, TEST_LOCATION);
   DALI_TEST_EQUALS(newSurfaceRect.width, 1000, TEST_LOCATION);
   DALI_TEST_EQUALS(newSurfaceRect.height, 2000, TEST_LOCATION);
+
+  // SurfaceRect should be changed.
+  surfaceRect = newSurfaceRect;
+
+  // Resize the scene multiple times
+  uint32_t resizeCount = 10u;
+
+  for(uint32_t i = 0u; i < resizeCount; ++i)
+  {
+    Vector2 newSize(1000.0f, 2100.0f + i);
+    DALI_TEST_CHECK(stage.GetSize() != newSize);
+    defaultScene.SurfaceResized(newSize.width, newSize.height);
+
+    DALI_TEST_EQUALS(stage.GetSize(), newSize, TEST_LOCATION);
+    DALI_TEST_EQUALS(defaultScene.GetSize(), newSize, TEST_LOCATION);
+
+    // Check current surface rect
+    Rect<int32_t> newSurfaceRect = defaultScene.GetCurrentSurfaceRect();
+
+    // It should not be changed yet.
+    DALI_TEST_CHECK(surfaceRect == newSurfaceRect);
+  }
+
+  // Render after resizing surface
+  application.SendNotification();
+  application.Render(0);
+
+  // Check whether the number of surface resized count get well.
+  surfaceResized = defaultScene.GetSurfaceRectChangedCount();
+  DALI_TEST_EQUALS(surfaceResized, resizeCount, TEST_LOCATION);
+
+  // Check current surface rect
+  newSurfaceRect = defaultScene.GetCurrentSurfaceRect();
+
+  // It should be changed
+  DALI_TEST_EQUALS(newSurfaceRect.x, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(newSurfaceRect.y, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(newSurfaceRect.width, 1000, TEST_LOCATION);
+  DALI_TEST_EQUALS(newSurfaceRect.height, 2100 + (resizeCount - 1), TEST_LOCATION);
 
   END_TEST;
 }
@@ -2928,6 +2967,108 @@ int UtcDaliSceneEnableDisablePartialUpdate(void)
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  END_TEST;
+}
+
+int UtcDaliSceneGeoTouchedEnabledDisabled(void)
+{
+  TestApplication          application;
+  Dali::Integration::Scene scene = application.GetScene();
+  DALI_TEST_EQUALS(scene.IsGeometryHittestEnabled(), false, TEST_LOCATION);
+
+  TouchedSignalData data;
+  TouchFunctor      functor(data);
+  scene.TouchedSignal().Connect(&application, functor);
+
+  // Render and notify.
+  application.SendNotification();
+  application.Render();
+
+  // Confirm functor not called before there has been any touch event.
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+
+  // No actors, single touch, down, motion then up.
+  {
+    GenerateTouch(application, PointState::DOWN, Vector2(10.0f, 10.0f));
+
+    DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+    DALI_TEST_CHECK(data.receivedTouchEvent.GetPointCount() != 0u);
+    DALI_TEST_CHECK(!data.receivedTouchEvent.GetHitActor(0));
+
+    data.Reset();
+
+    // Confirm there is no signal when the touchpoint is only moved.
+    GenerateTouch(application, PointState::MOTION, Vector2(1200.0f, 10.0f)); // Some motion
+
+    DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+    data.Reset();
+
+    // Confirm a following up event generates a signal.
+    GenerateTouch(application, PointState::UP, Vector2(1200.0f, 10.0f));
+
+    DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+    DALI_TEST_CHECK(data.receivedTouchEvent.GetPointCount() != 0u);
+    DALI_TEST_CHECK(!data.receivedTouchEvent.GetHitActor(0));
+    data.Reset();
+  }
+
+  // Add an actor to the scene.
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  actor.TouchedSignal().Connect(&DummyTouchCallback);
+  scene.Add(actor);
+
+  // Render and notify.
+  application.SendNotification();
+  application.Render();
+
+  // Actor on scene, single touch, down in actor, motion, then up outside actor.
+  {
+    GenerateTouch(application, PointState::DOWN, Vector2(10.0f, 10.0f));
+
+    DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+    DALI_TEST_CHECK(data.receivedTouchEvent.GetPointCount() != 0u);
+    DALI_TEST_CHECK(data.receivedTouchEvent.GetHitActor(0) == actor);
+    data.Reset();
+
+    GenerateTouch(application, PointState::MOTION, Vector2(150.0f, 10.0f)); // Some motion
+
+    DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+    data.Reset();
+
+    GenerateTouch(application, PointState::UP, Vector2(150.0f, 10.0f)); // Some motion
+
+    DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+    DALI_TEST_CHECK(data.receivedTouchEvent.GetPointCount() != 0u);
+    DALI_TEST_CHECK(!data.receivedTouchEvent.GetHitActor(0));
+    data.Reset();
+  }
+
+  scene.SetGeometryHittestEnabled(true);
+  DALI_TEST_EQUALS(scene.IsGeometryHittestEnabled(), true, TEST_LOCATION);
+  {
+    GenerateTouch(application, PointState::DOWN, Vector2(10.0f, 10.0f));
+
+    DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+    DALI_TEST_CHECK(data.receivedTouchEvent.GetPointCount() != 0u);
+    DALI_TEST_CHECK(data.receivedTouchEvent.GetHitActor(0) == actor);
+    data.Reset();
+
+    GenerateTouch(application, PointState::MOTION, Vector2(150.0f, 10.0f)); // Some motion
+
+    DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+    data.Reset();
+
+    GenerateTouch(application, PointState::UP, Vector2(150.0f, 10.0f)); // Some motion
+
+    DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+    DALI_TEST_CHECK(data.receivedTouchEvent.GetPointCount() != 0u);
+    DALI_TEST_CHECK(data.receivedTouchEvent.GetHitActor(0) == actor);
+    data.Reset();
+  }
 
   END_TEST;
 }

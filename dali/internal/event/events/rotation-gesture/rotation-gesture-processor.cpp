@@ -65,7 +65,14 @@ void EmitRotationSignal(
   rotation->SetSourceType(rotationEvent.sourceType);
   rotation->SetSourceData(rotationEvent.sourceData);
 
-  DALI_TRACE_SCOPE(gTraceFilter, "DALI_EMIT_ROTATION_GESTURE_SIGNAL");
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+  {
+    std::ostringstream stream;
+    stream << "[" << gestureDetectors.size() << "]";
+    DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_EMIT_ROTATION_GESTURE_SIGNAL", stream.str().c_str());
+  }
+#endif
 
   Dali::Actor                                    actorHandle(actor);
   const GestureDetectorContainer::const_iterator endIter = gestureDetectors.end();
@@ -73,6 +80,15 @@ void EmitRotationSignal(
   {
     static_cast<RotationGestureDetector*>(*iter)->EmitRotationGestureSignal(actorHandle, Dali::RotationGesture(rotation.Get()));
   }
+
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+  {
+    std::ostringstream stream;
+    stream << "[" << gestureDetectors.size() << "]";
+    DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_EMIT_ROTATION_GESTURE_SIGNAL", stream.str().c_str());
+  }
+#endif
 }
 
 /**

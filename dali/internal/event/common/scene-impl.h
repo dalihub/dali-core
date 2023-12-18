@@ -233,14 +233,24 @@ public:
   const Rect<int32_t>& GetCurrentSurfaceRect() const;
 
   /**
-   * @copydoc Dali::Integration::Scene::IsSurfaceRectChanged
+   * @copydoc Dali::Integration::Scene::GetSurfaceRectChangedCount
    */
-  bool IsSurfaceRectChanged() const;
+  uint32_t GetSurfaceRectChangedCount() const;
 
   /**
    * @copydoc Dali::Integration::Scene::SetSurfaceRenderTarget
    */
   void SetSurfaceRenderTarget(const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo);
+
+  /**
+   * @copydoc Dali::Integration::Scene::SetGeometryHittestEnabled
+   */
+  void SetGeometryHittestEnabled(bool enabled);
+
+  /**
+   * @copydoc Dali::Integration::Scene::IsGeometryHittestEnabled
+   */
+  bool IsGeometryHittestEnabled() const;
 
   /**
    * Used by the EventProcessor to emit key event signals.
@@ -423,6 +433,7 @@ private:
 
   bool mDepthTreeDirty : 1;       ///< True if the depth tree needs recalculating
   bool mPartialUpdateEnabled : 1; ///< True if the partial update is enabled
+  bool mGeometryHittest : 1;      ///< True if the geometry hittest is enabled
 
   EventProcessor mEventProcessor;
 

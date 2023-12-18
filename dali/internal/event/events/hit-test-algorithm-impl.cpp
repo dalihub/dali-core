@@ -89,9 +89,14 @@ struct HitTestFunctionWrapper : public HitTestInterface
     return false;
   }
 
-  bool ActorRequiresHitResultCheck(Actor* actor, Integration::Point point, Vector2 hitPointLocal, uint32_t timeStamp) override
+  bool ActorRequiresHitResultCheck(Actor* actor, Integration::Point point, Vector2 hitPointLocal, uint32_t timeStamp, bool isGeometry) override
   {
-    return actor->EmitHitTestResultSignal(point, hitPointLocal, timeStamp);
+    // Geometry way does not require Hittest from the client.
+    if(!isGeometry)
+    {
+      return actor->EmitHitTestResultSignal(point, hitPointLocal, timeStamp);
+    }
+    return true;
   }
 
   Dali::HitTestAlgorithm::HitTestFunction mFunc;
@@ -120,13 +125,19 @@ struct ActorTouchableCheck : public HitTestInterface
     return layer->IsTouchConsumed();
   }
 
-  bool ActorRequiresHitResultCheck(Actor* actor, Integration::Point point, Vector2 hitPointLocal, uint32_t timeStamp) override
+  bool ActorRequiresHitResultCheck(Actor* actor, Integration::Point point, Vector2 hitPointLocal, uint32_t timeStamp, bool isGeometry) override
   {
-    if(point.GetState() != PointState::STARTED && actor->IsAllowedOnlyOwnTouch() && ownActor != actor)
+    // The Geometry way behaves like AllowedOnlyOwnTouch is enabled.
+    if(point.GetState() != PointState::STARTED && (isGeometry || actor->IsAllowedOnlyOwnTouch()) && ownActor != actor)
     {
       return false;
     }
-    return actor->EmitHitTestResultSignal(point, hitPointLocal, timeStamp);
+    // Geometry way does not require Hittest from the client.
+    if(!isGeometry)
+    {
+      return actor->EmitHitTestResultSignal(point, hitPointLocal, timeStamp);
+    }
+    return true;
   }
 
   void SetOwnActor(const Actor* actor)
@@ -182,7 +193,8 @@ void HitTestActor(const RenderTask&         renderTask,
                   bool                      overlayedActor,
                   Actor&                    actor,
                   bool&                     overlayHit,
-                  HitActor&                 hit)
+                  HitActor&                 hit,
+                  bool                      isGeometry)
 {
   if(clippingActor || hitCheck.IsActorHittable(&actor))
   {
@@ -218,7 +230,7 @@ void HitTestActor(const RenderTask&         renderTask,
             }
 
             // If the hit actor does not want to hit, the hit-test continues.
-            if(hitCheck.ActorRequiresHitResultCheck(&actor, point, hitPointLocal, eventTime))
+            if(hitCheck.ActorRequiresHitResultCheck(&actor, point, hitPointLocal, eventTime, isGeometry))
             {
               hit.actor       = &actor;
               hit.hitPosition = hitPointLocal;
@@ -298,7 +310,9 @@ HitActor HitTestWithinLayer(Actor&                                     actor,
                             bool                                       layerIs3d,
                             const RayTest&                             rayTest,
                             const Integration::Point&                  point,
-                            const uint32_t                             eventTime)
+                            const uint32_t                             eventTime,
+                            std::list<Dali::Internal::Actor*>&         actorLists,
+                            bool                                       isGeometry)
 {
   HitActor hit;
 
@@ -314,18 +328,35 @@ HitActor HitTestWithinLayer(Actor&                                     actor,
   bool overlayedActor = overlayed || actor.IsOverlay();
 
   // If we are a clipping actor or hittable...
-  HitTestActor(renderTask, rayOrigin, rayDir, nearClippingPlane, farClippingPlane, hitCheck, rayTest, point, eventTime, clippingActor, overlayedActor, actor, overlayHit, hit);
+  HitTestActor(renderTask, rayOrigin, rayDir, nearClippingPlane, farClippingPlane, hitCheck, rayTest, point, eventTime, clippingActor, overlayedActor, actor, overlayHit, hit, isGeometry);
 
   // If current actor is clipping, and hit failed, We should not checkup child actors. Fast return
   if(clippingActor && !(hit.actor))
   {
     return hit;
   }
+  else if (isGeometry && hit.actor)
+  {
+    // Saves the actors that can be hit as a list
+    actorLists.push_back(hit.actor);
+  }
 
   // Find a child hit, until we run out of actors in the current layer.
   HitActor childHit;
   if(actor.GetChildCount() > 0)
   {
+    // If the child touches outside the parent's size boundary, it should not be hit.
+    if(isGeometry && !actor.IsLayer())
+    {
+      Vector2 hitPointLocal;
+      float   distance;
+      if(!(rayTest.SphereTest(actor, rayOrigin, rayDir) &&
+            rayTest.ActorTest(actor, rayOrigin, rayDir, hitPointLocal, distance)))
+      {
+        return hit;
+      }
+    }
+
     childHit.distance        = std::numeric_limits<float>::max();
     childHit.depth           = std::numeric_limits<int32_t>::min();
     ActorContainer& children = actor.GetChildrenInternal();
@@ -340,20 +371,21 @@ HitActor HitTestWithinLayer(Actor&                                     actor,
          (hitCheck.DescendActorHierarchy((*iter).Get()))) // We can descend into child hierarchy
       {
         HitActor currentHit(HitTestWithinLayer((*iter->Get()),
-                                               renderTask,
-                                               exclusives,
-                                               rayOrigin,
-                                               rayDir,
-                                               nearClippingPlane,
-                                               farClippingPlane,
-                                               hitCheck,
-                                               overlayedActor,
-                                               overlayHit,
-                                               layerIs3d,
-                                               rayTest,
-                                               point,
-                                               eventTime));
-
+                                              renderTask,
+                                              exclusives,
+                                              rayOrigin,
+                                              rayDir,
+                                              nearClippingPlane,
+                                              farClippingPlane,
+                                              hitCheck,
+                                              overlayedActor,
+                                              overlayHit,
+                                              layerIs3d,
+                                              rayTest,
+                                              point,
+                                              eventTime,
+                                              actorLists,
+                                              isGeometry));
         // Make sure the set hit actor is actually hittable. This is usually required when we have some
         // clipping as we need to hit-test all actors as we descend the tree regardless of whether they
         // are hittable or not.
@@ -438,6 +470,118 @@ void GetCameraClippingPlane(RenderTask& renderTask, float& nearClippingPlane, fl
   CameraActor* cameraActor = renderTask.GetCameraActor();
   nearClippingPlane        = cameraActor->GetNearClippingPlane();
   farClippingPlane         = cameraActor->GetFarClippingPlane();
+}
+
+void GeoHitTestRenderTask(const RenderTaskList::ExclusivesContainer& exclusives,
+                       const Vector2&                             sceneSize,
+                       LayerList&                                 layers,
+                       RenderTask&                                renderTask,
+                       Vector2                                    screenCoordinates,
+                       Results&                                   results,
+                       HitTestInterface&                          hitCheck,
+                       const RayTest&                             rayTest)
+{
+  if(renderTask.IsHittable(screenCoordinates))
+  {
+    Viewport viewport;
+    renderTask.GetHittableViewport(viewport);
+
+    if(screenCoordinates.x < static_cast<float>(viewport.x) ||
+       screenCoordinates.x > static_cast<float>(viewport.x + viewport.width) ||
+       screenCoordinates.y < static_cast<float>(viewport.y) ||
+       screenCoordinates.y > static_cast<float>(viewport.y + viewport.height))
+    {
+      // The screen coordinate is outside the viewport of render task. The viewport clips all layers.
+      return;
+    }
+
+    float nearClippingPlane, farClippingPlane;
+    GetCameraClippingPlane(renderTask, nearClippingPlane, farClippingPlane);
+
+    // Determine the layer depth of the source actor
+    Actor* sourceActor(renderTask.GetSourceActor());
+    if(sourceActor)
+    {
+      Dali::Layer sourceLayer(sourceActor->GetLayer());
+      if(sourceLayer)
+      {
+        const uint32_t sourceActorDepth(sourceLayer.GetProperty<bool>(Dali::Layer::Property::DEPTH));
+        CameraActor* cameraActor     = renderTask.GetCameraActor();
+        bool         pickingPossible = cameraActor->BuildPickingRay(screenCoordinates,
+                                                                    viewport,
+                                                                    results.rayOrigin,
+                                                                    results.rayDirection);
+        if(!pickingPossible)
+        {
+          return;
+        }
+
+        // Hit test starting with the top layer, working towards the bottom layer.
+        bool     overlayHit           = false;
+
+        for(uint32_t i = 0; i < layers.GetLayerCount(); ++i)
+        {
+          Layer* layer(layers.GetLayer(i));
+          overlayHit = false;
+          HitActor hit;
+
+          // Ensure layer is touchable (also checks whether ancestors are also touchable)
+          if(IsActuallyHittable(*layer, screenCoordinates, sceneSize, hitCheck))
+          {
+            // Always hit-test the source actor; otherwise test whether the layer is below the source actor in the hierarchy
+            if(sourceActorDepth == i)
+            {
+              // Recursively hit test the source actor & children, without crossing into other layers.
+              hit = HitTestWithinLayer(*sourceActor,
+                                      renderTask,
+                                      exclusives,
+                                      results.rayOrigin,
+                                      results.rayDirection,
+                                      nearClippingPlane,
+                                      farClippingPlane,
+                                      hitCheck,
+                                      overlayHit,
+                                      overlayHit,
+                                      layer->GetBehavior() == Dali::Layer::LAYER_3D,
+                                      rayTest,
+                                      results.point,
+                                      results.eventTime,
+                                      results.actorLists,
+                                      true);
+            }
+            else if(IsWithinSourceActors(*sourceActor, *layer))
+            {
+              // Recursively hit test all the actors, without crossing into other layers.
+              hit = HitTestWithinLayer(*layer,
+                                      renderTask,
+                                      exclusives,
+                                      results.rayOrigin,
+                                      results.rayDirection,
+                                      nearClippingPlane,
+                                      farClippingPlane,
+                                      hitCheck,
+                                      overlayHit,
+                                      overlayHit,
+                                      layer->GetBehavior() == Dali::Layer::LAYER_3D,
+                                      rayTest,
+                                      results.point,
+                                      results.eventTime,
+                                      results.actorLists,
+                                      true);
+            }
+          }
+
+          if(hit.actor)
+          {
+            results.renderTask       = RenderTaskPtr(&renderTask);
+            results.actor            = Dali::Actor(hit.actor);
+            results.actorCoordinates = hit.hitPosition;
+          }
+        }
+      }
+    }
+  }
+  return;
 }
 
 /**
@@ -536,7 +680,9 @@ bool HitTestRenderTask(const RenderTaskList::ExclusivesContainer& exclusives,
                                        layer->GetBehavior() == Dali::Layer::LAYER_3D,
                                        rayTest,
                                        results.point,
-                                       results.eventTime);
+                                       results.eventTime,
+                                       results.actorLists,
+                                       false);
             }
             else if(IsWithinSourceActors(*sourceActor, *layer))
             {
@@ -555,7 +701,9 @@ bool HitTestRenderTask(const RenderTaskList::ExclusivesContainer& exclusives,
                                        layer->GetBehavior() == Dali::Layer::LAYER_3D,
                                        rayTest,
                                        results.point,
-                                       results.eventTime);
+                                       results.eventTime,
+                                       results.actorLists,
+                                       false);
             }
 
             // If this layer is set to consume the hit, then do not check any layers behind it
@@ -603,6 +751,7 @@ bool HitTestRenderTask(const RenderTaskList::ExclusivesContainer& exclusives,
  * @param[in] taskList The list of render tasks
  * @param[out] results Ray information calculated by the camera
  * @param[in] hitCheck The hit testing interface object to use
+ * @param[in] isGeometry Whether the scene using geometry event propagation touch and hover events.
  * @return True if we have a hit, false otherwise
  */
 bool HitTestRenderTaskList(const Vector2&    sceneSize,
@@ -610,25 +759,44 @@ bool HitTestRenderTaskList(const Vector2&    sceneSize,
                            RenderTaskList&   taskList,
                            const Vector2&    screenCoordinates,
                            Results&          results,
-                           HitTestInterface& hitCheck)
+                           HitTestInterface& hitCheck,
+                           bool isGeometry)
 {
-  RenderTaskList::RenderTaskContainer&                  tasks      = taskList.GetTasks();
-  RenderTaskList::RenderTaskContainer::reverse_iterator endIter    = tasks.rend();
-  const auto&                                           exclusives = taskList.GetExclusivesList();
-  RayTest                                               rayTest;
-
-  // Hit test order should be reverse of draw order
-  for(RenderTaskList::RenderTaskContainer::reverse_iterator iter = tasks.rbegin(); endIter != iter; ++iter)
+  if(isGeometry)
   {
-    RenderTask& renderTask = *iter->Get();
-    if(HitTestRenderTask(exclusives, sceneSize, layers, renderTask, screenCoordinates, results, hitCheck, rayTest))
-    {
-      // Return true when an actor is hit (or layer in our render-task consumes the hit)
-      return true;
-    }
-  }
+    RenderTaskList::RenderTaskContainer&                  tasks      = taskList.GetTasks();
+    RenderTaskList::RenderTaskContainer::iterator endIter            = tasks.end();
+    const auto&                                           exclusives = taskList.GetExclusivesList();
+    RayTest                                               rayTest;
 
-  return false;
+    // Hit test order should be of draw order
+    for(RenderTaskList::RenderTaskContainer::iterator iter = tasks.begin(); endIter != iter; ++iter)
+    {
+      RenderTask& renderTask = *iter->Get();
+      GeoHitTestRenderTask(exclusives, sceneSize, layers, renderTask, screenCoordinates, results, hitCheck, rayTest);
+    }
+
+    return !results.actorLists.empty();
+  }
+  else
+  {
+    RenderTaskList::RenderTaskContainer&                  tasks      = taskList.GetTasks();
+    RenderTaskList::RenderTaskContainer::reverse_iterator endIter    = tasks.rend();
+    const auto&                                           exclusives = taskList.GetExclusivesList();
+    RayTest                                               rayTest;
+
+    // Hit test order should be reverse of draw order
+    for(RenderTaskList::RenderTaskContainer::reverse_iterator iter = tasks.rbegin(); endIter != iter; ++iter)
+    {
+      RenderTask& renderTask = *iter->Get();
+      if(HitTestRenderTask(exclusives, sceneSize, layers, renderTask, screenCoordinates, results, hitCheck, rayTest))
+      {
+        // Return true when an actor is hit (or layer in our render-task consumes the hit)
+        return true;
+      }
+    }
+    return false;
+  }
 }
 
 /**
@@ -639,6 +807,7 @@ bool HitTestRenderTaskList(const Vector2&    sceneSize,
  * @param[in] taskList The list of render tasks
  * @param[out] results Ray information calculated by the camera
  * @param[in] hitCheck The hit testing interface object to use
+ * @param[in] isGeometry Whether the scene using geometry event propagation touch and hover events.
  * @return True if we have a hit, false otherwise
  */
 bool HitTestForEachRenderTask(const Vector2&    sceneSize,
@@ -646,11 +815,12 @@ bool HitTestForEachRenderTask(const Vector2&    sceneSize,
                               RenderTaskList&   taskList,
                               const Vector2&    screenCoordinates,
                               Results&          results,
-                              HitTestInterface& hitCheck)
+                              HitTestInterface& hitCheck,
+                              bool isGeometry)
 {
   bool result = false;
 
-  if(HitTestRenderTaskList(sceneSize, layers, taskList, screenCoordinates, results, hitCheck))
+  if(HitTestRenderTaskList(sceneSize, layers, taskList, screenCoordinates, results, hitCheck, isGeometry))
   {
     // Found hit.
     result = true;
@@ -663,13 +833,13 @@ bool HitTestForEachRenderTask(const Vector2&    sceneSize,
 
 HitTestInterface::~HitTestInterface() = default;
 
-bool HitTest(const Vector2& sceneSize, RenderTaskList& taskList, LayerList& layerList, const Vector2& screenCoordinates, Dali::HitTestAlgorithm::Results& results, Dali::HitTestAlgorithm::HitTestFunction func)
+bool HitTest(const Vector2& sceneSize, RenderTaskList& taskList, LayerList& layerList, const Vector2& screenCoordinates, Dali::HitTestAlgorithm::Results& results, Dali::HitTestAlgorithm::HitTestFunction func, bool isGeometry)
 {
   bool wasHit(false);
   // Hit-test the regular on-scene actors
   Results                hitTestResults;
   HitTestFunctionWrapper hitTestFunctionWrapper(func);
-  if(HitTestForEachRenderTask(sceneSize, layerList, taskList, screenCoordinates, hitTestResults, hitTestFunctionWrapper))
+  if(HitTestForEachRenderTask(sceneSize, layerList, taskList, screenCoordinates, hitTestResults, hitTestFunctionWrapper, isGeometry))
   {
     results.actor            = hitTestResults.actor;
     results.actorCoordinates = hitTestResults.actorCoordinates;
@@ -678,23 +848,23 @@ bool HitTest(const Vector2& sceneSize, RenderTaskList& taskList, LayerList& laye
   return wasHit;
 }
 
-bool HitTest(const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList& layerList, const Vector2& screenCoordinates, Results& results, HitTestInterface& hitTestInterface)
+bool HitTest(const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList& layerList, const Vector2& screenCoordinates, Results& results, HitTestInterface& hitTestInterface, bool isGeometry)
 {
   bool wasHit(false);
 
   // Hit-test the regular on-scene actors
   if(!wasHit)
   {
-    wasHit = HitTestForEachRenderTask(sceneSize, layerList, renderTaskList, screenCoordinates, results, hitTestInterface);
+    wasHit = HitTestForEachRenderTask(sceneSize, layerList, renderTaskList, screenCoordinates, results, hitTestInterface, isGeometry);
   }
   return wasHit;
 }
 
-bool HitTest(const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList& layerList, const Vector2& screenCoordinates, Results& results, const Actor* ownActor)
+bool HitTest(const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList& layerList, const Vector2& screenCoordinates, Results& results, const Actor* ownActor, bool isGeometry)
 {
   ActorTouchableCheck actorTouchableCheck;
   actorTouchableCheck.SetOwnActor(ownActor);
-  return HitTest(sceneSize, renderTaskList, layerList, screenCoordinates, results, actorTouchableCheck);
+  return HitTest(sceneSize, renderTaskList, layerList, screenCoordinates, results, actorTouchableCheck, isGeometry);
 }
 
 } // namespace HitTestAlgorithm

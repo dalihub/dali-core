@@ -198,9 +198,9 @@ const Rect<int32_t>& Scene::GetCurrentSurfaceRect() const
   return GetImplementation(*this).GetCurrentSurfaceRect();
 }
 
-bool Scene::IsSurfaceRectChanged() const
+uint32_t Scene::GetSurfaceRectChangedCount() const
 {
-  return GetImplementation(*this).IsSurfaceRectChanged();
+  return GetImplementation(*this).GetSurfaceRectChangedCount();
 }
 
 void Scene::SetRotationCompletedAcknowledgement()
@@ -226,6 +226,16 @@ void Scene::SetPartialUpdateEnabled(bool enabled)
 bool Scene::IsPartialUpdateEnabled() const
 {
   return GetImplementation(*this).IsPartialUpdateEnabled();
+}
+
+void Scene::SetGeometryHittestEnabled(bool enabled)
+{
+  GetImplementation(*this).SetGeometryHittestEnabled(enabled);
+}
+
+bool Scene::IsGeometryHittestEnabled()
+{
+  return GetImplementation(*this).IsGeometryHittestEnabled();
 }
 
 Scene::EventProcessingFinishedSignalType& Scene::EventProcessingFinishedSignal()

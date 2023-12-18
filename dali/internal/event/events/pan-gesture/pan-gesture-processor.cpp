@@ -571,7 +571,14 @@ void PanGestureProcessor::EmitPanSignal(Actor*                          actor,
       mSceneObject->AddGesture(*pan.Get());
     }
 
-    DALI_TRACE_SCOPE(gTraceFilter, "DALI_EMIT_PAN_GESTURE_SIGNAL");
+#ifdef TRACE_ENABLED
+    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+    {
+      std::ostringstream stream;
+      stream << "[" << gestureDetectors.size() << "]";
+      DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_EMIT_PAN_GESTURE_SIGNAL", stream.str().c_str());
+    }
+#endif
 
     Dali::Actor actorHandle(actor);
 
@@ -580,6 +587,15 @@ void PanGestureProcessor::EmitPanSignal(Actor*                          actor,
     {
       static_cast<PanGestureDetector*>(*iter)->EmitPanGestureSignal(actorHandle, Dali::PanGesture(pan.Get()));
     }
+
+#ifdef TRACE_ENABLED
+    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+    {
+      std::ostringstream stream;
+      stream << "[" << gestureDetectors.size() << "]";
+      DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_EMIT_PAN_GESTURE_SIGNAL", stream.str().c_str());
+    }
+#endif
   }
 }
 

@@ -107,6 +107,11 @@ bool CompareItems3D(const RenderInstructionProcessor::SortAttributes& lhs, const
     }
     else
     {
+      if(lhs.renderItem->mDepthIndex != rhs.renderItem->mDepthIndex)
+      {
+        return lhs.renderItem->mDepthIndex < rhs.renderItem->mDepthIndex;
+      }
+
       // If both RenderItems are transparent, sort using Z, then shader, then material, then geometry.
       if(Equals(lhs.zValue, rhs.zValue))
       {
@@ -270,7 +275,8 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
     bool isOpaque = true;
     if(!hasRenderCallback)
     {
-      Renderer::OpacityType opacityType = rendererExist ? renderable.mRenderer->GetOpacityType(updateBufferIndex, renderPass, *node) : Renderer::OPAQUE;
+      bool isVisualRenderer = (isLayer3d && !!(renderable.mRenderer->GetVisualProperties()));
+      Renderer::OpacityType opacityType = rendererExist ? (isVisualRenderer ? Renderer::TRANSLUCENT : renderable.mRenderer->GetOpacityType(updateBufferIndex, renderPass, *node)) : Renderer::OPAQUE;
 
       // We can skip render when node is not clipping and transparent
       skipRender = (opacityType == Renderer::TRANSPARENT && node->GetClippingMode() == ClippingMode::DISABLED);

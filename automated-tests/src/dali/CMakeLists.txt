@@ -34,6 +34,9 @@ SET(TC_SOURCES
         utc-Dali-FrameCallbackInterface.cpp
         utc-Dali-FreeList.cpp
         utc-Dali-Geometry.cpp
+        utc-Dali-GeoHitTestAlgorithm.cpp
+        utc-Dali-GeoHoverProcessing.cpp
+        utc-Dali-GeoTouchProcessing.cpp
         utc-Dali-GestureDetector.cpp
         utc-Dali-Handle.cpp
         utc-Dali-Hash.cpp
