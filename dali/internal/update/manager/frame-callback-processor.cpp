@@ -106,7 +106,14 @@ bool FrameCallbackProcessor::Update(BufferIndex bufferIndex, float elapsedSecond
 
   if(!mFrameCallbacks.empty())
   {
-    DALI_TRACE_SCOPE(gTraceFilter, "DALI_FRAME_CALLBACK_UPDATE");
+#ifdef TRACE_ENABLED
+    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+    {
+      std::ostringstream stream;
+      stream << "[" << mFrameCallbacks.size() << "]";
+      DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_FRAME_CALLBACK_UPDATE", stream.str().c_str());
+    }
+#endif
 
     // If any of the FrameCallback::Update calls returns false, then they are no longer required & can be removed.
     auto iter = std::remove_if(
@@ -116,6 +123,15 @@ bool FrameCallbackProcessor::Update(BufferIndex bufferIndex, float elapsedSecond
         return (requests & FrameCallback::CONTINUE_CALLING) == 0;
       });
     mFrameCallbacks.erase(iter, mFrameCallbacks.end());
+
+#ifdef TRACE_ENABLED
+    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+    {
+      std::ostringstream stream;
+      stream << "[" << mFrameCallbacks.size() << "]";
+      DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_FRAME_CALLBACK_UPDATE", stream.str().c_str());
+    }
+#endif
   }
 
   mNodeHierarchyChanged = false;

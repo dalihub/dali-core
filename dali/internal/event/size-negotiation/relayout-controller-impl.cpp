@@ -438,13 +438,21 @@ void RelayoutController::Relayout()
     // 2. Iterate through the stack until it's empty.
     if(mRelayoutStack->Size() > 0)
     {
-      DALI_TRACE_SCOPE(gTraceFilter, "DALI_RELAYOUT");
+      DALI_TRACE_BEGIN(gTraceFilter, "DALI_RELAYOUT");
       PRINT_HIERARCHY;
+#ifdef TRACE_ENABLED
+      uint32_t relayoutActorCount   = 0u;
+      uint32_t negotiatedActorCount = 0u;
+#endif
 
       while(mRelayoutStack->Size() > 0)
       {
         Dali::Actor actor;
         Vector2     size;
+
+#ifdef TRACE_ENABLED
+        ++relayoutActorCount;
+#endif
 
         mRelayoutStack->GetBack(actor, size);
         Actor& actorImpl = GetImplementation(actor);
@@ -452,6 +460,9 @@ void RelayoutController::Relayout()
 
         if(actorImpl.RelayoutRequired() && actorImpl.OnScene())
         {
+#ifdef TRACE_ENABLED
+          ++negotiatedActorCount;
+#endif
           DALI_LOG_INFO(gLogFilter, Debug::General, "[Internal::RelayoutController::Relayout] Negotiating %p %s %s (%.2f, %.2f)\n", &actorImpl, actor.GetTypeName().c_str(), actor.GetProperty<std::string>(Dali::Actor::Property::NAME).c_str(), size.width, size.height);
 
           // 3. Negotiate the size with the current actor. Pass it an empty container which the actor
@@ -464,6 +475,15 @@ void RelayoutController::Relayout()
       mRelayoutInfoAllocator.ResetMemoryPool();
 
       PRINT_HIERARCHY;
+
+#ifdef TRACE_ENABLED
+      if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+      {
+        std::ostringstream stream;
+        stream << "[relayoutActor:" << relayoutActorCount << " negotiatedActor:" << negotiatedActorCount << "]";
+        DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_RELAYOUT", stream.str().c_str());
+      }
+#endif
     }
 
     mPerformingRelayout = false;
