@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PROPERTY_INPUT_IMPL_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -180,18 +180,6 @@ public:
     // the return will never be executed, it's just to keep the compiler happy
     return reinterpret_cast<const Matrix&>(*this);
   }
-
-  /**
-   * Retrieve the address of the property value. Only for use
-   * when writing uniforms.
-   */
-  virtual const void* GetValueAddress(BufferIndex bufferIndex) const = 0;
-
-  /**
-   * Retrieve the size of the property value for use in copying.
-   * Only for use when writing uniforms.
-   */
-  virtual size_t GetValueSize() const = 0;
 
   // Accessors for Constraint functions
 
