@@ -68,7 +68,14 @@ void EmitTapSignal(
   tap->SetSourceType(tapEvent.sourceType);
   tap->SetSourceData(tapEvent.sourceData);
 
-  DALI_TRACE_SCOPE(gTraceFilter, "DALI_EMIT_TAP_GESTURE_SIGNAL");
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+  {
+    std::ostringstream stream;
+    stream << "[" << gestureDetectors.size() << "]";
+    DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_EMIT_TAP_GESTURE_SIGNAL", stream.str().c_str());
+  }
+#endif
 
   Dali::Actor                                    actorHandle(actor);
   const GestureDetectorContainer::const_iterator endIter = gestureDetectors.end();
@@ -76,6 +83,15 @@ void EmitTapSignal(
   {
     static_cast<TapGestureDetector*>(*iter)->EmitTapGestureSignal(actorHandle, Dali::TapGesture(tap.Get()));
   }
+
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+  {
+    std::ostringstream stream;
+    stream << "[" << gestureDetectors.size() << "]";
+    DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_EMIT_TAP_GESTURE_SIGNAL", stream.str().c_str());
+  }
+#endif
 }
 
 } // unnamed namespace
