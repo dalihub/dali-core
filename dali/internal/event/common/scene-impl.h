@@ -253,6 +253,16 @@ public:
   bool IsGeometryHittestEnabled() const;
 
   /**
+   * @copydoc Dali::Integration::Scene::SetNativeId
+   */
+  void SetNativeId(int32_t nativeId);
+
+  /**
+   * @copydoc Dali::Integration::Scene::GetNativeId
+   */
+  int32_t GetNativeId() const;
+
+  /**
    * Used by the EventProcessor to emit key event signals.
    * @param[in] event The key event.
    */
@@ -442,6 +452,9 @@ private:
 
   // The Screen's orientation
   int32_t mScreenOrientation;
+
+  // The native window id
+  int32_t mNativeId;
 
   // The key event signal
   Integration::Scene::KeyEventSignalType          mKeyEventSignal;

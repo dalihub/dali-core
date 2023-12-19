@@ -238,6 +238,16 @@ bool Scene::IsGeometryHittestEnabled()
   return GetImplementation(*this).IsGeometryHittestEnabled();
 }
 
+void Scene::SetNativeId(int32_t nativeId)
+{
+  return GetImplementation(*this).SetNativeId(nativeId);
+}
+
+int32_t Scene::GetNativeId() const
+{
+  return GetImplementation(*this).GetNativeId();
+}
+
 Scene::EventProcessingFinishedSignalType& Scene::EventProcessingFinishedSignal()
 {
   return GetImplementation(*this).EventProcessingFinishedSignal();

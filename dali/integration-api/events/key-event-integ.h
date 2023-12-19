@@ -142,6 +142,11 @@ struct DALI_CORE_API KeyEvent : public Event
    * Whether the key referenced by the event is a repeating key.
    */
   bool isRepeat;
+
+  /**
+   * Window id where key event occurred.
+   */
+  uint32_t windowId;
 };
 
 } // namespace Integration

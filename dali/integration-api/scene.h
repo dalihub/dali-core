@@ -431,6 +431,20 @@ public:
   bool IsGeometryHittestEnabled();
 
   /**
+   * @brief Sets the native window id
+   *
+   * @param nativeId The native window id
+   */
+  void SetNativeId(int32_t nativeId);
+
+  /**
+   * @brief Gets the native window id
+   *
+   * @return The native window id
+   */
+  int32_t GetNativeId() const;
+
+  /**
    * @brief This signal is emitted just after the event processing is finished.
    *
    * @return The signal to connect to
