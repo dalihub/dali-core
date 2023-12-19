@@ -45,7 +45,8 @@ KeyEvent::KeyEvent()
   mDeviceName(""),
   mDeviceClass(Device::Class::NONE),
   mDeviceSubclass(Device::Subclass::NONE),
-  mIsRepeat(false)
+  mIsRepeat(false),
+  mWindowId(0)
 {
 }
 
@@ -71,7 +72,8 @@ KeyEvent::KeyEvent(const std::string&           keyName,
   mDeviceName(deviceName),
   mDeviceClass(deviceClass),
   mDeviceSubclass(deviceSubclass),
-  mIsRepeat(false)
+  mIsRepeat(false),
+  mWindowId(0)
 {
 }
 
@@ -172,6 +174,11 @@ bool KeyEvent::IsRepeat() const
   return mIsRepeat;
 }
 
+uint32_t KeyEvent::GetWindowId() const
+{
+  return mWindowId;
+}
+
 void KeyEvent::SetKeyName(const std::string& keyName)
 {
   mKeyName = keyName;
@@ -205,6 +212,11 @@ void KeyEvent::SetState(const Dali::KeyEvent::State& state)
 void KeyEvent::SetRepeat(const bool repeat)
 {
   mIsRepeat = repeat;
+}
+
+void KeyEvent::SetWindowId(uint32_t windowId)
+{
+  mWindowId = windowId;
 }
 
 } // namespace Internal

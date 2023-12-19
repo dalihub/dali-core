@@ -177,6 +177,11 @@ public:
   bool IsRepeat() const;
 
   /**
+   * @copydoc Dali::KeyEvent::GetWindowId()
+   */
+  uint32_t GetWindowId() const;
+
+  /**
    * @brief Set the name given to the key pressed
    *
    * @param[in] keyName The name given to the key pressed.
@@ -225,6 +230,14 @@ public:
    */
   void SetRepeat(const bool repeat);
 
+  /**
+   * @brief Sets window id where key event occurred.
+   *
+   * @param[in] windowId The window id where key event occurred
+   */
+  void SetWindowId(uint32_t windowId);
+
+
 private:
   /**
    * @brief Destructor.
@@ -253,6 +266,7 @@ private:
   Device::Class::Type    mDeviceClass;    ///< The class of device the key event originated from
   Device::Subclass::Type mDeviceSubclass; ///< The subclass of device the key event originated from
   bool                   mIsRepeat;       ///< Whether the key referenced by the event is a repeating key.
+  uint32_t               mWindowId;       ///< The window id where key event occurred.
 };
 
 } // namespace Internal
