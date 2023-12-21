@@ -428,14 +428,9 @@ void Core::RunProcessors()
 {
   if(mProcessors.Count() != 0)
   {
-#ifdef TRACE_ENABLED
-    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-    {
-      std::ostringstream stream;
-      stream << "[" << mProcessors.Count() << "]";
-      DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_CORE_RUN_PROCESSORS", stream.str().c_str());
-    }
-#endif
+    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_PROCESSORS", [&](std::ostringstream& oss) {
+      oss << "[" << mProcessors.Count() << "]";
+    });
 
     // Copy processor pointers to prevent changes to vector affecting loop iterator.
     Dali::Vector<Integration::Processor*> processors(mProcessors);
@@ -449,23 +444,13 @@ void Core::RunProcessors()
       {
         if(!mProcessorUnregistered)
         {
-#ifdef TRACE_ENABLED
-          if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-          {
-            std::ostringstream stream;
-            stream << "[" << processor->GetProcessorName() << "]";
-            DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_CORE_RUN_PROCESSOR", stream.str().c_str());
-          }
-#endif
+          DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_PROCESSOR", [&](std::ostringstream& oss) {
+            oss << "[" << processor->GetProcessorName() << "]";
+          });
           processor->Process(false);
-#ifdef TRACE_ENABLED
-          if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-          {
-            std::ostringstream stream;
-            stream << "[" << processor->GetProcessorName() << "]";
-            DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_CORE_RUN_PROCESSOR", stream.str().c_str());
-          }
-#endif
+          DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_PROCESSOR", [&](std::ostringstream& oss) {
+            oss << "[" << processor->GetProcessorName() << "]";
+          });
         }
         else
         {
@@ -474,40 +459,25 @@ void Core::RunProcessors()
           auto iter = std::find(mProcessors.Begin(), mProcessors.End(), processor);
           if(iter != mProcessors.End())
           {
-#ifdef TRACE_ENABLED
-            if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-            {
-              std::ostringstream stream;
-              stream << "[" << processor->GetProcessorName() << "]";
-              DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_CORE_RUN_PROCESSOR", stream.str().c_str());
-            }
-#endif
+            DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_PROCESSOR", [&](std::ostringstream& oss) {
+              oss << "[" << processor->GetProcessorName() << "]";
+            });
             processor->Process(false);
-#ifdef TRACE_ENABLED
-            if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-            {
-              std::ostringstream stream;
-              stream << "[" << processor->GetProcessorName() << "]";
-              DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_CORE_RUN_PROCESSOR", stream.str().c_str());
-            }
-#endif
+            DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_PROCESSOR", [&](std::ostringstream& oss) {
+              oss << "[" << processor->GetProcessorName() << "]";
+            });
           }
         }
       }
     }
-#ifdef TRACE_ENABLED
-    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-    {
-      std::ostringstream stream;
-      stream << "[" << mProcessors.Count();
+    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_PROCESSORS", [&](std::ostringstream& oss) {
+      oss << "[" << mProcessors.Count();
       if(mProcessorUnregistered)
       {
-        stream << ", processor changed";
+        oss << ", processor changed";
       }
-      stream << "]";
-      DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_CORE_RUN_PROCESSORS", stream.str().c_str());
-    }
-#endif
+      oss << "]";
+    });
   }
 }
 
@@ -515,14 +485,9 @@ void Core::RunPostProcessors()
 {
   if(mPostProcessors.Count() != 0)
   {
-#ifdef TRACE_ENABLED
-    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-    {
-      std::ostringstream stream;
-      stream << "[" << mPostProcessors.Count() << "]";
-      DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSORS", stream.str().c_str());
-    }
-#endif
+    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSORS", [&](std::ostringstream& oss) {
+      oss << "[" << mPostProcessors.Count() << "]";
+    });
 
     // Copy processor pointers to prevent changes to vector affecting loop iterator.
     Dali::Vector<Integration::Processor*> processors(mPostProcessors);
@@ -536,23 +501,13 @@ void Core::RunPostProcessors()
       {
         if(!mPostProcessorUnregistered)
         {
-#ifdef TRACE_ENABLED
-          if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-          {
-            std::ostringstream stream;
-            stream << "[" << processor->GetProcessorName() << "]";
-            DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSOR", stream.str().c_str());
-          }
-#endif
+          DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSOR", [&](std::ostringstream& oss) {
+            oss << "[" << processor->GetProcessorName() << "]";
+          });
           processor->Process(true);
-#ifdef TRACE_ENABLED
-          if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-          {
-            std::ostringstream stream;
-            stream << "[" << processor->GetProcessorName() << "]";
-            DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSOR", stream.str().c_str());
-          }
-#endif
+          DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSOR", [&](std::ostringstream& oss) {
+            oss << "[" << processor->GetProcessorName() << "]";
+          });
         }
         else
         {
@@ -561,41 +516,26 @@ void Core::RunPostProcessors()
           auto iter = std::find(mPostProcessors.Begin(), mPostProcessors.End(), processor);
           if(iter != mPostProcessors.End())
           {
-#ifdef TRACE_ENABLED
-            if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-            {
-              std::ostringstream stream;
-              stream << "[" << processor->GetProcessorName() << "]";
-              DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSOR", stream.str().c_str());
-            }
-#endif
+            DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSOR", [&](std::ostringstream& oss) {
+              oss << "[" << processor->GetProcessorName() << "]";
+            });
             processor->Process(true);
-#ifdef TRACE_ENABLED
-            if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-            {
-              std::ostringstream stream;
-              stream << "[" << processor->GetProcessorName() << "]";
-              DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSOR", stream.str().c_str());
-            }
-#endif
+            DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSOR", [&](std::ostringstream& oss) {
+              oss << "[" << processor->GetProcessorName() << "]";
+            });
           }
         }
       }
     }
 
-#ifdef TRACE_ENABLED
-    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-    {
-      std::ostringstream stream;
-      stream << "[" << mPostProcessors.Count();
+    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSORS", [&](std::ostringstream& oss) {
+      oss << "[" << mPostProcessors.Count();
       if(mPostProcessorUnregistered)
       {
-        stream << ", post processor changed";
+        oss << ", processor changed";
       }
-      stream << "]";
-      DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSORS", stream.str().c_str());
-    }
-#endif
+      oss << "]";
+    });
   }
 }
 

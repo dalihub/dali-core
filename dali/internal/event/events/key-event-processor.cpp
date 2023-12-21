@@ -61,14 +61,9 @@ void KeyEventProcessor::ProcessKeyEvent(const Integration::KeyEvent& event)
   keyEvent->SetWindowId(event.windowId);
   Dali::KeyEvent keyEventHandle(keyEvent.Get());
 
-#ifdef TRACE_ENABLED
-  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-  {
-    std::ostringstream stream;
-    stream << "[name:" << event.keyName << ", code:" << event.keyCode << ", state:" << KEY_EVENT_STATES[event.state] << ", time:" << event.time << "]";
-    DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_PROCESS_KEY_EVENT", stream.str().c_str());
-  }
-#endif
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_PROCESS_KEY_EVENT", [&](std::ostringstream& oss) {
+    oss << "[name:" << event.keyName << ", code:" << event.keyCode << ", state:" << KEY_EVENT_STATES[event.state] << ", time:" << event.time << "]";
+  });
 
   // Emit the key event signal from the scene.
   bool consumed = mScene.EmitInterceptKeyEventSignal(keyEventHandle);
@@ -80,12 +75,7 @@ void KeyEventProcessor::ProcessKeyEvent(const Integration::KeyEvent& event)
   {
     mScene.EmitKeyEventSignal(keyEventHandle);
   }
-#ifdef TRACE_ENABLED
-  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-  {
-    DALI_TRACE_END(gTraceFilter, "DALI_PROCESS_KEY_EVENT");
-  }
-#endif
+  DALI_TRACE_END(gTraceFilter, "DALI_PROCESS_KEY_EVENT");
 }
 
 } // namespace Internal

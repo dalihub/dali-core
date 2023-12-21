@@ -68,14 +68,9 @@ void EmitTapSignal(
   tap->SetSourceType(tapEvent.sourceType);
   tap->SetSourceData(tapEvent.sourceData);
 
-#ifdef TRACE_ENABLED
-  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-  {
-    std::ostringstream stream;
-    stream << "[" << gestureDetectors.size() << "]";
-    DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_EMIT_TAP_GESTURE_SIGNAL", stream.str().c_str());
-  }
-#endif
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_EMIT_TAP_GESTURE_SIGNAL", [&](std::ostringstream& oss) {
+    oss << "[" << gestureDetectors.size() << "]";
+  });
 
   Dali::Actor                                    actorHandle(actor);
   const GestureDetectorContainer::const_iterator endIter = gestureDetectors.end();
@@ -84,14 +79,9 @@ void EmitTapSignal(
     static_cast<TapGestureDetector*>(*iter)->EmitTapGestureSignal(actorHandle, Dali::TapGesture(tap.Get()));
   }
 
-#ifdef TRACE_ENABLED
-  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-  {
-    std::ostringstream stream;
-    stream << "[" << gestureDetectors.size() << "]";
-    DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_EMIT_TAP_GESTURE_SIGNAL", stream.str().c_str());
-  }
-#endif
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_EMIT_TAP_GESTURE_SIGNAL", [&](std::ostringstream& oss) {
+    oss << "[" << gestureDetectors.size() << "]";
+  });
 }
 
 } // unnamed namespace
