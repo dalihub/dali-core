@@ -219,6 +219,14 @@ public:
     filter->BeginTrace(tag, message);                       \
   }
 
+#define DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(filter, tag, messageGenerator) \
+  if(filter && filter->IsTraceEnabled())                                       \
+  {                                                                            \
+    std::ostringstream oss;                                                    \
+    messageGenerator(oss);                                                     \
+    filter->BeginTrace(tag, oss.str().c_str());                                \
+  }
+
 /**
  * End of tracing
  */
@@ -232,6 +240,14 @@ public:
   if(filter && filter->IsTraceEnabled())                  \
   {                                                       \
     filter->EndTrace(tag, message);                       \
+  }
+
+#define DALI_TRACE_END_WITH_MESSAGE_GENERATOR(filter, tag, messageGenerator) \
+  if(filter && filter->IsTraceEnabled())                                     \
+  {                                                                          \
+    std::ostringstream oss;                                                  \
+    messageGenerator(oss);                                                   \
+    filter->EndTrace(tag, oss.str().c_str());                                \
   }
 
 /**
@@ -251,8 +267,10 @@ public:
 #define DALI_INIT_TRACE_FILTER(name, tag, enable)
 #define DALI_TRACE_BEGIN(filter, tag)
 #define DALI_TRACE_BEGIN_WITH_MESSAGE(filter, tag, message)
+#define DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(filter, tag, messageGenerator)
 #define DALI_TRACE_END(filter, tag)
 #define DALI_TRACE_END_WITH_MESSAGE(filter, tag, message)
+#define DALI_TRACE_END_WITH_MESSAGE_GENERATOR(filter, tag, messageGenerator)
 #define DALI_TRACE_FUNCTION(filter)
 #define DALI_TRACE_SCOPE(filter, tag)
 

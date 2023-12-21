@@ -68,14 +68,9 @@ void EmitPinchSignal(
   pinch->SetSourceType(pinchEvent.sourceType);
   pinch->SetSourceData(pinchEvent.sourceData);
 
-#ifdef TRACE_ENABLED
-  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-  {
-    std::ostringstream stream;
-    stream << "[" << gestureDetectors.size() << "]";
-    DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_EMIT_PINCH_GESTURE_SIGNAL", stream.str().c_str());
-  }
-#endif
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_EMIT_PINCH_GESTURE_SIGNAL", [&](std::ostringstream& oss) {
+    oss << "[" << gestureDetectors.size() << "]";
+  });
 
   Dali::Actor                                    actorHandle(actor);
   const GestureDetectorContainer::const_iterator endIter = gestureDetectors.end();
@@ -84,14 +79,9 @@ void EmitPinchSignal(
     static_cast<PinchGestureDetector*>(*iter)->EmitPinchGestureSignal(actorHandle, Dali::PinchGesture(pinch.Get()));
   }
 
-#ifdef TRACE_ENABLED
-  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-  {
-    std::ostringstream stream;
-    stream << "[" << gestureDetectors.size() << "]";
-    DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_EMIT_PINCH_GESTURE_SIGNAL", stream.str().c_str());
-  }
-#endif
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_EMIT_PINCH_GESTURE_SIGNAL", [&](std::ostringstream& oss) {
+    oss << "[" << gestureDetectors.size() << "]";
+  });
 }
 
 /**
