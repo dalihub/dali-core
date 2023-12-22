@@ -5339,6 +5339,130 @@ int UtcDaliActorPropertyScissorClippingActor02(void)
 
   END_TEST;
 }
+int UtcDaliActorPropertyScissorClippingActorWihtoutRenderer(void)
+{
+  // This test checks that an actor is correctly setup for clipping.
+  tet_infoline("Testing Actor::Property::ClippingMode: CLIP_TO_BOUNDING_BOX actor without renderer");
+  TestApplication application;
+
+  TestGlAbstraction& glAbstraction       = application.GetGlAbstraction();
+  TraceCallStack&    scissorTrace        = glAbstraction.GetScissorTrace();
+  TraceCallStack&    enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
+
+  const Vector2 stageSize(TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+  const Vector2 actorSize(16.0f, 16.0f);
+
+  // Create a clipping actor without renderer
+  Actor clippingActorA                  = Actor::New();
+  clippingActorA[Actor::Property::SIZE] = actorSize;
+
+  // Add dummy actor, to make application would be rendering.
+  Actor dummyActor = CreateRenderableActor();
+  dummyActor[Actor::Property::SIZE] = actorSize;
+  clippingActorA.Add(dummyActor);
+
+  // Note: Scissor coords are have flipped Y values compared with DALi's coordinate system.
+  // We choose BOTTOM_LEFT to give us x=0, y=0 starting coordinates for the first test.
+  clippingActorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_LEFT);
+  clippingActorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_LEFT);
+  clippingActorA.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
+  application.GetScene().Add(clippingActorA);
+
+  // Gather the call trace.
+  GenerateTrace(application, enabledDisableTrace, scissorTrace);
+
+  // Check we are writing to the color buffer.
+  CheckColorMask(glAbstraction, true);
+
+  // Check scissor test was enabled.
+
+  std::ostringstream scissor;
+  scissor << std::hex << GL_SCISSOR_TEST;
+  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Enable", scissor.str()));
+
+  // Check the scissor was set, and the coordinates are correct.
+  std::stringstream compareParametersString;
+  compareParametersString << "0, 0, " << actorSize.x << ", " << actorSize.y;
+  DALI_TEST_CHECK(scissorTrace.FindMethodAndParams("Scissor", compareParametersString.str())); // Compare with 0, 0, 16, 16
+
+  clippingActorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_RIGHT);
+  clippingActorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_RIGHT);
+
+  // Gather the call trace.
+  GenerateTrace(application, enabledDisableTrace, scissorTrace);
+
+  // Check the scissor was set, and the coordinates are correct.
+  compareParametersString.str(std::string());
+  compareParametersString.clear();
+  compareParametersString << (stageSize.x - actorSize.x) << ", " << (stageSize.y - actorSize.y) << ", " << actorSize.x << ", " << actorSize.y;
+  DALI_TEST_CHECK(scissorTrace.FindMethodAndParams("Scissor", compareParametersString.str())); // Compare with 464, 784, 16, 16
+
+  END_TEST;
+}
+
+int UtcDaliActorPropertyScissorClippingActorWihtoutRendererUnderLayer3D(void)
+{
+  // This test checks that an actor is correctly setup for clipping.
+  tet_infoline("Testing Actor::Property::ClippingMode: CLIP_TO_BOUNDING_BOX actor without renderer under layer 3d");
+  TestApplication application;
+
+  TestGlAbstraction& glAbstraction       = application.GetGlAbstraction();
+  TraceCallStack&    scissorTrace        = glAbstraction.GetScissorTrace();
+  TraceCallStack&    enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
+
+  const Vector2 stageSize(TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+  const Vector2 actorSize(16.0f, 16.0f);
+
+  // Make root layer as LAYER_3D, to make we follow 3d flow.
+  application.GetScene().GetRootLayer().SetProperty(Layer::Property::BEHAVIOR, Layer::LAYER_3D);
+
+  // Create a clipping actor without renderer
+  Actor clippingActorA                  = Actor::New();
+  clippingActorA[Actor::Property::SIZE] = actorSize;
+
+  // Add dummy actor, to make application would be rendering.
+  Actor dummyActor = CreateRenderableActor();
+  dummyActor[Actor::Property::SIZE] = actorSize;
+  clippingActorA.Add(dummyActor);
+
+  // Note: Scissor coords are have flipped Y values compared with DALi's coordinate system.
+  // We choose BOTTOM_LEFT to give us x=0, y=0 starting coordinates for the first test.
+  clippingActorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_LEFT);
+  clippingActorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_LEFT);
+  clippingActorA.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
+  application.GetScene().Add(clippingActorA);
+
+  // Gather the call trace.
+  GenerateTrace(application, enabledDisableTrace, scissorTrace);
+
+  // Check we are writing to the color buffer.
+  CheckColorMask(glAbstraction, true);
+
+  // Check scissor test was enabled.
+
+  std::ostringstream scissor;
+  scissor << std::hex << GL_SCISSOR_TEST;
+  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Enable", scissor.str()));
+
+  // Check the scissor was set, and the coordinates are correct.
+  std::stringstream compareParametersString;
+  compareParametersString << "0, 0, " << actorSize.x << ", " << actorSize.y;
+  DALI_TEST_CHECK(scissorTrace.FindMethodAndParams("Scissor", compareParametersString.str())); // Compare with 0, 0, 16, 16
+
+  clippingActorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_RIGHT);
+  clippingActorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_RIGHT);
+
+  // Gather the call trace.
+  GenerateTrace(application, enabledDisableTrace, scissorTrace);
+
+  // Check the scissor was set, and the coordinates are correct.
+  compareParametersString.str(std::string());
+  compareParametersString.clear();
+  compareParametersString << (stageSize.x - actorSize.x) << ", " << (stageSize.y - actorSize.y) << ", " << actorSize.x << ", " << actorSize.y;
+  DALI_TEST_CHECK(scissorTrace.FindMethodAndParams("Scissor", compareParametersString.str())); // Compare with 464, 784, 16, 16
+
+  END_TEST;
+}
 
 int UtcDaliActorPropertyScissorClippingActorSiblings(void)
 {
