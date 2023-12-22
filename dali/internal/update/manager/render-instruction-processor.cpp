@@ -259,7 +259,7 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
     bool isOpaque = true;
     if(!hasRenderCallback)
     {
-      bool isVisualRenderer = (isLayer3d && !!(renderable.mRenderer->GetVisualProperties()));
+      bool isVisualRenderer = (isLayer3d && !!(renderable.mRenderer && renderable.mRenderer->GetVisualProperties()));
       Renderer::OpacityType opacityType = renderable.mRenderer ? (isVisualRenderer ? Renderer::TRANSLUCENT : renderable.mRenderer->GetOpacityType(updateBufferIndex, renderPass, *node)) : Renderer::OPAQUE;
 
       // We can skip render when node is not clipping and transparent
