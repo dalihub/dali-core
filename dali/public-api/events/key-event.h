@@ -247,6 +247,14 @@ public:
    */
   bool IsRepeat() const;
 
+  /**
+   * @brief Gets the Window Id where key event occurred.
+   *
+   * @SINCE_2_3.5
+   * @return The window id
+   */
+  uint32_t GetWindowId() const;
+
 public: // Not intended for application developers
   /// @cond internal
   /**

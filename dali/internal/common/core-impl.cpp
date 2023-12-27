@@ -449,7 +449,23 @@ void Core::RunProcessors()
       {
         if(!mProcessorUnregistered)
         {
+#ifdef TRACE_ENABLED
+          if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+          {
+            std::ostringstream stream;
+            stream << "[" << processor->GetProcessorName() << "]";
+            DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_CORE_RUN_PROCESSOR", stream.str().c_str());
+          }
+#endif
           processor->Process(false);
+#ifdef TRACE_ENABLED
+          if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+          {
+            std::ostringstream stream;
+            stream << "[" << processor->GetProcessorName() << "]";
+            DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_CORE_RUN_PROCESSOR", stream.str().c_str());
+          }
+#endif
         }
         else
         {
@@ -458,7 +474,23 @@ void Core::RunProcessors()
           auto iter = std::find(mProcessors.Begin(), mProcessors.End(), processor);
           if(iter != mProcessors.End())
           {
+#ifdef TRACE_ENABLED
+            if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+            {
+              std::ostringstream stream;
+              stream << "[" << processor->GetProcessorName() << "]";
+              DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_CORE_RUN_PROCESSOR", stream.str().c_str());
+            }
+#endif
             processor->Process(false);
+#ifdef TRACE_ENABLED
+            if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+            {
+              std::ostringstream stream;
+              stream << "[" << processor->GetProcessorName() << "]";
+              DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_CORE_RUN_PROCESSOR", stream.str().c_str());
+            }
+#endif
           }
         }
       }
@@ -504,7 +536,23 @@ void Core::RunPostProcessors()
       {
         if(!mPostProcessorUnregistered)
         {
+#ifdef TRACE_ENABLED
+          if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+          {
+            std::ostringstream stream;
+            stream << "[" << processor->GetProcessorName() << "]";
+            DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSOR", stream.str().c_str());
+          }
+#endif
           processor->Process(true);
+#ifdef TRACE_ENABLED
+          if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+          {
+            std::ostringstream stream;
+            stream << "[" << processor->GetProcessorName() << "]";
+            DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSOR", stream.str().c_str());
+          }
+#endif
         }
         else
         {
@@ -513,7 +561,23 @@ void Core::RunPostProcessors()
           auto iter = std::find(mPostProcessors.Begin(), mPostProcessors.End(), processor);
           if(iter != mPostProcessors.End())
           {
+#ifdef TRACE_ENABLED
+            if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+            {
+              std::ostringstream stream;
+              stream << "[" << processor->GetProcessorName() << "]";
+              DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSOR", stream.str().c_str());
+            }
+#endif
             processor->Process(true);
+#ifdef TRACE_ENABLED
+            if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+            {
+              std::ostringstream stream;
+              stream << "[" << processor->GetProcessorName() << "]";
+              DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSOR", stream.str().c_str());
+            }
+#endif
           }
         }
       }

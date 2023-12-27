@@ -3072,3 +3072,18 @@ int UtcDaliSceneGeoTouchedEnabledDisabled(void)
 
   END_TEST;
 }
+
+int UtcDaliSceneGetNativeId(void)
+{
+  TestApplication application; // Initializes
+
+  Dali::Integration::Scene scene = application.GetScene();
+  int32_t nativeId = scene.GetNativeId();
+  DALI_TEST_EQUALS(nativeId, 0, TEST_LOCATION);
+
+  // Test that setting native id
+  scene.SetNativeId(1);
+  nativeId = scene.GetNativeId();
+  DALI_TEST_EQUALS(nativeId, 1, TEST_LOCATION);
+  END_TEST;
+}

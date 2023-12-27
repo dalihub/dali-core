@@ -61,7 +61,8 @@ Scene::Scene()
   mGeometryHittest(false),
   mEventProcessor(*this, ThreadLocalStorage::GetInternal()->GetGestureEventProcessor()),
   mSurfaceOrientation(0),
-  mScreenOrientation(0)
+  mScreenOrientation(0),
+  mNativeId(0)
 {
 }
 
@@ -508,6 +509,16 @@ void Scene::SetGeometryHittestEnabled(bool enabled)
 bool Scene::IsGeometryHittestEnabled() const
 {
   return mGeometryHittest;
+}
+
+void Scene::SetNativeId(int32_t nativeId)
+{
+  mNativeId = nativeId;
+}
+
+int32_t Scene::GetNativeId() const
+{
+  return mNativeId;
 }
 
 Integration::Scene::KeyEventSignalType& Scene::KeyEventSignal()

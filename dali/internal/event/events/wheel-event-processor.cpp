@@ -190,8 +190,8 @@ void WheelEventProcessor::ProcessWheelEvent(const Integration::WheelEvent& event
       consumedActor = EmitWheelSignals(hitTestResults.actor, wheelEventHandle);
     }
 
-    DALI_LOG_INFO(gLogFilter, Debug::Concise, "HitActor:      (%p) %s\n", hitTestResults.actor ? reinterpret_cast<void*>(&hitTestResults.actor.GetBaseObject()) : NULL, hitTestResults.actor ? hitTestResults.actor.GetProperty<std::string>(Dali::Actor::Property::NAME).c_str() : "");
-    DALI_LOG_INFO(gLogFilter, Debug::Concise, "ConsumedActor: (%p) %s\n", consumedActor ? reinterpret_cast<void*>(&consumedActor.GetBaseObject()) : NULL, consumedActor ? consumedActor.GetProperty<std::string>(Dali::Actor::Property::NAME).c_str() : "");
+    DALI_LOG_RELEASE_INFO("HitActor:      (%p) id(%d) %s\n", hitTestResults.actor ? reinterpret_cast<void*>(&hitTestResults.actor.GetBaseObject()) : NULL, hitTestResults.actor ? hitTestResults.actor.GetProperty<int32_t>(Dali::Actor::Property::ID) : -1, hitTestResults.actor ? hitTestResults.actor.GetProperty<std::string>(Dali::Actor::Property::NAME).c_str() : "");
+    DALI_LOG_RELEASE_INFO("ConsumedActor: (%p) id(%d) %s\n", consumedActor ? reinterpret_cast<void*>(&consumedActor.GetBaseObject()) : NULL, consumedActor ? consumedActor.GetProperty<int32_t>(Dali::Actor::Property::ID) : -1, consumedActor ? consumedActor.GetProperty<std::string>(Dali::Actor::Property::NAME).c_str() : "");
   }
   else
   {
