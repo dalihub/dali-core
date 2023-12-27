@@ -113,6 +113,11 @@ bool KeyEvent::IsRepeat() const
   return GetImplementation(*this).IsRepeat();
 }
 
+uint32_t KeyEvent::GetWindowId() const
+{
+  return GetImplementation(*this).GetWindowId();
+}
+
 KeyEvent::KeyEvent(Internal::KeyEvent* internal)
 : BaseHandle(internal)
 {

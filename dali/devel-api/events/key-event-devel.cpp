@@ -82,6 +82,11 @@ void SetRepeat(KeyEvent keyEvent, const bool repeat)
   GetImplementation(keyEvent).SetRepeat(repeat);
 }
 
+void SetWindowId(KeyEvent keyEvent, uint32_t windowId)
+{
+  GetImplementation(keyEvent).SetWindowId(windowId);
+}
+
 } // namespace DevelKeyEvent
 
 } // namespace Dali

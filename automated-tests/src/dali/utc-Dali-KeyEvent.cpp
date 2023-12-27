@@ -112,6 +112,7 @@ int UtcDaliKeyEventDefaultConstructor(void)
   DALI_TEST_EQUALS(Device::Class::NONE, event.GetDeviceClass(), TEST_LOCATION);       // check device class
   DALI_TEST_EQUALS(Device::Subclass::NONE, event.GetDeviceSubclass(), TEST_LOCATION); // check device subclass
   DALI_TEST_EQUALS(false, event.IsRepeat(), TEST_LOCATION);                           // check repeat
+  DALI_TEST_EQUALS(0, event.GetWindowId(), TEST_LOCATION);                            // check window id
 
   END_TEST;
 }
@@ -571,6 +572,20 @@ int UtcDaliKeyEventSetRepeat(void)
 
   DevelKeyEvent::SetRepeat(event, true);
   DALI_TEST_EQUALS(true, event.IsRepeat(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliKeyEventSetWindowId(void)
+{
+  TestApplication application;
+
+  Dali::KeyEvent event = DevelKeyEvent::New(TEST_STRING_1, "I", "i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE);
+
+  DALI_TEST_EQUALS(0, event.GetWindowId(), TEST_LOCATION);
+
+  DevelKeyEvent::SetWindowId(event, 1);
+  DALI_TEST_EQUALS(1, event.GetWindowId(), TEST_LOCATION);
 
   END_TEST;
 }

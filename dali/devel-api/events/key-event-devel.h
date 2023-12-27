@@ -125,6 +125,15 @@ DALI_CORE_API void SetState(KeyEvent keyEvent, const KeyEvent::State& state);
  */
 DALI_CORE_API void SetRepeat(KeyEvent keyEvent, const bool repeat);
 
+/**
+ * @brief Sets window id where key event occurred.
+ *
+ * @SINCE_2_3.5
+ * @param[in] keyEvent The instance of KeyEvent.
+ * @param[in] windowId The window id where key event occurred.
+ */
+DALI_CORE_API void SetWindowId(KeyEvent keyEvent, uint32_t windowId);
+
 } // namespace DevelKeyEvent
 
 } // namespace Dali
