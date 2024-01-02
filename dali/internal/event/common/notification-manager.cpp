@@ -157,26 +157,16 @@ void NotificationManager::ProcessMessages()
   const MessageContainer::Iterator end  = mImpl->eventMessageQueue.End();
   if(iter != end)
   {
-#ifdef TRACE_ENABLED
-    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-    {
-      std::ostringstream stream;
-      stream << "[" << mImpl->eventMessageQueue.Count() << "]";
-      DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_NOTIFICATION_PROCESS_MESSAGE", stream.str().c_str());
-    }
-#endif
+    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_NOTIFICATION_PROCESS_MESSAGE", [&](std::ostringstream& oss) {
+      oss << "[" << mImpl->eventMessageQueue.Count() << "]";
+    });
     for(; iter != end; ++iter)
     {
       (*iter)->Process(0u /*ignored*/);
     }
-#ifdef TRACE_ENABLED
-    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-    {
-      std::ostringstream stream;
-      stream << "[" << mImpl->eventMessageQueue.Count() << "]";
-      DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_NOTIFICATION_PROCESS_MESSAGE", stream.str().c_str());
-    }
-#endif
+    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_NOTIFICATION_PROCESS_MESSAGE", [&](std::ostringstream& oss) {
+      oss << "[" << mImpl->eventMessageQueue.Count() << "]";
+    });
   }
   // release the processed messages from event side queue
   mImpl->eventMessageQueue.Clear();
@@ -185,14 +175,9 @@ void NotificationManager::ProcessMessages()
   const InterfaceContainer::iterator end2  = mImpl->eventInterfaceQueue.end();
   if(iter2 != end2)
   {
-#ifdef TRACE_ENABLED
-    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-    {
-      std::ostringstream stream;
-      stream << "[" << mImpl->eventInterfaceQueue.size() << "]";
-      DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_NOTIFICATION_NOTIFY_COMPLETED", stream.str().c_str());
-    }
-#endif
+    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_NOTIFICATION_NOTIFY_COMPLETED", [&](std::ostringstream& oss) {
+      oss << "[" << mImpl->eventInterfaceQueue.size() << "]";
+    });
     for(; iter2 != end2; ++iter2)
     {
       CompleteNotificationInterface* interface = iter2->first;
@@ -201,14 +186,9 @@ void NotificationManager::ProcessMessages()
         interface->NotifyCompleted(std::move(iter2->second));
       }
     }
-#ifdef TRACE_ENABLED
-    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-    {
-      std::ostringstream stream;
-      stream << "[" << mImpl->eventInterfaceQueue.size() << "]";
-      DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_NOTIFICATION_NOTIFY_COMPLETED", stream.str().c_str());
-    }
-#endif
+    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_NOTIFICATION_NOTIFY_COMPLETED", [&](std::ostringstream& oss) {
+      oss << "[" << mImpl->eventInterfaceQueue.size() << "]";
+    });
   }
   // just clear the container, we dont own the objects
   mImpl->eventInterfaceQueue.clear();
