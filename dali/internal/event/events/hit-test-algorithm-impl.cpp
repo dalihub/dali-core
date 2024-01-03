@@ -391,6 +391,25 @@ bool IsWithinSourceActors(const Actor& sourceActor, const Actor& actor)
 }
 
 /**
+ * Returns true if the actor and all of the actor's parents are visible and sensitive.
+ */
+bool IsActorActuallyHittable(Actor* actor, HitTestInterface& hitCheck)
+{
+  Actor* currentActor = actor;
+  // Ensure that we can descend into the layer's (or any of its parent's) hierarchy.
+  while(currentActor)
+  {
+    if(!hitCheck.DescendActorHierarchy(currentActor))
+    {
+      return false;
+    }
+    currentActor = currentActor->GetParent();
+  }
+
+  return true;
+}
+
+/**
  * Returns true if the layer and all of the layer's parents are visible and sensitive.
  */
 inline bool IsActuallyHittable(Layer& layer, const Vector2& screenCoordinates, const Vector2& stageSize, HitTestInterface& hitCheck)
@@ -414,17 +433,7 @@ inline bool IsActuallyHittable(Layer& layer, const Vector2& screenCoordinates, c
   if(hittable)
   {
     Actor* actor(&layer);
-
-    // Ensure that we can descend into the layer's (or any of its parent's) hierarchy.
-    while(actor && hittable)
-    {
-      if(!hitCheck.DescendActorHierarchy(actor))
-      {
-        hittable = false;
-        break;
-      }
-      actor = actor->GetParent();
-    }
+    hittable = IsActorActuallyHittable(actor, hitCheck);
   }
 
   return hittable;
@@ -471,7 +480,9 @@ bool HitTestRenderTask(const RenderTaskList::ExclusivesContainer& exclusives,
 
     // Determine the layer depth of the source actor
     Actor* sourceActor(renderTask.GetSourceActor());
-    if(sourceActor)
+
+    // Check the source actor is actually hittable or not.
+    if(sourceActor && IsActorActuallyHittable(sourceActor, hitCheck))
     {
       Dali::Layer sourceLayer(sourceActor->GetLayer());
       if(sourceLayer)
@@ -595,6 +606,70 @@ bool HitTestRenderTask(const RenderTaskList::ExclusivesContainer& exclusives,
   return false;
 }
 
+Dali::Actor FindPriorActorInLayer(Dali::Actor rootActor, Dali::Actor firstActor, Dali::Actor secondActor)
+{
+  if(rootActor == firstActor)
+  {
+    return firstActor;
+  }
+
+  if(rootActor == secondActor)
+  {
+    return secondActor;
+  }
+
+  Dali::Actor priorActor;
+  uint32_t childCount = rootActor.GetChildCount();
+  if(childCount > 0)
+  {
+    for(int32_t i = childCount - 1; i >= 0; --i)
+    {
+      Dali::Actor child = rootActor.GetChildAt(i);
+      if(GetImplementation(child).IsLayer())
+      {
+        continue;
+      }
+      priorActor = FindPriorActorInLayer(child, firstActor, secondActor);
+      if(priorActor)
+      {
+        break;
+      }
+    }
+  }
+  return priorActor;
+}
+
+Dali::Actor FindPriorActorInLayers(LayerList& layers, Dali::Actor rootActor, Dali::Actor firstActor, Dali::Actor secondActor)
+{
+  Dali::Layer sourceLayer = rootActor.GetLayer();
+  const uint32_t sourceActorDepth(sourceLayer.GetProperty<bool>(Dali::Layer::Property::DEPTH));
+
+  Dali::Actor priorActor;
+  uint32_t layerCount = layers.GetLayerCount();
+  if(layerCount > 0)
+  {
+    for(int32_t i = layerCount - 1; i >= 0; --i)
+    {
+      Layer* layer(layers.GetLayer(i));
+      if(sourceActorDepth == static_cast<uint32_t>(i))
+      {
+        priorActor = FindPriorActorInLayer(rootActor, firstActor, secondActor);
+      }
+      else if(IsWithinSourceActors(GetImplementation(rootActor), *layer))
+      {
+        Dali::Actor layerRoot = Dali::Actor(layer);
+        priorActor            = FindPriorActorInLayer(layerRoot, firstActor, secondActor);
+      }
+
+      if(priorActor)
+      {
+        break;
+      }
+    }
+  }
+  return priorActor;
+}
+
 /**
  * Iterate through the RenderTaskList and perform hit testing.
  *
@@ -617,6 +692,7 @@ bool HitTestRenderTaskList(const Vector2&    sceneSize,
   const auto&                                           exclusives = taskList.GetExclusivesList();
   RayTest                                               rayTest;
 
+  Results storedResults = results;
   std::vector<std::pair<Dali::Actor, Results>> hitResults;
   // Hit test order should be reverse of draw order
   for(RenderTaskList::RenderTaskContainer::reverse_iterator iter = tasks.rbegin(); endIter != iter; ++iter)
@@ -632,9 +708,27 @@ bool HitTestRenderTaskList(const Vector2&    sceneSize,
       }
       else
       {
-        for(auto && pair : hitResults)
+        Actor* sourceActor(renderTask.GetSourceActor());
+        for(auto&& pair : hitResults)
         {
-          if(pair.first == results.actor)
+          Dali::Actor mappingActor = pair.first;
+          if(!IsWithinSourceActors(*sourceActor, GetImplementation(mappingActor)))
+          {
+            continue;
+          }
+
+          bool mappingActorInsideHitConsumingLayer = false;
+          if(GetImplementation(results.actor).IsLayer())
+          {
+            Dali::Layer resultLayer = Dali::Layer::DownCast(results.actor);
+            // Check the resultLayer is consuming hit even though the layer is not hittable.
+            // And check the resultLayer is the layer of mappingActor too.
+            if(hitCheck.DoesLayerConsumeHit(&GetImplementation(resultLayer)) && !hitCheck.IsActorHittable(&GetImplementation(results.actor)) && results.actor == mappingActor.GetLayer())
+            {
+              mappingActorInsideHitConsumingLayer = true;
+            }
+          }
+          if(mappingActorInsideHitConsumingLayer || mappingActor == FindPriorActorInLayers(layers, Dali::Actor(sourceActor), mappingActor, results.actor))
           {
             results = pair.second;
             break;
@@ -646,6 +740,23 @@ bool HitTestRenderTaskList(const Vector2&    sceneSize,
     }
   }
 
+  // When nothing is hitted in OnScreen RenderTask but there is hit results from OffScreen RenderTask,
+  // then returns the result those mapping Actor is placed on top.
+  if(!hitResults.empty())
+  {
+    Dali::Actor topMappingActor = hitResults.front().first;
+    results                     = hitResults.front().second;
+    Dali::Actor rootActor       = Dali::Actor(tasks.front().Get()->GetSourceActor());
+    for(uint32_t i = 1; i < hitResults.size(); ++i)
+    {
+      Dali::Actor priorActor = FindPriorActorInLayers(layers, rootActor, topMappingActor, hitResults[i].first);
+      results                = (priorActor == topMappingActor) ? results : hitResults[i].second;
+      topMappingActor        = priorActor;
+    }
+    return true;
+  }
+
+  results = storedResults;
   return false;
 }
 
