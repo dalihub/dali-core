@@ -497,7 +497,7 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
       if(interceptedTouchActor)
       {
         Actor* touchConsumedActor(mLastConsumedActor.GetActor());
-        if(touchConsumedActor) // If there is a consultative actor, send events only to the consultative actor.
+        if(touchConsumedActor) // If there is a consumed actor, send events only to the consumed actor.
         {
           RenderTask& currentRenderTaskImpl = *currentRenderTask.Get();
           consumedActor = EmitTouchSignals(touchConsumedActor, currentRenderTaskImpl, touchEventImpl, primaryPointState, isGeometry);
@@ -533,22 +533,17 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
                   mLastRenderTask &&
                   mLastPrimaryPointState != PointState::FINISHED)
           {
-            std::list<Dali::Internal::Actor*> internalActorLists = mCandidateActorLists;
-            while(!internalActorLists.empty())
+            std::list<Dali::Internal::Actor*>::reverse_iterator rIter = mCandidateActorLists.rbegin();
+            for (; rIter != mCandidateActorLists.rend(); rIter++)
             {
-              Actor* actorImpl = internalActorLists.back();
-              // Only emit the signal if the actor's touch signal has connections (or derived actor implementation requires touch).
-              if(actorImpl->GetTouchRequired())
-              {
-                EmitTouchSignals(actorImpl, *mLastRenderTask.Get(), touchEventImpl, PointState::INTERRUPTED, isGeometry);
-              }
-              internalActorLists.pop_back();
+              Actor* actorImpl(*rIter);
+              EmitTouchSignals(actorImpl, *mLastRenderTask.Get(), touchEventImpl, PointState::INTERRUPTED, isGeometry);
             }
           }
         }
 
         Actor* touchConsumedActor(mLastConsumedActor.GetActor());
-        if(touchConsumedActor) // If there is a consultative actor, send events only to the consultative actor.
+        if(touchConsumedActor) // If there is a consumed actor, send events only to the consumed actor.
         {
           RenderTask& currentRenderTaskImpl = *currentRenderTask.Get();
           consumedActor = EmitTouchSignals(touchConsumedActor, currentRenderTaskImpl, touchEventImpl, primaryPointState, isGeometry);
