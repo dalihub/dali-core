@@ -241,13 +241,14 @@ void LongPressGestureRecognizer::EmitGesture(GestureState state)
     }
     longPress.sourceType = mSourceType;
     longPress.sourceData = mSourceData;
+    longPress.renderTask = mRenderTask;
 
     if(mScene)
     {
       // Create another handle so the recognizer cannot be destroyed during process function
       GestureRecognizerPtr recognizerHandle = this;
 
-      mObserver.Process(*mScene, longPress);
+      mObserver.Process(*mScene, longPress, mActor.GetActor());
     }
   }
 }

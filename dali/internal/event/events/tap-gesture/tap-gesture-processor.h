@@ -59,8 +59,9 @@ public: // To be called by GestureEventProcessor
    * This method is called whenever a tap gesture event occurs.
    * @param[in] scene The scene the tap gesture event occurs in.
    * @param[in] tapEvent The event that has occurred.
+   * @param[in] actor The actor where the event occurred. If this is null, the actor is found through hittest.
    */
-  void Process(Scene& scene, const TapGestureEvent& event) override;
+  void Process(Scene& scene, const TapGestureEvent& event, Actor* actor = nullptr) override;
 
   /**
    * Adds a gesture detector to this gesture processor.

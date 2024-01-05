@@ -83,6 +83,11 @@ public:
   Dali::Actor GetAttachedActor(size_t index) const;
 
   /**
+   * @copydoc Dali::GestureDetector::FeedTouch()
+   */
+  bool FeedTouch(Dali::Actor& actor, Dali::TouchEvent& touch);
+
+  /**
    * Returns a const reference to the container of attached actor pointers.
    * @return A const reference to the attached internal actors.
    */

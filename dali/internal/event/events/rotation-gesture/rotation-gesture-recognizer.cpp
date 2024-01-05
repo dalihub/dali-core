@@ -224,13 +224,14 @@ void RotationGestureRecognizer::SendRotation(GestureState state, const Integrati
   gesture.time       = currentEvent.time;
   gesture.sourceType = mSourceType;
   gesture.sourceData = mSourceData;
+  gesture.renderTask = mRenderTask;
 
   if(mScene)
   {
     // Create another handle so the recognizer cannot be destroyed during process function
     GestureRecognizerPtr recognizerHandle = this;
 
-    mObserver.Process(*mScene, gesture);
+    mObserver.Process(*mScene, gesture, mActor.GetActor());
   }
 }
 

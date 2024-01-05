@@ -100,7 +100,7 @@ TapGestureProcessor::TapGestureProcessor()
 
 TapGestureProcessor::~TapGestureProcessor() = default;
 
-void TapGestureProcessor::Process(Scene& scene, const TapGestureEvent& tapEvent)
+void TapGestureProcessor::Process(Scene& scene, const TapGestureEvent& tapEvent, Actor* actor)
 {
   DALI_TRACE_SCOPE(gTraceFilter, "DALI_PROCESS_TAP_GESTURE");
   switch(tapEvent.state)
@@ -109,7 +109,15 @@ void TapGestureProcessor::Process(Scene& scene, const TapGestureEvent& tapEvent)
     {
       // Do a hit test and if an actor has been hit then save to see if tap event is still valid on a tap( same actor being hit )
       HitTestAlgorithm::Results hitTestResults;
-      if(HitTest(scene, tapEvent.point, hitTestResults))
+      if(actor)
+      {
+        SetActor(actor);
+        mCurrentTapActor.SetActor(GetCurrentGesturedActor());
+
+        // Indicate that we've processed a touch down. Bool should be sufficient as a change in actor will result in a cancellation
+        mPossibleProcessed = true;
+      }
+      else if(HitTest(scene, tapEvent.point, hitTestResults))
       {
         SetActor(&GetImplementation(hitTestResults.actor));
         mCurrentTapActor.SetActor(GetCurrentGesturedActor());
@@ -128,16 +136,32 @@ void TapGestureProcessor::Process(Scene& scene, const TapGestureEvent& tapEvent)
     {
       // Ensure that we're processing a hit on the current actor and that we've already processed a touch down
       HitTestAlgorithm::Results hitTestResults;
-      if(GetCurrentGesturedActor() && HitTest(scene, tapEvent.point, hitTestResults) && mPossibleProcessed)
+      if(GetCurrentGesturedActor())
       {
-        // Check that this actor is still the one that was used for the last touch down ?
-        if(mCurrentTapActor.GetActor() == &GetImplementation(hitTestResults.actor))
+        if(actor)
         {
-          mCurrentTapEvent = &tapEvent;
-          ProcessAndEmit(hitTestResults);
+          hitTestResults.actor = Dali::Actor(actor);
+          hitTestResults.renderTask = tapEvent.renderTask;
+          // Check that this actor is still the one that was used for the last touch down ?
+          if(mCurrentTapActor.GetActor() == &GetImplementation(hitTestResults.actor))
+          {
+            mCurrentTapEvent = &tapEvent;
+            ProcessAndEmitActor(hitTestResults);
+          }
+          mCurrentTapEvent   = nullptr;
+          mPossibleProcessed = false;
         }
-        mCurrentTapEvent   = nullptr;
-        mPossibleProcessed = false;
+        else if(HitTest(scene, tapEvent.point, hitTestResults) && mPossibleProcessed)
+        {
+          // Check that this actor is still the one that was used for the last touch down ?
+          if(mCurrentTapActor.GetActor() == &GetImplementation(hitTestResults.actor))
+          {
+            mCurrentTapEvent = &tapEvent;
+            ProcessAndEmit(hitTestResults);
+          }
+          mCurrentTapEvent   = nullptr;
+          mPossibleProcessed = false;
+        }
       }
       break;
     }
