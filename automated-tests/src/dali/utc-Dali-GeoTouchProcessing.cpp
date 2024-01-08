@@ -2197,7 +2197,7 @@ int UtcDaliGeoTouchEventIntercept04(void)
 
   // Connect to actor's touched signal
   SignalData        data;
-  TouchEventFunctor functor(data, false /* Do not consume */);
+  TouchEventFunctor functor(data); // consume
   actor.TouchedSignal().Connect(&application, functor);
 
   // Connect to parent's touched signal
@@ -2230,7 +2230,7 @@ int UtcDaliGeoTouchEventIntercept04(void)
   DALI_TEST_CHECK(parent == interceptData.touchedActor);
   DALI_TEST_EQUALS(true, parentData.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(PointState::DOWN, parentData.receivedTouch.points[0].state, TEST_LOCATION);
-  DALI_TEST_CHECK(parent == parentData.receivedTouch.points[0].hitActor);
+  DALI_TEST_CHECK(actor == parentData.receivedTouch.points[0].hitActor);
   DALI_TEST_CHECK(parent == parentData.touchedActor);
   data.Reset();
   interceptData.Reset();
