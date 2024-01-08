@@ -104,12 +104,17 @@ Dali::Actor EmitInterceptTouchSignals(Dali::Actor actor, const Dali::TouchEvent&
 
 // geometry
 // child -> below
-Dali::Actor EmitGeoInterceptTouchSignals(std::list<Dali::Internal::Actor*>& actorLists, std::list<Dali::Internal::Actor*>& interceptActorList, const Dali::TouchEvent& touchEvent)
+Dali::Actor EmitGeoInterceptTouchSignals(std::list<Dali::Internal::Actor*>& actorLists, std::list<Dali::Internal::Actor*>& interceptActorList, const Dali::TouchEvent& touchEvent, ActorObserver& lastConsumedActor)
 {
   interceptActorList.clear();
   Dali::Actor interceptedActor;
   for(auto&& actor : actorLists)
   {
+    // If there is a consumed actor, the intercept is sent only up to the moment before the consumed actor.
+    if(lastConsumedActor.GetActor() == actor)
+    {
+        break;
+    }
     interceptActorList.push_back(actor);
     if(ShouldEmitInterceptTouchEvent(*actor, touchEvent))
     {
@@ -513,7 +518,7 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
       {
         Dali::Actor interceptedActor;
         // Let's find out if there is an intercept actor.
-        interceptedActor = EmitGeoInterceptTouchSignals(mCandidateActorLists, mInterceptedActorLists, touchEventHandle);
+        interceptedActor = EmitGeoInterceptTouchSignals(mCandidateActorLists, mInterceptedActorLists, touchEventHandle, mLastConsumedActor);
         if(interceptedActor)
         {
           mInterceptedTouchActor.SetActor(&GetImplementation(interceptedActor));
