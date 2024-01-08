@@ -2,7 +2,7 @@
 #define DALI_PIXEL_DATA_INTEG_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,27 +36,31 @@ namespace Dali::Integration
  */
 struct PixelDataBuffer
 {
-  uint8_t*                         buffer;
-  uint32_t                         bufferSize;
-  Dali::PixelData::ReleaseFunction releaseFunction;
+  uint8_t* buffer;
+  uint32_t bufferSize;
+  uint32_t width;
+  uint32_t height;
+  uint32_t stride;
 
-  PixelDataBuffer(uint8_t*                         buffer,
-                  uint32_t                         bufferSize,
-                  Dali::PixelData::ReleaseFunction releaseFunction)
+  PixelDataBuffer(uint8_t* buffer,
+                  uint32_t bufferSize,
+                  uint32_t width,
+                  uint32_t height,
+                  uint32_t stride = 0)
   : buffer(buffer),
     bufferSize(bufferSize),
-    releaseFunction(releaseFunction)
+    width(width),
+    height(height),
+    stride(stride)
   {
   }
 };
 
 /**
- * Get the buffer from a pixel data object, zero it in the pixel data object
- * and release the handle.
- * @param[in,out] pixelData The pixel data object to take the buffer from
- * @return the buffer and the data release mechanism
+ * Release the buffer from a pixel data object, zero it in the pixel data object.
+ * @param[in] pixelData The pixel data object to take the buffer from
  */
-DALI_CORE_API PixelDataBuffer ReleasePixelDataBuffer(Dali::PixelData& pixelData);
+DALI_CORE_API void ReleasePixelDataBuffer(Dali::PixelData pixelData);
 
 /**
  * Get the buffer from a pixel data object.
@@ -64,6 +68,26 @@ DALI_CORE_API PixelDataBuffer ReleasePixelDataBuffer(Dali::PixelData& pixelData)
  * @return the buffer of pixelData.
  */
 DALI_CORE_API PixelDataBuffer GetPixelDataBuffer(const Dali::PixelData& pixelData);
+
+/**
+ * Creates a PixelData object which will release the buffer automatically after upload to texture.
+ * @return The pixel data object.
+ */
+DALI_CORE_API Dali::PixelData NewPixelDataWithReleaseAfterUpload(uint8_t*                   buffer,
+                                                                 uint32_t                   bufferSize,
+                                                                 uint32_t                   width,
+                                                                 uint32_t                   height,
+                                                                 uint32_t                   stride,
+                                                                 Pixel::Format              pixelFormat,
+                                                                 PixelData::ReleaseFunction releaseFunction);
+
+/**
+ * Get whether we need to release pixel data after texture upload or not.
+ * @note This function can be called from another thread. Be careful about thread safety.
+ * @param[in] pixelData The pixel data object to get the release policy.
+ * @return True if we need to release pixel data after texture upload. False otherwise.
+ */
+DALI_CORE_API bool IsPixelDataReleaseAfterUpload(const Dali::PixelData& pixelData);
 
 } // namespace Dali::Integration
 
