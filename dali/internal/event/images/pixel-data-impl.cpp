@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,14 +39,16 @@ PixelData::PixelData(uint8_t*                         buffer,
                      uint32_t                         height,
                      uint32_t                         stride,
                      Pixel::Format                    pixelFormat,
-                     Dali::PixelData::ReleaseFunction releaseFunction)
+                     Dali::PixelData::ReleaseFunction releaseFunction,
+                     bool                             releaseAfterUpload)
 : mBuffer(buffer),
   mBufferSize(bufferSize),
   mWidth(width),
   mHeight(height),
   mStride(stride),
   mPixelFormat(pixelFormat),
-  mReleaseFunction(releaseFunction)
+  mReleaseFunction(releaseFunction),
+  mReleaseAfterUpload(releaseAfterUpload)
 {
   DALI_LOG_INFO(gPixelDataLogFilter, Debug::Concise, "Allocated PixelData of size %u\n", bufferSize);
 #if defined(DEBUG_ENABLED)
@@ -56,20 +58,7 @@ PixelData::PixelData(uint8_t*                         buffer,
 
 PixelData::~PixelData()
 {
-  if(mBuffer)
-  {
-    if(mReleaseFunction == Dali::PixelData::FREE)
-    {
-      free(mBuffer);
-    }
-    else
-    {
-      delete[] mBuffer;
-    }
-#if defined(DEBUG_ENABLED)
-    gPixelDataAllocationTotal -= mBufferSize;
-#endif
-  }
+  ReleasePixelDataBuffer();
 }
 
 PixelDataPtr PixelData::New(uint8_t*                         buffer,
@@ -78,9 +67,10 @@ PixelDataPtr PixelData::New(uint8_t*                         buffer,
                             uint32_t                         height,
                             uint32_t                         stride,
                             Pixel::Format                    pixelFormat,
-                            Dali::PixelData::ReleaseFunction releaseFunction)
+                            Dali::PixelData::ReleaseFunction releaseFunction,
+                            bool                             releaseAfterUpload)
 {
-  return new PixelData(buffer, bufferSize, width, height, stride, pixelFormat, releaseFunction);
+  return new PixelData(buffer, bufferSize, width, height, stride, pixelFormat, releaseFunction, releaseAfterUpload);
 }
 
 uint32_t PixelData::GetWidth() const
@@ -108,16 +98,28 @@ uint32_t PixelData::GetBufferSize() const
   return mBufferSize;
 }
 
-Dali::Integration::PixelDataBuffer PixelData::ReleasePixelDataBuffer()
+void PixelData::ReleasePixelDataBuffer()
 {
-  Dali::Integration::PixelDataBuffer pixelDataBuffer(mBuffer, mBufferSize, mReleaseFunction);
-  mBuffer = nullptr;
-  return pixelDataBuffer;
+  if(mBuffer)
+  {
+    if(mReleaseFunction == Dali::PixelData::FREE)
+    {
+      free(mBuffer);
+    }
+    else
+    {
+      delete[] mBuffer;
+    }
+    mBuffer = nullptr;
+#if defined(DEBUG_ENABLED)
+    gPixelDataAllocationTotal -= mBufferSize;
+#endif
+  }
 }
 
 Dali::Integration::PixelDataBuffer PixelData::GetPixelDataBuffer() const
 {
-  Dali::Integration::PixelDataBuffer pixelDataBuffer(mBuffer, mBufferSize, mReleaseFunction);
+  Dali::Integration::PixelDataBuffer pixelDataBuffer(mBuffer, mBufferSize, mWidth, mHeight, mStride);
   return pixelDataBuffer;
 }
 

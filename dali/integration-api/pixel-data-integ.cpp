@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,12 +23,10 @@
 
 namespace Dali::Integration
 {
-PixelDataBuffer ReleasePixelDataBuffer(Dali::PixelData& pixelData)
+void ReleasePixelDataBuffer(Dali::PixelData pixelData)
 {
-  Internal::PixelData& pixelDataImpl   = GetImplementation(pixelData);
-  PixelDataBuffer      pixelDataBuffer = pixelDataImpl.ReleasePixelDataBuffer();
-  pixelData.Reset();
-  return pixelDataBuffer;
+  Internal::PixelData& pixelDataImpl = GetImplementation(pixelData);
+  pixelDataImpl.ReleasePixelDataBuffer();
 }
 
 PixelDataBuffer GetPixelDataBuffer(const Dali::PixelData& pixelData)
@@ -36,5 +34,23 @@ PixelDataBuffer GetPixelDataBuffer(const Dali::PixelData& pixelData)
   const Internal::PixelData& pixelDataImpl   = GetImplementation(pixelData);
   PixelDataBuffer            pixelDataBuffer = pixelDataImpl.GetPixelDataBuffer();
   return pixelDataBuffer;
+}
+
+Dali::PixelData NewPixelDataWithReleaseAfterUpload(uint8_t*                   buffer,
+                                                   uint32_t                   bufferSize,
+                                                   uint32_t                   width,
+                                                   uint32_t                   height,
+                                                   uint32_t                   stride,
+                                                   Pixel::Format              pixelFormat,
+                                                   PixelData::ReleaseFunction releaseFunction)
+{
+  IntrusivePtr<Internal::PixelData> internal = Internal::PixelData::New(buffer, bufferSize, width, height, stride, pixelFormat, releaseFunction, true);
+  return PixelData(internal.Get());
+}
+
+bool IsPixelDataReleaseAfterUpload(const Dali::PixelData& pixelData)
+{
+  const Internal::PixelData& pixelDataImpl = GetImplementation(pixelData);
+  return pixelDataImpl.IsPixelDataReleaseAfterUpload();
 }
 } // namespace Dali::Integration

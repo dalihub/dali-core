@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PIXEL_DATA_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,7 @@ public:
    * @param [in] stride           Buffer stride in pixels, 0 means the buffer is tightly packed
    * @param [in] pixelFormat      The pixel format
    * @param [in] releaseFunction  The function used to release the memory.
+   * @param [in] releaseAfterUpload Whether we release buffer after texture upload or not.
    */
   static PixelDataPtr New(uint8_t*                         buffer,
                           uint32_t                         bufferSize,
@@ -51,18 +52,20 @@ public:
                           uint32_t                         height,
                           uint32_t                         stride,
                           Pixel::Format                    pixelFormat,
-                          Dali::PixelData::ReleaseFunction releaseFunction);
+                          Dali::PixelData::ReleaseFunction releaseFunction,
+                          bool                             releaseAfterUpload);
 
   /**
    * @brief Constructor.
    *
-   * @param [in] buffer           The raw pixel data.
-   * @param [in] bufferSize       The size of the buffer in bytes
-   * @param [in] width            Buffer width in pixels
-   * @param [in] height           Buffer height in pixels
-   * @param [in] stride           Buffer stride in pixels, 0 means the buffer is tightly packed
-   * @param [in] pixelFormat      The pixel format
-   * @param [in] releaseFunction  The function used to release the memory.
+   * @param [in] buffer             The raw pixel data.
+   * @param [in] bufferSize         The size of the buffer in bytes
+   * @param [in] width              Buffer width in pixels
+   * @param [in] height             Buffer height in pixels
+   * @param [in] stride             Buffer stride in pixels, 0 means the buffer is tightly packed
+   * @param [in] pixelFormat        The pixel format
+   * @param [in] releaseFunction    The function used to release the memory.
+   * @param [in] releaseAfterUpload Whether we release buffer after texture upload or not.
    */
   PixelData(uint8_t*                         buffer,
             uint32_t                         bufferSize,
@@ -70,7 +73,8 @@ public:
             uint32_t                         height,
             uint32_t                         stride,
             Pixel::Format                    pixelFormat,
-            Dali::PixelData::ReleaseFunction releaseFunction);
+            Dali::PixelData::ReleaseFunction releaseFunction,
+            bool                             releaseAfterUpload);
 
 protected:
   /**
@@ -112,16 +116,25 @@ public:
   uint32_t GetBufferSize() const;
 
   /**
-   * Return the buffer pointer and reset the internal buffer to zero.
-   * @return The buffer pointer and associated data.
+   * Release the buffer data and reset the internal buffer to zero.
    */
-  Dali::Integration::PixelDataBuffer ReleasePixelDataBuffer();
+  void ReleasePixelDataBuffer();
 
   /**
    * Return the buffer pointer.
    * @return The buffer pointer.
    */
   Dali::Integration::PixelDataBuffer GetPixelDataBuffer() const;
+
+  /**
+   * Get whether we need to release pixel data after texture upload or not.
+   * @note This function can be called from another thread. Be careful.
+   * @return True if we need to release pixel data after texture upload. False otherwise.
+   */
+  bool IsPixelDataReleaseAfterUpload() const
+  {
+    return mReleaseAfterUpload;
+  }
 
   /**
    * @copydoc PixelData::GetStride()
@@ -159,6 +172,8 @@ private:
   uint32_t                         mStride;          ///< Buffer stride in pixels, 0 means the buffer is tightly packed
   Pixel::Format                    mPixelFormat;     ///< Pixel format
   Dali::PixelData::ReleaseFunction mReleaseFunction; ///< Function for releasing memory
+
+  const bool mReleaseAfterUpload;
 
 #if defined(DEBUG_ENABLED)
   static uint32_t gPixelDataAllocationTotal;
