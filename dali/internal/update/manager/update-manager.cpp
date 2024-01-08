@@ -1008,6 +1008,8 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
 
   uint32_t keepUpdating          = 0;
   bool     keepRendererRendering = false;
+  bool     keepRendererRenderingByFrameUpdateCallback = false;
+
   mImpl->renderingRequired       = false;
 
   // Although the scene-graph may not require an update, we still need to synchronize double-buffered
@@ -1057,7 +1059,7 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
     // Call the frame-callback-processor if set
     if(mImpl->frameCallbackProcessor)
     {
-      keepRendererRendering |= mImpl->frameCallbackProcessor->Update(bufferIndex, elapsedSeconds);
+      keepRendererRenderingByFrameUpdateCallback |= mImpl->frameCallbackProcessor->Update(bufferIndex, elapsedSeconds);
     }
 
     // Update node hierarchy, apply constraints,
@@ -1208,7 +1210,12 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
     keepUpdating |= KeepUpdating::STAGE_KEEP_RENDERING;
   }
 
-  if(keepUpdating & KeepUpdating::STAGE_KEEP_RENDERING)
+  if(keepRendererRenderingByFrameUpdateCallback)
+  {
+    keepUpdating |= KeepUpdating::FRAME_UPDATE_CALLBACK;
+  }
+
+  if(keepUpdating & (KeepUpdating::STAGE_KEEP_RENDERING | KeepUpdating::FRAME_UPDATE_CALLBACK))
   {
     // Set dirty flags for next frame to continue rendering
     mImpl->nodeDirtyFlags |= RenderableUpdateFlags;

@@ -65,7 +65,8 @@ enum Reasons
   STAGE_KEEP_RENDERING   = 1 << 1, ///<  - Stage::KeepRendering() is being used
   ANIMATIONS_RUNNING     = 1 << 2, ///< - Animations are ongoing
   MONITORING_PERFORMANCE = 1 << 3, ///< - The --enable-performance-monitor option is being used
-  RENDER_TASK_SYNC       = 1 << 4  ///< - A render task is waiting for render sync
+  RENDER_TASK_SYNC       = 1 << 4, ///< - A render task is waiting for render sync
+  FRAME_UPDATE_CALLBACK  = 1 << 5  ///< - Some FrameUpdateCallback return true.
 };
 }
 
