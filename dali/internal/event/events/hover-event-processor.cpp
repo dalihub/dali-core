@@ -381,6 +381,7 @@ void HoverEventProcessor::ProcessHoverEvent(const Integration::HoverEvent& event
   for(auto&& currentPoint : event.points)
   {
     HitTestAlgorithm::Results hitTestResults;
+    hitTestResults.eventTime = event.time;
     ActorHoverableCheck       actorHoverableCheck;
     HitTestAlgorithm::HitTest(mScene.GetSize(), mScene.GetRenderTaskList(), mScene.GetLayerList(), currentPoint.GetScreenPosition(), hitTestResults, actorHoverableCheck, isGeometry);
 
