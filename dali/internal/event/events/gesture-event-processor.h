@@ -74,6 +74,16 @@ public: // To be called by EventProcessor
    */
   void ProcessTouchEvent(Scene& scene, const Integration::TouchEvent& event);
 
+  /**
+   * This function is called by gesture detector whenever a touch event occurs
+   * @param[in] gestureDetector The gesture detector
+   * @param[in] actor The actor
+   * @param[in] renderTask The renderTask
+   * @param[in] scene The scene
+   * @param[in] event The event that has occurred
+   */
+  void ProcessTouchEvent(GestureDetector* gestureDetector, Actor& actor, Dali::Internal::RenderTask& renderTask, Scene& scene, const Integration::TouchEvent& event);
+
 public: // To be called by gesture detectors
   /**
    * This method adds the specified gesture detector to the relevant gesture processor.

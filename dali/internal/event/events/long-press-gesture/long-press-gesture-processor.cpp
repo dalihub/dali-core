@@ -124,7 +124,7 @@ LongPressGestureProcessor::LongPressGestureProcessor()
 
 LongPressGestureProcessor::~LongPressGestureProcessor() = default;
 
-void LongPressGestureProcessor::Process(Scene& scene, const LongPressGestureEvent& longPressEvent)
+void LongPressGestureProcessor::Process(Scene& scene, const LongPressGestureEvent& longPressEvent, Actor* actor)
 {
   DALI_TRACE_SCOPE(gTraceFilter, "DALI_PROCESS_LONG_PRESS_GESTURE");
   switch(longPressEvent.state)
@@ -135,7 +135,11 @@ void LongPressGestureProcessor::Process(Scene& scene, const LongPressGestureEven
       ResetActor();
 
       HitTestAlgorithm::Results hitTestResults;
-      if(HitTest(scene, longPressEvent.point, hitTestResults))
+      if(actor)
+      {
+        SetActor(actor);
+      }
+      else if(HitTest(scene, longPressEvent.point, hitTestResults))
       {
         SetActor(&GetImplementation(hitTestResults.actor));
       }
@@ -148,7 +152,19 @@ void LongPressGestureProcessor::Process(Scene& scene, const LongPressGestureEven
       if(currentGesturedActor)
       {
         HitTestAlgorithm::Results hitTestResults;
-        HitTest(scene, longPressEvent.point, hitTestResults);
+        if(actor)
+        {
+          hitTestResults.actor = Dali::Actor(actor);
+          hitTestResults.renderTask = longPressEvent.renderTask;
+
+          Vector2     actorCoords;
+          currentGesturedActor->ScreenToLocal(*hitTestResults.renderTask.Get(), actorCoords.x, actorCoords.y, longPressEvent.point.x, longPressEvent.point.y);
+          hitTestResults.actorCoordinates = actorCoords;
+        }
+        else
+        {
+          HitTest(scene, longPressEvent.point, hitTestResults);
+        }
 
         if(hitTestResults.actor && (currentGesturedActor == &GetImplementation(hitTestResults.actor)))
         {
@@ -157,7 +173,14 @@ void LongPressGestureProcessor::Process(Scene& scene, const LongPressGestureEven
 
           // Set mCurrentLongPressEvent to use inside overridden methods called from ProcessAndEmit()
           mCurrentLongPressEvent = &longPressEvent;
-          ProcessAndEmit(hitTestResults);
+          if(actor)
+          {
+            ProcessAndEmitActor(hitTestResults);
+          }
+          else
+          {
+            ProcessAndEmit(hitTestResults);
+          }
           mCurrentLongPressEvent = nullptr;
         }
         else

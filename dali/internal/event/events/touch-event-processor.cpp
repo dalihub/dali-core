@@ -104,12 +104,17 @@ Dali::Actor EmitInterceptTouchSignals(Dali::Actor actor, const Dali::TouchEvent&
 
 // geometry
 // child -> below
-Dali::Actor EmitGeoInterceptTouchSignals(std::list<Dali::Internal::Actor*>& actorLists, std::list<Dali::Internal::Actor*>& interceptActorList, const Dali::TouchEvent& touchEvent)
+Dali::Actor EmitGeoInterceptTouchSignals(std::list<Dali::Internal::Actor*>& actorLists, std::list<Dali::Internal::Actor*>& interceptActorList, const Dali::TouchEvent& touchEvent, ActorObserver& lastConsumedActor)
 {
   interceptActorList.clear();
   Dali::Actor interceptedActor;
   for(auto&& actor : actorLists)
   {
+    // If there is a consumed actor, the intercept is sent only up to the moment before the consumed actor.
+    if(lastConsumedActor.GetActor() == actor)
+    {
+        break;
+    }
     interceptActorList.push_back(actor);
     if(ShouldEmitInterceptTouchEvent(*actor, touchEvent))
     {
@@ -497,7 +502,7 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
       if(interceptedTouchActor)
       {
         Actor* touchConsumedActor(mLastConsumedActor.GetActor());
-        if(touchConsumedActor) // If there is a consultative actor, send events only to the consultative actor.
+        if(touchConsumedActor) // If there is a consumed actor, send events only to the consumed actor.
         {
           RenderTask& currentRenderTaskImpl = *currentRenderTask.Get();
           consumedActor = EmitTouchSignals(touchConsumedActor, currentRenderTaskImpl, touchEventImpl, primaryPointState, isGeometry);
@@ -513,7 +518,7 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
       {
         Dali::Actor interceptedActor;
         // Let's find out if there is an intercept actor.
-        interceptedActor = EmitGeoInterceptTouchSignals(mCandidateActorLists, mInterceptedActorLists, touchEventHandle);
+        interceptedActor = EmitGeoInterceptTouchSignals(mCandidateActorLists, mInterceptedActorLists, touchEventHandle, mLastConsumedActor);
         if(interceptedActor)
         {
           mInterceptedTouchActor.SetActor(&GetImplementation(interceptedActor));
@@ -533,22 +538,17 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
                   mLastRenderTask &&
                   mLastPrimaryPointState != PointState::FINISHED)
           {
-            std::list<Dali::Internal::Actor*> internalActorLists = mCandidateActorLists;
-            while(!internalActorLists.empty())
+            std::list<Dali::Internal::Actor*>::reverse_iterator rIter = mCandidateActorLists.rbegin();
+            for (; rIter != mCandidateActorLists.rend(); rIter++)
             {
-              Actor* actorImpl = internalActorLists.back();
-              // Only emit the signal if the actor's touch signal has connections (or derived actor implementation requires touch).
-              if(actorImpl->GetTouchRequired())
-              {
-                EmitTouchSignals(actorImpl, *mLastRenderTask.Get(), touchEventImpl, PointState::INTERRUPTED, isGeometry);
-              }
-              internalActorLists.pop_back();
+              Actor* actorImpl(*rIter);
+              EmitTouchSignals(actorImpl, *mLastRenderTask.Get(), touchEventImpl, PointState::INTERRUPTED, isGeometry);
             }
           }
         }
 
         Actor* touchConsumedActor(mLastConsumedActor.GetActor());
-        if(touchConsumedActor) // If there is a consultative actor, send events only to the consultative actor.
+        if(touchConsumedActor) // If there is a consumed actor, send events only to the consumed actor.
         {
           RenderTask& currentRenderTaskImpl = *currentRenderTask.Get();
           consumedActor = EmitTouchSignals(touchConsumedActor, currentRenderTaskImpl, touchEventImpl, primaryPointState, isGeometry);

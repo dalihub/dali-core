@@ -100,6 +100,19 @@ void GestureProcessor::ProcessTouch(Scene& scene, const Integration::TouchEvent&
   }
 }
 
+void GestureProcessor::ProcessTouch(Actor& actor, Dali::Internal::RenderTask& renderTask, Scene& scene, const Integration::TouchEvent& event)
+{
+  if(mGestureRecognizer)
+  {
+    if(!event.points.empty())
+    {
+      mPoint     = event.points[0];
+      mEventTime = event.time;
+    }
+    mGestureRecognizer->SendEvent(actor, renderTask, scene, event);
+  }
+}
+
 void GestureProcessor::GetGesturedActor(Actor*& actor, GestureDetectorContainer& gestureDetectors)
 {
   while(actor)
@@ -197,6 +210,22 @@ void GestureProcessor::ProcessAndEmit(HitTestAlgorithm::Results& hitTestResults)
       {
         actor = actor->GetParent();
       }
+    }
+  }
+}
+
+void GestureProcessor::ProcessAndEmitActor(HitTestAlgorithm::Results& hitTestResults)
+{
+  if(hitTestResults.actor)
+  {
+    Actor*  hitTestActor(&GetImplementation(hitTestResults.actor));
+    Actor*  actor(hitTestActor);
+    GestureDetectorContainer gestureDetectors;
+    GetGesturedActor(actor, gestureDetectors);
+
+    if(actor && actor->IsVisible() && !gestureDetectors.empty() && actor == hitTestActor)
+    {
+      EmitGestureSignal(actor, gestureDetectors, hitTestResults.actorCoordinates);
     }
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 
 #include "test-graphics-texture.h"
+#include <dali/integration-api/pixel-data-integ.h>
 #include <iostream>
 #include <sstream>
 
@@ -935,26 +936,74 @@ void TestGraphicsTexture::Update(Graphics::TextureUpdateInfo updateInfo, Graphic
                         updateInfo.srcExtent2D.width != (mCreateInfo.size.width / (1 << updateInfo.level)) ||
                         updateInfo.srcExtent2D.height != (mCreateInfo.size.height / (1 << updateInfo.level)));
 
+  uint8_t* pixels        = nullptr;
+  bool     releasePixels = false;
+
+  switch(source.sourceType)
+  {
+    case Graphics::TextureUpdateSourceInfo::Type::PIXEL_DATA:
+    {
+      auto pixelDataBuffer = Dali::Integration::GetPixelDataBuffer(source.pixelDataSource.pixelData);
+
+      pixels        = pixelDataBuffer.buffer;
+      releasePixels = Dali::Integration::IsPixelDataReleaseAfterUpload(source.pixelDataSource.pixelData) && updateInfo.srcOffset == 0u;
+      break;
+    }
+    case Graphics::TextureUpdateSourceInfo::Type::MEMORY:
+    {
+      pixels        = reinterpret_cast<uint8_t*>(source.memorySource.memory);
+      releasePixels = true;
+      break;
+    }
+    default:
+    {
+      // TODO : Implement here
+      break;
+    }
+  }
+
   if(!isSubImage)
   {
     if(!mIsCompressed)
     {
-      mGlAbstraction.TexImage2D(target, updateInfo.level, mGlInternalFormat, updateInfo.srcExtent2D.width, updateInfo.srcExtent2D.height, 0, mGlFormat, mPixelDataType, source.memorySource.memory);
+      mGlAbstraction.TexImage2D(target, updateInfo.level, mGlInternalFormat, updateInfo.srcExtent2D.width, updateInfo.srcExtent2D.height, 0, mGlFormat, mPixelDataType, pixels);
     }
     else
     {
-      mGlAbstraction.CompressedTexImage2D(target, updateInfo.level, mGlInternalFormat, updateInfo.srcExtent2D.width, updateInfo.srcExtent2D.height, 0, updateInfo.srcSize, source.memorySource.memory);
+      mGlAbstraction.CompressedTexImage2D(target, updateInfo.level, mGlInternalFormat, updateInfo.srcExtent2D.width, updateInfo.srcExtent2D.height, 0, updateInfo.srcSize, pixels);
     }
   }
   else
   {
     if(!mIsCompressed)
     {
-      mGlAbstraction.TexSubImage2D(target, updateInfo.level, updateInfo.dstOffset2D.x, updateInfo.dstOffset2D.y, updateInfo.srcExtent2D.width, updateInfo.srcExtent2D.height, mGlFormat, mPixelDataType, source.memorySource.memory);
+      mGlAbstraction.TexSubImage2D(target, updateInfo.level, updateInfo.dstOffset2D.x, updateInfo.dstOffset2D.y, updateInfo.srcExtent2D.width, updateInfo.srcExtent2D.height, mGlFormat, mPixelDataType, pixels);
     }
     else
     {
-      mGlAbstraction.CompressedTexSubImage2D(target, updateInfo.level, updateInfo.dstOffset2D.x, updateInfo.dstOffset2D.y, updateInfo.srcExtent2D.width, updateInfo.srcExtent2D.height, mGlFormat, updateInfo.srcSize, source.memorySource.memory);
+      mGlAbstraction.CompressedTexSubImage2D(target, updateInfo.level, updateInfo.dstOffset2D.x, updateInfo.dstOffset2D.y, updateInfo.srcExtent2D.width, updateInfo.srcExtent2D.height, mGlFormat, updateInfo.srcSize, pixels);
+    }
+  }
+
+  if(releasePixels && pixels != nullptr)
+  {
+    switch(source.sourceType)
+    {
+      case Graphics::TextureUpdateSourceInfo::Type::PIXEL_DATA:
+      {
+        Dali::Integration::ReleasePixelDataBuffer(source.pixelDataSource.pixelData);
+        break;
+      }
+      case Graphics::TextureUpdateSourceInfo::Type::MEMORY:
+      {
+        free(reinterpret_cast<void*>(pixels));
+        break;
+      }
+      default:
+      {
+        // TODO : Implement here
+        break;
+      }
     }
   }
 }

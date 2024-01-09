@@ -143,7 +143,7 @@ PanGestureProcessor::~PanGestureProcessor()
   mSceneObject = nullptr; // mSceneObject is owned and destroyed by update manager (there is only one of these for now)
 }
 
-void PanGestureProcessor::Process(Scene& scene, const PanGestureEvent& panEvent)
+void PanGestureProcessor::Process(Scene& scene, const PanGestureEvent& panEvent, Actor* actor)
 {
 #if defined(DEBUG_ENABLED)
   DALI_LOG_TRACE_METHOD(gLogFilter);
@@ -163,7 +163,12 @@ void PanGestureProcessor::Process(Scene& scene, const PanGestureEvent& panEvent)
       ResetActor();
 
       HitTestAlgorithm::Results hitTestResults;
-      if(HitTest(scene, panEvent.currentPosition, hitTestResults))
+      if(actor)
+      {
+        SetActor(actor);
+        mPossiblePanPosition = panEvent.currentPosition;
+      }
+      else if(HitTest(scene, panEvent.currentPosition, hitTestResults))
       {
         SetActor(&GetImplementation(hitTestResults.actor));
         mPossiblePanPosition = panEvent.currentPosition;
@@ -180,7 +185,19 @@ void PanGestureProcessor::Process(Scene& scene, const PanGestureEvent& panEvent)
       // it can be told when the gesture ends as well.
 
       HitTestAlgorithm::Results hitTestResults;
-      HitTest(scene, panEvent.previousPosition, hitTestResults); // Hit Test previous position
+      if(actor)
+      {
+        hitTestResults.actor = Dali::Actor(actor);
+        hitTestResults.renderTask = panEvent.renderTask;
+
+        Vector2 actorCoords;
+        actor->ScreenToLocal(*hitTestResults.renderTask.Get(), actorCoords.x, actorCoords.y, panEvent.currentPosition.x, panEvent.currentPosition.y);
+        hitTestResults.actorCoordinates = actorCoords;
+      }
+      else
+      {
+        HitTest(scene, panEvent.previousPosition, hitTestResults); // Hit Test previous position
+      }
 
       if(hitTestResults.actor)
       {
@@ -196,7 +213,14 @@ void PanGestureProcessor::Process(Scene& scene, const PanGestureEvent& panEvent)
 
         // Set mCurrentPanEvent to use inside overridden methods called in ProcessAndEmit()
         mCurrentPanEvent = &panEvent;
-        ProcessAndEmit(hitTestResults);
+        if(actor)
+        {
+          ProcessAndEmitActor(hitTestResults);
+        }
+        else
+        {
+          ProcessAndEmit(hitTestResults);
+        }
         mCurrentPanEvent = nullptr;
       }
       else

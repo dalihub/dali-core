@@ -219,11 +219,12 @@ void TapGestureRecognizer::ProcessEvent(TapGestureEvent& event)
 {
   event.sourceType = mSourceType;
   event.sourceData = mSourceData;
+  event.renderTask = mRenderTask;
   if(mScene)
   {
     // Create another handle so the recognizer cannot be destroyed during process function
     GestureRecognizerPtr recognizerHandle = this;
-    mObserver.Process(*mScene, event);
+    mObserver.Process(*mScene, event, mActor.GetActor());
   }
 }
 

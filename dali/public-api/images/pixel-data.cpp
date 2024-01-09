@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ PixelData PixelData::New(uint8_t*        buffer,
                          Pixel::Format   pixelFormat,
                          ReleaseFunction releaseFunction)
 {
-  IntrusivePtr<Internal::PixelData> internal = Internal::PixelData::New(buffer, bufferSize, width, height, 0, pixelFormat, releaseFunction);
+  IntrusivePtr<Internal::PixelData> internal = Internal::PixelData::New(buffer, bufferSize, width, height, 0, pixelFormat, releaseFunction, false);
   return PixelData(internal.Get());
 }
 
@@ -42,7 +42,7 @@ PixelData PixelData::New(uint8_t*        buffer,
                          Pixel::Format   pixelFormat,
                          ReleaseFunction releaseFunction)
 {
-  IntrusivePtr<Internal::PixelData> internal = Internal::PixelData::New(buffer, bufferSize, width, height, stride, pixelFormat, releaseFunction);
+  IntrusivePtr<Internal::PixelData> internal = Internal::PixelData::New(buffer, bufferSize, width, height, stride, pixelFormat, releaseFunction, false);
   return PixelData(internal.Get());
 }
 

@@ -121,7 +121,7 @@ RotationGestureProcessor::RotationGestureProcessor()
 {
 }
 
-void RotationGestureProcessor::Process(Scene& scene, const RotationGestureEvent& rotationEvent)
+void RotationGestureProcessor::Process(Scene& scene, const RotationGestureEvent& rotationEvent, Actor* actor)
 {
   DALI_TRACE_SCOPE(gTraceFilter, "DALI_PROCESS_ROTATION_GESTURE");
   switch(rotationEvent.state)
@@ -135,7 +135,25 @@ void RotationGestureProcessor::Process(Scene& scene, const RotationGestureEvent&
       ResetActor();
 
       HitTestAlgorithm::Results hitTestResults;
-      if(HitTest(scene, rotationEvent.centerPoint, hitTestResults))
+      if(actor)
+      {
+        hitTestResults.actor = Dali::Actor(actor);
+        hitTestResults.renderTask = rotationEvent.renderTask;
+
+        // Record the current render-task for Screen->Actor coordinate conversions
+        mCurrentRenderTask = hitTestResults.renderTask;
+
+        Vector2     actorCoords;
+        actor->ScreenToLocal(*mCurrentRenderTask.Get(), actorCoords.x, actorCoords.y, rotationEvent.centerPoint.x, rotationEvent.centerPoint.y);
+        hitTestResults.actorCoordinates = actorCoords;
+
+        // Set mCurrentRotationEvent to use inside overridden methods called from ProcessAndEmit()
+        mCurrentRotationEvent = &rotationEvent;
+        ProcessAndEmitActor(hitTestResults);
+        mCurrentRotationEvent = nullptr;
+
+      }
+      else if(HitTest(scene, rotationEvent.centerPoint, hitTestResults))
       {
         // Record the current render-task for Screen->Actor coordinate conversions
         mCurrentRenderTask = hitTestResults.renderTask;

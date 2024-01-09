@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/handle.h>
+#include <dali/public-api/events/touch-event.h>
 
 namespace Dali
 {
@@ -163,6 +164,15 @@ public: // Actor related
    * @pre The gesture detector has been initialized.
    */
   Actor GetAttachedActor(size_t index) const;
+
+  /**
+   * @brief The gesture is recognized by sending a Touch event to the actor.
+   *
+   * @param actor The actor receiving touch events
+   * @param touch The thouch event
+   * @return If true , the gesture is being recognized.
+   */
+  bool FeedTouch(Dali::Actor& actor, Dali::TouchEvent& touch);
 
 protected:
   /// @cond internal

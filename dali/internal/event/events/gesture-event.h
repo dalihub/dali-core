@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/events/event.h>
 #include <dali/internal/event/events/gesture-impl.h>
+#include <dali/internal/event/render-tasks/render-task-impl.h>
 
 namespace Dali
 {
@@ -65,6 +66,12 @@ struct GestureEvent
    * The data of the source type.
    */
   GestureSourceData sourceData;
+
+  /**
+   * The render task used to generate this touch event.
+   */
+  RenderTaskPtr renderTask;
+
 
 protected: // Constructors only to be used by derived structures.
   /**
