@@ -121,7 +121,7 @@ RotationGestureProcessor::RotationGestureProcessor()
 {
 }
 
-void RotationGestureProcessor::Process(Scene& scene, const RotationGestureEvent& rotationEvent, Actor* actor)
+void RotationGestureProcessor::Process(Scene& scene, const RotationGestureEvent& rotationEvent)
 {
   DALI_TRACE_SCOPE(gTraceFilter, "DALI_PROCESS_ROTATION_GESTURE");
   switch(rotationEvent.state)
@@ -135,21 +135,21 @@ void RotationGestureProcessor::Process(Scene& scene, const RotationGestureEvent&
       ResetActor();
 
       HitTestAlgorithm::Results hitTestResults;
-      if(actor)
+      if(GetFeededActor())
       {
-        hitTestResults.actor = Dali::Actor(actor);
-        hitTestResults.renderTask = rotationEvent.renderTask;
+        hitTestResults.actor = Dali::Actor(GetFeededActor());
+        hitTestResults.renderTask = GetFeededRenderTask();
 
         // Record the current render-task for Screen->Actor coordinate conversions
         mCurrentRenderTask = hitTestResults.renderTask;
 
         Vector2     actorCoords;
-        actor->ScreenToLocal(*mCurrentRenderTask.Get(), actorCoords.x, actorCoords.y, rotationEvent.centerPoint.x, rotationEvent.centerPoint.y);
+        GetFeededActor()->ScreenToLocal(*mCurrentRenderTask.Get(), actorCoords.x, actorCoords.y, rotationEvent.centerPoint.x, rotationEvent.centerPoint.y);
         hitTestResults.actorCoordinates = actorCoords;
 
         // Set mCurrentRotationEvent to use inside overridden methods called from ProcessAndEmit()
         mCurrentRotationEvent = &rotationEvent;
-        ProcessAndEmitActor(hitTestResults);
+        ProcessAndEmitActor(hitTestResults, GetFeededGestureDetector());
         mCurrentRotationEvent = nullptr;
 
       }
@@ -181,6 +181,11 @@ void RotationGestureProcessor::Process(Scene& scene, const RotationGestureEvent&
           // Ensure actor is still attached to the emitters, if it is not then remove the emitter.
           GestureDetectorContainer::iterator endIter = std::remove_if(mCurrentRotationEmitters.begin(), mCurrentRotationEmitters.end(), IsNotAttachedFunctor(currentGesturedActor));
           mCurrentRotationEmitters.erase(endIter, mCurrentRotationEmitters.end());
+
+          if(GetFeededActor() && GetFeededGestureDetector())
+          {
+            mCurrentRotationEmitters.push_back(GetFeededGestureDetector());
+          }
 
           if(!mCurrentRotationEmitters.empty())
           {

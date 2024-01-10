@@ -66,7 +66,6 @@ void LongPressGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
   unsigned int                            pointCount(event.GetPointCount());
   Dali::Integration::PlatformAbstraction& platformAbstraction = ThreadLocalStorage::Get().GetPlatformAbstraction();
   GestureRecognizerPtr                    ptr(this); // To keep us from being destroyed during the life-time of this method
-
   switch(mState)
   {
     // CLEAR: Wait till one point touches the screen before starting timer.
@@ -241,14 +240,13 @@ void LongPressGestureRecognizer::EmitGesture(GestureState state)
     }
     longPress.sourceType = mSourceType;
     longPress.sourceData = mSourceData;
-    longPress.renderTask = mRenderTask;
 
     if(mScene)
     {
       // Create another handle so the recognizer cannot be destroyed during process function
       GestureRecognizerPtr recognizerHandle = this;
 
-      mObserver.Process(*mScene, longPress, mActor.GetActor());
+      mObserver.Process(*mScene, longPress);
     }
   }
 }

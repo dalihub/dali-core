@@ -1741,6 +1741,82 @@ int UtcDaliGeoTouchEventInterruptedDifferentConsumer(void)
   END_TEST;
 }
 
+int UtcDaliGeoTouchEventInterruptedDifferentConsumer02(void)
+{
+  TestApplication application;
+
+  application.GetScene().SetGeometryHittestEnabled(true);
+
+  Actor rootActor(application.GetScene().GetRootLayer());
+
+  Actor parent = Actor::New();
+  parent.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  parent.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(parent);
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parent.Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's touched signal
+  SignalData        data;
+  TouchEventFunctor functor(data, false /* Do not consume */);
+  actor.TouchedSignal().Connect(&application, functor);
+
+  // Connect to parent's touched signal
+  SignalData        parentData;
+  TouchEventFunctor parentFunctor(parentData, false /* Do not consume */);
+  parent.TouchedSignal().Connect(&application, parentFunctor);
+
+  // Connect to root's touched signal
+  SignalData        rootData;
+  TouchEventFunctor rootFunctor(rootData, false /* Do not consume */);
+  rootActor.TouchedSignal().Connect(&application, rootFunctor);
+
+  // Emit a down signal
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::DOWN, data.receivedTouch.points[0].state, TEST_LOCATION);
+  DALI_TEST_CHECK(actor == data.receivedTouch.points[0].hitActor);
+  DALI_TEST_CHECK(actor == data.touchedActor);
+  DALI_TEST_EQUALS(true, parentData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::DOWN, parentData.receivedTouch.points[0].state, TEST_LOCATION);
+  DALI_TEST_CHECK(actor == parentData.receivedTouch.points[0].hitActor);
+  DALI_TEST_CHECK(parent == parentData.touchedActor);
+  DALI_TEST_EQUALS(true, rootData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::DOWN, rootData.receivedTouch.points[0].state, TEST_LOCATION);
+  DALI_TEST_CHECK(actor == rootData.receivedTouch.points[0].hitActor);
+  DALI_TEST_CHECK(rootActor == rootData.touchedActor);
+  data.Reset();
+  parentData.Reset();
+  rootData.Reset();
+
+  // child is now consumer, connect to the touched signal of the child so that it becomes the consumer
+  SignalData        secondData;
+  TouchEventFunctor secondFunctor(secondData /* Consume */);
+  actor.TouchedSignal().Connect(&application, secondFunctor);
+
+  // Emit an motion signal, Since child has comsume, Actors who were previously touched will get interrupted.
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 20.0f)));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::MOTION, data.receivedTouch.points[0].state, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, parentData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::INTERRUPTED, parentData.receivedTouch.points[0].state, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, rootData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::INTERRUPTED, rootData.receivedTouch.points[0].state, TEST_LOCATION);
+  data.Reset();
+  parentData.Reset();
+  rootData.Reset();
+
+  END_TEST;
+}
+
+
 int UtcDaliGeoTouchEventGetRadius(void)
 {
   TestApplication application;
