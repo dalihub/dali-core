@@ -858,7 +858,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
             auto program = item.mRenderer->PrepareProgram(instruction);
             if(program)
             {
-              auto memoryRequirements = program->GetUniformBlocksMemoryRequirements();
+              const auto& memoryRequirements = program->GetUniformBlocksMemoryRequirements();
 
               totalSizeCPU += memoryRequirements.totalCpuSizeRequired;
               totalSizeGPU += memoryRequirements.totalGpuSizeRequired;
