@@ -132,11 +132,6 @@ Dali::Actor EmitGeoInterceptTouchSignals(std::list<Dali::Internal::Actor*>& acto
   Dali::Actor interceptedActor;
   for(auto&& actor : actorLists)
   {
-    // If there is a consumed actor, the intercept is sent only up to the moment before the consumed actor.
-    if(lastConsumedActor.GetActor() == actor)
-    {
-      break;
-    }
     interceptActorList.push_back(actor);
     if(ShouldEmitInterceptTouchEvent(*actor, touchEvent))
     {
@@ -146,6 +141,11 @@ Dali::Actor EmitGeoInterceptTouchSignals(std::list<Dali::Internal::Actor*>& acto
         interceptedActor = Dali::Actor(actor);
         break;
       }
+    }
+    // If there is a consumed actor, the intercept is sent only up to the moment before the consumed actor.
+    if(lastConsumedActor.GetActor() == actor)
+    {
+      break;
     }
   }
   return interceptedActor;
@@ -501,6 +501,17 @@ struct TouchEventProcessor::Impl
           {
             // Let's propagate touch events from the intercepted actor or start propagating touch events from the leaf actor.
             localVars.consumedActor = EmitGeoTouchSignals(interceptedActor ? processor.mInterceptedActorLists : processor.mCandidateActorLists, localVars.touchEventHandle);
+
+            // If consumed, the actors who previously received the touch are interrupted, indicating that the touch has been consumed by another actor.
+            if(localVars.consumedActor && localVars.primaryPointState != PointState::DOWN)
+            {
+              std::list<Dali::Internal::Actor*>::reverse_iterator rIter = std::find(processor.mCandidateActorLists.rbegin(), processor.mCandidateActorLists.rend(), localVars.consumedActor);
+              for(++rIter; rIter != processor.mCandidateActorLists.rend(); ++rIter)
+              {
+                Actor* actorImpl(*rIter);
+                EmitTouchSignals(actorImpl, *processor.mLastRenderTask.Get(), localVars.touchEventImpl, PointState::INTERRUPTED, localVars.isGeometry);
+              }
+            }
           }
         }
       }

@@ -78,9 +78,8 @@ public: // To be called by GestureEventProcessor
    * This method is called whenever a pinch gesture event occurs.
    * @param[in] scene The scene the pinch gesture event occurs in.
    * @param[in] pinchEvent The event that has occurred.
-   * @param[in] actor The actor where the event occurred. If this is null, the actor is found through hittest.
    */
-  void Process(Scene& scene, const PinchGestureEvent& pinchEvent, Actor* actor = nullptr) override;
+  void Process(Scene& scene, const PinchGestureEvent& pinchEvent) override;
 
   /**
    * Adds a gesture detector to this gesture processor.

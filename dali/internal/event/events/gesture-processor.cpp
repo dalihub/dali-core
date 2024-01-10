@@ -78,7 +78,10 @@ GestureProcessor::GestureProcessor(GestureType::Value type)
   mCurrentGesturedActor(nullptr),
   mPoint(),
   mEventTime(0u),
-  mGesturedActorDisconnected(false)
+  mGesturedActorDisconnected(false),
+  mFeededActor(nullptr),
+  mRenderTask(),
+  mGestureDetector(nullptr)
 {
 }
 
@@ -96,11 +99,13 @@ void GestureProcessor::ProcessTouch(Scene& scene, const Integration::TouchEvent&
       mPoint     = event.points[0];
       mEventTime = event.time;
     }
+    mFeededActor = nullptr;
+    mGestureDetector = nullptr;
     mGestureRecognizer->SendEvent(scene, event);
   }
 }
 
-void GestureProcessor::ProcessTouch(Actor& actor, Dali::Internal::RenderTask& renderTask, Scene& scene, const Integration::TouchEvent& event)
+void GestureProcessor::ProcessTouch(GestureDetector* gestureDetector, Actor& actor, Dali::Internal::RenderTask& renderTask, Scene& scene, const Integration::TouchEvent& event)
 {
   if(mGestureRecognizer)
   {
@@ -109,8 +114,26 @@ void GestureProcessor::ProcessTouch(Actor& actor, Dali::Internal::RenderTask& re
       mPoint     = event.points[0];
       mEventTime = event.time;
     }
-    mGestureRecognizer->SendEvent(actor, renderTask, scene, event);
+    mGestureDetector = gestureDetector;
+    mFeededActor.SetActor(&actor);
+    mRenderTask = &renderTask;
+    mGestureRecognizer->SendEvent(scene, event);
   }
+}
+
+Actor* GestureProcessor::GetFeededActor()
+{
+  return mFeededActor.GetActor();
+}
+
+GestureDetector* GestureProcessor::GetFeededGestureDetector()
+{
+  return mGestureDetector;
+}
+
+RenderTaskPtr GestureProcessor::GetFeededRenderTask()
+{
+  return mRenderTask;
 }
 
 void GestureProcessor::GetGesturedActor(Actor*& actor, GestureDetectorContainer& gestureDetectors)
@@ -214,17 +237,17 @@ void GestureProcessor::ProcessAndEmit(HitTestAlgorithm::Results& hitTestResults)
   }
 }
 
-void GestureProcessor::ProcessAndEmitActor(HitTestAlgorithm::Results& hitTestResults)
+void GestureProcessor::ProcessAndEmitActor(HitTestAlgorithm::Results& hitTestResults, GestureDetector* gestureDetector)
 {
-  if(hitTestResults.actor)
+  if(hitTestResults.actor && gestureDetector)
   {
-    Actor*  hitTestActor(&GetImplementation(hitTestResults.actor));
-    Actor*  actor(hitTestActor);
+    Actor*  actor(&GetImplementation(hitTestResults.actor));
     GestureDetectorContainer gestureDetectors;
-    GetGesturedActor(actor, gestureDetectors);
-
-    if(actor && actor->IsVisible() && !gestureDetectors.empty() && actor == hitTestActor)
+    // Check deriving class for whether the current gesture satisfies the gesture detector's parameters.
+    if(actor && actor->IsVisible() && gestureDetector && CheckGestureDetector(gestureDetector, actor))
     {
+      gestureDetectors.push_back(gestureDetector);
+      gestureDetector->SetDetected(true);
       EmitGestureSignal(actor, gestureDetectors, hitTestResults.actorCoordinates);
     }
   }
