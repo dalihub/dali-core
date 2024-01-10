@@ -608,16 +608,6 @@ bool HitTestRenderTask(const RenderTaskList::ExclusivesContainer& exclusives,
 
 Dali::Actor FindPriorActorInLayer(Dali::Actor rootActor, Dali::Actor firstActor, Dali::Actor secondActor)
 {
-  if(rootActor == firstActor)
-  {
-    return firstActor;
-  }
-
-  if(rootActor == secondActor)
-  {
-    return secondActor;
-  }
-
   Dali::Actor priorActor;
   uint32_t childCount = rootActor.GetChildCount();
   if(childCount > 0)
@@ -636,13 +626,27 @@ Dali::Actor FindPriorActorInLayer(Dali::Actor rootActor, Dali::Actor firstActor,
       }
     }
   }
+
+  if(!priorActor)
+  {
+    if(rootActor == firstActor)
+    {
+      priorActor = firstActor;
+    }
+
+    if(rootActor == secondActor)
+    {
+      priorActor = secondActor;
+    }
+  }
+
   return priorActor;
 }
 
 Dali::Actor FindPriorActorInLayers(LayerList& layers, Dali::Actor rootActor, Dali::Actor firstActor, Dali::Actor secondActor)
 {
   Dali::Layer sourceLayer = rootActor.GetLayer();
-  const uint32_t sourceActorDepth(sourceLayer.GetProperty<bool>(Dali::Layer::Property::DEPTH));
+  const uint32_t sourceActorDepth(sourceLayer.GetProperty<int>(Dali::Layer::Property::DEPTH));
 
   Dali::Actor priorActor;
   uint32_t layerCount = layers.GetLayerCount();
