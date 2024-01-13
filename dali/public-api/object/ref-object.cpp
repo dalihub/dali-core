@@ -65,7 +65,7 @@ void RefObject::Unreference()
   }
 }
 
-uint32_t RefObject::ReferenceCount()
+uint32_t RefObject::ReferenceCount() const
 {
   return mCount;
 }
