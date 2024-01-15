@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_GESTURE_PROPERTIES_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -151,6 +151,22 @@ public:
   {
     return mValue;
   }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
+   */
+  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  {
+    return &mValue;
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
+   */
+  size_t GetValueSize() const override
+  {
+    return sizeof(Vector2);
+  }
 };
 
 /**
@@ -170,6 +186,22 @@ public:
   const bool& GetBoolean(BufferIndex bufferIndex) const override
   {
     return mValue;
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
+   */
+  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  {
+    return &mValue;
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
+   */
+  size_t GetValueSize() const override
+  {
+    return sizeof(bool);
   }
 };
 
