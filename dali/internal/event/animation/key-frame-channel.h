@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_KEY_FRAME_CHANNEL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,6 +98,65 @@ struct KeyFrameChannel
       }
     }
     return interpolatedV;
+  }
+
+  bool OptimizeValuesLinear()
+  {
+    ProgressValues optimizedValues;
+    bool           optimized = false;
+
+    // Optimize works only if value has more or equal than 3 values.
+    if(mValues.size() < 3u)
+    {
+      return optimized;
+    }
+
+    auto iter = mValues.begin();
+    for(; iter + 1 != mValues.end();)
+    {
+      // Insert iter, which is the first value, or jter what we fail to ignore previous loops.
+      optimizedValues.push_back(*iter);
+      const float iterProgress = iter->GetProgress();
+
+      auto jter = iter + 1;
+
+      for(; jter + 1 != mValues.end();)
+      {
+        // Check whether we can ignore jter now.
+        const auto  kter         = jter + 1;
+        const float jterProgress = jter->GetProgress();
+        const float kterProgress = kter->GetProgress();
+
+        float frameProgress = (jterProgress - iterProgress) / (kterProgress - iterProgress);
+
+        // Interpolate with iter and kter.
+        // Check value between interpolatedV and jter->GetValue().
+        // If two values are similar, we can skip jter!
+        V interpolatedV{};
+        Interpolate(interpolatedV, iter->GetValue(), kter->GetValue(), frameProgress);
+
+        // TODO : We might need to find more good way to compare two values
+        if(Property::Value(interpolatedV) != Property::Value(jter->GetValue()))
+        {
+          break;
+        }
+
+        optimized = true;
+
+        // Keep checking for the next jter
+        ++jter;
+      }
+      iter = jter;
+    }
+
+    // Insert last value.
+    optimizedValues.push_back(*iter);
+
+    if(optimized)
+    {
+      mValues = std::move(optimizedValues);
+    }
+    return optimized;
   }
 
   ProgressValues mValues;

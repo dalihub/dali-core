@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -183,6 +183,15 @@ void KeyFrames::SetKeyFrameValue(std::size_t index, const Property::Value& value
   {
     mKeyFrames->SetKeyFrameValue(index, value);
   }
+}
+
+bool KeyFrames::OptimizeKeyFramesLinear()
+{
+  if(mKeyFrames)
+  {
+    return mKeyFrames->OptimizeValuesLinear();
+  }
+  return false;
 }
 
 } // namespace Internal
