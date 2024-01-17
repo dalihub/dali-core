@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,14 @@
 #include <dali/internal/update/manager/scene-graph-traveler.h>
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/trace.h>
 #include <dali/internal/update/nodes/node.h>
+
+namespace
+{
+// TODO : The name of trace marker name is from VD specific. We might need to change it future.
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_COMBINED, false);
+} // namespace
 
 namespace Dali
 {
@@ -54,6 +61,9 @@ SceneGraph::Node* SceneGraphTraveler::FindNode(uint32_t id)
   }
   else
   {
+    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_SCENE_GRAPH_TRAVELER", [&](std::ostringstream& oss) {
+      oss << "[" << mTravledNodeMap.size() << "]";
+    });
     while(!FullSearched())
     {
       SceneGraph::Node& currentNode = GetCurrentNode();
@@ -68,6 +78,10 @@ SceneGraph::Node* SceneGraphTraveler::FindNode(uint32_t id)
         break;
       }
     }
+    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_SCENE_GRAPH_TRAVELER", [&](std::ostringstream& oss) {
+      oss << "[" << mTravledNodeMap.size() << ",";
+      oss << "found:" << (node == nullptr ? 0 : 1) << "]";
+    });
   }
 
   return node;

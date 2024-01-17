@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,11 @@
 // CLASS HEADER
 #include <dali/internal/render/queue/render-queue.h>
 
+// EXTERNAL INCLUDES
+#include <sstream>
+
 // INTERNAL INCLUDES
+#include <dali/integration-api/trace.h>
 #include <dali/internal/common/message.h>
 
 namespace Dali
@@ -30,6 +34,8 @@ namespace // unnamed namespace
 static const std::size_t INITIAL_BUFFER_SIZE = 32768;
 static const std::size_t MAX_BUFFER_SIZE     = 32768;
 
+// TODO : The name of trace marker name is from VD specific. We might need to change it future.
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_COMBINED, false);
 } // unnamed namespace
 
 namespace SceneGraph
@@ -80,8 +86,11 @@ uint32_t* RenderQueue::ReserveMessageSlot(BufferIndex updateBufferIndex, std::si
 
 void RenderQueue::ProcessMessages(BufferIndex bufferIndex)
 {
+  DALI_TRACE_BEGIN(gTraceFilter, "DALI_RENDER_MESSAGE_QUEUE_PROCESS");
   std::size_t capacity = container0->GetCapacity() + container1->GetCapacity();
   mCapacity            = capacity; // write is atomic.
+
+  uint32_t messageCount = 0u;
 
   MessageBuffer* container = GetCurrentContainer(bufferIndex);
 
@@ -89,6 +98,7 @@ void RenderQueue::ProcessMessages(BufferIndex bufferIndex)
   {
     MessageBase* message = reinterpret_cast<MessageBase*>(iter.Get());
 
+    ++messageCount;
     message->Process(bufferIndex);
 
     // Call virtual destructor explictly; since delete will not be called after placement new
@@ -98,6 +108,9 @@ void RenderQueue::ProcessMessages(BufferIndex bufferIndex)
   container->Reset();
 
   LimitBufferCapacity(bufferIndex);
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_MESSAGE_QUEUE_PROCESS", [&](std::ostringstream& oss) {
+    oss << "[" << messageCount << "]";
+  });
 }
 
 MessageBuffer* RenderQueue::GetCurrentContainer(BufferIndex bufferIndex)

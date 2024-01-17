@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,13 @@
 // CLASS HEADER
 #include <dali/internal/update/queue/update-message-queue.h>
 
+// EXTERNAL INCLUDES
+#include <sstream>
+
 // INTERNAL INCLUDES
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/integration-api/render-controller.h>
+#include <dali/integration-api/trace.h>
 #include <dali/internal/common/message-buffer.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/render/common/performance-monitor.h>
@@ -48,6 +52,9 @@ typedef vector<MessageBuffer*> MessageBufferQueue;
 using MessageBufferIter = MessageBufferQueue::iterator;
 
 using MessageQueueMutex = Dali::Mutex;
+
+// TODO : The name of trace marker name is from VD specific. We might need to change it future.
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_COMBINED, false);
 
 } // unnamed namespace
 
@@ -210,6 +217,9 @@ bool MessageQueue::FlushQueue()
   {
     // queueMutex must be locked whilst accessing processQueue or recycleQueue
     MessageQueueMutex::ScopedLock lock(mImpl->queueMutex);
+    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MESSAGE_QUEUE_FLUSH", [&](std::ostringstream& oss) {
+      oss << "[capacity:" << mImpl->currentMessageBuffer->GetCapacity() << "]";
+    });
 
     mImpl->processQueue.push_back(mImpl->currentMessageBuffer);
     mImpl->currentMessageBuffer = nullptr;
@@ -237,6 +247,7 @@ bool MessageQueue::FlushQueue()
       mImpl->sceneUpdate |= 2;
       mImpl->sceneUpdateFlag = false;
     }
+    DALI_TRACE_END(gTraceFilter, "DALI_MESSAGE_QUEUE_FLUSH");
   }
 
   return messagesToProcess;
@@ -260,12 +271,19 @@ bool MessageQueue::ProcessMessages(BufferIndex updateBufferIndex)
     copiedProcessQueue = std::move(mImpl->processQueue); // Move message queue
   }
 
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_UPDATE_MESSAGE_QUEUE_PROCESS", [&](std::ostringstream& oss) {
+    oss << "[queueCount:" << copiedProcessQueue.size() << "]";
+  });
+
+  uint32_t messageCount = 0u;
+
   for(auto&& buffer : copiedProcessQueue)
   {
     for(MessageBuffer::Iterator bufferIter = buffer->Begin(); bufferIter.IsValid(); bufferIter.Next())
     {
       MessageBase* message = reinterpret_cast<MessageBase*>(bufferIter.Get());
 
+      ++messageCount;
       message->Process(updateBufferIndex);
 
       // Call virtual destructor explictly; since delete will not be called after placement new
@@ -280,6 +298,12 @@ bool MessageQueue::ProcessMessages(BufferIndex updateBufferIndex)
     mImpl->recycleQueue.insert(mImpl->recycleQueue.end(),
                                std::make_move_iterator(copiedProcessQueue.begin()),
                                std::make_move_iterator(copiedProcessQueue.end()));
+
+    // Note trace end inside of mutex, since we need to check recycleQueue size correct.
+    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_UPDATE_MESSAGE_QUEUE_PROCESS", [&](std::ostringstream& oss) {
+      oss << "[messageCount:" << messageCount << ",";
+      oss << "recycleQueueCount:" << mImpl->recycleQueue.size() << "]";
+    });
   }
 
   PERF_MONITOR_END(PerformanceMonitor::PROCESS_MESSAGES);

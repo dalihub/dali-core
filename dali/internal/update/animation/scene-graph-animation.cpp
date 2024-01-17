@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <cmath> // fmod
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/trace.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/render/common/performance-monitor.h>
 #include <dali/public-api/math/math-utils.h>
@@ -52,6 +53,9 @@ bool CompareAnimatorEndTimes(const Dali::Internal::SceneGraph::AnimatorBase* lhs
 {
   return ((lhs->GetIntervalDelay() + lhs->GetDuration()) < (rhs->GetIntervalDelay() + rhs->GetDuration()));
 }
+
+// TODO : The name of trace marker name is from VD specific. We might need to change it future.
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_COMBINED, false);
 
 } // unnamed namespace
 

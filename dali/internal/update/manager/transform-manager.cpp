@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@
 #include <dali/public-api/common/constants.h>
 
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/trace.h>
 
 namespace Dali
 {
@@ -77,6 +78,8 @@ inline void CalculateCenterPosition(
   }
 }
 
+// TODO : The name of trace marker name is from VD specific. We might need to change it future.
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_COMBINED, false);
 } // unnamed namespace
 
 TransformManager::TransformManager()
@@ -225,6 +228,7 @@ void TransformManager::ResetToBaseValue()
 {
   if(mComponentCount)
   {
+    DALI_TRACE_SCOPE(gTraceFilter, "DALI_TRANSFORM_RESET_TO_BASE");
     memcpy(&mTxComponentAnimatable[0], &mTxComponentAnimatableBaseValue[0], sizeof(TransformComponentAnimatable) * mComponentCount);
     memcpy(&mSize[0], &mSizeBase[0], sizeof(Vector3) * mComponentCount);
     memset(&mLocalMatrixDirty[0], false, sizeof(bool) * mComponentCount);
@@ -235,8 +239,13 @@ bool TransformManager::Update()
 {
   bool componentsChanged = false;
 
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_TRANSFORM_UPDATE", [&](std::ostringstream& oss) {
+    oss << "[" << mComponentCount << "]";
+  });
+
   if(mReorder)
   {
+    DALI_TRACE_SCOPE(gTraceFilter, "DALI_TRANSFORM_REORDER");
     //If some transform component has change its parent or has been removed since last update
     //we need to reorder the vectors
     ReorderComponents();
@@ -281,15 +290,15 @@ bool TransformManager::Update()
         // Compute intermediate Local information
         CalculateCenterPosition(centerPosition, mTxComponentStatic[i], mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, mSize[i], half, topLeft);
         Vector3 intermediateLocalPosition = mTxComponentAnimatable[i].mPosition + centerPosition + (mTxComponentStatic[i].mParentOrigin - half) * mSize[parentIndex];
-        Matrix intermediateLocalMatrix;
+        Matrix  intermediateLocalMatrix;
         intermediateLocalMatrix.SetTransformComponents(mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, intermediateLocalPosition);
 
         // Compute intermediate world information
         Matrix intermediateWorldMatrix;
         MatrixUtils::MultiplyTransformMatrix(intermediateWorldMatrix, intermediateLocalMatrix, mWorld[parentIndex]);
 
-        Vector3       intermediateWorldPosition, intermediateWorldScale;
-        Quaternion    intermediateWorldOrientation;
+        Vector3    intermediateWorldPosition, intermediateWorldScale;
+        Quaternion intermediateWorldOrientation;
         intermediateWorldMatrix.GetTransformComponents(intermediateWorldPosition, intermediateWorldOrientation, intermediateWorldScale);
 
         // Compute final world information
@@ -356,6 +365,10 @@ bool TransformManager::Update()
     componentsChanged  = componentsChanged || mComponentDirty[i];
     mComponentDirty[i] = false;
   }
+
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_TRANSFORM_UPDATE", [&](std::ostringstream& oss) {
+    oss << "[componentsChanged:" << componentsChanged << "]";
+  });
 
   return componentsChanged;
 }

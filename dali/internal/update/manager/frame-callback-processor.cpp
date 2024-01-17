@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,11 @@
 // EXTERNAL INCLUDES
 #include <algorithm>
 
+#ifdef TRACE_ENABLED
+#include <chrono>
+#include <cmath>
+#endif
+
 // INTERNAL INCLUDES
 #include <dali/devel-api/update/frame-callback-interface.h>
 #include <dali/devel-api/update/update-proxy.h>
@@ -30,6 +35,18 @@
 namespace
 {
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
+
+#ifdef TRACE_ENABLED
+uint64_t GetNanoSeconds()
+{
+  // Get the time of a monotonic clock since its epoch.
+  auto epoch = std::chrono::steady_clock::now().time_since_epoch();
+
+  auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(epoch);
+
+  return static_cast<uint64_t>(duration.count());
+}
+#endif
 } // namespace
 
 namespace Dali
@@ -83,7 +100,9 @@ bool FrameCallbackProcessor::Update(BufferIndex bufferIndex, float elapsedSecond
 
   if(mNodeHierarchyChanged)
   {
-    DALI_LOG_DEBUG_INFO("Node hierarchy changed. Update traveler map\n");
+    DALI_LOG_DEBUG_INFO("Node hierarchy changed. Update traveler map [%zu]\n", mTravelerMap.size());
+    uint32_t removedCount      = 0u;
+    uint32_t cacheClearedCount = 0u;
     // Clear node traveler
     for(auto iter = mTravelerMap.begin(); iter != mTravelerMap.end();)
     {
@@ -92,16 +111,19 @@ bool FrameCallbackProcessor::Update(BufferIndex bufferIndex, float elapsedSecond
       if(iter->second->IsInvalidated() || iter->second->ReferenceCount() == 1u)
       {
         iter = mTravelerMap.erase(iter);
+        ++removedCount;
       }
       else
       {
         if(iter->first->IsDescendentHierarchyChanged())
         {
           iter->second->NodeHierarchyChanged();
+          ++cacheClearedCount;
         }
         ++iter;
       }
     }
+    DALI_LOG_DEBUG_INFO("Update traveler map Finished [%zu] removed:%zu, updated:%zu\n", mTravelerMap.size(), removedCount, cacheClearedCount);
   }
 
   if(!mFrameCallbacks.empty())
@@ -110,17 +132,41 @@ bool FrameCallbackProcessor::Update(BufferIndex bufferIndex, float elapsedSecond
       oss << "[" << mFrameCallbacks.size() << "]";
     });
 
+#ifdef TRACE_ENABLED
+    std::vector<std::pair<uint64_t, uint32_t>> frameCallbackTimeChecker;
+
+    uint32_t frameIndex = 0u;
+#endif
+
     // If any of the FrameCallback::Update calls returns false, then they are no longer required & can be removed.
     auto iter = std::remove_if(
       mFrameCallbacks.begin(), mFrameCallbacks.end(), [&](OwnerPointer<FrameCallback>& frameCallback) {
+#ifdef TRACE_ENABLED
+        uint64_t start = GetNanoSeconds();
+#endif
         FrameCallback::RequestFlags requests = frameCallback->Update(bufferIndex, elapsedSeconds, mNodeHierarchyChanged);
+#ifdef TRACE_ENABLED
+        uint64_t end = GetNanoSeconds();
+        frameCallbackTimeChecker.emplace_back(end - start, ++frameIndex);
+#endif
         keepRendering |= (requests & FrameCallback::KEEP_RENDERING);
         return (requests & FrameCallback::CONTINUE_CALLING) == 0;
       });
     mFrameCallbacks.erase(iter, mFrameCallbacks.end());
 
     DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_FRAME_CALLBACK_UPDATE", [&](std::ostringstream& oss) {
-      oss << "[" << mFrameCallbacks.size() << "]";
+      oss << "[" << mFrameCallbacks.size() << ",";
+
+      std::sort(frameCallbackTimeChecker.rbegin(), frameCallbackTimeChecker.rend());
+      auto topCount = std::min(5u, static_cast<uint32_t>(frameCallbackTimeChecker.size()));
+
+      oss << "top" << topCount << "[";
+      for(auto i = 0u; i < topCount; ++i)
+      {
+        oss << "(" << static_cast<float>(frameCallbackTimeChecker[i].first) / 1000000.0f << "ms,";
+        oss << frameCallbackTimeChecker[i].second << ")";
+      }
+      oss << "]";
     });
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <dali/internal/render/common/render-algorithms.h>
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/trace.h>
 #include <dali/internal/render/common/render-debug.h>
 #include <dali/internal/render/common/render-instruction.h>
 #include <dali/internal/render/common/render-list.h>
@@ -390,6 +391,8 @@ inline void SetupDepthBuffer(const RenderItem& item, Graphics::CommandBuffer& co
   }
 }
 
+// TODO : The name of trace marker name is from VD specific. We might need to change it future.
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_COMBINED, false);
 } // Unnamed namespace
 
 /**
@@ -645,6 +648,11 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
   // Prepare Render::Renderer Render for this secondary command buffer.
   Renderer::PrepareCommandBuffer();
 
+  uint32_t renderCallCount = 0u;
+
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_LIST_PROCESS", [&](std::ostringstream& oss) {
+    oss << "[" << count << "]";
+  });
   // Loop through all RenderItems in the RenderList, set up any prerequisites to render them, then perform the render.
   for(uint32_t index = 0u; index < count; ++index)
   {
@@ -697,10 +705,14 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
         {
           // Render the item. It will write into the command buffer everything it has to render
           item.mRenderer->Render(secondaryCommandBuffer, bufferIndex, *item.mNode, item.mModelMatrix, item.mModelViewMatrix, viewMatrix, projectionMatrix, item.mScale, item.mSize, !item.mIsOpaque, instruction, queue);
+          ++renderCallCount;
         }
       }
     }
   }
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_LIST_PROCESS", [&](std::ostringstream& oss) {
+    oss << "[renderCallCount:" << renderCallCount << "]";
+  });
 }
 
 RenderAlgorithms::RenderAlgorithms(Graphics::Controller& graphicsController)
@@ -744,6 +756,9 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
                                                 int                                 orientation,
                                                 const Uint16Pair&                   sceneSize)
 {
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_INSTRUCTION_PROCESS", [&](std::ostringstream& oss) {
+    oss << "[" << instruction.RenderListCount() << "]";
+  });
   DALI_PRINT_RENDER_INSTRUCTION(instruction, bufferIndex);
 
   const Matrix* viewMatrix       = instruction.GetViewMatrix(bufferIndex);
@@ -790,6 +805,7 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
       mGraphicsCommandBuffer->ExecuteCommandBuffers(std::move(buffers));
     }
   }
+  DALI_TRACE_END(gTraceFilter, "DALI_RENDER_INSTRUCTION_PROCESS");
 }
 
 } // namespace Render

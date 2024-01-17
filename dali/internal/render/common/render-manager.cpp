@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/threading/thread-pool.h>
 #include <dali/integration-api/core.h>
+#include <dali/integration-api/trace.h>
 #include <dali/internal/common/ordered-set.h>
 
 #include <dali/internal/event/common/scene-impl.h>
@@ -127,6 +128,9 @@ inline void AlignDamagedRect(Rect<int32_t>& rect)
   rect.width       = ((right + 16) / 16) * 16 - rect.x;
   rect.height      = ((bottom + 16) / 16) * 16 - rect.y;
 }
+
+// TODO : The name of trace marker name is from VD specific. We might need to change it future.
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_COMBINED, false);
 } // namespace
 
 /**
@@ -481,6 +485,8 @@ void RenderManager::RemoveRenderTracker(Render::RenderTracker* renderTracker)
 
 void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear)
 {
+  DALI_TRACE_BEGIN(gTraceFilter, "DALI_RENDER_PRE_RENDER");
+
   DALI_PRINT_RENDER_START(mImpl->renderBufferIndex);
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "\n\nNewFrame %d\n", mImpl->frameCount);
 
@@ -525,6 +531,10 @@ void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear
   */
 
   mImpl->commandBufferSubmitted = false;
+
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_PRE_RENDER", [&](std::ostringstream& oss) {
+    oss << "[" << totalInstructionCount << "]";
+  });
 }
 
 void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>& damagedRects)
@@ -596,6 +606,12 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
     itemsDirtyRects.clear();
     return;
   }
+
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_DIRTY_RECT", [&](std::ostringstream& oss) {
+    oss << "[" << itemsDirtyRects.size() << "]";
+  });
+
+  uint32_t renderItemCount = 0u;
 
   // Mark previous dirty rects in the std::unordered_map.
   for(auto& dirtyRectPair : itemsDirtyRects)
@@ -671,6 +687,8 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
           if(!renderList->IsEmpty())
           {
             const std::size_t listCount = renderList->Count();
+            renderItemCount += listCount;
+
             for(uint32_t listIndex = 0u; listIndex < listCount; ++listIndex)
             {
               RenderItem& item = renderList->GetItem(listIndex);
@@ -785,6 +803,11 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
   {
     damagedRectCleaner.SetCleanOnReturn(false);
   }
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_DIRTY_RECT", [&](std::ostringstream& oss) {
+    oss << "[" << itemsDirtyRects.size() << ",";
+    oss << "itemCount:" << renderItemCount << ",";
+    oss << "damagedRects:" << damagedRects.size() << "]";
+  });
 }
 
 void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo)
@@ -834,6 +857,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     clippingRect = Rect<int>();
   }
 
+  DALI_TRACE_BEGIN(gTraceFilter, "DALI_RENDER_UBO");
   // Prefetch programs before we start rendering so reflection is
   // ready, and we can pull exact size of UBO needed (no need to resize during drawing)
   auto totalSizeCPU = 0u;
@@ -903,6 +927,10 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "GPU buffer: nil\n");
   }
 #endif
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_UBO", [&](std::ostringstream& oss) {
+    oss << "[cpuMemory:" << totalSizeCPU << ",";
+    oss << "gpuMemory:" << totalSizeGPU << "]";
+  });
 
   for(uint32_t i = 0; i < instructionCount; ++i)
   {
@@ -1104,6 +1132,10 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     mainCommandBuffer->EndRenderPass(syncObject);
   }
 
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_FINISHED", [&](std::ostringstream& oss) {
+    oss << "[" << targetstoPresent.size() << "]";
+  });
+
   // Flush UBOs
   mImpl->uniformBufferManager->Flush(sceneObject, renderToFbo);
   mImpl->renderAlgorithms.SubmitCommandBuffer();
@@ -1120,6 +1152,8 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       rt = target;
     }
   }
+
+  DALI_TRACE_END(gTraceFilter, "DALI_RENDER_FINISHED");
 }
 
 void RenderManager::PostRender()
@@ -1136,17 +1170,31 @@ void RenderManager::PostRender()
   }
 
   // Notify RenderGeometries that rendering has finished
-  for(auto&& iter : mImpl->geometryContainer)
+  if(mImpl->geometryContainer.Count() > 0u)
   {
-    iter->OnRenderFinished();
+    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_GEOMETRY_RENDER_FINISHED", [&](std::ostringstream& oss) {
+      oss << "[" << mImpl->geometryContainer.Count() << "]";
+    });
+    for(auto&& iter : mImpl->geometryContainer)
+    {
+      iter->OnRenderFinished();
+    }
+    DALI_TRACE_END(gTraceFilter, "DALI_GEOMETRY_RENDER_FINISHED");
   }
 
   // Notify updated RenderTexture that rendering has finished
-  for(auto&& iter : mImpl->updatedTextures)
+  if(mImpl->updatedTextures.Count() > 0u)
   {
-    iter->OnRenderFinished();
+    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_TEXTURE_UPDATED", [&](std::ostringstream& oss) {
+      oss << "[" << mImpl->updatedTextures.Count() << "]";
+    });
+    for(auto&& iter : mImpl->updatedTextures)
+    {
+      iter->OnRenderFinished();
+    }
+    mImpl->updatedTextures.Clear();
+    DALI_TRACE_END(gTraceFilter, "DALI_TEXTURE_UPDATED");
   }
-  mImpl->updatedTextures.Clear();
 
   // Remove discarded textures after OnRenderFinished called
   mImpl->textureDiscardQueue.Clear();

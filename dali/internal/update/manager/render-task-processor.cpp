@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/trace.h>
 #include <dali/internal/render/common/render-instruction-container.h>
 #include <dali/internal/render/common/render-instruction.h>
 #include <dali/internal/render/common/render-item.h>
@@ -42,6 +43,9 @@ namespace SceneGraph
 {
 namespace // Unnamed namespace
 {
+// TODO : The name of trace marker name is from VD specific. We might need to change it future.
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_COMBINED, false);
+
 // Return false if the node or it's parents are exclusive to another render-task.
 bool CheckExclusivity(const Node& node, const RenderTask& task)
 {
@@ -214,6 +218,7 @@ void ProcessTasks(BufferIndex                          updateBufferIndex,
                   bool                                 isRenderingToFbo,
                   bool                                 processOffscreen)
 {
+  DALI_TRACE_SCOPE(gTraceFilter, "DALI_TASK_PROCESS");
   uint32_t clippingId       = 0u;
   bool     hasClippingNodes = false;
 
