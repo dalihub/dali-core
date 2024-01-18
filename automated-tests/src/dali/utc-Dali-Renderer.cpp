@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -5069,5 +5069,145 @@ int UtcDaliRendererUniformBlocksUnregisterScene01(void)
   namedParams["id"] << 6;
   DALI_TEST_CHECK(gl.mBufferTrace.FindMethodAndParams("DeleteBuffers", namedParams));
 
+  END_TEST;
+}
+
+int UtcDaliRendererUniformNameCrop(void)
+{
+  TestApplication application;
+  tet_infoline("Tests against reflection cropping one character too many form array uniform name.\n");
+
+  auto& graphics = application.GetGraphicsController();
+
+  auto uniforms = std::vector<UniformData>{
+    {"uSomeColor", Dali::Property::Type::FLOAT},
+    {"uSomeColors[10]", Dali::Property::Type::FLOAT}};
+  graphics.AddCustomUniforms(uniforms);
+
+  auto& gl = application.GetGlAbstraction();
+  graphics.mCallStack.EnableLogging(true);
+  graphics.mCommandBufferCallStack.EnableLogging(true);
+  gl.mBufferTrace.EnableLogging(true);
+  gl.mBufferTrace.Enable(true);
+
+  gl.mSetUniformTrace.EnableLogging(true);
+  gl.mSetUniformTrace.Enable(true);
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader   shader   = Shader::New("vertexSrc", "fragmentSrc");
+  Renderer renderer = Renderer::New(geometry, shader);
+  Actor    actor    = Actor::New();
+  actor.AddRenderer(renderer);
+  actor[Actor::Property::SIZE] = Vector2(120, 120);
+  application.GetScene().Add(actor);
+
+  std::ostringstream oss;
+  struct UniformIndexPair
+  {
+    Property::Index index;
+    std::string     name;
+    UniformIndexPair(Property::Index index, std::string name)
+    : index(index),
+      name(std::move(name))
+    {
+    }
+  };
+  std::vector<UniformIndexPair> uniformIndices;
+  for(int i = 0; i < 10; ++i)
+  {
+    Property::Index index;
+    oss << "uArray[" << i + 1 << "]";
+    auto value = float(i);
+    index      = renderer.RegisterProperty(oss.str(), value);
+    uniformIndices.emplace_back(index, oss.str());
+    oss.str("");
+    oss.clear();
+  }
+
+  // Cause overwrite, index 10 and uToOverflow should share same memory
+  [[maybe_unused]] auto badArrayIndex  = renderer.RegisterProperty("uSomeColor", 100.0f);
+  [[maybe_unused]] auto badArrayIndex2 = renderer.RegisterProperty("uSomeColors[0]", 200.0f);
+
+  application.GetScene().Add(actor);
+  application.SendNotification();
+  application.Render(0);
+
+  float value = 0.0f;
+  gl.GetUniformValue("uSomeColor", value);
+
+  // Test against the bug when name is one character short and array may be mistaken for
+  // an individual uniform of the same name minut 1 character.
+  DALI_TEST_EQUALS(value, 100.0f, std::numeric_limits<float>::epsilon(), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliRendererUniformArrayOverflow(void)
+{
+  TestApplication application;
+  tet_infoline("Overflow test whether uColor uniform would be overriden by array with out-of-bound index.\n");
+
+  auto& graphics = application.GetGraphicsController();
+  auto  uniforms = std::vector<UniformData>{{"uArray[10]", Dali::Property::Type::FLOAT}};
+
+  graphics.AddCustomUniforms(uniforms);
+
+  auto& gl = application.GetGlAbstraction();
+  graphics.mCallStack.EnableLogging(true);
+  graphics.mCommandBufferCallStack.EnableLogging(true);
+  gl.mBufferTrace.EnableLogging(true);
+  gl.mBufferTrace.Enable(true);
+
+  gl.mSetUniformTrace.EnableLogging(true);
+  gl.mSetUniformTrace.Enable(true);
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader   shader   = Shader::New("vertexSrc", "fragmentSrc");
+  Renderer renderer = Renderer::New(geometry, shader);
+  Actor    actor    = Actor::New();
+  actor.AddRenderer(renderer);
+  actor[Actor::Property::SIZE] = Vector2(120, 120);
+  application.GetScene().Add(actor);
+
+  std::ostringstream oss;
+  struct UniformIndexPair
+  {
+    Property::Index index;
+    std::string     name;
+    UniformIndexPair(Property::Index index, std::string name)
+    : index(index),
+      name(std::move(name))
+    {
+    }
+  };
+  std::vector<UniformIndexPair> uniformIndices;
+  for(int i = 0; i < 10; ++i)
+  {
+    Property::Index index;
+    oss << "uArray[" << i << "]";
+    auto value = float(i);
+    index      = renderer.RegisterProperty(oss.str(), value);
+    uniformIndices.emplace_back(index, oss.str());
+    oss.str("");
+    oss.clear();
+  }
+
+  // Cause overwrite, index 10 and uToOverflow should share same memory
+  [[maybe_unused]] auto badArrayIndex = renderer.RegisterProperty("uArray[10]", 0.0f);
+
+  application.GetScene().Add(actor);
+  application.SendNotification();
+  application.Render(0);
+
+  Vector4 uniformColor = Vector4::ZERO;
+  gl.GetUniformValue("uColor", uniformColor);
+  tet_printf("uColor value %f, %f, %f, %f\n",
+             uniformColor.r,
+             uniformColor.g,
+             uniformColor.b,
+             uniformColor.a);
+
+  // the r component of uColor uniform must not be changed.
+  // if r is 0.0f then test fails as the array stomped on the uniform's memory.
+  DALI_TEST_EQUALS((uniformColor.r != 0.0f), true, TEST_LOCATION);
   END_TEST;
 }
