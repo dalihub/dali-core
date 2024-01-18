@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -225,11 +225,14 @@ bool Program::GetUniform(const std::string_view& name, Hash hashedName, Hash has
   Hash             hash  = hashedName;
   std::string_view match = name;
 
+  int arrayIndex = 0;
+
   if(!name.empty() && name.back() == ']')
   {
-    hash     = hashedNameNoArray;
-    auto pos = name.rfind("[");
-    match    = name.substr(0, pos - 1); // Remove subscript
+    hash       = hashedNameNoArray;
+    auto pos   = name.rfind("[");
+    match      = name.substr(0, pos); // Remove subscript
+    arrayIndex = atoi(&name[pos + 1]);
   }
 
   for(const ReflectionUniformInfo& item : mReflection)
@@ -239,6 +242,16 @@ bool Program::GetUniform(const std::string_view& name, Hash hashedName, Hash has
       if(!item.hasCollision || item.uniformInfo.name == match)
       {
         out = item.uniformInfo;
+
+        // Array out of bounds
+        if(item.uniformInfo.elementCount > 0 && arrayIndex >= int(item.uniformInfo.elementCount))
+        {
+          DALI_LOG_ERROR("Uniform %s, array index out of bound [%d >= %d]!\n",
+                         item.uniformInfo.name.c_str(),
+                         int(arrayIndex),
+                         int(item.uniformInfo.elementCount));
+          return false;
+        }
         return true;
       }
       else

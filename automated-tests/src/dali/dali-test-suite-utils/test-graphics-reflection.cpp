@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ namespace
 {
 static const std::vector<UniformData> UNIFORMS =
   {
+    UniformData("uColor", Property::Type::VECTOR4),
     UniformData("uRendererColor", Property::Type::FLOAT),
     UniformData("uCustom", Property::Type::INTEGER),
     UniformData("uCustom3", Property::Type::VECTOR3),
@@ -47,7 +48,6 @@ static const std::vector<UniformData> UNIFORMS =
     UniformData("sTexture", Property::Type::FLOAT),
     UniformData("sTextureRect", Property::Type::FLOAT),
     UniformData("sGloss", Property::Type::FLOAT),
-    UniformData("uColor", Property::Type::VECTOR4),
     UniformData("uActorColor", Property::Type::VECTOR4),
     UniformData("uModelMatrix", Property::Type::MATRIX),
     UniformData("uModelView", Property::Type::MATRIX),
@@ -140,19 +140,6 @@ TestGraphicsReflection::TestGraphicsReflection(TestGraphicsController& controlle
   mDefaultUniformBlock.members.clear();
 
   int offset = 0;
-  for(const auto& data : UNIFORMS)
-  {
-    mDefaultUniformBlock.members.emplace_back();
-    auto& item   = mDefaultUniformBlock.members.back();
-    item.name    = data.name;
-    item.binding = 0;
-    item.offsets.push_back(offset);
-    item.locations.push_back(gl.GetUniformLocation(programId, data.name.c_str()));
-    item.bufferIndex  = 0;
-    item.uniformClass = Graphics::UniformClass::UNIFORM;
-    item.type         = data.type;
-    offset += GetSizeForType(data.type);
-  }
 
   for(const auto& data : mCustomUniforms)
   {
@@ -233,6 +220,21 @@ TestGraphicsReflection::TestGraphicsReflection(TestGraphicsController& controlle
       offset += GetSizeForType(data.type);
     }
   }
+
+  for(const auto& data : UNIFORMS)
+  {
+    mDefaultUniformBlock.members.emplace_back();
+    auto& item   = mDefaultUniformBlock.members.back();
+    item.name    = data.name;
+    item.binding = 0;
+    item.offsets.push_back(offset);
+    item.locations.push_back(gl.GetUniformLocation(programId, data.name.c_str()));
+    item.bufferIndex  = 0;
+    item.uniformClass = Graphics::UniformClass::UNIFORM;
+    item.type         = data.type;
+    offset += GetSizeForType(data.type);
+  }
+
   mDefaultUniformBlock.size = offset;
 
   mUniformBlocks.push_back(mDefaultUniformBlock);
@@ -329,6 +331,7 @@ bool TestGraphicsReflection::GetUniformBlock(uint32_t index, Dali::Graphics::Uni
     out.members[i].uniformClass = Graphics::UniformClass::UNIFORM;
     out.members[i].offset       = memberUniform.offsets[0];
     out.members[i].location     = memberUniform.locations[0];
+    out.members[i].elementCount = memberUniform.numElements;
   }
 
   return true;
