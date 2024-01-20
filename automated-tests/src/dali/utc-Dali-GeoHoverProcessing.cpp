@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -368,7 +368,7 @@ int UtcDaliGeoHoverParentConsumer(void)
 {
   TestApplication application;
   application.GetScene().SetGeometryHittestEnabled(true);
-  Actor           rootActor(application.GetScene().GetRootLayer());
+  Actor rootActor(application.GetScene().GetRootLayer());
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -469,7 +469,7 @@ int UtcDaliGeoHoverInterruptedParentConsumer(void)
 {
   TestApplication application;
   application.GetScene().SetGeometryHittestEnabled(true);
-  Actor           rootActor(application.GetScene().GetRootLayer());
+  Actor rootActor(application.GetScene().GetRootLayer());
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -595,7 +595,7 @@ int UtcDaliGeoHoverLeaveParentConsumer(void)
 {
   TestApplication application;
   application.GetScene().SetGeometryHittestEnabled(true);
-  Actor           rootActor(application.GetScene().GetRootLayer());
+  Actor rootActor(application.GetScene().GetRootLayer());
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -705,7 +705,7 @@ int UtcDaliGeoHoverActorBecomesInsensitiveParentConsumer(void)
 {
   TestApplication application;
   application.GetScene().SetGeometryHittestEnabled(true);
-  Actor           rootActor(application.GetScene().GetRootLayer());
+  Actor rootActor(application.GetScene().GetRootLayer());
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -803,7 +803,7 @@ int UtcDaliGeoHoverMultipleLayers(void)
 {
   TestApplication application;
   application.GetScene().SetGeometryHittestEnabled(true);
-  Actor           rootActor(application.GetScene().GetRootLayer());
+  Actor rootActor(application.GetScene().GetRootLayer());
 
   // Connect to actor's hovered signal
   SignalData        data;
@@ -927,7 +927,7 @@ int UtcDaliGeoHoverMultipleLayers(void)
 
 int UtcDaliGeoHoverMultipleRenderTasks(void)
 {
-  TestApplication    application;
+  TestApplication application;
   application.GetScene().SetGeometryHittestEnabled(true);
   Integration::Scene stage(application.GetScene());
   Vector2            stageSize(stage.GetSize());
@@ -973,7 +973,7 @@ int UtcDaliGeoHoverMultipleRenderTasks(void)
 
 int UtcDaliGeoHoverMultipleRenderTasksWithChildLayer(void)
 {
-  TestApplication    application;
+  TestApplication application;
   application.GetScene().SetGeometryHittestEnabled(true);
   Integration::Scene stage(application.GetScene());
   Vector2            stageSize(stage.GetSize());
@@ -1026,7 +1026,7 @@ int UtcDaliGeoHoverMultipleRenderTasksWithChildLayer(void)
 
 int UtcDaliGeoHoverOffscreenRenderTasks(void)
 {
-  TestApplication    application;
+  TestApplication application;
   application.GetScene().SetGeometryHittestEnabled(true);
   Integration::Scene stage(application.GetScene());
   Vector2            stageSize(stage.GetSize());
@@ -1077,7 +1077,7 @@ int UtcDaliGeoHoverOffscreenRenderTasks(void)
 
 int UtcDaliGeoHoverMultipleRenderableActors(void)
 {
-  TestApplication    application;
+  TestApplication application;
   application.GetScene().SetGeometryHittestEnabled(true);
   Integration::Scene stage(application.GetScene());
   Vector2            stageSize(stage.GetSize());
@@ -1249,7 +1249,7 @@ int UtcDaliGeoHoverActorUnStaged(void)
 
 int UtcDaliGeoHoverLeaveActorReadded(void)
 {
-  TestApplication    application;
+  TestApplication application;
   application.GetScene().SetGeometryHittestEnabled(true);
   Integration::Scene stage = application.GetScene();
 
@@ -1296,7 +1296,7 @@ int UtcDaliGeoHoverLeaveActorReadded(void)
 
 int UtcDaliGeoHoverClippingActor(void)
 {
-  TestApplication    application;
+  TestApplication application;
   application.GetScene().SetGeometryHittestEnabled(true);
   Integration::Scene stage = application.GetScene();
 
@@ -1349,7 +1349,7 @@ int UtcDaliGeoHoverClippingActor(void)
 
 int UtcDaliGeoHoverActorHide(void)
 {
-  TestApplication    application;
+  TestApplication application;
   application.GetScene().SetGeometryHittestEnabled(true);
   Integration::Scene stage = application.GetScene();
 
@@ -1382,6 +1382,64 @@ int UtcDaliGeoHoverActorHide(void)
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(PointState::INTERRUPTED, data.hoverEvent.GetState(0), TEST_LOCATION);
   data.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliGeoHoverEnsureDifferentConsumerReceivesInterrupted(void)
+{
+  // Interrupted event with a different consumer to previous event
+
+  TestApplication    application;
+  Integration::Scene scene = application.GetScene();
+  scene.SetGeometryHittestEnabled(true);
+
+  Actor parent = Actor::New();
+  parent.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  parent.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  scene.Add(parent);
+
+  Actor child = Actor::New();
+  child.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  child.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parent.Add(child);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to parent's hover signal
+  SignalData        dataParent;
+  HoverEventFunctor functorParent(dataParent);
+  parent.HoveredSignal().Connect(&application, functorParent);
+
+  // Connect to child's hovered signal but do not consume
+  SignalData        dataChildNoConsume;
+  HoverEventFunctor functorChildNoConsume(dataChildNoConsume, false);
+  child.HoveredSignal().Connect(&application, functorChildNoConsume);
+
+  // Create a functor to consume the event of the child, but don't connect just yet
+  SignalData        dataChildConsume;
+  HoverEventFunctor functorChildConsume(dataChildConsume);
+
+  auto resetData = [&]() { dataParent.Reset(); dataChildNoConsume.Reset(); dataChildConsume.Reset(); };
+
+  // Emit a started
+  application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(10.0f, 10.0f)));
+  DALI_TEST_EQUALS(true, dataParent.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, dataChildNoConsume.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, dataChildConsume.functorCalled, TEST_LOCATION);
+  resetData();
+
+  // Connect to child's hover event and consume so it's a different consumer on interrupted
+  child.HoveredSignal().Connect(&application, functorChildConsume);
+
+  // Emit interrupted, all three methods should be called
+  application.ProcessEvent(GenerateSingleHover(PointState::INTERRUPTED, Vector2(10.0f, 10.0f)));
+  DALI_TEST_EQUALS(true, dataParent.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, dataChildNoConsume.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, dataChildConsume.functorCalled, TEST_LOCATION);
+  resetData();
 
   END_TEST;
 }

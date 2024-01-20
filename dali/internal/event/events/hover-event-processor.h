@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_HOVER_EVENT_PROCESSOR_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,13 +72,13 @@ public:
    */
   void SendInterruptedHoverEvent(Dali::Internal::Actor* actor);
 
+  // Movable but not copyable
+  HoverEventProcessor(const HoverEventProcessor&) = delete;
+  HoverEventProcessor(HoverEventProcessor&&)      = default;
+  HoverEventProcessor& operator=(const HoverEventProcessor&) = delete;
+  HoverEventProcessor& operator=(HoverEventProcessor&&) = default;
+
 private:
-  // Undefined
-  HoverEventProcessor(const HoverEventProcessor&);
-
-  // Undefined
-  HoverEventProcessor& operator=(const HoverEventProcessor& rhs);
-
   /**
    * Clears the value.
    */
@@ -90,13 +90,15 @@ private:
    */
   void OnObservedActorDisconnected(Dali::Internal::Actor* actor);
 
-  Scene&        mScene;                                       ///< Reference to the scene
-  ActorObserver mLastPrimaryHitActor;                         ///< Stores the last primary point hit actor
-  ActorObserver mLastConsumedActor;                           ///< Stores the last consumed actor
-  ActorObserver mHoverStartConsumedActor;                     ///< Stores the hover-start consumed actor
-  RenderTaskPtr mLastRenderTask;                              ///< The RenderTask used for the last hit actor
+  Scene&                            mScene;                   ///< Reference to the scene
+  ActorObserver                     mLastPrimaryHitActor;     ///< Stores the last primary point hit actor
+  ActorObserver                     mLastConsumedActor;       ///< Stores the last consumed actor
+  ActorObserver                     mHoverStartConsumedActor; ///< Stores the hover-start consumed actor
+  RenderTaskPtr                     mLastRenderTask;          ///< The RenderTask used for the last hit actor
   std::list<Dali::Internal::Actor*> mCandidateActorLists;     ///< Stores a list of actors that can be touched, from leaf actor to root.
-  std::list<Dali::Internal::Actor*> mLastActorLists;     ///< Stores a list of actors that can be touched, from leaf actor to root.
+  std::list<Dali::Internal::Actor*> mLastActorLists;          ///< Stores a list of actors that can be touched, from leaf actor to root.
+
+  struct Impl;
 };
 
 } // namespace Internal

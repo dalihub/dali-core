@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -559,13 +559,52 @@ int UtcDaliGeoTouchEventInterrupted(void)
   END_TEST;
 }
 
+int UtcDaliGeoTouchEventNotConsumedInterrupted(void)
+{
+  TestApplication application;
+
+  application.GetScene().SetGeometryHittestEnabled(true);
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's touched signal
+  SignalData        data;
+  TouchEventFunctor functor(data, false);
+  actor.TouchedSignal().Connect(&application, functor);
+
+  // Emit a down signal
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::DOWN, data.receivedTouch.points[0].state, TEST_LOCATION);
+  data.Reset();
+
+  // Emit an interrupted signal, we should be signalled regardless of whether there is a hit or not even though we didn't consume
+  // as we still were the hit-actor in the last event.
+  application.ProcessEvent(GenerateSingleTouch(PointState::INTERRUPTED, Vector2(200.0f, 200.0f /* Outside actor */)));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::INTERRUPTED, data.receivedTouch.points[0].state, TEST_LOCATION);
+  data.Reset();
+
+  // Emit another interrupted signal, our signal handler should not be called.
+  application.ProcessEvent(GenerateSingleTouch(PointState::INTERRUPTED, Vector2(200.0f, 200.0f)));
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  END_TEST;
+}
+
 int UtcDaliGeoTouchEventParentConsumer(void)
 {
   TestApplication application;
 
   application.GetScene().SetGeometryHittestEnabled(true);
 
-  Actor           rootActor(application.GetScene().GetRootLayer());
+  Actor rootActor(application.GetScene().GetRootLayer());
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -658,7 +697,7 @@ int UtcDaliGeoTouchEventInterruptedParentConsumer(void)
 
   application.GetScene().SetGeometryHittestEnabled(true);
 
-  Actor           rootActor(application.GetScene().GetRootLayer());
+  Actor rootActor(application.GetScene().GetRootLayer());
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -776,7 +815,7 @@ int UtcDaliGeoTouchEventActorBecomesInsensitiveParentConsumer(void)
 
   application.GetScene().SetGeometryHittestEnabled(true);
 
-  Actor           rootActor(application.GetScene().GetRootLayer());
+  Actor rootActor(application.GetScene().GetRootLayer());
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -867,7 +906,7 @@ int UtcDaliGeoTouchEventMultipleLayers(void)
 
   application.GetScene().SetGeometryHittestEnabled(true);
 
-  Actor           rootActor(application.GetScene().GetRootLayer());
+  Actor rootActor(application.GetScene().GetRootLayer());
 
   // Connect to actor's touched signal
   SignalData        data;
@@ -994,10 +1033,9 @@ int UtcDaliGeoTouchEventMultipleLayers(void)
 
 int UtcDaliGeoTouchEventMultipleRenderTasks(void)
 {
-  TestApplication    application;
+  TestApplication application;
 
   application.GetScene().SetGeometryHittestEnabled(true);
-
 
   Integration::Scene scene(application.GetScene());
   Vector2            sceneSize(scene.GetSize());
@@ -1045,7 +1083,7 @@ int UtcDaliGeoTouchEventMultipleRenderTasks(void)
 
 int UtcDaliGeoTouchEventMultipleRenderTasksWithChildLayer(void)
 {
-  TestApplication    application;
+  TestApplication application;
 
   application.GetScene().SetGeometryHittestEnabled(true);
 
@@ -1102,7 +1140,7 @@ int UtcDaliGeoTouchEventMultipleRenderTasksWithChildLayer(void)
 
 int UtcDaliGeoTouchEventOffscreenRenderTasks(void)
 {
-  TestApplication    application;
+  TestApplication application;
 
   application.GetScene().SetGeometryHittestEnabled(true);
 
@@ -1155,7 +1193,7 @@ int UtcDaliGeoTouchEventOffscreenRenderTasks(void)
 
 int UtcDaliGeoTouchEventMultipleRenderableActors(void)
 {
-  TestApplication    application;
+  TestApplication application;
 
   application.GetScene().SetGeometryHittestEnabled(true);
 
@@ -1636,7 +1674,7 @@ int UtcDaliGeoTouchEventInterruptedDifferentConsumer(void)
 
   application.GetScene().SetGeometryHittestEnabled(true);
 
-  Actor           rootActor(application.GetScene().GetRootLayer());
+  Actor rootActor(application.GetScene().GetRootLayer());
 
   Actor parent = Actor::New();
   parent.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -2120,7 +2158,6 @@ int UtcDaliGeoTouchEventIntercept02(void)
   interceptData.Reset();
   parentData.Reset();
 
-
   END_TEST;
 }
 
@@ -2153,7 +2190,7 @@ int UtcDaliGeoTouchEventIntercept03(void)
   application.SendNotification();
   application.Render();
 
-  Actor           rootActor(application.GetScene().GetRootLayer());
+  Actor rootActor(application.GetScene().GetRootLayer());
 
   // Connect to root actor's intercept touched signal
   SignalData        sceneData;
@@ -2170,7 +2207,6 @@ int UtcDaliGeoTouchEventIntercept03(void)
   // Even if the layer is touch consumed, the root actor must be able to intercept touch.
   DALI_TEST_EQUALS(true, sceneData.functorCalled, TEST_LOCATION);
   sceneData.Reset();
-
 
   END_TEST;
 }
@@ -2456,5 +2492,46 @@ int UtcDaliGeoTouchEventDispatchTouchMotionPropertySet(void)
 
   data.Reset();
 
+  END_TEST;
+}
+
+int UtcDaliGeoTouchDownDifferentUp(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's touched signal
+  SignalData        data;
+  TouchEventFunctor functor(data);
+  actor.TouchedSignal().Connect(&application, functor);
+
+  // Emit a down signal
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::DOWN, data.receivedTouch.points[0].state, TEST_LOCATION);
+  data.Reset();
+
+  // Emit a signal outside the actor, we should NOT be signalled.
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(200.0f, 200.0f /* Outside actor */)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(210.0f, 200.0f /* Outside actor */)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(220.0f, 200.0f /* Outside actor */)));
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Set the geometry hit test on
+  application.GetScene().SetGeometryHittestEnabled(true);
+
+  // ...and emit an up event outside of the actor's bounds, we should get an interrupted signal
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(200.0f, 200.0f)));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::INTERRUPTED, data.receivedTouch.points[0].state, TEST_LOCATION);
   END_TEST;
 }
