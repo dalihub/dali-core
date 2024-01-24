@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_INHERITED_PROPERTY_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -120,22 +120,6 @@ public:
   const Vector3& GetVector3(BufferIndex bufferIndex) const override
   {
     return mValue[bufferIndex];
-  }
-
-  /**
-   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
-   */
-  const void* GetValueAddress(BufferIndex bufferIndex) const override
-  {
-    return &mValue[bufferIndex];
-  }
-
-  /**
-   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
-   */
-  size_t GetValueSize() const override
-  {
-    return sizeof(Vector3);
   }
 
   /**
@@ -282,22 +266,6 @@ public:
   const Vector4& GetVector4(BufferIndex bufferIndex) const override
   {
     return mValue[bufferIndex];
-  }
-
-  /**
-   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
-   */
-  const void* GetValueAddress(BufferIndex bufferIndex) const override
-  {
-    return &mValue[bufferIndex];
-  }
-
-  /**
-   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
-   */
-  size_t GetValueSize() const override
-  {
-    return sizeof(Vector4);
   }
 
   /**
@@ -465,22 +433,6 @@ public:
   }
 
   /**
-   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
-   */
-  const void* GetValueAddress(BufferIndex bufferIndex) const override
-  {
-    return &mValue[bufferIndex];
-  }
-
-  /**
-   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
-   */
-  size_t GetValueSize() const override
-  {
-    return sizeof(Vector4);
-  }
-
-  /**
    * @copydoc Dali::PropertyInput::GetConstraintInputQuaternion()
    */
   const Quaternion& GetConstraintInputQuaternion(BufferIndex bufferIndex) const override
@@ -623,22 +575,6 @@ public:
   const Matrix& GetMatrix(BufferIndex bufferIndex) const override
   {
     return mValue[bufferIndex];
-  }
-
-  /**
-   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
-   */
-  const void* GetValueAddress(BufferIndex bufferIndex) const override
-  {
-    return &mValue[bufferIndex];
-  }
-
-  /**
-   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
-   */
-  size_t GetValueSize() const override
-  {
-    return sizeof(Matrix);
   }
 
   /**
