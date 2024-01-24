@@ -6,6 +6,7 @@ SET(RPM_NAME "core-${PKG_NAME}-tests")
 SET(CAPI_LIB "dali-internal")
 
 SET(TC_SOURCES
+        utc-Dali-Internal-AnimatableProperty.cpp
         utc-Dali-Internal-ActorObserver.cpp
         utc-Dali-Internal-ActorRelayout.cpp
         utc-Dali-Internal-ConstString.cpp

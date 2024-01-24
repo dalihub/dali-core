@@ -65,7 +65,7 @@ public:
    * @SINCE_1_0.0
    * @return The reference count
    */
-  uint32_t ReferenceCount();
+  uint32_t ReferenceCount() const;
 
 protected:
   /**

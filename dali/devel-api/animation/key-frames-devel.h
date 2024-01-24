@@ -2,7 +2,7 @@
 #define DALI_KEY_FRAMES_DEVEL_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/animation/key-frames.h>
+#include <dali/public-api/common/constants.h>
 
 namespace Dali
 {
@@ -50,6 +51,15 @@ DALI_CORE_API void GetKeyFrame(KeyFrames keyFrames, std::size_t index, float& ti
  * @param[in] value The value of the given key frame
  */
 DALI_CORE_API void SetKeyFrameValue(KeyFrames keyFrames, std::size_t index, const Property::Value& value);
+
+/**
+ * Optimize keyframes. Remove some frames what we can remove that might show same result.
+ * If two keyframe has same progress, we will remain only latest one.
+ * @warning It will be works well only if we use keyFrames animate as Dali::Animation::LINEAR interpolation
+ * @param[in] keyFrames The KeyFrames object to perform this operation on.
+ * @return True if keyframe optimized. False otherwise.
+ */
+DALI_CORE_API bool OptimizeKeyFramesLinear(KeyFrames keyFrames);
 
 } // namespace DevelKeyFrames
 

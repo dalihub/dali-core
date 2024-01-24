@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -335,7 +335,7 @@ void Layer::SetTouchConsumed(bool consume)
   mTouchConsumed = consume;
 }
 
-bool Layer::OnTouched(Dali::Actor actor, const TouchEvent& touch)
+bool Layer::OnTouched(Dali::Actor actor, const Dali::TouchEvent& touch)
 {
   // This event is only called when mTouchConsumed is true. So touch always consumed.
   return true;

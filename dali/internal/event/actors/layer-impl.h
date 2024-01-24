@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_LAYER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -252,9 +252,9 @@ private:
    *
    * @param[in] actor Layer touched
    * @param[in] touch Touch information
-   * @return True if the touch is consummed.
+   * @return True if the touch is consumed.
    */
-  bool OnTouched(Dali::Actor actor, const TouchEvent& touch);
+  bool OnTouched(Dali::Actor actor, const Dali::TouchEvent& touch);
 
   LayerList* mLayerList; ///< Only valid when layer is on-scene
 
