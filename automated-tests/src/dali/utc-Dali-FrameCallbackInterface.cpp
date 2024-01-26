@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1174,5 +1174,133 @@ int UtcDaliFrameCallbackUpdateNotify01(void)
   DALI_TEST_EQUALS(frameCallback.mSyncPoints.size(), 2, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mSyncPoints.front(), syncPoint1, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mSyncPoints.back(), syncPoint2, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliFrameCallbackWithoutRootActor(void)
+{
+  // Test to ensure that we should call methods on actors even if have been removed on the stage
+  // If we add frame callback with empty handle.
+
+  TestApplication application;
+  Stage           stage = Stage::GetCurrent();
+
+  Actor actor = Actor::New();
+  stage.Add(actor);
+
+  FrameCallbackActorIdCheck frameCallback(actor.GetProperty<int>(Actor::Property::ID));
+  DevelStage::AddFrameCallback(stage, frameCallback, Actor());
+
+  application.SendNotification();
+  application.Render();
+
+  // All methods should return successfully.
+
+  DALI_TEST_EQUALS(frameCallback.mCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetSizeCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetPositionCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetColorCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetScaleCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetPositionAndSizeCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetWorldPositionScaleAndSizeCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetSizeCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetPositionCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetColorCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetScaleCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakeSizeCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakePositionCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakeColorCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakeScaleCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetOrientationCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetOrientationCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakeOrientationCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetWorldTransformCallSuccess, true, TEST_LOCATION);
+
+  frameCallback.Reset();
+
+  // Remove the actor from stage, the methods should return successfully.
+
+  stage.Remove(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(frameCallback.mCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetSizeCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetPositionCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetColorCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetScaleCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetPositionAndSizeCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetWorldPositionScaleAndSizeCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetSizeCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetPositionCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetColorCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetScaleCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakeSizeCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakePositionCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakeColorCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakeScaleCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetOrientationCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetOrientationCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakeOrientationCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetWorldTransformCallSuccess, true, TEST_LOCATION);
+
+  // Remove callback. frameCallback should not be called.
+
+  frameCallback.Reset();
+  DevelStage::RemoveFrameCallback(stage, frameCallback);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(frameCallback.mCalled, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetSizeCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetPositionCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetColorCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetScaleCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetPositionAndSizeCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetWorldPositionScaleAndSizeCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetSizeCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetPositionCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetColorCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetScaleCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakeSizeCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakePositionCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakeColorCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakeScaleCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetOrientationCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetOrientationCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakeOrientationCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetWorldTransformCallSuccess, false, TEST_LOCATION);
+
+  frameCallback.Reset();
+
+  // Re-add the actor back to the stage, but frameCallback should not be emitted because we remove it.
+
+  stage.Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(frameCallback.mCalled, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetSizeCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetPositionCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetColorCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetScaleCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetPositionAndSizeCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetWorldPositionScaleAndSizeCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetSizeCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetPositionCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetColorCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetScaleCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakeSizeCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakePositionCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakeColorCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakeScaleCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetOrientationCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetOrientationCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mBakeOrientationCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetWorldTransformCallSuccess, false, TEST_LOCATION);
+
   END_TEST;
 }

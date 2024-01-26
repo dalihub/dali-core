@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,8 @@
 #include <dali/devel-api/update/update-proxy.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/trace.h>
+#include <dali/internal/update/manager/global-scene-graph-traveler.h>
+#include <dali/internal/update/manager/scene-graph-traveler.h>
 
 namespace
 {
@@ -42,7 +44,7 @@ FrameCallbackProcessor::FrameCallbackProcessor(UpdateManager& updateManager, Tra
 : mFrameCallbacks(),
   mUpdateManager(updateManager),
   mTransformManager(transformManager),
-  mTravelerMap{},
+  mRootNodeTravelerMap{},
   mNodeHierarchyChanged(true)
 {
 }
@@ -51,11 +53,24 @@ FrameCallbackProcessor::~FrameCallbackProcessor() = default;
 
 void FrameCallbackProcessor::AddFrameCallback(OwnerPointer<FrameCallback>& frameCallback, const Node* rootNode)
 {
-  Node& node = const_cast<Node&>(*rootNode); // Was sent as const from event thread, we need to be able to use non-const version here.
+  // We allow to input root node as nullptr.
+  // In this case, let we use global scene graph traveler, instead of node traveler
+  if(rootNode)
+  {
+    Node& node = const_cast<Node&>(*rootNode); // Was sent as const from event thread, we need to be able to use non-const version here.
 
-  SceneGraphTravelerPtr traveler = GetSceneGraphTraveler(&node);
+    auto traveler = GetSceneGraphTraveler(&node);
 
-  frameCallback->ConnectToSceneGraph(mUpdateManager, mTransformManager, node, traveler);
+    frameCallback->ConnectToSceneGraph(mUpdateManager, mTransformManager, node, traveler);
+  }
+  else
+  {
+    if(!mGlobalTraveler)
+    {
+      mGlobalTraveler = new GlobalSceneGraphTraveler(mUpdateManager);
+    }
+    frameCallback->ConnectToSceneGraph(mUpdateManager, mTransformManager, mGlobalTraveler);
+  }
 
   mFrameCallbacks.emplace_back(frameCallback);
 }
@@ -81,17 +96,17 @@ bool FrameCallbackProcessor::Update(BufferIndex bufferIndex, float elapsedSecond
 {
   bool keepRendering = false;
 
-  if(mNodeHierarchyChanged)
+  if(mNodeHierarchyChanged && !mRootNodeTravelerMap.empty())
   {
     DALI_LOG_DEBUG_INFO("Node hierarchy changed. Update traveler map\n");
     // Clear node traveler
-    for(auto iter = mTravelerMap.begin(); iter != mTravelerMap.end();)
+    for(auto iter = mRootNodeTravelerMap.begin(); iter != mRootNodeTravelerMap.end();)
     {
       // We don't need to erase invalidated traveler always. Just erase now.
       // Note : ReferenceCount == 1 mean, no frame callbacks use this traveler now. We can erase it.
       if(iter->second->IsInvalidated() || iter->second->ReferenceCount() == 1u)
       {
-        iter = mTravelerMap.erase(iter);
+        iter = mRootNodeTravelerMap.erase(iter);
       }
       else
       {
@@ -131,9 +146,9 @@ bool FrameCallbackProcessor::Update(BufferIndex bufferIndex, float elapsedSecond
 
 SceneGraphTravelerPtr FrameCallbackProcessor::GetSceneGraphTraveler(Node* rootNode)
 {
-  auto iter = mTravelerMap.find(rootNode);
+  auto iter = mRootNodeTravelerMap.find(rootNode);
 
-  if(iter != mTravelerMap.end())
+  if(iter != mRootNodeTravelerMap.end())
   {
     // Check wheter traveler is invalidated or not
     if(!iter->second->IsInvalidated())
@@ -142,12 +157,12 @@ SceneGraphTravelerPtr FrameCallbackProcessor::GetSceneGraphTraveler(Node* rootNo
     }
     else
     {
-      mTravelerMap.erase(iter);
+      mRootNodeTravelerMap.erase(iter);
     }
   }
 
   // Create new traveler and keep it.
-  return (mTravelerMap.insert({rootNode, new SceneGraphTraveler(*rootNode)})).first->second;
+  return (mRootNodeTravelerMap.insert({rootNode, new SceneGraphTraveler(mUpdateManager, *rootNode)})).first->second;
 }
 
 } // namespace SceneGraph

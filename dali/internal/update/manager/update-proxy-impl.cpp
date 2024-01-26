@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,19 +19,19 @@
 #include <dali/internal/update/manager/update-proxy-impl.h>
 
 // INTERNAL INCLUDES
+#include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/manager/update-proxy-property-modifier.h>
 
 namespace Dali
 {
 namespace Internal
 {
-UpdateProxy::UpdateProxy(SceneGraph::UpdateManager& updateManager, SceneGraph::TransformManager& transformManager, SceneGraph::Node& rootNode, SceneGraphTravelerPtr traveler)
+UpdateProxy::UpdateProxy(SceneGraph::UpdateManager& updateManager, SceneGraph::TransformManager& transformManager, SceneGraphTravelerInterfacePtr traveler)
 : mLastCachedIdNodePair({0u, nullptr}),
   mDirtyNodes(),
   mCurrentBufferIndex(0u),
   mUpdateManager(updateManager),
   mTransformManager(transformManager),
-  mRootNode(rootNode),
   mSceneGraphTraveler(traveler),
   mPropertyModifier(nullptr)
 {

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_TRAVELER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,50 +22,59 @@
 #include <unordered_map>
 
 // INTERNAL INCLUDES
-#include <dali/internal/update/common/property-owner.h>
-#include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/common/intrusive-ptr.h>
-#include <dali/public-api/common/vector-wrapper.h>
-#include <dali/public-api/object/ref-object.h>
+#include <dali/internal/update/manager/scene-graph-traveler-interface.h>
 
 namespace Dali
 {
 namespace Internal
 {
-namespace SceneGraph
-{
-class Node;
-} // namespace SceneGraph
-
 class SceneGraphTraveler;
 using SceneGraphTravelerPtr = IntrusivePtr<SceneGraphTraveler>;
 
 /**
- * @brief Helper class to travel scene graph incrementally.
+ * @brief Helper class to travel scene graph under root node.
  */
-class SceneGraphTraveler : public Dali::RefObject, public SceneGraph::PropertyOwner::Observer
+class SceneGraphTraveler : public SceneGraphTravelerInterface, public SceneGraph::PropertyOwner::Observer
 {
 public:
-  SceneGraphTraveler(SceneGraph::Node& rootNode);
+  /**
+   * @brief Construct
+   * @param[in] updateManager The update manager.
+   * @param[in] rootNode The root node of this traveler. The traveler will find only under this rootNode.
+   */
+  SceneGraphTraveler(SceneGraph::UpdateManager& updateManager, SceneGraph::Node& rootNode);
 
-  ~SceneGraphTraveler();
+  /**
+   * @brief Destructor
+   */
+  ~SceneGraphTraveler() override;
 
 public:
+  /**
+   * @brief Call this method if hierarchy was changed under root node.
+   */
   void NodeHierarchyChanged()
   {
     Clear();
   }
 
+  /**
+   * @brief Whether root node is invalidated or not.
+   *
+   * @return True if root node is invalidated.
+   */
   bool IsInvalidated() const
   {
     return mInvalidated;
   }
 
-  SceneGraph::Node* FindNode(uint32_t id);
+public: // From SceneGraphTravelerInterface
+  /**
+   * @copydoc Dali::Internal::SceneGraphTravelerInterface::FindNode()
+   */
+  SceneGraph::Node* FindNode(uint32_t id) override;
 
-private:
-  // From SceneGraph::PropertyOwner::Observer
-
+private: // From SceneGraph::PropertyOwner::Observer
   /**
    * @copydoc SceneGraph::PropertyOwner::Observer::PropertyOwnerConnected()
    */
@@ -93,19 +102,13 @@ private:
 private:
   void Clear();
 
-  bool FullSearched() const;
-
-  SceneGraph::Node& GetCurrentNode();
-
-  void IterateNextNode();
-
 private:
-  SceneGraph::Node&                                   mRootNode;
-  std::vector<std::pair<SceneGraph::Node*, uint32_t>> mNodeStack; ///< Depth first search stack. Pair of node, and it's index of children that we need to iterate next.
+  SceneGraph::Node& mRootNode;
 
   std::unordered_map<uint32_t, SceneGraph::Node*> mTravledNodeMap; ///< Used to store cached pointers to already searched for Nodes.
+                                                                   ///< If node is not under root node, it will store nullptr.
 
-  bool mInvalidated : 1; ///< Troe if root node was destroyed.
+  bool mInvalidated : 1; ///< True if root node was destroyed.
 };
 
 } // namespace Internal

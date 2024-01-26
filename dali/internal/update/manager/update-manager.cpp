@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -224,6 +224,7 @@ struct UpdateManager::Impl
       (*iter)->OnDestroy();
       Node::Delete(*iter);
     }
+    nodeIdMap.clear();
 
     for(auto&& scene : scenes)
     {
@@ -274,6 +275,8 @@ struct UpdateManager::Impl
   std::vector<SceneInfoPtr> scenes; ///< A container of SceneInfo.
 
   Vector<Node*> nodes; ///< A container of all instantiated nodes
+
+  std::unordered_map<uint32_t, Node*> nodeIdMap; ///< A container of nodes map by id.
 
   Vector<Camera*> cameras; ///< A container of cameras. Note : these cameras are owned by Impl::nodes.
 
@@ -360,6 +363,10 @@ void UpdateManager::InstallRoot(OwnerPointer<Layer>& layer)
 
   rootLayer->AddInitializeResetter(*this);
 
+  // Do not allow to insert duplicated nodes.
+  // It could be happened if node id is overflowed.
+  DALI_ASSERT_ALWAYS(mImpl->nodeIdMap.insert({rootLayer->GetId(), rootLayer}).second);
+
   mImpl->scenes.emplace_back(new Impl::SceneInfo(rootLayer));
 }
 
@@ -376,6 +383,8 @@ void UpdateManager::UninstallRoot(Layer* layer)
       break;
     }
   }
+
+  mImpl->nodeIdMap.erase(layer->GetId());
 
   mImpl->nodeDiscardQueue.Add(mSceneGraphBuffers.GetUpdateBufferIndex(), layer);
 
@@ -396,7 +405,12 @@ void UpdateManager::AddNode(OwnerPointer<Node>& node)
     AddCamera(static_cast<Camera*>(rawNode));
   }
 
+  // Do not allow to insert duplicated nodes.
+  // It could be happened if node id is overflowed.
+  DALI_ASSERT_ALWAYS(mImpl->nodeIdMap.insert({rawNode->GetId(), rawNode}).second);
+
   mImpl->nodes.PushBack(rawNode);
+
   rawNode->CreateTransform(&mImpl->transformManager);
 }
 
@@ -460,6 +474,8 @@ void UpdateManager::DestroyNode(Node* node)
   {
     RemoveCamera(static_cast<Camera*>(node));
   }
+
+  mImpl->nodeIdMap.erase(node->GetId());
 
   mImpl->nodeDiscardQueue.Add(mSceneGraphBuffers.GetUpdateBufferIndex(), node);
 
@@ -1297,6 +1313,17 @@ void UpdateManager::SetRenderingBehavior(DevelStage::Rendering renderingBehavior
 void UpdateManager::RequestRendering()
 {
   mImpl->renderingRequired = true;
+}
+
+Node* UpdateManager::GetNodePointerById(uint32_t nodeId) const
+{
+  Node* foundNodePointer = nullptr;
+  auto  iter             = mImpl->nodeIdMap.find(nodeId);
+  if(iter != mImpl->nodeIdMap.end())
+  {
+    foundNodePointer = iter->second;
+  }
+  return foundNodePointer;
 }
 
 void UpdateManager::SetLayerDepths(const SortedLayerPointers& layers, const Layer* rootLayer)

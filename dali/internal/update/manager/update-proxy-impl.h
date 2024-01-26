@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_UPDATE_PROXY_IMPL_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/vector3.h>
 
-#include <dali/internal/update/manager/scene-graph-traveler.h>
+#include <dali/internal/update/manager/scene-graph-traveler-interface.h>
 
 namespace Dali
 {
@@ -56,10 +56,9 @@ public:
    * @brief Constructor.
    * @param[in]  updateManager      Ref to the UpdateManager in order to add property resetters
    * @param[in]  transformManager   Ref to the TransformManager in order to set/get transform properties of nodes
-   * @param[in]  rootNode           The root node for this proxy
-   * @param[in]  traveler           The cache of traversal for given rootNode
+   * @param[in]  traveler           The cache of traversal.
    */
-  UpdateProxy(SceneGraph::UpdateManager& updateManager, SceneGraph::TransformManager& transformManager, SceneGraph::Node& rootNode, SceneGraphTravelerPtr traveler);
+  UpdateProxy(SceneGraph::UpdateManager& updateManager, SceneGraph::TransformManager& transformManager, SceneGraphTravelerInterfacePtr traveler);
 
   /**
    * @brief Destructor.
@@ -164,15 +163,6 @@ public:
   bool BakeColor(uint32_t id, const Vector4& color);
 
   /**
-   * @brief Retrieves the root-node used by this class
-   * @return The root node used by this class.
-   */
-  SceneGraph::Node& GetRootNode() const
-  {
-    return mRootNode;
-  }
-
-  /**
    * @brief Sets the buffer index to use when processing the next callback.
    * @param[in]  bufferIndex  The current buffer index
    */
@@ -239,10 +229,9 @@ private:
   std::vector<uint32_t> mDirtyNodes;           ///< Used to store the ID of the dirty nodes with non-transform property modifications.
   BufferIndex           mCurrentBufferIndex;
 
-  SceneGraph::UpdateManager&    mUpdateManager;      ///< Reference to the Update Manager.
-  SceneGraph::TransformManager& mTransformManager;   ///< Reference to the Transform Manager.
-  SceneGraph::Node&             mRootNode;           ///< The root node of this update proxy.
-  SceneGraphTravelerPtr         mSceneGraphTraveler; ///< The cache system when we travel scene graph. (Not owned)
+  SceneGraph::UpdateManager&     mUpdateManager;      ///< Reference to the Update Manager.
+  SceneGraph::TransformManager&  mTransformManager;   ///< Reference to the Transform Manager.
+  SceneGraphTravelerInterfacePtr mSceneGraphTraveler; ///< The cache system when we travel scene graph. (Not owned)
 
   std::list<Dali::UpdateProxy::NotifySyncPoint> mSyncPoints;
 

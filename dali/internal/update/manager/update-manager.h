@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_UPDATE_MANAGER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -681,6 +681,14 @@ public:
    *       for any other purposes.
    */
   void RequestRendering();
+
+  /**
+   * @brief Get the active Node pointer by node id.
+   *
+   * @param[in] nodeId The id of node what we want to get.
+   * @return The pointer of node, or nullptr if given node id is not exist, or discarded.
+   */
+  Node* GetNodePointerById(uint32_t nodeId) const;
 
   /**
    * Sets the depths of all layers.
@@ -1606,6 +1614,17 @@ inline void AddFrameCallbackMessage(UpdateManager& manager, OwnerPointer<FrameCa
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&manager, &UpdateManager::AddFrameCallback, frameCallback, &rootNode);
+}
+
+inline void AddGlobalFrameCallbackMessage(UpdateManager& manager, OwnerPointer<FrameCallback>& frameCallback)
+{
+  using LocalType = MessageValue2<UpdateManager, OwnerPointer<FrameCallback>, const Node*>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new(slot) LocalType(&manager, &UpdateManager::AddFrameCallback, frameCallback, nullptr);
 }
 
 inline void RemoveFrameCallbackMessage(UpdateManager& manager, FrameCallbackInterface& frameCallback)

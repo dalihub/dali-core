@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,16 @@
 #include <dali/internal/update/manager/scene-graph-traveler.h>
 
 // INTERNAL INCLUDES
+#include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/nodes/node.h>
 
 namespace Dali
 {
 namespace Internal
 {
-SceneGraphTraveler::SceneGraphTraveler(SceneGraph::Node& rootNode)
-: mRootNode(rootNode),
-  mNodeStack{},
+SceneGraphTraveler::SceneGraphTraveler(SceneGraph::UpdateManager& updateManager, SceneGraph::Node& rootNode)
+: SceneGraphTravelerInterface(updateManager),
+  mRootNode(rootNode),
   mInvalidated{false}
 {
   mRootNode.AddObserver(*this);
@@ -46,26 +47,53 @@ SceneGraph::Node* SceneGraphTraveler::FindNode(uint32_t id)
 {
   SceneGraph::Node* node = nullptr;
 
-  // Find node in cached map
-  auto iter = mTravledNodeMap.find(id);
-  if(iter != mTravledNodeMap.end())
+  if(!mInvalidated)
   {
-    node = iter->second;
-  }
-  else
-  {
-    while(!FullSearched())
+    // Find node in cached map
+    auto iter = mTravledNodeMap.find(id);
+    if(iter != mTravledNodeMap.end())
     {
-      SceneGraph::Node& currentNode = GetCurrentNode();
-      IterateNextNode();
+      node = iter->second;
+    }
+    else
+    {
+      SceneGraph::Node* currentNode = mUpdateManager.GetNodePointerById(id);
 
-      // Cache traveled node and id pair.
-      mTravledNodeMap.insert({currentNode.mId, &currentNode});
+      bool isNodeUnderRootNode = false;
 
-      if(currentNode.mId == id)
+      std::vector<std::pair<uint32_t, SceneGraph::Node*>> nodeStack;
+
+      SceneGraph::Node* iterateNode = currentNode;
+
+      while(iterateNode)
       {
-        node = &currentNode;
-        break;
+        uint32_t iterateNodeId = iterateNode->GetId();
+
+        auto iter = mTravledNodeMap.find(iterateNodeId);
+        if(iter != mTravledNodeMap.end())
+        {
+          // iter->second could be nullptr if it was failed item before.
+          if(iter->second != nullptr)
+          {
+            isNodeUnderRootNode = true;
+          }
+          break;
+        }
+        nodeStack.push_back({iterateNodeId, iterateNode});
+
+        // Go to parent.
+        iterateNode = iterateNode->GetParent();
+      }
+
+      // Store current found result.
+      for(auto&& idPair : nodeStack)
+      {
+        mTravledNodeMap.insert({idPair.first, isNodeUnderRootNode ? idPair.second : nullptr});
+      }
+
+      if(isNodeUnderRootNode)
+      {
+        node = currentNode;
       }
     }
   }
@@ -77,44 +105,9 @@ void SceneGraphTraveler::Clear()
 {
   mTravledNodeMap.clear();
   mTravledNodeMap.rehash(0u); ///< Note : We have to reduce capacity of hash map. Without this line, clear() API will be slow downed.
-  mNodeStack.clear();
   if(!mInvalidated)
   {
-    mNodeStack.emplace_back(&mRootNode, 0u);
-  }
-}
-
-bool SceneGraphTraveler::FullSearched() const
-{
-  return mNodeStack.empty();
-}
-
-SceneGraph::Node& SceneGraphTraveler::GetCurrentNode()
-{
-  DALI_ASSERT_DEBUG(!FullSearched());
-
-  return *(mNodeStack.back().first);
-}
-
-void SceneGraphTraveler::IterateNextNode()
-{
-  while(!mNodeStack.empty())
-  {
-    auto&    currentNode       = *(mNodeStack.back().first);
-    uint32_t currentChildIndex = mNodeStack.back().second;
-
-    if(currentNode.GetChildren().Count() <= currentChildIndex)
-    {
-      mNodeStack.pop_back();
-      continue;
-    }
-    else
-    {
-      // Stack current child, and increase index
-      ++mNodeStack.back().second;
-      mNodeStack.emplace_back(currentNode.GetChildren()[currentChildIndex], 0u);
-      break;
-    }
+    mTravledNodeMap.insert({mRootNode.GetId(), &mRootNode});
   }
 }
 

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_FRAME_CALLBACK_PROCESSOR_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ public:
   /**
    * Adds an implementation of the FrameCallbackInterface.
    * @param[in]  frameCallback  An OwnerPointer to the SceneGraph FrameCallback object
-   * @param[in]  rootNode       A pointer to the root node to apply the FrameCallback to
+   * @param[in]  rootNode       A pointer to the root node to apply the FrameCallback to. Or nullptr if given frame callback use globally.
    */
   void AddFrameCallback(OwnerPointer<FrameCallback>& frameCallback, const Node* rootNode);
 
@@ -114,7 +114,9 @@ private:
   TransformManager& mTransformManager;
 
   using TravelerContainer = std::unordered_map<const Node*, SceneGraphTravelerPtr>;
-  TravelerContainer mTravelerMap;
+  TravelerContainer mRootNodeTravelerMap;
+
+  SceneGraphTravelerInterfacePtr mGlobalTraveler;
 
   bool mNodeHierarchyChanged; ///< Set to true if the node hierarchy changes
 };

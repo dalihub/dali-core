@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -348,6 +348,15 @@ void Stage::AddFrameCallback(FrameCallbackInterface& frameCallback, Actor& rootA
   // Create scene-graph object and transfer to UpdateManager
   OwnerPointer<SceneGraph::FrameCallback> transferOwnership(SceneGraph::FrameCallback::New(frameCallback));
   AddFrameCallbackMessage(mUpdateManager, transferOwnership, rootActor.GetNode());
+}
+
+void Stage::AddGlobalFrameCallback(FrameCallbackInterface& frameCallback)
+{
+  DALI_ASSERT_ALWAYS((!FrameCallbackInterface::Impl::Get(frameCallback).IsConnectedToSceneGraph()) && "FrameCallbackInterface implementation already added");
+
+  // Create scene-graph object and transfer to UpdateManager
+  OwnerPointer<SceneGraph::FrameCallback> transferOwnership(SceneGraph::FrameCallback::New(frameCallback));
+  AddGlobalFrameCallbackMessage(mUpdateManager, transferOwnership);
 }
 
 void Stage::RemoveFrameCallback(FrameCallbackInterface& frameCallback)

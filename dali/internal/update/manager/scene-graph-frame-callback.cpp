@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,17 +39,27 @@ FrameCallback::~FrameCallback()
 {
   if(mUpdateProxy)
   {
-    mUpdateProxy->GetRootNode().RemoveObserver(*this);
+    if(mRootNode)
+    {
+      mRootNode->RemoveObserver(*this);
+    }
     mUpdateProxy->AddNodeResetters();
   }
 
   Invalidate();
 }
 
-void FrameCallback::ConnectToSceneGraph(UpdateManager& updateManager, TransformManager& transformManager, Node& rootNode, SceneGraphTravelerPtr traveler)
+void FrameCallback::ConnectToSceneGraph(UpdateManager& updateManager, TransformManager& transformManager, Node& rootNode, SceneGraphTravelerInterfacePtr traveler)
 {
-  mUpdateProxy = std::unique_ptr<UpdateProxy>(new UpdateProxy(updateManager, transformManager, rootNode, traveler));
+  mRootNode = &rootNode;
   rootNode.AddObserver(*this);
+
+  ConnectToSceneGraph(updateManager, transformManager, traveler);
+}
+
+void FrameCallback::ConnectToSceneGraph(UpdateManager& updateManager, TransformManager& transformManager, SceneGraphTravelerInterfacePtr traveler)
+{
+  mUpdateProxy = std::unique_ptr<UpdateProxy>(new UpdateProxy(updateManager, transformManager, traveler));
 }
 
 FrameCallback::RequestFlags FrameCallback::Update(BufferIndex bufferIndex, float elapsedSeconds, bool nodeHierarchyChanged)
@@ -103,6 +113,7 @@ void FrameCallback::Invalidate()
 void FrameCallback::PropertyOwnerDestroyed(PropertyOwner& owner)
 {
   mUpdateProxy.reset(); // Root node is being destroyed so no point keeping the update-proxy either
+  mRootNode = nullptr;
 
   Invalidate();
 }
