@@ -2673,6 +2673,7 @@ int UtcDaliSceneGetOverlayLayer(void)
 
   // If new render task is created, the last task is overlayTask
   RenderTask newTask = scene.GetRenderTaskList().CreateTask();
+  application.SendNotification();
   DALI_TEST_EQUALS(tasks.GetTaskCount(), 3u, TEST_LOCATION);
   DALI_TEST_EQUALS(newTask, tasks.GetTask(1u), TEST_LOCATION);
   DALI_TEST_EQUALS(overlayTask, tasks.GetTask(2u), TEST_LOCATION);

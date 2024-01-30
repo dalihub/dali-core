@@ -286,6 +286,7 @@ void Scene::RebuildDepthTree()
     actor->RebuildDepthTree();
     mDepthTreeDirty = false;
   }
+  mRenderTaskList->SortTasks();
 }
 
 void Scene::SetBackgroundColor(const Vector4& color)

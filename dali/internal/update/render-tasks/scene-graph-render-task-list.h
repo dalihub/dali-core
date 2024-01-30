@@ -75,12 +75,6 @@ public:
   void AddTask(OwnerPointer<RenderTask>& newTask);
 
   /**
-   * Add a overlay RenderTask to the list.
-   * @param[in] newTask The RenderTaskList takes ownership of this overlay task.
-   */
-  void AddOverlayTask(OwnerPointer<RenderTask>& newTask);
-
-  /**
    * Remove a RenderTask from the list.
    * @param[in] task The RenderTaskList will destroy this task.
    */
@@ -120,6 +114,11 @@ public:
    */
   static uint32_t GetMemoryPoolCapacity();
 
+  /**
+   * @brief Sort RenderTasks along OrderIndex
+   */
+  void SortTasks(OwnerPointer<std::vector<const SceneGraph::RenderTask*>>& sortedTasks);
+
 protected:
   /**
    * Protected constructor. See New()
@@ -138,7 +137,6 @@ private:
   ResetterManager*               mResetterManager;         ///< for sending bake resetter if rendertask initalized
   RenderMessageDispatcher*       mRenderMessageDispatcher; ///< for sending messages to render thread
   RenderTaskContainer            mRenderTasks;             ///< A container of owned RenderTasks
-  RenderTask*                    mOverlayRenderTask;       ///< OverlayRenderTask.
 };
 
 // Messages for RenderTaskList
@@ -155,18 +153,6 @@ inline void AddTaskMessage(EventThreadServices& eventThreadServices, const Rende
   new(slot) LocalType(&list, &RenderTaskList::AddTask, task);
 }
 
-inline void AddOverlayTaskMessage(EventThreadServices& eventThreadServices, const RenderTaskList& list, OwnerPointer<RenderTask>& task)
-{
-  // Message has ownership of the RenderTask while in transit from event -> update
-  using LocalType = MessageValue1<RenderTaskList, OwnerPointer<RenderTask> >;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&list, &RenderTaskList::AddOverlayTask, task);
-}
-
 inline void RemoveTaskMessage(EventThreadServices& eventThreadServices, const RenderTaskList& list, const RenderTask& constTask)
 {
   // Scene graph thread can destroy this object.
@@ -179,6 +165,17 @@ inline void RemoveTaskMessage(EventThreadServices& eventThreadServices, const Re
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&list, &RenderTaskList::RemoveTask, &task);
+}
+
+inline void SortTasksMessage(EventThreadServices& eventThreadServices, const RenderTaskList& list, OwnerPointer<std::vector<const SceneGraph::RenderTask*>>& sortedTasks)
+{
+  using LocalType = MessageValue1<RenderTaskList, OwnerPointer<std::vector<const SceneGraph::RenderTask*>>>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new(slot) LocalType(&list, &RenderTaskList::SortTasks, sortedTasks);
 }
 
 } // namespace SceneGraph
