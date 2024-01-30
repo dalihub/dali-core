@@ -90,7 +90,7 @@ public:
    * @param[in] cameraActor The actor from which the scene is viewed for this render task.
    * @return A valid handle to a new RenderTask
    */
-  RenderTaskPtr CreateTask(Actor* sourceActor, CameraActor* cameraActor);
+  RenderTaskPtr CreateTask(Actor* sourceActor, CameraActor* cameraActor, bool isOverlayTask = false);
 
   /**
    * @brief Creates a new RenderTask for overlay.
@@ -150,6 +150,19 @@ public:
   }
 
   /**
+   * @brief Request to sort RenderTasks along OrderIndex
+   */
+  void RequestToSort()
+  {
+    mIsRequestedToSortTask = true;
+  }
+
+  /**
+   * @brief Sort RenderTasks along OrderIndex
+   */
+  void SortTasks();
+
+  /**
    * Provide notification signals for a "Finished" render task.
    * This method should be called in the event-thread
    * Queue NotifyFinishedMessage() from update-thread
@@ -200,6 +213,8 @@ private:
   RenderTaskContainer mTasks;      ///< Reference counted render-tasks
   ExclusivesContainer mExclusives; ///< List of rendertasks with exclusively owned source actors.
   RenderTaskPtr       mOverlayRenderTask{nullptr};
+
+  bool mIsRequestedToSortTask{false};
 };
 
 } // namespace Internal
