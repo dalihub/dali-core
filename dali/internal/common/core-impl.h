@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_CORE_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -318,11 +318,10 @@ private:
   AnimationPlaylist& GetAnimationPlaylist() const;
 
   /**
-   * @brief Returns GlAbstraction.
-   * @note Use only for the capability. Do not use this for bypass context
-   * @return GlAbstraction
+   * @brief Returns GraphicsConfig
+   * @return A reference to the GraphicsConfig struct.
    */
-  Integration::GlAbstraction& GetGlAbstraction() const;
+  Integration::GraphicsConfig& GetGraphicsConfig() const;
 
 private:
   /**
