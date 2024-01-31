@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_STAGE_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -298,6 +298,11 @@ public:
    * @copydoc Dali::DevelStage::AddFrameCallback()
    */
   void AddFrameCallback(FrameCallbackInterface& frameCallback, Actor& rootActor);
+
+  /**
+   * @copydoc Dali::DevelStage::AddFrameCallback()
+   */
+  void AddGlobalFrameCallback(FrameCallbackInterface& frameCallback);
 
   /**
    * @copydoc Dali::DevelStage::RemoveFrameCallback()

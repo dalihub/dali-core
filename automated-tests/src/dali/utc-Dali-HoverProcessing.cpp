@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1401,6 +1401,202 @@ int UtcDaliHoverActorHide(void)
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(PointState::INTERRUPTED, data.hoverEvent.GetState(0), TEST_LOCATION);
   data.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliHoverStartConsumerDifferentAtEnd(void)
+{
+  // Start a hover in one actor, continue it in another actor
+  // End hover in the second actor
+  // First actor should still get a hover finished call
+  TestApplication    application;
+  Integration::Scene scene = application.GetScene();
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  scene.Add(actor);
+
+  Actor actor2 = Actor::New();
+  actor2.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor2.SetProperty(Actor::Property::POSITION, Vector2(100.0f, 100.0f));
+  actor2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  scene.Add(actor2);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to hover start actor's hovered signal
+  SignalData        dataStartActor;
+  HoverEventFunctor functorStartActor(dataStartActor);
+  actor.HoveredSignal().Connect(&application, functorStartActor);
+
+  // Connect to second actor's hovered signal
+  SignalData        dataSecondActor;
+  HoverEventFunctor functorSecondActor(dataSecondActor);
+  actor2.HoveredSignal().Connect(&application, functorSecondActor);
+
+  auto resetData = [&]() { dataStartActor.Reset(); dataSecondActor.Reset(); };
+
+  // Emit a started
+  application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(10.0f, 10.0f)));
+  DALI_TEST_EQUALS(true, dataStartActor.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, dataSecondActor.functorCalled, TEST_LOCATION);
+  resetData();
+
+  // Emit a hover somewhere else
+  application.ProcessEvent(GenerateSingleHover(PointState::MOTION, Vector2(110.0f, 110.0f)));
+  DALI_TEST_EQUALS(false, dataStartActor.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, dataSecondActor.functorCalled, TEST_LOCATION);
+  resetData();
+
+  // Emit a hover end in the same point, the hover start actor should still be informed
+  application.ProcessEvent(GenerateSingleHover(PointState::FINISHED, Vector2(110.0f, 110.0f)));
+  DALI_TEST_EQUALS(true, dataStartActor.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, dataSecondActor.functorCalled, TEST_LOCATION);
+  resetData();
+
+  // Do it again with the geometry on
+  // Emit a started
+  application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(10.0f, 10.0f)));
+  DALI_TEST_EQUALS(true, dataStartActor.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, dataSecondActor.functorCalled, TEST_LOCATION);
+  resetData();
+
+  // Emit a hover somewhere else
+  application.ProcessEvent(GenerateSingleHover(PointState::MOTION, Vector2(110.0f, 110.0f)));
+  DALI_TEST_EQUALS(false, dataStartActor.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, dataSecondActor.functorCalled, TEST_LOCATION);
+  resetData();
+
+  scene.SetGeometryHittestEnabled(true);
+
+  // Emit a hover end in the same point, the hover start actor should still be informed
+  application.ProcessEvent(GenerateSingleHover(PointState::FINISHED, Vector2(110.0f, 110.0f)));
+  DALI_TEST_EQUALS(true, dataStartActor.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, dataSecondActor.functorCalled, TEST_LOCATION);
+  resetData();
+
+  END_TEST;
+}
+
+int UtcDaliHoverEnsureDifferentConsumerReceivesInterrupted(void)
+{
+  // Interrupted event with a different consumer to previous event
+
+  TestApplication    application;
+  Integration::Scene scene = application.GetScene();
+
+  Actor parent = Actor::New();
+  parent.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  parent.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  scene.Add(parent);
+
+  Actor child = Actor::New();
+  child.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  child.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parent.Add(child);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to parent's hover signal
+  SignalData        dataParent;
+  HoverEventFunctor functorParent(dataParent);
+  parent.HoveredSignal().Connect(&application, functorParent);
+
+  // Connect to child's hovered signal but do not consume
+  SignalData        dataChildNoConsume;
+  HoverEventFunctor functorChildNoConsume(dataChildNoConsume, false);
+  child.HoveredSignal().Connect(&application, functorChildNoConsume);
+
+  // Create a functor to consume the event of the child, but don't connect just yet
+  SignalData        dataChildConsume;
+  HoverEventFunctor functorChildConsume(dataChildConsume);
+
+  auto resetData = [&]() { dataParent.Reset(); dataChildNoConsume.Reset(); dataChildConsume.Reset(); };
+
+  // Emit a started
+  application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(10.0f, 10.0f)));
+  DALI_TEST_EQUALS(true, dataParent.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, dataChildNoConsume.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, dataChildConsume.functorCalled, TEST_LOCATION);
+  resetData();
+
+  // Connect to child's hover event and consume so it's a different consumer on interrupted
+  child.HoveredSignal().Connect(&application, functorChildConsume);
+
+  // Emit interrupted, all three methods should be called
+  application.ProcessEvent(GenerateSingleHover(PointState::INTERRUPTED, Vector2(10.0f, 10.0f)));
+  DALI_TEST_EQUALS(true, dataParent.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, dataChildNoConsume.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, dataChildConsume.functorCalled, TEST_LOCATION);
+  resetData();
+
+  END_TEST;
+}
+
+int UtcDaliHoverEnsureDifferentConsumerReceivesLeave(void)
+{
+  // Motion event outside previous hit actor
+  // This event is consumed by a different actor
+  // The previous consumer's listener should still get called
+
+  TestApplication    application;
+  Integration::Scene scene = application.GetScene();
+
+  Actor parent = Actor::New();
+  parent.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  parent.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  scene.Add(parent);
+
+  Actor child = Actor::New();
+  child.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  child.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parent.Add(child);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to parent's hover signal
+  SignalData        dataParent;
+  HoverEventFunctor functorParent(dataParent);
+  parent.HoveredSignal().Connect(&application, functorParent);
+
+  // Connect to child's hovered signal but do not consume
+  SignalData        dataChildNoConsume;
+  HoverEventFunctor functorChildNoConsume(dataChildNoConsume, false);
+  child.HoveredSignal().Connect(&application, functorChildNoConsume);
+
+  // Create a functor to consume the event of the child, but don't connect just yet
+  SignalData        dataChildConsume;
+  HoverEventFunctor functorChildConsume(dataChildConsume);
+
+  auto resetData = [&]() { dataParent.Reset(); dataChildNoConsume.Reset(); dataChildConsume.Reset(); };
+
+  // Emit a started
+  application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(10.0f, 10.0f)));
+  DALI_TEST_EQUALS(true, dataParent.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, dataChildNoConsume.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, dataChildConsume.functorCalled, TEST_LOCATION);
+  resetData();
+
+  // Connect to child's hover event and consume so it's a different consumer on interrupted
+  child.HoveredSignal().Connect(&application, functorChildConsume);
+
+  // Also make last consumer insensitive
+  parent.SetProperty(Actor::Property::SENSITIVE, false);
+
+  // Emit interrupted, all three methods should be called
+  application.ProcessEvent(GenerateSingleHover(PointState::MOTION, Vector2(110.0f, 110.0f)));
+  DALI_TEST_EQUALS(true, dataParent.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, dataChildNoConsume.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, dataChildConsume.functorCalled, TEST_LOCATION);
+  resetData();
 
   END_TEST;
 }

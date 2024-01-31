@@ -2,7 +2,7 @@
 #define DALI_STAGE_DEVEL_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,11 +71,12 @@ DALI_CORE_API Rendering GetRenderingBehavior(Dali::Stage stage);
  *
  * @param[in] stage The stage to set the FrameCallbackInterface implementation on
  * @param[in] frameCallback An implementation of the FrameCallbackInterface
- * @param[in] rootActor The root-actor in the scene that the callback applies to
+ * @param[in] rootActor The root-actor in the scene that the callback applies to. Or empty handle if we don't care whether the node is scene on or not.
  *
  * @note The frameCallback cannot be added more than once. This will assert if that is attempted.
  * @note Only the rootActor and it's children will be parsed by the UpdateProxy.
- * @note If the rootActor is destroyed, then the callback is automatically removed
+ * @note If the rootActor is destroyed, then the callback is automatically removed.
+ * @note If the rootActor is empty handle, given frameCallback will not be removed automatically.
  * @see FrameCallbackInterface
  */
 DALI_CORE_API void AddFrameCallback(Dali::Stage stage, FrameCallbackInterface& frameCallback, Actor rootActor);

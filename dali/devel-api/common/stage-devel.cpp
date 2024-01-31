@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,14 @@ Rendering GetRenderingBehavior(Dali::Stage stage)
 
 void AddFrameCallback(Dali::Stage stage, FrameCallbackInterface& frameCallback, Actor rootActor)
 {
-  GetImplementation(stage).AddFrameCallback(frameCallback, GetImplementation(rootActor));
+  if(rootActor)
+  {
+    GetImplementation(stage).AddFrameCallback(frameCallback, GetImplementation(rootActor));
+  }
+  else
+  {
+    GetImplementation(stage).AddGlobalFrameCallback(frameCallback);
+  }
 }
 
 void RemoveFrameCallback(Dali::Stage stage, FrameCallbackInterface& frameCallback)

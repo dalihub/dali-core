@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_FRAME_CALLBACK_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@
 #include <dali/devel-api/update/frame-callback-interface.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/update/common/property-owner.h>
-#include <dali/internal/update/manager/scene-graph-traveler.h>
+#include <dali/internal/update/manager/scene-graph-traveler-interface.h>
 #include <dali/internal/update/manager/update-proxy-impl.h>
 #include <dali/public-api/common/list-wrapper.h>
 
@@ -75,7 +75,15 @@ public:
    * @param[in]  rootNode          The rootNode of this frame-callback
    * @param[in]  traveler          The cache of traversal for given rootNode
    */
-  void ConnectToSceneGraph(UpdateManager& updateManager, TransformManager& transformManager, Node& rootNode, SceneGraphTravelerPtr traveler);
+  void ConnectToSceneGraph(UpdateManager& updateManager, TransformManager& transformManager, Node& rootNode, SceneGraphTravelerInterfacePtr traveler);
+
+  /**
+   * Called from the update-thread when connecting to the scene-graph.
+   * @param[in]  updateManager     The Update Manager
+   * @param[in]  transformManager  The Transform Manager
+   * @param[in]  traveler          The cache of traversal
+   */
+  void ConnectToSceneGraph(UpdateManager& updateManager, TransformManager& transformManager, SceneGraphTravelerInterfacePtr traveler);
 
   // Movable but not copyable
 
@@ -150,6 +158,7 @@ private:
 private:
   Mutex                                         mMutex;
   std::unique_ptr<UpdateProxy>                  mUpdateProxy{nullptr}; ///< A unique pointer to the implementation of the UpdateProxy.
+  Node*                                         mRootNode{nullptr};    ///< Connected root node for given FrameCallback. It could be nullptr if it is global callback.
   FrameCallbackInterface*                       mFrameCallbackInterface;
   std::list<Dali::UpdateProxy::NotifySyncPoint> mSyncPoints;
   bool                                          mValid{true}; ///< Set to false when Invalidate() is called.
