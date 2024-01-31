@@ -22,7 +22,6 @@
 #include <memory.h>
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/threading/thread-pool.h>
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/trace.h>
 #include <dali/internal/common/ordered-set.h>
@@ -149,17 +148,12 @@ struct RenderManager::Impl
     stencilBufferAvailable(stencilBufferAvailableParam),
     partialUpdateAvailable(partialUpdateAvailableParam)
   {
-    // Create thread pool with just one thread ( there may be a need to create more threads in the future ).
-    threadPool = std::make_unique<Dali::ThreadPool>();
-    threadPool->Initialize(1u);
-
     uniformBufferManager = std::make_unique<Render::UniformBufferManager>(&graphicsController);
     pipelineCache        = std::make_unique<Render::PipelineCache>(graphicsController);
   }
 
   ~Impl()
   {
-    threadPool.reset(nullptr); // reset now to maintain correct destruction order
     rendererContainer.Clear(); // clear now before the pipeline cache is deleted
   }
 
@@ -208,8 +202,7 @@ struct RenderManager::Impl
   Integration::StencilBufferAvailable stencilBufferAvailable; ///< Whether the stencil buffer is available
   Integration::PartialUpdateAvailable partialUpdateAvailable; ///< Whether the partial update is available
 
-  std::unique_ptr<Dali::ThreadPool> threadPool;        ///< The thread pool
-  Vector<Render::TextureKey>        updatedTextures{}; ///< The updated texture list
+  Vector<Render::TextureKey> updatedTextures{}; ///< The updated texture list
 
   uint32_t    frameCount{0u};                                                    ///< The current frame count
   BufferIndex renderBufferIndex{SceneGraphBuffers::INITIAL_UPDATE_BUFFER_INDEX}; ///< The index of the buffer to read from;
