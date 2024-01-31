@@ -1541,15 +1541,14 @@ Rect<> Actor::CalculateScreenExtents() const
 
 Rect<> Actor::CalculateCurrentScreenExtents() const
 {
+  BufferIndex bufferIndex = GetEventThreadServices().GetEventBufferIndex();
   if(mLayer3DParentsCount == 0)
   {
     // We can assume that this actor is under 2d layer. Use faster, but imprecise algorithm
-    BufferIndex bufferIndex = GetEventThreadServices().GetEventBufferIndex();
     return CalculateCurrentActorScreenExtents(*this, bufferIndex);
   }
   else
   {
-    BufferIndex bufferIndex = GetEventThreadServices().GetEventBufferIndex();
     return CalculateCurrentActorScreenExtentsRenderTaskList(*this, bufferIndex);
   }
 }
