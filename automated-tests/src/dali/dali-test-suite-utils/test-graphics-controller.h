@@ -2,7 +2,7 @@
 #define TEST_GRAPHICS_CONTROLLER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 #include <dali/graphics-api/graphics-controller.h>
 #include <unordered_map>
 #include "test-gl-abstraction.h"
-#include "test-gl-context-helper-abstraction.h"
 #include "test-graphics-command-buffer.h"
 #include "test-graphics-program.h"
 #include "test-graphics-reflection.h"
@@ -104,14 +103,14 @@ public:
     mGl.Initialize();
   }
 
-  Integration::GlAbstraction& GetGlAbstraction() override
+  Integration::GlAbstraction& GetGlAbstraction()
   {
     return mGl;
   }
 
-  Integration::GlContextHelperAbstraction& GetGlContextHelperAbstraction() override
+  Integration::GraphicsConfig& GetGraphicsConfig()
   {
-    return mGlContextHelperAbstraction;
+    return mGl;
   }
 
   TestGraphicsSyncImplementation& GetGraphicsSyncImpl()
@@ -465,7 +464,6 @@ public:
 
   TestGlAbstraction              mGl;
   TestGraphicsSyncImplementation mGraphicsSyncImpl;
-  TestGlContextHelperAbstraction mGlContextHelperAbstraction;
 
   bool            isDiscardQueueEmptyResult{true};
   bool            isDrawOnResumeRequiredResult{true};
