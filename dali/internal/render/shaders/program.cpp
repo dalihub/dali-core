@@ -229,10 +229,13 @@ bool Program::GetUniform(const std::string_view& name, Hash hashedName, Hash has
 
   if(!name.empty() && name.back() == ']')
   {
-    hash       = hashedNameNoArray;
-    auto pos   = name.rfind("[");
-    match      = name.substr(0, pos); // Remove subscript
-    arrayIndex = atoi(&name[pos + 1]);
+    auto pos = name.rfind("[");
+    if(pos != std::string::npos)
+    {
+      hash       = hashedNameNoArray;
+      match      = name.substr(0, pos); // Remove subscript
+      arrayIndex = atoi(&name[pos + 1]);
+    }
   }
 
   for(const ReflectionUniformInfo& item : mReflection)
