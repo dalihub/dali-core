@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_PROGRAM_CREATE_INFO_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,9 +94,22 @@ struct ProgramCreateInfo
     return *this;
   }
 
+  /**
+   * @brief Set the name of program.
+   *
+   * @param[in] value set of allocation callbacks
+   * @return reference to this structure.
+   */
+  auto& SetName(const std::string& value)
+  {
+    name = value;
+    return *this;
+  }
+
   GraphicsStructureType type{GraphicsStructureType::PROGRAM_CREATE_INFO_STRUCT};
   ExtensionCreateInfo*  nextExtension{nullptr};
 
+  std::string_view                name{};
   const std::vector<ShaderState>* shaderState{nullptr};
   const AllocationCallbacks*      allocationCallbacks{nullptr};
 };
