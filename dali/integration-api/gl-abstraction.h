@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_GL_ABSTRACTION_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,8 @@
 ** TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 ** MATERIALS OR THE USE OR OTHER DEALINGS IN THE MATERIALS.
 */
+
+#include <dali/integration-api/graphics-config.h>
 
 /* OpenGL ES 3.0 */
 struct __GLsync;
@@ -91,7 +93,7 @@ namespace Integration
  * A concrete implementation must be created for each platform, and provided when creating the
  * Dali::Integration::Core object.
  */
-class GlAbstraction
+class GlAbstraction : public GraphicsConfig
 {
 protected:
   // Protected construction & deletion

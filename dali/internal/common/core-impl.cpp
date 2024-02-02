@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/events/event.h>
-#include <dali/integration-api/gl-context-helper-abstraction.h>
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/integration-api/processor-interface.h>
 #include <dali/integration-api/render-controller.h>
@@ -72,7 +71,6 @@ namespace Internal
 {
 using Integration::Event;
 using Integration::GlAbstraction;
-using Integration::GlContextHelperAbstraction;
 using Integration::PlatformAbstraction;
 using Integration::RenderController;
 using Integration::RenderStatus;
@@ -640,9 +638,9 @@ AnimationPlaylist& Core::GetAnimationPlaylist() const
   return *(mAnimationPlaylist);
 }
 
-Integration::GlAbstraction& Core::GetGlAbstraction() const
+Integration::GraphicsConfig& Core::GetGraphicsConfig() const
 {
-  return mGraphicsController.GetGlAbstraction();
+  return mGraphicsController.GetGraphicsConfig();
 }
 
 void Core::AddScene(Scene* scene)

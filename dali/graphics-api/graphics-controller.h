@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_CONTROLLER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/graphics-config.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <memory>
 
@@ -43,7 +44,6 @@ namespace Dali
 namespace Integration
 {
 class GlAbstraction;
-class GlContextHelperAbstraction;
 } // namespace Integration
 
 namespace Graphics
@@ -70,9 +70,10 @@ class Texture;
 class Controller
 {
 public:
-  // Temporary until graphics api is complete
-  virtual Integration::GlAbstraction&              GetGlAbstraction()              = 0;
-  virtual Integration::GlContextHelperAbstraction& GetGlContextHelperAbstraction() = 0;
+  /**
+   * Get graphics configuration for info about the graphics subsystem.
+   */
+  virtual Integration::GraphicsConfig& GetGraphicsConfig() = 0;
 
   /**
    * @brief Destroys controller
