@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -441,6 +441,7 @@ Program* Renderer::PrepareProgram(const SceneGraph::RenderInstruction& instructi
 
     auto createInfo = Graphics::ProgramCreateInfo();
     createInfo.SetShaderState(shaderStates);
+    createInfo.SetName(shaderData->GetName());
     auto graphicsProgram = mGraphicsController->CreateProgram(createInfo, nullptr);
     program->SetGraphicsProgram(std::move(graphicsProgram), *mUniformBufferManager); // generates reflection
   }

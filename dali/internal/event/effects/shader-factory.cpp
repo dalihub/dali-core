@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,7 +71,7 @@ ShaderFactory::~ShaderFactory()
   }
 }
 
-ShaderDataPtr ShaderFactory::Load(std::string_view vertexSource, std::string_view fragmentSource, const Dali::Shader::Hint::Value hints, uint32_t renderPass, size_t& shaderHash)
+ShaderDataPtr ShaderFactory::Load(std::string_view vertexSource, std::string_view fragmentSource, const Dali::Shader::Hint::Value hints, uint32_t renderPassTag, std::string_view name, size_t& shaderHash)
 {
   // Work out the filename for the binary that the glsl source will be compiled and linked to:
   shaderHash = CalculateHash(vertexSource.data(), fragmentSource.data());
@@ -96,7 +96,7 @@ ShaderDataPtr ShaderFactory::Load(std::string_view vertexSource, std::string_vie
   if(shaderData.Get() == nullptr)
   {
     // Allocate the structure that returns the loaded shader:
-    shaderData = new ShaderData(std::string(vertexSource), std::string(fragmentSource), hints, renderPass);
+    shaderData = new ShaderData(vertexSource, fragmentSource, hints, renderPassTag, name);
     shaderData->SetHashValue(shaderHash);
     shaderData->GetBuffer().Clear();
 

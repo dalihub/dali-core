@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SHADER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,8 @@ public:
    */
   static ShaderPtr New(std::string_view          vertexShader,
                        std::string_view          fragmentShader,
-                       Dali::Shader::Hint::Value hints);
+                       Dali::Shader::Hint::Value hints,
+                       std::string_view          shaderName);
 
   /**
    * @copydoc Dali::Shader::New()
@@ -83,7 +84,7 @@ private: // implementation
   /**
    * Constructor
    *
-   * @param sceneObject the scene object
+   * @param[in] sceneObject the scene object
    */
   Shader(const SceneGraph::Shader* sceneObject);
 
@@ -95,8 +96,9 @@ private: // implementation
    * @param[in] fragmentShader Fragment Shader code for the effect.
    * @param[in] renderPassTag render pass tag of this shader data
    * @param[in] hints Hints to define the geometry of the rendered object
+   * @param[in] name The name of shader data.
    */
-  void UpdateShaderData(std::string_view vertexShader, std::string_view fragmentShader, uint32_t renderPassTag, Dali::Shader::Hint::Value hints);
+  void UpdateShaderData(std::string_view vertexShader, std::string_view fragmentShader, uint32_t renderPassTag, Dali::Shader::Hint::Value hints, std::string_view name);
 
   /**
    * @brief Sets shader data from shaderMap.
@@ -112,8 +114,8 @@ protected:
   ~Shader() override;
 
 private: // unimplemented methods
-  Shader()                         = delete;
-  Shader(const Shader&)            = delete;
+  Shader()              = delete;
+  Shader(const Shader&) = delete;
   Shader& operator=(const Shader&) = delete;
 
 private:

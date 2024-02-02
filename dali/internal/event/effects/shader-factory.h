@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SHADER_FACTORY_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,13 +59,14 @@ public:
    *
    * @param [in] vertexSource   The vertex shader source code
    * @param [in] fragmentSource The fragment shader source code
-   * @param [in] renderPass     RenderPass the shaders are executed
+   * @param [in] renderPassTag  RenderPass the shaders are executed
+   * @param [in] name           The name of shaders are executed
    * @param [out] shaderHash    Hash key created from vertex and fragment shader code
    * @return                    ShaderData containing the source and hash value, and additionally,
    *                            a compiled shader program binary if one could be found, else an
    *                            empty binary buffer cleared to size zero.
    */
-  Internal::ShaderDataPtr Load(std::string_view vertexSource, std::string_view fragmentSource, const Dali::Shader::Hint::Value hints, uint32_t renderPass, size_t& shaderHash);
+  Internal::ShaderDataPtr Load(std::string_view vertexSource, std::string_view fragmentSource, const Dali::Shader::Hint::Value hints, uint32_t renderPassTag, std::string_view name, size_t& shaderHash);
 
   /**
    * @brief Saves shader to memory cache and filesystem.

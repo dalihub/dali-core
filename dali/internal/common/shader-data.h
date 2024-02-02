@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SHADER_DATA_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <string>
+#include <string_view>
 
 // INTERNAL INCLUDES
 #include <dali/graphics-api/graphics-types.h>
@@ -36,7 +37,8 @@ using ShaderDataPtr = IntrusivePtr<ShaderData>;
 
 namespace
 {
-inline std::vector<char> StringToVector(const std::string& str)
+template<typename StdStringType>
+inline std::vector<char> StringToVector(const StdStringType& str)
 {
   auto retval = std::vector<char>{};
   retval.insert(retval.begin(), str.begin(), str.end());
@@ -59,14 +61,35 @@ public:
    * @param[in] fragmentSource Source code for fragment program
    * @param[in] hints          Hints for rendering
    * @param[in] renderPassTag  RenderPassTag to match shader data and render task.
+   * @param[in] name           Shader name for debug.
    */
-  ShaderData(std::string vertexSource, std::string fragmentSource, const Dali::Shader::Hint::Value hints, uint32_t renderPassTag)
+  ShaderData(std::string vertexSource, std::string fragmentSource, const Dali::Shader::Hint::Value hints, uint32_t renderPassTag, std::string_view name)
   : mShaderHash(-1),
     mVertexShader(StringToVector(vertexSource)),
     mFragmentShader(StringToVector(fragmentSource)),
     mHints(hints),
     mSourceMode(Graphics::ShaderSourceMode::TEXT),
-    mRenderPassTag(renderPassTag)
+    mRenderPassTag(renderPassTag),
+    mName(name)
+  {
+  }
+
+  /**
+   * Constructor
+   * @param[in] vertexSource   Source code for vertex program
+   * @param[in] fragmentSource Source code for fragment program
+   * @param[in] hints          Hints for rendering
+   * @param[in] renderPassTag  RenderPassTag to match shader data and render task.
+   * @param[in] name           Shader name for debug.
+   */
+  ShaderData(std::string_view vertexSource, std::string_view fragmentSource, const Dali::Shader::Hint::Value hints, uint32_t renderPassTag, std::string_view name)
+  : mShaderHash(-1),
+    mVertexShader(StringToVector(vertexSource)),
+    mFragmentShader(StringToVector(fragmentSource)),
+    mHints(hints),
+    mSourceMode(Graphics::ShaderSourceMode::TEXT),
+    mRenderPassTag(renderPassTag),
+    mName(name)
   {
   }
 
@@ -76,14 +99,16 @@ public:
    * @param[in] fragmentSource Source code for fragment program
    * @param[in] hints          Hints for rendering
    * @param[in] renderPassTag  RenderPassTag to match shader data and render task.
+   * @param[in] name Shader name for debug.
    */
-  ShaderData(std::vector<char>& vertexSource, std::vector<char>& fragmentSource, const Dali::Shader::Hint::Value hints, uint32_t renderPassTag)
+  ShaderData(std::vector<char>& vertexSource, std::vector<char>& fragmentSource, const Dali::Shader::Hint::Value hints, uint32_t renderPassTag, std::string_view name)
   : mShaderHash(-1),
     mVertexShader(vertexSource),
     mFragmentShader(fragmentSource),
     mHints(hints),
     mSourceMode(Graphics::ShaderSourceMode::BINARY),
-    mRenderPassTag(renderPassTag)
+    mRenderPassTag(renderPassTag),
+    mName(name)
   {
   }
 
@@ -242,9 +267,18 @@ public: // API
     return mRenderPassTag;
   }
 
-private:                                         // Not implemented
-  ShaderData(const ShaderData& other);           ///< no copying of this object
-  ShaderData& operator=(const ShaderData& rhs);  ///< no copying of this object
+  /**
+   * Get Name of shader data
+   * @return Name for this shader data, Default value is empty string.
+   */
+  const std::string& GetName() const
+  {
+    return mName;
+  }
+
+private:                                        // Not implemented
+  ShaderData(const ShaderData& other);          ///< no copying of this object
+  ShaderData& operator=(const ShaderData& rhs); ///< no copying of this object
 
 private:                                         // Data
   std::size_t                mShaderHash;        ///< hash key created with vertex and fragment shader code
@@ -254,6 +288,7 @@ private:                                         // Data
   Dali::Vector<uint8_t>      mBuffer;            ///< buffer containing compiled binary bytecode
   Graphics::ShaderSourceMode mSourceMode;        ///< Source mode of shader data ( text or binary )
   uint32_t                   mRenderPassTag{0u}; ///< Render Pass Tag for this shader
+  std::string                mName{""};          ///< Name for this shader
 };
 
 } // namespace Internal
