@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -486,6 +486,48 @@ int UtcDaliScriptingGetLinearEnumerationNameN(void)
 
   value = GetLinearEnumerationName(10, NULL, 1);
   DALI_TEST_CHECK(NULL == value);
+
+  END_TEST;
+}
+
+int UtcDaliScriptingGetLinearEnumerationNameP(void)
+{
+  const Scripting::StringEnum myTable[] =
+    {
+      {"ONE", 0},
+      {"TWO", 1},
+      {"THREE", 2},
+      {"FOUR", 3},
+      {"FIVE", 4},
+    };
+  const unsigned int myTableCount = sizeof(myTable) / sizeof(myTable[0]);
+
+  for(uint32_t i = 0; i < myTableCount; ++i)
+  {
+    const char* value = GetLinearEnumerationName<int32_t>(static_cast<int32_t>(i), myTable, myTableCount);
+    // We know that myTable[i].string is result. But for make clear test, let we just iterate and found it
+    std::string expectName = "invalid";
+    for(uint32_t j = 0; j < myTableCount; ++j)
+    {
+      if(myTable[j].value == static_cast<int32_t>(i))
+      {
+        DALI_TEST_CHECK(i == j);
+        expectName = myTable[j].string;
+        break;
+      }
+    }
+    DALI_TEST_EQUALS(std::string(value), expectName, TEST_LOCATION);
+  }
+
+  // Invalid case check
+  {
+    const char* value = GetLinearEnumerationName<int32_t>(static_cast<int32_t>(myTableCount), myTable, myTableCount);
+    DALI_TEST_CHECK(NULL == value);
+  }
+  {
+    const char* value = GetLinearEnumerationName<int32_t>(-1, myTable, myTableCount);
+    DALI_TEST_CHECK(NULL == value);
+  }
 
   END_TEST;
 }
