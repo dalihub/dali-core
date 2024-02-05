@@ -60,6 +60,11 @@ Shader::Shader(Internal::Shader* pointer)
 {
 }
 
+uint32_t Shader::GetShaderLanguageVersion()
+{
+  return Dali::Internal::Shader::GetShaderLanguageVersion();
+}
+
 std::string Shader::GetShaderVersionPrefix()
 {
   return Dali::Internal::Shader::GetShaderVersionPrefix();
