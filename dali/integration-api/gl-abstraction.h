@@ -142,6 +142,12 @@ public:
   virtual bool IsBlendEquationSupported(DevelBlendEquation::Type blendEquation) = 0;
 
   /**
+   * Returns shading language version.
+   * @Return shading language version.
+   */
+  virtual uint32_t GetShaderLanguageVersion() = 0;
+
+  /**
    * Returns shader prefix of shading language version.
    * @Return shader prefix of shading language version.
    */

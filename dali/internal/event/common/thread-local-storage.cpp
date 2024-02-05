@@ -164,6 +164,11 @@ bool ThreadLocalStorage::IsBlendEquationSupported(DevelBlendEquation::Type blend
   return mCore->GetGlAbstraction().IsBlendEquationSupported(blendEquation);
 }
 
+uint32_t ThreadLocalStorage::GetShaderLanguageVersion()
+{
+  return mCore->GetGlAbstraction().GetShaderLanguageVersion();
+}
+
 std::string ThreadLocalStorage::GetShaderVersionPrefix()
 {
   return mCore->GetGlAbstraction().GetShaderVersionPrefix();

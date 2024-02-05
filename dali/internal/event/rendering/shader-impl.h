@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SHADER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,14 +112,19 @@ protected:
   ~Shader() override;
 
 private: // unimplemented methods
-  Shader()                         = delete;
-  Shader(const Shader&)            = delete;
+  Shader()              = delete;
+  Shader(const Shader&) = delete;
   Shader& operator=(const Shader&) = delete;
 
 private:
   std::vector<Internal::ShaderDataPtr> mShaderDataList;
 
 public:
+  /**
+   * @copydoc Dali::Shader::GetShaderLanguageVersion()
+   */
+  static uint32_t GetShaderLanguageVersion();
+
   /**
    * @copydoc Dali::Shader::GetShaderVersionPrefix()
    */

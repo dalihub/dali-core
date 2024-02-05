@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -342,6 +342,36 @@ int UtcDaliShaderAnimatedProperty01(void)
   END_TEST;
 }
 
+int UtcDaliShaderGetShaderLanguageVersion(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test get shader language version");
+
+  auto originalShaderVersion = application.GetGlAbstraction().GetShaderLanguageVersion();
+
+  try
+  {
+    uint32_t expectVersion                                = 100;
+    application.GetGlAbstraction().mShaderLanguageVersion = expectVersion;
+
+    DALI_TEST_EQUALS(Dali::Shader::GetShaderLanguageVersion(), expectVersion, TEST_LOCATION);
+
+    expectVersion                                         = 200;
+    application.GetGlAbstraction().mShaderLanguageVersion = expectVersion;
+
+    DALI_TEST_EQUALS(Dali::Shader::GetShaderLanguageVersion(), expectVersion, TEST_LOCATION);
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(false);
+  }
+
+  application.GetGlAbstraction().mShaderLanguageVersion = originalShaderVersion;
+
+  END_TEST;
+}
+
 int UtcDaliShaderAnimatedProperty02(void)
 {
   TestApplication application;
@@ -506,10 +536,10 @@ int UtcDaliShaderPropertyValueConstructorMap(void)
 
   std::string   hintSet = "MODIFIES_GEOMETRY";
   Property::Map map;
-  map["vertex"]     = VertexSource;
-  map["fragment"]   = FragmentSource;
+  map["vertex"]        = VertexSource;
+  map["fragment"]      = FragmentSource;
   map["renderPassTag"] = 0;
-  map["hints"]      = hintSet;
+  map["hints"]         = hintSet;
 
   Shader shader = Shader::New(map);
 
@@ -538,10 +568,10 @@ int UtcDaliShaderPropertyValueConstructorMap2(void)
 
   std::string   hintSet = "MODIFIES_GEOMETRY";
   Property::Map map;
-  map["vertex"]     = VertexSource;
-  map["fragment"]   = FragmentSource;
+  map["vertex"]        = VertexSource;
+  map["fragment"]      = FragmentSource;
   map["renderPassTag"] = 0;
-  map["hints"]      = Shader::Hint::Value::MODIFIES_GEOMETRY;
+  map["hints"]         = Shader::Hint::Value::MODIFIES_GEOMETRY;
 
   Shader shader = Shader::New(map);
 
@@ -571,15 +601,15 @@ int UtcDaliShaderPropertyValueConstructorArray(void)
 
   std::string   hintSet = "MODIFIES_GEOMETRY";
   Property::Map map[2];
-  map[0]["vertex"]     = VertexSource;
-  map[0]["fragment"]   = FragmentSource;
+  map[0]["vertex"]        = VertexSource;
+  map[0]["fragment"]      = FragmentSource;
   map[0]["renderPassTag"] = 0;
-  map[0]["hints"]      = hintSet;
+  map[0]["hints"]         = hintSet;
 
-  map[1]["vertex"]     = VertexSource2;
-  map[1]["fragment"]   = FragmentSource2;
+  map[1]["vertex"]        = VertexSource2;
+  map[1]["fragment"]      = FragmentSource2;
   map[1]["renderPassTag"] = 1;
-  map[1]["hints"]      = hintSet;
+  map[1]["hints"]         = hintSet;
 
   Property::Array array;
   array.PushBack(map[0]);
@@ -621,15 +651,15 @@ int UtcDaliShaderProgramPropertyArray(void)
   std::string hintSet = "MODIFIES_GEOMETRY";
 
   Property::Map map[2];
-  map[0]["vertex"]     = VertexSource;
-  map[0]["fragment"]   = FragmentSource;
+  map[0]["vertex"]        = VertexSource;
+  map[0]["fragment"]      = FragmentSource;
   map[0]["renderPassTag"] = 0;
-  map[0]["hints"]      = hintSet;
+  map[0]["hints"]         = hintSet;
 
-  map[1]["vertex"]     = VertexSource2;
-  map[1]["fragment"]   = FragmentSource2;
+  map[1]["vertex"]        = VertexSource2;
+  map[1]["fragment"]      = FragmentSource2;
   map[1]["renderPassTag"] = 1;
-  map[1]["hints"]      = hintSet;
+  map[1]["hints"]         = hintSet;
 
   Property::Array array;
   array.PushBack(map[0]);

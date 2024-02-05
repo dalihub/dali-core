@@ -2,7 +2,7 @@
 #define DALI_SHADER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -199,6 +199,15 @@ public:
    * @return A reference to this
    */
   Shader& operator=(Shader&& rhs);
+
+  /**
+   * @brief Get the number of shading language version.
+   * @note This can potentially block until GL has been initialized
+   * when the first time any DALi application is launched in the system.
+   * @SINCE_2_3.10
+   * @return shader languange versoin as integer.
+   */
+  static uint32_t GetShaderLanguageVersion();
 
   /**
    * @brief Get shader preprocessor of shading language version.
