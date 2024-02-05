@@ -351,6 +351,36 @@ int UtcDaliShaderAnimatedProperty01(void)
   END_TEST;
 }
 
+int UtcDaliShaderGetShaderLanguageVersion(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test get shader language version");
+
+  auto originalShaderVersion = application.GetGlAbstraction().GetShaderLanguageVersion();
+
+  try
+  {
+    uint32_t expectVersion                                = 100;
+    application.GetGlAbstraction().mShaderLanguageVersion = expectVersion;
+
+    DALI_TEST_EQUALS(Dali::Shader::GetShaderLanguageVersion(), expectVersion, TEST_LOCATION);
+
+    expectVersion                                         = 200;
+    application.GetGlAbstraction().mShaderLanguageVersion = expectVersion;
+
+    DALI_TEST_EQUALS(Dali::Shader::GetShaderLanguageVersion(), expectVersion, TEST_LOCATION);
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(false);
+  }
+
+  application.GetGlAbstraction().mShaderLanguageVersion = originalShaderVersion;
+
+  END_TEST;
+}
+
 int UtcDaliShaderAnimatedProperty02(void)
 {
   TestApplication application;

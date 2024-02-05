@@ -328,6 +328,12 @@ Shader::~Shader()
   }
 }
 
+uint32_t Shader::GetShaderLanguageVersion()
+{
+  Dali::Internal::ThreadLocalStorage& tls = Dali::Internal::ThreadLocalStorage::Get();
+  return tls.GetShaderLanguageVersion();
+}
+
 std::string Shader::GetShaderVersionPrefix()
 {
   Dali::Internal::ThreadLocalStorage& tls = Dali::Internal::ThreadLocalStorage::Get();

@@ -123,6 +123,11 @@ private:
 
 public:
   /**
+   * @copydoc Dali::Shader::GetShaderLanguageVersion()
+   */
+  static uint32_t GetShaderLanguageVersion();
+
+  /**
    * @copydoc Dali::Shader::GetShaderVersionPrefix()
    */
   static std::string GetShaderVersionPrefix();
