@@ -2,7 +2,7 @@
 #define DALI_SCRIPTING_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -242,7 +242,7 @@ const char* GetEnumerationName(T value, const StringEnum* table, uint32_t tableC
 template<typename T>
 const char* GetLinearEnumerationName(T value, const StringEnum* table, uint32_t tableCount)
 {
-  if(table && (value > 0 || value <= static_cast<int>(tableCount)))
+  if(table && (value >= 0 && value < static_cast<int>(tableCount)))
   {
     return table[value].string;
   }
