@@ -19,7 +19,6 @@
 #include <dali/internal/event/common/thread-local-storage.h>
 
 // INTERNAL INCLUDES
-#include <dali/integration-api/gl-abstraction.h>
 #include <dali/integration-api/processor-interface.h>
 #include <dali/internal/common/core-impl.h>
 #include <dali/internal/event/common/event-thread-services.h>

@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_CORE_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -182,7 +182,7 @@ private:
  * Integration::Core is used for integration with the native windowing system.
  * The following integration tasks must be completed:
  *
- * 1) Handle GL context creation, and notify the Core when this occurs.
+ * 1) Handle Graphics context creation, and notify the Core when this occurs.
  *
  * 2) Provide suspend/resume behaviour (see below for more details).
  *
@@ -194,7 +194,6 @@ private:
  *
  * 5) Provide an implementation of the PlatformAbstraction interface, used to access platform specific services.
  *
- * 6) Provide an implementation of the GlAbstraction interface, used to access OpenGL services.
  *
  * Multi-threading notes:
  *

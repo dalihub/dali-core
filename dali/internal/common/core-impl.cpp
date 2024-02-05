@@ -70,7 +70,6 @@ namespace Dali
 namespace Internal
 {
 using Integration::Event;
-using Integration::GlAbstraction;
 using Integration::PlatformAbstraction;
 using Integration::RenderController;
 using Integration::RenderStatus;
