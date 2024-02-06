@@ -15947,3 +15947,23 @@ int UtcDaliAnimationPlayBlendQuaternion(void)
 
   END_TEST;
 }
+
+int UtcDaliAnimationGetAnimationId(void)
+{
+  TestApplication application;
+
+  Animation animation = Animation::New(1.0f);
+
+  // Let we check id is not zero
+  DALI_TEST_CHECK(animation.GetAnimationId() != 0u);
+
+  auto previousId = animation.GetAnimationId();
+
+  animation.Clear();
+
+  // Let we check id is same even after we call Clear()
+  DALI_TEST_CHECK(animation.GetAnimationId() != 0u);
+  DALI_TEST_CHECK(animation.GetAnimationId() == previousId);
+
+  END_TEST;
+}

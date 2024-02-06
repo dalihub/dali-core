@@ -571,6 +571,14 @@ public:
    */
   int32_t GetOrderIndex() const;
 
+  /**
+   * @brief Get the unique id of RenderTask. It could be 0 given render task is invalid.
+   *
+   * @SINCE_2_3.10
+   * @return The unique id of RenderTask, or 0 if invalid.
+   */
+  uint32_t GetRenderTaskId() const;
+
 public: // Signals
   /**
    * @brief If the refresh rate is REFRESH_ONCE, connect to this signal to be notified when a RenderTask has finished.

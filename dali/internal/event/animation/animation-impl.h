@@ -401,6 +401,11 @@ public:
    */
   Dali::Animation::LoopingMode GetLoopingMode() const;
 
+  /**
+   * @copydoc Dali::Animation::GetAnimationId()
+   */
+  uint32_t GetAnimationId() const;
+
 public: // For connecting animators to animations
   /**
    * Add an animator connector.
@@ -561,6 +566,8 @@ private:
 
   AnimatorConnectorContainer     mConnectors{};            ///< Owned by the Animation
   ConnectorTargetValuesContainer mConnectorTargetValues{}; //< Used to store animating property target value information
+
+  uint32_t mAnimationId{0u};
 
   AlphaFunction          mDefaultAlpha;
   Vector2                mPlayRange{0.0f, 1.0f};

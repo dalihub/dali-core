@@ -192,6 +192,10 @@ void Animation::CreateSceneObject()
 
   // Create a new animation, Keep a const pointer to the animation.
   mAnimation = SceneGraph::Animation::New(mDurationSeconds, mSpeedFactor, mPlayRange, mLoopCount, mEndAction, mDisconnectAction);
+
+  // Set id of scene graph animation
+  mAnimationId = mAnimation->GetNotifyId();
+
   OwnerPointer<SceneGraph::Animation> transferOwnership(const_cast<SceneGraph::Animation*>(mAnimation));
   AddAnimationMessage(mEventThreadServices.GetUpdateManager(), transferOwnership);
 
@@ -209,6 +213,9 @@ void Animation::DestroySceneObject()
     // Remove animation using a message to the update manager
     RemoveAnimationMessage(mEventThreadServices.GetUpdateManager(), *mAnimation);
     mAnimation = nullptr;
+
+    // Reset id
+    mAnimationId = 0u;
   }
 }
 
@@ -1093,6 +1100,11 @@ void Animation::SetLoopingMode(Dali::Animation::LoopingMode loopingMode)
 Dali::Animation::LoopingMode Animation::GetLoopingMode() const
 {
   return mAutoReverseEnabled ? Dali::Animation::AUTO_REVERSE : Dali::Animation::RESTART;
+}
+
+uint32_t Animation::GetAnimationId() const
+{
+  return mAnimationId;
 }
 
 bool Animation::CompareConnectorEndTimes(const Animation::ConnectorTargetValues& lhs, const Animation::ConnectorTargetValues& rhs)
