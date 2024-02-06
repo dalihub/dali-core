@@ -216,22 +216,24 @@ void RenderTaskList::Initialize()
   mSceneObject->SetCompleteNotificationInterface(this);
 }
 
-void RenderTaskList::NotifyCompleted(CompleteNotificationInterface::ParameterList notifierList)
+void RenderTaskList::NotifyCompleted(CompleteNotificationInterface::ParameterList notifierIdList)
 {
   DALI_LOG_TRACE_METHOD(gLogRenderList);
 
   RenderTaskContainer finishedRenderTasks;
 
-  // TODO : Optimize here if required.
-  // Note : Actually, Total number of RenderTask should be small enough so full search might not overhead for now.
-
-  // Since render tasks can be unreferenced during the signal emissions, iterators into render tasks pointers may be invalidated.
-  // First copy the finished render tasks, then emit signals
-  for(RenderTaskContainer::iterator iter = mTasks.begin(), endIt = mTasks.end(); iter != endIt; ++iter)
+  for(const auto& notifierId : notifierIdList)
   {
-    if((*iter)->HasFinished())
+    auto* renderTask = GetEventObject(notifierId);
+    if(DALI_LIKELY(renderTask))
     {
-      finishedRenderTasks.push_back(*iter);
+      // Check if this render task hold inputed scenegraph render task.
+      DALI_ASSERT_DEBUG(renderTask->GetRenderTaskSceneObject()->GetNotifyId() == notifierId);
+
+      if(renderTask->HasFinished())
+      {
+        finishedRenderTasks.push_back(renderTask);
+      }
     }
   }
 
