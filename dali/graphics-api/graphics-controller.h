@@ -41,11 +41,6 @@
 
 namespace Dali
 {
-namespace Integration
-{
-class GlAbstraction;
-} // namespace Integration
-
 namespace Graphics
 {
 class Command;
