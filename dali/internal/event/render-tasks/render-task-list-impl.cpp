@@ -42,6 +42,11 @@ namespace Dali
 {
 namespace Internal
 {
+namespace
+{
+static constexpr uint32_t ORDER_INDEX_OVERLAY_RENDER_TASK = INT32_MAX;
+}
+
 RenderTaskListPtr RenderTaskList::New()
 {
   RenderTaskListPtr taskList = new RenderTaskList();
@@ -56,16 +61,14 @@ RenderTaskPtr RenderTaskList::CreateTask()
   return CreateTask(&mDefaults.GetDefaultRootActor(), &mDefaults.GetDefaultCameraActor());
 }
 
-RenderTaskPtr RenderTaskList::CreateTask(Actor* sourceActor, CameraActor* cameraActor)
+RenderTaskPtr RenderTaskList::CreateTask(Actor* sourceActor, CameraActor* cameraActor, bool isOverlayTask)
 {
   RenderTaskPtr task = RenderTask::New(sourceActor, cameraActor, *this);
-  if(mOverlayRenderTask && mTasks.back() == mOverlayRenderTask)
+  mTasks.push_back(task);
+
+  if(isOverlayTask)
   {
-    mTasks.insert(mTasks.end() - 1, task);
-  }
-  else
-  {
-    mTasks.push_back(task);
+    task->SetOrderIndex(ORDER_INDEX_OVERLAY_RENDER_TASK);
   }
 
   // Setup mapping infomations between scenegraph rendertask
@@ -78,11 +81,7 @@ RenderTaskPtr RenderTaskList::CreateOverlayTask(Actor* sourceActor, CameraActor*
 {
   if(!mOverlayRenderTask)
   {
-    mOverlayRenderTask = RenderTask::New(sourceActor, cameraActor, *this, true);
-    mTasks.push_back(mOverlayRenderTask);
-
-    // Setup mapping infomations between scenegraph rendertask
-    this->MapNotifier(mOverlayRenderTask->GetRenderTaskSceneObject(), *mOverlayRenderTask);
+    mOverlayRenderTask = CreateTask(sourceActor, cameraActor, true);
   }
   return mOverlayRenderTask;
 }
@@ -168,6 +167,25 @@ void RenderTaskList::SetExclusive(RenderTask* task, bool exclusive)
     exclusiveSlot.actor.SetActor(task->GetSourceActor());
     mExclusives.emplace_back(std::move(exclusiveSlot));
   }
+}
+
+void RenderTaskList::SortTasks()
+{
+  if(!mIsRequestedToSortTask)
+  {
+    return;
+  }
+
+  std::stable_sort(mTasks.begin(), mTasks.end(), [](RenderTaskPtr first, RenderTaskPtr second) -> bool
+                   { return first->GetOrderIndex() < second->GetOrderIndex(); });
+
+  OwnerPointer<std::vector<const SceneGraph::RenderTask*>> sortedTasks(new std::vector<const SceneGraph::RenderTask*>());
+  for(auto && task : mTasks)
+  {
+    sortedTasks->push_back(task->GetRenderTaskSceneObject());
+  }
+  SortTasksMessage(mEventThreadServices, *mSceneObject, sortedTasks);
+  mIsRequestedToSortTask = false;
 }
 
 RenderTaskList::RenderTaskList()

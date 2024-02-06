@@ -81,14 +81,7 @@ RenderTaskPtr RenderTask::New(Actor* sourceActor, CameraActor* cameraActor, Rend
   // transfer scene object ownership to update manager
   const SceneGraph::RenderTaskList&    parentSceneObject = renderTaskList.GetSceneObject();
   OwnerPointer<SceneGraph::RenderTask> transferOwnership(sceneObject);
-  if(isOverlayTask)
-  {
-    AddOverlayTaskMessage(task->GetEventThreadServices(), parentSceneObject, transferOwnership);
-  }
-  else
-  {
-    AddTaskMessage(task->GetEventThreadServices(), parentSceneObject, transferOwnership);
-  }
+  AddTaskMessage(task->GetEventThreadServices(), parentSceneObject, transferOwnership);
 
   // Set the default source & camera actors
   task->SetSourceActor(sourceActor);
@@ -617,6 +610,20 @@ void RenderTask::SetRenderPassTag(uint32_t renderPassTag)
 uint32_t RenderTask::GetRenderPassTag() const
 {
   return mRenderPassTag;
+}
+
+void RenderTask::SetOrderIndex(int32_t orderIndex)
+{
+  if(mOrderIndex != orderIndex)
+  {
+    mOrderIndex = orderIndex;
+    mRenderTaskList.RequestToSort();
+  }
+}
+
+int32_t RenderTask::GetOrderIndex() const
+{
+  return mOrderIndex;
 }
 
 const SceneGraph::RenderTask* RenderTask::GetRenderTaskSceneObject() const
