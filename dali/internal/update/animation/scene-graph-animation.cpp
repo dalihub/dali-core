@@ -221,6 +221,7 @@ void Animation::Pause()
   if(mState == Playing)
   {
     mState = Paused;
+    DALI_LOG_DEBUG_INFO("Animation[%u] with duration %f ms Paused\n", GetNotifyId(), mDurationSeconds * 1000.0f);
   }
 }
 
@@ -243,6 +244,7 @@ void Animation::Bake(BufferIndex bufferIndex, EndAction action)
 
 void Animation::SetAnimatorsActive(bool active)
 {
+  DALI_LOG_DEBUG_INFO("Animation[%u] with duration %f ms %s\n", GetNotifyId(), mDurationSeconds * 1000.0f, active ? "Play" : "Stop");
   for(auto&& item : mAnimators)
   {
     item->SetActive(active);
@@ -297,6 +299,7 @@ void Animation::OnDestroy(BufferIndex bufferIndex)
   }
 
   mState = Destroyed;
+  DALI_LOG_DEBUG_INFO("Animation[%u] with duration %f ms Destroyed\n", GetNotifyId(), mDurationSeconds * 1000.0f);
 }
 
 void Animation::SetLoopingMode(bool loopingMode)
