@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_LINEAR_CONSTRAINER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,16 +114,21 @@ struct LinearConstraintFunctor
           min++;
         }
 
-        min--;
-        max = min + 1;
+        max = min;
 
-        if(min >= valueCount - 1)
+        if(min >= valueCount)
         {
           min = max = valueCount - 1;
           tLocal    = 0.0f;
         }
+        else if(min == 0u)
+        {
+          min = max = 0u;
+          tLocal    = 0.0f;
+        }
         else
         {
+          min--;
           tLocal = (t - mProgress[min]) / (mProgress[max] - mProgress[min]);
         }
       }
