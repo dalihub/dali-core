@@ -279,6 +279,11 @@ public:
    */
   int32_t GetOrderIndex() const;
 
+  /**
+   * @copydoc Dali::RenderTask::GetRenderTaskId()
+   */
+  uint32_t GetRenderTaskId() const;
+
 public: // Used by RenderTaskList, which owns the SceneGraph::RenderTasks
   /**
    * Retrieve the scene-graph RenderTask object.
@@ -401,6 +406,8 @@ private:
 
   uint32_t mRenderPassTag{0u};
   int32_t mOrderIndex{0u};
+
+  uint32_t mRenderTaskId{0u};
 
   bool mExclusive : 1;    ///< True if the render-task has exclusive access to the source Nodes.
   bool mInputEnabled : 1; ///< True if the render-task should be considered for input handling.

@@ -2,7 +2,7 @@
 #define DALI_ANIMATION_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -521,6 +521,14 @@ public:
    * @return The current looping mode
    */
   LoopingMode GetLoopingMode() const;
+
+  /**
+   * @brief Get the unique id of Animation. It could be 0 given animation is invalid.
+   *
+   * @SINCE_2_3.14
+   * @return The unique id of Animation, or 0 if invalid.
+   */
+  uint32_t GetAnimationId() const;
 
   /**
    * @brief Connects to this signal to be notified when an Animation's animations have finished.
