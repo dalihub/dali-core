@@ -34,6 +34,7 @@ Scene::Scene()
   mSurfaceRect(),
   mSurfaceOrientation(0),
   mScreenOrientation(0),
+  mRotationCompletedAcknowledgement(false),
   mSurfaceRectChangedCount(0u)
 {
 }
