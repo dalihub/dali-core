@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,6 +83,7 @@ Layer* FindLayer(Node& node)
  *
  * @param[in]  updateBufferIndex The current update buffer index.
  * @param[in]  node The current node of the scene-graph.
+ * @param[in]  parentVisibilityChanged The parent node's visibility was changed at current frame.
  * @param[in]  currentLayer The current layer containing lists of opaque/transparent renderables.
  * @param[in]  renderTask The current render-task.
  * @param[in]  inheritedDrawMode The draw mode of the parent
@@ -96,6 +97,7 @@ Layer* FindLayer(Node& node)
  */
 void AddRenderablesForTask(BufferIndex updateBufferIndex,
                            Node&       node,
+                           bool        parentVisibilityChanged,
                            Layer&      currentLayer,
                            RenderTask& renderTask,
                            int         inheritedDrawMode,
@@ -116,7 +118,12 @@ void AddRenderablesForTask(BufferIndex updateBufferIndex,
   if(!node.GetPartialRenderingData().mVisible)
   {
     node.GetPartialRenderingData().mVisible = true;
-    node.SetUpdatedTree(true);
+    parentVisibilityChanged                 = true;
+  }
+
+  if(parentVisibilityChanged)
+  {
+    node.SetUpdated(true);
   }
 
   // Check whether node is exclusive to a different render-task
@@ -184,7 +191,7 @@ void AddRenderablesForTask(BufferIndex updateBufferIndex,
   for(NodeIter iter = children.Begin(); iter != endIter; ++iter)
   {
     Node& child = **iter;
-    AddRenderablesForTask(updateBufferIndex, child, *layer, renderTask, inheritedDrawMode, currentClippingId, clippingDepth, scissorDepth, clippingUsed, keepRendering);
+    AddRenderablesForTask(updateBufferIndex, child, parentVisibilityChanged, *layer, renderTask, inheritedDrawMode, currentClippingId, clippingDepth, scissorDepth, clippingUsed, keepRendering);
   }
 }
 
@@ -280,6 +287,7 @@ void ProcessTasks(BufferIndex                          updateBufferIndex,
 
       AddRenderablesForTask(updateBufferIndex,
                             *sourceNode,
+                            false,
                             *layer,
                             renderTask,
                             sourceNode->GetDrawMode(),
