@@ -112,6 +112,18 @@ public:
    */
   bool IsAttached(Actor& actor) const;
 
+  /**
+   * @brief Returns whether the gesture was detected.
+   * @return true, if the gesture was detected, false otherwise.
+   */
+  bool IsDetected() const;
+
+  /**
+   * @brief Sets whether the gesture was detected.
+   * @param detected Whether gesture detected.
+   */
+  void SetDetected(bool detected);
+
 protected: // Creation & Destruction
   /**
    * Construct a new GestureDetector.
@@ -174,6 +186,7 @@ protected:
   GestureDetectorActorContainer mAttachedActors;        ///< Object::Observer is used to provide weak-pointer behaviour
   GestureDetectorActorContainer mPendingAttachActors;   ///< Object::Observer is used to provide weak-pointer behaviour
   GestureEventProcessor&        mGestureEventProcessor; ///< A reference to the gesture event processor.
+  bool mIsDetected : 1;                                 ///< Whether gesture detected.
 };
 
 } // namespace Internal

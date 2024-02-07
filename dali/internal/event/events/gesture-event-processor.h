@@ -336,6 +336,7 @@ private:
 
   int32_t envOptionMinimumPanDistance;
   int32_t envOptionMinimumPanEvents;
+  bool mIsProcessingFeedTouch;  // Whether the gesture is being recognized via FeedTouch in gestureDetector
 };
 
 } // namespace Internal

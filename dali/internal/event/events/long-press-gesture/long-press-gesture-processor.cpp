@@ -124,7 +124,7 @@ LongPressGestureProcessor::LongPressGestureProcessor()
 
 LongPressGestureProcessor::~LongPressGestureProcessor() = default;
 
-void LongPressGestureProcessor::Process(Scene& scene, const LongPressGestureEvent& longPressEvent, Actor* actor)
+void LongPressGestureProcessor::Process(Scene& scene, const LongPressGestureEvent& longPressEvent)
 {
   DALI_TRACE_SCOPE(gTraceFilter, "DALI_PROCESS_LONG_PRESS_GESTURE");
   switch(longPressEvent.state)
@@ -135,9 +135,9 @@ void LongPressGestureProcessor::Process(Scene& scene, const LongPressGestureEven
       ResetActor();
 
       HitTestAlgorithm::Results hitTestResults;
-      if(actor)
+      if(GetFeededActor())
       {
-        SetActor(actor);
+        SetActor(GetFeededActor());
       }
       else if(HitTest(scene, longPressEvent.point, hitTestResults))
       {
@@ -152,10 +152,10 @@ void LongPressGestureProcessor::Process(Scene& scene, const LongPressGestureEven
       if(currentGesturedActor)
       {
         HitTestAlgorithm::Results hitTestResults;
-        if(actor)
+        if(GetFeededActor())
         {
-          hitTestResults.actor = Dali::Actor(actor);
-          hitTestResults.renderTask = longPressEvent.renderTask;
+          hitTestResults.actor = Dali::Actor(GetFeededActor());
+          hitTestResults.renderTask = GetFeededRenderTask();
 
           Vector2     actorCoords;
           currentGesturedActor->ScreenToLocal(*hitTestResults.renderTask.Get(), actorCoords.x, actorCoords.y, longPressEvent.point.x, longPressEvent.point.y);
@@ -173,9 +173,9 @@ void LongPressGestureProcessor::Process(Scene& scene, const LongPressGestureEven
 
           // Set mCurrentLongPressEvent to use inside overridden methods called from ProcessAndEmit()
           mCurrentLongPressEvent = &longPressEvent;
-          if(actor)
+          if(GetFeededActor())
           {
-            ProcessAndEmitActor(hitTestResults);
+            ProcessAndEmitActor(hitTestResults, GetFeededGestureDetector());
           }
           else
           {
@@ -199,7 +199,6 @@ void LongPressGestureProcessor::Process(Scene& scene, const LongPressGestureEven
 
       // Only send subsequent long press gesture signals if we processed the gesture when it started.
       // Check if actor is still touchable.
-
       Actor* currentGesturedActor = GetCurrentGesturedActor();
       if(currentGesturedActor)
       {
@@ -208,7 +207,10 @@ void LongPressGestureProcessor::Process(Scene& scene, const LongPressGestureEven
           // Ensure actor is still attached to the emitters, if it is not then remove the emitter.
           GestureDetectorContainer::iterator endIter = std::remove_if(mCurrentEmitters.begin(), mCurrentEmitters.end(), IsNotAttachedFunctor(currentGesturedActor));
           mCurrentEmitters.erase(endIter, mCurrentEmitters.end());
-
+          if(GetFeededGestureDetector())
+          {
+            mCurrentEmitters.push_back(GetFeededGestureDetector());
+          }
           if(!mCurrentEmitters.empty())
           {
             Vector2     actorCoords;
