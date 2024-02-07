@@ -22,6 +22,7 @@
 #include <cmath> // fmod
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
 #include <dali/integration-api/trace.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/render/common/performance-monitor.h>
