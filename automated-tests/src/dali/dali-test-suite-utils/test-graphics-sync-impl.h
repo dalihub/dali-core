@@ -2,7 +2,7 @@
 #define TEST_SYNC_IMPLEMENTATION_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,10 @@ class TestSyncObject : public Integration::GraphicsSyncAbstraction::SyncObject
 public:
   TestSyncObject(TraceCallStack& trace);
   ~TestSyncObject() override;
-  bool            IsSynced() override;
+  bool IsSynced() override;
+  void Wait() override;
+  void ClientWait() override;
+
   bool            synced;
   TraceCallStack& mTrace;
 };
