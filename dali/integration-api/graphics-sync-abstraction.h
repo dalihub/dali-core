@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_GRAPHICS_SYNC_ABSTRACTION_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,6 +55,17 @@ public:
      * can now be destroyed)
      */
     virtual bool IsSynced() = 0;
+
+    /**
+     * Wait in the GPU for the synchronisation object to be signalled (but can timeout)
+     */
+    virtual void Wait() = 0;
+
+    /**
+     * Wait in the CPU for the synchronisation object to be signalled.
+     * This will block the render thread - use with caution.
+     */
+    virtual void ClientWait() = 0;
   };
 
   /**

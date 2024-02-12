@@ -38,6 +38,16 @@ bool TestSyncObject::IsSynced()
   return synced;
 }
 
+void TestSyncObject::Wait()
+{
+  mTrace.PushCall("SyncObject::Wait", ""); // Trace the method
+}
+
+void TestSyncObject::ClientWait()
+{
+  mTrace.PushCall("SyncObject::ClientWait", ""); // Trace the method
+}
+
 TestGraphicsSyncImplementation::TestGraphicsSyncImplementation()
 {
   Initialize();
