@@ -551,6 +551,26 @@ public:
    */
   uint32_t GetRenderPassTag() const;
 
+  /**
+   * Sets Order Index to define rendering order for this RenderTask.
+   * In the DALi, offscreen renderTasks are rendered earlier than onscreen renderTask.
+   * In each category of OffScreen RenderTask and OnScreen RenderTask,
+   * a RenderTask with a smaller orderIndex is rendered first.
+   * The RenderTasks in RenderTaskList is always sorted as acending order of the OrderIndex.
+   * The OrderIndex value is needed to be set between [-1000, 1000].
+   * Default orderIndex is 0.
+   * @param[in] orderIndex the order index for this render task.
+   * @note The order among RenderTasks whose OrderIndex has not changed follows the order in which they were created.
+   * @note Rendering order among RenderTasks those have same OrderIndex cannot be guaranteed after the OrderIndex is changed
+   */
+  void SetOrderIndex(int32_t orderIndex);
+
+  /**
+   * Gets Order Index for this RenderTask.
+   * @return OrderIndex value for this render task.
+   */
+  int32_t GetOrderIndex() const;
+
 public: // Signals
   /**
    * @brief If the refresh rate is REFRESH_ONCE, connect to this signal to be notified when a RenderTask has finished.

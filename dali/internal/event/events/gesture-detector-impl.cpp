@@ -37,7 +37,8 @@ namespace Internal
 GestureDetector::GestureDetector(GestureType::Value type, const SceneGraph::PropertyOwner* sceneObject)
 : Object(sceneObject),
   mType(type),
-  mGestureEventProcessor(ThreadLocalStorage::Get().GetGestureEventProcessor())
+  mGestureEventProcessor(ThreadLocalStorage::Get().GetGestureEventProcessor()),
+  mIsDetected(false)
 {
 }
 
@@ -268,7 +269,10 @@ bool GestureDetector::FeedTouch(Dali::Actor& actor, Dali::TouchEvent& touch)
     Dali::Internal::Actor& actorImpl(GetImplementation(actor));
     if(state == PointState::DOWN)
     {
+      //TODO We need to find a better way to add detectors to the processor other than detach and attach.
+      Detach(actorImpl);
       Attach(actorImpl);
+      mIsDetected = false;
     }
 
     Integration::TouchEvent touchEvent(touch.GetTime());
@@ -292,13 +296,28 @@ bool GestureDetector::FeedTouch(Dali::Actor& actor, Dali::TouchEvent& touch)
     Dali::Internal::TouchEvent& touchEventImpl(GetImplementation(touch));
     mGestureEventProcessor.ProcessTouchEvent(this, actorImpl, GetImplementation(touchEventImpl.GetRenderTaskPtr()), actorImpl.GetScene(), touchEvent);
 
+    if(IsDetected())
+    {
+      ret = !actorImpl.NeedGesturePropagation();
+    }
+
     if(state == PointState::FINISHED || state == PointState::INTERRUPTED || state == PointState::LEAVE)
     {
+      //TODO We need to find a better way to remove detectors to the processor other than detach.
       Detach(actorImpl);
     }
-    ret = true;
   }
   return ret;
+}
+
+bool GestureDetector::IsDetected() const
+{
+  return mIsDetected;
+}
+
+void GestureDetector::SetDetected(bool detected)
+{
+  mIsDetected = detected;
 }
 
 bool GestureDetector::IsAttached(Actor& actor) const

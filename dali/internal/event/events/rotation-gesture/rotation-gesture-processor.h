@@ -63,9 +63,8 @@ public: // To be called by GestureEventProcessor
    * This method is called whenever a rotation gesture event occurs.
    * @param[in] scene The scene the rotation gesture event occurs in.
    * @param[in] rotationEvent The event that has occurred.
-   * @param[in] actor The actor where the event occurred. If this is null, the actor is found through hittest.
    */
-  void Process(Scene& scene, const RotationGestureEvent& rotationEvent, Actor* actor = nullptr) override;
+  void Process(Scene& scene, const RotationGestureEvent& rotationEvent) override;
 
   /**
    * Adds a gesture detector to this gesture processor.

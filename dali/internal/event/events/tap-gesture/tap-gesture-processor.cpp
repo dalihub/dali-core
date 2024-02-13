@@ -100,7 +100,7 @@ TapGestureProcessor::TapGestureProcessor()
 
 TapGestureProcessor::~TapGestureProcessor() = default;
 
-void TapGestureProcessor::Process(Scene& scene, const TapGestureEvent& tapEvent, Actor* actor)
+void TapGestureProcessor::Process(Scene& scene, const TapGestureEvent& tapEvent)
 {
   DALI_TRACE_SCOPE(gTraceFilter, "DALI_PROCESS_TAP_GESTURE");
   switch(tapEvent.state)
@@ -109,9 +109,9 @@ void TapGestureProcessor::Process(Scene& scene, const TapGestureEvent& tapEvent,
     {
       // Do a hit test and if an actor has been hit then save to see if tap event is still valid on a tap( same actor being hit )
       HitTestAlgorithm::Results hitTestResults;
-      if(actor)
+      if(GetFeededActor())
       {
-        SetActor(actor);
+        SetActor(GetFeededActor());
         mCurrentTapActor.SetActor(GetCurrentGesturedActor());
 
         // Indicate that we've processed a touch down. Bool should be sufficient as a change in actor will result in a cancellation
@@ -138,15 +138,15 @@ void TapGestureProcessor::Process(Scene& scene, const TapGestureEvent& tapEvent,
       HitTestAlgorithm::Results hitTestResults;
       if(GetCurrentGesturedActor())
       {
-        if(actor)
+        if(GetFeededActor())
         {
-          hitTestResults.actor = Dali::Actor(actor);
-          hitTestResults.renderTask = tapEvent.renderTask;
+          hitTestResults.actor = Dali::Actor(GetFeededActor());
+          hitTestResults.renderTask = GetFeededRenderTask();
           // Check that this actor is still the one that was used for the last touch down ?
           if(mCurrentTapActor.GetActor() == &GetImplementation(hitTestResults.actor))
           {
             mCurrentTapEvent = &tapEvent;
-            ProcessAndEmitActor(hitTestResults);
+            ProcessAndEmitActor(hitTestResults, GetFeededGestureDetector());
           }
           mCurrentTapEvent   = nullptr;
           mPossibleProcessed = false;

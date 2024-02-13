@@ -143,7 +143,7 @@ PanGestureProcessor::~PanGestureProcessor()
   mSceneObject = nullptr; // mSceneObject is owned and destroyed by update manager (there is only one of these for now)
 }
 
-void PanGestureProcessor::Process(Scene& scene, const PanGestureEvent& panEvent, Actor* actor)
+void PanGestureProcessor::Process(Scene& scene, const PanGestureEvent& panEvent)
 {
 #if defined(DEBUG_ENABLED)
   DALI_LOG_TRACE_METHOD(gLogFilter);
@@ -163,9 +163,9 @@ void PanGestureProcessor::Process(Scene& scene, const PanGestureEvent& panEvent,
       ResetActor();
 
       HitTestAlgorithm::Results hitTestResults;
-      if(actor)
+      if(GetFeededActor())
       {
-        SetActor(actor);
+        SetActor(GetFeededActor());
         mPossiblePanPosition = panEvent.currentPosition;
       }
       else if(HitTest(scene, panEvent.currentPosition, hitTestResults))
@@ -185,13 +185,13 @@ void PanGestureProcessor::Process(Scene& scene, const PanGestureEvent& panEvent,
       // it can be told when the gesture ends as well.
 
       HitTestAlgorithm::Results hitTestResults;
-      if(actor)
+      if(GetFeededActor())
       {
-        hitTestResults.actor = Dali::Actor(actor);
-        hitTestResults.renderTask = panEvent.renderTask;
+        hitTestResults.actor = Dali::Actor(GetFeededActor());
+        hitTestResults.renderTask = GetFeededRenderTask();
 
         Vector2 actorCoords;
-        actor->ScreenToLocal(*hitTestResults.renderTask.Get(), actorCoords.x, actorCoords.y, panEvent.currentPosition.x, panEvent.currentPosition.y);
+        GetFeededActor()->ScreenToLocal(*hitTestResults.renderTask.Get(), actorCoords.x, actorCoords.y, panEvent.currentPosition.x, panEvent.currentPosition.y);
         hitTestResults.actorCoordinates = actorCoords;
       }
       else
@@ -213,9 +213,9 @@ void PanGestureProcessor::Process(Scene& scene, const PanGestureEvent& panEvent,
 
         // Set mCurrentPanEvent to use inside overridden methods called in ProcessAndEmit()
         mCurrentPanEvent = &panEvent;
-        if(actor)
+        if(GetFeededActor())
         {
-          ProcessAndEmitActor(hitTestResults);
+          ProcessAndEmitActor(hitTestResults, GetFeededGestureDetector());
         }
         else
         {
@@ -235,7 +235,32 @@ void PanGestureProcessor::Process(Scene& scene, const PanGestureEvent& panEvent,
     {
       // Requires a core update
       mNeedsUpdate = true;
+      Actor* currentGesturedActor = GetCurrentGesturedActor();
+      if(GetFeededActor() && GetFeededActor() != currentGesturedActor && (mCurrentPanEmitters.empty() || (currentGesturedActor && currentGesturedActor->NeedGesturePropagation())) && GetFeededGestureDetector())
+      {
+        if(currentGesturedActor)
+        {
+          currentGesturedActor->SetNeedGesturePropagation(false);
+        }
+        mCurrentPanEvent = &panEvent;
+        if(GetFeededActor()->IsHittable() && CheckGestureDetector(GetFeededGestureDetector(), GetFeededActor()))
+        {
+          mCurrentPanEmitters.clear();
+          ResetActor();
 
+          // Record the current render-task for Screen->Actor coordinate conversions
+          mCurrentRenderTask = GetFeededRenderTask();
+
+          Vector2 actorCoords;
+          GetFeededActor()->ScreenToLocal(*mCurrentRenderTask.Get(), actorCoords.x, actorCoords.y, panEvent.currentPosition.x, panEvent.currentPosition.y);
+
+          mCurrentPanEmitters.push_back(GetFeededGestureDetector());
+          SetActor(GetFeededActor());
+          GetFeededGestureDetector()->SetDetected(true);
+          EmitPanSignal(GetFeededActor(), mCurrentPanEmitters, panEvent, actorCoords, GestureState::STARTED, mCurrentRenderTask);
+        }
+        mCurrentPanEvent = nullptr;
+      }
       DALI_FALLTHROUGH;
     }
 
@@ -244,7 +269,6 @@ void PanGestureProcessor::Process(Scene& scene, const PanGestureEvent& panEvent,
     {
       // Only send subsequent pan gesture signals if we processed the pan gesture when it started.
       // Check if actor is still touchable.
-
       Actor* currentGesturedActor = GetCurrentGesturedActor();
       if(currentGesturedActor)
       {
@@ -252,17 +276,18 @@ void PanGestureProcessor::Process(Scene& scene, const PanGestureEvent& panEvent,
         {
           GestureDetectorContainer outsideTouchesRangeEmitters;
 
-          // Removes emitters that no longer have the actor attached
-          // Also remove emitters whose touches are outside the range of the current pan event and add them to outsideTouchesRangeEmitters
-          GestureDetectorContainer::iterator endIter = std::remove_if(mCurrentPanEmitters.begin(), mCurrentPanEmitters.end(), IsNotAttachedAndOutsideTouchesRangeFunctor(currentGesturedActor, panEvent.numberOfTouches, outsideTouchesRangeEmitters));
-          mCurrentPanEmitters.erase(endIter, mCurrentPanEmitters.end());
+          if(!(GetFeededActor() && GetFeededGestureDetector()))
+          {
+            // Removes emitters that no longer have the actor attached
+            // Also remove emitters whose touches are outside the range of the current pan event and add them to outsideTouchesRangeEmitters
+            GestureDetectorContainer::iterator endIter = std::remove_if(mCurrentPanEmitters.begin(), mCurrentPanEmitters.end(), IsNotAttachedAndOutsideTouchesRangeFunctor(currentGesturedActor, panEvent.numberOfTouches, outsideTouchesRangeEmitters));
+            mCurrentPanEmitters.erase(endIter, mCurrentPanEmitters.end());
+          }
 
           Vector2 actorCoords;
-
           if(!outsideTouchesRangeEmitters.empty() || !mCurrentPanEmitters.empty())
           {
             currentGesturedActor->ScreenToLocal(*mCurrentRenderTask.Get(), actorCoords.x, actorCoords.y, panEvent.currentPosition.x, panEvent.currentPosition.y);
-
             // EmitPanSignal checks whether we have a valid actor and whether the container we are passing in has emitters before it emits the pan.
             EmitPanSignal(currentGesturedActor, outsideTouchesRangeEmitters, panEvent, actorCoords, GestureState::FINISHED, mCurrentRenderTask);
             EmitPanSignal(currentGesturedActor, mCurrentPanEmitters, panEvent, actorCoords, panEvent.state, mCurrentRenderTask);

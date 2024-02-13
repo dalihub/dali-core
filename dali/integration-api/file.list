@@ -37,8 +37,8 @@ SET( platform_abstraction_header_files
    ${platform_abstraction_src_dir}/core-enumerations.h
    ${platform_abstraction_src_dir}/debug.h
    ${platform_abstraction_src_dir}/gl-abstraction.h
-   ${platform_abstraction_src_dir}/gl-context-helper-abstraction.h
    ${platform_abstraction_src_dir}/gl-defines.h
+   ${platform_abstraction_src_dir}/graphics-config.h
    ${platform_abstraction_src_dir}/graphics-sync-abstraction.h
    ${platform_abstraction_src_dir}/input-options.h
    ${platform_abstraction_src_dir}/lockless-buffer.h

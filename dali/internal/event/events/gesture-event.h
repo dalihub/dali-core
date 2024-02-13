@@ -67,12 +67,6 @@ struct GestureEvent
    */
   GestureSourceData sourceData;
 
-  /**
-   * The render task used to generate this touch event.
-   */
-  RenderTaskPtr renderTask;
-
-
 protected: // Constructors only to be used by derived structures.
   /**
    * This constructor is only used by derived classes.

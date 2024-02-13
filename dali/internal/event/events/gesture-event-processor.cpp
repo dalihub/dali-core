@@ -42,7 +42,8 @@ GestureEventProcessor::GestureEventProcessor(SceneGraph::UpdateManager& updateMa
   mRotationGestureProcessor(),
   mRenderController(renderController),
   envOptionMinimumPanDistance(-1),
-  envOptionMinimumPanEvents(-1)
+  envOptionMinimumPanEvents(-1),
+  mIsProcessingFeedTouch(false)
 {
 }
 
@@ -50,44 +51,49 @@ GestureEventProcessor::~GestureEventProcessor() = default;
 
 void GestureEventProcessor::ProcessTouchEvent(Scene& scene, const Integration::TouchEvent& event)
 {
-  mLongPressGestureProcessor.ProcessTouch(scene, event);
-  mPanGestureProcessor.ProcessTouch(scene, event);
-  mPinchGestureProcessor.ProcessTouch(scene, event);
-  mTapGestureProcessor.ProcessTouch(scene, event);
-  mRotationGestureProcessor.ProcessTouch(scene, event);
+  if(!mIsProcessingFeedTouch)
+  {
+    mLongPressGestureProcessor.ProcessTouch(scene, event);
+    mPanGestureProcessor.ProcessTouch(scene, event);
+    mPinchGestureProcessor.ProcessTouch(scene, event);
+    mTapGestureProcessor.ProcessTouch(scene, event);
+    mRotationGestureProcessor.ProcessTouch(scene, event);
+  }
+  mIsProcessingFeedTouch = false;
 }
 
 void GestureEventProcessor::ProcessTouchEvent(GestureDetector* gestureDetector, Actor& actor, Dali::Internal::RenderTask& renderTask, Scene& scene, const Integration::TouchEvent& event)
 {
+  mIsProcessingFeedTouch = true;
   switch(gestureDetector->GetType())
   {
     case GestureType::LONG_PRESS:
     {
-      mLongPressGestureProcessor.ProcessTouch(actor, renderTask, scene, event);
+      mLongPressGestureProcessor.ProcessTouch(gestureDetector, actor, renderTask, scene, event);
       break;
     }
 
     case GestureType::PAN:
     {
-      mPanGestureProcessor.ProcessTouch(actor, renderTask, scene, event);
+      mPanGestureProcessor.ProcessTouch(gestureDetector, actor, renderTask, scene, event);
       break;
     }
 
     case GestureType::PINCH:
     {
-      mPinchGestureProcessor.ProcessTouch(actor, renderTask, scene, event);
+      mPinchGestureProcessor.ProcessTouch(gestureDetector, actor, renderTask, scene, event);
       break;
     }
 
     case GestureType::TAP:
     {
-      mTapGestureProcessor.ProcessTouch(actor, renderTask, scene, event);
+      mTapGestureProcessor.ProcessTouch(gestureDetector, actor, renderTask, scene, event);
       break;
     }
 
     case GestureType::ROTATION:
     {
-      mRotationGestureProcessor.ProcessTouch(actor, renderTask, scene, event);
+      mRotationGestureProcessor.ProcessTouch(gestureDetector, actor, renderTask, scene, event);
       break;
     }
   }

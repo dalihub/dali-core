@@ -262,14 +262,13 @@ void PinchGestureRecognizer::SendPinch(GestureState state, const Integration::To
   gesture.time       = currentEvent.time;
   gesture.sourceType = mSourceType;
   gesture.sourceData = mSourceData;
-  gesture.renderTask = mRenderTask;
 
   if(mScene)
   {
     // Create another handle so the recognizer cannot be destroyed during process function
     GestureRecognizerPtr recognizerHandle = this;
 
-    mObserver.Process(*mScene, gesture, mActor.GetActor());
+    mObserver.Process(*mScene, gesture);
   }
 }
 

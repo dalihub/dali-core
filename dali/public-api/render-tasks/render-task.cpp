@@ -48,6 +48,9 @@ const bool     RenderTask::DEFAULT_CLEAR_ENABLED = false;
 const bool     RenderTask::DEFAULT_CULL_MODE     = true;
 const uint32_t RenderTask::DEFAULT_REFRESH_RATE  = REFRESH_ALWAYS;
 
+static constexpr int32_t MIN_ORDER_INDEX = -1000;
+static constexpr int32_t MAX_ORDER_INDEX = 1000;
+
 RenderTask::RenderTask() = default;
 
 RenderTask RenderTask::DownCast(BaseHandle handle)
@@ -281,6 +284,22 @@ void RenderTask::SetRenderPassTag(uint32_t renderPassTag)
 uint32_t RenderTask::GetRenderPassTag() const
 {
   return GetImplementation(*this).GetRenderPassTag();
+}
+
+void RenderTask::SetOrderIndex(int32_t orderIndex)
+{
+  if(orderIndex < MIN_ORDER_INDEX || orderIndex > MAX_ORDER_INDEX)
+  {
+    DALI_LOG_ERROR("OrderIndex value can be available between [-1000, 1000].\n");
+    orderIndex = std::min(orderIndex, MAX_ORDER_INDEX);
+    orderIndex = std::max(orderIndex, MIN_ORDER_INDEX);
+  }
+  GetImplementation(*this).SetOrderIndex(orderIndex);
+}
+
+int32_t RenderTask::GetOrderIndex() const
+{
+  return GetImplementation(*this).GetOrderIndex();
 }
 
 RenderTask::RenderTask(Internal::RenderTask* internal)
