@@ -106,7 +106,6 @@ private:
   SceneGraph::Node& mRootNode;
 
   std::unordered_map<uint32_t, SceneGraph::Node*> mTravledNodeMap; ///< Used to store cached pointers to already searched for Nodes.
-                                                                   ///< If node is not under root node, it will store nullptr.
 
   bool mInvalidated : 1; ///< True if root node was destroyed.
 };

@@ -72,11 +72,7 @@ SceneGraph::Node* SceneGraphTraveler::FindNode(uint32_t id)
         auto iter = mTravledNodeMap.find(iterateNodeId);
         if(iter != mTravledNodeMap.end())
         {
-          // iter->second could be nullptr if it was failed item before.
-          if(iter->second != nullptr)
-          {
-            isNodeUnderRootNode = true;
-          }
+          isNodeUnderRootNode = true;
           break;
         }
         nodeStack.push_back({iterateNodeId, iterateNode});
@@ -86,13 +82,13 @@ SceneGraph::Node* SceneGraphTraveler::FindNode(uint32_t id)
       }
 
       // Store current found result.
-      for(auto&& idPair : nodeStack)
-      {
-        mTravledNodeMap.insert({idPair.first, isNodeUnderRootNode ? idPair.second : nullptr});
-      }
-
+      // Note : We don't cache failed cases, to avoid memory increasement.
       if(isNodeUnderRootNode)
       {
+        for(auto&& idPair : nodeStack)
+        {
+          mTravledNodeMap.insert({idPair.first, idPair.second});
+        }
         node = currentNode;
       }
     }
