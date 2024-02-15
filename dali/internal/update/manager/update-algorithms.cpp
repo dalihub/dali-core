@@ -213,21 +213,24 @@ inline void UpdateLayers(Node&             node,
 
   // if any child node has moved or had its sort modifier changed, layer is not clean and old frame cannot be reused
   // also if node has been deleted, dont reuse old render items
-  if(nodeDirtyFlags != NodePropertyFlags::NOTHING)
+  if(layer->GetReuseRenderers(updateBufferIndex))
   {
-    layer->SetReuseRenderers(updateBufferIndex, false);
-  }
-  else
-  {
-    // If the node is not dirty, then check renderers
-    const uint32_t count = node.GetRendererCount();
-    for(uint32_t i = 0; i < count; ++i)
+    if(nodeDirtyFlags != NodePropertyFlags::NOTHING)
     {
-      SceneGraph::RendererKey renderer = node.GetRendererAt(i);
-      if(renderer->IsDirty())
+      layer->SetReuseRenderers(updateBufferIndex, false);
+    }
+    else
+    {
+      // If the node is not dirty, then check renderers
+      const uint32_t count = node.GetRendererCount();
+      for(uint32_t i = 0; i < count; ++i)
       {
-        layer->SetReuseRenderers(updateBufferIndex, false);
-        break;
+        SceneGraph::RendererKey renderer = node.GetRendererAt(i);
+        if(renderer->IsDirty())
+        {
+          layer->SetReuseRenderers(updateBufferIndex, false);
+          break;
+        }
       }
     }
   }
