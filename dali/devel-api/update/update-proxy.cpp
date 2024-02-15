@@ -118,6 +118,16 @@ UpdateProxy::NotifySyncPoint UpdateProxy::PopSyncPoint()
   return mImpl.PopSyncPoint();
 }
 
+bool UpdateProxy::GetUpdateArea(uint32_t id, Vector4& updateArea) const
+{
+  return mImpl.GetUpdateArea(id, updateArea);
+}
+
+bool UpdateProxy::SetUpdateArea(uint32_t id, const Vector4& updateArea)
+{
+  return mImpl.SetUpdateArea(id, updateArea);
+}
+
 UpdateProxy::UpdateProxy(Internal::UpdateProxy& impl)
 : mImpl(impl)
 {

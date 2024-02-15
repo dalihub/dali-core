@@ -343,6 +343,30 @@ void UpdateProxy::AddNodeResetters()
   }
 }
 
+bool UpdateProxy::GetUpdateArea(uint32_t id, Vector4& updateArea) const
+{
+  bool              success = false;
+  SceneGraph::Node* node    = GetNodeWithId(id);
+  if(node)
+  {
+    updateArea = node->GetUpdateAreaHint();
+    success = true;
+  }
+  return success;
+}
+
+bool UpdateProxy::SetUpdateArea(uint32_t id, const Vector4& updateArea)
+{
+  bool              success = false;
+  SceneGraph::Node* node    = GetNodeWithId(id);
+  if(node)
+  {
+    node->SetUpdateAreaHint(updateArea);
+    success = true;
+  }
+  return success;
+}
+
 } // namespace Internal
 
 } // namespace Dali
