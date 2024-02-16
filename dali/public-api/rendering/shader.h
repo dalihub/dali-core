@@ -203,6 +203,15 @@ public:
   Shader& operator=(Shader&& rhs) noexcept;
 
   /**
+   * @brief Get the number of shading language version.
+   * @note This can potentially block until GL has been initialized
+   * when the first time any DALi application is launched in the system.
+   * @SINCE_2_3.11
+   * @return shader languange version as integer.
+   */
+  static uint32_t GetShaderLanguageVersion();
+
+  /**
    * @brief Get shader preprocessor of shading language version.
    * @note This can potentially block until GL has been initialized
    * when the first time any DALi application is launched in the system.
