@@ -33,7 +33,7 @@ AC_SUBST(DALI_VERSION)
 DALI_CFLAGS=-DPLATFORM_TIZEN
 
 # Use C++ 11
-DALI_CFLAGS="$DALI_CFLAGS -std=c++14 -Wnon-virtual-dtor -Woverloaded-virtual -Wold-style-cast -Werror -Wall -Wextra -Wno-unused-parameter -Wfloat-equal -Wconversion"
+DALI_CFLAGS="$DALI_CFLAGS -std=c++14 -Wnon-virtual-dtor -Woverloaded-virtual -Wold-style-cast -Werror -Wall -Wextra -Wno-unused-parameter -Wfloat-equal -Wconversion -Wno-cast-function-type -Wno-class-memaccess -Wno-string-plus-int "
 
 AC_ARG_ENABLE(exportall,
               [AC_HELP_STRING([--enable-exportall],

@@ -412,6 +412,7 @@ void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
         mTouchDownConsumedActor.SetActor( NULL );
       }
       // No break, Fallthrough
+      __attribute__ ((fallthrough));
 
       case PointState::DOWN:
       {

@@ -21,7 +21,6 @@
 #include <dali/internal/common/internal-constants.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/update/nodes/node.h>
-#include <dali/internal/update/rendering/data-providers/node-data-provider.h>
 #include <dali/internal/update/rendering/render-instruction.h>
 #include <dali/internal/update/rendering/scene-graph-geometry.h>
 #include <dali/internal/update/rendering/scene-graph-property-buffer.h>
