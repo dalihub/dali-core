@@ -1,26 +1,26 @@
 #
 # Add graphics-api source files here
 #
+SET( graphics_api_src_dir ${ROOT_SRC_DIR}/dali/graphics-api )
 
-graphics_api_src_files =
-
-graphics_api_header_files = \
-    $(graphics_api_src_dir)/graphics-api-base-factory.h \
-    $(graphics_api_src_dir)/graphics-api-buffer-factory.h \
-    $(graphics_api_src_dir)/graphics-api-buffer.h \
-    $(graphics_api_src_dir)/graphics-api-controller.h \
-    $(graphics_api_src_dir)/graphics-api-framebuffer-factory.h \
-    $(graphics_api_src_dir)/graphics-api-framebuffer.h \
-    $(graphics_api_src_dir)/graphics-api-pipeline-factory.h \
-    $(graphics_api_src_dir)/graphics-api-pipeline.h \
-    $(graphics_api_src_dir)/graphics-api-render-command.h \
-    $(graphics_api_src_dir)/graphics-api-sampler-factory.h \
-    $(graphics_api_src_dir)/graphics-api-sampler.h \
-    $(graphics_api_src_dir)/graphics-api-shader-details.h \
-    $(graphics_api_src_dir)/graphics-api-shader-factory.h \
-    $(graphics_api_src_dir)/graphics-api-shader.h \
-    $(graphics_api_src_dir)/graphics-api-texture-details.h \
-    $(graphics_api_src_dir)/graphics-api-texture-factory.h \
-    $(graphics_api_src_dir)/graphics-api-texture.h \
-    $(graphics_api_src_dir)/graphics-api-types-debug.h \
-    $(graphics_api_src_dir)/graphics-api-types.h
+SET( GRAPHICS_API_HEADERS ${GRAPHICS_API_HEADERS}
+    ${graphics_api_src_dir}/graphics-api-base-factory.h
+    ${graphics_api_src_dir}/graphics-api-buffer-factory.h
+    ${graphics_api_src_dir}/graphics-api-buffer.h
+    ${graphics_api_src_dir}/graphics-api-controller.h
+    ${graphics_api_src_dir}/graphics-api-framebuffer-factory.h
+    ${graphics_api_src_dir}/graphics-api-framebuffer.h
+    ${graphics_api_src_dir}/graphics-api-pipeline-factory.h
+    ${graphics_api_src_dir}/graphics-api-pipeline.h
+    ${graphics_api_src_dir}/graphics-api-render-command.h
+    ${graphics_api_src_dir}/graphics-api-sampler-factory.h
+    ${graphics_api_src_dir}/graphics-api-sampler.h
+    ${graphics_api_src_dir}/graphics-api-shader-details.h
+    ${graphics_api_src_dir}/graphics-api-shader-factory.h
+    ${graphics_api_src_dir}/graphics-api-shader.h
+    ${graphics_api_src_dir}/graphics-api-texture-details.h
+    ${graphics_api_src_dir}/graphics-api-texture-factory.h
+    ${graphics_api_src_dir}/graphics-api-texture.h
+    ${graphics_api_src_dir}/graphics-api-types-debug.h
+    ${graphics_api_src_dir}/graphics-api-types.h
+)

@@ -12,6 +12,8 @@ dali.info
 install_manifest.txt
 libdali-core.so.0
 libdali-core.so.0.1.1
+libdali2-core.so.2
+libdali2-core.so.2.0.0
 *~
 *.pc
 *.o

@@ -80,6 +80,7 @@ namespace Log
 
 enum DebugPriority
 {
+  DebugDebug,
   DebugInfo,
   DebugWarning,
   DebugError
