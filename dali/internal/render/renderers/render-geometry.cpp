@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -201,7 +201,7 @@ bool Geometry::Draw(
 
     if(elementBufferOffset != 0u)
     {
-      elementBufferOffset = (elementBufferOffset >= numIndices) ? numIndices - 1 : elementBufferOffset;
+      elementBufferOffset = (elementBufferOffset >= numIndices) ? numIndices : elementBufferOffset;
       firstIndexOffset    = intptr_t(elementBufferOffset * sizeOfIndex);
       numIndices -= elementBufferOffset;
     }
@@ -215,14 +215,18 @@ bool Geometry::Draw(
   //Draw call
   if(mIndexBuffer && mGeometryType != Dali::Geometry::POINTS)
   {
-    //Indexed draw call
-    const Graphics::Buffer* ibo = mIndexBuffer->GetGraphicsObject();
-    if(ibo)
+    // Issue draw call only if there's non-zero numIndices
+    if(numIndices)
     {
-      commandBuffer.BindIndexBuffer(*ibo, 0, mIndexType);
-    }
+      //Indexed draw call
+      const Graphics::Buffer* ibo = mIndexBuffer->GetGraphicsObject();
+      if(ibo)
+      {
+        commandBuffer.BindIndexBuffer(*ibo, 0, mIndexType);
+      }
 
-    commandBuffer.DrawIndexed(numIndices, instanceCount, firstIndexOffset, 0, 0);
+      commandBuffer.DrawIndexed(numIndices, instanceCount, firstIndexOffset, 0, 0);
+    }
   }
   else
   {

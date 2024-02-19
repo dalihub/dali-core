@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -9547,6 +9547,146 @@ int UtcDaliAnimationKeyFramesSetKeyFrameP(void)
   DALI_TEST_EQUALS(outputTime, inputTime, TEST_LOCATION);
   DALI_TEST_EQUALS(outputValue.GetType(), Property::Type::VECTOR4, TEST_LOCATION);
   DALI_TEST_EQUALS(outputValue.Get<Vector4>(), newValue, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimationKeyFramesOptimizeKeyFramesLinearP(void)
+{
+  TestApplication application;
+
+  KeyFrames keyFrames = KeyFrames::New();
+
+  float firstExpectTime   = 0.0f;
+  float firstExpectValue  = 0.0f;
+  float secondExpectTime  = 0.4f;
+  float secondExpectValue = 1.2f;
+  float thirdExpectTime   = 0.8f;
+  float thirdExpectValue  = 0.4f;
+  float fourthExpectTime  = 1.0f;
+  float fourthExpectValue = 0.7f;
+
+  float interpolateLate = 0.5f;
+
+  tet_printf("first - second phase test\n");
+
+  DALI_TEST_EQUALS(false, DevelKeyFrames::OptimizeKeyFramesLinear(keyFrames), TEST_LOCATION);
+  DALI_TEST_EQUALS(DevelKeyFrames::GetKeyFrameCount(keyFrames), 0, TEST_LOCATION);
+
+  keyFrames.Add(firstExpectTime, firstExpectValue);
+  DALI_TEST_EQUALS(false, DevelKeyFrames::OptimizeKeyFramesLinear(keyFrames), TEST_LOCATION);
+  DALI_TEST_EQUALS(DevelKeyFrames::GetKeyFrameCount(keyFrames), 1, TEST_LOCATION);
+
+  keyFrames.Add(firstExpectTime * (1.0f - interpolateLate) + secondExpectTime * interpolateLate, firstExpectValue * (1.0f - interpolateLate) + secondExpectValue * interpolateLate);
+  DALI_TEST_EQUALS(false, DevelKeyFrames::OptimizeKeyFramesLinear(keyFrames), TEST_LOCATION);
+  DALI_TEST_EQUALS(DevelKeyFrames::GetKeyFrameCount(keyFrames), 2, TEST_LOCATION);
+
+  keyFrames.Add(secondExpectTime, secondExpectValue);
+
+  DALI_TEST_EQUALS(DevelKeyFrames::GetKeyFrameCount(keyFrames), 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, DevelKeyFrames::OptimizeKeyFramesLinear(keyFrames), TEST_LOCATION);
+  DALI_TEST_EQUALS(DevelKeyFrames::GetKeyFrameCount(keyFrames), 2, TEST_LOCATION);
+
+  float           outputTime;
+  Property::Value outputValue;
+
+  DevelKeyFrames::GetKeyFrame(keyFrames, 0, outputTime, outputValue);
+
+  DALI_TEST_EQUALS(outputTime, firstExpectTime, TEST_LOCATION);
+  DALI_TEST_EQUALS(outputValue.GetType(), Property::Type::FLOAT, TEST_LOCATION);
+  DALI_TEST_EQUALS(outputValue.Get<float>(), firstExpectValue, TEST_LOCATION);
+
+  DevelKeyFrames::GetKeyFrame(keyFrames, 1, outputTime, outputValue);
+
+  DALI_TEST_EQUALS(outputTime, secondExpectTime, TEST_LOCATION);
+  DALI_TEST_EQUALS(outputValue.GetType(), Property::Type::FLOAT, TEST_LOCATION);
+  DALI_TEST_EQUALS(outputValue.Get<float>(), secondExpectValue, TEST_LOCATION);
+
+  tet_printf("second - third phase test\n");
+
+  interpolateLate = 0.3f;
+  keyFrames.Add(secondExpectTime * (1.0f - interpolateLate) + thirdExpectTime * interpolateLate, secondExpectValue * (1.0f - interpolateLate) + thirdExpectValue * interpolateLate);
+  DALI_TEST_EQUALS(DevelKeyFrames::GetKeyFrameCount(keyFrames), 3, TEST_LOCATION);
+
+  interpolateLate = 0.4f;
+  keyFrames.Add(secondExpectTime * (1.0f - interpolateLate) + thirdExpectTime * interpolateLate, secondExpectValue * (1.0f - interpolateLate) + thirdExpectValue * interpolateLate);
+  DALI_TEST_EQUALS(DevelKeyFrames::GetKeyFrameCount(keyFrames), 4, TEST_LOCATION);
+
+  interpolateLate = 0.5f;
+  keyFrames.Add(secondExpectTime * (1.0f - interpolateLate) + thirdExpectTime * interpolateLate, secondExpectValue * (1.0f - interpolateLate) + thirdExpectValue * interpolateLate);
+  DALI_TEST_EQUALS(DevelKeyFrames::GetKeyFrameCount(keyFrames), 5, TEST_LOCATION);
+
+  interpolateLate = 0.8f;
+  keyFrames.Add(secondExpectTime * (1.0f - interpolateLate) + thirdExpectTime * interpolateLate, secondExpectValue * (1.0f - interpolateLate) + thirdExpectValue * interpolateLate);
+  DALI_TEST_EQUALS(DevelKeyFrames::GetKeyFrameCount(keyFrames), 6, TEST_LOCATION);
+
+  keyFrames.Add(thirdExpectTime, thirdExpectValue);
+  DALI_TEST_EQUALS(DevelKeyFrames::GetKeyFrameCount(keyFrames), 7, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(true, DevelKeyFrames::OptimizeKeyFramesLinear(keyFrames), TEST_LOCATION);
+  DALI_TEST_EQUALS(DevelKeyFrames::GetKeyFrameCount(keyFrames), 3, TEST_LOCATION);
+
+  DevelKeyFrames::GetKeyFrame(keyFrames, 0, outputTime, outputValue);
+
+  DALI_TEST_EQUALS(outputTime, firstExpectTime, TEST_LOCATION);
+  DALI_TEST_EQUALS(outputValue.GetType(), Property::Type::FLOAT, TEST_LOCATION);
+  DALI_TEST_EQUALS(outputValue.Get<float>(), firstExpectValue, TEST_LOCATION);
+
+  DevelKeyFrames::GetKeyFrame(keyFrames, 1, outputTime, outputValue);
+
+  DALI_TEST_EQUALS(outputTime, secondExpectTime, TEST_LOCATION);
+  DALI_TEST_EQUALS(outputValue.GetType(), Property::Type::FLOAT, TEST_LOCATION);
+  DALI_TEST_EQUALS(outputValue.Get<float>(), secondExpectValue, TEST_LOCATION);
+
+  DevelKeyFrames::GetKeyFrame(keyFrames, 2, outputTime, outputValue);
+
+  DALI_TEST_EQUALS(outputTime, thirdExpectTime, TEST_LOCATION);
+  DALI_TEST_EQUALS(outputValue.GetType(), Property::Type::FLOAT, TEST_LOCATION);
+  DALI_TEST_EQUALS(outputValue.Get<float>(), thirdExpectValue, TEST_LOCATION);
+
+  tet_printf("third - fourth phase test. Test what we skip same progress.\n");
+
+  interpolateLate = 0.3f;
+  keyFrames.Add(thirdExpectTime * (1.0f - interpolateLate) + fourthExpectTime * interpolateLate, thirdExpectValue * (1.0f - interpolateLate) + fourthExpectValue * interpolateLate);
+  DALI_TEST_EQUALS(DevelKeyFrames::GetKeyFrameCount(keyFrames), 4, TEST_LOCATION);
+
+  interpolateLate = 0.5f;
+  keyFrames.Add(thirdExpectTime * (1.0f - interpolateLate) + fourthExpectTime * interpolateLate, thirdExpectValue * (1.0f - interpolateLate) + fourthExpectValue * interpolateLate);
+  DALI_TEST_EQUALS(DevelKeyFrames::GetKeyFrameCount(keyFrames), 5, TEST_LOCATION);
+
+  interpolateLate = 0.8f;
+  keyFrames.Add(thirdExpectTime * (1.0f - interpolateLate) + fourthExpectTime * interpolateLate, thirdExpectValue * (1.0f - interpolateLate) + fourthExpectValue * interpolateLate);
+  DALI_TEST_EQUALS(DevelKeyFrames::GetKeyFrameCount(keyFrames), 6, TEST_LOCATION);
+
+  keyFrames.Add(fourthExpectTime, fourthExpectValue);
+  DALI_TEST_EQUALS(DevelKeyFrames::GetKeyFrameCount(keyFrames), 7, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(true, DevelKeyFrames::OptimizeKeyFramesLinear(keyFrames), TEST_LOCATION);
+  DALI_TEST_EQUALS(DevelKeyFrames::GetKeyFrameCount(keyFrames), 4, TEST_LOCATION);
+
+  DevelKeyFrames::GetKeyFrame(keyFrames, 0, outputTime, outputValue);
+
+  DALI_TEST_EQUALS(outputTime, firstExpectTime, TEST_LOCATION);
+  DALI_TEST_EQUALS(outputValue.GetType(), Property::Type::FLOAT, TEST_LOCATION);
+  DALI_TEST_EQUALS(outputValue.Get<float>(), firstExpectValue, TEST_LOCATION);
+
+  DevelKeyFrames::GetKeyFrame(keyFrames, 1, outputTime, outputValue);
+
+  DALI_TEST_EQUALS(outputTime, secondExpectTime, TEST_LOCATION);
+  DALI_TEST_EQUALS(outputValue.GetType(), Property::Type::FLOAT, TEST_LOCATION);
+  DALI_TEST_EQUALS(outputValue.Get<float>(), secondExpectValue, TEST_LOCATION);
+
+  DevelKeyFrames::GetKeyFrame(keyFrames, 2, outputTime, outputValue);
+
+  DALI_TEST_EQUALS(outputTime, thirdExpectTime, TEST_LOCATION);
+  DALI_TEST_EQUALS(outputValue.GetType(), Property::Type::FLOAT, TEST_LOCATION);
+  DALI_TEST_EQUALS(outputValue.Get<float>(), thirdExpectValue, TEST_LOCATION);
+
+  DevelKeyFrames::GetKeyFrame(keyFrames, 3, outputTime, outputValue);
+
+  DALI_TEST_EQUALS(outputTime, fourthExpectTime, TEST_LOCATION);
+  DALI_TEST_EQUALS(outputValue.GetType(), Property::Type::FLOAT, TEST_LOCATION);
+  DALI_TEST_EQUALS(outputValue.Get<float>(), fourthExpectValue, TEST_LOCATION);
 
   END_TEST;
 }

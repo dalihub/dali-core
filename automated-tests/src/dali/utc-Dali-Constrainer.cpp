@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,6 +101,21 @@ static void SetupLinearConstrainerNonUniformProgress(Dali::LinearConstrainer& li
 
   points[0] = 0.0f;
   points[1] = 0.25f;
+  points[2] = 1.0f;
+  linearConstrainer.SetProperty(Dali::LinearConstrainer::Property::PROGRESS, points);
+}
+
+static void SetupLinearConstrainerNonUniformProgressNonStartWithZero(Dali::LinearConstrainer& linearConstrainer)
+{
+  Dali::Property::Array points;
+  points.Resize(3);
+  points[0] = 0.0f;
+  points[1] = 1.0f;
+  points[2] = 0.0f;
+  linearConstrainer.SetProperty(Dali::LinearConstrainer::Property::VALUE, points);
+
+  points[0] = 0.5f;
+  points[1] = 0.75f;
   points[2] = 1.0f;
   linearConstrainer.SetProperty(Dali::LinearConstrainer::Property::PROGRESS, points);
 }
@@ -480,7 +495,7 @@ int UtcLinearConstrainerMoveAssignment(void)
   END_TEST;
 }
 
-int UtcLinearConstrainerApply(void)
+int UtcLinearConstrainerApply01(void)
 {
   TestApplication application;
 
@@ -545,6 +560,34 @@ int UtcLinearConstrainerApply(void)
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds * 250.0f) /* 75% progress */);
   DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Dali::Actor::Property::POSITION).x, 1.0f / 3.0f, Math::MACHINE_EPSILON_1, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds * 250.0f) /* 100% progress */);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Dali::Actor::Property::POSITION).x, 0.0f, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds * 250.0f) /* beyond the animation duration*/);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Dali::Actor::Property::POSITION).x, 0.0f, TEST_LOCATION);
+
+  //Setup a LinearConstrainer specifying the progress for each value which is not start with 0.0f
+  linearConstrainer.Remove(actor);
+  SetupLinearConstrainerNonUniformProgressNonStartWithZero(linearConstrainer);
+  linearConstrainer.Apply(Property(actor, Dali::Actor::Property::POSITION_X), Property(actor, index), range);
+
+  actor.SetProperty(index, 0.0f);
+  animation.Play();
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds * 250.0f) /* 25% progress */);
+
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Dali::Actor::Property::POSITION).x, 0.0f, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds * 250.0f) /* 50% progress */);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Dali::Actor::Property::POSITION).x, 0.0f, Math::MACHINE_EPSILON_1, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds * 250.0f) /* 75% progress */);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Dali::Actor::Property::POSITION).x, 1.0f, Math::MACHINE_EPSILON_1, TEST_LOCATION);
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds * 250.0f) /* 100% progress */);

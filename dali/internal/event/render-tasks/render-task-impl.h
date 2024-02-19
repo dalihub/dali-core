@@ -269,6 +269,16 @@ public:
    */
   uint32_t GetRenderPassTag() const;
 
+  /**
+   * @copydoc Dali::RenderTask::SetOrderIndex()
+   */
+  void SetOrderIndex(int32_t orderIndex);
+
+  /**
+   * @copydoc Dali::RenderTask::GetOrderIndex()
+   */
+  int32_t GetOrderIndex() const;
+
 public: // Used by RenderTaskList, which owns the SceneGraph::RenderTasks
   /**
    * Retrieve the scene-graph RenderTask object.
@@ -390,6 +400,7 @@ private:
   Dali::RenderTask::ScreenToFrameBufferFunction mScreenToFrameBufferFunction; ///< Used to convert screen to frame-buffer coordinates
 
   uint32_t mRenderPassTag{0u};
+  int32_t mOrderIndex{0u};
 
   bool mExclusive : 1;    ///< True if the render-task has exclusive access to the source Nodes.
   bool mInputEnabled : 1; ///< True if the render-task should be considered for input handling.

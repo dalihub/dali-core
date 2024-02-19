@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
 #include <dali/internal/event/common/thread-local-storage.h>
 
 // INTERNAL INCLUDES
-#include <dali/integration-api/gl-abstraction.h>
 #include <dali/integration-api/processor-interface.h>
 #include <dali/internal/common/core-impl.h>
 #include <dali/internal/event/common/event-thread-services.h>
@@ -162,22 +161,22 @@ AnimationPlaylist& ThreadLocalStorage::GetAnimationPlaylist()
 
 bool ThreadLocalStorage::IsBlendEquationSupported(DevelBlendEquation::Type blendEquation)
 {
-  return mCore->GetGlAbstraction().IsBlendEquationSupported(blendEquation);
+  return mCore->GetGraphicsConfig().IsBlendEquationSupported(blendEquation);
 }
 
 std::string ThreadLocalStorage::GetShaderVersionPrefix()
 {
-  return mCore->GetGlAbstraction().GetShaderVersionPrefix();
+  return mCore->GetGraphicsConfig().GetShaderVersionPrefix();
 }
 
 std::string ThreadLocalStorage::GetVertexShaderPrefix()
 {
-  return mCore->GetGlAbstraction().GetVertexShaderPrefix();
+  return mCore->GetGraphicsConfig().GetVertexShaderPrefix();
 }
 
 std::string ThreadLocalStorage::GetFragmentShaderPrefix()
 {
-  return mCore->GetGlAbstraction().GetFragmentShaderPrefix();
+  return mCore->GetGraphicsConfig().GetFragmentShaderPrefix();
 }
 
 void ThreadLocalStorage::AddScene(Scene* scene)

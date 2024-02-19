@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -215,7 +215,7 @@ std::list<SignalConnection>::iterator BaseSignal::FindCallback(CallbackBase* cal
   {
     const auto& iter = convertorIter->second; // std::list<SignalConnection>::iterator
 
-    if(*iter) // the value of iterator can be null.
+    if(*iter && iter->GetCallback()) // the value of iterator can be null.
     {
       if(*(iter->GetCallback()) == *callback)
       {

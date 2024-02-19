@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_KEY_FRAMES_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,6 +97,11 @@ public:
    */
   void SetKeyFrameValue(std::size_t index, const Property::Value& value);
 
+  /**
+   * @copydoc Dali::DevelKeyFrames::OptimizeKeyFramesLinear()
+   */
+  bool OptimizeKeyFramesLinear();
+
 private:
   Dali::Property::Type          mType{Property::NONE}; // Type of the specialization
   std::unique_ptr<KeyFrameSpec> mKeyFrames;            // Pointer to the specialized key frame object
@@ -127,6 +132,12 @@ public:
    * @param[in] value The value of the given key frame
    */
   virtual void SetKeyFrameValue(std::size_t index, const Property::Value& value) = 0;
+
+  /**
+   * Optimize key frame value as linear interpolation.
+   * @return True if optimize successfully, so the total frame reduced. False otherwise.
+   */
+  virtual bool OptimizeValuesLinear() = 0;
 };
 
 /**
@@ -190,6 +201,14 @@ public:
   {
     auto& element  = mChannel.mValues[index];
     element.mValue = value.Get<V>();
+  }
+
+  /**
+   * @copydoc KeyFrameSpec::OptimizeValuesLinear()
+   */
+  bool OptimizeValuesLinear() override
+  {
+    return mChannel.OptimizeValuesLinear();
   }
 
   /**

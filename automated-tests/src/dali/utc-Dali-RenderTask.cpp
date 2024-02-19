@@ -4261,3 +4261,126 @@ int UtcDaliRenderTaskWithWrongShaderData(void)
 
   END_TEST;
 }
+
+int UtcDaliRenderTaskOrderIndex01(void)
+{
+  TestApplication application;
+  tet_infoline("Testing RenderTask with OrderIndex");
+
+  Stage   stage = Stage::GetCurrent();
+  Vector2 stageSize(stage.GetSize());
+
+  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTask     renderTask1    = renderTaskList.CreateTask();
+
+  application.SendNotification();
+  uint32_t       answer1[2]     = {0u, 0u};
+  DALI_TEST_EQUALS(2, renderTaskList.GetTaskCount(), TEST_LOCATION);
+  for(uint32_t i = 0; i < 2; ++i)
+  {
+    DALI_TEST_EQUALS(answer1[i], renderTaskList.GetTask(i).GetOrderIndex(), TEST_LOCATION);
+  }
+
+  RenderTask renderTask2 = renderTaskList.CreateTask();
+  application.SendNotification();
+  int32_t answer2[3] = {0u, 0u, 0u};
+  DALI_TEST_EQUALS(3, renderTaskList.GetTaskCount(), TEST_LOCATION);
+  for(uint32_t i = 0; i < 3; ++i)
+  {
+    DALI_TEST_EQUALS(answer2[i], renderTaskList.GetTask(i).GetOrderIndex(), TEST_LOCATION);
+  }
+
+  RenderTask renderTask3 = renderTaskList.CreateTask();
+  application.SendNotification();
+  int32_t answer3[4] = {0u, 0u, 0u, 0u};
+  DALI_TEST_EQUALS(4, renderTaskList.GetTaskCount(), TEST_LOCATION);
+  for(uint32_t i = 0; i < 4; ++i)
+  {
+    DALI_TEST_EQUALS(answer3[i], renderTaskList.GetTask(i).GetOrderIndex(), TEST_LOCATION);
+  }
+
+  renderTask1.SetOrderIndex(3);
+  application.SendNotification();
+  int32_t answer4[4] = {0u, 0u, 0u, 3u};
+  for(uint32_t i = 0; i < 4; ++i)
+  {
+    DALI_TEST_EQUALS(answer4[i], renderTaskList.GetTask(i).GetOrderIndex(), TEST_LOCATION);
+  }
+
+  renderTask2.SetOrderIndex(7);
+  application.SendNotification();
+  int32_t answer5[4] = {0u, 0u, 3u, 7u};
+  for(uint32_t i = 0; i < 4; ++i)
+  {
+    DALI_TEST_EQUALS(answer5[i], renderTaskList.GetTask(i).GetOrderIndex(), TEST_LOCATION);
+  }
+
+  Dali::Integration::Scene scene = application.GetScene();
+  scene.GetOverlayLayer();
+  application.SendNotification();
+  DALI_TEST_EQUALS(5, renderTaskList.GetTaskCount(), TEST_LOCATION);
+  int32_t answer6[5] = {0u, 0u, 3u, 7u, INT32_MAX};
+  for(uint32_t i = 0; i < 5; ++i)
+  {
+    DALI_TEST_EQUALS(answer6[i], renderTaskList.GetTask(i).GetOrderIndex(), TEST_LOCATION);
+  }
+
+  renderTask3.SetOrderIndex(4);
+  application.SendNotification();
+  int32_t answer7[5] = {0u, 3u, 4u, 7u, INT32_MAX};
+  for(uint32_t i = 0; i < 5; ++i)
+  {
+    DALI_TEST_EQUALS(answer7[i], renderTaskList.GetTask(i).GetOrderIndex(), TEST_LOCATION);
+  }
+
+  renderTask2.SetOrderIndex(2);
+  application.SendNotification();
+  int32_t answer8[5] = {0u, 2u, 3u, 4u, INT32_MAX};
+  for(uint32_t i = 0; i < 5; ++i)
+  {
+    DALI_TEST_EQUALS(answer8[i], renderTaskList.GetTask(i).GetOrderIndex(), TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskOrderIndex02(void)
+{
+  TestApplication application;
+  tet_infoline("Testing RenderTask with OrderIndex");
+
+  Stage   stage = Stage::GetCurrent();
+  Vector2 stageSize(stage.GetSize());
+
+  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTask     renderTask1    = renderTaskList.CreateTask();
+  application.SendNotification();
+  DALI_TEST_EQUALS(renderTask1, renderTaskList.GetTask(1u), TEST_LOCATION);
+  
+  RenderTask     renderTask2    = renderTaskList.CreateTask();
+  application.SendNotification();
+  DALI_TEST_EQUALS(renderTask1, renderTaskList.GetTask(1u), TEST_LOCATION);
+  DALI_TEST_EQUALS(renderTask2, renderTaskList.GetTask(2u), TEST_LOCATION);
+
+  RenderTask     renderTask3    = renderTaskList.CreateTask();
+  application.SendNotification();
+  DALI_TEST_EQUALS(renderTask1, renderTaskList.GetTask(1u), TEST_LOCATION);
+  DALI_TEST_EQUALS(renderTask2, renderTaskList.GetTask(2u), TEST_LOCATION);
+  DALI_TEST_EQUALS(renderTask3, renderTaskList.GetTask(3u), TEST_LOCATION);
+
+  RenderTask     renderTask4    = renderTaskList.CreateTask();
+  application.SendNotification();
+  DALI_TEST_EQUALS(renderTask1, renderTaskList.GetTask(1u), TEST_LOCATION);
+  DALI_TEST_EQUALS(renderTask2, renderTaskList.GetTask(2u), TEST_LOCATION);
+  DALI_TEST_EQUALS(renderTask3, renderTaskList.GetTask(3u), TEST_LOCATION);
+  DALI_TEST_EQUALS(renderTask4, renderTaskList.GetTask(4u), TEST_LOCATION);
+
+  renderTask2.SetOrderIndex(2);
+  application.SendNotification();
+  DALI_TEST_EQUALS(renderTask1, renderTaskList.GetTask(1u), TEST_LOCATION);
+  DALI_TEST_EQUALS(renderTask3, renderTaskList.GetTask(2u), TEST_LOCATION);
+  DALI_TEST_EQUALS(renderTask4, renderTaskList.GetTask(3u), TEST_LOCATION);
+  DALI_TEST_EQUALS(renderTask2, renderTaskList.GetTask(4u), TEST_LOCATION);
+
+  END_TEST;
+}

@@ -46,8 +46,7 @@ RenderTaskList* RenderTaskList::New()
 RenderTaskList::RenderTaskList()
 : mNotificationObject(nullptr),
   mResetterManager(nullptr),
-  mRenderMessageDispatcher(nullptr),
-  mOverlayRenderTask(nullptr)
+  mRenderMessageDispatcher(nullptr)
 {
 }
 
@@ -71,20 +70,7 @@ void RenderTaskList::AddTask(OwnerPointer<RenderTask>& newTask)
 
   newTask->Initialize(*mResetterManager, *mRenderMessageDispatcher);
 
-  if(mOverlayRenderTask && mRenderTasks[mRenderTasks.Size() - 1] == mOverlayRenderTask)
-  {
-    mRenderTasks.Insert(mRenderTasks.End() - 1, newTask.Release());
-  }
-  else
-  {
-    mRenderTasks.PushBack(newTask.Release());
-  }
-}
-
-void RenderTaskList::AddOverlayTask(OwnerPointer<RenderTask>& newTask)
-{
-  AddTask(newTask);
-  mOverlayRenderTask = mRenderTasks[mRenderTasks.Size() - 1];
+  mRenderTasks.PushBack(newTask.Release());
 }
 
 void RenderTaskList::RemoveTask(RenderTask* task)
@@ -94,16 +80,21 @@ void RenderTaskList::RemoveTask(RenderTask* task)
   {
     if(*iter == task)
     {
-      if(mOverlayRenderTask == task)
-      {
-        mOverlayRenderTask = nullptr;
-      }
-
       // Destroy the task
       mRenderTasks.Erase(iter);
 
       break; // we're finished
     }
+  }
+}
+
+void RenderTaskList::SortTasks(OwnerPointer<std::vector<const SceneGraph::RenderTask*>>& sortedTasks)
+{
+  for(uint32_t i = 0; i < sortedTasks->size(); ++i)
+  {
+    const SceneGraph::RenderTask* task = (*sortedTasks)[i];
+    SceneGraph::RenderTask* castedTask = const_cast<SceneGraph::RenderTask*>(task);
+    mRenderTasks[i]                    = castedTask;
   }
 }
 
