@@ -57,7 +57,7 @@ void GraphicsBuffer::Write( void* src, uint32_t srcSize, uint32_t dstOffset )
   {
     // Only write up to maximum of current buffer size. Notify user
     srcSize = uint32_t(mBuffer.size()) - dstOffset;
-    tet_infoline("Attempting to write past end of buffer.");
+    fprintf(stderr, "Attempting to write past end of buffer.");
   }
 
   memcpy( &mBuffer[dstOffset], src, srcSize);

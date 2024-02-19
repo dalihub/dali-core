@@ -1,8 +1,5 @@
-#ifndef __DALI_DEMANGLER_H__
-#define __DALI_DEMANGLER_H__
-
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,28 +15,33 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <string>
-
-// INTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h>
+// FILE HEADER
+#include <dali/internal/event/common/demangler.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
+std::string DemangleClassName(const char* typeIdName)
+{
+  std::string name  = typeIdName;
+  int         index = name.find_last_of(' ');
 
-/**
- * Demangle a nested typeid name to its class name.
- * @param[in] typeIdName The type id name string to demangle.
- * @returns the class name ie "Actor" or an empty string
- */
-std::string DemangleClassName(const char *typeIdName);
+  if(0 <= index)
+  {
+    name = name.substr(index + 1, name.size() - index);
+  }
 
+  index = name.find_last_of(':');
+
+  if(0 <= index)
+  {
+    name = name.substr(index + 1, name.size() - index);
+  }
+
+  return name;
 }
 
-}
+} // namespace Internal
 
-
-#endif // header
+} // namespace Dali

@@ -1,5 +1,8 @@
 #
 # Add package doxy headers here
+
+SET(package_doxy_dir ${ROOT_SRC_DIR}/doc)
 #
-package_doxy_files = \
-  $(package_doxy_dir)/dali-core-doc.h
+SET(package_doxy_files
+  ${package_doxy_dir}/dali-core-doc.h
+)
