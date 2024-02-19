@@ -634,9 +634,10 @@ int UtcDaliHoverLeaveParentConsumer(void)
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, rootData.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(PointState::LEAVE, data.hoverEvent.GetState(0), TEST_LOCATION);
-  DALI_TEST_EQUALS(PointState::LEAVE, rootData.hoverEvent.GetState(0), TEST_LOCATION);
+  // rootActor receives "started" state because a new hover event entered in rootActor area.
+  DALI_TEST_EQUALS(PointState::STARTED, rootData.hoverEvent.GetState(0), TEST_LOCATION);
   DALI_TEST_CHECK(actor == data.hoverEvent.GetHitActor(0));
-  DALI_TEST_CHECK(actor == rootData.hoverEvent.GetHitActor(0));
+  DALI_TEST_CHECK(rootActor == rootData.hoverEvent.GetHitActor(0));
   data.Reset();
   rootData.Reset();
 
