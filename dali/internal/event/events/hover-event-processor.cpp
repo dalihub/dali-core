@@ -402,15 +402,25 @@ struct HoverEventProcessor::Impl
       else
       {
         // If the actor is hit first, the hover is started.
-        if(hitActor && processor.mLastPrimaryHitActor.GetActor() != hitActor && localVars.primaryPointState == PointState::MOTION)
+        if(hitActor && processor.mLastPrimaryHitActor.GetActor() != hitActor &&
+           localVars.primaryPointState == PointState::MOTION && GetImplementation(hitActor).GetLeaveRequired())
         {
-          Actor* hitActorImpl = &GetImplementation(hitActor);
-          if(hitActorImpl->GetLeaveRequired())
-          {
+            // A leave event is sent to the previous actor first.
+            localVars.lastPrimaryHitActor = processor.mLastPrimaryHitActor.GetActor();
+            localVars.lastConsumedActor   = processor.mLastConsumedActor.GetActor();
+            Impl::DeliverLeaveEvent(processor, localVars);
+
             localVars.hoverEvent->GetPoint(0).SetState(PointState::STARTED);
-          }
+            localVars.primaryPointState = PointState::STARTED;
+
+            // It sends a started event and updates information.
+            localVars.consumedActor = EmitHoverSignals(hitActor, localVars.hoverEventHandle);
+            UpdateMembersWithCurrentHitInformation(processor, localVars);
         }
-        localVars.consumedActor = EmitHoverSignals(hitActor, localVars.hoverEventHandle);
+        else
+        {
+          localVars.consumedActor = EmitHoverSignals(hitActor, localVars.hoverEventHandle);
+        }
       }
 
       if(localVars.hoverEvent->GetPoint(0).GetState() != PointState::MOTION)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -207,6 +207,11 @@ bool TestGlAbstraction::IsMultisampledRenderToTextureSupported()
 bool TestGlAbstraction::IsBlendEquationSupported(DevelBlendEquation::Type blendEquation)
 {
   return true;
+}
+
+uint32_t TestGlAbstraction::GetShaderLanguageVersion()
+{
+  return mShaderLanguageVersion;
 }
 
 std::string TestGlAbstraction::GetShaderVersionPrefix()

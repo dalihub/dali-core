@@ -2,7 +2,7 @@
 #define DALI_SHADER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,7 +110,7 @@ public:
        * @brief Name: "program", Type: MAP or ARRAY.
        * @note The default value is empty.
        * @note It is Property::Map or Property::Array of the map.
-       * @note Format: {"renderPassTag":"", "vertex":"", "fragment":"", "hints":""}
+       * @note Format: {"renderPassTag":"", "vertex":"", "fragment":"", "hints":"", "name":""}
        * @SINCE_1_1.43
        */
       PROGRAM = DEFAULT_OBJECT_PROPERTY_START_INDEX,
@@ -124,11 +124,13 @@ public:
    * @param[in] vertexShader Vertex shader code for the effect.
    * @param[in] fragmentShader Fragment Shader code for the effect.
    * @param[in] hints Hints to define the geometry of the rendered object
+   * @param[in] shaderName The name of this shader. (optional)
    * @return A handle to a shader effect
    */
   static Shader New(std::string_view vertexShader,
                     std::string_view fragmentShader,
-                    Hint::Value      hints = Hint::NONE);
+                    Hint::Value      hints      = Hint::NONE,
+                    std::string_view shaderName = "");
 
   /**
    * @brief Creates Shader.
@@ -199,6 +201,15 @@ public:
    * @return A reference to this
    */
   Shader& operator=(Shader&& rhs) noexcept;
+
+  /**
+   * @brief Get the number of shading language version.
+   * @note This can potentially block until GL has been initialized
+   * when the first time any DALi application is launched in the system.
+   * @SINCE_2_3.11
+   * @return shader languange version as integer.
+   */
+  static uint32_t GetShaderLanguageVersion();
 
   /**
    * @brief Get shader preprocessor of shading language version.

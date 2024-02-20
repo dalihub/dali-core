@@ -189,11 +189,21 @@ public:
   /**
    * Enables the reuse of the model view matrices of all renderers for this layer
    * @param[in] updateBufferIndex The current update buffer index.
-   * @param value to set
+   * @param[in] value to set
    */
   void SetReuseRenderers(BufferIndex updateBufferIndex, bool value)
   {
     mAllChildTransformsClean[updateBufferIndex] = value;
+  }
+
+  /**
+   * Get the reuse of the model view matrices of all renderers for this layer is enabled.
+   * @param[in] updateBufferIndex The current update buffer index.
+   * @return Whether all child transform was clean or not.
+   */
+  bool GetReuseRenderers(BufferIndex updateBufferIndex)
+  {
+    return mAllChildTransformsClean[updateBufferIndex];
   }
 
   /**
