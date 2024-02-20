@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -292,7 +292,7 @@ const Vector2 CalculateActorScreenPosition(const Actor& actor)
     Vector3 worldPosition = RetrieveCalculatedWorldPosition(actor, worldTransformMatrix);
     Vector3 actorSize     = CalculateScaledActorSize(actor, worldTransformMatrix);
 
-    auto sceneSize = actor.GetScene().GetSize();
+    const auto& sceneSize = actor.GetScene().GetSize();
 
     Vector2 screenPositionTopLeft = CalculateActorTopLeftScreenPosition(sceneSize, actorSize, worldPosition);
     Vector2 anchorPointOffSet     = (actorSize * actor.GetAnchorPointForPosition()).GetVectorXY();
@@ -310,7 +310,7 @@ const Vector2 CalculateCurrentActorScreenPosition(const Actor& actor, BufferInde
     Vector3 worldPosition = CalculateCurrentWorldPosition(actor, bufferIndex);
     Vector3 actorSize     = CalculateCurrentScaledActorSize(actor, bufferIndex);
 
-    auto sceneSize = actor.GetScene().GetCurrentSurfaceRect(); // Use the update object's size
+    const auto& sceneSize = actor.GetScene().GetCurrentSurfaceRect(); // Use the update object's size
 
     Vector2 screenPositionTopLeft = CalculateActorTopLeftScreenPosition(sceneSize, actorSize, worldPosition);
     Vector2 anchorPointOffSet     = (actorSize * actor.GetAnchorPointForPosition()).GetVectorXY();
@@ -331,7 +331,7 @@ Rect<> CalculateActorScreenExtents(const Actor& actor)
     Vector3 worldPosition = RetrieveCalculatedWorldPosition(actor, worldTransformMatrix);
     Vector3 actorSize     = CalculateScaledActorSize(actor, worldTransformMatrix);
 
-    auto sceneSize = actor.GetScene().GetSize();
+    const auto& sceneSize = actor.GetScene().GetSize();
 
     position2 = CalculateActorTopLeftScreenPosition(sceneSize, actorSize, worldPosition);
     size2     = Vector2(actorSize.width, actorSize.height);
@@ -348,7 +348,7 @@ Rect<> CalculateCurrentActorScreenExtents(const Actor& actor, BufferIndex buffer
     Vector3 worldPosition = CalculateCurrentWorldPosition(actor, bufferIndex);
     Vector3 actorSize     = CalculateCurrentScaledActorSize(actor, bufferIndex);
 
-    auto sceneSize = actor.GetScene().GetCurrentSurfaceRect(); // Use the update object's size
+    const auto& sceneSize = actor.GetScene().GetCurrentSurfaceRect(); // Use the update object's size
 
     position2 = CalculateActorTopLeftScreenPosition(sceneSize, actorSize, worldPosition);
     size2     = Vector2(actorSize.width, actorSize.height);
@@ -460,7 +460,7 @@ const Vector2 CalculateActorScreenPositionRenderTaskList(const Actor& actor)
   Vector2 result;
   if(actor.OnScene())
   {
-    auto worldMatrix = Dali::Internal::CalculateActorWorldTransform(actor);
+    auto        worldMatrix    = Dali::Internal::CalculateActorWorldTransform(actor);
     const auto& renderTaskList = actor.GetScene().GetRenderTaskList();
 
     ConvertLocalToScreenRenderTaskList(renderTaskList, actor, worldMatrix, actor.GetTargetSize() * (actor.GetAnchorPointForPosition() - Vector3(0.5f, 0.5f, 0.5f)), result.x, result.y);
@@ -473,8 +473,8 @@ const Vector2 CalculateCurrentActorScreenPositionRenderTaskList(const Actor& act
   Vector2 result;
   if(actor.OnScene())
   {
-    const auto& node = actor.GetNode();
-    const auto& worldMatrix = node.GetWorldMatrix(bufferIndex);
+    const auto& node           = actor.GetNode();
+    const auto& worldMatrix    = node.GetWorldMatrix(bufferIndex);
     const auto& renderTaskList = actor.GetScene().GetRenderTaskList();
 
     ConvertLocalToScreenRenderTaskList(renderTaskList, actor, worldMatrix, node.GetSize(bufferIndex) * (actor.GetAnchorPointForPosition() - Vector3(0.5f, 0.5f, 0.5f)), result.x, result.y);
@@ -616,8 +616,8 @@ Rect<> CalculateCurrentActorScreenExtentsRenderTaskList(const Actor& actor, Buff
 
   if(actor.OnScene())
   {
-    const auto& node = actor.GetNode();
-    const auto& worldMatrix = node.GetWorldMatrix(bufferIndex);
+    const auto& node           = actor.GetNode();
+    const auto& worldMatrix    = node.GetWorldMatrix(bufferIndex);
     const auto& renderTaskList = actor.GetScene().GetRenderTaskList();
 
     ConvertLocalToScreenExtentRenderTaskList(renderTaskList, actor, worldMatrix, node.GetSize(bufferIndex), result);
