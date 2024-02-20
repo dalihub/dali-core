@@ -20,9 +20,33 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/trace.h>
 #include <dali/internal/event/animation/animation-impl.h>
 #include <dali/internal/update/animation/scene-graph-animation.h>
 #include <dali/public-api/common/vector-wrapper.h>
+
+#ifdef TRACE_ENABLED
+#include <chrono>
+#include <thread>
+#include <cmath>
+#endif
+
+namespace
+{
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
+
+#ifdef TRACE_ENABLED
+uint64_t GetNanoseconds()
+{
+  // Get the time of a monotonic clock since its epoch.
+  auto epoch = std::chrono::steady_clock::now().time_since_epoch();
+
+  auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(epoch);
+
+  return static_cast<uint64_t>(duration.count());
+}
+#endif
+}
 
 namespace Dali
 {
@@ -100,6 +124,17 @@ void AnimationPlaylist::NotifyCompleted(CompleteNotificationInterface::Parameter
 {
   std::vector<Dali::Animation> finishedAnimations; // Will own handle until all emits have been done.
 
+#ifdef TRACE_ENABLED
+  std::vector<std::pair<uint64_t, uint32_t>> animationFinishedTimeChecker;
+
+  uint64_t start = 0u;
+  uint64_t end = 0u;
+#endif
+
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_ANIMATION_FINISHED", [&](std::ostringstream& oss) {
+    oss << "[n:" << notifierIdList.Count() << "]";
+  });
+
   for(const auto& notifierId : notifierIdList)
   {
     auto* animation = GetEventObject(notifierId);
@@ -123,8 +158,36 @@ void AnimationPlaylist::NotifyCompleted(CompleteNotificationInterface::Parameter
   // Now it's safe to emit the signals
   for(auto& animation : finishedAnimations)
   {
+#ifdef TRACE_ENABLED
+    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+    {
+      start = GetNanoseconds();
+    }
+#endif
     GetImplementation(animation).EmitSignalFinish();
+#ifdef TRACE_ENABLED
+    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+    {
+      end = GetNanoseconds();
+      animationFinishedTimeChecker.emplace_back(end - start, GetImplementation(animation).GetSceneObject()->GetNotifyId());
+    }
+#endif
   }
+
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_ANIMATION_FINISHED", [&](std::ostringstream& oss) {
+    oss << "[f:" << finishedAnimations.size() << ",";
+
+    std::sort(animationFinishedTimeChecker.rbegin(), animationFinishedTimeChecker.rend());
+    auto topCount = std::min(5u, static_cast<uint32_t>(animationFinishedTimeChecker.size()));
+
+    oss << "top" << topCount;
+    for(auto i = 0u; i < topCount; ++i)
+    {
+      oss << "(" << static_cast<float>(animationFinishedTimeChecker[i].first) / 1000000.0f << "ms,";
+      oss << animationFinishedTimeChecker[i].second << ")";
+    }
+    oss << "]";
+  });
 }
 
 uint32_t AnimationPlaylist::GetAnimationCount()

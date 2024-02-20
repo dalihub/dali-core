@@ -37,7 +37,7 @@ namespace
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
 
 #ifdef TRACE_ENABLED
-uint64_t GetNanoSeconds()
+uint64_t GetNanoseconds()
 {
   // Get the time of a monotonic clock since its epoch.
   auto epoch = std::chrono::steady_clock::now().time_since_epoch();
@@ -142,14 +142,14 @@ bool FrameCallbackProcessor::Update(BufferIndex bufferIndex, float elapsedSecond
 #ifdef TRACE_ENABLED
         if(gTraceFilter && gTraceFilter->IsTraceEnabled())
         {
-          start = GetNanoSeconds();
+          start = GetNanoseconds();
         }
 #endif
         FrameCallback::RequestFlags requests = frameCallback->Update(bufferIndex, elapsedSeconds, mNodeHierarchyChanged);
 #ifdef TRACE_ENABLED
         if(gTraceFilter && gTraceFilter->IsTraceEnabled())
         {
-          end = GetNanoSeconds();
+          end = GetNanoseconds();
           frameCallbackTimeChecker.emplace_back(end - start, ++frameIndex);
         }
 #endif
@@ -167,7 +167,7 @@ bool FrameCallbackProcessor::Update(BufferIndex bufferIndex, float elapsedSecond
       std::sort(frameCallbackTimeChecker.rbegin(), frameCallbackTimeChecker.rend());
       auto topCount = std::min(5u, static_cast<uint32_t>(frameCallbackTimeChecker.size()));
 
-      oss << "top" << topCount << "[";
+      oss << "top" << topCount;
       for(auto i = 0u; i < topCount; ++i)
       {
         oss << "(" << static_cast<float>(frameCallbackTimeChecker[i].first) / 1000000.0f << "ms,";
