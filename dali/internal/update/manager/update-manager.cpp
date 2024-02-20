@@ -770,38 +770,38 @@ void UpdateManager::ResetProperties(BufferIndex bufferIndex)
 
   if(mImpl->nodeResetters.Count() > 0u)
   {
-    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_NODE_RESETTER", [&](std::ostringstream& oss) {
-      oss << "[" << mImpl->nodeResetters.Count() << "]";
-    });
     // Reset node properties
     mImpl->nodeResetters.ResetToBaseValues(bufferIndex);
-    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_NODE_RESETTER", [&](std::ostringstream& oss) {
-      oss << "[" << mImpl->nodeResetters.Count() << "]";
-    });
+#ifdef TRACE_ENABLED
+    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+    {
+      DALI_LOG_DEBUG_INFO("END: DALI_NODE_RESETTER [%zu]\n", mImpl->nodeResetters.Count());
+    }
+#endif
   }
 
   if(mImpl->rendererResetters.Count() > 0u)
   {
-    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDERER_RESETTER", [&](std::ostringstream& oss) {
-      oss << "[" << mImpl->rendererResetters.Count() << "]";
-    });
     // Reset renderer properties
     mImpl->rendererResetters.ResetToBaseValues(bufferIndex);
-    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDERER_RESETTER", [&](std::ostringstream& oss) {
-      oss << "[" << mImpl->rendererResetters.Count() << "]";
-    });
+#ifdef TRACE_ENABLED
+    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+    {
+      DALI_LOG_DEBUG_INFO("END: DALI_RENDERER_RESETTER [%zu]\n", mImpl->rendererResetters.Count());
+    }
+#endif
   }
 
   if(mImpl->propertyResetters.Count() > 0u)
   {
-    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_PROPERTY_RESETTER", [&](std::ostringstream& oss) {
-      oss << "[" << mImpl->propertyResetters.Count() << "]";
-    });
     // Reset all animating / constrained properties
     mImpl->propertyResetters.ResetToBaseValues(bufferIndex);
-    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_PROPERTY_RESETTER", [&](std::ostringstream& oss) {
-      oss << "[" << mImpl->propertyResetters.Count() << "]";
-    });
+#ifdef TRACE_ENABLED
+    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+    {
+      DALI_LOG_DEBUG_INFO("END: DALI_PROPERTY_RESETTER [%zu]\n", mImpl->propertyResetters.Count());
+    }
+#endif
   }
 
   // Clear all root nodes dirty flags
@@ -811,9 +811,6 @@ void UpdateManager::ResetProperties(BufferIndex bufferIndex)
     root->ResetDirtyFlags(bufferIndex);
   }
 
-  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_UPDATE_NODE_RESET", [&](std::ostringstream& oss) {
-    oss << "[" << mImpl->nodes.Count() << "]";
-  });
   // Clear node dirty flags
   Vector<Node*>::Iterator iter    = mImpl->nodes.Begin() + 1;
   Vector<Node*>::Iterator endIter = mImpl->nodes.End();
@@ -821,7 +818,12 @@ void UpdateManager::ResetProperties(BufferIndex bufferIndex)
   {
     (*iter)->ResetDirtyFlags(bufferIndex);
   }
-  DALI_TRACE_END(gTraceFilter, "DALI_UPDATE_NODE_RESET");
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+  {
+    DALI_LOG_DEBUG_INFO("END: DALI_UPDATE_NODE_RESET [%zu]\n", mImpl->nodes.Count());
+  }
+#endif
 }
 
 bool UpdateManager::ProcessGestures(BufferIndex bufferIndex, uint32_t lastVSyncTimeMilliseconds, uint32_t nextVSyncTimeMilliseconds)
@@ -833,6 +835,12 @@ bool UpdateManager::ProcessGestures(BufferIndex bufferIndex, uint32_t lastVSyncT
     // gesture processor only supports default properties
     mImpl->panGestureProcessor->ResetDefaultProperties(bufferIndex); // Needs to be done every time as gesture data is written directly to an update-buffer rather than via a message
     gestureUpdated |= mImpl->panGestureProcessor->UpdateProperties(lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds);
+#ifdef TRACE_ENABLED
+    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+    {
+      DALI_LOG_DEBUG_INFO("END: DALI_UPDATE_GESTURE [updated:%d]\n", gestureUpdated);
+    }
+#endif
   }
 
   return gestureUpdated;
@@ -844,10 +852,6 @@ bool UpdateManager::Animate(BufferIndex bufferIndex, float elapsedSeconds)
   bool animationLooped = false;
 
   auto&& iter = mImpl->animations.Begin();
-
-  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_ANIMATION_ANIMATE", [&](std::ostringstream& oss) {
-    oss << "[" << mImpl->animations.Count() << "]";
-  });
 
   while(iter != mImpl->animations.End())
   {
@@ -890,16 +894,18 @@ bool UpdateManager::Animate(BufferIndex bufferIndex, float elapsedSeconds)
     mImpl->notificationManager.QueueNotification(&mImpl->animationPlaylist, std::move(mImpl->notifyRequiredAnimations));
   }
 
-  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_ANIMATION_ANIMATE", [&](std::ostringstream& oss) {
-    oss << "[" << mImpl->animations.Count() << "]";
-  });
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled() && mImpl->animations.Count() > 0u)
+  {
+    DALI_LOG_DEBUG_INFO("END: DALI_ANIMATION_ANIMATE [%zu active:%d]\n", mImpl->animations.Count(), animationActive);
+  }
+#endif
 
   return animationActive;
 }
 
 void UpdateManager::ConstrainCustomObjects(PropertyOwnerContainer& postPropertyOwners, BufferIndex bufferIndex)
 {
-  DALI_TRACE_SCOPE(gTraceFilter, "DALI_UPDATE_CONSTRAINT_CUSTOM_OBJECTS");
   // Constrain custom objects (in construction order)
   for(auto&& object : mImpl->customObjects)
   {
@@ -909,11 +915,19 @@ void UpdateManager::ConstrainCustomObjects(PropertyOwnerContainer& postPropertyO
       postPropertyOwners.PushBack(object);
     }
   }
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled() && mImpl->customObjects.Count() > 0u)
+  {
+    DALI_LOG_DEBUG_INFO("END: DALI_UPDATE_CONSTRAINT_CUSTOM_OBJECTS [%zu]\n", mImpl->customObjects.Count());
+  }
+#endif
 }
 
 void UpdateManager::ConstrainRenderTasks(PropertyOwnerContainer& postPropertyOwners, BufferIndex bufferIndex)
 {
-  DALI_TRACE_SCOPE(gTraceFilter, "DALI_UPDATE_CONSTRAINT_RENDER_TASK");
+#ifdef TRACE_ENABLED
+  uint32_t taskCount = 0u;
+#endif
   // Constrain render-tasks
   for(auto&& scene : mImpl->scenes)
   {
@@ -922,6 +936,9 @@ void UpdateManager::ConstrainRenderTasks(PropertyOwnerContainer& postPropertyOwn
       RenderTaskList::RenderTaskContainer& tasks = scene->taskList->GetTasks();
       for(auto&& task : tasks)
       {
+#ifdef TRACE_ENABLED
+        ++taskCount;
+#endif
         ConstrainPropertyOwner(*task, bufferIndex);
         if(!task->GetPostConstraints().Empty())
         {
@@ -930,11 +947,16 @@ void UpdateManager::ConstrainRenderTasks(PropertyOwnerContainer& postPropertyOwn
       }
     }
   }
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled() && taskCount > 0u)
+  {
+    DALI_LOG_DEBUG_INFO("END: DALI_UPDATE_CONSTRAINT_RENDER_TASK [%u]\n", taskCount);
+  }
+#endif
 }
 
 void UpdateManager::ConstrainShaders(PropertyOwnerContainer& postPropertyOwners, BufferIndex bufferIndex)
 {
-  DALI_TRACE_SCOPE(gTraceFilter, "DALI_UPDATE_CONSTRAINT_SHADER");
   // constrain shaders... (in construction order)
   for(auto&& shader : mImpl->shaders)
   {
@@ -944,11 +966,16 @@ void UpdateManager::ConstrainShaders(PropertyOwnerContainer& postPropertyOwners,
       postPropertyOwners.PushBack(shader);
     }
   }
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled() && mImpl->shaders.Count() > 0u)
+  {
+    DALI_LOG_DEBUG_INFO("END: DALI_UPDATE_CONSTRAINT_SHADER [%zu]\n", mImpl->shaders.Count());
+  }
+#endif
 }
 
 void UpdateManager::ProcessPropertyNotifications(BufferIndex bufferIndex)
 {
-  DALI_TRACE_SCOPE(gTraceFilter, "DALI_UPDATE_PROPERTY_NOTIFICATION");
   for(auto&& notification : mImpl->propertyNotifications)
   {
     bool valid = notification->Check(bufferIndex);
@@ -957,6 +984,12 @@ void UpdateManager::ProcessPropertyNotifications(BufferIndex bufferIndex)
       mImpl->notificationManager.QueueMessage(PropertyChangedMessage(mImpl->propertyNotifier, notification->GetNotifyId(), notification->GetValidity()));
     }
   }
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled() && mImpl->propertyNotifications.Count() > 0u)
+  {
+    DALI_LOG_DEBUG_INFO("END: DALI_UPDATE_PROPERTY_NOTIFICATION [%zu]\n", mImpl->propertyNotifications.Count());
+  }
+#endif
 }
 
 void UpdateManager::ForwardCompiledShadersToEventThread()
@@ -986,7 +1019,6 @@ void UpdateManager::ForwardCompiledShadersToEventThread()
 
 void UpdateManager::UpdateRenderers(PropertyOwnerContainer& postPropertyOwners, BufferIndex bufferIndex)
 {
-  DALI_TRACE_SCOPE(gTraceFilter, "DALI_UPDATE_RENDERER");
   for(const auto& rendererKey : mImpl->renderers)
   {
     // Apply constraints
@@ -999,11 +1031,16 @@ void UpdateManager::UpdateRenderers(PropertyOwnerContainer& postPropertyOwners, 
 
     mImpl->renderingRequired = renderer->PrepareRender(bufferIndex) || mImpl->renderingRequired;
   }
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+  {
+    DALI_LOG_DEBUG_INFO("END: DALI_UPDATE_RENDERER [%zu]\n", mImpl->renderers.Count());
+  }
+#endif
 }
 
 void UpdateManager::UpdateNodes(PropertyOwnerContainer& postPropertyOwners, BufferIndex bufferIndex)
 {
-  DALI_TRACE_SCOPE(gTraceFilter, "DALI_UPDATE_NODES");
   mImpl->nodeDirtyFlags = NodePropertyFlags::NOTHING;
 
   for(auto&& scene : mImpl->scenes)
@@ -1018,11 +1055,16 @@ void UpdateManager::UpdateNodes(PropertyOwnerContainer& postPropertyOwners, Buff
                                               postPropertyOwners);
     }
   }
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+  {
+    DALI_LOG_DEBUG_INFO("END: DALI_UPDATE_NODES\n");
+  }
+#endif
 }
 
 void UpdateManager::UpdateLayers(BufferIndex bufferIndex)
 {
-  DALI_TRACE_SCOPE(gTraceFilter, "DALI_UPDATE_LAYER");
   for(auto&& scene : mImpl->scenes)
   {
     if(scene && scene->root)
@@ -1030,6 +1072,12 @@ void UpdateManager::UpdateLayers(BufferIndex bufferIndex)
       SceneGraph::UpdateLayerTree(*scene->root, bufferIndex);
     }
   }
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+  {
+    DALI_LOG_DEBUG_INFO("END: DALI_UPDATE_LAYER\n");
+  }
+#endif
 }
 
 uint32_t UpdateManager::Update(float    elapsedSeconds,
@@ -1050,9 +1098,7 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
   bool isAnimationRunning = IsAnimationRunning();
 
   // Process Touches & Gestures
-  DALI_TRACE_BEGIN(gTraceFilter, "DALI_UPDATE_GESTURE");
   const bool gestureUpdated = ProcessGestures(bufferIndex, lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds);
-  DALI_TRACE_END(gTraceFilter, "DALI_UPDATE_GESTURE");
 
   bool updateScene =                                   // The scene-graph requires an update if..
     (mImpl->nodeDirtyFlags & RenderableUpdateFlags) || // ..nodes were dirty in previous frame OR
@@ -1089,15 +1135,6 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
   // We should not start skipping update steps or reusing lists until there has been two frames where nothing changes
   if(updateScene || mImpl->previousUpdateScene)
   {
-    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_UPDATE_INTERNAL", [&](std::ostringstream& oss) {
-      oss << "[node:" << mImpl->nodes.Size() << ",";
-      oss << "custom:" << mImpl->customObjects.Size() << ",";
-      oss << "animations:" << mImpl->animations.Size() << ",";
-      oss << "renderers:" << mImpl->renderers.Size() << ",";
-      oss << "textureSets:" << mImpl->textureSets.Size() << ",";
-      oss << "shaders:" << mImpl->shaders.Size() << "]";
-    });
-
     // Animate
     bool animationActive = Animate(bufferIndex, elapsedSeconds);
 
@@ -1164,8 +1201,6 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
     // reset the update buffer index and make sure there is enough room in the instruction container
     if(mImpl->renderersAdded)
     {
-      DALI_TRACE_BEGIN(gTraceFilter, "DALI_UPDATE_TASK_PROCESS");
-
       // Calculate how many render tasks we have in total
       std::size_t numberOfRenderTasks = 0;
       for(auto&& scene : mImpl->scenes)
@@ -1221,10 +1256,27 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
       }
 
       DALI_LOG_INFO(gLogFilter, Debug::General, "Update: numberOfRenderTasks(%d), Render Instructions(%d)\n", numberOfRenderTasks, numberOfRenderInstructions);
-      DALI_TRACE_END(gTraceFilter, "DALI_UPDATE_TASK_PROCESS");
+#ifdef TRACE_ENABLED
+      if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+      {
+        DALI_LOG_DEBUG_INFO("END: DALI_UPDATE_TASK_PROCESS\n");
+      }
+#endif
     }
 
-    DALI_TRACE_END(gTraceFilter, "DALI_UPDATE_INTERNAL");
+#ifdef TRACE_ENABLED
+    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+    {
+      std::ostringstream oss;
+      oss << "[n:" << mImpl->nodes.Size() << ",";
+      oss << "c:" << mImpl->customObjects.Size() << ",";
+      oss << "a:" << mImpl->animations.Size() << ",";
+      oss << "r:" << mImpl->renderers.Size() << ",";
+      oss << "t:" << mImpl->textureSets.Size() << ",";
+      oss << "s:" << mImpl->shaders.Size() << "]";
+      DALI_LOG_DEBUG_INFO("END: DALI_UPDATE_INTERNAL [%s]\n", oss.str().c_str());
+    }
+#endif
   }
 
   if(!uploadOnly)

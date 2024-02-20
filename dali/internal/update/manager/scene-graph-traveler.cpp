@@ -61,9 +61,6 @@ SceneGraph::Node* SceneGraphTraveler::FindNode(uint32_t id)
   }
   else
   {
-    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_SCENE_GRAPH_TRAVELER", [&](std::ostringstream& oss) {
-      oss << "[" << mTravledNodeMap.size() << "]";
-    });
     while(!FullSearched())
     {
       SceneGraph::Node& currentNode = GetCurrentNode();
@@ -78,10 +75,12 @@ SceneGraph::Node* SceneGraphTraveler::FindNode(uint32_t id)
         break;
       }
     }
-    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_SCENE_GRAPH_TRAVELER", [&](std::ostringstream& oss) {
-      oss << "[" << mTravledNodeMap.size() << ",";
-      oss << "found:" << (node == nullptr ? 0 : 1) << "]";
-    });
+#ifdef TRACE_ENABLED
+    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+    {
+      DALI_LOG_DEBUG_INFO("END: DALI_SCENE_GRAPH_TRAVELER [%zu,found:%d]\n", mTravledNodeMap.size(), (node == nullptr ? 0 : 1));
+    }
+#endif
   }
 
   return node;

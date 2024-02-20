@@ -128,33 +128,40 @@ bool FrameCallbackProcessor::Update(BufferIndex bufferIndex, float elapsedSecond
 
   if(!mFrameCallbacks.empty())
   {
-    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_FRAME_CALLBACK_UPDATE", [&](std::ostringstream& oss) {
-      oss << "[" << mFrameCallbacks.size() << "]";
-    });
-
 #ifdef TRACE_ENABLED
     std::vector<std::pair<uint64_t, uint32_t>> frameCallbackTimeChecker;
 
     uint32_t frameIndex = 0u;
+    uint64_t start = 0u;
+    uint64_t end = 0u;
 #endif
 
     // If any of the FrameCallback::Update calls returns false, then they are no longer required & can be removed.
     auto iter = std::remove_if(
       mFrameCallbacks.begin(), mFrameCallbacks.end(), [&](OwnerPointer<FrameCallback>& frameCallback) {
 #ifdef TRACE_ENABLED
-        uint64_t start = GetNanoSeconds();
+        if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+        {
+          start = GetNanoSeconds();
+        }
 #endif
         FrameCallback::RequestFlags requests = frameCallback->Update(bufferIndex, elapsedSeconds, mNodeHierarchyChanged);
 #ifdef TRACE_ENABLED
-        uint64_t end = GetNanoSeconds();
-        frameCallbackTimeChecker.emplace_back(end - start, ++frameIndex);
+        if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+        {
+          end = GetNanoSeconds();
+          frameCallbackTimeChecker.emplace_back(end - start, ++frameIndex);
+        }
 #endif
         keepRendering |= (requests & FrameCallback::KEEP_RENDERING);
         return (requests & FrameCallback::CONTINUE_CALLING) == 0;
       });
     mFrameCallbacks.erase(iter, mFrameCallbacks.end());
 
-    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_FRAME_CALLBACK_UPDATE", [&](std::ostringstream& oss) {
+#ifdef TRACE_ENABLED
+    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+    {
+      std::ostringstream oss;
       oss << "[" << mFrameCallbacks.size() << ",";
 
       std::sort(frameCallbackTimeChecker.rbegin(), frameCallbackTimeChecker.rend());
@@ -167,7 +174,9 @@ bool FrameCallbackProcessor::Update(BufferIndex bufferIndex, float elapsedSecond
         oss << frameCallbackTimeChecker[i].second << ")";
       }
       oss << "]";
-    });
+      DALI_LOG_DEBUG_INFO("END: DALI_FRAME_CALLBACK_UPDATE [%s]\n", oss.str().c_str());
+    }
+#endif
   }
 
   mNodeHierarchyChanged = false;

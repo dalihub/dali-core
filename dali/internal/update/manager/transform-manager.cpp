@@ -228,10 +228,15 @@ void TransformManager::ResetToBaseValue()
 {
   if(mComponentCount)
   {
-    DALI_TRACE_SCOPE(gTraceFilter, "DALI_TRANSFORM_RESET_TO_BASE");
     memcpy(&mTxComponentAnimatable[0], &mTxComponentAnimatableBaseValue[0], sizeof(TransformComponentAnimatable) * mComponentCount);
     memcpy(&mSize[0], &mSizeBase[0], sizeof(Vector3) * mComponentCount);
     memset(&mLocalMatrixDirty[0], false, sizeof(bool) * mComponentCount);
+#ifdef TRACE_ENABLED
+    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+    {
+      DALI_LOG_DEBUG_INFO("END: DALI_TRANSFORM_RESET_TO_BASE\n");
+    }
+#endif
   }
 }
 
@@ -239,16 +244,17 @@ bool TransformManager::Update()
 {
   bool componentsChanged = false;
 
-  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_TRANSFORM_UPDATE", [&](std::ostringstream& oss) {
-    oss << "[" << mComponentCount << "]";
-  });
-
   if(mReorder)
   {
-    DALI_TRACE_SCOPE(gTraceFilter, "DALI_TRANSFORM_REORDER");
     //If some transform component has change its parent or has been removed since last update
     //we need to reorder the vectors
     ReorderComponents();
+#ifdef TRACE_ENABLED
+    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+    {
+      DALI_LOG_DEBUG_INFO("END: DALI_TRANSFORM_REORDER\n");
+    }
+#endif
     mReorder = false;
   }
 
@@ -366,9 +372,12 @@ bool TransformManager::Update()
     mComponentDirty[i] = false;
   }
 
-  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_TRANSFORM_UPDATE", [&](std::ostringstream& oss) {
-    oss << "[componentsChanged:" << componentsChanged << "]";
-  });
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+  {
+    DALI_LOG_DEBUG_INFO("END: DALI_TRANSFORM_UPDATE [%zu,%d]\n", mComponentCount, componentsChanged);
+  }
+#endif
 
   return componentsChanged;
 }

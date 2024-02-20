@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/threading/mutex.h>
+#include <dali/integration-api/debug.h>
 #include <dali/integration-api/render-controller.h>
 #include <dali/integration-api/trace.h>
 #include <dali/internal/common/message-buffer.h>
@@ -217,9 +218,6 @@ bool MessageQueue::FlushQueue()
   {
     // queueMutex must be locked whilst accessing processQueue or recycleQueue
     MessageQueueMutex::ScopedLock lock(mImpl->queueMutex);
-    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MESSAGE_QUEUE_FLUSH", [&](std::ostringstream& oss) {
-      oss << "[capacity:" << mImpl->currentMessageBuffer->GetCapacity() << "]";
-    });
 
     mImpl->processQueue.push_back(mImpl->currentMessageBuffer);
     mImpl->currentMessageBuffer = nullptr;
@@ -247,7 +245,13 @@ bool MessageQueue::FlushQueue()
       mImpl->sceneUpdate |= 2;
       mImpl->sceneUpdateFlag = false;
     }
-    DALI_TRACE_END(gTraceFilter, "DALI_MESSAGE_QUEUE_FLUSH");
+
+#ifdef TRACE_ENABLED
+    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+    {
+      DALI_LOG_DEBUG_INFO("END: DALI_MESSAGE_QUEUE_FLUSH [%zu]\n", mImpl->currentMessageBuffer->GetCapacity());
+    }
+#endif
   }
 
   return messagesToProcess;
@@ -270,10 +274,6 @@ bool MessageQueue::ProcessMessages(BufferIndex updateBufferIndex)
 
     copiedProcessQueue = std::move(mImpl->processQueue); // Move message queue
   }
-
-  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_UPDATE_MESSAGE_QUEUE_PROCESS", [&](std::ostringstream& oss) {
-    oss << "[queueCount:" << copiedProcessQueue.size() << "]";
-  });
 
   uint32_t messageCount = 0u;
 
@@ -300,10 +300,15 @@ bool MessageQueue::ProcessMessages(BufferIndex updateBufferIndex)
                                std::make_move_iterator(copiedProcessQueue.end()));
 
     // Note trace end inside of mutex, since we need to check recycleQueue size correct.
-    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_UPDATE_MESSAGE_QUEUE_PROCESS", [&](std::ostringstream& oss) {
+#ifdef TRACE_ENABLED
+    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+    {
+      std::ostringstream oss;
       oss << "[messageCount:" << messageCount << ",";
       oss << "recycleQueueCount:" << mImpl->recycleQueue.size() << "]";
-    });
+      DALI_LOG_DEBUG_INFO("END: DALI_UPDATE_MESSAGE_QUEUE_PROCESS [%s]\n", oss.str().c_str());
+    }
+#endif
   }
 
   PERF_MONITOR_END(PerformanceMonitor::PROCESS_MESSAGES);

@@ -218,7 +218,6 @@ void ProcessTasks(BufferIndex                          updateBufferIndex,
                   bool                                 isRenderingToFbo,
                   bool                                 processOffscreen)
 {
-  DALI_TRACE_SCOPE(gTraceFilter, "DALI_TASK_PROCESS");
   uint32_t clippingId       = 0u;
   bool     hasClippingNodes = false;
 
@@ -313,6 +312,12 @@ void ProcessTasks(BufferIndex                          updateBufferIndex,
       }
     }
   }
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+  {
+    DALI_LOG_DEBUG_INFO("END: DALI_TASK_PROCESS\n");
+  }
+#endif
 }
 
 } // Anonymous namespace.

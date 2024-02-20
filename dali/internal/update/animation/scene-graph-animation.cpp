@@ -55,9 +55,6 @@ bool CompareAnimatorEndTimes(const Dali::Internal::SceneGraph::AnimatorBase* lhs
   return ((lhs->GetIntervalDelay() + lhs->GetDuration()) < (rhs->GetIntervalDelay() + rhs->GetDuration()));
 }
 
-// TODO : The name of trace marker name is from VD specific. We might need to change it future.
-DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_COMBINED, false);
-
 } // unnamed namespace
 
 namespace Dali

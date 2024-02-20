@@ -33,12 +33,6 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/trace.h>
 
-namespace
-{
-// TODO : The name of trace marker name is from VD specific. We might need to change it future.
-DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_COMBINED, false);
-} // namespace
-
 namespace Dali
 {
 namespace Internal
@@ -168,8 +162,6 @@ NodePropertyFlags UpdateNodeTree(Layer&                  rootNode,
     return NodePropertyFlags::NOTHING;
   }
 
-  DALI_TRACE_BEGIN(gTraceFilter, "DALI_UPDATE_NODE_TREE");
-
   // If the root node was not previously visible
   BufferIndex previousBuffer = updateBufferIndex ? 0u : 1u;
   if(DALI_UNLIKELY(!rootNode.IsVisible(previousBuffer))) // almost never ever true
@@ -199,8 +191,6 @@ NodePropertyFlags UpdateNodeTree(Layer&                  rootNode,
                                         postPropertyOwners,
                                         updated);
   }
-
-  DALI_TRACE_END(gTraceFilter, "DALI_UPDATE_NODE_TREE");
 
   return cumulativeDirtyFlags;
 }

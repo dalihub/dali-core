@@ -650,9 +650,6 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
 
   uint32_t renderCallCount = 0u;
 
-  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_LIST_PROCESS", [&](std::ostringstream& oss) {
-    oss << "[" << count << "]";
-  });
   // Loop through all RenderItems in the RenderList, set up any prerequisites to render them, then perform the render.
   for(uint32_t index = 0u; index < count; ++index)
   {
@@ -710,9 +707,12 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
       }
     }
   }
-  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_LIST_PROCESS", [&](std::ostringstream& oss) {
-    oss << "[renderCallCount:" << renderCallCount << "]";
-  });
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+  {
+    DALI_LOG_DEBUG_INFO("END: DALI_RENDER_LIST_PROCESS [%u]\n", renderCallCount);
+  }
+#endif
 }
 
 RenderAlgorithms::RenderAlgorithms(Graphics::Controller& graphicsController)
@@ -756,9 +756,6 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
                                                 int                                 orientation,
                                                 const Uint16Pair&                   sceneSize)
 {
-  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_INSTRUCTION_PROCESS", [&](std::ostringstream& oss) {
-    oss << "[" << instruction.RenderListCount() << "]";
-  });
   DALI_PRINT_RENDER_INSTRUCTION(instruction, bufferIndex);
 
   const Matrix* viewMatrix       = instruction.GetViewMatrix(bufferIndex);
@@ -805,7 +802,12 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
       mGraphicsCommandBuffer->ExecuteCommandBuffers(std::move(buffers));
     }
   }
-  DALI_TRACE_END(gTraceFilter, "DALI_RENDER_INSTRUCTION_PROCESS");
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+  {
+    DALI_LOG_DEBUG_INFO("END: DALI_RENDER_INSTRUCTION_PROCESS\n");
+  }
+#endif
 }
 
 } // namespace Render

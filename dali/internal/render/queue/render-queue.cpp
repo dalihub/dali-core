@@ -22,6 +22,7 @@
 #include <sstream>
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
 #include <dali/integration-api/trace.h>
 #include <dali/internal/common/message.h>
 
@@ -86,7 +87,6 @@ uint32_t* RenderQueue::ReserveMessageSlot(BufferIndex updateBufferIndex, std::si
 
 void RenderQueue::ProcessMessages(BufferIndex bufferIndex)
 {
-  DALI_TRACE_BEGIN(gTraceFilter, "DALI_RENDER_MESSAGE_QUEUE_PROCESS");
   std::size_t capacity = container0->GetCapacity() + container1->GetCapacity();
   mCapacity            = capacity; // write is atomic.
 
@@ -108,9 +108,12 @@ void RenderQueue::ProcessMessages(BufferIndex bufferIndex)
   container->Reset();
 
   LimitBufferCapacity(bufferIndex);
-  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_MESSAGE_QUEUE_PROCESS", [&](std::ostringstream& oss) {
-    oss << "[" << messageCount << "]";
-  });
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+  {
+    DALI_LOG_DEBUG_INFO("END: DALI_RENDER_MESSAGE_QUEUE_PROCESS [%u]\n", messageCount);
+  }
+#endif
 }
 
 MessageBuffer* RenderQueue::GetCurrentContainer(BufferIndex bufferIndex)
