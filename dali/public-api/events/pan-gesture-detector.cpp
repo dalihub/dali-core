@@ -27,7 +27,7 @@ const Radian PanGestureDetector::DIRECTION_LEFT(-Math::PI);
 const Radian PanGestureDetector::DIRECTION_RIGHT(0.0f);
 const Radian PanGestureDetector::DIRECTION_UP(-0.5f * Math::PI);
 const Radian PanGestureDetector::DIRECTION_DOWN(0.5f * Math::PI);
-const Radian PanGestureDetector::DIRECTION_HORIZONTAL(Math::PI);
+const Radian PanGestureDetector::DIRECTION_HORIZONTAL(-Math::PI);
 const Radian PanGestureDetector::DIRECTION_VERTICAL(-0.5f * Math::PI);
 const Radian PanGestureDetector::DEFAULT_THRESHOLD(0.25f * Math::PI);
 
