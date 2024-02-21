@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -286,6 +286,7 @@ Property::Type Object::GetPropertyType(Property::Index index) const
 void Object::SetProperty(Property::Index index, Property::Value propertyValue)
 {
   DALI_ASSERT_ALWAYS(index > Property::INVALID_INDEX && "Property index is out of bounds");
+  Dali::Handle handle(this);
 
   bool propertySet(true);
 
@@ -388,7 +389,6 @@ void Object::SetProperty(Property::Index index, Property::Value propertyValue)
     OnPropertySet(index, propertyValue);
     if(!mPropertySetSignal.Empty())
     {
-      Dali::Handle handle(this);
       mPropertySetSignal.Emit(handle, index, propertyValue);
     }
   }
