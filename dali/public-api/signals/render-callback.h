@@ -2,7 +2,7 @@
 #define DALI_RENDER_CALLBACK_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,8 +39,6 @@ namespace Dali
  * This structure contains data to be passed into the RenderCallback
  * functor.
  *
- * RenderCallbackInput inherits from Graphics::NativeDrawInput
- *
  * @SINCE_2_1.30
  */
 struct DALI_CORE_API RenderCallbackInput
@@ -51,7 +49,8 @@ struct DALI_CORE_API RenderCallbackInput
   Rect<int32_t>         clippingBox;
   std::vector<uint32_t> textureBindings;
 
-  std::any eglContext; ///< Storage for EGL Context
+  std::any eglContext;       ///< Storage for EGL Context
+  bool     usingOwnEglContext; ///< Uses own EGL context (owns GL state), custom code should be aware of it
 
   Matrix view; // Added at end to avoid abi break.
 };
@@ -71,6 +70,46 @@ struct DALI_CORE_API RenderCallbackInput
 class DALI_CORE_API RenderCallback
 {
 public:
+
+  /**
+   * @brief Mode of execution of custom rendering code into the pipeline
+   *
+   * ISOLATED mode will try to isolate custom rendering so it will start with
+   * clean state of graphics API and won't affect DALi rendering pipeline. This
+   * mode is considered as safe.
+   *
+   * UNSAFE mode will inject custom rendering code into DALi rendering
+   * pipeline as is and won't isolate graphics native API state. This mode
+   * should be used with caution and is considered unsafe.
+   *
+   * The default mode is ISOLATED.
+   *
+   * @SINCE_2_3.12
+   */
+  enum class ExecutionMode
+  {
+    /**
+     * @brief Native rendering commands will be isolated from DALi graphics pipline state
+     * @details This mode is default and provides safest way of executing custom graphics API commands.
+     * @SINCE_2_3.12
+     */
+    ISOLATED,
+
+    /**
+     * @brief Native rendering will be injected directly into DALi graphics pipeline
+     * @details This mode is considered unsafe as it's directly injected into DALi rendering pipeline.
+     * It inherits current graphics API state and may alter it.
+     * @SINCE_2_3.12
+     */
+    UNSAFE,
+
+    /**
+     * @brief Default mode is ISOLATED
+     * @SINCE_2_3.12
+     */
+    DEFAULT = ISOLATED
+  };
+
   /**
    * Templated member function type
    */
@@ -82,12 +121,14 @@ public:
    *
    * @param[in] object Object to invoke
    * @param[in] func Member function to invoke
+   * @param[in] executionMode execution mode of custom code
    *
-   * @SINCE_2_1.14
+   * @SINCE_2_3.12
    */
   template<class T>
-  RenderCallback(T* object, FuncType<T> func)
-  : mCallback(MakeCallback(object, func))
+  RenderCallback(T* object, FuncType<T> func, ExecutionMode executionMode)
+  : mCallback(MakeCallback(object, func)),
+    mExecutionMode(executionMode)
   {
   }
 
@@ -102,7 +143,22 @@ public:
   template<class T>
   static std::unique_ptr<RenderCallback> New(T* object, FuncType<T> func)
   {
-    return std::make_unique<RenderCallback>(object, func);
+    return std::make_unique<RenderCallback>(object, func, ExecutionMode::DEFAULT);
+  }
+
+  /**
+   * @brief Creates new instance of RenderCallback
+   *
+   * @SINCE_2_3.12
+   * @param[in] object Object to invoke
+   * @param[in] func Member function to invoke
+   * @param[in] executionMode Execution mode of custom code
+   * @return Unique pointer to the RenderCallback instance
+   */
+  template<class T>
+  static std::unique_ptr<RenderCallback> New(T* object, FuncType<T> func, ExecutionMode executionMode)
+  {
+    return std::make_unique<RenderCallback>(object, func, executionMode);
   }
 
   /**
@@ -169,10 +225,21 @@ public:
     return mRenderCallbackInput;
   }
 
+  /**
+   * @brief Returns execution mode of the callback
+   *
+   * @SINCE_2_3.12
+   * @return Valid execution mode
+   */
+   [[nodiscard]] ExecutionMode GetExecutionMode() const
+   {
+     return mExecutionMode;
+   }
+
 private:
   std::unique_ptr<CallbackBase> mCallback; //< Callback base object
   RenderCallbackInput           mRenderCallbackInput;
-
+  ExecutionMode                 mExecutionMode{ExecutionMode::DEFAULT};
   std::vector<Dali::Texture> mTextureResources{};
 };
 } // namespace Dali
