@@ -20,8 +20,8 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/rendering/frame-buffer.h>
 #include <dali/internal/update/rendering/scene-graph-texture.h>
-#include <dali/graphics-api/graphics-api-controller.h>
-#include <dali/graphics-api/graphics-api-framebuffer.h>
+#include <dali/graphics-api/graphics-controller.h>
+#include <dali/graphics-api/graphics-framebuffer.h>
 
 namespace Dali
 {

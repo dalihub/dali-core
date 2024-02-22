@@ -21,8 +21,8 @@
 #include <dali/public-api/rendering/sampler.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/event-thread-services.h>
-#include <dali/graphics-api/graphics-api-controller.h>
-#include <dali/graphics-api/graphics-api-types.h>
+#include <dali/graphics-api/graphics-controller.h>
+#include <dali/graphics-api/graphics-types.h>
 
 #include <memory>
 

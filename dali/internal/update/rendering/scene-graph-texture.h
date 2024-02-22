@@ -24,8 +24,8 @@
 #include <dali/public-api/images/image-operations.h> // Dali::ImageDimensions
 #include <dali/public-api/rendering/sampler.h>
 #include <dali/public-api/rendering/texture.h>
-#include <dali/graphics-api/graphics-api-controller.h>
-#include <dali/graphics-api/graphics-api-texture.h>
+#include <dali/graphics-api/graphics-controller.h>
+#include <dali/graphics-api/graphics-texture.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/rendering/texture-impl.h>
 #include <dali/internal/update/rendering/scene-graph-sampler.h>

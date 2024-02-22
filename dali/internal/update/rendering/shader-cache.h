@@ -17,9 +17,9 @@
  * limitations under the License.
  */
 
-#include <dali/graphics-api/graphics-api-controller.h>
-#include <dali/graphics-api/graphics-api-shader.h>
-#include <dali/graphics-api/graphics-api-shader-details.h>
+#include <dali/graphics-api/graphics-controller.h>
+#include <dali/graphics-api/graphics-shader.h>
+#include <dali/graphics-api/graphics-types.h>
 #include <memory>
 
 namespace Dali

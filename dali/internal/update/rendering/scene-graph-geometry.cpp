@@ -22,7 +22,7 @@
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/update/rendering/scene-graph-property-buffer.h>
 
-#include <dali/graphics-api/graphics-api-buffer.h>
+#include <dali/graphics-api/graphics-buffer.h>
 
 namespace Dali
 {

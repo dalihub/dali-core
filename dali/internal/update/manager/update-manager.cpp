@@ -26,7 +26,7 @@
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/render-controller.h>
-#include <dali/graphics-api/graphics-api-controller.h>
+#include <dali/graphics-api/graphics-controller.h>
 
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/devel-api/threading/mutex.h>
@@ -61,8 +61,8 @@
 #include <dali/internal/update/rendering/render-instruction-container.h>
 #include <dali/internal/update/rendering/shader-cache.h>
 
-#include <dali/graphics-api/graphics-api-buffer-factory.h>
-#include <dali/graphics-api/graphics-api-buffer.h>
+#include <dali/graphics-api/graphics-controller.h>
+#include <dali/graphics-api/graphics-buffer.h>
 
 // Un-comment to enable node tree debug logging
 //#define NODE_TREE_LOGGING 1

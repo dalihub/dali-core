@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/graphics-api/graphics-api-controller.h>
+#include <dali/graphics-api/graphics-controller.h>
 
 // INTERNAL INCLUDES
 #include <dali/internal/update/rendering/render-instruction-container.h>
@@ -50,6 +50,16 @@ public:
   GraphicsAlgorithms& operator=(GraphicsAlgorithms&&) = default;
 
 
+  /*
+   *@todo: Convert this to work the same way that RenderAlgorithms does in latest DALi.
+   *Plan of attack:
+   * 1. Change object creation (remove factories)
+   * 2. Make command buffers work same as latest DALi
+   *    a. Fix up ownership model of command buffers.
+   *    b. Change APIs to pass command buffer
+   * 3. Update UBOs to work same as new API
+   */
+
   /**
    * Submits render instructions
    * @param graphics Instance of the Graphics object
@@ -78,16 +88,16 @@ private:
 
   void RecordRenderItemList( Graphics::Controller& graphics,
                              BufferIndex bufferIndex,
-                             Graphics::RenderCommand::RenderTargetBinding& renderTargetBinding,
+                             Graphics::RenderTarget& renderTarget, //@todo ???
                              Matrix viewProjection,
                              RenderInstruction& instruction,
                              const RenderList& renderItemList,
-                             std::vector<Graphics::RenderCommand*>& commandList);
+                             std::vector<Graphics::CommandBuffer*>& commandList);
 
   void RecordInstruction( Graphics::Controller& graphics,
                           BufferIndex bufferIndex,
                           RenderInstruction& instruction,
-                          std::vector<Graphics::RenderCommand*>& commandList);
+                          std::vector<Graphics::CommandBuffer*>& commandList);
 
   bool PrepareGraphicsPipeline( Graphics::Controller& controller,
                                 RenderInstruction& instruction,

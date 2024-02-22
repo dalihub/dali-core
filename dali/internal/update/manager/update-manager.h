@@ -49,7 +49,7 @@
 #include <dali/internal/update/rendering/scene-graph-texture-set.h> // for OwnerPointer< TextureSet >
 #include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
 
-#include <dali/graphics-api/graphics-api-controller.h>
+#include <dali/graphics-api/graphics-controller.h>
 
 namespace Dali
 {

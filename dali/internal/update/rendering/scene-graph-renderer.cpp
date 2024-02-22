@@ -30,13 +30,11 @@
 #include <dali/internal/update/rendering/scene-graph-texture-set.h>
 #include <dali/internal/update/graphics/graphics-buffer-manager.h>
 
-#include <dali/graphics-api/graphics-api-controller.h>
-#include <dali/graphics-api/graphics-api-render-command.h>
-#include <dali/graphics-api/graphics-api-shader.h>
-#include <dali/graphics-api/graphics-api-shader-details.h>
-#include <dali/graphics-api/graphics-api-pipeline-factory.h>
-#include <dali/graphics-api/graphics-api-sampler.h>
-#include <dali/graphics-api/graphics-api-sampler-factory.h>
+#include <dali/graphics-api/graphics-controller.h>
+#include <dali/graphics-api/graphics-command-buffer.h>
+#include <dali/graphics-api/graphics-shader.h>
+#include <dali/graphics-api/graphics-types.h>
+#include <dali/graphics-api/graphics-sampler.h>
 
 #include <cstring>
 #include <dali/integration-api/debug.h>
@@ -284,7 +282,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex, RenderInstruction* 
 
           texture->PrepareTexture(); // Ensure that a native texture is ready to be drawn
 
-          auto binding    = Graphics::RenderCommand::TextureBinding{}
+          auto binding    = Graphics::TextureBinding{}
             .SetBinding(samplers[i].binding)
             .SetTexture(texture->GetGfxObject())
             .SetSampler(sampler ? sampler->GetGfxObject() : nullptr);
@@ -296,6 +294,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex, RenderInstruction* 
     }
   }
 
+  //@todo Move to Geometry? (to align with latest DALi structure)
 
   // Build render command
   // todo: this may be deferred until all render items are sorted, otherwise
@@ -307,7 +306,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex, RenderInstruction* 
   bool usesIndexBuffer{false};
   if ((usesIndexBuffer = mGeometry->HasIndexBuffer()))
   {
-    cmd.BindIndexBuffer(Graphics::RenderCommand::IndexBufferBinding()
+    cmd.BindIndexBuffer(Graphics::Buffer
                         .SetBuffer(mGeometry->GetIndexBuffer())
                         .SetOffset(0)
     );
@@ -317,24 +316,34 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex, RenderInstruction* 
 
   if(usesIndexBuffer)
   {
-    cmd.Draw(std::move(Graphics::RenderCommand::DrawCommand{}
-                                        .SetFirstIndex( uint32_t(mIndexedDrawFirstElement) )
-                                        .SetDrawType( Graphics::RenderCommand::DrawType::INDEXED_DRAW )
-                                        .SetFirstInstance( 0u )
-                                        .SetIndicesCount(
-                                          mIndexedDrawElementsCount ?
-                                            uint32_t( mIndexedDrawElementsCount ) :
-                                            mGeometry->GetIndexBufferElementCount() )
-                                        .SetInstanceCount( 1u )));
+    commandBuffer.DrawIndexed( mIndexedDrawElementsCount ? uint32_t( mIndexedDrawElementsCount ) : mGeometry->GetIndexBufferElementCount(),
+                               1u,
+                               mIndexedDrawFirstElement,
+                               0,
+                               0);
+
+    // cmd.Draw(std::move(Graphics::RenderCommand::DrawCommand{}
+    //                                     .SetFirstIndex( uint32_t(mIndexedDrawFirstElement) )
+    //                                     .SetDrawType( Graphics::RenderCommand::DrawType::INDEXED_DRAW )
+    //                                     .SetFirstInstance( 0u )
+    //                                     .SetIndicesCount(
+    //                                       mIndexedDrawElementsCount ?
+    //                                         uint32_t( mIndexedDrawElementsCount ) :
+    //                                         mGeometry->GetIndexBufferElementCount() )
+    //                                     .SetInstanceCount( 1u )));
   }
   else
   {
-    cmd.Draw(std::move(Graphics::RenderCommand::DrawCommand{}
-                                        .SetFirstVertex(0u)
-                                        .SetDrawType(Graphics::RenderCommand::DrawType::VERTEX_DRAW)
-                                        .SetFirstInstance(0u)
-                                        .SetVertexCount(vb->GetElementCount())
-                                        .SetInstanceCount(1u)));
+    commandBuffer.Draw(vb->GetElementCount(),
+                       1u, // Instance Count
+                       0u, // First vertex
+                       0);
+    // cmd.Draw(std::move(Graphics::RenderCommand::DrawCommand{}
+    //                                     .SetFirstVertex(0u)
+    //                                     .SetDrawType(Graphics::RenderCommand::DrawType::VERTEX_DRAW)
+    //                                     .SetFirstInstance(0u)
+    //                                     .SetVertexCount(vb->GetElementCount())
+    //                                     .SetInstanceCount(1u)));
   }
 
   DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  "done\n" );
@@ -354,7 +363,7 @@ void Renderer::WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::Re
   }
 }
 
-void Renderer::WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::RenderCommand::UniformBufferBinding>& bindings, const Graphics::ShaderDetails::UniformInfo& uniformInfo, const void* data, uint32_t size )
+void Renderer::WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const Graphics::UniformInfo& uniformInfo, const void* data, uint32_t size )
 {
   if( !mShader->GetGfxObject() )
   {
@@ -367,7 +376,7 @@ void Renderer::WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::Re
 
 bool Renderer::UpdateUniformBuffers( RenderInstruction& instruction,
                                      GraphicsBuffer& ubo,
-                                     std::vector<Graphics::RenderCommand::UniformBufferBinding>*& outBindings,
+                                     std::vector<Graphics::UniformBufferBinding>*& outBindings,
                                      uint32_t& offset,
                                      BufferIndex updateBufferIndex )
 {

@@ -25,7 +25,7 @@
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/integration-api/events/event.h>
 #include <dali/integration-api/debug.h>
-#include <dali/graphics-api/graphics-api-controller.h>
+#include <dali/graphics-api/graphics-controller.h>
 #include <dali/integration-api/processor-interface.h>
 #include <dali/internal/common/core-impl.h>
 

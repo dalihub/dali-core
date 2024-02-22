@@ -27,11 +27,11 @@
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/uniform-map.h>
 #include <dali/internal/update/common/scene-graph-connection-change-propagator.h>
-#include <dali/internal/update/rendering/render-command-container.h>
+//#include <dali/internal/update/rendering/render-command-container.h>
 #include <dali/internal/update/rendering/stencil-parameters.h>
-#include <dali/graphics-api/graphics-api-controller.h>
-#include <dali/graphics-api/graphics-api-pipeline.h>
-#include <dali/graphics-api/graphics-api-render-command.h>
+#include <dali/graphics-api/graphics-controller.h>
+#include <dali/graphics-api/graphics-pipeline.h>
+#include <dali/graphics-api/graphics-command-buffer.h>
 #include <cstring>
 
 namespace Dali
@@ -375,28 +375,28 @@ public:
    * Frees all the render commands and associated data for the given render instruction
    * @param[in] renderInstruction The render instruction for this render command
    */
-  void FreeRenderCommand( RenderInstruction* renderInstruction );
+  //void FreeRenderCommand( RenderInstruction* renderInstruction );
 
   /**
    * Gets the render command associated with the render instruction
    * @param[in] renderInstruction The render instruction for this render command
    * @param[in] updateBufferIndex The current update buffer index.
    */
-  RenderCommand& GetRenderCommand( RenderInstruction* renderInstruction, BufferIndex updateBufferIndex );
+  //RenderCommand& GetRenderCommand( RenderInstruction* renderInstruction, BufferIndex updateBufferIndex );
 
   template<class T>
-  void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::RenderCommand::UniformBufferBinding>& bindings, const std::string& name, size_t hash, const T& data )
+  void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const std::string& name, size_t hash, const T& data )
   {
     WriteUniform( ubo, bindings, name, hash, &data, sizeof(T) );
   }
 
   template<class T>
-  void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::RenderCommand::UniformBufferBinding>& bindings, const Graphics::ShaderDetails::UniformInfo& uniformInfo, const T& data )
+  void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const Graphics::UniformInfo& uniformInfo, const T& data )
   {
     WriteUniform( ubo, bindings, uniformInfo, &data, sizeof(T) );
   }
 
-  void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::RenderCommand::UniformBufferBinding>& bindings, const std::string& name, size_t hash, const Matrix3& data )
+  void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const std::string& name, size_t hash, const Matrix3& data )
   {
     // Matrix3 has to take stride in account ( 16 )
     float values[12];
@@ -409,7 +409,7 @@ public:
     WriteUniform( ubo, bindings, name, hash, &values, sizeof(float)*12 );
   }
 
-  void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::RenderCommand::UniformBufferBinding>& bindings, const Graphics::ShaderDetails::UniformInfo& uniformInfo, const Matrix3& data )
+  void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const Graphics::UniformInfo& uniformInfo, const Matrix3& data )
   {
     // Matrix3 has to take stride in account ( 16 )
     float values[12];
@@ -422,8 +422,9 @@ public:
     WriteUniform( ubo, bindings, uniformInfo, &values, sizeof(float)*12 );
   }
 
-  void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::RenderCommand::UniformBufferBinding>& bindings, const std::string& name, size_t hash, const void* data, uint32_t size );
-  void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::RenderCommand::UniformBufferBinding>& bindings, const Graphics::ShaderDetails::UniformInfo& uniformInfo, const void* data, uint32_t size );
+  void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const std::string& name, size_t hash, const void* data, uint32_t size );
+
+  void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const Graphics::UniformInfo& uniformInfo, const void* data, uint32_t size );
 
   /**
    * Query whether the renderer is fully opaque, fully transparent or transparent.
@@ -442,7 +443,7 @@ public:
    */
   bool UpdateUniformBuffers( RenderInstruction& instruction,
                              GraphicsBuffer& ubo,
-                             std::vector<Graphics::RenderCommand::UniformBufferBinding>*& outBindings,
+                             std::vector<Graphics::UniformBufferBinding>*& outBindings,
                              uint32_t& offset,
                              BufferIndex updateBufferIndex );
 
@@ -458,7 +459,7 @@ public:
 
   void BindPipeline( std::unique_ptr<Graphics::Pipeline> pipeline, BufferIndex updateBufferIndex, RenderInstruction* renderInstruction )
   {
-    GetRenderCommand( renderInstruction, updateBufferIndex ).BindPipeline( std::move(pipeline), updateBufferIndex );
+    GetRenderCommand( renderInstruction, updateBufferIndex ).BindPipeline( std::move(pipeline) );
   }
 
   std::unique_ptr<Graphics::Pipeline> ReleaseGraphicsPipeline( BufferIndex updateBufferIndex, RenderInstruction* renderInstruction )
@@ -550,8 +551,8 @@ private:
 
   bool                         mPremultipledAlphaEnabled:1;       ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 
-  RenderCommandContainer       mRenderCommands;
-  std::vector<Graphics::RenderCommand::TextureBinding> mTextureBindings;
+  //RenderCommandContainer       mRenderCommands;
+  std::vector<Graphics::TextureBinding> mTextureBindings;
 
 public:
   AnimatableProperty< float >  mOpacity;                          ///< The opacity value

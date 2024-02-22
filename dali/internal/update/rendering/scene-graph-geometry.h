@@ -20,7 +20,7 @@
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/devel-api/common/owner-container.h>
-#include <dali/graphics-api/graphics-api-controller.h>
+#include <dali/graphics-api/graphics-controller.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/common/buffer-index.h>

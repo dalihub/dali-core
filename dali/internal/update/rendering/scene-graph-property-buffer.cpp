@@ -20,8 +20,8 @@
 
 // INTERNAL HEADERS
 #include <dali/internal/event/common/property-buffer-impl.h>  // Dali::Internal::PropertyBuffer
-#include <dali/graphics-api/graphics-api-controller.h>
-#include <dali/graphics-api/graphics-api-buffer.h>
+#include <dali/graphics-api/graphics-controller.h>
+#include <dali/graphics-api/graphics-buffer.h>
 
 
 namespace Dali

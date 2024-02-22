@@ -16,8 +16,8 @@
  */
 
 #include "graphics-buffer-manager.h"
-#include <dali/graphics-api/graphics-api-buffer-factory.h>
-#include <dali/graphics-api/graphics-api-buffer.h>
+#include <dali/graphics-api/graphics-controller.h>
+#include <dali/graphics-api/graphics-buffer.h>
 
 #include <memory>
 #include <cstring>

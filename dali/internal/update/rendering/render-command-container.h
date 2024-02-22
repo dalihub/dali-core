@@ -77,7 +77,7 @@ public:
     return *renderCommand;
   }
 
-  void BindTextures( std::vector<Graphics::RenderCommand::TextureBinding>& textureBindings )
+  void BindTextures( std::vector<Graphics::TextureBinding>& textureBindings )
   {
     for( auto& elem : mRenderCommands )
     {

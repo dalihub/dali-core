@@ -21,8 +21,8 @@
 #include <dali/public-api/actors/sampling.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/rendering/sampler.h>
-#include <dali/graphics-api/graphics-api-buffer.h>
-#include <dali/graphics-api/graphics-api-controller.h>
+#include <dali/graphics-api/graphics-buffer.h>
+#include <dali/graphics-api/graphics-controller.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/event/common/event-thread-services.h>

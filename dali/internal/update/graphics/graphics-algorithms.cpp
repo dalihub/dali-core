@@ -20,9 +20,9 @@
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 
 // EXTERNAL INCLUDES
-#include <dali/graphics-api/graphics-api-controller.h>
-#include <dali/graphics-api/graphics-api-render-command.h>
-#include <dali/graphics-api/graphics-api-framebuffer.h>
+#include <dali/graphics-api/graphics-controller.h>
+#include <dali/graphics-api/graphics-command-buffer.h>
+#include <dali/graphics-api/graphics-framebuffer.h>
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/hash.h>
@@ -33,7 +33,7 @@
 #include <dali/internal/update/rendering/scene-graph-geometry.h>
 #include <dali/internal/update/rendering/scene-graph-property-buffer.h>
 #include <dali/internal/update/rendering/scene-graph-shader.h>
-#include "../../../graphics-api/graphics-api-types.h"
+#include "../../../graphics-api/graphics-types.h"
 
 namespace Dali
 {
@@ -157,7 +157,7 @@ constexpr Graphics::CompareOp ConvertStencilFunc( StencilFunction::Type stencilF
  * Helper function writing data to the DALi shader default uniforms
  */
 template<class T>
-bool WriteDefaultUniform( Renderer* renderer, GraphicsBuffer& ubo, const std::vector<Graphics::RenderCommand::UniformBufferBinding>& bindings, Shader::DefaultUniformIndex defaultUniformIndex, const T& data )
+bool WriteDefaultUniform( Renderer* renderer, GraphicsBuffer& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, Shader::DefaultUniformIndex defaultUniformIndex, const T& data )
 {
   auto info = renderer->GetShader().GetDefaultUniform( defaultUniformIndex );
   if( info )
@@ -470,11 +470,11 @@ bool GraphicsAlgorithms::SetupPipelineViewportState( Graphics::ViewportState& ou
 void GraphicsAlgorithms::RecordRenderItemList(
   Graphics::Controller &graphics,
   BufferIndex bufferIndex,
-  Graphics::RenderCommand::RenderTargetBinding &renderTargetBinding,
+  Graphics::RenderTargetBinding &renderTargetBinding,
   Matrix viewProjection,
   RenderInstruction &instruction,
   const RenderList &renderItemList,
-  std::vector<Graphics::RenderCommand *> &commandList)
+  std::vector<Graphics::CommandBuffer *> &commandList)
 {
   auto numberOfRenderItems = renderItemList.Count();
 
@@ -493,6 +493,7 @@ void GraphicsAlgorithms::RecordRenderItemList(
       continue;
     }
 
+    // @todo Should create commandBuffers similarly to current gfx impl
     auto &renderCmd = renderer->GetRenderCommand( &instruction, bufferIndex );
     auto &cmd = renderCmd.GetGfxRenderCommand( bufferIndex );
 
@@ -503,7 +504,7 @@ void GraphicsAlgorithms::RecordRenderItemList(
     {
       continue;
     }
-    cmd.BindRenderTarget( renderTargetBinding );
+    //cmd.BindRenderTarget( renderTargetBinding ); //@todo Should now be BeginrenderPass
 
     auto width = float(instruction.mViewport.width);
     auto height = float(instruction.mViewport.height);
@@ -529,7 +530,7 @@ void GraphicsAlgorithms::RecordRenderItemList(
     auto ubo = mUniformBuffer[bufferIndex].get();
     if( ubo && shader )
     {
-      std::vector<Graphics::RenderCommand::UniformBufferBinding>* bindings{ nullptr };
+      std::vector<Graphics::UniformBufferBinding>* bindings{ nullptr };
       if( renderer->UpdateUniformBuffers( instruction, *ubo, bindings, mUboOffset, bufferIndex ) )
       {
         cmd.BindUniformBuffers( bindings );
@@ -590,11 +591,12 @@ void GraphicsAlgorithms::RecordInstruction(
   Matrix::Multiply( viewProjection, *viewMatrix, *projectionMatrix );
 
 
-  auto renderTargetBinding = Graphics::RenderCommand::RenderTargetBinding{}
-  .SetClearColors( {{ instruction.mClearColor.r,
-                    instruction.mClearColor.g,
-                    instruction.mClearColor.b,
-                    instruction.mClearColor.a }} );
+  // @todo change to BeginRenderPass
+  // auto renderTargetBinding = Graphics::RenderTargetBinding{}
+  // .SetClearColors( {{ instruction.mClearColor.r,
+  //                   instruction.mClearColor.g,
+  //                   instruction.mClearColor.b,
+  //                   instruction.mClearColor.a }} );
 
   if( !instruction.mIgnoreRenderToFbo )
   {

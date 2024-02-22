@@ -15,7 +15,7 @@
  */
 
 #include <dali/internal/update/rendering/shader-cache.h>
-#include <dali/graphics-api/graphics-api-controller.h>
+#include <dali/graphics-api/graphics-controller.h>
 
 namespace Dali
 {

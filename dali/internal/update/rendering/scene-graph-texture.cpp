@@ -28,9 +28,9 @@
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/rendering/texture-impl.h>
 #include <dali/internal/update/rendering/scene-graph-sampler.h>
-#include <dali/graphics-api/graphics-api-controller.h>
-#include <dali/graphics-api/graphics-api-texture.h>
-#include <dali/graphics-api/graphics-api-texture-details.h>
+#include <dali/graphics-api/graphics-controller.h>
+#include <dali/graphics-api/graphics-texture.h>
+#include <dali/graphics-api/graphics-types.h>
 
 namespace Dali
 {

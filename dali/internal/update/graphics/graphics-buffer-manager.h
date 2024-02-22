@@ -18,7 +18,7 @@
  *
  */
 
-#include <dali/graphics-api/graphics-api-controller.h>
+#include <dali/graphics-api/graphics-controller.h>
 
 #include <memory>
 

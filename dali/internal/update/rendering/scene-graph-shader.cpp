@@ -17,7 +17,7 @@
 
 // CLASS HEADER
 #include <dali/internal/update/rendering/scene-graph-shader.h>
-#include <dali/graphics-api/graphics-api-shader-details.h>
+#include <dali/graphics-api/graphics-types.h>
 
 #include <tuple>
 #include <map>

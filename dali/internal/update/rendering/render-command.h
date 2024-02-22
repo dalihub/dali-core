@@ -18,9 +18,9 @@
  */
 
 #include <dali/internal/common/buffer-index.h>
-#include <dali/graphics-api/graphics-api-render-command.h>
-#include <dali/graphics-api/graphics-api-pipeline.h>
-#include <dali/graphics-api/graphics-api-controller.h>
+#include <dali/graphics-api/graphics-command-buffer.h>
+#include <dali/graphics-api/graphics-controller.h>
+#include <dali/graphics-api/graphics-pipeline.h>
 #include <memory>
 
 namespace Dali
@@ -42,7 +42,7 @@ struct RenderCommand
   }
 
   Graphics::RenderCommand& AllocateGfxRenderCommand( Graphics::Controller& controller,
-                                                          BufferIndex updateBufferIndex )
+                                                     BufferIndex updateBufferIndex )
   {
     if (!mGfxRenderCommand)
     {
@@ -51,33 +51,24 @@ struct RenderCommand
     return *mGfxRenderCommand.get();
   }
 
-  Graphics::RenderCommand& GetGfxRenderCommand( BufferIndex bufferIndex )
+  Graphics::CommandBuffer& GetGfxRenderCommand( BufferIndex bufferIndex )
   {
     DALI_ASSERT_ALWAYS( mGfxRenderCommand != nullptr );
     return *mGfxRenderCommand.get();
   }
 
-  void BindPipeline( std::unique_ptr<Graphics::Pipeline> pipeline, BufferIndex updateBufferIndex )
+  void BindPipeline( std::unique_ptr<Graphics::Pipeline> pipeline )
   {
-    mGfxPipeline = std::move(pipeline);
-    mGfxRenderCommand->BindPipeline( mGfxPipeline.get() );
+    mGfxPipeline = std::move(pipeline); //@query
+    mGfxRenderCommand->BindPipeline( *mGfxPipeline.get() );
   }
 
-  std::unique_ptr<Graphics::Pipeline> ReleaseGraphicsPipeline( BufferIndex updateBufferIndex )
-  {
-    return std::move( mGfxPipeline );
-  }
+  // std::unique_ptr<Graphics::Pipeline> ReleaseGraphicsPipeline( BufferIndex updateBufferIndex )
+  // {
+  //   return std::move( mGfxPipeline );
+  //}
 
-  void BindTextures( std::vector<Graphics::RenderCommand::TextureBinding>& textureBindings,
-                     BufferIndex updateBufferIndex )
-  {
-    if( !mGfxRenderCommand->GetTextureBindings() )
-    {
-      mGfxRenderCommand->BindTextures( &textureBindings );
-    }
-  }
-
-  void BindTextures( std::vector<Graphics::RenderCommand::TextureBinding>& textureBindings )
+  void BindTextures( std::vector<Graphics::TextureBinding>& textureBindings )
   {
     if( mGfxRenderCommand )
     {
@@ -85,9 +76,9 @@ struct RenderCommand
     }
   }
 
-  std::unique_ptr<Graphics::RenderCommand> mGfxRenderCommand;
+  std::unique_ptr<Graphics::CommandBuffer> mGfxRenderCommand;
   std::unique_ptr<Graphics::Pipeline> mGfxPipeline;
-  std::vector<Graphics::RenderCommand::UniformBufferBinding> mUboBindings;
+  std::vector<Graphics::UniformBufferBinding> mUboBindings;
 };
 
 } // namespace SceneGraph
