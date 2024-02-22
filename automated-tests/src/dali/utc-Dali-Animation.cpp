@@ -3406,6 +3406,103 @@ int UtcDaliAnimationClearP(void)
   END_TEST;
 }
 
+int UtcDaliAnimationEmptyAnimator(void)
+{
+  // Clear and play the empty animation, and get the state values.
+  TestApplication application;
+
+  float     durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  animation.SetLoopCount(3);
+
+  bool                 signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  try
+  {
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::STOPPED, TEST_LOCATION);
+    DALI_TEST_EQUALS(animation.GetCurrentLoop(), 0, TEST_LOCATION);
+    application.SendNotification();
+    application.Render();
+
+    animation.Play();
+
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::PLAYING, TEST_LOCATION);
+    DALI_TEST_EQUALS(animation.GetCurrentLoop(), 0, TEST_LOCATION);
+    application.SendNotification();
+    application.Render(1500 /* 150% of loop. */);
+    application.SendNotification(); // Notification trigger.
+
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::PLAYING, TEST_LOCATION);
+    DALI_TEST_EQUALS(animation.GetCurrentLoop(), 1, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render(1400 /* 290% of loop. */);
+    application.SendNotification(); // Notification trigger.
+
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::PLAYING, TEST_LOCATION);
+    DALI_TEST_EQUALS(animation.GetCurrentLoop(), 2, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render(100 + 1100 /* 300% of loop. and extra 110%. */);
+    application.SendNotification(); // Notification trigger.
+
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::STOPPED, TEST_LOCATION);
+    DALI_TEST_EQUALS(animation.GetCurrentLoop(), 3, TEST_LOCATION);
+
+    // Check wether empty animation also call finished signal.
+    finishCheck.CheckSignalReceived();
+    finishCheck.Reset();
+
+    animation.Play();
+
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::PLAYING, TEST_LOCATION);
+    //DALI_TEST_EQUALS(animation.GetCurrentLoop(), 0, TEST_LOCATION); ///< TODO : We'd better change the policy of GetCurrentLoop result
+    application.SendNotification();
+    application.Render(1500 /* 150% of loop. */);
+    application.SendNotification(); // Notification trigger.
+
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::PLAYING, TEST_LOCATION);
+    DALI_TEST_EQUALS(animation.GetCurrentLoop(), 1, TEST_LOCATION);
+
+    animation.Clear();
+
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::STOPPED, TEST_LOCATION);
+    DALI_TEST_EQUALS(animation.GetCurrentLoop(), 0, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render(1000);
+    application.Render(1000);
+    application.Render(1100 /* Over the loop count */);
+    application.SendNotification(); // Notification trigger.
+
+    // Check animation completed signal not recieved even of
+    finishCheck.CheckSignalNotReceived();
+
+    // Call clear again already cleared cases.
+    animation.Clear();
+
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::STOPPED, TEST_LOCATION);
+    DALI_TEST_EQUALS(animation.GetCurrentLoop(), 0, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render(1000);
+    application.Render(1000);
+    application.Render(1100 /* Over the loop count */);
+    application.SendNotification(); // Notification trigger.
+
+    // Check animation completed signal not recieved even of
+    finishCheck.CheckSignalNotReceived();
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+
+  END_TEST;
+}
+
 int UtcDaliAnimationFinishedSignalP(void)
 {
   TestApplication application;
