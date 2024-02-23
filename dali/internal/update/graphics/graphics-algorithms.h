@@ -34,6 +34,8 @@ namespace Internal
 namespace SceneGraph
 {
 class UniformBuffer;
+
+
 class GraphicsAlgorithms
 {
 public:
@@ -117,15 +119,16 @@ private:
 
   ScissorStackType                        mScissorStack{};        ///< Contains the currently applied scissor hierarchy (so we can undo clips)
 
-  std::unique_ptr<GraphicsBufferManager> mGraphicsBufferManager;
+  //std::unique_ptr<GraphicsBufferManager> mGraphicsBufferManager;
+  //using UniformBufferList = std::array<std::unique_ptr<GraphicsBuffer>, 2u>;
+  //UniformBufferList           mUniformBuffer;
 
-  using UniformBufferList = std::array<std::unique_ptr<GraphicsBuffer>, 2u>;
-  UniformBufferList           mUniformBuffer;
+  std::unique_ptr<UniformBufferManager> mUniformBufferManager;
 
-  uint32_t mUniformBlockAllocationCount;
-  uint32_t mUniformBlockAllocationBytes;
-  uint32_t mUniformBlockMaxSize;
-  uint32_t mUboOffset { 0u };
+  //uint32_t mUniformBlockAllocationCount;
+//  uint32_t mUniformBlockAllocationBytes;
+//  uint32_t mUniformBlockMaxSize;
+//  uint32_t mUboOffset { 0u };
   uint32_t mCurrentFrameIndex { 0u };
 
   Dali::Graphics::DepthStencilState mCurrentStencilState{};

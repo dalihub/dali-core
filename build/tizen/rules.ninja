@@ -61,7 +61,7 @@ rule CXX_SHARED_LIBRARY_LINKER__dali2-core
 # Rule for creating library symlink.
 
 rule CMAKE_SYMLINK_LIBRARY
-  command = /home2/ds/opt/bin/cmake -E cmake_symlink_library $in $SONAME $out && $POST_BUILD
+  command = /usr/bin/cmake -E cmake_symlink_library $in $SONAME $out && $POST_BUILD
   description = Creating library symlink $out
 
 
@@ -69,7 +69,7 @@ rule CMAKE_SYMLINK_LIBRARY
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = /home2/ds/opt/bin/cmake -S/home2/ds/Git/Vulkan/dali-core/build/tizen -B/home2/ds/Git/Vulkan/dali-core/build/tizen
+  command = /usr/bin/cmake -S/home/david/Git/Vulkan/dali-core/build/tizen -B/home/david/Git/Vulkan/dali-core/build/tizen
   description = Re-running CMake...
   generator = 1
 
@@ -78,7 +78,7 @@ rule RERUN_CMAKE
 # Rule for cleaning all built files.
 
 rule CLEAN
-  command = /home/ds/tizen-studio/tools/ninja -t clean
+  command = /home/david/tizen-studio/tools/ninja -t clean
   description = Cleaning all built files...
 
 
@@ -86,6 +86,6 @@ rule CLEAN
 # Rule for printing all primary targets available.
 
 rule HELP
-  command = /home/ds/tizen-studio/tools/ninja -t targets
+  command = /home/david/tizen-studio/tools/ninja -t targets
   description = All primary targets available:
 

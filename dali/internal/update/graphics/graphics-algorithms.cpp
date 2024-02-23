@@ -986,9 +986,9 @@ void GraphicsAlgorithms::SubmitRenderInstructions(
   auto numberOfInstructions = renderInstructions.Count( bufferIndex );
 
   // Prepare uniform buffers
-  if( !mGraphicsBufferManager )
+  if( !mUniformBufferManager )
   {
-    mGraphicsBufferManager.reset( new GraphicsBufferManager( &controller ) );
+    mUniformBufferManager.reset( new UniformBufferManager( &controller ) );
   }
 
   controller.BeginFrame();

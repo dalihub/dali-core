@@ -45,7 +45,7 @@ struct Sampler
    */
   Sampler()
   : mGraphicsController( nullptr ),
-    mGfxSampler( nullptr ),
+    mGraphicsSampler( nullptr ),
     mMinificationFilter(FilterMode::DEFAULT),
     mMagnificationFilter(FilterMode::DEFAULT),
     mSWrapMode(WrapMode::DEFAULT),
@@ -106,14 +106,11 @@ struct Sampler
    * Returns Graphics API sampler object
    * @return Pointer to API sampler or nullptr
    */
-  const Dali::Graphics::Sampler* GetGfxObject() const
-  {
-    return mGfxSampler.get();
-  }
+  const Dali::Graphics::Sampler* GetGraphicsObject();
 
   void DestroyGraphicsObjects()
   {
-    mGfxSampler.reset();
+    mGraphicsSampler.reset();
   }
 
   inline Graphics::SamplerAddressMode GetGfxSamplerAddressMode( WrapMode mode ) const
@@ -158,20 +155,11 @@ struct Sampler
   void Initialize( Graphics::Controller& graphicsController )
   {
     mGraphicsController = &graphicsController;
-    mGfxSampler.reset( nullptr );
-    mGfxSampler = graphicsController.CreateSampler(
-                    graphicsController.GetSamplerFactory()
-                    .SetMinFilter( GetGfxFilter( mMinificationFilter ) )
-                    .SetMagFilter( GetGfxFilter( mMagnificationFilter ) )
-                    .SetAddressModeU( GetGfxSamplerAddressMode( mSWrapMode ) )
-                    .SetAddressModeV( GetGfxSamplerAddressMode( mTWrapMode ) )
-                    .SetAddressModeW( GetGfxSamplerAddressMode( mRWrapMode ) )
-                    .SetMipmapMode( GetGfxSamplerMipmapMode( mMinificationFilter ) )
-                    );
+    mGraphicsSampler.reset();
   }
 
   Graphics::Controller* mGraphicsController;   ///< Graphics interface
-  std::unique_ptr<Dali::Graphics::Sampler> mGfxSampler; ///< Graphics Sampler object, default sampler is nullptr
+  Graphics::UniquePtr<Dali::Graphics::Sampler> mGraphicsSampler; ///< Graphics Sampler object, default sampler is nullptr
 
   FilterMode  mMinificationFilter   : 4;    ///< The minify filter
   FilterMode  mMagnificationFilter  : 4;    ///< The magnify filter

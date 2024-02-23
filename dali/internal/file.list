@@ -102,7 +102,9 @@ SET( internal_src_files
   ${internal_src_dir}/update/gestures/pan-gesture-profiling.cpp
   ${internal_src_dir}/update/gestures/scene-graph-pan-gesture.cpp
   ${internal_src_dir}/update/graphics/graphics-algorithms.cpp
-  ${internal_src_dir}/update/graphics/graphics-buffer-manager.cpp
+  ${internal_src_dir}/update/graphics/uniform-buffer.cpp
+  ${internal_src_dir}/update/graphics/uniform-buffer-manager.cpp
+  ${internal_src_dir}/update/graphics/uniform-buffer-view.cpp
   ${internal_src_dir}/update/queue/update-message-queue.cpp
   ${internal_src_dir}/update/manager/frame-callback-processor.cpp
   ${internal_src_dir}/update/manager/render-instruction-processor.cpp
@@ -119,14 +121,16 @@ SET( internal_src_files
   ${internal_src_dir}/update/render-tasks/scene-graph-camera.cpp
   ${internal_src_dir}/update/render-tasks/scene-graph-render-task.cpp
   ${internal_src_dir}/update/render-tasks/scene-graph-render-task-list.cpp
+  ${internal_src_dir}/update/rendering/gpu-buffer.cpp
   ${internal_src_dir}/update/rendering/render-instruction-container.cpp
   ${internal_src_dir}/update/rendering/render-instruction.cpp
   ${internal_src_dir}/update/rendering/render-item.cpp
   ${internal_src_dir}/update/rendering/scene-graph-frame-buffer.cpp
   ${internal_src_dir}/update/rendering/scene-graph-geometry.cpp
   ${internal_src_dir}/update/rendering/scene-graph-property-buffer.cpp
-  ${internal_src_dir}/update/rendering/scene-graph-texture.cpp
+  ${internal_src_dir}/update/rendering/scene-graph-sampler.cpp
   ${internal_src_dir}/update/rendering/scene-graph-shader.cpp
+  ${internal_src_dir}/update/rendering/scene-graph-texture.cpp
   ${internal_src_dir}/update/rendering/scene-graph-texture-set.cpp
   ${internal_src_dir}/update/rendering/scene-graph-renderer.cpp
   ${internal_src_dir}/update/rendering/shader-cache.cpp

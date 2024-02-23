@@ -234,16 +234,6 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex, RenderInstruction* 
     return;
   }
 
-  /**
-   * Prepare vertex attribute buffer bindings
-   */
-  std::vector<const Graphics::Buffer*> vertexBuffers{};
-
-  for(auto&& vertexBuffer : mGeometry->GetVertexBuffers())
-  {
-    vertexBuffers.push_back( vertexBuffer->GetGfxObject() );
-  }
-
   auto& shader = *mShader->GetGfxObject();
 
   /**
@@ -293,58 +283,10 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex, RenderInstruction* 
       renderCmd.BindTextures( mTextureBindings, updateBufferIndex );
     }
   }
+  uint32_t instanceCount = 1u;
 
-  //@todo Move to Geometry? (to align with latest DALi structure)
-
-  // Build render command
-  // todo: this may be deferred until all render items are sorted, otherwise
-  // certain optimisations cannot be done
-
-  const auto &vb = mGeometry->GetVertexBuffers()[0];
-
-  // set optional index buffer
-  bool usesIndexBuffer{false};
-  if ((usesIndexBuffer = mGeometry->HasIndexBuffer()))
-  {
-    cmd.BindIndexBuffer(Graphics::Buffer
-                        .SetBuffer(mGeometry->GetIndexBuffer())
-                        .SetOffset(0)
-    );
-  }
-
-  cmd.BindVertexBuffers(std::move(vertexBuffers) );
-
-  if(usesIndexBuffer)
-  {
-    commandBuffer.DrawIndexed( mIndexedDrawElementsCount ? uint32_t( mIndexedDrawElementsCount ) : mGeometry->GetIndexBufferElementCount(),
-                               1u,
-                               mIndexedDrawFirstElement,
-                               0,
-                               0);
-
-    // cmd.Draw(std::move(Graphics::RenderCommand::DrawCommand{}
-    //                                     .SetFirstIndex( uint32_t(mIndexedDrawFirstElement) )
-    //                                     .SetDrawType( Graphics::RenderCommand::DrawType::INDEXED_DRAW )
-    //                                     .SetFirstInstance( 0u )
-    //                                     .SetIndicesCount(
-    //                                       mIndexedDrawElementsCount ?
-    //                                         uint32_t( mIndexedDrawElementsCount ) :
-    //                                         mGeometry->GetIndexBufferElementCount() )
-    //                                     .SetInstanceCount( 1u )));
-  }
-  else
-  {
-    commandBuffer.Draw(vb->GetElementCount(),
-                       1u, // Instance Count
-                       0u, // First vertex
-                       0);
-    // cmd.Draw(std::move(Graphics::RenderCommand::DrawCommand{}
-    //                                     .SetFirstVertex(0u)
-    //                                     .SetDrawType(Graphics::RenderCommand::DrawType::VERTEX_DRAW)
-    //                                     .SetFirstInstance(0u)
-    //                                     .SetVertexCount(vb->GetElementCount())
-    //                                     .SetInstanceCount(1u)));
-  }
+  mGeometry->BindVertexAttributes(commandBuffer);
+  mGeometry->Draw(mGraphicsController, commandBuffer, mIndexedDrawFirstElement, mIndexedDrawElementsCount, instanceCount);
 
   DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  "done\n" );
 }

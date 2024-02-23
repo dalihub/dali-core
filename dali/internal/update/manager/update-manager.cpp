@@ -304,13 +304,13 @@ struct UpdateManager::Impl
           auto info = Graphics::TextureUpdateInfo{};
 
           // initialise texture object without allocating memory for it yet
-          if(!request.texture->GetGfxObject())
+          if(!request.texture->GetGraphicsObject())
           {
             request.texture->CreateTextureInternal( Texture::Usage::SAMPLE, nullptr, 0u );
           }
 
           // prepare transfer info structure
-          info.dstTexture = request.texture->GetGfxObject();
+          info.dstTexture = request.texture->GetGraphicsObject();
           info.dstOffset2D = { request.uploadParams.xOffset, request.uploadParams.yOffset };
           info.srcOffset = 0u;
           info.srcSize = request.pixelData->GetBufferSize();
@@ -1017,7 +1017,7 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
       // This may trigger garbage collection.
       if( numberOfDiscardedRenderers > 0 )
       {
-        mImpl->graphicsController.RunGarbageCollector( numberOfDiscardedRenderers );
+        //mImpl->graphicsController.RunGarbageCollector( numberOfDiscardedRenderers );
       }
 
       // generate graphics objects

@@ -35,10 +35,10 @@ PropertyBuffer::PropertyBuffer()
 : mGraphicsController( nullptr ),
   mFormat( nullptr ),
   mData( nullptr ),
+  mGpuBuffer(nullptr),
   mSize(0),
+  mElementCount(0),
   mDataChanged(true),
-  mGraphicsBuffer{ nullptr },
-  mGraphicsBufferUsage{ 0u | Graphics::BufferUsage::VERTEX_BUFFER }
 {
 }
 
@@ -62,13 +62,6 @@ void PropertyBuffer::SetData( OwnerPointer< Dali::Vector<uint8_t> >& data, uint3
   mData.Swap( data );
   mSize = size;
   mDataChanged = true;
-
-  if( mGraphicsController )
-  {
-    mGraphicsBuffer = mGraphicsController->CreateBuffer( mGraphicsController->GetBufferFactory()
-                                                         .SetSize( uint32_t( mFormat->size * size) )
-                                                         .SetUsageFlags( 0u | Graphics::BufferUsage::VERTEX_BUFFER ));
-  }
 }
 
 bool PropertyBuffer::Update( Dali::Graphics::Controller& controller )
@@ -78,17 +71,26 @@ bool PropertyBuffer::Update( Dali::Graphics::Controller& controller )
     return false;
   }
 
-  if( mDataChanged || !mGraphicsBuffer )
+  if(!mVertexBufferUpdateCallback && !mData)
   {
-    if( !mGraphicsBuffer )
+    return false;
+  }
+
+  if(!mGpuBuffer || mDataChanged)
+  {
+    if(!mGpuBuffer)
     {
-      mGraphicsBuffer = mGraphicsController->CreateBuffer( mGraphicsController->GetBufferFactory()
-                                                           .SetUsageFlags( mGraphicsBufferUsage )
-                                                           .SetSize( mSize ) );
+      mGpuBuffer = new GpuBuffer(graphicsController, 0 | Graphics::BufferUsage::VERTEX_BUFFER, GpuBuffer::WritePolicy::DISCARD);
     }
 
-    // schedule deferred write
-    mGraphicsBuffer->Write( mData.Get()->begin(), GetDataSize(), 0u );
+    // Update the GpuBuffer
+    if(mGpuBuffer && mData)
+    {
+      DALI_ASSERT_DEBUG(mSize && "No data in the property buffer!");
+      mGpuBuffer->UpdateDataBuffer(graphicsController, GetDataSize(), &((*mData)[0]));
+    }
+
+    mElementCount = mSize;
 
     mDataChanged = false;
   }

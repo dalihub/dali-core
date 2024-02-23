@@ -41,8 +41,8 @@ struct ShaderCache
     Item( Item&& ) = default;
 
     Item( std::unique_ptr<Dali::Graphics::Shader> _shader,
-          Dali::Graphics::ShaderDetails::ShaderSource _vertexSource,
-          Dali::Graphics::ShaderDetails::ShaderSource _fragmentSource )
+          Dali::Graphics::ShaderSource _vertexSource,
+          Dali::Graphics::ShaderSource _fragmentSource )
     : shader(std::move(_shader)),
       vertexSource( _vertexSource ),
       fragmentSource( _fragmentSource )
@@ -50,9 +50,9 @@ struct ShaderCache
 
     ~Item() = default;
 
-    std::unique_ptr<Dali::Graphics::Shader>               shader{ nullptr };
-    Dali::Graphics::ShaderDetails::ShaderSource           vertexSource{""};
-    Dali::Graphics::ShaderDetails::ShaderSource           fragmentSource{""};
+    std::unique_ptr<Dali::Graphics::Shader> shader{ nullptr };
+    Dali::Graphics::ShaderSource vertexSource{""};
+    Dali::Graphics::ShaderSource fragmentSource{""};
   };
 
   /**
@@ -65,9 +65,8 @@ struct ShaderCache
   /**
    * Get a shader from it's source code
    */
-  Dali::Graphics::Shader& GetShader(
-    const Dali::Graphics::ShaderDetails::ShaderSource& vsh,
-    const Dali::Graphics::ShaderDetails::ShaderSource& fsh );
+  Dali::Graphics::Shader& GetShader( const Dali::Graphics::ShaderSource& vsh,
+                                     const Dali::Graphics::ShaderSource& fsh );
 
   /**
    * Destroy any graphics objects owned by this scene graph object

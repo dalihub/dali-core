@@ -76,11 +76,38 @@ public:
   void RemovePropertyBuffer(  const SceneGraph::PropertyBuffer* propertyBuffer );
 
   /**
-   * Gets the attribute locations on the shader for the attributes defined in the geometry RenderBuffers
-   * @param[out] attributeLocation The vector where the attributes locations will be stored
-   * @param[in] program The program
-   * @param[in] bufferIndex The current buffer index
+   * @return the topology of this geometry
    */
+  [[nodiscard]] Graphics::PrimitiveTopology GetTopology() const;
+
+  /**
+   * Upload the geometry if it has changed
+   */
+  void Upload(Graphics::Controller& graphicsController);
+
+  /**
+   * Set up the attributes and perform the Draw call corresponding to the geometry type.
+   *
+   * @param[in] graphicsController The graphics controller
+   * @param[in,out] commandBuffer The current command buffer queue
+   * @param[in] elementBufferOffset The index of first vertex / element to draw if index buffer bound
+   * @param[in] elementBufferCount Number of vertices / elements to draw if index buffer bound, uses whole buffer when 0
+   * @param[in] instanceCount Number of instances to draw (use in conjunction with VertexBuffer divisor)
+   * @return true if the draw command was issued, false otherwise
+   */
+  bool Draw(Graphics::Controller&    graphicsController,
+            Graphics::CommandBuffer& commandBuffer,
+            uint32_t                 elementBufferOffset,
+            uint32_t                 elementBufferCount,
+            uint32_t                 instanceCount);
+
+  /**
+   * @brief Set up the attributes bind commaneds
+   *
+   * @param[in,out] commandBuffer The current command buffer queue
+   * @return true if the bind command was issued, false otherwise
+   */
+  bool BindVertexAttributes(Graphics::CommandBuffer& commandBuffer);
 
   /**
    * Chack if the attributes for the geometry have changed
@@ -113,9 +140,9 @@ public:
     return mVertexBuffers;
   }
 
-  Graphics::Buffer* GetIndexBuffer()
+  const GpuBuffer* GetIndexBuffer() const
   {
-    return mIndexBuffer.get();
+    return mIndexBuffer.Get();
   }
 
   bool HasIndexBuffer() const
@@ -130,7 +157,7 @@ public:
 
   void DestroyGraphicsObjects()
   {
-    mIndexBuffer.reset();
+    mIndexBuffer.Reset();
   }
 
 private:
@@ -138,7 +165,7 @@ private:
 
   // PropertyBuffers
   Vector< SceneGraph::PropertyBuffer* > mVertexBuffers;
-  std::unique_ptr<Graphics::Buffer> mIndexBuffer;
+  OwnerPointer<GpuBuffer> mIndexBuffer;
   uint32_t mIndexBufferElementCount;
   Type mGeometryType;
 

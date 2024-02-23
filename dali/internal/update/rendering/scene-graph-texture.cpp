@@ -30,6 +30,7 @@
 #include <dali/internal/update/rendering/scene-graph-sampler.h>
 #include <dali/graphics-api/graphics-controller.h>
 #include <dali/graphics-api/graphics-texture.h>
+#include <dali/graphics-api/graphics-texture-upload-helper.h>
 #include <dali/graphics-api/graphics-types.h>
 
 namespace Dali
@@ -322,14 +323,25 @@ void Texture::UploadTexture( PixelDataPtr pixelData, const Internal::Texture::Up
     CreateTextureInternal( Usage::SAMPLE, nullptr, 0u );
   }
 
-  // schedule upload
-  mGraphicsTexture->CopyMemory( pixelData->GetBuffer(),
-                                pixelData->GetBufferSize(),
-                                { params.width, params.height },
-                                { params.xOffset, params.yOffset },
-                                params.layer,
-                                params.mipmap,
-                                {} );
+  Graphics::TextureUpdateInfo info{};
+
+  info.dstTexture   = mGraphicsTexture.get();
+  info.dstOffset2D  = {params.xOffset, params.yOffset};
+  info.layer        = params.layer;
+  info.level        = params.mipmap;
+  info.srcReference = 0;
+  info.srcExtent2D  = {params.dataWidth, params.dataHeight};
+  info.srcOffset    = 0u;
+  info.srcSize      = pixelData->GetBufferSize();
+  info.srcStride    = pixelData->GetStride();
+  info.srcFormat    = Dali::Graphics::ConvertPixelFormat(pixelData->GetPixelFormat());
+
+  Graphics::TextureUpdateSourceInfo updateSourceInfo{};
+  updateSourceInfo.sourceType                = Graphics::TextureUpdateSourceInfo::Type::PIXEL_DATA;
+  updateSourceInfo.pixelDataSource.pixelData = Dali::PixelData(pixelData.Get());
+
+  mGraphicsController->UpdateTextures({info}, {updateSourceInfo});
+
 
   DALI_LOG_INFO( gTextureFilter, Debug::General, "SC::Texture(%p)::UploadTexture() GfxTexture: %p\n", this, mGraphicsTexture.get() );
 }
@@ -368,16 +380,20 @@ void Texture::CreateTextureInternal( Usage usage, unsigned char* buffer, unsigne
     }
 
     // Convert DALi format to Graphics API format
-    mGraphicsTexture = mGraphicsController->CreateTexture( mGraphicsController->GetTextureFactory()
-                                                           .SetFormat( ConvertPixelFormat( mFormat ) )
-                                                           .SetUsage( graphicsUsage )
-                                                           .SetSize( { mWidth, mHeight } )
-                                                           .SetType( Graphics::TextureDetails::Type::TEXTURE_2D )
-                                                           .SetMipMapFlag( Graphics::TextureDetails::MipMapFlag::DISABLED )
-                                                           .SetData( buffer )
-                                                           .SetDataSize( bufferSize )
-                                                           .SetNativeImage( mNativeImage )
-                                                           .SetTiling( Graphics::TextureTiling::LINEAR ));
+    auto createInfo = Graphics::TextureCreateInfo();
+    createInfo
+      .SetTextureType(Dali::Graphics::ConvertTextureType(mType))
+      .SetUsageFlags(graphicsUsage)
+      .SetFormat(Dali::Graphics::ConvertPixelFormat(mFormat))
+      .SetSize({mWidth, mHeight})
+      .SetLayout(Graphics::TextureLayout::LINEAR)
+      .SetAllocationPolicy(Graphics::TextureAllocationPolicy::CREATION)
+      .SetData(buffer)
+      .SetDataSize(bufferSize)
+      .SetNativeImage(mNativeImage)
+      .SetMipMapFlag(Graphics::TextureMipMapFlag::DISABLED);
+
+    mGraphicsTexture = mGraphicsController->CreateTexture( createInfo, std::move(mGraphicsTexture));
   }
 }
 
@@ -396,15 +412,21 @@ void Texture::PrepareTexture()
         mWidth = uint16_t(mNativeImage->GetWidth());
         mHeight = uint16_t(mNativeImage->GetHeight());
         mHasAlpha= mNativeImage->RequiresBlending();
-        mGraphicsTexture = mGraphicsController->CreateTexture( mGraphicsController->GetTextureFactory()
-                                                               .SetFormat( ConvertPixelFormat( mFormat ) )
-                                                               .SetUsage( Graphics::TextureDetails::Usage::SAMPLE )
-                                                               .SetSize( { mWidth, mHeight } )
-                                                               .SetType( Graphics::TextureDetails::Type::TEXTURE_2D )
-                                                               .SetMipMapFlag( Graphics::TextureDetails::MipMapFlag::DISABLED )
-                                                               .SetData( nullptr )
-                                                               .SetDataSize( 0 )
-                                                               .SetNativeImage( mNativeImage ));
+
+        auto createInfo = Graphics::TextureCreateInfo();
+        createInfo
+          .SetTextureType(Dali::Graphics::ConvertTextureType(mType))
+          .SetUsageFlags(Graphics::TextureUsageFlagBits::SAMPLE)
+          .SetFormat(Dali::Graphics::ConvertPixelFormat(mFormat))
+          .SetSize({mWidth, mHeight})
+          .SetLayout(Graphics::TextureLayout::LINEAR)
+          .SetAllocationPolicy(Graphics::TextureAllocationPolicy::CREATION)
+          .SetData(nullptr)
+          .SetDataSize(0)
+          .SetNativeImage(mNativeImage)
+          .SetMipMapFlag(Graphics::TextureMipMapFlag::DISABLED);
+
+        mGraphicsTexture = mGraphicsController->CreateTexture( createInfo, std::move(mGraphicsTexture));
       }
     }
     mNativeImage->PrepareTexture();

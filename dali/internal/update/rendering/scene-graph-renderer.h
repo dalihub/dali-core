@@ -32,6 +32,7 @@
 #include <dali/graphics-api/graphics-controller.h>
 #include <dali/graphics-api/graphics-pipeline.h>
 #include <dali/graphics-api/graphics-command-buffer.h>
+#include <dali/internal/update/graphics/uniform-buffer-manager.h>
 #include <cstring>
 
 namespace Dali
@@ -523,11 +524,18 @@ private:
 
 private:
   Graphics::Controller*        mGraphicsController;               ///< Graphics controller
+  ProgramCache*                mProgramCache{nullptr};
+  PipelineCache        *       mPipelineCache{nullptr};
+  PipelineCachePtr             mPipeline{};
+  UniformBufferManager*        mUniformBufferManager{};// @todo move to RenderItem
+  std::vector<Graphics::UniformBufferBinding> mUniformBufferBindings{};
 
   CollectedUniformMap          mCollectedUniformMap[2];           ///< Uniform maps collected by the renderer
   TextureSet*                  mTextureSet;                       ///< The texture set this renderer uses. (Not owned)
   SceneGraph::Geometry*        mGeometry;                         ///< The geometry this renderer uses. (Not owned)
-  Shader*                      mShader;                           ///< The shader this renderer uses. (Not owned)
+  //Shader*                      mShader;                           ///< The shader this renderer uses. (Not owned)
+  Program*                     mCurrentProgram;
+
   OwnerPointer< Vector4 >      mBlendColor;                       ///< The blend color for blending operation
 
   StencilParameters            mStencilParameters;                ///< Struct containing all stencil related options
@@ -552,7 +560,7 @@ private:
   bool                         mPremultipledAlphaEnabled:1;       ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 
   //RenderCommandContainer       mRenderCommands;
-  std::vector<Graphics::TextureBinding> mTextureBindings;
+  //std::vector<Graphics::TextureBinding> mTextureBindings;
 
 public:
   AnimatableProperty< float >  mOpacity;                          ///< The opacity value
