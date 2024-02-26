@@ -25,10 +25,6 @@
 namespace Dali::Internal::SceneGraph
 {
 class Scene;
-}
-
-namespace Dali::Internal::Render
-{
 class UniformBufferV2;
 class UniformBufferView;
 

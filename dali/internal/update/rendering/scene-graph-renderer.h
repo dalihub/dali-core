@@ -20,6 +20,7 @@
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/renderer.h> // Dali::Renderer
 #include <dali/devel-api/rendering/renderer-devel.h>
+
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/event/common/event-thread-services.h>
@@ -27,12 +28,16 @@
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/uniform-map.h>
 #include <dali/internal/update/common/scene-graph-connection-change-propagator.h>
-//#include <dali/internal/update/rendering/render-command-container.h>
+
+#include <dali/internal/update/graphics/uniform-buffer-manager.h>
+#include <dali/internal/update/graphics/uniform-buffer.h>
+
 #include <dali/internal/update/rendering/stencil-parameters.h>
 #include <dali/graphics-api/graphics-controller.h>
 #include <dali/graphics-api/graphics-pipeline.h>
 #include <dali/graphics-api/graphics-command-buffer.h>
-#include <dali/internal/update/graphics/uniform-buffer-manager.h>
+
+
 #include <cstring>
 
 namespace Dali
@@ -458,15 +463,9 @@ public:
    */
   void TextureSetDeleted();
 
-  void BindPipeline( std::unique_ptr<Graphics::Pipeline> pipeline, BufferIndex updateBufferIndex, RenderInstruction* renderInstruction )
-  {
-    GetRenderCommand( renderInstruction, updateBufferIndex ).BindPipeline( std::move(pipeline) );
-  }
+  void BindPipeline( std::unique_ptr<Graphics::Pipeline> pipeline, BufferIndex updateBufferIndex, RenderInstruction* renderInstruction );
 
-  std::unique_ptr<Graphics::Pipeline> ReleaseGraphicsPipeline( BufferIndex updateBufferIndex, RenderInstruction* renderInstruction )
-  {
-    return GetRenderCommand( renderInstruction, updateBufferIndex ) .ReleaseGraphicsPipeline( updateBufferIndex );
-  }
+  std::unique_ptr<Graphics::Pipeline> ReleaseGraphicsPipeline( BufferIndex updateBufferIndex, RenderInstruction* renderInstruction );
 
   void CheckRenderCommandCount(BufferIndex bufferIndex);
 
@@ -524,17 +523,15 @@ private:
 
 private:
   Graphics::Controller*        mGraphicsController;               ///< Graphics controller
-  ProgramCache*                mProgramCache{nullptr};
-  PipelineCache        *       mPipelineCache{nullptr};
-  PipelineCachePtr             mPipeline{};
-  UniformBufferManager*        mUniformBufferManager{};// @todo move to RenderItem
+  //PipelineCache        *       mPipelineCache{nullptr};
+  //PipelineCachePtr             mPipeline{};
+  UniformBufferManager*        mUniformBufferManager{};
   std::vector<Graphics::UniformBufferBinding> mUniformBufferBindings{};
 
   CollectedUniformMap          mCollectedUniformMap[2];           ///< Uniform maps collected by the renderer
   TextureSet*                  mTextureSet;                       ///< The texture set this renderer uses. (Not owned)
   SceneGraph::Geometry*        mGeometry;                         ///< The geometry this renderer uses. (Not owned)
-  //Shader*                      mShader;                           ///< The shader this renderer uses. (Not owned)
-  Program*                     mCurrentProgram;
+  Shader*                      mShader;                           ///< The shader this renderer uses. (Not owned)
 
   OwnerPointer< Vector4 >      mBlendColor;                       ///< The blend color for blending operation
 

@@ -55,7 +55,7 @@ public:
   /*
    *@todo: Convert this to work the same way that RenderAlgorithms does in latest DALi.
    *Plan of attack:
-   * 1. Change object creation (remove factories)
+   * 1. Change object creation (remove factories)  DONE
    * 2. Make command buffers work same as latest DALi
    *    a. Fix up ownership model of command buffers.
    *    b. Change APIs to pass command buffer

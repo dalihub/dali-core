@@ -52,7 +52,7 @@ std::array<size_t, 8> DEFAULT_UNIFORM_HASHTABLE = {
 
 Shader::Shader( Dali::Shader::Hint::Value& hints )
 : mGraphicsController( nullptr ),
-  mGraphicsShader( nullptr ),
+  mGraphicsProgram( nullptr ),
   mShaderCache( nullptr ),
   mHints( hints ),
   mConnectionObservers()
@@ -71,14 +71,14 @@ void Shader::Initialize( Graphics::Controller& graphicsController, ShaderCache& 
   mShaderCache = &shaderCache;
 }
 
-const Graphics::Shader* Shader::GetGfxObject() const
+const Graphics::Program* Shader::GetGfxObject() const
 {
-  return mGraphicsShader;
+  return &mGraphicsProgram;
 }
 
 Graphics::Shader* Shader::GetGfxObject()
 {
-  return mGraphicsShader;
+  return &mGraphicsProgram;
 }
 
 void Shader::AddConnectionObserver( ConnectionChangePropagator::Observer& observer )
@@ -103,12 +103,12 @@ void Shader::SetShaderProgram( Internal::ShaderDataPtr shaderData, bool modifies
   // @todo: we should handle non-binary shaders as well in the future
   if (shaderData->GetType() == ShaderData::Type::BINARY)
   {
-    mGraphicsShader = &mShaderCache->GetShader(
-      Graphics::ShaderDetails::ShaderSource(shaderData->GetShaderForStage(ShaderData::ShaderStage::VERTEX)),
-      Graphics::ShaderDetails::ShaderSource(shaderData->GetShaderForStage(ShaderData::ShaderStage::FRAGMENT)));
+    mGraphicsProgram = &mShaderCache->GetShader(
+      shaderData->GetShaderForStage(ShaderData::ShaderStage::VERTEX),
+      shaderData->GetShaderForStage(ShaderData::ShaderStage::FRAGMENT));
   }
 
-  if( mGraphicsShader )
+  if( mGraphicsProgram )
   {
     BuildReflection();
   }
@@ -116,23 +116,24 @@ void Shader::SetShaderProgram( Internal::ShaderDataPtr shaderData, bool modifies
 
 void Shader::DestroyGraphicsObjects()
 {
-  mGraphicsShader = nullptr;
+  mGraphicsProgram = nullptr;
 }
 
 void Shader::BuildReflection()
 {
-  if( mGraphicsShader )
+  if( mGraphicsProgram )
   {
+    auto& reflection = mController.GetProgramReflection(mGraphicsProgram);
     mReflectionDefaultUniforms.clear();
     mReflectionDefaultUniforms.resize( DEFAULT_UNIFORM_HASHTABLE.size() );
 
-    auto uniformBlockCount = mGraphicsShader->GetUniformBlockCount();
+    auto uniformBlockCount = reflection->GetUniformBlockCount();
 
     // add uniform block fields
     for( auto i = 0u; i < uniformBlockCount; ++i )
     {
-      Graphics::ShaderDetails::UniformBlockInfo uboInfo;
-      mGraphicsShader->GetUniformBlock( i, uboInfo );
+      Graphics::UniformBlockInfo uboInfo;
+      reflection->GetUniformBlock( i, uboInfo );
 
       // for each member store data
       for( const auto& item : uboInfo.members )
@@ -159,7 +160,7 @@ void Shader::BuildReflection()
     auto samplers = mGraphicsShader->GetSamplers();
     for( const auto& sampler : samplers )
     {
-      mReflection.emplace_back( ReflectionUniformInfo{ CalculateHash( sampler.name ), false, mGraphicsShader, sampler } );
+      mReflection.emplace_back( ReflectionUniformInfo{ CalculateHash( sampler.name ), false, sampler } );
     }
 
     // check for potential collisions
@@ -187,6 +188,9 @@ void Shader::BuildReflection()
       }
     }
   }
+
+  // Modern: program.cpp adds mUniformBlockMemoryRequirements calculation
+  // Here, it's done in GraphicsAlgorithms::PrepareGraphicsPipeline
 }
 
 bool Shader::GetUniform( const std::string& name, size_t hashedName, Graphics::ShaderDetails::UniformInfo& out ) const

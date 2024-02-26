@@ -21,11 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/graphics-api/graphics-controller.h>
 
-namespace Dali
-{
-class VertexBufferUpdateCallback;
-
-namespace Internal
+namespace Dali:: Internal::Render
 {
 /**
  * Used to create and update a GPU memory buffer.
@@ -80,17 +76,6 @@ public:
   void UpdateDataBuffer(Graphics::Controller& graphicsController, uint32_t size, const void* data);
 
   /**
-   * Updates existing buffer by calling associated VertexBufferUpdateCallback
-   *
-   * bytesUpdatedCount limits next draw call to that amount of data.
-   *
-   * @param[in] graphicsController Valid controller
-   * @param[in] callback  Valid pointer to the VertexBufferUpdateCallback
-   * @param[out] bytesUpdatedCount Number of bytes updated
-   */
-  void UpdateDataBufferWithCallback(Graphics::Controller& graphicsController, Dali::VertexBufferUpdateCallback* callback, uint32_t& bytesUpdatedCount);
-
-  /**
    * Get the size of the buffer
    * @return size Size of the buffer in bytes
    */
@@ -117,7 +102,6 @@ private:
   WritePolicy                           mWritePolicy{WritePolicy::RETAIN}; ///< data write policy for the buffer
 };
 
-} // namespace Internal
-} // namespace Dali
+} // namespace Dali::Internal::Render
 
 #endif // DALI_INTERNAL_RENDERERS_GPU_BUFFER_H

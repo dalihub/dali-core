@@ -637,18 +637,19 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::Controller& controll
   auto &renderCmd = renderer->GetRenderCommand( &instruction, bufferIndex );
   auto &cmd = renderCmd.GetGfxRenderCommand( bufferIndex );
   auto *geometry = renderer->GetGeometry();
-  auto gfxShader = renderer->GetShader().GetGfxObject();
+  auto graphicsProgram = renderer->GetShader().GetGfxObject();
 
-  if( !gfxShader )
+  if( !graphicsProgram )
   {
     return false;
   }
+  auto& reflection = controller.GetProgramReflection(graphicsProgram);
 
   // Update allocation requirements
-  mUniformBlockAllocationCount += gfxShader->GetUniformBlockCount();
-  for( auto i = 0u; i < gfxShader->GetUniformBlockCount(); ++i )
+  mUniformBlockAllocationCount += reflection->GetUniformBlockCount();
+  for( auto i = 0u; i < reflection->GetUniformBlockCount(); ++i )
   {
-    auto size = gfxShader->GetUniformBlockSize( i );
+    auto size = reflection->GetUniformBlockSize( i );
     auto blockSize = (( size / UBO_ALIGNMENT ) + ( ( size % UBO_ALIGNMENT ) ? 1 : 0 )) * UBO_ALIGNMENT;
     if( mUniformBlockMaxSize < blockSize )
     {
@@ -681,7 +682,7 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::Controller& controll
       // create attribute description
       vi.attributes
         .emplace_back(
-          gfxShader->GetVertexAttributeLocation(vertexBuffer->GetAttributeName(i)),
+          reflection->GetVertexAttributeLocation(vertexBuffer->GetAttributeName(i)),
           bindingIndex, (vertexBuffer->GetFormat()
                                      ->components[i]).offset,
           VertexInputFormat::UNDEFINED);
@@ -873,45 +874,39 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::Controller& controll
     }
   }
 
+  Graphics::ProgramState programState{};
+  programState.SetProgram(graphicsProgram);
+
+  colorBlendState
+    .SetColorComponentsWriteBits(0xff)
+    .SetLogicOpEnable(false);
+
+  Graphics::InputAssemblyState inputAssembly{};
+  inputAssembly
+    .SetTopology(topology)
+    .SetPrimitiveRestartEnable(false);
+
+  Graphics::RasterizationState rasterizationState{};
+  rasterizationState
+    .SetCullMode(cullMode)
+    .SetPolygonMode(PolygonMode::FILL)
+    .SetFrontFace(FrontFace::COUNTER_CLOCKWISE);
+
+  Graphics::PipelineCreateInfo createInfo;
+  createInfo
+    .SetProgramState(&programState)
+    .SetColorBlendState(&colorBlendState)
+    .SetRasterizationState(&rasterizationState)
+    .SetVertexInputState(&vi)
+    .SetInputAssemblyState(&inputAssembly);
+
+    //.SetFramebufferState( framebufferState )   // Does not exist in modern API
+    //.SetDepthStencilState( depthStencilState ) // Not used in modern impl
+    //.SetViewportState( &viewportState )        // Not used in modern impl
+    //.SetDynamicStateMask( dynamicStateMask );  // Not used in modern impl
+
   // create pipeline
-  auto pipeline = controller.CreatePipeline( controller.GetPipelineFactory()
-            .SetOldPipeline( renderer->ReleaseGraphicsPipeline( bufferIndex, &instruction) ) // set old pipeline
-
-            // vertex input
-            .SetVertexInputState(vi)
-
-            // shaders
-            .SetShaderState( ShaderState()
-                              .SetShaderProgram(*gfxShader))
-
-            // input assembly
-            .SetInputAssemblyState( InputAssemblyState()
-                                     .SetTopology(topology)
-                                     .SetPrimitiveRestartEnable(false))
-
-            // viewport ( if zeroes then framebuffer size used )
-            .SetViewportState( viewportState )
-
-            .SetFramebufferState( framebufferState )
-
-            // depth stencil
-            .SetDepthStencilState( depthStencilState )
-
-            // color blend
-            .SetColorBlendState( colorBlendState
-                                  .SetColorComponentsWriteBits(0xff)
-                                  .SetLogicOpEnable(false))
-
-            // rasterization
-            .SetRasterizationState( RasterizationState()
-                                     .SetCullMode(cullMode)
-                                     .SetPolygonMode(PolygonMode::FILL)
-                                     .SetFrontFace(FrontFace::COUNTER_CLOCKWISE))
-
-            // dynamic state mask
-            .SetDynamicStateMask( dynamicStateMask )
-  );
-
+  auto pipeline = controller.CreatePipeline( createInfo, nullptr /*renderer->ReleaseGraphicsPipeline() */ );
 
   // bind pipeline to the render command
   renderer->BindPipeline( std::move(pipeline), bufferIndex, &instruction );
@@ -925,7 +920,6 @@ void GraphicsAlgorithms::PrepareRendererPipelines( Graphics::Controller& control
                                                    bool& usesStencil,
                                                    BufferIndex bufferIndex )
 {
-
   mUniformBlockAllocationCount = 0u;
   mUniformBlockAllocationBytes = 0u;
   mUniformBlockMaxSize = 0u;

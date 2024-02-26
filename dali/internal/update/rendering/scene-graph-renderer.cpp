@@ -199,7 +199,7 @@ void Renderer::UpdateUniformMap( BufferIndex updateBufferIndex, Node& node )
 
     localMap.Resize( oldMap.Count() );
 
-      uint32_t index=0;
+    uint32_t index=0;
     for( CollectedUniformMap::Iterator iter = oldMap.Begin(), end = oldMap.End() ; iter != end ; ++iter, ++index )
     {
       localMap[index] = *iter;
@@ -234,7 +234,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex, RenderInstruction* 
     return;
   }
 
-  auto& shader = *mShader->GetGfxObject();
+  auto& program = *mShader->GetGfxObject();
 
   /**
    * Prepare textures
@@ -798,6 +798,17 @@ void Renderer::DestroyGraphicsObjects()
 {
   mRenderCommands.DestroyAll();
 }
+
+void Renderer::BindPipeline( std::unique_ptr<Graphics::Pipeline> pipeline, BufferIndex updateBufferIndex, RenderInstruction* renderInstruction )
+{
+  //GetRenderCommand( renderInstruction, updateBufferIndex ).BindPipeline( std::move(pipeline) );
+}
+
+std::unique_ptr<Graphics::Pipeline> ReleaseGraphicsPipeline( BufferIndex updateBufferIndex, RenderInstruction* renderInstruction )
+{
+  //return GetRenderCommand( renderInstruction, updateBufferIndex ) .ReleaseGraphicsPipeline( updateBufferIndex );
+}
+
 
 } // namespace SceneGraph
 } // namespace Internal

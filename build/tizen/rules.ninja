@@ -22,25 +22,6 @@ rule CUSTOM_COMMAND
 #############################################
 # Rule for compiling CXX files.
 
-rule CXX_COMPILER__linker-test
-  depfile = $DEP_FILE
-  deps = gcc
-  command = /usr/lib/ccache/g++  $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
-  description = Building CXX object $out
-
-
-#############################################
-# Rule for linking CXX executable.
-
-rule CXX_EXECUTABLE_LINKER__linker-test
-  command = $PRE_LINK && /usr/lib/ccache/g++  $FLAGS  $LINK_FLAGS $in  -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
-  description = Linking CXX executable $TARGET_FILE
-  restat = $RESTAT
-
-
-#############################################
-# Rule for compiling CXX files.
-
 rule CXX_COMPILER__dali2-core
   depfile = $DEP_FILE
   deps = gcc
@@ -61,15 +42,34 @@ rule CXX_SHARED_LIBRARY_LINKER__dali2-core
 # Rule for creating library symlink.
 
 rule CMAKE_SYMLINK_LIBRARY
-  command = /usr/bin/cmake -E cmake_symlink_library $in $SONAME $out && $POST_BUILD
+  command = /home2/ds/opt/bin/cmake -E cmake_symlink_library $in $SONAME $out && $POST_BUILD
   description = Creating library symlink $out
+
+
+#############################################
+# Rule for compiling CXX files.
+
+rule CXX_COMPILER__linker-test
+  depfile = $DEP_FILE
+  deps = gcc
+  command = /usr/lib/ccache/g++  $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
+  description = Building CXX object $out
+
+
+#############################################
+# Rule for linking CXX executable.
+
+rule CXX_EXECUTABLE_LINKER__linker-test
+  command = $PRE_LINK && /usr/lib/ccache/g++  $FLAGS  $LINK_FLAGS $in  -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
+  description = Linking CXX executable $TARGET_FILE
+  restat = $RESTAT
 
 
 #############################################
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = /usr/bin/cmake -S/home/david/Git/Vulkan/dali-core/build/tizen -B/home/david/Git/Vulkan/dali-core/build/tizen
+  command = /home2/ds/opt/bin/cmake -S/home2/ds/Git/Vulkan/dali-core/build/tizen -B/home2/ds/Git/Vulkan/dali-core/build/tizen
   description = Re-running CMake...
   generator = 1
 
@@ -78,7 +78,7 @@ rule RERUN_CMAKE
 # Rule for cleaning all built files.
 
 rule CLEAN
-  command = /home/david/tizen-studio/tools/ninja -t clean
+  command = /home/ds/tizen-studio/tools/ninja -t clean
   description = Cleaning all built files...
 
 
@@ -86,6 +86,6 @@ rule CLEAN
 # Rule for printing all primary targets available.
 
 rule HELP
-  command = /home/david/tizen-studio/tools/ninja -t targets
+  command = /home/ds/tizen-studio/tools/ninja -t targets
   description = All primary targets available:
 

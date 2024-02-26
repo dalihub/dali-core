@@ -30,7 +30,7 @@ namespace SceneGraph
 {
 
 /**
- * Caches graphics shaders as they are created by SceneGraph::Shader.
+ * Caches graphics programs as they are created by SceneGraph::Shader.
  */
 struct ShaderCache
 {
@@ -39,20 +39,19 @@ struct ShaderCache
     Item() = default;
     Item( const Item& ) = delete;
     Item( Item&& ) = default;
-
-    Item( std::unique_ptr<Dali::Graphics::Shader> _shader,
-          Dali::Graphics::ShaderSource _vertexSource,
-          Dali::Graphics::ShaderSource _fragmentSource )
-    : shader(std::move(_shader)),
+    Item( Graphics::UniquePtr<Graphics::Program>&& _program,
+          std::vector<char>& _vertexSource,
+          std::vector<char>& _fragmentSource )
+    : program(std::move(_program)),
       vertexSource( _vertexSource ),
       fragmentSource( _fragmentSource )
     {}
 
     ~Item() = default;
 
-    std::unique_ptr<Dali::Graphics::Shader> shader{ nullptr };
-    Dali::Graphics::ShaderSource vertexSource{""};
-    Dali::Graphics::ShaderSource fragmentSource{""};
+    Graphics::UniquePtr<Graphics::Program> program;
+    std::vector<char>& vertexSource;
+    std::vector<char>& fragmentSource;
   };
 
   /**
@@ -65,8 +64,8 @@ struct ShaderCache
   /**
    * Get a shader from it's source code
    */
-  Dali::Graphics::Shader& GetShader( const Dali::Graphics::ShaderSource& vsh,
-                                     const Dali::Graphics::ShaderSource& fsh );
+  Graphics::Program& GetShader( const std::vector<char>&& vsh,
+                                const std::vector<char>&& fsh );
 
   /**
    * Destroy any graphics objects owned by this scene graph object

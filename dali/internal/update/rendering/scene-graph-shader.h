@@ -41,8 +41,10 @@ class ConnectionObserver;
 class SceneController;
 
 /**
- * Owner of Graphics Shader; also enables sharing of uniform properties.
+ * Owner of Graphics Program; also enables sharing of uniform properties.
  * Owned by UpdateManager.
+ *
+ * Equivalent of Render::Program in modern GLES world, but it's (also) the scene graph object of Dali::Shader,
  */
 class Shader : public PropertyOwner, public UniformMap::Observer
 {
@@ -105,13 +107,13 @@ public:
    * Get the graphics shader object
    * @return the graphics shader object
    */
-  const Graphics::Shader* GetGfxObject() const;
+  const Graphics::Program* GetGfxObject() const;
 
   /**
    * Get the graphics shader object
    * @return the graphics shader object
    */
-  Graphics::Shader* GetGfxObject();
+  Graphics::Program* GetGfxObject();
 
   /**
    * Destroy any graphics objects owned by this scene graph object
@@ -130,7 +132,7 @@ public:
    *
    * @return False when uniform is not found or due to hash collision the result is ambiguous
    */
-  bool GetUniform( const std::string& name, size_t hashedName, Graphics::ShaderDetails::UniformInfo& out ) const;
+  bool GetUniform( const std::string& name, size_t hashedName, Graphics::UniformInfo& out ) const;
 
   /**
    * Retrieves default uniform
@@ -138,14 +140,14 @@ public:
    * @param[out] outputUniformInfo the reference to UniformInfo object
    * @return True is uniform found, false otherwise
    */
-  bool GetDefaultUniform( DefaultUniformIndex defaultUniformIndex, Graphics::ShaderDetails::UniformInfo& outputUniformInfo ) const;
+  bool GetDefaultUniform( DefaultUniformIndex defaultUniformIndex, Graphics::UniformInfo& outputUniformInfo ) const;
 
   /**
    * Retrievs default uniform
    * @param[in] defaultUniformIndex index of the uniform
    * @return Valid pointer to the UniformInfo object or nullptr
    */
-  const Graphics::ShaderDetails::UniformInfo* GetDefaultUniform( DefaultUniformIndex defaultUniformIndex ) const;
+  const Graphics::UniformInfo* GetDefaultUniform( DefaultUniformIndex defaultUniformIndex ) const;
 
 public: // Messages
   /**
@@ -184,8 +186,7 @@ private:
   {
     size_t                               hashValue { 0 };
     bool                                 hasCollision { false };
-    Graphics::Shader*                    graphicsShader { nullptr };
-    Graphics::ShaderDetails::UniformInfo uniformInfo {};
+    Graphics::UniformInfo uniformInfo {};
   };
 
   /**
@@ -195,8 +196,9 @@ private:
 
 private: // Data
   Graphics::Controller*           mGraphicsController; ///< Graphics interface object
-  Graphics::Shader*               mGraphicsShader; ///< The graphics object ( owned by cache )
-  ShaderCache*                    mShaderCache;
+  Graphics::Program&              mGraphicsProgram; ///< The graphics object
+  ShaderCache&                    mShaderCache; ///< The Program cache (Owns assoc Graphics::Program)
+
   Dali::Shader::Hint::Value       mHints; ///< Hints for the shader
   ConnectionChangePropagator      mConnectionObservers; ///< Watch for connection changes
 

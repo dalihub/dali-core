@@ -21,11 +21,13 @@
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/graphics-api/graphics-controller.h>
+
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/event/common/event-thread-services.h>
+#include <dali/internal/update/rendering/gpu-buffer.h>
 
 namespace Dali
 {

@@ -29,9 +29,9 @@ ShaderCache::ShaderCache( Dali::Graphics::Controller& controller )
 {
 }
 
-Dali::Graphics::Shader& ShaderCache::GetShader(
-  const Dali::Graphics::ShaderDetails::ShaderSource& vsh,
-  const Dali::Graphics::ShaderDetails::ShaderSource& fsh )
+Dali::Graphics::Program& ShaderCache::GetShader(
+  const std::vector<char>& vertexShaderSource,
+  const std::vector<char>& fragmentShaderSource)
 {
   for( auto&& item : mItems )
   {
@@ -40,18 +40,35 @@ Dali::Graphics::Shader& ShaderCache::GetShader(
       return *item.shader.get();
     }
   }
-  auto shader =
-    mController.CreateShader( mController.GetShaderFactory()
-                              .SetShaderModule( Graphics::ShaderDetails::PipelineStage::VERTEX,
-                                                Graphics::ShaderDetails::Language::SPIRV_1_0,
-                                                vsh )
-                              .SetShaderModule( Graphics::ShaderDetails::PipelineStage::FRAGMENT,
-                                                Graphics::ShaderDetails::Language::SPIRV_1_0,
-                                                fsh ) );
 
-  auto retval = shader.get();
-  mItems.emplace_back( std::move(shader), vsh, fsh );
-  return *retval;
+  Graphics::ShaderCreateInfo vertexShaderCreateInfo;
+  vertexShaderCreateInfo.SetPipelineStage(Graphics::PipelineStage::VERTEX_SHADER);
+  vertexShaderCreateInfo.SetSourceMode(Graphics::ShaderSourceMode::BINARY);
+  vertexShaderCreateInfo.SetSourceSize(vertexShaderSource.size());
+  vertexShaderCreateInfo.SetSourceData(static_cast<const void*>(vertexShaderSource.data()));
+  auto vertexShader = mGraphicsController->CreateShader(vertexShaderCreateInfo, nullptr);
+
+  Graphics::ShaderCreateInfo fragmentShaderCreateInfo;
+  fragmentShaderCreateInfo.SetPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER);
+  fragmentShaderCreateInfo.SetSourceMode(Graphics::ShaderSourceMode::BINARY);
+  fragmentShaderCreateInfo.SetSourceSize(fragmentShaderSource.size());
+  fragmentShaderCreateInfo.SetSourceData(static_cast<const void*>(fragmentShaderSource.data()));
+  auto fragmentShader = mGraphicsController->CreateShader(fragmentShaderCreateInfo, nullptr);
+
+  std::vector<Graphics::ShaderState> shaderStates{
+    Graphics::ShaderState()
+    .SetShader(*vertexShader.get())
+    .SetPipelineStage(Graphics::PipelineStage::VERTEX_SHADER),
+    Graphics::ShaderState()
+    .SetShader(*fragmentShader.get())
+    .SetPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER)};
+
+  auto createInfo = Graphics::ProgramCreateInfo();
+  createInfo.SetShaderState(shaderStates);
+
+  auto graphicsProgram = mGraphicsController->CreateProgram(createInfo, nullptr);
+  mItems.emplace_back(std::move(graphicsProgram), vertexShaderSource, fragmentShaderSource);
+  return *mItems.back().program.get();
 }
 
 void ShaderCache::DestroyGraphicsObjects()
