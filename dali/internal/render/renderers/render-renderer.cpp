@@ -478,14 +478,21 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
       mRenderCallbackInput = std::unique_ptr<RenderCallbackInput>(new RenderCallbackInput);
     }
 
+    bool isolatedNotDirect = (mRenderCallback->GetExecutionMode() == RenderCallback::ExecutionMode::ISOLATED);
+
     Graphics::DrawNativeInfo info{};
     info.api      = Graphics::DrawNativeAPI::GLES;
     info.callback = &static_cast<Dali::CallbackBase&>(*mRenderCallback);
     info.userData = mRenderCallbackInput.get();
 
+    // Tell custom renderer whether code executes in isolation or is injected directly and may alter
+    // state or DALi rendering pipeline
+    mRenderCallbackInput->usingOwnEglContext = isolatedNotDirect;
     // Set storage for the context to be used
     info.glesNativeInfo.eglSharedContextStoragePointer = &mRenderCallbackInput->eglContext;
-    info.reserved                                      = nullptr;
+    info.executionMode = isolatedNotDirect ?
+                         Graphics::DrawNativeExecutionMode::ISOLATED : Graphics::DrawNativeExecutionMode::DIRECT;
+    info.reserved = nullptr;
 
     auto& textureResources = mRenderCallback->GetTextureResources();
 

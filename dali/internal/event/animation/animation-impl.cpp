@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -389,6 +389,13 @@ void Animation::Clear()
 {
   DALI_ASSERT_DEBUG(mAnimation);
 
+  // Recreate scene-object only if animation play now, or connector connected at least 1 times.
+  if(mConnectors.Count() == 0u && mState == Dali::Animation::STOPPED)
+  {
+    // Animation is empty. Fast-out
+    return;
+  }
+
   // Only notify the objects with the current values if the end action is set to BAKE
   if(mEndAction == EndAction::BAKE && mState != Dali::Animation::STOPPED)
   {
@@ -406,8 +413,10 @@ void Animation::Clear()
   DestroySceneObject();
   CreateSceneObject();
 
-  // Reset the notification count, since the new scene-object has never been played
+  // Reset the notification count and relative values, since the new scene-object has never been played
   mNotificationCount = 0;
+  mCurrentLoop       = 0;
+  mState             = Dali::Animation::STOPPED;
 
   // Update the current playlist
   mPlaylist.OnClear(*this);

@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_COMMAND_BUFFER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,6 +96,15 @@ enum class DrawNativeAPI
   UNDEFINED
 };
 
+/**
+ * Specifies native draw commands execution mode
+ */
+enum class DrawNativeExecutionMode
+{
+  ISOLATED, ///< Commands execute isolated from the main pipeline (not altering state)
+  DIRECT ///< Commands inherit and alter current state of the main pipeline (unsafe!)
+};
+
 struct DrawNativeInfo
 {
   DrawNativeAPI       api;      ///< API used by the callback
@@ -110,6 +119,8 @@ struct DrawNativeInfo
   Graphics::Buffer**  bufferList;   ///< Buffers to be used by the call
   uint32_t            bufferCount;  ///< Number of buffers used by the callback
 
+  DrawNativeExecutionMode executionMode; ///< Specifies whether to isolate rendering from main pipeline
+
   /**
    * The GLES api specific structure that stores pointers to objects to be filled when requested
    * by caller. The structure cointains void* to avoid creating any complex constructors and keep
@@ -118,6 +129,14 @@ struct DrawNativeInfo
   struct GLESNativeInfo
   {
     void* eglSharedContextStoragePointer; ///< Indicates the storage object to pass the shared context, must be null if not in use
+
+    /**
+     * If false, it will inject GL calls into current context (window)
+     * and won't create own context. This will alter GLES state and
+     * it's application responsibility to maintain it so DALi can render
+     * correctly after.
+     */
+    bool useOwnEglContext;
   } glesNativeInfo;
 
   void* userData; ///< Data passed into the callback (unspecified type, callback should decode it)
