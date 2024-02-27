@@ -189,8 +189,9 @@ ClippingBox IntersectAABB( const ClippingBox& aabbA, const ClippingBox& aabbB )
 }
 
 GraphicsAlgorithms::GraphicsAlgorithms( Graphics::Controller& controller )
+: mGraphicsController(controller)
 {
-  mGraphicsBufferManager.reset( new GraphicsBufferManager( &controller ) );
+  mUniformBufferManager.reset( new UniformBufferManager( &controller ) );
 }
 
 bool GraphicsAlgorithms::SetupScissorClipping( const RenderItem& item)
@@ -468,7 +469,6 @@ bool GraphicsAlgorithms::SetupPipelineViewportState( Graphics::ViewportState& ou
 }
 
 void GraphicsAlgorithms::RecordRenderItemList(
-  Graphics::Controller &graphics,
   BufferIndex bufferIndex,
   Graphics::RenderTargetBinding &renderTargetBinding,
   Matrix viewProjection,
@@ -526,7 +526,7 @@ void GraphicsAlgorithms::RecordRenderItemList(
     // update the uniform buffer
     // pass shared UBO and offset, return new offset for next item to be used
     // don't process bindings if there are no uniform buffers allocated
-    auto shader = renderer->GetShader().GetGfxObject();
+    auto shader = renderer->GetShader().GetGraphicsObject();
     auto ubo = mUniformBuffer[bufferIndex].get();
     if( ubo && shader )
     {
@@ -577,10 +577,10 @@ void GraphicsAlgorithms::RecordRenderItemList(
 }
 
 void GraphicsAlgorithms::RecordInstruction(
-  Graphics::Controller& graphics,
   BufferIndex bufferIndex,
   RenderInstruction& instruction,
-  std::vector<Graphics::RenderCommand*>& commandList)
+  std::vector<Graphics::RenderCommand*>& commandList,
+  bool renderToFbo)
 {
   using namespace Graphics;
 
@@ -602,7 +602,7 @@ void GraphicsAlgorithms::RecordInstruction(
   {
     if( instruction.mFrameBuffer != 0 )
     {
-      renderTargetBinding.SetFramebuffer( instruction.mFrameBuffer->GetGfxObject());
+      renderTargetBinding.SetFramebuffer( instruction.mFrameBuffer->GetGraphicsObject());
       // Store the size of the framebuffer in case the viewport isn't set.
       renderTargetBinding.framebufferWidth = float(instruction.mFrameBuffer->GetWidth());
       renderTargetBinding.framebufferHeight = float(instruction.mFrameBuffer->GetHeight());
@@ -618,13 +618,13 @@ void GraphicsAlgorithms::RecordInstruction(
   }
 }
 
-bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::Controller& controller,
-                              RenderInstruction& instruction,
-                              const RenderList* renderList,
-                              RenderItem& item,
-                              bool& usesDepth,
-                              bool& usesStencil,
-                              BufferIndex bufferIndex )
+bool GraphicsAlgorithms::PrepareGraphicsPipeline(
+  RenderInstruction& instruction,
+  const RenderList* renderList,
+  RenderItem& item,
+  bool& usesDepth,
+  bool& usesStencil,
+  BufferIndex bufferIndex )
 {
   using namespace Dali::Graphics;
 
@@ -637,13 +637,13 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::Controller& controll
   auto &renderCmd = renderer->GetRenderCommand( &instruction, bufferIndex );
   auto &cmd = renderCmd.GetGfxRenderCommand( bufferIndex );
   auto *geometry = renderer->GetGeometry();
-  auto graphicsProgram = renderer->GetShader().GetGfxObject();
+  auto graphicsProgram = renderer->GetShader().GetGraphicsObject();
 
   if( !graphicsProgram )
   {
     return false;
   }
-  auto& reflection = controller.GetProgramReflection(graphicsProgram);
+  auto& reflection = mGraphicsController.GetProgramReflection(graphicsProgram);
 
   // Update allocation requirements
   mUniformBlockAllocationCount += reflection->GetUniformBlockCount();
@@ -662,15 +662,17 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::Controller& controll
    * Prepare vertex attribute buffer bindings
    */
   uint32_t bindingIndex{0u};
-  std::vector<Graphics::Buffer*> vertexBuffers{};
+  std::vector<const Graphics::Buffer*> vertexBuffers{};
 
   for (auto &&vertexBuffer : geometry->GetVertexBuffers())
   {
-    vertexBuffers.push_back(vertexBuffer->GetGfxObject());
+    auto gpuBuffer = vertexBuffer->GetGpuBuffer();
+    auto graphicsBuffer = gpuBuffer->GetGraphicsObject();
+    vertexBuffers.push_back(graphicsBuffer);
     auto attributeCountInForBuffer = vertexBuffer->GetAttributeCount();
 
     // update vertex buffer if necessary
-    vertexBuffer->Update(controller);
+    vertexBuffer->Update(mGraphicsController);
 
     // store buffer binding
     vi.bufferBindings
@@ -819,7 +821,7 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::Controller& controll
   FramebufferState framebufferState{};
   if( instruction.mFrameBuffer )
   {
-    framebufferState.SetFramebuffer( *instruction.mFrameBuffer->GetGfxObject() );
+    framebufferState.SetFramebuffer( *instruction.mFrameBuffer->GetGraphicsObject() );
   }
 
   /**
@@ -906,7 +908,7 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::Controller& controll
     //.SetDynamicStateMask( dynamicStateMask );  // Not used in modern impl
 
   // create pipeline
-  auto pipeline = controller.CreatePipeline( createInfo, nullptr /*renderer->ReleaseGraphicsPipeline() */ );
+  auto pipeline = mGraphicsController.CreatePipeline( createInfo, nullptr /*renderer->ReleaseGraphicsPipeline() */ );
 
   // bind pipeline to the render command
   renderer->BindPipeline( std::move(pipeline), bufferIndex, &instruction );
@@ -914,11 +916,11 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::Controller& controll
 }
 
 
-void GraphicsAlgorithms::PrepareRendererPipelines( Graphics::Controller& controller,
-                                                   RenderInstructionContainer& renderInstructions,
-                                                   bool& usesDepth,
-                                                   bool& usesStencil,
-                                                   BufferIndex bufferIndex )
+void GraphicsAlgorithms::PrepareRendererPipelines(
+  RenderInstructionContainer& renderInstructions,
+  bool& usesDepth,
+  bool& usesStencil,
+  BufferIndex bufferIndex )
 {
   mUniformBlockAllocationCount = 0u;
   mUniformBlockAllocationBytes = 0u;
@@ -958,23 +960,47 @@ void GraphicsAlgorithms::PrepareRendererPipelines( Graphics::Controller& control
     }
   }
 }
+void GraphicsAlgorithms::ResetCommandBuffer()
+{
+  // Reset main command buffer
+  if(!mGraphicsCommandBuffer)
+  {
+    mGraphicsCommandBuffer = mGraphicsController.CreateCommandBuffer(
+      Graphics::CommandBufferCreateInfo()
+        .SetLevel(Graphics::CommandBufferLevel::PRIMARY),
+      nullptr);
+  }
+  else
+  {
+    mGraphicsCommandBuffer->Reset();
+  }
+}
 
 void GraphicsAlgorithms::SubmitRenderInstructions(
-  Graphics::Controller&  controller,
   RenderInstructionContainer& renderInstructions,
   BufferIndex                 bufferIndex )
 {
+  // ComputeUniformBufferRequirements
+
+  // BeginFrame
+  // PrepareRendererPipelines
+  // foreach RenderInstruction, // records fbos first
+  //   RecordInstruction
+  // SubmitCommands
+  // EndFrame
+
+
   bool usesDepth = false;
   bool usesStencil = false;
 
-  PrepareRendererPipelines( controller, renderInstructions, usesDepth, usesStencil, bufferIndex );
+  PrepareRendererPipelines( renderInstructions, usesDepth, usesStencil, bufferIndex );
 
   // If state of depth/stencil has changed between frames then the pipelines must be
   // prepared again. Note, this stage does not recompile shader but collects necessary
   // data to compile pipelines at the further stage.
-  if( controller.EnableDepthStencilBuffer( usesDepth, usesStencil ) )
+  if( mGraphicsController.EnableDepthStencilBuffer( usesDepth, usesStencil ) )
   {
-    PrepareRendererPipelines( controller, renderInstructions, usesDepth, usesStencil, bufferIndex );
+    PrepareRendererPipelines( mGraphicsController, renderInstructions, usesDepth, usesStencil, bufferIndex );
   }
 
   auto numberOfInstructions = renderInstructions.Count( bufferIndex );
@@ -982,10 +1008,10 @@ void GraphicsAlgorithms::SubmitRenderInstructions(
   // Prepare uniform buffers
   if( !mUniformBufferManager )
   {
-    mUniformBufferManager.reset( new UniformBufferManager( &controller ) );
+    mUniformBufferManager.reset( new UniformBufferManager( &mGraphicsController ) );
   }
 
-  controller.BeginFrame();
+  mGraphicsController.BeginFrame();
 
   auto pagedAllocation = ( ( mUniformBlockAllocationBytes / UBO_PAGE_SIZE + 1u ) ) * UBO_PAGE_SIZE;
 
@@ -1012,22 +1038,34 @@ void GraphicsAlgorithms::SubmitRenderInstructions(
 
   std::vector<Graphics::RenderCommand*> commandList{};
 
+  // First, record each framebuffer
   for( uint32_t i = 0; i < numberOfInstructions; ++i )
   {
     RenderInstruction& instruction = renderInstructions.At( bufferIndex, i );
-
-    RecordInstruction(controller, bufferIndex, instruction, commandList);
+    if(instruction.mFrameBuffer)
+    {
+      RecordInstruction(bufferIndex, instruction, commandList, true);
+    }
+  }
+  // Then, record all other instructions to the surface.
+  for( uint32_t i = 0; i < numberOfInstructions; ++i )
+  {
+    RenderInstruction& instruction = renderInstructions.At( bufferIndex, i );
+    if(!instruction.mFrameBuffer)
+    {
+      RecordInstruction(bufferIndex, instruction, commandList, false);
+    }
   }
 
   // Submit all render commands in one go
-  controller.SubmitCommands( std::move(commandList) );
+  mGraphicsController.SubmitCommands( std::move(commandList) );
 
   if( mUniformBlockAllocationBytes && mUniformBuffer[bufferIndex] )
   {
     mUniformBuffer[bufferIndex]->Flush();
   }
 
-  controller.EndFrame();
+  mGraphicsController.EndFrame();
 
   mCurrentFrameIndex++;
 }

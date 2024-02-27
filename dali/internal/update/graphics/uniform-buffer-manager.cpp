@@ -42,27 +42,21 @@ UniformBufferManager::UniformBufferManager(Dali::Graphics::Controller* controlle
 
 UniformBufferManager::~UniformBufferManager() = default;
 
-void UniformBufferManager::SetCurrentSceneRenderInfo(/*SceneGraph::Scene* scene, */bool offscreen)
+void UniformBufferManager::SetCurrentSceneRenderInfo(SceneGraph::Scene* scene, bool offscreen)
 {
   mCurrentSceneOffscreen = offscreen;
-  //mCurrentScene          = scene;
-
-  // Only works if RegisterScene has been called...
-  mCurrentUBOSet = FindSetForScene(/*scene*/);
 }
 
 Graphics::UniquePtr<UniformBufferView> UniformBufferManager::CreateUniformBufferView(uint32_t size, bool emulated)
 {
   // Allocate offset of given UBO (allocation strategy may reuse memory)
-
-  DALI_ASSERT_DEBUG(mCurrentUBOSet && "UBO set should exist when creating view");
-  if(!mCurrentUBOSet)
+  if(!mUBOSet)
   {
     return Graphics::UniquePtr<UniformBufferView>(nullptr);
   }
 
   UBOSet::BufferType                    bufferType = UBOSet::GetBufferType(mCurrentSceneOffscreen, emulated);
-  Graphics::UniquePtr<UniformBufferV2>& ubo        = mCurrentUBOSet->GetBuffer(bufferType);
+  Graphics::UniquePtr<UniformBufferV2>& ubo        = mUBOSet->GetBuffer(bufferType);
 
   // Use current offset and increment it after
   auto offset = ubo->GetCurrentOffset();
@@ -74,73 +68,59 @@ Graphics::UniquePtr<UniformBufferView> UniformBufferManager::CreateUniformBuffer
   return retval;
 }
 
-void UniformBufferManager::RegisterScene(/*SceneGraph::Scene* scene*/)
+void UniformBufferManager::RegisterScene(SceneGraph::Scene* scene)
 {
-  if(mUBO == nullptr)
+  if(mUBOSet == nullptr)
   {
     // Create new UBO set
-    mUBO = std::make_unique<UBOSet>();
+    mUBOSet = std::make_unique<UBOSet>();
 
     uint32_t cpuAlignment = GetUniformBlockAlignment(true);
     uint32_t gpuAlignment = GetUniformBlockAlignment(false);
 
     // Create all buffers per scene
-    mUBO->cpuBufferOnScreen  = UniformBufferV2::New(mController, true, cpuAlignment);
-    mUBO->gpuBufferOnScreen  = UniformBufferV2::New(mController, false, gpuAlignment);
-    mUBO->cpuBufferOffScreen = UniformBufferV2::New(mController, true, cpuAlignment);
-    mUBO->gpuBufferOffScreen = UniformBufferV2::New(mController, false, gpuAlignment);
+    mUBOSet->cpuBufferOnScreen  = UniformBufferV2::New(mController, true, cpuAlignment);
+    mUBOSet->gpuBufferOnScreen  = UniformBufferV2::New(mController, false, gpuAlignment);
+    mUBOSet->cpuBufferOffScreen = UniformBufferV2::New(mController, true, cpuAlignment);
+    mUBOSet->gpuBufferOffScreen = UniformBufferV2::New(mController, false, gpuAlignment);
   }
 }
 
-void UniformBufferManager::UnregisterScene(/*SceneGraph::Scene* scene*/)
+void UniformBufferManager::UnregisterScene(SceneGraph::Scene* scene)
 {
-  mUBO.reset();
+  mUBOSet.reset();
 }
 
-UniformBufferV2* UniformBufferManager::GetUniformBufferForScene(/*SceneGraph::Scene* scene, */bool offscreen, bool emulated)
+UniformBufferV2* UniformBufferManager::GetUniformBufferForScene(SceneGraph::Scene* scene, bool offscreen, bool emulated)
 {
-  auto* uboSet = GetUBOSetForScene(/*scene*/);
-  if(!uboSet)
-  {
-    return nullptr;
-  }
-  DALI_ASSERT_DEBUG(mCurrentScene == scene && "Scene should match current cache");
-  return uboSet->GetBuffer(UBOSet::GetBufferType(offscreen, emulated)).get();
+  return mUBOSet->GetBuffer(UBOSet::GetBufferType(offscreen, emulated)).get();
 }
 
 void UniformBufferManager::Rollback(SceneGraph::Scene* scene, bool offscreen)
 {
-  auto* uboSet = GetUBOSetForScene(scene);
-  if(uboSet)
+  if(offscreen)
   {
-    if(offscreen)
-    {
-      uboSet->cpuBufferOffScreen->Rollback();
-      uboSet->gpuBufferOffScreen->Rollback();
-    }
-    else
-    {
-      uboSet->cpuBufferOnScreen->Rollback();
-      uboSet->gpuBufferOnScreen->Rollback();
-    }
+    mUBOSet->cpuBufferOffScreen->Rollback();
+    mUBOSet->gpuBufferOffScreen->Rollback();
+  }
+  else
+  {
+    mUBOSet->cpuBufferOnScreen->Rollback();
+    mUBOSet->gpuBufferOnScreen->Rollback();
   }
 }
 
 void UniformBufferManager::Flush(SceneGraph::Scene* scene, bool offscreen)
 {
-  auto* uboSet = GetUBOSetForScene(scene);
-  if(uboSet)
+  if(offscreen)
   {
-    if(offscreen)
-    {
-      uboSet->cpuBufferOffScreen->Flush();
-      uboSet->gpuBufferOffScreen->Flush();
-    }
-    else
-    {
-      uboSet->cpuBufferOnScreen->Flush();
-      uboSet->gpuBufferOnScreen->Flush();
-    }
+    mUBOSet->cpuBufferOffScreen->Flush();
+    mUBOSet->gpuBufferOffScreen->Flush();
+  }
+  else
+  {
+    mUBOSet->cpuBufferOnScreen->Flush();
+    mUBOSet->gpuBufferOnScreen->Flush();
   }
 }
 
@@ -183,33 +163,6 @@ uint32_t UniformBufferManager::GetUniformBlockAlignment(bool emulated)
   return mCachedUniformBlockAlignment;
 }
 
-UniformBufferManager::UBOSet* UniformBufferManager::GetUBOSetForScene(SceneGraph::Scene* scene)
-{
-  if(mCurrentScene == scene)
-  {
-    return mCurrentUBOSet;
-  }
-  mCurrentUBOSet = FindSetForScene(scene);
-  return mCurrentUBOSet;
-}
-
-// Find efficiently without caching
-UniformBufferManager::UBOSet* UniformBufferManager::FindSetForScene(SceneGraph::Scene* scene)
-{
-  if(mUBOMap.size() == 1 && mUBOMap.begin()->first == scene)
-  {
-    return &mUBOMap.begin()->second;
-  }
-  else
-  {
-    auto iter = mUBOMap.find(scene);
-    if(iter != mUBOMap.end())
-    {
-      return &iter->second;
-    }
-  }
-  return nullptr;
-}
 
 UniformBufferManager::UBOSet::UBOSet(UniformBufferManager::UBOSet&& rhs)
 {

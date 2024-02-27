@@ -25,7 +25,7 @@
 #include <dali/internal/update/rendering/render-instruction-container.h>
 #include <dali/internal/update/rendering/render-instruction.h>
 #include <dali/internal/common/buffer-index.h>
-#include <dali/internal/update/graphics/graphics-buffer-manager.h>
+#include <dali/internal/update/graphics/uniform-buffer-manager.h>
 
 namespace Dali
 {
@@ -48,8 +48,8 @@ public:
   GraphicsAlgorithms(const GraphicsAlgorithms&) = delete;
   GraphicsAlgorithms& operator=(const GraphicsAlgorithms&) = delete;
 
-  GraphicsAlgorithms(GraphicsAlgorithms&&) = default;
-  GraphicsAlgorithms& operator=(GraphicsAlgorithms&&) = default;
+  GraphicsAlgorithms(GraphicsAlgorithms&&) = delete;
+  GraphicsAlgorithms& operator=(GraphicsAlgorithms&&) = delete;
 
 
   /*
@@ -63,13 +63,17 @@ public:
    */
 
   /**
+   * Clear down and re-create primary command buffer.
+   */
+  void ResetCommandBuffer();
+
+  /**
    * Submits render instructions
    * @param graphics Instance of the Graphics object
    * @param renderInstructions container of render instructions
    * @param bufferIndex current buffer index
    */
-  void SubmitRenderInstructions( Graphics::Controller &graphics,
-                                 SceneGraph::RenderInstructionContainer &renderInstructions,
+  void SubmitRenderInstructions( SceneGraph::RenderInstructionContainer &renderInstructions,
                                  BufferIndex bufferIndex );
 
   void DiscardUnusedResources( Graphics::Controller& controller );
@@ -117,18 +121,15 @@ private:
 
   using ScissorStackType = std::vector<Dali::ClippingBox>;      ///< The container type used to maintain the applied scissor hierarchy
 
-  ScissorStackType                        mScissorStack{};        ///< Contains the currently applied scissor hierarchy (so we can undo clips)
-
-  //std::unique_ptr<GraphicsBufferManager> mGraphicsBufferManager;
-  //using UniformBufferList = std::array<std::unique_ptr<GraphicsBuffer>, 2u>;
-  //UniformBufferList           mUniformBuffer;
-
+  Graphics::Controller& mGraphicsController;
+  Graphics::UniquePtr<Graphics::CommandBuffer> mGraphicsCommandBuffer{};
   std::unique_ptr<UniformBufferManager> mUniformBufferManager;
+  ScissorStackType mScissorStack{};        ///< Contains the currently applied scissor hierarchy (so we can undo clips)
 
   //uint32_t mUniformBlockAllocationCount;
-//  uint32_t mUniformBlockAllocationBytes;
-//  uint32_t mUniformBlockMaxSize;
-//  uint32_t mUboOffset { 0u };
+  //  uint32_t mUniformBlockAllocationBytes;
+  //  uint32_t mUniformBlockMaxSize;
+  //  uint32_t mUboOffset { 0u };
   uint32_t mCurrentFrameIndex { 0u };
 
   Dali::Graphics::DepthStencilState mCurrentStencilState{};

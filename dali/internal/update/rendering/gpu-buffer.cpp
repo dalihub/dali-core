@@ -16,21 +16,16 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/render/renderers/gpu-buffer.h>
-#include <dali/public-api/rendering/vertex-buffer.h>
+#include <dali/internal/update/rendering/gpu-buffer.h>
+
 
 // INTERNAL INCLUDES
 #include <dali/graphics-api/graphics-types.h>
 #include <dali/public-api/common/dali-common.h>
 #include <cstring>
 
-namespace Dali
+namespace Dali::Internal::SceneGraph
 {
-namespace Internal
-{
-namespace
-{
-} // namespace
 
 GpuBuffer::GpuBuffer(Graphics::Controller& graphicsController, Graphics::BufferUsageFlags usage, GpuBuffer::WritePolicy writePolicy)
 : mUsage(usage),
@@ -75,32 +70,6 @@ void GpuBuffer::UpdateDataBuffer(Graphics::Controller& graphicsController, uint3
   graphicsController.UnmapMemory(std::move(memory));
 }
 
-void GpuBuffer::UpdateDataBufferWithCallback(Graphics::Controller& graphicsController, Dali::VertexBufferUpdateCallback* callback, uint32_t& bytesUpdatedCount)
-{
-  // create or orphan object so mapping can be instant
-  if(!mGraphicsObject || mWritePolicy == WritePolicy::DISCARD)
-  {
-    Graphics::BufferCreateInfo createInfo{};
-    createInfo.SetUsage(mUsage).SetSize(mSize);
-    mGraphicsObject = graphicsController.CreateBuffer(createInfo, std::move(mGraphicsObject));
-    mCapacity       = mSize;
-  }
-
-  Graphics::MapBufferInfo info{};
-  info.buffer = mGraphicsObject.get();
-  info.usage  = 0 | Graphics::MemoryUsageFlagBits::WRITE;
-  info.offset = 0;
-  info.size   = mSize; // map entire buffer
-
-  auto  memory = graphicsController.MapBufferRange(info);
-  void* ptr    = memory->LockRegion(0, mSize);
-
-  bytesUpdatedCount = callback->Invoke(ptr, mSize); // passing low level binary size, not element count!
-
-  memory->Unlock(true);
-  graphicsController.UnmapMemory(std::move(memory));
-}
-
 void GpuBuffer::Destroy()
 {
   mCapacity = 0;
@@ -108,6 +77,4 @@ void GpuBuffer::Destroy()
   mGraphicsObject.reset();
 }
 
-} // namespace Internal
-
-} //namespace Dali
+} //namespace Dali::Internal::SceneGraph

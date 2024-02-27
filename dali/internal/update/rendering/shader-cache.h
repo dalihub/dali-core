@@ -36,7 +36,6 @@ struct ShaderCache
 {
   struct Item
   {
-    Item() = default;
     Item( const Item& ) = delete;
     Item( Item&& ) = default;
     Item( Graphics::UniquePtr<Graphics::Program>&& _program,

@@ -71,12 +71,12 @@ void Shader::Initialize( Graphics::Controller& graphicsController, ShaderCache& 
   mShaderCache = &shaderCache;
 }
 
-const Graphics::Program* Shader::GetGfxObject() const
+const Graphics::Program* Shader::GetGraphicsObject() const
 {
   return &mGraphicsProgram;
 }
 
-Graphics::Shader* Shader::GetGfxObject()
+Graphics::Shader* Shader::GetGraphicsObject()
 {
   return &mGraphicsProgram;
 }

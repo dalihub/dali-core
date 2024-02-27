@@ -840,34 +840,6 @@ void UpdateManager::PrepareNodes( BufferIndex updateBufferIndex )
   }
 }
 
-void UpdateManager::PrepareRenderers( BufferIndex bufferIndex )
-{
-  // Prepare renderers. Each render item maps to a render
-  // command. There may be more than one render item per renderer if
-  // the actor containing the renderer is in more than one render
-  // task. The renderer owns the render commands.
-
-  const auto renderInstructionCount = mImpl->renderInstructions.Count( bufferIndex );
-  for( auto i=0u; i < renderInstructionCount; ++i )
-  {
-    auto& renderInstruction = mImpl->renderInstructions.At( bufferIndex, i);
-    const auto renderListCount = renderInstruction.RenderListCount();
-    for( auto j=0u; j < renderListCount; ++j )
-    {
-      auto renderList = renderInstruction.GetRenderList( j );
-      const auto renderItemCount = renderList->Count();
-      for( auto k=0u; k < renderItemCount; ++k )
-      {
-        auto& renderItem = renderList->GetItem( k );
-        if( renderItem.mRenderer )
-        {
-          renderItem.mRenderer->PrepareRender( bufferIndex, &renderInstruction );
-        }
-      }
-    }
-  }
-}
-
 void UpdateManager::UploadTexture( Texture* texture,
                                    PixelDataPtr pixelData,
                                    const Internal::Texture::UploadParams& params )
@@ -1013,21 +985,23 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
         }
       }
 
+      // RENDER SCENE equivalent
+
       // Pass the total number of renderers that were discarded this frame to the graphics backend.
       // This may trigger garbage collection.
-      if( numberOfDiscardedRenderers > 0 )
-      {
+      //if( numberOfDiscardedRenderers > 0 )
+      //{
         //mImpl->graphicsController.RunGarbageCollector( numberOfDiscardedRenderers );
-      }
+      //}
 
-      // generate graphics objects
-      PrepareNodes( bufferIndex );
+      mImpl->graphicsAlgorithms.ResetCommandBuffer(); // Creates primary/main command buffer
+      PrepareNodes( bufferIndex ); // Checks if node's uniformMap have been updated.
       if( future )
       {
         future->Wait();
         future.reset();
       }
-      PrepareRenderers( bufferIndex );
+
       mImpl->graphicsAlgorithms.SubmitRenderInstructions( mImpl->graphicsController, mImpl->renderInstructions, bufferIndex );
     }
   }
@@ -1037,6 +1011,10 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
     mImpl->graphicsAlgorithms.DiscardUnusedResources( mImpl->graphicsController );
   }
 
+  for( auto geometry : mImpl->geometryContainer)
+  {
+    geometry->OnRenderFinished();
+  }
   for( auto taskList : mImpl->taskLists )
   {
     RenderTaskList::RenderTaskContainer& tasks = taskList->GetTasks();
@@ -1093,8 +1071,6 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
 
   // The update has finished; swap the double-buffering indices
   mSceneGraphBuffers.Swap();
-
-  mImpl->graphicsController.SwapBuffers();
 
   // Clear texture upload requests
   if( !mImpl->textureUploadRequestContainer.empty() )

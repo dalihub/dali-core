@@ -37,8 +37,7 @@ PropertyBuffer::PropertyBuffer()
   mData( nullptr ),
   mGpuBuffer(nullptr),
   mSize(0),
-  mElementCount(0),
-  mDataChanged(true),
+  mDataChanged(true)
 {
 }
 
@@ -64,14 +63,9 @@ void PropertyBuffer::SetData( OwnerPointer< Dali::Vector<uint8_t> >& data, uint3
   mDataChanged = true;
 }
 
-bool PropertyBuffer::Update( Dali::Graphics::Controller& controller )
+bool PropertyBuffer::Update( Dali::Graphics::Controller& graphicsController )
 {
   if( !mData || !mFormat || !mSize )
-  {
-    return false;
-  }
-
-  if(!mVertexBufferUpdateCallback && !mData)
   {
     return false;
   }
@@ -89,9 +83,6 @@ bool PropertyBuffer::Update( Dali::Graphics::Controller& controller )
       DALI_ASSERT_DEBUG(mSize && "No data in the property buffer!");
       mGpuBuffer->UpdateDataBuffer(graphicsController, GetDataSize(), &((*mData)[0]));
     }
-
-    mElementCount = mSize;
-
     mDataChanged = false;
   }
 

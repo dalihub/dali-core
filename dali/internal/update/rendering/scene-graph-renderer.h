@@ -557,7 +557,7 @@ private:
   bool                         mPremultipledAlphaEnabled:1;       ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 
   //RenderCommandContainer       mRenderCommands;
-  //std::vector<Graphics::TextureBinding> mTextureBindings;
+  std::vector<Graphics::TextureBinding> mTextureBindings;
 
 public:
   AnimatableProperty< float >  mOpacity;                          ///< The opacity value

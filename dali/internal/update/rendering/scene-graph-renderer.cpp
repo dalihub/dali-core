@@ -28,7 +28,7 @@
 #include <dali/internal/update/rendering/scene-graph-sampler.h>
 #include <dali/internal/update/rendering/scene-graph-texture.h>
 #include <dali/internal/update/rendering/scene-graph-texture-set.h>
-#include <dali/internal/update/graphics/graphics-buffer-manager.h>
+#include <dali/internal/update/graphics/uniform-buffer-manager.h>
 
 #include <dali/graphics-api/graphics-controller.h>
 #include <dali/graphics-api/graphics-command-buffer.h>
@@ -226,20 +226,22 @@ RenderCommand& Renderer::GetRenderCommand( RenderInstruction* renderInstruction,
 
 void Renderer::PrepareRender( BufferIndex updateBufferIndex, RenderInstruction* renderInstruction )
 {
-  auto& renderCmd = mRenderCommands.AllocRenderCommand( renderInstruction, *mGraphicsController, updateBufferIndex );
-  auto& cmd = renderCmd.GetGfxRenderCommand( updateBufferIndex );
+  //auto& renderCmd = mRenderCommands.AllocRenderCommand( renderInstruction, *mGraphicsController, updateBufferIndex );
+  //auto& cmd = renderCmd.GetGfxRenderCommand( updateBufferIndex );
+  Graphics::UniquePtr<Graphics::CommandBuffer> commandBuffer = mGraphicsController->CreateCommandBuffer();
 
-  if (!mShader->GetGfxObject())
+  if (!mShader->GetGraphicsObject())
   {
     return;
   }
 
-  auto& program = *mShader->GetGfxObject();
+  auto& program = *mShader->GetGraphicsObject();
+  auto& reflection = mGraphicsController.GetProgramReflection(program);
 
   /**
    * Prepare textures
    */
-  auto samplers = shader.GetSamplers();
+  auto samplers = reflection.GetSamplers();
   if(mTextureSet)
   {
     if (!samplers.empty())
@@ -260,7 +262,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex, RenderInstruction* 
                 sampler->mTWrapMode == WrapMode::DEFAULT &&
                 sampler->mRWrapMode == WrapMode::DEFAULT )
             {
-              sampler->mGfxSampler.reset( nullptr );
+              sampler->DestroyGraphicsObjects();
             }
             else
             {
@@ -274,31 +276,31 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex, RenderInstruction* 
 
           auto binding    = Graphics::TextureBinding{}
             .SetBinding(samplers[i].binding)
-            .SetTexture(texture->GetGfxObject())
-            .SetSampler(sampler ? sampler->GetGfxObject() : nullptr);
+            .SetTexture(texture->GetGraphicsObject())
+            .SetSampler(sampler ? sampler->GetGraphicsObject() : nullptr);
 
           mTextureBindings.emplace_back(binding);
         }
       }
-      renderCmd.BindTextures( mTextureBindings, updateBufferIndex );
+      commandBuffer->BindTextures( mTextureBindings );
     }
   }
   uint32_t instanceCount = 1u;
 
-  mGeometry->BindVertexAttributes(commandBuffer);
-  mGeometry->Draw(mGraphicsController, commandBuffer, mIndexedDrawFirstElement, mIndexedDrawElementsCount, instanceCount);
+  mGeometry->BindVertexAttributes(*commandBuffer.get());
+  mGeometry->Draw(*mGraphicsController, *commandBuffer.get(), mIndexedDrawFirstElement, mIndexedDrawElementsCount, instanceCount);
 
   DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  "done\n" );
 }
 
-void Renderer::WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::RenderCommand::UniformBufferBinding>& bindings, const std::string& name, size_t hash, const void* data, uint32_t size )
+void Renderer::WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const std::string& name, size_t hash, const void* data, uint32_t size )
 {
-  if( !mShader->GetGfxObject() )
+  if( !mShader->GetGraphicsObject() )
   {
     // Invalid pipeline
     return;
   }
-  auto uniformInfo = Graphics::ShaderDetails::UniformInfo{};
+  auto uniformInfo = Graphics::UniformInfo{};
   if( mShader->GetUniform( name, hash, uniformInfo ) )
   {
     ubo.Write( data, size, bindings[uniformInfo.bufferIndex].offset + uniformInfo.offset, false );
@@ -307,7 +309,7 @@ void Renderer::WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::Re
 
 void Renderer::WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const Graphics::UniformInfo& uniformInfo, const void* data, uint32_t size )
 {
-  if( !mShader->GetGfxObject() )
+  if( !mShader->GetGraphicsObject() )
   {
     // Invalid pipeline
     return;
@@ -331,8 +333,8 @@ bool Renderer::UpdateUniformBuffers( RenderInstruction& instruction,
     DALI_LOG_ERROR("%p, i:%u - FAILED TO REGENERATE UNIFORM MAP", this, updateBufferIndex );
   }
 
-  auto uboCount = mShader->GetGfxObject()->GetUniformBlockCount();
-  auto gfxShader = mShader->GetGfxObject();
+  auto& reflection = mGraphicsController->GetProgramReflection( *mShader->GetGraphicsObject());
+  auto uboCount = reflection.GetUniformBlockCount();
 
   RenderCommand* renderCommand;
   if( !mRenderCommands.Find( &instruction, renderCommand, updateBufferIndex ) )

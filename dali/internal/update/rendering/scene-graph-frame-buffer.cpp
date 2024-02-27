@@ -19,9 +19,10 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/update/rendering/scene-graph-texture.h>
-#include <dali/graphics-api/graphics-texture-details.h>
+#include <dali/graphics-api/graphics-types.h>
 #include <dali/graphics-api/graphics-framebuffer.h>
 #include <dali/graphics-api/graphics-controller.h>
+#include <dali/integration-api/debug.h>
 
 namespace Dali
 {
@@ -62,7 +63,7 @@ void FrameBuffer::AttachColorTexture( SceneGraph::Texture* texture, unsigned int
   {
     if(!texture->GetGraphicsObject())
     {
-      texture->Create(0 | Graphics::TextureUsageFlagBits::COLOR_ATTACHMENT | Graphics::TextureUsageFlagBits::SAMPLE);
+      texture->CreateTexture(0 | Graphics::TextureUsageFlagBits::COLOR_ATTACHMENT | Graphics::TextureUsageFlagBits::SAMPLE);
     }
 
     uint32_t                  attachmentId = mCreateInfo.colorAttachments.size();
@@ -80,7 +81,7 @@ void FrameBuffer::AttachDepthStencilTexture( SceneGraph::Texture* texture,
   {
     if(!texture->GetGraphicsObject())
     {
-      texture->Create(0 | Graphics::TextureUsageFlagBits::DEPTH_STENCIL_ATTACHMENT | Graphics::TextureUsageFlagBits::SAMPLE);
+      texture->CreateTexture(0 | Graphics::TextureUsageFlagBits::DEPTH_STENCIL_ATTACHMENT | Graphics::TextureUsageFlagBits::SAMPLE);
     }
 
     mCreateInfo.depthStencilAttachment.depthTexture = texture->GetGraphicsObject();
@@ -186,7 +187,7 @@ void FrameBuffer::PrepareFramebuffer()
 
 void FrameBuffer::DestroyGraphicsObjects()
 {
-  mGraphicsFramebuffer.reset();
+  mGraphicsObject.reset();
 }
 
 } //Render

@@ -49,37 +49,37 @@ public:
    *
    * @param[in] scene Valid pointer to the scene
    */
-  void RegisterScene(/*SceneGraph::Scene* scene*/);
+  void RegisterScene(SceneGraph::Scene* scene=nullptr);
 
   /**
    * @brief Removes association with a scene
    *
    * @param[in] scene Valid pointer to a scene object
    */
-  void UnregisterScene(/*SceneGraph::Scene* scene*/);
+  void UnregisterScene(SceneGraph::Scene* scene=nullptr);
 
   /**
    * @brief Get the uniform buffer for the given scene, if current.
    */
-  UniformBufferV2* GetUniformBufferForScene(/*SceneGraph::Scene* scene, */bool offscreen, bool emulated);
+  UniformBufferV2* GetUniformBufferForScene(SceneGraph::Scene* scene, bool offscreen, bool emulated);
 
   /**
    * @brief must be called when rendering scene starts, this way the manager knows
    * which UBO set we are going to use.
    */
-  void SetCurrentSceneRenderInfo(/*SceneGraph::Scene* scene, */bool offscreen);
+  void SetCurrentSceneRenderInfo(SceneGraph::Scene* scene, bool offscreen);
 
   /**
    * @brief Rolls back UBO set matching conditions
    * @param[in] scene Valid scene pointer
    * @param[in] offscreen Offscreen or onscreen
    */
-  void Rollback(/*SceneGraph::Scene* scene, */bool offscreen);
+  void Rollback(SceneGraph::Scene* scene, bool offscreen);
 
   /**
    * @brief Flushes current UBO set
    */
-  void Flush(/*SceneGraph::Scene* scene, */bool offscreen);
+  void Flush(SceneGraph::Scene* scene, bool offscreen);
 
   /**
    * Gets the uniform block alignment.
@@ -156,18 +156,7 @@ private:
     }
   };
 
-  UBOSet* GetUBOSet()
-  {
-    return mCurrentUBOSet;
-  }
-
-  UBOSet* FindUBOSet()
-  {
-    return mUBO.get();
-  }
-
-  Graphics::UniquePtr<UBOSet>          mUBO;
-  UBOSet*                              mCurrentUBOSet{nullptr};
+  Graphics::UniquePtr<UBOSet>          mUBOSet;
   uint32_t                             mCachedUniformBlockAlignment{0u};
   bool                                 mCurrentSceneOffscreen{false};
 };

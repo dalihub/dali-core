@@ -43,7 +43,7 @@ class PropertyBuffer;
 class Geometry
 {
 public:
-  typedef Dali::Geometry::Type Type;
+  using Type = Dali::Geometry::Type;
 
   Geometry();
 
@@ -75,7 +75,7 @@ public:
    * Removes a PropertyBuffer from the geometry
    * @param[in] propertyBuffer The property buffer to be removed
    */
-  void RemovePropertyBuffer(  const SceneGraph::PropertyBuffer* propertyBuffer );
+  void RemovePropertyBuffer( const SceneGraph::PropertyBuffer* propertyBuffer );
 
   /**
    * @return the topology of this geometry
@@ -85,7 +85,7 @@ public:
   /**
    * Upload the geometry if it has changed
    */
-  void Upload(Graphics::Controller& graphicsController);
+  void Upload( Graphics::Controller& graphicsController );
 
   /**
    * Set up the attributes and perform the Draw call corresponding to the geometry type.
@@ -97,11 +97,11 @@ public:
    * @param[in] instanceCount Number of instances to draw (use in conjunction with VertexBuffer divisor)
    * @return true if the draw command was issued, false otherwise
    */
-  bool Draw(Graphics::Controller&    graphicsController,
-            Graphics::CommandBuffer& commandBuffer,
-            uint32_t                 elementBufferOffset,
-            uint32_t                 elementBufferCount,
-            uint32_t                 instanceCount);
+  bool Draw( Graphics::Controller&    graphicsController,
+             Graphics::CommandBuffer& commandBuffer,
+             uint32_t                 elementBufferOffset,
+             uint32_t                 elementBufferCount,
+             uint32_t                 instanceCount );
 
   /**
    * @brief Set up the attributes bind commaneds
@@ -109,7 +109,7 @@ public:
    * @param[in,out] commandBuffer The current command buffer queue
    * @return true if the bind command was issued, false otherwise
    */
-  bool BindVertexAttributes(Graphics::CommandBuffer& commandBuffer);
+  bool BindVertexAttributes( Graphics::CommandBuffer& commandBuffer );
 
   /**
    * Chack if the attributes for the geometry have changed
@@ -137,7 +137,7 @@ public:
   /**
    * @return
    */
-  const Vector< SceneGraph::PropertyBuffer* >& GetVertexBuffers() const
+  const Vector<SceneGraph::PropertyBuffer*>& GetVertexBuffers() const
   {
     return mVertexBuffers;
   }
@@ -162,12 +162,16 @@ public:
     mIndexBuffer.Reset();
   }
 
+  void OnRenderFinished();
+
 private:
   Graphics::Controller* mGraphicsController; ///< Graphics interface object
 
   // PropertyBuffers
   Vector< SceneGraph::PropertyBuffer* > mVertexBuffers;
   OwnerPointer<GpuBuffer> mIndexBuffer;
+  std::vector<uint16_t>   mIndices;
+
   uint32_t mIndexBufferElementCount;
   Type mGeometryType;
 

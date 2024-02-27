@@ -107,13 +107,13 @@ public:
    * Get the graphics shader object
    * @return the graphics shader object
    */
-  const Graphics::Program* GetGfxObject() const;
+  const Graphics::Program* GetGraphicsObject() const;
 
   /**
    * Get the graphics shader object
    * @return the graphics shader object
    */
-  Graphics::Program* GetGfxObject();
+  Graphics::Program* GetGraphicsObject();
 
   /**
    * Destroy any graphics objects owned by this scene graph object

@@ -21,8 +21,9 @@
 // INTERNAL INCLUDES
 #include <dali/graphics-api/graphics-controller.h>
 
-namespace Dali:: Internal::Render
+namespace Dali:: Internal::SceneGraph
 {
+
 /**
  * Used to create and update a GPU memory buffer.
  *
@@ -102,6 +103,6 @@ private:
   WritePolicy                           mWritePolicy{WritePolicy::RETAIN}; ///< data write policy for the buffer
 };
 
-} // namespace Dali::Internal::Render
+} // namespace Dali::Internal::SceneGraph
 
 #endif // DALI_INTERNAL_RENDERERS_GPU_BUFFER_H

@@ -24,6 +24,9 @@
 
 #include <dali/graphics-api/graphics-buffer.h>
 
+// EXTERNAL HEADERS
+#include <string.h>
+
 namespace Dali
 {
 namespace Internal
@@ -61,10 +64,9 @@ void Geometry::AddPropertyBuffer( SceneGraph::PropertyBuffer* propertyBuffer )
 void Geometry::SetIndexBuffer( Dali::Vector<unsigned short>& indices )
 {
   // set new index buffer
-  auto sizeInBytes = uint32_t(indices.Size() * sizeof(indices[0]));
-  memcpy(mIndices.Begin(), indices.Begin(), indices.Count()*sizeof(unsigned short));
+  //auto sizeInBytes = uint32_t(indices.Size() * sizeof(indices[0]));
+  std::memcpy(mIndices.data(), indices.begin(), indices.Count()*sizeof(unsigned short));
   mIndicesChanged = true;
-  mIndexType = Graphics::Format::R32_UINT;
 }
 
 void Geometry::RemovePropertyBuffer( const SceneGraph::PropertyBuffer* propertyBuffer )
@@ -95,7 +97,7 @@ void Geometry::Upload(Graphics::Controller& graphicsController)
     // Update buffers
     if(mIndicesChanged)
     {
-      if(mIndices.Empty())
+      if(mIndices.empty())
       {
         mIndexBuffer = nullptr;
       }
@@ -107,7 +109,7 @@ void Geometry::Upload(Graphics::Controller& graphicsController)
           mIndexBuffer = new GpuBuffer(graphicsController, 0 | Graphics::BufferUsage::INDEX_BUFFER, GpuBuffer::WritePolicy::RETAIN);
         }
 
-        uint32_t bufferSize = static_cast<uint32_t>(sizeof(uint16_t) * mIndices.Size());
+        uint32_t bufferSize = static_cast<uint32_t>(sizeof(uint16_t) * mIndices.size());
         mIndexBuffer->UpdateDataBuffer(graphicsController, bufferSize, &mIndices[0]);
       }
 
@@ -170,9 +172,9 @@ bool Geometry::Draw(
   intptr_t firstIndexOffset(0u);
   if(mIndexBuffer)
   {
-    std::size_t sizeOfIndex = GetSizeOfIndexFromIndexType(mIndexType);
+    std::size_t sizeOfIndex = sizeof(uint16_t);
 
-    numIndices = static_cast<uint32_t>(mIndices.Size() * sizeof(uint16_t) / sizeOfIndex);
+    numIndices = static_cast<uint32_t>(mIndices.size() * sizeof(uint16_t) / sizeOfIndex);
 
     if(elementBufferOffset != 0u)
     {
@@ -197,7 +199,7 @@ bool Geometry::Draw(
       const Graphics::Buffer* ibo = mIndexBuffer->GetGraphicsObject();
       if(ibo)
       {
-        commandBuffer.BindIndexBuffer(*ibo, 0, mIndexType);
+        commandBuffer.BindIndexBuffer(*ibo, 0, Graphics::Format::R16_UINT);
       }
 
       commandBuffer.DrawIndexed(numIndices, instanceCount, firstIndexOffset, 0, 0);
@@ -218,16 +220,16 @@ bool Geometry::Draw(
     else if(mVertexBuffers.Count() > 0)
     {
       // truncated, no value loss happening in practice
-      numVertices = static_cast<uint32_t>(mVertexBuffers[0]->GetRenderableElementCount());
+      numVertices = static_cast<uint32_t>(mVertexBuffers[0]->GetElementCount());
     }
     // In case we have more buffers, we select buffer with less elements to render
     // TODO: we may eventually support wrapping around buffers????
     else if(mVertexBuffers.Count() > 1)
     {
-      auto elementsCount = mVertexBuffers[0]->GetRenderableElementCount();
+      auto elementsCount = mVertexBuffers[0]->GetElementCount();
       for(auto& vertexBuffer : mVertexBuffers)
       {
-        elementsCount = std::min(elementsCount, vertexBuffer->GetRenderableElementCount());
+        elementsCount = std::min(elementsCount, vertexBuffer->GetElementCount());
       }
       numVertices = elementsCount;
     }
