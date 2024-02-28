@@ -206,6 +206,16 @@ public:
    */
   void AddNodeResetters();
 
+  /**
+   * @copydoc Dali::UpdateProxy::GetUpdateArea()
+   */
+  bool GetUpdateArea(uint32_t id, Vector4& updateArea) const;
+
+  /**
+   * @copydoc Dali::UpdateProxy::SetUpdateArea()
+   */
+  bool SetUpdateArea(uint32_t id, const Vector4& updateArea);
+
 private:
   /**
    * @brief Retrieves the node with the specified ID.

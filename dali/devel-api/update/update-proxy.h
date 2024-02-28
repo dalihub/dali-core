@@ -219,6 +219,24 @@ public:
    */
   NotifySyncPoint PopSyncPoint();
 
+  /**
+   * @brief Given the Actor ID, Gets the updated area of the actor.
+   *
+   * @param[in]   id     The Actor ID
+   * @param[out]  updateArea  Get to the Actor's current updated area, if Actor ID is valid
+   * @return Whether the method call was successful or not.
+   */
+  bool GetUpdateArea(uint32_t id, Vector4& updateArea) const;
+
+  /**
+   * @brief Given the Actor ID, Sets the updated area of the actor.
+   *
+   * @param[in]   id     The Actor ID
+   * @param[in]   updateArea  Set to the Actor's current updated area, if Actor ID is valid
+   * @return Whether the method call was successful or not.
+   */
+  bool SetUpdateArea(uint32_t id, const Vector4& updateArea);
+
 public: // Not intended for application developers
   /// @cond internal
 
