@@ -169,6 +169,11 @@ void Animation::Play()
     mAnimatorSortRequired = false;
   }
 
+  // Let we don't change current loop value if the state was paused.
+  if(mState != Paused)
+  {
+    mCurrentLoop = 0;
+  }
   mState = Playing;
 
   if(mSpeedFactor < 0.0f && mElapsedSeconds <= mPlayRange.x * mDurationSeconds)
@@ -177,8 +182,6 @@ void Animation::Play()
   }
 
   SetAnimatorsActive(true);
-
-  mCurrentLoop = 0;
 }
 
 void Animation::PlayFrom(float progress)
@@ -188,11 +191,14 @@ void Animation::PlayFrom(float progress)
   if(mState != Playing)
   {
     mElapsedSeconds = progress * mDurationSeconds;
-    mState          = Playing;
+    // Let we don't change current loop value if the state was paused.
+    if(mState != Paused)
+    {
+      mCurrentLoop = 0;
+    }
+    mState = Playing;
 
     SetAnimatorsActive(true);
-
-    mCurrentLoop = 0;
   }
 }
 
@@ -201,7 +207,12 @@ void Animation::PlayAfter(float delaySeconds)
   if(mState != Playing)
   {
     mDelaySeconds = delaySeconds;
-    mState        = Playing;
+    // Let we don't change current loop value if the state was paused.
+    if(mState != Paused)
+    {
+      mCurrentLoop = 0;
+    }
+    mState = Playing;
 
     if(mSpeedFactor < 0.0f && mElapsedSeconds <= mPlayRange.x * mDurationSeconds)
     {
@@ -209,8 +220,6 @@ void Animation::PlayAfter(float delaySeconds)
     }
 
     SetAnimatorsActive(true);
-
-    mCurrentLoop = 0;
   }
 }
 
@@ -278,6 +287,20 @@ bool Animation::Stop(BufferIndex bufferIndex)
   mIsFirstLoop    = true;
 
   return animationFinished;
+}
+
+void Animation::Clear(BufferIndex bufferIndex)
+{
+  // Stop animation immediatly.
+  Stop(bufferIndex);
+
+  // Remove all animator.
+  mAnimators.Clear();
+  mAnimatorSortRequired = false;
+
+  // Reset animation state values.
+  mPlayedCount = 0;
+  mCurrentLoop = 0;
 }
 
 void Animation::OnDestroy(BufferIndex bufferIndex)

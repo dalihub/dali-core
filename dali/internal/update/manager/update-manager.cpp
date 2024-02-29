@@ -587,6 +587,17 @@ void UpdateManager::StopAnimation(Animation* animation)
   mImpl->animationFinishedDuringUpdate = mImpl->animationFinishedDuringUpdate || animationFinished;
 }
 
+void UpdateManager::ClearAnimation(Animation* animation)
+{
+  DALI_ASSERT_DEBUG(animation && "NULL animation called to clear");
+
+  animation->Clear(mSceneGraphBuffers.GetUpdateBufferIndex());
+
+  // We should remove all notify lists what we requests before clear.
+  // TODO : Could we do this more faster?
+  Dali::EraseIf(mImpl->notifyRequiredAnimations, [&animation](const NotifierInterface::NotifyId& key) { return key == animation->GetNotifyId(); });
+}
+
 void UpdateManager::RemoveAnimation(Animation* animation)
 {
   DALI_ASSERT_DEBUG(animation && "NULL animation called to remove");
@@ -871,8 +882,8 @@ bool UpdateManager::Animate(BufferIndex bufferIndex, float elapsedSeconds)
     mImpl->animationFinishedDuringUpdate = mImpl->animationFinishedDuringUpdate || finished;
     animationLooped                      = animationLooped || looped;
 
-    // queue the notification on finished or stoped or looped (to update loop count)
-    if(finished || looped)
+    // queue the notification on finished or stoped
+    if(finished)
     {
       mImpl->notifyRequiredAnimations.PushBack(animation->GetNotifyId());
     }
