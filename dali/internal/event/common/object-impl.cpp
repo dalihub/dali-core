@@ -1222,12 +1222,15 @@ AnimatablePropertyMetadata* Object::GetSceneAnimatableProperty(Property::Index i
         {
           // If the base property is not registered yet, register the base property first.
           RegisterAnimatableProperty(*typeInfo, basePropertyIndex, value);
+          DALI_ASSERT_ALWAYS(mAnimatableProperties.Size() > 0u && "Something wrong when we regiser animatable base property!");
+
           animatableProperty = static_cast<AnimatablePropertyMetadata*>(mAnimatableProperties[mAnimatableProperties.Size() - 1]);
         }
 
         // Create the metadata for the property component.
         mAnimatableProperties.PushBack(new AnimatablePropertyMetadata(index, typeInfo->GetComponentIndex(index), animatableProperty->value, animatableProperty->GetSceneGraphProperty()));
       }
+      DALI_ASSERT_ALWAYS(mAnimatableProperties.Size() > 0u && "Something wrong when we regiser new animatable property!");
 
       // The metadata has just been added and therefore should be in the end of the vector.
       animatableProperty = static_cast<AnimatablePropertyMetadata*>(mAnimatableProperties[mAnimatableProperties.Size() - 1]);
