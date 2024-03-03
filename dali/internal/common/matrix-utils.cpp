@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -438,6 +438,7 @@ void MultiplyAssign(Dali::Matrix& result, const Dali::Matrix& rhs)
   {
     // If rhs is same matrix with result, we need to copy temperal vaules.
     temp = static_cast<float*>(malloc(NUM_BYTES_IN_MATRIX));
+    DALI_ASSERT_ALWAYS(temp && "malloc is failed.");
     memcpy(temp, rhsPtr, NUM_BYTES_IN_MATRIX);
     rhsPtr = temp;
   }
@@ -571,6 +572,7 @@ void MultiplyAssign(Dali::Matrix3& result, const Dali::Matrix3& rhs)
   {
     // If rhs is same matrix with result, we need to copy temperal vaules.
     temp = static_cast<float*>(malloc(NUM_BYTES_IN_MATRIX3));
+    DALI_ASSERT_ALWAYS(temp && "malloc is failed.");
     memcpy(temp, rhsPtr, NUM_BYTES_IN_MATRIX3);
     rhsPtr = temp;
   }
