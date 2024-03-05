@@ -1,0 +1,672 @@
+{
+	"inputs" : 
+	[
+		{
+			"path" : "CMakeLists.txt"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeDetermineSystem.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeSystem.cmake.in"
+		},
+		{
+			"isGenerated" : true,
+			"path" : "cmake-build-debug/CMakeFiles/3.27.8/CMakeSystem.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeSystemSpecificInitialize.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Platform/Linux-Initialize.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeDetermineCCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeDetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeDetermineCompilerId.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeCompilerIdDetection.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/ADSP-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/ARMCC-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/ARMClang-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/AppleClang-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/Clang-DetermineCompilerInternal.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/Borland-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/Bruce-C-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/Clang-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/Clang-DetermineCompilerInternal.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/Compaq-C-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/Cray-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/Embarcadero-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/Fujitsu-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/FujitsuClang-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/GHS-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/GNU-C-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/HP-C-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/IAR-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/IBMClang-C-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/Intel-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/IntelLLVM-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/LCC-C-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/MSVC-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/NVHPC-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/NVIDIA-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/OpenWatcom-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/PGI-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/PathScale-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/SCO-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/SDCC-C-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/SunPro-C-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/TI-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/Tasking-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/TinyCC-C-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/VisualAge-C-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/IBMCPP-C-DetermineVersionInternal.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/Watcom-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/XL-C-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/IBMCPP-C-DetermineVersionInternal.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/XLClang-C-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/zOS-C-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/IBMCPP-C-DetermineVersionInternal.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeFindBinUtils.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/GNU-FindBinUtils.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeCCompiler.cmake.in"
+		},
+		{
+			"isGenerated" : true,
+			"path" : "cmake-build-debug/CMakeFiles/3.27.8/CMakeCCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeDetermineCXXCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeDetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Platform/Linux-Determine-CXX.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeDetermineCompilerId.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeCompilerIdDetection.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/ADSP-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/ARMCC-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/ARMClang-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/AppleClang-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/Clang-DetermineCompilerInternal.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/Borland-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/Clang-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/Clang-DetermineCompilerInternal.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/Comeau-CXX-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/Compaq-CXX-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/Cray-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/Embarcadero-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/Fujitsu-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/FujitsuClang-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/GHS-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/GNU-CXX-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/HP-CXX-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/IAR-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/IBMClang-CXX-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/Intel-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/IntelLLVM-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/LCC-CXX-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/MSVC-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/NVHPC-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/NVIDIA-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/OpenWatcom-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/PGI-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/PathScale-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/SCO-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/SunPro-CXX-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/TI-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/Tasking-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/VisualAge-CXX-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/IBMCPP-CXX-DetermineVersionInternal.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/Watcom-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/XL-CXX-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/IBMCPP-CXX-DetermineVersionInternal.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/XLClang-CXX-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/zOS-CXX-DetermineCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/IBMCPP-CXX-DetermineVersionInternal.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeFindBinUtils.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/GNU-FindBinUtils.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeCXXCompiler.cmake.in"
+		},
+		{
+			"isGenerated" : true,
+			"path" : "cmake-build-debug/CMakeFiles/3.27.8/CMakeCXXCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeSystemSpecificInformation.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeGenericSystem.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeInitializeConfigs.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Platform/Linux.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Platform/UnixPaths.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeCInformation.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeLanguageInformation.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/GNU-C.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/GNU.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/CMakeCommonCompilerMacros.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Platform/Linux-GNU-C.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Platform/Linux-GNU.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeCommonLanguageInclude.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeTestCCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeTestCompilerCommon.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeDetermineCompilerABI.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeParseImplicitIncludeInfo.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeParseImplicitLinkInfo.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeParseLibraryArchitecture.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeTestCompilerCommon.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/home2/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeCCompilerABI.c"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeDetermineCompileFeatures.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Internal/FeatureTesting.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeCCompiler.cmake.in"
+		},
+		{
+			"isGenerated" : true,
+			"path" : "cmake-build-debug/CMakeFiles/3.27.8/CMakeCCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeCXXInformation.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeLanguageInformation.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/GNU-CXX.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Compiler/GNU.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Platform/Linux-GNU-CXX.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Platform/Linux-GNU.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeCommonLanguageInclude.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeTestCXXCompiler.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeTestCompilerCommon.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeDetermineCompilerABI.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeParseImplicitIncludeInfo.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeParseImplicitLinkInfo.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeParseLibraryArchitecture.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeTestCompilerCommon.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/home2/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeCXXCompilerABI.cpp"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeDetermineCompileFeatures.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Internal/FeatureTesting.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeCXXCompiler.cmake.in"
+		},
+		{
+			"isGenerated" : true,
+			"path" : "cmake-build-debug/CMakeFiles/3.27.8/CMakeCXXCompiler.cmake"
+		},
+		{
+			"path" : "dali2-core.pc.in"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CheckCXXCompilerFlag.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Internal/CheckCompilerFlag.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Internal/CheckFlagCommonConfig.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Internal/CheckSourceCompiles.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeCheckCompilerFlagCommonPatterns.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/CheckCXXSourceCompiles.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/data/Packages/clion-2023.3.4/bin/cmake/linux/x64/share/cmake-3.27/Modules/Internal/CheckSourceCompiles.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/Git/Vulkan/dali-core/dali/internal/file.list"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/Git/Vulkan/dali-core/dali/integration-api/file.list"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/Git/Vulkan/dali-core/dali/public-api/file.list"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/Git/Vulkan/dali-core/dali/devel-api/file.list"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/Git/Vulkan/dali-core/dali/graphics-api/file.list"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/Git/Vulkan/dali-core/dali/internal/file-unix.list"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/home/ds/Git/Vulkan/dali-core/doc/file.list"
+		}
+	],
+	"kind" : "cmakeFiles",
+	"paths" : 
+	{
+		"build" : "/home/ds/Git/Vulkan/dali-core/build/tizen/cmake-build-debug",
+		"source" : "/home/ds/Git/Vulkan/dali-core/build/tizen"
+	},
+	"version" : 
+	{
+		"major" : 1,
+		"minor" : 0
+	}
+}

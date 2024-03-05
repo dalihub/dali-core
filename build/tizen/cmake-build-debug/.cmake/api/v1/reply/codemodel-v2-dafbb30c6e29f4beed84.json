@@ -1,0 +1,70 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-fcd1c59c15c05c9255b3.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.8.2"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "dali2-core",
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "dali2-core::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-dali2-core-Debug-89a906c44ea3ace0f8b1.json",
+					"name" : "dali2-core",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "linker-test::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-linker-test-Debug-f1563c45649e4ef5a8e1.json",
+					"name" : "linker-test",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/ds/Git/Vulkan/dali-core/build/tizen/cmake-build-debug",
+		"source" : "/home/ds/Git/Vulkan/dali-core/build/tizen"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 6
+	}
+}

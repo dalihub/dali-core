@@ -79,13 +79,13 @@ public:
    * @brief Get the width of the FrameBuffer
    * @return The width of the framebuffer
    */
-  unsigned int GetWidth() const;
+  [[nodiscard]] unsigned int GetWidth() const;
 
   /**
    * @brief Get the height of the FrameBuffer
    * @return The height of the framebuffer
    */
-  unsigned int GetHeight() const;
+  [[nodiscard]] unsigned int GetHeight() const;
 
   /**
    * Prepare the Graphics API framebuffer object when it's required
@@ -95,7 +95,7 @@ public:
   /**
    * Get the graphics object associated with this framebuffer
    */
-  const Graphics::Framebuffer* GetGraphicsObject() const
+  [[nodiscard]] const Graphics::Framebuffer* GetGraphicsObject() const
   {
     return mGraphicsObject.get();
   }

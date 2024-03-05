@@ -135,7 +135,6 @@ Renderer::Renderer()
   mDepthTestMode( DepthTestMode::AUTO ),
   mRenderingBehavior( DevelRenderer::Rendering::IF_REQUIRED ),
   mPremultipledAlphaEnabled( false ),
-  mRenderCommands{},
   mTextureBindings{},
   mOpacity( 1.0f ),
   mDepthIndex( 0 )
@@ -211,25 +210,12 @@ void Renderer::UpdateUniformMap( BufferIndex updateBufferIndex, Node& node )
     mRegenerateUniformMap--;
   }
 }
-
-void Renderer::FreeRenderCommand( RenderInstruction* renderInstruction )
+void Renderer::PrepareRender(
+  Graphics::CommandBuffer& commandBuffer,
+  BufferIndex updateBufferIndex,
+  RenderInstruction* renderInstruction,
+  RenderItem& item )
 {
-
-  mRenderCommands.DestroyRenderCommand( renderInstruction );
-}
-
-RenderCommand& Renderer::GetRenderCommand( RenderInstruction* renderInstruction,
-                                           BufferIndex updateBufferIndex )
-{
-  return mRenderCommands.GetRenderCommand( renderInstruction, updateBufferIndex );
-}
-
-void Renderer::PrepareRender( BufferIndex updateBufferIndex, RenderInstruction* renderInstruction )
-{
-  //auto& renderCmd = mRenderCommands.AllocRenderCommand( renderInstruction, *mGraphicsController, updateBufferIndex );
-  //auto& cmd = renderCmd.GetGfxRenderCommand( updateBufferIndex );
-  Graphics::UniquePtr<Graphics::CommandBuffer> commandBuffer = mGraphicsController->CreateCommandBuffer();
-
   if (!mShader->GetGraphicsObject())
   {
     return;
@@ -287,8 +273,8 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex, RenderInstruction* 
   }
   uint32_t instanceCount = 1u;
 
-  mGeometry->BindVertexAttributes(*commandBuffer.get());
-  mGeometry->Draw(*mGraphicsController, *commandBuffer.get(), mIndexedDrawFirstElement, mIndexedDrawElementsCount, instanceCount);
+  mGeometry->BindVertexAttributes(commandBuffer);
+  mGeometry->Draw(*mGraphicsController, commandBuffer, mIndexedDrawFirstElement, mIndexedDrawElementsCount, instanceCount);
 
   DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  "done\n" );
 }
@@ -318,11 +304,13 @@ void Renderer::WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::Un
   ubo.Write( data, size, bindings[uniformInfo.bufferIndex].offset + uniformInfo.offset, false );
 }
 
-bool Renderer::UpdateUniformBuffers( RenderInstruction& instruction,
-                                     GraphicsBuffer& ubo,
-                                     std::vector<Graphics::UniformBufferBinding>*& outBindings,
-                                     uint32_t& offset,
-                                     BufferIndex updateBufferIndex )
+bool Renderer::UpdateUniformBuffers(
+  Graphics::CommandBuffer& commandBuffer,
+  RenderInstruction& instruction,
+  GraphicsBuffer& ubo,
+  std::vector<Graphics::UniformBufferBinding>*& outBindings,
+  uint32_t& offset,
+  BufferIndex updateBufferIndex )
 {
   int updates( 0u );
 
@@ -336,12 +324,6 @@ bool Renderer::UpdateUniformBuffers( RenderInstruction& instruction,
   auto& reflection = mGraphicsController->GetProgramReflection( *mShader->GetGraphicsObject());
   auto uboCount = reflection.GetUniformBlockCount();
 
-  RenderCommand* renderCommand;
-  if( !mRenderCommands.Find( &instruction, renderCommand, updateBufferIndex ) )
-  {
-    DALI_ASSERT_DEBUG( 0 && "Can't find render command for this instruction" );
-    return false;
-  }
 
   auto& currentUboBindings = renderCommand->mUboBindings;
 

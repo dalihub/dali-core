@@ -17,28 +17,27 @@
  * limitations under the License.
  */
 
+#include "render-item.h"
+
+#include <cstring>
+
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/renderer.h> // Dali::Renderer
-#include <dali/devel-api/rendering/renderer-devel.h>
 
+#include <dali/devel-api/rendering/renderer-devel.h>
+#include <dali/graphics-api/graphics-command-buffer.h>
+#include <dali/graphics-api/graphics-controller.h>
+#include <dali/graphics-api/graphics-pipeline.h>
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/property-owner.h>
-#include <dali/internal/update/common/uniform-map.h>
 #include <dali/internal/update/common/scene-graph-connection-change-propagator.h>
-
+#include <dali/internal/update/common/uniform-map.h>
 #include <dali/internal/update/graphics/uniform-buffer-manager.h>
 #include <dali/internal/update/graphics/uniform-buffer.h>
-
 #include <dali/internal/update/rendering/stencil-parameters.h>
-#include <dali/graphics-api/graphics-controller.h>
-#include <dali/graphics-api/graphics-pipeline.h>
-#include <dali/graphics-api/graphics-command-buffer.h>
-
-
-#include <cstring>
 
 namespace Dali
 {
@@ -367,28 +366,21 @@ public:
    * Gets the rendering behavior
    * @return The rendering behavior
    */
-  DevelRenderer::Rendering::Type GetRenderingBehavior() const;
+  [[nodiscard]] DevelRenderer::Rendering::Type GetRenderingBehavior() const;
 
   /**
    * Prepare the object for rendering.
    * This is called by the UpdateManager when an object is due to be rendered in the current frame.
+   * @param[in] commandBuffer The command buffer to record commands to.
    * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] renderInstruction The render instruction for this render command
+   * @param[in] item The render item.
    */
-  void PrepareRender( BufferIndex updateBufferIndex, RenderInstruction* renderInstruction );
+  void PrepareRender( Graphics::CommandBuffer& commandBuffer,
+                      BufferIndex                            updateBufferIndex,
+                      RenderInstruction*                     renderInstruction,
+                      RenderItem& item );
 
-  /**
-   * Frees all the render commands and associated data for the given render instruction
-   * @param[in] renderInstruction The render instruction for this render command
-   */
-  //void FreeRenderCommand( RenderInstruction* renderInstruction );
-
-  /**
-   * Gets the render command associated with the render instruction
-   * @param[in] renderInstruction The render instruction for this render command
-   * @param[in] updateBufferIndex The current update buffer index.
-   */
-  //RenderCommand& GetRenderCommand( RenderInstruction* renderInstruction, BufferIndex updateBufferIndex );
 
   template<class T>
   void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::UniformBufferBinding>& bindings, const std::string& name, size_t hash, const T& data )
@@ -447,7 +439,8 @@ public:
    * @param[in] updateBufferIndex update buffer index
    * @return true whether uniform buffer has been updated
    */
-  bool UpdateUniformBuffers( RenderInstruction& instruction,
+  bool UpdateUniformBuffers( Graphics::CommandBuffer& commandBuffer,
+                             RenderInstruction& instruction,
                              GraphicsBuffer& ubo,
                              std::vector<Graphics::UniformBufferBinding>*& outBindings,
                              uint32_t& offset,
@@ -466,8 +459,6 @@ public:
   void BindPipeline( std::unique_ptr<Graphics::Pipeline> pipeline, BufferIndex updateBufferIndex, RenderInstruction* renderInstruction );
 
   std::unique_ptr<Graphics::Pipeline> ReleaseGraphicsPipeline( BufferIndex updateBufferIndex, RenderInstruction* renderInstruction );
-
-  void CheckRenderCommandCount(BufferIndex bufferIndex);
 
   /**
    * Destroy all graphics objects

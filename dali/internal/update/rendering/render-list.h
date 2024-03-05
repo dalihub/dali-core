@@ -244,6 +244,21 @@ public:
     return mHasColorRenderItems;
   }
 
+  Graphics::CommandBuffer& GetCommandBuffer(Graphics::Controller& controller)
+  {
+    if(!mGraphicsCommandBuffer)
+    {
+      mGraphicsCommandBuffer = controller.CreateCommandBuffer(
+        Graphics::CommandBufferCreateInfo().SetLevel(Graphics::CommandBufferLevel::SECONDARY), nullptr);
+    }
+    return *mGraphicsCommandBuffer.get();
+  }
+
+  const Graphics::CommandBuffer* GetCommandBuffer() const
+  {
+    return mGraphicsCommandBuffer.get();
+  }
+
 private:
 
   /*
@@ -254,6 +269,7 @@ private:
 
   RenderItemContainer mItems; ///< Each item is a renderer and matrix pair
   uint32_t mNextFree;         ///< index for the next free item to use
+  mutable Graphics::UniquePtr<Graphics::CommandBuffer> mGraphicsCommandBuffer{nullptr};
 
   ClippingBox* mClippingBox;               ///< The clipping box, in window coordinates, when clipping is enabled
   Layer*       mSourceLayer;              ///< The originating layer where the renderers are from

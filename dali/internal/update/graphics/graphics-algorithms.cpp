@@ -25,15 +25,19 @@
 #include <dali/graphics-api/graphics-framebuffer.h>
 
 // INTERNAL INCLUDES
+#include <dali/graphics-api/graphics-types.h>
+
+#include <dali/integration-api/core-enumerations.h>
+
 #include <dali/devel-api/common/hash.h>
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/update/rendering/render-instruction-container.h>
-#include <dali/internal/update/rendering/scene-graph-texture-set.h>
-#include <dali/internal/update/rendering/scene-graph-renderer.h>
 #include <dali/internal/update/rendering/scene-graph-geometry.h>
 #include <dali/internal/update/rendering/scene-graph-property-buffer.h>
+#include <dali/internal/update/rendering/scene-graph-renderer.h>
+#include <dali/internal/update/rendering/scene-graph-scene.h>
 #include <dali/internal/update/rendering/scene-graph-shader.h>
-#include "../../../graphics-api/graphics-types.h"
+#include <dali/internal/update/rendering/scene-graph-texture-set.h>
 
 namespace Dali
 {
@@ -53,14 +57,50 @@ constexpr auto UBO_SHRINK_THRESHOLD = 0.75f;
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_RENDERER" );
 #endif
 
-static constexpr float CLIP_MATRIX_DATA[] = {
+constexpr float CLIP_MATRIX_DATA[] = {
   1.0f, 0.0f, 0.0f, 0.0f,
   0.0f, -1.0f, 0.0f, 0.0f,
   0.0f, 0.0f, -0.5f, 0.0f,
   0.0f, 0.0f, 0.5f, 1.0f
 };
 
-static const Matrix CLIP_MATRIX(CLIP_MATRIX_DATA);
+const Matrix CLIP_MATRIX(CLIP_MATRIX_DATA);
+
+struct GraphicsDepthCompareOp
+{
+  constexpr explicit GraphicsDepthCompareOp(DepthFunction::Type compareOp)
+  {
+    switch(compareOp)
+    {
+      case DepthFunction::NEVER:
+        op = Graphics::CompareOp::NEVER;
+        break;
+      case DepthFunction::LESS:
+        op = Graphics::CompareOp::LESS;
+        break;
+      case DepthFunction::EQUAL:
+        op = Graphics::CompareOp::EQUAL;
+        break;
+      case DepthFunction::LESS_EQUAL:
+        op = Graphics::CompareOp::LESS_OR_EQUAL;
+        break;
+      case DepthFunction::GREATER:
+        op = Graphics::CompareOp::GREATER;
+        break;
+      case DepthFunction::NOT_EQUAL:
+        op = Graphics::CompareOp::NOT_EQUAL;
+        break;
+      case DepthFunction::GREATER_EQUAL:
+        op = Graphics::CompareOp::GREATER_OR_EQUAL;
+        break;
+      case DepthFunction::ALWAYS:
+        op = Graphics::CompareOp::ALWAYS;
+        break;
+    }
+  }
+  Graphics::CompareOp op{Graphics::CompareOp::NEVER};
+};
+
 
 constexpr Graphics::BlendFactor ConvertBlendFactor( BlendFactor::Type blendFactor )
 {
@@ -166,6 +206,64 @@ bool WriteDefaultUniform( Renderer* renderer, GraphicsBuffer& ubo, const std::ve
     return true;
   }
   return false;
+}
+
+/**
+ * @brief Sets up the depth buffer for reading and writing based on the current render item.
+ * The items read and write mode are used if specified.
+ *  - If AUTO is selected for reading, the decision will be based on the Layer Behavior.
+ *  - If AUTO is selected for writing, the decision will be based on the items opacity.
+ * @param[in]     item                The RenderItem to set up the depth buffer for.
+ * @param[in,out] secondaryCommandBuffer The secondary command buffer to write depth commands to
+ * @param[in]     depthTestEnabled    True if depth testing has been enabled.
+ * @param[in/out] firstDepthBufferUse Initialize to true on the first call, this method will set it to false afterwards.
+ */
+inline void SetupDepthBuffer(const RenderItem& item, Graphics::CommandBuffer& commandBuffer, bool depthTestEnabled, bool& firstDepthBufferUse)
+{
+  // Set up whether or not to write to the depth buffer.
+  const DepthWriteMode::Type depthWriteMode = item.mRenderer->GetDepthWriteMode();
+  // Most common mode (AUTO) is tested first.
+  const bool enableDepthWrite = ((depthWriteMode == DepthWriteMode::AUTO) && depthTestEnabled && item.mIsOpaque) ||
+                                (depthWriteMode == DepthWriteMode::ON);
+
+  // Set up whether or not to read from (test) the depth buffer.
+  const DepthTestMode::Type depthTestMode = item.mRenderer->GetDepthTestMode();
+
+  // Most common mode (AUTO) is tested first.
+  const bool enableDepthTest = ((depthTestMode == DepthTestMode::AUTO) && depthTestEnabled) ||
+                               (depthTestMode == DepthTestMode::ON);
+
+  // Is the depth buffer in use?
+  if(enableDepthWrite || enableDepthTest)
+  {
+    // The depth buffer must be enabled if either reading or writing.
+    commandBuffer.SetDepthTestEnable(true);
+
+    // Look-up the depth function from the Dali::DepthFunction enum, and set it.
+    commandBuffer.SetDepthCompareOp(GraphicsDepthCompareOp(item.mRenderer->GetDepthFunction()).op);
+
+    // If this is the first use of the depth buffer this RenderTask, perform a clear.
+    // Note: We could do this at the beginning of the RenderTask and rely on the
+    // graphics implementation to ignore the clear if not required, but, we would
+    // have to enable the depth buffer to do so, which could be a redundant enable.
+    if(DALI_UNLIKELY(firstDepthBufferUse))
+    {
+      // This is the first time the depth buffer is being written to or read.
+      firstDepthBufferUse = false;
+
+      // Note: The buffer will only be cleared if written to since a previous clear.
+      commandBuffer.SetDepthWriteEnable(true);
+      commandBuffer.ClearDepthBuffer();
+    }
+
+    // Set up the depth mask based on our depth write setting.
+    commandBuffer.SetDepthWriteEnable(enableDepthWrite);
+  }
+  else
+  {
+    // The depth buffer is not being used by this renderer, so we must disable it to stop it being tested.
+    commandBuffer.SetDepthTestEnable(false);
+  }
 }
 
 }
@@ -469,117 +567,120 @@ bool GraphicsAlgorithms::SetupPipelineViewportState( Graphics::ViewportState& ou
 }
 
 void GraphicsAlgorithms::RecordRenderItemList(
+  const RenderList& renderList,
   BufferIndex bufferIndex,
-  Graphics::RenderTargetBinding &renderTargetBinding,
-  Matrix viewProjection,
-  RenderInstruction &instruction,
-  const RenderList &renderItemList,
-  std::vector<Graphics::CommandBuffer *> &commandList)
+  const Matrix& viewMatrix,
+  const Matrix& projectionMatrix,
+  RenderInstruction& instruction,
+  bool depthBufferAvailable)
 {
-  auto numberOfRenderItems = renderItemList.Count();
+  // Note: The depth buffer is enabled or disabled on a per-renderer basis.
+  // Here we pre-calculate the value to use if these modes are set to AUTO.
+  const bool autoDepthTestMode((depthBufferAvailable == Integration::DepthBufferAvailable::TRUE) &&
+                               !(renderList.GetSourceLayer()->IsDepthTestDisabled()) &&
+                               renderList.HasColorRenderItems());
 
-  const auto viewMatrix = instruction.GetViewMatrix( bufferIndex );
-  const auto projectionMatrix = instruction.GetProjectionMatrix( bufferIndex );
+  bool firstDepthBufferUse(true);
+
+  auto* mutableRenderList      = const_cast<RenderList*>(&renderList);
+  auto& secondaryCommandBuffer = mutableRenderList->GetCommandBuffer(mGraphicsController);
+  secondaryCommandBuffer.Reset();
+
+  auto width = float(instruction.mViewport.width);
+  auto height = float(instruction.mViewport.height);
+
+  // If the viewport hasn't been set, and we're rendering to a framebuffer, then
+  // set the size of the viewport to that of the framebuffer.
+  if( !instruction.mIsViewportSet && instruction.mFrameBuffer != nullptr )
+  {
+    width = float(instruction.mFrameBuffer->GetWidth());
+    height = float(instruction.mFrameBuffer->GetHeight());
+  }
+  secondaryCommandBuffer.SetViewport( { float( instruction.mViewport.x ),
+                                        float( instruction.mViewport.y ),
+                                        width,
+                                        height,
+                                        0.0f , 1.0f } );
+
+  // @todo setup scissor clip
+
+  auto numberOfRenderItems = renderList.Count();
 
   Matrix vulkanProjectionMatrix;
-  Matrix::Multiply( vulkanProjectionMatrix, *projectionMatrix, CLIP_MATRIX );
+  Matrix::Multiply( vulkanProjectionMatrix, projectionMatrix, CLIP_MATRIX );
 
   for( auto i = 0u; i < numberOfRenderItems; ++i )
   {
-    auto& item = renderItemList.GetItem( i );
+    auto& item = mutableRenderList->GetItem( i );
     auto renderer = item.mRenderer;
     if( !renderer )
     {
       continue;
     }
 
-    // @todo Should create commandBuffers similarly to current gfx impl
-    auto &renderCmd = renderer->GetRenderCommand( &instruction, bufferIndex );
-    auto &cmd = renderCmd.GetGfxRenderCommand( bufferIndex );
+    //SetupClipping(...);
+    SetupDepthBuffer(item, secondaryCommandBuffer, autoDepthTestMode, firstDepthBufferUse);
 
-    auto color = item.mNode->GetWorldColor( bufferIndex );
+    item.mRenderer->PrepareRender( secondaryCommandBuffer, bufferIndex, &instruction, item );
 
-    if (cmd.GetVertexBufferBindings()
-           .empty())
-    {
-      continue;
-    }
-    //cmd.BindRenderTarget( renderTargetBinding ); //@todo Should now be BeginrenderPass
-
-    auto width = float(instruction.mViewport.width);
-    auto height = float(instruction.mViewport.height);
-
-    // If the viewport hasn't been set, and we're rendering to a framebuffer, then
-    // set the size of the viewport to that of the framebuffer.
-    if( !instruction.mIsViewportSet && renderTargetBinding.framebuffer != nullptr )
-    {
-      width = renderTargetBinding.framebufferWidth;
-      height = renderTargetBinding.framebufferHeight;
-    }
-    cmd.mDrawCommand.SetViewport( { float( instruction.mViewport.x ),
-                                    float( instruction.mViewport.y ),
-                                    width,
-                                    height,
-                                    0.0f , 1.0f } )
-                    .SetViewportEnable( true );
-
+    // Move all this code to scene-graph-renderer
+    //
+    // auto color = item.mNode->GetWorldColor( bufferIndex );
+    //
     // update the uniform buffer
     // pass shared UBO and offset, return new offset for next item to be used
     // don't process bindings if there are no uniform buffers allocated
-    auto shader = renderer->GetShader().GetGraphicsObject();
-    auto ubo = mUniformBuffer[bufferIndex].get();
-    if( ubo && shader )
-    {
-      std::vector<Graphics::UniformBufferBinding>* bindings{ nullptr };
-      if( renderer->UpdateUniformBuffers( instruction, *ubo, bindings, mUboOffset, bufferIndex ) )
-      {
-        cmd.BindUniformBuffers( bindings );
-      }
+    // auto shader = renderer->GetShader().GetGraphicsObject();
+    // auto ubo = mUniformBuffer[bufferIndex].get();
+    // if( ubo && shader )
+    // {
+    //   std::vector<Graphics::UniformBufferBinding>* bindings{ nullptr };
+    //   if( renderer->UpdateUniformBuffers( instruction, *ubo, bindings, mUboOffset, bufferIndex ) )
+    //   {
+    //     cmd.BindUniformBuffers( bindings );
+    //   }
 
-      auto opacity = renderer->GetOpacity( bufferIndex );
+    //   auto opacity = renderer->GetOpacity( bufferIndex );
 
-      if( renderer->IsPreMultipliedAlphaEnabled() )
-      {
-        float alpha = color.a * opacity;
-        color = Vector4( color.r * alpha, color.g * alpha, color.b * alpha, alpha );
-      }
-      else
-      {
-        color.a *= opacity;
-      }
+    //   if( renderer->IsPreMultipliedAlphaEnabled() )
+    //   {
+    //     float alpha = color.a * opacity;
+    //     color = Vector4( color.r * alpha, color.g * alpha, color.b * alpha, alpha );
+    //   }
+    //   else
+    //   {
+    //     color.a *= opacity;
+    //   }
 
-      // we know bindings for this render item, so we can use 'offset' and write additional
-      // uniforms
-      Matrix mvp, mvp2;
-      Matrix::Multiply(mvp, item.mModelMatrix, viewProjection);
-      Matrix::Multiply(mvp2, mvp, CLIP_MATRIX);
+    //   // we know bindings for this render item, so we can use 'offset' and write additional
+    //   // uniforms
+    //   Matrix mvp, mvp2;
+    //   Matrix::Multiply(mvp, item.mModelMatrix, viewProjection);
+    //   Matrix::Multiply(mvp2, mvp, CLIP_MATRIX);
 
-      WriteDefaultUniform( renderer, *ubo, *bindings, Shader::DefaultUniformIndex::MODEL_MATRIX, item.mModelMatrix );
-      WriteDefaultUniform( renderer, *ubo, *bindings, Shader::DefaultUniformIndex::MVP_MATRIX, mvp2 );
-      WriteDefaultUniform( renderer, *ubo, *bindings, Shader::DefaultUniformIndex::VIEW_MATRIX, *viewMatrix );
-      WriteDefaultUniform( renderer, *ubo, *bindings, Shader::DefaultUniformIndex::MODEL_VIEW_MATRIX, item.mModelViewMatrix );
-      WriteDefaultUniform( renderer, *ubo, *bindings, Shader::DefaultUniformIndex::PROJECTION_MATRIX, vulkanProjectionMatrix );
-      WriteDefaultUniform( renderer, *ubo, *bindings, Shader::DefaultUniformIndex::SIZE, item.mSize );
-      WriteDefaultUniform( renderer, *ubo, *bindings, Shader::DefaultUniformIndex::COLOR, color );
+    //   WriteDefaultUniform( renderer, *ubo, *bindings, Shader::DefaultUniformIndex::MODEL_MATRIX, item.mModelMatrix );
+    //   WriteDefaultUniform( renderer, *ubo, *bindings, Shader::DefaultUniformIndex::MVP_MATRIX, mvp2 );
+    //   WriteDefaultUniform( renderer, *ubo, *bindings, Shader::DefaultUniformIndex::VIEW_MATRIX, *viewMatrix );
+    //   WriteDefaultUniform( renderer, *ubo, *bindings, Shader::DefaultUniformIndex::MODEL_VIEW_MATRIX, item.mModelViewMatrix );
+    //   WriteDefaultUniform( renderer, *ubo, *bindings, Shader::DefaultUniformIndex::PROJECTION_MATRIX, vulkanProjectionMatrix );
+    //   WriteDefaultUniform( renderer, *ubo, *bindings, Shader::DefaultUniformIndex::SIZE, item.mSize );
+    //   WriteDefaultUniform( renderer, *ubo, *bindings, Shader::DefaultUniformIndex::COLOR, color );
 
-      // Update normal matrix only when used in the shader
-      if( renderer->GetShader().GetDefaultUniform( Shader::DefaultUniformIndex::NORMAL_MATRIX ) )
-      {
-        Matrix3 uNormalMatrix( item.mModelViewMatrix );
-        uNormalMatrix.Invert();
-        uNormalMatrix.Transpose();
-        WriteDefaultUniform( renderer, *ubo, *bindings, Shader::DefaultUniformIndex::NORMAL_MATRIX, uNormalMatrix );
-      }
-    }
-
-    commandList.push_back(&cmd);
+    //   // Update normal matrix only when used in the shader
+    //   if( renderer->GetShader().GetDefaultUniform( Shader::DefaultUniformIndex::NORMAL_MATRIX ) )
+    //   {
+    //     Matrix3 uNormalMatrix( item.mModelViewMatrix );
+    //     uNormalMatrix.Invert();
+    //     uNormalMatrix.Transpose();
+    //     WriteDefaultUniform( renderer, *ubo, *bindings, Shader::DefaultUniformIndex::NORMAL_MATRIX, uNormalMatrix );
+    //   }
+    // }
   }
 }
 
 void GraphicsAlgorithms::RecordInstruction(
   BufferIndex bufferIndex,
   RenderInstruction& instruction,
-  std::vector<Graphics::RenderCommand*>& commandList,
   bool renderToFbo)
 {
   using namespace Graphics;
@@ -587,34 +688,31 @@ void GraphicsAlgorithms::RecordInstruction(
   // Create constant buffer with static uniforms: view matrix, projection matrix
   const Matrix* viewMatrix       = instruction.GetViewMatrix( bufferIndex );
   const Matrix* projectionMatrix = instruction.GetProjectionMatrix( bufferIndex );
-  Matrix        viewProjection;
-  Matrix::Multiply( viewProjection, *viewMatrix, *projectionMatrix );
 
-
-  // @todo change to BeginRenderPass
-  // auto renderTargetBinding = Graphics::RenderTargetBinding{}
-  // .SetClearColors( {{ instruction.mClearColor.r,
-  //                   instruction.mClearColor.g,
-  //                   instruction.mClearColor.b,
-  //                   instruction.mClearColor.a }} );
-
-  if( !instruction.mIgnoreRenderToFbo )
+  if(viewMatrix && projectionMatrix)
   {
-    if( instruction.mFrameBuffer != 0 )
+    std::vector<const Graphics::CommandBuffer*> buffers;
+
+    auto numberOfRenderLists = instruction.RenderListCount();
+    for( auto i = 0u; i < numberOfRenderLists; ++i )
     {
-      renderTargetBinding.SetFramebuffer( instruction.mFrameBuffer->GetGraphicsObject());
-      // Store the size of the framebuffer in case the viewport isn't set.
-      renderTargetBinding.framebufferWidth = float(instruction.mFrameBuffer->GetWidth());
-      renderTargetBinding.framebufferHeight = float(instruction.mFrameBuffer->GetHeight());
-    }
-  }
+      const RenderList* renderList = instruction.GetRenderList(i);
+      if(renderList && !renderList->IsEmpty())
+      {
+        RecordRenderItemList(*renderList, bufferIndex, *viewMatrix, *projectionMatrix, instruction);
 
-  auto numberOfRenderLists = instruction.RenderListCount();
-  for( auto i = 0u; i < numberOfRenderLists; ++i )
-  {
-    RecordRenderItemList( graphics, bufferIndex, renderTargetBinding,
-                          viewProjection, instruction, *instruction.GetRenderList(i),
-                          commandList );
+        // Execute command buffer
+        auto* commandBuffer = renderList->GetCommandBuffer();
+        if(commandBuffer)
+        {
+          buffers.push_back(commandBuffer);
+        }
+      }
+    }
+    if(!buffers.empty())
+    {
+      mGraphicsCommandBuffer->ExecuteCommandBuffers(std::move(buffers));
+    }
   }
 }
 
@@ -624,7 +722,7 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline(
   RenderItem& item,
   bool& usesDepth,
   bool& usesStencil,
-  BufferIndex bufferIndex )
+  BufferIndex bufferIndex)
 {
   using namespace Dali::Graphics;
 
@@ -634,8 +732,6 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline(
   VertexInputState vi{};
 
   auto *renderer = item.mRenderer;
-  auto &renderCmd = renderer->GetRenderCommand( &instruction, bufferIndex );
-  auto &cmd = renderCmd.GetGfxRenderCommand( bufferIndex );
   auto *geometry = renderer->GetGeometry();
   auto graphicsProgram = renderer->GetShader().GetGraphicsObject();
 
@@ -738,46 +834,46 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline(
   /**
    * 1. DEPTH MDOE
    */
-  // use correct depth mode
-  DepthStencilState depthStencilState;
-  depthStencilState.SetDepthCompareOp( CompareOp::GREATER );
+  // // use correct depth mode
+  // DepthStencilState depthStencilState;
+  // depthStencilState.SetDepthCompareOp( CompareOp::GREATER );
 
-  const bool depthTestEnable( !renderList->GetSourceLayer()->IsDepthTestDisabled() && renderList->HasColorRenderItems() );
+  // const bool depthTestEnable( !renderList->GetSourceLayer()->IsDepthTestDisabled() && renderList->HasColorRenderItems() );
 
-  const bool enableDepthWrite = ( ( renderer->GetDepthWriteMode() == DepthWriteMode::AUTO )
-                                  && depthTestEnable && item.mIsOpaque ) ||
-                                ( renderer->GetDepthWriteMode() == DepthWriteMode::ON );
+  // const bool enableDepthWrite = ( ( renderer->GetDepthWriteMode() == DepthWriteMode::AUTO )
+  //                                 && depthTestEnable && item.mIsOpaque ) ||
+  //                               ( renderer->GetDepthWriteMode() == DepthWriteMode::ON );
 
-  // Set up whether or not to read from (test) the depth buffer.
-  const DepthTestMode::Type depthTestMode = item.mRenderer->GetDepthTestMode();
+  // // Set up whether or not to read from (test) the depth buffer.
+  // const DepthTestMode::Type depthTestMode = item.mRenderer->GetDepthTestMode();
 
-  // Most common mode (AUTO) is tested first.
-  const bool enableDepthTest = ( ( depthTestMode == DepthTestMode::AUTO ) && depthTestEnable ) ||
-                               ( depthTestMode == DepthTestMode::ON );
+  // // Most common mode (AUTO) is tested first.
+  // const bool enableDepthTest = ( ( depthTestMode == DepthTestMode::AUTO ) && depthTestEnable ) ||
+  //                              ( depthTestMode == DepthTestMode::ON );
 
-  depthStencilState.SetDepthTestEnable( enableDepthTest );
-  depthStencilState.SetDepthWriteEnable( enableDepthWrite );
+  // depthStencilState.SetDepthTestEnable( enableDepthTest );
+  // depthStencilState.SetDepthWriteEnable( enableDepthWrite );
 
-  if( !usesDepth && (enableDepthTest || enableDepthWrite) )
-  {
-    usesDepth = true; // set out-value to indicate at least 1 pipeline uses depth buffer
-  }
+  // if( !usesDepth && (enableDepthTest || enableDepthWrite) )
+  // {
+  //   usesDepth = true; // set out-value to indicate at least 1 pipeline uses depth buffer
+  // }
 
-  // Stencil setup
-  bool stencilEnabled = mCurrentStencilState.stencilTestEnable;
+  // // Stencil setup
+  // bool stencilEnabled = mCurrentStencilState.stencilTestEnable;
 
-  if( !usesStencil && stencilEnabled )
-  {
-    usesStencil = true; // set out-value to indicate at least 1 pipeline uses stencil buffer
-  }
+  // if( !usesStencil && stencilEnabled )
+  // {
+  //   usesStencil = true; // set out-value to indicate at least 1 pipeline uses stencil buffer
+  // }
 
-  if( stencilEnabled)
-  {
-    depthStencilState
-      .SetStencilTestEnable( mCurrentStencilState.stencilTestEnable )
-      .SetFront( mCurrentStencilState.front )
-      .SetBack( mCurrentStencilState.back );
-  }
+  // if( stencilEnabled)
+  // {
+  //   depthStencilState
+  //     .SetStencilTestEnable( mCurrentStencilState.stencilTestEnable )
+  //     .SetFront( mCurrentStencilState.front )
+  //     .SetBack( mCurrentStencilState.back );
+  // }
 
   /**
    * 2. BLENDING
@@ -802,54 +898,54 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline(
   /**
    * 3. VIEWPORT
    */
-  ViewportState viewportState{};
+  // ViewportState viewportState{};
 
-  // Set viewport only when not using dynamic viewport state
-  if( !cmd.GetDrawCommand().viewportEnable && instruction.mIsViewportSet )
-  {
-    // scissor test only when we have viewport
-    viewportState.SetViewport({ float(instruction.mViewport.x), float(instruction.mViewport.y),
-                                float(instruction.mViewport.width), float(instruction.mViewport.height),
-                                0.0, 1.0});
-  }
-  else
-  {
-    // Use zero-size viewport for dynamic viewport or viewport-less state
-    viewportState.SetViewport( { 0.0, 0.0, 0.0, 0.0, 0.0, 1.0 } );
-  }
+  // // Set viewport only when not using dynamic viewport state
+  // if( !cmd.GetDrawCommand().viewportEnable && instruction.mIsViewportSet )
+  // {
+  //   // scissor test only when we have viewport
+  //   viewportState.SetViewport({ float(instruction.mViewport.x), float(instruction.mViewport.y),
+  //                               float(instruction.mViewport.width), float(instruction.mViewport.height),
+  //                               0.0, 1.0});
+  // }
+  // else
+  // {
+  //   // Use zero-size viewport for dynamic viewport or viewport-less state
+  //   viewportState.SetViewport( { 0.0, 0.0, 0.0, 0.0, 0.0, 1.0 } );
+  // }
 
-  FramebufferState framebufferState{};
-  if( instruction.mFrameBuffer )
-  {
-    framebufferState.SetFramebuffer( *instruction.mFrameBuffer->GetGraphicsObject() );
-  }
+  //FramebufferState framebufferState{};
+  //if( instruction.mFrameBuffer )
+  //{
+  //framebufferState.SetFramebuffer( *instruction.mFrameBuffer->GetGraphicsObject() );
+  //}
 
   /**
    * Scissor test is represented only by the dynamic state as it can be transformed
    * any time.
    */
-  Graphics::PipelineDynamicStateMask dynamicStateMask{ 0u };
+  // Graphics::PipelineDynamicStateMask dynamicStateMask{ 0u };
 
-  if( SetupPipelineViewportState( viewportState) )
-  {
-    cmd.mDrawCommand.SetScissor( viewportState.scissor );
-    cmd.mDrawCommand.SetScissorTestEnable( true );
-    dynamicStateMask = Graphics::PipelineDynamicStateBits::SCISSOR_BIT;
-  }
-  else
-  {
-    cmd.mDrawCommand.SetScissorTestEnable( false );
-  }
+  // if( SetupPipelineViewportState( viewportState) )
+  // {
+  //   cmd.mDrawCommand.SetScissor( viewportState.scissor );
+  //   cmd.mDrawCommand.SetScissorTestEnable( true );
+  //   dynamicStateMask = Graphics::PipelineDynamicStateBits::SCISSOR_BIT;
+  // }
+  // else
+  // {
+  //   cmd.mDrawCommand.SetScissorTestEnable( false );
+  // }
 
-  // todo: make it possible to decide earlier whether we want dynamic or static viewport
-  dynamicStateMask |= Graphics::PipelineDynamicStateBits::VIEWPORT_BIT;
+  // // todo: make it possible to decide earlier whether we want dynamic or static viewport
+  // dynamicStateMask |= Graphics::PipelineDynamicStateBits::VIEWPORT_BIT;
 
-  // reset pipeline's viewport to prevent hashing function changing due to animated values.
-  viewportState.SetViewport({0.0, 0.0, 0.0, 0.0, 0.0, 1.0});
+  // // reset pipeline's viewport to prevent hashing function changing due to animated values.
+  // viewportState.SetViewport({0.0, 0.0, 0.0, 0.0, 0.0, 1.0});
 
-  // disable scissors per-pipeline
-  viewportState.SetScissorTestEnable( false );
-  viewportState.SetScissor( {} );
+  // // disable scissors per-pipeline
+  // viewportState.SetScissorTestEnable( false );
+  // viewportState.SetScissor( {} );
 
   // set face culling
   auto cullMode { CullMode::NONE };
@@ -954,12 +1050,13 @@ void GraphicsAlgorithms::PrepareRendererPipelines(
 
         if( item.mRenderer )
         {
-          PrepareGraphicsPipeline( controller, ri, renderList, item, usesDepth, usesStencil, bufferIndex );
+          PrepareGraphicsPipeline( ri, renderList, item, usesDepth, usesStencil, bufferIndex );
         }
       }
     }
   }
 }
+
 void GraphicsAlgorithms::ResetCommandBuffer()
 {
   // Reset main command buffer
@@ -977,21 +1074,15 @@ void GraphicsAlgorithms::ResetCommandBuffer()
 }
 
 void GraphicsAlgorithms::SubmitRenderInstructions(
-  RenderInstructionContainer& renderInstructions,
+  SceneGraph::Scene* scene,
+  Integration::DepthBufferAvailable depthBufferAvailable,
+  Integration::StencilBufferAvailable stencilBufferAvailable,
   BufferIndex                 bufferIndex )
 {
-  // ComputeUniformBufferRequirements
-
-  // BeginFrame
-  // PrepareRendererPipelines
-  // foreach RenderInstruction, // records fbos first
-  //   RecordInstruction
-  // SubmitCommands
-  // EndFrame
-
-
   bool usesDepth = false;
   bool usesStencil = false;
+
+  RenderInstructionContainer& renderInstructions = scene->GetRenderInstructions();
 
   PrepareRendererPipelines( renderInstructions, usesDepth, usesStencil, bufferIndex );
 
@@ -1011,7 +1102,7 @@ void GraphicsAlgorithms::SubmitRenderInstructions(
     mUniformBufferManager.reset( new UniformBufferManager( &mGraphicsController ) );
   }
 
-  mGraphicsController.BeginFrame();
+  /*** Compute uniform buffer size ***/
 
   auto pagedAllocation = ( ( mUniformBlockAllocationBytes / UBO_PAGE_SIZE + 1u ) ) * UBO_PAGE_SIZE;
 
@@ -1022,8 +1113,8 @@ void GraphicsAlgorithms::SubmitRenderInstructions(
     mUniformBuffer[bufferIndex] = std::move( mGraphicsBufferManager->AllocateUniformBuffer( pagedAllocation ) );
   }
   else if( mUniformBlockAllocationBytes && (
-    mUniformBuffer[bufferIndex]->GetSize() < pagedAllocation ||
-    (pagedAllocation < uint32_t(float(mUniformBuffer[bufferIndex]->GetSize()) * UBO_SHRINK_THRESHOLD ))))
+                                             mUniformBuffer[bufferIndex]->GetSize() < pagedAllocation ||
+                                             (pagedAllocation < uint32_t(float(mUniformBuffer[bufferIndex]->GetSize()) * UBO_SHRINK_THRESHOLD ))))
   {
     mUniformBuffer[bufferIndex]->Reserve( pagedAllocation, true );
   }
@@ -1036,7 +1127,12 @@ void GraphicsAlgorithms::SubmitRenderInstructions(
 
   mUboOffset = 0u;
 
-  std::vector<Graphics::RenderCommand*> commandList{};
+  Graphics::RenderTarget*           currentRenderTarget = nullptr;
+  Graphics::RenderPass*             currentRenderPass   = nullptr;
+  std::vector<Graphics::ClearValue> currentClearValues{};
+  auto clippingRect = Rect<int>();
+  auto viewportRect = Rect<int>();
+  std::vector<Graphics::RenderTarget*> targetsToPresent;
 
   // First, record each framebuffer
   for( uint32_t i = 0; i < numberOfInstructions; ++i )
@@ -1044,45 +1140,88 @@ void GraphicsAlgorithms::SubmitRenderInstructions(
     RenderInstruction& instruction = renderInstructions.At( bufferIndex, i );
     if(instruction.mFrameBuffer)
     {
-      RecordInstruction(bufferIndex, instruction, commandList, true);
+      if(!instruction.mFrameBuffer->GetGraphicsObject())
+      {
+        DALI_LOG_ERROR("Framebuffer has no graphics object at time of use");
+        continue;
+      }
+      Graphics::Rect2D scissorArea{viewportRect.x, viewportRect.y, uint32_t(viewportRect.width), uint32_t(viewportRect.height)};
+
+      auto loadOp = instruction.mIsClearColorSet ? Graphics::AttachmentLoadOp::CLEAR : Graphics::AttachmentLoadOp::LOAD;
+      currentRenderTarget = instruction.mFrameBuffer->GetGraphicsRenderTarget();
+      currentRenderPass = instruction.mFrameBuffer->GetGraphicsRenderPass(loadOp, Graphics::AttachmentStoreOp::STORE);
+      currentClearValues = instruction.mFrameBuffer->GetGraphicsRenderPassClearValues();
+
+      targetsToPresent.emplace_back(currentRenderTarget);
+      mGraphicsCommandBuffer->BeginRenderPass(currentRenderPass, currentRenderTarget, scissorArea, currentClearValues);
+
+      RecordInstruction(bufferIndex, instruction, true, instruction.mFrameBuffer.);
+      mGraphicsCommandBuffer->EndRenderPass(nullptr);
     }
   }
+
   // Then, record all other instructions to the surface.
+  currentRenderTarget = scene->GetSurfaceRenderTarget();
+  currentClearValues = scene->GetGraphicsRenderPassClearValues();
+  auto surfaceRect = scene->GetSurfaceRect();
+  clippingRect = surfaceRect;
+  Graphics::Rect2D scissorArea = {clippingRect.x, clippingRect.y, static_cast<uint32_t>(clippingRect.width), static_cast<uint32_t>(clippingRect.height)};
+  targetsToPresent.emplace_back(currentRenderTarget);
+
   for( uint32_t i = 0; i < numberOfInstructions; ++i )
   {
     RenderInstruction& instruction = renderInstructions.At( bufferIndex, i );
+
+    auto loadOp = instruction.mIsClearColorSet ? Graphics::AttachmentLoadOp::CLEAR : Graphics::AttachmentLoadOp::LOAD;
+    currentRenderPass = scene->GetGraphicsRenderPass(loadOp, Graphics::AttachmentStoreOp::STORE);
+
     if(!instruction.mFrameBuffer)
     {
-      RecordInstruction(bufferIndex, instruction, commandList, false);
+      mGraphicsCommandBuffer->BeginRenderPass(currentRenderPass, currentRenderTarget, scissorArea, currentClearValues);
+
+      // Check whether a viewport is specified, otherwise the full surface size is used
+      if(instruction.mIsViewportSet)
+      {
+        // For Viewport the lower-left corner is (0,0)
+        const int32_t y = (surfaceRect.height - instruction.mViewport.height) - instruction.mViewport.y;
+        viewportRect.Set(instruction.mViewport.x, y, instruction.mViewport.width, instruction.mViewport.height);
+      }
+      else
+      {
+        viewportRect = surfaceRect;
+      }
+      mGraphicsCommandBuffer->SetViewport({float(viewportRect.x),
+                                           float(viewportRect.y),
+                                           float(viewportRect.width),
+                                           float(viewportRect.height)});
+
+      RecordInstruction(bufferIndex, instruction, false, depthBufferAvailable==Integration::DepthBufferAvailable::TRUE);
+
+      mGraphicsCommandBuffer->EndRenderPass(nullptr);
     }
   }
 
-  // Submit all render commands in one go
-  mGraphicsController.SubmitCommands( std::move(commandList) );
+  mUniformBufferManager->Flush(nullptr, false);
 
-  if( mUniformBlockAllocationBytes && mUniformBuffer[bufferIndex] )
+  Graphics::SubmitInfo submitInfo;
+  submitInfo.cmdBuffer.push_back(mGraphicsCommandBuffer.get());
+  submitInfo.flags = 0 | Graphics::SubmitFlagBits::FLUSH;
+
+  mGraphicsController.SubmitCommandBuffers(submitInfo);
+
+  std::sort(targetsToPresent.begin(), targetsToPresent.end());
+
+  Graphics::RenderTarget* rt = nullptr;
+  for(auto& target : targetsToPresent)
   {
-    mUniformBuffer[bufferIndex]->Flush();
+    if(target != rt)
+    {
+      mGraphicsController.PresentRenderTarget(target);
+      rt = target;
+    }
   }
-
-  mGraphicsController.EndFrame();
 
   mCurrentFrameIndex++;
-}
-
-void GraphicsAlgorithms::DiscardUnusedResources( Graphics::Controller& controller )
-{
-  // wait for queues to be idle
-  controller.WaitIdle();
-
-  // Destroy Uniform buffers
-  for( auto& ubo : mUniformBuffer )
-  {
-    ubo.reset( nullptr );
-  }
-
-  // Discard unused resources
-  controller.DiscardUnusedResources();
 }
 
 } // namespace SceneGraph

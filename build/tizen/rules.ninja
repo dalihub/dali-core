@@ -69,7 +69,7 @@ rule CXX_EXECUTABLE_LINKER__linker-test
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = /home2/ds/opt/bin/cmake -S/home2/ds/Git/Vulkan/dali-core/build/tizen -B/home2/ds/Git/Vulkan/dali-core/build/tizen
+  command = /home2/ds/opt/bin/cmake -S/home2/ds/Git/Vulkan/dali-core/build/tizen -B/home/ds/Git/Vulkan/dali-core/build/tizen
   description = Re-running CMake...
   generator = 1
 

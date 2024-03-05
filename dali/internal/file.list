@@ -129,6 +129,7 @@ SET( internal_src_files
   ${internal_src_dir}/update/rendering/scene-graph-geometry.cpp
   ${internal_src_dir}/update/rendering/scene-graph-property-buffer.cpp
   ${internal_src_dir}/update/rendering/scene-graph-sampler.cpp
+  ${internal_src_dir}/update/rendering/scene-graph-scene.cpp
   ${internal_src_dir}/update/rendering/scene-graph-shader.cpp
   ${internal_src_dir}/update/rendering/scene-graph-texture.cpp
   ${internal_src_dir}/update/rendering/scene-graph-texture-set.cpp

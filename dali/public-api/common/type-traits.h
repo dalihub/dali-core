@@ -1,3 +1,5 @@
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-builtins"
 #ifndef __DALI_TYPE_TRAITS_H__
 #define __DALI_TYPE_TRAITS_H__
 
@@ -72,3 +74,5 @@ struct TypeTraits : public BasicTypes< Type >
 } // namespace Dali
 
 #endif /* __DALI_TYPE_TRAITS_H__ */
+
+#pragma clang diagnostic pop

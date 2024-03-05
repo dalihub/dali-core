@@ -1,0 +1,3461 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"INSTALL",
+			"INSTALL_HEADERS_WITH_DIRECTORY"
+		],
+		"files" : 
+		[
+			"CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 269,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 275,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 290,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 3
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 291,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 119
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 292,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 156
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 156
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 156
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 156
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 156
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 156
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 156
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 156
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 156
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 156
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 156
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 156
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 156
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 156
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 156
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 156
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 156
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 156
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 156
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 156
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 156
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 156
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 156
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 156
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 156
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 156
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 156
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 156
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 293,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 185
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 185
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 185
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 185
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 185
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 185
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 185
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 185
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 185
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 185
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 185
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 185
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 185
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 185
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 185
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 185
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 185
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 185
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 185
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 185
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 185
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 185
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 185
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 185
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 185
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 185
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 185
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 185
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 185
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 185
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 285,
+				"parent" : 185
+			}
+		]
+	},
+	"installers" : 
+	[
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/lib",
+			"paths" : 
+			[
+				"libdali2-core.so.2.0.0",
+				"libdali2-core.so.2"
+			],
+			"targetId" : "dali2-core::@6890427a1f51a3e7e1df",
+			"targetIndex" : 0,
+			"targetInstallNamelink" : "skip",
+			"type" : "target"
+		},
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/lib",
+			"paths" : 
+			[
+				"libdali2-core.so"
+			],
+			"targetId" : "dali2-core::@6890427a1f51a3e7e1df",
+			"targetIndex" : 0,
+			"targetInstallNamelink" : "only",
+			"type" : "target"
+		},
+		{
+			"backtrace" : 2,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/lib/pkgconfig",
+			"paths" : 
+			[
+				"dali2-core.pc"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 4,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/dali-core.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 5,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/dali-core-version.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 6,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/actors",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/actors/actor.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 7,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/actors",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/actors/actor-enumerations.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 8,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/actors",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/actors/camera-actor.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 9,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/actors",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/actors/custom-actor.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 10,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/actors",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/actors/custom-actor-impl.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 11,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/actors",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/actors/draw-mode.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 12,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/actors",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/actors/layer.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 13,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/actors",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/actors/sampling.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 14,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/animation",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/animation/alpha-function.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 15,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/animation",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/animation/animation.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 16,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/animation",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/animation/constraint.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 17,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/animation",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/animation/constraints.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 18,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/animation",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/animation/constraint-source.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 19,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/animation",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/animation/key-frames.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 20,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/animation",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/animation/linear-constrainer.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 21,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/animation",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/animation/path.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 22,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/animation",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/animation/time-period.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 23,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/common",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/common/compile-time-assert.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 24,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/common",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/common/constants.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 25,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/common",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/common/dali-common.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 26,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/common",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/common/dali-vector.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 27,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/common",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/common/extents.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 28,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/common",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/common/intrusive-ptr.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 29,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/common",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/common/loading-state.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 30,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/common",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/common/stage.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 31,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/common",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/common/type-traits.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 32,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/common",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/common/vector-wrapper.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 33,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/common",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/common/view-mode.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 34,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/events/device.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 35,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/events/gesture.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 36,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/events/gesture-detector.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 37,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/events/hover-event.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 38,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/events/key-event.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 39,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/events/long-press-gesture.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 40,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/events/long-press-gesture-detector.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 41,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/events/wheel-event.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 42,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/events/pan-gesture.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 43,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/events/pan-gesture-detector.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 44,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/events/pinch-gesture.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 45,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/events/pinch-gesture-detector.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 46,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/events/point-state.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 47,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/events/tap-gesture.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 48,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/events/tap-gesture-detector.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 49,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/events/touch-point.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 50,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/events/touch-event.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 51,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/events/touch-data.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 52,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/events/mouse-button.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 53,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/images",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/images/buffer-image.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 54,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/images",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/images/encoded-buffer-image.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 55,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/images",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/images/frame-buffer-image.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 56,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/images",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/images/image.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 57,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/images",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/images/image-operations.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 58,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/images",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/images/pixel.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 59,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/images",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/images/pixel-data.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 60,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/images",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/images/resource-image.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 61,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/images",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/images/native-image.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 62,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/images",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/images/native-image-interface.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 63,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/math",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/math/angle-axis.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 64,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/math",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/math/compile-time-math.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 65,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/math",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/math/degree.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 66,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/math",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/math/math-utils.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 67,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/math",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/math/matrix.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 68,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/math",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/math/matrix3.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 69,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/math",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/math/quaternion.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 70,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/math",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/math/radian.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 71,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/math",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/math/random.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 72,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/math",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/math/rect.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 73,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/math",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/math/uint-16-pair.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 74,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/math",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/math/vector2.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 75,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/math",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/math/vector3.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 76,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/math",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/math/vector4.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 77,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/math",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/math/viewport.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 78,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/object",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/object/any.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 79,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/object",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/object/base-handle.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 80,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/object",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/object/base-object.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 81,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/object",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/object/handle.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 82,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/object",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/object/object-registry.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 83,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/object",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/object/property-array.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 84,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/object",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/object/property-conditions.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 85,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/object",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/object/property-index-ranges.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 86,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/object",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/object/property-input.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 87,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/object",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/object/property-key.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 88,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/object",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/object/property-map.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 89,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/object",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/object/property-notification-declarations.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 90,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/object",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/object/property-notification.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 91,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/object",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/object/property-types.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 92,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/object",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/object/property-value.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 93,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/object",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/object/property.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 94,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/object",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/object/ref-object.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 95,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/object",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/object/type-info.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 96,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/object",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/object/type-registry.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 97,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/object",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/object/type-registry-helper.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 98,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/object",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/object/weak-handle.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 99,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/render-tasks",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/render-tasks/render-task.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 100,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/render-tasks",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/render-tasks/render-task-list.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 101,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/rendering",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/rendering/frame-buffer.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 102,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/rendering",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/rendering/geometry.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 103,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/rendering",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/rendering/property-buffer.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 104,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/rendering",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/rendering/texture.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 105,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/rendering",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/rendering/texture-set.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 106,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/rendering",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/rendering/renderer.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 107,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/rendering",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/rendering/sampler.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 108,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/rendering",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/rendering/shader.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 109,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/size-negotiation",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/size-negotiation/relayout-container.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 110,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/signals",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/signals/base-signal.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 111,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/signals",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/signals/callback.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 112,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/signals",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/signals/connection-tracker-interface.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 113,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/signals",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/signals/connection-tracker.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 114,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/signals",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/signals/dali-signal.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 115,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/signals",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/signals/functor-delegate.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 116,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/signals",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/signals/signal-slot-connections.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 117,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/signals",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/signals/signal-slot-observers.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 118,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/public-api/signals",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/public-api/signals/slot-delegate.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 120,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/actors",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/actors/actor-devel.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 121,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/actors",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/actors/custom-actor-devel.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 122,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/actors",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/actors/layer-devel.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 123,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/animation",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/animation/animation-data.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 124,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/animation",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/animation/path-constrainer.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 125,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/animation",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/animation/animation-devel.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 126,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/common",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/common/bitwise-enum.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 127,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/common",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/common/circular-queue.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 128,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/common",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/common/hash.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 129,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/common",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/common/map-wrapper.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 130,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/common",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/common/owner-container.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 131,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/common",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/common/ref-counted-dali-vector.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 132,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/common",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/common/set-wrapper.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 133,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/common",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/common/stage-devel.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 134,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/events/hit-test-algorithm.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 135,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/events/touch-data-devel.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 136,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/images",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/images/distance-field.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 137,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/images",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/images/native-image-interface-extension.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 138,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/images",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/images/nine-patch-image.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 139,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/images",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/images/texture-set-image.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 140,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/images",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/images/pixel-data-devel.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 141,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/object",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/object/csharp-type-info.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 142,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/object",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/object/csharp-type-registry.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 143,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/object",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/object/handle-devel.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 144,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/object",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/object/property-helper-devel.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 145,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/rendering",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/rendering/renderer-devel.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 146,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/rendering",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/rendering/shader-devel.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 147,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/signals",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/signals/signal-delegate.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 148,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/scripting",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/scripting/enum-helper.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 149,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/scripting",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/scripting/scripting.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 150,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/threading",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/threading/conditional-wait.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 151,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/threading",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/threading/mutex.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 152,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/threading",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/threading/thread.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 153,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/threading",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/threading/thread-pool.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 154,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/update",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/update/frame-callback-interface.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 155,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/devel-api/update",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/devel-api/update/update-proxy.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 157,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/graphics-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/graphics-api/graphics-buffer-create-info.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 158,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/graphics-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/graphics-api/graphics-buffer.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 159,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/graphics-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/graphics-api/graphics-command-buffer-create-info.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 160,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/graphics-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/graphics-api/graphics-command-buffer.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 161,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/graphics-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/graphics-api/graphics-controller.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 162,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/graphics-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/graphics-api/graphics-debug.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 163,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/graphics-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/graphics-api/graphics-framebuffer-create-info.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 164,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/graphics-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/graphics-api/graphics-framebuffer.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 165,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/graphics-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/graphics-api/graphics-memory.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 166,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/graphics-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/graphics-api/graphics-pipeline-create-info.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 167,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/graphics-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/graphics-api/graphics-pipeline.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 168,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/graphics-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/graphics-api/graphics-program-create-info.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 169,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/graphics-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/graphics-api/graphics-program.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 170,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/graphics-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/graphics-api/graphics-reflection.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 171,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/graphics-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/graphics-api/graphics-render-pass-create-info.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 172,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/graphics-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/graphics-api/graphics-render-pass.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 173,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/graphics-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/graphics-api/graphics-render-target-create-info.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 174,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/graphics-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/graphics-api/graphics-render-target.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 175,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/graphics-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/graphics-api/graphics-sampler-create-info.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 176,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/graphics-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/graphics-api/graphics-sampler.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 177,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/graphics-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/graphics-api/graphics-shader-create-info.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 178,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/graphics-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/graphics-api/graphics-shader.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 179,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/graphics-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/graphics-api/graphics-sync-object-create-info.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 180,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/graphics-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/graphics-api/graphics-sync-object.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 181,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/graphics-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/graphics-api/graphics-texture-create-info.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 182,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/graphics-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/graphics-api/graphics-texture.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 183,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/graphics-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/graphics-api/graphics-texture-upload-helper.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 184,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/graphics-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/graphics-api/graphics-types.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 186,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/integration-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/integration-api/core.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 187,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/integration-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/integration-api/core-enumerations.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 188,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/integration-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/integration-api/debug.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 189,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/integration-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/integration-api/trace.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 190,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/integration-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/integration-api/profiling.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 191,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/integration-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/integration-api/input-options.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 192,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/integration-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/integration-api/bitmap.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 193,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/integration-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/integration-api/resource-policies.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 194,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/integration-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/integration-api/resource-types.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 195,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/integration-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/integration-api/gesture-manager.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 196,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/integration-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/integration-api/render-controller.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 197,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/integration-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/integration-api/platform-abstraction.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 198,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/integration-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/integration-api/processor-interface.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 199,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/integration-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/integration-api/lockless-buffer.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 200,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/integration-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/integration-api/render-task-list-integ.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 201,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/integration-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/integration-api/scene.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 202,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/integration-api",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/integration-api/render-surface.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 203,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/integration-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/integration-api/events/event.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 204,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/integration-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/integration-api/events/gesture-event.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 205,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/integration-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/integration-api/events/gesture-requests.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 206,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/integration-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/integration-api/events/hover-event-integ.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 207,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/integration-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/integration-api/events/key-event-integ.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 208,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/integration-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/integration-api/events/long-press-gesture-event.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 209,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/integration-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/integration-api/events/wheel-event-integ.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 210,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/integration-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/integration-api/events/multi-point-event-integ.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 211,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/integration-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/integration-api/events/pan-gesture-event.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 212,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/integration-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/integration-api/events/pinch-gesture-event.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 213,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/integration-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/integration-api/events/point.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 214,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/integration-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/integration-api/events/tap-gesture-event.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 215,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/integration-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/integration-api/events/touch-event-combiner.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 216,
+			"component" : "Unspecified",
+			"destination" : "/usr/local/include/dali/integration-api/events",
+			"paths" : 
+			[
+				"/home/ds/Git/Vulkan/dali-core/dali/integration-api/events/touch-event-integ.h"
+			],
+			"type" : "file"
+		}
+	],
+	"paths" : 
+	{
+		"build" : ".",
+		"source" : "."
+	}
+}
