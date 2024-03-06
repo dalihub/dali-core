@@ -3308,7 +3308,7 @@ int UtcDaliAnimationStopEmitFinishedSignalImmediateP(void)
     application.SendNotification();
     application.Render(0);
 
-    // expect finished signal recieved due to Stop API.
+    // expect finished signal not recieved.
     application.SendNotification();
     finishCheck.CheckSignalNotReceived();
     finishCheck.Reset();
@@ -3327,7 +3327,7 @@ int UtcDaliAnimationStopEmitFinishedSignalImmediateP(void)
     application.SendNotification();
     application.Render(0);
 
-    // expect finished signal recieved due to Stop API.
+    // expect finished signal not recieved.
     application.SendNotification();
     finishCheck.CheckSignalNotReceived();
     finishCheck.Reset();
@@ -3403,6 +3403,90 @@ int UtcDaliAnimationClearP(void)
   finishCheck.CheckSignalReceived();
   DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), Vector3::ZERO /*Check move-animator was destroyed*/, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::SCALE), targetScale, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliAnimationClearIgnoreFinishedSignal(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  // Build the animation
+  float     durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  Vector3   targetPosition(100.0f, 100.0f, 100.0f);
+  animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
+
+  Vector3 fiftyPercentProgress(targetPosition * 0.5f);
+
+  // Start the animation
+  animation.Play();
+
+  bool                 signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  // Check finished signal not emmited if animation was cleared.
+  {
+    tet_printf("Check whether stop and clear case didnt send finished signal\n");
+    // Play the animation, and stop after animation finished naturally, and clear.
+    animation.Play();
+
+    application.SendNotification();
+
+    animation.Stop();
+    animation.Clear();
+
+    application.SendNotification();
+    finishCheck.CheckSignalNotReceived();
+    finishCheck.Reset();
+
+    // Finish animation naturally. (Note that dali don't call finished callback even if one render frame spend more than duration.)
+    application.Render(static_cast<uint32_t>(durationSeconds * 500.0f));
+    application.Render(static_cast<uint32_t>(durationSeconds * 500.0f) + 10u);
+    application.SendNotification();
+
+    // expect finished signal not recieved.
+    finishCheck.CheckSignalNotReceived();
+    finishCheck.Reset();
+
+    application.SendNotification();
+    application.Render(0);
+  }
+  {
+    tet_printf("Check whether stop and clear and render-well case send finished signal\n");
+    // Play the animation, and stop after animation finished naturally, and clear, and play again.
+    animation.PlayAfter(durationSeconds);
+
+    application.SendNotification();
+
+    // delay 50%.
+    application.Render(static_cast<uint32_t>(durationSeconds * 500.0f));
+
+    animation.Stop();
+    animation.Clear();
+    animation.Play();
+
+    application.SendNotification();
+    finishCheck.CheckSignalNotReceived();
+    finishCheck.Reset();
+
+    // Finish animation naturally. (Note that dali don't call finished callback even if one render frame spend more than duration.)
+    application.Render(static_cast<uint32_t>(durationSeconds * 500.0f));
+    application.Render(static_cast<uint32_t>(durationSeconds * 500.0f) + 10u);
+    application.SendNotification();
+
+    // expect finished signal recieved due to Animation finished.
+    application.SendNotification();
+    finishCheck.CheckSignalReceived();
+    finishCheck.Reset();
+
+    application.SendNotification();
+    application.Render(0);
+  }
+
   END_TEST;
 }
 
