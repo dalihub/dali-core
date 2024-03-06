@@ -581,9 +581,6 @@ void UpdateManager::StopAnimation(Animation* animation)
 
   bool animationFinished = animation->Stop(mSceneGraphBuffers.GetUpdateBufferIndex());
 
-  // Queue this animation into notify required animations. Since we need to send Finished signal
-  mImpl->notifyRequiredAnimations.PushBack(animation->GetNotifyId());
-
   mImpl->animationFinishedDuringUpdate = mImpl->animationFinishedDuringUpdate || animationFinished;
 }
 
@@ -591,11 +588,7 @@ void UpdateManager::ClearAnimation(Animation* animation)
 {
   DALI_ASSERT_DEBUG(animation && "NULL animation called to clear");
 
-  animation->Clear(mSceneGraphBuffers.GetUpdateBufferIndex());
-
-  // We should remove all notify lists what we requests before clear.
-  // TODO : Could we do this more faster?
-  Dali::EraseIf(mImpl->notifyRequiredAnimations, [&animation](const NotifierInterface::NotifyId& key) { return key == animation->GetNotifyId(); });
+  animation->ClearAnimator(mSceneGraphBuffers.GetUpdateBufferIndex());
 }
 
 void UpdateManager::RemoveAnimation(Animation* animation)
@@ -860,7 +853,6 @@ bool UpdateManager::ProcessGestures(BufferIndex bufferIndex, uint32_t lastVSyncT
 bool UpdateManager::Animate(BufferIndex bufferIndex, float elapsedSeconds)
 {
   bool animationActive = false;
-  bool animationLooped = false;
 
   auto&& iter = mImpl->animations.Begin();
 
@@ -868,9 +860,9 @@ bool UpdateManager::Animate(BufferIndex bufferIndex, float elapsedSeconds)
   {
     Animation* animation             = *iter;
     bool       finished              = false;
-    bool       looped                = false;
+    bool       stopped               = false;
     bool       progressMarkerReached = false;
-    animation->Update(bufferIndex, elapsedSeconds, looped, finished, progressMarkerReached);
+    animation->Update(bufferIndex, elapsedSeconds, stopped, finished, progressMarkerReached);
 
     animationActive = animationActive || animation->IsActive();
 
@@ -880,10 +872,9 @@ bool UpdateManager::Animate(BufferIndex bufferIndex, float elapsedSeconds)
     }
 
     mImpl->animationFinishedDuringUpdate = mImpl->animationFinishedDuringUpdate || finished;
-    animationLooped                      = animationLooped || looped;
 
-    // queue the notification on finished or stoped
-    if(finished)
+    // queue the notification on finished or stopped
+    if(finished || stopped)
     {
       mImpl->notifyRequiredAnimations.PushBack(animation->GetNotifyId());
     }
