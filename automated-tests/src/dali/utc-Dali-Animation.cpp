@@ -3406,7 +3406,7 @@ int UtcDaliAnimationClearP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationEmptyAnimator(void)
+int UtcDaliAnimationEmptyAnimatorAndLoopCount(void)
 {
   // Clear and play the empty animation, and get the state values.
   TestApplication application;
@@ -3432,14 +3432,12 @@ int UtcDaliAnimationEmptyAnimator(void)
     DALI_TEST_EQUALS(animation.GetCurrentLoop(), 0, TEST_LOCATION);
     application.SendNotification();
     application.Render(1500 /* 150% of loop. */);
-    application.SendNotification(); // Notification trigger.
 
     DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::PLAYING, TEST_LOCATION);
     DALI_TEST_EQUALS(animation.GetCurrentLoop(), 1, TEST_LOCATION);
 
     application.SendNotification();
     application.Render(1400 /* 290% of loop. */);
-    application.SendNotification(); // Notification trigger.
 
     DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::PLAYING, TEST_LOCATION);
     DALI_TEST_EQUALS(animation.GetCurrentLoop(), 2, TEST_LOCATION);
@@ -3451,49 +3449,105 @@ int UtcDaliAnimationEmptyAnimator(void)
     DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::STOPPED, TEST_LOCATION);
     DALI_TEST_EQUALS(animation.GetCurrentLoop(), 3, TEST_LOCATION);
 
-    // Check wether empty animation also call finished signal.
+    tet_printf("Check wether empty animation also call finished signal.\n");
     finishCheck.CheckSignalReceived();
     finishCheck.Reset();
 
     animation.Play();
 
     DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::PLAYING, TEST_LOCATION);
-    //DALI_TEST_EQUALS(animation.GetCurrentLoop(), 0, TEST_LOCATION); ///< TODO : We'd better change the policy of GetCurrentLoop result
     application.SendNotification();
+    application.Render(0 /* 0% of loop. */);
+
+    // LoopCount beome 0 again.
+    DALI_TEST_EQUALS(animation.GetCurrentLoop(), 0, TEST_LOCATION);
+
     application.Render(1500 /* 150% of loop. */);
-    application.SendNotification(); // Notification trigger.
 
     DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::PLAYING, TEST_LOCATION);
     DALI_TEST_EQUALS(animation.GetCurrentLoop(), 1, TEST_LOCATION);
 
+    animation.Pause();
+
+    application.SendNotification();
+    application.Render(2500 /* 150% of loop. (Since it is paused) */);
+
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::PAUSED, TEST_LOCATION);
+    DALI_TEST_EQUALS(animation.GetCurrentLoop(), 1, TEST_LOCATION);
+
+    animation.Play();
+
+    application.SendNotification();
+    application.Render(1000 /* 250% of loop. */);
+
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::PLAYING, TEST_LOCATION);
+    DALI_TEST_EQUALS(animation.GetCurrentLoop(), 2, TEST_LOCATION);
+
     animation.Clear();
 
     DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::STOPPED, TEST_LOCATION);
-    DALI_TEST_EQUALS(animation.GetCurrentLoop(), 0, TEST_LOCATION);
 
     application.SendNotification();
-    application.Render(1000);
-    application.Render(1000);
+    application.Render(500 + 100 /* 300% of loop + 10% over the loop. */);
+    application.SendNotification(); // Notification trigger.
+
+    DALI_TEST_EQUALS(animation.GetCurrentLoop(), 0, TEST_LOCATION);
+
+    tet_printf("Check animation completed signal not recieved even if animation finished normally at this loop.\n");
+    finishCheck.CheckSignalNotReceived();
+
+    application.SendNotification();
+    application.Render(1100);
+    application.Render(1100);
     application.Render(1100 /* Over the loop count */);
     application.SendNotification(); // Notification trigger.
 
-    // Check animation completed signal not recieved even of
+    tet_printf("Check animation completed signal not recieved even if animation finished normally.\n");
     finishCheck.CheckSignalNotReceived();
 
-    // Call clear again already cleared cases.
+    animation.Play();
+
+    application.SendNotification();
+    application.Render(1500 /* 150% of loop. */);
+
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::PLAYING, TEST_LOCATION);
+    DALI_TEST_EQUALS(animation.GetCurrentLoop(), 1, TEST_LOCATION);
+
+    animation.Stop();
     animation.Clear();
 
     DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::STOPPED, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+    application.SendNotification(); // Notification trigger.
+
+    DALI_TEST_EQUALS(animation.GetCurrentLoop(), 0, TEST_LOCATION);
+
+    tet_printf("Check animation completed signal not recieved even if we call Stop forcibly.\n");
+    finishCheck.CheckSignalNotReceived();
+
+    animation.Clear();
+
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::STOPPED, TEST_LOCATION);
+
+    animation.Play();
+
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::PLAYING, TEST_LOCATION);
     DALI_TEST_EQUALS(animation.GetCurrentLoop(), 0, TEST_LOCATION);
 
     application.SendNotification();
-    application.Render(1000);
-    application.Render(1000);
+    application.Render(1100);
+    application.Render(1100);
     application.Render(1100 /* Over the loop count */);
     application.SendNotification(); // Notification trigger.
 
-    // Check animation completed signal not recieved even of
-    finishCheck.CheckSignalNotReceived();
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::STOPPED, TEST_LOCATION);
+    DALI_TEST_EQUALS(animation.GetCurrentLoop(), 3, TEST_LOCATION);
+
+    tet_printf("Check animation completed signal recieved. (Since clear didn't disconnect complete signal)\n");
+    finishCheck.CheckSignalReceived();
+    finishCheck.Reset();
   }
   catch(...)
   {
@@ -14155,6 +14209,33 @@ void CheckPropertyValuesWhenCallingAnimationMethod(TestFunction functionToTest, 
 
     DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::POSITION).Get<Vector3>(), expectedValueTable[i].expectedGetPropertyValue, VECTOR3_EPSILON, TEST_LOCATION);
     DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::POSITION).Get<Vector3>(), expectedValueTable[i].expectedGetPropertyValue, VECTOR3_EPSILON, TEST_LOCATION);
+
+    // If we call Clear before, The animation didn't give any effort to actor now. Let we check it
+    if(functionToTest == TestFunction::CLEAR)
+    {
+      actor.SetProperty(Actor::Property::POSITION, originalPosition);
+
+      DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::POSITION).Get<Vector3>(), originalPosition, VECTOR3_EPSILON, TEST_LOCATION);
+      DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::POSITION).Get<Vector3>(), expectedValueTable[i].expectedGetPropertyValue, VECTOR3_EPSILON, TEST_LOCATION);
+
+      application.SendNotification();
+      application.Render();
+
+      DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::POSITION).Get<Vector3>(), originalPosition, VECTOR3_EPSILON, TEST_LOCATION);
+      DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::POSITION).Get<Vector3>(), originalPosition, VECTOR3_EPSILON, TEST_LOCATION);
+
+      // Start the animation, which we already clear.
+      animation.Play();
+
+      DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::POSITION).Get<Vector3>(), originalPosition, VECTOR3_EPSILON, TEST_LOCATION);
+      DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::POSITION).Get<Vector3>(), originalPosition, VECTOR3_EPSILON, TEST_LOCATION);
+
+      application.SendNotification();
+      application.Render(halfAnimationDuration);
+
+      DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::POSITION).Get<Vector3>(), originalPosition, VECTOR3_EPSILON, TEST_LOCATION);
+      DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::POSITION).Get<Vector3>(), originalPosition, VECTOR3_EPSILON, TEST_LOCATION);
+    }
   }
 }
 } // unnamed namespace

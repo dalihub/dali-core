@@ -264,7 +264,13 @@ int32_t Animation::GetLoopCount()
 
 int32_t Animation::GetCurrentLoop()
 {
-  return mCurrentLoop;
+  int32_t loopCount = 0;
+  if(mAnimation) // always exists in practice
+  {
+    loopCount = mAnimation->GetCurrentLoop();
+  }
+
+  return loopCount;
 }
 
 bool Animation::IsLooping() const
@@ -304,6 +310,8 @@ Dali::Animation::EndAction Animation::GetDisconnectAction() const
 
 void Animation::Play()
 {
+  mPlayCalled = true;
+
   // Update the current playlist
   mPlaylist.OnPlay(*this);
 
@@ -321,6 +329,8 @@ void Animation::PlayFrom(float progress)
 {
   if(progress >= mPlayRange.x && progress <= mPlayRange.y)
   {
+    mPlayCalled = true;
+
     // Update the current playlist
     mPlaylist.OnPlay(*this);
 
@@ -337,6 +347,8 @@ void Animation::PlayFrom(float progress)
 
 void Animation::PlayAfter(float delaySeconds)
 {
+  mPlayCalled = true;
+
   // The negative delay means play immediately.
   delaySeconds = std::max(0.f, delaySeconds);
 
@@ -357,13 +369,16 @@ void Animation::PlayAfter(float delaySeconds)
 
 void Animation::Pause()
 {
-  mState = Dali::Animation::PAUSED;
+  if(mState != Dali::Animation::PAUSED)
+  {
+    mState = Dali::Animation::PAUSED;
 
-  // mAnimation is being used in a separate thread; queue a Pause message
-  PauseAnimationMessage(mEventThreadServices, *mAnimation);
+    // mAnimation is being used in a separate thread; queue a Pause message
+    PauseAnimationMessage(mEventThreadServices, *mAnimation);
 
-  // Notify the objects with the _paused_, i.e. current values
-  NotifyObjects(Notify::FORCE_CURRENT_VALUE);
+    // Notify the objects with the _paused_, i.e. current values
+    NotifyObjects(Notify::FORCE_CURRENT_VALUE);
+  }
 }
 
 Dali::Animation::State Animation::GetState() const
@@ -373,15 +388,18 @@ Dali::Animation::State Animation::GetState() const
 
 void Animation::Stop()
 {
-  mState = Dali::Animation::STOPPED;
-
-  // mAnimation is being used in a separate thread; queue a Stop message
-  StopAnimationMessage(mEventThreadServices.GetUpdateManager(), *mAnimation);
-
-  // Only notify the objects with the _stopped_, i.e. current values if the end action is set to BAKE
-  if(mEndAction == EndAction::BAKE)
+  if(mState != Dali::Animation::STOPPED)
   {
-    NotifyObjects(Notify::USE_CURRENT_VALUE);
+    mState = Dali::Animation::STOPPED;
+
+    // mAnimation is being used in a separate thread; queue a Stop message
+    StopAnimationMessage(mEventThreadServices.GetUpdateManager(), *mAnimation);
+
+    // Only notify the objects with the _stopped_, i.e. current values if the end action is set to BAKE
+    if(mEndAction == EndAction::BAKE)
+    {
+      NotifyObjects(Notify::USE_CURRENT_VALUE);
+    }
   }
 }
 
@@ -389,8 +407,7 @@ void Animation::Clear()
 {
   DALI_ASSERT_DEBUG(mAnimation);
 
-  // Recreate scene-object only if animation play now, or connector connected at least 1 times.
-  if(mConnectors.Count() == 0u && mState == Dali::Animation::STOPPED)
+  if(mConnectors.Empty() && mState == Dali::Animation::STOPPED && !mPlayCalled)
   {
     // Animation is empty. Fast-out
     return;
@@ -409,14 +426,13 @@ void Animation::Clear()
   mConnectorTargetValues.clear();
   mConnectorTargetValuesSortRequired = false;
 
-  // Replace the old scene-object with a new one
-  DestroySceneObject();
-  CreateSceneObject();
+  // mAnimation is being used in a separate thread; queue a Clear message
+  ClearAnimationMessage(mEventThreadServices.GetUpdateManager(), *mAnimation);
 
   // Reset the notification count and relative values, since the new scene-object has never been played
   mNotificationCount = 0;
-  mCurrentLoop       = 0;
   mState             = Dali::Animation::STOPPED;
+  mPlayCalled        = false;
 
   // Update the current playlist
   mPlaylist.OnClear(*this);
@@ -814,9 +830,6 @@ bool Animation::HasFinished()
 {
   bool          hasFinished(false);
   const int32_t playedCount(mAnimation->GetPlayedCount());
-
-  // If the play count has been incremented, then another notification is required
-  mCurrentLoop = mAnimation->GetCurrentLoop();
 
   if(playedCount > mNotificationCount)
   {

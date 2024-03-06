@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_ANIMATION_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -230,6 +230,12 @@ public:
    * @return True if the animation has finished (otherwise it wasn't playing)
    */
   bool Stop(BufferIndex bufferIndex);
+
+  /**
+   * Clear the animation. It will clear all animator, and make this animation never played before.
+   * @param[in] bufferIndex The buffer to update when mEndAction == Bake.
+   */
+  void Clear(BufferIndex bufferIndex);
 
   /**
    * Called shortly before the animation is destroyed.

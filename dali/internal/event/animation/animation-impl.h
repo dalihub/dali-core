@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ANIMATION_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -569,7 +569,6 @@ private:
   float                  mSpeedFactor{1.0f};
   int32_t                mNotificationCount{0}; ///< Keep track of how many Finished signals have been emitted.
   int32_t                mLoopCount{1};
-  int32_t                mCurrentLoop{0};
   float                  mProgressReachedMarker{0.0f};
   float                  mDelaySeconds{0.0f};
   EndAction              mEndAction;
@@ -577,6 +576,7 @@ private:
   Dali::Animation::State mState{Dali::Animation::STOPPED};
   bool                   mAutoReverseEnabled{false};                ///< Flag to identify that the looping mode is auto reverse.
   bool                   mConnectorTargetValuesSortRequired{false}; ///< Flag to whether we need to sort mConnectorTargetValues or not
+  bool                   mPlayCalled{false};                        ///< Flag to whether we call Play at least 1 time after create, or clear.
 };
 
 } // namespace Internal

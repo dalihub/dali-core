@@ -144,13 +144,15 @@ public:
     const Vector3&    positionToSet,
     const Vector4&    colorToSet,
     const Vector3&    scaleToSet,
-    const Quaternion& orientationToSet)
+    const Quaternion& orientationToSet,
+    const Vector4&    updateAreaToSet)
   : mActorId(actorId),
     mSizeToSet(sizeToSet),
     mPositionToSet(positionToSet),
     mColorToSet(colorToSet),
     mScaleToSet(scaleToSet),
-    mOrientationToSet(orientationToSet)
+    mOrientationToSet(orientationToSet),
+    mUpdateArea(updateAreaToSet)
   {
   }
 
@@ -163,11 +165,13 @@ public:
     updateProxy.SetOrientation(mActorId, mOrientationToSet);
     updateProxy.SetColor(mActorId, mColorToSet);
     updateProxy.SetScale(mActorId, mScaleToSet);
+    updateProxy.SetUpdateArea(mActorId, mUpdateArea);
     updateProxy.GetSize(mActorId, mSizeAfterSetting);
     updateProxy.GetPosition(mActorId, mPositionAfterSetting);
     updateProxy.GetColor(mActorId, mColorAfterSetting);
     updateProxy.GetScale(mActorId, mScaleAfterSetting);
     updateProxy.GetOrientation(mActorId, mOrientationAfterSetting);
+    updateProxy.GetUpdateArea(mActorId, mUpdateAreaAfterSetting);
 
     return false;
   }
@@ -178,12 +182,14 @@ public:
   const Vector4&     mColorToSet;
   const Vector3&     mScaleToSet;
   const Quaternion&  mOrientationToSet;
+  const Vector4&     mUpdateArea;
 
   Vector3    mSizeAfterSetting;
   Vector3    mPositionAfterSetting;
   Vector4    mColorAfterSetting;
   Vector3    mScaleAfterSetting;
   Quaternion mOrientationAfterSetting;
+  Vector4    mUpdateAreaAfterSetting;
 };
 
 class FrameCallbackBaker : public FrameCallbackBasic
@@ -295,10 +301,12 @@ public:
     mBakeColorCallSuccess                    = updateProxy.BakeColor(mActorId, vec4);
     mBakeScaleCallSuccess                    = updateProxy.BakeScale(mActorId, vec3);
 
-    mGetOrientationCallSuccess    = updateProxy.GetOrientation(mActorId, quat);
-    mSetOrientationCallSuccess    = updateProxy.SetOrientation(mActorId, quat);
-    mBakeOrientationCallSuccess   = updateProxy.BakeOrientation(mActorId, quat);
-    mGetWorldTransformCallSuccess = updateProxy.GetWorldTransformAndSize(mActorId, vec3, vec3, quat, vec3);
+    mGetOrientationCallSuccess               = updateProxy.GetOrientation(mActorId, quat);
+    mSetOrientationCallSuccess               = updateProxy.SetOrientation(mActorId, quat);
+    mBakeOrientationCallSuccess              = updateProxy.BakeOrientation(mActorId, quat);
+    mGetWorldTransformCallSuccess            = updateProxy.GetWorldTransformAndSize(mActorId, vec3, vec3, quat, vec3);
+    mGetUpdateAreaCallSuccess                = updateProxy.GetUpdateArea(mActorId, vec4);
+    mSetUpdateAreaCallSuccess                = updateProxy.SetUpdateArea(mActorId, vec4);
 
     return false;
   }
@@ -323,11 +331,13 @@ public:
     mBakeColorCallSuccess                    = false;
     mBakeScaleCallSuccess                    = false;
 
-    mSetOrientationCallSuccess  = false;
-    mGetOrientationCallSuccess  = false;
-    mBakeOrientationCallSuccess = false;
+    mSetOrientationCallSuccess               = false;
+    mGetOrientationCallSuccess               = false;
+    mBakeOrientationCallSuccess              = false;
 
-    mGetWorldTransformCallSuccess = false;
+    mGetWorldTransformCallSuccess            = false;
+    mGetUpdateAreaCallSuccess                = false;
+    mSetUpdateAreaCallSuccess                = false;
   }
 
   const uint32_t mActorId;
@@ -350,6 +360,8 @@ public:
   bool mBakeScaleCallSuccess{false};
   bool mBakeOrientationCallSuccess{false};
   bool mGetWorldTransformCallSuccess{false};
+  bool mGetUpdateAreaCallSuccess{false};
+  bool mSetUpdateAreaCallSuccess{false};
 };
 
 } // namespace
@@ -468,8 +480,9 @@ int UtcDaliFrameCallbackSetters(void)
   Vector4    colorToSet(Color::MAGENTA);
   Vector3    scaleToSet(1.0f, 3.0f, 5.0f);
   Quaternion orientationToSet(Radian(Math::PI_2), Vector3::ZAXIS);
+  Vector4    updateAreaToSet(10.0f, 10.0f, 200.0f, 100.0f);
 
-  FrameCallbackSetter frameCallback(actor.GetProperty<int>(Actor::Property::ID), sizeToSet, positionToSet, colorToSet, scaleToSet, orientationToSet);
+  FrameCallbackSetter frameCallback(actor.GetProperty<int>(Actor::Property::ID), sizeToSet, positionToSet, colorToSet, scaleToSet, orientationToSet, updateAreaToSet);
   DevelStage::AddFrameCallback(stage, frameCallback, stage.GetRootLayer());
 
   application.SendNotification();
@@ -481,6 +494,7 @@ int UtcDaliFrameCallbackSetters(void)
   DALI_TEST_EQUALS(frameCallback.mColorAfterSetting, colorToSet, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mScaleAfterSetting, scaleToSet, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mOrientationAfterSetting, orientationToSet, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mUpdateAreaAfterSetting, updateAreaToSet, TEST_LOCATION);
 
   // Ensure the actual actor values haven't changed as we didn't bake the values after removing the callback
   DevelStage::RemoveFrameCallback(stage, frameCallback);
@@ -789,6 +803,8 @@ int UtcDaliFrameCallbackInvalidActorId(void)
   DALI_TEST_EQUALS(frameCallback.mBakeOrientationCallSuccess, false, TEST_LOCATION);
 
   DALI_TEST_EQUALS(frameCallback.mGetWorldTransformCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetUpdateAreaCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetUpdateAreaCallSuccess, false, TEST_LOCATION);
 
   END_TEST;
 }
@@ -831,6 +847,8 @@ int UtcDaliFrameCallbackActorRemovedAndAdded(void)
   DALI_TEST_EQUALS(frameCallback.mSetOrientationCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeOrientationCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mGetWorldTransformCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetUpdateAreaCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetUpdateAreaCallSuccess, true, TEST_LOCATION);
 
   frameCallback.Reset();
 
@@ -860,6 +878,8 @@ int UtcDaliFrameCallbackActorRemovedAndAdded(void)
   DALI_TEST_EQUALS(frameCallback.mSetOrientationCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeOrientationCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mGetWorldTransformCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetUpdateAreaCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetUpdateAreaCallSuccess, false, TEST_LOCATION);
 
   frameCallback.Reset();
 
@@ -889,6 +909,8 @@ int UtcDaliFrameCallbackActorRemovedAndAdded(void)
   DALI_TEST_EQUALS(frameCallback.mSetOrientationCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeOrientationCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mGetWorldTransformCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetUpdateAreaCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetUpdateAreaCallSuccess, true, TEST_LOCATION);
 
   END_TEST;
 }
@@ -1215,6 +1237,8 @@ int UtcDaliFrameCallbackWithoutRootActor(void)
   DALI_TEST_EQUALS(frameCallback.mSetOrientationCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeOrientationCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mGetWorldTransformCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetUpdateAreaCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetUpdateAreaCallSuccess, true, TEST_LOCATION);
 
   frameCallback.Reset();
 
@@ -1244,6 +1268,8 @@ int UtcDaliFrameCallbackWithoutRootActor(void)
   DALI_TEST_EQUALS(frameCallback.mSetOrientationCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeOrientationCallSuccess, true, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mGetWorldTransformCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetUpdateAreaCallSuccess, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetUpdateAreaCallSuccess, true, TEST_LOCATION);
 
   // Remove callback. frameCallback should not be called.
 
@@ -1272,6 +1298,8 @@ int UtcDaliFrameCallbackWithoutRootActor(void)
   DALI_TEST_EQUALS(frameCallback.mSetOrientationCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeOrientationCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mGetWorldTransformCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetUpdateAreaCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetUpdateAreaCallSuccess, false, TEST_LOCATION);
 
   frameCallback.Reset();
 
@@ -1301,6 +1329,8 @@ int UtcDaliFrameCallbackWithoutRootActor(void)
   DALI_TEST_EQUALS(frameCallback.mSetOrientationCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mBakeOrientationCallSuccess, false, TEST_LOCATION);
   DALI_TEST_EQUALS(frameCallback.mGetWorldTransformCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mGetUpdateAreaCallSuccess, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameCallback.mSetUpdateAreaCallSuccess, false, TEST_LOCATION);
 
   END_TEST;
 }

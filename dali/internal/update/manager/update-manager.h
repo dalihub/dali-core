@@ -235,6 +235,12 @@ public:
   void StopAnimation(Animation* animation);
 
   /**
+   * Clear an animation.
+   * @param[in] animation The animation to clear.
+   */
+  void ClearAnimation(Animation* animation);
+
+  /**
    * Remove an animation.
    * @param[in] animation The animation to remove.
    */
@@ -976,6 +982,20 @@ inline void StopAnimationMessage(UpdateManager& manager, const Animation& constA
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&manager, &UpdateManager::StopAnimation, &animation);
+}
+
+inline void ClearAnimationMessage(UpdateManager& manager, const Animation& constAnimation)
+{
+  // The scene-graph thread owns this object so it can safely edit it.
+  Animation& animation = const_cast<Animation&>(constAnimation);
+
+  using LocalType = MessageValue1<UpdateManager, Animation*>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new(slot) LocalType(&manager, &UpdateManager::ClearAnimation, &animation);
 }
 
 inline void RemoveAnimationMessage(UpdateManager& manager, const Animation& constAnimation)
