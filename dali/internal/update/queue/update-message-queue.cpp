@@ -220,7 +220,6 @@ bool MessageQueue::FlushQueue()
     MessageQueueMutex::ScopedLock lock(mImpl->queueMutex);
 
     mImpl->processQueue.push_back(mImpl->currentMessageBuffer);
-    mImpl->currentMessageBuffer = nullptr;
 
     // Grab any recycled MessageBuffers
     while(!mImpl->recycleQueue.empty())
@@ -252,6 +251,7 @@ bool MessageQueue::FlushQueue()
       DALI_LOG_DEBUG_INFO("END: DALI_MESSAGE_QUEUE_FLUSH [%zu]\n", mImpl->currentMessageBuffer->GetCapacity());
     }
 #endif
+    mImpl->currentMessageBuffer = nullptr;
   }
 
   return messagesToProcess;
